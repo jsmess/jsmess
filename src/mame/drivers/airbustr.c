@@ -225,9 +225,8 @@ Code at 505: waits for bit 1 to go low, writes command, waits for bit
 #include "includes/airbustr.h"
 
 /* Read/Write Handlers */
-static READ8_HANDLER( devram_r )
+READ8_MEMBER(airbustr_state::devram_r)
 {
-	airbustr_state *state = space->machine().driver_data<airbustr_state>();
 
 	// There's an MCU here, possibly
 	switch (offset)
@@ -243,7 +242,7 @@ static READ8_HANDLER( devram_r )
 		case 0xff2:
 		case 0xff3:
 		{
-			int	x = (state->m_devram[0xff0] + state->m_devram[0xff1] * 256) * (state->m_devram[0xff2] + state->m_devram[0xff3] * 256);
+			int	x = (m_devram[0xff0] + m_devram[0xff1] * 256) * (m_devram[0xff2] + m_devram[0xff3] * 256);
 			if (offset == 0xff2)
 				return (x & 0x00ff) >> 0;
 			else
@@ -253,132 +252,124 @@ static READ8_HANDLER( devram_r )
 		/* Reading eff4, F0 times must yield at most 80-1 consecutive
            equal values */
 		case 0xff4:
-			return space->machine().rand();
+			return machine().rand();
 
 		default:
-			return state->m_devram[offset];
+			return m_devram[offset];
 	}
 }
 
-static WRITE8_HANDLER( master_nmi_trigger_w )
+WRITE8_MEMBER(airbustr_state::master_nmi_trigger_w)
 {
-	airbustr_state *state = space->machine().driver_data<airbustr_state>();
-	device_set_input_line(state->m_slave, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(m_slave, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE8_HANDLER( master_bankswitch_w )
+WRITE8_MEMBER(airbustr_state::master_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 }
 
-static WRITE8_HANDLER( slave_bankswitch_w )
+WRITE8_MEMBER(airbustr_state::slave_bankswitch_w)
 {
-	airbustr_state *state = space->machine().driver_data<airbustr_state>();
 
-	memory_set_bank(space->machine(), "bank2", data & 0x07);
+	membank("bank2")->set_entry(data & 0x07);
 
-	flip_screen_set(space->machine(), data & 0x10);
+	flip_screen_set(data & 0x10);
 
 	// used at the end of levels, after defeating the boss, to leave trails
-	pandora_set_clear_bitmap(state->m_pandora, data & 0x20);
+	pandora_set_clear_bitmap(m_pandora, data & 0x20);
 }
 
-static WRITE8_HANDLER( sound_bankswitch_w )
+WRITE8_MEMBER(airbustr_state::sound_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank3", data & 0x07);
+	membank("bank3")->set_entry(data & 0x07);
 }
 
-static READ8_HANDLER( soundcommand_status_r )
+READ8_MEMBER(airbustr_state::soundcommand_status_r)
 {
-	airbustr_state *state = space->machine().driver_data<airbustr_state>();
 
 	// bits: 2 <-> ?    1 <-> soundlatch full   0 <-> soundlatch2 empty
-	return 4 + state->m_soundlatch_status * 2 + (1 - state->m_soundlatch2_status);
+	return 4 + m_soundlatch_status * 2 + (1 - m_soundlatch2_status);
 }
 
-static READ8_HANDLER( soundcommand_r )
+READ8_MEMBER(airbustr_state::soundcommand_r)
 {
-	airbustr_state *state = space->machine().driver_data<airbustr_state>();
-	state->m_soundlatch_status = 0;	// soundlatch has been read
-	return soundlatch_r(space, 0);
+	m_soundlatch_status = 0;	// soundlatch has been read
+	return soundlatch_byte_r(space, 0);
 }
 
-static READ8_HANDLER( soundcommand2_r )
+READ8_MEMBER(airbustr_state::soundcommand2_r)
 {
-	airbustr_state *state = space->machine().driver_data<airbustr_state>();
-	state->m_soundlatch2_status = 0;	// soundlatch2 has been read
-	return soundlatch2_r(space, 0);
+	m_soundlatch2_status = 0;	// soundlatch2 has been read
+	return soundlatch2_byte_r(space, 0);
 }
 
-static WRITE8_HANDLER( soundcommand_w )
+WRITE8_MEMBER(airbustr_state::soundcommand_w)
 {
-	airbustr_state *state = space->machine().driver_data<airbustr_state>();
-	soundlatch_w(space, 0, data);
-	state->m_soundlatch_status = 1;	// soundlatch has been written
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
+	soundlatch_byte_w(space, 0, data);
+	m_soundlatch_status = 1;	// soundlatch has been written
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
 }
 
-static WRITE8_HANDLER( soundcommand2_w )
+WRITE8_MEMBER(airbustr_state::soundcommand2_w)
 {
-	airbustr_state *state = space->machine().driver_data<airbustr_state>();
-	soundlatch2_w(space, 0, data);
-	state->m_soundlatch2_status = 1;	// soundlatch2 has been written
+	soundlatch2_byte_w(space, 0, data);
+	m_soundlatch2_status = 1;	// soundlatch2 has been written
 }
 
-static WRITE8_HANDLER( airbustr_paletteram_w )
+WRITE8_MEMBER(airbustr_state::airbustr_paletteram_w)
 {
-	airbustr_state *state = space->machine().driver_data<airbustr_state>();
 	int val;
 
 	/*  ! byte 1 ! ! byte 0 !   */
 	/*  xGGG GGRR   RRRB BBBB   */
 	/*  x432 1043   2104 3210   */
 
-	state->m_paletteram[offset] = data;
-	val = (state->m_paletteram[offset | 1] << 8) | state->m_paletteram[offset & ~1];
+	m_paletteram[offset] = data;
+	val = (m_paletteram[offset | 1] << 8) | m_paletteram[offset & ~1];
 
-	palette_set_color_rgb(space->machine(), offset / 2, pal5bit(val >> 5), pal5bit(val >> 10), pal5bit(val >> 0));
+	palette_set_color_rgb(machine(), offset / 2, pal5bit(val >> 5), pal5bit(val >> 10), pal5bit(val >> 0));
 }
 
-static WRITE8_HANDLER( airbustr_coin_counter_w )
+WRITE8_MEMBER(airbustr_state::airbustr_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
-	coin_counter_w(space->machine(), 1, data & 2);
-	coin_lockout_w(space->machine(), 0, ~data & 4);
-	coin_lockout_w(space->machine(), 1, ~data & 8);
+	coin_counter_w(machine(), 0, data & 1);
+	coin_counter_w(machine(), 1, data & 2);
+	coin_lockout_w(machine(), 0, ~data & 4);
+	coin_lockout_w(machine(), 1, ~data & 8);
 }
 
 /* Memory Maps */
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, airbustr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", pandora_spriteram_r, pandora_spriteram_w)
+	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_r, pandora_spriteram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE_MEMBER(airbustr_state, m_devram) // shared with protection device
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("devram") // shared with protection device
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( master_io_map, AS_IO, 8, airbustr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(master_bankswitch_w)
 	AM_RANGE(0x01, 0x01) AM_WRITENOP // ???
 	AM_RANGE(0x02, 0x02) AM_WRITE(master_nmi_trigger_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, airbustr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(airbustr_videoram2_w) AM_BASE_MEMBER(airbustr_state, m_videoram2)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(airbustr_colorram2_w) AM_BASE_MEMBER(airbustr_state, m_colorram2)
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(airbustr_videoram_w) AM_BASE_MEMBER(airbustr_state, m_videoram)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(airbustr_colorram_w) AM_BASE_MEMBER(airbustr_state, m_colorram)
-	AM_RANGE(0xd000, 0xd5ff) AM_RAM_WRITE(airbustr_paletteram_w) AM_BASE_MEMBER(airbustr_state, m_paletteram)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(airbustr_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(airbustr_colorram2_w) AM_SHARE("colorram2")
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(airbustr_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(airbustr_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xd000, 0xd5ff) AM_RAM_WRITE(airbustr_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd600, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( slave_io_map, AS_IO, 8, airbustr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(slave_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(soundcommand2_r, soundcommand_w)
@@ -391,17 +382,17 @@ static ADDRESS_MAP_START( slave_io_map, AS_IO, 8 )
 	AM_RANGE(0x38, 0x38) AM_WRITENOP // irq ack / irq mask
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, airbustr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, airbustr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x06, 0x06) AM_READWRITE(soundcommand_r, soundcommand2_w)
 ADDRESS_MAP_END
 
@@ -448,23 +439,23 @@ static INPUT_PORTS_START( airbustr )
 	PORT_DIPSETTING(    0x08, "Mode 1" )			//     routine at 0x056d: 11 21 12 16 (bit 3 active)
 	PORT_DIPSETTING(    0x00, "Mode 2" )			//     11 21 13 14 (bit 3 not active)
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )	PORT_CONDITION("DSW1", 0x08, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )	PORT_CONDITION("DSW1", 0x08, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )	PORT_CONDITION("DSW1", 0x08, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )	PORT_CONDITION("DSW1", 0x08, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )	PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )	PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )	PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )	PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )	PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )	PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )	PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )	PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )	PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )	PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )	PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )	PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SW1:7,8")
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )	PORT_CONDITION("DSW1", 0x08, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )	PORT_CONDITION("DSW1", 0x08, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )	PORT_CONDITION("DSW1", 0x08, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )	PORT_CONDITION("DSW1", 0x08, PORTCOND_NOTEQUALS, 0x00)
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )	PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )	PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )	PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )	PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )	PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )	PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )	PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )	PORT_CONDITION("DSW1", 0x08, NOTEQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )	PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )	PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )	PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )	PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
@@ -580,16 +571,16 @@ static INTERRUPT_GEN( slave_interrupt )
 static MACHINE_START( airbustr )
 {
 	airbustr_state *state = machine.driver_data<airbustr_state>();
-	UINT8 *MASTER = machine.region("master")->base();
-	UINT8 *SLAVE = machine.region("slave")->base();
-	UINT8 *AUDIO = machine.region("audiocpu")->base();
+	UINT8 *MASTER = state->memregion("master")->base();
+	UINT8 *SLAVE = state->memregion("slave")->base();
+	UINT8 *AUDIO = state->memregion("audiocpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 3, &MASTER[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank1", 3, 5, &MASTER[0x10000], 0x4000);
-	memory_configure_bank(machine, "bank2", 0, 3, &SLAVE[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank2", 3, 5, &SLAVE[0x10000], 0x4000);
-	memory_configure_bank(machine, "bank3", 0, 3, &AUDIO[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank3", 3, 5, &AUDIO[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 3, &MASTER[0x00000], 0x4000);
+	state->membank("bank1")->configure_entries(3, 5, &MASTER[0x10000], 0x4000);
+	state->membank("bank2")->configure_entries(0, 3, &SLAVE[0x00000], 0x4000);
+	state->membank("bank2")->configure_entries(3, 5, &SLAVE[0x10000], 0x4000);
+	state->membank("bank3")->configure_entries(0, 3, &AUDIO[0x00000], 0x4000);
+	state->membank("bank3")->configure_entries(3, 5, &AUDIO[0x10000], 0x4000);
 
 	state->m_master = machine.device("master");
 	state->m_slave = machine.device("slave");
@@ -616,9 +607,9 @@ static MACHINE_RESET( airbustr )
 	state->m_fg_scrolly = 0;
 	state->m_highbits = 0;
 
-	memory_set_bank(machine, "bank1", 0x02);
-	memory_set_bank(machine, "bank2", 0x02);
-	memory_set_bank(machine, "bank3", 0x02);
+	state->membank("bank1")->set_entry(0x02);
+	state->membank("bank2")->set_entry(0x02);
+	state->membank("bank3")->set_entry(0x02);
 }
 
 /* Machine Driver */
@@ -797,7 +788,8 @@ ROM_END
 
 static DRIVER_INIT( airbustr )
 {
-	machine.device("master")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xe000, 0xefff, FUNC(devram_r)); // protection device lives here
+	airbustr_state *state = machine.driver_data<airbustr_state>();
+	machine.device("master")->memory().space(AS_PROGRAM)->install_read_handler(0xe000, 0xefff, read8_delegate(FUNC(airbustr_state::devram_r),state)); // protection device lives here
 }
 
 

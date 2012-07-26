@@ -146,8 +146,8 @@ static READ32_DEVICE_HANDLER( s3c2440_adc_data_r )
 	UINT32 data = 0;
 	switch (offset)
 	{
-		case 2 + 0 : data = input_port_read( device->machine(), "PENX"); break;
-		case 2 + 1 : data = 915 - input_port_read( device->machine(), "PENY") + 90; break;
+		case 2 + 0 : data = device->machine().root_device().ioport( "PENX")->read(); break;
+		case 2 + 1 : data = 915 - device->machine().root_device().ioport( "PENY")->read() + 90; break;
 	}
 	verboselog( device->machine(), 5,  "s3c2440_adc_data_r %08X\n", data);
 	return data;
@@ -170,7 +170,7 @@ static MACHINE_START( mini2440 )
 	state->m_nand = machine.device<nand_device>( "nand");
 	state->m_dac[0] = machine.device( "dac1");
 	state->m_dac[1] = machine.device( "dac2");
-	state->m_nand->set_data_ptr(machine.region("nand")->base());
+	state->m_nand->set_data_ptr(state->memregion("nand")->base());
 }
 
 static MACHINE_RESET( mini2440 )
@@ -184,7 +184,7 @@ static MACHINE_RESET( mini2440 )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mini2440_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( mini2440_map, AS_PROGRAM, 32, mini2440_state )
 //  AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 	AM_RANGE(0x30000000, 0x37ffffff) AM_RAM
 ADDRESS_MAP_END

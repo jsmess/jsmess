@@ -6,10 +6,13 @@ class seibuspi_state : public driver_device
 {
 public:
 	seibuspi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spi_scrollram(*this, "spi_scrollram"),
+		m_spimainram(*this, "spimainram"){ }
 
-	UINT32 *m_spimainram;
-	UINT32 *m_spi_scrollram;
+	optional_shared_ptr<UINT32> m_spi_scrollram;
+	required_shared_ptr<UINT32> m_spimainram;
+
 	intel_e28f008sa_device *m_flash[2];
 	UINT8 *m_z80_rom;
 	int m_z80_prg_fifo_pos;
@@ -43,6 +46,45 @@ public:
 	UINT32 m_bg_fore_layer_position;
 	UINT8 m_alpha_table[8192];
 	UINT8 m_sprite_bpp;
+	DECLARE_READ32_MEMBER(ejanhs_speedup_r);
+	DECLARE_READ32_MEMBER(spi_layer_bank_r);
+	DECLARE_WRITE32_MEMBER(spi_layer_bank_w);
+	DECLARE_READ32_MEMBER(spi_layer_enable_r);
+	DECLARE_WRITE32_MEMBER(spi_layer_enable_w);
+	DECLARE_WRITE32_MEMBER(tilemap_dma_start_w);
+	DECLARE_WRITE32_MEMBER(palette_dma_start_w);
+	DECLARE_WRITE32_MEMBER(sprite_dma_start_w);
+	DECLARE_WRITE32_MEMBER(video_dma_length_w);
+	DECLARE_WRITE32_MEMBER(video_dma_address_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(ejsakura_keyboard_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ejanhs_encode);
+	DECLARE_READ32_MEMBER(sb_coin_r);
+	DECLARE_WRITE8_MEMBER(sb_coin_w);
+	DECLARE_READ32_MEMBER(sound_fifo_r);
+	DECLARE_WRITE32_MEMBER(sound_fifo_w);
+	DECLARE_READ32_MEMBER(sound_fifo_status_r);
+	DECLARE_READ32_MEMBER(spi_int_r);
+	DECLARE_READ32_MEMBER(spi_unknown_r);
+	DECLARE_WRITE32_MEMBER(z80_prg_fifo_w);
+	DECLARE_WRITE32_MEMBER(z80_enable_w);
+	DECLARE_READ32_MEMBER(spi_controls1_r);
+	DECLARE_READ32_MEMBER(spi_controls2_r);
+	DECLARE_READ8_MEMBER(z80_soundfifo_r);
+	DECLARE_WRITE8_MEMBER(z80_soundfifo_w);
+	DECLARE_READ8_MEMBER(z80_soundfifo_status_r);
+	DECLARE_WRITE8_MEMBER(z80_bank_w);
+	DECLARE_READ8_MEMBER(z80_jp1_r);
+	DECLARE_READ8_MEMBER(z80_coin_r);
+	DECLARE_READ32_MEMBER(soundrom_r);
+	DECLARE_WRITE32_MEMBER(input_select_w);
+	DECLARE_READ32_MEMBER(senkyu_speedup_r);
+	DECLARE_READ32_MEMBER(senkyua_speedup_r);
+	DECLARE_READ32_MEMBER(batlball_speedup_r);
+	DECLARE_READ32_MEMBER(rdft_speedup_r);
+	DECLARE_READ32_MEMBER(viprp1_speedup_r);
+	DECLARE_READ32_MEMBER(viprp1o_speedup_r);
+	DECLARE_READ32_MEMBER(rf2_speedup_r);
+	DECLARE_READ32_MEMBER(rfjet_speedup_r);
 };
 
 
@@ -59,14 +101,6 @@ SCREEN_UPDATE_RGB32( spi );
 VIDEO_START( sys386f2 );
 SCREEN_UPDATE_RGB32( sys386f2 );
 
-READ32_HANDLER( spi_layer_bank_r );
-WRITE32_HANDLER( spi_layer_bank_w );
-WRITE32_HANDLER( spi_layer_enable_w );
 
 void rf2_set_layer_banks(running_machine &machine, int banks);
 
-WRITE32_HANDLER( tilemap_dma_start_w );
-WRITE32_HANDLER( palette_dma_start_w );
-WRITE32_HANDLER( video_dma_length_w );
-WRITE32_HANDLER( video_dma_address_w );
-WRITE32_HANDLER( sprite_dma_start_w );

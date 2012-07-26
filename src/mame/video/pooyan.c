@@ -29,6 +29,7 @@
 
 PALETTE_INIT( pooyan )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -128,25 +129,23 @@ VIDEO_START( pooyan )
  *
  *************************************/
 
-WRITE8_HANDLER( pooyan_videoram_w )
+WRITE8_MEMBER(pooyan_state::pooyan_videoram_w)
 {
-	pooyan_state *state = space->machine().driver_data<pooyan_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( pooyan_colorram_w )
+WRITE8_MEMBER(pooyan_state::pooyan_colorram_w)
 {
-	pooyan_state *state = space->machine().driver_data<pooyan_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( pooyan_flipscreen_w )
+WRITE8_MEMBER(pooyan_state::pooyan_flipscreen_w)
 {
-	flip_screen_set(space->machine(), ~data & 0x01);
+	flip_screen_set(~data & 0x01);
 }
 
 

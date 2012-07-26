@@ -90,7 +90,7 @@ static void draw_sprites_pre(running_machine &machine, int x_offs, int y_offs)
 {
 	galastrm_state *state = machine.driver_data<galastrm_state>();
 	UINT32 *spriteram32 = state->m_spriteram;
-	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
+	UINT16 *spritemap = (UINT16 *)state->memregion("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
@@ -102,7 +102,7 @@ static void draw_sprites_pre(running_machine &machine, int x_offs, int y_offs)
        while processing sprite ram and then draw them all at the end */
 	state->m_sprite_ptr_pre = state->m_spritelist;
 
-	for (offs = (state->m_spriteram_size/4-4);offs >= 0;offs -= 4)
+	for (offs = (state->m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
 	{
 		data = spriteram32[offs+0];
 		flipx =    (data & 0x00800000) >> 23;

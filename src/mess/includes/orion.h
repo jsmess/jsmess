@@ -34,6 +34,27 @@ public:
 	UINT8 m_orionpro_128_page;
 	UINT8 m_orionpro_rom2_segment;
 	UINT8 m_orionpro_dispatcher;
+	DECLARE_READ8_MEMBER(orion128_system_r);
+	DECLARE_WRITE8_MEMBER(orion128_system_w);
+	DECLARE_READ8_MEMBER(orion128_romdisk_r);
+	DECLARE_WRITE8_MEMBER(orion128_romdisk_w);
+	DECLARE_WRITE8_MEMBER(orion128_video_mode_w);
+	DECLARE_WRITE8_MEMBER(orion128_video_page_w);
+	DECLARE_WRITE8_MEMBER(orion128_memory_page_w);
+	DECLARE_WRITE8_MEMBER(orion_disk_control_w);
+	DECLARE_READ8_MEMBER(orion128_floppy_r);
+	DECLARE_WRITE8_MEMBER(orion128_floppy_w);
+	DECLARE_READ8_MEMBER(orionz80_floppy_rtc_r);
+	DECLARE_WRITE8_MEMBER(orionz80_floppy_rtc_w);
+	DECLARE_WRITE8_MEMBER(orionz80_sound_w);
+	DECLARE_WRITE8_MEMBER(orionz80_sound_fe_w);
+	DECLARE_WRITE8_MEMBER(orionz80_memory_page_w);
+	DECLARE_WRITE8_MEMBER(orionz80_dispatcher_w);
+	DECLARE_READ8_MEMBER(orionz80_io_r);
+	DECLARE_WRITE8_MEMBER(orionz80_io_w);
+	DECLARE_WRITE8_MEMBER(orionpro_memory_page_w);
+	DECLARE_READ8_MEMBER(orionpro_io_r);
+	DECLARE_WRITE8_MEMBER(orionpro_io_w);
 };
 
 
@@ -48,24 +69,8 @@ extern MACHINE_START( orionz80 );
 extern MACHINE_RESET( orionz80 );
 extern INTERRUPT_GEN( orionz80_interrupt );
 
-extern READ8_HANDLER ( orion128_system_r );
-extern WRITE8_HANDLER ( orion128_system_w );
-extern READ8_HANDLER ( orion128_romdisk_r );
-extern WRITE8_HANDLER ( orion128_romdisk_w );
-extern WRITE8_HANDLER ( orion128_video_mode_w );
-extern WRITE8_HANDLER ( orion128_memory_page_w );
-extern WRITE8_HANDLER ( orion128_video_page_w );
-extern WRITE8_HANDLER ( orionz80_memory_page_w );
-extern WRITE8_HANDLER ( orionz80_dispatcher_w );
-extern WRITE8_HANDLER ( orionz80_sound_w );
-extern READ8_HANDLER ( orion128_floppy_r );
-extern WRITE8_HANDLER ( orion128_floppy_w );
-extern READ8_HANDLER ( orionz80_io_r );
-extern WRITE8_HANDLER ( orionz80_io_w );
 
 extern MACHINE_RESET( orionpro );
-extern READ8_HANDLER ( orionpro_io_r );
-extern WRITE8_HANDLER ( orionpro_io_w );
 
 /*----------- defined in video/orion.c -----------*/
 

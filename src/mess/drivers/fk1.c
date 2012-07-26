@@ -5,7 +5,6 @@
         12/05/2009 Skeleton driver.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -300,8 +299,8 @@ READ8_MEMBER( fk1_state::fk1_bank_ram_r )
 	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
 	space_mem->install_write_bank(0x0000, 0x3fff, "bank1");
-	memory_set_bankptr(machine(), "bank1", ram);
-	memory_set_bankptr(machine(), "bank2", ram + 0x4000);
+	membank("bank1")->set_base(ram);
+	membank("bank2")->set_base(ram + 0x4000);
 	return 0;
 }
 
@@ -309,8 +308,8 @@ READ8_MEMBER( fk1_state::fk1_bank_rom_r )
 {
 	address_space *space_mem = m_maincpu->memory().space(AS_PROGRAM);
 	space_mem->unmap_write(0x0000, 0x3fff);
-	memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base());
-	memory_set_bankptr(machine(), "bank2", machine().device<ram_device>(RAM_TAG)->pointer() + 0x10000);
+	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base());
+	membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x10000);
 	return 0;
 }
 
@@ -389,7 +388,7 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 {
 	fk1_state *state = timer.machine().driver_data<fk1_state>();
 
-	if (input_port_read(timer.machine(), "LINE0"))
+	if (timer.machine().root_device().ioport("LINE0")->read())
 	{
 		state->m_int_vector = 6;
 		cputag_set_input_line(timer.machine(), "maincpu", 0, HOLD_LINE);
@@ -430,10 +429,10 @@ MACHINE_RESET_MEMBER( fk1_state )
 	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
 	space->unmap_write(0x0000, 0x3fff);
-	memory_set_bankptr(machine(), "bank1", machine().region("maincpu")->base()); // ROM
-	memory_set_bankptr(machine(), "bank2", ram + 0x10000); // VRAM
-	memory_set_bankptr(machine(), "bank3", ram + 0x8000);
-	memory_set_bankptr(machine(), "bank4", ram + 0xc000);
+	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base()); // ROM
+	membank("bank2")->set_base(ram + 0x10000); // VRAM
+	membank("bank3")->set_base(ram + 0x8000);
+	membank("bank4")->set_base(ram + 0xc000);
 
 	device_set_irq_callback(machine().device("maincpu"), fk1_irq_callback);
 }

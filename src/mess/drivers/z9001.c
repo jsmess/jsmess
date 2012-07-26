@@ -18,7 +18,6 @@ Some other control keys:
 ^L clear screen
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -41,16 +40,17 @@ class z9001_state : public driver_device
 public:
 	z9001_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_framecnt(0)
-	{ }
+		  m_maincpu(*this, "maincpu"),
+		  m_framecnt(0),
+		  m_p_colorram(*this, "p_colorram"),
+		  m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	DECLARE_WRITE8_MEMBER(kbd_put);
-	const UINT8 *m_p_videoram;
-	const UINT8 *m_p_colorram;
-	const UINT8 *m_p_chargen;
 	UINT8 m_framecnt;
+	required_shared_ptr<const UINT8> m_p_colorram;
+	required_shared_ptr<const UINT8> m_p_videoram;
+	DECLARE_WRITE8_MEMBER(kbd_put);
+	const UINT8 *m_p_chargen;
 	virtual void machine_reset();
 	//virtual void machine_start();
 	virtual void video_start();
@@ -59,8 +59,8 @@ public:
 static ADDRESS_MAP_START(z9001_mem, AS_PROGRAM, 8, z9001_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xe7ff ) AM_RAM
-	AM_RANGE( 0xe800, 0xebff ) AM_RAM AM_BASE(m_p_colorram)
-	AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE( 0xe800, 0xebff ) AM_RAM AM_SHARE("p_colorram")
+	AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_SHARE("p_videoram")
 	AM_RANGE( 0xf000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
@@ -95,7 +95,7 @@ MACHINE_RESET_MEMBER( z9001_state )
 
 VIDEO_START_MEMBER( z9001_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 static SCREEN_UPDATE_IND16( z9001 )

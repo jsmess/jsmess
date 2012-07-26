@@ -34,7 +34,7 @@ TILE_GET_INFO( get_fg_tile_info )
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	terracre_state *state = machine.driver_data<terracre_state>();
-	const UINT8 *spritepalettebank = machine.region("user1")->base();
+	const UINT8 *spritepalettebank = state->memregion("user1")->base();
 	const gfx_element *pGfx = machine.gfx[2];
 	const UINT16 *pSource = state->m_spriteram;
 	int i;
@@ -78,7 +78,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			color += 16 * (spritepalettebank[(tile>>1)&0xff] & 0x0f);
 		}
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 				sx=240-sx;
 				sy=240-sy;
@@ -95,6 +95,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 PALETTE_INIT( amazon )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -151,43 +152,39 @@ PALETTE_INIT( amazon )
 	}
 }
 
-WRITE16_HANDLER( amazon_background_w )
+WRITE16_MEMBER(terracre_state::amazon_background_w)
 {
-	terracre_state *state = space->machine().driver_data<terracre_state>();
-	COMBINE_DATA( &state->m_amazon_videoram[offset] );
-	state->m_background->mark_tile_dirty(offset );
+	COMBINE_DATA( &m_amazon_videoram[offset] );
+	m_background->mark_tile_dirty(offset );
 }
 
-WRITE16_HANDLER( amazon_foreground_w )
+WRITE16_MEMBER(terracre_state::amazon_foreground_w)
 {
-	terracre_state *state = space->machine().driver_data<terracre_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	COMBINE_DATA( &videoram[offset] );
-	state->m_foreground->mark_tile_dirty(offset );
+	m_foreground->mark_tile_dirty(offset );
 }
 
-WRITE16_HANDLER( amazon_flipscreen_w )
+WRITE16_MEMBER(terracre_state::amazon_flipscreen_w)
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		coin_counter_w( space->machine(), 0, data&0x01 );
-		coin_counter_w( space->machine(), 1, (data&0x02)>>1 );
-		flip_screen_set(space->machine(), data&0x04);
+		coin_counter_w( machine(), 0, data&0x01 );
+		coin_counter_w( machine(), 1, (data&0x02)>>1 );
+		flip_screen_set(data&0x04);
 	}
 }
 
-WRITE16_HANDLER( amazon_scrolly_w )
+WRITE16_MEMBER(terracre_state::amazon_scrolly_w)
 {
-	terracre_state *state = space->machine().driver_data<terracre_state>();
-	COMBINE_DATA(&state->m_yscroll);
-	state->m_background->set_scrolly(0,state->m_yscroll);
+	COMBINE_DATA(&m_yscroll);
+	m_background->set_scrolly(0,m_yscroll);
 }
 
-WRITE16_HANDLER( amazon_scrollx_w )
+WRITE16_MEMBER(terracre_state::amazon_scrollx_w)
 {
-	terracre_state *state = space->machine().driver_data<terracre_state>();
-	COMBINE_DATA(&state->m_xscroll);
-	state->m_background->set_scrollx(0,state->m_xscroll);
+	COMBINE_DATA(&m_xscroll);
+	m_background->set_scrollx(0,m_xscroll);
 }
 
 VIDEO_START( amazon )

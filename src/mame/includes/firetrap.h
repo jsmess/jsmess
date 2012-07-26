@@ -8,14 +8,17 @@ class firetrap_state : public driver_device
 {
 public:
 	firetrap_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg1videoram(*this, "bg1videoram"),
+		m_bg2videoram(*this, "bg2videoram"),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT8 *       m_bg1videoram;
-	UINT8 *       m_bg2videoram;
-	UINT8 *       m_fgvideoram;
-	UINT8 *       m_spriteram;
-	size_t        m_spriteram_size;
+	required_shared_ptr<UINT8> m_bg1videoram;
+	required_shared_ptr<UINT8> m_bg2videoram;
+	required_shared_ptr<UINT8> m_fgvideoram;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	tilemap_t       *m_fg_tilemap;
@@ -40,18 +43,29 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	device_t *m_msm;
+	DECLARE_WRITE8_MEMBER(firetrap_nmi_disable_w);
+	DECLARE_WRITE8_MEMBER(firetrap_bankselect_w);
+	DECLARE_READ8_MEMBER(firetrap_8751_bootleg_r);
+	DECLARE_READ8_MEMBER(firetrap_8751_r);
+	DECLARE_WRITE8_MEMBER(firetrap_8751_w);
+	DECLARE_WRITE8_MEMBER(firetrap_sound_command_w);
+	DECLARE_WRITE8_MEMBER(firetrap_sound_2400_w);
+	DECLARE_WRITE8_MEMBER(firetrap_sound_bankselect_w);
+	DECLARE_WRITE8_MEMBER(firetrap_adpcm_data_w);
+	DECLARE_WRITE8_MEMBER(flip_screen_w);
+	DECLARE_WRITE8_MEMBER(firetrap_fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(firetrap_bg1videoram_w);
+	DECLARE_WRITE8_MEMBER(firetrap_bg2videoram_w);
+	DECLARE_WRITE8_MEMBER(firetrap_bg1_scrollx_w);
+	DECLARE_WRITE8_MEMBER(firetrap_bg1_scrolly_w);
+	DECLARE_WRITE8_MEMBER(firetrap_bg2_scrollx_w);
+	DECLARE_WRITE8_MEMBER(firetrap_bg2_scrolly_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 
 /*----------- defined in video/firetrap.c -----------*/
 
-WRITE8_HANDLER( firetrap_fgvideoram_w );
-WRITE8_HANDLER( firetrap_bg1videoram_w );
-WRITE8_HANDLER( firetrap_bg2videoram_w );
-WRITE8_HANDLER( firetrap_bg1_scrollx_w );
-WRITE8_HANDLER( firetrap_bg1_scrolly_w );
-WRITE8_HANDLER( firetrap_bg2_scrollx_w );
-WRITE8_HANDLER( firetrap_bg2_scrolly_w );
 
 PALETTE_INIT( firetrap );
 VIDEO_START( firetrap );

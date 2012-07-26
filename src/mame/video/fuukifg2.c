@@ -64,10 +64,10 @@ INLINE void fuuki16_vram_w(address_space *space, offs_t offset, UINT16 data, UIN
 	state->m_tilemap[_N_]->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( fuuki16_vram_0_w ) { fuuki16_vram_w(space, offset, data, mem_mask, 0); }
-WRITE16_HANDLER( fuuki16_vram_1_w ) { fuuki16_vram_w(space, offset, data, mem_mask, 1); }
-WRITE16_HANDLER( fuuki16_vram_2_w ) { fuuki16_vram_w(space, offset, data, mem_mask, 2); }
-WRITE16_HANDLER( fuuki16_vram_3_w ) { fuuki16_vram_w(space, offset, data, mem_mask, 3); }
+WRITE16_MEMBER(fuuki16_state::fuuki16_vram_0_w){ fuuki16_vram_w(&space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(fuuki16_state::fuuki16_vram_1_w){ fuuki16_vram_w(&space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(fuuki16_state::fuuki16_vram_2_w){ fuuki16_vram_w(&space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(fuuki16_state::fuuki16_vram_3_w){ fuuki16_vram_w(&space, offset, data, mem_mask, 3); }
 
 
 /***************************************************************************
@@ -82,6 +82,7 @@ WRITE16_HANDLER( fuuki16_vram_3_w ) { fuuki16_vram_w(space, offset, data, mem_ma
 #if 0
 PALETTE_INIT( fuuki16 )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int pen;
 
 	/* The game does not initialise the palette at startup. It should
@@ -147,7 +148,7 @@ static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rec
 	int max_y =	visarea.max_y + 1;
 
 	/* Draw them backwards, for pdrawgfx */
-	for ( offs = (state->m_spriteram_size - 8) / 2; offs >=0; offs -= 8 / 2 )
+	for ( offs = (state->m_spriteram.bytes() - 8) / 2; offs >=0; offs -= 8 / 2 )
 	{
 		int x, y, xstart, ystart, xend, yend, xinc, yinc;
 		int xnum, ynum, xzoom, yzoom, flipx, flipy;
@@ -182,7 +183,7 @@ static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rec
 		sx = (sx & 0x1ff) - (sx & 0x200);
 		sy = (sy & 0x1ff) - (sy & 0x200);
 
-		if (flip_screen_get(screen.machine()))
+		if (state->flip_screen())
 		{
 			flipx = !flipx;		sx = max_x - sx - xnum * 16;
 			flipy = !flipy;		sy = max_y - sy - ynum * 16;
@@ -306,12 +307,12 @@ SCREEN_UPDATE_IND16( fuuki16 )
 	int tm_middle = pri_table[state->m_priority[0] & 0x0f][1];
 	int tm_back   = pri_table[state->m_priority[0] & 0x0f][2];
 
-	flip_screen_set(screen.machine(), state->m_vregs[0x1e / 2] & 1);
+	state->flip_screen_set(state->m_vregs[0x1e / 2] & 1);
 
 	/* Layers scrolling */
 
-	scrolly_offs = state->m_vregs[0xc / 2] - (flip_screen_get(screen.machine()) ? 0x103 : 0x1f3);
-	scrollx_offs = state->m_vregs[0xe / 2] - (flip_screen_get(screen.machine()) ? 0x2a7 : 0x3f6);
+	scrolly_offs = state->m_vregs[0xc / 2] - (state->flip_screen() ? 0x103 : 0x1f3);
+	scrollx_offs = state->m_vregs[0xe / 2] - (state->flip_screen() ? 0x2a7 : 0x3f6);
 
 	layer0_scrolly = state->m_vregs[0x0 / 2] + scrolly_offs;
 	layer0_scrollx = state->m_vregs[0x2 / 2] + scrollx_offs;

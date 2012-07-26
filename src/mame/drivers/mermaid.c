@@ -122,41 +122,38 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 /* Read/Write Handlers */
 
-static WRITE8_HANDLER( mermaid_ay8910_write_port_w )
+WRITE8_MEMBER(mermaid_state::mermaid_ay8910_write_port_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
-	if (state->m_ay8910_enable[0]) ay8910_data_w(state->m_ay1, offset, data);
-	if (state->m_ay8910_enable[1]) ay8910_data_w(state->m_ay2, offset, data);
+	if (m_ay8910_enable[0]) ay8910_data_w(m_ay1, offset, data);
+	if (m_ay8910_enable[1]) ay8910_data_w(m_ay2, offset, data);
 }
 
-static WRITE8_HANDLER( mermaid_ay8910_control_port_w )
+WRITE8_MEMBER(mermaid_state::mermaid_ay8910_control_port_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
-	if (state->m_ay8910_enable[0]) ay8910_address_w(state->m_ay1, offset, data);
-	if (state->m_ay8910_enable[1]) ay8910_address_w(state->m_ay2, offset, data);
+	if (m_ay8910_enable[0]) ay8910_address_w(m_ay1, offset, data);
+	if (m_ay8910_enable[1]) ay8910_address_w(m_ay2, offset, data);
 }
 
 
-static WRITE8_HANDLER( nmi_mask_w )
+WRITE8_MEMBER(mermaid_state::nmi_mask_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
 /* Memory Map */
 
-static ADDRESS_MAP_START( mermaid_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mermaid_map, AS_PROGRAM, 8, mermaid_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(mermaid_videoram2_w) AM_BASE_MEMBER(mermaid_state, m_videoram2)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(mermaid_videoram_w) AM_BASE_MEMBER(mermaid_state, m_videoram)
-	AM_RANGE(0xd800, 0xd81f) AM_RAM_WRITE(mermaid_bg_scroll_w) AM_BASE_MEMBER(mermaid_state, m_bg_scrollram)
-	AM_RANGE(0xd840, 0xd85f) AM_RAM_WRITE(mermaid_fg_scroll_w) AM_BASE_MEMBER(mermaid_state, m_fg_scrollram)
-	AM_RANGE(0xd880, 0xd8bf) AM_RAM AM_BASE_SIZE_MEMBER(mermaid_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(mermaid_colorram_w) AM_BASE_MEMBER(mermaid_state, m_colorram)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(mermaid_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(mermaid_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd800, 0xd81f) AM_RAM_WRITE(mermaid_bg_scroll_w) AM_SHARE("bg_scrollram")
+	AM_RANGE(0xd840, 0xd85f) AM_RAM_WRITE(mermaid_fg_scroll_w) AM_SHARE("fg_scrollram")
+	AM_RANGE(0xd880, 0xd8bf) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(mermaid_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW")
-	AM_RANGE(0xe000, 0xe001) AM_RAM AM_BASE_MEMBER(mermaid_state, m_ay8910_enable)
+	AM_RANGE(0xe000, 0xe001) AM_RAM AM_SHARE("ay8910_enable")
 	AM_RANGE(0xe002, 0xe004) AM_WRITENOP // ???
 	AM_RANGE(0xe005, 0xe005) AM_WRITE(mermaid_flip_screen_x_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITE(mermaid_flip_screen_y_w)
@@ -175,36 +172,33 @@ static ADDRESS_MAP_START( mermaid_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(mermaid_ay8910_control_port_w)
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( rougien_sample_rom_lo_w )
+WRITE8_MEMBER(mermaid_state::rougien_sample_rom_lo_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 
-	state->m_adpcm_rom_sel = (data & 1) | (state->m_adpcm_rom_sel & 2);
+	m_adpcm_rom_sel = (data & 1) | (m_adpcm_rom_sel & 2);
 }
 
-static WRITE8_HANDLER( rougien_sample_rom_hi_w )
+WRITE8_MEMBER(mermaid_state::rougien_sample_rom_hi_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 
-	state->m_adpcm_rom_sel = ((data & 1)<<1) | (state->m_adpcm_rom_sel & 1);
+	m_adpcm_rom_sel = ((data & 1)<<1) | (m_adpcm_rom_sel & 1);
 }
 
-static WRITE8_HANDLER( rougien_sample_playback_w )
+WRITE8_MEMBER(mermaid_state::rougien_sample_playback_w)
 {
-	mermaid_state *state = space->machine().driver_data<mermaid_state>();
 
-	if((state->m_adpcm_play_reg & 1) && ((data & 1) == 0))
+	if((m_adpcm_play_reg & 1) && ((data & 1) == 0))
 	{
-		state->m_adpcm_pos = state->m_adpcm_rom_sel*0x1000;
-		state->m_adpcm_end = state->m_adpcm_pos+0x1000;
-		state->m_adpcm_idle = 0;
-		msm5205_reset_w(space->machine().device("adpcm"), 0);
+		m_adpcm_pos = m_adpcm_rom_sel*0x1000;
+		m_adpcm_end = m_adpcm_pos+0x1000;
+		m_adpcm_idle = 0;
+		msm5205_reset_w(machine().device("adpcm"), 0);
 	}
 
-	state->m_adpcm_play_reg = data & 1;
+	m_adpcm_play_reg = data & 1;
 }
 
-static ADDRESS_MAP_START( rougien_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rougien_map, AS_PROGRAM, 8, mermaid_state )
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(rougien_sample_playback_w)
 	AM_RANGE(0xe802, 0xe802) AM_WRITE(rougien_sample_rom_hi_w)
 	AM_RANGE(0xe803, 0xe803) AM_WRITE(rougien_sample_rom_lo_w)
@@ -425,7 +419,7 @@ static void rougien_adpcm_int( device_t *device )
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().region("adpcm")->base();
+		UINT8 *ROM = device->machine().root_device().memregion("adpcm")->base();
 
 		state->m_adpcm_data = ((state->m_adpcm_trigger ? (ROM[state->m_adpcm_pos] & 0x0f) : (ROM[state->m_adpcm_pos] & 0xf0) >> 4));
 		msm5205_data_w(device, state->m_adpcm_data & 0xf);

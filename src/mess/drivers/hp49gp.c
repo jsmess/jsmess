@@ -36,11 +36,12 @@ class hp49gp_state : public driver_device
 {
 public:
 	hp49gp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_steppingstone(*this, "steppingstone"){ }
 
 	UINT32 m_port[9];
 	device_t *m_s3c2410;
-	UINT32 *m_steppingstone;
+	required_shared_ptr<UINT32> m_steppingstone;
 	lcd_spi_t m_lcd_spi;
 };
 
@@ -191,13 +192,13 @@ static UINT32 s3c2410_gpio_port_r( device_t *device, int port, UINT32 mask)
 		case S3C2410_GPIO_PORT_G :
 		{
 			data = data & ~0xFF00;
-			if ((data & 0x02) == 0) data |= (input_port_read( device->machine(), "ROW1") << 8);
-			if ((data & 0x04) == 0) data |= (input_port_read( device->machine(), "ROW2") << 8);
-			if ((data & 0x08) == 0) data |= (input_port_read( device->machine(), "ROW3") << 8);
-			if ((data & 0x10) == 0) data |= (input_port_read( device->machine(), "ROW4") << 8);
-			if ((data & 0x20) == 0) data |= (input_port_read( device->machine(), "ROW5") << 8);
-			if ((data & 0x40) == 0) data |= (input_port_read( device->machine(), "ROW6") << 8);
-			if ((data & 0x80) == 0) data |= (input_port_read( device->machine(), "ROW7") << 8);
+			if ((data & 0x02) == 0) data |= (device->machine().root_device().ioport( "ROW1")->read() << 8);
+			if ((data & 0x04) == 0) data |= (device->machine().root_device().ioport( "ROW2")->read() << 8);
+			if ((data & 0x08) == 0) data |= (device->machine().root_device().ioport( "ROW3")->read() << 8);
+			if ((data & 0x10) == 0) data |= (device->machine().root_device().ioport( "ROW4")->read() << 8);
+			if ((data & 0x20) == 0) data |= (device->machine().root_device().ioport( "ROW5")->read() << 8);
+			if ((data & 0x40) == 0) data |= (device->machine().root_device().ioport( "ROW6")->read() << 8);
+			if ((data & 0x80) == 0) data |= (device->machine().root_device().ioport( "ROW7")->read() << 8);
 		}
 		break;
 		case S3C2410_GPIO_PORT_H :
@@ -251,12 +252,12 @@ static MACHINE_RESET( hp49gp )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( hp49gp_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( hp49gp_map, AS_PROGRAM, 32, hp49gp_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM
 	AM_RANGE(0x08000000, 0x0801ffff) AM_RAM
 	AM_RANGE(0x08020000, 0x0803ffff) AM_RAM
 	AM_RANGE(0x08040000, 0x0807ffff) AM_RAM
-	AM_RANGE(0x40000000, 0x40000fff) AM_RAM AM_BASE_MEMBER(hp49gp_state, m_steppingstone)
+	AM_RANGE(0x40000000, 0x40000fff) AM_RAM AM_SHARE("steppingstone")
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -266,7 +267,7 @@ ADDRESS_MAP_END
 static DRIVER_INIT( hp49gp )
 {
 	hp49gp_state *hp49gp = machine.driver_data<hp49gp_state>();
-	UINT8 *rom = (UINT8 *)machine.region( "maincpu")->base();
+	UINT8 *rom = (UINT8 *)machine.root_device().memregion( "maincpu")->base();
 	memcpy( hp49gp->m_steppingstone, rom, 1024);
 	lcd_spi_init( machine);
 }

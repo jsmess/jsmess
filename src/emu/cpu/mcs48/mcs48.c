@@ -149,7 +149,7 @@ struct _mcs48_state
 
 	UINT16		a11;				/* A11 value, either 0x000 or 0x800 */
 
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	int			icount;
 
@@ -842,7 +842,7 @@ static const mcs48_ophandler opcode_table[256]=
     mcs48_init - generic MCS-48 initialization
 -------------------------------------------------*/
 
-static void mcs48_init(legacy_cpu_device *device, device_irq_callback irqcallback, UINT8 feature_mask, UINT16 romsize)
+static void mcs48_init(legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback, UINT8 feature_mask, UINT16 romsize)
 {
 	mcs48_state *cpustate = get_safe_token(device);
 
@@ -1225,27 +1225,27 @@ void upi41_master_w(device_t *_device, UINT8 a0, UINT8 data)
 ***************************************************************************/
 
 /* FIXME: the memory maps should probably support rom banking for EA */
-static ADDRESS_MAP_START(program_10bit, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(program_10bit, AS_PROGRAM, 8, legacy_cpu_device)
 	AM_RANGE(0x000, 0x3ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(program_11bit, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(program_11bit, AS_PROGRAM, 8, legacy_cpu_device)
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(program_12bit, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(program_12bit, AS_PROGRAM, 8, legacy_cpu_device)
 	AM_RANGE(0x000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_6bit, AS_DATA, 8)
+static ADDRESS_MAP_START(data_6bit, AS_DATA, 8, legacy_cpu_device)
 	AM_RANGE(0x00, 0x3f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_7bit, AS_DATA, 8)
+static ADDRESS_MAP_START(data_7bit, AS_DATA, 8, legacy_cpu_device)
 	AM_RANGE(0x00, 0x7f) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(data_8bit, AS_DATA, 8)
+static ADDRESS_MAP_START(data_8bit, AS_DATA, 8, legacy_cpu_device)
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 

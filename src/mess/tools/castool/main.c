@@ -27,13 +27,14 @@
 #include "formats/gtp_cas.h"
 #include "formats/hect_tap.h"
 #include "formats/ace_tap.h"
+#include "formats/adam_cas.h"
 #include "formats/kc_cas.h"
 #include "formats/kim1_cas.h"
 #include "formats/lviv_lvt.h"
 #include "formats/mz_cas.h"
 #include "formats/orao_cas.h"
 #include "formats/oric_tap.h"
-#include "formats/pmd_pmd.h"
+#include "formats/pmd_cas.h"
 #include "formats/primoptp.h"
 #include "formats/rk_cas.h"
 #include "formats/sord_cas.h"
@@ -43,6 +44,7 @@
 #include "formats/uef_cas.h"
 #include "formats/vg5k_cas.h"
 #include "formats/vt_cas.h"
+#include "formats/x07_cas.h"
 #include "formats/zx81_p.h"
 
 struct SupportedCassetteFormats
@@ -54,6 +56,7 @@ struct SupportedCassetteFormats
 
 const struct SupportedCassetteFormats formats[] = {
 	{"a26", a26_cassette_formats               ,"Atari 2600"},
+	{"ddp", coleco_adam_cassette_formats       ,"Coleco Adam"},
 	{"apf", apf_cassette_formats               ,"APF Imagination Machine"},
 	{"cbm", cbm_cassette_formats               ,"Commodore"},
 	{"cgenie", cgenie_cassette_formats         ,"Colour Genie"},
@@ -70,7 +73,7 @@ const struct SupportedCassetteFormats formats[] = {
 	{"mz", mz700_cassette_formats              ,"Sharp MZ"},
 	{"orao", orao_cassette_formats             ,"Orao"},
 	{"oric", oric_cassette_formats             ,"Oric"},
-	{"pmd85", pmd85_pmd_format                 ,"PMD-85"},
+	{"pmd85", pmd85_cassette_formats           ,"PMD-85"},
 	{"primo", primo_ptp_format                 ,"Primo"},
 	{"rku", rku_cassette_formats               ,"UT-88"},
 	{"rk8", rk8_cassette_formats               ,"Mikro-80"},
@@ -89,6 +92,7 @@ const struct SupportedCassetteFormats formats[] = {
 	{"vg5k", vg5k_cassette_formats             ,"VG 5000 k7"},
 	{"vtech1", vtech1_cassette_formats         ,"Video Technology Laser 110-310"},
 	{"vtech2", vtech2_cassette_formats         ,"Video Technology Laser 350-700"},
+	{"x07", x07_cassette_formats               ,"Canon X-07"},
 	{"zx81_p", zx81_p_format                   ,"Sinclair ZX81"},
 	{"zx80_o", zx80_o_format                   ,"Sinclair ZX80"},
 	{NULL,NULL,NULL}

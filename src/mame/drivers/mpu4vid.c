@@ -999,7 +999,7 @@ static VIDEO_START( mpu4_vid )
 	/* if anything uses tile sizes other than 8x8 we can't really do it this way.. we'll have to draw tiles by hand.
       All Barcrest stuff uses 8x8, son unless the BwB is different, we don't need to */
 
-	state->m_vid_vidram = auto_alloc_array(machine, UINT16, 0x20000/2);
+	state->m_vid_vidram.allocate(0x20000/2);
 
 	memset(state->m_vid_vidram,0,0x20000);
 
@@ -1011,10 +1011,10 @@ static VIDEO_START( mpu4_vid )
 	assert(state->m_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[state->m_gfx_index+0] = gfx_element_alloc(machine, &mpu4_vid_char_8x8_layout, (UINT8 *)state->m_vid_vidram, machine.total_colors() / 16, 0);
-	machine.gfx[state->m_gfx_index+1] = gfx_element_alloc(machine, &mpu4_vid_char_8x16_layout, (UINT8 *)state->m_vid_vidram, machine.total_colors() / 16, 0);
-	machine.gfx[state->m_gfx_index+2] = gfx_element_alloc(machine, &mpu4_vid_char_16x8_layout, (UINT8 *)state->m_vid_vidram, machine.total_colors() / 16, 0);
-	machine.gfx[state->m_gfx_index+3] = gfx_element_alloc(machine, &mpu4_vid_char_16x16_layout, (UINT8 *)state->m_vid_vidram, machine.total_colors() / 16, 0);
+	machine.gfx[state->m_gfx_index+0] = gfx_element_alloc(machine, &mpu4_vid_char_8x8_layout, reinterpret_cast<UINT8 *>(state->m_vid_vidram.target()), machine.total_colors() / 16, 0);
+	machine.gfx[state->m_gfx_index+1] = gfx_element_alloc(machine, &mpu4_vid_char_8x16_layout, reinterpret_cast<UINT8 *>(state->m_vid_vidram.target()), machine.total_colors() / 16, 0);
+	machine.gfx[state->m_gfx_index+2] = gfx_element_alloc(machine, &mpu4_vid_char_16x8_layout, reinterpret_cast<UINT8 *>(state->m_vid_vidram.target()), machine.total_colors() / 16, 0);
+	machine.gfx[state->m_gfx_index+3] = gfx_element_alloc(machine, &mpu4_vid_char_16x16_layout, reinterpret_cast<UINT8 *>(state->m_vid_vidram.target()), machine.total_colors() / 16, 0);
 
 	state->m_scn2674_IR_pointer = 0;
 }
@@ -1182,10 +1182,10 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_track_r )
 	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",device->machine().describe_context()));
 
 
-	UINT8 data = input_port_read(device->machine(), "AUX1");
+	UINT8 data = state->ioport("AUX1")->read();
 
-	INT8 dx = input_port_read(device->machine(), "TRACKX");
-	INT8 dy = input_port_read(device->machine(), "TRACKY");
+	INT8 dx = state->ioport("TRACKX")->read();
+	INT8 dy = state->ioport("TRACKY")->read();
 
 	state->m_cur[0] = dy + dx;
 	state->m_cur[1] = dy - dx;
@@ -1468,12 +1468,12 @@ static INPUT_PORTS_START( dealem )
 
 	PORT_START("ORANGE2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN5) PORT_NAME("20p Token")PORT_IMPULSE(5)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x04)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x05)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x06)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x07)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x08)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x09)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p") PORT_CONDITION("DIL1",0x0f,EQUALS,0x04)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p") PORT_CONDITION("DIL1",0x0f,EQUALS,0x05)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p") PORT_CONDITION("DIL1",0x0f,EQUALS,0x06)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p") PORT_CONDITION("DIL1",0x0f,EQUALS,0x07)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p") PORT_CONDITION("DIL1",0x0f,EQUALS,0x08)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p") PORT_CONDITION("DIL1",0x0f,EQUALS,0x09)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -1484,22 +1484,22 @@ static INPUT_PORTS_START( dealem )
 	PORT_START("BLACK1")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Gamble")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2) PORT_NAME("Pontoon")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x01)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x09)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x03)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x04)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x05)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x06)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x07)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x08)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,EQUALS,0x01)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,EQUALS,0x09)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,EQUALS,0x03)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,EQUALS,0x04)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,EQUALS,0x05)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,EQUALS,0x06)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,EQUALS,0x07)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,EQUALS,0x08)
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Rear Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_START("BLACK2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x00)
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x02)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,EQUALS,0x00)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Hi-Lo") PORT_CONDITION("DIL1",0x0f,EQUALS,0x02)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Twist")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Lo")
@@ -1574,10 +1574,10 @@ static INPUT_PORTS_START( dealem )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_SPECIAL)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_SPECIAL)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_SPECIAL)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5) PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x00)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5) PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x01)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5) PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x02)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5) PORT_CONDITION("DIL1",0x0f,PORTCOND_EQUALS,0x03)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5) PORT_CONDITION("DIL1",0x0f,EQUALS,0x00)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5) PORT_CONDITION("DIL1",0x0f,EQUALS,0x01)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5) PORT_CONDITION("DIL1",0x0f,EQUALS,0x02)
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("10p")PORT_IMPULSE(5) PORT_CONDITION("DIL1",0x0f,EQUALS,0x03)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_COIN2) PORT_NAME("20p")PORT_IMPULSE(5)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_COIN3) PORT_NAME("50p")PORT_IMPULSE(5)
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
@@ -1974,95 +1974,95 @@ static MACHINE_RESET( mpu4_vid )
 	state->m_chr_value		= 0;
 }
 
-static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16, mpu4_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, m_vid_mainram)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 //  AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w)
-/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
-	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
-	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, status_read, control_write, 0xff)
-	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, data_read, data_write, 0xff)
-	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8_MODERN("6840ptm_68k", ptm6840_device, read, write, 0xff)
-	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE(characteriser16_r, characteriser16_w)
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8_LEGACY("saa", saa1099_data_w, 0x00ff)
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8_LEGACY("saa", saa1099_control_w, 0x00ff)
+	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE_LEGACY(ef9369_r, ef9369_w)
+/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE_LEGACY(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE_LEGACY(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
+	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE_LEGACY(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
+	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_read, control_write, 0xff)
+	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_read, data_write, 0xff)
+	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0xff)
+	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE_LEGACY(characteriser16_r, characteriser16_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16, mpu4_state )
 	AM_RANGE(0x000000, 0x5fffff) AM_ROM //AM_WRITENOP
 	AM_RANGE(0x600000, 0x63ffff) AM_RAM	/* The Mating Game has an extra 256kB RAM on the program card */
 //  AM_RANGE(0x640000, 0x7fffff) AM_NOP /* Possible bug, reads and writes here */
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, m_vid_mainram)
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w)
-	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
-	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, status_read, control_write, 0xff)
-	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, data_read, data_write, 0xff)
-	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8_MODERN("6840ptm_68k", ptm6840_device, read, write, 0xff)
-	AM_RANGE(0xffa040, 0xffa04f) AM_DEVREAD8_MODERN("ptm_ic3ss", ptm6840_device, read,0xff)  // 6840PTM on sampled sound board
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8_LEGACY("saa", saa1099_data_w, 0x00ff)
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8_LEGACY("saa", saa1099_control_w, 0x00ff)
+	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE_LEGACY(ef9369_r, ef9369_w)
+	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE_LEGACY(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
+	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE_LEGACY(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
+	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_read, control_write, 0xff)
+	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_read, data_write, 0xff)
+	AM_RANGE(0xff9000, 0xff900f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0xff)
+	AM_RANGE(0xffa040, 0xffa04f) AM_DEVREAD8("ptm_ic3ss", ptm6840_device, read,0xff)  // 6840PTM on sampled sound board
 	AM_RANGE(0xffa040, 0xffa04f) AM_WRITE8(ic3ss_w,0x00ff)  // 6840PTM on sampled sound board
-	AM_RANGE(0xffa060, 0xffa067) AM_DEVREADWRITE8_MODERN("pia_ic4ss", pia6821_device, read, write,0x00ff)    // PIA6821 on sampled sound board
-	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE(characteriser16_r, characteriser16_w)
+	AM_RANGE(0xffa060, 0xffa067) AM_DEVREADWRITE8("pia_ic4ss", pia6821_device, read, write,0x00ff)    // PIA6821 on sampled sound board
+	AM_RANGE(0xffd000, 0xffd00f) AM_READWRITE_LEGACY(characteriser16_r, characteriser16_w)
 //  AM_RANGE(0xfff000, 0xffffff) AM_NOP /* Possible bug, reads and writes here */
 ADDRESS_MAP_END
 
 /* TODO: Fix up MPU4 map*/
-static ADDRESS_MAP_START( mpu4_6809_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mpu4_6809_map, AS_PROGRAM, 8, mpu4_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE_MODERN("acia6850_0", acia6850_device, status_read, control_write)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE_MODERN("acia6850_0", acia6850_device, data_read, data_write)
+	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("acia6850_0", acia6850_device, status_read, control_write)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("acia6850_0", acia6850_device, data_read, data_write)
 	AM_RANGE(0x0880, 0x0881) AM_NOP //Read/write here
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE_MODERN("ptm_ic2", ptm6840_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE_MODERN("pia_ic3", pia6821_device, read, write)
-	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE_MODERN("pia_ic4", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE_MODERN("pia_ic5", pia6821_device, read, write)
-	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE_MODERN("pia_ic6", pia6821_device, read, write)
-	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE_MODERN("pia_ic7", pia6821_device, read, write)
-	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE_MODERN("pia_ic8", pia6821_device, read, write)
+	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_device, read, write)
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_device, read, write)
+	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_device, read, write)
+	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_device, read, write)
+	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_device, read, write)
+	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_device, read, write)
+	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_device, read, write)
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 	AM_RANGE(0xbe00, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM	AM_REGION("maincpu",0)  /* 64k EPROM on board, only this region read */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bwbvid_68k_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bwbvid_68k_map, AS_PROGRAM, 16, mpu4_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, m_vid_mainram)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w)
-//  AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE(bt471_r,bt471_w) //Some games use this
-/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
-	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, status_read, control_write, 0xff)
-	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, data_read, data_write, 0xff)
-	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8_MODERN("6840ptm_68k", ptm6840_device, read, write, 0xff)
-	//AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8_LEGACY("saa", saa1099_data_w, 0x00ff)
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8_LEGACY("saa", saa1099_control_w, 0x00ff)
+	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE_LEGACY(ef9369_r, ef9369_w)
+//  AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE_LEGACY(bt471_r,bt471_w) //Some games use this
+/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE_LEGACY(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE_LEGACY(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
+	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE_LEGACY(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_read, control_write, 0xff)
+	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_read, data_write, 0xff)
+	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0xff)
+	//AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE_LEGACY(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE_LEGACY(adpcm_r, adpcm_w)  CHR ?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16, mpu4_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(mpu4_state, m_vid_mainram)
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(ef9369_r, ef9369_w)
-	//AM_RANGE(0xa00000, 0xa00003) AM_READWRITE(bt471_r,bt471_w) Some games use this
-/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
-	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
-	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, status_read, control_write, 0xff)
-	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8_MODERN("acia6850_1", acia6850_device, data_read, data_write, 0xff)
-	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8_MODERN("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
-	AM_RANGE(0xe02000, 0xe02007) AM_DEVREADWRITE8_MODERN("pia_ic4ss", pia6821_device, read, write, 0xff00)
-	AM_RANGE(0xe03000, 0xe0300f) AM_DEVREAD8_MODERN("ptm_ic3ss", ptm6840_device, read,0xff00)  // 6840PTM on sampled sound board
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8_LEGACY("saa", saa1099_data_w, 0x00ff)
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8_LEGACY("saa", saa1099_control_w, 0x00ff)
+	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE_LEGACY(ef9369_r, ef9369_w)
+	//AM_RANGE(0xa00000, 0xa00003) AM_READWRITE_LEGACY(bt471_r,bt471_w) Some games use this
+/*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE_LEGACY(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
+	AM_RANGE(0xb00000, 0xb0000f) AM_READWRITE_LEGACY(mpu4_vid_scn2674_r, mpu4_vid_scn2674_w)
+	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE_LEGACY(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_read, control_write, 0xff)
+	AM_RANGE(0xe00002, 0xe00003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_read, data_write, 0xff)
+	AM_RANGE(0xe01000, 0xe0100f) AM_DEVREADWRITE8("6840ptm_68k", ptm6840_device, read, write, 0x00ff)
+	AM_RANGE(0xe02000, 0xe02007) AM_DEVREADWRITE8("pia_ic4ss", pia6821_device, read, write, 0xff00)
+	AM_RANGE(0xe03000, 0xe0300f) AM_DEVREAD8("ptm_ic3ss", ptm6840_device, read,0xff00)  // 6840PTM on sampled sound board
 	AM_RANGE(0xe03000, 0xe0300f) AM_WRITE8(ic3ss_w,0xff00)  // 6840PTM on sampled sound board
-	AM_RANGE(0xe04000, 0xe0400f) AM_READWRITE(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
+	AM_RANGE(0xe04000, 0xe0400f) AM_READWRITE_LEGACY(bwb_characteriser16_r, bwb_characteriser16_w)//AM_READWRITE_LEGACY(adpcm_r, adpcm_w)  CHR ?
 ADDRESS_MAP_END
 
 /* Deal 'Em */
@@ -2112,6 +2112,7 @@ GFXDECODE_END
 
 static PALETTE_INIT( dealem )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i, len;
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
@@ -2122,7 +2123,7 @@ static PALETTE_INIT( dealem )
 			3,	resistances_rg,	weights_g,	1000,	0,
 			2,	resistances_b,	weights_b,	1000,	0);
 
-	len = machine.region("proms")->bytes();
+	len = machine.root_device().memregion("proms")->bytes();
 	for (i = 0; i < len; i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
@@ -2195,24 +2196,24 @@ static const mc6845_interface hd6845_intf =
 };
 
 
-static ADDRESS_MAP_START( dealem_memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dealem_memmap, AS_PROGRAM, 8, mpu4_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 
-/*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) */ //Runs hoppers
+/*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE_LEGACY(68681_duart_r,68681_duart_w) */ //Runs hoppers
 
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE_MODERN("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
+	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
 
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE_MODERN("pia_ic3", pia6821_device, read, write)		/* PIA6821 IC3 */
-	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE_MODERN("pia_ic4", pia6821_device, read, write)		/* PIA6821 IC4 */
-	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE_MODERN("pia_ic5", pia6821_device, read, write)		/* PIA6821 IC5 */
-	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE_MODERN("pia_ic6", pia6821_device, read, write)		/* PIA6821 IC6 */
-	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE_MODERN("pia_ic7", pia6821_device, read, write)		/* PIA6821 IC7 */
-	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE_MODERN("pia_ic8", pia6821_device, read, write)		/* PIA6821 IC8 */
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_device, read, write)		/* PIA6821 IC3 */
+	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_device, read, write)		/* PIA6821 IC4 */
+	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_device, read, write)		/* PIA6821 IC5 */
+	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_device, read, write)		/* PIA6821 IC6 */
+	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_device, read, write)		/* PIA6821 IC7 */
+	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_device, read, write)		/* PIA6821 IC8 */
 
-	AM_RANGE(0x1000, 0x2fff) AM_RAM AM_BASE_MEMBER(mpu4_state, m_dealem_videoram)
+	AM_RANGE(0x1000, 0x2fff) AM_RAM AM_SHARE("dealem_videoram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM	AM_WRITENOP/* 64k  paged ROM (4 pages) */
 ADDRESS_MAP_END
 
@@ -2882,7 +2883,7 @@ static DRIVER_INIT (prizeinv)
 void mpu4vid_char_cheat(running_machine& machine, int address)
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
-	UINT8* cheattable = machine.region( "video" )->base()+address;
+	UINT8* cheattable = state->memregion( "video" )->base()+address;
 	state->m_current_chr_table = blank_data;
 	for (int i=0;i<72;i++)
 	{

@@ -24,7 +24,7 @@
 
 READ8_MEMBER( comx35_state::mem_r )
 {
-	UINT8 *rom = machine().region(CDP1802_TAG)->base();
+	UINT8 *rom = memregion(CDP1802_TAG)->base();
 	UINT8 *ram = m_ram->pointer();
 	int extrom = 1;
 
@@ -138,13 +138,11 @@ ADDRESS_MAP_END
 //  INPUT_CHANGED( comx35_reset )
 //-------------------------------------------------
 
-static INPUT_CHANGED( comx35_reset )
+INPUT_CHANGED_MEMBER( comx35_state::trigger_reset )
 {
-	comx35_state *state = field.machine().driver_data<comx35_state>();
-
-	if (newval && BIT(input_port_read(field.machine(), "D6"), 7))
+	if (newval && BIT(ioport("D6")->read(), 7))
 	{
-		state->machine_reset();
+		machine_reset();
 	}
 }
 
@@ -242,7 +240,7 @@ static INPUT_PORTS_START( comx35 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RT") PORT_CODE(KEYCODE_F10) PORT_CHAR(UCHAR_MAMEKEY(F10)) PORT_CHANGED(comx35_reset, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RT") PORT_CODE(KEYCODE_F10) PORT_CHAR(UCHAR_MAMEKEY(F10)) PORT_CHANGED_MEMBER(DEVICE_SELF, comx35_state, trigger_reset, 0)
 INPUT_PORTS_END
 
 
@@ -363,12 +361,12 @@ static COSMAC_INTERFACE( cosmac_intf )
 
 READ_LINE_MEMBER( comx35_state::shift_r )
 {
-	return BIT(input_port_read(machine(), "MODIFIERS"), 0);
+	return BIT(ioport("MODIFIERS")->read(), 0);
 }
 
 READ_LINE_MEMBER( comx35_state::control_r )
 {
-	return BIT(input_port_read(machine(), "MODIFIERS"), 1);
+	return BIT(ioport("MODIFIERS")->read(), 1);
 }
 
 static CDP1871_INTERFACE( kbc_intf )
@@ -447,21 +445,26 @@ SLOT_INTERFACE_END
 //**************************************************************************
 
 //-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void comx35_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_ID_RESET:
+		m_clear = 1;
+		break;
+	}
+}
+
+
+//-------------------------------------------------
 //  MACHINE_START( comx35 )
 //-------------------------------------------------
 
-static TIMER_CALLBACK( reset_tick )
-{
-	comx35_state *state = machine.driver_data<comx35_state>();
-
-	state->m_clear = 1;
-}
-
 void comx35_state::machine_start()
 {
-	// allocate reset timer
-	m_reset_timer = machine().scheduler().timer_alloc(FUNC(reset_tick));
-
 	// clear the RAM since DOS card will go crazy if RAM is not all zeroes
 	UINT8 *ram = m_ram->pointer();
 	memset(ram, 0, 0x8000);
@@ -493,7 +496,7 @@ void comx35_state::machine_reset()
 	m_int = CLEAR_LINE;
 	m_prd = CLEAR_LINE;
 
-	m_reset_timer->adjust(attotime::from_msec(t));
+	timer_set(attotime::from_msec(t), TIMER_ID_RESET);
 }
 
 

@@ -61,11 +61,19 @@ class midas_state : public driver_device
 {
 public:
 	midas_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_gfxregs(*this, "gfxregs"){ }
 
 	UINT16 *m_gfxram;
-	UINT16 *m_gfxregs;
+	required_shared_ptr<UINT16> m_gfxregs;
 	tilemap_t *m_tmap;
+	DECLARE_READ16_MEMBER(ret_ffff);
+	DECLARE_WRITE16_MEMBER(midas_gfxregs_w);
+	DECLARE_WRITE16_MEMBER(livequiz_coin_w);
+	DECLARE_READ16_MEMBER(hammer_sensor_r);
+	DECLARE_WRITE16_MEMBER(hammer_coin_w);
+	DECLARE_WRITE16_MEMBER(hammer_motor_w);
+	DECLARE_WRITE16_MEMBER(hammer_led_w);
 };
 
 
@@ -214,25 +222,24 @@ static WRITE16_DEVICE_HANDLER( midas_eeprom_w )
 	}
 }
 
-static READ16_HANDLER( ret_ffff )
+READ16_MEMBER(midas_state::ret_ffff)
 {
 	return 0xffff;
 }
 
-static WRITE16_HANDLER( midas_gfxregs_w )
+WRITE16_MEMBER(midas_state::midas_gfxregs_w)
 {
-	midas_state *state = space->machine().driver_data<midas_state>();
-	COMBINE_DATA( state->m_gfxregs + offset );
+	COMBINE_DATA( m_gfxregs + offset );
 
 	switch( offset )
 	{
 		case 1:
 		{
-			UINT16 addr = state->m_gfxregs[0];
-			state->m_gfxram[addr] = data;
-			state->m_gfxregs[0] += state->m_gfxregs[2];
+			UINT16 addr = m_gfxregs[0];
+			m_gfxram[addr] = data;
+			m_gfxregs[0] += m_gfxregs[2];
 
-			if ( addr >= 0x7000 && addr <= 0x7fff )	state->m_tmap->mark_tile_dirty(addr - 0x7000);
+			if ( addr >= 0x7000 && addr <= 0x7fff )	m_tmap->mark_tile_dirty(addr - 0x7000);
 
 			break;
 		}
@@ -243,18 +250,18 @@ static WRITE16_HANDLER( midas_gfxregs_w )
                                        Live Quiz Show
 ***************************************************************************************/
 
-static WRITE16_HANDLER( livequiz_coin_w )
+WRITE16_MEMBER(midas_state::livequiz_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x0001);
+		coin_counter_w(machine(), 0, data & 0x0001);
 	}
 #ifdef MAME_DEBUG
 //  popmessage("coin %04X", data);
 #endif
 }
 
-static ADDRESS_MAP_START( livequiz_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( livequiz_map, AS_PROGRAM, 16, midas_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("DSW_PLAYER1")
@@ -262,21 +269,21 @@ static ADDRESS_MAP_START( livequiz_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("PLAYER2")
 	AM_RANGE(0x980000, 0x980001) AM_READ_PORT("START")
 
-	AM_RANGE(0x980000, 0x980001) AM_WRITE( livequiz_coin_w )
+	AM_RANGE(0x980000, 0x980001) AM_WRITE(livequiz_coin_w )
 
-	AM_RANGE(0x9a0000, 0x9a0001) AM_DEVWRITE( "eeprom", midas_eeprom_w )
+	AM_RANGE(0x9a0000, 0x9a0001) AM_DEVWRITE_LEGACY("eeprom", midas_eeprom_w )
 
-	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE( midas_gfxregs_w ) AM_BASE_MEMBER(midas_state, m_gfxregs )
+	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE(midas_gfxregs_w ) AM_SHARE("gfxregs")
 
-	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_WRITE( paletteram16_xrgb_word_be_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_WRITE(paletteram_xrgb_word_be_w ) AM_SHARE("paletteram")
 	AM_RANGE(0xa40000, 0xa7ffff) AM_RAM
 
-	AM_RANGE(0xb00000, 0xb00001) AM_READ( ret_ffff )
-	AM_RANGE(0xb20000, 0xb20001) AM_READ( ret_ffff )
-	AM_RANGE(0xb40000, 0xb40001) AM_READ( ret_ffff )
-	AM_RANGE(0xb60000, 0xb60001) AM_READ( ret_ffff )
+	AM_RANGE(0xb00000, 0xb00001) AM_READ(ret_ffff )
+	AM_RANGE(0xb20000, 0xb20001) AM_READ(ret_ffff )
+	AM_RANGE(0xb40000, 0xb40001) AM_READ(ret_ffff )
+	AM_RANGE(0xb60000, 0xb60001) AM_READ(ret_ffff )
 
-	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8( "ymz", ymz280b_r, ymz280b_w, 0x00ff )
+	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff )
 
 	AM_RANGE(0xba0000, 0xba0001) AM_READ_PORT("START3")
 	AM_RANGE(0xbc0000, 0xbc0001) AM_READ_PORT("PLAYER3")
@@ -290,33 +297,33 @@ ADDRESS_MAP_END
                                           Hammer
 ***************************************************************************************/
 
-static READ16_HANDLER( hammer_sensor_r )
+READ16_MEMBER(midas_state::hammer_sensor_r)
 {
-	if (input_port_read(space->machine(), "HAMMER") & 0x80)
+	if (ioport("HAMMER")->read() & 0x80)
 		return 0xffff;
 
-	return (input_port_read(space->machine(), "SENSORY") << 8) | input_port_read(space->machine(), "SENSORX");
+	return (ioport("SENSORY")->read() << 8) | ioport("SENSORX")->read();
 }
 
-static WRITE16_HANDLER( hammer_coin_w )
+WRITE16_MEMBER(midas_state::hammer_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x0001);
-		coin_counter_w(space->machine(), 1, data & 0x0002);
+		coin_counter_w(machine(), 0, data & 0x0001);
+		coin_counter_w(machine(), 1, data & 0x0002);
 	}
 #ifdef MAME_DEBUG
 //  popmessage("coin %04X", data);
 #endif
 }
 
-static WRITE16_HANDLER( hammer_motor_w )
+WRITE16_MEMBER(midas_state::hammer_motor_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		ticket_dispenser_w(space->machine().device("prize1"), 0, (data & 0x0001) << 7);
-		ticket_dispenser_w(space->machine().device("prize2"), 0, (data & 0x0002) << 6);
-		ticket_dispenser_w(space->machine().device("ticket"), 0, (data & 0x0010) << 3);
+		machine().device<ticket_dispenser_device>("prize1")->write(space, 0, (data & 0x0001) << 7);
+		machine().device<ticket_dispenser_device>("prize2")->write(space, 0, (data & 0x0002) << 6);
+		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x0010) << 3);
 		// data & 0x0080 ?
 	}
 #ifdef MAME_DEBUG
@@ -324,14 +331,14 @@ static WRITE16_HANDLER( hammer_motor_w )
 #endif
 }
 
-static WRITE16_HANDLER( hammer_led_w )
+WRITE16_MEMBER(midas_state::hammer_led_w)
 {
 #ifdef MAME_DEBUG
 //  popmessage("led %04X", data);
 #endif
 }
 
-static ADDRESS_MAP_START( hammer_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hammer_map, AS_PROGRAM, 16, midas_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("DSW")
@@ -339,30 +346,30 @@ static ADDRESS_MAP_START( hammer_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x940000, 0x940001) AM_READ_PORT("IN0")
 	AM_RANGE(0x980000, 0x980001) AM_READ_PORT("TILT")
 
-	AM_RANGE(0x980000, 0x980001) AM_WRITE( hammer_coin_w )
+	AM_RANGE(0x980000, 0x980001) AM_WRITE(hammer_coin_w )
 	AM_RANGE(0x9c000c, 0x9c000d) AM_WRITENOP	// IRQ Ack
-	AM_RANGE(0x9c000e, 0x9c000f) AM_WRITE( hammer_led_w )
+	AM_RANGE(0x9c000e, 0x9c000f) AM_WRITE(hammer_led_w )
 
-	AM_RANGE(0x9a0000, 0x9a0001) AM_DEVWRITE( "eeprom", midas_eeprom_w )
+	AM_RANGE(0x9a0000, 0x9a0001) AM_DEVWRITE_LEGACY("eeprom", midas_eeprom_w )
 
-	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE( midas_gfxregs_w ) AM_BASE_MEMBER(midas_state, m_gfxregs )
+	AM_RANGE(0x9c0000, 0x9c0005) AM_WRITE(midas_gfxregs_w ) AM_SHARE("gfxregs")
 
-	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_WRITE( paletteram16_xrgb_word_be_w ) AM_BASE_GENERIC( paletteram )
+	AM_RANGE(0xa00000, 0xa3ffff) AM_RAM_WRITE(paletteram_xrgb_word_be_w ) AM_SHARE("paletteram")
 	AM_RANGE(0xa40000, 0xa7ffff) AM_RAM
 
-	AM_RANGE(0xb00000, 0xb00001) AM_READ( ret_ffff )
-	AM_RANGE(0xb20000, 0xb20001) AM_READ( ret_ffff )
-	AM_RANGE(0xb40000, 0xb40001) AM_READ( ret_ffff )
-	AM_RANGE(0xb60000, 0xb60001) AM_READ( ret_ffff )
+	AM_RANGE(0xb00000, 0xb00001) AM_READ(ret_ffff )
+	AM_RANGE(0xb20000, 0xb20001) AM_READ(ret_ffff )
+	AM_RANGE(0xb40000, 0xb40001) AM_READ(ret_ffff )
+	AM_RANGE(0xb60000, 0xb60001) AM_READ(ret_ffff )
 
-	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8( "ymz", ymz280b_r, ymz280b_w, 0x00ff )
+	AM_RANGE(0xb80008, 0xb8000b) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff )
 
 	AM_RANGE(0xba0000, 0xba0001) AM_READ_PORT("IN1")
 	AM_RANGE(0xbc0000, 0xbc0001) AM_READ_PORT("HAMMER")
 
-	AM_RANGE(0xbc0002, 0xbc0003) AM_WRITE( hammer_motor_w )
+	AM_RANGE(0xbc0002, 0xbc0003) AM_WRITE(hammer_motor_w )
 
-	AM_RANGE(0xbc0004, 0xbc0005) AM_READ( hammer_sensor_r )
+	AM_RANGE(0xbc0004, 0xbc0005) AM_READ(hammer_sensor_r )
 
 	AM_RANGE(0xd00000, 0xd1ffff) AM_RAM	// zoom table?
 
@@ -650,11 +657,11 @@ static INPUT_PORTS_START( hammer )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("HAMMER")	// bc0000
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("prize1", ticket_dispenser_line_r)	// prize 1 sensor ("tejisw 1")
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("prize2", ticket_dispenser_line_r)	// prize 2 sensor ("tejisw 2")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("prize1", ticket_dispenser_device, line_r)	// prize 1 sensor ("tejisw 1")
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("prize2", ticket_dispenser_device, line_r)	// prize 2 sensor ("tejisw 2")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_IMPULSE(5)	PORT_NAME( "Hammer" )
@@ -726,9 +733,9 @@ static MACHINE_CONFIG_START( hammer, midas_state )
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MCFG_TICKET_DISPENSER_ADD("prize1", 1000*5, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
-	MCFG_TICKET_DISPENSER_ADD("prize2", 1000*5, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
-	MCFG_TICKET_DISPENSER_ADD("ticket",    200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
+	MCFG_TICKET_DISPENSER_ADD("prize1", attotime::from_msec(1000*5), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
+	MCFG_TICKET_DISPENSER_ADD("prize2", attotime::from_msec(1000*5), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
+	MCFG_TICKET_DISPENSER_ADD("ticket",    attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -863,7 +870,7 @@ ROM_END
 
 static DRIVER_INIT( livequiz )
 {
-	UINT16 *rom = (UINT16 *) machine.region("maincpu")->base();
+	UINT16 *rom = (UINT16 *) machine.root_device().memregion("maincpu")->base();
 
 	// PROTECTION CHECKS
 	rom[0x13345a/2]	=	0x4e75;

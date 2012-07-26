@@ -654,7 +654,7 @@ static DEVICE_START( snk6502_sound )
 	snk6502_sound_state *state = get_safe_token(device);
 
 	state->m_samples = device->machine().device<samples_device>("samples");
-	state->m_ROM = device->machine().region("snk6502")->base();
+	state->m_ROM = device->machine().root_device().memregion("snk6502")->base();
 
 	// adjusted
 	snk6502_set_music_freq(device->machine(), 43000);
@@ -1038,8 +1038,8 @@ WRITE8_HANDLER( fantasy_sound_w )
 		/* select tune in ROM based on sound command byte */
 		tone_channels[2].base = 0x1000 + ((data & 0x70) << 4);
 		tone_channels[2].mask = 0xff;
-
-		snk6502_flipscreen_w(space, 0, data);
+		snk6502_state *state = space->machine().driver_data<snk6502_state>();
+		state->snk6502_flipscreen_w(*space, 0, data);
 		break;
 	}
 }

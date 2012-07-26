@@ -42,23 +42,22 @@
 #include "includes/snookr10.h"
 
 
-WRITE8_HANDLER( snookr10_videoram_w )
+WRITE8_MEMBER(snookr10_state::snookr10_videoram_w)
 {
-	snookr10_state *state = space->machine().driver_data<snookr10_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( snookr10_colorram_w )
+WRITE8_MEMBER(snookr10_state::snookr10_colorram_w)
 {
-	snookr10_state *state = space->machine().driver_data<snookr10_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
 PALETTE_INIT( snookr10 )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	/* GGBBBRRR */
 
 	int i;
@@ -119,6 +118,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 PALETTE_INIT( apple10 )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	/* GGBBBRRR */
 
 	int i, cn;

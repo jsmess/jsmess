@@ -31,6 +31,7 @@
 
 PALETTE_INIT( hyperspt )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b[2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -89,26 +90,24 @@ PALETTE_INIT( hyperspt )
 	}
 }
 
-WRITE8_HANDLER( hyperspt_videoram_w )
+WRITE8_MEMBER(hyperspt_state::hyperspt_videoram_w)
 {
-	hyperspt_state *state = space->machine().driver_data<hyperspt_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( hyperspt_colorram_w )
+WRITE8_MEMBER(hyperspt_state::hyperspt_colorram_w)
 {
-	hyperspt_state *state = space->machine().driver_data<hyperspt_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( hyperspt_flipscreen_w )
+WRITE8_MEMBER(hyperspt_state::hyperspt_flipscreen_w)
 {
-	if (flip_screen_get(space->machine()) != (data & 0x01))
+	if (flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(space->machine(), data & 0x01);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(data & 0x01);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -136,7 +135,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
 	{
 		int sx = spriteram[offs + 3];
 		int sy = 240 - spriteram[offs + 1];
@@ -145,13 +144,13 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int flipx = ~spriteram[offs] & 0x40;
 		int flipy = spriteram[offs] & 0x80;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
 		}
 
-		/* Note that this adjustment must be done AFTER handling flip_screen_get(machine), thus */
+		/* Note that this adjustment must be done AFTER handling state->flip_screen(), thus */
 		/* proving that this is a hardware related "feature" */
 
 		sy += 1;
@@ -182,7 +181,7 @@ SCREEN_UPDATE_IND16( hyperspt )
 	for (row = 0; row < 32; row++)
 	{
 		int scrollx = state->m_scroll[row * 2] + (state->m_scroll[(row * 2) + 1] & 0x01) * 256;
-		if (flip_screen_get(screen.machine())) scrollx = -scrollx;
+		if (state->flip_screen()) scrollx = -scrollx;
 		state->m_bg_tilemap->set_scrollx(row, scrollx);
 	}
 

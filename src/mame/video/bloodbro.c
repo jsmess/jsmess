@@ -74,25 +74,22 @@ VIDEO_START( bloodbro )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( bloodbro_bgvideoram_w )
+WRITE16_MEMBER(bloodbro_state::bloodbro_bgvideoram_w)
 {
-	bloodbro_state *state = space->machine().driver_data<bloodbro_state>();
-	COMBINE_DATA(&state->m_bgvideoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bgvideoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( bloodbro_fgvideoram_w )
+WRITE16_MEMBER(bloodbro_state::bloodbro_fgvideoram_w)
 {
-	bloodbro_state *state = space->machine().driver_data<bloodbro_state>();
-	COMBINE_DATA(&state->m_fgvideoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_fgvideoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( bloodbro_txvideoram_w )
+WRITE16_MEMBER(bloodbro_state::bloodbro_txvideoram_w)
 {
-	bloodbro_state *state = space->machine().driver_data<bloodbro_state>();
-	COMBINE_DATA(&state->m_txvideoram[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_txvideoram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -150,7 +147,7 @@ static void bloodbro_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	bloodbro_state *state = machine.driver_data<bloodbro_state>();
 	UINT16 *spriteram16 = state->m_spriteram;
 	int offs;
-	for (offs = 0;offs < state->m_spriteram_size/2;offs += 4)
+	for (offs = 0;offs < state->m_spriteram.bytes()/2;offs += 4)
 	{
 		int sx,sy,x,y,width,height,attributes,tile_number,color,flipx,flipy,pri_mask;
 
@@ -201,7 +198,7 @@ static void weststry_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	int offs;
 
 	/* TODO: the last two entries are not sprites - control registers? */
-	for (offs = 0;offs < state->m_spriteram_size/2 - 8;offs += 4)
+	for (offs = 0;offs < state->m_spriteram.bytes()/2 - 8;offs += 4)
 	{
 		int data = spriteram16[offs+2];
 		int data0 = spriteram16[offs+0];

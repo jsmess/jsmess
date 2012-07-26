@@ -8,7 +8,7 @@
 #define AMSTR_PC_H_
 
 
-#define PC200_MODE (input_port_read(machine, "DSW0") & 0x30)
+#define PC200_MODE (machine.root_device().ioport("DSW0")->read() & 0x30)
 #define PC200_MDA 0x30
 
 

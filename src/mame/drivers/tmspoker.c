@@ -218,10 +218,14 @@ class tmspoker_state : public driver_device
 {
 public:
 	tmspoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(tmspoker_videoram_w);
+	//DECLARE_WRITE8_MEMBER(debug_w);
+	DECLARE_READ8_MEMBER(unk_r);
 };
 
 
@@ -229,11 +233,10 @@ public:
 *     Video Hardware     *
 *************************/
 
-static WRITE8_HANDLER( tmspoker_videoram_w )
+WRITE8_MEMBER(tmspoker_state::tmspoker_videoram_w)
 {
-	tmspoker_state *state = space->machine().driver_data<tmspoker_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -273,7 +276,7 @@ static PALETTE_INIT( tmspoker )
 *  Read / Write Handlers  *
 **************************/
 
-//static WRITE8_HANDLER( debug_w )
+//WRITE8_MEMBER(tmspoker_state::debug_w)
 //{
 //  popmessage("written : %02X", data);
 //}
@@ -290,18 +293,18 @@ static INTERRUPT_GEN( tmspoker_interrupt )
 
 static MACHINE_START( tmspoker )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0], 0x1000);
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	machine.root_device().membank("bank1")->configure_entries(0, 2, &ROM[0], 0x1000);
 }
 
 
 static MACHINE_RESET( tmspoker )
 {
-	UINT8 seldsw = (input_port_read(machine, "SELDSW") );
+	UINT8 seldsw = (machine.root_device().ioport("SELDSW")->read() );
 
 	popmessage("ROM Bank: %02X", seldsw);
 
-	memory_set_bank(machine, "bank1", seldsw);
+	machine.root_device().membank("bank1")->set_entry(seldsw);
 }
 
 
@@ -309,24 +312,24 @@ static MACHINE_RESET( tmspoker )
 * Memory Map Information *
 *************************/
 //59a
-static ADDRESS_MAP_START( tmspoker_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tmspoker_map, AS_PROGRAM, 8, tmspoker_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x2801, 0x2801) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x3000, 0x33ff) AM_WRITE(tmspoker_videoram_w) AM_BASE_MEMBER(tmspoker_state, m_videoram)
+	AM_RANGE(0x2800, 0x2800) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x2801, 0x2801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x3000, 0x33ff) AM_WRITE(tmspoker_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x3800, 0x3fff) AM_RAM //NVRAM?
 	AM_RANGE(0x2000, 0x20ff) AM_RAM //color RAM?
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER(unk_r)
+READ8_MEMBER(tmspoker_state::unk_r)
 {
 	printf("%x\n",offset);
-	return 0;//0xff;//mame_rand(space->machine);
+	return 0;//0xff;//mame_rand(machine);
 }
 
-static ADDRESS_MAP_START( tmspoker_cru_map, AS_IO, 8 )
+static ADDRESS_MAP_START( tmspoker_cru_map, AS_IO, 8, tmspoker_state )
 	AM_RANGE(0x0000, 0xffff) AM_READ(unk_r)
 ADDRESS_MAP_END
 
@@ -612,8 +615,8 @@ static DRIVER_INIT( bus )
 {
 	/* decode the TMS9980 ROMs */
 	offs_t offs;
-	UINT8 *rom = machine.region("maincpu")->base();
-	const size_t len = machine.region("maincpu")->bytes();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	const size_t len = machine.root_device().memregion("maincpu")->bytes();
 
 	for (offs = 0; offs < len; offs++)
 	{

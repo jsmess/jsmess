@@ -191,24 +191,24 @@ ae500w07.ad1 - M6295 Samples (23c4001)
 
 
 // It looks like this needs a synch between z80 and 68k ??? See z80:006A-0091
-static READ16_HANDLER( sound_r )
+READ16_MEMBER(tecmosys_state::sound_r)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		space->machine().scheduler().synchronize();
-		return soundlatch2_r( space,  0 );
+		machine().scheduler().synchronize();
+		return soundlatch2_byte_r(space,  0 );
 	}
 
 	return 0;
 }
 
-static WRITE16_HANDLER( sound_w )
+WRITE16_MEMBER(tecmosys_state::sound_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		space->machine().scheduler().synchronize();
-		soundlatch_w(space, 0x00, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		machine().scheduler().synchronize();
+		soundlatch_byte_w(space, 0x00, data & 0xff);
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -221,10 +221,9 @@ static WRITE16_HANDLER( sound_w )
     - 880000 & 03, crash
 */
 
-static WRITE16_HANDLER( unk880000_w )
+WRITE16_MEMBER(tecmosys_state::unk880000_w)
 {
-	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
-	COMBINE_DATA(&state->m_880000regs[offset]);
+	COMBINE_DATA(&m_880000regs[offset]);
 
 	switch( offset )
 	{
@@ -235,33 +234,32 @@ static WRITE16_HANDLER( unk880000_w )
 			break; // global y scroll for sprites
 
 		case 0x08/2:
-			state->m_spritelist = data & 0x3; // which of the 4 spritelists to use (buffering)
+			m_spritelist = data & 0x3; // which of the 4 spritelists to use (buffering)
 			break;
 
 		case 0x22/2:
-			watchdog_reset( space->machine() );
-			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, cpu_get_pc(&space->device()) );
+			machine().watchdog_reset();
+			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, cpu_get_pc(&space.device()) );
 			break;
 
 		default:
-			logerror( "unk880000_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, cpu_get_pc(&space->device()) );
+			logerror( "unk880000_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, cpu_get_pc(&space.device()) );
 			break;
 	}
 }
 
-static READ16_HANDLER( unk880000_r )
+READ16_MEMBER(tecmosys_state::unk880000_r)
 {
-	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
-	//UINT16 ret = state->m_880000regs[offset];
+	//UINT16 ret = m_880000regs[offset];
 
-	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, cpu_get_pc(&space->device()), state->m_880000regs[offset] );
+	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, cpu_get_pc(&space.device()), m_880000regs[offset] );
 
 	/* this code allows scroll regs to be updated, but tkdensho at least resets perodically */
 
 	switch( offset )
 	{
 		case 0:
-			if ( space->machine().primary_screen->vpos() >= 240) return 0;
+			if ( machine().primary_screen->vpos() >= 240) return 0;
 			else return 1;
 
 		default:
@@ -286,76 +284,76 @@ static WRITE16_DEVICE_HANDLER( eeprom_w )
 	}
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tecmosys_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // work ram
 	AM_RANGE(0x210000, 0x210001) AM_READNOP // single byte overflow on stack defined as 0x210000
-	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE(bg0_tilemap_w) AM_BASE_MEMBER(tecmosys_state, m_bg0tilemap_ram) // bg0 ram
-	AM_RANGE(0x301000, 0x3013ff) AM_RAM_WRITE(bg0_tilemap_lineram_w) AM_BASE_MEMBER(tecmosys_state, m_bg0tilemap_lineram)// bg0 linescroll? (guess)
+	AM_RANGE(0x300000, 0x300fff) AM_RAM_WRITE(bg0_tilemap_w) AM_SHARE("bg0tilemap_ram") // bg0 ram
+	AM_RANGE(0x301000, 0x3013ff) AM_RAM_WRITE(bg0_tilemap_lineram_w) AM_SHARE("bg0_lineram")// bg0 linescroll? (guess)
 
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(bg1_tilemap_w) AM_BASE_MEMBER(tecmosys_state, m_bg1tilemap_ram) // bg1 ram
-	AM_RANGE(0x401000, 0x4013ff) AM_RAM_WRITE(bg1_tilemap_lineram_w) AM_BASE_MEMBER(tecmosys_state, m_bg1tilemap_lineram)// bg1 linescroll? (guess)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(bg1_tilemap_w) AM_SHARE("bg1tilemap_ram") // bg1 ram
+	AM_RANGE(0x401000, 0x4013ff) AM_RAM_WRITE(bg1_tilemap_lineram_w) AM_SHARE("bg1_lineram")// bg1 linescroll? (guess)
 
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(bg2_tilemap_w) AM_BASE_MEMBER(tecmosys_state, m_bg2tilemap_ram) // bg2 ram
-	AM_RANGE(0x501000, 0x5013ff) AM_RAM_WRITE(bg2_tilemap_lineram_w) AM_BASE_MEMBER(tecmosys_state, m_bg2tilemap_lineram) // bg2 linescroll? (guess)
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(bg2_tilemap_w) AM_SHARE("bg2tilemap_ram") // bg2 ram
+	AM_RANGE(0x501000, 0x5013ff) AM_RAM_WRITE(bg2_tilemap_lineram_w) AM_SHARE("bg2_lineram") // bg2 linescroll? (guess)
 
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(fg_tilemap_w) AM_BASE_MEMBER(tecmosys_state, m_fgtilemap_ram) // fix ram
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(tecmosys_state, m_spriteram) // obj ram
+	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(fg_tilemap_w) AM_SHARE("fgtilemap_ram") // fix ram
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("spriteram") // obj ram
 	AM_RANGE(0x880000, 0x88000b) AM_READ(unk880000_r)
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram) // AM_WRITEONLY // obj pal
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram") // AM_WRITEONLY // obj pal
 
 	//AM_RANGE(0x980000, 0x9807ff) AM_WRITEONLY // bg pal
-	//AM_RANGE(0x980800, 0x980fff) AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram) // fix pal
+	//AM_RANGE(0x980800, 0x980fff) AM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram") // fix pal
 	// the two above are as tested by the game code, I've only rolled them into one below to get colours to show right.
-	AM_RANGE(0x980000, 0x980fff) AM_RAM_WRITE(tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_MEMBER(tecmosys_state, m_tilemap_paletteram16)
+	AM_RANGE(0x980000, 0x980fff) AM_RAM_WRITE(tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("tmap_palette")
 
-	AM_RANGE(0x880000, 0x88002f) AM_WRITE( unk880000_w ) AM_BASE_MEMBER(tecmosys_state, m_880000regs)	// 10 byte dta@88000c, 880022=watchdog?
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("eeprom", eeprom_w	)
-	AM_RANGE(0xa80000, 0xa80005) AM_WRITEONLY AM_BASE_MEMBER(tecmosys_state, m_a80000regs)	// a80000-3 scroll? a80004 inverted ? 3 : 0
-	AM_RANGE(0xb00000, 0xb00005) AM_WRITEONLY AM_BASE_MEMBER(tecmosys_state, m_b00000regs)	// b00000-3 scrool?, b00004 inverted ? 3 : 0
+	AM_RANGE(0x880000, 0x88002f) AM_WRITE(unk880000_w ) AM_SHARE("880000regs")	// 10 byte dta@88000c, 880022=watchdog?
+	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE_LEGACY("eeprom", eeprom_w	)
+	AM_RANGE(0xa80000, 0xa80005) AM_WRITEONLY AM_SHARE("a80000regs")	// a80000-3 scroll? a80004 inverted ? 3 : 0
+	AM_RANGE(0xb00000, 0xb00005) AM_WRITEONLY AM_SHARE("b00000regs")	// b00000-3 scrool?, b00004 inverted ? 3 : 0
 	AM_RANGE(0xb80000, 0xb80001) AM_READWRITE(tecmosys_prot_status_r, tecmosys_prot_status_w)
-	AM_RANGE(0xc00000, 0xc00005) AM_WRITEONLY AM_BASE_MEMBER(tecmosys_state, m_c00000regs)	// c00000-3 scroll? c00004 inverted ? 13 : 10
-	AM_RANGE(0xc80000, 0xc80005) AM_WRITEONLY AM_BASE_MEMBER(tecmosys_state, m_c80000regs)	// c80000-3 scrool? c80004 inverted ? 3 : 0
+	AM_RANGE(0xc00000, 0xc00005) AM_WRITEONLY AM_SHARE("c00000regs")	// c00000-3 scroll? c00004 inverted ? 13 : 10
+	AM_RANGE(0xc80000, 0xc80005) AM_WRITEONLY AM_SHARE("c80000regs")	// c80000-3 scrool? c80004 inverted ? 3 : 0
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("P1")
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("P2")
-	AM_RANGE(0xd80000, 0xd80001) AM_DEVREAD("eeprom", eeprom_r)
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE( sound_w )
+	AM_RANGE(0xd80000, 0xd80001) AM_DEVREAD_LEGACY("eeprom", eeprom_r)
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(sound_w )
 	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(tecmosys_prot_data_w)
 	AM_RANGE(0xf00000, 0xf00001) AM_READ(sound_r)
 	AM_RANGE(0xf80000, 0xf80001) AM_READ(tecmosys_prot_data_r)
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( tecmosys_z80_bank_w )
+WRITE8_MEMBER(tecmosys_state::tecmosys_z80_bank_w)
 {
-	memory_set_bank(space->machine(), "bank1", data);
+	membank("bank1")->set_entry(data);
 }
 
-static WRITE8_HANDLER( tecmosys_oki_bank_w )
+WRITE8_MEMBER(tecmosys_state::tecmosys_oki_bank_w)
 {
 	UINT8 upperbank = (data & 0x30) >> 4;
 	UINT8 lowerbank = (data & 0x03) >> 0;
-	UINT8* region = space->machine().region("oki")->base();
+	UINT8* region = memregion("oki")->base();
 
 	memcpy( region+0x00000, region+0x80000 + lowerbank * 0x20000, 0x20000  );
 	memcpy( region+0x20000, region+0x80000 + upperbank * 0x20000, 0x20000  );
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tecmosys_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, tecmosys_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymf", ymf262_r, ymf262_w)
-	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ymf", ymf262_r, ymf262_w)
+	AM_RANGE(0x10, 0x10) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x20, 0x20) AM_WRITE(tecmosys_oki_bank_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(tecmosys_z80_bank_w)
-	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
-	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch2_w)
-	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("ymz", ymz280b_r, ymz280b_w)
+	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE_LEGACY("ymz", ymz280b_r, ymz280b_w)
 ADDRESS_MAP_END
 
 
@@ -449,8 +447,8 @@ static const ymf262_interface tecmosys_ymf262_interface =
 
 static MACHINE_START( tecmosys )
 {
-//  tecmosys_state *state = machine.driver_data<tecmosys_state>();
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("audiocpu")->base(), 0x4000);
+	tecmosys_state *state = machine.driver_data<tecmosys_state>();
+	state->membank("bank1")->configure_entries(0, 16, state->memregion("audiocpu")->base(), 0x4000);
 }
 
 static MACHINE_CONFIG_START( deroon, tecmosys_state )
@@ -633,8 +631,8 @@ ROM_END
 
 static void tecmosys_descramble(running_machine &machine)
 {
-	UINT8 *gfxsrc  = machine.region( "gfx1" )->base();
-	size_t srcsize = machine.region( "gfx1" )->bytes();
+	UINT8 *gfxsrc  = machine.root_device().memregion( "gfx1" )->base();
+	size_t srcsize = machine.root_device().memregion( "gfx1" )->bytes();
 	int i;
 
 	for (i=0; i < srcsize; i+=4)

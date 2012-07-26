@@ -296,12 +296,16 @@ class blitz_state : public driver_device
 {
 public:
 	blitz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	int m_mux_data;
+	DECLARE_WRITE8_MEMBER(megadpkr_videoram_w);
+	DECLARE_WRITE8_MEMBER(megadpkr_colorram_w);
 };
 
 
@@ -311,18 +315,16 @@ public:
 *********************************************/
 
 
-static WRITE8_HANDLER( megadpkr_videoram_w )
+WRITE8_MEMBER(blitz_state::megadpkr_videoram_w)
 {
-	blitz_state *state = space->machine().driver_data<blitz_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( megadpkr_colorram_w )
+WRITE8_MEMBER(blitz_state::megadpkr_colorram_w)
 {
-	blitz_state *state = space->machine().driver_data<blitz_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -362,6 +364,7 @@ static SCREEN_UPDATE_IND16( megadpkr )
 
 static PALETTE_INIT( megadpkr )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 /*
     This hardware has a feature called BLUE KILLER.
     Using the original intensity line, the PCB has a bridge
@@ -419,10 +422,10 @@ static READ8_DEVICE_HANDLER( megadpkr_mux_port_r )
 	blitz_state *state = device->machine().driver_data<blitz_state>();
 	switch( state->m_mux_data & 0xf0 )		/* bits 4-7 */
 	{
-		case 0x10: return input_port_read(device->machine(), "IN0-0");
-		case 0x20: return input_port_read(device->machine(), "IN0-1");
-		case 0x40: return input_port_read(device->machine(), "IN0-2");
-		case 0x80: return input_port_read(device->machine(), "IN0-3");
+		case 0x10: return state->ioport("IN0-0")->read();
+		case 0x20: return state->ioport("IN0-1")->read();
+		case 0x40: return state->ioport("IN0-2")->read();
+		case 0x80: return state->ioport("IN0-3")->read();
 	}
 	return 0xff;
 }
@@ -469,24 +472,24 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 *           Memory Map Information           *
 *********************************************/
 
-static ADDRESS_MAP_START( megadpkr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( megadpkr_map, AS_PROGRAM, 8, blitz_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0x7fff) // seems that hardware is playing with A14 & A15 CPU lines...
 
 	AM_RANGE(0x0000, 0x07ff) AM_RAM //AM_SHARE("nvram")   /* battery backed RAM */
-//  AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
-//  AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
+//  AM_RANGE(0x0800, 0x0800) AM_DEVWRITE_LEGACY("crtc", mc6845_address_w)
+//  AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE_LEGACY("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 
 /*  There is another set of PIAs controlled by the code.
     Maybe they are just mirrors...
 
-    AM_RANGE(0x10f4, 0x10f7) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
-    AM_RANGE(0x10f8, 0x10fb) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
+    AM_RANGE(0x10f4, 0x10f7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+    AM_RANGE(0x10f8, 0x10fb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 */
 
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(megadpkr_videoram_w) AM_BASE_MEMBER(blitz_state, m_videoram)
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(megadpkr_colorram_w) AM_BASE_MEMBER(blitz_state, m_colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(megadpkr_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(megadpkr_colorram_w) AM_SHARE("colorram")
 
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -590,7 +593,7 @@ ADDRESS_MAP_END
 
 
 /*
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, blitz_state )
     ADDRESS_MAP_GLOBAL_MASK(0x7ff)
     AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END

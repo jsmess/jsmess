@@ -83,7 +83,7 @@ Custom ICs - 053260        - sound chip (QFP80)
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, simpsons_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1f80, 0x1f80) AM_READ_PORT("COIN")
 	AM_RANGE(0x1f81, 0x1f81) AM_READ_PORT("TEST")
@@ -91,24 +91,24 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1f91, 0x1f91) AM_READ_PORT("P2")
 	AM_RANGE(0x1f92, 0x1f92) AM_READ_PORT("P3")
 	AM_RANGE(0x1f93, 0x1f93) AM_READ_PORT("P4")
-	AM_RANGE(0x1fa0, 0x1fa7) AM_DEVWRITE("k053246", k053246_w)
-	AM_RANGE(0x1fb0, 0x1fbf) AM_DEVWRITE("k053251", k053251_w)
+	AM_RANGE(0x1fa0, 0x1fa7) AM_DEVWRITE_LEGACY("k053246", k053246_w)
+	AM_RANGE(0x1fb0, 0x1fbf) AM_DEVWRITE_LEGACY("k053251", k053251_w)
 	AM_RANGE(0x1fc0, 0x1fc0) AM_WRITE(simpsons_coin_counter_w)
 	AM_RANGE(0x1fc2, 0x1fc2) AM_WRITE(simpsons_eeprom_w)
 	AM_RANGE(0x1fc4, 0x1fc4) AM_READ(simpsons_sound_interrupt_r)
-	AM_RANGE(0x1fc6, 0x1fc7) AM_DEVREADWRITE("k053260", simpsons_sound_r, k053260_w)
-	AM_RANGE(0x1fc8, 0x1fc9) AM_DEVREAD("k053246", k053246_r)
+	AM_RANGE(0x1fc6, 0x1fc7) AM_DEVREADWRITE_LEGACY("k053260", simpsons_sound_r, k053260_w)
+	AM_RANGE(0x1fc8, 0x1fc9) AM_DEVREAD_LEGACY("k053246", k053246_r)
 	AM_RANGE(0x1fca, 0x1fca) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank4")
-	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE("k052109", k052109_r, k052109_w)
+	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)
 	AM_RANGE(0x4000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( z80_bankswitch_w )
+WRITE8_MEMBER(simpsons_state::z80_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank2", data & 7);
+	membank("bank2")->set_entry(data & 7);
 }
 
 #if 0
@@ -126,20 +126,19 @@ static TIMER_CALLBACK( nmi_callback )
 	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( z80_arm_nmi_w )
+WRITE8_MEMBER(simpsons_state::z80_arm_nmi_w)
 {
-	simpsons_state *state = space->machine().driver_data<simpsons_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
-	space->machine().scheduler().timer_set(attotime::from_usec(25), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	machine().scheduler().timer_set(attotime::from_usec(25), FUNC(nmi_callback));	/* kludge until the K053260 is emulated correctly */
 }
 
-static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, simpsons_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(z80_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_r, k053260_w)
+	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE_LEGACY("k053260", k053260_r, k053260_w)
 	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(z80_bankswitch_w)
 ADDRESS_MAP_END
 

@@ -175,7 +175,7 @@ static DEVICE_START( exidy440_sound )
 	state->stream = device->machine().sound().stream_alloc(*device, 0, 2, device->clock(), NULL, channel_update);
 
 	/* allocate the sample cache */
-	length = machine.region("cvsd")->bytes() * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
+	length = machine.root_device().memregion("cvsd")->bytes() * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
 	state->sound_cache = (sound_cache_entry *)auto_alloc_array(machine, UINT8, length);
 
 	/* determine the hard end of the cache and reset */
@@ -696,7 +696,7 @@ static INT16 *find_or_add_to_sound_cache(device_t *device, int address, int leng
 		if (current->address == address && current->length == length && current->bits == bits && current->frequency == frequency)
 			return current->data;
 
-	return add_to_sound_cache(device, &device->machine().region("cvsd")->base()[address], address, length, bits, frequency);
+	return add_to_sound_cache(device, &device->machine().root_device().memregion("cvsd")->base()[address], address, length, bits, frequency);
 }
 
 
@@ -944,14 +944,14 @@ static WRITE8_DEVICE_HANDLER( sound_banks_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( exidy440_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( exidy440_audio_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x7fff) AM_NOP
-	AM_RANGE(0x8000, 0x801f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("custom", m6844_r, m6844_w)
-	AM_RANGE(0x8400, 0x840f) AM_MIRROR(0x03f0) AM_DEVREADWRITE("custom", sound_volume_r, sound_volume_w)
-	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_DEVREAD("custom", sound_command_r) AM_WRITENOP
+	AM_RANGE(0x8000, 0x801f) AM_MIRROR(0x03e0) AM_DEVREADWRITE_LEGACY("custom", m6844_r, m6844_w)
+	AM_RANGE(0x8400, 0x840f) AM_MIRROR(0x03f0) AM_DEVREADWRITE_LEGACY("custom", sound_volume_r, sound_volume_w)
+	AM_RANGE(0x8800, 0x8800) AM_MIRROR(0x03ff) AM_DEVREAD_LEGACY("custom", sound_command_r) AM_WRITENOP
 	AM_RANGE(0x8c00, 0x93ff) AM_NOP
-	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x03fc) AM_READNOP AM_DEVWRITE("custom", sound_banks_w)
-	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READNOP AM_DEVWRITE("custom", sound_interrupt_clear_w)
+	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x03fc) AM_READNOP AM_DEVWRITE_LEGACY("custom", sound_banks_w)
+	AM_RANGE(0x9800, 0x9800) AM_MIRROR(0x03ff) AM_READNOP AM_DEVWRITE_LEGACY("custom", sound_interrupt_clear_w)
 	AM_RANGE(0x9c00, 0x9fff) AM_NOP
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xdfff) AM_NOP

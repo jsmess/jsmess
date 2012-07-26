@@ -51,22 +51,22 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 ***************************************************************************/
 
-WRITE16_HANDLER( unico_palette_w )
+WRITE16_MEMBER(unico_state::unico_palette_w)
 {
 	UINT16 data1, data2;
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	data1 = space->machine().generic.paletteram.u16[offset & ~1];
-	data2 = space->machine().generic.paletteram.u16[offset |  1];
-	palette_set_color_rgb( space->machine(),offset/2,
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	data1 = m_generic_paletteram_16[offset & ~1];
+	data2 = m_generic_paletteram_16[offset |  1];
+	palette_set_color_rgb( machine(),offset/2,
 		 (data1 >> 8) & 0xFC,
 		 (data1 >> 0) & 0xFC,
 		 (data2 >> 8) & 0xFC	);
 }
 
-WRITE32_HANDLER( unico_palette32_w )
+WRITE32_MEMBER(unico_state::unico_palette32_w)
 {
-	UINT32 rgb0 = COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
-	palette_set_color_rgb( space->machine(),offset,
+	UINT32 rgb0 = COMBINE_DATA(&m_generic_paletteram_32[offset]);
+	palette_set_color_rgb( machine(),offset,
 		 (rgb0 >> 24) & 0xFC,
 		 (rgb0 >> 16) & 0xFC,
 		 (rgb0 >>  8) & 0xFC	);
@@ -104,22 +104,20 @@ static TILE_GET_INFO( get_tile_info32 )
 	SET_TILE_INFO(1, code, attr & 0x1f, TILE_FLIPYX( attr >> 5 ));
 }
 
-WRITE16_HANDLER( unico_vram_w )
+WRITE16_MEMBER(unico_state::unico_vram_w)
 {
-	unico_state *state = space->machine().driver_data<unico_state>();
-	UINT16 *vram = state->m_vram;
+	UINT16 *vram = m_vram;
 	int tile = ((offset / 0x2000) + 1) % 3;
 	COMBINE_DATA(&vram[offset]);
-	state->m_tilemap[tile]->mark_tile_dirty((offset & 0x3fff)/2);
+	m_tilemap[tile]->mark_tile_dirty((offset & 0x3fff)/2);
 }
 
-WRITE32_HANDLER( unico_vram32_w )
+WRITE32_MEMBER(unico_state::unico_vram32_w)
 {
-	unico_state *state = space->machine().driver_data<unico_state>();
-	UINT32 *vram = state->m_vram32;
+	UINT32 *vram = m_vram32;
 	int tile = ((offset / 0x1000) + 1) % 3;
 	COMBINE_DATA(&vram[offset]);
-	state->m_tilemap[tile]->mark_tile_dirty((offset & 0x3fff));
+	m_tilemap[tile]->mark_tile_dirty((offset & 0x3fff));
 }
 
 
@@ -228,7 +226,7 @@ static void unico_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,co
 	int offs;
 
 	/* Draw them backwards, for pdrawgfx */
-	for ( offs = (state->m_spriteram_size-8)/2; offs >= 0 ; offs -= 8/2 )
+	for ( offs = (state->m_spriteram.bytes()-8)/2; offs >= 0 ; offs -= 8/2 )
 	{
 		int x, startx, endx, incx;
 
@@ -279,11 +277,11 @@ static void unico_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,co
 static void zeropnt2_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	unico_state *state = machine.driver_data<unico_state>();
-	UINT32 *spriteram32 = (UINT32 *)state->m_spriteram;
+	UINT32 *spriteram32 = reinterpret_cast<UINT32 *>(state->m_spriteram.target());
 	int offs;
 
 	/* Draw them backwards, for pdrawgfx */
-	for ( offs = (state->m_spriteram_size-8)/4; offs >= 0 ; offs -= 8/4 )
+	for ( offs = (state->m_spriteram.bytes()-8)/4; offs >= 0 ; offs -= 8/4 )
 	{
 		int x, startx, endx, incx;
 

@@ -3,7 +3,6 @@
 #ifndef __INCLUDES_ELF__
 #define __INCLUDES_ELF__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"
@@ -56,6 +55,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( q_w );
 	DECLARE_READ8_MEMBER( dma_r );
 	DECLARE_WRITE_LINE_MEMBER( da_w );
+	DECLARE_INPUT_CHANGED_MEMBER( input_w );
 
 	// display state
 	UINT8 m_data;

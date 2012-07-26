@@ -10,10 +10,22 @@ class asteroid_state : public driver_device
 {
 public:
 	asteroid_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ram1(*this, "ram1"),
+		m_ram2(*this, "ram2"){ }
 
-	UINT8 *m_ram1;
-	UINT8 *m_ram2;
+	optional_shared_ptr<UINT8> m_ram1;
+	optional_shared_ptr<UINT8> m_ram2;
+	DECLARE_WRITE8_MEMBER(astdelux_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(llander_led_w);
+	DECLARE_READ8_MEMBER(asteroid_IN0_r);
+	DECLARE_READ8_MEMBER(asterock_IN0_r);
+	DECLARE_READ8_MEMBER(asteroid_IN1_r);
+	DECLARE_READ8_MEMBER(asteroid_DSW1_r);
+	DECLARE_WRITE8_MEMBER(asteroid_bank_switch_w);
+	DECLARE_WRITE8_MEMBER(astdelux_bank_switch_w);
+	DECLARE_WRITE8_MEMBER(astdelux_led_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
 };
 
 
@@ -23,14 +35,7 @@ INTERRUPT_GEN( asteroid_interrupt );
 INTERRUPT_GEN( asterock_interrupt );
 INTERRUPT_GEN( llander_interrupt );
 
-READ8_HANDLER( asteroid_IN0_r );
-READ8_HANDLER( asterock_IN0_r );
-READ8_HANDLER( asteroid_IN1_r );
-READ8_HANDLER( asteroid_DSW1_r );
 
-WRITE8_HANDLER( asteroid_bank_switch_w );
-WRITE8_HANDLER( astdelux_bank_switch_w );
-WRITE8_HANDLER( astdelux_led_w );
 
 MACHINE_RESET( asteroid );
 

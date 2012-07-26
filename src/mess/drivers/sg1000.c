@@ -62,7 +62,6 @@ Notes:
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -112,14 +111,14 @@ WRITE8_MEMBER( sg1000_state::tvdraw_axis_w )
 {
 	if (data & 0x01)
 	{
-		m_tvdraw_data = input_port_read(machine(), "TVDRAW_X");
+		m_tvdraw_data = ioport("TVDRAW_X")->read();
 
 		if (m_tvdraw_data < 4) m_tvdraw_data = 4;
 		if (m_tvdraw_data > 251) m_tvdraw_data = 251;
 	}
 	else
 	{
-		m_tvdraw_data = input_port_read(machine(), "TVDRAW_Y") + 32;
+		m_tvdraw_data = ioport("TVDRAW_Y")->read() + 32;
 	}
 }
 
@@ -129,7 +128,7 @@ WRITE8_MEMBER( sg1000_state::tvdraw_axis_w )
 
 READ8_MEMBER( sg1000_state::tvdraw_status_r )
 {
-	return input_port_read(machine(), "TVDRAW_PEN");
+	return ioport("TVDRAW_PEN")->read();
 }
 
 /*-------------------------------------------------
@@ -269,9 +268,9 @@ ADDRESS_MAP_END
     INPUT_CHANGED( trigger_nmi )
 -------------------------------------------------*/
 
-static INPUT_CHANGED( trigger_nmi )
+INPUT_CHANGED_MEMBER( sg1000_state::trigger_nmi )
 {
-	cputag_set_input_line(field.machine(), Z80_TAG, INPUT_LINE_NMI, (input_port_read(field.machine(), "NMI") ? CLEAR_LINE : ASSERT_LINE));
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*-------------------------------------------------
@@ -312,7 +311,7 @@ static INPUT_PORTS_START( sg1000 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("NMI")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("PAUSE") PORT_CODE(KEYCODE_P) PORT_CHANGED(trigger_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("PAUSE") PORT_CODE(KEYCODE_P) PORT_CHANGED_MEMBER(DEVICE_SELF, sg1000_state, trigger_nmi, 0)
 
 	PORT_INCLUDE( tvdraw )
 INPUT_PORTS_END
@@ -495,7 +494,7 @@ INPUT_PORTS_START( sk1100 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
 	PORT_START("NMI")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F10) PORT_CHANGED(trigger_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, sg1000_state, trigger_nmi, 0)
 INPUT_PORTS_END
 
 /*-------------------------------------------------
@@ -565,7 +564,7 @@ READ8_MEMBER( sc3000_state::ppi_pa_r )
 
 	static const char *const keynames[] = { "PA0", "PA1", "PA2", "PA3", "PA4", "PA5", "PA6", "PA7" };
 
-	return input_port_read(machine(), keynames[m_keylatch]);
+	return ioport(keynames[m_keylatch])->read();
 }
 
 READ8_MEMBER( sc3000_state::ppi_pb_r )
@@ -586,7 +585,7 @@ READ8_MEMBER( sc3000_state::ppi_pb_r )
 	static const char *const keynames[] = { "PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7" };
 
 	/* keyboard */
-	UINT8 data = input_port_read(machine(), keynames[m_keylatch]);
+	UINT8 data = ioport(keynames[m_keylatch])->read();
 
 	/* cartridge contact */
 	data |= 0x10;
@@ -664,15 +663,15 @@ void sg1000_state::install_cartridge(UINT8 *ptr, int size)
 	case 40 * 1024:
 		program->install_read_bank(0x8000, 0x9fff, "bank1");
 		program->unmap_write(0x8000, 0x9fff);
-		memory_configure_bank(machine(), "bank1", 0, 1, machine().region(Z80_TAG)->base() + 0x8000, 0);
-		memory_set_bank(machine(), "bank1", 0);
+		membank("bank1")->configure_entry(0, memregion(Z80_TAG)->base() + 0x8000);
+		membank("bank1")->set_entry(0);
 		break;
 
 	case 48 * 1024:
 		program->install_read_bank(0x8000, 0xbfff, "bank1");
 		program->unmap_write(0x8000, 0xbfff);
-		memory_configure_bank(machine(), "bank1", 0, 1, machine().region(Z80_TAG)->base() + 0x8000, 0);
-		memory_set_bank(machine(), "bank1", 0);
+		membank("bank1")->configure_entry(0, memregion(Z80_TAG)->base() + 0x8000);
+		membank("bank1")->set_entry(0);
 		break;
 
 	default:
@@ -700,7 +699,7 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 	running_machine &machine = image.device().machine();
 	sg1000_state *state = machine.driver_data<sg1000_state>();
 	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
-	UINT8 *ptr = machine.region(Z80_TAG)->base();
+	UINT8 *ptr = state->memregion(Z80_TAG)->base();
 	UINT32 ram_size = 0x400;
 	bool install_2000_ram = false;
 	UINT32 size;
@@ -814,7 +813,7 @@ static DEVICE_IMAGE_LOAD( omv_cart )
 	running_machine &machine = image.device().machine();
 	sg1000_state *state = machine.driver_data<sg1000_state>();
 	UINT32 size;
-	UINT8 *ptr = machine.region(Z80_TAG)->base();
+	UINT8 *ptr = state->memregion(Z80_TAG)->base();
 
 	if (image.software_entry() == NULL)
 	{
@@ -870,7 +869,7 @@ static DEVICE_IMAGE_LOAD( sc3000_cart )
 {
 	running_machine &machine = image.device().machine();
 	sc3000_state *state = machine.driver_data<sc3000_state>();
-	UINT8 *ptr = machine.region(Z80_TAG)->base();
+	UINT8 *ptr = state->memregion(Z80_TAG)->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)
@@ -948,7 +947,7 @@ WRITE8_MEMBER( sf7000_state::ppi_pc_w )
 	}
 
 	/* ROM selection */
-	memory_set_bank(machine(), "bank1", BIT(data, 6));
+	membank("bank1")->set_entry(BIT(data, 6));
 
 	/* printer strobe */
 	m_centronics->strobe_w(BIT(data, 7));
@@ -1033,7 +1032,7 @@ static const floppy_interface sf7000_floppy_interface =
 
 static TIMER_CALLBACK( lightgun_tick )
 {
-	UINT8 *rom = machine.region(Z80_TAG)->base();
+	UINT8 *rom = machine.root_device().memregion(Z80_TAG)->base();
 
 	if (IS_CARTRIDGE_TV_DRAW(rom))
 	{
@@ -1082,9 +1081,9 @@ void sc3000_state::machine_start()
 void sf7000_state::machine_start()
 {
 	/* configure memory banking */
-	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(Z80_TAG)->base(), 0);
-	memory_configure_bank(machine(), "bank1", 1, 1, m_ram->pointer(), 0);
-	memory_configure_bank(machine(), "bank2", 0, 1, m_ram->pointer(), 0);
+	membank("bank1")->configure_entry(0, memregion(Z80_TAG)->base());
+	membank("bank1")->configure_entry(1, m_ram->pointer());
+	membank("bank2")->configure_entry(0, m_ram->pointer());
 
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
@@ -1098,8 +1097,8 @@ void sf7000_state::machine_start()
 
 void sf7000_state::machine_reset()
 {
-	memory_set_bank(machine(), "bank1", 0);
-	memory_set_bank(machine(), "bank2", 0);
+	membank("bank1")->set_entry(0);
+	membank("bank2")->set_entry(0);
 }
 
 /***************************************************************************

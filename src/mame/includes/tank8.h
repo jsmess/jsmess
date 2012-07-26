@@ -27,18 +27,27 @@ class tank8_state : public driver_device
 {
 public:
 	tank8_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_video_ram(*this, "video_ram"),
+		m_pos_h_ram(*this, "pos_h_ram"),
+		m_pos_v_ram(*this, "pos_v_ram"),
+		m_pos_d_ram(*this, "pos_d_ram"),
+		m_team(*this, "team"){ }
 
 	int m_collision_index;
-	UINT8 *m_video_ram;
-	UINT8 *m_pos_h_ram;
-	UINT8 *m_pos_v_ram;
-	UINT8 *m_pos_d_ram;
-	UINT8 *m_team;
+	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT8> m_pos_h_ram;
+	required_shared_ptr<UINT8> m_pos_v_ram;
+	required_shared_ptr<UINT8> m_pos_d_ram;
+	required_shared_ptr<UINT8> m_team;
 	tilemap_t *m_tilemap;
 	bitmap_ind16 m_helper1;
 	bitmap_ind16 m_helper2;
 	bitmap_ind16 m_helper3;
+	DECLARE_READ8_MEMBER(tank8_collision_r);
+	DECLARE_WRITE8_MEMBER(tank8_lockout_w);
+	DECLARE_WRITE8_MEMBER(tank8_int_reset_w);
+	DECLARE_WRITE8_MEMBER(tank8_video_ram_w);
 };
 
 
@@ -59,6 +68,5 @@ SCREEN_VBLANK( tank8 );
 VIDEO_START( tank8 );
 SCREEN_UPDATE_IND16( tank8 );
 
-WRITE8_HANDLER( tank8_video_ram_w );
 
 

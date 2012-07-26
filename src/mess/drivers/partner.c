@@ -23,7 +23,7 @@
 #include "includes/partner.h"
 
 /* Address maps */
-static ADDRESS_MAP_START(partner_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(partner_mem, AS_PROGRAM, 8, partner_state )
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x0800, 0x3fff ) AM_RAMBANK("bank2")
 	AM_RANGE( 0x4000, 0x5fff ) AM_RAMBANK("bank3")
@@ -34,10 +34,10 @@ static ADDRESS_MAP_START(partner_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0xc000, 0xc7ff ) AM_RAMBANK("bank8")
 	AM_RANGE( 0xc800, 0xcfff ) AM_RAMBANK("bank9")
 	AM_RANGE( 0xd000, 0xd7ff ) AM_RAMBANK("bank10")
-	AM_RANGE( 0xd800, 0xd8ff ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w)  // video
-	AM_RANGE( 0xd900, 0xd9ff ) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write)
+	AM_RANGE( 0xd800, 0xd8ff ) AM_DEVREADWRITE_LEGACY("i8275", i8275_r, i8275_w)  // video
+	AM_RANGE( 0xd900, 0xd9ff ) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE( 0xda00, 0xdaff ) AM_WRITE(partner_mem_page_w)
-	AM_RANGE( 0xdb00, 0xdbff ) AM_DEVWRITE("dma8257", i8257_w)	 // DMA
+	AM_RANGE( 0xdb00, 0xdbff ) AM_DEVWRITE_LEGACY("dma8257", i8257_w)	 // DMA
 	AM_RANGE( 0xdc00, 0xddff ) AM_RAMBANK("bank11")
 	AM_RANGE( 0xde00, 0xdeff ) AM_WRITE(partner_win_memory_page_w)
 	AM_RANGE( 0xe000, 0xe7ff ) AM_RAMBANK("bank12")

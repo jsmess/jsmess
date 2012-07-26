@@ -32,12 +32,11 @@ static INTERRUPT_GEN( popeye_interrupt )
 /* the protection device simply returns the last two values written shifted left */
 /* by a variable amount. */
 
-static READ8_HANDLER( protection_r )
+READ8_MEMBER(popeye_state::protection_r)
 {
-	popeye_state *state = space->machine().driver_data<popeye_state>();
 	if (offset == 0)
 	{
-		return ((state->m_prot1 << state->m_prot_shift) | (state->m_prot0 >> (8-state->m_prot_shift))) & 0xff;
+		return ((m_prot1 << m_prot_shift) | (m_prot0 >> (8-m_prot_shift))) & 0xff;
 	}
 	else	/* offset == 1 */
 	{
@@ -46,71 +45,70 @@ static READ8_HANDLER( protection_r )
 	}
 }
 
-static WRITE8_HANDLER( protection_w )
+WRITE8_MEMBER(popeye_state::protection_w)
 {
-	popeye_state *state = space->machine().driver_data<popeye_state>();
 	if (offset == 0)
 	{
 		/* this is the same as the level number (1-3) */
-		state->m_prot_shift = data & 0x07;
+		m_prot_shift = data & 0x07;
 	}
 	else	/* offset == 1 */
 	{
-		state->m_prot0 = state->m_prot1;
-		state->m_prot1 = data;
+		m_prot0 = m_prot1;
+		m_prot1 = data;
 	}
 }
 
 
 
 
-static ADDRESS_MAP_START( skyskipr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( skyskipr_map, AS_PROGRAM, 8, popeye_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_BASE_MEMBER(popeye_state, m_background_pos)
-	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_BASE_MEMBER(popeye_state, m_palettebank)
-	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE_SIZE_MEMBER(popeye_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_SHARE("background_pos")
+	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_SHARE("palettebank")
+	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x8e80, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_BASE_MEMBER(popeye_state, m_videoram)
-	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_BASE_MEMBER(popeye_state, m_colorram)
+	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(skyskipr_bitmap_w)
 	AM_RANGE(0xe000, 0xe001) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( popeye_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( popeye_map, AS_PROGRAM, 8, popeye_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8bff) AM_RAM
-	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_BASE_MEMBER(popeye_state, m_background_pos)
-	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_BASE_MEMBER(popeye_state, m_palettebank)
-	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE_SIZE_MEMBER(popeye_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_SHARE("background_pos")
+	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_SHARE("palettebank")
+	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x8e80, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_BASE_MEMBER(popeye_state, m_videoram)
-	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_BASE_MEMBER(popeye_state, m_colorram)
+	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(popeye_bitmap_w)
 	AM_RANGE(0xe000, 0xe001) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( popeyebl_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( popeyebl_map, AS_PROGRAM, 8, popeye_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_BASE_MEMBER(popeye_state, m_background_pos)
-	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_BASE_MEMBER(popeye_state, m_palettebank)
-	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_BASE_SIZE_MEMBER(popeye_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8c00, 0x8c02) AM_RAM AM_SHARE("background_pos")
+	AM_RANGE(0x8c03, 0x8c03) AM_RAM AM_SHARE("palettebank")
+	AM_RANGE(0x8c04, 0x8e7f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x8e80, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_BASE_MEMBER(popeye_state, m_videoram)
-	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_BASE_MEMBER(popeye_state, m_colorram)
+	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(popeye_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xa400, 0xa7ff) AM_WRITE(popeye_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(skyskipr_bitmap_w)
 	AM_RANGE(0xe000, 0xe01f) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( popeye_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( popeye_io_map, AS_IO, 8, popeye_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
-	AM_RANGE(0x03, 0x03) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 ADDRESS_MAP_END
 
 
@@ -397,7 +395,7 @@ static WRITE8_DEVICE_HANDLER( popeye_portB_w )
 {
 	popeye_state *state = device->machine().driver_data<popeye_state>();
 	/* bit 0 flips screen */
-	flip_screen_set(device->machine(), data & 1);
+	state->flip_screen_set(data & 1);
 
 	/* bits 1-3 select DSW1 bit to read */
 	state->m_dswbit = (data & 0x0e) >> 1;
@@ -409,8 +407,8 @@ static READ8_DEVICE_HANDLER( popeye_portA_r )
 	int res;
 
 
-	res = input_port_read(device->machine(), "DSW0");
-	res |= (input_port_read(device->machine(), "DSW1") << (7-state->m_dswbit)) & 0x80;
+	res = state->ioport("DSW0")->read();
+	res |= (state->ioport("DSW1")->read() << (7-state->m_dswbit)) & 0x80;
 
 	return res;
 }
@@ -622,7 +620,7 @@ static DRIVER_INIT( skyskipr )
 {
 	popeye_state *state = machine.driver_data<popeye_state>();
 	UINT8 *buffer;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	int len = 0x10000;
 
 	/* decrypt the program ROMs */
@@ -644,7 +642,7 @@ static DRIVER_INIT( popeye )
 {
 	popeye_state *state = machine.driver_data<popeye_state>();
 	UINT8 *buffer;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	int len = 0x10000;
 
 	/* decrypt the program ROMs */

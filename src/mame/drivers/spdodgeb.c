@@ -29,35 +29,34 @@ Notes:
 #include "includes/spdodgeb.h"
 
 
-static WRITE8_HANDLER( sound_command_w )
+WRITE8_MEMBER(spdodgeb_state::sound_command_w)
 {
-	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine(), "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
+	soundlatch_byte_w(space, offset, data);
+	cputag_set_input_line(machine(), "audiocpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( spd_adpcm_w )
+WRITE8_MEMBER(spdodgeb_state::spd_adpcm_w)
 {
-	spdodgeb_state *state = space->machine().driver_data<spdodgeb_state>();
 	int chip = offset & 1;
-	device_t *adpcm = space->machine().device((chip == 0) ? "msm1" : "msm2");
+	device_t *adpcm = machine().device((chip == 0) ? "msm1" : "msm2");
 
 	switch (offset/2)
 	{
 		case 3:
-			state->m_adpcm_idle[chip] = 1;
+			m_adpcm_idle[chip] = 1;
 			msm5205_reset_w(adpcm,1);
 			break;
 
 		case 2:
-			state->m_adpcm_pos[chip] = (data & 0x7f) * 0x200;
+			m_adpcm_pos[chip] = (data & 0x7f) * 0x200;
 			break;
 
 		case 1:
-			state->m_adpcm_end[chip] = (data & 0x7f) * 0x200;
+			m_adpcm_end[chip] = (data & 0x7f) * 0x200;
 			break;
 
 		case 0:
-			state->m_adpcm_idle[chip] = 0;
+			m_adpcm_idle[chip] = 0;
 			msm5205_reset_w(adpcm,0);
 			break;
 	}
@@ -79,7 +78,7 @@ static void spd_adpcm_int(device_t *device)
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().region("adpcm")->base() + 0x10000 * chip;
+		UINT8 *ROM = device->machine().root_device().memregion("adpcm")->base() + 0x10000 * chip;
 
 		state->m_adpcm_data[chip] = ROM[state->m_adpcm_pos[chip]++];
 		msm5205_data_w(device,state->m_adpcm_data[chip] >> 4);
@@ -99,8 +98,8 @@ static void mcu63705_update_inputs(running_machine &machine)
 	{
 		int curr[2][2];
 
-		curr[p][0] = input_port_read(machine, p ? "P2" : "P1") & 0x01;
-		curr[p][1] = input_port_read(machine, p ? "P2" : "P1") & 0x02;
+		curr[p][0] = state->ioport(p ? "P2" : "P1")->read() & 0x01;
+		curr[p][1] = state->ioport(p ? "P2" : "P1")->read() & 0x02;
 
 		for (j = 0;j <= 1;j++)
 		{
@@ -134,7 +133,7 @@ static void mcu63705_update_inputs(running_machine &machine)
 	{
 		int curr[2];
 
-		curr[p] = input_port_read(machine, p ? "P2" : "P1") & 0x30;
+		curr[p] = machine.root_device().ioport(p ? "P2" : "P1")->read() & 0x30;
 
 		if (state->m_jumped[p]) buttons[p] = 0;	/* jump only momentarily flips the buttons */
 		else buttons[p] = curr[p];
@@ -145,8 +144,8 @@ static void mcu63705_update_inputs(running_machine &machine)
 		state->m_prev[p] = curr[p];
 	}
 
-	state->m_inputs[0] = input_port_read(machine, "P1") & 0xcf;
-	state->m_inputs[1] = input_port_read(machine, "P2") & 0x0f;
+	state->m_inputs[0] = machine.root_device().ioport("P1")->read() & 0xcf;
+	state->m_inputs[1] = machine.root_device().ioport("P2")->read() & 0x0f;
 	state->m_inputs[2] = state->m_running[0] | buttons[0];
 	state->m_inputs[3] = state->m_running[1] | buttons[1];
 }
@@ -167,7 +166,7 @@ static void mcu63705_update_inputs(running_machine &machine)
 
 	for (p=0; p<=1; p++)
 	{
-		curr_port[p] = input_port_read(machine, p ? "P2" : "P1");
+		curr_port[p] = state->ioport(p ? "P2" : "P1")->read();
 		curr_dash[p] = 0;
 
 		if (curr_port[p] & R)
@@ -210,48 +209,45 @@ static void mcu63705_update_inputs(running_machine &machine)
 }
 #endif
 
-static READ8_HANDLER( mcu63701_r )
+READ8_MEMBER(spdodgeb_state::mcu63701_r)
 {
-	spdodgeb_state *state = space->machine().driver_data<spdodgeb_state>();
-//  logerror("CPU #0 PC %04x: read from port %02x of 63701 data address 3801\n",cpu_get_pc(&space->device()),offset);
+//  logerror("CPU #0 PC %04x: read from port %02x of 63701 data address 3801\n",cpu_get_pc(&space.device()),offset);
 
-	if (state->m_mcu63701_command == 0) return 0x6a;
+	if (m_mcu63701_command == 0) return 0x6a;
 	else switch (offset)
 	{
 		default:
-		case 0: return state->m_inputs[0];
-		case 1: return state->m_inputs[1];
-		case 2: return state->m_inputs[2];
-		case 3: return state->m_inputs[3];
-		case 4: return input_port_read(space->machine(), "IN1");
+		case 0: return m_inputs[0];
+		case 1: return m_inputs[1];
+		case 2: return m_inputs[2];
+		case 3: return m_inputs[3];
+		case 4: return ioport("IN1")->read();
 	}
 }
 
-static WRITE8_HANDLER( mcu63701_w )
+WRITE8_MEMBER(spdodgeb_state::mcu63701_w)
 {
-	spdodgeb_state *state = space->machine().driver_data<spdodgeb_state>();
-//  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",cpu_get_pc(&space->device()),data);
-	state->m_mcu63701_command = data;
-	mcu63705_update_inputs(space->machine());
+//  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",cpu_get_pc(&space.device()),data);
+	m_mcu63701_command = data;
+	mcu63705_update_inputs(machine());
 }
 
 
-static READ8_HANDLER( port_0_r )
+READ8_MEMBER(spdodgeb_state::port_0_r)
 {
-	spdodgeb_state *state = space->machine().driver_data<spdodgeb_state>();
-	int port = input_port_read(space->machine(), "IN0");
+	int port = ioport("IN0")->read();
 
-	state->m_toggle^=0x02;	/* mcu63701_busy flag */
+	m_toggle^=0x02;	/* mcu63701_busy flag */
 
-	return (port | state->m_toggle);
+	return (port | m_toggle);
 }
 
 
 
-static ADDRESS_MAP_START( spdodgeb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spdodgeb_map, AS_PROGRAM, 8, spdodgeb_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x10ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(spdodgeb_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(spdodgeb_videoram_w) AM_BASE_MEMBER(spdodgeb_state, m_videoram)
+	AM_RANGE(0x1000, 0x10ff) AM_WRITEONLY AM_SHARE("spriteram")
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(spdodgeb_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x3000, 0x3000) AM_READ(port_0_r) //AM_WRITENOP
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW") //AM_WRITENOP
 	AM_RANGE(0x3002, 0x3002) AM_WRITE(sound_command_w)
@@ -265,10 +261,10 @@ static ADDRESS_MAP_START( spdodgeb_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spdodgeb_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spdodgeb_sound_map, AS_PROGRAM, 8, spdodgeb_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_r)
-	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE("ymsnd", ym3812_w)
+	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x2800, 0x2801) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 	AM_RANGE(0x3800, 0x3807) AM_WRITE(spd_adpcm_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -276,7 +272,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( spdodgeb )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* mcu63701_busy flag */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )

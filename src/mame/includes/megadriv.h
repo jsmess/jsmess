@@ -103,24 +103,98 @@ class md_boot_state : public md_base_state
 {
 public:
 	md_boot_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag) { }
+	: md_base_state(mconfig, type, tag) { m_protcount = 0;}
 
 	// bootleg specific
 	int m_aladmdb_mcu_port;
+
+	int m_protcount;
+
+	// jzth protection
+	DECLARE_WRITE16_MEMBER( bl_710000_w )
+	{
+		int pc = cpu_get_pc(&space.device());
+
+		logerror("%06x writing to bl_710000_w %04x %04x\n", pc, data, mem_mask);
+
+		// protection value is read from  0x710000 after a series of writes.. and stored at ff0007
+		// startup
+		/*
+        059ce0 writing to bl_710000_w ff08 ffff
+        059d04 writing to bl_710000_w 000a ffff
+        059d04 writing to bl_710000_w 000b ffff
+        059d04 writing to bl_710000_w 000c ffff
+        059d04 writing to bl_710000_w 000f ffff
+        059d1c writing to bl_710000_w ff09 ffff
+        059d2a reading from bl_710000_r  (wants 0xe)
+        059ce0 writing to bl_710000_w ff08 ffff
+        059d04 writing to bl_710000_w 000a ffff
+        059d04 writing to bl_710000_w 000b ffff
+        059d04 writing to bl_710000_w 000c ffff
+        059d04 writing to bl_710000_w 000f ffff
+        059d1c writing to bl_710000_w ff09 ffff
+        059d2a reading from bl_710000_r  (wants 0xe)
+        */
+		// before lv stage 3
+		/*
+        059ce0 writing to bl_710000_w 0008 ffff
+        059d04 writing to bl_710000_w 000b ffff
+        059d04 writing to bl_710000_w 000f ffff
+        059d1c writing to bl_710000_w ff09 ffff
+        059d2a reading from bl_710000_r  (wants 0x4)
+        */
+		// start level 3
+		/*
+        059ce0 writing to bl_710000_w ff08 ffff
+        059d04 writing to bl_710000_w 000b ffff
+        059d04 writing to bl_710000_w 000c ffff
+        059d04 writing to bl_710000_w 000e ffff
+        059d1c writing to bl_710000_w ff09 ffff
+        059d2a reading from bl_710000_r  (wants 0x5)
+
+        // after end sequence
+        059ce0 writing to bl_710000_w 0008 ffff
+        059d04 writing to bl_710000_w 000a ffff
+        059d04 writing to bl_710000_w 000b ffff
+        059d04 writing to bl_710000_w 000c ffff
+        059d04 writing to bl_710000_w 000f ffff
+        059d1c writing to bl_710000_w ff09 ffff
+        059d2a reading from bl_710000_r  (wants 0xe)
+
+        */
+		m_protcount++;
+	}
+
+
+	DECLARE_READ16_MEMBER( bl_710000_r )
+	{
+		UINT16 ret;
+		int pc = cpu_get_pc(&space.device());
+		logerror("%06x reading from bl_710000_r\n", pc);
+
+		if (m_protcount==6) { ret = 0xe; }
+		else if (m_protcount==5) { ret = 0x5; }
+		else if (m_protcount==4) { ret = 0x4; }
+		else ret = 0xf;
+
+		m_protcount = 0;
+		return ret;
+	}
 };
 
 class segac2_state : public md_base_state
 {
 public:
 	segac2_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag) { }
+	: md_base_state(mconfig, type, tag),
+	  m_paletteram(*this, "paletteram") { }
 
 	// for Print Club only
 	int m_cam_data;
 
 	int m_segac2_enable_display;
 
-	UINT16* m_paletteram;
+	required_shared_ptr<UINT16> m_paletteram;
 
 	/* internal states */
 	UINT8		m_misc_io_data[0x10];	/* holds values written to the I/O chip */
@@ -144,7 +218,8 @@ class mplay_state : public md_base_state
 {
 public:
 	mplay_state(const machine_config &mconfig, device_type type, const char *tag)
-	: md_base_state(mconfig, type, tag) { }
+	: md_base_state(mconfig, type, tag),
+	m_ic3_ram(*this, "ic3_ram") { }
 
 	UINT32 m_bios_mode;  // determines whether ROM banks or Game data
 	// is to read from 0x8000-0xffff
@@ -161,7 +236,7 @@ public:
 	UINT8 m_bios_6404;
 
 	UINT16 *m_genesis_io_ram;
-	UINT8* m_ic3_ram;
+	required_shared_ptr<UINT8> m_ic3_ram;
 	UINT8* m_ic37_ram;
 	UINT16 *m_ic36_ram;
 };

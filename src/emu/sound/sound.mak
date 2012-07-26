@@ -244,6 +244,16 @@ endif
 
 
 #-------------------------------------------------
+# Imagetek I5000 sound
+#-------------------------------------------------
+
+ifneq ($(filter I5000_SND,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/i5000.o
+endif
+
+
+
+#-------------------------------------------------
 # Irem custom sound chips
 #-------------------------------------------------
 
@@ -369,7 +379,7 @@ endif
 # OKI ADPCM sample players
 #-------------------------------------------------
 
-ifneq ($(filter OKIM6258 OKIM9810,$(SOUNDS)),)
+ifneq ($(filter OKIM6258 OKIM6295 OKIM9810 I5000_SND,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/okiadpcm.o
 endif
 

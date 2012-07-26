@@ -2,11 +2,14 @@ class marineb_state : public driver_device
 {
 public:
 	marineb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_colorram(*this, "colorram"){ }
 
-	UINT8 *   m_videoram;
-	UINT8 *   m_colorram;
-	UINT8 *   m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_colorram;
 
 	/* video-related */
 	tilemap_t   *m_bg_tilemap;
@@ -22,18 +25,19 @@ public:
 	device_t *m_audiocpu;
 
 	UINT8     m_irq_mask;
+	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_WRITE8_MEMBER(marineb_videoram_w);
+	DECLARE_WRITE8_MEMBER(marineb_colorram_w);
+	DECLARE_WRITE8_MEMBER(marineb_column_scroll_w);
+	DECLARE_WRITE8_MEMBER(marineb_palette_bank_0_w);
+	DECLARE_WRITE8_MEMBER(marineb_palette_bank_1_w);
+	DECLARE_WRITE8_MEMBER(marineb_flipscreen_x_w);
+	DECLARE_WRITE8_MEMBER(marineb_flipscreen_y_w);
 };
 
 
 /*----------- defined in video/marineb.c -----------*/
 
-WRITE8_HANDLER( marineb_videoram_w );
-WRITE8_HANDLER( marineb_colorram_w );
-WRITE8_HANDLER( marineb_column_scroll_w );
-WRITE8_HANDLER( marineb_palette_bank_0_w );
-WRITE8_HANDLER( marineb_palette_bank_1_w );
-WRITE8_HANDLER( marineb_flipscreen_x_w );
-WRITE8_HANDLER( marineb_flipscreen_y_w );
 
 PALETTE_INIT( marineb );
 VIDEO_START( marineb );

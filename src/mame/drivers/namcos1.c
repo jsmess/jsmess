@@ -350,35 +350,35 @@ C - uses sub board with support for player 3 and 4 controls
 
 /**********************************************************************/
 
-static WRITE8_HANDLER( namcos1_sub_firq_w )
+WRITE8_MEMBER(namcos1_state::namcos1_sub_firq_w)
 {
-	cputag_set_input_line(space->machine(), "sub", M6809_FIRQ_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine(), "sub", M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( irq_ack_w )
+WRITE8_MEMBER(namcos1_state::irq_ack_w)
 {
-	device_set_input_line(&space->device(), 0, CLEAR_LINE);
+	device_set_input_line(&space.device(), 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( firq_ack_w )
+WRITE8_MEMBER(namcos1_state::firq_ack_w)
 {
-	device_set_input_line(&space->device(), M6809_FIRQ_LINE, CLEAR_LINE);
+	device_set_input_line(&space.device(), M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
 
-static READ8_HANDLER( dsw_r )
+READ8_MEMBER(namcos1_state::dsw_r)
 {
-	int ret = input_port_read(space->machine(), "DIPSW");
+	int ret = ioport("DIPSW")->read();
 	if (!(offset & 2)) ret >>= 4;
 	return 0xf0 | ret;
 }
 
-static WRITE8_HANDLER( namcos1_coin_w )
+WRITE8_MEMBER(namcos1_state::namcos1_coin_w)
 {
-	coin_lockout_global_w(space->machine(), ~data & 1);
-	coin_counter_w(space->machine(), 0,data & 2);
-	coin_counter_w(space->machine(), 1,data & 4);
+	coin_lockout_global_w(machine(), ~data & 1);
+	coin_counter_w(machine(), 0,data & 2);
+	coin_counter_w(machine(), 1,data & 4);
 }
 
 static void namcos1_update_DACs(running_machine &machine)
@@ -396,39 +396,36 @@ void namcos1_init_DACs(running_machine &machine)
 	state->m_dac1_gain=0x80;
 }
 
-static WRITE8_HANDLER( namcos1_dac_gain_w )
+WRITE8_MEMBER(namcos1_state::namcos1_dac_gain_w)
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
 	int value;
 
 	/* DAC0 (bits 0,2) */
 	value = (data & 1) | ((data >> 1) & 2); /* GAIN0,GAIN1 */
-	state->m_dac0_gain = 0x20 * (value+1);
+	m_dac0_gain = 0x20 * (value+1);
 
 	/* DAC1 (bits 3,4) */
 	value = (data >> 3) & 3; /* GAIN2,GAIN3 */
-	state->m_dac1_gain = 0x20 * (value+1);
+	m_dac1_gain = 0x20 * (value+1);
 
-	namcos1_update_DACs(space->machine());
+	namcos1_update_DACs(machine());
 }
 
-static WRITE8_HANDLER( namcos1_dac0_w )
+WRITE8_MEMBER(namcos1_state::namcos1_dac0_w)
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-	state->m_dac0_value = data - 0x80; /* shift zero point */
-	namcos1_update_DACs(space->machine());
+	m_dac0_value = data - 0x80; /* shift zero point */
+	namcos1_update_DACs(machine());
 }
 
-static WRITE8_HANDLER( namcos1_dac1_w )
+WRITE8_MEMBER(namcos1_state::namcos1_dac1_w)
 {
-	namcos1_state *state = space->machine().driver_data<namcos1_state>();
-	state->m_dac1_value = data - 0x80; /* shift zero point */
-	namcos1_update_DACs(space->machine());
+	m_dac1_value = data - 0x80; /* shift zero point */
+	namcos1_update_DACs(machine());
 }
 
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x4000, 0x5fff) AM_RAMBANK("bank3")
@@ -448,7 +445,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank9")
 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank10")
 	AM_RANGE(0x4000, 0x5fff) AM_RAMBANK("bank11")
@@ -466,11 +463,11 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, namcos1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank17")	/* Banked ROMs */
-	AM_RANGE(0x4000, 0x4001) AM_DEVREAD("ymsnd", ym2151_status_port_r)
-	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x5000, 0x53ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w) AM_MIRROR(0x400) /* PSG ( Shared ) */
+	AM_RANGE(0x4000, 0x4001) AM_DEVREAD_LEGACY("ymsnd", ym2151_status_port_r)
+	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x5000, 0x53ff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r, namcos1_cus30_w) AM_MIRROR(0x400) /* PSG ( Shared ) */
 	AM_RANGE(0x7000, 0x77ff) AM_RAMBANK("bank18")	/* TRIRAM (shared) */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM	/* Sound RAM 3 */
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(namcos1_sound_bankswitch_w) /* ROM bank selector */
@@ -480,8 +477,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6801_io_r, m6801_io_w)
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, namcos1_state )
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM /* built in RAM */
 	AM_RANGE(0x1000, 0x1003) AM_READ(dsw_r)
 	AM_RANGE(0x1400, 0x1400) AM_READ_PORT("CONTROL0")
@@ -497,7 +494,7 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8, namcos1_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ_PORT("COIN") AM_WRITE(namcos1_coin_w)
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READNOP AM_WRITE(namcos1_dac_gain_w)
 ADDRESS_MAP_END
@@ -1066,7 +1063,7 @@ static void namcos1_sound_interrupt( device_t *device, int irq )
 
 static const ym2151_interface ym2151_config =
 {
-	namcos1_sound_interrupt
+	DEVCB_LINE(namcos1_sound_interrupt)
 };
 
 static const namco_interface namco_config =

@@ -39,25 +39,28 @@ class good_state : public driver_device
 {
 public:
 	good_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fg_tilemapram(*this, "fg_tilemapram"),
+		m_bg_tilemapram(*this, "bg_tilemapram"){ }
 
 	/* memory pointers */
-	UINT16 *  m_bg_tilemapram;
-	UINT16 *  m_fg_tilemapram;
+	required_shared_ptr<UINT16> m_fg_tilemapram;
+	required_shared_ptr<UINT16> m_bg_tilemapram;
 	UINT16 *  m_sprites;
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
+	DECLARE_WRITE16_MEMBER(fg_tilemapram_w);
+	DECLARE_WRITE16_MEMBER(bg_tilemapram_w);
 };
 
 
-static WRITE16_HANDLER( fg_tilemapram_w )
+WRITE16_MEMBER(good_state::fg_tilemapram_w)
 {
-	good_state *state = space->machine().driver_data<good_state>();
-	COMBINE_DATA(&state->m_fg_tilemapram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_fg_tilemapram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -68,11 +71,10 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(0, tileno, attr, 0);
 }
 
-static WRITE16_HANDLER( bg_tilemapram_w )
+WRITE16_MEMBER(good_state::bg_tilemapram_w)
 {
-	good_state *state = space->machine().driver_data<good_state>();
-	COMBINE_DATA(&state->m_bg_tilemapram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_bg_tilemapram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -101,20 +103,20 @@ static SCREEN_UPDATE_IND16( good )
 	return 0;
 }
 
-static ADDRESS_MAP_START( good_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( good_map, AS_PROGRAM, 16, good_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
 	//AM_RANGE(0x270000, 0x270007) AM_RAM // scroll?
-	AM_RANGE(0x270000, 0x270001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x270000, 0x270001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("IN0")
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1")
 	AM_RANGE(0x280004, 0x280005) AM_READ_PORT("IN2")
 
-	AM_RANGE(0x800000, 0x8007ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x800000, 0x8007ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 
-	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE(fg_tilemapram_w) AM_BASE_MEMBER(good_state, m_fg_tilemapram)
-	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE(bg_tilemapram_w) AM_BASE_MEMBER(good_state, m_bg_tilemapram)
+	AM_RANGE(0x820000, 0x820fff) AM_RAM_WRITE(fg_tilemapram_w) AM_SHARE("fg_tilemapram")
+	AM_RANGE(0x822000, 0x822fff) AM_RAM_WRITE(bg_tilemapram_w) AM_SHARE("bg_tilemapram")
 
 	AM_RANGE(0xff0000, 0xffefff) AM_RAM
 ADDRESS_MAP_END

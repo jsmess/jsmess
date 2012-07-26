@@ -11,6 +11,7 @@
 
 PALETTE_INIT( funkybee )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* first, the character/sprite palette */
@@ -39,39 +40,35 @@ PALETTE_INIT( funkybee )
 	}
 }
 
-WRITE8_HANDLER( funkybee_videoram_w )
+WRITE8_MEMBER(funkybee_state::funkybee_videoram_w)
 {
-	funkybee_state *state = space->machine().driver_data<funkybee_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( funkybee_colorram_w )
+WRITE8_MEMBER(funkybee_state::funkybee_colorram_w)
 {
-	funkybee_state *state = space->machine().driver_data<funkybee_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( funkybee_gfx_bank_w )
+WRITE8_MEMBER(funkybee_state::funkybee_gfx_bank_w)
 {
-	funkybee_state *state = space->machine().driver_data<funkybee_state>();
-	if (state->m_gfx_bank != (data & 0x01))
+	if (m_gfx_bank != (data & 0x01))
 	{
-		state->m_gfx_bank = data & 0x01;
-		space->machine().tilemap().mark_all_dirty();
+		m_gfx_bank = data & 0x01;
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( funkybee_scroll_w )
+WRITE8_MEMBER(funkybee_state::funkybee_scroll_w)
 {
-	funkybee_state *state = space->machine().driver_data<funkybee_state>();
-	state->m_bg_tilemap->set_scrollx(0, flip_screen_get(space->machine()) ? -data : data);
+	m_bg_tilemap->set_scrollx(0, flip_screen() ? -data : data);
 }
 
-WRITE8_HANDLER( funkybee_flipscreen_w )
+WRITE8_MEMBER(funkybee_state::funkybee_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 0x01);
+	flip_screen_set(data & 0x01);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -111,7 +108,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sx = state->m_videoram[offs2 + 0x10];
 		int sy = 224 - state->m_colorram[offs2];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sy += 32;
 			flipx = !flipx;
@@ -131,7 +128,7 @@ static void draw_columns( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	for (offs = 0x1f; offs >= 0; offs--)
 	{
-		int const flip = flip_screen_get(machine);
+		int const flip = state->flip_screen();
 		int code = state->m_videoram[0x1c00 + offs];
 		int color = state->m_colorram[0x1f10] & 0x03;
 		int sx = flip ? state->m_videoram[0x1f1f] : state->m_videoram[0x1f10];

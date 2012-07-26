@@ -421,12 +421,18 @@ class magicfly_state : public driver_device
 {
 public:
 	magicfly_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	int m_input_selector;
+	DECLARE_WRITE8_MEMBER(magicfly_videoram_w);
+	DECLARE_WRITE8_MEMBER(magicfly_colorram_w);
+	DECLARE_READ8_MEMBER(mux_port_r);
+	DECLARE_WRITE8_MEMBER(mux_port_w);
 };
 
 
@@ -435,18 +441,16 @@ public:
 *************************/
 
 
-static WRITE8_HANDLER( magicfly_videoram_w )
+WRITE8_MEMBER(magicfly_state::magicfly_videoram_w)
 {
-	magicfly_state *state = space->machine().driver_data<magicfly_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( magicfly_colorram_w )
+WRITE8_MEMBER(magicfly_state::magicfly_colorram_w)
 {
-	magicfly_state *state = space->machine().driver_data<magicfly_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_magicfly_tile_info )
@@ -553,23 +557,21 @@ static PALETTE_INIT( magicfly )
 ******************************/
 
 
-static READ8_HANDLER( mux_port_r )
+READ8_MEMBER(magicfly_state::mux_port_r)
 {
-	magicfly_state *state = space->machine().driver_data<magicfly_state>();
-	switch( state->m_input_selector )
+	switch( m_input_selector )
 	{
-		case 0x01: return input_port_read(space->machine(), "IN0-0");
-		case 0x02: return input_port_read(space->machine(), "IN0-1");
-		case 0x04: return input_port_read(space->machine(), "IN0-2");
-		case 0x08: return input_port_read(space->machine(), "IN0-3");
-		case 0x00: return input_port_read(space->machine(), "DSW0");
+		case 0x01: return ioport("IN0-0")->read();
+		case 0x02: return ioport("IN0-1")->read();
+		case 0x04: return ioport("IN0-2")->read();
+		case 0x08: return ioport("IN0-3")->read();
+		case 0x00: return ioport("DSW0")->read();
 	}
 	return 0xff;
 }
 
-static WRITE8_HANDLER( mux_port_w )
+WRITE8_MEMBER(magicfly_state::mux_port_w)
 {
-	magicfly_state *state = space->machine().driver_data<magicfly_state>();
 /*  - bits -
     7654 3210
     ---- xxxx   Input selector.
@@ -579,13 +581,13 @@ static WRITE8_HANDLER( mux_port_w )
     x--- ----   Sound DAC.
 
 */
-	state->m_input_selector = data & 0x0f;	/* Input Selector */
+	m_input_selector = data & 0x0f;	/* Input Selector */
 
-	dac_data_w(space->machine().device("dac"), data & 0x80);		/* Sound DAC */
+	dac_data_w(machine().device("dac"), data & 0x80);		/* Sound DAC */
 
-	coin_counter_w(space->machine(), 0, data & 0x40);	/* Coin1 */
-	coin_counter_w(space->machine(), 1, data & 0x10);	/* Coin2 */
-	coin_counter_w(space->machine(), 2, data & 0x20);	/* Payout */
+	coin_counter_w(machine(), 0, data & 0x40);	/* Coin1 */
+	coin_counter_w(machine(), 1, data & 0x10);	/* Coin2 */
+	coin_counter_w(machine(), 2, data & 0x20);	/* Payout */
 }
 
 
@@ -593,12 +595,12 @@ static WRITE8_HANDLER( mux_port_w )
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( magicfly_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( magicfly_map, AS_PROGRAM, 8, magicfly_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")    /* MK48Z02B NVRAM */
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(magicfly_videoram_w) AM_BASE_MEMBER(magicfly_state, m_videoram)	/* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(magicfly_colorram_w) AM_BASE_MEMBER(magicfly_state, m_colorram)	/* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(magicfly_videoram_w) AM_SHARE("videoram")	/* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(magicfly_colorram_w) AM_SHARE("colorram")	/* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
 	AM_RANGE(0x2800, 0x2800) AM_READ(mux_port_r)	/* multiplexed input port */
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(mux_port_w)	/* output port */
 	AM_RANGE(0xc000, 0xffff) AM_ROM					/* ROM space */

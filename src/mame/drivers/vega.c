@@ -25,7 +25,7 @@ public:
 };
 
 
-static ADDRESS_MAP_START( vega_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( vega_map, AS_PROGRAM, 8, vega_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -106,7 +106,7 @@ UINT8 ascii_to_bin( UINT8 ascii )
 DRIVER_INIT(vegaa)
 {
 	UINT8* buf = (UINT8*)malloc(0x10000);
-	UINT8* rom = machine.region("maincpu")->base();
+	UINT8* rom = machine.root_device().memregion("maincpu")->base();
 	int i;
 	int count = 0;
 	// last 0xc bytes of file are just some settings, ignore

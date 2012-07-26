@@ -22,14 +22,15 @@ class exerion_state : public driver_device
 {
 public:
 	exerion_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_main_ram(*this, "main_ram"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_main_ram;
-	UINT8 *  m_videoram;
-	UINT8 *  m_spriteram;
-	size_t   m_videoram_size;
-	size_t   m_spriteram_size;
+	required_shared_ptr<UINT8> m_main_ram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	UINT8    m_cocktail_flip;
@@ -46,6 +47,12 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_READ8_MEMBER(exerion_protection_r);
+	DECLARE_WRITE8_MEMBER(exerion_videoreg_w);
+	DECLARE_WRITE8_MEMBER(exerion_video_latch_w);
+	DECLARE_READ8_MEMBER(exerion_video_timing_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(exerion_controls_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 
@@ -56,6 +63,3 @@ PALETTE_INIT( exerion );
 VIDEO_START( exerion );
 SCREEN_UPDATE_IND16( exerion );
 
-WRITE8_HANDLER( exerion_videoreg_w );
-WRITE8_HANDLER( exerion_video_latch_w );
-READ8_HANDLER( exerion_video_timing_r );

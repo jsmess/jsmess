@@ -74,7 +74,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 /* Read/Write Handlers */
 
-static READ8_HANDLER( gunsmoke_protection_r )
+READ8_MEMBER(gunsmoke_state::gunsmoke_protection_r)
 {
     /*
         The routine at 0x0e69 tries to read data starting at 0xc4c9.
@@ -97,7 +97,7 @@ static READ8_HANDLER( gunsmoke_protection_r )
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( gunsmoke_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gunsmoke_map, AS_PROGRAM, 8, gunsmoke_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
@@ -106,24 +106,24 @@ static ADDRESS_MAP_START( gunsmoke_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc4c9, 0xc4cb) AM_READ(gunsmoke_protection_r)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(gunsmoke_c804_w)	// ROM bank switch, screen flip
 	AM_RANGE(0xc806, 0xc806) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(gunsmoke_videoram_w) AM_BASE_MEMBER(gunsmoke_state, m_videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(gunsmoke_colorram_w) AM_BASE_MEMBER(gunsmoke_state, m_colorram)
-	AM_RANGE(0xd800, 0xd801) AM_RAM AM_BASE_MEMBER(gunsmoke_state, m_scrollx)
-	AM_RANGE(0xd802, 0xd802) AM_RAM AM_BASE_MEMBER(gunsmoke_state, m_scrolly)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(gunsmoke_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(gunsmoke_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xd800, 0xd801) AM_RAM AM_SHARE("scrollx")
+	AM_RANGE(0xd802, 0xd802) AM_RAM AM_SHARE("scrolly")
 	AM_RANGE(0xd806, 0xd806) AM_WRITE(gunsmoke_d806_w)	// sprites and bg enable
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(gunsmoke_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gunsmoke_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0xe002, 0xe003) AM_DEVWRITE("ym2", ym2203_w)
+	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe001) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
+	AM_RANGE(0xe002, 0xe003) AM_DEVWRITE_LEGACY("ym2", ym2203_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -274,9 +274,9 @@ GFXDECODE_END
 static MACHINE_START( gunsmoke )
 {
 	gunsmoke_state *state = machine.driver_data<gunsmoke_state>();
-	UINT8 *rombase = machine.region("maincpu")->base();
+	UINT8 *rombase = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 4, &rombase[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 4, &rombase[0x10000], 0x4000);
 
 	state->save_item(NAME(state->m_chon));
 	state->save_item(NAME(state->m_objon));

@@ -39,13 +39,14 @@ class tapatune_state : public driver_device
 {
 public:
 	tapatune_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) {}
+		: driver_device(mconfig, type, tag),
+		  m_videoram(*this, "videoram") {}
 
 	UINT8	m_paletteram[0x300];
 	UINT16	m_palette_write_address;
 	rgb_t	m_pens[0x100];
 
-	UINT16	*m_videoram;
+	required_shared_ptr<UINT16> m_videoram;
 
 	UINT8	m_controls_mux;
 	UINT8	m_z80_to_68k_index;
@@ -55,68 +56,80 @@ public:
 	UINT8	m_68k_to_z80_data;
 
 	UINT16	m_bsmt_data;
+	DECLARE_WRITE16_MEMBER(palette_w);
+	DECLARE_READ16_MEMBER(read_from_z80);
+	DECLARE_WRITE16_MEMBER(write_to_z80);
+	DECLARE_READ16_MEMBER(irq_ack_r);
+	DECLARE_READ8_MEMBER(sound_irq_clear);
+	DECLARE_WRITE8_MEMBER(controls_mux);
+	DECLARE_READ8_MEMBER(controls_r);
+	DECLARE_WRITE8_MEMBER(write_index_to_68k);
+	DECLARE_WRITE8_MEMBER(write_data_to_68k);
+	DECLARE_READ8_MEMBER(read_index_from_68k);
+	DECLARE_READ8_MEMBER(read_data_from_68k);
+	DECLARE_READ8_MEMBER(bsmt_status_r);
+	DECLARE_WRITE8_MEMBER(bsmt_data_lo_w);
+	DECLARE_WRITE8_MEMBER(bsmt_data_hi_w);
+	DECLARE_WRITE8_MEMBER(bsmt_reg_w);
 };
 
-static WRITE16_HANDLER(palette_w)
+WRITE16_MEMBER(tapatune_state::palette_w)
 {
-	tapatune_state *state = space->machine().driver_data<tapatune_state>();
 
 	//logerror("Palette write: offset = %02x, data = %04x, mask = %04x\n", offset, data, mem_mask );
 	switch(offset)
 	{
 		case 0: // address register
-			state->m_palette_write_address = ((data >> 8) & 0xff) * 3;
+			m_palette_write_address = ((data >> 8) & 0xff) * 3;
 			break;
 		case 1: // palette data
-			state->m_paletteram[state->m_palette_write_address++] = (data >> 8) & 0xff;
+			m_paletteram[m_palette_write_address++] = (data >> 8) & 0xff;
 			break;
 		case 2: // unknown?
 			break;
 	}
 }
 
-static READ16_HANDLER(read_from_z80)
+READ16_MEMBER(tapatune_state::read_from_z80)
 {
-	tapatune_state *state = space->machine().driver_data<tapatune_state>();
 
-	//logerror("Reading data from Z80: index = %02x, data = %02x\n", state->m_z80_to_68k_index, state->m_z80_to_68k_data );
+	//logerror("Reading data from Z80: index = %02x, data = %02x\n", m_z80_to_68k_index, m_z80_to_68k_data );
 
 	switch( offset )
 	{
 		case 0:
-			return ((UINT16)state->m_z80_to_68k_data << 8) | (state->m_z80_to_68k_index);
+			return ((UINT16)m_z80_to_68k_data << 8) | (m_z80_to_68k_index);
 		default:
 			return 0;
 	}
 }
 
-static WRITE16_HANDLER(write_to_z80)
+WRITE16_MEMBER(tapatune_state::write_to_z80)
 {
-	tapatune_state *state = space->machine().driver_data<tapatune_state>();
 
 	switch( offset )
 	{
 		case 0:
 			//if ( (data >> 8) & 0xff )
 			//  logerror("Command to Z80: %04x\n", data);
-			state->m_68k_to_z80_index = data & 0xff;
-			state->m_68k_to_z80_data = (data >> 8) & 0xff;
-			cputag_set_input_line(space->machine(), "maincpu", 3, CLEAR_LINE);
+			m_68k_to_z80_index = data & 0xff;
+			m_68k_to_z80_data = (data >> 8) & 0xff;
+			cputag_set_input_line(machine(), "maincpu", 3, CLEAR_LINE);
 			break;
 		case 1:
 			break;
 	}
 }
 
-static READ16_HANDLER(irq_ack_r)
+READ16_MEMBER(tapatune_state::irq_ack_r)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 2, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 2, CLEAR_LINE);
 	return 0;
 }
 
-static ADDRESS_MAP_START( tapatune_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tapatune_map, AS_PROGRAM, 16, tapatune_state )
 	AM_RANGE(0x000000, 0x2fffff) AM_ROM // program rom and graphics roms
-	AM_RANGE(0x300000, 0x31ffff) AM_RAM AM_BASE_MEMBER(tapatune_state, m_videoram) // hardware video buffer
+	AM_RANGE(0x300000, 0x31ffff) AM_RAM AM_SHARE("videoram") // hardware video buffer
 	AM_RANGE(0x320000, 0x327fff) AM_RAM // workram
 	AM_RANGE(0x328000, 0x32ffff) AM_RAM
 	AM_RANGE(0x330000, 0x337fff) AM_RAM // ram used as system video buffer
@@ -124,98 +137,90 @@ static ADDRESS_MAP_START( tapatune_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400003) AM_READWRITE(read_from_z80, write_to_z80)
 	AM_RANGE(0x400010, 0x400011) AM_READ(irq_ack_r)
 	AM_RANGE(0x600000, 0x600005) AM_WRITE(palette_w)
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8_MODERN("crtc", mc6845_device, address_w, 0xff00)
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, register_r, register_w, 0xff00)
+	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0xff00)
+	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
 ADDRESS_MAP_END
 
-static READ8_HANDLER(sound_irq_clear)
+READ8_MEMBER(tapatune_state::sound_irq_clear)
 {
-	cputag_set_input_line(space->machine(), "soundcpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "soundcpu", 0, CLEAR_LINE);
 	return 0;
 }
 
-static WRITE8_HANDLER(controls_mux)
+WRITE8_MEMBER(tapatune_state::controls_mux)
 {
-	tapatune_state *state = space->machine().driver_data<tapatune_state>();
 	//logerror("Controls mux written with %02x\n", data);
-	state->m_controls_mux = data;
+	m_controls_mux = data;
 }
 
-static READ8_HANDLER(controls_r)
+READ8_MEMBER(tapatune_state::controls_r)
 {
-	tapatune_state *state = space->machine().driver_data<tapatune_state>();
-	switch( state->m_controls_mux )
+	switch( m_controls_mux )
 	{
-		case 0x07: return input_port_read(space->machine(), "DSW1");
-		case 0x08: return input_port_read(space->machine(), "DSW2");
-		case 0x09: return input_port_read(space->machine(), "IN0");
+		case 0x07: return ioport("DSW1")->read();
+		case 0x08: return ioport("DSW2")->read();
+		case 0x09: return ioport("IN0")->read();
 		default: return 0xff;
 	}
 }
 
-static WRITE8_HANDLER(write_index_to_68k)
+WRITE8_MEMBER(tapatune_state::write_index_to_68k)
 {
-	tapatune_state *state = space->machine().driver_data<tapatune_state>();
-	state->m_z80_to_68k_index = data;
+	m_z80_to_68k_index = data;
 }
 
-static WRITE8_HANDLER(write_data_to_68k)
+WRITE8_MEMBER(tapatune_state::write_data_to_68k)
 {
-	tapatune_state *state = space->machine().driver_data<tapatune_state>();
-	state->m_z80_to_68k_data = data;
-	//logerror("Writing data from Z80: index = %02x, data = %02x\n", state->m_z80_to_68k_index, state->m_z80_to_68k_data );
-	cputag_set_input_line(space->machine(), "maincpu", 3, ASSERT_LINE);
+	m_z80_to_68k_data = data;
+	//logerror("Writing data from Z80: index = %02x, data = %02x\n", m_z80_to_68k_index, m_z80_to_68k_data );
+	cputag_set_input_line(machine(), "maincpu", 3, ASSERT_LINE);
 }
 
-static READ8_HANDLER(read_index_from_68k)
+READ8_MEMBER(tapatune_state::read_index_from_68k)
 {
-	tapatune_state *state = space->machine().driver_data<tapatune_state>();
-	return state->m_68k_to_z80_index;
+	return m_68k_to_z80_index;
 }
 
-static READ8_HANDLER(read_data_from_68k)
+READ8_MEMBER(tapatune_state::read_data_from_68k)
 {
-	tapatune_state *state = space->machine().driver_data<tapatune_state>();
-	//if ( state->m_68k_to_z80_data != 0 )
-	//  logerror("Load command from 68K: %02x %02x\n", state->m_68k_to_z80_index, state->m_68k_to_z80_data);
-	return state->m_68k_to_z80_data;
+	//if ( m_68k_to_z80_data != 0 )
+	//  logerror("Load command from 68K: %02x %02x\n", m_68k_to_z80_index, m_68k_to_z80_data);
+	return m_68k_to_z80_data;
 }
 
-static READ8_HANDLER(bsmt_status_r)
+READ8_MEMBER(tapatune_state::bsmt_status_r)
 {
-	bsmt2000_device *bsmt = space->machine().device<bsmt2000_device>("bsmt");
+	bsmt2000_device *bsmt = machine().device<bsmt2000_device>("bsmt");
 	return (bsmt->read_status() << 7) ^ 0x80;
 }
 
-static WRITE8_HANDLER(bsmt_data_lo_w)
+WRITE8_MEMBER(tapatune_state::bsmt_data_lo_w)
 {
-	tapatune_state *state = space->machine().driver_data<tapatune_state>();
-	state->m_bsmt_data = (state->m_bsmt_data & 0xff00) | data;
+	m_bsmt_data = (m_bsmt_data & 0xff00) | data;
 }
 
-static WRITE8_HANDLER(bsmt_data_hi_w)
+WRITE8_MEMBER(tapatune_state::bsmt_data_hi_w)
 {
-	tapatune_state *state = space->machine().driver_data<tapatune_state>();
-	state->m_bsmt_data = (state->m_bsmt_data & 0x00ff) | (data << 8);
+	m_bsmt_data = (m_bsmt_data & 0x00ff) | (data << 8);
 }
 
-static WRITE8_HANDLER(bsmt_reg_w)
+WRITE8_MEMBER(tapatune_state::bsmt_reg_w)
 {
-	bsmt2000_device *bsmt = space->machine().device<bsmt2000_device>("bsmt");
-	tapatune_state *state = space->machine().driver_data<tapatune_state>();
+	bsmt2000_device *bsmt = machine().device<bsmt2000_device>("bsmt");
 
-	//logerror("Writing BSMT reg: %02X data: %04X\n", data, state->m_bsmt_data);
+
+	//logerror("Writing BSMT reg: %02X data: %04X\n", data, m_bsmt_data);
 	bsmt->write_reg(data);
-	bsmt->write_data(state->m_bsmt_data);
+	bsmt->write_data(m_bsmt_data);
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tapatune_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START ( sound_io_map, AS_IO, 8)
+static ADDRESS_MAP_START ( sound_io_map, AS_IO, 8, tapatune_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(bsmt_data_lo_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(bsmt_data_hi_w)
@@ -281,7 +286,7 @@ static INPUT_PORTS_START( tapatune )
 	PORT_START("COINS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS")
@@ -337,9 +342,10 @@ static MC6845_UPDATE_ROW( update_row )
 
 	offs_t offs = (ma*2 + ra*0x40)*4;
 
+	UINT8 *videoram = reinterpret_cast<UINT8 *>(state->m_videoram.target());
 	for (x = 0; x < x_count*4; x++)
 	{
-		UINT8 pix = ((UINT8*)state->m_videoram)[BYTE_XOR_BE(offs + x)];
+		UINT8 pix = videoram[BYTE_XOR_BE(offs + x)];
 		dest[2*x] = pens[((pix >> 4) & 0x0f)];
 		dest[2*x + 1] = pens[(pix & 0x0f)];
 	}
@@ -393,7 +399,7 @@ static MACHINE_CONFIG_START( tapatune, tapatune_state )
 
 	MCFG_MC6845_ADD("crtc", H46505, 24000000/16, h46505_intf)	/* H46505 */
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", 100, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW)
+	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

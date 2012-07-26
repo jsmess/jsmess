@@ -50,7 +50,6 @@ PIO A-Data 0F4h, A-Command 0F5h, B-Data 0F6h, B-Command 0F7h
 'maincpu' (F14B): unmapped i/o memory write to 0030 = D0 & FF
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -65,14 +64,15 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_terminal(*this, TERMINAL_TAG)
-	{ }
+	,
+		m_p_ram(*this, "p_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_READ8_MEMBER(mccpm_f0_r);
 	DECLARE_READ8_MEMBER(mccpm_f1_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
-	UINT8 *m_p_ram;
+	required_shared_ptr<UINT8> m_p_ram;
 	UINT8 m_term_data;
 	virtual void machine_reset();
 };
@@ -95,7 +95,7 @@ READ8_MEMBER( mccpm_state::mccpm_f1_r )
 
 static ADDRESS_MAP_START(mccpm_mem, AS_PROGRAM, 8, mccpm_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE(m_p_ram)
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("p_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mccpm_io, AS_IO, 8, mccpm_state)
@@ -112,7 +112,7 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER( mccpm_state )
 {
-	UINT8* bios = machine().region("maincpu")->base();
+	UINT8* bios = memregion("maincpu")->base();
 	memcpy(m_p_ram, bios, 0x1000);
 }
 

@@ -14,7 +14,6 @@ The code below is just a sample; it does not represent any aspect of the
 real hardware.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"

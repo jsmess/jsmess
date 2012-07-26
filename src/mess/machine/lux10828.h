@@ -3,7 +3,6 @@
 #ifndef __LUXOR_55_10828__
 #define __LUXOR_55_10828__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

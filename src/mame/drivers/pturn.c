@@ -83,9 +83,11 @@ class pturn_state : public driver_device
 {
 public:
 	pturn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_fgmap;
 	tilemap_t *m_bgmap;
 	int m_bgbank;
@@ -95,8 +97,21 @@ public:
 	int m_bgcolor;
 	int m_nmi_main;
 	int m_nmi_sub;
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	required_shared_ptr<UINT8> m_spriteram;
+	DECLARE_WRITE8_MEMBER(pturn_videoram_w);
+	DECLARE_WRITE8_MEMBER(nmi_main_enable_w);
+	DECLARE_WRITE8_MEMBER(nmi_sub_enable_w);
+	DECLARE_WRITE8_MEMBER(sound_w);
+	DECLARE_WRITE8_MEMBER(bgcolor_w);
+	DECLARE_WRITE8_MEMBER(bg_scrollx_w);
+	DECLARE_WRITE8_MEMBER(fgpalette_w);
+	DECLARE_WRITE8_MEMBER(bg_scrolly_w);
+	DECLARE_WRITE8_MEMBER(fgbank_w);
+	DECLARE_WRITE8_MEMBER(bgbank_w);
+	DECLARE_WRITE8_MEMBER(flip_w);
+	DECLARE_READ8_MEMBER(pturn_custom_r);
+	DECLARE_READ8_MEMBER(pturn_protection_r);
+	DECLARE_READ8_MEMBER(pturn_protection2_r);
 };
 
 
@@ -128,7 +143,7 @@ static TILE_GET_INFO( get_pturn_bg_tile_info )
 {
 	pturn_state *state = machine.driver_data<pturn_state>();
 	int tileno,palno;
-	tileno = machine.region("user1")->base()[tile_index];
+	tileno = state->memregion("user1")->base()[tile_index];
 	palno=state->m_bgpalette;
 	if(palno==1)
 	{
@@ -165,13 +180,13 @@ static SCREEN_UPDATE_IND16(pturn)
 		flipy=spriteram[offs+1]&0x80;
 
 
-		if (flip_screen_x_get(screen.machine()))
+		if (state->flip_screen_x())
 		{
 			sx = 224 - sx;
 			flipx ^= 0x40;
 		}
 
-		if (flip_screen_y_get(screen.machine()))
+		if (state->flip_screen_y())
 		{
 			flipy ^= 0x80;
 			sy = 224 - sy;
@@ -191,92 +206,83 @@ static SCREEN_UPDATE_IND16(pturn)
 }
 
 #ifdef UNUSED_FUNCTION
-READ8_HANDLER (pturn_protection_r)
+READ8_MEMBER(pturn_state::pturn_protection_r)
 {
     return 0x66;
 }
 
-READ8_HANDLER (pturn_protection2_r)
+READ8_MEMBER(pturn_state::pturn_protection2_r)
 {
     return 0xfe;
 }
 #endif
 
-static WRITE8_HANDLER( pturn_videoram_w )
+WRITE8_MEMBER(pturn_state::pturn_videoram_w)
 {
-	pturn_state *state = space->machine().driver_data<pturn_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset]=data;
-	state->m_fgmap->mark_tile_dirty(offset);
+	m_fgmap->mark_tile_dirty(offset);
 }
 
 
-static WRITE8_HANDLER( nmi_main_enable_w )
+WRITE8_MEMBER(pturn_state::nmi_main_enable_w)
 {
-	pturn_state *state = space->machine().driver_data<pturn_state>();
-	state->m_nmi_main = data;
+	m_nmi_main = data;
 }
 
-static WRITE8_HANDLER( nmi_sub_enable_w )
+WRITE8_MEMBER(pturn_state::nmi_sub_enable_w)
 {
-	pturn_state *state = space->machine().driver_data<pturn_state>();
-	state->m_nmi_sub = data;
+	m_nmi_sub = data;
 }
 
-static WRITE8_HANDLER(sound_w)
+WRITE8_MEMBER(pturn_state::sound_w)
 {
-	soundlatch_w(space,0,data);
+	soundlatch_byte_w(space,0,data);
 }
 
 
-static WRITE8_HANDLER(bgcolor_w)
+WRITE8_MEMBER(pturn_state::bgcolor_w)
 {
-	pturn_state *state = space->machine().driver_data<pturn_state>();
-	state->m_bgcolor=data;
+	m_bgcolor=data;
 }
 
-static WRITE8_HANDLER(bg_scrollx_w)
+WRITE8_MEMBER(pturn_state::bg_scrollx_w)
 {
-	pturn_state *state = space->machine().driver_data<pturn_state>();
-	state->m_bgmap->set_scrolly(0, (data>>5)*32*8);
-	state->m_bgpalette=data&0x1f;
-	state->m_bgmap->mark_all_dirty();
+	m_bgmap->set_scrolly(0, (data>>5)*32*8);
+	m_bgpalette=data&0x1f;
+	m_bgmap->mark_all_dirty();
 }
 
-static WRITE8_HANDLER(fgpalette_w)
+WRITE8_MEMBER(pturn_state::fgpalette_w)
 {
-	pturn_state *state = space->machine().driver_data<pturn_state>();
-	state->m_fgpalette=data&0x1f;
-	state->m_fgmap->mark_all_dirty();
+	m_fgpalette=data&0x1f;
+	m_fgmap->mark_all_dirty();
 }
 
-static WRITE8_HANDLER(bg_scrolly_w)
+WRITE8_MEMBER(pturn_state::bg_scrolly_w)
 {
-	pturn_state *state = space->machine().driver_data<pturn_state>();
-	state->m_bgmap->set_scrollx(0, data);
+	m_bgmap->set_scrollx(0, data);
 }
 
-static WRITE8_HANDLER(fgbank_w)
+WRITE8_MEMBER(pturn_state::fgbank_w)
 {
-	pturn_state *state = space->machine().driver_data<pturn_state>();
-	state->m_fgbank=data&1;
-	state->m_fgmap->mark_all_dirty();
+	m_fgbank=data&1;
+	m_fgmap->mark_all_dirty();
 }
 
-static WRITE8_HANDLER(bgbank_w)
+WRITE8_MEMBER(pturn_state::bgbank_w)
 {
-	pturn_state *state = space->machine().driver_data<pturn_state>();
-	state->m_bgbank=data&1;
-	state->m_bgmap->mark_all_dirty();
+	m_bgbank=data&1;
+	m_bgmap->mark_all_dirty();
 }
 
-static WRITE8_HANDLER(flip_w)
+WRITE8_MEMBER(pturn_state::flip_w)
 {
-	flip_screen_set(space->machine(), data);
+	flip_screen_set(data);
 }
 
 
-static READ8_HANDLER (pturn_custom_r)
+READ8_MEMBER(pturn_state::pturn_custom_r)
 {
 	int addr = (int)offset + 0xc800;
 
@@ -302,18 +308,18 @@ static READ8_HANDLER (pturn_custom_r)
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, pturn_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_WRITENOP AM_READ(pturn_custom_r)
 
 	AM_RANGE(0xdfe0, 0xdfe0) AM_NOP
 
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(pturn_videoram_w) AM_BASE_MEMBER(pturn_state, m_videoram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(pturn_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(fgpalette_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(sound_w)
 
-	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_BASE_SIZE_MEMBER(pturn_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("spriteram")
 
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(bg_scrollx_w)
 
@@ -325,7 +331,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf806, 0xf806) AM_READNOP /* Protection related, ((val&3)==2) -> jump to 0 */
 
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE (flip_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(flip_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(nmi_main_enable_w)
 	AM_RANGE(0xfc02, 0xfc02) AM_WRITENOP /* Unknown */
 	AM_RANGE(0xfc03, 0xfc03) AM_WRITENOP /* Unknown */
@@ -336,13 +342,13 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, pturn_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r) AM_WRITE(nmi_sub_enable_w)
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r) AM_WRITE(nmi_sub_enable_w)
 	AM_RANGE(0x4000, 0x4000) AM_RAM
-	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 static const gfx_layout charlayout =
@@ -471,8 +477,9 @@ static INTERRUPT_GEN( pturn_main_intgen )
 
 static MACHINE_RESET( pturn )
 {
+	pturn_state *state = machine.driver_data<pturn_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	soundlatch_clear_w(space,0,0);
+	state->soundlatch_clear_byte_w(*space,0,0);
 }
 
 static MACHINE_CONFIG_START( pturn, pturn_state )

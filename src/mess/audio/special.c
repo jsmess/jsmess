@@ -7,8 +7,6 @@
 
 ****************************************************************************/
 
-#include "emu.h"
-#include "machine/pit8253.h"
 #include "includes/special.h"
 
 typedef struct _specimx_sound_state specimx_sound_state;

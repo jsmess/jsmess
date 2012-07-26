@@ -209,6 +209,7 @@ SOUNDS += SP0250
 SOUNDS += SPU
 SOUNDS += CDDA
 SOUNDS += ICS2115
+SOUNDS += I5000_SND
 SOUNDS += ST0016
 SOUNDS += NILE
 SOUNDS += X1_010
@@ -456,6 +457,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/orbit.o $(AUDIO)/orbit.o $(VIDEO)/orbit.o \
 	$(DRIVERS)/poolshrk.o $(AUDIO)/poolshrk.o $(VIDEO)/poolshrk.o \
 	$(DRIVERS)/quantum.o \
+	$(DRIVERS)/quizshow.o \
 	$(DRIVERS)/rampart.o $(VIDEO)/rampart.o \
 	$(DRIVERS)/relief.o $(VIDEO)/relief.o \
 	$(DRIVERS)/runaway.o $(VIDEO)/runaway.o \
@@ -515,10 +517,12 @@ $(MAMEOBJ)/bfm.a: \
 	$(DRIVERS)/bfm_sc1.o \
 	$(DRIVERS)/bfm_sc2.o $(VIDEO)/bfm_adr2.o \
 	$(DRIVERS)/bfm_sc4.o \
+	$(DRIVERS)/bfm_sc4h.o \
 	$(DRIVERS)/bfm_sc5.o \
 	$(DRIVERS)/bfm_swp.o \
 	$(DRIVERS)/bfmsys83.o \
 	$(DRIVERS)/bfmsys85.o \
+	$(MACHINE)/sec.o \
 	$(MACHINE)/bfm_bd1.o $(VIDEO)/bfm_dm01.o \
 
 $(MAMEOBJ)/bmc.a: \
@@ -573,6 +577,7 @@ $(MAMEOBJ)/comad.a: \
 
 $(MAMEOBJ)/cvs.a: \
 	$(DRIVERS)/cvs.o $(VIDEO)/cvs.o \
+	$(DRIVERS)/galaxia.o $(VIDEO)/galaxia.o \
 	$(DRIVERS)/quasar.o $(VIDEO)/quasar.o \
 
 $(MAMEOBJ)/dataeast.a: \
@@ -690,6 +695,7 @@ $(MAMEOBJ)/exidy.a: \
 
 $(MAMEOBJ)/f32.a: \
 	$(DRIVERS)/crospang.o $(VIDEO)/crospang.o \
+	$(DRIVERS)/silvmil.o \
 	$(DRIVERS)/f-32.o \
 
 $(MAMEOBJ)/funworld.a: \
@@ -809,7 +815,6 @@ $(MAMEOBJ)/jaleco.a: \
 	$(DRIVERS)/psychic5.o $(VIDEO)/psychic5.o \
 	$(DRIVERS)/pturn.o \
 	$(DRIVERS)/skyfox.o $(VIDEO)/skyfox.o \
-	$(DRIVERS)/stepstag.o \
 	$(DRIVERS)/tetrisp2.o $(VIDEO)/tetrisp2.o \
 	$(MACHINE)/jalcrpt.o \
 	$(VIDEO)/jalblend.o \
@@ -971,7 +976,7 @@ $(MAMEOBJ)/midway.a: \
 	$(DRIVERS)/astrocde.o $(VIDEO)/astrocde.o \
 	$(DRIVERS)/balsente.o $(MACHINE)/balsente.o $(VIDEO)/balsente.o \
 	$(DRIVERS)/gridlee.o $(AUDIO)/gridlee.o $(VIDEO)/gridlee.o \
-	$(DRIVERS)/mcr.o $(MACHINE)/mcr.o $(AUDIO)/mcr.o $(VIDEO)/mcr.o \
+	$(DRIVERS)/mcr.o $(MACHINE)/mcr.o $(VIDEO)/mcr.o \
 	$(DRIVERS)/mcr3.o $(VIDEO)/mcr3.o \
 	$(DRIVERS)/mcr68.o $(MACHINE)/mcr68.o $(VIDEO)/mcr68.o \
 	$(DRIVERS)/midqslvr.o \
@@ -989,6 +994,7 @@ $(MAMEOBJ)/midway.a: \
 	$(MACHINE)/midwayic.o \
 	$(AUDIO)/dcs.o \
 	$(AUDIO)/gorf.o \
+	$(AUDIO)/midway.o \
 	$(AUDIO)/wow.o \
 
 $(MAMEOBJ)/namco.a: \
@@ -1570,7 +1576,6 @@ $(MAMEOBJ)/yunsung.a: \
 	$(DRIVERS)/yunsun16.o $(VIDEO)/yunsun16.o \
 
 $(MAMEOBJ)/zaccaria.a: \
-	$(DRIVERS)/galaxia.o \
 	$(DRIVERS)/laserbat.o $(AUDIO)/laserbat.o \
 	$(DRIVERS)/zac2650.o $(VIDEO)/zac2650.o \
 	$(DRIVERS)/zaccaria.o $(VIDEO)/zaccaria.o \
@@ -1691,6 +1696,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/cb2001.o \
 	$(DRIVERS)/cdi.o $(VIDEO)/mcd212.o $(MACHINE)/cdi070.o $(MACHINE)/cdislave.o $(MACHINE)/cdicdic.o \
 	$(DRIVERS)/cesclass.o \
+	$(DRIVERS)/chance32.o \
 	$(DRIVERS)/chsuper.o \
 	$(DRIVERS)/cidelsa.o $(VIDEO)/cidelsa.o \
 	$(DRIVERS)/coinmstr.o \
@@ -1775,6 +1781,8 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/majorpkr.o \
 	$(DRIVERS)/malzak.o $(VIDEO)/malzak.o \
 	$(DRIVERS)/mcatadv.o $(VIDEO)/mcatadv.o \
+	$(DRIVERS)/meyc8080.o \
+	$(DRIVERS)/meyc8088.o \
 	$(DRIVERS)/micro3d.o $(MACHINE)/micro3d.o $(VIDEO)/micro3d.o $(AUDIO)/micro3d.o \
 	$(DRIVERS)/midas.o \
 	$(DRIVERS)/miniboy7.o \
@@ -1860,16 +1868,17 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/tugboat.o \
 	$(DRIVERS)/umipoker.o \
 	$(DRIVERS)/unkfr.o \
+	$(DRIVERS)/unkhorse.o \
 	$(DRIVERS)/unkpcp.o \
 	$(DRIVERS)/usgames.o $(VIDEO)/usgames.o \
 	$(DRIVERS)/vamphalf.o \
 	$(DRIVERS)/vcombat.o \
 	$(DRIVERS)/vectrex.o $(VIDEO)/vectrex.o $(MACHINE)/vectrex.o \
 	$(DRIVERS)/videopkr.o \
+    $(DRIVERS)/voyager.o \
 	$(DRIVERS)/vp101.o \
 	$(DRIVERS)/vpoker.o \
 	$(DRIVERS)/vroulet.o \
-	$(DRIVERS)/wldarrow.o \
 	$(DRIVERS)/xtom3d.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
 	$(DRIVERS)/gamtor.o \
@@ -1895,6 +1904,8 @@ $(DRIVERS)/8080bw.o:	$(LAYOUT)/invrvnge.lh \
 			$(LAYOUT)/cosmicm.lh
 
 $(DRIVERS)/acefruit.o:	$(LAYOUT)/sidewndr.lh
+
+$(DRIVERS)/amaticmg.o:	$(LAYOUT)/suprstar.lh
 
 $(DRIVERS)/ampoker2.o:	$(LAYOUT)/ampoker2.lh \
 			$(LAYOUT)/sigmapkr.lh \
@@ -1941,6 +1952,10 @@ $(DRIVERS)/bfm_sc2.o:	$(LAYOUT)/bfm_sc2.lh \
 			$(LAYOUT)/slots.lh \
 			$(LAYOUT)/sltblgpo.lh \
 			$(LAYOUT)/sltblgtk.lh
+
+$(DRIVERS)/bfm_sc4.o:	$(LAYOUT)/bfm_sc4.lh
+
+$(DRIVERS)/bfm_sc4h.o:	$(LAYOUT)/bfm_sc4.lh
 
 $(DRIVERS)/blockade.o:	$(LAYOUT)/blockade.lh
 
@@ -1991,6 +2006,8 @@ $(DRIVERS)/galaxi.o:	$(LAYOUT)/galaxi.lh
 $(DRIVERS)/gatron.o:	$(LAYOUT)/poker41.lh \
 			$(LAYOUT)/pulltabs.lh
 
+$(DRIVERS)/globalfr.o:	$(LAYOUT)/globalfr.lh
+
 $(DRIVERS)/goldnpkr.o:	$(LAYOUT)/goldnpkr.lh \
 			$(LAYOUT)/pmpoker.lh \
 			$(LAYOUT)/upndown.lh
@@ -2001,6 +2018,8 @@ $(DRIVERS)/goldstar.o:	$(LAYOUT)/lucky8.lh \
 $(DRIVERS)/grchamp.o:	$(LAYOUT)/grchamp.lh
 
 $(DRIVERS)/highvdeo.o:	$(LAYOUT)/fashion.lh
+
+$(DRIVERS)/icecold.o:	$(LAYOUT)/icecold.lh
 
 $(DRIVERS)/igspoker.o:	$(LAYOUT)/igspoker.lh
 
@@ -2049,6 +2068,12 @@ $(DRIVERS)/mw8080bw.o:	$(LAYOUT)/280zzzap.lh \
 $(DRIVERS)/meadows.o:	$(LAYOUT)/deadeye.lh \
 			$(LAYOUT)/gypsyjug.lh
 
+$(DRIVERS)/meyc8080.o:	$(LAYOUT)/wldarrow.lh \
+			$(LAYOUT)/mdrawpkr.lh \
+			$(LAYOUT)/meybjack.lh
+
+$(DRIVERS)/meyc8088.o:	$(LAYOUT)/gldarrow.lh
+
 $(DRIVERS)/midzeus.o:	$(LAYOUT)/crusnexo.lh
 
 $(DRIVERS)/mil4000.o:	$(LAYOUT)/mil4000.lh
@@ -2078,6 +2103,8 @@ $(DRIVERS)/polepos.o:	$(LAYOUT)/polepos.lh \
 
 $(DRIVERS)/qix.o:	$(LAYOUT)/elecyoyo.lh
 
+$(DRIVERS)/quizshow.o:	$(LAYOUT)/quizshow.lh
+
 $(DRIVERS)/re900.o:	$(LAYOUT)/re900.lh
 
 $(DRIVERS)/roul.o:	$(LAYOUT)/roul.lh
@@ -2104,8 +2131,6 @@ $(DRIVERS)/sspeedr.o:	$(LAYOUT)/sspeedr.lh
 
 $(DRIVERS)/stactics.o:	$(LAYOUT)/stactics.lh
 
-$(DRIVERS)/stepstag.o:	$(LAYOUT)/stepstag.lh
-
 $(DRIVERS)/sstrangr.o:	$(LAYOUT)/sstrangr.lh
 
 $(DRIVERS)/subsino.o:	$(LAYOUT)/victor5.lh \
@@ -2130,7 +2155,8 @@ $(DRIVERS)/tceptor.o:	$(LAYOUT)/tceptor2.lh
 
 $(DRIVERS)/tehkanwc.o:	$(LAYOUT)/gridiron.lh
 
-$(DRIVERS)/tetrisp2.o:	$(LAYOUT)/rocknms.lh
+$(DRIVERS)/tetrisp2.o:	$(LAYOUT)/rocknms.lh \
+			$(LAYOUT)/stepstag.lh
 
 $(DRIVERS)/thayers.o:	$(LAYOUT)/dlair.lh
 
@@ -2197,3 +2223,7 @@ $(MACHINE)/model1.o: $(MAMESRC)/includes/model1.h $(MAMESRC)/audio/dsbz80.h
 $(VIDEO)/model2.o:	$(MAMESRC)/video/model2rd.c
 $(VIDEO)/model3.o:	$(MAMESRC)/video/m3raster.c
 $(VIDEO)/n64.o:		$(MAMESRC)/video/rdpfiltr.c
+$(DRIVERS)/bfm_sc4.o: $(MAMESRC)/includes/bfm_sc45.h
+$(DRIVERS)/bfm_sc5.o: $(MAMESRC)/includes/bfm_sc45.h
+
+

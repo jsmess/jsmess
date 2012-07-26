@@ -576,7 +576,7 @@ void snug_high_speed_gpl_device::device_reset()
 	m_led_on = false;
 	m_mbx_enabled = false;
 	m_ram_enabled = false;
-	m_flash_mode = (input_port_read(*this, "HSGPLMODE")==0);
+	m_flash_mode = (ioport("HSGPLMODE")->read()==0);
 
 	m_current_grom_port = 0;
 	m_current_bank = 0;

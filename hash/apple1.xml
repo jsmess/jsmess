@@ -28,6 +28,17 @@
 		</part>
 	</software>
 
+	<software name="aslite">
+		<description>Applesoft Lite</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="Load at 6000.7FFFR, press emulated F12 (cursor appears), enter at 6000R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="9457756">
+				<rom name="applesoft lite.wav" size="9457756" crc="b37799c4" sha1="edb1a6c801a0c0a58004eec42116ad7a22730df7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="apple30">
 		<description>Apple 30th</description> <!-- Graphics demo -->
@@ -174,6 +185,18 @@
 		</part>
 	</software>
 
+	<software name="concentr">
+		<description>Concentration</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.3FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="10773674">
+				<rom name="concentration.wav" size="10773674" crc="30f252f4" sha1="4ded5cb6bfa074944fe7a4e56a7d01c3b30ce918" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="craps">
 		<description>Craps</description>
 		<year>19??</year>
@@ -194,6 +217,18 @@
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="18392504">
 				<rom name="deal or no deal.wav" size="18392504" crc="28ad3585" sha1="bf59a22794a755c711b429f6633135402cd12e36" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eliza">
+		<description>ELIZA</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.3FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="18453608">
+				<rom name="eliza.wav" size="18453608" crc="c8cf353e" sha1="aaec29bd2da471facbeb2f6c5292278a62b48f4f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -222,6 +257,18 @@
 		</part>
 	</software>
 
+	<software name="hangman">
+		<description>Hangman</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.3FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="10573754">
+				<rom name="hangman.wav" size="10573754" crc="d2926fb9" sha1="42bcde5ac2e44f24f82dc781a33186e71d1d3ed4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="hilo">
 		<description>HiLo</description>
 		<year>19??</year>
@@ -242,6 +289,18 @@
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="9205804">
 				<rom name="lunarlander (ascii graphics).wav" size="9205804" crc="becc6aff" sha1="2204b5002e17b8cbf79c232334cc4502680cbf29" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matrix">
+		<description>Matrix</description> <!-- Graphics demo -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR300.FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="4098404">
+				<rom name="matrix.wav" size="4098404" crc="6d2221be" sha1="dc4497142f6c7704d1e0325263c087bcd805a5c7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -278,6 +337,18 @@
 		<part name="cass" interface="apple1_cass">
 			<dataarea name="cass" size="18338436">
 				<rom name="startrek2003.wav" size="18338436" crc="659d91a9" sha1="7754c0883a342f68023ebed198b27359dc602f56" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="trek2">
+		<description>TREK II</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="First load BASIC, then load at 4A.00FFR0300.2FFFR, enter at E2B3R" />
+		<part name="cass" interface="apple1_cass">
+			<dataarea name="cass" size="8022016">
+				<rom name="trek ii.wav" size="8022016" crc="3d9f5163" sha1="9671f060e417b7715f83fa57cc33588192604017" offset="0" />
 			</dataarea>
 		</part>
 	</software>

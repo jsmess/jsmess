@@ -27,6 +27,7 @@
 ***************************************************************************/
 PALETTE_INIT( seicross )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 
@@ -53,28 +54,26 @@ PALETTE_INIT( seicross )
 	}
 }
 
-WRITE8_HANDLER( seicross_videoram_w )
+WRITE8_MEMBER(seicross_state::seicross_videoram_w)
 {
-	seicross_state *state = space->machine().driver_data<seicross_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( seicross_colorram_w )
+WRITE8_MEMBER(seicross_state::seicross_colorram_w)
 {
 	/* bit 5 of the address is not used for color memory. There is just */
 	/* 512k of memory; every two consecutive rows share the same memory */
 	/* region. */
-	seicross_state *state = space->machine().driver_data<seicross_state>();
 
 	offset &= 0xffdf;
 
-	state->m_colorram[offset] = data;
-	state->m_colorram[offset + 0x20] = data;
+	m_colorram[offset] = data;
+	m_colorram[offset + 0x20] = data;
 
-	state->m_bg_tilemap->mark_tile_dirty(offset);
-	state->m_bg_tilemap->mark_tile_dirty(offset + 0x20);
+	m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset + 0x20);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -104,7 +103,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	UINT8 *spriteram_2 = state->m_spriteram2;
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int x = spriteram[offs + 3];
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
@@ -120,7 +119,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 					x-256,240-spriteram[offs + 2],0);
 	}
 
-	for (offs = state->m_spriteram2_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram2.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int x = spriteram_2[offs + 3];
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],

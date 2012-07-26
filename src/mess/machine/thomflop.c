@@ -1716,7 +1716,7 @@ static READ8_HANDLER ( to7_network_r )
 	if ( offset == 8 )
 	{
 		/* network ID of the computer */
-		UINT8 id = input_port_read(space->machine(), "fconfig") >> 3;
+		UINT8 id = space->machine().root_device().ioport("fconfig")->read() >> 3;
 		VLOG(( "%f $%04x to7_network_r: read id $%02X\n", space->machine().time().as_double(), cpu_get_previouspc(space->machine().device("maincpu")), id ));
 		return id;
 	}
@@ -1760,7 +1760,7 @@ UINT8 to7_floppy_bank;
 
 void to7_floppy_init ( running_machine &machine, void* base )
 {
-	memory_configure_bank( machine, THOM_FLOP_BANK, 0, TO7_NB_FLOP_BANK, base, 0x800 );
+	machine.root_device().membank( THOM_FLOP_BANK )->configure_entries( 0, TO7_NB_FLOP_BANK, base, 0x800 );
 	state_save_register_global( machine, to7_controller_type );
 	state_save_register_global( machine, to7_floppy_bank );
 	to7_5p14sd_init(machine);
@@ -1774,7 +1774,7 @@ void to7_floppy_init ( running_machine &machine, void* base )
 
 void to7_floppy_reset ( running_machine &machine )
 {
-	to7_controller_type = (input_port_read(machine, "fconfig") ) & 7;
+	to7_controller_type = (machine.root_device().ioport("fconfig")->read() ) & 7;
 
 	switch ( to7_controller_type )
 	{
@@ -1809,7 +1809,7 @@ void to7_floppy_reset ( running_machine &machine )
 		break;
 	}
 
-	memory_set_bank( machine, THOM_FLOP_BANK, to7_floppy_bank );
+	machine.root_device().membank( THOM_FLOP_BANK )->set_entry( to7_floppy_bank );
 }
 
 
@@ -1857,7 +1857,7 @@ WRITE8_HANDLER ( to7_floppy_w )
 		if ( offset == 8 )
 		{
 			to7_floppy_bank = 3 + (data & 3);
-			memory_set_bank( space->machine(), THOM_FLOP_BANK,  to7_floppy_bank );
+			space->machine().root_device().membank( THOM_FLOP_BANK )->set_entry( to7_floppy_bank );
 			VLOG (( "to7_floppy_w: set CD 90-351 ROM bank to %i\n", data & 3 ));
 		}
 		else
@@ -1887,7 +1887,7 @@ WRITE8_HANDLER ( to7_floppy_w )
 void to9_floppy_init( running_machine &machine, void* int_base, void* ext_base )
 {
 	to7_floppy_init( machine, ext_base );
-	memory_configure_bank( machine, THOM_FLOP_BANK, TO7_NB_FLOP_BANK, 1, int_base, 0x800 );
+	machine.root_device().membank( THOM_FLOP_BANK )->configure_entry( TO7_NB_FLOP_BANK, int_base);
 }
 
 
@@ -1903,7 +1903,7 @@ void to9_floppy_reset( running_machine &machine )
 	{
 		LOG(( "to9_floppy_reset: internal controller\n" ));
 		to7_5p14_reset(machine);
-		memory_set_bank( machine, THOM_FLOP_BANK, TO7_NB_FLOP_BANK );
+		machine.root_device().membank( THOM_FLOP_BANK )->set_entry( TO7_NB_FLOP_BANK );
 	}
 }
 

@@ -41,15 +41,27 @@ class sbrkout_state : public driver_device
 {
 public:
 	sbrkout_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	emu_timer *m_scanline_timer;
 	emu_timer *m_pot_timer;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_sync2_value;
 	UINT8 m_pot_mask[2];
 	UINT8 m_pot_trigger[2];
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_READ8_MEMBER(switches_r);
+	DECLARE_WRITE8_MEMBER(pot_mask1_w);
+	DECLARE_WRITE8_MEMBER(pot_mask2_w);
+	DECLARE_WRITE8_MEMBER(start_1_led_w);
+	DECLARE_WRITE8_MEMBER(start_2_led_w);
+	DECLARE_WRITE8_MEMBER(serve_led_w);
+	DECLARE_WRITE8_MEMBER(coincount_w);
+	DECLARE_READ8_MEMBER(sync_r);
+	DECLARE_READ8_MEMBER(sync2_r);
+	DECLARE_WRITE8_MEMBER(sbrkout_videoram_w);
 };
 
 
@@ -87,7 +99,7 @@ static MACHINE_START( sbrkout )
 {
 	sbrkout_state *state = machine.driver_data<sbrkout_state>();
 	UINT8 *videoram = state->m_videoram;
-	memory_set_bankptr(machine, "bank1", &videoram[0x380]);
+	state->membank("bank1")->set_base(&videoram[0x380]);
 	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(scanline_callback));
 	state->m_pot_timer = machine.scheduler().timer_alloc(FUNC(pot_trigger_callback));
 
@@ -130,7 +142,7 @@ static TIMER_CALLBACK( scanline_callback )
 	/* on the VBLANK, read the pot and schedule an interrupt time for it */
 	if (scanline == machine.primary_screen->visible_area().max_y + 1)
 	{
-		UINT8 potvalue = input_port_read(machine, "PADDLE");
+		UINT8 potvalue = state->ioport("PADDLE")->read();
 		state->m_pot_timer->adjust(machine.primary_screen->time_until_pos(56 + (potvalue / 2), (potvalue % 2) * 128));
 	}
 
@@ -142,9 +154,9 @@ static TIMER_CALLBACK( scanline_callback )
 }
 
 
-static WRITE8_HANDLER( irq_ack_w )
+WRITE8_MEMBER(sbrkout_state::irq_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -155,32 +167,31 @@ static WRITE8_HANDLER( irq_ack_w )
  *
  *************************************/
 
-static READ8_HANDLER( switches_r )
+READ8_MEMBER(sbrkout_state::switches_r)
 {
-	sbrkout_state *state = space->machine().driver_data<sbrkout_state>();
 	UINT8 result = 0xff;
 
 	/* DIP switches are selected by ADR0+ADR1 if ADR3 == 0 */
 	if ((offset & 0x0b) == 0x00)
-		result &= (input_port_read(space->machine(), "DIPS") << 6) | 0x3f;
+		result &= (ioport("DIPS")->read() << 6) | 0x3f;
 	if ((offset & 0x0b) == 0x01)
-		result &= (input_port_read(space->machine(), "DIPS") << 4) | 0x3f;
+		result &= (ioport("DIPS")->read() << 4) | 0x3f;
 	if ((offset & 0x0b) == 0x02)
-		result &= (input_port_read(space->machine(), "DIPS") << 0) | 0x3f;
+		result &= (ioport("DIPS")->read() << 0) | 0x3f;
 	if ((offset & 0x0b) == 0x03)
-		result &= (input_port_read(space->machine(), "DIPS") << 2) | 0x3f;
+		result &= (ioport("DIPS")->read() << 2) | 0x3f;
 
 	/* other switches are selected by ADR0+ADR1+ADR2 if ADR4 == 0 */
 	if ((offset & 0x17) == 0x00)
-		result &= (input_port_read(space->machine(), "SELECT") << 7) | 0x7f;
+		result &= (ioport("SELECT")->read() << 7) | 0x7f;
 	if ((offset & 0x17) == 0x04)
-		result &= ((state->m_pot_trigger[0] & ~state->m_pot_mask[0]) << 7) | 0x7f;
+		result &= ((m_pot_trigger[0] & ~m_pot_mask[0]) << 7) | 0x7f;
 	if ((offset & 0x17) == 0x05)
-		result &= ((state->m_pot_trigger[1] & ~state->m_pot_mask[1]) << 7) | 0x7f;
+		result &= ((m_pot_trigger[1] & ~m_pot_mask[1]) << 7) | 0x7f;
 	if ((offset & 0x17) == 0x06)
-		result &= input_port_read(space->machine(), "SERVE");
+		result &= ioport("SERVE")->read();
 	if ((offset & 0x17) == 0x07)
-		result &= (input_port_read(space->machine(), "SELECT") << 6) | 0x7f;
+		result &= (ioport("SELECT")->read() << 6) | 0x7f;
 
 	return result;
 }
@@ -204,21 +215,19 @@ static TIMER_CALLBACK( pot_trigger_callback )
 }
 
 
-static WRITE8_HANDLER( pot_mask1_w )
+WRITE8_MEMBER(sbrkout_state::pot_mask1_w)
 {
-	sbrkout_state *state = space->machine().driver_data<sbrkout_state>();
-	state->m_pot_mask[0] = ~offset & 1;
-	state->m_pot_trigger[0] = 0;
-	update_nmi_state(space->machine());
+	m_pot_mask[0] = ~offset & 1;
+	m_pot_trigger[0] = 0;
+	update_nmi_state(machine());
 }
 
 
-static WRITE8_HANDLER( pot_mask2_w )
+WRITE8_MEMBER(sbrkout_state::pot_mask2_w)
 {
-	sbrkout_state *state = space->machine().driver_data<sbrkout_state>();
-	state->m_pot_mask[1] = ~offset & 1;
-	state->m_pot_trigger[1] = 0;
-	update_nmi_state(space->machine());
+	m_pot_mask[1] = ~offset & 1;
+	m_pot_trigger[1] = 0;
+	update_nmi_state(machine());
 }
 
 
@@ -235,27 +244,27 @@ static WRITE8_HANDLER( pot_mask2_w )
     reversed for the Serve LED, which has a NOT on the signal.
 */
 
-static WRITE8_HANDLER( start_1_led_w )
+WRITE8_MEMBER(sbrkout_state::start_1_led_w)
 {
 	output_set_led_value(0, offset & 1);
 }
 
 
-static WRITE8_HANDLER( start_2_led_w )
+WRITE8_MEMBER(sbrkout_state::start_2_led_w)
 {
 	output_set_led_value(1, offset & 1);
 }
 
 
-static WRITE8_HANDLER( serve_led_w )
+WRITE8_MEMBER(sbrkout_state::serve_led_w)
 {
 	output_set_led_value(0, ~offset & 1);
 }
 
 
-static WRITE8_HANDLER( coincount_w )
+WRITE8_MEMBER(sbrkout_state::coincount_w)
 {
-	coin_counter_w(space->machine(), 0, offset & 1);
+	coin_counter_w(machine(), 0, offset & 1);
 }
 
 
@@ -266,19 +275,17 @@ static WRITE8_HANDLER( coincount_w )
  *
  *************************************/
 
-static READ8_HANDLER( sync_r )
+READ8_MEMBER(sbrkout_state::sync_r)
 {
-	sbrkout_state *state = space->machine().driver_data<sbrkout_state>();
-	int hpos = space->machine().primary_screen->hpos();
-	state->m_sync2_value = (hpos >= 128 && hpos <= space->machine().primary_screen->visible_area().max_x);
-	return space->machine().primary_screen->vpos();
+	int hpos = machine().primary_screen->hpos();
+	m_sync2_value = (hpos >= 128 && hpos <= machine().primary_screen->visible_area().max_x);
+	return machine().primary_screen->vpos();
 }
 
 
-static READ8_HANDLER( sync2_r )
+READ8_MEMBER(sbrkout_state::sync2_r)
 {
-	sbrkout_state *state = space->machine().driver_data<sbrkout_state>();
-	return (state->m_sync2_value << 7) | 0x7f;
+	return (m_sync2_value << 7) | 0x7f;
 }
 
 
@@ -305,12 +312,11 @@ static VIDEO_START( sbrkout )
 }
 
 
-static WRITE8_HANDLER( sbrkout_videoram_w )
+WRITE8_MEMBER(sbrkout_state::sbrkout_videoram_w)
 {
-	sbrkout_state *state = space->machine().driver_data<sbrkout_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -349,10 +355,10 @@ static SCREEN_UPDATE_IND16( sbrkout )
  *************************************/
 
 /* full memory map derived from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sbrkout_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x380) AM_RAMBANK("bank1")
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sbrkout_videoram_w) AM_BASE_MEMBER(sbrkout_state, m_videoram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sbrkout_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0800, 0x083f) AM_READ(switches_r)
 	AM_RANGE(0x0840, 0x0840) AM_MIRROR(0x003f) AM_READ_PORT("COIN")
 	AM_RANGE(0x0880, 0x0880) AM_MIRROR(0x003f) AM_READ_PORT("START")
@@ -392,29 +398,29 @@ static INPUT_PORTS_START( sbrkout )
 	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x70, 0x00, "Extended Play" )
 	/* Progressive */
-	PORT_DIPSETTING(	0x10, "200" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(	0x20, "400" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(	0x30, "600" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(	0x40, "900" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(	0x50, "1200" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(	0x60, "1600" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(	0x70, "2000" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(	0x10, "200" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x00)
+	PORT_DIPSETTING(	0x20, "400" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x00)
+	PORT_DIPSETTING(	0x30, "600" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x00)
+	PORT_DIPSETTING(	0x40, "900" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x00)
+	PORT_DIPSETTING(	0x50, "1200" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x00)
+	PORT_DIPSETTING(	0x60, "1600" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x00)
+	PORT_DIPSETTING(	0x70, "2000" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x00)
 	/* Double */
-	PORT_DIPSETTING(	0x10, "200" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x02)
-	PORT_DIPSETTING(	0x20, "400" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x02)
-	PORT_DIPSETTING(	0x30, "600" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x02)
-	PORT_DIPSETTING(	0x40, "800" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x02)
-	PORT_DIPSETTING(	0x50, "1000" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x02)
-	PORT_DIPSETTING(	0x60, "1200" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x02)
-	PORT_DIPSETTING(	0x70, "1500" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x02)
+	PORT_DIPSETTING(	0x10, "200" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x02)
+	PORT_DIPSETTING(	0x20, "400" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x02)
+	PORT_DIPSETTING(	0x30, "600" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x02)
+	PORT_DIPSETTING(	0x40, "800" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x02)
+	PORT_DIPSETTING(	0x50, "1000" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x02)
+	PORT_DIPSETTING(	0x60, "1200" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x02)
+	PORT_DIPSETTING(	0x70, "1500" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x02)
 	/* Cavity */
-	PORT_DIPSETTING(	0x10, "200" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
-	PORT_DIPSETTING(	0x20, "300" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
-	PORT_DIPSETTING(	0x30, "400" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
-	PORT_DIPSETTING(	0x40, "700" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
-	PORT_DIPSETTING(	0x50, "900" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
-	PORT_DIPSETTING(	0x60, "1100" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
-	PORT_DIPSETTING(	0x70, "1400" )	PORT_CONDITION("SELECT",0x03,PORTCOND_EQUALS,0x01)
+	PORT_DIPSETTING(	0x10, "200" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x01)
+	PORT_DIPSETTING(	0x20, "300" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x01)
+	PORT_DIPSETTING(	0x30, "400" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x01)
+	PORT_DIPSETTING(	0x40, "700" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x01)
+	PORT_DIPSETTING(	0x50, "900" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x01)
+	PORT_DIPSETTING(	0x60, "1100" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x01)
+	PORT_DIPSETTING(	0x70, "1400" )	PORT_CONDITION("SELECT",0x03,EQUALS,0x01)
 	PORT_DIPSETTING(	0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Lives ) )
 	PORT_DIPSETTING(	0x80, "3" )

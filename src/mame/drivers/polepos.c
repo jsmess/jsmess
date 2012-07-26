@@ -241,42 +241,40 @@ Todo:
 /* Pole Position II protection                                                       */
 /*************************************************************************************/
 
-static READ16_HANDLER( polepos2_ic25_r )
+READ16_MEMBER(polepos_state::polepos2_ic25_r)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
 	int result;
 	/* protection states */
 
 	offset = offset & 0x1ff;
 	if (offset < 0x100)
 	{
-		state->m_last_signed = offset & 0xff;
-		result = state->m_last_result & 0xff;
+		m_last_signed = offset & 0xff;
+		result = m_last_result & 0xff;
 	}
 	else
 	{
-		state->m_last_unsigned = offset & 0xff;
-		result = (state->m_last_result >> 8) & 0xff;
-		state->m_last_result = (INT8)state->m_last_signed * (UINT8)state->m_last_unsigned;
+		m_last_unsigned = offset & 0xff;
+		result = (m_last_result >> 8) & 0xff;
+		m_last_result = (INT8)m_last_signed * (UINT8)m_last_unsigned;
 	}
 
-//  logerror("%04X: read IC25 @ %04X = %02X\n", cpu_get_pc(&space->device()), offset, result);
+//  logerror("%04X: read IC25 @ %04X = %02X\n", cpu_get_pc(&space.device()), offset, result);
 
 	return result | (result << 8);
 }
 
 
-static READ8_HANDLER( polepos_adc_r )
+READ8_MEMBER(polepos_state::polepos_adc_r)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
-	return input_port_read(space->machine(), state->m_adc_input ? "ACCEL" : "BRAKE");
+	return ioport(m_adc_input ? "ACCEL" : "BRAKE")->read();
 }
 
-static READ8_HANDLER( polepos_ready_r )
+READ8_MEMBER(polepos_state::polepos_ready_r)
 {
 	int ret = 0xff;
 
-	if (space->machine().primary_screen->vpos() >= 128)
+	if (machine().primary_screen->vpos() >= 128)
 		ret ^= 0x02;
 
 	ret ^= 0x08; /* ADC End Flag */
@@ -285,17 +283,16 @@ static READ8_HANDLER( polepos_ready_r )
 }
 
 
-static WRITE8_HANDLER( polepos_latch_w )
+WRITE8_MEMBER(polepos_state::polepos_latch_w)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
 	int bit = data & 1;
 
 	switch (offset)
 	{
 		case 0x00:	/* IRQON */
-			state->m_main_irq_mask = bit;
+			m_main_irq_mask = bit;
 			if (!bit)
-				cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IOSEL */
@@ -303,28 +300,28 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x02:	/* CLSON */
-			polepos_sound_enable(space->machine().device("namco"),bit);
+			polepos_sound_enable(machine().device("namco"),bit);
 			if (!bit)
 			{
-				polepos_engine_sound_lsb_w(space->machine().device("polepos"), 0, 0);
-				polepos_engine_sound_msb_w(space->machine().device("polepos"), 0, 0);
+				polepos_engine_sound_lsb_w(machine().device("polepos"), 0, 0);
+				polepos_engine_sound_msb_w(machine().device("polepos"), 0, 0);
 			}
 			break;
 
 		case 0x03:	/* GASEL */
-			state->m_adc_input = bit;
+			m_adc_input = bit;
 			break;
 
 		case 0x04:	/* RESB */
-			cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x05:	/* RESA */
-			cputag_set_input_line(space->machine(), "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(machine(), "sub2", INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x06:	/* SB0 */
-			state->m_auto_start_mask = !bit;
+			m_auto_start_mask = !bit;
 			break;
 
 		case 0x07:	/* CHACL */
@@ -333,23 +330,21 @@ static WRITE8_HANDLER( polepos_latch_w )
 	}
 }
 
-static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
+WRITE16_MEMBER(polepos_state::polepos_z8002_nvi_enable_w)
 {
-	polepos_state *state = space->machine().driver_data<polepos_state>();
 	data &= 1;
 
-	state->m_sub_irq_mask = data;
+	m_sub_irq_mask = data;
 	if (!data)
-		device_set_input_line(&space->device(), 0, CLEAR_LINE);
+		device_set_input_line(&space.device(), 0, CLEAR_LINE);
 }
 
 
-static CUSTOM_INPUT( high_port_r ) { return input_port_read(field.machine(), (const char *)param) >> 4; }
-static CUSTOM_INPUT( low_port_r ) { return input_port_read(field.machine(), (const char *)param) & 0x0f; }
-static CUSTOM_INPUT( auto_start_r )
+CUSTOM_INPUT_MEMBER(polepos_state::high_port_r){ return field.machine().root_device().ioport((const char *)param)->read() >> 4; }
+CUSTOM_INPUT_MEMBER(polepos_state::low_port_r){ return field.machine().root_device().ioport((const char *)param)->read() & 0x0f; }
+CUSTOM_INPUT_MEMBER(polepos_state::auto_start_r)
 {
-	polepos_state *state = field.machine().driver_data<polepos_state>();
-	return state->m_auto_start_mask;
+	return m_auto_start_mask;
 }
 
 static WRITE8_DEVICE_HANDLER( out_0 )
@@ -383,9 +378,9 @@ static const namco_51xx_interface namco_51xx_intf =
 
 static READ8_DEVICE_HANDLER( namco_52xx_rom_r )
 {
-	UINT32 length = device->machine().region("52xx")->bytes();
+	UINT32 length = device->machine().root_device().memregion("52xx")->bytes();
 logerror("ROM @ %04X\n", offset);
-	return (offset < length) ? device->machine().region("52xx")->base()[offset] : 0xff;
+	return (offset < length) ? device->machine().root_device().memregion("52xx")->base()[offset] : 0xff;
 }
 
 static READ8_DEVICE_HANDLER( namco_52xx_si_r )
@@ -414,7 +409,7 @@ static READ8_DEVICE_HANDLER( steering_changed_r )
 {
 	polepos_state *state = device->machine().driver_data<polepos_state>();
 	/* read the current steering value and update our delta */
-	UINT8 steer_new = input_port_read(device->machine(), "STEER");
+	UINT8 steer_new = state->ioport("STEER")->read();
 	state->m_steer_accum += (INT8)(steer_new - state->m_steer_last) * 2;
 	state->m_steer_last = steer_new;
 
@@ -470,12 +465,13 @@ static TIMER_DEVICE_CALLBACK( polepos_scanline )
 
 static MACHINE_RESET( polepos )
 {
+	polepos_state *state = machine.driver_data<polepos_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0; i < 8; i++)
-		polepos_latch_w(space, i, 0);
+		state->polepos_latch_w(*space, i, 0);
 
 	/* set the interrupt vectors (this shouldn't be needed) */
 	device_set_input_line_vector(machine.device("sub"), 0, Z8000_NVI);
@@ -488,7 +484,7 @@ static MACHINE_RESET( polepos )
  * CPU memory structures
  *********************************************************************/
 
-static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, polepos_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("nvram")					/* Battery Backup */
 	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(polepos_sprite_r, polepos_sprite_w)			/* Motion Object */
@@ -497,31 +493,31 @@ static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x5000, 0x57ff) AM_READWRITE(polepos_view_r, polepos_view_w)				/* Background Memory */
 
 	AM_RANGE(0x8000, 0x83bf) AM_MIRROR(0x0c00) AM_RAM									/* Sound Memory */
-	AM_RANGE(0x83c0, 0x83ff) AM_MIRROR(0x0c00) AM_DEVREADWRITE("namco", polepos_sound_r, polepos_sound_w)	/* Sound data */
+	AM_RANGE(0x83c0, 0x83ff) AM_MIRROR(0x0c00) AM_DEVREADWRITE_LEGACY("namco", polepos_sound_r, polepos_sound_w)	/* Sound data */
 
-	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0eff) AM_DEVREADWRITE("06xx", namco_06xx_data_r, namco_06xx_data_w)
-	AM_RANGE(0x9100, 0x9100) AM_MIRROR(0x0eff) AM_DEVREADWRITE("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
+	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0eff) AM_DEVREADWRITE_LEGACY("06xx", namco_06xx_data_r, namco_06xx_data_w)
+	AM_RANGE(0x9100, 0x9100) AM_MIRROR(0x0eff) AM_DEVREADWRITE_LEGACY("06xx", namco_06xx_ctrl_r, namco_06xx_ctrl_w)
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0cff) AM_READ(polepos_ready_r)					/* READY */
 	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x0cf8) AM_WRITE(polepos_latch_w)				/* misc latches */
 	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x0cff) AM_WRITE(watchdog_reset_w)				/* Watchdog */
-	AM_RANGE(0xa200, 0xa200) AM_MIRROR(0x0cff) AM_DEVWRITE("polepos", polepos_engine_sound_lsb_w)	/* Car Sound ( Lower Nibble ) */
-	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x0cff) AM_DEVWRITE("polepos", polepos_engine_sound_msb_w)	/* Car Sound ( Upper Nibble ) */
+	AM_RANGE(0xa200, 0xa200) AM_MIRROR(0x0cff) AM_DEVWRITE_LEGACY("polepos", polepos_engine_sound_lsb_w)	/* Car Sound ( Lower Nibble ) */
+	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x0cff) AM_DEVWRITE_LEGACY("polepos", polepos_engine_sound_msb_w)	/* Car Sound ( Upper Nibble ) */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_io, AS_IO, 8 )
+static ADDRESS_MAP_START( z80_io, AS_IO, 8, polepos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(polepos_adc_r) AM_WRITENOP
 ADDRESS_MAP_END
 
 
 /* the same memory map is used by both Z8002 CPUs; all RAM areas are shared */
-static ADDRESS_MAP_START( z8002_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( z8002_map, AS_PROGRAM, 16, polepos_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x6000, 0x6001) AM_MIRROR(0x0ffe) AM_WRITE(polepos_z8002_nvi_enable_w)	/* NVI enable - *NOT* shared by the two CPUs */
-	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(polepos_sprite16_r, polepos_sprite16_w) AM_BASE_MEMBER(polepos_state, m_sprite16_memory)	/* Motion Object */
-	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(polepos_road16_r, polepos_road16_w) AM_BASE_MEMBER(polepos_state, m_road16_memory)		/* Road Memory */
-	AM_RANGE(0x9800, 0x9fff) AM_READWRITE(polepos_alpha16_r, polepos_alpha16_w) AM_BASE_MEMBER(polepos_state, m_alpha16_memory)	/* Alphanumeric (char ram) */
-	AM_RANGE(0xa000, 0xafff) AM_READWRITE(polepos_view16_r, polepos_view16_w) AM_BASE_MEMBER(polepos_state, m_view16_memory)		/* Background memory */
+	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(polepos_sprite16_r, polepos_sprite16_w) AM_SHARE("sprite16_memory")	/* Motion Object */
+	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(polepos_road16_r, polepos_road16_w) AM_SHARE("road16_memory")		/* Road Memory */
+	AM_RANGE(0x9800, 0x9fff) AM_READWRITE(polepos_alpha16_r, polepos_alpha16_w) AM_SHARE("alpha16_memory")	/* Alphanumeric (char ram) */
+	AM_RANGE(0xa000, 0xafff) AM_READWRITE(polepos_view16_r, polepos_view16_w) AM_SHARE("view16_memory")		/* Background memory */
 	AM_RANGE(0xc000, 0xc001) AM_MIRROR(0x38fe) AM_WRITE(polepos_view16_hscroll_w)						/* Background horz scroll position */
 	AM_RANGE(0xc100, 0xc101) AM_MIRROR(0x38fe) AM_WRITE(polepos_road16_vscroll_w)						/* Road vertical position */
 ADDRESS_MAP_END
@@ -536,7 +532,7 @@ static INPUT_PORTS_START( polepos )
 	PORT_START("IN0L")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Gear Change") PORT_CODE(KEYCODE_SPACE) POLEPOS_TOGGLE /* Gear */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(auto_start_r, NULL)	// start 1, program controlled
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, polepos_state,auto_start_r, NULL)	// start 1, program controlled
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0H")
@@ -570,7 +566,7 @@ static INPUT_PORTS_START( polepos )
 	PORT_DIPSETTING(	0x00, "4" )
 
 	PORT_START("DSWA_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "DSWA")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, polepos_state,high_port_r, "DSWA")
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x07, 0x07, "Extended Rank" )
@@ -599,7 +595,7 @@ static INPUT_PORTS_START( polepos )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "DSWB")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, polepos_state,high_port_r, "DSWB")
 
 	PORT_START("BRAKE")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
@@ -678,10 +674,10 @@ static INPUT_PORTS_START( topracern )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("IN0L")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(low_port_r, "IN0")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, polepos_state,low_port_r, "IN0")
 
 	PORT_START("IN0H")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "IN0")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, polepos_state,high_port_r, "IN0")
 
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
@@ -708,7 +704,7 @@ static INPUT_PORTS_START( topracern )
 	PORT_DIPSETTING(	0x00, "4" )
 
 	PORT_START("DSWA_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "DSWA")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, polepos_state,high_port_r, "DSWA")
 
 	/* FIXME: these dips don't work and may not even exist on this bootleg */
 	PORT_START("DSWB")
@@ -738,7 +734,7 @@ static INPUT_PORTS_START( topracern )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB_HI")
-	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM(high_port_r, "DSWB")
+	PORT_BIT( 0x0f, 0x00, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, polepos_state,high_port_r, "DSWB")
 
 	PORT_START("BRAKE")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0,0x90) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
@@ -1005,12 +1001,12 @@ static MACHINE_CONFIG_START( topracern, polepos_state )
 MACHINE_CONFIG_END
 
 
-static ADDRESS_MAP_START( sound_z80_bootleg_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_z80_bootleg_map, AS_PROGRAM, 8, polepos_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2700, 0x27ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_z80_bootleg_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_z80_bootleg_iomap, AS_IO, 8, polepos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -1991,8 +1987,9 @@ static DRIVER_INIT( topracern )
 
 static DRIVER_INIT( polepos2 )
 {
+	polepos_state *state = machine.driver_data<polepos_state>();
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4000, 0x5fff, FUNC(polepos2_ic25_r));
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0x4000, 0x5fff, read16_delegate(FUNC(polepos_state::polepos2_ic25_r),state));
 }
 
 

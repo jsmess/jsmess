@@ -8,11 +8,13 @@ class dbz_state : public driver_device
 {
 public:
 	dbz_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg1_videoram(*this, "bg1_videoram"),
+		m_bg2_videoram(*this, "bg2_videoram"){ }
 
 	/* memory pointers */
-	UINT16 *      m_bg1_videoram;
-	UINT16 *      m_bg2_videoram;
+	required_shared_ptr<UINT16> m_bg1_videoram;
+	required_shared_ptr<UINT16> m_bg2_videoram;
 //  UINT16 *      m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
@@ -33,6 +35,12 @@ public:
 	device_t *m_k056832;
 	device_t *m_k053936_1;
 	device_t *m_k053936_2;
+	DECLARE_READ16_MEMBER(dbzcontrol_r);
+	DECLARE_WRITE16_MEMBER(dbzcontrol_w);
+	DECLARE_WRITE16_MEMBER(dbz_sound_command_w);
+	DECLARE_WRITE16_MEMBER(dbz_sound_cause_nmi);
+	DECLARE_WRITE16_MEMBER(dbz_bg2_videoram_w);
+	DECLARE_WRITE16_MEMBER(dbz_bg1_videoram_w);
 };
 
 
@@ -41,8 +49,6 @@ public:
 extern void dbz_sprite_callback(running_machine &machine, int *code, int *color, int *priority_mask);
 extern void dbz_tile_callback(running_machine &machine, int layer, int *code, int *color, int *flags);
 
-WRITE16_HANDLER(dbz_bg1_videoram_w);
-WRITE16_HANDLER(dbz_bg2_videoram_w);
 
 VIDEO_START(dbz);
 SCREEN_UPDATE_IND16(dbz);

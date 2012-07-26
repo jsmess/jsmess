@@ -427,7 +427,7 @@ static READ16_HANDLER( megaplay_io_read )
 static READ8_HANDLER( bank_r )
 {
 	mplay_state *state = space->machine().driver_data<mplay_state>();
-	UINT8* bank = space->machine().region("mtbios")->base();
+	UINT8* bank = state->memregion("mtbios")->base();
 	UINT32 fulladdress = state->m_mp_bios_bank_addr + offset;
 
 	if ((fulladdress >= 0x000000) && (fulladdress <= 0x3fffff)) // ROM Addresses
@@ -450,7 +450,7 @@ static READ8_HANDLER( bank_r )
 		}
 		else
 		{
-			return space->machine().region("maincpu")->base()[fulladdress ^ 1];
+			return space->machine().root_device().memregion("maincpu")->base()[fulladdress ^ 1];
 		}
 	}
 	else if (fulladdress >= 0xa10000 && fulladdress <= 0xa1001f) // IO Acess
@@ -579,32 +579,32 @@ static WRITE8_HANDLER( megaplay_game_w )
 	state->m_mp_bios_bank_addr = ((state->m_mp_bios_bank_addr >> 1) | (data << 23)) & 0xff8000;
 }
 
-static ADDRESS_MAP_START( megaplay_bios_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( megaplay_bios_map, AS_PROGRAM, 8, mplay_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(megaplay_game_w)
+	AM_RANGE(0x6000, 0x6000) AM_WRITE_LEGACY(megaplay_game_w)
 	AM_RANGE(0x6200, 0x6200) AM_READ_PORT("DSW0")
 	AM_RANGE(0x6201, 0x6201) AM_READ_PORT("DSW1")
-	AM_RANGE(0x6203, 0x6203) AM_READWRITE(megaplay_bios_banksel_r, megaplay_bios_banksel_w)
-	AM_RANGE(0x6204, 0x6204) AM_READWRITE(megaplay_bios_6204_r, megaplay_bios_width_w)
+	AM_RANGE(0x6203, 0x6203) AM_READWRITE_LEGACY(megaplay_bios_banksel_r, megaplay_bios_banksel_w)
+	AM_RANGE(0x6204, 0x6204) AM_READWRITE_LEGACY(megaplay_bios_6204_r, megaplay_bios_width_w)
 	AM_RANGE(0x6400, 0x6400) AM_READ_PORT("TEST")
 	AM_RANGE(0x6401, 0x6401) AM_READ_PORT("COIN")
-	AM_RANGE(0x6402, 0x6402) AM_READWRITE(megaplay_bios_6402_r, megaplay_bios_6402_w)
-	AM_RANGE(0x6403, 0x6403) AM_READWRITE(megaplay_bios_gamesel_r, megaplay_bios_gamesel_w)
-	AM_RANGE(0x6404, 0x6404) AM_READWRITE(megaplay_bios_6404_r, megaplay_bios_6404_w)
-	AM_RANGE(0x6600, 0x6600) AM_READWRITE(megaplay_bios_6600_r, megaplay_bios_6600_w)
+	AM_RANGE(0x6402, 0x6402) AM_READWRITE_LEGACY(megaplay_bios_6402_r, megaplay_bios_6402_w)
+	AM_RANGE(0x6403, 0x6403) AM_READWRITE_LEGACY(megaplay_bios_gamesel_r, megaplay_bios_gamesel_w)
+	AM_RANGE(0x6404, 0x6404) AM_READWRITE_LEGACY(megaplay_bios_6404_r, megaplay_bios_6404_w)
+	AM_RANGE(0x6600, 0x6600) AM_READWRITE_LEGACY(megaplay_bios_6600_r, megaplay_bios_6600_w)
 	AM_RANGE(0x6001, 0x67ff) AM_WRITEONLY
-	AM_RANGE(0x6800, 0x77ff) AM_RAM AM_BASE_MEMBER(mplay_state, m_ic3_ram)
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE(bank_r, bank_w)
+	AM_RANGE(0x6800, 0x77ff) AM_RAM AM_SHARE("ic3_ram")
+	AM_RANGE(0x8000, 0xffff) AM_READWRITE_LEGACY(bank_r, bank_w)
 ADDRESS_MAP_END
 
 /* basically from src/drivers/segasyse.c */
-static ADDRESS_MAP_START( megaplay_bios_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( megaplay_bios_io_map, AS_IO, 8, mplay_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE("sn2", sn76496_w)	/* SN76489 */
-	AM_RANGE(0xbe, 0xbe) AM_READWRITE(sms_vdp_data_r, sms_vdp_data_w)	/* VDP */
-	AM_RANGE(0xbf, 0xbf) AM_READWRITE(sms_vdp_ctrl_r, sms_vdp_ctrl_w)	/* VDP */
+	AM_RANGE(0x7f, 0x7f) AM_DEVWRITE_LEGACY("sn2", sn76496_w)	/* SN76489 */
+	AM_RANGE(0xbe, 0xbe) AM_READWRITE_LEGACY(sms_vdp_data_r, sms_vdp_data_w)	/* VDP */
+	AM_RANGE(0xbf, 0xbf) AM_READWRITE_LEGACY(sms_vdp_ctrl_r, sms_vdp_ctrl_w)	/* VDP */
 ADDRESS_MAP_END
 
 
@@ -828,9 +828,9 @@ ROM_END
 
 static void mplay_start(running_machine &machine)
 {
-	UINT8 *src = machine.region("mtbios")->base();
-	UINT8 *instruction_rom = machine.region("user1")->base();
-	UINT8 *game_rom = machine.region("maincpu")->base();
+	UINT8 *src = machine.root_device().memregion("mtbios")->base();
+	UINT8 *instruction_rom = machine.root_device().memregion("user1")->base();
+	UINT8 *game_rom = machine.root_device().memregion("maincpu")->base();
 	int offs;
 
 	memmove(src + 0x10000, src + 0x8000, 0x18000); // move bios..

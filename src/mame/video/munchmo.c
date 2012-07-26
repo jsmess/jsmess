@@ -4,6 +4,7 @@
 
 PALETTE_INIT( mnchmobl )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -29,16 +30,14 @@ PALETTE_INIT( mnchmobl )
 	}
 }
 
-WRITE8_HANDLER( mnchmobl_palette_bank_w )
+WRITE8_MEMBER(munchmo_state::mnchmobl_palette_bank_w)
 {
-	munchmo_state *state = space->machine().driver_data<munchmo_state>();
-	state->m_palette_bank = data & 0x3;
+	m_palette_bank = data & 0x3;
 }
 
-WRITE8_HANDLER( mnchmobl_flipscreen_w )
+WRITE8_MEMBER(munchmo_state::mnchmobl_flipscreen_w)
 {
-	munchmo_state *state = space->machine().driver_data<munchmo_state>();
-	state->m_flipscreen = data;
+	m_flipscreen = data;
 }
 
 
@@ -83,7 +82,7 @@ static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, con
     the tiles in ROM B2.2B
 */
 	munchmo_state *state = machine.driver_data<munchmo_state>();
-	UINT8 *rom = machine.region("gfx2")->base();
+	UINT8 *rom = state->memregion("gfx2")->base();
 	const gfx_element *gfx = machine.gfx[1];
 	int offs;
 

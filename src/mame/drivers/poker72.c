@@ -19,11 +19,16 @@ class poker72_state : public driver_device
 {
 public:
 	poker72_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"),
+		m_pal(*this, "pal"){ }
 
-	UINT8 *m_vram;
-	UINT8 *m_pal;
+	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<UINT8> m_pal;
 	UINT8 m_tile_bank;
+	DECLARE_WRITE8_MEMBER(poker72_paletteram_w);
+	DECLARE_WRITE8_MEMBER(output_w);
+	DECLARE_WRITE8_MEMBER(tile_bank_w);
 };
 
 
@@ -58,45 +63,43 @@ static SCREEN_UPDATE_IND16(poker72)
 	return 0;
 }
 
-static WRITE8_HANDLER( poker72_paletteram_w )
+WRITE8_MEMBER(poker72_state::poker72_paletteram_w)
 {
-	poker72_state *state = space->machine().driver_data<poker72_state>();
 	int r,g,b;
-	state->m_pal[offset] = data;
+	m_pal[offset] = data;
 
-	r = state->m_pal[(offset & 0x3ff)+0x000] & 0x3f;
-	g = state->m_pal[(offset & 0x3ff)+0x400] & 0x3f;
-	b = state->m_pal[(offset & 0x3ff)+0x800] & 0x3f;
+	r = m_pal[(offset & 0x3ff)+0x000] & 0x3f;
+	g = m_pal[(offset & 0x3ff)+0x400] & 0x3f;
+	b = m_pal[(offset & 0x3ff)+0x800] & 0x3f;
 
-	palette_set_color_rgb( space->machine(), offset & 0x3ff, pal6bit(r), pal6bit(g), pal6bit(b));
+	palette_set_color_rgb( machine(), offset & 0x3ff, pal6bit(r), pal6bit(g), pal6bit(b));
 }
 
-static WRITE8_HANDLER( output_w )
+WRITE8_MEMBER(poker72_state::output_w)
 {
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	printf("%02x\n",data);
 
 /*  if((data & 0xc) == 0xc)
-        memory_set_bankptr(space->machine(), "bank1", &ROM[0x10000]);
+        membank("bank1")->set_base(&ROM[0x10000]);
     else*/
 	if(data & 8)
-		memory_set_bankptr(space->machine(), "bank1", &ROM[0x08000]);
+		membank("bank1")->set_base(&ROM[0x08000]);
 	else
-		memory_set_bankptr(space->machine(), "bank1", &ROM[0x00000]);
+		membank("bank1")->set_base(&ROM[0x00000]);
 }
 
-static WRITE8_HANDLER( tile_bank_w )
+WRITE8_MEMBER(poker72_state::tile_bank_w)
 {
-	poker72_state *state = space->machine().driver_data<poker72_state>();
-	state->m_tile_bank = (data & 4) >> 2;
+	m_tile_bank = (data & 4) >> 2;
 }
 
-static ADDRESS_MAP_START( poker72_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( poker72_map, AS_PROGRAM, 8, poker72_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM //work ram
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE_MEMBER(poker72_state, m_vram)
-	AM_RANGE(0xf000, 0xfbff) AM_RAM_WRITE(poker72_paletteram_w) AM_BASE_MEMBER(poker72_state, m_pal)
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0xf000, 0xfbff) AM_RAM_WRITE(poker72_paletteram_w) AM_SHARE("pal")
 	AM_RANGE(0xfc00, 0xfdff) AM_RAM //???
 	AM_RANGE(0xfe08, 0xfe08) AM_READ_PORT("IN0")
 	AM_RANGE(0xfe09, 0xfe09) AM_READ_PORT("IN1")
@@ -108,8 +111,8 @@ static ADDRESS_MAP_START( poker72_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xfe17, 0xfe17) AM_READNOP //irq ack
 	AM_RANGE(0xfe20, 0xfe20) AM_WRITE(output_w) //output, irq enable?
 	AM_RANGE(0xfe22, 0xfe22) AM_WRITE(tile_bank_w)
-	AM_RANGE(0xfe40, 0xfe40) AM_DEVREADWRITE("ay", ay8910_r, ay8910_data_w)
-	AM_RANGE(0xfe60, 0xfe60) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0xfe40, 0xfe40) AM_DEVREADWRITE_LEGACY("ay", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xfe60, 0xfe60) AM_DEVWRITE_LEGACY("ay", ay8910_address_w)
 ADDRESS_MAP_END
 
 
@@ -336,9 +339,9 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_RESET( poker72 )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
-	memory_set_bankptr(machine, "bank1", &ROM[0]);
+	machine.root_device().membank("bank1")->set_base(&ROM[0]);
 }
 
 static MACHINE_CONFIG_START( poker72, poker72_state )
@@ -390,7 +393,7 @@ ROM_END
 
 static DRIVER_INIT( poker72 )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	rom[0x4a9] = 0x28;
 }

@@ -71,7 +71,7 @@ static WRITE8_DEVICE_HANDLER( bagman_ls259_w )
 {
 	bagman_state *state = device->machine().driver_data<bagman_state>();
 	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	bagman_pal16r6_w(space, offset,data); /*this is just a simulation*/
+	state->bagman_pal16r6_w(*space, offset,data); /*this is just a simulation*/
 
 	if (state->m_ls259_buf[offset] != (data&1) )
 	{
@@ -97,34 +97,33 @@ static WRITE8_DEVICE_HANDLER( bagman_ls259_w )
 	}
 }
 
-static WRITE8_HANDLER( bagman_coin_counter_w )
+WRITE8_MEMBER(bagman_state::bagman_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset,data);
+	coin_counter_w(machine(), offset,data);
 }
 
-static WRITE8_HANDLER( irq_mask_w )
+WRITE8_MEMBER(bagman_state::irq_mask_w)
 {
-	bagman_state *state = space->machine().driver_data<bagman_state>();
 
-	state->m_irq_mask = data & 1;
+	m_irq_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bagman_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bagman_videoram_w) AM_BASE_MEMBER(bagman_state, m_videoram)
-	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(bagman_colorram_w) AM_BASE_MEMBER(bagman_state, m_colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(bagman_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(bagman_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP	/* written to, but unused */
 	AM_RANGE(0xa000, 0xa000) AM_READ(bagman_pal16r6_r)
-	//AM_RANGE(0xa800, 0xa805) AM_READ(bagman_ls259_r) /*just for debugging purposes*/
+	//AM_RANGE(0xa800, 0xa805) AM_READ_LEGACY(bagman_ls259_r) /*just for debugging purposes*/
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE(bagman_flipscreen_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE_MEMBER(bagman_state, m_video_enable)
+	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_SHARE("video_enable")
 	AM_RANGE(0xc000, 0xffff) AM_ROM /* Super Bagman only */
-	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(bagman_state, m_spriteram, m_spriteram_size)	/* hidden portion of color RAM */
+	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_SHARE("spriteram")	/* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
 									/* writes are handled by bagman_colorram_w */
-	AM_RANGE(0xa800, 0xa805) AM_DEVWRITE("tmsprom", bagman_ls259_w) /* TMS5110 driving state machine */
+	AM_RANGE(0xa800, 0xa805) AM_DEVWRITE_LEGACY("tmsprom", bagman_ls259_w) /* TMS5110 driving state machine */
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(bagman_coin_counter_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
 	AM_RANGE(0xb800, 0xb800) AM_READNOP								/* looks like watchdog from schematics */
@@ -138,18 +137,18 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( pickin_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pickin_map, AS_PROGRAM, 8, bagman_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(bagman_videoram_w) AM_BASE_MEMBER(bagman_state, m_videoram)
-	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(bagman_colorram_w) AM_BASE_MEMBER(bagman_state, m_colorram)
-	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(bagman_state, m_spriteram, m_spriteram_size)	/* hidden portion of color RAM */
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(bagman_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9800, 0x9bff) AM_RAM_WRITE(bagman_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x9800, 0x981f) AM_WRITEONLY AM_SHARE("spriteram")	/* hidden portion of color RAM */
 									/* here only to initialize the pointer, */
 									/* writes are handled by bagman_colorram_w */
 	AM_RANGE(0x9c00, 0x9fff) AM_WRITENOP	/* written to, but unused */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(irq_mask_w)
 	AM_RANGE(0xa001, 0xa002) AM_WRITE(bagman_flipscreen_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_BASE_MEMBER(bagman_state, m_video_enable)
+	AM_RANGE(0xa003, 0xa003) AM_WRITEONLY AM_SHARE("video_enable")
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(bagman_coin_counter_w)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW")
 
@@ -159,14 +158,14 @@ static ADDRESS_MAP_START( pickin_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP	/* ???? */
 
 	/* guess */
-	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0xb800, 0xb800) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0xb800, 0xb800) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8, bagman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x09) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x08, 0x09) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	//AM_RANGE(0x56, 0x56) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -380,7 +379,7 @@ static READ8_DEVICE_HANDLER( dial_input_p1_r )
 	bagman_state *state = device->machine().driver_data<bagman_state>();
 	UINT8 dial_val;
 
-	dial_val = input_port_read(device->machine(), "DIAL_P1");
+	dial_val = state->ioport("DIAL_P1")->read();
 
 	if(state->m_p1_res != 0x60)
 		state->m_p1_res = 0x60;
@@ -393,7 +392,7 @@ static READ8_DEVICE_HANDLER( dial_input_p1_r )
 
 	state->m_p1_old_val = dial_val;
 
-	return (input_port_read(device->machine(), "P1") & 0x9f) | (state->m_p1_res);
+	return (state->ioport("P1")->read() & 0x9f) | (state->m_p1_res);
 }
 
 static READ8_DEVICE_HANDLER( dial_input_p2_r )
@@ -401,7 +400,7 @@ static READ8_DEVICE_HANDLER( dial_input_p2_r )
 	bagman_state *state = device->machine().driver_data<bagman_state>();
 	UINT8 dial_val;
 
-	dial_val = input_port_read(device->machine(), "DIAL_P2");
+	dial_val = state->ioport("DIAL_P2")->read();
 
 	if(state->m_p2_res != 0x60)
 		state->m_p2_res = 0x60;
@@ -414,7 +413,7 @@ static READ8_DEVICE_HANDLER( dial_input_p2_r )
 
 	state->m_p2_old_val = dial_val;
 
-	return (input_port_read(device->machine(), "P2") & 0x9f) | (state->m_p2_res);
+	return (state->ioport("P2")->read() & 0x9f) | (state->m_p2_res);
 }
 
 static const ay8910_interface ay8910_dial_config =

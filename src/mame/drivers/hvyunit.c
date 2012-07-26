@@ -75,11 +75,13 @@ class hvyunit_state : public driver_device
 {
 public:
 	hvyunit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
 	/* Video */
-	UINT8			*m_videoram;
-	UINT8			*m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t		*m_bg_tilemap;
 	UINT16			m_scrollx;
 	UINT16			m_scrolly;
@@ -99,6 +101,27 @@ public:
 	device_t	*m_sound_cpu;
 	device_t	*m_mermaid;
 	device_t	*m_pandora;
+	DECLARE_WRITE8_MEMBER(trigger_nmi_on_slave_cpu);
+	DECLARE_WRITE8_MEMBER(master_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(mermaid_data_w);
+	DECLARE_READ8_MEMBER(mermaid_data_r);
+	DECLARE_READ8_MEMBER(mermaid_status_r);
+	DECLARE_WRITE8_MEMBER(trigger_nmi_on_sound_cpu2);
+	DECLARE_WRITE8_MEMBER(hu_videoram_w);
+	DECLARE_WRITE8_MEMBER(hu_colorram_w);
+	DECLARE_WRITE8_MEMBER(slave_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(hu_scrollx_w);
+	DECLARE_WRITE8_MEMBER(hu_scrolly_w);
+	DECLARE_WRITE8_MEMBER(coin_count_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_READ8_MEMBER(mermaid_p0_r);
+	DECLARE_WRITE8_MEMBER(mermaid_p0_w);
+	DECLARE_READ8_MEMBER(mermaid_p1_r);
+	DECLARE_WRITE8_MEMBER(mermaid_p1_w);
+	DECLARE_READ8_MEMBER(mermaid_p2_r);
+	DECLARE_WRITE8_MEMBER(mermaid_p2_w);
+	DECLARE_READ8_MEMBER(mermaid_p3_r);
+	DECLARE_WRITE8_MEMBER(mermaid_p3_w);
 };
 
 
@@ -186,43 +209,39 @@ static SCREEN_VBLANK( hvyunit )
  *
  *************************************/
 
-static WRITE8_HANDLER( trigger_nmi_on_slave_cpu )
+WRITE8_MEMBER(hvyunit_state::trigger_nmi_on_slave_cpu)
 {
-	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
-	device_set_input_line(state->m_slave_cpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_set_input_line(m_slave_cpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE8_HANDLER( master_bankswitch_w )
+WRITE8_MEMBER(hvyunit_state::master_bankswitch_w)
 {
-	unsigned char *ROM = space->machine().region("master")->base();
+	unsigned char *ROM = memregion("master")->base();
 	int bank = data & 7;
 	ROM = &ROM[0x4000 * bank];
-	memory_set_bankptr(space->machine(), "bank1", ROM);
+	membank("bank1")->set_base(ROM);
 }
 
-static WRITE8_HANDLER( mermaid_data_w )
+WRITE8_MEMBER(hvyunit_state::mermaid_data_w)
 {
-	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
-	state->m_data_to_mermaid = data;
-	state->m_z80_to_mermaid_full = 1;
-	state->m_mermaid_int0_l = 0;
-	device_set_input_line(state->m_mermaid, INPUT_LINE_IRQ0, ASSERT_LINE);
+	m_data_to_mermaid = data;
+	m_z80_to_mermaid_full = 1;
+	m_mermaid_int0_l = 0;
+	device_set_input_line(m_mermaid, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-static READ8_HANDLER( mermaid_data_r )
+READ8_MEMBER(hvyunit_state::mermaid_data_r)
 {
-	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
-	state->m_mermaid_to_z80_full = 0;
-	return state->m_data_to_z80;
+	m_mermaid_to_z80_full = 0;
+	return m_data_to_z80;
 }
 
-static READ8_HANDLER( mermaid_status_r )
+READ8_MEMBER(hvyunit_state::mermaid_status_r)
 {
-	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
-	return (!state->m_mermaid_to_z80_full << 2) | (state->m_z80_to_mermaid_full << 3);
+	return (!m_mermaid_to_z80_full << 2) | (m_z80_to_mermaid_full << 3);
 }
 
 
@@ -232,58 +251,52 @@ static READ8_HANDLER( mermaid_status_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
+WRITE8_MEMBER(hvyunit_state::trigger_nmi_on_sound_cpu2)
 {
-	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
-	soundlatch_w(space, 0, data);
-	device_set_input_line(state->m_sound_cpu, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_byte_w(space, 0, data);
+	device_set_input_line(m_sound_cpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE8_HANDLER( hu_videoram_w )
+WRITE8_MEMBER(hvyunit_state::hu_videoram_w)
 {
-	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( hu_colorram_w )
+WRITE8_MEMBER(hvyunit_state::hu_colorram_w)
 {
-	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( slave_bankswitch_w )
+WRITE8_MEMBER(hvyunit_state::slave_bankswitch_w)
 {
-	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
-	unsigned char *ROM = space->machine().region("slave")->base();
+	unsigned char *ROM = memregion("slave")->base();
 	int bank = (data & 0x03);
-	state->m_port0_data = data;
+	m_port0_data = data;
 	ROM = &ROM[0x4000 * bank];
 
-	memory_set_bankptr(space->machine(), "bank2", ROM);
+	membank("bank2")->set_base(ROM);
 }
 
-static WRITE8_HANDLER( hu_scrollx_w )
+WRITE8_MEMBER(hvyunit_state::hu_scrollx_w)
 {
-	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
-	state->m_scrollx = data;
+	m_scrollx = data;
 }
 
-static WRITE8_HANDLER( hu_scrolly_w )
+WRITE8_MEMBER(hvyunit_state::hu_scrolly_w)
 {
-	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
-	state->m_scrolly = data;
+	m_scrolly = data;
 }
 
-static WRITE8_HANDLER( coin_count_w )
+WRITE8_MEMBER(hvyunit_state::coin_count_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
-	coin_counter_w(space->machine(), 1, data & 2);
+	coin_counter_w(machine(), 0, data & 1);
+	coin_counter_w(machine(), 1, data & 2);
 }
 
 
@@ -293,13 +306,13 @@ static WRITE8_HANDLER( coin_count_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( sound_bankswitch_w )
+WRITE8_MEMBER(hvyunit_state::sound_bankswitch_w)
 {
-	unsigned char *ROM = space->machine().region("soundcpu")->base();
+	unsigned char *ROM = memregion("soundcpu")->base();
 	int bank = data & 0x3;
 	ROM = &ROM[0x4000 * bank];
 
-	memory_set_bankptr(space->machine(), "bank3", ROM);
+	membank("bank3")->set_base(ROM);
 }
 
 
@@ -309,80 +322,74 @@ static WRITE8_HANDLER( sound_bankswitch_w )
  *
  *************************************/
 
-static READ8_HANDLER( mermaid_p0_r )
+READ8_MEMBER(hvyunit_state::mermaid_p0_r)
 {
 	// ?
 	return 0;
 }
 
-static WRITE8_HANDLER( mermaid_p0_w )
+WRITE8_MEMBER(hvyunit_state::mermaid_p0_w)
 {
-	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
-	if (!BIT(state->m_mermaid_p[0], 1) && BIT(data, 1))
+	if (!BIT(m_mermaid_p[0], 1) && BIT(data, 1))
 	{
-		state->m_mermaid_to_z80_full = 1;
-		state->m_data_to_z80 = state->m_mermaid_p[1];
+		m_mermaid_to_z80_full = 1;
+		m_data_to_z80 = m_mermaid_p[1];
 	}
 
 	if (BIT(data, 0) == 1)
-		state->m_z80_to_mermaid_full = 0;
+		m_z80_to_mermaid_full = 0;
 
-	state->m_mermaid_p[0] = data;
+	m_mermaid_p[0] = data;
 }
 
-static READ8_HANDLER( mermaid_p1_r )
+READ8_MEMBER(hvyunit_state::mermaid_p1_r)
 {
-	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
-	if (BIT(state->m_mermaid_p[0], 0) == 0)
-		return state->m_data_to_mermaid;
+	if (BIT(m_mermaid_p[0], 0) == 0)
+		return m_data_to_mermaid;
 	else
 		return 0; // ?
 }
 
-static WRITE8_HANDLER( mermaid_p1_w )
+WRITE8_MEMBER(hvyunit_state::mermaid_p1_w)
 {
-	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
 	if (data == 0xff)
 	{
-		state->m_mermaid_int0_l = 1;
-		device_set_input_line(state->m_mermaid, INPUT_LINE_IRQ0, CLEAR_LINE);
+		m_mermaid_int0_l = 1;
+		device_set_input_line(m_mermaid, INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 
-	state->m_mermaid_p[1] = data;
+	m_mermaid_p[1] = data;
 }
 
-static READ8_HANDLER( mermaid_p2_r )
+READ8_MEMBER(hvyunit_state::mermaid_p2_r)
 {
-	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
-	switch ((state->m_mermaid_p[0] >> 2) & 3)
+	switch ((m_mermaid_p[0] >> 2) & 3)
 	{
-		case 0: return input_port_read(space->machine(), "IN1");
-		case 1: return input_port_read(space->machine(), "IN2");
-		case 2: return input_port_read(space->machine(), "IN0");
+		case 0: return ioport("IN1")->read();
+		case 1: return ioport("IN2")->read();
+		case 2: return ioport("IN0")->read();
 		default: return 0xff;
 	}
 }
 
-static WRITE8_HANDLER( mermaid_p2_w )
+WRITE8_MEMBER(hvyunit_state::mermaid_p2_w)
 {
-	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
-	state->m_mermaid_p[2] = data;
+	m_mermaid_p[2] = data;
 }
 
-static READ8_HANDLER( mermaid_p3_r )
+READ8_MEMBER(hvyunit_state::mermaid_p3_r)
 {
-	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
 	UINT8 dsw = 0;
-	UINT8 dsw1 = input_port_read(space->machine(), "DSW1");
-	UINT8 dsw2 = input_port_read(space->machine(), "DSW2");
+	UINT8 dsw1 = ioport("DSW1")->read();
+	UINT8 dsw2 = ioport("DSW2")->read();
 
-	switch ((state->m_mermaid_p[0] >> 5) & 3)
+	switch ((m_mermaid_p[0] >> 5) & 3)
 	{
 		case 0: dsw = (BIT(dsw2, 4) << 3) | (BIT(dsw2, 0) << 2) | (BIT(dsw1, 4) << 1) | BIT(dsw1, 0); break;
 		case 1: dsw = (BIT(dsw2, 5) << 3) | (BIT(dsw2, 1) << 2) | (BIT(dsw1, 5) << 1) | BIT(dsw1, 1); break;
@@ -390,15 +397,14 @@ static READ8_HANDLER( mermaid_p3_r )
 		case 3: dsw = (BIT(dsw2, 7) << 3) | (BIT(dsw2, 3) << 2) | (BIT(dsw1, 7) << 1) | BIT(dsw1, 3); break;
 	}
 
-	return (dsw << 4) | (state->m_mermaid_int0_l << 2) | (state->m_mermaid_to_z80_full << 3);
+	return (dsw << 4) | (m_mermaid_int0_l << 2) | (m_mermaid_to_z80_full << 3);
 }
 
-static WRITE8_HANDLER( mermaid_p3_w )
+WRITE8_MEMBER(hvyunit_state::mermaid_p3_w)
 {
-	hvyunit_state *state = space->machine().driver_data<hvyunit_state>();
 
-	state->m_mermaid_p[3] = data;
-	device_set_input_line(state->m_slave_cpu, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+	m_mermaid_p[3] = data;
+	device_set_input_line(m_slave_cpu, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -408,15 +414,15 @@ static WRITE8_HANDLER( mermaid_p3_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( master_memory, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( master_memory, AS_PROGRAM, 8, hvyunit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", pandora_spriteram_r, pandora_spriteram_w)
+	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_r, pandora_spriteram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_io, AS_IO, 8 )
+static ADDRESS_MAP_START( master_io, AS_IO, 8, hvyunit_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(master_bankswitch_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(master_bankswitch_w) // correct?
@@ -424,18 +430,18 @@ static ADDRESS_MAP_START( master_io, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( slave_memory, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slave_memory, AS_PROGRAM, 8, hvyunit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(hu_videoram_w) AM_BASE_MEMBER(hvyunit_state, m_videoram)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(hu_colorram_w) AM_BASE_MEMBER(hvyunit_state, m_colorram)
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_split1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(hu_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(hu_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_byte_split_hi_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_byte_split_lo_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_io, AS_IO, 8 )
+static ADDRESS_MAP_START( slave_io, AS_IO, 8, hvyunit_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(slave_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(trigger_nmi_on_sound_cpu2)
@@ -445,26 +451,26 @@ static ADDRESS_MAP_START( slave_io, AS_IO, 8 )
 	AM_RANGE(0x0c, 0x0c) AM_READ(mermaid_status_r)
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(coin_count_w)
 
-//  AM_RANGE(0x22, 0x22) AM_READ(hu_scrolly_hi_reset) //22/a2 taken from ram $f065
-//  AM_RANGE(0xa2, 0xa2) AM_READ(hu_scrolly_hi_set)
+//  AM_RANGE(0x22, 0x22) AM_READ_LEGACY(hu_scrolly_hi_reset) //22/a2 taken from ram $f065
+//  AM_RANGE(0xa2, 0xa2) AM_READ_LEGACY(hu_scrolly_hi_set)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_memory, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_memory, AS_PROGRAM, 8, hvyunit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io, AS_IO, 8, hvyunit_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_bankswitch_w)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r)
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_io, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_io, AS_IO, 8, hvyunit_state )
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(mermaid_p0_r, mermaid_p0_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(mermaid_p1_r, mermaid_p1_w)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(mermaid_p2_r, mermaid_p2_w)
@@ -523,23 +529,23 @@ static INPUT_PORTS_START( hvyunit )
 	PORT_DIPSETTING(    0x08, ( "Mode 1" ) )
 	PORT_DIPSETTING(    0x00, ( "Mode 2" ) )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("DSW1:5,6")
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) ) PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("DSW1:7,8")
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) ) PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSW1", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x08)
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x08)
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSW1", 0x08, EQUALS, 0x00)
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("DSW2:1,2")

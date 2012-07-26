@@ -32,7 +32,7 @@ int pc1251_ina(device_t *device)
 
 	if (state->m_outb & 0x01)
 	{
-		data |= input_port_read(machine, "KEY0");
+		data |= machine.root_device().ioport("KEY0")->read();
 
 		/* At Power Up we fake a 'CL' pressure */
 		if (state->m_power)
@@ -40,31 +40,31 @@ int pc1251_ina(device_t *device)
 	}
 
 	if (state->m_outb & 0x02)
-		data |= input_port_read(machine, "KEY1");
+		data |= machine.root_device().ioport("KEY1")->read();
 
 	if (state->m_outb & 0x04)
-		data |= input_port_read(machine, "KEY2");
+		data |= machine.root_device().ioport("KEY2")->read();
 
 	if (state->m_outa & 0x01)
-		data |= input_port_read(machine, "KEY3");
+		data |= machine.root_device().ioport("KEY3")->read();
 
 	if (state->m_outa & 0x02)
-		data |= input_port_read(machine, "KEY4");
+		data |= machine.root_device().ioport("KEY4")->read();
 
 	if (state->m_outa & 0x04)
-		data |= input_port_read(machine, "KEY5");
+		data |= machine.root_device().ioport("KEY5")->read();
 
 	if (state->m_outa & 0x08)
-		data |= input_port_read(machine, "KEY6");
+		data |= machine.root_device().ioport("KEY6")->read();
 
 	if (state->m_outa & 0x10)
-		data |= input_port_read(machine, "KEY7");
+		data |= machine.root_device().ioport("KEY7")->read();
 
 	if (state->m_outa & 0x20)
-		data |= input_port_read(machine, "KEY8");
+		data |= machine.root_device().ioport("KEY8")->read();
 
 	if (state->m_outa & 0x40)
-		data |= input_port_read(machine, "KEY9");
+		data |= machine.root_device().ioport("KEY9")->read();
 
 	return data;
 }
@@ -75,25 +75,25 @@ int pc1251_inb(device_t *device)
 	int data = state->m_outb;
 
 	if (state->m_outb & 0x08)
-		data |= (input_port_read(device->machine(), "MODE") & 0x07);
+		data |= (state->ioport("MODE")->read() & 0x07);
 
 	return data;
 }
 
 int pc1251_brk(device_t *device)
 {
-	return (input_port_read(device->machine(), "EXTRA") & 0x01);
+	return (device->machine().root_device().ioport("EXTRA")->read() & 0x01);
 }
 
 int pc1251_reset(device_t *device)
 {
-	return (input_port_read(device->machine(), "EXTRA") & 0x02);
+	return (device->machine().root_device().ioport("EXTRA")->read() & 0x02);
 }
 
 MACHINE_START( pc1251 )
 {
 	device_t *main_cpu = machine.device("maincpu");
-	UINT8 *ram = machine.region("maincpu")->base() + 0x8000;
+	UINT8 *ram = machine.root_device().memregion("maincpu")->base() + 0x8000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
 	machine.device<nvram_device>("cpu_nvram")->set_base(cpu, 96);
@@ -110,7 +110,7 @@ DRIVER_INIT( pc1251 )
 {
 	pc1251_state *state = machine.driver_data<pc1251_state>();
 	int i;
-	UINT8 *gfx = machine.region("gfx1")->base();
+	UINT8 *gfx = state->memregion("gfx1")->base();
 	for (i=0; i<128; i++) gfx[i]=i;
 
 	state->m_power = 1;

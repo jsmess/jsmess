@@ -76,7 +76,7 @@ z88_1024k_ram_device::z88_1024k_ram_device(const machine_config &mconfig, const 
 
 void z88_32k_ram_device::device_start()
 {
-	m_ram = machine().region_alloc(tag(), get_cart_size(), 1, ENDIANNESS_LITTLE)->base();
+	m_ram = machine().memory().region_alloc(tag(), get_cart_size(), 1, ENDIANNESS_LITTLE)->base();
 	memset(m_ram, 0, get_cart_size());
 }
 

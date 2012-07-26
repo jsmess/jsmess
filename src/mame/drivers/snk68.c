@@ -49,77 +49,73 @@ Notes:
 
 /******************************************************************************/
 
-static READ16_HANDLER( sound_status_r )
+READ16_MEMBER(snk68_state::sound_status_r)
 {
-	snk68_state *state = space->machine().driver_data<snk68_state>();
 
-	return (state->m_sound_status << 8);
+	return (m_sound_status << 8);
 }
 
-static WRITE8_HANDLER( sound_status_w )
+WRITE8_MEMBER(snk68_state::sound_status_w)
 {
-	snk68_state *state = space->machine().driver_data<snk68_state>();
 
-	state->m_sound_status = data;
+	m_sound_status = data;
 }
 
-static READ16_HANDLER( control_1_r )
+READ16_MEMBER(snk68_state::control_1_r)
 {
-	return (input_port_read(space->machine(), "P1") + (input_port_read(space->machine(), "P2") << 8));
+	return (ioport("P1")->read() + (ioport("P2")->read() << 8));
 }
 
-static READ16_HANDLER( control_2_r )
+READ16_MEMBER(snk68_state::control_2_r)
 {
-	return input_port_read(space->machine(), "SYSTEM");
+	return ioport("SYSTEM")->read();
 }
 
-static READ16_HANDLER( rotary_1_r )
+READ16_MEMBER(snk68_state::rotary_1_r)
 {
-	return (( ~(1 << input_port_read(space->machine(), "ROT1")) )<<8)&0xff00;
+	return (( ~(1 << ioport("ROT1")->read()) )<<8)&0xff00;
 }
 
-static READ16_HANDLER( rotary_2_r )
+READ16_MEMBER(snk68_state::rotary_2_r)
 {
-	return (( ~(1 << input_port_read(space->machine(), "ROT2")) )<<8)&0xff00;
+	return (( ~(1 << ioport("ROT2")->read()) )<<8)&0xff00;
 }
 
-static READ16_HANDLER( rotary_lsb_r )
+READ16_MEMBER(snk68_state::rotary_lsb_r)
 {
-	return ((( ~(1 << input_port_read(space->machine(), "ROT2"))  ) <<4)&0xf000)
-		 + ((( ~(1 << input_port_read(space->machine(), "ROT1"))  )    )&0x0f00);
+	return ((( ~(1 << ioport("ROT2")->read())  ) <<4)&0xf000)
+		 + ((( ~(1 << ioport("ROT1")->read())  )    )&0x0f00);
 }
 
-static READ16_HANDLER( protcontrols_r )
+READ16_MEMBER(snk68_state::protcontrols_r)
 {
-	snk68_state *state = space->machine().driver_data<snk68_state>();
 	static const char *const portnames[] = { "P1", "P2", "SYSTEM" };
 
-	return input_port_read(space->machine(), portnames[offset]) ^ state->m_invert_controls;
+	return ioport(portnames[offset])->read() ^ m_invert_controls;
 }
 
-static WRITE16_HANDLER( protection_w )
+WRITE16_MEMBER(snk68_state::protection_w)
 {
 	/* top byte is used, meaning unknown */
 	/* bottom byte is protection in ikari 3 and streetsm */
 	if (ACCESSING_BITS_0_7)
 	{
-		snk68_state *state = space->machine().driver_data<snk68_state>();
-		state->m_invert_controls = ((data & 0xff) == 0x07) ? 0xff : 0x00;
+		m_invert_controls = ((data & 0xff) == 0x07) ? 0xff : 0x00;
 	}
 }
 
-static WRITE16_HANDLER( sound_w )
+WRITE16_MEMBER(snk68_state::sound_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(space, 0, data >> 8);
-		cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_byte_w(space, 0, data >> 8);
+		cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( pow_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pow_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x080000, 0x080001) AM_READ(control_1_r)
@@ -131,12 +127,12 @@ static ADDRESS_MAP_START( pow_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
 //  AM_RANGE(0x0f0008, 0x0f0009) AM_WRITENOP    /* ?? */
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(pow_fg_videoram_r, pow_fg_videoram_w) AM_MIRROR(0x1000) AM_BASE_MEMBER(snk68_state, m_pow_fg_videoram)	// 8-bit
-	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(pow_spriteram_r, pow_spriteram_w) AM_BASE_MEMBER(snk68_state, m_spriteram)	// only partially populated
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(pow_paletteram16_word_w) AM_BASE_MEMBER(snk68_state, m_paletteram)
+	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(pow_fg_videoram_r, pow_fg_videoram_w) AM_MIRROR(0x1000) AM_SHARE("pow_fg_videoram")	// 8-bit
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(pow_spriteram_r, pow_spriteram_w) AM_SHARE("spriteram")	// only partially populated
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(pow_paletteram16_word_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16, snk68_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x043fff) AM_RAM
 	AM_RANGE(0x080000, 0x080005) AM_READ(protcontrols_r) /* Player 1 & 2 */
@@ -152,18 +148,18 @@ static ADDRESS_MAP_START( searchar_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0f0008, 0x0f0009) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0f8000, 0x0f8001) AM_READ(sound_status_r)
-	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(pow_spriteram_r, pow_spriteram_w) AM_BASE_MEMBER(snk68_state, m_spriteram)	// only partially populated
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(searchar_fg_videoram_w) AM_MIRROR(0x1000) AM_BASE_MEMBER(snk68_state, m_pow_fg_videoram) /* Mirror is used by Ikari 3 */
+	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(pow_spriteram_r, pow_spriteram_w) AM_SHARE("spriteram")	// only partially populated
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(searchar_fg_videoram_w) AM_MIRROR(0x1000) AM_SHARE("pow_fg_videoram") /* Mirror is used by Ikari 3 */
 	AM_RANGE(0x300000, 0x33ffff) AM_ROMBANK("bank1") /* Extra code bank */
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(pow_paletteram16_word_w) AM_BASE_MEMBER(snk68_state, m_paletteram)
+	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(pow_paletteram16_word_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, snk68_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r) AM_WRITE(sound_status_w)
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r) AM_WRITE(sound_status_w)
 ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( D7759_write_port_0_w )
@@ -178,12 +174,12 @@ static WRITE8_DEVICE_HANDLER( D7759_upd_reset_w )
 	upd7759_reset_w(device, data & 0x80);
 }
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, snk68_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_status_port_r, ym3812_control_port_w)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_write_port_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("upd", D7759_write_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("upd", D7759_upd_reset_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_status_port_r, ym3812_control_port_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("ymsnd", ym3812_write_port_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("upd", D7759_write_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("upd", D7759_upd_reset_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -1044,7 +1040,7 @@ ROM_END
 
 static DRIVER_INIT( searchar )
 {
-	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());
+	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("user1")->base());
 }
 
 /******************************************************************************/

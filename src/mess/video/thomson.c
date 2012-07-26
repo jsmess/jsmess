@@ -54,7 +54,7 @@ static int thom_update_screen_size( running_machine &machine )
 {
 	screen_device *screen = machine.first_screen();
 	const rectangle &visarea = screen->visible_area();
-	UINT8 p = input_port_read(machine, "vconfig");
+	UINT8 p = machine.root_device().ioport("vconfig")->read();
 	int new_w, new_h, changed = 0;
 
 	switch ( p & 3 )
@@ -135,8 +135,8 @@ struct thom_vsignal thom_get_vsignal ( running_machine &machine )
 
 static void thom_get_lightpen_pos( running_machine &machine, int*x, int* y )
 {
-	*x = input_port_read(machine, "lightpen_x");
-	*y = input_port_read(machine, "lightpen_y");
+	*x = machine.root_device().ioport("lightpen_x")->read();
+	*y = machine.root_device().ioport("lightpen_y")->read();
 
 	if ( *x < 0 )
 		*x = 0;
@@ -870,7 +870,7 @@ void thom_set_mode_point ( running_machine &machine, int point )
 {
 	assert( point >= 0 && point <= 1 );
 	thom_mode_point = ( ! point ) * 0x2000;
-	memory_set_bank( machine, THOM_VRAM_BANK, ! point );
+	machine.root_device().membank( THOM_VRAM_BANK )->set_entry( ! point );
 }
 
 
@@ -1149,7 +1149,7 @@ VIDEO_START ( thom )
 
 	thom_mode_point = 0;
 	state_save_register_global(machine,  thom_mode_point );
-	memory_set_bank( machine, THOM_VRAM_BANK, 0 );
+	machine.root_device().membank( THOM_VRAM_BANK )->set_entry( 0 );
 
 	thom_floppy_rcount = 0;
 	thom_floppy_wcount = 0;

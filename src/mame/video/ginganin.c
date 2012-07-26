@@ -76,7 +76,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *gfx = machine.region("gfx5")->base();
+	UINT8 *gfx = machine.root_device().memregion("gfx5")->base();
 	int code = gfx[2 * tile_index + 0] * 256 + gfx[2 * tile_index + 1];
 	SET_TILE_INFO(
 			BG_GFX,
@@ -103,11 +103,10 @@ static TILE_GET_INFO( get_fg_tile_info )
 			0);
 }
 
-WRITE16_HANDLER( ginganin_fgram16_w )
+WRITE16_MEMBER(ginganin_state::ginganin_fgram16_w)
 {
-	ginganin_state *state = space->machine().driver_data<ginganin_state>();
-	COMBINE_DATA(&state->m_fgram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_fgram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -128,11 +127,10 @@ static TILE_GET_INFO( get_txt_tile_info )
 			0);
 }
 
-WRITE16_HANDLER( ginganin_txtram16_w )
+WRITE16_MEMBER(ginganin_state::ginganin_txtram16_w)
 {
-	ginganin_state *state = space->machine().driver_data<ginganin_state>();
-	COMBINE_DATA(&state->m_txtram[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_txtram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -148,42 +146,41 @@ VIDEO_START( ginganin )
 }
 
 
-WRITE16_HANDLER( ginganin_vregs16_w )
+WRITE16_MEMBER(ginganin_state::ginganin_vregs16_w)
 {
-	ginganin_state *state = space->machine().driver_data<ginganin_state>();
-	COMBINE_DATA(&state->m_vregs[offset]);
-	data = state->m_vregs[offset];
+	COMBINE_DATA(&m_vregs[offset]);
+	data = m_vregs[offset];
 
 	switch (offset)
 	{
 	case 0:
-		state->m_fg_tilemap->set_scrolly(0, data);
+		m_fg_tilemap->set_scrolly(0, data);
 		break;
 	case 1:
-		state->m_fg_tilemap->set_scrollx(0, data);
+		m_fg_tilemap->set_scrollx(0, data);
 		break;
 	case 2:
-		state->m_bg_tilemap->set_scrolly(0, data);
+		m_bg_tilemap->set_scrolly(0, data);
 		break;
 	case 3:
-		state->m_bg_tilemap->set_scrollx(0, data);
+		m_bg_tilemap->set_scrollx(0, data);
 		break;
 	case 4:
-		state->m_layers_ctrl = data;
+		m_layers_ctrl = data;
 		break;
 /*  case 5:
  *      break;
  */
 	case 6:
-		state->m_flipscreen = !(data & 1);
-		space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+		m_flipscreen = !(data & 1);
+		machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 		break;
 	case 7:
-		soundlatch_w(space, 0, data);
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_byte_w(space, 0, data);
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 		break;
 	default:
-		logerror("CPU #0 PC %06X : Warning, videoreg %04X <- %04X\n", cpu_get_pc(&space->device()), offset, data);
+		logerror("CPU #0 PC %06X : Warning, videoreg %04X <- %04X\n", cpu_get_pc(&space.device()), offset, data);
 	}
 }
 
@@ -215,7 +212,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const r
 	UINT16 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = 0; offs < (state->m_spriteram_size >> 1); offs += 4)
+	for (offs = 0; offs < (state->m_spriteram.bytes() >> 1); offs += 4)
 	{
 		int y = spriteram[offs + 0];
 		int x = spriteram[offs + 1];

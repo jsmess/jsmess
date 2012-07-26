@@ -45,7 +45,6 @@ elektor TV Game Computer which is a kind of developer machine for the VC4000.
 
 Go to the bottom to see the game list and emulation status of each.
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/vc4000.h"
 
@@ -57,25 +56,25 @@ READ8_MEMBER( vc4000_state::vc4000_key_r )
 	switch(offset & 0x0f)
 	{
 	case 0x08:
-		data = input_port_read(machine(), "KEYPAD1_1");
+		data = ioport("KEYPAD1_1")->read();
 		break;
 	case 0x09:
-		data = input_port_read(machine(), "KEYPAD1_2");
+		data = ioport("KEYPAD1_2")->read();
 		break;
 	case 0x0a:
-		data = input_port_read(machine(), "KEYPAD1_3");
+		data = ioport("KEYPAD1_3")->read();
 		break;
 	case 0x0b:
-		data = input_port_read(machine(), "PANEL");
+		data = ioport("PANEL")->read();
 		break;
 	case 0x0c:
-		data = input_port_read(machine(), "KEYPAD2_1");
+		data = ioport("KEYPAD2_1")->read();
 		break;
 	case 0x0d:
-		data = input_port_read(machine(), "KEYPAD2_2");
+		data = ioport("KEYPAD2_2")->read();
 		break;
 	case 0x0e:
-		data = input_port_read(machine(), "KEYPAD2_3");
+		data = ioport("KEYPAD2_3")->read();
 		break;
 	}
 	return data;
@@ -191,6 +190,7 @@ static PALETTE_INIT( vc4000 )
 static DEVICE_IMAGE_LOAD( vc4000_cart )
 {
 	running_machine &machine = image.device().machine();
+	vc4000_state *state = machine.driver_data<vc4000_state>();
 	address_space *memspace = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT32 size;
 
@@ -205,34 +205,34 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 	if (size > 0x1000)	/* 6k rom + 1k ram - Chess2 only */
 	{
 		memspace->install_read_bank(0x0800, 0x15ff, "bank1");	/* extra rom */
-		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x1000);
+		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1000);
 
 		memspace->install_readwrite_bank(0x1800, 0x1bff, "bank2");	/* ram */
-		memory_set_bankptr(machine, "bank2", machine.region("maincpu")->base() + 0x1800);
+		state->membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1800);
 	}
 	else if (size > 0x0800)	/* some 4k roms have 1k of mirrored ram */
 	{
 		memspace->install_read_bank(0x0800, 0x0fff, "bank1");	/* extra rom */
-		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x0800);
+		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x0800);
 
 		memspace->install_readwrite_bank(0x1000, 0x15ff, 0, 0x800, "bank2"); /* ram */
-		memory_set_bankptr(machine, "bank2", machine.region("maincpu")->base() + 0x1000);
+		state->membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1000);
 	}
 	else if (size == 0x0800)	/* 2k roms + 2k ram - Hobby Module(Radofin) and elektor TVGC*/
 	{
 		memspace->install_readwrite_bank(0x0800, 0x0fff, "bank1"); /* ram */
-		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x0800);
+		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x0800);
 	}
 
 	if (size > 0)
 	{
 		if (image.software_entry() == NULL)
 		{
-			if (image.fread( machine.region("maincpu")->base(), size) != size)
+			if (image.fread( machine.root_device().memregion("maincpu")->base(), size) != size)
 				return IMAGE_INIT_FAIL;
 		}
 		else
-			memcpy(machine.region("maincpu")->base(), image.get_software_region("rom"), size);
+			memcpy(machine.root_device().memregion("maincpu")->base(), image.get_software_region("rom"), size);
 	}
 
 	return IMAGE_INIT_PASS;

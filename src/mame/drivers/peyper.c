@@ -12,19 +12,25 @@ public:
 
     UINT8 display_block;
     UINT8 display[16];
+	DECLARE_READ8_MEMBER(sw_r);
+	DECLARE_WRITE8_MEMBER(col_w);
+	DECLARE_WRITE8_MEMBER(disp_w);
+	DECLARE_WRITE8_MEMBER(lamp_w);
+	DECLARE_WRITE8_MEMBER(lamp7_w);
+	DECLARE_WRITE8_MEMBER(sol_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
 };
 
 
-static READ8_HANDLER(sw_r)
+READ8_MEMBER(peyper_state::sw_r)
 {
     return 0xff;
 }
 
-static WRITE8_HANDLER(col_w)
+WRITE8_MEMBER(peyper_state::col_w)
 {
-    peyper_state *state = space->machine().driver_data<peyper_state>();
 
-    if (data==0x90) state->display_block = 0;
+    if (data==0x90) display_block = 0;
 }
 
 static const UINT8 hex_to_7seg[16] =
@@ -34,10 +40,9 @@ static const UINT8 hex_to_7seg[16] =
      0x00, 0x00, 0x00, 0x00 };
 
 /* seems to only work correctly for 'solarwap', 'poleposn' and 'sonstwar' (look at how high-scores are displayed for example) - or shall layout be changed ? */
-static WRITE8_HANDLER(disp_w)
+WRITE8_MEMBER(peyper_state::disp_w)
 {
-    peyper_state *state = space->machine().driver_data<peyper_state>();
-    state->display[state->display_block] = data;
+    display[display_block] = data;
 
     UINT8 a = data & 0x0f;
     UINT8 b = data >> 4;
@@ -53,7 +58,7 @@ static WRITE8_HANDLER(disp_w)
 6 -> DPL19,DPL1
 7 -> DPL30,DPL33
 */
-    switch(state->display_block) {
+    switch(display_block) {
         case 0 :
                 output_set_indexed_value("dpl_",25,hex_a);
                 output_set_indexed_value("dpl_",27,hex_b);
@@ -141,37 +146,37 @@ static WRITE8_HANDLER(disp_w)
                 break;
     }
 
-    state->display_block++;
-    state->display_block&=0x0f;
+    display_block++;
+    display_block&=0x0f;
 }
 
-static WRITE8_HANDLER(lamp_w)
+WRITE8_MEMBER(peyper_state::lamp_w)
 {
     //logerror("lamp_w %02x\n",data);
     //logerror("[%d]= %02x\n",4+offset/4,data);
 }
 
-static WRITE8_HANDLER(lamp7_w)
+WRITE8_MEMBER(peyper_state::lamp7_w)
 {
     //logerror("[7]= %02x\n",data);
 }
 
-static WRITE8_HANDLER(sol_w)
+WRITE8_MEMBER(peyper_state::sol_w)
 {
     //logerror("sol_w %02x\n",data);
 }
 
 
-static CUSTOM_INPUT( wolfman_replay_hs_r )
+CUSTOM_INPUT_MEMBER(peyper_state::wolfman_replay_hs_r)
 {
 	int bit_mask = (FPTR)param;
 
 	switch (bit_mask)
 	{
 		case 0x03:
-			return ((input_port_read(field.machine(), "REPLAY") & bit_mask) >> 0);
+			return ((ioport("REPLAY")->read() & bit_mask) >> 0);
 		case 0x40:
-			return ((input_port_read(field.machine(), "REPLAY") & bit_mask) >> 6);
+			return ((ioport("REPLAY")->read() & bit_mask) >> 6);
 		default:
 			logerror("wolfman_replay_hs_r : invalid %02X bit_mask\n",bit_mask);
 			return 0;
@@ -179,23 +184,23 @@ static CUSTOM_INPUT( wolfman_replay_hs_r )
 }
 
 
-static ADDRESS_MAP_START( peyper_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( peyper_map, AS_PROGRAM, 8, peyper_state )
 //  AM_RANGE(0x0000, 0xffff) AM_NOP
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5FFF) AM_ROM
 	AM_RANGE(0x6000, 0x67FF) AM_RAM //AM_BASE_GENERIC(nvram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( peyper_io, AS_IO, 8 )
+static ADDRESS_MAP_START( peyper_io, AS_IO, 8, peyper_state )
 //  AM_RANGE(0x0000, 0xffff) AM_NOP
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(sw_r,disp_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(col_w)
-//  AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay8910_0", ay8910_address_w)
-//  AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay8910_0", ay8910_data_w)
-//  AM_RANGE(0x08, 0x08) AM_DEVWRITE("ay8910_1", ay8910_address_w)
-//  AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay8910_1", ay8910_data_w)
+//  AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("ay8910_0", ay8910_address_w)
+//  AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("ay8910_0", ay8910_data_w)
+//  AM_RANGE(0x08, 0x08) AM_DEVWRITE_LEGACY("ay8910_1", ay8910_address_w)
+//  AM_RANGE(0x0a, 0x0a) AM_DEVWRITE_LEGACY("ay8910_1", ay8910_data_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(sol_w)
 	AM_RANGE(0x10, 0x18) AM_WRITE(lamp_w)
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW0")
@@ -446,14 +451,14 @@ static INPUT_PORTS_START( wolfman )
 	PORT_DIPSETTING(    0x20, "01" )
 //  PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )          // Partidas/Moneda - code at 0x0a69 - tables at 0x0b30 (4 * 3) - credits BCD stored at 0x6151
 //  PORT_DIPNAME( 0x04, 0x00, "Balls" )                     // Bolas/Partida - code at 0x0a5c - stored at 0x60bd
-	PORT_BIT( 0x03, 0x00, IPT_SPECIAL) PORT_CUSTOM(wolfman_replay_hs_r, (void *)0x03)
+	PORT_BIT( 0x03, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, peyper_state,wolfman_replay_hs_r, (void *)0x03)
 
 	/* DSW1 : port 0x24 - DSW1-1 is bit 7 ... DSW1-8 is bit 0 */
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x80, 0x00, "Adjust Replay" )             // Premios por Puntuacion - code at 0x0aa3 - stored at 0x60c4 and 0x60cc (0x00 NO / 0x05 YES)
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
-	PORT_BIT( 0x40, 0x00, IPT_SPECIAL) PORT_CUSTOM(wolfman_replay_hs_r, (void *)0x40)
+	PORT_BIT( 0x40, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, peyper_state,wolfman_replay_hs_r, (void *)0x40)
 	PORT_DIPNAME( 0x20, 0x00, "Clear RAM on Reset" )        // Borrador RAM - code at 0x0ace - range 0x6141..0x616f - 0x616d = 0x5a and 0x616e = 0xa5
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )

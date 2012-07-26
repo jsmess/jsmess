@@ -69,43 +69,39 @@ VIDEO_START( crzrally )
 	state->m_bg_tilemap = tilemap_create(machine, crzrally_get_tile_info, tilemap_scan_cols, 8, 8, 32, 32);
 }
 
-WRITE8_HANDLER( holeland_videoram_w )
+WRITE8_MEMBER(holeland_state::holeland_videoram_w)
 {
-	holeland_state *state = space->machine().driver_data<holeland_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( holeland_colorram_w )
+WRITE8_MEMBER(holeland_state::holeland_colorram_w)
 {
-	holeland_state *state = space->machine().driver_data<holeland_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( holeland_pal_offs_w )
+WRITE8_MEMBER(holeland_state::holeland_pal_offs_w)
 {
-	holeland_state *state = space->machine().driver_data<holeland_state>();
-	if ((data & 1) != state->m_po[offset])
+	if ((data & 1) != m_po[offset])
 	{
-		state->m_po[offset] = data & 1;
-		state->m_palette_offset = (state->m_po[0] + (state->m_po[1] << 1)) << 4;
-		space->machine().tilemap().mark_all_dirty();
+		m_po[offset] = data & 1;
+		m_palette_offset = (m_po[0] + (m_po[1] << 1)) << 4;
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( holeland_scroll_w )
+WRITE8_MEMBER(holeland_state::holeland_scroll_w)
 {
-	holeland_state *state = space->machine().driver_data<holeland_state>();
-	state->m_bg_tilemap->set_scrollx(0, data);
+	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_HANDLER( holeland_flipscreen_w )
+WRITE8_MEMBER(holeland_state::holeland_flipscreen_w)
 {
 	if (offset)
-		flip_screen_y_set(space->machine(), data);
+		flip_screen_y_set(data);
 	else
-		flip_screen_x_set(space->machine(), data);
+		flip_screen_x_set(data);
 }
 
 
@@ -116,7 +112,7 @@ static void holeland_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	int offs, code, sx, sy, color, flipx, flipy;
 
 	/* Weird, sprites entries don't start on DWORD boundary */
-	for (offs = 3; offs < state->m_spriteram_size - 1; offs += 4)
+	for (offs = 3; offs < state->m_spriteram.bytes() - 1; offs += 4)
 	{
 		sy = 236 - spriteram[offs];
 		sx = spriteram[offs + 2];
@@ -129,13 +125,13 @@ static void holeland_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		flipx = spriteram[offs + 3] & 0x04;
 		flipy = spriteram[offs + 3] & 0x08;
 
-		if (flip_screen_x_get(machine))
+		if (state->flip_screen_x())
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y_get(machine))
+		if (state->flip_screen_y())
 		{
 			flipy = !flipy;
 			sy = 240 - sy;
@@ -156,7 +152,7 @@ static void crzrally_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	int offs, code, sx, sy, color, flipx, flipy;
 
 	/* Weird, sprites entries don't start on DWORD boundary */
-	for (offs = 3; offs < state->m_spriteram_size - 1; offs += 4)
+	for (offs = 3; offs < state->m_spriteram.bytes() - 1; offs += 4)
 	{
 		sy = 236 - spriteram[offs];
 		sx = spriteram[offs + 2];
@@ -168,13 +164,13 @@ static void crzrally_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		flipx = spriteram[offs + 3] & 0x04;
 		flipy = spriteram[offs + 3] & 0x08;
 
-		if (flip_screen_x_get(machine))
+		if (state->flip_screen_x())
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y_get(machine))
+		if (state->flip_screen_y())
 		{
 			flipy = !flipy;
 			sy = 240 - sy;

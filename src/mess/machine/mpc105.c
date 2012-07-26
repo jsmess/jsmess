@@ -119,7 +119,7 @@ void mpc105_device::update_memory()
 				if (m_bank_base > 0)
 				{
 					sprintf(bank_str,"bank%d",bank + m_bank_base);
-					memory_set_bankptr(machine(), bank_str, machine().device<ram_device>(RAM_TAG)->pointer());
+					membank(bank_str)->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 				}
 			}
 		}

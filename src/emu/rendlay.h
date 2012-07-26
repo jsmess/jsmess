@@ -121,6 +121,8 @@ private:
 			CTYPE_LED14SEGSC,
 			CTYPE_LED16SEGSC,
 			CTYPE_DOTMATRIX,
+			CTYPE_SIMPLECOUNTER,
+			CTYPE_REEL,
 			CTYPE_MAX
 		};
 
@@ -128,7 +130,10 @@ private:
 		void draw_rect(bitmap_argb32 &dest, const rectangle &bounds);
 		void draw_disk(bitmap_argb32 &dest, const rectangle &bounds);
 		void draw_text(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds);
+		void draw_simplecounter(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
+		void draw_reel(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state);
 		void load_bitmap();
+		void load_reel_bitmap(int number);
 		void draw_led7seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
 		void draw_led14seg(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
 		void draw_led14segsc(bitmap_argb32 &dest, const rectangle &bounds, int pattern);
@@ -145,20 +150,32 @@ private:
 		void draw_segment_comma(bitmap_argb32 &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color);
 		void apply_skew(bitmap_argb32 &dest, int skewwidth);
 
+		#define MAX_BITMAPS 32
+
 		// internal state
-		component *			m_next;			// link to next component
-		component_type		m_type;			// type of component
-		int					m_state;		// state where this component is visible (-1 means all states)
-		render_bounds		m_bounds;		// bounds of the element
-		render_color		m_color;		// color of the element
-		astring				m_string;		// string for text components
-		int					m_textalign;	// text alignment to box
-		bitmap_argb32		m_bitmap;		// source bitmap for images
-		astring				m_dirname;		// directory name of image file (for lazy loading)
-		emu_file *			m_file;			// file object for reading image/alpha files
-		astring				m_imagefile;	// name of the image file (for lazy loading)
-		astring				m_alphafile;	// name of the alpha file (for lazy loading)
-		bool				m_hasalpha;		// is there any alpha component present?
+		component *			m_next;						// link to next component
+		component_type		m_type;						// type of component
+		int					m_state;					// state where this component is visible (-1 means all states)
+		render_bounds		m_bounds;					// bounds of the element
+		render_color		m_color;					// color of the element
+		astring				m_string;					// string for text components
+		int					m_digits;					// number of digits for simple counters
+		int					m_textalign;				// text alignment to box
+		bitmap_argb32		m_bitmap[MAX_BITMAPS];		// source bitmap for images
+		astring				m_dirname;					// directory name of image file (for lazy loading)
+		emu_file *			m_file[MAX_BITMAPS];		// file object for reading image/alpha files
+		astring				m_imagefile[MAX_BITMAPS];	// name of the image file (for lazy loading)
+		astring				m_alphafile[MAX_BITMAPS];	// name of the alpha file (for lazy loading)
+		bool				m_hasalpha[MAX_BITMAPS];	// is there any alpha component present?
+
+		// stuff for fruit machine reels
+		// basically made up of multiple text strings / gfx
+		int					m_numstops;
+		astring				m_stopnames[MAX_BITMAPS];
+		int					m_stateoffset;
+		int					m_reelreversed;
+		int					m_numsymbolsvisible;
+
 	};
 
 	// a texture encapsulates a texture for a given element in a given state
@@ -215,7 +232,7 @@ public:
 		int orientation() const { return m_orientation; }
 		render_container *screen_container(running_machine &machine) const { return (m_screen != NULL) ? &m_screen->container() : NULL; }
 		bool has_input() const { return bool(m_input_tag); }
-		const char *input_tag_and_mask(UINT32 &mask) const { mask = m_input_mask; return m_input_tag; }
+		const char *input_tag_and_mask(ioport_value &mask) const { mask = m_input_mask; return m_input_tag; }
 
 		// fetch state based on configured source
 		int state() const;
@@ -226,7 +243,7 @@ public:
 		layout_element *	m_element;			// pointer to the associated element (non-screens only)
 		astring				m_output_name;		// name of this item
 		astring				m_input_tag;		// input tag of this item
-		UINT32				m_input_mask;		// input mask of this item
+		ioport_value		m_input_mask;		// input mask of this item
 		screen_device *		m_screen;			// pointer to screen
 		int					m_orientation;		// orientation of this item
 		render_bounds		m_bounds;			// bounds of the item

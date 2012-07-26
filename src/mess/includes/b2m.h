@@ -38,6 +38,11 @@ public:
 	device_t *m_fdc;
 	device_t *m_pic;
 	device_t *m_speaker;
+	DECLARE_READ8_MEMBER(b2m_keyboard_r);
+	DECLARE_WRITE8_MEMBER(b2m_palette_w);
+	DECLARE_READ8_MEMBER(b2m_palette_r);
+	DECLARE_WRITE8_MEMBER(b2m_localmachine_w);
+	DECLARE_READ8_MEMBER(b2m_localmachine_r);
 };
 
 /*----------- defined in machine/b2m.c -----------*/
@@ -53,10 +58,6 @@ extern DRIVER_INIT( b2m );
 extern MACHINE_START( b2m );
 extern MACHINE_RESET( b2m );
 extern INTERRUPT_GEN( b2m_vblank_interrupt );
-extern READ8_HANDLER( b2m_palette_r );
-extern WRITE8_HANDLER( b2m_palette_w );
-extern READ8_HANDLER( b2m_localmachine_r );
-extern WRITE8_HANDLER( b2m_localmachine_w );
 
 /*----------- defined in video/b2m.c -----------*/
 

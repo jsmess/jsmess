@@ -35,13 +35,12 @@ VIDEO_START( darius )
 
 /***************************************************************************/
 
-WRITE16_HANDLER( darius_fg_layer_w )
+WRITE16_MEMBER(darius_state::darius_fg_layer_w)
 {
-	darius_state *state = space->machine().driver_data<darius_state>();
 
-	COMBINE_DATA(&state->m_fg_ram[offset]);
+	COMBINE_DATA(&m_fg_ram[offset]);
 	if (offset < 0x4000)
-		state->m_fg_tilemap->mark_tile_dirty((offset & 0x1fff));
+		m_fg_tilemap->mark_tile_dirty((offset & 0x1fff));
 }
 
 /***************************************************************************/
@@ -54,7 +53,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT16 code, data, sx, sy;
 	UINT8 flipx, flipy, color, priority;
 
-	for (offs = state->m_spriteram_size / 2 - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
 	{
 		code = spriteram[offs + 2] & 0x1fff;
 

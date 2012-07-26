@@ -20,6 +20,7 @@
 
 PALETTE_INIT( gomoku )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	int bit0, bit1, bit2, r, g, b;
 
@@ -68,36 +69,31 @@ static TILE_GET_INFO( get_fg_tile_info )
 			TILE_FLIPYX(flipyx));
 }
 
-WRITE8_HANDLER( gomoku_videoram_w )
+WRITE8_MEMBER(gomoku_state::gomoku_videoram_w)
 {
-	gomoku_state *state = space->machine().driver_data<gomoku_state>();
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( gomoku_colorram_w )
+WRITE8_MEMBER(gomoku_state::gomoku_colorram_w)
 {
-	gomoku_state *state = space->machine().driver_data<gomoku_state>();
-	state->m_colorram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( gomoku_bgram_w )
+WRITE8_MEMBER(gomoku_state::gomoku_bgram_w)
 {
-	gomoku_state *state = space->machine().driver_data<gomoku_state>();
-	state->m_bgram[offset] = data;
+	m_bgram[offset] = data;
 }
 
-WRITE8_HANDLER( gomoku_flipscreen_w )
+WRITE8_MEMBER(gomoku_state::gomoku_flipscreen_w)
 {
-	gomoku_state *state = space->machine().driver_data<gomoku_state>();
-	state->m_flipscreen = (data & 0x02) ? 0 : 1;
+	m_flipscreen = (data & 0x02) ? 0 : 1;
 }
 
-WRITE8_HANDLER( gomoku_bg_dispsw_w )
+WRITE8_MEMBER(gomoku_state::gomoku_bg_dispsw_w)
 {
-	gomoku_state *state = space->machine().driver_data<gomoku_state>();
-	state->m_bg_dispsw = (data & 0x02) ? 0 : 1;
+	m_bg_dispsw = (data & 0x02) ? 0 : 1;
 }
 
 
@@ -110,9 +106,9 @@ WRITE8_HANDLER( gomoku_bg_dispsw_w )
 VIDEO_START( gomoku )
 {
 	gomoku_state *state = machine.driver_data<gomoku_state>();
-	UINT8 *GOMOKU_BG_X = machine.region( "user1" )->base();
-	UINT8 *GOMOKU_BG_Y = machine.region( "user2" )->base();
-	UINT8 *GOMOKU_BG_D = machine.region( "user3" )->base();
+	UINT8 *GOMOKU_BG_X = state->memregion( "user1" )->base();
+	UINT8 *GOMOKU_BG_Y = state->memregion( "user2" )->base();
+	UINT8 *GOMOKU_BG_D = state->memregion( "user3" )->base();
 	int x, y;
 	int bgdata;
 	int color;
@@ -153,9 +149,9 @@ VIDEO_START( gomoku )
 SCREEN_UPDATE_IND16( gomoku )
 {
 	gomoku_state *state = screen.machine().driver_data<gomoku_state>();
-	UINT8 *GOMOKU_BG_X = screen.machine().region( "user1" )->base();
-	UINT8 *GOMOKU_BG_Y = screen.machine().region( "user2" )->base();
-	UINT8 *GOMOKU_BG_D = screen.machine().region( "user3" )->base();
+	UINT8 *GOMOKU_BG_X = screen.machine().root_device().memregion( "user1" )->base();
+	UINT8 *GOMOKU_BG_Y = screen.machine().root_device().memregion( "user2" )->base();
+	UINT8 *GOMOKU_BG_D = state->memregion( "user3" )->base();
 	int x, y;
 	int bgram;
 	int bgoffs;

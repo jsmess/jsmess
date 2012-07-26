@@ -69,25 +69,22 @@ VIDEO_START( wc90b )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( wc90b_bgvideoram_w )
+WRITE8_MEMBER(wc90b_state::wc90b_bgvideoram_w)
 {
-	wc90b_state *state = space->machine().driver_data<wc90b_state>();
-	state->m_bgvideoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_HANDLER( wc90b_fgvideoram_w )
+WRITE8_MEMBER(wc90b_state::wc90b_fgvideoram_w)
 {
-	wc90b_state *state = space->machine().driver_data<wc90b_state>();
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_HANDLER( wc90b_txvideoram_w )
+WRITE8_MEMBER(wc90b_state::wc90b_txvideoram_w)
 {
-	wc90b_state *state = space->machine().driver_data<wc90b_state>();
-	state->m_txvideoram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_txvideoram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
 
@@ -105,7 +102,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	int offs, sx, sy;
 
 	/* draw all visible sprites of specified priority */
-	for ( offs = state->m_spriteram_size - 8 ; offs >= 0 ; offs -= 8 )
+	for ( offs = state->m_spriteram.bytes() - 8 ; offs >= 0 ; offs -= 8 )
 	{
 		if ( ( ~( spriteram[offs+3] >> 7 ) & 1 ) == priority )
 		{

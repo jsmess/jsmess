@@ -117,64 +117,64 @@ static READ8_HANDLER( mirrorcolorram_r )
 }
 
 
-static ADDRESS_MAP_START( decocass_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x5fff) AM_RAM_WRITE(ram_w) AM_BASE_MEMBER(decocass_state, m_rambase)
-	AM_RANGE(0x6000, 0xbfff) AM_RAM_WRITE(charram_w) AM_BASE_MEMBER(decocass_state, m_charram) /* still RMS3 RAM */
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(fgvideoram_w) AM_BASE_SIZE_MEMBER(decocass_state, m_fgvideoram, m_fgvideoram_size)  /* DSP3 RAM */
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE(fgcolorram_w) AM_BASE_SIZE_MEMBER(decocass_state, m_colorram, m_colorram_size)
-	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(mirrorvideoram_r, mirrorvideoram_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(mirrorcolorram_r, mirrorcolorram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(tileram_w) AM_BASE_SIZE_MEMBER(decocass_state, m_tileram, m_tileram_size)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(objectram_w) AM_BASE_SIZE_MEMBER(decocass_state, m_objectram, m_objectram_size)
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM_WRITE(decocass_paletteram_w) AM_BASE_MEMBER(decocass_state, m_paletteram)
-	AM_RANGE(0xe300, 0xe300) AM_READ_PORT("DSW1") AM_WRITE(decocass_watchdog_count_w)
-	AM_RANGE(0xe301, 0xe301) AM_READ_PORT("DSW2") AM_WRITE(decocass_watchdog_flip_w)
-	AM_RANGE(0xe302, 0xe302) AM_WRITE(decocass_color_missiles_w)
-	AM_RANGE(0xe400, 0xe400) AM_WRITE(decocass_reset_w)
+static ADDRESS_MAP_START( decocass_map, AS_PROGRAM, 8, decocass_state )
+	AM_RANGE(0x0000, 0x5fff) AM_RAM_WRITE_LEGACY(ram_w) AM_SHARE("rambase")
+	AM_RANGE(0x6000, 0xbfff) AM_RAM_WRITE_LEGACY(charram_w) AM_SHARE("charram") /* still RMS3 RAM */
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE_LEGACY(fgvideoram_w) AM_SHARE("fgvideoram")  /* DSP3 RAM */
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM_WRITE_LEGACY(fgcolorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xc800, 0xcbff) AM_READWRITE_LEGACY(mirrorvideoram_r, mirrorvideoram_w)
+	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE_LEGACY(mirrorcolorram_r, mirrorcolorram_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE_LEGACY(tileram_w) AM_SHARE("tileram")
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE_LEGACY(objectram_w) AM_SHARE("objectram")
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM_WRITE_LEGACY(decocass_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xe300, 0xe300) AM_READ_PORT("DSW1") AM_WRITE_LEGACY(decocass_watchdog_count_w)
+	AM_RANGE(0xe301, 0xe301) AM_READ_PORT("DSW2") AM_WRITE_LEGACY(decocass_watchdog_flip_w)
+	AM_RANGE(0xe302, 0xe302) AM_WRITE_LEGACY(decocass_color_missiles_w)
+	AM_RANGE(0xe400, 0xe400) AM_WRITE_LEGACY(decocass_reset_w)
 
 /* BIO-3 board */
-	AM_RANGE(0xe402, 0xe402) AM_WRITE(decocass_mode_set_w)
-	AM_RANGE(0xe403, 0xe403) AM_WRITE(decocass_back_h_shift_w)
-	AM_RANGE(0xe404, 0xe404) AM_WRITE(decocass_back_vl_shift_w)
-	AM_RANGE(0xe405, 0xe405) AM_WRITE(decocass_back_vr_shift_w)
-	AM_RANGE(0xe406, 0xe406) AM_WRITE(decocass_part_h_shift_w)
-	AM_RANGE(0xe407, 0xe407) AM_WRITE(decocass_part_v_shift_w)
+	AM_RANGE(0xe402, 0xe402) AM_WRITE_LEGACY(decocass_mode_set_w)
+	AM_RANGE(0xe403, 0xe403) AM_WRITE_LEGACY(decocass_back_h_shift_w)
+	AM_RANGE(0xe404, 0xe404) AM_WRITE_LEGACY(decocass_back_vl_shift_w)
+	AM_RANGE(0xe405, 0xe405) AM_WRITE_LEGACY(decocass_back_vr_shift_w)
+	AM_RANGE(0xe406, 0xe406) AM_WRITE_LEGACY(decocass_part_h_shift_w)
+	AM_RANGE(0xe407, 0xe407) AM_WRITE_LEGACY(decocass_part_v_shift_w)
 
-	AM_RANGE(0xe410, 0xe410) AM_WRITE(decocass_color_center_bot_w)
-	AM_RANGE(0xe411, 0xe411) AM_WRITE(decocass_center_h_shift_space_w)
-	AM_RANGE(0xe412, 0xe412) AM_WRITE(decocass_center_v_shift_w)
-	AM_RANGE(0xe413, 0xe413) AM_WRITE(decocass_coin_counter_w)
-	AM_RANGE(0xe414, 0xe414) AM_WRITE(decocass_sound_command_w)
-	AM_RANGE(0xe415, 0xe416) AM_WRITE(decocass_quadrature_decoder_reset_w)
-	AM_RANGE(0xe417, 0xe417) AM_WRITE(decocass_nmi_reset_w)
-	AM_RANGE(0xe420, 0xe42f) AM_WRITE(decocass_adc_w)
+	AM_RANGE(0xe410, 0xe410) AM_WRITE_LEGACY(decocass_color_center_bot_w)
+	AM_RANGE(0xe411, 0xe411) AM_WRITE_LEGACY(decocass_center_h_shift_space_w)
+	AM_RANGE(0xe412, 0xe412) AM_WRITE_LEGACY(decocass_center_v_shift_w)
+	AM_RANGE(0xe413, 0xe413) AM_WRITE_LEGACY(decocass_coin_counter_w)
+	AM_RANGE(0xe414, 0xe414) AM_WRITE_LEGACY(decocass_sound_command_w)
+	AM_RANGE(0xe415, 0xe416) AM_WRITE_LEGACY(decocass_quadrature_decoder_reset_w)
+	AM_RANGE(0xe417, 0xe417) AM_WRITE_LEGACY(decocass_nmi_reset_w)
+	AM_RANGE(0xe420, 0xe42f) AM_WRITE_LEGACY(decocass_adc_w)
 
-	AM_RANGE(0xe500, 0xe5ff) AM_READWRITE(decocass_e5xx_r, decocass_e5xx_w)	/* read data from 8041/status */
+	AM_RANGE(0xe500, 0xe5ff) AM_READWRITE_LEGACY(decocass_e5xx_r, decocass_e5xx_w)	/* read data from 8041/status */
 
-	AM_RANGE(0xe600, 0xe6ff) AM_READ(decocass_input_r)		/* inputs */
-	AM_RANGE(0xe700, 0xe700) AM_READ(decocass_sound_data_r)	/* read sound CPU data */
-	AM_RANGE(0xe701, 0xe701) AM_READ(decocass_sound_ack_r)	/* read sound CPU ack status */
+	AM_RANGE(0xe600, 0xe6ff) AM_READ_LEGACY(decocass_input_r)		/* inputs */
+	AM_RANGE(0xe700, 0xe700) AM_READ_LEGACY(decocass_sound_data_r)	/* read sound CPU data */
+	AM_RANGE(0xe701, 0xe701) AM_READ_LEGACY(decocass_sound_ack_r)	/* read sound CPU ack status */
 
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decocass_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( decocass_sound_map, AS_PROGRAM, 8, decocass_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_READWRITE(decocass_sound_nmi_enable_r, decocass_sound_nmi_enable_w)
-	AM_RANGE(0x1800, 0x1fff) AM_READWRITE(decocass_sound_data_ack_reset_r, decocass_sound_data_ack_reset_w)
-	AM_RANGE(0x2000, 0x2fff) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE("ay2", ay8910_data_w)
-	AM_RANGE(0x8000, 0x8fff) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0xa000, 0xafff) AM_READ(decocass_sound_command_r)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(decocass_sound_data_w)
+	AM_RANGE(0x1000, 0x17ff) AM_READWRITE_LEGACY(decocass_sound_nmi_enable_r, decocass_sound_nmi_enable_w)
+	AM_RANGE(0x1800, 0x1fff) AM_READWRITE_LEGACY(decocass_sound_data_ack_reset_r, decocass_sound_data_ack_reset_w)
+	AM_RANGE(0x2000, 0x2fff) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0x8000, 0x8fff) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0xa000, 0xafff) AM_READ_LEGACY(decocass_sound_command_r)
+	AM_RANGE(0xc000, 0xcfff) AM_WRITE_LEGACY(decocass_sound_data_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( decocass_mcu_portmap, AS_IO, 8 )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(i8041_p1_r, i8041_p1_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(i8041_p2_r, i8041_p2_w)
+static ADDRESS_MAP_START( decocass_mcu_portmap, AS_IO, 8, decocass_state )
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE_LEGACY(i8041_p1_r, i8041_p1_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE_LEGACY(i8041_p2_r, i8041_p2_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( decocass )
@@ -239,7 +239,7 @@ static INPUT_PORTS_START( decocass )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )						PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
 
 	PORT_START("DSW2") /* Start with all Unknown as each can change per game, except for Country Code */
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:1")		/* Most Dipswitch Settings sheets show this as "Number of Players" (Lives) */
@@ -1451,7 +1451,7 @@ static DRIVER_INIT( decocass )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	int A;
 
 	/* allocate memory and mark all RAM regions with their decrypted pointers */
@@ -1475,8 +1475,8 @@ static DRIVER_INIT( decocass )
 static DRIVER_INIT( decocrom )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
-	int romlength = machine.region("user3")->bytes();
-	UINT8 *rom = machine.region("user3")->base();
+	int romlength = state->memregion("user3")->bytes();
+	UINT8 *rom = state->memregion("user3")->base();
 	int i;
 
 	state->m_decrypted2 = auto_alloc_array(machine, UINT8, romlength);
@@ -1491,11 +1491,11 @@ static DRIVER_INIT( decocrom )
 	/* convert charram to a banked ROM */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x6000, 0xafff, "bank1");
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x6000, 0xafff, FUNC(decocass_de0091_w));
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_charram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user3")->base(), 0);
-	memory_configure_bank_decrypted(machine, "bank1", 0, 1, &state->m_decrypted[0x6000], 0);
-	memory_configure_bank_decrypted(machine, "bank1", 1, 1, state->m_decrypted2, 0);
-	memory_set_bank(machine, "bank1", 0);
+	state->membank("bank1")->configure_entry(0, state->m_charram);
+	state->membank("bank1")->configure_entry(1, state->memregion("user3")->base());
+	state->membank("bank1")->configure_decrypted_entry(0, &state->m_decrypted[0x6000]);
+	state->membank("bank1")->configure_decrypted_entry(1, state->m_decrypted2);
+	state->membank("bank1")->set_entry(0);
 
 	/* install the bank selector */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe900, 0xe900, FUNC(decocass_e900_w));

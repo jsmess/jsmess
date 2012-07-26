@@ -53,10 +53,9 @@ Memo:
  *
  *************************************/
 
-static READ8_HANDLER( fromance_commanddata_r )
+READ8_MEMBER(fromance_state::fromance_commanddata_r)
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
-	return state->m_commanddata;
+	return m_commanddata;
 }
 
 
@@ -68,42 +67,39 @@ static TIMER_CALLBACK( deferred_commanddata_w )
 }
 
 
-static WRITE8_HANDLER( fromance_commanddata_w )
+WRITE8_MEMBER(fromance_state::fromance_commanddata_w)
 {
 	/* do this on a timer to let the slave CPU synchronize */
-	space->machine().scheduler().synchronize(FUNC(deferred_commanddata_w), data);
+	machine().scheduler().synchronize(FUNC(deferred_commanddata_w), data);
 }
 
 
-static READ8_HANDLER( fromance_busycheck_main_r )
+READ8_MEMBER(fromance_state::fromance_busycheck_main_r)
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
 
 	/* set a timer to force synchronization after the read */
-	space->machine().scheduler().synchronize();
+	machine().scheduler().synchronize();
 
-	if (!state->m_directionflag)
+	if (!m_directionflag)
 		return 0x00;		// standby
 	else
 		return 0xff;		// busy
 }
 
 
-static READ8_HANDLER( fromance_busycheck_sub_r )
+READ8_MEMBER(fromance_state::fromance_busycheck_sub_r)
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
 
-	if (state->m_directionflag)
+	if (m_directionflag)
 		return 0xff;		// standby
 	else
 		return 0x00;		// busy
 }
 
 
-static WRITE8_HANDLER( fromance_busycheck_sub_w )
+WRITE8_MEMBER(fromance_state::fromance_busycheck_sub_w)
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
-	state->m_directionflag = 0;
+	m_directionflag = 0;
 }
 
 
@@ -114,9 +110,9 @@ static WRITE8_HANDLER( fromance_busycheck_sub_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( fromance_rombank_w )
+WRITE8_MEMBER(fromance_state::fromance_rombank_w)
 {
-	memory_set_bank(space->machine(), "bank1", data);
+	membank("bank1")->set_entry(data);
 }
 
 
@@ -137,11 +133,10 @@ static WRITE8_DEVICE_HANDLER( fromance_adpcm_reset_w )
 }
 
 
-static WRITE8_HANDLER( fromance_adpcm_w )
+WRITE8_MEMBER(fromance_state::fromance_adpcm_w)
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
-	state->m_adpcm_data = data;
-	state->m_vclk_left = 2;
+	m_adpcm_data = data;
+	m_vclk_left = 2;
 }
 
 
@@ -174,28 +169,26 @@ static void fromance_adpcm_int( device_t *device )
  *
  *************************************/
 
-static WRITE8_HANDLER( fromance_portselect_w )
+WRITE8_MEMBER(fromance_state::fromance_portselect_w)
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
-	state->m_portselect = data;
+	m_portselect = data;
 }
 
 
-static READ8_HANDLER( fromance_keymatrix_r )
+READ8_MEMBER(fromance_state::fromance_keymatrix_r)
 {
-	fromance_state *state = space->machine().driver_data<fromance_state>();
 	int ret = 0xff;
 
-	if (state->m_portselect & 0x01)
-		ret &= input_port_read(space->machine(), "KEY1");
-	if (state->m_portselect & 0x02)
-		ret &= input_port_read(space->machine(), "KEY2");
-	if (state->m_portselect & 0x04)
-		ret &= input_port_read(space->machine(), "KEY3");
-	if (state->m_portselect & 0x08)
-		ret &= input_port_read(space->machine(), "KEY4");
-	if (state->m_portselect & 0x10)
-		ret &= input_port_read(space->machine(), "KEY5");
+	if (m_portselect & 0x01)
+		ret &= ioport("KEY1")->read();
+	if (m_portselect & 0x02)
+		ret &= ioport("KEY2")->read();
+	if (m_portselect & 0x04)
+		ret &= ioport("KEY3")->read();
+	if (m_portselect & 0x08)
+		ret &= ioport("KEY4")->read();
+	if (m_portselect & 0x10)
+		ret &= ioport("KEY5")->read();
 
 	return ret;
 }
@@ -208,7 +201,7 @@ static READ8_HANDLER( fromance_keymatrix_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( fromance_coinctr_w )
+WRITE8_MEMBER(fromance_state::fromance_coinctr_w)
 {
 	//
 }
@@ -221,7 +214,7 @@ static WRITE8_HANDLER( fromance_coinctr_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( nekkyoku_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nekkyoku_main_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("SERVICE") AM_WRITE(fromance_portselect_w)
@@ -232,7 +225,7 @@ static ADDRESS_MAP_START( nekkyoku_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf005, 0xf005) AM_READ_PORT("DSW1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromance_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( fromance_main_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0x9e89, 0x9e89) AM_READNOP			// unknown (idolmj)
@@ -252,7 +245,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( nekkyoku_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nekkyoku_sub_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xefff) AM_READWRITE(fromance_videoram_r, fromance_videoram_w)
@@ -260,7 +253,7 @@ static ADDRESS_MAP_START( nekkyoku_sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_READWRITE(fromance_paletteram_r, fromance_paletteram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromance_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( fromance_sub_map, AS_PROGRAM, 8, fromance_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -276,46 +269,46 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( nekkyoku_sub_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( nekkyoku_sub_io_map, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
 	AM_RANGE(0x12, 0x12) AM_READNOP				// unknown
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(fromance_rombank_w)
-	AM_RANGE(0xe1, 0xe1) AM_READWRITE(fromance_busycheck_sub_r, fromance_gfxreg_w)
+	AM_RANGE(0xe1, 0xe1) AM_READ(fromance_busycheck_sub_r) AM_WRITE(fromance_gfxreg_w)
 	AM_RANGE(0xe2, 0xe5) AM_WRITE(fromance_scroll_w)
 	AM_RANGE(0xe6, 0xe6) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
-	AM_RANGE(0xe7, 0xe7) AM_DEVWRITE("msm", fromance_adpcm_reset_w)
+	AM_RANGE(0xe7, 0xe7) AM_DEVWRITE_LEGACY("msm", fromance_adpcm_reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0xe9, 0xea) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0xe9, 0xea) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( idolmj_sub_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( idolmj_sub_io_map, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
 	AM_RANGE(0x12, 0x12) AM_READNOP				// unknown
 	AM_RANGE(0x20, 0x20) AM_WRITE(fromance_rombank_w)
-	AM_RANGE(0x21, 0x21) AM_READWRITE(fromance_busycheck_sub_r, fromance_gfxreg_w)
+	AM_RANGE(0x21, 0x21) AM_READ(fromance_busycheck_sub_r) AM_WRITE(fromance_gfxreg_w)
 	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
 	AM_RANGE(0x26, 0x26) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
-	AM_RANGE(0x27, 0x27) AM_DEVWRITE("msm", fromance_adpcm_reset_w)
+	AM_RANGE(0x27, 0x27) AM_DEVWRITE_LEGACY("msm", fromance_adpcm_reset_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0x29, 0x2a) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x29, 0x2a) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromance_sub_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( fromance_sub_io_map, AS_IO, 8, fromance_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
 	AM_RANGE(0x12, 0x12) AM_READNOP				// unknown
 	AM_RANGE(0x20, 0x20) AM_WRITE(fromance_rombank_w)
-	AM_RANGE(0x21, 0x21) AM_READWRITE(fromance_busycheck_sub_r, fromance_gfxreg_w)
+	AM_RANGE(0x21, 0x21) AM_READ(fromance_busycheck_sub_r) AM_WRITE(fromance_gfxreg_w)
 	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
 	AM_RANGE(0x26, 0x26) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
-	AM_RANGE(0x27, 0x27) AM_DEVWRITE("msm", fromance_adpcm_reset_w)
+	AM_RANGE(0x27, 0x27) AM_DEVWRITE_LEGACY("msm", fromance_adpcm_reset_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0x2a, 0x2b) AM_DEVWRITE("ymsnd", ym2413_w)
+	AM_RANGE(0x2a, 0x2b) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
 ADDRESS_MAP_END
 
 
@@ -961,9 +954,9 @@ static const msm5205_interface msm5205_config =
 static MACHINE_START( fromance )
 {
 	fromance_state *state = machine.driver_data<fromance_state>();
-	UINT8 *ROM = machine.region("sub")->base();
+	UINT8 *ROM = state->memregion("sub")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 0x100, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 0x100, &ROM[0x10000], 0x4000);
 
 	state->m_subcpu = machine.device("sub");
 

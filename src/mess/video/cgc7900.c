@@ -18,9 +18,9 @@
 #define OVERLAY_FB					BIT(cell, 8)	/* turns on Blue in background if SET */
 #define OVERLAY_DATA				(cell & 0xff)	/* ASCII or Plot Dot character */
 
-#define IMAGE_SELECT				BIT(m_roll_overlay, 13)
-#define OVERLAY_CURSOR_BLINK		BIT(m_roll_overlay, 12)
-#define OVERLAY_CHARACTER_BLINK		BIT(m_roll_overlay, 11)
+#define IMAGE_SELECT				BIT(m_roll_overlay[0], 13)
+#define OVERLAY_CURSOR_BLINK		BIT(m_roll_overlay[0], 12)
+#define OVERLAY_CHARACTER_BLINK		BIT(m_roll_overlay[0], 11)
 
 /***************************************************************************
     READ/WRITE HANDLERS
@@ -191,7 +191,7 @@ static PALETTE_INIT( cgc7900 )
 void cgc7900_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = machine().region("gfx1")->base();
+	m_char_rom = memregion("gfx1")->base();
 }
 
 /*-------------------------------------------------

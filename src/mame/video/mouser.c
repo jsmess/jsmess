@@ -18,6 +18,7 @@
 
 PALETTE_INIT( mouser )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -44,14 +45,14 @@ PALETTE_INIT( mouser )
 	}
 }
 
-WRITE8_HANDLER( mouser_flip_screen_x_w )
+WRITE8_MEMBER(mouser_state::mouser_flip_screen_x_w)
 {
-	flip_screen_x_set(space->machine(), ~data & 1);
+	flip_screen_x_set(~data & 1);
 }
 
-WRITE8_HANDLER( mouser_flip_screen_y_w )
+WRITE8_MEMBER(mouser_state::mouser_flip_screen_y_w)
 {
-	flip_screen_y_set(space->machine(), ~data & 1);
+	flip_screen_y_set(~data & 1);
 }
 
 SCREEN_UPDATE_IND16( mouser )
@@ -71,12 +72,12 @@ SCREEN_UPDATE_IND16( mouser )
 		sx = offs % 32;
 		sy = offs / 32;
 
-		if (flip_screen_x_get(screen.machine()))
+		if (state->flip_screen_x())
 		{
 			sx = 31 - sx;
 		}
 
-		if (flip_screen_y_get(screen.machine()))
+		if (state->flip_screen_y())
 		{
 			sy = 31 - sy;
 		}
@@ -93,7 +94,7 @@ SCREEN_UPDATE_IND16( mouser )
 		drawgfx_opaque(bitmap,cliprect,screen.machine().gfx[0],
 				state->m_videoram[offs] | (state->m_colorram[color_offs] >> 5) * 256 | ((state->m_colorram[color_offs] >> 4) & 1) * 512,
 				state->m_colorram[color_offs]%16,
-				flip_screen_x_get(screen.machine()),flip_screen_y_get(screen.machine()),
+				state->flip_screen_x(),state->flip_screen_y(),
 				8*sx,scrolled_y_position);
 	}
 
@@ -108,13 +109,13 @@ SCREEN_UPDATE_IND16( mouser )
 		flipx = BIT(spriteram[offs], 6);
 		flipy = BIT(spriteram[offs], 7);
 
-		if (flip_screen_x_get(screen.machine()))
+		if (state->flip_screen_x())
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y_get(screen.machine()))
+		if (state->flip_screen_y())
 		{
 			flipy = !flipy;
 			sy = 238 - sy;
@@ -137,13 +138,13 @@ SCREEN_UPDATE_IND16( mouser )
 		flipx = BIT(spriteram[offs], 6);
 		flipy = BIT(spriteram[offs], 7);
 
-		if (flip_screen_x_get(screen.machine()))
+		if (state->flip_screen_x())
 		{
 			flipx = !flipx;
 			sx = 240 - sx;
 		}
 
-		if (flip_screen_y_get(screen.machine()))
+		if (state->flip_screen_y())
 		{
 			flipy = !flipy;
 			sy = 238 - sy;

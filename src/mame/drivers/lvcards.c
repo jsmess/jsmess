@@ -96,92 +96,89 @@ static MACHINE_RESET( lvpoker )
 	state->m_result = 0;
 }
 
-static WRITE8_HANDLER(control_port_2_w)
+WRITE8_MEMBER(lvcards_state::control_port_2_w)
 {
-	lvcards_state *state = space->machine().driver_data<lvcards_state>();
 	switch (data)
 	{
 		case 0x60:
-		state->m_payout = 1;
+		m_payout = 1;
 		break;
 		case 0xc0:
-		state->m_payout = 1;
+		m_payout = 1;
 		break;
 		default:
-		state->m_payout = 0;
+		m_payout = 0;
 		break;
 	}
 }
 
-static WRITE8_HANDLER(control_port_2a_w)
+WRITE8_MEMBER(lvcards_state::control_port_2a_w)
 {
-	lvcards_state *state = space->machine().driver_data<lvcards_state>();
 	switch (data)
 	{
 		case 0x60:
-		state->m_payout = 1;
+		m_payout = 1;
 		break;
 		case 0x80:
-		state->m_payout = 1;
+		m_payout = 1;
 		break;
 		default:
-		state->m_payout = 0;
+		m_payout = 0;
 		break;
 	}
 }
 
-static READ8_HANDLER( payout_r )
+READ8_MEMBER(lvcards_state::payout_r)
 {
-	lvcards_state *state = space->machine().driver_data<lvcards_state>();
-	state->m_result = input_port_read(space->machine(), "IN2");
+	m_result = ioport("IN2")->read();
 
-	if (state->m_payout)
+	if (m_payout)
 	{
-    	if ( state->m_pulse < 3 )
+    	if ( m_pulse < 3 )
 		{
-			state->m_result = state->m_result | 0x40;
-	        state->m_pulse++;
+			m_result = m_result | 0x40;
+	        m_pulse++;
         }
        else
     	{
-        	state->m_pulse = 0;
+        	m_pulse = 0;
         }
    }
-   return state->m_result;
+   return m_result;
 }
 
-static ADDRESS_MAP_START( ponttehk_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ponttehk_map, AS_PROGRAM, 8, lvcards_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(lvcards_videoram_w) AM_BASE_MEMBER(lvcards_state, m_videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(lvcards_colorram_w) AM_BASE_MEMBER(lvcards_state, m_colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(lvcards_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(lvcards_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1") AM_WRITENOP // lamps
 	AM_RANGE(0xa002, 0xa002) AM_READ(payout_r) AM_WRITE(control_port_2a_w)//AM_WRITENOP // ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lvcards_map, AS_PROGRAM, 8  )
+static ADDRESS_MAP_START( lvcards_map, AS_PROGRAM, 8, lvcards_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(lvcards_videoram_w) AM_BASE_MEMBER(lvcards_state, m_videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(lvcards_colorram_w) AM_BASE_MEMBER(lvcards_state, m_colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(lvcards_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(lvcards_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1") AM_WRITENOP
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2") AM_WRITENOP
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lvcards_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( lvcards_io_map, AS_IO, 8, lvcards_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lvpoker_map, AS_PROGRAM, 8  )
+static ADDRESS_MAP_START( lvpoker_map, AS_PROGRAM, 8, lvcards_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(lvcards_videoram_w) AM_BASE_MEMBER(lvcards_state, m_videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(lvcards_colorram_w) AM_BASE_MEMBER(lvcards_state, m_colorram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(lvcards_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(lvcards_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1") AM_WRITENOP // lamps
 	AM_RANGE(0xa002, 0xa002) AM_READ(payout_r) AM_WRITE(control_port_2_w)

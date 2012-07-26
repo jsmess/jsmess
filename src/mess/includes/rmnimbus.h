@@ -196,6 +196,30 @@ public:
 	UINT16 m_pixel_mask;
 	UINT8 m_hs_count;
 	UINT32 m_debug_video;
+	DECLARE_READ16_MEMBER(nimbus_i186_internal_port_r);
+	DECLARE_WRITE16_MEMBER(nimbus_i186_internal_port_w);
+	DECLARE_READ8_MEMBER(nimbus_mcu_r);
+	DECLARE_WRITE8_MEMBER(nimbus_mcu_w);
+	DECLARE_READ16_MEMBER(nimbus_io_r);
+	DECLARE_WRITE16_MEMBER(nimbus_io_w);
+	DECLARE_READ8_MEMBER(nimbus_disk_r);
+	DECLARE_WRITE8_MEMBER(nimbus_disk_w);
+	DECLARE_READ8_MEMBER(nimbus_pc8031_r);
+	DECLARE_WRITE8_MEMBER(nimbus_pc8031_w);
+	DECLARE_READ8_MEMBER(nimbus_pc8031_iou_r);
+	DECLARE_WRITE8_MEMBER(nimbus_pc8031_iou_w);
+	DECLARE_READ8_MEMBER(nimbus_pc8031_port_r);
+	DECLARE_WRITE8_MEMBER(nimbus_pc8031_port_w);
+	DECLARE_READ8_MEMBER(nimbus_iou_r);
+	DECLARE_WRITE8_MEMBER(nimbus_iou_w);
+	DECLARE_READ8_MEMBER(nimbus_sound_ay8910_r);
+	DECLARE_WRITE8_MEMBER(nimbus_sound_ay8910_w);
+	DECLARE_WRITE8_MEMBER(nimbus_sound_ay8910_porta_w);
+	DECLARE_WRITE8_MEMBER(nimbus_sound_ay8910_portb_w);
+	DECLARE_READ8_MEMBER(nimbus_mouse_js_r);
+	DECLARE_WRITE8_MEMBER(nimbus_mouse_js_w);
+	DECLARE_READ16_MEMBER(nimbus_video_io_r);
+	DECLARE_WRITE16_MEMBER(nimbus_video_io_w);
 };
 
 
@@ -211,8 +235,6 @@ MACHINE_RESET(nimbus);
 MACHINE_START(nimbus);
 
 /* 80186 Internal */
-READ16_HANDLER (nimbus_i186_internal_port_r);
-WRITE16_HANDLER (nimbus_i186_internal_port_w);
 
 /* external int priority masks */
 
@@ -246,8 +268,6 @@ WRITE16_HANDLER (nimbus_i186_internal_port_w);
 #define BYTE_WORD               0x0001
 
 /* Nimbus specific */
-READ16_HANDLER (nimbus_io_r);
-WRITE16_HANDLER (nimbus_io_w);
 
 /* External int vectors for chained interupts */
 #define EXTERNAL_INT_DISK       0x80
@@ -275,8 +295,6 @@ WRITE16_HANDLER (nimbus_io_w);
 #define HIBLOCK_BASE_MASK   0x08
 #define HIBLOCK_SELECT_MASK 0x10
 
-READ8_HANDLER( nimbus_mcu_r );
-WRITE8_HANDLER( nimbus_mcu_w );
 
 
 /* Z80 SIO for keyboard */
@@ -292,8 +310,6 @@ extern const z80sio_interface nimbus_sio_intf;
 
 extern const wd17xx_interface nimbus_wd17xx_interface;
 
-READ8_HANDLER( nimbus_disk_r );
-WRITE8_HANDLER( nimbus_disk_w );
 
 #define NO_DRIVE_SELECTED   0xFF
 
@@ -362,14 +378,8 @@ void nimbus_scsi_linechange(device_t *device, UINT8 line, UINT8 state);
 #define IPC_IN_BYTE_AVAIL   0X02
 #define IPC_IN_READ_PEND    0X04
 
-READ8_HANDLER( nimbus_pc8031_r );
-WRITE8_HANDLER( nimbus_pc8031_w );
 
-READ8_HANDLER( nimbus_pc8031_iou_r );
-WRITE8_HANDLER( nimbus_pc8031_iou_w );
 
-READ8_HANDLER( nimbus_pc8031_port_r );
-WRITE8_HANDLER( nimbus_pc8031_port_w );
 
 #define ER59256_TAG             "er59256"
 
@@ -380,19 +390,13 @@ WRITE8_HANDLER( nimbus_pc8031_port_w );
 #define MOUSE_INT_ENABLE        0x08
 #define PC8031_INT_ENABLE       0x10
 
-READ8_HANDLER( nimbus_iou_r );
-WRITE8_HANDLER( nimbus_iou_w );
 
 /* Sound hardware */
 
 #define AY8910_TAG              "ay8910"
 #define MONO_TAG                "mono"
 
-READ8_HANDLER( nimbus_sound_ay8910_r );
-WRITE8_HANDLER( nimbus_sound_ay8910_w );
 
-WRITE8_HANDLER( nimbus_sound_ay8910_porta_w );
-WRITE8_HANDLER( nimbus_sound_ay8910_portb_w );
 
 
 #define MSM5205_TAG             "msm5205"
@@ -413,8 +417,6 @@ enum
 	MOUSE_PHASE_NEGATIVE
 };
 
-READ8_HANDLER( nimbus_mouse_js_r );
-WRITE8_HANDLER( nimbus_mouse_js_w );
 
 #define MOUSE_INT_ENABLED(state)     (((state)->m_iou_reg092 & MOUSE_INT_ENABLE) ? 1 : 0)
 
@@ -432,8 +434,6 @@ WRITE_LINE_DEVICE_HANDLER(nimbus_ack_w);
 
 /*----------- defined in video/rmnimbus.c -----------*/
 
-READ16_HANDLER (nimbus_video_io_r);
-WRITE16_HANDLER (nimbus_video_io_w);
 
 VIDEO_START( nimbus );
 SCREEN_VBLANK( nimbus );

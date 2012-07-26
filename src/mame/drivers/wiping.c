@@ -40,42 +40,40 @@ dip: 6.7 7.7
 
 
 /* input ports are rotated 90 degrees */
-static READ8_HANDLER( ports_r )
+READ8_MEMBER(wiping_state::ports_r)
 {
 	int i,res;
 	static const char *const portnames[] = { "P1", "P2", "IN2", "IN3", "IN4", "IN5", "SYSTEM", "DSW" };
 
 	res = 0;
 	for (i = 0; i < 8; i++)
-		res |= ((input_port_read(space->machine(), portnames[i]) >> offset) & 1) << i;
+		res |= ((ioport(portnames[i])->read() >> offset) & 1) << i;
 
 	return res;
 }
 
-static WRITE8_HANDLER( subcpu_reset_w )
+WRITE8_MEMBER(wiping_state::subcpu_reset_w)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( main_irq_mask_w )
+WRITE8_MEMBER(wiping_state::main_irq_mask_w)
 {
-	wiping_state *state = space->machine().driver_data<wiping_state>();
 
-	state->m_main_irq_mask = data & 1;
+	m_main_irq_mask = data & 1;
 }
 
-static WRITE8_HANDLER( sound_irq_mask_w )
+WRITE8_MEMBER(wiping_state::sound_irq_mask_w)
 {
-	wiping_state *state = space->machine().driver_data<wiping_state>();
 
-	state->m_sound_irq_mask = data & 1;
+	m_sound_irq_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wiping_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_BASE_MEMBER(wiping_state, m_videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_BASE_MEMBER(wiping_state, m_colorram)
-	AM_RANGE(0x8800, 0x88ff) AM_BASE_SIZE_MEMBER(wiping_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8000, 0x83ff) AM_SHARE("videoram")
+	AM_RANGE(0x8400, 0x87ff) AM_SHARE("colorram")
+	AM_RANGE(0x8800, 0x88ff) AM_SHARE("spriteram")
 	AM_RANGE(0x8000, 0x8bff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share2")
@@ -87,9 +85,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wiping_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_DEVWRITE("wiping", wiping_sound_w)
+	AM_RANGE(0x4000, 0x7fff) AM_DEVWRITE_LEGACY("wiping", wiping_sound_w)
 	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(sound_irq_mask_w)

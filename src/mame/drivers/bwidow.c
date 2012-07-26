@@ -231,6 +231,10 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	int m_lastdata;
+	DECLARE_READ8_MEMBER(spacduel_IN3_r);
+	DECLARE_WRITE8_MEMBER(bwidow_misc_w);
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
 };
 
 
@@ -263,16 +267,16 @@ Typically, only the high 2 bits are read.
 
 */
 
-static READ8_HANDLER( spacduel_IN3_r )
+READ8_MEMBER(bwidow_state::spacduel_IN3_r)
 {
 	int res;
 	int res1;
 	int res2;
 	int res3;
 
-	res1 = input_port_read(space->machine(), "IN3");
-	res2 = input_port_read(space->machine(), "IN4");
-	res3 = input_port_read_safe(space->machine(), "DSW2", 0);
+	res1 = ioport("IN3")->read();
+	res2 = ioport("IN4")->read();
+	res3 = ioport("DSW2")->read_safe(0);
 	res = 0x00;
 
 	switch (offset & 0x07)
@@ -314,9 +318,9 @@ static READ8_HANDLER( spacduel_IN3_r )
 	return res;
 }
 
-static CUSTOM_INPUT( clock_r )
+CUSTOM_INPUT_MEMBER(bwidow_state::clock_r)
 {
-	return (field.machine().device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
+	return (machine().device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
 }
 
 
@@ -326,9 +330,8 @@ static CUSTOM_INPUT( clock_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( bwidow_misc_w )
+WRITE8_MEMBER(bwidow_state::bwidow_misc_w)
 {
-	bwidow_state *state = space->machine().driver_data<bwidow_state>();
 	/*
         0x10 = p1 led
         0x20 = p2 led
@@ -336,12 +339,12 @@ static WRITE8_HANDLER( bwidow_misc_w )
         0x02 = coin counter 2
     */
 
-	if (data == state->m_lastdata) return;
-	set_led_status(space->machine(), 0,~data & 0x10);
-	set_led_status(space->machine(), 1,~data & 0x20);
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
-	state->m_lastdata = data;
+	if (data == m_lastdata) return;
+	set_led_status(machine(), 0,~data & 0x10);
+	set_led_status(machine(), 1,~data & 0x20);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
+	m_lastdata = data;
 }
 
 /*************************************
@@ -350,9 +353,9 @@ static WRITE8_HANDLER( bwidow_misc_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( irq_ack_w )
+WRITE8_MEMBER(bwidow_state::irq_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -362,43 +365,43 @@ static WRITE8_HANDLER( irq_ack_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( bwidow_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bwidow_map, AS_PROGRAM, 8, bwidow_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x2000)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE_LEGACY(&avgdvg_vectorram) AM_SIZE_LEGACY(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x2800, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x67ff) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
-	AM_RANGE(0x6800, 0x6fff) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVREAD_MODERN("earom", atari_vg_earom_device, read)
+	AM_RANGE(0x6000, 0x67ff) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x6800, 0x6fff) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("earom", atari_vg_earom_device, read)
 	AM_RANGE(0x7800, 0x7800) AM_READ_PORT("IN0")
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN3")
 	AM_RANGE(0x8800, 0x8800) AM_READ_PORT("IN4")
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(bwidow_misc_w) /* coin counters, leds */
-	AM_RANGE(0x8840, 0x8840) AM_WRITE(avgdvg_go_w)
-	AM_RANGE(0x8880, 0x8880) AM_WRITE(avgdvg_reset_w)
+	AM_RANGE(0x8840, 0x8840) AM_WRITE_LEGACY(avgdvg_go_w)
+	AM_RANGE(0x8880, 0x8880) AM_WRITE_LEGACY(avgdvg_reset_w)
 	AM_RANGE(0x88c0, 0x88c0) AM_WRITE(irq_ack_w) /* interrupt acknowledge */
-	AM_RANGE(0x8900, 0x8900) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, ctrl_w)
-	AM_RANGE(0x8940, 0x897f) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, write)
+	AM_RANGE(0x8900, 0x8900) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
+	AM_RANGE(0x8940, 0x897f) AM_DEVWRITE("earom", atari_vg_earom_device, write)
 	AM_RANGE(0x8980, 0x89ed) AM_WRITENOP /* watchdog clear */
 	AM_RANGE(0x9000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spacduel_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spacduel_map, AS_PROGRAM, 8, bwidow_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
 	AM_RANGE(0x0900, 0x0907) AM_READ(spacduel_IN3_r)	/* IN1 */
 	AM_RANGE(0x0905, 0x0906) AM_WRITENOP /* ignore? */
-	AM_RANGE(0x0a00, 0x0a00) AM_DEVREAD_MODERN("earom", atari_vg_earom_device, read)
-//  AM_RANGE(0x0c00, 0x0c00) AM_WRITE(coin_counter_w) /* coin out */
-	AM_RANGE(0x0c80, 0x0c80) AM_WRITE(avgdvg_go_w)
+	AM_RANGE(0x0a00, 0x0a00) AM_DEVREAD("earom", atari_vg_earom_device, read)
+//  AM_RANGE(0x0c00, 0x0c00) AM_WRITE_LEGACY(coin_counter_w) /* coin out */
+	AM_RANGE(0x0c80, 0x0c80) AM_WRITE_LEGACY(avgdvg_go_w)
 	AM_RANGE(0x0d00, 0x0d00) AM_WRITENOP /* watchdog clear */
-	AM_RANGE(0x0d80, 0x0d80) AM_WRITE(avgdvg_reset_w)
+	AM_RANGE(0x0d80, 0x0d80) AM_WRITE_LEGACY(avgdvg_reset_w)
 	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(irq_ack_w) /* interrupt acknowledge */
-	AM_RANGE(0x0e80, 0x0e80) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, ctrl_w)
-	AM_RANGE(0x0f00, 0x0f3f) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, write)
-	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
-	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x2000)
+	AM_RANGE(0x0e80, 0x0e80) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
+	AM_RANGE(0x0f00, 0x0f3f) AM_DEVWRITE("earom", atari_vg_earom_device, write)
+	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE_LEGACY(&avgdvg_vectorram) AM_SIZE_LEGACY(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x2800, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -422,7 +425,7 @@ static INPUT_PORTS_START( bwidow )
 	/* per default (busy vector processor). */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
 	/* bit 7 is tied to a 3kHz clock */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bwidow_state,clock_r, NULL)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME(0x03, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("D4:!7,!8")
@@ -501,7 +504,7 @@ static INPUT_PORTS_START( gravitar )
 	/* per default (busy vector processor). */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
 	/* bit 7 is tied to a 3kHz clock */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bwidow_state,clock_r, NULL)
 
 	PORT_START("DSW0")
 	PORT_DIPUNUSED_DIPLOC( 0x03, IP_ACTIVE_HIGH, "D4:!7,!8" )
@@ -575,7 +578,7 @@ static INPUT_PORTS_START( lunarbat )
 	/* per default (busy vector processor). */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
 	/* bit 7 is tied to a 3kHz clock */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bwidow_state,clock_r, NULL)
 
 	PORT_START("DSW0")	/* DSW0 - Not read */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -609,7 +612,7 @@ static INPUT_PORTS_START( spacduel )
 	/* per default (busy vector processor). */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
 	/* bit 7 is tied to a 3kHz clock */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bwidow_state,clock_r, NULL)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME(0x03, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("D4:!7,!8")

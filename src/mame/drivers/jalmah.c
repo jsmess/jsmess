@@ -118,7 +118,13 @@ class jalmah_state : public driver_device
 {
 public:
 	jalmah_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_sc0_vram(*this, "sc0_vram"),
+		m_sc1_vram(*this, "sc1_vram"),
+		m_sc2_vram(*this, "sc2_vram"),
+		m_sc3_vram(*this, "sc3_vram"),
+		m_jm_shared_ram(*this, "jshared_ram"),
+		m_jm_mcu_code(*this, "jmcu_code"){ }
 
 	tilemap_t *m_sc0_tilemap_0;
 	tilemap_t *m_sc0_tilemap_1;
@@ -135,10 +141,10 @@ public:
 	tilemap_t *m_sc3_tilemap_0;
 	tilemap_t *m_sc3_tilemap_2;
 	tilemap_t *m_sc3_tilemap_3;
-	UINT16 *m_sc0_vram;
-	UINT16 *m_sc1_vram;
-	UINT16 *m_sc2_vram;
-	UINT16 *m_sc3_vram;
+	required_shared_ptr<UINT16> m_sc0_vram;
+	optional_shared_ptr<UINT16> m_sc1_vram;
+	optional_shared_ptr<UINT16> m_sc2_vram;
+	required_shared_ptr<UINT16> m_sc3_vram;
 	UINT16 *m_jm_scrollram;
 	UINT16 *m_jm_vregs;
 	UINT16 m_sc0bank;
@@ -147,8 +153,8 @@ public:
 	UINT8 m_sc1_prin;
 	UINT8 m_sc2_prin;
 	UINT8 m_sc3_prin;
-	UINT16 *m_jm_shared_ram;
-	UINT16 *m_jm_mcu_code;
+	required_shared_ptr<UINT16> m_jm_shared_ram;
+	required_shared_ptr<UINT16> m_jm_mcu_code;
 	UINT8 m_mcu_prg;
 	int m_respcount;
 	UINT8 m_test_mode;
@@ -157,6 +163,28 @@ public:
 	UINT8 m_oki_rom;
 	UINT8 m_oki_bank;
 	UINT8 m_oki_za;
+	DECLARE_WRITE16_MEMBER(sc0_vram_w);
+	DECLARE_WRITE16_MEMBER(sc3_vram_w);
+	DECLARE_WRITE16_MEMBER(sc1_vram_w);
+	DECLARE_WRITE16_MEMBER(sc2_vram_w);
+	DECLARE_WRITE16_MEMBER(jalmah_tilebank_w);
+	DECLARE_WRITE16_MEMBER(jalmah_scroll_w);
+	DECLARE_WRITE16_MEMBER(urashima_bank_w);
+	DECLARE_WRITE16_MEMBER(urashima_sc0_vram_w);
+	DECLARE_WRITE16_MEMBER(urashima_sc3_vram_w);
+	DECLARE_WRITE16_MEMBER(urashima_vregs_w);
+	DECLARE_WRITE16_MEMBER(urashima_dma_w);
+	DECLARE_WRITE16_MEMBER(jalmah_okirom_w);
+	DECLARE_WRITE16_MEMBER(jalmah_okibank_w);
+	DECLARE_WRITE16_MEMBER(jalmah_flip_screen_w);
+	DECLARE_READ16_MEMBER(urashima_mcu_r);
+	DECLARE_WRITE16_MEMBER(urashima_mcu_w);
+	DECLARE_READ16_MEMBER(daireika_mcu_r);
+	DECLARE_WRITE16_MEMBER(daireika_mcu_w);
+	DECLARE_READ16_MEMBER(mjzoomin_mcu_r);
+	DECLARE_WRITE16_MEMBER(mjzoomin_mcu_w);
+	DECLARE_READ16_MEMBER(kakumei_mcu_r);
+	DECLARE_READ16_MEMBER(suchipi_mcu_r);
 };
 
 
@@ -325,7 +353,7 @@ priority = 8, then 4, 2 and finally 1).
 static void jalmah_priority_system(running_machine &machine)
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	UINT8 *pri_rom = machine.region("user1")->base();
+	UINT8 *pri_rom = state->memregion("user1")->base();
 	UINT8 i;
 	UINT8 prinum[0x10];
 
@@ -472,63 +500,58 @@ static SCREEN_UPDATE_IND16( urashima )
 	return 0;
 }
 
-static WRITE16_HANDLER( sc0_vram_w )
+WRITE16_MEMBER(jalmah_state::sc0_vram_w)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
-	COMBINE_DATA(&state->m_sc0_vram[offset]);
+	COMBINE_DATA(&m_sc0_vram[offset]);
 	/*2048x256 tilemap*/
-	state->m_sc0_tilemap_0->mark_tile_dirty(offset);
+	m_sc0_tilemap_0->mark_tile_dirty(offset);
 	/*1024x512 tilemap*/
-	state->m_sc0_tilemap_1->mark_tile_dirty(offset);
+	m_sc0_tilemap_1->mark_tile_dirty(offset);
 	/*512x1024 tilemap*/
-	state->m_sc0_tilemap_2->mark_tile_dirty(offset);
+	m_sc0_tilemap_2->mark_tile_dirty(offset);
 	/*256x2048 tilemap*/
-	state->m_sc0_tilemap_3->mark_tile_dirty(offset);
+	m_sc0_tilemap_3->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( sc3_vram_w )
+WRITE16_MEMBER(jalmah_state::sc3_vram_w)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
-	COMBINE_DATA(&state->m_sc3_vram[offset]);
+	COMBINE_DATA(&m_sc3_vram[offset]);
 	/*2048x256 tilemap*/
-	state->m_sc3_tilemap_0->mark_tile_dirty(offset);
+	m_sc3_tilemap_0->mark_tile_dirty(offset);
 	/*1024x512 tilemap*/
-	state->m_sc3_tilemap_2->mark_tile_dirty(offset);
+	m_sc3_tilemap_2->mark_tile_dirty(offset);
 	/*512x1024 tilemap*/
-	state->m_sc3_tilemap_3->mark_tile_dirty(offset);
+	m_sc3_tilemap_3->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( sc1_vram_w )
+WRITE16_MEMBER(jalmah_state::sc1_vram_w)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
-	COMBINE_DATA(&state->m_sc1_vram[offset]);
+	COMBINE_DATA(&m_sc1_vram[offset]);
 	/*2048x256 tilemap*/
-	state->m_sc1_tilemap_0->mark_tile_dirty(offset);
+	m_sc1_tilemap_0->mark_tile_dirty(offset);
 	/*1024x512 tilemap*/
-	state->m_sc1_tilemap_1->mark_tile_dirty(offset);
+	m_sc1_tilemap_1->mark_tile_dirty(offset);
 	/*512x1024 tilemap*/
-	state->m_sc1_tilemap_2->mark_tile_dirty(offset);
+	m_sc1_tilemap_2->mark_tile_dirty(offset);
 	/*256x2048 tilemap*/
-	state->m_sc1_tilemap_3->mark_tile_dirty(offset);
+	m_sc1_tilemap_3->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( sc2_vram_w )
+WRITE16_MEMBER(jalmah_state::sc2_vram_w)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
-	COMBINE_DATA(&state->m_sc2_vram[offset]);
+	COMBINE_DATA(&m_sc2_vram[offset]);
 	/*2048x256 tilemap*/
-	state->m_sc2_tilemap_0->mark_tile_dirty(offset);
+	m_sc2_tilemap_0->mark_tile_dirty(offset);
 	/*1024x512 tilemap*/
-	state->m_sc2_tilemap_1->mark_tile_dirty(offset);
+	m_sc2_tilemap_1->mark_tile_dirty(offset);
 	/*512x1024 tilemap*/
-	state->m_sc2_tilemap_2->mark_tile_dirty(offset);
+	m_sc2_tilemap_2->mark_tile_dirty(offset);
 	/*256x2048 tilemap*/
-	state->m_sc2_tilemap_3->mark_tile_dirty(offset);
+	m_sc2_tilemap_3->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( jalmah_tilebank_w )
+WRITE16_MEMBER(jalmah_state::jalmah_tilebank_w)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
 	/*
      xxxx ---- fg bank (used by suchipi)
      ---- xxxx Priority number (trusted,see mjzoomin)
@@ -536,24 +559,23 @@ static WRITE16_HANDLER( jalmah_tilebank_w )
 	//popmessage("Write to tilebank %02x",data);
 	if (ACCESSING_BITS_0_7)
 	{
-		if (state->m_sc0bank != ((data & 0xf0) >> 4))
+		if (m_sc0bank != ((data & 0xf0) >> 4))
 		{
-			state->m_sc0bank = (data & 0xf0) >> 4;
-			state->m_sc0_tilemap_0->mark_all_dirty();
-			state->m_sc0_tilemap_1->mark_all_dirty();
-			state->m_sc0_tilemap_2->mark_all_dirty();
-			state->m_sc0_tilemap_3->mark_all_dirty();
+			m_sc0bank = (data & 0xf0) >> 4;
+			m_sc0_tilemap_0->mark_all_dirty();
+			m_sc0_tilemap_1->mark_all_dirty();
+			m_sc0_tilemap_2->mark_all_dirty();
+			m_sc0_tilemap_3->mark_all_dirty();
 		}
-		if (state->m_pri != (data & 0x0f))
-			state->m_pri = data & 0x0f;
+		if (m_pri != (data & 0x0f))
+			m_pri = data & 0x0f;
 	}
 }
 
-static WRITE16_HANDLER( jalmah_scroll_w )
+WRITE16_MEMBER(jalmah_state::jalmah_scroll_w)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
-	UINT16 *jm_scrollram = state->m_jm_scrollram;
-	UINT16 *jm_vregs = state->m_jm_vregs;
+	UINT16 *jm_scrollram = m_jm_scrollram;
+	UINT16 *jm_vregs = m_jm_vregs;
 	//logerror("[%04x]<-%04x\n",(offset+0x10)*2,data);
 	switch(offset+(0x10))
 	{
@@ -579,41 +601,37 @@ static WRITE16_HANDLER( jalmah_scroll_w )
 	}
 }
 
-static WRITE16_HANDLER( urashima_bank_w )
+WRITE16_MEMBER(jalmah_state::urashima_bank_w)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		if (state->m_sc0bank != (data & 0x0f))
+		if (m_sc0bank != (data & 0x0f))
 		{
-			state->m_sc0bank = (data & 0x0f);
-			state->m_sc0_tilemap_0->mark_all_dirty();
-			//state->m_sc0_tilemap_2->mark_all_dirty();
-			//state->m_sc0_tilemap_3->mark_all_dirty();
+			m_sc0bank = (data & 0x0f);
+			m_sc0_tilemap_0->mark_all_dirty();
+			//m_sc0_tilemap_2->mark_all_dirty();
+			//m_sc0_tilemap_3->mark_all_dirty();
 		}
 	}
 }
 
-static WRITE16_HANDLER( urashima_sc0_vram_w )
+WRITE16_MEMBER(jalmah_state::urashima_sc0_vram_w)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
-	COMBINE_DATA(&state->m_sc0_vram[offset]);
-	state->m_sc0_tilemap_0->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_sc0_vram[offset]);
+	m_sc0_tilemap_0->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( urashima_sc3_vram_w )
+WRITE16_MEMBER(jalmah_state::urashima_sc3_vram_w)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
-	COMBINE_DATA(&state->m_sc3_vram[offset]);
-	state->m_sc3_tilemap_0->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_sc3_vram[offset]);
+	m_sc3_tilemap_0->mark_tile_dirty(offset);
 }
 
 /*Urashima Mahjong uses a bigger (and mostly unused/wasted) video register ram.*/
-static WRITE16_HANDLER( urashima_vregs_w )
+WRITE16_MEMBER(jalmah_state::urashima_vregs_w)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
-	UINT16 *jm_scrollram = state->m_jm_scrollram;
-	UINT16 *jm_vregs = state->m_jm_vregs;
+	UINT16 *jm_scrollram = m_jm_scrollram;
+	UINT16 *jm_vregs = m_jm_vregs;
 	//logerror("[%04x]<-%04x\n",(offset)*2,data);
 	switch(offset)
 	{
@@ -680,18 +698,18 @@ xxxx ---- MCU program revision
 
 
 #define MCU_READ(tag, _bit_, _offset_, _retval_) \
-if((0xffff - input_port_read(machine, tag)) & _bit_) { jm_shared_ram[_offset_] = _retval_; }
+if((0xffff - machine.root_device().ioport(tag)->read()) & _bit_) { jm_shared_ram[_offset_] = _retval_; }
 
 /*Funky "DMA" / protection thing*/
 /*---- -x-- "DMA" execute.*/
 /*---- ---x used too very often,I don't have any clue of what it is,it might just be the source or the destination address.*/
-static WRITE16_HANDLER( urashima_dma_w )
+WRITE16_MEMBER(jalmah_state::urashima_dma_w)
 {
 	if(data & 4)
 	{
 		UINT32 i;
 		for(i = 0; i < 0x200; i += 2)
-			space->write_word(0x88200 + i, space->read_word(0x88400 + i));
+			space.write_word(0x88200 + i, space.read_word(0x88400 + i));
 	}
 }
 
@@ -731,12 +749,12 @@ static void daireika_mcu_run(running_machine &machine)
 
 	if(state->m_test_mode)	//service_mode
 	{
-		jm_shared_ram[0x000/2] = input_port_read(machine, "KEY0");
-		jm_shared_ram[0x002/2] = input_port_read(machine, "KEY1");
-		jm_shared_ram[0x004/2] = input_port_read(machine, "KEY2");
-		jm_shared_ram[0x006/2] = input_port_read(machine, "KEY3");
-		jm_shared_ram[0x008/2] = input_port_read(machine, "KEY4");
-		jm_shared_ram[0x00a/2] = input_port_read(machine, "KEY5");
+		jm_shared_ram[0x000/2] = machine.root_device().ioport("KEY0")->read();
+		jm_shared_ram[0x002/2] = machine.root_device().ioport("KEY1")->read();
+		jm_shared_ram[0x004/2] = machine.root_device().ioport("KEY2")->read();
+		jm_shared_ram[0x006/2] = machine.root_device().ioport("KEY3")->read();
+		jm_shared_ram[0x008/2] = machine.root_device().ioport("KEY4")->read();
+		jm_shared_ram[0x00a/2] = machine.root_device().ioport("KEY5")->read();
 	}
 	else
 	{
@@ -775,12 +793,12 @@ static void mjzoomin_mcu_run(running_machine &machine)
 
 	if(state->m_test_mode)	//service_mode
 	{
-		jm_shared_ram[0x000/2] = input_port_read(machine, "KEY0");
-		jm_shared_ram[0x002/2] = input_port_read(machine, "KEY1");
-		jm_shared_ram[0x004/2] = input_port_read(machine, "KEY2");
-		jm_shared_ram[0x006/2] = input_port_read(machine, "KEY3");
-		jm_shared_ram[0x008/2] = input_port_read(machine, "KEY4");
-		jm_shared_ram[0x00a/2] = input_port_read(machine, "KEY5");
+		jm_shared_ram[0x000/2] = state->ioport("KEY0")->read();
+		jm_shared_ram[0x002/2] = state->ioport("KEY1")->read();
+		jm_shared_ram[0x004/2] = state->ioport("KEY2")->read();
+		jm_shared_ram[0x006/2] = state->ioport("KEY3")->read();
+		jm_shared_ram[0x008/2] = state->ioport("KEY4")->read();
+		jm_shared_ram[0x00a/2] = state->ioport("KEY5")->read();
 	}
 	else
 	{
@@ -820,12 +838,12 @@ static void urashima_mcu_run(running_machine &machine)
 
 	if(state->m_test_mode)	//service_mode
 	{
-		jm_shared_ram[0x300/2] = input_port_read(machine, "KEY0");
-		jm_shared_ram[0x302/2] = input_port_read(machine, "KEY1");
-		jm_shared_ram[0x304/2] = input_port_read(machine, "KEY2");
-		jm_shared_ram[0x306/2] = input_port_read(machine, "KEY3");
-		jm_shared_ram[0x308/2] = input_port_read(machine, "KEY4");
-		jm_shared_ram[0x30a/2] = input_port_read(machine, "KEY5");
+		jm_shared_ram[0x300/2] = state->ioport("KEY0")->read();
+		jm_shared_ram[0x302/2] = state->ioport("KEY1")->read();
+		jm_shared_ram[0x304/2] = state->ioport("KEY2")->read();
+		jm_shared_ram[0x306/2] = state->ioport("KEY3")->read();
+		jm_shared_ram[0x308/2] = state->ioport("KEY4")->read();
+		jm_shared_ram[0x30a/2] = state->ioport("KEY5")->read();
 	}
 	else
 	{
@@ -864,9 +882,9 @@ static void second_mcu_run(running_machine &machine)
 	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
 	if(state->m_test_mode)	//service_mode
 	{
-		jm_shared_ram[0x200/2] = input_port_read(machine, "KEY0");
-		jm_shared_ram[0x202/2] = input_port_read(machine, "KEY1");
-		jm_shared_ram[0x204/2] = input_port_read(machine, "KEY2");
+		jm_shared_ram[0x200/2] = state->ioport("KEY0")->read();
+		jm_shared_ram[0x202/2] = state->ioport("KEY1")->read();
+		jm_shared_ram[0x204/2] = state->ioport("KEY2")->read();
 	}
 	else
 	{
@@ -928,48 +946,46 @@ Basic driver start
 ******************************************************************************************/
 
 
-static WRITE16_HANDLER( jalmah_okirom_w )
+WRITE16_MEMBER(jalmah_state::jalmah_okirom_w)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
 	if(ACCESSING_BITS_0_7)
 	{
-		UINT8 *oki = space->machine().region("oki")->base();
+		UINT8 *oki = memregion("oki")->base();
 
-		state->m_oki_rom = data & 1;
+		m_oki_rom = data & 1;
 
 		/* ZA appears to be related to the banking, or maybe kakumei2 uses PAL shuffling and this is for something else? */
-		state->m_oki_za = (data & 2) ? 1 : 0;
+		m_oki_za = (data & 2) ? 1 : 0;
 
-		memcpy(&oki[0x20000], &oki[(state->m_oki_rom * 0x80000) + ((state->m_oki_bank+state->m_oki_za) * 0x20000) + 0x40000], 0x20000);
+		memcpy(&oki[0x20000], &oki[(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000], 0x20000);
 	}
 
-	//popmessage("PC=%06x %02x %02x %02x %08x",cpu_get_pc(&space->device()),state->m_oki_rom,state->m_oki_za,state->m_oki_bank,(state->m_oki_rom * 0x80000) + ((state->m_oki_bank+state->m_oki_za) * 0x20000) + 0x40000);
+	//popmessage("PC=%06x %02x %02x %02x %08x",cpu_get_pc(&space.device()),m_oki_rom,m_oki_za,m_oki_bank,(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000);
 }
 
-static WRITE16_HANDLER( jalmah_okibank_w )
+WRITE16_MEMBER(jalmah_state::jalmah_okibank_w)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
 	if(ACCESSING_BITS_0_7)
 	{
-		UINT8 *oki = space->machine().region("oki")->base();
+		UINT8 *oki = memregion("oki")->base();
 
-		state->m_oki_bank = data & 3;
+		m_oki_bank = data & 3;
 
-		memcpy(&oki[0x20000], &oki[(state->m_oki_rom * 0x80000) + ((state->m_oki_bank+state->m_oki_za) * 0x20000) + 0x40000], 0x20000);
+		memcpy(&oki[0x20000], &oki[(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000], 0x20000);
 	}
 
-	//popmessage("PC=%06x %02x %02x %02x %08x",cpu_get_pc(&space->device()),state->m_oki_rom,state->m_oki_za,state->m_oki_bank,(state->m_oki_rom * 0x80000) + ((state->m_oki_bank+state->m_oki_za) * 0x20000) + 0x40000);
+	//popmessage("PC=%06x %02x %02x %02x %08x",cpu_get_pc(&space.device()),m_oki_rom,m_oki_za,m_oki_bank,(m_oki_rom * 0x80000) + ((m_oki_bank+m_oki_za) * 0x20000) + 0x40000);
 }
 
-static WRITE16_HANDLER( jalmah_flip_screen_w )
+WRITE16_MEMBER(jalmah_state::jalmah_flip_screen_w)
 {
 	/*---- ----x flip screen*/
-	flip_screen_set(space->machine(), data & 1);
+	flip_screen_set(data & 1);
 
 //  popmessage("%04x",data);
 }
 
-static ADDRESS_MAP_START( jalmah, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( jalmah, AS_PROGRAM, 16, jalmah_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("DSW")
@@ -981,19 +997,19 @@ static ADDRESS_MAP_START( jalmah, AS_PROGRAM, 16 )
 	AM_RANGE(0x080018, 0x080019) AM_WRITE(jalmah_okibank_w)
 	AM_RANGE(0x08001a, 0x08001b) AM_WRITE(jalmah_okirom_w)
 /**/AM_RANGE(0x080020, 0x08003f) AM_RAM_WRITE(jalmah_scroll_w)
-	AM_RANGE(0x080040, 0x080041) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x080040, 0x080041) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	//       0x084000, 0x084001  ?
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram) /* Palette RAM */
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(sc0_vram_w) AM_BASE_MEMBER(jalmah_state, m_sc0_vram)
-	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(sc1_vram_w) AM_BASE_MEMBER(jalmah_state, m_sc1_vram)
-	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(sc2_vram_w) AM_BASE_MEMBER(jalmah_state, m_sc2_vram)
-	AM_RANGE(0x09c000, 0x09ffff) AM_RAM_WRITE(sc3_vram_w) AM_BASE_MEMBER(jalmah_state, m_sc3_vram)
-	AM_RANGE(0x0f0000, 0x0f0fff) AM_RAM AM_BASE_MEMBER(jalmah_state, m_jm_shared_ram)/*shared with MCU*/
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram") /* Palette RAM */
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(sc0_vram_w) AM_SHARE("sc0_vram")
+	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(sc1_vram_w) AM_SHARE("sc1_vram")
+	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(sc2_vram_w) AM_SHARE("sc2_vram")
+	AM_RANGE(0x09c000, 0x09ffff) AM_RAM_WRITE(sc3_vram_w) AM_SHARE("sc3_vram")
+	AM_RANGE(0x0f0000, 0x0f0fff) AM_RAM AM_SHARE("jshared_ram")/*shared with MCU*/
 	AM_RANGE(0x0f1000, 0x0fffff) AM_RAM /*Work Ram*/
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE_MEMBER(jalmah_state, m_jm_mcu_code)/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("jmcu_code")/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( urashima, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( urashima, AS_PROGRAM, 16, jalmah_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("DSW")
@@ -1005,21 +1021,21 @@ static ADDRESS_MAP_START( urashima, AS_PROGRAM, 16 )
 	AM_RANGE(0x080018, 0x080019) AM_WRITE(jalmah_okibank_w)
 	AM_RANGE(0x08001a, 0x08001b) AM_WRITE(jalmah_okirom_w)
 /**/AM_RANGE(0x08001c, 0x08001d) AM_RAM_WRITE(urashima_bank_w)
-	AM_RANGE(0x080040, 0x080041) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x080040, 0x080041) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	//       0x084000, 0x084001  ?
-	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE_GENERIC(paletteram) /* Palette RAM */
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(urashima_sc0_vram_w) AM_BASE_MEMBER(jalmah_state, m_sc0_vram)
+	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBRGBx_word_w) AM_SHARE("paletteram") /* Palette RAM */
+	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(urashima_sc0_vram_w) AM_SHARE("sc0_vram")
 	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(urashima_sc0_vram_w)
 	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(urashima_sc0_vram_w)
-//  AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(urashima_sc1_vram_w) AM_BASE_MEMBER(jalmah_state, m_sc1_vram)/*unused*/
-//  AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(urashima_sc2_vram_w) AM_BASE_MEMBER(jalmah_state, m_sc2_vram)/*unused*/
+//  AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE_LEGACY(urashima_sc1_vram_w) AM_SHARE("sc1_vram")/*unused*/
+//  AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE_LEGACY(urashima_sc2_vram_w) AM_SHARE("sc2_vram")/*unused*/
 	/*$9c000-$9cfff Video Registers*/
 /**/AM_RANGE(0x09c000, 0x09dfff) AM_WRITE(urashima_vregs_w)
-/**///AM_RANGE(0x09c480, 0x09c49f) AM_RAM_WRITE(urashima_sc2vregs_w)
-	AM_RANGE(0x09e000, 0x0a1fff) AM_RAM_WRITE(urashima_sc3_vram_w) AM_BASE_MEMBER(jalmah_state, m_sc3_vram)
-	AM_RANGE(0x0f0000, 0x0f0fff) AM_RAM AM_BASE_MEMBER(jalmah_state, m_jm_shared_ram)/*shared with MCU*/
+/**///AM_RANGE(0x09c480, 0x09c49f) AM_RAM_WRITE_LEGACY(urashima_sc2vregs_w)
+	AM_RANGE(0x09e000, 0x0a1fff) AM_RAM_WRITE(urashima_sc3_vram_w) AM_SHARE("sc3_vram")
+	AM_RANGE(0x0f0000, 0x0f0fff) AM_RAM AM_SHARE("jshared_ram")/*shared with MCU*/
 	AM_RANGE(0x0f1000, 0x0fffff) AM_RAM /*Work Ram*/
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE_MEMBER(jalmah_state, m_jm_mcu_code)/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("jmcu_code")/*extra RAM for MCU code prg (NOT ON REAL HW!!!)*/
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( common )
@@ -1362,15 +1378,15 @@ static MACHINE_RESET ( jalmah )
 	{
 		case MJZOOMIN_MCU:
 		case DAIREIKA_MCU:
-			state->m_test_mode = (~(input_port_read(machine, "SYSTEM")) & 0x0008) ? (1) : (0);
+			state->m_test_mode = (~(state->ioport("SYSTEM")->read()) & 0x0008) ? (1) : (0);
 			break;
 		case URASHIMA_MCU:
-			state->m_test_mode = ((~(input_port_read(machine, "SYSTEM")) & 0x0008) || (~(input_port_read(machine, "DSW")) & 0x8000)) ? (1) : (0);
+			state->m_test_mode = ((~(state->ioport("SYSTEM")->read()) & 0x0008) || (~(state->ioport("DSW")->read()) & 0x8000)) ? (1) : (0);
 			break;
 		case KAKUMEI_MCU:
 		case KAKUMEI2_MCU:
 		case SUCHIPI_MCU:
-			state->m_test_mode = (~(input_port_read(machine, "DSW")) & 0x0004) ? (1) : (0);
+			state->m_test_mode = (~(state->ioport("DSW")->read()) & 0x0004) ? (1) : (0);
 			break;
 	}
 }
@@ -1716,9 +1732,8 @@ MCU code snippets
 
 ******************************************************************************************/
 
-static READ16_HANDLER( urashima_mcu_r )
+READ16_MEMBER(jalmah_state::urashima_mcu_r)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
 	static const int resp[] = {	0x99, 0xd8, 0x00,
 							0x2a, 0x6a, 0x00,
 							0x9c, 0xd8, 0x00,
@@ -1731,10 +1746,10 @@ static READ16_HANDLER( urashima_mcu_r )
 							0x21, 0x61, 0x00 };
 	int res;
 
-	res = resp[state->m_respcount++];
-	if (state->m_respcount >= sizeof(resp)/sizeof(resp[0])) state->m_respcount = 0;
+	res = resp[m_respcount++];
+	if (m_respcount >= sizeof(resp)/sizeof(resp[0])) m_respcount = 0;
 
-//  logerror("%04x: mcu_r %02x\n",cpu_get_pc(&space->device()),res);
+//  logerror("%04x: mcu_r %02x\n",cpu_get_pc(&space.device()),res);
 
 	return res;
 }
@@ -1742,11 +1757,10 @@ static READ16_HANDLER( urashima_mcu_r )
 /*
 data value is REQ under mjzoomin video test menu.It is related to the MCU?
 */
-static WRITE16_HANDLER( urashima_mcu_w )
+WRITE16_MEMBER(jalmah_state::urashima_mcu_w)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
-	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
-	UINT16 *jm_mcu_code = state->m_jm_mcu_code;
+	UINT16 *jm_shared_ram = m_jm_shared_ram;
+	UINT16 *jm_mcu_code = m_jm_mcu_code;
 	if(ACCESSING_BITS_0_7 && data)
 	{
 		/*******************************************************
@@ -1936,9 +1950,8 @@ static WRITE16_HANDLER( urashima_mcu_w )
 	}
 }
 
-static READ16_HANDLER( daireika_mcu_r )
+READ16_MEMBER(jalmah_state::daireika_mcu_r)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
 	static const int resp[] = {	0x99, 0xd8, 0x00,
 							0x2a, 0x6a, 0x00,
 							0x9c, 0xd8, 0x00,
@@ -1951,10 +1964,10 @@ static READ16_HANDLER( daireika_mcu_r )
 							0x21, 0x61, 0x00 };
 	int res;
 
-	res = resp[state->m_respcount++];
-	if (state->m_respcount >= sizeof(resp)/sizeof(resp[0])) state->m_respcount = 0;
+	res = resp[m_respcount++];
+	if (m_respcount >= sizeof(resp)/sizeof(resp[0])) m_respcount = 0;
 
-//  logerror("%04x: mcu_r %02x\n",cpu_get_pc(&space->device()),res);
+//  logerror("%04x: mcu_r %02x\n",cpu_get_pc(&space.device()),res);
 
 	return res;
 }
@@ -1965,11 +1978,10 @@ data value is REQ under mjzoomin video test menu.It is related to the MCU?
 static const UINT16 dai_mcu_code[0x11] = { 0x33c5, 0x0010, 0x07fe, 0x3a39,0x000f,0x000c,0xda86,0x0245,
 									       0x003f, 0x33c5, 0x000f, 0x000c,0x3a39,0x0010,0x07fe,0x4e75    };
 
-static WRITE16_HANDLER( daireika_mcu_w )
+WRITE16_MEMBER(jalmah_state::daireika_mcu_w)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
-	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
-	UINT16 *jm_mcu_code = state->m_jm_mcu_code;
+	UINT16 *jm_shared_ram = m_jm_shared_ram;
+	UINT16 *jm_mcu_code = m_jm_mcu_code;
 	UINT16 i;
 
 	if(ACCESSING_BITS_0_7 && data)
@@ -2113,11 +2125,11 @@ static WRITE16_HANDLER( daireika_mcu_w )
 		jm_shared_ram[0x0128/2] = 0x0010;
 		jm_shared_ram[0x012a/2] = 0x8980;
 
-		//state->m_pri $f0590
+		//m_pri $f0590
 		jm_mcu_code[0x8980/2] = 0x33fc;
 		jm_mcu_code[0x8982/2] = 0x0006;
 		jm_mcu_code[0x8984/2] = 0x000f;
-		jm_mcu_code[0x8986/2] = 0x0590; //move.w #$6,$f0590 (state->m_pri n)
+		jm_mcu_code[0x8986/2] = 0x0590; //move.w #$6,$f0590 (m_pri n)
 		jm_mcu_code[0x8988/2] = 0x4df9;
 		jm_mcu_code[0x898a/2] = 0x0009;
 		jm_mcu_code[0x898c/2] = 0xc000; //lea.w #9c000,A6
@@ -2218,9 +2230,8 @@ static WRITE16_HANDLER( daireika_mcu_w )
 	}
 }
 
-static READ16_HANDLER( mjzoomin_mcu_r )
+READ16_MEMBER(jalmah_state::mjzoomin_mcu_r)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
 	static const int resp[] = {	0x9c, 0xd8, 0x00,
 							0x2a, 0x6a, 0x00,
 							0x99, 0xd8, 0x00,
@@ -2232,10 +2243,10 @@ static READ16_HANDLER( mjzoomin_mcu_r )
 							0x21, 0x61, 0x00 };
 	int res;
 
-	res = resp[state->m_respcount++];
-	if (state->m_respcount >= sizeof(resp)/sizeof(resp[0])) state->m_respcount = 0;
+	res = resp[m_respcount++];
+	if (m_respcount >= sizeof(resp)/sizeof(resp[0])) m_respcount = 0;
 
-//  logerror("%04x: mcu_r %02x\n",cpu_get_pc(&space->device()),res);
+//  logerror("%04x: mcu_r %02x\n",cpu_get_pc(&space.device()),res);
 
 	return res;
 }
@@ -2243,11 +2254,10 @@ static READ16_HANDLER( mjzoomin_mcu_r )
 /*
 data value is REQ under mjzoomin video test menu.It is related to the MCU?
 */
-static WRITE16_HANDLER( mjzoomin_mcu_w )
+WRITE16_MEMBER(jalmah_state::mjzoomin_mcu_w)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
-	UINT16 *jm_shared_ram = state->m_jm_shared_ram;
-	UINT16 *jm_mcu_code = state->m_jm_mcu_code;
+	UINT16 *jm_shared_ram = m_jm_shared_ram;
+	UINT16 *jm_mcu_code = m_jm_mcu_code;
 	if(ACCESSING_BITS_0_7 && data)
 	{
 		/******************************************************
@@ -2357,9 +2367,8 @@ static WRITE16_HANDLER( mjzoomin_mcu_w )
 	}
 }
 
-static READ16_HANDLER( kakumei_mcu_r )
+READ16_MEMBER(jalmah_state::kakumei_mcu_r)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
 	static const int resp[] = {	0x8a, 0xd8, 0x00,
 							0x3c, 0x7c, 0x00,
 							0x99, 0xd8, 0x00,
@@ -2371,17 +2380,16 @@ static READ16_HANDLER( kakumei_mcu_r )
 							0x3e, 0x7e, 0x00 };
 	int res;
 
-	res = resp[state->m_respcount++];
-	if (state->m_respcount >= sizeof(resp)/sizeof(resp[0])) state->m_respcount = 0;
+	res = resp[m_respcount++];
+	if (m_respcount >= sizeof(resp)/sizeof(resp[0])) m_respcount = 0;
 
-//  popmessage("%04x: mcu_r %02x",cpu_get_pc(&space->device()),res);
+//  popmessage("%04x: mcu_r %02x",cpu_get_pc(&space.device()),res);
 
 	return res;
 }
 
-static READ16_HANDLER( suchipi_mcu_r )
+READ16_MEMBER(jalmah_state::suchipi_mcu_r)
 {
-	jalmah_state *state = space->machine().driver_data<jalmah_state>();
 	static const int resp[] = {	0x8a, 0xd8, 0x00,
 							0x3c, 0x7c, 0x00,
 							0x99, 0xd8, 0x00,
@@ -2393,10 +2401,10 @@ static READ16_HANDLER( suchipi_mcu_r )
 							0x3e, 0x7e, 0x00 };
 	int res;
 
-	res = resp[state->m_respcount++];
-	if (state->m_respcount >= sizeof(resp)/sizeof(resp[0])) state->m_respcount = 0;
+	res = resp[m_respcount++];
+	if (m_respcount >= sizeof(resp)/sizeof(resp[0])) m_respcount = 0;
 
-//  popmessage("%04x: mcu_r %02x",cpu_get_pc(&space->device()),res);
+//  popmessage("%04x: mcu_r %02x",cpu_get_pc(&space.device()),res);
 
 	return res;
 }
@@ -2404,8 +2412,8 @@ static READ16_HANDLER( suchipi_mcu_r )
 static DRIVER_INIT( urashima )
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80004, 0x80005, FUNC(urashima_mcu_r) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x80012, 0x80013, FUNC(urashima_mcu_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::urashima_mcu_r), state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::urashima_mcu_w), state));
 
 	state->m_mcu_prg = 0x12;
 }
@@ -2413,8 +2421,8 @@ static DRIVER_INIT( urashima )
 static DRIVER_INIT( daireika )
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80004, 0x80005, FUNC(daireika_mcu_r) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x80012, 0x80013, FUNC(daireika_mcu_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::daireika_mcu_r), state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::daireika_mcu_w), state));
 
 	state->m_mcu_prg = 0x11;
 }
@@ -2422,8 +2430,8 @@ static DRIVER_INIT( daireika )
 static DRIVER_INIT( mjzoomin )
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80004, 0x80005, FUNC(mjzoomin_mcu_r) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x80012, 0x80013, FUNC(mjzoomin_mcu_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::mjzoomin_mcu_r), state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x80012, 0x80013, write16_delegate(FUNC(jalmah_state::mjzoomin_mcu_w), state));
 
 	state->m_mcu_prg = 0x13;
 }
@@ -2431,15 +2439,14 @@ static DRIVER_INIT( mjzoomin )
 static DRIVER_INIT( kakumei )
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80004, 0x80005, FUNC(kakumei_mcu_r) );
-
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::kakumei_mcu_r), state));
 	state->m_mcu_prg = 0x21;
 }
 
 static DRIVER_INIT( kakumei2 )
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80004, 0x80005, FUNC(kakumei_mcu_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::kakumei_mcu_r), state));
 
 	state->m_mcu_prg = 0x22;
 }
@@ -2447,7 +2454,7 @@ static DRIVER_INIT( kakumei2 )
 static DRIVER_INIT( suchipi )
 {
 	jalmah_state *state = machine.driver_data<jalmah_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x80004, 0x80005, FUNC(suchipi_mcu_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x80004, 0x80005, read16_delegate(FUNC(jalmah_state::suchipi_mcu_r), state));
 
 	state->m_mcu_prg = 0x23;
 }

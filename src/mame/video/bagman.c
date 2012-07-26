@@ -11,18 +11,16 @@
 #include "includes/bagman.h"
 
 
-WRITE8_HANDLER( bagman_videoram_w )
+WRITE8_MEMBER(bagman_state::bagman_videoram_w)
 {
-	bagman_state *state = space->machine().driver_data<bagman_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( bagman_colorram_w )
+WRITE8_MEMBER(bagman_state::bagman_colorram_w)
 {
-	bagman_state *state = space->machine().driver_data<bagman_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 /***************************************************************************
@@ -46,6 +44,7 @@ WRITE8_HANDLER( bagman_colorram_w )
 ***************************************************************************/
 PALETTE_INIT( bagman )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
@@ -81,13 +80,12 @@ PALETTE_INIT( bagman )
 	}
 }
 
-WRITE8_HANDLER( bagman_flipscreen_w )
+WRITE8_MEMBER(bagman_state::bagman_flipscreen_w)
 {
-	bagman_state *state = space->machine().driver_data<bagman_state>();
-	if ((flip_screen_get(space->machine()) ^ data) & 1)
+	if ((flip_screen() ^ data) & 1)
 	{
-		flip_screen_set(space->machine(), data & 0x01);
-		state->m_bg_tilemap->mark_all_dirty();
+		flip_screen_set(data & 0x01);
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -117,7 +115,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy;
 
@@ -125,12 +123,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		sy = 255 - spriteram[offs + 2] - 16;
 		flipx = spriteram[offs] & 0x40;
 		flipy = spriteram[offs] & 0x80;
-		if (flip_screen_x_get(machine))
+		if (state->flip_screen_x())
 		{
 			sx = bitmap.width() - sx - 15;
 			flipx = !flipx;
 		}
-		if (flip_screen_y_get(machine))
+		if (state->flip_screen_y())
 		{
 			sy = bitmap.height() - sy - 15;
 			flipy = !flipy;

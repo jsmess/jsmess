@@ -319,7 +319,7 @@ static MACHINE_RESET( psychic5 )
 {
 	psychic5_state *state = machine.driver_data<psychic5_state>();
 	state->m_bank_latch = 0xff;
-	flip_screen_set(machine, 0);
+	state->flip_screen_set(0);
 }
 
 /***************************************************************************
@@ -347,58 +347,55 @@ static TIMER_DEVICE_CALLBACK( psychic5_scanline )
 
 ***************************************************************************/
 
-static READ8_HANDLER( psychic5_bankselect_r )
+READ8_MEMBER(psychic5_state::psychic5_bankselect_r)
 {
-	psychic5_state *state = space->machine().driver_data<psychic5_state>();
-	return state->m_bank_latch;
+	return m_bank_latch;
 }
 
-static WRITE8_HANDLER( psychic5_bankselect_w )
+WRITE8_MEMBER(psychic5_state::psychic5_bankselect_w)
 {
-	psychic5_state *state = space->machine().driver_data<psychic5_state>();
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	int bankaddress;
 
-	if (state->m_bank_latch != data)
+	if (m_bank_latch != data)
 	{
-		state->m_bank_latch = data;
+		m_bank_latch = data;
 		bankaddress = 0x10000 + ((data & 3) * 0x4000);
-		memory_set_bankptr(space->machine(), "bank1",&RAM[bankaddress]);	 /* Select 4 banks of 16k */
+		membank("bank1")->set_base(&RAM[bankaddress]);	 /* Select 4 banks of 16k */
 	}
 }
 
-static WRITE8_HANDLER( bombsa_bankselect_w )
+WRITE8_MEMBER(psychic5_state::bombsa_bankselect_w)
 {
-	psychic5_state *state = space->machine().driver_data<psychic5_state>();
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	int bankaddress;
 
-	if (state->m_bank_latch != data)
+	if (m_bank_latch != data)
 	{
-		state->m_bank_latch = data;
+		m_bank_latch = data;
 		bankaddress = 0x10000 + ((data & 7) * 0x4000);
-		memory_set_bankptr(space->machine(), "bank1", &RAM[bankaddress]);	 /* Select 8 banks of 16k */
+		membank("bank1")->set_base(&RAM[bankaddress]);	 /* Select 8 banks of 16k */
 	}
 }
 
-static WRITE8_HANDLER( psychic5_coin_counter_w )
+WRITE8_MEMBER(psychic5_state::psychic5_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
 	// bit 7 toggles flip screen
 	if (data & 0x80)
 	{
-		flip_screen_set(space->machine(), !flip_screen_get(space->machine()));
+		flip_screen_set(!flip_screen());
 	}
 }
 
-static WRITE8_HANDLER( bombsa_flipscreen_w )
+WRITE8_MEMBER(psychic5_state::bombsa_flipscreen_w)
 {
 	// bit 7 toggles flip screen
 	if (data & 0x80)
 	{
-		flip_screen_set(space->machine(), !flip_screen_get(space->machine()));
+		flip_screen_set(!flip_screen());
 	}
 }
 
@@ -409,65 +406,65 @@ static WRITE8_HANDLER( bombsa_flipscreen_w )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( psychic5_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( psychic5_main_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(psychic5_paged_ram_r, psychic5_paged_ram_w)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_RAM_WRITE(soundlatch_w)
+	AM_RANGE(0xf000, 0xf000) AM_RAM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xf001, 0xf001) AM_READNOP AM_WRITE(psychic5_coin_counter_w)
 	AM_RANGE(0xf002, 0xf002) AM_READWRITE(psychic5_bankselect_r, psychic5_bankselect_w)
 	AM_RANGE(0xf003, 0xf003) AM_READWRITE(psychic5_vram_page_select_r, psychic5_vram_page_select_w)
 	AM_RANGE(0xf004, 0xf004) AM_NOP	// ???
 	AM_RANGE(0xf005, 0xf005) AM_READNOP AM_WRITE(psychic5_title_screen_w)
 	AM_RANGE(0xf006, 0xf1ff) AM_NOP
-	AM_RANGE(0xf200, 0xf7ff) AM_RAM AM_BASE_SIZE_MEMBER(psychic5_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf200, 0xf7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( psychic5_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( psychic5_sound_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( psychic5_soundport_map, AS_IO, 8 )
+static ADDRESS_MAP_START( psychic5_soundport_map, AS_IO, 8, psychic5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ym2", ym2203_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("ym2", ym2203_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bombsa_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bombsa_main_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 
 	/* ports look like the other games */
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch_w) // confirmed
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch_byte_w) // confirmed
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(bombsa_flipscreen_w)
 	AM_RANGE(0xd002, 0xd002) AM_READWRITE(psychic5_bankselect_r, bombsa_bankselect_w)
 	AM_RANGE(0xd003, 0xd003) AM_READWRITE(psychic5_vram_page_select_r, psychic5_vram_page_select_w)
 	AM_RANGE(0xd005, 0xd005) AM_WRITE(bombsa_unknown_w) // ?
 
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM
-	AM_RANGE(0xd200, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(psychic5_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd200, 0xd7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(psychic5_paged_ram_r, bombsa_paged_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bombsa_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bombsa_sound_map, AS_PROGRAM, 8, psychic5_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xf000, 0xf000) AM_WRITEONLY								// Is this a confirm of some sort?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bombsa_soundport_map, AS_IO, 8 )
+static ADDRESS_MAP_START( bombsa_soundport_map, AS_IO, 8, psychic5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 

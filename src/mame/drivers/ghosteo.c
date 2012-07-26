@@ -78,12 +78,15 @@ class ghosteo_state : public driver_device
 {
 public:
 	ghosteo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_system_memory(*this, "systememory"){ }
 
-	UINT32 *m_system_memory;
+	required_shared_ptr<UINT32> m_system_memory;
 	int m_security_count;
 	UINT32 m_bballoon_port[20];
 	struct nand_t m_nand;
+	DECLARE_WRITE32_MEMBER(sound_w);
+	DECLARE_READ32_MEMBER(bballoon_speedup_r);
 };
 
 
@@ -266,7 +269,7 @@ static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
 		break;
 		case NAND_M_READ :
 		{
-			UINT8 *flash = (UINT8 *)device->machine().region( "user1")->base();
+			UINT8 *flash = (UINT8 *)device->machine().root_device().memregion( "user1")->base();
 			if (nand.byte_addr < 0x200)
 			{
 				data = *(flash + nand.page_addr * 0x200 + nand.byte_addr);
@@ -329,7 +332,7 @@ static WRITE_LINE_DEVICE_HANDLER( s3c2410_i2c_sda_w )
 	i2cmem_sda_write( i2cmem, state);
 }
 
-static WRITE32_HANDLER( sound_w )
+WRITE32_MEMBER(ghosteo_state::sound_w)
 {
 	if ((data >= 0x20) && (data <= 0x7F))
 	{
@@ -345,12 +348,12 @@ static WRITE32_HANDLER( sound_w )
 	}
 }
 
-static ADDRESS_MAP_START( bballoon_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( bballoon_map, AS_PROGRAM, 32, ghosteo_state )
 	AM_RANGE(0x10000000, 0x10000003) AM_READ_PORT("10000000")
 	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
 	AM_RANGE(0x10200000, 0x10200003) AM_READ_PORT("10200000")
 	AM_RANGE(0x10300000, 0x10300003) AM_WRITE(sound_w)
-	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_BASE_MEMBER(ghosteo_state, m_system_memory) AM_MIRROR(0x02000000)
+	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_SHARE("systememory") AM_MIRROR(0x02000000)
 ADDRESS_MAP_END
 
 /*
@@ -435,23 +438,23 @@ static const i2cmem_interface i2cmem_interface =
 
 device_t* s3c2410;
 
-static READ32_HANDLER( bballoon_speedup_r )
+READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 {
 	UINT32 ret = s3c2410_lcd_r(s3c2410, offset+0x10/4, mem_mask);
 
 
-	int pc = cpu_get_pc(&space->device());
+	int pc = cpu_get_pc(&space.device());
 
 	// these are vblank waits
 	if (pc == 0x3001c0e4 || pc == 0x3001c0d8)
 	{
 		// BnB Arcade
-		device_spin_until_time(&space->device(), attotime::from_usec(20));
+		device_spin_until_time(&space.device(), attotime::from_usec(20));
 	}
 	else if (pc == 0x3002b580 || pc == 0x3002b550)
 	{
 		// Happy Tour
-		device_spin_until_time(&space->device(), attotime::from_usec(20));
+		device_spin_until_time(&space.device(), attotime::from_usec(20));
 	}
 	//else
 	//  printf("speedup %08x %08x\n", pc, ret);
@@ -461,7 +464,8 @@ static READ32_HANDLER( bballoon_speedup_r )
 
 static MACHINE_RESET( bballoon )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4d000010, 0x4d000013, FUNC(bballoon_speedup_r));
+	ghosteo_state *state = machine.driver_data<ghosteo_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x4d000010, 0x4d000013,read32_delegate(FUNC(ghosteo_state::bballoon_speedup_r), state));
 	s3c2410 = machine.device("s3c2410");
 }
 

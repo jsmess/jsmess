@@ -127,7 +127,7 @@ static MACHINE_RESET( arcadecl )
  *
  *************************************/
 
-static WRITE16_HANDLER( latch_w )
+WRITE16_MEMBER(arcadecl_state::latch_w)
 {
 	/* bit layout in this register:
 
@@ -138,9 +138,9 @@ static WRITE16_HANDLER( latch_w )
 	/* lower byte being modified? */
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_device *oki = space->machine().device<okim6295_device>("oki");
+		okim6295_device *oki = machine().device<okim6295_device>("oki");
 		oki->set_bank_base((data & 0x80) ? 0x40000 : 0x00000);
-		atarigen_set_oki6295_vol(space->machine(), (data & 0x001f) * 100 / 0x1f);
+		atarigen_set_oki6295_vol(machine(), (data & 0x001f) * 100 / 0x1f);
 	}
 }
 
@@ -152,13 +152,13 @@ static WRITE16_HANDLER( latch_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, arcadecl_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE_MEMBER(arcadecl_state, m_bitmap)
-	AM_RANGE(0x3c0000, 0x3c07ff) AM_RAM_WRITE(atarigen_expanded_666_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3e0000, 0x3e07ff) AM_READWRITE(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_SHARE("bitmap")
+	AM_RANGE(0x3c0000, 0x3c07ff) AM_RAM_WRITE_LEGACY(atarigen_expanded_666_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x3e0000, 0x3e07ff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0x3e0800, 0x3effbf) AM_RAM
-	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(atarimo_0_slipram_r, atarimo_0_slipram_w)
+	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)
 	AM_RANGE(0x640000, 0x640001) AM_READ_PORT("PLAYER1")
 	AM_RANGE(0x640002, 0x640003) AM_READ_PORT("PLAYER2")
 	AM_RANGE(0x640010, 0x640011) AM_READ_PORT("STATUS")
@@ -168,10 +168,10 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x640024, 0x640025) AM_READ_PORT("TRACKX1")
 	AM_RANGE(0x640026, 0x640027) AM_READ_PORT("TRACKY1")
 	AM_RANGE(0x640040, 0x64004f) AM_WRITE(latch_w)
-	AM_RANGE(0x640060, 0x64006f) AM_WRITE(atarigen_eeprom_enable_w)
-	AM_RANGE(0x641000, 0x641fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
-	AM_RANGE(0x642000, 0x642001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0xff00)
-	AM_RANGE(0x646000, 0x646fff) AM_WRITE(atarigen_scanline_int_ack_w)
+	AM_RANGE(0x640060, 0x64006f) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
+	AM_RANGE(0x641000, 0x641fff) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
+	AM_RANGE(0x642000, 0x642001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
+	AM_RANGE(0x646000, 0x646fff) AM_WRITE_LEGACY(atarigen_scanline_int_ack_w)
 	AM_RANGE(0x647000, 0x647fff) AM_WRITE(watchdog_reset16_w)
 ADDRESS_MAP_END
 
@@ -208,7 +208,7 @@ static INPUT_PORTS_START( arcadecl )
 	PORT_BIT(  0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(  0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT(  0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN")
@@ -268,7 +268,7 @@ static INPUT_PORTS_START( sparkz )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN")
@@ -398,7 +398,7 @@ ROM_END
 
 static DRIVER_INIT( sparkz )
 {
-	memset(machine.region("gfx1")->base(), 0, machine.region("gfx1")->bytes());
+	memset(machine.root_device().memregion("gfx1")->base(), 0, machine.root_device().memregion("gfx1")->bytes());
 }
 
 

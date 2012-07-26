@@ -24,7 +24,6 @@
 
 ****************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "includes/next.h"
 #include "formats/pc_dsk.h"
@@ -884,7 +883,7 @@ static ADDRESS_MAP_START( next_mem, AS_PROGRAM, 32, next_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( next_0b_nofdc_mem, AS_PROGRAM, 32, next_state )
-	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_BASE(vram)
+	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_SHARE("vram")
 
 	AM_IMPORT_FROM(next_mem)
 ADDRESS_MAP_END
@@ -897,19 +896,19 @@ static ADDRESS_MAP_START( next_fdc_mem, AS_PROGRAM, 32, next_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( next_0b_mem, AS_PROGRAM, 32, next_state )
-	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_BASE(vram)
+	AM_RANGE(0x0b000000, 0x0b03ffff) AM_RAM AM_SHARE("vram")
 
 	AM_IMPORT_FROM(next_fdc_mem)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( next_0c_mem, AS_PROGRAM, 32, next_state )
-	AM_RANGE(0x0c000000, 0x0c1fffff) AM_RAM AM_BASE(vram)
+	AM_RANGE(0x0c000000, 0x0c1fffff) AM_RAM AM_SHARE("vram")
 
 	AM_IMPORT_FROM(next_fdc_mem)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( next_2c_mem, AS_PROGRAM, 32, next_state )
-	AM_RANGE(0x2c000000, 0x2c1fffff) AM_RAM AM_BASE(vram)
+	AM_RANGE(0x2c000000, 0x2c1fffff) AM_RAM AM_SHARE("vram")
 
 	AM_IMPORT_FROM(next_fdc_mem)
 ADDRESS_MAP_END
@@ -1152,14 +1151,14 @@ COMP( ????, nextctc, nextst, 0,       nextctc,   next,    nextctc, "Next Softwar
 
 		/*
 
-    UINT32 *rom = (UINT32 *)(machine.region("user1")->base());
+    UINT32 *rom = (UINT32 *)(machine.root_device().memregion("user1")->base());
     rom[0x3f48/4] = 0x2f017000; // memory test funcall
     rom[0x3f4c/4] = 0x4e712400;
     rom[0x00b8/4] = 0x001a4e71; // rom checksum
     rom[0x00bc/4] = 0x4e714e71;
 
 v74
-    UINT32 *rom = (UINT32 *)(machine.region("user1")->base());
+    UINT32 *rom = (UINT32 *)(machine.root_device().memregion("user1")->base());
     rom[0x329c/4] = 0x70004e71; // memory test funcall
     rom[0x32a0/4] = 0x4e712400;
     rom[0x03f8/4] = 0x001a4e71; // rom checksum

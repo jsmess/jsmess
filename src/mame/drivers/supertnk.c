@@ -115,6 +115,13 @@ public:
 	UINT8 m_rom_bank;
 	UINT8 m_bitplane_select;
 	pen_t m_pens[NUM_PENS];
+	DECLARE_WRITE8_MEMBER(supertnk_bankswitch_0_w);
+	DECLARE_WRITE8_MEMBER(supertnk_bankswitch_1_w);
+	DECLARE_WRITE8_MEMBER(supertnk_interrupt_ack_w);
+	DECLARE_WRITE8_MEMBER(supertnk_videoram_w);
+	DECLARE_READ8_MEMBER(supertnk_videoram_r);
+	DECLARE_WRITE8_MEMBER(supertnk_bitplane_select_0_w);
+	DECLARE_WRITE8_MEMBER(supertnk_bitplane_select_1_w);
 };
 
 
@@ -125,29 +132,27 @@ public:
  *
  *************************************/
 
-static WRITE8_HANDLER( supertnk_bankswitch_0_w )
+WRITE8_MEMBER(supertnk_state::supertnk_bankswitch_0_w)
 {
-	supertnk_state *state = space->machine().driver_data<supertnk_state>();
 	offs_t bank_address;
 
-	state->m_rom_bank = (state->m_rom_bank & 0x02) | ((data << 0) & 0x01);
+	m_rom_bank = (m_rom_bank & 0x02) | ((data << 0) & 0x01);
 
-	bank_address = 0x10000 + (state->m_rom_bank * 0x1000);
+	bank_address = 0x10000 + (m_rom_bank * 0x1000);
 
-	memory_set_bankptr(space->machine(), "bank1", &space->machine().region("maincpu")->base()[bank_address]);
+	membank("bank1")->set_base(&machine().root_device().memregion("maincpu")->base()[bank_address]);
 }
 
 
-static WRITE8_HANDLER( supertnk_bankswitch_1_w )
+WRITE8_MEMBER(supertnk_state::supertnk_bankswitch_1_w)
 {
-	supertnk_state *state = space->machine().driver_data<supertnk_state>();
 	offs_t bank_address;
 
-	state->m_rom_bank = (state->m_rom_bank & 0x01) | ((data << 1) & 0x02);
+	m_rom_bank = (m_rom_bank & 0x01) | ((data << 1) & 0x02);
 
-	bank_address = 0x10000 + (state->m_rom_bank * 0x1000);
+	bank_address = 0x10000 + (m_rom_bank * 0x1000);
 
-	memory_set_bankptr(space->machine(), "bank1", &space->machine().region("maincpu")->base()[bank_address]);
+	membank("bank1")->set_base(&machine().root_device().memregion("maincpu")->base()[bank_address]);
 }
 
 
@@ -165,9 +170,9 @@ static INTERRUPT_GEN( supertnk_interrupt )
 }
 
 
-static WRITE8_HANDLER( supertnk_interrupt_ack_w )
+WRITE8_MEMBER(supertnk_state::supertnk_interrupt_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -182,7 +187,7 @@ static VIDEO_START( supertnk )
 {
 	supertnk_state *state = machine.driver_data<supertnk_state>();
 	offs_t i;
-	const UINT8 *prom = machine.region("proms")->base();
+	const UINT8 *prom = state->memregion("proms")->base();
 
 	for (i = 0; i < NUM_PENS; i++)
 	{
@@ -197,48 +202,44 @@ static VIDEO_START( supertnk )
 }
 
 
-static WRITE8_HANDLER( supertnk_videoram_w )
+WRITE8_MEMBER(supertnk_state::supertnk_videoram_w)
 {
-	supertnk_state *state = space->machine().driver_data<supertnk_state>();
 
-	if (state->m_bitplane_select > 2)
+	if (m_bitplane_select > 2)
 	{
-		state->m_videoram[0][offset] = 0;
-		state->m_videoram[1][offset] = 0;
-		state->m_videoram[2][offset] = 0;
+		m_videoram[0][offset] = 0;
+		m_videoram[1][offset] = 0;
+		m_videoram[2][offset] = 0;
 	}
 	else
 	{
-		state->m_videoram[state->m_bitplane_select][offset] = data;
+		m_videoram[m_bitplane_select][offset] = data;
 	}
 }
 
 
-static READ8_HANDLER( supertnk_videoram_r )
+READ8_MEMBER(supertnk_state::supertnk_videoram_r)
 {
-	supertnk_state *state = space->machine().driver_data<supertnk_state>();
 	UINT8 ret = 0x00;
 
-	if (state->m_bitplane_select < 3)
-		ret = state->m_videoram[state->m_bitplane_select][offset];
+	if (m_bitplane_select < 3)
+		ret = m_videoram[m_bitplane_select][offset];
 
 	return ret;
 }
 
 
-static WRITE8_HANDLER( supertnk_bitplane_select_0_w )
+WRITE8_MEMBER(supertnk_state::supertnk_bitplane_select_0_w)
 {
-	supertnk_state *state = space->machine().driver_data<supertnk_state>();
 
-	state->m_bitplane_select = (state->m_bitplane_select & 0x02) | ((data << 0) & 0x01);
+	m_bitplane_select = (m_bitplane_select & 0x02) | ((data << 0) & 0x01);
 }
 
 
-static WRITE8_HANDLER( supertnk_bitplane_select_1_w )
+WRITE8_MEMBER(supertnk_state::supertnk_bitplane_select_1_w)
 {
-	supertnk_state *state = space->machine().driver_data<supertnk_state>();
 
-	state->m_bitplane_select = (state->m_bitplane_select & 0x01) | ((data << 1) & 0x02);
+	m_bitplane_select = (m_bitplane_select & 0x01) | ((data << 1) & 0x02);
 }
 
 
@@ -284,12 +285,13 @@ static SCREEN_UPDATE_RGB32( supertnk )
 
 static MACHINE_RESET( supertnk )
 {
+	supertnk_state *state = machine.driver_data<supertnk_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	supertnk_bankswitch_0_w(space, 0, 0);
-	supertnk_bankswitch_1_w(space, 0, 0);
+	state->supertnk_bankswitch_0_w(*space, 0, 0);
+	state->supertnk_bankswitch_1_w(*space, 0, 0);
 
-	supertnk_bitplane_select_0_w(space, 0, 0);
-	supertnk_bitplane_select_1_w(space, 0, 0);
+	state->supertnk_bitplane_select_0_w(*space, 0, 0);
+	state->supertnk_bitplane_select_1_w(*space, 0, 0);
 }
 
 
@@ -300,13 +302,13 @@ static MACHINE_RESET( supertnk )
  *
  *************************************/
 
-static ADDRESS_MAP_START( supertnk_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( supertnk_map, AS_PROGRAM, 8, supertnk_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x17ff) AM_ROMBANK("bank1")
 	AM_RANGE(0x1800, 0x1bff) AM_RAM
 	AM_RANGE(0x1efc, 0x1efc) AM_READ_PORT("JOYS")
 	AM_RANGE(0x1efd, 0x1efd) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x1efe, 0x1eff) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x1efe, 0x1eff) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x1efe, 0x1efe) AM_READ_PORT("DSW")
 	AM_RANGE(0x1eff, 0x1eff) AM_READ_PORT("UNK")
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(supertnk_videoram_r, supertnk_videoram_w)
@@ -320,7 +322,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( supertnk_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( supertnk_io_map, AS_IO, 8, supertnk_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x0400, 0x0400) AM_WRITE(supertnk_bitplane_select_0_w)
 	AM_RANGE(0x0401, 0x0401) AM_WRITE(supertnk_bitplane_select_1_w)
@@ -488,8 +490,8 @@ static DRIVER_INIT( supertnk )
 {
 	/* decode the TMS9980 ROMs */
 	offs_t offs;
-	UINT8 *rom = machine.region("maincpu")->base();
-	size_t len = machine.region("maincpu")->bytes();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	size_t len = machine.root_device().memregion("maincpu")->bytes();
 
 	for (offs = 0; offs < len; offs++)
 	{

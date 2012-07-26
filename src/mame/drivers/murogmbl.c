@@ -42,14 +42,16 @@ class murogmbl_state : public driver_device
 {
 public:
 	murogmbl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_video(*this, "video"){ }
 
-	UINT8* m_video;
+	required_shared_ptr<UINT8> m_video;
 };
 
 
 static PALETTE_INIT( murogmbl )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
 
@@ -73,16 +75,16 @@ static PALETTE_INIT( murogmbl )
 	}
 }
 
-static ADDRESS_MAP_START( murogmbl_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( murogmbl_map, AS_PROGRAM, 8, murogmbl_state )
 	AM_RANGE(0x0000, 0x1fFf) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM
-	AM_RANGE(0x5800, 0x5bff) AM_RAM AM_BASE_MEMBER(murogmbl_state, m_video)
+	AM_RANGE(0x5800, 0x5bff) AM_RAM AM_SHARE("video")
 	AM_RANGE(0x5c00, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
 	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("DSW")
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN1")
-	AM_RANGE(0x7800, 0x7800) AM_READNOP AM_DEVWRITE("dac1", dac_w) /* read is always discarded */
+	AM_RANGE(0x7800, 0x7800) AM_READNOP AM_DEVWRITE_LEGACY("dac1", dac_w) /* read is always discarded */
 ADDRESS_MAP_END
 
 static VIDEO_START(murogmbl)

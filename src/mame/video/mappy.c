@@ -32,6 +32,7 @@
 
 PALETTE_INIT( superpac )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -91,6 +92,7 @@ PALETTE_INIT( superpac )
 
 PALETTE_INIT( mappy )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
 	int i;
@@ -162,6 +164,7 @@ PALETTE_INIT( mappy )
 
 PALETTE_INIT( phozon )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances[4] = { 2200, 1000, 470, 220 };
 	double rweights[4], gweights[4], bweights[4];
 	int i;
@@ -357,38 +360,35 @@ VIDEO_START( mappy )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( superpac_videoram_w )
+WRITE8_MEMBER(mappy_state::superpac_videoram_w)
 {
-	mappy_state *state = space->machine().driver_data<mappy_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( mappy_videoram_w )
+WRITE8_MEMBER(mappy_state::mappy_videoram_w)
 {
-	mappy_state *state = space->machine().driver_data<mappy_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_HANDLER( superpac_flipscreen_w )
+WRITE8_MEMBER(mappy_state::superpac_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 1);
+	flip_screen_set(data & 1);
 }
 
-READ8_HANDLER( superpac_flipscreen_r )
+READ8_MEMBER(mappy_state::superpac_flipscreen_r)
 {
-	flip_screen_set(space->machine(), 1);
+	flip_screen_set(1);
 	return 0xff;
 }
 
-WRITE8_HANDLER( mappy_scroll_w )
+WRITE8_MEMBER(mappy_state::mappy_scroll_w)
 {
-	mappy_state *state = space->machine().driver_data<mappy_state>();
 
-	state->m_scroll = offset >> 3;
+	m_scroll = offset >> 3;
 }
 
 
@@ -401,6 +401,7 @@ WRITE8_HANDLER( mappy_scroll_w )
 
 static void mappy_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base)
 {
+	mappy_state *state = machine.driver_data<mappy_state>();
 	UINT8 *spriteram = spriteram_base + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x800;
@@ -433,7 +434,7 @@ static void mappy_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 			sy -= 16 * sizey;
 			sy = (sy & 0xff) - 32;	// fix wraparound
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -481,6 +482,7 @@ spriteram_3
 
 static void phozon_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 *spriteram_base)
 {
+	mappy_state *state = machine.driver_data<mappy_state>();
 	UINT8 *spriteram = spriteram_base + 0x780;
 	UINT8 *spriteram_2 = spriteram + 0x800;
 	UINT8 *spriteram_3 = spriteram_2 + 0x800;
@@ -512,7 +514,7 @@ static void phozon_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, 
 			sy -= 8 * sizey;
 			sy = (sy & 0xff) - 32;	// fix wraparound
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -571,7 +573,7 @@ SCREEN_UPDATE_IND16( phozon )
 	mappy_state *state = screen.machine().driver_data<mappy_state>();
 
 	/* flip screen control is embedded in RAM */
-	flip_screen_set(screen.machine(), state->m_spriteram[0x1f7f-0x800] & 1);
+	state->flip_screen_set(state->m_spriteram[0x1f7f-0x800] & 1);
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 

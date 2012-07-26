@@ -32,7 +32,7 @@ void super6_state::bankswitch()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
-	UINT8 *rom = machine().region(Z80_TAG)->base();
+	UINT8 *rom = memregion(Z80_TAG)->base();
 
 	// power on jump
 	if (!BIT(m_bank0, 6)) {	program->install_rom(0x0000, 0x07ff, 0, 0xf800, rom); return; }

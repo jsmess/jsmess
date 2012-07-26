@@ -33,10 +33,11 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT8 *m_code_base;
+	DECLARE_READ8_MEMBER(io_read_missing_dips);
 };
 
 
-static READ8_HANDLER( io_read_missing_dips )
+READ8_MEMBER(kingpin_state::io_read_missing_dips)
 {
 	return 0x00;
 }
@@ -99,34 +100,34 @@ INPUT_PORTS_END
 /* Main CPU */
 /* There's an OKI MSM5126-25RS in here - (2k RAM) */
 /* A 3.6V battery traces directly to U19, rendering it nvram */
-static ADDRESS_MAP_START( kingpin_program_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kingpin_program_map, AS_PROGRAM, 8, kingpin_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kingpin_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( kingpin_io_map, AS_IO, 8, kingpin_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(io_read_missing_dips)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW")
 /*  AM_RANGE(0x02, 0x02) AM_READ(io_read_missing_dips) */
-/*  AM_RANGE(0x02, 0x02) AM_WRITE(NO IDEA) */
+/*  AM_RANGE(0x02, 0x02) AM_WRITE_LEGACY(NO IDEA) */
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
-/*  AM_RANGE(0x12, 0x12) AM_WRITE(NO IDEA) */
-/*  AM_RANGE(0x13, 0x13) AM_WRITE(NO IDEA) */
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, vram_read, vram_write)
-	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE_MODERN("tms9928a", tms9928a_device, register_read, register_write)
-/*  AM_RANGE(0x30, 0x30) AM_WRITE(LIKELY LIGHTS) */
-/*  AM_RANGE(0x40, 0x40) AM_WRITE(LIKELY LIGHTS) */
-/*  AM_RANGE(0x50, 0x50) AM_WRITE(LIKELY LIGHTS) */
-/*  AM_RANGE(0x60, 0x60) AM_WRITE(LIKELY LIGHTS) */
-/*  AM_RANGE(0x70, 0x70) AM_WRITE(LIKELY LIGHTS) */
+/*  AM_RANGE(0x12, 0x12) AM_WRITE_LEGACY(NO IDEA) */
+/*  AM_RANGE(0x13, 0x13) AM_WRITE_LEGACY(NO IDEA) */
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
+	AM_RANGE(0x21, 0x21) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
+/*  AM_RANGE(0x30, 0x30) AM_WRITE_LEGACY(LIKELY LIGHTS) */
+/*  AM_RANGE(0x40, 0x40) AM_WRITE_LEGACY(LIKELY LIGHTS) */
+/*  AM_RANGE(0x50, 0x50) AM_WRITE_LEGACY(LIKELY LIGHTS) */
+/*  AM_RANGE(0x60, 0x60) AM_WRITE_LEGACY(LIKELY LIGHTS) */
+/*  AM_RANGE(0x70, 0x70) AM_WRITE_LEGACY(LIKELY LIGHTS) */
 ADDRESS_MAP_END
 
 
 /* Sound CPU */
 /* There's an OKI MSM5126-25RS in here - (2k RAM) */
-static ADDRESS_MAP_START( kingpin_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kingpin_sound_map, AS_PROGRAM, 8, kingpin_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8400, 0x8bff) AM_RAM
 ADDRESS_MAP_END
@@ -177,7 +178,7 @@ static DRIVER_INIT( kingpin )
 	kingpin_state *state = machine.driver_data<kingpin_state>();
 
 	/* Hacks to keep the emu a'runnin */
-	state->m_code_base = machine.region("maincpu")->base();
+	state->m_code_base = state->memregion("maincpu")->base();
 	state->m_code_base[0x17d4] = 0xc3;	/* Maybe sound related? */
 }
 

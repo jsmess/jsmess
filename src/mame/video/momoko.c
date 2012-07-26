@@ -12,66 +12,56 @@
 #include "includes/momoko.h"
 
 
-WRITE8_HANDLER ( momoko_fg_scrollx_w )
+WRITE8_MEMBER(momoko_state::momoko_fg_scrollx_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_fg_scrollx = data;
+	m_fg_scrollx = data;
 }
 
-WRITE8_HANDLER ( momoko_fg_scrolly_w )
+WRITE8_MEMBER(momoko_state::momoko_fg_scrolly_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_fg_scrolly = data;
+	m_fg_scrolly = data;
 }
 
-WRITE8_HANDLER ( momoko_fg_select_w )
+WRITE8_MEMBER(momoko_state::momoko_fg_select_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_fg_select = data & 0x0f;
-	state->m_fg_mask = data & 0x10;
+	m_fg_select = data & 0x0f;
+	m_fg_mask = data & 0x10;
 }
 
-WRITE8_HANDLER ( momoko_text_scrolly_w )
+WRITE8_MEMBER(momoko_state::momoko_text_scrolly_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_text_scrolly = data;
+	m_text_scrolly = data;
 }
 
-WRITE8_HANDLER ( momoko_text_mode_w )
+WRITE8_MEMBER(momoko_state::momoko_text_mode_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_text_mode = data;
+	m_text_mode = data;
 }
 
-WRITE8_HANDLER ( momoko_bg_scrollx_w )
+WRITE8_MEMBER(momoko_state::momoko_bg_scrollx_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_bg_scrollx[offset] = data;
+	m_bg_scrollx[offset] = data;
 }
 
-WRITE8_HANDLER ( momoko_bg_scrolly_w )
+WRITE8_MEMBER(momoko_state::momoko_bg_scrolly_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_bg_scrolly[offset] = data;
+	m_bg_scrolly[offset] = data;
 }
 
-WRITE8_HANDLER( momoko_bg_select_w )
+WRITE8_MEMBER(momoko_state::momoko_bg_select_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_bg_select = data & 0x0f;
-	state->m_bg_mask = data & 0x10;
+	m_bg_select = data & 0x0f;
+	m_bg_mask = data & 0x10;
 }
 
-WRITE8_HANDLER( momoko_bg_priority_w )
+WRITE8_MEMBER(momoko_state::momoko_bg_priority_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_bg_priority = data & 0x01;
+	m_bg_priority = data & 0x01;
 }
 
-WRITE8_HANDLER( momoko_flipscreen_w )
+WRITE8_MEMBER(momoko_state::momoko_flipscreen_w)
 {
-	momoko_state *state = space->machine().driver_data<momoko_state>();
-	state->m_flipscreen = data & 0x01;
+	m_flipscreen = data & 0x01;
 }
 
 /****************************************************************************/
@@ -81,7 +71,7 @@ static void momoko_draw_bg_pri( running_machine &machine, bitmap_ind16 &bitmap, 
 	int xx, sx, sy, px, py, dot;
 	UINT32 gfxadr;
 	UINT8 d0, d1;
-	UINT8 *BG_GFX = machine.region("gfx2")->base();
+	UINT8 *BG_GFX = machine.root_device().memregion("gfx2")->base();
 
 	for (sy = 0; sy < 8; sy++)
 	{
@@ -117,13 +107,13 @@ SCREEN_UPDATE_IND16( momoko )
 	int x, y, dx, dy, rx, ry, radr, chr, sy, fx, fy, px, py, offs, col, pri, flip ;
 	UINT8 *spriteram = state->m_spriteram;
 
-	UINT8 *BG_MAP     = screen.machine().region("user1")->base();
-	UINT8 *BG_COL_MAP = screen.machine().region("user2")->base();
-	UINT8 *FG_MAP     = screen.machine().region("user3")->base();
-	UINT8 *TEXT_COLOR = screen.machine().region("proms")->base();
+	UINT8 *BG_MAP     = screen.machine().root_device().memregion("user1")->base();
+	UINT8 *BG_COL_MAP = screen.machine().root_device().memregion("user2")->base();
+	UINT8 *FG_MAP     = screen.machine().root_device().memregion("user3")->base();
+	UINT8 *TEXT_COLOR = state->memregion("proms")->base();
 
 
-	flip = state->m_flipscreen ^ (input_port_read(screen.machine(), "FAKE") & 0x01);
+	flip = state->m_flipscreen ^ (screen.machine().root_device().ioport("FAKE")->read() & 0x01);
 
 	/* draw BG layer */
 	dx = (7 - state->m_bg_scrollx[0]) & 7;
@@ -229,7 +219,7 @@ SCREEN_UPDATE_IND16( momoko )
 
 
 	/* draw sprites (others) */
-	for (offs = 9 * 4; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 9 * 4; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		chr = spriteram[offs + 1] | ((spriteram[offs + 2] & 0x60) << 3);
 		chr = ((chr & 0x380) << 1) | (chr & 0x7f);

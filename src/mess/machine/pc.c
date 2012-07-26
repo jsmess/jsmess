@@ -38,7 +38,6 @@
 
 #include "machine/8237dma.h"
 
-#include "machine/kb_keytro.h"
 #include "machine/ram.h"
 
 #include "memconv.h"
@@ -65,25 +64,24 @@
  *
  *************************************************************************/
 
-READ8_HANDLER(pc_page_r)
+READ8_MEMBER(pc_state::pc_page_r)
 {
 	return 0xFF;
 }
 
 
-WRITE8_HANDLER(pc_page_w)
+WRITE8_MEMBER(pc_state::pc_page_w)
 {
-	pc_state *st = space->machine().driver_data<pc_state>();
 	switch(offset % 4)
 	{
 	case 1:
-		st->m_dma_offset[0][2] = data;
+		m_dma_offset[0][2] = data;
 		break;
 	case 2:
-		st->m_dma_offset[0][3] = data;
+		m_dma_offset[0][3] = data;
 		break;
 	case 3:
-		st->m_dma_offset[0][0] = st->m_dma_offset[0][1] = data;
+		m_dma_offset[0][0] = m_dma_offset[0][1] = data;
 		break;
 	}
 }
@@ -99,25 +97,23 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 }
 
 
-static READ8_HANDLER( pc_dma_read_byte )
+READ8_MEMBER(pc_state::pc_dma_read_byte)
 {
 	UINT8 result;
-	pc_state *st = space->machine().driver_data<pc_state>();
-	offs_t page_offset = (((offs_t) st->m_dma_offset[0][st->m_dma_channel]) << 16)
+	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0x0F0000;
 
-	result = space->read_byte( page_offset + offset);
+	result = space.read_byte( page_offset + offset);
 	return result;
 }
 
 
-static WRITE8_HANDLER( pc_dma_write_byte )
+WRITE8_MEMBER(pc_state::pc_dma_write_byte)
 {
-	pc_state *st = space->machine().driver_data<pc_state>();
-	offs_t page_offset = (((offs_t) st->m_dma_offset[0][st->m_dma_channel]) << 16)
+	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0x0F0000;
 
-	space->write_byte( page_offset + offset, data);
+	space.write_byte( page_offset + offset, data);
 }
 
 
@@ -173,8 +169,8 @@ I8237_INTERFACE( ibm5150_dma8237_config )
 {
 	DEVCB_DEVICE_LINE("dma8237", pc_dma_hrq_changed),
 	DEVCB_DEVICE_LINE("dma8237", pc_dma8237_out_eop),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
+	DEVCB_DRIVER_MEMBER(pc_state, pc_dma_read_byte),
+	DEVCB_DRIVER_MEMBER(pc_state, pc_dma_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER("dma8237", pc_dma8237_fdc_dack_r), DEVCB_DEVICE_HANDLER("dma8237", pc_dma8237_hdc_dack_r) },
 	{ DEVCB_DEVICE_HANDLER("dma8237", pc_dma8237_0_dack_w), DEVCB_NULL, DEVCB_DEVICE_HANDLER("dma8237", pc_dma8237_fdc_dack_w), DEVCB_DEVICE_HANDLER("dma8237", pc_dma8237_hdc_dack_w) },
 	{ DEVCB_DEVICE_LINE("dma8237", pc_dack0_w), DEVCB_DEVICE_LINE("dma8237", pc_dack1_w), DEVCB_DEVICE_LINE("dma8237", pc_dack2_w), DEVCB_DEVICE_LINE("dma8237", pc_dack3_w) }
@@ -432,9 +428,9 @@ const rs232_port_interface ibm5150_serport_config[4] =
 
 static UINT8	nmi_enabled;
 
-WRITE8_HANDLER( pc_nmi_enable_w )
+WRITE8_MEMBER(pc_state::pc_nmi_enable_w)
 {
-	logerror( "%08X: changing NMI state to %s\n", cpu_get_pc(&space->device()), data & 0x80 ? "enabled" : "disabled" );
+	logerror( "%08X: changing NMI state to %s\n", cpu_get_pc(&space.device()), data & 0x80 ? "enabled" : "disabled" );
 
 	nmi_enabled = data & 0x80;
 }
@@ -486,7 +482,7 @@ static struct {
 } pcjr_keyb;
 
 
-READ8_HANDLER( pcjr_nmi_enable_r )
+READ8_MEMBER(pc_state::pcjr_nmi_enable_r)
 {
 	pcjr_keyb.latch = 0;
 
@@ -621,50 +617,40 @@ static void pcjr_keyb_init(running_machine &machine)
  *
  **********************************************************/
 
-
-WRITE8_HANDLER( ibm5150_kb_set_clock_signal )
+WRITE_LINE_MEMBER( pc_state::keyboard_clock_w )
 {
-	pc_state *st = space->machine().driver_data<pc_state>();
-	device_t *keyboard = space->machine().device("keyboard");
-
-	if ( st->m_ppi_clock_signal != data )
+	if ( m_ppi_clock_signal != state )
 	{
-		if ( st->m_ppi_keyb_clock && st->m_ppi_shift_enable )
+		if ( m_ppi_keyb_clock && m_ppi_shift_enable )
 		{
-			st->m_ppi_clock_signal = data;
-			if ( ! st->m_ppi_keyboard_clear )
+			m_ppi_clock_signal = state;
+			if ( ! m_ppi_keyboard_clear )
 			{
 				/* Data is clocked in on a high->low transition */
-				if ( ! data )
+				if ( ! state )
 				{
-					UINT8	trigger_irq = st->m_ppi_shift_register & 0x01;
+					UINT8   trigger_irq = m_ppi_shift_register & 0x01;
 
-					st->m_ppi_shift_register = ( st->m_ppi_shift_register >> 1 ) | ( st->m_ppi_data_signal << 7 );
+					m_ppi_shift_register = ( m_ppi_shift_register >> 1 ) | ( m_ppi_data_signal << 7 );
 					if ( trigger_irq )
 					{
-						pic8259_ir1_w(st->m_pic8259, 1);
-						st->m_ppi_shift_enable = 0;
-						st->m_ppi_clock_signal = 0;
-						kb_keytronic_clock_w(keyboard, st->m_ppi_clock_signal);
+						pic8259_ir1_w(m_pic8259, 1);
+						m_ppi_shift_enable = 0;
+						m_ppi_clock_signal = 0;
+						m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
 					}
 				}
 			}
 		}
 	}
-
-	kb_keytronic_clock_w(keyboard, st->m_ppi_clock_signal);
 }
 
 
-WRITE8_HANDLER( ibm5150_kb_set_data_signal )
+WRITE_LINE_MEMBER( pc_state::keyboard_data_w )
 {
-	pc_state *st = space->machine().driver_data<pc_state>();
-	device_t *keyboard = space->machine().device("keyboard");
-
-	st->m_ppi_data_signal = data;
-
-	kb_keytronic_data_w(keyboard, st->m_ppi_data_signal);
+	m_ppi_data_signal = state;
 }
+
 
 static READ8_DEVICE_HANDLER (ibm5160_ppi_porta_r)
 {
@@ -684,7 +670,7 @@ static READ8_DEVICE_HANDLER (ibm5160_ppi_porta_r)
          *      01 - color 40x25
          * 6-7  The number of floppy disk drives
          */
-		data = input_port_read(device->machine(), "DSW0");
+		data = device->machine().root_device().ioport("DSW0")->read();
 	}
 	else
 	{
@@ -709,13 +695,13 @@ static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
 	if (st->m_ppi_portc_switch_high)
 	{
 		/* read hi nibble of S2 */
-		data = (data & 0xf0) | ((input_port_read(device->machine(), "DSW0") >> 4) & 0x0f);
+		data = (data & 0xf0) | ((device->machine().root_device().ioport("DSW0")->read() >> 4) & 0x0f);
 		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
 	}
 	else
 	{
 		/* read lo nibble of S2 */
-		data = (data & 0xf0) | (input_port_read(device->machine(), "DSW0") & 0x0f);
+		data = (data & 0xf0) | (device->machine().root_device().ioport("DSW0")->read() & 0x0f);
 		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
 	}
 
@@ -732,7 +718,6 @@ static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
 static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 {
 	pc_state *st = device->machine().driver_data<pc_state>();
-	device_t *keyboard = device->machine().device("keyboard");
 
 	/* PPI controller port B*/
 	st->m_ppi_portb = data;
@@ -743,7 +728,7 @@ static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 	pc_speaker_set_spkrdata( device->machine(), data & 0x02 );
 
 	st->m_ppi_clock_signal = ( st->m_ppi_keyb_clock ) ? 1 : 0;
-	kb_keytronic_clock_w(keyboard, st->m_ppi_clock_signal);
+	st->m_pc_kbdc->clock_write_from_mb(st->m_ppi_clock_signal);
 
 	/* If PB7 is set clear the shift register and reset the IRQ line */
 	if ( st->m_ppi_keyboard_clear )
@@ -784,7 +769,7 @@ static READ8_DEVICE_HANDLER (pc_ppi_porta_r)
          *      01 - color 40x25
          * 6-7  The number of floppy disk drives
          */
-		data = input_port_read(device->machine(), "DSW0");
+		data = device->machine().root_device().ioport("DSW0")->read();
 	}
 	else
 	{
@@ -985,12 +970,13 @@ static void pc_set_keyb_int(running_machine &machine, int state)
 
 void mess_init_pc_common(running_machine &machine, UINT32 flags, void (*set_keyb_int_func)(running_machine &, int), void (*set_hdc_int_func)(running_machine &,int,int))
 {
+	pc_state *state = machine.driver_data<pc_state>();
 	if ( set_keyb_int_func != NULL )
 		init_pc_common(machine, flags, set_keyb_int_func);
 
 	/* MESS managed RAM */
 	if ( machine.device<ram_device>(RAM_TAG)->pointer() )
-		memory_set_bankptr( machine, "bank10", machine.device<ram_device>(RAM_TAG)->pointer() );
+		state->membank( "bank10" )->set_base( machine.device<ram_device>(RAM_TAG)->pointer() );
 }
 
 
@@ -1021,8 +1007,8 @@ DRIVER_INIT( pcmda )
 
 DRIVER_INIT( europc )
 {
-	UINT8 *gfx = &machine.region("gfx1")->base()[0x8000];
-	UINT8 *rom = &machine.region("maincpu")->base()[0];
+	UINT8 *gfx = &machine.root_device().memregion("gfx1")->base()[0x8000];
+	UINT8 *rom = &machine.root_device().memregion("maincpu")->base()[0];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
@@ -1054,7 +1040,7 @@ DRIVER_INIT( t1000hx )
 
 DRIVER_INIT( pc200 )
 {
-	UINT8 *gfx = &machine.region("gfx1")->base()[0x8000];
+	UINT8 *gfx = &machine.root_device().memregion("gfx1")->base()[0x8000];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
@@ -1066,7 +1052,7 @@ DRIVER_INIT( pc200 )
 
 DRIVER_INIT( ppc512 )
 {
-	UINT8 *gfx = &machine.region("gfx1")->base()[0x8000];
+	UINT8 *gfx = &machine.root_device().memregion("gfx1")->base()[0x8000];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
@@ -1077,7 +1063,7 @@ DRIVER_INIT( ppc512 )
 }
 DRIVER_INIT( pc1512 )
 {
-	UINT8 *gfx = &machine.region("gfx1")->base()[0x8000];
+	UINT8 *gfx = &machine.root_device().memregion("gfx1")->base()[0x8000];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
@@ -1093,7 +1079,7 @@ DRIVER_INIT( pcjr )
 	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pcjr_set_keyb_int, pc_set_irq_line);
 }
 
-static READ8_HANDLER( input_port_0_r ) { return input_port_read(space->machine(), "IN0"); }
+static READ8_HANDLER( input_port_0_r ) { return space->machine().root_device().ioport("IN0")->read(); }
 
 DRIVER_INIT( pc1640 )
 {
@@ -1211,7 +1197,7 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
 
 		size = image.get_software_region_length("rom" );
 
-		memcpy( image.device().machine().region("maincpu")->base() + address, cart, size );
+		memcpy( image.device().machine().root_device().memregion("maincpu")->base() + address, cart, size );
 	}
 	else
 	{
@@ -1240,7 +1226,7 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
 		}
 
 		/* Read the cartridge contents */
-		if ( ( image_size - 0x200 ) != image.fread(image.device().machine().region("maincpu")->base() + address, image_size - 0x200 ) )
+		if ( ( image_size - 0x200 ) != image.fread(image.device().machine().root_device().memregion("maincpu")->base() + address, image_size - 0x200 ) )
 		{
 			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unable to read cartridge contents" );
 			return IMAGE_INIT_FAIL;
@@ -1390,7 +1376,7 @@ void pc_rtc_init(running_machine &machine)
 	pc_rtc.timer->adjust(attotime::zero, 0, attotime(1,0));
 }
 
-READ8_HANDLER( pc_rtc_r )
+READ8_MEMBER(pc_state::pc_rtc_r)
 {
 	int data;
 	switch (offset) {
@@ -1401,7 +1387,7 @@ READ8_HANDLER( pc_rtc_r )
 	return data;
 }
 
-WRITE8_HANDLER( pc_rtc_w )
+WRITE8_MEMBER(pc_state::pc_rtc_w)
 {
 	logerror( "rtc write %.2x %.2x\n", offset, data);
 	switch(offset) {
@@ -1409,9 +1395,6 @@ WRITE8_HANDLER( pc_rtc_w )
 		pc_rtc.data[offset]=data;
 	}
 }
-
-READ16_HANDLER( pc16le_rtc_r ) { return read16le_with_read8_handler(pc_rtc_r, space, offset, mem_mask); }
-WRITE16_HANDLER( pc16le_rtc_w ) { write16le_with_write8_handler(pc_rtc_w, space, offset, data, mem_mask); }
 
 /*************************************************************************
  *
@@ -1432,11 +1415,9 @@ static struct {
 	UINT8 reg[8];
 } pc_expansion={ { 0,0,0,0,0,0,1 } };
 
-WRITE8_HANDLER ( pc_EXP_w )
+WRITE8_MEMBER(pc_state::pc_EXP_w)
 {
-	running_machine &machine = space->machine();
-
-	DBG_LOG(1,"EXP_unit_w",("%.2x $%02x\n", offset, data));
+	//DBG_LOG(1,"EXP_unit_w",("%.2x $%02x\n", offset, data));
 	switch (offset) {
 	case 4:
 		pc_expansion.reg[4]=pc_expansion.reg[5]=pc_expansion.reg[6]=data;
@@ -1446,12 +1427,10 @@ WRITE8_HANDLER ( pc_EXP_w )
 	}
 }
 
-READ8_HANDLER ( pc_EXP_r )
+READ8_MEMBER(pc_state::pc_EXP_r)
 {
     int data;
 	UINT16 a;
-	running_machine &machine = space->machine();
-
 	switch (offset) {
 	case 6:
 		data = pc_expansion.reg[offset];
@@ -1463,7 +1442,7 @@ READ8_HANDLER ( pc_EXP_r )
 	default:
 		data = pc_expansion.reg[offset];
 	}
-    DBG_LOG(1,"EXP_unit_r",("%.2x $%02x\n", offset, data));
+    //DBG_LOG(1,"EXP_unit_r",("%.2x $%02x\n", offset, data));
 	return data;
 }
 

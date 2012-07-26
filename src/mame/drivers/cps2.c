@@ -706,7 +706,7 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 		/* bit 7 - */
 
 		/* EEPROM */
-		input_port_write(space->machine(), "EEPROMOUT", data, 0xffff);
+		state->ioport("EEPROMOUT")->write(data, 0xffff);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -798,9 +798,9 @@ static READ16_HANDLER( joy_or_paddle_r )
 	cps_state *state = space->machine().driver_data<cps_state>();
 
 	if (state->m_readpaddle != 0)
-		return (input_port_read(space->machine(), "IN0"));
+		return (state->ioport("IN0")->read());
 	else
-		return (input_port_read(space->machine(), "PADDLE1") & 0xff) | (input_port_read(space->machine(), "PADDLE2") << 8);
+		return (state->ioport("PADDLE1")->read() & 0xff) | (state->ioport("PADDLE2")->read() << 8);
 }
 
 
@@ -810,66 +810,60 @@ static READ16_HANDLER( joy_or_paddle_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( cps2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cps2_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM																			/* 68000 ROM */
-	AM_RANGE(0x400000, 0x40000b) AM_RAM AM_BASE_SIZE_MEMBER(cps_state, m_output, m_output_size)						/* CPS2 object output */
+	AM_RANGE(0x400000, 0x40000b) AM_RAM AM_SHARE("output")														/* CPS2 object output */
 	AM_RANGE(0x618000, 0x619fff) AM_READWRITE(qsound_sharedram1_r, qsound_sharedram1_w)     					/* Q RAM */
 	AM_RANGE(0x662000, 0x662001) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x662008, 0x662009) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x662020, 0x662021) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x660000, 0x663fff) AM_RAM																			/* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
 	AM_RANGE(0x664000, 0x664001) AM_RAM																			/* Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?) */
-	AM_RANGE(0x700000, 0x701fff) AM_WRITE(cps2_objram1_w) AM_BASE_MEMBER(cps_state, m_objram1)  							/* Object RAM, no game seems to use it directly */
-	AM_RANGE(0x708000, 0x709fff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, m_objram2)			/* Object RAM */
-	AM_RANGE(0x70a000, 0x70bfff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, m_objram2)			/* mirror */
-	AM_RANGE(0x70c000, 0x70dfff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, m_objram2)			/* mirror */
-	AM_RANGE(0x70e000, 0x70ffff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, m_objram2)			/* mirror */
-	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cps_state, m_cps_a_regs)								/* mirror (sfa) */
-	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE_MEMBER(cps_state, m_cps_b_regs)			/* mirror (sfa) */
+	AM_RANGE(0x700000, 0x701fff) AM_WRITE(cps2_objram1_w) AM_SHARE("objram1")							/* Object RAM, no game seems to use it directly */
+	AM_RANGE(0x708000, 0x709fff) AM_MIRROR(0x006000) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_SHARE("objram2")			/* Object RAM */
+	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_SHARE("cps_a_regs")								/* mirror (sfa) */
+	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_SHARE("cps_b_regs")			/* mirror (sfa) */
 	AM_RANGE(0x804000, 0x804001) AM_READ_PORT("IN0")                											/* IN0 */
 	AM_RANGE(0x804010, 0x804011) AM_READ_PORT("IN1")                											/* IN1 */
 	AM_RANGE(0x804020, 0x804021) AM_READ_PORT("IN2")                											/* IN2 + EEPROM */
-	AM_RANGE(0x804030, 0x804031) AM_READ(cps2_qsound_volume_r)      											/* Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present. */
-	AM_RANGE(0x804040, 0x804041) AM_WRITE(cps2_eeprom_port_w)													/* EEPROM */
+	AM_RANGE(0x804030, 0x804031) AM_READ_LEGACY(cps2_qsound_volume_r)   											/* Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present. */
+	AM_RANGE(0x804040, 0x804041) AM_WRITE_LEGACY(cps2_eeprom_port_w)													/* EEPROM */
 	AM_RANGE(0x8040a0, 0x8040a1) AM_WRITENOP                													/* Unknown (reset once on startup) */
-	AM_RANGE(0x8040b0, 0x8040b3) AM_READ(kludge_r)																/* unknown (xmcotaj hangs if this is 0) */
+	AM_RANGE(0x8040b0, 0x8040b3) AM_READ_LEGACY(kludge_r)																/* unknown (xmcotaj hangs if this is 0) */
 	AM_RANGE(0x8040e0, 0x8040e1) AM_WRITE(cps2_objram_bank_w)													/* bit 0 = Object ram bank swap */
-	AM_RANGE(0x804100, 0x80413f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cps_state, m_cps_a_regs)							/* CPS-A custom */
+	AM_RANGE(0x804100, 0x80413f) AM_WRITE(cps1_cps_a_w) AM_SHARE("cps_a_regs")							/* CPS-A custom */
 	AM_RANGE(0x804140, 0x80417f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w)           							/* CPS-B custom */
-	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE_SIZE_MEMBER(cps_state, m_gfxram, m_gfxram_size)	/* Video RAM */
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_SHARE("gfxram")	/* Video RAM */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM																			/* RAM */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dead_cps2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dead_cps2_map, AS_PROGRAM, 16, cps_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM																			/* 68000 ROM */
-	AM_RANGE(0x400000, 0x40000b) AM_RAM AM_BASE_SIZE_MEMBER(cps_state, m_output, m_output_size)						/* CPS2 object output */
+	AM_RANGE(0x400000, 0x40000b) AM_RAM AM_SHARE("output")														/* CPS2 object output */
 	AM_RANGE(0x618000, 0x619fff) AM_READWRITE(qsound_sharedram1_r, qsound_sharedram1_w)     					/* Q RAM */
 	AM_RANGE(0x662000, 0x662001) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x662008, 0x662009) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x662020, 0x662021) AM_RAM																			/* Network adapter related, accessed in SSF2TB */
 	AM_RANGE(0x660000, 0x663fff) AM_RAM																			/* When bit 14 of 0x804030 equals 0 this space is available. Many games store highscores and other info here if available. */
 	AM_RANGE(0x664000, 0x664001) AM_RAM																			/* Unknown - Only used if 0x660000-0x663fff available (could be RAM enable?) */
-	AM_RANGE(0x700000, 0x701fff) AM_WRITE(cps2_objram1_w) AM_BASE_MEMBER(cps_state, m_objram1)  							/* Object RAM, no game seems to use it directly */
-	AM_RANGE(0x708000, 0x709fff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, m_objram2)			/* Object RAM */
-	AM_RANGE(0x70a000, 0x70bfff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, m_objram2)			/* mirror */
-	AM_RANGE(0x70c000, 0x70dfff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, m_objram2)			/* mirror */
-	AM_RANGE(0x70e000, 0x70ffff) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_BASE_MEMBER(cps_state, m_objram2)			/* mirror */
-	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cps_state, m_cps_a_regs)								/* mirror (sfa) */
-	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE_MEMBER(cps_state, m_cps_b_regs)			/* mirror (sfa) */
+	AM_RANGE(0x700000, 0x701fff) AM_WRITE(cps2_objram1_w) AM_SHARE("objram1")							/* Object RAM, no game seems to use it directly */
+	AM_RANGE(0x708000, 0x709fff) AM_MIRROR(0x006000) AM_READWRITE(cps2_objram2_r, cps2_objram2_w) AM_SHARE("objram2")			/* Object RAM */
+	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_SHARE("cps_a_regs")								/* mirror (sfa) */
+	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_SHARE("cps_b_regs")			/* mirror (sfa) */
 	AM_RANGE(0x804000, 0x804001) AM_READ_PORT("IN0")                											/* IN0 */
 	AM_RANGE(0x804010, 0x804011) AM_READ_PORT("IN1")                											/* IN1 */
 	AM_RANGE(0x804020, 0x804021) AM_READ_PORT("IN2")                											/* IN2 + EEPROM */
-	AM_RANGE(0x804030, 0x804031) AM_READ(cps2_qsound_volume_r)      											/* Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present. */
-	AM_RANGE(0x804040, 0x804041) AM_WRITE(cps2_eeprom_port_w)													/* EEPROM */
+	AM_RANGE(0x804030, 0x804031) AM_READ_LEGACY(cps2_qsound_volume_r)   											/* Master volume. Also when bit 14=0 addon memory is present, when bit 15=0 network adapter present. */
+	AM_RANGE(0x804040, 0x804041) AM_WRITE_LEGACY(cps2_eeprom_port_w)													/* EEPROM */
 	AM_RANGE(0x8040a0, 0x8040a1) AM_WRITENOP                													/* Unknown (reset once on startup) */
-	AM_RANGE(0x8040b0, 0x8040b3) AM_READ(kludge_r)																/* unknown (xmcotaj hangs if this is 0) */
+	AM_RANGE(0x8040b0, 0x8040b3) AM_READ_LEGACY(kludge_r)																/* unknown (xmcotaj hangs if this is 0) */
 	AM_RANGE(0x8040e0, 0x8040e1) AM_WRITE(cps2_objram_bank_w)													/* bit 0 = Object ram bank swap */
-	AM_RANGE(0x804100, 0x80413f) AM_WRITE(cps1_cps_a_w) AM_BASE_MEMBER(cps_state, m_cps_a_regs)								/* CPS-A custom */
+	AM_RANGE(0x804100, 0x80413f) AM_WRITE(cps1_cps_a_w) AM_SHARE("cps_a_regs")								/* CPS-A custom */
 	AM_RANGE(0x804140, 0x80417f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w)           							/* CPS-B custom */
-	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE_SIZE_MEMBER(cps_state, m_gfxram, m_gfxram_size)	/* Video RAM */
+	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_SHARE("gfxram")	/* Video RAM */
 	AM_RANGE(0xff0000, 0xffffef) AM_RAM																			/* RAM */
-	AM_RANGE(0xfffff0, 0xfffffb) AM_RAM AM_BASE_SIZE_MEMBER(cps_state, m_output, m_output_size)						/* CPS2 output */
+	AM_RANGE(0xfffff0, 0xfffffb) AM_RAM AM_SHARE("output")														/* CPS2 output */
 ADDRESS_MAP_END
 
 
@@ -1223,7 +1217,7 @@ static MACHINE_START( cps2 )
 	state->m_audiocpu = machine.device("audiocpu");
 
 	if (state->m_audiocpu != NULL)	// gigaman2 has no audiocpu
-		memory_configure_bank(machine, "bank1", 0, (QSOUND_SIZE - 0x10000) / 0x4000, machine.region("audiocpu")->base() + 0x10000, 0x4000);
+		state->membank("bank1")->configure_entries(0, (QSOUND_SIZE - 0x10000) / 0x4000, state->memregion("audiocpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -8170,8 +8164,8 @@ static WRITE16_HANDLER( gigaman2_dummyqsound_w )
 static void gigaman2_gfx_reorder(running_machine &machine)
 {
 	int i;
-	int length = machine.region( "gfx" )->bytes();
-	UINT16 *rom = (UINT16 *)machine.region("gfx")->base();
+	int length = machine.root_device().memregion( "gfx" )->bytes();
+	UINT16 *rom = (UINT16 *)machine.root_device().memregion("gfx")->base();
 	UINT16 *buf = auto_alloc_array(machine, UINT16, length );
 
 	memcpy (buf, rom, length);
@@ -8187,8 +8181,8 @@ static DRIVER_INIT( gigaman2 )
 {
 	cps_state *state = machine.driver_data<cps_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
-	int length = machine.region("maincpu")->bytes();
+	UINT16 *rom = (UINT16 *)state->memregion("maincpu")->base();
+	int length = state->memregion("maincpu")->bytes();
 
 	gigaman2_gfx_reorder(machine);
 
@@ -9504,7 +9498,7 @@ ROM_START( vhunt2d )
 	ROM_LOAD16_WORD_SWAP( "vh2j_d.04a", 0x080000, 0x80000, CRC(ced9bba3) SHA1(ef7be9d39ae93ffde7d940736de9711a24585ef4) )
 	ROM_LOAD16_WORD_SWAP( "vh2j.05",    0x100000, 0x80000, CRC(de34f624) SHA1(60bbbd1765e76839b01c38765da2368c5188ec61) )
 	ROM_LOAD16_WORD_SWAP( "vh2j.06",    0x180000, 0x80000, CRC(6a3b9897) SHA1(4f3b37004db8a3d3dde709b51c94c392615134b5) )
-	ROM_LOAD16_WORD_SWAP( "vh2j_d.06",  0x200000, 0x80000, CRC(f320ea30) SHA1(c7853b83892a49917e7a0aa68bc66875a9263589) ) // fails rom test, bad? I don't see why this should change
+	ROM_LOAD16_WORD_SWAP( "vh2j.07",    0x200000, 0x80000, CRC(b021c029) SHA1(de4299197600608e83fe50775e3f352f5add844d) )
 	ROM_LOAD16_WORD_SWAP( "vh2j.08",    0x280000, 0x80000, CRC(ac873dff) SHA1(ad9a085b8403801035683b6f63eee33daf4e97ae) )
 	ROM_LOAD16_WORD_SWAP( "vh2j.09",    0x300000, 0x80000, CRC(eaefce9c) SHA1(d842a824f0d0adc13a86f780084164c1273c45a4) )
 	ROM_LOAD16_WORD_SWAP( "vh2j.10",    0x380000, 0x80000, CRC(11730952) SHA1(2966b80b99ab065614a6ddb546110f482b998e32) )
@@ -9530,14 +9524,14 @@ ROM_START( vhunt2d )
 ROM_END
 
 
-ROM_START( vsav2d ) // all modified roms fail rom check
+ROM_START( vsav2d )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "vs2j_d.03", 0x000000, 0x80000, CRC(5ee19aee) SHA1(da16d64c4de0b14a39c4a19a00c59f59579d0bd8) )
-	ROM_LOAD16_WORD_SWAP( "vs2j_d.04", 0x080000, 0x80000, CRC(80116c47) SHA1(e73c2d1fc006a74e3bb4c7a0e1b888b24b3f4c33) )
-	ROM_LOAD16_WORD_SWAP( "vs2j_d.05", 0x100000, 0x80000, CRC(dc74a062) SHA1(723e806f70a1cfcfcb37d59fae30bfd27a581f3a) )
+	ROM_LOAD16_WORD_SWAP( "vs2j_d.03", 0x000000, 0x80000, CRC(50865f7b) SHA1(30914bde1caec55847f28167bfb48bc4473a376c) )
+	ROM_LOAD16_WORD_SWAP( "vs2j_d.04", 0x080000, 0x80000, CRC(c3bff0e3) SHA1(5b81dfdc3bf4e78a9d023cd8c753ce0839c0e175) )
+	ROM_LOAD16_WORD_SWAP( "vs2j.05",   0x100000, 0x80000, CRC(61979638) SHA1(4d5625a9a06926c1a42c8f6e3a4c943f17750ec2) )
 	ROM_LOAD16_WORD_SWAP( "vs2j.06",   0x180000, 0x80000, CRC(f37c5bc2) SHA1(d8c1040a6ee6b9fc677a6a32b99bf02b6a707812) )
 	ROM_LOAD16_WORD_SWAP( "vs2j.07",   0x200000, 0x80000, CRC(8f885809) SHA1(69dac07e1f483b6478f792d20a137d6a081fbea3) )
-	ROM_LOAD16_WORD_SWAP( "vs2j_d.08", 0x280000, 0x80000, CRC(97554918) SHA1(da6a8f6ba160696b141117c7c0da6f459637a729) ) // should this really be different?
+	ROM_LOAD16_WORD_SWAP( "vs2j.08",   0x280000, 0x80000, CRC(2018c120) SHA1(de1184ab771c6f075cdefa744a28b09f78d91643) )
 	ROM_LOAD16_WORD_SWAP( "vs2j.09",   0x300000, 0x80000, CRC(fac3c217) SHA1(0e9dd54e401e6d7c4fe81107ffd27e42ca810fcb) )
 	ROM_LOAD16_WORD_SWAP( "vs2j.10",   0x380000, 0x80000, CRC(eb490213) SHA1(bf0416df66a33c7a4678ab4a047de334dfd3b31e) )
 
@@ -9794,7 +9788,7 @@ GAME( 1994, ssf2xjd,  ssf2t,    dead_cps2, cps2_2p6b, cps2,    ROT0,   "bootleg"
 GAME( 1997, sgemfd,   sgemf,    dead_cps2, cps2_2p3b, cps2,    ROT0,   "bootleg", "Super Gem Fighter Mini Mix (USA 970904 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 2000, mmatrixd, mmatrix,  dead_cps2, cps2_2p1b, cps2,    ROT0,   "bootleg", "Mars Matrix: Hyper Solid Shooting (Japan 000412 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 2000, dimahoud, dimahoo,  dead_cps2, cps2_2p3b, cps2,    ROT270, "bootleg", "Dimahoo (USA 000121 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1997, vhunt2d,  vhunt2,   dead_cps2, cps2_2p6b, cps2,    ROT0,   "bootleg", "Vampire Hunter 2: Darkstalkers Revenge (Japan 970929 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1997, vhunt2d,  vhunt2,   dead_cps2, cps2_2p6b, cps2,    ROT0,   "bootleg", "Vampire Hunter 2: Darkstalkers Revenge (Japan 970913 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1997, vsav2d,   vsav2,    dead_cps2, cps2_2p6b, cps2,    ROT0,   "bootleg", "Vampire Savior 2: The Lord of Vampire (Japan 970913 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1997, csclub1d, csclub,   dead_cps2, cps2_2p3b, cps2,    ROT0,   "bootleg", "Capcom Sports Club (Euro 970722 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1995, cybotsud, cybots,   dead_cps2, cybots,    cps2,    ROT0,   "bootleg", "Cyberbots: Fullmetal Madness (USA 950424 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )

@@ -7,6 +7,7 @@
 #include "emu.h"
 #include "cpu/tms34010/tms34010.h"
 #include "includes/midtunit.h"
+#include "includes/midxunit.h"
 
 
 /* compile-time options */
@@ -127,7 +128,7 @@ VIDEO_START( midxunit )
  *
  *************************************/
 
-READ16_HANDLER( midtunit_gfxrom_r )
+READ16_MEMBER(midtunit_state::midtunit_gfxrom_r)
 {
 	UINT8 *base = &midtunit_gfx_rom[gfxbank_offset[(offset >> 21) & 1]];
 	offset = (offset & 0x01fffff) * 2;
@@ -135,7 +136,7 @@ READ16_HANDLER( midtunit_gfxrom_r )
 }
 
 
-READ16_HANDLER( midwunit_gfxrom_r )
+READ16_MEMBER(midtunit_state::midwunit_gfxrom_r)
 {
 	UINT8 *base = &midtunit_gfx_rom[gfxbank_offset[0]];
 	offset *= 2;
@@ -150,7 +151,7 @@ READ16_HANDLER( midwunit_gfxrom_r )
  *
  *************************************/
 
-WRITE16_HANDLER( midtunit_vram_w )
+WRITE16_MEMBER(midtunit_state::midtunit_vram_w)
 {
 	offset *= 2;
 	if (videobank_select)
@@ -170,7 +171,7 @@ WRITE16_HANDLER( midtunit_vram_w )
 }
 
 
-WRITE16_HANDLER( midtunit_vram_data_w )
+WRITE16_MEMBER(midtunit_state::midtunit_vram_data_w)
 {
 	offset *= 2;
 	if (ACCESSING_BITS_0_7)
@@ -180,7 +181,7 @@ WRITE16_HANDLER( midtunit_vram_data_w )
 }
 
 
-WRITE16_HANDLER( midtunit_vram_color_w )
+WRITE16_MEMBER(midtunit_state::midtunit_vram_color_w)
 {
 	offset *= 2;
 	if (ACCESSING_BITS_0_7)
@@ -190,7 +191,7 @@ WRITE16_HANDLER( midtunit_vram_color_w )
 }
 
 
-READ16_HANDLER( midtunit_vram_r )
+READ16_MEMBER(midtunit_state::midtunit_vram_r)
 {
 	offset *= 2;
 	if (videobank_select)
@@ -200,14 +201,14 @@ READ16_HANDLER( midtunit_vram_r )
 }
 
 
-READ16_HANDLER( midtunit_vram_data_r )
+READ16_MEMBER(midtunit_state::midtunit_vram_data_r)
 {
 	offset *= 2;
 	return (local_videoram[offset] & 0x00ff) | (local_videoram[offset + 1] << 8);
 }
 
 
-READ16_HANDLER( midtunit_vram_color_r )
+READ16_MEMBER(midtunit_state::midtunit_vram_color_r)
 {
 	offset *= 2;
 	return (local_videoram[offset] >> 8) | (local_videoram[offset + 1] & 0xff00);
@@ -240,7 +241,7 @@ void midtunit_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftr
  *
  *************************************/
 
-WRITE16_HANDLER( midtunit_control_w )
+WRITE16_MEMBER(midtunit_state::midtunit_control_w)
 {
 	/*
         other important bits:
@@ -261,7 +262,7 @@ WRITE16_HANDLER( midtunit_control_w )
 }
 
 
-WRITE16_HANDLER( midwunit_control_w )
+WRITE16_MEMBER(midtunit_state::midwunit_control_w)
 {
 	/*
         other important bits:
@@ -279,7 +280,7 @@ WRITE16_HANDLER( midwunit_control_w )
 }
 
 
-READ16_HANDLER( midwunit_control_r )
+READ16_MEMBER(midtunit_state::midwunit_control_r)
 {
 	return midtunit_control;
 }
@@ -292,26 +293,26 @@ READ16_HANDLER( midwunit_control_r )
  *
  *************************************/
 
-WRITE16_HANDLER( midtunit_paletteram_w )
+WRITE16_MEMBER(midtunit_state::midtunit_paletteram_w)
 {
 	//int newword;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	//newword = space->machine().generic.paletteram.u16[offset];
-	palette_set_color_rgb(space->machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	//newword = m_generic_paletteram_16[offset];
+	palette_set_color_rgb(machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 
-WRITE16_HANDLER( midxunit_paletteram_w )
+WRITE16_MEMBER(midtunit_state::midxunit_paletteram_w)
 {
 	if (!(offset & 1))
 		midtunit_paletteram_w(space, offset / 2, data, mem_mask);
 }
 
 
-READ16_HANDLER( midxunit_paletteram_r )
+READ16_MEMBER(midtunit_state::midxunit_paletteram_r)
 {
-	return space->machine().generic.paletteram.u16[offset / 2];
+	return m_generic_paletteram_16[offset / 2];
 }
 
 
@@ -599,7 +600,7 @@ static TIMER_CALLBACK( dma_callback )
  *
  *************************************/
 
-READ16_HANDLER( midtunit_dma_r )
+READ16_MEMBER(midtunit_state::midtunit_dma_r)
 {
 	/* rmpgwt sometimes reads register 0, expecting it to return the */
 	/* current DMA status; thus we map register 0 to register 1 */
@@ -656,7 +657,7 @@ READ16_HANDLER( midtunit_dma_r )
  *           | ----------2----- | select top/bottom or left/right for reg 12/13
  */
 
-WRITE16_HANDLER( midtunit_dma_w )
+WRITE16_MEMBER(midtunit_state::midtunit_dma_w)
 {
 	static const UINT8 register_map[2][16] =
 	{
@@ -678,7 +679,7 @@ WRITE16_HANDLER( midtunit_dma_w )
 
 	/* high bit triggers action */
 	command = dma_register[DMA_COMMAND];
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 	if (!(command & 0x8000))
 		return;
 
@@ -714,7 +715,7 @@ WRITE16_HANDLER( midtunit_dma_w )
 
 if (LOG_DMA)
 {
-	if (space->machine().input().code_pressed(KEYCODE_L))
+	if (machine().input().code_pressed(KEYCODE_L))
 	{
 		logerror("DMA command %04X: (bpp=%d skip=%d xflip=%d yflip=%d preskip=%d postskip=%d)\n",
 				command, (command >> 12) & 7, (command >> 7) & 1, (command >> 4) & 1, (command >> 5) & 1, (command >> 8) & 3, (command >> 10) & 3);
@@ -788,7 +789,7 @@ if (LOG_DMA)
 
 	/* signal we're done */
 skipdma:
-	space->machine().scheduler().timer_set(attotime::from_nsec(41 * pixels), FUNC(dma_callback));
+	machine().scheduler().timer_set(attotime::from_nsec(41 * pixels), FUNC(dma_callback));
 
 	g_profiler.stop();
 }

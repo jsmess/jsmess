@@ -262,7 +262,7 @@ WRITE_LINE_MEMBER( ti_fdc_device::drq_w )
 void ti_fdc_device::device_start(void)
 {
 	if (VERBOSE>5) LOG("ti_fdc: TI FDC start\n");
-	m_dsrrom = subregion(DSRROM)->base();
+	m_dsrrom = memregion(DSRROM)->base();
 	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
 	m_controller = subdevice(FDC_TAG);
 

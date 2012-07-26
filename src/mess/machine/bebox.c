@@ -1071,7 +1071,7 @@ MACHINE_RESET( bebox )
 	cputag_set_input_line(machine, "ppc1", INPUT_LINE_RESET, CLEAR_LINE);
 	cputag_set_input_line(machine, "ppc2", INPUT_LINE_RESET, ASSERT_LINE);
 
-	memcpy(machine.device<fujitsu_29f016a_device>("flash")->space()->get_read_ptr(0),machine.region("user1")->base(),0x200000);
+	memcpy(machine.device<fujitsu_29f016a_device>("flash")->space()->get_read_ptr(0),state->memregion("user1")->base(),0x200000);
 }
 
 static void bebox_exit(running_machine &machine)
@@ -1089,18 +1089,19 @@ MACHINE_START( bebox )
 
 DRIVER_INIT( bebox )
 {
+	bebox_state *state = machine.driver_data<bebox_state>();
 	address_space *space_0 = machine.device("ppc1")->memory().space(AS_PROGRAM);
 	address_space *space_1 = machine.device("ppc2")->memory().space(AS_PROGRAM);
 	offs_t vram_begin;
 	offs_t vram_end;
 
 	/* set up boot and flash ROM */
-	memory_set_bankptr(machine, "bank2", machine.region("user2")->base());
+	state->membank("bank2")->set_base(machine.root_device().memregion("user2")->base());
 
 	/* install MESS managed RAM */
 	space_0->install_readwrite_bank(0, machine.device<ram_device>(RAM_TAG)->size() - 1, 0, 0x02000000, "bank3");
 	space_1->install_readwrite_bank(0, machine.device<ram_device>(RAM_TAG)->size() - 1, 0, 0x02000000, "bank3");
-	memory_set_bankptr(machine, "bank3", machine.device<ram_device>(RAM_TAG)->pointer());
+	state->membank("bank3")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
 
 	kbdc8042_init(machine, &bebox_8042_interface);
 
@@ -1129,6 +1130,6 @@ DRIVER_INIT( bebox )
 			U64(0x4E80042000000000)
 		};
 		space_1->install_read_bank(0x9421FFF0, 0x9421FFFF, "bank1");
-		memory_set_bankptr(machine, "bank1", ops);
+		state->membank("bank1")->set_base(ops);
 	}
 }

@@ -60,13 +60,20 @@ public:
 	device_t	*m_pic8259_2;
 	device_t	*m_dma8237_1;
 	device_t	*m_dma8237_2;
+	DECLARE_WRITE32_MEMBER(pnp_config_w);
+	DECLARE_WRITE32_MEMBER(pnp_data_w);
+	DECLARE_WRITE32_MEMBER(bios_ram_w);
+	DECLARE_READ8_MEMBER(at_page8_r);
+	DECLARE_WRITE8_MEMBER(at_page8_w);
+	DECLARE_READ8_MEMBER(pc_dma_read_byte);
+	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 };
 
 #if !ENABLE_VGA
 static SCREEN_UPDATE_RGB32( taitowlf )
 {
 	int x,y,count;
-	const UINT8 *blit_ram = screen.machine().region("user5")->base();
+	const UINT8 *blit_ram = screen.machine().root_device().memregion("user5")->base();
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 
@@ -137,11 +144,11 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 		{
 			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
 			{
-				memory_set_bankptr(busdevice->machine(), "bank1", state->m_bios_ram);
+				state->membank("bank1")->set_base(state->m_bios_ram);
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				memory_set_bankptr(busdevice->machine(), "bank1", busdevice->machine().region("user1")->base() + 0x30000);
+				state->membank("bank1")->set_base(busdevice->machine().root_device().memregion("user1")->base() + 0x30000);
 			}
 			break;
 		}
@@ -262,7 +269,7 @@ static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int functi
 }
 
 // ISA Plug-n-Play
-static WRITE32_HANDLER( pnp_config_w )
+WRITE32_MEMBER(taitowlf_state::pnp_config_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -270,7 +277,7 @@ static WRITE32_HANDLER( pnp_config_w )
 	}
 }
 
-static WRITE32_HANDLER( pnp_data_w )
+WRITE32_MEMBER(taitowlf_state::pnp_data_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
@@ -303,12 +310,11 @@ static WRITE32_DEVICE_HANDLER( fdc_w )
 
 
 
-static WRITE32_HANDLER(bios_ram_w)
+WRITE32_MEMBER(taitowlf_state::bios_ram_w)
 {
-	taitowlf_state *state = space->machine().driver_data<taitowlf_state>();
-	if (state->m_mxtc_config_reg[0x59] & 0x20)		// write to RAM if this region is write-enabled
+	if (m_mxtc_config_reg[0x59] & 0x20)		// write to RAM if this region is write-enabled
 	{
-		COMBINE_DATA(state->m_bios_ram + offset);
+		COMBINE_DATA(m_bios_ram + offset);
 	}
 }
 
@@ -321,48 +327,46 @@ static WRITE32_HANDLER(bios_ram_w)
 
 
 
-static READ8_HANDLER(at_page8_r)
+READ8_MEMBER(taitowlf_state::at_page8_r)
 {
-	taitowlf_state *state = space->machine().driver_data<taitowlf_state>();
-	UINT8 data = state->m_at_pages[offset % 0x10];
+	UINT8 data = m_at_pages[offset % 0x10];
 
 	switch(offset % 8)
 	{
 	case 1:
-		data = state->m_dma_offset[(offset / 8) & 1][2];
+		data = m_dma_offset[(offset / 8) & 1][2];
 		break;
 	case 2:
-		data = state->m_dma_offset[(offset / 8) & 1][3];
+		data = m_dma_offset[(offset / 8) & 1][3];
 		break;
 	case 3:
-		data = state->m_dma_offset[(offset / 8) & 1][1];
+		data = m_dma_offset[(offset / 8) & 1][1];
 		break;
 	case 7:
-		data = state->m_dma_offset[(offset / 8) & 1][0];
+		data = m_dma_offset[(offset / 8) & 1][0];
 		break;
 	}
 	return data;
 }
 
 
-static WRITE8_HANDLER(at_page8_w)
+WRITE8_MEMBER(taitowlf_state::at_page8_w)
 {
-	taitowlf_state *state = space->machine().driver_data<taitowlf_state>();
-	state->m_at_pages[offset % 0x10] = data;
+	m_at_pages[offset % 0x10] = data;
 
 	switch(offset % 8)
 	{
 	case 1:
-		state->m_dma_offset[(offset / 8) & 1][2] = data;
+		m_dma_offset[(offset / 8) & 1][2] = data;
 		break;
 	case 2:
-		state->m_dma_offset[(offset / 8) & 1][3] = data;
+		m_dma_offset[(offset / 8) & 1][3] = data;
 		break;
 	case 3:
-		state->m_dma_offset[(offset / 8) & 1][1] = data;
+		m_dma_offset[(offset / 8) & 1][1] = data;
 		break;
 	case 7:
-		state->m_dma_offset[(offset / 8) & 1][0] = data;
+		m_dma_offset[(offset / 8) & 1][0] = data;
 		break;
 	}
 }
@@ -377,23 +381,21 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 }
 
 
-static READ8_HANDLER( pc_dma_read_byte )
+READ8_MEMBER(taitowlf_state::pc_dma_read_byte)
 {
-	taitowlf_state *state = space->machine().driver_data<taitowlf_state>();
-	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0xFF0000;
 
-	return space->read_byte(page_offset + offset);
+	return space.read_byte(page_offset + offset);
 }
 
 
-static WRITE8_HANDLER( pc_dma_write_byte )
+WRITE8_MEMBER(taitowlf_state::pc_dma_write_byte)
 {
-	taitowlf_state *state = space->machine().driver_data<taitowlf_state>();
-	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0xFF0000;
 
-	space->write_byte(page_offset + offset, data);
+	space.write_byte(page_offset + offset, data);
 }
 
 
@@ -425,8 +427,8 @@ static I8237_INTERFACE( dma8237_1_config )
 {
 	DEVCB_LINE(pc_dma_hrq_changed),
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
+	DEVCB_DRIVER_MEMBER(taitowlf_state, pc_dma_read_byte),
+	DEVCB_DRIVER_MEMBER(taitowlf_state, pc_dma_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
@@ -443,21 +445,9 @@ static I8237_INTERFACE( dma8237_2_config )
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
 
-static READ32_HANDLER(at_page32_r)
-{
-	return read32le_with_read8_handler(at_page8_r, space, offset, mem_mask);
-}
-
-
-static WRITE32_HANDLER(at_page32_w)
-{
-	write32le_with_write8_handler(at_page8_w, space, offset, data, mem_mask);
-}
-
-
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( taitowlf_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( taitowlf_map, AS_PROGRAM, 32, taitowlf_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM
 	#if ENABLE_VGA
@@ -472,23 +462,23 @@ static ADDRESS_MAP_START( taitowlf_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user1", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(taitowlf_io, AS_IO, 32)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8_MODERN("rtc", mc146818_device, read, write, 0xffffffff)
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,				at_page32_w)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
+static ADDRESS_MAP_START(taitowlf_io, AS_IO, 32, taitowlf_state )
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffffffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
+	AM_RANGE(0x0060, 0x006f) AM_READWRITE_LEGACY(kbdc8042_32le_r,			kbdc8042_32le_w)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff)
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE_LEGACY("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_r, ide_w)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE_LEGACY("ide", ide_r, ide_w)
 	AM_RANGE(0x0300, 0x03af) AM_NOP
 	AM_RANGE(0x03b0, 0x03df) AM_NOP
 	AM_RANGE(0x0278, 0x027b) AM_WRITE(pnp_config_w)
-	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE("ide", fdc_r, fdc_w)
+	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE_LEGACY("ide", fdc_r, fdc_w)
 	AM_RANGE(0x0a78, 0x0a7b) AM_WRITE(pnp_data_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_32le_r,	pci_32le_w)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE_LEGACY("pcibus", pci_32le_r,	pci_32le_w)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -549,7 +539,7 @@ static MACHINE_START(taitowlf)
 
 static MACHINE_RESET(taitowlf)
 {
-	memory_set_bankptr(machine, "bank1", machine.region("user1")->base() + 0x30000);
+	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("user1")->base() + 0x30000);
 }
 
 

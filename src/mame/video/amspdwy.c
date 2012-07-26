@@ -16,18 +16,17 @@
 #include "includes/amspdwy.h"
 
 
-WRITE8_HANDLER( amspdwy_paletteram_w )
+WRITE8_MEMBER(amspdwy_state::amspdwy_paletteram_w)
 {
 	data ^= 0xff;
-	paletteram_BBGGGRRR_w(space, offset, data);
-//  paletteram_RRRGGGBB_w(offset, data);
+	paletteram_BBGGGRRR_byte_w(space, offset, data);
+//  paletteram_RRRGGGBB_byte_w(offset, data);
 }
 
-WRITE8_HANDLER( amspdwy_flipscreen_w )
+WRITE8_MEMBER(amspdwy_state::amspdwy_flipscreen_w)
 {
-	amspdwy_state *state = space->machine().driver_data<amspdwy_state>();
-	state->m_flipscreen ^= 1;
-	flip_screen_set(space->machine(), state->m_flipscreen);
+	m_flipscreen ^= 1;
+	flip_screen_set(m_flipscreen);
 }
 
 /***************************************************************************
@@ -55,18 +54,16 @@ static TILE_GET_INFO( get_tile_info )
 			0);
 }
 
-WRITE8_HANDLER( amspdwy_videoram_w )
+WRITE8_MEMBER(amspdwy_state::amspdwy_videoram_w)
 {
-	amspdwy_state *state = space->machine().driver_data<amspdwy_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( amspdwy_colorram_w )
+WRITE8_MEMBER(amspdwy_state::amspdwy_colorram_w)
 {
-	amspdwy_state *state = space->machine().driver_data<amspdwy_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -111,7 +108,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	int max_x = machine.primary_screen->width()  - 1;
 	int max_y = machine.primary_screen->height() - 1;
 
-	for (i = 0; i < state->m_spriteram_size ; i += 4)
+	for (i = 0; i < state->m_spriteram.bytes() ; i += 4)
 	{
 		int y = spriteram[i + 0];
 		int x = spriteram[i + 1];
@@ -120,7 +117,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int flipx = attr & 0x80;
 		int flipy = attr & 0x40;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			x = max_x - x - 8;
 			y = max_y - y - 8;

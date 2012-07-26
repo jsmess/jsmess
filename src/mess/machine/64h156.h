@@ -60,7 +60,6 @@
 #ifndef __C64H156__
 #define __C64H156__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "imagedev/flopdrv.h"

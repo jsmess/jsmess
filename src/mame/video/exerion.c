@@ -36,6 +36,7 @@
 
 PALETTE_INIT( exerion )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -110,7 +111,7 @@ VIDEO_START( exerion )
 	UINT8 *gfx;
 
 	/* get pointers to the mixing and lookup PROMs */
-	state->m_background_mixer = machine.region("proms")->base() + 0x320;
+	state->m_background_mixer = state->memregion("proms")->base() + 0x320;
 
 	/* allocate memory for the decoded background graphics */
 	state->m_background_gfx[0] = auto_alloc_array(machine, UINT16, 256 * 256 * 4);
@@ -135,7 +136,7 @@ VIDEO_START( exerion )
      * Where AA,BB,CC,DD are the 2bpp data for the pixel,and a,b,c,d are the OR
      * of these two bits together.
      */
-	gfx = machine.region("gfx3")->base();
+	gfx = state->memregion("gfx3")->base();
 	for (i = 0; i < 4; i++)
 	{
 		int y;
@@ -183,48 +184,46 @@ VIDEO_START( exerion )
  *
  *************************************/
 
-WRITE8_HANDLER( exerion_videoreg_w )
+WRITE8_MEMBER(exerion_state::exerion_videoreg_w)
 {
-	exerion_state *state = space->machine().driver_data<exerion_state>();
 
 	/* bit 0 = flip screen and joystick input multiplexer */
-	state->m_cocktail_flip = data & 1;
+	m_cocktail_flip = data & 1;
 
 	/* bits 1-2 char lookup table bank */
-	state->m_char_palette = (data & 0x06) >> 1;
+	m_char_palette = (data & 0x06) >> 1;
 
 	/* bits 3 char bank */
-	state->m_char_bank = (data & 0x08) >> 3;
+	m_char_bank = (data & 0x08) >> 3;
 
 	/* bits 4-5 unused */
 
 	/* bits 6-7 sprite lookup table bank */
-	state->m_sprite_palette = (data & 0xc0) >> 6;
+	m_sprite_palette = (data & 0xc0) >> 6;
 }
 
 
-WRITE8_HANDLER( exerion_video_latch_w )
+WRITE8_MEMBER(exerion_state::exerion_video_latch_w)
 {
-	exerion_state *state = space->machine().driver_data<exerion_state>();
-	int scanline = space->machine().primary_screen->vpos();
+	int scanline = machine().primary_screen->vpos();
 	if (scanline > 0)
-		space->machine().primary_screen->update_partial(scanline - 1);
-	state->m_background_latches[offset] = data;
+		machine().primary_screen->update_partial(scanline - 1);
+	m_background_latches[offset] = data;
 }
 
 
-READ8_HANDLER( exerion_video_timing_r )
+READ8_MEMBER(exerion_state::exerion_video_timing_r)
 {
 	/* bit 0 is the SNMI signal, which is the negated value of H6, if H7=1 & H8=1 & VBLANK=0, otherwise 1 */
 	/* bit 1 is VBLANK */
 
-	UINT16 hcounter = space->machine().primary_screen->hpos() + EXERION_HCOUNT_START;
+	UINT16 hcounter = machine().primary_screen->hpos() + EXERION_HCOUNT_START;
 	UINT8 snmi = 1;
 
-	if (((hcounter & 0x180) == 0x180) && !space->machine().primary_screen->vblank())
+	if (((hcounter & 0x180) == 0x180) && !machine().primary_screen->vblank())
 		snmi = !((hcounter >> 6) & 0x01);
 
-	return (space->machine().primary_screen->vblank() << 1) | snmi;
+	return (machine().primary_screen->vblank() << 1) | snmi;
 }
 
 
@@ -359,7 +358,7 @@ SCREEN_UPDATE_IND16( exerion )
 	draw_background(screen.machine(), bitmap, cliprect);
 
 	/* draw sprites */
-	for (i = 0; i < state->m_spriteram_size; i += 4)
+	for (i = 0; i < state->m_spriteram.bytes(); i += 4)
 	{
 		int flags = state->m_spriteram[i + 0];
 		int y = state->m_spriteram[i + 1] ^ 255;

@@ -171,11 +171,10 @@ static TIMER_CALLBACK( clock_irq )
 }
 
 
-static CUSTOM_INPUT( get_vblank )
+CUSTOM_INPUT_MEMBER(ccastles_state::get_vblank)
 {
-	ccastles_state *state = field.machine().driver_data<ccastles_state>();
-	int scanline = field.machine().primary_screen->vpos();
-	return state->m_syncprom[scanline & 0xff] & 1;
+	int scanline = machine().primary_screen->vpos();
+	return m_syncprom[scanline & 0xff] & 1;
 }
 
 
@@ -192,7 +191,7 @@ static MACHINE_START( ccastles )
 	rectangle visarea;
 
 	/* initialize globals */
-	state->m_syncprom = machine.region("proms")->base() + 0x000;
+	state->m_syncprom = state->memregion("proms")->base() + 0x000;
 
 	/* find the start of VBLANK in the SYNC PROM */
 	for (state->m_vblank_start = 0; state->m_vblank_start < 256; state->m_vblank_start++)
@@ -214,7 +213,7 @@ static MACHINE_START( ccastles )
 	machine.primary_screen->configure(320, 256, visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* configure the ROM banking */
-	memory_configure_bank(machine, "bank1", 0, 2, machine.region("maincpu")->base() + 0xa000, 0x6000);
+	state->membank("bank1")->configure_entries(0, 2, state->memregion("maincpu")->base() + 0xa000, 0x6000);
 
 	/* create a timer for IRQs and set up the first callback */
 	state->m_irq_timer = machine.scheduler().timer_alloc(FUNC(clock_irq));
@@ -242,40 +241,39 @@ static MACHINE_RESET( ccastles )
  *
  *************************************/
 
-static WRITE8_HANDLER( irq_ack_w )
+WRITE8_MEMBER(ccastles_state::irq_ack_w)
 {
-	ccastles_state *state = space->machine().driver_data<ccastles_state>();
-	if (state->m_irq_state)
+	if (m_irq_state)
 	{
-		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
-		state->m_irq_state = 0;
+		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
+		m_irq_state = 0;
 	}
 }
 
 
-static WRITE8_HANDLER( led_w )
+WRITE8_MEMBER(ccastles_state::led_w)
 {
-	set_led_status(space->machine(), offset, ~data & 1);
+	set_led_status(machine(), offset, ~data & 1);
 }
 
 
-static WRITE8_HANDLER( ccounter_w )
+WRITE8_MEMBER(ccastles_state::ccounter_w)
 {
-	coin_counter_w(space->machine(), offset, data & 1);
+	coin_counter_w(machine(), offset, data & 1);
 }
 
 
-static WRITE8_HANDLER( bankswitch_w )
+WRITE8_MEMBER(ccastles_state::bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 1);
+	membank("bank1")->set_entry(data & 1);
 }
 
 
-static READ8_HANDLER( leta_r )
+READ8_MEMBER(ccastles_state::leta_r)
 {
 	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
 
-	return input_port_read(space->machine(), letanames[offset]);
+	return ioport(letanames[offset])->read();
 }
 
 
@@ -286,39 +284,35 @@ static READ8_HANDLER( leta_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( nvram_recall_w )
+WRITE8_MEMBER(ccastles_state::nvram_recall_w)
 {
-	ccastles_state *state = space->machine().driver_data<ccastles_state>();
-	state->m_nvram_4b->recall(0);
-	state->m_nvram_4b->recall(1);
-	state->m_nvram_4b->recall(0);
-	state->m_nvram_4a->recall(0);
-	state->m_nvram_4a->recall(1);
-	state->m_nvram_4a->recall(0);
+	m_nvram_4b->recall(0);
+	m_nvram_4b->recall(1);
+	m_nvram_4b->recall(0);
+	m_nvram_4a->recall(0);
+	m_nvram_4a->recall(1);
+	m_nvram_4a->recall(0);
 }
 
 
-static WRITE8_HANDLER( nvram_store_w )
+WRITE8_MEMBER(ccastles_state::nvram_store_w)
 {
-	ccastles_state *state = space->machine().driver_data<ccastles_state>();
-	state->m_nvram_store[offset] = data & 1;
-	state->m_nvram_4b->store(~state->m_nvram_store[0] & state->m_nvram_store[1]);
-	state->m_nvram_4a->store(~state->m_nvram_store[0] & state->m_nvram_store[1]);
+	m_nvram_store[offset] = data & 1;
+	m_nvram_4b->store(~m_nvram_store[0] & m_nvram_store[1]);
+	m_nvram_4a->store(~m_nvram_store[0] & m_nvram_store[1]);
 }
 
 
-static READ8_HANDLER( nvram_r )
+READ8_MEMBER(ccastles_state::nvram_r)
 {
-	ccastles_state *state = space->machine().driver_data<ccastles_state>();
-	return (state->m_nvram_4b->read(*space, offset) & 0x0f) | (state->m_nvram_4a->read(*space, offset) << 4);
+	return (m_nvram_4b->read(space, offset) & 0x0f) | (m_nvram_4a->read(space, offset) << 4);
 }
 
 
-static WRITE8_HANDLER( nvram_w )
+WRITE8_MEMBER(ccastles_state::nvram_w)
 {
-	ccastles_state *state = space->machine().driver_data<ccastles_state>();
-	state->m_nvram_4b->write(*space, offset, data);
-	state->m_nvram_4a->write(*space, offset, data >> 4);
+	m_nvram_4b->write(space, offset, data);
+	m_nvram_4a->write(space, offset, data >> 4);
 }
 
 
@@ -330,17 +324,17 @@ static WRITE8_HANDLER( nvram_w )
  *************************************/
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, ccastles_state )
 	AM_RANGE(0x0000, 0x0001) AM_WRITE(ccastles_bitmode_addr_w)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(ccastles_bitmode_r, ccastles_bitmode_w)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM_WRITE(ccastles_videoram_w) AM_BASE_MEMBER(ccastles_state, m_videoram)
+	AM_RANGE(0x0000, 0x7fff) AM_RAM_WRITE(ccastles_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x8e00, 0x8fff) AM_BASE_MEMBER(ccastles_state, m_spriteram)
+	AM_RANGE(0x8e00, 0x8fff) AM_SHARE("spriteram")
 	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0300) AM_READWRITE(nvram_r, nvram_w)
 	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x01fc) AM_READ(leta_r)
 	AM_RANGE(0x9600, 0x97ff) AM_READ_PORT("IN0")
-	AM_RANGE(0x9800, 0x980f) AM_MIRROR(0x01f0) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
-	AM_RANGE(0x9a00, 0x9a0f) AM_MIRROR(0x01f0) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x9800, 0x980f) AM_MIRROR(0x01f0) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x9a00, 0x9a0f) AM_MIRROR(0x01f0) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x9c00, 0x9c7f) AM_WRITE(nvram_recall_w)
 	AM_RANGE(0x9c80, 0x9cff) AM_WRITE(ccastles_hscroll_w)
 	AM_RANGE(0x9d00, 0x9d7f) AM_WRITE(ccastles_vscroll_w)
@@ -371,7 +365,7 @@ static INPUT_PORTS_START( ccastles )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_vblank, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ccastles_state,get_vblank, NULL)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )					/* 1p Jump, non-cocktail start1 */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)		/* 2p Jump, non-cocktail start2 */
 

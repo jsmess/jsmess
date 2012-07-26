@@ -62,17 +62,20 @@ public:
 	int m_map4[256];
 	int m_map16[256];
 	emu_timer *m_scanline_timer;
+	DECLARE_READ8_MEMBER(electron_read_keyboard);
+	DECLARE_READ8_MEMBER(electron_jim_r);
+	DECLARE_WRITE8_MEMBER(electron_jim_w);
+	DECLARE_READ8_MEMBER(electron_1mhz_r);
+	DECLARE_WRITE8_MEMBER(electron_1mhz_w);
+	DECLARE_READ8_MEMBER(electron_ula_r);
+	DECLARE_WRITE8_MEMBER(electron_ula_w);
+	void electron_tape_start();
+	void electron_tape_stop();
 };
 
 
 /*----------- defined in machine/electron.c -----------*/
 
-READ8_HANDLER( electron_jim_r );
-WRITE8_HANDLER( electron_jim_w );
-READ8_HANDLER( electron_1mhz_r );
-WRITE8_HANDLER( electron_1mhz_w );
-READ8_HANDLER( electron_ula_r );
-WRITE8_HANDLER( electron_ula_w );
 MACHINE_START( electron );
 
 void electron_interrupt_handler(running_machine &machine, int mode, int interrupt);

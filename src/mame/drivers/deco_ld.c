@@ -112,13 +112,20 @@ class deco_ld_state : public driver_device
 public:
 	deco_ld_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") { }
+		  m_laserdisc(*this, "laserdisc") ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 m_vram_bank;
 	required_device<pioneer_ldv1000_device> m_laserdisc;
+	required_shared_ptr<UINT8> m_videoram;
+	UINT8 m_vram_bank;
 	UINT8 m_laserdisc_data;
 	int m_nmimask;
+	DECLARE_WRITE8_MEMBER(rblaster_sound_w);
+	DECLARE_WRITE8_MEMBER(rblaster_vram_bank_w);
+	DECLARE_READ8_MEMBER(laserdisc_r);
+	DECLARE_WRITE8_MEMBER(laserdisc_w);
+	DECLARE_READ8_MEMBER(test_r);
+	DECLARE_WRITE8_MEMBER(nmimask_w);
 };
 
 
@@ -148,40 +155,37 @@ static SCREEN_UPDATE_IND16( rblaster )
 }
 
 #if 0
-static WRITE8_HANDLER( rblaster_sound_w )
+WRITE8_MEMBER(deco_ld_state::rblaster_sound_w)
 {
-	soundlatch_w(space,0,data);
-	device_set_input_line(space->machine().cpu[1], 0, HOLD_LINE);
+	soundlatch_byte_w(space,0,data);
+	device_set_input_line(machine().cpu[1], 0, HOLD_LINE);
 }
 #endif
 
-static WRITE8_HANDLER( rblaster_vram_bank_w )
+WRITE8_MEMBER(deco_ld_state::rblaster_vram_bank_w)
 {
-	deco_ld_state *state = space->machine().driver_data<deco_ld_state>();
-	state->m_vram_bank = data;
+	m_vram_bank = data;
 }
 
-static READ8_HANDLER( laserdisc_r )
+READ8_MEMBER(deco_ld_state::laserdisc_r)
 {
-	deco_ld_state *state = space->machine().driver_data<deco_ld_state>();
-	UINT8 result = state->m_laserdisc->status_r();
+	UINT8 result = m_laserdisc->status_r();
 //  mame_printf_debug("laserdisc_r = %02X\n", result);
 	return result;
 }
 
 
-static WRITE8_HANDLER( laserdisc_w )
+WRITE8_MEMBER(deco_ld_state::laserdisc_w)
 {
-	deco_ld_state *state = space->machine().driver_data<deco_ld_state>();
-	state->m_laserdisc_data = data;
+	m_laserdisc_data = data;
 }
 
-static READ8_HANDLER( test_r )
+READ8_MEMBER(deco_ld_state::test_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static ADDRESS_MAP_START( begas_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( begas_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 //  AM_RANGE(0x1000, 0x1007) AM_NOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(test_r)
@@ -193,14 +197,14 @@ static ADDRESS_MAP_START( begas_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1003, 0x1003) AM_WRITE(rblaster_vram_bank_w) //might be 1001
 	AM_RANGE(0x1006, 0x1006) AM_NOP //ld status / command
 	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // ld data
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_RRRGGGBB_byte_w) AM_SHARE("paletteram")
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_MEMBER(deco_ld_state, m_videoram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN1")
 	AM_RANGE(0x1001, 0x1001) AM_READ(test_r)//_PORT("IN2")
@@ -211,15 +215,15 @@ static ADDRESS_MAP_START( cobra_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1004, 0x1004) AM_WRITE(rblaster_vram_bank_w) //might be 1001
 	AM_RANGE(0x1006, 0x1006) AM_NOP //ld status / command
 	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // ld data
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_RRRGGGBB_byte_w) AM_SHARE("paletteram")
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM //vram attr?
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE_MEMBER(deco_ld_state, m_videoram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rblaster_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rblaster_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 //  AM_RANGE(0x1000, 0x1007) AM_NOP
 	AM_RANGE(0x1001, 0x1001) AM_WRITENOP //???
@@ -227,8 +231,8 @@ static ADDRESS_MAP_START( rblaster_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1003, 0x1003) AM_WRITE(rblaster_vram_bank_w) //might be 1001
 	AM_RANGE(0x1006, 0x1006) AM_NOP //ld status / command
 	AM_RANGE(0x1007, 0x1007) AM_READWRITE(laserdisc_r,laserdisc_w) // ld data
-	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_MEMBER(deco_ld_state, m_videoram)
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(paletteram_RRRGGGBB_byte_w) AM_SHARE("paletteram")
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -236,10 +240,9 @@ ADDRESS_MAP_END
 /* sound arrangement is pratically identical to Zero Target. */
 
 #ifdef UNUSED_FUNCTION
-static WRITE8_HANDLER( nmimask_w )
+WRITE8_MEMBER(deco_ld_state::nmimask_w)
 {
-	deco_ld_state *state = space->machine().driver_data<deco_ld_state>();
-	state->m_nmimask = data & 0x80;
+	m_nmimask = data & 0x80;
 }
 #endif
 
@@ -250,13 +253,13 @@ static INTERRUPT_GEN ( sound_interrupt )
 }
 
 
-static ADDRESS_MAP_START( rblaster_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rblaster_sound_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -283,7 +286,7 @@ static INPUT_PORTS_START( cobra )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x01, 0x00, "SYS1" )
@@ -439,7 +442,7 @@ static INPUT_PORTS_START( rblaster )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x01, 0x00, "SYS1" )

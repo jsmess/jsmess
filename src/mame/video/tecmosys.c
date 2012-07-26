@@ -53,65 +53,57 @@ static TILE_GET_INFO( get_fg_tile_info )
 }
 
 
-WRITE16_HANDLER( bg0_tilemap_w )
+WRITE16_MEMBER(tecmosys_state::bg0_tilemap_w)
 {
-	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
-	COMBINE_DATA(&state->m_bg0tilemap_ram[offset]);
-	state->m_bg0tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_bg0tilemap_ram[offset]);
+	m_bg0tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( bg1_tilemap_w )
+WRITE16_MEMBER(tecmosys_state::bg1_tilemap_w)
 {
-	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
-	COMBINE_DATA(&state->m_bg1tilemap_ram[offset]);
-	state->m_bg1tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_bg1tilemap_ram[offset]);
+	m_bg1tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( bg2_tilemap_w )
+WRITE16_MEMBER(tecmosys_state::bg2_tilemap_w)
 {
-	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
-	COMBINE_DATA(&state->m_bg2tilemap_ram[offset]);
-	state->m_bg2tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_bg2tilemap_ram[offset]);
+	m_bg2tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( fg_tilemap_w )
+WRITE16_MEMBER(tecmosys_state::fg_tilemap_w)
 {
-	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
-	COMBINE_DATA(&state->m_fgtilemap_ram[offset]);
-	state->m_txt_tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_fgtilemap_ram[offset]);
+	m_txt_tilemap->mark_tile_dirty(offset/2);
 }
 
 
-INLINE void set_color_555(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
+INLINE void set_color_555_tecmo(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
 {
 	palette_set_color_rgb(machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
 }
 
-WRITE16_HANDLER( tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w )
+WRITE16_MEMBER(tecmosys_state::tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w)
 {
-	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
-	COMBINE_DATA(&state->m_tilemap_paletteram16[offset]);
-	set_color_555(space->machine(), offset+0x4000, 5, 10, 0, state->m_tilemap_paletteram16[offset]);
+	COMBINE_DATA(&m_tilemap_paletteram16[offset]);
+	set_color_555_tecmo(machine(), offset+0x4000, 5, 10, 0, m_tilemap_paletteram16[offset]);
 }
 
-WRITE16_HANDLER( bg0_tilemap_lineram_w )
+WRITE16_MEMBER(tecmosys_state::bg0_tilemap_lineram_w)
 {
-	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
-	COMBINE_DATA(&state->m_bg0tilemap_lineram[offset]);
+	COMBINE_DATA(&m_bg0tilemap_lineram[offset]);
 	if (data!=0x0000) popmessage("non 0 write to bg0 lineram %04x %04x",offset,data);
 }
 
-WRITE16_HANDLER( bg1_tilemap_lineram_w )
+WRITE16_MEMBER(tecmosys_state::bg1_tilemap_lineram_w)
 {
-	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
-	COMBINE_DATA(&state->m_bg1tilemap_lineram[offset]);
+	COMBINE_DATA(&m_bg1tilemap_lineram[offset]);
 	if (data!=0x0000) popmessage("non 0 write to bg1 lineram %04x %04x",offset,data);
 }
 
-WRITE16_HANDLER( bg2_tilemap_lineram_w )
+WRITE16_MEMBER(tecmosys_state::bg2_tilemap_lineram_w)
 {
-	tecmosys_state *state = space->machine().driver_data<tecmosys_state>();
-	COMBINE_DATA(&state->m_bg2tilemap_lineram[offset]);
+	COMBINE_DATA(&m_bg2tilemap_lineram[offset]);
 	if (data!=0x0000) popmessage("non 0 write to bg2 lineram %04x %04x",offset,data);
 }
 
@@ -120,7 +112,7 @@ WRITE16_HANDLER( bg2_tilemap_lineram_w )
 static void tecmosys_render_sprites_to_bitmap(running_machine &machine, bitmap_rgb32 &bitmap, UINT16 extrax, UINT16 extray )
 {
 	tecmosys_state *state = machine.driver_data<tecmosys_state>();
-	UINT8 *gfxsrc    = machine.region       ( "gfx1" )->base();
+	UINT8 *gfxsrc    = state->memregion       ( "gfx1" )->base();
 	int i;
 
 	/* render sprites (with priority information) to temp bitmap */
@@ -257,7 +249,7 @@ static void tecmosys_do_final_mix(running_machine &machine, bitmap_rgb32 &bitmap
 
 			if (srcptr2[x]&0x3fff)
 			{
-				penvalue2 = machine.generic.paletteram.u16[srcptr2[x]&0x3fff];
+				penvalue2 = state->m_generic_paletteram_16[srcptr2[x]&0x3fff];
 				colour2 = paldata[srcptr2[x]&0x3fff];
 			}
 			else

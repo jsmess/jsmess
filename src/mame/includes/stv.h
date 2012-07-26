@@ -5,14 +5,17 @@ class saturn_state : public driver_device
 {
 public:
 	saturn_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_workram_l(*this, "workram_l"),
+		  m_workram_h(*this, "workram_h"),
+		  m_sound_ram(*this, "sound_ram") { }
 
-	UINT32    *m_workram_l;
-	UINT32    *m_workram_h;
+	required_shared_ptr<UINT32> m_workram_l;
+	required_shared_ptr<UINT32> m_workram_h;
 	UINT8     *m_backupram;
 	UINT8     *m_cart_backupram;
 	UINT32    *m_scu_regs;
-	UINT16    *m_sound_ram;
+	required_shared_ptr<UINT16> m_sound_ram;
 	UINT16    *m_scsp_regs;
 	UINT16    *m_vdp2_regs;
 	UINT32    *m_vdp2_vram;
@@ -120,6 +123,27 @@ public:
 	legacy_cpu_device* m_audiocpu;
 
 	bitmap_rgb32 m_tmpbitmap;
+	DECLARE_READ8_MEMBER(stv_ioga_r);
+	DECLARE_WRITE8_MEMBER(stv_ioga_w);
+	DECLARE_READ8_MEMBER(critcrsh_ioga_r);
+	DECLARE_READ8_MEMBER(magzun_ioga_r);
+	DECLARE_WRITE8_MEMBER(magzun_ioga_w);
+	DECLARE_READ8_MEMBER(stvmp_ioga_r);
+	DECLARE_WRITE8_MEMBER(stvmp_ioga_w);
+	DECLARE_READ32_MEMBER(stv_ioga_r32);
+	DECLARE_WRITE32_MEMBER(stv_ioga_w32);
+	DECLARE_READ32_MEMBER(critcrsh_ioga_r32);
+	DECLARE_READ32_MEMBER(stvmp_ioga_r32);
+	DECLARE_WRITE32_MEMBER(stvmp_ioga_w32);
+	DECLARE_READ32_MEMBER(magzun_ioga_r32);
+	DECLARE_WRITE32_MEMBER(magzun_ioga_w32);
+	DECLARE_READ32_MEMBER(magzun_hef_hack_r);
+	DECLARE_READ32_MEMBER(magzun_rx_hack_r);
+	DECLARE_READ32_MEMBER(astrass_hack_r);
+	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
+	DECLARE_INPUT_CHANGED_MEMBER(tray_open);
+	DECLARE_INPUT_CHANGED_MEMBER(tray_close);
 };
 
 #define MASTER_CLOCK_352 57272720

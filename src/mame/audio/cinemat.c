@@ -51,17 +51,16 @@
  *
  *************************************/
 
-WRITE8_HANDLER( cinemat_sound_control_w )
+WRITE8_MEMBER(cinemat_state::cinemat_sound_control_w)
 {
-	cinemat_state *state = space->machine().driver_data<cinemat_state>();
-	UINT8 oldval = state->m_sound_control;
+	UINT8 oldval = m_sound_control;
 
 	/* form an 8-bit value with the new bit */
-	state->m_sound_control = (state->m_sound_control & ~(1 << offset)) | ((data & 1) << offset);
+	m_sound_control = (m_sound_control & ~(1 << offset)) | ((data & 1) << offset);
 
 	/* if something changed, call the sound subroutine */
-	if ((state->m_sound_control != oldval) && state->m_sound_handler)
-		(*state->m_sound_handler)(space->machine(), state->m_sound_control, state->m_sound_control ^ oldval);
+	if ((m_sound_control != oldval) && m_sound_handler)
+		(*m_sound_handler)(machine(), m_sound_control, m_sound_control ^ oldval);
 }
 
 
@@ -1535,23 +1534,23 @@ static MACHINE_RESET( demon_sound )
 }
 
 
-static ADDRESS_MAP_START( demon_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( demon_sound_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x4002, 0x4003) AM_DEVWRITE("ay1", ay8910_data_address_w)
-	AM_RANGE(0x5000, 0x5001) AM_DEVREAD("ay2", ay8910_r)
-	AM_RANGE(0x5002, 0x5003) AM_DEVWRITE("ay2", ay8910_data_address_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVREAD("ay3", ay8910_r)
-	AM_RANGE(0x6002, 0x6003) AM_DEVWRITE("ay3", ay8910_data_address_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x4002, 0x4003) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
+	AM_RANGE(0x5000, 0x5001) AM_DEVREAD_LEGACY("ay2", ay8910_r)
+	AM_RANGE(0x5002, 0x5003) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVREAD_LEGACY("ay3", ay8910_r)
+	AM_RANGE(0x6002, 0x6003) AM_DEVWRITE_LEGACY("ay3", ay8910_data_address_w)
 	AM_RANGE(0x7000, 0x7000) AM_WRITENOP  /* watchdog? */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( demon_sound_ports, AS_IO, 8 )
+static ADDRESS_MAP_START( demon_sound_ports, AS_IO, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVWRITE("ctc", z80ctc_w)
-	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE("ctc", z80ctc_w)
+	AM_RANGE(0x00, 0x03) AM_DEVWRITE_LEGACY("ctc", z80ctc_w)
+	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE_LEGACY("ctc", z80ctc_w)
 ADDRESS_MAP_END
 
 
@@ -1598,21 +1597,22 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static WRITE8_HANDLER( qb3_sound_w )
+WRITE8_MEMBER(cinemat_state::qb3_sound_w)
 {
-	UINT16 rega = cpu_get_reg(space->machine().device("maincpu"), CCPU_A);
-	demon_sound_w(space->machine(), 0x00 | (~rega & 0x0f), 0x10);
+	UINT16 rega = cpu_get_reg(machine().device("maincpu"), CCPU_A);
+	demon_sound_w(machine(), 0x00 | (~rega & 0x0f), 0x10);
 }
 
 
 static MACHINE_RESET( qb3_sound )
 {
+	cinemat_state *state = machine.driver_data<cinemat_state>();
 	MACHINE_RESET_CALL(demon_sound);
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x04, 0x04, FUNC(qb3_sound_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x04, 0x04, write8_delegate(FUNC(cinemat_state::qb3_sound_w),state));
 
 	/* this patch prevents the sound ROM from eating itself when command $0A is sent */
 	/* on a cube rotate */
-	machine.region("audiocpu")->base()[0x11dc] = 0x09;
+	state->memregion("audiocpu")->base()[0x11dc] = 0x09;
 }
 
 

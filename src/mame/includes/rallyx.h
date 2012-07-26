@@ -11,13 +11,15 @@ class rallyx_state : public driver_device
 {
 public:
 	rallyx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_videoram(*this, "videoram"),
+		m_radarattr(*this, "radarattr") { }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_radarattr;
 	UINT8 *  m_spriteram;
 	UINT8 *  m_spriteram2;
-	UINT8 *  m_radarattr;
 	UINT8 *  m_radarx;
 	UINT8 *  m_radary;
 
@@ -38,15 +40,19 @@ public:
 	samples_device *m_samples;
 
 	UINT8    m_main_irq_mask;
+	DECLARE_WRITE8_MEMBER(rallyx_interrupt_vector_w);
+	DECLARE_WRITE8_MEMBER(rallyx_bang_w);
+	DECLARE_WRITE8_MEMBER(rallyx_latch_w);
+	DECLARE_WRITE8_MEMBER(locomotn_latch_w);
+	DECLARE_WRITE8_MEMBER(rallyx_videoram_w);
+	DECLARE_WRITE8_MEMBER(rallyx_scrollx_w);
+	DECLARE_WRITE8_MEMBER(rallyx_scrolly_w);
+	DECLARE_WRITE8_MEMBER(tactcian_starson_w);
 };
 
 
 /*----------- defined in video/rallyx.c -----------*/
 
-WRITE8_HANDLER( rallyx_videoram_w );
-WRITE8_HANDLER( rallyx_scrollx_w );
-WRITE8_HANDLER( rallyx_scrolly_w );
-WRITE8_HANDLER( tactcian_starson_w );
 
 PALETTE_INIT( rallyx );
 PALETTE_INIT( jungler );

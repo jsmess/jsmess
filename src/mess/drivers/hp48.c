@@ -906,7 +906,7 @@ ROM_END
    run-time.
  */
 
-static ADDRESS_MAP_START ( hp48, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START ( hp48, AS_PROGRAM, 8, hp48_state )
 
 	AM_RANGE( 0x00000, 0xfffff ) AM_NOP /* configured at run-time */
 

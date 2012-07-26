@@ -16,16 +16,22 @@ class hitme_state : public driver_device
 {
 public:
 	hitme_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* video-related */
 	tilemap_t  *m_tilemap;
 
 	/* misc */
 	attotime m_timeout_time;
+	DECLARE_WRITE8_MEMBER(hitme_vidram_w);
+	DECLARE_READ8_MEMBER(hitme_port_0_r);
+	DECLARE_READ8_MEMBER(hitme_port_1_r);
+	DECLARE_READ8_MEMBER(hitme_port_2_r);
+	DECLARE_READ8_MEMBER(hitme_port_3_r);
 };
 
 

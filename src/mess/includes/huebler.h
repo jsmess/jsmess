@@ -19,7 +19,8 @@ public:
 		  m_key_d6(0),
 		  m_key_d7(0),
 		  m_key_a8(1)
-	{ }
+	,
+		m_video_ram(*this, "video_ram"){ }
 
 	required_device<cassette_image_device> m_cassette;
 
@@ -41,7 +42,7 @@ public:
 	int m_key_a8;
 
 	// video state
-	UINT8 *m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 	const UINT8 *m_char_rom;
 };
 

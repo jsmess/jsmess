@@ -43,6 +43,11 @@ public:
 	int m_row_d;
 	int m_laser_bg_mode;
 	int m_laser_two_color;
+	DECLARE_WRITE8_MEMBER(laser_bank_select_w);
+	DECLARE_WRITE8_MEMBER(laser_fdc_w);
+	DECLARE_WRITE8_MEMBER(laser_bg_mode_w);
+	DECLARE_WRITE8_MEMBER(laser_two_color_w);
+	DECLARE_READ8_MEMBER(laser_fdc_r);
 };
 
 
@@ -56,17 +61,12 @@ MACHINE_RESET( laser700 );
 DEVICE_IMAGE_LOAD( laser_cart );
 DEVICE_IMAGE_UNLOAD( laser_cart );
 
-extern  READ8_HANDLER ( laser_fdc_r );
-extern WRITE8_HANDLER ( laser_fdc_w );
-extern WRITE8_HANDLER ( laser_bank_select_w );
 
 
 /*----------- defined in video/vtech2.c -----------*/
 
 extern VIDEO_START( laser );
 extern SCREEN_UPDATE_IND16( laser );
-extern WRITE8_HANDLER ( laser_bg_mode_w );
-extern WRITE8_HANDLER ( laser_two_color_w );
 
 
 #endif /* VTECH2_H_ */

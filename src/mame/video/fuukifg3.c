@@ -77,10 +77,10 @@ INLINE void fuuki32_vram_w(address_space *space, offs_t offset, UINT32 data, UIN
 	state->m_tilemap[_N_]->mark_tile_dirty(offset);
 }
 
-WRITE32_HANDLER( fuuki32_vram_0_w ) { fuuki32_vram_w(space, offset, data, mem_mask, 0); }
-WRITE32_HANDLER( fuuki32_vram_1_w ) { fuuki32_vram_w(space, offset, data, mem_mask, 1); }
-WRITE32_HANDLER( fuuki32_vram_2_w ) { fuuki32_vram_w(space, offset, data, mem_mask, 2); }
-WRITE32_HANDLER( fuuki32_vram_3_w ) { fuuki32_vram_w(space, offset, data, mem_mask, 3); }
+WRITE32_MEMBER(fuuki32_state::fuuki32_vram_0_w){ fuuki32_vram_w(&space, offset, data, mem_mask, 0); }
+WRITE32_MEMBER(fuuki32_state::fuuki32_vram_1_w){ fuuki32_vram_w(&space, offset, data, mem_mask, 1); }
+WRITE32_MEMBER(fuuki32_state::fuuki32_vram_2_w){ fuuki32_vram_w(&space, offset, data, mem_mask, 2); }
+WRITE32_MEMBER(fuuki32_state::fuuki32_vram_3_w){ fuuki32_vram_w(&space, offset, data, mem_mask, 3); }
 
 
 /***************************************************************************
@@ -94,11 +94,11 @@ WRITE32_HANDLER( fuuki32_vram_3_w ) { fuuki32_vram_w(space, offset, data, mem_ma
 VIDEO_START( fuuki32 )
 {
 	fuuki32_state *state = machine.driver_data<fuuki32_state>();
-	state->m_buf_spriteram = auto_alloc_array(machine, UINT32, state->m_spriteram_size / 4);
-	state->m_buf_spriteram2 = auto_alloc_array(machine, UINT32, state->m_spriteram_size / 4);
+	state->m_buf_spriteram = auto_alloc_array(machine, UINT32, state->m_spriteram.bytes() / 4);
+	state->m_buf_spriteram2 = auto_alloc_array(machine, UINT32, state->m_spriteram.bytes() / 4);
 
-	state->save_pointer(NAME(state->m_buf_spriteram), state->m_spriteram_size / 4);
-	state->save_pointer(NAME(state->m_buf_spriteram2), state->m_spriteram_size / 4);
+	state->save_pointer(NAME(state->m_buf_spriteram), state->m_spriteram.bytes() / 4);
+	state->save_pointer(NAME(state->m_buf_spriteram2), state->m_spriteram.bytes() / 4);
 
 	state->m_tilemap[0] = tilemap_create(machine, get_tile_info_0, tilemap_scan_rows, 16, 16, 64, 32);
 	state->m_tilemap[1] = tilemap_create(machine, get_tile_info_1, tilemap_scan_rows, 16, 16, 64, 32);
@@ -156,7 +156,7 @@ static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rec
 	UINT32 *src = state->m_buf_spriteram2; /* Use spriteram buffered by 2 frames, need palette buffered by one frame? */
 
 	/* Draw them backwards, for pdrawgfx */
-	for (offs = (state->m_spriteram_size - 8) / 4; offs >= 0; offs -= 8/4)
+	for (offs = (state->m_spriteram.bytes() - 8) / 4; offs >= 0; offs -= 8/4)
 	{
 		int x, y, xstart, ystart, xend, yend, xinc, yinc;
 		int xnum, ynum, xzoom, yzoom, flipx, flipy;
@@ -198,7 +198,7 @@ static void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rec
 		sx = (sx & 0x1ff) - (sx & 0x200);
 		sy = (sy & 0x1ff) - (sy & 0x200);
 
-		if (flip_screen_get(screen.machine()))
+		if (state->flip_screen())
 		{
 			flipx = !flipx;		sx = max_x - sx - xnum * 16;
 			flipy = !flipy;		sy = max_y - sy - ynum * 16;
@@ -330,12 +330,12 @@ SCREEN_UPDATE_IND16( fuuki32 )
 	int tm_middle = pri_table[(state->m_priority[0] >> 16) & 0x0f][1];
 	int tm_back   = pri_table[(state->m_priority[0] >> 16) & 0x0f][2];
 
-	flip_screen_set(screen.machine(), (state->m_vregs[0x1e / 4] & 0x0000ffff) & 1);
+	state->flip_screen_set((state->m_vregs[0x1e / 4] & 0x0000ffff) & 1);
 
 	/* Layers scrolling */
 
-	scrolly_offs = ((state->m_vregs[0xc / 4] & 0xffff0000) >> 16) - (flip_screen_get(screen.machine()) ? 0x103 : 0x1f3);
-	scrollx_offs =  (state->m_vregs[0xc / 4] & 0x0000ffff) - (flip_screen_get(screen.machine()) ? 0x2c7 : 0x3f6);
+	scrolly_offs = ((state->m_vregs[0xc / 4] & 0xffff0000) >> 16) - (state->flip_screen() ? 0x103 : 0x1f3);
+	scrollx_offs =  (state->m_vregs[0xc / 4] & 0x0000ffff) - (state->flip_screen() ? 0x2c7 : 0x3f6);
 
 	layer0_scrolly = ((state->m_vregs[0x0 / 4] & 0xffff0000) >> 16) + scrolly_offs;
 	layer0_scrollx = ((state->m_vregs[0x0 / 4] & 0x0000ffff)) + scrollx_offs;
@@ -377,7 +377,7 @@ SCREEN_VBLANK( fuuki32 )
 		/* Buffer sprites and tilebank by 2 frames */
 		state->m_spr_buffered_tilebank[1] = state->m_spr_buffered_tilebank[0];
 		state->m_spr_buffered_tilebank[0] = state->m_tilebank[0];
-		memcpy(state->m_buf_spriteram2, state->m_buf_spriteram, state->m_spriteram_size);
-		memcpy(state->m_buf_spriteram, state->m_spriteram, state->m_spriteram_size);
+		memcpy(state->m_buf_spriteram2, state->m_buf_spriteram, state->m_spriteram.bytes());
+		memcpy(state->m_buf_spriteram, state->m_spriteram, state->m_spriteram.bytes());
 	}
 }

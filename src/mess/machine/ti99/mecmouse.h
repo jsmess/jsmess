@@ -27,6 +27,7 @@ public:
 protected:
 	void device_start(void);
 	void device_reset(void);
+	ioport_constructor device_input_ports() const;
 
 private:
 	void poll(void);

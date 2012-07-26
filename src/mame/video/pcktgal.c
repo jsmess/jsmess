@@ -4,6 +4,7 @@
 
 PALETTE_INIT( pcktgal )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < machine.total_colors();i++)
@@ -36,7 +37,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = 0;offs < state->m_spriteram_size;offs += 4)
+	for (offs = 0;offs < state->m_spriteram.bytes();offs += 4)
 	{
 		if (spriteram[offs] != 0xf8)
 		{
@@ -48,7 +49,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 			flipx = spriteram[offs+1] & 0x04;
 			flipy = spriteram[offs+1] & 0x02;
-			if (flip_screen_get(machine)) {
+			if (state->flip_screen()) {
 				sx=240-sx;
 				sy=240-sy;
 				if (flipx) flipx=0; else flipx=1;
@@ -66,7 +67,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 SCREEN_UPDATE_IND16( pcktgal )
 {
-//  flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
+//  state->flip_screen_set(screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 	screen.machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	draw_sprites(screen.machine(), bitmap, cliprect);
 	return 0;

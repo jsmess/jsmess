@@ -38,31 +38,34 @@ class go2000_state : public driver_device
 {
 public:
 	go2000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_videoram2(*this, "videoram2"){ }
 
 	/* memory pointers */
-	UINT16 *  m_videoram;
-	UINT16 *  m_videoram2;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_videoram2;
 //  UINT16 *  m_paletteram;   // currently this uses generic palette handling
 
 	/* devices */
 	device_t *m_soundcpu;
+	DECLARE_WRITE16_MEMBER(sound_cmd_w);
+	DECLARE_WRITE8_MEMBER(go2000_pcm_1_bankswitch_w);
 };
 
 
-static WRITE16_HANDLER( sound_cmd_w )
+WRITE16_MEMBER(go2000_state::sound_cmd_w)
 {
-	go2000_state *state = space->machine().driver_data<go2000_state>();
-	soundlatch_w(space, offset, data & 0xff);
-	device_set_input_line(state->m_soundcpu, 0, HOLD_LINE);
+	soundlatch_byte_w(space, offset, data & 0xff);
+	device_set_input_line(m_soundcpu, 0, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( go2000_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( go2000_map, AS_PROGRAM, 16, go2000_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_MEMBER(go2000_state, m_videoram)
-	AM_RANGE(0x610000, 0x61ffff) AM_RAM AM_BASE_MEMBER(go2000_state, m_videoram2)
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x610000, 0x61ffff) AM_RAM AM_SHARE("videoram2")
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW")
 	AM_RANGE(0x620002, 0x620003) AM_WRITE(sound_cmd_w)
@@ -71,20 +74,20 @@ static ADDRESS_MAP_START( go2000_map, AS_PROGRAM, 16 )
 //  AM_RANGE(0xe00020, 0xe00021) AM_WRITENOP
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( go2000_pcm_1_bankswitch_w )
+WRITE8_MEMBER(go2000_state::go2000_pcm_1_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 }
 
-static ADDRESS_MAP_START( go2000_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( go2000_sound_map, AS_PROGRAM, 8, go2000_state )
 	AM_RANGE(0x0000, 0x03ff) AM_ROM
 	AM_RANGE(0x0400, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( go2000_sound_io, AS_IO, 8 )
+static ADDRESS_MAP_START( go2000_sound_io, AS_IO, 8, go2000_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac1", dac_w)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac1", dac_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(go2000_pcm_1_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -133,14 +136,14 @@ static INPUT_PORTS_START( go2000 )
 	PORT_DIPSETTING(      0x0100, "7" )
 	PORT_DIPSETTING(      0x0000, "8" )
 	PORT_DIPNAME( 0x1800, 0x1800, "M1 value" ) PORT_DIPLOCATION("SW-2:4,5")
-	PORT_DIPSETTING(      0x0800, "3000" ) PORT_CONDITION("DSW", 0x0003, PORTCOND_EQUALS, 0x0000)
-	PORT_DIPSETTING(      0x0000, "3500" ) PORT_CONDITION("DSW", 0x0003, PORTCOND_EQUALS, 0x0000)
-	PORT_DIPSETTING(      0x1800, "4000" ) PORT_CONDITION("DSW", 0x0003, PORTCOND_EQUALS, 0x0000)
-	PORT_DIPSETTING(      0x1000, "4500" ) PORT_CONDITION("DSW", 0x0003, PORTCOND_EQUALS, 0x0000)
-	PORT_DIPSETTING(      0x0800, "6000" ) PORT_CONDITION("DSW", 0x0003, PORTCOND_NOTEQUALS, 0x0000)
-	PORT_DIPSETTING(      0x0000, "7000" ) PORT_CONDITION("DSW", 0x0003, PORTCOND_NOTEQUALS, 0x0000)
-	PORT_DIPSETTING(      0x1800, "8000" ) PORT_CONDITION("DSW", 0x0003, PORTCOND_NOTEQUALS, 0x0000)
-	PORT_DIPSETTING(      0x1000, "9000" ) PORT_CONDITION("DSW", 0x0003, PORTCOND_NOTEQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0800, "3000" ) PORT_CONDITION("DSW", 0x0003, EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0000, "3500" ) PORT_CONDITION("DSW", 0x0003, EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x1800, "4000" ) PORT_CONDITION("DSW", 0x0003, EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x1000, "4500" ) PORT_CONDITION("DSW", 0x0003, EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0800, "6000" ) PORT_CONDITION("DSW", 0x0003, NOTEQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0000, "7000" ) PORT_CONDITION("DSW", 0x0003, NOTEQUALS, 0x0000)
+	PORT_DIPSETTING(      0x1800, "8000" ) PORT_CONDITION("DSW", 0x0003, NOTEQUALS, 0x0000)
+	PORT_DIPSETTING(      0x1000, "9000" ) PORT_CONDITION("DSW", 0x0003, NOTEQUALS, 0x0000)
 	PORT_DIPUNKNOWN_DIPLOC( 0x2000, IP_ACTIVE_LOW, "SW-2:6" )
 	PORT_DIPNAME( 0xc000, 0xc000, "Difficult-2" ) PORT_DIPLOCATION("SW-2:7,8")
 	PORT_DIPSETTING(      0xc000, "1" )
@@ -277,7 +280,7 @@ static SCREEN_UPDATE_IND16(go2000)
 				if (flipx)
 					tile_flipx = !tile_flipx;
 
-				if (flip_screen_get(screen.machine()))
+				if (state->flip_screen())
 				{
 					sx = max_x - sx;
 					sy = max_y - sy;
@@ -307,13 +310,13 @@ static SCREEN_UPDATE_IND16(go2000)
 static MACHINE_START( go2000 )
 {
 	go2000_state *state = machine.driver_data<go2000_state>();
-	UINT8 *SOUND = machine.region("soundcpu")->base();
+	UINT8 *SOUND = state->memregion("soundcpu")->base();
 	int i;
 
 	for (i = 0; i < 8; i++)
-		memory_configure_bank(machine, "bank1", i, 1, &SOUND[0x00400 + i * 0x10000], 0x10000 - 0x400);
+		state->membank("bank1")->configure_entry(i, &SOUND[0x00400 + i * 0x10000]);
 
-	memory_set_bank(machine, "bank1", 0);
+	state->membank("bank1")->set_entry(0);
 
 	state->m_soundcpu = machine.device("soundcpu");
 }

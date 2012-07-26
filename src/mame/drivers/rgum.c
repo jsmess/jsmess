@@ -23,11 +23,14 @@ class rgum_state : public driver_device
 {
 public:
 	rgum_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"),
+		m_cram(*this, "cram"){ }
 
-	UINT8 *m_vram;
-	UINT8 *m_cram;
+	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<UINT8> m_cram;
 	UINT8 m_hbeat;
+	DECLARE_CUSTOM_INPUT_MEMBER(rgum_heartbeat_r);
 };
 
 
@@ -58,34 +61,33 @@ static SCREEN_UPDATE_IND16(royalgum)
 	return 0;
 }
 
-static ADDRESS_MAP_START( rgum_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rgum_map, AS_PROGRAM, 8, rgum_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM //not all of it?
 
-	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("aysnd", ay8910_data_w)
-	AM_RANGE(0x2002, 0x2002) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_address_w)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
+	AM_RANGE(0x2002, 0x2002) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_address_w)
 
 	AM_RANGE(0x2801, 0x2801) AM_READNOP //read but value discarded?
 	AM_RANGE(0x2803, 0x2803) AM_READNOP
 
-	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x3000, 0x3003) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
 
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_MEMBER(rgum_state, m_vram)
-	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_BASE_MEMBER(rgum_state, m_cram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0x5000, 0x57ff) AM_RAM AM_SHARE("cram")
 
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static CUSTOM_INPUT( rgum_heartbeat_r )
+CUSTOM_INPUT_MEMBER(rgum_state::rgum_heartbeat_r)
 {
-	rgum_state *state = field.machine().driver_data<rgum_state>();
 
-	state->m_hbeat ^= 1;
+	m_hbeat ^= 1;
 
-	return state->m_hbeat;
+	return m_hbeat;
 }
 
 
@@ -106,7 +108,7 @@ static INPUT_PORTS_START( rgum )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(rgum_heartbeat_r, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rgum_state,rgum_heartbeat_r, NULL)
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

@@ -25,27 +25,33 @@ public:
 	mw18w_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_WRITE8_MEMBER(mw18w_sound0_w);
+	DECLARE_WRITE8_MEMBER(mw18w_sound1_w);
+	DECLARE_WRITE8_MEMBER(mw18w_lamps_w);
+	DECLARE_WRITE8_MEMBER(mw18w_led_display_w);
+	DECLARE_WRITE8_MEMBER(mw18w_irq0_clear_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(mw18w_sensors_r);
 };
 
 
-static WRITE8_HANDLER( mw18w_sound0_w )
+WRITE8_MEMBER(mw18w_state::mw18w_sound0_w)
 {
 	// sound write (airhorn, brake, crash) plus motor speed for backdrop, and coin counter
-	coin_counter_w(space->machine(), 0, data&1);
+	coin_counter_w(machine(), 0, data&1);
 }
 
-static WRITE8_HANDLER( mw18w_sound1_w )
+WRITE8_MEMBER(mw18w_state::mw18w_sound1_w)
 {
 	// sound write (bell, engine) plus lamp dim control for backdrop lamp
 	;
 }
 
-static WRITE8_HANDLER( mw18w_lamps_w )
+WRITE8_MEMBER(mw18w_state::mw18w_lamps_w)
 {
 	;
 }
 
-static WRITE8_HANDLER( mw18w_led_display_w )
+WRITE8_MEMBER(mw18w_state::mw18w_led_display_w)
 {
 	// d0-3: 7448 (BCD to LED segment)
 	const UINT8 ls48_map[16] =
@@ -56,12 +62,12 @@ static WRITE8_HANDLER( mw18w_led_display_w )
 	output_set_digit_value(data>>4, ls48_map[data&0xf]);
 }
 
-static WRITE8_HANDLER( mw18w_irq0_clear_w )
+WRITE8_MEMBER(mw18w_state::mw18w_irq0_clear_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
-static CUSTOM_INPUT( mw18w_sensors_r )
+CUSTOM_INPUT_MEMBER(mw18w_state::mw18w_sensors_r)
 {
 	// d7: off road
 	// d6: in dock area
@@ -71,12 +77,12 @@ static CUSTOM_INPUT( mw18w_sensors_r )
 
 
 
-static ADDRESS_MAP_START( mw18w_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mw18w_map, AS_PROGRAM, 8, mw18w_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mw18w_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( mw18w_portmap, AS_IO, 8, mw18w_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(mw18w_sound0_w)
@@ -88,7 +94,7 @@ static ADDRESS_MAP_START( mw18w_portmap, AS_IO, 8 )
 	AM_RANGE(0x07, 0x07) AM_WRITE(mw18w_irq0_clear_w)
 ADDRESS_MAP_END
 
-static const UINT32 mw18w_controller_table[] =
+static const ioport_value mw18w_controller_table[] =
 {
 	// same encoder as sspeedr
 	0x3f, 0x3e, 0x3c, 0x3d, 0x39, 0x38, 0x3a, 0x3b,
@@ -109,7 +115,7 @@ static INPUT_PORTS_START( mw18w )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	// left/right sw.
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mw18w_sensors_r, NULL)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw18w_state,mw18w_sensors_r, NULL)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x1f, 0x00, IPT_PEDAL ) PORT_REMAP_TABLE(mw18w_controller_table + 0x20) PORT_SENSITIVITY(100) PORT_KEYDELTA(1)	// accelerate
@@ -135,22 +141,22 @@ static INPUT_PORTS_START( mw18w )
 	PORT_DIPSETTING(    0x30, "90 seconds" )
 
 	PORT_DIPNAME( 0x0c, 0x00, "Extended Time" ) PORT_DIPLOCATION("SW:3,4")
-	PORT_DIPSETTING(    0x00, "20 seconds at 4000" )  PORT_CONDITION("DSW", 0x30, PORTCOND_EQUALS, 0x00) // @ 60 seconds
-	PORT_DIPSETTING(    0x04, "30 seconds at 8000" )  PORT_CONDITION("DSW", 0x30, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x08, "15 seconds at 8000" )  PORT_CONDITION("DSW", 0x30, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x0c, "30 seconds at 10000" ) PORT_CONDITION("DSW", 0x30, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, "20 seconds at 6000" )  PORT_CONDITION("DSW", 0x30, PORTCOND_EQUALS, 0x10) // @ 70 seconds
-	PORT_DIPSETTING(    0x04, "30 seconds at 9000" )  PORT_CONDITION("DSW", 0x30, PORTCOND_EQUALS, 0x10)
-	PORT_DIPSETTING(    0x08, "20 seconds at 9000" )  PORT_CONDITION("DSW", 0x30, PORTCOND_EQUALS, 0x10)
-	PORT_DIPSETTING(    0x0c, "30 seconds at 12000" ) PORT_CONDITION("DSW", 0x30, PORTCOND_EQUALS, 0x10)
-	PORT_DIPSETTING(    0x00, "20 seconds at 8000" )  PORT_CONDITION("DSW", 0x30, PORTCOND_EQUALS, 0x20) // @ 80 seconds
-	PORT_DIPSETTING(    0x04, "30 seconds at 12000" ) PORT_CONDITION("DSW", 0x30, PORTCOND_EQUALS, 0x20)
-	PORT_DIPSETTING(    0x08, "20 seconds at 12000" ) PORT_CONDITION("DSW", 0x30, PORTCOND_EQUALS, 0x20)
-	PORT_DIPSETTING(    0x0c, "30 seconds at 16000" ) PORT_CONDITION("DSW", 0x30, PORTCOND_EQUALS, 0x20)
-	PORT_DIPSETTING(    0x00, "20 seconds at 10000" ) PORT_CONDITION("DSW", 0x30, PORTCOND_EQUALS, 0x30) // @ 90 seconds
-	PORT_DIPSETTING(    0x04, "30 seconds at 15000" ) PORT_CONDITION("DSW", 0x30, PORTCOND_EQUALS, 0x30)
-	PORT_DIPSETTING(    0x08, "20 seconds at 15000" ) PORT_CONDITION("DSW", 0x30, PORTCOND_EQUALS, 0x30)
-	PORT_DIPSETTING(    0x0c, "30 seconds at 20000" ) PORT_CONDITION("DSW", 0x30, PORTCOND_EQUALS, 0x30)
+	PORT_DIPSETTING(    0x00, "20 seconds at 4000" )  PORT_CONDITION("DSW", 0x30, EQUALS, 0x00) // @ 60 seconds
+	PORT_DIPSETTING(    0x04, "30 seconds at 8000" )  PORT_CONDITION("DSW", 0x30, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x08, "15 seconds at 8000" )  PORT_CONDITION("DSW", 0x30, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x0c, "30 seconds at 10000" ) PORT_CONDITION("DSW", 0x30, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "20 seconds at 6000" )  PORT_CONDITION("DSW", 0x30, EQUALS, 0x10) // @ 70 seconds
+	PORT_DIPSETTING(    0x04, "30 seconds at 9000" )  PORT_CONDITION("DSW", 0x30, EQUALS, 0x10)
+	PORT_DIPSETTING(    0x08, "20 seconds at 9000" )  PORT_CONDITION("DSW", 0x30, EQUALS, 0x10)
+	PORT_DIPSETTING(    0x0c, "30 seconds at 12000" ) PORT_CONDITION("DSW", 0x30, EQUALS, 0x10)
+	PORT_DIPSETTING(    0x00, "20 seconds at 8000" )  PORT_CONDITION("DSW", 0x30, EQUALS, 0x20) // @ 80 seconds
+	PORT_DIPSETTING(    0x04, "30 seconds at 12000" ) PORT_CONDITION("DSW", 0x30, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x08, "20 seconds at 12000" ) PORT_CONDITION("DSW", 0x30, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x0c, "30 seconds at 16000" ) PORT_CONDITION("DSW", 0x30, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "20 seconds at 10000" ) PORT_CONDITION("DSW", 0x30, EQUALS, 0x30) // @ 90 seconds
+	PORT_DIPSETTING(    0x04, "30 seconds at 15000" ) PORT_CONDITION("DSW", 0x30, EQUALS, 0x30)
+	PORT_DIPSETTING(    0x08, "20 seconds at 15000" ) PORT_CONDITION("DSW", 0x30, EQUALS, 0x30)
+	PORT_DIPSETTING(    0x0c, "30 seconds at 20000" ) PORT_CONDITION("DSW", 0x30, EQUALS, 0x30)
 
 	PORT_DIPNAME( 0x40, 0x40, "I/O Test" ) PORT_DIPLOCATION("SW:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )

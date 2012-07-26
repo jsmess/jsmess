@@ -11,14 +11,14 @@ class fromance_state : public driver_device
 {
 public:
 	fromance_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_videoram(*this, "videoram"),
+		  m_spriteram(*this, "spriteram") { }
 
 	/* memory pointers (used by pipedrm) */
-	UINT8 *  m_videoram;
-	UINT8 *  m_spriteram;
+	optional_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<UINT8> m_spriteram;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
-	size_t   m_videoram_size;
-	size_t   m_spriteram_size;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -51,6 +51,24 @@ public:
 
 	/* devices */
 	device_t *m_subcpu;
+	DECLARE_READ8_MEMBER(fromance_commanddata_r);
+	DECLARE_WRITE8_MEMBER(fromance_commanddata_w);
+	DECLARE_READ8_MEMBER(fromance_busycheck_main_r);
+	DECLARE_READ8_MEMBER(fromance_busycheck_sub_r);
+	DECLARE_WRITE8_MEMBER(fromance_busycheck_sub_w);
+	DECLARE_WRITE8_MEMBER(fromance_rombank_w);
+	DECLARE_WRITE8_MEMBER(fromance_adpcm_w);
+	DECLARE_WRITE8_MEMBER(fromance_portselect_w);
+	DECLARE_READ8_MEMBER(fromance_keymatrix_r);
+	DECLARE_WRITE8_MEMBER(fromance_coinctr_w);
+	DECLARE_WRITE8_MEMBER(fromance_gfxreg_w);
+	DECLARE_READ8_MEMBER(fromance_paletteram_r);
+	DECLARE_WRITE8_MEMBER(fromance_paletteram_w);
+	DECLARE_READ8_MEMBER(fromance_videoram_r);
+	DECLARE_WRITE8_MEMBER(fromance_videoram_w);
+	DECLARE_WRITE8_MEMBER(fromance_scroll_w);
+	DECLARE_WRITE8_MEMBER(fromance_crtc_data_w);
+	DECLARE_WRITE8_MEMBER(fromance_crtc_register_w);
 };
 
 
@@ -63,15 +81,7 @@ VIDEO_START( hatris );
 SCREEN_UPDATE_IND16( fromance );
 SCREEN_UPDATE_IND16( pipedrm );
 
-WRITE8_HANDLER( fromance_crtc_data_w );
-WRITE8_HANDLER( fromance_crtc_register_w );
 
-WRITE8_HANDLER( fromance_gfxreg_w );
 
-WRITE8_HANDLER( fromance_scroll_w );
 
-READ8_HANDLER( fromance_paletteram_r );
-WRITE8_HANDLER( fromance_paletteram_w );
 
-READ8_HANDLER( fromance_videoram_r );
-WRITE8_HANDLER( fromance_videoram_w );

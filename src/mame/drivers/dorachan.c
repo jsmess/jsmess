@@ -19,17 +19,20 @@ class dorachan_state : public driver_device
 {
 public:
 	dorachan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	size_t   m_videoram_size;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* video-related */
 	UINT8    m_flip_screen;
 
 	/* devices */
 	device_t *m_main_cpu;
+	DECLARE_WRITE8_MEMBER(dorachan_ctrl_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(dorachan_protection_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(dorachan_v128_r);
 };
 
 
@@ -39,19 +42,18 @@ public:
  *
  *************************************/
 
-static CUSTOM_INPUT( dorachan_protection_r )
+CUSTOM_INPUT_MEMBER(dorachan_state::dorachan_protection_r)
 {
-	dorachan_state *state = field.machine().driver_data<dorachan_state>();
 	UINT8 ret = 0;
 
-	switch (cpu_get_previouspc(state->m_main_cpu))
+	switch (cpu_get_previouspc(m_main_cpu))
 	{
 	case 0x70ce: ret = 0xf2; break;
 	case 0x72a2: ret = 0xd5; break;
 	case 0x72b5: ret = 0xcb; break;
 
 	default:
-		mame_printf_debug("unhandled $2400 read @ %x\n", cpu_get_previouspc(state->m_main_cpu));
+		mame_printf_debug("unhandled $2400 read @ %x\n", cpu_get_previouspc(m_main_cpu));
 		break;
 	}
 
@@ -86,9 +88,9 @@ static SCREEN_UPDATE_RGB32( dorachan )
 
 	get_pens(pens);
 
-	color_map_base = screen.machine().region("proms")->base();
+	color_map_base = state->memregion("proms")->base();
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{
 		int i;
 		UINT8 fore_color;
@@ -120,19 +122,17 @@ static SCREEN_UPDATE_RGB32( dorachan )
 }
 
 
-static WRITE8_HANDLER(dorachan_ctrl_w)
+WRITE8_MEMBER(dorachan_state::dorachan_ctrl_w)
 {
-	dorachan_state *state = space->machine().driver_data<dorachan_state>();
-	state->m_flip_screen = (data >> 6) & 0x01;
+	m_flip_screen = (data >> 6) & 0x01;
 }
 
 
-static CUSTOM_INPUT( dorachan_v128_r )
+CUSTOM_INPUT_MEMBER(dorachan_state::dorachan_v128_r)
 {
-	dorachan_state *state = field.machine().driver_data<dorachan_state>();
 
 	/* to avoid resetting (when player 2 starts) bit 0 need to be inverted when screen is flipped */
-	return ((field.machine().primary_screen->vpos() >> 7) & 0x01) ^ state->m_flip_screen;
+	return ((machine().primary_screen->vpos() >> 7) & 0x01) ^ m_flip_screen;
 }
 
 
@@ -143,7 +143,7 @@ static CUSTOM_INPUT( dorachan_v128_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( dorachan_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dorachan_map, AS_PROGRAM, 8, dorachan_state )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
 	AM_RANGE(0x1800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x23ff) AM_ROM
@@ -151,7 +151,7 @@ static ADDRESS_MAP_START( dorachan_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2c00, 0x2c00) AM_MIRROR(0x03ff) AM_READ_PORT("JOY")
 	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x03ff) AM_READ_PORT("V128")
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_SIZE_MEMBER(dorachan_state, m_videoram, m_videoram_size)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x6000, 0x77ff) AM_ROM
 ADDRESS_MAP_END
 
@@ -163,7 +163,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dorachan_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( dorachan_io_map, AS_IO, 8, dorachan_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_WRITENOP
 	AM_RANGE(0x02, 0x02) AM_WRITENOP
@@ -180,7 +180,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dorachan )
 	PORT_START("PROT")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(dorachan_protection_r, NULL)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dorachan_state,dorachan_protection_r, NULL)
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -209,7 +209,7 @@ static INPUT_PORTS_START( dorachan )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 
 	PORT_START("V128")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(dorachan_v128_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dorachan_state,dorachan_v128_r, NULL)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 

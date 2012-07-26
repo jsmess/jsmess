@@ -37,11 +37,10 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 #include "sound/dac.h"
 #include "includes/trucocl.h"
 
-static WRITE8_HANDLER( irq_enable_w )
+WRITE8_MEMBER(trucocl_state::irq_enable_w)
 {
-	trucocl_state *state = space->machine().driver_data<trucocl_state>();
 
-	state->m_irq_mask = (data & 1) ^ 1;
+	m_irq_mask = (data & 1) ^ 1;
 }
 
 
@@ -53,7 +52,7 @@ static TIMER_CALLBACK( dac_irq )
 static WRITE8_DEVICE_HANDLER( audio_dac_w )
 {
 	trucocl_state *state = device->machine().driver_data<trucocl_state>();
-	UINT8 *rom = device->machine().region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	int	dac_address = ( data & 0xf0 ) << 8;
 	int	sel = ( ( (~data) >> 1 ) & 2 ) | ( data & 1 );
 
@@ -80,14 +79,14 @@ static WRITE8_DEVICE_HANDLER( audio_dac_w )
 	device->machine().scheduler().timer_set( attotime::from_hz( 16000 ), FUNC(dac_irq ));
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trucocl_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(trucocl_videoram_w) AM_BASE_MEMBER(trucocl_state, m_videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(trucocl_colorram_w) AM_BASE_MEMBER(trucocl_state, m_colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(trucocl_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(trucocl_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x4c00, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_enable_w)
 	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("IN0")
-	AM_RANGE(0x5080, 0x5080) AM_DEVWRITE("dac", audio_dac_w)
+	AM_RANGE(0x5080, 0x5080) AM_DEVWRITE_LEGACY("dac", audio_dac_w)
 	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

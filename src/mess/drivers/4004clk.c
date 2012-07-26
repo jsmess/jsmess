@@ -5,7 +5,6 @@
         03/08/2009 Initial driver
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i4004/i4004.h"
@@ -33,7 +32,7 @@ public:
 
 READ8_MEMBER(nixieclock_state::data_r)
 {
-	return input_port_read(machine(), "INPUT") & 0x0f;
+	return ioport("INPUT")->read() & 0x0f;
 }
 
 static UINT8 nixie_to_num(UINT16 val)

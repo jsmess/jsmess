@@ -96,18 +96,22 @@ class lynx_state : public driver_device
 {
 public:
 	lynx_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_mem_0000(*this, "mem_0000"),
+		m_mem_fc00(*this, "mem_fc00"),
+		m_mem_fd00(*this, "mem_fd00"),
+		m_mem_fe00(*this, "mem_fe00"),
+		m_mem_fffa(*this, "mem_fffa"){ }
 
 	virtual void video_start();
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 *m_mem_0000;
-	UINT8 *m_mem_fc00;
-	UINT8 *m_mem_fd00;
-	UINT8 *m_mem_fe00;
-	UINT8 *m_mem_fffa;
-	size_t m_mem_fe00_size;
+	required_shared_ptr<UINT8> m_mem_0000;
+	required_shared_ptr<UINT8> m_mem_fc00;
+	required_shared_ptr<UINT8> m_mem_fd00;
+	required_shared_ptr<UINT8> m_mem_fe00;
+	required_shared_ptr<UINT8> m_mem_fffa;
 	UINT16 m_granularity;
 	int m_sign_AB;
 	int m_sign_CD;
@@ -122,6 +126,17 @@ public:
 	UART m_uart;
 	bitmap_ind16 m_bitmap;
 	bitmap_ind16 m_bitmap_temp;
+	DECLARE_READ8_MEMBER(suzy_read);
+	DECLARE_WRITE8_MEMBER(suzy_write);
+	DECLARE_WRITE8_MEMBER(lynx_uart_w);
+	DECLARE_READ8_MEMBER(mikey_read);
+	DECLARE_WRITE8_MEMBER(mikey_write);
+	DECLARE_READ8_MEMBER(lynx_memory_config_r);
+	DECLARE_WRITE8_MEMBER(lynx_memory_config_w);
+	void lynx_divide();
+	void lynx_multiply();
+	UINT8 lynx_timer_read(int which, int offset);
+	void lynx_timer_write(int which, int offset, UINT8 data);
 };
 
 
@@ -130,8 +145,6 @@ public:
 MACHINE_START( lynx );
 MACHINE_RESET( lynx );
 
-READ8_HANDLER( lynx_memory_config_r );
-WRITE8_HANDLER( lynx_memory_config_w );
 void lynx_timer_count_down(running_machine &machine, int nr);
 
 INTERRUPT_GEN( lynx_frame_int );

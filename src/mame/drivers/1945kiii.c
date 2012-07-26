@@ -53,28 +53,34 @@ public:
 	k3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_oki1(*this, "oki1"),
-		  m_oki2(*this, "oki2") { }
+		  m_oki2(*this, "oki2") ,
+		m_spriteram_1(*this, "spritera1"),
+		m_spriteram_2(*this, "spritera2"),
+		m_bgram(*this, "bgram"){ }
 
+	/* devices */
+	required_device<okim6295_device> m_oki1;
+	required_device<okim6295_device> m_oki2;
 	/* memory pointers */
-	UINT16 *  m_spriteram_1;
-	UINT16 *  m_spriteram_2;
-	UINT16 *  m_bgram;
+	required_shared_ptr<UINT16> m_spriteram_1;
+	required_shared_ptr<UINT16> m_spriteram_2;
+	required_shared_ptr<UINT16> m_bgram;
 //  UINT16 *  m_paletteram16; // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 
-	/* devices */
-	required_device<okim6295_device> m_oki1;
-	required_device<okim6295_device> m_oki2;
+	DECLARE_WRITE16_MEMBER(k3_bgram_w);
+	DECLARE_WRITE16_MEMBER(k3_scrollx_w);
+	DECLARE_WRITE16_MEMBER(k3_scrolly_w);
+	DECLARE_WRITE16_MEMBER(k3_soundbanks_w);
 };
 
 
-static WRITE16_HANDLER( k3_bgram_w )
+WRITE16_MEMBER(k3_state::k3_bgram_w)
 {
-	k3_state *state = space->machine().driver_data<k3_state>();
-	COMBINE_DATA(&state->m_bgram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bgram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_k3_bg_tile_info )
@@ -125,43 +131,40 @@ static SCREEN_UPDATE_IND16(k3)
 }
 
 
-static WRITE16_HANDLER( k3_scrollx_w )
+WRITE16_MEMBER(k3_state::k3_scrollx_w)
 {
-	k3_state *state = space->machine().driver_data<k3_state>();
-	state->m_bg_tilemap->set_scrollx(0, data);
+	m_bg_tilemap->set_scrollx(0, data);
 }
 
-static WRITE16_HANDLER( k3_scrolly_w )
+WRITE16_MEMBER(k3_state::k3_scrolly_w)
 {
-	k3_state *state = space->machine().driver_data<k3_state>();
-	state->m_bg_tilemap->set_scrolly(0, data);
+	m_bg_tilemap->set_scrolly(0, data);
 }
 
-static WRITE16_HANDLER( k3_soundbanks_w )
+WRITE16_MEMBER(k3_state::k3_soundbanks_w)
 {
-	k3_state *state = space->machine().driver_data<k3_state>();
-	state->m_oki1->set_bank_base((data & 4) ? 0x40000 : 0);
-	state->m_oki2->set_bank_base((data & 2) ? 0x40000 : 0);
+	m_oki1->set_bank_base((data & 4) ? 0x40000 : 0);
+	m_oki2->set_bank_base((data & 2) ? 0x40000 : 0);
 }
 
-static ADDRESS_MAP_START( k3_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( k3_map, AS_PROGRAM, 16, k3_state )
 	AM_RANGE(0x0009ce, 0x0009cf) AM_WRITENOP	// bug in code? (clean up log)
 	AM_RANGE(0x0009d2, 0x0009d3) AM_WRITENOP	// bug in code? (clean up log)
 
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	// Main Ram
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	// palette
-	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_BASE_MEMBER(k3_state, m_spriteram_1)
-	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_BASE_MEMBER(k3_state, m_spriteram_2)
-	AM_RANGE(0x2c0000, 0x2c0fff) AM_RAM_WRITE(k3_bgram_w) AM_BASE_MEMBER(k3_state, m_bgram)
+	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")	// palette
+	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_SHARE("spritera1")
+	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("spritera2")
+	AM_RANGE(0x2c0000, 0x2c0fff) AM_RAM_WRITE(k3_bgram_w) AM_SHARE("bgram")
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(k3_scrollx_w)
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(k3_scrolly_w)
 	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(k3_soundbanks_w)
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x440000, 0x440001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x480000, 0x480001) AM_READ_PORT("DSW")
-	AM_RANGE(0x4c0000, 0x4c0001) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0xff00)
-	AM_RANGE(0x500000, 0x500001) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0xff00)
+	AM_RANGE(0x4c0000, 0x4c0001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0xff00)
+	AM_RANGE(0x500000, 0x500001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0x8c0000, 0x8cffff) AM_RAM	// not used?
 ADDRESS_MAP_END
 

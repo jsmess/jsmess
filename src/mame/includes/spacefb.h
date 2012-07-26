@@ -28,18 +28,24 @@ class spacefb_state : public driver_device
 {
 public:
 	spacefb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	UINT8 m_sound_latch;
 	emu_timer *m_interrupt_timer;
-	UINT8 *m_videoram;
-	size_t m_videoram_size;
+	required_shared_ptr<UINT8> m_videoram;
 	UINT8 *m_object_present_map;
 	UINT8 m_port_0;
 	UINT8 m_port_2;
 	UINT32 m_star_shift_reg;
 	double m_color_weights_rg[3];
 	double m_color_weights_b[2];
+	DECLARE_WRITE8_MEMBER(spacefb_port_0_w);
+	DECLARE_WRITE8_MEMBER(spacefb_port_2_w);
+	DECLARE_READ8_MEMBER(spacefb_audio_p2_r);
+	DECLARE_READ8_MEMBER(spacefb_audio_t0_r);
+	DECLARE_READ8_MEMBER(spacefb_audio_t1_r);
+	DECLARE_WRITE8_MEMBER(spacefb_port_1_w);
 };
 
 
@@ -47,10 +53,6 @@ public:
 
 MACHINE_CONFIG_EXTERN( spacefb_audio );
 
-READ8_HANDLER( spacefb_audio_p2_r );
-READ8_HANDLER( spacefb_audio_t0_r );
-READ8_HANDLER( spacefb_audio_t1_r );
-WRITE8_HANDLER( spacefb_port_1_w );
 
 
 /*----------- defined in video/spacefb.c -----------*/
@@ -58,5 +60,3 @@ WRITE8_HANDLER( spacefb_port_1_w );
 VIDEO_START( spacefb );
 SCREEN_UPDATE_RGB32( spacefb );
 
-WRITE8_HANDLER( spacefb_port_0_w );
-WRITE8_HANDLER( spacefb_port_2_w );

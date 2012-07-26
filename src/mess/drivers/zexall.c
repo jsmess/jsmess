@@ -17,7 +17,6 @@ One i/o port is used:
 0001 - bit 0 controls whether interrupt timer is enabled (1) or not (0), this is a holdover from a project of kevtris' and can be ignored.
 
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 /* Core includes */
 #include "emu.h"
@@ -32,7 +31,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_terminal(*this, TERMINAL_TAG)
-	{ }
+	,
+		m_main_ram(*this, "main_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -42,7 +42,7 @@ public:
 	DECLARE_WRITE8_MEMBER( zexall_output_ack_w );
 	DECLARE_WRITE8_MEMBER( zexall_output_req_w );
 	DECLARE_WRITE8_MEMBER( zexall_output_data_w );
-	UINT8 *m_main_ram;
+	required_shared_ptr<UINT8> m_main_ram;
 	UINT8 m_data[8]; // unused; to suppress the scalar initializer warning
 	UINT8 m_out_data; // byte written to 0xFFFF
 	UINT8 m_out_req; // byte written to 0xFFFE
@@ -63,7 +63,7 @@ static MACHINE_RESET( zexall )
 {
 // rom is self-modifying, so need to refresh it on each run
 	zexall_state *state = machine.driver_data<zexall_state>();
-	UINT8 *rom = machine.region("romcode")->base();
+	UINT8 *rom = state->memregion("romcode")->base();
 	UINT8 *ram = state->m_main_ram;
 	/* fill main ram with zexall code */
 	memcpy(ram, rom, 0x228a);
@@ -114,7 +114,7 @@ WRITE8_MEMBER( zexall_state::zexall_output_data_w )
 
 static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8, zexall_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xfffc) AM_RAM AM_BASE(m_main_ram)
+	AM_RANGE(0x0000, 0xfffc) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0xfffd, 0xfffd) AM_READWRITE(zexall_output_ack_r,zexall_output_ack_w)
 	AM_RANGE(0xfffe, 0xfffe) AM_READWRITE(zexall_output_req_r,zexall_output_req_w)
 	AM_RANGE(0xffff, 0xffff) AM_READWRITE(zexall_output_data_r,zexall_output_data_w)

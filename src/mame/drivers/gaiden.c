@@ -136,25 +136,23 @@ Notes:
 #include "sound/okim6295.h"
 #include "includes/gaiden.h"
 
-static WRITE16_HANDLER( gaiden_sound_command_w )
+WRITE16_MEMBER(gaiden_state::gaiden_sound_command_w)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 
 	if (ACCESSING_BITS_0_7)
-		soundlatch_w(space, 0, data & 0xff);	/* Ninja Gaiden */
+		soundlatch_byte_w(space, 0, data & 0xff);	/* Ninja Gaiden */
 	if (ACCESSING_BITS_8_15)
-		soundlatch_w(space, 0, data >> 8);	/* Tecmo Knight */
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_byte_w(space, 0, data >> 8);	/* Tecmo Knight */
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE16_HANDLER( drgnbowl_sound_command_w )
+WRITE16_MEMBER(gaiden_state::drgnbowl_sound_command_w)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(space, 0, data >> 8);
-		device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+		soundlatch_byte_w(space, 0, data >> 8);
+		device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 	}
 }
 
@@ -164,9 +162,8 @@ static WRITE16_HANDLER( drgnbowl_sound_command_w )
 /* and reads the answer from 0x07a007. The returned values contain the address of */
 /* a function to jump to. */
 
-static WRITE16_HANDLER( wildfang_protection_w )
+WRITE16_MEMBER(gaiden_state::wildfang_protection_w)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -179,47 +176,46 @@ static WRITE16_HANDLER( wildfang_protection_w )
 
 		data >>= 8;
 
-//      logerror("PC %06x: prot = %02x\n",cpu_get_pc(&space->device()),data);
+//      logerror("PC %06x: prot = %02x\n",cpu_get_pc(&space.device()),data);
 
 		switch (data & 0xf0)
 		{
 			case 0x00:	/* init */
-				state->m_prot = 0x00;
+				m_prot = 0x00;
 				break;
 			case 0x10:	/* high 4 bits of jump code */
-				state->m_jumpcode = (data & 0x0f) << 4;
-				state->m_prot = 0x10;
+				m_jumpcode = (data & 0x0f) << 4;
+				m_prot = 0x10;
 				break;
 			case 0x20:	/* low 4 bits of jump code */
-				state->m_jumpcode |= data & 0x0f;
-				if (state->m_jumpcode >= ARRAY_LENGTH(jumppoints))
+				m_jumpcode |= data & 0x0f;
+				if (m_jumpcode >= ARRAY_LENGTH(jumppoints))
 				{
-					logerror("unknown jumpcode %02x\n", state->m_jumpcode);
-					state->m_jumpcode = 0;
+					logerror("unknown jumpcode %02x\n", m_jumpcode);
+					m_jumpcode = 0;
 				}
-				state->m_prot = 0x20;
+				m_prot = 0x20;
 				break;
 			case 0x30:	/* ask for bits 12-15 of function address */
-				state->m_prot = 0x40 | ((jumppoints[state->m_jumpcode] >> 12) & 0x0f);
+				m_prot = 0x40 | ((jumppoints[m_jumpcode] >> 12) & 0x0f);
 				break;
 			case 0x40:	/* ask for bits 8-11 of function address */
-				state->m_prot = 0x50 | ((jumppoints[state->m_jumpcode] >> 8) & 0x0f);
+				m_prot = 0x50 | ((jumppoints[m_jumpcode] >> 8) & 0x0f);
 				break;
 			case 0x50:	/* ask for bits 4-7 of function address */
-				state->m_prot = 0x60 | ((jumppoints[state->m_jumpcode] >> 4) & 0x0f);
+				m_prot = 0x60 | ((jumppoints[m_jumpcode] >> 4) & 0x0f);
 				break;
 			case 0x60:	/* ask for bits 0-3 of function address */
-				state->m_prot = 0x70 | ((jumppoints[state->m_jumpcode] >> 0) & 0x0f);
+				m_prot = 0x70 | ((jumppoints[m_jumpcode] >> 0) & 0x0f);
 				break;
 		}
 	}
 }
 
-static READ16_HANDLER( wildfang_protection_r )
+READ16_MEMBER(gaiden_state::wildfang_protection_r)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
-//  logerror("PC %06x: read prot %02x\n", cpu_get_pc(&space->device()), state->m_prot);
-	return state->m_prot;
+//  logerror("PC %06x: read prot %02x\n", cpu_get_pc(&space.device()), m_prot);
+	return m_prot;
 }
 
 
@@ -334,73 +330,71 @@ static MACHINE_START( raiga )
 	state->save_item(NAME(state->m_spr_offset_y));
 }
 
-static WRITE16_HANDLER( raiga_protection_w )
+WRITE16_MEMBER(gaiden_state::raiga_protection_w)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
 
 	if (ACCESSING_BITS_8_15)
 	{
 		data >>= 8;
 
-//      logerror("PC %06x: prot = %02x\n", cpu_get_pc(&space->device()), data);
+//      logerror("PC %06x: prot = %02x\n", cpu_get_pc(&space.device()), data);
 
 		switch (data & 0xf0)
 		{
 			case 0x00:	/* init */
-				state->m_prot = 0x00;
+				m_prot = 0x00;
 				break;
 			case 0x10:	/* high 4 bits of jump code */
-				state->m_jumpcode = (data & 0x0f) << 4;
-				state->m_prot = 0x10;
+				m_jumpcode = (data & 0x0f) << 4;
+				m_prot = 0x10;
 				break;
 			case 0x20:	/* low 4 bits of jump code */
-				state->m_jumpcode |= data & 0x0f;
-				logerror("requested protection jumpcode %02x\n", state->m_jumpcode);
-//              state->m_jumpcode = 0;
-				if (state->m_raiga_jumppoints[state->m_jumpcode] == -2)
+				m_jumpcode |= data & 0x0f;
+				logerror("requested protection jumpcode %02x\n", m_jumpcode);
+//              m_jumpcode = 0;
+				if (m_raiga_jumppoints[m_jumpcode] == -2)
 				{
-					state->m_raiga_jumppoints = jumppoints_other;
+					m_raiga_jumppoints = jumppoints_other;
 				}
 
-				if (state->m_raiga_jumppoints[state->m_jumpcode] == -1)
+				if (m_raiga_jumppoints[m_jumpcode] == -1)
 				{
-					logerror("unknown jumpcode %02x\n", state->m_jumpcode);
-					popmessage("unknown jumpcode %02x", state->m_jumpcode);
-					state->m_jumpcode = 0;
+					logerror("unknown jumpcode %02x\n", m_jumpcode);
+					popmessage("unknown jumpcode %02x", m_jumpcode);
+					m_jumpcode = 0;
 				}
-				state->m_prot = 0x20;
+				m_prot = 0x20;
 				break;
 			case 0x30:	/* ask for bits 12-15 of function address */
-				state->m_prot = 0x40 | ((state->m_raiga_jumppoints[state->m_jumpcode] >> 12) & 0x0f);
+				m_prot = 0x40 | ((m_raiga_jumppoints[m_jumpcode] >> 12) & 0x0f);
 				break;
 			case 0x40:	/* ask for bits 8-11 of function address */
-				state->m_prot = 0x50 | ((state->m_raiga_jumppoints[state->m_jumpcode] >> 8) & 0x0f);
+				m_prot = 0x50 | ((m_raiga_jumppoints[m_jumpcode] >> 8) & 0x0f);
 				break;
 			case 0x50:	/* ask for bits 4-7 of function address */
-				state->m_prot = 0x60 | ((state->m_raiga_jumppoints[state->m_jumpcode] >> 4) & 0x0f);
+				m_prot = 0x60 | ((m_raiga_jumppoints[m_jumpcode] >> 4) & 0x0f);
 				break;
 			case 0x60:	/* ask for bits 0-3 of function address */
-				state->m_prot = 0x70 | ((state->m_raiga_jumppoints[state->m_jumpcode] >> 0) & 0x0f);
+				m_prot = 0x70 | ((m_raiga_jumppoints[m_jumpcode] >> 0) & 0x0f);
 				break;
 		}
 	}
 }
 
-static READ16_HANDLER( raiga_protection_r )
+READ16_MEMBER(gaiden_state::raiga_protection_r)
 {
-	gaiden_state *state = space->machine().driver_data<gaiden_state>();
-//  logerror("PC %06x: read prot %02x\n", cpu_get_pc(&space->device()), state->m_prot);
-	return state->m_prot;
+//  logerror("PC %06x: read prot %02x\n", cpu_get_pc(&space.device()), m_prot);
+	return m_prot;
 }
 
-static ADDRESS_MAP_START( gaiden_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( gaiden_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_BASE_MEMBER(gaiden_state, m_videoram)
-	AM_RANGE(0x072000, 0x073fff) AM_READWRITE(gaiden_videoram2_r, gaiden_videoram2_w) AM_BASE_MEMBER(gaiden_state, m_videoram2)
-	AM_RANGE(0x074000, 0x075fff) AM_READWRITE(gaiden_videoram3_r, gaiden_videoram3_w) AM_BASE_MEMBER(gaiden_state, m_videoram3)
-	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE_SIZE_MEMBER(gaiden_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x072000, 0x073fff) AM_READWRITE(gaiden_videoram2_r, gaiden_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x074000, 0x075fff) AM_READWRITE(gaiden_videoram3_r, gaiden_videoram3_w) AM_SHARE("videoram3")
+	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2") AM_WRITE(gaiden_sproffsety_w)
 	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
@@ -419,14 +413,14 @@ static ADDRESS_MAP_START( gaiden_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drgnbowl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( drgnbowl_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_BASE_MEMBER(gaiden_state, m_videoram)
-	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(gaiden_videoram2_w) AM_BASE_MEMBER(gaiden_state, m_videoram2)
-	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(gaiden_videoram3_w) AM_BASE_MEMBER(gaiden_state, m_videoram3)
-	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE_SIZE_MEMBER(gaiden_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x072000, 0x073fff) AM_RAM_WRITE(gaiden_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x074000, 0x075fff) AM_RAM_WRITE(gaiden_videoram3_w) AM_SHARE("videoram3")
+	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x07a004, 0x07a005) AM_READ_PORT("DSW")
@@ -438,27 +432,27 @@ static ADDRESS_MAP_START( drgnbowl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x07f006, 0x07f007) AM_WRITE(gaiden_fgscrollx_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gaiden_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xefff) AM_ROM	/* raiga only */
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE("ym2", ym2203_w)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
+	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE_LEGACY("ym2", ym2203_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_NOP /* ?? */
-	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
+	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drgnbowl_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( drgnbowl_sound_map, AS_PROGRAM, 8, gaiden_state )
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drgnbowl_sound_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( drgnbowl_sound_port_map, AS_IO, 8, gaiden_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( common )
@@ -906,23 +900,23 @@ Others
 2x      8x2 switches DIP
 */
 
-static ADDRESS_MAP_START( mastninj_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mastninj_sound_map, AS_PROGRAM, 8, gaiden_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xc400, 0xc401) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("ym2", ym2203_w)
+	AM_RANGE(0xc400, 0xc401) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
+	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE_LEGACY("ym2", ym2203_w)
 //  AM_RANGE(0xfc00, 0xfc00) AM_NOP /* ?? */
-//  AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
+//  AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mastninj_map, AS_PROGRAM, 16, gaiden_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_BASE_MEMBER(gaiden_state, m_videoram)
-	AM_RANGE(0x072000, 0x073fff) AM_READWRITE(gaiden_videoram2_r, gaiden_videoram2_w) AM_BASE_MEMBER(gaiden_state, m_videoram2)
-	AM_RANGE(0x074000, 0x075fff) AM_READWRITE(gaiden_videoram3_r, gaiden_videoram3_w) AM_BASE_MEMBER(gaiden_state, m_videoram3)
-	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_BASE_SIZE_MEMBER(gaiden_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(gaiden_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x072000, 0x073fff) AM_READWRITE(gaiden_videoram2_r, gaiden_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x074000, 0x075fff) AM_READWRITE(gaiden_videoram3_r, gaiden_videoram3_w) AM_SHARE("videoram3")
+	AM_RANGE(0x076000, 0x077fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x078000, 0x079fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 //  AM_RANGE(0x078800, 0x079fff) AM_RAM
 	AM_RANGE(0x07a000, 0x07a001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x07a002, 0x07a003) AM_READ_PORT("P1_P2")
@@ -1505,8 +1499,8 @@ static DRIVER_INIT( wildfang )
 
 	state->m_prot = 0;
 	state->m_jumpcode = 0;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x07a006, 0x07a007, FUNC(wildfang_protection_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07a804, 0x07a805, FUNC(wildfang_protection_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x07a006, 0x07a007, read16_delegate(FUNC(gaiden_state::wildfang_protection_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07a804, 0x07a805, write16_delegate(FUNC(gaiden_state::wildfang_protection_w),state));
 }
 
 static DRIVER_INIT( raiga )
@@ -1518,15 +1512,15 @@ static DRIVER_INIT( raiga )
 
 	state->m_prot = 0;
 	state->m_jumpcode = 0;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x07a006, 0x07a007, FUNC(raiga_protection_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x07a804, 0x07a805, FUNC(raiga_protection_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x07a006, 0x07a007, read16_delegate(FUNC(gaiden_state::raiga_protection_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x07a804, 0x07a805, write16_delegate(FUNC(gaiden_state::raiga_protection_w),state));
 }
 
 static void descramble_drgnbowl_gfx(running_machine &machine)
 {
 	int i;
-	UINT8 *ROM = machine.region("maincpu")->base();
-	size_t size = machine.region("maincpu")->bytes();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	size_t size = machine.root_device().memregion("maincpu")->bytes();
 	UINT8 *buffer = auto_alloc_array(machine, UINT8, size);
 
 	memcpy(buffer, ROM, size);
@@ -1542,8 +1536,8 @@ static void descramble_drgnbowl_gfx(running_machine &machine)
 
 	auto_free(machine, buffer);
 
-	ROM = machine.region("gfx2")->base();
-	size = machine.region("gfx2")->bytes();
+	ROM = machine.root_device().memregion("gfx2")->base();
+	size = machine.root_device().memregion("gfx2")->bytes();
 	buffer = auto_alloc_array(machine, UINT8, size);
 
 	memcpy(buffer,ROM,size);
@@ -1613,8 +1607,8 @@ static void descramble_mastninj_gfx(running_machine &machine, UINT8* src)
 static DRIVER_INIT(mastninj)
 {
 	// rearrange the graphic roms into a format that MAME can decode
-	descramble_mastninj_gfx(machine, machine.region("gfx2")->base());
-	descramble_mastninj_gfx(machine, machine.region("gfx3")->base());
+	descramble_mastninj_gfx(machine, machine.root_device().memregion("gfx2")->base());
+	descramble_mastninj_gfx(machine, machine.root_device().memregion("gfx3")->base());
 	DRIVER_INIT_CALL(shadoww);
 }
 

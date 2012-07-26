@@ -108,7 +108,7 @@
 
 ***************************************************************************/
 
-WRITE16_HANDLER( seta2_vregs_w )
+WRITE16_MEMBER(seta2_state::seta2_vregs_w)
 {
 	/* 02/04 = horizontal display start/end
                mj4simai = 0065/01E5 (0180 visible area)
@@ -124,30 +124,29 @@ WRITE16_HANDLER( seta2_vregs_w )
                grdians =  019a
     */
 
-	seta2_state *state = space->machine().driver_data<seta2_state>();
-	UINT16 olddata = state->m_vregs[offset];
+	UINT16 olddata = m_vregs[offset];
 
-	COMBINE_DATA(&state->m_vregs[offset]);
-	if ( state->m_vregs[offset] != olddata )
-		logerror("CPU #0 PC %06X: Video Reg %02X <- %04X\n",cpu_get_pc(&space->device()),offset*2,data);
+	COMBINE_DATA(&m_vregs[offset]);
+	if ( m_vregs[offset] != olddata )
+		logerror("CPU #0 PC %06X: Video Reg %02X <- %04X\n",cpu_get_pc(&space.device()),offset*2,data);
 
 	switch( offset*2 )
 	{
 	case 0x1c:	// FLIP SCREEN (myangel)    <- this is actually zoom
-		flip_screen_set(space->machine(),  data & 1 );
-		if (data & ~1)	logerror("CPU #0 PC %06X: flip screen unknown bits %04X\n",cpu_get_pc(&space->device()),data);
+		flip_screen_set(data & 1 );
+		if (data & ~1)	logerror("CPU #0 PC %06X: flip screen unknown bits %04X\n",cpu_get_pc(&space.device()),data);
 		break;
 	case 0x2a:	// FLIP X (pzlbowl)
-		flip_screen_x_set(space->machine(),  data & 1 );
-		if (data & ~1)	logerror("CPU #0 PC %06X: flipx unknown bits %04X\n",cpu_get_pc(&space->device()),data);
+		flip_screen_x_set(data & 1 );
+		if (data & ~1)	logerror("CPU #0 PC %06X: flipx unknown bits %04X\n",cpu_get_pc(&space.device()),data);
 		break;
 	case 0x2c:	// FLIP Y (pzlbowl)
-		flip_screen_y_set(space->machine(),  data & 1 );
-		if (data & ~1)	logerror("CPU #0 PC %06X: flipy unknown bits %04X\n",cpu_get_pc(&space->device()),data);
+		flip_screen_y_set(data & 1 );
+		if (data & ~1)	logerror("CPU #0 PC %06X: flipy unknown bits %04X\n",cpu_get_pc(&space.device()),data);
 		break;
 
 	case 0x30:	// BLANK SCREEN (pzlbowl, myangel)
-		if (data & ~1)	logerror("CPU #0 PC %06X: blank unknown bits %04X\n",cpu_get_pc(&space->device()),data);
+		if (data & ~1)	logerror("CPU #0 PC %06X: blank unknown bits %04X\n",cpu_get_pc(&space.device()),data);
 		break;
 	}
 }
@@ -220,7 +219,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	// When debugging, use state->m_spriteram here, and run mame -update_in_pause
 	UINT16 *buffered_spriteram16 = state->m_buffered_spriteram;
 	UINT16 *s1  = buffered_spriteram16 + 0x3000/2;
-	UINT16 *end = &buffered_spriteram16[state->m_spriteram_size/2];
+	UINT16 *end = &buffered_spriteram16[state->m_spriteram.bytes()/2];
 
 //  for ( ; s1 < end; s1+=4 )
 	for ( ; s1 < buffered_spriteram16 + 0x4000/2; s1+=4 )	// more reasonable (and it cures MAME lockup in e.g. funcube3 boot)
@@ -452,12 +451,13 @@ VIDEO_START( seta2 )
 	machine.gfx[4]->color_granularity = 16;
 	machine.gfx[5]->color_granularity = 16;
 
-	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram_size/2);
+	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram.bytes()/2);
 
 	state->m_xoffset = 0;
 	state->m_yoffset = 0;
 
-    state_save_register_global_pointer(machine, state->m_vregs, 0x40);
+	//TODO:FIX
+    //state_save_register_global_pointer(machine, state->m_vregs, 0x40);
 }
 
 VIDEO_START( seta2_xoffset )
@@ -499,6 +499,6 @@ SCREEN_VBLANK( seta2 )
 		seta2_state *state = screen.machine().driver_data<seta2_state>();
 
 		// Buffer sprites by 1 frame
-		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);
+		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram.bytes());
 	}
 }

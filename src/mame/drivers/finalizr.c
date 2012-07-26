@@ -34,30 +34,27 @@ static TIMER_DEVICE_CALLBACK( finalizr_scanline )
 }
 
 
-static WRITE8_HANDLER( finalizr_coin_w )
+WRITE8_MEMBER(finalizr_state::finalizr_coin_w)
 {
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 }
 
-static WRITE8_HANDLER( finalizr_flipscreen_w )
+WRITE8_MEMBER(finalizr_state::finalizr_flipscreen_w)
 {
-	finalizr_state *state = space->machine().driver_data<finalizr_state>();
-	state->m_nmi_enable = data & 0x01;
-	state->m_irq_enable = data & 0x02;
+	m_nmi_enable = data & 0x01;
+	m_irq_enable = data & 0x02;
 
-	flip_screen_set(space->machine(), ~data & 0x08);
+	flip_screen_set(~data & 0x08);
 }
 
-static WRITE8_HANDLER( finalizr_i8039_irq_w )
+WRITE8_MEMBER(finalizr_state::finalizr_i8039_irq_w)
 {
-	finalizr_state *state = space->machine().driver_data<finalizr_state>();
-	device_set_input_line(state->m_audio_cpu, 0, ASSERT_LINE);
+	device_set_input_line(m_audio_cpu, 0, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( i8039_irqen_w )
+WRITE8_MEMBER(finalizr_state::i8039_irqen_w)
 {
-	finalizr_state *state = space->machine().driver_data<finalizr_state>();
 
 	/*  bit 0x80 goes active low, indicating that the
         external IRQ being serviced is complete
@@ -65,12 +62,11 @@ static WRITE8_HANDLER( i8039_irqen_w )
     */
 
 	if ((data & 0x80) == 0)
-		device_set_input_line(state->m_audio_cpu, 0, CLEAR_LINE);
+		device_set_input_line(m_audio_cpu, 0, CLEAR_LINE);
 }
 
-static READ8_HANDLER( i8039_T1_r )
+READ8_MEMBER(finalizr_state::i8039_T1_r)
 {
-	finalizr_state *state = space->machine().driver_data<finalizr_state>();
 
 	/*  I suspect the clock-out from the I8039 T0 line should be connected
         here (See the i8039_T0_w handler below).
@@ -82,12 +78,12 @@ static READ8_HANDLER( i8039_T1_r )
         based on the I8039 main xtal clock input frequency of 9.216MHz
     */
 
-	state->m_T1_line++;
-	state->m_T1_line %= 16;
-	return (!(state->m_T1_line % 3) && (state->m_T1_line > 0));
+	m_T1_line++;
+	m_T1_line %= 16;
+	return (!(m_T1_line % 3) && (m_T1_line > 0));
 }
 
-static WRITE8_HANDLER( i8039_T0_w )
+WRITE8_MEMBER(finalizr_state::i8039_T0_w)
 {
 	/*  This becomes a clock output at a frequency of 3.072MHz (derived
         by internally dividing the main xtal clock input by a factor of 3).
@@ -97,11 +93,11 @@ static WRITE8_HANDLER( i8039_T0_w )
     */
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0001, 0x0001) AM_WRITEONLY AM_BASE_MEMBER(finalizr_state, m_scroll)
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, finalizr_state )
+	AM_RANGE(0x0001, 0x0001) AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0x0003, 0x0003) AM_WRITE(finalizr_videoctrl_w)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(finalizr_flipscreen_w)
-//  AM_RANGE(0x0020, 0x003f) AM_WRITEONLY AM_BASE_MEMBER(finalizr_state, m_scroll)
+//  AM_RANGE(0x0020, 0x003f) AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0808, 0x0808) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0810, 0x0810) AM_READ_PORT("SYSTEM")
@@ -110,28 +106,28 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0813, 0x0813) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0818, 0x0818) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x0819, 0x0819) AM_WRITE(finalizr_coin_w)
-	AM_RANGE(0x081a, 0x081a) AM_DEVWRITE("snsnd", sn76496_w)	/* This address triggers the SN chip to read the data port. */
+	AM_RANGE(0x081a, 0x081a) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)	/* This address triggers the SN chip to read the data port. */
 	AM_RANGE(0x081b, 0x081b) AM_WRITENOP		/* Loads the snd command into the snd latch */
 	AM_RANGE(0x081c, 0x081c) AM_WRITE(finalizr_i8039_irq_w)	/* custom sound chip */
-	AM_RANGE(0x081d, 0x081d) AM_WRITE(soundlatch_w)			/* custom sound chip */
-	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_BASE_MEMBER(finalizr_state, m_colorram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_BASE_SIZE_MEMBER(finalizr_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_BASE_MEMBER(finalizr_state, m_colorram2)
-	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_BASE_MEMBER(finalizr_state, m_videoram2)
-	AM_RANGE(0x3000, 0x31ff) AM_RAM AM_BASE_SIZE_MEMBER(finalizr_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x081d, 0x081d) AM_WRITE(soundlatch_byte_w)			/* custom sound chip */
+	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("colorram")
+	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_SHARE("colorram2")
+	AM_RANGE(0x2c00, 0x2fff) AM_RAM AM_SHARE("videoram2")
+	AM_RANGE(0x3000, 0x31ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3200, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE_MEMBER(finalizr_state, m_spriteram_2)
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("spriteram_2")
 	AM_RANGE(0x3a00, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, finalizr_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
-	AM_RANGE(0x00, 0xff)                   AM_READ(soundlatch_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_w)
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, finalizr_state )
+	AM_RANGE(0x00, 0xff)                   AM_READ(soundlatch_byte_r)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_WRITE(i8039_T0_w)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(i8039_T1_r)
@@ -143,7 +139,7 @@ static INPUT_PORTS_START( finalizr )
 	KONAMI8_SYSTEM_10
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("P1")
 	KONAMI8_MONO_B12_UNK

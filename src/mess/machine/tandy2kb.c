@@ -322,18 +322,18 @@ READ8_MEMBER( tandy2k_keyboard_device::kb_p1_r )
 
 	UINT8 data = 0xff;
 
-	if (!BIT(m_keylatch, 0)) data &= input_port_read(machine(), "Y0");
-	if (!BIT(m_keylatch, 1)) data &= input_port_read(machine(), "Y1");
-	if (!BIT(m_keylatch, 2)) data &= input_port_read(machine(), "Y2");
-	if (!BIT(m_keylatch, 3)) data &= input_port_read(machine(), "Y3");
-	if (!BIT(m_keylatch, 4)) data &= input_port_read(machine(), "Y4");
-	if (!BIT(m_keylatch, 5)) data &= input_port_read(machine(), "Y5");
-	if (!BIT(m_keylatch, 6)) data &= input_port_read(machine(), "Y6");
-	if (!BIT(m_keylatch, 7)) data &= input_port_read(machine(), "Y7");
-	if (!BIT(m_keylatch, 8)) data &= input_port_read(machine(), "Y8");
-	if (!BIT(m_keylatch, 9)) data &= input_port_read(machine(), "Y9");
-	if (!BIT(m_keylatch, 10)) data &= input_port_read(machine(), "Y10");
-	if (!BIT(m_keylatch, 11)) data &= input_port_read(machine(), "Y11");
+	if (!BIT(m_keylatch, 0)) data &= ioport("Y0")->read();
+	if (!BIT(m_keylatch, 1)) data &= ioport("Y1")->read();
+	if (!BIT(m_keylatch, 2)) data &= ioport("Y2")->read();
+	if (!BIT(m_keylatch, 3)) data &= ioport("Y3")->read();
+	if (!BIT(m_keylatch, 4)) data &= ioport("Y4")->read();
+	if (!BIT(m_keylatch, 5)) data &= ioport("Y5")->read();
+	if (!BIT(m_keylatch, 6)) data &= ioport("Y6")->read();
+	if (!BIT(m_keylatch, 7)) data &= ioport("Y7")->read();
+	if (!BIT(m_keylatch, 8)) data &= ioport("Y8")->read();
+	if (!BIT(m_keylatch, 9)) data &= ioport("Y9")->read();
+	if (!BIT(m_keylatch, 10)) data &= ioport("Y10")->read();
+	if (!BIT(m_keylatch, 11)) data &= ioport("Y11")->read();
 
 	return ~data;
 }

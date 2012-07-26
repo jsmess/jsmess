@@ -11,31 +11,24 @@
 #define TURBO_X_SCALE		2
 
 
-struct i8279_state
-{
-	UINT8		command;
-	UINT8		mode;
-	UINT8		prescale;
-	UINT8		inhibit;
-	UINT8		clear;
-	UINT8		ram[16];
-};
-
 
 class turbo_state : public driver_device
 {
 public:
 	turbo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_videoram(*this, "videoram"),
+		  m_spriteram(*this, "spriteram"),
+		  m_sprite_position(*this, "sprite_position") { }
 
 	/* memory pointers */
-	UINT8 *		m_videoram;
-	UINT8 *		m_spriteram;
-	UINT8 *		m_sprite_position;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_sprite_position;
 	UINT8 *		m_buckrog_bitmap_ram;
 
 	/* machine states */
-	i8279_state	m_i8279;
+	UINT8		m_i8279_scanlines;
 
 	/* sound state */
 	UINT8		m_turbo_osel;
@@ -79,6 +72,18 @@ public:
 	UINT8		m_buckrog_command;
 	UINT8		m_buckrog_myship;
 	int m_last_sound_a;
+
+	DECLARE_WRITE8_MEMBER(scanlines_w);
+	DECLARE_WRITE8_MEMBER(digit_w);
+	DECLARE_READ8_MEMBER(turbo_collision_r);
+	DECLARE_WRITE8_MEMBER(turbo_collision_clear_w);
+	DECLARE_WRITE8_MEMBER(turbo_analog_reset_w);
+	DECLARE_WRITE8_MEMBER(turbo_coin_and_lamp_w);
+	DECLARE_READ8_MEMBER(buckrog_cpu2_command_r);
+	DECLARE_READ8_MEMBER(buckrog_port_2_r);
+	DECLARE_READ8_MEMBER(buckrog_port_3_r);
+	DECLARE_WRITE8_MEMBER(turbo_videoram_w);
+	DECLARE_WRITE8_MEMBER(buckrog_bitmap_w);
 };
 
 
@@ -113,5 +118,3 @@ PALETTE_INIT( buckrog );
 VIDEO_START( buckrog );
 SCREEN_UPDATE_IND16( buckrog );
 
-WRITE8_HANDLER( turbo_videoram_w );
-WRITE8_HANDLER( buckrog_bitmap_w );

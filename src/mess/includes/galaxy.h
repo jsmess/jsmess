@@ -24,6 +24,8 @@ public:
 	UINT32 m_start_addr;
 	emu_timer *m_gal_video_timer;
 	bitmap_ind16 m_bitmap;
+	DECLARE_READ8_MEMBER(galaxy_keyboard_r);
+	DECLARE_WRITE8_MEMBER(galaxy_latch_w);
 };
 
 
@@ -33,8 +35,6 @@ DRIVER_INIT( galaxy );
 MACHINE_RESET( galaxy );
 INTERRUPT_GEN( galaxy_interrupt );
 SNAPSHOT_LOAD( galaxy );
-READ8_HANDLER( galaxy_keyboard_r );
-WRITE8_HANDLER( galaxy_latch_w );
 
 MACHINE_RESET( galaxyp );
 

@@ -45,50 +45,54 @@ class vroulet_state : public driver_device
 {
 public:
 	vroulet_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_ball(*this, "ball"){ }
 
-	UINT8 *m_ball;
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_ball;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(vroulet_paletteram_w);
+	DECLARE_WRITE8_MEMBER(vroulet_videoram_w);
+	DECLARE_WRITE8_MEMBER(vroulet_colorram_w);
 };
 
 
 /* video */
 
 
-static WRITE8_HANDLER(vroulet_paletteram_w)
+WRITE8_MEMBER(vroulet_state::vroulet_paletteram_w)
 {
 	/*
-     paletteram_xxxxBBBBGGGGRRRR_be_w
+     paletteram_xxxxBBBBGGGGRRRR_byte_be_w
      but... each palette has 8 colors only, not 16 as expected...
     */
 
 	int i,j,a,b;
-	space->machine().generic.paletteram.u8[offset]=data;
+	m_generic_paletteram_8[offset]=data;
 	for(i=0;i<32;i++)
 	{
 		for(j=0;j<16;j++)
 		{
-			a=space->machine().generic.paletteram.u8[((i*8+j)*2)&0xff ];
-			b=space->machine().generic.paletteram.u8[((i*8+j)*2+1)&0xff ];
-			palette_set_color_rgb(space->machine(),i*16+j,pal4bit(b),pal4bit(b>>4),pal4bit(a));
+			a=m_generic_paletteram_8[((i*8+j)*2)&0xff ];
+			b=m_generic_paletteram_8[((i*8+j)*2+1)&0xff ];
+			palette_set_color_rgb(machine(),i*16+j,pal4bit(b),pal4bit(b>>4),pal4bit(a));
 		}
 	}
 }
 
-static WRITE8_HANDLER( vroulet_videoram_w )
+WRITE8_MEMBER(vroulet_state::vroulet_videoram_w)
 {
-	vroulet_state *state = space->machine().driver_data<vroulet_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( vroulet_colorram_w )
+WRITE8_MEMBER(vroulet_state::vroulet_colorram_w)
 {
-	vroulet_state *state = space->machine().driver_data<vroulet_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -119,23 +123,23 @@ static SCREEN_UPDATE_IND16(vroulet)
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( vroulet_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( vroulet_map, AS_PROGRAM, 8, vroulet_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0x8000) AM_NOP
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(vroulet_videoram_w) AM_BASE_MEMBER(vroulet_state, m_videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(vroulet_colorram_w) AM_BASE_MEMBER(vroulet_state, m_colorram)
-	AM_RANGE(0xa000, 0xa001) AM_RAM AM_BASE_MEMBER(vroulet_state, m_ball)
-	AM_RANGE(0xb000, 0xb0ff) AM_WRITE(vroulet_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(vroulet_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(vroulet_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xa000, 0xa001) AM_RAM AM_SHARE("ball")
+	AM_RANGE(0xb000, 0xb0ff) AM_WRITE(vroulet_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xc000, 0xc000) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vroulet_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( vroulet_io_map, AS_IO, 8, vroulet_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 /* Input Ports */

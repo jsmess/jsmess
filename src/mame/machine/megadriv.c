@@ -1788,14 +1788,14 @@ static UINT8 megadrive_io_read_data_port_6button(running_machine &machine, int p
 		{
 			/* here we read B, C & the additional buttons */
 			retdata = (megadrive_io_data_regs[portnum] & helper) |
-						(((input_port_read_safe(machine, pad3names[portnum], 0) & 0x30) |
-							(input_port_read_safe(machine, pad6names[portnum], 0) & 0x0f)) & ~helper);
+						(((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x30) |
+							(machine.root_device().ioport(pad6names[portnum])->read_safe(0) & 0x0f)) & ~helper);
 		}
 		else
 		{
 			/* here we read B, C & the directional buttons */
 			retdata = (megadrive_io_data_regs[portnum] & helper) |
-						((input_port_read_safe(machine, pad3names[portnum], 0) & 0x3f) & ~helper);
+						((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x3f) & ~helper);
 		}
 	}
 	else
@@ -1804,20 +1804,20 @@ static UINT8 megadrive_io_read_data_port_6button(running_machine &machine, int p
 		{
 			/* here we read ((Start & A) >> 2) | 0x00 */
 			retdata = (megadrive_io_data_regs[portnum] & helper) |
-						(((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) & ~helper);
+						(((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) & ~helper);
 		}
 		else if (io_stage[portnum]==2)
 		{
 			/* here we read ((Start & A) >> 2) | 0x0f */
 			retdata = (megadrive_io_data_regs[portnum] & helper) |
-						((((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) | 0x0f) & ~helper);
+						((((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) | 0x0f) & ~helper);
 		}
 		else
 		{
 			/* here we read ((Start & A) >> 2) | Up and Down */
 			retdata = (megadrive_io_data_regs[portnum] & helper) |
-						((((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) |
-							(input_port_read_safe(machine, pad3names[portnum], 0) & 0x03)) & ~helper);
+						((((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) |
+							(machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x03)) & ~helper);
 		}
 	}
 
@@ -1837,14 +1837,14 @@ static UINT8 megadrive_io_read_data_port_3button(running_machine &machine, int p
 	{
 		/* here we read B, C & the directional buttons */
 		retdata = (megadrive_io_data_regs[portnum] & helper) |
-					(((input_port_read_safe(machine, pad3names[portnum], 0) & 0x3f) | 0x40) & ~helper);
+					(((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x3f) | 0x40) & ~helper);
 	}
 	else
 	{
 		/* here we read ((Start & A) >> 2) | Up and Down */
 		retdata = (megadrive_io_data_regs[portnum] & helper) |
-					((((input_port_read_safe(machine, pad3names[portnum], 0) & 0xc0) >> 2) |
-						(input_port_read_safe(machine, pad3names[portnum], 0) & 0x03) | 0x40) & ~helper);
+					((((machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0xc0) >> 2) |
+						(machine.root_device().ioport(pad3names[portnum])->read_safe(0) & 0x03) | 0x40) & ~helper);
 	}
 
 	return retdata;
@@ -1858,18 +1858,18 @@ UINT8 megatech_bios_port_cc_dc_r(running_machine &machine, int offset, int ctrl)
 	if (ctrl == 0x55)
 	{
 			/* A keys */
-			retdata = ((input_port_read(machine, "PAD1") & 0x40) >> 2) |
-				((input_port_read(machine, "PAD2") & 0x40) >> 4) | 0xeb;
+			retdata = ((machine.root_device().ioport("PAD1")->read() & 0x40) >> 2) |
+				((machine.root_device().ioport("PAD2")->read() & 0x40) >> 4) | 0xeb;
 	}
 	else
 	{
 		if (offset == 0)
 		{
-			retdata = (input_port_read(machine, "PAD1") & 0x3f) | ((input_port_read(machine, "PAD2") & 0x03) << 6);
+			retdata = (machine.root_device().ioport("PAD1")->read() & 0x3f) | ((machine.root_device().ioport("PAD2")->read() & 0x03) << 6);
 		}
 		else
 		{
-			retdata = ((input_port_read(machine, "PAD2") & 0x3c) >> 2) | 0xf0;
+			retdata = ((machine.root_device().ioport("PAD2")->read() & 0x3c) >> 2) | 0xf0;
 		}
 
 	}
@@ -2070,30 +2070,30 @@ WRITE16_HANDLER( megadriv_68k_io_write )
 
 
 
-static ADDRESS_MAP_START( megadriv_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( megadriv_map, AS_PROGRAM, 16, driver_device )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	/*      (0x000000 - 0x3fffff) == GAME ROM (4Meg Max, Some games have special banking too) */
 
-	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(megadriv_68k_read_z80_ram,megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8("ymsnd", megadriv_68k_YM2612_read,megadriv_68k_YM2612_write, 0xffff)
+	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE_LEGACY(megadriv_68k_read_z80_ram,megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE_LEGACY(megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8_LEGACY("ymsnd", megadriv_68k_YM2612_read,megadriv_68k_YM2612_write, 0xffff)
 
-	AM_RANGE(0xa06000, 0xa06001) AM_WRITE(megadriv_68k_z80_bank_write)
+	AM_RANGE(0xa06000, 0xa06001) AM_WRITE_LEGACY(megadriv_68k_z80_bank_write)
 
-	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE(megadriv_68k_io_read,megadriv_68k_io_write)
+	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE_LEGACY(megadriv_68k_io_read,megadriv_68k_io_write)
 
-	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus,megadriv_68k_req_z80_bus)
-	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
+	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE_LEGACY(megadriv_68k_check_z80_bus,megadriv_68k_req_z80_bus)
+	AM_RANGE(0xa11200, 0xa11201) AM_WRITE_LEGACY(megadriv_68k_req_z80_reset)
 
 	/* these are fake - remove allocs in VIDEO_START to use these to view ram instead */
-//  AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE(&megadrive_vdp_vram)
-//  AM_RANGE(0xb10000, 0xb1007f) AM_RAM AM_BASE(&megadrive_vdp_vsram)
-//  AM_RANGE(0xb10100, 0xb1017f) AM_RAM AM_BASE(&megadrive_vdp_cram)
+//  AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE_LEGACY(&megadrive_vdp_vram)
+//  AM_RANGE(0xb10000, 0xb1007f) AM_RAM AM_BASE_LEGACY(&megadrive_vdp_vsram)
+//  AM_RANGE(0xb10100, 0xb1017f) AM_RAM AM_BASE_LEGACY(&megadrive_vdp_cram)
 
-	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE(megadriv_vdp_r,megadriv_vdp_w)
-	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE(megadriv_vdp_r,megadriv_vdp_w) // the earth defend
+	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE_LEGACY(megadriv_vdp_r,megadriv_vdp_w)
+	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE_LEGACY(megadriv_vdp_r,megadriv_vdp_w) // the earth defend
 
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE_LEGACY(&megadrive_ram)
 //  AM_RANGE(0xff0000, 0xffffff) AM_READONLY
 	/*       0xe00000 - 0xffffff) == MAIN RAM (64kb, Mirrored, most games use ff0000 - ffffff) */
 ADDRESS_MAP_END
@@ -2353,21 +2353,21 @@ static READ8_HANDLER( megadriv_z80_unmapped_read )
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( megadriv_z80_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( megadriv_z80_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1") AM_MIRROR(0x2000) // RAM can be accessed by the 68k
-	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("ymsnd", ym2612_r,ym2612_w)
+	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE_LEGACY("ymsnd", ym2612_r,ym2612_w)
 
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(megadriv_z80_z80_bank_w)
-	AM_RANGE(0x6001, 0x6001) AM_WRITE(megadriv_z80_z80_bank_w) // wacky races uses this address
+	AM_RANGE(0x6000, 0x6000) AM_WRITE_LEGACY(megadriv_z80_z80_bank_w)
+	AM_RANGE(0x6001, 0x6001) AM_WRITE_LEGACY(megadriv_z80_z80_bank_w) // wacky races uses this address
 
-	AM_RANGE(0x6100, 0x7eff) AM_READ(megadriv_z80_unmapped_read)
+	AM_RANGE(0x6100, 0x7eff) AM_READ_LEGACY(megadriv_z80_unmapped_read)
 
-	AM_RANGE(0x7f00, 0x7fff) AM_READWRITE(megadriv_z80_vdp_read,megadriv_z80_vdp_write)
+	AM_RANGE(0x7f00, 0x7fff) AM_READWRITE_LEGACY(megadriv_z80_vdp_read,megadriv_z80_vdp_write)
 
-	AM_RANGE(0x8000, 0xffff) AM_READWRITE(z80_read_68k_banked_data,z80_write_68k_banked_data) // The Z80 can read the 68k address space this way
+	AM_RANGE(0x8000, 0xffff) AM_READWRITE_LEGACY(z80_read_68k_banked_data,z80_write_68k_banked_data) // The Z80 can read the 68k address space this way
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( megadriv_z80_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( megadriv_z80_io_map, AS_IO, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x0000, 0xff) AM_NOP
 ADDRESS_MAP_END
@@ -2376,23 +2376,23 @@ ADDRESS_MAP_END
 /************************************ Megadrive Bootlegs *************************************/
 
 // smaller ROM region because some bootlegs check for RAM there
-static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, driver_device )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	/* Cartridge Program Rom */
 	AM_RANGE(0x200000, 0x2023ff) AM_RAM // tested
 
-	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(megadriv_68k_read_z80_ram, megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
-	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8("ymsnd", megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
-	AM_RANGE(0xa06000, 0xa06001) AM_WRITE(megadriv_68k_z80_bank_write)
+	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE_LEGACY(megadriv_68k_read_z80_ram, megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE_LEGACY(megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa04000, 0xa04003) AM_DEVREADWRITE8_LEGACY("ymsnd", megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
+	AM_RANGE(0xa06000, 0xa06001) AM_WRITE_LEGACY(megadriv_68k_z80_bank_write)
 
-	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE(megadriv_68k_io_read, megadriv_68k_io_write)
-	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus, megadriv_68k_req_z80_bus)
-	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
+	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE_LEGACY(megadriv_68k_io_read, megadriv_68k_io_write)
+	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE_LEGACY(megadriv_68k_check_z80_bus, megadriv_68k_req_z80_bus)
+	AM_RANGE(0xa11200, 0xa11201) AM_WRITE_LEGACY(megadriv_68k_req_z80_reset)
 
-	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE(megadriv_vdp_r, megadriv_vdp_w)
-	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE(megadriv_vdp_r, megadriv_vdp_w) // the earth defend
+	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE_LEGACY(megadriv_vdp_r, megadriv_vdp_w)
+	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE_LEGACY(megadriv_vdp_r, megadriv_vdp_w) // the earth defend
 
-	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE_LEGACY(&megadrive_ram)
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_DERIVED( md_bootleg, megadriv )
@@ -2560,7 +2560,7 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 
 			// install the game rom in the normal 0x000000-0x03fffff space used by the genesis - this allows VDP DMA operations to work as they have to be from this area or RAM
 			// it should also UNMAP the banked rom area...
-			space->install_rom(0x0000100, 0x03fffff, space->machine().region("gamecart")->base() + 0x100);
+			space->install_rom(0x0000100, 0x03fffff, space->machine().root_device().memregion("gamecart")->base() + 0x100);
 		}
 		else
 		{
@@ -2568,7 +2568,7 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 
 			// this is actually blank / nop area
 			// we should also map the banked area back (we don't currently unmap it tho)
-			space->install_rom(0x0000100, 0x03fffff, space->machine().region("maincpu")->base()+0x100);
+			space->install_rom(0x0000100, 0x03fffff, space->machine().root_device().memregion("maincpu")->base()+0x100);
 		}
 
 		if((a15106_reg & 4) == 0) // clears the FIFO state
@@ -2860,12 +2860,12 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 		if (data & 0x01)
 		{
 			_32x_adapter_enabled = 1;
-			space->install_rom(0x0880000, 0x08fffff, space->machine().region("gamecart")->base()); // 'fixed' 512kb rom bank
+			space->install_rom(0x0880000, 0x08fffff, space->machine().root_device().memregion("gamecart")->base()); // 'fixed' 512kb rom bank
 
 			space->install_read_bank(0x0900000, 0x09fffff, "bank12"); // 'bankable' 1024kb rom bank
-			memory_set_bankptr(space->machine(),  "bank12", space->machine().region("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
+			space->machine().root_device().membank("bank12")->set_base(space->machine().root_device().memregion("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
 
-			space->install_rom(0x0000000, 0x03fffff, space->machine().region("32x_68k_bios")->base());
+			space->install_rom(0x0000000, 0x03fffff, space->machine().root_device().memregion("32x_68k_bios")->base());
 
 			/* VDP area */
 			space->install_legacy_readwrite_handler(0x0a15180, 0x0a1518b, FUNC(_32x_common_vdp_regs_r), FUNC(_32x_common_vdp_regs_w)); // common / shared VDP regs
@@ -2881,7 +2881,7 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 		{
 			_32x_adapter_enabled = 0;
 
-			space->install_rom(0x0000000, 0x03fffff, space->machine().region("gamecart")->base());
+			space->install_rom(0x0000000, 0x03fffff, space->machine().root_device().memregion("gamecart")->base());
 			space->machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x000070, 0x000073, FUNC(_32x_68k_hint_vector_r), FUNC(_32x_68k_hint_vector_w)); // h interrupt vector
 		}
 	}
@@ -2949,7 +2949,7 @@ static WRITE16_HANDLER( _32x_68k_a15104_w )
 		_32x_68k_a15104_reg = (_32x_68k_a15104_reg & 0x00ff) | (data & 0xff00);
 	}
 
-	memory_set_bankptr(space->machine(),  "bank12", space->machine().region("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
+	space->machine().root_device().membank("bank12")->set_base(space->machine().root_device().memregion("gamecart")->base()+((_32x_68k_a15104_reg&0x3)*0x100000) );
 }
 
 /**********************************************************************************************/
@@ -3730,26 +3730,26 @@ _32X_MAP_RAM_WRITEHANDLERS(paletteram) // _32x_sh2_paletteram_w
 // SH2 memory maps
 /**********************************************************************************************/
 
-static ADDRESS_MAP_START( sh2_main_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( sh2_main_map, AS_PROGRAM, 32, driver_device )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 
-	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE( _32x_sh2_master_4000_common_4002_r, _32x_sh2_master_4000_common_4002_w )
-	AM_RANGE(0x00004004, 0x00004007) AM_READWRITE( _32x_sh2_common_4004_common_4006_r, _32x_sh2_common_4004_common_4006_w)
+	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE_LEGACY(_32x_sh2_master_4000_common_4002_r, _32x_sh2_master_4000_common_4002_w )
+	AM_RANGE(0x00004004, 0x00004007) AM_READWRITE_LEGACY(_32x_sh2_common_4004_common_4006_r, _32x_sh2_common_4004_common_4006_w)
 
-	AM_RANGE(0x00004008, 0x00004013) AM_READWRITE16( _32x_dreq_common_r, _32x_dreq_common_w, 0xffffffff )
+	AM_RANGE(0x00004008, 0x00004013) AM_READWRITE16_LEGACY(_32x_dreq_common_r, _32x_dreq_common_w, 0xffffffff )
 
-	AM_RANGE(0x00004014, 0x00004017) AM_READNOP AM_WRITE( _32x_sh2_master_4014_master_4016_w ) // IRQ clear
-	AM_RANGE(0x00004018, 0x0000401b) AM_READNOP AM_WRITE( _32x_sh2_master_4018_master_401a_w ) // IRQ clear
-	AM_RANGE(0x0000401c, 0x0000401f) AM_READNOP AM_WRITE( _32x_sh2_master_401c_master_401e_w ) // IRQ clear
+	AM_RANGE(0x00004014, 0x00004017) AM_READNOP AM_WRITE_LEGACY(_32x_sh2_master_4014_master_4016_w ) // IRQ clear
+	AM_RANGE(0x00004018, 0x0000401b) AM_READNOP AM_WRITE_LEGACY(_32x_sh2_master_4018_master_401a_w ) // IRQ clear
+	AM_RANGE(0x0000401c, 0x0000401f) AM_READNOP AM_WRITE_LEGACY(_32x_sh2_master_401c_master_401e_w ) // IRQ clear
 
-	AM_RANGE(0x00004020, 0x0000402f) AM_READWRITE( _32x_sh2_commsram_r, _32x_sh2_commsram_w )
-	AM_RANGE(0x00004030, 0x0000403f) AM_READWRITE16( _32x_pwm_r, _32x_pwm_w, 0xffffffff )
+	AM_RANGE(0x00004020, 0x0000402f) AM_READWRITE_LEGACY(_32x_sh2_commsram_r, _32x_sh2_commsram_w )
+	AM_RANGE(0x00004030, 0x0000403f) AM_READWRITE16_LEGACY(_32x_pwm_r, _32x_pwm_w, 0xffffffff )
 
-	AM_RANGE(0x00004100, 0x0000410b) AM_READWRITE16( _32x_common_vdp_regs_r, _32x_common_vdp_regs_w , 0xffffffff)
-	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE( _32x_sh2_paletteram_r, _32x_sh2_paletteram_w)
+	AM_RANGE(0x00004100, 0x0000410b) AM_READWRITE16_LEGACY(_32x_common_vdp_regs_r, _32x_common_vdp_regs_w , 0xffffffff)
+	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE_LEGACY(_32x_sh2_paletteram_r, _32x_sh2_paletteram_w)
 
-	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE(_32x_sh2_framebuffer_dram_r, _32x_sh2_framebuffer_dram_w)
-	AM_RANGE(0x04020000, 0x0403ffff) AM_READWRITE(_32x_sh2_framebuffer_overwrite_dram_r, _32x_sh2_framebuffer_overwrite_dram_w)
+	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE_LEGACY(_32x_sh2_framebuffer_dram_r, _32x_sh2_framebuffer_dram_w)
+	AM_RANGE(0x04020000, 0x0403ffff) AM_READWRITE_LEGACY(_32x_sh2_framebuffer_overwrite_dram_r, _32x_sh2_framebuffer_overwrite_dram_w)
 
 	AM_RANGE(0x06000000, 0x0603ffff) AM_RAM AM_SHARE("share10")
 	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_REGION("gamecart_sh2", 0) // program is writeable (wwfraw)
@@ -3759,26 +3759,26 @@ static ADDRESS_MAP_START( sh2_main_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sh2_slave_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( sh2_slave_map, AS_PROGRAM, 32, driver_device )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 
-	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE( _32x_sh2_slave_4000_common_4002_r, _32x_sh2_slave_4000_common_4002_w )
-	AM_RANGE(0x00004004, 0x00004007) AM_READWRITE( _32x_sh2_common_4004_common_4006_r, _32x_sh2_common_4004_common_4006_w)
+	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE_LEGACY(_32x_sh2_slave_4000_common_4002_r, _32x_sh2_slave_4000_common_4002_w )
+	AM_RANGE(0x00004004, 0x00004007) AM_READWRITE_LEGACY(_32x_sh2_common_4004_common_4006_r, _32x_sh2_common_4004_common_4006_w)
 
-	AM_RANGE(0x00004008, 0x00004013) AM_READWRITE16( _32x_dreq_common_r, _32x_dreq_common_w, 0xffffffff )
+	AM_RANGE(0x00004008, 0x00004013) AM_READWRITE16_LEGACY(_32x_dreq_common_r, _32x_dreq_common_w, 0xffffffff )
 
-	AM_RANGE(0x00004014, 0x00004017) AM_READNOP AM_WRITE( _32x_sh2_slave_4014_slave_4016_w ) // IRQ clear
-	AM_RANGE(0x00004018, 0x0000401b) AM_READNOP AM_WRITE( _32x_sh2_slave_4018_slave_401a_w ) // IRQ clear
-	AM_RANGE(0x0000401c, 0x0000401f) AM_READNOP AM_WRITE( _32x_sh2_slave_401c_slave_401e_w ) // IRQ clear
+	AM_RANGE(0x00004014, 0x00004017) AM_READNOP AM_WRITE_LEGACY(_32x_sh2_slave_4014_slave_4016_w ) // IRQ clear
+	AM_RANGE(0x00004018, 0x0000401b) AM_READNOP AM_WRITE_LEGACY(_32x_sh2_slave_4018_slave_401a_w ) // IRQ clear
+	AM_RANGE(0x0000401c, 0x0000401f) AM_READNOP AM_WRITE_LEGACY(_32x_sh2_slave_401c_slave_401e_w ) // IRQ clear
 
-	AM_RANGE(0x00004020, 0x0000402f) AM_READWRITE( _32x_sh2_commsram_r, _32x_sh2_commsram_w )
-	AM_RANGE(0x00004030, 0x0000403f) AM_READWRITE16( _32x_pwm_r, _32x_pwm_w, 0xffffffff )
+	AM_RANGE(0x00004020, 0x0000402f) AM_READWRITE_LEGACY(_32x_sh2_commsram_r, _32x_sh2_commsram_w )
+	AM_RANGE(0x00004030, 0x0000403f) AM_READWRITE16_LEGACY(_32x_pwm_r, _32x_pwm_w, 0xffffffff )
 
-	AM_RANGE(0x00004100, 0x0000410b) AM_READWRITE16( _32x_common_vdp_regs_r, _32x_common_vdp_regs_w , 0xffffffff)
-	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE(_32x_sh2_paletteram_r, _32x_sh2_paletteram_w)
+	AM_RANGE(0x00004100, 0x0000410b) AM_READWRITE16_LEGACY(_32x_common_vdp_regs_r, _32x_common_vdp_regs_w , 0xffffffff)
+	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE_LEGACY(_32x_sh2_paletteram_r, _32x_sh2_paletteram_w)
 
-	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE(_32x_sh2_framebuffer_dram_r, _32x_sh2_framebuffer_dram_w)
-	AM_RANGE(0x04020000, 0x0403ffff) AM_READWRITE(_32x_sh2_framebuffer_overwrite_dram_r, _32x_sh2_framebuffer_overwrite_dram_w)
+	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE_LEGACY(_32x_sh2_framebuffer_dram_r, _32x_sh2_framebuffer_dram_w)
+	AM_RANGE(0x04020000, 0x0403ffff) AM_READWRITE_LEGACY(_32x_sh2_framebuffer_overwrite_dram_r, _32x_sh2_framebuffer_overwrite_dram_w)
 
 	AM_RANGE(0x06000000, 0x0603ffff) AM_RAM AM_SHARE("share10")
 	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_REGION("gamecart_sh2", 0) // program is writeable (wwfraw)
@@ -6005,7 +6005,7 @@ void segacd_init_main_cpu( running_machine& machine )
 	space->unmap_readwrite        (0x020000,0x3fffff);
 
 //  space->install_read_bank(0x0020000, 0x003ffff, "scd_4m_prgbank");
-//  memory_set_bankptr(space->machine(),  "scd_4m_prgbank", segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
+//  space->machine().root_device().membank("scd_4m_prgbank")->set_base(segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
 	space->install_legacy_read_handler (0x0020000, 0x003ffff, FUNC(scd_4m_prgbank_ram_r) );
 	space->install_legacy_write_handler (0x0020000, 0x003ffff, FUNC(scd_4m_prgbank_ram_w) );
 	segacd_wordram_mapped = 1;
@@ -6767,47 +6767,47 @@ READ16_HANDLER( segacd_font_converted_r )
 	return retdata;
 }
 
-static ADDRESS_MAP_START( segacd_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
+static ADDRESS_MAP_START( segacd_map, AS_PROGRAM, 16, driver_device )
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE_LEGACY(&segacd_4meg_prgram)
 
-	AM_RANGE(0x080000, 0x0bffff) AM_READWRITE(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_BASE(&segacd_dataram)
-	AM_RANGE(0x0c0000, 0x0dffff) AM_READWRITE(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) AM_BASE(&segacd_dataram2)
+	AM_RANGE(0x080000, 0x0bffff) AM_READWRITE_LEGACY(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_BASE_LEGACY(&segacd_dataram)
+	AM_RANGE(0x0c0000, 0x0dffff) AM_READWRITE_LEGACY(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) AM_BASE_LEGACY(&segacd_dataram2)
 
-	AM_RANGE(0xfe0000, 0xfe3fff) AM_READWRITE(segacd_backupram_r,segacd_backupram_w) AM_SHARE("backupram") AM_BASE(&segacd_backupram)// backup RAM, odd bytes only!
+	AM_RANGE(0xfe0000, 0xfe3fff) AM_READWRITE_LEGACY(segacd_backupram_r,segacd_backupram_w) AM_SHARE("backupram") AM_BASE_LEGACY(&segacd_backupram)// backup RAM, odd bytes only!
 
-	AM_RANGE(0xff0000, 0xff001f) AM_DEVWRITE8("rfsnd", rf5c68_w, 0x00ff)  // PCM, RF5C164
-	AM_RANGE(0xff0020, 0xff003f) AM_DEVREAD8("rfsnd", rf5c68_r, 0x00ff)
-	AM_RANGE(0xff2000, 0xff3fff) AM_DEVREADWRITE8("rfsnd", rf5c68_mem_r, rf5c68_mem_w,0x00ff)  // PCM, RF5C164
+	AM_RANGE(0xff0000, 0xff001f) AM_DEVWRITE8_LEGACY("rfsnd", rf5c68_w, 0x00ff)  // PCM, RF5C164
+	AM_RANGE(0xff0020, 0xff003f) AM_DEVREAD8_LEGACY("rfsnd", rf5c68_r, 0x00ff)
+	AM_RANGE(0xff2000, 0xff3fff) AM_DEVREADWRITE8_LEGACY("rfsnd", rf5c68_mem_r, rf5c68_mem_w,0x00ff)  // PCM, RF5C164
 
 
-	AM_RANGE(0xff8000 ,0xff8001) AM_READWRITE(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
-	AM_RANGE(0xff8002 ,0xff8003) AM_READWRITE(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
+	AM_RANGE(0xff8000 ,0xff8001) AM_READWRITE_LEGACY(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
+	AM_RANGE(0xff8002 ,0xff8003) AM_READWRITE_LEGACY(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
 
-	AM_RANGE(0xff8004 ,0xff8005) AM_READWRITE(segacd_cdc_mode_address_r, segacd_cdc_mode_address_w)
-	AM_RANGE(0xff8006 ,0xff8007) AM_READWRITE(segacd_cdc_data_r, segacd_cdc_data_w)
-	AM_RANGE(0xff8008, 0xff8009) AM_READ(cdc_data_sub_r)
-	AM_RANGE(0xff800a, 0xff800b) AM_READWRITE(cdc_dmaaddr_r,cdc_dmaaddr_w) // CDC DMA Address
-	AM_RANGE(0xff800c, 0xff800d) AM_READWRITE(segacd_stopwatch_timer_r, segacd_stopwatch_timer_w)// Stopwatch timer
-	AM_RANGE(0xff800e ,0xff800f) AM_READWRITE(segacd_comms_flags_r, segacd_comms_flags_subcpu_w)
-	AM_RANGE(0xff8010 ,0xff801f) AM_READWRITE(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
-	AM_RANGE(0xff8020 ,0xff802f) AM_READWRITE(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
-	AM_RANGE(0xff8030, 0xff8031) AM_READWRITE(segacd_irq3timer_r, segacd_irq3timer_w) // Timer W/INT3
-	AM_RANGE(0xff8032, 0xff8033) AM_READWRITE(segacd_irq_mask_r,segacd_irq_mask_w)
-	AM_RANGE(0xff8034, 0xff8035) AM_READWRITE(segacd_cdfader_r,segacd_cdfader_w) // CD Fader
-	AM_RANGE(0xff8036, 0xff8037) AM_READWRITE(segacd_cdd_ctrl_r,segacd_cdd_ctrl_w)
-	AM_RANGE(0xff8038, 0xff8041) AM_READ8(segacd_cdd_rx_r,0xffff)
-	AM_RANGE(0xff8042, 0xff804b) AM_WRITE8(segacd_cdd_tx_w,0xffff)
-	AM_RANGE(0xff804c, 0xff804d) AM_READWRITE(segacd_font_color_r, segacd_font_color_w)
-	AM_RANGE(0xff804e, 0xff804f) AM_RAM AM_BASE(&segacd_font_bits)
-	AM_RANGE(0xff8050, 0xff8057) AM_READ(segacd_font_converted_r)
-	AM_RANGE(0xff8058, 0xff8059) AM_READWRITE(segacd_stampsize_r, segacd_stampsize_w) // Stamp size
-	AM_RANGE(0xff805a, 0xff805b) AM_READWRITE(segacd_stampmap_base_address_r, segacd_stampmap_base_address_w) // Stamp map base address
-	AM_RANGE(0xff805c, 0xff805d) AM_READWRITE(segacd_imagebuffer_vcell_size_r, segacd_imagebuffer_vcell_size_w)// Image buffer V cell size
-	AM_RANGE(0xff805e, 0xff805f) AM_READWRITE(segacd_imagebuffer_start_address_r, segacd_imagebuffer_start_address_w) // Image buffer start address
-	AM_RANGE(0xff8060, 0xff8061) AM_READWRITE(segacd_imagebuffer_offset_r, segacd_imagebuffer_offset_w)
-	AM_RANGE(0xff8062, 0xff8063) AM_READWRITE(segacd_imagebuffer_hdot_size_r, segacd_imagebuffer_hdot_size_w) // Image buffer H dot size
-	AM_RANGE(0xff8064, 0xff8065) AM_READWRITE(segacd_imagebuffer_vdot_size_r, segacd_imagebuffer_vdot_size_w ) // Image buffer V dot size
-	AM_RANGE(0xff8066, 0xff8067) AM_WRITE(segacd_trace_vector_base_address_w)// Trace vector base address
+	AM_RANGE(0xff8004 ,0xff8005) AM_READWRITE_LEGACY(segacd_cdc_mode_address_r, segacd_cdc_mode_address_w)
+	AM_RANGE(0xff8006 ,0xff8007) AM_READWRITE_LEGACY(segacd_cdc_data_r, segacd_cdc_data_w)
+	AM_RANGE(0xff8008, 0xff8009) AM_READ_LEGACY(cdc_data_sub_r)
+	AM_RANGE(0xff800a, 0xff800b) AM_READWRITE_LEGACY(cdc_dmaaddr_r,cdc_dmaaddr_w) // CDC DMA Address
+	AM_RANGE(0xff800c, 0xff800d) AM_READWRITE_LEGACY(segacd_stopwatch_timer_r, segacd_stopwatch_timer_w)// Stopwatch timer
+	AM_RANGE(0xff800e ,0xff800f) AM_READWRITE_LEGACY(segacd_comms_flags_r, segacd_comms_flags_subcpu_w)
+	AM_RANGE(0xff8010 ,0xff801f) AM_READWRITE_LEGACY(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
+	AM_RANGE(0xff8020 ,0xff802f) AM_READWRITE_LEGACY(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
+	AM_RANGE(0xff8030, 0xff8031) AM_READWRITE_LEGACY(segacd_irq3timer_r, segacd_irq3timer_w) // Timer W/INT3
+	AM_RANGE(0xff8032, 0xff8033) AM_READWRITE_LEGACY(segacd_irq_mask_r,segacd_irq_mask_w)
+	AM_RANGE(0xff8034, 0xff8035) AM_READWRITE_LEGACY(segacd_cdfader_r,segacd_cdfader_w) // CD Fader
+	AM_RANGE(0xff8036, 0xff8037) AM_READWRITE_LEGACY(segacd_cdd_ctrl_r,segacd_cdd_ctrl_w)
+	AM_RANGE(0xff8038, 0xff8041) AM_READ8_LEGACY(segacd_cdd_rx_r,0xffff)
+	AM_RANGE(0xff8042, 0xff804b) AM_WRITE8_LEGACY(segacd_cdd_tx_w,0xffff)
+	AM_RANGE(0xff804c, 0xff804d) AM_READWRITE_LEGACY(segacd_font_color_r, segacd_font_color_w)
+	AM_RANGE(0xff804e, 0xff804f) AM_RAM AM_BASE_LEGACY(&segacd_font_bits)
+	AM_RANGE(0xff8050, 0xff8057) AM_READ_LEGACY(segacd_font_converted_r)
+	AM_RANGE(0xff8058, 0xff8059) AM_READWRITE_LEGACY(segacd_stampsize_r, segacd_stampsize_w) // Stamp size
+	AM_RANGE(0xff805a, 0xff805b) AM_READWRITE_LEGACY(segacd_stampmap_base_address_r, segacd_stampmap_base_address_w) // Stamp map base address
+	AM_RANGE(0xff805c, 0xff805d) AM_READWRITE_LEGACY(segacd_imagebuffer_vcell_size_r, segacd_imagebuffer_vcell_size_w)// Image buffer V cell size
+	AM_RANGE(0xff805e, 0xff805f) AM_READWRITE_LEGACY(segacd_imagebuffer_start_address_r, segacd_imagebuffer_start_address_w) // Image buffer start address
+	AM_RANGE(0xff8060, 0xff8061) AM_READWRITE_LEGACY(segacd_imagebuffer_offset_r, segacd_imagebuffer_offset_w)
+	AM_RANGE(0xff8062, 0xff8063) AM_READWRITE_LEGACY(segacd_imagebuffer_hdot_size_r, segacd_imagebuffer_hdot_size_w) // Image buffer H dot size
+	AM_RANGE(0xff8064, 0xff8065) AM_READWRITE_LEGACY(segacd_imagebuffer_vdot_size_r, segacd_imagebuffer_vdot_size_w ) // Image buffer V dot size
+	AM_RANGE(0xff8066, 0xff8067) AM_WRITE_LEGACY(segacd_trace_vector_base_address_w)// Trace vector base address
 //  AM_RANGE(0xff8068, 0xff8069) // Subcode address
 
 //  AM_RANGE(0xff8100, 0xff817f) // Subcode buffer area
@@ -6922,7 +6922,7 @@ static UINT32 pm_io(address_space *space, int reg, int write, UINT32 d)
 			int addr = state->m_pmac_read[reg]&0xffff;
 			if      ((mode & 0xfff0) == 0x0800) // ROM, inc 1, verified to be correct
 			{
-				UINT16 *ROM = (UINT16 *) space->machine().region("maincpu")->base();
+				UINT16 *ROM = (UINT16 *) space->machine().root_device().memregion("maincpu")->base();
 				state->m_pmac_read[reg] += 1;
 				d = ROM[addr|((mode&0xf)<<16)];
 			}
@@ -7113,27 +7113,27 @@ static READ16_HANDLER( svp_68k_cell2_r )
 	return ((UINT16 *)state->m_dram)[a1];
 }
 
-static ADDRESS_MAP_START( svp_ssp_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( svp_ssp_map, AS_PROGRAM, 16, driver_device )
 	AM_RANGE(0x0000, 0x03ff) AM_ROMBANK("bank3")
 	AM_RANGE(0x0400, 0xffff) AM_ROMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( svp_ext_map, AS_IO, 16 )
+static ADDRESS_MAP_START( svp_ext_map, AS_IO, 16, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xf)
-	AM_RANGE(0*2, 0*2+1) AM_READWRITE(read_PM0, write_PM0)
-	AM_RANGE(1*2, 1*2+1) AM_READWRITE(read_PM1, write_PM1)
-	AM_RANGE(2*2, 2*2+1) AM_READWRITE(read_PM2, write_PM2)
-	AM_RANGE(3*2, 3*2+1) AM_READWRITE(read_XST, write_XST)
-	AM_RANGE(4*2, 4*2+1) AM_READWRITE(read_PM4, write_PM4)
-	AM_RANGE(6*2, 6*2+1) AM_READWRITE(read_PMC, write_PMC)
-	AM_RANGE(7*2, 7*2+1) AM_READWRITE(read_AL, write_AL)
+	AM_RANGE(0*2, 0*2+1) AM_READWRITE_LEGACY(read_PM0, write_PM0)
+	AM_RANGE(1*2, 1*2+1) AM_READWRITE_LEGACY(read_PM1, write_PM1)
+	AM_RANGE(2*2, 2*2+1) AM_READWRITE_LEGACY(read_PM2, write_PM2)
+	AM_RANGE(3*2, 3*2+1) AM_READWRITE_LEGACY(read_XST, write_XST)
+	AM_RANGE(4*2, 4*2+1) AM_READWRITE_LEGACY(read_PM4, write_PM4)
+	AM_RANGE(6*2, 6*2+1) AM_READWRITE_LEGACY(read_PMC, write_PMC)
+	AM_RANGE(7*2, 7*2+1) AM_READWRITE_LEGACY(read_AL, write_AL)
 ADDRESS_MAP_END
 
 
 /* emulate testmode plug */
 static UINT8 megadrive_io_read_data_port_svp(running_machine &machine, int portnum)
 {
-	if (portnum == 0 && input_port_read_safe(machine, "MEMORY_TEST", 0x00))
+	if (portnum == 0 && machine.root_device().ioport("MEMORY_TEST")->read_safe(0x00))
 	{
 		return (megadrive_io_data_regs[0] & 0xc0);
 	}
@@ -7173,10 +7173,10 @@ static void svp_init(running_machine &machine)
 	machine.device("svp")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x438, 0x438, FUNC(svp_speedup_r));
 
 	state->m_iram = auto_alloc_array(machine, UINT8, 0x800);
-	memory_set_bankptr(machine,  "bank3", state->m_iram);
+	state->membank("bank3")->set_base(state->m_iram);
 	/* SVP ROM just shares m68k region.. */
-	ROM = machine.region("maincpu")->base();
-	memory_set_bankptr(machine,  "bank4", ROM + 0x800);
+	ROM = state->memregion("maincpu")->base();
+	state->membank("bank4")->set_base(ROM + 0x800);
 
 	megadrive_io_read_data_port_ptr	= megadrive_io_read_data_port_svp;
 }
@@ -9277,7 +9277,7 @@ MACHINE_RESET( megadriv )
 	/* default state of z80 = reset, with bus */
 	mame_printf_debug("Resetting Megadrive / Genesis\n");
 
-	switch (input_port_read_safe(machine, "REGION", 0xff))
+	switch (machine.root_device().ioport("REGION")->read_safe(0xff))
 	{
 
 		case 1: // US
@@ -9414,7 +9414,7 @@ SCREEN_VBLANK(megadriv)
 		megadrive_imode_odd_frame^=1;
 //      cputag_set_input_line(machine, "genesis_snd_z80", 0, CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
 
-		if (input_port_read_safe(screen.machine(), "RESET", 0x00) & 0x01)
+		if (screen.machine().root_device().ioport("RESET")->read_safe(0x00) & 0x01)
 			cputag_set_input_line(screen.machine(), "maincpu", INPUT_LINE_RESET, PULSE_LINE);
 
 /*
@@ -9856,7 +9856,7 @@ static void megadriv_init_common(running_machine &machine)
 		//printf("GENESIS Sound Z80 cpu found '%s'\n", _genesis_snd_z80_cpu->tag() );
 
 		genz80.z80_prgram = auto_alloc_array(machine, UINT8, 0x2000);
-		memory_set_bankptr(machine,  "bank1", genz80.z80_prgram );
+		machine.root_device().membank("bank1")->set_base(genz80.z80_prgram );
 	}
 
 	/* Look to see if this system has the 32x Master SH2 */
@@ -9933,7 +9933,7 @@ static void megadriv_init_common(running_machine &machine)
           some games specify a single address, (start 200001, end 200001)
           this usually means there is serial eeprom instead */
 		int i;
-		UINT16 *rom = (UINT16*)machine.region("maincpu")->base();
+		UINT16 *rom = (UINT16*)machine.root_device().memregion("maincpu")->base();
 
 		mame_printf_debug("DEBUG:: Header: Backup RAM string (ignore for games without)\n");
 		for (i=0;i<12;i++)
@@ -10050,7 +10050,7 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine &machine, const
 
 
 	machine.device(tag)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x0000, 0x1fff, "bank1");
-	memory_set_bankptr(machine,  "bank1", genz80.z80_prgram );
+	machine.root_device().membank("bank1")->set_base(genz80.z80_prgram );
 
 	machine.device(tag)->memory().space(AS_PROGRAM)->install_ram(0x0000, 0x1fff, genz80.z80_prgram);
 
@@ -10093,7 +10093,7 @@ DRIVER_INIT( _32x )
 
 	if (_32x_adapter_enabled == 0)
 	{
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_rom(0x0000000, 0x03fffff, machine.region("gamecart")->base());
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_rom(0x0000000, 0x03fffff, machine.root_device().memregion("gamecart")->base());
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x000070, 0x000073, FUNC(_32x_68k_hint_vector_r), FUNC(_32x_68k_hint_vector_w)); // h interrupt vector
 	};
 

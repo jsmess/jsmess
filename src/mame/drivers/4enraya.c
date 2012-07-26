@@ -62,10 +62,9 @@ Sound :
 
 #define MAIN_CLOCK XTAL_8MHz
 
-static WRITE8_HANDLER( sound_data_w )
+WRITE8_MEMBER(_4enraya_state::sound_data_w)
 {
-	_4enraya_state *state = space->machine().driver_data<_4enraya_state>();
-	state->m_soundlatch = data;
+	m_soundlatch = data;
 }
 
 static WRITE8_DEVICE_HANDLER( sound_control_w )
@@ -78,9 +77,9 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 	state->m_last_snd_ctrl = data;
 }
 
-static READ8_HANDLER( fenraya_custom_map_r )
+READ8_MEMBER(_4enraya_state::fenraya_custom_map_r)
 {
-	UINT8 *prom = space->machine().region("pal_prom")->base();
+	UINT8 *prom = memregion("pal_prom")->base();
 	UINT8 prom_routing = (prom[offset >> 12] & 0xf) ^ 0xf;
 	UINT8 res;
 
@@ -88,34 +87,32 @@ static READ8_HANDLER( fenraya_custom_map_r )
 
 	if(prom_routing & 1) //ROM5
 	{
-		UINT8 *rom = space->machine().region("maincpu")->base();
+		UINT8 *rom = memregion("maincpu")->base();
 		res |= rom[offset & 0x7fff];
 	}
 
 	if(prom_routing & 2) //ROM4
 	{
-		UINT8 *rom = space->machine().region("maincpu")->base();
+		UINT8 *rom = memregion("maincpu")->base();
 		res |= rom[(offset & 0x7fff) | 0x8000];
 	}
 
 	if(prom_routing & 4) //RAM
 	{
-		_4enraya_state *state = space->machine().driver_data<_4enraya_state>();
-		res |= state->m_workram[offset & 0xfff];
+		res |= m_workram[offset & 0xfff];
 	}
 
 	if(prom_routing & 8) //gfx control / RAM wait
 	{
-		_4enraya_state *state = space->machine().driver_data<_4enraya_state>();
-		res |= state->m_videoram[offset & 0xfff];
+		res |= m_videoram[offset & 0xfff];
 	}
 
 	return res;
 }
 
-static WRITE8_HANDLER( fenraya_custom_map_w )
+WRITE8_MEMBER(_4enraya_state::fenraya_custom_map_w)
 {
-	UINT8 *prom = space->machine().region("pal_prom")->base();
+	UINT8 *prom = memregion("pal_prom")->base();
 	UINT8 prom_routing = (prom[offset >> 12] & 0xf) ^ 0xf;
 
 	if(prom_routing & 1) //ROM5
@@ -130,8 +127,7 @@ static WRITE8_HANDLER( fenraya_custom_map_w )
 
 	if(prom_routing & 4) //RAM
 	{
-		_4enraya_state *state = space->machine().driver_data<_4enraya_state>();
-		state->m_workram[offset & 0xfff] = data;
+		m_workram[offset & 0xfff] = data;
 	}
 
 	if(prom_routing & 8) //gfx control / RAM wait
@@ -140,40 +136,40 @@ static WRITE8_HANDLER( fenraya_custom_map_w )
 	}
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, _4enraya_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(fenraya_custom_map_r,fenraya_custom_map_w)
 	#if 0
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(fenraya_videoram_w) AM_BASE_SIZE_MEMBER(_4enraya_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE(fenraya_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(fenraya_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_NOP
 	#endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8, _4enraya_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x23, 0x23) AM_WRITE(sound_data_w)
-	AM_RANGE(0x33, 0x33) AM_DEVWRITE("aysnd", sound_control_w)
+	AM_RANGE(0x33, 0x33) AM_DEVWRITE_LEGACY("aysnd", sound_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( unkpacg_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( unkpacg_main_map, AS_PROGRAM, 8, _4enraya_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(fenraya_videoram_w) AM_BASE_SIZE_MEMBER(_4enraya_state, m_videoram, m_videoram_size)
+	AM_RANGE(0x7000, 0x7fff) AM_WRITE(fenraya_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( unkpacg_main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( unkpacg_main_portmap, AS_IO, 8, _4enraya_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
 	AM_RANGE(0x20, 0x20) AM_WRITE(sound_data_w)
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE("aysnd", sound_control_w)
+	AM_RANGE(0x30, 0x30) AM_DEVWRITE_LEGACY("aysnd", sound_control_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( 4enraya )
@@ -396,7 +392,7 @@ ROM_END
 static DRIVER_INIT( unkpacg )
 {
 	_4enraya_state *state = machine.driver_data<_4enraya_state>();
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 
 	state->m_snd_latch_bit = 2;
 

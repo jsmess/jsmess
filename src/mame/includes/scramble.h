@@ -5,12 +5,21 @@ class scramble_state : public galaxold_state
 {
 public:
 	scramble_state(const machine_config &mconfig, device_type type, const char *tag)
-		: galaxold_state(mconfig, type, tag) { }
+		: galaxold_state(mconfig, type, tag),
+		  m_soundram(*this, "soundram") { }
 
-	UINT8 *m_soundram;
+	optional_shared_ptr<UINT8> m_soundram;
 	UINT8 m_cavelon_bank;
 	UINT8 m_security_2B_counter;
 	UINT8 m_xb;
+	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_custom_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ckongs_coinage_r);
+	DECLARE_READ8_MEMBER(hncholms_prot_r);
+	DECLARE_READ8_MEMBER(scramble_soundram_r);
+	DECLARE_WRITE8_MEMBER(scramble_soundram_w);
+	DECLARE_WRITE8_MEMBER(hotshock_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(scramble_filter_w);
+	DECLARE_WRITE8_MEMBER(frogger_filter_w);
 };
 
 
@@ -54,16 +63,12 @@ READ8_HANDLER( triplep_pap_r );
 READ8_HANDLER( hunchbks_mirror_r );
 WRITE8_HANDLER( hunchbks_mirror_w );
 
-CUSTOM_INPUT( darkplnt_custom_r );
-
 
 /*----------- defined in audio/scramble.c -----------*/
 
 void scramble_sh_init(running_machine &machine);
 WRITE_LINE_DEVICE_HANDLER( scramble_sh_7474_q_callback );
 
-WRITE8_HANDLER( scramble_filter_w );
-WRITE8_HANDLER( frogger_filter_w );
 
 READ8_DEVICE_HANDLER( scramble_portB_r );
 READ8_DEVICE_HANDLER( frogger_portB_r );
@@ -72,7 +77,6 @@ READ8_DEVICE_HANDLER( hotshock_soundlatch_r );
 
 WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w );
 WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w );
-WRITE8_HANDLER( hotshock_sh_irqtrigger_w );
 
 MACHINE_CONFIG_EXTERN( ad2083_audio );
 

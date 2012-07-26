@@ -15,19 +15,25 @@ class model3_state : public driver_device
 public:
 	model3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_work_ram(*this, "work_ram"),
+		m_paletteram64(*this, "paletteram64"),
+		m_soundram(*this, "soundram"){ }
+
+	required_device<cpu_device> m_maincpu;
+
+	required_shared_ptr<UINT64> m_work_ram;
+	required_shared_ptr<UINT64> m_paletteram64;
+	required_shared_ptr<UINT16> m_soundram;
 
     int m_sound_irq_enable;
     emu_timer *m_sound_timer;
 	UINT8 m_irq_enable;
 	UINT8 m_irq_state;
 	UINT8 m_scsi_irq_state;
-	UINT64 *m_work_ram;
 	int m_crom_bank;
 	int m_controls_bank;
 	UINT32 m_real3d_device_id;
-	UINT16 *m_soundram;
 	UINT32 m_mpc105_regs[0x40];
 	UINT32 m_mpc105_addr;
 	int m_pci_bus;
@@ -54,7 +60,6 @@ public:
 	int m_scsp_last_line;
 	UINT32 *m_vrom;
 	int m_step;
-	UINT64 *m_paletteram64;
 	int m_m3_step;
 	INT32 m_tap_state;
 	UINT64 m_ir;
@@ -102,7 +107,50 @@ public:
 	UINT32 m_matrix_base_address;
 	cached_texture *m_texcache[2][1024/32][2048/32];
 
-	required_device<cpu_device> m_maincpu;
+	DECLARE_READ32_MEMBER(rtc72421_r);
+	DECLARE_WRITE32_MEMBER(rtc72421_w);
+	DECLARE_READ64_MEMBER(model3_char_r);
+	DECLARE_WRITE64_MEMBER(model3_char_w);
+	DECLARE_READ64_MEMBER(model3_tile_r);
+	DECLARE_WRITE64_MEMBER(model3_tile_w);
+	DECLARE_READ64_MEMBER(model3_vid_reg_r);
+	DECLARE_WRITE64_MEMBER(model3_vid_reg_w);
+	DECLARE_WRITE64_MEMBER(model3_palette_w);
+	DECLARE_READ64_MEMBER(model3_palette_r);
+	DECLARE_WRITE64_MEMBER(real3d_display_list_w);
+	DECLARE_WRITE64_MEMBER(real3d_polygon_ram_w);
+	DECLARE_WRITE64_MEMBER(real3d_cmd_w);
+	DECLARE_READ64_MEMBER(mpc105_addr_r);
+	DECLARE_WRITE64_MEMBER(mpc105_addr_w);
+	DECLARE_READ64_MEMBER(mpc105_data_r);
+	DECLARE_WRITE64_MEMBER(mpc105_data_w);
+	DECLARE_READ64_MEMBER(mpc105_reg_r);
+	DECLARE_WRITE64_MEMBER(mpc105_reg_w);
+	DECLARE_READ64_MEMBER(mpc106_addr_r);
+	DECLARE_WRITE64_MEMBER(mpc106_addr_w);
+	DECLARE_READ64_MEMBER(mpc106_data_r);
+	DECLARE_WRITE64_MEMBER(mpc106_data_w);
+	DECLARE_READ64_MEMBER(mpc106_reg_r);
+	DECLARE_WRITE64_MEMBER(mpc106_reg_w);
+	DECLARE_READ64_MEMBER(scsi_r);
+	DECLARE_WRITE64_MEMBER(scsi_w);
+	DECLARE_READ64_MEMBER(real3d_dma_r);
+	DECLARE_WRITE64_MEMBER(real3d_dma_w);
+	DECLARE_READ64_MEMBER(model3_ctrl_r);
+	DECLARE_WRITE64_MEMBER(model3_ctrl_w);
+	DECLARE_READ64_MEMBER(model3_sys_r);
+	DECLARE_WRITE64_MEMBER(model3_sys_w);
+	DECLARE_READ64_MEMBER(model3_rtc_r);
+	DECLARE_WRITE64_MEMBER(model3_rtc_w);
+	DECLARE_READ64_MEMBER(real3d_status_r);
+	DECLARE_WRITE8_MEMBER(model3_sound_w);
+	DECLARE_READ64_MEMBER(network_r);
+	DECLARE_WRITE64_MEMBER(network_w);
+	DECLARE_READ64_MEMBER(model3_security_r);
+	DECLARE_WRITE64_MEMBER(daytona2_rombank_w);
+	DECLARE_WRITE16_MEMBER(model3snd_ctrl);
+	UINT32 pci_device_get_reg();
+	void pci_device_set_reg(UINT32 value);
 };
 
 
@@ -117,27 +165,14 @@ void model3_machine_init(running_machine &machine, int step);
 int model3_tap_read(running_machine &machine);
 void model3_tap_write(running_machine &machine, int tck, int tms, int tdi, int trst);
 void model3_tap_reset(running_machine &machine);
-READ32_HANDLER(rtc72421_r);
-WRITE32_HANDLER(rtc72421_w);
 
 
 /*----------- defined in video/model3.c -----------*/
 
-READ64_HANDLER(model3_char_r);
-WRITE64_HANDLER(model3_char_w);
-READ64_HANDLER(model3_tile_r);
-WRITE64_HANDLER(model3_tile_w);
-READ64_HANDLER(model3_vid_reg_r);
-WRITE64_HANDLER(model3_vid_reg_w);
-READ64_HANDLER(model3_palette_r);
-WRITE64_HANDLER(model3_palette_w);
 
 VIDEO_START(model3);
 SCREEN_UPDATE_IND16(model3);
 
-WRITE64_HANDLER(real3d_cmd_w);
-WRITE64_HANDLER(real3d_display_list_w);
-WRITE64_HANDLER(real3d_polygon_ram_w);
 void real3d_display_list_end(running_machine &machine);
 void real3d_display_list1_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap);
 void real3d_display_list2_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap);

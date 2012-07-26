@@ -4,15 +4,21 @@ class appoooh_state : public driver_device
 {
 public:
 	appoooh_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_fg_videoram(*this, "fg_videoram"),
+		m_fg_colorram(*this, "fg_colorram"),
+		m_spriteram_2(*this, "spriteram_2"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_bg_colorram(*this, "bg_colorram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_bg_videoram;
-	UINT8 *  m_bg_colorram;
-	UINT8 *  m_fg_videoram;
-	UINT8 *  m_fg_colorram;
-	UINT8 *  m_spriteram;
-	UINT8 *  m_spriteram_2;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_fg_videoram;
+	required_shared_ptr<UINT8> m_fg_colorram;
+	required_shared_ptr<UINT8> m_spriteram_2;
+	required_shared_ptr<UINT8> m_bg_videoram;
+	required_shared_ptr<UINT8> m_bg_colorram;
 
 	/* video-related */
 	tilemap_t  *m_fg_tilemap;
@@ -28,6 +34,13 @@ public:
 	device_t *m_adpcm;
 
 	UINT8 m_nmi_mask;
+	DECLARE_WRITE8_MEMBER(appoooh_adpcm_w);
+	DECLARE_WRITE8_MEMBER(appoooh_scroll_w);
+	DECLARE_WRITE8_MEMBER(appoooh_fg_videoram_w);
+	DECLARE_WRITE8_MEMBER(appoooh_fg_colorram_w);
+	DECLARE_WRITE8_MEMBER(appoooh_bg_videoram_w);
+	DECLARE_WRITE8_MEMBER(appoooh_bg_colorram_w);
+	DECLARE_WRITE8_MEMBER(appoooh_out_w);
 };
 
 #define CHR1_OFST   0x00  /* palette page of char set #1 */
@@ -36,14 +49,8 @@ public:
 
 /* ----------- defined in video/appoooh.c -----------*/
 
-WRITE8_HANDLER( appoooh_fg_videoram_w );
-WRITE8_HANDLER( appoooh_fg_colorram_w );
-WRITE8_HANDLER( appoooh_bg_videoram_w );
-WRITE8_HANDLER( appoooh_bg_colorram_w );
 PALETTE_INIT( appoooh );
 PALETTE_INIT( robowres );
-WRITE8_HANDLER( appoooh_scroll_w );
-WRITE8_HANDLER( appoooh_out_w );
 VIDEO_START( appoooh );
 SCREEN_UPDATE_IND16( appoooh );
 SCREEN_UPDATE_IND16( robowres );

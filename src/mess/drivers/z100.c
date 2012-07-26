@@ -140,7 +140,6 @@ ZDIPSW      EQU 0FFH    ; Configuration dip switches
   ZDIPSWHZ    EQU 10000000B   ; 1=50Hz(0=60HZ)
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
@@ -759,7 +758,7 @@ static MACHINE_RESET(z100)
 	//z100_state *state = machine.driver_data<z100_state>();
 	int i;
 
-	if(input_port_read(machine,"CONFIG") & 1)
+	if(machine.root_device().ioport("CONFIG")->read() & 1)
 	{
 		for(i=0;i<8;i++)
 			palette_set_color_rgb(machine, i,pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
@@ -815,7 +814,7 @@ ROM_END
 
 static DRIVER_INIT( z100 )
 {
-	UINT8 *ROM = machine.region("ipl")->base();
+	UINT8 *ROM = machine.root_device().memregion("ipl")->base();
 
 	ROM[0xfc116 & 0x3fff] = 0x90; // patch parity IRQ check
 	ROM[0xfc117 & 0x3fff] = 0x90;

@@ -46,15 +46,15 @@ static MACHINE_RESET( runaway )
 }
 
 
-static READ8_HANDLER( runaway_input_r )
+READ8_MEMBER(runaway_state::runaway_input_r)
 {
 	UINT8 val = 0;
 
-	if (input_port_read(space->machine(), "3000D7") & (1 << offset))
+	if (ioport("3000D7")->read() & (1 << offset))
 	{
 		val |= 0x80;
 	}
-	if (input_port_read(space->machine(), "3000D6") & (1 << offset))
+	if (ioport("3000D6")->read() & (1 << offset))
 	{
 		val |= 0x40;
 	}
@@ -65,29 +65,29 @@ static READ8_HANDLER( runaway_input_r )
 
 static READ8_DEVICE_HANDLER( runaway_pot_r )
 {
-	return (input_port_read(device->machine(), "7000") << (7 - offset)) & 0x80;
+	return (device->machine().root_device().ioport("7000")->read() << (7 - offset)) & 0x80;
 }
 
 
-static WRITE8_HANDLER( runaway_led_w )
+WRITE8_MEMBER(runaway_state::runaway_led_w)
 {
-	set_led_status(space->machine(), offset, ~data & 1);
+	set_led_status(machine(), offset, ~data & 1);
 }
 
 
-static WRITE8_HANDLER( runaway_irq_ack_w )
+WRITE8_MEMBER(runaway_state::runaway_irq_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
-static ADDRESS_MAP_START( runaway_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( runaway_map, AS_PROGRAM, 8, runaway_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(runaway_video_ram_w) AM_BASE_MEMBER(runaway_state, m_video_ram)
-	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE_MEMBER(runaway_state, m_sprite_ram)
+	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(runaway_video_ram_w) AM_SHARE("video_ram")
+	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_SHARE("sprite_ram")
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(runaway_irq_ack_w)
-	AM_RANGE(0x1400, 0x143f) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, write)
-	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, ctrl_w)
+	AM_RANGE(0x1400, 0x143f) AM_DEVWRITE("earom", atari_vg_earom_device, write)
+	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
 	AM_RANGE(0x1c00, 0x1c0f) AM_WRITE(runaway_paletteram_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP /* coin counter? */
 	AM_RANGE(0x2001, 0x2001) AM_WRITENOP /* coin counter? */
@@ -96,9 +96,9 @@ static ADDRESS_MAP_START( runaway_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x3000, 0x3007) AM_READ(runaway_input_r)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("4000")
-	AM_RANGE(0x5000, 0x5000) AM_DEVREAD_MODERN("earom", atari_vg_earom_device, read)
-	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("pokey1", pokey_r,pokey_w)
-	AM_RANGE(0x7000, 0x700f) AM_DEVREADWRITE("pokey2", pokey_r,pokey_w)
+	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("earom", atari_vg_earom_device, read)
+	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r,pokey_w)
+	AM_RANGE(0x7000, 0x700f) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r,pokey_w)
 	AM_RANGE(0x8000, 0xcfff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM	/* for the interrupt vectors */
 ADDRESS_MAP_END
@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( qwak )
 	PORT_START("3000D7")	/* 3000 D7 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -159,7 +159,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( runaway )
 	PORT_START("3000D7") /* 3000 D7 */
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT ( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )

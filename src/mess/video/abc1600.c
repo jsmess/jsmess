@@ -1055,9 +1055,9 @@ void abc1600_state::video_start()
 	m_video_ram = auto_alloc_array(machine(), UINT16, VIDEORAM_SIZE);
 
 	// find memory regions
-	m_wrmsk_rom = machine().region("wrmsk")->base();
-	m_shinf_rom = machine().region("shinf")->base();
-	m_drmsk_rom = machine().region("drmsk")->base();
+	m_wrmsk_rom = memregion("wrmsk")->base();
+	m_shinf_rom = memregion("shinf")->base();
+	m_drmsk_rom = memregion("drmsk")->base();
 
 	// state saving
 	save_pointer(NAME(m_video_ram), VIDEORAM_SIZE);

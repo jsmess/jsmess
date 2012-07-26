@@ -152,26 +152,26 @@ Notes:
 #define MASTER_CLOCK	XTAL_24MHz
 
 
-static WRITE8_HANDLER( lsasquad_bankswitch_w )
+WRITE8_MEMBER(lsasquad_state::lsasquad_bankswitch_w)
 {
 	/* bits 0-2 select ROM bank */
-	memory_set_bank(space->machine(), "bank1", data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 
 	/* bit 3 is zeroed on startup, maybe reset sound CPU */
 
 	/* bit 4 flips screen */
-	flip_screen_set(space->machine(), data & 0x10);
+	flip_screen_set(data & 0x10);
 
 	/* other bits unknown */
 }
 
-static ADDRESS_MAP_START( lsasquad_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( lsasquad_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, m_videoram, m_videoram_size)	/* SCREEN RAM */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(lsasquad_state, m_scrollram)	/* SCROLL RAM */
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, m_spriteram, m_spriteram_size)	/* OBJECT RAM */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")	/* SCREEN RAM */
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("scrollram")	/* SCROLL RAM */
+	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_SHARE("spriteram")	/* OBJECT RAM */
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("DSWC")
@@ -186,11 +186,11 @@ static ADDRESS_MAP_START( lsasquad_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xee00, 0xee00) AM_READWRITE(lsasquad_mcu_r,lsasquad_mcu_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lsasquad_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( lsasquad_sound_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2203_r,ym2203_w)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r,ym2203_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(lsasquad_sh_sound_command_r, lsasquad_sh_result_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(lsasquad_sh_nmi_disable_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(lsasquad_sh_nmi_enable_w)
@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( lsasquad_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xefff) AM_ROM		/* space for diagnostic ROM? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lsasquad_m68705_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( lsasquad_m68705_map, AS_PROGRAM, 8, lsasquad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(lsasquad_68705_port_a_r,lsasquad_68705_port_a_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(lsasquad_68705_port_b_r,lsasquad_68705_port_b_w)
@@ -210,13 +210,13 @@ static ADDRESS_MAP_START( lsasquad_m68705_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( storming_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( storming_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, m_videoram, m_videoram_size)	/* SCREEN RAM */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(lsasquad_state, m_scrollram)	/* SCROLL RAM */
-	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, m_spriteram, m_spriteram_size)	/* OBJECT RAM */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")	/* SCREEN RAM */
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("scrollram")	/* SCROLL RAM */
+	AM_RANGE(0xe400, 0xe5ff) AM_RAM AM_SHARE("spriteram")	/* OBJECT RAM */
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe802, 0xe802) AM_READ_PORT("DSWC")
@@ -373,13 +373,13 @@ INPUT_PORTS_END
 
 /* DAIKAIJU */
 
-static ADDRESS_MAP_START( daikaiju_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( daikaiju_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM	/* SRAM */
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, m_videoram, m_videoram_size)	/* SCREEN RAM */
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(lsasquad_state, m_scrollram)	/* SCROLL RAM */
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE_SIZE_MEMBER(lsasquad_state, m_spriteram, m_spriteram_size)	/* OBJECT RAM */
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("videoram")	/* SCREEN RAM */
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("scrollram")	/* SCROLL RAM */
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("spriteram")	/* OBJECT RAM */
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe803, 0xe803) AM_READ(daikaiju_mcu_status_r)	/* COIN + 68705 status */
@@ -393,11 +393,11 @@ static ADDRESS_MAP_START( daikaiju_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xee00, 0xee00) AM_READWRITE(lsasquad_mcu_r, lsasquad_mcu_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( daikaiju_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( daikaiju_sound_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ(daikaiju_sh_sound_command_r)
 	AM_RANGE(0xd400, 0xd400) AM_WRITENOP
 	AM_RANGE(0xd800, 0xd800) AM_READ(daikaiju_sound_status_r) AM_WRITENOP
@@ -567,9 +567,9 @@ static const ym2203_interface ym2203_config =
 static MACHINE_START( lsasquad )
 {
 	lsasquad_state *state = machine.driver_data<lsasquad_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x2000);
+	state->membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");

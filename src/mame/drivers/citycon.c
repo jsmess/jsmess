@@ -14,39 +14,38 @@ Dip locations added from dip listing at crazykong.com
 #include "includes/citycon.h"
 
 
-static READ8_HANDLER( citycon_in_r )
+READ8_MEMBER(citycon_state::citycon_in_r)
 {
-	return input_port_read(space->machine(), flip_screen_get(space->machine()) ? "P2" : "P1");
+	return ioport(flip_screen() ? "P2" : "P1")->read();
 }
 
-static READ8_HANDLER( citycon_irq_ack_r )
+READ8_MEMBER(citycon_state::citycon_irq_ack_r)
 {
-	citycon_state *state = space->machine().driver_data<citycon_state>();
-	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 
 	return 0;
 }
 
-static ADDRESS_MAP_START( citycon_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( citycon_map, AS_PROGRAM, 8, citycon_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(citycon_videoram_w) AM_BASE_MEMBER(citycon_state, m_videoram)
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(citycon_linecolor_w) AM_BASE_MEMBER(citycon_state, m_linecolor)
-	AM_RANGE(0x2800, 0x28ff) AM_RAM AM_BASE_SIZE_MEMBER(citycon_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(citycon_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(citycon_linecolor_w) AM_SHARE("linecolor")
+	AM_RANGE(0x2800, 0x28ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2800, 0x2fff) AM_NOP //0x2900-0x2fff cleared at post but unused
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(citycon_in_r, citycon_background_w)	/* player 1 & 2 inputs multiplexed */
-	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1") AM_WRITE(soundlatch_w)
-	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_WRITE(soundlatch2_w)
-	AM_RANGE(0x3004, 0x3005) AM_READNOP AM_WRITEONLY AM_BASE_MEMBER(citycon_state, m_scroll)
+	AM_RANGE(0x3000, 0x3000) AM_READ(citycon_in_r) AM_WRITE(citycon_background_w)	/* player 1 & 2 inputs multiplexed */
+	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2") AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0x3004, 0x3005) AM_READNOP AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0x3007, 0x3007) AM_READ(citycon_irq_ack_r)
-	AM_RANGE(0x3800, 0x3cff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x3800, 0x3cff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, citycon_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-//  AM_RANGE(0x4002, 0x4002) AM_DEVREAD("aysnd", ay8910_r)  /* ?? */
-	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+//  AM_RANGE(0x4002, 0x4002) AM_DEVREAD_LEGACY("aysnd", ay8910_r)  /* ?? */
+	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -177,8 +176,8 @@ static const ym2203_interface ym2203_config =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
-		DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch2_r),
+		DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
+		DEVCB_DRIVER_MEMBER(driver_device, soundlatch2_byte_r),
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
@@ -339,7 +338,7 @@ ROM_END
 
 static DRIVER_INIT( citycon )
 {
-	UINT8 *rom = machine.region("gfx1")->base();
+	UINT8 *rom = machine.root_device().memregion("gfx1")->base();
 	int i;
 
 	/*

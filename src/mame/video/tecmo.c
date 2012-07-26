@@ -115,50 +115,45 @@ VIDEO_START( tecmo )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( tecmo_txvideoram_w )
+WRITE8_MEMBER(tecmo_state::tecmo_txvideoram_w)
 {
-	tecmo_state *state = space->machine().driver_data<tecmo_state>();
-	state->m_txvideoram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_txvideoram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( tecmo_fgvideoram_w )
+WRITE8_MEMBER(tecmo_state::tecmo_fgvideoram_w)
 {
-	tecmo_state *state = space->machine().driver_data<tecmo_state>();
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x1ff);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x1ff);
 }
 
-WRITE8_HANDLER( tecmo_bgvideoram_w )
+WRITE8_MEMBER(tecmo_state::tecmo_bgvideoram_w)
 {
-	tecmo_state *state = space->machine().driver_data<tecmo_state>();
-	state->m_bgvideoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x1ff);
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x1ff);
 }
 
-WRITE8_HANDLER( tecmo_fgscroll_w )
+WRITE8_MEMBER(tecmo_state::tecmo_fgscroll_w)
 {
-	tecmo_state *state = space->machine().driver_data<tecmo_state>();
 
-	state->m_fgscroll[offset] = data;
+	m_fgscroll[offset] = data;
 
-	state->m_fg_tilemap->set_scrollx(0, state->m_fgscroll[0] + 256 * state->m_fgscroll[1]);
-	state->m_fg_tilemap->set_scrolly(0, state->m_fgscroll[2]);
+	m_fg_tilemap->set_scrollx(0, m_fgscroll[0] + 256 * m_fgscroll[1]);
+	m_fg_tilemap->set_scrolly(0, m_fgscroll[2]);
 }
 
-WRITE8_HANDLER( tecmo_bgscroll_w )
+WRITE8_MEMBER(tecmo_state::tecmo_bgscroll_w)
 {
-	tecmo_state *state = space->machine().driver_data<tecmo_state>();
 
-	state->m_bgscroll[offset] = data;
+	m_bgscroll[offset] = data;
 
-	state->m_bg_tilemap->set_scrollx(0, state->m_bgscroll[0] + 256 * state->m_bgscroll[1]);
-	state->m_bg_tilemap->set_scrolly(0, state->m_bgscroll[2]);
+	m_bg_tilemap->set_scrollx(0, m_bgscroll[0] + 256 * m_bgscroll[1]);
+	m_bg_tilemap->set_scrolly(0, m_bgscroll[2]);
 }
 
-WRITE8_HANDLER( tecmo_flipscreen_w )
+WRITE8_MEMBER(tecmo_state::tecmo_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 1);
+	flip_screen_set(data & 1);
 }
 
 
@@ -186,7 +181,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		{42,43,46,47,58,59,62,63}
 	};
 
-	for (offs = state->m_spriteram_size-8;offs >= 0;offs -= 8)
+	for (offs = state->m_spriteram.bytes()-8;offs >= 0;offs -= 8)
 	{
 		int flags = spriteram[offs+3];
 		int priority = flags>>6;
@@ -210,7 +205,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			flipx = bank & 1;
 			flipy = bank & 2;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				xpos = 256 - (8 * size) - xpos;
 				ypos = 256 - (8 * size) - ypos;

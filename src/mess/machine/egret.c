@@ -32,7 +32,6 @@
     --xx      ?  IPL 1/0 for hardware power switch, trickle sense (bit 1) and pulled up to +5v (bit 0) if Egret controls the PSU
 */
 
-#define ADDRESS_MAP_MODERN
 
 //#define EGRET_SUPER_VERBOSE
 
@@ -380,7 +379,7 @@ void egret_device::device_start()
 	save_item(NAME(disk_pram));
 
 	astring tempstring;
-	UINT8 *rom = device().machine().region(device().subtag(tempstring, EGRET_CPU_TAG))->base();
+	UINT8 *rom = device().machine().root_device().memregion(device().subtag(tempstring, EGRET_CPU_TAG))->base();
 
     if (rom)
     {

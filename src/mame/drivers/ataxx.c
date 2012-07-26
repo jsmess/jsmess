@@ -45,22 +45,22 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( master_map_program, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( master_map_program, AS_PROGRAM, 8, leland_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2") AM_WRITE(ataxx_battery_ram_w) AM_SHARE("battery")
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_READWRITE(ataxx_paletteram_and_misc_r, ataxx_paletteram_and_misc_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf800, 0xffff) AM_READWRITE(ataxx_paletteram_and_misc_r, ataxx_paletteram_and_misc_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( master_map_io, AS_IO, 8 )
+static ADDRESS_MAP_START( master_map_io, AS_IO, 8, leland_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_DEVREAD("custom", leland_80186_response_r)
-	AM_RANGE(0x05, 0x05) AM_DEVWRITE("custom", leland_80186_command_hi_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("custom", leland_80186_command_lo_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("custom", ataxx_80186_control_w)
-	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("eeprom", ataxx_eeprom_r, ataxx_eeprom_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD_LEGACY("custom", leland_80186_response_r)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE_LEGACY("custom", leland_80186_command_hi_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("custom", leland_80186_command_lo_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE_LEGACY("custom", ataxx_80186_control_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_LEGACY("eeprom", ataxx_eeprom_r, ataxx_eeprom_w)
 	AM_RANGE(0xd0, 0xef) AM_READWRITE(ataxx_mvram_port_r, ataxx_mvram_port_w)
 	AM_RANGE(0xf0, 0xff) AM_READWRITE(ataxx_master_input_r, ataxx_master_output_w)
 ADDRESS_MAP_END
@@ -74,7 +74,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( slave_map_program, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slave_map_program, AS_PROGRAM, 8, leland_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank3")
 	AM_RANGE(0xa000, 0xdfff) AM_ROM
@@ -85,7 +85,7 @@ static ADDRESS_MAP_START( slave_map_program, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( slave_map_io, AS_IO, 8 )
+static ADDRESS_MAP_START( slave_map_io, AS_IO, 8, leland_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x60, 0x7f) AM_READWRITE(ataxx_svram_port_r, ataxx_svram_port_w)
 ADDRESS_MAP_END
@@ -115,7 +115,7 @@ static INPUT_PORTS_START( ataxx )
 
 	PORT_START("IN1")		/* 0xF7 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SLAVEHALT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")		/* 0x20 */
@@ -146,7 +146,7 @@ static INPUT_PORTS_START( wsf )
 
 	PORT_START("IN1")		/* 0xF7 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SLAVEHALT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")		/* 0x20 */
@@ -198,7 +198,7 @@ static INPUT_PORTS_START( indyheat )
 
 	PORT_START("IN1")		/* 0xF7 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SLAVEHALT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")		/* 0x20 */
@@ -244,7 +244,7 @@ static INPUT_PORTS_START( brutforc )
 
 	PORT_START("IN1")		/* 0xF7 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SLAVEHALT )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")		/* 0x20 */
@@ -711,7 +711,8 @@ static DRIVER_INIT( ataxx )
 	leland_rotate_memory(machine, "slave");
 
 	/* set up additional input ports */
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x03, FUNC(ataxx_trackball_r));
+	leland_state *state = machine.driver_data<leland_state>();
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0x00, 0x03, read8_delegate(FUNC(leland_state::ataxx_trackball_r),state));
 }
 
 
@@ -721,7 +722,8 @@ static DRIVER_INIT( ataxxj )
 	leland_rotate_memory(machine, "slave");
 
 	/* set up additional input ports */
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x03, FUNC(ataxx_trackball_r));
+	leland_state *state = machine.driver_data<leland_state>();
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0x00, 0x03, read8_delegate(FUNC(leland_state::ataxx_trackball_r),state));
 }
 
 
@@ -743,14 +745,15 @@ static DRIVER_INIT( indyheat )
 	leland_rotate_memory(machine, "slave");
 
 	/* set up additional input ports */
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x02, FUNC(indyheat_wheel_r));
-	machine.device("master")->memory().space(AS_IO)->install_legacy_read_handler(0x08, 0x0b, FUNC(indyheat_analog_r));
+	leland_state *state = machine.driver_data<leland_state>();
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0x00, 0x02, read8_delegate(FUNC(leland_state::indyheat_wheel_r),state));
+	machine.device("master")->memory().space(AS_IO)->install_read_handler(0x08, 0x0b, read8_delegate(FUNC(leland_state::indyheat_analog_r),state));
 	machine.device("master")->memory().space(AS_IO)->install_read_port(0x0d, 0x0d, "P1");
 	machine.device("master")->memory().space(AS_IO)->install_read_port(0x0e, 0x0e, "P2");
 	machine.device("master")->memory().space(AS_IO)->install_read_port(0x0f, 0x0f, "P3");
 
 	/* set up additional output ports */
-	machine.device("master")->memory().space(AS_IO)->install_legacy_write_handler(0x08, 0x0b, FUNC(indyheat_analog_w));
+	machine.device("master")->memory().space(AS_IO)->install_write_handler(0x08, 0x0b, write8_delegate(FUNC(leland_state::indyheat_analog_w),state));
 }
 
 

@@ -25,7 +25,6 @@
     - Make better artwork
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -162,7 +161,7 @@ READ8_MEMBER( savia84_state::savia84_8255_portc_r ) // IN FA - read keyboard
 	{
 		char kbdrow[6];
 		sprintf(kbdrow,"X%d",m_kbd);
-		return input_port_read(machine(), kbdrow);
+		return ioport(kbdrow)->read();
 	}
 	else
 		return 0xff;

@@ -159,9 +159,9 @@ Pin #11(+) | | R               |
  *
  *************************************/
 
-static CUSTOM_INPUT( cclownz_paddle )
+CUSTOM_INPUT_MEMBER(lethalj_state::cclownz_paddle)
 {
-	int value = input_port_read(field.machine(), "PADDLE");
+	int value = ioport("PADDLE")->read();
 	return ((value << 4) & 0xf00) | (value & 0x00f);
 }
 
@@ -173,31 +173,31 @@ static CUSTOM_INPUT( cclownz_paddle )
  *
  *************************************/
 
-static WRITE16_HANDLER( ripribit_control_w )
+WRITE16_MEMBER(lethalj_state::ripribit_control_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
-	ticket_dispenser_w(space->machine().device("ticket"), 0, ((data >> 1) & 1) << 7);
+	coin_counter_w(machine(), 0, data & 1);
+	machine().device<ticket_dispenser_device>("ticket")->write(space, 0, ((data >> 1) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 }
 
 
-static WRITE16_HANDLER( cfarm_control_w )
+WRITE16_MEMBER(lethalj_state::cfarm_control_w)
 {
-	ticket_dispenser_w(space->machine().device("ticket"), 0, ((data >> 0) & 1) << 7);
+	machine().device<ticket_dispenser_device>("ticket")->write(space, 0, ((data >> 0) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 	output_set_lamp_value(1, (data >> 3) & 1);
 	output_set_lamp_value(2, (data >> 4) & 1);
-	coin_counter_w(space->machine(), 0, (data >> 7) & 1);
+	coin_counter_w(machine(), 0, (data >> 7) & 1);
 }
 
 
-static WRITE16_HANDLER( cclownz_control_w )
+WRITE16_MEMBER(lethalj_state::cclownz_control_w)
 {
-	ticket_dispenser_w(space->machine().device("ticket"), 0, ((data >> 0) & 1) << 7);
+	machine().device<ticket_dispenser_device>("ticket")->write(space, 0, ((data >> 0) & 1) << 7);
 	output_set_lamp_value(0, (data >> 2) & 1);
 	output_set_lamp_value(1, (data >> 4) & 1);
 	output_set_lamp_value(2, (data >> 5) & 1);
-	coin_counter_w(space->machine(), 0, (data >> 6) & 1);
+	coin_counter_w(machine(), 0, (data >> 6) & 1);
 }
 
 
@@ -208,11 +208,11 @@ static WRITE16_HANDLER( cclownz_control_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( lethalj_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( lethalj_map, AS_PROGRAM, 16, lethalj_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
-	AM_RANGE(0x04000000, 0x0400000f) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x04000010, 0x0400001f) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x04100000, 0x0410000f) AM_DEVREADWRITE8_MODERN("oki3", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x04000000, 0x0400000f) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x04000010, 0x0400001f) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x04100000, 0x0410000f) AM_DEVREADWRITE8("oki3", okim6295_device, read, write, 0x00ff)
 //  AM_RANGE(0x04100010, 0x0410001f) AM_READNOP     /* read but never examined */
 	AM_RANGE(0x04200000, 0x0420001f) AM_WRITENOP	/* clocks bits through here */
 	AM_RANGE(0x04300000, 0x0430007f) AM_READ(lethalj_gun_r)
@@ -220,7 +220,7 @@ static ADDRESS_MAP_START( lethalj_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x04500010, 0x0450001f) AM_READ_PORT("IN0")
 	AM_RANGE(0x04600000, 0x0460000f) AM_READ_PORT("IN1")
 	AM_RANGE(0x04700000, 0x0470007f) AM_WRITE(lethalj_blitter_w)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP	/* seems to be a bug in their code, one of many. */
 	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -404,7 +404,7 @@ static INPUT_PORTS_START( ripribit )
 	PORT_START("IN0")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -491,7 +491,7 @@ static INPUT_PORTS_START( cfarm )
 	PORT_DIPSETTING(      0x0000, "10" )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0006, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -541,8 +541,8 @@ static INPUT_PORTS_START( cclownz )
 	PORT_DIPSETTING(      0x0000, "3000" )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cclownz_paddle, NULL)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
+	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, lethalj_state,cclownz_paddle, NULL)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0060, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -598,7 +598,7 @@ static MACHINE_CONFIG_START( gameroom, lethalj_state )
 	MCFG_CPU_CONFIG(tms_config)
 	MCFG_CPU_PROGRAM_MAP(lethalj_map)
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -896,19 +896,22 @@ ROM_END
 
 static DRIVER_INIT( ripribit )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x04100010, 0x0410001f, FUNC(ripribit_control_w));
+	lethalj_state *state = machine.driver_data<lethalj_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::ripribit_control_w),state));
 }
 
 
 static DRIVER_INIT( cfarm )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x04100010, 0x0410001f, FUNC(cfarm_control_w));
+	lethalj_state *state = machine.driver_data<lethalj_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cfarm_control_w),state));
 }
 
 
 static DRIVER_INIT( cclownz )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x04100010, 0x0410001f, FUNC(cclownz_control_w));
+	lethalj_state *state = machine.driver_data<lethalj_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x04100010, 0x0410001f, write16_delegate(FUNC(lethalj_state::cclownz_control_w),state));
 }
 
 

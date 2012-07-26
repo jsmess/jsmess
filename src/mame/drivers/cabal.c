@@ -61,71 +61,68 @@ static MACHINE_RESET( cabalbl )
 
 /******************************************************************************************/
 
-static WRITE16_HANDLER( cabalbl_sndcmd_w )
+WRITE16_MEMBER(cabal_state::cabalbl_sndcmd_w)
 {
-	cabal_state *state = space->machine().driver_data<cabal_state>();
 
 	switch (offset)
 	{
 		case 0x0:
-			state->m_sound_command1 = data;
+			m_sound_command1 = data;
 			break;
 
 		case 0x1: /* ?? */
-			state->m_sound_command2 = data & 0xff;
+			m_sound_command2 = data & 0xff;
 			break;
 	}
 }
 
 
 
-static WRITE16_HANDLER( track_reset_w )
+WRITE16_MEMBER(cabal_state::track_reset_w)
 {
-	cabal_state *state = space->machine().driver_data<cabal_state>();
 	int i;
 	static const char *const track_names[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	for (i = 0; i < 4; i++)
-		state->m_last[i] = input_port_read(space->machine(), track_names[i]);
+		m_last[i] = ioport(track_names[i])->read();
 }
 
-static READ16_HANDLER( track_r )
+READ16_MEMBER(cabal_state::track_r)
 {
-	cabal_state *state = space->machine().driver_data<cabal_state>();
 
 	switch (offset)
 	{
 		default:
-		case 0:	return (( input_port_read(space->machine(), "IN0") - state->m_last[0]) & 0x00ff)		 | (((input_port_read(space->machine(), "IN2") - state->m_last[2]) & 0x00ff) << 8);	/* X lo */
-		case 1:	return (((input_port_read(space->machine(), "IN0") - state->m_last[0]) & 0xff00) >> 8) | (( input_port_read(space->machine(), "IN2") - state->m_last[2]) & 0xff00);			/* X hi */
-		case 2:	return (( input_port_read(space->machine(), "IN1") - state->m_last[1]) & 0x00ff)		 | (((input_port_read(space->machine(), "IN3") - state->m_last[3]) & 0x00ff) << 8);	/* Y lo */
-		case 3:	return (((input_port_read(space->machine(), "IN1") - state->m_last[1]) & 0xff00) >> 8) | (( input_port_read(space->machine(), "IN3") - state->m_last[3]) & 0xff00);			/* Y hi */
+		case 0: return (( ioport("IN0")->read() - m_last[0]) & 0x00ff)           | (((ioport("IN2")->read() - m_last[2]) & 0x00ff) << 8);       /* X lo */
+		case 1: return (((ioport("IN0")->read() - m_last[0]) & 0xff00) >> 8) | (( ioport("IN2")->read() - m_last[2]) & 0xff00);                 /* X hi */
+		case 2: return (( ioport("IN1")->read() - m_last[1]) & 0x00ff)           | (((ioport("IN3")->read() - m_last[3]) & 0x00ff) << 8);       /* Y lo */
+		case 3: return (((ioport("IN1")->read() - m_last[1]) & 0xff00) >> 8) | (( ioport("IN3")->read() - m_last[3]) & 0xff00);                 /* Y hi */
 	}
 }
 
 
-static WRITE16_HANDLER( cabal_sound_irq_trigger_word_w )
+WRITE16_MEMBER(cabal_state::cabal_sound_irq_trigger_word_w)
 {
-	seibu_main_word_w(space,4,data,mem_mask);
+	seibu_main_word_w(&space,4,data,mem_mask);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
-	device_spin_until_time(&space->device(), attotime::from_usec(50));
+	device_spin_until_time(&space.device(), attotime::from_usec(50));
 }
 
-static WRITE16_HANDLER( cabalbl_sound_irq_trigger_word_w )
+WRITE16_MEMBER(cabal_state::cabalbl_sound_irq_trigger_word_w)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x437ff) AM_RAM
-	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_BASE_SIZE_MEMBER(cabal_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x44000, 0x4ffff) AM_RAM
-	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE(cabal_text_videoram16_w) AM_BASE_MEMBER(cabal_state, m_colorram)
-	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(cabal_background_videoram16_w) AM_BASE_MEMBER(cabal_state, m_videoram)
+	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE(cabal_text_videoram16_w) AM_SHARE("colorram")
+	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(cabal_background_videoram16_w) AM_SHARE("videoram")
 	AM_RANGE(0x80200, 0x803ff) AM_RAM
 	AM_RANGE(0xa0000, 0xa0001) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0008, 0xa000f) AM_READ(track_r)
@@ -133,25 +130,25 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xc0001) AM_WRITE(track_reset_w)
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(cabal_flipscreen_w)
-	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(cabal_sound_irq_trigger_word_w)	// fix coin insertion
-	AM_RANGE(0xe8000, 0xe800d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0xe8000, 0xe800d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cabalbl_main_map, AS_PROGRAM, 16, cabal_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x437ff) AM_RAM
-	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_BASE_SIZE_MEMBER(cabal_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x43800, 0x43fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x44000, 0x4ffff) AM_RAM
-	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE(cabal_text_videoram16_w) AM_BASE_MEMBER(cabal_state, m_colorram)
-	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(cabal_background_videoram16_w) AM_BASE_MEMBER(cabal_state, m_videoram)
+	AM_RANGE(0x60000, 0x607ff) AM_RAM_WRITE(cabal_text_videoram16_w) AM_SHARE("colorram")
+	AM_RANGE(0x80000, 0x801ff) AM_RAM_WRITE(cabal_background_videoram16_w) AM_SHARE("videoram")
 	AM_RANGE(0x80200, 0x803ff) AM_RAM
 	AM_RANGE(0xa0000, 0xa0001) AM_READ_PORT("DSW")
 	AM_RANGE(0xa0008, 0xa0009) AM_READ_PORT("JOY")
 	AM_RANGE(0xa0010, 0xa0011) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc0040, 0xc0041) AM_WRITENOP /* ??? */
 	AM_RANGE(0xc0080, 0xc0081) AM_WRITE(cabal_flipscreen_w)
-	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xe0000, 0xe07ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xe8000, 0xe8003) AM_WRITE(cabalbl_sndcmd_w)
 	AM_RANGE(0xe8004, 0xe8005) AM_READ(soundlatch2_word_r)
 	AM_RANGE(0xe8008, 0xe8009) AM_WRITE(cabalbl_sound_irq_trigger_word_w)
@@ -160,58 +157,56 @@ ADDRESS_MAP_END
 /*********************************************************************/
 
 
-static READ8_HANDLER( cabalbl_snd2_r )
+READ8_MEMBER(cabal_state::cabalbl_snd2_r)
 {
-	cabal_state *state = space->machine().driver_data<cabal_state>();
 
-	return BITSWAP8(state->m_sound_command2, 7,2,4,5,3,6,1,0);
+	return BITSWAP8(m_sound_command2, 7,2,4,5,3,6,1,0);
 }
 
-static READ8_HANDLER( cabalbl_snd1_r )
+READ8_MEMBER(cabal_state::cabalbl_snd1_r)
 {
-	cabal_state *state = space->machine().driver_data<cabal_state>();
 
-	return BITSWAP8(state->m_sound_command1, 7,2,4,5,3,6,1,0);
+	return BITSWAP8(m_sound_command1, 7,2,4,5,3,6,1,0);
 }
 
-static WRITE8_HANDLER( cabalbl_coin_w )
+WRITE8_MEMBER(cabal_state::cabalbl_coin_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
-	coin_counter_w(space->machine(), 1, data & 2);
+	coin_counter_w(machine(), 0, data & 1);
+	coin_counter_w(machine(), 1, data & 2);
 
 	//data & 0x40? video enable?
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(seibu_irq_clear_w)
-	AM_RANGE(0x4002, 0x4002) AM_WRITE(seibu_rst10_ack_w)
-	AM_RANGE(0x4003, 0x4003) AM_WRITE(seibu_rst18_ack_w)
-	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE("adpcm1", seibu_adpcm_adr_w)
-	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x4010, 0x4011) AM_READ(seibu_soundlatch_r)
-	AM_RANGE(0x4012, 0x4012) AM_READ(seibu_main_data_pending_r)
+	AM_RANGE(0x4001, 0x4001) AM_WRITE_LEGACY(seibu_irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_WRITE_LEGACY(seibu_rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_WRITE_LEGACY(seibu_rst18_ack_w)
+	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE_LEGACY("adpcm1", seibu_adpcm_adr_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x4010, 0x4011) AM_READ_LEGACY(seibu_soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_READ_LEGACY(seibu_main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
-	AM_RANGE(0x4018, 0x4019) AM_WRITE(seibu_main_data_w)
-	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("adpcm1", seibu_adpcm_ctl_w)
-	AM_RANGE(0x401b, 0x401b) AM_WRITE(seibu_coin_w)
-	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE("adpcm2", seibu_adpcm_adr_w)
-	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE("adpcm2", seibu_adpcm_ctl_w)
+	AM_RANGE(0x4018, 0x4019) AM_WRITE_LEGACY(seibu_main_data_w)
+	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE_LEGACY("adpcm1", seibu_adpcm_ctl_w)
+	AM_RANGE(0x401b, 0x401b) AM_WRITE_LEGACY(seibu_coin_w)
+	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE_LEGACY("adpcm2", seibu_adpcm_adr_w)
+	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE_LEGACY("adpcm2", seibu_adpcm_ctl_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cabalbl_sound_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(soundlatch3_w)
-	AM_RANGE(0x4002, 0x4002) AM_WRITE(soundlatch4_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(soundlatch3_byte_w)
+	AM_RANGE(0x4002, 0x4002) AM_WRITE(soundlatch4_byte_w)
 	AM_RANGE(0x4004, 0x4004) AM_WRITE(cabalbl_coin_w)
 	AM_RANGE(0x4006, 0x4006) AM_READ_PORT("COIN")
 	AM_RANGE(0x4008, 0x4008) AM_READ(cabalbl_snd2_r)
 	AM_RANGE(0x400a, 0x400a) AM_READ(cabalbl_snd1_r)
-	AM_RANGE(0x400c, 0x400c) AM_WRITE(soundlatch2_w)
-	AM_RANGE(0x400e, 0x400f) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x400c, 0x400c) AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0x400e, 0x400f) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITENOP  /* ??? */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -227,31 +222,31 @@ static WRITE8_DEVICE_HANDLER( cabalbl_adpcm_w )
 	msm5205_vclk_w(device,0);
 }
 
-static ADDRESS_MAP_START( cabalbl_talk1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cabalbl_talk1_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl_talk1_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( cabalbl_talk1_portmap, AS_IO, 8, cabal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch3_r)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("msm1", cabalbl_adpcm_w)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch3_byte_r)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("msm1", cabalbl_adpcm_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl_talk2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cabalbl_talk2_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cabalbl_talk2_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( cabalbl_talk2_portmap, AS_IO, 8, cabal_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch4_r)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("msm2", cabalbl_adpcm_w)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch4_byte_r)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("msm2", cabalbl_adpcm_w)
 ADDRESS_MAP_END
 
 /***************************************************************************/
 
 static INPUT_PORTS_START( common )
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3,4") PORT_CONDITION("DSW", 0x0010, PORTCOND_NOTEQUALS, 0x00)
+	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3,4") PORT_CONDITION("DSW", 0x0010, NOTEQUALS, 0x00)
 	PORT_DIPSETTING(      0x000a, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(      0x000b, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( 4C_1C ) )
@@ -268,12 +263,12 @@ static INPUT_PORTS_START( common )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_A )) PORT_DIPLOCATION("SW1:1,2") PORT_CONDITION("DSW", 0x0010, PORTCOND_EQUALS, 0x00)
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_A )) PORT_DIPLOCATION("SW1:1,2") PORT_CONDITION("DSW", 0x0010, EQUALS, 0x00)
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coin_B )) PORT_DIPLOCATION("SW1:3,4") PORT_CONDITION("DSW", 0x0010, PORTCOND_EQUALS, 0x00)
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coin_B )) PORT_DIPLOCATION("SW1:3,4") PORT_CONDITION("DSW", 0x0010, EQUALS, 0x00)
 	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_5C ) )
@@ -469,7 +464,7 @@ static void irqhandler(device_t *device, int irq)
 
 static const ym2151_interface cabalbl_ym2151_interface =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static const msm5205_interface msm5205_interface_1 =
@@ -849,14 +844,14 @@ static void seibu_sound_bootleg(running_machine &machine,const char *cpu,int len
 {
 	address_space *space = machine.device(cpu)->memory().space(AS_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length);
-	UINT8 *rom = machine.region(cpu)->base();
+	UINT8 *rom = machine.root_device().memregion(cpu)->base();
 
 	space->set_decrypted_region(0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
 
 	memcpy(decrypt, rom+length, length);
 
 	if (length > 0x10000)
-		memory_configure_bank_decrypted(machine, "bank1", 0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
+		machine.root_device().membank("bank1")->configure_decrypted_entries(0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
 }
 
 

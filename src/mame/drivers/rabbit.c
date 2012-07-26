@@ -1,6 +1,6 @@
 /***************************************************************************
 
-                     -= 68020 + Imagetek 15000 Games =-
+                     -= 68020 + Imagetek I5000 Games =-
 
             driver by   David Haywood ( hazemamewip (at) hotmail.com )
             partly based on metro.c driver by Luca Elia
@@ -8,15 +8,15 @@
 
 Main  CPU    :  MC68020
 
-Video Chips   : Imagetek 15000 |
-Sound Chips   : Imagetek 15000 |\- both sound and gfx
-Other Features: Memory Blitter (part of Imagetek 15000)
+Video Chips   : Imagetek I5000 |
+Sound Chips   : Imagetek I5000 |\- both sound and gfx
+Other Features: Memory Blitter (part of Imagetek I5000)
 
 ---------------------------------------------------------------------------
 Year + Game                     PCB         Video Chip  Issues / Notes
 ---------------------------------------------------------------------------
-97  Rabbit                      VG5330-B    15000
-97? Tokimeki Mahjong Paradise(1)VG5550-B    15000
+97  Rabbit                      VG5330-B    I5000
+97? Tokimeki Mahjong Paradise(1)VG5550-B    I5000
 ---------------------------------------------------------------------------
 Not dumped yet:
 unknown
@@ -25,7 +25,6 @@ To Do:
 
 - raster effects (rabbit only?, see left side of one of the levels in rabbit)
 - clean up zoom code and make zoom effect more accurate
-- sound (adpcm of some kind)
 - status bar in rabbit is the wrong colour, timing of blitter / interrupts?
 
 Notes:
@@ -51,7 +50,7 @@ VG5330-B
 |                        41    40 |
 |                                 |
 |J     IMAGETEK          33    32 |
-|A      15000            23    22 |
+|A      I5000            23    22 |
 |M            40MHz               |
 |M                       13    12 |
 |A             68EC020   03    02 |
@@ -78,39 +77,59 @@ CPU:    MC68EC020FG25
 OSC:    40.00000MHz
     24.00000MHz
 
-Custom: Imagetek 15000 (2ch video & 2ch sound)
+Custom: Imagetek I5000 (2ch video & 2ch sound)
 
 */
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
-
-#define VERBOSE_AUDIO_LOG (0)	// enable to show audio writes (very noisy when music is playing)
+#include "sound/i5000.h"
 
 
 class rabbit_state : public driver_device
 {
 public:
 	rabbit_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_viewregs0(*this, "viewregs0"),
+		  m_viewregs6(*this, "viewregs6"),
+		  m_viewregs7(*this, "viewregs7"),
+		  m_viewregs9(*this, "viewregs9"),
+		  m_viewregs10(*this, "viewregs10"),
+		  m_tilemap_regs(*this, "tilemap_regs"),
+		  m_spriteregs(*this, "spriteregs"),
+		  m_blitterregs(*this, "blitterregs"),
+		  m_spriteram(*this, "spriteram") { }
 
-	UINT32 *m_viewregs0;
-	UINT32 *m_viewregs6;
-	UINT32 *m_viewregs7;
-	UINT32 *m_viewregs9;
-	UINT32 *m_viewregs10;
-	UINT32 *m_tilemap_regs[4];
-	UINT32 *m_spriteregs;
-	UINT32 *m_blitterregs;
+	required_shared_ptr<UINT32> m_viewregs0;
+	required_shared_ptr<UINT32> m_viewregs6;
+	required_shared_ptr<UINT32> m_viewregs7;
+	required_shared_ptr<UINT32> m_viewregs9;
+	required_shared_ptr<UINT32> m_viewregs10;
+	required_shared_ptr_array<UINT32, 4> m_tilemap_regs;
+	required_shared_ptr<UINT32> m_spriteregs;
+	required_shared_ptr<UINT32> m_blitterregs;
 	bitmap_ind16 *m_sprite_bitmap;
 	rectangle m_sprite_clip;
 	int m_vblirqlevel;
 	int m_bltirqlevel;
 	int m_banking;
 	UINT32 *m_tilemap_ram[4];
-	UINT32 *m_spriteram;
+	required_shared_ptr<UINT32> m_spriteram;
 	tilemap_t *m_tilemap[4];
+	DECLARE_WRITE32_MEMBER(rabbit_tilemap0_w);
+	DECLARE_WRITE32_MEMBER(rabbit_tilemap1_w);
+	DECLARE_WRITE32_MEMBER(rabbit_tilemap2_w);
+	DECLARE_WRITE32_MEMBER(rabbit_tilemap3_w);
+	DECLARE_WRITE32_MEMBER(rabbit_paletteram_dword_w);
+	DECLARE_READ32_MEMBER(rabbit_tilemap0_r);
+	DECLARE_READ32_MEMBER(rabbit_tilemap1_r);
+	DECLARE_READ32_MEMBER(rabbit_tilemap2_r);
+	DECLARE_READ32_MEMBER(rabbit_tilemap3_r);
+	DECLARE_READ32_MEMBER(randomrabbits);
+	DECLARE_WRITE32_MEMBER(rabbit_rombank_w);
+	DECLARE_WRITE32_MEMBER(rabbit_blitter_w);
 };
 
 
@@ -182,33 +201,29 @@ static TILE_GET_INFO( get_rabbit_tilemap3_tile_info )
 	get_rabbit_tilemap_info(machine,tileinfo,tile_index,3,0);
 }
 
-static WRITE32_HANDLER( rabbit_tilemap0_w )
+WRITE32_MEMBER(rabbit_state::rabbit_tilemap0_w)
 {
-	rabbit_state *state = space->machine().driver_data<rabbit_state>();
-	COMBINE_DATA(&state->m_tilemap_ram[0][offset]);
-	state->m_tilemap[0]->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tilemap_ram[0][offset]);
+	m_tilemap[0]->mark_tile_dirty(offset);
 }
 
-static WRITE32_HANDLER( rabbit_tilemap1_w )
+WRITE32_MEMBER(rabbit_state::rabbit_tilemap1_w)
 {
-	rabbit_state *state = space->machine().driver_data<rabbit_state>();
-	COMBINE_DATA(&state->m_tilemap_ram[1][offset]);
-	state->m_tilemap[1]->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tilemap_ram[1][offset]);
+	m_tilemap[1]->mark_tile_dirty(offset);
 }
 
-static WRITE32_HANDLER( rabbit_tilemap2_w )
+WRITE32_MEMBER(rabbit_state::rabbit_tilemap2_w)
 {
-	rabbit_state *state = space->machine().driver_data<rabbit_state>();
-	COMBINE_DATA(&state->m_tilemap_ram[2][offset]);
-	state->m_tilemap[2]->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tilemap_ram[2][offset]);
+	m_tilemap[2]->mark_tile_dirty(offset);
 }
 
 
-static WRITE32_HANDLER( rabbit_tilemap3_w )
+WRITE32_MEMBER(rabbit_state::rabbit_tilemap3_w)
 {
-	rabbit_state *state = space->machine().driver_data<rabbit_state>();
-	COMBINE_DATA(&state->m_tilemap_ram[3][offset]);
-	state->m_tilemap[3]->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tilemap_ram[3][offset]);
+	m_tilemap[3]->mark_tile_dirty(offset);
 }
 
 /*
@@ -465,138 +480,59 @@ static SCREEN_UPDATE_IND16(rabbit)
 }
 
 
-static WRITE32_HANDLER( rabbit_paletteram_dword_w )
+WRITE32_MEMBER(rabbit_state::rabbit_paletteram_dword_w)
 {
 	int r,g,b;
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	b = ((space->machine().generic.paletteram.u32[offset] & 0x000000ff) >>0);
-	r = ((space->machine().generic.paletteram.u32[offset] & 0x0000ff00) >>8);
-	g = ((space->machine().generic.paletteram.u32[offset] & 0x00ff0000) >>16);
+	b = ((m_generic_paletteram_32[offset] & 0x000000ff) >>0);
+	r = ((m_generic_paletteram_32[offset] & 0x0000ff00) >>8);
+	g = ((m_generic_paletteram_32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(space->machine(),offset,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset,MAKE_RGB(r,g,b));
 }
 
-static READ32_HANDLER( rabbit_tilemap0_r )
+READ32_MEMBER(rabbit_state::rabbit_tilemap0_r)
 {
-	rabbit_state *state = space->machine().driver_data<rabbit_state>();
-	return state->m_tilemap_ram[0][offset];
+	return m_tilemap_ram[0][offset];
 }
 
-static READ32_HANDLER( rabbit_tilemap1_r )
+READ32_MEMBER(rabbit_state::rabbit_tilemap1_r)
 {
-	rabbit_state *state = space->machine().driver_data<rabbit_state>();
-	return state->m_tilemap_ram[1][offset];
+	return m_tilemap_ram[1][offset];
 }
 
-static READ32_HANDLER( rabbit_tilemap2_r )
+READ32_MEMBER(rabbit_state::rabbit_tilemap2_r)
 {
-	rabbit_state *state = space->machine().driver_data<rabbit_state>();
-	return state->m_tilemap_ram[2][offset];
+	return m_tilemap_ram[2][offset];
 }
 
-static READ32_HANDLER( rabbit_tilemap3_r )
+READ32_MEMBER(rabbit_state::rabbit_tilemap3_r)
 {
-	rabbit_state *state = space->machine().driver_data<rabbit_state>();
-	return state->m_tilemap_ram[3][offset];
+	return m_tilemap_ram[3][offset];
 }
 
-static READ32_HANDLER( randomrabbits )
+READ32_MEMBER(rabbit_state::randomrabbits)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
 /* rom bank is used when testing roms, not currently hooked up */
-static WRITE32_HANDLER ( rabbit_rombank_w )
+WRITE32_MEMBER(rabbit_state::rabbit_rombank_w)
 {
-	UINT8 *dataroms = space->machine().region("gfx1")->base();
+	UINT8 *dataroms = memregion("gfx1")->base();
 #if 0
 	int bank;
 	printf("rabbit rombank %08x\n",data);
 	bank = data & 0x3ff;
 
-	memory_set_bankptr(space->machine(), "bank1",&dataroms[0x40000*(bank&0x3ff)]);
+	membank("bank1")->set_base(&dataroms[0x40000*(bank&0x3ff)]);
 #else
-	memory_set_bankptr(space->machine(), "bank1",&dataroms[0]);
+	membank("bank1")->set_base(&dataroms[0]);
 #endif
 
 }
 
-/*
-    Audio notes:
-
-    There are 16 PCM voices.  Each voice has 4 16-bit wide registers.
-    Voice 0 uses registers 0-3, 1 uses registers 4-7, etc.
-
-    The first 2 registers for each voice are the LSW and MSW of the sample
-    starting address.  The remaining 2 haven't been figured out yet.
-
-    Registers 64 and up are "global", they don't belong to any specific voice.
-
-    Register 66 is key-on (bitmapped so bit 0 = voice 0, bit 15 = voice 15).
-    Register 67 is key-off (bitmapped identically to the key-on register).
-
-    There are a few other "global" registers, their purpose is unknown at this
-    time (timer?  the game seems to "play music" fine with just the VBL).
-*/
-
-static WRITE32_HANDLER( rabbit_audio_w )
-{
-	int reg, voice, base, i;
-
-if (VERBOSE_AUDIO_LOG)
-{
-	if (mem_mask == 0xffff0000)
-	{
-		reg = offset*2;
-		data >>= 16;
-	}
-	else if (mem_mask == 0x0000ffff)
-	{
-		reg = (offset*2)+1;
-		data &= 0xffff;
-	}
-	else	logerror("audio error: unknown mask %08x\n", mem_mask);
-
-	if (reg < 64)
-	{
-		voice = reg / 4;
-		base = voice*4;
-		logerror("V%02d: parm %d = %04x\n", voice, reg-base, data);
-	}
-	else
-	{
-		if (reg == 66)
-		{
-			logerror("Key on [%04x]: ", data);
-			for (i = 0; i < 16; i++)
-			{
-				if (data & (1<<i))
-				{
-					logerror("%02d ", i);
-				}
-			}
-			logerror("\n");
-		}
-		else if (reg == 67)
-		{
-			logerror("Key off [%04x]: ", data);
-			for (i = 0; i < 16; i++)
-			{
-				if (data & (1<<i))
-				{
-					logerror("%02d ", i);
-				}
-			}
-			logerror("\n");
-		}
-		else
-		{
-			logerror("Unknown write %04x to global reg %d\n", data, reg);
-		}
-	}
-}
-}
 
 #define BLITCMDLOG 0
 #define BLITLOG 0
@@ -610,7 +546,7 @@ static TIMER_CALLBACK( rabbit_blit_done )
 static void rabbit_do_blit(running_machine &machine)
 {
 	rabbit_state *state = machine.driver_data<rabbit_state>();
-	UINT8 *blt_data = machine.region("gfx1")->base();
+	UINT8 *blt_data = state->memregion("gfx1")->base();
 	int blt_source = (state->m_blitterregs[0]&0x000fffff)>>0;
 	int blt_column = (state->m_blitterregs[1]&0x00ff0000)>>16;
 	int blt_line   = (state->m_blitterregs[1]&0x000000ff);
@@ -703,14 +639,13 @@ static void rabbit_do_blit(running_machine &machine)
 
 
 
-static WRITE32_HANDLER( rabbit_blitter_w )
+WRITE32_MEMBER(rabbit_state::rabbit_blitter_w)
 {
-	rabbit_state *state = space->machine().driver_data<rabbit_state>();
-	COMBINE_DATA(&state->m_blitterregs[offset]);
+	COMBINE_DATA(&m_blitterregs[offset]);
 
 	if (offset == 0x0c/4)
 	{
-		rabbit_do_blit(space->machine());
+		rabbit_do_blit(machine());
 	}
 }
 
@@ -732,31 +667,29 @@ static WRITE32_DEVICE_HANDLER( rabbit_eeprom_write )
 	}
 }
 
-static ADDRESS_MAP_START( rabbit_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( rabbit_map, AS_PROGRAM, 32, rabbit_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x000000, 0x000003) AM_WRITENOP // bug in code / emulation?
 	AM_RANGE(0x000010, 0x000013) AM_WRITENOP // bug in code / emulation?
 	AM_RANGE(0x000024, 0x000027) AM_WRITENOP // bug in code / emulation?
 	AM_RANGE(0x00719c, 0x00719f) AM_WRITENOP // bug in code / emulation?
-	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("INPUTS") AM_DEVWRITE("eeprom", rabbit_eeprom_write)
+	AM_RANGE(0x200000, 0x200003) AM_READ_PORT("INPUTS") AM_DEVWRITE_LEGACY("eeprom", rabbit_eeprom_write)
 	AM_RANGE(0x400010, 0x400013) AM_READ(randomrabbits) // gfx chip status?
-	AM_RANGE(0x400980, 0x400983) AM_READ(randomrabbits) // sound chip status?
-	AM_RANGE(0x400984, 0x400987) AM_READ(randomrabbits) // sound chip status?
 	/* this lot are probably gfxchip/blitter etc. related */
-	AM_RANGE(0x400010, 0x400013) AM_WRITEONLY AM_BASE_MEMBER(rabbit_state, m_viewregs0 )
-	AM_RANGE(0x400100, 0x400117) AM_WRITEONLY AM_BASE_MEMBER(rabbit_state, m_tilemap_regs[0] ) // tilemap regs1
-	AM_RANGE(0x400120, 0x400137) AM_WRITEONLY AM_BASE_MEMBER(rabbit_state, m_tilemap_regs[1] ) // tilemap regs2
-	AM_RANGE(0x400140, 0x400157) AM_WRITEONLY AM_BASE_MEMBER(rabbit_state, m_tilemap_regs[2] ) // tilemap regs3
-	AM_RANGE(0x400160, 0x400177) AM_WRITEONLY AM_BASE_MEMBER(rabbit_state, m_tilemap_regs[3] ) // tilemap regs4
-	AM_RANGE(0x400200, 0x40021b) AM_WRITEONLY AM_BASE_MEMBER(rabbit_state, m_spriteregs ) // sprregs?
+	AM_RANGE(0x400010, 0x400013) AM_WRITEONLY AM_SHARE("viewregs0" )
+	AM_RANGE(0x400100, 0x400117) AM_WRITEONLY AM_SHARE("tilemap_regs.0" ) // tilemap regs1
+	AM_RANGE(0x400120, 0x400137) AM_WRITEONLY AM_SHARE("tilemap_regs.1" ) // tilemap regs2
+	AM_RANGE(0x400140, 0x400157) AM_WRITEONLY AM_SHARE("tilemap_regs.2" ) // tilemap regs3
+	AM_RANGE(0x400160, 0x400177) AM_WRITEONLY AM_SHARE("tilemap_regs.3" ) // tilemap regs4
+	AM_RANGE(0x400200, 0x40021b) AM_WRITEONLY AM_SHARE("spriteregs" ) // sprregs?
 	AM_RANGE(0x400300, 0x400303) AM_WRITE(rabbit_rombank_w) // used during rom testing, rombank/area select + something else?
-	AM_RANGE(0x400400, 0x400413) AM_WRITEONLY AM_BASE_MEMBER(rabbit_state, m_viewregs6 ) // some global controls? (brightness etc.?)
-	AM_RANGE(0x400500, 0x400503) AM_WRITEONLY AM_BASE_MEMBER(rabbit_state, m_viewregs7 )
-	AM_RANGE(0x400700, 0x40070f) AM_WRITE(rabbit_blitter_w) AM_BASE_MEMBER(rabbit_state, m_blitterregs )
-	AM_RANGE(0x400800, 0x40080f) AM_WRITEONLY AM_BASE_MEMBER(rabbit_state, m_viewregs9 ) // never changes?
-	AM_RANGE(0x400900, 0x40098f) AM_WRITE(rabbit_audio_w)
+	AM_RANGE(0x400400, 0x400413) AM_WRITEONLY AM_SHARE("viewregs6" ) // some global controls? (brightness etc.?)
+	AM_RANGE(0x400500, 0x400503) AM_WRITEONLY AM_SHARE("viewregs7" )
+	AM_RANGE(0x400700, 0x40070f) AM_WRITE(rabbit_blitter_w) AM_SHARE("blitterregs" )
+	AM_RANGE(0x400800, 0x40080f) AM_WRITEONLY AM_SHARE("viewregs9" ) // never changes?
+	AM_RANGE(0x400900, 0x4009ff) AM_DEVREADWRITE16("i5000snd", i5000snd_device, read, write, 0xffffffff)
 	/* hmm */
-	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_BASE_MEMBER(rabbit_state, m_viewregs10 )
+	AM_RANGE(0x479700, 0x479713) AM_WRITEONLY AM_SHARE("viewregs10" )
 
 	AM_RANGE(0x440000, 0x47ffff) AM_ROMBANK("bank1") // data (gfx / sound) rom readback for ROM testing
 	/* tilemaps */
@@ -764,8 +697,8 @@ static ADDRESS_MAP_START( rabbit_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x484000, 0x487fff) AM_READWRITE(rabbit_tilemap1_r,rabbit_tilemap1_w)
 	AM_RANGE(0x488000, 0x48bfff) AM_READWRITE(rabbit_tilemap2_r,rabbit_tilemap2_w)
 	AM_RANGE(0x48c000, 0x48ffff) AM_READWRITE(rabbit_tilemap3_r,rabbit_tilemap3_w)
-	AM_RANGE(0x494000, 0x497fff) AM_RAM AM_BASE_MEMBER(rabbit_state, m_spriteram) // sprites?
-	AM_RANGE(0x4a0000, 0x4affff) AM_RAM_WRITE(rabbit_paletteram_dword_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x494000, 0x497fff) AM_RAM AM_SHARE("spriteram") // sprites?
+	AM_RANGE(0x4a0000, 0x4affff) AM_RAM_WRITE(rabbit_paletteram_dword_w) AM_SHARE("paletteram")
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -950,7 +883,7 @@ static TIMER_DEVICE_CALLBACK( rabbit_scanline )
 
 
 static MACHINE_CONFIG_START( rabbit, rabbit_state )
-	MCFG_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_24MHz)
 	MCFG_CPU_PROGRAM_MAP(rabbit_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", rabbit_scanline, "screen", 0, 1)
 
@@ -971,6 +904,13 @@ static MACHINE_CONFIG_START( rabbit, rabbit_state )
 	MCFG_PALETTE_INIT( all_black ) // the status bar palette doesn't get transfered (or our colour select is wrong).. more obvious when it's black than in 'MAME default' colours
 
 	MCFG_VIDEO_START(rabbit)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_I5000_SND_ADD("i5000snd", XTAL_40MHz)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -1021,12 +961,13 @@ ROM_START( rabbit )
 	ROM_LOAD( "jbg1.50", 0x200000, 0x200000, CRC(1fc7f6e0) SHA1(b36062d2a9683683ffffd3003d5244a185f53280) )
 	ROM_LOAD( "jbg2.60", 0x400000, 0x200000, CRC(aee265fc) SHA1(ec420ab30b9b5141162223fc1fbf663ad9f211e6) )
 
-	ROM_REGION( 0x400000, "unknown", 0 ) /* sound rom */
-	ROM_LOAD( "jsn0.11", 0x0000000, 0x400000, CRC(e1f726e8) SHA1(598d75f3ff9e43ec8ce6131ed37f4345bf2f2d8e) )
+	ROM_REGION( 0x400000, "i5000snd", ROMREGION_ERASE ) /* sound rom */
+	ROM_LOAD( "jsn0.11", 0x000000, 0x000018, CRC(e1f726e8) SHA1(598d75f3ff9e43ec8ce6131ed37f4345bf2f2d8e) ) // header "VCDT i5000"
+	ROM_CONTINUE(        0x000000, 0x3fffe8 ) // sample data starts here
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "rabbit.nv", 0x0000, 0x0080, CRC(73d471ed) SHA1(45e045f5ea9036342b88013e021d402741d98537) )
 ROM_END
 
 
-GAME( 1997, rabbit,        0, rabbit,  rabbit,  rabbit,  ROT0, "Electronic Arts / Aorn", "Rabbit (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND ) // somewhat playable
+GAME( 1997, rabbit,        0, rabbit,  rabbit,  rabbit,  ROT0, "Aorn / Electronic Arts", "Rabbit (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND ) // somewhat playable

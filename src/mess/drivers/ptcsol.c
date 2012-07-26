@@ -100,7 +100,6 @@
       - CA - List the files on a tape
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -137,7 +136,8 @@ public:
 	m_cass2(*this, CASSETTE2_TAG),
 	m_uart(*this, "uart"),
 	m_uart_s(*this, "uart_s")
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass1;
@@ -161,7 +161,7 @@ public:
 	UINT8 m_sol20_fc;
 	UINT8 m_sol20_fe;
 	const UINT8 *m_p_chargen;
-	const UINT8 *m_p_videoram;
+	required_shared_ptr<const UINT8> m_p_videoram;
 	UINT8 m_framecnt;
 	emu_timer *m_cassette_timer;
 	cass_data_t m_cass_data;
@@ -312,7 +312,7 @@ READ8_MEMBER( sol20_state::sol20_fa_r )
 	data |= ay31015_get_output_pin( m_uart, AY31015_FE   ) ? 0x08 : 0;
 	ay31015_set_input_pin( m_uart, AY31015_SWE, 1 );
 
-	bool arrowkey = input_port_read(machine(), "ARROWS") ? 0 : 1;
+	bool arrowkey = ioport("ARROWS")->read() ? 0 : 1;
 	bool keydown = m_sol20_fa & 1;
 
 	return data | (arrowkey & keydown);
@@ -328,7 +328,7 @@ READ8_MEMBER( sol20_state::sol20_fb_r)
 
 READ8_MEMBER( sol20_state::sol20_fc_r )
 {
-	UINT8 data = input_port_read(machine(), "ARROWS");
+	UINT8 data = ioport("ARROWS")->read();
 	if (BIT(data, 0)) return 0x32;
 	if (BIT(data, 1)) return 0x34;
 	if (BIT(data, 2)) return 0x36;
@@ -397,7 +397,7 @@ static ADDRESS_MAP_START( sol20_mem, AS_PROGRAM, 8, sol20_state)
 	AM_RANGE(0X0800, 0Xbfff) AM_RAM	// optional s100 ram
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0Xc800, 0Xcbff) AM_RAM	// system ram
-	AM_RANGE(0Xcc00, 0Xcfff) AM_RAM	AM_BASE(m_p_videoram)
+	AM_RANGE(0Xcc00, 0Xcfff) AM_RAM	AM_SHARE("p_videoram")
 	AM_RANGE(0Xd000, 0Xffff) AM_RAM	// optional s100 ram
 ADDRESS_MAP_END
 
@@ -529,7 +529,8 @@ static const cassette_interface sol20_cassette_interface =
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( sol20_boot )
 {
-	memory_set_bank(machine, "boot", 0);
+	sol20_state *state = machine.driver_data<sol20_state>();
+	state->membank("boot")->set_entry(0);
 }
 
 MACHINE_START_MEMBER( sol20_state )
@@ -555,7 +556,7 @@ MACHINE_RESET_MEMBER( sol20_state )
 	ay31015_set_input_pin( m_uart, AY31015_CS, 1 );
 
 	// set switched uart pins
-	data = input_port_read(machine(), "S4");
+	data = ioport("S4")->read();
 	ay31015_set_input_pin( m_uart_s, AY31015_CS, 0 );
 	ay31015_set_input_pin( m_uart_s, AY31015_NB1, BIT(data, 1) ? 1 : 0);
 	ay31015_set_input_pin( m_uart_s, AY31015_NB2, BIT(data, 2) ? 1 : 0);
@@ -565,7 +566,7 @@ MACHINE_RESET_MEMBER( sol20_state )
 	ay31015_set_input_pin( m_uart_s, AY31015_CS, 1 );
 
 	// set rs232 baud rate
-	data = input_port_read(machine(), "S3");
+	data = ioport("S3")->read();
 
 	if (data > 1)
 		do
@@ -575,7 +576,7 @@ MACHINE_RESET_MEMBER( sol20_state )
 		}
 		while (!(data & 1) && (s_count < 7)); // find which switch is used
 
-	if ((s_count == 7) && (input_port_read(machine(), "CONFIG")&1)) // if highest, look at jumper
+	if ((s_count == 7) && (ioport("CONFIG")->read()&1)) // if highest, look at jumper
 		s_clock = 9600 << 4;
 	else
 		s_clock = s_bauds[s_count] << 4;
@@ -585,19 +586,20 @@ MACHINE_RESET_MEMBER( sol20_state )
 	ay31015_set_transmitter_clock( m_uart_s, s_clock);
 
 	// boot-bank
-	memory_set_bank(machine(), "boot", 1);
+	membank("boot")->set_entry(1);
 	machine().scheduler().timer_set(attotime::from_usec(9), FUNC(sol20_boot));
 }
 
 static DRIVER_INIT( sol20 )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xc000);
+	sol20_state *state = machine.driver_data<sol20_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
 }
 
 VIDEO_START_MEMBER( sol20_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 SCREEN_UPDATE16_MEMBER( sol20_state )
@@ -606,8 +608,8 @@ SCREEN_UPDATE16_MEMBER( sol20_state )
 // Each character is 9 pixels wide (blank ones at the right) and 13 lines deep.
 // Note on blinking characters:
 // any character with bit 7 set will blink. With DPMON, do DA C000 C2FF to see what happens
-	UINT8 s1 = input_port_read(machine(), "S1");
-	UINT16 which = (input_port_read(machine(), "CONFIG") & 2) << 10;
+	UINT8 s1 = ioport("S1")->read();
+	UINT16 which = (ioport("CONFIG")->read() & 2) << 10;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma,x,inv;
 	UINT8 polarity = (s1 & 8) ? 0xff : 0;

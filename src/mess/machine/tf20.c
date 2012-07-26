@@ -85,7 +85,7 @@ static READ8_HANDLER( tf20_dip_r )
 {
 	logerror("%s: tf20_dip_r\n", space->machine().describe_context());
 
-	return input_port_read(space->machine(), "tf20_dip");
+	return space->machine().root_device().ioport("tf20_dip")->read();
 }
 
 static TIMER_CALLBACK( tf20_upd765_tc_reset )
@@ -199,20 +199,20 @@ READ_LINE_DEVICE_HANDLER( tf20_pinc_r )
     ADDRESS MAPS
 *****************************************************************************/
 
-static ADDRESS_MAP_START( tf20_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tf20_mem, AS_PROGRAM, 8, tf20_device )
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank21")
 	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank22")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tf20_io, AS_IO, 8 )
+static ADDRESS_MAP_START( tf20_io, AS_IO, 8, tf20_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE_MODERN("3a", upd7201_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0xf6, 0xf6) AM_READ(tf20_rom_disable)
-	AM_RANGE(0xf7, 0xf7) AM_READ(tf20_dip_r)
-	AM_RANGE(0xf8, 0xf8) AM_DEVREAD("5a", tf20_upd765_tc_r) AM_WRITE(tf20_fdc_control_w)
-	AM_RANGE(0xfa, 0xfa) AM_DEVREAD("5a", upd765_status_r)
-	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("5a", upd765_data_r, upd765_data_w)
+	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("3a", upd7201_device, ba_cd_r, ba_cd_w)
+	AM_RANGE(0xf6, 0xf6) AM_READ_LEGACY(tf20_rom_disable)
+	AM_RANGE(0xf7, 0xf7) AM_READ_LEGACY(tf20_dip_r)
+	AM_RANGE(0xf8, 0xf8) AM_DEVREAD_LEGACY("5a", tf20_upd765_tc_r) AM_WRITE_LEGACY(tf20_fdc_control_w)
+	AM_RANGE(0xfa, 0xfa) AM_DEVREAD_LEGACY("5a", upd765_status_r)
+	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE_LEGACY("5a", upd765_data_r, upd765_data_w)
 ADDRESS_MAP_END
 
 

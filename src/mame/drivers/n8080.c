@@ -17,38 +17,35 @@
 #define MASTER_CLOCK	XTAL_20_16MHz
 
 
-static WRITE8_HANDLER( n8080_shift_bits_w )
+WRITE8_MEMBER(n8080_state::n8080_shift_bits_w)
 {
-	n8080_state *state = space->machine().driver_data<n8080_state>();
-	state->m_shift_bits = data & 7;
+	m_shift_bits = data & 7;
 }
-static WRITE8_HANDLER( n8080_shift_data_w )
+WRITE8_MEMBER(n8080_state::n8080_shift_data_w)
 {
-	n8080_state *state = space->machine().driver_data<n8080_state>();
-	state->m_shift_data = (state->m_shift_data >> 8) | (data << 8);
+	m_shift_data = (m_shift_data >> 8) | (data << 8);
 }
 
 
-static READ8_HANDLER( n8080_shift_r )
+READ8_MEMBER(n8080_state::n8080_shift_r)
 {
-	n8080_state *state = space->machine().driver_data<n8080_state>();
-	return state->m_shift_data >> (8 - state->m_shift_bits);
+	return m_shift_data >> (8 - m_shift_bits);
 }
 
-static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 8, n8080_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(n8080_state, m_videoram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( helifire_main_cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( helifire_main_cpu_map, AS_PROGRAM, 8, n8080_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(n8080_state, m_videoram)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_MEMBER(n8080_state, m_colorram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("colorram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( main_io_map, AS_IO, 8, n8080_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")

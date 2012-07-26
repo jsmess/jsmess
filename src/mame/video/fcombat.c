@@ -14,8 +14,8 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 	//palno = (tile_index - (tile_index / 32 * 16) * 32 * 16) / 32;
 
-	tileno = machine.region("user1")->base()[tile_index];
-	palno = 0x18; //machine.region("user2")->base()[tile_index] >> 3;
+	tileno = machine.root_device().memregion("user1")->base()[tile_index];
+	palno = 0x18; //machine.root_device().memregion("user2")->base()[tile_index] >> 3;
 	SET_TILE_INFO(2, tileno, palno, 0);
 }
 
@@ -39,6 +39,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 PALETTE_INIT( fcombat )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -112,23 +113,22 @@ VIDEO_START( fcombat )
  *
  *************************************/
 
-WRITE8_HANDLER( fcombat_videoreg_w )
+WRITE8_MEMBER(fcombat_state::fcombat_videoreg_w)
 {
-	fcombat_state *state = space->machine().driver_data<fcombat_state>();
 
 	/* bit 0 = flip screen and joystick input multiplexor */
-	state->m_cocktail_flip = data & 1;
+	m_cocktail_flip = data & 1;
 
 	/* bits 1-2 char lookup table bank */
-	state->m_char_palette = (data & 0x06) >> 1;
+	m_char_palette = (data & 0x06) >> 1;
 
 	/* bits 3 char bank */
-	state->m_char_bank = (data & 0x08) >> 3;
+	m_char_bank = (data & 0x08) >> 3;
 
 	/* bits 4-5 unused */
 
 	/* bits 6-7 sprite lookup table bank */
-	state->m_sprite_palette = 0;//(data & 0xc0) >> 6;
+	m_sprite_palette = 0;//(data & 0xc0) >> 6;
 	//popmessage("%08x",data);
 }
 
@@ -148,7 +148,7 @@ SCREEN_UPDATE_IND16( fcombat )
 	//draw_background(bitmap, cliprect);
 
 	/* draw sprites */
-	for (i = 0; i < state->m_spriteram_size; i += 4)
+	for (i = 0; i < state->m_spriteram.bytes(); i += 4)
 	{
 		int flags = state->m_spriteram[i + 0];
 		int y = state->m_spriteram[i + 1] ^ 255;

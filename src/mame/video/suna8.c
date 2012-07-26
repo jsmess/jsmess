@@ -83,7 +83,7 @@ static TILE_GET_INFO( get_tile_info )
 
 	if (machine.input().code_pressed(KEYCODE_X))
 	{
-		UINT8 *rom = machine.region("maincpu")->base() + 0x10000 + 0x4000 * state->m_trombank;
+		UINT8 *rom = state->memregion("maincpu")->base() + 0x10000 + 0x4000 * state->m_trombank;
 		code = rom[ 2 * tile_index + 0 ];
 		attr = rom[ 2 * tile_index + 1 ];
 	}
@@ -101,55 +101,49 @@ static TILE_GET_INFO( get_tile_info )
 #endif
 
 
-READ8_HANDLER( suna8_banked_paletteram_r )
+READ8_MEMBER( suna8_state::banked_paletteram_r )
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
-
-	offset += state->m_palettebank * 0x200;
-	return space->machine().generic.paletteram.u8[offset];
+	offset += m_palettebank * 0x200;
+	return m_generic_paletteram_8[offset];
 }
 
-READ8_HANDLER( suna8_banked_spriteram_r )
+READ8_MEMBER(suna8_state::suna8_banked_spriteram_r)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	offset += state->m_spritebank * 0x2000;
-	return state->m_spriteram[offset];
+	offset += m_spritebank * 0x2000;
+	return m_spriteram[offset];
 }
 
-WRITE8_HANDLER( suna8_spriteram_w )
+WRITE8_MEMBER(suna8_state::suna8_spriteram_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	state->m_spriteram[offset] = data;
+	m_spriteram[offset] = data;
 #if TILEMAPS
-	state->m_bg_tilemap->mark_tile_dirty(offset/2);
+	m_bg_tilemap->mark_tile_dirty(offset/2);
 #endif
 }
 
-WRITE8_HANDLER( suna8_banked_spriteram_w )
+WRITE8_MEMBER(suna8_state::suna8_banked_spriteram_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	offset += state->m_spritebank * 0x2000;
-	state->m_spriteram[offset] = data;
+	offset += m_spritebank * 0x2000;
+	m_spriteram[offset] = data;
 #if TILEMAPS
-	state->m_bg_tilemap->mark_tile_dirty(offset/2);
+	m_bg_tilemap->mark_tile_dirty(offset/2);
 #endif
 }
 
 /*
     Banked Palette RAM. The data is scrambled
 */
-WRITE8_HANDLER( brickzn_banked_paletteram_w )
+WRITE8_MEMBER( suna8_state::brickzn_banked_paletteram_w )
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 	int r,g,b;
 	UINT16 rgb;
 
-	offset += state->m_palettebank * 0x200;
-	space->machine().generic.paletteram.u8[offset] = data;
-	rgb = (space->machine().generic.paletteram.u8[offset&~1] << 8) + space->machine().generic.paletteram.u8[offset|1];
+	offset += m_palettebank * 0x200;
+	m_generic_paletteram_8[offset] = data;
+	rgb = (m_generic_paletteram_8[offset&~1] << 8) + m_generic_paletteram_8[offset|1];
 	r	=	(((rgb & (1<<0xc))?1:0)<<0) |
 			(((rgb & (1<<0xb))?1:0)<<1) |
 			(((rgb & (1<<0xe))?1:0)<<2) |
@@ -163,7 +157,7 @@ WRITE8_HANDLER( brickzn_banked_paletteram_w )
 			(((rgb & (1<<0x6))?1:0)<<2) |
 			(((rgb & (1<<0x7))?1:0)<<3);
 
-	palette_set_color_rgb(space->machine(),offset/2,pal4bit(r),pal4bit(g),pal4bit(b));
+	palette_set_color_rgb(machine(),offset/2,pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
 
@@ -175,8 +169,8 @@ static void suna8_vh_start_common(running_machine &machine, int dim)
 	state->m_text_dim = dim;
 	if (!(state->m_text_dim > 0))
 	{
-		machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200 * 2);
-		state->m_spriteram = auto_alloc_array(machine, UINT8, 0x2000 * 2);
+		state->m_generic_paletteram_8.allocate(0x200 * 2);
+		state->m_spriteram.allocate(0x2000 * 2);
 		state->m_spritebank  = 0;
 		state->m_palettebank = 0;
 	}
@@ -319,7 +313,7 @@ static void draw_normal_sprites(running_machine &machine, bitmap_ind16 &bitmap,c
 				if (flipx)	tile_flipx = !tile_flipx;
 				if (flipy)	tile_flipy = !tile_flipy;
 
-				if (flip_screen_get(machine))
+				if (state->flip_screen())
 				{
 					sx = max_x - sx;	tile_flipx = !tile_flipx;
 					sy = max_y - sy;	tile_flipy = !tile_flipy;
@@ -387,7 +381,7 @@ static void draw_text_sprites(running_machine &machine, bitmap_ind16 &bitmap,con
 				int sx		=	 x + tx * 8;
 				int sy		=	(y + real_ty * 8) & 0xff;
 
-				if (flip_screen_get(machine))
+				if (state->flip_screen())
 				{
 					sx = max_x - sx;	flipx = !flipx;
 					sy = max_y - sy;	flipy = !flipy;
@@ -422,7 +416,7 @@ SCREEN_UPDATE_IND16( suna8 )
 	if (screen.machine().input().code_pressed(KEYCODE_Z) || screen.machine().input().code_pressed(KEYCODE_X))
 	{
 		suna8_state *state = screen.machine().driver_data<suna8_state>();
-		int max_tiles = screen.machine().region("gfx1")->bytes() / (0x400 * 0x20);
+		int max_tiles = state->memregion("gfx1")->bytes() / (0x400 * 0x20);
 
 		if (screen.machine().input().code_pressed_once(KEYCODE_Q))	{ state->m_page--;	screen.machine().tilemap().mark_all_dirty();	}
 		if (screen.machine().input().code_pressed_once(KEYCODE_W))	{ state->m_page++;	screen.machine().tilemap().mark_all_dirty();	}

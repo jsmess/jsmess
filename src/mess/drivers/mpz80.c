@@ -163,7 +163,7 @@ inline offs_t mpz80_state::get_address(offs_t offset)
 READ8_MEMBER( mpz80_state::mmu_r )
 {
 	m_addr = get_address(offset);
-	UINT8 *rom = machine().region(Z80_TAG)->base();
+	UINT8 *rom = memregion(Z80_TAG)->base();
 	UINT8 data = 0;
 
 	if (m_pretrap)
@@ -468,7 +468,7 @@ READ8_MEMBER( mpz80_state::switch_r )
 	data |= m_int_pend << 1;
 
 	// boot address
-	data |= input_port_read(machine(), "16C") & 0xfc;
+	data |= ioport("16C")->read() & 0xfc;
 
 	return data;
 }
@@ -539,7 +539,7 @@ static ADDRESS_MAP_START( mpz80_mem, AS_PROGRAM, 8, mpz80_state )
     AM_RANGE(0x0401, 0x0401) AM_READWRITE(keyboard_r, disp_col_w)
     AM_RANGE(0x0402, 0x0402) AM_READWRITE(switch_r, task_w)
     AM_RANGE(0x0403, 0x0403) AM_READWRITE(status_r, mask_w)
-    AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE(m_map_ram)
+    AM_RANGE(0x0600, 0x07ff) AM_RAM AM_SHARE("map_ram")
     AM_RANGE(0x0800, 0x0bff) AM_ROM AM_REGION(Z80_TAG, 0)
     AM_RANGE(0x0c00, 0x0c00) AM_DEVREADWRITE(AM9512_TAG, am9512_device, read, write)
 */
@@ -566,7 +566,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mpz80 )
 	PORT_START("16C")
-	PORT_DIPNAME( 0xf8, 0xf8, "Power-On-Jump Address" ) PORT_DIPLOCATION("16C:1,2,3,4,5") PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPNAME( 0xf8, 0xf8, "Power-On-Jump Address" ) PORT_DIPLOCATION("16C:1,2,3,4,5") PORT_CONDITION("12C", 0x02, EQUALS, 0x02)
 	PORT_DIPSETTING(    0xf8, "F800H" )
 	PORT_DIPSETTING(    0xf0, "F000H" )
 	PORT_DIPSETTING(    0xe8, "E800H" )
@@ -599,7 +599,7 @@ static INPUT_PORTS_START( mpz80 )
 	PORT_DIPSETTING(    0x10, "Boot DJ/DMA" )
 	PORT_DIPSETTING(    0x08, "Boot HD/DMA" )
 	PORT_DIPSETTING(    0x00, "Boot HDCA" )
-	PORT_DIPNAME( 0x70, 0x00, "Diagnostics" ) PORT_DIPLOCATION("16C:2,3,4") PORT_CONDITION("12C", 0x02, PORTCOND_EQUALS, 0x00)
+	PORT_DIPNAME( 0x70, 0x00, "Diagnostics" ) PORT_DIPLOCATION("16C:2,3,4") PORT_CONDITION("12C", 0x02, EQUALS, 0x00)
 	PORT_DIPSETTING(    0x00, "Read Registers" )
 	PORT_DIPSETTING(    0x10, "Write Registers" )
 	PORT_DIPSETTING(    0x20, "Write Map RAMs" )
@@ -827,13 +827,11 @@ ROM_END
 //  DRIVER_INIT( mpz80 )
 //-------------------------------------------------
 
-DIRECT_UPDATE_HANDLER( mpz80_direct_update_handler )
+DIRECT_UPDATE_MEMBER(mpz80_state::mpz80_direct_update_handler)
 {
-	mpz80_state *state = machine.driver_data<mpz80_state>();
-
-	if (state->m_trap && address >= state->m_trap_start && address <= state->m_trap_start + 0xf)
+	if (m_trap && address >= m_trap_start && address <= m_trap_start + 0xf)
 	{
-		direct.explicit_configure(state->m_trap_start, state->m_trap_start + 0xf, 0xf, machine.region(Z80_TAG)->base() + ((state->m_trap_reset << 10) | 0x3f0));
+		direct.explicit_configure(m_trap_start, m_trap_start + 0xf, 0xf, memregion(Z80_TAG)->base() + ((m_trap_reset << 10) | 0x3f0));
 		return ~0;
 	}
 
@@ -842,8 +840,9 @@ DIRECT_UPDATE_HANDLER( mpz80_direct_update_handler )
 
 static DRIVER_INIT( mpz80 )
 {
+	mpz80_state *state = machine.driver_data<mpz80_state>();
 	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate(FUNC(mpz80_direct_update_handler), &machine));
+	program->set_direct_update_handler(direct_update_delegate(FUNC(mpz80_state::mpz80_direct_update_handler), state));
 }
 
 

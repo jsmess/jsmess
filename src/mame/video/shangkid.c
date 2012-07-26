@@ -43,7 +43,7 @@ static TILE_GET_INFO( get_bg_tile_info ){
 	}
 
 	tileinfo.category =
-		(machine.region( "proms" )->base()[0x800+color*4]==2)?1:0;
+		(machine.root_device().memregion( "proms" )->base()[0x800+color*4]==2)?1:0;
 }
 
 VIDEO_START( shangkid )
@@ -52,12 +52,11 @@ VIDEO_START( shangkid )
 	state->m_background = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,64,32);
 }
 
-WRITE8_HANDLER( shangkid_videoram_w )
+WRITE8_MEMBER(shangkid_state::shangkid_videoram_w)
 {
-	shangkid_state *state = space->machine().driver_data<shangkid_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_background->mark_tile_dirty(offset&0x7ff );
+	m_background->mark_tile_dirty(offset&0x7ff );
 }
 
 static void draw_sprite(running_machine &machine, const UINT8 *source, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -202,6 +201,7 @@ SCREEN_UPDATE_IND16( shangkid )
 
 PALETTE_INIT( dynamski )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */

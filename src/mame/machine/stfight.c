@@ -13,7 +13,7 @@
 #include "includes/stfight.h"
 
 // this prototype will move to the driver
-static WRITE8_HANDLER( stfight_bank_w );
+
 
 
 /*
@@ -40,7 +40,7 @@ DRIVER_INIT( empcity )
 {
 	stfight_state *state = machine.driver_data<stfight_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	int A;
 
 	state->m_decrypt = auto_alloc_array(machine, UINT8, 0x8000);
@@ -96,16 +96,16 @@ MACHINE_RESET( stfight )
 	state->m_coin_mech_query = 0;
 
     // initialise rom bank
-    stfight_bank_w( space, 0, 0 );
+    state->stfight_bank_w(*space, 0, 0 );
 }
 
 // It's entirely possible that this bank is never switched out
 // - in fact I don't even know how/where it's switched in!
-static WRITE8_HANDLER( stfight_bank_w )
+WRITE8_MEMBER(stfight_state::stfight_bank_w)
 {
-	UINT8   *ROM2 = space->machine().region("maincpu")->base() + 0x10000;
+	UINT8   *ROM2 = memregion("maincpu")->base() + 0x10000;
 
-	memory_set_bankptr(space->machine(),  "bank1", &ROM2[data<<14] );
+	membank("bank1")->set_base(&ROM2[data<<14] );
 }
 
 /*
@@ -130,22 +130,21 @@ INTERRUPT_GEN( stfight_vb_interrupt )
  */
 
 // Perhaps define dipswitches as active low?
-READ8_HANDLER( stfight_dsw_r )
+READ8_MEMBER(stfight_state::stfight_dsw_r)
 {
-    return( ~input_port_read(space->machine(), offset ? "DSW1" : "DSW0") );
+    return( ~ioport(offset ? "DSW1" : "DSW0")->read() );
 }
 
-READ8_HANDLER( stfight_coin_r )
+READ8_MEMBER(stfight_state::stfight_coin_r)
 {
-	stfight_state *state = space->machine().driver_data<stfight_state>();
     int coin_mech_data;
     int i;
 
     // Was the coin mech queried by software?
-    if( state->m_coin_mech_query_active )
+    if( m_coin_mech_query_active )
     {
-        state->m_coin_mech_query_active = 0;
-        return( (~state->m_coin_mech_query) & 0x03 );
+        m_coin_mech_query_active = 0;
+        return( (~m_coin_mech_query) & 0x03 );
     }
 
     /*
@@ -155,13 +154,13 @@ READ8_HANDLER( stfight_coin_r )
      *        since it's read by the 30Hz interrupt ISR
      */
 
-    coin_mech_data = input_port_read(space->machine(), "COIN");
+    coin_mech_data = ioport("COIN")->read();
 
     for( i=0; i<2; i++ )
     {
         /* Only valid on signal edge */
-        if( ( coin_mech_data & (1<<i) ) != state->m_coin_mech_latch[i] )
-            state->m_coin_mech_latch[i] = coin_mech_data & (1<<i);
+        if( ( coin_mech_data & (1<<i) ) != m_coin_mech_latch[i] )
+            m_coin_mech_latch[i] = coin_mech_data & (1<<i);
         else
             coin_mech_data |= coin_mech_data & (1<<i);
     }
@@ -169,12 +168,11 @@ READ8_HANDLER( stfight_coin_r )
     return( coin_mech_data );
 }
 
-WRITE8_HANDLER( stfight_coin_w )
+WRITE8_MEMBER(stfight_state::stfight_coin_w)
 {
-	stfight_state *state = space->machine().driver_data<stfight_state>();
     // interrogate coin mech
-    state->m_coin_mech_query_active = 1;
-    state->m_coin_mech_query = data;
+    m_coin_mech_query_active = 1;
+    m_coin_mech_query = data;
 }
 
 /*
@@ -194,7 +192,7 @@ static const int sampleLimits[] =
 void stfight_adpcm_int(device_t *device)
 {
 	stfight_state *state = device->machine().driver_data<stfight_state>();
-	UINT8 *SAMPLES = device->machine().region("adpcm")->base();
+	UINT8 *SAMPLES = state->memregion("adpcm")->base();
 	int adpcm_data = SAMPLES[state->m_adpcm_data_offs & 0x7fff];
 
     // finished playing sample?
@@ -227,7 +225,7 @@ WRITE8_DEVICE_HANDLER( stfight_adpcm_control_w )
     msm5205_reset_w( device, data & 0x08 ? 1 : 0 );
 }
 
-WRITE8_HANDLER( stfight_e800_w )
+WRITE8_MEMBER(stfight_state::stfight_e800_w)
 {
 }
 
@@ -235,20 +233,18 @@ WRITE8_HANDLER( stfight_e800_w )
  *      Machine hardware for YM2303 fm sound control
  */
 
-WRITE8_HANDLER( stfight_fm_w )
+WRITE8_MEMBER(stfight_state::stfight_fm_w)
 {
-	stfight_state *state = space->machine().driver_data<stfight_state>();
     // the sound cpu ignores any fm data without bit 7 set
-    state->m_fm_data = 0x80 | data;
+    m_fm_data = 0x80 | data;
 }
 
-READ8_HANDLER( stfight_fm_r )
+READ8_MEMBER(stfight_state::stfight_fm_r)
 {
-	stfight_state *state = space->machine().driver_data<stfight_state>();
-    int data = state->m_fm_data;
+    int data = m_fm_data;
 
     // clear the latch?!?
-    state->m_fm_data &= 0x7f;
+    m_fm_data &= 0x7f;
 
     return( data );
 }

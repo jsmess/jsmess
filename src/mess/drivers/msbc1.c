@@ -47,7 +47,6 @@ Notes:
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -67,7 +66,7 @@ INPUT_PORTS_END
 void msbc1_state::machine_reset()
 {
 	void *ram = machine().firstcpu->memory().space(AS_PROGRAM)->get_write_ptr(0);
-	UINT8 *rom = machine().region(MC68000R12_TAG)->base();
+	UINT8 *rom = memregion(MC68000R12_TAG)->base();
 
 	memcpy(ram, rom, 8);
 

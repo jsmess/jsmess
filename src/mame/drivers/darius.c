@@ -148,21 +148,20 @@ static void parse_control( running_machine &machine )	/* assumes Z80 sandwiched 
 	device_set_input_line(state->m_cpub, INPUT_LINE_RESET, (state->m_cpua_ctrl & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static WRITE16_HANDLER( cpua_ctrl_w )
+WRITE16_MEMBER(darius_state::cpua_ctrl_w)
 {
-	darius_state *state = space->machine().driver_data<darius_state>();
 
 	if ((data & 0xff00) && ((data & 0xff) == 0))
 		data = data >> 8;
 
-	state->m_cpua_ctrl = data;
+	m_cpua_ctrl = data;
 
-	parse_control(space->machine());
+	parse_control(machine());
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space->device()), data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n", cpu_get_pc(&space.device()), data);
 }
 
-static WRITE16_HANDLER( darius_watchdog_w )
+WRITE16_MEMBER(darius_state::darius_watchdog_w)
 {
 	watchdog_reset_w(space, 0, data);
 }
@@ -172,50 +171,48 @@ static WRITE16_HANDLER( darius_watchdog_w )
                         GAME INPUTS
 **********************************************************/
 
-static READ16_HANDLER( darius_ioc_r )
+READ16_MEMBER(darius_state::darius_ioc_r)
 {
-	darius_state *state = space->machine().driver_data<darius_state>();
 
 	switch (offset)
 	{
 		case 0x01:
-			return (tc0140syt_comm_r(state->m_tc0140syt, 0) & 0xff);	/* sound interface read */
+			return (tc0140syt_comm_r(m_tc0140syt, 0) & 0xff);	/* sound interface read */
 
 		case 0x04:
-			return input_port_read(space->machine(), "P1");
+			return ioport("P1")->read();
 
 		case 0x05:
-			return input_port_read(space->machine(), "P2");
+			return ioport("P2")->read();
 
 		case 0x06:
-			return input_port_read(space->machine(), "SYSTEM");
+			return ioport("SYSTEM")->read();
 
 		case 0x07:
-			return state->m_coin_word;	/* bits 3&4 coin lockouts, must return zero */
+			return m_coin_word;	/* bits 3&4 coin lockouts, must return zero */
 
 		case 0x08:
-			return input_port_read(space->machine(), "DSW");
+			return ioport("DSW")->read();
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(&space->device()),offset);
+logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(&space.device()),offset);
 
 	return 0xff;
 }
 
-static WRITE16_HANDLER( darius_ioc_w )
+WRITE16_MEMBER(darius_state::darius_ioc_w)
 {
-	darius_state *state = space->machine().driver_data<darius_state>();
 
 	switch (offset)
 	{
 		case 0x00:	/* sound interface write */
 
-			tc0140syt_port_w(state->m_tc0140syt, 0, data & 0xff);
+			tc0140syt_port_w(m_tc0140syt, 0, data & 0xff);
 			return;
 
 		case 0x01:	/* sound interface write */
 
-			tc0140syt_comm_w(state->m_tc0140syt, 0, data & 0xff);
+			tc0140syt_comm_w(m_tc0140syt, 0, data & 0xff);
 			return;
 
 		case 0x28:	/* unknown, written by both cpus - always 0? */
@@ -225,16 +222,16 @@ static WRITE16_HANDLER( darius_ioc_w )
 		case 0x30:	/* coin control */
 			/* bits 7,5,4,0 used on reset */
 			/* bit 4 used whenever bg is blanked ? */
-			coin_lockout_w(space->machine(), 0, ~data & 0x02);
-			coin_lockout_w(space->machine(), 1, ~data & 0x04);
-			coin_counter_w(space->machine(), 0, data & 0x08);
-			coin_counter_w(space->machine(), 1, data & 0x40);
-			state->m_coin_word = data & 0xffff;
+			coin_lockout_w(machine(), 0, ~data & 0x02);
+			coin_lockout_w(machine(), 1, ~data & 0x04);
+			coin_counter_w(machine(), 0, data & 0x08);
+			coin_counter_w(machine(), 1, data & 0x40);
+			m_coin_word = data & 0xffff;
 //popmessage(" address %04x value %04x",offset,data);
 			return;
 	}
 
-logerror("CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",cpu_get_pc(&space->device()),offset,data);
+logerror("CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",cpu_get_pc(&space.device()),offset,data);
 }
 
 
@@ -242,31 +239,31 @@ logerror("CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",
                      MEMORY STRUCTURES
 ***********************************************************/
 
-static ADDRESS_MAP_START( darius_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( darius_map, AS_PROGRAM, 16, darius_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM												/* main RAM */
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(cpua_ctrl_w)
 	AM_RANGE(0x0b0000, 0x0b0001) AM_WRITE(darius_watchdog_w)
 	AM_RANGE(0xc00000, 0xc0007f) AM_READWRITE(darius_ioc_r, darius_ioc_w)			/* inputs, sound */
-	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_word_r, pc080sn_word_w)	/* tilemaps */
-	AM_RANGE(0xd20000, 0xd20003) AM_DEVWRITE("pc080sn", pc080sn_yscroll_word_w)
-	AM_RANGE(0xd40000, 0xd40003) AM_DEVWRITE("pc080sn", pc080sn_xscroll_word_w)
-	AM_RANGE(0xd50000, 0xd50003) AM_DEVWRITE("pc080sn", pc080sn_ctrl_word_w)
-	AM_RANGE(0xd80000, 0xd80fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)/* palette */
-	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("share1") AM_BASE_SIZE_MEMBER(darius_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE_LEGACY("pc080sn", pc080sn_word_r, pc080sn_word_w)	/* tilemaps */
+	AM_RANGE(0xd20000, 0xd20003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_yscroll_word_w)
+	AM_RANGE(0xd40000, 0xd40003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_xscroll_word_w)
+	AM_RANGE(0xd50000, 0xd50003) AM_DEVWRITE_LEGACY("pc080sn", pc080sn_ctrl_word_w)
+	AM_RANGE(0xd80000, 0xd80fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")/* palette */
+	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE("share3") AM_BASE_MEMBER(darius_state, m_fg_ram)
+	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE("fg_ram")
 	AM_RANGE(0xe10000, 0xe10fff) AM_RAM												/* ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( darius_cpub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( darius_cpub_map, AS_PROGRAM, 16, darius_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_RAM				/* local RAM */
 	AM_RANGE(0xc00000, 0xc0007f) AM_WRITE(darius_ioc_w)	/* only writes $c00050 (?) */
-	AM_RANGE(0xd80000, 0xd80fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w)
-	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xd80000, 0xd80fff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w)
+	AM_RANGE(0xe00100, 0xe00fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe01000, 0xe02fff) AM_RAM AM_SHARE("share2")
-	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE("share3")
+	AM_RANGE(0xe08000, 0xe0ffff) AM_RAM_WRITE(darius_fg_layer_w) AM_SHARE("fg_ram")
 ADDRESS_MAP_END
 
 
@@ -277,28 +274,26 @@ ADDRESS_MAP_END
 static void reset_sound_region( running_machine &machine )
 {
 	darius_state *state = machine.driver_data<darius_state>();
-	memory_set_bank(machine, "bank1", state->m_banknum);
+	state->membank("bank1")->set_entry(state->m_banknum);
 }
 
-static WRITE8_HANDLER( sound_bankswitch_w )
+WRITE8_MEMBER(darius_state::sound_bankswitch_w)
 {
-	darius_state *state = space->machine().driver_data<darius_state>();
 
-	state->m_banknum = data & 0x03;
-	reset_sound_region(space->machine());
+	m_banknum = data & 0x03;
+	reset_sound_region(machine());
 //  banknum = data;
 //  reset_sound_region();
 }
 
-static WRITE8_HANDLER( adpcm_command_w )
+WRITE8_MEMBER(darius_state::adpcm_command_w)
 {
-	darius_state *state = space->machine().driver_data<darius_state>();
-	state->m_adpcm_command = data;
+	m_adpcm_command = data;
 	/* logerror("#ADPCM command write =%2x\n",data); */
 }
 
 #if 0
-static WRITE8_HANDLER( display_value )
+WRITE8_MEMBER(darius_state::display_value)
 {
 	popmessage("d800=%x", data);
 }
@@ -391,43 +386,38 @@ static void update_da( running_machine &machine )
 		flt_volume_set_volume(state->m_msm5205_r, right / 100.0);
 }
 
-static WRITE8_HANDLER( darius_fm0_pan )
+WRITE8_MEMBER(darius_state::darius_fm0_pan)
 {
-	darius_state *state = space->machine().driver_data<darius_state>();
-	state->m_pan[0] = data & 0xff;  /* data 0x00:right 0xff:left */
-	update_fm0(space->machine());
+	m_pan[0] = data & 0xff;  /* data 0x00:right 0xff:left */
+	update_fm0(machine());
 }
 
-static WRITE8_HANDLER( darius_fm1_pan )
+WRITE8_MEMBER(darius_state::darius_fm1_pan)
 {
-	darius_state *state = space->machine().driver_data<darius_state>();
-	state->m_pan[1] = data & 0xff;
-	update_fm1(space->machine());
+	m_pan[1] = data & 0xff;
+	update_fm1(machine());
 }
 
-static WRITE8_HANDLER( darius_psg0_pan )
+WRITE8_MEMBER(darius_state::darius_psg0_pan)
 {
-	darius_state *state = space->machine().driver_data<darius_state>();
-	state->m_pan[2] = data & 0xff;
-	update_psg0(space->machine(), 0);
-	update_psg0(space->machine(), 1);
-	update_psg0(space->machine(), 2);
+	m_pan[2] = data & 0xff;
+	update_psg0(machine(), 0);
+	update_psg0(machine(), 1);
+	update_psg0(machine(), 2);
 }
 
-static WRITE8_HANDLER( darius_psg1_pan )
+WRITE8_MEMBER(darius_state::darius_psg1_pan)
 {
-	darius_state *state = space->machine().driver_data<darius_state>();
-	state->m_pan[3] = data & 0xff;
-	update_psg1(space->machine(), 0);
-	update_psg1(space->machine(), 1);
-	update_psg1(space->machine(), 2);
+	m_pan[3] = data & 0xff;
+	update_psg1(machine(), 0);
+	update_psg1(machine(), 1);
+	update_psg1(machine(), 2);
 }
 
-static WRITE8_HANDLER( darius_da_pan )
+WRITE8_MEMBER(darius_state::darius_da_pan)
 {
-	darius_state *state = space->machine().driver_data<darius_state>();
-	state->m_pan[4] = data & 0xff;
-	update_da(space->machine());
+	m_pan[4] = data & 0xff;
+	update_da(machine());
 }
 
 /**** Mixer Control ****/
@@ -490,13 +480,13 @@ static WRITE8_DEVICE_HANDLER( darius_write_portB1 )
            Sound memory structures / ADPCM
 *****************************************************/
 
-static ADDRESS_MAP_START( darius_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( darius_sound_map, AS_PROGRAM, 8, darius_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
-	AM_RANGE(0xb000, 0xb000) AM_READNOP AM_DEVWRITE("tc0140syt", tc0140syt_slave_port_w)
-	AM_RANGE(0xb001, 0xb001) AM_DEVREADWRITE("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
+	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0xb000, 0xb000) AM_READNOP AM_DEVWRITE_LEGACY("tc0140syt", tc0140syt_slave_port_w)
+	AM_RANGE(0xb001, 0xb001) AM_DEVREADWRITE_LEGACY("tc0140syt", tc0140syt_slave_comm_r, tc0140syt_slave_comm_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(darius_fm0_pan)
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(darius_fm1_pan)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(darius_psg0_pan)
@@ -507,7 +497,7 @@ static ADDRESS_MAP_START( darius_sound_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( darius_sound2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( darius_sound2_map, AS_PROGRAM, 8, darius_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_WRITENOP
 	/* yes, no RAM */
 ADDRESS_MAP_END
@@ -527,37 +517,34 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B		/* 8KHz   */
 };
 
-static READ8_HANDLER( adpcm_command_read )
+READ8_MEMBER(darius_state::adpcm_command_read)
 {
-	darius_state *state = space->machine().driver_data<darius_state>();
 
-	/* logerror("read port 0: %02x  PC=%4x\n",adpcm_command, cpu_get_pc(&space->device()) ); */
-	return state->m_adpcm_command;
+	/* logerror("read port 0: %02x  PC=%4x\n",adpcm_command, cpu_get_pc(&space.device()) ); */
+	return m_adpcm_command;
 }
 
-static READ8_HANDLER( readport2 )
+READ8_MEMBER(darius_state::readport2)
 {
 	return 0;
 }
 
-static READ8_HANDLER( readport3 )
+READ8_MEMBER(darius_state::readport3)
 {
 	return 0;
 }
 
-static WRITE8_HANDLER( adpcm_nmi_disable )
+WRITE8_MEMBER(darius_state::adpcm_nmi_disable)
 {
-	darius_state *state = space->machine().driver_data<darius_state>();
 
-	state->m_nmi_enable = 0;
-	/* logerror("write port 0: NMI DISABLE  PC=%4x\n", data, cpu_get_pc(&space->device()) ); */
+	m_nmi_enable = 0;
+	/* logerror("write port 0: NMI DISABLE  PC=%4x\n", data, cpu_get_pc(&space.device()) ); */
 }
 
-static WRITE8_HANDLER( adpcm_nmi_enable )
+WRITE8_MEMBER(darius_state::adpcm_nmi_enable)
 {
-	darius_state *state = space->machine().driver_data<darius_state>();
-	state->m_nmi_enable = 1;
-	/* logerror("write port 1: NMI ENABLE   PC=%4x\n", cpu_get_pc(&space->device()) ); */
+	m_nmi_enable = 1;
+	/* logerror("write port 1: NMI ENABLE   PC=%4x\n", cpu_get_pc(&space.device()) ); */
 }
 
 static WRITE8_DEVICE_HANDLER( adpcm_data_w )
@@ -566,11 +553,11 @@ static WRITE8_DEVICE_HANDLER( adpcm_data_w )
 	msm5205_reset_w(device, !(data & 0x20));	/* my best guess, but it could be output enable as well */
 }
 
-static ADDRESS_MAP_START( darius_sound2_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( darius_sound2_io_map, AS_IO, 8, darius_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(adpcm_command_read, adpcm_nmi_disable)
 	AM_RANGE(0x01, 0x01) AM_WRITE(adpcm_nmi_enable)
-	AM_RANGE(0x02, 0x02) AM_READ(readport2) AM_DEVWRITE("msm", adpcm_data_w)	/* readport2 ??? */
+	AM_RANGE(0x02, 0x02) AM_READ(readport2) AM_DEVWRITE_LEGACY("msm", adpcm_data_w)	/* readport2 ??? */
 	AM_RANGE(0x03, 0x03) AM_READ(readport3)	/* ??? */
 ADDRESS_MAP_END
 
@@ -855,9 +842,9 @@ static MACHINE_START( darius )
 {
 	darius_state *state = machine.driver_data<darius_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 4, machine.region("audiocpu")->base() + 0x10000, 0x8000);
-	memory_configure_bank(machine, "bank1", 4, 1, machine.region("audiocpu")->base(), 0x8000);
-	memory_set_bank(machine, "bank1", 4);
+	state->membank("bank1")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000, 0x8000);
+	state->membank("bank1")->configure_entry(4, state->memregion("audiocpu")->base());
+	state->membank("bank1")->set_entry(4);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
@@ -1288,7 +1275,7 @@ ROM_END
 static DRIVER_INIT( darius )
 {
 	/**** setup sound bank image ****/
-	UINT8 *RAM = machine.region("audiocpu")->base();
+	UINT8 *RAM = machine.root_device().memregion("audiocpu")->base();
 	int  i;
 
 	for (i = 3; i >= 0; i--)

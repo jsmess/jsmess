@@ -193,18 +193,16 @@ VIDEO_START( warpwarp )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( geebee_videoram_w )
+WRITE8_MEMBER(warpwarp_state::geebee_videoram_w)
 {
-	warpwarp_state *state = space->machine().driver_data<warpwarp_state>();
-	state->m_geebee_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_geebee_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( warpwarp_videoram_w )
+WRITE8_MEMBER(warpwarp_state::warpwarp_videoram_w)
 {
-	warpwarp_state *state = space->machine().driver_data<warpwarp_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
@@ -228,7 +226,7 @@ static void draw_ball(running_machine &machine, bitmap_ind16 &bitmap, const rect
 	{
 		int x,y,i,j;
 
-		if (flip_screen_get(machine) & 1) {
+		if (state->flip_screen() & 1) {
 			x = 376 - state->m_ball_h;
 			y = 280 - state->m_ball_v;
 		}

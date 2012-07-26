@@ -25,8 +25,9 @@ class pet_state : public driver_device
 public:
 	pet_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_ieee(*this, IEEE488_TAG)
-	{ }
+		  m_ieee(*this, IEEE488_TAG),
+		m_videoram(*this, "videoram"),
+		m_memory(*this, "memory"){ }
 
 	required_device<ieee488_device> m_ieee;
 
@@ -37,9 +38,9 @@ public:
 	int m_pia0_irq;
 	int m_pia1_irq;
 	int m_via_irq;
-	UINT8 *m_videoram;
+	optional_shared_ptr<UINT8> m_videoram;
 	int m_font;
-	UINT8 *m_memory;
+	optional_shared_ptr<UINT8> m_memory;
 	UINT8 *m_supermemory;
 	UINT8 *m_pet80_bank1_base;
 	int m_keyline_select;

@@ -39,60 +39,55 @@ NOTE: An eBay auction of the PCB shows "1996.9.16 PROMAT" on the JAMMA+ adapter 
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 
-static READ16_HANDLER( oneshot_in0_word_r )
+READ16_MEMBER(oneshot_state::oneshot_in0_word_r)
 {
-	oneshot_state *state = space->machine().driver_data<oneshot_state>();
-	int data = input_port_read(space->machine(), "DSW1");
+	int data = ioport("DSW1")->read();
 
 	switch (data & 0x0c)
 	{
 		case 0x00 :
-			state->m_gun_x_shift = 35;
+			m_gun_x_shift = 35;
 			break;
 		case 0x04 :
-			state->m_gun_x_shift = 30;
+			m_gun_x_shift = 30;
 			break;
 		case 0x08 :
-			state->m_gun_x_shift = 40;
+			m_gun_x_shift = 40;
 			break;
 		case 0x0c :
-			state->m_gun_x_shift = 50;
+			m_gun_x_shift = 50;
 			break;
 	}
 
 	return data;
 }
 
-static READ16_HANDLER( oneshot_gun_x_p1_r )
+READ16_MEMBER(oneshot_state::oneshot_gun_x_p1_r)
 {
-	oneshot_state *state = space->machine().driver_data<oneshot_state>();
 
 	/* shots must be in a different location to register */
-	state->m_p1_wobble ^= 1;
+	m_p1_wobble ^= 1;
 
-	return state->m_gun_x_p1 ^ state->m_p1_wobble;
+	return m_gun_x_p1 ^ m_p1_wobble;
 }
 
-static READ16_HANDLER( oneshot_gun_y_p1_r )
+READ16_MEMBER(oneshot_state::oneshot_gun_y_p1_r)
 {
-	oneshot_state *state = space->machine().driver_data<oneshot_state>();
-	return state->m_gun_y_p1;
+	return m_gun_y_p1;
 }
 
-static READ16_HANDLER( oneshot_gun_x_p2_r )
+READ16_MEMBER(oneshot_state::oneshot_gun_x_p2_r)
 {
-	oneshot_state *state = space->machine().driver_data<oneshot_state>();
 
 	/* shots must be in a different location to register */
-	state->m_p2_wobble ^= 1;
+	m_p2_wobble ^= 1;
 
-	return state->m_gun_x_p2 ^ state->m_p2_wobble;
+	return m_gun_x_p2 ^ m_p2_wobble;
 }
 
-static READ16_HANDLER( oneshot_gun_y_p2_r )
+READ16_MEMBER(oneshot_state::oneshot_gun_y_p2_r)
 {
-	oneshot_state *state = space->machine().driver_data<oneshot_state>();
-	return state->m_gun_y_p2;
+	return m_gun_y_p2;
 }
 
 static WRITE16_DEVICE_HANDLER( soundbank_w )
@@ -105,18 +100,18 @@ static WRITE16_DEVICE_HANDLER( soundbank_w )
 
 
 
-static ADDRESS_MAP_START( oneshot_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( oneshot_map, AS_PROGRAM, 16, oneshot_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM
-	AM_RANGE(0x0c0000, 0x0c07ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x120000, 0x120fff) AM_RAM AM_BASE_MEMBER(oneshot_state, m_sprites)
-	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(oneshot_mid_videoram_w) AM_BASE_MEMBER(oneshot_state, m_mid_videoram) // some people , girl etc.
-	AM_RANGE(0x181000, 0x181fff) AM_RAM_WRITE(oneshot_fg_videoram_w) AM_BASE_MEMBER(oneshot_state, m_fg_videoram) // credits etc.
-	AM_RANGE(0x182000, 0x182fff) AM_RAM_WRITE(oneshot_bg_videoram_w) AM_BASE_MEMBER(oneshot_state, m_bg_videoram) // credits etc.
-	AM_RANGE(0x188000, 0x18800f) AM_WRITEONLY AM_BASE_MEMBER(oneshot_state, m_scroll)	// scroll registers
+	AM_RANGE(0x0c0000, 0x0c07ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x120000, 0x120fff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0x180000, 0x180fff) AM_RAM_WRITE(oneshot_mid_videoram_w) AM_SHARE("mid_videoram") // some people , girl etc.
+	AM_RANGE(0x181000, 0x181fff) AM_RAM_WRITE(oneshot_fg_videoram_w) AM_SHARE("fg_videoram") // credits etc.
+	AM_RANGE(0x182000, 0x182fff) AM_RAM_WRITE(oneshot_bg_videoram_w) AM_SHARE("bg_videoram") // credits etc.
+	AM_RANGE(0x188000, 0x18800f) AM_WRITEONLY AM_SHARE("scroll")	// scroll registers
 	AM_RANGE(0x190002, 0x190003) AM_READ(soundlatch_word_r)
 	AM_RANGE(0x190010, 0x190011) AM_WRITE(soundlatch_word_w)
-	AM_RANGE(0x190018, 0x190019) AM_DEVWRITE("oki", soundbank_w)
+	AM_RANGE(0x190018, 0x190019) AM_DEVWRITE_LEGACY("oki", soundbank_w)
 	AM_RANGE(0x190026, 0x190027) AM_READ(oneshot_gun_x_p1_r)
 	AM_RANGE(0x19002e, 0x19002f) AM_READ(oneshot_gun_x_p2_r)
 	AM_RANGE(0x190036, 0x190037) AM_READ(oneshot_gun_y_p1_r)
@@ -128,12 +123,12 @@ static ADDRESS_MAP_START( oneshot_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x19c034, 0x19c035) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oneshot_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( oneshot_sound_map, AS_PROGRAM, 8, oneshot_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_READWRITE(soundlatch_r,soundlatch_w)
+	AM_RANGE(0x8000, 0x8000) AM_READWRITE(soundlatch_byte_r,soundlatch_byte_w)
 	AM_RANGE(0x8001, 0x87ff) AM_RAM
-	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym3812_r,ym3812_w)
-	AM_RANGE(0xe010, 0xe010) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r,ym3812_w)
+	AM_RANGE(0xe010, 0xe010) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 

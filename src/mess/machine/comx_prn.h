@@ -12,7 +12,6 @@
 #ifndef __COMX_PRN__
 #define __COMX_PRN__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/comxexp.h"

@@ -135,32 +135,30 @@ HT-01B
 #define VBSTART				(224+16)
 
 
-static READ8_HANDLER( thepit_colorram_r )
+READ8_MEMBER(thepit_state::thepit_colorram_r)
 {
-	thepit_state *state = space->machine().driver_data<thepit_state>();
-	return state->m_colorram[offset];
+	return m_colorram[offset];
 }
 
-static WRITE8_HANDLER( thepit_sound_enable_w )
+WRITE8_MEMBER(thepit_state::thepit_sound_enable_w)
 {
-	space->machine().sound().system_enable(data);
+	machine().sound().system_enable(data);
 }
 
-static WRITE8_HANDLER( nmi_mask_w )
+WRITE8_MEMBER(thepit_state::nmi_mask_w)
 {
-	thepit_state *state = space->machine().driver_data<thepit_state>();
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
 
-static ADDRESS_MAP_START( thepit_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( thepit_main_map, AS_PROGRAM, 8, thepit_state )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x0400) AM_RAM_WRITE(thepit_colorram_w) AM_BASE_MEMBER(thepit_state, m_colorram)
-	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(thepit_videoram_w) AM_BASE_MEMBER(thepit_state, m_videoram)
-	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM AM_BASE_MEMBER(thepit_state, m_attributesram)
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE_MEMBER(thepit_state, m_spriteram) AM_SIZE_MEMBER(thepit_state, m_spriteram_size)
+	AM_RANGE(0x8800, 0x8bff) AM_MIRROR(0x0400) AM_RAM_WRITE(thepit_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x9000, 0x93ff) AM_MIRROR(0x0400) AM_RAM_WRITE(thepit_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM AM_SHARE("attributesram")
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9860, 0x98ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(thepit_input_port_0_r) AM_WRITENOP // Not hooked up according to the schematics
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
@@ -171,17 +169,17 @@ static ADDRESS_MAP_START( thepit_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb004, 0xb005) AM_WRITENOP // Unused, but initialized
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(thepit_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(thepit_flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_READWRITE(watchdog_reset_r, soundlatch_w)
+	AM_RANGE(0xb800, 0xb800) AM_READWRITE(watchdog_reset_r, soundlatch_byte_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( intrepid_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( intrepid_main_map, AS_PROGRAM, 8, thepit_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8c00, 0x8fff) AM_READWRITE(thepit_colorram_r, thepit_colorram_w) /* mirror for intrepi2 */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(thepit_videoram_w) AM_BASE_MEMBER(thepit_state, m_videoram)
-	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(thepit_colorram_w) AM_BASE_MEMBER(thepit_state, m_colorram)
-	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM AM_BASE_MEMBER(thepit_state, m_attributesram)
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE_MEMBER(thepit_state, m_spriteram) AM_SIZE_MEMBER(thepit_state, m_spriteram_size)
+	AM_RANGE(0x8c00, 0x8fff) AM_READ(thepit_colorram_r) AM_WRITE(thepit_colorram_w) /* mirror for intrepi2 */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(thepit_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(thepit_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM AM_SHARE("attributesram")
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9860, 0x98ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(thepit_input_port_0_r)
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
@@ -193,23 +191,23 @@ static ADDRESS_MAP_START( intrepid_main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb005, 0xb005) AM_WRITE(intrepid_graphics_bank_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(thepit_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(thepit_flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_READWRITE(watchdog_reset_r, soundlatch_w)
+	AM_RANGE(0xb800, 0xb800) AM_READWRITE(watchdog_reset_r, soundlatch_byte_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, thepit_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( audio_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, thepit_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_w)
-	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x8d, 0x8d) AM_DEVREAD("ay2", ay8910_r)
-	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x8f, 0x8f) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_byte_w)
+	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x8d, 0x8d) AM_DEVREAD_LEGACY("ay2", ay8910_r)
+	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x8f, 0x8f) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 ADDRESS_MAP_END
 
 
@@ -538,14 +536,14 @@ static INPUT_PORTS_START( rtriv )
 	PORT_DIPSETTING(    0x20, "Number of Wrong Answer" )
 	PORT_DIPSETTING(    0x00, "Number of Good Answer for Bonus Question" )
 	PORT_DIPNAME( 0xc0, 0x40, "Gaming Option Number" )
-	PORT_DIPSETTING(    0x00, "2" ) PORT_CONDITION("DSW", 0x20, PORTCOND_EQUALS, 0x20)
-	PORT_DIPSETTING(    0x40, "3" ) PORT_CONDITION("DSW", 0x20, PORTCOND_EQUALS, 0x20)
-	PORT_DIPSETTING(    0x80, "4" ) PORT_CONDITION("DSW", 0x20, PORTCOND_EQUALS, 0x20)
-	PORT_DIPSETTING(    0xc0, "5" ) PORT_CONDITION("DSW", 0x20, PORTCOND_EQUALS, 0x20)
-	PORT_DIPSETTING(    0x00, "4" ) PORT_CONDITION("DSW", 0x20, PORTCOND_NOTEQUALS, 0x20)
-	PORT_DIPSETTING(    0x40, "5" ) PORT_CONDITION("DSW", 0x20, PORTCOND_NOTEQUALS, 0x20)
-	PORT_DIPSETTING(    0x80, "6" ) PORT_CONDITION("DSW", 0x20, PORTCOND_NOTEQUALS, 0x20)
-	PORT_DIPSETTING(    0xc0, "7" ) PORT_CONDITION("DSW", 0x20, PORTCOND_NOTEQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "2" ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x40, "3" ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x80, "4" ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0xc0, "5" ) PORT_CONDITION("DSW", 0x20, EQUALS, 0x20)
+	PORT_DIPSETTING(    0x00, "4" ) PORT_CONDITION("DSW", 0x20, NOTEQUALS, 0x20)
+	PORT_DIPSETTING(    0x40, "5" ) PORT_CONDITION("DSW", 0x20, NOTEQUALS, 0x20)
+	PORT_DIPSETTING(    0x80, "6" ) PORT_CONDITION("DSW", 0x20, NOTEQUALS, 0x20)
+	PORT_DIPSETTING(    0xc0, "7" ) PORT_CONDITION("DSW", 0x20, NOTEQUALS, 0x20)
 
 	/* Since the real inputs are multiplexed, we used this fake port
        to read the 2nd player controls when the screen is flipped */
@@ -631,7 +629,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
@@ -1066,27 +1064,26 @@ ROM_END
 */
 
 
-static READ8_HANDLER( rtriv_question_r )
+READ8_MEMBER(thepit_state::rtriv_question_r)
 {
-	thepit_state *state = space->machine().driver_data<thepit_state>();
 	// Set-up the remap table for every 16 bytes
 	if((offset & 0xc00) == 0x800)
 	{
-		state->m_remap_address[offset & 0x0f] = ((offset & 0xf0) >> 4) ^ 0x0f;
+		m_remap_address[offset & 0x0f] = ((offset & 0xf0) >> 4) ^ 0x0f;
 	}
 	// Select which rom to read and the high 5 bits of address
 	else if((offset & 0xc00) == 0x400)
 	{
-		state->m_question_rom = (offset & 0x70) >> 4;
-		state->m_question_address = ((offset & 0x80) << 3) | ((offset & 0x0f) << 11);
+		m_question_rom = (offset & 0x70) >> 4;
+		m_question_address = ((offset & 0x80) << 3) | ((offset & 0x0f) << 11);
 	}
 	// Read the actual byte from question roms
 	else if((offset & 0xc00) == 0xc00)
 	{
-		UINT8 *ROM = space->machine().region("user1")->base();
+		UINT8 *ROM = memregion("user1")->base();
 		int real_address;
 
-		real_address = (0x8000 * state->m_question_rom) | state->m_question_address | (offset & 0x3f0) | state->m_remap_address[offset & 0x0f];
+		real_address = (0x8000 * m_question_rom) | m_question_address | (offset & 0x3f0) | m_remap_address[offset & 0x0f];
 
 		return ROM[real_address];
 	}
@@ -1097,7 +1094,8 @@ static READ8_HANDLER( rtriv_question_r )
 static DRIVER_INIT( rtriv )
 {
 	// Set-up the weirdest questions read ever done
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x4000, 0x4fff, FUNC(rtriv_question_r));
+	thepit_state *state = machine.driver_data<thepit_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x4000, 0x4fff, read8_delegate(FUNC(thepit_state::rtriv_question_r),state));
 }
 
 

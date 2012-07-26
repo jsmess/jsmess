@@ -4,7 +4,7 @@
 void newbrain_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = machine().region("chargen")->base();
+	m_char_rom = memregion("chargen")->base();
 
 	/* register for state saving */
 	save_item(NAME(m_tvcnsl));

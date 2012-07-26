@@ -85,7 +85,7 @@
 #include "includes/hec2hrp.h"
 
 /*****************************************************************************/
-static ADDRESS_MAP_START(hecdisc2_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(hecdisc2_mem, AS_PROGRAM, 8, hec2hrp_state )
 /*****************************************************************************/
 	ADDRESS_MAP_UNMAP_HIGH
 
@@ -96,106 +96,106 @@ static ADDRESS_MAP_START(hecdisc2_mem, AS_PROGRAM, 8)
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hecdisc2_io , AS_IO, 8)
+static ADDRESS_MAP_START( hecdisc2_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// ROM Page managing
-	AM_RANGE(0x000,0x00f) AM_READWRITE( hector_disc2_io00_port_r, hector_disc2_io00_port_w )
+	AM_RANGE(0x000,0x00f) AM_READWRITE_LEGACY(hector_disc2_io00_port_r, hector_disc2_io00_port_w )
 	// RS232 - 8251 managing
-	AM_RANGE(0x020,0x02f) AM_READWRITE( hector_disc2_io20_port_r, hector_disc2_io20_port_w )
+	AM_RANGE(0x020,0x02f) AM_READWRITE_LEGACY(hector_disc2_io20_port_r, hector_disc2_io20_port_w )
 	// Hector communication managing
-	AM_RANGE(0x030,0x03f) AM_READWRITE( hector_disc2_io30_port_r, hector_disc2_io30_port_w )
-	AM_RANGE(0x040,0x04f) AM_READWRITE( hector_disc2_io40_port_r, hector_disc2_io40_port_w )
-	AM_RANGE(0x050,0x05f) AM_READWRITE( hector_disc2_io50_port_r, hector_disc2_io50_port_w )
+	AM_RANGE(0x030,0x03f) AM_READWRITE_LEGACY(hector_disc2_io30_port_r, hector_disc2_io30_port_w )
+	AM_RANGE(0x040,0x04f) AM_READWRITE_LEGACY(hector_disc2_io40_port_r, hector_disc2_io40_port_w )
+	AM_RANGE(0x050,0x05f) AM_READWRITE_LEGACY(hector_disc2_io50_port_r, hector_disc2_io50_port_w )
 	// uPD765 link:
-	AM_RANGE(0x060,0x060) AM_DEVREAD	 ("upd765",upd765_status_r			  )
-//  AM_RANGE(0x061,0x061) AM_DEVREADWRITE("upd765",upd765_data_r,upd765_data_w)
-//  AM_RANGE(0x070,0x07f) AM_DEVREADWRITE("upd765",upd765_dack_r,upd765_dack_w)
-AM_RANGE(0x061,0x061) AM_READWRITE( hector_disc2_io61_port_r, hector_disc2_io61_port_w )//patched version
-AM_RANGE(0x070,0x07F) AM_READWRITE( hector_disc2_io70_port_r, hector_disc2_io70_port_w )//patched version
+	AM_RANGE(0x060,0x060) AM_DEVREAD_LEGACY("upd765",upd765_status_r			  )
+//  AM_RANGE(0x061,0x061) AM_DEVREADWRITE_LEGACY("upd765",upd765_data_r,upd765_data_w)
+//  AM_RANGE(0x070,0x07f) AM_DEVREADWRITE_LEGACY("upd765",upd765_dack_r,upd765_dack_w)
+AM_RANGE(0x061,0x061) AM_READWRITE_LEGACY(hector_disc2_io61_port_r, hector_disc2_io61_port_w )//patched version
+AM_RANGE(0x070,0x07F) AM_READWRITE_LEGACY(hector_disc2_io70_port_r, hector_disc2_io70_port_w )//patched version
 ADDRESS_MAP_END
 
 /*****************************************************************************/
-static ADDRESS_MAP_START(hec2hrp_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(hec2hrp_mem, AS_PROGRAM, 8, hec2hrp_state )
 /*****************************************************************************/
 	ADDRESS_MAP_UNMAP_HIGH
 	/* Hardware address mapping*/
-	AM_RANGE(0x0800,0x0808) AM_WRITE( hector_switch_bank_w)/* Bank management*/
-	AM_RANGE(0x1000,0x1000) AM_WRITE( hector_color_a_w)  /* Color c0/c1*/
-	AM_RANGE(0x1800,0x1800) AM_WRITE( hector_color_b_w)  /* Color c2/c3*/
-	AM_RANGE(0x2000,0x2003) AM_WRITE( hector_sn_2000_w)  /* Sound*/
-	AM_RANGE(0x2800,0x2803) AM_WRITE( hector_sn_2800_w)  /* Sound*/
-	AM_RANGE(0x3000,0x3000) AM_READWRITE( hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
-	AM_RANGE(0x3800,0x3807) AM_READWRITE( hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
+	AM_RANGE(0x0800,0x0808) AM_WRITE(hector_switch_bank_w)/* Bank management*/
+	AM_RANGE(0x1000,0x1000) AM_WRITE(hector_color_a_w)  /* Color c0/c1*/
+	AM_RANGE(0x1800,0x1800) AM_WRITE(hector_color_b_w)  /* Color c2/c3*/
+	AM_RANGE(0x2000,0x2003) AM_WRITE(hector_sn_2000_w)  /* Sound*/
+	AM_RANGE(0x2800,0x2803) AM_WRITE(hector_sn_2800_w)  /* Sound*/
+	AM_RANGE(0x3000,0x3000) AM_READWRITE(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
+	AM_RANGE(0x3800,0x3807) AM_READWRITE(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
 
 	/* Main ROM page*/
 	AM_RANGE(0x0000,0x3fff) AM_ROM
 
 	/* Video br mapping*/
-	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_MEMBER(hec2hrp_state, m_videoram)
+	AM_RANGE(0x4000,0x49ff) AM_RAM AM_SHARE("videoram")
 	/* continous RAM*/
 	AM_RANGE(0x4A00,0xbfff) AM_RAM
 	/* from 0xC000 to 0xFFFF => Bank Ram for video and data !*/
-	AM_RANGE(0xc000,0xffff) AM_RAM AM_BASE_MEMBER(hec2hrp_state, m_hector_videoram)
+	AM_RANGE(0xc000,0xffff) AM_RAM AM_SHARE("hector_videoram")
 ADDRESS_MAP_END
 
 /*****************************************************************************/
-static ADDRESS_MAP_START(hec2hrx_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(hec2hrx_mem, AS_PROGRAM, 8, hec2hrp_state )
 /*****************************************************************************/
 	ADDRESS_MAP_UNMAP_HIGH
 	/* Hardware address mapping*/
-	AM_RANGE(0x0800,0x0808) AM_WRITE( hector_switch_bank_w)/* Bank management*/
-	AM_RANGE(0x1000,0x1000) AM_WRITE( hector_color_a_w)  /* Color c0/c1*/
-	AM_RANGE(0x1800,0x1800) AM_WRITE( hector_color_b_w)  /* Color c2/c3*/
-	AM_RANGE(0x2000,0x2003) AM_WRITE( hector_sn_2000_w)  /* Sound*/
-	AM_RANGE(0x2800,0x2803) AM_WRITE( hector_sn_2800_w)  /* Sound*/
-	AM_RANGE(0x3000,0x3000) AM_READWRITE( hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
-	AM_RANGE(0x3800,0x3807) AM_READWRITE( hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
+	AM_RANGE(0x0800,0x0808) AM_WRITE(hector_switch_bank_w)/* Bank management*/
+	AM_RANGE(0x1000,0x1000) AM_WRITE(hector_color_a_w)  /* Color c0/c1*/
+	AM_RANGE(0x1800,0x1800) AM_WRITE(hector_color_b_w)  /* Color c2/c3*/
+	AM_RANGE(0x2000,0x2003) AM_WRITE(hector_sn_2000_w)  /* Sound*/
+	AM_RANGE(0x2800,0x2803) AM_WRITE(hector_sn_2800_w)  /* Sound*/
+	AM_RANGE(0x3000,0x3000) AM_READWRITE(hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
+	AM_RANGE(0x3800,0x3807) AM_READWRITE(hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
 
 	/* Main ROM page*/
 	AM_RANGE(0x0000,0x3fff) AM_ROMBANK("bank2")
 
 	/* Video br mapping*/
-	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_MEMBER(hec2hrp_state, m_videoram)
+	AM_RANGE(0x4000,0x49ff) AM_RAM AM_SHARE("videoram")
 	/* continous RAM*/
 	AM_RANGE(0x4A00,0xbfff) AM_RAM
 	/* from 0xC000 to 0xFFFF => Bank Ram for video and data !*/
-	AM_RANGE(0xc000,0xffff) AM_RAMBANK("bank1") AM_BASE_MEMBER(hec2hrp_state, m_hector_videoram)
+	AM_RANGE(0xc000,0xffff) AM_RAMBANK("bank1") AM_SHARE("hector_videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hec2hrp_io , AS_IO, 8)
+static ADDRESS_MAP_START( hec2hrp_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000,0x0ff) AM_READWRITE( hector_io_8255_r, hector_io_8255_w )
+	AM_RANGE(0x000,0x0ff) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hec2hrx_io , AS_IO, 8)
+static ADDRESS_MAP_START( hec2hrx_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x0f0,0x0ff) AM_READWRITE( hector_io_8255_r, hector_io_8255_w )
+	AM_RANGE(0x0f0,0x0ff) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hec2mdhrx_io , AS_IO, 8)
+static ADDRESS_MAP_START( hec2mdhrx_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	// Minidisc commands and changing the rom page !*/
-	AM_RANGE(0x000,0x0EF) AM_READWRITE( hector_179x_register_r,hector_179x_register_w)/* 179x registers*/
-	AM_RANGE(0x0f0,0x0ff) AM_READWRITE( hector_io_8255_r, hector_io_8255_w )
+	AM_RANGE(0x000,0x0EF) AM_READWRITE(hector_179x_register_r,hector_179x_register_w)/* 179x registers*/
+	AM_RANGE(0x0f0,0x0ff) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hec2mx40_io , AS_IO, 8)
+static ADDRESS_MAP_START( hec2mx40_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000,0x0ef) AM_WRITE(     hector_mx40_io_port_w )
-	AM_RANGE(0x0f0,0x0f3) AM_READWRITE( hector_io_8255_r, hector_io_8255_w )
+	AM_RANGE(0x000,0x0ef) AM_WRITE(hector_mx40_io_port_w )
+	AM_RANGE(0x0f0,0x0f3) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hec2mx80_io , AS_IO, 8)
+static ADDRESS_MAP_START( hec2mx80_io , AS_IO, 8, hec2hrp_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x000,0x0ef) AM_WRITE(     hector_mx80_io_port_w )
-	AM_RANGE(0x0f0,0x0f3) AM_READWRITE( hector_io_8255_r, hector_io_8255_w )
+	AM_RANGE(0x000,0x0ef) AM_WRITE(hector_mx80_io_port_w )
+	AM_RANGE(0x0f0,0x0f3) AM_READWRITE(hector_io_8255_r, hector_io_8255_w )
 
 
 ADDRESS_MAP_END
@@ -308,32 +308,32 @@ static MACHINE_START( hec2hrx )
 /*****************************************************************************/
 {
 	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
-	UINT8 *RAM   = machine.region("maincpu"  )->base();	// pointer to mess ram
+	UINT8 *RAM   = machine.root_device().memregion("maincpu"  )->base();	// pointer to mess ram
 	//Patch rom possible !
 	//RAMD2[0xff6b] = 0x0ff; // force verbose mode hector !
 
 	// Memory install for bank switching
-	memory_configure_bank(machine, "bank1", HECTOR_BANK_PROG , 1, &RAM[0xc000]   , 0); // Mess ram
-	memory_configure_bank(machine, "bank1", HECTOR_BANK_VIDEO, 1, state->m_hector_videoram_hrx, 0); // Video ram
+	state->membank("bank1")->configure_entry(HECTOR_BANK_PROG , &RAM[0xc000]   ); // Mess ram
+	state->membank("bank1")->configure_entry(HECTOR_BANK_VIDEO, state->m_hector_videoram_hrx); // Video ram
 
 	// Set bank HECTOR_BANK_PROG as basic bank
-	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
+	state->membank("bank1")->set_entry(HECTOR_BANK_PROG);
 
 /******************************************************SPECIFIQUE MX ***************************/
-	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE0 , 1, &RAM[0x0000]                    , 0); // Mess ram
-	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE1 , 1, machine.region("page1")->base() , 0); // Rom page 1
-	memory_configure_bank(machine, "bank2", HECTORMX_BANK_PAGE2 , 1, machine.region("page2")->base() , 0); // Rom page 2
-	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
+	state->membank("bank2")->configure_entry(HECTORMX_BANK_PAGE0 , &RAM[0x0000]                    ); // Mess ram
+	state->membank("bank2")->configure_entry(HECTORMX_BANK_PAGE1 , machine.root_device().memregion("page1")->base() ); // Rom page 1
+	state->membank("bank2")->configure_entry(HECTORMX_BANK_PAGE2 , machine.root_device().memregion("page2")->base() ); // Rom page 2
+	state->membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
 /******************************************************SPECIFIQUE MX ***************************/
 
 /*************************************************SPECIFIQUE DISK II ***************************/
-	memory_configure_bank(machine, "bank3", DISCII_BANK_ROM , 1, machine.region("rom_disc2")->base() , 0); // ROM
-	memory_configure_bank(machine, "bank3", DISCII_BANK_RAM , 1, machine.region("disc2mem" )->base() , 0); // RAM
-	memory_set_bank(machine, "bank3", DISCII_BANK_ROM);
+	state->membank("bank3")->configure_entry(DISCII_BANK_ROM , machine.root_device().memregion("rom_disc2")->base() ); // ROM
+	state->membank("bank3")->configure_entry(DISCII_BANK_RAM , state->memregion("disc2mem" )->base() ); // RAM
+	state->membank("bank3")->set_entry(DISCII_BANK_ROM);
 /*************************************************SPECIFIQUE DISK II ***************************/
 
 	// As video HR ram is in bank, use extern memory
-	state->m_hector_videoram  = state->m_hector_videoram_hrx;
+	state->m_hector_videoram.set_target(state->m_hector_videoram_hrx,state->m_hector_videoram.bytes());
 
 	hector_init(machine);
 	hector_disc2_init(machine); // Init of the Disc II !
@@ -344,34 +344,35 @@ static MACHINE_START( hec2mdhrx )
 //minidisc
 {
 	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
-	UINT8 *RAM   = machine.region("maincpu"  )->base();	// pointer to mess ram
+	UINT8 *RAM   = machine.root_device().memregion("maincpu"  )->base();	// pointer to mess ram
 
 	// Memory install for bank switching
-	memory_configure_bank(machine, "bank1", HECTOR_BANK_PROG , 1, &RAM[0xc000]   , 0); // Mess ram
-	memory_configure_bank(machine, "bank1", HECTOR_BANK_VIDEO, 1, state->m_hector_videoram_hrx, 0); // Video ram
+	state->membank("bank1")->configure_entry(HECTOR_BANK_PROG , &RAM[0xc000]   ); // Mess ram
+	state->membank("bank1")->configure_entry(HECTOR_BANK_VIDEO, state->m_hector_videoram_hrx); // Video ram
 
 	// Set bank HECTOR_BANK_PROG as basic bank
-	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
+	state->membank("bank1")->set_entry(HECTOR_BANK_PROG);
 	//Here the bank 5 is not used for the language switch but for the floppy ROM.....
 	/******************************************************SPECIFIQUE Mini disque ***************************/
-	memory_configure_bank(machine, "bank2", HECTOR_BANK_BASE , 1, &RAM[0x0000]                    , 0); // Rom base page
-	memory_configure_bank(machine, "bank2", HECTOR_BANK_DISC , 1, machine.region("page2")->base() , 0); // Rom page mini disc
-	memory_set_bank(machine, "bank2", HECTOR_BANK_BASE);
+	state->membank("bank2")->configure_entry(HECTOR_BANK_BASE , &RAM[0x0000]                    ); // Rom base page
+	state->membank("bank2")->configure_entry(HECTOR_BANK_DISC , state->memregion("page2")->base() ); // Rom page mini disc
+	state->membank("bank2")->set_entry(HECTOR_BANK_BASE);
 	/******************************************************SPECIFIQUE Mini disque ***************************/
 
 	// As video HR ram is in bank, use extern memory
-	state->m_hector_videoram  = state->m_hector_videoram_hrx;
+	state->m_hector_videoram.set_target(state->m_hector_videoram_hrx,state->m_hector_videoram.bytes());
 
 	hector_init(machine);
 	hector_minidisc_init(machine);
 }
 static MACHINE_RESET(hec2hrx)
 {
+	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
 	//Hector Memory
-	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
-	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
+	state->membank("bank1")->set_entry(HECTOR_BANK_PROG);
+	state->membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
 	//DISK II Memory
-	memory_set_bank(machine, "bank3", DISCII_BANK_ROM);
+	state->membank("bank3")->set_entry(DISCII_BANK_ROM);
 
 	// Machines init
 	hector_reset(machine, 1, 1);
@@ -380,9 +381,10 @@ static MACHINE_RESET(hec2hrx)
 //minidisc
 static MACHINE_RESET(hec2mdhrx)
 {
+	hec2hrp_state *state = machine.driver_data<hec2hrp_state>();
 	//Hector Memory
-	memory_set_bank(machine, "bank1", HECTOR_BANK_PROG);
-	memory_set_bank(machine, "bank2", HECTORMX_BANK_PAGE0);
+	state->membank("bank1")->set_entry(HECTOR_BANK_PROG);
+	state->membank("bank2")->set_entry(HECTORMX_BANK_PAGE0);
 
 	// Machines init
 	hector_reset(machine, 1, 0);

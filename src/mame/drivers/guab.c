@@ -81,6 +81,15 @@ public:
 	struct ef9369 m_pal;
 	emu_timer *m_fdc_timer;
 	struct wd1770 m_fdc;
+	DECLARE_WRITE16_MEMBER(guab_tms34061_w);
+	DECLARE_READ16_MEMBER(guab_tms34061_r);
+	DECLARE_WRITE16_MEMBER(ef9369_w);
+	DECLARE_READ16_MEMBER(ef9369_r);
+	DECLARE_WRITE16_MEMBER(wd1770_w);
+	DECLARE_READ16_MEMBER(wd1770_r);
+	DECLARE_READ16_MEMBER(io_r);
+	DECLARE_WRITE16_MEMBER(io_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 
@@ -128,7 +137,7 @@ static const struct tms34061_interface tms34061intf =
 };
 
 
-static WRITE16_HANDLER( guab_tms34061_w )
+WRITE16_MEMBER(guab_state::guab_tms34061_w)
 {
 	int func = (offset >> 19) & 3;
 	int row = (offset >> 7) & 0xff;
@@ -140,14 +149,14 @@ static WRITE16_HANDLER( guab_tms34061_w )
 		col = offset <<= 1;
 
 	if (ACCESSING_BITS_8_15)
-		tms34061_w(space, col, row, func, data >> 8);
+		tms34061_w(&space, col, row, func, data >> 8);
 
 	if (ACCESSING_BITS_0_7)
-		tms34061_w(space, col | 1, row, func, data & 0xff);
+		tms34061_w(&space, col | 1, row, func, data & 0xff);
 }
 
 
-static READ16_HANDLER( guab_tms34061_r )
+READ16_MEMBER(guab_state::guab_tms34061_r)
 {
 	UINT16 data = 0;
 	int func = (offset >> 19) & 3;
@@ -160,10 +169,10 @@ static READ16_HANDLER( guab_tms34061_r )
 		col = offset <<= 1;
 
 	if (ACCESSING_BITS_8_15)
-		data |= tms34061_r(space, col, row, func) << 8;
+		data |= tms34061_r(&space, col, row, func) << 8;
 
 	if (ACCESSING_BITS_0_7)
-		data |= tms34061_r(space, col | 1, row, func);
+		data |= tms34061_r(&space, col | 1, row, func);
 
 	return data;
 }
@@ -175,10 +184,9 @@ static READ16_HANDLER( guab_tms34061_r )
  ****************************/
 
 /* Non-multiplexed mode */
-static WRITE16_HANDLER( ef9369_w )
+WRITE16_MEMBER(guab_state::ef9369_w)
 {
-	guab_state *state = space->machine().driver_data<guab_state>();
-	struct ef9369 &pal = state->m_pal;
+	struct ef9369 &pal = m_pal;
 	data &= 0x00ff;
 
 	/* Address register */
@@ -207,7 +215,7 @@ static WRITE16_HANDLER( ef9369_w )
 			col = pal.clut[entry] & 0xfff;
 
 			/* Update the MAME palette */
-			palette_set_color_rgb(space->machine(), entry, pal4bit(col >> 0), pal4bit(col >> 4), pal4bit(col >> 8));
+			palette_set_color_rgb(machine(), entry, pal4bit(col >> 0), pal4bit(col >> 4), pal4bit(col >> 8));
 		}
 
 			/* Address register auto-increment */
@@ -216,10 +224,9 @@ static WRITE16_HANDLER( ef9369_w )
 	}
 }
 
-static READ16_HANDLER( ef9369_r )
+READ16_MEMBER(guab_state::ef9369_r)
 {
-	guab_state *state = space->machine().driver_data<guab_state>();
-	struct ef9369 &pal = state->m_pal;
+	struct ef9369 &pal = m_pal;
 	if ((offset & 1) == 0)
 	{
 		UINT16 col = pal.clut[pal.addr >> 1];
@@ -312,7 +319,7 @@ static TIMER_CALLBACK( fdc_data_callback )
 {
 	guab_state *state = machine.driver_data<guab_state>();
 	struct wd1770 &fdc = state->m_fdc;
-	UINT8* disk = (UINT8*)machine.region("user1")->base();
+	UINT8* disk = (UINT8*)state->memregion("user1")->base();
 	int more_data = 0;
 
 	/*
@@ -372,10 +379,9 @@ static TIMER_CALLBACK( fdc_data_callback )
 }
 
 
-static WRITE16_HANDLER( wd1770_w )
+WRITE16_MEMBER(guab_state::wd1770_w)
 {
-	guab_state *state = space->machine().driver_data<guab_state>();
-	struct wd1770 &fdc = state->m_fdc;
+	struct wd1770 &fdc = m_fdc;
 	data &= 0xff;
 
 	switch (offset)
@@ -445,7 +451,7 @@ static WRITE16_HANDLER( wd1770_w )
 															fdc.sector));
 
 					/* Set the data read timer */
-					state->m_fdc_timer->adjust(attotime::from_usec(USEC_DELAY));
+					m_fdc_timer->adjust(attotime::from_usec(USEC_DELAY));
 
 					break;
 				}
@@ -464,7 +470,7 @@ static WRITE16_HANDLER( wd1770_w )
 															fdc.sector));
 
 					/* Trigger a DRQ interrupt on the CPU */
-					cputag_set_input_line(space->machine(), "maincpu", INT_FLOPPYCTRL, ASSERT_LINE);
+					cputag_set_input_line(machine(), "maincpu", INT_FLOPPYCTRL, ASSERT_LINE);
 					fdc.status |= DATA_REQUEST;
 					break;
 				}
@@ -482,7 +488,7 @@ static WRITE16_HANDLER( wd1770_w )
 				case 13:
 				{
 					/* Stop any operation in progress */
-					state->m_fdc_timer->reset();
+					m_fdc_timer->reset();
 					fdc.status &= ~BUSY;
 					FDC_LOG(("Force Interrupt\n"));
 					break;
@@ -509,21 +515,20 @@ static WRITE16_HANDLER( wd1770_w )
 			fdc.data = data;
 
 			/* Clear the DRQ */
-			cputag_set_input_line(space->machine(), "maincpu", INT_FLOPPYCTRL, CLEAR_LINE);
+			cputag_set_input_line(machine(), "maincpu", INT_FLOPPYCTRL, CLEAR_LINE);
 
 			/* Queue an event to write the data if write command was specified */
 			if (fdc.cmd & 0x20)
-				state->m_fdc_timer->adjust(attotime::from_usec(USEC_DELAY));
+				m_fdc_timer->adjust(attotime::from_usec(USEC_DELAY));
 
 			break;
 		}
 	}
 }
 
-static READ16_HANDLER( wd1770_r )
+READ16_MEMBER(guab_state::wd1770_r)
 {
-	guab_state *state = space->machine().driver_data<guab_state>();
-	struct wd1770 &fdc = state->m_fdc;
+	struct wd1770 &fdc = m_fdc;
 	UINT16 retval = 0;
 
 	switch (offset)
@@ -548,7 +553,7 @@ static READ16_HANDLER( wd1770_r )
 			retval = fdc.data;
 
 			/* Clear the DRQ */
-			cputag_set_input_line(space->machine(), "maincpu", INT_FLOPPYCTRL, CLEAR_LINE);
+			cputag_set_input_line(machine(), "maincpu", INT_FLOPPYCTRL, CLEAR_LINE);
 			fdc.status &= ~DATA_REQUEST;
 			break;
 		}
@@ -564,7 +569,7 @@ static READ16_HANDLER( wd1770_r )
  *
  ****************************************/
 
-static READ16_HANDLER( io_r )
+READ16_MEMBER(guab_state::io_r)
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 
@@ -574,7 +579,7 @@ static READ16_HANDLER( io_r )
 		case 0x01:
 		case 0x02:
 		{
-			return input_port_read(space->machine(), portnames[offset]);
+			return ioport(portnames[offset])->read();
 		}
 		case 0x30:
 		{
@@ -589,12 +594,12 @@ static READ16_HANDLER( io_r )
 	}
 }
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(guab_state::coin_inserted)
 {
 	if (newval == 0)
 	{
 		UINT32 credit;
-		address_space *space = field.machine().device("maincpu")->memory().space(AS_PROGRAM);
+		address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 		/* Get the current credit value and add the new coin value */
 		credit = space->read_dword(0x8002c) + (UINT32)(FPTR)param;
@@ -608,10 +613,9 @@ static INPUT_CHANGED( coin_inserted )
  *
  ****************************************/
 
-static WRITE16_HANDLER( io_w )
+WRITE16_MEMBER(guab_state::io_w)
 {
-	guab_state *state = space->machine().driver_data<guab_state>();
-	struct wd1770 &fdc = state->m_fdc;
+	struct wd1770 &fdc = m_fdc;
 	switch (offset)
 	{
 		case 0x10:
@@ -646,7 +650,7 @@ static WRITE16_HANDLER( io_w )
 		}
 		case 0x30:
 		{
-			sn76496_w(space->machine().device("snsnd"), 0, data & 0xff);
+			sn76496_w(machine().device("snsnd"), 0, data & 0xff);
 			break;
 		}
 		case 0x31:
@@ -679,13 +683,13 @@ static WRITE16_HANDLER( io_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( guab_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( guab_map, AS_PROGRAM, 16, guab_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_ROM AM_REGION("maincpu", 0x10000)
 	AM_RANGE(0x0c0000, 0x0c007f) AM_READWRITE(io_r, io_w)
 	AM_RANGE(0x0c0080, 0x0c0083) AM_NOP /* ACIA 1 */
 	AM_RANGE(0x0c00a0, 0x0c00a3) AM_NOP /* ACIA 2 */
-	AM_RANGE(0x0c00c0, 0x0c00cf) AM_DEVREADWRITE8_MODERN("6840ptm", ptm6840_device, read, write, 0xff)
+	AM_RANGE(0x0c00c0, 0x0c00cf) AM_DEVREADWRITE8("6840ptm", ptm6840_device, read, write, 0xff)
 	AM_RANGE(0x0c00e0, 0x0c00e7) AM_READWRITE(wd1770_r, wd1770_w)
 	AM_RANGE(0x080000, 0x080fff) AM_RAM
 	AM_RANGE(0x100000, 0x100003) AM_READWRITE(ef9369_r, ef9369_w)
@@ -704,8 +708,8 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( guab )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("50p") PORT_CHANGED(coin_inserted, (void *)50)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )   PORT_NAME("100p") PORT_CHANGED(coin_inserted, (void *)100)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("50p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, (void *)50)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )   PORT_NAME("100p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, (void *)100)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Key switch") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
@@ -730,14 +734,14 @@ static INPUT_PORTS_START( guab )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("C")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("D")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("10p") PORT_CHANGED(coin_inserted, (void *)10)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("20p") PORT_CHANGED(coin_inserted, (void *)20)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("10p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, (void *)10)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("20p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, (void *)20)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tenup )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("50p") PORT_CHANGED(coin_inserted, (void *)50)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )   PORT_NAME("100p") PORT_CHANGED(coin_inserted, (void *)100)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("50p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, (void *)50)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )   PORT_NAME("100p") PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, (void *)100)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Back door") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Cash door") PORT_CODE(KEYCODE_T) PORT_TOGGLE
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Key switch") PORT_CODE(KEYCODE_Y) PORT_TOGGLE
@@ -762,8 +766,8 @@ static INPUT_PORTS_START( tenup )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("A")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("B")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("C")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("10p")  PORT_CHANGED(coin_inserted, (void *)10)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("20p")  PORT_CHANGED(coin_inserted, (void *)20)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_NAME("10p")  PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, (void *)10)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("20p")  PORT_CHANGED_MEMBER(DEVICE_SELF, guab_state,coin_inserted, (void *)20)
 INPUT_PORTS_END
 
 

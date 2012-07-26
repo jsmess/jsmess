@@ -16,7 +16,6 @@
     26/06/2011 Added modifier keys.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -31,13 +30,14 @@ public:
 	beehive_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER(beehive_60_r);
 	DECLARE_WRITE8_MEMBER(beehive_62_w);
 	const UINT8 *m_p_chargen;
-	const UINT8 *m_p_videoram;
+	required_shared_ptr<const UINT8> m_p_videoram;
 	UINT8 m_keyline;
 	virtual void machine_reset();
 	virtual void video_start();
@@ -50,7 +50,7 @@ READ8_MEMBER(beehive_state::beehive_60_r)
 	{
 		char kbdrow[6];
 		sprintf(kbdrow,"X%d", m_keyline&15);
-		return input_port_read(machine(), kbdrow);
+		return ioport(kbdrow)->read();
 	}
 	else
 		return 0xff;
@@ -64,7 +64,7 @@ WRITE8_MEMBER(beehive_state::beehive_62_w)
 static ADDRESS_MAP_START(beehive_mem, AS_PROGRAM, 8, beehive_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x17ff ) AM_ROM
-	AM_RANGE( 0x8000, 0x8fff ) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE( 0x8000, 0x8fff ) AM_RAM AM_SHARE("p_videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( beehive_io, AS_IO, 8, beehive_state)
@@ -232,7 +232,7 @@ MACHINE_RESET_MEMBER(beehive_state)
 
 VIDEO_START_MEMBER( beehive_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 /* This system appears to have inline attribute bytes of unknown meaning.

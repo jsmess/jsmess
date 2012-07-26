@@ -3,7 +3,6 @@
 #ifndef __APRICOT_KEYBOARD__
 #define __APRICOT_KEYBOARD__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 

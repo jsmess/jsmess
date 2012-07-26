@@ -17,11 +17,13 @@ class sstrangr_state : public driver_device
 {
 public:
 	sstrangr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ram(*this, "ram"){ }
 
-	UINT8 *m_ram;
+	required_shared_ptr<UINT8> m_ram;
 	UINT8 m_flip_screen;
 	UINT8 *m_proms;
+	DECLARE_WRITE8_MEMBER(port_w);
 };
 
 
@@ -90,7 +92,7 @@ static SCREEN_UPDATE_RGB32( sstrngr2 )
 
 	get_pens(pens);
 
-	color_map_base = &screen.machine().region("proms")->base()[state->m_flip_screen ? 0x0000 : 0x0200];
+	color_map_base = &state->memregion("proms")->base()[state->m_flip_screen ? 0x0000 : 0x0200];
 
 	for (offs = 0; offs < 0x2000; offs++)
 	{
@@ -129,24 +131,23 @@ static SCREEN_UPDATE_RGB32( sstrngr2 )
 }
 
 
-static WRITE8_HANDLER( port_w )
+WRITE8_MEMBER(sstrangr_state::port_w)
 {
-	sstrangr_state *state = space->machine().driver_data<sstrangr_state>();
 
-	state->m_flip_screen = data & 0x20;
+	m_flip_screen = data & 0x20;
 }
 
 
 
-static ADDRESS_MAP_START( sstrangr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sstrangr_map, AS_PROGRAM, 8, sstrangr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(sstrangr_state,m_ram)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x6000, 0x63ff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sstrangr_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sstrangr_io_map, AS_IO, 8, sstrangr_state )
 	AM_RANGE(0x41, 0x41) AM_READ_PORT("DSW")
 	AM_RANGE(0x42, 0x42) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x44, 0x44) AM_READ_PORT("EXT") AM_WRITE(port_w)
@@ -185,7 +186,7 @@ static INPUT_PORTS_START( sstrangr )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 
 	PORT_START("EXT")      /* External switches */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -252,7 +253,7 @@ static INPUT_PORTS_START( sstrngr2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
 
 	PORT_START("EXT")      /* External switches */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_DIPNAME( 0x02, 0x00, "Player's Bullet Speed (Cheat)" )
 	PORT_DIPSETTING(    0x00, "Slow" )
 	PORT_DIPSETTING(    0x02, "Fast" )

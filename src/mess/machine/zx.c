@@ -18,19 +18,19 @@
 #define LOG_ZX81_VSYNC do { if (DEBUG_ZX81_VSYNC) logerror("VSYNC starts in scanline: %d\n", space->machine().primary_screen->vpos()); } while (0)
 
 
-static WRITE8_HANDLER( zx_ram_w )
+WRITE8_MEMBER(zx_state::zx_ram_w)
 {
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	RAM[offset + 0x4000] = data;
 
 	if (data & 0x40)
 	{
-		space->write_byte(offset | 0xc000, data);
+		space.write_byte(offset | 0xc000, data);
 		RAM[offset | 0xc000] = data;
 	}
 	else
 	{
-		space->write_byte(offset | 0xc000, 0);
+		space.write_byte(offset | 0xc000, 0);
 		RAM[offset | 0xc000] = 0;
 	}
 }
@@ -38,58 +38,59 @@ static WRITE8_HANDLER( zx_ram_w )
 /* I know this looks really pointless... but it has to be here */
 READ8_MEMBER( zx_state::zx_ram_r )
 {
-	UINT8 *RAM = machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	return RAM[offset | 0xc000];
 }
 
 DRIVER_INIT( zx )
 {
+	zx_state *state = machine.driver_data<zx_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	space->install_read_bank(0x4000, 0x4000 + machine.device<ram_device>(RAM_TAG)->size() - 1, "bank1");
-	space->install_legacy_write_handler(0x4000, 0x4000 + machine.device<ram_device>(RAM_TAG)->size() - 1, FUNC(zx_ram_w));
-	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x4000);
+	space->install_write_handler(0x4000, 0x4000 + machine.device<ram_device>(RAM_TAG)->size() - 1, write8_delegate(FUNC(zx_state::zx_ram_w),state));
+	state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x4000);
 }
 
-DIRECT_UPDATE_HANDLER( zx_setdirect )
+DIRECT_UPDATE_MEMBER(zx_state::zx_setdirect)
 {
 	if (address & 0xc000)
-		zx_ula_r(machine, address, "maincpu", 0);
+		zx_ula_r(machine(), address, "maincpu", 0);
 	return address;
 }
 
-DIRECT_UPDATE_HANDLER( pc8300_setdirect )
+DIRECT_UPDATE_MEMBER(zx_state::pc8300_setdirect)
 {
 	if (address & 0xc000)
-		zx_ula_r(machine, address, "gfx1", 0);
+		zx_ula_r(machine(), address, "gfx1", 0);
 	return address;
 }
 
-DIRECT_UPDATE_HANDLER( pow3000_setdirect )
+DIRECT_UPDATE_MEMBER(zx_state::pow3000_setdirect)
 {
 	if (address & 0xc000)
-		zx_ula_r(machine, address, "gfx1", 1);
+		zx_ula_r(machine(), address, "gfx1", 1);
 	return address;
 }
 
 MACHINE_RESET( zx80 )
 {
 	zx_state *state = machine.driver_data<zx_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(zx_setdirect), &machine));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(zx_state::zx_setdirect), state));
 	state->m_tape_bit = 0x80;
 }
 
 MACHINE_RESET( pow3000 )
 {
 	zx_state *state = machine.driver_data<zx_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(pow3000_setdirect), &machine));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(zx_state::pow3000_setdirect), state));
 	state->m_tape_bit = 0x80;
 }
 
 MACHINE_RESET( pc8300 )
 {
 	zx_state *state = machine.driver_data<zx_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(pc8300_setdirect), &machine));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(zx_state::pc8300_setdirect), state));
 	state->m_tape_bit = 0x80;
 }
 
@@ -110,23 +111,23 @@ READ8_MEMBER( zx_state::zx80_io_r )
 	if (offs == 0xfe)
 	{
 		if ((offset & 0x0100) == 0)
-			data &= input_port_read(machine(), "ROW0");
+			data &= ioport("ROW0")->read();
 		if ((offset & 0x0200) == 0)
-			data &= input_port_read(machine(), "ROW1");
+			data &= ioport("ROW1")->read();
 		if ((offset & 0x0400) == 0)
-			data &= input_port_read(machine(), "ROW2");
+			data &= ioport("ROW2")->read();
 		if ((offset & 0x0800) == 0)
-			data &= input_port_read(machine(), "ROW3");
+			data &= ioport("ROW3")->read();
 		if ((offset & 0x1000) == 0)
-			data &= input_port_read(machine(), "ROW4");
+			data &= ioport("ROW4")->read();
 		if ((offset & 0x2000) == 0)
-			data &= input_port_read(machine(), "ROW5");
+			data &= ioport("ROW5")->read();
 		if ((offset & 0x4000) == 0)
-			data &= input_port_read(machine(), "ROW6");
+			data &= ioport("ROW6")->read();
 		if ((offset & 0x8000) == 0)
-			data &= input_port_read(machine(), "ROW7");
+			data &= ioport("ROW7")->read();
 
-		if (!input_port_read(machine(), "CONFIG"))
+		if (!ioport("CONFIG")->read())
 			data &= ~0x40;
 
 		machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
@@ -167,23 +168,23 @@ READ8_MEMBER( zx_state::zx81_io_r )
 	if (offs == 0xfe)
 	{
 		if ((offset & 0x0100) == 0)
-			data &= input_port_read(machine(), "ROW0");
+			data &= ioport("ROW0")->read();
 		if ((offset & 0x0200) == 0)
-			data &= input_port_read(machine(), "ROW1");
+			data &= ioport("ROW1")->read();
 		if ((offset & 0x0400) == 0)
-			data &= input_port_read(machine(), "ROW2");
+			data &= ioport("ROW2")->read();
 		if ((offset & 0x0800) == 0)
-			data &= input_port_read(machine(), "ROW3");
+			data &= ioport("ROW3")->read();
 		if ((offset & 0x1000) == 0)
-			data &= input_port_read(machine(), "ROW4");
+			data &= ioport("ROW4")->read();
 		if ((offset & 0x2000) == 0)
-			data &= input_port_read(machine(), "ROW5");
+			data &= ioport("ROW5")->read();
 		if ((offset & 0x4000) == 0)
-			data &= input_port_read(machine(), "ROW6");
+			data &= ioport("ROW6")->read();
 		if ((offset & 0x8000) == 0)
-			data &= input_port_read(machine(), "ROW7");
+			data &= ioport("ROW7")->read();
 
-		if (!input_port_read(machine(), "CONFIG"))
+		if (!ioport("CONFIG")->read())
 			data &= ~0x40;
 
 		machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
@@ -234,21 +235,21 @@ READ8_MEMBER( zx_state::pc8300_io_r )
 	if (offs == 0xfe)
 	{
 		if ((offset & 0x0100) == 0)
-			data &= input_port_read(machine(), "ROW0");
+			data &= ioport("ROW0")->read();
 		if ((offset & 0x0200) == 0)
-			data &= input_port_read(machine(), "ROW1");
+			data &= ioport("ROW1")->read();
 		if ((offset & 0x0400) == 0)
-			data &= input_port_read(machine(), "ROW2");
+			data &= ioport("ROW2")->read();
 		if ((offset & 0x0800) == 0)
-			data &= input_port_read(machine(), "ROW3");
+			data &= ioport("ROW3")->read();
 		if ((offset & 0x1000) == 0)
-			data &= input_port_read(machine(), "ROW4");
+			data &= ioport("ROW4")->read();
 		if ((offset & 0x2000) == 0)
-			data &= input_port_read(machine(), "ROW5");
+			data &= ioport("ROW5")->read();
 		if ((offset & 0x4000) == 0)
-			data &= input_port_read(machine(), "ROW6");
+			data &= ioport("ROW6")->read();
 		if ((offset & 0x8000) == 0)
-			data &= input_port_read(machine(), "ROW7");
+			data &= ioport("ROW7")->read();
 
 		machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
 
@@ -291,7 +292,7 @@ READ8_MEMBER( zx_state::pow3000_io_r )
 
 	if (offs == 0x7e)
 	{
-		data = (input_port_read(machine(), "CONFIG"));
+		data = (ioport("CONFIG")->read());
 	}
 	else
 	if (offs == 0xf5)
@@ -303,21 +304,21 @@ READ8_MEMBER( zx_state::pow3000_io_r )
 	if (offs == 0xfe)
 	{
 		if ((offset & 0x0100) == 0)
-			data &= input_port_read(machine(), "ROW0");
+			data &= ioport("ROW0")->read();
 		if ((offset & 0x0200) == 0)
-			data &= input_port_read(machine(), "ROW1");
+			data &= ioport("ROW1")->read();
 		if ((offset & 0x0400) == 0)
-			data &= input_port_read(machine(), "ROW2");
+			data &= ioport("ROW2")->read();
 		if ((offset & 0x0800) == 0)
-			data &= input_port_read(machine(), "ROW3");
+			data &= ioport("ROW3")->read();
 		if ((offset & 0x1000) == 0)
-			data &= input_port_read(machine(), "ROW4");
+			data &= ioport("ROW4")->read();
 		if ((offset & 0x2000) == 0)
-			data &= input_port_read(machine(), "ROW5");
+			data &= ioport("ROW5")->read();
 		if ((offset & 0x4000) == 0)
-			data &= input_port_read(machine(), "ROW6");
+			data &= ioport("ROW6")->read();
 		if ((offset & 0x8000) == 0)
-			data &= input_port_read(machine(), "ROW7");
+			data &= ioport("ROW7")->read();
 
 		machine().device<cassette_image_device>(CASSETTE_TAG)->output(+1.0);
 

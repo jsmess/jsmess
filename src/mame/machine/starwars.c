@@ -48,11 +48,11 @@ static TIMER_CALLBACK( math_run_clear )
  *
  *************************************/
 
-WRITE8_HANDLER( starwars_nstore_w )
+WRITE8_MEMBER(starwars_state::starwars_nstore_w)
 {
-	space->machine().device<x2212_device>("x2212")->store(0);
-	space->machine().device<x2212_device>("x2212")->store(1);
-	space->machine().device<x2212_device>("x2212")->store(0);
+	machine().device<x2212_device>("x2212")->store(0);
+	machine().device<x2212_device>("x2212")->store(1);
+	machine().device<x2212_device>("x2212")->store(0);
 }
 
 /*************************************
@@ -61,41 +61,40 @@ WRITE8_HANDLER( starwars_nstore_w )
  *
  *************************************/
 
-WRITE8_HANDLER( starwars_out_w )
+WRITE8_MEMBER(starwars_state::starwars_out_w)
 {
-	starwars_state *state = space->machine().driver_data<starwars_state>();
 	switch (offset & 7)
 	{
 		case 0:		/* Coin counter 1 */
-			coin_counter_w(space->machine(), 0, data);
+			coin_counter_w(machine(), 0, data);
 			break;
 
 		case 1:		/* Coin counter 2 */
-			coin_counter_w(space->machine(), 1, data);
+			coin_counter_w(machine(), 1, data);
 			break;
 
 		case 2:		/* LED 3 */
-			set_led_status(space->machine(), 2, ~data & 0x80);
+			set_led_status(machine(), 2, ~data & 0x80);
 			break;
 
 		case 3:		/* LED 2 */
-			set_led_status(space->machine(), 1, ~data & 0x80);
+			set_led_status(machine(), 1, ~data & 0x80);
 			break;
 
 		case 4:		/* bank switch */
-			memory_set_bank(space->machine(), "bank1", (data >> 7) & 1);
-			if (state->m_is_esb)
-				memory_set_bank(space->machine(), "bank2", (data >> 7) & 1);
+			membank("bank1")->set_entry((data >> 7) & 1);
+			if (m_is_esb)
+				membank("bank2")->set_entry((data >> 7) & 1);
 			break;
 		case 5:		/* reset PRNG */
 			break;
 
 		case 6:		/* LED 1 */
-			set_led_status(space->machine(), 0, ~data & 0x80);
+			set_led_status(machine(), 0, ~data & 0x80);
 			break;
 
 		case 7:		/* NVRAM array recall */
-			space->machine().device<x2212_device>("x2212")->recall(~data & 0x80);
+			machine().device<x2212_device>("x2212")->recall(~data & 0x80);
 			break;
 	}
 }
@@ -108,11 +107,10 @@ WRITE8_HANDLER( starwars_out_w )
  *
  *************************************/
 
-CUSTOM_INPUT( matrix_flag_r )
+CUSTOM_INPUT_MEMBER(starwars_state::matrix_flag_r)
 {
-	starwars_state *state = field.machine().driver_data<starwars_state>();
 	/* set the matrix processor flag */
-	return state->m_math_run ? 1 : 0;
+	return m_math_run ? 1 : 0;
 }
 
 
@@ -123,16 +121,15 @@ CUSTOM_INPUT( matrix_flag_r )
  *
  *************************************/
 
-READ8_HANDLER( starwars_adc_r )
+READ8_MEMBER(starwars_state::starwars_adc_r)
 {
-	starwars_state *state = space->machine().driver_data<starwars_state>();
 	/* pitch */
-	if (state->m_control_num == kPitch)
-		return input_port_read(space->machine(), "STICKY");
+	if (m_control_num == kPitch)
+		return ioport("STICKY")->read();
 
 	/* yaw */
-	else if (state->m_control_num == kYaw)
-		return input_port_read(space->machine(), "STICKX");
+	else if (m_control_num == kYaw)
+		return ioport("STICKX")->read();
 
 	/* default to unused thrust */
 	else
@@ -140,10 +137,9 @@ READ8_HANDLER( starwars_adc_r )
 }
 
 
-WRITE8_HANDLER( starwars_adc_select_w )
+WRITE8_MEMBER(starwars_state::starwars_adc_select_w)
 {
-	starwars_state *state = space->machine().driver_data<starwars_state>();
-	state->m_control_num = offset;
+	m_control_num = offset;
 }
 
 
@@ -157,7 +153,7 @@ WRITE8_HANDLER( starwars_adc_select_w )
 void starwars_mproc_init(running_machine &machine)
 {
 	starwars_state *state = machine.driver_data<starwars_state>();
-	UINT8 *src = machine.region("user2")->base();
+	UINT8 *src = state->memregion("user2")->base();
 	int cnt, val;
 
 	state->m_PROM_STR = auto_alloc_array(machine, UINT8, 1024);
@@ -371,7 +367,7 @@ static void run_mproc(running_machine &machine)
  *
  *************************************/
 
-READ8_HANDLER( starwars_prng_r )
+READ8_MEMBER(starwars_state::starwars_prng_r)
 {
 	/*
      * The PRNG is a modified 23 bit LFSR. Taps are at 4 and 22 so the
@@ -386,7 +382,7 @@ READ8_HANDLER( starwars_prng_r )
      */
 
 	/* Use MAME's PRNG for now */
-	return space->machine().rand();
+	return machine().rand();
 }
 
 
@@ -397,45 +393,42 @@ READ8_HANDLER( starwars_prng_r )
  *
  *************************************/
 
-READ8_HANDLER( starwars_div_reh_r )
+READ8_MEMBER(starwars_state::starwars_div_reh_r)
 {
-	starwars_state *state = space->machine().driver_data<starwars_state>();
-	return (state->m_quotient_shift & 0xff00) >> 8;
+	return (m_quotient_shift & 0xff00) >> 8;
 }
 
 
-READ8_HANDLER( starwars_div_rel_r )
+READ8_MEMBER(starwars_state::starwars_div_rel_r)
 {
-	starwars_state *state = space->machine().driver_data<starwars_state>();
-	return state->m_quotient_shift & 0x00ff;
+	return m_quotient_shift & 0x00ff;
 }
 
 
-WRITE8_HANDLER( starwars_math_w )
+WRITE8_MEMBER(starwars_state::starwars_math_w)
 {
-	starwars_state *state = space->machine().driver_data<starwars_state>();
 	int i;
 
 	data &= 0xff;	/* ASG 971002 -- make sure we only get bytes here */
 	switch (offset)
 	{
 		case 0:	/* mw0 */
-			state->m_MPA = data << 2;	/* Set starting PROM address */
-			run_mproc(space->machine());			/* and run the Matrix Processor */
+			m_MPA = data << 2;	/* Set starting PROM address */
+			run_mproc(machine());			/* and run the Matrix Processor */
 			break;
 
 		case 1:	/* mw1 */
-			state->m_BIC = (state->m_BIC & 0x00ff) | ((data & 0x01) << 8);
+			m_BIC = (m_BIC & 0x00ff) | ((data & 0x01) << 8);
 			break;
 
 		case 2:	/* mw2 */
-			state->m_BIC = (state->m_BIC & 0x0100) | data;
+			m_BIC = (m_BIC & 0x0100) | data;
 			break;
 
 		case 4: /* dvsrh */
-			state->m_divisor = (state->m_divisor & 0x00ff) | (data << 8);
-			state->m_dvd_shift = state->m_dividend;
-			state->m_quotient_shift = 0;
+			m_divisor = (m_divisor & 0x00ff) | (data << 8);
+			m_dvd_shift = m_dividend;
+			m_quotient_shift = 0;
 			break;
 
 		case 5: /* dvsrl */
@@ -445,35 +438,35 @@ WRITE8_HANDLER( starwars_math_w )
 			/*       If the Tie fighters look corrupt, he byte order of */
 			/*       the 16 bit writes in the 6809 are backwards        */
 
-			state->m_divisor = (state->m_divisor & 0xff00) | data;
+			m_divisor = (m_divisor & 0xff00) | data;
 
 			/*
              * Simple restoring division as shown in the
              * schematics. The algorithm produces the same "wrong"
-             * results as the hardware if state->m_divisor < 2*state->m_dividend or
-             * state->m_divisor > 0x8000.
+             * results as the hardware if m_divisor < 2*m_dividend or
+             * m_divisor > 0x8000.
              */
 			for (i = 1; i < 16; i++)
 			{
-				state->m_quotient_shift <<= 1;
-				if (((INT32)state->m_dvd_shift + (state->m_divisor ^ 0xffff) + 1) & 0x10000)
+				m_quotient_shift <<= 1;
+				if (((INT32)m_dvd_shift + (m_divisor ^ 0xffff) + 1) & 0x10000)
 				{
-					state->m_quotient_shift |= 1;
-					state->m_dvd_shift = (state->m_dvd_shift + (state->m_divisor ^ 0xffff) + 1) << 1;
+					m_quotient_shift |= 1;
+					m_dvd_shift = (m_dvd_shift + (m_divisor ^ 0xffff) + 1) << 1;
 				}
 				else
 				{
-					state->m_dvd_shift <<= 1;
+					m_dvd_shift <<= 1;
 				}
 			}
 			break;
 
 		case 6: /* dvddh */
-			state->m_dividend = (state->m_dividend & 0x00ff) | (data << 8);
+			m_dividend = (m_dividend & 0x00ff) | (data << 8);
 			break;
 
 		case 7: /* dvddl */
-			state->m_dividend = (state->m_dividend & 0xff00) | (data);
+			m_dividend = (m_dividend & 0xff00) | (data);
 			break;
 
 		default:

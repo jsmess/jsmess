@@ -87,17 +87,24 @@ class calorie_state : public driver_device
 {
 public:
 	calorie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fg_ram(*this, "fg_ram"),
+		m_sprites(*this, "sprites"){ }
 
 	/* memory pointers */
-	UINT8 *  m_fg_ram;
-	UINT8 *  m_sprites;
+	required_shared_ptr<UINT8> m_fg_ram;
+	required_shared_ptr<UINT8> m_sprites;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
 	UINT8    m_bg_bank;
+	DECLARE_WRITE8_MEMBER(fg_ram_w);
+	DECLARE_WRITE8_MEMBER(bg_bank_w);
+	DECLARE_WRITE8_MEMBER(calorie_flipscreen_w);
+	DECLARE_READ8_MEMBER(calorie_soundlatch_r);
+	DECLARE_WRITE8_MEMBER(bogus_w);
 };
 
 
@@ -110,7 +117,7 @@ public:
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	calorie_state *state = machine.driver_data<calorie_state>();
-	UINT8 *src = machine.region("user1")->base();
+	UINT8 *src = state->memregion("user1")->base();
 	int bg_base = (state->m_bg_bank & 0x0f) * 0x200;
 	int code  = src[bg_base + tile_index] | (((src[bg_base + tile_index + 0x100]) & 0x10) << 4);
 	int color = src[bg_base + tile_index + 0x100] & 0x0f;
@@ -166,7 +173,7 @@ static SCREEN_UPDATE_IND16( calorie )
 		ypos = 0xff - state->m_sprites[x + 2];
 		xpos = state->m_sprites[x + 3];
 
-		if (flip_screen_get(screen.machine()))
+		if (state->flip_screen())
 		{
 			if (state->m_sprites[x + 1] & 0x10)
 				ypos = 0xff - ypos + 32;
@@ -198,35 +205,33 @@ static SCREEN_UPDATE_IND16( calorie )
  *
  *************************************/
 
-static WRITE8_HANDLER( fg_ram_w )
+WRITE8_MEMBER(calorie_state::fg_ram_w)
 {
-	calorie_state *state = space->machine().driver_data<calorie_state>();
-	state->m_fg_ram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_fg_ram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-static WRITE8_HANDLER( bg_bank_w )
+WRITE8_MEMBER(calorie_state::bg_bank_w)
 {
-	calorie_state *state = space->machine().driver_data<calorie_state>();
-	if((state->m_bg_bank & ~0x10) != (data & ~0x10))
-		state->m_bg_tilemap->mark_all_dirty();
+	if((m_bg_bank & ~0x10) != (data & ~0x10))
+		m_bg_tilemap->mark_all_dirty();
 
-	state->m_bg_bank = data;
+	m_bg_bank = data;
 }
 
-static WRITE8_HANDLER( calorie_flipscreen_w )
+WRITE8_MEMBER(calorie_state::calorie_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 1);
+	flip_screen_set(data & 1);
 }
 
-static READ8_HANDLER( calorie_soundlatch_r )
+READ8_MEMBER(calorie_state::calorie_soundlatch_r)
 {
-	UINT8 latch = soundlatch_r(space, 0);
-	soundlatch_clear_w(space, 0, 0);
+	UINT8 latch = soundlatch_byte_r(space, 0);
+	soundlatch_clear_byte_w(space, 0, 0);
 	return latch;
 }
 
-static WRITE8_HANDLER( bogus_w )
+WRITE8_MEMBER(calorie_state::bogus_w)
 {
 	popmessage("written to 3rd sound chip: data = %02X port = %02X", data, offset);
 }
@@ -237,35 +242,35 @@ static WRITE8_HANDLER( bogus_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( calorie_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( calorie_map, AS_PROGRAM, 8, calorie_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fg_ram_w) AM_BASE_MEMBER(calorie_state, m_fg_ram)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_BASE_MEMBER(calorie_state, m_sprites)
-	AM_RANGE(0xdc00, 0xdcff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fg_ram_w) AM_SHARE("fg_ram")
+	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0xdc00, 0xdcff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0xde00, 0xde00) AM_WRITE(bg_bank_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P1")
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("P2")
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("DSW1") AM_WRITE(calorie_flipscreen_w)
 	AM_RANGE(0xf005, 0xf005) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(soundlatch_byte_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( calorie_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( calorie_sound_map, AS_PROGRAM, 8, calorie_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc000) AM_READ(calorie_soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( calorie_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( calorie_sound_io_map, AS_IO, 8, calorie_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x11, 0x11) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x11, 0x11) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 	// 3rd ?
 	AM_RANGE(0x00, 0xff) AM_WRITE(bogus_w)
 ADDRESS_MAP_END
@@ -551,7 +556,7 @@ static DRIVER_INIT( calorie )
 static DRIVER_INIT( calorieb )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, machine.region("maincpu")->base() + 0x10000);
+	space->set_decrypted_region(0x0000, 0x7fff, machine.root_device().memregion("maincpu")->base() + 0x10000);
 }
 
 

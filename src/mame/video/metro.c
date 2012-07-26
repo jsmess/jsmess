@@ -79,11 +79,10 @@ static TILE_GET_INFO( metro_k053936_gstrik2_get_tile_info )
 			0);
 }
 
-WRITE16_HANDLER( metro_k053936_w )
+WRITE16_MEMBER(metro_state::metro_k053936_w)
 {
-	metro_state *state = space->machine().driver_data<metro_state>();
-	COMBINE_DATA(&state->m_k053936_ram[offset]);
-	state->m_k053936_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_k053936_ram[offset]);
+	m_k053936_tilemap->mark_tile_dirty(offset);
 }
 
 static TILEMAP_MAPPER( tilemap_scan_gstrik2 )
@@ -239,17 +238,16 @@ INLINE void metro_vram_w( running_machine &machine, offs_t offset, UINT16 data, 
 	COMBINE_DATA(&vram[offset]);
 }
 
-WRITE16_HANDLER( metro_vram_0_w ) { metro_state *state = space->machine().driver_data<metro_state>();  metro_vram_w(space->machine(), offset, data, mem_mask, 0, state->m_vram_0); }
-WRITE16_HANDLER( metro_vram_1_w ) { metro_state *state = space->machine().driver_data<metro_state>();  metro_vram_w(space->machine(), offset, data, mem_mask, 1, state->m_vram_1); }
-WRITE16_HANDLER( metro_vram_2_w ) { metro_state *state = space->machine().driver_data<metro_state>();  metro_vram_w(space->machine(), offset, data, mem_mask, 2, state->m_vram_2); }
+WRITE16_MEMBER(metro_state::metro_vram_0_w){ metro_vram_w(machine(), offset, data, mem_mask, 0, m_vram_0); }
+WRITE16_MEMBER(metro_state::metro_vram_1_w){ metro_vram_w(machine(), offset, data, mem_mask, 1, m_vram_1); }
+WRITE16_MEMBER(metro_state::metro_vram_2_w){ metro_vram_w(machine(), offset, data, mem_mask, 2, m_vram_2); }
 
 
 
 /* Dirty the relevant tilemap when its window changes */
-WRITE16_HANDLER( metro_window_w )
+WRITE16_MEMBER(metro_state::metro_window_w)
 {
-	metro_state *state = space->machine().driver_data<metro_state>();
-	COMBINE_DATA(&state->m_window[offset]);
+	COMBINE_DATA(&m_window[offset]);
 
 }
 
@@ -275,8 +273,8 @@ WRITE16_HANDLER( metro_window_w )
 
 static void expand_gfx1(metro_state &state)
 {
-	UINT8 *base_gfx = state.machine().region("gfx1")->base();
-	UINT32 length = 2 * state.machine().region("gfx1")->bytes();
+	UINT8 *base_gfx = state.machine().root_device().memregion("gfx1")->base();
+	UINT32 length = 2 * state.machine().root_device().memregion("gfx1")->bytes();
 	state.m_expanded_gfx1 = auto_alloc_array(state.machine(), UINT8, length);
 	for (int i = 0; i < length; i += 2)
 	{
@@ -286,7 +284,7 @@ static void expand_gfx1(metro_state &state)
 	}
 }
 
-VIDEO_START( metro_14100 )
+VIDEO_START( metro_i4100 )
 {
 	metro_state *state = machine.driver_data<metro_state>();
 	expand_gfx1(*state);
@@ -308,7 +306,7 @@ VIDEO_START( metro_14100 )
 	state->m_bg_tilemap_scrolldx[2] = 0;
 }
 
-VIDEO_START( metro_14220 )
+VIDEO_START( metro_i4220 )
 {
 	metro_state *state = machine.driver_data<metro_state>();
 	expand_gfx1(*state);
@@ -330,7 +328,7 @@ VIDEO_START( metro_14220 )
 	state->m_bg_tilemap_scrolldx[2] = -2;
 }
 
-VIDEO_START( metro_14300 )
+VIDEO_START( metro_i4300 )
 {
 	metro_state *state = machine.driver_data<metro_state>();
 	expand_gfx1(*state);
@@ -356,7 +354,7 @@ VIDEO_START( blzntrnd )
 {
 	metro_state *state = machine.driver_data<metro_state>();
 
-	VIDEO_START_CALL(metro_14220);
+	VIDEO_START_CALL(metro_i4220);
 
 	state->m_has_zoom = 1;
 
@@ -371,7 +369,7 @@ VIDEO_START( gstrik2 )
 {
 	metro_state *state = machine.driver_data<metro_state>();
 
-	VIDEO_START_CALL(metro_14220);
+	VIDEO_START_CALL(metro_i4220);
 
 	state->m_has_zoom = 1;
 
@@ -448,14 +446,14 @@ void metro_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const r
 {
 	metro_state *state = machine.driver_data<metro_state>();
 	UINT8 *base_gfx4 = state->m_expanded_gfx1;
-	UINT8 *base_gfx8 = machine.region("gfx1")->base();
-	UINT32 gfx_size = machine.region("gfx1")->bytes();
+	UINT8 *base_gfx8 = state->memregion("gfx1")->base();
+	UINT32 gfx_size = state->memregion("gfx1")->bytes();
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
 	int max_x = visarea.max_x + 1;
 	int max_y = visarea.max_y + 1;
 
-	int max_sprites = state->m_spriteram_size / 8;
+	int max_sprites = state->m_spriteram.bytes() / 8;
 	int sprites     = state->m_videoregs[0x00/2] % max_sprites;
 
 	int color_start = ((state->m_videoregs[0x08/2] & 0x0f) << 4) + 0x100;
@@ -754,7 +752,7 @@ SCREEN_UPDATE_IND16( metro )
 	if (screenctrl & 2)
 		return 0;
 
-	//flip_screen_set(screen.machine(), screenctrl & 1);
+	//state->flip_screen_set(screenctrl & 1);
 	state->m_flip_screen = screenctrl & 1;
 
 	/* If the game supports 16x16 tiles, make sure that the

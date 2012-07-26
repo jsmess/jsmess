@@ -9,14 +9,21 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_oki(*this, "oki"),
-		  m_msm(*this, "msm") { }
+		  m_msm(*this, "msm") ,
+		m_tilemapram(*this, "tilemapram"),
+		m_spriteram(*this, "spriteram"),
+		m_ioc_ram(*this, "ioc_ram"){ }
+
+	/* devices */
+	required_device<cpu_device> m_maincpu;
+	required_device<okim6295_device> m_oki;
+	required_device<msm5205_device> m_msm;
 
 	/* memory pointers */
-	UINT16 *    m_tilemapram;
-	UINT16 *    m_ioc_ram;
-	UINT16 *    m_spriteram;
+	required_shared_ptr<UINT16> m_tilemapram;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_ioc_ram;
 //  UINT16 *    m_paletteram; // currently this uses generic palette handling
-	size_t      m_spriteram_size;
 
 	/* video-related */
 	tilemap_t     *m_tilemap[3];
@@ -38,10 +45,12 @@ public:
 	UINT8       m_adpcm_trigger;
 	UINT8       m_adpcm_data;
 
-	/* devices */
-	required_device<cpu_device> m_maincpu;
-	required_device<okim6295_device> m_oki;
-	required_device<msm5205_device> m_msm;
+	DECLARE_READ16_MEMBER(ioc_r);
+	DECLARE_WRITE16_MEMBER(ioc_w);
+	DECLARE_READ16_MEMBER(gcpinbal_tilemaps_word_r);
+	DECLARE_WRITE16_MEMBER(gcpinbal_tilemaps_word_w);
+	DECLARE_READ16_MEMBER(gcpinbal_ctrl_word_r);
+	DECLARE_WRITE16_MEMBER(gcpinbal_ctrl_word_w);
 };
 
 
@@ -50,5 +59,3 @@ public:
 VIDEO_START( gcpinbal );
 SCREEN_UPDATE_IND16( gcpinbal );
 
-READ16_HANDLER ( gcpinbal_tilemaps_word_r );
-WRITE16_HANDLER( gcpinbal_tilemaps_word_w );

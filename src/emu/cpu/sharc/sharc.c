@@ -124,7 +124,7 @@ struct _SHARC_REGS
 	UINT16 *internal_ram;
 	UINT16 *internal_ram_block0, *internal_ram_block1;
 
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	address_space *data;
@@ -1046,7 +1046,7 @@ static CPU_READOP( sharc )
 }
 
 // This is just used to stop the debugger from complaining about executing from I/O space
-static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START( internal_pgm, AS_PROGRAM, 64, adsp21062_device )
 	AM_RANGE(0x20000, 0x7ffff) AM_RAM
 ADDRESS_MAP_END
 

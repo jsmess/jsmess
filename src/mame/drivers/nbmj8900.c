@@ -32,20 +32,10 @@ TODO:
 #include "includes/nbmj8900.h"
 
 
-#define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
-#if SIGNED_DAC
-#define DAC_WRITE	dac_signed_w
-#else
-#define DAC_WRITE	dac_w
-#endif
-
-
-
-
 static DRIVER_INIT( ohpaipee )
 {
 #if 0
-	UINT8 *prot = machine.region("protdata")->base();
+	UINT8 *prot = machine.root_device().memregion("protdata")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -59,7 +49,7 @@ static DRIVER_INIT( ohpaipee )
 		prot[i] = BITSWAP8(prot[i],2,7,3,5,0,6,4,1);
 	}
 #else
-	unsigned char *ROM = machine.region("maincpu")->base();
+	unsigned char *ROM = machine.root_device().memregion("maincpu")->base();
 
 	// Protection ROM check skip
 	ROM[0x00e4] = 0x00;
@@ -71,14 +61,12 @@ static DRIVER_INIT( ohpaipee )
 #endif
 
 	nb1413m3_type = NB1413M3_OHPAIPEE;
-
-//  init_nb1413m3(machine);
 }
 
 static DRIVER_INIT( togenkyo )
 {
 #if 0
-	UINT8 *prot = machine.region("protdata")->base();
+	UINT8 *prot = machine.root_device().memregion("protdata")->base();
 	int i;
 
 	/* this is one possible way to rearrange the protection ROM data to get the
@@ -91,7 +79,7 @@ static DRIVER_INIT( togenkyo )
 		prot[i] = BITSWAP8(prot[i],2,7,3,5,0,6,4,1);
 	}
 #else
-	unsigned char *ROM = machine.region("maincpu")->base();
+	unsigned char *ROM = machine.root_device().memregion("maincpu")->base();
 
 	// Protection ROM check skip
 	ROM[0x010b] = 0x00;
@@ -103,46 +91,44 @@ static DRIVER_INIT( togenkyo )
 #endif
 
 	nb1413m3_type = NB1413M3_TOGENKYO;
-
-//S init_nb1413m3(machine);
 }
 
 
-static ADDRESS_MAP_START( ohpaipee_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ohpaipee_map, AS_PROGRAM, 8, nbmj8900_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8900_clut_r, nbmj8900_clut_w)
 	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(nbmj8900_palette_type1_r, nbmj8900_palette_type1_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( togenkyo_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( togenkyo_map, AS_PROGRAM, 8, nbmj8900_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8900_clut_r, nbmj8900_clut_w)
 	AM_RANGE(0xf400, 0xf5ff) AM_READWRITE(nbmj8900_palette_type1_r, nbmj8900_palette_type1_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ohpaipee_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( ohpaipee_io_map, AS_IO, 8, nbmj8900_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
-	AM_RANGE(0x00, 0x00) AM_WRITE(nb1413m3_nmi_clock_w)
+	AM_RANGE(0x00, 0x7f) AM_READ_LEGACY(nb1413m3_sndrom_r)
+	AM_RANGE(0x00, 0x00) AM_WRITE_LEGACY(nb1413m3_nmi_clock_w)
 	AM_RANGE(0x20, 0x27) AM_WRITE(nbmj8900_blitter_w)
 
 	AM_RANGE(0x40, 0x40) AM_WRITE(nbmj8900_clutsel_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(nbmj8900_romsel_w)
 	AM_RANGE(0x70, 0x70) AM_WRITE(nbmj8900_scrolly_w)
 
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ymsnd", ym3812_r,ym3812_w)
+	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r,ym3812_w)
 
-	AM_RANGE(0x90, 0x90) AM_READ(nb1413m3_inputport0_r)
+	AM_RANGE(0x90, 0x90) AM_READ_LEGACY(nb1413m3_inputport0_r)
 
-	AM_RANGE(0xa0, 0xa0) AM_READWRITE(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_READWRITE(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
-	AM_RANGE(0xc0, 0xc0) AM_READ(nb1413m3_inputport3_r)
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", DAC_WRITE)
+	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
+	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
+	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(nb1413m3_inputport3_r)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(nbmj8900_vramsel_w)
-	AM_RANGE(0xf0, 0xf0) AM_READ(nb1413m3_dipsw1_r)
-	AM_RANGE(0xf1, 0xf1) AM_READWRITE(nb1413m3_dipsw2_r, nb1413m3_outcoin_w)
+	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r)
+	AM_RANGE(0xf1, 0xf1) AM_READWRITE_LEGACY(nb1413m3_dipsw2_r, nb1413m3_outcoin_w)
 ADDRESS_MAP_END
 
 
@@ -341,12 +327,11 @@ static MACHINE_CONFIG_START( ohpaipee, nbmj8900_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 2500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 MACHINE_CONFIG_END
-
 
 static MACHINE_CONFIG_DERIVED( togenkyo, ohpaipee )
 
@@ -354,7 +339,6 @@ static MACHINE_CONFIG_DERIVED( togenkyo, ohpaipee )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(togenkyo_map)
 MACHINE_CONFIG_END
-
 
 
 ROM_START( ohpaipee )

@@ -108,12 +108,12 @@
  *
  *************************************/
 
-static WRITE8_HANDLER( lamp_control_w )
+WRITE8_MEMBER(victory_state::lamp_control_w)
 {
-	set_led_status(space->machine(), 0, data & 0x80);
-	set_led_status(space->machine(), 1, data & 0x40);
-	set_led_status(space->machine(), 2, data & 0x20);
-	set_led_status(space->machine(), 3, data & 0x10);
+	set_led_status(machine(), 0, data & 0x80);
+	set_led_status(machine(), 1, data & 0x40);
+	set_led_status(machine(), 2, data & 0x20);
+	set_led_status(machine(), 3, data & 0x10);
 }
 
 
@@ -124,21 +124,21 @@ static WRITE8_HANDLER( lamp_control_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, victory_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_READ(victory_video_control_r)
 	AM_RANGE(0xc100, 0xc1ff) AM_WRITE(victory_video_control_w)
 	AM_RANGE(0xc200, 0xc3ff) AM_WRITE(victory_paletteram_w)
-	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_BASE_MEMBER(victory_state, m_videoram)
-	AM_RANGE(0xc800, 0xdfff) AM_RAM AM_BASE_MEMBER(victory_state, m_charram)
+	AM_RANGE(0xc400, 0xc7ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0xc800, 0xdfff) AM_RAM AM_SHARE("charram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x07fc) AM_DEVREADWRITE("custom", victory_sound_response_r, victory_sound_command_w)
-	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x07fc) AM_DEVREAD("custom", victory_sound_status_r)
+	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x07fc) AM_DEVREADWRITE_LEGACY("custom", victory_sound_response_r, victory_sound_command_w)
+	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x07fc) AM_DEVREAD_LEGACY("custom", victory_sound_status_r)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( main_io_map, AS_IO, 8, victory_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READ_PORT("SW2")
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0x03) AM_READ_PORT("SW1")

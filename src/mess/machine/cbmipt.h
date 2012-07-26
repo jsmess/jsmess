@@ -10,6 +10,7 @@
 #include "machine/c64_bn1541.h"
 #include "machine/c64_comal80.h"
 #include "machine/c64_cpm.h"
+#include "machine/c64_currah_speech.h"
 #include "machine/c64_dela_ep256.h"
 #include "machine/c64_dela_ep64.h"
 #include "machine/c64_dela_ep7x8.h"
@@ -24,6 +25,7 @@
 #include "machine/c64_fun_play.h"
 #include "machine/c64_geocable.h"
 #include "machine/c64_georam.h"
+#include "machine/c64_ide64.h"
 #include "machine/c64_ieee488.h"
 #include "machine/c64_kingsoft.h"
 #include "machine/c64_mach5.h"
@@ -31,9 +33,11 @@
 #include "machine/c64_magic_formel.h"
 #include "machine/c64_mikro_assembler.h"
 #include "machine/c64_multiscreen.h"
+#include "machine/c64_neoram.h"
 #include "machine/c64_ocean.h"
 #include "machine/c64_pagefox.h"
 #include "machine/c64_prophet64.h"
+#include "machine/c64_ps64.h"
 #include "machine/c64_rex.h"
 #include "machine/c64_rex_ep256.h"
 #include "machine/c64_ross.h"
@@ -45,12 +49,15 @@
 #include "machine/c64_structured_basic.h"
 #include "machine/c64_super_explode.h"
 #include "machine/c64_super_games.h"
+#include "machine/c64_sw8k.h"
 #include "machine/c64_system3.h"
+#include "machine/c64_tdos.h"
 #include "machine/c64_vw64.h"
 #include "machine/c64_warp_speed.h"
 #include "machine/c64_westermann.h"
 #include "machine/c64_xl80.h"
 #include "machine/c64_zaxxon.h"
+#include "machine/c128_comal80.h"
 #include "machine/c1541.h"
 #include "machine/c1571.h"
 #include "machine/c1581.h"
@@ -58,6 +65,8 @@
 #include "machine/c2040.h"
 #include "machine/c8280.h"
 #include "machine/d9060.h"
+#include "machine/cmdhd.h"
+#include "machine/fd2000.h"
 #include "machine/interpod.h"
 #include "machine/serialbox.h"
 #include "machine/softbox.h"
@@ -68,6 +77,7 @@
 #include "machine/vic1210.h"
 #include "machine/vic10std.h"
 #include "machine/vic20std.h"
+#include "machine/vic20_megacart.h"
 
 
 #define MCFG_CBM_IEC_ADD(_intf, _default_drive) \
@@ -132,13 +142,14 @@ INPUT_PORTS_EXTERN( vic_controls );
 
 
 
-extern const slot_interface slot_interface_cbm_iec_devices[];
-extern const slot_interface slot_interface_sx1541_iec_devices[];
-extern const slot_interface slot_interface_cbm_ieee488_devices[];
-extern const slot_interface slot_interface_vic20_expansion_cards[];
-extern const slot_interface slot_interface_vic10_expansion_cards[];
-extern const slot_interface slot_interface_c64_expansion_cards[];
-extern const slot_interface slot_interface_c64_user_port_cards[];
+SLOT_INTERFACE_EXTERN( cbm_iec_devices );
+SLOT_INTERFACE_EXTERN( sx1541_iec_devices );
+SLOT_INTERFACE_EXTERN( cbm_ieee488_devices );
+SLOT_INTERFACE_EXTERN( vic20_expansion_cards );
+SLOT_INTERFACE_EXTERN( vic10_expansion_cards );
+SLOT_INTERFACE_EXTERN( c64_expansion_cards );
+SLOT_INTERFACE_EXTERN( c64_user_port_cards );
+SLOT_INTERFACE_EXTERN( c128_expansion_cards );
 
 
 

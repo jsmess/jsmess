@@ -61,35 +61,41 @@ class rbmk_state : public driver_device
 {
 public:
 	rbmk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_gms_vidram2(*this, "gms_vidram2"),
+		m_gms_vidram(*this, "gms_vidram"){ }
 
-	UINT16 *m_gms_vidram;
-	UINT16 *m_gms_vidram2;
+	required_shared_ptr<UINT16> m_gms_vidram2;
+	required_shared_ptr<UINT16> m_gms_vidram;
 	UINT16 m_tilebank;
 	UINT8 m_mux_data;
+	DECLARE_READ16_MEMBER(gms_read);
+	DECLARE_WRITE16_MEMBER(gms_write1);
+	DECLARE_WRITE16_MEMBER(gms_write2);
+	DECLARE_WRITE16_MEMBER(gms_write3);
+	DECLARE_READ8_MEMBER(rbmk_mcu_io_r);
+	DECLARE_WRITE8_MEMBER(rbmk_mcu_io_w);
+	DECLARE_WRITE8_MEMBER(mcu_io_mux_w);
 };
 
 
-static READ16_HANDLER( gms_read )
+READ16_MEMBER(rbmk_state::gms_read)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
 
-static WRITE16_HANDLER( gms_write1 )
+WRITE16_MEMBER(rbmk_state::gms_write1)
 {
-
 }
 
-static WRITE16_HANDLER( gms_write2 )
+WRITE16_MEMBER(rbmk_state::gms_write2)
 {
-	rbmk_state *state = space->machine().driver_data<rbmk_state>();
-	state->m_tilebank=data;
+	m_tilebank=data;
 }
 
-static WRITE16_HANDLER( gms_write3 )
+WRITE16_MEMBER(rbmk_state::gms_write3)
 {
-
 }
 
 static WRITE16_DEVICE_HANDLER( eeprom_w )
@@ -106,15 +112,15 @@ static WRITE16_DEVICE_HANDLER( eeprom_w )
 }
 
 
-static ADDRESS_MAP_START( rbmk_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( rbmk_mem, AS_PROGRAM, 16, rbmk_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM
-	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_BASE_MEMBER(rbmk_state, m_gms_vidram2)
+	AM_RANGE(0x940000, 0x940fff) AM_RAM AM_SHARE("gms_vidram2")
 	AM_RANGE(0x980300, 0x983fff) AM_RAM // 0x2048  words ???, byte access
-	AM_RANGE(0x900000, 0x900fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_BASE_MEMBER(rbmk_state, m_gms_vidram)
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE("eeprom", eeprom_w)
+	AM_RANGE(0x900000, 0x900fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x9c0000, 0x9c0fff) AM_RAM AM_SHARE("gms_vidram")
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
 	AM_RANGE(0xC00000, 0xC00001) AM_READ_PORT("IN0") AM_WRITE(gms_write1)
 	AM_RANGE(0xC08000, 0xC08001) AM_READ_PORT("IN1") AM_WRITE(gms_write2)
 	AM_RANGE(0xC10000, 0xC10001) AM_READ_PORT("IN3")
@@ -124,52 +130,49 @@ static ADDRESS_MAP_START( rbmk_mem, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rbmk_mcu_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rbmk_mcu_mem, AS_PROGRAM, 8, rbmk_state )
 //  AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static READ8_HANDLER( rbmk_mcu_io_r )
+READ8_MEMBER(rbmk_state::rbmk_mcu_io_r)
 {
-	rbmk_state *state = space->machine().driver_data<rbmk_state>();
-	if(state->m_mux_data & 8)
+	if(m_mux_data & 8)
 	{
-		return ym2151_r(space->machine().device("ymsnd"), offset & 1);
+		return ym2151_r(machine().device("ymsnd"), offset & 1);
 	}
-	else if(state->m_mux_data & 4)
+	else if(m_mux_data & 4)
 	{
 		//printf("%02x R\n",offset);
 		// ...
 		return 0xff;
 	}
 	else
-		printf("Warning: mux data R = %02x",state->m_mux_data);
+		printf("Warning: mux data R = %02x",m_mux_data);
 
 	return 0xff;
 }
 
-static WRITE8_HANDLER( rbmk_mcu_io_w )
+WRITE8_MEMBER(rbmk_state::rbmk_mcu_io_w)
 {
-	rbmk_state *state = space->machine().driver_data<rbmk_state>();
-	if(state->m_mux_data & 8) { ym2151_w(space->machine().device("ymsnd"), offset & 1, data); }
-	else if(state->m_mux_data & 4)
+	if(m_mux_data & 8) { ym2151_w(machine().device("ymsnd"), offset & 1, data); }
+	else if(m_mux_data & 4)
 	{
 		//printf("%02x %02x W\n",offset,data);
 		// ...
 	}
 	else
-		printf("Warning: mux data W = %02x",state->m_mux_data);
+		printf("Warning: mux data W = %02x",m_mux_data);
 }
 
-static WRITE8_HANDLER( mcu_io_mux_w )
+WRITE8_MEMBER(rbmk_state::mcu_io_mux_w)
 {
-	rbmk_state *state = space->machine().driver_data<rbmk_state>();
-	state->m_mux_data = ~data;
+	m_mux_data = ~data;
 }
 
-static ADDRESS_MAP_START( rbmk_mcu_io, AS_IO, 8 )
-	AM_RANGE(0x0ff00, 0x0ffff) AM_READWRITE( rbmk_mcu_io_r, rbmk_mcu_io_w )
+static ADDRESS_MAP_START( rbmk_mcu_io, AS_IO, 8, rbmk_state )
+	AM_RANGE(0x0ff00, 0x0ffff) AM_READWRITE(rbmk_mcu_io_r, rbmk_mcu_io_w )
 
-	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE( mcu_io_mux_w )
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_WRITE(mcu_io_mux_w )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( rbmk )

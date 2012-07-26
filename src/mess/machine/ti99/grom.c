@@ -281,7 +281,7 @@ void ti99_grom_device::device_reset(void)
 	m_waddr_LSB = false;
 	m_buffer = 0;
 
-	m_memptr = owner()->subregion(m_regionname)->base();
+	m_memptr = owner()->memregion(m_regionname)->base();
 	assert (m_memptr!=NULL);
 
 	m_memptr += m_offset_reg;

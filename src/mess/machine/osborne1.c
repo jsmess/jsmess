@@ -51,21 +51,21 @@ READ8_MEMBER( osborne1_state::osborne1_2000_r )
 			break;
 		case 0x200:	/* Keyboard */
 			/* Row 0 */
-			if ( offset & 0x01 )	data &= input_port_read(machine(), "ROW0");
+			if ( offset & 0x01 )	data &= ioport("ROW0")->read();
 			/* Row 1 */
-			if ( offset & 0x02 )	data &= input_port_read(machine(), "ROW1");
+			if ( offset & 0x02 )	data &= ioport("ROW1")->read();
 			/* Row 2 */
-			if ( offset & 0x04 )	data &= input_port_read(machine(), "ROW3");
+			if ( offset & 0x04 )	data &= ioport("ROW3")->read();
 			/* Row 3 */
-			if ( offset & 0x08 )	data &= input_port_read(machine(), "ROW4");
+			if ( offset & 0x08 )	data &= ioport("ROW4")->read();
 			/* Row 4 */
-			if ( offset & 0x10 )	data &= input_port_read(machine(), "ROW5");
+			if ( offset & 0x10 )	data &= ioport("ROW5")->read();
 			/* Row 5 */
-			if ( offset & 0x20 )	data &= input_port_read(machine(), "ROW2");
+			if ( offset & 0x20 )	data &= ioport("ROW2")->read();
 			/* Row 6 */
-			if ( offset & 0x40 )	data &= input_port_read(machine(), "ROW6");
+			if ( offset & 0x40 )	data &= ioport("ROW6")->read();
 			/* Row 7 */
-			if ( offset & 0x80 )	data &= input_port_read(machine(), "ROW7");
+			if ( offset & 0x80 )	data &= ioport("ROW7")->read();
 			break;
 		case 0x900:	/* IEEE488 PIA */
 			data = m_pia0->read(space, offset & 0x03 );
@@ -152,31 +152,30 @@ WRITE8_MEMBER( osborne1_state::osborne1_bankswitch_w )
 	}
 	if ( m_bank2_enabled )
 	{
-		memory_set_bankptr(machine(),"bank1", machine().region("maincpu")->base() );
-		memory_set_bankptr(machine(),"bank2", m_empty_4K );
-		memory_set_bankptr(machine(),"bank3", m_empty_4K );
+		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() );
+		membank("bank2")->set_base(m_empty_4K );
+		membank("bank3")->set_base(m_empty_4K );
 	}
 	else
 	{
-		memory_set_bankptr(machine(),"bank1", machine().device<ram_device>(RAM_TAG)->pointer() );
-		memory_set_bankptr(machine(),"bank2", machine().device<ram_device>(RAM_TAG)->pointer() + 0x1000 );
-		memory_set_bankptr(machine(),"bank3", machine().device<ram_device>(RAM_TAG)->pointer() + 0x3000 );
+		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() );
+		membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x1000 );
+		membank("bank3")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x3000 );
 	}
 	m_bank4_ptr = machine().device<ram_device>(RAM_TAG)->pointer() + ( ( m_bank3_enabled ) ? 0x10000 : 0xF000 );
-	memory_set_bankptr(machine(),"bank4", m_bank4_ptr );
+	membank("bank4")->set_base(m_bank4_ptr );
 	m_bankswitch = offset;
 	m_in_irq_handler = 0;
 }
 
 
-DIRECT_UPDATE_HANDLER( osborne1_opbase )
+DIRECT_UPDATE_MEMBER(osborne1_state::osborne1_opbase)
 {
-	osborne1_state *state = machine.driver_data<osborne1_state>();
 	if ( ( address & 0xF000 ) == 0x2000 )
 	{
-		if ( ! state->m_bank2_enabled )
+		if ( ! m_bank2_enabled )
 		{
-			direct.explicit_configure(0x2000, 0x2fff, 0x0fff, machine.device<ram_device>(RAM_TAG)->pointer() + 0x2000);
+			direct.explicit_configure(0x2000, 0x2fff, 0x0fff, machine().device<ram_device>(RAM_TAG)->pointer() + 0x2000);
 			return ~0;
 		}
 	}
@@ -191,18 +190,71 @@ WRITE_LINE_MEMBER( osborne1_state::ieee_pia_irq_a_func )
 }
 
 
+READ8_MEMBER( osborne1_state::ieee_pia_pb_r )
+{
+	/*
+
+        bit     description
+
+        0
+        1
+        2
+        3       EOI
+        4
+        5       DAV
+        6       NDAC
+        7       NRFD
+
+    */
+
+	UINT8 data = 0;
+
+	data |= m_ieee->eoi_r() << 3;
+	data |= m_ieee->dav_r() << 5;
+	data |= m_ieee->ndac_r() << 6;
+	data |= m_ieee->nrfd_r() << 7;
+
+	return data;
+}
+
+
+WRITE8_MEMBER( osborne1_state::ieee_pia_pb_w )
+{
+	/*
+
+        bit     description
+
+        0
+        1
+        2
+        3       EOI
+        4       ATN
+        5       DAV
+        6       NDAC
+        7       NRFD
+
+    */
+
+	m_ieee->eoi_w(BIT(data, 3));
+	m_ieee->atn_w(BIT(data, 4));
+	m_ieee->dav_w(BIT(data, 5));
+	m_ieee->ndac_w(BIT(data, 6));
+	m_ieee->nrfd_w(BIT(data, 7));
+}
+
+
 const pia6821_interface osborne1_ieee_pia_config =
 {
-	DEVCB_NULL,							/* in_a_func */
-	DEVCB_NULL,							/* in_b_func */
+	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_r),	/* in_a_func */
+	DEVCB_DRIVER_MEMBER(osborne1_state, ieee_pia_pb_r),				/* in_b_func */
 	DEVCB_NULL,							/* in_ca1_func */
 	DEVCB_NULL,							/* in_cb1_func */
 	DEVCB_NULL,							/* in_ca2_func */
 	DEVCB_NULL,							/* in_cb2_func */
-	DEVCB_NULL,							/* out_a_func */
-	DEVCB_NULL,							/* out_b_func */
-	DEVCB_NULL,							/* out_ca2_func */
-	DEVCB_NULL,							/* out_cb2_func */
+	DEVCB_DEVICE_MEMBER(IEEE488_TAG, ieee488_device, dio_w),	/* out_a_func */
+	DEVCB_DRIVER_MEMBER(osborne1_state, ieee_pia_pb_w),				/* out_b_func */
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ifc_w),	/* out_ca2_func */
+	DEVCB_DEVICE_LINE_MEMBER(IEEE488_TAG, ieee488_device, ren_w),	/* out_cb2_func */
 	DEVCB_DRIVER_LINE_MEMBER(osborne1_state, ieee_pia_irq_a_func),	/* irq_a_func */
 	DEVCB_NULL							/* irq_b_func */
 };
@@ -383,14 +435,14 @@ MACHINE_RESET( osborne1 )
 	state->m_pia_1_irq_state = FALSE;
 	state->m_in_irq_handler = 0;
 
-	state->m_p_chargen = machine.region( "chargen" )->base();
+	state->m_p_chargen = state->memregion( "chargen" )->base();
 
 	memset( machine.device<ram_device>(RAM_TAG)->pointer() + 0x10000, 0xFF, 0x1000 );
 
 	for(drive=0;drive<2;drive++)
 		floppy_install_load_proc(floppy_get_device(machine, drive), osborne1_load_proc);
 
-	space->set_direct_update_handler(direct_update_delegate(FUNC(osborne1_opbase), &machine));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(osborne1_state::osborne1_opbase), state));
 }
 
 

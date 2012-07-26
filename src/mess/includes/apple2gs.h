@@ -41,6 +41,18 @@ typedef enum
 	ADBSTATE_INRESPONSE
 } adbstate_t;
 
+#define IRQ_KBD_SRQ			0x01
+#define IRQ_ADB_DATA		0x02
+#define IRQ_ADB_MOUSE		0x04
+#define IRQ_VGC_SCANLINE	0x08
+#define IRQ_VGC_SECOND		0x10
+#define IRQ_INTEN_QSECOND	0x20
+#define IRQ_INTEN_VBL		0x40
+#define IRQ_DOC			    0x80
+#define IRQ_SLOT            0x100
+
+void apple2gs_add_irq(running_machine &machine, UINT16 irq_mask);
+void apple2gs_remove_irq(running_machine &machine, UINT16 irq_mask);
 
 class apple2gs_state : public apple2_state
 {
@@ -48,11 +60,13 @@ public:
 	apple2gs_state(const machine_config &mconfig, device_type type, const char *tag)
 		: apple2_state(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-        m_es5503(*this, "es5503")
+        m_es5503(*this, "es5503"),
+        m_fdc(*this, "fdc")
         { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<es5503_device> m_es5503;
+    required_device<device_t> m_fdc;
 
 	UINT8 *m_slowmem;
 	UINT8 m_newvideo;
@@ -64,7 +78,7 @@ public:
 	UINT8 m_inten;
 	UINT8 m_intflag;
 	UINT8 m_shadow;
-	UINT8 m_pending_irqs;
+	UINT16 m_pending_irqs;
 	UINT8 m_mouse_x;
 	UINT8 m_mouse_y;
 	INT8 m_mouse_dx;
@@ -101,6 +115,20 @@ public:
 	bitmap_ind16 *m_legacy_gfx;
     bool m_is_rom3;
     UINT8 m_echo_bank;
+
+	DECLARE_DIRECT_UPDATE_MEMBER(apple2gs_opbase);
+
+    READ8_MEMBER( apple2gs_c0xx_r );
+    WRITE8_MEMBER( apple2gs_c0xx_w );
+    WRITE8_MEMBER( apple2gs_main0400_w );
+    WRITE8_MEMBER( apple2gs_aux0400_w );
+    WRITE8_MEMBER( apple2gs_main2000_w );
+    WRITE8_MEMBER( apple2gs_aux2000_w );
+    WRITE8_MEMBER( apple2gs_main4000_w );
+    WRITE8_MEMBER( apple2gs_aux4000_w );
+
+    UINT8 adb_read_datareg();
+    UINT8 adb_read_kmstatus();
 };
 
 

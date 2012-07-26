@@ -38,11 +38,14 @@ class cgenie_state : public driver_device
 {
 public:
 	cgenie_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_colorram(*this, "colorram"),
+		m_fontram(*this, "fontram"){ }
+
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_fontram;
 
 	UINT8 *m_videoram;
-	UINT8 *m_fontram;
-	UINT8 *m_colorram;
 	int m_tv_mode;
 	int m_font_offset[4];
 	int m_port_ff;

@@ -55,7 +55,7 @@ static WRITE8_DEVICE_HANDLER( p0c_w )
 
 	/* bit 2 toggles during gameplay */
 
-	flip_screen_set(device->machine(), data & 8);
+	state->flip_screen_set(data & 8);
 
 //  popmessage("%02x",data&0x0f);
 }
@@ -69,7 +69,7 @@ static READ8_DEVICE_HANDLER( p1b_r )
 static READ8_DEVICE_HANDLER( p1c_r )
 {
 	taxidriv_state *state = device->machine().driver_data<taxidriv_state>();
-	return (state->m_s2 << 7) | (state->m_s4 << 6) | ((input_port_read(device->machine(), "SERVCOIN") & 1) << 4);
+	return (state->m_s2 << 7) | (state->m_s4 << 6) | ((state->ioport("SERVCOIN")->read() & 1) << 4);
 }
 
 static WRITE8_DEVICE_HANDLER( p1a_w )
@@ -151,35 +151,35 @@ static const ppi8255_interface ppi8255_intf[5] =
 };
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, taxidriv_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM	/* ??? */
 	AM_RANGE(0x9000, 0x9fff) AM_RAM	/* ??? */
 	AM_RANGE(0xa000, 0xafff) AM_RAM	/* ??? */
 	AM_RANGE(0xb000, 0xbfff) AM_RAM	/* ??? */
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_MEMBER(taxidriv_state, m_vram4)			/* radar bitmap */
-	AM_RANGE(0xc800, 0xcfff) AM_WRITEONLY AM_BASE_MEMBER(taxidriv_state, m_vram5)	/* "sprite1" bitmap */
-	AM_RANGE(0xd000, 0xd7ff) AM_WRITEONLY AM_BASE_MEMBER(taxidriv_state, m_vram6)	/* "sprite2" bitmap */
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE_MEMBER(taxidriv_state, m_vram7)			/* "sprite3" bitmap */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("vram4")			/* radar bitmap */
+	AM_RANGE(0xc800, 0xcfff) AM_WRITEONLY AM_SHARE("vram5")	/* "sprite1" bitmap */
+	AM_RANGE(0xd000, 0xd7ff) AM_WRITEONLY AM_SHARE("vram6")	/* "sprite2" bitmap */
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("vram7")			/* "sprite3" bitmap */
 	AM_RANGE(0xe000, 0xf3ff) AM_READONLY
-	AM_RANGE(0xe000, 0xe3ff) AM_WRITEONLY AM_BASE_MEMBER(taxidriv_state, m_vram1)	/* car tilemap */
-	AM_RANGE(0xe400, 0xebff) AM_WRITEONLY AM_BASE_MEMBER(taxidriv_state, m_vram2)	/* bg1 tilemap */
-	AM_RANGE(0xec00, 0xefff) AM_WRITEONLY AM_BASE_MEMBER(taxidriv_state, m_vram0)	/* fg tilemap */
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_BASE_MEMBER(taxidriv_state, m_vram3)	/* bg2 tilemap */
-	AM_RANGE(0xf400, 0xf403) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xf480, 0xf483) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)	/* "sprite1" placement */
-	AM_RANGE(0xf500, 0xf503) AM_DEVREADWRITE("ppi8255_3", ppi8255_r, ppi8255_w)	/* "sprite2" placement */
-	AM_RANGE(0xf580, 0xf583) AM_DEVREADWRITE("ppi8255_4", ppi8255_r, ppi8255_w)	/* "sprite3" placement */
+	AM_RANGE(0xe000, 0xe3ff) AM_WRITEONLY AM_SHARE("vram1")	/* car tilemap */
+	AM_RANGE(0xe400, 0xebff) AM_WRITEONLY AM_SHARE("vram2")	/* bg1 tilemap */
+	AM_RANGE(0xec00, 0xefff) AM_WRITEONLY AM_SHARE("vram0")	/* fg tilemap */
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_SHARE("vram3")	/* bg2 tilemap */
+	AM_RANGE(0xf400, 0xf403) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xf480, 0xf483) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)	/* "sprite1" placement */
+	AM_RANGE(0xf500, 0xf503) AM_DEVREADWRITE_LEGACY("ppi8255_3", ppi8255_r, ppi8255_w)	/* "sprite2" placement */
+	AM_RANGE(0xf580, 0xf583) AM_DEVREADWRITE_LEGACY("ppi8255_4", ppi8255_r, ppi8255_w)	/* "sprite3" placement */
 	//AM_RANGE(0xf780, 0xf781) AM_WRITEONLY     /* more scroll registers? */
-	AM_RANGE(0xf782, 0xf787) AM_WRITEONLY AM_BASE_MEMBER(taxidriv_state, m_scroll)	/* bg scroll (three copies always identical) */
+	AM_RANGE(0xf782, 0xf787) AM_WRITEONLY AM_SHARE("scroll")	/* bg scroll (three copies always identical) */
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, taxidriv_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW0")
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("DSW2")
@@ -187,18 +187,18 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8, taxidriv_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2000) AM_READNOP	/* irq ack? */
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu3_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( cpu3_port_map, AS_IO, 8, taxidriv_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x03, 0x03) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 ADDRESS_MAP_END
 
 

@@ -17,7 +17,6 @@
         while M 1234 will display memory at 9123.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -32,11 +31,12 @@ public:
 	homez80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER( homez80_keyboard_r );
-	UINT8* m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8* m_p_chargen;
 	bool m_irq;
 	virtual void machine_reset();
@@ -49,13 +49,13 @@ READ8_MEMBER( homez80_state::homez80_keyboard_r )
 {
 	char kbdrow[8];
 	sprintf(kbdrow,"LINE%d",offset);
-	return input_port_read(machine(), kbdrow);
+	return ioport(kbdrow)->read();
 }
 
 static ADDRESS_MAP_START(homez80_mem, AS_PROGRAM, 8, homez80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x0fff ) AM_ROM  // Monitor
-	AM_RANGE( 0x2000, 0x23ff ) AM_RAM  AM_BASE(m_p_videoram) // Video RAM
+	AM_RANGE( 0x2000, 0x23ff ) AM_RAM  AM_SHARE("p_videoram") // Video RAM
 	AM_RANGE( 0x7020, 0x702f ) AM_READ(homez80_keyboard_r)
 	AM_RANGE( 0x8000, 0xffff ) AM_RAM  // 32 K RAM
 ADDRESS_MAP_END
@@ -220,7 +220,7 @@ MACHINE_RESET_MEMBER( homez80_state )
 
 VIDEO_START_MEMBER( homez80_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 SCREEN_UPDATE16_MEMBER( homez80_state )

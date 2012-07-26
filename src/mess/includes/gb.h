@@ -181,23 +181,63 @@ public:
 	void (*update_scanline)( running_machine &machine );
 
 	bitmap_ind16 m_bitmap;
+	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_mbc1);
+	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_mbc2);
+	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_mbc3);
+	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_mbc5);
+	DECLARE_WRITE8_MEMBER(gb_ram_bank_select_mbc6);
+	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_mbc6_1);
+	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_mbc6_2);
+	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_mbc7);
+	DECLARE_WRITE8_MEMBER(gb_rom_bank_unknown_mbc7);
+	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_wisdom);
+	DECLARE_WRITE8_MEMBER(gb_ram_bank_select_mbc1);
+	DECLARE_WRITE8_MEMBER(gb_ram_bank_select_mbc3);
+	DECLARE_WRITE8_MEMBER(gb_ram_bank_select_mbc5);
+	DECLARE_WRITE8_MEMBER(gb_ram_enable);
+	DECLARE_WRITE8_MEMBER(gb_mem_mode_select_mbc1);
+	DECLARE_WRITE8_MEMBER(gb_mem_mode_select_mbc3);
+	DECLARE_WRITE8_MEMBER(gb_ram_tama5);
+	DECLARE_WRITE8_MEMBER(gb_rom_bank_mmm01_0000_w);
+	DECLARE_WRITE8_MEMBER(gb_rom_bank_mmm01_2000_w);
+	DECLARE_WRITE8_MEMBER(gb_rom_bank_mmm01_4000_w);
+	DECLARE_WRITE8_MEMBER(gb_rom_bank_mmm01_6000_w);
+	DECLARE_WRITE8_MEMBER(gb_rom_bank_select_mbc1_kor);
+	DECLARE_WRITE8_MEMBER(gb_ram_bank_select_mbc1_kor);
+	DECLARE_WRITE8_MEMBER(gb_mem_mode_select_mbc1_kor);
+	DECLARE_WRITE8_MEMBER(gb_io_w);
+	DECLARE_WRITE8_MEMBER(gb_io2_w);
+	DECLARE_WRITE8_MEMBER(sgb_io_w);
+	DECLARE_READ8_MEMBER(gb_ie_r);
+	DECLARE_WRITE8_MEMBER(gb_ie_w);
+	DECLARE_READ8_MEMBER(gb_io_r);
+	DECLARE_WRITE8_MEMBER(gbc_io2_w);
+	DECLARE_READ8_MEMBER(gbc_io2_r);
+	DECLARE_READ8_MEMBER(megaduck_video_r);
+	DECLARE_WRITE8_MEMBER(megaduck_video_w);
+	DECLARE_WRITE8_MEMBER(megaduck_sound_w1);
+	DECLARE_READ8_MEMBER(megaduck_sound_r1);
+	DECLARE_WRITE8_MEMBER(megaduck_sound_w2);
+	DECLARE_READ8_MEMBER(megaduck_sound_r2);
+	DECLARE_WRITE8_MEMBER(megaduck_rom_bank_select_type1);
+	DECLARE_WRITE8_MEMBER(megaduck_rom_bank_select_type2);
+	DECLARE_READ8_MEMBER(gb_video_r);
+	DECLARE_READ8_MEMBER(gb_vram_r);
+	DECLARE_WRITE8_MEMBER(gb_vram_w);
+	DECLARE_READ8_MEMBER(gb_oam_r);
+	DECLARE_WRITE8_MEMBER(gb_oam_w);
+	DECLARE_WRITE8_MEMBER(gb_video_w);
+	DECLARE_READ8_MEMBER(gbc_video_r);
+	DECLARE_WRITE8_MEMBER(gbc_video_w);
 };
 
 
 /*----------- defined in machine/gb.c -----------*/
 
-WRITE8_HANDLER( gb_ram_enable );
-WRITE8_HANDLER( gb_io_w );
-READ8_HANDLER ( gb_io_r );
-WRITE8_HANDLER( gb_io2_w );
-READ8_HANDLER( gb_ie_r );
-WRITE8_HANDLER( gb_ie_w );
 DEVICE_START(gb_cart);
 DEVICE_IMAGE_LOAD(gb_cart);
 INTERRUPT_GEN( gb_scanline_interrupt );
 void gb_timer_callback(lr35902_cpu_device *device, int cycles);
-WRITE8_HANDLER( gbc_io2_w );
-READ8_HANDLER( gbc_io2_r );
 MACHINE_START( gb );
 MACHINE_RESET( gb );
 MACHINE_RESET( gbpocket );
@@ -210,7 +250,6 @@ MACHINE_RESET( gbpocket );
 
 extern MACHINE_START( sgb );
 extern MACHINE_RESET( sgb );
-extern WRITE8_HANDLER ( sgb_io_w );
 
 MACHINE_START( gbc );
 MACHINE_RESET( gbc );
@@ -220,25 +259,11 @@ MACHINE_RESET( gbc );
 extern DEVICE_IMAGE_LOAD(megaduck_cart);
 extern MACHINE_START( megaduck );
 extern MACHINE_RESET( megaduck );
-extern  READ8_HANDLER( megaduck_video_r );
-extern WRITE8_HANDLER( megaduck_video_w );
-extern WRITE8_HANDLER( megaduck_rom_bank_select_type1 );
-extern WRITE8_HANDLER( megaduck_rom_bank_select_type2 );
-extern  READ8_HANDLER( megaduck_sound_r1 );
-extern WRITE8_HANDLER( megaduck_sound_w1 );
-extern  READ8_HANDLER( megaduck_sound_r2 );
-extern WRITE8_HANDLER( megaduck_sound_w2 );
 
 
 /*----------- defined in video/gb.c -----------*/
 
-READ8_HANDLER( gbc_video_r );
-WRITE8_HANDLER ( gbc_video_w );
 
-READ8_HANDLER( gb_oam_r );
-WRITE8_HANDLER( gb_oam_w );
-READ8_HANDLER( gb_vram_r );
-WRITE8_HANDLER( gb_vram_w );
 
 enum
 {
@@ -254,8 +279,6 @@ PALETTE_INIT( sgb );
 PALETTE_INIT( gbc );
 PALETTE_INIT( megaduck );
 
-READ8_HANDLER( gb_video_r );
-WRITE8_HANDLER( gb_video_w );
 MACHINE_START( gb_video );
 MACHINE_START( gbc_video );
 void gb_video_reset( running_machine &machine, int mode );

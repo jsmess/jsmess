@@ -67,8 +67,8 @@ static const ay8910_interface nimbus_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,	                    /* portA read */
 	DEVCB_NULL, 					/* portB read */
-	DEVCB_MEMORY_HANDLER(MAINCPU_TAG, PROGRAM, nimbus_sound_ay8910_porta_w),   /* portA write */
-	DEVCB_MEMORY_HANDLER(MAINCPU_TAG, PROGRAM, nimbus_sound_ay8910_portb_w)    /* portB write */
+	DEVCB_DRIVER_MEMBER(rmnimbus_state, nimbus_sound_ay8910_porta_w),   /* portA write */
+	DEVCB_DRIVER_MEMBER(rmnimbus_state, nimbus_sound_ay8910_portb_w)    /* portB write */
 };
 
 static const msm5205_interface msm5205_config =
@@ -102,7 +102,7 @@ static const centronics_interface nimbus_centronics_config =
 	DEVCB_NULL
 };
 
-static ADDRESS_MAP_START(nimbus_mem, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(nimbus_mem, AS_PROGRAM, 16, rmnimbus_state )
     AM_RANGE( 0x00000, 0x1FFFF ) AM_RAMBANK(RAM_BANK00_TAG)
     AM_RANGE( 0x20000, 0x3FFFF ) AM_RAMBANK(RAM_BANK01_TAG)
     AM_RANGE( 0x40000, 0x5FFFF ) AM_RAMBANK(RAM_BANK02_TAG)
@@ -114,18 +114,18 @@ static ADDRESS_MAP_START(nimbus_mem, AS_PROGRAM, 16)
     AM_RANGE( 0xF0000, 0xFFFFF ) AM_ROM AM_REGION(MAINCPU_TAG, 0x0f0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(nimbus_io, AS_IO, 16)
-    AM_RANGE( 0x0000, 0x0031) AM_READWRITE( nimbus_video_io_r, nimbus_video_io_w)
-    AM_RANGE( 0x0032, 0x007f) AM_READWRITE( nimbus_io_r, nimbus_io_w)
-    AM_RANGE( 0x0080, 0x0081) AM_READWRITE8( nimbus_mcu_r, nimbus_mcu_w, 0x00FF)
-    AM_RANGE( 0x0092, 0x0093) AM_READWRITE8( nimbus_iou_r, nimbus_iou_w, 0x00FF)
-    AM_RANGE( 0x00A4, 0x00A5) AM_READWRITE8( nimbus_mouse_js_r, nimbus_mouse_js_w, 0x00FF)
-    AM_RANGE( 0X00c0, 0X00cf) AM_READWRITE8( nimbus_pc8031_r, nimbus_pc8031_w, 0x00FF)
-    AM_RANGE( 0X00e0, 0X00ef) AM_READWRITE8( nimbus_sound_ay8910_r, nimbus_sound_ay8910_w, 0x00FF)
-    AM_RANGE( 0x00f0, 0x00f7) AM_DEVREADWRITE8(Z80SIO_TAG, z80sio_cd_ba_r, z80sio_cd_ba_w, 0x00ff)
-    AM_RANGE( 0x0400, 0x041f) AM_READWRITE8( nimbus_disk_r, nimbus_disk_w, 0x00FF)
-	AM_RANGE( 0x0480, 0x049f) AM_DEVREADWRITE8_MODERN(VIA_TAG, via6522_device, read, write, 0x00FF)
-	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( nimbus_i186_internal_port_r, nimbus_i186_internal_port_w)/* CPU 80186         */
+static ADDRESS_MAP_START(nimbus_io, AS_IO, 16, rmnimbus_state )
+    AM_RANGE( 0x0000, 0x0031) AM_READWRITE(nimbus_video_io_r, nimbus_video_io_w)
+    AM_RANGE( 0x0032, 0x007f) AM_READWRITE(nimbus_io_r, nimbus_io_w)
+    AM_RANGE( 0x0080, 0x0081) AM_READWRITE8(nimbus_mcu_r, nimbus_mcu_w, 0x00FF)
+    AM_RANGE( 0x0092, 0x0093) AM_READWRITE8(nimbus_iou_r, nimbus_iou_w, 0x00FF)
+    AM_RANGE( 0x00A4, 0x00A5) AM_READWRITE8(nimbus_mouse_js_r, nimbus_mouse_js_w, 0x00FF)
+    AM_RANGE( 0X00c0, 0X00cf) AM_READWRITE8(nimbus_pc8031_r, nimbus_pc8031_w, 0x00FF)
+    AM_RANGE( 0X00e0, 0X00ef) AM_READWRITE8(nimbus_sound_ay8910_r, nimbus_sound_ay8910_w, 0x00FF)
+    AM_RANGE( 0x00f0, 0x00f7) AM_DEVREADWRITE8_LEGACY(Z80SIO_TAG, z80sio_cd_ba_r, z80sio_cd_ba_w, 0x00ff)
+    AM_RANGE( 0x0400, 0x041f) AM_READWRITE8(nimbus_disk_r, nimbus_disk_w, 0x00FF)
+	AM_RANGE( 0x0480, 0x049f) AM_DEVREADWRITE8(VIA_TAG, via6522_device, read, write, 0x00FF)
+	AM_RANGE( 0xff00, 0xffff) AM_READWRITE(nimbus_i186_internal_port_r, nimbus_i186_internal_port_w)/* CPU 80186         */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( nimbus )
@@ -271,13 +271,13 @@ static INPUT_PORTS_START( nimbus )
 
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START(nimbus_iocpu_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(nimbus_iocpu_mem, AS_PROGRAM, 8, rmnimbus_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nimbus_iocpu_io , AS_IO, 8)
+static ADDRESS_MAP_START( nimbus_iocpu_io , AS_IO, 8, rmnimbus_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x000FF) AM_READWRITE(nimbus_pc8031_iou_r, nimbus_pc8031_iou_w)
 	AM_RANGE(0x00010, 0x07fff) AM_RAM

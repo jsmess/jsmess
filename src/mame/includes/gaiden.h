@@ -8,14 +8,17 @@ class gaiden_state : public driver_device
 {
 public:
 	gaiden_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_videoram2(*this, "videoram2"),
+		m_videoram3(*this, "videoram3"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT16 *    m_videoram;
-	UINT16 *    m_videoram2;
-	UINT16 *    m_videoram3;
-	UINT16 *    m_spriteram;
-	size_t      m_spriteram_size;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_videoram2;
+	required_shared_ptr<UINT16> m_videoram3;
+	required_shared_ptr<UINT16> m_spriteram;
 
 	/* video-related */
 	tilemap_t   *m_text_layer;
@@ -43,6 +46,28 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	DECLARE_WRITE16_MEMBER(gaiden_sound_command_w);
+	DECLARE_WRITE16_MEMBER(drgnbowl_sound_command_w);
+	DECLARE_WRITE16_MEMBER(wildfang_protection_w);
+	DECLARE_READ16_MEMBER(wildfang_protection_r);
+	DECLARE_WRITE16_MEMBER(raiga_protection_w);
+	DECLARE_READ16_MEMBER(raiga_protection_r);
+	DECLARE_WRITE16_MEMBER(gaiden_flip_w);
+	DECLARE_WRITE16_MEMBER(gaiden_txscrollx_w);
+	DECLARE_WRITE16_MEMBER(gaiden_txscrolly_w);
+	DECLARE_WRITE16_MEMBER(gaiden_fgscrollx_w);
+	DECLARE_WRITE16_MEMBER(gaiden_fgscrolly_w);
+	DECLARE_WRITE16_MEMBER(gaiden_bgscrollx_w);
+	DECLARE_WRITE16_MEMBER(gaiden_bgscrolly_w);
+	DECLARE_WRITE16_MEMBER(gaiden_txoffsety_w);
+	DECLARE_WRITE16_MEMBER(gaiden_fgoffsety_w);
+	DECLARE_WRITE16_MEMBER(gaiden_bgoffsety_w);
+	DECLARE_WRITE16_MEMBER(gaiden_sproffsety_w);
+	DECLARE_WRITE16_MEMBER(gaiden_videoram3_w);
+	DECLARE_READ16_MEMBER(gaiden_videoram3_r);
+	DECLARE_WRITE16_MEMBER(gaiden_videoram2_w);
+	DECLARE_READ16_MEMBER(gaiden_videoram2_r);
+	DECLARE_WRITE16_MEMBER(gaiden_videoram_w);
 };
 
 
@@ -57,20 +82,4 @@ SCREEN_UPDATE_RGB32( gaiden );
 SCREEN_UPDATE_RGB32( raiga );
 SCREEN_UPDATE_IND16( drgnbowl );
 
-WRITE16_HANDLER( gaiden_videoram_w );
-WRITE16_HANDLER( gaiden_videoram2_w );
-READ16_HANDLER( gaiden_videoram2_r );
-WRITE16_HANDLER( gaiden_videoram3_w );
-READ16_HANDLER( gaiden_videoram3_r );
 
-WRITE16_HANDLER( gaiden_flip_w );
-WRITE16_HANDLER( gaiden_txscrollx_w );
-WRITE16_HANDLER( gaiden_txscrolly_w );
-WRITE16_HANDLER( gaiden_fgscrollx_w );
-WRITE16_HANDLER( gaiden_fgscrolly_w );
-WRITE16_HANDLER( gaiden_bgscrollx_w );
-WRITE16_HANDLER( gaiden_bgscrolly_w );
-WRITE16_HANDLER( gaiden_txoffsety_w );
-WRITE16_HANDLER( gaiden_fgoffsety_w );
-WRITE16_HANDLER( gaiden_bgoffsety_w );
-WRITE16_HANDLER( gaiden_sproffsety_w );

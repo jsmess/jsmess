@@ -28,6 +28,7 @@
 
 PALETTE_INIT( sbasketb )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances[4] = { 2000, 1000, 470, 220 };
 	double rweights[4], gweights[4], bweights[4];
 	int i;
@@ -94,26 +95,24 @@ PALETTE_INIT( sbasketb )
 	}
 }
 
-WRITE8_HANDLER( sbasketb_videoram_w )
+WRITE8_MEMBER(sbasketb_state::sbasketb_videoram_w)
 {
-	sbasketb_state *state = space->machine().driver_data<sbasketb_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( sbasketb_colorram_w )
+WRITE8_MEMBER(sbasketb_state::sbasketb_colorram_w)
 {
-	sbasketb_state *state = space->machine().driver_data<sbasketb_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( sbasketb_flipscreen_w )
+WRITE8_MEMBER(sbasketb_state::sbasketb_flipscreen_w)
 {
-	if (flip_screen_get(space->machine()) != data)
+	if (flip_screen() != data)
 	{
-		flip_screen_set(space->machine(), data);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(data);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -154,7 +153,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			int flipx =  spriteram[offs + 1] & 0x40;
 			int flipy =  spriteram[offs + 1] & 0x80;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;

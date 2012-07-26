@@ -15,12 +15,15 @@ class drtomy_state : public driver_device
 {
 public:
 	drtomy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram_fg(*this, "videorafg"),
+		m_videoram_bg(*this, "videorabg"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT16 *  m_spriteram;
-	UINT16 *  m_videoram_bg;
-	UINT16 *  m_videoram_fg;
+	required_shared_ptr<UINT16> m_videoram_fg;
+	required_shared_ptr<UINT16> m_videoram_bg;
+	required_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *  m_paletteram16; // currently this uses generic palette handling
 
 	/* video-related */
@@ -29,6 +32,8 @@ public:
 
 	/* misc */
 	int       m_oki_bank;
+	DECLARE_WRITE16_MEMBER(drtomy_vram_fg_w);
+	DECLARE_WRITE16_MEMBER(drtomy_vram_bg_w);
 };
 
 
@@ -133,18 +138,16 @@ static SCREEN_UPDATE_IND16( drtomy )
 	return 0;
 }
 
-static WRITE16_HANDLER( drtomy_vram_fg_w )
+WRITE16_MEMBER(drtomy_state::drtomy_vram_fg_w)
 {
-	drtomy_state *state = space->machine().driver_data<drtomy_state>();
-	COMBINE_DATA(&state->m_videoram_fg[offset]);
-	state->m_tilemap_fg->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram_fg[offset]);
+	m_tilemap_fg->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( drtomy_vram_bg_w )
+WRITE16_MEMBER(drtomy_state::drtomy_vram_bg_w)
 {
-	drtomy_state *state = space->machine().driver_data<drtomy_state>();
-	COMBINE_DATA(&state->m_videoram_bg[offset]);
-	state->m_tilemap_bg->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram_bg[offset]);
+	m_tilemap_bg->mark_tile_dirty(offset);
 }
 
 static WRITE16_DEVICE_HANDLER( drtomy_okibank_w )
@@ -160,18 +163,18 @@ static WRITE16_DEVICE_HANDLER( drtomy_okibank_w )
 	/* unknown bit 2 -> (data & 4) */
 }
 
-static ADDRESS_MAP_START( drtomy_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( drtomy_map, AS_PROGRAM, 16, drtomy_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM	/* ROM */
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(drtomy_vram_fg_w) AM_BASE_MEMBER(drtomy_state, m_videoram_fg)	/* Video RAM FG */
-	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(drtomy_vram_bg_w) AM_BASE_MEMBER(drtomy_state, m_videoram_bg) /* Video RAM BG */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram) /* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(drtomy_state, m_spriteram) /* Sprite RAM */
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(drtomy_vram_fg_w) AM_SHARE("videorafg")	/* Video RAM FG */
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(drtomy_vram_bg_w) AM_SHARE("videorabg") /* Video RAM BG */
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram") /* Palette */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram") /* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
-	AM_RANGE(0x70000c, 0x70000d) AM_DEVWRITE("oki", drtomy_okibank_w) /* OKI banking */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff) /* OKI 6295*/
+	AM_RANGE(0x70000c, 0x70000d) AM_DEVWRITE_LEGACY("oki", drtomy_okibank_w) /* OKI banking */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff) /* OKI 6295*/
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM	/* Work RAM */
 ADDRESS_MAP_END
 

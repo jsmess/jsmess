@@ -782,6 +782,17 @@ void screen_device::register_screen_bitmap(bitmap_t &bitmap)
 
 
 //-------------------------------------------------
+//  vblank_port_read - custom port handler to
+//  return a VBLANK state
+//-------------------------------------------------
+
+int screen_device::vblank_port_read()
+{
+	return vblank();
+}
+
+
+//-------------------------------------------------
 //  vblank_begin - call any external callbacks to
 //  signal the VBLANK period has begun
 //-------------------------------------------------
@@ -951,7 +962,7 @@ void screen_device::finalize_burnin()
 	scaledvis.min_y = m_visarea.min_y * m_burnin.height() / m_height;
 	scaledvis.max_y = m_visarea.max_y * m_burnin.height() / m_height;
 
-	// wrap a bitmap around the subregion we care about
+	// wrap a bitmap around the memregion we care about
 	bitmap_argb32 finalmap(scaledvis.width(), scaledvis.height());
 	int srcwidth = m_burnin.width();
 	int srcheight = m_burnin.height();

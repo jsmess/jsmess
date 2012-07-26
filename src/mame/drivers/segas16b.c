@@ -1030,7 +1030,7 @@ static void sound_w(running_machine &machine, UINT8 data)
 	if (state->m_soundcpu != NULL)
 	{
 		address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
-		soundlatch_w(space, 0, data & 0xff);
+		state->soundlatch_byte_w(*space, 0, data & 0xff);
 		device_set_input_line(state->m_soundcpu, 0, HOLD_LINE);
 	}
 }
@@ -1168,11 +1168,11 @@ static READ16_HANDLER( standard_io_r )
 		case 0x1000/2:
 		{
 			static const char *const sysports[] = { "SERVICE", "P1", "UNUSED", "P2" };
-			return input_port_read(space->machine(), sysports[offset & 3]);
+			return space->machine().root_device().ioport(sysports[offset & 3])->read();
 		}
 
 		case 0x2000/2:
-			return input_port_read(space->machine(), (offset & 1) ? "DSW1" : "DSW2");
+			return space->machine().root_device().ioport((offset & 1) ? "DSW1" : "DSW2")->read();
 	}
 	logerror("%06X:standard_io_r - unknown read access to address %04X\n", cpu_get_pc(&space->device()), offset * 2);
 	return segaic16_open_bus_r(space, 0, mem_mask);
@@ -1319,7 +1319,7 @@ static WRITE16_HANDLER( unknown_rgn2_w )
 static WRITE8_DEVICE_HANDLER( upd7759_control_w )
 {
 	segas1x_state *state = device->machine().driver_data<segas1x_state>();
-	int size = device->machine().region("soundcpu")->bytes() - 0x10000;
+	int size = state->memregion("soundcpu")->bytes() - 0x10000;
 	if (size > 0)
 	{
 		int bankoffs = 0;
@@ -1376,7 +1376,7 @@ static WRITE8_DEVICE_HANDLER( upd7759_control_w )
 				bankoffs += (data & 0x07) * 0x04000;
 				break;
 		}
-		memory_set_bankptr(device->machine(), "bank1", device->machine().region("soundcpu")->base() + 0x10000 + (bankoffs % size));
+		state->membank("bank1")->set_base(device->machine().root_device().memregion("soundcpu")->base() + 0x10000 + (bankoffs % size));
 	}
 }
 
@@ -1450,7 +1450,7 @@ static void altbeast_common_i8751_sim(running_machine &machine, offs_t soundoffs
 	}
 
 	/* read inputs */
-	workram[inputoffs] = ~input_port_read(machine, "SERVICE") << 8;
+	workram[inputoffs] = ~machine.root_device().ioport("SERVICE")->read() << 8;
 }
 
 static void altbeasj_i8751_sim(running_machine &machine)
@@ -1534,8 +1534,8 @@ static void goldnaxe_i8751_sim(running_machine &machine)
 	}
 
 	/* read inputs */
-	workram[0x2cd0/2] = (input_port_read(machine, "P1") << 8) | input_port_read(machine, "P2");
-	workram[0x2c96/2] = input_port_read(machine, "SERVICE") << 8;
+	workram[0x2cd0/2] = (state->ioport("P1")->read() << 8) | state->ioport("P2")->read();
+	workram[0x2c96/2] = machine.root_device().ioport("SERVICE")->read() << 8;
 }
 
 
@@ -1557,9 +1557,9 @@ static void tturf_i8751_sim(running_machine &machine)
 	}
 
 	/* read inputs */
-	workram[0x01e6/2] = input_port_read(machine, "SERVICE") << 8;
-	workram[0x01e8/2] = input_port_read(machine, "P1") << 8;
-	workram[0x01ea/2] = input_port_read(machine, "P2") << 8;
+	workram[0x01e6/2] = machine.root_device().ioport("SERVICE")->read() << 8;
+	workram[0x01e8/2] = machine.root_device().ioport("P1")->read() << 8;
+	workram[0x01ea/2] = machine.root_device().ioport("P2")->read() << 8;
 }
 
 
@@ -1591,34 +1591,35 @@ static void wb3_i8751_sim(running_machine &machine)
 
 static READ16_HANDLER( aceattac_custom_io_r )
 {
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 	switch (offset & (0x3000/2))
 	{
 		case 0x1000/2:
 			switch (offset & 3)
 			{
 				case 0x01:
-					return input_port_read(space->machine(), "P1");
+					return state->ioport("P1")->read();
 
 				case 0x02:
-					return input_port_read(space->machine(), "DIAL1") | (input_port_read(space->machine(), "DIAL2") << 4);
+					return state->ioport("DIAL1")->read() | (state->ioport("DIAL2")->read() << 4);
 					// low nibble: Sega 56pin Edge "16"-"19" // rotary switch 10positions 4bit-binary-pinout
 					// high nibble: Sega 56pin Edge "T"-"W"  // ditto
 
 				case 0x03:
-					return input_port_read(space->machine(), "P2");
+					return state->ioport("P2")->read();
 			}
 			break;
 		case 0x3000/2:
 			switch (offset & 3)
 			{
-				case 0:	return input_port_read(space->machine(), "HANDX1");
-				case 1:	return input_port_read(space->machine(), "TRACKX1");
-				case 2:	return input_port_read(space->machine(), "TRACKY1");
-				case 3:	return input_port_read(space->machine(), "HANDY1");
-				case 4:	return input_port_read(space->machine(), "HANDX2");
-				case 5:	return input_port_read(space->machine(), "TRACKX2");
-				case 6:	return input_port_read(space->machine(), "TRACKY2");
-				case 7:	return input_port_read(space->machine(), "HANDY2");
+				case 0:	return state->ioport("HANDX1")->read();
+				case 1:	return state->ioport("TRACKX1")->read();
+				case 2:	return state->ioport("TRACKY1")->read();
+				case 3:	return state->ioport("HANDY1")->read();
+				case 4:	return state->ioport("HANDX2")->read();
+				case 5:	return state->ioport("TRACKX2")->read();
+				case 6:	return state->ioport("TRACKY2")->read();
+				case 7:	return state->ioport("HANDY2")->read();
 			}
 			break;
 	}
@@ -1656,19 +1657,20 @@ static WRITE16_HANDLER( atomicp_sound_w )
 
 static READ16_HANDLER( dunkshot_custom_io_r )
 {
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 	switch (offset & (0x3000/2))
 	{
 		case 0x3000/2:
 			switch ((offset/2) & 7)
 			{
-				case 0:	return (input_port_read(space->machine(), "ANALOGX1") << 4) >> (8 * (offset & 1));
-				case 1:	return (input_port_read(space->machine(), "ANALOGY1") << 4) >> (8 * (offset & 1));
-				case 2:	return (input_port_read(space->machine(), "ANALOGX2") << 4) >> (8 * (offset & 1));
-				case 3:	return (input_port_read(space->machine(), "ANALOGY2") << 4) >> (8 * (offset & 1));
-				case 4:	return (input_port_read(space->machine(), "ANALOGX3") << 4) >> (8 * (offset & 1));
-				case 5:	return (input_port_read(space->machine(), "ANALOGY3") << 4) >> (8 * (offset & 1));
-				case 6:	return (input_port_read(space->machine(), "ANALOGX4") << 4) >> (8 * (offset & 1));
-				case 7:	return (input_port_read(space->machine(), "ANALOGY4") << 4) >> (8 * (offset & 1));
+				case 0:	return (state->ioport("ANALOGX1")->read() << 4) >> (8 * (offset & 1));
+				case 1:	return (state->ioport("ANALOGY1")->read() << 4) >> (8 * (offset & 1));
+				case 2:	return (state->ioport("ANALOGX2")->read() << 4) >> (8 * (offset & 1));
+				case 3:	return (state->ioport("ANALOGY2")->read() << 4) >> (8 * (offset & 1));
+				case 4:	return (state->ioport("ANALOGX3")->read() << 4) >> (8 * (offset & 1));
+				case 5:	return (state->ioport("ANALOGY3")->read() << 4) >> (8 * (offset & 1));
+				case 6:	return (state->ioport("ANALOGX4")->read() << 4) >> (8 * (offset & 1));
+				case 7:	return (state->ioport("ANALOGY4")->read() << 4) >> (8 * (offset & 1));
 			}
 			break;
 	}
@@ -1714,7 +1716,7 @@ static WRITE16_HANDLER( hwchamp_custom_io_w )
 			switch (offset & 0x30/2)
 			{
 				case 0x20/2:
-					state->m_hwc_input_value = input_port_read_safe(space->machine(), portname[offset & 3], 0xff);
+					state->m_hwc_input_value = state->ioport(portname[offset & 3])->read_safe(0xff);
 					break;
 
 				case 0x30/2:
@@ -1741,15 +1743,16 @@ static WRITE16_HANDLER( hwchamp_custom_io_w )
 
 static READ16_HANDLER( passshtj_custom_io_r )
 {
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 	switch (offset & (0x3000/2))
 	{
 		case 0x3000/2:
 			switch (offset & 3)
 			{
-				case 0:	return input_port_read(space->machine(), "P1");
-				case 1:	return input_port_read(space->machine(), "P2");
-				case 2:	return input_port_read(space->machine(), "P3");
-				case 3:	return input_port_read(space->machine(), "P4");
+				case 0:	return state->ioport("P1")->read();
+				case 1:	return state->ioport("P2")->read();
+				case 2:	return state->ioport("P3")->read();
+				case 3:	return state->ioport("P4")->read();
 			}
 			break;
 	}
@@ -1766,15 +1769,16 @@ static READ16_HANDLER( passshtj_custom_io_r )
 
 static READ16_HANDLER( sdi_custom_io_r )
 {
+	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 	switch (offset & (0x3000/2))
 	{
 		case 0x3000/2:
 			switch ((offset/2) & 3)
 			{
-				case 0:	return input_port_read(space->machine(), "ANALOGX1");
-				case 1:	return input_port_read(space->machine(), "ANALOGY1");
-				case 2:	return input_port_read(space->machine(), "ANALOGX2");
-				case 3:	return input_port_read(space->machine(), "ANALOGY2");
+				case 0:	return state->ioport("ANALOGX1")->read();
+				case 1:	return state->ioport("ANALOGY1")->read();
+				case 2:	return state->ioport("ANALOGX2")->read();
+				case 3:	return state->ioport("ANALOGY2")->read();
 			}
 			break;
 	}
@@ -1800,12 +1804,12 @@ static READ16_HANDLER( sjryuko_custom_io_r )
 			switch (offset & 3)
 			{
 				case 1:
-					if (input_port_read_safe(space->machine(), portname[state->m_mj_input_num], 0xff) != 0xff)
+					if (state->ioport(portname[state->m_mj_input_num])->read_safe(0xff) != 0xff)
 						return 0xff & ~(1 << state->m_mj_input_num);
 					return 0xff;
 
 				case 2:
-					return input_port_read_safe(space->machine(), portname[state->m_mj_input_num], 0xff);
+					return state->ioport(portname[state->m_mj_input_num])->read_safe(0xff);
 			}
 			break;
 	}
@@ -1837,9 +1841,9 @@ static WRITE16_HANDLER( sjryuko_custom_io_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( system16b_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( system16b_map, AS_PROGRAM, 16, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0xffffff) AM_READWRITE(segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w)
+	AM_RANGE(0x000000, 0xffffff) AM_READWRITE_LEGACY(segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w)
 ADDRESS_MAP_END
 
 
@@ -1850,21 +1854,21 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_r)
+	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVWRITE("upd", upd7759_control_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_DEVREADWRITE("upd", upd7759_status_r, upd7759_port_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_DEVWRITE_LEGACY("upd", upd7759_control_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_DEVREADWRITE_LEGACY("upd", upd7759_status_r, upd7759_port_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 
@@ -1875,9 +1879,9 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0xff00) AM_READWRITE(segaic16_memory_mapper_r, segaic16_memory_mapper_w)
+	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0xff00) AM_READWRITE_LEGACY(segaic16_memory_mapper_r, segaic16_memory_mapper_w)
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ_PORT("SERVICE")
 ADDRESS_MAP_END
 
@@ -6822,8 +6826,8 @@ static WRITE16_HANDLER( isgsm_cart_addr_low_w )
 // when reading from this port the data is xored by a fixed value depending on the cart
 static READ16_HANDLER( isgsm_cart_data_r )
 {
-	int size = space->machine().region("gamecart_rgn")->bytes();
-	UINT8* rgn = space->machine().region("gamecart_rgn")->base();
+	int size = space->machine().root_device().memregion("gamecart_rgn")->bytes();
+	UINT8* rgn = space->machine().root_device().memregion("gamecart_rgn")->base();
 
 	isgsm_cart_addr++;
 
@@ -6847,16 +6851,16 @@ static WRITE16_HANDLER( isgsm_data_w )
 
 	switch (isgsm_type&0x0f)
 	{
-		case 0x0: dest = space->machine().region("gfx2")->base();
+		case 0x0: dest = space->machine().root_device().memregion("gfx2")->base();
 			break;
 
-		case 0x1: dest = space->machine().region("gfx1")->base();
+		case 0x1: dest = space->machine().root_device().memregion("gfx1")->base();
 			break;
 
-		case 0x2: dest = space->machine().region("soundcpu")->base();
+		case 0x2: dest = space->machine().root_device().memregion("soundcpu")->base();
 			break;
 
-		case 0x3: dest = space->machine().region("maincpu")->base();
+		case 0x3: dest = space->machine().root_device().memregion("maincpu")->base();
 			break;
 
 		default: // no other cases?
@@ -6967,7 +6971,7 @@ static WRITE16_HANDLER( isgsm_data_w )
 
 			dest[isgsm_addr] = byte;
 
-			if (dest == space->machine().region("gfx1")->base())
+			if (dest == space->machine().root_device().memregion("gfx1")->base())
 			{
 
 				// we need to re-decode the tiles if writing to this area to keep MAME happy
@@ -7061,45 +7065,45 @@ static WRITE16_HANDLER( isgsm_main_bank_change_w )
 	// other values on real hw have strange results, change memory mapping etc??
 	if (data==1)
 	{
-		memory_set_bankptr(space->machine(),ISGSM_MAIN_BANK, space->machine().region("maincpu")->base());
+		space->machine().root_device().membank(ISGSM_MAIN_BANK)->set_base(space->machine().root_device().memregion("maincpu")->base());
 	}
 }
 
 static MACHINE_START( isgsm )
 {
-	memory_set_bankptr(machine,ISGSM_CART_BANK, machine.region("gamecart_rgn")->base());
-	memory_set_bankptr(machine,ISGSM_MAIN_BANK, machine.region("bios")->base());
+	machine.root_device().membank(ISGSM_CART_BANK)->set_base(machine.root_device().memregion("gamecart_rgn")->base());
+	machine.root_device().membank(ISGSM_MAIN_BANK)->set_base(machine.root_device().memregion("bios")->base());
 }
 
-static ADDRESS_MAP_START( isgsm_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( isgsm_map, AS_PROGRAM, 16, segas1x_state )
 
 	AM_RANGE(0x000000, 0x0fffff) AM_ROMBANK(ISGSM_MAIN_BANK) // this area is ALWAYS read-only, even when the game is banked in
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM // used during startup for decompression
-	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE( rom_5704_bank_w )
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(segaic16_tileram_0_w) AM_BASE(&segaic16_tileram_0)
-	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(segaic16_textram_0_w) AM_BASE(&segaic16_textram_0)
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_BASE(&segaic16_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
-	AM_RANGE(0xC40000, 0xC43fff) AM_READWRITE(misc_io_r, misc_io_w)
+	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE_LEGACY(rom_5704_bank_w )
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE_LEGACY(segaic16_tileram_0_w) AM_BASE_LEGACY(&segaic16_tileram_0)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE_LEGACY(segaic16_textram_0_w) AM_BASE_LEGACY(&segaic16_textram_0)
+	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_BASE_LEGACY(&segaic16_paletteram)
+	AM_RANGE(0xC40000, 0xC43fff) AM_READWRITE_LEGACY(misc_io_r, misc_io_w)
 
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITE( isgsm_data_w ) // writes decompressed data here (copied from RAM..)
-	AM_RANGE(0xe00002, 0xe00003) AM_WRITE( isgsm_type_w ) // selects which 'type' of data we're writing
-	AM_RANGE(0xe00004, 0xe00005) AM_WRITE( isgsm_addr_high_w ) // high address, and some mode bits
-	AM_RANGE(0xe00006, 0xe00007) AM_WRITE( isgsm_addr_low_w )  // low address
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE_LEGACY(isgsm_data_w ) // writes decompressed data here (copied from RAM..)
+	AM_RANGE(0xe00002, 0xe00003) AM_WRITE_LEGACY(isgsm_type_w ) // selects which 'type' of data we're writing
+	AM_RANGE(0xe00004, 0xe00005) AM_WRITE_LEGACY(isgsm_addr_high_w ) // high address, and some mode bits
+	AM_RANGE(0xe00006, 0xe00007) AM_WRITE_LEGACY(isgsm_addr_low_w )  // low address
 
-	AM_RANGE(0xe80000, 0xe80001) AM_READ( isgsm_cart_data_r ) // 8-bit port that the entire cart can be read from
+	AM_RANGE(0xe80000, 0xe80001) AM_READ_LEGACY(isgsm_cart_data_r ) // 8-bit port that the entire cart can be read from
 	AM_RANGE(0xe80002, 0xe80003) AM_READ_PORT("CARDDSW")
-	AM_RANGE(0xe80004, 0xe80005) AM_WRITE( isgsm_cart_addr_high_w )
-	AM_RANGE(0xe80006, 0xe80007) AM_WRITE( isgsm_cart_addr_low_w )
-	AM_RANGE(0xe80008, 0xe80009) AM_READWRITE( isgsm_cart_security_high_r, isgsm_cart_security_high_w ) // 32-bit bitswap device..
-	AM_RANGE(0xe8000a, 0xe8000b) AM_READWRITE( isgsm_cart_security_low_r,  isgsm_cart_security_low_w )
+	AM_RANGE(0xe80004, 0xe80005) AM_WRITE_LEGACY(isgsm_cart_addr_high_w )
+	AM_RANGE(0xe80006, 0xe80007) AM_WRITE_LEGACY(isgsm_cart_addr_low_w )
+	AM_RANGE(0xe80008, 0xe80009) AM_READWRITE_LEGACY(isgsm_cart_security_high_r, isgsm_cart_security_high_w ) // 32-bit bitswap device..
+	AM_RANGE(0xe8000a, 0xe8000b) AM_READWRITE_LEGACY(isgsm_cart_security_low_r,  isgsm_cart_security_low_w )
 
 	AM_RANGE(0xee0000, 0xefffff) AM_ROMBANK(ISGSM_CART_BANK) // only the first 0x20000 bytes of the cart are visible here..
 
-	AM_RANGE(0xfe0006, 0xfe0007) AM_WRITE( isgsm_sound_w16 )
-	AM_RANGE(0xfe0008, 0xfe0009) AM_WRITE( isgsm_sound_reset_w )
-	AM_RANGE(0xfe000a, 0xfe000b) AM_WRITE( isgsm_main_bank_change_w )
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE(&workram)
+	AM_RANGE(0xfe0006, 0xfe0007) AM_WRITE_LEGACY(isgsm_sound_w16 )
+	AM_RANGE(0xfe0008, 0xfe0009) AM_WRITE_LEGACY(isgsm_sound_reset_w )
+	AM_RANGE(0xfe000a, 0xfe000b) AM_WRITE_LEGACY(isgsm_main_bank_change_w )
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE_LEGACY(&workram)
 ADDRESS_MAP_END
 
 
@@ -7219,8 +7223,8 @@ static MACHINE_RESET( isgsm )
 	for (int i = 0; i < 16; i++)
 		segaic16_sprites_set_bank(machine, 0, i, i);
 
-	memory_set_bankptr(machine,ISGSM_CART_BANK, machine.region("gamecart_rgn")->base());
-	memory_set_bankptr(machine,ISGSM_MAIN_BANK, machine.region("bios")->base());
+	machine.root_device().membank(ISGSM_CART_BANK)->set_base(machine.root_device().memregion("gamecart_rgn")->base());
+	machine.root_device().membank(ISGSM_MAIN_BANK)->set_base(machine.root_device().memregion("bios")->base());
 	devtag_reset( machine, "maincpu" );
 }
 
@@ -7248,7 +7252,7 @@ DRIVER_INIT( isgsm )
 
 	// decrypt the bios...
 	UINT16* temp = (UINT16*)malloc(0x20000);
-	UINT16* rom = (UINT16*)machine.region("bios")->base();
+	UINT16* rom = (UINT16*)machine.root_device().memregion("bios")->base();
 	int i;
 
 	for (i=0;i<0x10000;i++)
@@ -7265,7 +7269,7 @@ DRIVER_INIT( shinfz )
 	DRIVER_INIT_CALL( isgsm );
 
 	UINT16* temp = (UINT16*)malloc(0x200000);
-	UINT16* rom = (UINT16*)machine.region("gamecart_rgn")->base();
+	UINT16* rom = (UINT16*)machine.root_device().memregion("gamecart_rgn")->base();
 	int i;
 
 	for (i=0;i<0x100000;i++)
@@ -7285,7 +7289,7 @@ DRIVER_INIT( tetrbx )
 	DRIVER_INIT_CALL( isgsm );
 
 	UINT16* temp = (UINT16*)malloc(0x80000);
-	UINT16* rom = (UINT16*)machine.region("gamecart_rgn")->base();
+	UINT16* rom = (UINT16*)machine.root_device().memregion("gamecart_rgn")->base();
 	int i;
 
 	for (i=0;i<0x80000/2;i++)

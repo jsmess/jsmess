@@ -23,15 +23,21 @@ class pzletime_state : public driver_device
 {
 public:
 	pzletime_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_video_regs(*this, "video_regs"),
+		m_tilemap_regs(*this, "tilemap_regs"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_mid_videoram(*this, "mid_videoram"),
+		m_txt_videoram(*this, "txt_videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT16 *       m_bg_videoram;
-	UINT16 *       m_mid_videoram;
-	UINT16 *       m_txt_videoram;
-	UINT16 *       m_tilemap_regs;
-	UINT16 *       m_video_regs;
-	UINT16 *       m_spriteram;
+	required_shared_ptr<UINT16> m_video_regs;
+	required_shared_ptr<UINT16> m_tilemap_regs;
+	required_shared_ptr<UINT16> m_bg_videoram;
+	required_shared_ptr<UINT16> m_mid_videoram;
+	required_shared_ptr<UINT16> m_txt_videoram;
+	required_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *       m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
@@ -40,6 +46,11 @@ public:
 
 	/* misc */
 	int            m_ticket;
+	DECLARE_WRITE16_MEMBER(mid_videoram_w);
+	DECLARE_WRITE16_MEMBER(txt_videoram_w);
+	DECLARE_WRITE16_MEMBER(ticket_w);
+	DECLARE_WRITE16_MEMBER(video_regs_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(ticket_status_r);
 };
 
 
@@ -134,18 +145,16 @@ static SCREEN_UPDATE_IND16( pzletime )
 	return 0;
 }
 
-static WRITE16_HANDLER( mid_videoram_w )
+WRITE16_MEMBER(pzletime_state::mid_videoram_w)
 {
-	pzletime_state *state = space->machine().driver_data<pzletime_state>();
-	COMBINE_DATA(&state->m_mid_videoram[offset]);
-	state->m_mid_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_mid_videoram[offset]);
+	m_mid_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( txt_videoram_w )
+WRITE16_MEMBER(pzletime_state::txt_videoram_w)
 {
-	pzletime_state *state = space->machine().driver_data<pzletime_state>();
-	COMBINE_DATA(&state->m_txt_videoram[offset]);
-	state->m_txt_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_txt_videoram[offset]);
+	m_txt_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE16_DEVICE_HANDLER( eeprom_w )
@@ -159,38 +168,36 @@ static WRITE16_DEVICE_HANDLER( eeprom_w )
 	}
 }
 
-static WRITE16_HANDLER( ticket_w )
+WRITE16_MEMBER(pzletime_state::ticket_w)
 {
-	pzletime_state *state = space->machine().driver_data<pzletime_state>();
 
 	if (ACCESSING_BITS_0_7)
-		state->m_ticket = data & 1;
+		m_ticket = data & 1;
 }
 
-static WRITE16_HANDLER( video_regs_w )
+WRITE16_MEMBER(pzletime_state::video_regs_w)
 {
-	pzletime_state *state = space->machine().driver_data<pzletime_state>();
 	int i;
 
-	COMBINE_DATA(&state->m_video_regs[offset]);
+	COMBINE_DATA(&m_video_regs[offset]);
 
 	if (offset == 0)
 	{
-		if (state->m_video_regs[0] > 0)
+		if (m_video_regs[0] > 0)
 		{
 			for (i = 0; i < 0x300; i++)
 			{
-				palette_set_pen_contrast(space->machine(), i, (double)0x8000/(double)state->m_video_regs[0]);
+				palette_set_pen_contrast(machine(), i, (double)0x8000/(double)m_video_regs[0]);
 			}
 		}
 	}
 	else if (offset == 1)
 	{
-		if (state->m_video_regs[1] > 0)
+		if (m_video_regs[1] > 0)
 		{
 			for (i = 0x300; i < 32768 + 0x300; i++)
 			{
-				palette_set_pen_contrast(space->machine(), i, (double)0x8000/(double)state->m_video_regs[1]);
+				palette_set_pen_contrast(machine(), i, (double)0x8000/(double)m_video_regs[1]);
 			}
 		}
 	}
@@ -201,25 +208,24 @@ static WRITE16_DEVICE_HANDLER( oki_bank_w )
 	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 0x3));
 }
 
-static CUSTOM_INPUT( ticket_status_r )
+CUSTOM_INPUT_MEMBER(pzletime_state::ticket_status_r)
 {
-	pzletime_state *state = field.machine().driver_data<pzletime_state>();
-	return (state->m_ticket && !(field.machine().primary_screen->frame_number() % 128));
+	return (m_ticket && !(machine().primary_screen->frame_number() % 128));
 }
 
-static ADDRESS_MAP_START( pzletime_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pzletime_map, AS_PROGRAM, 16, pzletime_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x700000, 0x700005) AM_RAM_WRITE(video_regs_w) AM_BASE_MEMBER(pzletime_state, m_video_regs)
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x900000, 0x9005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xa00000, 0xa00007) AM_RAM AM_BASE_MEMBER(pzletime_state, m_tilemap_regs)
-	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_BASE_MEMBER(pzletime_state, m_bg_videoram)
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(mid_videoram_w) AM_BASE_MEMBER(pzletime_state, m_mid_videoram)
-	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(txt_videoram_w) AM_BASE_MEMBER(pzletime_state, m_txt_videoram)
-	AM_RANGE(0xd00000, 0xd01fff) AM_RAM AM_BASE_MEMBER(pzletime_state, m_spriteram)
-	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("INPUT") AM_DEVWRITE("eeprom", eeprom_w)
+	AM_RANGE(0x700000, 0x700005) AM_RAM_WRITE(video_regs_w) AM_SHARE("video_regs")
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x900000, 0x9005ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xa00000, 0xa00007) AM_RAM AM_SHARE("tilemap_regs")
+	AM_RANGE(0xb00000, 0xb3ffff) AM_RAM AM_SHARE("bg_videoram")
+	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(mid_videoram_w) AM_SHARE("mid_videoram")
+	AM_RANGE(0xc01000, 0xc01fff) AM_RAM_WRITE(txt_videoram_w) AM_SHARE("txt_videoram")
+	AM_RANGE(0xd00000, 0xd01fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("INPUT") AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
 	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("SYSTEM") AM_WRITE(ticket_w)
-	AM_RANGE(0xe00004, 0xe00005) AM_DEVWRITE("oki", oki_bank_w)
+	AM_RANGE(0xe00004, 0xe00005) AM_DEVWRITE_LEGACY("oki", oki_bank_w)
 	AM_RANGE(0xf00000, 0xf0ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -229,11 +235,11 @@ static INPUT_PORTS_START( pzletime )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x0004, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit) /* eeprom */
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ticket_status_r, NULL) /* ticket dispenser */
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, pzletime_state,ticket_status_r, NULL) /* ticket dispenser */
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("INPUT")

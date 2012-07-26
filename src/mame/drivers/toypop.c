@@ -37,53 +37,46 @@ TODO:
 #include "includes/toypop.h"
 
 
-static READ16_HANDLER( toypop_m68000_sharedram_r )
+READ16_MEMBER(toypop_state::toypop_m68000_sharedram_r)
 {
-	toypop_state *state = space->machine().driver_data<toypop_state>();
-	return state->m_m68000_sharedram[offset];
+	return m_m68000_sharedram[offset];
 }
 
-static WRITE16_HANDLER( toypop_m68000_sharedram_w )
+WRITE16_MEMBER(toypop_state::toypop_m68000_sharedram_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toypop_state *state = space->machine().driver_data<toypop_state>();
-		state->m_m68000_sharedram[offset] = data & 0xff;
+		m_m68000_sharedram[offset] = data & 0xff;
 	}
 }
 
-static READ8_HANDLER( toypop_main_interrupt_enable_r )
+READ8_MEMBER(toypop_state::toypop_main_interrupt_enable_r)
 {
-	toypop_state *state = space->machine().driver_data<toypop_state>();
 
-	state->m_main_irq_mask = 1;
+	m_main_irq_mask = 1;
 	return 0;
 }
 
-static WRITE8_HANDLER( toypop_main_interrupt_enable_w )
+WRITE8_MEMBER(toypop_state::toypop_main_interrupt_enable_w)
 {
-	toypop_state *state = space->machine().driver_data<toypop_state>();
-	state->m_main_irq_mask = 1;
+	m_main_irq_mask = 1;
 }
 
-static WRITE8_HANDLER( toypop_main_interrupt_disable_w )
+WRITE8_MEMBER(toypop_state::toypop_main_interrupt_disable_w)
 {
-	toypop_state *state = space->machine().driver_data<toypop_state>();
-	state->m_main_irq_mask = 0;
-//  cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	m_main_irq_mask = 0;
+//  cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( toypop_sound_interrupt_enable_acknowledge_w )
+WRITE8_MEMBER(toypop_state::toypop_sound_interrupt_enable_acknowledge_w)
 {
-	toypop_state *state = space->machine().driver_data<toypop_state>();
-	state->m_sound_irq_mask = 1;
-//  cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
+	m_sound_irq_mask = 1;
+//  cputag_set_input_line(machine(), "audiocpu", 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( toypop_sound_interrupt_disable_w )
+WRITE8_MEMBER(toypop_state::toypop_sound_interrupt_disable_w)
 {
-	toypop_state *state = space->machine().driver_data<toypop_state>();
-	state->m_sound_irq_mask = 0;
+	m_sound_irq_mask = 0;
 }
 
 static TIMER_CALLBACK( namcoio_run )
@@ -135,24 +128,24 @@ static INTERRUPT_GEN( toypop_sound_timer_irq )
 		device_set_input_line(device, 0, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( toypop_sound_clear_w )
+WRITE8_MEMBER(toypop_state::toypop_sound_clear_w)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( toypop_sound_assert_w )
+WRITE8_MEMBER(toypop_state::toypop_sound_assert_w)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( toypop_m68000_clear_w )
+WRITE8_MEMBER(toypop_state::toypop_m68000_clear_w)
 {
-	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, CLEAR_LINE);
+	cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( toypop_m68000_assert_w )
+WRITE8_MEMBER(toypop_state::toypop_m68000_assert_w)
 {
-	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine(), "sub", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_RESET( toypop )
@@ -175,16 +168,14 @@ static INTERRUPT_GEN( toypop_m68000_interrupt )
 		device_set_input_line(device, 6, HOLD_LINE);
 }
 
-static WRITE16_HANDLER( toypop_m68000_interrupt_enable_w )
+WRITE16_MEMBER(toypop_state::toypop_m68000_interrupt_enable_w)
 {
-	toypop_state *state = space->machine().driver_data<toypop_state>();
-	state->m_interrupt_enable_68k = 1;
+	m_interrupt_enable_68k = 1;
 }
 
-static WRITE16_HANDLER( toypop_m68000_interrupt_disable_w )
+WRITE16_MEMBER(toypop_state::toypop_m68000_interrupt_disable_w)
 {
-	toypop_state *state = space->machine().driver_data<toypop_state>();
-	state->m_interrupt_enable_68k = 0;
+	m_interrupt_enable_68k = 0;
 }
 
 
@@ -195,16 +186,16 @@ static WRITE16_HANDLER( toypop_m68000_interrupt_disable_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( liblrabl_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_BASE_MEMBER(toypop_state,m_videoram)	/* video RAM */
-	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_BASE_MEMBER(toypop_state,m_spriteram)										/* general RAM, area 1 */
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_MEMBER(toypop_state,m_m68000_sharedram)		/* shared RAM with the 68000 CPU */
-	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE("namco", namco_snd_sharedram_r, namco_snd_sharedram_w) /* shared RAM with sound CPU */
-	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE("58xx", namcoio_r, namcoio_w)				/* custom I/O */
-	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE("56xx_1", namcoio_r, namcoio_w)				/* custom I/O */
-	AM_RANGE(0x6820, 0x682f) AM_DEVREADWRITE("56xx_2", namcoio_r, namcoio_w)				/* custom I/O */
+static ADDRESS_MAP_START( liblrabl_map, AS_PROGRAM, 8, toypop_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_SHARE("videoram")	/* video RAM */
+	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_SHARE("spriteram")										/* general RAM, area 1 */
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("m68k_shared")		/* shared RAM with the 68000 CPU */
+	AM_RANGE(0x6000, 0x63ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w) /* shared RAM with sound CPU */
+	AM_RANGE(0x6800, 0x680f) AM_DEVREADWRITE_LEGACY("58xx", namcoio_r, namcoio_w)				/* custom I/O */
+	AM_RANGE(0x6810, 0x681f) AM_DEVREADWRITE_LEGACY("56xx_1", namcoio_r, namcoio_w)				/* custom I/O */
+	AM_RANGE(0x6820, 0x682f) AM_DEVREADWRITE_LEGACY("56xx_2", namcoio_r, namcoio_w)				/* custom I/O */
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(toypop_main_interrupt_enable_w)		/* enable interrupt */
-	AM_RANGE(0x7800, 0x7800) AM_READWRITE(watchdog_reset_r, toypop_main_interrupt_disable_w) /* disable interrupt */
+	AM_RANGE(0x7800, 0x7800) AM_READ(watchdog_reset_r) AM_WRITE(toypop_main_interrupt_disable_w) /* disable interrupt */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(toypop_m68000_clear_w)				/* reset 68000 */
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(toypop_m68000_assert_w)				/* reset 68000 */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(toypop_sound_clear_w)					/* sound CPU reset */
@@ -213,14 +204,14 @@ static ADDRESS_MAP_START( liblrabl_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM											/* ROM code */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( toypop_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_BASE_MEMBER(toypop_state,m_videoram)	/* video RAM */
-	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_BASE_MEMBER(toypop_state,m_spriteram)										/* general RAM, area 1 */
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_MEMBER(toypop_state,m_m68000_sharedram)		/* shared RAM with the 68000 CPU */
-	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE("58xx", namcoio_r, namcoio_w)				/* custom I/O */
-	AM_RANGE(0x6010, 0x601f) AM_DEVREADWRITE("56xx_1", namcoio_r, namcoio_w)				/* custom I/O */
-	AM_RANGE(0x6020, 0x602f) AM_DEVREADWRITE("56xx_2", namcoio_r, namcoio_w)				/* custom I/O */
-	AM_RANGE(0x6800, 0x6bff) AM_DEVREADWRITE("namco", namco_snd_sharedram_r, namco_snd_sharedram_w) /* shared RAM with sound CPU */
+static ADDRESS_MAP_START( toypop_map, AS_PROGRAM, 8, toypop_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(toypop_videoram_w) AM_SHARE("videoram")	/* video RAM */
+	AM_RANGE(0x0800, 0x1fff) AM_RAM	AM_SHARE("spriteram")										/* general RAM, area 1 */
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("m68k_shared")		/* shared RAM with the 68000 CPU */
+	AM_RANGE(0x6000, 0x600f) AM_DEVREADWRITE_LEGACY("58xx", namcoio_r, namcoio_w)				/* custom I/O */
+	AM_RANGE(0x6010, 0x601f) AM_DEVREADWRITE_LEGACY("56xx_1", namcoio_r, namcoio_w)				/* custom I/O */
+	AM_RANGE(0x6020, 0x602f) AM_DEVREADWRITE_LEGACY("56xx_2", namcoio_r, namcoio_w)				/* custom I/O */
+	AM_RANGE(0x6800, 0x6bff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w) /* shared RAM with sound CPU */
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(toypop_main_interrupt_enable_r, toypop_main_interrupt_disable_w) /* disable interrupt */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(toypop_m68000_clear_w)				/* reset 68000 */
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(toypop_m68000_assert_w)				/* reset 68000 */
@@ -237,8 +228,8 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the main CPU + sound registers */
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, toypop_state )
+	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE_LEGACY("namco", namco_snd_sharedram_r, namco_snd_sharedram_w)	/* shared RAM with the main CPU + sound registers */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(toypop_sound_interrupt_disable_w)	/* ??? toypop doesn't write here */
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(toypop_sound_interrupt_enable_acknowledge_w)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(watchdog_reset_w)
@@ -253,13 +244,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( m68k_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( m68k_map, AS_PROGRAM, 16, toypop_state )
 	AM_RANGE(0x000000, 0x007fff) AM_ROM										/* ROM code */
 	AM_RANGE(0x080000, 0x0bffff) AM_RAM										/* RAM */
 	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(toypop_m68000_sharedram_r, toypop_m68000_sharedram_w)	/* shared RAM with the main CPU */
 	AM_RANGE(0x180000, 0x187fff) AM_READWRITE(toypop_merged_background_r, toypop_merged_background_w) /* RAM that has to be merged with the background image */
 	AM_RANGE(0x18fffc, 0x18ffff) AM_WRITE(toypop_flipscreen_w)				/* flip mode */
-	AM_RANGE(0x190000, 0x1dffff) AM_RAM AM_BASE_MEMBER(toypop_state,m_bg_image)			/* RAM containing the background image */
+	AM_RANGE(0x190000, 0x1dffff) AM_RAM AM_SHARE("bg_image")			/* RAM containing the background image */
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(toypop_m68000_interrupt_enable_w)	/* interrupt enable */
 	AM_RANGE(0x380000, 0x380001) AM_WRITE(toypop_m68000_interrupt_disable_w)/* interrupt disable */
 ADDRESS_MAP_END
@@ -315,17 +306,17 @@ static INPUT_PORTS_START( liblrabl )
 	PORT_DIPSETTING(    0x1c, "40k 120k 200k 400k 600k 1m" )
 	PORT_DIPSETTING(    0x0c, "40k 140k 250k 400k 700k 1m" )
 	// bonus scores for 1, 2 or 3 lives
-	PORT_DIPSETTING(    0x14, "50k 150k 300k 500k 700k 1m" ) PORT_CONDITION("DSW1", 0x03, PORTCOND_NOTEQUALS, 0x01)
-	PORT_DIPSETTING(    0x04, "40k 120k and every 120k" )    PORT_CONDITION("DSW1", 0x03, PORTCOND_NOTEQUALS, 0x01)
-	PORT_DIPSETTING(    0x18, "40k 150k and every 150k" )    PORT_CONDITION("DSW1", 0x03, PORTCOND_NOTEQUALS, 0x01)
-	PORT_DIPSETTING(    0x08, "50k 150k 300k" )              PORT_CONDITION("DSW1", 0x03, PORTCOND_NOTEQUALS, 0x01)
-	PORT_DIPSETTING(    0x10, "40k 120k 200k" )              PORT_CONDITION("DSW1", 0x03, PORTCOND_NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x14, "50k 150k 300k 500k 700k 1m" ) PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x04, "40k 120k and every 120k" )    PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x18, "40k 150k and every 150k" )    PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x08, "50k 150k 300k" )              PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
+	PORT_DIPSETTING(    0x10, "40k 120k 200k" )              PORT_CONDITION("DSW1", 0x03, NOTEQUALS, 0x01)
 	// bonus scores for 5 lives
-	PORT_DIPSETTING(    0x14, "40k 120k" )                   PORT_CONDITION("DSW1", 0x03, PORTCOND_EQUALS, 0x01)
-	PORT_DIPSETTING(    0x04, "50k 150k" )                   PORT_CONDITION("DSW1", 0x03, PORTCOND_EQUALS, 0x01)
-	PORT_DIPSETTING(    0x18, "50k 150k and every 150k" )    PORT_CONDITION("DSW1", 0x03, PORTCOND_EQUALS, 0x01)
-	PORT_DIPSETTING(    0x08, "60k 200k and every 200k" )    PORT_CONDITION("DSW1", 0x03, PORTCOND_EQUALS, 0x01)
-	PORT_DIPSETTING(    0x10, "50k" )                        PORT_CONDITION("DSW1", 0x03, PORTCOND_EQUALS, 0x01)
+	PORT_DIPSETTING(    0x14, "40k 120k" )                   PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x04, "50k 150k" )                   PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x18, "50k 150k and every 150k" )    PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x08, "60k 200k and every 200k" )    PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)
+	PORT_DIPSETTING(    0x10, "50k" )                        PORT_CONDITION("DSW1", 0x03, EQUALS, 0x01)
 	// bonus scores for common
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWA:3,2,1")
@@ -502,10 +493,10 @@ static const namco_interface namco_config =
 
 ***************************************************************************/
 
-static READ8_DEVICE_HANDLER( dipA_l )	{ return input_port_read(device->machine(), "DSW1"); }				// dips A
-static READ8_DEVICE_HANDLER( dipA_h )	{ return input_port_read(device->machine(), "DSW1") >> 4; }			// dips A
-static READ8_DEVICE_HANDLER( dipB_l )	{ return input_port_read(device->machine(), "DSW2"); }				// dips B
-static READ8_DEVICE_HANDLER( dipB_h )	{ return input_port_read(device->machine(), "DSW2") >> 4; }			// dips B
+static READ8_DEVICE_HANDLER( dipA_l )	{ return device->machine().root_device().ioport("DSW1")->read(); }				// dips A
+static READ8_DEVICE_HANDLER( dipA_h )	{ return device->machine().root_device().ioport("DSW1")->read() >> 4; }			// dips A
+static READ8_DEVICE_HANDLER( dipB_l )	{ return device->machine().root_device().ioport("DSW2")->read(); }				// dips B
+static READ8_DEVICE_HANDLER( dipB_h )	{ return device->machine().root_device().ioport("DSW2")->read() >> 4; }			// dips B
 
 static WRITE8_DEVICE_HANDLER( out_coin0 )
 {
@@ -520,7 +511,8 @@ static WRITE8_DEVICE_HANDLER( out_coin1 )
 
 static WRITE8_DEVICE_HANDLER( flip )
 {
-	flip_screen_set(device->machine(), data & 1);
+	toypop_state *state = device->machine().driver_data<toypop_state>();
+	state->flip_screen_set(data & 1);
 }
 
 /* chip #0: player inputs, buttons, coins */

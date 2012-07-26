@@ -47,77 +47,34 @@ void vic1210_device::device_start()
 
 
 //-------------------------------------------------
-//  vic20_ram1_r - RAM 1 read
+//  vic20_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 vic1210_device::vic20_ram1_r(address_space &space, offs_t offset)
-{
-	return m_ram[offset & 0x3ff];
-}
-
-
-//-------------------------------------------------
-//  vic20_ram1_w - RAM 1 write
-//-------------------------------------------------
-
-void vic1210_device::vic20_ram1_w(address_space &space, offs_t offset, UINT8 data)
-{
-	m_ram[offset & 0x3ff] = data;
-}
-
-
-//-------------------------------------------------
-//  vic20_ram2_r - RAM 2 read
-//-------------------------------------------------
-
-UINT8 vic1210_device::vic20_ram2_r(address_space &space, offs_t offset)
-{
-	return m_ram[0x400 | (offset & 0x3ff)];
-}
-
-
-//-------------------------------------------------
-//  vic20_ram2_w - RAM 2 write
-//-------------------------------------------------
-
-void vic1210_device::vic20_ram2_w(address_space &space, offs_t offset, UINT8 data)
-{
-	m_ram[0x400 | (offset & 0x3ff)] = data;
-}
-
-
-//-------------------------------------------------
-//  vic20_ram3_r - RAM 3 read
-//-------------------------------------------------
-
-UINT8 vic1210_device::vic20_ram3_r(address_space &space, offs_t offset)
-{
-	return m_ram[0x800 | (offset & 0x3ff)];
-}
-
-
-//-------------------------------------------------
-//  vic20_ram3_w - RAM 3 write
-//-------------------------------------------------
-
-void vic1210_device::vic20_ram3_w(address_space &space, offs_t offset, UINT8 data)
-{
-	m_ram[0x800 | (offset & 0x3ff)] = data;
-}
-
-
-//-------------------------------------------------
-//  vic20_blk5_r - block 5 read
-//-------------------------------------------------
-
-UINT8 vic1210_device::vic20_blk5_r(address_space &space, offs_t offset)
+UINT8 vic1210_device::vic20_cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
 {
 	UINT8 data = 0;
 
-	if (m_blk5)
+	if (!ram1 || !ram2 || !ram3)
+	{
+		data = m_ram[offset & 0xbff];
+	}
+	else if (!blk5 && m_blk5)
 	{
 		data = m_blk5[offset & 0xfff];
 	}
 
 	return data;
+}
+
+
+//-------------------------------------------------
+//  vic20_cd_w - cartridge data write
+//-------------------------------------------------
+
+void vic1210_device::vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3)
+{
+	if (!ram1 || !ram2 || !ram3)
+	{
+		m_ram[offset & 0xbff] = data;
+	}
 }

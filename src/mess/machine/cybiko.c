@@ -42,7 +42,7 @@ static void init_ram_handler(running_machine &machine, offs_t start, offs_t size
 {
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(start, start + size - 1, 0, mirror - size, "bank1");
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(start, start + size - 1, 0, mirror - size, "bank1");
-	memory_set_bankptr( machine, "bank1", machine.device<ram_device>(RAM_TAG)->pointer());
+	machine.root_device().membank( "bank1" )->set_base( machine.device<ram_device>(RAM_TAG)->pointer());
 }
 
 DRIVER_INIT( cybikov1 )
@@ -202,7 +202,7 @@ MACHINE_START( cybikov2 )
 	nvram_system_load( machine, "flash1", cybiko_at45dbxx_load, 1);
 	// multi-purpose flash
 	nvram_system_load( machine, "flash2", cybiko_sst39vfx_load, 1);
-	memory_set_bankptr( machine, "bank2", sst39vfx_get_base(flash2));
+	machine.root_device().membank( "bank2" )->set_base( sst39vfx_get_base(flash2));
 	// serial port
 	cybiko_rs232_init(machine);
 	// other
@@ -217,7 +217,7 @@ MACHINE_START( cybikoxt )
 	nvram_system_load( machine, "rtc", cybiko_pcf8593_load, 0);
 	// multi-purpose flash
 	nvram_system_load( machine, "flash2", cybiko_sst39vfx_load, 1);
-	memory_set_bankptr( machine, "bank2", sst39vfx_get_base(flash2));
+	machine.root_device().membank( "bank2" )->set_base( sst39vfx_get_base(flash2));
 	// ramdisk
 	nvram_system_load( machine, "ramdisk", cybiko_ramdisk_load, 0);
 	// serial port
@@ -387,7 +387,7 @@ int cybiko_state::cybiko_key_r( offs_t offset, int mem_mask)
 	for (UINT8 i = 0; i < 15; i++)
 	{
 		if (!BIT(offset, i))
-			data &= ~input_port_read_safe(machine(), keynames[i], 0);
+			data &= ~ioport(keynames[i])->read_safe(0);
 	}
 	if (data != 0xFFFF)
 	{
@@ -423,7 +423,7 @@ READ8_MEMBER( cybiko_state::cybikov1_io_reg_r )
 		// keyboard
 		case H8S_IO_PORT1 :
 		{
-			if (!BIT(input_port_read(machine(), "A1"), 1))
+			if (!BIT(ioport("A1")->read(), 1))
 				data |= (1 << 3); // "esc" key
 		}
 		break;
@@ -469,7 +469,7 @@ READ8_MEMBER( cybiko_state::cybikov2_io_reg_r )
 		// keyboard
 		case H8S_IO_PORT1 :
 		{
-			if (!BIT(input_port_read(machine(), "A1"), 1))
+			if (!BIT(ioport("A1")->read(), 1))
 				data |= (1 << 3); // "esc" key
 		}
 		break;

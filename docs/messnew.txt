@@ -1,4 +1,301 @@
-﻿0.145u4
+﻿0.145u8
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+(none)
+
+System Driver Changes:
+----------------------
+-gbcolor: fixed sprite regression. [Alegend45]
+
+-kc: Added emulation of GIDE interface. [Sandro Ronco]
+
+-Apple2: Preliminary infrastructure for emulating Apple IIe auxiliary
+ slot cards [R. Belmont]
+
+-x68k: Added clone X68000 Super (with its own internal SCSI ROM dump).
+ Added internal SCSI ROM dump for the XVI. [Anna Wu, Barry Rodewald]
+
+-apple2: Added "The Mill" 6809 card.  BASIC demo program works; OS9
+ and Excel Flex appear to need undumped additional ROMs. [R. Belmont]
+
+-pc: Corrected SN76496 clocks to /4 of sysclock instead of /5, fixes
+ pitch to match video [MooglyGuy, Kef Schecter]
+
+-tvc: added cartridge support. [Sandro Ronco]
+
+-c64: Added preliminary support for the IDE64 v4.1 cartridge.
+ Load/save from BASIC works, but there is graphics corruption in the
+ menu, and USB/CF is not supported yet. [Curt Coder]
+
+-vectrex: support 64k bankswitched carts and carts with SRAM
+ [mkasick, kbare]
+
+-IBM PC drivers: Implemented the PC keyboard connector as a slot
+ device. In the future this will allow the user to select which
+ keybaord to use with an emulated PC. Converted the Keytronic PC3270
+ keyboard implementation to C++ as an example pc keyboard. 
+ [Wilbert Pol]
+
+-osborne1: Added IEEE-488 bus. [Curt Coder]
+
+-PC Drivers: Updated remaining PC/XT and AT drivers to use the
+ keyboard slot implementation. Removed legacy device implementation for
+ the Keytronic keyboard. Removed an unneeded include from
+ drivers/amstr_pc.c.  [Wilbert Pol]
+
+-DEC Rainbow: fleshed out the Z80 side including partial WD1793 hookup
+ and correct shared RAM handling, but system doesn't get any further
+ yet. [R. Belmont]
+
+-DEC Rainbow: initial Z80/8088 comms work, ends with Error 10 now instead
+ of 18 [R. Belmont]
+
+-DEC Rainbow: Hooked up VBL and Z80->8088 IRQs.  Still doesn't boot,
+ but closer than ever. [R. Belmont]
+
+-DEC Rainbow: 82/83 to the diagnostic port is meant to reboot the Z80. 
+ This passes the "memory arbitration test". [R. Belmont]
+
+-DEC Rainbow: Improved Z80 control, fixed weird garbage on screen and
+ eliminated "Z80 response" system error. [R. Belmont]
+
+-DEC Rainbow: Hooked up keyboard i8251, but our 8251 core needs
+ interrupts. [R. Belmont]
+
+
+
+Software Lists:
+----------------
+-snes.xml: verified more carts [MESSfan]
+-pico.xml: new dumps added [Team Europe]
+-apple1.xml: added a few more tapes [Anon01]
+-tvc: added cartridges softlist. [Sandro Ronco]
+-snes.xml: finished documenting unreleased titles, very special thanks
+ to Evan of snes central who made this a piece of cake [MESSfan]
+
+Source Changes:
+----------------
+-ap2_dsk: added some missing defines and comments and a way to select
+ whether to use lenient (if the address mark contents are sane
+ regardless of whether the checksum byte was good or not) or normal
+ (only if checksum was valid) usage of the address marks. Also switched
+ the default output sector order from prodos order to dos3.3 order,
+ which is slightly more useful. Added a define to switch between the
+ three possible sector orderings: prodos, dos3.3, and logical.
+ [Lord Nightmare]
+
+-dfi_dsk.c: fixed a nasty bug when reading df bytes with 0x80 set
+ throwing the timing way off; this makes most disk images decode a
+ whole heck of a lot better. ap2_dsk.c: fixed a nasty
+ array-out-of-bounds access problem if an address mark with an insane
+ sector value in it is read. [Lord Nightmare, Phil Pemberton]
+
+-Fixed a logic bug in the dfi header check which surprisingly doesn't
+ come up at all on GCC (compiler bug?) but does happen on clang. Also
+ disabled some accidentally enabled debug code, and handle the case of
+ no index transitions at all properly. [Lord Nightmare, Balrog]
+
+-Fix bug found by Clang (behavior *appears* correct but can't verify)
+ [Balrog, R. Belmont]
+
+-3c505 improvements.  Netbooting a MESS Apollo instance off a second
+ MESS Apollo instance is now possible, and Domain/OS 10.4 works.
+ [Hans Ostermeyer]
+
+-Various Clang warning cleanups (and a few actual bugfixes) [Balrog]
+
+-i386: Big pmode update.  OS/2 2.1 more or less runs now.  [Carl]
+
+-ap2_dsk.c: Preliminary, working RWTS18 decoding support; Decodes disks
+ and shows ascii text; not sure if sectors are in the correct order
+ yet. [Lord Nightmare, Balrog, Roland Gustafsson]
+
+
+0.145u7
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+-SAPI 2 [Robbbert]
+-Pyldin 601 [Robbbert]
+
+Skeleton drivers:
+-----------------
+- Powertran Cortex [Robbbert,Kaylee]
+
+System Driver Changes:
+----------------------
+-apple2: CFFA2000 now has savable settings EEPROM, plus default settings 
+ patched to enable two drives [R. Belmont]
+-apple2: Thunderclock Plus card added [R. Belmont]
+-apollo: add alternate layouts for a better experience on XGA (1024x768) 
+ and WXGA (1280x800) displays. [Hans Ostermeyer]
+-apple2: Added Microsoft SoftCard.  Works only on apple2 and apple2p for now, 
+ and only with Microsoft's CP/M boot disks. [R. Belmont]
+-sms: Prevent a crash in sms1pal and some optimizations.  [Enik Land]
+-c64: Added support for the Currah Speech 64 cartridge, pitch is not spot on yet. [Curt Coder]
+-c64: Added support for the NeoRAM cartridge. [Curt Coder]
+-c64: Added support for the Commodore CP/M cartridge. VICE Team, your move ;) [Curt Coder, R. Belmont]
+-adam: Improved the cassette emulation:
+	- added ddp tape image support
+	- edited cassette.c to allow speed / direction / channel selection
+	- changed cassimg.c so multichannel tapes work [huygens]
+-c64: Added support for the 4040+Fast Hack'em cartridge. [Curt Coder]
+-mk83: fixed video, computer responds to commands. [Robbbert]
+-sapi: SAPI1 - modernised. SAPI2 connected to ascii keyboard, works. 
+ Sapi3 connected to terminal. Needs a boot disk & fdc.  [Robbbert]
+-apple2: Added Videx VideoTerm card emulation for slot 3 on II/II+ [R. Belmont]
+-apple2: cards that don't take over c800 now don't have to.
+ Fixes SoftCard compatibility with VideoTerm and IIe - CP/M now 
+ runs in 80 columns in those setups. [R. Belmont]
+-apple2gs: writes to card CnXX and C800 space now honored.
+ CFFA2 settings changes work. [R. Belmont]
+-apple2: Fixed reset bit for Mockingboard/Phasor.  Fixes stuck sounds 
+ in Mockingboard and Phasor utility programs. [R. Belmont]
+-apple2: Enabled AE Phasor, it works pretty well now [R. Belmont]
+-apple2: Added Super Serial Card.  Not terribly useful at present, 
+ but should get interesting in the future. [R. Belmont]
+-apple2: added /INH support to the slots for the D000-FFFF region and 
+ added IAI SwyftCard support.  (It must go in slot 3 of a IIe!)
+
+Software Lists:
+----------------
+- pico.xml: added new Japanese dumps [Team Europe]
+
+Source Changes:
+----------------
+-3c505: Switched to using core device_network_interface [Hans Ostermeyer]
+-Add multiread support (behind a define for now pending heuristics) to the 
+ dfi import support. Fix some inaccuracies regarding index decode position in dfi files. [Lord Nightmare]
+-Modern apple 2 disk decoder for 16-sector disk images implemented using Olivier's 
+ new system for floptool. Only supports importing from .dfi 50mhz multi-read x3 
+ images at the moment. [Lord Nightmare, Balrog, Jason Scott, Karsten Scheibler]
+-fix dsk export from floptool so it can work with just one .dfi read instead of
+ needing 3 reads. Tested at 50mhz sampling rate only. [Lord Nightmare]
+-More work on dfi and apple2 modern disk stuff; most of the auto speed recognition 
+ stuff is in the dfi handler now but the actual data scaling to match the internal 
+ mfi 200mhz sample rate stream is not done yet. There are also some likely issues 
+ with beginnings and ends of index pulses. Brickwall windowing has been implemented 
+ for dfi for regeneration of missed transitions from marginal reads as well as discarding of noise.
+ A histogram has been added (disabled by default) for dfi format as well.
+ [Lord Nightmare, Phil Pemberton, Balrog]
+-Some additional tweaks to ap2 and dfi stuff; disabled the horribly broken load() 
+ code in ap2_dsk. [Lord Nightmare, Balrog]
+-ap2_dsk.c: beginnings of 13-sector format support. gives a warning if you try to read one so far.
+-dfi_dsk.c: fix a bug involving offsets read from source file per track which caused an 
+ occasional 0xFF byte to end up in the stream (reading off end of file buffer) [Lord Nightmare]
+-ap2_dsk now produces valid, runnable ProDOS-order .po disk images. [Lord Nightmare, adtpro]
+
+0.145u6
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+(none)
+
+System Driver Changes:
+----------------------
+-pmd85: added support for loading .ptp cassette images. [Sandro Ronco]
+-apple2: Apple II slots rewrite [R. Belmont]
+ All Apple IIs that had slots now have them in MESS except the IIgs.
+ Slot 0 has one available card: the language card (which it defaults to)
+ Slots 1-7 can have any of the Mockingboard, CFFA2000, and Disk II cards.  
+ By default a Mockingboard is in Slot 4 and the Disk II is in 6.  Due to 
+ current limitations only one Disk II controller per machine will work, but
+ multiple CFFAs and Mockingboards should work great.  
+ The plain 6502 firmware version of the CFFA2000 is now supported so you can 
+ use CHDs with the emulated II Plus and unenhanced IIe as well.
+ 5.25" disks are broken on the IIgs at the moment; I'm looking into it.
+-iskr1030: Year/manufacturer fixes. [AntoPISA]
+- Apple II updates [R. Belmont]: 
+	- Improved C800 arbitration
+	- Cleanup and more documentation
+	- New working card: Apple II "Slinky" 1 MB Memory Expansion Card
+	- New non-working card: Apple II SCSI Card, Rev. C
+- Apple IIgs: User-configured slots now available.  Boot 6.0.1 and use 
+  the Slots Control Panel to set the desired slots to Your Card to use. [R. Belmont]
+- Apple II: Support AE RamFactor card (clone of Apple Memory Expansion) [R. Belmont]
+- Apple II: Fixed C800 banking with INTCXROM and implemented RamFactor card
+  ROM banking.  RamFactor diagnostic (g Cn0a in the Monitor) now works.
+- Apple II: RamFactor cards now have 8 MB capacity each [R. Belmont]
+- Apple II: Even more slot ROM arbitration work.  80 column mode works on IIe again, 
+  and AppleWorks 3 no longer crashes on boot. [R. Belmont]
+- Apple II: Allow slot 3 to be used by cards on II/II+. [R. Belmont]
+
+
+Software Lists:
+----------------
+- x07.xml: Added memory cards softlist. [Anna Wu, Sandro Ronco]
+- apple1.xml: added a few more tapes [Anon01]
+- a800.xml: added some new dumps and confirmed more dumps [K1W1]
+
+Source Changes:
+----------------
+- Fix for feature name xml output in softlist [bobz]
+- m68k improvements: [Hans Ostermeyer]
+   - Fixed BFINS, BFEXTU, and BFEXTS to fetch 8-bit quantities as 8 bits 
+     (corrects Domain/OS 10.3.5 crash on page boundry)
+   - Added SoftFloat log functions and m68k FLOGNP1, FLOGN, FLOG2, and FLOG10 instructions
+- uPD765: fix Apollo floppy read/write problems [Hans Ostermeyer]
+
+0.145u5
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+- Commodore 900 [Curt Coder]
+
+System Driver Changes:
+----------------------
+-c64: Added support for Kingsoft cartridges. [Curt Coder]
+ - Classical Games/Protovision 4 player joystick interface
+ - Digital Excess/Hitmen, Kingsoft, and Starbyte 4 player joystick interfaces
+ - Final Cartridge III
+ - XL 80 column cartridge
+ - geoCable Centronics cable
+ - SpeedDOS/Burst Nibbler 1541 parallel cable. SpeedDOS kernal replacement 
+   and FCopy III are somewhat working. E.g. "mess c64p -user bn1541 -flop fcopy3.d64"
+ - several Kernal replacements, and extended the parallel cable support to 1571.
+-apollo: do bounds checking on Ethernet packets [Hans Ostermeyer]
+-a7800: Added controller line pullup signals from the riot chip. 
+ Fixes two-button behavior on asteroids etc. [Huygens]
+-dc: Fix the maple hookup and controllers and add the missing maple irq [O. Galibert]
+
+Software Lists:
+----------------
+-pv1000.xml : New Casio PV-1000 dump (anondumper)
+
+Source Changes:
+----------------
+(none)
+
+0.145u4
 
 New System Drivers Supported:
 -----------------------------

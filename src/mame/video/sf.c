@@ -9,7 +9,7 @@
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *base = machine.region("gfx5")->base() + 2 * tile_index;
+	UINT8 *base = machine.root_device().memregion("gfx5")->base() + 2 * tile_index;
 	int attr = base[0x10000];
 	int color = base[0];
 	int code = (base[0x10000 + 1] << 8) | base[1];
@@ -22,7 +22,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	UINT8 *base = machine.region("gfx5")->base() + 0x20000 + 2 * tile_index;
+	UINT8 *base = machine.root_device().memregion("gfx5")->base() + 0x20000 + 2 * tile_index;
 	int attr = base[0x10000];
 	int color = base[0];
 	int code = (base[0x10000 + 1] << 8) | base[1];
@@ -72,28 +72,25 @@ VIDEO_START( sf )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( sf_videoram_w )
+WRITE16_MEMBER(sf_state::sf_videoram_w)
 {
-	sf_state *state = space->machine().driver_data<sf_state>();
-	COMBINE_DATA(&state->m_videoram[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_videoram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( sf_bg_scroll_w )
+WRITE16_MEMBER(sf_state::sf_bg_scroll_w)
 {
-	sf_state *state = space->machine().driver_data<sf_state>();
-	COMBINE_DATA(&state->m_bgscroll);
-	state->m_bg_tilemap->set_scrollx(0, state->m_bgscroll);
+	COMBINE_DATA(&m_bgscroll);
+	m_bg_tilemap->set_scrollx(0, m_bgscroll);
 }
 
-WRITE16_HANDLER( sf_fg_scroll_w )
+WRITE16_MEMBER(sf_state::sf_fg_scroll_w)
 {
-	sf_state *state = space->machine().driver_data<sf_state>();
-	COMBINE_DATA(&state->m_fgscroll);
-	state->m_fg_tilemap->set_scrollx(0, state->m_fgscroll);
+	COMBINE_DATA(&m_fgscroll);
+	m_fg_tilemap->set_scrollx(0, m_fgscroll);
 }
 
-WRITE16_HANDLER( sf_gfxctrl_w )
+WRITE16_MEMBER(sf_state::sf_gfxctrl_w)
 {
 	/* b0 = reset, or maybe "set anyway" */
 	/* b1 = pulsed when control6.b6==0 until it's 1 */
@@ -104,14 +101,13 @@ WRITE16_HANDLER( sf_gfxctrl_w )
 	/* b6 = active middle plane */
 	/* b7 = active sprites */
 
-	sf_state *state = space->machine().driver_data<sf_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_sf_active = data & 0xff;
-		flip_screen_set(space->machine(), data & 0x04);
-		state->m_tx_tilemap->enable(data & 0x08);
-		state->m_bg_tilemap->enable(data & 0x20);
-		state->m_fg_tilemap->enable(data & 0x40);
+		m_sf_active = data & 0xff;
+		flip_screen_set(data & 0x04);
+		m_tx_tilemap->enable(data & 0x08);
+		m_bg_tilemap->enable(data & 0x20);
+		m_fg_tilemap->enable(data & 0x40);
 	}
 }
 
@@ -148,7 +144,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const r
 		{
 			int c1, c2, c3, c4, t;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx = 480 - sx;
 				sy = 224 - sy;
@@ -199,7 +195,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const r
 		}
 		else
 		{
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx = 496 - sx;
 				sy = 240 - sy;

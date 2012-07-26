@@ -1183,9 +1183,9 @@ nthbyte( const UINT32 *pSource, int offs )
 static void
 ReadAnalogDrivingPorts( running_machine &machine, UINT16 *gas, UINT16 *brake, UINT16 *steer )
 {
-	*gas   = input_port_read(machine, "GAS");
-	*brake = input_port_read(machine, "BRAKE");
-	*steer = input_port_read(machine, "STEER");
+	*gas   = machine.root_device().ioport("GAS")->read();
+	*brake = machine.root_device().ioport("BRAKE")->read();
+	*steer = machine.root_device().ioport("STEER")->read();
 }
 
 /* TODO: REMOVE (THIS IS HANDLED BY "SUBCPU") */
@@ -1193,9 +1193,9 @@ static UINT16
 AnalogAsDigital( running_machine &machine )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	UINT16 inputs = input_port_read_safe(machine, "INPUTS", 0);
-	UINT16 gas    = input_port_read_safe(machine, "GAS", 0);
-	UINT16 steer  = input_port_read_safe(machine, "STEER", 0);
+	UINT16 inputs = state->ioport("INPUTS")->read_safe(0);
+	UINT16 gas    = state->ioport("GAS")->read_safe(0);
+	UINT16 steer  = state->ioport("STEER")->read_safe(0);
 	UINT16 result = 0xffff;
 
 	switch( state->m_gametype )
@@ -1245,10 +1245,10 @@ static void
 HandleCoinage(running_machine &machine, int slots, int address_is_odd)
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	UINT16 *share16 = (UINT16 *)state->m_shareram;
+	UINT16 *share16 = (UINT16 *)state->m_shareram.target();
 	UINT32 coin_state;
 
-	coin_state = input_port_read(machine, "INPUTS") & 0x1200;
+	coin_state = state->ioport("INPUTS")->read() & 0x1200;
 
 	if (!(coin_state & 0x1000) && (state->m_old_coin_state & 0x1000))
 	{
@@ -1277,7 +1277,7 @@ HandleDrivingIO( running_machine &machine )
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	if( nthbyte(state->m_system_controller, 0x18) != 0 )
 	{
-		UINT16 flags = input_port_read(machine, "INPUTS");
+		UINT16 flags = state->ioport("INPUTS")->read();
 		UINT16 gas, brake, steer, coinram_address_is_odd = 0;
 		ReadAnalogDrivingPorts( machine, &gas, &brake, &steer );
 
@@ -1335,12 +1335,12 @@ HandleCyberCommandoIO( running_machine &machine )
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	if( nthbyte(state->m_system_controller, 0x18) != 0 )
 	{
-		UINT16 flags = input_port_read(machine, "INPUTS");
+		UINT16 flags = state->ioport("INPUTS")->read();
 
-		UINT16 volume0 = input_port_read(machine, "STICKY1") * 0x10;
-		UINT16 volume1 = input_port_read(machine, "STICKY2") * 0x10;
-		UINT16 volume2 = input_port_read(machine, "STICKX1") * 0x10;
-		UINT16 volume3 = input_port_read(machine, "STICKX2") * 0x10;
+		UINT16 volume0 = state->ioport("STICKY1")->read() * 0x10;
+		UINT16 volume1 = state->ioport("STICKY2")->read() * 0x10;
+		UINT16 volume2 = state->ioport("STICKX1")->read() * 0x10;
+		UINT16 volume3 = state->ioport("STICKX2")->read() * 0x10;
 
 		state->m_shareram[0x030/4] = (flags<<16) | volume0;
 		state->m_shareram[0x034/4] = (volume1<<16) | volume2;
@@ -1360,53 +1360,48 @@ InitDSP( running_machine &machine )
 	cputag_set_input_line(machine, "mcu",INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
 } /* InitDSP */
 
-static READ16_HANDLER( pdp_status_r )
+READ16_MEMBER(namcos22_state::pdp_status_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	return state->m_mMasterBIOZ;
+	return m_mMasterBIOZ;
 } /* pdp_status_r */
 
-static void
-WriteToPointRAM( namcos22_state *state, offs_t offs, UINT32 data )
+void namcos22_state::WriteToPointRAM(offs_t offs, UINT32 data )
 {
 	offs &= 0xffffff; /* 24 bit addressing */
-	if( state->m_mbSuperSystem22 )
+	if( m_mbSuperSystem22 )
 	{
 		if( offs>=0xf80000 && offs<=0xf9ffff )
-			state->m_mpPointRAM[offs-0xf80000] = data & 0x00ffffff;
+			m_mpPointRAM[offs-0xf80000] = data & 0x00ffffff;
 	}
 	else
 	{
 		if( offs>=0xf00000 && offs<=0xf1ffff )
-			state->m_mpPointRAM[offs-0xf00000] = data & 0x00ffffff;
+			m_mpPointRAM[offs-0xf00000] = data & 0x00ffffff;
 	}
 } /* WriteToPointRAM */
 
-static UINT32
-ReadFromCommRAM( namcos22_state *state, offs_t offs )
+UINT32 namcos22_state::ReadFromCommRAM(offs_t offs )
 {
-	return state->m_polygonram[offs&0x7fff];
+	return m_polygonram[offs&0x7fff];
 } /* ReadFromCommRAM */
 
-static void
-WriteToCommRAM( namcos22_state *state, offs_t offs, UINT32 data )
+void namcos22_state::WriteToCommRAM(offs_t offs, UINT32 data )
 {
-	if (data & 0x00800000) state->m_polygonram[offs&0x7fff] = data | 0xff000000;
-	else state->m_polygonram[offs&0x7fff] = data & 0x00ffffff;
+	if (data & 0x00800000) m_polygonram[offs&0x7fff] = data | 0xff000000;
+	else m_polygonram[offs&0x7fff] = data & 0x00ffffff;
 } /* WriteToCommRAM */
 
-static READ16_HANDLER( pdp_begin_r )
+READ16_MEMBER(namcos22_state::pdp_begin_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 	/* this feature appears to be only used on Super System22 hardware */
-	if( state->m_mbSuperSystem22 )
+	if( m_mbSuperSystem22 )
 	{
-		UINT16 offs = state->m_polygonram[0x20000/4-1];
-		state->m_mMasterBIOZ = 1;
+		UINT16 offs = m_polygonram[0x20000/4-1];
+		m_mMasterBIOZ = 1;
 		for(;;)
 		{
 			UINT16 start = offs;
-			UINT16 cmd = ReadFromCommRAM(state, offs++);
+			UINT16 cmd = ReadFromCommRAM(offs++);
 			UINT32 srcAddr;
 			UINT32 dstAddr;
 			UINT32 numWords;
@@ -1418,77 +1413,77 @@ static READ16_HANDLER( pdp_begin_r )
 				break;
 
 			case 0xfff5: /* write to point ram */
-				dstAddr = ReadFromCommRAM(state, offs++); /* 32 bit PointRAM address */
-				data    = ReadFromCommRAM(state, offs++); /* 24 bit data */
-				WriteToPointRAM( state, dstAddr, data );
+				dstAddr = ReadFromCommRAM(offs++); /* 32 bit PointRAM address */
+				data    = ReadFromCommRAM(offs++); /* 24 bit data */
+				WriteToPointRAM(dstAddr, data );
 				break;
 
 			case 0xfff6: /* read word from point ram */
-				srcAddr = ReadFromCommRAM(state, offs++); /* 32 bit PointRAM address */
-				dstAddr = ReadFromCommRAM(state, offs++); /* CommRAM address; receives 24 bit PointRAM data */
-				data    = namcos22_point_rom_r( space->machine(), srcAddr );
-				WriteToCommRAM( state, dstAddr, data );
+				srcAddr = ReadFromCommRAM(offs++); /* 32 bit PointRAM address */
+				dstAddr = ReadFromCommRAM(offs++); /* CommRAM address; receives 24 bit PointRAM data */
+				data    = namcos22_point_rom_r( machine(), srcAddr );
+				WriteToCommRAM(dstAddr, data );
 				break;
 
 			case 0xfff7: /* block move (CommRAM to CommRAM) */
-				srcAddr  = ReadFromCommRAM(state, offs++);
-				dstAddr  = ReadFromCommRAM(state, offs++);
-				numWords = ReadFromCommRAM(state, offs++);
+				srcAddr  = ReadFromCommRAM(offs++);
+				dstAddr  = ReadFromCommRAM(offs++);
+				numWords = ReadFromCommRAM(offs++);
 				while( numWords-- )
 				{
-					data = ReadFromCommRAM(state, srcAddr++);
-					WriteToCommRAM( state, dstAddr++, data );
+					data = ReadFromCommRAM(srcAddr++);
+					WriteToCommRAM(dstAddr++, data );
 				}
 				break;
 
 			case 0xfffa: /* read block from point ram */
-				srcAddr  = ReadFromCommRAM(state, offs++); /* 32 bit PointRAM address */
-				dstAddr  = ReadFromCommRAM(state, offs++); /* CommRAM address; receives data */
-				numWords = ReadFromCommRAM(state, offs++); /* block size */
+				srcAddr  = ReadFromCommRAM(offs++); /* 32 bit PointRAM address */
+				dstAddr  = ReadFromCommRAM(offs++); /* CommRAM address; receives data */
+				numWords = ReadFromCommRAM(offs++); /* block size */
 				while( numWords-- )
 				{
-					data = namcos22_point_rom_r( space->machine(), srcAddr++ );
-					WriteToCommRAM( state, dstAddr++, data );
+					data = namcos22_point_rom_r( machine(), srcAddr++ );
+					WriteToCommRAM(dstAddr++, data );
 				}
 				break;
 
 			case 0xfffb: /* write block to point ram */
-				dstAddr  = ReadFromCommRAM(state, offs++); /* 32 bit PointRAM address */
-				numWords = ReadFromCommRAM(state, offs++); /* block size */
+				dstAddr  = ReadFromCommRAM(offs++); /* 32 bit PointRAM address */
+				numWords = ReadFromCommRAM(offs++); /* block size */
 				while( numWords-- )
 				{
-					data = ReadFromCommRAM( state, offs++ ); /* 24 bit source data */
-					WriteToPointRAM( state, dstAddr++, data );
+					data = ReadFromCommRAM(offs++ ); /* 24 bit source data */
+					WriteToPointRAM(dstAddr++, data );
 				}
 				break;
 
 			case 0xfffc: /* point ram to point ram */
-				srcAddr  = ReadFromCommRAM(state, offs++);
-				dstAddr  = ReadFromCommRAM(state, offs++);
-				numWords = ReadFromCommRAM(state, offs++);
+				srcAddr  = ReadFromCommRAM(offs++);
+				dstAddr  = ReadFromCommRAM(offs++);
+				numWords = ReadFromCommRAM(offs++);
 				while( numWords-- )
 				{
-					data = namcos22_point_rom_r( space->machine(), srcAddr++ );
-					WriteToPointRAM( state, dstAddr++, data );
+					data = namcos22_point_rom_r( machine(), srcAddr++ );
+					WriteToPointRAM(dstAddr++, data );
 				}
 				break;
 
 			case 0xfffd: /* direct command to render device */
 				// len -> command (eg. BB0003) -> data
-				numWords = ReadFromCommRAM(state, offs++);
+				numWords = ReadFromCommRAM(offs++);
 				while( numWords-- )
 				{
-					data = ReadFromCommRAM(state, offs++);
+					data = ReadFromCommRAM(offs++);
 					//namcos22_WriteDataToRenderDevice( data );
 				}
 				break;
 
 			case 0xfffe: /* unknown */
-				data = ReadFromCommRAM(state, offs++); /* ??? (usually 0x400 or 0) */
+				data = ReadFromCommRAM(offs++); /* ??? (usually 0x400 or 0) */
 				break;
 
 			case 0xffff: /* "goto" command */
-				offs = ReadFromCommRAM(state, offs);
+				offs = ReadFromCommRAM(offs);
 				if( offs == start )
 				{ /* most commands end with a "goto self" */
 					return 0;
@@ -1500,20 +1495,18 @@ static READ16_HANDLER( pdp_begin_r )
 				return 0;
 			}
 		} /* for(;;) */
-	} /* state->m_mbSuperSystem22 */
+	} /* m_mbSuperSystem22 */
 	return 0;
 } /* pdp_begin_r */
 
-static READ16_HANDLER( slave_external_ram_r )
+READ16_MEMBER(namcos22_state::slave_external_ram_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	return state->m_mpSlaveExternalRAM[offset];
+	return m_mpSlaveExternalRAM[offset];
 }
 
-static WRITE16_HANDLER( slave_external_ram_w )
+WRITE16_MEMBER(namcos22_state::slave_external_ram_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	COMBINE_DATA( &state->m_mpSlaveExternalRAM[offset] );
+	COMBINE_DATA( &m_mpSlaveExternalRAM[offset] );
 }
 
 static void HaltSlaveDSP( running_machine &machine )
@@ -1528,54 +1521,49 @@ static void EnableSlaveDSP( running_machine &machine )
 	namcos22_enable_slave_simulation(machine, 1);
 }
 
-static READ16_HANDLER( dsp_HOLD_signal_r )
+READ16_MEMBER(namcos22_state::dsp_HOLD_signal_r)
 { /* STUB */
 	return 0;
 }
 
-static WRITE16_HANDLER( dsp_HOLD_ACK_w )
+WRITE16_MEMBER(namcos22_state::dsp_HOLD_ACK_w)
 { /* STUB */
 }
 
-static WRITE16_HANDLER( dsp_XF_output_w )
+WRITE16_MEMBER(namcos22_state::dsp_XF_output_w)
 { /* STUB */
 }
 
 /************************************************************/
 
-static WRITE16_HANDLER( point_ram_idx_w )
+WRITE16_MEMBER(namcos22_state::point_ram_idx_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	state->m_mPointAddr<<=16;
-	state->m_mPointAddr |= data;
+	m_mPointAddr<<=16;
+	m_mPointAddr |= data;
 }
 
-static WRITE16_HANDLER( point_ram_loword_iw )
+WRITE16_MEMBER(namcos22_state::point_ram_loword_iw)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	state->m_mPointData |= data;
-	WriteToPointRAM( state, state->m_mPointAddr++, state->m_mPointData );
+	m_mPointData |= data;
+	WriteToPointRAM(m_mPointAddr++, m_mPointData );
 }
 
-static WRITE16_HANDLER( point_ram_hiword_w )
+WRITE16_MEMBER(namcos22_state::point_ram_hiword_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	state->m_mPointData = (data<<16);
+	m_mPointData = (data<<16);
 }
 
-static READ16_HANDLER( point_ram_loword_r )
+READ16_MEMBER(namcos22_state::point_ram_loword_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	return namcos22_point_rom_r(space->machine(), state->m_mPointAddr)&0xffff;
+	return namcos22_point_rom_r(machine(), m_mPointAddr)&0xffff;
 }
 
-static READ16_HANDLER( point_ram_hiword_ir )
+READ16_MEMBER(namcos22_state::point_ram_hiword_ir)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	return namcos22_point_rom_r(space->machine(), state->m_mPointAddr++)>>16;
+	return namcos22_point_rom_r(machine(), m_mPointAddr++)>>16;
 }
 
-static WRITE16_HANDLER( dsp_unk2_w )
+WRITE16_MEMBER(namcos22_state::dsp_unk2_w)
 {
 	/**
      * Used by Ridge Racer (Japan) to specify baseaddr
@@ -1593,57 +1581,55 @@ enum
 	eDSP_UPLOAD_DATA
 };
 
-static READ16_HANDLER( dsp_unk_port3_r )
+READ16_MEMBER(namcos22_state::dsp_unk_port3_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	state->m_mMasterBIOZ = 0;
-	state->m_mDspUploadState = eDSP_UPLOAD_READY;
+	m_mMasterBIOZ = 0;
+	m_mDspUploadState = eDSP_UPLOAD_READY;
 	return 0;
 }
 
-static WRITE16_HANDLER( upload_code_to_slave_dsp_w )
+WRITE16_MEMBER(namcos22_state::upload_code_to_slave_dsp_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 
-	switch( state->m_mDspUploadState )
+	switch( m_mDspUploadState )
 	{
 	case eDSP_UPLOAD_READY:
 		logerror( "UPLOAD_READY; cmd = 0x%x\n", data );
 		switch (data)
 		{
 			case 0:
-				HaltSlaveDSP(space->machine());
+				HaltSlaveDSP(machine());
 				break;
 			case 1:
-				state->m_mDspUploadState = eDSP_UPLOAD_DEST;
+				m_mDspUploadState = eDSP_UPLOAD_DEST;
 				break;
 			case 2:
 				/* custom IC poke */
 				break;
 			case 3:
-				EnableSlaveDSP(space->machine());
+				EnableSlaveDSP(machine());
 				break;
 			case 4:
 				break;
 			case 0x10:
 				/* serial i/o related? */
-				EnableSlaveDSP(space->machine());
+				EnableSlaveDSP(machine());
 				break;
 
 			default:
-				logerror( "%08x: master port#7: 0x%04x\n", cpu_get_previouspc(&space->device()), data );
+				logerror( "%08x: master port#7: 0x%04x\n", cpu_get_previouspc(&space.device()), data );
 				break;
 		}
 		break;
 
 	case eDSP_UPLOAD_DEST:
-		state->m_mUploadDestIdx = data;
-		state->m_mDspUploadState = eDSP_UPLOAD_DATA;
+		m_mUploadDestIdx = data;
+		m_mDspUploadState = eDSP_UPLOAD_DATA;
 		break;
 
 	case eDSP_UPLOAD_DATA:
-		state->m_mpSlaveExternalRAM[state->m_mUploadDestIdx&0x1fff] = data;
-		state->m_mUploadDestIdx++;
+		m_mpSlaveExternalRAM[m_mUploadDestIdx&0x1fff] = data;
+		m_mUploadDestIdx++;
 		break;
 
 	default:
@@ -1651,19 +1637,19 @@ static WRITE16_HANDLER( upload_code_to_slave_dsp_w )
 	}
 }
 
-static READ16_HANDLER( dsp_unk8_r )
+READ16_MEMBER(namcos22_state::dsp_unk8_r)
 {
 	/* bit 0x0001 is busy signal */
 	return 0;
 }
 
-static READ16_HANDLER( custom_ic_status_r )
+READ16_MEMBER(namcos22_state::custom_ic_status_r)
 {
 	/* bit 0x0001 signals completion */
 	return 0x0063;
 }
 
-static READ16_HANDLER( dsp_upload_status_r )
+READ16_MEMBER(namcos22_state::dsp_upload_status_r)
 {
 	/**
      * bit 0x0001 is polled to confirm that code/data has been
@@ -1672,31 +1658,27 @@ static READ16_HANDLER( dsp_upload_status_r )
 	return 0x0000;
 }
 
-static READ16_HANDLER( master_external_ram_r )
+READ16_MEMBER(namcos22_state::master_external_ram_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	return state->m_mpMasterExternalRAM[offset];
+	return m_mpMasterExternalRAM[offset];
 }
 
-static WRITE16_HANDLER( master_external_ram_w )
+WRITE16_MEMBER(namcos22_state::master_external_ram_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	COMBINE_DATA( &state->m_mpMasterExternalRAM[offset] );
+	COMBINE_DATA( &m_mpMasterExternalRAM[offset] );
 }
 
-static WRITE16_HANDLER( slave_serial_io_w )
+WRITE16_MEMBER(namcos22_state::slave_serial_io_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	state->m_mSerialDataSlaveToMasterNext = data;
+	m_mSerialDataSlaveToMasterNext = data;
 	logerror( "slave_serial_io_w(%04x)\n", data );
 }
 
-static READ16_HANDLER( master_serial_io_r )
+READ16_MEMBER(namcos22_state::master_serial_io_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 	logerror( "master_serial_io_r() == %04x\n",
-		state->m_mSerialDataSlaveToMasterCurrent );
-	return state->m_mSerialDataSlaveToMasterCurrent;
+		m_mSerialDataSlaveToMasterCurrent );
+	return m_mSerialDataSlaveToMasterCurrent;
 }
 
 static TIMER_DEVICE_CALLBACK( dsp_master_serial_irq )
@@ -1733,11 +1715,11 @@ static TIMER_DEVICE_CALLBACK( dsp_slave_serial_irq )
 	}
 }
 
-static WRITE16_HANDLER( dsp_unk_porta_w )
+WRITE16_MEMBER(namcos22_state::dsp_unk_porta_w)
 {
 }
 
-static WRITE16_HANDLER( dsp_led_w )
+WRITE16_MEMBER(namcos22_state::dsp_led_w)
 {
 	/* I believe this port controls diagnostic LEDs on the DSP PCB. */
 }
@@ -1778,37 +1760,35 @@ static WRITE16_HANDLER( dsp_led_w )
  * 0x0075 0xf205 // sx,sy
  * 0x602b 0x93e8 // i,zpos
  */
-static WRITE16_HANDLER( dsp_unk8_w )
+WRITE16_MEMBER(namcos22_state::dsp_unk8_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	state->m_mRenderBufSize = 0;
+	m_mRenderBufSize = 0;
 }
 
-static WRITE16_HANDLER( master_render_device_w )
+WRITE16_MEMBER(namcos22_state::master_render_device_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	if( state->m_mRenderBufSize<MAX_RENDER_CMD_SEQ )
+	if( m_mRenderBufSize<MAX_RENDER_CMD_SEQ )
 	{
-		state->m_mRenderBufData[state->m_mRenderBufSize++] = data;
-		if( state->m_mRenderBufSize == MAX_RENDER_CMD_SEQ )
+		m_mRenderBufData[m_mRenderBufSize++] = data;
+		if( m_mRenderBufSize == MAX_RENDER_CMD_SEQ )
 		{
-			namcos22_draw_direct_poly( space->machine(), state->m_mRenderBufData );
+			namcos22_draw_direct_poly( machine(), m_mRenderBufData );
 		}
 	}
 }
 
-static ADDRESS_MAP_START( master_dsp_program, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( master_dsp_program, AS_PROGRAM, 16, namcos22_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM /* internal ROM (4k words) */
-	AM_RANGE(0x4000, 0x7fff) AM_ROM AM_BASE_MEMBER(namcos22_state, m_mpMasterExternalRAM)
+	AM_RANGE(0x4000, 0x7fff) AM_ROM AM_SHARE("mpmasterextram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_dsp_data, AS_DATA, 16 )
+static ADDRESS_MAP_START( master_dsp_data, AS_DATA, 16, namcos22_state )
 	AM_RANGE(0x1000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_READ(master_external_ram_r) AM_WRITE(master_external_ram_w)
 	AM_RANGE(0x8000, 0xffff) AM_READ(namcos22_dspram16_r) AM_WRITE(namcos22_dspram16_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_dsp_io, AS_IO, 16 )
+static ADDRESS_MAP_START( master_dsp_io, AS_IO, 16, namcos22_state )
 	AM_RANGE(0x0,0x0) AM_WRITE(point_ram_loword_iw) AM_READ(point_ram_loword_r)
 	AM_RANGE(0x1,0x1) AM_WRITE(point_ram_hiword_w) AM_READ(point_ram_hiword_ir)
 	AM_RANGE(0x2,0x2) AM_WRITE(dsp_unk2_w) AM_READ(pdp_begin_r)
@@ -1830,23 +1810,23 @@ static ADDRESS_MAP_START( master_dsp_io, AS_IO, 16 )
 	AM_RANGE(TMS32025_DR,    TMS32025_DR)    AM_READ(master_serial_io_r)
 ADDRESS_MAP_END
 
-static READ16_HANDLER( dsp_BIOZ_r )
+READ16_MEMBER(namcos22_state::dsp_BIOZ_r)
 { /* STUB */
 	return 1;
 }
 
-static READ16_HANDLER( dsp_slave_port3_r )
+READ16_MEMBER(namcos22_state::dsp_slave_port3_r)
 {
 	return 0x0010; /* ? */
 }
 
-static READ16_HANDLER( dsp_slave_port4_r )
+READ16_MEMBER(namcos22_state::dsp_slave_port4_r)
 {
 	return 0;
 //  return ReadDataFromSlaveBuf();
 }
 
-static READ16_HANDLER( dsp_slave_port5_r )
+READ16_MEMBER(namcos22_state::dsp_slave_port5_r)
 {
 #if 0
 	int numWords = SlaveBufSize();
@@ -1856,7 +1836,7 @@ static READ16_HANDLER( dsp_slave_port5_r )
 	return 0;
 }
 
-static READ16_HANDLER( dsp_slave_port6_r )
+READ16_MEMBER(namcos22_state::dsp_slave_port6_r)
 {
 	/**
      * bit 0x9 indicates whether device at port2 is ready to receive data
@@ -1865,12 +1845,12 @@ static READ16_HANDLER( dsp_slave_port6_r )
 	return 0;
 }
 
-static WRITE16_HANDLER( dsp_slave_portc_w )
+WRITE16_MEMBER(namcos22_state::dsp_slave_portc_w)
 {
 	/* Unknown; used before transmitting a command sequence. */
 }
 
-static READ16_HANDLER( dsp_slave_port8_r )
+READ16_MEMBER(namcos22_state::dsp_slave_port8_r)
 {
 	/* This reports  status of the device mapped at port 0xb.
      *
@@ -1880,27 +1860,27 @@ static READ16_HANDLER( dsp_slave_port8_r )
 	return 0; /* status */
 }
 
-static READ16_HANDLER( dsp_slave_portb_r )
+READ16_MEMBER(namcos22_state::dsp_slave_portb_r)
 {
 	/* The slave DSP reads before transmitting a command sequence. */
 	return 0;
 }
 
-static WRITE16_HANDLER( dsp_slave_portb_w )
+WRITE16_MEMBER(namcos22_state::dsp_slave_portb_w)
 {
 	/* The slave dsp uses this to transmit a command sequence to an external device. */
 }
 
-static ADDRESS_MAP_START( slave_dsp_program, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( slave_dsp_program, AS_PROGRAM, 16, namcos22_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM /* internal ROM */
-	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_BASE_MEMBER(namcos22_state, m_mpSlaveExternalRAM)
+	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_SHARE("mpslaveextram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_dsp_data, AS_DATA, 16 )
+static ADDRESS_MAP_START( slave_dsp_data, AS_DATA, 16, namcos22_state )
 	AM_RANGE(0x8000, 0x9fff) AM_READ(slave_external_ram_r) AM_WRITE(slave_external_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_dsp_io, AS_IO, 16 )
+static ADDRESS_MAP_START( slave_dsp_io, AS_IO, 16, namcos22_state )
 	/* unknown signal */
 	AM_RANGE(0x3,0x3) AM_READ(dsp_slave_port3_r)
 
@@ -1930,7 +1910,7 @@ static NVRAM_HANDLER( namcos22 )
 	UINT8 data[4];
 	if( read_or_write )
 	{
-		for( i=0; i<state->m_nvmem_size/4; i++ )
+		for( i=0; i<state->m_nvmem.bytes()/4; i++ )
 		{
 			UINT32 dword = state->m_nvmem[i];
 			data[0] = dword>>24;
@@ -1944,7 +1924,7 @@ static NVRAM_HANDLER( namcos22 )
 	{
 		if( file )
 		{
-			for( i=0; i<state->m_nvmem_size/4; i++ )
+			for( i=0; i<state->m_nvmem.bytes()/4; i++ )
 			{
 				file->read( data, 4 );
 				state->m_nvmem[i] = (data[0]<<24)|(data[1]<<16)|(data[2]<<8)|data[3];
@@ -1952,12 +1932,12 @@ static NVRAM_HANDLER( namcos22 )
 		}
 		else
 		{
-			memset( state->m_nvmem, 0x00, state->m_nvmem_size );
-			if (machine.region("nvram")->bytes() == state->m_nvmem_size)
+			memset( state->m_nvmem, 0x00, state->m_nvmem.bytes() );
+			if (machine.root_device().memregion("nvram")->bytes() == state->m_nvmem.bytes())
 			{
-				UINT8* nvram = machine.region("nvram")->base();
+				UINT8* nvram = machine.root_device().memregion("nvram")->base();
 
-				for( i=0; i<state->m_nvmem_size/4; i++ )
+				for( i=0; i<state->m_nvmem.bytes()/4; i++ )
 				{
 					state->m_nvmem[i] = (nvram[0+i*4]<<24)|(nvram[1+i*4]<<16)|(nvram[2+i*4]<<8)|nvram[3+i*4];
 				}
@@ -2032,7 +2012,7 @@ static GFXDECODE_START( super )
 GFXDECODE_END
 
 /* prelim! */
-static READ32_HANDLER( namcos22_C139_SCI_r )
+READ32_MEMBER(namcos22_state::namcos22_C139_SCI_r)
 {
 	switch( offset )
 	{
@@ -2042,7 +2022,7 @@ static READ32_HANDLER( namcos22_C139_SCI_r )
 }
 
 #if 0
-static WRITE32_HANDLER( namcos22_C139_SCI_w )
+WRITE32_MEMBER(namcos22_state::namcos22_C139_SCI_w)
 {
 	COMBINE_DATA( &namcos22_C139_SCI[offset] );
 	/*
@@ -2074,10 +2054,9 @@ static WRITE32_HANDLER( namcos22_C139_SCI_w )
 }
 #endif
 
-static READ32_HANDLER( namcos22_system_controller_r )
+READ32_MEMBER(namcos22_state::namcos22_system_controller_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	return state->m_system_controller[offset];
+	return m_system_controller[offset];
 }
 
 /* system controller (super system22)
@@ -2119,32 +2098,31 @@ static READ32_HANDLER( namcos22_system_controller_r )
 
 0x1c: dsp control
 */
-static WRITE32_HANDLER( namcos22s_system_controller_w )
+WRITE32_MEMBER(namcos22_state::namcos22s_system_controller_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 	int oldreg, newreg;
 
 	// acknowledge irqs
 	if (offset == 0x04/4 && mem_mask & 0xff000000)
 	{
 		// vblank
-		state->m_irq_state &= ~1;
-		cputag_set_input_line(space->machine(), "maincpu", nthbyte(state->m_system_controller, 0x00) & 7, CLEAR_LINE);
+		m_irq_state &= ~1;
+		cputag_set_input_line(machine(), "maincpu", nthbyte(m_system_controller, 0x00) & 7, CLEAR_LINE);
 	}
 
 	// irq level / enable irqs
 	if (offset == 0x00/4 && mem_mask & 0xff000000)
 	{
 		// vblank
-		oldreg = nthbyte(state->m_system_controller, 0x00) & 7;
+		oldreg = nthbyte(m_system_controller, 0x00) & 7;
 		newreg = data >> 24 & 7;
-		if (state->m_irq_state & 1 && oldreg != newreg)
+		if (m_irq_state & 1 && oldreg != newreg)
 		{
-			cputag_set_input_line(space->machine(), "maincpu", oldreg, CLEAR_LINE);
+			cputag_set_input_line(machine(), "maincpu", oldreg, CLEAR_LINE);
 			if (newreg)
-				cputag_set_input_line(space->machine(), "maincpu", newreg, ASSERT_LINE);
+				cputag_set_input_line(machine(), "maincpu", newreg, ASSERT_LINE);
 			else
-				state->m_irq_state &= ~1;
+				m_irq_state &= ~1;
 		}
 	}
 
@@ -2152,40 +2130,40 @@ static WRITE32_HANDLER( namcos22s_system_controller_w )
 	if (offset == 0x16/4 && mem_mask & 0x0000ff00)
 	{
 		if (data & 0x0000ff00)
-			cputag_set_input_line(space->machine(), "mcu", INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(machine(), "mcu", INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cputag_set_input_line(space->machine(), "mcu", INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(machine(), "mcu", INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
 	// dsp control
 	if (offset == 0x1c/4 && mem_mask & 0xff000000)
 	{
-		oldreg = nthbyte(state->m_system_controller, 0x1c);
+		oldreg = nthbyte(m_system_controller, 0x1c);
 		newreg = data >> 24 & 0xff;
 		if (newreg != oldreg)
 		{
 			if( newreg == 0 )
 			{ /* disable DSPs */
-				cputag_set_input_line(space->machine(), "master", INPUT_LINE_RESET, ASSERT_LINE); /* master DSP */
-				cputag_set_input_line(space->machine(), "slave", INPUT_LINE_RESET, ASSERT_LINE); /* slave DSP */
-				namcos22_enable_slave_simulation(space->machine(), 0);
-				state->m_mbEnableDspIrqs = 0;
+				cputag_set_input_line(machine(), "master", INPUT_LINE_RESET, ASSERT_LINE); /* master DSP */
+				cputag_set_input_line(machine(), "slave", INPUT_LINE_RESET, ASSERT_LINE); /* slave DSP */
+				namcos22_enable_slave_simulation(machine(), 0);
+				m_mbEnableDspIrqs = 0;
 			}
 			else if( newreg == 1 )
 			{ /* enable dsp and rendering subsystem */
-				cputag_set_input_line(space->machine(), "master", INPUT_LINE_RESET, CLEAR_LINE);
-				namcos22_enable_slave_simulation(space->machine(), 1);
-				state->m_mbEnableDspIrqs = 1;
+				cputag_set_input_line(machine(), "master", INPUT_LINE_RESET, CLEAR_LINE);
+				namcos22_enable_slave_simulation(machine(), 1);
+				m_mbEnableDspIrqs = 1;
 			}
 			else if( newreg == 0xff )
 			{ /* used to upload game-specific code to master/slave dsps */
-				cputag_set_input_line(space->machine(), "master", INPUT_LINE_RESET, CLEAR_LINE);
-				state->m_mbEnableDspIrqs = 0;
+				cputag_set_input_line(machine(), "master", INPUT_LINE_RESET, CLEAR_LINE);
+				m_mbEnableDspIrqs = 0;
 			}
 		}
 	}
 
-	COMBINE_DATA( &state->m_system_controller[offset] );
+	COMBINE_DATA( &m_system_controller[offset] );
 
 } /* namcos22s_system_controller_w */
 
@@ -2250,32 +2228,31 @@ static INTERRUPT_GEN( namcos22s_interrupt )
 0x1a: 0 or 1 or 0xff -> DSP control
 0x1b: ?
 */
-static WRITE32_HANDLER( namcos22_system_controller_w )
+WRITE32_MEMBER(namcos22_state::namcos22_system_controller_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 	int oldreg, newreg;
 
 	// acknowledge irqs
 	if (offset == 0x09/4 && mem_mask & 0x00ff0000)
 	{
 		// vblank
-		state->m_irq_state &= ~1;
-		cputag_set_input_line(space->machine(), "maincpu", nthbyte(state->m_system_controller, 0x04) & 7, CLEAR_LINE);
+		m_irq_state &= ~1;
+		cputag_set_input_line(machine(), "maincpu", nthbyte(m_system_controller, 0x04) & 7, CLEAR_LINE);
 	}
 
 	// irq level / enable irqs
 	if (offset == 0x04/4 && mem_mask & 0xff000000)
 	{
 		// vblank
-		oldreg = nthbyte(state->m_system_controller, 0x04) & 7;
+		oldreg = nthbyte(m_system_controller, 0x04) & 7;
 		newreg = data >> 24 & 7;
-		if (state->m_irq_state & 1 && oldreg != newreg)
+		if (m_irq_state & 1 && oldreg != newreg)
 		{
-			cputag_set_input_line(space->machine(), "maincpu", oldreg, CLEAR_LINE);
+			cputag_set_input_line(machine(), "maincpu", oldreg, CLEAR_LINE);
 			if (newreg)
-				cputag_set_input_line(space->machine(), "maincpu", newreg, ASSERT_LINE);
+				cputag_set_input_line(machine(), "maincpu", newreg, ASSERT_LINE);
 			else
-				state->m_irq_state &= ~1;
+				m_irq_state &= ~1;
 		}
 	}
 
@@ -2283,40 +2260,40 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 	if (offset == 0x1a/4 && mem_mask & 0xff000000)
 	{
 		if (data & 0xff000000)
-			cputag_set_input_line(space->machine(), "mcu", INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(machine(), "mcu", INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cputag_set_input_line(space->machine(), "mcu", INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(machine(), "mcu", INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
 	// dsp control
 	if (offset == 0x1a/4 && mem_mask & 0x0000ff00)
 	{
-		oldreg = nthbyte(state->m_system_controller, 0x1a);
+		oldreg = nthbyte(m_system_controller, 0x1a);
 		newreg = data >> 8 & 0xff;
 		if (newreg != oldreg)
 		{
 			if( newreg == 0 )
 			{ /* disable DSPs */
-				cputag_set_input_line(space->machine(), "master", INPUT_LINE_RESET, ASSERT_LINE); /* master DSP */
-				cputag_set_input_line(space->machine(), "slave", INPUT_LINE_RESET, ASSERT_LINE); /* slave DSP */
-				namcos22_enable_slave_simulation(space->machine(), 0);
-				state->m_mbEnableDspIrqs = 0;
+				cputag_set_input_line(machine(), "master", INPUT_LINE_RESET, ASSERT_LINE); /* master DSP */
+				cputag_set_input_line(machine(), "slave", INPUT_LINE_RESET, ASSERT_LINE); /* slave DSP */
+				namcos22_enable_slave_simulation(machine(), 0);
+				m_mbEnableDspIrqs = 0;
 			}
 			else if( newreg == 1 )
 			{ /* enable dsp and rendering subsystem */
-				cputag_set_input_line(space->machine(), "master", INPUT_LINE_RESET, CLEAR_LINE);
-				namcos22_enable_slave_simulation(space->machine(), 1);
-				state->m_mbEnableDspIrqs = 1;
+				cputag_set_input_line(machine(), "master", INPUT_LINE_RESET, CLEAR_LINE);
+				namcos22_enable_slave_simulation(machine(), 1);
+				m_mbEnableDspIrqs = 1;
 			}
 			else if( newreg == 0xff )
 			{ /* used to upload game-specific code to master/slave dsps */
-				cputag_set_input_line(space->machine(), "master", INPUT_LINE_RESET, CLEAR_LINE);
-				state->m_mbEnableDspIrqs = 0;
+				cputag_set_input_line(machine(), "master", INPUT_LINE_RESET, CLEAR_LINE);
+				m_mbEnableDspIrqs = 0;
 			}
 		}
 	}
 
-	COMBINE_DATA( &state->m_system_controller[offset] );
+	COMBINE_DATA( &m_system_controller[offset] );
 
 } /* namcos22_system_controller_w */
 
@@ -2394,23 +2371,22 @@ static INTERRUPT_GEN( namcos22_interrupt )
 	}
 }
 
-static READ32_HANDLER( namcos22_keycus_r )
+READ32_MEMBER(namcos22_state::namcos22_keycus_r)
 {
 	// this chip is also used for reading random values in some games
 	// for example in timecris to determine where certain enemies will emerge
 	// but it is not yet understood how this works
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-//  printf("Hit keycus mask %x PC=%x\n", mem_mask, cpu_get_pc(&space->device()));
+//  printf("Hit keycus mask %x PC=%x\n", mem_mask, cpu_get_pc(&space.device()));
 
 	if (ACCESSING_BITS_0_15)
-		return state->m_keycus_id;
+		return m_keycus_id;
 	if (ACCESSING_BITS_16_31)
-		return state->m_keycus_id << 16;
+		return m_keycus_id << 16;
 
 	return 0;
 }
 
-static WRITE32_HANDLER( namcos22_keycus_w )
+WRITE32_MEMBER(namcos22_state::namcos22_keycus_w)
 {
 	// for obfuscating keycus and/or random seed?
 }
@@ -2430,42 +2406,38 @@ static WRITE32_HANDLER( namcos22_keycus_w )
  * Other values seem to be digital versions of analog ports, for example "the gas pedal is
  * pressed" as a boolean flag.  IO RAM supplies it as an analog value.
  */
-static READ32_HANDLER( namcos22_portbit_r )
+READ32_MEMBER(namcos22_state::namcos22_portbit_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	UINT32 data = state->m_mSys22PortBits;
-	state->m_mSys22PortBits>>=1;
+	UINT32 data = m_mSys22PortBits;
+	m_mSys22PortBits>>=1;
 	return data&0x10001;
 }
-static WRITE32_HANDLER( namcos22_portbit_w )
+WRITE32_MEMBER(namcos22_state::namcos22_portbit_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	unsigned dat50000008 = AnalogAsDigital(space->machine());
+	unsigned dat50000008 = AnalogAsDigital(machine());
 	unsigned dat5000000a = 0xffff;
-	state->m_mSys22PortBits = (dat50000008<<16)|dat5000000a;
+	m_mSys22PortBits = (dat50000008<<16)|dat5000000a;
 }
 
-static READ32_HANDLER( namcos22_dipswitch_r )
+READ32_MEMBER(namcos22_state::namcos22_dipswitch_r)
 {
-	return input_port_read(space->machine(), "DSW0")<<16;
+	return ioport("DSW0")->read()<<16;
 }
 
-static READ32_HANDLER( namcos22_mcuram_r )
+READ32_MEMBER(namcos22_state::namcos22_mcuram_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	return state->m_shareram[offset];
+	return m_shareram[offset];
 }
 
-static WRITE32_HANDLER( namcos22_mcuram_w )
+WRITE32_MEMBER(namcos22_state::namcos22_mcuram_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	COMBINE_DATA(&state->m_shareram[offset]);
+	COMBINE_DATA(&m_shareram[offset]);
 }
 
-static READ32_HANDLER( namcos22_gun_r )
+READ32_MEMBER(namcos22_state::namcos22_gun_r)
 {
-	int xpos = input_port_read_safe(space->machine(), "LIGHTX", 0) * 640 / 0xff;
-	int ypos = input_port_read_safe(space->machine(), "LIGHTY", 0) * 240 / 0xff + 0x10;
+	int xpos = ioport("LIGHTX")->read_safe(0) * 640 / 0xff;
+	int ypos = ioport("LIGHTY")->read_safe(0) * 240 / 0xff + 0x10;
 	switch( offset )
 	{
 	case 0: /* 430000 */
@@ -2481,7 +2453,7 @@ static READ32_HANDLER( namcos22_gun_r )
 	}
 } /* namcos22_gun_r */
 
-static WRITE32_HANDLER( namcos22_cpuleds_w )
+WRITE32_MEMBER(namcos22_state::namcos22_cpuleds_w)
 {
 	// 8 leds on cpu board, left to right:
 	// GYRGYRGY green/yellow/red, 0=on 1=off
@@ -2498,39 +2470,36 @@ static WRITE32_HANDLER( namcos22_cpuleds_w )
 	output_set_lamp_value(7, data>>0 & 1);
 }
 
-static READ32_HANDLER( alpinesa_prot_r )
+READ32_MEMBER(namcos22_state::alpinesa_prot_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	return state->m_mAlpineSurferProtData;
+	return m_mAlpineSurferProtData;
 } /* alpinesa_prot_r */
 
-static WRITE32_HANDLER( alpinesa_prot_w )
+WRITE32_MEMBER(namcos22_state::alpinesa_prot_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 	switch( data )
 	{
 	case 0:
-		state->m_mAlpineSurferProtData = 0;
+		m_mAlpineSurferProtData = 0;
 		break;
 	case 1:
-		state->m_mAlpineSurferProtData = 1;
+		m_mAlpineSurferProtData = 1;
 		break;
 	case 3:
-		state->m_mAlpineSurferProtData = 2;
+		m_mAlpineSurferProtData = 2;
 		break;
 	default:
 		break;
 	}
 } /* alpinesa_prot_w */
 
-static WRITE32_HANDLER( namcos22s_nvmem_w )
+WRITE32_MEMBER(namcos22_state::namcos22s_nvmem_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	mem_mask &= 0xff00ff00; // 8KB RAM over 16KB address space
-	COMBINE_DATA(&state->m_nvmem[offset]);
+	mem_mask &= 0xff00ff00; // 8KB RAM over 16KB address &space
+	COMBINE_DATA(&m_nvmem[offset]);
 }
 
-static WRITE32_HANDLER( namcos22s_chipselect_w )
+WRITE32_MEMBER(namcos22_state::namcos22s_chipselect_w)
 {
 	// assume that this register is for chip enable/disable
 	// it's written many times during boot-up, and most games don't touch it afterwards (last value usually 0038 or 0838)
@@ -2538,15 +2507,14 @@ static WRITE32_HANDLER( namcos22s_chipselect_w )
 	// 4000: spot related (set in dirtdash and testmode)
 	// 0800: fade related?
 	// other bits: no clue
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 	if (ACCESSING_BITS_16_23)
-		state->m_chipselect = data >> 16;
+		m_chipselect = data >> 16;
 	else if (ACCESSING_BITS_24_31)
-		state->m_chipselect = data >> 24;
+		m_chipselect = data >> 24;
 }
 
 /* Namco Super System 22 */
-static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32, namcos22_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(namcos22_keycus_r, namcos22_keycus_w)
 	AM_RANGE(0x410000, 0x413fff) AM_RAM /* C139 SCI buffer */
@@ -2555,38 +2523,36 @@ static ADDRESS_MAP_START( namcos22s_am, AS_PROGRAM, 32 )
 	AM_RANGE(0x430000, 0x430003) AM_WRITE(namcos22_cpuleds_w)
 	AM_RANGE(0x440000, 0x440003) AM_READ(namcos22_dipswitch_r)
 	AM_RANGE(0x450008, 0x45000b) AM_READWRITE(namcos22_portbit_r, namcos22_portbit_w)
-	AM_RANGE(0x460000, 0x463fff) AM_RAM_WRITE(namcos22s_nvmem_w) AM_BASE_SIZE_MEMBER(namcos22_state, m_nvmem, m_nvmem_size)
-	AM_RANGE(0x700000, 0x70001f) AM_READWRITE(namcos22_system_controller_r, namcos22s_system_controller_w) AM_BASE_MEMBER(namcos22_state, m_system_controller)
+	AM_RANGE(0x460000, 0x463fff) AM_RAM_WRITE(namcos22s_nvmem_w) AM_SHARE("nvmem")
+	AM_RANGE(0x700000, 0x70001f) AM_READWRITE(namcos22_system_controller_r, namcos22s_system_controller_w) AM_SHARE("syscontrol")
 	AM_RANGE(0x800000, 0x800003) AM_WRITE(namcos22s_chipselect_w)
-	AM_RANGE(0x810000, 0x81000f) AM_RAM AM_BASE_MEMBER(namcos22_state, m_czattr)
+	AM_RANGE(0x810000, 0x81000f) AM_RAM AM_SHARE("czattr")
 	AM_RANGE(0x810200, 0x8103ff) AM_READWRITE(namcos22s_czram_r, namcos22s_czram_w)
 	AM_RANGE(0x820000, 0x8202ff) AM_WRITENOP /* leftover of old (non-super) video mixer device */
-	AM_RANGE(0x824000, 0x8243ff) AM_READWRITE(namcos22_gamma_r, namcos22_gamma_w) AM_BASE_MEMBER(namcos22_state, m_gamma)
-	AM_RANGE(0x828000, 0x83ffff) AM_READWRITE(namcos22_paletteram_r, namcos22_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x824000, 0x8243ff) AM_READWRITE(namcos22_gamma_r, namcos22_gamma_w) AM_SHARE("gamma")
+	AM_RANGE(0x828000, 0x83ffff) AM_READWRITE(namcos22_paletteram_r, namcos22_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x860000, 0x860007) AM_READWRITE(namcos22s_spotram_r, namcos22s_spotram_w)
-	AM_RANGE(0x880000, 0x89dfff) AM_READWRITE(namcos22_cgram_r, namcos22_cgram_w) AM_BASE_MEMBER(namcos22_state, m_cgram)
-	AM_RANGE(0x89e000, 0x89ffff) AM_READWRITE(namcos22_textram_r, namcos22_textram_w) AM_BASE_MEMBER(namcos22_state, m_textram)
-	AM_RANGE(0x8a0000, 0x8a000f) AM_READWRITE(namcos22_tilemapattr_r, namcos22_tilemapattr_w) AM_BASE_MEMBER(namcos22_state, m_tilemapattr)
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_BASE_MEMBER(namcos22_state, m_vics_data)
-	AM_RANGE(0x940000, 0x94007f) AM_READWRITE(namcos22s_vics_control_r, namcos22s_vics_control_w) AM_BASE_MEMBER(namcos22_state, m_vics_control)
-	AM_RANGE(0x980000, 0x9affff) AM_RAM AM_BASE_MEMBER(namcos22_state, m_spriteram) /* C374 */
-	AM_RANGE(0xa04000, 0xa0bfff) AM_READWRITE(namcos22_mcuram_r, namcos22_mcuram_w) AM_BASE_MEMBER(namcos22_state, m_shareram) /* COM RAM */
-	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(namcos22_dspram_r, namcos22_dspram_w) AM_BASE_MEMBER(namcos22_state, m_polygonram)
+	AM_RANGE(0x880000, 0x89dfff) AM_READWRITE(namcos22_cgram_r, namcos22_cgram_w) AM_SHARE("cgram")
+	AM_RANGE(0x89e000, 0x89ffff) AM_READWRITE(namcos22_textram_r, namcos22_textram_w) AM_SHARE("textram")
+	AM_RANGE(0x8a0000, 0x8a000f) AM_READWRITE(namcos22_tilemapattr_r, namcos22_tilemapattr_w) AM_SHARE("tilemapattr")
+	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("vics_data")
+	AM_RANGE(0x940000, 0x94007f) AM_READWRITE(namcos22s_vics_control_r, namcos22s_vics_control_w) AM_SHARE("vics_control")
+	AM_RANGE(0x980000, 0x9affff) AM_RAM AM_SHARE("spriteram") /* C374 */
+	AM_RANGE(0xa04000, 0xa0bfff) AM_READWRITE(namcos22_mcuram_r, namcos22_mcuram_w) AM_SHARE("shareram") /* COM RAM */
+	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(namcos22_dspram_r, namcos22_dspram_w) AM_SHARE("polygonram")
 	AM_RANGE(0xe00000, 0xe3ffff) AM_RAM /* workram */
 ADDRESS_MAP_END
 
-static READ16_HANDLER( s22mcu_shared_r )
+READ16_MEMBER(namcos22_state::s22mcu_shared_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	UINT16 *share16 = (UINT16 *)state->m_shareram;
+	UINT16 *share16 = (UINT16 *)m_shareram.target();
 
 	return share16[BYTE_XOR_BE(offset)];
 }
 
-static WRITE16_HANDLER( s22mcu_shared_w )
+WRITE16_MEMBER(namcos22_state::s22mcu_shared_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	UINT16 *share16 = (UINT16 *)state->m_shareram;
+	UINT16 *share16 = (UINT16 *)m_shareram.target();
 
 	COMBINE_DATA(&share16[BYTE_XOR_BE(offset)]);
 }
@@ -2617,9 +2583,9 @@ static WRITE16_HANDLER( s22mcu_shared_w )
 */
 
 // Super System 22 M37710
-static ADDRESS_MAP_START( mcu_program, AS_PROGRAM, 16 )
-	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE_MODERN("c352", c352_device, read, write)
-	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE( s22mcu_shared_r, s22mcu_shared_w )
+static ADDRESS_MAP_START( mcu_program, AS_PROGRAM, 16, namcos22_state )
+	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
+	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE(s22mcu_shared_r, s22mcu_shared_w )
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("user4", 0xc000)
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("user4", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("user4", 0)
@@ -2629,9 +2595,9 @@ static ADDRESS_MAP_START( mcu_program, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 // System 22 37702
-static ADDRESS_MAP_START( mcu_s22_program, AS_PROGRAM, 16 )
-	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE_MODERN("c352", c352_device, read, write)
-	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE( s22mcu_shared_r, s22mcu_shared_w )
+static ADDRESS_MAP_START( mcu_s22_program, AS_PROGRAM, 16, namcos22_state )
+	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
+	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE(s22mcu_shared_r, s22mcu_shared_w )
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("mcu", 0)
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("user4", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("user4", 0)
@@ -2641,71 +2607,68 @@ static ADDRESS_MAP_START( mcu_s22_program, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( mcu_port4_w )
+WRITE8_MEMBER(namcos22_state::mcu_port4_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	state->m_p4 = data;
+	m_p4 = data;
 }
 
-static READ8_HANDLER( mcu_port4_r )
+READ8_MEMBER(namcos22_state::mcu_port4_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	return state->m_p4;
+	return m_p4;
 }
 
-static WRITE8_HANDLER( mcu_port5_w )
+WRITE8_MEMBER(namcos22_state::mcu_port5_w)
 {
 	;
 }
 
-static READ8_HANDLER( mcu_port5_r )
+READ8_MEMBER(namcos22_state::mcu_port5_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 
-	if (state->m_p4 & 8)
-		return input_port_read_safe(space->machine(), "MCUP5A", 0xff);
+	if (m_p4 & 8)
+		return ioport("MCUP5A")->read_safe(0xff);
 	else
-		return input_port_read_safe(space->machine(), "MCUP5B", 0xff);
+		return ioport("MCUP5B")->read_safe(0xff);
 }
 
-static WRITE8_HANDLER( mcu_port6_w )
+WRITE8_MEMBER(namcos22_state::mcu_port6_w)
 {
 	;
 }
 
-static READ8_HANDLER( mcu_port6_r )
+READ8_MEMBER(namcos22_state::mcu_port6_r)
 {
 	return 0;
 }
 
-static WRITE8_HANDLER( mcu_port7_w )
+WRITE8_MEMBER(namcos22_state::mcu_port7_w)
 {
 	;
 }
 
-static READ8_HANDLER( mcu_port7_r )
+READ8_MEMBER(namcos22_state::mcu_port7_r)
 {
 	return 0;
 }
 
-static WRITE8_HANDLER( propcycle_mcu_port5_w )
+WRITE8_MEMBER(namcos22_state::propcycle_mcu_port5_w)
 {
 	// prop cycle outputs:
 	// bit 1 = fan
 	// bit 2 = button light
 
 	output_set_value("fan0", data & 1);
-	set_led_status(space->machine(), 0, data & 2);
+	set_led_status(machine(), 0, data & 2);
 }
 
-static READ8_HANDLER( propcycle_mcu_adc_r )
+READ8_MEMBER(namcos22_state::propcycle_mcu_adc_r)
 {
 	// H+L = horizontal, 1 H+L = vertical
 	UINT16 ddx, ddy;
 
-	ddx = input_port_read(space->machine(), "STICKX");
+	ddx = ioport("STICKX")->read();
 	if (ddx > 0) ddx -= 1;
-	ddy = input_port_read(space->machine(), "STICKY");
+	ddy = ioport("STICKY")->read();
 	if (ddy > 0) ddy -= 1;
 
 	ddx <<= 2;
@@ -2722,12 +2685,12 @@ static READ8_HANDLER( propcycle_mcu_adc_r )
 			// and timer A3 is configured by the MCU program to cause an interrupt each time
 			// it's clocked.  by counting the number of interrupts in a frame, we can determine
 			// how fast the user is pedaling.
-			if( input_port_read(space->machine(), "JOY") & 0x10 )
+			if( ioport("JOY")->read() & 0x10 )
 			{
 				int i;
 				for (i = 0; i < 16; i++)
 				{
-					generic_pulse_irq_line(space->machine().device("mcu"), M37710_LINE_TIMERA3TICK, 1);
+					generic_pulse_irq_line(machine().device("mcu")->execute(), M37710_LINE_TIMERA3TICK, 1);
 				}
 			}
 
@@ -2749,36 +2712,35 @@ static TIMER_CALLBACK( alpine_steplock_callback )
 	state->m_motor_status = param;
 }
 
-static WRITE8_HANDLER( alpine_mcu_port5_w )
+WRITE8_MEMBER(namcos22_state::alpine_mcu_port5_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 
 	// bits 1+2 are steplock motor outputs
 	if ((data & 6) == 6)
 	{
-		if (state->m_motor_status == 2)
+		if (m_motor_status == 2)
 		{
 			// free steps
-			state->m_motor_status = 0;
-			state->m_motor_timer->adjust(attotime::from_msec(500), 1);
+			m_motor_status = 0;
+			m_motor_timer->adjust(attotime::from_msec(500), 1);
 		}
 	}
 	else if (data & 4)
 	{
-		if (state->m_motor_status == 1)
+		if (m_motor_status == 1)
 		{
 			// lock steps
-			state->m_motor_status = 0;
-			state->m_motor_timer->adjust(attotime::from_msec(500), 2);
+			m_motor_status = 0;
+			m_motor_timer->adjust(attotime::from_msec(500), 2);
 		}
 	}
 }
 
-static READ8_HANDLER( alpineracer_mcu_adc_r )
+READ8_MEMBER(namcos22_state::alpineracer_mcu_adc_r)
 {
 	// 0 H+L = swing, 1 H+L = edge
-	UINT16 swing = input_port_read(space->machine(), "SWING")<<2;
-	UINT16 edge  = input_port_read(space->machine(), "EDGE" )<<2;
+	UINT16 swing = ioport("SWING")->read()<<2;
+	UINT16 edge  = ioport("EDGE" )->read()<<2;
 
 	switch (offset)
 	{
@@ -2799,10 +2761,10 @@ static READ8_HANDLER( alpineracer_mcu_adc_r )
 	}
 }
 
-static READ8_HANDLER( cybrcycc_mcu_adc_r )
+READ8_MEMBER(namcos22_state::cybrcycc_mcu_adc_r)
 {
 	UINT16 gas,brake,steer;
-	ReadAnalogDrivingPorts( space->machine(), &gas, &brake, &steer );
+	ReadAnalogDrivingPorts( machine(), &gas, &brake, &steer );
 
 	gas <<= 2;
 	brake <<= 2;
@@ -2833,10 +2795,10 @@ static READ8_HANDLER( cybrcycc_mcu_adc_r )
 	}
 }
 
-static READ8_HANDLER( tokyowar_mcu_adc_r )
+READ8_MEMBER(namcos22_state::tokyowar_mcu_adc_r)
 {
 	UINT16 gas,brake,steer;
-	ReadAnalogDrivingPorts( space->machine(), &gas, &brake, &steer );
+	ReadAnalogDrivingPorts( machine(), &gas, &brake, &steer );
 
 	gas <<= 2;
 	brake <<= 2;
@@ -2867,13 +2829,13 @@ static READ8_HANDLER( tokyowar_mcu_adc_r )
 	}
 }
 
-static READ8_HANDLER( aquajet_mcu_adc_r )
+READ8_MEMBER(namcos22_state::aquajet_mcu_adc_r)
 {
 	UINT16 gas, steer, ddy;
 
-	gas   = input_port_read(space->machine(), "GAS") ^ 0x7f;
-	steer = input_port_read(space->machine(), "STEER") ^ 0xff;
-	ddy = input_port_read(space->machine(), "STICKY");
+	gas   = ioport("GAS")->read() ^ 0x7f;
+	steer = ioport("STEER")->read() ^ 0xff;
+	ddy = ioport("STICKY")->read();
 	if (ddy > 0) ddy -= 1;
 
 	gas <<= 2;
@@ -2911,13 +2873,13 @@ static READ8_HANDLER( aquajet_mcu_adc_r )
 	}
 }
 
-static READ8_HANDLER( airco22_mcu_adc_r )
+READ8_MEMBER(namcos22_state::airco22_mcu_adc_r)
 {
 	UINT16 pedal, x, y;
 
-	pedal = input_port_read(space->machine(), "PEDAL")<<2;
-	x = input_port_read(space->machine(), "STICKX")<<2;
-	y = input_port_read(space->machine(), "STICKY")<<2;
+	pedal = ioport("PEDAL")->read()<<2;
+	x = ioport("STICKX")->read()<<2;
+	y = ioport("STICKY")->read()<<2;
 
 
 	switch (offset)
@@ -2945,21 +2907,20 @@ static READ8_HANDLER( airco22_mcu_adc_r )
 	}
 }
 
-static ADDRESS_MAP_START( mcu_io, AS_IO, 8 )
-	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READ( mcu_port4_r ) AM_WRITE( mcu_port4_w )
-	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_READ( mcu_port5_r ) AM_WRITE( mcu_port5_w )
-	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READ( mcu_port6_r ) AM_WRITE( mcu_port6_w )
-	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READ( mcu_port7_r ) AM_WRITE( mcu_port7_w )
+static ADDRESS_MAP_START( mcu_io, AS_IO, 8, namcos22_state )
+	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READ(mcu_port4_r ) AM_WRITE(mcu_port4_w )
+	AM_RANGE(M37710_PORT5, M37710_PORT5) AM_READ(mcu_port5_r ) AM_WRITE(mcu_port5_w )
+	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READ(mcu_port6_r ) AM_WRITE(mcu_port6_w )
+	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READ(mcu_port7_r ) AM_WRITE(mcu_port7_w )
 ADDRESS_MAP_END
 
-static READ8_HANDLER( mcu_port4_s22_r )
+READ8_MEMBER(namcos22_state::mcu_port4_s22_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	return state->m_p4 | 0x10;	// for C74, 0x10 selects sound MCU role, 0x00 selects control-reading role
+	return m_p4 | 0x10;	// for C74, 0x10 selects sound MCU role, 0x00 selects control-reading role
 }
 
-static ADDRESS_MAP_START( mcu_s22_io, AS_IO, 8 )
-	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READ( mcu_port4_s22_r )
+static ADDRESS_MAP_START( mcu_s22_io, AS_IO, 8, namcos22_state )
+	AM_RANGE(M37710_PORT4, M37710_PORT4) AM_READ(mcu_port4_s22_r )
 ADDRESS_MAP_END
 
 static TIMER_DEVICE_CALLBACK( mcu_irq )
@@ -3031,7 +2992,7 @@ MACHINE_CONFIG_END
 
 /* Namco System 22 */
 
-static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32, namcos22_state )
 	/**
      * Program ROM (2M bytes)
      * Mounted position: LLB: CPU 4D, LMB: CPU 2D, UMB: CPU 8D, UUB: CPU 6D
@@ -3104,7 +3065,7 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32 )
      * System Controller: Interrupt Control, Peripheral Control
      *
      */
-	AM_RANGE(0x40000000, 0x4000001f) AM_READWRITE(namcos22_system_controller_r, namcos22_system_controller_w) AM_BASE_MEMBER(namcos22_state, m_system_controller)
+	AM_RANGE(0x40000000, 0x4000001f) AM_READWRITE(namcos22_system_controller_r, namcos22_system_controller_w) AM_SHARE("syscontrol")
 
 	/**
      * Unknown Device (optional for diagnostics?)
@@ -3127,7 +3088,7 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32 )
      * Mounted position: CPU 9E
      * Known chip type: HN58C65P-25 (8k x 8bit EEPROM)
      */
-	AM_RANGE(0x58000000, 0x58001fff) AM_RAM AM_BASE_SIZE_MEMBER(namcos22_state, m_nvmem, m_nvmem_size)
+	AM_RANGE(0x58000000, 0x58001fff) AM_RAM AM_SHARE("nvmem")
 
 	/**
      * C74 (Mitsubishi M37702 MCU) Shared RAM (0x60004000 - 0x6000bfff)
@@ -3169,7 +3130,7 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32 )
      * +0x0300 - 0x03ff?    Song Title (put messages here from Sound CPU)
      */
 	AM_RANGE(0x60000000, 0x60003fff) AM_WRITENOP
-	AM_RANGE(0x60004000, 0x6000bfff) AM_READWRITE(namcos22_mcuram_r, namcos22_mcuram_w) AM_BASE_MEMBER(namcos22_state, m_shareram)
+	AM_RANGE(0x60004000, 0x6000bfff) AM_READWRITE(namcos22_mcuram_r, namcos22_mcuram_w) AM_SHARE("shareram")
 
 	/**
      * C71 (TI TMS320C25 DSP) Shared RAM (0x70000000 - 0x70020000)
@@ -3179,7 +3140,7 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32 )
      * Known chip type: TC55328P-25, N341256P-15
      * Notes: connected bits = 0x00ffffff (24bit)
      */
-	AM_RANGE(0x70000000, 0x7001ffff) AM_READWRITE(namcos22_dspram_r, namcos22_dspram_w) AM_BASE_MEMBER(namcos22_state, m_polygonram)
+	AM_RANGE(0x70000000, 0x7001ffff) AM_READWRITE(namcos22_dspram_r, namcos22_dspram_w) AM_SHARE("polygonram")
 
 	/**
      * LED on PCB(?)
@@ -3191,20 +3152,20 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32 )
      * Mounted position: VIDEO 8P
      * Known chip type: TC55328P-25
      */
-	AM_RANGE(0x90010000, 0x90017fff) AM_RAM AM_BASE_MEMBER(namcos22_state, m_czram)
+	AM_RANGE(0x90010000, 0x90017fff) AM_RAM AM_SHARE("czram")
 
 	/**
      * C305 (Display Controller)
      * Mounted position: VIDEO 7D (C305)
      * Notes: Boot time check: 0x90020100 - 0x9002027f
      */
-	AM_RANGE(0x90020000, 0x90027fff) AM_READWRITE(namcos22_gamma_r, namcos22_gamma_w) AM_BASE_MEMBER(namcos22_state, m_gamma)
+	AM_RANGE(0x90020000, 0x90027fff) AM_READWRITE(namcos22_gamma_r, namcos22_gamma_w) AM_SHARE("gamma")
 
 	/**
      * Mounted position: VIDEO 6B, 7B, 8B (near C305)
      * Note: 0xff00-0xffff are for Tilemap (16 x 16)
      */
-	AM_RANGE(0x90028000, 0x9003ffff) AM_READWRITE(namcos22_paletteram_r, namcos22_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x90028000, 0x9003ffff) AM_READWRITE(namcos22_paletteram_r, namcos22_paletteram_w) AM_SHARE("paletteram")
 
 	/**
      * unknown (option)
@@ -3215,7 +3176,7 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32 )
 	/**
      * Tilemap PCG Memory
      */
-	AM_RANGE(0x90080000, 0x9009dfff) AM_READWRITE(namcos22_cgram_r, namcos22_cgram_w) AM_BASE_MEMBER(namcos22_state, m_cgram)
+	AM_RANGE(0x90080000, 0x9009dfff) AM_READWRITE(namcos22_cgram_r, namcos22_cgram_w) AM_SHARE("cgram")
 
 	/**
      * Tilemap Memory (64 x 64)
@@ -3223,13 +3184,13 @@ static ADDRESS_MAP_START( namcos22_am, AS_PROGRAM, 32 )
      * Known chip type: HM511664 (64k x 16bit SRAM)
      * Note: Self test: 90084000 - 9009ffff
      */
-	AM_RANGE(0x9009e000, 0x9009ffff) AM_READWRITE(namcos22_textram_r, namcos22_textram_w) AM_BASE_MEMBER(namcos22_state, m_textram)
+	AM_RANGE(0x9009e000, 0x9009ffff) AM_READWRITE(namcos22_textram_r, namcos22_textram_w) AM_SHARE("textram")
 
 	/**
      * Tilemap Register
      * Mounted position: unknown
      */
-	AM_RANGE(0x900a0000, 0x900a000f) AM_READWRITE(namcos22_tilemapattr_r, namcos22_tilemapattr_w) AM_BASE_MEMBER(namcos22_state, m_tilemapattr)
+	AM_RANGE(0x900a0000, 0x900a000f) AM_READWRITE(namcos22_tilemapattr_r, namcos22_tilemapattr_w) AM_SHARE("tilemapattr")
 ADDRESS_MAP_END
 
 
@@ -4762,10 +4723,9 @@ ROM_END
 
 /*******************************************************************/
 
-static CUSTOM_INPUT( alpine_motor_read )
+CUSTOM_INPUT_MEMBER(namcos22_state::alpine_motor_read)
 {
-	namcos22_state *state = field.machine().driver_data<namcos22_state>();
-	return state->m_motor_status >> (FPTR)param & 1;
+	return m_motor_status >> (FPTR)param & 1;
 }
 
 static INPUT_PORTS_START( alpiner )
@@ -4803,7 +4763,7 @@ static INPUT_PORTS_START( alpiner )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START ) // Decision / View Change
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY // L Selection
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_16WAY // R Selection
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM(alpine_motor_read, (void *)0) // steps are free
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state,alpine_motor_read, (void *)0) // steps are free
 
 	PORT_START("SWING")
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steps Swing")
@@ -4812,7 +4772,7 @@ static INPUT_PORTS_START( alpiner )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_NAME("Steps Edge")
 
 	PORT_START("MCUP5B")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM(alpine_motor_read, (void *)1) // steps are locked
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos22_state,alpine_motor_read, (void *)1) // steps are locked
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END /* Alpine Racer */
 
@@ -5447,65 +5407,64 @@ INPUT_PORTS_END /* Rave Racer */
 // MCU speed cheats (every bit helps with these games)
 
 // for MCU BIOS v1.41
-static READ16_HANDLER( mcu141_speedup_r )
+READ16_MEMBER(namcos22_state::mcu141_speedup_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	if ((cpu_get_pc(&space->device()) == 0xc12d) && (!(state->m_su_82 & 0xff00)))
+	if ((cpu_get_pc(&space.device()) == 0xc12d) && (!(m_su_82 & 0xff00)))
 	{
-		device_spin_until_interrupt(&space->device());
+		device_spin_until_interrupt(&space.device());
 	}
 
-	return state->m_su_82;
+	return m_su_82;
 }
 
-static WRITE16_HANDLER( mcu_speedup_w )
+WRITE16_MEMBER(namcos22_state::mcu_speedup_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	COMBINE_DATA(&state->m_su_82);
+	COMBINE_DATA(&m_su_82);
 }
 
 // for MCU BIOS v1.30
-static READ16_HANDLER( mcu130_speedup_r )
+READ16_MEMBER(namcos22_state::mcu130_speedup_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	if ((cpu_get_pc(&space->device()) == 0xc12a) && (!(state->m_su_82 & 0xff00)))
+	if ((cpu_get_pc(&space.device()) == 0xc12a) && (!(m_su_82 & 0xff00)))
 	{
-		device_spin_until_interrupt(&space->device());
+		device_spin_until_interrupt(&space.device());
 	}
 
-	return state->m_su_82;
+	return m_su_82;
 }
 
 // for NSTX7702 v1.00 (C74)
-static READ16_HANDLER( mcuc74_speedup_r )
+READ16_MEMBER(namcos22_state::mcuc74_speedup_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	if (((cpu_get_pc(&space->device()) == 0xc0df) || (cpu_get_pc(&space->device()) == 0xc101)) && (!(state->m_su_82 & 0xff00)))
+	if (((cpu_get_pc(&space.device()) == 0xc0df) || (cpu_get_pc(&space.device()) == 0xc101)) && (!(m_su_82 & 0xff00)))
 	{
-		device_spin_until_interrupt(&space->device());
+		device_spin_until_interrupt(&space.device());
 	}
 
-	return state->m_su_82;
+	return m_su_82;
 }
 
 static void install_c74_speedup(running_machine &machine)
 {
+	namcos22_state *state = machine.driver_data<namcos22_state>();
 	if (MCU_SPEEDUP)
-		machine.device("mcu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x80, 0x81, FUNC(mcuc74_speedup_r), FUNC(mcu_speedup_w));
+		machine.device("mcu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x80, 0x81, read16_delegate(FUNC(namcos22_state::mcuc74_speedup_r),state), write16_delegate(FUNC(namcos22_state::mcu_speedup_w),state));
 }
 
 static void install_130_speedup(running_machine &machine)
 {
+	namcos22_state *state = machine.driver_data<namcos22_state>();
 	// install speedup cheat for 1.30 MCU BIOS
 	if (MCU_SPEEDUP)
-		machine.device("mcu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x82, 0x83, FUNC(mcu130_speedup_r), FUNC(mcu_speedup_w));
+		machine.device("mcu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos22_state::mcu130_speedup_r),state), write16_delegate(FUNC(namcos22_state::mcu_speedup_w),state));
 }
 
 static void install_141_speedup(running_machine &machine)
 {
+	namcos22_state *state = machine.driver_data<namcos22_state>();
 	// install speedup cheat for 1.41 MCU BIOS
 	if (MCU_SPEEDUP)
-		machine.device("mcu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x82, 0x83, FUNC(mcu141_speedup_r), FUNC(mcu_speedup_w));
+		machine.device("mcu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos22_state::mcu141_speedup_r),state), write16_delegate(FUNC(namcos22_state::mcu_speedup_w),state));
 }
 
 static void namcos22_init( running_machine &machine, int game_type )
@@ -5528,8 +5487,8 @@ static void alpine_init_common( running_machine &machine, int game_type )
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	namcos22_init(machine, game_type);
 
-	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(alpineracer_mcu_adc_r));
-	machine.device("mcu")->memory().space(AS_IO)->install_legacy_write_handler(M37710_PORT5, M37710_PORT5, FUNC(alpine_mcu_port5_w));
+	machine.device("mcu")->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::alpineracer_mcu_adc_r),state));
+	machine.device("mcu")->memory().space(AS_IO)->install_write_handler(M37710_PORT5, M37710_PORT5, write8_delegate(FUNC(namcos22_state::alpine_mcu_port5_w),state));
 
 	state->m_motor_timer = machine.scheduler().timer_alloc(FUNC(alpine_steplock_callback));
 	state->m_motor_timer->reset();
@@ -5561,8 +5520,8 @@ static DRIVER_INIT( alpinesa )
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	alpine_init_common(machine, NAMCOS22_ALPINE_SURFER);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x200000, 0x200003, FUNC(alpinesa_prot_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x300000, 0x300003, FUNC(alpinesa_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler (0x200000, 0x200003, read32_delegate(FUNC(namcos22_state::alpinesa_prot_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x300000, 0x300003, write32_delegate(FUNC(namcos22_state::alpinesa_prot_w),state));
 	install_141_speedup(machine);
 
 	state->m_keycus_id = 0x01a9;
@@ -5570,15 +5529,16 @@ static DRIVER_INIT( alpinesa )
 
 static DRIVER_INIT( airco22 )
 {
+	namcos22_state *state = machine.driver_data<namcos22_state>();
 	namcos22_init(machine, NAMCOS22_AIR_COMBAT22);
 
 	// S22-BIOS ver1.20 namco all rights reserved 94/12/21
-	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(airco22_mcu_adc_r));
+	machine.device("mcu")->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::airco22_mcu_adc_r),state));
 }
 
 static DRIVER_INIT( propcycl )
 {
-   UINT32 *pROM = (UINT32 *)machine.region("maincpu")->base();
+   UINT32 *pROM = (UINT32 *)machine.root_device().memregion("maincpu")->base();
 
 	/* patch out strange routine (uninitialized-eprom related?) */
 	pROM[0x1992C/4] = 0x4E754E75;
@@ -5596,9 +5556,9 @@ static DRIVER_INIT( propcycl )
 //   pROM[0x22296/4] |= 0x00004e75;
 
 	namcos22_init(machine, NAMCOS22_PROP_CYCLE);
-
-	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(propcycle_mcu_adc_r));
-	machine.device("mcu")->memory().space(AS_IO)->install_legacy_write_handler(M37710_PORT5, M37710_PORT5, FUNC(propcycle_mcu_port5_w));
+	namcos22_state *state = machine.driver_data<namcos22_state>();
+	machine.device("mcu")->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::propcycle_mcu_adc_r),state));
+	machine.device("mcu")->memory().space(AS_IO)->install_write_handler(M37710_PORT5, M37710_PORT5, write8_delegate(FUNC(namcos22_state::propcycle_mcu_port5_w),state));
 	install_141_speedup(machine);
 }
 
@@ -5664,7 +5624,7 @@ static DRIVER_INIT( cybrcyc )
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	namcos22_init(machine, NAMCOS22_CYBER_CYCLES);
 
-	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(cybrcycc_mcu_adc_r));
+	machine.device("mcu")->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::cybrcycc_mcu_adc_r),state));
 	install_130_speedup(machine);
 
 	state->m_keycus_id = 0x0387;
@@ -5682,7 +5642,7 @@ static DRIVER_INIT( tokyowar )
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	namcos22_init(machine, NAMCOS22_TOKYO_WARS);
 
-	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(tokyowar_mcu_adc_r));
+	machine.device("mcu")->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::tokyowar_mcu_adc_r),state));
 	install_141_speedup(machine);
 
 	state->m_keycus_id = 0x01a8;
@@ -5691,8 +5651,8 @@ static DRIVER_INIT( tokyowar )
 static DRIVER_INIT( aquajet )
 {
 	namcos22_init(machine, NAMCOS22_AQUA_JET);
-
-	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(aquajet_mcu_adc_r));
+	namcos22_state *state = machine.driver_data<namcos22_state>();
+	machine.device("mcu")->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::aquajet_mcu_adc_r),state));
 	install_141_speedup(machine);
 }
 
@@ -5701,7 +5661,7 @@ static DRIVER_INIT( dirtdash )
 	namcos22_state *state = machine.driver_data<namcos22_state>();
 	namcos22_init(machine, NAMCOS22_DIRT_DASH);
 
-	machine.device("mcu")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC7_H, FUNC(cybrcycc_mcu_adc_r));
+	machine.device("mcu")->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC7_H, read8_delegate(FUNC(namcos22_state::cybrcycc_mcu_adc_r),state));
 	install_141_speedup(machine);
 
 	state->m_keycus_id = 0x01a2;

@@ -73,7 +73,7 @@ static void bankswitch(running_machine &machine, UINT8 data)
         7       RELCPMH
 
     */
-
+	mtx_state *state = machine.driver_data<mtx_state>();
 	address_space *program = machine.device(Z80_TAG)->memory().space(AS_PROGRAM);
 	ram_device *messram = machine.device<ram_device>(RAM_TAG);
 
@@ -82,7 +82,7 @@ static void bankswitch(running_machine &machine, UINT8 data)
 	UINT8 ram_page = data >> 0 & 0x0f;
 
 	/* set rom bank (switches between basic and assembler rom or cartridges) */
-	memory_set_bank(machine, "bank2", rom_page);
+	state->membank("bank2")->set_entry(rom_page);
 
 	/* set ram bank, for invalid pages a nop-handler will be installed */
 	if (ram_page >= messram->size()/0x8000)
@@ -94,20 +94,20 @@ static void bankswitch(running_machine &machine, UINT8 data)
 	{
 		program->nop_readwrite(0x4000, 0x7fff);
 		program->install_readwrite_bank(0x8000, 0xbfff, "bank4");
-		memory_set_bank(machine, "bank4", ram_page);
+		state->membank("bank4")->set_entry(ram_page);
 	}
 	else
 	{
 		program->install_readwrite_bank(0x4000, 0x7fff, "bank3");
 		program->install_readwrite_bank(0x8000, 0xbfff, "bank4");
-		memory_set_bank(machine, "bank3", ram_page);
-		memory_set_bank(machine, "bank4", ram_page);
+		state->membank("bank3")->set_entry(ram_page);
+		state->membank("bank4")->set_entry(ram_page);
 	}
 }
 
-WRITE8_HANDLER( mtx_bankswitch_w )
+WRITE8_MEMBER(mtx_state::mtx_bankswitch_w)
 {
-	bankswitch(space->machine(), data);
+	bankswitch(machine(), data);
 }
 
 /*-------------------------------------------------
@@ -127,11 +127,10 @@ READ8_DEVICE_HANDLER( mtx_sound_strobe_r )
     mtx_sound_latch_w - sound latch write
 -------------------------------------------------*/
 
-WRITE8_HANDLER( mtx_sound_latch_w )
+WRITE8_MEMBER(mtx_state::mtx_sound_latch_w)
 {
-	mtx_state *state = space->machine().driver_data<mtx_state>();
 
-	state->m_sound_latch = data;
+	m_sound_latch = data;
 }
 
 /*-------------------------------------------------
@@ -190,31 +189,29 @@ READ8_DEVICE_HANDLER( mtx_prt_r )
     mtx_sense_w - keyboard sense write
 -------------------------------------------------*/
 
-WRITE8_HANDLER( mtx_sense_w )
+WRITE8_MEMBER(mtx_state::mtx_sense_w)
 {
-	mtx_state *state = space->machine().driver_data<mtx_state>();
 
-	state->m_key_sense = data;
+	m_key_sense = data;
 }
 
 /*-------------------------------------------------
     mtx_key_lo_r - keyboard low read
 -------------------------------------------------*/
 
-READ8_HANDLER( mtx_key_lo_r )
+READ8_MEMBER(mtx_state::mtx_key_lo_r)
 {
-	mtx_state *state = space->machine().driver_data<mtx_state>();
 
 	UINT8 data = 0xff;
 
-	if (!(state->m_key_sense & 0x01)) data &= input_port_read(space->machine(), "ROW0");
-	if (!(state->m_key_sense & 0x02)) data &= input_port_read(space->machine(), "ROW1");
-	if (!(state->m_key_sense & 0x04)) data &= input_port_read(space->machine(), "ROW2");
-	if (!(state->m_key_sense & 0x08)) data &= input_port_read(space->machine(), "ROW3");
-	if (!(state->m_key_sense & 0x10)) data &= input_port_read(space->machine(), "ROW4");
-	if (!(state->m_key_sense & 0x20)) data &= input_port_read(space->machine(), "ROW5");
-	if (!(state->m_key_sense & 0x40)) data &= input_port_read(space->machine(), "ROW6");
-	if (!(state->m_key_sense & 0x80)) data &= input_port_read(space->machine(), "ROW7");
+	if (!(m_key_sense & 0x01)) data &= ioport("ROW0")->read();
+	if (!(m_key_sense & 0x02)) data &= ioport("ROW1")->read();
+	if (!(m_key_sense & 0x04)) data &= ioport("ROW2")->read();
+	if (!(m_key_sense & 0x08)) data &= ioport("ROW3")->read();
+	if (!(m_key_sense & 0x10)) data &= ioport("ROW4")->read();
+	if (!(m_key_sense & 0x20)) data &= ioport("ROW5")->read();
+	if (!(m_key_sense & 0x40)) data &= ioport("ROW6")->read();
+	if (!(m_key_sense & 0x80)) data &= ioport("ROW7")->read();
 
 	return data;
 }
@@ -223,20 +220,19 @@ READ8_HANDLER( mtx_key_lo_r )
     mtx_key_lo_r - keyboard high read
 -------------------------------------------------*/
 
-READ8_HANDLER( mtx_key_hi_r )
+READ8_MEMBER(mtx_state::mtx_key_hi_r)
 {
-	mtx_state *state = space->machine().driver_data<mtx_state>();
 
-	UINT8 data = input_port_read(space->machine(), "country_code");
+	UINT8 data = ioport("country_code")->read();
 
-	if (!(state->m_key_sense & 0x01)) data &= input_port_read(space->machine(), "ROW0") >> 8;
-	if (!(state->m_key_sense & 0x02)) data &= input_port_read(space->machine(), "ROW1") >> 8;
-	if (!(state->m_key_sense & 0x04)) data &= input_port_read(space->machine(), "ROW2") >> 8;
-	if (!(state->m_key_sense & 0x08)) data &= input_port_read(space->machine(), "ROW3") >> 8;
-	if (!(state->m_key_sense & 0x10)) data &= input_port_read(space->machine(), "ROW4") >> 8;
-	if (!(state->m_key_sense & 0x20)) data &= input_port_read(space->machine(), "ROW5") >> 8;
-	if (!(state->m_key_sense & 0x40)) data &= input_port_read(space->machine(), "ROW6") >> 8;
-	if (!(state->m_key_sense & 0x80)) data &= input_port_read(space->machine(), "ROW7") >> 8;
+	if (!(m_key_sense & 0x01)) data &= ioport("ROW0")->read() >> 8;
+	if (!(m_key_sense & 0x02)) data &= ioport("ROW1")->read() >> 8;
+	if (!(m_key_sense & 0x04)) data &= ioport("ROW2")->read() >> 8;
+	if (!(m_key_sense & 0x08)) data &= ioport("ROW3")->read() >> 8;
+	if (!(m_key_sense & 0x10)) data &= ioport("ROW4")->read() >> 8;
+	if (!(m_key_sense & 0x20)) data &= ioport("ROW5")->read() >> 8;
+	if (!(m_key_sense & 0x40)) data &= ioport("ROW6")->read() >> 8;
+	if (!(m_key_sense & 0x80)) data &= ioport("ROW7")->read() >> 8;
 
 	return data;
 }
@@ -245,7 +241,7 @@ READ8_HANDLER( mtx_key_hi_r )
     hrx_address_w - HRX video RAM address
 -------------------------------------------------*/
 
-WRITE8_HANDLER( hrx_address_w )
+WRITE8_MEMBER(mtx_state::hrx_address_w)
 {
 	if (offset)
 	{
@@ -287,7 +283,7 @@ WRITE8_HANDLER( hrx_address_w )
     hrx_data_r - HRX data read
 -------------------------------------------------*/
 
-READ8_HANDLER( hrx_data_r )
+READ8_MEMBER(mtx_state::hrx_data_r)
 {
 	return 0;
 }
@@ -296,7 +292,7 @@ READ8_HANDLER( hrx_data_r )
     hrx_data_w - HRX data write
 -------------------------------------------------*/
 
-WRITE8_HANDLER( hrx_data_w )
+WRITE8_MEMBER(mtx_state::hrx_data_w)
 {
 }
 
@@ -304,7 +300,7 @@ WRITE8_HANDLER( hrx_data_w )
     hrx_attr_r - HRX attribute read
 -------------------------------------------------*/
 
-READ8_HANDLER( hrx_attr_r )
+READ8_MEMBER(mtx_state::hrx_attr_r)
 {
 	return 0;
 }
@@ -313,7 +309,7 @@ READ8_HANDLER( hrx_attr_r )
     hrx_attr_r - HRX attribute write
 -------------------------------------------------*/
 
-WRITE8_HANDLER( hrx_attr_w )
+WRITE8_MEMBER(mtx_state::hrx_attr_w)
 {
 	/*
 
@@ -387,10 +383,10 @@ MACHINE_START( mtx512 )
 	state->m_cassette = machine.device<cassette_image_device>(CASSETTE_TAG);
 
 	/* configure memory */
-	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());
-	memory_configure_bank(machine, "bank2", 0, 8, machine.region("user2")->base(), 0x2000);
-	memory_configure_bank(machine, "bank3", 0, messram->size()/0x4000/2, messram->pointer(), 0x4000);
-	memory_configure_bank(machine, "bank4", 0, messram->size()/0x4000/2, messram->pointer() + messram->size()/2, 0x4000);
+	state->membank("bank1")->set_base(machine.root_device().memregion("user1")->base());
+	state->membank("bank2")->configure_entries(0, 8, state->memregion("user2")->base(), 0x2000);
+	state->membank("bank3")->configure_entries(0, messram->size()/0x4000/2, messram->pointer(), 0x4000);
+	state->membank("bank4")->configure_entries(0, messram->size()/0x4000/2, messram->pointer() + messram->size()/2, 0x4000);
 }
 
 /*-------------------------------------------------

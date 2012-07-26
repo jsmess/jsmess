@@ -8,12 +8,15 @@ class compgolf_state : public driver_device
 {
 public:
 	compgolf_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_bg_ram(*this, "bg_ram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT8 *        m_videoram;
-	UINT8 *        m_bg_ram;
-	UINT8 *        m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_bg_ram;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	tilemap_t        *m_text_tilemap;
@@ -25,13 +28,14 @@ public:
 
 	/* misc */
 	int            m_bank;
+	DECLARE_WRITE8_MEMBER(compgolf_ctrl_w);
+	DECLARE_WRITE8_MEMBER(compgolf_video_w);
+	DECLARE_WRITE8_MEMBER(compgolf_back_w);
 };
 
 
 /*----------- defined in video/compgolf.c -----------*/
 
-WRITE8_HANDLER( compgolf_video_w );
-WRITE8_HANDLER( compgolf_back_w );
 PALETTE_INIT ( compgolf );
 VIDEO_START  ( compgolf );
 SCREEN_UPDATE_IND16( compgolf );

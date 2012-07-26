@@ -60,7 +60,7 @@ void kc_m011_device::device_start()
 {
 	m_slot = dynamic_cast<kcexp_slot_device *>(owner());
 
-	m_ram = machine().region_alloc(tag(), get_ram_size(), 1, ENDIANNESS_LITTLE)->base();
+	m_ram = machine().memory().region_alloc(tag(), get_ram_size(), 1, ENDIANNESS_LITTLE)->base();
 	memset(m_ram, 0, get_ram_size());
 }
 

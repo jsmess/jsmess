@@ -8,38 +8,34 @@
 #include "includes/renegade.h"
 
 
-WRITE8_HANDLER( renegade_videoram_w )
+WRITE8_MEMBER(renegade_state::renegade_videoram_w)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
 	offset = offset % (64 * 16);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( renegade_videoram2_w )
+WRITE8_MEMBER(renegade_state::renegade_videoram2_w)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	state->m_videoram2[offset] = data;
+	m_videoram2[offset] = data;
 	offset = offset % (32 * 32);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( renegade_flipscreen_w )
+WRITE8_MEMBER(renegade_state::renegade_flipscreen_w)
 {
-	flip_screen_set(space->machine(), ~data & 0x01);
+	flip_screen_set(~data & 0x01);
 }
 
-WRITE8_HANDLER( renegade_scroll0_w )
+WRITE8_MEMBER(renegade_state::renegade_scroll0_w)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	state->m_scrollx = (state->m_scrollx & 0xff00) | data;
+	m_scrollx = (m_scrollx & 0xff00) | data;
 }
 
-WRITE8_HANDLER( renegade_scroll1_w )
+WRITE8_MEMBER(renegade_state::renegade_scroll1_w)
 {
-	renegade_state *state = space->machine().driver_data<renegade_state>();
-	state->m_scrollx = (state->m_scrollx & 0xff) | (data << 8);
+	m_scrollx = (m_scrollx & 0xff) | (data << 8);
 }
 
 static TILE_GET_INFO( get_bg_tilemap_info )
@@ -101,7 +97,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			if (sx > 248)
 				sx -= 256;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -114,17 +110,17 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 				drawgfx_transpen(bitmap, cliprect, machine.gfx[sprite_bank],
 					sprite_number + 1,
 					color,
-					xflip, flip_screen_get(machine),
-					sx, sy + (flip_screen_get(machine) ? -16 : 16), 0);
+					xflip, state->flip_screen(),
+					sx, sy + (state->flip_screen() ? -16 : 16), 0);
 			}
 			else
 			{
-				sy += (flip_screen_get(machine) ? -16 : 16);
+				sy += (state->flip_screen() ? -16 : 16);
 			}
 			drawgfx_transpen(bitmap, cliprect, machine.gfx[sprite_bank],
 				sprite_number,
 				color,
-				xflip, flip_screen_get(machine),
+				xflip, state->flip_screen(),
 				sx, sy, 0);
 		}
 		source += 4;

@@ -69,14 +69,20 @@ class panicr_state : public driver_device
 {
 public:
 	panicr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_mainram(*this, "mainram"),
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram"),
+		m_scrollram(*this, "scrollram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_mainram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_scrollram;
 	tilemap_t *m_bgtilemap;
 	tilemap_t *m_txttilemap;
-	UINT8 *m_scrollram;
-	UINT8 *m_mainram;
-	UINT8 *m_spriteram;
+	DECLARE_READ8_MEMBER(t5182shared_r);
+	DECLARE_WRITE8_MEMBER(t5182shared_w);
 };
 
 
@@ -87,6 +93,7 @@ public:
 
 static PALETTE_INIT( panicr )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -144,8 +151,8 @@ static TILE_GET_INFO( get_bgtile_info )
 {
 	int code,attr;
 
-	code=machine.region("user1")->base()[tile_index];
-	attr=machine.region("user2")->base()[tile_index];
+	code=machine.root_device().memregion("user1")->base()[tile_index];
+	attr=machine.root_device().memregion("user2")->base()[tile_index];
 	code+=((attr&7)<<8);
 	SET_TILE_INFO(
 		1,
@@ -171,38 +178,38 @@ static TILE_GET_INFO( get_txttile_info )
 		0);
 }
 
-static READ8_HANDLER(t5182shared_r)
+READ8_MEMBER(panicr_state::t5182shared_r)
 {
 	if ((offset & 1) == 0)
-		return t5182_sharedram_r(space, offset/2);
+		return t5182_sharedram_r(&space, offset/2);
 	else
 		return 0;
 }
 
-static WRITE8_HANDLER(t5182shared_w)
+WRITE8_MEMBER(panicr_state::t5182shared_w)
 {
 	if ((offset & 1) == 0)
-		t5182_sharedram_w(space, offset/2, data);
+		t5182_sharedram_w(&space, offset/2, data);
 }
 
 
-static ADDRESS_MAP_START( panicr_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_BASE_MEMBER(panicr_state, m_mainram)
-	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_BASE_MEMBER(panicr_state, m_spriteram)
+static ADDRESS_MAP_START( panicr_map, AS_PROGRAM, 8, panicr_state )
+	AM_RANGE(0x00000, 0x01fff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x03000, 0x03fff) AM_RAM
 	AM_RANGE(0x08000, 0x0bfff) AM_RAM AM_REGION("user3", 0) //attribue map ?
-	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE_MEMBER(panicr_state, m_videoram)
-	AM_RANGE(0x0d000, 0x0d000) AM_WRITE(t5182_sound_irq_w)
-	AM_RANGE(0x0d002, 0x0d002) AM_READ(t5182_sharedram_semaphore_snd_r)
-	AM_RANGE(0x0d004, 0x0d004) AM_WRITE(t5182_sharedram_semaphore_main_acquire_w)
-	AM_RANGE(0x0d006, 0x0d006) AM_WRITE(t5182_sharedram_semaphore_main_release_w)
+	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x0d000, 0x0d000) AM_WRITE_LEGACY(t5182_sound_irq_w)
+	AM_RANGE(0x0d002, 0x0d002) AM_READ_LEGACY(t5182_sharedram_semaphore_snd_r)
+	AM_RANGE(0x0d004, 0x0d004) AM_WRITE_LEGACY(t5182_sharedram_semaphore_main_acquire_w)
+	AM_RANGE(0x0d006, 0x0d006) AM_WRITE_LEGACY(t5182_sharedram_semaphore_main_release_w)
 	AM_RANGE(0x0d200, 0x0d2ff) AM_READWRITE(t5182shared_r, t5182shared_w)
 	AM_RANGE(0x0d400, 0x0d400) AM_READ_PORT("P1")
 	AM_RANGE(0x0d402, 0x0d402) AM_READ_PORT("P2")
 	AM_RANGE(0x0d404, 0x0d404) AM_READ_PORT("START")
 	AM_RANGE(0x0d406, 0x0d406) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0d407, 0x0d407) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0d800, 0x0d81f) AM_RAM AM_BASE_MEMBER(panicr_state, m_scrollram)
+	AM_RANGE(0x0d800, 0x0d81f) AM_RAM AM_SHARE("scrollram")
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -462,8 +469,8 @@ static DRIVER_INIT( panicr )
 	int size;
 	int i;
 
-	rom = machine.region("gfx1")->base();
-	size = machine.region("gfx1")->bytes();
+	rom = machine.root_device().memregion("gfx1")->base();
+	size = machine.root_device().memregion("gfx1")->bytes();
 
 	// text data lines
 	for (i = 0;i < size/2;i++)
@@ -485,8 +492,8 @@ static DRIVER_INIT( panicr )
 	}
 
 
-	rom = machine.region("gfx2")->base();
-	size = machine.region("gfx2")->bytes();
+	rom = machine.root_device().memregion("gfx2")->base();
+	size = machine.root_device().memregion("gfx2")->bytes();
 
 	// tiles data lines
 	for (i = 0;i < size/4;i++)
@@ -512,8 +519,8 @@ static DRIVER_INIT( panicr )
 	}
 
 
-	rom = machine.region("gfx3")->base();
-	size = machine.region("gfx3")->bytes();
+	rom = machine.root_device().memregion("gfx3")->base();
+	size = machine.root_device().memregion("gfx3")->bytes();
 
 	// sprites data lines
 	for (i = 0;i < size/2;i++)
@@ -538,8 +545,8 @@ static DRIVER_INIT( panicr )
 
 	//rearrange  bg tilemaps a bit....
 
-	rom = machine.region("user1")->base();
-	size = machine.region("user1")->bytes();
+	rom = machine.root_device().memregion("user1")->base();
+	size = machine.root_device().memregion("user1")->bytes();
 	memcpy(buf,rom, size);
 
 	{
@@ -551,8 +558,8 @@ static DRIVER_INIT( panicr )
 			}
 	}
 
-	rom = machine.region("user2")->base();
-	size = machine.region("user2")->bytes();
+	rom = machine.root_device().memregion("user2")->base();
+	size = machine.root_device().memregion("user2")->bytes();
 
 	memcpy(buf,rom, size);
 	{

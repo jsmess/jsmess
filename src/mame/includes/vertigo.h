@@ -85,9 +85,10 @@ class vertigo_state : public driver_device
 {
 public:
 	vertigo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_vectorram(*this, "vectorram") { }
 
-	UINT16 *m_vectorram;
+	required_shared_ptr<UINT16> m_vectorram;
 	device_t *m_ttl74148;
 	device_t *m_custom;
 	attotime m_irq4_time;
@@ -98,6 +99,13 @@ public:
 	vector_generator m_vgen;
 	UINT16 *m_vectorrom;
 	microcode m_mc[MC_LENGTH];
+	DECLARE_READ16_MEMBER(vertigo_io_convert);
+	DECLARE_READ16_MEMBER(vertigo_io_adc);
+	DECLARE_READ16_MEMBER(vertigo_coin_r);
+	DECLARE_WRITE16_MEMBER(vertigo_wsot_w);
+	DECLARE_WRITE16_MEMBER(vertigo_audio_w);
+	DECLARE_READ16_MEMBER(vertigo_sio_r);
+	DECLARE_WRITE16_MEMBER(vertigo_motor_w);
 };
 
 
@@ -107,13 +115,6 @@ void vertigo_update_irq(device_t *device);
 
 extern const struct pit8253_config vertigo_pit8254_config;
 
-READ16_HANDLER( vertigo_io_convert );
-READ16_HANDLER( vertigo_io_adc );
-READ16_HANDLER( vertigo_coin_r );
-READ16_HANDLER( vertigo_sio_r );
-WRITE16_HANDLER( vertigo_audio_w );
-WRITE16_HANDLER( vertigo_motor_w );
-WRITE16_HANDLER( vertigo_wsot_w );
 
 INTERRUPT_GEN( vertigo_interrupt );
 MACHINE_START( vertigo );

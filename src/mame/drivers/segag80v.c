@@ -158,11 +158,11 @@
  *
  *************************************/
 
-static INPUT_CHANGED( service_switch )
+INPUT_CHANGED_MEMBER(segag80v_state::service_switch)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -198,17 +198,15 @@ static offs_t decrypt_offset(address_space *space, offs_t offset)
 	return (offset & 0xff00) | (*state->m_decrypt)(pc, space->read_byte(pc + 1));
 }
 
-static WRITE8_HANDLER( mainram_w )
+WRITE8_MEMBER(segag80v_state::mainram_w)
 {
-	segag80v_state *state = space->machine().driver_data<segag80v_state>();
-	state->m_mainram[decrypt_offset(space, offset)] = data;
+	m_mainram[decrypt_offset(&space, offset)] = data;
 }
 
 static WRITE8_DEVICE_HANDLER( usb_ram_w ) { sega_usb_ram_w(device, decrypt_offset(device->machine().device("maincpu")->memory().space(AS_PROGRAM), offset), data); }
-static WRITE8_HANDLER( vectorram_w )
+WRITE8_MEMBER(segag80v_state::vectorram_w)
 {
-	segag80v_state *state = space->machine().driver_data<segag80v_state>();
-	state->m_vectorram[decrypt_offset(space, offset)] = data;
+	m_vectorram[decrypt_offset(&space, offset)] = data;
 }
 
 
@@ -228,17 +226,17 @@ INLINE UINT8 demangle(UINT8 d7d6, UINT8 d5d4, UINT8 d3d2, UINT8 d1d0)
 }
 
 
-static READ8_HANDLER( mangled_ports_r )
+READ8_MEMBER(segag80v_state::mangled_ports_r)
 {
 	/* The input ports are odd. Neighboring lines are read via a mux chip  */
 	/* one bit at a time. This means that one bank of DIP switches will be */
 	/* read as two bits from each of 4 ports. For this reason, the input   */
 	/* ports have been organized logically, and are demangled at runtime.  */
 	/* 4 input ports each provide 8 bits of information. */
-	UINT8 d7d6 = input_port_read(space->machine(), "D7D6");
-	UINT8 d5d4 = input_port_read(space->machine(), "D5D4");
-	UINT8 d3d2 = input_port_read(space->machine(), "D3D2");
-	UINT8 d1d0 = input_port_read(space->machine(), "D1D0");
+	UINT8 d7d6 = ioport("D7D6")->read();
+	UINT8 d5d4 = ioport("D5D4")->read();
+	UINT8 d3d2 = ioport("D3D2")->read();
+	UINT8 d1d0 = ioport("D1D0")->read();
 	int shift = offset & 3;
 	return demangle(d7d6 >> shift, d5d4 >> shift, d3d2 >> shift, d1d0 >> shift);
 }
@@ -251,20 +249,18 @@ static READ8_HANDLER( mangled_ports_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( spinner_select_w )
+WRITE8_MEMBER(segag80v_state::spinner_select_w)
 {
-	segag80v_state *state = space->machine().driver_data<segag80v_state>();
-	state->m_spinner_select = data;
+	m_spinner_select = data;
 }
 
 
-static READ8_HANDLER( spinner_input_r )
+READ8_MEMBER(segag80v_state::spinner_input_r)
 {
-	segag80v_state *state = space->machine().driver_data<segag80v_state>();
 	INT8 delta;
 
-	if (state->m_spinner_select & 1)
-		return input_port_read(space->machine(), "FC");
+	if (m_spinner_select & 1)
+		return ioport("FC")->read();
 
 /*
  * The values returned are always increasing.  That is, regardless of whether
@@ -274,13 +270,13 @@ static READ8_HANDLER( spinner_input_r )
  */
 
 	/* I'm sure this can be further simplified ;-) BW */
-	delta = input_port_read(space->machine(), "SPINNER");
+	delta = ioport("SPINNER")->read();
 	if (delta != 0)
 	{
-		state->m_spinner_sign = (delta >> 7) & 1;
-		state->m_spinner_count += abs(delta);
+		m_spinner_sign = (delta >> 7) & 1;
+		m_spinner_count += abs(delta);
 	}
-	return ~((state->m_spinner_count << 1) | state->m_spinner_sign);
+	return ~((m_spinner_count << 1) | m_spinner_sign);
 }
 
 
@@ -291,30 +287,29 @@ static READ8_HANDLER( spinner_input_r )
  *
  *************************************/
 
-static CUSTOM_INPUT( elim4_joint_coin_r )
+CUSTOM_INPUT_MEMBER(segag80v_state::elim4_joint_coin_r)
 {
-	return (input_port_read(field.machine(), "COINS") & 0xf) != 0xf;
+	return (ioport("COINS")->read() & 0xf) != 0xf;
 }
 
 
-static READ8_HANDLER( elim4_input_r )
+READ8_MEMBER(segag80v_state::elim4_input_r)
 {
-	segag80v_state *state = space->machine().driver_data<segag80v_state>();
 	UINT8 result = 0;
 
 	/* bit 3 enables demux */
-	if (state->m_spinner_select & 8)
+	if (m_spinner_select & 8)
 	{
 		/* Demux bit 0-2. Only 6 and 7 are connected */
-		switch (state->m_spinner_select & 7)
+		switch (m_spinner_select & 7)
 		{
 			case 6:
 				/* player 3 & 4 controls */
-				result = input_port_read(space->machine(), "FC");
+				result = ioport("FC")->read();
 				break;
 			case 7:
 				/* the 4 coin inputs */
-				result = input_port_read(space->machine(), "COINS");
+				result = ioport("COINS")->read();
 				break;
 		}
 	}
@@ -331,20 +326,18 @@ static READ8_HANDLER( elim4_input_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( multiply_w )
+WRITE8_MEMBER(segag80v_state::multiply_w)
 {
-	segag80v_state *state = space->machine().driver_data<segag80v_state>();
-	state->m_mult_data[offset] = data;
+	m_mult_data[offset] = data;
 	if (offset == 1)
-		state->m_mult_result = state->m_mult_data[0] * state->m_mult_data[1];
+		m_mult_result = m_mult_data[0] * m_mult_data[1];
 }
 
 
-static READ8_HANDLER( multiply_r )
+READ8_MEMBER(segag80v_state::multiply_r)
 {
-	segag80v_state *state = space->machine().driver_data<segag80v_state>();
-	UINT8 result = state->m_mult_result;
-	state->m_mult_result >>= 8;
+	UINT8 result = m_mult_result;
+	m_mult_result >>= 8;
 	return result;
 }
 
@@ -356,19 +349,19 @@ static READ8_HANDLER( multiply_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( coin_count_w )
+WRITE8_MEMBER(segag80v_state::coin_count_w)
 {
-	coin_counter_w(space->machine(), 0, (data >> 7) & 1);
-	coin_counter_w(space->machine(), 1, (data >> 6) & 1);
+	coin_counter_w(machine(), 0, (data >> 7) & 1);
+	coin_counter_w(machine(), 1, (data >> 6) & 1);
 }
 
 
-static WRITE8_HANDLER( unknown_w )
+WRITE8_MEMBER(segag80v_state::unknown_w)
 {
 	/* writing an 0x04 here enables interrupts */
 	/* some games write 0x00/0x01 here as well */
 	if (data != 0x00 && data != 0x01 && data != 0x04)
-		mame_printf_debug("%04X:unknown_w = %02X\n", cpu_get_pc(&space->device()), data);
+		mame_printf_debug("%04X:unknown_w = %02X\n", cpu_get_pc(&space.device()), data);
 }
 
 
@@ -380,16 +373,16 @@ static WRITE8_HANDLER( unknown_w )
  *************************************/
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, segag80v_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM		/* CPU board ROM */
 	AM_RANGE(0x0800, 0xbfff) AM_ROM		/* PROM board ROM area */
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_BASE_MEMBER(segag80v_state, m_mainram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(vectorram_w) AM_BASE_MEMBER(segag80v_state, m_vectorram) AM_SIZE_MEMBER(segag80v_state, m_vectorram_size)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_SHARE("mainram")
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(vectorram_w) AM_SHARE("vectorram")
 ADDRESS_MAP_END
 
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8, segag80v_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xbc, 0xbc) /* AM_READ ??? */
 	AM_RANGE(0xbd, 0xbe) AM_WRITE(multiply_w)
@@ -487,7 +480,7 @@ static INPUT_PORTS_START( g80v_generic )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )				/* P1.30 */
 
 	PORT_START("SERVICESW")
-	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_CHANGED(service_switch, 0)
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_CHANGED_MEMBER(DEVICE_SELF, segag80v_state,service_switch, 0)
 INPUT_PORTS_END
 
 
@@ -562,7 +555,7 @@ static INPUT_PORTS_START( elim4 )
 	PORT_INCLUDE( g80v_generic )
 
 	PORT_MODIFY("D7D6")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(elim4_joint_coin_r, NULL)	/* combination of all four coin inputs */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, segag80v_state,elim4_joint_coin_r, NULL)	/* combination of all four coin inputs */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
@@ -1305,8 +1298,8 @@ static DRIVER_INIT( elim2 )
 
 	/* configure sound */
 	state->m_usb = NULL;
-	iospace->install_legacy_write_handler(0x3e, 0x3e, FUNC(elim1_sh_w));
-	iospace->install_legacy_write_handler(0x3f, 0x3f, FUNC(elim2_sh_w));
+	iospace->install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(segag80v_state::elim1_sh_w),state));
+	iospace->install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(segag80v_state::elim2_sh_w),state));
 }
 
 
@@ -1320,12 +1313,12 @@ static DRIVER_INIT( elim4 )
 
 	/* configure sound */
 	state->m_usb = NULL;
-	iospace->install_legacy_write_handler(0x3e, 0x3e, FUNC(elim1_sh_w));
-	iospace->install_legacy_write_handler(0x3f, 0x3f, FUNC(elim2_sh_w));
+	iospace->install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(segag80v_state::elim1_sh_w),state));
+	iospace->install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(segag80v_state::elim2_sh_w),state));
 
 	/* configure inputs */
-	iospace->install_legacy_write_handler(0xf8, 0xf8, FUNC(spinner_select_w));
-	iospace->install_legacy_read_handler(0xfc, 0xfc, FUNC(elim4_input_r));
+	iospace->install_write_handler(0xf8, 0xf8, write8_delegate(FUNC(segag80v_state::spinner_select_w),state));
+	iospace->install_read_handler(0xfc, 0xfc, read8_delegate(FUNC(segag80v_state::elim4_input_r),state));
 }
 
 
@@ -1341,8 +1334,8 @@ static DRIVER_INIT( spacfury )
 	state->m_usb = NULL;
 	iospace->install_legacy_write_handler(*machine.device("segaspeech"), 0x38, 0x38, FUNC(sega_speech_data_w));
 	iospace->install_legacy_write_handler(*machine.device("segaspeech"), 0x3b, 0x3b, FUNC(sega_speech_control_w));
-	iospace->install_legacy_write_handler(0x3e, 0x3e, FUNC(spacfury1_sh_w));
-	iospace->install_legacy_write_handler(0x3f, 0x3f, FUNC(spacfury2_sh_w));
+	iospace->install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(segag80v_state::spacfury1_sh_w),state));
+	iospace->install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(segag80v_state::spacfury2_sh_w),state));
 }
 
 
@@ -1360,12 +1353,12 @@ static DRIVER_INIT( zektor )
 	iospace->install_legacy_write_handler(*machine.device("segaspeech"), 0x38, 0x38, FUNC(sega_speech_data_w));
 	iospace->install_legacy_write_handler(*machine.device("segaspeech"), 0x3b, 0x3b, FUNC(sega_speech_control_w));
 	iospace->install_legacy_write_handler(*ay, 0x3c, 0x3d, FUNC(ay8910_address_data_w));
-	iospace->install_legacy_write_handler(0x3e, 0x3e, FUNC(zektor1_sh_w));
-	iospace->install_legacy_write_handler(0x3f, 0x3f, FUNC(zektor2_sh_w));
+	iospace->install_write_handler(0x3e, 0x3e, write8_delegate(FUNC(segag80v_state::zektor1_sh_w),state));
+	iospace->install_write_handler(0x3f, 0x3f, write8_delegate(FUNC(segag80v_state::zektor2_sh_w),state));
 
 	/* configure inputs */
-	iospace->install_legacy_write_handler(0xf8, 0xf8, FUNC(spinner_select_w));
-	iospace->install_legacy_read_handler(0xfc, 0xfc, FUNC(spinner_input_r));
+	iospace->install_write_handler(0xf8, 0xf8, write8_delegate(FUNC(segag80v_state::spinner_select_w),state));
+	iospace->install_read_handler(0xfc, 0xfc, read8_delegate(FUNC(segag80v_state::spinner_input_r),state));
 }
 
 
@@ -1384,8 +1377,8 @@ static DRIVER_INIT( tacscan )
 	pgmspace->install_legacy_readwrite_handler(*state->m_usb, 0xd000, 0xdfff, FUNC(sega_usb_ram_r), FUNC(usb_ram_w));
 
 	/* configure inputs */
-	iospace->install_legacy_write_handler(0xf8, 0xf8, FUNC(spinner_select_w));
-	iospace->install_legacy_read_handler(0xfc, 0xfc, FUNC(spinner_input_r));
+	iospace->install_write_handler(0xf8, 0xf8, write8_delegate(FUNC(segag80v_state::spinner_select_w),state));
+	iospace->install_read_handler(0xfc, 0xfc, read8_delegate(FUNC(segag80v_state::spinner_input_r),state));
 }
 
 
@@ -1407,8 +1400,8 @@ static DRIVER_INIT( startrek )
 	pgmspace->install_legacy_readwrite_handler(*state->m_usb, 0xd000, 0xdfff, FUNC(sega_usb_ram_r), FUNC(usb_ram_w));
 
 	/* configure inputs */
-	iospace->install_legacy_write_handler(0xf8, 0xf8, FUNC(spinner_select_w));
-	iospace->install_legacy_read_handler(0xfc, 0xfc, FUNC(spinner_input_r));
+	iospace->install_write_handler(0xf8, 0xf8, write8_delegate(FUNC(segag80v_state::spinner_select_w),state));
+	iospace->install_read_handler(0xfc, 0xfc, read8_delegate(FUNC(segag80v_state::spinner_input_r),state));
 }
 
 

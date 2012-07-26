@@ -144,7 +144,7 @@ const device_type UPD7220 = &device_creator<upd7220_device>;
 
 
 // default address map
-static ADDRESS_MAP_START( upd7220_vram, AS_0, 8 )
+static ADDRESS_MAP_START( upd7220_vram, AS_0, 8, upd7220_device )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 ADDRESS_MAP_END
 

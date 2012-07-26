@@ -84,21 +84,21 @@ be verified on real PCB.
 #include "sound/okim6295.h"
 #include "includes/dooyong.h"
 
-static WRITE8_HANDLER( lastday_bankswitch_w )
+WRITE8_MEMBER(dooyong_state::lastday_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 
 	if (data & 0xf8) popmessage("bankswitch %02x",data);
 }
 
 static MACHINE_START( lastday )
 {
-	memory_configure_bank(machine, "bank1", 0, 8, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 8, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
-static WRITE8_HANDLER( flip_screen_w )
+WRITE8_MEMBER(dooyong_state::flip_screen_w)
 {
-	flip_screen_set(space->machine(), data);
+	flip_screen_set(data);
 }
 
 static MACHINE_RESET( sound_ym2203 )
@@ -115,7 +115,7 @@ static MACHINE_RESET( sound_ym2203 )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( lastday_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( lastday_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc007) AM_WRITE(dooyong_bgscroll8_w)
@@ -125,39 +125,39 @@ static ADDRESS_MAP_START( lastday_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc011, 0xc011) AM_READ_PORT("P1")
 	AM_RANGE(0xc011, 0xc011) AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xc012, 0xc012) AM_READ_PORT("P2")
-	AM_RANGE(0xc012, 0xc012) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xc012, 0xc012) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xc013, 0xc013) AM_READ_PORT("DSWA")
 	AM_RANGE(0xc014, 0xc014) AM_READ_PORT("DSWB")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE_MEMBER(dooyong_state, m_txvideoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pollux_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pollux_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE_MEMBER(dooyong_state, m_txvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSWA") AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSWB")
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("P1")
 	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("P2")
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(pollux_ctrl_w)	/* coin counter, flip screen */
-	AM_RANGE(0xf010, 0xf010) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xf010, 0xf010) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xf018, 0xf01f) AM_WRITE(dooyong_bgscroll8_w)
 	AM_RANGE(0xf020, 0xf027) AM_WRITE(dooyong_fgscroll8_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gulfstrm_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gulfstrm_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE_MEMBER(dooyong_state, m_txvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(lastday_bankswitch_w)
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("DSWB")
@@ -165,13 +165,13 @@ static ADDRESS_MAP_START( gulfstrm_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf003, 0xf003) AM_READ_PORT("P1")
 	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(pollux_ctrl_w)	/* coin counter, flip screen */
-	AM_RANGE(0xf010, 0xf010) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xf010, 0xf010) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xf018, 0xf01f) AM_WRITE(dooyong_bgscroll8_w)
 	AM_RANGE(0xf020, 0xf027) AM_WRITE(dooyong_fgscroll8_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bluehawk_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bluehawk_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSWA")
@@ -181,17 +181,17 @@ static ADDRESS_MAP_START( bluehawk_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("P2")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc008, 0xc008) AM_WRITE(lastday_bankswitch_w)
-	AM_RANGE(0xc010, 0xc010) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xc010, 0xc010) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xc018, 0xc01f) AM_WRITE(dooyong_fg2scroll8_w)
 	AM_RANGE(0xc040, 0xc047) AM_WRITE(dooyong_bgscroll8_w)
 	AM_RANGE(0xc048, 0xc04f) AM_WRITE(dooyong_fgscroll8_w)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE_MEMBER(dooyong_state, m_txvideoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( flytiger_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( flytiger_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("spriteram")
@@ -203,24 +203,24 @@ static ADDRESS_MAP_START( flytiger_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe006, 0xe006) AM_READ_PORT("DSWA")
 	AM_RANGE(0xe008, 0xe008) AM_READ_PORT("DSWB")
 	AM_RANGE(0xe010, 0xe010) AM_WRITE(flytiger_ctrl_w)	/* coin counter, flip screen */
-	AM_RANGE(0xe020, 0xe020) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xe020, 0xe020) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xe030, 0xe037) AM_WRITE(dooyong_bgscroll8_w)
 	AM_RANGE(0xe040, 0xe047) AM_WRITE(dooyong_fgscroll8_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_flytiger_w) AM_BASE_MEMBER(dooyong_state, m_paletteram_flytiger)
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE_MEMBER(dooyong_state, m_txvideoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_flytiger_w) AM_SHARE("flytiger_palram")
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_SHARE("txvideoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( primella_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( primella_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM /* what is this? looks like a palette? scratchpad RAM maybe? */
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE_MEMBER(dooyong_state, m_txvideoram)
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_SHARE("txvideoram")
+	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSWA")
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(primella_ctrl_w)	/* bank switch, flip screen etc */
 	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("DSWB")
-	AM_RANGE(0xf810, 0xf810) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xf810, 0xf810) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xf820, 0xf820) AM_READ_PORT("P1")
 	AM_RANGE(0xf830, 0xf830) AM_READ_PORT("P2")
 	AM_RANGE(0xf840, 0xf840) AM_READ_PORT("SYSTEM")
@@ -228,7 +228,7 @@ static ADDRESS_MAP_START( primella_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xfc08, 0xfc0f) AM_WRITE(dooyong_fgscroll8_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rshark_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( rshark_map, AS_PROGRAM, 16, dooyong_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)	/* super-x needs this and is similar */
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04cfff) AM_RAM
@@ -239,14 +239,14 @@ static ADDRESS_MAP_START( rshark_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0c0006, 0x0c0007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c4000, 0x0c400f) AM_WRITE(dooyong_bgscroll16_w)
 	AM_RANGE(0x0c4010, 0x0c401f) AM_WRITE(dooyong_bg2scroll16_w)
-	AM_RANGE(0x0c8000, 0x0c8fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0c8000, 0x0c8fff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0c0012, 0x0c0013) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x0c0014, 0x0c0015) AM_WRITE(rshark_ctrl_w)	/* flip screen + unknown stuff */
 	AM_RANGE(0x0cc000, 0x0cc00f) AM_WRITE(dooyong_fgscroll16_w)
 	AM_RANGE(0x0cc010, 0x0cc01f) AM_WRITE(dooyong_fg2scroll16_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( superx_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( superx_map, AS_PROGRAM, 16, dooyong_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x0d0000, 0x0dcfff) AM_RAM
@@ -257,14 +257,14 @@ static ADDRESS_MAP_START( superx_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x080006, 0x080007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x084000, 0x08400f) AM_WRITE(dooyong_bgscroll16_w)
 	AM_RANGE(0x084010, 0x08401f) AM_WRITE(dooyong_bg2scroll16_w)
-	AM_RANGE(0x088000, 0x088fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x088000, 0x088fff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x080012, 0x080013) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x080014, 0x080015) AM_WRITE(rshark_ctrl_w)	/* flip screen + unknown stuff */
 	AM_RANGE(0x08c000, 0x08c00f) AM_WRITE(dooyong_fgscroll16_w)
 	AM_RANGE(0x08c010, 0x08c01f) AM_WRITE(dooyong_fg2scroll16_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( popbingo_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( popbingo_map, AS_PROGRAM, 16, dooyong_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04cfff) AM_RAM
@@ -278,34 +278,34 @@ static ADDRESS_MAP_START( popbingo_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x0c0018, 0x0c001b) AM_WRITENOP // ?
 	AM_RANGE(0x0c4000, 0x0c400f) AM_WRITE(dooyong_bgscroll16_w)
 	AM_RANGE(0x0c4010, 0x0c401f) AM_WRITE(dooyong_bg2scroll16_w) // not used atm
-	AM_RANGE(0x0c8000, 0x0c8fff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0c8000, 0x0c8fff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0cc000, 0x0cc00f) AM_WRITE(dooyong_fgscroll16_w) // not used atm
 	AM_RANGE(0x0cc010, 0x0cc01f) AM_WRITE(dooyong_fg2scroll16_w) // not used atm
 	AM_RANGE(0x0dc000, 0x0dc01f) AM_RAM // registers of some kind?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lastday_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( lastday_sound_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0xf002, 0xf003) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0xf002, 0xf003) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pollux_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pollux_sound_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
-	AM_RANGE(0xf802, 0xf803) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0xf804, 0xf805) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf802, 0xf803) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0xf804, 0xf805) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bluehawk_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bluehawk_sound_map, AS_PROGRAM, 8, dooyong_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
-	AM_RANGE(0xf808, 0xf809) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xf80a, 0xf80a) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf808, 0xf809) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xf80a, 0xf80a) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -327,23 +327,23 @@ static INPUT_PORTS_START( dooyongz80_generic )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SWA:5,6")
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSWA", 0x02, PORTCOND_EQUALS, 0x02)
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSWA", 0x02, PORTCOND_EQUALS, 0x02)
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )		PORT_CONDITION("DSWA", 0x02, PORTCOND_EQUALS, 0x02)
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )		PORT_CONDITION("DSWA", 0x02, PORTCOND_EQUALS, 0x02)
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )		PORT_CONDITION("DSWA", 0x02, PORTCOND_NOTEQUALS, 0x02)
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )		PORT_CONDITION("DSWA", 0x02, PORTCOND_NOTEQUALS, 0x02)
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSWA", 0x02, PORTCOND_NOTEQUALS, 0x02)
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSWA", 0x02, PORTCOND_NOTEQUALS, 0x02)
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )		PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )		PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )		PORT_CONDITION("DSWA", 0x02, NOTEQUALS, 0x02)
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )		PORT_CONDITION("DSWA", 0x02, NOTEQUALS, 0x02)
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSWA", 0x02, NOTEQUALS, 0x02)
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSWA", 0x02, NOTEQUALS, 0x02)
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SWA:7,8")
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSWA", 0x02, PORTCOND_EQUALS, 0x02)
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSWA", 0x02, PORTCOND_EQUALS, 0x02)
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )		PORT_CONDITION("DSWA", 0x02, PORTCOND_EQUALS, 0x02)
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )		PORT_CONDITION("DSWA", 0x02, PORTCOND_EQUALS, 0x02)
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )		PORT_CONDITION("DSWA", 0x02, PORTCOND_NOTEQUALS, 0x02)
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )		PORT_CONDITION("DSWA", 0x02, PORTCOND_NOTEQUALS, 0x02)
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) )		PORT_CONDITION("DSWA", 0x02, PORTCOND_NOTEQUALS, 0x02)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )		PORT_CONDITION("DSWA", 0x02, PORTCOND_NOTEQUALS, 0x02)
+	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )		PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )		PORT_CONDITION("DSWA", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )		PORT_CONDITION("DSWA", 0x02, NOTEQUALS, 0x02)
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )		PORT_CONDITION("DSWA", 0x02, NOTEQUALS, 0x02)
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_4C ) )		PORT_CONDITION("DSWA", 0x02, NOTEQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )		PORT_CONDITION("DSWA", 0x02, NOTEQUALS, 0x02)
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )		PORT_DIPLOCATION("SWB:1,2")
@@ -413,23 +413,23 @@ static INPUT_PORTS_START( dooyongm68_generic )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )		PORT_DIPLOCATION("SWA:5,6")
-	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0002)
-	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0002)
-	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )		PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0002)
-	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_2C ) )		PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0002)
-	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )		PORT_CONDITION("DSW", 0x0002, PORTCOND_NOTEQUALS, 0x0002)
-	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) )		PORT_CONDITION("DSW", 0x0002, PORTCOND_NOTEQUALS, 0x0002)
-	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSW", 0x0002, PORTCOND_NOTEQUALS, 0x0002)
-	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW", 0x0002, PORTCOND_NOTEQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSW", 0x0002, EQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW", 0x0002, EQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )		PORT_CONDITION("DSW", 0x0002, EQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_2C ) )		PORT_CONDITION("DSW", 0x0002, EQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )		PORT_CONDITION("DSW", 0x0002, NOTEQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) )		PORT_CONDITION("DSW", 0x0002, NOTEQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSW", 0x0002, NOTEQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW", 0x0002, NOTEQUALS, 0x0002)
 	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) )		PORT_DIPLOCATION("SWA:7,8")
-	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0002)
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0002)
-	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )		PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0002)
-	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )		PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0002)
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW", 0x0002, PORTCOND_NOTEQUALS, 0x0002)
-	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_3C ) )		PORT_CONDITION("DSW", 0x0002, PORTCOND_NOTEQUALS, 0x0002)
-	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_4C ) )		PORT_CONDITION("DSW", 0x0002, PORTCOND_NOTEQUALS, 0x0002)
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )		PORT_CONDITION("DSW", 0x0002, PORTCOND_NOTEQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSW", 0x0002, EQUALS, 0x0002)
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW", 0x0002, EQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )		PORT_CONDITION("DSW", 0x0002, EQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )		PORT_CONDITION("DSW", 0x0002, EQUALS, 0x0002)
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW", 0x0002, NOTEQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_3C ) )		PORT_CONDITION("DSW", 0x0002, NOTEQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_4C ) )		PORT_CONDITION("DSW", 0x0002, NOTEQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )		PORT_CONDITION("DSW", 0x0002, NOTEQUALS, 0x0002)
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )		PORT_DIPLOCATION("SWB:1,2")
 	PORT_DIPSETTING(      0x0000, "1" )
 	PORT_DIPSETTING(      0x0200, "2" )
@@ -536,7 +536,7 @@ static INPUT_PORTS_START( gulfstrm )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_VBLANK )	/* ??? */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")	/* ??? */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -605,14 +605,14 @@ static INPUT_PORTS_START( rshark )
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SWA:7,8")
-	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0002)
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0002)
-	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0002)
-	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_EQUALS, 0x0002)
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_2C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_NOTEQUALS, 0x0002)
-	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_3C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_NOTEQUALS, 0x0002)
-	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_4C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_NOTEQUALS, 0x0002)
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )	PORT_CONDITION("DSW", 0x0002, PORTCOND_NOTEQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) )	PORT_CONDITION("DSW", 0x0002, EQUALS, 0x0002)
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )	PORT_CONDITION("DSW", 0x0002, EQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )	PORT_CONDITION("DSW", 0x0002, EQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )	PORT_CONDITION("DSW", 0x0002, EQUALS, 0x0002)
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_2C ) )	PORT_CONDITION("DSW", 0x0002, NOTEQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_3C ) )	PORT_CONDITION("DSW", 0x0002, NOTEQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_4C ) )	PORT_CONDITION("DSW", 0x0002, NOTEQUALS, 0x0002)
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )	PORT_CONDITION("DSW", 0x0002, NOTEQUALS, 0x0002)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( superx )
@@ -815,7 +815,7 @@ static const ym2203_interface ym2203_interface_2 =
 
 static const ym2151_interface ym2151_config =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 /***************************************************************************
@@ -1282,9 +1282,46 @@ ROM_START( gulfstrm )
 	ROM_LOAD16_BYTE( "11.n9",        0x00001, 0x10000, CRC(7dfe4a9c) SHA1(40982b5b266e4a928544ab5ec330080935588c57) )
 ROM_END
 
+ROM_START( gulfstrma )
+	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for banks */
+	ROM_LOAD( "1.bin",       0x00000, 0x20000, CRC(d04fb06b) SHA1(bdf09ab692f90e3dea815605998f75b6478c8047) )
+	ROM_RELOAD(              0x10000, 0x20000 )				/* banked at 0x8000-0xbfff */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
+	ROM_LOAD( "3.c5",         0x00000, 0x10000, CRC(c029b015) SHA1(86f8d4f6560cb99e25e8e8baf72dde743a7b9c4c) )
+
+	ROM_REGION( 0x8000, "gfx1", 0 )	/* chars */
+	ROM_LOAD( "2.s4",         0x0000, 0x8000, CRC(c2d65a25) SHA1(a198b42c0737b253aca5bab6fb58ab561ccc1d5c) )	/* empty */
+	ROM_CONTINUE(             0x0000, 0x8000 )
+
+	ROM_REGION( 0x80000, "gfx2", 0 )	/* sprites */
+	ROM_LOAD16_BYTE( "14.b1",        0x00000, 0x20000, CRC(67bdf73d) SHA1(3e357448b6f255fdec731f143afa3d3149523ed2) )
+	ROM_LOAD16_BYTE( "16.c1",        0x00001, 0x20000, CRC(7770a76f) SHA1(4f9f5245f59008b26ed60e636285ea85271744e7) )
+	ROM_LOAD16_BYTE( "15.b1",        0x40000, 0x20000, CRC(84803f7e) SHA1(74b694c0d20c5b016b9d7258b0296229972151d5) )
+	ROM_LOAD16_BYTE( "17.e1",        0x40001, 0x20000, CRC(94706500) SHA1(8f4a6f7ce20b1b50577271601c2c2632b5a2292c) )
+
+	ROM_REGION( 0x80000, "gfx3", 0 )	/* tiles */
+	ROM_LOAD16_BYTE( "4.d8",         0x00000, 0x20000, CRC(858fdbb6) SHA1(4c317ab6069a8509287d3df88cf4272f512a40a3) )
+	ROM_LOAD16_BYTE( "5.b9",         0x00001, 0x20000, CRC(c0a552e8) SHA1(31dcb14eb8815c609b0bf4d5f1ea17b26ab18aec) )
+	ROM_LOAD16_BYTE( "6.d8",         0x40000, 0x20000, CRC(20eedda3) SHA1(8c8b1284e07f5380037f8431f2649aa99fd47542) )
+	ROM_LOAD16_BYTE( "7.d9",         0x40001, 0x20000, CRC(294f8c40) SHA1(b7afb87510ab52682151ff2b13029427487589ec) )
+
+	ROM_REGION( 0x40000, "gfx4", 0 )	/* tiles */
+	ROM_LOAD16_BYTE( "12.bin",       0x00000, 0x20000, CRC(3e3d3b57) SHA1(398a6cac7144ba7bacaa36c593bcb4b3c051eb0f) )
+	ROM_LOAD16_BYTE( "13.bin",       0x00001, 0x20000, CRC(66fcce80) SHA1(6ab2b7cd49447d374cde40b98db0a6209dcad461) )
+
+	ROM_REGION( 0x20000, "gfx5", 0 )	/* background tilemaps */
+	ROM_LOAD16_BYTE( "8.e8",         0x00000, 0x10000, CRC(8d7f4693) SHA1(a7c8573d9e54c8230decc3e88f76ae729d77b096) )
+	ROM_LOAD16_BYTE( "9.e9",         0x00001, 0x10000, CRC(34d440c4) SHA1(74b0e15e75f62106177234b6ea54a5d312628802) )
+
+	ROM_REGION( 0x20000, "gfx6", 0 )	/* fg tilemaps */
+	ROM_LOAD16_BYTE( "10.bin",       0x00000, 0x10000, CRC(08149140) SHA1(ff0094883ca0fc81bae991d6ea62d0064d6f7c47) )
+	ROM_LOAD16_BYTE( "11.bin",       0x00001, 0x10000, CRC(2ed7545b) SHA1(6a70743bbb03ef694310f2b5531f384209db62a1) )
+ROM_END
+
 ROM_START( gulfstrmm )
 	ROM_REGION( 0x30000, "maincpu", 0 )	/* 64k for code + 128k for banks */
-	ROM_LOAD( "18.1",         0x00000, 0x20000, CRC(d38e2667) SHA1(3690d708c7be85871d6bb32a774d711a30782126) )
+	ROM_LOAD( "18.l4",        0x00000, 0x20000, CRC(d38e2667) SHA1(3690d708c7be85871d6bb32a774d711a30782126) )
 	ROM_RELOAD(               0x10000, 0x20000 )				/* banked at 0x8000-0xbfff */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* sound */
@@ -1902,7 +1939,8 @@ ROM_END
 
 GAME( 1990, lastday,  0,        lastday,  lastday,  0, ROT270, "Dooyong",  "The Last Day (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1990, lastdaya, lastday,  lastday,  lastday,  0, ROT270, "Dooyong",  "The Last Day (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1991, gulfstrm, 0,        gulfstrm, gulfstrm, 0, ROT270, "Dooyong",  "Gulf Storm",            GAME_SUPPORTS_SAVE )
+GAME( 1991, gulfstrm, 0,        gulfstrm, gulfstrm, 0, ROT270, "Dooyong",  "Gulf Storm (set 1)",   GAME_SUPPORTS_SAVE )
+GAME( 1991, gulfstrma,gulfstrm, gulfstrm, gulfstrm, 0, ROT270, "Dooyong",  "Gulf Storm (set 2)",   GAME_SUPPORTS_SAVE )
 GAME( 1991, gulfstrmm,gulfstrm, gulfstrm, gulfstrm, 0, ROT270, "Dooyong (Media Shoji license)", "Gulf Storm (Media Shoji)",  GAME_SUPPORTS_SAVE )
 GAME( 1991, pollux,   0,        pollux,   pollux,   0, ROT270, "Dooyong",  "Pollux (set 1)",       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1991, polluxa,  pollux,   pollux,   pollux,   0, ROT270, "Dooyong",  "Pollux (set 2)",       GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

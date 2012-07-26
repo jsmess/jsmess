@@ -201,11 +201,9 @@ ADDRESS_MAP_END
     INPUT_CHANGED( trigger_nmi )
 -------------------------------------------------*/
 
-static INPUT_CHANGED( trigger_nmi )
+INPUT_CHANGED_MEMBER( crvision_state::trigger_nmi )
 {
-	crvision_state *state = field.machine().driver_data<crvision_state>();
-
-	state->m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*-------------------------------------------------
@@ -374,7 +372,7 @@ static INPUT_PORTS_START( crvision )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Button 1 / - =") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=') PORT_PLAYER(2)
 
 	PORT_START("NMI")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F10) PORT_CHANGED(trigger_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, crvision_state, trigger_nmi, 0)
 INPUT_PORTS_END
 
 /*-------------------------------------------------
@@ -554,7 +552,7 @@ UINT8 crvision_state::read_keyboard(int pa)
 
 	for (i = 0; i < 8; i++)
 	{
-		value = input_port_read(machine(), keynames[pa][i]);
+		value = ioport(keynames[pa][i])->read();
 
 		if (value != 0xff)
 		{
@@ -650,14 +648,14 @@ READ8_MEMBER( laser2001_state::pia_pa_r )
 
 	UINT8 data = 0xff;
 
-	if (!BIT(m_keylatch, 0)) data &= input_port_read(machine(), "ROW0");
-	if (!BIT(m_keylatch, 1)) data &= input_port_read(machine(), "ROW1");
-	if (!BIT(m_keylatch, 2)) data &= input_port_read(machine(), "ROW2");
-	if (!BIT(m_keylatch, 3)) data &= input_port_read(machine(), "ROW3");
-	if (!BIT(m_keylatch, 4)) data &= input_port_read(machine(), "ROW4");
-	if (!BIT(m_keylatch, 5)) data &= input_port_read(machine(), "ROW5");
-	if (!BIT(m_keylatch, 6)) data &= input_port_read(machine(), "ROW6");
-	if (!BIT(m_keylatch, 7)) data &= input_port_read(machine(), "ROW7");
+	if (!BIT(m_keylatch, 0)) data &= ioport("ROW0")->read();
+	if (!BIT(m_keylatch, 1)) data &= ioport("ROW1")->read();
+	if (!BIT(m_keylatch, 2)) data &= ioport("ROW2")->read();
+	if (!BIT(m_keylatch, 3)) data &= ioport("ROW3")->read();
+	if (!BIT(m_keylatch, 4)) data &= ioport("ROW4")->read();
+	if (!BIT(m_keylatch, 5)) data &= ioport("ROW5")->read();
+	if (!BIT(m_keylatch, 6)) data &= ioport("ROW6")->read();
+	if (!BIT(m_keylatch, 7)) data &= ioport("ROW7")->read();
 
 	return data;
 }
@@ -682,10 +680,10 @@ READ8_MEMBER( laser2001_state::pia_pb_r )
 {
 	UINT8 data = 0xff;
 
-	if (!BIT(m_joylatch, 0)) data &= input_port_read(machine(), "JOY0");
-	if (!BIT(m_joylatch, 1)) data &= input_port_read(machine(), "JOY1");
-	if (!BIT(m_joylatch, 2)) data &= input_port_read(machine(), "JOY2");
-	if (!BIT(m_joylatch, 3)) data &= input_port_read(machine(), "JOY3");
+	if (!BIT(m_joylatch, 0)) data &= ioport("JOY0")->read();
+	if (!BIT(m_joylatch, 1)) data &= ioport("JOY1")->read();
+	if (!BIT(m_joylatch, 2)) data &= ioport("JOY2")->read();
+	if (!BIT(m_joylatch, 3)) data &= ioport("JOY3")->read();
 
 	return data;
 }
@@ -849,7 +847,8 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 	UINT32 size;
 	UINT8 *temp_copy;
 	running_machine &machine = image.device().machine();
-	UINT8 *mem = machine.region(M6502_TAG)->base();
+	crvision_state *state = machine.driver_data<crvision_state>();
+	UINT8 *mem = state->memregion(M6502_TAG)->base();
 	address_space *program = machine.device(M6502_TAG)->memory().space(AS_PROGRAM);
 
 	if (image.software_entry() == NULL)
@@ -942,11 +941,11 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 		return IMAGE_INIT_FAIL;
 	}
 
-	memory_configure_bank(machine, "bank1", 0, 1, mem + 0x8000, 0);
-	memory_set_bank(machine, "bank1", 0);
+	state->membank("bank1")->configure_entry(0, mem + 0x8000);
+	state->membank("bank1")->set_entry(0);
 
-	memory_configure_bank(machine, "bank2", 0, 1, mem + 0x4000, 0);
-	memory_set_bank(machine, "bank2", 0);
+	state->membank("bank2")->configure_entry(0, mem + 0x4000);
+	state->membank("bank2")->set_entry(0);
 
 	auto_free(machine, temp_copy);
 

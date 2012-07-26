@@ -15,7 +15,6 @@
 
 ****************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -32,7 +31,7 @@ UINT8 ti68k_state::keypad_r (running_machine &machine)
 	for (bit = 0; bit < 10; bit++)
 		if (~m_kb_mask & (0x01 << bit))
 			for (port = 0; port < 8; port++)
-				data ^= input_port_read(machine, bitnames[port]) & (0x01 << bit) ? 0x01 << port : 0x00;
+				data ^= machine.root_device().ioport(bitnames[port])->read() & (0x01 << bit) ? 0x01 << port : 0x00;
 	return data;
 }
 
@@ -146,7 +145,7 @@ READ16_MEMBER ( ti68k_state::flash_r )
 	}
 	else
 	{
-		UINT16 *rom_base = (UINT16 *)(*space.machine().region("flash"));
+		UINT16 *rom_base = (UINT16 *)(*space.machine().root_device().memregion("flash"));
 
 		return rom_base[offset];
 	}
@@ -421,7 +420,7 @@ INPUT_PORTS_END
 
 void ti68k_state::machine_start()
 {
-	UINT16 *rom = (UINT16 *)(*machine().region("flash"));
+	UINT16 *rom = (UINT16 *)(*machine().root_device().memregion("flash"));
 	int i;
 
 	m_flash_mem = !((rom[0x32] & 0x0f) != 0);

@@ -34,6 +34,11 @@ public:
 	device_t *m_audiocpu;
 	device_t *m_pc090oj;
 	device_t *m_tc0100scn;
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(asuka_msm5205_address_w);
+	DECLARE_READ16_MEMBER(cadash_share_r);
+	DECLARE_WRITE16_MEMBER(cadash_share_w);
+	DECLARE_WRITE16_MEMBER(asuka_spritectrl_w);
 };
 
 
@@ -49,7 +54,6 @@ WRITE16_HANDLER( bonzeadv_cchip_ram_w );
 
 /*----------- defined in video/asuka.c -----------*/
 
-WRITE16_HANDLER( asuka_spritectrl_w );
 
 SCREEN_UPDATE_IND16( asuka );
 SCREEN_UPDATE_IND16( bonzeadv );

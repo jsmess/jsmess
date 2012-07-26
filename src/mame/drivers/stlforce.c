@@ -90,27 +90,27 @@ static WRITE16_DEVICE_HANDLER( oki_bank_w )
 	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * ((data>>8) & 3));
 }
 
-static ADDRESS_MAP_START( stlforce_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( stlforce_map, AS_PROGRAM, 16, stlforce_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(stlforce_bg_videoram_w) AM_BASE_MEMBER(stlforce_state,m_bg_videoram)
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(stlforce_mlow_videoram_w) AM_BASE_MEMBER(stlforce_state,m_mlow_videoram)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(stlforce_mhigh_videoram_w) AM_BASE_MEMBER(stlforce_state,m_mhigh_videoram)
-	AM_RANGE(0x101800, 0x1027ff) AM_RAM_WRITE(stlforce_tx_videoram_w) AM_BASE_MEMBER(stlforce_state,m_tx_videoram)
+	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(stlforce_bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(stlforce_mlow_videoram_w) AM_SHARE("mlow_videoram")
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(stlforce_mhigh_videoram_w) AM_SHARE("mhigh_videoram")
+	AM_RANGE(0x101800, 0x1027ff) AM_RAM_WRITE(stlforce_tx_videoram_w) AM_SHARE("tx_videoram")
 	AM_RANGE(0x102800, 0x102fff) AM_RAM /* unknown / ram */
-	AM_RANGE(0x103000, 0x1033ff) AM_RAM AM_BASE_MEMBER(stlforce_state,m_bg_scrollram)
-	AM_RANGE(0x103400, 0x1037ff) AM_RAM AM_BASE_MEMBER(stlforce_state,m_mlow_scrollram)
-	AM_RANGE(0x103800, 0x103bff) AM_RAM AM_BASE_MEMBER(stlforce_state,m_mhigh_scrollram)
-	AM_RANGE(0x103c00, 0x103fff) AM_RAM AM_BASE_MEMBER(stlforce_state,m_vidattrram)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x103000, 0x1033ff) AM_RAM AM_SHARE("bg_scrollram")
+	AM_RANGE(0x103400, 0x1037ff) AM_RAM AM_SHARE("mlow_scrollram")
+	AM_RANGE(0x103800, 0x103bff) AM_RAM AM_SHARE("mhigh_scrollram")
+	AM_RANGE(0x103c00, 0x103fff) AM_RAM AM_SHARE("vidattrram")
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x105000, 0x107fff) AM_RAM /* unknown / ram */
-	AM_RANGE(0x108000, 0x108fff) AM_RAM AM_BASE_MEMBER(stlforce_state,m_spriteram)
+	AM_RANGE(0x108000, 0x108fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x109000, 0x11ffff) AM_RAM
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("INPUT")
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x400010, 0x400011) AM_DEVWRITE("eeprom", eeprom_w)
-	AM_RANGE(0x400012, 0x400013) AM_DEVWRITE("oki", oki_bank_w)
+	AM_RANGE(0x400010, 0x400011) AM_DEVWRITE_LEGACY("eeprom", eeprom_w)
+	AM_RANGE(0x400012, 0x400013) AM_DEVWRITE_LEGACY("oki", oki_bank_w)
 	AM_RANGE(0x40001e, 0x40001f) AM_WRITENOP // sprites buffer commands
-	AM_RANGE(0x410000, 0x410001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x410000, 0x410001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( stlforce )
@@ -137,7 +137,7 @@ static INPUT_PORTS_START( stlforce )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit) /* eeprom */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )

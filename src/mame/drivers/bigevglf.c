@@ -63,15 +63,14 @@ J1100072A
 #include "includes/bigevglf.h"
 
 
-static WRITE8_HANDLER( beg_banking_w )
+WRITE8_MEMBER(bigevglf_state::beg_banking_w)
 {
-	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
-	state->m_beg_bank = data;
+	m_beg_bank = data;
 
 /* d0-d3 connect to A11-A14 of the ROMs (via ls273 latch)
    d4-d7 select one of ROMs (via ls273(above) and then ls154)
 */
-	memory_set_bank(space->machine(), "bank1", state->m_beg_bank & 0xff); /* empty sockets for IC37-IC44 ROMS */
+	membank("bank1")->set_entry(m_beg_bank & 0xff); /* empty sockets for IC37-IC44 ROMS */
 }
 
 static TIMER_CALLBACK( from_sound_latch_callback )
@@ -80,35 +79,32 @@ static TIMER_CALLBACK( from_sound_latch_callback )
 	state->m_from_sound = param & 0xff;
 	state->m_sound_state |= 2;
 }
-static WRITE8_HANDLER( beg_fromsound_w )	/* write to D800 sets bit 1 in status */
+WRITE8_MEMBER(bigevglf_state::beg_fromsound_w)/* write to D800 sets bit 1 in status */
 {
-	space->machine().scheduler().synchronize(FUNC(from_sound_latch_callback), (cpu_get_pc(&space->device()) << 16) | data);
+	machine().scheduler().synchronize(FUNC(from_sound_latch_callback), (cpu_get_pc(&space.device()) << 16) | data);
 }
 
-static READ8_HANDLER( beg_fromsound_r )
+READ8_MEMBER(bigevglf_state::beg_fromsound_r)
 {
-	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	/* set a timer to force synchronization after the read */
-	space->machine().scheduler().synchronize();
-	return state->m_from_sound;
+	machine().scheduler().synchronize();
+	return m_from_sound;
 }
 
-static READ8_HANDLER( beg_soundstate_r )
+READ8_MEMBER(bigevglf_state::beg_soundstate_r)
 {
-	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
-	UINT8 ret = state->m_sound_state;
+	UINT8 ret = m_sound_state;
 	/* set a timer to force synchronization after the read */
-	space->machine().scheduler().synchronize();
-	state->m_sound_state &= ~2; /* read from port 21 clears bit 1 in status */
+	machine().scheduler().synchronize();
+	m_sound_state &= ~2; /* read from port 21 clears bit 1 in status */
 	return ret;
 }
 
-static READ8_HANDLER( soundstate_r )
+READ8_MEMBER(bigevglf_state::soundstate_r)
 {
-	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	/* set a timer to force synchronization after the read */
-	space->machine().scheduler().synchronize();
-	return state->m_sound_state;
+	machine().scheduler().synchronize();
+	return m_sound_state;
 }
 
 static TIMER_CALLBACK( nmi_callback )
@@ -122,34 +118,30 @@ static TIMER_CALLBACK( nmi_callback )
 	state->m_sound_state &= ~1;
 }
 
-static WRITE8_HANDLER( sound_command_w )	/* write to port 20 clears bit 0 in status */
+WRITE8_MEMBER(bigevglf_state::sound_command_w)/* write to port 20 clears bit 0 in status */
 {
-	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
-	state->m_for_sound = data;
-	space->machine().scheduler().synchronize(FUNC(nmi_callback), data);
+	m_for_sound = data;
+	machine().scheduler().synchronize(FUNC(nmi_callback), data);
 }
 
-static READ8_HANDLER( sound_command_r )	/* read from D800 sets bit 0 in status */
+READ8_MEMBER(bigevglf_state::sound_command_r)/* read from D800 sets bit 0 in status */
 {
-	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
-	state->m_sound_state |= 1;
-	return state->m_for_sound;
+	m_sound_state |= 1;
+	return m_for_sound;
 }
 
-static WRITE8_HANDLER( nmi_disable_w )
+WRITE8_MEMBER(bigevglf_state::nmi_disable_w)
 {
-	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
-	state->m_sound_nmi_enable = 0;
+	m_sound_nmi_enable = 0;
 }
 
-static WRITE8_HANDLER( nmi_enable_w )
+WRITE8_MEMBER(bigevglf_state::nmi_enable_w)
 {
-	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
-	state->m_sound_nmi_enable = 1;
-	if (state->m_pending_nmi)
+	m_sound_nmi_enable = 1;
+	if (m_pending_nmi)
 	{
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-		state->m_pending_nmi = 0;
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_pending_nmi = 0;
 	}
 }
 
@@ -162,29 +154,28 @@ static TIMER_CALLBACK( deferred_ls74_w )
 }
 
 /* do this on a timer to let the CPUs synchronize */
-static WRITE8_HANDLER( beg13_a_clr_w )
+WRITE8_MEMBER(bigevglf_state::beg13_a_clr_w)
 {
-	space->machine().scheduler().synchronize(FUNC(deferred_ls74_w), (0 << 8) | 0);
+	machine().scheduler().synchronize(FUNC(deferred_ls74_w), (0 << 8) | 0);
 }
 
-static WRITE8_HANDLER( beg13_b_clr_w )
+WRITE8_MEMBER(bigevglf_state::beg13_b_clr_w)
 {
-	space->machine().scheduler().synchronize(FUNC(deferred_ls74_w), (1 << 8) | 0);
+	machine().scheduler().synchronize(FUNC(deferred_ls74_w), (1 << 8) | 0);
 }
 
-static WRITE8_HANDLER( beg13_a_set_w )
+WRITE8_MEMBER(bigevglf_state::beg13_a_set_w)
 {
-	space->machine().scheduler().synchronize(FUNC(deferred_ls74_w), (0 << 8) | 1);
+	machine().scheduler().synchronize(FUNC(deferred_ls74_w), (0 << 8) | 1);
 }
 
-static WRITE8_HANDLER( beg13_b_set_w )
+WRITE8_MEMBER(bigevglf_state::beg13_b_set_w)
 {
-	space->machine().scheduler().synchronize(FUNC(deferred_ls74_w), (1 << 8) | 1);
+	machine().scheduler().synchronize(FUNC(deferred_ls74_w), (1 << 8) | 1);
 }
 
-static READ8_HANDLER( beg_status_r )
+READ8_MEMBER(bigevglf_state::beg_status_r)
 {
-	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 
 /* d0 = Q of 74ls74 IC13(partA)
    d1 = Q of 74ls74 IC13(partB)
@@ -196,31 +187,28 @@ static READ8_HANDLER( beg_status_r )
 
 */
 	/* set a timer to force synchronization after the read */
-	space->machine().scheduler().synchronize();
-	return (state->m_beg13_ls74[0] << 0) | (state->m_beg13_ls74[1] << 1);
+	machine().scheduler().synchronize();
+	return (m_beg13_ls74[0] << 0) | (m_beg13_ls74[1] << 1);
 }
 
 
-static READ8_HANDLER( beg_trackball_x_r )
+READ8_MEMBER(bigevglf_state::beg_trackball_x_r)
 {
-	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	static const char *const portx_name[2] = { "P1X", "P2X" };
 
-	return input_port_read(space->machine(), portx_name[state->m_port_select]);
+	return ioport(portx_name[m_port_select])->read();
 }
 
-static READ8_HANDLER( beg_trackball_y_r )
+READ8_MEMBER(bigevglf_state::beg_trackball_y_r)
 {
-	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	static const char *const porty_name[2] = { "P1Y", "P2Y" };
 
-	return input_port_read(space->machine(), porty_name[state->m_port_select]);
+	return ioport(porty_name[m_port_select])->read();
 }
 
-static WRITE8_HANDLER( beg_port08_w )
+WRITE8_MEMBER(bigevglf_state::beg_port08_w)
 {
-	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
-	state->m_port_select = (data & 0x04) >> 2;
+	m_port_select = (data & 0x04) >> 2;
 }
 
 
@@ -306,18 +294,18 @@ INPUT_PORTS_END
 /*****************************************************************************/
 /* Main CPU */
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bigevglf_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xd7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_SHARE("share1") /* only half of the RAM is accessible, line a10 of IC73 (6116) is GNDed */
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(bigevglf_palette_w) AM_BASE_MEMBER(bigevglf_state, m_paletteram)
-	AM_RANGE(0xe800, 0xefff) AM_WRITEONLY AM_BASE_MEMBER(bigevglf_state, m_spriteram1) /* sprite 'templates' */
+	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(bigevglf_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0xe800, 0xefff) AM_WRITEONLY AM_SHARE("spriteram1") /* sprite 'templates' */
 	AM_RANGE(0xf000, 0xf0ff) AM_READWRITE(bigevglf_vidram_r, bigevglf_vidram_w) /* 41464 (64kB * 8 chips), addressed using ports 1 and 5 */
-	AM_RANGE(0xf840, 0xf8ff) AM_RAM AM_BASE_MEMBER(bigevglf_state, m_spriteram2)  /* spriteram (x,y,offset in spriteram1,palette) */
+	AM_RANGE(0xf840, 0xf8ff) AM_RAM AM_SHARE("spriteram2")  /* spriteram (x,y,offset in spriteram1,palette) */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigevglf_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( bigevglf_portmap, AS_IO, 8, bigevglf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP	/* video ram enable ???*/
 	AM_RANGE(0x01, 0x01) AM_WRITE(bigevglf_gfxcontrol_w)  /* plane select */
@@ -332,27 +320,26 @@ ADDRESS_MAP_END
 /*********************************************************************************/
 /* Sub CPU */
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, bigevglf_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_SHARE("share1") /* shared with main CPU */
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER( sub_cpu_mcu_coin_port_r )
+READ8_MEMBER(bigevglf_state::sub_cpu_mcu_coin_port_r)
 {
-	bigevglf_state *state = space->machine().driver_data<bigevglf_state>();
 	/*
             bit 0 and bit 1 = coin inputs
             bit 3 and bit 4 = MCU status
             bit 5           = must toggle, vblank ?
 
     */
-	state->m_mcu_coin_bit5 ^= 0x20;
-	return bigevglf_mcu_status_r(space, 0) | (input_port_read(space->machine(), "PORT04") & 3) | state->m_mcu_coin_bit5;	/* bit 0 and bit 1 - coin inputs */
+	m_mcu_coin_bit5 ^= 0x20;
+	return bigevglf_mcu_status_r(space, 0) | (ioport("PORT04")->read() & 3) | m_mcu_coin_bit5;	/* bit 0 and bit 1 - coin inputs */
 }
 
-static ADDRESS_MAP_START( bigevglf_sub_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( bigevglf_sub_portmap, AS_IO, 8, bigevglf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("PORT00")
 	AM_RANGE(0x01, 0x01) AM_READNOP
@@ -378,11 +365,11 @@ ADDRESS_MAP_END
 /*********************************************************************************/
 /* Sound CPU */
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bigevglf_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE("msm", msm5232_w)
+	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xca00, 0xca0d) AM_DEVWRITE_LEGACY("msm", msm5232_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITENOP
 	AM_RANGE(0xce00, 0xce00) AM_WRITENOP
 	AM_RANGE(0xd800, 0xd800) AM_READWRITE(sound_command_r, beg_fromsound_w)	/* write to D800 sets bit 1 in status */
@@ -396,7 +383,7 @@ ADDRESS_MAP_END
 /*********************************************************************************/
 /* MCU */
 
-static ADDRESS_MAP_START( m68705_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( m68705_map, AS_PROGRAM, 8, bigevglf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(bigevglf_68705_port_a_r, bigevglf_68705_port_a_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(bigevglf_68705_port_b_r, bigevglf_68705_port_b_w)
@@ -632,8 +619,8 @@ ROM_END
 
 static DRIVER_INIT( bigevglf )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 0xff, &ROM[0x10000], 0x800);
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	machine.root_device().membank("bank1")->configure_entries(0, 0xff, &ROM[0x10000], 0x800);
 }
 
 GAME( 1986, bigevglf,  0,        bigevglf, bigevglf, bigevglf, ROT270, "Taito America Corporation", "Big Event Golf (US)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

@@ -35,34 +35,34 @@ static void msx_cpu_setbank (running_machine &machine, int page, UINT8 *mem)
 	switch (page)
 	{
 	case 1:
-		memory_set_bankptr (machine,"bank1", mem);
+		state->membank ("bank1")->set_base (mem);
 		break;
 	case 2:
-		memory_set_bankptr (machine,"bank2", mem);
+		state->membank ("bank2")->set_base (mem);
 		break;
 	case 3:
-		memory_set_bankptr (machine,"bank3", mem);
+		state->membank ("bank3")->set_base (mem);
 		break;
 	case 4:
-		memory_set_bankptr (machine,"bank4", mem);
-		memory_set_bankptr (machine,"bank5", mem + 0x1ff8);
+		state->membank ("bank4")->set_base (mem);
+		state->membank ("bank5")->set_base (mem + 0x1ff8);
 		space->install_read_bank(0x7ff8, 0x7fff, "bank5");
 		break;
 	case 5:
-		memory_set_bankptr (machine,"bank6", mem);
-		memory_set_bankptr (machine,"bank7", mem + 0x1800);
+		state->membank ("bank6")->set_base (mem);
+		state->membank ("bank7")->set_base (mem + 0x1800);
 		space->install_read_bank(0x9800, 0x9fff, "bank7");
 		break;
 	case 6:
-		memory_set_bankptr (machine,"bank8", mem);
-		memory_set_bankptr (machine,"bank9", mem + 0x1800);
+		state->membank ("bank8")->set_base (mem);
+		state->membank ("bank9")->set_base (mem + 0x1800);
 		space->install_read_bank(0xb800, 0xbfff, "bank9");
 		break;
 	case 7:
-		memory_set_bankptr (machine,"bank10", mem);
+		state->membank ("bank10")->set_base (mem);
 		break;
 	case 8:
-		memory_set_bankptr (machine,"bank11", mem);
+		state->membank ("bank11")->set_base (mem);
 		state->m_top_page = mem;
 		break;
 	}

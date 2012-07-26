@@ -107,8 +107,8 @@ void mecmouse_device::poll()
 	int new_mx, new_my;
 	int delta_x, delta_y;
 
-	new_mx = input_port_read(machine(), "MOUSEX");
-	new_my = input_port_read(machine(), "MOUSEY");
+	new_mx = ioport("MOUSEX")->read();
+	new_my = ioport("MOUSEY")->read();
 
 	/* compute x delta */
 	delta_x = new_mx - m_last_mx;
@@ -145,7 +145,7 @@ void mecmouse_device::poll()
 int mecmouse_device::get_values()
 {
 	int answer;
-	int buttons = input_port_read(machine(), "MOUSE0") & 3;
+	int buttons = ioport("MOUSE0")->read() & 3;
 	answer = (m_read_y ? m_y_buf : m_x_buf) << 4;
 
 	if ((buttons & 1)==0)
@@ -163,7 +163,7 @@ int mecmouse_device::get_values()
 int mecmouse_device::get_values8(int mode)
 {
 	int answer;
-	int buttons = input_port_read(machine(), "MOUSE0") & 3;
+	int buttons = ioport("MOUSE0")->read() & 3;
 
 	if (mode == 0)
 	{
@@ -203,6 +203,24 @@ void mecmouse_device::device_reset(void)
 	m_y = 0;
 	m_last_mx = 0;
 	m_last_my = 0;
+}
+
+INPUT_PORTS_START( mecmouse )
+	/* 3 ports for mouse */
+	PORT_START("MOUSEX") /* Mouse - X AXIS */
+		PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+
+	PORT_START("MOUSEY") /* Mouse - Y AXIS */
+		PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
+
+	PORT_START("MOUSE0") /* Mouse - buttons */
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Mouse Button 1") PORT_PLAYER(1)
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Mouse Button 2") PORT_PLAYER(1)
+INPUT_PORTS_END
+
+ioport_constructor mecmouse_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME( mecmouse );
 }
 
 const device_type MECMOUSE = &device_creator<mecmouse_device>;

@@ -71,7 +71,7 @@ struct _tlcs900_state
 	int halted;
 	int icount;
 	int regbank;
-	device_irq_callback irqcallback;
+	device_irq_acknowledge_callback irqcallback;
 	legacy_cpu_device *device;
 	address_space *program;
 };
@@ -1095,8 +1095,8 @@ static WRITE8_HANDLER( tlcs900_internal_w )
 }
 
 
-static ADDRESS_MAP_START( tlcs900_mem, AS_PROGRAM, 8 )
-	AM_RANGE( 0x000000, 0x00007f ) AM_READWRITE( tlcs900_internal_r, tlcs900_internal_w )
+static ADDRESS_MAP_START( tlcs900_mem, AS_PROGRAM, 8, legacy_cpu_device )
+	AM_RANGE( 0x000000, 0x00007f ) AM_READWRITE_LEGACY( tlcs900_internal_r, tlcs900_internal_w )
 ADDRESS_MAP_END
 
 

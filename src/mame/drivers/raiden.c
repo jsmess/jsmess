@@ -46,66 +46,66 @@
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(raiden_state, m_shared_ram)
+	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x0b000, 0x0b001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0b002, 0x0b003) AM_READ_PORT("DSW")
 	AM_RANGE(0x0b000, 0x0b007) AM_WRITE(raiden_control_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_MEMBER(raiden_state, m_videoram)
-	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
-	AM_RANGE(0x0d060, 0x0d067) AM_WRITEONLY AM_BASE_MEMBER(raiden_state, m_scroll_ram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_SHARE("videoram")
+	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0d060, 0x0d067) AM_WRITEONLY AM_SHARE("scroll_ram")
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x01fff) AM_RAM
-	AM_RANGE(0x02000, 0x027ff) AM_RAM_WRITE(raiden_background_w) AM_BASE_MEMBER(raiden_state, m_back_data)
-	AM_RANGE(0x02800, 0x02fff) AM_RAM_WRITE(raiden_foreground_w) AM_BASE_MEMBER(raiden_state, m_fore_data)
-	AM_RANGE(0x03000, 0x03fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x02000, 0x027ff) AM_RAM_WRITE(raiden_background_w) AM_SHARE("back_data")
+	AM_RANGE(0x02800, 0x02fff) AM_RAM_WRITE(raiden_foreground_w) AM_SHARE("fore_data")
+	AM_RANGE(0x03000, 0x03fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x04000, 0x04fff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x07ffe, 0x0afff) AM_WRITENOP
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 /************************* Alternate board set ************************/
 
-static ADDRESS_MAP_START( alt_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( alt_main_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(raiden_state, m_shared_ram)
-	AM_RANGE(0x0a000, 0x0a00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_MEMBER(raiden_state, m_videoram)
+	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("shared_ram")
+	AM_RANGE(0x0a000, 0x0a00d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_SHARE("videoram")
 	AM_RANGE(0x0e000, 0x0e001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0e000, 0x0e007) AM_WRITE(raidena_control_w)
 	AM_RANGE(0x0e002, 0x0e003) AM_READ_PORT("DSW")
-	AM_RANGE(0x0f000, 0x0f035) AM_WRITEONLY AM_BASE_MEMBER(raiden_state, m_scroll_ram)
+	AM_RANGE(0x0f000, 0x0f035) AM_WRITEONLY AM_SHARE("scroll_ram")
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( raidenu_main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( raidenu_main_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x08000, 0x08035) AM_WRITEONLY AM_BASE_MEMBER(raiden_state, m_scroll_ram)
-	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(raiden_state, m_shared_ram)
+	AM_RANGE(0x08000, 0x08035) AM_WRITEONLY AM_SHARE("scroll_ram")
+	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x0b000, 0x0b001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0b002, 0x0b003) AM_READ_PORT("DSW")
 	AM_RANGE(0x0b000, 0x0b007) AM_WRITE(raidena_control_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_MEMBER(raiden_state, m_videoram)
-	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_SHARE("videoram")
+	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( raidenu_sub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( raidenu_sub_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x00000, 0x05fff) AM_RAM
-	AM_RANGE(0x06000, 0x067ff) AM_RAM_WRITE(raiden_background_w) AM_BASE_MEMBER(raiden_state, m_back_data)
-	AM_RANGE(0x06800, 0x06fff) AM_RAM_WRITE(raiden_foreground_w) AM_BASE_MEMBER(raiden_state, m_fore_data)
-	AM_RANGE(0x07000, 0x07fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x06000, 0x067ff) AM_RAM_WRITE(raiden_background_w) AM_SHARE("back_data")
+	AM_RANGE(0x06800, 0x06fff) AM_RAM_WRITE(raiden_foreground_w) AM_SHARE("fore_data")
+	AM_RANGE(0x07000, 0x07fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("shared_ram")
 	//AM_RANGE(0x07ffe, 0x0afff) AM_WRITENOP
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -138,7 +138,7 @@ static INPUT_PORTS_START( raiden )
 	PORT_DIPSETTING(      0x0001, "A" )
 	PORT_DIPSETTING(      0x0000, "B" )
 	/* Coin Mode A */
-	PORT_DIPNAME( 0x001e, 0x001e, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0001, PORTCOND_EQUALS, 0x0001) PORT_DIPLOCATION("SW1:2,3,4,5")
+	PORT_DIPNAME( 0x001e, 0x001e, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0001) PORT_DIPLOCATION("SW1:2,3,4,5")
 	PORT_DIPSETTING(      0x0014, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(      0x0016, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0018, DEF_STR( 4C_1C ) )
@@ -156,12 +156,12 @@ static INPUT_PORTS_START( raiden )
 	PORT_DIPSETTING(      0x000a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 	/* Coin Mode B */
-	PORT_DIPNAME( 0x0006, 0x0006, DEF_STR( Coin_A ) ) PORT_CONDITION("DSW", 0x0001, PORTCOND_NOTEQUALS, 0x0001) PORT_DIPLOCATION("SW1:2,3")
+	PORT_DIPNAME( 0x0006, 0x0006, DEF_STR( Coin_A ) ) PORT_CONDITION("DSW", 0x0001, NOTEQUALS, 0x0001) PORT_DIPLOCATION("SW1:2,3")
     PORT_DIPSETTING(      0x0000, "5C/1C or Free if Coin B too" )
     PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
     PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
     PORT_DIPSETTING(      0x0006, DEF_STR( 1C_1C ) )
-    PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Coin_B ) ) PORT_CONDITION("DSW", 0x0001, PORTCOND_NOTEQUALS, 0x0001) PORT_DIPLOCATION("SW1:4,5")
+    PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Coin_B ) ) PORT_CONDITION("DSW", 0x0001, NOTEQUALS, 0x0001) PORT_DIPLOCATION("SW1:4,5")
     PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ) )
     PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
     PORT_DIPSETTING(      0x0008, DEF_STR( 1C_5C ) )
@@ -512,19 +512,18 @@ ROM_END
 //#define SYNC_HACK
 
 #ifdef SYNC_HACK
-static READ16_HANDLER( sub_cpu_spin_r )
+READ16_MEMBER(raiden_state::sub_cpu_spin_r)
 {
-	raiden_state *state = space->machine().driver_data<raiden_state>();
-	int pc=cpu_get_pc(&space->device());
-	int ret=state->m_shared_ram[0x4];
+	int pc=cpu_get_pc(&space.device());
+	int ret=m_shared_ram[0x4];
 
 	// main set
 	if (pc==0xfcde6 && ret!=0x40)
-		device_spin(&space->device());
+		device_spin(&space.device());
 
 	// alt sets
 	if (pc==0xfcde8 && ret!=0x40)
-		device_spin(&space->device());
+		device_spin(&space.device());
 
 	return ret;
 }
@@ -549,7 +548,7 @@ bit-swapping */
 static void common_decrypt(running_machine &machine)
 {
 
-	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x20000; i++)
@@ -561,7 +560,7 @@ static void common_decrypt(running_machine &machine)
 		RAM[0xc0000/2 + i] = data;
 	}
 
-	RAM = (UINT16 *)machine.region("sub")->base();
+	RAM = (UINT16 *)machine.root_device().memregion("sub")->base();
 
 	for (i = 0; i < 0x20000; i++)
 	{

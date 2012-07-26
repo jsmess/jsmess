@@ -34,14 +34,15 @@
 #include "includes/clshroad.h"
 
 
-WRITE8_HANDLER( clshroad_flipscreen_w )
+WRITE8_MEMBER(clshroad_state::clshroad_flipscreen_w)
 {
-	flip_screen_set(space->machine(),  data & 1 );
+	flip_screen_set(data & 1 );
 }
 
 
 PALETTE_INIT( clshroad )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	for (i = 0;i < 256;i++)
 		palette_set_color_rgb(machine,i,	pal4bit(color_prom[i + 256 * 0]),
@@ -51,6 +52,7 @@ PALETTE_INIT( clshroad )
 
 PALETTE_INIT( firebatl )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -130,14 +132,13 @@ static TILE_GET_INFO( get_tile_info_0b )
 			0);
 }
 
-WRITE8_HANDLER( clshroad_vram_0_w )
+WRITE8_MEMBER(clshroad_state::clshroad_vram_0_w)
 {
-	clshroad_state *state = space->machine().driver_data<clshroad_state>();
 	int tile_index = offset / 2;
 	int tile = (tile_index & 0x1f) + (tile_index & ~0x3f)/2;
-	state->m_vram_0[offset] = data;
-	if (tile_index & 0x20)	state->m_tilemap_0a->mark_tile_dirty(tile);
-	else					state->m_tilemap_0b->mark_tile_dirty(tile);
+	m_vram_0[offset] = data;
+	if (tile_index & 0x20)	m_tilemap_0a->mark_tile_dirty(tile);
+	else					m_tilemap_0b->mark_tile_dirty(tile);
 }
 
 /***************************************************************************
@@ -200,11 +201,10 @@ static TILE_GET_INFO( get_tile_info_1 )
 			0);
 }
 
-WRITE8_HANDLER( clshroad_vram_1_w )
+WRITE8_MEMBER(clshroad_state::clshroad_vram_1_w)
 {
-	clshroad_state *state = space->machine().driver_data<clshroad_state>();
-	state->m_vram_1[offset] = data;
-	state->m_tilemap_1->mark_tile_dirty(offset % 0x400);
+	m_vram_1[offset] = data;
+	m_tilemap_1->mark_tile_dirty(offset % 0x400);
 }
 
 
@@ -292,7 +292,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	UINT8 *spriteram = state->m_spriteram;
 	int i;
 
-	for (i = 0; i < state->m_spriteram_size ; i += 8)
+	for (i = 0; i < state->m_spriteram.bytes() ; i += 8)
 	{
 		int y		=	 240 - spriteram[i+1];
 		int code	=	(spriteram[i+3] & 0x3f) + (spriteram[i+2] << 6);
@@ -303,7 +303,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int flipy	=	0;
 
 		x -= 0x4a/2;
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			y = 240 - y;
 			flipx = !flipx;

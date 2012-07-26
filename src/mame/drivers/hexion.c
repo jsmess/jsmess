@@ -87,16 +87,16 @@ Notes:
 #include "machine/k053252.h"
 
 
-static WRITE8_HANDLER( coincntr_w )
+WRITE8_MEMBER(hexion_state::coincntr_w)
 {
-//logerror("%04x: coincntr_w %02x\n",cpu_get_pc(&space->device()),data);
+//logerror("%04x: coincntr_w %02x\n",cpu_get_pc(&space.device()),data);
 
 	/* bits 0/1 = coin counters */
-	coin_counter_w(space->machine(), 0,data & 0x01);
-	coin_counter_w(space->machine(), 1,data & 0x02);
+	coin_counter_w(machine(), 0,data & 0x01);
+	coin_counter_w(machine(), 1,data & 0x02);
 
 	/* bit 5 = flip screen */
-	flip_screen_set(space->machine(), data & 0x20);
+	flip_screen_set(data & 0x20);
 
 	/* other bit unknown */
 if ((data & 0xdc) != 0x10) popmessage("coincntr %02x",data);
@@ -112,19 +112,19 @@ static WRITE_LINE_DEVICE_HANDLER( hexion_nmi_ack_w )
 	cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xdffe) AM_READWRITE(hexion_bankedram_r, hexion_bankedram_w)
 	AM_RANGE(0xdfff, 0xdfff) AM_WRITE(hexion_bankctrl_w)
-	AM_RANGE(0xe800, 0xe87f) AM_DEVREADWRITE("konami", k051649_waveform_r, k051649_waveform_w)
-	AM_RANGE(0xe880, 0xe889) AM_DEVWRITE(    "konami", k051649_frequency_w)
-	AM_RANGE(0xe88a, 0xe88e) AM_DEVWRITE(    "konami", k051649_volume_w)
-	AM_RANGE(0xe88f, 0xe88f) AM_DEVWRITE(    "konami", k051649_keyonoff_w)
-	AM_RANGE(0xe8e0, 0xe8ff) AM_DEVREADWRITE("konami", k051649_test_r, k051649_test_w)
-	AM_RANGE(0xf000, 0xf00f) AM_DEVREADWRITE("k053252",k053252_r,k053252_w)
-	AM_RANGE(0xf200, 0xf200) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
+	AM_RANGE(0xe800, 0xe87f) AM_DEVREADWRITE_LEGACY("konami", k051649_waveform_r, k051649_waveform_w)
+	AM_RANGE(0xe880, 0xe889) AM_DEVWRITE_LEGACY("konami", k051649_frequency_w)
+	AM_RANGE(0xe88a, 0xe88e) AM_DEVWRITE_LEGACY("konami", k051649_volume_w)
+	AM_RANGE(0xe88f, 0xe88f) AM_DEVWRITE_LEGACY("konami", k051649_keyonoff_w)
+	AM_RANGE(0xe8e0, 0xe8ff) AM_DEVREADWRITE_LEGACY("konami", k051649_test_r, k051649_test_w)
+	AM_RANGE(0xf000, 0xf00f) AM_DEVREADWRITE_LEGACY("k053252",k053252_r,k053252_w)
+	AM_RANGE(0xf200, 0xf200) AM_DEVWRITE("oki", okim6295_device, write)
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf402, 0xf402) AM_READ_PORT("P1")

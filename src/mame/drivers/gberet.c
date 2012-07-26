@@ -108,61 +108,59 @@ static TIMER_DEVICE_CALLBACK( gberet_interrupt_tick )
  *
  *************************************/
 
-static WRITE8_HANDLER( gberet_coin_counter_w )
+WRITE8_MEMBER(gberet_state::gberet_coin_counter_w)
 {
 	/* bits 0/1 = coin counters */
-	coin_counter_w(space->machine(), 0, data & 1);
-	coin_counter_w(space->machine(), 1, data & 2);
+	coin_counter_w(machine(), 0, data & 1);
+	coin_counter_w(machine(), 1, data & 2);
 }
 
-static WRITE8_HANDLER( mrgoemon_coin_counter_w )
+WRITE8_MEMBER(gberet_state::mrgoemon_coin_counter_w)
 {
 	/* bits 0/1 = coin counters */
-	coin_counter_w(space->machine(), 0, data & 1);
-	coin_counter_w(space->machine(), 1, data & 2);
+	coin_counter_w(machine(), 0, data & 1);
+	coin_counter_w(machine(), 1, data & 2);
 
 	/* bits 5-7 = ROM bank select */
-	memory_set_bank(space->machine(), "bank1", ((data & 0xe0) >> 5));
+	membank("bank1")->set_entry(((data & 0xe0) >> 5));
 }
 
-static WRITE8_HANDLER( gberet_flipscreen_w )
+WRITE8_MEMBER(gberet_state::gberet_flipscreen_w)
 {
-	gberet_state *state = space->machine().driver_data<gberet_state>();
 
 	/* bits 0/1/2 = interrupt enable */
-	UINT8 ack_mask = ~data & state->m_interrupt_mask; // 1->0
+	UINT8 ack_mask = ~data & m_interrupt_mask; // 1->0
 
 	if (ack_mask & 1)
-		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 
 	if (ack_mask & 6)
-		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+		cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 
-	state->m_interrupt_mask = data & 7;
+	m_interrupt_mask = data & 7;
 
 	/* bit 3 = flip screen */
-	flip_screen_set(space->machine(), data & 8);
+	flip_screen_set(data & 8);
 }
 
-static WRITE8_HANDLER( gberet_sound_w )
+WRITE8_MEMBER(gberet_state::gberet_sound_w)
 {
-	gberet_state *state = space->machine().driver_data<gberet_state>();
-	sn76496_w(space->machine().device("snsnd"), 0, *state->m_soundlatch);
+	sn76496_w(machine().device("snsnd"), 0, *m_soundlatch);
 }
 
-static ADDRESS_MAP_START( gberet_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gberet_map, AS_PROGRAM, 8, gberet_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE_MEMBER(gberet_state, m_colorram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE_MEMBER(gberet_state, m_videoram)
-	AM_RANGE(0xd000, 0xd0ff) AM_RAM AM_BASE_MEMBER(gberet_state, m_spriteram2)
-	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE_MEMBER(gberet_state, m_spriteram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd000, 0xd0ff) AM_RAM AM_SHARE("spriteram2")
+	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd200, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe03f) AM_RAM_WRITE(gberet_scroll_w) AM_BASE_MEMBER(gberet_state, m_scrollram)
+	AM_RANGE(0xe000, 0xe03f) AM_RAM_WRITE(gberet_scroll_w) AM_SHARE("scrollram")
 	AM_RANGE(0xe040, 0xe042) AM_WRITENOP // ???
 	AM_RANGE(0xe043, 0xe043) AM_WRITE(gberet_sprite_bank_w)
 	AM_RANGE(0xe044, 0xe044) AM_WRITE(gberet_flipscreen_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(gberet_coin_counter_w)
-	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE_MEMBER(gberet_state, m_soundlatch)
+	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2") AM_WRITEONLY AM_SHARE("soundlatch")
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW3") AM_WRITE(gberet_sound_w)
 	AM_RANGE(0xf600, 0xf600) AM_READ_PORT("DSW1") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xf601, 0xf601) AM_READ_PORT("P2")
@@ -170,19 +168,19 @@ static ADDRESS_MAP_START( gberet_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf603, 0xf603) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mrgoemon_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mrgoemon_map, AS_PROGRAM, 8, gberet_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE_MEMBER(gberet_state, m_colorram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE_MEMBER(gberet_state, m_videoram)
-	AM_RANGE(0xd000, 0xd0ff) AM_RAM AM_BASE_MEMBER(gberet_state, m_spriteram2)
-	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_BASE_MEMBER(gberet_state, m_spriteram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd000, 0xd0ff) AM_RAM AM_SHARE("spriteram2")
+	AM_RANGE(0xd100, 0xd1ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd200, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe03f) AM_RAM_WRITE(gberet_scroll_w) AM_BASE_MEMBER(gberet_state, m_scrollram)
+	AM_RANGE(0xe000, 0xe03f) AM_RAM_WRITE(gberet_scroll_w) AM_SHARE("scrollram")
 	AM_RANGE(0xe040, 0xe042) AM_WRITENOP // ???
 	AM_RANGE(0xe043, 0xe043) AM_WRITE(gberet_sprite_bank_w)
 	AM_RANGE(0xe044, 0xe044) AM_WRITE(gberet_flipscreen_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mrgoemon_coin_counter_w)
-	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE_MEMBER(gberet_state, m_soundlatch)
+	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2") AM_WRITEONLY AM_SHARE("soundlatch")
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW3") AM_WRITE(gberet_sound_w)
 	AM_RANGE(0xf600, 0xf600) AM_READ_PORT("DSW1") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xf601, 0xf601) AM_READ_PORT("P2")
@@ -192,35 +190,35 @@ static ADDRESS_MAP_START( mrgoemon_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( gberetb_flipscreen_w )
+WRITE8_MEMBER(gberet_state::gberetb_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 8);
+	flip_screen_set(data & 8);
 }
 
-static READ8_HANDLER( gberetb_irq_ack_r )
+READ8_MEMBER(gberet_state::gberetb_irq_ack_r)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 	return 0xff;
 }
 
-static WRITE8_HANDLER( gberetb_nmi_ack_w )
+WRITE8_MEMBER(gberet_state::gberetb_nmi_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( gberetb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gberetb_map, AS_PROGRAM, 8, gberet_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_BASE_MEMBER(gberet_state, m_colorram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_BASE_MEMBER(gberet_state, m_videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(gberet_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(gberet_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe03f) AM_RAM
 	AM_RANGE(0xe040, 0xe043) AM_WRITENOP // ???
 	AM_RANGE(0xe044, 0xe044) AM_WRITE(gberetb_flipscreen_w) // did hw even support flipscreen?
 	AM_RANGE(0xe800, 0xe8ff) AM_RAM
-	AM_RANGE(0xe900, 0xe9ff) AM_RAM AM_BASE_SIZE_MEMBER(gberet_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe900, 0xe9ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP // coin counter not supported
 	AM_RANGE(0xf200, 0xf200) AM_READ_PORT("DSW2")
-	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("snsnd", sn76496_w)
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("snsnd", sn76496_w)
 	AM_RANGE(0xf600, 0xf600) AM_READ_PORT("P2")
 	AM_RANGE(0xf601, 0xf601) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf602, 0xf602) AM_READ_PORT("P1")
@@ -575,8 +573,8 @@ ROM_END
 
 static DRIVER_INIT( mrgoemon )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x800);
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	machine.root_device().membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x800);
 }
 
 

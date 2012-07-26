@@ -11,12 +11,13 @@ class darius_state : public driver_device
 {
 public:
 	darius_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_fg_ram(*this, "fg_ram"){ }
 
 	/* memory pointers */
-	UINT16 *    m_spriteram;
-	UINT16 *    m_fg_ram;
-	size_t      m_spriteram_size;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_fg_ram;
 
 	/* video-related */
 	tilemap_t  *m_fg_tilemap;
@@ -61,12 +62,29 @@ public:
 	device_t *m_filter1_3r;
 	device_t *m_msm5205_l;
 	device_t *m_msm5205_r;
+	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
+	DECLARE_WRITE16_MEMBER(darius_watchdog_w);
+	DECLARE_READ16_MEMBER(darius_ioc_r);
+	DECLARE_WRITE16_MEMBER(darius_ioc_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(adpcm_command_w);
+	DECLARE_WRITE8_MEMBER(display_value);
+	DECLARE_WRITE8_MEMBER(darius_fm0_pan);
+	DECLARE_WRITE8_MEMBER(darius_fm1_pan);
+	DECLARE_WRITE8_MEMBER(darius_psg0_pan);
+	DECLARE_WRITE8_MEMBER(darius_psg1_pan);
+	DECLARE_WRITE8_MEMBER(darius_da_pan);
+	DECLARE_READ8_MEMBER(adpcm_command_read);
+	DECLARE_READ8_MEMBER(readport2);
+	DECLARE_READ8_MEMBER(readport3);
+	DECLARE_WRITE8_MEMBER(adpcm_nmi_disable);
+	DECLARE_WRITE8_MEMBER(adpcm_nmi_enable);
+	DECLARE_WRITE16_MEMBER(darius_fg_layer_w);
 };
 
 
 /*----------- defined in video/darius.c -----------*/
 
-WRITE16_HANDLER( darius_fg_layer_w );
 
 VIDEO_START( darius );
 SCREEN_UPDATE_IND16( darius_left );

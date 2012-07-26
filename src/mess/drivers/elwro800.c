@@ -44,6 +44,11 @@ public:
 	/* NR signal */
 	UINT8 m_NR;
 	UINT8 m_df_on_databus;
+
+	DECLARE_DIRECT_UPDATE_MEMBER(elwro800_direct_handler);
+	DECLARE_WRITE8_MEMBER(elwro800jr_fdc_control_w);
+	DECLARE_READ8_MEMBER(elwro800jr_io_r);
+	DECLARE_WRITE8_MEMBER(elwro800jr_io_w);
 };
 
 
@@ -54,12 +59,11 @@ public:
  * (note that in CP/J mode address 66 is used for FCB)
  *
  *************************************/
-DIRECT_UPDATE_HANDLER(elwro800_direct_handler)
+DIRECT_UPDATE_MEMBER(elwro800_state::elwro800_direct_handler)
 {
-	elwro800_state *state = machine.driver_data<elwro800_state>();
-	if (state->m_ram_at_0000 && address == 0x66)
+	if (m_ram_at_0000 && address == 0x66)
 	{
-		direct.explicit_configure(0x66, 0x66, 0, &state->m_df_on_databus);
+		direct.explicit_configure(0x66, 0x66, 0, &m_df_on_databus);
 		return ~0;
 	}
 	return address;
@@ -80,14 +84,14 @@ static const struct upd765_interface elwro800jr_upd765_interface =
 	{FLOPPY_0,FLOPPY_1, NULL, NULL}
 };
 
-static WRITE8_HANDLER(elwro800jr_fdc_control_w)
+WRITE8_MEMBER(elwro800_state::elwro800jr_fdc_control_w)
 {
-	device_t *fdc = space->machine().device("upd765");
+	device_t *fdc = machine().device("upd765");
 
-	floppy_mon_w(floppy_get_device(space->machine(), 0), !BIT(data, 0));
-	floppy_mon_w(floppy_get_device(space->machine(), 1), !BIT(data, 1));
-	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 0), 1,1);
-	floppy_drive_set_ready_state(floppy_get_device(space->machine(), 1), 1,1);
+	floppy_mon_w(floppy_get_device(machine(), 0), !BIT(data, 0));
+	floppy_mon_w(floppy_get_device(machine(), 1), !BIT(data, 1));
+	floppy_drive_set_ready_state(floppy_get_device(machine(), 0), 1,1);
+	floppy_drive_set_ready_state(floppy_get_device(machine(), 1), 1,1);
 
 	upd765_tc_w(fdc, data & 0x04);
 
@@ -102,7 +106,7 @@ static WRITE8_HANDLER(elwro800jr_fdc_control_w)
 
 static void elwro800jr_mmu_w(running_machine &machine, UINT8 data)
 {
-	UINT8 *prom = machine.region("proms")->base() + 0x200;
+	UINT8 *prom = machine.root_device().memregion("proms")->base() + 0x200;
 	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
 	UINT8 cs;
 	UINT8 ls175;
@@ -114,21 +118,21 @@ static void elwro800jr_mmu_w(running_machine &machine, UINT8 data)
 	if (!BIT(cs,0))
 	{
 		// rom BAS0
-		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x0000); /* BAS0 ROM */
+		state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x0000); /* BAS0 ROM */
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x0000, 0x1fff);
 		state->m_ram_at_0000 = 0;
 	}
 	else if (!BIT(cs,4))
 	{
 		// rom BOOT
-		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x4000); /* BOOT ROM */
+		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x4000); /* BOOT ROM */
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x0000, 0x1fff);
 		state->m_ram_at_0000 = 0;
 	}
 	else
 	{
 		// RAM
-		memory_set_bankptr(machine, "bank1", messram);
+		state->membank("bank1")->set_base(messram);
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x1fff, "bank1");
 		state->m_ram_at_0000 = 1;
 	}
@@ -136,12 +140,12 @@ static void elwro800jr_mmu_w(running_machine &machine, UINT8 data)
 	cs = prom[((0x2000 >> 10) | (ls175 << 6)) & 0x1ff];
 	if (!BIT(cs,1))
 	{
-		memory_set_bankptr(machine, "bank2", machine.region("maincpu")->base() + 0x2000);	/* BAS1 ROM */
+		state->membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x2000);	/* BAS1 ROM */
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x2000, 0x3fff);
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank2", messram + 0x2000); /* RAM */
+		state->membank("bank2")->set_base(messram + 0x2000); /* RAM */
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x2000, 0x3fff, "bank2");
 	}
 
@@ -219,11 +223,10 @@ static const centronics_interface elwro800jr_centronics_interface =
  *  0x??FE, 0x??7F, 0x??7B (read): keyboard reading
  *************************************/
 
-static READ8_HANDLER(elwro800jr_io_r)
+READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 {
-	UINT8 *prom = space->machine().region("proms")->base();
+	UINT8 *prom = memregion("proms")->base();
 	UINT8 cs = prom[offset & 0x1ff];
-	elwro800_state *state = space->machine().driver_data<elwro800_state>();
 
 	if (!BIT(cs,0))
 	{
@@ -233,7 +236,7 @@ static READ8_HANDLER(elwro800jr_io_r)
 		int i;
 		char port_name[6] = "LINE0";
 
-		if ( !state->m_NR )
+		if ( !m_NR )
 		{
 			for (i = 0; i < 9; mask >>= 1, i++)
 			{
@@ -247,24 +250,24 @@ static READ8_HANDLER(elwro800jr_io_r)
 					{
 						port_name[4] = '0' + (7 - i);
 					}
-					data &= (input_port_read(space->machine(), port_name));
+					data &= (ioport(port_name)->read());
 				}
 			}
 
 			if ((offset & 0xff) == 0xfb)
 			{
-				data &= input_port_read(space->machine(), "LINE9");
+				data &= ioport("LINE9")->read();
 			}
 
 			/* cassette input from wav */
-			if ((space->machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.0038 )
+			if ((machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0.0038 )
 			{
 				data &= ~0x40;
 			}
 		}
 		else
 		{
-			data = input_port_read(space->machine(), "NETWORK ID");
+			data = ioport("NETWORK ID")->read();
 		}
 
 		return data;
@@ -276,13 +279,13 @@ static READ8_HANDLER(elwro800jr_io_r)
 	else if (!BIT(cs,2))
 	{
 		// CS55
-		i8255_device *ppi = space->machine().device<i8255_device>("ppi8255");
-		return ppi->read(*space, (offset & 0x03) ^ 0x03);
+		i8255_device *ppi = machine().device<i8255_device>("ppi8255");
+		return ppi->read(space, (offset & 0x03) ^ 0x03);
 	}
 	else if (!BIT(cs,3))
 	{
 		// CSFDC
-		device_t *fdc = space->machine().device("upd765");
+		device_t *fdc = machine().device("upd765");
 		if (offset & 1)
 		{
 			return upd765_data_r(fdc,0);
@@ -295,14 +298,14 @@ static READ8_HANDLER(elwro800jr_io_r)
 	else if (!BIT(cs,4))
 	{
 		// CS51
-		i8251_device *usart = space->machine().device<i8251_device>("i8251");
+		i8251_device *usart = machine().device<i8251_device>("i8251");
 		if (offset & 1)
 		{
-			return usart->status_r(*space, 0);
+			return usart->status_r(space, 0);
 		}
 		else
 		{
-			return usart->data_r(*space, 0);
+			return usart->data_r(space, 0);
 		}
 	}
 	else if (!BIT(cs,5))
@@ -316,9 +319,9 @@ static READ8_HANDLER(elwro800jr_io_r)
 	return 0x00;
 }
 
-static WRITE8_HANDLER(elwro800jr_io_w)
+WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
 {
-	UINT8 *prom = space->machine().region("proms")->base();
+	UINT8 *prom = memregion("proms")->base();
 	UINT8 cs = prom[offset & 0x1ff];
 
 	if (!BIT(cs,0))
@@ -329,18 +332,18 @@ static WRITE8_HANDLER(elwro800jr_io_w)
 	else if (!BIT(cs,1))
 	{
 		// CF7
-		elwro800jr_mmu_w(space->machine(), data);
+		elwro800jr_mmu_w(machine(), data);
 	}
 	else if (!BIT(cs,2))
 	{
 		// CS55
-		i8255_device *ppi = space->machine().device<i8255_device>("ppi8255");
-		ppi->write(*space, (offset & 0x03) ^ 0x03, data);
+		i8255_device *ppi = machine().device<i8255_device>("ppi8255");
+		ppi->write(space, (offset & 0x03) ^ 0x03, data);
 	}
 	else if (!BIT(cs,3))
 	{
 		// CSFDC
-		device_t *fdc = space->machine().device("upd765");
+		device_t *fdc = machine().device("upd765");
 		if (offset & 1)
 		{
 			upd765_data_w(fdc, 0, data);
@@ -349,14 +352,14 @@ static WRITE8_HANDLER(elwro800jr_io_w)
 	else if (!BIT(cs,4))
 	{
 		// CS51
-		i8251_device *usart = space->machine().device<i8251_device>("i8251");
+		i8251_device *usart = machine().device<i8251_device>("i8251");
 		if (offset & 1)
 		{
-			usart->control_w(*space, 0, data);
+			usart->control_w(space, 0, data);
 		}
 		else
 		{
-			usart->data_w(*space, 0, data);
+			usart->data_w(space, 0, data);
 		}
 	}
 	else if (!BIT(cs,5))
@@ -376,13 +379,13 @@ static WRITE8_HANDLER(elwro800jr_io_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START(elwro800_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(elwro800_mem, AS_PROGRAM, 8, elwro800_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x4000, 0xffff) AM_RAMBANK("bank3")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(elwro800_io, AS_IO, 8)
+static ADDRESS_MAP_START(elwro800_io, AS_IO, 8, elwro800_state )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(elwro800jr_io_r, elwro800jr_io_w)
 ADDRESS_MAP_END
 
@@ -512,7 +515,7 @@ static MACHINE_RESET(elwro800)
 	state->m_df_on_databus = 0xdf;
 	memset(messram, 0, 64*1024);
 
-	memory_set_bankptr(machine, "bank3", messram + 0x4000);
+	state->membank("bank3")->set_base(messram + 0x4000);
 
 	state->m_port_7ffd_data = 0;
 	state->m_port_1ffd_data = -1;
@@ -520,7 +523,7 @@ static MACHINE_RESET(elwro800)
 	// this is a reset of ls175 in mmu
 	elwro800jr_mmu_w(machine, 0);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(elwro800_direct_handler), &machine));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(elwro800_state::elwro800_direct_handler), state));
 }
 
 static const cassette_interface elwro800jr_cassette_interface =

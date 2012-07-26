@@ -7,7 +7,6 @@
 It requires a floppy disk to boot from.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -22,7 +21,8 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_terminal(*this, TERMINAL_TAG)
-	{ }
+	,
+		m_ccs_ram(*this, "ccs_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -30,7 +30,7 @@ public:
 	DECLARE_READ8_MEMBER( ccs2422_11_r );
 	DECLARE_WRITE8_MEMBER( ccs2422_10_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	UINT8 *m_ccs_ram;
+	required_shared_ptr<UINT8> m_ccs_ram;
 	UINT8 m_term_data;
 	virtual void machine_reset();
 };
@@ -55,7 +55,7 @@ WRITE8_MEMBER( ccs2422_state::ccs2422_10_w )
 
 static ADDRESS_MAP_START(ccs2422_mem, AS_PROGRAM, 8, ccs2422_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE(m_ccs_ram)
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("ccs_ram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ccs2422_io, AS_IO, 8, ccs2422_state)
@@ -72,7 +72,7 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(ccs2422_state)
 {
-	UINT8* user1 = machine().region("user1")->base();
+	UINT8* user1 = memregion("user1")->base();
 	memcpy((UINT8*)m_ccs_ram, user1, 0x0800);
 
 	// this should be rom/ram banking

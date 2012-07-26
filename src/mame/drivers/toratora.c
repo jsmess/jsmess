@@ -27,11 +27,11 @@ class toratora_state : public driver_device
 {
 public:
 	toratora_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *    m_videoram;
-	size_t     m_videoram_size;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* video-related */
 	int        m_timer;
@@ -43,6 +43,9 @@ public:
 	pia6821_device *m_pia_u1;
 	pia6821_device *m_pia_u2;
 	pia6821_device *m_pia_u3;
+	DECLARE_WRITE8_MEMBER(clear_tv_w);
+	DECLARE_READ8_MEMBER(timer_r);
+	DECLARE_WRITE8_MEMBER(clear_timer_w);
 };
 
 
@@ -70,7 +73,7 @@ static SCREEN_UPDATE_RGB32( toratora )
 	toratora_state *state = screen.machine().driver_data<toratora_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{
 		int i;
 
@@ -98,10 +101,9 @@ static SCREEN_UPDATE_RGB32( toratora )
 }
 
 
-static WRITE8_HANDLER( clear_tv_w )
+WRITE8_MEMBER(toratora_state::clear_tv_w)
 {
-	toratora_state *state = space->machine().driver_data<toratora_state>();
-	state->m_clear_tv = 1;
+	m_clear_tv = 1;
 }
 
 
@@ -146,26 +148,24 @@ static INTERRUPT_GEN( toratora_timer )
 	if (state->m_timer & 0x100)
 		popmessage("watchdog!");
 
-	if (state->m_last != (input_port_read(device->machine(), "INPUT") & 0x0f))
+	if (state->m_last != (state->ioport("INPUT")->read() & 0x0f))
 	{
-		state->m_last = input_port_read(device->machine(), "INPUT") & 0x0f;
+		state->m_last = state->ioport("INPUT")->read() & 0x0f;
 		generic_pulse_irq_line(device, 0, 1);
 	}
-	state->m_pia_u1->set_a_input(input_port_read(device->machine(), "INPUT") & 0x0f, 0);
-	state->m_pia_u1->ca1_w(input_port_read(device->machine(), "INPUT") & 0x10);
-	state->m_pia_u1->ca2_w(input_port_read(device->machine(), "INPUT") & 0x20);
+	state->m_pia_u1->set_a_input(device->machine().root_device().ioport("INPUT")->read() & 0x0f, 0);
+	state->m_pia_u1->ca1_w(device->machine().root_device().ioport("INPUT")->read() & 0x10);
+	state->m_pia_u1->ca2_w(device->machine().root_device().ioport("INPUT")->read() & 0x20);
 }
 
-static READ8_HANDLER( timer_r )
+READ8_MEMBER(toratora_state::timer_r)
 {
-	toratora_state *state = space->machine().driver_data<toratora_state>();
-	return state->m_timer;
+	return m_timer;
 }
 
-static WRITE8_HANDLER( clear_timer_w )
+WRITE8_MEMBER(toratora_state::clear_timer_w)
 {
-	toratora_state *state = space->machine().driver_data<toratora_state>();
-	state->m_timer = 0;
+	m_timer = 0;
 }
 
 
@@ -308,18 +308,18 @@ static const pia6821_interface pia_u3_intf =
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, toratora_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x7fff) AM_ROM  /* not fully populated */
-	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE_SIZE_MEMBER(toratora_state, m_videoram, m_videoram_size)
+	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xa000, 0xf047) AM_NOP
 	AM_RANGE(0xf048, 0xf049) AM_NOP
 	AM_RANGE(0xf04a, 0xf04a) AM_WRITE(clear_tv_w)	/* the read is mark *LEDEN, but not used */
 	AM_RANGE(0xf04b, 0xf04b) AM_READWRITE(timer_r, clear_timer_w)
 	AM_RANGE(0xa04c, 0xf09f) AM_NOP
-	AM_RANGE(0xf0a0, 0xf0a3) AM_DEVREADWRITE_MODERN("pia_u1", pia6821_device, read, write)
-	AM_RANGE(0xf0a4, 0xf0a7) AM_DEVREADWRITE_MODERN("pia_u3", pia6821_device, read, write)
-	AM_RANGE(0xf0a8, 0xf0ab) AM_DEVREADWRITE_MODERN("pia_u2", pia6821_device, read, write)
+	AM_RANGE(0xf0a0, 0xf0a3) AM_DEVREADWRITE("pia_u1", pia6821_device, read, write)
+	AM_RANGE(0xf0a4, 0xf0a7) AM_DEVREADWRITE("pia_u3", pia6821_device, read, write)
+	AM_RANGE(0xf0a8, 0xf0ab) AM_DEVREADWRITE("pia_u2", pia6821_device, read, write)
 	AM_RANGE(0xf0ac, 0xf7ff) AM_NOP
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END

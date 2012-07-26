@@ -95,11 +95,13 @@ static void palette_init_common( running_machine &machine, const UINT8 *color_pr
 
 PALETTE_INIT( ladybug )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	palette_init_common(machine, color_prom, 0x20, 0, 5, 2, 6, 4, 7);
 }
 
 PALETTE_INIT( sraider )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* the resistor net may be probably different than Lady Bug */
@@ -135,32 +137,29 @@ PALETTE_INIT( sraider )
 	colortable_entry_set_value(machine.colortable, 0x81, 0x40);
 }
 
-WRITE8_HANDLER( ladybug_videoram_w )
+WRITE8_MEMBER(ladybug_state::ladybug_videoram_w)
 {
-	ladybug_state *state = space->machine().driver_data<ladybug_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( ladybug_colorram_w )
+WRITE8_MEMBER(ladybug_state::ladybug_colorram_w)
 {
-	ladybug_state *state = space->machine().driver_data<ladybug_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( ladybug_flipscreen_w )
+WRITE8_MEMBER(ladybug_state::ladybug_flipscreen_w)
 {
-	if (flip_screen_get(space->machine()) != (data & 0x01))
+	if (flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(space->machine(), data & 0x01);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(data & 0x01);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( sraider_io_w )
+WRITE8_MEMBER(ladybug_state::sraider_io_w)
 {
-	ladybug_state *state = space->machine().driver_data<ladybug_state>();
 
 	// bit7 = flip
 	// bit6 = grid red
@@ -169,15 +168,15 @@ WRITE8_HANDLER( sraider_io_w )
 	// bit3 = enable stars
 	// bit210 = stars speed/dir
 
-	if (flip_screen_get(space->machine()) != (data & 0x80))
+	if (flip_screen() != (data & 0x80))
 	{
-		flip_screen_set(space->machine(), data & 0x80);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(data & 0x80);
+		machine().tilemap().mark_all_dirty();
 	}
 
-	state->m_grid_color = data & 0x70;
+	m_grid_color = data & 0x70;
 
-	redclash_set_stars_enable(space->machine(), (data & 0x08) >> 3);
+	redclash_set_stars_enable(machine(), (data & 0x08) >> 3);
 
 	/*
      * There must be a subtle clocking difference between
@@ -185,7 +184,7 @@ WRITE8_HANDLER( sraider_io_w )
      * hence the -1 here
      */
 
-	redclash_set_stars_speed(space->machine(), (data & 0x07) - 1);
+	redclash_set_stars_speed(machine(), (data & 0x07) - 1);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -237,7 +236,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram_size - 2 * 0x40; offs >= 2 * 0x40; offs -= 0x40)
+	for (offs = state->m_spriteram.bytes() - 2 * 0x40; offs >= 2 * 0x40; offs -= 0x40)
 	{
 		int i = 0;
 
@@ -295,7 +294,7 @@ SCREEN_UPDATE_IND16( ladybug )
 		int sx = offs % 4;
 		int sy = offs / 4;
 
-		if (flip_screen_get(screen.machine()))
+		if (state->flip_screen())
 			state->m_bg_tilemap->set_scrollx(offs, -state->m_videoram[32 * sx + sy]);
 		else
 			state->m_bg_tilemap->set_scrollx(offs, state->m_videoram[32 * sx + sy]);
@@ -328,7 +327,7 @@ SCREEN_UPDATE_IND16( sraider )
 		int sx = offs % 4;
 		int sy = offs / 4;
 
-		if (flip_screen_get(screen.machine()))
+		if (state->flip_screen())
 			state->m_bg_tilemap->set_scrollx(offs, -state->m_videoram[32 * sx + sy]);
 		else
 			state->m_bg_tilemap->set_scrollx(offs, state->m_videoram[32 * sx + sy]);
@@ -338,7 +337,7 @@ SCREEN_UPDATE_IND16( sraider )
 	bitmap.fill(0, cliprect);
 
 	// draw the stars
-	if (flip_screen_get(screen.machine()))
+	if (state->flip_screen())
 		redclash_draw_stars(screen.machine(), bitmap, cliprect, 0x60, 1, 0x27, 0xff);
 	else
 		redclash_draw_stars(screen.machine(), bitmap, cliprect, 0x60, 1, 0x00, 0xd8);
@@ -347,7 +346,7 @@ SCREEN_UPDATE_IND16( sraider )
 	colortable_palette_set_color(screen.machine().colortable, 0x40, MAKE_RGB(state->m_grid_color & 0x40 ? 0xff : 0,
 		            														 state->m_grid_color & 0x20 ? 0xff : 0,
 		            														 state->m_grid_color & 0x10 ? 0xff : 0));
-	state->m_grid_tilemap->draw(bitmap, cliprect, 0, flip_screen_get(screen.machine()));
+	state->m_grid_tilemap->draw(bitmap, cliprect, 0, state->flip_screen());
 
 	for (i = 0; i < 0x100; i++)
 	{
@@ -356,7 +355,7 @@ SCREEN_UPDATE_IND16( sraider )
 			UINT8 x = i;
 			int height = cliprect.max_y - cliprect.min_y + 1;
 
-			if (flip_screen_get(screen.machine()))
+			if (state->flip_screen())
 				x = ~x;
 
 			bitmap.plot_box(x, cliprect.min_y, 1, height, 0x81);
@@ -364,7 +363,7 @@ SCREEN_UPDATE_IND16( sraider )
 	}
 
 	// now the chars
-	state->m_bg_tilemap->draw(bitmap, cliprect, 0, flip_screen_get(screen.machine()));
+	state->m_bg_tilemap->draw(bitmap, cliprect, 0, state->flip_screen());
 
 	// now the sprites
 	draw_sprites(screen.machine(), bitmap, cliprect);

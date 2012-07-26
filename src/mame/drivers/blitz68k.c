@@ -43,19 +43,108 @@ class blitz68k_state : public driver_device
 public:
 	blitz68k_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") { }
+		  m_nvram(*this, "nvram"),
+		  m_frame_buffer(*this, "frame_buffer"),
+		  m_blit_romaddr(*this, "blit_romaddr"),
+		  m_blit_attr1_ram(*this, "blit_attr1_ram"),
+		  m_blit_dst_ram_loword(*this, "blitram_loword"),
+		  m_blit_attr2_ram(*this, "blit_attr2_ram"),
+		  m_blit_dst_ram_hiword(*this, "blitram_hiword"),
+		  m_blit_vregs(*this, "blit_vregs"),
+		  m_blit_transpen(*this, "blit_transpen"),
+		  m_leds0(*this, "leds0"),
+		  m_leds1(*this, "leds1"),
+		  m_leds2(*this, "leds2") { }
 
 	optional_shared_ptr<UINT16>	m_nvram;
 	UINT8 *m_blit_buffer;
-	UINT16 *m_frame_buffer;
-	UINT16 *m_blit_romaddr;
-	UINT16 *m_blit_attr1_ram;
-	UINT16 *m_blit_dst_ram_loword;
-	UINT16 *m_blit_attr2_ram;
-	UINT16 *m_blit_dst_ram_hiword;
-	UINT16 *m_blit_vregs;
-	UINT16 *m_blit_transpen;
-	UINT16 *m_leds[3];
+	optional_shared_ptr<UINT16> m_frame_buffer;
+	optional_shared_ptr<UINT16> m_blit_romaddr;
+	optional_shared_ptr<UINT16> m_blit_attr1_ram;
+	optional_shared_ptr<UINT16> m_blit_dst_ram_loword;
+	optional_shared_ptr<UINT16> m_blit_attr2_ram;
+	optional_shared_ptr<UINT16> m_blit_dst_ram_hiword;
+	optional_shared_ptr<UINT16> m_blit_vregs;
+	optional_shared_ptr<UINT16> m_blit_transpen;
+	optional_shared_ptr<UINT16> m_leds0;
+	optional_shared_ptr<UINT16> m_leds1;
+	optional_shared_ptr<UINT16> m_leds2;
+	DECLARE_WRITE16_MEMBER(blit_copy_w);
+	DECLARE_READ8_MEMBER(blit_status_r);
+	DECLARE_WRITE8_MEMBER(blit_x_w);
+	DECLARE_WRITE8_MEMBER(blit_y_w);
+	DECLARE_WRITE8_MEMBER(blit_xy_w);
+	DECLARE_WRITE8_MEMBER(blit_w_w);
+	DECLARE_WRITE8_MEMBER(blit_h_w);
+	DECLARE_WRITE8_MEMBER(blit_wh_w);
+	DECLARE_WRITE8_MEMBER(blit_addr0_w);
+	DECLARE_WRITE8_MEMBER(blit_addr1_w);
+	DECLARE_WRITE8_MEMBER(blit_addr01_w);
+	DECLARE_WRITE8_MEMBER(blit_addr2_w);
+	DECLARE_WRITE8_MEMBER(blit_pens_w);
+	DECLARE_WRITE8_MEMBER(blit_pen0_w);
+	DECLARE_WRITE8_MEMBER(blit_pen1_w);
+	DECLARE_WRITE8_MEMBER(blit_pen2_w);
+	DECLARE_WRITE8_MEMBER(blit_pen3_w);
+	DECLARE_WRITE8_MEMBER(blit_flag0_w);
+	DECLARE_WRITE8_MEMBER(blit_flag1_w);
+	DECLARE_WRITE8_MEMBER(blit_flipx_w);
+	DECLARE_WRITE8_MEMBER(blit_flipy_w);
+	DECLARE_WRITE8_MEMBER(blit_solid_w);
+	DECLARE_WRITE8_MEMBER(blit_trans_w);
+	DECLARE_WRITE8_MEMBER(blit_flag6_w);
+	DECLARE_WRITE8_MEMBER(blit_flag7_w);
+	DECLARE_WRITE8_MEMBER(blit_flags_w);
+	DECLARE_WRITE8_MEMBER(blit_draw_w);
+	DECLARE_WRITE8_MEMBER(blit_hwyxa_draw_w);
+	DECLARE_READ16_MEMBER(blitter_status_r);
+	DECLARE_WRITE16_MEMBER(lamps_w);
+	DECLARE_READ16_MEMBER(test_r);
+	DECLARE_WRITE16_MEMBER(irq_callback_w);
+	DECLARE_WRITE16_MEMBER(sound_write_w);
+	DECLARE_READ8_MEMBER(bankrob_mcu1_r);
+	DECLARE_READ8_MEMBER(bankrob_mcu2_r);
+	DECLARE_READ8_MEMBER(bankrob_mcu_status_read_r);
+	DECLARE_READ8_MEMBER(bankrob_mcu_status_write_r);
+	DECLARE_WRITE8_MEMBER(bankrob_mcu1_w);
+	DECLARE_WRITE8_MEMBER(bankrob_mcu2_w);
+	DECLARE_READ8_MEMBER(bankroba_mcu1_r);
+	DECLARE_READ8_MEMBER(bankroba_mcu2_r);
+	DECLARE_READ8_MEMBER(bankroba_mcu1_status_write_r);
+	DECLARE_READ8_MEMBER(bankroba_mcu2_status_write_r);
+	DECLARE_WRITE8_MEMBER(bankroba_mcu1_w);
+	DECLARE_WRITE8_MEMBER(bankroba_mcu2_w);
+	DECLARE_WRITE16_MEMBER(cjffruit_leds1_w);
+	DECLARE_WRITE16_MEMBER(cjffruit_leds2_w);
+	DECLARE_WRITE16_MEMBER(cjffruit_leds3_w);
+	DECLARE_READ8_MEMBER(crtc_r);
+	DECLARE_WRITE8_MEMBER(crtc_w);
+	DECLARE_READ16_MEMBER(cjffruit_mcu_r);
+	DECLARE_WRITE16_MEMBER(cjffruit_mcu_w);
+	DECLARE_READ16_MEMBER(deucesw2_mcu_r);
+	DECLARE_WRITE16_MEMBER(deucesw2_mcu_w);
+	DECLARE_WRITE16_MEMBER(deucesw2_leds1_w);
+	DECLARE_WRITE16_MEMBER(deucesw2_leds2_w);
+	DECLARE_WRITE16_MEMBER(deucesw2_leds3_w);
+	DECLARE_READ8_MEMBER(dualgame_mcu1_r);
+	DECLARE_READ8_MEMBER(dualgame_mcu2_r);
+	DECLARE_READ8_MEMBER(dualgame_mcu_status_read_r);
+	DECLARE_READ8_MEMBER(dualgame_mcu_status_write_r);
+	DECLARE_WRITE8_MEMBER(dualgame_mcu1_w);
+	DECLARE_WRITE8_MEMBER(dualgame_mcu2_w);
+	DECLARE_READ16_MEMBER(hermit_mcu_r);
+	DECLARE_WRITE16_MEMBER(hermit_mcu_w);
+	DECLARE_WRITE16_MEMBER(hermit_leds1_w);
+	DECLARE_WRITE16_MEMBER(hermit_leds2_w);
+	DECLARE_READ16_MEMBER(hermit_track_r);
+	DECLARE_READ8_MEMBER(maxidbl_mcu1_r);
+	DECLARE_READ8_MEMBER(maxidbl_mcu2_r);
+	DECLARE_READ8_MEMBER(maxidbl_mcu_status_read_r);
+	DECLARE_READ8_MEMBER(maxidbl_mcu_status_write_r);
+	DECLARE_WRITE8_MEMBER(maxidbl_mcu1_w);
+	DECLARE_WRITE8_MEMBER(maxidbl_mcu2_w);
+	void show_leds123();
+	void show_leds12();
 };
 
 /*************************************************************************************************************
@@ -151,25 +240,24 @@ static SCREEN_UPDATE_RGB32(blitz68k_noblit)
 *************************************************************************************************************/
 
 
-static WRITE16_HANDLER( blit_copy_w )
+WRITE16_MEMBER(blitz68k_state::blit_copy_w)
 {
-	blitz68k_state *state = space->machine().driver_data<blitz68k_state>();
-	UINT8 *blit_rom = space->machine().region("blitter")->base();
+	UINT8 *blit_rom = memregion("blitter")->base();
 	UINT32 blit_dst_xpos;
 	UINT32 blit_dst_ypos;
 	int x,y,x_size,y_size;
 	UINT32 src;
 
-	logerror("blit copy %04x %04x %04x %04x %04x\n", state->m_blit_romaddr[0], state->m_blit_attr1_ram[0], state->m_blit_dst_ram_loword[0], state->m_blit_attr2_ram[0], state->m_blit_dst_ram_hiword[0] );
-	logerror("blit vregs %04x %04x %04x %04x\n",state->m_blit_vregs[0/2],state->m_blit_vregs[2/2],state->m_blit_vregs[4/2],state->m_blit_vregs[6/2]);
-	logerror("blit transpen %04x %04x %04x %04x %04x %04x %04x %04x\n",state->m_blit_transpen[0/2],state->m_blit_transpen[2/2],state->m_blit_transpen[4/2],state->m_blit_transpen[6/2],
-	                                                               state->m_blit_transpen[8/2],state->m_blit_transpen[10/2],state->m_blit_transpen[12/2],state->m_blit_transpen[14/2]);
+	logerror("blit copy %04x %04x %04x %04x %04x\n", m_blit_romaddr[0], m_blit_attr1_ram[0], m_blit_dst_ram_loword[0], m_blit_attr2_ram[0], m_blit_dst_ram_hiword[0] );
+	logerror("blit vregs %04x %04x %04x %04x\n",m_blit_vregs[0/2],m_blit_vregs[2/2],m_blit_vregs[4/2],m_blit_vregs[6/2]);
+	logerror("blit transpen %04x %04x %04x %04x %04x %04x %04x %04x\n",m_blit_transpen[0/2],m_blit_transpen[2/2],m_blit_transpen[4/2],m_blit_transpen[6/2],
+	                                                               m_blit_transpen[8/2],m_blit_transpen[10/2],m_blit_transpen[12/2],m_blit_transpen[14/2]);
 
-	blit_dst_xpos = (state->m_blit_dst_ram_loword[0] & 0x00ff)*2;
-	blit_dst_ypos = ((state->m_blit_dst_ram_loword[0] & 0xff00)>>8);
+	blit_dst_xpos = (m_blit_dst_ram_loword[0] & 0x00ff)*2;
+	blit_dst_ypos = ((m_blit_dst_ram_loword[0] & 0xff00)>>8);
 
-	y_size = (0x100-((state->m_blit_attr2_ram[0] & 0xff00)>>8));
-	x_size = (state->m_blit_attr2_ram[0] & 0x00ff)*2;
+	y_size = (0x100-((m_blit_attr2_ram[0] & 0xff00)>>8));
+	x_size = (m_blit_attr2_ram[0] & 0x00ff)*2;
 
 	/* rounding around for 0 size */
 	if(x_size == 0) { x_size = 0x200; }
@@ -177,8 +265,8 @@ static WRITE16_HANDLER( blit_copy_w )
 	/* TODO: used by steaser "Game Over" msg on attract mode*/
 //  if(y_size == 1) { y_size = 32; }
 
-	src = state->m_blit_romaddr[0] | (state->m_blit_attr1_ram[0] & 0x1f00)<<8;
-//  src|= (state->m_blit_transpen[0xc/2] & 0x0100)<<12;
+	src = m_blit_romaddr[0] | (m_blit_attr1_ram[0] & 0x1f00)<<8;
+//  src|= (m_blit_transpen[0xc/2] & 0x0100)<<12;
 
 	for(y=0;y<y_size;y++)
 	{
@@ -186,20 +274,20 @@ static WRITE16_HANDLER( blit_copy_w )
 		{
 			int drawx = (blit_dst_xpos+x)&0x1ff;
 			int drawy = (blit_dst_ypos+y)&0x0ff;
-			if(state->m_blit_transpen[0x8/2] & 0x100)
-				state->m_blit_buffer[drawy*512+drawx] = ((state->m_blit_vregs[0] & 0xf00)>>8);
+			if(m_blit_transpen[0x8/2] & 0x100)
+				m_blit_buffer[drawy*512+drawx] = ((m_blit_vregs[0] & 0xf00)>>8);
 			else
 			{
 				UINT8 pen_helper;
 
 				pen_helper = blit_rom[src] & 0xff;
-				if(state->m_blit_transpen[0xa/2] & 0x100) //pen is opaque register
+				if(m_blit_transpen[0xa/2] & 0x100) //pen is opaque register
 				{
 					if(pen_helper)
-						state->m_blit_buffer[drawy*512+drawx] = ((pen_helper & 0xff) <= 3) ? ((state->m_blit_vregs[pen_helper] & 0xf00)>>8) : blit_rom[src];
+						m_blit_buffer[drawy*512+drawx] = ((pen_helper & 0xff) <= 3) ? ((m_blit_vregs[pen_helper] & 0xf00)>>8) : blit_rom[src];
 				}
 				else
-					state->m_blit_buffer[drawy*512+drawx] = ((pen_helper & 0xff) <= 3) ? ((state->m_blit_vregs[pen_helper] & 0xf00)>>8) : blit_rom[src];
+					m_blit_buffer[drawy*512+drawx] = ((pen_helper & 0xff) <= 3) ? ((m_blit_vregs[pen_helper] & 0xf00)>>8) : blit_rom[src];
 			}
 
 			src++;
@@ -214,20 +302,20 @@ static WRITE16_HANDLER( blit_copy_w )
 
 *************************************************************************************************************/
 
-static READ8_HANDLER( blit_status_r )
+READ8_MEMBER(blitz68k_state::blit_status_r)
 {
 	return 0;	// bit 0 = blitter busy
 }
 
-static WRITE8_HANDLER( blit_x_w )
+WRITE8_MEMBER(blitz68k_state::blit_x_w)
 {
 	blit.x = data;
 }
-static WRITE8_HANDLER( blit_y_w )
+WRITE8_MEMBER(blitz68k_state::blit_y_w)
 {
 	blit.y = data;
 }
-static WRITE8_HANDLER( blit_xy_w )
+WRITE8_MEMBER(blitz68k_state::blit_xy_w)
 {
 	if (offset)
 		blit_x_w(space, offset, data);
@@ -236,15 +324,15 @@ static WRITE8_HANDLER( blit_xy_w )
 }
 
 
-static WRITE8_HANDLER( blit_w_w )
+WRITE8_MEMBER(blitz68k_state::blit_w_w)
 {
 	blit.w = data;
 }
-static WRITE8_HANDLER( blit_h_w )
+WRITE8_MEMBER(blitz68k_state::blit_h_w)
 {
 	blit.h = data;
 }
-static WRITE8_HANDLER( blit_wh_w )
+WRITE8_MEMBER(blitz68k_state::blit_wh_w)
 {
 	if (offset)
 		blit_w_w(space, offset, data-1);
@@ -253,83 +341,83 @@ static WRITE8_HANDLER( blit_wh_w )
 }
 
 
-static WRITE8_HANDLER( blit_addr0_w )
+WRITE8_MEMBER(blitz68k_state::blit_addr0_w)
 {
 	blit.addr[0] = data;
 }
-static WRITE8_HANDLER( blit_addr1_w )
+WRITE8_MEMBER(blitz68k_state::blit_addr1_w)
 {
 	blit.addr[1] = data;
 }
-static WRITE8_HANDLER( blit_addr01_w )
+WRITE8_MEMBER(blitz68k_state::blit_addr01_w)
 {
 	if (offset)
 		blit_addr0_w(space, offset, data);
 	else
 		blit_addr1_w(space, offset, data);
 }
-static WRITE8_HANDLER( blit_addr2_w )
+WRITE8_MEMBER(blitz68k_state::blit_addr2_w)
 {
 	blit.addr[2] = data;
 }
 
 
-static WRITE8_HANDLER( blit_pens_w )
+WRITE8_MEMBER(blitz68k_state::blit_pens_w)
 {
 	blit.pen[offset] = data;
 }
-static WRITE8_HANDLER( blit_pen0_w )
+WRITE8_MEMBER(blitz68k_state::blit_pen0_w)
 {
 	blit.pen[0] = data;
 }
-static WRITE8_HANDLER( blit_pen1_w )
+WRITE8_MEMBER(blitz68k_state::blit_pen1_w)
 {
 	blit.pen[1] = data;
 }
-static WRITE8_HANDLER( blit_pen2_w )
+WRITE8_MEMBER(blitz68k_state::blit_pen2_w)
 {
 	blit.pen[2] = data;
 }
-static WRITE8_HANDLER( blit_pen3_w )
+WRITE8_MEMBER(blitz68k_state::blit_pen3_w)
 {
 	blit.pen[3] = data;
 }
 
 
-static WRITE8_HANDLER( blit_flag0_w )
+WRITE8_MEMBER(blitz68k_state::blit_flag0_w)
 {
 	blit.flag[0] = data;
 }
-static WRITE8_HANDLER( blit_flag1_w )
+WRITE8_MEMBER(blitz68k_state::blit_flag1_w)
 {
 	blit.flag[1] = data;
 }
-static WRITE8_HANDLER( blit_flipx_w )
+WRITE8_MEMBER(blitz68k_state::blit_flipx_w)
 {
 	blit.flipx = data;
 }
-static WRITE8_HANDLER( blit_flipy_w )
+WRITE8_MEMBER(blitz68k_state::blit_flipy_w)
 {
 	blit.flipy = data;
 }
-static WRITE8_HANDLER( blit_solid_w )
+WRITE8_MEMBER(blitz68k_state::blit_solid_w)
 {
 	blit.solid = data;
 }
-static WRITE8_HANDLER( blit_trans_w )
+WRITE8_MEMBER(blitz68k_state::blit_trans_w)
 {
 	blit.trans = data;
 }
-static WRITE8_HANDLER( blit_flag6_w )
+WRITE8_MEMBER(blitz68k_state::blit_flag6_w)
 {
 	blit.flag[6] = data;
 }
-static WRITE8_HANDLER( blit_flag7_w )
+WRITE8_MEMBER(blitz68k_state::blit_flag7_w)
 {
 	blit.flag[7] = data;
 }
 
-static WRITE8_HANDLER( blit_flags_w )
+WRITE8_MEMBER(blitz68k_state::blit_flags_w)
 {
 	switch(offset)
 	{
@@ -340,17 +428,16 @@ static WRITE8_HANDLER( blit_flags_w )
 	}
 }
 
-static WRITE8_HANDLER( blit_draw_w )
+WRITE8_MEMBER(blitz68k_state::blit_draw_w)
 {
-	blitz68k_state *state = space->machine().driver_data<blitz68k_state>();
-	UINT8 *blit_rom  = space->machine().region("blitter")->base();
-	int blit_romsize = space->machine().region("blitter")->bytes();
+	UINT8 *blit_rom  = memregion("blitter")->base();
+	int blit_romsize = memregion("blitter")->bytes();
 	UINT32 blit_dst_xpos;
 	UINT32 blit_dst_ypos;
 	int x, y, x_size, y_size;
 	UINT32 src;
 
-	logerror("%s: blit x=%02x y=%02x w=%02x h=%02x addr=%02x%02x%02x pens=%02x %02x %02x %02x flag=%02x %02x %02x %02x - %02x %02x %02x %02x\n", space->machine().describe_context(),
+	logerror("%s: blit x=%02x y=%02x w=%02x h=%02x addr=%02x%02x%02x pens=%02x %02x %02x %02x flag=%02x %02x %02x %02x - %02x %02x %02x %02x\n", machine().describe_context(),
 				blit.x,  blit.y, blit.w, blit.h,
 				blit.addr[2], blit.addr[1], blit.addr[0],
 				blit.pen[0], blit.pen[1], blit.pen[2], blit.pen[3],
@@ -397,7 +484,7 @@ static WRITE8_HANDLER( blit_draw_w )
 				if (pen <= 3)
 					pen = blit.pen[pen] & 0xf;
 
-				state->m_blit_buffer[drawy * 512 + drawx] = pen;
+				m_blit_buffer[drawy * 512 + drawx] = pen;
 			}
 		}
 	}
@@ -409,7 +496,7 @@ static WRITE8_HANDLER( blit_draw_w )
 	blit.y = blit_dst_ypos;
 }
 
-static WRITE8_HANDLER( blit_hwyxa_draw_w )
+WRITE8_MEMBER(blitz68k_state::blit_hwyxa_draw_w)
 {
 	switch (offset)
 	{
@@ -428,16 +515,16 @@ static WRITE8_HANDLER( blit_hwyxa_draw_w )
     Outputs
 *************************************************************************************************************/
 
-static void show_leds123(blitz68k_state *state)
+void blitz68k_state::show_leds123()
 {
 #ifdef MAME_DEBUG
-	popmessage("led %02x %02x %02x", state->m_leds[0][0]>>8, state->m_leds[1][0]>>8, state->m_leds[2][0]>>8);
+	popmessage("led %02x %02x %02x", m_leds0[0]>>8, m_leds1[0]>>8, m_leds2[0]>>8);
 #endif
 }
-static void show_leds12(blitz68k_state *state)
+void blitz68k_state::show_leds12()
 {
 #ifdef MAME_DEBUG
-	popmessage("led %02x %02x", state->m_leds[0][0]>>8, state->m_leds[1][0]>>8);
+	popmessage("led %02x %02x", m_leds0[0]>>8, m_leds1[0]>>8);
 #endif
 }
 
@@ -448,37 +535,37 @@ static void show_leds12(blitz68k_state *state)
 *************************************************************************************************************/
 
 /*bit 0 is the blitter busy flag*/
-static READ16_HANDLER( blitter_status_r )
+READ16_MEMBER(blitz68k_state::blitter_status_r)
 {
 	return 0;
 }
 
 /*TODO*/
-static WRITE16_HANDLER( lamps_w )
+WRITE16_MEMBER(blitz68k_state::lamps_w)
 {
 //  popmessage("%02x",data);
 }
 
-static READ16_HANDLER( test_r )
+READ16_MEMBER(blitz68k_state::test_r)
 {
-	return 0xffff;//space->machine().rand();
+	return 0xffff;//machine().rand();
 }
 
 #if 0
-static WRITE16_HANDLER( irq_callback_w )
+WRITE16_MEMBER(blitz68k_state::irq_callback_w)
 {
 //  popmessage("%02x",data);
-	cputag_set_input_line(space->machine(), "maincpu", 3, HOLD_LINE );
+	cputag_set_input_line(machine(), "maincpu", 3, HOLD_LINE );
 }
 
-static WRITE16_HANDLER( sound_write_w )
+WRITE16_MEMBER(blitz68k_state::sound_write_w)
 {
 	popmessage("%02x",data);
 	dac_data_w(0, data & 0x0f);		/* Sound DAC? */
 }
 #endif
 
-static ADDRESS_MAP_START( ilpag_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ilpag_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x1fffff) AM_ROM AM_REGION("blitter", 0)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("nvram")
@@ -486,16 +573,16 @@ static ADDRESS_MAP_START( ilpag_map, AS_PROGRAM, 16 )
 //  AM_RANGE(0x800000, 0x800001) AM_READ(test_r)
 //  AM_RANGE(0x880000, 0x880001) AM_READ(test_r)
 
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0xff00 )
-	AM_RANGE(0x900004, 0x900005) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
-	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_transpen) //video registers for the blitter write
-	AM_RANGE(0x990000, 0x990007) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_vregs) //pens
-	AM_RANGE(0x998000, 0x998001) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_romaddr)
-	AM_RANGE(0x9a0000, 0x9a0001) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_attr1_ram)
-	AM_RANGE(0x9a8000, 0x9a8001) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_dst_ram_loword)
-	AM_RANGE(0x9b0000, 0x9b0001) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_attr2_ram)
-	AM_RANGE(0x9b8000, 0x9b8001) AM_RAM_WRITE( blit_copy_w ) AM_BASE_MEMBER(blitz68k_state, m_blit_dst_ram_hiword)
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0xff00 )
+	AM_RANGE(0x900004, 0x900005) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_SHARE("blit_transpen") //video registers for the blitter write
+	AM_RANGE(0x990000, 0x990007) AM_RAM AM_SHARE("blit_vregs") //pens
+	AM_RANGE(0x998000, 0x998001) AM_RAM AM_SHARE("blit_romaddr")
+	AM_RANGE(0x9a0000, 0x9a0001) AM_RAM AM_SHARE("blit_attr1_ram")
+	AM_RANGE(0x9a8000, 0x9a8001) AM_RAM AM_SHARE("blitram_loword")
+	AM_RANGE(0x9b0000, 0x9b0001) AM_RAM AM_SHARE("blit_attr2_ram")
+	AM_RANGE(0x9b8000, 0x9b8001) AM_RAM_WRITE(blit_copy_w ) AM_SHARE("blitram_hiword")
 	AM_RANGE(0x9e0000, 0x9e0001) AM_READ(blitter_status_r)
 
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(lamps_w)
@@ -505,7 +592,7 @@ static ADDRESS_MAP_START( ilpag_map, AS_PROGRAM, 16 )
 //  AM_RANGE(0xc00300, 0xc00301) AM_WRITE(irq_callback_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( steaser_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( steaser_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x1fffff) AM_ROM AM_REGION("blitter", 0)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("nvram")
@@ -515,17 +602,17 @@ static ADDRESS_MAP_START( steaser_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x880000, 0x880001) AM_READ(test_r)
 //  AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE(sound_write_w)
 
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0xff00 )
-	AM_RANGE(0x900004, 0x900005) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0xff00 )
+	AM_RANGE(0x900004, 0x900005) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
 	AM_RANGE(0x940000, 0x940001) AM_WRITENOP //? Seems a dword write for some read, written consecutively
-	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_transpen)//probably transparency pens
-	AM_RANGE(0x990000, 0x990005) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_vregs)
-	AM_RANGE(0x998000, 0x998001) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_romaddr)
-	AM_RANGE(0x9a0000, 0x9a0001) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_attr1_ram)
-	AM_RANGE(0x9a8000, 0x9a8001) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_dst_ram_loword)
-	AM_RANGE(0x9b0000, 0x9b0001) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_blit_attr2_ram)
-	AM_RANGE(0x9b8000, 0x9b8001) AM_RAM_WRITE( blit_copy_w ) AM_BASE_MEMBER(blitz68k_state, m_blit_dst_ram_hiword)
+	AM_RANGE(0x980000, 0x98000f) AM_RAM AM_SHARE("blit_transpen")//probably transparency pens
+	AM_RANGE(0x990000, 0x990005) AM_RAM AM_SHARE("blit_vregs")
+	AM_RANGE(0x998000, 0x998001) AM_RAM AM_SHARE("blit_romaddr")
+	AM_RANGE(0x9a0000, 0x9a0001) AM_RAM AM_SHARE("blit_attr1_ram")
+	AM_RANGE(0x9a8000, 0x9a8001) AM_RAM AM_SHARE("blitram_loword")
+	AM_RANGE(0x9b0000, 0x9b0001) AM_RAM AM_SHARE("blit_attr2_ram")
+	AM_RANGE(0x9b8000, 0x9b8001) AM_RAM_WRITE(blit_copy_w ) AM_SHARE("blitram_hiword")
 	AM_RANGE(0x9c0002, 0x9c0003) AM_READNOP //pen control?
 	AM_RANGE(0x9d0000, 0x9d0001) AM_READNOP //?
 	AM_RANGE(0x9e0000, 0x9e0001) AM_READ(blitter_status_r)
@@ -543,44 +630,44 @@ ADDRESS_MAP_END
 *************************************************************************************************************/
 
 // MCU simulation (to be done)
-static READ8_HANDLER( bankrob_mcu1_r )
+READ8_MEMBER(blitz68k_state::bankrob_mcu1_r)
 {
-	UINT8 ret = 0;	// space->machine().rand() gives "interesting" results
-	logerror("%s: mcu1 reads %02x\n", space->machine().describe_context(), ret);
+	UINT8 ret = 0;	// machine().rand() gives "interesting" results
+	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
-static READ8_HANDLER( bankrob_mcu2_r )
+READ8_MEMBER(blitz68k_state::bankrob_mcu2_r)
 {
-	UINT8 ret = 0;	// space->machine().rand() gives "interesting" results
-	logerror("%s: mcu2 reads %02x\n", space->machine().describe_context(), ret);
+	UINT8 ret = 0;	// machine().rand() gives "interesting" results
+	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-static READ8_HANDLER( bankrob_mcu_status_read_r )
+READ8_MEMBER(blitz68k_state::bankrob_mcu_status_read_r)
 {
 	return 0x03;	// bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
-static READ8_HANDLER( bankrob_mcu_status_write_r )
+READ8_MEMBER(blitz68k_state::bankrob_mcu_status_write_r)
 {
 	return 0x03;	// bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
-static WRITE8_HANDLER( bankrob_mcu1_w )
+WRITE8_MEMBER(blitz68k_state::bankrob_mcu1_w)
 {
-	logerror("%s: mcu1 written with %02x\n", space->machine().describe_context(), data);
+	logerror("%s: mcu1 written with %02x\n", machine().describe_context(), data);
 }
-static WRITE8_HANDLER( bankrob_mcu2_w )
+WRITE8_MEMBER(blitz68k_state::bankrob_mcu2_w)
 {
-	logerror("%s: mcu2 written with %02x\n", space->machine().describe_context(), data);
+	logerror("%s: mcu2 written with %02x\n", machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( bankrob_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bankrob_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 
-	AM_RANGE(0x220000, 0x220001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, index_r, 0xff00 )
-	AM_RANGE(0x220002, 0x220003) AM_DEVREAD8_MODERN("ramdac",ramdac_device, pal_r, 0xff00 )
+	AM_RANGE(0x220000, 0x220001) AM_DEVREAD8("ramdac",ramdac_device, index_r, 0xff00 )
+	AM_RANGE(0x220002, 0x220003) AM_DEVREAD8("ramdac",ramdac_device, pal_r, 0xff00 )
 
 	AM_RANGE(0x240000, 0x240001) AM_WRITE8(blit_addr0_w, 0xff00)
 	AM_RANGE(0x240002, 0x240003) AM_WRITE8(blit_addr1_w, 0xff00)
@@ -612,9 +699,9 @@ static ADDRESS_MAP_START( bankrob_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x2e000c, 0x2e000d) AM_WRITE8(blit_flag6_w, 0xff00)
 	AM_RANGE(0x2e000e, 0x2e000f) AM_WRITE8(blit_flag7_w, 0xff00)
 
-	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
-	AM_RANGE(0x300002, 0x300003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0xff00 )
-	AM_RANGE(0x300004, 0x300005) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x300002, 0x300003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0xff00 )
+	AM_RANGE(0x300004, 0x300005) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
 
 	AM_RANGE(0x400000, 0x400001) AM_READ8(bankrob_mcu_status_write_r, 0x00ff)
 	AM_RANGE(0x400002, 0x400003) AM_READ8(bankrob_mcu_status_read_r,  0x00ff)
@@ -622,57 +709,57 @@ static ADDRESS_MAP_START( bankrob_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x400004, 0x400005) AM_READWRITE8(bankrob_mcu1_r, bankrob_mcu1_w, 0x00ff)
 	AM_RANGE(0x400006, 0x400007) AM_READWRITE8(bankrob_mcu2_r, bankrob_mcu2_w, 0xff00)
 
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, status_r,   address_w,  0xff00)	// triggered by MCU?
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, register_r, register_w, 0xff00)
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r,   address_w,  0xff00)	// triggered by MCU?
+	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
 ADDRESS_MAP_END
 
 // bankroba:
 
 // MCU simulation (to be done)
-static READ8_HANDLER( bankroba_mcu1_r )
+READ8_MEMBER(blitz68k_state::bankroba_mcu1_r)
 {
-	UINT8 ret = space->machine().rand();	// space->machine().rand() gives "interesting" results
-	logerror("%s: mcu1 reads %02x\n", space->machine().describe_context(), ret);
+	UINT8 ret = machine().rand();	// machine().rand() gives "interesting" results
+	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
-static READ8_HANDLER( bankroba_mcu2_r )
+READ8_MEMBER(blitz68k_state::bankroba_mcu2_r)
 {
-	UINT8 ret = space->machine().rand();	// space->machine().rand() gives "interesting" results
-	logerror("%s: mcu2 reads %02x\n", space->machine().describe_context(), ret);
+	UINT8 ret = machine().rand();	// machine().rand() gives "interesting" results
+	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-static READ8_HANDLER( bankroba_mcu1_status_write_r )
+READ8_MEMBER(blitz68k_state::bankroba_mcu1_status_write_r)
 {
 	return 0x00;	// bit 0 = MCU1. Active low.
 }
-static READ8_HANDLER( bankroba_mcu2_status_write_r )
+READ8_MEMBER(blitz68k_state::bankroba_mcu2_status_write_r)
 {
 	return 0x01;	// bit 0 = MCU2. Active high.
 }
 
-static WRITE8_HANDLER( bankroba_mcu1_w )
+WRITE8_MEMBER(blitz68k_state::bankroba_mcu1_w)
 {
-	logerror("%s: mcu1 written with %02x\n", space->machine().describe_context(), data);
+	logerror("%s: mcu1 written with %02x\n", machine().describe_context(), data);
 }
-static WRITE8_HANDLER( bankroba_mcu2_w )
+WRITE8_MEMBER(blitz68k_state::bankroba_mcu2_w)
 {
-	logerror("%s: mcu2 written with %02x\n", space->machine().describe_context(), data);
+	logerror("%s: mcu2 written with %02x\n", machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( bankroba_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bankroba_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
-	AM_RANGE(0x800000, 0x800001) AM_WRITE8(bankroba_mcu1_r, 0x00ff)	// lev 4
+	AM_RANGE(0x800000, 0x800001) AM_READ8(bankroba_mcu1_r, 0x00ff)	// lev 4
 	AM_RANGE(0x840000, 0x840001) AM_WRITE8(bankroba_mcu1_w, 0x00ff)
 
-	AM_RANGE(0x880000, 0x880001) AM_WRITE8(bankroba_mcu2_r, 0x00ff)	// lev 3
+	AM_RANGE(0x880000, 0x880001) AM_READ8(bankroba_mcu2_r, 0x00ff)	// lev 3
 	AM_RANGE(0x8c0000, 0x8c0001) AM_WRITE8(bankroba_mcu2_w, 0x00ff)
 
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
-	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0xff00 )
-	AM_RANGE(0x900004, 0x900005) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0xff00 )
+	AM_RANGE(0x900004, 0x900005) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
 
 //  AM_RANGE(0x940000, 0x940001) AM_WRITE   // lev 6
 
@@ -699,8 +786,8 @@ static ADDRESS_MAP_START( bankroba_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x9b8000, 0x9b8001) AM_WRITE8(blit_draw_w, 0x00ff)
 
-	AM_RANGE(0x9c0000, 0x9c0001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, index_r, 0xff00 )
-	AM_RANGE(0x9c0002, 0x9c0003) AM_DEVREAD8_MODERN("ramdac",ramdac_device, pal_r, 0xff00 )
+	AM_RANGE(0x9c0000, 0x9c0001) AM_DEVREAD8("ramdac",ramdac_device, index_r, 0xff00 )
+	AM_RANGE(0x9c0002, 0x9c0003) AM_DEVREAD8("ramdac",ramdac_device, pal_r, 0xff00 )
 
 	AM_RANGE(0x9d0000, 0x9d0001) AM_READ8(bankroba_mcu1_status_write_r, 0xff00)
 
@@ -717,71 +804,68 @@ ADDRESS_MAP_END
     Funny Fruit
 *************************************************************************************************************/
 
-static WRITE16_HANDLER( cjffruit_leds1_w )
+WRITE16_MEMBER(blitz68k_state::cjffruit_leds1_w)
 {
-	blitz68k_state *state = space->machine().driver_data<blitz68k_state>();
-	data = COMBINE_DATA(state->m_leds[0]);
+	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x0100);	// coin in
-		set_led_status(space->machine(), 0, data & 0x0200);	// win???
+		coin_counter_w(machine(), 0, data & 0x0100);	// coin in
+		set_led_status(machine(), 0, data & 0x0200);	// win???
 //                                     1  data & 0x0400     // win???
-		set_led_status(space->machine(), 2, data & 0x0800);	// small
-		set_led_status(space->machine(), 3, data & 0x1000);	// big
-		set_led_status(space->machine(), 4, data & 0x2000);	// take
-		set_led_status(space->machine(), 5, data & 0x4000);	// double up
-		set_led_status(space->machine(), 6, data & 0x8000);	// cancel
-		show_leds123(state);
+		set_led_status(machine(), 2, data & 0x0800);	// small
+		set_led_status(machine(), 3, data & 0x1000);	// big
+		set_led_status(machine(), 4, data & 0x2000);	// take
+		set_led_status(machine(), 5, data & 0x4000);	// double up
+		set_led_status(machine(), 6, data & 0x8000);	// cancel
+		show_leds123();
 	}
 }
 
-static WRITE16_HANDLER( cjffruit_leds2_w )
+WRITE16_MEMBER(blitz68k_state::cjffruit_leds2_w)
 {
-	blitz68k_state *state = space->machine().driver_data<blitz68k_state>();
-	data = COMBINE_DATA(state->m_leds[1]);
+	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(space->machine(),  7, data & 0x0100);	// start
-		set_led_status(space->machine(),  8, data & 0x0200);	// bet
-		set_led_status(space->machine(),  9, data & 0x0400);	// hold 5
-		set_led_status(space->machine(), 10, data & 0x0800);	// hold 4
-		set_led_status(space->machine(), 11, data & 0x1000);	// hold 3
-		set_led_status(space->machine(), 12, data & 0x2000);	// hold 2
-		set_led_status(space->machine(), 13, data & 0x4000);	// collect
-		set_led_status(space->machine(), 14, data & 0x8000);	// call attendant
-		show_leds123(state);
+		set_led_status(machine(),  7, data & 0x0100);	// start
+		set_led_status(machine(),  8, data & 0x0200);	// bet
+		set_led_status(machine(),  9, data & 0x0400);	// hold 5
+		set_led_status(machine(), 10, data & 0x0800);	// hold 4
+		set_led_status(machine(), 11, data & 0x1000);	// hold 3
+		set_led_status(machine(), 12, data & 0x2000);	// hold 2
+		set_led_status(machine(), 13, data & 0x4000);	// collect
+		set_led_status(machine(), 14, data & 0x8000);	// call attendant
+		show_leds123();
 	}
 }
 
-static WRITE16_HANDLER( cjffruit_leds3_w )
+WRITE16_MEMBER(blitz68k_state::cjffruit_leds3_w)
 {
-	blitz68k_state *state = space->machine().driver_data<blitz68k_state>();
-	data = COMBINE_DATA(state->m_leds[2]);
+	data = COMBINE_DATA(m_leds2);
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(space->machine(), 15, data & 0x0100);	// hopper coins?
-		set_led_status(space->machine(), 16, data & 0x0400);	// coin out?
-		show_leds123(state);
+		set_led_status(machine(), 15, data & 0x0100);	// hopper coins?
+		set_led_status(machine(), 16, data & 0x0400);	// coin out?
+		show_leds123();
 	}
 }
 
 // CRTC
-static READ8_HANDLER( crtc_r )
+READ8_MEMBER(blitz68k_state::crtc_r)
 {
-	mc6845_device *mc6845 = space->machine().device<mc6845_device>("crtc");
+	mc6845_device *mc6845 = machine().device<mc6845_device>("crtc");
 	if (offset)
-		return mc6845->register_r(*space, 0);
+		return mc6845->register_r(space, 0);
 	else
-		return mc6845->status_r(*space, 0);
+		return mc6845->status_r(space, 0);
 }
 
-static WRITE8_HANDLER( crtc_w )
+WRITE8_MEMBER(blitz68k_state::crtc_w)
 {
-	mc6845_device *mc6845 = space->machine().device<mc6845_device>("crtc");
+	mc6845_device *mc6845 = machine().device<mc6845_device>("crtc");
 	if (offset)
-		mc6845->register_w(*space, 0, data);
+		mc6845->register_w(space, 0, data);
 	else
-		mc6845->address_w(*space, 0, data);
+		mc6845->address_w(space, 0, data);
 }
 
 static WRITE16_DEVICE_HANDLER( crtc_lpen_w )
@@ -793,51 +877,51 @@ static WRITE16_DEVICE_HANDLER( crtc_lpen_w )
 }
 
 // MCU simulation (to be done)
-static READ16_HANDLER( cjffruit_mcu_r )
+READ16_MEMBER(blitz68k_state::cjffruit_mcu_r)
 {
-	UINT8 ret = 0x00;	// space->machine().rand() gives "interesting" results
-	logerror("%s: mcu reads %02x\n", space->machine().describe_context(), ret);
+	UINT8 ret = 0x00;	// machine().rand() gives "interesting" results
+	logerror("%s: mcu reads %02x\n", machine().describe_context(), ret);
 	return ret << 8;
 }
 
-static WRITE16_HANDLER( cjffruit_mcu_w )
+WRITE16_MEMBER(blitz68k_state::cjffruit_mcu_w)
 {
-	logerror("%s: mcu written with %02x\n", space->machine().describe_context(),data >> 8);
+	logerror("%s: mcu written with %02x\n", machine().describe_context(),data >> 8);
 }
 
-static ADDRESS_MAP_START( cjffruit_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cjffruit_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x480000, 0x4807ff) AM_RAM
 
 	AM_RANGE(0x820000, 0x820007) AM_WRITE8(blit_hwyxa_draw_w, 0xffff)
 
-	AM_RANGE(0x850000, 0x850001) AM_READ( cjffruit_mcu_r )
+	AM_RANGE(0x850000, 0x850001) AM_READ(cjffruit_mcu_r )
 
 	AM_RANGE(0x870000, 0x870001) AM_READ_PORT("IN0")
 	AM_RANGE(0x872000, 0x872001) AM_READ_PORT("IN1")
 	AM_RANGE(0x874000, 0x874001) AM_READ_PORT("IN2")
 	AM_RANGE(0x876000, 0x876001) AM_READ_PORT("DSW")
 
-	AM_RANGE(0x880000, 0x880001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
-	AM_RANGE(0x880000, 0x880001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0x00ff )
-	AM_RANGE(0x880002, 0x880003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
-	AM_RANGE(0x880000, 0x880001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, index_r, 0xff00 )
-	AM_RANGE(0x880000, 0x880001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, pal_r, 0x00ff )
+	AM_RANGE(0x880000, 0x880001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x880000, 0x880001) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0x00ff )
+	AM_RANGE(0x880002, 0x880003) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x880000, 0x880001) AM_DEVREAD8("ramdac",ramdac_device, index_r, 0xff00 )
+	AM_RANGE(0x880000, 0x880001) AM_DEVREAD8("ramdac",ramdac_device, pal_r, 0x00ff )
 
 	AM_RANGE(0x8a0000, 0x8a0007) AM_WRITE8(blit_hwyxa_draw_w, 0xffff)
 
 	AM_RANGE(0x8b0000, 0x8b0003) AM_WRITE8(blit_pens_w, 0xffff)
 
-	AM_RANGE(0x8e0000, 0x8e0001) AM_WRITE( cjffruit_mcu_w )
+	AM_RANGE(0x8e0000, 0x8e0001) AM_WRITE(cjffruit_mcu_w )
 
-	AM_RANGE(0x8f8000, 0x8f8001) AM_WRITE(cjffruit_leds1_w) AM_BASE_MEMBER(blitz68k_state, m_leds[0])
-	AM_RANGE(0x8fa000, 0x8fa001) AM_WRITE(cjffruit_leds2_w) AM_BASE_MEMBER(blitz68k_state, m_leds[1])
-	AM_RANGE(0x8fc000, 0x8fc001) AM_WRITE(cjffruit_leds3_w) AM_BASE_MEMBER(blitz68k_state, m_leds[2])
+	AM_RANGE(0x8f8000, 0x8f8001) AM_WRITE(cjffruit_leds1_w) AM_SHARE("leds0")
+	AM_RANGE(0x8fa000, 0x8fa001) AM_WRITE(cjffruit_leds2_w) AM_SHARE("leds1")
+	AM_RANGE(0x8fc000, 0x8fc001) AM_WRITE(cjffruit_leds3_w) AM_SHARE("leds2")
 
 	AM_RANGE(0x8fe000, 0x8fe003) AM_WRITE8(blit_flags_w, 0xffff)	// flipx,y,solid,trans
 	AM_RANGE(0x8fe004, 0x8fe005) AM_WRITEONLY
-	AM_RANGE(0x8fe006, 0x8fe007) AM_DEVWRITE("crtc", crtc_lpen_w)	// 0x8fe006: 0->1, 0x8fe007: 1->0
+	AM_RANGE(0x8fe006, 0x8fe007) AM_DEVWRITE_LEGACY("crtc", crtc_lpen_w)	// 0x8fe006: 0->1, 0x8fe007: 1->0
 
 	AM_RANGE(0xc40000, 0xc40001) AM_READWRITE8(crtc_r, crtc_w, 0xffff)
 ADDRESS_MAP_END
@@ -847,76 +931,73 @@ ADDRESS_MAP_END
 *************************************************************************************************************/
 
 // MCU simulation (to be done)
-static READ16_HANDLER( deucesw2_mcu_r )
+READ16_MEMBER(blitz68k_state::deucesw2_mcu_r)
 {
-	UINT8 ret = 0x00;	// space->machine().rand() gives "interesting" results
-	logerror("%s: mcu reads %02x\n", space->machine().describe_context(), ret);
+	UINT8 ret = 0x00;	// machine().rand() gives "interesting" results
+	logerror("%s: mcu reads %02x\n", machine().describe_context(), ret);
 	return ret << 8;
 }
 
-static WRITE16_HANDLER( deucesw2_mcu_w )
+WRITE16_MEMBER(blitz68k_state::deucesw2_mcu_w)
 {
-	logerror("%s: mcu written with %02x\n", space->machine().describe_context(),data >> 8);
+	logerror("%s: mcu written with %02x\n", machine().describe_context(),data >> 8);
 }
 
-static WRITE16_HANDLER( deucesw2_leds1_w )
+WRITE16_MEMBER(blitz68k_state::deucesw2_leds1_w)
 {
-	blitz68k_state *state = space->machine().driver_data<blitz68k_state>();
-	data = COMBINE_DATA(state->m_leds[0]);
+	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x0100);	// coin in
-		set_led_status(space->machine(), 0, data & 0x0200);	// win???
+		coin_counter_w(machine(), 0, data & 0x0100);	// coin in
+		set_led_status(machine(), 0, data & 0x0200);	// win???
 //                                     1  data & 0x0400     // win???
-		set_led_status(space->machine(), 2, data & 0x0800);	// small
-		set_led_status(space->machine(), 3, data & 0x1000);	// big
-		set_led_status(space->machine(), 4, data & 0x2000);	// take
-		set_led_status(space->machine(), 5, data & 0x4000);	// double up
-		set_led_status(space->machine(), 6, data & 0x8000);	// cancel
-		show_leds123(state);
+		set_led_status(machine(), 2, data & 0x0800);	// small
+		set_led_status(machine(), 3, data & 0x1000);	// big
+		set_led_status(machine(), 4, data & 0x2000);	// take
+		set_led_status(machine(), 5, data & 0x4000);	// double up
+		set_led_status(machine(), 6, data & 0x8000);	// cancel
+		show_leds123();
 	}
 }
 
-static WRITE16_HANDLER( deucesw2_leds2_w )
+WRITE16_MEMBER(blitz68k_state::deucesw2_leds2_w)
 {
-	blitz68k_state *state = space->machine().driver_data<blitz68k_state>();
-	data = COMBINE_DATA(state->m_leds[1]);
+	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(space->machine(),  7, data & 0x0100);	// start
-		set_led_status(space->machine(),  8, data & 0x0200);	// bet
-		set_led_status(space->machine(),  9, data & 0x0400);	// hold 5
-		set_led_status(space->machine(), 10, data & 0x0800);	// hold 4
-		set_led_status(space->machine(), 11, data & 0x1000);	// hold 3
-		set_led_status(space->machine(), 12, data & 0x2000);	// hold 2
-		set_led_status(space->machine(), 13, data & 0x4000);	// hold 1
-		set_led_status(space->machine(), 14, data & 0x8000);	// call attendant
-		show_leds123(state);
+		set_led_status(machine(),  7, data & 0x0100);	// start
+		set_led_status(machine(),  8, data & 0x0200);	// bet
+		set_led_status(machine(),  9, data & 0x0400);	// hold 5
+		set_led_status(machine(), 10, data & 0x0800);	// hold 4
+		set_led_status(machine(), 11, data & 0x1000);	// hold 3
+		set_led_status(machine(), 12, data & 0x2000);	// hold 2
+		set_led_status(machine(), 13, data & 0x4000);	// hold 1
+		set_led_status(machine(), 14, data & 0x8000);	// call attendant
+		show_leds123();
 	}
 }
 
-static WRITE16_HANDLER( deucesw2_leds3_w )
+WRITE16_MEMBER(blitz68k_state::deucesw2_leds3_w)
 {
-	blitz68k_state *state = space->machine().driver_data<blitz68k_state>();
-	data = COMBINE_DATA(state->m_leds[2]);
+	data = COMBINE_DATA(m_leds2);
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(space->machine(), 15, data & 0x0100);	// hopper coins?
-		set_led_status(space->machine(), 16, data & 0x0400);	// coin out?
-		show_leds123(state);
+		set_led_status(machine(), 15, data & 0x0100);	// hopper coins?
+		set_led_status(machine(), 16, data & 0x0400);	// coin out?
+		show_leds123();
 	}
 }
 
-static ADDRESS_MAP_START( deucesw2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( deucesw2_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 
 	AM_RANGE(0x800000, 0x800007) AM_WRITE8(blit_hwyxa_draw_w, 0xffff)
 
-	AM_RANGE(0x812000, 0x812001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, index_r, 0xff00 )
-	AM_RANGE(0x812000, 0x812001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, pal_r, 0x00ff )
+	AM_RANGE(0x812000, 0x812001) AM_DEVREAD8("ramdac",ramdac_device, index_r, 0xff00 )
+	AM_RANGE(0x812000, 0x812001) AM_DEVREAD8("ramdac",ramdac_device, pal_r, 0x00ff )
 
-	AM_RANGE(0x830000, 0x830001) AM_READ( deucesw2_mcu_r )
+	AM_RANGE(0x830000, 0x830001) AM_READ(deucesw2_mcu_r )
 
 	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("IN0")
 	AM_RANGE(0x850000, 0x850001) AM_READ_PORT("IN1")
@@ -925,21 +1006,21 @@ static ADDRESS_MAP_START( deucesw2_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x880000, 0x880007) AM_WRITE8(blit_hwyxa_draw_w, 0xffff)
 
-	AM_RANGE(0x890000, 0x890001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
-	AM_RANGE(0x890000, 0x890001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0x00ff )
-	AM_RANGE(0x890002, 0x890003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x890000, 0x890001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x890000, 0x890001) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0x00ff )
+	AM_RANGE(0x890002, 0x890003) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
 
 	AM_RANGE(0x894000, 0x894003) AM_WRITE8(blit_pens_w, 0xffff)
 
-	AM_RANGE(0x896000, 0x896001) AM_WRITE( deucesw2_mcu_w )
+	AM_RANGE(0x896000, 0x896001) AM_WRITE(deucesw2_mcu_w )
 
-	AM_RANGE(0x898000, 0x898001) AM_WRITE(deucesw2_leds1_w) AM_BASE_MEMBER(blitz68k_state, m_leds[0])
-	AM_RANGE(0x89a000, 0x89a001) AM_WRITE(deucesw2_leds2_w) AM_BASE_MEMBER(blitz68k_state, m_leds[1])
-	AM_RANGE(0x89c000, 0x89c001) AM_WRITE(deucesw2_leds3_w) AM_BASE_MEMBER(blitz68k_state, m_leds[2])
+	AM_RANGE(0x898000, 0x898001) AM_WRITE(deucesw2_leds1_w) AM_SHARE("leds0")
+	AM_RANGE(0x89a000, 0x89a001) AM_WRITE(deucesw2_leds2_w) AM_SHARE("leds1")
+	AM_RANGE(0x89c000, 0x89c001) AM_WRITE(deucesw2_leds3_w) AM_SHARE("leds2")
 
 	AM_RANGE(0x89e000, 0x89e003) AM_WRITE8(blit_flags_w, 0xffff)	// flipx,y,solid,trans
 	AM_RANGE(0x89e004, 0x89e005) AM_WRITEONLY
-	AM_RANGE(0x89e006, 0x89e007) AM_DEVWRITE("crtc", crtc_lpen_w)	// 0x89e006: 0->1, 0x89e007: 1->0
+	AM_RANGE(0x89e006, 0x89e007) AM_DEVWRITE_LEGACY("crtc", crtc_lpen_w)	// 0x89e006: 0->1, 0x89e007: 1->0
 
 	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE8(crtc_r, crtc_w, 0xffff)
 ADDRESS_MAP_END
@@ -949,44 +1030,44 @@ ADDRESS_MAP_END
 *************************************************************************************************************/
 
 // MCU simulation (to be done)
-static READ8_HANDLER( dualgame_mcu1_r )
+READ8_MEMBER(blitz68k_state::dualgame_mcu1_r)
 {
-	UINT8 ret = 0;	// space->machine().rand() gives "interesting" results
-	logerror("%s: mcu1 reads %02x\n", space->machine().describe_context(), ret);
+	UINT8 ret = 0;	// machine().rand() gives "interesting" results
+	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
-static READ8_HANDLER( dualgame_mcu2_r )
+READ8_MEMBER(blitz68k_state::dualgame_mcu2_r)
 {
-	UINT8 ret = 0;	// space->machine().rand() gives "interesting" results
-	logerror("%s: mcu2 reads %02x\n", space->machine().describe_context(), ret);
+	UINT8 ret = 0;	// machine().rand() gives "interesting" results
+	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-static READ8_HANDLER( dualgame_mcu_status_read_r )
+READ8_MEMBER(blitz68k_state::dualgame_mcu_status_read_r)
 {
 	return 0x03;	// bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
-static READ8_HANDLER( dualgame_mcu_status_write_r )
+READ8_MEMBER(blitz68k_state::dualgame_mcu_status_write_r)
 {
 	return 0x03;	// bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
-static WRITE8_HANDLER( dualgame_mcu1_w )
+WRITE8_MEMBER(blitz68k_state::dualgame_mcu1_w)
 {
-	logerror("%s: mcu1 written with %02x\n", space->machine().describe_context(), data);
+	logerror("%s: mcu1 written with %02x\n", machine().describe_context(), data);
 }
-static WRITE8_HANDLER( dualgame_mcu2_w )
+WRITE8_MEMBER(blitz68k_state::dualgame_mcu2_w)
 {
-	logerror("%s: mcu2 written with %02x\n", space->machine().describe_context(), data);
+	logerror("%s: mcu2 written with %02x\n", machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( dualgame_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dualgame_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
 
-	AM_RANGE(0x220002, 0x220003) AM_DEVREAD8_MODERN("ramdac",ramdac_device, index_r, 0xff00 )
-	AM_RANGE(0x220002, 0x220003) AM_DEVREAD8_MODERN("ramdac",ramdac_device, pal_r, 0x00ff )
+	AM_RANGE(0x220002, 0x220003) AM_DEVREAD8("ramdac",ramdac_device, index_r, 0xff00 )
+	AM_RANGE(0x220002, 0x220003) AM_DEVREAD8("ramdac",ramdac_device, pal_r, 0x00ff )
 
 	AM_RANGE(0x240000, 0x240001) AM_WRITE8(blit_addr0_w, 0xff00)
 	AM_RANGE(0x240002, 0x240003) AM_WRITE8(blit_addr1_w, 0xff00)
@@ -1007,7 +1088,7 @@ static ADDRESS_MAP_START( dualgame_map, AS_PROGRAM, 16 )
 
 	AM_RANGE(0x280000, 0x280001) AM_READ8(blit_status_r, 0xff00)
 
-	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE("crtc", crtc_lpen_w)
+	AM_RANGE(0x2a0000, 0x2a0001) AM_DEVWRITE_LEGACY("crtc", crtc_lpen_w)
 	AM_RANGE(0x2a0000, 0x2a0001) AM_READNOP
 
 	AM_RANGE(0x2c0000, 0x2c0001) AM_WRITENOP	// 1->0 (MCU related?)
@@ -1021,9 +1102,9 @@ static ADDRESS_MAP_START( dualgame_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x2e000c, 0x2e000d) AM_WRITE8(blit_flag6_w, 0xff00)
 	AM_RANGE(0x2e000e, 0x2e000f) AM_WRITE8(blit_flag7_w, 0xff00)
 
-	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
-	AM_RANGE(0x300002, 0x300003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0xff00 )
-	AM_RANGE(0x300004, 0x300005) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x300000, 0x300001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x300002, 0x300003) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0xff00 )
+	AM_RANGE(0x300004, 0x300005) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
 
 	AM_RANGE(0x400000, 0x400001) AM_READ8(dualgame_mcu_status_write_r, 0x00ff)
 	AM_RANGE(0x400002, 0x400003) AM_READ8(dualgame_mcu_status_read_r,  0x00ff)
@@ -1031,8 +1112,8 @@ static ADDRESS_MAP_START( dualgame_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x400004, 0x400005) AM_READWRITE8(dualgame_mcu1_r, dualgame_mcu1_w, 0x00ff)
 	AM_RANGE(0x400006, 0x400007) AM_READWRITE8(dualgame_mcu2_r, dualgame_mcu2_w, 0xff00)
 
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, status_r,   address_w,  0xff00)
-	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, register_r, register_w, 0xff00)
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r,   address_w,  0xff00)
+	AM_RANGE(0x800002, 0x800003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
 ADDRESS_MAP_END
 
 /*************************************************************************************************************
@@ -1040,82 +1121,80 @@ ADDRESS_MAP_END
 *************************************************************************************************************/
 
 // MCU simulation (to be done)
-static READ16_HANDLER( hermit_mcu_r )
+READ16_MEMBER(blitz68k_state::hermit_mcu_r)
 {
-	UINT8 ret = 0x00;	// space->machine().rand() gives "interesting" results
-	logerror("%s: mcu reads %02x\n", space->machine().describe_context(), ret);
+	UINT8 ret = 0x00;	// machine().rand() gives "interesting" results
+	logerror("%s: mcu reads %02x\n", machine().describe_context(), ret);
 	return ret << 8;
 }
 
-static WRITE16_HANDLER( hermit_mcu_w )
+WRITE16_MEMBER(blitz68k_state::hermit_mcu_w)
 {
-	logerror("%s: mcu written with %02x\n", space->machine().describe_context(),data >> 8);
+	logerror("%s: mcu written with %02x\n", machine().describe_context(),data >> 8);
 }
 
-static WRITE16_HANDLER( hermit_leds1_w )
+WRITE16_MEMBER(blitz68k_state::hermit_leds1_w)
 {
-	blitz68k_state *state = space->machine().driver_data<blitz68k_state>();
-	data = COMBINE_DATA(state->m_leds[0]);
+	data = COMBINE_DATA(m_leds0);
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x0100);	// coin in
-		show_leds12(state);
+		coin_counter_w(machine(), 0, data & 0x0100);	// coin in
+		show_leds12();
 	}
 }
 
-static WRITE16_HANDLER( hermit_leds2_w )
+WRITE16_MEMBER(blitz68k_state::hermit_leds2_w)
 {
-	blitz68k_state *state = space->machine().driver_data<blitz68k_state>();
-	data = COMBINE_DATA(state->m_leds[1]);
+	data = COMBINE_DATA(m_leds1);
 	if (ACCESSING_BITS_8_15)
 	{
-		set_led_status(space->machine(),  7, data & 0x0100);	// button
-		show_leds12(state);
+		set_led_status(machine(),  7, data & 0x0100);	// button
+		show_leds12();
 	}
 }
 
-static READ16_HANDLER( hermit_track_r )
+READ16_MEMBER(blitz68k_state::hermit_track_r)
 {
 #ifdef MAME_DEBUG
-//  popmessage("track %02x %02x", input_port_read(space->machine(), "TRACK_X"), input_port_read(space->machine(), "TRACK_Y"));
+//  popmessage("track %02x %02x", ioport("TRACK_Y")->read());
 #endif
 
 	return
-		((0xf - ((input_port_read(space->machine(), "TRACK_Y") + 0x7) & 0xf)) << 12) |
-		((0xf - ((input_port_read(space->machine(), "TRACK_X") + 0x7) & 0xf)) << 8)  ;
+		((0xf - ((ioport("TRACK_Y")->read() + 0x7) & 0xf)) << 12) |
+		((0xf - ((ioport("TRACK_X")->read() + 0x7) & 0xf)) << 8)  ;
 }
 
-static ADDRESS_MAP_START( hermit_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hermit_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
 
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0x00ff )
-	AM_RANGE(0x800002, 0x800003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
-	AM_RANGE(0x840000, 0x840001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, index_w, 0xff00 )
-	AM_RANGE(0x840000, 0x840001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, pal_w, 0x00ff )
-	AM_RANGE(0x840002, 0x840003) AM_DEVWRITE8_MODERN("ramdac",ramdac_device, mask_w, 0xff00 )
-	AM_RANGE(0x840000, 0x840001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, index_r, 0xff00 )
-	AM_RANGE(0x840000, 0x840001) AM_DEVREAD8_MODERN("ramdac",ramdac_device, pal_r, 0x00ff )
+	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0x00ff )
+	AM_RANGE(0x800002, 0x800003) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x840000, 0x840001) AM_DEVWRITE8("ramdac",ramdac_device, index_w, 0xff00 )
+	AM_RANGE(0x840000, 0x840001) AM_DEVWRITE8("ramdac",ramdac_device, pal_w, 0x00ff )
+	AM_RANGE(0x840002, 0x840003) AM_DEVWRITE8("ramdac",ramdac_device, mask_w, 0xff00 )
+	AM_RANGE(0x840000, 0x840001) AM_DEVREAD8("ramdac",ramdac_device, index_r, 0xff00 )
+	AM_RANGE(0x840000, 0x840001) AM_DEVREAD8("ramdac",ramdac_device, pal_r, 0x00ff )
 
 
-	AM_RANGE(0x8c0000, 0x8c0003) AM_WRITE8( blit_pens_w, 0xffff )
+	AM_RANGE(0x8c0000, 0x8c0003) AM_WRITE8(blit_pens_w, 0xffff )
 
-	AM_RANGE(0x940000, 0x940001) AM_READ( hermit_mcu_r )
-	AM_RANGE(0x980000, 0x980001) AM_WRITE( hermit_mcu_w )
+	AM_RANGE(0x940000, 0x940001) AM_READ(hermit_mcu_r )
+	AM_RANGE(0x980000, 0x980001) AM_WRITE(hermit_mcu_w )
 
 	AM_RANGE(0x9c0000, 0x9c0001) AM_READ_PORT("IN0")
-	AM_RANGE(0x9c8000, 0x9c8001) AM_READ( hermit_track_r )
+	AM_RANGE(0x9c8000, 0x9c8001) AM_READ(hermit_track_r )
 	AM_RANGE(0x9d0000, 0x9d0001) AM_READ_PORT("IN2")
 	AM_RANGE(0x9d8000, 0x9d8001) AM_READ_PORT("DSW")
 
-	AM_RANGE(0x9e0000, 0x9e0001) AM_WRITE(hermit_leds1_w) AM_BASE_MEMBER(blitz68k_state, m_leds[0])
-	AM_RANGE(0x9e8000, 0x9e8001) AM_WRITE(hermit_leds2_w) AM_BASE_MEMBER(blitz68k_state, m_leds[1])
+	AM_RANGE(0x9e0000, 0x9e0001) AM_WRITE(hermit_leds1_w) AM_SHARE("leds0")
+	AM_RANGE(0x9e8000, 0x9e8001) AM_WRITE(hermit_leds2_w) AM_SHARE("leds1")
 
 	AM_RANGE(0x9f0000, 0x9f0003) AM_WRITE8(blit_flags_w, 0xffff)	// flipx,y,solid,trans
 	AM_RANGE(0x9f0004, 0x9f0005) AM_WRITEONLY
-	AM_RANGE(0x9f0006, 0x9f0007) AM_DEVWRITE("crtc", crtc_lpen_w)	// 0x9f0006: 0->1, 0x9f0007: 1->0
+	AM_RANGE(0x9f0006, 0x9f0007) AM_DEVWRITE_LEGACY("crtc", crtc_lpen_w)	// 0x9f0006: 0->1, 0x9f0007: 1->0
 
 	AM_RANGE(0xb00000, 0xb00001) AM_READWRITE8(crtc_r, crtc_w, 0xffff)	// triggered by MCU?
 
@@ -1127,43 +1206,43 @@ ADDRESS_MAP_END
 *************************************************************************************************************/
 
 // MCU simulation (to be done)
-static READ8_HANDLER( maxidbl_mcu1_r )
+READ8_MEMBER(blitz68k_state::maxidbl_mcu1_r)
 {
-	UINT8 ret = 0;	// space->machine().rand() gives "interesting" results
-	logerror("%s: mcu1 reads %02x\n", space->machine().describe_context(), ret);
+	UINT8 ret = 0;	// machine().rand() gives "interesting" results
+	logerror("%s: mcu1 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
-static READ8_HANDLER( maxidbl_mcu2_r )
+READ8_MEMBER(blitz68k_state::maxidbl_mcu2_r)
 {
-	UINT8 ret = 0;	// space->machine().rand() gives "interesting" results
-	logerror("%s: mcu2 reads %02x\n", space->machine().describe_context(), ret);
+	UINT8 ret = 0;	// machine().rand() gives "interesting" results
+	logerror("%s: mcu2 reads %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
-static READ8_HANDLER( maxidbl_mcu_status_read_r )
+READ8_MEMBER(blitz68k_state::maxidbl_mcu_status_read_r)
 {
 	return 0x03;	// bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
-static READ8_HANDLER( maxidbl_mcu_status_write_r )
+READ8_MEMBER(blitz68k_state::maxidbl_mcu_status_write_r)
 {
 	return 0x03;	// bit 0 = MCU1, bit 1 = MCU2. Active high.
 }
 
-static WRITE8_HANDLER( maxidbl_mcu1_w )
+WRITE8_MEMBER(blitz68k_state::maxidbl_mcu1_w)
 {
-	logerror("%s: mcu1 written with %02x\n", space->machine().describe_context(), data);
+	logerror("%s: mcu1 written with %02x\n", machine().describe_context(), data);
 }
-static WRITE8_HANDLER( maxidbl_mcu2_w )
+WRITE8_MEMBER(blitz68k_state::maxidbl_mcu2_w)
 {
-	logerror("%s: mcu2 written with %02x\n", space->machine().describe_context(), data);
+	logerror("%s: mcu2 written with %02x\n", machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( maxidbl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( maxidbl_map, AS_PROGRAM, 16, blitz68k_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
-	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_BASE_MEMBER(blitz68k_state, m_frame_buffer)
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM AM_SHARE("frame_buffer")
 
 	AM_RANGE(0x30000c, 0x30000d) AM_WRITENOP	// 0->1 (IRQ3 ack.?)
 	AM_RANGE(0x30000e, 0x30000f) AM_WRITENOP	// 1->0 (MCU related?)
@@ -1174,8 +1253,8 @@ static ADDRESS_MAP_START( maxidbl_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x500004, 0x500005) AM_READWRITE8(maxidbl_mcu1_r, maxidbl_mcu1_w, 0x00ff)
 	AM_RANGE(0x500006, 0x500007) AM_READWRITE8(maxidbl_mcu2_r, maxidbl_mcu2_w, 0xff00)
 
-	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, status_r,   address_w,  0xff00)	// triggered by MCU?
-	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8_MODERN("crtc", mc6845_device, register_r, register_w, 0xff00)
+	AM_RANGE(0x600000, 0x600001) AM_DEVREADWRITE8("crtc", mc6845_device, status_r,   address_w,  0xff00)	// triggered by MCU?
+	AM_RANGE(0x600002, 0x600003) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
 ADDRESS_MAP_END
 
 
@@ -1596,8 +1675,8 @@ const mc6845_interface mc6845_intf_irq5 =
 	crtc_addr				/* update address callback */
 };
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, blitz68k_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
 static RAMDAC_INTERFACE( ramdac_intf )
@@ -1658,14 +1737,14 @@ static TIMER_DEVICE_CALLBACK( steaser_mcu_sim )
 //  for(i=0;i<8;i+=2)
 //      state->m_nvram[((0x8a0)+i)/2] = 0;
 	/*finally, read the inputs*/
-	state->m_nvram[0x89e/2] = input_port_read(timer.machine(), "MENU") & 0xffff;
-	state->m_nvram[0x8a0/2] = input_port_read(timer.machine(), "STAT") & 0xffff;
-	state->m_nvram[0x8a2/2] = input_port_read(timer.machine(), "BET_DEAL") & 0xffff;
-	state->m_nvram[0x8a4/2] = input_port_read(timer.machine(), "TAKE_DOUBLE") & 0xffff;
-	state->m_nvram[0x8a6/2] = input_port_read(timer.machine(), "SMALL_BIG") & 0xffff;
-	state->m_nvram[0x8a8/2] = input_port_read(timer.machine(), "CANCEL_HOLD1") & 0xffff;
-	state->m_nvram[0x8aa/2] = input_port_read(timer.machine(), "HOLD2_HOLD3") & 0xffff;
-	state->m_nvram[0x8ac/2] = input_port_read(timer.machine(), "HOLD4_HOLD5") & 0xffff;
+	state->m_nvram[0x89e/2] = timer.machine().root_device().ioport("MENU")->read() & 0xffff;
+	state->m_nvram[0x8a0/2] = timer.machine().root_device().ioport("STAT")->read() & 0xffff;
+	state->m_nvram[0x8a2/2] = timer.machine().root_device().ioport("BET_DEAL")->read() & 0xffff;
+	state->m_nvram[0x8a4/2] = timer.machine().root_device().ioport("TAKE_DOUBLE")->read() & 0xffff;
+	state->m_nvram[0x8a6/2] = timer.machine().root_device().ioport("SMALL_BIG")->read() & 0xffff;
+	state->m_nvram[0x8a8/2] = timer.machine().root_device().ioport("CANCEL_HOLD1")->read() & 0xffff;
+	state->m_nvram[0x8aa/2] = timer.machine().root_device().ioport("HOLD2_HOLD3")->read() & 0xffff;
+	state->m_nvram[0x8ac/2] = timer.machine().root_device().ioport("HOLD4_HOLD5")->read() & 0xffff;
 }
 
 
@@ -2611,7 +2690,7 @@ ROM_END
 
 static DRIVER_INIT( bankrob )
 {
-	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xb5e0/2] = 0x6028;
@@ -2626,7 +2705,7 @@ static DRIVER_INIT( bankrob )
 
 static DRIVER_INIT( bankroba )
 {
-	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0x11e4e/2] = 0x6028;
@@ -2641,7 +2720,7 @@ static DRIVER_INIT( bankroba )
 
 static DRIVER_INIT( cjffruit )
 {
-	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xf564/2] = 0x6028;
@@ -2652,7 +2731,7 @@ static DRIVER_INIT( cjffruit )
 
 static DRIVER_INIT( deucesw2 )
 {
-	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0x8fe4/2] = 0x6020;
@@ -2663,7 +2742,7 @@ static DRIVER_INIT( deucesw2 )
 
 static DRIVER_INIT( dualgame )
 {
-	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xa518/2] = 0x6024;
@@ -2674,7 +2753,7 @@ static DRIVER_INIT( dualgame )
 
 static DRIVER_INIT( hermit )
 {
-	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xdeba/2] = 0x602e;
@@ -2691,7 +2770,7 @@ static DRIVER_INIT( hermit )
 
 static DRIVER_INIT( maxidbl )
 {
-	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xb384/2] = 0x6036;
@@ -2702,7 +2781,7 @@ static DRIVER_INIT( maxidbl )
 
 static DRIVER_INIT( megadblj )
 {
-	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xe21c/2] = 0x6040;
@@ -2713,7 +2792,7 @@ static DRIVER_INIT( megadblj )
 
 static DRIVER_INIT( megadble )
 {
-	UINT16 *ROM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	// WRONG C8 #1
 	ROM[0xcfc2/2] = 0x4e71;

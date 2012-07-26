@@ -9,19 +9,25 @@ class ddragon_state : public driver_device
 {
 public:
 	ddragon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_rambase(*this, "rambase"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_fgvideoram(*this, "fgvideoram"),
+		m_spriteram(*this, "spriteram"),
+		m_scrollx_lo(*this, "scrollx_lo"),
+		m_scrolly_lo(*this, "scrolly_lo"),
+		m_darktowr_mcu_ports(*this, "darktowr_mcu"){ }
 
 	/* memory pointers */
-	UINT8 *        m_rambase;
-	UINT8 *        m_bgvideoram;
-	UINT8 *        m_fgvideoram;
-	UINT8 *        m_spriteram;
-	UINT8 *        m_scrollx_lo;
-	UINT8 *        m_scrolly_lo;
-	UINT8 *        m_darktowr_mcu_ports;
+	optional_shared_ptr<UINT8> m_rambase;
+	required_shared_ptr<UINT8> m_bgvideoram;
+	required_shared_ptr<UINT8> m_fgvideoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_scrollx_lo;
+	required_shared_ptr<UINT8> m_scrolly_lo;
+	optional_shared_ptr<UINT8> m_darktowr_mcu_ports;
 //  UINT8 *        m_paletteram;  // currently this uses generic palette handling
 //  UINT8 *        m_paletteram_2;    // currently this uses generic palette handling
-	size_t         m_spriteram_size;	// FIXME: this appears in chinagat.c, but is it really used?
 
 	/* video-related */
 	tilemap_t        *m_fg_tilemap;
@@ -58,13 +64,30 @@ public:
 	device_t *m_sub_cpu;
 	device_t *m_adpcm_1;
 	device_t *m_adpcm_2;
+	DECLARE_WRITE8_MEMBER(ddragon_bgvideoram_w);
+	DECLARE_WRITE8_MEMBER(ddragon_fgvideoram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(sub_cpu_busy);
+	DECLARE_WRITE8_MEMBER(ddragon_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(toffy_bankswitch_w);
+	DECLARE_READ8_MEMBER(darktowr_mcu_bank_r);
+	DECLARE_WRITE8_MEMBER(darktowr_mcu_bank_w);
+	DECLARE_WRITE8_MEMBER(darktowr_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(ddragon_interrupt_w);
+	DECLARE_WRITE8_MEMBER(ddragon2_sub_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(ddragon2_sub_irq_w);
+	DECLARE_WRITE8_MEMBER(darktowr_mcu_w);
+	DECLARE_READ8_MEMBER(ddragon_hd63701_internal_registers_r);
+	DECLARE_WRITE8_MEMBER(ddragon_hd63701_internal_registers_w);
+	DECLARE_READ8_MEMBER(ddragon_spriteram_r);
+	DECLARE_WRITE8_MEMBER(ddragon_spriteram_w);
+	DECLARE_WRITE8_MEMBER(dd_adpcm_w);
+	DECLARE_READ8_MEMBER(dd_adpcm_status_r);
+	DECLARE_WRITE8_MEMBER(ddragonba_port_w);
 };
 
 
 /*----------- defined in video/ddragon.c -----------*/
 
-WRITE8_HANDLER( ddragon_bgvideoram_w );
-WRITE8_HANDLER( ddragon_fgvideoram_w );
 
 VIDEO_START( chinagat );
 VIDEO_START( ddragon );

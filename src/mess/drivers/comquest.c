@@ -45,20 +45,20 @@ icq3250a-d
 #include "imagedev/cartslot.h"
 
 #ifdef UNUSED_FUNCTION
-static  READ8_HANDLER(comquest_read)
+READ8_MEMBER(comquest_state::comquest_read)
 {
 	UINT8 data=0;
 	logerror("comquest read %.4x %.2x\n",offset,data);
 	return data;
 }
 
-static WRITE8_HANDLER(comquest_write)
+WRITE8_MEMBER(comquest_state::comquest_write)
 {
 	logerror("comquest read %.4x %.2x\n",offset,data);
 }
 #endif
 
-static ADDRESS_MAP_START( comquest_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( comquest_mem , AS_PROGRAM, 8, comquest_state )
 //  { 0x0000, 0x7fff, SMH_BANK(1) },
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xffff) AM_READONLY AM_WRITENOP
@@ -205,8 +205,8 @@ GFXDECODE_END
 
 static MACHINE_RESET( comquest )
 {
-//  UINT8 *mem=machine.region("user1")->base();
-//  memory_set_bankptr(machine, 1,mem+0x00000);
+//  UINT8 *mem=machine.root_device().memregion("user1")->base();
+//  state->membank(1)->set_base(mem+0x00000);
 }
 
 static const UINT32 amask= 0xffff;

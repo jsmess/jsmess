@@ -21,10 +21,17 @@ class cbmb_state : public driver_device
 public:
 	cbmb_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_ieee(*this, IEEE488_TAG)
-	{ }
+		  m_ieee(*this, IEEE488_TAG),
+		m_basic(*this, "basic"),
+		m_videoram(*this, "videoram"),
+		m_kernal(*this, "kernal"),
+		m_colorram(*this, "colorram"){ }
 
 	required_device<ieee488_device> m_ieee;
+	required_shared_ptr<UINT8> m_basic;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_kernal;
+	optional_shared_ptr<UINT8> m_colorram;
 
 	DECLARE_READ8_MEMBER( vic_lightpen_x_cb );
 	DECLARE_READ8_MEMBER( vic_lightpen_y_cb );
@@ -41,10 +48,6 @@ public:
 	int m_p500;
 	int m_cbm700;
 	int m_cbm_ntsc;
-	UINT8 *m_videoram;
-	UINT8 *m_basic;
-	UINT8 *m_kernal;
-	UINT8 *m_colorram;
 	int m_keyline_a;
 	int m_keyline_b;
 	int m_keyline_c;
@@ -52,13 +55,13 @@ public:
 	int m_old_level;
 	int m_irq_level;
 	int m_font;
+	DECLARE_WRITE8_MEMBER(cbmb_colorram_w);
 };
 
 /*----------- defined in machine/cbmb.c -----------*/
 
 extern const mos6526_interface cbmb_cia;
 
-WRITE8_HANDLER ( cbmb_colorram_w );
 
 READ8_DEVICE_HANDLER( cbmb_tpi0_port_a_r );
 WRITE8_DEVICE_HANDLER( cbmb_tpi0_port_a_w );

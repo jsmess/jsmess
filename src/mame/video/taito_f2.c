@@ -34,8 +34,8 @@ static void taitof2_core_vh_start (running_machine &machine, int sprite_type, in
 	state->m_hide_pixels = hide;
 	state->m_flip_hide_pixels = flip_hide;
 
-	state->m_spriteram_delayed = auto_alloc_array(machine, UINT16, state->m_spriteram_size / 2);
-	state->m_spriteram_buffered = auto_alloc_array(machine, UINT16, state->m_spriteram_size / 2);
+	state->m_spriteram_delayed = auto_alloc_array(machine, UINT16, state->m_spriteram.bytes() / 2);
+	state->m_spriteram_buffered = auto_alloc_array(machine, UINT16, state->m_spriteram.bytes() / 2);
 	state->m_spritelist = auto_alloc_array(machine, struct f2_tempsprite, 0x400);
 
 	for (i = 0; i < 8; i ++)
@@ -67,8 +67,8 @@ static void taitof2_core_vh_start (running_machine &machine, int sprite_type, in
 	state->save_item(NAME(state->m_spritepri));
 	state->save_item(NAME(state->m_spriteblendmode));
 	state->save_item(NAME(state->m_prepare_sprites));
-	state->save_pointer(NAME(state->m_spriteram_delayed), state->m_spriteram_size / 2);
-	state->save_pointer(NAME(state->m_spriteram_buffered), state->m_spriteram_size / 2);
+	state->save_pointer(NAME(state->m_spriteram_delayed), state->m_spriteram.bytes() / 2);
+	state->save_pointer(NAME(state->m_spriteram_buffered), state->m_spriteram.bytes() / 2);
 }
 
 /**************************************************************************************/
@@ -230,21 +230,19 @@ might be for Footchmp. That seems to be the only game
 altering spritebanks of sprites while they're on screen.
 ********************************************************/
 
-WRITE16_HANDLER( taitof2_sprite_extension_w )
+WRITE16_MEMBER(taitof2_state::taitof2_sprite_extension_w)
 {
 	/* areas above 0x1000 cleared in some games, but not used */
-	taitof2_state *state = space->machine().driver_data<taitof2_state>();
 
 	if (offset < 0x800)
 	{
-		COMBINE_DATA(&state->m_sprite_extension[offset]);
+		COMBINE_DATA(&m_sprite_extension[offset]);
 	}
 }
 
 
-WRITE16_HANDLER( taitof2_spritebank_w )
+WRITE16_MEMBER(taitof2_state::taitof2_spritebank_w)
 {
-	taitof2_state *state = space->machine().driver_data<taitof2_state>();
 	int i = 0;
 	int j = 0;
 
@@ -255,8 +253,8 @@ WRITE16_HANDLER( taitof2_spritebank_w )
 	{
 		j = (offset & 1) << 1;   /* either set pair 0&1 or 2&3 */
 		i = data << 11;
-		state->m_spritebank_buffered[j] = i;
-		state->m_spritebank_buffered[j + 1] = (i + 0x400);
+		m_spritebank_buffered[j] = i;
+		m_spritebank_buffered[j + 1] = (i + 0x400);
 
 //logerror("bank %d, set to: %04x\n", j, i);
 //logerror("bank %d, paired so: %04x\n", j + 1, i + 0x400);
@@ -265,25 +263,24 @@ WRITE16_HANDLER( taitof2_spritebank_w )
 	else   /* last 4 are individual banks */
 	{
 		i = data << 10;
-		state->m_spritebank_buffered[offset] = i;
+		m_spritebank_buffered[offset] = i;
 
 //logerror("bank %d, new value: %04x\n", offset, i);
 	}
 
 }
 
-WRITE16_HANDLER( koshien_spritebank_w )
+WRITE16_MEMBER(taitof2_state::koshien_spritebank_w)
 {
-	taitof2_state *state = space->machine().driver_data<taitof2_state>();
-	state->m_spritebank_buffered[0] = 0x0000;   /* never changes */
-	state->m_spritebank_buffered[1] = 0x0400;
+	m_spritebank_buffered[0] = 0x0000;   /* never changes */
+	m_spritebank_buffered[1] = 0x0400;
 
-	state->m_spritebank_buffered[2] =  ((data & 0x00f) + 1) * 0x800;
-	state->m_spritebank_buffered[4] = (((data & 0x0f0) >> 4) + 1) * 0x800;
-	state->m_spritebank_buffered[6] = (((data & 0xf00) >> 8) + 1) * 0x800;
-	state->m_spritebank_buffered[3] = state->m_spritebank_buffered[2] + 0x400;
-	state->m_spritebank_buffered[5] = state->m_spritebank_buffered[4] + 0x400;
-	state->m_spritebank_buffered[7] = state->m_spritebank_buffered[6] + 0x400;
+	m_spritebank_buffered[2] =  ((data & 0x00f) + 1) * 0x800;
+	m_spritebank_buffered[4] = (((data & 0x0f0) >> 4) + 1) * 0x800;
+	m_spritebank_buffered[6] = (((data & 0xf00) >> 8) + 1) * 0x800;
+	m_spritebank_buffered[3] = m_spritebank_buffered[2] + 0x400;
+	m_spritebank_buffered[5] = m_spritebank_buffered[4] + 0x400;
+	m_spritebank_buffered[7] = m_spritebank_buffered[6] + 0x400;
 }
 
 static void taito_f2_tc360_spritemixdraw( running_machine &machine, bitmap_ind16 &dest_bmp, const rectangle &clip, const gfx_element *gfx,
@@ -840,7 +837,7 @@ static void taitof2_handle_sprite_buffering( running_machine &machine )
 
 	if (state->m_prepare_sprites)	/* no buffering */
 	{
-		memcpy(state->m_spriteram_buffered, state->m_spriteram, state->m_spriteram_size);
+		memcpy(state->m_spriteram_buffered, state->m_spriteram, state->m_spriteram.bytes());
 		state->m_prepare_sprites = 0;
 	}
 }
@@ -916,10 +913,10 @@ SCREEN_VBLANK( taitof2_full_buffer_delayed )
 		taitof2_update_sprites_active_area(screen.machine());
 
 		state->m_prepare_sprites = 0;
-		memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram_size);
-		for (i = 0; i < state->m_spriteram_size / 2; i++)
+		memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram.bytes());
+		for (i = 0; i < state->m_spriteram.bytes() / 2; i++)
 			state->m_spriteram_buffered[i] = spriteram[i];
-		memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram_size);
+		memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram.bytes());
 	}
 }
 
@@ -935,10 +932,10 @@ SCREEN_VBLANK( taitof2_partial_buffer_delayed )
 		taitof2_update_sprites_active_area(screen.machine());
 
 		state->m_prepare_sprites = 0;
-		memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram_size);
-		for (i = 0;i < state->m_spriteram_size / 2; i += 4)
+		memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram.bytes());
+		for (i = 0;i < state->m_spriteram.bytes() / 2; i += 4)
 			state->m_spriteram_buffered[i] = spriteram[i];
-		memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram_size);
+		memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram.bytes());
 	}
 }
 
@@ -954,14 +951,14 @@ SCREEN_VBLANK( taitof2_partial_buffer_delayed_thundfox )
 		taitof2_update_sprites_active_area(screen.machine());
 
 		state->m_prepare_sprites = 0;
-		memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram_size);
-		for (i = 0; i < state->m_spriteram_size / 2; i += 8)
+		memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram.bytes());
+		for (i = 0; i < state->m_spriteram.bytes() / 2; i += 8)
 		{
 			state->m_spriteram_buffered[i]     = spriteram[i];
 			state->m_spriteram_buffered[i + 1] = spriteram[i + 1];
 			state->m_spriteram_buffered[i + 4] = spriteram[i + 4];
 		}
-		memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram_size);
+		memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram.bytes());
 	}
 }
 
@@ -980,8 +977,8 @@ SCREEN_VBLANK( taitof2_partial_buffer_delayed_qzchikyu )
 		taitof2_update_sprites_active_area(screen.machine());
 
 		state->m_prepare_sprites = 0;
-		memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram_size);
-		for (i = 0; i < state->m_spriteram_size / 2; i += 8)
+		memcpy(state->m_spriteram_buffered, state->m_spriteram_delayed, state->m_spriteram.bytes());
+		for (i = 0; i < state->m_spriteram.bytes() / 2; i += 8)
 		{
 			state->m_spriteram_buffered[i]     = spriteram[i];
 			state->m_spriteram_buffered[i + 1] = spriteram[i + 1];
@@ -990,7 +987,7 @@ SCREEN_VBLANK( taitof2_partial_buffer_delayed_qzchikyu )
 			state->m_spriteram_buffered[i + 6] = spriteram[i + 6];	// not needed?
 			state->m_spriteram_buffered[i + 7] = spriteram[i + 7];	// not needed?
 		}
-		memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram_size);
+		memcpy(state->m_spriteram_delayed, spriteram, state->m_spriteram.bytes());
 	}
 }
 

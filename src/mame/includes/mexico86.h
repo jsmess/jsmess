@@ -3,13 +3,15 @@ class mexico86_state : public driver_device
 {
 public:
 	mexico86_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_objectram(*this, "objectram"),
+		m_protection_ram(*this, "protection_ram"),
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *     m_protection_ram;
-	UINT8 *     m_videoram;
-	UINT8 *     m_objectram;
-	size_t      m_objectram_size;
+	required_shared_ptr<UINT8> m_objectram;
+	required_shared_ptr<UINT8> m_protection_ram;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* video-related */
 	int      m_charbank;
@@ -39,25 +41,26 @@ public:
 	UINT8 m_queue[64];
 	int m_qfront;
 	int m_qstate;
+	DECLARE_WRITE8_MEMBER(mexico86_sub_output_w);
+	DECLARE_WRITE8_MEMBER(mexico86_f008_w);
+	DECLARE_READ8_MEMBER(mexico86_68705_port_a_r);
+	DECLARE_WRITE8_MEMBER(mexico86_68705_port_a_w);
+	DECLARE_WRITE8_MEMBER(mexico86_68705_ddr_a_w);
+	DECLARE_READ8_MEMBER(mexico86_68705_port_b_r);
+	DECLARE_WRITE8_MEMBER(mexico86_68705_port_b_w);
+	DECLARE_WRITE8_MEMBER(mexico86_68705_ddr_b_w);
+	DECLARE_WRITE8_MEMBER(mexico86_bankswitch_w);
 };
 
 
 /*----------- defined in machine/mexico86.c -----------*/
 
-WRITE8_HANDLER( mexico86_f008_w );
 INTERRUPT_GEN( kikikai_interrupt );
 INTERRUPT_GEN( mexico86_m68705_interrupt );
-READ8_HANDLER( mexico86_68705_port_a_r );
-WRITE8_HANDLER( mexico86_68705_port_a_w );
-WRITE8_HANDLER( mexico86_68705_ddr_a_w );
-READ8_HANDLER( mexico86_68705_port_b_r );
-WRITE8_HANDLER( mexico86_68705_port_b_w );
-WRITE8_HANDLER( mexico86_68705_ddr_b_w );
 
 
 /*----------- defined in video/mexico86.c -----------*/
 
-WRITE8_HANDLER( mexico86_bankswitch_w );
 
 SCREEN_UPDATE_IND16( mexico86 );
 SCREEN_UPDATE_IND16( kikikai );

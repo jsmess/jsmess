@@ -30,7 +30,8 @@ public:
 		  scsi(*this, "scsibus:7:ncr5390"),
 		  net(*this, "net"),
 		  mo(*this, "mo"),
-		  fdc(*this, "fdc")
+		  fdc(*this, "fdc"),
+		  vram(*this, "vram")
 	{ }
 
 	required_device<cpu_device> maincpu;
@@ -81,7 +82,7 @@ public:
 	UINT32 irq_status;
 	UINT32 irq_mask;
 	int irq_level;
-	UINT32 *vram;
+	required_shared_ptr<UINT32> vram;
 	UINT8 scsictrl, scsistat;
 
 	UINT32 phy[2];

@@ -5,12 +5,16 @@ class lwings_state : public driver_device
 public:
 	lwings_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram") { }
+		  m_spriteram(*this, "spriteram") ,
+		m_fgvideoram(*this, "fgvideoram"),
+		m_bg1videoram(*this, "bg1videoram"),
+		m_soundlatch2(*this, "soundlatch2"){ }
 
 	/* memory pointers */
-	UINT8 *  m_fgvideoram;
-	UINT8 *  m_bg1videoram;
-	UINT8 *  m_soundlatch2;
+	required_device<buffered_spriteram8_device> m_spriteram;
+	required_shared_ptr<UINT8> m_fgvideoram;
+	required_shared_ptr<UINT8> m_bg1videoram;
+	required_shared_ptr<UINT8> m_soundlatch2;
 //      UINT8 *  m_paletteram;    // currently this uses generic palette handling
 //      UINT8 *  m_paletteram2;   // currently this uses generic palette handling
 
@@ -30,18 +34,24 @@ public:
 	UINT8    m_adpcm;
 	UINT8    m_nmi_mask;
 
-	required_device<buffered_spriteram8_device> m_spriteram;
+	DECLARE_WRITE8_MEMBER(avengers_adpcm_w);
+	DECLARE_READ8_MEMBER(avengers_adpcm_r);
+	DECLARE_WRITE8_MEMBER(lwings_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(avengers_protection_w);
+	DECLARE_WRITE8_MEMBER(avengers_prot_bank_w);
+	DECLARE_READ8_MEMBER(avengers_protection_r);
+	DECLARE_READ8_MEMBER(avengers_soundlatch2_r);
+	DECLARE_WRITE8_MEMBER(lwings_fgvideoram_w);
+	DECLARE_WRITE8_MEMBER(lwings_bg1videoram_w);
+	DECLARE_WRITE8_MEMBER(lwings_bg1_scrollx_w);
+	DECLARE_WRITE8_MEMBER(lwings_bg1_scrolly_w);
+	DECLARE_WRITE8_MEMBER(trojan_bg2_scrollx_w);
+	DECLARE_WRITE8_MEMBER(trojan_bg2_image_w);
 };
 
 
 /*----------- defined in video/lwings.c -----------*/
 
-WRITE8_HANDLER( lwings_fgvideoram_w );
-WRITE8_HANDLER( lwings_bg1videoram_w );
-WRITE8_HANDLER( lwings_bg1_scrollx_w );
-WRITE8_HANDLER( lwings_bg1_scrolly_w );
-WRITE8_HANDLER( trojan_bg2_scrollx_w );
-WRITE8_HANDLER( trojan_bg2_image_w );
 
 VIDEO_START( lwings );
 VIDEO_START( trojan );

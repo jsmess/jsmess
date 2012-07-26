@@ -18,6 +18,7 @@
 
 PALETTE_INIT( vulgus )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	machine.colortable = colortable_alloc(machine, 256);
@@ -128,39 +129,36 @@ VIDEO_START( vulgus )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( vulgus_fgvideoram_w )
+WRITE8_MEMBER(vulgus_state::vulgus_fgvideoram_w)
 {
-	vulgus_state *state = space->machine().driver_data<vulgus_state>();
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( vulgus_bgvideoram_w )
+WRITE8_MEMBER(vulgus_state::vulgus_bgvideoram_w)
 {
-	vulgus_state *state = space->machine().driver_data<vulgus_state>();
-	state->m_bgvideoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-WRITE8_HANDLER( vulgus_c804_w )
+WRITE8_MEMBER(vulgus_state::vulgus_c804_w)
 {
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* bit 7 flips screen */
-	flip_screen_set(space->machine(), data & 0x80);
+	flip_screen_set(data & 0x80);
 }
 
 
-WRITE8_HANDLER( vulgus_palette_bank_w )
+WRITE8_MEMBER(vulgus_state::vulgus_palette_bank_w)
 {
-	vulgus_state *state = space->machine().driver_data<vulgus_state>();
-	if (state->m_palette_bank != (data & 3))
+	if (m_palette_bank != (data & 3))
 	{
-		state->m_palette_bank = data & 3;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_palette_bank = data & 3;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -178,7 +176,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	int offs;
 
 
-	for (offs = state->m_spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
 	{
 		int code,i,col,sx,sy,dir;
 
@@ -188,7 +186,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		sx = spriteram[offs + 3];
 		sy = spriteram[offs + 2];
 		dir = 1;
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -203,14 +201,14 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 					code + i,
 					col,
-					flip_screen_get(machine),flip_screen_get(machine),
+					state->flip_screen(),state->flip_screen(),
 					sx, sy + 16 * i * dir,15);
 
 			/* draw again with wraparound */
 			drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 					code + i,
 					col,
-					flip_screen_get(machine),flip_screen_get(machine),
+					state->flip_screen(),state->flip_screen(),
 					sx, sy + 16 * i * dir -  dir * 256,15);
 			i--;
 		} while (i >= 0);

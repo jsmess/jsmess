@@ -57,11 +57,10 @@ VIDEO_START( speedbal )
  *                                   *
  *************************************/
 
-WRITE8_HANDLER( speedbal_foreground_videoram_w )
+WRITE8_MEMBER(speedbal_state::speedbal_foreground_videoram_w)
 {
-	speedbal_state *state = space->machine().driver_data<speedbal_state>();
-	state->m_foreground_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset>>1);
+	m_foreground_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset>>1);
 }
 
 /*************************************
@@ -70,11 +69,10 @@ WRITE8_HANDLER( speedbal_foreground_videoram_w )
  *                                   *
  *************************************/
 
-WRITE8_HANDLER( speedbal_background_videoram_w )
+WRITE8_MEMBER(speedbal_state::speedbal_background_videoram_w)
 {
-	speedbal_state *state = space->machine().driver_data<speedbal_state>();
-	state->m_background_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset>>1);
+	m_background_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset>>1);
 }
 
 
@@ -92,7 +90,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 	/* Drawing sprites: 64 in total */
 
-	for (offset = 0;offset < state->m_spriteram_size;offset += 4)
+	for (offset = 0;offset < state->m_spriteram.bytes();offset += 4)
 	{
 		if(!(spriteram[offset + 2] & 0x80))
 			continue;
@@ -106,7 +104,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 		flipx = flipy = 0;
 
-		if(flip_screen_get(machine))
+		if(state->flip_screen())
 		{
 			x = 246 - x;
 			y = 238 - y;

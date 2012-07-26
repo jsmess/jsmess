@@ -21,7 +21,6 @@ Note that bit 3 of port 82 is tested at boot. If low, the computer bypasses
 the monitor and goes straight to "Joining HiNet".
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"

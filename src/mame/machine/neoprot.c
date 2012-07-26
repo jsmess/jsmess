@@ -6,7 +6,7 @@
         ssideki, fatfury2, kof98 (some versions), mslugx
 
     SMA chip
-        kof99, garou, garouo, mslug3, kof2002
+        kof99, garou, garouh, mslug3, kof2002
 
         custom banking, random number generator
         encryption (see machine/neocrypt.c)
@@ -119,7 +119,7 @@ void fatfury2_install_protection( running_machine &machine )
 static WRITE16_HANDLER ( kof98_prot_w )
 {
 	/* info from razoola */
-	UINT16* mem16 = (UINT16*)space->machine().region("maincpu")->base();
+	UINT16* mem16 = (UINT16*)space->machine().root_device().memregion("maincpu")->base();
 
 	switch (data)
 	{
@@ -160,7 +160,7 @@ void install_kof98_protection( running_machine &machine )
 void mslugx_install_protection( running_machine &machine )
 {
 	int i;
-	UINT16 *mem16 = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *mem16 = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	for (i = 0;i < (0x100000/2) - 4;i++)
 	{
@@ -257,7 +257,7 @@ static WRITE16_HANDLER( garou_bankswitch_w )
 }
 
 
-static WRITE16_HANDLER( garouo_bankswitch_w )
+static WRITE16_HANDLER( garouh_bankswitch_w )
 {
 	/* thanks to Razoola and Mr K for the info */
 	int bankaddress;
@@ -428,9 +428,9 @@ void garou_install_protection( running_machine &machine )
 }
 
 
-void garouo_install_protection( running_machine &machine )
+void garouh_install_protection( running_machine &machine )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x2fffc0, 0x2fffc1, FUNC(garouo_bankswitch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x2fffc0, 0x2fffc1, FUNC(garouh_bankswitch_w));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x2fe446, 0x2fe447, FUNC(prot_9a37_r));
 
 	sma_install_random_read_handler(machine, 0x2fffcc, 0x2ffff0);

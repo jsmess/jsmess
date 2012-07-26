@@ -35,7 +35,6 @@
 
 *****************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/tms9900/tms9900.h"
@@ -567,9 +566,9 @@ READ8_MEMBER( ti99_4p::read_by_9901 )
 		// (bit 1: INT1 status)
 		// (bit 2: INT2 status)
 		// bit 3-7: keyboard status bits 0 to 4
-		answer = ((input_port_read(machine(), keynames[m_keyboard_column >> 1]) >> ((m_keyboard_column & 1) * 8)) << 3) & 0xF8;
+		answer = ((ioport(keynames[m_keyboard_column >> 1])->read() >> ((m_keyboard_column & 1) * 8)) << 3) & 0xF8;
 		if (m_alphalock_line==false)
-			answer &= ~(input_port_read(*this, "ALPHA") << 3);
+			answer &= ~(ioport("ALPHA")->read() << 3);
 		break;
 
 	case TMS9901_INT8_INT15:
@@ -578,7 +577,7 @@ READ8_MEMBER( ti99_4p::read_by_9901 )
 		// bit 3: tape input mirror
 		// bit 5-7: weird, not emulated
 		if (m_keyboard_column == 7)	answer = 0x07;
-		else				answer = ((input_port_read(machine(), keynames[m_keyboard_column >> 1]) >> ((m_keyboard_column & 1) * 8)) >> 5) & 0x07;
+		else				answer = ((ioport(keynames[m_keyboard_column >> 1])->read() >> ((m_keyboard_column & 1) * 8)) >> 5) & 0x07;
 		break;
 
 	case TMS9901_P0_P7:
@@ -750,13 +749,13 @@ MACHINE_START( ti99_4p )
 	driver->m_cassette = static_cast<cassette_image_device*>(machine.device(CASSETTE_TAG));
 	driver->m_tms9901 = static_cast<tms9901_device*>(machine.device(TMS9901_TAG));
 
-	driver->m_ram = (UINT16*)(*machine.region(SAMSMEM_TAG));
-	driver->m_scratchpad = (UINT16*)(*machine.region(PADMEM_TAG));
+	driver->m_ram = (UINT16*)(*machine.root_device().memregion(SAMSMEM_TAG));
+	driver->m_scratchpad = (UINT16*)(*machine.root_device().memregion(PADMEM_TAG));
 
 	driver->m_peribox->senila(CLEAR_LINE);
 	driver->m_peribox->senilb(CLEAR_LINE);
 
-	UINT16 *rom = (UINT16*)(*machine.region("maincpu"));
+	UINT16 *rom = (UINT16*)(*machine.root_device().memregion("maincpu"));
 	driver->m_rom0  = rom + 0x2000;
 	driver->m_dsr   = rom + 0x6000;
 	driver->m_rom6a = rom + 0x3000;

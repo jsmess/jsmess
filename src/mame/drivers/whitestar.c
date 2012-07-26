@@ -2,7 +2,6 @@
     Sega/Stern Whitestar
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "video/mc6845.h"
@@ -18,7 +17,8 @@ public:
         m_dmdcpu(*this, "dmdcpu"),
 		m_mc6845(*this, "mc6845"),
 		m_decobsmt(*this, "decobsmt")
-        { }
+        ,
+		m_vram(*this, "vram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_dmdcpu;
@@ -30,7 +30,7 @@ public:
 	UINT8 m_dmd_status;
 	UINT8 m_dmd_busy;
 
-    UINT8 *m_vram;
+	required_shared_ptr<UINT8> m_vram;
 
 	DECLARE_WRITE8_MEMBER(dmd_latch_w);
     DECLARE_READ8_MEMBER(dmd_latch_r);
@@ -98,12 +98,12 @@ WRITE8_MEMBER(whitestar_state::switch_w)
 
 WRITE8_MEMBER(whitestar_state::bank_w)
 {
-	memory_set_bankptr(machine(), "bank1", machine().region("user1")->base() + (data & 0x1f) * 0x4000);
+	membank("bank1")->set_base(machine().root_device().memregion("user1")->base() + (data & 0x1f) * 0x4000);
 }
 
 WRITE8_MEMBER(whitestar_state::dmd_bank_w)
 {
-	memory_set_bankptr(machine(), "dmd_bank1", machine().region("dmdcpu")->base() + (data & 0x1f) * 0x4000);
+	membank("dmd_bank1")->set_base(machine().root_device().memregion("dmdcpu")->base() + (data & 0x1f) * 0x4000);
 }
 
 READ8_MEMBER(whitestar_state::dmd_latch_r)
@@ -158,7 +158,7 @@ WRITE8_MEMBER(whitestar_state::dmd_status_w)
 
 static ADDRESS_MAP_START( whitestar_dmd_map, AS_PROGRAM, 8, whitestar_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(m_vram) // video out
+	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_SHARE("vram") // video out
 	AM_RANGE(0x3000, 0x3000) AM_DEVREADWRITE("mc6845", mc6845_device, register_r, address_w)
 	AM_RANGE(0x3001, 0x3001) AM_DEVWRITE("mc6845", mc6845_device, register_w)
 	AM_RANGE(0x3002, 0x3002) AM_WRITE(dmd_bank_w)
@@ -170,8 +170,8 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( whitestar )
 {
-	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());
-	memory_set_bankptr(machine, "dmd_bank1", machine.region("dmdcpu")->base());
+	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("user1")->base());
+	machine.root_device().membank("dmd_bank1")->set_base(machine.root_device().memregion("dmdcpu")->base());
 }
 
 static DRIVER_INIT( whitestar )

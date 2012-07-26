@@ -62,22 +62,27 @@ class m79amb_state : public driver_device
 {
 public:
 	m79amb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_mask(*this, "mask"){ }
 
 	/* memory pointers */
-	UINT8 *        m_videoram;
-	UINT8 *        m_mask;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_mask;
 
 	/* misc */
 	UINT8 m_lut_gun1[0x100];
 	UINT8 m_lut_gun2[0x100];
+	DECLARE_WRITE8_MEMBER(ramtek_videoram_w);
+	DECLARE_READ8_MEMBER(gray5bit_controller0_r);
+	DECLARE_READ8_MEMBER(gray5bit_controller1_r);
+	DECLARE_WRITE8_MEMBER(m79amb_8002_w);
 };
 
 
-static WRITE8_HANDLER( ramtek_videoram_w )
+WRITE8_MEMBER(m79amb_state::ramtek_videoram_w)
 {
-	m79amb_state *state = space->machine().driver_data<m79amb_state>();
-	state->m_videoram[offset] = data & ~*state->m_mask;
+	m_videoram[offset] = data & ~*m_mask;
 }
 
 static SCREEN_UPDATE_RGB32( ramtek )
@@ -107,39 +112,37 @@ static SCREEN_UPDATE_RGB32( ramtek )
 }
 
 
-static READ8_HANDLER( gray5bit_controller0_r )
+READ8_MEMBER(m79amb_state::gray5bit_controller0_r)
 {
-	m79amb_state *state = space->machine().driver_data<m79amb_state>();
-	UINT8 port_data = input_port_read(space->machine(), "8004");
-	UINT8 gun_pos = input_port_read(space->machine(), "GUN1");
+	UINT8 port_data = ioport("8004")->read();
+	UINT8 gun_pos = ioport("GUN1")->read();
 
-	return (port_data & 0xe0) | state->m_lut_gun1[gun_pos];
+	return (port_data & 0xe0) | m_lut_gun1[gun_pos];
 }
 
-static READ8_HANDLER( gray5bit_controller1_r )
+READ8_MEMBER(m79amb_state::gray5bit_controller1_r)
 {
-	m79amb_state *state = space->machine().driver_data<m79amb_state>();
-	UINT8 port_data = input_port_read(space->machine(), "8005");
-	UINT8 gun_pos = input_port_read(space->machine(), "GUN2");
+	UINT8 port_data = ioport("8005")->read();
+	UINT8 gun_pos = ioport("GUN2")->read();
 
-	return (port_data & 0xe0) | state->m_lut_gun2[gun_pos];
+	return (port_data & 0xe0) | m_lut_gun2[gun_pos];
 }
 
-static WRITE8_HANDLER( m79amb_8002_w )
+WRITE8_MEMBER(m79amb_state::m79amb_8002_w)
 {
 	/* D1 may also be watchdog reset */
 	/* port goes to 0x7f to turn on explosion lamp */
 	output_set_value("EXP_LAMP", data ? 1 : 0);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, m79amb_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(ramtek_videoram_w) AM_BASE_MEMBER(m79amb_state, m_videoram)
+	AM_RANGE(0x4000, 0x5fff) AM_RAM_WRITE(ramtek_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x6000, 0x63ff) AM_RAM					/* ?? */
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("8000") AM_DEVWRITE("discrete", m79amb_8000_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITEONLY AM_BASE_MEMBER(m79amb_state, m_mask)
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("8000") AM_DEVWRITE_LEGACY("discrete", m79amb_8000_w)
+	AM_RANGE(0x8001, 0x8001) AM_WRITEONLY AM_SHARE("mask")
 	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("8002") AM_WRITE(m79amb_8002_w)
-	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE("discrete", m79amb_8003_w)
+	AM_RANGE(0x8003, 0x8003) AM_DEVWRITE_LEGACY("discrete", m79amb_8003_w)
 	AM_RANGE(0x8004, 0x8004) AM_READ(gray5bit_controller0_r)
 	AM_RANGE(0x8005, 0x8005) AM_READ(gray5bit_controller1_r)
 	AM_RANGE(0xc000, 0xc07f) AM_RAM					/* ?? */
@@ -168,7 +171,7 @@ static INPUT_PORTS_START( m79amb )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Free_Play ))
 
 	PORT_START("8002")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
@@ -287,7 +290,7 @@ static const UINT8 lut_pos[0x20] = {
 static DRIVER_INIT( m79amb )
 {
 	m79amb_state *state = machine.driver_data<m79amb_state>();
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	int i, j;
 
 	/* PROM data is active low */

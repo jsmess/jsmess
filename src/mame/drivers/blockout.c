@@ -74,29 +74,26 @@
 #define MAIN_CLOCK XTAL_10MHz
 #define AUDIO_CLOCK XTAL_3_579545MHz
 
-static WRITE16_HANDLER( blockout_sound_command_w )
+WRITE16_MEMBER(blockout_state::blockout_sound_command_w)
 {
-	blockout_state *state = space->machine().driver_data<blockout_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, offset, data & 0xff);
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_byte_w(space, offset, data & 0xff);
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
-static WRITE16_HANDLER( blockout_irq6_ack_w )
+WRITE16_MEMBER(blockout_state::blockout_irq6_ack_w)
 {
-	blockout_state *state = space->machine().driver_data<blockout_state>();
 
-	device_set_input_line(state->m_maincpu, 6, CLEAR_LINE);
+	device_set_input_line(m_maincpu, 6, CLEAR_LINE);
 }
 
-static WRITE16_HANDLER( blockout_irq5_ack_w )
+WRITE16_MEMBER(blockout_state::blockout_irq5_ack_w)
 {
-	blockout_state *state = space->machine().driver_data<blockout_state>();
 
-	device_set_input_line(state->m_maincpu, 5, CLEAR_LINE);
+	device_set_input_line(m_maincpu, 5, CLEAR_LINE);
 }
 
 /*************************************
@@ -105,7 +102,7 @@ static WRITE16_HANDLER( blockout_irq5_ack_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, blockout_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P1")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P2")
@@ -116,16 +113,16 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x100012, 0x100013) AM_WRITE(blockout_irq5_ack_w)
 	AM_RANGE(0x100014, 0x100015) AM_WRITE(blockout_sound_command_w)
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP	/* don't know, maybe reset sound CPU */
-	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_BASE_MEMBER(blockout_state, m_videoram)
+	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x1f4000, 0x1fffff) AM_RAM	/* work RAM */
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_MEMBER(blockout_state, m_frontvideoram)
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("frontvideoram")
 	AM_RANGE(0x208000, 0x21ffff) AM_RAM	/* ??? */
 	AM_RANGE(0x280002, 0x280003) AM_WRITE(blockout_frontcolor_w)
-	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_BASE_MEMBER(blockout_state, m_paletteram)
+	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( agress_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( agress_map, AS_PROGRAM, 16, blockout_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P1")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("P2")
@@ -136,21 +133,21 @@ static ADDRESS_MAP_START( agress_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x100012, 0x100013) AM_WRITE(blockout_irq5_ack_w)
 	AM_RANGE(0x100014, 0x100015) AM_WRITE(blockout_sound_command_w)
 	AM_RANGE(0x100016, 0x100017) AM_WRITENOP	/* don't know, maybe reset sound CPU */
-	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_BASE_MEMBER(blockout_state, m_videoram)
+	AM_RANGE(0x180000, 0x1bffff) AM_RAM_WRITE(blockout_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1d4000, 0x1dffff) AM_RAM	/* work RAM */
 	AM_RANGE(0x1f4000, 0x1fffff) AM_RAM	/* work RAM */
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE_MEMBER(blockout_state, m_frontvideoram) AM_MIRROR(0x004000) // agress checks at F3A that this is mirrored, blockout glitches if you do it to it
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("frontvideoram") AM_MIRROR(0x004000) // agress checks at F3A that this is mirrored, blockout glitches if you do it to it
 	AM_RANGE(0x208000, 0x21ffff) AM_RAM	/* ??? */
 	AM_RANGE(0x280002, 0x280003) AM_WRITE(blockout_frontcolor_w)
-	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_BASE_MEMBER(blockout_state, m_paletteram)
+	AM_RANGE(0x280200, 0x2805ff) AM_RAM_WRITE(blockout_paletteram_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, blockout_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 
@@ -271,7 +268,7 @@ static void blockout_irq_handler(device_t *device, int irq)
 
 static const ym2151_interface ym2151_config =
 {
-	blockout_irq_handler
+	DEVCB_LINE(blockout_irq_handler)
 };
 
 

@@ -12,7 +12,6 @@
             KR580VV79  programmable peripheral device, keyboard and display controller (i8279)
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -105,7 +104,7 @@ static I8275_DISPLAY_PIXELS(sm1800_display_pixels)
 	int i;
 	sm1800_state *state = device->machine().driver_data<sm1800_state>();
 	bitmap_ind16 &bitmap = state->m_bitmap;
-	UINT8 *charmap = device->machine().region("chargen")->base();
+	UINT8 *charmap = state->memregion("chargen")->base();
 	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if (vsp)
 		pixels = 0;

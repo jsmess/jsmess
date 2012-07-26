@@ -302,7 +302,7 @@ INLINE int sign_double(double x)
     structure based on the configured type
 -------------------------------------------------*/
 
-void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, legacy_cpu_device *device, device_irq_callback irqcallback)
+void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback)
 {
 	const powerpc_config *config = (const powerpc_config *)device->static_config();
 
@@ -2146,8 +2146,8 @@ static WRITE8_HANDLER( ppc4xx_spu_w )
     the 4XX
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( internal_ppc4xx, AS_PROGRAM, 32 )
-	AM_RANGE(0x40000000, 0x4000000f) AM_READWRITE8(ppc4xx_spu_r, ppc4xx_spu_w, 0xffffffff)
+static ADDRESS_MAP_START( internal_ppc4xx, AS_PROGRAM, 32, legacy_cpu_device )
+	AM_RANGE(0x40000000, 0x4000000f) AM_READWRITE8_LEGACY(ppc4xx_spu_r, ppc4xx_spu_w, 0xffffffff)
 ADDRESS_MAP_END
 
 

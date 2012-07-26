@@ -26,7 +26,7 @@ public:
 	virtual bool call_load();
 	virtual void call_unload();
 
-	virtual iodevice_t image_type() const { return IO_UNKNOWN; }
+	virtual iodevice_t image_type() const { return IO_ROM; }
 
 	virtual bool is_readable()  const { return 1; }
 	virtual bool is_writeable() const { return 0; }
@@ -43,7 +43,6 @@ protected:
 	// device-level overrides
     virtual void device_config_complete() { update_names(); }
 	virtual void device_start();
-	void update_names();
 
 private:
 	UINT8* m_base;

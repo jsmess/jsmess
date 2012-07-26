@@ -31,6 +31,7 @@
 
 PALETTE_INIT( trackfld )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -89,74 +90,71 @@ PALETTE_INIT( trackfld )
 	}
 }
 
-WRITE8_HANDLER( trackfld_videoram_w )
+WRITE8_MEMBER(trackfld_state::trackfld_videoram_w)
 {
-	trackfld_state *state = space->machine().driver_data<trackfld_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( trackfld_colorram_w )
+WRITE8_MEMBER(trackfld_state::trackfld_colorram_w)
 {
-	trackfld_state *state = space->machine().driver_data<trackfld_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( trackfld_flipscreen_w )
+WRITE8_MEMBER(trackfld_state::trackfld_flipscreen_w)
 {
-	if (flip_screen_get(space->machine()) != data)
+	if (flip_screen() != data)
 	{
-		flip_screen_set(space->machine(), data);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(data);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( atlantol_gfxbank_w )
+WRITE8_MEMBER(trackfld_state::atlantol_gfxbank_w)
 {
-	trackfld_state *state = space->machine().driver_data<trackfld_state>();
 	if (data & 1)
 	{
 		/* male / female sprites switch */
-		if ((state->m_old_gfx_bank == 1 && (data & 1) == 1) || (state->m_old_gfx_bank == 0 && (data & 1) == 1))
-			state->m_sprite_bank2 = 0x200;
+		if ((m_old_gfx_bank == 1 && (data & 1) == 1) || (m_old_gfx_bank == 0 && (data & 1) == 1))
+			m_sprite_bank2 = 0x200;
 		else
-			state->m_sprite_bank2 = 0;
+			m_sprite_bank2 = 0;
 
-		state->m_sprite_bank1 = 0;
-		state->m_old_gfx_bank = data & 1;
+		m_sprite_bank1 = 0;
+		m_old_gfx_bank = data & 1;
 	}
 	else
 	{
 		/* male / female sprites switch */
-		if ((state->m_old_gfx_bank == 0 && (data & 1) == 0) || (state->m_old_gfx_bank == 1 && (data & 1) == 0))
-			state->m_sprite_bank2 = 0;
+		if ((m_old_gfx_bank == 0 && (data & 1) == 0) || (m_old_gfx_bank == 1 && (data & 1) == 0))
+			m_sprite_bank2 = 0;
 		else
-			state->m_sprite_bank2 = 0x200;
+			m_sprite_bank2 = 0x200;
 
-		state->m_sprite_bank1 = 0;
-		state->m_old_gfx_bank = data & 1;
+		m_sprite_bank1 = 0;
+		m_old_gfx_bank = data & 1;
 	}
 
 	if ((data & 3) == 3)
 	{
-		if (state->m_sprite_bank2)
-			state->m_sprite_bank1 = 0x500;
+		if (m_sprite_bank2)
+			m_sprite_bank1 = 0x500;
 		else
-			state->m_sprite_bank1 = 0x300;
+			m_sprite_bank1 = 0x300;
 	}
 	else if ((data & 3) == 2)
 	{
-		if (state->m_sprite_bank2)
-			state->m_sprite_bank1 = 0x300;
+		if (m_sprite_bank2)
+			m_sprite_bank1 = 0x300;
 		else
-			state->m_sprite_bank1 = 0x100;
+			m_sprite_bank1 = 0x100;
 	}
 
-	if (state->m_bg_bank != (data & 0x8))
+	if (m_bg_bank != (data & 0x8))
 	{
-		state->m_bg_bank = data & 0x8;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bg_bank = data & 0x8;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -199,7 +197,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT8 *spriteram_2 = state->m_spriteram2;
 	int offs;
 
-	for (offs = state->m_spriteram_size - 2; offs >= 0; offs -= 2)
+	for (offs = state->m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
 	{
 		int attr = spriteram_2[offs];
 		int code = spriteram[offs + 1];
@@ -211,7 +209,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sx = spriteram[offs] - 1;
 		int sy = 240 - spriteram_2[offs + 1];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
@@ -256,7 +254,7 @@ SCREEN_UPDATE_IND16( trackfld )
 	for (row = 0; row < 32; row++)
 	{
 		scrollx = state->m_scroll[row] + 256 * (state->m_scroll2[row] & 0x01);
-		if (flip_screen_get(screen.machine())) scrollx = -scrollx;
+		if (state->flip_screen()) scrollx = -scrollx;
 		state->m_bg_tilemap->set_scrollx(row, scrollx);
 	}
 

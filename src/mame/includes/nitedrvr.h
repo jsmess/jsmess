@@ -19,11 +19,13 @@ class nitedrvr_state : public driver_device
 {
 public:
 	nitedrvr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_hvc(*this, "hvc"){ }
 
 	/* memory pointers */
-	UINT8 *    m_hvc;
-	UINT8 *    m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_hvc;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -42,17 +44,19 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_discrete;
+	DECLARE_READ8_MEMBER(nitedrvr_steering_reset_r);
+	DECLARE_WRITE8_MEMBER(nitedrvr_steering_reset_w);
+	DECLARE_READ8_MEMBER(nitedrvr_in0_r);
+	DECLARE_READ8_MEMBER(nitedrvr_in1_r);
+	DECLARE_WRITE8_MEMBER(nitedrvr_out0_w);
+	DECLARE_WRITE8_MEMBER(nitedrvr_out1_w);
+	DECLARE_WRITE8_MEMBER(nitedrvr_videoram_w);
+	DECLARE_WRITE8_MEMBER(nitedrvr_hvc_w);
 };
 
 
 /*----------- defined in machine/nitedrvr.c -----------*/
 
-READ8_HANDLER( nitedrvr_in0_r );
-READ8_HANDLER( nitedrvr_in1_r );
-READ8_HANDLER( nitedrvr_steering_reset_r );
-WRITE8_HANDLER( nitedrvr_steering_reset_w );
-WRITE8_HANDLER( nitedrvr_out0_w );
-WRITE8_HANDLER( nitedrvr_out1_w );
 
 TIMER_DEVICE_CALLBACK( nitedrvr_crash_toggle_callback );
 
@@ -67,8 +71,6 @@ DISCRETE_SOUND_EXTERN( nitedrvr );
 
 /*----------- defined in video/nitedrvr.c -----------*/
 
-WRITE8_HANDLER( nitedrvr_hvc_w );
-WRITE8_HANDLER( nitedrvr_videoram_w );
 
 VIDEO_START( nitedrvr );
 SCREEN_UPDATE_IND16( nitedrvr );

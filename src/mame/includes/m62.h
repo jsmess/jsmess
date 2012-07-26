@@ -2,15 +2,18 @@ class m62_state : public driver_device
 {
 public:
 	m62_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_m62_tileram(*this, "m62_tileram"),
+		m_m62_textram(*this, "m62_textram"),
+		m_scrollram(*this, "scrollram"){ }
 
 	/* memory pointers */
-	UINT8 *              m_spriteram;
-	size_t               m_spriteram_size;
+	required_shared_ptr<UINT8> m_spriteram;
 
-	UINT8 *              m_m62_tileram;
-	UINT8 *              m_m62_textram;
-	UINT8 *              m_scrollram;
+	required_shared_ptr<UINT8> m_m62_tileram;
+	optional_shared_ptr<UINT8> m_m62_textram;
+	optional_shared_ptr<UINT8> m_scrollram;
 
 	/* video-related */
 	tilemap_t*             m_bg_tilemap;
@@ -28,27 +31,36 @@ public:
 	/* misc */
 	int                 m_ldrun2_bankswap;	//ldrun2
 	int                 m_bankcontrol[2];	//ldrun2
+	DECLARE_READ8_MEMBER(ldrun2_bankswitch_r);
+	DECLARE_WRITE8_MEMBER(ldrun2_bankswitch_w);
+	DECLARE_READ8_MEMBER(ldrun3_prot_5_r);
+	DECLARE_READ8_MEMBER(ldrun3_prot_7_r);
+	DECLARE_WRITE8_MEMBER(ldrun4_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(kidniki_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(spelunkr_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(spelunk2_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(youjyudn_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(m62_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(m62_hscroll_low_w);
+	DECLARE_WRITE8_MEMBER(m62_hscroll_high_w);
+	DECLARE_WRITE8_MEMBER(m62_vscroll_low_w);
+	DECLARE_WRITE8_MEMBER(m62_vscroll_high_w);
+	DECLARE_WRITE8_MEMBER(m62_tileram_w);
+	DECLARE_WRITE8_MEMBER(m62_textram_w);
+	DECLARE_WRITE8_MEMBER(kungfum_tileram_w);
+	DECLARE_WRITE8_MEMBER(ldrun3_topbottom_mask_w);
+	DECLARE_WRITE8_MEMBER(kidniki_text_vscroll_low_w);
+	DECLARE_WRITE8_MEMBER(kidniki_text_vscroll_high_w);
+	DECLARE_WRITE8_MEMBER(kidniki_background_bank_w);
+	DECLARE_WRITE8_MEMBER(spelunkr_palbank_w);
+	DECLARE_WRITE8_MEMBER(spelunk2_gfxport_w);
+	DECLARE_WRITE8_MEMBER(horizon_scrollram_w);
 };
 
 
 /*----------- defined in video/m62.c -----------*/
 
-WRITE8_HANDLER( m62_tileram_w );
-WRITE8_HANDLER( m62_textram_w );
-WRITE8_HANDLER( m62_flipscreen_w );
-WRITE8_HANDLER( m62_hscroll_low_w );
-WRITE8_HANDLER( m62_hscroll_high_w );
-WRITE8_HANDLER( m62_vscroll_low_w );
-WRITE8_HANDLER( m62_vscroll_high_w );
 
-WRITE8_HANDLER( horizon_scrollram_w );
-WRITE8_HANDLER( kidniki_text_vscroll_low_w );
-WRITE8_HANDLER( kidniki_text_vscroll_high_w );
-WRITE8_HANDLER( kidniki_background_bank_w );
-WRITE8_HANDLER( kungfum_tileram_w );
-WRITE8_HANDLER( ldrun3_topbottom_mask_w );
-WRITE8_HANDLER( spelunkr_palbank_w );
-WRITE8_HANDLER( spelunk2_gfxport_w );
 
 PALETTE_INIT( m62 );
 PALETTE_INIT( lotlot );

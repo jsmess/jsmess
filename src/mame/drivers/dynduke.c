@@ -72,25 +72,25 @@ Also, implemented conditional port for Coin Mode (SW1:1)
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( master_map, AS_PROGRAM, 16, dynduke_state )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x08000, 0x080ff) AM_RAM AM_BASE_MEMBER(dynduke_state, m_scroll_ram)
+	AM_RANGE(0x08000, 0x080ff) AM_RAM AM_SHARE("scroll_ram")
 	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0b000, 0x0b001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0b002, 0x0b003) AM_READ_PORT("DSW")
 	AM_RANGE(0x0b004, 0x0b005) AM_WRITENOP
 	AM_RANGE(0x0b006, 0x0b007) AM_WRITE(dynduke_control_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(dynduke_text_w) AM_BASE_MEMBER(dynduke_state, m_videoram)
-	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(dynduke_text_w) AM_SHARE("videoram")
+	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16, dynduke_state )
 	AM_RANGE(0x00000, 0x05fff) AM_RAM
-	AM_RANGE(0x06000, 0x067ff) AM_RAM_WRITE(dynduke_background_w) AM_BASE_MEMBER(dynduke_state, m_back_data)
-	AM_RANGE(0x06800, 0x06fff) AM_RAM_WRITE(dynduke_foreground_w) AM_BASE_MEMBER(dynduke_state, m_fore_data)
-	AM_RANGE(0x07000, 0x07fff) AM_RAM_WRITE(dynduke_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x06000, 0x067ff) AM_RAM_WRITE(dynduke_background_w) AM_SHARE("back_data")
+	AM_RANGE(0x06800, 0x06fff) AM_RAM_WRITE(dynduke_foreground_w) AM_SHARE("fore_data")
+	AM_RANGE(0x07000, 0x07fff) AM_RAM_WRITE(dynduke_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0a000, 0x0a001) AM_WRITE(dynduke_gfxbank_w)
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITENOP
@@ -98,12 +98,12 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 /* Memory map used by DlbDyn - probably an addressing PAL is different */
-static ADDRESS_MAP_START( masterj_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( masterj_map, AS_PROGRAM, 16, dynduke_state )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x08000, 0x087ff) AM_RAM_WRITE(dynduke_text_w) AM_BASE_MEMBER(dynduke_state, m_videoram)
-	AM_RANGE(0x09000, 0x0900d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
-	AM_RANGE(0x0c000, 0x0c0ff) AM_RAM AM_BASE_MEMBER(dynduke_state, m_scroll_ram)
+	AM_RANGE(0x08000, 0x087ff) AM_RAM_WRITE(dynduke_text_w) AM_SHARE("videoram")
+	AM_RANGE(0x09000, 0x0900d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0c000, 0x0c0ff) AM_RAM AM_SHARE("scroll_ram")
 	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x0f000, 0x0f001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0f002, 0x0f003) AM_READ_PORT("DSW")
@@ -139,18 +139,18 @@ static INPUT_PORTS_START( dynduke )
 	PORT_DIPNAME( 0x0001, 0x0001, "Coin Mode" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0001, "Mode 1" )
 	PORT_DIPSETTING(      0x0000, "Mode 2" )
-	PORT_DIPNAME( 0x0006, 0x0006, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:2,3") PORT_CONDITION("DSW", 0x0001, PORTCOND_EQUALS, 0x0000)
+	PORT_DIPNAME( 0x0006, 0x0006, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:2,3") PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0000)
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x0018, 0x0008, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:4,5") PORT_CONDITION("DSW", 0x0001, PORTCOND_EQUALS, 0x0000)
+	PORT_DIPNAME( 0x0018, 0x0008, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:4,5") PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0000)
 	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x001e, 0x001e, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:2,3,4,5") PORT_CONDITION("DSW", 0x0001, PORTCOND_EQUALS, 0x0001)
+	PORT_DIPNAME( 0x001e, 0x001e, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:2,3,4,5") PORT_CONDITION("DSW", 0x0001, EQUALS, 0x0001)
 	PORT_DIPSETTING(      0x0018, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x001a, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x001c, DEF_STR( 2C_1C ) )

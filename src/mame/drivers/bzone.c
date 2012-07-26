@@ -244,7 +244,7 @@ static MACHINE_START( redbaron )
 
 static INTERRUPT_GEN( bzone_interrupt )
 {
-	if (input_port_read(device->machine(), "IN0") & 0x10)
+	if (device->machine().root_device().ioport("IN0")->read() & 0x10)
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -256,15 +256,15 @@ static INTERRUPT_GEN( bzone_interrupt )
  *
  *************************************/
 
-static CUSTOM_INPUT( clock_r )
+CUSTOM_INPUT_MEMBER(bzone_state::clock_r)
 {
-	return (field.machine().device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
+	return (machine().device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
 }
 
 
-static WRITE8_HANDLER( bzone_coin_counter_w )
+WRITE8_MEMBER(bzone_state::bzone_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset,data);
+	coin_counter_w(machine(), offset,data);
 }
 
 
@@ -278,7 +278,7 @@ static WRITE8_HANDLER( bzone_coin_counter_w )
 static READ8_DEVICE_HANDLER( redbaron_joy_r )
 {
 	bzone_state *state = device->machine().driver_data<bzone_state>();
-	return input_port_read(device->machine(), state->m_rb_input_select ? "FAKE1" : "FAKE2");
+	return state->ioport(state->m_rb_input_select ? "FAKE1" : "FAKE2")->read();
 }
 
 static WRITE8_DEVICE_HANDLER( redbaron_joysound_w )
@@ -296,47 +296,47 @@ static WRITE8_DEVICE_HANDLER( redbaron_joysound_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( bzone_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bzone_map, AS_PROGRAM, 8, bzone_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
 	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(bzone_coin_counter_w)
-	AM_RANGE(0x1200, 0x1200) AM_WRITE(avgdvg_go_w)
+	AM_RANGE(0x1200, 0x1200) AM_WRITE_LEGACY(avgdvg_go_w)
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x1600, 0x1600) AM_WRITE(avgdvg_reset_w)
-	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("mathbox", mathbox_status_r)
-	AM_RANGE(0x1810, 0x1810) AM_DEVREAD("mathbox", mathbox_lo_r)
-	AM_RANGE(0x1818, 0x1818) AM_DEVREAD("mathbox", mathbox_hi_r)
-	AM_RANGE(0x1820, 0x182f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0x1840, 0x1840) AM_DEVWRITE("discrete", bzone_sounds_w)
-	AM_RANGE(0x1860, 0x187f) AM_DEVWRITE("mathbox", mathbox_go_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x2000)
+	AM_RANGE(0x1600, 0x1600) AM_WRITE_LEGACY(avgdvg_reset_w)
+	AM_RANGE(0x1800, 0x1800) AM_DEVREAD_LEGACY("mathbox", mathbox_status_r)
+	AM_RANGE(0x1810, 0x1810) AM_DEVREAD_LEGACY("mathbox", mathbox_lo_r)
+	AM_RANGE(0x1818, 0x1818) AM_DEVREAD_LEGACY("mathbox", mathbox_hi_r)
+	AM_RANGE(0x1820, 0x182f) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0x1840, 0x1840) AM_DEVWRITE_LEGACY("discrete", bzone_sounds_w)
+	AM_RANGE(0x1860, 0x187f) AM_DEVWRITE_LEGACY("mathbox", mathbox_go_w)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE_LEGACY(&avgdvg_vectorram) AM_SIZE_LEGACY(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( redbaron_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( redbaron_map, AS_PROGRAM, 8, bzone_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
 	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP		/* coin out */
-	AM_RANGE(0x1200, 0x1200) AM_WRITE(avgdvg_go_w)
+	AM_RANGE(0x1200, 0x1200) AM_WRITE_LEGACY(avgdvg_go_w)
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x1600, 0x1600) AM_WRITE(avgdvg_reset_w)
-	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("mathbox", mathbox_status_r)
+	AM_RANGE(0x1600, 0x1600) AM_WRITE_LEGACY(avgdvg_reset_w)
+	AM_RANGE(0x1800, 0x1800) AM_DEVREAD_LEGACY("mathbox", mathbox_status_r)
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN4")
-	AM_RANGE(0x1804, 0x1804) AM_DEVREAD("mathbox", mathbox_lo_r)
-	AM_RANGE(0x1806, 0x1806) AM_DEVREAD("mathbox", mathbox_hi_r)
-	AM_RANGE(0x1808, 0x1808) AM_DEVWRITE("custom", redbaron_joysound_w)	/* and select joystick pot also */
+	AM_RANGE(0x1804, 0x1804) AM_DEVREAD_LEGACY("mathbox", mathbox_lo_r)
+	AM_RANGE(0x1806, 0x1806) AM_DEVREAD_LEGACY("mathbox", mathbox_hi_r)
+	AM_RANGE(0x1808, 0x1808) AM_DEVWRITE_LEGACY("custom", redbaron_joysound_w)	/* and select joystick pot also */
 	AM_RANGE(0x180a, 0x180a) AM_WRITENOP				/* sound reset, yet todo */
-	AM_RANGE(0x180c, 0x180c) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, ctrl_w)
-	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0x1820, 0x185f) AM_DEVREADWRITE_MODERN("earom", atari_vg_earom_device, read, write)
-	AM_RANGE(0x1860, 0x187f) AM_DEVWRITE("mathbox", mathbox_go_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x2000)
+	AM_RANGE(0x180c, 0x180c) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
+	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0x1820, 0x185f) AM_DEVREADWRITE("earom", atari_vg_earom_device, read, write)
+	AM_RANGE(0x1860, 0x187f) AM_DEVWRITE_LEGACY("mathbox", mathbox_go_w)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE_LEGACY(&avgdvg_vectorram) AM_SIZE_LEGACY(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x3000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -359,7 +359,7 @@ ADDRESS_MAP_END
 	/* per default (busy vector processor). */\
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)\
 	/* bit 7 is tied to a 3kHz clock */\
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bzone_state,clock_r, NULL)
 
 
 #define BZONEDSW0\
@@ -778,31 +778,30 @@ ROM_END
  *
  *************************************/
 
-static READ8_HANDLER( analog_data_r )
+READ8_MEMBER(bzone_state::analog_data_r)
 {
-	bzone_state *state = space->machine().driver_data<bzone_state>();
-	return state->m_analog_data;
+	return m_analog_data;
 }
 
 
-static WRITE8_HANDLER( analog_select_w )
+WRITE8_MEMBER(bzone_state::analog_select_w)
 {
-	bzone_state *state = space->machine().driver_data<bzone_state>();
 	static const char *const analog_port[] = { "AN0", "AN1", "AN2" };
 
 	if (offset <= 2)
-		state->m_analog_data = input_port_read(space->machine(), analog_port[offset]);
+		m_analog_data = ioport(analog_port[offset])->read();
 }
 
 
 static DRIVER_INIT( bradley )
 {
+	bzone_state *state = machine.driver_data<bzone_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	space->install_ram(0x400, 0x7ff);
 	space->install_read_port(0x1808, 0x1808, "1808");
 	space->install_read_port(0x1809, 0x1809, "1809");
-	space->install_legacy_read_handler(0x180a, 0x180a, FUNC(analog_data_r));
-	space->install_legacy_write_handler(0x1848, 0x1850, FUNC(analog_select_w));
+	space->install_read_handler(0x180a, 0x180a, read8_delegate(FUNC(bzone_state::analog_data_r),state));
+	space->install_write_handler(0x1848, 0x1850, write8_delegate(FUNC(bzone_state::analog_select_w),state));
 }
 
 

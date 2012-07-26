@@ -50,12 +50,22 @@ class poo_state : public driver_device
 {
 public:
 	poo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_sprites(*this, "sprites"),
+		m_scrolly(*this, "scrolly"),
+		m_vram(*this, "vram"){ }
 
-	UINT8 *m_vram;
-	UINT8 *m_scrolly;
-	UINT8 *m_sprites;
+	required_shared_ptr<UINT8> m_sprites;
+	required_shared_ptr<UINT8> m_scrolly;
+	required_shared_ptr<UINT8> m_vram;
 	UINT8 m_vram_colbank;
+	DECLARE_READ8_MEMBER(unk_inp_r);
+	DECLARE_READ8_MEMBER(unk_inp2_r);
+	DECLARE_READ8_MEMBER(unk_inp3_r);
+	DECLARE_WRITE8_MEMBER(unk_w);
+	DECLARE_WRITE8_MEMBER(sound_cmd_w);
+	DECLARE_WRITE8_MEMBER(poo_vregs_w);
+	DECLARE_READ8_MEMBER(timer_r);
 };
 
 
@@ -106,54 +116,53 @@ static SCREEN_UPDATE_IND16(unclepoo)
 	return 0;
 }
 
-static READ8_HANDLER( unk_inp_r )
+READ8_MEMBER(poo_state::unk_inp_r)
 {
-	return 0x00;//space->machine().rand();
+	return 0x00;//machine().rand();
 }
 
 #if 0
 
-static READ8_HANDLER( unk_inp2_r )
+READ8_MEMBER(poo_state::unk_inp2_r)
 {
 	return 0xff;
 }
 
-static READ8_HANDLER( unk_inp3_r )
+READ8_MEMBER(poo_state::unk_inp3_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 #endif
 
 
 #if 0
-static WRITE8_HANDLER( unk_w )
+WRITE8_MEMBER(poo_state::unk_w)
 {
 	printf("%02x %02x\n",data,offset);
 }
 #endif
 
 /* soundlatch write */
-static WRITE8_HANDLER( sound_cmd_w )
+WRITE8_MEMBER(poo_state::sound_cmd_w)
 {
-	soundlatch_w(space, 0, (data & 0xff));
-	cputag_set_input_line(space->machine(), "subcpu", 0, HOLD_LINE);
+	soundlatch_byte_w(space, 0, (data & 0xff));
+	cputag_set_input_line(machine(), "subcpu", 0, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( poo_vregs_w )
+WRITE8_MEMBER(poo_state::poo_vregs_w)
 {
-	poo_state *state = space->machine().driver_data<poo_state>();
 	// bit 2 used, unknown purpose
-	state->m_vram_colbank = data & 0x18;
+	m_vram_colbank = data & 0x18;
 }
 
-static ADDRESS_MAP_START( unclepoo_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( unclepoo_main_map, AS_PROGRAM, 8, poo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x97ff) AM_RAM
-	AM_RANGE(0x9800, 0x9801) AM_READ(unk_inp_r) //AM_WRITE( unk_w )
+	AM_RANGE(0x9800, 0x9801) AM_READ(unk_inp_r) //AM_WRITE(unk_w )
 
-	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_BASE_MEMBER(poo_state, m_sprites)
-	AM_RANGE(0xb080, 0xb0ff) AM_RAM AM_BASE_MEMBER(poo_state, m_scrolly)
+	AM_RANGE(0xb000, 0xb07f) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0xb080, 0xb0ff) AM_RAM AM_SHARE("scrolly")
 
 	AM_RANGE(0xb400, 0xb400) AM_WRITE(sound_cmd_w)
 
@@ -165,26 +174,26 @@ static ADDRESS_MAP_START( unclepoo_main_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0xb700, 0xb700) AM_WRITE(poo_vregs_w)
 
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE_MEMBER(poo_state, m_vram)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("vram")
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( unclepoo_main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( unclepoo_main_portmap, AS_IO, 8, poo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( unclepoo_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( unclepoo_sub_map, AS_PROGRAM, 8, poo_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_WRITENOP  /* R/C filter ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( unclepoo_sub_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( unclepoo_sub_portmap, AS_IO, 8, poo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE("ay", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("ay", ay8910_address_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREADWRITE_LEGACY("ay", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE_LEGACY("ay", ay8910_address_w)
 ADDRESS_MAP_END
 
 
@@ -282,6 +291,7 @@ GFXDECODE_END
 
 static PALETTE_INIT( unclepoo )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -306,9 +316,9 @@ static PALETTE_INIT( unclepoo )
 	}
 }
 
- static READ8_HANDLER( timer_r )
+READ8_MEMBER(poo_state::timer_r)
 {
-	return downcast<cpu_device *>(&space->device())->total_cycles() / 16;
+	return downcast<cpu_device *>(&space.device())->total_cycles() / 16;
 }
 
 
@@ -316,8 +326,8 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("subcpu", PROGRAM, soundlatch_r),
-	DEVCB_MEMORY_HANDLER("subcpu", PROGRAM, timer_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
+	DEVCB_DRIVER_MEMBER(poo_state, timer_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

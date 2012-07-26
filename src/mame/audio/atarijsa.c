@@ -87,12 +87,12 @@ static WRITE8_HANDLER( jsa3_io_w );
  *
  *************************************/
 
-static ADDRESS_MAP_START( jsa3_oki_map, AS_0, 8 )
+static ADDRESS_MAP_START( jsa3_oki_map, AS_0, 8, driver_device )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("bank12")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank13")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jsa3_oki2_map, AS_0, 8 )
+static ADDRESS_MAP_START( jsa3_oki2_map, AS_0, 8, driver_device )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("bank14")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank15")
 ADDRESS_MAP_END
@@ -133,7 +133,7 @@ void atarijsa_init(running_machine &machine, const char *testport, int testmask)
 	test_mask = testmask;
 
 	/* predetermine the bank base */
-	rgn = machine.region("jsa")->base();
+	rgn = machine.root_device().memregion("jsa")->base();
 	bank_base = &rgn[0x03000];
 	bank_source_data = &rgn[0x10000];
 
@@ -161,14 +161,14 @@ void atarijsa_init(running_machine &machine, const char *testport, int testmask)
 		/* the upper 128k is fixed, the lower 128k is bankswitched */
 		for (rgn = 0; rgn < ARRAY_LENGTH(regions); rgn++)
 		{
-			UINT8 *base = machine.region(regions[rgn])->base();
-			if (base != NULL && machine.region(regions[rgn])->bytes() >= 0x80000)
+			UINT8 *base = machine.root_device().memregion(regions[rgn])->base();
+			if (base != NULL && machine.root_device().memregion(regions[rgn])->bytes() >= 0x80000)
 			{
 				const char *bank = (rgn != 2) ? "bank12" : "bank14";
 				const char *bank_plus_1 = (rgn != 2) ? "bank13" : "bank15";
-				memory_configure_bank(machine, bank, 0, 2, base + 0x00000, 0x00000);
-				memory_configure_bank(machine, bank, 2, 2, base + 0x20000, 0x20000);
-				memory_set_bankptr(machine, bank_plus_1, base + 0x60000);
+				machine.root_device().membank(bank)->configure_entries(0, 2, base + 0x00000, 0x00000);
+				machine.root_device().membank(bank)->configure_entries(2, 2, base + 0x20000, 0x20000);
+				machine.root_device().membank(bank_plus_1)->set_base(base + 0x60000);
 			}
 		}
 	}
@@ -227,8 +227,8 @@ static READ8_HANDLER( jsa1_io_r )
                 0x02 = coin 2
                 0x01 = coin 1
             */
-			result = input_port_read(space->machine(), "JSAI");
-			if (!(input_port_read(space->machine(), test_port) & test_mask)) result ^= 0x80;
+			result = space->machine().root_device().ioport("JSAI")->read();
+			if (!(space->machine().root_device().ioport(test_port)->read() & test_mask)) result ^= 0x80;
 			if (atarigen->m_cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen->m_sound_to_cpu_ready) result ^= 0x20;
 			if ((tms5220 != NULL) && (tms5220_readyq_r(tms5220) == 0))
@@ -360,8 +360,8 @@ static READ8_HANDLER( jsa2_io_r )
                 0x02 = coin 2
                 0x01 = coin 1
             */
-			result = input_port_read(space->machine(), "JSAII");
-			if (!(input_port_read(space->machine(), test_port) & test_mask)) result ^= 0x80;
+			result = space->machine().root_device().ioport("JSAII")->read();
+			if (!(space->machine().root_device().ioport(test_port)->read() & test_mask)) result ^= 0x80;
 			if (atarigen->m_cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen->m_sound_to_cpu_ready) result ^= 0x20;
 			break;
@@ -483,8 +483,8 @@ static READ8_HANDLER( jsa3_io_r )
                 0x02 = coin L (active high)
                 0x01 = coin R (active high)
             */
-			result = input_port_read(space->machine(), "JSAIII");
-			if (!(input_port_read(space->machine(), test_port) & test_mask)) result ^= 0x90;
+			result = space->machine().root_device().ioport("JSAIII")->read();
+			if (!(space->machine().root_device().ioport(test_port)->read() & test_mask)) result ^= 0x90;
 			if (atarigen->m_cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen->m_sound_to_cpu_ready) result ^= 0x20;
 			break;
@@ -548,7 +548,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 
 			/* update the OKI bank */
 			if (oki6295 != NULL)
-				memory_set_bank(space->machine(), "bank12", (memory_get_bank(space->machine(), "bank12") & 2) | ((data >> 1) & 1));
+				space->machine().root_device().membank("bank12")->set_entry((space->machine().root_device().membank("bank12")->entry() & 2) | ((data >> 1) & 1));
 
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
@@ -572,7 +572,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 
 			/* update the OKI bank */
 			if (oki6295 != NULL)
-				memory_set_bank(space->machine(), "bank12", (memory_get_bank(space->machine(), "bank12") & 1) | ((data >> 3) & 2));
+				space->machine().root_device().membank("bank12")->set_entry((space->machine().root_device().membank("bank12")->entry() & 1) | ((data >> 3) & 2));
 
 			/* update the volumes */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
@@ -617,8 +617,8 @@ static READ8_HANDLER( jsa3s_io_r )
                 0x02 = coin L (active high)
                 0x01 = coin R (active high)
             */
-			result = input_port_read(space->machine(), "JSAIII");
-			if (!(input_port_read(space->machine(), test_port) & test_mask)) result ^= 0x90;
+			result = space->machine().root_device().ioport("JSAIII")->read();
+			if (!(space->machine().root_device().ioport(test_port)->read() & test_mask)) result ^= 0x90;
 			if (atarigen->m_cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen->m_sound_to_cpu_ready) result ^= 0x20;
 			break;
@@ -681,7 +681,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
 			if ((data&1) == 0) devtag_reset(space->machine(), "ymsnd");
 
 			/* update the OKI bank */
-			memory_set_bank(space->machine(), "bank12", (memory_get_bank(space->machine(), "bank12") & 2) | ((data >> 1) & 1));
+			space->machine().root_device().membank("bank12")->set_entry((space->machine().root_device().membank("bank12")->entry() & 2) | ((data >> 1) & 1));
 
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
@@ -705,8 +705,8 @@ static WRITE8_HANDLER( jsa3s_io_w )
             */
 
 			/* update the OKI bank */
-			memory_set_bank(space->machine(), "bank12", (memory_get_bank(space->machine(), "bank12") & 1) | ((data >> 3) & 2));
-			memory_set_bank(space->machine(), "bank14", data >> 6);
+			space->machine().root_device().membank("bank12")->set_entry((space->machine().root_device().membank("bank12")->entry() & 1) | ((data >> 3) & 2));
+			space->machine().root_device().membank("bank14")->set_entry(data >> 6);
 
 			/* update the volumes */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
@@ -748,35 +748,35 @@ static void update_all_volumes(running_machine &machine )
  *
  *************************************/
 
-static ADDRESS_MAP_START( atarijsa1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( atarijsa1_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(jsa1_io_r, jsa1_io_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x2800, 0x2bff) AM_READWRITE_LEGACY(jsa1_io_r, jsa1_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( atarijsa2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( atarijsa2_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x2800, 0x2bff) AM_READWRITE(jsa2_io_r, jsa2_io_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x2800, 0x2bff) AM_READWRITE_LEGACY(jsa2_io_r, jsa2_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 /* full map verified from schematics and Batman GALs */
-static ADDRESS_MAP_START( atarijsa3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( atarijsa3_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(jsa3_io_r, jsa3_io_w)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x2800, 0x2fff) AM_READWRITE_LEGACY(jsa3_io_r, jsa3_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( atarijsa3s_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( atarijsa3s_map, AS_PROGRAM, 8, driver_device )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x2800, 0x2fff) AM_READWRITE(jsa3s_io_r, jsa3s_io_w)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x07fe) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x2800, 0x2fff) AM_READWRITE_LEGACY(jsa3s_io_r, jsa3s_io_w)
 	AM_RANGE(0x3000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -790,8 +790,8 @@ ADDRESS_MAP_END
 
 static const ym2151_interface ym2151_config =
 {
-	atarigen_ym2151_irq_gen,
-	ym2151_ctl_w
+	DEVCB_LINE(atarigen_ym2151_irq_gen),
+	DEVCB_HANDLER(ym2151_ctl_w)
 };
 
 

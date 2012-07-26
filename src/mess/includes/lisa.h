@@ -92,10 +92,12 @@ class lisa_state : public driver_device
 {
 public:
 	lisa_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_fdc_rom(*this,"fdc_rom"),
+		m_fdc_ram(*this,"fdc_ram") { }
 
-	UINT8 *m_fdc_rom;
-	UINT8 *m_fdc_ram;
+	required_shared_ptr<UINT8> m_fdc_rom;
+	required_shared_ptr<UINT8> m_fdc_ram;
 	UINT8 *m_ram_ptr;
 	UINT8 *m_rom_ptr;
 	UINT8 *m_videoROM_ptr;
@@ -137,6 +139,16 @@ public:
 	int m_last_my;
 	int m_frame_count;
 	int m_videoROM_address;
+	DECLARE_READ8_MEMBER(lisa_fdc_io_r);
+	DECLARE_WRITE8_MEMBER(lisa_fdc_io_w);
+	DECLARE_READ8_MEMBER(lisa_fdc_r);
+	DECLARE_READ8_MEMBER(lisa210_fdc_r);
+	DECLARE_WRITE8_MEMBER(lisa_fdc_w);
+	DECLARE_WRITE8_MEMBER(lisa210_fdc_w);
+	DECLARE_READ16_MEMBER(lisa_r);
+	DECLARE_WRITE16_MEMBER(lisa_w);
+	DECLARE_READ16_MEMBER(lisa_IO_r);
+	DECLARE_WRITE16_MEMBER(lisa_IO_w);
 };
 
 
@@ -159,14 +171,6 @@ MACHINE_RESET( lisa );
 
 INTERRUPT_GEN( lisa_interrupt );
 
-READ8_HANDLER ( lisa_fdc_io_r );
-WRITE8_HANDLER ( lisa_fdc_io_w );
-READ8_HANDLER ( lisa_fdc_r );
-READ8_HANDLER ( lisa210_fdc_r );
-WRITE8_HANDLER ( lisa_fdc_w );
-WRITE8_HANDLER ( lisa210_fdc_w );
-READ16_HANDLER ( lisa_r );
-WRITE16_HANDLER ( lisa_w );
 
 
 #endif /* LISA_H_ */

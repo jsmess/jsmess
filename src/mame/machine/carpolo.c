@@ -142,71 +142,63 @@ void carpolo_generate_car_border_interrupt(running_machine &machine, int car, in
 }
 
 
-READ8_HANDLER( carpolo_ball_screen_collision_cause_r )
+READ8_MEMBER(carpolo_state::carpolo_ball_screen_collision_cause_r)
 {
-	carpolo_state *state = space->machine().driver_data<carpolo_state>();
 	/* bit 0 - 0=ball collided with border
        bit 1 - 0=ball collided with goal
        bit 2 - 0=ball collided with score area
        bit 3 - which goal/score collided (0=left, 1=right) */
-	return state->m_ball_screen_collision_cause;
+	return m_ball_screen_collision_cause;
 }
 
-READ8_HANDLER( carpolo_car_ball_collision_x_r )
+READ8_MEMBER(carpolo_state::carpolo_car_ball_collision_x_r)
 {
-	carpolo_state *state = space->machine().driver_data<carpolo_state>();
 	/* the x coordinate of the colliding pixel */
-	return state->m_car_ball_collision_x;
+	return m_car_ball_collision_x;
 }
 
-READ8_HANDLER( carpolo_car_ball_collision_y_r )
+READ8_MEMBER(carpolo_state::carpolo_car_ball_collision_y_r)
 {
-	carpolo_state *state = space->machine().driver_data<carpolo_state>();
 	/* the y coordinate of the colliding pixel */
-	return state->m_car_ball_collision_y;
+	return m_car_ball_collision_y;
 }
 
-READ8_HANDLER( carpolo_car_car_collision_cause_r )
+READ8_MEMBER(carpolo_state::carpolo_car_car_collision_cause_r)
 {
-	carpolo_state *state = space->machine().driver_data<carpolo_state>();
 	/* bit 0 - car 4 collided
        bit 1 - car 3 collided
        bit 2 - car 2 collided
        bit 3 - car 1 collided */
-	return state->m_car_car_collision_cause;
+	return m_car_car_collision_cause;
 }
 
-READ8_HANDLER( carpolo_car_goal_collision_cause_r )
+READ8_MEMBER(carpolo_state::carpolo_car_goal_collision_cause_r)
 {
-	carpolo_state *state = space->machine().driver_data<carpolo_state>();
 	/* bit 0-1 - which car collided
        bit 2   - horizontal timing bit 1TEC4 (not accessed)
        bit 3   - which goal collided (0=left, 1=right) */
-	return state->m_car_goal_collision_cause;
+	return m_car_goal_collision_cause;
 }
 
-READ8_HANDLER( carpolo_car_ball_collision_cause_r )
+READ8_MEMBER(carpolo_state::carpolo_car_ball_collision_cause_r)
 {
-	carpolo_state *state = space->machine().driver_data<carpolo_state>();
 	/* bit 0-1 - which car collided
        bit 2-3 - unconnected */
-	return state->m_car_ball_collision_cause;
+	return m_car_ball_collision_cause;
 }
 
-READ8_HANDLER( carpolo_car_border_collision_cause_r )
+READ8_MEMBER(carpolo_state::carpolo_car_border_collision_cause_r)
 {
-	carpolo_state *state = space->machine().driver_data<carpolo_state>();
 	/* bit 0-1 - which car collided
        bit 2   - 0=vertical border, 1=horizontal border */
-	return state->m_car_border_collision_cause;
+	return m_car_border_collision_cause;
 }
 
 
-READ8_HANDLER( carpolo_interrupt_cause_r )
+READ8_MEMBER(carpolo_state::carpolo_interrupt_cause_r)
 {
-	carpolo_state *state = space->machine().driver_data<carpolo_state>();
 	/* the output of the 148 goes to bits 1-3 (which is priority ^ 7) */
-	return (ttl74148_output_r(state->m_ttl74148_3s) << 1) | state->m_priority_0_extension;
+	return (ttl74148_output_r(m_ttl74148_3s) << 1) | m_priority_0_extension;
 }
 
 
@@ -225,7 +217,7 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 
 
 	/* check the coins here as well - they drive the clock of the flip-flops */
-	port_value = input_port_read(device->machine(), "IN0");
+	port_value = state->ioport("IN0")->read();
 
 	state->m_ttl7474_2s_1->clock_w((port_value & 0x01) >> 0);
 	state->m_ttl7474_2s_2->clock_w((port_value & 0x02) >> 1);
@@ -248,7 +240,7 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 			case 3:	movement_flip_flop = state->m_ttl7474_1a_1;	dir_flip_flop = state->m_ttl7474_1a_2;	break;
 		}
 
-		port_value = input_port_read(device->machine(), portnames[player]);
+		port_value = device->machine().root_device().ioport(portnames[player])->read();
 
 		if (port_value != state->m_last_wheel_value[player])
 		{
@@ -266,7 +258,7 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 
 
 	/* finally read the accelerator pedals */
-	port_value = input_port_read(device->machine(), "PEDALS");
+	port_value = device->machine().root_device().ioport("PEDALS")->read();
 
 	for (player = 0; player < 4; player++)
 	{
@@ -320,46 +312,40 @@ static WRITE_LINE_DEVICE_HANDLER( coin4_interrupt_clear_w )
 	drvstate->m_ttl7474_2u_2->clear_w(state);
 }
 
-WRITE8_HANDLER( carpolo_ball_screen_interrupt_clear_w )
+WRITE8_MEMBER(carpolo_state::carpolo_ball_screen_interrupt_clear_w)
 {
-	carpolo_state *state = space->machine().driver_data<carpolo_state>();
-	ttl74148_input_line_w(state->m_ttl74148_3s, BALL_SCREEN_PRIORITY_LINE, 1);
-	ttl74148_update(state->m_ttl74148_3s);
+	ttl74148_input_line_w(m_ttl74148_3s, BALL_SCREEN_PRIORITY_LINE, 1);
+	ttl74148_update(m_ttl74148_3s);
 }
 
-WRITE8_HANDLER( carpolo_car_car_interrupt_clear_w )
+WRITE8_MEMBER(carpolo_state::carpolo_car_car_interrupt_clear_w)
 {
-	carpolo_state *state = space->machine().driver_data<carpolo_state>();
-	ttl74148_input_line_w(state->m_ttl74148_3s, CAR_CAR_PRIORITY_LINE, 1);
-	ttl74148_update(state->m_ttl74148_3s);
+	ttl74148_input_line_w(m_ttl74148_3s, CAR_CAR_PRIORITY_LINE, 1);
+	ttl74148_update(m_ttl74148_3s);
 }
 
-WRITE8_HANDLER( carpolo_car_goal_interrupt_clear_w )
+WRITE8_MEMBER(carpolo_state::carpolo_car_goal_interrupt_clear_w)
 {
-	carpolo_state *state = space->machine().driver_data<carpolo_state>();
-	ttl74148_input_line_w(state->m_ttl74148_3s, CAR_GOAL_PRIORITY_LINE, 1);
-	ttl74148_update(state->m_ttl74148_3s);
+	ttl74148_input_line_w(m_ttl74148_3s, CAR_GOAL_PRIORITY_LINE, 1);
+	ttl74148_update(m_ttl74148_3s);
 }
 
-WRITE8_HANDLER( carpolo_car_ball_interrupt_clear_w )
+WRITE8_MEMBER(carpolo_state::carpolo_car_ball_interrupt_clear_w)
 {
-	carpolo_state *state = space->machine().driver_data<carpolo_state>();
-	ttl74148_input_line_w(state->m_ttl74148_3s, PRI0_PRIORTITY_LINE, 1);
-	ttl74148_update(state->m_ttl74148_3s);
+	ttl74148_input_line_w(m_ttl74148_3s, PRI0_PRIORTITY_LINE, 1);
+	ttl74148_update(m_ttl74148_3s);
 }
 
-WRITE8_HANDLER( carpolo_car_border_interrupt_clear_w )
+WRITE8_MEMBER(carpolo_state::carpolo_car_border_interrupt_clear_w)
 {
-	carpolo_state *state = space->machine().driver_data<carpolo_state>();
-	ttl74148_input_line_w(state->m_ttl74148_3s, PRI0_PRIORTITY_LINE, 1);
-	ttl74148_update(state->m_ttl74148_3s);
+	ttl74148_input_line_w(m_ttl74148_3s, PRI0_PRIORTITY_LINE, 1);
+	ttl74148_update(m_ttl74148_3s);
 }
 
-WRITE8_HANDLER( carpolo_timer_interrupt_clear_w )
+WRITE8_MEMBER(carpolo_state::carpolo_timer_interrupt_clear_w)
 {
-	carpolo_state *state = space->machine().driver_data<carpolo_state>();
-	ttl74148_input_line_w(state->m_ttl74148_3s, PRI0_PRIORTITY_LINE, 1);
-	ttl74148_update(state->m_ttl74148_3s);
+	ttl74148_input_line_w(m_ttl74148_3s, PRI0_PRIORTITY_LINE, 1);
+	ttl74148_update(m_ttl74148_3s);
 }
 
 
@@ -436,7 +422,7 @@ static READ8_DEVICE_HANDLER( pia_1_port_a_r )
 		  (state->m_ttl7474_1c_2->output_r() ? 0x02 : 0x00) |
 		  (state->m_ttl7474_1d_2->output_r() ? 0x04 : 0x00) |
 		  (state->m_ttl7474_1f_2->output_r() ? 0x08 : 0x00) |
-		  (input_port_read(device->machine(), "IN2") & 0xf0);
+		  (state->ioport("IN2")->read() & 0xf0);
 
 	return ret;
 }

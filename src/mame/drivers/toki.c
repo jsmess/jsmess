@@ -43,13 +43,13 @@ for now. Even at 12 this slowdown still happens a little.
 #include "sound/3812intf.h"
 #include "includes/toki.h"
 
-static WRITE16_HANDLER( tokib_soundcommand16_w )
+WRITE16_MEMBER(toki_state::tokib_soundcommand16_w)
 {
-	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+	soundlatch_byte_w(space, 0, data & 0xff);
+	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 
-static READ16_HANDLER( pip16_r )
+READ16_MEMBER(toki_state::pip16_r)
 {
 	return ~0;
 }
@@ -71,55 +71,54 @@ static void toki_adpcm_int (device_t *device)
 static WRITE8_DEVICE_HANDLER( toki_adpcm_control_w )
 {
 	int bankaddress;
-	UINT8 *RAM = device->machine().region("audiocpu")->base();
+	UINT8 *RAM = device->machine().root_device().memregion("audiocpu")->base();
 
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	memory_set_bankptr(device->machine(), "bank1",&RAM[bankaddress]);
+	device->machine().root_device().membank("bank1")->set_base(&RAM[bankaddress]);
 
 	msm5205_reset_w(device,data & 0x08);
 }
 
-static WRITE8_HANDLER( toki_adpcm_data_w )
+WRITE8_MEMBER(toki_state::toki_adpcm_data_w)
 {
-	toki_state *state = space->machine().driver_data<toki_state>();
-	state->m_msm5205next = data;
+	m_msm5205next = data;
 }
 
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( toki_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( toki_map, AS_PROGRAM, 16, toki_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x06d7ff) AM_RAM
 	AM_RANGE(0x06d800, 0x06dfff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x06e800, 0x06efff) AM_RAM_WRITE(toki_background1_videoram16_w) AM_BASE_MEMBER(toki_state, m_background1_videoram16)
-	AM_RANGE(0x06f000, 0x06f7ff) AM_RAM_WRITE(toki_background2_videoram16_w) AM_BASE_MEMBER(toki_state, m_background2_videoram16)
-	AM_RANGE(0x06f800, 0x06ffff) AM_RAM_WRITE(toki_foreground_videoram16_w) AM_BASE_MEMBER(toki_state, m_videoram)
-	AM_RANGE(0x080000, 0x08000d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
-	AM_RANGE(0x0a0000, 0x0a005f) AM_WRITE(toki_control_w) AM_BASE_MEMBER(toki_state, m_scrollram16)
+	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x06e800, 0x06efff) AM_RAM_WRITE(toki_background1_videoram16_w) AM_SHARE("bg1_vram16")
+	AM_RANGE(0x06f000, 0x06f7ff) AM_RAM_WRITE(toki_background2_videoram16_w) AM_SHARE("bg2_vram16")
+	AM_RANGE(0x06f800, 0x06ffff) AM_RAM_WRITE(toki_foreground_videoram16_w) AM_SHARE("videoram")
+	AM_RANGE(0x080000, 0x08000d) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0a0000, 0x0a005f) AM_WRITE(toki_control_w) AM_SHARE("scrollram16")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
 /* In the bootleg, sound and sprites are remapped to 0x70000 */
-static ADDRESS_MAP_START( tokib_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tokib_map, AS_PROGRAM, 16, toki_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x060000, 0x06dfff) AM_RAM
-	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x06e800, 0x06efff) AM_RAM_WRITE(toki_background1_videoram16_w) AM_BASE_MEMBER(toki_state, m_background1_videoram16)
-	AM_RANGE(0x06f000, 0x06f7ff) AM_RAM_WRITE(toki_background2_videoram16_w) AM_BASE_MEMBER(toki_state, m_background2_videoram16)
-	AM_RANGE(0x06f800, 0x06ffff) AM_RAM_WRITE(toki_foreground_videoram16_w) AM_BASE_MEMBER(toki_state, m_videoram)
+	AM_RANGE(0x06e000, 0x06e7ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x06e800, 0x06efff) AM_RAM_WRITE(toki_background1_videoram16_w) AM_SHARE("bg1_vram16")
+	AM_RANGE(0x06f000, 0x06f7ff) AM_RAM_WRITE(toki_background2_videoram16_w) AM_SHARE("bg2_vram16")
+	AM_RANGE(0x06f800, 0x06ffff) AM_RAM_WRITE(toki_foreground_videoram16_w) AM_SHARE("videoram")
 	AM_RANGE(0x071000, 0x071001) AM_WRITENOP	/* sprite related? seems another scroll register */
 				/* gets written the same value as 75000a (bg2 scrollx) */
 	AM_RANGE(0x071804, 0x071807) AM_WRITENOP	/* sprite related, always 01be0100 */
 	AM_RANGE(0x07180e, 0x071e45) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x072000, 0x072001) AM_READ(watchdog_reset16_r)   /* probably */
 	AM_RANGE(0x075000, 0x075001) AM_WRITE(tokib_soundcommand16_w)
-	AM_RANGE(0x075004, 0x07500b) AM_WRITEONLY AM_BASE_MEMBER(toki_state, m_scrollram16)
+	AM_RANGE(0x075004, 0x07500b) AM_WRITEONLY AM_SHARE("scrollram16")
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("SYSTEM")
@@ -130,14 +129,14 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( tokib_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tokib_audio_map, AS_PROGRAM, 8, toki_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm", toki_adpcm_control_w)	/* MSM5205 + ROM bank */
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("msm", toki_adpcm_control_w)	/* MSM5205 + ROM bank */
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(toki_adpcm_data_w)
-	AM_RANGE(0xec00, 0xec01) AM_MIRROR(0x0008) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
+	AM_RANGE(0xec00, 0xec01) AM_MIRROR(0x0008) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -739,7 +738,7 @@ ROM_END
 
 static DRIVER_INIT( toki )
 {
-	UINT8 *ROM = machine.region("oki")->base();
+	UINT8 *ROM = machine.root_device().memregion("oki")->base();
 	UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x20000);
 	int i;
 
@@ -762,14 +761,14 @@ static DRIVER_INIT( tokib )
 	UINT8 *rom;
 
 	/* invert the sprite data in the ROMs */
-	len = machine.region("gfx2")->bytes();
-	rom = machine.region("gfx2")->base();
+	len = machine.root_device().memregion("gfx2")->bytes();
+	rom = machine.root_device().memregion("gfx2")->base();
 	for (i = 0; i < len; i++)
 		rom[i] ^= 0xff;
 
 	/* merge background tile graphics together */
-	len = machine.region("gfx3")->bytes();
-	rom = machine.region("gfx3")->base();
+	len = machine.root_device().memregion("gfx3")->bytes();
+	rom = machine.root_device().memregion("gfx3")->base();
 	for (offs = 0; offs < len; offs += 0x20000)
 	{
 		UINT8 *base = &rom[offs];
@@ -782,8 +781,8 @@ static DRIVER_INIT( tokib )
 			memcpy (&base[0x18000 + i * 0x800], &temp[0x1800 + i * 0x2000], 0x800);
 		}
 	}
-	len = machine.region("gfx4")->bytes();
-	rom = machine.region("gfx4")->base();
+	len = machine.root_device().memregion("gfx4")->bytes();
+	rom = machine.root_device().memregion("gfx4")->base();
 	for (offs = 0; offs < len; offs += 0x20000)
 	{
 		UINT8 *base = &rom[offs];
@@ -805,7 +804,7 @@ static DRIVER_INIT(jujub)
 	/* Program ROMs are bitswapped */
 	{
 		int i;
-		UINT16 *prgrom = (UINT16*)machine.region("maincpu")->base();
+		UINT16 *prgrom = (UINT16*)machine.root_device().memregion("maincpu")->base();
 
 		for (i = 0; i < 0x60000/2; i++)
 		{
@@ -820,7 +819,7 @@ static DRIVER_INIT(jujub)
 	{
 		address_space *space = machine.device("audiocpu")->memory().space(AS_PROGRAM);
 		UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x20000);
-		UINT8 *rom = machine.region("audiocpu")->base();
+		UINT8 *rom = machine.root_device().memregion("audiocpu")->base();
 		int i;
 
 		memcpy(decrypt,rom,0x20000);
@@ -835,7 +834,7 @@ static DRIVER_INIT(jujub)
 	}
 
 	{
-		UINT8 *ROM = machine.region("oki")->base();
+		UINT8 *ROM = machine.root_device().memregion("oki")->base();
 		UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x20000);
 		int i;
 

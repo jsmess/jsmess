@@ -71,20 +71,18 @@ static TILE_GET_INFO( get_tile_info_1 )
 			(attr & 0x20) ? TILE_FLIPX : 0);
 }
 
-WRITE16_HANDLER( yunsun16_vram_0_w )
+WRITE16_MEMBER(yunsun16_state::yunsun16_vram_0_w)
 {
-	yunsun16_state *state = space->machine().driver_data<yunsun16_state>();
 
-	COMBINE_DATA(&state->m_vram_0[offset]);
-	state->m_tilemap_0->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_vram_0[offset]);
+	m_tilemap_0->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( yunsun16_vram_1_w )
+WRITE16_MEMBER(yunsun16_state::yunsun16_vram_1_w)
 {
-	yunsun16_state *state = space->machine().driver_data<yunsun16_state>();
 
-	COMBINE_DATA(&state->m_vram_1[offset]);
-	state->m_tilemap_1->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_vram_1[offset]);
+	m_tilemap_1->mark_tile_dirty(offset / 2);
 }
 
 
@@ -162,7 +160,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			break;
 	}
 
-	for (offs = (state->m_spriteram_size - 8) / 2 ; offs >= 0; offs -= 8 / 2)
+	for (offs = (state->m_spriteram.bytes() - 8) / 2 ; offs >= 0; offs -= 8 / 2)
 	{
 		int x = state->m_spriteram[offs + 0];
 		int y = state->m_spriteram[offs + 1];
@@ -174,7 +172,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		x += state->m_sprites_scrolldx;
 		y += state->m_sprites_scrolldy;
 
-		if (flip_screen_get(machine))	// not used?
+		if (state->flip_screen())	// not used?
 		{
 			flipx = !flipx;		x = max_x - x - 16;
 			flipy = !flipy;		y = max_y - y - 16;

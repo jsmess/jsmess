@@ -8,18 +8,33 @@ class suprridr_state : public driver_device
 {
 public:
 	suprridr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fgram(*this, "fgram"),
+		m_bgram(*this, "bgram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	UINT8 m_nmi_enable;
 	UINT8 m_sound_data;
-	UINT8 *m_fgram;
-	UINT8 *m_bgram;
+	required_shared_ptr<UINT8> m_fgram;
+	required_shared_ptr<UINT8> m_bgram;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_bg_tilemap_noscroll;
 	UINT8 m_flipx;
 	UINT8 m_flipy;
-	UINT8 *m_spriteram;
+	required_shared_ptr<UINT8> m_spriteram;
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(sound_data_w);
+	DECLARE_WRITE8_MEMBER(sound_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(coin_lock_w);
+	DECLARE_WRITE8_MEMBER(suprridr_flipx_w);
+	DECLARE_WRITE8_MEMBER(suprridr_flipy_w);
+	DECLARE_WRITE8_MEMBER(suprridr_fgdisable_w);
+	DECLARE_WRITE8_MEMBER(suprridr_fgscrolly_w);
+	DECLARE_WRITE8_MEMBER(suprridr_bgscrolly_w);
+	DECLARE_WRITE8_MEMBER(suprridr_bgram_w);
+	DECLARE_WRITE8_MEMBER(suprridr_fgram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(suprridr_control_r);
 };
 
 
@@ -28,14 +43,7 @@ public:
 VIDEO_START( suprridr );
 PALETTE_INIT( suprridr );
 
-WRITE8_HANDLER( suprridr_flipx_w );
-WRITE8_HANDLER( suprridr_flipy_w );
-WRITE8_HANDLER( suprridr_fgdisable_w );
-WRITE8_HANDLER( suprridr_fgscrolly_w );
-WRITE8_HANDLER( suprridr_bgscrolly_w );
 int suprridr_is_screen_flipped(running_machine &machine);
 
-WRITE8_HANDLER( suprridr_fgram_w );
-WRITE8_HANDLER( suprridr_bgram_w );
 
 SCREEN_UPDATE_IND16( suprridr );

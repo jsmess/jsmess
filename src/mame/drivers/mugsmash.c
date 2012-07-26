@@ -46,18 +46,17 @@ behavior we use .
 #include "sound/okim6295.h"
 #include "includes/mugsmash.h"
 
-static WRITE16_HANDLER( mugsmash_reg2_w )
+WRITE16_MEMBER(mugsmash_state::mugsmash_reg2_w)
 {
-	mugsmash_state *state = space->machine().driver_data<mugsmash_state>();
 
-	state->m_regs2[offset] = data;
-	//popmessage ("Regs2 %04x, %04x, %04x, %04x", state->m_regs2[0], state->m_regs2[1], state->m_regs2[2], state->m_regs2[3]);
+	m_regs2[offset] = data;
+	//popmessage ("Regs2 %04x, %04x, %04x, %04x", m_regs2[0], m_regs2[1], m_regs2[2], m_regs2[3]);
 
 	switch (offset)
 	{
 	case 1:
-		soundlatch_w(space, 1, data & 0xff);
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE );
+		soundlatch_byte_w(space, 1, data & 0xff);
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 	default:
@@ -148,23 +147,23 @@ static WRITE16_HANDLER( mugsmash_reg2_w )
 #define USE_FAKE_INPUT_PORTS	0
 
 #if USE_FAKE_INPUT_PORTS
-static READ16_HANDLER ( mugsmash_input_ports_r )
+READ16_MEMBER(mugsmash_state::mugsmash_input_ports_r)
 {
 	UINT16 data = 0xffff;
 
 	switch (offset)
 	{
 		case 0 :
-			data = (input_port_read(space->machine(), "P1") & 0xff) | ((input_port_read(space->machine(), "DSW1") & 0xc0) << 6) | ((input_port_read(space->machine(), "IN0") & 0x03) << 8);
+			data = (ioport("P1")->read() & 0xff) | ((ioport("DSW1")->read() & 0xc0) << 6) | ((ioport("IN0")->read() & 0x03) << 8);
 			break;
 		case 1 :
-			data = (input_port_read(space->machine(), "P2") & 0xff) | ((input_port_read(space->machine(), "DSW1") & 0x3f) << 8);
+			data = (ioport("P2")->read() & 0xff) | ((ioport("DSW1")->read() & 0x3f) << 8);
 			break;
 		case 2 :
-			data = ((input_port_read(space->machine(), "DSW2") & 0x3f) << 8);
+			data = ((ioport("DSW2")->read() & 0x3f) << 8);
 			break;
 		case 3 :
-			data = ((input_port_read(space->machine(), "DSW2") & 0xc0) << 2);
+			data = ((ioport("DSW2")->read() & 0xc0) << 2);
 			break;
 	}
 
@@ -172,16 +171,16 @@ static READ16_HANDLER ( mugsmash_input_ports_r )
 }
 #endif
 
-static ADDRESS_MAP_START( mugsmash_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mugsmash_map, AS_PROGRAM, 16, mugsmash_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(mugsmash_videoram1_w) AM_BASE_MEMBER(mugsmash_state, m_videoram1)
-	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(mugsmash_videoram2_w) AM_BASE_MEMBER(mugsmash_state, m_videoram2)
-	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(mugsmash_reg_w) AM_BASE_MEMBER(mugsmash_state, m_regs1)	/* video registers*/
-	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x140000, 0x140007) AM_WRITE(mugsmash_reg2_w) AM_BASE_MEMBER(mugsmash_state, m_regs2) /* sound + ? */
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(mugsmash_videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0x082000, 0x082fff) AM_RAM_WRITE(mugsmash_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(mugsmash_reg_w) AM_SHARE("regs1")	/* video registers*/
+	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x140000, 0x140007) AM_WRITE(mugsmash_reg2_w) AM_SHARE("regs2") /* sound + ? */
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* main ram? */
 	AM_RANGE(0x1c4000, 0x1cffff) AM_RAM
-	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_BASE_MEMBER(mugsmash_state, m_spriteram) /* sprite ram */
+	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("spriteram") /* sprite ram */
 #if USE_FAKE_INPUT_PORTS
 	AM_RANGE(0x180000, 0x180007) AM_READ(mugsmash_input_ports_r)
 #else
@@ -192,12 +191,12 @@ static ADDRESS_MAP_START( mugsmash_map, AS_PROGRAM, 16 )
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mugsmash_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mugsmash_sound_map, AS_PROGRAM, 8, mugsmash_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ymsnd", ym2151_r,ym2151_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r,ym2151_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 
@@ -397,7 +396,7 @@ static void irq_handler(device_t *device, int irq)
 
 static const ym2151_interface ym2151_config =
 {
-	irq_handler
+	DEVCB_LINE(irq_handler)
 };
 
 static MACHINE_START( mugsmash )

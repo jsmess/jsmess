@@ -204,11 +204,11 @@ void abc80_state::video_start()
 	m_video_ram = auto_alloc_array(machine(), UINT8, 0x400);
 
 	// find memory regions
-	m_char_rom = machine().region("chargen")->base();
-	m_hsync_prom = machine().region("hsync")->base();
-	m_vsync_prom = machine().region("vsync")->base();
-	m_line_prom = machine().region("line")->base();
-	m_attr_prom = machine().region("attr")->base();
+	m_char_rom = memregion("chargen")->base();
+	m_hsync_prom = memregion("hsync")->base();
+	m_vsync_prom = memregion("vsync")->base();
+	m_line_prom = memregion("line")->base();
+	m_attr_prom = memregion("attr")->base();
 
 	// register for state saving
 	save_item(NAME(m_blink));

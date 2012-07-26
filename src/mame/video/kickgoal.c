@@ -4,25 +4,22 @@
 #include "includes/kickgoal.h"
 
 
-WRITE16_HANDLER( kickgoal_fgram_w )
+WRITE16_MEMBER(kickgoal_state::kickgoal_fgram_w)
 {
-	kickgoal_state *state = space->machine().driver_data<kickgoal_state>();
-	state->m_fgram[offset] = data;
-	state->m_fgtm->mark_tile_dirty(offset / 2);
+	m_fgram[offset] = data;
+	m_fgtm->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( kickgoal_bgram_w )
+WRITE16_MEMBER(kickgoal_state::kickgoal_bgram_w)
 {
-	kickgoal_state *state = space->machine().driver_data<kickgoal_state>();
-	state->m_bgram[offset] = data;
-	state->m_bgtm->mark_tile_dirty(offset / 2);
+	m_bgram[offset] = data;
+	m_bgtm->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( kickgoal_bg2ram_w )
+WRITE16_MEMBER(kickgoal_state::kickgoal_bg2ram_w)
 {
-	kickgoal_state *state = space->machine().driver_data<kickgoal_state>();
-	state->m_bg2ram[offset] = data;
-	state->m_bg2tm->mark_tile_dirty(offset / 2);
+	m_bg2ram[offset] = data;
+	m_bg2tm->mark_tile_dirty(offset / 2);
 }
 
 
@@ -99,7 +96,7 @@ static void kickgoal_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	const gfx_element *gfx = machine.gfx[1];
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size / 2; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes() / 2; offs += 4)
 	{
 		int xpos = spriteram[offs + 3];
 		int ypos = spriteram[offs + 0] & 0x00ff;
@@ -232,7 +229,7 @@ static void actionhw_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	const gfx_element *gfx = machine.gfx[1];
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size / 2; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes() / 2; offs += 4)
 	{
 		int xpos = spriteram[offs + 3];
 		int ypos = spriteram[offs + 0] & 0x00ff;

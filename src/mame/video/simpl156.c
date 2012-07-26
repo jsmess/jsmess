@@ -16,7 +16,7 @@ VIDEO_START( simpl156 )
 	state->m_pf1_rowscroll = auto_alloc_array_clear(machine, UINT16, 0x800/2);
 	state->m_pf2_rowscroll = auto_alloc_array_clear(machine, UINT16, 0x800/2);
 	state->m_spriteram = auto_alloc_array_clear(machine, UINT16, 0x2000/2);
-	machine.generic.paletteram.u16 =  auto_alloc_array_clear(machine, UINT16, 0x1000/2);
+	state->m_generic_paletteram_16.allocate(0x1000/2);
 
 	memset(state->m_spriteram, 0xff, 0x2000);
 
@@ -24,7 +24,6 @@ VIDEO_START( simpl156 )
 	state->save_pointer(NAME(state->m_pf1_rowscroll), 0x800/2);
 	state->save_pointer(NAME(state->m_pf2_rowscroll), 0x800/2);
 	state->save_pointer(NAME(state->m_spriteram), 0x2000/2);
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u16, 0x1000/2);
 }
 
 SCREEN_UPDATE_IND16( simpl156 )
@@ -41,7 +40,7 @@ SCREEN_UPDATE_IND16( simpl156 )
 	deco16ic_tilemap_1_draw(state->m_deco_tilegen1, bitmap, cliprect, 0, 4);
 
 	//FIXME: flip_screen_x should not be written!
-	flip_screen_set_no_update(screen.machine(), 1);
+	state->flip_screen_set_no_update(1);
 
 	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, 0x1400/4); // 0x1400/4 seems right for charlien (doesn't initialize any more RAM, so will draw a garbage 0 with more)
 	return 0;

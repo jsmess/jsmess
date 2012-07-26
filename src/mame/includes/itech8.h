@@ -14,16 +14,17 @@ class itech8_state : public driver_device
 public:
 	itech8_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_visarea(0, 0, 0, 0) { }
+		  m_visarea(0, 0, 0, 0){ }
 
-	UINT8 *m_grom_bank;
+	rectangle m_visarea;
+	UINT8 m_grom_bank;
+
 	UINT8 m_blitter_int;
 	UINT8 m_tms34061_int;
 	UINT8 m_periodic_int;
 	UINT8 m_sound_data;
 	UINT8 m_pia_porta_data;
 	UINT8 m_pia_portb_data;
-	rectangle m_visarea;
 	UINT8 m_z80_ctrl;
 	UINT8 m_z80_port_val;
 	UINT8 m_z80_clear_to_send;
@@ -53,6 +54,27 @@ public:
 	UINT8 m_grmatch_palcontrol;
 	UINT8 m_grmatch_xscroll;
 	rgb_t m_grmatch_palette[2][16];
+	DECLARE_WRITE8_MEMBER(itech8_nmi_ack_w);
+	DECLARE_WRITE8_MEMBER(blitter_w);
+	DECLARE_WRITE8_MEMBER(rimrockn_bank_w);
+	DECLARE_WRITE8_MEMBER(pia_portb_out);
+	DECLARE_WRITE8_MEMBER(sound_data_w);
+	DECLARE_WRITE8_MEMBER(gtg2_sound_data_w);
+	DECLARE_READ8_MEMBER(sound_data_r);
+	DECLARE_WRITE8_MEMBER(grom_bank_w);
+	DECLARE_WRITE16_MEMBER(grom_bank16_w);
+	DECLARE_WRITE16_MEMBER(display_page16_w);
+	DECLARE_WRITE16_MEMBER(palette16_w);
+	DECLARE_WRITE8_MEMBER(itech8_palette_w);
+	DECLARE_WRITE8_MEMBER(itech8_page_w);
+	DECLARE_READ8_MEMBER(itech8_blitter_r);
+	DECLARE_WRITE8_MEMBER(itech8_blitter_w);
+	DECLARE_WRITE8_MEMBER(itech8_tms34061_w);
+	DECLARE_READ8_MEMBER(itech8_tms34061_r);
+	DECLARE_WRITE8_MEMBER(grmatch_palette_w);
+	DECLARE_WRITE8_MEMBER(grmatch_xscroll_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(special_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
 };
 
 
@@ -78,18 +100,10 @@ SCREEN_UPDATE_RGB32( slikshot );
 
 VIDEO_START( itech8 );
 
-WRITE8_HANDLER( itech8_page_w );
 
-WRITE8_HANDLER( itech8_palette_w );
 
-READ8_HANDLER( itech8_blitter_r );
-WRITE8_HANDLER( itech8_blitter_w );
 
-WRITE8_HANDLER( itech8_tms34061_w );
-READ8_HANDLER( itech8_tms34061_r );
 
-WRITE8_HANDLER( grmatch_palette_w );
-WRITE8_HANDLER( grmatch_xscroll_w );
 TIMER_DEVICE_CALLBACK( grmatch_palette_update );
 
 SCREEN_UPDATE_RGB32( itech8_2layer );

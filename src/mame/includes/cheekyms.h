@@ -9,12 +9,15 @@ class cheekyms_state : public driver_device
 {
 public:
 	cheekyms_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_port_80(*this, "port_80"){ }
 
 	/* memory pointers */
-	UINT8 *        m_videoram;
-	UINT8 *        m_spriteram;
-	UINT8 *        m_port_80;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_port_80;
 
 	/* video-related */
 	tilemap_t        *m_cm_tilemap;
@@ -25,6 +28,9 @@ public:
 	device_t *m_dac;
 
 	UINT8          m_irq_mask;
+	DECLARE_WRITE8_MEMBER(cheekyms_port_40_w);
+	DECLARE_WRITE8_MEMBER(cheekyms_port_80_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 
@@ -33,5 +39,3 @@ public:
 PALETTE_INIT( cheekyms );
 VIDEO_START( cheekyms );
 SCREEN_UPDATE_IND16( cheekyms );
-WRITE8_HANDLER( cheekyms_port_40_w );
-WRITE8_HANDLER( cheekyms_port_80_w );

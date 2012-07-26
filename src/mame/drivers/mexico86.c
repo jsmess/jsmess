@@ -80,14 +80,14 @@ static READ8_DEVICE_HANDLER( kiki_ym2203_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( mexico86_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mexico86_map, AS_PROGRAM, 8, mexico86_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")					/* banked roms */
 	AM_RANGE(0xc000, 0xe7ff) AM_RAM AM_SHARE("share1")  				/* shared with sound cpu */
-	AM_RANGE(0xd500, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(mexico86_state, m_objectram, m_objectram_size)
-	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_BASE_MEMBER(mexico86_state, m_protection_ram)  /* shared with mcu */
+	AM_RANGE(0xd500, 0xd7ff) AM_RAM AM_SHARE("objectram")
+	AM_RANGE(0xe800, 0xe8ff) AM_RAM AM_SHARE("protection_ram")  /* shared with mcu */
 	AM_RANGE(0xe900, 0xefff) AM_RAM
-	AM_RANGE(0xc000, 0xd4ff) AM_RAM AM_BASE_MEMBER(mexico86_state, m_videoram)
+	AM_RANGE(0xc000, 0xd4ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mexico86_bankswitch_w)	/* program and gfx ROM banks */
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(mexico86_f008_w)  		/* cpu reset lines + other unknown stuff */
 	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN3")
@@ -95,14 +95,14 @@ static ADDRESS_MAP_START( mexico86_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share2")					/* communication ram - to connect 4 players's subboard */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mexico86_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mexico86_sound_map, AS_PROGRAM, 8, mexico86_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xa7ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xa800, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", kiki_ym2203_r,ym2203_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", kiki_ym2203_r,ym2203_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mexico86_m68705_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mexico86_m68705_map, AS_PROGRAM, 8, mexico86_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(mexico86_68705_port_a_r,mexico86_68705_port_a_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(mexico86_68705_port_b_r,mexico86_68705_port_b_w)
@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( mexico86_m68705_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( mexico86_sub_output_w )
+WRITE8_MEMBER(mexico86_state::mexico86_sub_output_w)
 {
 	/*--x- ---- coin lockout 2*/
 	/*---x ---- coin lockout 1*/
@@ -123,7 +123,7 @@ static WRITE8_HANDLER( mexico86_sub_output_w )
 	/*---- --x- <unknown, always high, irq ack?>*/
 }
 
-static ADDRESS_MAP_START( mexico86_sub_cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mexico86_sub_cpu_map, AS_PROGRAM, 8, mexico86_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM /* sub cpu ram */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share2")  /* shared with main */
@@ -421,9 +421,9 @@ static const ym2203_interface ym2203_config =
 static MACHINE_START( mexico86 )
 {
 	mexico86_state *state = machine.driver_data<mexico86_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
@@ -452,7 +452,7 @@ static MACHINE_RESET( mexico86 )
 
 	/*TODO: check the PCB and see how the halt / reset lines are connected. */
 	if (machine.device("sub") != NULL)
-		cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (input_port_read(machine, "DSW1") & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+		cputag_set_input_line(machine, "sub", INPUT_LINE_RESET, (state->ioport("DSW1")->read() & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
 	state->m_port_a_in = 0;
 	state->m_port_a_out = 0;

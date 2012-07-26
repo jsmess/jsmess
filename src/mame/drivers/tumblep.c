@@ -62,40 +62,38 @@ static WRITE16_DEVICE_HANDLER( tumblep_oki_w )
     /* STUFF IN OTHER BYTE TOO..*/
 }
 
-static READ16_HANDLER( tumblep_prot_r )
+READ16_MEMBER(tumblep_state::tumblep_prot_r)
 {
 	return ~0;
 }
 #endif
 
-static WRITE16_HANDLER( tumblep_sound_w )
+WRITE16_MEMBER(tumblep_state::tumblep_sound_w)
 {
-	tumblep_state *state = space->machine().driver_data<tumblep_state>();
-	soundlatch_w(space, 0, data & 0xff);
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+	soundlatch_byte_w(space, 0, data & 0xff);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
-static WRITE16_HANDLER( jumppop_sound_w )
+WRITE16_MEMBER(tumblep_state::jumppop_sound_w)
 {
-	tumblep_state *state = space->machine().driver_data<tumblep_state>();
-	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(state->m_audiocpu, 0, ASSERT_LINE );
+	soundlatch_byte_w(space, 0, data & 0xff);
+	cputag_set_input_line(m_audiocpu, 0, ASSERT_LINE );
 }
 #endif
 
 /******************************************************************************/
 
-static READ16_HANDLER( tumblepop_controls_r )
+READ16_MEMBER(tumblep_state::tumblepop_controls_r)
 {
 	switch (offset << 1)
 	{
 		case 0:
-			return input_port_read(space->machine(), "PLAYERS");
+			return ioport("PLAYERS")->read();
 		case 2:
-			return input_port_read(space->machine(), "DSW");
+			return ioport("DSW")->read();
 		case 8:
-			return input_port_read(space->machine(), "SYSTEM");
+			return ioport("SYSTEM")->read();
 		case 10: /* ? */
 		case 12:
         	return 0;
@@ -106,7 +104,7 @@ static READ16_HANDLER( tumblepop_controls_r )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tumblep_state )
 #if TUMBLEP_HACK
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITEONLY	// To write levels modifications
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -115,30 +113,30 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 #endif
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(tumblep_sound_w)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x180000, 0x18000f) AM_READ(tumblepop_controls_r)
 	AM_RANGE(0x18000c, 0x18000d) AM_WRITENOP
-	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM AM_BASE_SIZE_MEMBER(tumblep_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
-	AM_RANGE(0x320000, 0x320fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x322000, 0x322fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x340000, 0x3407ff) AM_WRITEONLY AM_BASE_MEMBER(tumblep_state, m_pf1_rowscroll) // unused
-	AM_RANGE(0x342000, 0x3427ff) AM_WRITEONLY AM_BASE_MEMBER(tumblep_state, m_pf2_rowscroll) // unused
+	AM_RANGE(0x1a0000, 0x1a07ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x320000, 0x320fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x322000, 0x322fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x340000, 0x3407ff) AM_WRITEONLY AM_SHARE("pf1_rowscroll") // unused
+	AM_RANGE(0x342000, 0x3427ff) AM_WRITEONLY AM_SHARE("pf2_rowscroll") // unused
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
 /* Physical memory map (21 bits) */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tumblep_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP	/* YM2203 - this board doesn't have one */
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x130000, 0x130001) AM_NOP	/* This board only has 1 oki chip */
-	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
+	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(h6280_timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
+	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE_LEGACY(h6280_timer_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE_LEGACY(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -166,7 +164,7 @@ static INPUT_PORTS_START( tumblep )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -282,7 +280,7 @@ static void sound_irq(device_t *device, int state)
 
 static const ym2151_interface ym2151_config =
 {
-	sound_irq
+	DEVCB_LINE(sound_irq)
 };
 
 static const deco16ic_interface tumblep_deco16ic_tilegen1_intf =
@@ -391,7 +389,7 @@ ROM_END
 void tumblep_patch_code(UINT16 offset)
 {
 	/* A hack which enables all Dip Switches effects */
-	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	RAM[(offset + 0)/2] = 0x0240;
 	RAM[(offset + 2)/2] = 0xffff;	// andi.w  #$f3ff, D0
 }

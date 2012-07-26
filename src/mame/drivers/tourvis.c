@@ -18,7 +18,7 @@
     Power League IV
     Final Match Tennis
     Formation Soccer
-    Super Volleay Ball
+    Super Volley ball
     Rastan Saga II
     Dungeon Explorer
     Legendary Axe
@@ -193,6 +193,7 @@ public:
 	tourvision_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_WRITE8_MEMBER(tourvision_8085_d000_w);
 };
 
 
@@ -272,35 +273,35 @@ static INPUT_PORTS_START( tourvision )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) // games slot status in bits 3 to 7
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, tourvision_state )
 	AM_RANGE( 0x000000, 0x0FFFFF) AM_ROM
-	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000) AM_BASE( &pce_user_ram )
-	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE( vdc_0_r, vdc_0_w )
-	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE( vce_r, vce_w )
-	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE( "c6280", c6280_r, c6280_w )
-	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE( h6280_timer_r, h6280_timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE( pce_joystick_r, pce_joystick_w )
-	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE( h6280_irq_status_r, h6280_irq_status_w )
+	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000) AM_BASE_LEGACY(&pce_user_ram )
+	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE_LEGACY(vdc_0_r, vdc_0_w )
+	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE_LEGACY(vce_r, vce_w )
+	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE_LEGACY("c6280", c6280_r, c6280_w )
+	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE_LEGACY(h6280_timer_r, h6280_timer_w )
+	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE_LEGACY(pce_joystick_r, pce_joystick_w )
+	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE_LEGACY(h6280_irq_status_r, h6280_irq_status_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pce_io , AS_IO, 8)
-	AM_RANGE( 0x00, 0x03) AM_READWRITE( vdc_0_r, vdc_0_w )
+static ADDRESS_MAP_START( pce_io , AS_IO, 8, tourvision_state )
+	AM_RANGE( 0x00, 0x03) AM_READWRITE_LEGACY(vdc_0_r, vdc_0_w )
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( tourvision_8085_d000_w )
+WRITE8_MEMBER(tourvision_state::tourvision_8085_d000_w)
 {
 	//logerror( "D000 (8085) write %02x\n", data );
 }
 
-static ADDRESS_MAP_START(tourvision_8085_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(tourvision_8085_map, AS_PROGRAM, 8, tourvision_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x80ff) AM_DEVREADWRITE_MODERN("i8155", i8155_device, memory_r, memory_w)
-	AM_RANGE(0x8100, 0x8107) AM_DEVREADWRITE_MODERN("i8155", i8155_device, io_r, io_w)
+	AM_RANGE(0x8000, 0x80ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
+	AM_RANGE(0x8100, 0x8107) AM_DEVREADWRITE("i8155", i8155_device, io_r, io_w)
 	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW2")
 	AM_RANGE(0xb000, 0xb000) AM_READNOP // unknown (must NOT be == 0x03 ? code at 0x1154)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xd000, 0xd000) AM_WRITE( tourvision_8085_d000_w )
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(tourvision_8085_d000_w )
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_READNOP // protection or internal counter ? there is sometimes some data in BIOS0 which is replaced by 0xff in BIOS1
 ADDRESS_MAP_END
@@ -491,15 +492,34 @@ ROM_START(tvsci)
 	TOURVISION_BIOS
 ROM_END
 
+
+ROM_START(tvlegaxe)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_makyodensetsuthelegendaryaxe.bin", 0x00000, 0x100000, CRC(50ec3f97) SHA1(d583fa240a4dfd14b0d53ff78762fbac52694dd2) )
+
+	TOURVISION_BIOS
+ROM_END
+
+
+ROM_START(tvsvball)
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "tourv_supervolleyball.bin", 0x00000, 0x100000, CRC(8a32a1ca) SHA1(80144fb4035415eb9b2c67d78d55757ed0d641a1) )
+
+	TOURVISION_BIOS
+ROM_END
+
+
 static DRIVER_INIT(tourvision)
 {
 	DRIVER_INIT_CALL(pce);
 }
 
 GAME( 19??, tourvis,  0,       tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision)", "Tourvision PCE bootleg", GAME_IS_BIOS_ROOT | GAME_NOT_WORKING )
+GAME( 1988, tvlegaxe, tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Victor Musical Industries, Inc.", "Makyo Densetsu - The Legenary Axe (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1989, tvusapb,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Aicom", "USA Pro Basketball (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1989, tvdunexp, tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Hudson / Atlus", "Dungeon Explorer (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1990, tvthbld,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Sega / NEC Avenue", "Thunder Blade (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1990, tvrs2,    tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Taito", "Rastan Saga II (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1990, tvsvball, tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Video System", "Super Volley ball (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1991, tvpwlg4,  tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Hudson", "Power League IV (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1991, tvsci,    tourvis, tourvision, tourvision, tourvision, ROT0, "bootleg (Tourvision) / Taito", "Special Criminal Investigation (Tourvision PCE bootleg)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )

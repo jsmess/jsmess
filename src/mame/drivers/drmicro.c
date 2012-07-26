@@ -31,13 +31,12 @@ static INTERRUPT_GEN( drmicro_interrupt )
 		 device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE8_HANDLER( nmi_enable_w )
+WRITE8_MEMBER(drmicro_state::nmi_enable_w)
 {
-	drmicro_state *state = space->machine().driver_data<drmicro_state>();
 
-	state->m_nmi_enable = data & 1;
-	state->m_flipscreen = (data & 2) ? 1 : 0;
-	flip_screen_set(space->machine(), data & 2);
+	m_nmi_enable = data & 1;
+	m_flipscreen = (data & 2) ? 1 : 0;
+	flip_screen_set(data & 2);
 
 	// bit2,3 unknown
 }
@@ -46,7 +45,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 static void pcm_w(device_t *device)
 {
 	drmicro_state *state = device->machine().driver_data<drmicro_state>();
-	UINT8 *PCM = device->machine().region("adpcm")->base();
+	UINT8 *PCM = state->memregion("adpcm")->base();
 
 	int data = PCM[state->m_pcm_adr / 2];
 
@@ -64,11 +63,10 @@ static void pcm_w(device_t *device)
 		msm5205_reset_w(device, 1);
 }
 
-static WRITE8_HANDLER( pcm_set_w )
+WRITE8_MEMBER(drmicro_state::pcm_set_w)
 {
-	drmicro_state *state = space->machine().driver_data<drmicro_state>();
-	state->m_pcm_adr = ((data & 0x3f) << 9);
-	pcm_w(state->m_msm);
+	m_pcm_adr = ((data & 0x3f) << 9);
+	pcm_w(m_msm);
 }
 
 /*************************************
@@ -77,18 +75,18 @@ static WRITE8_HANDLER( pcm_set_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( drmicro_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( drmicro_map, AS_PROGRAM, 8, drmicro_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(drmicro_videoram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, drmicro_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("sn3", sn76496_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(pcm_set_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2") AM_WRITE(nmi_enable_w)
 	AM_RANGE(0x05, 0x05) AM_NOP // unused? / watchdog?

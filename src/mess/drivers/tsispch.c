@@ -97,7 +97,6 @@
 *
 *  F44B4: general in-operation LED status write
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 /* Core includes */
 #include "emu.h"
@@ -198,7 +197,7 @@ READ8_MEMBER( tsispch_state::dsw_r )
      * which makes this register read 0xFC
      * When s4-7 is turned on, it reads 0xBC
      */
-	data = input_port_read(machine(), "s4");
+	data = ioport("s4")->read();
 	return data;
 }
 
@@ -279,8 +278,8 @@ void tsispch_state::machine_reset()
 
 DRIVER_INIT( prose2k )
 {
-	UINT8 *dspsrc = (UINT8 *)(*machine.region("dspprgload"));
-	UINT32 *dspprg = (UINT32 *)(*machine.region("dspprg"));
+	UINT8 *dspsrc = (UINT8 *)(*machine.root_device().memregion("dspprgload"));
+	UINT32 *dspprg = (UINT32 *)(*machine.root_device().memregion("dspprg"));
 	fprintf(stderr,"driver init\n");
     // unpack 24 bit 7720 data into 32 bit space and shuffle it so it can run as 7725 code
 	// data format as-is in dspsrc: (L = always 0, X = doesn't matter)

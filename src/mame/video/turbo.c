@@ -202,22 +202,20 @@ VIDEO_START( buckrog )
  *
  *************************************/
 
-WRITE8_HANDLER( turbo_videoram_w )
+WRITE8_MEMBER(turbo_state::turbo_videoram_w)
 {
-	turbo_state *state = space->machine().driver_data<turbo_state>();
-	state->m_videoram[offset] = data;
+	m_videoram[offset] = data;
 	if (offset < 0x400)
 	{
-		space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-		state->m_fg_tilemap->mark_tile_dirty(offset);
+		machine().primary_screen->update_partial(machine().primary_screen->vpos());
+		m_fg_tilemap->mark_tile_dirty(offset);
 	}
 }
 
 
-WRITE8_HANDLER( buckrog_bitmap_w )
+WRITE8_MEMBER(turbo_state::buckrog_bitmap_w)
 {
-	turbo_state *state = space->machine().driver_data<turbo_state>();
-	state->m_buckrog_bitmap_ram[offset] = data & 1;
+	m_buckrog_bitmap_ram[offset] = data & 1;
 }
 
 
@@ -285,7 +283,7 @@ INLINE UINT32 sprite_xscale(UINT8 dacinput, double vr1, double vr2, double cext)
 
 static void turbo_prepare_sprites(running_machine &machine, turbo_state *state, UINT8 y, sprite_info *info)
 {
-	const UINT8 *pr1119 = machine.region("proms")->base() + 0x200;
+	const UINT8 *pr1119 = machine.root_device().memregion("proms")->base() + 0x200;
 	int sprnum;
 
 	/* initialize the line enable signals to 0 */
@@ -343,7 +341,7 @@ static void turbo_prepare_sprites(running_machine &machine, turbo_state *state, 
                     VR1 = 310 Ohm
                     VR2 = 910 Ohm
             */
-			info->step[level] = sprite_xscale(xscale, 1.0e3 * input_port_read(machine, "VR1") / 100.0, 1.0e3 * input_port_read(machine, "VR2") / 100.0, 100e-12);
+			info->step[level] = sprite_xscale(xscale, 1.0e3 * machine.root_device().ioport("VR1")->read() / 100.0, 1.0e3 * machine.root_device().ioport("VR2")->read() / 100.0, 100e-12);
 		}
 	}
 }
@@ -351,7 +349,7 @@ static void turbo_prepare_sprites(running_machine &machine, turbo_state *state, 
 
 static UINT32 turbo_get_sprite_bits(running_machine &machine, UINT8 road, sprite_info *sprinfo)
 {
-	const UINT8 *sprite_gfxdata = machine.region("gfx1")->base();
+	const UINT8 *sprite_gfxdata = machine.root_device().memregion("gfx1")->base();
 	UINT8 sprlive = sprinfo->lst;
 	UINT32 sprdata = 0;
 	int level;
@@ -408,8 +406,8 @@ SCREEN_UPDATE_IND16( turbo )
 {
 	turbo_state *state = screen.machine().driver_data<turbo_state>();
 	bitmap_ind16 &fgpixmap = state->m_fg_tilemap->pixmap();
-	const UINT8 *road_gfxdata = screen.machine().region("gfx3")->base();
-	const UINT8 *prom_base = screen.machine().region("proms")->base();
+	const UINT8 *road_gfxdata = screen.machine().root_device().memregion("gfx3")->base();
+	const UINT8 *prom_base = state->memregion("proms")->base();
 	const UINT8 *pr1114 = prom_base + 0x000;
 	const UINT8 *pr1115 = prom_base + 0x020;
 	const UINT8 *pr1116 = prom_base + 0x040;
@@ -644,7 +642,7 @@ SCREEN_UPDATE_IND16( turbo )
 
 static void subroc3d_prepare_sprites(running_machine &machine, turbo_state *state, UINT8 y, sprite_info *info)
 {
-	const UINT8 *pr1449 = machine.region("proms")->base() + 0x300;
+	const UINT8 *pr1449 = machine.root_device().memregion("proms")->base() + 0x300;
 	int sprnum;
 
 	/* initialize the line enable signals to 0 */
@@ -710,7 +708,7 @@ static UINT32 subroc3d_get_sprite_bits(running_machine &machine, sprite_info *sp
        end is in bit 1, plb in bit 0
     */
 	static const UINT8 plb_end[16] = { 0,1,1,2, 1,1,1,1, 1,1,1,1, 0,1,1,2 };
-	const UINT8 *sprite_gfxdata = machine.region("gfx1")->base();
+	const UINT8 *sprite_gfxdata = machine.root_device().memregion("gfx1")->base();
 	UINT32 sprdata = 0;
 	int level;
 
@@ -763,7 +761,7 @@ SCREEN_UPDATE_IND16( subroc3d )
 {
 	turbo_state *state = screen.machine().driver_data<turbo_state>();
 	bitmap_ind16 &fgpixmap = state->m_fg_tilemap->pixmap();
-	const UINT8 *prom_base = screen.machine().region("proms")->base();
+	const UINT8 *prom_base = state->memregion("proms")->base();
 	const UINT8 *pr1419 = prom_base + 0x000;
 	const UINT8 *pr1620 = prom_base + 0x200;
 	const UINT8 *pr1450 = prom_base + 0x500;
@@ -863,7 +861,7 @@ SCREEN_UPDATE_IND16( subroc3d )
 
 static void buckrog_prepare_sprites(running_machine &machine, turbo_state *state, UINT8 y, sprite_info *info)
 {
-	const UINT8 *pr5196 = machine.region("proms")->base() + 0x100;
+	const UINT8 *pr5196 = machine.root_device().memregion("proms")->base() + 0x100;
 	int sprnum;
 
 	/* initialize the line enable signals to 0 */
@@ -930,7 +928,7 @@ static UINT32 buckrog_get_sprite_bits(running_machine &machine, sprite_info *spr
        end is in bit 1, plb in bit 0
     */
 	static const UINT8 plb_end[16] = { 0,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,2 };
-	const UINT8 *sprite_gfxdata = machine.region("gfx1")->base();
+	const UINT8 *sprite_gfxdata = machine.root_device().memregion("gfx1")->base();
 	UINT32 sprdata = 0;
 	int level;
 
@@ -983,8 +981,8 @@ SCREEN_UPDATE_IND16( buckrog )
 {
 	turbo_state *state = screen.machine().driver_data<turbo_state>();
 	bitmap_ind16 &fgpixmap = state->m_fg_tilemap->pixmap();
-	const UINT8 *bgcolor = screen.machine().region("gfx3")->base();
-	const UINT8 *prom_base = screen.machine().region("proms")->base();
+	const UINT8 *bgcolor = screen.machine().root_device().memregion("gfx3")->base();
+	const UINT8 *prom_base = state->memregion("proms")->base();
 	const UINT8 *pr5194 = prom_base + 0x000;
 	const UINT8 *pr5198 = prom_base + 0x500;
 	const UINT8 *pr5199 = prom_base + 0x700;

@@ -47,6 +47,7 @@ static int intensity(int bits)
 
 static PALETTE_INIT( fgoal )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* for B/W screens PCB can be jumpered to use lower half of PROM */
@@ -72,7 +73,7 @@ static TIMER_CALLBACK( interrupt_callback )
 {
 	fgoal_state *state = machine.driver_data<fgoal_state>();
 	int scanline;
-	int coin = (input_port_read(machine, "IN1") & 2);
+	int coin = (state->ioport("IN1")->read() & 2);
 
 	device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);
 
@@ -97,89 +98,81 @@ static unsigned video_ram_address( running_machine &machine )
 }
 
 
-static READ8_HANDLER( fgoal_analog_r )
+READ8_MEMBER(fgoal_state::fgoal_analog_r)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	return input_port_read(space->machine(), state->m_fgoal_player ? "PADDLE1" : "PADDLE0"); /* PCB can be jumpered to use a single dial */
+	return ioport(m_fgoal_player ? "PADDLE1" : "PADDLE0")->read(); /* PCB can be jumpered to use a single dial */
 }
 
 
-static CUSTOM_INPUT( fgoal_80_r )
+CUSTOM_INPUT_MEMBER(fgoal_state::fgoal_80_r)
 {
-	UINT8 ret = (field.machine().primary_screen->vpos() & 0x80) ? 1 : 0;
+	UINT8 ret = (machine().primary_screen->vpos() & 0x80) ? 1 : 0;
 
 	return ret;
 }
 
-static READ8_HANDLER( fgoal_nmi_reset_r )
+READ8_MEMBER(fgoal_state::fgoal_nmi_reset_r)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 
 	return 0;
 }
 
 
-static READ8_HANDLER( fgoal_irq_reset_r )
+READ8_MEMBER(fgoal_state::fgoal_irq_reset_r)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 
 	return 0;
 }
 
 
-static READ8_HANDLER( fgoal_row_r )
+READ8_MEMBER(fgoal_state::fgoal_row_r)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	return state->m_row;
+	return m_row;
 }
 
 
-static WRITE8_HANDLER( fgoal_row_w )
+WRITE8_MEMBER(fgoal_state::fgoal_row_w)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
 
-	state->m_row = data;
-	mb14241_shift_data_w(state->m_mb14241, 0, 0);
+	m_row = data;
+	mb14241_shift_data_w(m_mb14241, 0, 0);
 }
 
-static WRITE8_HANDLER( fgoal_col_w )
+WRITE8_MEMBER(fgoal_state::fgoal_col_w)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
 
-	state->m_col = data;
-	mb14241_shift_count_w(state->m_mb14241, 0, data);
+	m_col = data;
+	mb14241_shift_count_w(m_mb14241, 0, data);
 }
 
-static READ8_HANDLER( fgoal_address_hi_r )
+READ8_MEMBER(fgoal_state::fgoal_address_hi_r)
 {
-	return video_ram_address(space->machine()) >> 8;
+	return video_ram_address(machine()) >> 8;
 }
 
-static READ8_HANDLER( fgoal_address_lo_r )
+READ8_MEMBER(fgoal_state::fgoal_address_lo_r)
 {
-	return video_ram_address(space->machine()) & 0xff;
+	return video_ram_address(machine()) & 0xff;
 }
 
-static READ8_HANDLER( fgoal_shifter_r )
+READ8_MEMBER(fgoal_state::fgoal_shifter_r)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	UINT8 v = mb14241_shift_result_r(state->m_mb14241, 0);
+	UINT8 v = mb14241_shift_result_r(m_mb14241, 0);
 
 	return BITSWAP8(v, 7, 6, 5, 4, 3, 2, 1, 0);
 }
 
-static READ8_HANDLER( fgoal_shifter_reverse_r )
+READ8_MEMBER(fgoal_state::fgoal_shifter_reverse_r)
 {
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	UINT8 v = mb14241_shift_result_r(state->m_mb14241, 0);
+	UINT8 v = mb14241_shift_result_r(m_mb14241, 0);
 
 	return BITSWAP8(v, 0, 1, 2, 3, 4, 5, 6, 7);
 }
 
 
-static WRITE8_HANDLER( fgoal_sound1_w )
+WRITE8_MEMBER(fgoal_state::fgoal_sound1_w)
 {
 	/* BIT0 => SX2 */
 	/* BIT1 => SX1 */
@@ -192,7 +185,7 @@ static WRITE8_HANDLER( fgoal_sound1_w )
 }
 
 
-static WRITE8_HANDLER( fgoal_sound2_w )
+WRITE8_MEMBER(fgoal_state::fgoal_sound2_w)
 {
 	/* BIT0 => CX0 */
 	/* BIT1 => SX6 */
@@ -200,12 +193,11 @@ static WRITE8_HANDLER( fgoal_sound2_w )
 	/* BIT3 => SX5 */
 	/* BIT4 => SX4 */
 	/* BIT5 => SX3 */
-	fgoal_state *state = space->machine().driver_data<fgoal_state>();
-	state->m_fgoal_player = data & 1;
+	m_fgoal_player = data & 1;
 }
 
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, fgoal_state )
 
 	AM_RANGE(0x0000, 0x00ef) AM_RAM
 
@@ -224,12 +216,12 @@ static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x00f1, 0x00f1) AM_WRITE(fgoal_col_w)
 	AM_RANGE(0x00f2, 0x00f2) AM_WRITE(fgoal_row_w)
 	AM_RANGE(0x00f3, 0x00f3) AM_WRITE(fgoal_col_w)
-	AM_RANGE(0x00f4, 0x00f7) AM_DEVWRITE("mb14241", mb14241_shift_data_w)
+	AM_RANGE(0x00f4, 0x00f7) AM_DEVWRITE_LEGACY("mb14241", mb14241_shift_data_w)
 	AM_RANGE(0x00f8, 0x00fb) AM_WRITE(fgoal_sound1_w)
 	AM_RANGE(0x00fc, 0x00ff) AM_WRITE(fgoal_sound2_w)
 
 	AM_RANGE(0x0100, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_BASE_MEMBER(fgoal_state, m_video_ram)
+	AM_RANGE(0x4000, 0x7fff) AM_RAM AM_SHARE("video_ram")
 
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(fgoal_ypos_w)
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(fgoal_xpos_w)
@@ -266,7 +258,7 @@ static INPUT_PORTS_START( fgoal )
 	/* extra credit score changes depending on player's performance */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(fgoal_80_r, NULL) /* 128V */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fgoal_state,fgoal_80_r, NULL) /* 128V */
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ))
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ))

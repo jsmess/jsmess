@@ -60,52 +60,49 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 /******************************************************************************/
 
-static WRITE16_HANDLER( sshangha_protection16_w )
+WRITE16_MEMBER(sshangha_state::sshangha_protection16_w)
 {
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
-	COMBINE_DATA(&state->m_prot_data[offset]);
+	COMBINE_DATA(&m_prot_data[offset]);
 
-	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %04x\n",cpu_get_pc(&space->device()),offset<<1,data);
+	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %04x\n",cpu_get_pc(&space.device()),offset<<1,data);
 }
 
 /* Protection/IO chip 146 */
-static READ16_HANDLER( sshangha_protection16_r )
+READ16_MEMBER(sshangha_state::sshangha_protection16_r)
 {
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
 	switch (offset)
 	{
 		case 0x050 >> 1:
-			return input_port_read(space->machine(), "INPUTS");
+			return ioport("INPUTS")->read();
 		case 0x76a >> 1:
-			return input_port_read(space->machine(), "SYSTEM");
+			return ioport("SYSTEM")->read();
 		case 0x0ac >> 1:
-			return input_port_read(space->machine(), "DSW");
+			return ioport("DSW")->read();
 
 		// Protection TODO
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",cpu_get_pc(&space->device()),offset<<1);
-	return state->m_prot_data[offset];
+	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",cpu_get_pc(&space.device()),offset<<1);
+	return m_prot_data[offset];
 }
 
-static READ16_HANDLER( sshanghb_protection16_r )
+READ16_MEMBER(sshangha_state::sshanghb_protection16_r)
 {
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
 	switch (offset)
 	{
 		case 0x050 >> 1:
-			return input_port_read(space->machine(), "INPUTS");
+			return ioport("INPUTS")->read();
 		case 0x76a >> 1:
-			return input_port_read(space->machine(), "SYSTEM");
+			return ioport("SYSTEM")->read();
 		case 0x0ac >> 1:
-			return input_port_read(space->machine(), "DSW");
+			return ioport("DSW")->read();
 	}
 
-	return state->m_prot_data[offset];
+	return m_prot_data[offset];
 }
 
 /* Probably returns 0xffff when sprite DMA is complete, the game waits on it */
-static READ16_HANDLER( deco_71_r )
+READ16_MEMBER(sshangha_state::deco_71_r)
 {
 	return 0xffff;
 }
@@ -118,20 +115,19 @@ static MACHINE_RESET( sshangha )
 
 /******************************************************************************/
 
-INLINE void set_color_888(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT32 data)
+INLINE void sshangha_set_color_888(running_machine &machine, pen_t color, int rshift, int gshift, int bshift, UINT32 data)
 {
 	palette_set_color_rgb(machine, color, (data >> rshift) & 0xff, (data >> gshift) & 0xff, (data >> bshift) & 0xff);
 }
 
 
-WRITE16_HANDLER( paletteram16_xbgr_word_be_sprites2_w )
+WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_sprites2_w)
 {
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
-	COMBINE_DATA(&state->m_sprite_paletteram2[offset]);
-	set_color_888(space->machine(), (offset/2)+0x100, 0, 8, 16, state->m_sprite_paletteram2[(offset) | 1] | (state->m_sprite_paletteram2[(offset) & ~1] << 16) );
+	COMBINE_DATA(&m_sprite_paletteram2[offset]);
+	sshangha_set_color_888(machine(), (offset/2)+0x100, 0, 8, 16, m_sprite_paletteram2[(offset) | 1] | (m_sprite_paletteram2[(offset) & ~1] << 16) );
 }
 
-WRITE16_HANDLER( paletteram16_xbgr_word_be_sprites_w )
+WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_sprites_w)
 {
 	// hack??? we have to call this otherwise the sprite colours for some selected tiles are wrong (most noticeable on the 2nd level of quest mode)
 	// however if we simply mirror the memory both ways the how to play screen ends up with bad colours
@@ -140,35 +136,32 @@ WRITE16_HANDLER( paletteram16_xbgr_word_be_sprites_w )
 	// maybe related to sprite DMA on the original, or the apparent lack of a 2nd sprite controller on the bootleg.
 	paletteram16_xbgr_word_be_sprites2_w(space,offset,data,mem_mask);
 
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
-	COMBINE_DATA(&state->m_sprite_paletteram[offset]);
-	set_color_888(space->machine(), (offset/2)+0x000, 0, 8, 16, state->m_sprite_paletteram[(offset) | 1] | (state->m_sprite_paletteram[(offset) & ~1] << 16) );
+	COMBINE_DATA(&m_sprite_paletteram[offset]);
+	sshangha_set_color_888(machine(), (offset/2)+0x000, 0, 8, 16, m_sprite_paletteram[(offset) | 1] | (m_sprite_paletteram[(offset) & ~1] << 16) );
 }
 
-WRITE16_HANDLER( paletteram16_xbgr_word_be_tilelow_w )
+WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_tilelow_w)
 {
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
-	COMBINE_DATA(&state->m_tile_paletteram1[offset]);
-	set_color_888(space->machine(), (offset/2)+0x200, 0, 8, 16, state->m_tile_paletteram1[(offset) | 1] | (state->m_tile_paletteram1[(offset) & ~1] << 16) );
+	COMBINE_DATA(&m_tile_paletteram1[offset]);
+	sshangha_set_color_888(machine(), (offset/2)+0x200, 0, 8, 16, m_tile_paletteram1[(offset) | 1] | (m_tile_paletteram1[(offset) & ~1] << 16) );
 }
 
-WRITE16_HANDLER( paletteram16_xbgr_word_be_tilehigh_w )
+WRITE16_MEMBER(sshangha_state::paletteram16_xbgr_word_be_tilehigh_w)
 {
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
-	COMBINE_DATA(&state->m_tile_paletteram2[offset]);
-	set_color_888(space->machine(), (offset/2)+0x300, 0, 8, 16, state->m_tile_paletteram2[(offset) | 1] | (state->m_tile_paletteram2[(offset) & ~1] << 16) );
+	COMBINE_DATA(&m_tile_paletteram2[offset]);
+	sshangha_set_color_888(machine(), (offset/2)+0x300, 0, 8, 16, m_tile_paletteram2[(offset) | 1] | (m_tile_paletteram2[(offset) & ~1] << 16) );
 }
 
-static ADDRESS_MAP_START( sshangha_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sshangha_map, AS_PROGRAM, 16, sshangha_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10000f) AM_RAM AM_BASE_MEMBER(sshangha_state, m_sound_shared_ram)
+	AM_RANGE(0x100000, 0x10000f) AM_RAM AM_SHARE("sound_shared")
 
-	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE_MEMBER(sshangha_state, m_pf1_rowscroll)
-	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE_MEMBER(sshangha_state, m_pf2_rowscroll)
+	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_SHARE("pf1_rowscroll")
+	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_SHARE("pf2_rowscroll")
 	AM_RANGE(0x206800, 0x207fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x320000, 0x320001) AM_WRITE(sshangha_video_w)
 	AM_RANGE(0x320002, 0x320005) AM_WRITENOP
 	AM_RANGE(0x320006, 0x320007) AM_READNOP //irq ack
@@ -180,37 +173,37 @@ static ADDRESS_MAP_START( sshangha_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x370000, 0x370001) AM_READ(deco_71_r)
 	AM_RANGE(0x370000, 0x370007) AM_WRITENOP
 
-	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites_w) AM_BASE_MEMBER(sshangha_state, m_sprite_paletteram)
-	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilehigh_w) AM_BASE_MEMBER(sshangha_state, m_tile_paletteram2)
-	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites2_w) AM_BASE_MEMBER(sshangha_state, m_sprite_paletteram2)
-	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilelow_w) AM_BASE_MEMBER(sshangha_state, m_tile_paletteram1)
+	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites_w) AM_SHARE("sprite_palram")
+	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilehigh_w) AM_SHARE("tile_palram2")
+	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites2_w) AM_SHARE("sprite_palram2")
+	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilelow_w) AM_SHARE("tile_palram1")
 	AM_RANGE(0x381000, 0x383fff) AM_RAM // unused palette area
 
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
-	AM_RANGE(0xff4000, 0xff47ff) AM_READWRITE(sshangha_protection16_r,sshangha_protection16_w) AM_BASE_MEMBER(sshangha_state, m_prot_data)
+	AM_RANGE(0xff4000, 0xff47ff) AM_READWRITE(sshangha_protection16_r,sshangha_protection16_w) AM_SHARE("prot_data")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sshanghb_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sshanghb_map, AS_PROGRAM, 16, sshangha_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x084000, 0x0847ff) AM_READ(sshanghb_protection16_r)
-	AM_RANGE(0x101000, 0x10100f) AM_RAM AM_BASE_MEMBER(sshangha_state, m_sound_shared_ram) /* the bootleg writes here */
+	AM_RANGE(0x101000, 0x10100f) AM_RAM AM_SHARE("sound_shared") /* the bootleg writes here */
 
-	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE_MEMBER(sshangha_state, m_pf1_rowscroll)
-	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE_MEMBER(sshangha_state, m_pf2_rowscroll)
+	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_SHARE("pf1_rowscroll")
+	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_SHARE("pf2_rowscroll")
 	AM_RANGE(0x206800, 0x207fff) AM_RAM
-	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
 	AM_RANGE(0x320000, 0x320001) AM_WRITE(sshangha_video_w)
 	AM_RANGE(0x320002, 0x320005) AM_WRITENOP
 	AM_RANGE(0x320006, 0x320007) AM_READNOP //irq ack
 
 	AM_RANGE(0x340000, 0x340fff) AM_RAM // original spriteram
 
-	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites_w) AM_BASE_MEMBER(sshangha_state, m_sprite_paletteram)
-	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilehigh_w) AM_BASE_MEMBER(sshangha_state, m_tile_paletteram2)
-	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites2_w) AM_BASE_MEMBER(sshangha_state, m_sprite_paletteram2)
-	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilelow_w) AM_BASE_MEMBER(sshangha_state, m_tile_paletteram1)
+	AM_RANGE(0x380000, 0x3803ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites_w) AM_SHARE("sprite_palram")
+	AM_RANGE(0x380400, 0x3807ff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilehigh_w) AM_SHARE("tile_palram2")
+	AM_RANGE(0x380800, 0x380bff) AM_RAM_WRITE(paletteram16_xbgr_word_be_sprites2_w) AM_SHARE("sprite_palram2")
+	AM_RANGE(0x380c00, 0x380fff) AM_RAM_WRITE(paletteram16_xbgr_word_be_tilelow_w) AM_SHARE("tile_palram1")
 	AM_RANGE(0x381000, 0x383fff) AM_RAM // unused palette area
 
 	AM_RANGE(0x3c0000, 0x3c0fff) AM_RAM AM_SHARE("spriteram") // bootleg spriteram
@@ -222,23 +215,21 @@ ADDRESS_MAP_END
 
 /* 8 "sound latches" shared between main and sound cpus. */
 
-static READ8_HANDLER(sshangha_sound_shared_r)
+READ8_MEMBER(sshangha_state::sshangha_sound_shared_r)
 {
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
-	return state->m_sound_shared_ram[offset] & 0xff;
+	return m_sound_shared_ram[offset] & 0xff;
 }
 
-static WRITE8_HANDLER(sshangha_sound_shared_w)
+WRITE8_MEMBER(sshangha_state::sshangha_sound_shared_w)
 {
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
-	state->m_sound_shared_ram[offset] = data & 0xff;
+	m_sound_shared_ram[offset] = data & 0xff;
 }
 
 /* Note: there's rom data after 0x8000 but the game never seem to call a rom bank, left-over? */
-static ADDRESS_MAP_START( sshangha_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sshangha_sound_map, AS_PROGRAM, 8, sshangha_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2203_r,ym2203_w)
-	AM_RANGE(0xc200, 0xc201) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r,ym2203_w)
+	AM_RANGE(0xc200, 0xc201) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xf800, 0xf807) AM_READWRITE(sshangha_sound_shared_r,sshangha_sound_shared_w)
 	AM_RANGE(0xf808, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -268,7 +259,7 @@ static INPUT_PORTS_START( sshangha )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -287,23 +278,23 @@ static INPUT_PORTS_START( sshangha )
 	PORT_DIPSETTING(      0x0010, "Mode 1" )
 	PORT_DIPSETTING(      0x0000, "Mode 2" )
 	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSW", 0x0010, PORTCOND_EQUALS, 0x0010) //Mode 1
-	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW", 0x0010, PORTCOND_EQUALS, 0x0010) //Mode 1
-	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )		PORT_CONDITION("DSW", 0x0010, PORTCOND_EQUALS, 0x0010) //Mode 1
-	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_2C ) )		PORT_CONDITION("DSW", 0x0010, PORTCOND_EQUALS, 0x0010) //Mode 1
-	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )		PORT_CONDITION("DSW", 0x0010, PORTCOND_NOTEQUALS, 0x0010) //Mode 2
-	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )		PORT_CONDITION("DSW", 0x0010, PORTCOND_NOTEQUALS, 0x0010) //Mode 2
-	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW", 0x0010, PORTCOND_NOTEQUALS, 0x0010) //Mode 2
-	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )		PORT_CONDITION("DSW", 0x0010, PORTCOND_NOTEQUALS, 0x0010) //Mode 2
+	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSW", 0x0010, EQUALS, 0x0010) //Mode 1
+	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW", 0x0010, EQUALS, 0x0010) //Mode 1
+	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )		PORT_CONDITION("DSW", 0x0010, EQUALS, 0x0010) //Mode 1
+	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_2C ) )		PORT_CONDITION("DSW", 0x0010, EQUALS, 0x0010) //Mode 1
+	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )		PORT_CONDITION("DSW", 0x0010, NOTEQUALS, 0x0010) //Mode 2
+	PORT_DIPSETTING(      0x0008, DEF_STR( 3C_1C ) )		PORT_CONDITION("DSW", 0x0010, NOTEQUALS, 0x0010) //Mode 2
+	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW", 0x0010, NOTEQUALS, 0x0010) //Mode 2
+	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )		PORT_CONDITION("DSW", 0x0010, NOTEQUALS, 0x0010) //Mode 2
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:7,8")
-	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSW", 0x0010, PORTCOND_EQUALS, 0x0010) //Mode 1
-	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW", 0x0010, PORTCOND_EQUALS, 0x0010) //Mode 1
-	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )		PORT_CONDITION("DSW", 0x0010, PORTCOND_EQUALS, 0x0010) //Mode 1
-	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_2C ) )		PORT_CONDITION("DSW", 0x0010, PORTCOND_EQUALS, 0x0010) //Mode 1
-	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )		PORT_CONDITION("DSW", 0x0010, PORTCOND_NOTEQUALS, 0x0010) //Mode 2
-	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )		PORT_CONDITION("DSW", 0x0010, PORTCOND_NOTEQUALS, 0x0010) //Mode 2
-	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW", 0x0010, PORTCOND_NOTEQUALS, 0x0010) //Mode 2
-	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_4C ) )		PORT_CONDITION("DSW", 0x0010, PORTCOND_NOTEQUALS, 0x0010) //Mode 2
+	PORT_DIPSETTING(      0x0002, DEF_STR( 2C_1C ) )		PORT_CONDITION("DSW", 0x0010, EQUALS, 0x0010) //Mode 1
+	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW", 0x0010, EQUALS, 0x0010) //Mode 1
+	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )		PORT_CONDITION("DSW", 0x0010, EQUALS, 0x0010) //Mode 1
+	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_2C ) )		PORT_CONDITION("DSW", 0x0010, EQUALS, 0x0010) //Mode 1
+	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )		PORT_CONDITION("DSW", 0x0010, NOTEQUALS, 0x0010) //Mode 2
+	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )		PORT_CONDITION("DSW", 0x0010, NOTEQUALS, 0x0010) //Mode 2
+	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )		PORT_CONDITION("DSW", 0x0010, NOTEQUALS, 0x0010) //Mode 2
+	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_4C ) )		PORT_CONDITION("DSW", 0x0010, NOTEQUALS, 0x0010) //Mode 2
 	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0xc000, DEF_STR( Normal ) )
@@ -501,7 +492,7 @@ static DRIVER_INIT( sshangha )
 #if SSHANGHA_HACK
 	/* This is a hack to allow you to use the extra features
          of the first "Unused" Dip Switch (see notes above). */
-	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	RAM[0x000384/2] = 0x4e71;
 	RAM[0x000386/2] = 0x4e71;
 	RAM[0x000388/2] = 0x4e71;

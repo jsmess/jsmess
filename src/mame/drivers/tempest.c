@@ -289,6 +289,12 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_player_select;
+	DECLARE_WRITE8_MEMBER(wdclr_w);
+	DECLARE_WRITE8_MEMBER(tempest_led_w);
+	DECLARE_WRITE8_MEMBER(tempest_coin_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(tempest_knob_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(tempest_buttons_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
 };
 
 
@@ -314,10 +320,10 @@ static MACHINE_START( tempest )
  *
  *************************************/
 
-static WRITE8_HANDLER( wdclr_w )
+WRITE8_MEMBER(tempest_state::wdclr_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
-	watchdog_reset(space->machine());
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	machine().watchdog_reset();
 }
 
 /*************************************
@@ -326,37 +332,33 @@ static WRITE8_HANDLER( wdclr_w )
  *
  *************************************/
 
-static CUSTOM_INPUT( tempest_knob_r )
+CUSTOM_INPUT_MEMBER(tempest_state::tempest_knob_r)
 {
-	tempest_state *state = field.machine().driver_data<tempest_state>();
-	return input_port_read(field.machine(), (state->m_player_select == 0) ?
-										TEMPEST_KNOB_P1_TAG : TEMPEST_KNOB_P2_TAG);
+	return ioport((m_player_select == 0) ? TEMPEST_KNOB_P1_TAG : TEMPEST_KNOB_P2_TAG)->read();
 }
 
-static CUSTOM_INPUT( tempest_buttons_r )
+CUSTOM_INPUT_MEMBER(tempest_state::tempest_buttons_r)
 {
-	tempest_state *state = field.machine().driver_data<tempest_state>();
-	return input_port_read(field.machine(), (state->m_player_select == 0) ?
-										TEMPEST_BUTTONS_P1_TAG : TEMPEST_BUTTONS_P2_TAG);
+	return ioport((m_player_select == 0) ? TEMPEST_BUTTONS_P1_TAG : TEMPEST_BUTTONS_P2_TAG)->read();
 }
 
 
-static CUSTOM_INPUT( clock_r )
+CUSTOM_INPUT_MEMBER(tempest_state::clock_r)
 {
 	/* Emulate the 3kHz source on bit 7 (divide 1.5MHz by 512) */
-	return (field.machine().device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
+	return (machine().device<cpu_device>("maincpu")->total_cycles() & 0x100) ? 1 : 0;
 }
 
 
 static READ8_DEVICE_HANDLER( input_port_1_bit_r )
 {
-	return (input_port_read(device->machine(), "IN1/DSW0") & (1 << offset)) ? 0 : 228;
+	return (device->machine().root_device().ioport("IN1/DSW0")->read() & (1 << offset)) ? 0 : 228;
 }
 
 
 static READ8_DEVICE_HANDLER( input_port_2_bit_r )
 {
-	return (input_port_read(device->machine(), "IN2") & (1 << offset)) ? 0 : 228;
+	return (device->machine().root_device().ioport("IN2")->read() & (1 << offset)) ? 0 : 228;
 }
 
 
@@ -367,21 +369,20 @@ static READ8_DEVICE_HANDLER( input_port_2_bit_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( tempest_led_w )
+WRITE8_MEMBER(tempest_state::tempest_led_w)
 {
-	tempest_state *state = space->machine().driver_data<tempest_state>();
-	set_led_status(space->machine(), 0, ~data & 0x02);
-	set_led_status(space->machine(), 1, ~data & 0x01);
+	set_led_status(machine(), 0, ~data & 0x02);
+	set_led_status(machine(), 1, ~data & 0x01);
 	/* FLIP is bit 0x04 */
-	state->m_player_select = data & 0x04;
+	m_player_select = data & 0x04;
 }
 
 
-static WRITE8_HANDLER( tempest_coin_w )
+WRITE8_MEMBER(tempest_state::tempest_coin_w)
 {
-	coin_counter_w(space->machine(), 0, (data & 0x01));
-	coin_counter_w(space->machine(), 1, (data & 0x02));
-	coin_counter_w(space->machine(), 2, (data & 0x04));
+	coin_counter_w(machine(), 0, (data & 0x01));
+	coin_counter_w(machine(), 1, (data & 0x02));
+	coin_counter_w(machine(), 2, (data & 0x04));
 	avg_set_flip_x(data & 0x08);
 	avg_set_flip_y(data & 0x10);
 }
@@ -394,26 +395,26 @@ static WRITE8_HANDLER( tempest_coin_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tempest_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x080f) AM_WRITEONLY AM_BASE(&avgdvg_colorram)
+	AM_RANGE(0x0800, 0x080f) AM_WRITEONLY AM_BASE_LEGACY(&avgdvg_colorram)
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("IN0")
 	AM_RANGE(0x0d00, 0x0d00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0e00, 0x0e00) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x2000)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE_LEGACY(&avgdvg_vectorram) AM_SIZE_LEGACY(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x2000)
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(tempest_coin_w)
-	AM_RANGE(0x4800, 0x4800) AM_WRITE(avgdvg_go_w)
+	AM_RANGE(0x4800, 0x4800) AM_WRITE_LEGACY(avgdvg_go_w)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(wdclr_w)
-	AM_RANGE(0x5800, 0x5800) AM_WRITE(avgdvg_reset_w)
-	AM_RANGE(0x6000, 0x603f) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, write)
-	AM_RANGE(0x6040, 0x6040) AM_DEVREAD("mathbox", mathbox_status_r) AM_DEVWRITE_MODERN("earom", atari_vg_earom_device, ctrl_w)
-	AM_RANGE(0x6050, 0x6050) AM_DEVREAD_MODERN("earom", atari_vg_earom_device, read)
-	AM_RANGE(0x6060, 0x6060) AM_DEVREAD("mathbox", mathbox_lo_r)
-	AM_RANGE(0x6070, 0x6070) AM_DEVREAD("mathbox", mathbox_hi_r)
-	AM_RANGE(0x6080, 0x609f) AM_DEVWRITE("mathbox", mathbox_go_w)
-	AM_RANGE(0x60c0, 0x60cf) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
-	AM_RANGE(0x60d0, 0x60df) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x5800, 0x5800) AM_WRITE_LEGACY(avgdvg_reset_w)
+	AM_RANGE(0x6000, 0x603f) AM_DEVWRITE("earom", atari_vg_earom_device, write)
+	AM_RANGE(0x6040, 0x6040) AM_DEVREAD_LEGACY("mathbox", mathbox_status_r) AM_DEVWRITE("earom", atari_vg_earom_device, ctrl_w)
+	AM_RANGE(0x6050, 0x6050) AM_DEVREAD("earom", atari_vg_earom_device, read)
+	AM_RANGE(0x6060, 0x6060) AM_DEVREAD_LEGACY("mathbox", mathbox_lo_r)
+	AM_RANGE(0x6070, 0x6070) AM_DEVREAD_LEGACY("mathbox", mathbox_hi_r)
+	AM_RANGE(0x6080, 0x609f) AM_DEVWRITE_LEGACY("mathbox", mathbox_go_w)
+	AM_RANGE(0x60c0, 0x60cf) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x60d0, 0x60df) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x60e0, 0x60e0) AM_WRITE(tempest_led_w)
 	AM_RANGE(0x9000, 0xdfff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
@@ -438,10 +439,10 @@ static INPUT_PORTS_START( tempest )
 	/* per default (busy vector processor). */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
 	/* bit 7 is tied to a 3kHz (?) clock */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,clock_r, NULL)
 
 	PORT_START("IN1/DSW0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(tempest_knob_r, NULL)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,tempest_knob_r, NULL)
 	/* The next one is reponsible for cocktail mode.
      * According to the documentation, this is not a switch, although
      * it may have been planned to put it on the Math Box PCB, D/E2 )
@@ -462,7 +463,7 @@ static INPUT_PORTS_START( tempest )
 	PORT_DIPNAME(  0x04, 0x04, "Rating" ) PORT_DIPLOCATION("DE2:2")
 	PORT_DIPSETTING(     0x04, "1, 3, 5, 7, 9" )
 	PORT_DIPSETTING(     0x00, "tied to high score" )
-	PORT_BIT(0x18, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(tempest_buttons_r, NULL)
+	PORT_BIT(0x18, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tempest_state,tempest_buttons_r, NULL)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )

@@ -42,15 +42,15 @@
 
 /* Memory Map */
 
-static ADDRESS_MAP_START( nitedrvr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nitedrvr_map, AS_PROGRAM, 8, nitedrvr_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x100) // SCRAM
-	AM_RANGE(0x0200, 0x027f) AM_RAM_WRITE(nitedrvr_videoram_w) AM_MIRROR(0x180) AM_BASE_MEMBER(nitedrvr_state, m_videoram) // PFW
-	AM_RANGE(0x0400, 0x05ff) AM_WRITE(nitedrvr_hvc_w) AM_BASE_MEMBER(nitedrvr_state, m_hvc) // POSH, POSV, CHAR, Watchdog
+	AM_RANGE(0x0200, 0x027f) AM_RAM_WRITE(nitedrvr_videoram_w) AM_MIRROR(0x180) AM_SHARE("videoram") // PFW
+	AM_RANGE(0x0400, 0x05ff) AM_WRITE(nitedrvr_hvc_w) AM_SHARE("hvc") // POSH, POSV, CHAR, Watchdog
 	AM_RANGE(0x0600, 0x07ff) AM_READ(nitedrvr_in0_r)
 	AM_RANGE(0x0800, 0x09ff) AM_READ(nitedrvr_in1_r)
 	AM_RANGE(0x0a00, 0x0bff) AM_WRITE(nitedrvr_out0_w)
 	AM_RANGE(0x0c00, 0x0dff) AM_WRITE(nitedrvr_out1_w)
-	AM_RANGE(0x8000, 0x807f) AM_RAM AM_MIRROR(0x380) AM_BASE_MEMBER(nitedrvr_state, m_videoram) // PFR
+	AM_RANGE(0x8000, 0x807f) AM_RAM AM_MIRROR(0x380) AM_SHARE("videoram") // PFR
 	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(nitedrvr_steering_reset_r, nitedrvr_steering_reset_w)
 	AM_RANGE(0x9000, 0x9fff) AM_ROM // ROM1-ROM2
 	AM_RANGE(0xfff0, 0xffff) AM_ROM // ROM2 for 6502 vectors
@@ -78,7 +78,7 @@ static INPUT_PORTS_START( nitedrvr )
 	PORT_DIPNAME( 0x20, 0x20, "Bonus Time" )
 	PORT_DIPSETTING(	0x00, DEF_STR ( No ) )
 	PORT_DIPSETTING(	0x20, "Score = 350" )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("GEARS")	// fake

@@ -41,24 +41,23 @@
 #include "includes/lkage.h"
 
 
-WRITE8_HANDLER( lkage_videoram_w )
+WRITE8_MEMBER(lkage_state::lkage_videoram_w)
 {
-	lkage_state *state = space->machine().driver_data<lkage_state>();
 
-	state->m_videoram[offset] = data;
+	m_videoram[offset] = data;
 
 	switch (offset / 0x400)
 	{
 	case 0:
-		state->m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
+		m_tx_tilemap->mark_tile_dirty(offset & 0x3ff);
 		break;
 
 	case 1:
-		state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+		m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 		break;
 
 	case 2:
-		state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+		m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 		break;
 
 	default:
@@ -139,12 +138,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			priority_mask = 0xf0;
 		}
 
-		if (flip_screen_x_get(machine))
+		if (state->flip_screen_x())
 		{
 			sx = 239 - sx - 24;
 			flipx = !flipx;
 		}
-		if (flip_screen_y_get(machine))
+		if (state->flip_screen_y())
 		{
 			sy = 254 - 16 * height - sy;
 			flipy = !flipy;
@@ -177,8 +176,8 @@ SCREEN_UPDATE_IND16( lkage )
 	lkage_state *state = screen.machine().driver_data<lkage_state>();
 	int bank;
 
-	flip_screen_x_set(screen.machine(), ~state->m_vreg[2] & 0x01);
-	flip_screen_y_set(screen.machine(), ~state->m_vreg[2] & 0x02);
+	state->flip_screen_x_set(~state->m_vreg[2] & 0x01);
+	state->flip_screen_y_set(~state->m_vreg[2] & 0x02);
 
 	bank = state->m_vreg[1] & 0x08;
 

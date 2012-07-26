@@ -2,16 +2,21 @@ class fortyl_state : public driver_device
 {
 public:
 	fortyl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_video_ctrl(*this, "video_ctrl"),
+		m_spriteram(*this, "spriteram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram2(*this, "spriteram2"),
+		m_mcu_ram(*this, "mcu_ram"){ }
 
 	/* memory pointers */
-	UINT8 *     m_videoram;
-	UINT8 *     m_colorram;
-	UINT8 *     m_spriteram;
-	UINT8 *     m_spriteram2;
-	UINT8 *     m_video_ctrl;
-	size_t      m_spriteram_size;
-	size_t      m_spriteram2_size;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_video_ctrl;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_spriteram2;
+	optional_shared_ptr<UINT8> m_mcu_ram;
 
 	/* video-related */
 	bitmap_ind16    *m_tmp_bitmap1;
@@ -31,7 +36,6 @@ public:
 	int			m_pending_nmi;
 
 	/* fake mcu */
-	UINT8 *     m_mcu_ram;
 	UINT8       m_from_mcu;
 	int         m_mcu_sent;
 	int			m_main_sent;
@@ -53,18 +57,33 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(nmi_disable_w);
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(fortyl_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(bank_select_w);
+	DECLARE_WRITE8_MEMBER(pix1_w);
+	DECLARE_WRITE8_MEMBER(pix2_w);
+	DECLARE_READ8_MEMBER(pix1_r);
+	DECLARE_READ8_MEMBER(pix2_r);
+	DECLARE_WRITE8_MEMBER(undoukai_mcu_w);
+	DECLARE_READ8_MEMBER(undoukai_mcu_r);
+	DECLARE_READ8_MEMBER(undoukai_mcu_status_r);
+	DECLARE_READ8_MEMBER(from_snd_r);
+	DECLARE_READ8_MEMBER(snd_flag_r);
+	DECLARE_WRITE8_MEMBER(to_main_w);
+	DECLARE_WRITE8_MEMBER(fortyl_pixram_sel_w);
+	DECLARE_READ8_MEMBER(fortyl_pixram_r);
+	DECLARE_WRITE8_MEMBER(fortyl_pixram_w);
+	DECLARE_WRITE8_MEMBER(fortyl_bg_videoram_w);
+	DECLARE_READ8_MEMBER(fortyl_bg_videoram_r);
+	DECLARE_WRITE8_MEMBER(fortyl_bg_colorram_w);
+	DECLARE_READ8_MEMBER(fortyl_bg_colorram_r);
 };
 
 
 /*----------- defined in video/40love.c -----------*/
 
-WRITE8_HANDLER( fortyl_bg_videoram_w );
-WRITE8_HANDLER( fortyl_bg_colorram_w );
-READ8_HANDLER ( fortyl_bg_videoram_r );
-READ8_HANDLER ( fortyl_bg_colorram_r );
-WRITE8_HANDLER( fortyl_pixram_sel_w );
-READ8_HANDLER( fortyl_pixram_r );
-WRITE8_HANDLER( fortyl_pixram_w );
 
 VIDEO_START( fortyl );
 SCREEN_UPDATE_IND16( fortyl );

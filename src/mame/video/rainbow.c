@@ -12,9 +12,8 @@
 
 /***************************************************************************/
 
-WRITE16_HANDLER( rbisland_spritectrl_w )
+WRITE16_MEMBER(rbisland_state::rbisland_spritectrl_w)
 {
-	rbisland_state *state = space->machine().driver_data<rbisland_state>();
 
 	if (offset == 0)
 	{
@@ -22,13 +21,12 @@ WRITE16_HANDLER( rbisland_spritectrl_w )
 		/* bits 5-7 are the sprite palette bank */
 		/* other bits unknown */
 
-		pc090oj_set_sprite_ctrl(state->m_pc090oj, (data & 0xe0) >> 5);
+		pc090oj_set_sprite_ctrl(m_pc090oj, (data & 0xe0) >> 5);
 	}
 }
 
-WRITE16_HANDLER( jumping_spritectrl_w )
+WRITE16_MEMBER(rbisland_state::jumping_spritectrl_w)
 {
-	rbisland_state *state = space->machine().driver_data<rbisland_state>();
 
 	if (offset == 0)
 	{
@@ -36,7 +34,7 @@ WRITE16_HANDLER( jumping_spritectrl_w )
 		/* bits 5-7 are the sprite palette bank */
 		/* other bits unknown */
 
-		state->m_sprite_ctrl = data;
+		m_sprite_ctrl = data;
 	}
 }
 
@@ -107,7 +105,7 @@ SCREEN_UPDATE_IND16( jumping )
 	pc080sn_tilemap_draw(state->m_pc080sn, bitmap, cliprect, layer[0], TILEMAP_DRAW_OPAQUE, 0);
 
 	/* Draw the sprites. 128 sprites in total */
-	for (offs = state->m_spriteram_size / 2 - 8; offs >= 0; offs -= 8)
+	for (offs = state->m_spriteram.bytes() / 2 - 8; offs >= 0; offs -= 8)
 	{
 		int tile = spriteram[offs];
 		if (tile < screen.machine().gfx[1]->total_elements)

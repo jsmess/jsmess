@@ -182,121 +182,119 @@ TODO:
 #include "sound/n63701x.h"
 #include "includes/namcos86.h"
 
-static WRITE8_HANDLER( bankswitch1_w )
+WRITE8_MEMBER(namcos86_state::bankswitch1_w)
 {
-	UINT8 *base = space->machine().region("cpu1")->base() + 0x10000;
+	UINT8 *base = memregion("cpu1")->base() + 0x10000;
 
 	/* if the ROM expansion module is available, don't do anything. This avoids conflict */
 	/* with bankswitch1_ext_w() in wndrmomo */
-	if (space->machine().region("user1")->base()) return;
+	if (machine().root_device().memregion("user1")->base()) return;
 
-	memory_set_bankptr(space->machine(), "bank1",base + ((data & 0x03) * 0x2000));
+	membank("bank1")->set_base(base + ((data & 0x03) * 0x2000));
 }
 
-static WRITE8_HANDLER( bankswitch1_ext_w )
+WRITE8_MEMBER(namcos86_state::bankswitch1_ext_w)
 {
-	UINT8 *base = space->machine().region("user1")->base();
+	UINT8 *base = memregion("user1")->base();
 
 	if (base == 0) return;
 
-	memory_set_bankptr(space->machine(), "bank1",base + ((data & 0x1f) * 0x2000));
+	membank("bank1")->set_base(base + ((data & 0x1f) * 0x2000));
 }
 
-static WRITE8_HANDLER( bankswitch2_w )
+WRITE8_MEMBER(namcos86_state::bankswitch2_w)
 {
-	UINT8 *base = space->machine().region("cpu2")->base() + 0x10000;
+	UINT8 *base = memregion("cpu2")->base() + 0x10000;
 
-	memory_set_bankptr(space->machine(), "bank2",base + ((data & 0x03) * 0x2000));
+	membank("bank2")->set_base(base + ((data & 0x03) * 0x2000));
 }
 
 /* Stubs to pass the correct Dip Switch setup to the MCU */
-static READ8_HANDLER( dsw0_r )
+READ8_MEMBER(namcos86_state::dsw0_r)
 {
 	int rhi, rlo;
 
-	rhi  = ( input_port_read(space->machine(), "DSWA") & 0x01 ) << 4;
-	rhi |= ( input_port_read(space->machine(), "DSWA") & 0x04 ) << 3;
-	rhi |= ( input_port_read(space->machine(), "DSWA") & 0x10 ) << 2;
-	rhi |= ( input_port_read(space->machine(), "DSWA") & 0x40 ) << 1;
+	rhi  = ( ioport("DSWA")->read() & 0x01 ) << 4;
+	rhi |= ( ioport("DSWA")->read() & 0x04 ) << 3;
+	rhi |= ( ioport("DSWA")->read() & 0x10 ) << 2;
+	rhi |= ( ioport("DSWA")->read() & 0x40 ) << 1;
 
-	rlo  = ( input_port_read(space->machine(), "DSWB") & 0x01 );
-	rlo |= ( input_port_read(space->machine(), "DSWB") & 0x04 ) >> 1;
-	rlo |= ( input_port_read(space->machine(), "DSWB") & 0x10 ) >> 2;
-	rlo |= ( input_port_read(space->machine(), "DSWB") & 0x40 ) >> 3;
+	rlo  = ( ioport("DSWB")->read() & 0x01 );
+	rlo |= ( ioport("DSWB")->read() & 0x04 ) >> 1;
+	rlo |= ( ioport("DSWB")->read() & 0x10 ) >> 2;
+	rlo |= ( ioport("DSWB")->read() & 0x40 ) >> 3;
 
 	return rhi | rlo;
 }
 
-static READ8_HANDLER( dsw1_r )
+READ8_MEMBER(namcos86_state::dsw1_r)
 {
 	int rhi, rlo;
 
-	rhi  = ( input_port_read(space->machine(), "DSWA") & 0x02 ) << 3;
-	rhi |= ( input_port_read(space->machine(), "DSWA") & 0x08 ) << 2;
-	rhi |= ( input_port_read(space->machine(), "DSWA") & 0x20 ) << 1;
-	rhi |= ( input_port_read(space->machine(), "DSWA") & 0x80 );
+	rhi  = ( ioport("DSWA")->read() & 0x02 ) << 3;
+	rhi |= ( ioport("DSWA")->read() & 0x08 ) << 2;
+	rhi |= ( ioport("DSWA")->read() & 0x20 ) << 1;
+	rhi |= ( ioport("DSWA")->read() & 0x80 );
 
-	rlo  = ( input_port_read(space->machine(), "DSWB") & 0x02 ) >> 1;
-	rlo |= ( input_port_read(space->machine(), "DSWB") & 0x08 ) >> 2;
-	rlo |= ( input_port_read(space->machine(), "DSWB") & 0x20 ) >> 3;
-	rlo |= ( input_port_read(space->machine(), "DSWB") & 0x80 ) >> 4;
+	rlo  = ( ioport("DSWB")->read() & 0x02 ) >> 1;
+	rlo |= ( ioport("DSWB")->read() & 0x08 ) >> 2;
+	rlo |= ( ioport("DSWB")->read() & 0x20 ) >> 3;
+	rlo |= ( ioport("DSWB")->read() & 0x80 ) >> 4;
 
 	return rhi | rlo;
 }
 
 
-static WRITE8_HANDLER( int_ack1_w )
+WRITE8_MEMBER(namcos86_state::int_ack1_w)
 {
-	cputag_set_input_line(space->machine(), "cpu1", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "cpu1", 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( int_ack2_w )
+WRITE8_MEMBER(namcos86_state::int_ack2_w)
 {
-	cputag_set_input_line(space->machine(), "cpu2", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "cpu2", 0, CLEAR_LINE);
 }
 
 
-static WRITE8_HANDLER( watchdog1_w )
+WRITE8_MEMBER(namcos86_state::watchdog1_w)
 {
-	namcos86_state *state = space->machine().driver_data<namcos86_state>();
-	state->m_wdog |= 1;
-	if (state->m_wdog == 3)
+	m_wdog |= 1;
+	if (m_wdog == 3)
 	{
-		state->m_wdog = 0;
+		m_wdog = 0;
 		watchdog_reset_w(space,0,0);
 	}
 }
 
-static WRITE8_HANDLER( watchdog2_w )
+WRITE8_MEMBER(namcos86_state::watchdog2_w)
 {
-	namcos86_state *state = space->machine().driver_data<namcos86_state>();
-	state->m_wdog |= 2;
-	if (state->m_wdog == 3)
+	m_wdog |= 2;
+	if (m_wdog == 3)
 	{
-		state->m_wdog = 0;
+		m_wdog = 0;
 		watchdog_reset_w(space,0,0);
 	}
 }
 
 
-static WRITE8_HANDLER( namcos86_coin_w )
+WRITE8_MEMBER(namcos86_state::namcos86_coin_w)
 {
-	coin_lockout_global_w(space->machine(), data & 1);
-	coin_counter_w(space->machine(), 0,~data & 2);
-	coin_counter_w(space->machine(), 1,~data & 4);
+	coin_lockout_global_w(machine(), data & 1);
+	coin_counter_w(machine(), 0,~data & 2);
+	coin_counter_w(machine(), 1,~data & 4);
 }
 
-static WRITE8_HANDLER( namcos86_led_w )
+WRITE8_MEMBER(namcos86_state::namcos86_led_w)
 {
-	set_led_status(space->machine(), 0,data & 0x08);
-	set_led_status(space->machine(), 1,data & 0x10);
+	set_led_status(machine(), 0,data & 0x08);
+	set_led_status(machine(), 1,data & 0x10);
 }
 
 
-static WRITE8_HANDLER( cus115_w )
+WRITE8_MEMBER(namcos86_state::cus115_w)
 {
 	/* make sure the expansion board is present */
-	if (!space->machine().region("user1")->base())
+	if (!machine().root_device().memregion("user1")->base())
 	{
 		popmessage("expansion board not present");
 		return;
@@ -308,7 +306,7 @@ static WRITE8_HANDLER( cus115_w )
 		case 1:
 		case 2:
 		case 3:
-			namco_63701x_w(space->machine().device("namco2"), (offset & 0x1e00) >> 9,data);
+			namco_63701x_w(machine().device("namco2"), (offset & 0x1e00) >> 9,data);
 			break;
 
 		case 4:
@@ -326,18 +324,18 @@ static WRITE8_HANDLER( cus115_w )
 
 static MACHINE_RESET( namco86 )
 {
-	UINT8 *base = machine.region("cpu1")->base() + 0x10000;
+	UINT8 *base = machine.root_device().memregion("cpu1")->base() + 0x10000;
 
-	memory_set_bankptr(machine, "bank1",base);
+	machine.root_device().membank("bank1")->set_base(base);
 }
 
 
 
-static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(rthunder_videoram1_r,rthunder_videoram1_w) AM_BASE_MEMBER(namcos86_state, m_rthunder_videoram1)
-	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(rthunder_videoram2_r,rthunder_videoram2_w) AM_BASE_MEMBER(namcos86_state, m_rthunder_videoram2)
+static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, namcos86_state )
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(rthunder_videoram1_r,rthunder_videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(rthunder_videoram2_r,rthunder_videoram2_w) AM_SHARE("videoram2")
 
-	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
+	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */
 
 	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(rthunder_spriteram_r,rthunder_spriteram_w)
 
@@ -364,8 +362,8 @@ ADDRESS_MAP_END
 
 
 #define CPU2_MEMORY(NAME,ADDR_SPRITE,ADDR_VIDEO1,ADDR_VIDEO2,ADDR_ROM,ADDR_BANK,ADDR_WDOG,ADDR_INT)	\
-static ADDRESS_MAP_START( NAME##_cpu2_map, AS_PROGRAM, 8 )							\
-	AM_RANGE(ADDR_SPRITE+0x0000, ADDR_SPRITE+0x1fff) AM_READWRITE(rthunder_spriteram_r,rthunder_spriteram_w) AM_BASE_MEMBER(namcos86_state, m_rthunder_spriteram)	\
+static ADDRESS_MAP_START( NAME##_cpu2_map, AS_PROGRAM, 8, namcos86_state )							\
+	AM_RANGE(ADDR_SPRITE+0x0000, ADDR_SPRITE+0x1fff) AM_READWRITE(rthunder_spriteram_r,rthunder_spriteram_w) AM_SHARE("spriteram")	\
 	AM_RANGE(ADDR_VIDEO1+0x0000, ADDR_VIDEO1+0x1fff) AM_READWRITE(rthunder_videoram1_r,rthunder_videoram1_w)	\
 	AM_RANGE(ADDR_VIDEO2+0x0000, ADDR_VIDEO2+0x1fff) AM_READWRITE(rthunder_videoram2_r,rthunder_videoram2_w)	\
 	AM_RANGE(ADDR_ROM+0x0000, ADDR_ROM+0x1fff) AM_ROMBANK("bank2")								\
@@ -389,12 +387,12 @@ CPU2_MEMORY( wndrmomo, 0x2000, 0x4000, 0x6000, UNUSED, UNUSED, 0xc000, 0xc800 )
 
 
 #define MCU_MEMORY(NAME,ADDR_LOWROM,ADDR_INPUT,ADDR_UNK1,ADDR_UNK2)			\
-static ADDRESS_MAP_START( NAME##_mcu_map, AS_PROGRAM, 8 )					\
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6801_io_r,m6801_io_w)	\
+static ADDRESS_MAP_START( NAME##_mcu_map, AS_PROGRAM, 8, namcos86_state )	\
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r,m6801_io_w)	\
 	AM_RANGE(0x0080, 0x00ff) AM_RAM														\
-	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */	\
+	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r, namcos1_cus30_w) /* PSG device, shared RAM */	\
 	AM_RANGE(0x1400, 0x1fff) AM_RAM														\
-	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)	\
+	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)	\
 	AM_RANGE(ADDR_INPUT+0x20, ADDR_INPUT+0x20) AM_READ_PORT("IN0")						\
 	AM_RANGE(ADDR_INPUT+0x21, ADDR_INPUT+0x21) AM_READ_PORT("IN1")						\
 	AM_RANGE(ADDR_INPUT+0x30, ADDR_INPUT+0x30) AM_READ(dsw0_r)							\
@@ -417,12 +415,12 @@ MCU_MEMORY( wndrmomo, 0x4000, 0x3800, 0xc000, 0xc800 )
 #undef UNUSED
 
 
-static READ8_HANDLER( readFF )
+READ8_MEMBER(namcos86_state::readFF)
 {
 	return 0xff;
 }
 
-static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_port_map, AS_IO, 8, namcos86_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ_PORT("IN2")
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ(readFF)	/* leds won't work otherwise */
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_WRITE(namcos86_coin_w)
@@ -1473,8 +1471,8 @@ static DRIVER_INIT( namco86 )
 	UINT8 *buffer;
 
 	/* shuffle tile ROMs so regular gfx unpack routines can be used */
-	gfx = machine.region("gfx1")->base();
-	size = machine.region("gfx1")->bytes() * 2 / 3;
+	gfx = machine.root_device().memregion("gfx1")->base();
+	size = machine.root_device().memregion("gfx1")->bytes() * 2 / 3;
 	buffer = auto_alloc_array(machine, UINT8,  size );
 
 	{
@@ -1498,8 +1496,8 @@ static DRIVER_INIT( namco86 )
 		auto_free( machine, buffer );
 	}
 
-	gfx = machine.region("gfx2")->base();
-	size = machine.region("gfx2")->bytes() * 2 / 3;
+	gfx = machine.root_device().memregion("gfx2")->base();
+	size = machine.root_device().memregion("gfx2")->bytes() * 2 / 3;
 	buffer = auto_alloc_array(machine, UINT8,  size );
 
 	{

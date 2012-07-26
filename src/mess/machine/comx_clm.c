@@ -210,8 +210,8 @@ void comx_clm_device::device_start()
 {
 	m_slot = dynamic_cast<comx_expansion_slot_device *>(owner());
 
-	m_rom = subregion("c000")->base();
-	m_char_rom = subregion(MC6845_TAG)->base();
+	m_rom = memregion("c000")->base();
+	m_char_rom = memregion(MC6845_TAG)->base();
 	m_video_ram = auto_alloc_array(machine(), UINT8, VIDEORAM_SIZE);
 
 	// state saving

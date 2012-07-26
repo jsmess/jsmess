@@ -160,43 +160,42 @@ static WRITE8_DEVICE_HANDLER( oki_bankswitch_w )
 	oki->set_bank_base((data & 1) * 0x40000);
 }
 
-static WRITE16_HANDLER( ddragon3_io_w )
+WRITE16_MEMBER(ddragon3_state::ddragon3_io_w)
 {
-	ddragon3_state *state = space->machine().driver_data<ddragon3_state>();
 
-	COMBINE_DATA(&state->m_io_reg[offset]);
+	COMBINE_DATA(&m_io_reg[offset]);
 
 	switch (offset)
 	{
 		case 0:
-			state->m_vreg = state->m_io_reg[0];
+			m_vreg = m_io_reg[0];
 			break;
 
-		case 1: /* soundlatch_w */
-			soundlatch_w(space, 1, state->m_io_reg[1] & 0xff);
-			device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE );
+		case 1: /* soundlatch_byte_w */
+			soundlatch_byte_w(space, 1, m_io_reg[1] & 0xff);
+			device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 		case 2:
 			/*  this gets written to on startup and at the end of IRQ6
             **  possibly trigger IRQ on sound CPU
             */
-			device_set_input_line(state->m_maincpu, 6, CLEAR_LINE);
+			device_set_input_line(m_maincpu, 6, CLEAR_LINE);
 			break;
 
 		case 3:
 			/*  this gets written to on startup,
             **  and at the end of IRQ5 (input port read) */
-			device_set_input_line(state->m_maincpu, 5, CLEAR_LINE);
+			device_set_input_line(m_maincpu, 5, CLEAR_LINE);
 			break;
 
 		case 4:
 			/* this gets written to at the end of IRQ6 only */
-			device_set_input_line(state->m_maincpu, 6, CLEAR_LINE);
+			device_set_input_line(m_maincpu, 6, CLEAR_LINE);
 			break;
 
 		default:
-			logerror("OUTPUT 1400[%02x] %08x, pc=%06x \n", offset, (unsigned)data, cpu_get_pc(&space->device()) );
+			logerror("OUTPUT 1400[%02x] %08x, pc=%06x \n", offset, (unsigned)data, cpu_get_pc(&space.device()) );
 			break;
 	}
 }
@@ -207,28 +206,28 @@ static WRITE16_HANDLER( ddragon3_io_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( ddragon3_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ddragon3_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram_w) AM_BASE_MEMBER(ddragon3_state, m_fg_videoram) /* Foreground (32x32 Tiles - 4 by per tile) */
-	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram_w) AM_BASE_MEMBER(ddragon3_state, m_bg_videoram) /* Background (32x32 Tiles - 2 by per tile) */
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram_w) AM_SHARE("fg_videoram") /* Foreground (32x32 Tiles - 4 by per tile) */
+	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram_w) AM_SHARE("bg_videoram") /* Background (32x32 Tiles - 2 by per tile) */
 	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(ddragon3_scroll_w)
 	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("DSW")
 	AM_RANGE(0x100006, 0x100007) AM_READ_PORT("P3")
 	AM_RANGE(0x100000, 0x10000f) AM_WRITE(ddragon3_io_w)
-	AM_RANGE(0x140000, 0x1405ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram) /* Palette RAM */
-	AM_RANGE(0x180000, 0x180fff) AM_RAM AM_BASE_MEMBER(ddragon3_state, m_spriteram)
+	AM_RANGE(0x140000, 0x1405ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram") /* Palette RAM */
+	AM_RANGE(0x180000, 0x180fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dd3b_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dd3b_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram_w) AM_BASE_MEMBER(ddragon3_state, m_fg_videoram) /* Foreground (32x32 Tiles - 4 by per tile) */
-	AM_RANGE(0x081000, 0x081fff) AM_RAM AM_BASE_MEMBER(ddragon3_state, m_spriteram)
-	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram_w) AM_BASE_MEMBER(ddragon3_state, m_bg_videoram) /* Background (32x32 Tiles - 2 by per tile) */
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram_w) AM_SHARE("fg_videoram") /* Foreground (32x32 Tiles - 4 by per tile) */
+	AM_RANGE(0x081000, 0x081fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram_w) AM_SHARE("bg_videoram") /* Background (32x32 Tiles - 2 by per tile) */
 	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(ddragon3_scroll_w)
-	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram) /* Palette RAM */
+	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram") /* Palette RAM */
 	AM_RANGE(0x140000, 0x14000f) AM_WRITE(ddragon3_io_w)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN0")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("IN1")
@@ -237,14 +236,14 @@ static ADDRESS_MAP_START( dd3b_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ctribe_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ctribe_map, AS_PROGRAM, 16, ddragon3_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram_w) AM_BASE_MEMBER(ddragon3_state, m_fg_videoram) /* Foreground (32x32 Tiles - 4 by per tile) */
-	AM_RANGE(0x081000, 0x081fff) AM_RAM AM_BASE_MEMBER(ddragon3_state, m_spriteram)
-	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram_w) AM_BASE_MEMBER(ddragon3_state, m_bg_videoram) /* Background (32x32 Tiles - 2 by per tile) */
+	AM_RANGE(0x080000, 0x080fff) AM_RAM_WRITE(ddragon3_fg_videoram_w) AM_SHARE("fg_videoram") /* Foreground (32x32 Tiles - 4 by per tile) */
+	AM_RANGE(0x081000, 0x081fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x082000, 0x0827ff) AM_RAM_WRITE(ddragon3_bg_videoram_w) AM_SHARE("bg_videoram") /* Background (32x32 Tiles - 2 by per tile) */
 	AM_RANGE(0x082800, 0x082fff) AM_RAM
 	AM_RANGE(0x0c0000, 0x0c000f) AM_READWRITE(ddragon3_scroll_r, ddragon3_scroll_w)
-	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram) /* Palette RAM */
+	AM_RANGE(0x100000, 0x1005ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram") /* Palette RAM */
 	AM_RANGE(0x140000, 0x14000f) AM_WRITE(ddragon3_io_w)
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("IN0")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("IN1")
@@ -253,21 +252,21 @@ static ADDRESS_MAP_START( ctribe_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* working RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ddragon3_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ym2151", ym2151_r, ym2151_w)
-	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("oki", oki_bankswitch_w)
+	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE_LEGACY("ym2151", ym2151_r, ym2151_w)
+	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("oki", oki_bankswitch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ctribe_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ctribe_sound_map, AS_PROGRAM, 8, ddragon3_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE("ym2151", ym2151_status_port_r, ym2151_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0x8800, 0x8801) AM_DEVREADWRITE_LEGACY("ym2151", ym2151_status_port_r, ym2151_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 /*************************************
@@ -366,7 +365,7 @@ static INPUT_PORTS_START( ctribe )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(	  0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
@@ -421,10 +420,10 @@ static INPUT_PORTS_START( ctribe )
 	PORT_DIPSETTING(	  0x0800, DEF_STR( On ) )
 	PORT_SERVICE_DIPLOC( 0x1000, IP_ACTIVE_LOW, "SW2:5" )
 	PORT_DIPNAME( 0x2000, 0x2000, "Stage Clear Energy" ) PORT_DIPLOCATION("SW2:6")
-	PORT_DIPSETTING(	  0x2000, "0" )			PORT_CONDITION("IN3", 0x0100, PORTCOND_EQUALS, 0x0100)
-	PORT_DIPSETTING(	  0x0000, "50" )		PORT_CONDITION("IN3", 0x0100, PORTCOND_EQUALS, 0x0100)
-	PORT_DIPSETTING(	  0x2000, "100" )		PORT_CONDITION("IN3", 0x0100, PORTCOND_EQUALS, 0x0000)
-	PORT_DIPSETTING(	  0x0000, "150" )		PORT_CONDITION("IN3", 0x0100, PORTCOND_EQUALS, 0x0000)
+	PORT_DIPSETTING(	  0x2000, "0" )			PORT_CONDITION("IN3", 0x0100, EQUALS, 0x0100)
+	PORT_DIPSETTING(	  0x0000, "50" )		PORT_CONDITION("IN3", 0x0100, EQUALS, 0x0100)
+	PORT_DIPSETTING(	  0x2000, "100" )		PORT_CONDITION("IN3", 0x0100, EQUALS, 0x0000)
+	PORT_DIPSETTING(	  0x0000, "150" )		PORT_CONDITION("IN3", 0x0100, EQUALS, 0x0000)
 	PORT_BIT( 0xc000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")
@@ -522,7 +521,7 @@ static void dd3_ymirq_handler(device_t *device, int irq)
 
 static const ym2151_interface ym2151_config =
 {
-	dd3_ymirq_handler
+	DEVCB_LINE(dd3_ymirq_handler)
 };
 
 /*************************************

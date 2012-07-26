@@ -5,7 +5,6 @@
         16/07/2009 Initial driver.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -27,7 +26,8 @@ class ec65_state : public driver_device
 {
 public:
 	ec65_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	DECLARE_READ8_MEMBER(ec65_via_read_a);
 	DECLARE_READ8_MEMBER(ec65_read_ca1 );
@@ -35,7 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER(ec65_via_write_a);
 	DECLARE_WRITE8_MEMBER(ec65_via_write_b);
 	UINT8 *m_p_chargen;
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 };
 
 static ADDRESS_MAP_START(ec65_mem, AS_PROGRAM, 8, ec65_state)
@@ -50,13 +50,14 @@ static ADDRESS_MAP_START(ec65_mem, AS_PROGRAM, 8, ec65_state)
 	AM_RANGE(0xe140, 0xe140) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
 	AM_RANGE(0xe141, 0xe141) AM_DEVREADWRITE(MC6845_TAG, mc6845_device, register_r , register_w)
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM // 1KB on-board RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("p_videoram")
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ec65k_mem, AS_PROGRAM, 8, ec65_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xefff) AM_RAM
+	AM_RANGE(0x0000, 0xe7ff) AM_RAM
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("p_videoram")
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -154,7 +155,7 @@ static MACHINE_RESET(ec65)
 static VIDEO_START( ec65 )
 {
 	ec65_state *state = machine.driver_data<ec65_state>();
-	state->m_p_chargen = machine.region("chargen")->base();
+	state->m_p_chargen = state->memregion("chargen")->base();
 }
 
 static MC6845_UPDATE_ROW( ec65_update_row )

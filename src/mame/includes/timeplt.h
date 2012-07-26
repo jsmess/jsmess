@@ -8,13 +8,17 @@ class timeplt_state : public driver_device
 {
 public:
 	timeplt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_spriteram2(*this, "spriteram2"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	UINT8 *  m_colorram;
-	UINT8 *  m_spriteram;
-	UINT8 *  m_spriteram2;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_spriteram2;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -24,15 +28,18 @@ public:
 
 	/* devices */
 	cpu_device *m_maincpu;
+	DECLARE_WRITE8_MEMBER(timeplt_nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(timeplt_coin_counter_w);
+	DECLARE_READ8_MEMBER(psurge_protection_r);
+	DECLARE_WRITE8_MEMBER(timeplt_videoram_w);
+	DECLARE_WRITE8_MEMBER(timeplt_colorram_w);
+	DECLARE_WRITE8_MEMBER(timeplt_flipscreen_w);
+	DECLARE_READ8_MEMBER(timeplt_scanline_r);
 };
 
 
 /*----------- defined in video/timeplt.c -----------*/
 
-READ8_HANDLER( timeplt_scanline_r );
-WRITE8_HANDLER( timeplt_videoram_w );
-WRITE8_HANDLER( timeplt_colorram_w );
-WRITE8_HANDLER( timeplt_flipscreen_w );
 
 PALETTE_INIT( timeplt );
 VIDEO_START( timeplt );

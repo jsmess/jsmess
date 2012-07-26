@@ -12,42 +12,40 @@ Issues:
 #include "sound/ay8910.h"
 #include "includes/rollrace.h"
 
-static READ8_HANDLER( ra_fake_d800_r )
+READ8_MEMBER(rollrace_state::ra_fake_d800_r)
 {
 	return 0x51;
 }
 
-static WRITE8_HANDLER( ra_fake_d800_w )
+WRITE8_MEMBER(rollrace_state::ra_fake_d800_w)
 {
 /*  logerror("d900: %02X\n",data);*/
 }
 
-static WRITE8_HANDLER( nmi_mask_w )
+WRITE8_MEMBER(rollrace_state::nmi_mask_w)
 {
-	rollrace_state *state = space->machine().driver_data<rollrace_state>();
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
-static WRITE8_HANDLER( sound_nmi_mask_w )
+WRITE8_MEMBER(rollrace_state::sound_nmi_mask_w)
 {
-	rollrace_state *state = space->machine().driver_data<rollrace_state>();
 
-	state->m_sound_nmi_mask = data & 1;
+	m_sound_nmi_mask = data & 1;
 }
 
 
-static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8, rollrace_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROM			 /* only rollace2 */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd806, 0xd806) AM_READNOP /* looks like a watchdog, bit4 checked*/
 	AM_RANGE(0xd900, 0xd900) AM_READWRITE(ra_fake_d800_r,ra_fake_d800_w) /* protection ??*/
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(rollrace_state, m_videoram)
-	AM_RANGE(0xe400, 0xe47f) AM_RAM AM_BASE_MEMBER(rollrace_state, m_colorram)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0xe400, 0xe47f) AM_RAM AM_SHARE("colorram")
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xec00, 0xec0f) AM_NOP /* Analog sound effects ?? ec00 sound enable ?*/
-	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_BASE_SIZE_MEMBER(rollrace_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(rollrace_backgroundcolor_w)
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2") AM_WRITE(rollrace_bkgpen_w)
@@ -63,13 +61,13 @@ static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rollrace_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rollrace_sound_map, AS_PROGRAM, 8, rollrace_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,sound_nmi_mask_w)
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay3", ay8910_address_data_w)
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r) AM_WRITE(sound_nmi_mask_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE_LEGACY("ay3", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 
@@ -129,7 +127,7 @@ static INPUT_PORTS_START( rollrace )
 	PORT_DIPSETTING(	0x10, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(	0x18, DEF_STR( 1C_6C ) )
 
-/*  PORT_BIT( 0x40, IP_ACTIVE_HIGH , IPT_VBLANK )  freezes frame, could be vblank ?*/
+/*  PORT_BIT( 0x40, IP_ACTIVE_HIGH , IPT_CUSTOM ) PORT_VBLANK("screen")  freezes frame, could be vblank ?*/
 	PORT_DIPNAME( 0x40, 0x00, "Freeze" )
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( On ) )

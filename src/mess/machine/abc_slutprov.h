@@ -3,7 +3,6 @@
 #ifndef __ABC_SLUTPROV__
 #define __ABC_SLUTPROV__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "abcbus.h"

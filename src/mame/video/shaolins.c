@@ -28,6 +28,7 @@
 ***************************************************************************/
 PALETTE_INIT( shaolins )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances[4] = { 2200, 1000, 470, 220 };
 	double rweights[4], gweights[4], bweights[4];
 	int i;
@@ -88,52 +89,47 @@ PALETTE_INIT( shaolins )
 	}
 }
 
-WRITE8_HANDLER( shaolins_videoram_w )
+WRITE8_MEMBER(shaolins_state::shaolins_videoram_w)
 {
-	shaolins_state *state = space->machine().driver_data<shaolins_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( shaolins_colorram_w )
+WRITE8_MEMBER(shaolins_state::shaolins_colorram_w)
 {
-	shaolins_state *state = space->machine().driver_data<shaolins_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( shaolins_palettebank_w )
+WRITE8_MEMBER(shaolins_state::shaolins_palettebank_w)
 {
-	shaolins_state *state = space->machine().driver_data<shaolins_state>();
 
-	if (state->m_palettebank != (data & 0x07))
+	if (m_palettebank != (data & 0x07))
 	{
-		state->m_palettebank = data & 0x07;
-		space->machine().tilemap().mark_all_dirty();
+		m_palettebank = data & 0x07;
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( shaolins_scroll_w )
+WRITE8_MEMBER(shaolins_state::shaolins_scroll_w)
 {
-	shaolins_state *state = space->machine().driver_data<shaolins_state>();
 	int col;
 
 	for (col = 4; col < 32; col++)
-		state->m_bg_tilemap->set_scrolly(col, data + 1);
+		m_bg_tilemap->set_scrolly(col, data + 1);
 }
 
-WRITE8_HANDLER( shaolins_nmi_w )
+WRITE8_MEMBER(shaolins_state::shaolins_nmi_w)
 {
-	shaolins_state *state = space->machine().driver_data<shaolins_state>();
 
-	state->m_nmi_enable = data;
+	m_nmi_enable = data;
 
-	if (flip_screen_get(space->machine()) != (data & 0x01))
+	if (flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(space->machine(), data & 0x01);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(data & 0x01);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -164,7 +160,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram_size - 32; offs >= 0; offs -= 32 ) /* max 24 sprites */
+	for (offs = state->m_spriteram.bytes() - 32; offs >= 0; offs -= 32 ) /* max 24 sprites */
 	{
 		if (spriteram[offs] && spriteram[offs + 6]) /* stop rogue sprites on high score screen */
 		{
@@ -175,7 +171,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			int sx = 240 - spriteram[offs + 6];
 			int sy = 248 - spriteram[offs + 4];
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx = 240 - sx;
 				sy = 248 - sy;

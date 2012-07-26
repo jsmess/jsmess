@@ -23,9 +23,10 @@ class nexus3d_state : public driver_device
 {
 public:
 	nexus3d_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_mainram(*this, "mainram"){ }
 
-	UINT32* m_mainram;
+	required_shared_ptr<UINT32> m_mainram;
 
 	//
 	UINT8 m_last_flash_cmd;
@@ -38,6 +39,14 @@ public:
 
 	UINT8* m_flash_region;
 
+	DECLARE_READ32_MEMBER(nexus3d_unk_r);
+//  DECLARE_READ32_MEMBER(nexus3d_unk2_r);
+//  DECLARE_READ32_MEMBER(nexus3d_unk3_r);
+//  DECLARE_WRITE32_MEMBER(nexus3d_unk2_w);
+//  DECLARE_WRITE32_MEMBER(nexus3d_unk3_w);
+	DECLARE_READ8_MEMBER(n3d_flash_r);
+	DECLARE_WRITE8_MEMBER(n3d_flash_cmd_w);
+	DECLARE_WRITE8_MEMBER(n3d_flash_addr_w);
 };
 
 
@@ -58,19 +67,18 @@ void nexus3d_flash_reset(running_machine& machine)
 	state->m_flash_page_addr = 0;
 }
 
-READ8_HANDLER( n3d_flash_r )
+READ8_MEMBER(nexus3d_state::n3d_flash_r)
 {
-	nexus3d_state *state = space->machine().driver_data<nexus3d_state>();
 
-	if (state->m_last_flash_cmd==0x70) return 0xe0;
+	if (m_last_flash_cmd==0x70) return 0xe0;
 
-	if (state->m_last_flash_cmd==0x00)
+	if (m_last_flash_cmd==0x00)
 	{
-		UINT8 retdat = state->flash_page_data[state->m_flash_page_addr];
+		UINT8 retdat = flash_page_data[m_flash_page_addr];
 
-		//logerror("n3d_flash_r %02x %04x\n", offset, state->m_flash_page_addr);
+		//logerror("n3d_flash_r %02x %04x\n", offset, m_flash_page_addr);
 
-		state->m_flash_page_addr++;
+		m_flash_page_addr++;
 		return retdat;
 	}
 
@@ -81,85 +89,83 @@ READ8_HANDLER( n3d_flash_r )
 }
 
 
-WRITE8_HANDLER( n3d_flash_cmd_w )
+WRITE8_MEMBER(nexus3d_state::n3d_flash_cmd_w)
 {
-	nexus3d_state *state = space->machine().driver_data<nexus3d_state>();
 	logerror("n3d_flash_cmd_w %02x %02x\n", offset, data);
-	state->m_last_flash_cmd = data;
+	m_last_flash_cmd = data;
 
 	if (data==0x00)
 	{
-		memcpy(state->flash_page_data, state->m_flash_region + state->m_flash_addr * FLASH_PAGE_SIZE, FLASH_PAGE_SIZE);
+		memcpy(flash_page_data, m_flash_region + m_flash_addr * FLASH_PAGE_SIZE, FLASH_PAGE_SIZE);
 
 	}
 
 }
 
-WRITE8_HANDLER( n3d_flash_addr_w )
+WRITE8_MEMBER(nexus3d_state::n3d_flash_addr_w)
 {
-	nexus3d_state *state = space->machine().driver_data<nexus3d_state>();
 //  logerror("n3d_flash_addr_w %02x %02x\n", offset, data);
 
-	state->m_flash_addr_seq++;
+	m_flash_addr_seq++;
 
-	if (state->m_flash_addr_seq==3)
-		state->m_flash_addr = (state->m_flash_addr & 0xffff00) | data;
+	if (m_flash_addr_seq==3)
+		m_flash_addr = (m_flash_addr & 0xffff00) | data;
 
-	if (state->m_flash_addr_seq==4)
-		state->m_flash_addr = (state->m_flash_addr & 0xff00ff) | data << 8;
+	if (m_flash_addr_seq==4)
+		m_flash_addr = (m_flash_addr & 0xff00ff) | data << 8;
 
-	if (state->m_flash_addr_seq==5)
-		state->m_flash_addr = (state->m_flash_addr & 0x00ffff) | data << 16;
+	if (m_flash_addr_seq==5)
+		m_flash_addr = (m_flash_addr & 0x00ffff) | data << 16;
 
-	if (state->m_flash_addr_seq==5)
+	if (m_flash_addr_seq==5)
 	{
-		state->m_flash_addr_seq = 0;
-		state->m_flash_page_addr = 0;
-		logerror("set flash block to %08x\n", state->m_flash_addr);
+		m_flash_addr_seq = 0;
+		m_flash_page_addr = 0;
+		logerror("set flash block to %08x\n", m_flash_addr);
 	}
 
 }
 
-static READ32_HANDLER( nexus3d_unk_r )
+READ32_MEMBER(nexus3d_state::nexus3d_unk_r)
 {
-	return space->machine().rand() ^ (space->machine().rand() << 16);
+	return machine().rand() ^ (machine().rand() << 16);
 }
 
-//static READ32_HANDLER( nexus3d_unk2_r )
+//READ32_MEMBER(nexus3d_state::nexus3d_unk2_r)
 //{
-//  return 0x00000000;//space->machine().rand() ^ (space->machine().rand() << 16);
+//  return 0x00000000;//machine().rand() ^ (machine().rand() << 16);
 //}
 //
-//static READ32_HANDLER( nexus3d_unk3_r )
+//READ32_MEMBER(nexus3d_state::nexus3d_unk3_r)
 //{
-//  return 0x00000000;//space->machine().rand() ^ (space->machine().rand() << 16);
+//  return 0x00000000;//machine().rand() ^ (machine().rand() << 16);
 //}
 //
-//static WRITE32_HANDLER( nexus3d_unk2_w )
+//WRITE32_MEMBER(nexus3d_state::nexus3d_unk2_w)
 //{
 //
 //}
 //
-//static WRITE32_HANDLER( nexus3d_unk3_w )
+//WRITE32_MEMBER(nexus3d_state::nexus3d_unk3_w)
 //{
 //
 //}
 
-static ADDRESS_MAP_START( nexus3d_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(nexus3d_state, m_mainram)
+static ADDRESS_MAP_START( nexus3d_map, AS_PROGRAM, 32, nexus3d_state )
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("mainram")
 
 	AM_RANGE(0x00400000, 0x01ffffff) AM_RAM // ?? uploads various data, + pointers to data in the 0x01ffxxxx range, might be video system related
 
 	// flash
-	AM_RANGE(0x9C000000, 0x9C000003) AM_WRITE8( n3d_flash_r, 0xffffffff)
-	AM_RANGE(0x9C000010, 0x9C000013) AM_WRITE8( n3d_flash_cmd_w, 0xffffffff)
-	AM_RANGE(0x9C000018, 0x9C00001b) AM_WRITE8( n3d_flash_addr_w, 0xffffffff)
+	AM_RANGE(0x9C000000, 0x9C000003) AM_READ8(n3d_flash_r, 0xffffffff)
+	AM_RANGE(0x9C000010, 0x9C000013) AM_WRITE8(n3d_flash_cmd_w, 0xffffffff)
+	AM_RANGE(0x9C000018, 0x9C00001b) AM_WRITE8(n3d_flash_addr_w, 0xffffffff)
 
 	// lots of accesses in this range
-//  AM_RANGE(0xC0000F44, 0xC0000F47) AM_READWRITE( nexus3d_unk2_r, nexus3d_unk2_w ) // often
-//  AM_RANGE(0xC0000F4C, 0xC0000F4f) AM_READWRITE( nexus3d_unk3_r, nexus3d_unk3_w ) // often
+//  AM_RANGE(0xC0000F44, 0xC0000F47) AM_READWRITE(nexus3d_unk2_r, nexus3d_unk2_w ) // often
+//  AM_RANGE(0xC0000F4C, 0xC0000F4f) AM_READWRITE(nexus3d_unk3_r, nexus3d_unk3_w ) // often
 
-	AM_RANGE(0xE0000014, 0xE0000017) AM_READ( nexus3d_unk_r ) // sits waiting for this
+	AM_RANGE(0xE0000014, 0xE0000017) AM_READ(nexus3d_unk_r ) // sits waiting for this
 
 
 ADDRESS_MAP_END
@@ -257,8 +263,8 @@ static DRIVER_INIT( nexus3d )
 {
 	nexus3d_state *state = machine.driver_data<nexus3d_state>();
 	// the first part of the flash ROM automatically gets copied to RAM
-	memcpy( state->m_mainram, machine.region("user1")->base(), 4 * 1024);
-	state->m_flash_region = machine.region("user1")->base();
+	memcpy( state->m_mainram, state->memregion("user1")->base(), 4 * 1024);
+	state->m_flash_region = state->memregion("user1")->base();
 }
 
 GAME( 2005, acheart,  0, nexus3d, nexus3d, nexus3d, ROT0, "Examu", "Arcana Heart",GAME_IS_SKELETON )

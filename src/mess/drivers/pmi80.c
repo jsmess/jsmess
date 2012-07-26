@@ -30,7 +30,6 @@ Notes:
    things. Perhaps it connected to discrete LEDs or output lines.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -56,7 +55,7 @@ READ8_MEMBER( pmi80_state::keyboard_r)
 {
 	char kbdrow[6];
 	sprintf(kbdrow,"%X",m_keyrow);
-	return input_port_read(machine(), kbdrow);
+	return ioport(kbdrow)->read();
 }
 
 WRITE8_MEMBER( pmi80_state::keyboard_w )

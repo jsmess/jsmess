@@ -154,12 +154,12 @@ cartridge_pcb_minimem_device::cartridge_pcb_minimem_device(const machine_config 
 }
 
 cartridge_pcb_superspace_device::cartridge_pcb_superspace_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: cartridge_pcb_device(mconfig, TICARTPCBMIN, "SuperSpace II cartridge PCB", tag, owner, clock)
+: cartridge_pcb_device(mconfig, TICARTPCBSUP, "SuperSpace II cartridge PCB", tag, owner, clock)
 {
 }
 
 cartridge_pcb_mbx_device::cartridge_pcb_mbx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-: cartridge_pcb_device(mconfig, TICARTPCBMIN, "MBX cartridge PCB", tag, owner, clock)
+: cartridge_pcb_device(mconfig, TICARTPCBMBX, "MBX cartridge PCB", tag, owner, clock)
 {
 }
 
@@ -469,12 +469,13 @@ READ8Z_MEMBER(cartridge_pcb_mbx_device::readz)
 		}
 		else
 		{
-			*value = m_rom_ptr[(offset & 0x1fff) | (m_rom_page<<13)];
+			if (m_rom_ptr!=NULL)
+				*value = m_rom_ptr[(offset & 0x1fff) | (m_rom_page<<13)];
 		}
 	}
 }
 
-/* Write function for the super cartridge. */
+/* Write function for the mbx cartridge. */
 WRITE8_MEMBER(cartridge_pcb_mbx_device::write)
 {
 	if ((offset & GROM_MASK)==GROM_AREA)
@@ -961,11 +962,11 @@ void cartridge_device::device_reset()
 	if (m_type==PCB_GKRACKER)
 	{
 		cartridge_pcb_gramkracker_device* pcb = static_cast<cartridge_pcb_gramkracker_device*>(m_pcb);
-		pcb->m_gk_switch[1] = input_port_read(*owner(), GKSWITCH1_TAG);
-		pcb->m_gk_switch[2] = input_port_read(*owner(), GKSWITCH2_TAG);
-		pcb->m_gk_switch[3] = input_port_read(*owner(), GKSWITCH3_TAG);
-		pcb->m_gk_switch[4] = input_port_read(*owner(), GKSWITCH4_TAG);
-		pcb->m_gk_switch[5] = input_port_read(*owner(), GKSWITCH5_TAG);
+		pcb->m_gk_switch[1] = owner()->ioport(GKSWITCH1_TAG)->read();
+		pcb->m_gk_switch[2] = owner()->ioport(GKSWITCH2_TAG)->read();
+		pcb->m_gk_switch[3] = owner()->ioport(GKSWITCH3_TAG)->read();
+		pcb->m_gk_switch[4] = owner()->ioport(GKSWITCH4_TAG)->read();
+		pcb->m_gk_switch[5] = owner()->ioport(GKSWITCH5_TAG)->read();
 	}
 }
 
@@ -982,16 +983,16 @@ void cartridge_device::prepare_cartridge()
 
 	UINT8* grom_ptr;
 
-	const memory_region *regg;
-	const memory_region *regr;
-	const memory_region *regr2;
+	memory_region *regg;
+	memory_region *regr;
+	memory_region *regr2;
 
 	m_pcb->m_grom_size = m_softlist? get_software_region_length("grom_socket") : m_rpk->get_resource_length("grom_socket");
 	if (VERBOSE>6) LOG("gromport: grom_socket.size=0x%04x\n", m_pcb->m_grom_size);
 
 	if (m_pcb->m_grom_size > 0)
 	{
-		regg = subregion("grom_contents");
+		regg = memregion("grom_contents");
 		grom_ptr = m_softlist? get_software_region("grom_socket") : (UINT8*)m_rpk->get_contents_of_socket("grom_socket");
 		memcpy(regg->base(), grom_ptr, m_pcb->m_grom_size);
 
@@ -1012,7 +1013,7 @@ void cartridge_device::prepare_cartridge()
 	m_pcb->m_rom_size = m_softlist? get_software_region_length("rom_socket") : m_rpk->get_resource_length("rom_socket");
 	if (m_pcb->m_rom_size > 0)
 	{
-		regr = subregion("rom_contents");
+		regr = memregion("rom_contents");
 		m_pcb->m_rom_ptr = m_softlist? get_software_region("rom_socket") : (UINT8*)m_rpk->get_contents_of_socket("rom_socket");
 		memcpy(regr->base(), m_pcb->m_rom_ptr, m_pcb->m_rom_size);
 	}
@@ -1021,7 +1022,7 @@ void cartridge_device::prepare_cartridge()
 	if (rom2_length > 0)
 	{
 		// sizes do not differ between rom and rom2
-		regr2 = subregion("rom2_contents");
+		regr2 = memregion("rom2_contents");
 		m_pcb->m_rom2_ptr = m_softlist? get_software_region("rom2_socket") : (UINT8*)m_rpk->get_contents_of_socket("rom2_socket");
 		memcpy(regr2->base(), m_pcb->m_rom2_ptr, rom2_length);
 	}
@@ -1430,7 +1431,7 @@ READ8Z_MEMBER(gromport_device::readz)
 	// source of confusion when the GRAMKracker is plugged in, but the switch
 	// is not set.
 	// The check for the presence of the GK using the index is safer.
-	if ((m_gk_slot != -1) /*&& (input_port_read(*this, "CARTSLOT")==CART_GK) */)
+	if ((m_gk_slot != -1) /*&& (ioport("CARTSLOT")==CART_GK) */)
 	{
 		m_cartridge[m_gk_slot]->readz(space, offset, value, mem_mask);
 		return;
@@ -1468,7 +1469,7 @@ READ8Z_MEMBER(gromport_device::readz)
 WRITE8_MEMBER(gromport_device::write)
 {
 	// GRAMKracker support
-	if ((m_gk_slot != -1) /*&& (input_port_read(*this, "CARTSLOT")==CART_GK)*/)
+	if ((m_gk_slot != -1) /*&& (ioport("CARTSLOT")==CART_GK)*/)
 	{
 		m_cartridge[m_gk_slot]->write(space, offset, data, mem_mask);
 		return;
@@ -1512,7 +1513,7 @@ WRITE_LINE_MEMBER(gromport_device::ready_line)
 void gromport_device::crureadz(offs_t offset, UINT8 *value)
 {
 	// GRAMKracker support
-	if ((m_gk_slot != -1) /* && (input_port_read(*this, "CARTSLOT")==CART_GK)*/)
+	if ((m_gk_slot != -1) /* && (ioport("CARTSLOT")==CART_GK)*/)
 	{
 		m_cartridge[m_gk_slot]->crureadz(offset, value);
 		return;
@@ -1533,7 +1534,7 @@ void gromport_device::crureadz(offs_t offset, UINT8 *value)
 void gromport_device::cruwrite(offs_t offset, UINT8 data)
 {
 	// GRAMKracker support
-	if ((m_gk_slot != -1) /*&& (input_port_read(*this, "CARTSLOT")==CART_GK)*/)
+	if ((m_gk_slot != -1) /*&& (ioport("CARTSLOT")==CART_GK)*/)
 	{
 		m_cartridge[m_gk_slot]->cruwrite(offset, data);
 		return;
@@ -1586,7 +1587,7 @@ void gromport_device::device_stop(void)
 void gromport_device::device_reset(void)
 {
 	m_active_slot = 0;
-	m_fixed_slot = input_port_read(*this, "CARTSLOT") - 1;
+	m_fixed_slot = ioport("CARTSLOT")->read() - 1;
 }
 
 INPUT_CHANGED_MEMBER( gromport_device::gk_changed )
@@ -1609,28 +1610,28 @@ INPUT_PORTS_START(gromport_device)
 		PORT_DIPSETTING(    0x0f, "GRAM Kracker" )
 
 	PORT_START( GKSWITCH1_TAG )
-	PORT_DIPNAME( 0x01, 0x01, "GK switch 1" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 1)
+	PORT_DIPNAME( 0x01, 0x01, "GK switch 1" ) PORT_CONDITION( "CARTSLOT", 0x0f, EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 1)
 		PORT_DIPSETTING(    0x00, "GK Off" )
 		PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
 
 	PORT_START( GKSWITCH2_TAG )
-	PORT_DIPNAME( 0x01, 0x01, "GK switch 2" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 2)
+	PORT_DIPNAME( 0x01, 0x01, "GK switch 2" ) PORT_CONDITION( "CARTSLOT", 0x0f, EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 2)
 		PORT_DIPSETTING(    0x00, "GRAM 0" )
 		PORT_DIPSETTING(    0x01, "Op Sys" )
 
 	PORT_START( GKSWITCH3_TAG )
-	PORT_DIPNAME( 0x01, 0x01, "GK switch 3" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 3)
+	PORT_DIPNAME( 0x01, 0x01, "GK switch 3" ) PORT_CONDITION( "CARTSLOT", 0x0f, EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 3)
 		PORT_DIPSETTING(    0x00, "GRAM 1-2" )
 		PORT_DIPSETTING(    0x01, "TI BASIC" )
 
 	PORT_START( GKSWITCH4_TAG )
-	PORT_DIPNAME( 0x03, 0x01, "GK switch 4" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 4)
+	PORT_DIPNAME( 0x03, 0x01, "GK switch 4" ) PORT_CONDITION( "CARTSLOT", 0x0f, EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 4)
 		PORT_DIPSETTING(    0x00, "Bank 1" )
 		PORT_DIPSETTING(    0x01, "W/P" )
 		PORT_DIPSETTING(    0x02, "Bank 2" )
 
 	PORT_START( GKSWITCH5_TAG )
-	PORT_DIPNAME( 0x01, 0x00, "GK switch 5" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 5)
+	PORT_DIPNAME( 0x01, 0x00, "GK switch 5" ) PORT_CONDITION( "CARTSLOT", 0x0f, EQUALS, 0x0f ) PORT_CHANGED_MEMBER(DEVICE_SELF, gromport_device, gk_changed, 5)
 		PORT_DIPSETTING(    0x00, "Loader On" )
 		PORT_DIPSETTING(    0x01, "Loader Off" )
 INPUT_PORTS_END

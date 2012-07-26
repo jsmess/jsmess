@@ -5,7 +5,6 @@
         30/08/2010 Skeleton driver
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -20,11 +19,12 @@ public:
 	mes_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	const UINT8 *m_p_chargen;
-	const UINT8 *m_p_videoram;
+	required_shared_ptr<const UINT8> m_p_videoram;
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -36,7 +36,7 @@ static ADDRESS_MAP_START(mes_mem, AS_PROGRAM, 8, mes_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("p_videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mes_io, AS_IO, 8, mes_state)
@@ -53,7 +53,7 @@ MACHINE_RESET_MEMBER(mes_state)
 
 VIDEO_START_MEMBER( mes_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 /* This system appears to have 2 screens. Not implemented.

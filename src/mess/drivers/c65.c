@@ -69,7 +69,7 @@ bus serial (available in all modes), a Fast and a Burst serial bus
  *
  *************************************/
 
-static ADDRESS_MAP_START( c65_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( c65_mem , AS_PROGRAM, 8, c65_state )
 	AM_RANGE(0x00000, 0x07fff) AM_RAMBANK("bank11")
 	AM_RANGE(0x08000, 0x09fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank12")
 	AM_RANGE(0x0a000, 0x0bfff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank13")
@@ -79,15 +79,15 @@ static ADDRESS_MAP_START( c65_mem , AS_PROGRAM, 8)
 	AM_RANGE(0x0dc00, 0x0dfff) AM_READ_BANK("bank8") AM_WRITE_BANK("bank9")
 	AM_RANGE(0x0e000, 0x0ffff) AM_READ_BANK("bank10") AM_WRITE_BANK("bank15")
 	AM_RANGE(0x10000, 0x1f7ff) AM_RAM
-	AM_RANGE(0x1f800, 0x1ffff) AM_RAM AM_BASE_MEMBER(c65_state, m_colorram)
+	AM_RANGE(0x1f800, 0x1ffff) AM_RAM AM_SHARE("colorram")
 
 	AM_RANGE(0x20000, 0x23fff) AM_ROM /* &c65_dos,     maps to 0x8000    */
 	AM_RANGE(0x24000, 0x28fff) AM_ROM /* reserved */
-	AM_RANGE(0x29000, 0x29fff) AM_ROM AM_BASE_MEMBER(c65_state, m_chargen)
-	AM_RANGE(0x2a000, 0x2bfff) AM_ROM AM_BASE_MEMBER(c65_state, m_basic)
-	AM_RANGE(0x2c000, 0x2cfff) AM_ROM AM_BASE_MEMBER(c65_state, m_interface)
-	AM_RANGE(0x2d000, 0x2dfff) AM_ROM AM_BASE_MEMBER(c65_state, m_chargen)
-	AM_RANGE(0x2e000, 0x2ffff) AM_ROM AM_BASE_MEMBER(c65_state, m_kernal)
+	AM_RANGE(0x29000, 0x29fff) AM_ROM AM_SHARE("chargen")
+	AM_RANGE(0x2a000, 0x2bfff) AM_ROM AM_SHARE("basic")
+	AM_RANGE(0x2c000, 0x2cfff) AM_ROM AM_SHARE("interface")
+	AM_RANGE(0x2d000, 0x2dfff) AM_ROM AM_SHARE("chargen")
+	AM_RANGE(0x2e000, 0x2ffff) AM_ROM AM_SHARE("kernal")
 
 	AM_RANGE(0x30000, 0x31fff) AM_ROM /*&c65_monitor,     monitor maps to 0x6000    */
 	AM_RANGE(0x32000, 0x37fff) AM_ROM /*&c65_basic, */
@@ -221,17 +221,17 @@ static SCREEN_UPDATE_IND16( c65 )
 
 static UINT8 c65_lightpen_x_cb( running_machine &machine )
 {
-	return input_port_read(machine, "LIGHTX") & ~0x01;
+	return machine.root_device().ioport("LIGHTX")->read() & ~0x01;
 }
 
 static UINT8 c65_lightpen_y_cb( running_machine &machine )
 {
-	return input_port_read(machine, "LIGHTY") & ~0x01;
+	return machine.root_device().ioport("LIGHTY")->read() & ~0x01;
 }
 
 static UINT8 c65_lightpen_button_cb( running_machine &machine )
 {
-	return input_port_read(machine, "OTHER") & 0x04;
+	return machine.root_device().ioport("OTHER")->read() & 0x04;
 }
 
 static UINT8 c65_c64_mem_r( running_machine &machine, int offset )

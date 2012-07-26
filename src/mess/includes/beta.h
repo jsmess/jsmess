@@ -3,7 +3,6 @@
 #ifndef __BETA__
 #define __BETA__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -36,6 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER( riot_pa_w );
 	DECLARE_READ8_MEMBER( riot_pb_r );
 	DECLARE_WRITE8_MEMBER( riot_pb_w );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
 	/* EPROM state */
 	int m_eprom_oe;

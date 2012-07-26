@@ -98,12 +98,19 @@ class spool99_state : public driver_device
 {
 public:
 	spool99_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_main(*this, "mainram"),
+		m_vram(*this, "vram"),
+		m_cram(*this, "cram"){ }
 
-	UINT8 *m_main;
+	required_shared_ptr<UINT8> m_main;
+	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<UINT8> m_cram;
 	tilemap_t *m_sc0_tilemap;
-	UINT8 *m_cram;
-	UINT8 *m_vram;
+	DECLARE_WRITE8_MEMBER(spool99_vram_w);
+	DECLARE_WRITE8_MEMBER(spool99_cram_w);
+	DECLARE_READ8_MEMBER(spool99_io_r);
+	DECLARE_READ8_MEMBER(vcarn_io_r);
 };
 
 static TILE_GET_INFO( get_spool99_tile_info )
@@ -134,49 +141,47 @@ static SCREEN_UPDATE_IND16(spool99)
 	return 0;
 }
 
-static WRITE8_HANDLER( spool99_vram_w )
+WRITE8_MEMBER(spool99_state::spool99_vram_w)
 {
-	spool99_state *state = space->machine().driver_data<spool99_state>();
 
-	state->m_vram[offset] = data;
-	state->m_sc0_tilemap->mark_tile_dirty(offset/2);
+	m_vram[offset] = data;
+	m_sc0_tilemap->mark_tile_dirty(offset/2);
 }
 
-static WRITE8_HANDLER( spool99_cram_w )
+WRITE8_MEMBER(spool99_state::spool99_cram_w)
 {
-	spool99_state *state = space->machine().driver_data<spool99_state>();
 
-	state->m_cram[offset] = data;
-	state->m_sc0_tilemap->mark_tile_dirty(offset/2);
+	m_cram[offset] = data;
+	m_sc0_tilemap->mark_tile_dirty(offset/2);
 }
 
 
 
-static READ8_HANDLER( spool99_io_r )
+READ8_MEMBER(spool99_state::spool99_io_r)
 {
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 //  if(!(io_switch))
 	{
 		switch(offset+0xaf00)
 		{
-			case 0xafd8: return input_port_read(space->machine(),"COIN1");
+			case 0xafd8: return ioport("COIN1")->read();
 //          case 0xafd9: return 1;
-			case 0xafda: return input_port_read(space->machine(),"COIN2");
+			case 0xafda: return ioport("COIN2")->read();
 			case 0xafdb: return 1;
-			case 0xafdc: return input_port_read(space->machine(),"SERVICE1");//attract mode
-			case 0xafdd: return input_port_read(space->machine(),"HOLD3");
-			case 0xafde: return input_port_read(space->machine(),"HOLD4");
-			case 0xafdf: return input_port_read(space->machine(),"HOLD2");
-			case 0xafe0: return input_port_read(space->machine(),"HOLD1");
-			case 0xafe1: return input_port_read(space->machine(),"HOLD5");
-			case 0xafe2: return input_port_read(space->machine(),"START");
-			case 0xafe3: return input_port_read(space->machine(),"BET");//system 2
-			case 0xafe4: return input_port_read(space->machine(),"SERVICE2");//attract mode
+			case 0xafdc: return ioport("SERVICE1")->read();//attract mode
+			case 0xafdd: return ioport("HOLD3")->read();
+			case 0xafde: return ioport("HOLD4")->read();
+			case 0xafdf: return ioport("HOLD2")->read();
+			case 0xafe0: return ioport("HOLD1")->read();
+			case 0xafe1: return ioport("HOLD5")->read();
+			case 0xafe2: return ioport("START")->read();
+			case 0xafe3: return ioport("BET")->read();//system 2
+			case 0xafe4: return ioport("SERVICE2")->read();//attract mode
 //          case 0xafe5: return 1;
 //          case 0xafe6: return 1;
-			case 0xafe7: return space->machine().device<eeprom_device>("eeprom")->read_bit();
-			case 0xaff8: return space->machine().device<okim6295_device>("oki")->read(*space,0);
+			case 0xafe7: return machine().device<eeprom_device>("eeprom")->read_bit();
+			case 0xaff8: return machine().device<okim6295_device>("oki")->read(space,0);
 		}
 	}
 //  printf("%04x %d\n",offset+0xaf00,io_switch);
@@ -206,44 +211,44 @@ static WRITE8_DEVICE_HANDLER( eeprom_dataline_w )
 	eeprom->write_bit(data & 0x01);
 }
 
-static ADDRESS_MAP_START( spool99_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_MEMBER(spool99_state,m_main)
+static ADDRESS_MAP_START( spool99_map, AS_PROGRAM, 8, spool99_state )
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x0100, 0xaeff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
 	AM_RANGE(0xaf00, 0xafff) AM_READ(spool99_io_r)
-	AM_RANGE(0xafed, 0xafed) AM_DEVWRITE("eeprom", eeprom_resetline_w )
-	AM_RANGE(0xafee, 0xafee) AM_DEVWRITE("eeprom", eeprom_clockline_w )
-	AM_RANGE(0xafef, 0xafef) AM_DEVWRITE("eeprom", eeprom_dataline_w )
-	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
+	AM_RANGE(0xafed, 0xafed) AM_DEVWRITE_LEGACY("eeprom", eeprom_resetline_w )
+	AM_RANGE(0xafee, 0xafee) AM_DEVWRITE_LEGACY("eeprom", eeprom_clockline_w )
+	AM_RANGE(0xafef, 0xafef) AM_DEVWRITE_LEGACY("eeprom", eeprom_dataline_w )
+	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_device, write)
 
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0xb800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_BASE_MEMBER(spool99_state,m_vram)
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_BASE_MEMBER(spool99_state,m_cram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_SHARE("vram")
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_SHARE("cram")
 ADDRESS_MAP_END
 
-static READ8_HANDLER( vcarn_io_r )
+READ8_MEMBER(spool99_state::vcarn_io_r)
 {
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 //  if(!(io_switch))
 	{
 		switch(offset+0xa700)
 		{
-			case 0xa720: return input_port_read(space->machine(),"SERVICE1");//attract mode
-			case 0xa722: return input_port_read(space->machine(),"COIN1");
-			case 0xa723: return input_port_read(space->machine(),"COIN2");
-			case 0xa724: return input_port_read(space->machine(),"SERVICE2");//attract mode
-			case 0xa725: return input_port_read(space->machine(),"HOLD3");
-			case 0xa726: return input_port_read(space->machine(),"HOLD4");
-			case 0xa727: return input_port_read(space->machine(),"HOLD2");
-			case 0xa780: return space->machine().device<okim6295_device>("oki")->read(*space,0);
-			case 0xa7a0: return input_port_read(space->machine(),"HOLD1");
-			case 0xa7a1: return input_port_read(space->machine(),"HOLD5");
-			case 0xa7a2: return input_port_read(space->machine(),"START");
-			case 0xa7a3: return input_port_read(space->machine(),"BET");//system 2
+			case 0xa720: return ioport("SERVICE1")->read();//attract mode
+			case 0xa722: return ioport("COIN1")->read();
+			case 0xa723: return ioport("COIN2")->read();
+			case 0xa724: return ioport("SERVICE2")->read();//attract mode
+			case 0xa725: return ioport("HOLD3")->read();
+			case 0xa726: return ioport("HOLD4")->read();
+			case 0xa727: return ioport("HOLD2")->read();
+			case 0xa780: return machine().device<okim6295_device>("oki")->read(space,0);
+			case 0xa7a0: return ioport("HOLD1")->read();
+			case 0xa7a1: return ioport("HOLD5")->read();
+			case 0xa7a2: return ioport("START")->read();
+			case 0xa7a3: return ioport("BET")->read();//system 2
 
-			case 0xa7a7: return space->machine().device<eeprom_device>("eeprom")->read_bit();
+			case 0xa7a7: return machine().device<eeprom_device>("eeprom")->read_bit();
 
 		}
 	}
@@ -252,21 +257,21 @@ static READ8_HANDLER( vcarn_io_r )
 	return ROM[0xa700+offset];
 }
 
-static ADDRESS_MAP_START( vcarn_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_BASE_MEMBER(spool99_state,m_main)
+static ADDRESS_MAP_START( vcarn_map, AS_PROGRAM, 8, spool99_state )
+	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x0100, 0xa6ff) AM_ROM AM_REGION("maincpu", 0x100) AM_WRITENOP
 	AM_RANGE(0xa700, 0xa7ff) AM_READ(vcarn_io_r)
-	AM_RANGE(0xa745, 0xa745) AM_DEVWRITE("eeprom", eeprom_resetline_w )
-	AM_RANGE(0xa746, 0xa746) AM_DEVWRITE("eeprom", eeprom_clockline_w )
-	AM_RANGE(0xa747, 0xa747) AM_DEVWRITE("eeprom", eeprom_dataline_w )
-	AM_RANGE(0xa780, 0xa780) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
+	AM_RANGE(0xa745, 0xa745) AM_DEVWRITE_LEGACY("eeprom", eeprom_resetline_w )
+	AM_RANGE(0xa746, 0xa746) AM_DEVWRITE_LEGACY("eeprom", eeprom_clockline_w )
+	AM_RANGE(0xa747, 0xa747) AM_DEVWRITE_LEGACY("eeprom", eeprom_dataline_w )
+	AM_RANGE(0xa780, 0xa780) AM_DEVWRITE("oki", okim6295_device, write)
 
-	AM_RANGE(0xa800, 0xabff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xa800, 0xabff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_le_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0xb000, 0xdfff) AM_RAM
-//  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(vcarn_io_r,vcarn_io_w) AM_BASE(&vcarn_io)
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_BASE_MEMBER(spool99_state,m_vram)
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_BASE_MEMBER(spool99_state,m_cram)
+//  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(vcarn_io_r,vcarn_io_w) AM_BASE_LEGACY(&vcarn_io)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(spool99_vram_w) AM_SHARE("vram")
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(spool99_cram_w) AM_SHARE("cram")
 ADDRESS_MAP_END
 
 
@@ -414,7 +419,7 @@ static DRIVER_INIT( spool99 )
 {
 	spool99_state *state = machine.driver_data<spool99_state>();
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 //  vram = auto_alloc_array(machine, UINT8, 0x2000);
 	memcpy(state->m_main, ROM, 0x100);
 }

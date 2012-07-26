@@ -230,23 +230,21 @@ static TIMER_CALLBACK( delayed_ram16_w )
 }
 
 
-static WRITE16_HANDLER( m72_main_mcu_sound_w )
+WRITE16_MEMBER(m72_state::m72_main_mcu_sound_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	if (data & 0xfff0)
 		logerror("sound_w: %04x %04x\n", mem_mask, data);
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_mcu_snd_cmd_latch = data;
-		cputag_set_input_line(space->machine(), "mcu", 1, ASSERT_LINE);
+		m_mcu_snd_cmd_latch = data;
+		cputag_set_input_line(machine(), "mcu", 1, ASSERT_LINE);
 	}
 }
 
-static WRITE16_HANDLER( m72_main_mcu_w)
+WRITE16_MEMBER(m72_state::m72_main_mcu_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	UINT16 val = state->m_protection_ram[offset];
+	UINT16 val = m_protection_ram[offset];
 
 	COMBINE_DATA(&val);
 
@@ -256,38 +254,36 @@ static WRITE16_HANDLER( m72_main_mcu_w)
 
 	if (offset == 0x0fff/2 && ACCESSING_BITS_8_15)
 	{
-		state->m_protection_ram[offset] = val;
-		cputag_set_input_line(space->machine(), "mcu", 0, ASSERT_LINE);
+		m_protection_ram[offset] = val;
+		cputag_set_input_line(machine(), "mcu", 0, ASSERT_LINE);
 		/* Line driven, most likely by write line */
-		//space->machine().scheduler().timer_set(space->machine().device<cpu_device>("mcu")->cycles_to_attotime(2), FUNC(mcu_irq0_clear));
-		//space->machine().scheduler().timer_set(space->machine().device<cpu_device>("mcu")->cycles_to_attotime(0), FUNC(mcu_irq0_raise));
+		//machine().scheduler().timer_set(machine().device<cpu_device>("mcu")->cycles_to_attotime(2), FUNC(mcu_irq0_clear));
+		//machine().scheduler().timer_set(machine().device<cpu_device>("mcu")->cycles_to_attotime(0), FUNC(mcu_irq0_raise));
 	}
 	else
-		space->machine().scheduler().synchronize( FUNC(delayed_ram16_w), (offset<<16) | val, state->m_protection_ram);
+		machine().scheduler().synchronize( FUNC(delayed_ram16_w), (offset<<16) | val, m_protection_ram);
 }
 
-static WRITE8_HANDLER( m72_mcu_data_w )
+WRITE8_MEMBER(m72_state::m72_mcu_data_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	UINT16 val;
-	if (offset&1) val = (state->m_protection_ram[offset/2] & 0x00ff) | (data << 8);
-	else val = (state->m_protection_ram[offset/2] & 0xff00) | (data&0xff);
+	if (offset&1) val = (m_protection_ram[offset/2] & 0x00ff) | (data << 8);
+	else val = (m_protection_ram[offset/2] & 0xff00) | (data&0xff);
 
-	space->machine().scheduler().synchronize( FUNC(delayed_ram16_w), ((offset >>1 ) << 16) | val, state->m_protection_ram);
+	machine().scheduler().synchronize( FUNC(delayed_ram16_w), ((offset >>1 ) << 16) | val, m_protection_ram);
 }
 
-static READ8_HANDLER(m72_mcu_data_r )
+READ8_MEMBER(m72_state::m72_mcu_data_r)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	UINT8 ret;
 
 	if (offset == 0x0fff || offset == 0x0ffe)
 	{
-		cputag_set_input_line(space->machine(), "mcu", 0, CLEAR_LINE);
+		cputag_set_input_line(machine(), "mcu", 0, CLEAR_LINE);
 	}
 
-	if (offset&1) ret = (state->m_protection_ram[offset/2] & 0xff00)>>8;
-	else ret = (state->m_protection_ram[offset/2] & 0x00ff);
+	if (offset&1) ret = (m_protection_ram[offset/2] & 0xff00)>>8;
+	else ret = (m_protection_ram[offset/2] & 0x00ff);
 
 	return ret;
 }
@@ -300,58 +296,52 @@ static INTERRUPT_GEN( m72_mcu_int )
 	device_set_input_line(device, 1, ASSERT_LINE);
 }
 
-static READ8_HANDLER(m72_mcu_sample_r )
+READ8_MEMBER(m72_state::m72_mcu_sample_r)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	UINT8 sample;
-	sample = space->machine().region("samples")->base()[state->m_mcu_sample_addr++];
+	sample = memregion("samples")->base()[m_mcu_sample_addr++];
 	return sample;
 }
 
-static WRITE8_HANDLER(m72_mcu_ack_w )
+WRITE8_MEMBER(m72_state::m72_mcu_ack_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	cputag_set_input_line(space->machine(), "mcu", 1, CLEAR_LINE);
-	state->m_mcu_snd_cmd_latch = 0;
+	cputag_set_input_line(machine(), "mcu", 1, CLEAR_LINE);
+	m_mcu_snd_cmd_latch = 0;
 }
 
-static READ8_HANDLER(m72_mcu_snd_r )
+READ8_MEMBER(m72_state::m72_mcu_snd_r)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	return state->m_mcu_snd_cmd_latch;
+	return m_mcu_snd_cmd_latch;
 }
 
-static READ8_HANDLER(m72_mcu_port_r )
+READ8_MEMBER(m72_state::m72_mcu_port_r)
 {
 	logerror("port read: %02x\n", offset);
 	return 0;
 }
 
-static WRITE8_HANDLER(m72_mcu_port_w )
+WRITE8_MEMBER(m72_state::m72_mcu_port_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	if (offset == 1)
 	{
-		state->m_mcu_sample_latch = data;
-		cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+		m_mcu_sample_latch = data;
+		cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 		logerror("port: %02x %02x\n", offset, data);
 
 }
 
-static WRITE8_HANDLER( m72_mcu_low_w )
+WRITE8_MEMBER(m72_state::m72_mcu_low_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	state->m_mcu_sample_addr = (state->m_mcu_sample_addr & 0xffe000) | (data<<5);
-	logerror("low: %02x %02x %08x\n", offset, data, state->m_mcu_sample_addr);
+	m_mcu_sample_addr = (m_mcu_sample_addr & 0xffe000) | (data<<5);
+	logerror("low: %02x %02x %08x\n", offset, data, m_mcu_sample_addr);
 }
 
-static WRITE8_HANDLER( m72_mcu_high_w )
+WRITE8_MEMBER(m72_state::m72_mcu_high_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	state->m_mcu_sample_addr = (state->m_mcu_sample_addr & 0x1fff) | (data<<(8+5));
-	logerror("high: %02x %02x %08x\n", offset, data, state->m_mcu_sample_addr);
+	m_mcu_sample_addr = (m_mcu_sample_addr & 0x1fff) | (data<<(8+5));
+	logerror("high: %02x %02x %08x\n", offset, data, m_mcu_sample_addr);
 }
 
 static WRITE8_DEVICE_HANDLER( m72_snd_cpu_sample_w )
@@ -360,10 +350,9 @@ static WRITE8_DEVICE_HANDLER( m72_snd_cpu_sample_w )
 	dac_data_w(device, data);
 }
 
-static READ8_HANDLER( m72_snd_cpu_sample_r )
+READ8_MEMBER(m72_state::m72_snd_cpu_sample_r)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	return state->m_mcu_sample_latch;
+	return m_mcu_sample_latch;
 }
 
 INLINE DRIVER_INIT( m72_8751 )
@@ -376,15 +365,15 @@ INLINE DRIVER_INIT( m72_8751 )
 
 	state->m_protection_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
 	program->install_read_bank(0xb0000, 0xbffff, "bank1");
-	program->install_legacy_write_handler(0xb0000, 0xb0fff, FUNC(m72_main_mcu_w));
-	memory_set_bankptr(machine, "bank1", state->m_protection_ram);
+	program->install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::m72_main_mcu_w),state));
+	state->membank("bank1")->set_base(state->m_protection_ram);
 
 	//io->install_legacy_write_handler(0xc0, 0xc1, FUNC(loht_sample_trigger_w));
-	io->install_legacy_write_handler(0xc0, 0xc1, FUNC(m72_main_mcu_sound_w));
+	io->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::m72_main_mcu_sound_w),state));
 
 	/* sound cpu */
 	sndio->install_legacy_write_handler(*dac, 0x82, 0x82, 0xff, 0, FUNC(m72_snd_cpu_sample_w));
-	sndio->install_legacy_read_handler (0x84, 0x84, 0xff, 0, FUNC(m72_snd_cpu_sample_r));
+	sndio->install_read_handler (0x84, 0x84, 0xff, 0, read8_delegate(FUNC(m72_state::m72_snd_cpu_sample_r),state));
 
 	/* lohtb2 */
 #if 0
@@ -394,7 +383,7 @@ INLINE DRIVER_INIT( m72_8751 )
      * prefetching on the V30.
      */
 	{
-		UINT8 *rom=machine.region("mcu")->base();
+		UINT8 *rom=state->memregion("mcu")->base();
 
 		rom[0x12d+5] += 1; printf(" 5: %d\n", rom[0x12d+5]);
 		rom[0x12d+8] += 5;  printf(" 8: %d\n", rom[0x12d+8]);
@@ -434,8 +423,8 @@ the NMI handler in the other games.
 #if 0
 static int find_sample(int num)
 {
-	UINT8 *rom = machine.region("samples")->base();
-	int len = machine.region("samples")->bytes();
+	UINT8 *rom = machine.root_device().memregion("samples")->base();
+	int len = machine.root_device().memregion("samples")->bytes();
 	int addr = 0;
 
 	while (num--)
@@ -460,79 +449,70 @@ static INTERRUPT_GEN(fake_nmi)
 }
 
 
-static WRITE16_HANDLER( bchopper_sample_trigger_w )
+WRITE16_MEMBER(m72_state::bchopper_sample_trigger_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const int a[6] = { 0x0000, 0x0010, 0x2510, 0x6510, 0x8510, 0x9310 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 6) m72_set_sample_start(state->m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 6) m72_set_sample_start(m_audio, a[data & 0xff]);
 }
 
-static WRITE16_HANDLER( nspirit_sample_trigger_w )
+WRITE16_MEMBER(m72_state::nspirit_sample_trigger_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const int a[9] = { 0x0000, 0x0020, 0x2020, 0, 0x5720, 0, 0x7b60, 0x9b60, 0xc360 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m72_set_sample_start(state->m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m72_set_sample_start(m_audio, a[data & 0xff]);
 }
 
-static WRITE16_HANDLER( imgfight_sample_trigger_w )
+WRITE16_MEMBER(m72_state::imgfight_sample_trigger_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const int a[7] = { 0x0000, 0x0020, 0x44e0, 0x98a0, 0xc820, 0xf7a0, 0x108c0 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m72_set_sample_start(state->m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m72_set_sample_start(m_audio, a[data & 0xff]);
 }
 
-static WRITE16_HANDLER( loht_sample_trigger_w )
+WRITE16_MEMBER(m72_state::loht_sample_trigger_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const int a[7] = { 0x0000, 0x0020, 0, 0x2c40, 0x4320, 0x7120, 0xb200 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m72_set_sample_start(state->m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 7) m72_set_sample_start(m_audio, a[data & 0xff]);
 }
 
-static WRITE16_HANDLER( xmultiplm72_sample_trigger_w )
+WRITE16_MEMBER(m72_state::xmultiplm72_sample_trigger_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const int a[3] = { 0x0000, 0x0020, 0x1a40 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 3) m72_set_sample_start(state->m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 3) m72_set_sample_start(m_audio, a[data & 0xff]);
 }
 
-static WRITE16_HANDLER( dbreedm72_sample_trigger_w )
+WRITE16_MEMBER(m72_state::dbreedm72_sample_trigger_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const int a[9] = { 0x00000, 0x00020, 0x02c40, 0x08160, 0x0c8c0, 0x0ffe0, 0x13000, 0x15820, 0x15f40 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m72_set_sample_start(state->m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 9) m72_set_sample_start(m_audio, a[data & 0xff]);
 }
 
-static WRITE16_HANDLER( airduel_sample_trigger_w )
+WRITE16_MEMBER(m72_state::airduel_sample_trigger_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const int a[16] = {
 		0x00000, 0x00020, 0x03ec0, 0x05640, 0x06dc0, 0x083a0, 0x0c000, 0x0eb60,
 		0x112e0, 0x13dc0, 0x16520, 0x16d60, 0x18ae0, 0x1a5a0, 0x1bf00, 0x1c340 };
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 16) m72_set_sample_start(state->m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 16) m72_set_sample_start(m_audio, a[data & 0xff]);
 }
 
-static WRITE16_HANDLER( dkgenm72_sample_trigger_w )
+WRITE16_MEMBER(m72_state::dkgenm72_sample_trigger_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const int a[28] = {
 		0x00000, 0x00020, 0x01800, 0x02da0, 0x03be0, 0x05ae0, 0x06100, 0x06de0,
 		0x07260, 0x07a60, 0x08720, 0x0a5c0, 0x0c3c0, 0x0c7a0, 0x0e140, 0x0fb00,
 		0x10fa0, 0x10fc0, 0x10fe0, 0x11f40, 0x12b20, 0x130a0, 0x13c60, 0x14740,
 		0x153c0, 0x197e0, 0x1af40, 0x1c080 };
 
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 28) m72_set_sample_start(state->m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 28) m72_set_sample_start(m_audio, a[data & 0xff]);
 }
 
-static WRITE16_HANDLER( gallop_sample_trigger_w )
+WRITE16_MEMBER(m72_state::gallop_sample_trigger_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const int a[31] = {
 		0x00000, 0x00020, 0x00040, 0x01360, 0x02580, 0x04f20, 0x06240, 0x076e0,
 		0x08660, 0x092a0, 0x09ba0, 0x0a560, 0x0cee0, 0x0de20, 0x0e620, 0x0f1c0,
 		0x10200, 0x10220, 0x10240, 0x11380, 0x12760, 0x12780, 0x127a0, 0x13c40,
 		0x140a0, 0x16760, 0x17e40, 0x18ee0, 0x19f60, 0x1bbc0, 0x1cee0 };
 
-	if (ACCESSING_BITS_0_7 && (data & 0xff) < 31) m72_set_sample_start(state->m_audio, a[data & 0xff]);
+	if (ACCESSING_BITS_0_7 && (data & 0xff) < 31) m72_set_sample_start(m_audio, a[data & 0xff]);
 }
 
 
@@ -734,23 +714,21 @@ static void copy_le(UINT16 *dest, const UINT8 *src, UINT8 bytes)
 		dest[i/2] = src[i+0] | (src[i+1] << 8);
 }
 
-static READ16_HANDLER( protection_r )
+READ16_MEMBER(m72_state::protection_r)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	if (ACCESSING_BITS_8_15)
-		copy_le(state->m_protection_ram,state->m_protection_code,CODE_LEN);
-	return state->m_protection_ram[0xffa/2+offset];
+		copy_le(m_protection_ram,m_protection_code,CODE_LEN);
+	return m_protection_ram[0xffa/2+offset];
 }
 
-static WRITE16_HANDLER( protection_w )
+WRITE16_MEMBER(m72_state::protection_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	data ^= 0xffff;
-	COMBINE_DATA(&state->m_protection_ram[offset]);
+	COMBINE_DATA(&m_protection_ram[offset]);
 	data ^= 0xffff;
 
 	if (offset == 0x0fff/2 && ACCESSING_BITS_8_15 && (data >> 8) == 0)
-		copy_le(&state->m_protection_ram[0x0fe0],state->m_protection_crc,CRC_LEN);
+		copy_le(&m_protection_ram[0x0fe0],m_protection_crc,CRC_LEN);
 }
 
 static void install_protection_handler(running_machine &machine, const UINT8 *code,const UINT8 *crc)
@@ -760,37 +738,37 @@ static void install_protection_handler(running_machine &machine, const UINT8 *co
 	state->m_protection_code = code;
 	state->m_protection_crc =  crc;
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xb0000, 0xb0fff, "bank1");
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xb0ffa, 0xb0ffb, FUNC(protection_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xb0000, 0xb0fff, FUNC(protection_w));
-	memory_set_bankptr(machine, "bank1", state->m_protection_ram);
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xb0ffa, 0xb0ffb, read16_delegate(FUNC(m72_state::protection_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::protection_w),state));
+	state->membank("bank1")->set_base(state->m_protection_ram);
 }
 
 static DRIVER_INIT( bchopper )
 {
 	install_protection_handler(machine, bchopper_code,bchopper_crc);
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(bchopper_sample_trigger_w));
+	m72_state *state = machine.driver_data<m72_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::bchopper_sample_trigger_w),state));
 }
 
 static DRIVER_INIT( mrheli )
 {
 	install_protection_handler(machine, bchopper_code,mrheli_crc);
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(bchopper_sample_trigger_w));
+	m72_state *state = machine.driver_data<m72_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::bchopper_sample_trigger_w),state));
 }
 
 static DRIVER_INIT( nspirit )
 {
 	install_protection_handler(machine, nspirit_code,nspirit_crc);
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(nspirit_sample_trigger_w));
+	m72_state *state = machine.driver_data<m72_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::nspirit_sample_trigger_w),state));
 }
 
 static DRIVER_INIT( imgfight )
 {
 	install_protection_handler(machine, imgfight_code,imgfight_crc);
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(imgfight_sample_trigger_w));
+	m72_state *state = machine.driver_data<m72_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::imgfight_sample_trigger_w),state));
 }
 
 static DRIVER_INIT( loht )
@@ -798,7 +776,7 @@ static DRIVER_INIT( loht )
 	m72_state *state = machine.driver_data<m72_state>();
 	install_protection_handler(machine, loht_code,loht_crc);
 
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(loht_sample_trigger_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::loht_sample_trigger_w),state));
 
 	/* since we skip the startup tests, clear video RAM to prevent garbage on title screen */
 	memset(state->m_videoram2,0,0x4000);
@@ -807,34 +785,35 @@ static DRIVER_INIT( loht )
 static DRIVER_INIT( xmultiplm72 )
 {
 	install_protection_handler(machine, xmultiplm72_code,xmultiplm72_crc);
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(xmultiplm72_sample_trigger_w));
+	m72_state *state = machine.driver_data<m72_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::xmultiplm72_sample_trigger_w),state));
 }
 
 static DRIVER_INIT( dbreedm72 )
 {
 	install_protection_handler(machine, dbreedm72_code,dbreedm72_crc);
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(dbreedm72_sample_trigger_w));
+	m72_state *state = machine.driver_data<m72_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dbreedm72_sample_trigger_w),state));
 }
 
 static DRIVER_INIT( airduel )
 {
 	install_protection_handler(machine, airduel_code,airduel_crc);
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(airduel_sample_trigger_w));
+	m72_state *state = machine.driver_data<m72_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::airduel_sample_trigger_w),state));
 }
 
 static DRIVER_INIT( dkgenm72 )
 {
 	install_protection_handler(machine, dkgenm72_code,dkgenm72_crc);
-
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(dkgenm72_sample_trigger_w));
+	m72_state *state = machine.driver_data<m72_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::dkgenm72_sample_trigger_w),state));
 }
 
 static DRIVER_INIT( gallop )
 {
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0xc0, 0xc1, FUNC(gallop_sample_trigger_w));
+	m72_state *state = machine.driver_data<m72_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::gallop_sample_trigger_w),state));
 }
 
 
@@ -842,25 +821,22 @@ static DRIVER_INIT( gallop )
 
 
 
-static READ16_HANDLER( soundram_r )
+READ16_MEMBER(m72_state::soundram_r)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	return state->m_soundram[offset * 2 + 0] | (state->m_soundram[offset * 2 + 1] << 8);
+	return m_soundram[offset * 2 + 0] | (m_soundram[offset * 2 + 1] << 8);
 }
 
-static WRITE16_HANDLER( soundram_w )
+WRITE16_MEMBER(m72_state::soundram_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	if (ACCESSING_BITS_0_7)
-		state->m_soundram[offset * 2 + 0] = data;
+		m_soundram[offset * 2 + 0] = data;
 	if (ACCESSING_BITS_8_15)
-		state->m_soundram[offset * 2 + 1] = data >> 8;
+		m_soundram[offset * 2 + 1] = data >> 8;
 }
 
 
-static READ16_HANDLER( poundfor_trackball_r )
+READ16_MEMBER(m72_state::poundfor_trackball_r)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	static const char *const axisnames[] = { "TRACK0_X", "TRACK0_Y", "TRACK1_X", "TRACK1_Y" };
 
 	if (offset == 0)
@@ -869,9 +845,9 @@ static READ16_HANDLER( poundfor_trackball_r )
 
 		for (i = 0;i < 4;i++)
 		{
-			curr = input_port_read(space->machine(), axisnames[i]);
-			state->m_diff[i] = (curr - state->m_prev[i]);
-			state->m_prev[i] = curr;
+			curr = ioport(axisnames[i])->read();
+			m_diff[i] = (curr - m_prev[i]);
+			m_prev[i] = curr;
 		}
 	}
 
@@ -879,26 +855,26 @@ static READ16_HANDLER( poundfor_trackball_r )
 	{
 		default:
 		case 0:
-			return (state->m_diff[0] & 0xff) | ((state->m_diff[2] & 0xff) << 8);
+			return (m_diff[0] & 0xff) | ((m_diff[2] & 0xff) << 8);
 		case 1:
-			return ((state->m_diff[0] >> 8) & 0x1f) | (state->m_diff[2] & 0x1f00) | (input_port_read(space->machine(), "IN0") & 0xe0e0);
+			return ((m_diff[0] >> 8) & 0x1f) | (m_diff[2] & 0x1f00) | (ioport("IN0")->read() & 0xe0e0);
 		case 2:
-			return (state->m_diff[1] & 0xff) | ((state->m_diff[3] & 0xff) << 8);
+			return (m_diff[1] & 0xff) | ((m_diff[3] & 0xff) << 8);
 		case 3:
-			return ((state->m_diff[1] >> 8) & 0x1f) | (state->m_diff[3] & 0x1f00);
+			return ((m_diff[1] >> 8) & 0x1f) | (m_diff[3] & 0x1f00);
 	}
 }
 
 
 #define CPU1_MEMORY(NAME,ROMSIZE,WORKRAM)								\
-static ADDRESS_MAP_START( NAME##_map, AS_PROGRAM, 16 )		\
+static ADDRESS_MAP_START( NAME##_map, AS_PROGRAM, 16 , m72_state )		\
 	AM_RANGE(0x00000, ROMSIZE-1) AM_ROM									\
 	AM_RANGE(WORKRAM, WORKRAM+0x3fff) AM_RAM	/* work RAM */			\
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_MEMBER(m72_state, m_spriteram, m_spriteram_size)	\
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)			\
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)		\
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE_MEMBER(m72_state, m_videoram1)		\
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE_MEMBER(m72_state, m_videoram2)		\
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")	\
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")			\
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")		\
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_SHARE("videoram1")		\
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_SHARE("videoram2")		\
 	AM_RANGE(0xe0000, 0xeffff) AM_READWRITE(soundram_r, soundram_w)							\
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM									\
 ADDRESS_MAP_END
@@ -910,52 +886,52 @@ CPU1_MEMORY( rtype,       0x40000, 0x40000 )
 CPU1_MEMORY( xmultiplm72, 0x80000, 0x80000 )
 CPU1_MEMORY( dbreedm72,   0x80000, 0x90000 )
 
-static ADDRESS_MAP_START( xmultipl_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( xmultipl_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x9c000, 0x9ffff) AM_RAM	/* work RAM */
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY	/* leftover from protection?? */
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_MEMBER(m72_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE_MEMBER(m72_state, m_videoram1)
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE_MEMBER(m72_state, m_videoram2)
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dbreed_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dbreed_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0x88000, 0x8bfff) AM_RAM	/* work RAM */
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY	/* leftover from protection?? */
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_MEMBER(m72_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE_MEMBER(m72_state, m_videoram1)
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE_MEMBER(m72_state, m_videoram2)
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rtype2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( rtype2_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(m72_irq_line_w)
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_MEMBER(m72_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE_MEMBER(m72_state, m_videoram1)
-	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE_MEMBER(m72_state, m_videoram2)
-	AM_RANGE(0xd8000, 0xd8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(m72_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xd8000, 0xd8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( majtitle_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( majtitle_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xa03ff) AM_RAM AM_BASE_MEMBER(m72_state, m_majtitle_rowscrollram)
-	AM_RANGE(0xa4000, 0xa4bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xac000, 0xaffff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE_MEMBER(m72_state, m_videoram1)
-	AM_RANGE(0xb0000, 0xbffff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE_MEMBER(m72_state, m_videoram2)	/* larger than the other games */
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_MEMBER(m72_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc8000, 0xc83ff) AM_RAM AM_BASE_MEMBER(m72_state, m_spriteram2)
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xa0000, 0xa03ff) AM_RAM AM_SHARE("majtitle_rowscr")
+	AM_RANGE(0xa4000, 0xa4bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xac000, 0xaffff) AM_RAM_WRITE(m72_videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xb0000, 0xbffff) AM_RAM_WRITE(m72_videoram2_w) AM_SHARE("videoram2")	/* larger than the other games */
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xc8000, 0xc83ff) AM_RAM AM_SHARE("spriteram2")
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
 	AM_RANGE(0xd0000, 0xd3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xe0000, 0xe0001) AM_WRITE(m72_irq_line_w)
 	AM_RANGE(0xe4000, 0xe4001) AM_WRITEONLY	/* playfield enable? 1 during screen transitions, 0 otherwise */
@@ -963,51 +939,51 @@ static ADDRESS_MAP_START( majtitle_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hharry_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hharry_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY	/* leftover from protection?? */
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_MEMBER(m72_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE_MEMBER(m72_state, m_videoram1)
-	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE_MEMBER(m72_state, m_videoram2)
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xc8000, 0xc8bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xcc000, 0xccbff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xd8000, 0xdbfff) AM_RAM_WRITE(m72_videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hharryu_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hharryu_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
 	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(m72_irq_line_w)
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xb0ffe, 0xb0fff) AM_WRITEONLY	/* leftover from protection?? */
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_MEMBER(m72_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE_MEMBER(m72_state, m_videoram1)
-	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE_MEMBER(m72_state, m_videoram2)
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xd0000, 0xd3fff) AM_RAM_WRITE(m72_videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0xd4000, 0xd7fff) AM_RAM_WRITE(m72_videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kengo_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( kengo_map, AS_PROGRAM, 16, m72_state )
 	AM_RANGE(0x00000, 0x7ffff) AM_ROM
-	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_SHARE("paletteram")
+	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_SHARE("paletteram2")
 	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(m72_irq_line_w)
 	AM_RANGE(0xb4000, 0xb4001) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
-	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE_SIZE_MEMBER(m72_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x80000, 0x83fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE_MEMBER(m72_state, m_videoram1)
-	AM_RANGE(0x84000, 0x87fff) AM_RAM_WRITE(m72_videoram2_w) AM_BASE_MEMBER(m72_state, m_videoram2)
+	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x80000, 0x83fff) AM_RAM_WRITE(m72_videoram1_w) AM_SHARE("videoram1")
+	AM_RANGE(0x84000, 0x87fff) AM_RAM_WRITE(m72_videoram2_w) AM_SHARE("videoram2")
 	AM_RANGE(0xe0000, 0xe3fff) AM_RAM	/* work RAM */
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m72_portmap, AS_IO, 16 )
+static ADDRESS_MAP_START( m72_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_sound_command_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(m72_port02_w)	/* coin counters, reset sound cpu, other stuff? */
 	AM_RANGE(0x04, 0x05) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(m72_irq_line_w)
@@ -1019,11 +995,11 @@ static ADDRESS_MAP_START( m72_portmap, AS_IO, 16 )
 /*  { 0xc0, 0xc0      trigger sample, filled by init_ function */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rtype2_portmap, AS_IO, 16 )
+static ADDRESS_MAP_START( rtype2_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_sound_command_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
 	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
@@ -1032,11 +1008,11 @@ static ADDRESS_MAP_START( rtype2_portmap, AS_IO, 16 )
 	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( poundfor_portmap, AS_IO, 16 )
+static ADDRESS_MAP_START( poundfor_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
 	AM_RANGE(0x08, 0x0f) AM_READ(poundfor_trackball_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_sound_command_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
 	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
@@ -1045,11 +1021,11 @@ static ADDRESS_MAP_START( poundfor_portmap, AS_IO, 16 )
 	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( majtitle_portmap, AS_IO, 16 )
+static ADDRESS_MAP_START( majtitle_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_sound_command_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
 	AM_RANGE(0x40, 0x43) AM_WRITENOP /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
@@ -1059,11 +1035,11 @@ static ADDRESS_MAP_START( majtitle_portmap, AS_IO, 16 )
 	AM_RANGE(0x8e, 0x8f) AM_WRITE(majtitle_gfx_ctrl_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hharry_portmap, AS_IO, 16 )
+static ADDRESS_MAP_START( hharry_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_sound_command_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)	/* coin counters, reset sound cpu, other stuff? */
 	AM_RANGE(0x04, 0x05) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(m72_irq_line_w)
@@ -1074,11 +1050,11 @@ static ADDRESS_MAP_START( hharry_portmap, AS_IO, 16 )
 	AM_RANGE(0x86, 0x87) AM_WRITE(m72_scrollx2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kengo_portmap, AS_IO, 16 )
+static ADDRESS_MAP_START( kengo_portmap, AS_IO, 16, m72_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("IN0")
 	AM_RANGE(0x02, 0x03) AM_READ_PORT("IN1")
 	AM_RANGE(0x04, 0x05) AM_READ_PORT("DSW")
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_sound_command_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("m72", m72_sound_command_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(rtype2_port02_w)
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
@@ -1088,52 +1064,52 @@ static ADDRESS_MAP_START( kengo_portmap, AS_IO, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_ram_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(m72_state, m_soundram)
+static ADDRESS_MAP_START( sound_ram_map, AS_PROGRAM, 8, m72_state )
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_SHARE("soundram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_rom_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_rom_map, AS_PROGRAM, 8, m72_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rtype_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( rtype_sound_portmap, AS_IO, 8, m72_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("m72", m72_sound_irq_ack_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_sample_r)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)
+	AM_RANGE(0x84, 0x84) AM_DEVREAD_LEGACY("m72", m72_sample_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, m72_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("m72", m72_sound_irq_ack_w)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_sample_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_sample_r)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE_LEGACY("m72", m72_sample_w)
+	AM_RANGE(0x84, 0x84) AM_DEVREAD_LEGACY("m72", m72_sample_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rtype2_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( rtype2_sound_portmap, AS_IO, 8, m72_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", rtype2_sample_addr_w)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_sample_w)
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_sound_irq_ack_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_sample_r)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("m72", rtype2_sample_addr_w)
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE_LEGACY("m72", m72_sample_w)
+	AM_RANGE(0x83, 0x83) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)
+	AM_RANGE(0x84, 0x84) AM_DEVREAD_LEGACY("m72", m72_sample_r)
 //  AM_RANGE(0x87, 0x87) AM_WRITENOP    /* ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( poundfor_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( poundfor_sound_portmap, AS_IO, 8, m72_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE("m72", poundfor_sample_addr_w)
-	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x42, 0x42) AM_READ(soundlatch_r)
-	AM_RANGE(0x42, 0x42) AM_DEVWRITE("m72", m72_sound_irq_ack_w)
+	AM_RANGE(0x10, 0x13) AM_DEVWRITE_LEGACY("m72", poundfor_sample_addr_w)
+	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x42, 0x42) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x42, 0x42) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, m72_state )
 	/* External access */
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(m72_mcu_sample_r, m72_mcu_low_w)
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(m72_mcu_high_w)
@@ -1146,7 +1122,7 @@ static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 #define COIN_MODE_1 \
-	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0400, PORTCOND_NOTEQUALS, 0x0000) PORT_DIPLOCATION("SW1:5,6,7,8") \
+	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0400, NOTEQUALS, 0x0000) PORT_DIPLOCATION("SW1:5,6,7,8") \
 	PORT_DIPSETTING(      0x00a0, DEF_STR( 6C_1C ) ) \
 	PORT_DIPSETTING(      0x00b0, DEF_STR( 5C_1C ) ) \
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 4C_1C ) ) \
@@ -1165,12 +1141,12 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 
 #define COIN_MODE_2_A \
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) ) PORT_CONDITION("DSW", 0x0400, PORTCOND_EQUALS, 0x0000) PORT_DIPLOCATION("SW1:5,6") \
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) ) PORT_CONDITION("DSW", 0x0400, EQUALS, 0x0000) PORT_DIPLOCATION("SW1:5,6") \
 	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) ) \
 	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) ) \
 	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) ) \
 	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) ) PORT_CONDITION("DSW", 0x0400, PORTCOND_EQUALS, 0x0000) PORT_DIPLOCATION("SW1:7,8") \
+	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) ) PORT_CONDITION("DSW", 0x0400, EQUALS, 0x0000) PORT_DIPLOCATION("SW1:7,8") \
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_2C ) ) \
 	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_3C ) ) \
 	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_5C ) ) \
@@ -1450,10 +1426,10 @@ static INPUT_PORTS_START( xmultipl )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2")
-	PORT_DIPSETTING(      0x0000, "Upright (single)" )		PORT_CONDITION("DSW", 0x1000, PORTCOND_NOTEQUALS, 0x0000)
-	PORT_DIPSETTING(      0x0200, DEF_STR( Cocktail ) )		PORT_CONDITION("DSW", 0x1000, PORTCOND_NOTEQUALS, 0x0000)
-	PORT_DIPSETTING(      0x0000, "Upright (double) On" )	PORT_CONDITION("DSW", 0x1000, PORTCOND_EQUALS, 0x0000)
-	PORT_DIPSETTING(      0x0200, "Upright (double) Off" )	PORT_CONDITION("DSW", 0x1000, PORTCOND_EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0000, "Upright (single)" )		PORT_CONDITION("DSW", 0x1000, NOTEQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0200, DEF_STR( Cocktail ) )		PORT_CONDITION("DSW", 0x1000, NOTEQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0000, "Upright (double) On" )	PORT_CONDITION("DSW", 0x1000, EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0200, "Upright (double) Off" )	PORT_CONDITION("DSW", 0x1000, EQUALS, 0x0000)
 	PORT_DIPNAME( 0x0400, 0x0400, "Coin Mode" ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0400, "Mode 1" )
 	PORT_DIPSETTING(      0x0000, "Mode 2" )
@@ -1645,7 +1621,7 @@ static INPUT_PORTS_START( poundfor )
 	PORT_DIPSETTING(      0x0800, "Mode 1" )
 	PORT_DIPSETTING(      0x0000, "Mode 2" )
 	/* Coin Mode 1 */
-	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0800, PORTCOND_NOTEQUALS, 0x0000) PORT_DIPLOCATION("SW2:5,6,7,8")
+	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0800, NOTEQUALS, 0x0000) PORT_DIPLOCATION("SW2:5,6,7,8")
 	PORT_DIPSETTING(      0xa000, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(      0xb000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0xc000, DEF_STR( 4C_1C ) )
@@ -1707,7 +1683,7 @@ static INPUT_PORTS_START( airduel )
 	PORT_DIPSETTING(      0x0800, "Mode 1" )
 	PORT_DIPSETTING(      0x0000, "Mode 2" )
 	/* Coin Mode 1 */
-	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0800, PORTCOND_NOTEQUALS, 0x0000) PORT_DIPLOCATION("SW2:5,6,7,8")
+	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0800, NOTEQUALS, 0x0000) PORT_DIPLOCATION("SW2:5,6,7,8")
 	PORT_DIPSETTING(      0xa000, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(      0xb000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0xc000, DEF_STR( 4C_1C ) )
@@ -1849,7 +1825,7 @@ GFXDECODE_END
 
 static const ym2151_interface ym2151_config =
 {
-	m72_ym2151_irq_handler
+	DEVCB_LINE(m72_ym2151_irq_handler)
 };
 
 

@@ -33,7 +33,7 @@ static void pmd851_update_memory(running_machine &machine)
 
 	if (state->m_startup_mem_map)
 	{
-		UINT8 *mem = machine.region("maincpu")->base();
+		UINT8 *mem = state->memregion("maincpu")->base();
 
 		space->unmap_write(0x0000, 0x0fff);
 		space->nop_write(0x1000, 0x1fff);
@@ -43,13 +43,13 @@ static void pmd851_update_memory(running_machine &machine)
 		space->nop_read(0x1000, 0x1fff);
 		space->nop_read(0x3000, 0x3fff);
 
-		memory_set_bankptr(machine, "bank1", mem + 0x010000);
-		memory_set_bankptr(machine, "bank3", mem + 0x010000);
-		memory_set_bankptr(machine, "bank5", ram + 0xc000);
+		state->membank("bank1")->set_base(mem + 0x010000);
+		state->membank("bank3")->set_base(mem + 0x010000);
+		state->membank("bank5")->set_base(ram + 0xc000);
 
-		memory_set_bankptr(machine, "bank6", mem + 0x010000);
-		memory_set_bankptr(machine, "bank7", mem + 0x010000);
-		memory_set_bankptr(machine, "bank8", ram + 0xc000);
+		state->membank("bank6")->set_base(mem + 0x010000);
+		state->membank("bank7")->set_base(mem + 0x010000);
+		state->membank("bank8")->set_base(ram + 0xc000);
 	}
 	else
 	{
@@ -62,11 +62,11 @@ static void pmd851_update_memory(running_machine &machine)
 		space->install_read_bank(0x1000, 0x1fff, "bank2");
 		space->install_read_bank(0x3000, 0x3fff, "bank4");
 
-		memory_set_bankptr(machine, "bank1", ram);
-		memory_set_bankptr(machine, "bank2", ram + 0x1000);
-		memory_set_bankptr(machine, "bank3", ram + 0x2000);
-		memory_set_bankptr(machine, "bank4", ram + 0x3000);
-		memory_set_bankptr(machine, "bank5", ram + 0x4000);
+		state->membank("bank1")->set_base(ram);
+		state->membank("bank2")->set_base(ram + 0x1000);
+		state->membank("bank3")->set_base(ram + 0x2000);
+		state->membank("bank4")->set_base(ram + 0x3000);
+		state->membank("bank5")->set_base(ram + 0x4000);
 	}
 }
 
@@ -78,21 +78,21 @@ static void pmd852a_update_memory(running_machine &machine)
 
 	if (state->m_startup_mem_map)
 	{
-		UINT8 *mem = machine.region("maincpu")->base();
+		UINT8 *mem = state->memregion("maincpu")->base();
 
 		space->unmap_write(0x0000, 0x0fff);
 		space->unmap_write(0x2000, 0x2fff);
 
-		memory_set_bankptr(machine, "bank1", mem + 0x010000);
-		memory_set_bankptr(machine, "bank2", ram + 0x9000);
-		memory_set_bankptr(machine, "bank3", mem + 0x010000);
-		memory_set_bankptr(machine, "bank4", ram + 0xb000);
-		memory_set_bankptr(machine, "bank5", ram + 0xc000);
-		memory_set_bankptr(machine, "bank6", mem + 0x010000);
-		memory_set_bankptr(machine, "bank7", ram + 0x9000);
-		memory_set_bankptr(machine, "bank8", mem + 0x010000);
-		memory_set_bankptr(machine, "bank9", ram + 0xb000);
-		memory_set_bankptr(machine, "bank10", ram + 0xc000);
+		state->membank("bank1")->set_base(mem + 0x010000);
+		state->membank("bank2")->set_base(ram + 0x9000);
+		state->membank("bank3")->set_base(mem + 0x010000);
+		state->membank("bank4")->set_base(ram + 0xb000);
+		state->membank("bank5")->set_base(ram + 0xc000);
+		state->membank("bank6")->set_base(mem + 0x010000);
+		state->membank("bank7")->set_base(ram + 0x9000);
+		state->membank("bank8")->set_base(mem + 0x010000);
+		state->membank("bank9")->set_base(ram + 0xb000);
+		state->membank("bank10")->set_base(ram + 0xc000);
 
 	}
 	else
@@ -100,49 +100,49 @@ static void pmd852a_update_memory(running_machine &machine)
 		space->install_write_bank(0x0000, 0x0fff, "bank1");
 		space->install_write_bank(0x2000, 0x2fff, "bank3");
 
-		memory_set_bankptr(machine, "bank1", ram);
-		memory_set_bankptr(machine, "bank2", ram + 0x1000);
-		memory_set_bankptr(machine, "bank3", ram + 0x2000);
-		memory_set_bankptr(machine, "bank4", ram + 0x5000);
-		memory_set_bankptr(machine, "bank5", ram + 0x4000);
+		state->membank("bank1")->set_base(ram);
+		state->membank("bank2")->set_base(ram + 0x1000);
+		state->membank("bank3")->set_base(ram + 0x2000);
+		state->membank("bank4")->set_base(ram + 0x5000);
+		state->membank("bank5")->set_base(ram + 0x4000);
 	}
 }
 
 static void pmd853_update_memory(running_machine &machine)
 {
 	pmd85_state *state = machine.driver_data<pmd85_state>();
-	UINT8 *mem = machine.region("maincpu")->base();
+	UINT8 *mem = state->memregion("maincpu")->base();
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (state->m_startup_mem_map)
 	{
-		memory_set_bankptr(machine, "bank1", mem + 0x010000);
-		memory_set_bankptr(machine, "bank2", mem + 0x010000);
-		memory_set_bankptr(machine, "bank3", mem + 0x010000);
-		memory_set_bankptr(machine, "bank4", mem + 0x010000);
-		memory_set_bankptr(machine, "bank5", mem + 0x010000);
-		memory_set_bankptr(machine, "bank6", mem + 0x010000);
-		memory_set_bankptr(machine, "bank7", mem + 0x010000);
-		memory_set_bankptr(machine, "bank8", mem + 0x010000);
-		memory_set_bankptr(machine, "bank9", ram);
-		memory_set_bankptr(machine, "bank10", ram + 0x2000);
-		memory_set_bankptr(machine, "bank11", ram + 0x4000);
-		memory_set_bankptr(machine, "bank12", ram + 0x6000);
-		memory_set_bankptr(machine, "bank13", ram + 0x8000);
-		memory_set_bankptr(machine, "bank14", ram + 0xa000);
-		memory_set_bankptr(machine, "bank15", ram + 0xc000);
-		memory_set_bankptr(machine, "bank16", ram + 0xe000);
+		state->membank("bank1")->set_base(mem + 0x010000);
+		state->membank("bank2")->set_base(mem + 0x010000);
+		state->membank("bank3")->set_base(mem + 0x010000);
+		state->membank("bank4")->set_base(mem + 0x010000);
+		state->membank("bank5")->set_base(mem + 0x010000);
+		state->membank("bank6")->set_base(mem + 0x010000);
+		state->membank("bank7")->set_base(mem + 0x010000);
+		state->membank("bank8")->set_base(mem + 0x010000);
+		state->membank("bank9")->set_base(ram);
+		state->membank("bank10")->set_base(ram + 0x2000);
+		state->membank("bank11")->set_base(ram + 0x4000);
+		state->membank("bank12")->set_base(ram + 0x6000);
+		state->membank("bank13")->set_base(ram + 0x8000);
+		state->membank("bank14")->set_base(ram + 0xa000);
+		state->membank("bank15")->set_base(ram + 0xc000);
+		state->membank("bank16")->set_base(ram + 0xe000);
 	}
 	else
 	{
-		memory_set_bankptr(machine,  "bank1", ram);
-		memory_set_bankptr(machine,  "bank2", ram + 0x2000);
-		memory_set_bankptr(machine,  "bank3", ram + 0x4000);
-		memory_set_bankptr(machine,  "bank4", ram + 0x6000);
-		memory_set_bankptr(machine,  "bank5", ram + 0x8000);
-		memory_set_bankptr(machine,  "bank6", ram + 0xa000);
-		memory_set_bankptr(machine,  "bank7", ram + 0xc000);
-		memory_set_bankptr(machine,  "bank8", state->m_pmd853_memory_mapping ? mem + 0x010000 : ram + 0xe000);
+		state->membank("bank1")->set_base(ram);
+		state->membank("bank2")->set_base(ram + 0x2000);
+		state->membank("bank3")->set_base(ram + 0x4000);
+		state->membank("bank4")->set_base(ram + 0x6000);
+		state->membank("bank5")->set_base(ram + 0x8000);
+		state->membank("bank6")->set_base(ram + 0xa000);
+		state->membank("bank7")->set_base(ram + 0xc000);
+		state->membank("bank8")->set_base(state->m_pmd853_memory_mapping ? mem + 0x010000 : ram + 0xe000);
 	}
 }
 
@@ -154,18 +154,18 @@ static void alfa_update_memory(running_machine &machine)
 
 	if (state->m_startup_mem_map)
 	{
-		UINT8 *mem = machine.region("maincpu")->base();
+		UINT8 *mem = state->memregion("maincpu")->base();
 
 		space->unmap_write(0x0000, 0x0fff);
 		space->unmap_write(0x1000, 0x33ff);
 		space->nop_write(0x3400, 0x3fff);
 
-		memory_set_bankptr(machine, "bank1", mem + 0x010000);
-		memory_set_bankptr(machine, "bank2", mem + 0x011000);
-		memory_set_bankptr(machine, "bank4", ram + 0xc000);
-		memory_set_bankptr(machine, "bank5", mem + 0x010000);
-		memory_set_bankptr(machine, "bank6", mem + 0x011000);
-		memory_set_bankptr(machine, "bank7", ram + 0xc000);
+		state->membank("bank1")->set_base(mem + 0x010000);
+		state->membank("bank2")->set_base(mem + 0x011000);
+		state->membank("bank4")->set_base(ram + 0xc000);
+		state->membank("bank5")->set_base(mem + 0x010000);
+		state->membank("bank6")->set_base(mem + 0x011000);
+		state->membank("bank7")->set_base(ram + 0xc000);
 	}
 	else
 	{
@@ -173,10 +173,10 @@ static void alfa_update_memory(running_machine &machine)
 		space->install_write_bank(0x1000, 0x33ff, "bank2");
 		space->install_write_bank(0x3400, 0x3fff, "bank3");
 
-		memory_set_bankptr(machine, "bank1", ram);
-		memory_set_bankptr(machine, "bank2", ram + 0x1000);
-		memory_set_bankptr(machine, "bank3", ram + 0x3400);
-		memory_set_bankptr(machine, "bank4", ram + 0x4000);
+		state->membank("bank1")->set_base(ram);
+		state->membank("bank2")->set_base(ram + 0x1000);
+		state->membank("bank3")->set_base(ram + 0x3400);
+		state->membank("bank4")->set_base(ram + 0x4000);
 	}
 }
 
@@ -188,21 +188,21 @@ static void mato_update_memory(running_machine &machine)
 
 	if (state->m_startup_mem_map)
 	{
-		UINT8 *mem = machine.region("maincpu")->base();
+		UINT8 *mem = state->memregion("maincpu")->base();
 
 		space->unmap_write(0x0000, 0x3fff);
 
-		memory_set_bankptr(machine, "bank1", mem + 0x010000);
-		memory_set_bankptr(machine, "bank2", ram + 0xc000);
-		memory_set_bankptr(machine, "bank3", mem + 0x010000);
-		memory_set_bankptr(machine, "bank4", ram + 0xc000);
+		state->membank("bank1")->set_base(mem + 0x010000);
+		state->membank("bank2")->set_base(ram + 0xc000);
+		state->membank("bank3")->set_base(mem + 0x010000);
+		state->membank("bank4")->set_base(ram + 0xc000);
 	}
 	else
 	{
 		space->install_write_bank(0x0000, 0x3fff, "bank1");
 
-		memory_set_bankptr(machine, "bank1", ram);
-		memory_set_bankptr(machine, "bank2", ram + 0x4000);
+		state->membank("bank1")->set_base(ram);
+		state->membank("bank2")->set_base(ram + 0x4000);
 	}
 }
 
@@ -210,23 +210,23 @@ static void c2717_update_memory(running_machine &machine)
 {
 	pmd85_state *state = machine.driver_data<pmd85_state>();
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *mem = machine.region("maincpu")->base();
+	UINT8 *mem = state->memregion("maincpu")->base();
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	if (state->m_startup_mem_map)
 	{
 		space->unmap_write(0x0000, 0x3fff);
 
-		memory_set_bankptr(machine, "bank1", mem + 0x010000);
-		memory_set_bankptr(machine, "bank2", ram + 0x4000);
-		memory_set_bankptr(machine, "bank3", mem + 0x010000);
-		memory_set_bankptr(machine, "bank4", ram + 0xc000);
+		state->membank("bank1")->set_base(mem + 0x010000);
+		state->membank("bank2")->set_base(ram + 0x4000);
+		state->membank("bank3")->set_base(mem + 0x010000);
+		state->membank("bank4")->set_base(ram + 0xc000);
 	}
 	else
 	{
 		space->install_write_bank(0x0000, 0x3fff, "bank1");
-		memory_set_bankptr(machine, "bank1", ram);
-		memory_set_bankptr(machine, "bank2", ram + 0x4000);
+		state->membank("bank1")->set_base(ram);
+		state->membank("bank2")->set_base(ram + 0x4000);
 	}
 }
 
@@ -251,7 +251,7 @@ static  READ8_DEVICE_HANDLER ( pmd85_ppi_0_portb_r )
 		"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15"
 	};
 
-	return input_port_read(device->machine(), keynames[(state->m_ppi_port_outputs[0][0] & 0x0f)]) & input_port_read(device->machine(), "KEY15");
+	return device->machine().root_device().ioport(keynames[(state->m_ppi_port_outputs[0][0] & 0x0f)])->read() & device->machine().root_device().ioport("KEY15")->read();
 }
 
 static  READ8_DEVICE_HANDLER ( pmd85_ppi_0_portc_r )
@@ -297,14 +297,14 @@ static  READ8_DEVICE_HANDLER ( mato_ppi_0_portb_r )
 	for (i = 0; i < 8; i++)
 	{
 		if (!BIT(state->m_ppi_port_outputs[0][0], i))
-			data &= input_port_read(device->machine(), keynames[i]);
+			data &= device->machine().root_device().ioport(keynames[i])->read();
 	}
 	return data;
 }
 
 static  READ8_DEVICE_HANDLER ( mato_ppi_0_portc_r )
 {
-	return input_port_read(device->machine(), "KEY8") | 0x8f;
+	return device->machine().root_device().ioport("KEY8")->read() | 0x8f;
 }
 
 static WRITE8_DEVICE_HANDLER ( mato_ppi_0_portc_w )
@@ -459,8 +459,8 @@ const struct pit8253_config pmd85_pit8253_interface =
 static READ8_DEVICE_HANDLER ( pmd85_ppi_3_porta_r )
 {
 	pmd85_state *state = device->machine().driver_data<pmd85_state>();
-	if (device->machine().region("user1")->base() != NULL)
-		return device->machine().region("user1")->base()[state->m_ppi_port_outputs[3][1] | (state->m_ppi_port_outputs[3][2] << 8)];
+	if (state->memregion("user1")->base() != NULL)
+		return state->memregion("user1")->base()[state->m_ppi_port_outputs[3][1] | (state->m_ppi_port_outputs[3][2] << 8)];
 	else
 		return 0;
 }
@@ -516,11 +516,10 @@ static WRITE8_DEVICE_HANDLER ( pmd85_ppi_3_portc_w )
 
 *******************************************************************************/
 
-READ8_HANDLER ( pmd85_io_r )
+READ8_MEMBER(pmd85_state::pmd85_io_r)
 {
-	pmd85_state *state = space->machine().driver_data<pmd85_state>();
-	i8251_device *uart = space->machine().device<i8251_device>("uart");
-	if (state->m_startup_mem_map)
+	i8251_device *uart = machine().device<i8251_device>("uart");
+	if (m_startup_mem_map)
 	{
 		return 0xff;
 	}
@@ -531,23 +530,23 @@ READ8_HANDLER ( pmd85_io_r )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							return space->machine().device<i8255_device>("ppi8255_0")->read(*space, offset & 0x03);
+							return machine().device<i8255_device>("ppi8255_0")->read(space, offset & 0x03);
 				}
 				break;
 		case 0x08:	/* ROM module connector */
-				switch (state->m_model)
+				switch (m_model)
 				{
 					case PMD85_1:
 					case PMD85_2:
 					case PMD85_2A:
 					case C2717:
 					case PMD85_3:
-						if (state->m_rom_module_present)
+						if (m_rom_module_present)
 						{
 							switch (offset & 0x80)
 							{
 								case 0x80:	/* ROM module 8255 */
-									return space->machine().device<i8255_device>("ppi8255_3")->read(*space, offset & 0x03);
+									return machine().device<i8255_device>("ppi8255_3")->read(space, offset & 0x03);
 							}
 						}
 						break;
@@ -562,16 +561,16 @@ READ8_HANDLER ( pmd85_io_r )
 								case 0x10:	/* 8251 (casette recorder, V24) */
 										switch (offset & 0x01)
 										{
-											case 0x00: return uart->data_r(*space, offset & 0x01);
-											case 0x01: return uart->status_r(*space, offset & 0x01);
+											case 0x00: return uart->data_r(space, offset & 0x01);
+											case 0x01: return uart->status_r(space, offset & 0x01);
 										}
 										break;
 								case 0x40:      /* 8255 (GPIO/0, GPIO/1) */
-										return space->machine().device<i8255_device>("ppi8255_1")->read(*space, offset & 0x03);
+										return machine().device<i8255_device>("ppi8255_1")->read(space, offset & 0x03);
 								case 0x50:	/* 8253 */
-										return pit8253_r( space->machine().device("pit8253"), offset & 0x03);
+										return pit8253_r( machine().device("pit8253"), offset & 0x03);
 								case 0x70:	/* 8255 (IMS-2) */
-										return space->machine().device<i8255_device>("ppi8255_2")->read(*space, offset & 0x03);
+										return machine().device<i8255_device>("ppi8255_2")->read(space, offset & 0x03);
 							}
 							break;
 					case 0x80:	/* external interfaces */
@@ -584,14 +583,13 @@ READ8_HANDLER ( pmd85_io_r )
 	return 0xff;
 }
 
-WRITE8_HANDLER ( pmd85_io_w )
+WRITE8_MEMBER(pmd85_state::pmd85_io_w)
 {
-	pmd85_state *state = space->machine().driver_data<pmd85_state>();
-	i8251_device *uart = space->machine().device<i8251_device>("uart");
-	if (state->m_startup_mem_map)
+	i8251_device *uart = machine().device<i8251_device>("uart");
+	if (m_startup_mem_map)
 	{
-		state->m_startup_mem_map = 0;
-		(*state->update_memory)(space->machine());
+		m_startup_mem_map = 0;
+		(*update_memory)(machine());
 	}
 
 	switch (offset & 0x0c)
@@ -600,30 +598,30 @@ WRITE8_HANDLER ( pmd85_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							space->machine().device<i8255_device>("ppi8255_0")->write(*space, offset & 0x03, data);
+							machine().device<i8255_device>("ppi8255_0")->write(space, offset & 0x03, data);
 							/* PMD-85.3 memory banking */
 							if ((offset & 0x03) == 0x03)
 							{
-								state->m_pmd853_memory_mapping = data & 0x01;
-								(*state->update_memory)(space->machine());
+								m_pmd853_memory_mapping = data & 0x01;
+								(*update_memory)(machine());
 							}
 							break;
 				}
 				break;
 		case 0x08:	/* ROM module connector */
-				switch (state->m_model)
+				switch (m_model)
 				{
 					case PMD85_1:
 					case PMD85_2:
 					case PMD85_2A:
 					case C2717:
 					case PMD85_3:
-						if (state->m_rom_module_present)
+						if (m_rom_module_present)
 						{
 							switch (offset & 0x80)
 							{
 								case 0x80:	/* ROM module 8255 */
-										space->machine().device<i8255_device>("ppi8255_3")->write(*space, offset & 0x03, data);
+										machine().device<i8255_device>("ppi8255_3")->write(space, offset & 0x03, data);
 										break;
 							}
 						}
@@ -639,19 +637,19 @@ WRITE8_HANDLER ( pmd85_io_w )
 								case 0x10:	/* 8251 (casette recorder, V24) */
 										switch (offset & 0x01)
 										{
-											case 0x00: uart->data_w(*space, offset & 0x01, data); break;
-											case 0x01: uart->control_w(*space, offset & 0x01, data); break;
+											case 0x00: uart->data_w(space, offset & 0x01, data); break;
+											case 0x01: uart->control_w(space, offset & 0x01, data); break;
 										}
 										break;
 								case 0x40:      /* 8255 (GPIO/0, GPIO/0) */
-										space->machine().device<i8255_device>("ppi8255_1")->write(*space, offset & 0x03, data);
+										machine().device<i8255_device>("ppi8255_1")->write(space, offset & 0x03, data);
 										break;
 								case 0x50:	/* 8253 */
-										pit8253_w(space->machine().device("pit8253"), offset & 0x03, data);
+										pit8253_w(machine().device("pit8253"), offset & 0x03, data);
 										logerror ("8253 writing. Address: %02x, Data: %02x\n", offset, data);
 										break;
 								case 0x70:	/* 8255 (IMS-2) */
-										space->machine().device<i8255_device>("ppi8255_2")->write(*space, offset & 0x03, data);
+										machine().device<i8255_device>("ppi8255_2")->write(space, offset & 0x03, data);
 										break;
 							}
 							break;
@@ -672,10 +670,9 @@ WRITE8_HANDLER ( pmd85_io_w )
 
 *******************************************************************************/
 
- READ8_HANDLER ( mato_io_r )
+READ8_MEMBER(pmd85_state::mato_io_r)
 {
-	pmd85_state *state = space->machine().driver_data<pmd85_state>();
-	if (state->m_startup_mem_map)
+	if (m_startup_mem_map)
 	{
 		return 0xff;
 	}
@@ -686,7 +683,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							return space->machine().device<i8255_device>("ppi8255_0")->read(*space, offset & 0x03);
+							return machine().device<i8255_device>("ppi8255_0")->read(space, offset & 0x03);
 				}
 				break;
 	}
@@ -695,13 +692,12 @@ WRITE8_HANDLER ( pmd85_io_w )
 	return 0xff;
 }
 
-WRITE8_HANDLER ( mato_io_w )
+WRITE8_MEMBER(pmd85_state::mato_io_w)
 {
-	pmd85_state *state = space->machine().driver_data<pmd85_state>();
-	if (state->m_startup_mem_map)
+	if (m_startup_mem_map)
 	{
-		state->m_startup_mem_map = 0;
-		(*state->update_memory)(space->machine());
+		m_startup_mem_map = 0;
+		(*update_memory)(machine());
 	}
 
 	switch (offset & 0x0c)
@@ -710,7 +706,7 @@ WRITE8_HANDLER ( mato_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							return space->machine().device<i8255_device>("ppi8255_0")->write(*space, offset & 0x03, data);
+							return machine().device<i8255_device>("ppi8255_0")->write(space, offset & 0x03, data);
 							break;
 				}
 				break;
@@ -800,7 +796,7 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 	int data;
 	int current_level;
 
-	if (!(input_port_read(machine, "DSW0") & 0x02))	/* V.24 / Tape Switch */
+	if (!(machine.root_device().ioport("DSW0")->read() & 0x02))	/* V.24 / Tape Switch */
 	{
 		/* tape reading */
 		if (machine.device<cassette_image_device>(CASSETTE_TAG)->get_state()&CASSETTE_PLAY)
@@ -866,10 +862,10 @@ static TIMER_CALLBACK( pmd_reset )
 	machine.schedule_soft_reset();
 }
 
-DIRECT_UPDATE_HANDLER(pmd85_opbaseoverride)
+DIRECT_UPDATE_MEMBER(pmd85_state::pmd85_opbaseoverride)
 {
-	if (input_port_read(machine, "RESET") & 0x01)
-		machine.scheduler().timer_set(attotime::from_usec(10), FUNC(pmd_reset));
+	if (ioport("RESET")->read() & 0x01)
+		machine().scheduler().timer_set(attotime::from_usec(10), FUNC(pmd_reset));
 	return address;
 }
 
@@ -953,7 +949,7 @@ MACHINE_RESET( pmd85 )
 		case PMD85_2A:
 		case PMD85_3:
 		case C2717:
-			state->m_rom_module_present = (input_port_read(machine, "DSW0") & 0x01) ? 1 : 0;
+			state->m_rom_module_present = (machine.root_device().ioport("DSW0")->read() & 0x01) ? 1 : 0;
 			break;
 		case ALFA:
 		case MATO:
@@ -972,5 +968,5 @@ MACHINE_RESET( pmd85 )
 
 	machine.scheduler().timer_set(attotime::zero, FUNC(setup_machine_state));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(pmd85_opbaseoverride), &machine));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(pmd85_state::pmd85_opbaseoverride), state));
 }

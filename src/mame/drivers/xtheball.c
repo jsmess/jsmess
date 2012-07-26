@@ -18,11 +18,16 @@ class xtheball_state : public driver_device
 {
 public:
 	xtheball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram_bg(*this, "vrabg"),
+		m_vram_fg(*this, "vrafg"){ }
 
-	UINT16 *m_vram_bg;
-	UINT16 *m_vram_fg;
+	required_shared_ptr<UINT16> m_vram_bg;
+	required_shared_ptr<UINT16> m_vram_fg;
 	UINT8 m_bitvals[32];
+	DECLARE_WRITE16_MEMBER(bit_controls_w);
+	DECLARE_READ16_MEMBER(analogx_r);
+	DECLARE_READ16_MEMBER(analogy_watchdog_r);
 };
 
 
@@ -115,24 +120,23 @@ static void xtheball_from_shiftreg(address_space *space, UINT32 address, UINT16 
  *
  *************************************/
 
-static WRITE16_HANDLER( bit_controls_w )
+WRITE16_MEMBER(xtheball_state::bit_controls_w)
 {
-	xtheball_state *state = space->machine().driver_data<xtheball_state>();
-	UINT8 *bitvals = state->m_bitvals;
+	UINT8 *bitvals = m_bitvals;
 	if (ACCESSING_BITS_0_7)
 	{
 		if (bitvals[offset] != (data & 1))
 		{
-			logerror("%08x:bit_controls_w(%x,%d)\n", cpu_get_pc(&space->device()), offset, data & 1);
+			logerror("%08x:bit_controls_w(%x,%d)\n", cpu_get_pc(&space.device()), offset, data & 1);
 
 			switch (offset)
 			{
 				case 7:
-					ticket_dispenser_w(space->machine().device("ticket"), 0, data << 7);
+					machine().device<ticket_dispenser_device>("ticket")->write(space, 0, data << 7);
 					break;
 
 				case 8:
-					set_led_status(space->machine(), 0, data & 1);
+					set_led_status(machine(), 0, data & 1);
 					break;
 			}
 		}
@@ -185,17 +189,17 @@ static WRITE16_HANDLER( bit_controls_w )
  *
  *************************************/
 
-static READ16_HANDLER( analogx_r )
+READ16_MEMBER(xtheball_state::analogx_r)
 {
-	return (input_port_read(space->machine(), "ANALOGX") << 8) | 0x00ff;
+	return (ioport("ANALOGX")->read() << 8) | 0x00ff;
 }
 
 
-static READ16_HANDLER( analogy_watchdog_r )
+READ16_MEMBER(xtheball_state::analogy_watchdog_r)
 {
 	/* doubles as a watchdog address */
 	watchdog_reset_w(space,0,0);
-	return (input_port_read(space->machine(), "ANALOGY") << 8) | 0x00ff;
+	return (ioport("ANALOGY")->read() << 8) | 0x00ff;
 }
 
 
@@ -206,11 +210,11 @@ static READ16_HANDLER( analogy_watchdog_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xtheball_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_BASE_MEMBER(xtheball_state, m_vram_bg)
-	AM_RANGE(0x02000000, 0x020fffff) AM_RAM AM_BASE_MEMBER(xtheball_state, m_vram_fg)
-	AM_RANGE(0x03000000, 0x030000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
+	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_SHARE("vrabg")
+	AM_RANGE(0x02000000, 0x020fffff) AM_RAM AM_SHARE("vrafg")
+	AM_RANGE(0x03000000, 0x030000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
 	AM_RANGE(0x03040000, 0x030401ff) AM_WRITE(bit_controls_w)
 	AM_RANGE(0x03040080, 0x0304008f) AM_READ_PORT("DSW")
 	AM_RANGE(0x03040100, 0x0304010f) AM_READ(analogx_r)
@@ -221,9 +225,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x03040160, 0x0304016f) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x03040170, 0x0304017f) AM_READ_PORT("SERVICE1")
 	AM_RANGE(0x03040180, 0x0304018f) AM_READ(analogy_watchdog_r)
-	AM_RANGE(0x03060000, 0x0306000f) AM_DEVWRITE8("dac", dac_w, 0xff00)
+	AM_RANGE(0x03060000, 0x0306000f) AM_DEVWRITE8_LEGACY("dac", dac_w, 0xff00)
 	AM_RANGE(0x04000000, 0x057fffff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -238,7 +242,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( xtheball )
 	PORT_START("DSW")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0700, 0x0000, "Target Tickets")
 	PORT_DIPSETTING(      0x0000, "3" )
@@ -338,7 +342,7 @@ static MACHINE_CONFIG_START( xtheball, xtheball_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", 100, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)

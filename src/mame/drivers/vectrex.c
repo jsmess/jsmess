@@ -19,9 +19,9 @@ Bruce Tomlin (hardware info)
 #include "machine/nvram.h"
 
 
-static ADDRESS_MAP_START(vectrex_map, AS_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_MIRROR(0x0400) AM_BASE_MEMBER(vectrex_state, m_gce_vectorram) AM_SIZE_MEMBER(vectrex_state, m_gce_vectorram_size)
+static ADDRESS_MAP_START(vectrex_map, AS_PROGRAM, 8, vectrex_state )
+	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1") AM_REGION("maincpu", 0)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_MIRROR(0x0400) AM_SHARE("gce_vectorram")
 	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(vectrex_via_r, vectrex_via_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -92,7 +92,7 @@ static const ay8910_interface vectrex_ay8910_interface =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_INPUT_PORT("BUTTONS"),
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, vectrex_psg_port_w),
+	DEVCB_DRIVER_MEMBER(vectrex_state, vectrex_psg_port_w),
 	DEVCB_NULL
 };
 
@@ -133,7 +133,7 @@ static MACHINE_CONFIG_START( vectrex, vectrex_state )
 MACHINE_CONFIG_END
 
 ROM_START(vectrex)
-	ROM_REGION(0x10000,"maincpu", 0)
+	ROM_REGION(0x18000,"maincpu", 0)
 	ROM_LOAD("system.img", 0xe000, 0x2000, CRC(ba13fb57) SHA1(65d07426b520ddd3115d40f255511e0fd2e20ae7))
 ROM_END
 
@@ -173,12 +173,12 @@ ROM_END
 
 *****************************************************************/
 
-static ADDRESS_MAP_START(raaspec_map , AS_PROGRAM, 8)
+static ADDRESS_MAP_START(raaspec_map , AS_PROGRAM, 8, vectrex_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(raaspec_led_w)
-	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_MIRROR(0x0400) AM_BASE_MEMBER(vectrex_state, m_gce_vectorram) AM_SIZE_MEMBER(vectrex_state, m_gce_vectorram_size)
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE (vectrex_via_r, vectrex_via_w)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM AM_MIRROR(0x0400) AM_SHARE("gce_vectorram")
+	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(vectrex_via_r, vectrex_via_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

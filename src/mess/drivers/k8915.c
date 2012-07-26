@@ -7,7 +7,6 @@
         When it says DIAGNOSTIC RAZ P, press enter.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -23,14 +22,15 @@ public:
 	k8915_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER( k8915_52_r );
 	DECLARE_READ8_MEMBER( k8915_53_r );
 	DECLARE_WRITE8_MEMBER( k8915_a8_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 *m_p_chargen;
 	UINT8 m_framecnt;
 	UINT8 m_term_data;
@@ -57,15 +57,15 @@ WRITE8_MEMBER( k8915_state::k8915_a8_w )
 {
 // seems to switch ram and rom around.
 	if (data == 0x87)
-		memory_set_bank(machine(), "boot", 0); // ram at 0000
+		membank("boot")->set_entry(0); // ram at 0000
 	else
-		memory_set_bank(machine(), "boot", 1); // rom at 0000
+		membank("boot")->set_entry(1); // rom at 0000
 }
 
 static ADDRESS_MAP_START(k8915_mem, AS_PROGRAM, 8, k8915_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_RAMBANK("boot")
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("p_videoram")
 	AM_RANGE(0x1800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -82,18 +82,19 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(k8915_state)
 {
-	memory_set_bank(machine(), "boot", 1);
+	membank("boot")->set_entry(1);
 }
 
 static DRIVER_INIT(k8915)
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x10000);
+	k8915_state *state = machine.driver_data<k8915_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
 VIDEO_START_MEMBER( k8915_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 SCREEN_UPDATE16_MEMBER( k8915_state )

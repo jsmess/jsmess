@@ -63,9 +63,6 @@ enum
 // alarm
 #define ALARM_ENB		0x80
 
-// days per month
-static const int DAYS_PER_MONTH[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-
 // register write mask
 static const int REG_WRITE_MASK[0x10] =
 {
@@ -94,6 +91,7 @@ inline void hd64610_device::set_irq_line()
 	}
 }
 
+
 //-------------------------------------------------
 //  read_counter -
 //-------------------------------------------------
@@ -102,6 +100,7 @@ inline UINT8 hd64610_device::read_counter(int counter)
 {
 	return bcd_2_dec(m_regs[counter]);
 }
+
 
 //-------------------------------------------------
 //  write_counter -
@@ -112,101 +111,6 @@ inline void hd64610_device::write_counter(int counter, UINT8 value)
 	m_regs[counter] = dec_2_bcd(value);
 }
 
-//-------------------------------------------------
-//  advance_seconds -
-//-------------------------------------------------
-
-inline void hd64610_device::advance_seconds()
-{
-	int seconds = read_counter(REG_SECOND);
-
-	seconds++;
-
-	if (seconds > 59)
-	{
-		seconds = 0;
-
-		advance_minutes();
-	}
-
-	write_counter(REG_SECOND, seconds);
-}
-
-
-//-------------------------------------------------
-//  advance_minutes -
-//-------------------------------------------------
-
-inline void hd64610_device::advance_minutes()
-{
-	int minutes = read_counter(REG_MINUTE);
-	int hours = read_counter(REG_HOUR);
-	int days = read_counter(REG_DAY);
-	int month = read_counter(REG_MONTH);
-	int year = read_counter(REG_YEAR);
-	int day_of_week = read_counter(REG_DAY_OF_THE_WEEK);
-
-	minutes++;
-
-	if (minutes > 59)
-	{
-		minutes = 0;
-		hours++;
-	}
-
-	if (hours > 23)
-	{
-		hours = 0;
-		days++;
-		day_of_week++;
-	}
-
-	if (day_of_week > 6)
-	{
-		day_of_week++;
-	}
-
-	if (days > DAYS_PER_MONTH[month - 1])
-	{
-		days = 1;
-		month++;
-	}
-
-	if (month > 12)
-	{
-		month = 1;
-		year++;
-	}
-
-	if (year > 99)
-	{
-		year = 0;
-	}
-
-	write_counter(REG_MINUTE, minutes);
-	write_counter(REG_HOUR, hours);
-	write_counter(REG_DAY, days);
-	write_counter(REG_MONTH, month);
-	write_counter(REG_YEAR,year);
-	m_regs[REG_DAY_OF_THE_WEEK] = day_of_week;
-
-	check_alarm();
-	set_irq_line();
-}
-
-//-------------------------------------------------
-//  adjust_seconds -
-//-------------------------------------------------
-
-inline void hd64610_device::adjust_seconds()
-{
-	int seconds = read_counter(REG_SECOND);
-
-	write_counter(REG_SECOND, 0);
-
-	if (seconds >= 30)
-		advance_minutes();
-}
 
 //-------------------------------------------------
 //  check_alarm -
@@ -334,19 +238,21 @@ void hd64610_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 
 //-------------------------------------------------
-//  rtc_set_time - called to initialize the RTC to
-//  a known state
+//  rtc_clock_updated -
 //-------------------------------------------------
 
-void hd64610_device::rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second)
+void hd64610_device::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
 {
 	write_counter(REG_SECOND, second);
 	write_counter(REG_MINUTE, minute);
 	write_counter(REG_HOUR, hour);
 	write_counter(REG_DAY, day);
 	write_counter(REG_MONTH, month);
-	write_counter(REG_YEAR,year);
+	write_counter(REG_YEAR, year);
 	m_regs[REG_DAY_OF_THE_WEEK] = day_of_week;
+
+	check_alarm();
+	set_irq_line();
 }
 
 

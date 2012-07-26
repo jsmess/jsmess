@@ -26,7 +26,6 @@
 
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -76,7 +75,7 @@ READ8_MEMBER( lcmate2_state::key_r )
 		if (BIT(offset, i)==0)
 		{
 			sprintf(kbdrow,"LINE%d", i);
-			data &= input_port_read(machine(), kbdrow);
+			data &= ioport(kbdrow)->read();
 		}
 	}
 
@@ -85,7 +84,7 @@ READ8_MEMBER( lcmate2_state::key_r )
 
 WRITE8_MEMBER( lcmate2_state::bankswitch_w )
 {
-	memory_set_bank(machine(), "rombank", data&0x0f);
+	membank("rombank")->set_entry(data&0x0f);
 }
 
 static ADDRESS_MAP_START(lcmate2_mem, AS_PROGRAM, 8, lcmate2_state)
@@ -200,7 +199,7 @@ static PALETTE_INIT( lcmate2 )
 
 void lcmate2_state::machine_start()
 {
-	memory_configure_bank(machine(), "rombank", 0, 0x10, (UINT8*)machine().region("maincpu")->base(), 0x4000);
+	membank("rombank")->configure_entries(0, 0x10, (UINT8*)machine().root_device().memregion("maincpu")->base(), 0x4000);
 }
 
 static const hd44780_interface lcmate2_display =

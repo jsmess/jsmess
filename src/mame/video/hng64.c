@@ -651,12 +651,11 @@ static TILE_GET_INFO( get_hng64_tile3_16x16_info )
 }
 
 
-WRITE32_HANDLER( hng64_videoram_w )
+WRITE32_MEMBER(hng64_state::hng64_videoram_w)
 {
-	hng64_state *state = space->machine().driver_data<hng64_state>();
 	int realoff;
-
-	COMBINE_DATA(&state->m_videoram[offset]);
+	hng64_state *state = machine().driver_data<hng64_state>();
+	COMBINE_DATA(&m_videoram[offset]);
 
 	realoff = offset*4;
 
@@ -2057,11 +2056,11 @@ static void recoverPolygonBlock(running_machine& machine, const UINT16* packet, 
     //////////////////////////////////////////////*/
 
 	// 3d ROM Offset
-	UINT16* threeDRoms = (UINT16*)(machine.region("verts")->base());
+	UINT16* threeDRoms = (UINT16*)(machine.root_device().memregion("verts")->base());
 	UINT32  threeDOffset = (((UINT32)packet[2]) << 16) | ((UINT32)packet[3]);
 	UINT16* threeDPointer = &threeDRoms[threeDOffset * 3];
 
-	if (threeDOffset >= machine.region("verts")->bytes())
+	if (threeDOffset >= machine.root_device().memregion("verts")->bytes())
 	{
 		printf("Strange geometry packet: (ignoring)\n");
 		printPacket(packet, 1);
@@ -3016,7 +3015,7 @@ INLINE void FillSmoothTexPCHorizontalLine(running_machine &machine,
 
 	UINT8 paletteEntry = 0;
 	float t_coord, s_coord;
-	const UINT8 *gfx = machine.region("textures")->base();
+	const UINT8 *gfx = state->memregion("textures")->base();
 	const UINT8 *textureOffset = &gfx[prOptions.texIndex * 1024 * 1024];
 
 	for (; x_start <= x_end; x_start++)

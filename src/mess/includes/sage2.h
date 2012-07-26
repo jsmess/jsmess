@@ -1,4 +1,3 @@
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -75,6 +74,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ack_w );
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
+
+	DECLARE_DIRECT_UPDATE_MEMBER(sage2_direct_update_handler);
 
 	int m_reset;
 

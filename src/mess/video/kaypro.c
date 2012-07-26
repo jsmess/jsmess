@@ -316,5 +316,5 @@ WRITE8_MEMBER( kaypro_state::kaypro2x_videoram_w )
 VIDEO_START( kaypro )
 {
 	kaypro_state *state = machine.driver_data<kaypro_state>();
-	state->m_p_chargen = machine.region("chargen")->base();
+	state->m_p_chargen = state->memregion("chargen")->base();
 }

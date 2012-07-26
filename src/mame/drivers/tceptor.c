@@ -23,17 +23,15 @@
 /*******************************************************************/
 
 
-static READ16_HANDLER( m68k_shared_word_r )
+READ16_MEMBER(tceptor_state::m68k_shared_word_r)
 {
-	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	return state->m_m68k_shared_ram[offset];
+	return m_m68k_shared_ram[offset];
 }
 
-static WRITE16_HANDLER( m68k_shared_word_w )
+WRITE16_MEMBER(tceptor_state::m68k_shared_word_w)
 {
-	tceptor_state *state = space->machine().driver_data<tceptor_state>();
 	if (ACCESSING_BITS_0_7)
-		state->m_m68k_shared_ram[offset] = data & 0xff;
+		m_m68k_shared_ram[offset] = data & 0xff;
 }
 
 
@@ -48,16 +46,14 @@ static INTERRUPT_GEN( m6809_vb_interrupt )
 		state->m_m6809_irq_enable = 1;
 }
 
-static WRITE8_HANDLER( m6809_irq_enable_w )
+WRITE8_MEMBER(tceptor_state::m6809_irq_enable_w)
 {
-	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	state->m_m6809_irq_enable = 1;
+	m_m6809_irq_enable = 1;
 }
 
-static WRITE8_HANDLER( m6809_irq_disable_w )
+WRITE8_MEMBER(tceptor_state::m6809_irq_disable_w)
 {
-	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	state->m_m6809_irq_enable = 0;
+	m_m6809_irq_enable = 0;
 }
 
 
@@ -68,10 +64,9 @@ static INTERRUPT_GEN( m68k_vb_interrupt )
 		device_set_input_line(device, M68K_IRQ_1, HOLD_LINE);
 }
 
-static WRITE16_HANDLER( m68k_irq_enable_w )
+WRITE16_MEMBER(tceptor_state::m68k_irq_enable_w)
 {
-	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	state->m_m68k_irq_enable = data;
+	m_m68k_irq_enable = data;
 }
 
 
@@ -84,16 +79,14 @@ static INTERRUPT_GEN( mcu_vb_interrupt )
 		state->m_mcu_irq_enable = 1;
 }
 
-static WRITE8_HANDLER( mcu_irq_enable_w )
+WRITE8_MEMBER(tceptor_state::mcu_irq_enable_w)
 {
-	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	state->m_mcu_irq_enable = 1;
+	m_mcu_irq_enable = 1;
 }
 
-static WRITE8_HANDLER( mcu_irq_disable_w )
+WRITE8_MEMBER(tceptor_state::mcu_irq_disable_w)
 {
-	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	state->m_mcu_irq_enable = 0;
+	m_mcu_irq_enable = 0;
 }
 
 
@@ -136,39 +129,39 @@ static UINT8 fix_input1(UINT8 in1, UINT8 in2)
 	return r;
 }
 
-static READ8_HANDLER( dsw0_r )
+READ8_MEMBER(tceptor_state::dsw0_r)
 {
-	return fix_input0(input_port_read(space->machine(), "DSW1"), input_port_read(space->machine(), "DSW2"));
+	return fix_input0(ioport("DSW1")->read(), ioport("DSW2")->read());
 }
 
-static READ8_HANDLER( dsw1_r )
+READ8_MEMBER(tceptor_state::dsw1_r)
 {
-	return fix_input1(input_port_read(space->machine(), "DSW1"), input_port_read(space->machine(), "DSW2"));
+	return fix_input1(ioport("DSW1")->read(), ioport("DSW2")->read());
 }
 
-static READ8_HANDLER( input0_r )
+READ8_MEMBER(tceptor_state::input0_r)
 {
-	return fix_input0(input_port_read(space->machine(), "BUTTONS"), input_port_read(space->machine(), "SERVICE"));
+	return fix_input0(ioport("BUTTONS")->read(), ioport("SERVICE")->read());
 }
 
-static READ8_HANDLER( input1_r )
+READ8_MEMBER(tceptor_state::input1_r)
 {
-	return fix_input1(input_port_read(space->machine(), "BUTTONS"), input_port_read(space->machine(), "SERVICE"));
+	return fix_input1(ioport("BUTTONS")->read(), ioport("SERVICE")->read());
 }
 
-static READ8_HANDLER( readFF )
+READ8_MEMBER(tceptor_state::readFF)
 {
 	return 0xff;
 }
 
 /*******************************************************************/
 
-static ADDRESS_MAP_START( m6809_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( m6809_map, AS_PROGRAM, 8, tceptor_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(tceptor_tile_ram_w) AM_BASE_MEMBER(tceptor_state, m_tile_ram)
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(tceptor_tile_attr_w) AM_BASE_MEMBER(tceptor_state, m_tile_attr)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(tceptor_bg_ram_w) AM_BASE_MEMBER(tceptor_state, m_bg_ram)	// background (VIEW RAM)
-	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(tceptor_tile_ram_w) AM_SHARE("tile_ram")
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(tceptor_tile_attr_w) AM_SHARE("tile_attr")
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(tceptor_bg_ram_w) AM_SHARE("bg_ram")	// background (VIEW RAM)
+	AM_RANGE(0x4000, 0x43ff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r, namcos1_cus30_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITENOP				// 3D scope left/right?
 	AM_RANGE(0x4f00, 0x4f00) AM_READNOP				// unknown
 	AM_RANGE(0x4f01, 0x4f01) AM_READ_PORT("PEDAL")			// analog input (accel)
@@ -176,50 +169,50 @@ static ADDRESS_MAP_START( m6809_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4f03, 0x4f03) AM_READ_PORT("STICKY")			// analog input (up/down)
 	AM_RANGE(0x4f00, 0x4f03) AM_WRITENOP				// analog input control?
 	AM_RANGE(0x5000, 0x5006) AM_WRITE(tceptor_bg_scroll_w)	// bg scroll
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(tceptor_state, m_m68k_shared_ram) // COM RAM
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("m68k_shared_ram") // COM RAM
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(m6809_irq_disable_w)
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(m6809_irq_enable_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( m6502_a_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( m6502_a_map, AS_PROGRAM, 8, tceptor_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0100, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x02ff) AM_RAM
 	AM_RANGE(0x0300, 0x030f) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x3c01, 0x3c01) AM_WRITEONLY
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( m6502_b_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( m6502_b_map, AS_PROGRAM, 8, tceptor_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0100, 0x01ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("dac", voice_w)			// voice data
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("dac", voice_w)			// voice data
 	AM_RANGE(0x5000, 0x5000) AM_WRITEONLY			// voice ctrl??
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( m68k_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( m68k_map, AS_PROGRAM, 16, tceptor_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM			// M68K ERROR 1
 	AM_RANGE(0x100000, 0x10ffff) AM_ROM			// not sure
 	AM_RANGE(0x200000, 0x203fff) AM_RAM			// M68K ERROR 0
 	AM_RANGE(0x300000, 0x300001) AM_WRITEONLY
-	AM_RANGE(0x400000, 0x4001ff) AM_WRITEONLY AM_BASE_MEMBER(tceptor_state, m_sprite_ram)
-	AM_RANGE(0x500000, 0x51ffff) AM_WRITE(namco_road16_w)
+	AM_RANGE(0x400000, 0x4001ff) AM_WRITEONLY AM_SHARE("sprite_ram")
+	AM_RANGE(0x500000, 0x51ffff) AM_WRITE_LEGACY(namco_road16_w)
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(m68k_irq_enable_w)	// not sure
-	AM_RANGE(0x700000, 0x703fff) AM_READWRITE(m68k_shared_word_r, m68k_shared_word_w) AM_SHARE("share1")
+	AM_RANGE(0x700000, 0x703fff) AM_READWRITE(m68k_shared_word_r, m68k_shared_word_w) AM_SHARE("m68k_shared_ram")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6801_io_r, m6801_io_w)
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, tceptor_state )
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0080, 0x00ff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE("namco", namcos1_cus30_r, namcos1_cus30_w)
+	AM_RANGE(0x1000, 0x13ff) AM_DEVREADWRITE_LEGACY("namco", namcos1_cus30_r, namcos1_cus30_w)
 	AM_RANGE(0x1400, 0x154d) AM_RAM
 	AM_RANGE(0x17c0, 0x17ff) AM_RAM
 	AM_RANGE(0x2000, 0x20ff) AM_RAM AM_SHARE("share3")
@@ -236,7 +229,7 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, tceptor_state )
 	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_READ(readFF) AM_WRITENOP
 	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_READ(readFF) AM_WRITENOP
 ADDRESS_MAP_END

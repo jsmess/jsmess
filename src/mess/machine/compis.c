@@ -107,7 +107,7 @@ static void compis_keyb_update(running_machine &machine)
 
 	for (irow = 0; irow < 6; irow++)
 	{
-		data = input_port_read(machine, rownames[irow]);
+		data = machine.root_device().ioport(rownames[irow])->read();
 		if (data != 0)
 		{
 			ibit = 1;
@@ -171,7 +171,7 @@ static void compis_fdc_reset(running_machine &machine)
 void compis_state::compis_fdc_tc(int state)
 {
 	/* Terminal count if iSBX-218A has DMA enabled */
-	if (input_port_read(machine(), "DSW1"))
+	if (ioport("DSW1")->read())
 	{
 		upd765_tc_w(m_fdc, state);
 	}
@@ -180,7 +180,7 @@ void compis_state::compis_fdc_tc(int state)
 WRITE_LINE_MEMBER( compis_state::compis_fdc_int )
 {
 	/* No interrupt requests if iSBX-218A has DMA enabled */
-	if (!input_port_read(machine(), "DSW1") && state)
+	if (!ioport("DSW1")->read() && state)
 	{
 		if (m_8259m)
 		{
@@ -193,7 +193,7 @@ WRITE_LINE_MEMBER( compis_state::compis_fdc_int )
 WRITE_LINE_MEMBER( compis_state::compis_fdc_dma_drq )
 {
 	/* DMA requst if iSBX-218A has DMA enabled */
-	if (input_port_read(machine(), "DSW1") && state)
+	if (ioport("DSW1")->read() && state)
 	{
 		//compis_dma_drq(state, read);
 	}
@@ -213,7 +213,7 @@ READ16_MEMBER( compis_state::compis_fdc_dack_r )
 	UINT16 data;
 	data = 0xffff;
 	/* DMA acknowledge if iSBX-218A has DMA enabled */
-	if (input_port_read(machine(), "DSW1"))
+	if (ioport("DSW1")->read())
 	{
 		data = upd765_dack_r(m_fdc, 0);
 	}
@@ -271,7 +271,7 @@ READ8_MEMBER( compis_state::compis_ppi_port_b_r )
 	UINT8 data;
 
 	/* DIP switch - Test mode */
-	data = input_port_read(machine(), "DSW0");
+	data = ioport("DSW0")->read();
 
 	/* Centronics busy */
 	data |= m_centronics->busy_r() << 5;

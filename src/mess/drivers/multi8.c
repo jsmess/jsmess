@@ -11,7 +11,6 @@
     - keyboard
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -63,6 +62,8 @@ public:
 	UINT8 m_pen_clut[8];
 	UINT8 m_bw_mode;
 	UINT16 m_knj_addr;
+	DECLARE_READ8_MEMBER(ay8912_0_r);
+	DECLARE_READ8_MEMBER(ay8912_1_r);
 };
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
@@ -93,7 +94,7 @@ static VIDEO_START( multi8 )
 
 	state->m_vram_bank = 8;
 	state->m_bw_mode = 0;
-	state->m_p_chargen = machine.region("chargen")->base();
+	state->m_p_chargen = state->memregion("chargen")->base();
 }
 
 static void multi8_draw_pixel(running_machine &machine, bitmap_ind16 &bitmap,int y,int x,UINT8 pen,UINT8 width)
@@ -322,8 +323,8 @@ WRITE8_MEMBER( multi8_state::pal_w )
 	}
 }
 
-static READ8_HANDLER( ay8912_0_r ) { return ay8910_r(space->machine().device("aysnd"),0); }
-static READ8_HANDLER( ay8912_1_r ) { return ay8910_r(space->machine().device("aysnd"),1); }
+READ8_MEMBER(multi8_state::ay8912_0_r){ return ay8910_r(machine().device("aysnd"),0); }
+READ8_MEMBER(multi8_state::ay8912_1_r){ return ay8910_r(machine().device("aysnd"),1); }
 
 READ8_MEMBER( multi8_state::multi8_kanji_r )
 {
@@ -348,8 +349,8 @@ static ADDRESS_MAP_START(multi8_io, AS_IO, 8, multi8_state)
 	AM_RANGE(0x00, 0x00) AM_READ(key_input_r) AM_WRITENOP//keyboard
 	AM_RANGE(0x01, 0x01) AM_READ(key_status_r) AM_WRITENOP//keyboard
 	AM_RANGE(0x18, 0x19) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x18, 0x18) AM_READ_LEGACY(ay8912_0_r)
-	AM_RANGE(0x1a, 0x1a) AM_READ_LEGACY(ay8912_1_r)
+	AM_RANGE(0x18, 0x18) AM_READ(ay8912_0_r)
+	AM_RANGE(0x1a, 0x1a) AM_READ(ay8912_1_r)
 	AM_RANGE(0x1c, 0x1d) AM_WRITE(multi8_6845_w)
 //  AM_RANGE(0x20, 0x21) //sio, cmt
 //  AM_RANGE(0x24, 0x27) //pit
@@ -364,7 +365,7 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( multi8 )
 	PORT_START("VBLANK")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM) PORT_VBLANK("screen")
 
 	PORT_START("key1") //0x00-0x1f
 	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_UNUSED) //0x00 null
@@ -483,7 +484,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 	multi8_state *state = timer.machine().driver_data<multi8_state>();
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
-	UINT8 keymod = input_port_read(timer.machine(),"key_modifiers") & 0x1f;
+	UINT8 keymod = timer.machine().root_device().ioport("key_modifiers")->read() & 0x1f;
 	scancode = 0;
 
 	state->m_shift_press_flag = ((keymod & 0x02) >> 1);
@@ -492,7 +493,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 	{
 		for(i=0;i<32;i++)
 		{
-			if((input_port_read(timer.machine(),portnames[port_i])>>i) & 1)
+			if((timer.machine().root_device().ioport(portnames[port_i])->read()>>i) & 1)
 			{
 				//key_flag = 1;
 				if(!state->m_shift_press_flag)  // shift not pressed
@@ -577,7 +578,7 @@ static PALETTE_INIT( multi8 )
 
 READ8_MEMBER( multi8_state::porta_r )
 {
-	int vsync = (input_port_read(machine(), "VBLANK") & 0x1) << 5;
+	int vsync = (ioport("VBLANK")->read() & 0x1) << 5;
 	/*
     -x-- ---- kanji rom is present (0) yes
     --x- ---- vsync
@@ -643,9 +644,9 @@ static const ym2203_interface ym2203_config =
 static MACHINE_START(multi8)
 {
 	multi8_state *state = machine.driver_data<multi8_state>();
-	state->m_p_vram = machine.region("vram")->base();
-	state->m_p_wram = machine.region("wram")->base();
-	state->m_p_kanji = machine.region("kanji")->base();
+	state->m_p_vram = machine.root_device().memregion("vram")->base();
+	state->m_p_wram = machine.root_device().memregion("wram")->base();
+	state->m_p_kanji = state->memregion("kanji")->base();
 }
 
 static MACHINE_RESET(multi8)

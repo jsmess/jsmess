@@ -63,18 +63,16 @@ VIDEO_START( goindol )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( goindol_fg_videoram_w )
+WRITE8_MEMBER(goindol_state::goindol_fg_videoram_w)
 {
-	goindol_state *state = space->machine().driver_data<goindol_state>();
-	state->m_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( goindol_bg_videoram_w )
+WRITE8_MEMBER(goindol_state::goindol_bg_videoram_w)
 {
-	goindol_state *state = space->machine().driver_data<goindol_state>();
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
@@ -90,12 +88,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	goindol_state *state = machine.driver_data<goindol_state>();
 	int offs, sx, sy, tile, palette;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		sx = sprite_ram[offs];
 		sy = 240 - sprite_ram[offs + 1];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 248 - sx;
 			sy = 248 - sy;
@@ -111,14 +109,14 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 						machine.gfx[gfxbank],
 						tile,
 						palette,
-						flip_screen_get(machine),flip_screen_get(machine),
+						state->flip_screen(),state->flip_screen(),
 						sx,sy, 0);
 			drawgfx_transpen(bitmap,cliprect,
 						machine.gfx[gfxbank],
 						tile+1,
 						palette,
-						flip_screen_get(machine),flip_screen_get(machine),
-						sx,sy + (flip_screen_get(machine) ? -8 : 8), 0);
+						state->flip_screen(),state->flip_screen(),
+						sx,sy + (state->flip_screen() ? -8 : 8), 0);
 		}
 	}
 }

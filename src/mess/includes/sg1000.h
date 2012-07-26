@@ -51,6 +51,7 @@ public:
 	DECLARE_READ8_MEMBER( tvdraw_status_r );
 	DECLARE_READ8_MEMBER( tvdraw_data_r );
 	DECLARE_READ8_MEMBER( joysel_r );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 
 	/* keyboard state */
 	UINT8 m_keylatch;

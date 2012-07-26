@@ -14,20 +14,20 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 #include "sound/dac.h"
 #include "includes/ssozumo.h"
 
-static WRITE8_HANDLER( ssozumo_sh_command_w )
+WRITE8_MEMBER(ssozumo_state::ssozumo_sh_command_w)
 {
-	soundlatch_w(space, 0, data);
-	cputag_set_input_line(space->machine(), "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
+	soundlatch_byte_w(space, 0, data);
+	cputag_set_input_line(machine(), "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
 }
 
 
-static ADDRESS_MAP_START( ssozumo_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ssozumo_map, AS_PROGRAM, 8, ssozumo_state )
 	AM_RANGE(0x0000, 0x077f) AM_RAM
-	AM_RANGE(0x0780, 0x07ff) AM_RAM AM_BASE_SIZE_MEMBER(ssozumo_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ssozumo_videoram2_w) AM_BASE_MEMBER(ssozumo_state, m_videoram2)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ssozumo_colorram2_w) AM_BASE_MEMBER(ssozumo_state, m_colorram2)
-	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE(ssozumo_videoram_w) AM_BASE_MEMBER(ssozumo_state, m_videoram)
-	AM_RANGE(0x3200, 0x33ff) AM_RAM_WRITE(ssozumo_colorram_w) AM_BASE_MEMBER(ssozumo_state, m_colorram)
+	AM_RANGE(0x0780, 0x07ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ssozumo_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ssozumo_colorram2_w) AM_SHARE("colorram2")
+	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE(ssozumo_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x3200, 0x33ff) AM_RAM_WRITE(ssozumo_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x3400, 0x35ff) AM_RAM
 	AM_RANGE(0x3600, 0x37ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITE(ssozumo_flipscreen_w)
@@ -35,32 +35,31 @@ static ADDRESS_MAP_START( ssozumo_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4020, 0x4020) AM_READ_PORT("DSW2") AM_WRITE(ssozumo_scroll_w)
 	AM_RANGE(0x4030, 0x4030) AM_READ_PORT("DSW1")
 //  AM_RANGE(0x4030, 0x4030) AM_WRITEONLY
-	AM_RANGE(0x4050, 0x407f) AM_RAM_WRITE(ssozumo_paletteram_w) AM_BASE_MEMBER(ssozumo_state, m_paletteram)
+	AM_RANGE(0x4050, 0x407f) AM_RAM_WRITE(ssozumo_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( sound_nmi_mask_w )
+WRITE8_MEMBER(ssozumo_state::sound_nmi_mask_w)
 {
-	ssozumo_state *state = space->machine().driver_data<ssozumo_state>();
 
-	state->m_sound_nmi_mask = data & 1;
+	m_sound_nmi_mask = data & 1;
 }
 
 /* Same as Tag Team */
-static ADDRESS_MAP_START( ssozumo_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ssozumo_sound_map, AS_PROGRAM, 8, ssozumo_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_data_address_w)
-	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_data_address_w)
-	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE("dac", dac_signed_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
+	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
+	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
 	AM_RANGE(0x2005, 0x2005) AM_WRITE(sound_nmi_mask_w)
-	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_r)
+	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(ssozumo_state::coin_inserted)
 {
-	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( ssozumo )
@@ -71,8 +70,8 @@ static INPUT_PORTS_START( ssozumo )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ssozumo_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, ssozumo_state,coin_inserted, 0)
 
 	PORT_START("P2")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
@@ -130,7 +129,7 @@ static INPUT_PORTS_START( ssozumo )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Controls ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Dual ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 

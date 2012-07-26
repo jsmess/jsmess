@@ -289,11 +289,11 @@
  *
  *************************************/
 
-static INPUT_CHANGED( service_switch )
+INPUT_CHANGED_MEMBER(zaxxon_state::service_switch)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -306,13 +306,11 @@ static INTERRUPT_GEN( vblank_int )
 }
 
 
-static WRITE8_HANDLER( int_enable_w )
+WRITE8_MEMBER(zaxxon_state::int_enable_w)
 {
-	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
-
-	state->m_int_enabled = data & 1;
-	if (!state->m_int_enabled)
-		cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	m_int_enabled = data & 1;
+	if (!m_int_enabled)
+		cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -341,38 +339,36 @@ static MACHINE_START( zaxxon )
  *
  *************************************/
 
-static READ8_HANDLER( razmataz_counter_r )
+READ8_MEMBER(zaxxon_state::razmataz_counter_r)
 {
-	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
 
 	/* this behavior is really unknown; however, the code is using this */
 	/* counter as a sort of timeout when talking to the sound board */
 	/* it needs to be increasing at a reasonable rate but not too fast */
 	/* or else the sound will mess up */
-	return state->m_razmataz_counter++ >> 8;
+	return m_razmataz_counter++ >> 8;
 }
 
 
-static CUSTOM_INPUT( razmataz_dial_r )
+CUSTOM_INPUT_MEMBER(zaxxon_state::razmataz_dial_r)
 {
-	zaxxon_state *state = field.machine().driver_data<zaxxon_state>();
 	static const char *const dialname[2] = { "DIAL0", "DIAL1" };
 	int num = (FPTR)param;
 	int delta, res;
 
-	delta = input_port_read(field.machine(), dialname[num]);
+	delta = ioport(dialname[num])->read();
 
 	if (delta < 0x80)
 	{
 		// right
-		state->m_razmataz_dial_pos[num] -= delta;
-		res = (state->m_razmataz_dial_pos[num] << 1) | 1;
+		m_razmataz_dial_pos[num] -= delta;
+		res = (m_razmataz_dial_pos[num] << 1) | 1;
 	}
 	else
 	{
 		// left
-		state->m_razmataz_dial_pos[num] += delta;
-		res = (state->m_razmataz_dial_pos[num] << 1);
+		m_razmataz_dial_pos[num] += delta;
+		res = (m_razmataz_dial_pos[num] << 1);
 	}
 
 	return res;
@@ -386,40 +382,36 @@ static CUSTOM_INPUT( razmataz_dial_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( zaxxon_coin_counter_w )
+WRITE8_MEMBER(zaxxon_state::zaxxon_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset, data & 0x01);
+	coin_counter_w(machine(), offset, data & 0x01);
 }
 
 
 // There is no external coin lockout circuitry; instead, the pcb simply latches
 // the coin input, which then needs to be explicitly cleared by the game.
-static WRITE8_HANDLER( zaxxon_coin_enable_w )
+WRITE8_MEMBER(zaxxon_state::zaxxon_coin_enable_w)
 {
-	zaxxon_state *state = space->machine().driver_data<zaxxon_state>();
 
-	state->m_coin_enable[offset] = data & 1;
-	if (!state->m_coin_enable[offset])
-		state->m_coin_status[offset] = 0;
+	m_coin_enable[offset] = data & 1;
+	if (!m_coin_enable[offset])
+		m_coin_status[offset] = 0;
 }
 
 
-static INPUT_CHANGED( zaxxon_coin_inserted )
+INPUT_CHANGED_MEMBER(zaxxon_state::zaxxon_coin_inserted)
 {
 	if (newval)
 	{
-		zaxxon_state *state = field.machine().driver_data<zaxxon_state>();
-
-		state->m_coin_status[(int)(FPTR)param] = state->m_coin_enable[(int)(FPTR)param];
+		m_coin_status[(int)(FPTR)param] = m_coin_enable[(int)(FPTR)param];
 	}
 }
 
 
-static CUSTOM_INPUT( zaxxon_coin_r )
+CUSTOM_INPUT_MEMBER(zaxxon_state::zaxxon_coin_r)
 {
-	zaxxon_state *state = field.machine().driver_data<zaxxon_state>();
 
-	return state->m_coin_status[(int)(FPTR)param];
+	return m_coin_status[(int)(FPTR)param];
 }
 
 
@@ -431,11 +423,11 @@ static CUSTOM_INPUT( zaxxon_coin_r )
  *************************************/
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( zaxxon_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( zaxxon_map, AS_PROGRAM, 8, zaxxon_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM_WRITE(zaxxon_videoram_w) AM_BASE_MEMBER(zaxxon_state,m_videoram)
-	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x1f00) AM_RAM AM_BASE_MEMBER(zaxxon_state,m_spriteram)
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x1c00) AM_RAM_WRITE(zaxxon_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x1f00) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x18fc) AM_READ_PORT("SW00")
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x18fc) AM_READ_PORT("SW01")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x18fc) AM_READ_PORT("DSW02")
@@ -444,7 +436,7 @@ static ADDRESS_MAP_START( zaxxon_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc002) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_enable_w)
 	AM_RANGE(0xc003, 0xc004) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_coin_counter_w)
 	AM_RANGE(0xc006, 0xc006) AM_MIRROR(0x18f8) AM_WRITE(zaxxon_flipscreen_w)
-	AM_RANGE(0xe03c, 0xe03f) AM_MIRROR(0x1f00) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xe03c, 0xe03f) AM_MIRROR(0x1f00) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe0f0, 0xe0f0) AM_MIRROR(0x1f00) AM_WRITE(int_enable_w)
 	AM_RANGE(0xe0f1, 0xe0f1) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_fg_color_w)
 	AM_RANGE(0xe0f8, 0xe0f9) AM_MIRROR(0x1f00) AM_WRITE(zaxxon_bg_position_w)
@@ -454,11 +446,11 @@ ADDRESS_MAP_END
 
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( congo_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( congo_map, AS_PROGRAM, 8, zaxxon_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x1800) AM_RAM_WRITE(zaxxon_videoram_w) AM_BASE_MEMBER(zaxxon_state,m_videoram)
-	AM_RANGE(0xa400, 0xa7ff) AM_MIRROR(0x1800) AM_RAM_WRITE(congo_colorram_w) AM_BASE_MEMBER(zaxxon_state,m_colorram)
+	AM_RANGE(0xa000, 0xa3ff) AM_MIRROR(0x1800) AM_RAM_WRITE(zaxxon_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xa400, 0xa7ff) AM_MIRROR(0x1800) AM_RAM_WRITE(congo_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fc4) AM_READ_PORT("SW00")
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x1fc4) AM_READ_PORT("SW01")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x1fc4) AM_READ_PORT("DSW02")
@@ -475,17 +467,17 @@ static ADDRESS_MAP_START( congo_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc027, 0xc027) AM_MIRROR(0x1fc0) AM_WRITE(congo_color_bank_w)
 	AM_RANGE(0xc028, 0xc029) AM_MIRROR(0x1fc4) AM_WRITE(zaxxon_bg_position_w)
 	AM_RANGE(0xc030, 0xc033) AM_MIRROR(0x1fc4) AM_WRITE(congo_sprite_custom_w)
-	AM_RANGE(0xc038, 0xc03f) AM_MIRROR(0x1fc0) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xc038, 0xc03f) AM_MIRROR(0x1fc0) AM_WRITE(soundlatch_byte_w)
 ADDRESS_MAP_END
 
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( congo_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( congo_sound_map, AS_PROGRAM, 8, zaxxon_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_DEVWRITE("sn2", sn76496_w)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1fff) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
 ADDRESS_MAP_END
 
 
@@ -518,17 +510,17 @@ static INPUT_PORTS_START( zaxxon )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(zaxxon_coin_r, (void *)0)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(zaxxon_coin_r, (void *)1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(zaxxon_coin_r, (void *)2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_r, (void *)0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_r, (void *)1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_r, (void *)2)
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )    PORT_CHANGED(zaxxon_coin_inserted, (void *)0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )    PORT_CHANGED(zaxxon_coin_inserted, (void *)1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED(zaxxon_coin_inserted, (void *)2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )    PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, (void *)0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )    PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, (void *)1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, (void *)2)
 
 	PORT_START("SERVICESW")
-	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_CHANGED(service_switch, 0)
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,service_switch, 0)
 
 	PORT_START("DSW02")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:!1,!2")
@@ -679,7 +671,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( razmataz )
 	PORT_START("SW00")
-	PORT_BIT( 0xff, 0x00, IPT_SPECIAL) PORT_CUSTOM(razmataz_dial_r, (void *)0)
+	PORT_BIT( 0xff, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,razmataz_dial_r, (void *)0)
 
 	PORT_START("DIAL0")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_RESET PORT_PLAYER(1)
@@ -694,7 +686,7 @@ static INPUT_PORTS_START( razmataz )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("SW08")
-	PORT_BIT( 0xff, 0x00, IPT_SPECIAL) PORT_CUSTOM(razmataz_dial_r, (void *)1)
+	PORT_BIT( 0xff, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,razmataz_dial_r, (void *)1)
 
 	PORT_START("DIAL1")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_RESET PORT_PLAYER(2)
@@ -707,17 +699,17 @@ static INPUT_PORTS_START( razmataz )
 
 	PORT_START("SW100")
 	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(zaxxon_coin_r, (void *)0)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(zaxxon_coin_r, (void *)1)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(zaxxon_coin_r, (void *)2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_r, (void *)0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_r, (void *)1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_r, (void *)2)
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )    PORT_CHANGED(zaxxon_coin_inserted, (void *)0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )    PORT_CHANGED(zaxxon_coin_inserted, (void *)1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED(zaxxon_coin_inserted, (void *)2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )    PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, (void *)0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )    PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, (void *)1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,zaxxon_coin_inserted, (void *)2)
 
 	PORT_START("SERVICESW")
-	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_CHANGED(service_switch, 0)
+	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH ) PORT_CHANGED_MEMBER(DEVICE_SELF, zaxxon_state,service_switch, 0)
 
 	PORT_START("DSW02")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Bonus_Life ) )
@@ -772,7 +764,7 @@ static INPUT_PORTS_START( ixion )
 	PORT_INCLUDE(zaxxon)
 
 	PORT_MODIFY("SW00")
-	PORT_BIT( 0xff, 0x00, IPT_SPECIAL) PORT_CUSTOM(razmataz_dial_r, (void *)0)
+	PORT_BIT( 0xff, 0x00, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, zaxxon_state,razmataz_dial_r, (void *)0)
 
 	PORT_START("DIAL0")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_RESET
@@ -881,7 +873,7 @@ static const ppi8255_interface zaxxon_ppi_intf =
 
 static const ppi8255_interface congo_ppi_intf =
 {
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -1313,75 +1305,126 @@ ROM_START( ixion )
 	ROM_LOAD( "1941a.u72",       0x0100, 0x0100, CRC(a5d0d97e) SHA1(2677508b44f9b7a6c6ee56e49a7b88073e80debe) )
 ROM_END
 
+/*
+Extra notes about Congo Bongo:
 
-ROM_START( congo )
-	ROM_REGION( 0x8000, "maincpu", 0 )
-	ROM_LOAD( "congo1.u35",   0x0000, 0x2000, CRC(09355b5b) SHA1(0085ac7eb0035a88cb54cdd3dd6b2643141d39db) )
-	ROM_LOAD( "congo2.u34",   0x2000, 0x2000, CRC(1c5e30ae) SHA1(7cc5420e0e7a2793a671b938c121ae4079f5b1b8) )
-	ROM_LOAD( "congo3.u33",   0x4000, 0x2000, CRC(5ee1132c) SHA1(26294cd69ee43dfd29fc3642e8c04552dcdbaa49) )
-	ROM_LOAD( "congo4.u32",   0x6000, 0x2000, CRC(5332b9bf) SHA1(8440cc6f92918b3b467a5a0b86c9defeb0a7db0e) )
+There is known to be a version of Congo Bongo with official Sega "EPR" numbers. Sega game ID number for this set is 834-5197
 
-	ROM_REGION( 0x2000, "audiocpu", 0 )
-	ROM_LOAD( "congo17.u11",  0x0000, 0x2000, CRC(5024e673) SHA1(6f846146a4e29bcdfd5bd1bc5f1211d344cd5afa) )
+3 board stack with 834-5181 stickered as 834-5207 with standard 834-5167 video board & 834-5168 sound board.
+EPR-5309A.rom1 @ U35
+EPR-5310A.rom2 @ U34
+EPR-5311A.rom3 @ U33
+EPR-5312A.rom4 @ U32
 
-	ROM_REGION( 0x1000, "gfx_tx", 0 )
-	ROM_LOAD( "congo5.u76",   0x00000, 0x1000, CRC(7bf6ba2b) SHA1(3a2bd21b0e0e55cbd737c7b075492b5e8f944150) )
+Uses the MR018 BPROM @ U68
 
-	ROM_REGION( 0x6000, "gfx_bg", 0 )
-	ROM_LOAD( "congo8.u93",   0x00000, 0x2000, CRC(db99a619) SHA1(499029197d26f9aea3ac15d66b5738ce7dea1f6c) )
-	ROM_LOAD( "congo9.u94",   0x02000, 0x2000, CRC(93e2309e) SHA1(bd8a74332cac0cf85f319c1f35d04a4781c9d655) )
-	ROM_LOAD( "congo10.u95",  0x04000, 0x2000, CRC(f27a9407) SHA1(d41c90c89ae28c92bf0c57927357d9b68ed7e0ef) )
+Oddly, it seems most Congo Bongo board sets (2 & 3 board stacks) have hand written labels for the program roms. At least
+all the PCB photos I found via Google as well as those included in a recent redump of both board set types.  And YES it's
+actually "CONGO BONGO REV C ROM 2A" this is verified in several PCB photos.
 
-	ROM_REGION( 0xc000, "gfx_spr", 0 )
-	ROM_LOAD( "congo12.u78",  0x00000, 0x2000, CRC(15e3377a) SHA1(04a7fbfd58924359fae0ba76ed152f325f07beae) )
-	ROM_LOAD( "congo13.u79",  0x02000, 0x2000, CRC(1d1321c8) SHA1(d12e156a24db105c5f941b7ef79f32181b616710) )
-	ROM_LOAD( "congo11.u77",  0x04000, 0x2000, CRC(73e2709f) SHA1(14919facf08f6983c3a9baad031239a1b57c8202) )
-	ROM_LOAD( "congo14.u104", 0x06000, 0x2000, CRC(bf9169fe) SHA1(303d68e38e9a47464f14dc5be6bff1be01b88bb6) )
-	ROM_LOAD( "congo16.u106", 0x08000, 0x2000, CRC(cb6d5775) SHA1(b1f8ead6e6f8ad995baaeb7f8554d41ed2296fff) )
-	ROM_LOAD( "congo15.u105", 0x0a000, 0x2000, CRC(7b15a7a4) SHA1(b1c05e60a1442e4dd56d197be8b768bcbf45e2d9) )
+*/
 
-	ROM_REGION( 0x4000, "tilemap_dat", 0 )
-	ROM_LOAD( "congo6.u57",   0x0000, 0x2000, CRC(d637f02b) SHA1(29127149924c5bfdeb9456d7df2a5a5d14098794) )
-	ROM_LOAD( "congo7.u58",   0x2000, 0x2000, CRC(80927943) SHA1(4683520c241d209c6cabeaead9b363f046c30f70) )
+ROM_START( congo ) /* 2 board stack, Sega game ID number for this set is 834-5180 */
+	ROM_REGION( 0x8000, "maincpu", 0 ) /* Located on 834-5181 PCB,  AKA Tip Top-CONTR II */
+	ROM_LOAD( "congo_rev_c_rom1.u21",   0x0000, 0x2000, CRC(09355b5b) SHA1(0085ac7eb0035a88cb54cdd3dd6b2643141d39db) ) /* SUM16 written on label 044A */
+	ROM_LOAD( "congo_rev_c_rom2a.u22",  0x2000, 0x2000, CRC(1c5e30ae) SHA1(7cc5420e0e7a2793a671b938c121ae4079f5b1b8) ) /* SUM16 written on label DD4D */
+	ROM_LOAD( "congo_rev_c_rom3.u23",   0x4000, 0x2000, CRC(5ee1132c) SHA1(26294cd69ee43dfd29fc3642e8c04552dcdbaa49) ) /* SUM16 written on label C932 */
+	ROM_LOAD( "congo_rev_c_rom4.u24",   0x6000, 0x2000, CRC(5332b9bf) SHA1(8440cc6f92918b3b467a5a0b86c9defeb0a7db0e) ) /* SUM16 written on label 5128 */
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "congo.u68",    0x0000, 0x100, CRC(b788d8ae) SHA1(9765180f3087140c75e5953409df841787558160) )
+	ROM_REGION( 0x2000, "audiocpu", 0 ) /* Located on 834-5181 PCB,  AKA Tip Top-CONTR II */
+	ROM_LOAD( "tip_top_rom_17.u19",  0x0000, 0x2000, CRC(5024e673) SHA1(6f846146a4e29bcdfd5bd1bc5f1211d344cd5afa) )
+
+	ROM_REGION( 0x1000, "gfx_tx", 0 ) /* Located on 834-5181 PCB,  AKA Tip Top-CONTR II */
+	ROM_LOAD( "tip_top_rom_5.u76",   0x00000, 0x1000, CRC(7bf6ba2b) SHA1(3a2bd21b0e0e55cbd737c7b075492b5e8f944150) )
+
+	ROM_REGION( 0x6000, "gfx_bg", 0 ) /* Located on 834-5167 PCB, AKA Tip Tip-VIDEO */
+	ROM_LOAD( "tip_top_rom_8.u93",   0x00000, 0x2000, CRC(db99a619) SHA1(499029197d26f9aea3ac15d66b5738ce7dea1f6c) )
+	ROM_LOAD( "tip_top_rom_9.u94",   0x02000, 0x2000, CRC(93e2309e) SHA1(bd8a74332cac0cf85f319c1f35d04a4781c9d655) )
+	ROM_LOAD( "tip_top_rom_10.u95",  0x04000, 0x2000, CRC(f27a9407) SHA1(d41c90c89ae28c92bf0c57927357d9b68ed7e0ef) )
+
+	ROM_REGION( 0xc000, "gfx_spr", 0 ) /* Located on 834-5167 PCB, AKA Tip Tip-VIDEO */
+	ROM_LOAD( "tip_top_rom_12.u78",  0x00000, 0x2000, CRC(15e3377a) SHA1(04a7fbfd58924359fae0ba76ed152f325f07beae) )
+	ROM_LOAD( "tip_top_rom_13.u79",  0x02000, 0x2000, CRC(1d1321c8) SHA1(d12e156a24db105c5f941b7ef79f32181b616710) )
+	ROM_LOAD( "tip_top_rom_11.u77",  0x04000, 0x2000, CRC(73e2709f) SHA1(14919facf08f6983c3a9baad031239a1b57c8202) )
+	ROM_LOAD( "tip_top_rom_14.u104", 0x06000, 0x2000, CRC(bf9169fe) SHA1(303d68e38e9a47464f14dc5be6bff1be01b88bb6) )
+	ROM_LOAD( "tip_top_rom_16.u106", 0x08000, 0x2000, CRC(cb6d5775) SHA1(b1f8ead6e6f8ad995baaeb7f8554d41ed2296fff) )
+	ROM_LOAD( "tip_top_rom_15.u105", 0x0a000, 0x2000, CRC(7b15a7a4) SHA1(b1c05e60a1442e4dd56d197be8b768bcbf45e2d9) )
+
+	ROM_REGION( 0x4000, "tilemap_dat", 0 ) /* Located on 834-5167 PCB, AKA Tip Tip-VIDEO */
+	ROM_LOAD( "tip_top_rom_6.u57",   0x0000, 0x2000, CRC(d637f02b) SHA1(29127149924c5bfdeb9456d7df2a5a5d14098794) )
+	ROM_LOAD( "tip_top_rom_7.u58",   0x2000, 0x2000, CRC(80927943) SHA1(4683520c241d209c6cabeaead9b363f046c30f70) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* Located on 834-5181 PCB,  AKA Tip Top-CONTR II */
+	ROM_LOAD( "mr019.u87",    0x0000, 0x100, CRC(b788d8ae) SHA1(9765180f3087140c75e5953409df841787558160) ) /* BPROM type is a TBP28L22 per the schematics */
 	ROM_RELOAD(               0x0100, 0x100 )
 ROM_END
 
-ROM_START( tiptop )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+ROM_START( congoa ) /* 3 board stack, Sega game ID number for this set is 834-5156 */
+	ROM_REGION( 0x8000, "maincpu", 0 ) /* Located on 834-5166 PCB  AKA Tip Top-CONTR */
+	ROM_LOAD( "congo_rev_c_rom1.u35",   0x0000, 0x2000, CRC(09355b5b) SHA1(0085ac7eb0035a88cb54cdd3dd6b2643141d39db) ) /* SUM16 written on label 044A */
+	ROM_LOAD( "congo_rev_c_rom2a.u34",  0x2000, 0x2000, CRC(1c5e30ae) SHA1(7cc5420e0e7a2793a671b938c121ae4079f5b1b8) ) /* SUM16 written on label DD4D */
+	ROM_LOAD( "congo_rev_c_rom3.u33",   0x4000, 0x2000, CRC(5ee1132c) SHA1(26294cd69ee43dfd29fc3642e8c04552dcdbaa49) ) /* SUM16 written on label C932 */
+	ROM_LOAD( "congo_rev_c_rom4.u32",   0x6000, 0x2000, CRC(5332b9bf) SHA1(8440cc6f92918b3b467a5a0b86c9defeb0a7db0e) ) /* SUM16 written on label 5128 */
+
+	ROM_REGION( 0x2000, "audiocpu", 0 ) /* Located on 834-5168 PCB  AKA Tip Top-SOUND */
+	ROM_LOAD( "tip_top_rom_17.u11",  0x0000, 0x2000, CRC(5024e673) SHA1(6f846146a4e29bcdfd5bd1bc5f1211d344cd5afa) )
+
+	ROM_REGION( 0x1000, "gfx_tx", 0 ) /* Located on 834-5166 PCB  AKA Tip Top-CONTR */
+	ROM_LOAD( "tip_top_rom_5.u76",   0x00000, 0x1000, CRC(7bf6ba2b) SHA1(3a2bd21b0e0e55cbd737c7b075492b5e8f944150) )
+
+	ROM_REGION( 0x6000, "gfx_bg", 0 ) /* Located on 834-5167 PCB, AKA Tip Tip-VIDEO */
+	ROM_LOAD( "tip_top_rom_8.u93",   0x00000, 0x2000, CRC(db99a619) SHA1(499029197d26f9aea3ac15d66b5738ce7dea1f6c) )
+	ROM_LOAD( "tip_top_rom_9.u94",   0x02000, 0x2000, CRC(93e2309e) SHA1(bd8a74332cac0cf85f319c1f35d04a4781c9d655) )
+	ROM_LOAD( "tip_top_rom_10.u95",  0x04000, 0x2000, CRC(f27a9407) SHA1(d41c90c89ae28c92bf0c57927357d9b68ed7e0ef) )
+
+	ROM_REGION( 0xc000, "gfx_spr", 0 ) /* Located on 834-5167 PCB, AKA Tip Tip-VIDEO */
+	ROM_LOAD( "tip_top_rom_12.u78",  0x00000, 0x2000, CRC(15e3377a) SHA1(04a7fbfd58924359fae0ba76ed152f325f07beae) )
+	ROM_LOAD( "tip_top_rom_13.u79",  0x02000, 0x2000, CRC(1d1321c8) SHA1(d12e156a24db105c5f941b7ef79f32181b616710) )
+	ROM_LOAD( "tip_top_rom_11.u77",  0x04000, 0x2000, CRC(73e2709f) SHA1(14919facf08f6983c3a9baad031239a1b57c8202) )
+	ROM_LOAD( "tip_top_rom_14.u104", 0x06000, 0x2000, CRC(bf9169fe) SHA1(303d68e38e9a47464f14dc5be6bff1be01b88bb6) )
+	ROM_LOAD( "tip_top_rom_16.u106", 0x08000, 0x2000, CRC(cb6d5775) SHA1(b1f8ead6e6f8ad995baaeb7f8554d41ed2296fff) )
+	ROM_LOAD( "tip_top_rom_15.u105", 0x0a000, 0x2000, CRC(7b15a7a4) SHA1(b1c05e60a1442e4dd56d197be8b768bcbf45e2d9) )
+
+	ROM_REGION( 0x4000, "tilemap_dat", 0 ) /* Located on 834-5167 PCB, Tip Tip-VIDEO */
+	ROM_LOAD( "tip_top_rom_6.u57",   0x0000, 0x2000, CRC(d637f02b) SHA1(29127149924c5bfdeb9456d7df2a5a5d14098794) )
+	ROM_LOAD( "tip_top_rom_7.u58",   0x2000, 0x2000, CRC(80927943) SHA1(4683520c241d209c6cabeaead9b363f046c30f70) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* Located on 834-5166 PCB  AKA Tip Top-CONTR */
+	ROM_LOAD( "mr018.u68",    0x0000, 0x200, CRC(56b9f1ba) SHA1(32ae743087f7c2dfba6818df8e9d665d8d9a3ee7) ) /* dumped as TBP28S42, first 256 bytes match MR019 then 0xFF filled */
+ROM_END
+
+ROM_START( tiptop ) /* 3 board stack */
+	ROM_REGION( 0x8000, "maincpu", 0 ) /* Located on 834-5166 PCB  AKA Tip Top-CONTR */
 	ROM_LOAD( "tiptop1.u35",  0x0000, 0x2000, CRC(e19dc77b) SHA1(d3782dd55701e0f5cd426ad2771c1bd0264c366a) )
 	ROM_LOAD( "tiptop2.u34",  0x2000, 0x2000, CRC(3fcd3b6e) SHA1(2898807ee36fca7fbc06616c9a070604beb782b9) )
 	ROM_LOAD( "tiptop3.u33",  0x4000, 0x2000, CRC(1c94250b) SHA1(cb70a91d07b0a9c61a093f1b5d37f2e69d1345c1) )
 	ROM_LOAD( "tiptop4.u32",  0x6000, 0x2000, CRC(577b501b) SHA1(5cad98a60a5241ba9467aa03fcd94c7490e6dbbb) )
 
-	ROM_REGION( 0x2000, "audiocpu", 0 )
-	ROM_LOAD( "congo17.u11",  0x0000, 0x2000, CRC(5024e673) SHA1(6f846146a4e29bcdfd5bd1bc5f1211d344cd5afa) )
+	ROM_REGION( 0x2000, "audiocpu", 0 ) /* Located on 834-5168 PCB  AKA Tip Top-SOUND */
+	ROM_LOAD( "tip_top_rom_17.u11",  0x0000, 0x2000, CRC(5024e673) SHA1(6f846146a4e29bcdfd5bd1bc5f1211d344cd5afa) )
 
-	ROM_REGION( 0x1000, "gfx_tx", 0 )
-	ROM_LOAD( "congo5.u76",   0x00000, 0x1000, CRC(7bf6ba2b) SHA1(3a2bd21b0e0e55cbd737c7b075492b5e8f944150) )
+	ROM_REGION( 0x1000, "gfx_tx", 0 ) /* Located on 834-5166 PCB  AKA Tip Top-CONTR */
+	ROM_LOAD( "tip_top_rom_5.u76",   0x00000, 0x1000, CRC(7bf6ba2b) SHA1(3a2bd21b0e0e55cbd737c7b075492b5e8f944150) )
 
-	ROM_REGION( 0x6000, "gfx_bg", 0 )
-	ROM_LOAD( "congo8.u93",   0x00000, 0x2000, CRC(db99a619) SHA1(499029197d26f9aea3ac15d66b5738ce7dea1f6c) )
-	ROM_LOAD( "congo9.u94",   0x02000, 0x2000, CRC(93e2309e) SHA1(bd8a74332cac0cf85f319c1f35d04a4781c9d655) )
-	ROM_LOAD( "congo10.u95",  0x04000, 0x2000, CRC(f27a9407) SHA1(d41c90c89ae28c92bf0c57927357d9b68ed7e0ef) )
+	ROM_REGION( 0x6000, "gfx_bg", 0 ) /* Located on 834-5167 PCB, AKA Tip Tip-VIDEO */
+	ROM_LOAD( "tip_top_rom_8.u93",   0x00000, 0x2000, CRC(db99a619) SHA1(499029197d26f9aea3ac15d66b5738ce7dea1f6c) )
+	ROM_LOAD( "tip_top_rom_9.u94",   0x02000, 0x2000, CRC(93e2309e) SHA1(bd8a74332cac0cf85f319c1f35d04a4781c9d655) )
+	ROM_LOAD( "tip_top_rom_10.u95",  0x04000, 0x2000, CRC(f27a9407) SHA1(d41c90c89ae28c92bf0c57927357d9b68ed7e0ef) )
 
-	ROM_REGION( 0xc000, "gfx_spr", 0 )
-	ROM_LOAD( "congo12.u78",  0x00000, 0x2000, CRC(15e3377a) SHA1(04a7fbfd58924359fae0ba76ed152f325f07beae) )
-	ROM_LOAD( "congo13.u79",  0x02000, 0x2000, CRC(1d1321c8) SHA1(d12e156a24db105c5f941b7ef79f32181b616710) )
-	ROM_LOAD( "congo11.u77",  0x04000, 0x2000, CRC(73e2709f) SHA1(14919facf08f6983c3a9baad031239a1b57c8202) )
-	ROM_LOAD( "congo14.u104", 0x06000, 0x2000, CRC(bf9169fe) SHA1(303d68e38e9a47464f14dc5be6bff1be01b88bb6) )
-	ROM_LOAD( "congo16.u106", 0x08000, 0x2000, CRC(cb6d5775) SHA1(b1f8ead6e6f8ad995baaeb7f8554d41ed2296fff) )
-	ROM_LOAD( "congo15.u105", 0x0a000, 0x2000, CRC(7b15a7a4) SHA1(b1c05e60a1442e4dd56d197be8b768bcbf45e2d9) )
+	ROM_REGION( 0xc000, "gfx_spr", 0 ) /* Located on 834-5167 PCB, AKA Tip Tip-VIDEO */
+	ROM_LOAD( "tip_top_rom_12.u78",  0x00000, 0x2000, CRC(15e3377a) SHA1(04a7fbfd58924359fae0ba76ed152f325f07beae) )
+	ROM_LOAD( "tip_top_rom_13.u79",  0x02000, 0x2000, CRC(1d1321c8) SHA1(d12e156a24db105c5f941b7ef79f32181b616710) )
+	ROM_LOAD( "tip_top_rom_11.u77",  0x04000, 0x2000, CRC(73e2709f) SHA1(14919facf08f6983c3a9baad031239a1b57c8202) )
+	ROM_LOAD( "tip_top_rom_14.u104", 0x06000, 0x2000, CRC(bf9169fe) SHA1(303d68e38e9a47464f14dc5be6bff1be01b88bb6) )
+	ROM_LOAD( "tip_top_rom_16.u106", 0x08000, 0x2000, CRC(cb6d5775) SHA1(b1f8ead6e6f8ad995baaeb7f8554d41ed2296fff) )
+	ROM_LOAD( "tip_top_rom_15.u105", 0x0a000, 0x2000, CRC(7b15a7a4) SHA1(b1c05e60a1442e4dd56d197be8b768bcbf45e2d9) )
 
-	ROM_REGION( 0x4000, "tilemap_dat", 0 )
-	ROM_LOAD( "congo6.u57",   0x0000, 0x2000, CRC(d637f02b) SHA1(29127149924c5bfdeb9456d7df2a5a5d14098794) )
-	ROM_LOAD( "congo7.u58",   0x2000, 0x2000, CRC(80927943) SHA1(4683520c241d209c6cabeaead9b363f046c30f70) )
+	ROM_REGION( 0x4000, "tilemap_dat", 0 ) /* Located on 834-5167 PCB, AKA Tip Tip-VIDEO */
+	ROM_LOAD( "tip_top_rom_6.u57",   0x0000, 0x2000, CRC(d637f02b) SHA1(29127149924c5bfdeb9456d7df2a5a5d14098794) )
+	ROM_LOAD( "tip_top_rom_7.u58",   0x2000, 0x2000, CRC(80927943) SHA1(4683520c241d209c6cabeaead9b363f046c30f70) )
 
-	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "congo.u68",    0x0000, 0x100, CRC(b788d8ae) SHA1(9765180f3087140c75e5953409df841787558160) )
-	ROM_RELOAD(               0x0100, 0x100 )
+	ROM_REGION( 0x0200, "proms", 0 ) /* Located on 834-5166 PCB  AKA Tip Top-CONTR */
+	ROM_LOAD( "mr018.u68",    0x0000, 0x200, CRC(56b9f1ba) SHA1(32ae743087f7c2dfba6818df8e9d665d8d9a3ee7) ) /* dumped as TBP28S42, first 256 bytes match MR019 then 0xFF filled */
 ROM_END
 
 
@@ -1438,8 +1481,8 @@ static void zaxxonj_decode(running_machine &machine, const char *cputag)
 
 	int A;
 	address_space *space = machine.device(cputag)->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region(cputag)->base();
-	int size = machine.region(cputag)->bytes();
+	UINT8 *rom = machine.root_device().memregion(cputag)->base();
+	int size = machine.root_device().memregion(cputag)->bytes();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, size);
 
 	space->set_decrypted_region(0x0000, size - 1, decrypt);
@@ -1509,7 +1552,7 @@ static DRIVER_INIT( razmataz )
 	pgmspace->install_read_port(0xc00c, 0xc00c, 0, 0x18f3, "SW0C");
 
 	/* unknown behavior expected here */
-	pgmspace->install_legacy_read_handler(0xc80a, 0xc80a, FUNC(razmataz_counter_r));
+	pgmspace->install_read_handler(0xc80a, 0xc80a, read8_delegate(FUNC(zaxxon_state::razmataz_counter_r),state));
 
 	/* connect the universal sound board */
 	pgmspace->install_legacy_readwrite_handler(*usbsnd, 0xe03c, 0xe03c, 0, 0x1f00, FUNC(sega_usb_status_r), FUNC(sega_usb_data_w));
@@ -1540,11 +1583,11 @@ static DRIVER_INIT( ixion )
  *************************************/
 
 /* these games run on standard Zaxxon hardware */
-GAME( 1982, zaxxon,   0,      zaxxon,   zaxxon,   0,        ROT90,  "Sega",    "Zaxxon (set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, zaxxon,   0,      zaxxon,   zaxxon,   0,        ROT90,  "Sega",    "Zaxxon (set 1)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, zaxxon2,  zaxxon, zaxxon,   zaxxon,   0,        ROT90,  "Sega",    "Zaxxon (set 2)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, zaxxon3,  zaxxon, zaxxon,   zaxxon,   0,        ROT90,  "Sega",    "Zaxxon (set 3)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, zaxxonj,  zaxxon, zaxxon,   zaxxon,   zaxxonj,  ROT90,  "Sega",    "Zaxxon (Japan)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1982, zaxxonb,  zaxxon, zaxxon,   zaxxon,   zaxxonj,  ROT90,  "bootleg", "Jackson",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1982, zaxxonb,  zaxxon, zaxxon,   zaxxon,   zaxxonj,  ROT90,  "bootleg", "Jackson",         GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
 /* standard Zaxxon hardware but extra sound board plugged into 8255 PPI socket and encrypted cpu */
 GAME( 1982, szaxxon,  0,      zaxxon,   szaxxon,  szaxxon,  ROT90,  "Sega",    "Super Zaxxon (315-5013)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
@@ -1559,5 +1602,6 @@ GAME( 1983, ixion,    0,      razmataz, ixion,    ixion,    ROT270, "Sega",    "
 
 /* these games run on a slightly newer Zaxxon hardware with more ROM space and a */
 /* custom sprite DMA chip */
-GAME( 1983, congo,    0,      congo,    congo,    0,        ROT90,  "Sega",    "Congo Bongo", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1983, tiptop,   congo,  congo,    congo,    0,        ROT90,  "Sega",    "Tip Top", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, congo,    0,      congo,    congo,    0,        ROT90,  "Sega",    "Congo Bongo (Rev C, 2 board stack)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, congoa,   congo,  congo,    congo,    0,        ROT90,  "Sega",    "Congo Bongo (Rev C, 3 board stack)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1983, tiptop,   congo,  congo,    congo,    0,        ROT90,  "Sega",    "Tip Top (3 board stack)",     GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

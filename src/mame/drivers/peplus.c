@@ -180,25 +180,34 @@ class peplus_state : public driver_device
 public:
 	peplus_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_cmos_ram(*this, "cmos") { }
+		  m_cmos_ram(*this, "cmos") ,
+		m_program_ram(*this, "prograram"),
+		m_s3000_ram(*this, "s3000_ram"),
+		m_s5000_ram(*this, "s5000_ram"),
+		m_videoram(*this, "videoram"),
+		m_s7000_ram(*this, "s7000_ram"),
+		m_sb000_ram(*this, "sb000_ram"),
+		m_sd000_ram(*this, "sd000_ram"),
+		m_sf000_ram(*this, "sf000_ram"),
+		m_io_port(*this, "io_port"){ }
 
-	UINT8 *m_videoram;
 	required_shared_ptr<UINT8> m_cmos_ram;
+	required_shared_ptr<UINT8> m_program_ram;
+	required_shared_ptr<UINT8> m_s3000_ram;
+	required_shared_ptr<UINT8> m_s5000_ram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_s7000_ram;
+	required_shared_ptr<UINT8> m_sb000_ram;
+	required_shared_ptr<UINT8> m_sd000_ram;
+	required_shared_ptr<UINT8> m_sf000_ram;
+	required_shared_ptr<UINT8> m_io_port;
 	UINT16 m_autohold_addr;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_wingboard;
 	UINT8 m_jumper_e16_e17;
-	UINT8 *m_program_ram;
-	UINT8 *m_s3000_ram;
-	UINT8 *m_s5000_ram;
-	UINT8 *m_s7000_ram;
-	UINT8 *m_sb000_ram;
-	UINT8 *m_sd000_ram;
-	UINT8 *m_sf000_ram;
 	UINT16 m_vid_address;
 	UINT8 *m_palette_ram;
 	UINT8 *m_palette_ram2;
-	UINT8 *m_io_port;
 	UINT64 m_last_cycles;
 	UINT8 m_coin_state;
 	UINT64 m_last_door;
@@ -206,6 +215,33 @@ public:
 	UINT64 m_last_coin_out;
 	UINT8 m_coin_out_state;
 	int m_sda_dir;
+	DECLARE_WRITE8_MEMBER(peplus_bgcolor_w);
+	DECLARE_WRITE8_MEMBER(peplus_crtc_display_w);
+	DECLARE_WRITE8_MEMBER(peplus_io_w);
+	DECLARE_WRITE8_MEMBER(peplus_duart_w);
+	DECLARE_WRITE8_MEMBER(peplus_cmos_w);
+	DECLARE_WRITE8_MEMBER(peplus_s3000_w);
+	DECLARE_WRITE8_MEMBER(peplus_s5000_w);
+	DECLARE_WRITE8_MEMBER(peplus_s7000_w);
+	DECLARE_WRITE8_MEMBER(peplus_sb000_w);
+	DECLARE_WRITE8_MEMBER(peplus_sd000_w);
+	DECLARE_WRITE8_MEMBER(peplus_sf000_w);
+	DECLARE_WRITE8_MEMBER(peplus_output_bank_a_w);
+	DECLARE_WRITE8_MEMBER(peplus_output_bank_b_w);
+	DECLARE_WRITE8_MEMBER(peplus_output_bank_c_w);
+	DECLARE_READ8_MEMBER(peplus_io_r);
+	DECLARE_READ8_MEMBER(peplus_duart_r);
+	DECLARE_READ8_MEMBER(peplus_cmos_r);
+	DECLARE_READ8_MEMBER(peplus_s3000_r);
+	DECLARE_READ8_MEMBER(peplus_s5000_r);
+	DECLARE_READ8_MEMBER(peplus_s7000_r);
+	DECLARE_READ8_MEMBER(peplus_sb000_r);
+	DECLARE_READ8_MEMBER(peplus_sd000_r);
+	DECLARE_READ8_MEMBER(peplus_sf000_r);
+	DECLARE_READ8_MEMBER(peplus_bgcolor_r);
+	DECLARE_READ8_MEMBER(peplus_dropdoor_r);
+	DECLARE_READ8_MEMBER(peplus_watchdog_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(peplus_input_r);
 };
 
 
@@ -249,7 +285,7 @@ static const mc6845_interface mc6845_intf =
 static void peplus_load_superdata(running_machine &machine, const char *bank_name)
 {
 	peplus_state *state = machine.driver_data<peplus_state>();
-    UINT8 *super_data = machine.region(bank_name)->base();
+    UINT8 *super_data = state->memregion(bank_name)->base();
 
     /* Distribute Superboard Data */
     memcpy(state->m_s3000_ram, &super_data[0x3000], 0x1000);
@@ -265,11 +301,11 @@ static void peplus_load_superdata(running_machine &machine, const char *bank_nam
 * Write Handlers *
 ******************/
 
-static WRITE8_HANDLER( peplus_bgcolor_w )
+WRITE8_MEMBER(peplus_state::peplus_bgcolor_w)
 {
 	int i;
 
-	for (i = 0; i < space->machine().total_colors(); i++)
+	for (i = 0; i < machine().total_colors(); i++)
 	{
 		int bit0, bit1, bit2, r, g, b;
 
@@ -291,7 +327,7 @@ static WRITE8_HANDLER( peplus_bgcolor_w )
 		bit2 = 0;
 		b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
-		palette_set_color(space->machine(), (15 + (i*16)), MAKE_RGB(r, g, b));
+		palette_set_color(machine(), (15 + (i*16)), MAKE_RGB(r, g, b));
 	}
 }
 
@@ -316,8 +352,8 @@ static TIMER_CALLBACK(assert_lp_cb)
 
 static void handle_lightpen( device_t *device )
 {
-    int x_val = input_port_read_safe(device->machine(), "TOUCH_X",0x00);
-    int y_val = input_port_read_safe(device->machine(), "TOUCH_Y",0x00);
+    int x_val = device->machine().root_device().ioport("TOUCH_X")->read_safe(0x00);
+    int y_val = device->machine().root_device().ioport("TOUCH_Y")->read_safe(0x00);
     const rectangle &vis_area = device->machine().primary_screen->visible_area();
     int xt, yt;
 
@@ -333,85 +369,75 @@ static WRITE_LINE_DEVICE_HANDLER(crtc_vsync)
 	handle_lightpen(device);
 }
 
-static WRITE8_HANDLER( peplus_crtc_display_w )
+WRITE8_MEMBER(peplus_state::peplus_crtc_display_w)
 {
-	peplus_state *state = space->machine().driver_data<peplus_state>();
-	UINT8 *videoram = state->m_videoram;
-	videoram[state->m_vid_address] = data;
-	state->m_palette_ram[state->m_vid_address] = state->m_io_port[1];
-	state->m_palette_ram2[state->m_vid_address] = state->m_io_port[3];
+	UINT8 *videoram = m_videoram;
+	videoram[m_vid_address] = data;
+	m_palette_ram[m_vid_address] = m_io_port[1];
+	m_palette_ram2[m_vid_address] = m_io_port[3];
 
-	state->m_bg_tilemap->mark_tile_dirty(state->m_vid_address);
+	m_bg_tilemap->mark_tile_dirty(m_vid_address);
 
 	/* An access here triggers a device read !*/
-	space->machine().device<mc6845_device>("crtc")->register_r(*space, 0);
+	machine().device<mc6845_device>("crtc")->register_r(space, 0);
 }
 
-static WRITE8_HANDLER( peplus_io_w )
+WRITE8_MEMBER(peplus_state::peplus_io_w)
 {
-	peplus_state *state = space->machine().driver_data<peplus_state>();
-	state->m_io_port[offset] = data;
+	m_io_port[offset] = data;
 }
 
-static WRITE8_HANDLER( peplus_duart_w )
+WRITE8_MEMBER(peplus_state::peplus_duart_w)
 {
 	// Used for Slot Accounting System Communication
 }
 
-static WRITE8_HANDLER( peplus_cmos_w )
+WRITE8_MEMBER(peplus_state::peplus_cmos_w)
 {
-	peplus_state *state = space->machine().driver_data<peplus_state>();
 	char bank_name[6];
 
 	/* Test for Wingboard PAL Trigger Condition */
-	if (offset == 0x1fff && state->m_wingboard && data < 5)
+	if (offset == 0x1fff && m_wingboard && data < 5)
 	{
 		sprintf(bank_name, "user%d", data + 1);
-		peplus_load_superdata(space->machine(), bank_name);
+		peplus_load_superdata(machine(), bank_name);
 	}
 
-	state->m_cmos_ram[offset] = data;
+	m_cmos_ram[offset] = data;
 }
 
-static WRITE8_HANDLER( peplus_s3000_w )
+WRITE8_MEMBER(peplus_state::peplus_s3000_w)
 {
-	peplus_state *state = space->machine().driver_data<peplus_state>();
-	state->m_s3000_ram[offset] = data;
+	m_s3000_ram[offset] = data;
 }
 
-static WRITE8_HANDLER( peplus_s5000_w )
+WRITE8_MEMBER(peplus_state::peplus_s5000_w)
 {
-	peplus_state *state = space->machine().driver_data<peplus_state>();
-	state->m_s5000_ram[offset] = data;
+	m_s5000_ram[offset] = data;
 }
 
-static WRITE8_HANDLER( peplus_s7000_w )
+WRITE8_MEMBER(peplus_state::peplus_s7000_w)
 {
-	peplus_state *state = space->machine().driver_data<peplus_state>();
-	state->m_s7000_ram[offset] = data;
+	m_s7000_ram[offset] = data;
 }
 
-static WRITE8_HANDLER( peplus_sb000_w )
+WRITE8_MEMBER(peplus_state::peplus_sb000_w)
 {
-	peplus_state *state = space->machine().driver_data<peplus_state>();
-	state->m_sb000_ram[offset] = data;
+	m_sb000_ram[offset] = data;
 }
 
-static WRITE8_HANDLER( peplus_sd000_w )
+WRITE8_MEMBER(peplus_state::peplus_sd000_w)
 {
-	peplus_state *state = space->machine().driver_data<peplus_state>();
-	state->m_sd000_ram[offset] = data;
+	m_sd000_ram[offset] = data;
 }
 
-static WRITE8_HANDLER( peplus_sf000_w )
+WRITE8_MEMBER(peplus_state::peplus_sf000_w)
 {
-	peplus_state *state = space->machine().driver_data<peplus_state>();
-	state->m_sf000_ram[offset] = data;
+	m_sf000_ram[offset] = data;
 }
 
-static WRITE8_HANDLER( peplus_output_bank_a_w )
+WRITE8_MEMBER(peplus_state::peplus_output_bank_a_w)
 {
-	peplus_state *state = space->machine().driver_data<peplus_state>();
 	output_set_value("pe_bnka0",(data >> 0) & 1); /* Coin Lockout */
 	output_set_value("pe_bnka1",(data >> 1) & 1); /* Diverter */
 	output_set_value("pe_bnka2",(data >> 2) & 1); /* Bell */
@@ -421,12 +447,12 @@ static WRITE8_HANDLER( peplus_output_bank_a_w )
 	output_set_value("pe_bnka6",(data >> 6) & 1); /* specific to a kind of machine */
 	output_set_value("pe_bnka7",(data >> 7) & 1); /* specific to a kind of machine */
 
-    state->m_coin_out_state = 0;
+    m_coin_out_state = 0;
     if(((data >> 4) & 1) || ((data >> 5) & 1))
-        state->m_coin_out_state = 3;
+        m_coin_out_state = 3;
 }
 
-static WRITE8_HANDLER( peplus_output_bank_b_w )
+WRITE8_MEMBER(peplus_state::peplus_output_bank_b_w)
 {
 	output_set_value("pe_bnkb0",(data >> 0) & 1); /* specific to a kind of machine */
 	output_set_value("pe_bnkb1",(data >> 1) & 1); /* Deal Spin Start */
@@ -438,7 +464,7 @@ static WRITE8_HANDLER( peplus_output_bank_b_w )
 	output_set_value("pe_bnkb7",(data >> 7) & 1); /* specific to a kind of machine */
 }
 
-static WRITE8_HANDLER( peplus_output_bank_c_w )
+WRITE8_MEMBER(peplus_state::peplus_output_bank_c_w)
 {
 	output_set_value("pe_bnkc0",(data >> 0) & 1); /* Coin In Meter */
 	output_set_value("pe_bnkc1",(data >> 1) & 1); /* Coin Out Meter */
@@ -463,72 +489,64 @@ static WRITE8_DEVICE_HANDLER(i2c_nvram_w)
 * Read Handlers *
 ****************/
 
-static READ8_HANDLER( peplus_io_r )
+READ8_MEMBER(peplus_state::peplus_io_r)
 {
-	peplus_state *state = space->machine().driver_data<peplus_state>();
-    return state->m_io_port[offset];
+    return m_io_port[offset];
 }
 
-static READ8_HANDLER( peplus_duart_r )
+READ8_MEMBER(peplus_state::peplus_duart_r)
 {
 	// Used for Slot Accounting System Communication
 	return 0x00;
 }
 
-static READ8_HANDLER( peplus_cmos_r )
+READ8_MEMBER(peplus_state::peplus_cmos_r)
 {
-	peplus_state *state = space->machine().driver_data<peplus_state>();
-	return state->m_cmos_ram[offset];
+	return m_cmos_ram[offset];
 }
 
-static READ8_HANDLER( peplus_s3000_r )
+READ8_MEMBER(peplus_state::peplus_s3000_r)
 {
-	peplus_state *state = space->machine().driver_data<peplus_state>();
-	return state->m_s3000_ram[offset];
+	return m_s3000_ram[offset];
 }
 
-static READ8_HANDLER( peplus_s5000_r )
+READ8_MEMBER(peplus_state::peplus_s5000_r)
 {
-	peplus_state *state = space->machine().driver_data<peplus_state>();
-	return state->m_s5000_ram[offset];
+	return m_s5000_ram[offset];
 }
 
-static READ8_HANDLER( peplus_s7000_r )
+READ8_MEMBER(peplus_state::peplus_s7000_r)
 {
-	peplus_state *state = space->machine().driver_data<peplus_state>();
-	return state->m_s7000_ram[offset];
+	return m_s7000_ram[offset];
 }
 
-static READ8_HANDLER( peplus_sb000_r )
+READ8_MEMBER(peplus_state::peplus_sb000_r)
 {
-	peplus_state *state = space->machine().driver_data<peplus_state>();
-	return state->m_sb000_ram[offset];
+	return m_sb000_ram[offset];
 }
 
-static READ8_HANDLER( peplus_sd000_r )
+READ8_MEMBER(peplus_state::peplus_sd000_r)
 {
-	peplus_state *state = space->machine().driver_data<peplus_state>();
-	return state->m_sd000_ram[offset];
+	return m_sd000_ram[offset];
 }
 
-static READ8_HANDLER( peplus_sf000_r )
+READ8_MEMBER(peplus_state::peplus_sf000_r)
 {
-	peplus_state *state = space->machine().driver_data<peplus_state>();
-	return state->m_sf000_ram[offset];
+	return m_sf000_ram[offset];
 }
 
 /* Last Color in Every Palette is bgcolor */
-static READ8_HANDLER( peplus_bgcolor_r )
+READ8_MEMBER(peplus_state::peplus_bgcolor_r)
 {
-	return palette_get_color(space->machine(), 15); // Return bgcolor from First Palette
+	return palette_get_color(machine(), 15); // Return bgcolor from First Palette
 }
 
-static READ8_HANDLER( peplus_dropdoor_r )
+READ8_MEMBER(peplus_state::peplus_dropdoor_r)
 {
 	return 0x00; // Drop Door 0x00=Closed 0x02=Open
 }
 
-static READ8_HANDLER( peplus_watchdog_r )
+READ8_MEMBER(peplus_state::peplus_watchdog_r)
 {
 	return 0x00; // Watchdog
 }
@@ -558,7 +576,7 @@ static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 		sda = i2cmem_sda_read(device);
 	}
 
-	if ((input_port_read_safe(device->machine(), "SENSOR",0x00) & 0x01) == 0x01 && state->m_coin_state == 0) {
+	if ((state->ioport("SENSOR")->read_safe(0x00) & 0x01) == 0x01 && state->m_coin_state == 0) {
 		state->m_coin_state = 1; // Start Coin Cycle
 		state->m_last_cycles = device->machine().firstcpu->total_cycles();
 	} else {
@@ -597,7 +615,7 @@ static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 		door_wait = 12345;
 
 	if (curr_cycles - state->m_last_door > door_wait) {
-		if ((input_port_read_safe(device->machine(), "DOOR",0xff) & 0x01) == 0x01) {
+		if ((state->ioport("DOOR")->read_safe(0xff) & 0x01) == 0x01) {
 			state->m_door_open = (!state->m_door_open & 0x01);
 		} else {
 			state->m_door_open = 1;
@@ -682,6 +700,7 @@ static SCREEN_UPDATE_IND16( peplus )
 
 static PALETTE_INIT( peplus )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 /*  prom bits
     7654 3210
     ---- -xxx   red component.
@@ -730,65 +749,65 @@ GFXDECODE_END
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( peplus_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE_MEMBER(peplus_state, m_program_ram)
+static ADDRESS_MAP_START( peplus_map, AS_PROGRAM, 8, peplus_state )
+	AM_RANGE(0x0000, 0xffff) AM_ROM AM_SHARE("prograram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( peplus_iomap, AS_IO, 8, peplus_state )
 	// Battery-backed RAM (0x1000-0x01fff Extended RAM for Superboards Only)
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(peplus_cmos_r, peplus_cmos_w) AM_SHARE("cmos")
 
 	// CRT Controller
-	AM_RANGE(0x2008, 0x2008) AM_DEVWRITE("crtc", peplus_crtc_mode_w)
-	AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, status_r, address_w)
-	AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2083, 0x2083) AM_DEVREAD_MODERN("crtc", mc6845_device, register_r) AM_WRITE(peplus_crtc_display_w)
+	AM_RANGE(0x2008, 0x2008) AM_DEVWRITE_LEGACY("crtc", peplus_crtc_mode_w)
+	AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
+	AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x2083, 0x2083) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(peplus_crtc_display_w)
 
     // Superboard Data
-	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(peplus_s3000_r, peplus_s3000_w) AM_BASE_MEMBER(peplus_state, m_s3000_ram)
+	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(peplus_s3000_r, peplus_s3000_w) AM_SHARE("s3000_ram")
 
 	// Sound and Dipswitches
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("SW1")/* likely ay8910 input port, not direct */ AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("SW1")/* likely ay8910 input port, not direct */ AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 
     // Superboard Data
-	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(peplus_s5000_r, peplus_s5000_w) AM_BASE_MEMBER(peplus_state, m_s5000_ram)
+	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(peplus_s5000_r, peplus_s5000_w) AM_SHARE("s5000_ram")
 
 	// Background Color Latch
 	AM_RANGE(0x6000, 0x6000) AM_READ(peplus_bgcolor_r) AM_WRITE(peplus_bgcolor_w)
 
     // Bogus Location for Video RAM
-	AM_RANGE(0x06001, 0x06400) AM_RAM AM_BASE_MEMBER(peplus_state, m_videoram)
+	AM_RANGE(0x06001, 0x06400) AM_RAM AM_SHARE("videoram")
 
     // Superboard Data
-	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(peplus_s7000_r, peplus_s7000_w) AM_BASE_MEMBER(peplus_state, m_s7000_ram)
+	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(peplus_s7000_r, peplus_s7000_w) AM_SHARE("s7000_ram")
 
 	// Input Bank A, Output Bank C
-	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("i2cmem",peplus_input_bank_a_r) AM_WRITE(peplus_output_bank_c_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVREAD_LEGACY("i2cmem",peplus_input_bank_a_r) AM_WRITE(peplus_output_bank_c_w)
 
 	// Drop Door, I2C EEPROM Writes
-	AM_RANGE(0x9000, 0x9000) AM_READ(peplus_dropdoor_r) AM_DEVWRITE("i2cmem",i2c_nvram_w)
+	AM_RANGE(0x9000, 0x9000) AM_READ(peplus_dropdoor_r) AM_DEVWRITE_LEGACY("i2cmem",i2c_nvram_w)
 
 	// Input Banks B & C, Output Bank B
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0") AM_WRITE(peplus_output_bank_b_w)
 
     // Superboard Data
-	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(peplus_sb000_r, peplus_sb000_w) AM_BASE_MEMBER(peplus_state, m_sb000_ram)
+	AM_RANGE(0xb000, 0xbfff) AM_READWRITE(peplus_sb000_r, peplus_sb000_w) AM_SHARE("sb000_ram")
 
 	// Output Bank A
 	AM_RANGE(0xc000, 0xc000) AM_READ(peplus_watchdog_r) AM_WRITE(peplus_output_bank_a_w)
 
     // Superboard Data
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(peplus_sd000_r, peplus_sd000_w) AM_BASE_MEMBER(peplus_state, m_sd000_ram)
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(peplus_sd000_r, peplus_sd000_w) AM_SHARE("sd000_ram")
 
 	// DUART
 	AM_RANGE(0xe000, 0xe00f) AM_READWRITE(peplus_duart_r, peplus_duart_w)
 
     // Superboard Data
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(peplus_sf000_r, peplus_sf000_w) AM_BASE_MEMBER(peplus_state, m_sf000_ram)
+	AM_RANGE(0xf000, 0xffff) AM_READWRITE(peplus_sf000_r, peplus_sf000_w) AM_SHARE("sf000_ram")
 
 	/* Ports start here */
-	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(peplus_io_r) AM_WRITE(peplus_io_w) AM_BASE_MEMBER(peplus_state, m_io_port)
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(peplus_io_r) AM_WRITE(peplus_io_w) AM_SHARE("io_port")
 ADDRESS_MAP_END
 
 
@@ -796,10 +815,10 @@ ADDRESS_MAP_END
 *      Input ports       *
 *************************/
 
-static CUSTOM_INPUT( peplus_input_r )
+CUSTOM_INPUT_MEMBER(peplus_state::peplus_input_r)
 {
 	UINT8 inp_ret = 0x00;
-	UINT8 inp_read = input_port_read(field.machine(), (const char *)param);
+	UINT8 inp_read = ioport((const char *)param)->read();
 
 	if (inp_read & 0x01) inp_ret = 0x01;
 	if (inp_read & 0x02) inp_ret = 0x02;
@@ -855,9 +874,9 @@ static INPUT_PORTS_START( peplus_schip )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(peplus_input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -883,9 +902,9 @@ static INPUT_PORTS_START( peplus_poker )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Bill Acceptor") PORT_CODE(KEYCODE_U)
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(peplus_input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -911,9 +930,9 @@ static INPUT_PORTS_START( peplus_bjack )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_NAME("Bill Acceptor") PORT_CODE(KEYCODE_U)
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(peplus_input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -944,9 +963,9 @@ static INPUT_PORTS_START( peplus_keno )
 	PORT_BIT( 0xffff, 0x200, IPT_LIGHTGUN_Y ) PORT_MINMAX(0x00, 1024) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(peplus_input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Light Pen") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -972,9 +991,9 @@ static INPUT_PORTS_START( peplus_slots )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_NAME("Bill Acceptor") PORT_CODE(KEYCODE_U)
 
 	PORT_START("IN0")
-	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(peplus_input_r, "IN_BANK1")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK1")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(peplus_input_r, "IN_BANK2")
+	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, peplus_state,peplus_input_r, "IN_BANK2")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -1016,7 +1035,7 @@ static MACHINE_RESET( peplus )
 	state->m_autohold_addr = 0x5e7e; // AutoHold Address
 
 	if (state->m_autohold_addr)
-		state->m_program_ram[state->m_autohold_addr] = input_port_read_safe(machine, "AUTOHOLD",0x00) & 0x01;
+		state->m_program_ram[state->m_autohold_addr] = state->ioport("AUTOHOLD")->read_safe(0x00) & 0x01;
 #endif
 }
 

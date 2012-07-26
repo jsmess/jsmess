@@ -147,7 +147,8 @@ class firebeat_state : public driver_device
 {
 public:
 	firebeat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_work_ram(*this, "work_ram"){ }
 
 	UINT8 m_extend_board_irq_enable;
 	UINT8 m_extend_board_irq_active;
@@ -170,7 +171,7 @@ public:
 	const int * m_cur_cab_data;
 	int m_keyboard_state[2];
 	UINT8 m_spu_shared_ram[0x400];
-	UINT32 *m_work_ram;
+	required_shared_ptr<UINT32> m_work_ram;
 	IBUTTON m_ibutton;
 	int m_ibutton_state;
 	int m_ibutton_read_subkey_ptr;
@@ -726,15 +727,15 @@ static READ32_HANDLER(input_r)
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= (input_port_read(space->machine(), "IN0") & 0xff) << 24;
+		r |= (space->machine().root_device().ioport("IN0")->read() & 0xff) << 24;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= (input_port_read(space->machine(), "IN1") & 0xff) << 8;
+		r |= (space->machine().root_device().ioport("IN1")->read() & 0xff) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= (input_port_read(space->machine(), "IN2") & 0xff);
+		r |= (space->machine().root_device().ioport("IN2")->read() & 0xff);
 	}
 
 	return r;
@@ -744,11 +745,11 @@ static READ32_HANDLER( sensor_r )
 {
 	if (offset == 0)
 	{
-		return input_port_read(space->machine(), "SENSOR1") | 0x01000100;
+		return space->machine().root_device().ioport("SENSOR1")->read() | 0x01000100;
 	}
 	else
 	{
-		return input_port_read(space->machine(), "SENSOR2") | 0x01000100;
+		return space->machine().root_device().ioport("SENSOR2")->read() | 0x01000100;
 	}
 }
 
@@ -1364,11 +1365,11 @@ static READ32_HANDLER( keyboard_wheel_r )
 {
 	if (offset == 0)		// Keyboard Wheel (P1)
 	{
-		return input_port_read(space->machine(), "WHEEL_P1") << 24;
+		return space->machine().root_device().ioport("WHEEL_P1")->read() << 24;
 	}
 	else if (offset == 2)	// Keyboard Wheel (P2)
 	{
-		return input_port_read(space->machine(), "WHEEL_P2") << 24;
+		return space->machine().root_device().ioport("WHEEL_P2")->read() << 24;
 	}
 
 	return 0;
@@ -1458,7 +1459,7 @@ static TIMER_CALLBACK( keyboard_timer_callback )
 
 	for (keyboard=0; keyboard < 2; keyboard++)
 	{
-		UINT32 kbstate = input_port_read(machine, keynames[keyboard]);
+		UINT32 kbstate = machine.root_device().ioport(keynames[keyboard])->read();
 		int uart_channel = kb_uart_channel[keyboard];
 
 		if (kbstate != state->m_keyboard_state[keyboard])
@@ -1749,33 +1750,33 @@ static MACHINE_START( firebeat )
 	state->m_flash[2] = machine.device<fujitsu_29f016a_device>("flash2");
 }
 
-static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_BASE_MEMBER(firebeat_state, m_work_ram)
-	AM_RANGE(0x70000000, 0x70000fff) AM_READWRITE(midi_uart_r, midi_uart_w)
-	AM_RANGE(0x70006000, 0x70006003) AM_WRITE(extend_board_irq_w)
-	AM_RANGE(0x70008000, 0x7000800f) AM_READ(keyboard_wheel_r)
-	AM_RANGE(0x7000a000, 0x7000a003) AM_READ(extend_board_irq_r)
-	AM_RANGE(0x74000000, 0x740003ff) AM_READWRITE(ppc_spu_share_r, ppc_spu_share_w) // SPU shared RAM
-	AM_RANGE(0x7d000200, 0x7d00021f) AM_READ(cabinet_r)
-	AM_RANGE(0x7d000340, 0x7d000347) AM_READ(sensor_r)
-	AM_RANGE(0x7d000400, 0x7d000403) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0xffff0000)
-	AM_RANGE(0x7d000800, 0x7d000803) AM_READ(input_r)
-	AM_RANGE(0x7d400000, 0x7d5fffff) AM_READWRITE(flashram_r, flashram_w)
-	AM_RANGE(0x7d800000, 0x7dbfffff) AM_READWRITE(soundflash_r, soundflash_w)
-	AM_RANGE(0x7dc00000, 0x7dc0000f) AM_READWRITE(comm_uart_r, comm_uart_w)
-	AM_RANGE(0x7e000000, 0x7e00003f) AM_DEVREADWRITE8_MODERN("rtc", rtc65271_device, rtc_r, rtc_w, 0xffffffff)
-	AM_RANGE(0x7e000100, 0x7e00013f) AM_DEVREADWRITE8_MODERN("rtc", rtc65271_device, xram_r, xram_w, 0xffffffff)
-	AM_RANGE(0x7e800000, 0x7e8000ff) AM_READWRITE(gcu0_r, gcu0_w)
-	AM_RANGE(0x7e800100, 0x7e8001ff) AM_READWRITE(gcu1_r, gcu1_w)
-	AM_RANGE(0x7fe00000, 0x7fe0000f) AM_READWRITE(atapi_command_r, atapi_command_w)
-	AM_RANGE(0x7fe80000, 0x7fe8000f) AM_READWRITE(atapi_control_r, atapi_control_w)
+static ADDRESS_MAP_START( firebeat_map, AS_PROGRAM, 32, firebeat_state )
+	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM AM_SHARE("work_ram")
+	AM_RANGE(0x70000000, 0x70000fff) AM_READWRITE_LEGACY(midi_uart_r, midi_uart_w)
+	AM_RANGE(0x70006000, 0x70006003) AM_WRITE_LEGACY(extend_board_irq_w)
+	AM_RANGE(0x70008000, 0x7000800f) AM_READ_LEGACY(keyboard_wheel_r)
+	AM_RANGE(0x7000a000, 0x7000a003) AM_READ_LEGACY(extend_board_irq_r)
+	AM_RANGE(0x74000000, 0x740003ff) AM_READWRITE_LEGACY(ppc_spu_share_r, ppc_spu_share_w) // SPU shared RAM
+	AM_RANGE(0x7d000200, 0x7d00021f) AM_READ_LEGACY(cabinet_r)
+	AM_RANGE(0x7d000340, 0x7d000347) AM_READ_LEGACY(sensor_r)
+	AM_RANGE(0x7d000400, 0x7d000403) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xffff0000)
+	AM_RANGE(0x7d000800, 0x7d000803) AM_READ_LEGACY(input_r)
+	AM_RANGE(0x7d400000, 0x7d5fffff) AM_READWRITE_LEGACY(flashram_r, flashram_w)
+	AM_RANGE(0x7d800000, 0x7dbfffff) AM_READWRITE_LEGACY(soundflash_r, soundflash_w)
+	AM_RANGE(0x7dc00000, 0x7dc0000f) AM_READWRITE_LEGACY(comm_uart_r, comm_uart_w)
+	AM_RANGE(0x7e000000, 0x7e00003f) AM_DEVREADWRITE8("rtc", rtc65271_device, rtc_r, rtc_w, 0xffffffff)
+	AM_RANGE(0x7e000100, 0x7e00013f) AM_DEVREADWRITE8("rtc", rtc65271_device, xram_r, xram_w, 0xffffffff)
+	AM_RANGE(0x7e800000, 0x7e8000ff) AM_READWRITE_LEGACY(gcu0_r, gcu0_w)
+	AM_RANGE(0x7e800100, 0x7e8001ff) AM_READWRITE_LEGACY(gcu1_r, gcu1_w)
+	AM_RANGE(0x7fe00000, 0x7fe0000f) AM_READWRITE_LEGACY(atapi_command_r, atapi_command_w)
+	AM_RANGE(0x7fe80000, 0x7fe8000f) AM_READWRITE_LEGACY(atapi_control_r, atapi_control_w)
 	AM_RANGE(0x7ff80000, 0x7fffffff) AM_ROM AM_REGION("user1", 0)		/* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spu_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( spu_map, AS_PROGRAM, 16, firebeat_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM
-	AM_RANGE(0x340000, 0x34000f) AM_READ(spu_unk_r)
+	AM_RANGE(0x340000, 0x34000f) AM_READ_LEGACY(spu_unk_r)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -1955,7 +1956,7 @@ static MACHINE_RESET( firebeat )
 	firebeat_state *state = machine.driver_data<firebeat_state>();
 	void *cd;
 	int i;
-	UINT8 *sound = machine.region("ymz")->base();
+	UINT8 *sound = state->memregion("ymz")->base();
 
 	for (i=0; i < 0x200000; i++)
 	{
@@ -2224,7 +2225,7 @@ static void init_lights(running_machine &machine, write32_space_func out1, const
 static void init_firebeat(running_machine &machine)
 {
 	firebeat_state *state = machine.driver_data<firebeat_state>();
-	UINT8 *rom = machine.region("user2")->base();
+	UINT8 *rom = state->memregion("user2")->base();
 
 	atapi_init(machine);
 
@@ -2290,7 +2291,7 @@ ROM_START( ppp )
 	ROM_LOAD("gq977-ja", 0x00, 0xc0, BAD_DUMP CRC(55b5abdb) SHA1(d8da5bac005235480a1815bd0a79c3e8a63ebad1))
 
 	DISK_REGION( "scsi0" )
-	DISK_IMAGE_READONLY( "977jaa01", 0, SHA1(59c03d8eb366167feef741d42d9d8b54bfeb3c1e) )
+	DISK_IMAGE_READONLY( "977jaa01", 0, BAD_DUMP SHA1(59c03d8eb366167feef741d42d9d8b54bfeb3c1e) )
 
 	// TODO: the audio CD is not dumped
 ROM_END
@@ -2305,10 +2306,10 @@ ROM_START( kbm )
 	ROM_LOAD("gq974-ja", 0x00, 0xc0, BAD_DUMP CRC(4578f29b) SHA1(faaeaf6357c1e86e898e7017566cfd2fc7ee3d6f))
 
 	DISK_REGION( "scsi0" )
-	DISK_IMAGE_READONLY( "974jac01", 0, SHA1(c6145d7090e44c87f71ba626620d2ae2596a75ca) )
+	DISK_IMAGE_READONLY( "974jac01", 0, BAD_DUMP SHA1(c6145d7090e44c87f71ba626620d2ae2596a75ca) )
 
 	DISK_REGION( "scsi1" )
-	DISK_IMAGE_READONLY( "974jaa02", 1, SHA1(3b9946083239eb5687f66a49df24568bffa4fbbd) )
+	DISK_IMAGE_READONLY( "974jaa02", 1, BAD_DUMP SHA1(3b9946083239eb5687f66a49df24568bffa4fbbd) )
 ROM_END
 
 ROM_START( kbm2nd )
@@ -2321,10 +2322,10 @@ ROM_START( kbm2nd )
 	ROM_LOAD("gca01-ja", 0x00, 0xc0, BAD_DUMP CRC(2bda339d) SHA1(031cb3f44e7a89cd62a9ba948f3d19d53a325abd))
 
 	DISK_REGION( "scsi0" )
-	DISK_IMAGE_READONLY( "a01jaa01", 0, SHA1(37bc3879719b3d3c6bc8a5691abd7aa4aec87d45) )
+	DISK_IMAGE_READONLY( "a01jaa01", 0, BAD_DUMP SHA1(37bc3879719b3d3c6bc8a5691abd7aa4aec87d45) )
 
 	DISK_REGION( "scsi1" )
-	DISK_IMAGE_READONLY( "a01jaa02", 1, SHA1(a3fdeee0f85a7a9718c0fb1cc642ac22d3eff8db) )
+	DISK_IMAGE_READONLY( "a01jaa02", 1, BAD_DUMP SHA1(a3fdeee0f85a7a9718c0fb1cc642ac22d3eff8db) )
 ROM_END
 
 ROM_START( kbm3rd )
@@ -2337,10 +2338,10 @@ ROM_START( kbm3rd )
 	ROM_LOAD("gca12-ja", 0x00, 0xc0, BAD_DUMP CRC(cf01dc15) SHA1(da8d208233487ebe65a0a9826fc72f1f459baa26))
 
 	DISK_REGION( "scsi0" )
-	DISK_IMAGE_READONLY( "a12jaa01", 0, SHA1(10f2284248e51b1adf0fde173df72ad97fe0e5c8) )
+	DISK_IMAGE_READONLY( "a12jaa01", 0, BAD_DUMP SHA1(10f2284248e51b1adf0fde173df72ad97fe0e5c8) )
 
 	DISK_REGION( "scsi1" )
-	DISK_IMAGE_READONLY( "a12jaa02", 1, SHA1(1256ce9d71350d355a256f83c7b319f0e6e84525) )
+	DISK_IMAGE_READONLY( "a12jaa02", 1, BAD_DUMP SHA1(1256ce9d71350d355a256f83c7b319f0e6e84525) )
 ROM_END
 
 ROM_START( popn5 )
@@ -2374,10 +2375,10 @@ ROM_START( popn7 )
 	ROM_LOAD16_WORD_SWAP("a02jaa04.3q", 0x00000, 0x80000, CRC(8c6000dd) SHA1(94ab2a66879839411eac6c673b25143d15836683))
 
 	DISK_REGION( "scsi0" )
-	DISK_IMAGE_READONLY( "b00jab01", 0, SHA1(604fd460befcb5c53ae230155b83dec3a0b668d7) )
+	DISK_IMAGE_READONLY( "b00jab01", 0, BAD_DUMP SHA1(604fd460befcb5c53ae230155b83dec3a0b668d7) )
 
 	DISK_REGION( "scsi1" )
-	DISK_IMAGE_READONLY( "b00jaa02", 1, SHA1(9e226f6b377ea72514d58dd350578b7dad12a70a) )
+	DISK_IMAGE_READONLY( "b00jaa02", 1, BAD_DUMP SHA1(9e226f6b377ea72514d58dd350578b7dad12a70a) )
 ROM_END
 
 ROM_START( ppd )
@@ -2390,10 +2391,10 @@ ROM_START( ppd )
 	ROM_LOAD("gq977-ko", 0x00, 0xc0, BAD_DUMP CRC(ee743323) SHA1(2042e45879795557ad3cc21b37962f6bf54da60d))
 
 	DISK_REGION( "scsi0" )
-	DISK_IMAGE_READONLY( "977kaa01", 0, SHA1(7af9f4949ffa10ea5fc18b6c88c2abc710df3cf9) )
+	DISK_IMAGE_READONLY( "977kaa01", 0, BAD_DUMP SHA1(7af9f4949ffa10ea5fc18b6c88c2abc710df3cf9) )
 
 	DISK_REGION( "scsi1" )
-	DISK_IMAGE_READONLY( "977kaa02", 1, SHA1(cfca3cbc41c6203c3f3b482a6be5f63d33a8a966) )
+	DISK_IMAGE_READONLY( "977kaa02", 1, BAD_DUMP SHA1(cfca3cbc41c6203c3f3b482a6be5f63d33a8a966) )
 ROM_END
 
 ROM_START( ppp11 )
@@ -2406,10 +2407,10 @@ ROM_START( ppp11 )
 	ROM_LOAD("gq977-ja", 0x00, 0xc0, BAD_DUMP CRC(55b5abdb) SHA1(d8da5bac005235480a1815bd0a79c3e8a63ebad1))
 
 	DISK_REGION( "scsi0" )
-	DISK_IMAGE_READONLY( "gc977jaa01", 0, SHA1(6b93dd38029ea68f9572126e48d618edce68fbce) )
+	DISK_IMAGE_READONLY( "gc977jaa01", 0, BAD_DUMP SHA1(6b93dd38029ea68f9572126e48d618edce68fbce) )
 
 	DISK_REGION( "scsi1" )
-	DISK_IMAGE_READONLY( "gc977jaa02", 1, SHA1(b853a6f4edcaceb609fe2a3d6a18d4ac62bd3822) )
+	DISK_IMAGE_READONLY( "gc977jaa02", 1, BAD_DUMP SHA1(b853a6f4edcaceb609fe2a3d6a18d4ac62bd3822) )
 ROM_END
 
 /*****************************************************************************/

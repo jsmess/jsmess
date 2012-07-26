@@ -30,14 +30,14 @@ static struct sms_vdp *md_sms_vdp;
 #define SMS_VDP_VRAM(address) chip->vram[(address)&0x3fff]
 
 #ifdef UNUSED_FUNCTION
-static ADDRESS_MAP_START( sms_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sms_map, AS_PROGRAM, 8, driver_device )
 //  AM_RANGE(0x0000 , 0xbfff) AM_ROM
 //  AM_RANGE(0xc000 , 0xdfff) AM_RAM AM_MIRROR(0x2000)
 ADDRESS_MAP_END
 #endif
 
 
-ADDRESS_MAP_START( sms_io_map, AS_IO, 8 )
+ADDRESS_MAP_START( sms_io_map, AS_IO, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -1180,7 +1180,7 @@ SCREEN_VBLANK(sms)
 		end_of_frame(screen.machine(), md_sms_vdp);
 
 		// the SMS has a 'RESET' button on the machine, it generates an NMI
-		if (input_port_read_safe(screen.machine(),"PAUSE",0x00))
+		if (screen.machine().root_device().ioport("PAUSE")->read_safe(0x00))
 			cputag_set_input_line(screen.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -1464,7 +1464,7 @@ DRIVER_INIT( sms )
 
 static UINT8 ioport_gg00_r(running_machine& machine)
 {
-	UINT8 GG_START_BUTTON = input_port_read_safe(machine,"GGSTART",0x00);
+	UINT8 GG_START_BUTTON = machine.root_device().ioport("GGSTART")->read_safe(0x00);
 
 	return (GG_START_BUTTON << 7) |
 		   (0               << 6) |
@@ -1567,7 +1567,7 @@ READ8_HANDLER (megatech_sms_ioport_dc_r)
 	running_machine &machine = space->machine();
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 4: TL-A; bit 5: TR-A */
-	return (input_port_read(machine, "PAD1") & 0x3f) | ((input_port_read(machine, "PAD2") & 0x03) << 6);
+	return (machine.root_device().ioport("PAD1")->read() & 0x3f) | ((machine.root_device().ioport("PAD2")->read() & 0x03) << 6);
 }
 
 READ8_HANDLER (megatech_sms_ioport_dd_r)
@@ -1575,7 +1575,7 @@ READ8_HANDLER (megatech_sms_ioport_dd_r)
 	running_machine &machine = space->machine();
 	/* 2009-05 FP: would it be worth to give separate inputs to SMS? SMS has only 2 keys A,B (which are B,C on megadrive) */
 	/* bit 2: TL-B; bit 3: TR-B; bit 4: RESET; bit 5: unused; bit 6: TH-A; bit 7: TH-B*/
-	return ((input_port_read(machine, "PAD2") & 0x3c) >> 2) | 0x10;
+	return ((machine.root_device().ioport("PAD2")->read() & 0x3c) >> 2) | 0x10;
 }
 
 
@@ -1613,13 +1613,13 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 			//printf("bank ram??\n");
 			break;
 		case 1:
-			memcpy(sms_rom+0x0000, space->machine().region("maincpu")->base()+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x0000, space->machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
 		case 2:
-			memcpy(sms_rom+0x4000, space->machine().region("maincpu")->base()+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x4000, space->machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
 		case 3:
-			memcpy(sms_rom+0x8000, space->machine().region("maincpu")->base()+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x8000, space->machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 			break;
 
 	}
@@ -1628,19 +1628,19 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 static WRITE8_HANDLER( codemasters_rom_bank_0000_w )
 {
 	int bank = data&0x1f;
-	memcpy(sms_rom+0x0000, space->machine().region("maincpu")->base()+bank*0x4000, 0x4000);
+	memcpy(sms_rom+0x0000, space->machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 static WRITE8_HANDLER( codemasters_rom_bank_4000_w )
 {
 	int bank = data&0x1f;
-	memcpy(sms_rom+0x4000, space->machine().region("maincpu")->base()+bank*0x4000, 0x4000);
+	memcpy(sms_rom+0x4000, space->machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 static WRITE8_HANDLER( codemasters_rom_bank_8000_w )
 {
 	int bank = data&0x1f;
-	memcpy(sms_rom+0x8000, space->machine().region("maincpu")->base()+bank*0x4000, 0x4000);
+	memcpy(sms_rom+0x8000, space->machine().root_device().memregion("maincpu")->base()+bank*0x4000, 0x4000);
 }
 
 
@@ -1682,7 +1682,7 @@ void megatech_set_genz80_as_sms_standard_map(running_machine &machine, const cha
 	/* fixed rom bank area */
 	sms_rom = (UINT8 *)machine.device(tag)->memory().space(AS_PROGRAM)->install_rom(0x0000, 0xbfff, NULL);
 
-	memcpy(sms_rom, machine.region("maincpu")->base(), 0xc000);
+	memcpy(sms_rom, machine.root_device().memregion("maincpu")->base(), 0xc000);
 
 	if (mapper == MAPPER_STANDARD )
 	{

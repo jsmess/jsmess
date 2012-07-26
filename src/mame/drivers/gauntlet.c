@@ -185,12 +185,11 @@ static MACHINE_RESET( gauntlet )
  *
  *************************************/
 
-static READ16_HANDLER( port4_r )
+READ16_MEMBER(gauntlet_state::port4_r)
 {
-	gauntlet_state *state = space->machine().driver_data<gauntlet_state>();
-	int temp = input_port_read(space->machine(), "803008");
-	if (state->m_cpu_to_sound_ready) temp ^= 0x0020;
-	if (state->m_sound_to_cpu_ready) temp ^= 0x0010;
+	int temp = ioport("803008")->read();
+	if (m_cpu_to_sound_ready) temp ^= 0x0020;
+	if (m_sound_to_cpu_ready) temp ^= 0x0010;
 	return temp;
 }
 
@@ -202,26 +201,25 @@ static READ16_HANDLER( port4_r )
  *
  *************************************/
 
-static WRITE16_HANDLER( sound_reset_w )
+WRITE16_MEMBER(gauntlet_state::sound_reset_w)
 {
-	gauntlet_state *state = space->machine().driver_data<gauntlet_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		int oldword = state->m_sound_reset_val;
-		COMBINE_DATA(&state->m_sound_reset_val);
+		int oldword = m_sound_reset_val;
+		COMBINE_DATA(&m_sound_reset_val);
 
-		if ((oldword ^ state->m_sound_reset_val) & 1)
+		if ((oldword ^ m_sound_reset_val) & 1)
 		{
-			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, (state->m_sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
-			atarigen_sound_reset(space->machine());
-			if (state->m_sound_reset_val & 1)
+			cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, (m_sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
+			atarigen_sound_reset(machine());
+			if (m_sound_reset_val & 1)
 			{
-				devtag_reset(space->machine(), "ymsnd");
-				devtag_reset(space->machine(), "tms");
-				tms5220_set_frequency(space->machine().device("tms"), ATARI_CLOCK_14MHz/2 / 11);
-				atarigen_set_ym2151_vol(space->machine(), 0);
-				atarigen_set_pokey_vol(space->machine(), 0);
-				atarigen_set_tms5220_vol(space->machine(), 0);
+				devtag_reset(machine(), "ymsnd");
+				devtag_reset(machine(), "tms");
+				tms5220_set_frequency(machine().device("tms"), ATARI_CLOCK_14MHz/2 / 11);
+				atarigen_set_ym2151_vol(machine(), 0);
+				atarigen_set_pokey_vol(machine(), 0);
+				atarigen_set_tms5220_vol(machine(), 0);
 			}
 		}
 	}
@@ -235,15 +233,14 @@ static WRITE16_HANDLER( sound_reset_w )
  *
  *************************************/
 
-static READ8_HANDLER( switch_6502_r )
+READ8_MEMBER(gauntlet_state::switch_6502_r)
 {
-	gauntlet_state *state = space->machine().driver_data<gauntlet_state>();
 	int temp = 0x30;
 
-	if (state->m_cpu_to_sound_ready) temp ^= 0x80;
-	if (state->m_sound_to_cpu_ready) temp ^= 0x40;
-	if (!tms5220_readyq_r(space->machine().device("tms"))) temp ^= 0x20;
-	if (!(input_port_read(space->machine(), "803008") & 0x0008)) temp ^= 0x10;
+	if (m_cpu_to_sound_ready) temp ^= 0x80;
+	if (m_sound_to_cpu_ready) temp ^= 0x40;
+	if (!tms5220_readyq_r(machine().device("tms"))) temp ^= 0x20;
+	if (!(ioport("803008")->read() & 0x0008)) temp ^= 0x10;
 
 	return temp;
 }
@@ -255,13 +252,13 @@ static READ8_HANDLER( switch_6502_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( sound_ctl_w )
+WRITE8_MEMBER(gauntlet_state::sound_ctl_w)
 {
-	device_t *tms = space->machine().device("tms");
+	device_t *tms = machine().device("tms");
 	switch (offset & 7)
 	{
 		case 0:	/* music reset, bit D7, low reset */
-			if (((data>>7)&1) == 0) devtag_reset(space->machine(), "ymsnd");
+			if (((data>>7)&1) == 0) devtag_reset(machine(), "ymsnd");
 			break;
 
 		case 1:	/* speech write, bit D7, active low */
@@ -287,11 +284,11 @@ static WRITE8_HANDLER( sound_ctl_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( mixer_w )
+WRITE8_MEMBER(gauntlet_state::mixer_w)
 {
-	atarigen_set_ym2151_vol(space->machine(), (data & 7) * 100 / 7);
-	atarigen_set_pokey_vol(space->machine(), ((data >> 3) & 3) * 100 / 3);
-	atarigen_set_tms5220_vol(space->machine(), ((data >> 5) & 7) * 100 / 7);
+	atarigen_set_ym2151_vol(machine(), (data & 7) * 100 / 7);
+	atarigen_set_pokey_vol(machine(), ((data >> 3) & 3) * 100 / 3);
+	atarigen_set_tms5220_vol(machine(), ((data >> 5) & 7) * 100 / 7);
 }
 
 
@@ -303,7 +300,7 @@ static WRITE8_HANDLER( mixer_w )
  *************************************/
 
 /* full map verified from schematics */
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, gauntlet_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x037fff) AM_MIRROR(0x280000) AM_ROM
 	AM_RANGE(0x038000, 0x03ffff) AM_MIRROR(0x280000) AM_ROM	/* slapstic maps here */
@@ -311,28 +308,28 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 
 	/* MBUS */
 	AM_RANGE(0x800000, 0x801fff) AM_MIRROR(0x2fc000) AM_RAM
-	AM_RANGE(0x802000, 0x802fff) AM_MIRROR(0x2fc000) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
+	AM_RANGE(0x802000, 0x802fff) AM_MIRROR(0x2fc000) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x803000, 0x803001) AM_MIRROR(0x2fcef0) AM_READ_PORT("803000")
 	AM_RANGE(0x803002, 0x803003) AM_MIRROR(0x2fcef0) AM_READ_PORT("803002")
 	AM_RANGE(0x803004, 0x803005) AM_MIRROR(0x2fcef0) AM_READ_PORT("803004")
 	AM_RANGE(0x803006, 0x803007) AM_MIRROR(0x2fcef0) AM_READ_PORT("803006")
 	AM_RANGE(0x803008, 0x803009) AM_MIRROR(0x2fcef0) AM_READ(port4_r)
-	AM_RANGE(0x80300e, 0x80300f) AM_MIRROR(0x2fcef0) AM_READ(atarigen_sound_r)
+	AM_RANGE(0x80300e, 0x80300f) AM_MIRROR(0x2fcef0) AM_READ_LEGACY(atarigen_sound_r)
 	AM_RANGE(0x803100, 0x803101) AM_MIRROR(0x2fce8e) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x803120, 0x803121) AM_MIRROR(0x2fce8e) AM_WRITE(sound_reset_w)
-	AM_RANGE(0x803140, 0x803141) AM_MIRROR(0x2fce8e) AM_WRITE(atarigen_video_int_ack_w)
-	AM_RANGE(0x803150, 0x803151) AM_MIRROR(0x2fce8e) AM_WRITE(atarigen_eeprom_enable_w)
-	AM_RANGE(0x803170, 0x803171) AM_MIRROR(0x2fce8e) AM_WRITE(atarigen_sound_w)
+	AM_RANGE(0x803140, 0x803141) AM_MIRROR(0x2fce8e) AM_WRITE_LEGACY(atarigen_video_int_ack_w)
+	AM_RANGE(0x803150, 0x803151) AM_MIRROR(0x2fce8e) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
+	AM_RANGE(0x803170, 0x803171) AM_MIRROR(0x2fce8e) AM_WRITE_LEGACY(atarigen_sound_w)
 
 	/* VBUS */
-	AM_RANGE(0x900000, 0x901fff) AM_MIRROR(0x2c8000) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(gauntlet_state, m_playfield)
-	AM_RANGE(0x902000, 0x903fff) AM_MIRROR(0x2c8000) AM_READWRITE(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
+	AM_RANGE(0x900000, 0x901fff) AM_MIRROR(0x2c8000) AM_RAM_WRITE_LEGACY(atarigen_playfield_w) AM_SHARE("playfield")
+	AM_RANGE(0x902000, 0x903fff) AM_MIRROR(0x2c8000) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0x904000, 0x904fff) AM_MIRROR(0x2c8000) AM_RAM
-	AM_RANGE(0x905f6e, 0x905f6f) AM_MIRROR(0x2c8000) AM_RAM_WRITE(gauntlet_yscroll_w) AM_BASE_MEMBER(gauntlet_state, m_yscroll)
-	AM_RANGE(0x905000, 0x905f7f) AM_MIRROR(0x2c8000) AM_RAM_WRITE(atarigen_alpha_w) AM_BASE_MEMBER(gauntlet_state, m_alpha)
-	AM_RANGE(0x905f80, 0x905fff) AM_MIRROR(0x2c8000) AM_READWRITE(atarimo_0_slipram_r, atarimo_0_slipram_w)
-	AM_RANGE(0x910000, 0x9107ff) AM_MIRROR(0x2cf800) AM_RAM_WRITE(paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x930000, 0x930001) AM_MIRROR(0x2cfffe) AM_WRITE(gauntlet_xscroll_w) AM_BASE_MEMBER(gauntlet_state, m_xscroll)
+	AM_RANGE(0x905f6e, 0x905f6f) AM_MIRROR(0x2c8000) AM_RAM_WRITE_LEGACY(gauntlet_yscroll_w) AM_SHARE("yscroll")
+	AM_RANGE(0x905000, 0x905f7f) AM_MIRROR(0x2c8000) AM_RAM_WRITE_LEGACY(atarigen_alpha_w) AM_SHARE("alpha")
+	AM_RANGE(0x905f80, 0x905fff) AM_MIRROR(0x2c8000) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)
+	AM_RANGE(0x910000, 0x9107ff) AM_MIRROR(0x2cf800) AM_RAM_WRITE(paletteram_IIIIRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x930000, 0x930001) AM_MIRROR(0x2cfffe) AM_WRITE_LEGACY(gauntlet_xscroll_w) AM_SHARE("xscroll")
 ADDRESS_MAP_END
 
 
@@ -344,17 +341,17 @@ ADDRESS_MAP_END
  *************************************/
 
 /* full map verified from schematics */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gauntlet_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x1000, 0x100f) AM_MIRROR(0x27c0) AM_WRITE(atarigen_6502_sound_w)
-	AM_RANGE(0x1010, 0x101f) AM_MIRROR(0x27c0) AM_READ(atarigen_6502_sound_r)
+	AM_RANGE(0x1000, 0x100f) AM_MIRROR(0x27c0) AM_WRITE_LEGACY(atarigen_6502_sound_w)
+	AM_RANGE(0x1010, 0x101f) AM_MIRROR(0x27c0) AM_READ_LEGACY(atarigen_6502_sound_r)
 	AM_RANGE(0x1020, 0x102f) AM_MIRROR(0x27c0) AM_READ_PORT("COIN") AM_WRITE(mixer_w)
 	AM_RANGE(0x1030, 0x103f) AM_MIRROR(0x27c0) AM_READWRITE(switch_6502_r, sound_ctl_w)
-	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x27c0) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0x1810, 0x1811) AM_MIRROR(0x27ce) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x1820, 0x182f) AM_MIRROR(0x27c0) AM_DEVWRITE("tms", tms5220_data_w)
-	AM_RANGE(0x1830, 0x183f) AM_MIRROR(0x27c0) AM_READWRITE(atarigen_6502_irq_ack_r, atarigen_6502_irq_ack_w)
+	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x27c0) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0x1810, 0x1811) AM_MIRROR(0x27ce) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x1820, 0x182f) AM_MIRROR(0x27c0) AM_DEVWRITE_LEGACY("tms", tms5220_data_w)
+	AM_RANGE(0x1830, 0x183f) AM_MIRROR(0x27c0) AM_READWRITE_LEGACY(atarigen_6502_irq_ack_r, atarigen_6502_irq_ack_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -411,7 +408,7 @@ static INPUT_PORTS_START( gauntlet )
 	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0030, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_VBLANK )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COIN")	/* 1020 (sound) */
@@ -458,7 +455,7 @@ static INPUT_PORTS_START( vindctr2 )
 	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_SERVICE( 0x0008, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0030, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_VBLANK )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xff80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("COIN")	/* 1020 (sound) */
@@ -1624,7 +1621,7 @@ ROM_END
 static void gauntlet_common_init(running_machine &machine, int slapstic, int vindctr2)
 {
 	gauntlet_state *state = machine.driver_data<gauntlet_state>();
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	state->m_eeprom_default = NULL;
 	atarigen_slapstic_init(machine.device("maincpu"), 0x038000, 0, slapstic);
 
@@ -1660,7 +1657,7 @@ static DRIVER_INIT( gauntlet2 )
 
 static DRIVER_INIT( vindctr2 )
 {
-	UINT8 *gfx2_base = machine.region("gfx2")->base();
+	UINT8 *gfx2_base = machine.root_device().memregion("gfx2")->base();
 	UINT8 *data = auto_alloc_array(machine, UINT8, 0x8000);
 	int i;
 

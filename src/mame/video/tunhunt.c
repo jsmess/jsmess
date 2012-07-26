@@ -48,12 +48,11 @@
 
 /****************************************************************************************/
 
-WRITE8_HANDLER( tunhunt_videoram_w )
+WRITE8_MEMBER(tunhunt_state::tunhunt_videoram_w)
 {
-	tunhunt_state *state = space->machine().driver_data<tunhunt_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
@@ -156,7 +155,8 @@ static void set_pens(running_machine &machine)
     0020:   00 f0 f0 f0 b0 b0 00 f0
             00 f0 f0 00 b0 00 f0 f0
 */
-	//const UINT8 *color_prom = machine.region( "proms" )->base();
+	//const UINT8 *color_prom = machine.root_device().memregion( "proms" )->base();
+	tunhunt_state *state = machine.driver_data<tunhunt_state>();
 	int color;
 	int shade;
 	int i;
@@ -164,7 +164,7 @@ static void set_pens(running_machine &machine)
 
 	for( i=0; i<16; i++ )
 	{
-		color = machine.generic.paletteram.u8[i];
+		color = state->m_generic_paletteram_8[i];
 		shade = 0xf^(color>>4);
 
 		color &= 0xf; /* hue select */

@@ -101,6 +101,20 @@ public:
 	UINT8 m_speech_dummy_read; // have we done a dummy read yet?
 	UINT8 m_speech_load_address_count; // number of times load address has happened
 	UINT8 m_speech_load_settings_count; // number of times load settings has happened
+	DECLARE_READ8_MEMBER(socrates_rom_bank_r);
+	DECLARE_WRITE8_MEMBER(socrates_rom_bank_w);
+	DECLARE_READ8_MEMBER(socrates_ram_bank_r);
+	DECLARE_WRITE8_MEMBER(socrates_ram_bank_w);
+	DECLARE_READ8_MEMBER(read_f3);
+	DECLARE_WRITE8_MEMBER(unknownlatch_30);
+	DECLARE_READ8_MEMBER(status_and_speech);
+	DECLARE_WRITE8_MEMBER(speech_command);
+	DECLARE_READ8_MEMBER(socrates_keyboard_low_r);
+	DECLARE_READ8_MEMBER(socrates_keyboard_high_r);
+	DECLARE_WRITE8_MEMBER(socrates_keyboard_clear);
+	DECLARE_WRITE8_MEMBER(reset_speech);
+	DECLARE_WRITE8_MEMBER(socrates_scroll_w);
+	DECLARE_WRITE8_MEMBER(socrates_sound_w);
 };
 
 
@@ -113,14 +127,14 @@ public:
 static void socrates_set_rom_bank( running_machine &machine )
 {
 	socrates_state *state = machine.driver_data<socrates_state>();
-	memory_set_bankptr( machine, "bank1", machine.region("maincpu")->base() + ( state->m_rom_bank * 0x4000 ));
+	state->membank( "bank1" )->set_base( state->memregion("maincpu")->base() + ( state->m_rom_bank * 0x4000 ));
 }
 
 static void socrates_set_ram_bank( running_machine &machine )
 {
 	socrates_state *state = machine.driver_data<socrates_state>();
-	memory_set_bankptr( machine, "bank2", machine.region("vram")->base() + ( (state->m_ram_bank&0x3) * 0x4000 )); // window 0
-	memory_set_bankptr( machine, "bank3", machine.region("vram")->base() + ( ((state->m_ram_bank&0xC)>>2) * 0x4000 )); // window 1
+	state->membank( "bank2" )->set_base( machine.root_device().memregion("vram")->base() + ( (state->m_ram_bank&0x3) * 0x4000 )); // window 0
+	state->membank( "bank3" )->set_base( state->memregion("vram")->base() + ( ((state->m_ram_bank&0xC)>>2) * 0x4000 )); // window 1
 }
 
 static void socrates_update_kb( running_machine &machine )
@@ -132,7 +146,7 @@ static void socrates_update_kb( running_machine &machine )
 	// first check that the kb latch[1] is clear; if it isn't, don't touch it!
 	if ((state->m_kb_latch_low[1] != 0) || (state->m_kb_latch_high[1] != 1)) return;
 	// next check for joypad buttons
-	keyvalue = input_port_read(machine, "keyboard_jp");
+	keyvalue = machine.root_device().ioport("keyboard_jp")->read();
 	if (keyvalue != 0)
 	{
 		state->m_kb_latch_low[1] = (keyvalue & 0xFF0)>>4;
@@ -142,11 +156,11 @@ static void socrates_update_kb( running_machine &machine )
 	// next check for mouse movement.
 	// this isn't written yet, so write me please!
 	// next check if shift is down
-	shift = input_port_read(machine, "keyboard_50");
+	shift = machine.root_device().ioport("keyboard_50")->read();
 	// find key low and high byte ok keyboard section
 	for (row = 4; row>=0; row--)
 	{
-		keyvalue = input_port_read(machine, rownames[row]);
+		keyvalue = machine.root_device().ioport(rownames[row])->read();
 		if (keyvalue != 0)
 		{
 			for (powerof2 = 9; powerof2 >= 0; powerof2--)
@@ -206,7 +220,7 @@ static MACHINE_RESET( socrates )
 
 static DRIVER_INIT( socrates )
 {
-	UINT8 *gfx = machine.region("vram")->base();
+	UINT8 *gfx = machine.root_device().memregion("vram")->base();
 	int i;
     /* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
     for (i = 0; i < 0x10000; i++)
@@ -215,49 +229,44 @@ static DRIVER_INIT( socrates )
     machine.device("maincpu")->set_clock_scale(0.45f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
-static READ8_HANDLER( socrates_rom_bank_r )
+READ8_MEMBER(socrates_state::socrates_rom_bank_r)
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
  UINT8 data = 0xFF;
- data = state->m_rom_bank;
+ data = m_rom_bank;
  return data;
 }
 
-static WRITE8_HANDLER( socrates_rom_bank_w )
+WRITE8_MEMBER(socrates_state::socrates_rom_bank_w)
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
- state->m_rom_bank = data;
- socrates_set_rom_bank(space->machine());
+ m_rom_bank = data;
+ socrates_set_rom_bank(machine());
 }
 
-static READ8_HANDLER( socrates_ram_bank_r )
+READ8_MEMBER(socrates_state::socrates_ram_bank_r)
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
  UINT8 data = 0xFF;
- data = state->m_ram_bank;
+ data = m_ram_bank;
  return data;
 }
 
-static WRITE8_HANDLER( socrates_ram_bank_w )
+WRITE8_MEMBER(socrates_state::socrates_ram_bank_w)
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
- state->m_ram_bank = data&0xF;
- socrates_set_ram_bank(space->machine());
+ m_ram_bank = data&0xF;
+ socrates_set_ram_bank(machine());
 }
 
-static READ8_HANDLER( read_f3 ) // used for read-only i/o ports as mame/mess doesn't have a way to set the unmapped area to read as 0xF3
+READ8_MEMBER(socrates_state::read_f3)// used for read-only i/o ports as mame/mess doesn't have a way to set the unmapped area to read as 0xF3
 {
  return 0xF3;
 }
 
-static WRITE8_HANDLER( unknownlatch_30 ) // writes to i/o 0x3x do SOMETHING, possibly waitstate related (may halt cpu until vblank start?) or involve status reg bit 6
+WRITE8_MEMBER(socrates_state::unknownlatch_30)// writes to i/o 0x3x do SOMETHING, possibly waitstate related (may halt cpu until vblank start?) or involve status reg bit 6
 {
 //logerror("write to i/o 0x30, data %x\n", data); // too annoying to leave enabled
 }
 
-static READ8_HANDLER( status_and_speech ) // read 0x4x, some sort of status reg
+READ8_MEMBER(socrates_state::status_and_speech)// read 0x4x, some sort of status reg
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
 // bit 7 - speech status: high when speech is playing, low when it is not (or when speech cart is not present)
 // bit 6 - unknown, usually set, may involve the writes to 0x30, possibly some sort of fixed-length timer?
 // bit 5 - vblank status, high when not in vblank
@@ -266,37 +275,37 @@ static READ8_HANDLER( status_and_speech ) // read 0x4x, some sort of status reg
 // bit 2 - speech chip bit 2
 // bit 1 - speech chip bit 1
 // bit 0 - speech chip bit 0
-UINT8 *speechromint = space->machine().region("speechint")->base();
-UINT8 *speechromext = space->machine().region("speechext")->base();
+UINT8 *speechromint = memregion("speechint")->base();
+UINT8 *speechromext = memregion("speechext")->base();
 	int temp = 0;
-	temp |= (state->m_speech_running)?0x80:0;
+	temp |= (m_speech_running)?0x80:0;
 	temp |= 0x40; // unknown
-	temp |= (state->m_vblankstate)?0:0x20;
-	temp |= (state->m_hblankstate)?0:0x10;
-	switch(state->m_io40_latch&0xF0) // what was last opcode sent?
+	temp |= (m_vblankstate)?0:0x20;
+	temp |= (m_hblankstate)?0:0x10;
+	switch(m_io40_latch&0xF0) // what was last opcode sent?
 	{
 		case 0x60: case 0xE0:// speech status 'read' register
-			if(state->m_speech_settings&0x04) // external speech roms (outside of speech ic but still in cart) enabled
+			if(m_speech_settings&0x04) // external speech roms (outside of speech ic but still in cart) enabled
 			{
-			logerror("reading external speech rom nybble from nybble address %x (byte address %x)\n",state->m_speech_address, state->m_speech_address>>1);
-			temp |= ((speechromext[((state->m_speech_address>>1)&0xffff)]>>((state->m_speech_address&1)*4))&0xF);
+			logerror("reading external speech rom nybble from nybble address %x (byte address %x)\n",m_speech_address, m_speech_address>>1);
+			temp |= ((speechromext[((m_speech_address>>1)&0xffff)]>>((m_speech_address&1)*4))&0xF);
 			}
 			else
 			{
-			logerror("reading internal speech rom nybble from nybble address %x (byte address %x)\n",state->m_speech_address, state->m_speech_address>>1);
-			temp |= ((speechromint[((state->m_speech_address>>1)&0x1fff)]>>((state->m_speech_address&1)*4))&0xF);
+			logerror("reading internal speech rom nybble from nybble address %x (byte address %x)\n",m_speech_address, m_speech_address>>1);
+			temp |= ((speechromint[((m_speech_address>>1)&0x1fff)]>>((m_speech_address&1)*4))&0xF);
 			}
-			if (state->m_speech_dummy_read == 0) // if we havent done the dummy read yet, do so now
+			if (m_speech_dummy_read == 0) // if we havent done the dummy read yet, do so now
 			{
-				state->m_speech_dummy_read++;
+				m_speech_dummy_read++;
 			}
 			else
 			{
-				state->m_speech_address++;
+				m_speech_address++;
 			}
 			break;
 		default:
-			temp |= state->m_io40_latch&0xF; // read open bus
+			temp |= m_io40_latch&0xF; // read open bus
 			break;
 	}
 	logerror("read from i/o 0x4x of %x\n", temp);
@@ -310,9 +319,8 @@ static TIMER_CALLBACK( clear_speech_cb )
 	state->m_speech_load_settings_count = 0;
 }
 
-static WRITE8_HANDLER( speech_command ) // write 0x4x, some sort of bitfield; speech chip is probably hitachi hd38880 related but not exact, w/4 bit interface
+WRITE8_MEMBER(socrates_state::speech_command)// write 0x4x, some sort of bitfield; speech chip is probably hitachi hd38880 related but not exact, w/4 bit interface
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
 	logerror("write to i/o 0x4x of %x\n", data);
 /*
 // the high 4 bits of the write control which 'register' is written to, the low 4 bits are data (this is based on a readback test)
@@ -370,8 +378,8 @@ end hd38880 info.*/
 			if (data==0x80)
 			{
 				/* write me: start talking */
-				state->m_speech_running = 1;
-				space->machine().scheduler().timer_set(attotime::from_seconds(4), FUNC(clear_speech_cb)); // hack
+				m_speech_running = 1;
+				machine().scheduler().timer_set(attotime::from_seconds(4), FUNC(clear_speech_cb)); // hack
 			}
 			break;
 		case 0x90: // unknown, one of these is probably read and branch
@@ -381,31 +389,31 @@ end hd38880 info.*/
 		case 0xB0: // unknown
 			break;
 		case 0xC0: // load address to vsm
-			state->m_speech_address |= (((int)data&0xF)<<(state->m_speech_load_address_count*4))<<1;
-			state->m_speech_load_address_count++;
-			logerror("loaded address nybble %X, byte address is currently %5X with %d nybbles loaded\n", data&0xF, state->m_speech_address>>1, state->m_speech_load_address_count);
+			m_speech_address |= (((int)data&0xF)<<(m_speech_load_address_count*4))<<1;
+			m_speech_load_address_count++;
+			logerror("loaded address nybble %X, byte address is currently %5X with %d nybbles loaded\n", data&0xF, m_speech_address>>1, m_speech_load_address_count);
 			break;
 		case 0xD0: // load settings
-			state->m_speech_settings |= ((data&0xF)<<(state->m_speech_load_settings_count*4));
-			state->m_speech_load_settings_count++;
+			m_speech_settings |= ((data&0xF)<<(m_speech_load_settings_count*4));
+			m_speech_load_settings_count++;
 			break;
 		case 0xE0: // read byte, handled elsewhere
 			break;
 		case 0xF0: // command: sub 0 is speak, sub 8 is reset
 			if ((data&0xF) == 0) // speak
 			{
-				state->m_speech_running = 1;
-				space->machine().scheduler().timer_set(attotime::from_seconds(4), FUNC(clear_speech_cb)); // hack
+				m_speech_running = 1;
+				machine().scheduler().timer_set(attotime::from_seconds(4), FUNC(clear_speech_cb)); // hack
 			}
 			else if ((data&0xF) == 8) // reset
 			{
-				state->m_speech_running = 0;
-				state->m_speech_address = 0;
-				state->m_speech_settings = 0;
-				state->m_speech_dummy_read = 0;
-				state->m_speech_load_address_count = 0;
-				state->m_speech_load_settings_count = 0;
-				state->m_io40_latch &= 0x0f; // set last command to 0 to prevent problems
+				m_speech_running = 0;
+				m_speech_address = 0;
+				m_speech_settings = 0;
+				m_speech_dummy_read = 0;
+				m_speech_load_address_count = 0;
+				m_speech_load_settings_count = 0;
+				m_io40_latch &= 0x0f; // set last command to 0 to prevent problems
 			}
 			else // other
 			{
@@ -415,56 +423,51 @@ end hd38880 info.*/
 		default: // 00 through 70 are packets without the write bit set, ignore them
 			break;
 	}
-	state->m_io40_latch = data;
+	m_io40_latch = data;
 }
 
-static READ8_HANDLER( socrates_keyboard_low_r ) // keyboard code low
+READ8_MEMBER(socrates_state::socrates_keyboard_low_r)// keyboard code low
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
- socrates_update_kb(space->machine());
- socrates_check_kb_latch(space->machine());
- return state->m_kb_latch_low[0];
+ socrates_update_kb(machine());
+ socrates_check_kb_latch(machine());
+ return m_kb_latch_low[0];
 }
 
-static READ8_HANDLER( socrates_keyboard_high_r ) // keyboard code high
+READ8_MEMBER(socrates_state::socrates_keyboard_high_r)// keyboard code high
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
- socrates_update_kb(space->machine());
- socrates_check_kb_latch(space->machine());
- return state->m_kb_latch_high[0];
+ socrates_update_kb(machine());
+ socrates_check_kb_latch(machine());
+ return m_kb_latch_high[0];
 }
 
-static WRITE8_HANDLER( socrates_keyboard_clear ) // keyboard latch shift/clear
+WRITE8_MEMBER(socrates_state::socrates_keyboard_clear)// keyboard latch shift/clear
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
-	state->m_kb_latch_low[0] = state->m_kb_latch_low[1];
-	state->m_kb_latch_high[0] = state->m_kb_latch_high[1];
-	state->m_kb_latch_low[1] = 0;
-	state->m_kb_latch_high[1] = 1;
+	m_kb_latch_low[0] = m_kb_latch_low[1];
+	m_kb_latch_high[0] = m_kb_latch_high[1];
+	m_kb_latch_low[1] = 0;
+	m_kb_latch_high[1] = 1;
 }
 
-static WRITE8_HANDLER( reset_speech ) // i/o 60: reset speech synth
+WRITE8_MEMBER(socrates_state::reset_speech)// i/o 60: reset speech synth
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
- state->m_speech_running = 0;
- state->m_speech_address = 0;
- state->m_speech_settings = 0;
- state->m_speech_dummy_read = 0;
- state->m_speech_load_address_count = 0;
- state->m_speech_load_settings_count = 0;
- state->m_io40_latch &= 0x0f; // set last command to 0 to prevent problems
+ m_speech_running = 0;
+ m_speech_address = 0;
+ m_speech_settings = 0;
+ m_speech_dummy_read = 0;
+ m_speech_load_address_count = 0;
+ m_speech_load_settings_count = 0;
+ m_io40_latch &= 0x0f; // set last command to 0 to prevent problems
 logerror("write to i/o 0x60 of %x\n",data);
 }
 
 /* stuff below belongs in video/nc.c */
 
-static WRITE8_HANDLER( socrates_scroll_w )
+WRITE8_MEMBER(socrates_state::socrates_scroll_w)
 {
-	socrates_state *state = space->machine().driver_data<socrates_state>();
  if (offset == 0)
- state->m_scroll_offset = (state->m_scroll_offset&0x100) | data;
+ m_scroll_offset = (m_scroll_offset&0x100) | data;
  else
- state->m_scroll_offset = (state->m_scroll_offset&0xFF) | ((data&1)<<8);
+ m_scroll_offset = (m_scroll_offset&0xFF) | ((data&1)<<8);
 }
 
 /* NTSC-based Palette stuff */
@@ -585,7 +588,7 @@ static PALETTE_INIT( socrates )
 static VIDEO_START( socrates )
 {
 	socrates_state *state = machine.driver_data<socrates_state>();
-	state->m_videoram = machine.region("vram")->base();
+	state->m_videoram = state->memregion("vram")->base();
 	state->m_scroll_offset = 0;
 }
 
@@ -628,9 +631,9 @@ static SCREEN_UPDATE_IND16( socrates )
 
 /* below belongs in sound/nc.c */
 
-static WRITE8_HANDLER(socrates_sound_w)
+WRITE8_MEMBER(socrates_state::socrates_sound_w)
 {
-	device_t *socr_snd = space->machine().device("soc_snd");
+	device_t *socr_snd = machine().device("soc_snd");
 	switch(offset)
 	{
 		case 0:
@@ -655,7 +658,7 @@ static WRITE8_HANDLER(socrates_sound_w)
  Address Maps
 ******************************************************************************/
 
-static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8, socrates_state )
     ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE(0x0000, 0x3fff) AM_ROM /* system rom, bank 0 (fixed) */
     AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1") /* banked rom space; system rom is banks 0 through F, cartridge rom is banks 10 onward, usually banks 10 through 17. area past the end of the cartridge, and the whole 10-ff area when no cartridge is inserted, reads as 0xF3 */
@@ -663,7 +666,7 @@ static ADDRESS_MAP_START(z80_mem, AS_PROGRAM, 8)
     AM_RANGE(0xc000, 0xffff) AM_RAMBANK("bank3") /* banked ram 'window' 1 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(z80_io, AS_IO, 8)
+static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(socrates_rom_bank_r, socrates_rom_bank_w) AM_MIRROR(0x7) /* rom bank select - RW - 8 bits */

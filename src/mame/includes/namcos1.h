@@ -47,6 +47,21 @@ public:
 	UINT8 *m_tilemap_maskdata;
 	int m_copy_sprites;
 	UINT8 m_drawmode_table[16];
+	DECLARE_WRITE8_MEMBER(namcos1_sub_firq_w);
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_WRITE8_MEMBER(firq_ack_w);
+	DECLARE_READ8_MEMBER(dsw_r);
+	DECLARE_WRITE8_MEMBER(namcos1_coin_w);
+	DECLARE_WRITE8_MEMBER(namcos1_dac_gain_w);
+	DECLARE_WRITE8_MEMBER(namcos1_dac0_w);
+	DECLARE_WRITE8_MEMBER(namcos1_dac1_w);
+	DECLARE_WRITE8_MEMBER(namcos1_sound_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(namcos1_cpu_control_w);
+	DECLARE_WRITE8_MEMBER(namcos1_watchdog_w);
+	DECLARE_WRITE8_MEMBER(namcos1_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(namcos1_subcpu_bank_w);
+	DECLARE_WRITE8_MEMBER(namcos1_mcu_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(namcos1_mcu_patch_w);
 };
 
 
@@ -57,15 +72,8 @@ void namcos1_init_DACs(running_machine &machine);
 
 /*----------- defined in machine/namcos1.c -----------*/
 
-WRITE8_HANDLER( namcos1_bankswitch_w );
-WRITE8_HANDLER( namcos1_subcpu_bank_w );
 
-WRITE8_HANDLER( namcos1_cpu_control_w );
-WRITE8_HANDLER( namcos1_watchdog_w );
-WRITE8_HANDLER( namcos1_sound_bankswitch_w );
 
-WRITE8_HANDLER( namcos1_mcu_bankswitch_w );
-WRITE8_HANDLER( namcos1_mcu_patch_w );
 
 MACHINE_RESET( namcos1 );
 

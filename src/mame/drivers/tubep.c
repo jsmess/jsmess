@@ -114,7 +114,7 @@ TP-S.1 TP-S.2 TP-S.3 TP-B.1  8212 TP-B.2 TP-B.3          TP-B.4
  *************************************/
 
 
-static WRITE8_HANDLER( tubep_LS259_w )
+WRITE8_MEMBER(tubep_state::tubep_LS259_w)
 {
 	switch(offset)
 	{
@@ -124,7 +124,7 @@ static WRITE8_HANDLER( tubep_LS259_w )
                     port b0: bit0 - coin 1 counter
                     port b1  bit0 - coin 2 counter
                 */
-				coin_counter_w(space->machine(), offset,data&1);
+				coin_counter_w(machine(), offset,data&1);
 				break;
 		case 2:
 				//something...
@@ -144,31 +144,29 @@ static WRITE8_HANDLER( tubep_LS259_w )
 }
 
 
-static ADDRESS_MAP_START( tubep_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tubep_main_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_BASE_MEMBER(tubep_state, m_textram)	/* RAM on GFX PCB @B13 */
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_SHARE("textram")	/* RAM on GFX PCB @B13 */
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITEONLY AM_SHARE("share1")
-	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE("share4")				/* row of 8 x 2147 RAMs on main PCB */
+	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE("backgroundram")				/* row of 8 x 2147 RAMs on main PCB */
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( main_cpu_irq_line_clear_w )
+WRITE8_MEMBER(tubep_state::main_cpu_irq_line_clear_w)
 {
-	tubep_state *state = space->machine().driver_data<tubep_state>();
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
-	logerror("CPU#0 VBLANK int clear at scanline=%3i\n", state->m_curr_scanline);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	logerror("CPU#0 VBLANK int clear at scanline=%3i\n", m_curr_scanline);
 	return;
 }
 
 
-static WRITE8_HANDLER( tubep_soundlatch_w )
+WRITE8_MEMBER(tubep_state::tubep_soundlatch_w)
 {
-	tubep_state *state = space->machine().driver_data<tubep_state>();
-	state->m_sound_latch = (data&0x7f) | 0x80;
+	m_sound_latch = (data&0x7f) | 0x80;
 }
 
-static ADDRESS_MAP_START( tubep_main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( tubep_main_portmap, AS_IO, 8, tubep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW1")
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("DSW2")
@@ -191,68 +189,66 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static WRITE8_HANDLER( second_cpu_irq_line_clear_w )
+WRITE8_MEMBER(tubep_state::second_cpu_irq_line_clear_w)
 {
-	tubep_state *state = space->machine().driver_data<tubep_state>();
-	cputag_set_input_line(space->machine(), "slave", 0, CLEAR_LINE);
-	logerror("CPU#1 VBLANK int clear at scanline=%3i\n", state->m_curr_scanline);
+	cputag_set_input_line(machine(), "slave", 0, CLEAR_LINE);
+	logerror("CPU#1 VBLANK int clear at scanline=%3i\n", m_curr_scanline);
 	return;
 }
 
 
-static ADDRESS_MAP_START( tubep_second_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tubep_second_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tubep_background_a000_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(tubep_background_c000_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")								/* 6116 #1 */
-	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE("share4") AM_BASE_MEMBER(tubep_state, m_backgroundram)	/* row of 8 x 2147 RAMs on main PCB */
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_SHARE("share3")						/* sprites color lookup table */
+	AM_RANGE(0xe800, 0xebff) AM_WRITEONLY AM_SHARE("backgroundram")	/* row of 8 x 2147 RAMs on main PCB */
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITEONLY AM_SHARE("sprite_color")						/* sprites color lookup table */
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share2")									/* program copies here part of shared ram ?? */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tubep_second_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( tubep_second_portmap, AS_IO, 8, tubep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_WRITE(second_cpu_irq_line_clear_w)
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER( tubep_soundlatch_r )
+READ8_MEMBER(tubep_state::tubep_soundlatch_r)
 {
-	tubep_state *state = space->machine().driver_data<tubep_state>();
 	int res;
 
-	res = state->m_sound_latch;
-	state->m_sound_latch = 0; /* "=0" ????  or "&= 0x7f" ?????  works either way */
+	res = m_sound_latch;
+	m_sound_latch = 0; /* "=0" ????  or "&= 0x7f" ?????  works either way */
 
 	return res;
 }
 
-static READ8_HANDLER( tubep_sound_irq_ack )
+READ8_MEMBER(tubep_state::tubep_sound_irq_ack)
 {
-	cputag_set_input_line(space->machine(), "soundcpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "soundcpu", 0, CLEAR_LINE);
 	return 0;
 }
 
-static WRITE8_HANDLER( tubep_sound_unknown )
+WRITE8_MEMBER(tubep_state::tubep_sound_unknown)
 {
 	/*logerror("Sound CPU writes to port 0x07 - unknown function\n");*/
 	return;
 }
 
 
-static ADDRESS_MAP_START( tubep_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tubep_sound_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xd000, 0xd000) AM_READ(tubep_sound_irq_ack)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM		/* 6116 #3 */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( tubep_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( tubep_sound_portmap, AS_IO, 8, tubep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay3", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE_LEGACY("ay3", ay8910_address_data_w)
 	AM_RANGE(0x06, 0x06) AM_READ(tubep_soundlatch_r)
 	AM_RANGE(0x07, 0x07) AM_WRITE(tubep_sound_unknown)
 ADDRESS_MAP_END
@@ -364,8 +360,8 @@ static MACHINE_RESET( tubep )
  *************************************/
 
 /* MS2010-A CPU (equivalent to NSC8105 with one new opcode: 0xec) on graphics PCB */
-static ADDRESS_MAP_START( nsc_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share3") AM_BASE_MEMBER(tubep_state, m_sprite_colorsharedram)
+static ADDRESS_MAP_START( nsc_map, AS_PROGRAM, 8, tubep_state )
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("sprite_color")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x2000, 0x2009) AM_WRITE(tubep_sprite_control_w)
 	AM_RANGE(0x200a, 0x200b) AM_WRITENOP /* not used by the games - perhaps designed for debugging */
@@ -380,13 +376,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static WRITE8_HANDLER( rjammer_LS259_w )
+WRITE8_MEMBER(tubep_state::rjammer_LS259_w)
 {
 	switch(offset)
 	{
 		case 0:
 		case 1:
-				coin_counter_w(space->machine(), offset,data&1);	/* bit 0 = coin counter */
+				coin_counter_w(machine(), offset,data&1);	/* bit 0 = coin counter */
 				break;
 		case 5:
 				//screen_flip_w(offset,data&1); /* bit 0 = screen flip, active high */
@@ -397,23 +393,22 @@ static WRITE8_HANDLER( rjammer_LS259_w )
 }
 
 
-static WRITE8_HANDLER( rjammer_soundlatch_w )
+WRITE8_MEMBER(tubep_state::rjammer_soundlatch_w)
 {
-	tubep_state *state = space->machine().driver_data<tubep_state>();
-	state->m_sound_latch = data;
-	cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
+	m_sound_latch = data;
+	cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
-static ADDRESS_MAP_START( rjammer_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rjammer_main_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM									/* MB8416 SRAM on daughterboard on main PCB (there are two SRAMs, this is the one on the left) */
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_BASE_MEMBER(tubep_state, m_textram)/* RAM on GFX PCB @B13 */
+	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(tubep_textram_w) AM_SHARE("textram")/* RAM on GFX PCB @B13 */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")						/* MB8416 SRAM on daughterboard (the one on the right) */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rjammer_main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( rjammer_main_portmap, AS_IO, 8, tubep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW2")	/* a bug in game code (during attract mode) */
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW2")
@@ -428,16 +423,16 @@ static ADDRESS_MAP_START( rjammer_main_portmap, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rjammer_second_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rjammer_second_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM							/* M5M5117P @21G */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")				/* MB8416 on daughterboard (the one on the right) */
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(tubep_state, m_rjammer_backgroundram)/* M5M5117P @19B (background) */
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("rjammer_bgram")/* M5M5117P @19B (background) */
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share2")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rjammer_second_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( rjammer_second_portmap, AS_IO, 8, tubep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(rjammer_background_page_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(rjammer_background_LS377_w)
@@ -529,10 +524,9 @@ static MACHINE_RESET( rjammer )
  *
  *************************************/
 
-static READ8_HANDLER( rjammer_soundlatch_r )
+READ8_MEMBER(tubep_state::rjammer_soundlatch_r)
 {
-	tubep_state *state = space->machine().driver_data<tubep_state>();
-	int res = state->m_sound_latch;
+	int res = m_sound_latch;
 	return res;
 }
 
@@ -578,25 +572,24 @@ static void rjammer_adpcm_vck (device_t *device)
 }
 
 
-static WRITE8_HANDLER( rjammer_voice_input_w )
+WRITE8_MEMBER(tubep_state::rjammer_voice_input_w)
 {
-	tubep_state *state = space->machine().driver_data<tubep_state>();
 	/* 8 bits of adpcm data for MSM5205 */
 	/* need to buffer the data, and switch two nibbles on two following interrupts*/
 
-	state->m_ls377 = data;
+	m_ls377 = data;
 
 
 	/* NOTE: game resets interrupt line on ANY access to ANY I/O port.
             I do it here because this port (0x80) is first one accessed
             in the interrupt routine.
     */
-	cputag_set_input_line(space->machine(), "soundcpu", 0, CLEAR_LINE );
+	cputag_set_input_line(machine(), "soundcpu", 0, CLEAR_LINE );
 	return;
 }
 
 
-static WRITE8_HANDLER( rjammer_voice_intensity_control_w )
+WRITE8_MEMBER(tubep_state::rjammer_voice_intensity_control_w)
 {
 	/* 4 LSB bits select the intensity (analog circuit that alters the output from MSM5205) */
 	/* need to buffer the data */
@@ -604,21 +597,21 @@ static WRITE8_HANDLER( rjammer_voice_intensity_control_w )
 }
 
 
-static ADDRESS_MAP_START( rjammer_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rjammer_sound_map, AS_PROGRAM, 8, tubep_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM		/* M5M5117P (M58125P @2C on schematics) */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rjammer_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( rjammer_sound_portmap, AS_IO, 8, tubep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(rjammer_soundlatch_r)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("msm", rjammer_voice_startstop_w)
-	AM_RANGE(0x18, 0x18) AM_DEVWRITE("msm", rjammer_voice_frequency_select_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("msm", rjammer_voice_startstop_w)
+	AM_RANGE(0x18, 0x18) AM_DEVWRITE_LEGACY("msm", rjammer_voice_frequency_select_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(rjammer_voice_input_w)
-	AM_RANGE(0x90, 0x91) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x92, 0x93) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x94, 0x95) AM_DEVWRITE("ay3", ay8910_address_data_w)
+	AM_RANGE(0x90, 0x91) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x92, 0x93) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x94, 0x95) AM_DEVWRITE_LEGACY("ay3", ay8910_address_data_w)
 	AM_RANGE(0x96, 0x96) AM_WRITE(rjammer_voice_intensity_control_w)
 ADDRESS_MAP_END
 

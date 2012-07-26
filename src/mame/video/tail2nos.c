@@ -62,7 +62,7 @@ VIDEO_START( tail2nos )
 
 	state->m_bg_tilemap->set_transparent_pen(15);
 
-	state->m_zoomdata = (UINT16 *)machine.region("gfx3")->base();
+	state->m_zoomdata = (UINT16 *)state->memregion("gfx3")->base();
 
 	state->save_pointer(NAME(state->m_zoomdata), 0x20000 / 2);
 	machine.save().register_postload(save_prepost_delegate(FUNC(tail2nos_postload), &machine));
@@ -76,33 +76,29 @@ VIDEO_START( tail2nos )
 
 ***************************************************************************/
 
-WRITE16_HANDLER( tail2nos_bgvideoram_w )
+WRITE16_MEMBER(tail2nos_state::tail2nos_bgvideoram_w)
 {
-	tail2nos_state *state = space->machine().driver_data<tail2nos_state>();
 
-	COMBINE_DATA(&state->m_bgvideoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bgvideoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ16_HANDLER( tail2nos_zoomdata_r )
+READ16_MEMBER(tail2nos_state::tail2nos_zoomdata_r)
 {
-	tail2nos_state *state = space->machine().driver_data<tail2nos_state>();
-	return state->m_zoomdata[offset];
+	return m_zoomdata[offset];
 }
 
-WRITE16_HANDLER( tail2nos_zoomdata_w )
+WRITE16_MEMBER(tail2nos_state::tail2nos_zoomdata_w)
 {
-	tail2nos_state *state = space->machine().driver_data<tail2nos_state>();
-	int oldword = state->m_zoomdata[offset];
+	int oldword = m_zoomdata[offset];
 
-	COMBINE_DATA(&state->m_zoomdata[offset]);
-	if (oldword != state->m_zoomdata[offset])
-		gfx_element_mark_dirty(space->machine().gfx[2], offset / 64);
+	COMBINE_DATA(&m_zoomdata[offset]);
+	if (oldword != m_zoomdata[offset])
+		gfx_element_mark_dirty(machine().gfx[2], offset / 64);
 }
 
-WRITE16_HANDLER( tail2nos_gfxbank_w )
+WRITE16_MEMBER(tail2nos_state::tail2nos_gfxbank_w)
 {
-	tail2nos_state *state = space->machine().driver_data<tail2nos_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -116,10 +112,10 @@ WRITE16_HANDLER( tail2nos_gfxbank_w )
 		else
 			bank = 0;
 
-		if (state->m_charbank != bank)
+		if (m_charbank != bank)
 		{
-			state->m_charbank = bank;
-			state->m_bg_tilemap->mark_all_dirty();
+			m_charbank = bank;
+			m_bg_tilemap->mark_all_dirty();
 		}
 
 		/* bit 5 seems to select palette bank (used on startup) */
@@ -128,14 +124,14 @@ WRITE16_HANDLER( tail2nos_gfxbank_w )
 		else
 			bank = 3;
 
-		if (state->m_charpalette != bank)
+		if (m_charpalette != bank)
 		{
-			state->m_charpalette = bank;
-			state->m_bg_tilemap->mark_all_dirty();
+			m_charpalette = bank;
+			m_bg_tilemap->mark_all_dirty();
 		}
 
 		/* bit 4 seems to be video enable */
-		state->m_video_enable = data & 0x10;
+		m_video_enable = data & 0x10;
 	}
 }
 
@@ -153,7 +149,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	int offs;
 
 
-	for (offs = 0; offs < state->m_spriteram_size / 2; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes() / 2; offs += 4)
 	{
 		int sx, sy, flipx, flipy, code, color;
 

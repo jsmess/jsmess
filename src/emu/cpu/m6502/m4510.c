@@ -142,7 +142,7 @@ struct _m4510_Regs {
 	UINT16  low, high;
 	UINT32	mem[8];
 
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *space;
 	direct_read_data *direct;
@@ -393,8 +393,8 @@ static WRITE8_HANDLER( m4510_write_0000 )
 	cpustate->out_port_func(0, m4510_get_port(downcast<legacy_cpu_device *>(&space->device())));
 }
 
-static ADDRESS_MAP_START(m4510_mem, AS_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x0001) AM_READWRITE(m4510_read_0000, m4510_write_0000)
+static ADDRESS_MAP_START(m4510_mem, AS_PROGRAM, 8, legacy_cpu_device)
+	AM_RANGE(0x0000, 0x0001) AM_READWRITE_LEGACY(m4510_read_0000, m4510_write_0000)
 ADDRESS_MAP_END
 
 static CPU_TRANSLATE( m4510 )

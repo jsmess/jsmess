@@ -32,6 +32,7 @@
 
 PALETTE_INIT( m57 )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	machine.colortable = colortable_alloc(machine, 32 * 8 + 16);
@@ -126,12 +127,11 @@ static TILE_GET_INFO( get_tile_info )
  *
  *************************************/
 
-WRITE8_HANDLER( m57_videoram_w )
+WRITE8_MEMBER(m57_state::m57_videoram_w)
 {
-	m57_state *state = space->machine().driver_data<m57_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
@@ -158,16 +158,15 @@ VIDEO_START( m57 )
  *
  *************************************/
 
-WRITE8_HANDLER( m57_flipscreen_w )
+WRITE8_MEMBER(m57_state::m57_flipscreen_w)
 {
-	m57_state *state = space->machine().driver_data<m57_state>();
 
 	/* screen flip is handled both by software and hardware */
-	state->m_flipscreen = (data & 0x01) ^ (~input_port_read(space->machine(), "DSW2") & 0x01);
-	state->m_bg_tilemap->set_flip(state->m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	m_flipscreen = (data & 0x01) ^ (~ioport("DSW2")->read() & 0x01);
+	m_bg_tilemap->set_flip(m_flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	coin_counter_w(space->machine(), 0,data & 0x02);
-	coin_counter_w(space->machine(), 1,data & 0x20);
+	coin_counter_w(machine(), 0,data & 0x02);
+	coin_counter_w(machine(), 1,data & 0x20);
 }
 
 
@@ -226,7 +225,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	m57_state *state = machine.driver_data<m57_state>();
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		UINT8 attributes = state->m_spriteram[offs + 1];
 		int sx = state->m_spriteram[offs + 3];

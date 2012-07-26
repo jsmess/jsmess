@@ -53,7 +53,6 @@ Notes:
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -92,7 +91,7 @@ WRITE8_MEMBER( vixen_state::ctl_w )
 {
 	logerror("CTL %u\n", data);
 
-	memory_set_bank(machine(), "bank3", BIT(data, 0));
+	membank("bank3")->set_entry(BIT(data, 0));
 }
 
 
@@ -267,7 +266,7 @@ READ8_MEMBER( vixen_state::port3_r )
 static ADDRESS_MAP_START( vixen_mem, AS_PROGRAM, 8, vixen_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
-	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4") AM_BASE(m_video_ram)
+	AM_RANGE(0xf000, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4") AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 
@@ -413,14 +412,14 @@ static TIMER_DEVICE_CALLBACK( vsync_tick )
 void vixen_state::video_start()
 {
 	// find memory regions
-	m_sync_rom = machine().region("video")->base();
-	m_char_rom = machine().region("chargen")->base();
+	m_sync_rom = memregion("video")->base();
+	m_char_rom = memregion("chargen")->base();
 
 	// register for state saving
 	save_item(NAME(m_alt));
 	save_item(NAME(m_256));
 	save_item(NAME(m_vsync));
-	save_pointer(NAME(m_video_ram), 0x1000);
+	save_pointer(NAME(m_video_ram.target()), 0x1000);
 }
 
 
@@ -512,14 +511,14 @@ READ8_MEMBER( vixen_state::i8155_pa_r )
 {
 	UINT8 data = 0xff;
 
-	if (!BIT(m_col, 0)) data &= input_port_read(machine(), "ROW0");
-	if (!BIT(m_col, 1)) data &= input_port_read(machine(), "ROW1");
-	if (!BIT(m_col, 2)) data &= input_port_read(machine(), "ROW2");
-	if (!BIT(m_col, 3)) data &= input_port_read(machine(), "ROW3");
-	if (!BIT(m_col, 4)) data &= input_port_read(machine(), "ROW4");
-	if (!BIT(m_col, 5)) data &= input_port_read(machine(), "ROW5");
-	if (!BIT(m_col, 6)) data &= input_port_read(machine(), "ROW6");
-	if (!BIT(m_col, 7)) data &= input_port_read(machine(), "ROW7");
+	if (!BIT(m_col, 0)) data &= ioport("ROW0")->read();
+	if (!BIT(m_col, 1)) data &= ioport("ROW1")->read();
+	if (!BIT(m_col, 2)) data &= ioport("ROW2")->read();
+	if (!BIT(m_col, 3)) data &= ioport("ROW3")->read();
+	if (!BIT(m_col, 4)) data &= ioport("ROW4")->read();
+	if (!BIT(m_col, 5)) data &= ioport("ROW5")->read();
+	if (!BIT(m_col, 6)) data &= ioport("ROW6")->read();
+	if (!BIT(m_col, 7)) data &= ioport("ROW7")->read();
 
 	return data;
 }
@@ -784,16 +783,16 @@ void vixen_state::machine_start()
 	// configure memory banking
 	UINT8 *ram = m_ram->pointer();
 
-	memory_configure_bank(machine(), "bank1", 0, 1, ram, 0);
-	memory_configure_bank(machine(), "bank1", 1, 1, machine().region(Z8400A_TAG)->base(), 0);
+	membank("bank1")->configure_entry(0, ram);
+	membank("bank1")->configure_entry(1, memregion(Z8400A_TAG)->base());
 
-	memory_configure_bank(machine(), "bank2", 0, 1, ram, 0);
-	memory_configure_bank(machine(), "bank2", 1, 1, m_video_ram, 0);
+	membank("bank2")->configure_entry(0, ram);
+	membank("bank2")->configure_entry(1, m_video_ram);
 
-	memory_configure_bank(machine(), "bank3", 0, 1, m_video_ram, 0);
-	memory_configure_bank(machine(), "bank3", 1, 1, machine().region(Z8400A_TAG)->base(), 0);
+	membank("bank3")->configure_entry(0, m_video_ram);
+	membank("bank3")->configure_entry(1, memregion(Z8400A_TAG)->base());
 
-	memory_configure_bank(machine(), "bank4", 0, 1, m_video_ram, 0);
+	membank("bank4")->configure_entry(0, m_video_ram);
 
 	// register for state saving
 	save_item(NAME(m_reset));
@@ -815,9 +814,9 @@ void vixen_state::machine_reset()
 	program->install_read_bank(0x0000, 0xefff, 0xfff, 0, "bank1");
 	program->install_write_bank(0x0000, 0xefff, 0xfff, 0, "bank2");
 
-	memory_set_bank(machine(), "bank1", 1);
-	memory_set_bank(machine(), "bank2", 1);
-	memory_set_bank(machine(), "bank3", 1);
+	membank("bank1")->set_entry(1);
+	membank("bank2")->set_entry(1);
+	membank("bank3")->set_entry(1);
 
 	m_reset = 1;
 
@@ -905,26 +904,24 @@ ROM_END
 //  DRIVER_INIT( vixen )
 //-------------------------------------------------
 
-DIRECT_UPDATE_HANDLER( vixen_direct_update_handler )
+DIRECT_UPDATE_MEMBER(vixen_state::vixen_direct_update_handler)
 {
-	vixen_state *state = machine.driver_data<vixen_state>();
-
 	if (address >= 0xf000)
 	{
-		if (state->m_reset)
+		if (m_reset)
 		{
-			address_space *program = state->m_maincpu->memory().space(AS_PROGRAM);
+			address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 			program->install_read_bank(0x0000, 0xefff, "bank1");
 			program->install_write_bank(0x0000, 0xefff, "bank2");
 
-			memory_set_bank(machine, "bank1", 0);
-			memory_set_bank(machine, "bank2", 0);
+			membank("bank1")->set_entry(0);
+			membank("bank2")->set_entry(0);
 
-			state->m_reset = 0;
+			m_reset = 0;
 		}
 
-		direct.explicit_configure(0xf000, 0xffff, 0xfff, machine.region(Z8400A_TAG)->base());
+		direct.explicit_configure(0xf000, 0xffff, 0xfff, machine().root_device().memregion(Z8400A_TAG)->base());
 
 		return ~0;
 	}
@@ -934,8 +931,9 @@ DIRECT_UPDATE_HANDLER( vixen_direct_update_handler )
 
 static DRIVER_INIT( vixen )
 {
+	vixen_state *state = machine.driver_data<vixen_state>();
 	address_space *program = machine.device<cpu_device>(Z8400A_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate(FUNC(vixen_direct_update_handler), &machine));
+	program->set_direct_update_handler(direct_update_delegate(FUNC(vixen_state::vixen_direct_update_handler), state));
 }
 
 

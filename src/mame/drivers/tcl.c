@@ -63,7 +63,7 @@ static SCREEN_UPDATE_IND16( tcl )
 	return 0;
 }
 
-static ADDRESS_MAP_START( tcl_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tcl_map, AS_PROGRAM, 8, tcl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM  /* bfff ? */
 ADDRESS_MAP_END
 
@@ -189,8 +189,8 @@ static DRIVER_INIT(tcl)
 	/* only the first part is decrypted (and verified)*/
 
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *dest = machine.region("maincpu")->base();
-	int len = machine.region("maincpu")->bytes();
+	UINT8 *dest = machine.root_device().memregion("maincpu")->base();
+	int len = machine.root_device().memregion("maincpu")->bytes();
 	UINT8 *src = auto_alloc_array(machine, UINT8, len);
 
 	int i,idx=0;

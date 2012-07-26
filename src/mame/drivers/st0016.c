@@ -25,58 +25,56 @@ UINT32 st0016_rom_bank;
  *
  *************************************/
 
-static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, st0016_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READ(st0016_sprite_ram_r) AM_WRITE(st0016_sprite_ram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_READ(st0016_sprite2_ram_r) AM_WRITE(st0016_sprite2_ram_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xe87f) AM_RAM /* common ram */
-	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE("stsnd", st0016_snd_r, st0016_snd_w) /* sound regs 8 x $20 bytes, see notes */
+	AM_RANGE(0xe900, 0xe9ff) AM_DEVREADWRITE_LEGACY("stsnd", st0016_snd_r, st0016_snd_w) /* sound regs 8 x $20 bytes, see notes */
 	AM_RANGE(0xea00, 0xebff) AM_READ(st0016_palette_ram_r) AM_WRITE(st0016_palette_ram_w)
 	AM_RANGE(0xec00, 0xec1f) AM_READ(st0016_character_ram_r) AM_WRITE(st0016_character_ram_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM /* work ram */
 ADDRESS_MAP_END
 
-static READ8_HANDLER(mux_r)
+READ8_MEMBER(st0016_state::mux_r)
 {
 /*
     76543210
         xxxx - input port #2
     xxxx     - dip switches (2x8 bits) (multiplexed)
 */
-	st0016_state *state = space->machine().driver_data<st0016_state>();
-	int retval = input_port_read(space->machine(), "SYSTEM") & 0x0f;
+	int retval = ioport("SYSTEM")->read() & 0x0f;
 
-	switch(state->mux_port & 0x30)
+	switch(mux_port & 0x30)
 	{
-		case 0x00: retval |= ((input_port_read(space->machine(), "DSW1") & 1) << 4) | ((input_port_read(space->machine(), "DSW1") & 0x10) << 1)
-								| ((input_port_read(space->machine(), "DSW2") & 1) << 6) | ((input_port_read(space->machine(), "DSW2") & 0x10) <<3); break;
-		case 0x10: retval |= ((input_port_read(space->machine(), "DSW1") & 2) << 3) | ((input_port_read(space->machine(), "DSW1") & 0x20)   )
-								| ((input_port_read(space->machine(), "DSW2") & 2) << 5) | ((input_port_read(space->machine(), "DSW2") & 0x20) <<2); break;
-		case 0x20: retval |= ((input_port_read(space->machine(), "DSW1") & 4) << 2) | ((input_port_read(space->machine(), "DSW1") & 0x40) >> 1)
-								| ((input_port_read(space->machine(), "DSW2") & 4) << 4) | ((input_port_read(space->machine(), "DSW2") & 0x40) <<1); break;
-		case 0x30: retval |= ((input_port_read(space->machine(), "DSW1") & 8) << 1) | ((input_port_read(space->machine(), "DSW1") & 0x80) >> 2)
-								| ((input_port_read(space->machine(), "DSW2") & 8) << 3) | ((input_port_read(space->machine(), "DSW2") & 0x80)    ); break;
+		case 0x00: retval |= ((ioport("DSW1")->read() & 1) << 4) | ((ioport("DSW1")->read() & 0x10) << 1)
+								| ((ioport("DSW2")->read() & 1) << 6) | ((ioport("DSW2")->read() & 0x10) <<3); break;
+		case 0x10: retval |= ((ioport("DSW1")->read() & 2) << 3) | ((ioport("DSW1")->read() & 0x20)   )
+								| ((ioport("DSW2")->read() & 2) << 5) | ((ioport("DSW2")->read() & 0x20) <<2); break;
+		case 0x20: retval |= ((ioport("DSW1")->read() & 4) << 2) | ((ioport("DSW1")->read() & 0x40) >> 1)
+								| ((ioport("DSW2")->read() & 4) << 4) | ((ioport("DSW2")->read() & 0x40) <<1); break;
+		case 0x30: retval |= ((ioport("DSW1")->read() & 8) << 1) | ((ioport("DSW1")->read() & 0x80) >> 2)
+								| ((ioport("DSW2")->read() & 8) << 3) | ((ioport("DSW2")->read() & 0x80)    ); break;
 	}
 
 	return retval;
 }
 
-static WRITE8_HANDLER(mux_select_w)
+WRITE8_MEMBER(st0016_state::mux_select_w)
 {
-	st0016_state *state = space->machine().driver_data<st0016_state>();
 
-	state->mux_port=data;
+	mux_port=data;
 }
 
-WRITE8_HANDLER(st0016_rom_bank_w)
+WRITE8_MEMBER(st0016_state::st0016_rom_bank_w)
 {
-	memory_set_bankptr(space->machine(),  "bank1", space->machine().region("maincpu")->base() + (data* 0x4000) + 0x10000 );
+	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + (data* 0x4000) + 0x10000 );
 	st0016_rom_bank=data;
 }
 
-static ADDRESS_MAP_START( st0016_io, AS_IO, 8 )
+static ADDRESS_MAP_START( st0016_io, AS_IO, 8, st0016_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w) /* video/crt regs ? */
 	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("P1") AM_WRITE(mux_select_w)
@@ -102,37 +100,37 @@ ADDRESS_MAP_END
 
 static UINT32 latches[8];
 
-static READ32_HANDLER(latch32_r)
+READ32_MEMBER(st0016_state::latch32_r)
 {
 	if(!offset)
 		latches[2]&=~2;
 	return latches[offset];
 }
 
-static WRITE32_HANDLER(latch32_w)
+WRITE32_MEMBER(st0016_state::latch32_w)
 {
 	if(!offset)
 		latches[2]|=1;
 	COMBINE_DATA(&latches[offset]);
-	space->machine().scheduler().synchronize();
+	machine().scheduler().synchronize();
 }
 
-static READ8_HANDLER(latch8_r)
+READ8_MEMBER(st0016_state::latch8_r)
 {
 	if(!offset)
 		latches[2]&=~1;
 	return latches[offset];
 }
 
-static WRITE8_HANDLER(latch8_w)
+WRITE8_MEMBER(st0016_state::latch8_w)
 {
 	if(!offset)
 		latches[2]|=2;
 	latches[offset]=data;
-	space->machine().scheduler().synchronize();
+	machine().scheduler().synchronize();
 }
 
-static ADDRESS_MAP_START( v810_mem,AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( v810_mem,AS_PROGRAM, 32, st0016_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM
 	AM_RANGE(0x80000000, 0x8001ffff) AM_RAM
 	AM_RANGE(0xc0000000, 0xc001ffff) AM_RAM
@@ -140,7 +138,7 @@ static ADDRESS_MAP_START( v810_mem,AS_PROGRAM, 32 )
 	AM_RANGE(0xfff80000, 0xffffffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( st0016_m2_io, AS_IO, 8 )
+static ADDRESS_MAP_START( st0016_m2_io, AS_IO, 8, st0016_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w)
 	AM_RANGE(0xc0, 0xc3) AM_READ(latch8_r) AM_WRITE(latch8_w)
@@ -683,13 +681,13 @@ static DRIVER_INIT(nratechu)
 static DRIVER_INIT(mayjinsn)
 {
 	st0016_game=4|0x80;
-	memory_set_bankptr(machine, "bank2", machine.region("user1")->base());
+	machine.root_device().membank("bank2")->set_base(machine.root_device().memregion("user1")->base());
 }
 
 static DRIVER_INIT(mayjisn2)
 {
 	st0016_game=4;
-	memory_set_bankptr(machine, "bank2", machine.region("user1")->base());
+	machine.root_device().membank("bank2")->set_base(machine.root_device().memregion("user1")->base());
 }
 
 /*************************************

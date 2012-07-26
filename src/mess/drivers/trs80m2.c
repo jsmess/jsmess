@@ -75,13 +75,13 @@ void trs80m2_state::scan_keyboard()
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };
 	int table = 0, row, col;
 
-	if (input_port_read(machine(), "ROW9") & 0x07)
+	if (ioport("ROW9")->read() & 0x07)
 	{
 		// shift, upper case
 		table = 1;
 	}
 
-	if (input_port_read(machine(), "ROW9") & 0x18)
+	if (ioport("ROW9")->read() & 0x18)
 	{
 		// ctrl
 		table = 2;
@@ -90,7 +90,7 @@ void trs80m2_state::scan_keyboard()
 	// scan keyboard
 	for (row = 0; row < 9; row++)
 	{
-		UINT8 data = input_port_read(machine(), keynames[row]);
+		UINT8 data = ioport(keynames[row])->read();
 
 		for (col = 0; col < 8; col++)
 		{
@@ -130,7 +130,7 @@ READ8_MEMBER( trs80m2_state::read )
 	{
 		if (m_boot_rom)
 		{
-			data = machine().region(Z80_TAG)->base()[offset];
+			data = memregion(Z80_TAG)->base()[offset];
 		}
 		else
 		{
@@ -625,7 +625,7 @@ static const mc6845_interface mc6845_intf =
 void trs80m2_state::video_start()
 {
 	// find memory regions
-	m_char_rom = machine().region(MC6845_TAG)->base();
+	m_char_rom = memregion(MC6845_TAG)->base();
 
 	// allocate memory
 	m_video_ram = auto_alloc_array(machine(), UINT8, 0x800);

@@ -221,7 +221,7 @@ READ8_MEMBER( luxor_55_10828_device::pio_pb_r )
 	UINT8 data = 0x04;
 
 	// single/double sided drive
-	UINT8 sw1 = input_port_read(*this, "SW1") & 0x0f;
+	UINT8 sw1 = ioport("SW1")->read() & 0x0f;
 	int ds0 = m_sel0 ? BIT(sw1, 0) : 1;
 	int ds1 = m_sel1 ? BIT(sw1, 1) : 1;
 	data |= !(ds0 & ds1);
@@ -429,7 +429,7 @@ void luxor_55_10828_device::device_start()
 	save_item(NAME(m_sel1));
 
 	// patch out protection checks
-	UINT8 *rom = subregion("abc830")->base();
+	UINT8 *rom = memregion("abc830")->base();
 	rom[0x00fa] = 0xff;
 	rom[0x0336] = 0xff;
 	rom[0x0718] = 0xff;
@@ -460,7 +460,7 @@ void luxor_55_10828_device::device_reset()
 
 void luxor_55_10828_device::abcbus_cs(UINT8 data)
 {
-	UINT8 address = 0x2c | BIT(input_port_read(*this, "S1"), 0);
+	UINT8 address = 0x2c | BIT(ioport("S1")->read(), 0);
 
 	m_cs = (data == address);
 }

@@ -12,7 +12,6 @@
     Note: The $ key makes a square symbol.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -26,11 +25,12 @@ public:
 	bcs3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	const UINT8 *m_p_chargen;
-	const UINT8 *m_p_videoram;
+	required_shared_ptr<const UINT8> m_p_videoram;
 	DECLARE_READ8_MEMBER(bcs3_keyboard_r);
 	virtual void machine_reset();
 	virtual void video_start();
@@ -41,23 +41,23 @@ READ8_MEMBER( bcs3_state::bcs3_keyboard_r )
 	UINT8 data = 0;
 
 	if (~offset & 0x01)
-		data |= input_port_read(machine(), "LINE0");
+		data |= ioport("LINE0")->read();
 	if (~offset & 0x02)
-		data |= input_port_read(machine(), "LINE1");
+		data |= ioport("LINE1")->read();
 	if (~offset & 0x04)
-		data |= input_port_read(machine(), "LINE2");
+		data |= ioport("LINE2")->read();
 	if (~offset & 0x08)
-		data |= input_port_read(machine(), "LINE3");
+		data |= ioport("LINE3")->read();
 	if (~offset & 0x10)
-		data |= input_port_read(machine(), "LINE4");
+		data |= ioport("LINE4")->read();
 	if (~offset & 0x20)
-		data |= input_port_read(machine(), "LINE5");
+		data |= ioport("LINE5")->read();
 	if (~offset & 0x40)
-		data |= input_port_read(machine(), "LINE6");
+		data |= ioport("LINE6")->read();
 	if (~offset & 0x80)
-		data |= input_port_read(machine(), "LINE7");
+		data |= ioport("LINE7")->read();
 	if (~offset & 0x100)
-		data |= input_port_read(machine(), "LINE8");
+		data |= ioport("LINE8")->read();
 
 	return data;
 }
@@ -68,7 +68,7 @@ static ADDRESS_MAP_START(bcs3_mem, AS_PROGRAM, 8, bcs3_state)
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xffff ) AM_RAM
-	AM_RANGE( 0x3c50, 0x3d9f ) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE( 0x3c50, 0x3d9f ) AM_RAM AM_SHARE("p_videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(bcs3a_mem, AS_PROGRAM, 8, bcs3_state)
@@ -77,7 +77,7 @@ static ADDRESS_MAP_START(bcs3a_mem, AS_PROGRAM, 8, bcs3_state)
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xefff ) AM_RAM
-	AM_RANGE( 0x3c00, 0x5a7f ) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE( 0x3c00, 0x5a7f ) AM_RAM AM_SHARE("p_videoram")
 	AM_RANGE( 0xf000, 0xf3ff ) AM_ROM
 ADDRESS_MAP_END
 
@@ -87,7 +87,7 @@ static ADDRESS_MAP_START(bcs3b_mem, AS_PROGRAM, 8, bcs3_state)
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xefff ) AM_RAM
-	AM_RANGE( 0x3c00, 0x657f ) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE( 0x3c00, 0x657f ) AM_RAM AM_SHARE("p_videoram")
 	AM_RANGE( 0xf000, 0xf3ff ) AM_ROM
 ADDRESS_MAP_END
 
@@ -97,7 +97,7 @@ static ADDRESS_MAP_START(bcs3c_mem, AS_PROGRAM, 8, bcs3_state)
 	AM_RANGE( 0x1000, 0x11ff ) AM_READ_PORT("LINE9")
 	AM_RANGE( 0x1200, 0x13ff ) AM_READ(bcs3_keyboard_r)
 	AM_RANGE( 0x3c00, 0xffff ) AM_RAM
-	AM_RANGE( 0x3c00, 0x5ab3 ) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE( 0x3c00, 0x5ab3 ) AM_RAM AM_SHARE("p_videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bcs3_io, AS_IO, 8, bcs3_state)
@@ -216,7 +216,7 @@ MACHINE_RESET_MEMBER(bcs3_state)
 
 VIDEO_START_MEMBER( bcs3_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 static SCREEN_UPDATE_IND16( bcs3 )

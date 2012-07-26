@@ -52,7 +52,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_ldv1000(*this, "ld_ldv1000"),
 		  m_pr7820(*this, "ld_pr7820"),
-		  m_22vp932(*this, "ld_22vp932") { }
+		  m_22vp932(*this, "ld_22vp932") ,
+		m_videoram(*this, "videoram"){ }
 
 	void laserdisc_data_w(UINT8 data)
 	{
@@ -93,12 +94,20 @@ public:
 		return CLEAR_LINE;
 	}
 
-	UINT8 *m_videoram;
 	optional_device<pioneer_ldv1000_device> m_ldv1000;
 	optional_device<pioneer_pr7820_device> m_pr7820;
 	optional_device<phillips_22vp932_device> m_22vp932;
+	optional_shared_ptr<UINT8> m_videoram;
 	UINT8 m_last_misc;
 	UINT8 m_laserdisc_data;
+	DECLARE_WRITE8_MEMBER(misc_w);
+	DECLARE_WRITE8_MEMBER(dleuro_misc_w);
+	DECLARE_WRITE8_MEMBER(led_den1_w);
+	DECLARE_WRITE8_MEMBER(led_den2_w);
+	DECLARE_READ8_MEMBER(laserdisc_r);
+	DECLARE_WRITE8_MEMBER(laserdisc_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_status_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_command_r);
 };
 
 
@@ -251,7 +260,7 @@ static MACHINE_RESET( dlair )
 	/* determine the laserdisc player from the DIP switches */
 	if (state->m_laserdisc_type == LASERDISC_TYPE_VARIABLE)
 	{
-		int newtype = (input_port_read(machine, "DSW2") & 0x08) ? LASERDISC_TYPE_PIONEER_LDV1000 : LASERDISC_TYPE_PIONEER_PR7820;
+		int newtype = (state->ioport("DSW2")->read() & 0x08) ? LASERDISC_TYPE_PIONEER_LDV1000 : LASERDISC_TYPE_PIONEER_PR7820;
 		laserdisc_set_type(state->m_laserdisc, newtype);
 	}
 #endif
@@ -285,9 +294,8 @@ static INTERRUPT_GEN( vblank_callback )
  *
  *************************************/
 
-static WRITE8_HANDLER( misc_w )
+WRITE8_MEMBER(dlair_state::misc_w)
 {
-	dlair_state *state = space->machine().driver_data<dlair_state>();
 	/*
         D0-D3 = B0-B3
            D4 = coin counter
@@ -295,23 +303,22 @@ static WRITE8_HANDLER( misc_w )
            D6 = ENTER
            D7 = INT/EXT
     */
-	UINT8 diff = data ^ state->m_last_misc;
-	state->m_last_misc = data;
+	UINT8 diff = data ^ m_last_misc;
+	m_last_misc = data;
 
-	coin_counter_w(space->machine(), 0, (~data >> 4) & 1);
+	coin_counter_w(machine(), 0, (~data >> 4) & 1);
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
-		state->laserdisc_data_w(state->m_laserdisc_data);
+		laserdisc_data_w(m_laserdisc_data);
 
 	/* on bit 6 going low, we need to signal enter */
-	state->laserdisc_enter_w((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	laserdisc_enter_w((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
-static WRITE8_HANDLER( dleuro_misc_w )
+WRITE8_MEMBER(dlair_state::dleuro_misc_w)
 {
-	dlair_state *state = space->machine().driver_data<dlair_state>();
 	/*
            D0 = CHAR GEN ON+
            D1 = KILL VIDEO+
@@ -322,28 +329,28 @@ static WRITE8_HANDLER( dleuro_misc_w )
            D6 = ENTER
            D7 = INT/EXT
     */
-	UINT8 diff = data ^ state->m_last_misc;
-	state->m_last_misc = data;
+	UINT8 diff = data ^ m_last_misc;
+	m_last_misc = data;
 
-	coin_counter_w(space->machine(), 1, (~data >> 3) & 1);
-	coin_counter_w(space->machine(), 0, (~data >> 4) & 1);
+	coin_counter_w(machine(), 1, (~data >> 3) & 1);
+	coin_counter_w(machine(), 0, (~data >> 4) & 1);
 
 	/* on bit 5 going low, push the data out to the laserdisc player */
 	if ((diff & 0x20) && !(data & 0x20))
-		state->laserdisc_data_w(state->m_laserdisc_data);
+		laserdisc_data_w(m_laserdisc_data);
 
 	/* on bit 6 going low, we need to signal enter */
-	state->laserdisc_enter_w((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	laserdisc_enter_w((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
-static WRITE8_HANDLER( led_den1_w )
+WRITE8_MEMBER(dlair_state::led_den1_w)
 {
 	output_set_digit_value(0 + (offset & 7), led_map[data & 0x0f]);
 }
 
 
-static WRITE8_HANDLER( led_den2_w )
+WRITE8_MEMBER(dlair_state::led_den2_w)
 {
 	output_set_digit_value(8 + (offset & 7), led_map[data & 0x0f]);
 }
@@ -356,33 +363,29 @@ static WRITE8_HANDLER( led_den2_w )
  *
  *************************************/
 
-static CUSTOM_INPUT( laserdisc_status_r )
+CUSTOM_INPUT_MEMBER(dlair_state::laserdisc_status_r)
 {
-	dlair_state *state = field.machine().driver_data<dlair_state>();
-	return state->laserdisc_status_r();
+	return laserdisc_status_r();
 }
 
 
-static CUSTOM_INPUT( laserdisc_command_r )
+CUSTOM_INPUT_MEMBER(dlair_state::laserdisc_command_r)
 {
-	dlair_state *state = field.machine().driver_data<dlair_state>();
-	return (state->laserdisc_ready_r() == ASSERT_LINE) ? 0 : 1;
+	return (laserdisc_ready_r() == ASSERT_LINE) ? 0 : 1;
 }
 
 
-static READ8_HANDLER( laserdisc_r )
+READ8_MEMBER(dlair_state::laserdisc_r)
 {
-	dlair_state *state = space->machine().driver_data<dlair_state>();
-	UINT8 result = state->laserdisc_data_r();
+	UINT8 result = laserdisc_data_r();
 	mame_printf_debug("laserdisc_r = %02X\n", result);
 	return result;
 }
 
 
-static WRITE8_HANDLER( laserdisc_w )
+WRITE8_MEMBER(dlair_state::laserdisc_w)
 {
-	dlair_state *state = space->machine().driver_data<dlair_state>();
-	state->m_laserdisc_data = data;
+	m_laserdisc_data = data;
 }
 
 
@@ -394,16 +397,16 @@ static WRITE8_HANDLER( laserdisc_w )
  *************************************/
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( dlus_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dlus_map, AS_PROGRAM, 8, dlair_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fc7) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fc7) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0xc008, 0xc008) AM_MIRROR(0x1fc7) AM_READ_PORT("CONTROLS")
 	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0x1fc7) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0x1fc7) AM_READ(laserdisc_r)
-	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fc7) AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fc7) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 	AM_RANGE(0xe008, 0xe008) AM_MIRROR(0x1fc7) AM_WRITE(misc_w)
-	AM_RANGE(0xe010, 0xe010) AM_MIRROR(0x1fc7) AM_DEVWRITE("aysnd", ay8910_address_w)
+	AM_RANGE(0xe010, 0xe010) AM_MIRROR(0x1fc7) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 	AM_RANGE(0xe020, 0xe020) AM_MIRROR(0x1fc7) AM_WRITE(laserdisc_w)
 	AM_RANGE(0xe030, 0xe037) AM_MIRROR(0x1fc0) AM_WRITE(led_den2_w)
 	AM_RANGE(0xe038, 0xe03f) AM_MIRROR(0x1fc0) AM_WRITE(led_den1_w)
@@ -418,10 +421,10 @@ ADDRESS_MAP_END
  *************************************/
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( dleuro_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dleuro_map, AS_PROGRAM, 8, dlair_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_MIRROR(0x1800) AM_RAM
-	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_BASE_MEMBER(dlair_state, m_videoram)
+	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x1800) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1f47) // WT LED 1
 	AM_RANGE(0xe008, 0xe008) AM_MIRROR(0x1f47) // WT LED 2
 	AM_RANGE(0xe010, 0xe010) AM_MIRROR(0x1f47) AM_WRITE(led_den1_w)			// WT EXT LED 1
@@ -438,10 +441,10 @@ ADDRESS_MAP_END
 
 
 /* complete memory map derived from schematics */
-static ADDRESS_MAP_START( dleuro_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( dleuro_io_map, AS_IO, 8, dlair_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7c) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x7c) AM_DEVREADWRITE("sio", z80sio_ba_cd_r, z80sio_ba_cd_w)
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7c) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x80, 0x83) AM_MIRROR(0x7c) AM_DEVREADWRITE_LEGACY("sio", z80sio_ba_cd_r, z80sio_ba_cd_w)
 ADDRESS_MAP_END
 
 
@@ -552,14 +555,14 @@ static INPUT_PORTS_START( dlair )
 	PORT_DIPSETTING(    0x40, "PAYG3" )
 	PORT_DIPSETTING(    0x60, "PAYG4" )
 	PORT_DIPNAME( 0x90, 0x10, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("B:8,5")
-	PORT_DIPSETTING(	0x00, "Increase after 5" ) PORT_CONDITION("DSW1", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(	0x10, "Increase after 9" ) PORT_CONDITION("DSW1", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(	0x80, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(	0x90, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(	0x00, DEF_STR( Hard ) ) PORT_CONDITION("DSW1", 0x04, PORTCOND_EQUALS, 0x04)
-	PORT_DIPSETTING(	0x10, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, PORTCOND_EQUALS, 0x04)
-	PORT_DIPSETTING(	0x80, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, PORTCOND_EQUALS, 0x04)
-	PORT_DIPSETTING(	0x90, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, PORTCOND_EQUALS, 0x04)
+	PORT_DIPSETTING(	0x00, "Increase after 5" ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(	0x10, "Increase after 9" ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(	0x80, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(	0x90, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(	0x00, DEF_STR( Hard ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
+	PORT_DIPSETTING(	0x10, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
+	PORT_DIPSETTING(	0x80, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
+	PORT_DIPSETTING(	0x90, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
 
 	PORT_START("CONTROLS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -577,8 +580,8 @@ static INPUT_PORTS_START( dlair )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(laserdisc_status_r, NULL) 	/* status strobe */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(laserdisc_command_r, NULL)	/* command strobe */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_status_r, NULL) 	/* status strobe */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_command_r, NULL)	/* command strobe */
 INPUT_PORTS_END
 
 
@@ -609,8 +612,8 @@ static INPUT_PORTS_START( dleuro )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(laserdisc_status_r, NULL) 	/* status strobe */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(laserdisc_command_r, NULL)	/* command strobe */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_status_r, NULL) 	/* status strobe */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dlair_state,laserdisc_command_r, NULL)	/* command strobe */
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("A:2,1")
@@ -654,14 +657,14 @@ static INPUT_PORTS_START( dleuro )
 	PORT_DIPSETTING(    0x40, "PAYG3" )
 	PORT_DIPSETTING(    0x60, "PAYG4" )
 	PORT_DIPNAME( 0x90, 0x10, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("B:8,5s")
-	PORT_DIPSETTING(	0x00, "Increase after 5" ) PORT_CONDITION("DSW1", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(	0x10, "Increase after 9" ) PORT_CONDITION("DSW1", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(	0x80, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(	0x90, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(	0x00, DEF_STR( Hard ) ) PORT_CONDITION("DSW1", 0x04, PORTCOND_EQUALS, 0x04)
-	PORT_DIPSETTING(	0x10, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, PORTCOND_EQUALS, 0x04)
-	PORT_DIPSETTING(	0x80, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, PORTCOND_EQUALS, 0x04)
-	PORT_DIPSETTING(	0x90, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, PORTCOND_EQUALS, 0x04)
+	PORT_DIPSETTING(	0x00, "Increase after 5" ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(	0x10, "Increase after 9" ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(	0x80, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(	0x90, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x00)
+	PORT_DIPSETTING(	0x00, DEF_STR( Hard ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
+	PORT_DIPSETTING(	0x10, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
+	PORT_DIPSETTING(	0x80, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
+	PORT_DIPSETTING(	0x90, DEF_STR( Easy ) ) PORT_CONDITION("DSW1", 0x04, EQUALS, 0x04)
 INPUT_PORTS_END
 
 

@@ -6,13 +6,12 @@
 
 /*** SCR A LAYER ***/
 
-WRITE32_HANDLER( macrossp_scra_videoram_w )
+WRITE32_MEMBER(macrossp_state::macrossp_scra_videoram_w)
 {
-	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
-	COMBINE_DATA(&state->m_scra_videoram[offset]);
+	COMBINE_DATA(&m_scra_videoram[offset]);
 
-	state->m_scra_tilemap->mark_tile_dirty(offset);
+	m_scra_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -44,13 +43,12 @@ static TILE_GET_INFO( get_macrossp_scra_tile_info )
 
 /*** SCR B LAYER ***/
 
-WRITE32_HANDLER( macrossp_scrb_videoram_w )
+WRITE32_MEMBER(macrossp_state::macrossp_scrb_videoram_w)
 {
-	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
-	COMBINE_DATA(&state->m_scrb_videoram[offset]);
+	COMBINE_DATA(&m_scrb_videoram[offset]);
 
-	state->m_scrb_tilemap->mark_tile_dirty(offset);
+	m_scrb_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -82,13 +80,12 @@ static TILE_GET_INFO( get_macrossp_scrb_tile_info )
 
 /*** SCR C LAYER ***/
 
-WRITE32_HANDLER( macrossp_scrc_videoram_w )
+WRITE32_MEMBER(macrossp_state::macrossp_scrc_videoram_w)
 {
-	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
-	COMBINE_DATA(&state->m_scrc_videoram[offset]);
+	COMBINE_DATA(&m_scrc_videoram[offset]);
 
-	state->m_scrc_tilemap->mark_tile_dirty(offset);
+	m_scrc_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -120,13 +117,12 @@ static TILE_GET_INFO( get_macrossp_scrc_tile_info )
 
 /*** TEXT LAYER ***/
 
-WRITE32_HANDLER( macrossp_text_videoram_w )
+WRITE32_MEMBER(macrossp_state::macrossp_text_videoram_w)
 {
-	macrossp_state *state = space->machine().driver_data<macrossp_state>();
 
-	COMBINE_DATA(&state->m_text_videoram[offset]);
+	COMBINE_DATA(&m_text_videoram[offset]);
 
-	state->m_text_tilemap->mark_tile_dirty(offset);
+	m_text_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -149,8 +145,8 @@ VIDEO_START( macrossp )
 {
 	macrossp_state *state = machine.driver_data<macrossp_state>();
 
-	state->m_spriteram_old = auto_alloc_array_clear(machine, UINT32, state->m_spriteram_size / 4);
-	state->m_spriteram_old2 = auto_alloc_array_clear(machine, UINT32, state->m_spriteram_size / 4);
+	state->m_spriteram_old = auto_alloc_array_clear(machine, UINT32, state->m_spriteram.bytes() / 4);
+	state->m_spriteram_old2 = auto_alloc_array_clear(machine, UINT32, state->m_spriteram.bytes() / 4);
 
 	state->m_text_tilemap = tilemap_create(machine, get_macrossp_text_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
 	state->m_scra_tilemap = tilemap_create(machine, get_macrossp_scra_tile_info, tilemap_scan_rows, 16, 16, 64, 64);
@@ -167,8 +163,8 @@ VIDEO_START( macrossp )
 	machine.gfx[2]->color_granularity = 64;
 	machine.gfx[3]->color_granularity = 64;
 
-	state->save_pointer(NAME(state->m_spriteram_old), state->m_spriteram_size / 4);
-	state->save_pointer(NAME(state->m_spriteram_old2), state->m_spriteram_size / 4);
+	state->save_pointer(NAME(state->m_spriteram_old), state->m_spriteram.bytes() / 4);
+	state->save_pointer(NAME(state->m_spriteram_old2), state->m_spriteram.bytes() / 4);
 }
 
 
@@ -179,7 +175,7 @@ static void draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, const r
 	const gfx_element *gfx = machine.gfx[0];
 	//  UINT32 *source = state->m_spriteram;
 	UINT32 *source = state->m_spriteram_old2; /* buffers by two frames */
-	UINT32 *finish = source + state->m_spriteram_size / 4;
+	UINT32 *finish = source + state->m_spriteram.bytes() / 4;
 
 	while (source < finish)
 	{
@@ -437,7 +433,7 @@ SCREEN_VBLANK( macrossp )
 		macrossp_state *state = screen.machine().driver_data<macrossp_state>();
 
 		/* looks like sprites are *two* frames ahead, like nmk16 */
-		memcpy(state->m_spriteram_old2, state->m_spriteram_old, state->m_spriteram_size);
-		memcpy(state->m_spriteram_old, state->m_spriteram, state->m_spriteram_size);
+		memcpy(state->m_spriteram_old2, state->m_spriteram_old, state->m_spriteram.bytes());
+		memcpy(state->m_spriteram_old, state->m_spriteram, state->m_spriteram.bytes());
 	}
 }

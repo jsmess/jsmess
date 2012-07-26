@@ -40,7 +40,7 @@ static TILEMAP_MAPPER( fix_scan )
 static TILE_GET_INFO( get_back_tile_info )
 {
 	liberate_state *state = machine.driver_data<liberate_state>();
-	const UINT8 *RAM = machine.region("user1")->base();
+	const UINT8 *RAM = state->memregion("user1")->base();
 	int tile, bank;
 
 	/* Convert tile index of 512x512 to paged format */
@@ -102,108 +102,102 @@ static TILE_GET_INFO( prosport_get_back_tile_info )
 
 /***************************************************************************/
 
-WRITE8_HANDLER( deco16_io_w )
+WRITE8_MEMBER(liberate_state::deco16_io_w)
 {
-	liberate_state *state = space->machine().driver_data<liberate_state>();
-	state->m_io_ram[offset] = data;
+	m_io_ram[offset] = data;
 	if (offset > 1 && offset < 6)
-		state->m_back_tilemap->mark_all_dirty();
+		m_back_tilemap->mark_all_dirty();
 
 	switch (offset)
 	{
 		case 6: /* Background colour */
-			if (((data >> 4) & 3) != state->m_background_color)
+			if (((data >> 4) & 3) != m_background_color)
 			{
-				state->m_background_color = (data >> 4) & 3;
-				state->m_back_tilemap->mark_all_dirty();
+				m_background_color = (data >> 4) & 3;
+				m_back_tilemap->mark_all_dirty();
 			}
-			state->m_background_disable = data & 0x4;
-			flip_screen_set(space->machine(), data & 0x01);
+			m_background_disable = data & 0x4;
+			flip_screen_set(data & 0x01);
 			break;
 		case 7: /* Background palette resistors? */
 			/* Todo */
 			break;
 		case 8: /* Irq ack */
-			device_set_input_line(state->m_maincpu, DECO16_IRQ_LINE, CLEAR_LINE);
+			device_set_input_line(m_maincpu, DECO16_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 9: /* Sound */
-			soundlatch_w(space, 0, data);
-			device_set_input_line(state->m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
+			soundlatch_byte_w(space, 0, data);
+			device_set_input_line(m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 			break;
 	}
 }
 
-WRITE8_HANDLER( prosoccr_io_w )
+WRITE8_MEMBER(liberate_state::prosoccr_io_w)
 {
-	liberate_state *state = space->machine().driver_data<liberate_state>();
-	state->m_io_ram[offset] = data;
+	m_io_ram[offset] = data;
 	if (offset > 1 && offset < 6)
-		state->m_back_tilemap->mark_all_dirty();
+		m_back_tilemap->mark_all_dirty();
 
-	//  popmessage("%02x %02x",state->m_io_ram[6],state->m_io_ram[7]);
+	//  popmessage("%02x %02x",m_io_ram[6],m_io_ram[7]);
 
 	switch (offset)
 	{
 		case 6: /* unused here */
 			break;
 		case 7:
-			state->m_background_disable = ~data & 0x10;
+			m_background_disable = ~data & 0x10;
 			//sprite_priority = (data & 0x80)>>7;
 			/* -x-- --xx used during gameplay */
 			/* x--- ---- used on the attract mode */
 			break;
 		case 8: /* Irq ack */
-			device_set_input_line(state->m_maincpu, DECO16_IRQ_LINE, CLEAR_LINE);
+			device_set_input_line(m_maincpu, DECO16_IRQ_LINE, CLEAR_LINE);
 			break;
 		case 9: /* Sound */
-			soundlatch_w(space, 0, data);
-			device_set_input_line(state->m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
+			soundlatch_byte_w(space, 0, data);
+			device_set_input_line(m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 			break;
 	}
 }
 
 /* completely different i/o...*/
-WRITE8_HANDLER( prosport_io_w )
+WRITE8_MEMBER(liberate_state::prosport_io_w)
 {
-	liberate_state *state = space->machine().driver_data<liberate_state>();
-	state->m_io_ram[offset] = data;
+	m_io_ram[offset] = data;
 
 	switch (offset)
 	{
 		case 0:
 			//background_disable = ~data & 0x80;
-			flip_screen_set(space->machine(), data & 0x80);
-			state->m_back_tilemap->mark_all_dirty();
+			flip_screen_set(data & 0x80);
+			m_back_tilemap->mark_all_dirty();
 			break;
 		case 2: /* Sound */
-			soundlatch_w(space, 0, data);
-			device_set_input_line(state->m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
+			soundlatch_byte_w(space, 0, data);
+			device_set_input_line(m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 			break;
 		case 4: /* Irq ack */
-			device_set_input_line(state->m_maincpu, DECO16_IRQ_LINE, CLEAR_LINE);
+			device_set_input_line(m_maincpu, DECO16_IRQ_LINE, CLEAR_LINE);
 			break;
 	}
 }
 
-WRITE8_HANDLER( liberate_videoram_w )
+WRITE8_MEMBER(liberate_state::liberate_videoram_w)
 {
-	liberate_state *state = space->machine().driver_data<liberate_state>();
-	state->m_videoram[offset] = data;
-	state->m_fix_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( liberate_colorram_w )
+WRITE8_MEMBER(liberate_state::liberate_colorram_w)
 {
-	liberate_state *state = space->machine().driver_data<liberate_state>();
-	state->m_colorram[offset] = data;
-	state->m_fix_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_fix_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( prosport_bg_vram_w )
+WRITE8_MEMBER(liberate_state::prosport_bg_vram_w)
 {
-	liberate_state *state = space->machine().driver_data<liberate_state>();
-	state->m_bg_vram[offset] = data;
-	state->m_back_tilemap->mark_tile_dirty(offset);
+	m_bg_vram[offset] = data;
+	m_back_tilemap->mark_tile_dirty(offset);
 }
 
 /***************************************************************************/
@@ -249,17 +243,17 @@ VIDEO_START( prosport )
 
 /***************************************************************************/
 
-WRITE8_HANDLER( prosport_paletteram_w )
+WRITE8_MEMBER(liberate_state::prosport_paletteram_w)
 {
-	liberate_state *state = space->machine().driver_data<liberate_state>();
-	state->m_paletteram[offset] = data;
+	m_paletteram[offset] = data;
 
 	/* RGB output is inverted */
-	palette_set_color_rgb(space->machine(), offset, pal3bit(~data >> 0), pal3bit(~data >> 3), pal2bit(~data >> 6));
+	palette_set_color_rgb(machine(), offset, pal3bit(~data >> 0), pal3bit(~data >> 3), pal2bit(~data >> 6));
 }
 
 PALETTE_INIT( liberate )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i, bit0, bit1, bit2, g, r, b;
 
 	for (i = 0;i < 32;i++)
@@ -326,7 +320,7 @@ static void liberate_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 		if (multi && fy == 0)
 			sy -= 16;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -397,7 +391,7 @@ static void prosport_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 //      if (multi) sy -= 16;
 		if ((fy && multi) || (fx && multi)) { code2 = code; code++; }
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -458,7 +452,7 @@ static void boomrang_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 //      if (multi) sy -= 16;
 		if (fy && multi) { code2 = code; code++; }
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;

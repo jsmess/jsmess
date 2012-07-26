@@ -17,6 +17,7 @@
 ***************************************************************************/
 PALETTE_INIT( tankbatt )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	#define RES_1	0xc0 /* this is a guess */
@@ -58,12 +59,11 @@ PALETTE_INIT( tankbatt )
 	}
 }
 
-WRITE8_HANDLER( tankbatt_videoram_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_videoram_w)
 {
-	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -87,7 +87,7 @@ static void draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const r
 	tankbatt_state *state = machine.driver_data<tankbatt_state>();
 	int offs;
 
-	for (offs = 0;offs < state->m_bulletsram_size;offs += 2)
+	for (offs = 0;offs < state->m_bulletsram.bytes();offs += 2)
 	{
 		int color = 0xff;	/* cyan, same color as the tanks */
 		int x = state->m_bulletsram[offs + 1];

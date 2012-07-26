@@ -102,9 +102,9 @@ static void invalid_gba_draw_function(running_machine &machine, gba_state *state
 
 static void draw_roz_bitmap_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed, int depth)
 {
-	UINT8 *src8 = (UINT8 *)state->m_gba_vram;
-	UINT16 *src16 = (UINT16 *)state->m_gba_vram;
-	UINT16 *palette = (UINT16 *)state->m_gba_pram;
+	UINT8 *src8 = (UINT8 *)state->m_gba_vram.target();
+	UINT16 *src16 = (UINT16 *)state->m_gba_vram.target();
+	UINT16 *palette = (UINT16 *)state->m_gba_pram.target();
 	INT32 sx = (depth == 4) ? 160 : 240;
 	INT32 sy = (depth == 4) ? 128 : 160;
 	UINT32 prio = ((ctrl & BGCNT_PRIORITY) << 25) + 0x1000000;
@@ -211,9 +211,9 @@ static void draw_roz_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT
 	UINT32 base, mapbase, size;
 	static const INT32 sizes[4] = { 128, 256, 512, 1024 };
 	INT32 cx, cy, x, pixx, pixy;
-	UINT8 *mgba_vram = (UINT8 *)state->m_gba_vram;
+	UINT8 *mgba_vram = (UINT8 *)state->m_gba_vram.target();
 	UINT32 tile;
-	UINT16 *pgba_pram = (UINT16 *)state->m_gba_pram;
+	UINT16 *pgba_pram = (UINT16 *)state->m_gba_pram.target();
 	UINT16 pixel;
 	UINT32 prio = ((ctrl & BGCNT_PRIORITY) << 25) + 0x1000000;
 
@@ -393,8 +393,8 @@ static void draw_roz_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT
 
 static void draw_bg_scanline(gba_state *state, UINT32 *scanline, int ypos, UINT32 enablemask, UINT32 ctrl, UINT32 hofs, UINT32 vofs)
 {
-	UINT8 *vram = (UINT8*)state->m_gba_vram;
-	UINT16 *palette = (UINT16*)state->m_gba_pram;
+	UINT8 *vram = (UINT8*)state->m_gba_vram.target();
+	UINT16 *palette = (UINT16*)state->m_gba_pram.target();
 	UINT8 *chardata = &vram[((ctrl & BGCNT_CHARBASE) >> BGCNT_CHARBASE_SHIFT) * 0x4000];
 	UINT16 *screendata = (UINT16*)&vram[((ctrl & BGCNT_SCREENBASE) >> BGCNT_SCREENBASE_SHIFT) * 0x800];
 	UINT32 priority = ((ctrl & BGCNT_PRIORITY) << 25) + 0x1000000;
@@ -620,9 +620,9 @@ static void draw_gba_oam_window(gba_state *state, running_machine &machine, UINT
 	INT16 gba_oamindex;
 	UINT32 tilebytebase, tileindex, tiledrawindex;
 	UINT32 width, height;
-	UINT16 *pgba_oam = (UINT16 *)state->m_gba_oam;
+	UINT16 *pgba_oam = (UINT16 *)state->m_gba_oam.target();
 	int x = 0;
-	UINT8 *src = (UINT8*)state->m_gba_vram;
+	UINT8 *src = (UINT8*)state->m_gba_vram.target();
 
 	for(x = 0; x < 240; x++)
 	{
@@ -1069,9 +1069,9 @@ static void draw_gba_oam(gba_state *state, running_machine &machine, UINT32 *sca
 	INT32 mosaicx = ((state->m_MOSAIC & 0x0f00) >>  8) + 1;
 	UINT32 tileindex, tiledrawindex; //, tilebytebase
 	UINT8 width, height;
-	UINT16 *pgba_oam = (UINT16 *)state->m_gba_oam;
-	UINT8 *src = (UINT8 *)state->m_gba_vram;
-	UINT16 *palette = (UINT16*)state->m_gba_pram;
+	UINT16 *pgba_oam = (UINT16 *)state->m_gba_oam.target();
+	UINT8 *src = (UINT8 *)state->m_gba_vram.target();
+	UINT16 *palette = (UINT16*)state->m_gba_pram.target();
 	int x = 0;
 
 	for(x = 0; x < 240; x++)

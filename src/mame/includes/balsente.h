@@ -38,15 +38,19 @@ public:
 		  m_cem3(*this, "cem3"),
 		  m_cem4(*this, "cem4"),
 		  m_cem5(*this, "cem5"),
-		  m_cem6(*this, "cem6") { }
+		  m_cem6(*this, "cem6") ,
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram"),
+		m_shrike_io(*this, "shrike_io"),
+		m_shrike_shared(*this, "shrike_shared"){ }
+
+	required_device<timer_device> m_scanline_timer;
 
 	/* global data */
 	UINT8 m_shooter;
 	UINT8 m_shooter_x;
 	UINT8 m_shooter_y;
 	UINT8 m_adc_shift;
-	UINT16 *m_shrike_shared;
-	UINT16 *m_shrike_io;
 
 	/* 8253 counter state */
 	struct
@@ -62,7 +66,6 @@ public:
 		UINT8 writebyte;
 	} m_counter[3];
 
-	required_device<timer_device> m_scanline_timer;
 
 	/* manually clocked counter 0 states */
 	UINT8 m_counter_control;
@@ -115,14 +118,54 @@ public:
 	UINT8 m_grudge_last_steering[3];
 
 	/* video data */
-	UINT8 *m_videoram;
 	UINT8 m_expanded_videoram[256*256];
 	UINT8 *m_sprite_data;
 	UINT32 m_sprite_mask;
 	UINT8 *m_sprite_bank[2];
 
 	UINT8 m_palettebank_vis;
-	UINT8 *m_spriteram;
+
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<UINT16> m_shrike_io;
+	optional_shared_ptr<UINT16> m_shrike_shared;
+
+	DECLARE_WRITE8_MEMBER(balsente_random_reset_w);
+	DECLARE_READ8_MEMBER(balsente_random_num_r);
+	DECLARE_WRITE8_MEMBER(balsente_rombank_select_w);
+	DECLARE_WRITE8_MEMBER(balsente_rombank2_select_w);
+	DECLARE_WRITE8_MEMBER(balsente_misc_output_w);
+	DECLARE_READ8_MEMBER(balsente_m6850_r);
+	DECLARE_WRITE8_MEMBER(balsente_m6850_w);
+	DECLARE_READ8_MEMBER(balsente_m6850_sound_r);
+	DECLARE_WRITE8_MEMBER(balsente_m6850_sound_w);
+	DECLARE_READ8_MEMBER(balsente_adc_data_r);
+	DECLARE_WRITE8_MEMBER(balsente_adc_select_w);
+	DECLARE_READ8_MEMBER(balsente_counter_8253_r);
+	DECLARE_WRITE8_MEMBER(balsente_counter_8253_w);
+	DECLARE_READ8_MEMBER(balsente_counter_state_r);
+	DECLARE_WRITE8_MEMBER(balsente_counter_control_w);
+	DECLARE_WRITE8_MEMBER(balsente_chip_select_w);
+	DECLARE_WRITE8_MEMBER(balsente_dac_data_w);
+	DECLARE_WRITE8_MEMBER(balsente_register_addr_w);
+	DECLARE_WRITE8_MEMBER(spiker_expand_w);
+	DECLARE_READ8_MEMBER(spiker_expand_r);
+	DECLARE_READ8_MEMBER(grudge_steering_r);
+	DECLARE_READ8_MEMBER(shrike_shared_6809_r);
+	DECLARE_WRITE8_MEMBER(shrike_shared_6809_w);
+	DECLARE_WRITE16_MEMBER(shrike_io_68k_w);
+	DECLARE_READ16_MEMBER(shrike_io_68k_r);
+	void counter_set_out(int which, int out);
+	void counter_start(int which);
+	void counter_stop( int which);
+	void counter_update_count(int which);
+	void counter_set_gate(int which, int gate);
+	void update_counter_0_timer();
+	DECLARE_WRITE8_MEMBER(balsente_videoram_w);
+	DECLARE_WRITE8_MEMBER(balsente_palette_select_w);
+	DECLARE_WRITE8_MEMBER(balsente_paletteram_w);
+	DECLARE_WRITE8_MEMBER(shrike_sprite_select_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(nstocker_bits_r);
 };
 
 
@@ -135,48 +178,21 @@ MACHINE_RESET( balsente );
 
 void balsente_noise_gen(device_t *device, int count, short *buffer);
 
-WRITE8_HANDLER( balsente_random_reset_w );
-READ8_HANDLER( balsente_random_num_r );
 
-WRITE8_HANDLER( balsente_rombank_select_w );
-WRITE8_HANDLER( balsente_rombank2_select_w );
 
-WRITE8_HANDLER( balsente_misc_output_w );
 
-READ8_HANDLER( balsente_m6850_r );
-WRITE8_HANDLER( balsente_m6850_w );
 
-READ8_HANDLER( balsente_m6850_sound_r );
-WRITE8_HANDLER( balsente_m6850_sound_w );
 
 INTERRUPT_GEN( balsente_update_analog_inputs );
-READ8_HANDLER( balsente_adc_data_r );
-WRITE8_HANDLER( balsente_adc_select_w );
 
 TIMER_DEVICE_CALLBACK( balsente_counter_callback );
 
-READ8_HANDLER( balsente_counter_8253_r );
-WRITE8_HANDLER( balsente_counter_8253_w );
 
 TIMER_DEVICE_CALLBACK( balsente_clock_counter_0_ff );
 
-READ8_HANDLER( balsente_counter_state_r );
-WRITE8_HANDLER( balsente_counter_control_w );
 
-WRITE8_HANDLER( balsente_chip_select_w );
-WRITE8_HANDLER( balsente_dac_data_w );
-WRITE8_HANDLER( balsente_register_addr_w );
 
-CUSTOM_INPUT( nstocker_bits_r );
-WRITE8_HANDLER( spiker_expand_w );
-READ8_HANDLER( spiker_expand_r );
-READ8_HANDLER( grudge_steering_r );
 
-READ8_HANDLER( shrike_shared_6809_r );
-WRITE8_HANDLER( shrike_shared_6809_w );
-
-READ16_HANDLER( shrike_io_68k_r );
-WRITE16_HANDLER( shrike_io_68k_w );
 
 
 /*----------- defined in video/balsente.c -----------*/
@@ -184,7 +200,3 @@ WRITE16_HANDLER( shrike_io_68k_w );
 VIDEO_START( balsente );
 SCREEN_UPDATE_IND16( balsente );
 
-WRITE8_HANDLER( balsente_videoram_w );
-WRITE8_HANDLER( balsente_paletteram_w );
-WRITE8_HANDLER( balsente_palette_select_w );
-WRITE8_HANDLER( shrike_sprite_select_w );

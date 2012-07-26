@@ -66,7 +66,7 @@ spriteram is being tested, take no notice of that.]
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int y_offs )
 {
 	othunder_state *state = machine.driver_data<othunder_state>();
-	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
+	UINT16 *spritemap = (UINT16 *)state->memregion("user1")->base();
 	UINT16 tile_mask = (machine.gfx[0]->total_elements) - 1;
 	UINT16 *spriteram16 = state->m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
@@ -80,7 +80,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
        while processing sprite ram and then draw them all at the end */
 	struct othunder_tempsprite *sprite_ptr = state->m_spritelist;
 
-	for (offs = (state->m_spriteram_size / 2) - 4; offs >= 0; offs -= 4)
+	for (offs = (state->m_spriteram.bytes() / 2) - 4; offs >= 0; offs -= 4)
 	{
 		data = spriteram16[offs + 0];
 		zoomy = (data & 0xfe00) >> 9;

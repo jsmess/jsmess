@@ -179,21 +179,19 @@ void neogeo_set_screen_dark( running_machine &machine, UINT8 data )
 }
 
 
-READ16_HANDLER( neogeo_paletteram_r )
+READ16_MEMBER(neogeo_state::neogeo_paletteram_r)
 {
-	neogeo_state *state = space->machine().driver_data<neogeo_state>();
-	return state->m_palettes[state->m_palette_bank][offset];
+	return m_palettes[m_palette_bank][offset];
 }
 
 
-WRITE16_HANDLER( neogeo_paletteram_w )
+WRITE16_MEMBER(neogeo_state::neogeo_paletteram_w)
 {
-	neogeo_state *state = space->machine().driver_data<neogeo_state>();
-	UINT16 *addr = &state->m_palettes[state->m_palette_bank][offset];
+	UINT16 *addr = &m_palettes[m_palette_bank][offset];
 
 	COMBINE_DATA(addr);
 
-	state->m_pens[offset] = get_pen(space->machine(), *addr);
+	m_pens[offset] = get_pen(machine(), *addr);
 }
 
 
@@ -273,8 +271,8 @@ static void draw_fixed_layer( running_machine &machine, bitmap_rgb32 &bitmap, in
 	neogeo_state *state = machine.driver_data<neogeo_state>();
 	int x;
 
-	UINT8* gfx_base = machine.region(state->m_fixed_layer_source ? "fixed" : "fixedbios")->base();
-	UINT32 addr_mask = machine.region(state->m_fixed_layer_source ? "fixed" : "fixedbios")->bytes() - 1;
+	UINT8* gfx_base = state->memregion(state->m_fixed_layer_source ? "fixed" : "fixedbios")->base();
+	UINT32 addr_mask = state->memregion(state->m_fixed_layer_source ? "fixed" : "fixedbios")->bytes() - 1;
 	UINT16 *video_data = &state->m_videoram[0x7000 | (scanline >> 3)];
 	UINT32 *pixel_addr = &bitmap.pix32(scanline, NEOGEO_HBEND);
 
@@ -691,7 +689,7 @@ static void optimize_sprite_data( running_machine &machine )
        power of 2 */
 	state->m_sprite_gfx_address_mask = 0xffffffff;
 
-	len = machine.region("sprites")->bytes();
+	len = state->memregion("sprites")->bytes();
 
 	for (bit = 0x80000000; bit != 0; bit >>= 1)
 	{
@@ -703,7 +701,7 @@ static void optimize_sprite_data( running_machine &machine )
 
 	state->m_sprite_gfx = auto_alloc_array_clear(machine, UINT8, state->m_sprite_gfx_address_mask + 1);
 
-	src = machine.region("sprites")->base();
+	src = machine.root_device().memregion("sprites")->base();
 	dest = state->m_sprite_gfx;
 
 	for (i = 0; i < len; i += 0x80, src += 0x80)
@@ -793,7 +791,7 @@ static void set_video_control( running_machine &machine, UINT16 data )
 }
 
 
-READ16_HANDLER( neogeo_video_register_r )
+READ16_MEMBER(neogeo_state::neogeo_video_register_r)
 {
 	UINT16 ret;
 
@@ -806,9 +804,9 @@ READ16_HANDLER( neogeo_video_register_r )
 		{
 		default:
 		case 0x00:
-		case 0x01: ret = get_videoram_data(space->machine()); break;
-		case 0x02: ret = get_videoram_modulo(space->machine()); break;
-		case 0x03: ret = get_video_control(space->machine()); break;
+		case 0x01: ret = get_videoram_data(machine()); break;
+		case 0x02: ret = get_videoram_modulo(machine()); break;
+		case 0x03: ret = get_video_control(machine()); break;
 		}
 	}
 
@@ -816,7 +814,7 @@ READ16_HANDLER( neogeo_video_register_r )
 }
 
 
-WRITE16_HANDLER( neogeo_video_register_w )
+WRITE16_MEMBER(neogeo_state::neogeo_video_register_w)
 {
 	/* accessing the LSB only is not mapped */
 	if (mem_mask != 0x00ff)
@@ -827,13 +825,13 @@ WRITE16_HANDLER( neogeo_video_register_w )
 
 		switch (offset)
 		{
-		case 0x00: set_videoram_offset(space->machine(), data); break;
-		case 0x01: set_videoram_data(space->machine(), data); break;
-		case 0x02: set_videoram_modulo(space->machine(), data); break;
-		case 0x03: set_video_control(space->machine(), data); break;
-		case 0x04: neogeo_set_display_counter_msb(space, data); break;
-		case 0x05: neogeo_set_display_counter_lsb(space, data); break;
-		case 0x06: neogeo_acknowledge_interrupt(space->machine(), data); break;
+		case 0x00: set_videoram_offset(machine(), data); break;
+		case 0x01: set_videoram_data(machine(), data); break;
+		case 0x02: set_videoram_modulo(machine(), data); break;
+		case 0x03: set_video_control(machine(), data); break;
+		case 0x04: neogeo_set_display_counter_msb(&space, data); break;
+		case 0x05: neogeo_set_display_counter_lsb(&space, data); break;
+		case 0x06: neogeo_acknowledge_interrupt(machine(), data); break;
 		case 0x07: break; /* unknown, see get_video_control */
 		}
 	}
@@ -894,7 +892,7 @@ VIDEO_START( neogeo )
 
 	machine.save().register_postload(save_prepost_delegate(FUNC(regenerate_pens), &machine));
 
-	state->m_region_zoomy = machine.region("zoomy")->base();
+	state->m_region_zoomy = state->memregion("zoomy")->base();
 }
 
 

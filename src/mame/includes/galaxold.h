@@ -24,18 +24,23 @@ class galaxold_state : public driver_device
 {
 public:
 	galaxold_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_videoram(*this,"videoram"),
+		  m_spriteram(*this,"spriteram"),
+		  m_spriteram2(*this,"spriteram2"),
+		  m_attributesram(*this,"attributesram"),
+		  m_bulletsram(*this,"bulletsram"),
+		  m_rockclim_videoram(*this,"rockclim_vram"),
+		  m_racknrol_tiles_bank(*this,"racknrol_tbank") { }
 
-	UINT8 *m_videoram;
-	UINT8 *m_spriteram;
-	UINT8 *m_spriteram2;
-	UINT8 *m_attributesram;
-	UINT8 *m_bulletsram;
-	UINT8 *m_rockclim_videoram;
-	UINT8 *m_racknrol_tiles_bank;
-	size_t m_spriteram_size;
-	size_t m_spriteram2_size;
-	size_t m_bulletsram_size;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_spriteram2;
+	required_shared_ptr<UINT8> m_attributesram;
+	optional_shared_ptr<UINT8> m_bulletsram;
+	optional_shared_ptr<UINT8> m_rockclim_videoram;
+	optional_shared_ptr<UINT8> m_racknrol_tiles_bank;
+
 	int m_irq_line;
 	UINT8 m__4in1_bank;
 	tilemap_t *m_bg_tilemap;
@@ -81,6 +86,52 @@ public:
 	struct star m_stars[STAR_COUNT];
 
 	UINT8 m_nmi_mask; /* Harem per-game specific */
+	DECLARE_READ8_MEMBER(drivfrcg_port0_r);
+	DECLARE_READ8_MEMBER(scramb2_protection_r);
+	DECLARE_READ8_MEMBER(scramb2_port0_r);
+	DECLARE_READ8_MEMBER(scramb2_port1_r);
+	DECLARE_READ8_MEMBER(scramb2_port2_r);
+	DECLARE_WRITE8_MEMBER(harem_nmi_mask_w);
+	DECLARE_READ8_MEMBER(hexpoola_data_port_r);
+	DECLARE_WRITE8_MEMBER(galaxold_nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(galaxold_coin_lockout_w);
+	DECLARE_WRITE8_MEMBER(galaxold_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(galaxold_coin_counter_1_w);
+	DECLARE_WRITE8_MEMBER(galaxold_coin_counter_2_w);
+	DECLARE_WRITE8_MEMBER(galaxold_leds_w);
+	DECLARE_WRITE8_MEMBER(zigzag_sillyprotection_w);
+	DECLARE_READ8_MEMBER(scramblb_protection_1_r);
+	DECLARE_READ8_MEMBER(scramblb_protection_2_r);
+	DECLARE_WRITE8_MEMBER(_4in1_bank_w);
+	DECLARE_READ8_MEMBER(checkmaj_protection_r);
+	DECLARE_READ8_MEMBER(dingo_3000_r);
+	DECLARE_READ8_MEMBER(dingo_3035_r);
+	DECLARE_READ8_MEMBER(dingoe_3001_r);
+	DECLARE_WRITE8_MEMBER(racknrol_tiles_bank_w);
+	DECLARE_WRITE8_MEMBER(galaxold_videoram_w);
+	DECLARE_READ8_MEMBER(galaxold_videoram_r);
+	DECLARE_WRITE8_MEMBER(galaxold_attributesram_w);
+	DECLARE_WRITE8_MEMBER(galaxold_flip_screen_x_w);
+	DECLARE_WRITE8_MEMBER(galaxold_flip_screen_y_w);
+	DECLARE_WRITE8_MEMBER(gteikob2_flip_screen_x_w);
+	DECLARE_WRITE8_MEMBER(gteikob2_flip_screen_y_w);
+	DECLARE_WRITE8_MEMBER(hotshock_flip_screen_w);
+	DECLARE_WRITE8_MEMBER(scrambold_background_enable_w);
+	DECLARE_WRITE8_MEMBER(scrambold_background_red_w);
+	DECLARE_WRITE8_MEMBER(scrambold_background_green_w);
+	DECLARE_WRITE8_MEMBER(scrambold_background_blue_w);
+	DECLARE_WRITE8_MEMBER(galaxold_stars_enable_w);
+	DECLARE_WRITE8_MEMBER(darkplnt_bullet_color_w);
+	DECLARE_WRITE8_MEMBER(galaxold_gfxbank_w);
+	DECLARE_WRITE8_MEMBER(rockclim_videoram_w);
+	DECLARE_WRITE8_MEMBER(rockclim_scroll_w);
+	DECLARE_READ8_MEMBER(rockclim_videoram_r);
+	DECLARE_WRITE8_MEMBER(dambustr_bg_split_line_w);
+	DECLARE_WRITE8_MEMBER(dambustr_bg_color_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(_4in1_fake_port_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(vpool_lives_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
 };
 
 
@@ -99,25 +150,9 @@ PALETTE_INIT( turtles );
 
 VIDEO_START( dambustr );
 
-WRITE8_HANDLER( galaxold_videoram_w );
-READ8_HANDLER( galaxold_videoram_r );
 
-WRITE8_HANDLER( rockclim_videoram_w );
-WRITE8_HANDLER( rockclim_scroll_w );
-READ8_HANDLER( rockclim_videoram_r );
-WRITE8_HANDLER( dambustr_bg_split_line_w );
-WRITE8_HANDLER( dambustr_bg_color_w );
 
-WRITE8_HANDLER( galaxold_attributesram_w );
 
-WRITE8_HANDLER( galaxold_stars_enable_w );
-WRITE8_HANDLER( scrambold_background_enable_w );
-WRITE8_HANDLER( scrambold_background_red_w );
-WRITE8_HANDLER( scrambold_background_green_w );
-WRITE8_HANDLER( scrambold_background_blue_w );
-WRITE8_HANDLER( hotshock_flip_screen_w );
-WRITE8_HANDLER( darkplnt_bullet_color_w );
-WRITE8_HANDLER( racknrol_tiles_bank_w );
 
 VIDEO_START( galaxold_plain );
 VIDEO_START( galaxold );
@@ -146,9 +181,6 @@ void galaxold_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, const r
 SCREEN_UPDATE_IND16( galaxold );
 SCREEN_UPDATE_IND16( dambustr );
 
-WRITE8_HANDLER( galaxold_gfxbank_w );
-WRITE8_HANDLER( galaxold_flip_screen_x_w );
-WRITE8_HANDLER( galaxold_flip_screen_y_w );
 
 
 /*----------- defined in machine/galaxold.c -----------*/
@@ -161,24 +193,14 @@ WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_1_callback );
 DRIVER_INIT( 4in1 );
 DRIVER_INIT( ladybugg );
 
-WRITE8_HANDLER( galaxold_nmi_enable_w );
 
 MACHINE_RESET( galaxold );
 MACHINE_RESET( devilfsg );
 MACHINE_RESET( hunchbkg );
 
-WRITE8_HANDLER( galaxold_coin_lockout_w );
-WRITE8_HANDLER( galaxold_coin_counter_w );
 #define galaxold_coin_counter_0_w galaxold_coin_counter_w
-WRITE8_HANDLER( galaxold_coin_counter_1_w );
-WRITE8_HANDLER( galaxold_coin_counter_2_w );
-WRITE8_HANDLER( galaxold_leds_w );
 
-READ8_HANDLER( scramblb_protection_1_r );
-READ8_HANDLER( scramblb_protection_2_r );
 
-WRITE8_HANDLER( _4in1_bank_w );
-CUSTOM_INPUT( _4in1_fake_port_r );
 
 INTERRUPT_GEN( hunchbks_vh_interrupt );
 

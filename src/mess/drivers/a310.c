@@ -71,6 +71,8 @@ public:
 	a310_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_READ32_MEMBER(a310_psy_wram_r);
+	DECLARE_WRITE32_MEMBER(a310_psy_wram_w);
 };
 
 
@@ -90,12 +92,12 @@ static WRITE_LINE_DEVICE_HANDLER( a310_wd177x_drq_w )
 		archimedes_clear_fiq(device->machine(), ARCHIMEDES_FIQ_FLOPPY_DRQ);
 }
 
-static READ32_HANDLER( a310_psy_wram_r )
+READ32_MEMBER(a310_state::a310_psy_wram_r)
 {
 	return archimedes_memc_physmem[offset];
 }
 
-static WRITE32_HANDLER( a310_psy_wram_w )
+WRITE32_MEMBER(a310_state::a310_psy_wram_w)
 {
 	COMBINE_DATA(&archimedes_memc_physmem[offset]);
 }
@@ -104,10 +106,10 @@ static WRITE32_HANDLER( a310_psy_wram_w )
 static DRIVER_INIT(a310)
 {
 	UINT32 ram_size = machine.device<ram_device>(RAM_TAG)->size();
-
+	a310_state *state = machine.driver_data<a310_state>();
 	archimedes_memc_physmem = auto_alloc_array(machine, UINT32, 0x01000000);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x02000000, 0x02000000+(ram_size-1), FUNC(a310_psy_wram_r), FUNC(a310_psy_wram_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x02000000, 0x02000000+(ram_size-1), read32_delegate(FUNC(a310_state::a310_psy_wram_r), state), write32_delegate(FUNC(a310_state::a310_psy_wram_w), state));
 
 	archimedes_driver_init(machine);
 }
@@ -125,13 +127,13 @@ static MACHINE_RESET( a310 )
 	archimedes_reset(machine);
 }
 
-static ADDRESS_MAP_START( a310_mem, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
-//  AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
-	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
-	AM_RANGE(0x03400000, 0x035fffff) AM_READWRITE(archimedes_vidc_r, archimedes_vidc_w)
-	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(archimedes_memc_r, archimedes_memc_w)
-	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(archimedes_memc_page_w)
+static ADDRESS_MAP_START( a310_mem, AS_PROGRAM, 32, a310_state )
+	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE_LEGACY(archimedes_memc_logical_r, archimedes_memc_logical_w)
+//  AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE_LEGACY(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
+	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE_LEGACY(archimedes_ioc_r, archimedes_ioc_w)
+	AM_RANGE(0x03400000, 0x035fffff) AM_READWRITE_LEGACY(archimedes_vidc_r, archimedes_vidc_w)
+	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE_LEGACY(archimedes_memc_r, archimedes_memc_w)
+	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE_LEGACY(archimedes_memc_page_w)
 ADDRESS_MAP_END
 
 

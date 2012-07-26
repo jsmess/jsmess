@@ -13,65 +13,65 @@ driver by Nicola Salmoria
 #include "sound/2151intf.h"
 #include "includes/shisen.h"
 
-static READ8_HANDLER( sichuan2_dsw1_r )
+READ8_MEMBER(shisen_state::sichuan2_dsw1_r)
 {
-	int ret = input_port_read(space->machine(), "DSW1");
+	int ret = ioport("DSW1")->read();
 
 	/* Based on the coin mode fill in the upper bits */
-	if (input_port_read(space->machine(), "DSW2") & 0x04)
+	if (ioport("DSW2")->read() & 0x04)
 	{
 		/* Mode 1 */
-		ret	|= (input_port_read(space->machine(), "DSW1") << 4);
+		ret	|= (ioport("DSW1")->read() << 4);
 	}
 	else
 	{
 		/* Mode 2 */
-		ret	|= (input_port_read(space->machine(), "DSW1") & 0xf0);
+		ret	|= (ioport("DSW1")->read() & 0xf0);
 	}
 
 	return ret;
 }
 
-static WRITE8_HANDLER( sichuan2_coin_w )
+WRITE8_MEMBER(shisen_state::sichuan2_coin_w)
 {
 	if ((data & 0xf9) != 0x01) logerror("coin ctrl = %02x\n",data);
 
-	coin_counter_w(space->machine(), 0, data & 0x02);
-	coin_counter_w(space->machine(), 1, data & 0x04);
+	coin_counter_w(machine(), 0, data & 0x02);
+	coin_counter_w(machine(), 1, data & 0x04);
 }
 
 
 
-static ADDRESS_MAP_START( shisen_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( shisen_map, AS_PROGRAM, 8, shisen_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(sichuan2_paletteram_w) AM_BASE_MEMBER(shisen_state, m_paletteram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(sichuan2_videoram_w) AM_BASE_MEMBER(shisen_state, m_videoram)
+	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(sichuan2_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(sichuan2_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shisen_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( shisen_io_map, AS_IO, 8, shisen_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(sichuan2_dsw1_r, sichuan2_coin_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2") AM_DEVWRITE("m72", m72_sound_command_byte_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2") AM_DEVWRITE_LEGACY("m72", m72_sound_command_byte_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P1") AM_WRITE(sichuan2_bankswitch_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("COIN")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shisen_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( shisen_sound_map, AS_PROGRAM, 8, shisen_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0xfd00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shisen_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( shisen_sound_io_map, AS_IO, 8, shisen_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", shisen_sample_addr_w)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_sample_w)
-	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_sound_irq_ack_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREAD("m72", m72_sample_r)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("m72", shisen_sample_addr_w)
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE_LEGACY("m72", m72_sample_w)
+	AM_RANGE(0x83, 0x83) AM_DEVWRITE_LEGACY("m72", m72_sound_irq_ack_w)
+	AM_RANGE(0x84, 0x84) AM_DEVREAD_LEGACY("m72", m72_sample_r)
 ADDRESS_MAP_END
 
 
@@ -117,7 +117,7 @@ static INPUT_PORTS_START( shisen )
 	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coinage ) ) PORT_CONDITION("DSW2",0x04,PORTCOND_EQUALS,0x04) PORT_DIPLOCATION("SW1:5,6,7,8")
+	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coinage ) ) PORT_CONDITION("DSW2",0x04,EQUALS,0x04) PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(    0xa0, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 4C_1C ) )
@@ -134,12 +134,12 @@ static INPUT_PORTS_START( shisen )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_CONDITION("DSW2",0x04,PORTCOND_NOTEQUALS,0x04) PORT_DIPLOCATION("SW1:5,6")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_CONDITION("DSW2",0x04,NOTEQUALS,0x04) PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_CONDITION("DSW2",0x04,PORTCOND_NOTEQUALS,0x04) PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_CONDITION("DSW2",0x04,NOTEQUALS,0x04) PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
@@ -204,7 +204,7 @@ GFXDECODE_END
 
 static const ym2151_interface ym2151_config =
 {
-	m72_ym2151_irq_handler
+	DEVCB_LINE(m72_ym2151_irq_handler)
 };
 
 

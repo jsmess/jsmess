@@ -35,10 +35,10 @@ Verified Dip locations and recommended settings with manual
                                 Sky Fox
 ***************************************************************************/
 
-static ADDRESS_MAP_START( skyfox_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( skyfox_map, AS_PROGRAM, 8, skyfox_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM							// ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM							// RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_SIZE_MEMBER(skyfox_state, m_spriteram, m_spriteram_size)	// Sprites
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("spriteram")	// Sprites
 	AM_RANGE(0xd400, 0xdfff) AM_RAM							// RAM?
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("INPUTS")			// Input Ports
 	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("DSW0")			//
@@ -63,14 +63,14 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START( skyfox_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( skyfox_sound_map, AS_PROGRAM, 8, skyfox_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								// ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM								// RAM
 //  AM_RANGE(0x9000, 0x9001) AM_WRITENOP                        // ??
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", ym2203_r,ym2203_w)	// YM2203 #1
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r,ym2203_w)	// YM2203 #1
 //  AM_RANGE(0xb000, 0xb001) AM_WRITENOP                        // ??
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym2", ym2203_r,ym2203_w)	// YM2203 #2
-	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r)				// From Main CPU
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r,ym2203_w)	// YM2203 #2
+	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_byte_r)				// From Main CPU
 ADDRESS_MAP_END
 
 
@@ -82,10 +82,9 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(skyfox_state::coin_inserted)
 {
-	skyfox_state *state = field.machine().driver_data<skyfox_state>();
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( skyfox )
@@ -125,7 +124,7 @@ static INPUT_PORTS_START( skyfox )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW1")	// Coins, DSW + Vblank
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VBLANK  )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_VBLANK("screen")
 	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x0e, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 4C_1C ) )
@@ -158,8 +157,8 @@ static INPUT_PORTS_START( skyfox )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("COINS")	// Fake input port, coins are directly connected on NMI line
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, skyfox_state,coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, skyfox_state,coin_inserted, 0)
 INPUT_PORTS_END
 
 
@@ -433,8 +432,8 @@ ROM_END
 /* Untangle the graphics: cut each 32x32x8 tile in 16 8x8x8 tiles */
 static DRIVER_INIT( skyfox )
 {
-	UINT8 *RAM = machine.region("gfx1")->base();
-	UINT8 *end = RAM + machine.region("gfx1")->bytes();
+	UINT8 *RAM = machine.root_device().memregion("gfx1")->base();
+	UINT8 *end = RAM + machine.root_device().memregion("gfx1")->bytes();
 	UINT8 buf[32 * 32];
 
 	while (RAM < end)

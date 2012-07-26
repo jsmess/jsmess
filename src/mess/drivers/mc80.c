@@ -9,14 +9,13 @@
 Real workings of keyboard need to be understood and implemented.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/mc80.h"
 
 static ADDRESS_MAP_START(mc8020_mem, AS_PROGRAM, 8, mc80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_BASE(m_p_videoram)// 1KB RAM ZRE
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("p_videoram")// 1KB RAM ZRE
 	AM_RANGE(0x2000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -137,7 +136,7 @@ static TIMER_DEVICE_CALLBACK( mc8020_kbd )
 	for (i = 1; i < 8; i++)
 	{
 		sprintf(kbdrow,"X%X", i);
-		mem->write_word(0xd20+i, input_port_read(timer.machine(), kbdrow));
+		mem->write_word(0xd20+i, timer.machine().root_device().ioport(kbdrow)->read());
 	}
 }
 

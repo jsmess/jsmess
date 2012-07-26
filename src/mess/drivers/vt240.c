@@ -16,7 +16,6 @@
     0x1c8f: UPD7220
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -33,7 +32,8 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_hgdc(*this, "upd7220")
-		{ }
+		,
+		m_video_ram(*this, "video_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd7220_device> m_hgdc;
@@ -45,7 +45,7 @@ public:
 	//UINT8 m_pcg_internal_addr;
 	//UINT8 *m_char_rom;
 
-	UINT8 *m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 };
 
 /* TODO */
@@ -117,7 +117,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, vt240_state)
-	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -199,7 +199,7 @@ ROM_END
 /* Driver */
 static DRIVER_INIT( vt240 )
 {
-	UINT8 *ROM = machine.region("ipl")->base();
+	UINT8 *ROM = machine.root_device().memregion("ipl")->base();
 
 	/* patch T11 check */
 	ROM[0x09d] = 0x00;

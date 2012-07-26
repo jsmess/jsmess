@@ -369,8 +369,8 @@ static void argus_write_dummy_rams(running_machine &machine, int dramoffs, int v
 	int voffs;
 	int offs;
 
-	UINT8 *VROM1 = machine.region("user1")->base();		/* "ag_15.bin" */
-	UINT8 *VROM2 = machine.region("user2")->base();		/* "ag_16.bin" */
+	UINT8 *VROM1 = state->memregion("user1")->base();		/* "ag_15.bin" */
+	UINT8 *VROM2 = state->memregion("user2")->base();		/* "ag_16.bin" */
 
 	/* offset in pattern data */
 	offs = VROM1[vromoffs] | (VROM1[vromoffs + 1] << 8);
@@ -439,127 +439,115 @@ static void argus_change_bg_palette(running_machine &machine, int color, int lo_
   Memory handler
 ***************************************************************************/
 
-WRITE8_HANDLER( valtric_mosaic_w )
+WRITE8_MEMBER(argus_state::valtric_mosaic_w)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
-	state->m_valtric_mosaic = data;
+	m_valtric_mosaic = data;
 }
 
-READ8_HANDLER( argus_txram_r )
+READ8_MEMBER(argus_state::argus_txram_r)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
-	return state->m_txram[offset];
+	return m_txram[offset];
 }
 
-WRITE8_HANDLER( argus_txram_w )
+WRITE8_MEMBER(argus_state::argus_txram_w)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
-	state->m_txram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset >> 1);
+	m_txram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-READ8_HANDLER( argus_bg1ram_r )
+READ8_MEMBER(argus_state::argus_bg1ram_r)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
-	return state->m_bg1ram[offset];
+	return m_bg1ram[offset];
 }
 
-WRITE8_HANDLER( argus_bg1ram_w )
+WRITE8_MEMBER(argus_state::argus_bg1ram_w)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
-	state->m_bg1ram[offset] = data;
-	state->m_bg1_tilemap->mark_tile_dirty(offset >> 1);
+	m_bg1ram[offset] = data;
+	m_bg1_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-WRITE8_HANDLER( argus_bg_status_w )
+WRITE8_MEMBER(argus_state::argus_bg_status_w)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
-	if (state->m_bg_status != data)
+	if (m_bg_status != data)
 	{
-		state->m_bg_status = data;
+		m_bg_status = data;
 
 		/* Gray / purple scale */
-		if (state->m_bg_status & 2)
+		if (m_bg_status & 2)
 		{
 			int offs;
 
 			for (offs = 0x400; offs < 0x500; offs++)
 			{
-				argus_change_bg_palette(space->machine(), (offs - 0x400) + 0x080, offs, offs + 0x400);
+				argus_change_bg_palette(machine(), (offs - 0x400) + 0x080, offs, offs + 0x400);
 			}
 		}
 	}
 }
 
-WRITE8_HANDLER( valtric_bg_status_w )
+WRITE8_MEMBER(argus_state::valtric_bg_status_w)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
-	if (state->m_bg_status != data)
+	if (m_bg_status != data)
 	{
-		state->m_bg_status = data;
+		m_bg_status = data;
 
 		/* Gray / purple scale */
-		if (state->m_bg_status & 2)
+		if (m_bg_status & 2)
 		{
 			int offs;
 
 			for (offs = 0x400; offs < 0x600; offs += 2)
 			{
-				argus_change_bg_palette(space->machine(), ((offs - 0x400) >> 1) + 0x100, offs & ~1, offs | 1);
+				argus_change_bg_palette(machine(), ((offs - 0x400) >> 1) + 0x100, offs & ~1, offs | 1);
 			}
 		}
 	}
 }
 
-WRITE8_HANDLER( butasan_bg0_status_w )
+WRITE8_MEMBER(argus_state::butasan_bg0_status_w)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
-	state->m_bg_status = data;
+	m_bg_status = data;
 }
 
-WRITE8_HANDLER( butasan_bg1_status_w )
+WRITE8_MEMBER(argus_state::butasan_bg1_status_w)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
-	if (state->m_butasan_bg1_status != data)
+	if (m_butasan_bg1_status != data)
 	{
-		state->m_butasan_bg1_status = data;
+		m_butasan_bg1_status = data;
 
 		/* Bank changed */
-		state->m_bg1_tilemap->mark_all_dirty();
+		m_bg1_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( argus_flipscreen_w )
+WRITE8_MEMBER(argus_state::argus_flipscreen_w)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
-	state->m_flipscreen = data & 0x80;
+	m_flipscreen = data & 0x80;
 }
 
-READ8_HANDLER( argus_paletteram_r )
+READ8_MEMBER(argus_state::argus_paletteram_r)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
-	return state->m_paletteram[offset];
+	return m_paletteram[offset];
 }
 
-WRITE8_HANDLER( argus_paletteram_w )
+WRITE8_MEMBER(argus_state::argus_paletteram_w)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
 	int offs;
 
-	state->m_paletteram[offset] = data;
+	m_paletteram[offset] = data;
 
 	if (offset <= 0x0ff)								/* sprite color */
 	{
 		offset &= 0x07f;
 
-		argus_change_palette(space->machine(), offset, offset, offset + 0x080);
+		argus_change_palette(machine(), offset, offset, offset + 0x080);
 
 		if (offset == 0x07f || offset == 0x0ff)
 		{
-			state->m_palette_intensity = state->m_paletteram[0x0ff] | (state->m_paletteram[0x07f] << 8);
+			m_palette_intensity = m_paletteram[0x0ff] | (m_paletteram[0x07f] << 8);
 
 			for (offs = 0x400; offs < 0x500; offs++)
-				argus_change_bg_palette(space->machine(), (offs & 0xff) + 0x080, offs, offs + 0x400);
+				argus_change_bg_palette(machine(), (offs & 0xff) + 0x080, offs, offs + 0x400);
 		}
 	}
 	else if ((offset >= 0x400 && offset <= 0x4ff) ||
@@ -568,7 +556,7 @@ WRITE8_HANDLER( argus_paletteram_w )
 		offs = offset & 0xff;
 		offset = offs | 0x400;
 
-		argus_change_bg_palette(space->machine(), offs + 0x080, offset, offset + 0x400);
+		argus_change_bg_palette(machine(), offs + 0x080, offset, offset + 0x400);
 	}
 	else if ((offset >= 0x500 && offset <= 0x5ff) ||
 			 (offset >= 0x900 && offset <= 0x9ff))		/* BG1 color */
@@ -576,7 +564,7 @@ WRITE8_HANDLER( argus_paletteram_w )
 		offs = offset & 0xff;
 		offset = offs | 0x500;
 
-		argus_change_palette(space->machine(), offs + 0x180, offset, offset + 0x400);
+		argus_change_palette(machine(), offs + 0x180, offset, offset + 0x400);
 	}
 	else if ((offset >= 0x700 && offset <= 0x7ff) ||
 			 (offset >= 0xb00 && offset <= 0xbff))		/* text color */
@@ -584,139 +572,130 @@ WRITE8_HANDLER( argus_paletteram_w )
 		offs = offset & 0xff;
 		offset = offs | 0x700;
 
-		argus_change_palette(space->machine(), offs + 0x280, offset, offset + 0x400);
+		argus_change_palette(machine(), offs + 0x280, offset, offset + 0x400);
 	}
 }
 
-WRITE8_HANDLER( valtric_paletteram_w )
+WRITE8_MEMBER(argus_state::valtric_paletteram_w)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
-	state->m_paletteram[offset] = data;
+	m_paletteram[offset] = data;
 
 	if (offset <= 0x1ff)							/* Sprite color */
 	{
-		argus_change_palette(space->machine(), offset >> 1, offset & ~1, offset | 1);
+		argus_change_palette(machine(), offset >> 1, offset & ~1, offset | 1);
 
 		if (offset == 0x1fe || offset == 0x1ff)
 		{
 			int offs;
 
-			state->m_palette_intensity = state->m_paletteram[0x1ff] | (state->m_paletteram[0x1fe] << 8);
+			m_palette_intensity = m_paletteram[0x1ff] | (m_paletteram[0x1fe] << 8);
 
 			for (offs = 0x400; offs < 0x600; offs += 2)
-				argus_change_bg_palette(space->machine(), ((offs & 0x1ff) >> 1) + 0x100, offs & ~1, offs | 1);
+				argus_change_bg_palette(machine(), ((offs & 0x1ff) >> 1) + 0x100, offs & ~1, offs | 1);
 		}
 	}
 	else if (offset >= 0x400 && offset <= 0x5ff)		/* BG color */
 	{
-		argus_change_bg_palette(space->machine(), ((offset & 0x1ff) >> 1) + 0x100, offset & ~1, offset | 1);
+		argus_change_bg_palette(machine(), ((offset & 0x1ff) >> 1) + 0x100, offset & ~1, offset | 1);
 	}
 	else if (offset >= 0x600 && offset <= 0x7ff)		/* Text color */
 	{
-		argus_change_palette(space->machine(), ((offset & 0x1ff) >> 1) + 0x200, offset & ~1, offset | 1);
+		argus_change_palette(machine(), ((offset & 0x1ff) >> 1) + 0x200, offset & ~1, offset | 1);
 	}
 }
 
-WRITE8_HANDLER( butasan_paletteram_w )
+WRITE8_MEMBER(argus_state::butasan_paletteram_w)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
-	state->m_paletteram[offset] = data;
+	m_paletteram[offset] = data;
 
 	if (offset <= 0x1ff)							/* BG0 color */
 	{
-		argus_change_palette(space->machine(), (offset >> 1) + 0x100, offset & ~1, offset | 1);
+		argus_change_palette(machine(), (offset >> 1) + 0x100, offset & ~1, offset | 1);
 	}
 	else if (offset <= 0x23f)						/* BG1 color */
 	{
-		argus_change_palette(space->machine(), ((offset & 0x3f) >> 1) + 0x0c0, offset & ~1, offset | 1);
+		argus_change_palette(machine(), ((offset & 0x3f) >> 1) + 0x0c0, offset & ~1, offset | 1);
 	}
 	else if (offset >= 0x400 && offset <= 0x47f)	/* Sprite color */
 	{												/* 16 colors */
-		argus_change_palette(space->machine(), (offset & 0x7f) >> 1, offset & ~1, offset | 1);
+		argus_change_palette(machine(), (offset & 0x7f) >> 1, offset & ~1, offset | 1);
 	}
 	else if (offset >= 0x480 && offset <= 0x4ff)	/* Sprite color */
 	{												/* 8  colors */
 		int offs = (offset & 0x070) | ((offset & 0x00f) >> 1);
 
-		argus_change_palette(space->machine(), offs + 0x040, offset & ~1, offset | 1);
-		argus_change_palette(space->machine(), offs + 0x048, offset & ~1, offset | 1);
+		argus_change_palette(machine(), offs + 0x040, offset & ~1, offset | 1);
+		argus_change_palette(machine(), offs + 0x048, offset & ~1, offset | 1);
 	}
 	else if (offset >= 0x600 && offset <= 0x7ff)	/* Text color */
 	{
-		argus_change_palette(space->machine(), ((offset & 0x1ff) >> 1) + 0x200, offset & ~1, offset | 1);
+		argus_change_palette(machine(), ((offset & 0x1ff) >> 1) + 0x200, offset & ~1, offset | 1);
 	}
 	else if (offset >= 0x240 && offset <= 0x25f)	// dummy
-		argus_change_palette(space->machine(), ((offset & 0x1f) >> 1) + 0xe0, offset & ~1, offset | 1);
+		argus_change_palette(machine(), ((offset & 0x1f) >> 1) + 0xe0, offset & ~1, offset | 1);
 	else if (offset >= 0x500 && offset <= 0x51f)	// dummy
-		argus_change_palette(space->machine(), ((offset & 0x1f) >> 1) + 0xf0, offset & ~1, offset | 1);
+		argus_change_palette(machine(), ((offset & 0x1f) >> 1) + 0xf0, offset & ~1, offset | 1);
 }
 
-READ8_HANDLER( butasan_bg1ram_r )
+READ8_MEMBER(argus_state::butasan_bg1ram_r)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
-	return state->m_butasan_bg1ram[offset];
+	return m_butasan_bg1ram[offset];
 }
 
-WRITE8_HANDLER( butasan_bg1ram_w )
+WRITE8_MEMBER(argus_state::butasan_bg1ram_w)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
 	int idx;
 
-	state->m_butasan_bg1ram[offset] = data;
+	m_butasan_bg1ram[offset] = data;
 
 	idx = (offset & 0x00f) | ((offset & 0x200) >> 5) | ((offset & 0x1f0) << 1);
 	idx ^= 0x0f0;
 
-	state->m_bg1_tilemap->mark_tile_dirty(idx);
+	m_bg1_tilemap->mark_tile_dirty(idx);
 }
 
-WRITE8_HANDLER( butasan_pageselect_w )
+WRITE8_MEMBER(argus_state::butasan_pageselect_w)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
-	state->m_butasan_page_latch = data & 1;
+	m_butasan_page_latch = data & 1;
 }
 
-READ8_HANDLER( butasan_pagedram_r )
+READ8_MEMBER(argus_state::butasan_pagedram_r)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
 	if (offset <= 0x07ff)
-		return state->m_butasan_pagedram[state->m_butasan_page_latch][offset];
+		return m_butasan_pagedram[m_butasan_page_latch][offset];
 	else
-		return state->m_butasan_pagedram[0][offset];
+		return m_butasan_pagedram[0][offset];
 }
 
-WRITE8_HANDLER( butasan_pagedram_w )
+WRITE8_MEMBER(argus_state::butasan_pagedram_w)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
-	state->m_butasan_pagedram[state->m_butasan_page_latch][offset] = data;
+	m_butasan_pagedram[m_butasan_page_latch][offset] = data;
 
-	if (!state->m_butasan_page_latch)
+	if (!m_butasan_page_latch)
 	{
 		if (offset <= 0x07ff)
 		{
 			int idx;
 			idx = ((offset & 0x01e) >> 1) | ((offset & 0x400) >> 6) | (offset & 0x3e0);
 			idx ^= 0x1e0;
-			state->m_bg0_tilemap->mark_tile_dirty(idx);
+			m_bg0_tilemap->mark_tile_dirty(idx);
 		}
 	}
 	else
 	{
 		if (offset <= 0x07ff)
-			state->m_tx_tilemap->mark_tile_dirty((offset ^ 0x7c0) >> 1);
+			m_tx_tilemap->mark_tile_dirty((offset ^ 0x7c0) >> 1);
 	}
 }
 
-WRITE8_HANDLER( valtric_unknown_w )
+WRITE8_MEMBER(argus_state::valtric_unknown_w)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
-	state->m_valtric_unknown = data;
+	m_valtric_unknown = data;
 }
 
-WRITE8_HANDLER( butasan_unknown_w )
+WRITE8_MEMBER(argus_state::butasan_unknown_w)
 {
-	argus_state *state = space->machine().driver_data<argus_state>();
-	state->m_butasan_unknown = data;
+	m_butasan_unknown = data;
 }
 
 
@@ -858,7 +837,7 @@ static void argus_draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap, c
 	int offs;
 
 	/* Draw the sprites */
-	for (offs = 0; offs < state->m_spriteram_size; offs += 16)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 16)
 	{
 		if (!(spriteram[offs+15] == 0 && spriteram[offs+11] == 0xf0))
 		{
@@ -991,7 +970,7 @@ static void valtric_draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap,
 	int offs;
 
 	/* Draw the sprites */
-	for (offs = 0; offs < state->m_spriteram_size; offs += 16)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 16)
 	{
 		if (!(spriteram[offs+15] == 0 && spriteram[offs+11] == 0xf0))
 		{
@@ -1031,7 +1010,7 @@ static void butasan_draw_sprites(running_machine &machine, bitmap_rgb32 &bitmap,
 	int offs;
 
 	/* Draw the sprites */
-	for (offs = 0; offs < state->m_spriteram_size; offs += 16)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 16)
 	{
 		int sx, sy, tile, flipx, flipy, color;
 		int fx, fy;
@@ -1148,7 +1127,7 @@ static void butasan_log_vram(running_machine &machine)
 		logerror("\nSprite RAM\n");
 		logerror("---------------------------------------\n");
 		logerror("       +0 +1 +2 +3 +4 +5 +6 +7  +8 +9 +a +b +c +d +e +f\n");
-		for (offs = 0; offs < state->m_spriteram_size; offs += 16)
+		for (offs = 0; offs < state->m_spriteram.bytes(); offs += 16)
 		{
 			for (i = 0; i < 16; i++)
 			{

@@ -57,20 +57,18 @@ Grndtour:
 #include "sound/2413intf.h"
 
 
-static WRITE8_HANDLER( iqblock_prot_w )
+WRITE8_MEMBER(iqblock_state::iqblock_prot_w)
 {
-	iqblock_state *state = space->machine().driver_data<iqblock_state>();
-    state->m_rambase[0xe26] = data;
-    state->m_rambase[0xe27] = data;
-    state->m_rambase[0xe1c] = data;
+    m_rambase[0xe26] = data;
+    m_rambase[0xe27] = data;
+    m_rambase[0xe1c] = data;
 }
 
-static WRITE8_HANDLER( grndtour_prot_w )
+WRITE8_MEMBER(iqblock_state::grndtour_prot_w)
 {
-	iqblock_state *state = space->machine().driver_data<iqblock_state>();
-	state->m_rambase[0xe39] = data;
-    state->m_rambase[0xe3a] = data;
-    state->m_rambase[0xe2f] = data;
+	m_rambase[0xe39] = data;
+    m_rambase[0xe3a] = data;
+    m_rambase[0xe2f] = data;
 
 }
 
@@ -90,14 +88,14 @@ static TIMER_DEVICE_CALLBACK( iqblock_irq )
 }
 
 
-static WRITE8_HANDLER( iqblock_irqack_w )
+WRITE8_MEMBER(iqblock_state::iqblock_irqack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
-static READ8_HANDLER( extrarom_r )
+READ8_MEMBER(iqblock_state::extrarom_r)
 {
-	return space->machine().region("user1")->base()[offset];
+	return memregion("user1")->base()[offset];
 }
 
 
@@ -126,23 +124,23 @@ static const ppi8255_interface ppi8255_intf =
 };
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, iqblock_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(iqblock_state, m_rambase)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("rambase")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w)
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8, iqblock_state )
+	AM_RANGE(0x2000, 0x23ff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w)
+	AM_RANGE(0x2800, 0x2bff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w)
 	AM_RANGE(0x6000, 0x603f) AM_WRITE(iqblock_fgscroll_w)
 	AM_RANGE(0x6800, 0x69ff) AM_WRITE(iqblock_fgvideoram_w)	/* initialized up to 6fff... bug or larger tilemap? */
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(iqblock_bgvideoram_w)
-	AM_RANGE(0x5080, 0x5083) AM_DEVWRITE("ppi8255", ppi8255_w)
-	AM_RANGE(0x5080, 0x5083) AM_DEVREAD("ppi8255", ppi8255_r)
+	AM_RANGE(0x5080, 0x5083) AM_DEVWRITE_LEGACY("ppi8255", ppi8255_w)
+	AM_RANGE(0x5080, 0x5083) AM_DEVREAD_LEGACY("ppi8255", ppi8255_r)
 	AM_RANGE(0x5090, 0x5090) AM_READ_PORT("SW0")
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("SW1")
-	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE("ymsnd", ym2413_w) // UM3567_data_port_0_w
+	AM_RANGE(0x50b0, 0x50b1) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w) // UM3567_data_port_0_w
 	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(iqblock_irqack_w)
 	AM_RANGE(0x7000, 0x7fff) AM_READ(iqblock_bgvideoram_r)
 	AM_RANGE(0x8000, 0xffff) AM_READ(extrarom_r)
@@ -433,7 +431,7 @@ ROM_END
 static DRIVER_INIT( iqblock )
 {
 	iqblock_state *state = machine.driver_data<iqblock_state>();
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */
@@ -445,18 +443,18 @@ static DRIVER_INIT( iqblock )
 	}
 
 	/* initialize pointers for I/O mapped RAM */
-	machine.generic.paletteram.u8         = rom + 0x12000;
-	machine.generic.paletteram2.u8       = rom + 0x12800;
+	state->m_generic_paletteram_8.set_target(rom + 0x12000, 0x800);
+	state->m_generic_paletteram2_8.set_target(rom + 0x12800, 0x800);
 	state->m_fgvideoram = rom + 0x16800;
 	state->m_bgvideoram = rom + 0x17000;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe26, 0xfe26, FUNC(iqblock_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe26, 0xfe26, write8_delegate(FUNC(iqblock_state::iqblock_prot_w),state));
 	state->m_video_type=1;
 }
 
 static DRIVER_INIT( grndtour )
 {
 	iqblock_state *state = machine.driver_data<iqblock_state>();
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */
@@ -468,11 +466,11 @@ static DRIVER_INIT( grndtour )
 	}
 
 	/* initialize pointers for I/O mapped RAM */
-	machine.generic.paletteram.u8         = rom + 0x12000;
-	machine.generic.paletteram2.u8       = rom + 0x12800;
+	state->m_generic_paletteram_8.set_target(rom + 0x12000, 0x800);
+	state->m_generic_paletteram2_8.set_target(rom + 0x12800, 0x800);
 	state->m_fgvideoram = rom + 0x16800;
 	state->m_bgvideoram = rom + 0x17000;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe39, 0xfe39, FUNC(grndtour_prot_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe39, 0xfe39, write8_delegate(FUNC(iqblock_state::grndtour_prot_w),state));
 	state->m_video_type=0;
 }
 

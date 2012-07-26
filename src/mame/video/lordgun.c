@@ -46,11 +46,11 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 // xxxxBBBBGGGGRRRR, but repeat ecah color for each priority code (since we stuff it in the high bits of the pen)
-WRITE16_HANDLER( lordgun_paletteram_w )
+WRITE16_MEMBER(lordgun_state::lordgun_paletteram_w)
 {
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	for (int pri = 0; pri < 8; pri++)
-		palette_set_color_rgb(space->machine(), offset+0x800*pri, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
+		palette_set_color_rgb(machine(), offset+0x800*pri, pal4bit(data >> 0), pal4bit(data >> 4), pal4bit(data >> 8));
 }
 
 
@@ -82,10 +82,10 @@ INLINE void lordgun_vram_w(address_space *space, offs_t offset, UINT16 data, UIN
 	state->m_tilemap[_N_]->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( lordgun_vram_0_w ) { lordgun_vram_w(space, offset, data, mem_mask, 0); }
-WRITE16_HANDLER( lordgun_vram_1_w ) { lordgun_vram_w(space, offset, data, mem_mask, 1); }
-WRITE16_HANDLER( lordgun_vram_2_w ) { lordgun_vram_w(space, offset, data, mem_mask, 2); }
-WRITE16_HANDLER( lordgun_vram_3_w ) { lordgun_vram_w(space, offset, data, mem_mask, 3); }
+WRITE16_MEMBER(lordgun_state::lordgun_vram_0_w){ lordgun_vram_w(&space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(lordgun_state::lordgun_vram_1_w){ lordgun_vram_w(&space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(lordgun_state::lordgun_vram_2_w){ lordgun_vram_w(&space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(lordgun_state::lordgun_vram_3_w){ lordgun_vram_w(&space, offset, data, mem_mask, 3); }
 
 /***************************************************************************
 
@@ -177,7 +177,7 @@ static const int lordgun_gun_x_table[] =
 
 static const char *const gunnames[] = { "LIGHT0_X", "LIGHT1_X", "LIGHT0_Y", "LIGHT1_Y" };
 
-float lordgun_crosshair_mapper(const input_field_config *field, float linear_value)
+float lordgun_crosshair_mapper(ioport_field *field, float linear_value)
 {
 	int x = linear_value - 0x3c;
 
@@ -190,15 +190,15 @@ float lordgun_crosshair_mapper(const input_field_config *field, float linear_val
 static void lorddgun_calc_gun_scr(running_machine &machine, int i)
 {
 	lordgun_state *state = machine.driver_data<lordgun_state>();
-//  popmessage("%03x, %02x", input_port_read(machine, "LIGHT0_X"), input_port_read(machine, "LIGHT0_Y"));
+//  popmessage("%03x, %02x", machine, "LIGHT0_X"), state->ioport("LIGHT0_Y")->read());
 
-	int x = input_port_read(machine, gunnames[i]) - 0x3c;
+	int x = state->ioport(gunnames[i])->read() - 0x3c;
 
 	if ( (x < 0) || (x > sizeof(lordgun_gun_x_table)/sizeof(lordgun_gun_x_table[0])) )
 		x = 0;
 
 	state->m_gun[i].scr_x = lordgun_gun_x_table[x];
-	state->m_gun[i].scr_y = input_port_read(machine, gunnames[i+2]);
+	state->m_gun[i].scr_y = state->ioport(gunnames[i+2])->read();
 }
 
 void lordgun_update_gun(running_machine &machine, int i)
@@ -206,8 +206,8 @@ void lordgun_update_gun(running_machine &machine, int i)
 	lordgun_state *state = machine.driver_data<lordgun_state>();
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	state->m_gun[i].hw_x = input_port_read(machine, gunnames[i]);
-	state->m_gun[i].hw_y = input_port_read(machine, gunnames[i+2]);
+	state->m_gun[i].hw_x = state->ioport(gunnames[i])->read();
+	state->m_gun[i].hw_y = state->ioport(gunnames[i+2])->read();
 
 	lorddgun_calc_gun_scr(machine, i);
 
@@ -244,7 +244,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 {
 	lordgun_state *state = machine.driver_data<lordgun_state>();
 	UINT16 *s		=	state->m_spriteram;
-	UINT16 *end		=	state->m_spriteram + state->m_spriteram_size/2;
+	UINT16 *end		=	state->m_spriteram + state->m_spriteram.bytes()/2;
 
 	for ( ; s < end; s += 8/2 )
 	{

@@ -8,15 +8,20 @@ class equites_state : public driver_device
 {
 public:
 	equites_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg_videoram(*this, "bg_videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_workram(*this, "workram"),
+		m_spriteram_2(*this, "spriteram_2"),
+		m_mcu_ram(*this, "mcu_ram"){ }
 
 	/* memory pointers */
-	UINT16 *  m_bg_videoram;
+	required_shared_ptr<UINT16> m_bg_videoram;
 	UINT8  *  m_fg_videoram;	// 8bits
-	UINT16 *  m_spriteram;
-	UINT16 *  m_spriteram_2;
-	UINT16 *  m_workram;
-	UINT8  *  m_mcu_ram;	// 8bits
+	required_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_workram;
+	optional_shared_ptr<UINT16> m_spriteram_2;
+	required_shared_ptr<UINT8>  m_mcu_ram;  	// 8bits
 //  UINT16 *  m_nvram;    // currently this uses generic nvram handling
 
 	/* video-related */
@@ -53,24 +58,38 @@ public:
 	msm5232_device *m_msm;
 	device_t *m_dac_1;
 	device_t *m_dac_2;
+	DECLARE_WRITE8_MEMBER(equites_c0f8_w);
+	DECLARE_WRITE8_MEMBER(equites_cymbal_ctrl_w);
+	DECLARE_WRITE8_MEMBER(equites_dac_latch_w);
+	DECLARE_WRITE8_MEMBER(equites_8155_portb_w);
+	DECLARE_WRITE8_MEMBER(equites_8155_w);
+	DECLARE_READ16_MEMBER(hvoltage_debug_r);
+	DECLARE_WRITE16_MEMBER(gekisou_unknown_0_w);
+	DECLARE_WRITE16_MEMBER(gekisou_unknown_1_w);
+	DECLARE_READ16_MEMBER(equites_spriteram_kludge_r);
+	DECLARE_READ16_MEMBER(mcu_r);
+	DECLARE_WRITE16_MEMBER(mcu_w);
+	DECLARE_WRITE16_MEMBER(mcu_halt_assert_w);
+	DECLARE_WRITE16_MEMBER(mcu_halt_clear_w);
+	DECLARE_READ16_MEMBER(equites_fg_videoram_r);
+	DECLARE_WRITE16_MEMBER(equites_fg_videoram_w);
+	DECLARE_WRITE16_MEMBER(equites_bg_videoram_w);
+	DECLARE_WRITE16_MEMBER(equites_bgcolor_w);
+	DECLARE_WRITE16_MEMBER(equites_scrollreg_w);
+	DECLARE_WRITE16_MEMBER(splndrbt_selchar0_w);
+	DECLARE_WRITE16_MEMBER(splndrbt_selchar1_w);
+	DECLARE_WRITE16_MEMBER(equites_flip0_w);
+	DECLARE_WRITE16_MEMBER(equites_flip1_w);
+	DECLARE_WRITE16_MEMBER(splndrbt_flip0_w);
+	DECLARE_WRITE16_MEMBER(splndrbt_flip1_w);
+	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrollx_w);
+	DECLARE_WRITE16_MEMBER(splndrbt_bg_scrolly_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(gekisou_unknown_status);
 };
 
 
 /*----------- defined in video/equites.c -----------*/
 
-extern READ16_HANDLER(equites_fg_videoram_r);
-extern WRITE16_HANDLER(equites_fg_videoram_w);
-extern WRITE16_HANDLER(equites_bg_videoram_w);
-extern WRITE16_HANDLER(equites_scrollreg_w);
-extern WRITE16_HANDLER(equites_bgcolor_w);
-extern WRITE16_HANDLER(splndrbt_selchar0_w);
-extern WRITE16_HANDLER(splndrbt_selchar1_w);
-extern WRITE16_HANDLER(equites_flip0_w);
-extern WRITE16_HANDLER(equites_flip1_w);
-extern WRITE16_HANDLER(splndrbt_flip0_w);
-extern WRITE16_HANDLER(splndrbt_flip1_w);
-extern WRITE16_HANDLER(splndrbt_bg_scrollx_w);
-extern WRITE16_HANDLER(splndrbt_bg_scrolly_w);
 
 extern PALETTE_INIT( equites );
 extern VIDEO_START( equites );

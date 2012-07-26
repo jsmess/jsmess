@@ -47,29 +47,35 @@ class aceal_state : public driver_device
 {
 public:
 	aceal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_scoreram(*this, "scoreram"),
+		m_ram2(*this, "ram2"),
+		m_characterram(*this, "characterram"){ }
 
 	/* video-related */
-	UINT8 *  m_ram2;
-	UINT8 *  m_scoreram;
-	UINT8 *  m_characterram;
+	required_shared_ptr<UINT8> m_scoreram;
+	required_shared_ptr<UINT8> m_ram2;
+	required_shared_ptr<UINT8> m_characterram;
 
 	/* input-related */
 	int m_objpos[8];
+	DECLARE_WRITE8_MEMBER(ace_objpos_w);
+	DECLARE_READ8_MEMBER(ace_objpos_r);
+	DECLARE_WRITE8_MEMBER(ace_characterram_w);
+	DECLARE_WRITE8_MEMBER(ace_scoreram_w);
+	DECLARE_READ8_MEMBER(unk_r);
 };
 
 
-static WRITE8_HANDLER( ace_objpos_w )
+WRITE8_MEMBER(aceal_state::ace_objpos_w)
 {
-	aceal_state *state = space->machine().driver_data<aceal_state>();
-	state->m_objpos[offset] = data;
+	m_objpos[offset] = data;
 }
 
 #if 0
-static READ8_HANDLER( ace_objpos_r )
+READ8_MEMBER(aceal_state::ace_objpos_r)
 {
-	aceal_state *state = space->machine().driver_data<aceal_state>();
-	return state->m_objpos[offset];
+	return m_objpos[offset];
 }
 #endif
 
@@ -128,33 +134,31 @@ static PALETTE_INIT( ace )
 }
 
 
-static WRITE8_HANDLER( ace_characterram_w )
+WRITE8_MEMBER(aceal_state::ace_characterram_w)
 {
-	aceal_state *state = space->machine().driver_data<aceal_state>();
-	if (state->m_characterram[offset] != data)
+	if (m_characterram[offset] != data)
 	{
 		if (data & ~0x07)
 		{
 			logerror("write to %04x data = %02x\n", 0x8000 + offset, data);
 			popmessage("write to %04x data = %02x\n", 0x8000 + offset, data);
 		}
-		state->m_characterram[offset] = data;
-		gfx_element_mark_dirty(space->machine().gfx[1], 0);
-		gfx_element_mark_dirty(space->machine().gfx[2], 0);
-		gfx_element_mark_dirty(space->machine().gfx[3], 0);
+		m_characterram[offset] = data;
+		gfx_element_mark_dirty(machine().gfx[1], 0);
+		gfx_element_mark_dirty(machine().gfx[2], 0);
+		gfx_element_mark_dirty(machine().gfx[3], 0);
 	}
 }
 
-static WRITE8_HANDLER( ace_scoreram_w )
+WRITE8_MEMBER(aceal_state::ace_scoreram_w)
 {
-	aceal_state *state = space->machine().driver_data<aceal_state>();
-	state->m_scoreram[offset] = data;
-	gfx_element_mark_dirty(space->machine().gfx[4], offset / 32);
+	m_scoreram[offset] = data;
+	gfx_element_mark_dirty(machine().gfx[4], offset / 32);
 }
 
-static READ8_HANDLER( unk_r )
+READ8_MEMBER(aceal_state::unk_r)
 {
-	return space->machine().rand() & 0xff;
+	return machine().rand() & 0xff;
 }
 
 
@@ -162,13 +166,13 @@ static READ8_HANDLER( unk_r )
 /* 3x3106 - SRAM 256x1 */
 /* 1x3622 - ROM 512x4  - doesn't seem to be used ????????????*/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, aceal_state )
 
 	AM_RANGE(0x0000, 0x09ff) AM_ROM
 
-	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(ace_scoreram_w) AM_BASE_MEMBER(aceal_state, m_scoreram)	/* 2x2101 */
-	AM_RANGE(0x8300, 0x83ff) AM_RAM AM_BASE_MEMBER(aceal_state, m_ram2)	/* 2x2101 */
-	AM_RANGE(0x8000, 0x80ff) AM_RAM_WRITE(ace_characterram_w) AM_BASE_MEMBER(aceal_state, m_characterram)	/* 3x3101 (3bits: 0, 1, 2) */
+	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(ace_scoreram_w) AM_SHARE("scoreram")	/* 2x2101 */
+	AM_RANGE(0x8300, 0x83ff) AM_RAM AM_SHARE("ram2")	/* 2x2101 */
+	AM_RANGE(0x8000, 0x80ff) AM_RAM_WRITE(ace_characterram_w) AM_SHARE("characterram")	/* 3x3101 (3bits: 0, 1, 2) */
 
 	AM_RANGE(0xc000, 0xc005) AM_WRITE(ace_objpos_w)
 
@@ -244,7 +248,7 @@ static INPUT_PORTS_START( ace )
 	//c012
 
 	PORT_START("c014")	/* VBLANK??? */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("c015")	/* coin input */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )

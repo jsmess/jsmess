@@ -39,6 +39,7 @@
 
 #include "emu.h"
 #include "emuopts.h"
+#include "drivenum.h"
 #include "ui.h"
 #include "zippath.h"
 #include "uiimage.h"
@@ -49,6 +50,7 @@
 //**************************************************************************
 const image_device_type_info device_image_interface::m_device_info_array[] =
 	{
+		{ IO_UNKNOWN,	"unknown",		"unkn" },
 		{ IO_CARTSLOT,	"cartridge",	"cart" }, /*  0 */
 		{ IO_FLOPPY,	"floppydisk",	"flop" }, /*  1 */
 		{ IO_HARDDISK,	"harddisk",		"hard" }, /*  2 */
@@ -64,6 +66,7 @@ const image_device_type_info device_image_interface::m_device_info_array[] =
 		{ IO_MEMCARD,	"memcard",		"memc" }, /* 12 */
 		{ IO_CDROM,     "cdrom",        "cdrm" }, /* 13 */
 		{ IO_MAGTAPE,	"magtape",		"magt" }, /* 14 */
+		{ IO_ROM,		"romimage",		"rom"  }, /* 15 */
 	};
 
 
@@ -421,7 +424,7 @@ UINT8 *device_image_interface::get_software_region(const char *tag)
 		return NULL;
 
 	sprintf( full_tag, "%s:%s", device().tag(), tag );
-	return device().machine().region( full_tag )->base();
+	return device().machine().root_device().memregion( full_tag )->base();
 }
 
 
@@ -434,7 +437,7 @@ UINT32 device_image_interface::get_software_region_length(const char *tag)
     char full_tag[256];
 
     sprintf( full_tag, "%s:%s", device().tag(), tag );
-    return device().machine().region( full_tag )->bytes();
+    return device().machine().root_device().memregion( full_tag )->bytes();
 }
 
 
@@ -1257,7 +1260,7 @@ void ui_menu_control_device_image::handle()
 				zippath_closedir(directory);
 		}
 		submenu_result = -1;
-		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_selector(machine(), container, image, current_directory, current_file, true, true, can_create, &submenu_result)));
+		ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_file_selector(machine(), container, image, current_directory, current_file, true, image->image_interface()!=NULL, can_create, &submenu_result)));
 		state = SELECT_FILE;
 		break;
 	}

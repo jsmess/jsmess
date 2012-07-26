@@ -129,18 +129,18 @@ Dumped by Chackn
 #include "sound/2203intf.h"
 #include "includes/angelkds.h"
 
-static READ8_HANDLER( angelkds_main_sound_r );
-static WRITE8_HANDLER( angelkds_main_sound_w );
-static READ8_HANDLER( angelkds_sub_sound_r );
-static WRITE8_HANDLER( angelkds_sub_sound_w );
+
+
+
+
 
 /*** CPU Banking
 
 */
 
-static WRITE8_HANDLER( angelkds_cpu_bank_write )
+WRITE8_MEMBER(angelkds_state::angelkds_cpu_bank_write)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);	// shall we check (data & 0x0f) < # of available banks (8 or 10 resp.)?
+	membank("bank1")->set_entry(data & 0x0f);	// shall we check (data & 0x0f) < # of available banks (8 or 10 resp.)?
 }
 
 
@@ -154,24 +154,24 @@ these make the game a bit easier for testing purposes
 
 #if FAKEINPUTS
 
-static READ8_HANDLER( angelkds_input_r )
+READ8_MEMBER(angelkds_state::angelkds_input_r)
 {
 	int fake;
 	static const char *const portnames[] = { "I81", "I82" };
 	static const char *const fakenames[] = { "FAKE1", "FAKE2" };
 
-	fake = input_port_read(space->machine(), fakenames[offset]);
+	fake = ioport(fakenames[offset])->read();
 
-	return ((fake & 0x01) ? fake  : input_port_read(space->machine(), portnames[offset]));
+	return ((fake & 0x01) ? fake  : ioport(portnames[offset])->read());
 }
 
 #else
 
-static READ8_HANDLER( angelkds_input_r )
+READ8_MEMBER(angelkds_state::angelkds_input_r)
 {
 	static const char *const portnames[] = { "I81", "I82" };
 
-	return input_port_read(space->machine(), portnames[offset]);
+	return ioport(portnames[offset])->read();
 }
 
 #endif
@@ -192,15 +192,15 @@ contain a level.
 
 */
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, angelkds_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(angelkds_bgtopvideoram_w) AM_BASE_MEMBER(angelkds_state, m_bgtopvideoram) /* Top Half of Screen */
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(angelkds_bgbotvideoram_w) AM_BASE_MEMBER(angelkds_state, m_bgbotvideoram) /* Bottom Half of Screen */
-	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(angelkds_txvideoram_w) AM_BASE_MEMBER(angelkds_state, m_txvideoram)
-	AM_RANGE(0xec00, 0xecff) AM_RAM AM_BASE_MEMBER(angelkds_state, m_spriteram)
-	AM_RANGE(0xed00, 0xeeff) AM_RAM_WRITE(angelkds_paletteram_w) AM_BASE_MEMBER(angelkds_state, m_paletteram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(angelkds_bgtopvideoram_w) AM_SHARE("bgtopvideoram") /* Top Half of Screen */
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM_WRITE(angelkds_bgbotvideoram_w) AM_SHARE("bgbotvideoram") /* Bottom Half of Screen */
+	AM_RANGE(0xe800, 0xebff) AM_RAM_WRITE(angelkds_txvideoram_w) AM_SHARE("txvideoram")
+	AM_RANGE(0xec00, 0xecff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xed00, 0xeeff) AM_RAM_WRITE(angelkds_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xef00, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(angelkds_bgtopbank_write)
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(angelkds_bgtopscroll_write)
@@ -210,7 +210,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf005, 0xf005) AM_WRITE(angelkds_layer_ctrl_write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8, angelkds_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP // 00 on start-up, not again
 	AM_RANGE(0x42, 0x42) AM_WRITE(angelkds_cpu_bank_write)
@@ -226,7 +226,7 @@ ADDRESS_MAP_END
 
 /* sub cpu */
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, angelkds_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xaaa9, 0xaaa9) AM_READNOP
@@ -234,10 +234,10 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xaaac, 0xaaac) AM_READNOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sub_portmap, AS_IO, 8, angelkds_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
 	AM_RANGE(0x80, 0x83) AM_READWRITE(angelkds_sub_sound_r, angelkds_sub_sound_w) // spcpostn
 ADDRESS_MAP_END
 
@@ -486,28 +486,24 @@ sound related ?
 
 */
 
-static WRITE8_HANDLER( angelkds_main_sound_w )
+WRITE8_MEMBER(angelkds_state::angelkds_main_sound_w)
 {
-	angelkds_state *state = space->machine().driver_data<angelkds_state>();
-	state->m_sound[offset] = data;
+	m_sound[offset] = data;
 }
 
-static READ8_HANDLER( angelkds_main_sound_r )
+READ8_MEMBER(angelkds_state::angelkds_main_sound_r)
 {
-	angelkds_state *state = space->machine().driver_data<angelkds_state>();
-	return state->m_sound2[offset];
+	return m_sound2[offset];
 }
 
-static WRITE8_HANDLER( angelkds_sub_sound_w )
+WRITE8_MEMBER(angelkds_state::angelkds_sub_sound_w)
 {
-	angelkds_state *state = space->machine().driver_data<angelkds_state>();
-	state->m_sound2[offset] = data;
+	m_sound2[offset] = data;
 }
 
-static READ8_HANDLER( angelkds_sub_sound_r )
+READ8_MEMBER(angelkds_state::angelkds_sub_sound_r)
 {
-	angelkds_state *state = space->machine().driver_data<angelkds_state>();
-	return state->m_sound[offset];
+	return m_sound[offset];
 }
 
 
@@ -748,16 +744,16 @@ ROM_END
 
 static DRIVER_INIT( angelkds )
 {
-	UINT8 *RAM = machine.region("user1")->base();
-	memory_configure_bank(machine, "bank1", 0, 8, &RAM[0x0000], 0x4000);
+	UINT8 *RAM = machine.root_device().memregion("user1")->base();
+	machine.root_device().membank("bank1")->configure_entries(0, 8, &RAM[0x0000], 0x4000);
 }
 
 static DRIVER_INIT( spcpostn )
 {
-	UINT8 *RAM = machine.region("user1")->base();
+	UINT8 *RAM = machine.root_device().memregion("user1")->base();
 
 	sega_317_0005_decode(machine, "maincpu");
-	memory_configure_bank(machine, "bank1", 0, 10, &RAM[0x0000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 10, &RAM[0x0000], 0x4000);
 }
 
 

@@ -129,123 +129,118 @@ Dip locations verified with US conversion kit manual.
 
 /**********************************************************************************/
 
-static READ16_HANDLER( dassault_control_r )
+READ16_MEMBER(dassault_state::dassault_control_r)
 {
 	switch (offset << 1)
 	{
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
-			return input_port_read(space->machine(), "P1_P2");
+			return ioport("P1_P2")->read();
 
 		case 2: /* Player 3 & Player 4 joysticks & fire buttons */
-			return input_port_read(space->machine(), "P3_P4");
+			return ioport("P3_P4")->read();
 
 		case 4: /* Dip 1 (stored at 0x3f8035) */
-			return input_port_read(space->machine(), "DSW1");
+			return ioport("DSW1")->read();
 
 		case 6: /* Dip 2 (stored at 0x3f8034) */
-			return input_port_read(space->machine(), "DSW2");
+			return ioport("DSW2")->read();
 
 		case 8: /* VBL, Credits */
-			return input_port_read(space->machine(), "SYSTEM");
+			return ioport("SYSTEM")->read();
 	}
 
 	return 0xffff;
 }
 
-static WRITE16_HANDLER( dassault_control_w )
+WRITE16_MEMBER(dassault_state::dassault_control_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(machine(), 0, data & 1);
 	if (data & 0xfffe)
 		logerror("Coin cointrol %04x\n", data);
 }
 
-static READ16_HANDLER( dassault_sub_control_r )
+READ16_MEMBER(dassault_state::dassault_sub_control_r)
 {
-	return input_port_read(space->machine(), "VBLANK1");
+	return ioport("VBLANK1")->read();
 }
 
-static WRITE16_HANDLER( dassault_sound_w )
+WRITE16_MEMBER(dassault_state::dassault_sound_w)
 {
-	dassault_state *state = space->machine().driver_data<dassault_state>();
-	soundlatch_w(space, 0, data & 0xff);
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE); /* IRQ1 */
+	soundlatch_byte_w(space, 0, data & 0xff);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE); /* IRQ1 */
 }
 
 /* The CPU-CPU irq controller is overlaid onto the end of the shared memory */
-static READ16_HANDLER( dassault_irq_r )
+READ16_MEMBER(dassault_state::dassault_irq_r)
 {
-	dassault_state *state = space->machine().driver_data<dassault_state>();
 	switch (offset)
 	{
-	case 0: device_set_input_line(state->m_maincpu, 5, CLEAR_LINE); break;
-	case 1: device_set_input_line(state->m_subcpu, 6, CLEAR_LINE); break;
+	case 0: device_set_input_line(m_maincpu, 5, CLEAR_LINE); break;
+	case 1: device_set_input_line(m_subcpu, 6, CLEAR_LINE); break;
 	}
-	return state->m_shared_ram[(0xffc / 2) + offset]; /* The values probably don't matter */
+	return m_shared_ram[(0xffc / 2) + offset]; /* The values probably don't matter */
 }
 
-static WRITE16_HANDLER( dassault_irq_w )
+WRITE16_MEMBER(dassault_state::dassault_irq_w)
 {
-	dassault_state *state = space->machine().driver_data<dassault_state>();
 	switch (offset)
 	{
-	case 0: device_set_input_line(state->m_maincpu, 5, ASSERT_LINE); break;
-	case 1: device_set_input_line(state->m_subcpu, 6, ASSERT_LINE); break;
+	case 0: device_set_input_line(m_maincpu, 5, ASSERT_LINE); break;
+	case 1: device_set_input_line(m_subcpu, 6, ASSERT_LINE); break;
 	}
 
-	COMBINE_DATA(&state->m_shared_ram[(0xffc / 2) + offset]); /* The values probably don't matter */
+	COMBINE_DATA(&m_shared_ram[(0xffc / 2) + offset]); /* The values probably don't matter */
 }
 
-static WRITE16_HANDLER( shared_ram_w )
+WRITE16_MEMBER(dassault_state::shared_ram_w)
 {
-	dassault_state *state = space->machine().driver_data<dassault_state>();
-	COMBINE_DATA(&state->m_shared_ram[offset]);
+	COMBINE_DATA(&m_shared_ram[offset]);
 }
 
-static READ16_HANDLER( shared_ram_r )
+READ16_MEMBER(dassault_state::shared_ram_r)
 {
-	dassault_state *state = space->machine().driver_data<dassault_state>();
-	return state->m_shared_ram[offset];
+	return m_shared_ram[offset];
 }
 
 /**********************************************************************************/
 
-static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dassault_map, AS_PROGRAM, 16, dassault_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_DEVWRITE("deco_common", decocomn_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_DEVWRITE_LEGACY("deco_common", decocomn_nonbuffered_palette_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x140004, 0x140007) AM_WRITENOP /* ? */
 	AM_RANGE(0x180000, 0x180001) AM_WRITE(dassault_sound_w)
 
 	AM_RANGE(0x1c0000, 0x1c000f) AM_READ(dassault_control_r)
-	AM_RANGE(0x1c000a, 0x1c000b) AM_DEVWRITE("deco_common", decocomn_priority_w)
-	AM_RANGE(0x1c000c, 0x1c000d) AM_DEVWRITE_MODERN("spriteram2", buffered_spriteram16_device, write)
+	AM_RANGE(0x1c000a, 0x1c000b) AM_DEVWRITE_LEGACY("deco_common", decocomn_priority_w)
+	AM_RANGE(0x1c000c, 0x1c000d) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write)
 	AM_RANGE(0x1c000e, 0x1c000f) AM_WRITE(dassault_control_w)
 
-	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x212000, 0x212fff) AM_WRITEONLY AM_BASE_MEMBER(dassault_state, m_pf2_rowscroll)
-	AM_RANGE(0x220000, 0x22000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x212000, 0x212fff) AM_WRITEONLY AM_SHARE("pf2_rowscroll")
+	AM_RANGE(0x220000, 0x22000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
 
-	AM_RANGE(0x240000, 0x240fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x242000, 0x242fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x252000, 0x252fff) AM_WRITEONLY AM_BASE_MEMBER(dassault_state, m_pf4_rowscroll)
-	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("tilegen2", deco16ic_pf_control_w)
+	AM_RANGE(0x240000, 0x240fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x242000, 0x242fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x252000, 0x252fff) AM_WRITEONLY AM_SHARE("pf4_rowscroll")
+	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE_LEGACY("tilegen2", deco16ic_pf_control_w)
 
-	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE_MEMBER(dassault_state, m_ram) /* Main ram */
+	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("ram") /* Main ram */
 	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_SHARE("spriteram2") /* Spriteram (2nd) */
 	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE(dassault_irq_r, dassault_irq_w)
-	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE_MEMBER(dassault_state, m_shared_ram) /* Shared ram */
+	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_SHARE("shared_ram") /* Shared ram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dassault_sub_map, AS_PROGRAM, 16, dassault_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE_MODERN("spriteram", buffered_spriteram16_device, write)
+	AM_RANGE(0x100000, 0x100001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write)
 	AM_RANGE(0x100002, 0x100007) AM_WRITENOP /* ? */
 	AM_RANGE(0x100004, 0x100005) AM_READ(dassault_sub_control_r)
 
-	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE_MEMBER(dassault_state, m_ram2) /* Sub cpu ram */
+	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("ram2") /* Sub cpu ram */
 	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_SHARE("spriteram") /* Sprite ram */
 	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE(dassault_irq_r, dassault_irq_w)
 	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w)
@@ -253,16 +248,16 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dassault_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_r, ym2151_w)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
+	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE_LEGACY("ym2", ym2151_r, ym2151_w)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
+	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(h6280_timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
+	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE_LEGACY(h6280_timer_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE_LEGACY(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 /**********************************************************************************/
@@ -307,7 +302,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN4 )
 
 	PORT_START("VBLANK1") /* Cpu 1 vblank */
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( thndzone )
@@ -317,7 +312,7 @@ static INPUT_PORTS_START( thndzone )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )			// Adds 4 credits/coins !
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -374,7 +369,7 @@ static INPUT_PORTS_START( dassault )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3")
@@ -432,7 +427,7 @@ static INPUT_PORTS_START( dassault4 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3")
@@ -523,8 +518,8 @@ static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 
 static const ym2151_interface ym2151_config =
 {
-	sound_irq,
-	sound_bankswitch_w
+	DEVCB_LINE(sound_irq),
+	DEVCB_HANDLER(sound_bankswitch_w)
 };
 
 /**********************************************************************************/
@@ -835,8 +830,8 @@ ROM_END
 
 static DRIVER_INIT( dassault )
 {
-	const UINT8 *src = machine.region("gfx1")->base();
-	UINT8 *dst = machine.region("gfx2")->base();
+	const UINT8 *src = machine.root_device().memregion("gfx1")->base();
+	UINT8 *dst = machine.root_device().memregion("gfx2")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, 0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
@@ -852,8 +847,8 @@ static DRIVER_INIT( dassault )
 
 static DRIVER_INIT( thndzone )
 {
-	const UINT8 *src = machine.region("gfx1")->base();
-	UINT8 *dst = machine.region("gfx2")->base();
+	const UINT8 *src = machine.root_device().memregion("gfx1")->base();
+	UINT8 *dst = machine.root_device().memregion("gfx2")->base();
 	UINT8 *tmp = auto_alloc_array(machine, UINT8, 0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier

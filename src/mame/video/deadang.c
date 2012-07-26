@@ -4,31 +4,28 @@
 
 /******************************************************************************/
 
-WRITE16_HANDLER( deadang_foreground_w )
+WRITE16_MEMBER(deadang_state::deadang_foreground_w)
 {
-	deadang_state *state = space->machine().driver_data<deadang_state>();
-	COMBINE_DATA(&state->m_video_data[offset]);
-	state->m_pf1_layer->mark_tile_dirty(offset );
+	COMBINE_DATA(&m_video_data[offset]);
+	m_pf1_layer->mark_tile_dirty(offset );
 }
 
-WRITE16_HANDLER( deadang_text_w )
+WRITE16_MEMBER(deadang_state::deadang_text_w)
 {
-	deadang_state *state = space->machine().driver_data<deadang_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	state->m_text_layer->mark_tile_dirty(offset );
+	m_text_layer->mark_tile_dirty(offset );
 }
 
-WRITE16_HANDLER( deadang_bank_w )
+WRITE16_MEMBER(deadang_state::deadang_bank_w)
 {
-	deadang_state *state = space->machine().driver_data<deadang_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_deadangle_tilebank = data&1;
-		if (state->m_deadangle_tilebank!=state->m_deadangle_oldtilebank)
+		m_deadangle_tilebank = data&1;
+		if (m_deadangle_tilebank!=m_deadangle_oldtilebank)
 		{
-			state->m_deadangle_oldtilebank = state->m_deadangle_tilebank;
-			state->m_pf1_layer->mark_all_dirty();
+			m_deadangle_oldtilebank = m_deadangle_tilebank;
+			m_pf1_layer->mark_all_dirty();
 		}
 	}
 }
@@ -42,14 +39,14 @@ static TILEMAP_MAPPER( bg_scan )
 
 static TILE_GET_INFO( get_pf3_tile_info )
 {
-	const UINT16 *bgMap = (const UINT16 *)machine.region("gfx6")->base();
+	const UINT16 *bgMap = (const UINT16 *)machine.root_device().memregion("gfx6")->base();
 	int code= bgMap[tile_index];
 	SET_TILE_INFO(4,code&0x7ff,code>>12,0);
 }
 
 static TILE_GET_INFO( get_pf2_tile_info )
 {
-	const UINT16 *bgMap = (const UINT16 *)machine.region("gfx7")->base();
+	const UINT16 *bgMap = (const UINT16 *)machine.root_device().memregion("gfx7")->base();
 	int code= bgMap[tile_index];
 	SET_TILE_INFO(3,code&0x7ff,code>>12,0);
 }
@@ -116,7 +113,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		color = (spriteram16[offs+1]>>12)&0xf;
 		sprite = spriteram16[offs+1]&0xfff;
 
-		if (flip_screen_get(machine)) {
+		if (state->flip_screen()) {
 			x=240-x;
 			y=240-y;
 			if (fx) fx=0; else fx=1;
@@ -154,7 +151,7 @@ SCREEN_UPDATE_IND16( deadang )
 	state->m_pf3_layer->enable(!(state->m_scroll_ram[0x34]&1));
 	state->m_pf1_layer->enable(!(state->m_scroll_ram[0x34]&2));
 	state->m_pf2_layer->enable(!(state->m_scroll_ram[0x34]&4));
-	flip_screen_set(screen.machine(),  state->m_scroll_ram[0x34]&0x40 );
+	state->flip_screen_set(state->m_scroll_ram[0x34]&0x40 );
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	screen.machine().priority_bitmap.fill(0, cliprect);

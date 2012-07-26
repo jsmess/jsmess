@@ -8,12 +8,15 @@ class pandoras_state : public driver_device
 {
 public:
 	pandoras_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *    m_videoram;
-	UINT8 *    m_colorram;
-	UINT8 *    m_spriteram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* video-related */
 	tilemap_t     *m_layer0;
@@ -30,6 +33,16 @@ public:
 	cpu_device *m_subcpu;
 	cpu_device *m_audiocpu;
 	cpu_device *m_mcu;
+	DECLARE_WRITE8_MEMBER(pandoras_int_control_w);
+	DECLARE_WRITE8_MEMBER(pandoras_cpua_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(pandoras_cpub_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(pandoras_i8039_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(i8039_irqen_and_status_w);
+	DECLARE_WRITE8_MEMBER(pandoras_z80_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(pandoras_vram_w);
+	DECLARE_WRITE8_MEMBER(pandoras_cram_w);
+	DECLARE_WRITE8_MEMBER(pandoras_scrolly_w);
+	DECLARE_WRITE8_MEMBER(pandoras_flipscreen_w);
 };
 
 
@@ -37,10 +50,6 @@ public:
 
 PALETTE_INIT( pandoras );
 
-WRITE8_HANDLER( pandoras_vram_w );
-WRITE8_HANDLER( pandoras_cram_w );
-WRITE8_HANDLER( pandoras_flipscreen_w );
-WRITE8_HANDLER( pandoras_scrolly_w );
 
 VIDEO_START( pandoras );
 SCREEN_UPDATE_IND16( pandoras );

@@ -32,15 +32,19 @@ class m10_state : public driver_device
 {
 public:
 	m10_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_memory(*this, "memory"),
+		m_rom(*this, "rom"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_chargen(*this, "chargen"){ }
 
 	/* memory pointers */
-	UINT8 *             m_chargen;
-	UINT8 *             m_memory;
-	UINT8 *             m_rom;
-	UINT8 *             m_videoram;
-	UINT8 *             m_colorram;
-	size_t              m_videoram_size;
+	required_shared_ptr<UINT8> m_memory;
+	required_shared_ptr<UINT8> m_rom;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_chargen;
 
 	/* video-related */
 	tilemap_t *           m_tx_tilemap;
@@ -61,15 +65,24 @@ public:
 	device_t *m_ic8j1;
 	device_t *m_ic8j2;
 	samples_device *m_samples;
+	DECLARE_WRITE8_MEMBER(m10_ctrl_w);
+	DECLARE_WRITE8_MEMBER(m11_ctrl_w);
+	DECLARE_WRITE8_MEMBER(m15_ctrl_w);
+	DECLARE_WRITE8_MEMBER(m10_a500_w);
+	DECLARE_WRITE8_MEMBER(m11_a100_w);
+	DECLARE_WRITE8_MEMBER(m15_a100_w);
+	DECLARE_READ8_MEMBER(m10_a700_r);
+	DECLARE_READ8_MEMBER(m11_a700_r);
+	DECLARE_WRITE8_MEMBER(m10_colorram_w);
+	DECLARE_WRITE8_MEMBER(m10_chargen_w);
+	DECLARE_WRITE8_MEMBER(m15_chargen_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 
 /*----------- defined in video/m10.c -----------*/
 
 
-WRITE8_HANDLER( m10_colorram_w );
-WRITE8_HANDLER( m10_chargen_w );
-WRITE8_HANDLER( m15_chargen_w );
 
 SCREEN_UPDATE_IND16( m10 );
 SCREEN_UPDATE_IND16( m15 );

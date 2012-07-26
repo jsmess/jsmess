@@ -26,22 +26,21 @@
 #include "video/deco16ic.h"
 #include "video/decospr.h"
 
-static WRITE16_HANDLER( twocrude_control_w )
+WRITE16_MEMBER(cbuster_state::twocrude_control_w)
 {
-	cbuster_state *state = space->machine().driver_data<cbuster_state>();
 
 	switch (offset << 1)
 	{
 	case 0: /* DMA flag */
-		memcpy(state->m_spriteram16_buffer, state->m_spriteram16, 0x800);
+		memcpy(m_spriteram16_buffer, m_spriteram16, 0x800);
 		return;
 
 	case 6: /* IRQ ack */
 		return;
 
     case 2: /* Sound CPU write */
-		soundlatch_w(space, 0, data & 0xff);
-		device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+		soundlatch_byte_w(space, 0, data & 0xff);
+		device_set_input_line(m_audiocpu, 0, HOLD_LINE);
     	return;
 
 	case 4: /* Protection, maybe this is a PAL on the board?
@@ -61,42 +60,41 @@ static WRITE16_HANDLER( twocrude_control_w )
             protection?!
 
         */
-		if ((data & 0xffff) == 0x9a00) state->m_prot = 0;
-		if ((data & 0xffff) == 0xaa)   state->m_prot = 0x74;
-		if ((data & 0xffff) == 0x0200) state->m_prot = 0x63 << 8;
-		if ((data & 0xffff) == 0x9a)   state->m_prot = 0xe;
-		if ((data & 0xffff) == 0x55)   state->m_prot = 0x1e;
-		if ((data & 0xffff) == 0x0e)  {state->m_prot = 0x0e; state->m_pri = 0;} /* start */
-		if ((data & 0xffff) == 0x00)  {state->m_prot = 0x0e; state->m_pri = 0;} /* level 0 */
-		if ((data & 0xffff) == 0xf1)  {state->m_prot = 0x36; state->m_pri = 1;} /* level 1 */
-		if ((data & 0xffff) == 0x80)  {state->m_prot = 0x2e; state->m_pri = 1;} /* level 2 */
-		if ((data & 0xffff) == 0x40)  {state->m_prot = 0x1e; state->m_pri = 1;} /* level 3 */
-		if ((data & 0xffff) == 0xc0)  {state->m_prot = 0x3e; state->m_pri = 0;} /* level 4 */
-		if ((data & 0xffff) == 0xff)  {state->m_prot = 0x76; state->m_pri = 1;} /* level 5 */
+		if ((data & 0xffff) == 0x9a00) m_prot = 0;
+		if ((data & 0xffff) == 0xaa)   m_prot = 0x74;
+		if ((data & 0xffff) == 0x0200) m_prot = 0x63 << 8;
+		if ((data & 0xffff) == 0x9a)   m_prot = 0xe;
+		if ((data & 0xffff) == 0x55)   m_prot = 0x1e;
+		if ((data & 0xffff) == 0x0e)  {m_prot = 0x0e; m_pri = 0;} /* start */
+		if ((data & 0xffff) == 0x00)  {m_prot = 0x0e; m_pri = 0;} /* level 0 */
+		if ((data & 0xffff) == 0xf1)  {m_prot = 0x36; m_pri = 1;} /* level 1 */
+		if ((data & 0xffff) == 0x80)  {m_prot = 0x2e; m_pri = 1;} /* level 2 */
+		if ((data & 0xffff) == 0x40)  {m_prot = 0x1e; m_pri = 1;} /* level 3 */
+		if ((data & 0xffff) == 0xc0)  {m_prot = 0x3e; m_pri = 0;} /* level 4 */
+		if ((data & 0xffff) == 0xff)  {m_prot = 0x76; m_pri = 1;} /* level 5 */
 
 		break;
 	}
-	logerror("Warning %04x- %02x written to control %02x\n", cpu_get_pc(&space->device()), data, offset);
+	logerror("Warning %04x- %02x written to control %02x\n", cpu_get_pc(&space.device()), data, offset);
 }
 
-static READ16_HANDLER( twocrude_control_r )
+READ16_MEMBER(cbuster_state::twocrude_control_r)
 {
-	cbuster_state *state = space->machine().driver_data<cbuster_state>();
 
 	switch (offset << 1)
 	{
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
-			return input_port_read(space->machine(), "P1_P2");
+			return ioport("P1_P2")->read();
 
 		case 2: /* Dip Switches */
-			return input_port_read(space->machine(), "DSW");
+			return ioport("DSW")->read();
 
 		case 4: /* Protection */
-			logerror("%04x : protection control read at 30c000 %d\n", cpu_get_pc(&space->device()), offset);
-			return state->m_prot;
+			logerror("%04x : protection control read at 30c000 %d\n", cpu_get_pc(&space.device()), offset);
+			return m_prot;
 
 		case 6: /* Credits, VBL in byte 7 */
-			return input_port_read(space->machine(), "COINS");
+			return ioport("COINS")->read();
 	}
 
 	return ~0;
@@ -104,41 +102,41 @@ static READ16_HANDLER( twocrude_control_r )
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( twocrude_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( twocrude_map, AS_PROGRAM, 16, cbuster_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_BASE_MEMBER(cbuster_state, m_ram)
+	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_SHARE("ram")
 
-	AM_RANGE(0x0a0000, 0x0a1fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x0a2000, 0x0a2fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x0a4000, 0x0a47ff) AM_RAM AM_BASE_MEMBER(cbuster_state, m_pf1_rowscroll)
-	AM_RANGE(0x0a6000, 0x0a67ff) AM_RAM AM_BASE_MEMBER(cbuster_state, m_pf2_rowscroll)
+	AM_RANGE(0x0a0000, 0x0a1fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x0a2000, 0x0a2fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x0a4000, 0x0a47ff) AM_RAM AM_SHARE("pf1_rowscroll")
+	AM_RANGE(0x0a6000, 0x0a67ff) AM_RAM AM_SHARE("pf2_rowscroll")
 
-	AM_RANGE(0x0a8000, 0x0a8fff) AM_DEVREADWRITE("tilegen2", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x0aa000, 0x0aafff) AM_DEVREADWRITE("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x0ac000, 0x0ac7ff) AM_RAM AM_BASE_MEMBER(cbuster_state, m_pf3_rowscroll)
-	AM_RANGE(0x0ae000, 0x0ae7ff) AM_RAM AM_BASE_MEMBER(cbuster_state, m_pf4_rowscroll)
+	AM_RANGE(0x0a8000, 0x0a8fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x0aa000, 0x0aafff) AM_DEVREADWRITE_LEGACY("tilegen2", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x0ac000, 0x0ac7ff) AM_RAM AM_SHARE("pf3_rowscroll")
+	AM_RANGE(0x0ae000, 0x0ae7ff) AM_RAM AM_SHARE("pf4_rowscroll")
 
-	AM_RANGE(0x0b0000, 0x0b07ff) AM_RAM AM_BASE_MEMBER(cbuster_state, m_spriteram16)
+	AM_RANGE(0x0b0000, 0x0b07ff) AM_RAM AM_SHARE("spriteram16")
 	AM_RANGE(0x0b4000, 0x0b4001) AM_WRITENOP
-	AM_RANGE(0x0b5000, 0x0b500f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
-	AM_RANGE(0x0b6000, 0x0b600f) AM_DEVWRITE("tilegen2", deco16ic_pf_control_w)
-	AM_RANGE(0x0b8000, 0x0b8fff) AM_RAM_WRITE(twocrude_palette_24bit_rg_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x0b9000, 0x0b9fff) AM_RAM_WRITE(twocrude_palette_24bit_b_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0x0b5000, 0x0b500f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x0b6000, 0x0b600f) AM_DEVWRITE_LEGACY("tilegen2", deco16ic_pf_control_w)
+	AM_RANGE(0x0b8000, 0x0b8fff) AM_RAM_WRITE(twocrude_palette_24bit_rg_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0b9000, 0x0b9fff) AM_RAM_WRITE(twocrude_palette_24bit_b_w) AM_SHARE("paletteram2")
 	AM_RANGE(0x0bc000, 0x0bc00f) AM_READWRITE(twocrude_control_r, twocrude_control_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cbuster_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_r, ym2151_w)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
+	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE_LEGACY("ym2", ym2151_r, ym2151_w)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
+	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(h6280_timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
+	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE_LEGACY(h6280_timer_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE_LEGACY(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -166,7 +164,7 @@ static INPUT_PORTS_START( twocrude )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -272,7 +270,7 @@ static void sound_irq(device_t *device, int state)
 
 static const ym2151_interface ym2151_config =
 {
-	sound_irq
+	DEVCB_LINE(sound_irq)
 };
 
 static int twocrude_bank_callback( const int bank )
@@ -532,7 +530,7 @@ ROM_END
 
 static DRIVER_INIT( twocrude )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
 	UINT8 *PTR;
 	int i, j;
 
@@ -549,8 +547,8 @@ static DRIVER_INIT( twocrude )
 	}
 
 	/* Rearrange the 'extra' sprite bank to be in the same format as main sprites */
-	RAM = machine.region("gfx3")->base() + 0x080000;
-	PTR = machine.region("gfx3")->base() + 0x140000;
+	RAM = machine.root_device().memregion("gfx3")->base() + 0x080000;
+	PTR = machine.root_device().memregion("gfx3")->base() + 0x140000;
 	for (i = 0; i < 0x20000; i += 64)
 	{
 		for (j = 0; j < 16; j += 1)

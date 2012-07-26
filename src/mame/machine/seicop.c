@@ -1534,7 +1534,7 @@ static WRITE16_HANDLER( seibu_common_video_regs_w )
 
 	switch(offset)
 	{
-		case (0x01a/2): { flip_screen_set(space->machine(), seibu_vregs[offset] & 0x01); break; }
+		case (0x01a/2): { state->flip_screen_set(seibu_vregs[offset] & 0x01); break; }
 		case (0x01c/2): { state->m_layer_disable =  seibu_vregs[offset]; break; }
 		case (0x020/2): { state->m_scrollram16[0] = seibu_vregs[offset]; break; }
 		case (0x022/2): { state->m_scrollram16[1] = seibu_vregs[offset]; break; }
@@ -1680,11 +1680,11 @@ READ16_HANDLER( copdxbl_0_r )
 		//case (0x5b4/2):
 		//  return cop_mcu_ram[offset];
 
-		case (0x700/2): return input_port_read(space->machine(), "DSW1");
-		case (0x704/2):	return input_port_read(space->machine(), "PLAYERS12");
-		case (0x708/2):	return input_port_read(space->machine(), "PLAYERS34");
-		case (0x70c/2):	return input_port_read(space->machine(), "SYSTEM");
-		case (0x71c/2): return input_port_read(space->machine(), "DSW2");
+		case (0x700/2): return space->machine().root_device().ioport("DSW1")->read();
+		case (0x704/2):	return space->machine().root_device().ioport("PLAYERS12")->read();
+		case (0x708/2):	return space->machine().root_device().ioport("PLAYERS34")->read();
+		case (0x70c/2):	return space->machine().root_device().ioport("SYSTEM")->read();
+		case (0x71c/2): return space->machine().root_device().ioport("DSW2")->read();
 	}
 }
 
@@ -1713,7 +1713,7 @@ WRITE16_HANDLER( copdxbl_0_w )
 
 		case (0x740/2):
 		{
-			soundlatch_w(space, 0, data & 0xff);
+			state->soundlatch_byte_w(*space, 0, data & 0xff);
 			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 			break;
 		}
@@ -2676,7 +2676,7 @@ READ16_HANDLER( heatbrl_mcu_r )
 	{
 		static const char *const portnames[] = { "DSW1", "PLAYERS12", "PLAYERS34", "SYSTEM" };
 
-		return input_port_read(space->machine(), portnames[(offset >> 1) & 3]);
+		return space->machine().root_device().ioport(portnames[(offset >> 1) & 3])->read();
 	}
 
 	return generic_cop_r(space, offset, mem_mask);
@@ -2726,12 +2726,12 @@ READ16_HANDLER( cupsoc_mcu_r )
 	{
 		static const char *const portnames[] = { "DSW1", "PLAYERS12", "PLAYERS34", "SYSTEM" };
 
-		return input_port_read(space->machine(), portnames[(offset >> 1) & 3]);
+		return space->machine().root_device().ioport(portnames[(offset >> 1) & 3])->read();
 	}
 
 	if(offset == 0x35c/2)
 	{
-		return input_port_read(space->machine(), "DSW2");
+		return space->machine().root_device().ioport("DSW2")->read();
 	}
 
 	return generic_cop_r(space, offset, mem_mask);
@@ -2768,12 +2768,12 @@ READ16_HANDLER( cupsocs_mcu_r )
 	{
 		static const char *const portnames[] = { "DSW1", "PLAYERS12", "PLAYERS34", "SYSTEM" };
 
-		return input_port_read(space->machine(), portnames[(offset >> 1) & 3]);
+		return space->machine().root_device().ioport(portnames[(offset >> 1) & 3])->read();
 	}
 
 	if(offset == 0x31c/2)
 	{
-		return input_port_read(space->machine(), "DSW2");
+		return space->machine().root_device().ioport("DSW2")->read();
 	}
 
 	return generic_cop_r(space, offset, mem_mask);
@@ -2820,7 +2820,7 @@ READ16_HANDLER( godzilla_mcu_r )
 	{
 		static const char *const portnames[] = { "DSW1", "PLAYERS12", "PLAYERS34", "SYSTEM" };
 
-		return input_port_read(space->machine(), portnames[(offset >> 1) & 3]);
+		return space->machine().root_device().ioport(portnames[(offset >> 1) & 3])->read();
 	}
 
 	return generic_cop_r(space, offset, mem_mask);
@@ -2867,12 +2867,12 @@ READ16_HANDLER( denjinmk_mcu_r )
 	{
 		static const char *const portnames[] = { "DSW1", "PLAYERS12", "PLAYERS34", "SYSTEM" };
 
-		return input_port_read(space->machine(), portnames[(offset >> 1) & 3]);
+		return space->machine().root_device().ioport(portnames[(offset >> 1) & 3])->read();
 	}
 
 	if(offset == 0x35c/2)
 	{
-		return input_port_read(space->machine(), "DSW2");
+		return space->machine().root_device().ioport("DSW2")->read();
 	}
 
 	return generic_cop_r(space, offset, mem_mask);
@@ -2919,12 +2919,12 @@ READ16_HANDLER( grainbow_mcu_r )
 	{
 		static const char *const portnames[] = { "DSW1", "PLAYERS12", "PLAYERS34", "SYSTEM" };
 
-		return input_port_read(space->machine(), portnames[(offset >> 1) & 3]);
+		return space->machine().root_device().ioport(portnames[(offset >> 1) & 3])->read();
 	}
 
 	if(offset == 0x35c/2)
 	{
-		return input_port_read(space->machine(), "DSW2");
+		return space->machine().root_device().ioport("DSW2")->read();
 	}
 
 	return generic_cop_r(space, offset, mem_mask);
@@ -2967,7 +2967,7 @@ READ16_HANDLER( legionna_mcu_r )
 	{
 		static const char *const portnames[] = { "DSW1", "PLAYERS12", "UNK", "SYSTEM" };
 
-		return input_port_read(space->machine(), portnames[(offset >> 1) & 3]);
+		return space->machine().root_device().ioport(portnames[(offset >> 1) & 3])->read();
 	}
 
 	return generic_cop_r(space, offset, mem_mask);

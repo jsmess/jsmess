@@ -42,9 +42,9 @@ WRITE_LINE_DEVICE_HANDLER( galaxold_7474_9m_1_callback )
 	cputag_set_input_line(device->machine(), "maincpu", drvstate->m_irq_line, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE8_HANDLER( galaxold_nmi_enable_w )
+WRITE8_MEMBER(galaxold_state::galaxold_nmi_enable_w)
 {
-    ttl7474_device *target = space->machine().device<ttl7474_device>("7474_9m_1");
+    ttl7474_device *target = machine().device<ttl7474_device>("7474_9m_1");
 	target->preset_w(data ? 1 : 0);
 }
 
@@ -101,38 +101,38 @@ MACHINE_RESET( hunchbkg )
 	device_set_irq_callback(machine.device("maincpu"), hunchbkg_irq_callback);
 }
 
-WRITE8_HANDLER( galaxold_coin_lockout_w )
+WRITE8_MEMBER(galaxold_state::galaxold_coin_lockout_w)
 {
-	coin_lockout_global_w(space->machine(), ~data & 1);
+	coin_lockout_global_w(machine(), ~data & 1);
 }
 
 
-WRITE8_HANDLER( galaxold_coin_counter_w )
+WRITE8_MEMBER(galaxold_state::galaxold_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset, data & 0x01);
+	coin_counter_w(machine(), offset, data & 0x01);
 }
 
-WRITE8_HANDLER( galaxold_coin_counter_1_w )
+WRITE8_MEMBER(galaxold_state::galaxold_coin_counter_1_w)
 {
-	coin_counter_w(space->machine(), 1, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x01);
 }
 
-WRITE8_HANDLER( galaxold_coin_counter_2_w )
+WRITE8_MEMBER(galaxold_state::galaxold_coin_counter_2_w)
 {
-	coin_counter_w(space->machine(), 2, data & 0x01);
+	coin_counter_w(machine(), 2, data & 0x01);
 }
 
 
-WRITE8_HANDLER( galaxold_leds_w )
+WRITE8_MEMBER(galaxold_state::galaxold_leds_w)
 {
-	set_led_status(space->machine(), offset,data & 1);
+	set_led_status(machine(), offset,data & 1);
 }
 
 
 #ifdef UNUSED_FUNCTION
-static READ8_HANDLER( checkmaj_protection_r )
+READ8_MEMBER(galaxold_state::checkmaj_protection_r)
 {
-	switch (cpu_get_pc(&space->device()))
+	switch (cpu_get_pc(&space.device()))
 	{
 	case 0x0f15:  return 0xf5;
 	case 0x0f8f:  return 0x7c;
@@ -141,7 +141,7 @@ static READ8_HANDLER( checkmaj_protection_r )
 	case 0x10f1:  return 0xaa;
 	case 0x1402:  return 0xaa;
 	default:
-		logerror("Unknown protection read. PC=%04X\n",cpu_get_pc(&space->device()));
+		logerror("Unknown protection read. PC=%04X\n",cpu_get_pc(&space.device()));
 	}
 
 	return 0;
@@ -149,43 +149,43 @@ static READ8_HANDLER( checkmaj_protection_r )
 
 
 /* Zig Zag can swap ROMs 2 and 3 as a form of copy protection */
-WRITE8_HANDLER( zigzag_sillyprotection_w )
+WRITE8_MEMBER(galaxold_state::zigzag_sillyprotection_w)
 {
 	if (data)
 	{
 		/* swap ROM 2 and 3! */
-		memory_set_bank(space->machine(), "bank1", 1);
-		memory_set_bank(space->machine(), "bank2", 0);
+		membank("bank1")->set_entry(1);
+		membank("bank2")->set_entry(0);
 	}
 	else
 	{
-		memory_set_bank(space->machine(), "bank1", 0);
-		memory_set_bank(space->machine(), "bank2", 1);
+		membank("bank1")->set_entry(0);
+		membank("bank2")->set_entry(1);
 	}
 }
 
 DRIVER_INIT( zigzag )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 2, &RAM[0x2000], 0x1000);
-	memory_configure_bank(machine, "bank2", 0, 2, &RAM[0x2000], 0x1000);
-	memory_set_bank(machine, "bank1", 0);
-	memory_set_bank(machine, "bank2", 1);
+	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
+	machine.root_device().membank("bank1")->configure_entries(0, 2, &RAM[0x2000], 0x1000);
+	machine.root_device().membank("bank2")->configure_entries(0, 2, &RAM[0x2000], 0x1000);
+	machine.root_device().membank("bank1")->set_entry(0);
+	machine.root_device().membank("bank2")->set_entry(1);
 }
 
 
 
-static READ8_HANDLER( dingo_3000_r )
+READ8_MEMBER(galaxold_state::dingo_3000_r)
 {
 	return 0xaa;
 }
 
-static READ8_HANDLER( dingo_3035_r )
+READ8_MEMBER(galaxold_state::dingo_3035_r)
 {
 	return 0x8c;
 }
 
-static READ8_HANDLER( dingoe_3001_r )
+READ8_MEMBER(galaxold_state::dingoe_3001_r)
 {
 	return 0xaa;
 }
@@ -194,7 +194,7 @@ static READ8_HANDLER( dingoe_3001_r )
 DRIVER_INIT( dingoe )
 {
 	offs_t i;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	for (i = 0; i < 0x3000; i++)
 	{
@@ -223,45 +223,43 @@ DRIVER_INIT( dingoe )
 #endif
 
 
-READ8_HANDLER( scramblb_protection_1_r )
+READ8_MEMBER(galaxold_state::scramblb_protection_1_r)
 {
-	switch (cpu_get_pc(&space->device()))
+	switch (cpu_get_pc(&space.device()))
 	{
 	case 0x01da: return 0x80;
 	case 0x01e4: return 0x00;
 	default:
-		logerror("%04x: read protection 1\n",cpu_get_pc(&space->device()));
+		logerror("%04x: read protection 1\n",cpu_get_pc(&space.device()));
 		return 0;
 	}
 }
 
-READ8_HANDLER( scramblb_protection_2_r )
+READ8_MEMBER(galaxold_state::scramblb_protection_2_r)
 {
-	switch (cpu_get_pc(&space->device()))
+	switch (cpu_get_pc(&space.device()))
 	{
 	case 0x01ca: return 0x90;
 	default:
-		logerror("%04x: read protection 2\n",cpu_get_pc(&space->device()));
+		logerror("%04x: read protection 2\n",cpu_get_pc(&space.device()));
 		return 0;
 	}
 }
 
 
-WRITE8_HANDLER( _4in1_bank_w )
+WRITE8_MEMBER(galaxold_state::_4in1_bank_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m__4in1_bank = data & 0x03;
-	galaxold_gfxbank_w(space, 0, state->m__4in1_bank);
-	memory_set_bank(space->machine(), "bank1", state->m__4in1_bank);
+	m__4in1_bank = data & 0x03;
+	galaxold_gfxbank_w(space, 0, m__4in1_bank);
+	membank("bank1")->set_entry(m__4in1_bank);
 }
 
-CUSTOM_INPUT( _4in1_fake_port_r )
+CUSTOM_INPUT_MEMBER(galaxold_state::_4in1_fake_port_r)
 {
-	galaxold_state *state = field.machine().driver_data<galaxold_state>();
 	static const char *const portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
 	int bit_mask = (FPTR)param;
 
-	return (input_port_read(field.machine(), portnames[state->m__4in1_bank]) & bit_mask) ? 0x01 : 0x00;
+	return (ioport(portnames[m__4in1_bank])->read() & bit_mask) ? 0x01 : 0x00;
 }
 
 #ifdef UNUSED_FUNCTION
@@ -303,8 +301,8 @@ DRIVER_INIT( mooncrsu )
 
 DRIVER_INIT( mooncrst )
 {
-	offs_t i, len = machine.region("maincpu")->bytes();
-	UINT8 *rom = machine.region("maincpu")->base();
+	offs_t i, len = machine.root_device().memregion("maincpu")->bytes();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 
 	for (i = 0;i < len;i++)
@@ -322,7 +320,7 @@ DRIVER_INIT( moonqsr )
 {
 	offs_t i;
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
 	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
@@ -380,8 +378,8 @@ Pin layout is such that links can replace the PAL if encryption is not used.
 		{ 1,4,1,4 }
 	};
 
-	offs_t i, len = machine.region("maincpu")->bytes();
-	UINT8 *rom = machine.region("maincpu")->base();
+	offs_t i, len = machine.root_device().memregion("maincpu")->bytes();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 
 	for (i = 0; i < len; i++)
@@ -401,17 +399,17 @@ DRIVER_INIT( 4in1 )
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	offs_t i, len = machine.region("maincpu")->bytes();
-	UINT8 *RAM = machine.region("maincpu")->base();
+	offs_t i, len = state->memregion("maincpu")->bytes();
+	UINT8 *RAM = state->memregion("maincpu")->base();
 
 	/* Decrypt Program Roms */
 	for (i = 0; i < len; i++)
 		RAM[i] = RAM[i] ^ (i & 0xff);
 
 	/* games are banked at 0x0000 - 0x3fff */
-	memory_configure_bank(machine, "bank1", 0, 4, &RAM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 4, &RAM[0x10000], 0x4000);
 
-	_4in1_bank_w(space, 0, 0); /* set the initial CPU bank */
+	state->_4in1_bank_w(*space, 0, 0); /* set the initial CPU bank */
 
 	state_save_register_global(machine, state->m__4in1_bank);
 }
@@ -423,6 +421,7 @@ INTERRUPT_GEN( hunchbks_vh_interrupt )
 
 DRIVER_INIT( ladybugg )
 {
-/* Doesn't actually use the bank, but it mustn't have a coin lock! */
-machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x6002, 0x6002, FUNC(galaxold_gfxbank_w));
+	galaxold_state *state = machine.driver_data<galaxold_state>();
+	/* Doesn't actually use the bank, but it mustn't have a coin lock! */
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x6002, 0x6002, write8_delegate(FUNC(galaxold_state::galaxold_gfxbank_w),state));
 }

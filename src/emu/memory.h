@@ -90,7 +90,10 @@ struct game_driver;
 // forward declarations of classes defined here
 class address_map;
 class address_map_entry;
+class memory_manager;
 class memory_bank;
+class memory_block;
+class memory_share;
 class direct_read_data;
 class address_space;
 class address_table;
@@ -302,15 +305,16 @@ class address_space
 
 protected:
 	// construction/destruction
-	address_space(device_memory_interface &memory, address_spacenum spacenum, bool large);
+	address_space(memory_manager &manager, device_memory_interface &memory, address_spacenum spacenum, bool large);
 	virtual ~address_space();
 
 public:
 	// public allocator
-	static address_space &allocate(running_machine &machine, const address_space_config &config, device_memory_interface &memory, address_spacenum spacenum);
+	static address_space &allocate(memory_manager &manager, const address_space_config &config, device_memory_interface &memory, address_spacenum spacenum);
 
 	// getters
 	address_space *next() const { return m_next; }
+	memory_manager &manager() const { return m_manager; }
 	device_t &device() const { return m_device; }
 	running_machine &machine() const { return m_machine; }
 	const char *name() const { return m_name; }
@@ -554,7 +558,298 @@ protected:
 	UINT8					m_logaddrchars;		// number of characters to use for logical addresses
 
 private:
+	memory_manager &		m_manager;			// reference to the owning manager
 	running_machine &		m_machine;			// reference to the owning machine
+};
+
+
+// ======================> memory_block
+
+// a memory block is a chunk of RAM associated with a range of memory in a device's address space
+class memory_block
+{
+	DISABLE_COPYING(memory_block);
+
+	friend class simple_list<memory_block>;
+	friend resource_pool_object<memory_block>::~resource_pool_object();
+
+public:
+	// construction/destruction
+	memory_block(address_space &space, offs_t bytestart, offs_t byteend, void *memory = NULL);
+	~memory_block();
+
+	// getters
+	running_machine &machine() const { return m_machine; }
+	memory_block *next() const { return m_next; }
+	offs_t bytestart() const { return m_bytestart; }
+	offs_t byteend() const { return m_byteend; }
+	UINT8 *data() const { return m_data; }
+
+	// is the given range contained by this memory block?
+	bool contains(address_space &space, offs_t bytestart, offs_t byteend) const
+	{
+		return (&space == &m_space && m_bytestart <= bytestart && m_byteend >= byteend);
+	}
+
+private:
+	// internal state
+	memory_block *			m_next;					// next memory block in the list
+	running_machine &		m_machine;				// need the machine to free our memory
+	address_space &			m_space;				// which address space are we associated with?
+	offs_t					m_bytestart, m_byteend;	// byte-normalized start/end for verifying a match
+	UINT8 *					m_data;					// pointer to the data for this block
+	UINT8 *					m_allocated;			// pointer to the actually allocated block
+};
+
+
+// ======================> memory_bank
+
+// a memory bank is a global pointer to memory that can be shared across devices and changed dynamically
+class memory_bank
+{
+	friend class simple_list<memory_bank>;
+	friend resource_pool_object<memory_bank>::~resource_pool_object();
+
+	// a bank reference is an entry in a list of address spaces that reference a given bank
+	class bank_reference
+	{
+		friend class simple_list<bank_reference>;
+		friend resource_pool_object<bank_reference>::~resource_pool_object();
+
+	public:
+		// construction/destruction
+		bank_reference(address_space &space, read_or_write readorwrite)
+			: m_next(NULL),
+			  m_space(space),
+			  m_readorwrite(readorwrite) { }
+
+		// getters
+		bank_reference *next() const { return m_next; }
+		address_space &space() const { return m_space; }
+
+		// does this reference match the space+read/write combination?
+		bool matches(address_space &space, read_or_write readorwrite) const
+		{
+			return (&space == &m_space && (readorwrite == ROW_READWRITE || readorwrite == m_readorwrite));
+		}
+
+	private:
+		// internal state
+		bank_reference *		m_next;				// link to the next reference
+		address_space &			m_space;			// address space that references us
+		read_or_write			m_readorwrite;		// used for read or write?
+	};
+
+	// a bank_entry contains a raw and decrypted pointer
+	struct bank_entry
+	{
+		UINT8 *			m_raw;
+		UINT8 *			m_decrypted;
+	};
+
+public:
+	// construction/destruction
+	memory_bank(address_space &space, int index, offs_t bytestart, offs_t byteend, const char *tag = NULL);
+	~memory_bank();
+
+	// getters
+	memory_bank *next() const { return m_next; }
+	running_machine &machine() const { return m_machine; }
+	int index() const { return m_index; }
+	int entry() const { return m_curentry; }
+	bool anonymous() const { return m_anonymous; }
+	offs_t bytestart() const { return m_bytestart; }
+	void *base() const { return *m_baseptr; }
+	void *base_decrypted() const { return *m_basedptr; }
+	const char *tag() const { return m_tag; }
+	const char *name() const { return m_name; }
+
+	// compare a range against our range
+	bool matches_exactly(offs_t bytestart, offs_t byteend) const { return (m_bytestart == bytestart && m_byteend == byteend); }
+	bool fully_covers(offs_t bytestart, offs_t byteend) const { return (m_bytestart <= bytestart && m_byteend >= byteend); }
+	bool is_covered_by(offs_t bytestart, offs_t byteend) const { return (m_bytestart >= bytestart && m_byteend <= byteend); }
+	bool straddles(offs_t bytestart, offs_t byteend) const { return (m_bytestart < byteend && m_byteend > bytestart); }
+
+	// track and verify address space references to this bank
+	bool references_space(address_space &space, read_or_write readorwrite) const;
+	void add_reference(address_space &space, read_or_write readorwrite);
+
+	// set the base explicitly
+	void set_base(void *base);
+	void set_base_decrypted(void *base);
+
+	// configure and set entries
+	void configure_entry(int entrynum, void *base);
+	void configure_entries(int startentry, int numentries, void *base, offs_t stride);
+	void configure_decrypted_entry(int entrynum, void *base);
+	void configure_decrypted_entries(int startentry, int numentries, void *base, offs_t stride);
+	void set_entry(int entrynum);
+
+private:
+	// internal helpers
+	void invalidate_references();
+	void expand_entries(int entrynum);
+
+	// internal state
+	memory_bank *			m_next;					// next bank in sequence
+	running_machine &		m_machine;				// need the machine to free our memory
+	UINT8 **				m_baseptr;				// pointer to our base pointer in the global array
+	UINT8 **				m_basedptr;				// same for the decrypted base pointer
+	UINT8					m_index;				// array index for this handler
+	bool					m_anonymous;			// are we anonymous or explicit?
+	offs_t					m_bytestart;			// byte-adjusted start offset
+	offs_t					m_byteend;				// byte-adjusted end offset
+	int						m_curentry;				// current entry
+	bank_entry *			m_entry;				// array of entries (dynamically allocated)
+	int						m_entry_count;			// number of allocated entries
+	astring					m_name;					// friendly name for this bank
+	astring					m_tag;					// tag for this bank
+	simple_list<bank_reference> m_reflist;			// linked list of address spaces referencing this bank
+};
+
+
+// ======================> memory_share
+
+// a memory share contains information about shared memory region
+class memory_share
+{
+	friend class simple_list<memory_share>;
+
+public:
+	// construction/destruction
+	memory_share(UINT8 width, size_t bytes, void *ptr = NULL)
+		: m_ptr(ptr),
+		  m_bytes(bytes),
+		  m_width(width) { }
+
+	// getters
+	memory_share *next() const { return m_next; }
+	void *ptr() const { if (this == NULL) return NULL; return m_ptr; }
+	size_t bytes() const { return m_bytes; }
+	UINT8 width() const { return m_width; }
+
+	// setters
+	void set_ptr(void *ptr) { m_ptr = ptr; }
+
+private:
+	// internal state
+	memory_share *			m_next;					// next share in the list
+	void *					m_ptr;					// pointer to the memory backing the region
+	size_t					m_bytes;				// size of the shared region in bytes
+	UINT8					m_width;				// width of the shared region
+};
+
+
+// ======================> memory_region
+
+// memory region object
+class memory_region
+{
+	DISABLE_COPYING(memory_region);
+
+	friend class memory_manager;
+	friend class simple_list<memory_region>;
+	friend resource_pool_object<memory_region>::~resource_pool_object();
+
+	// construction/destruction
+	memory_region(running_machine &machine, const char *name, UINT32 length, UINT8 width, endianness_t endian);
+
+public:
+	// getters
+	running_machine &machine() const { return m_machine; }
+	memory_region *next() const { return m_next; }
+	UINT8 *base() { return (this != NULL) ? &m_buffer[0] : NULL; }
+	UINT8 *end() { return (this != NULL) ? base() + m_buffer.count() : NULL; }
+	UINT32 bytes() const { return (this != NULL) ? m_buffer.count() : 0; }
+	const char *name() const { return m_name; }
+
+	// flag expansion
+	endianness_t endianness() const { return m_endianness; }
+	UINT8 width() const { return m_width; }
+
+	// data access
+	UINT8 &u8(offs_t offset = 0) { return m_buffer[offset]; }
+	UINT16 &u16(offs_t offset = 0) { return reinterpret_cast<UINT16 *>(base())[offset]; }
+	UINT32 &u32(offs_t offset = 0) { return reinterpret_cast<UINT32 *>(base())[offset]; }
+	UINT64 &u64(offs_t offset = 0) { return reinterpret_cast<UINT64 *>(base())[offset]; }
+
+	// allow passing a region for any common pointer
+	operator void *() { return (this != NULL) ? reinterpret_cast<void *>(base()) : NULL; }
+	operator INT8 *() { return (this != NULL) ? reinterpret_cast<INT8 *>(base()) : NULL; }
+	operator UINT8 *() { return (this != NULL) ? reinterpret_cast<UINT8 *>(base()) : NULL; }
+	operator INT16 *() { return (this != NULL) ? reinterpret_cast<INT16 *>(base()) : NULL; }
+	operator UINT16 *() { return (this != NULL) ? reinterpret_cast<UINT16 *>(base()) : NULL; }
+	operator INT32 *() { return (this != NULL) ? reinterpret_cast<INT32 *>(base()) : NULL; }
+	operator UINT32 *() { return (this != NULL) ? reinterpret_cast<UINT32 *>(base()) : NULL; }
+	operator INT64 *() { return (this != NULL) ? reinterpret_cast<INT64 *>(base()) : NULL; }
+	operator UINT64 *() { return (this != NULL) ? reinterpret_cast<UINT64 *>(base()) : NULL; }
+
+private:
+	// internal data
+	running_machine &		m_machine;
+	memory_region *			m_next;
+	astring					m_name;
+	dynamic_buffer			m_buffer;
+	UINT8					m_width;
+	endianness_t			m_endianness;
+};
+
+
+
+// ======================> memory_manager
+
+// holds internal state for the memory system
+class memory_manager
+{
+	friend class address_space;
+	friend class address_table;
+	friend class device_t;
+	friend class memory_block;
+
+public:
+	// construction/destruction
+	memory_manager(running_machine &machine);
+	void initialize();
+
+	// getters
+	running_machine &machine() const { return m_machine; }
+	address_space *first_space() const { return m_spacelist.first(); }
+	memory_region *first_region() const { return m_regionlist.first(); }
+
+	// dump the internal memory tables to the given file
+	void dump(FILE *file);
+
+	// pointers to a bank pointer (internal usage only)
+	UINT8 **bank_pointer_addr(UINT8 index, bool decrypted = false) { return decrypted ? &m_bankd_ptr[index] : &m_bank_ptr[index]; }
+
+	// regions
+	memory_region *region_alloc(const char *name, UINT32 length, UINT8 width, endianness_t endian);
+	void region_free(const char *name);
+
+private:
+	// internal helpers
+	memory_bank *first_bank() const { return m_banklist.first(); }
+	memory_bank *bank(const char *tag) const { return m_banklist.find(tag); }
+	memory_region *region(const char *tag) { return m_regionlist.find(tag); }
+	memory_share *shared(const char *tag) { return m_sharelist.find(tag); }
+	void bank_reattach();
+
+	// internal state
+	running_machine &			m_machine;				// reference to the machine
+	bool						m_initialized;			// have we completed initialization?
+
+	UINT8 *						m_bank_ptr[256];		// array of bank pointers
+	UINT8 *						m_bankd_ptr[256];		// array of decrypted bank pointers
+
+	simple_list<address_space>	m_spacelist;			// list of address spaces
+	simple_list<memory_block>	m_blocklist;			// head of the list of memory blocks
+
+	tagged_list<memory_bank>	m_banklist;				// data gathered for each bank
+	UINT8						m_banknext;				// next bank to allocate
+
+	tagged_list<memory_share>	m_sharelist;			// map for share lookups
+
+	tagged_list<memory_region>	m_regionlist;			// list of memory regions
 };
 
 
@@ -566,6 +861,7 @@ private:
 // opcode base adjustment handler function macro
 #define DIRECT_UPDATE_MEMBER(name)		offs_t name(ATTR_UNUSED direct_read_data &direct, ATTR_UNUSED offs_t address)
 #define DIRECT_UPDATE_HANDLER(name)		offs_t name(ATTR_UNUSED running_machine &machine, ATTR_UNUSED direct_read_data &direct, ATTR_UNUSED offs_t address)
+#define DECLARE_DIRECT_UPDATE_MEMBER(name)	offs_t name(ATTR_UNUSED direct_read_data &direct, ATTR_UNUSED offs_t address)
 
 
 // space read/write handler function macros
@@ -657,51 +953,6 @@ private:
 #define DWORD_XOR_BE(a) 				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(4,0))
 #define DWORD_XOR_LE(a) 				((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(0,4))
 
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-extern const char *const address_space_names[ADDRESS_SPACES];
-
-
-
-//**************************************************************************
-//  FUNCTION PROTOTYPES FOR CORE MEMORY FUNCTIONS
-//**************************************************************************
-
-// initialize the memory system
-void memory_init(running_machine &machine);
-
-// configure the addresses for a bank
-void memory_configure_bank(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL(5);
-void memory_configure_bank(device_t &device, const char *tag, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL(5);
-
-// configure the decrypted addresses for a bank
-void memory_configure_bank_decrypted(running_machine &machine, const char *tag, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL(5);
-void memory_configure_bank_decrypted(device_t &device, const char *tag, int startentry, int numentries, void *base, offs_t stride) ATTR_NONNULL(5);
-
-// select one pre-configured entry to be the new bank base
-void memory_set_bank(running_machine &machine, const char *tag, int entrynum);
-void memory_set_bank(device_t &device, const char *tag, int entrynum);
-
-// return the currently selected bank
-int memory_get_bank(running_machine &machine, const char *tag);
-int memory_get_bank(device_t &device, const char *tag);
-
-// set the absolute address of a bank base
-void memory_set_bankptr(running_machine &machine, const char *tag, void *base) ATTR_NONNULL(3);
-void memory_set_bankptr(device_t &device, const char *tag, void *base) ATTR_NONNULL(3);
-
-// get a pointer to a shared memory region by tag
-void *memory_get_shared(running_machine &machine, const char *tag);
-void *memory_get_shared(running_machine &machine, const char *tag, size_t &length);
-
-// dump the internal memory tables to the given file
-void memory_dump(running_machine &machine, FILE *file);
-
-address_space *memory_nonspecific_space(running_machine &machine);
 
 
 //**************************************************************************
@@ -807,6 +1058,5 @@ inline UINT64 direct_read_data::read_decrypted_qword(offs_t byteaddress, offs_t 
 		return *reinterpret_cast<UINT64 *>(&m_decrypted[(byteaddress ^ directxor) & m_bytemask]);
 	return m_space.read_qword(byteaddress);
 }
-
 
 #endif	/* __MEMORY_H__ */

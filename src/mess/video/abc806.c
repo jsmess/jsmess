@@ -475,18 +475,18 @@ void abc806_state::video_start()
 	m_40 = 1;
 
 	// find memory regions
-	m_char_rom = machine().region(MC6845_TAG)->base();
-	m_rad_prom = machine().region("rad")->base();
-	m_hru2_prom = machine().region("hru2")->base();
+	m_char_rom = memregion(MC6845_TAG)->base();
+	m_rad_prom = memregion("rad")->base();
+	m_hru2_prom = memregion("hru2")->base();
 
 	// allocate memory
-	m_char_ram = auto_alloc_array(machine(), UINT8, ABC806_CHAR_RAM_SIZE);
+	m_char_ram.allocate(ABC806_CHAR_RAM_SIZE);
 	m_color_ram = auto_alloc_array(machine(), UINT8, ABC806_ATTR_RAM_SIZE);
 
 	// register for state saving
-	save_pointer(NAME(m_char_ram), ABC806_CHAR_RAM_SIZE);
+	save_pointer(NAME(m_char_ram.target()), ABC806_CHAR_RAM_SIZE);
 	save_pointer(NAME(m_color_ram), ABC806_ATTR_RAM_SIZE);
-	save_pointer(NAME(m_video_ram), ABC806_VIDEO_RAM_SIZE);
+	save_pointer(NAME(m_video_ram.target()), ABC806_VIDEO_RAM_SIZE);
 	save_item(NAME(m_txoff));
 	save_item(NAME(m_40));
 	save_item(NAME(m_flshclk_ctr));

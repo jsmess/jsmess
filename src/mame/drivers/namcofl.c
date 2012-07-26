@@ -166,69 +166,65 @@ OSC3: 48.384MHz
 #include "includes/namcofl.h"
 
 
-static READ32_HANDLER( fl_unk1_r )
+READ32_MEMBER(namcofl_state::fl_unk1_r)
 {
 	return 0xffffffff;
 }
 
-static READ32_HANDLER( fl_network_r )
+READ32_MEMBER(namcofl_state::fl_network_r)
 {
 	return 0xffffffff;
 }
 
-static READ32_HANDLER( namcofl_sysreg_r )
+READ32_MEMBER(namcofl_state::namcofl_sysreg_r)
 {
 	return 0;
 }
 
-static WRITE32_HANDLER( namcofl_sysreg_w )
+WRITE32_MEMBER(namcofl_state::namcofl_sysreg_w)
 {
-	namcofl_state *state = space->machine().driver_data<namcofl_state>();
-	if ((offset == 2) && ACCESSING_BITS_0_7)  // address space configuration
+	if ((offset == 2) && ACCESSING_BITS_0_7)  // address &space configuration
 	{
 		if (data == 0)	// RAM at 00000000, ROM at 10000000
 		{
-			memory_set_bankptr(space->machine(),  "bank1", state->m_workram );
-			memory_set_bankptr(space->machine(),  "bank2", space->machine().region("maincpu")->base() );
+			membank("bank1")->set_base(m_workram );
+			membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base() );
 		}
 		else		// ROM at 00000000, RAM at 10000000
 		{
-			memory_set_bankptr(space->machine(),  "bank1", space->machine().region("maincpu")->base() );
-			memory_set_bankptr(space->machine(),  "bank2", state->m_workram );
+			membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() );
+			membank("bank2")->set_base(m_workram );
 		}
 	}
 }
 
-static WRITE32_HANDLER( namcofl_paletteram_w )
+WRITE32_MEMBER(namcofl_state::namcofl_paletteram_w)
 {
-	namcofl_state *state = space->machine().driver_data<namcofl_state>();
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
 	if ((offset == 0x1808/4) && ACCESSING_BITS_16_31)
 	{
-		UINT16 v = space->machine().generic.paletteram.u32[offset] >> 16;
+		UINT16 v = m_generic_paletteram_32[offset] >> 16;
 		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
 
-		state->m_raster_interrupt_timer->adjust(space->machine().primary_screen->time_until_pos(triggerscanline));
+		m_raster_interrupt_timer->adjust(machine().primary_screen->time_until_pos(triggerscanline));
 	}
 }
 
-static READ32_HANDLER( namcofl_share_r )
+READ32_MEMBER(namcofl_state::namcofl_share_r)
 {
-	namcofl_state *state = space->machine().driver_data<namcofl_state>();
-	return (state->m_shareram[offset*2+1] << 16) | state->m_shareram[offset*2];
+	return (m_shareram[offset*2+1] << 16) | m_shareram[offset*2];
 }
 
-static WRITE32_HANDLER( namcofl_share_w )
+WRITE32_MEMBER(namcofl_state::namcofl_share_w)
 {
-	namcofl_state *state = space->machine().driver_data<namcofl_state>();
-	COMBINE_DATA(state->m_shareram+offset*2);
+	COMBINE_DATA(m_shareram+offset*2);
 	data >>= 16;
 	mem_mask >>= 16;
-	COMBINE_DATA(state->m_shareram+offset*2+1);
+	COMBINE_DATA(m_shareram+offset*2+1);
 }
 
-static ADDRESS_MAP_START( namcofl_mem, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( namcofl_mem, AS_PROGRAM, 32, namcofl_state )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAMBANK("bank1")
 	AM_RANGE(0x10000000, 0x100fffff) AM_RAMBANK("bank2")
 	AM_RANGE(0x20000000, 0x201fffff) AM_ROM AM_REGION("user1", 0)	/* data */
@@ -236,22 +232,21 @@ static ADDRESS_MAP_START( namcofl_mem, AS_PROGRAM, 32 )
 	AM_RANGE(0x30100000, 0x30100003) AM_WRITE(namcofl_spritebank_w)
 	AM_RANGE(0x30284000, 0x3028bfff) AM_READWRITE(namcofl_share_r, namcofl_share_w)
 	AM_RANGE(0x30300000, 0x30303fff) AM_RAM /* COMRAM */
-	AM_RANGE(0x30380000, 0x303800ff) AM_READ( fl_network_r )	/* network registers */
-	AM_RANGE(0x30400000, 0x3040ffff) AM_RAM_WRITE(namcofl_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x30800000, 0x3080ffff) AM_READWRITE(namco_tilemapvideoram32_le_r, namco_tilemapvideoram32_le_w )
-	AM_RANGE(0x30a00000, 0x30a0003f) AM_READWRITE(namco_tilemapcontrol32_le_r, namco_tilemapcontrol32_le_w )
-	AM_RANGE(0x30c00000, 0x30c1ffff) AM_READWRITE(namco_rozvideoram32_le_r,namco_rozvideoram32_le_w)
-	AM_RANGE(0x30d00000, 0x30d0001f) AM_READWRITE(namco_rozcontrol32_le_r,namco_rozcontrol32_le_w)
-	AM_RANGE(0x30e00000, 0x30e1ffff) AM_READWRITE(namco_obj32_le_r, namco_obj32_le_w)
+	AM_RANGE(0x30380000, 0x303800ff) AM_READ(fl_network_r )	/* network registers */
+	AM_RANGE(0x30400000, 0x3040ffff) AM_RAM_WRITE(namcofl_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x30800000, 0x3080ffff) AM_READWRITE_LEGACY(namco_tilemapvideoram32_le_r, namco_tilemapvideoram32_le_w )
+	AM_RANGE(0x30a00000, 0x30a0003f) AM_READWRITE_LEGACY(namco_tilemapcontrol32_le_r, namco_tilemapcontrol32_le_w )
+	AM_RANGE(0x30c00000, 0x30c1ffff) AM_READWRITE_LEGACY(namco_rozvideoram32_le_r,namco_rozvideoram32_le_w)
+	AM_RANGE(0x30d00000, 0x30d0001f) AM_READWRITE_LEGACY(namco_rozcontrol32_le_r,namco_rozcontrol32_le_w)
+	AM_RANGE(0x30e00000, 0x30e1ffff) AM_READWRITE_LEGACY(namco_obj32_le_r, namco_obj32_le_w)
 	AM_RANGE(0x30f00000, 0x30f0000f) AM_RAM /* NebulaM2 code says this is int enable at 0000, int request at 0004, but doesn't do much about it */
-	AM_RANGE(0x40000000, 0x4000005f) AM_READWRITE( namcofl_sysreg_r, namcofl_sysreg_w )
-	AM_RANGE(0xfffffffc, 0xffffffff) AM_READ( fl_unk1_r )
+	AM_RANGE(0x40000000, 0x4000005f) AM_READWRITE(namcofl_sysreg_r, namcofl_sysreg_w )
+	AM_RANGE(0xfffffffc, 0xffffffff) AM_READ(fl_unk1_r )
 ADDRESS_MAP_END
 
 
-static WRITE16_HANDLER( mcu_shared_w )
+WRITE16_MEMBER(namcofl_state::mcu_shared_w)
 {
-	namcofl_state *state = space->machine().driver_data<namcofl_state>();
 	// HACK!  Many games data ROM routines redirect the vector from the sound command read to an RTS.
 	// This needs more investigation.  nebulray and vshoot do NOT do this.
 	// Timers A2 and A3 are set up in "external input counter" mode, this may be related.
@@ -262,44 +257,41 @@ static WRITE16_HANDLER( mcu_shared_w )
 	}
 #endif
 
-	COMBINE_DATA(&state->m_shareram[offset]);
+	COMBINE_DATA(&m_shareram[offset]);
 
 	// C75 BIOS has a very short window on the CPU sync signal, so immediately let the i960 at it
 	if ((offset == 0x6000/2) && (data & 0x80))
 	{
-		device_yield(&space->device());
+		device_yield(&space.device());
 	}
 }
 
 
-static READ8_HANDLER( port6_r )
+READ8_MEMBER(namcofl_state::port6_r)
 {
-	namcofl_state *state = space->machine().driver_data<namcofl_state>();
-	return state->m_mcu_port6;
+	return m_mcu_port6;
 }
 
-static WRITE8_HANDLER( port6_w )
+WRITE8_MEMBER(namcofl_state::port6_w)
 {
-	namcofl_state *state = space->machine().driver_data<namcofl_state>();
-	state->m_mcu_port6 = data;
+	m_mcu_port6 = data;
 }
 
-static READ8_HANDLER( port7_r )
+READ8_MEMBER(namcofl_state::port7_r)
 {
-	namcofl_state *state = space->machine().driver_data<namcofl_state>();
-	switch (state->m_mcu_port6 & 0xf0)
+	switch (m_mcu_port6 & 0xf0)
 	{
 		case 0x00:
-			return input_port_read(space->machine(), "IN0");
+			return ioport("IN0")->read();
 
 		case 0x20:
-			return input_port_read(space->machine(), "MISC");
+			return ioport("MISC")->read();
 
 		case 0x40:
-			return input_port_read(space->machine(), "IN1");
+			return ioport("IN1")->read();
 
 		case 0x60:
-			return input_port_read(space->machine(), "IN2");
+			return ioport("IN2")->read();
 
 		default:
 			break;
@@ -308,35 +300,35 @@ static READ8_HANDLER( port7_r )
 	return 0xff;
 }
 
-static READ8_HANDLER(dac7_r)
+READ8_MEMBER(namcofl_state::dac7_r)
 {
-	return input_port_read_safe(space->machine(), "ACCEL", 0xff);
+	return ioport("ACCEL")->read_safe(0xff);
 }
 
-static READ8_HANDLER(dac6_r)
+READ8_MEMBER(namcofl_state::dac6_r)
 {
-	return input_port_read_safe(space->machine(), "BRAKE", 0xff);
+	return ioport("BRAKE")->read_safe(0xff);
 }
 
-static READ8_HANDLER(dac5_r)
+READ8_MEMBER(namcofl_state::dac5_r)
 {
-	return input_port_read_safe(space->machine(), "WHEEL", 0xff);
+	return ioport("WHEEL")->read_safe(0xff);
 }
 
-static READ8_HANDLER(dac4_r) { return 0xff; }
-static READ8_HANDLER(dac3_r) { return 0xff; }
-static READ8_HANDLER(dac2_r) { return 0xff; }
-static READ8_HANDLER(dac1_r) { return 0xff; }
-static READ8_HANDLER(dac0_r) { return 0xff; }
+READ8_MEMBER(namcofl_state::dac4_r){ return 0xff; }
+READ8_MEMBER(namcofl_state::dac3_r){ return 0xff; }
+READ8_MEMBER(namcofl_state::dac2_r){ return 0xff; }
+READ8_MEMBER(namcofl_state::dac1_r){ return 0xff; }
+READ8_MEMBER(namcofl_state::dac0_r){ return 0xff; }
 
-static ADDRESS_MAP_START( namcoc75_am, AS_PROGRAM, 16 )
-	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE_MODERN("c352", c352_device, read, write)
-	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(mcu_shared_w) AM_BASE_MEMBER(namcofl_state, m_shareram)
+static ADDRESS_MAP_START( namcoc75_am, AS_PROGRAM, 16, namcofl_state )
+	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
+	AM_RANGE(0x004000, 0x00bfff) AM_RAM_WRITE(mcu_shared_w) AM_SHARE("shareram")
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("c75", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("c75data", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( namcoc75_io, AS_IO, 8 )
+static ADDRESS_MAP_START( namcoc75_io, AS_IO, 8, namcofl_state )
 	AM_RANGE(M37710_PORT6, M37710_PORT6) AM_READWRITE(port6_r, port6_w)
 	AM_RANGE(M37710_PORT7, M37710_PORT7) AM_READ(port7_r)
 	AM_RANGE(M37710_ADC7_L, M37710_ADC7_L) AM_READ(dac7_r)
@@ -588,8 +580,8 @@ static MACHINE_RESET( namcofl )
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(machine.primary_screen->visible_area().max_y + 3), FUNC(network_interrupt_callback));
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(machine.primary_screen->visible_area().max_y + 1), FUNC(vblank_interrupt_callback));
 
-	memory_set_bankptr(machine,  "bank1", machine.region("maincpu")->base() );
-	memory_set_bankptr(machine,  "bank2", state->m_workram );
+	state->membank("bank1")->set_base(state->memregion("maincpu")->base() );
+	state->membank("bank2")->set_base(state->m_workram );
 
 	memset(state->m_workram, 0x00, 0x100000);
 }
@@ -819,8 +811,8 @@ static void namcofl_common_init(running_machine &machine)
 	namcofl_state *state = machine.driver_data<namcofl_state>();
 	state->m_workram = auto_alloc_array(machine, UINT32, 0x100000/4);
 
-	memory_set_bankptr(machine,  "bank1", machine.region("maincpu")->base() );
-	memory_set_bankptr(machine,  "bank2", state->m_workram );
+	state->membank("bank1")->set_base(state->memregion("maincpu")->base() );
+	state->membank("bank2")->set_base(state->m_workram );
 }
 
 static DRIVER_INIT(speedrcr)

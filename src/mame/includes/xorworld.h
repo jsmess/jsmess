@@ -2,17 +2,21 @@ class xorworld_state : public driver_device
 {
 public:
 	xorworld_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT16 *m_videoram;
+	required_shared_ptr<UINT16> m_videoram;
 	tilemap_t *m_bg_tilemap;
-	UINT16 *m_spriteram;
+	required_shared_ptr<UINT16> m_spriteram;
+	DECLARE_WRITE16_MEMBER(xorworld_irq2_ack_w);
+	DECLARE_WRITE16_MEMBER(xorworld_irq6_ack_w);
+	DECLARE_WRITE16_MEMBER(xorworld_videoram16_w);
 };
 
 
 /*----------- defined in video/xorworld.c -----------*/
 
-WRITE16_HANDLER( xorworld_videoram16_w );
 
 PALETTE_INIT( xorworld );
 VIDEO_START( xorworld );

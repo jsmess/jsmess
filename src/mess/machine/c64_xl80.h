@@ -12,7 +12,6 @@
 #ifndef __XL80__
 #define __XL80__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"
@@ -47,15 +46,14 @@ protected:
 	virtual void device_reset();
 
 	// device_c64_expansion_card_interface overrides
-	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2);
-	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2);
+	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2);
+	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2);
 	virtual int c64_game_r(offs_t offset, int ba, int rw, int hiram) { return 1; }
-	virtual int c64_exrom_r() { return 0; }
+	virtual int c64_exrom_r(offs_t offset, int ba, int rw, int hiram) { return 0; }
 
 private:
 	required_device<h46505_device> m_crtc;
 
-	UINT8 *m_rom;
 	UINT8 *m_char_rom;
 };
 

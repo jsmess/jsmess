@@ -49,22 +49,22 @@
 
 static void handle_cd32_joystick_cia(running_machine &machine, UINT8 pra, UINT8 dra);
 
-static WRITE32_HANDLER( aga_overlay_w )
+WRITE32_MEMBER(cd32_state::aga_overlay_w)
 {
 	if (ACCESSING_BITS_16_23)
 	{
 		data = (data >> 16) & 1;
 
 		/* switch banks as appropriate */
-		memory_set_bank(space->machine(), "bank1", data & 1);
+		membank("bank1")->set_entry(data & 1);
 
 		/* swap the write handlers between ROM and bank 1 based on the bit */
 		if ((data & 1) == 0)
 			/* overlay disabled, map RAM on 0x000000 */
-			space->install_write_bank(0x000000, 0x1fffff, "bank1");
+			space.install_write_bank(0x000000, 0x1fffff, "bank1");
 		else
 			/* overlay enabled, map Amiga system ROM on 0x000000 */
-			space->unmap_write(0x000000, 0x1fffff);
+			space.unmap_write(0x000000, 0x1fffff);
 	}
 }
 
@@ -122,15 +122,15 @@ static WRITE8_DEVICE_HANDLER( cd32_cia_0_portb_w )
 	logerror("%s:CIA0_portb_w(%02x)\n", device->machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( cd32_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( cd32_map, AS_PROGRAM, 32, cd32_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(cd32_state, m_chip_ram, m_chip_ram_size)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
 	AM_RANGE(0x800000, 0x800003) AM_READ_PORT("DIPSW1")
 	AM_RANGE(0x800010, 0x800013) AM_READ_PORT("DIPSW2")
-	AM_RANGE(0xb80000, 0xb8003f) AM_DEVREADWRITE("akiko", amiga_akiko32_r, amiga_akiko32_w)
+	AM_RANGE(0xb80000, 0xb8003f) AM_DEVREADWRITE_LEGACY("akiko", amiga_akiko32_r, amiga_akiko32_w)
 	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)
-	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16(amiga_cia_r, amiga_cia_w, 0xffffffff)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE_MEMBER(cd32_state, m_custom_regs)
+	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16_LEGACY(amiga_cia_r, amiga_cia_w, 0xffffffff)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16_LEGACY(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_SHARE("custom_regs")
 	AM_RANGE(0xe00000, 0xe7ffff) AM_ROM AM_REGION("user1", 0x80000)	/* CD32 Extended ROM */
 	AM_RANGE(0xa00000, 0xf7ffff) AM_NOP
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0x0)		/* Kickstart */
@@ -223,16 +223,15 @@ static UINT16 handle_joystick_potgor(running_machine &machine, UINT16 potgor)
 		/* shift at 1 == return one, >1 = return button states */
 		if (state->m_cd32_shifter[i] == 0)
 			potgor &= ~p9dat; /* shift at zero == return zero */
-		if (state->m_cd32_shifter[i] >= 2 && (input_port_read(machine, player_portname[i]) & (1 << (state->m_cd32_shifter[i] - 2))))
+		if (state->m_cd32_shifter[i] >= 2 && (state->ioport(player_portname[i])->read() & (1 << (state->m_cd32_shifter[i] - 2))))
 			potgor &= ~p9dat;
 	}
 	return potgor;
 }
 
-static CUSTOM_INPUT(cubo_input)
+CUSTOM_INPUT_MEMBER(cd32_state::cubo_input)
 {
-	cd32_state *state = field.machine().driver_data<cd32_state>();
-	return handle_joystick_potgor(field.machine(), state->m_potgo_value) >> 10;
+	return handle_joystick_potgor(machine(), m_potgo_value) >> 10;
 }
 
 static INPUT_PORTS_START( cd32 )
@@ -243,15 +242,15 @@ static INPUT_PORTS_START( cd32 )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("JOY0DAT")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(amiga_joystick_convert, "P2JOY")
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cd32_state,amiga_joystick_convert, "P2JOY")
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("JOY1DAT")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(amiga_joystick_convert, "P1JOY")
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cd32_state,amiga_joystick_convert, "P1JOY")
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("POTGO")
-	PORT_BIT( 0x4400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cubo_input, 0)
+	PORT_BIT( 0x4400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cd32_state,cubo_input, 0)
 	PORT_BIT( 0xbbff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("P1JOY")
@@ -854,8 +853,8 @@ static DRIVER_INIT( cd32 )
 	amiga_machine_config(machine, &cd32_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
+	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
+	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
 
 	/* input hack */
 	state->m_input_hack = NULL;
@@ -1175,56 +1174,56 @@ ROM_START( cndypuzl )
 	CD32_BIOS
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "cndypuzl", 0, SHA1(5f41ed3521b3e05d233ac1245b78cb0b118b2b90) )
+	DISK_IMAGE_READONLY( "cndypuzl", 0, BAD_DUMP SHA1(5f41ed3521b3e05d233ac1245b78cb0b118b2b90) )
 ROM_END
 
 ROM_START( haremchl )
 	CD32_BIOS
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "haremchl", 0, SHA1(abbab347c0d7c5eef0465d0eee770754a452e874) )
+	DISK_IMAGE_READONLY( "haremchl", 0, BAD_DUMP SHA1(abbab347c0d7c5eef0465d0eee770754a452e874) )
 ROM_END
 
 ROM_START( lsrquiz )
 	CD32_BIOS
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "lsrquiz", 0, SHA1(41fb6cd0c9d36bd77e9c3db69d36801edc791e96) )
+	DISK_IMAGE_READONLY( "lsrquiz", 0, BAD_DUMP SHA1(41fb6cd0c9d36bd77e9c3db69d36801edc791e96) )
 ROM_END
 
 ROM_START( lsrquiz2 )
 	CD32_BIOS
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "lsrquiz2", 0, SHA1(78e261df1c548fa492e6cf37a9469640bb8816bf) )
+	DISK_IMAGE_READONLY( "lsrquiz2", 0, BAD_DUMP SHA1(78e261df1c548fa492e6cf37a9469640bb8816bf) )
 ROM_END
 
 ROM_START( mgprem11 )
 	CD32_BIOS
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "mgprem11", 0, SHA1(7808db33d5949f6c86d12b32bc388c12377e7038) )
+	DISK_IMAGE_READONLY( "mgprem11", 0, BAD_DUMP SHA1(7808db33d5949f6c86d12b32bc388c12377e7038) )
 ROM_END
 
 ROM_START( lasstixx )
 	CD32_BIOS
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "lasstixx", 0, SHA1(b8f6138e1f1840c193e786c56dab03c512f3e21f) )
+	DISK_IMAGE_READONLY( "lasstixx", 0, BAD_DUMP SHA1(b8f6138e1f1840c193e786c56dab03c512f3e21f) )
 ROM_END
 
 ROM_START( mgnumber )
 	CD32_BIOS
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "magicnumber", 0, SHA1(60e1fadc42694742d19cc0ac2b6e99e9e33faa3d) )
+	DISK_IMAGE_READONLY( "magicnumber", 0, BAD_DUMP SHA1(60e1fadc42694742d19cc0ac2b6e99e9e33faa3d) )
 ROM_END
 
 ROM_START( odeontw2 )
 	CD32_BIOS
 
 	DISK_REGION( "cdrom" )
-	DISK_IMAGE_READONLY( "odeontw2", 0, SHA1(f39e09f35b65a6ae9f1eba4a22f970626b7d3b71) )
+	DISK_IMAGE_READONLY( "odeontw2", 0, BAD_DUMP SHA1(f39e09f35b65a6ae9f1eba4a22f970626b7d3b71) )
 ROM_END
 
 
@@ -1239,7 +1238,7 @@ static void cndypuzl_input_hack(running_machine &machine)
 {
 	cd32_state *state = machine.driver_data<cd32_state>();
 
-	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram_size)
+	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram.bytes())
 	{
 		//(*state->m_chip_ram_w)(0x051c02, 0x0000);
 
@@ -1259,7 +1258,7 @@ static void haremchl_input_hack(running_machine &machine)
 {
 	cd32_state *state = machine.driver_data<cd32_state>();
 
-	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram_size)
+	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram.bytes())
 	{
 		//amiga_chip_ram_w8(state, 0x002907, 0x00);
 
@@ -1280,7 +1279,7 @@ static void lsrquiz_input_hack(running_machine &machine)
 {
 	cd32_state *state = machine.driver_data<cd32_state>();
 
-	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram_size)
+	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram.bytes())
 	{
 		//amiga_chip_ram_w8(state, 0x001e1b, 0x00);
 
@@ -1302,7 +1301,7 @@ static void lsrquiz2_input_hack(running_machine &machine)
 {
 	cd32_state *state = machine.driver_data<cd32_state>();
 
-	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram_size)
+	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram.bytes())
 	{
 		//amiga_chip_ram_w8(state, 0x046107, 0x00);
 
@@ -1323,7 +1322,7 @@ static void lasstixx_input_hack(running_machine &machine)
 {
 	cd32_state *state = machine.driver_data<cd32_state>();
 
-	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram_size)
+	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram.bytes())
 	{
 		//amiga_chip_ram_w8(state, 0x00281c, 0x00);
 
@@ -1344,7 +1343,7 @@ static void mgnumber_input_hack(running_machine &machine)
 {
 	cd32_state *state = machine.driver_data<cd32_state>();
 
-	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram_size)
+	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram.bytes())
 	{
 		//(*state->m_chip_ram_w)(0x04bfa0, 0x0000);
 
@@ -1364,7 +1363,7 @@ static void mgprem11_input_hack(running_machine &machine)
 {
 	cd32_state *state = machine.driver_data<cd32_state>();
 
-	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram_size)
+	if (cpu_get_pc(machine.device("maincpu")) < state->m_chip_ram.bytes())
 	{
 		//amiga_chip_ram_w8(state, 0x044f7e, 0x00);
 
@@ -1448,7 +1447,7 @@ static void serial_w(running_machine &machine, UINT16 data)
 	cd32_state *state = machine.driver_data<cd32_state>();
 	UINT8 data8 = data & 0xff;
 	if ( data8 != 0x00 )
-		state->m_microtouch->rx(*memory_nonspecific_space(machine), 0, data8);
+		state->m_microtouch->rx(*machine.memory().first_space(), 0, data8);
 }
 
 WRITE8_MEMBER (cd32_state::microtouch_tx)
@@ -1473,8 +1472,8 @@ static DRIVER_INIT( odeontw2 )
 	amiga_machine_config(machine, &cd32_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
+	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
+	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
 
 	/* input hack */
 	state->m_input_hack = NULL;

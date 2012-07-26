@@ -11,7 +11,6 @@
 #ifndef __COCO12__
 #define __COCO12__
 
-#define ADDRESS_MAP_MODERN
 
 #include "includes/coco.h"
 #include "machine/6883sam.h"

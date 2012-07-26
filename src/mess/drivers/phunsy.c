@@ -5,7 +5,6 @@
         04/11/2010 Skeleton driver.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
@@ -24,9 +23,9 @@ class phunsy_state : public driver_device
 public:
 	phunsy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu"),
-	m_speaker(*this, SPEAKER_TAG)
-	{ }
+		m_maincpu(*this, "maincpu"),
+		m_speaker(*this, SPEAKER_TAG),
+		m_videoram(*this, "videoram") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_speaker;
@@ -36,7 +35,7 @@ public:
 	DECLARE_WRITE8_MEMBER( phunsy_ctrl_w );
 	DECLARE_WRITE8_MEMBER( phunsy_data_w );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	const UINT8	*m_p_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	const UINT8	*m_p_chargen;
 	UINT8		m_data_out;
 	UINT8		m_keyboard_input;
@@ -60,7 +59,7 @@ static ADDRESS_MAP_START(phunsy_mem, AS_PROGRAM, 8, phunsy_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x07ff) AM_ROM
 	AM_RANGE( 0x0800, 0x0fff) AM_RAM
-	AM_RANGE( 0x1000, 0x17ff) AM_RAM AM_BASE( m_p_videoram ) // Video RAM
+	AM_RANGE( 0x1000, 0x17ff) AM_RAM AM_SHARE("videoram") // Video RAM
 	AM_RANGE( 0x1800, 0x1fff) AM_RAM_WRITE( phunsy_1800_w ) AM_ROMBANK("bank1")	// Banked RAM/ROM
 	AM_RANGE( 0x4000, 0xffff) AM_RAMBANK("bank2") // Banked RAM
 ADDRESS_MAP_END
@@ -77,18 +76,18 @@ WRITE8_MEMBER( phunsy_state::phunsy_ctrl_w )
 	switch( m_u_bank )
 	{
 	case 0x00:	/* RAM */
-		memory_set_bankptr( machine(), "bank1", m_ram_1800 );
+		membank( "bank1" )->set_base( m_ram_1800 );
 		break;
 	case 0x01:	/* MDCR program */
 	case 0x02:	/* Disassembler */
 	case 0x03:	/* Label handler */
-		memory_set_bankptr( machine(), "bank1", machine().region("maincpu")->base() + ( 0x800 * m_u_bank ) );
+		membank( "bank1" )->set_base( memregion("maincpu")->base() + ( 0x800 * m_u_bank ) );
 		break;
 	default:	/* Not used */
 		break;
 	}
 
-	memory_set_bankptr( machine(), "bank2", machine().region("ram_4000")->base() + 0x4000 * m_q_bank );
+	membank( "bank2" )->set_base( memregion("ram_4000")->base() + 0x4000 * m_q_bank );
 }
 
 
@@ -183,8 +182,8 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 
 MACHINE_RESET_MEMBER(phunsy_state)
 {
-	memory_set_bankptr( machine(), "bank1", m_ram_1800 );
-	memory_set_bankptr( machine(), "bank2", machine().region("ram_4000")->base() );
+	membank( "bank1" )->set_base( m_ram_1800 );
+	membank( "bank2" )->set_base( memregion("ram_4000")->base() );
 
 	m_u_bank = 0;
 	m_q_bank = 0;
@@ -205,7 +204,7 @@ static PALETTE_INIT( phunsy )
 
 VIDEO_START_MEMBER( phunsy_state )
 {
-	m_p_chargen = machine().region( "chargen" )->base();
+	m_p_chargen = memregion( "chargen" )->base();
 }
 
 
@@ -222,7 +221,7 @@ SCREEN_UPDATE16_MEMBER( phunsy_state )
 
 			for (x = ma; x < ma+64; x++)
 			{
-				chr = m_p_videoram[x];
+				chr = m_videoram[x];
 
 				if (BIT(chr, 7))
 				{

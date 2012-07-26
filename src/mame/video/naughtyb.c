@@ -58,6 +58,7 @@ static const res_net_info naughtyb_net_info =
 
 PALETTE_INIT( naughtyb )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances[2] = { 270, 130 };
 	double weights[2];
 	int i;
@@ -110,30 +111,28 @@ VIDEO_START( naughtyb )
 
 
 
-WRITE8_HANDLER( naughtyb_videoreg_w )
+WRITE8_MEMBER(naughtyb_state::naughtyb_videoreg_w)
 {
-	naughtyb_state *state = space->machine().driver_data<naughtyb_state>();
 	// bits 4+5 control the sound circuit
-	pleiads_sound_control_c_w(space->machine().device("cust"),offset,data);
+	pleiads_sound_control_c_w(machine().device("cust"),offset,data);
 
-	state->m_cocktail =
-		( ( input_port_read(space->machine(), "DSW0") & 0x80 ) &&	// cabinet == cocktail
+	m_cocktail =
+		( ( ioport("DSW0")->read() & 0x80 ) &&	// cabinet == cocktail
 		  ( data & 0x01 ) );				// handling player 2
-	state->m_palreg  = (data >> 1) & 0x03;			// palette sel is bit 1 & 2
-	state->m_bankreg = (data >> 2) & 0x01;			// banksel is just bit 2
+	m_palreg  = (data >> 1) & 0x03;			// palette sel is bit 1 & 2
+	m_bankreg = (data >> 2) & 0x01;			// banksel is just bit 2
 }
 
-WRITE8_HANDLER( popflame_videoreg_w )
+WRITE8_MEMBER(naughtyb_state::popflame_videoreg_w)
 {
-	naughtyb_state *state = space->machine().driver_data<naughtyb_state>();
 	// bits 4+5 control the sound circuit
-	pleiads_sound_control_c_w(space->machine().device("cust"),offset,data);
+	pleiads_sound_control_c_w(machine().device("cust"),offset,data);
 
-	state->m_cocktail =
-		( ( input_port_read(space->machine(), "DSW0") & 0x80 ) &&	// cabinet == cocktail
+	m_cocktail =
+		( ( ioport("DSW0")->read() & 0x80 ) &&	// cabinet == cocktail
 		  ( data & 0x01 ) );				// handling player 2
-	state->m_palreg  = (data >> 1) & 0x03;			// palette sel is bit 1 & 2
-	state->m_bankreg = (data >> 3) & 0x01;			// banksel is just bit 3
+	m_palreg  = (data >> 1) & 0x03;			// palette sel is bit 1 & 2
+	m_bankreg = (data >> 3) & 0x01;			// banksel is just bit 3
 }
 
 

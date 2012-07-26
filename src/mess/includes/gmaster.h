@@ -25,6 +25,10 @@ public:
 
 	GMASTER_VIDEO m_video;
 	GMASTER_MACHINE m_gmachine;
+	DECLARE_READ8_MEMBER(gmaster_io_r);
+	DECLARE_WRITE8_MEMBER(gmaster_io_w);
+	DECLARE_READ8_MEMBER(gmaster_port_r);
+	DECLARE_WRITE8_MEMBER(gmaster_port_w);
 };
 
 

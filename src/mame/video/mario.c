@@ -64,6 +64,7 @@ static const res_net_info mario_net_info_std =
 ***************************************************************************/
 PALETTE_INIT( mario )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	rgb_t	*rgb;
 
 	rgb = compute_res_net_all(machine, color_prom, &mario_decode_info, &mario_net_info);
@@ -77,55 +78,50 @@ PALETTE_INIT( mario )
 	palette_normalize_range(machine.palette, 256, 511, 0, 255);
 }
 
-WRITE8_HANDLER( mario_videoram_w )
+WRITE8_MEMBER(mario_state::mario_videoram_w)
 {
-	mario_state	*state = space->machine().driver_data<mario_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( mario_gfxbank_w )
+WRITE8_MEMBER(mario_state::mario_gfxbank_w)
 {
-	mario_state	*state = space->machine().driver_data<mario_state>();
 
-	if (state->m_gfx_bank != (data & 0x01))
+	if (m_gfx_bank != (data & 0x01))
 	{
-		state->m_gfx_bank = data & 0x01;
-		space->machine().tilemap().mark_all_dirty();
+		m_gfx_bank = data & 0x01;
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( mario_palettebank_w )
+WRITE8_MEMBER(mario_state::mario_palettebank_w)
 {
-	mario_state	*state = space->machine().driver_data<mario_state>();
 
-	if (state->m_palette_bank != (data & 0x01))
+	if (m_palette_bank != (data & 0x01))
 	{
-		state->m_palette_bank = data & 0x01;
-		space->machine().tilemap().mark_all_dirty();
+		m_palette_bank = data & 0x01;
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( mario_scroll_w )
+WRITE8_MEMBER(mario_state::mario_scroll_w)
 {
-	mario_state	*state = space->machine().driver_data<mario_state>();
 
-	state->m_gfx_scroll = data + 17;
+	m_gfx_scroll = data + 17;
 }
 
-WRITE8_HANDLER( mario_flip_w )
+WRITE8_MEMBER(mario_state::mario_flip_w)
 {
-	mario_state	*state = space->machine().driver_data<mario_state>();
 
-	if (state->m_flip != (data & 0x01))
+	if (m_flip != (data & 0x01))
 	{
-		state->m_flip = data & 0x01;
-		if (state->m_flip)
-			space->machine().tilemap().set_flip_all(TILEMAP_FLIPX | TILEMAP_FLIPY);
+		m_flip = data & 0x01;
+		if (m_flip)
+			machine().tilemap().set_flip_all(TILEMAP_FLIPX | TILEMAP_FLIPY);
 		else
-			space->machine().tilemap().set_flip_all(0);
-		space->machine().tilemap().mark_all_dirty();
+			machine().tilemap().set_flip_all(0);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -169,7 +165,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	mario_state	*state = machine.driver_data<mario_state>();
 	int offs;
 
-	for (offs = 0;offs < state->m_spriteram_size;offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		if (state->m_spriteram[offs])
 		{
@@ -213,7 +209,7 @@ SCREEN_UPDATE_IND16( mario )
 	mario_state	*state = screen.machine().driver_data<mario_state>();
 	int t;
 
-	t = input_port_read(screen.machine(), "MONITOR");
+	t = screen.machine().root_device().ioport("MONITOR")->read();
 	if (t != state->m_monitor)
 	{
 		state->m_monitor = t;

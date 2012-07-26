@@ -113,7 +113,7 @@ ROM_END
 void sams_memory_expansion_device::device_start()
 {
 	if (VERBOSE>5) LOG("SuperAMS: start\n");
-	m_ram = subregion(RAMREGION)->base();
+	m_ram = memregion(RAMREGION)->base();
 }
 
 void sams_memory_expansion_device::device_reset()

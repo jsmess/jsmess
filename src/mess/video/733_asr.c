@@ -157,7 +157,7 @@ void asr733_init(running_machine &machine)
 		0x00,0x68,0xb0,0x00,0x00,0x00,0x00,0x00,0x20,0x50,0x20,0x50,0xa8,0x50,0x00,0x00
 	};
 
-	dst = machine.region(asr733_chr_region)->base();
+	dst = machine.root_device().memregion(asr733_chr_region)->base();
 
 	memcpy(dst, fontdata6x8, asrfontdata_size);
 }
@@ -664,7 +664,7 @@ void asr733_keyboard(device_t *device)
 	/* for (i = 0; i < 6; i++) */
 	for (i = 0; i < 4; i++)
 	{
-		key_buf[i] = input_port_read(device->machine(), keynames[i]);
+		key_buf[i] = device->machine().root_device().ioport(keynames[i])->read();
 	}
 
 	/* process key modifiers */

@@ -3,7 +3,6 @@
 #ifndef __WANGPC_KEYBOARD__
 #define __WANGPC_KEYBOARD__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"

@@ -17,7 +17,6 @@
 
 ****************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
@@ -44,13 +43,13 @@ UINT8 psion_state::kb_read(running_machine &machine)
 	{
 		for (line = 0; line < 7; line++)
 			if (m_kb_counter == (0x7f & ~(1 << line)))
-				data = input_port_read(machine, bitnames[line]);
+				data = machine.root_device().ioport(bitnames[line])->read();
 	}
 	else
 	{
 		//Read all the input lines
 		for (line = 0; line < 7; line++)
-			data &= input_port_read(machine, bitnames[line]);
+			data &= machine.root_device().ioport(bitnames[line])->read();
 	}
 
 	return data & 0x7c;
@@ -58,11 +57,12 @@ UINT8 psion_state::kb_read(running_machine &machine)
 
 void psion_state::update_banks(running_machine &machine)
 {
+	psion_state *state = machine.driver_data<psion_state>();
 	if (m_ram_bank < m_ram_bank_count && m_ram_bank_count)
-		memory_set_bank(machine, "rambank", m_ram_bank);
+		state->membank("rambank")->set_entry(m_ram_bank);
 
 	if (m_rom_bank < m_rom_bank_count && m_rom_bank_count)
-		memory_set_bank(machine, "rombank", m_rom_bank);
+		state->membank("rombank")->set_entry(m_rom_bank);
 }
 
 WRITE8_MEMBER( psion_state::hd63701_int_reg_w )
@@ -124,7 +124,7 @@ READ8_MEMBER( psion_state::hd63701_int_reg_r )
         ---- --x- pulse
         ---- ---x battery status
         */
-		return kb_read(machine()) | input_port_read(machine(), "BATTERY") | input_port_read(machine(), "ON") | (m_kb_counter == 0x7ff)<<1 | m_pulse<<1;
+		return kb_read(machine()) | ioport("BATTERY")->read() | ioport("ON")->read() | (m_kb_counter == 0x7ff)<<1 | m_pulse<<1;
 	case 0x17:
 		/* datapack control lines */
 		return (m_pack1->control_r() | (m_pack2->control_r() & 0x8f)) | ((m_pack2->control_r() & 0x10)<<1);
@@ -238,27 +238,27 @@ static INPUT_CHANGED( psion_on )
 static ADDRESS_MAP_START(psioncm_mem, AS_PROGRAM, 8, psion_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(m_sys_register)
+	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(m_ram) AM_SIZE(psion_state, m_ram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(psionla_mem, AS_PROGRAM, 8, psion_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(m_sys_register)
+	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x5fff) AM_RAM AM_BASE(m_ram) AM_SIZE(psion_state, m_ram_size)
+	AM_RANGE(0x0400, 0x5fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(psionp350_mem, AS_PROGRAM, 8, psion_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(m_sys_register)
+	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x3fff) AM_RAM AM_BASE(m_ram) AM_SIZE(psion_state, m_ram_size)
+	AM_RANGE(0x0400, 0x3fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("rambank")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -266,9 +266,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(psionlam_mem, AS_PROGRAM, 8, psion_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(m_sys_register)
+	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x7fff) AM_RAM AM_BASE(m_ram) AM_SIZE(psion_state, m_ram_size)
+	AM_RANGE(0x0400, 0x7fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("rombank")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -276,9 +276,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(psionlz_mem, AS_PROGRAM, 8, psion_state)
 	ADDRESS_MAP_UNMAP_LOW
 	AM_RANGE(0x0000, 0x001f) AM_READWRITE(hd63701_int_reg_r, hd63701_int_reg_w)
-	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_BASE(m_sys_register)
+	AM_RANGE(0x0040, 0x00ff) AM_RAM AM_SHARE("sys_register")
 	AM_RANGE(0x0100, 0x03ff) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0400, 0x3fff) AM_RAM AM_BASE(m_ram) AM_SIZE(psion_state, m_ram_size)
+	AM_RANGE(0x0400, 0x3fff) AM_RAM AM_SHARE("ram")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("rambank")
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("rombank")
 	AM_RANGE(0xc000, 0xffff) AM_ROM
@@ -351,7 +351,7 @@ static NVRAM_HANDLER( psion )
 	if (read_or_write)
 	{
 		file->write(state->m_sys_register, 0xc0);
-		file->write(state->m_ram, state->m_ram_size);
+		file->write(state->m_ram, state->m_ram.bytes());
 		if (state->m_ram_bank_count)
 			file->write(state->m_paged_ram, state->m_ram_bank_count * 0x4000);
 	}
@@ -360,7 +360,7 @@ static NVRAM_HANDLER( psion )
 		if (file)
 		{
 			file->read(state->m_sys_register, 0xc0);
-			file->read(state->m_ram, state->m_ram_size);
+			file->read(state->m_ram, state->m_ram.bytes());
 			if (state->m_ram_bank_count)
 				file->read(state->m_paged_ram, state->m_ram_bank_count * 0x4000);
 
@@ -403,18 +403,18 @@ void psion_state::machine_start()
 
 	if (m_rom_bank_count)
 	{
-		UINT8* rom_base = (UINT8 *)machine().region("maincpu")->base();
+		UINT8* rom_base = (UINT8 *)machine().root_device().memregion("maincpu")->base();
 
-		memory_configure_bank(machine(), "rombank", 0, 1, rom_base + 0x8000, 0x4000);
-		memory_configure_bank(machine(), "rombank", 1, m_rom_bank_count-1, rom_base + 0x10000, 0x4000);
-		memory_set_bank(machine(), "rombank", 0);
+		membank("rombank")->configure_entry(0, rom_base + 0x8000);
+		membank("rombank")->configure_entries(1, m_rom_bank_count-1, rom_base + 0x10000, 0x4000);
+		membank("rombank")->set_entry(0);
 	}
 
 	if (m_ram_bank_count)
 	{
 		m_paged_ram = auto_alloc_array(machine(), UINT8, m_ram_bank_count * 0x4000);
-		memory_configure_bank(machine(), "rambank", 0, m_ram_bank_count, m_paged_ram, 0x4000);
-		memory_set_bank(machine(), "rambank", 0);
+		membank("rambank")->configure_entries(0, m_ram_bank_count, m_paged_ram, 0x4000);
+		membank("rambank")->set_entry(0);
 	}
 
 	save_item(NAME(m_kb_counter));

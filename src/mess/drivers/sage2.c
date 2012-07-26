@@ -48,7 +48,7 @@ READ8_MEMBER( sage2_state::mmu_r )
 
 	if (m_reset || (offset >= 0xfe0000))
 	{
-		data = machine().region(M68000_TAG)->base()[offset & 0x1fff];
+		data = memregion(M68000_TAG)->base()[offset & 0x1fff];
 	}
 	else if (offset < 0x080000)
 	{
@@ -645,13 +645,11 @@ ROM_END
 //  DRIVER_INIT( sage2 )
 //-------------------------------------------------
 
-DIRECT_UPDATE_HANDLER( sage2_direct_update_handler )
+DIRECT_UPDATE_MEMBER(sage2_state::sage2_direct_update_handler)
 {
-	sage2_state *state = machine.driver_data<sage2_state>();
-
-	if (state->m_reset && address >= 0xfe0000)
+	if (m_reset && address >= 0xfe0000)
 	{
-		state->m_reset = 0;
+		m_reset = 0;
 	}
 
 	return address;
@@ -659,12 +657,13 @@ DIRECT_UPDATE_HANDLER( sage2_direct_update_handler )
 
 static DRIVER_INIT( sage2 )
 {
+	sage2_state *state = machine.driver_data<sage2_state>();
 	address_space *program = machine.device<cpu_device>(M68000_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate(FUNC(sage2_direct_update_handler), &machine));
+	program->set_direct_update_handler(direct_update_delegate(FUNC(sage2_state::sage2_direct_update_handler), state));
 
 	// patch out i8251 test
-	machine.region(M68000_TAG)->base()[0x1be8] = 0xd6;
-	machine.region(M68000_TAG)->base()[0x1be9] = 0x4e;
+	machine.root_device().memregion(M68000_TAG)->base()[0x1be8] = 0xd6;
+	machine.root_device().memregion(M68000_TAG)->base()[0x1be9] = 0x4e;
 }
 
 

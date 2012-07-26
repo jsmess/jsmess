@@ -14,14 +14,18 @@ class snk6502_state : public driver_device
 {
 public:
 	snk6502_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram2(*this, "videoram2"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_charram(*this, "charram"){ }
 
 	UINT8 m_sasuke_counter;
 
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
-	UINT8 *m_videoram2;
-	UINT8 *m_charram;
+	required_shared_ptr<UINT8> m_videoram2;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_charram;
 
 	int m_charbank;
 	int m_backcolor;
@@ -31,6 +35,18 @@ public:
 	rgb_t m_palette[64];
 
 	UINT8 m_irq_mask;
+	DECLARE_WRITE8_MEMBER(snk6502_videoram_w);
+	DECLARE_WRITE8_MEMBER(snk6502_videoram2_w);
+	DECLARE_WRITE8_MEMBER(snk6502_colorram_w);
+	DECLARE_WRITE8_MEMBER(snk6502_charram_w);
+	DECLARE_WRITE8_MEMBER(snk6502_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(snk6502_scrollx_w);
+	DECLARE_WRITE8_MEMBER(snk6502_scrolly_w);
+	DECLARE_WRITE8_MEMBER(satansat_b002_w);
+	DECLARE_WRITE8_MEMBER(satansat_backcolor_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(snk6502_music0_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(sasuke_count_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 
@@ -65,21 +81,12 @@ DISCRETE_SOUND_EXTERN( fantasy );
 
 /*----------- defined in video/snk6502.c -----------*/
 
-WRITE8_HANDLER( snk6502_videoram_w );
-WRITE8_HANDLER( snk6502_videoram2_w );
-WRITE8_HANDLER( snk6502_colorram_w );
-WRITE8_HANDLER( snk6502_charram_w );
-WRITE8_HANDLER( snk6502_flipscreen_w );
-WRITE8_HANDLER( snk6502_scrollx_w );
-WRITE8_HANDLER( snk6502_scrolly_w );
 
 PALETTE_INIT( snk6502 );
 VIDEO_START( snk6502 );
 SCREEN_UPDATE_IND16( snk6502 );
 VIDEO_START( pballoon );
 
-WRITE8_HANDLER( satansat_b002_w );
-WRITE8_HANDLER( satansat_backcolor_w );
 
 PALETTE_INIT( satansat );
 VIDEO_START( satansat );

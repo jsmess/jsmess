@@ -639,7 +639,7 @@ static SAMPLES_START( kageki_init_samples )
 	int start, size;
 	int i, n;
 
-	src = machine.region("samples")->base() + 0x0090;
+	src = state->memregion("samples")->base() + 0x0090;
 	for (i = 0; i < MAX_SAMPLES; i++)
 	{
 		start = (src[(i * 2) + 1] * 256) + src[(i * 2)];
@@ -680,8 +680,8 @@ static READ8_DEVICE_HANDLER( kageki_csport_r )
 	tnzs_state *state = device->machine().driver_data<tnzs_state>();
 	int dsw, dsw1, dsw2;
 
-	dsw1 = input_port_read(device->machine(), "DSWA");
-	dsw2 = input_port_read(device->machine(), "DSWB");
+	dsw1 = state->ioport("DSWA")->read();
+	dsw2 = state->ioport("DSWB")->read();
 
 	switch (state->m_kageki_csport_sel)
 	{
@@ -738,7 +738,7 @@ static WRITE8_DEVICE_HANDLER( kabukiz_sound_bank_w )
 {
 	// to avoid the write when the sound chip is initialized
 	if (data != 0xff)
-		memory_set_bank(device->machine(), "bank3", data & 0x07);
+		device->machine().root_device().membank("bank3")->set_entry(data & 0x07);
 }
 
 static WRITE8_DEVICE_HANDLER( kabukiz_sample_w )
@@ -748,41 +748,41 @@ static WRITE8_DEVICE_HANDLER( kabukiz_sample_w )
 		dac_data_w(device, data);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")	/* ROM + RAM */
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodelow_r8, spritecodelow_w8)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodehigh_r8, spritecodehigh_w8)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodelow_r8, spritecodelow_w8)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodehigh_r8, spritecodehigh_w8)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf000, 0xf2ff) AM_RAM AM_DEVREADWRITE("spritegen", spriteylow_r8, spriteylow_w8)
-	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", spritectrl_w8)  /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("spritegen", spritebgflag_w8)	/* enable / disable background transparency */
+	AM_RANGE(0xf000, 0xf2ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r8, spriteylow_w8)
+	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE_LEGACY("spritegen", spritectrl_w8)  /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("spritegen", spritebgflag_w8)	/* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_READNOP AM_WRITE(tnzs_bankswitch_w)
 	/* arknoid2, extrmatn, plumppop and drtoppel have PROMs instead of RAM */
 	/* drtoppel writes here anyway! (maybe leftover from tests during development) */
 	/* so the handler is patched out in init_drtopple() */
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu0_type2, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu0_type2, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank1")	/* ROM + RAM */
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodelow_r8, spritecodelow_w8)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodehigh_r8, spritecodehigh_w8)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodelow_r8, spritecodelow_w8)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodehigh_r8, spritecodehigh_w8)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf000, 0xf2ff) AM_RAM AM_DEVREADWRITE("spritegen", spriteylow_r8, spriteylow_w8)
-	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("spritegen", spritebgflag_w8)	/* enable / disable background transparency */
+	AM_RANGE(0xf000, 0xf2ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r8, spriteylow_w8)
+	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE_LEGACY("spritegen", spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("spritegen", spritebgflag_w8)	/* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_WRITE(tnzs_bankswitch_w)
 	/* kabukiz still writes here but it's not used (it's paletteram in type1 map) */
 	AM_RANGE(0xf800, 0xfbff) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tnzs_bankswitch1_w)
-	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xc000, 0xc001) AM_READWRITE(tnzs_mcu_r, tnzs_mcu_w)	/* not present in insectx */
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
@@ -791,11 +791,11 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
 						/* all by insectx. */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kageki_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kageki_sub_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tnzs_bankswitch1_w)
-	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
@@ -805,14 +805,13 @@ ADDRESS_MAP_END
 
 /* the later board is different, it has a third CPU (and of course no mcu) */
 
-static WRITE8_HANDLER( tnzsb_sound_command_w )
+WRITE8_MEMBER(tnzs_state::tnzsb_sound_command_w)
 {
-	tnzs_state *state = space->machine().driver_data<tnzs_state>();
-	soundlatch_w(space, offset, data);
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	soundlatch_byte_w(space, offset, data);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
-static ADDRESS_MAP_START( tnzsb_cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tnzsb_cpu1_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tnzs_bankswitch1_w)
@@ -825,10 +824,10 @@ static ADDRESS_MAP_START( tnzsb_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf000, 0xf003) AM_READONLY
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kabukiz_cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kabukiz_cpu1_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tnzs_bankswitch1_w)
@@ -840,27 +839,27 @@ static ADDRESS_MAP_START( kabukiz_cpu1_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf800, 0xfbff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf800, 0xfbff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tnzsb_cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tnzsb_cpu2_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kabukiz_cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kabukiz_cpu2_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tnzsb_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( tnzsb_io_map, AS_IO, 8, tnzs_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8742_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( i8742_io_map, AS_IO, 8, tnzs_state )
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(tnzs_port1_r)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(tnzs_port2_r, tnzs_port2_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ_PORT("COIN1")
@@ -868,51 +867,51 @@ static ADDRESS_MAP_START( i8742_io_map, AS_IO, 8 )
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( jpopnics_palette_w )
+WRITE8_MEMBER(tnzs_state::jpopnics_palette_w)
 {
 	int r, g, b;
 	UINT16 paldata;
-	space->machine().generic.paletteram.u8[offset] = data;
+	m_generic_paletteram_8[offset] = data;
 
 	offset = offset >> 1;
 
-	paldata = (space->machine().generic.paletteram.u8[offset * 2] << 8) | space->machine().generic.paletteram.u8[(offset * 2 + 1)];
+	paldata = (m_generic_paletteram_8[offset * 2] << 8) | m_generic_paletteram_8[(offset * 2 + 1)];
 
 	g = (paldata >> 12) & 0x000f;
 	r = (paldata >> 4) & 0x000f;
 	b = (paldata >> 8) & 0x000f;
 	// the other bits seem to be used, and the colours are wrong..
 
-	palette_set_color_rgb(space->machine(), offset, r << 4, g << 4, b << 4);
+	palette_set_color_rgb(machine(), offset, r << 4, g << 4, b << 4);
 }
 
 
 
-static ADDRESS_MAP_START( jpopnics_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jpopnics_main_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodelow_r8, spritecodelow_w8)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodehigh_r8, spritecodehigh_w8)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodelow_r8, spritecodelow_w8)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodehigh_r8, spritecodehigh_w8)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1") /* WORK RAM (shared by the 2 z80's) */
-	AM_RANGE(0xf000, 0xf2ff) AM_RAM AM_DEVREADWRITE("spritegen", spriteylow_r8, spriteylow_w8)
-	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("spritegen", spritebgflag_w8)	/* enable / disable background transparency */
+	AM_RANGE(0xf000, 0xf2ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r8, spriteylow_w8)
+	AM_RANGE(0xf300, 0xf303) AM_MIRROR(0xfc) AM_DEVWRITE_LEGACY("spritegen", spritectrl_w8) /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("spritegen", spritebgflag_w8)	/* enable / disable background transparency */
 	AM_RANGE(0xf600, 0xf600) AM_READNOP AM_WRITE(tnzs_bankswitch_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(jpopnics_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(jpopnics_palette_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( jpopnics_subbankswitch_w )
+WRITE8_MEMBER(tnzs_state::jpopnics_subbankswitch_w)
 {
 	/* bits 0-1 select ROM bank */
-	memory_set_bank(space->machine(), "bank2", data & 0x03);
+	membank("bank2")->set_entry(data & 0x03);
 }
 
-static ADDRESS_MAP_START( jpopnics_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jpopnics_sub_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank2")
 
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(jpopnics_subbankswitch_w)
-	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN1")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN2")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSWA")

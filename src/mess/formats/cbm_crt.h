@@ -12,6 +12,7 @@
 #define __CBM_CRT__
 
 #include "emu.h"
+#include "formats/imageutl.h"
 
 
 
@@ -139,6 +140,16 @@ struct _cbm_crt_chip
 	UINT8 start_address[2];
 	UINT8 image_size[2];
 };
+
+
+
+//**************************************************************************
+//  FUNCTION PROTOTYPES
+//**************************************************************************
+
+const char * cbm_crt_get_card(core_file *file);
+bool cbm_crt_read_header(core_file* file, size_t *roml_size, size_t *romh_size, int *exrom, int *game);
+bool cbm_crt_read_data(core_file* file, UINT8 *roml, UINT8 *romh);
 
 
 #endif

@@ -3,6 +3,7 @@
 
 PALETTE_INIT( jailbrek )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -34,18 +35,16 @@ PALETTE_INIT( jailbrek )
 	}
 }
 
-WRITE8_HANDLER( jailbrek_videoram_w )
+WRITE8_MEMBER(jailbrek_state::jailbrek_videoram_w)
 {
-	jailbrek_state *state = space->machine().driver_data<jailbrek_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( jailbrek_colorram_w )
+WRITE8_MEMBER(jailbrek_state::jailbrek_colorram_w)
 {
-	jailbrek_state *state = space->machine().driver_data<jailbrek_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -71,7 +70,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT8 *spriteram = state->m_spriteram;
 	int i;
 
-	for (i = 0; i < state->m_spriteram_size; i += 4)
+	for (i = 0; i < state->m_spriteram.bytes(); i += 4)
 	{
 		int attr = spriteram[i + 1];	// attributes = ?tyxcccc
 		int code = spriteram[i] + ((attr & 0x40) << 2);
@@ -81,7 +80,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sx = spriteram[i + 2] - ((attr & 0x80) << 1);
 		int sy = spriteram[i + 3];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

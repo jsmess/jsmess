@@ -91,6 +91,17 @@ public:
 	emu_timer*	m_gameplay_timer;
 	UINT8		m_money_reg;
 
+	DECLARE_WRITE8_MEMBER(famibox_nt_w);
+	DECLARE_READ8_MEMBER(famibox_nt_r);
+	DECLARE_WRITE8_MEMBER(sprite_dma_w);
+	DECLARE_READ8_MEMBER(famibox_IN0_r);
+	DECLARE_WRITE8_MEMBER(famibox_IN0_w);
+	DECLARE_READ8_MEMBER(famibox_IN1_r);
+	DECLARE_READ8_MEMBER(famibox_system_r);
+	DECLARE_WRITE8_MEMBER(famibox_system_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(famibox_coin_r);
+	DECLARE_INPUT_CHANGED_MEMBER(famibox_keyswitch_changed);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 /******************************************************
@@ -133,19 +144,17 @@ static void set_mirroring(famibox_state *state, int mirroring)
 }
 #endif
 
-static WRITE8_HANDLER (famibox_nt_w)
+WRITE8_MEMBER(famibox_state::famibox_nt_w)
 {
-	famibox_state *state = space->machine().driver_data<famibox_state>();
 	int page = ((offset & 0xc00) >> 10);
-	state->m_nt_page[page][offset & 0x3ff] = data;
+	m_nt_page[page][offset & 0x3ff] = data;
 }
 
 
-static READ8_HANDLER (famibox_nt_r)
+READ8_MEMBER(famibox_state::famibox_nt_r)
 {
-	famibox_state *state = space->machine().driver_data<famibox_state>();
 	int page = ((offset & 0xc00) >> 10);
-	return state->m_nt_page[page][offset & 0x3ff];
+	return m_nt_page[page][offset & 0x3ff];
 }
 
 /******************************************************
@@ -154,11 +163,11 @@ static READ8_HANDLER (famibox_nt_r)
 
 *******************************************************/
 
-static WRITE8_HANDLER( sprite_dma_w )
+WRITE8_MEMBER(famibox_state::sprite_dma_w)
 {
-	ppu2c0x_device *ppu = space->machine().device<ppu2c0x_device>("ppu");
+	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
 	int source = (data & 7);
-	ppu->spriteram_dma(space, source);
+	ppu->spriteram_dma(&space, source);
 }
 
 static READ8_DEVICE_HANDLER( psg_4015_r )
@@ -183,31 +192,28 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 *******************************************************/
 
 
-static READ8_HANDLER( famibox_IN0_r )
+READ8_MEMBER(famibox_state::famibox_IN0_r)
 {
-	famibox_state *state = space->machine().driver_data<famibox_state>();
-	return ((state->m_in_0 >> state->m_in_0_shift++) & 0x01) | 0x40;
+	return ((m_in_0 >> m_in_0_shift++) & 0x01) | 0x40;
 }
 
-static WRITE8_HANDLER( famibox_IN0_w )
+WRITE8_MEMBER(famibox_state::famibox_IN0_w)
 {
-	famibox_state *state = space->machine().driver_data<famibox_state>();
 	if (data & 0x01)
 	{
 		return;
 	}
 
-	state->m_in_0_shift = 0;
-	state->m_in_1_shift = 0;
+	m_in_0_shift = 0;
+	m_in_1_shift = 0;
 
-	state->m_in_0 = input_port_read(space->machine(), "P1");
-	state->m_in_1 = input_port_read(space->machine(), "P2");
+	m_in_0 = ioport("P1")->read();
+	m_in_1 = ioport("P2")->read();
 }
 
-static READ8_HANDLER( famibox_IN1_r )
+READ8_MEMBER(famibox_state::famibox_IN1_r)
 {
-	famibox_state *state = space->machine().driver_data<famibox_state>();
-	return ((state->m_in_1 >> state->m_in_1_shift++) & 0x01) | 0x40;
+	return ((m_in_1 >> m_in_1_shift++) & 0x01) | 0x40;
 }
 
 /******************************************************
@@ -251,9 +257,9 @@ static void famicombox_bankswitch(running_machine &machine, UINT8 bank)
 		if ( bank == famicombox_banks[i].bank ||
 			 famicombox_banks[i].bank == 0 )
 		{
-			memory_set_bankptr(machine, "cpubank1", machine.region(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].bank1_offset);
-			memory_set_bankptr(machine, "cpubank2", machine.region(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].bank2_offset);
-			memory_set_bankptr(machine, "ppubank1", machine.region(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].ppubank_offset);
+			machine.root_device().membank("cpubank1")->set_base(machine.root_device().memregion(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].bank1_offset);
+			machine.root_device().membank("cpubank2")->set_base(machine.root_device().memregion(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].bank2_offset);
+			machine.root_device().membank("ppubank1")->set_base(machine.root_device().memregion(famicombox_banks[i].memory_region)->base() + famicombox_banks[i].ppubank_offset);
 			break;
 		}
 	}
@@ -295,36 +301,34 @@ static TIMER_CALLBACK(famicombox_gameplay_timer_callback)
 	}
 }
 
-static READ8_HANDLER( famibox_system_r )
+READ8_MEMBER(famibox_state::famibox_system_r)
 {
-	famibox_state *state = space->machine().driver_data<famibox_state>();
 	switch( offset & 0x07 )
 	{
 		case 0: /* device which caused exception */
 			{
-				UINT8 ret = state->m_exception_cause;
-				state->m_exception_cause = 0xff;
+				UINT8 ret = m_exception_cause;
+				m_exception_cause = 0xff;
 				return ret;
 			}
 		case 2:
-			return input_port_read(space->machine(), "DSW");
+			return ioport("DSW")->read();
 		case 3:
-			return input_port_read(space->machine(), "KEYSWITCH");
+			return ioport("KEYSWITCH")->read();
 		case 7:
 			return 0x02;
 		default:
-			logerror("%s: Unhandled famibox_system_r(%x)\n", space->machine().describe_context(), offset );
+			logerror("%s: Unhandled famibox_system_r(%x)\n", machine().describe_context(), offset );
 			return 0;
 	}
 }
 
-static WRITE8_HANDLER( famibox_system_w )
+WRITE8_MEMBER(famibox_state::famibox_system_w)
 {
-	famibox_state *state = space->machine().driver_data<famibox_state>();
 	switch( offset & 0x07 )
 	{
 		case 0:
-			logerror("%s: Interrupt enable\n", space->machine().describe_context());
+			logerror("%s: Interrupt enable\n", machine().describe_context());
 			logerror("6.82Hz interrupt source (0 = enable): %d\n", BIT(data,0));
 			logerror("8 bit timer expiration @ 5003W (1 = enable): %d\n", BIT(data,1));
 			logerror("controller reads (1 = enable): %d\n", BIT(data,2));
@@ -332,36 +336,36 @@ static WRITE8_HANDLER( famibox_system_w )
 			logerror("money insertion (1 = enable): %d\n", BIT(data,4));
 			logerror("reset button (1 = enable): %d\n", BIT(data,5));
 			logerror("\"CATV connector\" pin 4 detection (1 = enable): %d\n", BIT(data,7));
-			state->m_exception_mask = data;
-			if ( BIT(state->m_exception_mask,1) && ( state->m_attract_timer_period != 0 ) )
+			m_exception_mask = data;
+			if ( BIT(m_exception_mask,1) && ( m_attract_timer_period != 0 ) )
 			{
-				if (state->m_attract_timer->start() != attotime::never)
+				if (m_attract_timer->start() != attotime::never)
 				{
-					state->m_attract_timer->adjust(attotime::from_seconds((INT32)((double)1.0/6.8274*state->m_attract_timer_period)), 0, attotime::never);
+					m_attract_timer->adjust(attotime::from_seconds((INT32)((double)1.0/6.8274*m_attract_timer_period)), 0, attotime::never);
 				}
 			}
 			break;
 		case 1:
-			state->m_money_reg = data;
-			logerror("%s: Money handling register: %02x\n", space->machine().describe_context(), data);
+			m_money_reg = data;
+			logerror("%s: Money handling register: %02x\n", machine().describe_context(), data);
 			break;
 		case 2:
-			logerror("%s: LED & memory protect register: %02x\n", space->machine().describe_context(), data);
+			logerror("%s: LED & memory protect register: %02x\n", machine().describe_context(), data);
 			break;
 		case 3:
-			logerror("%s: 8 bit down counter, for attract mode timing: %02x\n", space->machine().describe_context(), data);
-			state->m_attract_timer_period = data;
-			if ( BIT(state->m_exception_mask,1) && ( data != 0 ) )
+			logerror("%s: 8 bit down counter, for attract mode timing: %02x\n", machine().describe_context(), data);
+			m_attract_timer_period = data;
+			if ( BIT(m_exception_mask,1) && ( data != 0 ) )
 			{
-				state->m_attract_timer->adjust(attotime::from_hz(6.8274/state->m_attract_timer_period), 0, attotime::never);
+				m_attract_timer->adjust(attotime::from_hz(6.8274/m_attract_timer_period), 0, attotime::never);
 			}
 			break;
 		case 4:
-			logerror("%s: bankswitch %x\n", space->machine().describe_context(), data );
-			famicombox_bankswitch(space->machine(), data & 0x3f);
+			logerror("%s: bankswitch %x\n", machine().describe_context(), data );
+			famicombox_bankswitch(machine(), data & 0x3f);
 			break;
 		default:
-			logerror("%s: Unhandled famibox_system_w(%x,%02x)\n", space->machine().describe_context(), offset, data );
+			logerror("%s: Unhandled famibox_system_w(%x,%02x)\n", machine().describe_context(), offset, data );
 	}
 }
 
@@ -372,14 +376,14 @@ static WRITE8_HANDLER( famibox_system_w )
 *******************************************************/
 
 
-static ADDRESS_MAP_START( famibox_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( famibox_map, AS_PROGRAM, 8, famibox_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_MODERN("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
+	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes", nes_psg_r, nes_psg_w)			/* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
+	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE_LEGACY("nes", psg_4015_r, psg_4015_w)			/* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(famibox_IN0_r, famibox_IN0_w)	/* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READ(famibox_IN1_r) AM_DEVWRITE("nes", psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4017, 0x4017) AM_READ(famibox_IN1_r) AM_DEVWRITE_LEGACY("nes", psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(famibox_system_r, famibox_system_w)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("cpubank1")
@@ -392,41 +396,38 @@ ADDRESS_MAP_END
 
 *******************************************************/
 
-static INPUT_CHANGED( famibox_keyswitch_changed )
+INPUT_CHANGED_MEMBER(famibox_state::famibox_keyswitch_changed)
 {
-	famibox_state *state = field.machine().driver_data<famibox_state>();
 
-	if ( BIT(state->m_exception_mask, 3) )
+	if ( BIT(m_exception_mask, 3) )
 	{
-		state->m_exception_cause &= ~0x08;
-		famicombox_reset(field.machine());
+		m_exception_cause &= ~0x08;
+		famicombox_reset(machine());
 	}
 }
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(famibox_state::coin_inserted)
 {
-	famibox_state *state = field.machine().driver_data<famibox_state>();
 
 	if ( newval )
 	{
-		state->m_coins++;
-		if (state->m_attract_timer->start() != attotime::never)
+		m_coins++;
+		if (m_attract_timer->start() != attotime::never)
 		{
-			state->m_gameplay_timer->adjust(attotime::from_seconds(60*(state->m_money_reg == 0x22 ? 20 : 10)), 0, attotime::never);
+			m_gameplay_timer->adjust(attotime::from_seconds(60*(m_money_reg == 0x22 ? 20 : 10)), 0, attotime::never);
 		}
 
-		if ( BIT(state->m_exception_mask,4) && (state->m_coins == 1) )
+		if ( BIT(m_exception_mask,4) && (m_coins == 1) )
 		{
-			state->m_exception_cause &= ~0x10;
-			famicombox_reset(field.machine());
+			m_exception_cause &= ~0x10;
+			famicombox_reset(machine());
 		}
 	}
 }
 
-static CUSTOM_INPUT( famibox_coin_r )
+CUSTOM_INPUT_MEMBER(famibox_state::famibox_coin_r)
 {
-	famibox_state *state = field.machine().driver_data<famibox_state>();
-	return state->m_coins > 0;
+	return m_coins > 0;
 }
 
 static INPUT_PORTS_START( famibox )
@@ -476,17 +477,17 @@ static INPUT_PORTS_START( famibox )
 
 
 	PORT_START("KEYSWITCH")
-	PORT_DIPNAME( 0x3f, 0x01, "Key switch" ) PORT_CHANGED(famibox_keyswitch_changed, 0)
+	PORT_DIPNAME( 0x3f, 0x01, "Key switch" ) PORT_CHANGED_MEMBER(DEVICE_SELF, famibox_state,famibox_keyswitch_changed, 0)
 	PORT_DIPSETTING(    0x01, "Key position 1" )
 	PORT_DIPSETTING(    0x02, "Key position 2" )
 	PORT_DIPSETTING(    0x04, "Key position 3" )
 	PORT_DIPSETTING(    0x08, "Key position 4" )
 	PORT_DIPSETTING(    0x10, "Key position 5" )
 	PORT_DIPSETTING(    0x20, "Key position 6" )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(famibox_coin_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, famibox_state,famibox_coin_r, NULL)
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, famibox_state,coin_inserted, 0)
 
 INPUT_PORTS_END
 
@@ -553,7 +554,7 @@ static MACHINE_START( famibox )
 	state->m_nt_page[2] = state->m_nt_ram + 0x800;
 	state->m_nt_page[3] = state->m_nt_ram + 0xc00;
 
-	machine.device("ppu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x2000, 0x3eff, FUNC(famibox_nt_r), FUNC(famibox_nt_w));
+	machine.device("ppu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(famibox_state::famibox_nt_r), state), write8_delegate(FUNC(famibox_state::famibox_nt_w), state));
 	machine.device("ppu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x1fff, "ppubank1");
 
 	famicombox_bankswitch(machine, 0);

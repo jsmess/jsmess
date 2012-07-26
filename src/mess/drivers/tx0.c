@@ -70,18 +70,18 @@ static DRIVER_INIT( tx0 )
 	};
 
 	/* set up our font */
-	dst = machine.region("gfx1")->base();
+	dst = machine.root_device().memregion("gfx1")->base();
 
 	memcpy(dst, fontdata6x8, tx0_fontdata_size);
 }
 
 
-static ADDRESS_MAP_START(tx0_64kw_map, AS_PROGRAM, 32)
+static ADDRESS_MAP_START(tx0_64kw_map, AS_PROGRAM, 32, tx0_state )
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(tx0_8kw_map, AS_PROGRAM, 32)
+static ADDRESS_MAP_START(tx0_8kw_map, AS_PROGRAM, 32, tx0_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -1471,7 +1471,7 @@ static void tx0_keyboard(running_machine &machine)
 
 	for (i=0; i<4; i++)
 	{
-		typewriter_keys[i] = input_port_read(machine, twrnames[i]);
+		typewriter_keys[i] = machine.root_device().ioport(twrnames[i])->read();
 	}
 
 	for (i=0; i<4; i++)
@@ -1511,7 +1511,7 @@ static INTERRUPT_GEN( tx0_interrupt )
 
 
 	/* read new state of control keys */
-	control_keys = input_port_read(device->machine(), "CSW");
+	control_keys = state->ioport("CSW")->read();
 
 	if (control_keys & tx0_control)
 	{
@@ -1580,7 +1580,7 @@ static INTERRUPT_GEN( tx0_interrupt )
 
 
 		/* handle toggle switch register keys */
-		tsr_keys = (input_port_read(device->machine(), "MSW") << 16) | input_port_read(device->machine(), "LSW");
+		tsr_keys = (device->machine().root_device().ioport("MSW")->read() << 16) | device->machine().root_device().ioport("LSW")->read();
 
 		/* compute transitions */
 		tsr_transitions = tsr_keys & (~ state->m_old_tsr_keys);

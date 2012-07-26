@@ -20,7 +20,6 @@
     - Cassette UART on ports C1 and C3.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -35,13 +34,14 @@ public:
 	argo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu")
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE8_MEMBER(argo_videoram_w);
 	DECLARE_READ8_MEMBER(argo_io_r);
 	DECLARE_WRITE8_MEMBER(argo_io_w);
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	const UINT8 *m_p_chargen;
 	UINT8 m_framecnt;
 	UINT8 m_cursor_pos[3];
@@ -58,9 +58,9 @@ WRITE8_MEMBER(argo_state::argo_videoram_w)
 {
 	UINT8 *RAM;
 	if (m_ram_ctrl)
-		RAM = machine().region("videoram")->base();
+		RAM = memregion("videoram")->base();
 	else
-		RAM = machine().region("extraram")->base();
+		RAM = memregion("extraram")->base();
 
 	RAM[offset] = data;
 }
@@ -74,7 +74,7 @@ READ8_MEMBER(argo_state::argo_io_r)
 	case 0xA1: // keyboard
 		char kbdrow[6];
 		sprintf(kbdrow,"X%X",offset>>8);
-		return input_port_read(machine(), kbdrow);
+		return ioport(kbdrow)->read();
 
 	case 0xE8: // wants bit 4 low then high
 		return m_framecnt << 4;
@@ -103,7 +103,7 @@ WRITE8_MEMBER(argo_state::argo_io_w)
 	case 0xE8: // hardware scroll - we should use ports E0,E1,E2,E3
 		if ((m_scroll_ctrl == 2) & (data == 0xe3))
 		{
-			UINT8 *RAM = machine().region("videoram")->base();
+			UINT8 *RAM = memregion("videoram")->base();
 			m_scroll_ctrl = 0;
 			memcpy(RAM, RAM+80, 24*80);
 		}
@@ -136,7 +136,7 @@ static ADDRESS_MAP_START(argo_mem, AS_PROGRAM, 8, argo_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0xf7af) AM_RAM
-	AM_RANGE(0xf7b0, 0xf7ff) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE(0xf7b0, 0xf7ff) AM_RAM AM_SHARE("p_videoram")
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_WRITE(argo_videoram_w)
 ADDRESS_MAP_END
 
@@ -253,24 +253,26 @@ INPUT_PORTS_END
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( argo_boot )
 {
-	memory_set_bank(machine, "boot", 0);
+	argo_state *state = machine.driver_data<argo_state>();
+	state->membank("boot")->set_entry(0);
 }
 
 MACHINE_RESET_MEMBER(argo_state)
 {
-	memory_set_bank(machine(), "boot", 1);
+	membank("boot")->set_entry(1);
 	machine().scheduler().timer_set(attotime::from_usec(5), FUNC(argo_boot));
 }
 
 DRIVER_INIT( argo )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0xf800);
+	argo_state *state = machine.driver_data<argo_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 }
 
 VIDEO_START_MEMBER( argo_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 SCREEN_UPDATE16_MEMBER( argo_state )
@@ -325,7 +327,7 @@ SCREEN_UPDATE16_MEMBER( argo_state )
 		else
 		{
 			ma=0;
-			p_vram = machine().region("videoram")->base();
+			p_vram = memregion("videoram")->base();
 		}
 	}
 	return 0;

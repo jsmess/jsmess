@@ -3,7 +3,6 @@
 #ifndef __MPZ80__
 #define __MPZ80__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -72,10 +71,10 @@ public:
 	DECLARE_WRITE8_MEMBER( terminal_w );
 	DECLARE_WRITE_LINE_MEMBER( s100_pint_w );
 	DECLARE_WRITE_LINE_MEMBER( s100_nmi_w );
+	DECLARE_DIRECT_UPDATE_MEMBER(mpz80_direct_update_handler);
 
 	// memory state
 	UINT32 m_addr;
-	UINT8 *m_map_ram;
 	UINT8 m_task;
 	UINT8 m_mask;
 
@@ -97,6 +96,7 @@ public:
 	int m_trap_int;
 	int m_trap_stop;
 	int m_trap_aux;
+	UINT8 *m_map_ram;
 };
 
 #endif

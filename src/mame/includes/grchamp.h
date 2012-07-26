@@ -10,7 +10,13 @@ class grchamp_state : public driver_device
 {
 public:
 	grchamp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_radarram(*this, "radarram"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_leftram(*this, "leftram"),
+		m_rightram(*this, "rightram"),
+		m_centerram(*this, "centerram"){ }
 
 	UINT8		m_cpu0_out[16];
 	UINT8		m_cpu1_out[16];
@@ -25,12 +31,12 @@ public:
 	UINT16		m_collide;
 	UINT8		m_collmode;
 
-	UINT8 *		m_radarram;
-	UINT8 *		m_videoram;
-	UINT8 *		m_leftram;
-	UINT8 *		m_centerram;
-	UINT8 *		m_rightram;
-	UINT8 *		m_spriteram;
+	required_shared_ptr<UINT8> m_radarram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_leftram;
+	required_shared_ptr<UINT8> m_rightram;
+	required_shared_ptr<UINT8> m_centerram;
 
 	bitmap_ind16 m_work_bitmap;
 	tilemap_t *	m_text_tilemap;
@@ -39,6 +45,20 @@ public:
 	tilemap_t *	m_right_tilemap;
 
 	rgb_t		m_bgcolor[0x20];
+	DECLARE_WRITE8_MEMBER(cpu0_outputs_w);
+	DECLARE_WRITE8_MEMBER(led_board_w);
+	DECLARE_WRITE8_MEMBER(cpu1_outputs_w);
+	DECLARE_READ8_MEMBER(pc3259_0_r);
+	DECLARE_READ8_MEMBER(pc3259_1_r);
+	DECLARE_READ8_MEMBER(pc3259_2_r);
+	DECLARE_READ8_MEMBER(pc3259_3_r);
+	DECLARE_READ8_MEMBER(sub_to_main_comm_r);
+	DECLARE_WRITE8_MEMBER(main_to_sub_comm_w);
+	DECLARE_READ8_MEMBER(main_to_sub_comm_r);
+	UINT8 get_pc3259_bits(int offs);
+	DECLARE_WRITE8_MEMBER(grchamp_left_w);
+	DECLARE_WRITE8_MEMBER(grchamp_center_w);
+	DECLARE_WRITE8_MEMBER(grchamp_right_w);
 };
 
 /* Discrete Sound Input Nodes */
@@ -61,6 +81,3 @@ DISCRETE_SOUND_EXTERN( grchamp );
 PALETTE_INIT( grchamp );
 VIDEO_START( grchamp );
 SCREEN_UPDATE_RGB32( grchamp );
-WRITE8_HANDLER( grchamp_left_w );
-WRITE8_HANDLER( grchamp_center_w );
-WRITE8_HANDLER( grchamp_right_w );

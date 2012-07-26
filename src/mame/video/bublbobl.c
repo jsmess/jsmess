@@ -32,8 +32,8 @@ SCREEN_UPDATE_IND16( bublbobl )
 
 	sx = 0;
 
-	prom = screen.machine().region("proms")->base();
-	for (offs = 0; offs < state->m_objectram_size; offs += 4)
+	prom = state->memregion("proms")->base();
+	for (offs = 0; offs < state->m_objectram.bytes(); offs += 4)
 	{
 		/* skip empty sprites */
 		/* this is dword aligned so the UINT32 * cast shouldn't give problems */
@@ -73,7 +73,7 @@ SCREEN_UPDATE_IND16( bublbobl )
 				x = sx + xc * 8;
 				y = (sy + yc * 8) & 0xff;
 
-				if (flip_screen_get(screen.machine()))
+				if (state->flip_screen())
 				{
 					x = 248 - x;
 					y = 248 - y;

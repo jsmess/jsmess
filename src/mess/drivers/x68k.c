@@ -452,7 +452,7 @@ static void x68k_keyboard_push_scancode(running_machine &machine,unsigned char c
 		{
 			state->m_mfp.rsr |= 0x80;  // Buffer full
 //          mfp_trigger_irq(MFP_IRQ_RX_FULL);
-			if(input_port_read(machine,"options") & 0x01)
+			if(machine.root_device().ioport("options")->read() & 0x01)
 			{
 				state->m_current_vector[6] = 0x4c;
 				cputag_set_input_line_and_vector(machine, "maincpu",6,ASSERT_LINE,0x4c);
@@ -483,7 +483,7 @@ static TIMER_CALLBACK(x68k_keyboard_poll)
 		{
 			state->m_keyboard.keytime[x] -= 5;
 		}
-		if(!(input_port_read(machine, keynames[x / 32]) & (1 << (x % 32))))
+		if(!(machine.root_device().ioport(keynames[x / 32])->read() & (1 << (x % 32))))
 		{
 			if(state->m_keyboard.keyon[x] != 0)
 			{
@@ -497,14 +497,14 @@ static TIMER_CALLBACK(x68k_keyboard_poll)
 		// check to see if a key is being held
 		if(state->m_keyboard.keyon[x] != 0 && state->m_keyboard.keytime[x] == 0 && state->m_keyboard.last_pressed == x)
 		{
-			if(input_port_read(machine, keynames[state->m_keyboard.last_pressed / 32]) & (1 << (state->m_keyboard.last_pressed % 32)))
+			if(machine.root_device().ioport(keynames[state->m_keyboard.last_pressed / 32])->read() & (1 << (state->m_keyboard.last_pressed % 32)))
 			{
 				x68k_keyboard_push_scancode(machine,state->m_keyboard.last_pressed);
 				state->m_keyboard.keytime[state->m_keyboard.last_pressed] = (state->m_keyboard.repeat^2)*5+30;
 				logerror("KB: Holding key 0x%02x\n",state->m_keyboard.last_pressed);
 			}
 		}
-		if((input_port_read(machine,  keynames[x / 32]) & (1 << (x % 32))))
+		if((machine.root_device().ioport(keynames[x / 32])->read() & (1 << (x % 32))))
 		{
 			if(state->m_keyboard.keyon[x] == 0)
 			{
@@ -548,15 +548,15 @@ static int x68k_read_mouse(running_machine &machine)
 	switch(state->m_mouse.inputtype)
 	{
 	case 0:
-		ipt = input_port_read(machine, "mouse1");
+		ipt = machine.root_device().ioport("mouse1")->read();
 		break;
 	case 1:
-		val = input_port_read(machine, "mouse2");
+		val = machine.root_device().ioport("mouse2")->read();
 		ipt = val - state->m_mouse.last_mouse_x;
 		state->m_mouse.last_mouse_x = val;
 		break;
 	case 2:
-		val = input_port_read(machine, "mouse3");
+		val = machine.root_device().ioport("mouse3")->read();
 		ipt = val - state->m_mouse.last_mouse_y;
 		state->m_mouse.last_mouse_y = val;
 		break;
@@ -697,8 +697,8 @@ static UINT8 md_3button_r(device_t* device, int port)
 	x68k_state *state = device->machine().driver_data<x68k_state>();
 	if(port == 1)
 	{
-		UINT8 porta = input_port_read(device->machine(),"md3b") & 0xff;
-		UINT8 portb = (input_port_read(device->machine(),"md3b") >> 8) & 0xff;
+		UINT8 porta = device->machine().root_device().ioport("md3b")->read() & 0xff;
+		UINT8 portb = (state->ioport("md3b")->read() >> 8) & 0xff;
 		if(state->m_mdctrl.mux1 & 0x10)
 		{
 			return porta | 0x90;
@@ -710,8 +710,8 @@ static UINT8 md_3button_r(device_t* device, int port)
 	}
 	if(port == 2)
 	{
-		UINT8 porta = (input_port_read(device->machine(),"md3b") >> 16) & 0xff;
-		UINT8 portb = (input_port_read(device->machine(),"md3b") >> 24) & 0xff;
+		UINT8 porta = (device->machine().root_device().ioport("md3b")->read() >> 16) & 0xff;
+		UINT8 portb = (device->machine().root_device().ioport("md3b")->read() >> 24) & 0xff;
 		if(state->m_mdctrl.mux2 & 0x20)
 		{
 			return porta | 0x90;
@@ -749,9 +749,9 @@ static UINT8 md_6button_r(device_t* device, int port)
 	x68k_state *state = device->machine().driver_data<x68k_state>();
 	if(port == 1)
 	{
-		UINT8 porta = input_port_read(device->machine(),"md6b") & 0xff;
-		UINT8 portb = (input_port_read(device->machine(),"md6b") >> 8) & 0xff;
-		UINT8 extra = input_port_read(device->machine(),"md6b_extra") & 0x0f;
+		UINT8 porta = device->machine().root_device().ioport("md6b")->read() & 0xff;
+		UINT8 portb = (device->machine().root_device().ioport("md6b")->read() >> 8) & 0xff;
+		UINT8 extra = state->ioport("md6b_extra")->read() & 0x0f;
 
 		switch(state->m_mdctrl.seq1)
 		{
@@ -787,9 +787,9 @@ static UINT8 md_6button_r(device_t* device, int port)
 	}
 	if(port == 2)
 	{
-		UINT8 porta = (input_port_read(device->machine(),"md6b") >> 16) & 0xff;
-		UINT8 portb = (input_port_read(device->machine(),"md6b") >> 24) & 0xff;
-		UINT8 extra = (input_port_read(device->machine(),"md6b_extra") >> 4) & 0x0f;
+		UINT8 porta = (device->machine().root_device().ioport("md6b")->read() >> 16) & 0xff;
+		UINT8 portb = (device->machine().root_device().ioport("md6b")->read() >> 24) & 0xff;
+		UINT8 extra = (device->machine().root_device().ioport("md6b_extra")->read() >> 4) & 0x0f;
 
 		switch(state->m_mdctrl.seq2)
 		{
@@ -838,8 +838,8 @@ static UINT8 xpd1lr_r(device_t* device, int port)
 	x68k_state *state = device->machine().driver_data<x68k_state>();
 	if(port == 1)
 	{
-		UINT8 porta = input_port_read(device->machine(),"xpd1lr") & 0xff;
-		UINT8 portb = (input_port_read(device->machine(),"xpd1lr") >> 8) & 0xff;
+		UINT8 porta = device->machine().root_device().ioport("xpd1lr")->read() & 0xff;
+		UINT8 portb = (state->ioport("xpd1lr")->read() >> 8) & 0xff;
 		if(state->m_mdctrl.mux1 & 0x10)
 		{
 			return porta;
@@ -851,8 +851,8 @@ static UINT8 xpd1lr_r(device_t* device, int port)
 	}
 	if(port == 2)
 	{
-		UINT8 porta = (input_port_read(device->machine(),"xpd1lr") >> 16) & 0xff;
-		UINT8 portb = (input_port_read(device->machine(),"xpd1lr") >> 24) & 0xff;
+		UINT8 porta = (device->machine().root_device().ioport("xpd1lr")->read() >> 16) & 0xff;
+		UINT8 portb = (device->machine().root_device().ioport("xpd1lr")->read() >> 24) & 0xff;
 		if(state->m_mdctrl.mux2 & 0x20)
 		{
 			return porta;
@@ -869,13 +869,13 @@ static UINT8 xpd1lr_r(device_t* device, int port)
 static READ8_DEVICE_HANDLER( ppi_port_a_r )
 {
 	x68k_state *state = device->machine().driver_data<x68k_state>();
-	int ctrl = input_port_read(device->machine(),"ctrltype") & 0x0f;
+	int ctrl = device->machine().root_device().ioport("ctrltype")->read() & 0x0f;
 
 	switch(ctrl)
 	{
 		case 0x00:  // standard MSX/FM-Towns joystick
 			if(state->m_joy.joy1_enable == 0)
-				return input_port_read(device->machine(), "joy1");
+				return state->ioport("joy1")->read();
 			else
 				return 0xff;
 		case 0x01:  // 3-button Megadrive gamepad
@@ -892,13 +892,13 @@ static READ8_DEVICE_HANDLER( ppi_port_a_r )
 static READ8_DEVICE_HANDLER( ppi_port_b_r )
 {
 	x68k_state *state = device->machine().driver_data<x68k_state>();
-	int ctrl = input_port_read(device->machine(),"ctrltype") & 0xf0;
+	int ctrl = device->machine().root_device().ioport("ctrltype")->read() & 0xf0;
 
 	switch(ctrl)
 	{
 		case 0x00:  // standard MSX/FM-Towns joystick
 			if(state->m_joy.joy2_enable == 0)
-				return input_port_read(device->machine(), "joy2");
+				return state->ioport("joy2")->read();
 			else
 				return 0xff;
 		case 0x10:  // 3-button Megadrive gamepad
@@ -1544,7 +1544,7 @@ static WRITE16_HANDLER( x68k_sram_w )
 
 	if(state->m_sysport.sram_writeprotect == 0x31)
 	{
-		COMBINE_DATA(state->m_nvram + offset);
+		COMBINE_DATA(state->m_nvram16 + offset);
 	}
 }
 
@@ -1564,7 +1564,7 @@ static READ16_HANDLER( x68k_sram_r )
 	if(offset == 0x70/2)
 		return 0x0700;
 #endif
-	return state->m_nvram[offset];
+	return state->m_nvram16[offset];
 }
 
 static READ32_HANDLER( x68k_sram32_r )
@@ -1580,7 +1580,7 @@ static READ32_HANDLER( x68k_sram32_r )
 	if(offset == 0x70/2)
 		return 0x0700;
 #endif
-	return state->m_nvram[offset];
+	return state->m_nvram32[offset];
 }
 
 static WRITE32_HANDLER( x68k_sram32_w )
@@ -1588,7 +1588,7 @@ static WRITE32_HANDLER( x68k_sram32_w )
 	x68k_state *state = space->machine().driver_data<x68k_state>();
 	if(state->m_sysport.sram_writeprotect == 0x31)
 	{
-		COMBINE_DATA(state->m_nvram + offset);
+		COMBINE_DATA(state->m_nvram32 + offset);
 	}
 }
 
@@ -1715,7 +1715,7 @@ static READ16_HANDLER( x68k_rom0_r )
 	state->m_current_vector[2] = 0x02;  // bus error
 	state->m_current_irq_line = 2;
 //  cputag_set_input_line_and_vector(space->machine(), "maincpu",2,ASSERT_LINE,state->m_current_vector[2]);
-	if(input_port_read(space->machine(), "options") & 0x02)
+	if(state->ioport("options")->read() & 0x02)
 	{
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
@@ -1733,7 +1733,7 @@ static WRITE16_HANDLER( x68k_rom0_w )
 	state->m_current_vector[2] = 0x02;  // bus error
 	state->m_current_irq_line = 2;
 //  cputag_set_input_line_and_vector(space->machine(), "maincpu",2,ASSERT_LINE,state->m_current_vector[2]);
-	if(input_port_read(space->machine(), "options") & 0x02)
+	if(state->ioport("options")->read() & 0x02)
 	{
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
@@ -1750,7 +1750,7 @@ static READ16_HANDLER( x68k_emptyram_r )
 	state->m_current_vector[2] = 0x02;  // bus error
 	state->m_current_irq_line = 2;
 //  cputag_set_input_line_and_vector(space->machine(), "maincpu",2,ASSERT_LINE,state->m_current_vector[2]);
-	if(input_port_read(space->machine(), "options") & 0x02)
+	if(state->ioport("options")->read() & 0x02)
 	{
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
@@ -1768,7 +1768,7 @@ static WRITE16_HANDLER( x68k_emptyram_w )
 	state->m_current_vector[2] = 0x02;  // bus error
 	state->m_current_irq_line = 2;
 //  cputag_set_input_line_and_vector(space->machine(), "maincpu",2,ASSERT_LINE,state->m_current_vector[2]);
-	if(input_port_read(space->machine(), "options") & 0x02)
+	if(state->ioport("options")->read() & 0x02)
 	{
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
@@ -1781,7 +1781,7 @@ static READ16_HANDLER( x68k_exp_r )
 {
 	x68k_state *state = space->machine().driver_data<x68k_state>();
 	/* These are expansion devices, if not present, they cause a bus error */
-	if(input_port_read(space->machine(), "options") & 0x02)
+	if(state->ioport("options")->read() & 0x02)
 	{
 		state->m_current_vector[2] = 0x02;  // bus error
 		state->m_current_irq_line = 2;
@@ -1798,7 +1798,7 @@ static WRITE16_HANDLER( x68k_exp_w )
 {
 	x68k_state *state = space->machine().driver_data<x68k_state>();
 	/* These are expansion devices, if not present, they cause a bus error */
-	if(input_port_read(space->machine(), "options") & 0x02)
+	if(state->ioport("options")->read() & 0x02)
 	{
 		state->m_current_vector[2] = 0x02;  // bus error
 		state->m_current_irq_line = 2;
@@ -1960,113 +1960,113 @@ static WRITE_LINE_DEVICE_HANDLER( x68k_scsi_drq )
 	// TODO
 }
 
-static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(x68k_map, AS_PROGRAM, 16, x68k_state )
 //  AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
-	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
-//  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE_MEMBER(x68k_state, m_gvram)
-//  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w) AM_BASE_MEMBER(x68k_state, m_tvram)
-	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2")
-	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3")
-	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE(x68k_crtc_r, x68k_crtc_w)
-	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE(x68k_vid_r, x68k_vid_w)
-	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE(x68k_dmac_r, x68k_dmac_w)
-	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
-	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE(x68k_mfp_r, x68k_mfp_w)
-	AM_RANGE(0xe8a000, 0xe8bfff) AM_READWRITE(x68k_rtc_r, x68k_rtc_w)
-//  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
-	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
-	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE(x68k_fm_r, x68k_fm_w)
-	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8("okim6258", okim6258_status_r, okim6258_ctrl_w, 0x00ff)
-	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_status_r, okim6258_data_w, 0x00ff)
-	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
-	AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE_MODERN("x68k_hdc", x68k_hdc_image_device, hdc_r, hdc_w)
-	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)
-	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE(x68k_ppi_r, x68k_ppi_w)
-	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE(x68k_ioc_r, x68k_ioc_w)
-	AM_RANGE(0xea0000, 0xea1fff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // external SCSI ROM and controller
-	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE(x68k_exp_r, x68k_exp_w)
-	AM_RANGE(0xeafa80, 0xeafa89) AM_READWRITE(x68k_areaset_r, x68k_enh_areaset_w)
-	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE(x68k_spritereg_r, x68k_spritereg_w)
-	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE(x68k_spriteram_r, x68k_spriteram_w)
-	AM_RANGE(0xece000, 0xece3ff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // User I/O
-//  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(sram_r, sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram")
+	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE_LEGACY(x68k_rom0_r, x68k_rom0_w)
+//  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(x68k_gvram_r, x68k_gvram_w) AM_SHARE("gvram")
+//  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE_LEGACY(x68k_tvram_r, x68k_tvram_w) AM_SHARE("tvram")
+	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2") AM_SHARE("gvram16")
+	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3") AM_SHARE("tvram16")
+	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE_LEGACY(x68k_crtc_r, x68k_crtc_w)
+	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE_LEGACY(x68k_vid_r, x68k_vid_w)
+	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE_LEGACY(x68k_dmac_r, x68k_dmac_w)
+	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE_LEGACY(x68k_areaset_r, x68k_areaset_w)
+	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE_LEGACY(x68k_mfp_r, x68k_mfp_w)
+	AM_RANGE(0xe8a000, 0xe8bfff) AM_READWRITE_LEGACY(x68k_rtc_r, x68k_rtc_w)
+//  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE_LEGACY(x68k_printer_r, x68k_printer_w)
+	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE_LEGACY(x68k_sysport_r, x68k_sysport_w)
+	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE_LEGACY(x68k_fm_r, x68k_fm_w)
+	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8_LEGACY("okim6258", okim6258_status_r, okim6258_ctrl_w, 0x00ff)
+	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8_LEGACY("okim6258", okim6258_status_r, okim6258_data_w, 0x00ff)
+	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE_LEGACY(x68k_fdc_r, x68k_fdc_w)
+	AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE("x68k_hdc", x68k_hdc_image_device, hdc_r, hdc_w)
+	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE_LEGACY(x68k_scc_r, x68k_scc_w)
+	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE_LEGACY(x68k_ppi_r, x68k_ppi_w)
+	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE_LEGACY(x68k_ioc_r, x68k_ioc_w)
+	AM_RANGE(0xea0000, 0xea1fff) AM_READWRITE_LEGACY(x68k_exp_r, x68k_exp_w)  // external SCSI ROM and controller
+	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE_LEGACY(x68k_exp_r, x68k_exp_w)
+	AM_RANGE(0xeafa80, 0xeafa89) AM_READWRITE_LEGACY(x68k_areaset_r, x68k_enh_areaset_w)
+	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE_LEGACY(x68k_spritereg_r, x68k_spritereg_w)
+	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE_LEGACY(x68k_spriteram_r, x68k_spriteram_w)
+	AM_RANGE(0xece000, 0xece3ff) AM_READWRITE_LEGACY(x68k_exp_r, x68k_exp_w)  // User I/O
+//  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE_LEGACY(sram_r, sram_w) AM_BASE_LEGACY(&generic_nvram16) AM_SIZE_LEGACY(&generic_nvram_size)
+	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram16")
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
-	AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // internal SCSI ROM
+	AM_RANGE(0xfc0000, 0xfdffff) AM_READWRITE_LEGACY(x68k_exp_r, x68k_exp_w)  // internal SCSI ROM
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16)
+static ADDRESS_MAP_START(x68kxvi_map, AS_PROGRAM, 16, x68k_state )
 //  AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
-	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE(x68k_rom0_r, x68k_rom0_w)
-//  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE_MEMBER(x68k_state, m_gvram)
-//  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w) AM_BASE_MEMBER(x68k_state, m_tvram)
-	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2")
-	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3")
-	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE(x68k_crtc_r, x68k_crtc_w)
-	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE(x68k_vid_r, x68k_vid_w)
-	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE(x68k_dmac_r, x68k_dmac_w)
-	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE(x68k_areaset_r, x68k_areaset_w)
-	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE(x68k_mfp_r, x68k_mfp_w)
-	AM_RANGE(0xe8a000, 0xe8bfff) AM_READWRITE(x68k_rtc_r, x68k_rtc_w)
-//  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
-	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE(x68k_sysport_r, x68k_sysport_w)
-	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE(x68k_fm_r, x68k_fm_w)
-	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8("okim6258", okim6258_status_r, okim6258_ctrl_w, 0x00ff)
-	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_status_r, okim6258_data_w, 0x00ff)
-	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE(x68k_fdc_r, x68k_fdc_w)
-//  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE("x68k_hdc",x68k_hdc_r, x68k_hdc_w)
-	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8_MODERN("mb89352_int",mb89352_device,mb89352_r,mb89352_w,0x00ff)
-	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE(x68k_scc_r, x68k_scc_w)
-	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE(x68k_ppi_r, x68k_ppi_w)
-	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE(x68k_ioc_r, x68k_ioc_w)
-	AM_RANGE(0xea0000, 0xea1fff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // external SCSI ROM and controller
-	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE(x68k_exp_r, x68k_exp_w)
-	AM_RANGE(0xeafa80, 0xeafa89) AM_READWRITE(x68k_areaset_r, x68k_enh_areaset_w)
-	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE(x68k_spritereg_r, x68k_spritereg_w)
-	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE(x68k_spriteram_r, x68k_spriteram_w)
-	AM_RANGE(0xece000, 0xece3ff) AM_READWRITE(x68k_exp_r, x68k_exp_w)  // User I/O
-//  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(sram_r, sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram")
+	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE_LEGACY(x68k_rom0_r, x68k_rom0_w)
+//  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(x68k_gvram_r, x68k_gvram_w) AM_SHARE("gvram")
+//  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE_LEGACY(x68k_tvram_r, x68k_tvram_w) AM_SHARE("tvram")
+	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2") AM_SHARE("gvram16")
+	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3") AM_SHARE("tvram16")
+	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE_LEGACY(x68k_crtc_r, x68k_crtc_w)
+	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE_LEGACY(x68k_vid_r, x68k_vid_w)
+	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE_LEGACY(x68k_dmac_r, x68k_dmac_w)
+	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE_LEGACY(x68k_areaset_r, x68k_areaset_w)
+	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE_LEGACY(x68k_mfp_r, x68k_mfp_w)
+	AM_RANGE(0xe8a000, 0xe8bfff) AM_READWRITE_LEGACY(x68k_rtc_r, x68k_rtc_w)
+//  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE_LEGACY(x68k_printer_r, x68k_printer_w)
+	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE_LEGACY(x68k_sysport_r, x68k_sysport_w)
+	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE_LEGACY(x68k_fm_r, x68k_fm_w)
+	AM_RANGE(0xe92000, 0xe92001) AM_DEVREADWRITE8_LEGACY("okim6258", okim6258_status_r, okim6258_ctrl_w, 0x00ff)
+	AM_RANGE(0xe92002, 0xe92003) AM_DEVREADWRITE8_LEGACY("okim6258", okim6258_status_r, okim6258_data_w, 0x00ff)
+	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE_LEGACY(x68k_fdc_r, x68k_fdc_w)
+//  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE_LEGACY("x68k_hdc",x68k_hdc_r, x68k_hdc_w)
+	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8("mb89352_int",mb89352_device,mb89352_r,mb89352_w,0x00ff)
+	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE_LEGACY(x68k_scc_r, x68k_scc_w)
+	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE_LEGACY(x68k_ppi_r, x68k_ppi_w)
+	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE_LEGACY(x68k_ioc_r, x68k_ioc_w)
+	AM_RANGE(0xea0000, 0xea1fff) AM_READWRITE_LEGACY(x68k_exp_r, x68k_exp_w)  // external SCSI ROM and controller
+	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE_LEGACY(x68k_exp_r, x68k_exp_w)
+	AM_RANGE(0xeafa80, 0xeafa89) AM_READWRITE_LEGACY(x68k_areaset_r, x68k_enh_areaset_w)
+	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE_LEGACY(x68k_spritereg_r, x68k_spritereg_w)
+	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE_LEGACY(x68k_spriteram_r, x68k_spriteram_w)
+	AM_RANGE(0xece000, 0xece3ff) AM_READWRITE_LEGACY(x68k_exp_r, x68k_exp_w)  // User I/O
+//  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE_LEGACY(sram_r, sram_w) AM_BASE_LEGACY(&generic_nvram16) AM_SIZE_LEGACY(&generic_nvram_size)
+	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram16")
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfdffff) AM_ROM  // internal SCSI ROM
 	AM_RANGE(0xfe0000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32)
+static ADDRESS_MAP_START(x68030_map, AS_PROGRAM, 32, x68k_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x00ffffff)  // Still only has 24-bit address space
 //  AM_RANGE(0x000000, 0xbfffff) AM_RAMBANK(1)
-	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE16(x68k_rom0_r, x68k_rom0_w,0xffffffff)
-//  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(x68k_gvram_r, x68k_gvram_w) AM_BASE_MEMBER(x68k_state, m_gvram)
-//  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE(x68k_tvram_r, x68k_tvram_w) AM_BASE_MEMBER(x68k_state, m_tvram)
-	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2")
-	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3")
-	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE16(x68k_crtc_r, x68k_crtc_w,0xffffffff)
-	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE16(x68k_vid_r, x68k_vid_w,0xffffffff)
-	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE16(x68k_dmac_r, x68k_dmac_w,0xffffffff)
-	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE16(x68k_areaset_r, x68k_areaset_w,0xffffffff)
-	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE16(x68k_mfp_r, x68k_mfp_w,0xffffffff)
-	AM_RANGE(0xe8a000, 0xe8bfff) AM_READWRITE16(x68k_rtc_r, x68k_rtc_w,0xffffffff)
-//  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE(x68k_printer_r, x68k_printer_w)
-	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE16(x68k_sysport_r, x68k_sysport_w,0xffffffff)
-	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE16(x68k_fm_r, x68k_fm_w,0xffffffff)
-	AM_RANGE(0xe92000, 0xe92003) AM_DEVREADWRITE8("okim6258", okim6258_status_r, x68030_adpcm_w, 0x00ff00ff)
-	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE16(x68k_fdc_r, x68k_fdc_w,0xffffffff)
-//  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE16("x68k_hdc",x68k_hdc_r, x68k_hdc_w,0xffffffff)
-	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8_MODERN("mb89352_int",mb89352_device,mb89352_r,mb89352_w,0x00ff00ff)
-	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE16(x68k_scc_r, x68k_scc_w,0xffffffff)
-	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE16(x68k_ppi_r, x68k_ppi_w,0xffffffff)
-	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE16(x68k_ioc_r, x68k_ioc_w,0xffffffff)
-	AM_RANGE(0xea0000, 0xea1fff) AM_NOP//AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)  // external SCSI ROM and controller
-	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)
-	AM_RANGE(0xeafa80, 0xeafa8b) AM_READWRITE16(x68k_areaset_r, x68k_enh_areaset_w,0xffffffff)
-	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE16(x68k_spritereg_r, x68k_spritereg_w,0xffffffff)
-	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE16(x68k_spriteram_r, x68k_spriteram_w,0xffffffff)
-	AM_RANGE(0xece000, 0xece3ff) AM_READWRITE16(x68k_exp_r, x68k_exp_w,0xffffffff)  // User I/O
-//  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE(sram_r, sram_w) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram")
+	AM_RANGE(0xbffffc, 0xbfffff) AM_READWRITE16_LEGACY(x68k_rom0_r, x68k_rom0_w,0xffffffff)
+//  AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(x68k_gvram_r, x68k_gvram_w) AM_SHARE("gvram")
+//  AM_RANGE(0xe00000, 0xe7ffff) AM_READWRITE_LEGACY(x68k_tvram_r, x68k_tvram_w) AM_SHARE("tvram")
+	AM_RANGE(0xc00000, 0xdfffff) AM_RAMBANK("bank2") AM_SHARE("gvram32")
+	AM_RANGE(0xe00000, 0xe7ffff) AM_RAMBANK("bank3") AM_SHARE("tvram32")
+	AM_RANGE(0xe80000, 0xe81fff) AM_READWRITE16_LEGACY(x68k_crtc_r, x68k_crtc_w,0xffffffff)
+	AM_RANGE(0xe82000, 0xe83fff) AM_READWRITE16_LEGACY(x68k_vid_r, x68k_vid_w,0xffffffff)
+	AM_RANGE(0xe84000, 0xe85fff) AM_READWRITE16_LEGACY(x68k_dmac_r, x68k_dmac_w,0xffffffff)
+	AM_RANGE(0xe86000, 0xe87fff) AM_READWRITE16_LEGACY(x68k_areaset_r, x68k_areaset_w,0xffffffff)
+	AM_RANGE(0xe88000, 0xe89fff) AM_READWRITE16_LEGACY(x68k_mfp_r, x68k_mfp_w,0xffffffff)
+	AM_RANGE(0xe8a000, 0xe8bfff) AM_READWRITE16_LEGACY(x68k_rtc_r, x68k_rtc_w,0xffffffff)
+//  AM_RANGE(0xe8c000, 0xe8dfff) AM_READWRITE_LEGACY(x68k_printer_r, x68k_printer_w)
+	AM_RANGE(0xe8e000, 0xe8ffff) AM_READWRITE16_LEGACY(x68k_sysport_r, x68k_sysport_w,0xffffffff)
+	AM_RANGE(0xe90000, 0xe91fff) AM_READWRITE16_LEGACY(x68k_fm_r, x68k_fm_w,0xffffffff)
+	AM_RANGE(0xe92000, 0xe92003) AM_DEVREADWRITE8_LEGACY("okim6258", okim6258_status_r, x68030_adpcm_w, 0x00ff00ff)
+	AM_RANGE(0xe94000, 0xe95fff) AM_READWRITE16_LEGACY(x68k_fdc_r, x68k_fdc_w,0xffffffff)
+//  AM_RANGE(0xe96000, 0xe9601f) AM_DEVREADWRITE16_LEGACY("x68k_hdc",x68k_hdc_r, x68k_hdc_w,0xffffffff)
+	AM_RANGE(0xe96020, 0xe9603f) AM_DEVREADWRITE8("mb89352_int",mb89352_device,mb89352_r,mb89352_w,0x00ff00ff)
+	AM_RANGE(0xe98000, 0xe99fff) AM_READWRITE16_LEGACY(x68k_scc_r, x68k_scc_w,0xffffffff)
+	AM_RANGE(0xe9a000, 0xe9bfff) AM_READWRITE16_LEGACY(x68k_ppi_r, x68k_ppi_w,0xffffffff)
+	AM_RANGE(0xe9c000, 0xe9dfff) AM_READWRITE16_LEGACY(x68k_ioc_r, x68k_ioc_w,0xffffffff)
+	AM_RANGE(0xea0000, 0xea1fff) AM_NOP//AM_READWRITE16_LEGACY(x68k_exp_r, x68k_exp_w,0xffffffff)  // external SCSI ROM and controller
+	AM_RANGE(0xeafa00, 0xeafa1f) AM_READWRITE16_LEGACY(x68k_exp_r, x68k_exp_w,0xffffffff)
+	AM_RANGE(0xeafa80, 0xeafa8b) AM_READWRITE16_LEGACY(x68k_areaset_r, x68k_enh_areaset_w,0xffffffff)
+	AM_RANGE(0xeb0000, 0xeb7fff) AM_READWRITE16_LEGACY(x68k_spritereg_r, x68k_spritereg_w,0xffffffff)
+	AM_RANGE(0xeb8000, 0xebffff) AM_READWRITE16_LEGACY(x68k_spriteram_r, x68k_spriteram_w,0xffffffff)
+	AM_RANGE(0xece000, 0xece3ff) AM_READWRITE16_LEGACY(x68k_exp_r, x68k_exp_w,0xffffffff)  // User I/O
+//  AM_RANGE(0xed0000, 0xed3fff) AM_READWRITE_LEGACY(sram_r, sram_w) AM_BASE_LEGACY(&generic_nvram16) AM_SIZE_LEGACY(&generic_nvram_size)
+	AM_RANGE(0xed0000, 0xed3fff) AM_RAMBANK("bank4") AM_SHARE("nvram32")
 	AM_RANGE(0xed4000, 0xefffff) AM_NOP
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM
 	AM_RANGE(0xfc0000, 0xfdffff) AM_ROM  // internal SCSI ROM
@@ -2131,8 +2131,8 @@ static const upd765_interface fdc_interface =
 
 static const ym2151_interface x68k_ym2151_interface =
 {
-	x68k_fm_irq,
-	x68k_ct_w  // CT1, CT2 from YM2151 port 0x1b
+	DEVCB_LINE(x68k_fm_irq),
+	DEVCB_HANDLER(x68k_ct_w)  // CT1, CT2 from YM2151 port 0x1b
 };
 
 static const okim6258_interface x68k_okim6258_interface =
@@ -2163,24 +2163,24 @@ static INPUT_PORTS_START( x68000 )
 // TODO: Sharp Cyber Stick (CZ-8NJ2) support
 
 	PORT_START( "joy1" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CODE(JOYCODE_Y_UP_SWITCH)	 PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)	 PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CODE(JOYCODE_X_LEFT_SWITCH)	 PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)	 PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(JOYCODE_BUTTON1)	 PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(JOYCODE_BUTTON2)	 PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CODE(JOYCODE_Y_UP_SWITCH)	 PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)	 PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CODE(JOYCODE_X_LEFT_SWITCH)	 PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)	 PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(JOYCODE_BUTTON1)	 PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(JOYCODE_BUTTON2)	 PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x00)
 
 	PORT_START( "joy2" )
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CODE(JOYCODE_Y_UP_SWITCH)	 PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)	 PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CODE(JOYCODE_X_LEFT_SWITCH)	 PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)	 PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(JOYCODE_BUTTON1)	 PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(JOYCODE_BUTTON2)	 PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_CODE(JOYCODE_Y_UP_SWITCH)	 PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_CODE(JOYCODE_Y_DOWN_SWITCH)	 PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_CODE(JOYCODE_X_LEFT_SWITCH)	 PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)	 PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(JOYCODE_BUTTON1)	 PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(JOYCODE_BUTTON2)	 PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x00)
 
 	PORT_START( "key1" )
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_UNUSED) // unused
@@ -2329,129 +2329,129 @@ static INPUT_PORTS_START( x68000 )
 
 	// 3-button Megadrive gamepad
 	PORT_START("md3b")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("MD Pad 1 Up") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("MD Pad 1 Down") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("MD Pad 1 Left") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("MD Pad 1 Right") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 B Button") PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 C Button") PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("MD Pad 1 Up") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("MD Pad 1 Down") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("MD Pad 1 Left") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("MD Pad 1 Right") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 B Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 C Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
 
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 A Button") PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Start Button") PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x01)
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 A Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Start Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x01)
 
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("MD Pad 2 Up") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("MD Pad 2 Down") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("MD Pad 2 Left") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("MD Pad 2 Right") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 B Button") PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 C Button") PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("MD Pad 2 Up") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("MD Pad 2 Down") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("MD Pad 2 Left") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("MD Pad 2 Right") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 B Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 C Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
 
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 A Button") PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Start Button") PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x10)
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 A Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Start Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x10)
 
 	// 6-button Megadrive gamepad
 	PORT_START("md6b")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("MD Pad 1 Up") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("MD Pad 1 Down") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("MD Pad 1 Left") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("MD Pad 1 Right") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 B Button") PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 C Button") PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("MD Pad 1 Up") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("MD Pad 1 Down") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("MD Pad 1 Left") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("MD Pad 1 Right") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 B Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 C Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
 
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 A Button") PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Start Button") PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 A Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Start Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
 
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("MD Pad 2 Up") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("MD Pad 2 Down") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("MD Pad 2 Left") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("MD Pad 2 Right") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 B Button") PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 C Button") PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("MD Pad 2 Up") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("MD Pad 2 Down") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("MD Pad 2 Left") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_NAME("MD Pad 2 Right") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 B Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 C Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
 
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 A Button") PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Start Button") PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 A Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_START ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Start Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
 
 	// extra inputs
 	PORT_START("md6b_extra")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Z Button") PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Y Button") PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 X Button") PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Mode Button") PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x02)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Z Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Y Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 X Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME("MD Pad 1 Mode Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x02)
 
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Z Button") PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Y Button") PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 X Button") PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Mode Button") PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x20)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Z Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Y Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 X Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_NAME("MD Pad 2 Mode Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x20)
 
 	// Dempa/Micomsoft XPD-1LR (dual D-pad gamepad sold with Libble Rabble)
 	PORT_START("xpd1lr")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_NAME("XPD Pad 1 Left/Up") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x03)
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_NAME("XPD Pad 1 Left/Down") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x03)
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_NAME("XPD Pad 1 Left/Left") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x03)
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_NAME("XPD Pad 1 Left/Right") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x03)
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x03)
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("XPD Pad 1 B Button") PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x03)
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("XPD Pad 1 A Button") PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x03)
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x03)
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_NAME("XPD Pad 1 Left/Up") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_NAME("XPD Pad 1 Left/Down") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_NAME("XPD Pad 1 Left/Left") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_NAME("XPD Pad 1 Left/Right") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("XPD Pad 1 B Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("XPD Pad 1 A Button") PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
 
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_NAME("XPD Pad 1 Right/Up") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x03)
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_NAME("XPD Pad 1 Right/Down") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x03)
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_NAME("XPD Pad 1 Right/Left") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x03)
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_NAME("XPD Pad 1 Right/Right") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x03)
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x03)
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x03)
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x03)
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, PORTCOND_EQUALS, 0x03)
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_NAME("XPD Pad 1 Right/Up") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_NAME("XPD Pad 1 Right/Down") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_NAME("XPD Pad 1 Right/Left") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_NAME("XPD Pad 1 Right/Right") PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0x0f, EQUALS, 0x03)
 
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_NAME("XPD Pad 2 Left/Up") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x30)
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_NAME("XPD Pad 2 Left/Down") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x30)
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_NAME("XPD Pad 2 Left/Left") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x30)
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_NAME("XPD Pad 2 Left/Right") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x30)
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x30)
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("XPD Pad 2 B Button") PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x30)
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("XPD Pad 2 A Button") PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x30)
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x30)
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_NAME("XPD Pad 2 Left/Up") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_NAME("XPD Pad 2 Left/Down") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_NAME("XPD Pad 2 Left/Left") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_NAME("XPD Pad 2 Left/Right") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("XPD Pad 2 B Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("XPD Pad 2 A Button") PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
 
-	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_NAME("XPD Pad 2 Right/Up") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x30)
-	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_NAME("XPD Pad 2 Right/Down") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x30)
-	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_NAME("XPD Pad 2 Right/Left") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x30)
-	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_NAME("XPD Pad 2 Right/Right") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x30)
-	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x30)
-	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x30)
-	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x30)
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, PORTCOND_EQUALS, 0x30)
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_NAME("XPD Pad 2 Right/Up") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_NAME("XPD Pad 2 Right/Down") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
+	PORT_BIT( 0x04000000, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_NAME("XPD Pad 2 Right/Left") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_NAME("XPD Pad 2 Right/Right") PORT_8WAY PORT_PLAYER(2) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
+	PORT_BIT( 0x10000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
+	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
+	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
+	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("ctrltype", 0xf0, EQUALS, 0x30)
 
 INPUT_PORTS_END
 
@@ -2569,7 +2569,7 @@ static MACHINE_RESET( x68000 )
        more or less do the same job */
 
 	int drive;
-	UINT8* romdata = machine.region("user2")->base();
+	UINT8* romdata = state->memregion("user2")->base();
 	attotime irq_time;
 
 	memset(machine.device<ram_device>(RAM_TAG)->pointer(),0,machine.device<ram_device>(RAM_TAG)->size());
@@ -2640,20 +2640,20 @@ static MACHINE_START( x68000 )
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	x68k_state *state = machine.driver_data<x68k_state>();
 	/*  Install RAM handlers  */
-	state->m_spriteram = (UINT16*)(*machine.region("user1"));
+	state->m_spriteram = (UINT16*)(*state->memregion("user1"));
 	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_emptyram_r));
 	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_emptyram_w));
 	space->install_readwrite_bank(0x000000,machine.device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank1");
-	memory_set_bankptr(machine, "bank1",machine.device<ram_device>(RAM_TAG)->pointer());
+	state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
 	space->install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_r));
 	space->install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram_w));
-	memory_set_bankptr(machine, "bank2",state->m_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	state->membank("bank2")->set_base(state->m_gvram16);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram_r));
 	space->install_legacy_write_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram_w));
-	memory_set_bankptr(machine, "bank3",state->m_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	state->membank("bank3")->set_base(state->m_tvram16);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram_r));
 	space->install_legacy_write_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram_w));
-	memory_set_bankptr(machine, "bank4",state->m_nvram);  // so that code in SRAM is executable, there is an option for booting from SRAM
+	state->membank("bank4")->set_base(state->m_nvram16);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
 	state->m_kb_timer->adjust(attotime::zero, 0, attotime::from_msec(5));  // every 5ms
@@ -2671,23 +2671,20 @@ static MACHINE_START( x68030 )
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	x68k_state *state = machine.driver_data<x68k_state>();
 	/*  Install RAM handlers  */
-	state->m_spriteram = (UINT16*)(*machine.region("user1"));
+	state->m_spriteram = (UINT16*)(*state->memregion("user1"));
 	space->install_legacy_read_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_rom0_r),0xffffffff);
 	space->install_legacy_write_handler(0x000000,0xbffffb,0xffffffff,0,FUNC(x68k_rom0_w),0xffffffff);
 	space->install_readwrite_bank(0x000000,machine.device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank1");
-	// mirror? Human68k 3.02 explicitly adds 0x3000000 to some pointers
-	space->install_readwrite_bank(0x3000000,0x3000000+machine.device<ram_device>(RAM_TAG)->size()-1,0xffffffff,0,"bank5");
-	memory_set_bankptr(machine, "bank1",machine.device<ram_device>(RAM_TAG)->pointer());
-	memory_set_bankptr(machine, "bank5",machine.device<ram_device>(RAM_TAG)->pointer());
+	state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
 	space->install_legacy_read_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_r));
 	space->install_legacy_write_handler(0xc00000,0xdfffff,0xffffffff,0,FUNC(x68k_gvram32_w));
-	memory_set_bankptr(machine, "bank2",state->m_gvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	state->membank("bank2")->set_base(state->m_gvram32);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram32_r));
 	space->install_legacy_write_handler(0xe00000,0xe7ffff,0xffffffff,0,FUNC(x68k_tvram32_w));
-	memory_set_bankptr(machine, "bank3",state->m_tvram);  // so that code in VRAM is executable - needed for Terra Cresta
+	state->membank("bank3")->set_base(state->m_tvram32);  // so that code in VRAM is executable - needed for Terra Cresta
 	space->install_legacy_read_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram32_r));
 	space->install_legacy_write_handler(0xed0000,0xed3fff,0xffffffff,0,FUNC(x68k_sram32_w));
-	memory_set_bankptr(machine, "bank4",state->m_nvram);  // so that code in SRAM is executable, there is an option for booting from SRAM
+	state->membank("bank4")->set_base(state->m_nvram32);  // so that code in SRAM is executable, there is an option for booting from SRAM
 
 	// start keyboard timer
 	state->m_kb_timer->adjust(attotime::zero, 0, attotime::from_msec(5));  // every 5ms
@@ -2703,17 +2700,18 @@ static MACHINE_START( x68030 )
 static DRIVER_INIT( x68000 )
 {
 	x68k_state *state = machine.driver_data<x68k_state>();
-	unsigned char* rom = machine.region("maincpu")->base();
-	unsigned char* user2 = machine.region("user2")->base();
-	state->m_gvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
-	state->m_tvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
+	unsigned char* rom = machine.root_device().memregion("maincpu")->base();
+	unsigned char* user2 = machine.root_device().memregion("user2")->base();
+	//FIXME
+//  state->m_gvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
+//  state->m_tvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
 	state->m_sram = auto_alloc_array(machine, UINT16, 0x4000/sizeof(UINT16));
 
 	state->m_spritereg = auto_alloc_array_clear(machine, UINT16, 0x8000/sizeof(UINT16));
 
 #ifdef USE_PREDEFINED_SRAM
 	{
-		unsigned char* ramptr = machine.region("user3")->base();
+		unsigned char* ramptr = state->memregion("user3")->base();
 		memcpy(state->m_sram,ramptr,0x4000);
 	}
 #endif
@@ -2740,6 +2738,7 @@ static DRIVER_INIT( x68000 )
 	md_6button_init(machine);
 
 	state->m_sysport.cputype = 0xff;  // 68000, 10MHz
+	state->m_is_32bit = false;
 }
 
 static DRIVER_INIT( x68kxvi )
@@ -2747,6 +2746,7 @@ static DRIVER_INIT( x68kxvi )
 	x68k_state *state = machine.driver_data<x68k_state>();
 	DRIVER_INIT_CALL( x68000 );
 	state->m_sysport.cputype = 0xfe; // 68000, 16MHz
+	state->m_is_32bit = false;
 }
 
 static DRIVER_INIT( x68030 )
@@ -2754,9 +2754,10 @@ static DRIVER_INIT( x68030 )
 	x68k_state *state = machine.driver_data<x68k_state>();
 	DRIVER_INIT_CALL( x68000 );
 	state->m_sysport.cputype = 0xdc; // 68030, 25MHz
+	state->m_is_32bit = true;
 }
 
-static MACHINE_CONFIG_START( x68000_base, x68k_state )
+static MACHINE_CONFIG_FRAGMENT( x68000_base )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 10000000)  /* 10 MHz */
 	MCFG_CPU_PROGRAM_MAP(x68k_map)
@@ -2804,8 +2805,6 @@ static MACHINE_CONFIG_START( x68000_base, x68k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MCFG_NVRAM_ADD_0FILL("nvram")
-
 	MCFG_UPD72065_ADD("upd72065", fdc_interface)
 	MCFG_LEGACY_FLOPPY_4_DRIVES_ADD(x68k_floppy_interface)
 	MCFG_SOFTWARE_LIST_ADD("flop_list","x68k_flop")
@@ -2818,13 +2817,38 @@ static MACHINE_CONFIG_START( x68000_base, x68k_state )
 	MCFG_RAM_EXTRA_OPTIONS("1M,2M,3M,5M,6M,7M,8M,9M,10M,11M,12M")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( x68000, x68000_base )
+static MACHINE_CONFIG_START( x68000, x68k_state )
+	MCFG_FRAGMENT_ADD(x68000_base)
+
+	MCFG_NVRAM_ADD_0FILL("nvram16")
 
 	MCFG_X68KHDC_ADD( "x68k_hdc" )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( x68kxvi, x68000_base )
+static MACHINE_CONFIG_START( x68ksupr, x68k_state )
+	MCFG_FRAGMENT_ADD(x68000_base)
+
+	MCFG_NVRAM_ADD_0FILL("nvram16")
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(x68kxvi_map)
+
+	MCFG_MB89352A_ADD("mb89352_int",x68k_scsi_intf)
+	MCFG_HARDDISK_ADD("harddisk0")
+	MCFG_HARDDISK_ADD("harddisk1")
+	MCFG_HARDDISK_ADD("harddisk2")
+	MCFG_HARDDISK_ADD("harddisk3")
+	MCFG_HARDDISK_ADD("harddisk4")
+	MCFG_HARDDISK_ADD("harddisk5")
+	MCFG_HARDDISK_ADD("harddisk6")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( x68kxvi, x68k_state )
+
+	MCFG_FRAGMENT_ADD(x68000_base)
+
+	MCFG_NVRAM_ADD_0FILL("nvram16")
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_CLOCK(16000000)  /* 16 MHz */
@@ -2840,13 +2864,16 @@ static MACHINE_CONFIG_DERIVED( x68kxvi, x68000_base )
 	MCFG_HARDDISK_ADD("harddisk6")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( x68030, x68000_base )
+static MACHINE_CONFIG_START( x68030, x68k_state )
+	MCFG_FRAGMENT_ADD(x68000_base)
 
 	MCFG_CPU_REPLACE("maincpu", M68030, 25000000)  /* 25 MHz 68EC030 */
 	MCFG_CPU_PROGRAM_MAP(x68030_map)
 
 	MCFG_MACHINE_START( x68030 )
 	MCFG_MACHINE_RESET( x68000 )
+
+	MCFG_NVRAM_ADD_0FILL("nvram32")
 
 	MCFG_MB89352A_ADD("mb89352_int",x68k_scsi_intf)
 	MCFG_HARDDISK_ADD("harddisk0")
@@ -2876,6 +2903,26 @@ ROM_START( x68000 )
 	ROM_FILL(0x000,0x20000,0x00)
 ROM_END
 
+ROM_START( x68ksupr )
+	ROM_REGION16_BE(0x1000000, "maincpu", 0)  // 16MB address space
+	ROM_DEFAULT_BIOS("ipl11")
+	ROM_LOAD( "cgrom.dat",  0xf00000, 0xc0000, CRC(9f3195f1) SHA1(8d72c5b4d63bb14c5dbdac495244d659aa1498b6) )
+	ROM_SYSTEM_BIOS(0, "ipl10",  "IPL-ROM V1.0 (87/05/07)")
+	ROMX_LOAD( "iplrom.dat", 0xfe0000, 0x20000, CRC(72bdf532) SHA1(0ed038ed2133b9f78c6e37256807424e0d927560), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "ipl11",  "IPL-ROM V1.1 (91/01/11)")
+	ROMX_LOAD( "iplromxv.dat", 0xfe0000, 0x020000, CRC(00eeb408) SHA1(e33cdcdb69cd257b0b211ef46e7a8b144637db57), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(2, "ipl12",  "IPL-ROM V1.2 (91/10/24)")
+	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS(3, "ipl13",  "IPL-ROM V1.3 (92/11/27)")
+	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(4) )
+	ROM_LOAD("scsiinsu.bin",0xfc0000, 0x002000, CRC(f65a3e24) SHA1(15a17798839a3f7f361119205aebc301c2df5967) )  // Dumped from an X68000 Super HD
+//  ROM_LOAD("scsiexrom.dat",0xea0000, 0x002000, NO_DUMP )
+	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding
+	ROM_FILL(0x0000,0x8000,0x00)
+	ROM_REGION(0x20000, "user2", 0)
+	ROM_FILL(0x000,0x20000,0x00)
+ROM_END
+
 ROM_START( x68kxvi )
 	ROM_REGION16_BE(0x1000000, "maincpu", 0)  // 16MB address space
 	ROM_DEFAULT_BIOS("ipl11")
@@ -2888,7 +2935,7 @@ ROM_START( x68kxvi )
 	ROMX_LOAD( "iplromco.dat", 0xfe0000, 0x020000, CRC(6c7ef608) SHA1(77511fc58798404701f66b6bbc9cbde06596eba7), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(3, "ipl13",  "IPL-ROM V1.3 (92/11/27)")
 	ROMX_LOAD( "iplrom30.dat", 0xfe0000, 0x020000, CRC(e8f8fdad) SHA1(239e9124568c862c31d9ec0605e32373ea74b86a), ROM_BIOS(4) )
-	ROM_LOAD("scsiinrom.dat",0xfc0000, 0x002000, CRC(1c6c889e) SHA1(3f063d4231cdf53da6adc4db96533725e260076a) BAD_DUMP )
+	ROM_LOAD("scsiinco.bin",0xfc0000, 0x002000, CRC(2485e14d) SHA1(101a9bba8ea4bb90965c144bcfd7182f889ab958) )  // Dumped from an X68000 XVI Compact
 //  ROM_LOAD("scsiexrom.dat",0xea0000, 0x002000, NO_DUMP )
 	ROM_REGION(0x8000, "user1",0)  // For Background/Sprite decoding
 	ROM_FILL(0x0000,0x8000,0x00)
@@ -2919,5 +2966,6 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME        FLAGS */
 COMP( 1987, x68000, 0,      0,      x68000, x68000, x68000, "Sharp",    "X68000", GAME_IMPERFECT_GRAPHICS )
-COMP( 1991, x68kxvi,x68000, 0,      x68kxvi,x68000, x68kxvi, "Sharp",    "X68000 XVI", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+COMP( 1990, x68ksupr,x68000, 0,     x68ksupr,x68000,x68000, "Sharp",    "X68000 Super", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+COMP( 1991, x68kxvi,x68000, 0,      x68kxvi,x68000, x68kxvi,"Sharp",    "X68000 XVI", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 COMP( 1993, x68030, x68000, 0,      x68030, x68000, x68030, "Sharp",    "X68030", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

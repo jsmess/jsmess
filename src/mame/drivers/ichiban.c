@@ -34,7 +34,6 @@ HSync - 15.510kHz
 
 ***************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -105,9 +104,9 @@ GFXDECODE_END
 
 void ichibanjyan_state::machine_start()
 {
-	UINT8 *ROM = machine().region("code")->base();
+	UINT8 *ROM = memregion("code")->base();
 
-	memory_configure_bank(machine(), "bank1", 0, 4, ROM, 0x8000);
+	membank("bank1")->configure_entries(0, 4, ROM, 0x8000);
 }
 
 void ichibanjyan_state::machine_reset()

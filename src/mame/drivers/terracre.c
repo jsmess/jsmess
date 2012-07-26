@@ -131,9 +131,9 @@ static const UINT16 mHoreKidProtData[] =
 	0x1800 /* checksum */
 };
 
-static READ16_HANDLER( horekid_IN2_r )
+READ16_MEMBER(terracre_state::horekid_IN2_r)
 {
-	int data = input_port_read(space->machine(), "IN2");
+	int data = ioport("IN2")->read();
 
 	if (!(data & 0x40))		// FAKE button 3 for "Debug Mode"
 	{
@@ -144,45 +144,43 @@ static READ16_HANDLER( horekid_IN2_r )
 	return data;
 }
 
-static WRITE16_HANDLER( amazon_sound_w )
+WRITE16_MEMBER(terracre_state::amazon_sound_w)
 {
-	soundlatch_w(space,0,((data & 0x7f) << 1) | 1);
+	soundlatch_byte_w(space,0,((data & 0x7f) << 1) | 1);
 }
 
-static READ8_HANDLER( soundlatch_clear_r )
+READ8_MEMBER(terracre_state::soundlatch_clear_r)
 {
-	soundlatch_clear_w(space,0,0);
+	soundlatch_clear_byte_w(space,0,0);
 	return 0;
 }
 
-static READ16_HANDLER( amazon_protection_r )
+READ16_MEMBER(terracre_state::amazon_protection_r)
 {
-	terracre_state *state = space->machine().driver_data<terracre_state>();
-	offset = state->m_mAmazonProtReg[2];
+	offset = m_mAmazonProtReg[2];
 	if( offset<=0x56 )
 	{
 		UINT16 data;
-		data = state->m_mpProtData[offset/2];
+		data = m_mpProtData[offset/2];
 		if( offset&1 ) return data&0xff;
 		return data>>8;
 	}
 	return 0;
 }
 
-static WRITE16_HANDLER( amazon_protection_w )
+WRITE16_MEMBER(terracre_state::amazon_protection_w)
 {
-	terracre_state *state = space->machine().driver_data<terracre_state>();
 	if( ACCESSING_BITS_0_7 )
 	{
 		if( offset==1 )
 		{
-			state->m_mAmazonProtCmd = data;
+			m_mAmazonProtCmd = data;
 		}
 		else
 		{
-			if( state->m_mAmazonProtCmd>=32 && state->m_mAmazonProtCmd<=0x37 )
+			if( m_mAmazonProtCmd>=32 && m_mAmazonProtCmd<=0x37 )
 			{
-				state->m_mAmazonProtReg[state->m_mAmazonProtCmd-0x32] = data;
+				m_mAmazonProtReg[m_mAmazonProtCmd-0x32] = data;
 			}
 		}
 	}
@@ -196,11 +194,11 @@ static MACHINE_START( amazon )
 	state_save_register_global_array(machine, state->m_mAmazonProtReg);
 }
 
-static ADDRESS_MAP_START( terracre_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( terracre_map, AS_PROGRAM, 16, terracre_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x020000, 0x0201ff) AM_RAM AM_BASE_MEMBER(terracre_state, m_spriteram)
+	AM_RANGE(0x020000, 0x0201ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x020200, 0x021fff) AM_RAM
-	AM_RANGE(0x022000, 0x022fff) AM_WRITE(amazon_background_w) AM_BASE_MEMBER(terracre_state, m_amazon_videoram)
+	AM_RANGE(0x022000, 0x022fff) AM_WRITE(amazon_background_w) AM_SHARE("amazon_videoram")
 	AM_RANGE(0x023000, 0x023fff) AM_RAM
 	AM_RANGE(0x024000, 0x024001) AM_READ_PORT("P1")
 	AM_RANGE(0x024002, 0x024003) AM_READ_PORT("P2")
@@ -210,14 +208,14 @@ static ADDRESS_MAP_START( terracre_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x026002, 0x026003) AM_WRITE(amazon_scrollx_w)
 	AM_RANGE(0x026004, 0x026005) AM_WRITE(amazon_scrolly_w)
 	AM_RANGE(0x02600c, 0x02600d) AM_WRITE(amazon_sound_w)
-	AM_RANGE(0x028000, 0x0287ff) AM_WRITE(amazon_foreground_w) AM_BASE_MEMBER(terracre_state, m_videoram)
+	AM_RANGE(0x028000, 0x0287ff) AM_WRITE(amazon_foreground_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( amazon_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( amazon_map, AS_PROGRAM, 16, terracre_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
-	AM_RANGE(0x040000, 0x0401ff) AM_RAM AM_BASE_MEMBER(terracre_state, m_spriteram)
+	AM_RANGE(0x040000, 0x0401ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x040200, 0x040fff) AM_RAM
-	AM_RANGE(0x042000, 0x042fff) AM_WRITE(amazon_background_w) AM_BASE_MEMBER(terracre_state, m_amazon_videoram)
+	AM_RANGE(0x042000, 0x042fff) AM_WRITE(amazon_background_w) AM_SHARE("amazon_videoram")
 	AM_RANGE(0x044000, 0x044001) AM_READ_PORT("IN0")
 	AM_RANGE(0x044002, 0x044003) AM_READ_PORT("IN1")
 	AM_RANGE(0x044004, 0x044005) AM_READ_PORT("IN2")
@@ -226,31 +224,31 @@ static ADDRESS_MAP_START( amazon_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x046002, 0x046003) AM_WRITE(amazon_scrollx_w)
 	AM_RANGE(0x046004, 0x046005) AM_WRITE(amazon_scrolly_w)
 	AM_RANGE(0x04600c, 0x04600d) AM_WRITE(amazon_sound_w)
-	AM_RANGE(0x050000, 0x050fff) AM_WRITE(amazon_foreground_w) AM_BASE_MEMBER(terracre_state, m_videoram)
+	AM_RANGE(0x050000, 0x050fff) AM_WRITE(amazon_foreground_w) AM_SHARE("videoram")
 	AM_RANGE(0x070000, 0x070003) AM_READWRITE(amazon_protection_r, amazon_protection_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, terracre_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_3526_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_3526_io_map, AS_IO, 8, terracre_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_signed_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_signed_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("dac1", dac_signed_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("dac2", dac_signed_w)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
+	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_2203_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_2203_io_map, AS_IO, 8, terracre_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_signed_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_signed_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("dac1", dac_signed_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("dac2", dac_signed_w)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
+	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( terracre )
@@ -1026,7 +1024,7 @@ static DRIVER_INIT( horekid )
 {
 	terracre_state *state = machine.driver_data<terracre_state>();
 	state->m_mpProtData = mHoreKidProtData;
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x44004, 0x44005, FUNC(horekid_IN2_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x44004, 0x44005, read16_delegate(FUNC(terracre_state::horekid_IN2_r),state));
 }
 
 /*    YEAR, NAME,   PARENT,     MACHINE, INPUT,    INIT,     MONITOR,  COMPANY,      FULLNAME, FLAGS */

@@ -3,7 +3,6 @@
 #ifndef __TDV2324__
 #define __TDV2324__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -58,7 +57,8 @@ public:
 		  m_pic(*this, P8259A_TAG),
 		  m_pit0(*this, P8253_5_0_TAG),
 		  m_pit1(*this, P8253_5_1_TAG)
-	{ }
+	,
+		m_video_ram(*this, "video_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -79,7 +79,7 @@ public:
 	UINT8 m_sub_data;
 
 	// video state
-	UINT8 *m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 };
 
 

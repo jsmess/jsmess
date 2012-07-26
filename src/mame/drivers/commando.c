@@ -50,32 +50,32 @@ Note : there is an ingame typo bug that doesn't display the bonus life values
 
 /* Memory Maps */
 
-static ADDRESS_MAP_START( commando_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( commando_map, AS_PROGRAM, 8, commando_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(commando_c804_w)
 	AM_RANGE(0xc808, 0xc809) AM_WRITE(commando_scrollx_w)
 	AM_RANGE(0xc80a, 0xc80b) AM_WRITE(commando_scrolly_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(commando_videoram2_w) AM_BASE_MEMBER(commando_state, m_videoram2)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(commando_colorram2_w) AM_BASE_MEMBER(commando_state, m_colorram2)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(commando_videoram_w) AM_BASE_MEMBER(commando_state, m_videoram)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(commando_colorram_w) AM_BASE_MEMBER(commando_state, m_colorram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(commando_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(commando_colorram2_w) AM_SHARE("colorram2")
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(commando_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(commando_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
 	AM_RANGE(0xfe00, 0xff7f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xff80, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, commando_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ym2", ym2203_w)
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
+	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE_LEGACY("ym2", ym2203_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -517,7 +517,7 @@ ROM_END
 static DRIVER_INIT( commando )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0xc000);
 	int A;
 
@@ -537,7 +537,7 @@ static DRIVER_INIT( commando )
 static DRIVER_INIT( spaceinv )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0xc000);
 	int A;
 

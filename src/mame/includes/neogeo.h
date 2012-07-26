@@ -20,6 +20,10 @@
 #define NEOGEO_VBLANK_RELOAD_HPOS               (0x11f)
 
 #define NEOGEO_BANK_AUDIO_CPU_CART_BANK         "audio_cart"
+#define NEOGEO_BANK_AUDIO_CPU_CART_BANK0        "audio_cart0"
+#define NEOGEO_BANK_AUDIO_CPU_CART_BANK1        "audio_cart1"
+#define NEOGEO_BANK_AUDIO_CPU_CART_BANK2        "audio_cart2"
+#define NEOGEO_BANK_AUDIO_CPU_CART_BANK3        "audio_cart3"
 /* do not use 2, 3 and 4 */
 #define NEOGEO_BANK_CARTRIDGE                   "cartridge"
 #define NEOGEO_BANK_BIOS                        "bios"
@@ -108,6 +112,31 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	device_t *m_upd4990a;
+	DECLARE_WRITE8_MEMBER(audio_cpu_clear_nmi_w);
+	DECLARE_WRITE16_MEMBER(io_control_w);
+	DECLARE_WRITE16_MEMBER(save_ram_w);
+	DECLARE_READ16_MEMBER(memcard_r);
+	DECLARE_WRITE16_MEMBER(memcard_w);
+	DECLARE_WRITE16_MEMBER(audio_command_w);
+	DECLARE_READ8_MEMBER(audio_command_r);
+	DECLARE_WRITE8_MEMBER(audio_result_w);
+	DECLARE_WRITE16_MEMBER(main_cpu_bank_select_w);
+	DECLARE_READ8_MEMBER(audio_cpu_bank_select_f000_f7ff_r);
+	DECLARE_READ8_MEMBER(audio_cpu_bank_select_e000_efff_r);
+	DECLARE_READ8_MEMBER(audio_cpu_bank_select_c000_dfff_r);
+	DECLARE_READ8_MEMBER(audio_cpu_bank_select_8000_bfff_r);
+	DECLARE_WRITE16_MEMBER(system_control_w);
+	DECLARE_WRITE16_MEMBER(watchdog_w);
+	DECLARE_READ16_MEMBER(neogeo_unmapped_r);
+	DECLARE_READ16_MEMBER(neogeo_paletteram_r);
+	DECLARE_WRITE16_MEMBER(neogeo_paletteram_w);
+	DECLARE_READ16_MEMBER(neogeo_video_register_r);
+	DECLARE_WRITE16_MEMBER(neogeo_video_register_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(multiplexed_controller_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_controller_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_calendar_status);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_memcard_status);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_audio_result);
 };
 
 
@@ -118,7 +147,6 @@ void neogeo_set_display_counter_msb(address_space *space, UINT16 data);
 void neogeo_set_display_counter_lsb(address_space *space, UINT16 data);
 void neogeo_acknowledge_interrupt(running_machine &machine, UINT16 data);
 void neogeo_set_main_cpu_bank_address(address_space *space, UINT32 bank_address);
-READ16_HANDLER( neogeo_unmapped_r );
 DEVICE_IMAGE_LOAD( neo_cartridge );
 
 
@@ -134,7 +162,7 @@ void neo_pcm2_swap(running_machine &machine, int value);
 void neogeo_sfix_decrypt(running_machine &machine);
 void kof99_decrypt_68k(running_machine &machine);
 void garou_decrypt_68k(running_machine &machine);
-void garouo_decrypt_68k(running_machine &machine);
+void garouh_decrypt_68k(running_machine &machine);
 void mslug3_decrypt_68k(running_machine &machine);
 void kof2000_decrypt_68k(running_machine &machine);
 void kof98_decrypt_68k(running_machine &machine);
@@ -161,7 +189,7 @@ void fatfury2_install_protection(running_machine &machine);
 void mslugx_install_protection(running_machine &machine);
 void kof99_install_protection(running_machine &machine);
 void garou_install_protection(running_machine &machine);
-void garouo_install_protection(running_machine &machine);
+void garouh_install_protection(running_machine &machine);
 void mslug3_install_protection(running_machine &machine);
 void kof2000_install_protection(running_machine &machine);
 void install_kof98_protection(running_machine &machine);
@@ -214,13 +242,9 @@ VIDEO_START( neogeo );
 VIDEO_RESET( neogeo );
 SCREEN_UPDATE_RGB32( neogeo );
 
-READ16_HANDLER( neogeo_video_register_r );
-WRITE16_HANDLER( neogeo_video_register_w );
 
 void neogeo_set_palette_bank(running_machine &machine, UINT8 data);
 void neogeo_set_screen_dark(running_machine &machine, UINT8 data);
-READ16_HANDLER( neogeo_paletteram_r );
-WRITE16_HANDLER( neogeo_paletteram_w );
 
 void neogeo_set_fixed_layer_source(running_machine &machine, UINT8 data);
 

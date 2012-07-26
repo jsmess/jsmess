@@ -15,9 +15,8 @@
         0x01    = Scroll MSB
 */
 
-WRITE8_HANDLER( battlane_palette_w )
+WRITE8_MEMBER(battlane_state::battlane_palette_w)
 {
-	battlane_state *state = space->machine().driver_data<battlane_state>();
 	int r, g, b;
 	int bit0, bit1, bit2;
 
@@ -37,45 +36,40 @@ WRITE8_HANDLER( battlane_palette_w )
 
 	/* blue component */
 
-	bit0 = (~state->m_video_ctrl >> 7) & 0x01;
+	bit0 = (~m_video_ctrl >> 7) & 0x01;
 	bit1 = (~data >> 6) & 0x01;
 	bit2 = (~data >> 7) & 0x01;
 	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-	palette_set_color(space->machine(), offset, MAKE_RGB(r, g, b));
+	palette_set_color(machine(), offset, MAKE_RGB(r, g, b));
 }
 
-WRITE8_HANDLER( battlane_scrollx_w )
+WRITE8_MEMBER(battlane_state::battlane_scrollx_w)
 {
-	battlane_state *state = space->machine().driver_data<battlane_state>();
-	state->m_bg_tilemap->set_scrollx(0, ((state->m_video_ctrl & 0x01) << 8) + data);
+	m_bg_tilemap->set_scrollx(0, ((m_video_ctrl & 0x01) << 8) + data);
 }
 
-WRITE8_HANDLER( battlane_scrolly_w )
+WRITE8_MEMBER(battlane_state::battlane_scrolly_w)
 {
-	battlane_state *state = space->machine().driver_data<battlane_state>();
-	state->m_bg_tilemap->set_scrolly(0, ((state->m_cpu_control & 0x01) << 8) + data);
+	m_bg_tilemap->set_scrolly(0, ((m_cpu_control & 0x01) << 8) + data);
 }
 
-WRITE8_HANDLER( battlane_tileram_w )
+WRITE8_MEMBER(battlane_state::battlane_tileram_w)
 {
-	battlane_state *state = space->machine().driver_data<battlane_state>();
-	state->m_tileram[offset] = data;
-	//state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_tileram[offset] = data;
+	//m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( battlane_spriteram_w )
+WRITE8_MEMBER(battlane_state::battlane_spriteram_w)
 {
-	battlane_state *state = space->machine().driver_data<battlane_state>();
-	state->m_spriteram[offset] = data;
+	m_spriteram[offset] = data;
 }
 
-WRITE8_HANDLER( battlane_bitmap_w )
+WRITE8_MEMBER(battlane_state::battlane_bitmap_w)
 {
-	battlane_state *state = space->machine().driver_data<battlane_state>();
 	int i, orval;
 
-	orval = (~state->m_video_ctrl >> 1) & 0x07;
+	orval = (~m_video_ctrl >> 1) & 0x07;
 
 	if (!orval)
 		orval = 7;
@@ -84,19 +78,18 @@ WRITE8_HANDLER( battlane_bitmap_w )
 	{
 		if (data & 1 << i)
 		{
-			state->m_screen_bitmap.pix8(offset % 0x100, (offset / 0x100) * 8 + i) |= orval;
+			m_screen_bitmap.pix8(offset % 0x100, (offset / 0x100) * 8 + i) |= orval;
 		}
 		else
 		{
-			state->m_screen_bitmap.pix8(offset % 0x100, (offset / 0x100) * 8 + i) &= ~orval;
+			m_screen_bitmap.pix8(offset % 0x100, (offset / 0x100) * 8 + i) &= ~orval;
 		}
 	}
 }
 
-WRITE8_HANDLER( battlane_video_ctrl_w )
+WRITE8_MEMBER(battlane_state::battlane_video_ctrl_w)
 {
-	battlane_state *state = space->machine().driver_data<battlane_state>();
-	state->m_video_ctrl = data;
+	m_video_ctrl = data;
 }
 
 static TILE_GET_INFO( get_tile_info_bg )
@@ -182,7 +175,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipx = attr & 0x04;
 			flipy = attr & 0x02;
 
-			if (!flip_screen_get(machine))
+			if (!state->flip_screen())
             {
 				sx = 240 - sx;
 				sy = 240 - sy;
@@ -225,7 +218,7 @@ static void draw_fg_bitmap( running_machine &machine, bitmap_ind16 &bitmap )
 
 			if (data)
 			{
-				if (flip_screen_get(machine))
+				if (state->flip_screen())
 					bitmap.pix16(255 - y, 255 - x) = data;
 				else
 					bitmap.pix16(y, x) = data;

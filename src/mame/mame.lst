@@ -206,6 +206,7 @@ mooncrstu		// (c) 1980 Nichibutsu USA
 mooncrsto		// (c) 1980 Nichibutsu
 mooncrstg		// (c) 1980 Gremlin
 mooncrstuk		// (c) 1980 Nichibutsu UK
+mooncrstuku		// (c) 1980 Nichibutsu UK
 smooncrs		// Gremlin
 sstarcrs		// Taito (Brazil)
 mooncmw			// bootleg
@@ -248,6 +249,7 @@ ladybugg		// bootleg
 vpool			// bootleg
 drivfrcg		// [1984] Shinkai (Magic Electronics USA license)
 drivfrcb		// bootleg
+drivfrct		// bootleg
 bongo			// (c) 1983 Jetsoft
 hunchbkg		// (c) 1983 Century
 harem			// [1983] I.G.R.
@@ -378,7 +380,7 @@ cclimberj		// (c) 1980 Nichibutsu
 ccboot			// bootleg
 ccboot2			// bootleg
 
-ckong			// (c) 1981 (Falcon?)
+ckong			// (c) 1981 (Kyoei)
 ckongo			// bootleg (Orca)
 ckongalc		// bootleg (Alca)
 bigkong			// bootleg
@@ -602,6 +604,7 @@ sailorwr		// (c) 1993
 wcatcher		// (c) 1993
 jituroku		// (c) 1993 Windom
 yosimoto		// (c) 1994 Nichibutsu/Yoshimoto Kougyou
+yosimotm		// (c) 1994 Nichibutsu/Yoshimoto Kougyou
 psailor1		// (c) 1994 SPHINX
 psailor2		// (c) 1994 SPHINX
 otatidai		// (c) 1995 SPHINX
@@ -617,9 +620,12 @@ mscoutm			// (c) 1994 SPHINX/AV JAPAN
 mjegolf			// (c) 1994 FUJIC/AV JAPAN
 
 mhhonban		// (c) 199?
+zokumahj		// (c) 199?
 4psimasy		// (c) 1994
 musobana		// (c) 1995
 niyanpai		// (c) 1996
+
+csplayh1		// (c) 1995
 
 junai			// (c) 1998
 csplayh5		// (c) 1998
@@ -1922,11 +1928,12 @@ dariusj			// A96 (c) 1986 Taito Corporation (Japan)
 dariuso			// A96 (c) 1986 Taito Corporation (Japan)
 dariuse			// A96 (c) 1986 Taito Corporation (Japan)
 rastan			// B04 (c) 1987 Taito Corporation Japan (World)
-rastan2 		// B04 (c) 1987 Taito Corporation Japan (World)
+rastana 		// B04 (c) 1987 Taito Corporation Japan (World)
 rastanu			// B04 (c) 1987 Taito America Corporation (US)
-rastanu2		// B04 (c) 1987 Taito America Corporation (US)
+rastanua		// B04 (c) 1987 Taito America Corporation (US)
+rastanub		// B04 (c) 1987 Taito America Corporation (US)
 rastsaga		// B04 (c) 1987 Taito Corporation (Japan)
-rastsaga1		// B04 (c) 1987 Taito Corporation (Japan)
+rastsagaa		// B04 (c) 1987 Taito Corporation (Japan)
 topspeed		// B14 (c) 1987 Taito Corporation Japan (World)
 topspeedu		// B14 (c) 1987 Taito America Corporation (US)
 fullthrl		// B14 (c) 1987 Taito Corporation (Japan)
@@ -3959,8 +3966,9 @@ szaxxon			// (c) 1982
 futspy			// (c) 1984
 razmataz		// modified 834-0213, 834-0214 (c) 1983
 ixion			// (c) 1983
-congo			// 605-5167 (c) 1983
-tiptop			// 605-5167 (c) 1983
+congo			// 605-5167 (c) 1983 (2 board stack)
+congoa			// 605-5167 (c) 1983 (3 board stack)
+tiptop			// 605-5167 (c) 1983 (3 board stack)
 
 // Sega "LaserDisc hardware" games
 astron			// (c) 1983
@@ -4726,6 +4734,8 @@ puckpkmn		// (c) 2000 Genie
 puckpkmna		// (c) 2000 IBS
 topshoot		// (c) 1995 Sun Mixing
 
+jzth
+
 // Sega MegaTech, the number shown is on the label of the instruction rom
 megatech
 mt_beast		// 01
@@ -4880,7 +4890,7 @@ deathcox		// 2000.10 Death Crimson OX
 cspike			// 2000.10 Gun Spike / Cannon Spike
 sstrkfgt		// 2000.10 Sega Strike Fighter (Rev A)
 confmiss		// 2000.11 Confidential Mission												// First GD-ROM game?
-                // 2000.11 Ninja Assault
+ninjaslt        // 2000.11 Ninja Assault
 				// 2000.11 Shakatto Tambourine
 wwfroyal		// 2000.11 WWF Royal Rumble
 pjustic			// 2000.12 Moero Justice Gakuen / Project Justice
@@ -6180,7 +6190,7 @@ hardhat			// (c) 1982
 fax				// (c) 1983
 fax2			// (c) 1983
 circus			// no copyright notice [1977?]
-circusse		// bootleg
+springbd		// Sub-Electro bootleg of Circus
 robotbwl		// no copyright notice
 crash			// Exidy [1979?]
 smash			// bootleg
@@ -6217,6 +6227,7 @@ mf_flip			// (c) 1983 Exidy / First Star Software
 mf_bdash		// (c) 1984 Exidy / First Star Software
 
 // Atari b/w games
+quizshow		// 005464           1976/04 [2650]
 tank8			// ??????           1976/04 [6800]
 tank8a			// ??????           1976/04 [6800]
 tank8b			// ??????           1976/04 [6800]
@@ -6714,6 +6725,7 @@ pballoonr		// (c) 1982 SNK (Rock-Ola license)
 nibbler			// (c) 1982 Rock-ola (version 9)
 nibbler8		// (c) 1982 Rock-ola (version 8)
 nibbler6		// (c) 1982 Rock-ola (vresion 6)
+nibblerp		// (c) 1982 Rock-ola (pballoon conversion)
 nibblero		// (c) 1983 Olympia/Rock-Ola (version 8)
 
 // later SNK games, each game can be identified by PCB code and ROM
@@ -7012,7 +7024,7 @@ kof99k			// 0152 (c) 1999 SNK
 kof99p			// 0251 (c) 1999 SNK
 ganryu			// 0252 (c) 1999 Visco
 garou			// 0253 (c) 1999 SNK
-garouo			// 0253 (c) 1999 SNK
+garouh			// 0253 (c) 1999 SNK
 garoup			// 0253 (c) 1999 SNK
 garoubl			// bootleg
 s1945p			// 0254 (c) 1999 Psikyo
@@ -8317,6 +8329,7 @@ wschampa		// (c) 2001 Sammy USA Corporation
 funcube2		// (c) 2001 Namco
 funcube3		// (c) 2001 Namco
 funcube4		// (c) 2001 Namco
+funcube5		// (c) 2002 Namco
 trophyh			// (c) 2002 Sammy USA Corporation
 reelquak		// (c) ???? <unknown>
 
@@ -8470,6 +8483,7 @@ wiseguy			// (c) 1990 Dooyong
 lastday			// (c) 1990 Dooyong
 lastdaya		// (c) 1990 Dooyong
 gulfstrm		// (c) 1991 Dooyong
+gulfstrma		// (c) 1991 Dooyong
 gulfstrmm		// (c) 1991 Dooyong + distributed by Media Shoji
 pollux			// (c) 1991 Dooyong
 polluxa			// (c) 1991 Dooyong
@@ -8666,12 +8680,13 @@ aoh				// (c) 2001
 // Afega games
 twinactn		// (c) 1996 - bootleg of US AFF Mustang
 stagger1		// (c) 1998
-redhawk			// (c) 1997
+redhawk			// (c) 1997 New Vision Ent. license
 redhawke		// (c) 1997 Excellent Co., Ltd license
 redhawki		// (c) 1997 Haedong Corp. license
 redhawkb		// (c) 1997
-grdnstrm		// (c) 1998
-grdnstrmk		// (c) 1998
+grdnstrm		// (c) 1998 Apples Industries license
+grdnstrmk		// (c) 1998 (Korea)
+redfoxwp2		// (c) 1998 (China)
 bubl2000		// (c) 1998 Tuning
 hotbubl			// (c) 1998 Pandora
 popspops		// (c) 1999
@@ -8931,82 +8946,87 @@ chessc2			// (c) 200?
 haunthig		// (c) 200?
 
 // IGS PGM System Games
-pgm
-orlegend		// (c) 1997
-orlegende		// (c) 1997
-orlegendc		// (c) 1997
-orlegendca		// (c) 1997
-orlegend111c		// (c) 1997
-orlegend105k		// (c) 1997
-drgw2			// (c) 1997
-dw2v100x		// (c) 1997
-drgw2c			// (c) 1997
-drgw2j			// (c) 1997
-drgw3			// (c) 1998
-drgw3105		// (c) 1998
-drgw3100		// (c) 1998
-dwex			// (c) 1998
-killbld			// (c) 1998
-killbld104		// (c) 1998
-kov			// (c) 1999
-kovplus			// (c) 1999
-kovplusa		// (c) 1999
+pgm				// Base Unit
+orlegend		// (c) 1997 Oriental Legend
+orlegende		//
+orlegendc		//
+orlegendca		//
+orlegend111c	//
+orlegend105k	//
+drgw2			// (c) 1997 Dragon World 2
+dw2v100x		//
+drgw2c			//
+drgw2j			//
+drgw3			// (c) 1998 Dragon World 3
+drgw3105		//
+drgw3100		//
+dwex			// (c) 1998 Dragon World 3 EX
+killbld			// (c) 1998 The Killing Blade
+killbld104		//
+kov				// (c) 1999 Knights of Valor
+kov115			//
+kov100			//
+kovplus			// (c) 1999 Knights of Valor Plus (aka 10 Character version)
+kovplusa		//
 kovsgqyz		// bootleg
 kovsgqyza		// bootleg
 kovsgqyzb		// bootleg
-kov115			// (c) 1999
-kov100			// (c) 1999
-kovsh			// (c) 1999
-kovsh103		// (c) 1999
+kovsh			// (c) 1999 Knights of Valor Superheroes
+kovsh103		//
 kovqhsgs		// bootleg
+photoy2k		// (c) 1999 Photo Y2k
+photoy2k102		//
+photoy2k104		//
+puzlstar		// (c) 1999 Puzzle Star
+olds			// (c) 1999 Oriental Legend Super / Special
+olds100			//
+olds100a		//
+kov2			// (c) 2000 Knights of Valor 2
+kov2106			//
+kov2103			//
+kov2102			//
+kov2101			//
+kov2100			//
+kov2p			// (c) 2000 Knights of Valor 2 Nine Dragons
+kov2p205		//
+ddp2			// (c) 2001 DoDonPachi 2 - Bee Storm
+ddp2100			//
+ddp2101			//
+puzzli2			// (c) 2001 Puzzli 2
+martmast		// (c) 2001 Martial Masters
+martmastc		//
+martmastc102	//
+theglad			// (c) 2001 The Gladiator
+theglada		//
+thegladpcb		//
+dw2001			// (c) 2001 Dragon World 2001
+dwpc			// (c) 2001 Dragon World Pretty Chance
+py2k2			// (c) 2001 Photo Y2K2
+dmnfrnt			// (c) 2002 Demon Front
+dmnfrnta		//
+dmnfrntpcb		//
+kovshp			// (c) 200? Knights of Valor Superheroes PLUS
+kovshxas		// bootleg
 kovlsqh			// bootleg
 kovlsqh2		// bootleg
 kovlsjb			// bootleg
 kovlsjba		// bootleg
-photoy2k		// (c) 1999
-photoy2k102		// (c) 1999
-photoy2k104		// (c) 1999
-puzlstar		// (c) 1999
-olds			// (c) 1999
-olds100			// (c) 1999
-olds100a		// (c) 1999
-kov2			// (c) 2000
-kov2106			// (c) 2000
-kov2103			// (c) 2000
-kov2102			// (c) 2000
-kov2101			// (c) 2000
-kov2100			// (c) 2000
-kov2p			// (c) 2000
-kov2p205		// (c) 2000
-ddp2			// (c) 2001
-ddp2100			// (c) 2001
-ddp2101			// (c) 2001
-puzzli2			// (c) 2001
-martmast		// (c) 2001
-martmastc		// (c) 2001
-martmastc102		// (c) 2001
-theglad			// (c) 2001
-theglada		// (c) 2001
-thegladpcb
-dw2001			// (c) 2001
-py2k2			// (c) 2001
-dmnfrnt			// (c) 2002
-dmnfrnta		// (c) 2002
-dmnfrntpcb
-kovshp
-oldsplus
-killbldp
-happy6
-svg
-svgpcb
-ket			// (c) 2002 Cave
-keta			// (c) 2002 Cave
-ketb			// (c) 2002 Cave
-ddpdoj			// (c) 2002 Cave
-ddpdoja			// (c) 2002 Cave
-ddpdojb			// (c) 2002 Cave
-ddpdojblk		// (c) 2002 Cave
-espgal			// (c) 2003 Cave
+oldsplus		// (c) 2004 Oriental Legend Super Plus
+killbldp		// (c) 2004 Killing Blade Plus
+happy6			// (c) 200? Happy 6
+svg				// (c) 2003 Spectral vs Generation
+svgpcb			//
+ket				// (c) 2002 Ketsui
+keta			//
+ketb			//
+ddpdoj			// (c) 2002 DoDonPachi Dai-Ou-Jou
+ddpdoja			//
+ddpdojb			//
+ddpdojblk		//
+espgal			// (c) 2003 Espgaluda
+
+// IGS PGM2 Platform
+
 orleg2			// (c) 2007
 orleg2o			//
 kov2nl			// (c) 2008
@@ -9946,8 +9966,9 @@ spcking2		// (c) 1979 Konami
 spaceint		// [1980] Shoei
 spaceintj		// [1980] Shoei
 spacefb			// (c) [1980?] Nintendo
-spacefbu		// (c) [1980?] Nintendo
 spacefbe		// (c) [1980?] Nintendo
+spacefbe2		// (c) [1980?] Nintendo
+spacefba		// (c) [1980?] Nintendo
 spacefbg		// 834-0031 (c) 1980 Gremlin
 spacefbb		// bootleg
 spacebrd		// bootleg
@@ -10010,6 +10031,7 @@ policetr10		// (c) 1996 P&P Marketing
 policetr13a		// (c) 1996 P&P Marketing
 policetr13b		// (c) 1996 P&P Marketing
 sshooter		// (c) 1998 P&P Marketing
+sshooter17		// (c) 1998 P&P Marketing
 sshooter12		// (c) 1998 P&P Marketing
 sshooter11		// (c) 1998 P&P Marketing
 pass			// (c) 1992 Oksan
@@ -10023,9 +10045,9 @@ gtsers8			// (c) 1984 Greyhound Electronics
 gtsers9			// (c) 1984 Greyhound Electronics
 gtsers10		// (c) 1984 Greyhound Electronics
 gtsers11		// (c) 1984 Greyhound Electronics
+gtsers12		// (c) 1984 Greyhound Electronics
+gtsers14		// (c) 1984 Greyhound Electronics
 gt103a1			// (c) 1984 Greyhound Electronics
-gt103a2			// (c) 1984 Greyhound Electronics
-gt103a3			// (c) 1984 Greyhound Electronics
 gt103aa			// (c) 1984 Greyhound Electronics
 gt103asx		// (c) 1984 Greyhound Electronics
 reelfun			// (c) 1986 Grayhound Electronics
@@ -10071,6 +10093,7 @@ genix			// (c) 199? NIX
 fitfight		// bootleg of Art of Fighting
 histryma		// bootleg of Fighter's History
 bbprot			// unfinished prototype
+hotmindff		// (c) Playmark
 beaminv			// (c) 1979 Tekunon Kougyou (Arcade TV Game List - P.95, Left, 9 from top)
 pacominv		// (c) 1979 Pacom Corporation
 mcatadv			// (c) 1993 Wintechno
@@ -10213,6 +10236,7 @@ supertnk		// (c) 1981 VIDEO GAMES GmbH, W.-GERMANY
 crospang		// (c) 1998 F2 System
 heuksun			// (c) 1998 Oksan / F2 System
 bestri			// (c) F2 System
+silvmil			// (c) 1995 Para
 funybubl		// (c) 1999 In Chang Electronic Co
 funybublc		// (c) 1999 Comad Industries
 dcheese			// (c) 1993 HAR
@@ -10253,6 +10277,10 @@ kisekaeh		// (c) 1995 I'Max
 cultname		// (c) 1995 I'Max
 yuka			// (c) 1999 Yubis
 yujan			// (C) 1999 Yubis
+
+// Team Play, Inc.
+
+voyager         // (c) 2002 Team Play, Inc.
 
 // BMC
 
@@ -10340,6 +10368,7 @@ hotblock		// (c) 1993 Nics? / Nix?
 pntnpuzl		// Century?
 trucocl			// (c) 1991 Miky SRL
 ertictac		// (c) 1992 Sisteme
+ertictaca		// (c) 1992 Sisteme
 poizone			// (c) 1990 Sisteme
 ssfindo			// (c) 1999 Icarus
 ppcar			// (c) 1999 Icarus
@@ -10350,10 +10379,11 @@ dambustra		// (c) 1981 South West Research
 dambustruk		// (c) 1981 South West Research
 gunpey			// (c) 2000 Banpresto
 spaceg			// (c) 19??
-wldarrow		// (c) 1982
-unkmeyco		// (c) 198?
-mdrawpkr		// (c) 19??
-mdrawpkra		// (c) 19??
+gldarrow		// (c) 1984 Meyco Games
+wldarrow		// (c) 1982 Meyco Games
+casbjack		// (c) 1983 Meyco Games
+mdrawpkr		// (c) 1984 Meyco Games
+mdrawpkra		// (c) 1984 Meyco Games
 laserbas		// (c) 1981 Amstar/HOEI
 laserbasa		// (c) 1981 Amstar/HOEI
 futflash		// (c) 1981 HOEI (Arcade TV Game List - P.96, Right, 18 from top)
@@ -10456,6 +10486,7 @@ sigma2k			// (c) 2000 Sigma
 
 
 attckufo		// (c) 1980 Ryoto Electric Co.
+unkhorse
 fortecar
 fortecrd
 jackpool		// (c) 1997 Electronic Projects
@@ -10545,6 +10576,7 @@ sb2003			// (c) 2003 Limenko
 sb2003a			// (c) 2003 Limenko
 spotty			// (c) 2001 Prince Co.
 carrera			// (c) 19?? BS Electronics
+chance32		// (c) 19?? PAL Company
 
 // Golden Poker / Potten's Poker / Witch Card hardware
 goldnpkr		// (c) 1981 Bonanza
@@ -10784,12 +10816,14 @@ paclandp		// (c) 1989 Namco
 ggconnie		// (c) ???? Capcom
 paranoia		// (c) 1990 Naxat Soft
 tourvis			// (c) ???? Tourvision
+tvlegaxe		// (c) 1988 Victor Musical Industries, Inc. (Tourvision bootleg)
 tvusapb			// (c) 1989 Aicom (Tourvision bootleg)
 tvdunexp		// (c) 1989 Hudson / Atlus (Tourvision bootleg)
 tvthbld			// (c) 1990 Sega / NEC Avenue (Tourvision bootleg)
 tvrs2			// (c) 1990 Taito (Tourvision bootleg)
 tvpwlg4			// (c) 1991 Hudson (Tourvision bootleg)
 tvsci			// (c) 1991 Taito (Tourvision bootleg)
+tvsvball		// (c) 1990 Video System (Tourvision bootleg)
 vcombat			// (c) 1993 VR8 Inc.
 shadfgtr		// (c) 1993 DUTECH Inc.
 skimaxx			// (c) 1996 Kyle Hodgetts/ICE
@@ -11214,6 +11248,7 @@ bugfeverd		// (c) 2006 Amcoe
 bugfeverv		// (c) 2006 Amcoe
 bugfeverv2		// (c) 2006 Amcoe
 funriver		// (c) 2005 Amcoe - Fun River
+funriverd1		// (c) 2005 Amcoe
 funriverv		// (c) 2005 Amcoe
 dvisland		// (c) 2006 Amcoe - Devil's Island
 dvislando		// (c) 2006 Amcoe
@@ -12953,6 +12988,10 @@ sc4cckeyh	//
 sc4cckeyi	//
 sc4cckeyj	//
 sc4cckeyk	//
+sc4cckeyl	//
+sc4cckeym	//
+sc4cckeyn	//
+sc4cckeyo	//
 sc4ckx		// Casino King X (Mazooma)
 sc4ckxa		//
 sc4ckxb		//
@@ -13037,6 +13076,8 @@ sc4crcpe	//
 sc4crcpf	//
 sc4crcpg	//
 sc4crcph	//
+sc4crcpi	//
+sc4crcpj	//
 sc4crgc		// Cops 'n' Robbers Gold Club (Bellfruit)
 sc4crgca	//
 sc4crgcb	//
@@ -13093,6 +13134,17 @@ sc4cclimm	//
 sc4cclimn	//
 sc4cclimo	//
 sc4cclimp	//
+sc4cclimq	//
+sc4cclimr	//
+sc4cclims	//
+sc4cclimt	//
+sc4cclimu	//
+sc4clbmn	//
+sc4clbmna	//
+sc4clbmnb	//
+sc4clbmnc	//
+sc4boomb	//
+sc4boomba	//
 sc4cfqps	// Crazy Fruits (Qps)
 sc4cfqpsa	//
 sc4cfqpsb	//
@@ -13106,6 +13158,24 @@ sc4cfqpsi	//
 sc4cfqpsj	//
 sc4cfqpsk	//
 sc4cfcas	// Crazy Fruits Casino (Bellfruit)
+sc4cfcasa	//
+sc4cfcasb	//
+sc4cfcasc	//
+sc4cfcasd	//
+sc4cfcase	//
+sc4cfcasf	//
+sc4cfcasg	//
+sc4cfcash	//
+sc4cfcasi	//
+sc4cfcasj	//
+sc4cfcask	//
+sc4cfcasl	//
+sc4cfcasm	//
+sc4cfcasn	//
+sc4cfcaso	//
+sc4cfcasp	//
+sc4cfcasq	//
+sc4cfcasr	//
 sc4cfcla	// Crazy Fruits Classic (Bellfruit)
 sc4cfclab	//
 sc4cfclac	//
@@ -13179,6 +13249,10 @@ sc4crzkyp	//
 sc4crzkyq	//
 sc4crzkyr	//
 sc4crzkys	//
+sc4crzkyt	//
+sc4crzkyu	//
+sc4crzkyv	//
+sc4crzkyw	//
 sc4crzwl	// Crazy World (Mazooma)
 sc4crzwla	//
 sc4crzwlb	//
@@ -13769,6 +13843,10 @@ sc4luckbx	//
 sc4luckby	//
 sc4luckbz	//
 sc4luckb0	//
+sc4luckb1	//
+sc4luckb2	//
+sc4luckb3	//
+sc4luckb4	//
 sc4magci	// Magic Circle (Qps)
 sc4magcia	//
 sc4magcib	//
@@ -13823,6 +13901,10 @@ sc4mgrf		//
 sc4mgrg		//
 sc4mgrh		//
 sc4mgri		//
+sc4mgrj		//
+sc4mgrk		//
+sc4mgrl		//
+sc4mgrm		//
 sc4mspid	// Money Spider (Bellfruit)
 sc4mspida	//
 sc4mspidb	//
@@ -13899,7 +13981,6 @@ sc4mclbd	//
 sc4mclbe	//
 sc4mdlx		// Monopoly Deluxe (Mazooma)
 sc4mondxg   //
-sc4mowowd   //
 sc4mont		// Montego Pay (Qps)
 sc4monta	//
 sc4montb	//
@@ -13941,9 +14022,9 @@ sc4outlwc	//
 sc4pacmn	// Pac Man (Mazooma)
 sc4pacmna	//
 sc4pacmnb	//
-sc4pacmnc	//
-sc4pacmnd	//
-sc4pacmne	//
+sc4pacqp	//
+sc4pacqpa	//
+sc4pacqpb	//
 sc4paccs	// Pac Man Casino (Mazooma)
 sc4paccsa	//
 sc4paccsb	//
@@ -14011,6 +14092,8 @@ sc4pogbl	// Pots Of Gold Club (Bellfruit)
 sc4pogbla	//
 sc4pogblb	//
 sc4pogblc	//
+sc4pogbld	//
+sc4pogble	//
 sc4pwcrz	// Power Crazy (Bellfruit)
 sc4pwcrza	//
 sc4pwcrzb	//
@@ -14547,6 +14630,10 @@ sc4wldbnj	//
 sc4wldbnk	//
 sc4wldbnl	//
 sc4wldbnm	//
+sc4wldbnn	//
+sc4wldbno	//
+sc4wldbnp	//
+sc4wldbnq	//
 sc4wthng	// Wild Thing (Bellfruit)
 sc4wthnga	//
 sc4wthngb	//
@@ -14762,6 +14849,7 @@ sc4cariqe	//
 sc4cariqf	//
 sc4cariqg	//
 sc4cblas	// Cash Blast (Bellfruit)
+sc4cblasa	//
 sc4casxt	// Casino Xtravaganza  (Mazooma)
 sc4casxta	//
 sc4casxtb	//
@@ -14857,6 +14945,8 @@ sc4dndcs	// Deal Or No Deal Classic (Bellfruit)
 sc4dndcsa	//
 sc4dndcsb	//
 sc4dndcsc	//
+sc4dndcsd	//
+sc4dndcse	//
 sc4dndbb	// Deal Or No Deal Break The Bank (Bellfruit)
 sc4dndbba	//
 sc4dndbbb	//
@@ -14893,9 +14983,13 @@ sc4dndhff	//
 sc4dndhfg	//
 sc4dndhfh	//
 sc4dndhfi	//
+sc4dndhfj	//
+sc4dndhfk	//
+sc4dndhfl	//
 sc4dndys	// Deal Or No Deal It's Your Show (Bellfruit)
 sc4dndysa	//
 sc4dndysb	//
+sc4dndysc	//
 sc4dndlp	// Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit)
 sc4dndlpa	//
 sc4dndlpb	//
@@ -15033,6 +15127,8 @@ sc4fguy		// Family Guy (Bellfruit)
 sc4fguya	//
 sc4fguyb	//
 sc4fguyc	//
+sc4fguyd	//
+sc4fguye	//
 sc4fbspn	// Fat Boy Spin (Bellfruit)
 sc4fbspna	//
 sc4fbspnb	//
@@ -15079,22 +15175,22 @@ sc4gball	//
 sc4gballa	//
 sc4gballb	//
 sc4gballc	//
-sc4ggame	// Golden Game (Mazooma)
+sc4ggtb	    // Golden Game (Mazooma) Top Box
+sc4ggtba	//
+sc4ggtbb	//
+sc4ggame	// Golden Game
 sc4ggamea	//
 sc4ggameb	//
 sc4ggamec	//
 sc4ggamed	//
-sc4ggamee	//
 sc4ggamef	//
 sc4ggameg	//
-sc4ggameh	//
 sc4ggamei	//
 sc4ggamej	//
 sc4ggamek	//
 sc4ggamel	//
 sc4ggamem	//
 sc4ggamen	//
-sc4ggameo	//
 sc4ggamep	//
 sc4ggameq	//
 sc4ggamer	//
@@ -15129,8 +15225,9 @@ sc4ggdlxd	//
 sc4ggdlxe	//
 sc4ggdlxf	//
 sc4ggdlxg	//
-sc4ggg		// Grand Golden Game (Mazooma)
-sc4ggga		//
+sc4gggtb	// Grand Golden Game (Mazooma)
+sc4gggtba	//
+sc4ggg		//
 sc4gggb		//
 sc4gggc		//
 sc4gggd		//
@@ -15139,7 +15236,6 @@ sc4gggf		//
 sc4gggg		//
 sc4gggh		//
 sc4gggi		//
-sc4gggj		//
 sc4gggk		//
 sc4gggl		//
 sc4gggm		//
@@ -15179,6 +15275,10 @@ sc4hntcsl	//
 sc4hntcsm	//
 sc4hntcsn	//
 sc4hntcso	//
+sc4hntcsp	//
+sc4hntcsq	//
+sc4hntcsr	//
+sc4hntcss	//
 sc4hellb	// Hells Bells (Bellfruit)
 sc4hellba	//
 sc4hellbb	//
@@ -15233,6 +15333,8 @@ sc4ijobh	//
 sc4ijobi	//
 sc4ijobj	//
 sc4ijobk	//
+sc4ijobl	//
+sc4ijobm	//
 sc4jjok		// Jackpot Jokers (Bellfruit)
 sc4jjoka	//
 sc4ldvl		// Little Devil (Mazooma)
@@ -15352,6 +15454,9 @@ sc4mhph		//
 sc4mhpi		//
 sc4mhpj		//
 sc4mhpk		//
+sc4mhpl		//
+sc4mhpm		//
+sc4mhpn		//
 sc4mmb		// Monopoly Money Bags (Bellfruit)
 sc4mmba		//
 sc4mrh		// Monopoly Red Hot (Mazooma)
@@ -15426,6 +15531,8 @@ sc4popey	// Popeye (Mazooma)
 sc4popeya	//
 sc4popeyb	//
 sc4popeyc	//
+sc4popeyd	//
+sc4popeye	//
 sc4pog		// Pots Of Gold (Bellfruit)
 sc4bulcsb	//
 sc4poga		//
@@ -15436,6 +15543,8 @@ sc4pogd		//
 sc4poge		//
 sc4pogf		//
 sc4pogg		//
+sc4pogh		//
+sc4pogi		//
 sc4pwrpl	// Power Play (Mazooma)
 sc4pwrpla	//
 sc4pwrplb	//
@@ -15500,6 +15609,7 @@ sc4showtb	//
 sc4showtc	//
 sc4showtd	//
 sc4showte	//
+sc4showtf	//
 sc4slad		// Snakes & Ladders (Bellfruit)
 sc4slada	//
 sc4sladb	//
@@ -15638,16 +15748,17 @@ sc4dndbem	//
 sc4dndben	//
 sc4dndbc	// Deal Or No Deal Box Clever (Bellfruit)
 sc4dndbca	//
+sc4bwow     // Wheel of Wealth (Bellfruit)
+sc4bwowa	//
 sc4mowow	// Monopoly Wheel Of Wealth (Mazooma)
 sc4mowowa	//
 sc4mowowb	//
 sc4mowowc	//
-sc4mowowe	//
-sc4mowowf	//
-sc4mowowg	//
-sc4mowowh	//
-sc4mowowi	//
-sc4mowowj	//
+sc4mwwtb	//
+sc4mwwtba	//
+sc4mwwtbb	//
+sc4mwwtbc	//
+sc4mwwtbd	//
 sc4nunsm	// Nuns 'n' Roses (Mazooma)
 sc4nunsmb	//
 sc4nunsmc	//
@@ -17216,7 +17327,6 @@ ad5rsrr		// Ronnie O'Sullivan's Rocket Ronnie (Bellfruit)
 ad5tornc	// Tornado Club (Bellfruit)
 ad5vpa		// Video Poker Ace (Bellfruit)
 ad5vlv		// Viva Las Vegas (Bellfruit)
-ad5u1337	// Unknown Scorpion '39211337' (Mazooma)
 
 
 
@@ -18806,9 +18916,45 @@ m5clr		// MPU 5 Ram & Meter Clear (Barcrest)
 m5tst		// MPU 5 Test Rom (Barcrest)
 
 m5addams	// Addams Family (Barcrest)
+m5addamsa	//
+m5addamsb	//
+m5addamsc	//
+m5addamsd	//
+m5addamse	//
+m5addamsf	//
+m5addamsg	//
+m5addamsh	//
+m5addamsi	//
+m5addamsj	//
+m5addamsk	//
+m5addamsl	//
+m5addamsm	//
+m5addamsn	//
+m5addamso	//
+m5addamsp	//
+m5addamsq	//
+m5addamsr	//
+m5addamss	//
 m5addlad	// Adders & Ladders (Barcrest)
 m5addlada	//
 m5addladb	//
+m5addladc	//
+m5addladd	//
+m5addlade	//
+m5addladf	//
+m5addladg	//
+m5addladh	//
+m5addladi	//
+m5addladj	//
+m5addladk	//
+m5addladl	//
+m5addladm	//
+m5addladn	//
+m5addlado	//
+m5addladp	//
+m5addladq	//
+m5addladr	//
+m5addlads	//
 m5fire		// All Fired Up (Barcrest)
 m5arab		// Arabian Nights (Barcrest)
 m5austin	// Austin Powers (Barcrest)
@@ -18946,6 +19092,7 @@ m5hotrk		// Hot Rocks (Barcrest)
 /* Barcrest / Red Gaming */
 
 m5ashock	// Aftershock (Barcrest - Red Gaming)
+m5ashocka	//
 m5bigsht	// Big Shot (Barcrest - Red Gaming)
 m5bnkrs		// Bonkers (Barcrest - Red Gaming)
 m5bbank		// Break The Bank (Barcrest - Red Gaming)
@@ -18986,9 +19133,35 @@ m5slide		// Slider (Barcrest - Red Gaming)
 
 m5sixsht	// 6 Shooter (Vivid)
 m5sixshta	//
+m5sixshtb	//
+m5sixshtc	//
+m5sixshtd	//
+m5sixshte	//
+m5sixshtf	//
+m5sixshtg	//
+m5sixshth	//
+m5sixshti	//
+m5sixshtj	//
+m5sixshtk	//
+m5sixshtl	//
+m5sixshtm	//
+m5sixshtn	//
 m5all41		// All 4 One (Vivid)
-m5all41v	//
+m5all41a	//
+m5all41b	//
+m5all41c	//
+m5all41d	//
+m5all41e	//
+m5all41f	//
+m5all41g	//
+m5all41h	//
+m5all41i	//
+m5all41j	//
+m5all41k	//
+m5all41l	//
+m5all41m	//
 m5atlan		// Atlantic (Vivid)
+m5atlana	//
 m5bttf		// Back To The Features (Vivid)
 m5btlbnk	// Bottle Bank (Vivid)
 m5caesc		// Caesar's Cash (Vivid)
@@ -19042,6 +19215,9 @@ m5rawin		// Reel A Win (Vivid)
 /* Empire */
 
 m5fewmor	// A Few Dollars More (Empire)
+m5fewmora	//
+m5fewmorb	//
+m5fewmorc	//
 m5wonga		// A Fish Called Wonga (Empire)
 m5aceclb	// Ace Of Clubs (Empire)
 m5aceclba	//
@@ -19144,7 +19320,7 @@ m5xena		// Xena Warrior Princess (Bwb)
 
 
 /* Lowen */
-m5all41l	// All 4 One (Lowen)
+m5all41low	// All 4 One (Lowen)
 m5dblfun	// Double Fun (Lowen)
 m5jakjok	// Jackpot Jokers (Lowen)
 m5roundl	// Round & Round (Lowen)
@@ -19582,12 +19758,23 @@ hg_frd		// Fruit Deuce
 /* Global Games 'Stealth' */
 
 gl_dow		// Deals On Wheels (Global)
+gl_dowp
 gl_dowcl	// Deals On Wheels Club (Global)
+gl_dowclp
 gl_wywh		// Wish You Were Here Club (Global)
+gl_wywhp
+gl_wywh24
+gl_wywh24p
 gl_coc		// Carry On Clubbin' (Global)
+gl_cocp
+gl_coc29
+gl_coc29p
 gl_uyr		// Up Yer Riggin Club (Global)
+gl_uyrp
 gl_hbh		// Heartbreak Hotel (Global)
 gl_hbhcl	// Heartbreak Hotel Club (Global)
+gl_hbhclp
+gl_hbhcla
 
 /* Unknown, Pluto? */
 
@@ -19642,9 +19829,10 @@ specfrce        // (c) 2002 ICE/Play Mechanix
 jnero			// (c) 2004 ICE/Play Mechanix
 
 // Amatic Trading GMBH
-am_uslot		// (c) 1996 Amatic
+suprstar		// (c) 1996 Amatic
 am_mg24			// (c) 2000 Amatic
 am_mg3			// (c) 2000 Amatic
+am_mg3a			// (c) 2000 Amatic
 
 neptunp2
 rgum
@@ -19900,6 +20088,7 @@ trucksp2
    Bally MPU AS-2518-133
 */
 babypac
+babypac2
 granny
 
 // by68701.c
@@ -20228,6 +20417,7 @@ empsback
 
 // icecold.c
 icecold
+zekepeak
 
 // inder.c
 ind250cc
@@ -21270,3 +21460,4 @@ caspoker		// 1987, PM / Beck Elektronik.
 
 manohman		// 199?, Merkur.
 jankenmn		// 1985, Sunwise.
+bikkuric

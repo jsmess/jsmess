@@ -18,7 +18,16 @@ class megasys1_state : public driver_device
 {
 public:
 	megasys1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vregs(*this, "vregs"),
+		m_objectram(*this, "objectram"),
+		m_scrollram(*this, "scrollram"),
+		m_ram(*this, "ram"){ }
+
+	required_shared_ptr<UINT16> m_vregs;
+	required_shared_ptr<UINT16> m_objectram;
+	required_shared_ptr_array<UINT16,3> m_scrollram;
+	required_shared_ptr<UINT16> m_ram;
 
 	UINT16 *m_spriteram;
 	UINT16 m_ip_select;
@@ -26,10 +35,6 @@ public:
 	UINT8 m_ignore_oki_status;
 	UINT16 m_protection_val;
 	int m_bank;
-	UINT16 *m_scrollram[3];
-	UINT16 *m_objectram;
-	UINT16 *m_vregs;
-	UINT16 *m_ram;
 	int m_scrollx[3];
 	int m_scrolly[3];
 	int m_active_layers;
@@ -51,6 +56,28 @@ public:
 
 	int m_mcu_hs;
 	UINT16 m_mcu_hs_ram[0x10];
+	DECLARE_READ16_MEMBER(ip_select_r);
+	DECLARE_WRITE16_MEMBER(ip_select_w);
+	DECLARE_READ16_MEMBER(protection_peekaboo_r);
+	DECLARE_WRITE16_MEMBER(protection_peekaboo_w);
+	DECLARE_READ16_MEMBER(megasys1A_mcu_hs_r);
+	DECLARE_WRITE16_MEMBER(megasys1A_mcu_hs_w);
+	DECLARE_READ16_MEMBER(edfbl_input_r);
+	DECLARE_READ16_MEMBER(iganinju_mcu_hs_r);
+	DECLARE_WRITE16_MEMBER(iganinju_mcu_hs_w);
+	DECLARE_READ16_MEMBER(soldamj_spriteram16_r);
+	DECLARE_WRITE16_MEMBER(soldamj_spriteram16_w);
+	DECLARE_READ16_MEMBER(stdragon_mcu_hs_r);
+	DECLARE_WRITE16_MEMBER(stdragon_mcu_hs_w);
+	DECLARE_READ16_MEMBER(monkelf_input_r);
+	DECLARE_WRITE16_MEMBER(megasys1_scrollram_0_w);
+	DECLARE_WRITE16_MEMBER(megasys1_scrollram_1_w);
+	DECLARE_WRITE16_MEMBER(megasys1_scrollram_2_w);
+	DECLARE_WRITE16_MEMBER(megasys1_vregs_A_w);
+	DECLARE_READ16_MEMBER(megasys1_vregs_C_r);
+	DECLARE_WRITE16_MEMBER(megasys1_vregs_C_w);
+	DECLARE_WRITE16_MEMBER(megasys1_vregs_D_w);
+	void megasys1_set_vreg_flag(int which, int data);
 };
 
 
@@ -62,12 +89,5 @@ SCREEN_VBLANK( megasys1 );
 
 PALETTE_INIT( megasys1 );
 
-READ16_HANDLER( megasys1_vregs_C_r );
 
-WRITE16_HANDLER( megasys1_vregs_A_w );
-WRITE16_HANDLER( megasys1_vregs_C_w );
-WRITE16_HANDLER( megasys1_vregs_D_w );
 
-WRITE16_HANDLER( megasys1_scrollram_0_w );
-WRITE16_HANDLER( megasys1_scrollram_1_w );
-WRITE16_HANDLER( megasys1_scrollram_2_w );

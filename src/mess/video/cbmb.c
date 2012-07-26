@@ -16,7 +16,7 @@ VIDEO_START( cbmb_crtc )
 
 void cbm600_vh_init(running_machine &machine)
 {
-	UINT8 *gfx = machine.region("gfx1")->base();
+	UINT8 *gfx = machine.root_device().memregion("gfx1")->base();
 	int i;
 
 	/* inversion logic on board */
@@ -29,7 +29,7 @@ void cbm600_vh_init(running_machine &machine)
 
 void cbm700_vh_init(running_machine &machine)
 {
-	UINT8 *gfx = machine.region("gfx1")->base();
+	UINT8 *gfx = machine.root_device().memregion("gfx1")->base();
 	int i;
 	for (i=0; i<0x800; i++) {
 		gfx[0x1000+i]=gfx[0x800+i];

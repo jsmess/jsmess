@@ -24,11 +24,13 @@ class boxer_state : public driver_device
 {
 public:
 	boxer_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_tile_ram(*this, "tile_ram"),
+		m_sprite_ram(*this, "sprite_ram"){ }
 
 	/* memory pointers */
-	UINT8 * m_tile_ram;
-	UINT8 * m_sprite_ram;
+	required_shared_ptr<UINT8> m_tile_ram;
+	required_shared_ptr<UINT8> m_sprite_ram;
 
 	/* misc */
 	UINT8 m_pot_state;
@@ -36,6 +38,14 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_READ8_MEMBER(boxer_input_r);
+	DECLARE_READ8_MEMBER(boxer_misc_r);
+	DECLARE_WRITE8_MEMBER(boxer_bell_w);
+	DECLARE_WRITE8_MEMBER(boxer_sound_w);
+	DECLARE_WRITE8_MEMBER(boxer_pot_w);
+	DECLARE_WRITE8_MEMBER(boxer_irq_reset_w);
+	DECLARE_WRITE8_MEMBER(boxer_crowd_w);
+	DECLARE_WRITE8_MEMBER(boxer_led_w);
 };
 
 /*************************************
@@ -71,12 +81,12 @@ static TIMER_CALLBACK( periodic_callback )
 
 		memset(mask, 0, sizeof mask);
 
-		mask[input_port_read(machine, "STICK0_X")] |= 0x01;
-		mask[input_port_read(machine, "STICK0_Y")] |= 0x02;
-		mask[input_port_read(machine, "PADDLE0")]  |= 0x04;
-		mask[input_port_read(machine, "STICK1_X")] |= 0x08;
-		mask[input_port_read(machine, "STICK1_Y")] |= 0x10;
-		mask[input_port_read(machine, "PADDLE1")]  |= 0x20;
+		mask[state->ioport("STICK0_X")->read()] |= 0x01;
+		mask[state->ioport("STICK0_Y")->read()] |= 0x02;
+		mask[state->ioport("PADDLE0")->read()]  |= 0x04;
+		mask[state->ioport("STICK1_X")->read()] |= 0x08;
+		mask[state->ioport("STICK1_Y")->read()] |= 0x10;
+		mask[state->ioport("PADDLE1")->read()]  |= 0x20;
 
 		for (i = 1; i < 256; i++)
 			if (mask[i] != 0)
@@ -116,7 +126,7 @@ static void draw_boxer( running_machine &machine, bitmap_ind16 &bitmap, const re
 
 	for (n = 0; n < 2; n++)
 	{
-		const UINT8* p = machine.region(n == 0 ? "user1" : "user2")->base();
+		const UINT8* p = state->memregion(n == 0 ? "user1" : "user2")->base();
 
 		int i, j;
 
@@ -191,38 +201,37 @@ static SCREEN_UPDATE_IND16( boxer )
  *
  *************************************/
 
-static READ8_HANDLER( boxer_input_r )
+READ8_MEMBER(boxer_state::boxer_input_r)
 {
-	UINT8 val = input_port_read(space->machine(), "IN0");
+	UINT8 val = ioport("IN0")->read();
 
-	if (input_port_read(space->machine(), "IN3") < space->machine().primary_screen->vpos())
+	if (ioport("IN3")->read() < machine().primary_screen->vpos())
 		val |= 0x02;
 
 	return (val << ((offset & 7) ^ 7)) & 0x80;
 }
 
 
-static READ8_HANDLER( boxer_misc_r )
+READ8_MEMBER(boxer_state::boxer_misc_r)
 {
-	boxer_state *state = space->machine().driver_data<boxer_state>();
 	UINT8 val = 0;
 
 	switch (offset & 3)
 	{
 	case 0:
-		val = state->m_pot_state & state->m_pot_latch;
+		val = m_pot_state & m_pot_latch;
 		break;
 
 	case 1:
-		val = space->machine().primary_screen->vpos();
+		val = machine().primary_screen->vpos();
 		break;
 
 	case 2:
-		val = input_port_read(space->machine(), "IN1");
+		val = ioport("IN1")->read();
 		break;
 
 	case 3:
-		val = input_port_read(space->machine(), "IN2");
+		val = ioport("IN2")->read();
 		break;
 	}
 
@@ -232,19 +241,18 @@ static READ8_HANDLER( boxer_misc_r )
 
 
 
-static WRITE8_HANDLER( boxer_bell_w )
+WRITE8_MEMBER(boxer_state::boxer_bell_w)
 {
 }
 
 
-static WRITE8_HANDLER( boxer_sound_w )
+WRITE8_MEMBER(boxer_state::boxer_sound_w)
 {
 }
 
 
-static WRITE8_HANDLER( boxer_pot_w )
+WRITE8_MEMBER(boxer_state::boxer_pot_w)
 {
-	boxer_state *state = space->machine().driver_data<boxer_state>();
 	/* BIT0 => HPOT1 */
 	/* BIT1 => VPOT1 */
 	/* BIT2 => RPOT1 */
@@ -252,34 +260,33 @@ static WRITE8_HANDLER( boxer_pot_w )
 	/* BIT4 => VPOT2 */
 	/* BIT5 => RPOT2 */
 
-	state->m_pot_latch = data & 0x3f;
+	m_pot_latch = data & 0x3f;
 
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
-static WRITE8_HANDLER( boxer_irq_reset_w )
+WRITE8_MEMBER(boxer_state::boxer_irq_reset_w)
 {
-	boxer_state *state = space->machine().driver_data<boxer_state>();
-	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 }
 
 
-static WRITE8_HANDLER( boxer_crowd_w )
+WRITE8_MEMBER(boxer_state::boxer_crowd_w)
 {
 	/* BIT0 => ATTRACT */
 	/* BIT1 => CROWD-1 */
 	/* BIT2 => CROWD-2 */
 	/* BIT3 => CROWD-3 */
 
-	coin_lockout_global_w(space->machine(), data & 1);
+	coin_lockout_global_w(machine(), data & 1);
 }
 
 
-static WRITE8_HANDLER( boxer_led_w )
+WRITE8_MEMBER(boxer_state::boxer_led_w)
 {
-	set_led_status(space->machine(), 1, !(data & 1));
-	set_led_status(space->machine(), 0, !(data & 2));
+	set_led_status(machine(), 1, !(data & 1));
+	set_led_status(machine(), 0, !(data & 2));
 }
 
 
@@ -289,10 +296,10 @@ static WRITE8_HANDLER( boxer_led_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( boxer_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( boxer_map, AS_PROGRAM, 8, boxer_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x03ff) AM_RAM AM_BASE_MEMBER(boxer_state, m_tile_ram)
+	AM_RANGE(0x0200, 0x03ff) AM_RAM AM_SHARE("tile_ram")
 	AM_RANGE(0x0800, 0x08ff) AM_READ(boxer_input_r)
 	AM_RANGE(0x1000, 0x17ff) AM_READ(boxer_misc_r)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(boxer_pot_w)
@@ -301,7 +308,7 @@ static ADDRESS_MAP_START( boxer_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1b00, 0x1bff) AM_WRITE(boxer_crowd_w)
 	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(boxer_irq_reset_w)
 	AM_RANGE(0x1d00, 0x1dff) AM_WRITE(boxer_bell_w)
-	AM_RANGE(0x1e00, 0x1eff) AM_WRITEONLY AM_BASE_MEMBER(boxer_state, m_sprite_ram)
+	AM_RANGE(0x1e00, 0x1eff) AM_WRITEONLY AM_SHARE("sprite_ram")
 	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3000, 0x3fff) AM_ROM
 ADDRESS_MAP_END

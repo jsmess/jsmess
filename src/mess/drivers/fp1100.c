@@ -51,7 +51,6 @@ unimplemented instruction: PER
   scroll (as can be seen in the 9000-97FF area).
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -72,7 +71,8 @@ public:
 	//m_printer(*this, "centronics"),
 	m_crtc(*this, "crtc")
 	//m_fdc(*this, "fdc")
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
@@ -97,7 +97,7 @@ public:
 	DECLARE_WRITE8_MEMBER(sub_to_main_w);
 	DECLARE_WRITE8_MEMBER(portc_w);
 	UINT8 *m_wram;
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 m_mem_bank;
 	UINT8 irq_mask;
 	UINT8 m_main_latch;
@@ -147,7 +147,7 @@ READ8_MEMBER( fp1100_state::fp1100_mem_r )
 {
 	if(m_mem_bank == 0 && offset <= 0x8fff)
 	{
-		UINT8 *ipl = machine().region("ipl")->base();
+		UINT8 *ipl = memregion("ipl")->base();
 		return ipl[offset];
 	}
 
@@ -247,7 +247,7 @@ static ADDRESS_MAP_START(fp1100_slave_map, AS_PROGRAM, 8, fp1100_state )
 	AM_RANGE(0xff80, 0xffff) AM_RAM		/* upd7801 internal RAM */
 	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("sub_ipl",0x0000)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("sub_ipl",0x1000)
-	AM_RANGE(0x2000, 0xdfff) AM_READWRITE(fp1100_vram_r,fp1100_vram_w) AM_BASE(m_p_videoram) //vram B/R/G
+	AM_RANGE(0x2000, 0xdfff) AM_READWRITE(fp1100_vram_r,fp1100_vram_w) AM_SHARE("p_videoram") //vram B/R/G
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xe400, 0xe400) AM_READ_PORT("DSW") AM_WRITENOP // key mux write
@@ -361,7 +361,7 @@ static MACHINE_RESET(fp1100)
 
 	for(i=0;i<8;i++)
 	{
-		slot_type = (input_port_read(machine, "SLOTS") >> i*2) & 3;
+		slot_type = (machine.root_device().ioport("SLOTS")->read() >> i*2) & 3;
 		state->m_slot[i].id = id_type[slot_type];
 	}
 }

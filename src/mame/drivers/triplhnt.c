@@ -76,7 +76,7 @@ static void triplhnt_update_misc(running_machine &machine, int offset)
 	discrete_sound_w(discrete, TRIPLHNT_LAMP_EN, state->m_misc_flags & 0x02);	// Lamp is used to reset noise
 	discrete_sound_w(discrete, TRIPLHNT_BEAR_EN, state->m_misc_flags & 0x80);	// bear
 
-	is_witch_hunt = input_port_read(machine, "0C09") == 0x40;
+	is_witch_hunt = machine.root_device().ioport("0C09")->read() == 0x40;
 	bit = ~state->m_misc_flags & 0x40;
 
 	/* if we're not playing the sample yet, start it */
@@ -91,43 +91,40 @@ static void triplhnt_update_misc(running_machine &machine, int offset)
 }
 
 
-static WRITE8_HANDLER( triplhnt_misc_w )
+WRITE8_MEMBER(triplhnt_state::triplhnt_misc_w)
 {
-	triplhnt_update_misc(space->machine(), offset);
+	triplhnt_update_misc(machine(), offset);
 }
 
 
-static READ8_HANDLER( triplhnt_cmos_r )
+READ8_MEMBER(triplhnt_state::triplhnt_cmos_r)
 {
-	triplhnt_state *state = space->machine().driver_data<triplhnt_state>();
-	state->m_cmos_latch = offset;
+	m_cmos_latch = offset;
 
-	return state->m_cmos[state->m_cmos_latch] ^ 15;
+	return m_cmos[m_cmos_latch] ^ 15;
 }
 
 
-static READ8_HANDLER( triplhnt_input_port_4_r )
+READ8_MEMBER(triplhnt_state::triplhnt_input_port_4_r)
 {
 	watchdog_reset_w(space, 0, 0);
-	return input_port_read(space->machine(), "0C0B");
+	return ioport("0C0B")->read();
 }
 
 
-static READ8_HANDLER( triplhnt_misc_r )
+READ8_MEMBER(triplhnt_state::triplhnt_misc_r)
 {
-	triplhnt_state *state = space->machine().driver_data<triplhnt_state>();
-	triplhnt_update_misc(space->machine(), offset);
-	return input_port_read(space->machine(), "VBLANK") | state->m_hit_code;
+	triplhnt_update_misc(machine(), offset);
+	return ioport("VBLANK")->read() | m_hit_code;
 }
 
 
-static READ8_HANDLER( triplhnt_da_latch_r )
+READ8_MEMBER(triplhnt_state::triplhnt_da_latch_r)
 {
-	triplhnt_state *state = space->machine().driver_data<triplhnt_state>();
-	int cross_x = input_port_read(space->machine(), "STICKX");
-	int cross_y = input_port_read(space->machine(), "STICKY");
+	int cross_x = ioport("STICKX")->read();
+	int cross_y = ioport("STICKY")->read();
 
-	state->m_da_latch = offset;
+	m_da_latch = offset;
 
 	/* the following is a slight simplification */
 
@@ -135,14 +132,14 @@ static READ8_HANDLER( triplhnt_da_latch_r )
 }
 
 
-static ADDRESS_MAP_START( triplhnt_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( triplhnt_map, AS_PROGRAM, 8, triplhnt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x300)
-	AM_RANGE(0x0400, 0x04ff) AM_WRITEONLY AM_BASE_MEMBER(triplhnt_state, m_playfield_ram)
-	AM_RANGE(0x0800, 0x080f) AM_WRITEONLY AM_BASE_MEMBER(triplhnt_state, m_vpos_ram)
-	AM_RANGE(0x0810, 0x081f) AM_WRITEONLY AM_BASE_MEMBER(triplhnt_state, m_hpos_ram)
-	AM_RANGE(0x0820, 0x082f) AM_WRITEONLY AM_BASE_MEMBER(triplhnt_state, m_orga_ram)
-	AM_RANGE(0x0830, 0x083f) AM_WRITEONLY AM_BASE_MEMBER(triplhnt_state, m_code_ram)
+	AM_RANGE(0x0400, 0x04ff) AM_WRITEONLY AM_SHARE("playfield_ram")
+	AM_RANGE(0x0800, 0x080f) AM_WRITEONLY AM_SHARE("vpos_ram")
+	AM_RANGE(0x0810, 0x081f) AM_WRITEONLY AM_SHARE("hpos_ram")
+	AM_RANGE(0x0820, 0x082f) AM_WRITEONLY AM_SHARE("orga_ram")
+	AM_RANGE(0x0830, 0x083f) AM_WRITEONLY AM_SHARE("code_ram")
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("0C00")
 	AM_RANGE(0x0c08, 0x0c08) AM_READ_PORT("0C08")
 	AM_RANGE(0x0c09, 0x0c09) AM_READ_PORT("0C09")
@@ -199,7 +196,7 @@ static INPUT_PORTS_START( triplhnt )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("STICKX")
 	PORT_BIT( 0xfc, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x00,0xfc)  PORT_CROSSHAIR(X, 62.0/64, 1.0/64, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15)

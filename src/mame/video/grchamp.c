@@ -14,6 +14,7 @@
 
 PALETTE_INIT( grchamp )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances[3] = { 100, 270, 470 };
 	double rweights[3], gweights[3], bweights[2];
 	grchamp_state *state = machine.driver_data<grchamp_state>();
@@ -52,25 +53,22 @@ PALETTE_INIT( grchamp )
 }
 
 
-WRITE8_HANDLER( grchamp_left_w )
+WRITE8_MEMBER(grchamp_state::grchamp_left_w)
 {
-	grchamp_state *state = space->machine().driver_data<grchamp_state>();
-	state->m_leftram[offset] = data;
-	state->m_left_tilemap->mark_tile_dirty(offset);
+	m_leftram[offset] = data;
+	m_left_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( grchamp_center_w )
+WRITE8_MEMBER(grchamp_state::grchamp_center_w)
 {
-	grchamp_state *state = space->machine().driver_data<grchamp_state>();
-	state->m_centerram[offset] = data;
-	state->m_center_tilemap->mark_tile_dirty(offset);
+	m_centerram[offset] = data;
+	m_center_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( grchamp_right_w )
+WRITE8_MEMBER(grchamp_state::grchamp_right_w)
 {
-	grchamp_state *state = space->machine().driver_data<grchamp_state>();
-	state->m_rightram[offset] = data;
-	state->m_right_tilemap->mark_tile_dirty(offset);
+	m_rightram[offset] = data;
+	m_right_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_text_tile_info )
@@ -247,7 +245,7 @@ static void draw_objects(running_machine &machine, grchamp_state *state, int y, 
 
 
 */
-	const UINT8 *prom = machine.region("proms")->base() + 0x20;
+	const UINT8 *prom = machine.root_device().memregion("proms")->base() + 0x20;
 	const gfx_element *gfx;
 	int change = (state->m_cpu0_out[0] & 0x20) << 3;
 	int num;
@@ -366,9 +364,9 @@ SCREEN_UPDATE_RGB32( grchamp )
 	};
 
 	grchamp_state *state = screen.machine().driver_data<grchamp_state>();
-	const UINT8 *amedata = screen.machine().region("gfx5")->base();
-	const UINT8 *headdata = screen.machine().region("gfx6")->base();
-	const UINT8 *pldata = screen.machine().region("gfx7")->base();
+	const UINT8 *amedata = screen.machine().root_device().memregion("gfx5")->base();
+	const UINT8 *headdata = screen.machine().root_device().memregion("gfx6")->base();
+	const UINT8 *pldata = state->memregion("gfx7")->base();
 	bitmap_ind16 &lpixmap = state->m_left_tilemap->pixmap();
 	bitmap_ind16 &rpixmap = state->m_right_tilemap->pixmap();
 	bitmap_ind16 &cpixmap = state->m_center_tilemap->pixmap();

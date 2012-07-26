@@ -1520,14 +1520,14 @@ static MACHINE_RESET( cps )
 	if (strcmp(gamename, "sf2rb") == 0)
 	{
 		/* Patch out protection check */
-		UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+		UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 		rom[0xe5464 / 2] = 0x6012;
 	}
 
 	if (strcmp(gamename, "sf2rb2") == 0)
 	{
 		/* Patch out protection check */
-		UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+		UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 		rom[0xe5332 / 2] = 0x6014;
 	}
 
@@ -1538,13 +1538,13 @@ static MACHINE_RESET( cps )
            by the cpu core as a 32-bit branch. This branch would make the
            game crash (address error, since it would branch to an odd address)
            if location 180ca6 (outside ROM space) isn't 0. Protection check? */
-		UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+		UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 		rom[0x11756 / 2] = 0x4e71;
 	}
 	else if (strcmp(gamename, "ghouls") == 0)
 	{
 		/* Patch out self-test... it takes forever */
-		UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+		UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 		rom[0x61964 / 2] = 0x4ef9;
 		rom[0x61966 / 2] = 0x0000;
 		rom[0x61968 / 2] = 0x0400;
@@ -1572,10 +1572,9 @@ INLINE UINT16 *cps1_base( running_machine &machine, int offset, int boundary )
 
 
 
-WRITE16_HANDLER( cps1_cps_a_w )
+WRITE16_MEMBER(cps_state::cps1_cps_a_w)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
-	data = COMBINE_DATA(&state->m_cps_a_regs[offset]);
+	data = COMBINE_DATA(&m_cps_a_regs[offset]);
 
 	/*
     The main CPU writes the palette to gfxram, and the CPS-B custom copies it
@@ -1586,10 +1585,10 @@ WRITE16_HANDLER( cps1_cps_a_w )
     fixes glitches in the ghouls intro, but it might happen at next vblank.
     */
 	if (offset == CPS1_PALETTE_BASE)
-		cps1_build_palette(space->machine(), cps1_base(space->machine(), CPS1_PALETTE_BASE, state->m_palette_align));
+		cps1_build_palette(machine(), cps1_base(machine(), CPS1_PALETTE_BASE, m_palette_align));
 
 	// pzloop2 write to register 24 on startup. This is probably just a bug.
-	if (offset == 0x24 / 2 && state->m_cps_version == 2)
+	if (offset == 0x24 / 2 && m_cps_version == 2)
 		return;
 
 #ifdef MAME_DEBUG
@@ -1599,42 +1598,41 @@ WRITE16_HANDLER( cps1_cps_a_w )
 }
 
 
-READ16_HANDLER( cps1_cps_b_r )
+READ16_MEMBER(cps_state::cps1_cps_b_r)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
 
 	/* Some games interrogate a couple of registers on bootup. */
 	/* These are CPS1 board B self test checks. They wander from game to */
 	/* game. */
-	if (offset == state->m_game_config->cpsb_addr / 2)
-		return state->m_game_config->cpsb_value;
+	if (offset == m_game_config->cpsb_addr / 2)
+		return m_game_config->cpsb_value;
 
 	/* some games use as a protection check the ability to do 16-bit multiplications */
 	/* with a 32-bit result, by writing the factors to two ports and reading the */
 	/* result from two other ports. */
-	if (offset == state->m_game_config->mult_result_lo / 2)
-		return (state->m_cps_b_regs[state->m_game_config->mult_factor1 / 2] *
-				state->m_cps_b_regs[state->m_game_config->mult_factor2 / 2]) & 0xffff;
+	if (offset == m_game_config->mult_result_lo / 2)
+		return (m_cps_b_regs[m_game_config->mult_factor1 / 2] *
+				m_cps_b_regs[m_game_config->mult_factor2 / 2]) & 0xffff;
 
-	if (offset == state->m_game_config->mult_result_hi / 2)
-		return (state->m_cps_b_regs[state->m_game_config->mult_factor1 / 2] *
-				state->m_cps_b_regs[state->m_game_config->mult_factor2 / 2]) >> 16;
+	if (offset == m_game_config->mult_result_hi / 2)
+		return (m_cps_b_regs[m_game_config->mult_factor1 / 2] *
+				m_cps_b_regs[m_game_config->mult_factor2 / 2]) >> 16;
 
-	if (offset == state->m_game_config->in2_addr / 2)	/* Extra input ports (on C-board) */
-		return input_port_read(space->machine(), "IN2");
+	if (offset == m_game_config->in2_addr / 2)	/* Extra input ports (on C-board) */
+		return ioport("IN2")->read();
 
-	if (offset == state->m_game_config->in3_addr / 2)	/* Player 4 controls (on C-board) ("Captain Commando") */
-		return input_port_read(space->machine(), "IN3");
+	if (offset == m_game_config->in3_addr / 2)	/* Player 4 controls (on C-board) ("Captain Commando") */
+		return ioport("IN3")->read();
 
-	if (state->m_cps_version == 2)
+	if (m_cps_version == 2)
 	{
 		if (offset == 0x10/2)
 		{
 			// UNKNOWN--only mmatrix appears to read this, and I'm not sure if the result is actuallyused
-			return state->m_cps_b_regs[0x10 / 2];
+			return m_cps_b_regs[0x10 / 2];
 		}
 		if (offset == 0x12/2)
-			return state->m_cps_b_regs[0x12 / 2];
+			return m_cps_b_regs[0x12 / 2];
 	}
 #ifdef MAME_DEBUG
 	popmessage("CPS-B read port %02x contact MAMEDEV", offset * 2);
@@ -1643,12 +1641,11 @@ READ16_HANDLER( cps1_cps_b_r )
 }
 
 
-WRITE16_HANDLER( cps1_cps_b_w )
+WRITE16_MEMBER(cps_state::cps1_cps_b_w)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
-	data = COMBINE_DATA(&state->m_cps_b_regs[offset]);
+	data = COMBINE_DATA(&m_cps_b_regs[offset]);
 
-	if (state->m_cps_version == 2)
+	if (m_cps_version == 2)
 	{
 		/* To mark scanlines for raster effects */
 		if (offset == 0x0e/2)
@@ -1658,52 +1655,52 @@ WRITE16_HANDLER( cps1_cps_b_w )
 		}
 		if (offset == 0x10/2)
 		{
-			state->m_scanline1 = (data & 0x1ff);
+			m_scanline1 = (data & 0x1ff);
 			return;
 		}
 		if (offset == 0x12/2)
 		{
-			state->m_scanline2 = (data & 0x1ff);
+			m_scanline2 = (data & 0x1ff);
 			return;
 		}
 	}
 
 
 	// additional outputs on C-board
-	if (offset == state->m_game_config->out2_addr / 2)
+	if (offset == m_game_config->out2_addr / 2)
 	{
 		if (ACCESSING_BITS_0_7)
 		{
-			if (state->m_game_config->cpsb_value == 0x0402)	// Mercs (CN2 connector)
+			if (m_game_config->cpsb_value == 0x0402)	// Mercs (CN2 connector)
 			{
-				coin_lockout_w(space->machine(), 2, ~data & 0x01);
-				set_led_status(space->machine(), 0, data & 0x02);
-				set_led_status(space->machine(), 1, data & 0x04);
-				set_led_status(space->machine(), 2, data & 0x08);
+				coin_lockout_w(machine(), 2, ~data & 0x01);
+				set_led_status(machine(), 0, data & 0x02);
+				set_led_status(machine(), 1, data & 0x04);
+				set_led_status(machine(), 2, data & 0x08);
 			}
 			else	// kod, captcomm, knights
 			{
-				coin_lockout_w(space->machine(), 2, ~data & 0x02);
-				coin_lockout_w(space->machine(), 3, ~data & 0x08);
+				coin_lockout_w(machine(), 2, ~data & 0x02);
+				coin_lockout_w(machine(), 3, ~data & 0x08);
 			}
 		}
 	}
 
 #ifdef MAME_DEBUG
-	if (offset != state->m_game_config->cpsb_addr / 2 &&	// only varth writes here
-			offset != state->m_game_config->mult_factor1 / 2 &&
-			offset != state->m_game_config->mult_factor2 / 2 &&
-			offset != state->m_game_config->layer_control / 2 &&
-			offset != state->m_game_config->unknown1 / 2 &&
-			offset != state->m_game_config->unknown2 / 2 &&
-			offset != state->m_game_config->unknown3 / 2 &&
-			offset != state->m_game_config->priority[0] / 2 &&
-			offset != state->m_game_config->priority[1] / 2 &&
-			offset != state->m_game_config->priority[2] / 2 &&
-			offset != state->m_game_config->priority[3] / 2 &&
-			offset != state->m_game_config->palette_control / 2 &&
-			offset != state->m_game_config->out2_addr / 2 &&
-			!state->m_game_config->bootleg_kludge)
+	if (offset != m_game_config->cpsb_addr / 2 &&	// only varth writes here
+			offset != m_game_config->mult_factor1 / 2 &&
+			offset != m_game_config->mult_factor2 / 2 &&
+			offset != m_game_config->layer_control / 2 &&
+			offset != m_game_config->unknown1 / 2 &&
+			offset != m_game_config->unknown2 / 2 &&
+			offset != m_game_config->unknown3 / 2 &&
+			offset != m_game_config->priority[0] / 2 &&
+			offset != m_game_config->priority[1] / 2 &&
+			offset != m_game_config->priority[2] / 2 &&
+			offset != m_game_config->priority[3] / 2 &&
+			offset != m_game_config->palette_control / 2 &&
+			offset != m_game_config->out2_addr / 2 &&
+			!m_game_config->bootleg_kludge)
 		popmessage("CPS-B write %04x to port %02x contact MAMEDEV", data, offset * 2);
 #endif
 }
@@ -1719,9 +1716,9 @@ INLINE int cps2_port( running_machine &machine, int offset )
 
 static void cps1_gfx_decode( running_machine &machine )
 {
-	int size = machine.region("gfx")->bytes();
+	int size = machine.root_device().memregion("gfx")->bytes();
 	int i, j, gfxsize;
-	UINT8 *cps1_gfx = machine.region("gfx")->base();
+	UINT8 *cps1_gfx = machine.root_device().memregion("gfx")->base();
 
 	gfxsize = size / 4;
 
@@ -1775,11 +1772,11 @@ static void unshuffle( UINT64 *buf, int len )
 static void cps2_gfx_decode( running_machine &machine )
 {
 	const int banksize = 0x200000;
-	int size = machine.region("gfx")->bytes();
+	int size = machine.root_device().memregion("gfx")->bytes();
 	int i;
 
 	for (i = 0; i < size; i += banksize)
-		unshuffle((UINT64 *)(machine.region("gfx")->base() + i), banksize / 8);
+		unshuffle((UINT64 *)(machine.root_device().memregion("gfx")->base() + i), banksize / 8);
 
 	cps1_gfx_decode(machine);
 }
@@ -1910,20 +1907,19 @@ void cps1_get_video_base( running_machine &machine )
 }
 
 
-WRITE16_HANDLER( cps1_gfxram_w )
+WRITE16_MEMBER(cps_state::cps1_gfxram_w)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
 	int page = (offset >> 7) & 0x3c0;
-	COMBINE_DATA(&state->m_gfxram[offset]);
+	COMBINE_DATA(&m_gfxram[offset]);
 
-	if (page == (state->m_cps_a_regs[CPS1_SCROLL1_BASE] & 0x3c0))
-		state->m_bg_tilemap[0]->mark_tile_dirty(offset / 2 & 0x0fff);
+	if (page == (m_cps_a_regs[CPS1_SCROLL1_BASE] & 0x3c0))
+		m_bg_tilemap[0]->mark_tile_dirty(offset / 2 & 0x0fff);
 
-	if (page == (state->m_cps_a_regs[CPS1_SCROLL2_BASE] & 0x3c0))
-		state->m_bg_tilemap[1]->mark_tile_dirty(offset / 2 & 0x0fff);
+	if (page == (m_cps_a_regs[CPS1_SCROLL2_BASE] & 0x3c0))
+		m_bg_tilemap[1]->mark_tile_dirty(offset / 2 & 0x0fff);
 
-	if (page == (state->m_cps_a_regs[CPS1_SCROLL3_BASE] & 0x3c0))
-		state->m_bg_tilemap[2]->mark_tile_dirty(offset / 2 & 0x0fff);
+	if (page == (m_cps_a_regs[CPS1_SCROLL3_BASE] & 0x3c0))
+		m_bg_tilemap[2]->mark_tile_dirty(offset / 2 & 0x0fff);
 }
 
 
@@ -2124,7 +2120,7 @@ static VIDEO_START( cps )
 		state->m_cps2_buffered_obj = auto_alloc_array_clear(machine, UINT16, state->m_cps2_obj_size / 2);
 
 	/* clear RAM regions */
-	memset(state->m_gfxram, 0, state->m_gfxram_size);   /* Clear GFX RAM */
+	memset(state->m_gfxram, 0, state->m_gfxram.bytes());   /* Clear GFX RAM */
 	memset(state->m_cps_a_regs, 0, 0x40);   /* Clear CPS-A registers */
 	memset(state->m_cps_b_regs, 0, 0x40);   /* Clear CPS-B registers */
 
@@ -2316,7 +2312,7 @@ static void cps1_render_sprites( running_machine &machine, bitmap_ind16 &bitmap,
 
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)					\
 {																	\
-	if (flip_screen_get(machine))											\
+	if (state->flip_screen())											\
 		pdrawgfx_transpen(bitmap,\
 				cliprect,machine.gfx[2],							\
 				CODE,												\
@@ -2469,48 +2465,43 @@ static void cps1_render_sprites( running_machine &machine, bitmap_ind16 &bitmap,
 
 
 
-WRITE16_HANDLER( cps2_objram_bank_w )
+WRITE16_MEMBER(cps_state::cps2_objram_bank_w)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
 
 	if (ACCESSING_BITS_0_7)
-		state->m_objram_bank = data & 1;
+		m_objram_bank = data & 1;
 }
 
-READ16_HANDLER( cps2_objram1_r )
+READ16_MEMBER(cps_state::cps2_objram1_r)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
-	if (state->m_objram_bank & 1)
-		return state->m_objram2[offset];
+	if (m_objram_bank & 1)
+		return m_objram2[offset];
 	else
-		return state->m_objram1[offset];
+		return m_objram1[offset];
 }
 
-READ16_HANDLER( cps2_objram2_r )
+READ16_MEMBER(cps_state::cps2_objram2_r)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
-	if (state->m_objram_bank & 1)
-		return state->m_objram1[offset];
+	if (m_objram_bank & 1)
+		return m_objram1[offset];
 	else
-		return state->m_objram2[offset];
+		return m_objram2[offset];
 }
 
-WRITE16_HANDLER( cps2_objram1_w )
+WRITE16_MEMBER(cps_state::cps2_objram1_w)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
-	if (state->m_objram_bank & 1)
-		COMBINE_DATA(&state->m_objram2[offset]);
+	if (m_objram_bank & 1)
+		COMBINE_DATA(&m_objram2[offset]);
 	else
-		COMBINE_DATA(&state->m_objram1[offset]);
+		COMBINE_DATA(&m_objram1[offset]);
 }
 
-WRITE16_HANDLER( cps2_objram2_w )
+WRITE16_MEMBER(cps_state::cps2_objram2_w)
 {
-	cps_state *state = space->machine().driver_data<cps_state>();
-	if (state->m_objram_bank & 1)
-		COMBINE_DATA(&state->m_objram1[offset]);
+	if (m_objram_bank & 1)
+		COMBINE_DATA(&m_objram1[offset]);
 	else
-		COMBINE_DATA(&state->m_objram2[offset]);
+		COMBINE_DATA(&m_objram2[offset]);
 }
 
 static UINT16 *cps2_objbase( running_machine &machine )
@@ -2559,7 +2550,7 @@ static void cps2_render_sprites( running_machine &machine, bitmap_ind16 &bitmap,
 
 #define DRAWSPRITE(CODE,COLOR,FLIPX,FLIPY,SX,SY)									\
 {																					\
-	if (flip_screen_get(machine))															\
+	if (state->flip_screen())															\
 		pdrawgfx_transpen(bitmap,\
 				cliprect,machine.gfx[2],											\
 				CODE,																\
@@ -2706,7 +2697,7 @@ static void cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, cons
 {
 	cps_state *state = screen.machine().driver_data<cps_state>();
 	int offs;
-	UINT8 *stars_rom = screen.machine().region("stars")->base();
+	UINT8 *stars_rom = state->memregion("stars")->base();
 
 	if (!stars_rom && (state->m_stars_enabled[0] || state->m_stars_enabled[1]))
 	{
@@ -2727,7 +2718,7 @@ static void cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, cons
 				int sy = (offs % 256);
 				sx = (sx - state->m_stars2x + (col & 0x1f)) & 0x1ff;
 				sy = (sy - state->m_stars2y) & 0xff;
-				if (flip_screen_get(screen.machine()))
+				if (state->flip_screen())
 				{
 					sx = 511 - sx;
 					sy = 255 - sy;
@@ -2752,7 +2743,7 @@ static void cps1_render_stars( screen_device &screen, bitmap_ind16 &bitmap, cons
 				int sy = (offs % 256);
 				sx = (sx - state->m_stars1x + (col & 0x1f)) & 0x1ff;
 				sy = (sy - state->m_stars1y) & 0xff;
-				if (flip_screen_get(screen.machine()))
+				if (state->flip_screen())
 				{
 					sx = 511 - sx;
 					sy = 255 - sy;
@@ -2814,7 +2805,7 @@ SCREEN_UPDATE_IND16( cps1 )
 	int layercontrol, l0, l1, l2, l3;
 	int videocontrol = state->m_cps_a_regs[CPS1_VIDEOCONTROL];
 
-	flip_screen_set(screen.machine(), videocontrol & 0x8000);
+	state->flip_screen_set(videocontrol & 0x8000);
 
 	layercontrol = state->m_cps_b_regs[state->m_game_config->layer_control / 2];
 

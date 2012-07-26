@@ -11,7 +11,7 @@
 
 #include "machine/nvram.h"
 
-#define PC1350_CONTRAST (input_port_read(machine, "DSW0") & 0x07)
+#define PC1350_CONTRAST (machine.root_device().ioport("DSW0")->read() & 0x07)
 
 
 class pc1350_state : public driver_device

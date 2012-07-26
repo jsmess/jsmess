@@ -92,15 +92,27 @@ class cshooter_state : public driver_device
 {
 public:
 	cshooter_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_txram(*this, "txram"),
+		m_mainram(*this, "mainram"),
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT8* m_txram;
+	required_shared_ptr<UINT8> m_txram;
 	tilemap_t *m_txtilemap;
-	UINT8 *m_mainram;
+	optional_shared_ptr<UINT8> m_mainram;
 	int m_coin_stat;
 	int m_counter;
-	UINT8 *m_spriteram;
-	size_t m_spriteram_size;
+	optional_shared_ptr<UINT8> m_spriteram;
+	DECLARE_WRITE8_MEMBER(cshooter_txram_w);
+	DECLARE_READ8_MEMBER(cshooter_coin_r);
+	DECLARE_WRITE8_MEMBER(cshooter_c500_w);
+	DECLARE_WRITE8_MEMBER(cshooter_c700_w);
+	DECLARE_WRITE8_MEMBER(bank_w);
+	DECLARE_WRITE8_MEMBER(pal_w);
+	DECLARE_WRITE8_MEMBER(pal2_w);
+	DECLARE_READ8_MEMBER(pal_r);
+	DECLARE_READ8_MEMBER(seibu_sound_comms_r);
+	DECLARE_WRITE8_MEMBER(seibu_sound_comms_w);
 };
 
 
@@ -121,11 +133,10 @@ static TILE_GET_INFO( get_cstx_tile_info )
 			0);
 }
 
-static WRITE8_HANDLER(cshooter_txram_w)
+WRITE8_MEMBER(cshooter_state::cshooter_txram_w)
 {
-	cshooter_state *state = space->machine().driver_data<cshooter_state>();
-	state->m_txram[offset] = data;
-	state->m_txtilemap->mark_tile_dirty(offset/2);
+	m_txram[offset] = data;
+	m_txtilemap->mark_tile_dirty(offset/2);
 }
 
 static VIDEO_START(cshooter)
@@ -145,7 +156,7 @@ static SCREEN_UPDATE_IND16(cshooter)
 	{
 		UINT8 *spriteram = state->m_spriteram;
 		int i;
-		for(i=0;i<state->m_spriteram_size;i+=4)
+		for(i=0;i<state->m_spriteram.bytes();i+=4)
 		{
 			if(spriteram[i+3]!=0)
 			{
@@ -210,53 +221,52 @@ static MACHINE_RESET( airraid )
 	MACHINE_RESET_CALL(seibu_sound);
 }
 
-static READ8_HANDLER ( cshooter_coin_r )
+READ8_MEMBER(cshooter_state::cshooter_coin_r)
 {
-	cshooter_state *state = space->machine().driver_data<cshooter_state>();
 	/* Even reads must return 0xff - Odd reads must return the contents of input port 5.
        Code at 0x5061 is executed once during P.O.S.T. where there is one read.
        Code at 0x50b4 is then executed each frame (not sure) where there are 2 reads. */
-	return ( (state->m_counter++ & 1) ? 0xff : input_port_read(space->machine(), "COIN") );
+	return ( (m_counter++ & 1) ? 0xff : ioport("COIN")->read() );
 }
 
-static WRITE8_HANDLER ( cshooter_c500_w )
+WRITE8_MEMBER(cshooter_state::cshooter_c500_w)
 {
 }
 
-static WRITE8_HANDLER ( cshooter_c700_w )
+WRITE8_MEMBER(cshooter_state::cshooter_c700_w)
 {
 }
 
-static WRITE8_HANDLER ( bank_w )
+WRITE8_MEMBER(cshooter_state::bank_w)
 {
-	memory_set_bankptr(space->machine(), "bank1",&space->machine().region("user1")->base()[0x4000*((data>>4)&3)]);
+	membank("bank1")->set_base(&machine().root_device().memregion("user1")->base()[0x4000*((data>>4)&3)]);
 }
 
 
-static WRITE8_HANDLER(pal_w)
+WRITE8_MEMBER(cshooter_state::pal_w)
 {
-	space->machine().generic.paletteram.u8[offset]=data;
+	m_generic_paletteram_8[offset]=data;
 	offset&=0xff;
-	palette_set_color_rgb(space->machine(), offset, pal4bit(space->machine().generic.paletteram.u8[offset] >> 4), pal4bit(space->machine().generic.paletteram.u8[offset]), pal4bit(space->machine().generic.paletteram.u8[offset+0x100]));
+	palette_set_color_rgb(machine(), offset, pal4bit(m_generic_paletteram_8[offset] >> 4), pal4bit(m_generic_paletteram_8[offset]), pal4bit(m_generic_paletteram_8[offset+0x100]));
 }
 
-static WRITE8_HANDLER(pal2_w)
+WRITE8_MEMBER(cshooter_state::pal2_w)
 {
-	space->machine().generic.paletteram.u8[offset]=data;
+	m_generic_paletteram_8[offset]=data;
 	offset&=0x1ff;
-	palette_set_color_rgb(space->machine(), offset, pal4bit(space->machine().generic.paletteram.u8[offset] >> 4), pal4bit(space->machine().generic.paletteram.u8[offset]), pal4bit(space->machine().generic.paletteram.u8[offset+0x200]));
+	palette_set_color_rgb(machine(), offset, pal4bit(m_generic_paletteram_8[offset] >> 4), pal4bit(m_generic_paletteram_8[offset]), pal4bit(m_generic_paletteram_8[offset+0x200]));
 }
 
-static READ8_HANDLER(pal_r)
+READ8_MEMBER(cshooter_state::pal_r)
 {
-	return space->machine().generic.paletteram.u8[offset];
+	return m_generic_paletteram_8[offset];
 }
 
-static ADDRESS_MAP_START( cshooter_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cshooter_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xafff) AM_READ_BANK("bank1") AM_WRITEONLY
 	AM_RANGE(0xb000, 0xb0ff) AM_READONLY			// sound related ?
-	AM_RANGE(0xc000, 0xc1ff) AM_WRITE(pal_w) AM_READ(pal_r) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xc000, 0xc1ff) AM_WRITE(pal_w) AM_READ(pal_r) AM_SHARE("paletteram")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN0")
 	AM_RANGE(0xc201, 0xc201) AM_READ_PORT("IN1")
 	AM_RANGE(0xc202, 0xc202) AM_READ_PORT("IN2")
@@ -267,22 +277,22 @@ static ADDRESS_MAP_START( cshooter_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc600, 0xc600) AM_WRITENOP			// see notes
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITENOP			// see notes
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_BASE_MEMBER(cshooter_state, m_txram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_SHARE("txram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static READ8_HANDLER( seibu_sound_comms_r )
+READ8_MEMBER(cshooter_state::seibu_sound_comms_r)
 {
-	return seibu_main_word_r(space,offset,0x00ff);
+	return seibu_main_word_r(&space,offset,0x00ff);
 }
 
-static WRITE8_HANDLER( seibu_sound_comms_w )
+WRITE8_MEMBER(cshooter_state::seibu_sound_comms_w)
 {
-	seibu_main_word_w(space,offset,data,0x00ff);
+	seibu_main_word_w(&space,offset,data,0x00ff);
 }
 
-static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP // rld result write-back
 //  AM_RANGE(0xb000, 0xb0ff) AM_RAM
@@ -296,22 +306,22 @@ static ADDRESS_MAP_START( airraid_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc600, 0xc600) AM_WRITENOP			// see notes
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITENOP			// see notes
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_BASE_MEMBER(cshooter_state, m_txram)
-	AM_RANGE(0xd800, 0xdbff) AM_WRITE(pal2_w) AM_READ(pal_r) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(cshooter_txram_w) AM_SHARE("txram")
+	AM_RANGE(0xd800, 0xdbff) AM_WRITE(pal2_w) AM_READ(pal_r) AM_SHARE("paletteram")
 	AM_RANGE(0xdc11, 0xdc11) AM_WRITE(bank_w)
 	AM_RANGE(0xdc00, 0xdc1f) AM_RAM //video registers
 	AM_RANGE(0xde00, 0xde0f) AM_READWRITE(seibu_sound_comms_r,seibu_sound_comms_w)
-	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_BASE_MEMBER(cshooter_state, m_mainram)
-	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(cshooter_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 
 /* Sound CPU */
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cshooter_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xc000, 0xc001) AM_WRITENOP // AM_DEVWRITE("ym1", ym2203_w) ?
-	AM_RANGE(0xc800, 0xc801) AM_WRITENOP // AM_DEVWRITE("ym2", ym2203_w) ?
+	AM_RANGE(0xc000, 0xc001) AM_WRITENOP // AM_DEVWRITE_LEGACY("ym1", ym2203_w) ?
+	AM_RANGE(0xc800, 0xc801) AM_WRITENOP // AM_DEVWRITE_LEGACY("ym2", ym2203_w) ?
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -655,19 +665,19 @@ ROM_END
 static DRIVER_INIT( cshooter )
 {
 	/* temp so it boots */
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	rom[0xa2] = 0x00;
 	rom[0xa3] = 0x00;
 	rom[0xa4] = 0x00;
-	memory_set_bankptr(machine, "bank1",&machine.region("user1")->base()[0]);
+	machine.root_device().membank("bank1")->set_base(&machine.root_device().memregion("user1")->base()[0]);
 }
 
 static DRIVER_INIT( cshootere )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int A;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
 	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
@@ -697,7 +707,7 @@ static DRIVER_INIT( cshootere )
 			rom[A] = BITSWAP8(rom[A],7,6,1,4,3,2,5,0);
 	}
 
-	memory_set_bankptr(machine, "bank1",&machine.region("user1")->base()[0]);
+	machine.root_device().membank("bank1")->set_base(&machine.root_device().memregion("user1")->base()[0]);
 	seibu_sound_decrypt(machine,"audiocpu",0x2000);
 }
 

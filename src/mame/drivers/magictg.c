@@ -113,7 +113,6 @@ Medium size chip with heat sink on it
 
 ***************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 #include "emu.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/adsp2100/adsp2100.h"
@@ -133,7 +132,8 @@ public:
 		m_mips(*this, "mips"),
 		m_adsp(*this, "adsp"),
 		m_pci(*this, "pcibus")
-	{ }
+	,
+		m_adsp_pram(*this, "adsp_pram"){ }
 
 	required_device<cpu_device>			m_mips;
 	required_device<adsp2181_device>	m_adsp;
@@ -151,7 +151,7 @@ public:
 
 
 	/* ADSP-2181 */
-	UINT32*								m_adsp_pram;
+	required_shared_ptr<UINT32> m_adsp_pram;
 
 	struct
 	{
@@ -229,7 +229,7 @@ void magictg_state::machine_start()
 
 void magictg_state::machine_reset()
 {
-	UINT8 *adsp_boot = (UINT8*)machine().region("adsp")->base();
+	UINT8 *adsp_boot = (UINT8*)machine().root_device().memregion("adsp")->base();
 
 	zr36120_reset();
 
@@ -752,7 +752,7 @@ WRITE16_MEMBER( magictg_state::adsp_control_w )
 			if (data > 0)
 			{
 				address_space* addr_space;
-				UINT8* adsp_rom = (UINT8*)space.machine().region("adsp")->base();
+				UINT8* adsp_rom = (UINT8*)space.machine().root_device().memregion("adsp")->base();
 
 				UINT32 page = (m_adsp_regs.bdma_control >> 8) & 0xff;
 				UINT32 dir = (m_adsp_regs.bdma_control >> 2) & 1;
@@ -852,7 +852,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( adsp_program_map, AS_PROGRAM, 32, magictg_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_BASE(m_adsp_pram)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("adsp_pram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( adsp_data_map, AS_DATA, 16, magictg_state )

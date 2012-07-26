@@ -18,15 +18,14 @@
 
 
 
-WRITE8_HANDLER( microtan_videoram_w )
+WRITE8_MEMBER(microtan_state::microtan_videoram_w)
 {
-	microtan_state *state = space->machine().driver_data<microtan_state>();
-	UINT8 *videoram = state->m_videoram;
-	if ((videoram[offset] != data) || (state->m_chunky_buffer[offset] != state->m_chunky_graphics))
+	UINT8 *videoram = m_videoram;
+	if ((videoram[offset] != data) || (m_chunky_buffer[offset] != m_chunky_graphics))
 	{
 		videoram[offset] = data;
-		state->m_bg_tilemap->mark_tile_dirty(offset);
-		state->m_chunky_buffer[offset] = state->m_chunky_graphics;
+		m_bg_tilemap->mark_tile_dirty(offset);
+		m_chunky_buffer[offset] = m_chunky_graphics;
 	}
 }
 

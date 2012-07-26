@@ -37,7 +37,7 @@
 #define MLOG(x)  { logerror ("%s: ", apollo_cpu_context(machine.device(MAINCPU))); LOG(x) }
 #define MLOG1(x) { if (VERBOSE > 0) MLOG(x) }
 #define MLOG2(x) { if (VERBOSE > 1) MLOG(x) }
-#define SLOG(x)  { logerror ("%s: ", apollo_cpu_context(&space->device())); LOG(x) }
+#define SLOG(x)  { logerror ("%s: ", apollo_cpu_context(&space.device())); LOG(x) }
 #define SLOG1(x) { if (VERBOSE > 0) SLOG(x) }
 #define SLOG2(x) { if (VERBOSE > 1) SLOG(x) }
 
@@ -121,6 +121,55 @@ public:
 	device_t *pic8259_master;
 	device_t *pic8259_slave;
 
+	DECLARE_WRITE16_MEMBER(apollo_csr_status_register_w);
+	DECLARE_READ16_MEMBER(apollo_csr_status_register_r);
+	DECLARE_WRITE16_MEMBER(apollo_csr_control_register_w);
+	DECLARE_READ16_MEMBER(apollo_csr_control_register_r);
+	DECLARE_WRITE8_MEMBER(apollo_dma_1_w);
+	DECLARE_READ8_MEMBER(apollo_dma_1_r);
+	DECLARE_WRITE8_MEMBER(apollo_dma_2_w);
+	DECLARE_READ8_MEMBER(apollo_dma_2_r);
+	DECLARE_WRITE8_MEMBER(apollo_dma_page_register_w);
+	DECLARE_READ8_MEMBER(apollo_dma_page_register_r);
+	DECLARE_WRITE16_MEMBER(apollo_address_translation_map_w);
+	DECLARE_READ16_MEMBER(apollo_address_translation_map_r);
+	DECLARE_READ8_MEMBER(apollo_dma_read_byte);
+	DECLARE_WRITE8_MEMBER(apollo_dma_write_byte);
+	DECLARE_READ8_MEMBER(apollo_dma_read_word);
+	DECLARE_WRITE8_MEMBER(apollo_dma_write_word);
+	DECLARE_WRITE8_MEMBER(apollo_rtc_w);
+	DECLARE_READ8_MEMBER(apollo_rtc_r);
+	DECLARE_WRITE8_MEMBER(apollo_fdc_w);
+	DECLARE_READ8_MEMBER(apollo_fdc_r);
+	DECLARE_WRITE8_MEMBER(cache_control_register_w);
+	DECLARE_READ8_MEMBER(cache_status_register_r);
+	DECLARE_WRITE8_MEMBER(task_alias_register_w);
+	DECLARE_READ8_MEMBER(task_alias_register_r);
+	DECLARE_WRITE16_MEMBER(apollo_node_id_w);
+	DECLARE_READ16_MEMBER(apollo_node_id_r);
+	DECLARE_WRITE16_MEMBER(latch_page_on_parity_error_register_w);
+	DECLARE_READ16_MEMBER(latch_page_on_parity_error_register_r);
+	DECLARE_WRITE8_MEMBER(master_req_register_w);
+	DECLARE_READ8_MEMBER(master_req_register_r);
+	DECLARE_WRITE16_MEMBER(selective_clear_locations_w);
+	DECLARE_READ16_MEMBER(selective_clear_locations_r);
+	DECLARE_READ32_MEMBER(ram_with_parity_r);
+	DECLARE_WRITE32_MEMBER(ram_with_parity_w);
+	DECLARE_READ32_MEMBER(apollo_unmapped_r);
+	DECLARE_WRITE32_MEMBER(apollo_unmapped_w);
+	DECLARE_WRITE32_MEMBER(apollo_rom_w);
+	DECLARE_READ16_MEMBER(apollo_atbus_io_r);
+	DECLARE_WRITE16_MEMBER(apollo_atbus_io_w);
+	DECLARE_READ32_MEMBER(apollo_atbus_memory_r);
+	DECLARE_WRITE32_MEMBER(apollo_atbus_memory_w);
+	DECLARE_WRITE8_MEMBER(dn5500_memory_present_register_w);
+	DECLARE_READ8_MEMBER(dn5500_memory_present_register_r);
+	DECLARE_WRITE8_MEMBER(dn5500_11500_w);
+	DECLARE_READ8_MEMBER(dn5500_11500_r);
+	DECLARE_WRITE8_MEMBER(dn5500_io_protection_map_w);
+	DECLARE_READ8_MEMBER(dn5500_io_protection_map_r);
+	DECLARE_READ32_MEMBER(apollo_f8_r);
+	DECLARE_WRITE32_MEMBER(apollo_f8_w);
 };
 
 MACHINE_CONFIG_EXTERN( apollo );
@@ -170,24 +219,12 @@ UINT16 apollo_csr_get_control_register(void);
 UINT16 apollo_csr_get_status_register(void);
 void apollo_csr_set_status_register(UINT16 mask, UINT16 data);
 
-WRITE16_HANDLER( apollo_csr_status_register_w );
-READ16_HANDLER( apollo_csr_status_register_r );
-WRITE16_HANDLER( apollo_csr_control_register_w );
-READ16_HANDLER( apollo_csr_control_register_r );
 
 /*----------- machine/apollo_dma.c -----------*/
 
-WRITE8_HANDLER(apollo_dma_1_w );
-READ8_HANDLER( apollo_dma_1_r );
 
-WRITE8_HANDLER(apollo_dma_2_w );
-READ8_HANDLER( apollo_dma_2_r );
 
-WRITE8_HANDLER(apollo_dma_page_register_w );
-READ8_HANDLER( apollo_dma_page_register_r );
 
-WRITE16_HANDLER(apollo_address_translation_map_w );
-READ16_HANDLER( apollo_address_translation_map_r );
 
 /*----------- machine/apollo_pic.c -----------*/
 
@@ -206,8 +243,6 @@ READ8_DEVICE_HANDLER( apollo_ptm_r );
 
 /*----------- machine/apollo_rtc.c -----------*/
 
-WRITE8_HANDLER( apollo_rtc_w );
-READ8_HANDLER( apollo_rtc_r );
 
 /*----------- machine/apollo_sio.c -----------*/
 
@@ -223,8 +258,6 @@ WRITE8_DEVICE_HANDLER(apollo_sio2_w);
 
 /*----------- machine/apollo_fdc.c -----------*/
 
-READ8_HANDLER(apollo_fdc_r);
-WRITE8_HANDLER(apollo_fdc_w);
 
 /*----------- machine/apollo_eth.c -----------*/
 

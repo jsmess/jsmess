@@ -229,6 +229,14 @@
     E000-FFFF ROM     BIOS ROM
 ******************************************************************************/
 
+class a400_state : public driver_device
+{
+public:
+	a400_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag) { }
+
+};
+
 /**************************************************************
  *
  * Memory maps
@@ -236,88 +244,88 @@
  **************************************************************/
 
 
-static ADDRESS_MAP_START(a400_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(a400_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0x9fff) AM_NOP	/* RAM installed at runtime */
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("a000")
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
+	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(a800_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(a800_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("0000")
 	AM_RANGE(0x8000, 0x9fff) AM_RAMBANK("8000")
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("a000")
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
+	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(a600xl_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x5000, 0x57ff) AM_ROM AM_REGION("maincpu", 0x5000)	/* self test */
 	AM_RANGE(0xa000, 0xbfff) AM_ROM	/* BASIC */
 	AM_RANGE(0xc000, 0xcfff) AM_ROM /* OS */
-	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
+	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_ROM /* OS */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(a800xl_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(a800xl_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x57ff) AM_RAMBANK("bank2")
 	AM_RANGE(0x5800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
+	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(xegs_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(xegs_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x57ff) AM_RAMBANK("bank2")
 	AM_RANGE(0x5800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank0")
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAMBANK("bank3")
-	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd000, 0xd0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
 	AM_RANGE(0xd100, 0xd1ff) AM_NOP
-	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
-	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xd200, 0xd2ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
+	AM_RANGE(0xd300, 0xd3ff) AM_DEVREADWRITE("pia", pia6821_device, read_alt, write_alt)
+	AM_RANGE(0xd400, 0xd4ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
 	AM_RANGE(0xd500, 0xd7ff) AM_NOP
 	AM_RANGE(0xd800, 0xffff) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START(a5200_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(a5200_mem, AS_PROGRAM, 8, a400_state)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(atari_gtia_r, atari_gtia_w)
-	AM_RANGE(0xd400, 0xd5ff) AM_READWRITE(atari_antic_r, atari_antic_w)
-	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
+	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE_LEGACY(atari_gtia_r, atari_gtia_w)
+	AM_RANGE(0xd400, 0xd5ff) AM_READWRITE_LEGACY(atari_antic_r, atari_antic_w)
+	AM_RANGE(0xe800, 0xe8ff) AM_DEVREADWRITE_LEGACY("pokey", pokey_r, pokey_w)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -738,7 +746,7 @@ static PALETTE_INIT( mess_atari )
 
 static void a800xl_mmu(running_machine &machine, UINT8 new_mmu)
 {
-	UINT8 *base = machine.region("maincpu")->base();
+	UINT8 *base = machine.root_device().memregion("maincpu")->base();
 	UINT8 *base1, *base2, *base3, *base4;
 
 	/* check if memory C000-FFFF changed */
@@ -760,8 +768,8 @@ static void a800xl_mmu(running_machine &machine, UINT8 new_mmu)
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xc000, 0xcfff, "bank3");
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xd800, 0xffff, "bank4");
 	}
-	memory_set_bankptr(machine, "bank3", base3);
-	memory_set_bankptr(machine, "bank4", base4);
+	machine.root_device().membank("bank3")->set_base(base3);
+	machine.root_device().membank("bank4")->set_base(base4);
 
 	/* check if BASIC changed */
 	if( new_mmu & 0x02 )
@@ -778,7 +786,7 @@ static void a800xl_mmu(running_machine &machine, UINT8 new_mmu)
 		base1 = base + 0x10000;  /* 8K BASIC */
 	}
 
-	memory_set_bankptr(machine, "bank1", base1);
+	machine.root_device().membank("bank1")->set_base(base1);
 
 	/* check if self-test ROM changed */
 	if( new_mmu & 0x80 )
@@ -794,13 +802,13 @@ static void a800xl_mmu(running_machine &machine, UINT8 new_mmu)
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x5000, 0x57ff);
 		base2 = base + 0x15000;  /* 0x0800 bytes */
 	}
-	memory_set_bankptr(machine, "bank2", base2);
+	machine.root_device().membank("bank2")->set_base(base2);
 }
 
 /* BASIC was available in a separate cart, so we don't test it */
 static void a1200xl_mmu(running_machine &machine, UINT8 new_mmu)
 {
-	UINT8 *base = machine.region("maincpu")->base();
+	UINT8 *base = machine.root_device().memregion("maincpu")->base();
 	UINT8 *base2, *base3, *base4;
 
 	/* check if memory C000-FFFF changed */
@@ -822,8 +830,8 @@ static void a1200xl_mmu(running_machine &machine, UINT8 new_mmu)
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xc000, 0xcfff, "bank3");
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xd800, 0xffff, "bank4");
 	}
-	memory_set_bankptr(machine, "bank3", base3);
-	memory_set_bankptr(machine, "bank4", base4);
+	machine.root_device().membank("bank3")->set_base(base3);
+	machine.root_device().membank("bank4")->set_base(base4);
 
 	/* check if self-test ROM changed */
 	if( new_mmu & 0x80 )
@@ -839,12 +847,12 @@ static void a1200xl_mmu(running_machine &machine, UINT8 new_mmu)
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5000, 0x57ff, "bank2");
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x5000, 0x57ff);
 	}
-	memory_set_bankptr(machine, "bank2", base2);
+	machine.root_device().membank("bank2")->set_base(base2);
 }
 
 static void xegs_mmu(running_machine &machine, UINT8 new_mmu)
 {
-	UINT8 *base = machine.region("maincpu")->base();
+	UINT8 *base = machine.root_device().memregion("maincpu")->base();
 	UINT8 *base2, *base3, *base4;
 
 	/* check if memory C000-FFFF changed */
@@ -866,8 +874,8 @@ static void xegs_mmu(running_machine &machine, UINT8 new_mmu)
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xc000, 0xcfff, "bank3");
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(0xd800, 0xffff, "bank4");
 	}
-	memory_set_bankptr(machine, "bank3", base3);
-	memory_set_bankptr(machine, "bank4", base4);
+	machine.root_device().membank("bank3")->set_base(base3);
+	machine.root_device().membank("bank4")->set_base(base4);
 
 
 	/* check if self-test ROM changed */
@@ -884,7 +892,7 @@ static void xegs_mmu(running_machine &machine, UINT8 new_mmu)
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0x5000, 0x57ff);
 		base2 = base + 0x15000;  /* 0x0800 bytes */
 	}
-	memory_set_bankptr(machine, "bank2", base2);
+	machine.root_device().membank("bank2")->set_base(base2);
 }
 
 /**************************************************************
@@ -1072,7 +1080,7 @@ static MACHINE_CONFIG_FRAGMENT( a800_cartslot )
 	MCFG_CARTSLOT_INTERFACE("a800_cart")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( atari_common_nodac, driver_device )
+static MACHINE_CONFIG_START( atari_common_nodac, a400_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
 
@@ -1458,7 +1466,7 @@ static DRIVER_INIT( xegs )
 
 static DRIVER_INIT( a600xl )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	memcpy( rom + 0x5000, rom + 0xd000, 0x800 );
 }
 

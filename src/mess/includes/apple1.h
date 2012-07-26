@@ -41,6 +41,8 @@ public:
 	terminal_t *m_current_terminal;
 	terminal_t *m_terminal;
 	int m_blink_on;
+	DECLARE_READ8_MEMBER(apple1_cassette_r);
+	DECLARE_WRITE8_MEMBER(apple1_cassette_w);
 };
 
 
@@ -52,8 +54,6 @@ DRIVER_INIT( apple1 );
 MACHINE_RESET( apple1 );
 SNAPSHOT_LOAD( apple1 );
 
-READ8_HANDLER( apple1_cassette_r );
-WRITE8_HANDLER( apple1_cassette_w );
 
 
 /*----------- defined in video/apple1.c -----------*/

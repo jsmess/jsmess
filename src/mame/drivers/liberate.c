@@ -25,93 +25,89 @@
  *
  *************************************/
 
-static READ8_HANDLER( deco16_bank_r )
+READ8_MEMBER(liberate_state::deco16_bank_r)
 {
-	liberate_state *state = space->machine().driver_data<liberate_state>();
-	const UINT8 *ROM = space->machine().region("user1")->base();
+	const UINT8 *ROM = memregion("user1")->base();
 
 	/* The tilemap bank can be swapped into main memory */
-	if (state->m_bank)
+	if (m_bank)
 		return ROM[offset];
 
 	/* Else the handler falls through to read the usual address */
 	if (offset < 0x400)
-		return state->m_colorram[offset];
+		return m_colorram[offset];
 	if (offset < 0x800)
-		return state->m_videoram[offset - 0x400];
+		return m_videoram[offset - 0x400];
 	if (offset < 0x1000)
-		return state->m_spriteram[offset - 0x800];
+		return m_spriteram[offset - 0x800];
 	if (offset < 0x2200)
 	{
-		logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(&space->device()), offset);
+		logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(&space.device()), offset);
 		return 0;
 	}
 	if (offset < 0x2800)
-		return state->m_scratchram[offset - 0x2200];
+		return m_scratchram[offset - 0x2200];
 
-	logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(&space->device()), offset);
+	logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(&space.device()), offset);
 	return 0;
 }
 
-static READ8_HANDLER( deco16_io_r )
+READ8_MEMBER(liberate_state::deco16_io_r)
 {
-	if (offset == 0) return input_port_read(space->machine(), "IN1"); /* Player 1 controls */
-	if (offset == 1) return input_port_read(space->machine(), "IN2"); /* Player 2 controls */
-	if (offset == 2) return input_port_read(space->machine(), "IN3"); /* Vblank, coins */
-	if (offset == 3) return input_port_read(space->machine(), "DSW1"); /* Dip 1 */
-	if (offset == 4) return input_port_read(space->machine(), "DSW2"); /* Dip 2 */
+	if (offset == 0) return ioport("IN1")->read(); /* Player 1 controls */
+	if (offset == 1) return ioport("IN2")->read(); /* Player 2 controls */
+	if (offset == 2) return ioport("IN3")->read(); /* Vblank, coins */
+	if (offset == 3) return ioport("DSW1")->read(); /* Dip 1 */
+	if (offset == 4) return ioport("DSW2")->read(); /* Dip 2 */
 
-	logerror("%04x:  Read input %d\n", cpu_get_pc(&space->device()), offset);
+	logerror("%04x:  Read input %d\n", cpu_get_pc(&space.device()), offset);
 	return 0xff;
 }
 
-static WRITE8_HANDLER( deco16_bank_w )
+WRITE8_MEMBER(liberate_state::deco16_bank_w)
 {
-	liberate_state *state = space->machine().driver_data<liberate_state>();
-	state->m_bank = data;
+	m_bank = data;
 
-	if (state->m_bank)
-		state->m_maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x8000, 0x800f, FUNC(deco16_io_r));
+	if (m_bank)
+		m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::deco16_io_r),this));
 	else
-		state->m_maincpu->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0x800f, "bank1");
+		m_maincpu->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0x800f, "bank1");
 }
 
-static READ8_HANDLER( prosoccr_bank_r )
+READ8_MEMBER(liberate_state::prosoccr_bank_r)
 {
-	liberate_state *state = space->machine().driver_data<liberate_state>();
-	const UINT8 *ROM = space->machine().region("user1")->base();
+	const UINT8 *ROM = memregion("user1")->base();
 
 	/* The tilemap bank can be swapped into main memory */
-	if (state->m_bank)
+	if (m_bank)
 		return ROM[offset];
 
 	/* Else the handler falls through to read the usual address */
 	if (offset < 0x400)
-		return state->m_colorram[offset];
+		return m_colorram[offset];
 	if (offset < 0x800)
-		return state->m_videoram[offset - 0x400];
+		return m_videoram[offset - 0x400];
 	if (offset < 0xc00)
-		return state->m_colorram[offset - 0x800];
+		return m_colorram[offset - 0x800];
 	if (offset < 0x1000)
-		return state->m_spriteram[offset - 0xc00];
+		return m_spriteram[offset - 0xc00];
 	if (offset < 0x2200)
 	{
-		logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(&space->device()), offset);
+		logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(&space.device()), offset);
 		return 0;
 	}
 	if (offset < 0x2800)
-		return state->m_scratchram[offset - 0x2200];
+		return m_scratchram[offset - 0x2200];
 
-	logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(&space->device()), offset);
+	logerror("%04x: Unmapped bank read %04x\n", cpu_get_pc(&space.device()), offset);
 	return 0;
 }
 
-static READ8_HANDLER( prosoccr_charram_r )
+READ8_MEMBER(liberate_state::prosoccr_charram_r)
 {
-	liberate_state *state = space->machine().driver_data<liberate_state>();
-	UINT8 *SRC_GFX = space->machine().region("shared_gfx")->base();
+	UINT8 *SRC_GFX = memregion("shared_gfx")->base();
 
-	if (state->m_gfx_rom_readback)
+	if (m_gfx_rom_readback)
 	{
 		switch (offset & 0x1800)
 		{
@@ -125,22 +121,21 @@ static READ8_HANDLER( prosoccr_charram_r )
 	}
 
 	/* note: gfx_rom_readback == 1 never happens. */
-	return state->m_charram[offset + state->m_gfx_rom_readback * 0x1800];
+	return m_charram[offset + m_gfx_rom_readback * 0x1800];
 }
 
-static WRITE8_HANDLER( prosoccr_charram_w )
+WRITE8_MEMBER(liberate_state::prosoccr_charram_w)
 {
-	liberate_state *state = space->machine().driver_data<liberate_state>();
-	UINT8 *FG_GFX = space->machine().region("fg_gfx")->base();
+	UINT8 *FG_GFX = memregion("fg_gfx")->base();
 
-	if (state->m_bank)
+	if (m_bank)
 	{
 		prosoccr_io_w(space, offset & 0x0f, data);
 	}
 	else
 	{
 		/* note: gfx_rom_readback == 1 never happens. */
-		state->m_charram[offset + state->m_gfx_rom_readback * 0x1800] = data;
+		m_charram[offset + m_gfx_rom_readback * 0x1800] = data;
 
 		switch (offset & 0x1800)
 		{
@@ -162,34 +157,32 @@ static WRITE8_HANDLER( prosoccr_charram_w )
 	offset &= 0x7ff;
 
 	/* dirty char */
-	gfx_element_mark_dirty(space->machine().gfx[0], offset >> 3);
-//  gfx_element_mark_dirty(space->machine().gfx[0], (offset | 0x1800) >> 3);
+	gfx_element_mark_dirty(machine().gfx[0], offset >> 3);
+//  gfx_element_mark_dirty(machine().gfx[0], (offset | 0x1800) >> 3);
 }
 
-static WRITE8_HANDLER( prosoccr_char_bank_w )
+WRITE8_MEMBER(liberate_state::prosoccr_char_bank_w)
 {
-	liberate_state *state = space->machine().driver_data<liberate_state>();
-	state->m_gfx_rom_readback = data & 1; //enable GFX rom read-back
+	m_gfx_rom_readback = data & 1; //enable GFX rom read-back
 
 	if (data & 0xfe)
 		printf("%02x\n", data);
 }
 
-static WRITE8_HANDLER( prosoccr_io_bank_w )
+WRITE8_MEMBER(liberate_state::prosoccr_io_bank_w)
 {
-	liberate_state *state = space->machine().driver_data<liberate_state>();
-	state->m_bank = data & 1;
+	m_bank = data & 1;
 
-	if (state->m_bank)
-		state->m_maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x8000, 0x800f, FUNC(deco16_io_r));
+	if (m_bank)
+		m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::deco16_io_r),this));
 	else
-		state->m_maincpu->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x8000, 0x800f, FUNC(prosoccr_charram_r));
+		m_maincpu->memory().space(AS_PROGRAM)->install_read_handler(0x8000, 0x800f, read8_delegate(FUNC(liberate_state::prosoccr_charram_r),this));
 
 }
 
-static READ8_HANDLER( prosport_charram_r )
+READ8_MEMBER(liberate_state::prosport_charram_r)
 {
-	UINT8 *FG_GFX = space->machine().region("progolf_fg_gfx")->base();
+	UINT8 *FG_GFX = memregion("progolf_fg_gfx")->base();
 
 	switch (offset & 0x1800)
 	{
@@ -207,9 +200,9 @@ static READ8_HANDLER( prosport_charram_r )
 	return 0;
 }
 
-static WRITE8_HANDLER( prosport_charram_w )
+WRITE8_MEMBER(liberate_state::prosport_charram_w)
 {
-	UINT8 *FG_GFX = space->machine().region("progolf_fg_gfx")->base();
+	UINT8 *FG_GFX = memregion("progolf_fg_gfx")->base();
 
 	switch (offset & 0x1800)
 	{
@@ -230,8 +223,8 @@ static WRITE8_HANDLER( prosport_charram_w )
 	offset &= 0x7ff;
 
 	/* dirty char */
-	gfx_element_mark_dirty(space->machine().gfx[3], (offset + 0x800) >> 3);
-	gfx_element_mark_dirty(space->machine().gfx[3 + 4], (offset + 0x800) >> 5);
+	gfx_element_mark_dirty(machine().gfx[3], (offset + 0x800) >> 3);
+	gfx_element_mark_dirty(machine().gfx[3 + 4], (offset + 0x800) >> 5);
 }
 
 
@@ -241,65 +234,65 @@ static WRITE8_HANDLER( prosport_charram_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( prosport_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0200, 0x021f) AM_RAM_WRITE(prosport_paletteram_w) AM_BASE_MEMBER(liberate_state, m_paletteram)
+static ADDRESS_MAP_START( prosport_map, AS_PROGRAM, 8, liberate_state )
+	AM_RANGE(0x0200, 0x021f) AM_RAM_WRITE(prosport_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(prosport_bg_vram_w) AM_BASE_MEMBER(liberate_state, m_bg_vram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(prosport_bg_vram_w) AM_SHARE("bg_vram")
 	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(prosport_charram_r,prosport_charram_w) //0x1e00-0x1fff isn't charram!
 	AM_RANGE(0x2400, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(liberate_colorram_w) AM_BASE_MEMBER(liberate_state, m_colorram)
-	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(liberate_videoram_w) AM_BASE_MEMBER(liberate_state, m_videoram)
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE_MEMBER(liberate_state, m_spriteram)
+	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(liberate_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(liberate_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x8000, 0x800f) AM_WRITE(prosport_io_w)
 	AM_RANGE(0x8000, 0x800f) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( liberate_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( liberate_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(deco16_bank_r)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(liberate_colorram_w) AM_BASE_MEMBER(liberate_state, m_colorram)
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE_MEMBER(liberate_state, m_videoram)
-	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_BASE_MEMBER(liberate_state, m_spriteram)
-	AM_RANGE(0x6200, 0x67ff) AM_RAM AM_BASE_MEMBER(liberate_state, m_scratchram)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(liberate_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_SHARE("spriteram")
+	AM_RANGE(0x6200, 0x67ff) AM_RAM AM_SHARE("scratchram")
 	AM_RANGE(0x8000, 0x800f) AM_WRITE(deco16_io_w)
 	AM_RANGE(0x8000, 0x800f) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( prosoccr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( prosoccr_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(prosoccr_bank_r)
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x800) AM_WRITE(liberate_colorram_w) AM_BASE_MEMBER(liberate_state, m_colorram)
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE_MEMBER(liberate_state, m_videoram)
-	AM_RANGE(0x4c00, 0x4fff) AM_WRITEONLY AM_BASE_MEMBER(liberate_state, m_spriteram)
-	AM_RANGE(0x6200, 0x67ff) AM_RAM AM_BASE_MEMBER(liberate_state, m_scratchram)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x800) AM_WRITE(liberate_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4c00, 0x4fff) AM_WRITEONLY AM_SHARE("spriteram")
+	AM_RANGE(0x6200, 0x67ff) AM_RAM AM_SHARE("scratchram")
 	AM_RANGE(0x8000, 0x97ff) AM_READWRITE(prosoccr_charram_r, prosoccr_charram_w)
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(prosoccr_char_bank_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( deco16_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( deco16_io_map, AS_IO, 8, liberate_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(deco16_bank_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("TILT")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( prosoccr_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( prosoccr_io_map, AS_IO, 8, liberate_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(prosoccr_io_bank_w)
 	//AM_RANGE(0x01, 0x01) AM_READ_PORT("TILT")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( liberatb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( liberatb_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x00fe, 0x00fe) AM_READ_PORT("IN0")
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x3fff) AM_ROM /* Mirror of main rom */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(deco16_bank_r)
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(liberate_colorram_w) AM_BASE_MEMBER(liberate_state, m_colorram)
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_BASE_MEMBER(liberate_state, m_videoram)
-	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_BASE_MEMBER(liberate_state, m_spriteram)
-	AM_RANGE(0x6200, 0x67ff) AM_WRITEONLY AM_BASE_MEMBER(liberate_state, m_scratchram)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(liberate_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x4400, 0x47ff) AM_WRITE(liberate_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4800, 0x4fff) AM_WRITEONLY AM_SHARE("spriteram")
+	AM_RANGE(0x6200, 0x67ff) AM_WRITEONLY AM_SHARE("scratchram")
 	AM_RANGE(0xf000, 0xf00f) AM_WRITE(deco16_io_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN1")
 	AM_RANGE(0xf001, 0xf001) AM_READ_PORT("IN2")
@@ -315,25 +308,25 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( prosoccr_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( prosoccr_sound_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xc000, 0xc000) AM_WRITENOP //irq ack
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( liberate_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( liberate_sound_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP
-	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE("ay2", ay8910_data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r)
+	AM_RANGE(0x3000, 0x3000) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -345,7 +338,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( generic_input )
 	PORT_START("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -365,7 +358,7 @@ static INPUT_PORTS_START( generic_input )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -496,7 +489,7 @@ static INPUT_PORTS_START( yellowcb )
 	PORT_INCLUDE( kamikcab )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xfb, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
@@ -582,7 +575,7 @@ static INPUT_PORTS_START( liberatb )
 
 	PORT_MODIFY("IN0")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xf9, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW1")
@@ -770,7 +763,7 @@ GFXDECODE_END
 static INTERRUPT_GEN( deco16_interrupt )
 {
 	liberate_state *state = device->machine().driver_data<liberate_state>();
-	int p = ~input_port_read(device->machine(), "IN3");
+	int p = ~state->ioport("IN3")->read();
 	if ((p & 0x43) && !state->m_latch)
 	{
 		device_set_input_line(device, DECO16_IRQ_LINE, ASSERT_LINE);
@@ -1357,7 +1350,7 @@ static void sound_cpu_decrypt(running_machine &machine)
 {
 	address_space *space = machine.device("audiocpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
-	UINT8 *rom = machine.region("audiocpu")->base();
+	UINT8 *rom = machine.root_device().memregion("audiocpu")->base();
 	int i;
 
 	/* Bit swapping on sound cpu - Opcodes only */
@@ -1369,7 +1362,7 @@ static void sound_cpu_decrypt(running_machine &machine)
 
 static DRIVER_INIT( prosport )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	/* Main cpu has the nibbles swapped */
@@ -1391,7 +1384,7 @@ static DRIVER_INIT( liberate )
 	int A;
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	space->set_decrypted_region(0x0000, 0xffff, decrypted);
 
@@ -1402,7 +1395,7 @@ static DRIVER_INIT( liberate )
 		decrypted[A] = (decrypted[A] & 0x7d) | ((decrypted[A] & 0x02) << 6) | ((decrypted[A] & 0x80) >> 6);
 	}
 
-	memory_configure_bank_decrypted(machine, "bank1", 0, 1, decrypted + 0x8000, 0x10);
+	machine.root_device().membank("bank1")->configure_decrypted_entry(0, decrypted + 0x8000);
 
 	sound_cpu_decrypt(machine);
 }

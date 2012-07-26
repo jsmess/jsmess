@@ -71,22 +71,22 @@ static UINT32 olds_prot_addr( UINT16 addr )
 
 static UINT32 olds_read_reg( running_machine &machine, UINT16 addr )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_028_025_state *state = machine.driver_data<pgm_028_025_state>();
 	UINT32 protaddr = (olds_prot_addr(addr) - 0x400000) / 2;
 	return state->m_sharedprotram[protaddr] << 16 | state->m_sharedprotram[protaddr + 1];
 }
 
 static void olds_write_reg( running_machine &machine, UINT16 addr, UINT32 val )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_028_025_state *state = machine.driver_data<pgm_028_025_state>();
 	state->m_sharedprotram[(olds_prot_addr(addr) - 0x400000) / 2]     = val >> 16;
 	state->m_sharedprotram[(olds_prot_addr(addr) - 0x400000) / 2 + 1] = val & 0xffff;
 }
 
 static MACHINE_RESET( olds )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
-	UINT16 *mem16 = (UINT16 *)machine.region("user2")->base();
+	pgm_028_025_state *state = machine.driver_data<pgm_028_025_state>();
+	UINT16 *mem16 = (UINT16 *)state->memregion("user2")->base();
 	int i;
 
 	MACHINE_RESET_CALL(pgm);
@@ -107,7 +107,7 @@ static MACHINE_RESET( olds )
 
 static READ16_HANDLER( olds_r )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_028_025_state *state = space->machine().driver_data<pgm_028_025_state>();
 	UINT16 res = 0;
 
 	if (offset == 1)
@@ -120,7 +120,7 @@ static READ16_HANDLER( olds_r )
 			res = state->m_olds_cmd3;
 		else if (state->m_kb_cmd == 5)
 		{
-			UINT32 protvalue = 0x900000 | input_port_read(space->machine(), "Region"); // region from protection device.
+			UINT32 protvalue = 0x900000 | state->ioport("Region")->read(); // region from protection device.
 			res = (protvalue >> (8 * (state->m_kb_ptr - 1))) & 0xff; // includes region 1 = taiwan , 2 = china, 3 = japan (title = orlegend special), 4 = korea, 5 = hongkong, 6 = world
 
 		}
@@ -131,7 +131,7 @@ static READ16_HANDLER( olds_r )
 
 static WRITE16_HANDLER( olds_w )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_028_025_state *state = space->machine().driver_data<pgm_028_025_state>();
 	if (offset == 0)
 		state->m_kb_cmd = data;
 	else //offset==2
@@ -194,7 +194,7 @@ static READ16_HANDLER( olds_prot_swap_r )
 
 DRIVER_INIT( olds )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_028_025_state *state = machine.driver_data<pgm_028_025_state>();
 	pgm_basic_init(machine);
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xdcb400, 0xdcb403, FUNC(olds_r), FUNC(olds_w));
@@ -213,14 +213,16 @@ DRIVER_INIT( olds )
 	state->save_item(NAME(state->m_olds_cmd3));
 }
 
-static ADDRESS_MAP_START( olds_mem, AS_PROGRAM, 16)
+static ADDRESS_MAP_START( olds_mem, AS_PROGRAM, 16, pgm_028_025_state )
 	AM_IMPORT_FROM(pgm_mem)
 	AM_RANGE(0x100000, 0x3fffff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE_MEMBER(pgm_state, m_sharedprotram) // Shared with protection device
+	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("sharedprotram") // Shared with protection device
 ADDRESS_MAP_END
 
 
-MACHINE_CONFIG_DERIVED( olds, pgm )
+MACHINE_CONFIG_START( pgm_028_025_ol, pgm_028_025_state )
+	MCFG_FRAGMENT_ADD(pgmbase)
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(olds_mem)
 

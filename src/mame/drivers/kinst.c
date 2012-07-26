@@ -140,14 +140,20 @@ class kinst_state : public driver_device
 {
 public:
 	kinst_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_rambase(*this, "rambase"),
+		m_rambase2(*this, "rambase2"),
+		m_control(*this, "control"),
+		m_rombase(*this, "rombase"){ }
 
-	UINT32 *m_rambase;
-	UINT32 *m_rambase2;
-	UINT32 *m_rombase;
+	required_shared_ptr<UINT32> m_rambase;
+	required_shared_ptr<UINT32> m_rambase2;
+	required_shared_ptr<UINT32> m_control;
+	required_shared_ptr<UINT32> m_rombase;
 	UINT32 *m_video_base;
-	UINT32 *m_control;
 	const UINT8 *m_control_map;
+	DECLARE_READ32_MEMBER(kinst_control_r);
+	DECLARE_WRITE32_MEMBER(kinst_control_w);
 };
 
 
@@ -320,35 +326,34 @@ static WRITE32_DEVICE_HANDLER( kinst_ide_extra_w )
  *
  *************************************/
 
-static READ32_HANDLER( kinst_control_r )
+READ32_MEMBER(kinst_state::kinst_control_r)
 {
-	kinst_state *state = space->machine().driver_data<kinst_state>();
 	UINT32 result;
 	static const char *const portnames[] = { "P1", "P2", "VOLUME", "UNUSED", "DSW" };
 
 	/* apply shuffling */
-	offset = state->m_control_map[offset / 2];
-	result = state->m_control[offset];
+	offset = m_control_map[offset / 2];
+	result = m_control[offset];
 
 	switch (offset)
 	{
 		case 2:		/* $90 -- sound return */
-			result = input_port_read(space->machine(), portnames[offset]);
+			result = ioport(portnames[offset])->read();
 			result &= ~0x0002;
-			if (dcs_control_r(space->machine()) & 0x800)
+			if (dcs_control_r(machine()) & 0x800)
 				result |= 0x0002;
 			break;
 
 		case 0:		/* $80 */
 		case 1:		/* $88 */
 		case 3:		/* $98 */
-			result = input_port_read(space->machine(), portnames[offset]);
+			result = ioport(portnames[offset])->read();
 			break;
 
 		case 4:		/* $a0 */
-			result = input_port_read(space->machine(), portnames[offset]);
-			if (cpu_get_pc(&space->device()) == 0x802d428)
-				device_spin_until_interrupt(&space->device());
+			result = ioport(portnames[offset])->read();
+			if (cpu_get_pc(&space.device()) == 0x802d428)
+				device_spin_until_interrupt(&space.device());
 			break;
 	}
 
@@ -356,32 +361,31 @@ static READ32_HANDLER( kinst_control_r )
 }
 
 
-static WRITE32_HANDLER( kinst_control_w )
+WRITE32_MEMBER(kinst_state::kinst_control_w)
 {
-	kinst_state *state = space->machine().driver_data<kinst_state>();
 	UINT32 olddata;
 
 	/* apply shuffling */
-	offset = state->m_control_map[offset / 2];
-	olddata = state->m_control[offset];
-	COMBINE_DATA(&state->m_control[offset]);
+	offset = m_control_map[offset / 2];
+	olddata = m_control[offset];
+	COMBINE_DATA(&m_control[offset]);
 
 	switch (offset)
 	{
 		case 0:		/* $80 - VRAM buffer control */
 			if (data & 4)
-				state->m_video_base = &state->m_rambase[0x58000/4];
+				m_video_base = &m_rambase[0x58000/4];
 			else
-				state->m_video_base = &state->m_rambase[0x30000/4];
+				m_video_base = &m_rambase[0x30000/4];
 			break;
 
 		case 1:		/* $88 - sound reset */
-			dcs_reset_w(space->machine(), ~data & 0x01);
+			dcs_reset_w(machine(), ~data & 0x01);
 			break;
 
 		case 2:		/* $90 - sound control */
-			if (!(olddata & 0x02) && (state->m_control[offset] & 0x02))
-				dcs_data_w(space->machine(), state->m_control[3]);
+			if (!(olddata & 0x02) && (m_control[offset] & 0x02))
+				dcs_data_w(machine(), m_control[3]);
 			break;
 
 		case 3:		/* $98 - sound data */
@@ -397,14 +401,14 @@ static WRITE32_HANDLER( kinst_control_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, kinst_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(kinst_state, m_rambase)
-	AM_RANGE(0x08000000, 0x087fffff) AM_RAM AM_BASE_MEMBER(kinst_state, m_rambase2)
-	AM_RANGE(0x10000080, 0x100000ff) AM_READWRITE(kinst_control_r, kinst_control_w) AM_BASE_MEMBER(kinst_state, m_control)
-	AM_RANGE(0x10000100, 0x1000013f) AM_DEVREADWRITE("ide", kinst_ide_r, kinst_ide_w)
-	AM_RANGE(0x10000170, 0x10000173) AM_DEVREADWRITE("ide", kinst_ide_extra_r, kinst_ide_extra_w)
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_BASE_MEMBER(kinst_state, m_rombase)
+	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("rambase")
+	AM_RANGE(0x08000000, 0x087fffff) AM_RAM AM_SHARE("rambase2")
+	AM_RANGE(0x10000080, 0x100000ff) AM_READWRITE(kinst_control_r, kinst_control_w) AM_SHARE("control")
+	AM_RANGE(0x10000100, 0x1000013f) AM_DEVREADWRITE_LEGACY("ide", kinst_ide_r, kinst_ide_w)
+	AM_RANGE(0x10000170, 0x10000173) AM_DEVREADWRITE_LEGACY("ide", kinst_ide_extra_r, kinst_ide_extra_w)
+	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_REGION("user1", 0) AM_SHARE("rombase")
 ADDRESS_MAP_END
 
 

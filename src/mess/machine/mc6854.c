@@ -589,7 +589,7 @@ void mc6854_set_rx( device_t *device, int bit )
 	mc6854_t* mc6854 = get_safe_token( device );
 	int fieldlen = ( mc6854->rstate < 6 ) ? 8 : RWL;
 
-	if ( RRESET || DCD )
+	if ( RRESET || (mc6854->sr2 & DCD) )
 		return;
 
 	if ( bit )

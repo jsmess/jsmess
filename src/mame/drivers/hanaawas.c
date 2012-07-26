@@ -30,22 +30,21 @@
 #include "sound/ay8910.h"
 #include "includes/hanaawas.h"
 
-static READ8_HANDLER( hanaawas_input_port_0_r )
+READ8_MEMBER(hanaawas_state::hanaawas_input_port_0_r)
 {
-	hanaawas_state *state = space->machine().driver_data<hanaawas_state>();
 	int i, ordinal = 0;
 	UINT16 buttons = 0;
 
-	switch (state->m_mux)
+	switch (m_mux)
 	{
 	case 1: /* start buttons */
-		buttons = input_port_read(space->machine(), "START");
+		buttons = ioport("START")->read();
 		break;
 	case 2: /* player 1 buttons */
-		buttons = input_port_read(space->machine(), "P1");
+		buttons = ioport("P1")->read();
 		break;
 	case 4: /* player 2 buttons */
-		buttons = input_port_read(space->machine(), "P2");
+		buttons = ioport("P2")->read();
 		break;
 	}
 
@@ -61,31 +60,30 @@ static READ8_HANDLER( hanaawas_input_port_0_r )
 		}
 	}
 
-	return (input_port_read(space->machine(), "IN0") & 0xf0) | ordinal;
+	return (ioport("IN0")->read() & 0xf0) | ordinal;
 }
 
-static WRITE8_HANDLER( hanaawas_inputs_mux_w )
+WRITE8_MEMBER(hanaawas_state::hanaawas_inputs_mux_w)
 {
-	hanaawas_state *state = space->machine().driver_data<hanaawas_state>();
-	state->m_mux = data;
+	m_mux = data;
 }
 
-static ADDRESS_MAP_START( hanaawas_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hanaawas_map, AS_PROGRAM, 8, hanaawas_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_ROM
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(hanaawas_videoram_w) AM_BASE_MEMBER(hanaawas_state, m_videoram)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(hanaawas_colorram_w) AM_BASE_MEMBER(hanaawas_state, m_colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(hanaawas_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(hanaawas_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8800, 0x8bff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, hanaawas_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(hanaawas_input_port_0_r, hanaawas_inputs_mux_w)
 	AM_RANGE(0x01, 0x01) AM_READNOP /* it must return 0 */
-	AM_RANGE(0x10, 0x10) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x10, 0x11) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x10, 0x10) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x10, 0x11) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hanaawas )

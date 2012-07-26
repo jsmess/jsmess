@@ -125,7 +125,7 @@ void atom_state::bankswitch()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
-	UINT8 *eprom = machine().region(EXTROM_TAG)->base() + (m_eprom << 12);
+	UINT8 *eprom = memregion(EXTROM_TAG)->base() + (m_eprom << 12);
 
 	program->install_rom(0xa000, 0xafff, eprom);
 }
@@ -181,7 +181,7 @@ static ADDRESS_MAP_START( atom_mem, AS_PROGRAM, 8, atom_state )
 	AM_RANGE(0x0a00, 0x0a03) AM_MIRROR(0x1f8) AM_DEVREADWRITE_LEGACY(I8271_TAG, i8271_r, i8271_w)
 	AM_RANGE(0x0a04, 0x0a04) AM_MIRROR(0x1f8) AM_DEVREADWRITE_LEGACY(I8271_TAG, i8271_data_r, i8271_data_w)
 	AM_RANGE(0x0a05, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xafff) AM_ROM AM_REGION(EXTROM_TAG, 0)
 	AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255_device, read, write)
@@ -208,9 +208,9 @@ ADDRESS_MAP_END
     INPUT_CHANGED( trigger_reset )
 -------------------------------------------------*/
 
-static INPUT_CHANGED( trigger_reset )
+INPUT_CHANGED_MEMBER( atom_state::trigger_reset )
 {
-	cputag_set_input_line(field.machine(), SY6502_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*-------------------------------------------------
@@ -332,7 +332,7 @@ static INPUT_PORTS_START( atom )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("REPT")         PORT_CODE(KEYCODE_RCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 
 	PORT_START("BRK")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BREAK")        PORT_CODE(KEYCODE_ESC)   PORT_CHAR(UCHAR_MAMEKEY(ESC)) PORT_CHANGED(trigger_reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BREAK")        PORT_CODE(KEYCODE_ESC)   PORT_CHAR(UCHAR_MAMEKEY(ESC)) PORT_CHANGED_MEMBER(DEVICE_SELF, atom_state, trigger_reset, 0)
 
 	PORT_START("ECONET")
 	// station ID (0-255)
@@ -394,19 +394,19 @@ READ8_MEMBER( atom_state::ppi_pb_r )
 
 	switch (m_keylatch)
 	{
-	case 0: data &= input_port_read(machine(), "KEY0"); break;
-	case 1: data &= input_port_read(machine(), "KEY1"); break;
-	case 2: data &= input_port_read(machine(), "KEY2"); break;
-	case 3: data &= input_port_read(machine(), "KEY3"); break;
-	case 4: data &= input_port_read(machine(), "KEY4"); break;
-	case 5: data &= input_port_read(machine(), "KEY5"); break;
-	case 6: data &= input_port_read(machine(), "KEY6"); break;
-	case 7: data &= input_port_read(machine(), "KEY7"); break;
-	case 8: data &= input_port_read(machine(), "KEY8"); break;
-	case 9: data &= input_port_read(machine(), "KEY9"); break;
+	case 0: data &= ioport("KEY0")->read(); break;
+	case 1: data &= ioport("KEY1")->read(); break;
+	case 2: data &= ioport("KEY2")->read(); break;
+	case 3: data &= ioport("KEY3")->read(); break;
+	case 4: data &= ioport("KEY4")->read(); break;
+	case 5: data &= ioport("KEY5")->read(); break;
+	case 6: data &= ioport("KEY6")->read(); break;
+	case 7: data &= ioport("KEY7")->read(); break;
+	case 8: data &= ioport("KEY8")->read(); break;
+	case 9: data &= ioport("KEY9")->read(); break;
 	}
 
-	data &= input_port_read(machine(), "KEY10");
+	data &= ioport("KEY10")->read();
 
 	return data;
 }
@@ -437,7 +437,7 @@ READ8_MEMBER( atom_state::ppi_pc_r )
 	data |= (m_cassette->input() > 0.0) << 5;
 
 	/* keyboard RPT */
-	data |= BIT(input_port_read(machine(), "RPT"), 0) << 6;
+	data |= BIT(ioport("RPT")->read(), 0) << 6;
 
 	/* MC6847 FS */
 	data |= (m_vdg->fs_r() ? 1 : 0) << 7;
@@ -750,7 +750,7 @@ static DEVICE_IMAGE_LOAD( atom_cart )
 
 	/* With the following, we mirror the cart in the whole memory region */
 	for (i = 0; i < mirror; i++)
-		memcpy(image.device().machine().region(this_cart->region)->base() + this_cart->offset + i * size, temp_copy, size);
+		memcpy(image.device().machine().root_device().memregion(this_cart->region)->base() + this_cart->offset + i * size, temp_copy, size);
 
 	auto_free(image.device().machine(), temp_copy);
 

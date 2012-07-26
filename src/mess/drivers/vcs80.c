@@ -146,9 +146,9 @@ READ8_MEMBER( vcs80_state::pio_pa_r )
 	data |= m_keylatch;
 
 	/* keyboard rows */
-	data |= BIT(input_port_read(machine(), "ROW0"), m_keylatch) << 4;
-	data |= BIT(input_port_read(machine(), "ROW1"), m_keylatch) << 5;
-	data |= BIT(input_port_read(machine(), "ROW2"), m_keylatch) << 6;
+	data |= BIT(ioport("ROW0")->read(), m_keylatch) << 4;
+	data |= BIT(ioport("ROW1")->read(), m_keylatch) << 5;
+	data |= BIT(ioport("ROW2")->read(), m_keylatch) << 6;
 
 	/* demultiplexer clock */
 	data |= (m_keyclk << 7);
@@ -245,20 +245,19 @@ ROM_END
 
 /* Driver Initialization */
 
-DIRECT_UPDATE_HANDLER( vcs80_direct_update_handler )
+DIRECT_UPDATE_MEMBER(vcs80_state::vcs80_direct_update_handler)
 {
-	vcs80_state *state = machine.driver_data<vcs80_state>();
-
 	/* _A0 is connected to PIO PB7 */
-	z80pio_pb_w(state->m_pio, 0, (!BIT(address, 0)) << 7);
+	z80pio_pb_w(m_pio, 0, (!BIT(address, 0)) << 7);
 
 	return address;
 }
 
 static DRIVER_INIT( vcs80 )
 {
-	machine.device(Z80_TAG)->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(vcs80_direct_update_handler), &machine));
-	machine.device(Z80_TAG)->memory().space(AS_IO)->set_direct_update_handler(direct_update_delegate(FUNC(vcs80_direct_update_handler), &machine));
+	vcs80_state *state = machine.driver_data<vcs80_state>();
+	machine.device(Z80_TAG)->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(vcs80_state::vcs80_direct_update_handler), state));
+	machine.device(Z80_TAG)->memory().space(AS_IO)->set_direct_update_handler(direct_update_delegate(FUNC(vcs80_state::vcs80_direct_update_handler), state));
 }
 
 /* System Drivers */

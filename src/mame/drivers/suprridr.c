@@ -93,10 +93,9 @@
  *
  *************************************/
 
-static WRITE8_HANDLER( nmi_enable_w )
+WRITE8_MEMBER(suprridr_state::nmi_enable_w)
 {
-	suprridr_state *state = space->machine().driver_data<suprridr_state>();
-	state->m_nmi_enable = data;
+	m_nmi_enable = data;
 }
 
 
@@ -123,9 +122,9 @@ static TIMER_CALLBACK( delayed_sound_w )
 }
 
 
-static WRITE8_HANDLER( sound_data_w )
+WRITE8_MEMBER(suprridr_state::sound_data_w)
 {
-	space->machine().scheduler().synchronize(FUNC(delayed_sound_w), data);
+	machine().scheduler().synchronize(FUNC(delayed_sound_w), data);
 }
 
 
@@ -136,9 +135,9 @@ static READ8_DEVICE_HANDLER( sound_data_r )
 }
 
 
-static WRITE8_HANDLER( sound_irq_ack_w )
+WRITE8_MEMBER(suprridr_state::sound_irq_ack_w)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "audiocpu", 0, CLEAR_LINE);
 }
 
 
@@ -149,10 +148,10 @@ static WRITE8_HANDLER( sound_irq_ack_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( coin_lock_w )
+WRITE8_MEMBER(suprridr_state::coin_lock_w)
 {
 	/* cleared when 9 credits are hit, but never reset! */
-/*  coin_lockout_global_w(space->machine(), ~data & 1); */
+/*  coin_lockout_global_w(machine(), ~data & 1); */
 }
 
 
@@ -163,13 +162,13 @@ static WRITE8_HANDLER( coin_lock_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, suprridr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(suprridr_bgram_w) AM_BASE_MEMBER(suprridr_state, m_bgram)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(suprridr_fgram_w) AM_BASE_MEMBER(suprridr_state, m_fgram)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(suprridr_bgram_w) AM_SHARE("bgram")
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(suprridr_fgram_w) AM_SHARE("fgram")
 	AM_RANGE(0x9800, 0x983f) AM_RAM
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE_MEMBER(suprridr_state, m_spriteram)
+	AM_RANGE(0x9840, 0x987f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9880, 0x9bff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
@@ -185,7 +184,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8, suprridr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
@@ -198,19 +197,19 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, suprridr_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, suprridr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sound_irq_ack_w)
-	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x8d, 0x8d) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x8f, 0x8f) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x8d, 0x8d) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x8f, 0x8f) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 ADDRESS_MAP_END
 
 
@@ -225,15 +224,15 @@ ADDRESS_MAP_END
 #define SUPRRIDR_P1_CONTROL_PORT_TAG	("CONTP1")
 #define SUPRRIDR_P2_CONTROL_PORT_TAG	("CONTP2")
 
-static CUSTOM_INPUT( suprridr_control_r )
+CUSTOM_INPUT_MEMBER(suprridr_state::suprridr_control_r)
 {
 	UINT32 ret;
 
 	/* screen flip multiplexes controls */
-	if (suprridr_is_screen_flipped(field.machine()))
-		ret = input_port_read(field.machine(), SUPRRIDR_P2_CONTROL_PORT_TAG);
+	if (suprridr_is_screen_flipped(machine()))
+		ret = ioport(SUPRRIDR_P2_CONTROL_PORT_TAG)->read();
 	else
-		ret = input_port_read(field.machine(), SUPRRIDR_P1_CONTROL_PORT_TAG);
+		ret = ioport(SUPRRIDR_P1_CONTROL_PORT_TAG)->read();
 
 	return ret;
 }
@@ -241,7 +240,7 @@ static CUSTOM_INPUT( suprridr_control_r )
 
 static INPUT_PORTS_START( suprridr )
 	PORT_START("INPUTS")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(suprridr_control_r, NULL)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, suprridr_state,suprridr_control_r, NULL)
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )

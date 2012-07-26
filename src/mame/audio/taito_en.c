@@ -49,7 +49,7 @@ static WRITE16_HANDLER(f3_68000_share_w)
 
 static WRITE16_HANDLER( f3_es5505_bank_w )
 {
-	UINT32 max_banks_this_game=(space->machine().region("ensoniq.0")->bytes()/0x200000)-1;
+	UINT32 max_banks_this_game=(space->machine().root_device().memregion("ensoniq.0")->bytes()/0x200000)-1;
 
 #if 0
 {
@@ -222,7 +222,7 @@ static READ16_HANDLER(es5510_dsp_r)
 
 static WRITE16_HANDLER(es5510_dsp_w)
 {
-	UINT8 *snd_mem = (UINT8 *)space->machine().region("ensoniq.0")->base();
+	UINT8 *snd_mem = (UINT8 *)space->machine().root_device().memregion("ensoniq.0")->base();
 
 //  if (offset>4 && offset!=0x80  && offset!=0xa0  && offset!=0xc0  && offset!=0xe0)
 //      logerror("%06x: DSP write offset %04x %04x\n",cpu_get_pc(&space->device()),offset,data);
@@ -287,14 +287,14 @@ static WRITE16_HANDLER(es5510_dsp_w)
 	}
 }
 
-static ADDRESS_MAP_START( f3_sound_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( f3_sound_map, AS_PROGRAM, 16, driver_device )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_MIRROR(0x30000) AM_SHARE("share1")
-	AM_RANGE(0x140000, 0x140fff) AM_READWRITE(f3_68000_share_r, f3_68000_share_w)
-	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("ensoniq", es5505_r, es5505_w)
-	AM_RANGE(0x260000, 0x2601ff) AM_READWRITE(es5510_dsp_r, es5510_dsp_w)
-	AM_RANGE(0x280000, 0x28001f) AM_READWRITE(f3_68681_r, f3_68681_w)
-	AM_RANGE(0x300000, 0x30003f) AM_WRITE(f3_es5505_bank_w)
-	AM_RANGE(0x340000, 0x340003) AM_WRITE8(f3_volume_w,0xff00) /* 8 channel volume control */
+	AM_RANGE(0x140000, 0x140fff) AM_READWRITE_LEGACY(f3_68000_share_r, f3_68000_share_w)
+	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE_LEGACY("ensoniq", es5505_r, es5505_w)
+	AM_RANGE(0x260000, 0x2601ff) AM_READWRITE_LEGACY(es5510_dsp_r, es5510_dsp_w)
+	AM_RANGE(0x280000, 0x28001f) AM_READWRITE_LEGACY(f3_68681_r, f3_68681_w)
+	AM_RANGE(0x300000, 0x30003f) AM_WRITE_LEGACY(f3_es5505_bank_w)
+	AM_RANGE(0x340000, 0x340003) AM_WRITE8_LEGACY(f3_volume_w,0xff00) /* 8 channel volume control */
 	AM_RANGE(0xc00000, 0xc1ffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc20000, 0xc3ffff) AM_ROMBANK("bank2")
 	AM_RANGE(0xc40000, 0xc7ffff) AM_ROMBANK("bank3")
@@ -304,11 +304,11 @@ ADDRESS_MAP_END
 SOUND_RESET( taito_f3_soundsystem_reset )
 {
 	/* Sound cpu program loads to 0xc00000 so we use a bank */
-	UINT16 *ROM = (UINT16 *)machine.region("audiocpu")->base();
-	UINT16 *sound_ram = (UINT16 *)memory_get_shared(machine, "share1");
-	memory_set_bankptr(machine, "bank1",&ROM[0x80000]);
-	memory_set_bankptr(machine, "bank2",&ROM[0x90000]);
-	memory_set_bankptr(machine, "bank3",&ROM[0xa0000]);
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion("audiocpu")->base();
+	UINT16 *sound_ram = (UINT16 *)machine.root_device().memshare("share1")->ptr();
+	machine.root_device().membank("bank1")->set_base(&ROM[0x80000]);
+	machine.root_device().membank("bank2")->set_base(&ROM[0x90000]);
+	machine.root_device().membank("bank3")->set_base(&ROM[0xa0000]);
 
 	sound_ram[0]=ROM[0x80000]; /* Stack and Reset vectors */
 	sound_ram[1]=ROM[0x80001];
@@ -319,7 +319,7 @@ SOUND_RESET( taito_f3_soundsystem_reset )
 	machine.device("audiocpu")->reset();
 	//cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
-	f3_shared_ram = (UINT32 *)memory_get_shared(machine, "f3_shared");
+	f3_shared_ram = (UINT32 *)machine.root_device().memshare("f3_shared")->ptr();
 }
 
 static const es5505_interface es5505_taito_f3_config =

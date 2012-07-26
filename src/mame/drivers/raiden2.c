@@ -1,6 +1,7 @@
 /* Seibu Protected 1993-94 era hardware, V30 based (sequel to the 68k based hardware)
     TODO: figure out the rest of the protection
-    TODO: Zero team needs COIN3 and COIN4 found and hooked up, they may be on the sound cpu
+    TODO: Zero Team needs COIN3 and COIN4 found and hooked up, they may be on the sound cpu
+    TODO: Zero Team presumably needs additive blending on the character screen
 */
 
 /* raiden 2 board test note 17/04/08 (based on test by dox)
@@ -126,9 +127,6 @@ Current Problem(s) - in order of priority
 
  Protection - it isn't emulated, until it is the games will never work.
 
- Sprite Encryption - this is 99% complete for Raiden 2 / DX, just a few bad
- bits remain.  No decryption support for Zero Team yet.
-
  Video emulation - used to be more complete than it is now, tile banking is
  currently broken.
 
@@ -136,7 +134,6 @@ Current Problem(s) - in order of priority
 
 */
 
-#define ADDRESS_MAP_MODERN
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
@@ -481,7 +478,8 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 	switch(data) {
 	case 0x0205:   // 0205 0006 ffeb 0000 - 0188 0282 0082 0b8e 098e 0000 0000 0000
 		space.write_dword(cop_regs[0] + 4 + offset*4, space.read_dword(cop_regs[0] + 4 + offset*4) + space.read_dword(cop_regs[0] + 16 + offset*4));
-		space.write_word(cop_regs[0] + 0x1c + offset*4, space.read_word(cop_regs[0] + 0x1c + offset*4) + space.read_word(cop_regs[0] + 16 + offset*4));
+		/* TODO: check the following, makes Zero Team to crash as soon as this command is triggered. */
+		//space.write_word(cop_regs[0] + 0x1c + offset*4, space.read_word(cop_regs[0] + 0x1c + offset*4) + space.read_word(cop_regs[0] + 16 + offset*4));
 		break;
 
 	case 0x0904: { /* X Se Dae and Zero Team uses this variant */
@@ -616,7 +614,7 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 
 //  case 0x6ca:
 //      logerror("select bank %d %04x\n", (data >> 15) & 1, data);
-//      memory_set_bank(space.machine(), "bank1", (data >> 15) & 1);
+//      space.machine().root_device().membank("bank1")->set_entry((data >> 15) & 1);
 
 
 static void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
@@ -816,7 +814,7 @@ WRITE16_MEMBER(raiden2_state::raidendx_cop_bank_2_w)
 
 		/* probably bit 3 is from 6c9 */
 		/* TODO: this doesn't work! */
-		memory_set_bank(space.machine(), "mainbank", 8 | (cop_bank & 0x7000) >> 12);
+		space.machine().root_device().membank("mainbank")->set_entry(8 | (cop_bank & 0x7000) >> 12);
 	}
 }
 
@@ -1062,7 +1060,7 @@ static MACHINE_RESET(raiden2)
 	sprcpt_init();
 	MACHINE_RESET_CALL(seibu_sound);
 
-	memory_set_bank(machine, "mainbank", 1);
+	state->membank("mainbank")->set_entry(1);
 
 	state->prg_bank = 0;
 	//cop_init();
@@ -1075,7 +1073,7 @@ static MACHINE_RESET(raidendx)
 	sprcpt_init();
 	MACHINE_RESET_CALL(seibu_sound);
 
-	memory_set_bank(machine, "mainbank", 8);
+	state->membank("mainbank")->set_entry(8);
 
 	state->prg_bank = 0x08;
 
@@ -1091,7 +1089,7 @@ static MACHINE_RESET(zeroteam)
 	sprcpt_init();
 	MACHINE_RESET_CALL(seibu_sound);
 
-	memory_set_bank(machine, "mainbank", 1);
+	state->membank("mainbank")->set_entry(1);
 
 	state->prg_bank = 0;
 	//cop_init();
@@ -1106,7 +1104,7 @@ static MACHINE_RESET(xsedae)
 	sprcpt_init();
 	MACHINE_RESET_CALL(seibu_sound);
 
-	//memory_set_bank(machine, "mainbank", 1);
+	state->membank("mainbank")->set_entry(1);
 
 	//cop_init();
 }
@@ -1125,7 +1123,7 @@ WRITE16_MEMBER(raiden2_state::raiden2_bank_w)
 {
 	if(ACCESSING_BITS_8_15) {
 		logerror("select bank %d %04x\n", (data >> 15) & 1, data);
-		memory_set_bank(space.machine(), "mainbank", !((data >> 15) & 1));
+		space.machine().root_device().membank("mainbank")->set_entry(!((data >> 15) & 1));
 		prg_bank = ((data >> 15) & 1);
 	}
 }
@@ -1264,15 +1262,15 @@ static ADDRESS_MAP_START( raiden2_mem, AS_PROGRAM, 16, raiden2_state )
 
 	AM_RANGE(0x00800, 0x0bfff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE(sprites)
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(back_data)
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
-    AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(mid_data)
-    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(text_data)
+	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_SHARE("sprites")
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_SHARE("back_data")
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
+    AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_SHARE("mid_data")
+    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_SHARE("text_data")
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("mainbank")
 	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000)
@@ -1305,12 +1303,12 @@ static ADDRESS_MAP_START( zeroteam_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0x00800, 0x0b7ff) AM_RAM
-	AM_RANGE(0x0b800, 0x0bfff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(back_data)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
-	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(raiden2_midground_w) AM_BASE(mid_data)
-    AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(text_data)
-	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_BASE(sprites)
+	AM_RANGE(0x0b800, 0x0bfff) AM_RAM_WRITE(raiden2_background_w) AM_SHARE("back_data")
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
+	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(raiden2_midground_w) AM_SHARE("mid_data")
+    AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(raiden2_text_w) AM_SHARE("text_data")
+	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_SHARE("sprites")
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM
 
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("mainbank")
@@ -1335,12 +1333,12 @@ static ADDRESS_MAP_START( xsedae_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 
 	AM_RANGE(0x00800, 0x0b7ff) AM_RAM
-	AM_RANGE(0x0b800, 0x0bfff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(back_data)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
-	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(raiden2_midground_w) AM_BASE(mid_data)
-    AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(text_data)
-	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_BASE(sprites)
+	AM_RANGE(0x0b800, 0x0bfff) AM_RAM_WRITE(raiden2_background_w) AM_SHARE("back_data")
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(raiden2_foreground_w) AM_SHARE("fore_data")
+	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(raiden2_midground_w) AM_SHARE("mid_data")
+    AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(raiden2_text_w) AM_SHARE("text_data")
+	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_SHARE("sprites")
 
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM
 
@@ -2897,25 +2895,25 @@ ROM_END
 
 static DRIVER_INIT (raiden2)
 {
-	memory_configure_bank(machine, "mainbank", 0, 2, machine.region("mainprg")->base(), 0x20000);
+	machine.root_device().membank("mainbank")->configure_entries(0, 2, machine.root_device().memregion("mainprg")->base(), 0x20000);
 	raiden2_decrypt_sprites(machine);
 }
 
 static DRIVER_INIT (raidendx)
 {
-	memory_configure_bank(machine, "mainbank", 0, 0x10, machine.region("mainprg")->base(), 0x20000);
+	machine.root_device().membank("mainbank")->configure_entries(0, 0x10, machine.root_device().memregion("mainprg")->base(), 0x20000);
 	raiden2_decrypt_sprites(machine);
 }
 
 static DRIVER_INIT (xsedae)
 {
 	/* doesn't have banking */
-	//memory_configure_bank(machine, "mainbank", 0, 2, machine.region("mainprg")->base(), 0x20000);
+	//machine.root_device().membank("mainbank")->configure_entries(0, 2, machine.root_device().memregion("mainprg")->base(), 0x20000);
 }
 
 static DRIVER_INIT (zeroteam)
 {
-	memory_configure_bank(machine, "mainbank", 0, 2, machine.region("mainprg")->base(), 0x20000);
+	machine.root_device().membank("mainbank")->configure_entries(0, 2, machine.root_device().memregion("mainprg")->base(), 0x20000);
 	zeroteam_decrypt_sprites(machine);
 }
 

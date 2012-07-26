@@ -36,6 +36,7 @@ HuC6280A (Hudson)
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/i8155.h"
 #include "machine/pcecommn.h"
 #include "video/vdc.h"
 #include "cpu/h6280/h6280.h"
@@ -48,6 +49,11 @@ public:
 	paranoia_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_WRITE8_MEMBER(paranoia_8085_d000_w);
+	DECLARE_READ8_MEMBER(paranoia_z80_io_01_r);
+	DECLARE_READ8_MEMBER(paranoia_z80_io_02_r);
+	DECLARE_WRITE8_MEMBER(paranoia_z80_io_17_w);
+	DECLARE_WRITE8_MEMBER(paranoia_z80_io_37_w);
 };
 
 
@@ -63,81 +69,101 @@ static INPUT_PORTS_START( paranoia )
     PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8)
+static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, paranoia_state )
 	AM_RANGE( 0x000000, 0x03FFFF) AM_ROM
-	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000) AM_BASE( &pce_user_ram )
-	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE( vdc_0_r, vdc_0_w )
-	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE( vce_r, vce_w )
-	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE( "c6280", c6280_r, c6280_w )
-	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE( h6280_timer_r, h6280_timer_w )
-	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE( pce_joystick_r, pce_joystick_w )
-	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE( h6280_irq_status_r, h6280_irq_status_w )
+	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000) AM_BASE_LEGACY(&pce_user_ram )
+	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_READWRITE_LEGACY(vdc_0_r, vdc_0_w )
+	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_READWRITE_LEGACY(vce_r, vce_w )
+	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE_LEGACY("c6280", c6280_r, c6280_w )
+	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE_LEGACY(h6280_timer_r, h6280_timer_w )
+	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE_LEGACY(pce_joystick_r, pce_joystick_w )
+	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE_LEGACY(h6280_irq_status_r, h6280_irq_status_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pce_io , AS_IO, 8)
-	AM_RANGE( 0x00, 0x03) AM_READWRITE( vdc_0_r, vdc_0_w )
+static ADDRESS_MAP_START( pce_io , AS_IO, 8, paranoia_state )
+	AM_RANGE( 0x00, 0x03) AM_READWRITE_LEGACY(vdc_0_r, vdc_0_w )
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( paranoia_8085_d000_w )
+WRITE8_MEMBER(paranoia_state::paranoia_8085_d000_w)
 {
 	//logerror( "D000 (8085) write %02x\n", data );
 }
 
-static WRITE8_HANDLER( paranoia_8085_8155_w )
-{
-	switch( offset )
-	{
-	case 0: logerror( "8155 Command register write %x, timer command = %x, interrupt enable = %x, ports = %x\n", data, (data >> 6) & 3, (data >> 4) & 3, data & 0xf ); break;
-	case 1: logerror( "8155 I/O Port A write %x\n", data ); break;
-	case 2: logerror( "8155 I/O Port B write %x\n", data ); break;
-	case 3: logerror( "8155 I/O Port C (or control) write %x\n", data ); break;
-	case 4: logerror( "8155 Timer low 8 bits write %x\n", data ); break;
-	case 5: logerror( "8155 Timer high 6 bits write %x, timer mode %x\n", data & 0x3f, (data >> 6) & 3); break;
-	}
-}
-
-static ADDRESS_MAP_START(paranoia_8085_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(paranoia_8085_map, AS_PROGRAM, 8, paranoia_state )
 	AM_RANGE( 0x0000, 0x7fff) AM_ROM
-	AM_RANGE( 0x8000, 0x80ff) AM_RAM
-	AM_RANGE( 0x8100, 0x8105) AM_WRITE( paranoia_8085_8155_w )
-	AM_RANGE( 0xd000, 0xd000) AM_WRITE( paranoia_8085_d000_w )
+	AM_RANGE( 0x8000, 0x80ff) AM_DEVREADWRITE("i8155", i8155_device, memory_r, memory_w)
+	AM_RANGE( 0x8100, 0x8107) AM_DEVREADWRITE("i8155", i8155_device, io_r, io_w)
+	AM_RANGE( 0xd000, 0xd000) AM_WRITE(paranoia_8085_d000_w )
 	AM_RANGE( 0xe000, 0xe1ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(paranoia_8085_io_map, AS_IO, 8)
+static ADDRESS_MAP_START(paranoia_8085_io_map, AS_IO, 8, paranoia_state )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(paranoia_z80_map, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(paranoia_z80_map, AS_PROGRAM, 8, paranoia_state )
 	AM_RANGE( 0x0000, 0x3fff) AM_ROM
 	AM_RANGE( 0x6000, 0x67ff) AM_RAM
 	AM_RANGE( 0x7000, 0x73ff) AM_RAM
 ADDRESS_MAP_END
 
-static READ8_HANDLER(paranoia_z80_io_01_r)
+READ8_MEMBER(paranoia_state::paranoia_z80_io_01_r)
 {
 	return 0;
 }
 
-static READ8_HANDLER(paranoia_z80_io_02_r)
+READ8_MEMBER(paranoia_state::paranoia_z80_io_02_r)
 {
 	return 0;
 }
 
-static WRITE8_HANDLER(paranoia_z80_io_17_w)
+WRITE8_MEMBER(paranoia_state::paranoia_z80_io_17_w)
 {
 }
 
-static WRITE8_HANDLER(paranoia_z80_io_37_w)
+WRITE8_MEMBER(paranoia_state::paranoia_z80_io_37_w)
 {
 }
 
-static ADDRESS_MAP_START(paranoia_z80_io_map, AS_IO, 8)
+static ADDRESS_MAP_START(paranoia_z80_io_map, AS_IO, 8, paranoia_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ( paranoia_z80_io_01_r )
-	AM_RANGE( 0x02, 0x02 ) AM_READ( paranoia_z80_io_02_r )
-	AM_RANGE( 0x17, 0x17 ) AM_WRITE( paranoia_z80_io_17_w )
-	AM_RANGE( 0x37, 0x37 ) AM_WRITE( paranoia_z80_io_37_w )
+	AM_RANGE( 0x01, 0x01 ) AM_READ(paranoia_z80_io_01_r )
+	AM_RANGE( 0x02, 0x02 ) AM_READ(paranoia_z80_io_02_r )
+	AM_RANGE( 0x17, 0x17 ) AM_WRITE(paranoia_z80_io_17_w )
+	AM_RANGE( 0x37, 0x37 ) AM_WRITE(paranoia_z80_io_37_w )
 ADDRESS_MAP_END
+
+static WRITE8_DEVICE_HANDLER(paranoia_i8155_a_w)
+{
+	//logerror("i8155 Port A: %02X\n", data);
+}
+
+static WRITE8_DEVICE_HANDLER(paranoia_i8155_b_w)
+{
+	//logerror("i8155 Port B: %02X\n", data);
+}
+
+static WRITE8_DEVICE_HANDLER(paranoia_i8155_c_w)
+{
+	//logerror("i8155 Port C: %02X\n", data);
+}
+
+static WRITE_LINE_DEVICE_HANDLER(paranoia_i8155_timer_out)
+{
+	//cputag_set_input_line(device->machine(), "sub", I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
+	//logerror("Timer out %d\n", state);
+}
+
+static I8155_INTERFACE(i8155_intf)
+{
+	// all ports set to output
+	DEVCB_NULL,
+	DEVCB_HANDLER(paranoia_i8155_a_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(paranoia_i8155_b_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(paranoia_i8155_c_w),
+	DEVCB_LINE(paranoia_i8155_timer_out)
+};
 
 static const c6280_interface c6280_config =
 {
@@ -160,6 +186,8 @@ static MACHINE_CONFIG_START( paranoia, paranoia_state )
 	MCFG_CPU_ADD("sub2", Z80, 18000000/6)
 	MCFG_CPU_PROGRAM_MAP(paranoia_z80_map)
 	MCFG_CPU_IO_MAP(paranoia_z80_io_map)
+
+	MCFG_I8155_ADD("i8155", 1000000 /*?*/, i8155_intf)
 
     /* video hardware */
 

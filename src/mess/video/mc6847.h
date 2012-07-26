@@ -212,7 +212,7 @@ protected:
 
 		// artifacting config
 		void setup_config(device_t *device);
-		void poll_config(void) { m_artifacting = m_config ? input_port_read_direct(m_config) : 0; }
+		void poll_config(void) { m_artifacting = (m_config!=NULL) ? m_config->read() : 0; }
 
 		// artifacting application
 		template<int xscale>
@@ -252,9 +252,9 @@ protected:
 		}
 
 	private:
-		const input_port_config *m_config;
-		input_port_value m_artifacting;
-		input_port_value m_saved_artifacting;
+		ioport_port *m_config;
+		ioport_value m_artifacting;
+		ioport_value m_saved_artifacting;
 		pixel_t m_saved_c0, m_saved_c1;
 		pixel_t m_expanded_colors[128];
 

@@ -73,6 +73,8 @@ class pengo_state : public pacman_state
 public:
 	pengo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pacman_state(mconfig, type, tag) { }
+	DECLARE_WRITE8_MEMBER(pengo_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(irq_mask_w);
 };
 
 
@@ -105,30 +107,30 @@ public:
  *
  *************************************/
 
-static WRITE8_HANDLER( pengo_coin_counter_w )
+WRITE8_MEMBER(pengo_state::pengo_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset, data & 1);
+	coin_counter_w(machine(), offset, data & 1);
 }
 
-static WRITE8_HANDLER( irq_mask_w )
+WRITE8_MEMBER(pengo_state::irq_mask_w)
 {
-	pengo_state *state = space->machine().driver_data<pengo_state>();
 
-	state->m_irq_mask = data & 1;
+
+	m_irq_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8, pengo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pengo_state, m_videoram) /* video and color RAM, scratchpad RAM, sprite codes */
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pengo_state, m_colorram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram") /* video and color RAM, scratchpad RAM, sprite codes */
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE("namco", pacman_sound_w)
+	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
 	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x9000, 0x903f) AM_READ_PORT("DSW1")
 	AM_RANGE(0x9040, 0x907f) AM_READ_PORT("DSW0")
 	AM_RANGE(0x9040, 0x9040) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x9041, 0x9041) AM_DEVWRITE("namco", pacman_sound_enable_w)
+	AM_RANGE(0x9041, 0x9041) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
 	AM_RANGE(0x9042, 0x9042) AM_WRITE(pengo_palettebank_w)
 	AM_RANGE(0x9043, 0x9043) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x9044, 0x9045) AM_WRITE(pengo_coin_counter_w)
@@ -140,17 +142,17 @@ static ADDRESS_MAP_START( pengo_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jrpacmbl_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jrpacmbl_map, AS_PROGRAM, 8, pengo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_BASE_MEMBER(pengo_state, m_videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE("namco", pacman_sound_w)
+	AM_RANGE(0x9000, 0x901f) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
 	AM_RANGE(0x9020, 0x902f) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x9030, 0x9030) AM_WRITE(jrpacman_scroll_w)
 	AM_RANGE(0x9040, 0x904f) AM_READ_PORT("DSW")
 	AM_RANGE(0x9040, 0x9040) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x9041, 0x9041) AM_DEVWRITE("namco", pacman_sound_enable_w)
+	AM_RANGE(0x9041, 0x9041) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
 	AM_RANGE(0x9042, 0x9042) AM_WRITE(pengo_palettebank_w)
 	AM_RANGE(0x9043, 0x9043) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x9044, 0x9044) AM_WRITE(jrpacman_bgpriority_w)
@@ -690,7 +692,7 @@ static DRIVER_INIT( penta )
 	};
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	int A;
 
 	space->set_decrypted_region(0x0000, 0x7fff, decrypt);

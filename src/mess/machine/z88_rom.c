@@ -65,7 +65,7 @@ z88_256k_rom_device::z88_256k_rom_device(const machine_config &mconfig, const ch
 
 void z88_32k_rom_device::device_start()
 {
-	m_rom = machine().region_alloc(tag(), get_cart_size(), 1, ENDIANNESS_LITTLE)->base();
+	m_rom = machine().memory().region_alloc(tag(), get_cart_size(), 1, ENDIANNESS_LITTLE)->base();
 }
 
 /*-------------------------------------------------

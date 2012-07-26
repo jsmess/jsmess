@@ -110,7 +110,7 @@ static READ8_DEVICE_HANDLER( io_port_r )
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "DSW0", "DSW1" };
 	gameplan_state *state = device->machine().driver_data<gameplan_state>();
 
-	return input_port_read(device->machine(), portnames[state->m_current_port]);
+	return state->ioport(portnames[state->m_current_port])->read();
 }
 
 
@@ -167,7 +167,7 @@ static WRITE8_DEVICE_HANDLER( audio_trigger_w )
 
 static const via6522_interface via_2_interface =
 {
-	DEVCB_NULL, DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch_r),				  /*inputs : A/B         */
+	DEVCB_NULL, DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),				  /*inputs : A/B         */
 	DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,							  /*inputs : CA/B1,CA/B2 */
 	DEVCB_HANDLER(audio_cmd_w), DEVCB_NULL,						  /*outputs: A/B         */
 	DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER(audio_trigger_w), DEVCB_HANDLER(audio_reset_w), /*outputs: CA/B1,CA/B2 */
@@ -194,8 +194,9 @@ static WRITE_LINE_DEVICE_HANDLER( r6532_irq )
 
 static WRITE8_DEVICE_HANDLER( r6532_soundlatch_w )
 {
+	gameplan_state *gameplan = device->machine().driver_data<gameplan_state>();
 	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
-	soundlatch_w(space, 0, data);
+	gameplan->soundlatch_byte_w(*space, 0, data);
 }
 
 
@@ -215,11 +216,11 @@ static const riot6532_interface r6532_interface =
  *
  *************************************/
 
-static ADDRESS_MAP_START( gameplan_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gameplan_main_map, AS_PROGRAM, 8, gameplan_state )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x2000, 0x200f) AM_MIRROR(0x07f0) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)	/* VIA 1 */
-	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x07f0) AM_DEVREADWRITE_MODERN("via6522_1", via6522_device, read, write)	/* VIA 2 */
-	AM_RANGE(0x3000, 0x300f) AM_MIRROR(0x07f0) AM_DEVREADWRITE_MODERN("via6522_2", via6522_device, read, write)	/* VIA 3 */
+	AM_RANGE(0x2000, 0x200f) AM_MIRROR(0x07f0) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)	/* VIA 1 */
+	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x07f0) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)	/* VIA 2 */
+	AM_RANGE(0x3000, 0x300f) AM_MIRROR(0x07f0) AM_DEVREADWRITE("via6522_2", via6522_device, read, write)	/* VIA 3 */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -231,23 +232,23 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( gameplan_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gameplan_audio_map, AS_PROGRAM, 8, gameplan_state )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
-	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_ROM
 ADDRESS_MAP_END
 
 
 /* same as Gameplan, but larger ROM */
-static ADDRESS_MAP_START( leprechn_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( leprechn_audio_map, AS_PROGRAM, 8, gameplan_state )
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x1780) AM_RAM  /* 6532 internal RAM */
-	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE("riot", riot6532_r, riot6532_w)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x0800, 0x081f) AM_MIRROR(0x17e0) AM_DEVREADWRITE_LEGACY("riot", riot6532_r, riot6532_w)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x1ffc) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x1ffc) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 	AM_RANGE(0xe000, 0xefff) AM_MIRROR(0x1000) AM_ROM
 ADDRESS_MAP_END
 

@@ -12,18 +12,24 @@
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eeprom.h"
+
 #include "sound/okim6295.h"
+#include "includes/eolith.h"
 #include "includes/eolithsp.h"
 
 
-class eolith16_state : public driver_device
+class eolith16_state : public eolith_state
 {
 public:
 	eolith16_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: eolith_state(mconfig, type, tag) { }
 
 	UINT16 *m_vram;
 	int m_vbuffer;
+	DECLARE_WRITE16_MEMBER(eeprom_w);
+	DECLARE_READ16_MEMBER(eolith16_custom_r);
+	DECLARE_WRITE16_MEMBER(vram_w);
+	DECLARE_READ16_MEMBER(vram_r);
 };
 
 
@@ -40,43 +46,40 @@ static const eeprom_interface eeprom_interface_93C66 =
 	"*10011xxxxxx"	// unlock       100 11xxxxxxx
 };
 
-static WRITE16_HANDLER( eeprom_w )
+WRITE16_MEMBER(eolith16_state::eeprom_w)
 {
-	eolith16_state *state = space->machine().driver_data<eolith16_state>();
-	state->m_vbuffer = (data & 0x80) >> 7;
-	coin_counter_w(space->machine(), 0, data & 1);
+	m_vbuffer = (data & 0x80) >> 7;
+	coin_counter_w(machine(), 0, data & 1);
 
-	input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+	ioport("EEPROMOUT")->write(data, 0xff);
 
 	//data & 0x100 and data & 0x004 always set
 }
 
-static READ16_HANDLER( eolith16_custom_r )
+READ16_MEMBER(eolith16_state::eolith16_custom_r)
 {
-	eolith_speedup_read(space);
-	return input_port_read(space->machine(), "SPECIAL");
+	eolith_speedup_read(&space);
+	return ioport("SPECIAL")->read();
 }
 
 
 
-static WRITE16_HANDLER( vram_w )
+WRITE16_MEMBER(eolith16_state::vram_w)
 {
-	eolith16_state *state = space->machine().driver_data<eolith16_state>();
-	COMBINE_DATA(&state->m_vram[offset + (0x10000/2) * state->m_vbuffer]);
+	COMBINE_DATA(&m_vram[offset + (0x10000/2) * m_vbuffer]);
 }
 
-static READ16_HANDLER( vram_r )
+READ16_MEMBER(eolith16_state::vram_r)
 {
-	eolith16_state *state = space->machine().driver_data<eolith16_state>();
-	return state->m_vram[offset + (0x10000/2) * state->m_vbuffer];
+	return m_vram[offset + (0x10000/2) * m_vbuffer];
 }
 
-static ADDRESS_MAP_START( eolith16_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( eolith16_map, AS_PROGRAM, 16, eolith16_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
 	AM_RANGE(0x50000000, 0x5000ffff) AM_READWRITE(vram_r, vram_w)
 	AM_RANGE(0x90000000, 0x9000002f) AM_WRITENOP //?
 	AM_RANGE(0xff000000, 0xff1fffff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0xffe40000, 0xffe40001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0xffe40000, 0xffe40001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xffe80000, 0xffe80001) AM_WRITE(eeprom_w)
 	AM_RANGE(0xffea0000, 0xffea0001) AM_READ(eolith16_custom_r)
 	AM_RANGE(0xffea0002, 0xffea0003) AM_READ_PORT("SYSTEM")
@@ -88,7 +91,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( eolith16 )
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(eolith_speedup_getvblank, NULL)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith16_state, eolith_speedup_getvblank, NULL)
 	PORT_BIT( 0xff6f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")

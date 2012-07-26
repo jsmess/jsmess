@@ -11,7 +11,6 @@
 #ifndef __DGNALPHA__
 #define __DGNALPHA__
 
-#define ADDRESS_MAP_MODERN
 
 #include "includes/dragon.h"
 #include "sound/ay8910.h"

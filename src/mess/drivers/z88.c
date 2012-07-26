@@ -14,7 +14,6 @@
         Kevin Thacker [MESS driver]
 
 *******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/z88.h"
 
@@ -66,24 +65,36 @@ void z88_state::bankswitch_update(int bank, UINT16 page, int rams)
 	if (page < 0x20)	// internal ROM
 	{
 		// install read bank
-		m_maincpu->memory().space(AS_PROGRAM)->install_read_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
-		m_maincpu->memory().space(AS_PROGRAM)->unmap_write(bank<<14, (bank<<14) + 0x3fff);
+		if (m_bank_type[bank] != Z88_BANK_ROM)
+		{
+			m_maincpu->memory().space(AS_PROGRAM)->install_read_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
+			m_maincpu->memory().space(AS_PROGRAM)->unmap_write(bank<<14, (bank<<14) + 0x3fff);
+			m_bank_type[bank] = Z88_BANK_ROM;
+		}
 
-		memory_set_bank(machine(), bank_tag, page);
+		membank(bank_tag)->set_entry(page);
 	}
 	else if (page < 0x40)	// internal RAM
 	{
 		if((page & 0x1f) < (m_ram->size()>>14))
 		{
 			// install readwrite bank
-			m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
+			if (m_bank_type[bank] != Z88_BANK_RAM)
+			{
+				m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_bank(bank<<14, (bank<<14) + 0x3fff, bank_tag);
+				m_bank_type[bank] = Z88_BANK_RAM;
+			}
 
 			// set the bank
-			memory_set_bank(machine(), bank_tag, page);
+			membank(bank_tag)->set_entry(page);
 		}
 		else
 		{
-			m_maincpu->memory().space(AS_PROGRAM)->unmap_readwrite(bank<<14, (bank<<14) + 0x3fff);
+			if (m_bank_type[bank] != Z88_BANK_UNMAP)
+			{
+				m_maincpu->memory().space(AS_PROGRAM)->unmap_readwrite(bank<<14, (bank<<14) + 0x3fff);
+				m_bank_type[bank] = Z88_BANK_UNMAP;
+			}
 		}
 	}
 	else	// cartridges
@@ -91,20 +102,25 @@ void z88_state::bankswitch_update(int bank, UINT16 page, int rams)
 		m_bank[bank].slot = (page >> 6) & 3;
 		m_bank[bank].page = page & 0x3f;
 
-		switch (bank)
+		if (m_bank_type[bank] != Z88_BANK_CART)
 		{
-			case 0:
-				m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(bank<<14, (bank<<14) + 0x3fff, 0, 0, read8_delegate(FUNC(z88_state::bank0_cart_r), this), write8_delegate(FUNC(z88_state::bank0_cart_w), this));
-				break;
-			case 1:
-				m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(bank<<14, (bank<<14) + 0x3fff, 0, 0, read8_delegate(FUNC(z88_state::bank1_cart_r), this), write8_delegate(FUNC(z88_state::bank1_cart_w), this));
-				break;
-			case 2:
-				m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(bank<<14, (bank<<14) + 0x3fff, 0, 0, read8_delegate(FUNC(z88_state::bank2_cart_r), this), write8_delegate(FUNC(z88_state::bank2_cart_w), this));
-				break;
-			case 3:
-				m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(bank<<14, (bank<<14) + 0x3fff, 0, 0, read8_delegate(FUNC(z88_state::bank3_cart_r), this), write8_delegate(FUNC(z88_state::bank3_cart_w), this));
-				break;
+			switch (bank)
+			{
+				case 0:
+					m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(0x0000, 0x3fff, 0, 0, read8_delegate(FUNC(z88_state::bank0_cart_r), this), write8_delegate(FUNC(z88_state::bank0_cart_w), this));
+					break;
+				case 1:
+					m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(0x4000, 0x7fff, 0, 0, read8_delegate(FUNC(z88_state::bank1_cart_r), this), write8_delegate(FUNC(z88_state::bank1_cart_w), this));
+					break;
+				case 2:
+					m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(0x8000, 0xbfff, 0, 0, read8_delegate(FUNC(z88_state::bank2_cart_r), this), write8_delegate(FUNC(z88_state::bank2_cart_w), this));
+					break;
+				case 3:
+					m_maincpu->memory().space(AS_PROGRAM)->install_readwrite_handler(0xc000, 0xffff, 0, 0, read8_delegate(FUNC(z88_state::bank3_cart_r), this), write8_delegate(FUNC(z88_state::bank3_cart_w), this));
+					break;
+			}
+
+			m_bank_type[bank] = Z88_BANK_CART;
 		}
 	}
 
@@ -120,7 +136,7 @@ void z88_state::bankswitch_update(int bank, UINT16 page, int rams)
 		else
 			m_maincpu->memory().space(AS_PROGRAM)->unmap_write(0, 0x1fff);
 
-		memory_set_bank(machine(), "bank1", rams & 1);
+		membank("bank1")->set_entry(rams & 1);
 	}
 }
 
@@ -246,24 +262,29 @@ INPUT_PORTS_END
 
 void z88_state::machine_start()
 {
-	m_bios = (UINT8*)machine().region("bios")->base();
+	m_bios = (UINT8*)machine().root_device().memregion("bios")->base();
 	m_ram_base = (UINT8*)m_ram->pointer();
 
 	// configure the memory banks
-	memory_configure_bank(machine(), "bank1", 0, 1, m_bios, 0);
-	memory_configure_bank(machine(), "bank1", 1, 1, m_ram_base,  0);
-	memory_configure_bank(machine(), "bank2", 0, 32, m_bios, 0x4000);
-	memory_configure_bank(machine(), "bank3", 0, 32, m_bios, 0x4000);
-	memory_configure_bank(machine(), "bank4", 0, 32, m_bios, 0x4000);
-	memory_configure_bank(machine(), "bank5", 0, 32, m_bios, 0x4000);
-	memory_configure_bank(machine(), "bank2", 32, m_ram->size()>>14, m_ram_base, 0x4000);
-	memory_configure_bank(machine(), "bank3", 32, m_ram->size()>>14, m_ram_base, 0x4000);
-	memory_configure_bank(machine(), "bank4", 32, m_ram->size()>>14, m_ram_base, 0x4000);
-	memory_configure_bank(machine(), "bank5", 32, m_ram->size()>>14, m_ram_base, 0x4000);
+	membank("bank1")->configure_entry(0, m_bios);
+	membank("bank1")->configure_entry(1, m_ram_base);
+	membank("bank2")->configure_entries(0, 32, m_bios, 0x4000);
+	membank("bank3")->configure_entries(0, 32, m_bios, 0x4000);
+	membank("bank4")->configure_entries(0, 32, m_bios, 0x4000);
+	membank("bank5")->configure_entries(0, 32, m_bios, 0x4000);
+	membank("bank2")->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
+	membank("bank3")->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
+	membank("bank4")->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
+	membank("bank5")->configure_entries(32, m_ram->size()>>14, m_ram_base, 0x4000);
 
 	m_carts[1] = machine().device<z88cart_slot_device>("slot1");
 	m_carts[2] = machine().device<z88cart_slot_device>("slot2");
 	m_carts[3] = machine().device<z88cart_slot_device>("slot3");
+}
+
+void z88_state::machine_reset()
+{
+	m_bank_type[0] = m_bank_type[1] = m_bank_type[2] = m_bank_type[3] = 0;
 }
 
 READ8_MEMBER(z88_state::kb_r)
@@ -271,28 +292,28 @@ READ8_MEMBER(z88_state::kb_r)
 	UINT8 data = 0xff;
 
 	if (!(offset & 0x80))
-		data &= input_port_read(machine(), "LINE7");
+		data &= ioport("LINE7")->read();
 
 	if (!(offset & 0x40))
-		data &= input_port_read(machine(), "LINE6");
+		data &= ioport("LINE6")->read();
 
 	if (!(offset & 0x20))
-		data &= input_port_read(machine(), "LINE5");
+		data &= ioport("LINE5")->read();
 
 	if (!(offset & 0x10))
-		data &= input_port_read(machine(), "LINE4");
+		data &= ioport("LINE4")->read();
 
 	if (!(offset & 0x08))
-		data &= input_port_read(machine(), "LINE3");
+		data &= ioport("LINE3")->read();
 
 	if (!(offset & 0x04))
-		data &= input_port_read(machine(), "LINE2");
+		data &= ioport("LINE2")->read();
 
 	if (!(offset & 0x02))
-		data &= input_port_read(machine(), "LINE1");
+		data &= ioport("LINE1")->read();
 
 	if (!(offset & 0x01))
-		data &= input_port_read(machine(), "LINE0");
+		data &= ioport("LINE0")->read();
 
 	return data;
 }

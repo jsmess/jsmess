@@ -192,24 +192,24 @@ TODO:
 
 
 /*Rom bankswitching*/
-static WRITE8_HANDLER( gladiatr_bankswitch_w )
+WRITE8_MEMBER(gladiatr_state::gladiatr_bankswitch_w)
 {
-	UINT8 *rom = space->machine().region("maincpu")->base() + 0x10000;
+	UINT8 *rom = memregion("maincpu")->base() + 0x10000;
 
-	memory_set_bankptr(space->machine(), "bank1", rom + 0x6000 * (data & 0x01));
+	membank("bank1")->set_base(rom + 0x6000 * (data & 0x01));
 }
 
 
 static READ8_HANDLER( gladiator_dsw1_r )
 {
-	int orig = input_port_read(space->machine(), "DSW1")^0xff;
+	int orig = space->machine().root_device().ioport("DSW1")->read()^0xff;
 
 	return BITSWAP8(orig, 0,1,2,3,4,5,6,7);
 }
 
 static READ8_HANDLER( gladiator_dsw2_r )
 {
-	int orig = input_port_read(space->machine(), "DSW2")^0xff;
+	int orig = space->machine().root_device().ioport("DSW2")->read()^0xff;
 
 	return BITSWAP8(orig, 2,3,4,5,6,7,1,0);
 }
@@ -218,15 +218,15 @@ static READ8_HANDLER( gladiator_controls_r )
 {
 	int coins = 0;
 
-	if( input_port_read(space->machine(), "COINS") & 0xc0 ) coins = 0x80;
+	if( space->machine().root_device().ioport("COINS")->read() & 0xc0 ) coins = 0x80;
 	switch(offset)
 	{
 	case 0x01: /* start button , coins */
-		return input_port_read(space->machine(), "IN0") | coins;
+		return space->machine().root_device().ioport("IN0")->read() | coins;
 	case 0x02: /* Player 1 Controller , coins */
-		return input_port_read(space->machine(), "IN1") | coins;
+		return space->machine().root_device().ioport("IN1")->read() | coins;
 	case 0x04: /* Player 2 Controller , coins */
-		return input_port_read(space->machine(), "IN2") | coins;
+		return space->machine().root_device().ioport("IN2")->read() | coins;
 	}
 	/* unknown */
 	return 0;
@@ -237,7 +237,7 @@ static READ8_HANDLER( gladiator_button3_r )
 	switch(offset)
 	{
 	case 0x01: /* button 3 */
-		return input_port_read(space->machine(), "IN3");
+		return space->machine().root_device().ioport("IN3")->read();
 	}
 	/* unknown */
 	return 0;
@@ -256,8 +256,8 @@ static MACHINE_RESET( gladiator )
 	TAITO8741_start(&gladiator_8741interface);
 	/* 6809 bank memory set */
 	{
-		UINT8 *rom = machine.region("audiocpu")->base() + 0x10000;
-		memory_set_bankptr(machine, "bank2",rom);
+		UINT8 *rom = machine.root_device().memregion("audiocpu")->base() + 0x10000;
+		machine.root_device().membank("bank2")->set_base(rom);
 		machine.device("audiocpu")->reset();
 	}
 }
@@ -279,39 +279,39 @@ static void gladiator_ym_irq(device_t *device, int irq)
 /*Sound Functions*/
 static WRITE8_DEVICE_HANDLER( glad_adpcm_w )
 {
-	UINT8 *rom = device->machine().region("audiocpu")->base() + 0x10000;
+	UINT8 *rom = device->machine().root_device().memregion("audiocpu")->base() + 0x10000;
 
 	/* bit6 = bank offset */
-	memory_set_bankptr(device->machine(), "bank2",rom + ((data & 0x40) ? 0xc000 : 0));
+	device->machine().root_device().membank("bank2")->set_base(rom + ((data & 0x40) ? 0xc000 : 0));
 
 	msm5205_data_w(device,data);         /* bit0..3  */
 	msm5205_reset_w(device,(data>>5)&1); /* bit 5    */
 	msm5205_vclk_w (device,(data>>4)&1); /* bit4     */
 }
 
-static WRITE8_HANDLER( glad_cpu_sound_command_w )
+WRITE8_MEMBER(gladiatr_state::glad_cpu_sound_command_w)
 {
-	soundlatch_w(space,0,data);
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
+	soundlatch_byte_w(space,0,data);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static READ8_HANDLER( glad_cpu_sound_command_r )
+READ8_MEMBER(gladiatr_state::glad_cpu_sound_command_r)
 {
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_r(space,0);
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+	return soundlatch_byte_r(space,0);
 }
 
-static WRITE8_HANDLER( gladiatr_flipscreen_w )
+WRITE8_MEMBER(gladiatr_state::gladiatr_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 1);
+	flip_screen_set(data & 1);
 }
 
 
 #if 1
 /* !!!!! patch to IRQ timming for 2nd CPU !!!!! */
-static WRITE8_HANDLER( gladiatr_irq_patch_w )
+WRITE8_MEMBER(gladiatr_state::gladiatr_irq_patch_w)
 {
-	cputag_set_input_line(space->machine(), "sub", 0, HOLD_LINE);
+	cputag_set_input_line(machine(), "sub", 0, HOLD_LINE);
 }
 #endif
 
@@ -321,50 +321,46 @@ static WRITE8_HANDLER( gladiatr_irq_patch_w )
 
 
 
-static WRITE8_HANDLER(qx0_w)
+WRITE8_MEMBER(gladiatr_state::qx0_w)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
 	if(!offset)
 	{
-		state->m_data2=data;
-		state->m_flag2=1;
+		m_data2=data;
+		m_flag2=1;
 	}
 }
 
-static WRITE8_HANDLER(qx1_w)
+WRITE8_MEMBER(gladiatr_state::qx1_w)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
 	if(!offset)
 	{
-		state->m_data1=data;
-		state->m_flag1=1;
+		m_data1=data;
+		m_flag1=1;
 	}
 }
 
-static WRITE8_HANDLER(qx2_w){ }
+WRITE8_MEMBER(gladiatr_state::qx2_w){ }
 
-static WRITE8_HANDLER(qx3_w){ }
+WRITE8_MEMBER(gladiatr_state::qx3_w){ }
 
-static READ8_HANDLER(qx2_r){ return space->machine().rand(); }
+READ8_MEMBER(gladiatr_state::qx2_r){ return machine().rand(); }
 
-static READ8_HANDLER(qx3_r){ return space->machine().rand()&0xf; }
+READ8_MEMBER(gladiatr_state::qx3_r){ return machine().rand()&0xf; }
 
-static READ8_HANDLER(qx0_r)
+READ8_MEMBER(gladiatr_state::qx0_r)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
 	if(!offset)
-		 return state->m_data1;
+		 return m_data1;
 	else
-		return state->m_flag2;
+		return m_flag2;
 }
 
-static READ8_HANDLER(qx1_r)
+READ8_MEMBER(gladiatr_state::qx1_r)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
 	if(!offset)
-		return state->m_data2;
+		return m_data2;
 	else
-		return state->m_flag1;
+		return m_flag1;
 }
 
 static MACHINE_RESET( ppking )
@@ -374,24 +370,24 @@ static MACHINE_RESET( ppking )
 	state->m_flag1 = state->m_flag2 = 1;
 }
 
-static ADDRESS_MAP_START( ppking_cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ppking_cpu1_map, AS_PROGRAM, 8, gladiatr_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_BASE_MEMBER(gladiatr_state, m_spriteram)
+	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(ppking_video_registers_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(gladiatr_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_BASE_MEMBER(gladiatr_state, m_videoram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(gladiatr_colorram_w) AM_BASE_MEMBER(gladiatr_state, m_colorram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(gladiatr_textram_w) AM_BASE_MEMBER(gladiatr_state, m_textram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(gladiatr_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(gladiatr_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(gladiatr_textram_w) AM_SHARE("textram")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ppking_cpu3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ppking_cpu3_map, AS_PROGRAM, 8, gladiatr_state )
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8 )
+static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8, gladiatr_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(gladiatr_spritebuffer_w)
 	AM_RANGE(0xc004, 0xc004) AM_NOP	// WRITE(ppking_irq_patch_w)
@@ -399,60 +395,60 @@ static ADDRESS_MAP_START( ppking_cpu1_io, AS_IO, 8 )
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ppking_cpu2_io, AS_IO, 8 )
+static ADDRESS_MAP_START( ppking_cpu2_io, AS_IO, 8, gladiatr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x20, 0x21) AM_READ(qx1_r) AM_WRITE(qx1_w)
 	AM_RANGE(0x40, 0x40) AM_READNOP
-	AM_RANGE(0x60, 0x61) AM_READ(qx2_r) AM_WRITE(qx2_w)
-	AM_RANGE(0x80, 0x81) AM_READ(qx3_r) AM_WRITE(qx3_w)
+	AM_RANGE(0x60, 0x61) AM_READWRITE(qx2_r,qx2_w)
+	AM_RANGE(0x80, 0x81) AM_READWRITE(qx3_r,qx3_w)
 ADDRESS_MAP_END
 
 
 
 
-static ADDRESS_MAP_START( gladiatr_cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gladiatr_cpu1_map, AS_PROGRAM, 8, gladiatr_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_BASE_MEMBER(gladiatr_state, m_spriteram)
+	AM_RANGE(0xc000, 0xcbff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xcc00, 0xcfff) AM_WRITE(gladiatr_video_registers_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(gladiatr_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_BASE_MEMBER(gladiatr_state, m_videoram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(gladiatr_colorram_w) AM_BASE_MEMBER(gladiatr_state, m_colorram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(gladiatr_textram_w) AM_BASE_MEMBER(gladiatr_state, m_textram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(gladiatr_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(gladiatr_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(gladiatr_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(gladiatr_textram_w) AM_SHARE("textram")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram") /* battery backed RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, gladiatr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gladiatr_cpu3_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x1000, 0x1fff) AM_DEVWRITE("msm", glad_adpcm_w)
+static ADDRESS_MAP_START( gladiatr_cpu3_map, AS_PROGRAM, 8, gladiatr_state )
+	AM_RANGE(0x1000, 0x1fff) AM_DEVWRITE_LEGACY("msm", glad_adpcm_w)
 	AM_RANGE(0x2000, 0x2fff) AM_READ(glad_cpu_sound_command_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( gladiatr_cpu1_io, AS_IO, 8 )
+static ADDRESS_MAP_START( gladiatr_cpu1_io, AS_IO, 8, gladiatr_state )
 //  ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(gladiatr_spritebuffer_w)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(gladiatr_spritebank_w)
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(gladiatr_bankswitch_w)
 	AM_RANGE(0xc004, 0xc004) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
 	AM_RANGE(0xc007, 0xc007) AM_WRITE(gladiatr_flipscreen_w)
-	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE(TAITO8741_0_r, TAITO8741_0_w)
+	AM_RANGE(0xc09e, 0xc09f) AM_READWRITE_LEGACY(TAITO8741_0_r, TAITO8741_0_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP	// watchdog_reset_w doesn't work
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gladiatr_cpu2_io, AS_IO, 8 )
+static ADDRESS_MAP_START( gladiatr_cpu2_io, AS_IO, 8, gladiatr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x20, 0x21) AM_READWRITE(TAITO8741_1_r, TAITO8741_1_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x20, 0x21) AM_READWRITE_LEGACY(TAITO8741_1_r, TAITO8741_1_w)
 	AM_RANGE(0x40, 0x40) AM_NOP	// WRITE(sub_irq_ack_w)
-	AM_RANGE(0x60, 0x61) AM_READWRITE(TAITO8741_2_r, TAITO8741_2_w)
-	AM_RANGE(0x80, 0x81) AM_READWRITE(TAITO8741_3_r, TAITO8741_3_w)
+	AM_RANGE(0x60, 0x61) AM_READWRITE_LEGACY(TAITO8741_2_r, TAITO8741_2_w)
+	AM_RANGE(0x80, 0x81) AM_READWRITE_LEGACY(TAITO8741_3_r, TAITO8741_3_w)
 	AM_RANGE(0xa0, 0xa7) AM_NOP	// filters on sound output
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(glad_cpu_sound_command_w)
 ADDRESS_MAP_END
@@ -960,7 +956,7 @@ static DRIVER_INIT( gladiatr )
 	UINT8 *rom;
 	int i,j;
 
-	rom = machine.region("gfx2")->base();
+	rom = machine.root_device().memregion("gfx2")->base();
 	// unpack 3bpp graphics
 	for (j = 3; j >= 0; j--)
 	{
@@ -974,7 +970,7 @@ static DRIVER_INIT( gladiatr )
 	swap_block(rom + 0x14000, rom + 0x18000, 0x4000);
 
 
-	rom = machine.region("gfx3")->base();
+	rom = machine.root_device().memregion("gfx3")->base();
 	// unpack 3bpp graphics
 	for (j = 5; j >= 0; j--)
 	{
@@ -991,18 +987,17 @@ static DRIVER_INIT( gladiatr )
 	swap_block(rom + 0x24000, rom + 0x28000, 0x4000);
 
 	/* make sure bank is valid in cpu-reset */
-	rom = machine.region("audiocpu")->base() + 0x10000;
-	memory_set_bankptr(machine, "bank2",rom);
+	rom = machine.root_device().memregion("audiocpu")->base() + 0x10000;
+	machine.root_device().membank("bank2")->set_base(rom);
 }
 
 
-static READ8_HANDLER(f6a3_r)
+READ8_MEMBER(gladiatr_state::f6a3_r)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
-	if(cpu_get_previouspc(&space->device())==0x8e)
-		state->m_nvram[0x6a3]=1;
+	if(cpu_get_previouspc(&space.device())==0x8e)
+		m_nvram[0x6a3]=1;
 
-	return state->m_nvram[0x6a3];
+	return m_nvram[0x6a3];
 }
 
 static DRIVER_INIT(ppking)
@@ -1010,14 +1005,14 @@ static DRIVER_INIT(ppking)
 	UINT8 *rom;
 	int i,j;
 
-	rom = machine.region("gfx2")->base();
+	rom = machine.root_device().memregion("gfx2")->base();
 	// unpack 3bpp graphics
 	for (i = 0; i < 0x2000; i++)
 	{
 		rom[i+0x2000] = rom[i] >> 4;
 	}
 
-	rom = machine.region("gfx3")->base();
+	rom = machine.root_device().memregion("gfx3")->base();
 	// unpack 3bpp graphics
 	for (j = 1; j >= 0; j--)
 	{
@@ -1027,8 +1022,8 @@ static DRIVER_INIT(ppking)
 			rom[i+2*j*0x2000] = rom[i+j*0x2000];
 		}
 	}
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xf6a3,0xf6a3,FUNC(f6a3_r) );
+	gladiatr_state *state = machine.driver_data<gladiatr_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xf6a3,0xf6a3,read8_delegate(FUNC(gladiatr_state::f6a3_r),state));
 }
 
 

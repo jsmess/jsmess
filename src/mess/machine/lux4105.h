@@ -3,7 +3,6 @@
 #ifndef __LUXOR_4105__
 #define __LUXOR_4105__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "abc1600_bus.h"

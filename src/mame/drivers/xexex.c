@@ -89,29 +89,27 @@ static const eeprom_interface eeprom_intf =
 /* the interface with the 053247 is weird. The chip can address only 0x1000 bytes */
 /* of RAM, but they put 0x8000 there. The CPU can access them all. Address lines */
 /* A1, A5 and A6 don't go to the 053247. */
-static READ16_HANDLER( K053247_scattered_word_r )
+READ16_MEMBER(xexex_state::K053247_scattered_word_r)
 {
-	xexex_state *state = space->machine().driver_data<xexex_state>();
 
 	if (offset & 0x0031)
-		return state->m_spriteram[offset];
+		return m_spriteram[offset];
 	else
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x3fc0) >> 3);
-		return k053247_word_r(state->m_k053246, offset, mem_mask);
+		return k053247_word_r(m_k053246, offset, mem_mask);
 	}
 }
 
-static WRITE16_HANDLER( K053247_scattered_word_w )
+WRITE16_MEMBER(xexex_state::K053247_scattered_word_w)
 {
-	xexex_state *state = space->machine().driver_data<xexex_state>();
 
 	if (offset & 0x0031)
-		COMBINE_DATA(state->m_spriteram + offset);
+		COMBINE_DATA(m_spriteram + offset);
 	else
 	{
 		offset = ((offset & 0x000e) >> 1) | ((offset & 0x3fc0) >> 3);
-		k053247_word_w(state->m_k053246, offset, data, mem_mask);
+		k053247_word_w(m_k053246, offset, data, mem_mask);
 	}
 }
 
@@ -152,29 +150,26 @@ static void xexex_objdma( running_machine &machine, int limiter )
 	if (num_inactive) do { *dst = 0; dst += 8; } while (--num_inactive);
 }
 
-static READ16_HANDLER( spriteram_mirror_r )
+READ16_MEMBER(xexex_state::spriteram_mirror_r)
 {
-	xexex_state *state = space->machine().driver_data<xexex_state>();
-	return state->m_spriteram[offset];
+	return m_spriteram[offset];
 }
 
-static WRITE16_HANDLER( spriteram_mirror_w )
+WRITE16_MEMBER(xexex_state::spriteram_mirror_w)
 {
-	xexex_state *state = space->machine().driver_data<xexex_state>();
-	COMBINE_DATA(state->m_spriteram + offset);
+	COMBINE_DATA(m_spriteram + offset);
 }
 
-static READ16_HANDLER( xexex_waitskip_r )
+READ16_MEMBER(xexex_state::xexex_waitskip_r)
 {
-	xexex_state *state = space->machine().driver_data<xexex_state>();
 
-	if (cpu_get_pc(&space->device()) == 0x1158)
+	if (cpu_get_pc(&space.device()) == 0x1158)
 	{
-		device_spin_until_trigger(&space->device(), state->m_resume_trigger);
-		state->m_suspension_active = 1;
+		device_spin_until_trigger(&space.device(), m_resume_trigger);
+		m_suspension_active = 1;
 	}
 
-	return state->m_workram[0x14/2];
+	return m_workram[0x14/2];
 }
 
 
@@ -188,7 +183,7 @@ static void parse_control2( running_machine &machine )
 	/* bit 5  is enable irq 6 */
 	/* bit 6  is enable irq 5 */
 	/* bit 11 is watchdog */
-	input_port_write(machine, "EEPROMOUT", state->m_cur_control2, 0xff);
+	state->ioport("EEPROMOUT")->write(state->m_cur_control2, 0xff);
 
 	/* bit 8 = enable sprite ROM reading */
 	k053246_set_objcha_line(state->m_k053246, (state->m_cur_control2 & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
@@ -197,63 +192,58 @@ static void parse_control2( running_machine &machine )
 	state->m_cur_alpha = !(state->m_cur_control2 & 0x200);
 }
 
-static READ16_HANDLER( control2_r )
+READ16_MEMBER(xexex_state::control2_r)
 {
-	xexex_state *state = space->machine().driver_data<xexex_state>();
-	return state->m_cur_control2;
+	return m_cur_control2;
 }
 
-static WRITE16_HANDLER( control2_w )
+WRITE16_MEMBER(xexex_state::control2_w)
 {
-	xexex_state *state = space->machine().driver_data<xexex_state>();
-	COMBINE_DATA(&state->m_cur_control2);
-	parse_control2(space->machine());
+	COMBINE_DATA(&m_cur_control2);
+	parse_control2(machine());
 }
 
 
-static WRITE16_HANDLER( sound_cmd1_w )
+WRITE16_MEMBER(xexex_state::sound_cmd1_w)
 {
-	xexex_state *state = space->machine().driver_data<xexex_state>();
 
 	if(ACCESSING_BITS_0_7)
 	{
 		// anyone knows why 0x1a keeps lurking the sound queue in the world version???
-		if (state->m_strip_0x1a)
-			if (soundlatch2_r(space, 0) == 1 && data == 0x1a)
+		if (m_strip_0x1a)
+			if (soundlatch2_byte_r(space, 0) == 1 && data == 0x1a)
 				return;
 
-		soundlatch_w(space, 0, data & 0xff);
+		soundlatch_byte_w(space, 0, data & 0xff);
 	}
 }
 
-static WRITE16_HANDLER( sound_cmd2_w )
+WRITE16_MEMBER(xexex_state::sound_cmd2_w)
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch2_w(space, 0, data & 0xff);
+		soundlatch2_byte_w(space, 0, data & 0xff);
 }
 
-static WRITE16_HANDLER( sound_irq_w )
+WRITE16_MEMBER(xexex_state::sound_irq_w)
 {
-	xexex_state *state = space->machine().driver_data<xexex_state>();
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
-static READ16_HANDLER( sound_status_r )
+READ16_MEMBER(xexex_state::sound_status_r)
 {
-	return soundlatch3_r(space, 0);
+	return soundlatch3_byte_r(space, 0);
 }
 
 static void reset_sound_region(running_machine &machine)
 {
 	xexex_state *state = machine.driver_data<xexex_state>();
-	memory_set_bank(machine, "bank2", state->m_cur_sound_region & 0x07);
+	state->membank("bank2")->set_entry(state->m_cur_sound_region & 0x07);
 }
 
-static WRITE8_HANDLER( sound_bankswitch_w )
+WRITE8_MEMBER(xexex_state::sound_bankswitch_w)
 {
-	xexex_state *state = space->machine().driver_data<xexex_state>();
-	state->m_cur_sound_region = data & 7;
-	reset_sound_region(space->machine());
+	m_cur_sound_region = data & 7;
+	reset_sound_region(machine());
 }
 
 static void ym_set_mixing(device_t *device, double left, double right)
@@ -322,62 +312,62 @@ static TIMER_DEVICE_CALLBACK( xexex_interrupt )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, xexex_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_BASE_MEMBER(xexex_state, m_workram)			// work RAM
+	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_SHARE("workram")			// work RAM
 
 #if XE_SKIPIDLE
 	AM_RANGE(0x080014, 0x080015) AM_READ(xexex_waitskip_r)				// helps sound CPU by giving back control as early as possible
 #endif
 
-	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_BASE_MEMBER(xexex_state, m_spriteram)			// K053247 sprite RAM
+	AM_RANGE(0x090000, 0x097fff) AM_RAM AM_SHARE("spriteram")			// K053247 sprite RAM
 	AM_RANGE(0x098000, 0x09ffff) AM_READWRITE(spriteram_mirror_r, spriteram_mirror_w)	// K053247 sprite RAM mirror read
-	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE("k056832", k056832_word_w)				// VACSET (K054157)
-	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE("k053246", k053246_word_w)				// OBJSET1
-	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD("k053246", k053246_word_r)				// Passthrough to sprite roms
-	AM_RANGE(0x0c6000, 0x0c7fff) AM_DEVREADWRITE_MODERN("k053250", k053250_t, ram_r, ram_w)	// K053250 "road" RAM
-	AM_RANGE(0x0c8000, 0x0c800f) AM_DEVREADWRITE_MODERN("k053250", k053250_t, reg_r, reg_w)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE("k054338", k054338_word_w)				// CLTC
-	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE("k053251", k053251_lsb_w)				// priority encoder
-//  AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8("k053252", k053252_r,k053252_w,0x00ff)                // CCU
+	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVWRITE_LEGACY("k056832", k056832_word_w)				// VACSET (K054157)
+	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVWRITE_LEGACY("k053246", k053246_word_w)				// OBJSET1
+	AM_RANGE(0x0c4000, 0x0c4001) AM_DEVREAD_LEGACY("k053246", k053246_word_r)				// Passthrough to sprite roms
+	AM_RANGE(0x0c6000, 0x0c7fff) AM_DEVREADWRITE("k053250", k053250_t, ram_r, ram_w)	// K053250 "road" RAM
+	AM_RANGE(0x0c8000, 0x0c800f) AM_DEVREADWRITE("k053250", k053250_t, reg_r, reg_w)
+	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVWRITE_LEGACY("k054338", k054338_word_w)				// CLTC
+	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVWRITE_LEGACY("k053251", k053251_lsb_w)				// priority encoder
+//  AM_RANGE(0x0d0000, 0x0d001f) AM_DEVREADWRITE8_LEGACY("k053252", k053252_r,k053252_w,0x00ff)                // CCU
 	AM_RANGE(0x0d4000, 0x0d4001) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x0d600c, 0x0d600d) AM_WRITE(sound_cmd1_w)
 	AM_RANGE(0x0d600e, 0x0d600f) AM_WRITE(sound_cmd2_w)
 	AM_RANGE(0x0d6014, 0x0d6015) AM_READ(sound_status_r)
 	AM_RANGE(0x0d6000, 0x0d601f) AM_RAM									// sound regs fall through
-	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVWRITE("k056832", k056832_b_word_w)				// VSCCS regs
+	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVWRITE_LEGACY("k056832", k056832_b_word_w)				// VSCCS regs
 	AM_RANGE(0x0da000, 0x0da001) AM_READ_PORT("P1")
 	AM_RANGE(0x0da002, 0x0da003) AM_READ_PORT("P2")
 	AM_RANGE(0x0dc000, 0x0dc001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0dc002, 0x0dc003) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x0de000, 0x0de001) AM_READWRITE(control2_r, control2_w)
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
-	AM_RANGE(0x180000, 0x181fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)
-	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE("k056832", k056832_ram_word_r, k056832_ram_word_w)
-	AM_RANGE(0x190000, 0x191fff) AM_DEVREAD("k056832", k056832_rom_word_r)		// Passthrough to tile roms
-	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREAD_MODERN("k053250", k053250_t, rom_r)
-	AM_RANGE(0x1b0000, 0x1b1fff) AM_RAM_WRITE(paletteram16_xrgb_word_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x180000, 0x181fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)
+	AM_RANGE(0x182000, 0x183fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_word_r, k056832_ram_word_w)
+	AM_RANGE(0x190000, 0x191fff) AM_DEVREAD_LEGACY("k056832", k056832_rom_word_r)		// Passthrough to tile roms
+	AM_RANGE(0x1a0000, 0x1a1fff) AM_DEVREAD("k053250", k053250_t, rom_r)
+	AM_RANGE(0x1b0000, 0x1b1fff) AM_RAM_WRITE(paletteram_xrgb_word_be_w) AM_SHARE("paletteram")
 
 #if XE_DEBUG
-	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVREAD("k056832", k056832_word_r)
-	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVREAD("k053246", k053246_reg_word_r)
-	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVREAD("k054338", k054338_word_r)
-	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVREAD("k053251", k053251_lsb_r)
-	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVREAD("k056832", k056832_b_word_r)
+	AM_RANGE(0x0c0000, 0x0c003f) AM_DEVREAD_LEGACY("k056832", k056832_word_r)
+	AM_RANGE(0x0c2000, 0x0c2007) AM_DEVREAD_LEGACY("k053246", k053246_reg_word_r)
+	AM_RANGE(0x0ca000, 0x0ca01f) AM_DEVREAD_LEGACY("k054338", k054338_word_r)
+	AM_RANGE(0x0cc000, 0x0cc01f) AM_DEVREAD_LEGACY("k053251", k053251_lsb_r)
+	AM_RANGE(0x0d8000, 0x0d8007) AM_DEVREAD_LEGACY("k056832", k056832_b_word_r)
 #endif
 
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xexex_state )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE_MODERN("k054539", k054539_device, read, write)
-	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
-	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_r)
+	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
+	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_byte_w)
+	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_byte_r)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -466,10 +456,10 @@ static void xexex_postload(running_machine &machine)
 static MACHINE_START( xexex )
 {
 	xexex_state *state = machine.driver_data<xexex_state>();
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 
-	memory_configure_bank(machine, "bank2", 0, 8, &ROM[0x10000], 0x4000);
-	memory_set_bank(machine, "bank2", 0);
+	state->membank("bank2")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
+	state->membank("bank2")->set_entry(0);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
@@ -694,8 +684,8 @@ static DRIVER_INIT( xexex )
 	if (!strcmp(machine.system().name, "xexex"))
 	{
 		// Invulnerability
-//      *(UINT16 *)(machine.region("maincpu")->base() + 0x648d4) = 0x4a79;
-//      *(UINT16 *)(machine.region("maincpu")->base() + 0x00008) = 0x5500;
+//      *(UINT16 *)(state->memregion("maincpu")->base() + 0x648d4) = 0x4a79;
+//      *(UINT16 *)(state->memregion("maincpu")->base() + 0x00008) = 0x5500;
 		state->m_strip_0x1a = 1;
 	}
 }

@@ -229,6 +229,10 @@ public:
 	omegrace_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_READ8_MEMBER(omegrace_vg_go_r);
+	DECLARE_READ8_MEMBER(omegrace_spinner1_r);
+	DECLARE_WRITE8_MEMBER(omegrace_leds_w);
+	DECLARE_WRITE8_MEMBER(omegrace_soundlatch_w);
 };
 
 
@@ -253,9 +257,9 @@ static MACHINE_RESET( omegrace )
  *
  *************************************/
 
-static READ8_HANDLER( omegrace_vg_go_r )
+READ8_MEMBER(omegrace_state::omegrace_vg_go_r)
 {
-	avgdvg_go_w(space,0,0);
+	avgdvg_go_w(&space,0,0);
 	return 0;
 }
 
@@ -291,9 +295,9 @@ static const UINT8 spinnerTable[64] =
 };
 
 
-static READ8_HANDLER( omegrace_spinner1_r )
+READ8_MEMBER(omegrace_state::omegrace_spinner1_r)
 {
-	return (spinnerTable[input_port_read(space->machine(), "SPIN0") & 0x3f]);
+	return (spinnerTable[ioport("SPIN0")->read() & 0x3f]);
 }
 
 
@@ -304,26 +308,26 @@ static READ8_HANDLER( omegrace_spinner1_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( omegrace_leds_w )
+WRITE8_MEMBER(omegrace_state::omegrace_leds_w)
 {
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(space->machine(), 0,data & 0x01);
-	coin_counter_w(space->machine(), 1,data & 0x02);
+	coin_counter_w(machine(), 0,data & 0x01);
+	coin_counter_w(machine(), 1,data & 0x02);
 
 	/* bits 2 to 5 are the start leds (4 and 5 cocktail only) */
-	set_led_status(space->machine(), 0,~data & 0x04);
-	set_led_status(space->machine(), 1,~data & 0x08);
-	set_led_status(space->machine(), 2,~data & 0x10);
-	set_led_status(space->machine(), 3,~data & 0x20);
+	set_led_status(machine(), 0,~data & 0x04);
+	set_led_status(machine(), 1,~data & 0x08);
+	set_led_status(machine(), 2,~data & 0x10);
+	set_led_status(machine(), 3,~data & 0x20);
 
 	/* bit 6 flips screen (not supported) */
 }
 
 
-static WRITE8_HANDLER( omegrace_soundlatch_w )
+WRITE8_MEMBER(omegrace_state::omegrace_soundlatch_w)
 {
-	soundlatch_w (space, offset, data);
-	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+	soundlatch_byte_w (space, offset, data);
+	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 
 
@@ -334,20 +338,20 @@ static WRITE8_HANDLER( omegrace_soundlatch_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, omegrace_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4bff) AM_RAM
 	AM_RANGE(0x5c00, 0x5cff) AM_RAM AM_SHARE("nvram") /* NVRAM */
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x8000) /* vector ram */
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE_LEGACY(&avgdvg_vectorram) AM_SIZE_LEGACY(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x8000) /* vector ram */
 	AM_RANGE(0x9000, 0x9fff) AM_ROM /* vector rom */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( port_map, AS_IO, 8, omegrace_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x08) AM_READ(omegrace_vg_go_r)
 	AM_RANGE(0x09, 0x09) AM_READ(watchdog_reset_r)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(avgdvg_reset_w)
+	AM_RANGE(0x0a, 0x0a) AM_WRITE_LEGACY(avgdvg_reset_w)
 	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("AVGDVG")				/* vg_halt */
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")				/* DIP SW C4 */
 	AM_RANGE(0x17, 0x17) AM_READ_PORT("DSW2")				/* DIP SW C6 */
@@ -366,17 +370,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, omegrace_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_port, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_port, AS_IO, 8, omegrace_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)	/* likely ay8910 input port, not direct */
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)	/* likely ay8910 input port, not direct */
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 
@@ -585,8 +589,8 @@ ROM_END
 
 static DRIVER_INIT( omegrace )
 {
-	int i, len = machine.region("user1")->bytes();
-	UINT8 *prom = machine.region("user1")->base();
+	int i, len = machine.root_device().memregion("user1")->bytes();
+	UINT8 *prom = machine.root_device().memregion("user1")->base();
 
 	/* Omega Race has two pairs of the state PROM output
      * lines swapped before going into the decoder.

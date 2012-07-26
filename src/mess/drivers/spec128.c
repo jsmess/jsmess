@@ -213,7 +213,7 @@ void spectrum_128_update_memory(running_machine &machine)
 		ram_page = state->m_port_7ffd_data & 0x07;
 		ram_data = messram + (ram_page<<14);
 
-		memory_set_bankptr(machine, "bank4", ram_data);
+		state->membank("bank4")->set_base(ram_data);
 	}
 
 	/* ROM switching */
@@ -221,9 +221,9 @@ void spectrum_128_update_memory(running_machine &machine)
 
 	/* rom 0 is 128K rom, rom 1 is 48 BASIC */
 
-	ChosenROM = machine.region("maincpu")->base() + 0x010000 + (ROMSelection<<14);
+	ChosenROM = machine.root_device().memregion("maincpu")->base() + 0x010000 + (ROMSelection<<14);
 
-	memory_set_bankptr(machine, "bank1", ChosenROM);
+	state->membank("bank1")->set_base(ChosenROM);
 }
 
 static  READ8_HANDLER ( spectrum_128_ula_r )
@@ -234,18 +234,18 @@ static  READ8_HANDLER ( spectrum_128_ula_r )
 	return vpos<193 ? state->m_screen_location[0x1800|(vpos&0xf8)<<2]:0xff;
 }
 
-static ADDRESS_MAP_START (spectrum_128_io, AS_IO, 8)
+static ADDRESS_MAP_START (spectrum_128_io, AS_IO, 8, spectrum_state )
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff)
 	AM_RANGE(0x001f, 0x001f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
 	AM_RANGE(0x007f, 0x007f) AM_READ(spectrum_port_7f_r) AM_MIRROR(0xff00)
 	AM_RANGE(0x00df, 0x00df) AM_READ(spectrum_port_df_r) AM_MIRROR(0xff00)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(spectrum_128_port_7ffd_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_r, ay8910_address_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0x0001, 0x0001) AM_READ(spectrum_128_ula_r) AM_MIRROR(0xfffe)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(spectrum_128_port_7ffd_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE_LEGACY("ay8912", ay8910_r, ay8910_address_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0x0001, 0x0001) AM_READ_LEGACY(spectrum_128_ula_r) AM_MIRROR(0xfffe)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (spectrum_128_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START (spectrum_128_mem, AS_PROGRAM, 8, spectrum_state )
 	AM_RANGE( 0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE( 0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE( 0x8000, 0xbfff) AM_RAMBANK("bank3")
@@ -261,10 +261,10 @@ static MACHINE_RESET( spectrum_128 )
 	/* 0x0000-0x3fff always holds ROM */
 
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	memory_set_bankptr(machine, "bank2", messram + (5<<14));
+	state->membank("bank2")->set_base(messram + (5<<14));
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	memory_set_bankptr(machine, "bank3", messram + (2<<14));
+	state->membank("bank3")->set_base(messram + (2<<14));
 
 	MACHINE_RESET_CALL(spectrum);
 

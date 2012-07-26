@@ -13,7 +13,7 @@ TODO:
 - Unknown sound writes at C00F; also, there's an NMI handler that would
   read from C00F.
 - Sound samples were getting chopped; I fixed this by changing sound/adpcm.c to
-  disregard requests to play new samples until the previous one is finished.
+  disregard requests to play new samples until the previous one is finished*.
 
 Gotcha pcb: 97,7,29 PARA VER 3.0 but it is the same as ppchamp
 
@@ -63,9 +63,10 @@ Notes:
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "includes/gotcha.h"
+#include "video/decospr.h"
 
 
-static WRITE16_HANDLER( gotcha_lamps_w )
+WRITE16_MEMBER(gotcha_state::gotcha_lamps_w)
 {
 #if 0
 	popmessage("%c%c%c%c %c%c%c%c %c%c%c%c",
@@ -95,14 +96,14 @@ static WRITE16_DEVICE_HANDLER( gotcha_oki_bank_w )
 }
 
 
-static ADDRESS_MAP_START( gotcha_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( gotcha_map, AS_PROGRAM, 16, gotcha_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(soundlatch_word_w)
 	AM_RANGE(0x100002, 0x100003) AM_WRITE(gotcha_lamps_w)
-	AM_RANGE(0x100004, 0x100005) AM_DEVWRITE("oki", gotcha_oki_bank_w)
+	AM_RANGE(0x100004, 0x100005) AM_DEVWRITE_LEGACY("oki", gotcha_oki_bank_w)
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
-	AM_RANGE(0x140000, 0x1405ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_MEMBER(gotcha_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x140000, 0x1405ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("DSW")
@@ -110,16 +111,16 @@ static ADDRESS_MAP_START( gotcha_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x300002, 0x300009) AM_WRITE(gotcha_scroll_w)
 //  { 0x30000c, 0x30000d,
 	AM_RANGE(0x30000e, 0x30000f) AM_WRITE(gotcha_gfxbank_w)
-	AM_RANGE(0x320000, 0x320fff) AM_WRITE(gotcha_fgvideoram_w) AM_BASE_MEMBER(gotcha_state, m_fgvideoram)
-	AM_RANGE(0x322000, 0x322fff) AM_WRITE(gotcha_bgvideoram_w) AM_BASE_MEMBER(gotcha_state, m_bgvideoram)
+	AM_RANGE(0x320000, 0x320fff) AM_WRITE(gotcha_fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0x322000, 0x322fff) AM_WRITE(gotcha_bgvideoram_w) AM_SHARE("bgvideoram")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gotcha_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE_MODERN("oki", okim6295_device, write)	// TWO addresses!
-	AM_RANGE(0xc006, 0xc006) AM_READ(soundlatch_r)
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write) AM_MIRROR(1)
+	AM_RANGE(0xc006, 0xc006) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -244,7 +245,7 @@ static void irqhandler( device_t *device, int linestate )
 
 static const ym2151_interface ym2151_config =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 
@@ -299,6 +300,12 @@ static MACHINE_CONFIG_START( gotcha, gotcha_state )
 	MCFG_PALETTE_LENGTH(768)
 
 	MCFG_VIDEO_START(gotcha)
+
+	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
+	decospr_device::set_gfx_region(*device, 1);
+	decospr_device::set_is_bootleg(*device, true);
+	decospr_device::set_offsets(*device, 5,-1); // aligned to 2nd instruction screen in attract
+
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -392,5 +399,5 @@ ROM_START( ppchamp )
 	ROM_LOAD( "uz11", 0x00000, 0x80000, CRC(3d96274c) SHA1(c7a670af86194c370bf8fb30afbe027ab78a0227) )
 ROM_END
 
-GAME( 1997, gotcha,  0,      gotcha, gotcha, 0, ROT0, "Dongsung", "Got-cha Mini Game Festival", GAME_SUPPORTS_SAVE )
-GAME( 1997, ppchamp, gotcha, gotcha, gotcha, 0, ROT0, "Dongsung", "Pasha Pasha Champ Mini Game Festival (Korea)", GAME_SUPPORTS_SAVE )
+GAME( 1997, gotcha,  0,      gotcha, gotcha, 0, ROT0, "Dongsung / Para", "Got-cha Mini Game Festival", GAME_SUPPORTS_SAVE )
+GAME( 1997, ppchamp, gotcha, gotcha, gotcha, 0, ROT0, "Dongsung / Para", "Pasha Pasha Champ Mini Game Festival (Korea)", GAME_SUPPORTS_SAVE )

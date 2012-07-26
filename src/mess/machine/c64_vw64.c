@@ -93,7 +93,6 @@ void c64_vizawrite_cartridge_device::device_reset()
 {
 	m_game = 0;
 
-
 	m_game_timer->adjust(attotime::from_msec(TIMER_PERIOD), 0);
 }
 
@@ -112,7 +111,7 @@ void c64_vizawrite_cartridge_device::device_timer(emu_timer &timer, device_timer
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_vizawrite_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
+UINT8 c64_vizawrite_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
 

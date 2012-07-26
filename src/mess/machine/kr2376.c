@@ -163,9 +163,9 @@ static void detect_keypress(device_t *device)
 
 	static const char *const keynames[] = { "X0", "X1", "X2", "X3", "X4", "X5", "X6", "X7" };
 
-	if (input_port_read(device->machine(), keynames[kr2376->ring8]) == (1 << kr2376->ring11))
+	if (device->machine().root_device().ioport(keynames[kr2376->ring8])->read() == (1 << kr2376->ring11))
 	{
-		kr2376->modifiers = input_port_read(device->machine(), "MODIFIERS");
+		kr2376->modifiers = device->machine().root_device().ioport("MODIFIERS")->read();
 
 		kr2376->strobe = 1;
 		/*  strobe 0->1 transition, encode char and update parity */

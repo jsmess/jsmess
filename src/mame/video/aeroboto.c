@@ -79,45 +79,42 @@ VIDEO_START( aeroboto )
 
 ***************************************************************************/
 
-READ8_HANDLER( aeroboto_in0_r )
+READ8_MEMBER(aeroboto_state::aeroboto_in0_r)
 {
-	return input_port_read(space->machine(), flip_screen_get(space->machine()) ? "P2" : "P1");
+	return ioport(flip_screen() ? "P2" : "P1")->read();
 }
 
-WRITE8_HANDLER( aeroboto_3000_w )
+WRITE8_MEMBER(aeroboto_state::aeroboto_3000_w)
 {
-	aeroboto_state *state = space->machine().driver_data<aeroboto_state>();
 
 	/* bit 0 selects both flip screen and player1/player2 controls */
-	flip_screen_set(space->machine(), data & 0x01);
+	flip_screen_set(data & 0x01);
 
 	/* bit 1 = char bank select */
-	if (state->m_charbank != ((data & 0x02) >> 1))
+	if (m_charbank != ((data & 0x02) >> 1))
 	{
-		state->m_bg_tilemap->mark_all_dirty();
-		state->m_charbank = (data & 0x02) >> 1;
+		m_bg_tilemap->mark_all_dirty();
+		m_charbank = (data & 0x02) >> 1;
 	}
 
 	/* bit 2 = disable star field? */
-	state->m_starsoff = data & 0x4;
+	m_starsoff = data & 0x4;
 }
 
-WRITE8_HANDLER( aeroboto_videoram_w )
+WRITE8_MEMBER(aeroboto_state::aeroboto_videoram_w)
 {
-	aeroboto_state *state = space->machine().driver_data<aeroboto_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( aeroboto_tilecolor_w )
+WRITE8_MEMBER(aeroboto_state::aeroboto_tilecolor_w)
 {
-	aeroboto_state *state = space->machine().driver_data<aeroboto_state>();
 
-	if (state->m_tilecolor[offset] != data)
+	if (m_tilecolor[offset] != data)
 	{
-		state->m_tilecolor[offset] = data;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_tilecolor[offset] = data;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -134,12 +131,12 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	aeroboto_state *state = machine.driver_data<aeroboto_state>();
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int x = state->m_spriteram[offs + 3];
 		int y = 240 - state->m_spriteram[offs];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			x = 248 - x;
 			y = 240 - y;
@@ -148,7 +145,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		drawgfx_transpen(bitmap, cliprect, machine.gfx[1],
 				state->m_spriteram[offs + 1],
 				state->m_spriteram[offs + 2] & 0x07,
-				flip_screen_get(machine), flip_screen_get(machine),
+				state->flip_screen(), state->flip_screen(),
 				((x + 8) & 0xff) - 8, y, 0);
 	}
 }

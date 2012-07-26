@@ -35,7 +35,7 @@
 
 static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT16 size, UINT16 mode)
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
 	UINT16 param;
 	/*
     P_SRC =0x300290 (offset from prot rom base)
@@ -107,17 +107,17 @@ static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT
         };
         */
 		int x;
-		UINT16 *PROTROM = (UINT16*)machine.region("igs022data")->base();
+		UINT16 *PROTROM = (UINT16*)machine.root_device().memregion("igs022data")->base();
 
 		for (x = 0; x < size; x++)
 		{
-			//UINT16 *RAMDUMP = (UINT16*)space->machine().region("user2")->base();
+			//UINT16 *RAMDUMP = (UINT16*)space->machine().root_device().memregion("user2")->base();
 			//UINT16 dat = RAMDUMP[dst + x];
 
 			UINT16 dat2 = PROTROM[src + x];
 
 			UINT8 extraoffset = param&0xfe; // the lowest bit changed the table addressing in tests, see 'rawDataOdd' table instead.. it's still related to the main one, not identical
-			UINT8* dectable = (UINT8*)machine.region("igs022data")->base();//rawDataEven; // the basic decryption table is at the start of the mcu data rom! at least in killbld
+			UINT8* dectable = (UINT8*)machine.root_device().memregion("igs022data")->base();//rawDataEven; // the basic decryption table is at the start of the mcu data rom! at least in killbld
 			UINT16 extraxor = ((dectable[((x*2)+0+extraoffset)&0xff]) << 8) | (dectable[((x*2)+1+extraoffset)&0xff] << 0);
 
 			dat2 = ((dat2 & 0x00ff)<<8) | ((dat2 & 0xff00)>>8);
@@ -148,7 +148,7 @@ static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT
 	{
 		/* mode 5 seems to be a straight copy */
 		int x;
-		UINT16 *PROTROM = (UINT16*)machine.region("igs022data")->base();
+		UINT16 *PROTROM = (UINT16*)machine.root_device().memregion("igs022data")->base();
 		for (x = 0; x < size; x++)
 		{
 			UINT16 dat = PROTROM[src + x];
@@ -161,7 +161,7 @@ static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT
 	{
 		/* mode 6 seems to swap bytes and nibbles */
 		int x;
-		UINT16 *PROTROM = (UINT16*)machine.region("igs022data")->base();
+		UINT16 *PROTROM = (UINT16*)machine.root_device().memregion("igs022data")->base();
 		for (x = 0; x < size; x++)
 		{
 			UINT16 dat = PROTROM[src + x];
@@ -194,8 +194,8 @@ static void IGS022_do_dma(running_machine& machine, UINT16 src, UINT16 dst, UINT
 static void IGS022_reset(running_machine& machine)
 {
 	int i;
-	UINT16 *PROTROM = (UINT16*)machine.region("igs022data")->base();
-	pgm_state *state = machine.driver_data<pgm_state>();
+	UINT16 *PROTROM = (UINT16*)machine.root_device().memregion("igs022data")->base();
+	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
 	UINT16 tmp;
 
 	// fill ram with A5 patern
@@ -228,7 +228,7 @@ static void IGS022_reset(running_machine& machine)
 
 static void IGS022_handle_command(running_machine& machine)
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
 	UINT16 cmd = state->m_sharedprotram[0x200/2];
 	//mame_printf_debug("command %04x\n", cmd);
 	if (cmd == 0x6d)	//Store values to asic ram
@@ -279,7 +279,7 @@ static WRITE16_HANDLER( killbld_igs025_prot_w )
 {
 //  mame_printf_debug("killbrd prot r\n");
 //  return 0;
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_022_025_state *state = space->machine().driver_data<pgm_022_025_state>();
 	offset &= 0xf;
 
 	if (offset == 0)
@@ -307,7 +307,7 @@ static WRITE16_HANDLER( killbld_igs025_prot_w )
 static READ16_HANDLER( killbld_igs025_prot_r )
 {
 //  mame_printf_debug("killbld prot w\n");
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_022_025_state *state = space->machine().driver_data<pgm_022_025_state>();
 	UINT16 res ;
 
 	offset &= 0xf;
@@ -334,7 +334,7 @@ static READ16_HANDLER( killbld_igs025_prot_r )
 			}
 			else
 			{
-				UINT32 protvalue = 0x89911400 | input_port_read(space->machine(), "Region");
+				UINT32 protvalue = 0x89911400 | space->machine().root_device().ioport("Region")->read();
 				ret = (protvalue >> (8 * (state->m_kb_ptr - 1))) & 0xff;
 			}
 
@@ -351,7 +351,7 @@ static READ16_HANDLER( killbld_igs025_prot_r )
 
 static MACHINE_RESET( killbld )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
 
 	MACHINE_RESET_CALL(pgm);
 	/* fill the protection ram with a5 + auto dma */
@@ -371,7 +371,7 @@ static MACHINE_RESET( killbld )
 
 DRIVER_INIT( killbld )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
 
 	pgm_basic_init(machine);
 	pgm_killbld_decrypt(machine);
@@ -393,7 +393,7 @@ DRIVER_INIT( killbld )
 
 static MACHINE_RESET( dw3 )
 {
-	pgm_state *state = machine.driver_data<pgm_state>();
+	pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
 
 
 	MACHINE_RESET_CALL(pgm);
@@ -455,7 +455,7 @@ static int ptr=0;
 static UINT8 dw3_swap;
 static WRITE16_HANDLER( drgw3_igs025_prot_w )
 {
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_022_025_state *state = space->machine().driver_data<pgm_022_025_state>();
 
 	offset&=0xf;
 
@@ -482,7 +482,7 @@ static WRITE16_HANDLER( drgw3_igs025_prot_w )
 static READ16_HANDLER( drgw3_igs025_prot_r )
 {
 //  mame_printf_debug("killbld prot w\n");
-	pgm_state *state = space->machine().driver_data<pgm_state>();
+	pgm_022_025_state *state = space->machine().driver_data<pgm_022_025_state>();
 
 	UINT16 res ;
 
@@ -514,7 +514,7 @@ static READ16_HANDLER( drgw3_igs025_prot_r )
 		else if(state->m_kb_cmd==5)
 		{
 			UINT32 protvalue;
-			protvalue = 0x60000|input_port_read(space->machine(), "Region");
+			protvalue = 0x60000|space->machine().root_device().ioport("Region")->read();
 			res=(protvalue>>(8*(ptr-1)))&0xff;
 
 
@@ -530,11 +530,11 @@ DRIVER_INIT( drgw3 )
 	pgm_basic_init(machine);
 
 /*
-    pgm_state *state = machine.driver_data<pgm_state>();
+    pgm_022_025_state *state = machine.driver_data<pgm_022_025_state>();
 
     {
         int x;
-        UINT16 *RAMDUMP = (UINT16*)machine.region("user2")->base();
+        UINT16 *RAMDUMP = (UINT16*)state->memregion("user2")->base();
         for (x=0;x<(0x4000/2);x++)
         {
             state->m_sharedprotram[x] = RAMDUMP[x];
@@ -548,15 +548,17 @@ DRIVER_INIT( drgw3 )
 }
 
 
-static ADDRESS_MAP_START( killbld_mem, AS_PROGRAM, 16)
+static ADDRESS_MAP_START( killbld_mem, AS_PROGRAM, 16, pgm_022_025_state )
 	AM_IMPORT_FROM(pgm_mem)
 	AM_RANGE(0x100000, 0x2fffff) AM_ROMBANK("bank1") /* Game ROM */
-	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_BASE_MEMBER(pgm_state, m_sharedprotram) // Shared with protection device
+	AM_RANGE(0x300000, 0x303fff) AM_RAM AM_SHARE("sharedprotram") // Shared with protection device
 ADDRESS_MAP_END
 
 
 
-MACHINE_CONFIG_DERIVED( killbld, pgm )
+MACHINE_CONFIG_START( pgm_022_025_kb, pgm_022_025_state )
+	MCFG_FRAGMENT_ADD(pgmbase)
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(killbld_mem)
 
@@ -564,7 +566,9 @@ MACHINE_CONFIG_DERIVED( killbld, pgm )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_DERIVED( dw3, pgm )
+MACHINE_CONFIG_START( pgm_022_025_dw, pgm_022_025_state )
+	MCFG_FRAGMENT_ADD(pgmbase)
+
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(killbld_mem)
 

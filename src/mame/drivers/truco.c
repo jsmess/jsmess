@@ -231,7 +231,7 @@ static WRITE8_DEVICE_HANDLER( pia_ca2_w )
     Legs 07 [OSC IN] and 08 [OSC SEL] aren't connected,
     setting 1.6 seconds as WD timeout.
 */
-	watchdog_reset(device->machine());
+	device->machine().watchdog_reset();
 }
 
 static WRITE8_DEVICE_HANDLER( portb_w )
@@ -259,13 +259,13 @@ static WRITE8_DEVICE_HANDLER( pia_irqb_w )
 *                Memory Map                *
 *******************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, truco_state )
 	AM_RANGE(0x0000, 0x17ff) AM_RAM														/* General purpose RAM */
-	AM_RANGE(0x1800, 0x7bff) AM_RAM AM_BASE_MEMBER(truco_state, m_videoram)				/* Video RAM */
-	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_BASE_MEMBER(truco_state, m_battery_ram)			/* Battery backed RAM */
-	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
-	AM_RANGE(0x8004, 0x8004) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x8005, 0x8005) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x1800, 0x7bff) AM_RAM AM_SHARE("videoram")				/* Video RAM */
+	AM_RANGE(0x7c00, 0x7fff) AM_RAM AM_SHARE("battery_ram")			/* Battery backed RAM */
+	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x8004, 0x8004) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x8005, 0x8005) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x8008, 0xffff) AM_ROM
 ADDRESS_MAP_END
 /*
@@ -395,7 +395,7 @@ static INTERRUPT_GEN( truco_interrupt )
 	truco_state *state = device->machine().driver_data<truco_state>();
 	/* coinup */
 
-	if ( input_port_read(device->machine(),  "COIN") & 1 )
+	if ( state->ioport("COIN")->read() & 1 )
 	{
 		if ( state->m_trigger == 0 )
 		{

@@ -32,6 +32,15 @@ public:
 	UINT8 m_portc_data;
 	UINT8 m_sound_gate;
 	UINT8 m_sound_level;
+	DECLARE_READ8_MEMBER(keyboard_r);
+	DECLARE_READ8_MEMBER(sysreg_r);
+	DECLARE_WRITE8_MEMBER(sysreg_w);
+	DECLARE_READ8_MEMBER(text_r);
+	DECLARE_WRITE8_MEMBER(text_w);
+	DECLARE_READ8_MEMBER(gzu_r);
+	DECLARE_WRITE8_MEMBER(gzu_w);
+	DECLARE_READ8_MEMBER(devices_r);
+	DECLARE_WRITE8_MEMBER(devices_w);
 };
 
 

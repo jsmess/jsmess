@@ -3,7 +3,6 @@
 #ifndef __CRVISION__
 #define __CRVISION__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -55,6 +54,7 @@ public:
 	DECLARE_WRITE8_MEMBER( pia_pa_w );
 	DECLARE_READ8_MEMBER( pia_pa_r );
 	DECLARE_READ8_MEMBER( pia_pb_r );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 
 	UINT8 read_keyboard(int pa);
 

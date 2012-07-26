@@ -11,17 +11,25 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_spriteram(*this, "spriteram"),
 		  m_spriteram2(*this, "spriteram2"),
-		  m_s2650_spriteram(*this, "s2650_spriteram") { }
+		  m_s2650_spriteram(*this, "s2650_spriteram") ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_s2650games_tileram(*this, "s2650_tileram"),
+		m_rocktrv2_prot_data(*this, "rocktrv2_prot"){ }
+
+	optional_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_spriteram2;
+	optional_shared_ptr<UINT8> m_s2650_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<UINT8> m_colorram;
+	optional_shared_ptr<UINT8> m_s2650games_tileram;
+	optional_shared_ptr<UINT8> m_rocktrv2_prot_data;
 
 	UINT8 m_cannonb_bit_to_read;
 	int m_mystery;
 	UINT8 m_counter;
 	int m_bigbucks_bank;
-	UINT8 *m_rocktrv2_prot_data;
 	UINT8 m_rocktrv2_question_bank;
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
-	UINT8 *m_s2650games_tileram;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_charbank;
 	UINT8 m_spritebank;
@@ -32,9 +40,62 @@ public:
 	int m_xoffsethack;
 	UINT8 m_inv_spr;
 	UINT8 m_irq_mask;
-	optional_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_spriteram2;
-	optional_shared_ptr<UINT8> m_s2650_spriteram;
+
+	DECLARE_WRITE8_MEMBER(pacman_interrupt_vector_w);
+	DECLARE_WRITE8_MEMBER(piranha_interrupt_vector_w);
+	DECLARE_WRITE8_MEMBER(nmouse_interrupt_vector_w);
+	DECLARE_WRITE8_MEMBER(pacman_leds_w);
+	DECLARE_WRITE8_MEMBER(pacman_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(pacman_coin_lockout_global_w);
+	DECLARE_WRITE8_MEMBER(alibaba_sound_w);
+	DECLARE_READ8_MEMBER(alibaba_mystery_1_r);
+	DECLARE_READ8_MEMBER(alibaba_mystery_2_r);
+	DECLARE_READ8_MEMBER(maketrax_special_port2_r);
+	DECLARE_READ8_MEMBER(maketrax_special_port3_r);
+	DECLARE_READ8_MEMBER(korosuke_special_port2_r);
+	DECLARE_READ8_MEMBER(korosuke_special_port3_r);
+	DECLARE_READ8_MEMBER(mschamp_kludge_r);
+	DECLARE_WRITE8_MEMBER(bigbucks_bank_w);
+	DECLARE_READ8_MEMBER(bigbucks_question_r);
+	DECLARE_WRITE8_MEMBER(porky_banking_w);
+	DECLARE_READ8_MEMBER(drivfrcp_port1_r);
+	DECLARE_READ8_MEMBER(_8bpm_port1_r);
+	DECLARE_READ8_MEMBER(porky_port1_r);
+	DECLARE_READ8_MEMBER(rocktrv2_prot1_data_r);
+	DECLARE_READ8_MEMBER(rocktrv2_prot2_data_r);
+	DECLARE_READ8_MEMBER(rocktrv2_prot3_data_r);
+	DECLARE_READ8_MEMBER(rocktrv2_prot4_data_r);
+	DECLARE_WRITE8_MEMBER(rocktrv2_prot_data_w);
+	DECLARE_WRITE8_MEMBER(rocktrv2_question_bank_w);
+	DECLARE_READ8_MEMBER(rocktrv2_question_r);
+	DECLARE_READ8_MEMBER(pacman_read_nop);
+	DECLARE_READ8_MEMBER(mspacman_disable_decode_r_0x0038);
+	DECLARE_READ8_MEMBER(mspacman_disable_decode_r_0x03b0);
+	DECLARE_READ8_MEMBER(mspacman_disable_decode_r_0x1600);
+	DECLARE_READ8_MEMBER(mspacman_disable_decode_r_0x2120);
+	DECLARE_READ8_MEMBER(mspacman_disable_decode_r_0x3ff0);
+	DECLARE_READ8_MEMBER(mspacman_disable_decode_r_0x8000);
+	DECLARE_READ8_MEMBER(mspacman_disable_decode_r_0x97f0);
+	DECLARE_WRITE8_MEMBER(mspacman_disable_decode_w);
+	DECLARE_READ8_MEMBER(mspacman_enable_decode_r_0x3ff8);
+	DECLARE_WRITE8_MEMBER(mspacman_enable_decode_w);
+	DECLARE_WRITE8_MEMBER(irq_mask_w);
+	DECLARE_READ8_MEMBER(cannonbp_protection_r);
+	DECLARE_WRITE8_MEMBER(pacman_videoram_w);
+	DECLARE_WRITE8_MEMBER(pacman_colorram_w);
+	DECLARE_WRITE8_MEMBER(pacman_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(pengo_palettebank_w);
+	DECLARE_WRITE8_MEMBER(pengo_colortablebank_w);
+	DECLARE_WRITE8_MEMBER(pengo_gfxbank_w);
+	DECLARE_WRITE8_MEMBER(s2650games_videoram_w);
+	DECLARE_WRITE8_MEMBER(s2650games_colorram_w);
+	DECLARE_WRITE8_MEMBER(s2650games_scroll_w);
+	DECLARE_WRITE8_MEMBER(s2650games_tilesbank_w);
+	DECLARE_WRITE8_MEMBER(jrpacman_videoram_w);
+	DECLARE_WRITE8_MEMBER(jrpacman_charbank_w);
+	DECLARE_WRITE8_MEMBER(jrpacman_spritebank_w);
+	DECLARE_WRITE8_MEMBER(jrpacman_scroll_w);
+	DECLARE_WRITE8_MEMBER(jrpacman_bgpriority_w);
 };
 
 
@@ -44,35 +105,20 @@ PALETTE_INIT( pacman );
 VIDEO_START( pacman );
 SCREEN_UPDATE_IND16( pacman );
 
-WRITE8_HANDLER( pacman_videoram_w );
-WRITE8_HANDLER( pacman_colorram_w );
-WRITE8_HANDLER( pacman_flipscreen_w );
 
 
 VIDEO_START( pengo );
 
-WRITE8_HANDLER( pengo_palettebank_w );
-WRITE8_HANDLER( pengo_colortablebank_w );
-WRITE8_HANDLER( pengo_gfxbank_w );
 
 
 VIDEO_START( s2650games );
 SCREEN_UPDATE_IND16( s2650games );
 
 
-WRITE8_HANDLER( s2650games_videoram_w );
-WRITE8_HANDLER( s2650games_colorram_w );
-WRITE8_HANDLER( s2650games_scroll_w );
-WRITE8_HANDLER( s2650games_tilesbank_w );
 
 
 VIDEO_START( jrpacman );
 
-WRITE8_HANDLER( jrpacman_videoram_w );
-WRITE8_HANDLER( jrpacman_charbank_w );
-WRITE8_HANDLER( jrpacman_spritebank_w );
-WRITE8_HANDLER( jrpacman_scroll_w );
-WRITE8_HANDLER( jrpacman_bgpriority_w );
 
 VIDEO_START( birdiy );
 

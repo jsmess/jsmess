@@ -79,115 +79,108 @@ VIDEO_START( gladiatr )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( gladiatr_videoram_w )
+WRITE8_MEMBER(gladiatr_state::gladiatr_videoram_w)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( gladiatr_colorram_w )
+WRITE8_MEMBER(gladiatr_state::gladiatr_colorram_w)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( gladiatr_textram_w )
+WRITE8_MEMBER(gladiatr_state::gladiatr_textram_w)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
-	state->m_textram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_textram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( gladiatr_paletteram_w )
+WRITE8_MEMBER(gladiatr_state::gladiatr_paletteram_w)
 {
 	int r,g,b;
 
-	space->machine().generic.paletteram.u8[offset] = data;
+	m_generic_paletteram_8[offset] = data;
 	offset &= 0x3ff;
 
-	r = (space->machine().generic.paletteram.u8[offset] >> 0) & 0x0f;
-	g = (space->machine().generic.paletteram.u8[offset] >> 4) & 0x0f;
-	b = (space->machine().generic.paletteram.u8[offset + 0x400] >> 0) & 0x0f;
+	r = (m_generic_paletteram_8[offset] >> 0) & 0x0f;
+	g = (m_generic_paletteram_8[offset] >> 4) & 0x0f;
+	b = (m_generic_paletteram_8[offset + 0x400] >> 0) & 0x0f;
 
-	r = (r << 1) + ((space->machine().generic.paletteram.u8[offset + 0x400] >> 4) & 0x01);
-	g = (g << 1) + ((space->machine().generic.paletteram.u8[offset + 0x400] >> 5) & 0x01);
-	b = (b << 1) + ((space->machine().generic.paletteram.u8[offset + 0x400] >> 6) & 0x01);
+	r = (r << 1) + ((m_generic_paletteram_8[offset + 0x400] >> 4) & 0x01);
+	g = (g << 1) + ((m_generic_paletteram_8[offset + 0x400] >> 5) & 0x01);
+	b = (b << 1) + ((m_generic_paletteram_8[offset + 0x400] >> 6) & 0x01);
 
-	palette_set_color_rgb(space->machine(),offset,pal5bit(r),pal5bit(g),pal5bit(b));
+	palette_set_color_rgb(machine(),offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 
-WRITE8_HANDLER( gladiatr_spritebuffer_w )
+WRITE8_MEMBER(gladiatr_state::gladiatr_spritebuffer_w)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
-	state->m_sprite_buffer = data & 1;
+	m_sprite_buffer = data & 1;
 }
 
-WRITE8_HANDLER( gladiatr_spritebank_w )
+WRITE8_MEMBER(gladiatr_state::gladiatr_spritebank_w)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
-	state->m_sprite_bank = (data & 1) ? 4 : 2;
+	m_sprite_bank = (data & 1) ? 4 : 2;
 }
 
 
-WRITE8_HANDLER( ppking_video_registers_w )
+WRITE8_MEMBER(gladiatr_state::ppking_video_registers_w)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
 	switch (offset & 0x300)
 	{
 		case 0x000:
-			state->m_bg_tilemap->set_scrolly(offset & 0x0f, 0x100-data);
+			m_bg_tilemap->set_scrolly(offset & 0x0f, 0x100-data);
 			break;
 		case 0x200:
 			if (data & 0x80)
-				state->m_fg_scrolly = data + 0x100;
+				m_fg_scrolly = data + 0x100;
 			else
-				state->m_fg_scrolly = data;
+				m_fg_scrolly = data;
 			break;
 		case 0x300:
-			if (state->m_fg_tile_bank != (data & 0x03))
+			if (m_fg_tile_bank != (data & 0x03))
 			{
-				state->m_fg_tile_bank = data & 0x03;
-				state->m_fg_tilemap->mark_all_dirty();
+				m_fg_tile_bank = data & 0x03;
+				m_fg_tilemap->mark_all_dirty();
 			}
-			state->m_video_attributes = data;
+			m_video_attributes = data;
 			break;
 	}
 
-//popmessage("%02x %02x",state->m_fg_scrolly, state->m_video_attributes);
+//popmessage("%02x %02x",m_fg_scrolly, m_video_attributes);
 }
 
-WRITE8_HANDLER( gladiatr_video_registers_w )
+WRITE8_MEMBER(gladiatr_state::gladiatr_video_registers_w)
 {
-	gladiatr_state *state = space->machine().driver_data<gladiatr_state>();
 	switch (offset)
 	{
 		case 0x000:
-			state->m_fg_scrolly = data;
+			m_fg_scrolly = data;
 			break;
 		case 0x080:
-			if (state->m_fg_tile_bank != (data & 0x03))
+			if (m_fg_tile_bank != (data & 0x03))
 			{
-				state->m_fg_tile_bank = data & 0x03;
-				state->m_fg_tilemap->mark_all_dirty();
+				m_fg_tile_bank = data & 0x03;
+				m_fg_tilemap->mark_all_dirty();
 			}
-			if (state->m_bg_tile_bank != ((data & 0x10) >> 4))
+			if (m_bg_tile_bank != ((data & 0x10) >> 4))
 			{
-				state->m_bg_tile_bank = (data & 0x10) >> 4;
-				state->m_bg_tilemap->mark_all_dirty();
+				m_bg_tile_bank = (data & 0x10) >> 4;
+				m_bg_tilemap->mark_all_dirty();
 			}
-			state->m_video_attributes = data;
+			m_video_attributes = data;
 			break;
 		case 0x100:
-			state->m_fg_scrollx = data;
+			m_fg_scrollx = data;
 			break;
 		case 0x200:
-			state->m_bg_scrolly = data;
+			m_bg_scrolly = data;
 			break;
 		case 0x300:
-			state->m_bg_scrollx = data;
+			m_bg_scrollx = data;
 			break;
 	}
 }
@@ -224,7 +217,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int color = src[1] & 0x1f;
 		int x,y;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			xflip = !xflip;
 			yflip = !yflip;
@@ -294,9 +287,9 @@ SCREEN_UPDATE_IND16( gladiatr )
 		int scroll;
 
 		scroll = state->m_bg_scrollx + ((state->m_video_attributes & 0x04) << 6);
-		state->m_bg_tilemap->set_scrollx(0, scroll ^ (flip_screen_get(screen.machine()) ? 0x0f : 0));
+		state->m_bg_tilemap->set_scrollx(0, scroll ^ (state->flip_screen() ? 0x0f : 0));
 		scroll = state->m_fg_scrollx + ((state->m_video_attributes & 0x08) << 5);
-		state->m_fg_tilemap->set_scrollx(0, scroll ^ (flip_screen_get(screen.machine()) ? 0x0f : 0));
+		state->m_fg_tilemap->set_scrollx(0, scroll ^ (state->flip_screen() ? 0x0f : 0));
 
 		// always 0 anyway
 		state->m_bg_tilemap->set_scrolly(0, state->m_bg_scrolly);

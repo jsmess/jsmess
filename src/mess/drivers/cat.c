@@ -30,7 +30,6 @@ ToDo:
 - RS232C port
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -41,7 +40,9 @@ class cat_state : public driver_device
 {
 public:
 	cat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_p_sram(*this, "p_sram"),
+		m_p_videoram(*this, "p_videoram"){ }
 
 	DECLARE_WRITE16_MEMBER(cat_video_status_w);
 	DECLARE_WRITE16_MEMBER(cat_test_mode_w);
@@ -55,9 +56,9 @@ public:
 	DECLARE_WRITE16_MEMBER(cat_keyboard_w);
 	DECLARE_WRITE16_MEMBER(cat_video_w);
 	DECLARE_READ16_MEMBER(cat_something_r);
-	UINT16 *m_p_videoram;
+	optional_shared_ptr<UINT16> m_p_sram;
+	required_shared_ptr<UINT16> m_p_videoram;
 	UINT8 m_duart_inp;// = 0x0e;
-	UINT16 *m_p_sram;
 	UINT8 m_video_enable;
 	UINT16 m_pr_cont;
 	UINT8 m_keyboard_line;
@@ -107,7 +108,7 @@ READ16_MEMBER( cat_state::cat_keyboard_r )
 	UINT16 retVal = 0;
 	// Read country code
 	if (m_pr_cont == 0x0900)
-		retVal = input_port_read(machine(), "DIPSW1");
+		retVal = ioport("DIPSW1")->read();
 
 	// Regular keyboard read
 	if (m_pr_cont == 0x0800 || m_pr_cont == 0x0a00)
@@ -115,14 +116,14 @@ READ16_MEMBER( cat_state::cat_keyboard_r )
 		retVal=0xff00;
 		switch(m_keyboard_line)
 		{
-			case 0x01: retVal = input_port_read(machine(), "LINE0") << 8; break;
-			case 0x02: retVal = input_port_read(machine(), "LINE1") << 8; break;
-			case 0x04: retVal = input_port_read(machine(), "LINE2") << 8; break;
-			case 0x08: retVal = input_port_read(machine(), "LINE3") << 8; break;
-			case 0x10: retVal = input_port_read(machine(), "LINE4") << 8; break;
-			case 0x20: retVal = input_port_read(machine(), "LINE5") << 8; break;
-			case 0x40: retVal = input_port_read(machine(), "LINE6") << 8; break;
-			case 0x80: retVal = input_port_read(machine(), "LINE7") << 8; break;
+			case 0x01: retVal = ioport("LINE0")->read() << 8; break;
+			case 0x02: retVal = ioport("LINE1")->read() << 8; break;
+			case 0x04: retVal = ioport("LINE2")->read() << 8; break;
+			case 0x08: retVal = ioport("LINE3")->read() << 8; break;
+			case 0x10: retVal = ioport("LINE4")->read() << 8; break;
+			case 0x20: retVal = ioport("LINE5")->read() << 8; break;
+			case 0x40: retVal = ioport("LINE6")->read() << 8; break;
+			case 0x80: retVal = ioport("LINE7")->read() << 8; break;
 		}
 	}
 	return retVal;
@@ -155,16 +156,16 @@ READ16_MEMBER( cat_state::cat_something_r )
 static ADDRESS_MAP_START(cat_mem, AS_PROGRAM, 16, cat_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM // 256 KB ROM
-	AM_RANGE(0x00040000, 0x00043fff) AM_RAM AM_BASE(m_p_sram) // SRAM powered by battery
+	AM_RANGE(0x00040000, 0x00043fff) AM_RAM AM_SHARE("p_sram") // SRAM powered by battery
 	AM_RANGE(0x00200000, 0x0027ffff) AM_ROM AM_REGION("svrom",0x0000) // SV ROM
-	AM_RANGE(0x00400000, 0x0047ffff) AM_RAM AM_BASE(m_p_videoram) // 512 KB RAM
+	AM_RANGE(0x00400000, 0x0047ffff) AM_RAM AM_SHARE("p_videoram") // 512 KB RAM
 	AM_RANGE(0x00600000, 0x0065ffff) AM_WRITE(cat_video_w) // Video chip
 	AM_RANGE(0x00800000, 0x00800001) AM_READWRITE(cat_floppy_r, cat_floppy_w)
 	AM_RANGE(0x00800002, 0x00800003) AM_WRITE(cat_keyboard_w)
 	AM_RANGE(0x00800008, 0x00800009) AM_READ(cat_something_r)
 	AM_RANGE(0x0080000a, 0x0080000b) AM_READ(cat_keyboard_r)
 	AM_RANGE(0x0080000e, 0x0080000f) AM_READWRITE(cat_battery_r,cat_printer_w)
-	AM_RANGE(0x00810000, 0x0081001f) AM_DEVREADWRITE8_LEGACY( "duart68681", duart68681_r, duart68681_w, 0xff )
+	AM_RANGE(0x00810000, 0x0081001f) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff )
 	AM_RANGE(0x00820000, 0x008200ff) AM_READWRITE(cat_modem_r, cat_modem_w)// modem
 	AM_RANGE(0x00840000, 0x00840001) AM_WRITE(cat_video_status_w) // Video status
 	AM_RANGE(0x00860000, 0x00860001) AM_WRITE(cat_test_mode_w) // Test mode
@@ -173,7 +174,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(swyft_mem, AS_PROGRAM, 16, cat_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x0000ffff) AM_ROM // 64 KB ROM
-	AM_RANGE(0x00040000, 0x000fffff) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE(0x00040000, 0x000fffff) AM_RAM AM_SHARE("p_videoram")
 ADDRESS_MAP_END
 
 /* Input ports */

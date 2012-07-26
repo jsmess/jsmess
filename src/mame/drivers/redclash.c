@@ -31,44 +31,44 @@ static WRITE8_HANDLER( irqack_w )
 	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( zerohour_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( zerohour_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_BASE_SIZE_MEMBER(ladybug_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(redclash_videoram_w) AM_BASE_MEMBER(ladybug_state, m_videoram)
+	AM_RANGE(0x3800, 0x3bff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE_LEGACY(redclash_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")	/* IN0 */
 	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")	/* IN1 */
 	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")	/* DSW0 */
 	AM_RANGE(0x4803, 0x4803) AM_READ_PORT("DSW2")	/* DSW1 */
 	AM_RANGE(0x5000, 0x5007) AM_WRITENOP	/* to sound board */
-	AM_RANGE(0x5800, 0x5800) AM_WRITE(redclash_star0_w)
+	AM_RANGE(0x5800, 0x5800) AM_WRITE_LEGACY(redclash_star0_w)
 	AM_RANGE(0x5801, 0x5804) AM_WRITENOP	/* to sound board */
-	AM_RANGE(0x5805, 0x5805) AM_WRITE(redclash_star1_w)
-	AM_RANGE(0x5806, 0x5806) AM_WRITE(redclash_star2_w)
-	AM_RANGE(0x5807, 0x5807) AM_WRITE(redclash_flipscreen_w)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(redclash_star_reset_w)
-	AM_RANGE(0x7800, 0x7800) AM_WRITE(irqack_w)
+	AM_RANGE(0x5805, 0x5805) AM_WRITE_LEGACY(redclash_star1_w)
+	AM_RANGE(0x5806, 0x5806) AM_WRITE_LEGACY(redclash_star2_w)
+	AM_RANGE(0x5807, 0x5807) AM_WRITE_LEGACY(redclash_flipscreen_w)
+	AM_RANGE(0x7000, 0x7000) AM_WRITE_LEGACY(redclash_star_reset_w)
+	AM_RANGE(0x7800, 0x7800) AM_WRITE_LEGACY(irqack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( redclash_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( redclash_map, AS_PROGRAM, 8, ladybug_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 //  AM_RANGE(0x3000, 0x3000) AM_WRITENOP
 //  AM_RANGE(0x3800, 0x3800) AM_WRITENOP
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(redclash_videoram_w) AM_BASE_MEMBER(ladybug_state, m_videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE_LEGACY(redclash_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("IN0")	/* IN0 */
 	AM_RANGE(0x4801, 0x4801) AM_READ_PORT("IN1")	/* IN1 */
 	AM_RANGE(0x4802, 0x4802) AM_READ_PORT("DSW1")	/* DSW0 */
 	AM_RANGE(0x4803, 0x4803) AM_READ_PORT("DSW2")	/* DSW1 */
 	AM_RANGE(0x5000, 0x5007) AM_WRITENOP	/* to sound board */
-	AM_RANGE(0x5800, 0x5800) AM_WRITE(redclash_star0_w)
-	AM_RANGE(0x5801, 0x5801) AM_WRITE(redclash_gfxbank_w)
-	AM_RANGE(0x5805, 0x5805) AM_WRITE(redclash_star1_w)
-	AM_RANGE(0x5806, 0x5806) AM_WRITE(redclash_star2_w)
-	AM_RANGE(0x5807, 0x5807) AM_WRITE(redclash_flipscreen_w)
+	AM_RANGE(0x5800, 0x5800) AM_WRITE_LEGACY(redclash_star0_w)
+	AM_RANGE(0x5801, 0x5801) AM_WRITE_LEGACY(redclash_gfxbank_w)
+	AM_RANGE(0x5805, 0x5805) AM_WRITE_LEGACY(redclash_star1_w)
+	AM_RANGE(0x5806, 0x5806) AM_WRITE_LEGACY(redclash_star2_w)
+	AM_RANGE(0x5807, 0x5807) AM_WRITE_LEGACY(redclash_flipscreen_w)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_BASE_SIZE_MEMBER(ladybug_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(redclash_star_reset_w)
-	AM_RANGE(0x7800, 0x7800) AM_WRITE(irqack_w)
+	AM_RANGE(0x6800, 0x6bff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x7000, 0x7000) AM_WRITE_LEGACY(redclash_star_reset_w)
+	AM_RANGE(0x7800, 0x7800) AM_WRITE_LEGACY(irqack_w)
 ADDRESS_MAP_END
 
 /*
@@ -76,20 +76,16 @@ ADDRESS_MAP_END
   Interrupts are still used, but they are related to coin
   slots. Left slot generates an IRQ, Right slot a NMI.
 */
-static INPUT_CHANGED( left_coin_inserted )
+INPUT_CHANGED_MEMBER( ladybug_state::left_coin_inserted )
 {
-	ladybug_state *state = field.machine().driver_data<ladybug_state>();
-
 	if(newval)
-		device_set_input_line(state->m_maincpu, 0, ASSERT_LINE);
+		device_set_input_line(m_maincpu, 0, ASSERT_LINE);
 }
 
-static INPUT_CHANGED( right_coin_inserted )
+INPUT_CHANGED_MEMBER( ladybug_state::right_coin_inserted )
 {
-	ladybug_state *state = field.machine().driver_data<ladybug_state>();
-
 	if(newval)
-		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(m_maincpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INPUT_PORTS_START( redclash )
@@ -113,7 +109,7 @@ static INPUT_PORTS_START( redclash )
 	/* Note that there are TWO VBlank inputs, one is active low, the other active */
 	/* high. There are probably other differencies in the hardware, but emulating */
 	/* them this way is enough to get the game running. */
-	PORT_BIT( 0xc0, 0x40, IPT_VBLANK )
+	PORT_BIT( 0xc0, 0x40, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Difficulty?" )
@@ -181,8 +177,8 @@ static INPUT_PORTS_START( redclash )
 	/* handler to be notified of coin insertions. We use IMPULSE to */
 	/* trigger exactly one interrupt, without having to check when the */
 	/* user releases the key. */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(left_coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(right_coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state, left_coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state, right_coin_inserted, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( zerohour )
@@ -206,7 +202,7 @@ static INPUT_PORTS_START( zerohour )
 	/* Note that there are TWO VBlank inputs, one is active low, the other active */
 	/* high. There are probably other differencies in the hardware, but emulating */
 	/* them this way is enough to get the game running. */
-	PORT_BIT( 0xc0, 0x40, IPT_VBLANK )
+	PORT_BIT( 0xc0, 0x40, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW1")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" )	/* Switches 6-8 are not used */
@@ -256,8 +252,8 @@ static INPUT_PORTS_START( zerohour )
 	/* handler to be notified of coin insertions. We use IMPULSE to */
 	/* trigger exactly one interrupt, without having to check when the */
 	/* user releases the key. */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(left_coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(right_coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state, left_coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, ladybug_state, right_coin_inserted, 0)
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -543,9 +539,9 @@ ROM_END
 static DRIVER_INIT( redclash )
 {
 	int i,j;
-	const UINT8 *src = machine.region("gfx2")->base();
-	UINT8 *dst = machine.region("gfx3")->base();
-	int len = machine.region("gfx3")->bytes();
+	const UINT8 *src = machine.root_device().memregion("gfx2")->base();
+	UINT8 *dst = machine.root_device().memregion("gfx3")->base();
+	int len = machine.root_device().memregion("gfx3")->bytes();
 
 	/* rearrange the sprite graphics */
 	for (i = 0;i < len;i++)

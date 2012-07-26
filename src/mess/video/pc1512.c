@@ -400,7 +400,7 @@ int pc1512_state::get_display_mode(UINT8 mode)
 
 offs_t pc1512_state::get_char_rom_offset()
 {
-	return ((input_port_read(machine(), "LK") >> 5) & 0x03) << 11;
+	return ((ioport("LK")->read() >> 5) & 0x03) << 11;
 }
 
 void pc1512_state::draw_alpha(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
@@ -561,7 +561,7 @@ static const mc6845_interface crtc_intf =
 void pc1512_state::video_start()
 {
 	// find memory regions
-	m_char_rom = machine().region(AMS40041_TAG)->base();
+	m_char_rom = memregion(AMS40041_TAG)->base();
 
 	// allocate memory
 	m_video_ram = auto_alloc_array(machine(), UINT8, 0x10000);

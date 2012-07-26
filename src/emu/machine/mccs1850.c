@@ -353,16 +353,6 @@ void mccs1850_device::device_timer(emu_timer &timer, device_timer_id id, int par
 
 
 //-------------------------------------------------
-//  rtc_set_time - called to initialize the RTC to
-//  a known state
-//-------------------------------------------------
-
-void mccs1850_device::rtc_set_time(int year, int month, int day, int day_of_week, int hour, int minute, int second)
-{
-}
-
-
-//-------------------------------------------------
 //  nvram_default - called to initialize NVRAM to
 //  its default state
 //-------------------------------------------------
@@ -371,9 +361,9 @@ void mccs1850_device::nvram_default()
 {
 	memset(m_ram, 0xff, RAM_SIZE);
 
-	if (machine().region(tag()) != NULL)
+	if (machine().root_device().memregion(tag()) != NULL)
 	{
-		UINT8 *nvram = machine().region(tag())->base();
+		UINT8 *nvram = machine().root_device().memregion(tag())->base();
 
 		// initialize NVRAM
 		memcpy(m_ram, nvram, 0x20);

@@ -54,69 +54,69 @@ Capcom, 1996-1999
 From late 1996 to 1999 Capcom developed another hardware platform to rival the CPS2 System and called
 it CP SYSTEM III. Only 6 games were produced. Here's a detailed table of all known releases until now:
 
-                                                           |--------------- Cart ----------------|  |--------------- CD ---------------|
-Game                                                 Year  Part #     Label      Region  CD  NO CD  Part #      Catalog #    Label        Revision
----------------------------------------------------  ----  ---------  ---------  ------  --  -----  ----------  -----------  -----------  --------
-Warzard                                              1996  WZD96a00F  CP300000G  JAPAN   X          CAP-WZD000  CAP-WZD-3    CAP-WZD-3    961023
-Warzard                                                    WZD96a00F  CP300000G  JAPAN   X          CAP-WZD000  CAP-WZD-5    CAP-WZD-5    961121
-Red Earth                                                  WZD96aA0F  CP3000B0G  EUROPE  X          CAP-WZD0A0  CAP-WZD-3    CAP-WZD-3    961023
-Red Earth                                                  WZD96aA0F  CP3000B0G  EUROPE  X          CAP-WZD0A0  CAP-WZD-5    CAP-WZD-5    961121
-Red Earth                                                  WZD96aA0F  CP3000H0G  MEXICO* X          CAP-WZD0A0  CAP-WZD-3    CAP-WZD-3    961023
-Red Earth                                                  WZD96aA0F  CP3000H0G  MEXICO* X          CAP-WZD0A0  CAP-WZD-5    CAP-WZD-5    961121
-Red Earth                                                  WZD96aA0F  CP3000U0G  USA*    X          CAP-WZD0A0  CAP-WZD-3    CAP-WZD-3    961023
-Red Earth                                                  WZD96aA0F  CP3000U0G  USA*    X          CAP-WZD0A0  CAP-WZD-5    CAP-WZD-5    961121
+                                                           |--------------- Cart ----------------|  |-------------- CD ---------------|
+Game                                                 Year  Part #     Label      Region  CD  NO CD  Part #      Catalog #   Label        Revision
+---------------------------------------------------  ----  ---------  ---------  ------  --  -----  ----------  ----------  -----------  --------
+Warzard                                              1996  WZD96a00F  CP300000G  JAPAN   X          CAP-WZD000  CAP-WZD-3   CAP-WZD-3    961023
+Warzard                                                    WZD96a00F  CP300000G  JAPAN   X          CAP-WZD000  CAP-WZD-5   CAP-WZD-5    961121
+Red Earth                                                  WZD96aA0F  CP3000B0G  EUROPE  X          CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
+Red Earth                                                  WZD96aA0F  CP3000B0G  EUROPE  X          CAP-WZD0A0  CAP-WZD-5   CAP-WZD-5    961121
+Red Earth                                                  WZD96aA0F  CP3000H0G  MEXICO* X          CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
+Red Earth                                                  WZD96aA0F  CP3000H0G  MEXICO* X          CAP-WZD0A0  CAP-WZD-5   CAP-WZD-5    961121
+Red Earth                                                  WZD96aA0F  CP3000U0G  USA*    X          CAP-WZD0A0  CAP-WZD-3   CAP-WZD-3    961023
+Red Earth                                                  WZD96aA0F  CP3000U0G  USA*    X          CAP-WZD0A0  CAP-WZD-5   CAP-WZD-5    961121
 
-Street Fighter III: New Generation                   1997  SF397200F  CP300000G  JAPAN   X          CAP-SF3000  CAP-SF3-3    CAP-SF3-3    970204
-Street Fighter III: New Generation                         SF397200F  CP300000G  JAPAN   X          CAP-SF3000  ?            ?            970312*
-Street Fighter III: New Generation                         SF397200F  CP300000G  JAPAN   X          CAP-SF3000  ?            ?            970403*
-Street Fighter III: New Generation                         SF3972A0F  CP3000C0G  ASIA        X                                            970204
-Street Fighter III: New Generation                         SF3972A0F  CP3000C0G  ASIA        X                                            970312*
-Street Fighter III: New Generation                         SF3972A0F  CP3000C0G  ASIA        X                                            970403*
-Street Fighter III: New Generation                         SF3972A0F  CP3000H0G  MEXICO  X          CAP-SF30A0  CAP-SF3-3    CAP-SF3-3    970204
-Street Fighter III: New Generation                         SF3972A0F  CP3000H0G  MEXICO  X          CAP-SF30A0  ?            ?            970312*
-Street Fighter III: New Generation                         SF3972A0F  CP3000H0G  MEXICO  X          CAP-SF30A0  ?            ?            970403*
-Street Fighter III: New Generation                         SF3972A0F  CP3000U0G  USA     X          CAP-SF30A0  CAP-SF3-3    CAP-SF3-3    970204
-Street Fighter III: New Generation                         SF3972A0F  CP3000U0G  USA     X          CAP-SF30A0  ?            ?            970312*
-Street Fighter III: New Generation                         SF3972A0F  CP3000U0G  USA     X          CAP-SF30A0  ?            ?            970403*
+Street Fighter III: New Generation                   1997  SF397200F  CP300000G  JAPAN   X          CAP-SF3000  CAP-SF3-3   CAP-SF3-3    970204
+Street Fighter III: New Generation                         SF397200F  CP300000G  JAPAN   X          CAP-SF3000  ?           ?            970312*
+Street Fighter III: New Generation                         SF397200F  CP300000G  JAPAN   X          CAP-SF3000  ?           ?            970403*
+Street Fighter III: New Generation                         SF3972A0F  CP3000C0G  ASIA        X                                           970204
+Street Fighter III: New Generation                         SF3972A0F  CP3000C0G  ASIA        X                                           970312*
+Street Fighter III: New Generation                         SF3972A0F  CP3000C0G  ASIA        X                                           970403*
+Street Fighter III: New Generation                         SF3972A0F  CP3000H0G  MEXICO  X          CAP-SF30A0  CAP-SF3-3   CAP-SF3-3    970204
+Street Fighter III: New Generation                         SF3972A0F  CP3000H0G  MEXICO  X          CAP-SF30A0  ?           ?            970312*
+Street Fighter III: New Generation                         SF3972A0F  CP3000H0G  MEXICO  X          CAP-SF30A0  ?           ?            970403*
+Street Fighter III: New Generation                         SF3972A0F  CP3000U0G  USA     X          CAP-SF30A0  CAP-SF3-3   CAP-SF3-3    970204
+Street Fighter III: New Generation                         SF3972A0F  CP3000U0G  USA     X          CAP-SF30A0  ?           ?            970312*
+Street Fighter III: New Generation                         SF3972A0F  CP3000U0G  USA     X          CAP-SF30A0  ?           ?            970403*
 
-Street Fighter III 2nd Impact: Giant Attack          1997  3GA97a00F  CP300000G  JAPAN   X          CAP-3GA000  CAP-3GA000   CAP-3GA-1    970930
-Street Fighter III 2nd Impact: Giant Attack                3GA97a00F  CP300000G  JAPAN   X          CAP-3GA000  ?            ?            971016*
-Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000C0G  ASIA        X                                            970930
-Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000C0G  ASIA        X                                            971016*
-Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000U0G  USA     X          CAP-3GA0A0  CAP-3GA000   CAP-3GA-1    970930
-Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000U0G  USA     X          CAP-3GA0A0  ?            ?            971016*
+Street Fighter III 2nd Impact: Giant Attack          1997  3GA97a00F  CP300000G  JAPAN   X          CAP-3GA000  CAP-3GA000  CAP-3GA-1    970930
+Street Fighter III 2nd Impact: Giant Attack                3GA97a00F  CP300000G  JAPAN   X          CAP-3GA000  ?           ?            971016*
+Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000C0G  ASIA        X                                           970930
+Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000C0G  ASIA        X                                           971016*
+Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000U0G  USA     X          CAP-3GA0A0  CAP-3GA000  CAP-3GA-1    970930
+Street Fighter III 2nd Impact: Giant Attack                3GA97aA0F  CP3000U0G  USA     X          CAP-3GA0A0  ?           ?            971016*
 
-JoJo no Kimyouna Bouken                              1998  JJK98c00F  CP300000G  JAPAN   X          CAP-JJK000  CAP-JJK000   CAP-JJK-140  981202
-JoJo no Kimyouna Bouken                                    JJK98c00F  CP300000G  JAPAN   X          CAP-JJK000  CAP-JJK-2    CAP-JJK-160  990108
-JoJo no Kimyouna Bouken                                    JJK98c00F  CP300000G  JAPAN   X          CAP-JJK000  CAP-JJK-3    CAP-JJK-161  990128
-JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                            981202
-JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                            990108
-JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                            990128
-JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK000   CAP-JJK-140  981202
-JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK-2    CAP-JJK-160  990108
-JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK-3    CAP-JJK-161  990128
+JoJo no Kimyouna Bouken                              1998  JJK98c00F  CP300000G  JAPAN   X          CAP-JJK000  CAP-JJK000  CAP-JJK-140  981202
+JoJo no Kimyouna Bouken                                    JJK98c00F  CP300000G  JAPAN   X          CAP-JJK000  CAP-JJK-2   CAP-JJK-160  990108
+JoJo no Kimyouna Bouken                                    JJK98c00F  CP300000G  JAPAN   X          CAP-JJK000  CAP-JJK-3   CAP-JJK-161  990128
+JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                           981202
+JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                           990108
+JoJo's Venture                                             JJK98cA0F  CP3000C0G  ASIA        X                                           990128
+JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK000  CAP-JJK-140  981202
+JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK-2   CAP-JJK-160  990108
+JoJo's Venture                                             JJK98cA0F  CP3000U0G  USA     X          CAP-JJK0A0  CAP-JJK-3   CAP-JJK-161  990128
 
-Street Fighter III 3rd Strike: Fight for the Future  1999  33S99400F  CP300000G  JAPAN*  X          CAP-33S000  CAP-33S-1    CAP-33S-1    990512
-Street Fighter III 3rd Strike: Fight for the Future        33S99400F  CP300000G  JAPAN*  X          CAP-33S000  CAP-33S-2    CAP-33S-2    990608
-Street Fighter III 3rd Strike: Fight for the Future        33S99400F  CP300000G  JAPAN       X                                            990512
-Street Fighter III 3rd Strike: Fight for the Future        33S99400F  CP300000G  JAPAN       X                                            990608
-Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000B0G  EUROPE  X          CAP-33S0A0  CAP-33S-1    CAP-33S-1    990512
-Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000B0G  EUROPE  X          CAP-33S0A0  CAP-33S-2    CAP-33S-2    990608
-Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000C0G  ASIA*   X          CAP-33S0A0  CAP-33S-1    CAP-33S-1    990512
-Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000C0G  ASIA*   X          CAP-33S0A0  CAP-33S-2    CAP-33S-2    990608
-Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000C0G  ASIA*       X                                            990512
-Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000C0G  ASIA*       X                                            990608
-Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000H0G  MEXICO* ?          CAP-33S0A0  CAP-33S-1    CAP-33S-1    990512
-Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000H0G  MEXICO* ?          CAP-33S0A0  CAP-33S-2    CAP-33S-2    990608
-Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000U0G  USA     X          CAP-33S0A0  CAP-33S-1    CAP-33S-1    990512
-Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000U0G  USA     X          CAP-33S0A0  CAP-33S-2    CAP-33S-2    990608
+Street Fighter III 3rd Strike: Fight for the Future  1999  33S99400F  CP300000G  JAPAN*  X          CAP-33S000  CAP-33S-1   CAP-33S-1    990512
+Street Fighter III 3rd Strike: Fight for the Future        33S99400F  CP300000G  JAPAN*  X          CAP-33S000  CAP-33S-2   CAP-33S-2    990608
+Street Fighter III 3rd Strike: Fight for the Future        33S99400F  CP300000G  JAPAN       X                                           990512
+Street Fighter III 3rd Strike: Fight for the Future        33S99400F  CP300000G  JAPAN       X                                           990608
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000B0G  EUROPE  X          CAP-33S0A0  CAP-33S-1   CAP-33S-1    990512
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000B0G  EUROPE  X          CAP-33S0A0  CAP-33S-2   CAP-33S-2    990608
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000C0G  ASIA*   X          CAP-33S0A0  CAP-33S-1   CAP-33S-1    990512
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000C0G  ASIA*   X          CAP-33S0A0  CAP-33S-2   CAP-33S-2    990608
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000C0G  ASIA*       X                                           990512
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000C0G  ASIA*       X                                           990608
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000H0G  MEXICO* ?          CAP-33S0A0  CAP-33S-1   CAP-33S-1    990512
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000H0G  MEXICO* ?          CAP-33S0A0  CAP-33S-2   CAP-33S-2    990608
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000U0G  USA     X          CAP-33S0A0  CAP-33S-1   CAP-33S-1    990512
+Street Fighter III 3rd Strike: Fight for the Future        33S994A0F  CP3000U0G  USA     X          CAP-33S0A0  CAP-33S-2   CAP-33S-2    990608
 
-JoJo no Kimyouna Bouken: Miraie no Isan              1999  JJM99900F  CP300000G  JAPAN   X          CAP-JJM000  CAP-JJM-0    CAP-JJM-110  990913
-JoJo no Kimyouna Bouken: Miraie no Isan                    JJM99900F  CP300000G  JAPAN   X          CAP-JJM000  CAP-JJM-120  CAP-JJM-120  990927
-JoJo no Kimyouna Bouken: Miraie no Isan                    JJM99900F  CP300000G  JAPAN       X                                            990913
-JoJo no Kimyouna Bouken: Miraie no Isan                    JJM99900F  CP300000G  JAPAN       X                                            990927
-JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE      X                                            990913
-JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE      X                                            990927
+JoJo no Kimyouna Bouken: Miraie no Isan              1999  JJM99900F  CP300000G  JAPAN   X          CAP-JJM000  CAP-JJM-0   CAP-JJM-110  990913
+JoJo no Kimyouna Bouken: Miraie no Isan                    JJM99900F  CP300000G  JAPAN   X          CAP-JJM000  CAP-JJM-1   CAP-JJM-120  990927
+JoJo no Kimyouna Bouken: Miraie no Isan                    JJM99900F  CP300000G  JAPAN       X                                           990913
+JoJo no Kimyouna Bouken: Miraie no Isan                    JJM99900F  CP300000G  JAPAN       X                                           990927
+JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE      X                                           990913
+JoJo's Bizarre Adventure                                   JJM999A0F  CP3000B0G  EUROPE      X                                           990927
 
 * NOT DUMPED but known to exist
 
@@ -620,8 +620,6 @@ INLINE void cps3_drawgfxzoom(bitmap_rgb32 &dest_bmp,const rectangle &clip,const 
 
 
 
-DIRECT_UPDATE_HANDLER( cps3_direct_handler );
-
 /* Encryption */
 
 
@@ -665,9 +663,9 @@ static void cps3_decrypt_bios(running_machine &machine)
 {
 	cps3_state *state = machine.driver_data<cps3_state>();
 	int i;
-	UINT32 *coderegion = (UINT32*)machine.region("user1")->base();
+	UINT32 *coderegion = (UINT32*)state->memregion("user1")->base();
 
-	state->m_decrypted_bios = (UINT32*)machine.region("user1")->base();
+	state->m_decrypted_bios = (UINT32*)state->memregion("user1")->base();
 
 	for (i=0;i<0x80000;i+=4)
 	{
@@ -703,8 +701,8 @@ static void init_common(running_machine &machine, UINT32 key1, UINT32 key2, int 
 	state->m_altEncryption = altEncryption;
 
 	// cache pointers to regions
-	state->m_user4region = machine.region("user4")->base();
-	state->m_user5region = machine.region("user5")->base();
+	state->m_user4region = state->memregion("user4")->base();
+	state->m_user5region = state->memregion("user5")->base();
 
 	if (!state->m_user4region) state->m_user4region = auto_alloc_array(machine, UINT8, USER4REGION_LENGTH);
 	if (!state->m_user5region) state->m_user5region = auto_alloc_array(machine, UINT8, USER5REGION_LENGTH);
@@ -724,7 +722,7 @@ static void init_common(running_machine &machine, UINT32 key1, UINT32 key2, int 
 	state->m_0xc0000000_ram_decrypted = auto_alloc_array(machine, UINT32, 0x400/4);
 
 	address_space *main = machine.device<sh2_device>("maincpu")->space(AS_PROGRAM);
-	main->set_direct_update_handler(direct_update_delegate(FUNC(cps3_direct_handler), &machine));
+	main->set_direct_update_handler(direct_update_delegate(FUNC(cps3_state::cps3_direct_handler), state));
 
 	// flash roms
 	astring tempstr;
@@ -778,7 +776,7 @@ static void cps3_set_mame_colours(running_machine &machine, int colournum, UINT1
 {
 	cps3_state *state = machine.driver_data<cps3_state>();
 	int r,g,b;
-	UINT16* dst = (UINT16*)state->m_colourram;
+	UINT16* dst = (UINT16*)state->m_colourram.target();
 
 
 	r = (data >> 0) & 0x1f;
@@ -1248,57 +1246,53 @@ static SCREEN_UPDATE_RGB32(cps3)
 	return 0;
 }
 
-static READ32_HANDLER( cps3_ssram_r )
+READ32_MEMBER(cps3_state::cps3_ssram_r)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
 	if (offset>0x8000/4)
-		return LITTLE_ENDIANIZE_INT32(state->m_ss_ram[offset]);
+		return LITTLE_ENDIANIZE_INT32(m_ss_ram[offset]);
 	else
-		return state->m_ss_ram[offset];
+		return m_ss_ram[offset];
 }
 
-static WRITE32_HANDLER( cps3_ssram_w )
+WRITE32_MEMBER(cps3_state::cps3_ssram_w)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
 	if (offset>0x8000/4)
 	{
 		// we only want to endian-flip the character data, the tilemap info is fine
 		data = LITTLE_ENDIANIZE_INT32(data);
 		mem_mask = LITTLE_ENDIANIZE_INT32(mem_mask);
-		gfx_element_mark_dirty(space->machine().gfx[0], offset/16);
+		gfx_element_mark_dirty(machine().gfx[0], offset/16);
 	}
 
-	COMBINE_DATA(&state->m_ss_ram[offset]);
+	COMBINE_DATA(&m_ss_ram[offset]);
 }
 
-static WRITE32_HANDLER( cps3_0xc0000000_ram_w )
+WRITE32_MEMBER(cps3_state::cps3_0xc0000000_ram_w)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
-	COMBINE_DATA( &state->m_0xc0000000_ram[offset] );
+	COMBINE_DATA( &m_0xc0000000_ram[offset] );
 	// store a decrypted copy
-	state->m_0xc0000000_ram_decrypted[offset] = state->m_0xc0000000_ram[offset]^cps3_mask(offset*4+0xc0000000, state->m_key1, state->m_key2);
+	m_0xc0000000_ram_decrypted[offset] = m_0xc0000000_ram[offset]^cps3_mask(offset*4+0xc0000000, m_key1, m_key2);
 }
 
 
 
-DIRECT_UPDATE_HANDLER( cps3_direct_handler )
+DIRECT_UPDATE_MEMBER(cps3_state::cps3_direct_handler)
 {
-	cps3_state *state = machine.driver_data<cps3_state>();
 //  if(DEBUG_PRINTF) printf("address %04x\n",address);
 
 	/* BIOS ROM */
 	if (address < 0x80000)
 	{
-		direct.explicit_configure(0x00000, 0x7ffff, 0x7ffff, *direct.space().machine().region("user1"));
+		direct.explicit_configure(0x00000, 0x7ffff, 0x7ffff, *direct.space().machine().root_device().memregion("user1"));
 		return ~0;
 	}
 	/* RAM */
 	else if (address >= 0x06000000 && address <= 0x06ffffff)
 	{
-		UINT8 *decrypted = (UINT8*)state->m_decrypted_gamerom;
+		UINT8 *decrypted = (UINT8*)m_decrypted_gamerom;
 		UINT8 *raw = decrypted;
 
-		if (state->m_altEncryption) raw = (UINT8*) state->m_user4region;
+		if (m_altEncryption) raw = (UINT8*) m_user4region;
 
 		direct.explicit_configure(0x06000000, 0x06ffffff, 0x00ffffff, raw, decrypted);
 
@@ -1306,26 +1300,25 @@ DIRECT_UPDATE_HANDLER( cps3_direct_handler )
 	}
 	else if (address >= 0xc0000000 && address <= 0xc00003ff)
 	{
-		//direct->decrypted = (void*)state->m_0xc0000000_ram_decrypted;
-		direct.explicit_configure(0xc0000000, 0xc00003ff, 0x3ff, (UINT8*)state->m_0xc0000000_ram, (UINT8*)state->m_0xc0000000_ram_decrypted);
+		//direct->decrypted = (void*)m_0xc0000000_ram_decrypted;
+		direct.explicit_configure(0xc0000000, 0xc00003ff, 0x3ff, (UINT8*)m_0xc0000000_ram.target(), (UINT8*)m_0xc0000000_ram_decrypted);
 		return ~0;
 	}
 
 	/* anything else falls through to NOPs */
-	direct.explicit_configure(address, address, 0, (UINT8*)state->m_nops, (UINT8*)state->m_nops);
+	direct.explicit_configure(address, address, 0, (UINT8*)m_nops, (UINT8*)m_nops);
 	return ~0;
 }
 
 
-static WRITE32_HANDLER( cram_bank_w )
+WRITE32_MEMBER(cps3_state::cram_bank_w)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		// this seems to be related to accesses to the 0x04100000 region
-		if (state->m_cram_bank != data)
+		if (m_cram_bank != data)
 		{
-			state->m_cram_bank = data;
+			m_cram_bank = data;
 		//if(data&0xfffffff0)
 		//bank_w 00000000, ffff0000
 		//bank_w 00000001, ffff0000
@@ -1347,34 +1340,31 @@ static WRITE32_HANDLER( cram_bank_w )
 	}
 }
 
-static READ32_HANDLER( cram_data_r )
+READ32_MEMBER(cps3_state::cram_data_r)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
-	UINT32 fulloffset = (((state->m_cram_bank&0x7)*0x100000)/4) + offset;
+	UINT32 fulloffset = (((m_cram_bank&0x7)*0x100000)/4) + offset;
 
-	return LITTLE_ENDIANIZE_INT32(state->m_char_ram[fulloffset]);
+	return LITTLE_ENDIANIZE_INT32(m_char_ram[fulloffset]);
 }
 
-static WRITE32_HANDLER( cram_data_w )
+WRITE32_MEMBER(cps3_state::cram_data_w)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
-	UINT32 fulloffset = (((state->m_cram_bank&0x7)*0x100000)/4) + offset;
+	UINT32 fulloffset = (((m_cram_bank&0x7)*0x100000)/4) + offset;
 	mem_mask = LITTLE_ENDIANIZE_INT32(mem_mask);
 	data = LITTLE_ENDIANIZE_INT32(data);
-	COMBINE_DATA(&state->m_char_ram[fulloffset]);
-	gfx_element_mark_dirty(space->machine().gfx[1], fulloffset/0x40);
+	COMBINE_DATA(&m_char_ram[fulloffset]);
+	gfx_element_mark_dirty(machine().gfx[1], fulloffset/0x40);
 }
 
 /* FLASH ROM ACCESS */
 
-static READ32_HANDLER( cps3_gfxflash_r )
+READ32_MEMBER(cps3_state::cps3_gfxflash_r)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
 	UINT32 result = 0;
-	if (state->m_cram_gfxflash_bank&1) offset += 0x200000/4;
+	if (m_cram_gfxflash_bank&1) offset += 0x200000/4;
 
-	fujitsu_29f016a_device *chip0 = state->m_simm[2 + state->m_cram_gfxflash_bank/8][(state->m_cram_gfxflash_bank % 8) & ~1];
-	fujitsu_29f016a_device *chip1 = state->m_simm[2 + state->m_cram_gfxflash_bank/8][(state->m_cram_gfxflash_bank % 8) |  1];
+	fujitsu_29f016a_device *chip0 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) & ~1];
+	fujitsu_29f016a_device *chip1 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) |  1];
 	if (chip0 == NULL || chip1 == NULL)
 		return 0xffffffff;
 
@@ -1401,19 +1391,18 @@ static READ32_HANDLER( cps3_gfxflash_r )
 		result |= chip1->read( (offset<<1)+0x1 ) << 0;
 	}
 
-	//printf("read GFX flash chips addr %02x returning %08x mem_mask %08x crambank %08x gfxbank %08x\n", offset*2, result,mem_mask,  state->m_cram_bank, state->m_cram_gfxflash_bank  );
+	//printf("read GFX flash chips addr %02x returning %08x mem_mask %08x crambank %08x gfxbank %08x\n", offset*2, result,mem_mask,  m_cram_bank, m_cram_gfxflash_bank  );
 
 	return result;
 }
 
-static WRITE32_HANDLER( cps3_gfxflash_w )
+WRITE32_MEMBER(cps3_state::cps3_gfxflash_w)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
 	int command;
-	if (state->m_cram_gfxflash_bank&1) offset += 0x200000/4;
+	if (m_cram_gfxflash_bank&1) offset += 0x200000/4;
 
-	fujitsu_29f016a_device *chip0 = state->m_simm[2 + state->m_cram_gfxflash_bank/8][(state->m_cram_gfxflash_bank % 8) & ~1];
-	fujitsu_29f016a_device *chip1 = state->m_simm[2 + state->m_cram_gfxflash_bank/8][(state->m_cram_gfxflash_bank % 8) |  1];
+	fujitsu_29f016a_device *chip0 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) & ~1];
+	fujitsu_29f016a_device *chip1 = m_simm[2 + m_cram_gfxflash_bank/8][(m_cram_gfxflash_bank % 8) |  1];
 	if (chip0 == NULL || chip1 == NULL)
 		return;
 
@@ -1447,11 +1436,11 @@ static WRITE32_HANDLER( cps3_gfxflash_w )
 
 	/* make a copy in the linear memory region we actually use for drawing etc.  having it stored in interleaved flash roms isnt' very useful */
 	{
-		UINT32* romdata = (UINT32*)state->m_user5region;
+		UINT32* romdata = (UINT32*)m_user5region;
 		int real_offset = 0;
 		UINT32 newdata;
 
-		real_offset = ((state->m_cram_gfxflash_bank&0x3e) * 0x200000) + offset*4;
+		real_offset = ((m_cram_gfxflash_bank&0x3e) * 0x200000) + offset*4;
 
 		newdata =((chip0->read_raw(((offset*2)&0xfffffffe)+0)<<8) |
 			      (chip0->read_raw(((offset*2)&0xfffffffe)+1)<<24) |
@@ -1501,25 +1490,23 @@ static UINT32 cps3_flashmain_r(address_space *space, int which, UINT32 offset, U
 
 
 
-static READ32_HANDLER( cps3_flash1_r )
+READ32_MEMBER(cps3_state::cps3_flash1_r)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
-	UINT32 retvalue = cps3_flashmain_r(space, 0, offset,mem_mask);
+	UINT32 retvalue = cps3_flashmain_r(&space, 0, offset,mem_mask);
 
-	if (state->m_altEncryption) return retvalue;
+	if (m_altEncryption) return retvalue;
 
-	retvalue = retvalue ^ cps3_mask(0x6000000+offset*4, state->m_key1, state->m_key2);
+	retvalue = retvalue ^ cps3_mask(0x6000000+offset*4, m_key1, m_key2);
 	return retvalue;
 }
 
-static READ32_HANDLER( cps3_flash2_r )
+READ32_MEMBER(cps3_state::cps3_flash2_r)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
-	UINT32 retvalue = cps3_flashmain_r(space, 1, offset,mem_mask);
+	UINT32 retvalue = cps3_flashmain_r(&space, 1, offset,mem_mask);
 
-	if (state->m_altEncryption) return retvalue;
+	if (m_altEncryption) return retvalue;
 
-	retvalue = retvalue ^ cps3_mask(0x6800000+offset*4, state->m_key1, state->m_key2);
+	retvalue = retvalue ^ cps3_mask(0x6800000+offset*4, m_key1, m_key2);
 	return retvalue;
 }
 
@@ -1584,19 +1571,18 @@ static void cps3_flashmain_w(running_machine &machine, int which, UINT32 offset,
 	}
 }
 
-static WRITE32_HANDLER( cps3_flash1_w )
+WRITE32_MEMBER(cps3_state::cps3_flash1_w)
 {
-	cps3_flashmain_w(space->machine(),0,offset,data,mem_mask);
+	cps3_flashmain_w(machine(),0,offset,data,mem_mask);
 }
 
-static WRITE32_HANDLER( cps3_flash2_w )
+WRITE32_MEMBER(cps3_state::cps3_flash2_w)
 {
-	cps3_flashmain_w(space->machine(),1,offset,data,mem_mask);
+	cps3_flashmain_w(machine(),1,offset,data,mem_mask);
 }
 
-static WRITE32_HANDLER( cram_gfxflash_bank_w )
+WRITE32_MEMBER(cps3_state::cram_gfxflash_bank_w)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
 	if (ACCESSING_BITS_24_31)
 	{
 		//printf("cram_gfxflash_bank_w MSB32 %08x\n",data);
@@ -1640,8 +1626,8 @@ static WRITE32_HANDLER( cram_gfxflash_bank_w )
     SIMM 7 (Rom 70/71) ** NOT USED (would follow on in sequence tho)
 
     */
-		state->m_cram_gfxflash_bank = (data & 0xffff0000) >> 16;
-		state->m_cram_gfxflash_bank-= 0x0002;// as with sound access etc. first 4 meg is 'special' and skipped
+		m_cram_gfxflash_bank = (data & 0xffff0000) >> 16;
+		m_cram_gfxflash_bank-= 0x0002;// as with sound access etc. first 4 meg is 'special' and skipped
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -1652,23 +1638,23 @@ static WRITE32_HANDLER( cram_gfxflash_bank_w )
 }
 
 // this seems to be dma active flags, and maybe vblank... not if it is anything else
-static READ32_HANDLER( cps3_vbl_r )
+READ32_MEMBER(cps3_state::cps3_vbl_r)
 {
 	return 0x00000000;
 }
 
-static READ32_HANDLER( cps3_unk_io_r )
+READ32_MEMBER(cps3_state::cps3_unk_io_r)
 {
 	//  warzard will crash before booting if you return anything here
 	return 0xffffffff;
 }
 
-static READ32_HANDLER( cps3_40C0000_r )
+READ32_MEMBER(cps3_state::cps3_40C0000_r)
 {
 	return 0x00000000;
 }
 
-static READ32_HANDLER( cps3_40C0004_r )
+READ32_MEMBER(cps3_state::cps3_40C0004_r)
 {
 	return 0x00000000;
 }
@@ -1676,15 +1662,14 @@ static READ32_HANDLER( cps3_40C0004_r )
 /* EEPROM access is a little odd, I think it accesses eeprom through some kind of
    additional interface, as these writes aren't normal for the type of eeprom we have */
 
-static READ32_HANDLER( cps3_eeprom_r )
+READ32_MEMBER(cps3_state::cps3_eeprom_r)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
 	int addr = offset*4;
 
 	if (addr>=0x100 && addr<=0x17f)
 	{
-		if (ACCESSING_BITS_24_31) state->m_current_eeprom_read = (state->m_eeprom[offset-0x100/4] & 0xffff0000)>>16;
-		else state->m_current_eeprom_read = (state->m_eeprom[offset-0x100/4] & 0x0000ffff)>>0;
+		if (ACCESSING_BITS_24_31) m_current_eeprom_read = (m_eeprom[offset-0x100/4] & 0xffff0000)>>16;
+		else m_current_eeprom_read = (m_eeprom[offset-0x100/4] & 0x0000ffff)>>0;
 		// read word to latch...
 		return 0x00000000;
 	}
@@ -1694,8 +1679,8 @@ static READ32_HANDLER( cps3_eeprom_r )
 		if (ACCESSING_BITS_24_31) return 0;
 		else
 		{
-			//if(DEBUG_PRINTF) printf("reading %04x from eeprom\n", state->m_current_eeprom_read);
-			return state->m_current_eeprom_read;
+			//if(DEBUG_PRINTF) printf("reading %04x from eeprom\n", m_current_eeprom_read);
+			return m_current_eeprom_read;
 		}
 	}
 	else
@@ -1706,15 +1691,14 @@ static READ32_HANDLER( cps3_eeprom_r )
 	return 0x00000000;
 }
 
-static WRITE32_HANDLER( cps3_eeprom_w )
+WRITE32_MEMBER(cps3_state::cps3_eeprom_w)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
 	int addr = offset*4;
 
 	if (addr>=0x080 && addr<=0x0ff)
 	{
 		offset -= 0x80/4;
-		COMBINE_DATA(&state->m_eeprom[offset]);
+		COMBINE_DATA(&m_eeprom[offset]);
 		// write word to storage
 
 	}
@@ -1729,54 +1713,52 @@ static WRITE32_HANDLER( cps3_eeprom_w )
 
 }
 
-static READ32_HANDLER( cps3_cdrom_r )
+READ32_MEMBER(cps3_state::cps3_cdrom_r)
 {
 	UINT32 retval = 0;
 
 	if (ACCESSING_BITS_24_31)
 	{
-		retval |= ((UINT16)wd33c93_r(space,0))<<16;
+		retval |= ((UINT16)wd33c93_r(&space,0))<<16;
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-		retval |= (UINT16)wd33c93_r(space,1);
+		retval |= (UINT16)wd33c93_r(&space,1);
 	}
 
 	return retval;
 }
 
-static WRITE32_HANDLER( cps3_cdrom_w )
+WRITE32_MEMBER(cps3_state::cps3_cdrom_w)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		wd33c93_w(space,0,(data & 0x00ff0000)>>16);
+		wd33c93_w(&space,0,(data & 0x00ff0000)>>16);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-		wd33c93_w(space,1,(data & 0x000000ff)>>0);
+		wd33c93_w(&space,1,(data & 0x000000ff)>>0);
 	}
 }
 
-static WRITE32_HANDLER( cps3_ss_bank_base_w )
+WRITE32_MEMBER(cps3_state::cps3_ss_bank_base_w)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
 	// might be scroll registers or something else..
 	// used to display bank with 'insert coin' on during sfiii2 attract intro
-	COMBINE_DATA(&state->m_ss_bank_base);
+	COMBINE_DATA(&m_ss_bank_base);
 
 //  printf("cps3_ss_bank_base_w %08x %08x\n", data, mem_mask);
 }
 
-static WRITE32_HANDLER( cps3_ss_pal_base_w )
+WRITE32_MEMBER(cps3_state::cps3_ss_pal_base_w)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
 	 if(DEBUG_PRINTF) printf ("cps3_ss_pal_base_w %08x %08x\n", data, mem_mask);
 
 	if(ACCESSING_BITS_24_31)
 	{
-		state->m_ss_pal_base = (data & 0x00ff0000)>>16;
+		m_ss_pal_base = (data & 0x00ff0000)>>16;
 
 		if (data & 0xff000000) printf("ss_pal_base MSB32 upper bits used %04x \n", data);
 	}
@@ -1790,49 +1772,48 @@ static WRITE32_HANDLER( cps3_ss_pal_base_w )
 //<ElSemi> (a word each)
 
 
-static WRITE32_HANDLER( cps3_palettedma_w )
+WRITE32_MEMBER(cps3_state::cps3_palettedma_w)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
 	if (offset==0)
 	{
-		COMBINE_DATA(&state->m_paldma_source);
-		state->m_paldma_realsource = (state->m_paldma_source<<1)-0x400000;
+		COMBINE_DATA(&m_paldma_source);
+		m_paldma_realsource = (m_paldma_source<<1)-0x400000;
 	}
 	else if (offset==1)
 	{
-		COMBINE_DATA(&state->m_paldma_dest);
+		COMBINE_DATA(&m_paldma_dest);
 	}
 	else if (offset==2)
 	{
-		COMBINE_DATA(&state->m_paldma_fade);
+		COMBINE_DATA(&m_paldma_fade);
 	}
 	else if (offset==3)
 	{
-		COMBINE_DATA(&state->m_paldma_other2);
+		COMBINE_DATA(&m_paldma_other2);
 
 		if (ACCESSING_BITS_24_31)
 		{
-			state->m_paldma_length = (data & 0xffff0000)>>16;
+			m_paldma_length = (data & 0xffff0000)>>16;
 		}
 		if (ACCESSING_BITS_0_7)
 		{
 			if (data & 0x0002)
 			{
 				int i;
-				UINT16* src = (UINT16*)state->m_user5region;
-			//  if(DEBUG_PRINTF) printf("CPS3 pal dma start %08x (real: %08x) dest %08x fade %08x other2 %08x (length %04x)\n", state->m_paldma_source, state->m_paldma_realsource, state->m_paldma_dest, state->m_paldma_fade, state->m_paldma_other2, state->m_paldma_length);
+				UINT16* src = (UINT16*)m_user5region;
+			//  if(DEBUG_PRINTF) printf("CPS3 pal dma start %08x (real: %08x) dest %08x fade %08x other2 %08x (length %04x)\n", m_paldma_source, m_paldma_realsource, m_paldma_dest, m_paldma_fade, m_paldma_other2, m_paldma_length);
 
-				for (i=0;i<state->m_paldma_length;i++)
+				for (i=0;i<m_paldma_length;i++)
 				{
-					UINT16 coldata = src[BYTE_XOR_BE(((state->m_paldma_realsource>>1)+i))];
+					UINT16 coldata = src[BYTE_XOR_BE(((m_paldma_realsource>>1)+i))];
 
-					//if (state->m_paldma_fade!=0) printf("%08x\n",state->m_paldma_fade);
+					//if (m_paldma_fade!=0) printf("%08x\n",m_paldma_fade);
 
-					cps3_set_mame_colours(space->machine(), (state->m_paldma_dest+i)^1, coldata, state->m_paldma_fade);
+					cps3_set_mame_colours(machine(), (m_paldma_dest+i)^1, coldata, m_paldma_fade);
 				}
 
 
-				cputag_set_input_line(space->machine(), "maincpu", 10, ASSERT_LINE);
+				cputag_set_input_line(machine(), "maincpu", 10, ASSERT_LINE);
 
 
 			}
@@ -2073,17 +2054,16 @@ static void cps3_process_character_dma(running_machine &machine, UINT32 address)
 	}
 }
 
-static WRITE32_HANDLER( cps3_characterdma_w )
+WRITE32_MEMBER(cps3_state::cps3_characterdma_w)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
 	if(DEBUG_PRINTF) printf("chardma_w %08x %08x %08x\n", offset, data, mem_mask);
 
 	if (offset==0)
 	{
-		//COMBINE_DATA(&state->m_chardma_source);
+		//COMBINE_DATA(&m_chardma_source);
 		if (ACCESSING_BITS_0_7)
 		{
-			state->m_chardma_source = data & 0x0000ffff;
+			m_chardma_source = data & 0x0000ffff;
 		}
 		if (ACCESSING_BITS_24_31)
 		{
@@ -2092,85 +2072,82 @@ static WRITE32_HANDLER( cps3_characterdma_w )
 	}
 	else if (offset==1)
 	{
-		COMBINE_DATA(&state->m_chardma_other);
+		COMBINE_DATA(&m_chardma_other);
 
 		if (ACCESSING_BITS_24_31)
 		{
 			if ((data>>16) & 0x0040)
 			{
 				UINT32 list_address;
-				list_address = (state->m_chardma_source | ((state->m_chardma_other&0x003f0000)));
+				list_address = (m_chardma_source | ((m_chardma_other&0x003f0000)));
 
-				//printf("chardma_w activated %08x %08x (address = cram %08x)\n", state->m_chardma_source, state->m_chardma_other, list_address*4 );
-				cps3_process_character_dma(space->machine(), list_address);
+				//printf("chardma_w activated %08x %08x (address = cram %08x)\n", m_chardma_source, m_chardma_other, list_address*4 );
+				cps3_process_character_dma(machine(), list_address);
 			}
 			else
 			{
-				if(DEBUG_PRINTF) printf("chardma_w NOT activated %08x %08x\n", state->m_chardma_source, state->m_chardma_other );
+				if(DEBUG_PRINTF) printf("chardma_w NOT activated %08x %08x\n", m_chardma_source, m_chardma_other );
 			}
 
 			if ((data>>16) & 0xff80)
-				if(DEBUG_PRINTF) printf("chardma_w unknown bits in activate command %08x %08x\n", state->m_chardma_source, state->m_chardma_other );
+				if(DEBUG_PRINTF) printf("chardma_w unknown bits in activate command %08x %08x\n", m_chardma_source, m_chardma_other );
 		}
 		else
 		{
-			if(DEBUG_PRINTF) printf("chardma_w LSB32 write to activate command %08x %08x\n", state->m_chardma_source, state->m_chardma_other );
+			if(DEBUG_PRINTF) printf("chardma_w LSB32 write to activate command %08x %08x\n", m_chardma_source, m_chardma_other );
 		}
 	}
 }
 
-static WRITE32_HANDLER( cps3_irq10_ack_w )
+WRITE32_MEMBER(cps3_state::cps3_irq10_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 10, CLEAR_LINE); return;
+	cputag_set_input_line(machine(), "maincpu", 10, CLEAR_LINE); return;
 }
 
-static WRITE32_HANDLER( cps3_irq12_ack_w )
+WRITE32_MEMBER(cps3_state::cps3_irq12_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 12, CLEAR_LINE); return;
+	cputag_set_input_line(machine(), "maincpu", 12, CLEAR_LINE); return;
 }
 
-static WRITE32_HANDLER( cps3_unk_vidregs_w )
+WRITE32_MEMBER(cps3_state::cps3_unk_vidregs_w)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
-	COMBINE_DATA(&state->m_unk_vidregs[offset]);
+	COMBINE_DATA(&m_unk_vidregs[offset]);
 }
 
-static READ32_HANDLER( cps3_colourram_r )
+READ32_MEMBER(cps3_state::cps3_colourram_r)
 {
-	cps3_state *state = space->machine().driver_data<cps3_state>();
-	UINT16* src = (UINT16*)state->m_colourram;
+	UINT16* src = (UINT16*)m_colourram.target();
 
 	return src[offset*2+1] | (src[offset*2+0]<<16);
 }
 
-static WRITE32_HANDLER( cps3_colourram_w )
+WRITE32_MEMBER(cps3_state::cps3_colourram_w)
 {
-	//cps3_state *state = space->machine().driver_data<cps3_state>();
-//  COMBINE_DATA(&state->m_colourram[offset]);
+//  COMBINE_DATA(&m_colourram[offset]);
 
 	if (ACCESSING_BITS_24_31)
 	{
-		cps3_set_mame_colours(space->machine(), offset*2, (data & 0xffff0000) >> 16, 0);
+		cps3_set_mame_colours(machine(), offset*2, (data & 0xffff0000) >> 16, 0);
 	}
 
 	if (ACCESSING_BITS_0_7)
 	{
-		cps3_set_mame_colours(space->machine(), offset*2+1, (data & 0x0000ffff) >> 0, 0);
+		cps3_set_mame_colours(machine(), offset*2+1, (data & 0x0000ffff) >> 0, 0);
 	}
 }
 
 
 /* there are more unknown writes, but you get the idea */
-static ADDRESS_MAP_START( cps3_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( cps3_map, AS_PROGRAM, 32, cps3_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("user1", 0) // Bios ROM
-	AM_RANGE(0x02000000, 0x0207ffff) AM_RAM AM_BASE_MEMBER(cps3_state, m_mainram) // Main RAM
+	AM_RANGE(0x02000000, 0x0207ffff) AM_RAM AM_SHARE("mainram") // Main RAM
 
 	AM_RANGE(0x03000000, 0x030003ff) AM_RAM // 'FRAM' (SFIII memory test mode ONLY)
 
-//  AM_RANGE(0x04000000, 0x0407dfff) AM_RAM AM_BASE_MEMBER(cps3_state, m_spriteram)//AM_WRITEONLY // Sprite RAM (jojoba tests this size)
-	AM_RANGE(0x04000000, 0x0407ffff) AM_RAM AM_BASE_MEMBER(cps3_state, m_spriteram)//AM_WRITEONLY // Sprite RAM
+//  AM_RANGE(0x04000000, 0x0407dfff) AM_RAM AM_SHARE("spriteram")//AM_WRITEONLY // Sprite RAM (jojoba tests this size)
+	AM_RANGE(0x04000000, 0x0407ffff) AM_RAM AM_SHARE("spriteram")//AM_WRITEONLY // Sprite RAM
 
-	AM_RANGE(0x04080000, 0x040bffff) AM_READWRITE(cps3_colourram_r, cps3_colourram_w) AM_BASE_MEMBER(cps3_state, m_colourram)  // Colour RAM (jojoba tests this size) 0x20000 colours?!
+	AM_RANGE(0x04080000, 0x040bffff) AM_READWRITE(cps3_colourram_r, cps3_colourram_w) AM_SHARE("colourram")  // Colour RAM (jojoba tests this size) 0x20000 colours?!
 
 	// video registers of some kind probably
 	AM_RANGE(0x040C0000, 0x040C0003) AM_READ(cps3_40C0000_r)//?? every frame
@@ -2179,12 +2156,12 @@ static ADDRESS_MAP_START( cps3_map, AS_PROGRAM, 32 )
     AM_RANGE(0x040C000c, 0x040C000f) AM_READ(cps3_vbl_r)// AM_WRITENOP/
 
 	AM_RANGE(0x040C0000, 0x040C001f) AM_WRITE(cps3_unk_vidregs_w)
-	AM_RANGE(0x040C0020, 0x040C002b) AM_WRITEONLY AM_BASE_MEMBER(cps3_state, m_tilemap20_regs_base)
-	AM_RANGE(0x040C0030, 0x040C003b) AM_WRITEONLY AM_BASE_MEMBER(cps3_state, m_tilemap30_regs_base)
-	AM_RANGE(0x040C0040, 0x040C004b) AM_WRITEONLY AM_BASE_MEMBER(cps3_state, m_tilemap40_regs_base)
-	AM_RANGE(0x040C0050, 0x040C005b) AM_WRITEONLY AM_BASE_MEMBER(cps3_state, m_tilemap50_regs_base)
+	AM_RANGE(0x040C0020, 0x040C002b) AM_WRITEONLY AM_SHARE("tmap20_regs")
+	AM_RANGE(0x040C0030, 0x040C003b) AM_WRITEONLY AM_SHARE("tmap30_regs")
+	AM_RANGE(0x040C0040, 0x040C004b) AM_WRITEONLY AM_SHARE("tmap40_regs")
+	AM_RANGE(0x040C0050, 0x040C005b) AM_WRITEONLY AM_SHARE("tmap50_regs")
 
-	AM_RANGE(0x040C0060, 0x040C007f) AM_RAM AM_BASE_MEMBER(cps3_state, m_fullscreenzoom)
+	AM_RANGE(0x040C0060, 0x040C007f) AM_RAM AM_SHARE("fullscreenzoom")
 
 
 	AM_RANGE(0x040C0094, 0x040C009b) AM_WRITE(cps3_characterdma_w)
@@ -2196,7 +2173,7 @@ static ADDRESS_MAP_START( cps3_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x040C0084, 0x040C0087) AM_WRITE(cram_bank_w)
 	AM_RANGE(0x040C0088, 0x040C008b) AM_WRITE(cram_gfxflash_bank_w)
 
-	AM_RANGE(0x040e0000, 0x040e02ff) AM_DEVREADWRITE("cps3", cps3_sound_r, cps3_sound_w)
+	AM_RANGE(0x040e0000, 0x040e02ff) AM_DEVREADWRITE_LEGACY("cps3", cps3_sound_r, cps3_sound_w)
 
 	AM_RANGE(0x04100000, 0x041fffff) AM_READWRITE(cram_data_r, cram_data_w)
 	AM_RANGE(0x04200000, 0x043fffff) AM_READWRITE(cps3_gfxflash_r, cps3_gfxflash_w) // GFX Flash ROMS
@@ -2206,24 +2183,24 @@ static ADDRESS_MAP_START( cps3_map, AS_PROGRAM, 32 )
 
 	AM_RANGE(0x05000008, 0x0500000b) AM_WRITENOP // ?? every frame
 
-	AM_RANGE(0x05000a00, 0x05000a1f) AM_READ( cps3_unk_io_r ) // ?? every frame
+	AM_RANGE(0x05000a00, 0x05000a1f) AM_READ(cps3_unk_io_r ) // ?? every frame
 
-	AM_RANGE(0x05001000, 0x05001203) AM_READWRITE( cps3_eeprom_r, cps3_eeprom_w )
+	AM_RANGE(0x05001000, 0x05001203) AM_READWRITE(cps3_eeprom_r, cps3_eeprom_w )
 
 	AM_RANGE(0x05040000, 0x0504ffff) AM_READWRITE(cps3_ssram_r,cps3_ssram_w) // 'SS' RAM (Score Screen) (text tilemap + toles)
 	//0x25050020
-	AM_RANGE(0x05050020, 0x05050023) AM_WRITE( cps3_ss_bank_base_w )
-	AM_RANGE(0x05050024, 0x05050027) AM_WRITE( cps3_ss_pal_base_w )
+	AM_RANGE(0x05050020, 0x05050023) AM_WRITE(cps3_ss_bank_base_w )
+	AM_RANGE(0x05050024, 0x05050027) AM_WRITE(cps3_ss_pal_base_w )
 
-	AM_RANGE(0x05100000, 0x05100003) AM_WRITE( cps3_irq12_ack_w )
-	AM_RANGE(0x05110000, 0x05110003) AM_WRITE( cps3_irq10_ack_w )
+	AM_RANGE(0x05100000, 0x05100003) AM_WRITE(cps3_irq12_ack_w )
+	AM_RANGE(0x05110000, 0x05110003) AM_WRITE(cps3_irq10_ack_w )
 
-	AM_RANGE(0x05140000, 0x05140003) AM_READWRITE( cps3_cdrom_r, cps3_cdrom_w )
+	AM_RANGE(0x05140000, 0x05140003) AM_READWRITE(cps3_cdrom_r, cps3_cdrom_w )
 
-	AM_RANGE(0x06000000, 0x067fffff) AM_READWRITE( cps3_flash1_r, cps3_flash1_w ) /* Flash ROMs simm 1 */
-	AM_RANGE(0x06800000, 0x06ffffff) AM_READWRITE( cps3_flash2_r, cps3_flash2_w ) /* Flash ROMs simm 2 */
+	AM_RANGE(0x06000000, 0x067fffff) AM_READWRITE(cps3_flash1_r, cps3_flash1_w ) /* Flash ROMs simm 1 */
+	AM_RANGE(0x06800000, 0x06ffffff) AM_READWRITE(cps3_flash2_r, cps3_flash2_w ) /* Flash ROMs simm 2 */
 
-	AM_RANGE(0xc0000000, 0xc00003ff) AM_RAM_WRITE( cps3_0xc0000000_ram_w ) AM_BASE_MEMBER(cps3_state, m_0xc0000000_ram) /* Executes code from here */
+	AM_RANGE(0xc0000000, 0xc00003ff) AM_RAM_WRITE(cps3_0xc0000000_ram_w ) AM_SHARE("0xc0000000_ram") /* Executes code from here */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cps3 )
@@ -2673,7 +2650,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.1", 0 ) ROM_LOAD( "redearth-simm5.1", 0x00000, 0x200000, CRC(9b8cb56b) SHA1(2ff1081dc99bb7c2f1e036f4c112137c96b83d23) ) \
 
 #define REDEARTH_961121_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-wzd-5", 0, SHA1(e5676752b08283dc4a98c3d7b759e8aa6dcd0679) ) \
+	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-wzd-5", 0, BAD_DUMP SHA1(e5676752b08283dc4a98c3d7b759e8aa6dcd0679) ) \
 
 #define REDEARTH_961023_FLASH \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROM_LOAD( "redearth(__961023)-simm1.0", 0x00000, 0x200000, CRC(65bac346) SHA1(6f4ba0c2cae91a37fc97bea5fc8a50aaf6ca6513) ) \
@@ -2727,7 +2704,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.1", 0 ) ROM_LOAD( "sfiii-simm5.1", 0x00000, 0x200000, CRC(c6f1c066) SHA1(00de492dd1ef7aef05027a8c501c296b6602e917) ) \
 
 #define SFIII_970204_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-sf3-3", 0, SHA1(606e62cc5f46275e366e7dbb412dbaeb7e54cd0c) ) \
+	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-sf3-3", 0, BAD_DUMP SHA1(606e62cc5f46275e366e7dbb412dbaeb7e54cd0c) ) \
 
 #define SFIII2_970930_FLASH \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROM_LOAD( "sfiii2-simm1.0", 0x00000, 0x200000, CRC(2d666f0b) SHA1(68de034b3a3aeaf4b26122a84ad48b0b763e4122) ) \
@@ -2764,7 +2741,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.7", 0 ) ROM_LOAD( "sfiii2-simm5.7", 0x00000, 0x200000, CRC(93ffa199) SHA1(33ec2379f30c6fdf47ba72c1d0cad8bdd02f17df) ) \
 
 #define SFIII2_970930_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-3ga000", 0, SHA1(4e162885b0b3265a56e0265037bcf247e820f027) ) \
+	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-3ga000", 0, BAD_DUMP SHA1(4e162885b0b3265a56e0265037bcf247e820f027) ) \
 
 #define JOJO_990128_FLASH \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROM_LOAD( "jojo(__990128)-simm1.0", 0x00000, 0x200000, CRC(9516948b) SHA1(4d7e6c1eb7d1bebff2a5069bcd186070a9105474) ) \
@@ -2826,7 +2803,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.1", 0 ) ROM_LOAD( "jojo-simm5.1", 0x00000, 0x200000, CRC(734fd162) SHA1(16cdfac74d18a6c2216afb1ce6afbd7f15297c32) ) \
 
 #define JOJO_990108_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-jjk-2", 0, SHA1(0f5c09171409213e191a607ee89ca3a91fe9c96a) ) \
+	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-jjk-2", 0, BAD_DUMP SHA1(0f5c09171409213e191a607ee89ca3a91fe9c96a) ) \
 
 #define JOJO_981202_FLASH \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROM_LOAD( "jojo(__981202)-simm1.0", 0x00000, 0x200000, CRC(e06ba886) SHA1(4defd5e8e1e6d0c439fed8a6454e89a59e24ea4c) ) \
@@ -2857,7 +2834,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.1", 0 ) ROM_LOAD( "jojo-simm5.1",  0x00000, 0x200000, CRC(734fd162) SHA1(16cdfac74d18a6c2216afb1ce6afbd7f15297c32) ) \
 
 #define JOJO_981202_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-jjk000", 0, SHA1(09869f6d8c032b527e02d815749dc8fab1289e86) ) \
+	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-jjk000", 0, BAD_DUMP SHA1(09869f6d8c032b527e02d815749dc8fab1289e86) ) \
 
 #define SFIII3_990608_FLASH \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROM_LOAD( "sfiii3(__990608)-simm1.0", 0x00000, 0x200000, CRC(11dfd3cd) SHA1(dba1f77c46e80317e3279298411154dfb6db2309) ) \
@@ -2902,7 +2879,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm6.7", 0 ) ROM_LOAD( "sfiii3-simm6.7", 0x00000, 0x200000, CRC(cc5f4187) SHA1(248ddace21ed4736a56e92f77cc6ad219d7fef0b) ) \
 
 #define SFIII3_990608_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-33s-2", 0, SHA1(41b0e246db91cbfc3f8f0f62d981734feb4b4ab5) ) \
+	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-33s-2", 0, BAD_DUMP SHA1(41b0e246db91cbfc3f8f0f62d981734feb4b4ab5) ) \
 
 #define SFIII3_990512_FLASH \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROM_LOAD( "sfiii3(__990512)-simm1.0", 0x00000, 0x200000, CRC(66e66235) SHA1(0a98038721d176458d4f85dbd76c5edb93a65322) ) \
@@ -2947,7 +2924,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm6.7", 0 ) ROM_LOAD( "sfiii3-simm6.7",  0x00000, 0x200000, CRC(cc5f4187) SHA1(248ddace21ed4736a56e92f77cc6ad219d7fef0b) ) \
 
 #define SFIII3_990512_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-33s-1", 0, SHA1(2f4a9006a31903114f9f9dc09465ae253e565c51) ) \
+	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-33s-1", 0, BAD_DUMP SHA1(2f4a9006a31903114f9f9dc09465ae253e565c51) ) \
 
 #define JOJOBA_990927_FLASH \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROM_LOAD( "jojoba(__990927)-simm1.0", 0x00000, 0x200000, CRC(adcd8377) SHA1(f1aacbe061e3bcade5cca34435c3f86aec5f1499) ) \
@@ -2984,7 +2961,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x200000, "simm5.7", 0 ) ROM_LOAD( "jojoba-simm5.7", 0x00000, 0x200000, CRC(8c8be520) SHA1(c461f3f76a83592b36b29afb316679a7c8972404) ) \
 
 #define JOJOBA_990927_CDROM \
-	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-jjm-120", 0, SHA1(8628d3fa555fbd5f4121082e925c1834b76c5e65) ) \
+	DISK_REGION( "cdrom" ) DISK_IMAGE_READONLY( "cap-jjm-1", 0, SHA1(8628d3fa555fbd5f4121082e925c1834b76c5e65) ) \
 
 #define JOJOBA_990913_FLASH \
 	ROM_REGION( 0x200000, "simm1.0", 0 ) ROM_LOAD( "jojoba(__990913)-simm1.0", 0x00000, 0x200000, CRC(76976231) SHA1(90adde7e5983ec6a4e02789d5cefe9e85c9c52d5) ) \
@@ -3294,7 +3271,7 @@ ROM_END
     OCEANIA 7
     ASIA NCD 8
 
-    UINT32 *rom =  (UINT32*)machine.region ( "user1" )->base();
+    UINT32 *rom =  (UINT32*)machine.root_device().memregion ( "user1" )->base();
     rom[0x1fed8/4]^=0x00000001; // clear region to 0 (invalid)
     rom[0x1fed8/4]^=0x00000008; // region 8 - ASIA NO CD - doesn't actually skip the CD
                                 // test on startup, only during game, must be another flag
@@ -3319,7 +3296,7 @@ ROM_END
 
     // bios rom also lists korea, but game rom does not.
 
-    UINT32 *rom =  (UINT32*)machine.region ( "user1" )->base();
+    UINT32 *rom =  (UINT32*)machine.root_device().memregion ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000001; // region (clear region)
     rom[0x1fec8/4]^=0x00000008; // region
     rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test
@@ -3341,7 +3318,7 @@ ROM_END
     OCEANIA 7
     ASIA 8
 
-    UINT32 *rom =  (UINT32*)machine.region ( "user1" )->base();
+    UINT32 *rom =  (UINT32*)machine.root_device().memregion ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000001; // region (clear region)
     rom[0x1fec8/4]^=0x00000008; // region
     rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test
@@ -3365,7 +3342,7 @@ ROM_END
 
     DEVELOPMENT VERSION add 0x70 mask!
 
-    UINT32 *rom =  (UINT32*)machine.region ( "user1" )->base();
+    UINT32 *rom =  (UINT32*)machine.root_device().memregion ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000001; // region hack (clear jpn)
 
     rom[0x1fec8/4]^=0x00000004; // region
@@ -3386,7 +3363,7 @@ ROM_END
     BRAZIL 6
     OCEANIA 7
 
-    UINT32 *rom =  (UINT32*)machine.region ( "user1" )->base();
+    UINT32 *rom =  (UINT32*)machine.root_device().memregion ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000004; // region (clear region)
     rom[0x1fec8/4]^=0x00000001; // region
     rom[0x1fecc/4]^=0x01000000; // nocd
@@ -3408,7 +3385,7 @@ ROM_END
 
     DEVELOPMENT VERSION add 0x70 mask!
 
-    UINT32 *rom =  (UINT32*)machine.region ( "user1" )->base();
+    UINT32 *rom =  (UINT32*)machine.root_device().memregion ( "user1" )->base();
     rom[0x1fec8/4]^=0x00000001; // region (clear jpn)
     rom[0x1fec8/4]^=0x00000002; // region
     rom[0x1fec8/4]^=0x00000070; // DEV mode

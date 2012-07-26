@@ -13,13 +13,17 @@ class bankp_state : public driver_device
 {
 public:
 	bankp_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_videoram2(*this, "videoram2"),
+		m_colorram2(*this, "colorram2"){ }
 
 	/* memory pointers */
-	UINT8 * m_videoram;
-	UINT8 * m_colorram;
-	UINT8 * m_videoram2;
-	UINT8 * m_colorram2;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram2;
+	required_shared_ptr<UINT8> m_colorram2;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
@@ -28,17 +32,17 @@ public:
 	int     m_priority;
 
 	UINT8 m_nmi_mask;
+	DECLARE_WRITE8_MEMBER(bankp_scroll_w);
+	DECLARE_WRITE8_MEMBER(bankp_videoram_w);
+	DECLARE_WRITE8_MEMBER(bankp_colorram_w);
+	DECLARE_WRITE8_MEMBER(bankp_videoram2_w);
+	DECLARE_WRITE8_MEMBER(bankp_colorram2_w);
+	DECLARE_WRITE8_MEMBER(bankp_out_w);
 };
 
 
 /*----------- defined in video/bankp.c -----------*/
 
-WRITE8_HANDLER( bankp_videoram_w );
-WRITE8_HANDLER( bankp_colorram_w );
-WRITE8_HANDLER( bankp_videoram2_w );
-WRITE8_HANDLER( bankp_colorram2_w );
-WRITE8_HANDLER( bankp_scroll_w );
-WRITE8_HANDLER( bankp_out_w );
 
 PALETTE_INIT( bankp );
 VIDEO_START( bankp );

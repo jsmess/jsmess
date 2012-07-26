@@ -102,40 +102,40 @@ static void video_regdump(running_machine &machine, int ref, int params, const c
     to return the values for all of them, it doesn't seem to hurt !
 */
 
-READ16_HANDLER (nimbus_video_io_r)
+READ16_MEMBER(rmnimbus_state::nimbus_video_io_r)
 {
-	rmnimbus_state *state = space->machine().driver_data<rmnimbus_state>();
-    int     pc=cpu_get_pc(&space->device());
+	rmnimbus_state *state = machine().driver_data<rmnimbus_state>();
+    int     pc=cpu_get_pc(&space.device());
     UINT16  result;
 
     switch (offset)
     {
-        case    reg000  : result=state->m_vidregs[reg000]; break;
-        case    reg002  : result=state->m_vidregs[reg002]; break;
-        case    reg004  : result=state->m_vidregs[reg004]; break;
-        case    reg006  : result=state->m_vidregs[reg006]; break;
-        case    reg008  : result=state->m_vidregs[reg008]; break;
+        case    reg000  : result=m_vidregs[reg000]; break;
+        case    reg002  : result=m_vidregs[reg002]; break;
+        case    reg004  : result=m_vidregs[reg004]; break;
+        case    reg006  : result=m_vidregs[reg006]; break;
+        case    reg008  : result=m_vidregs[reg008]; break;
         case    reg00A  : result=read_reg_00A(state); break;
-        case    reg00C  : result=state->m_vidregs[reg00C]; break;
-        case    reg00E  : result=state->m_vidregs[reg00E]; break;
+        case    reg00C  : result=m_vidregs[reg00C]; break;
+        case    reg00E  : result=m_vidregs[reg00E]; break;
 
-        case    reg010  : result=state->m_vidregs[reg010]; break;
-        case    reg012  : result=state->m_vidregs[reg012]; break;
-        case    reg014  : result=state->m_vidregs[reg014]; break;
-        case    reg016  : result=state->m_vidregs[reg016]; break;
-        case    reg018  : result=state->m_vidregs[reg018]; break;
-        case    reg01A  : result=state->m_vidregs[reg01A]; break;
-        case    reg01C  : result=state->m_vidregs[reg01C]; break;
-        case    reg01E  : result=state->m_vidregs[reg01E]; break;
+        case    reg010  : result=m_vidregs[reg010]; break;
+        case    reg012  : result=m_vidregs[reg012]; break;
+        case    reg014  : result=m_vidregs[reg014]; break;
+        case    reg016  : result=m_vidregs[reg016]; break;
+        case    reg018  : result=m_vidregs[reg018]; break;
+        case    reg01A  : result=m_vidregs[reg01A]; break;
+        case    reg01C  : result=m_vidregs[reg01C]; break;
+        case    reg01E  : result=m_vidregs[reg01E]; break;
 
-        case    reg020  : result=state->m_vidregs[reg020]; break;
-        case    reg022  : result=state->m_vidregs[reg022]; break;
-        case    reg024  : result=state->m_vidregs[reg024]; break;
-        case    reg026  : result=state->m_vidregs[reg026]; break;
-        case    reg028  : result=state->m_hs_count; break; //result=state->m_vidregs[reg028]; break;
-        case    reg02A  : result=state->m_vidregs[reg02A]; break;
-        case    reg02C  : result=state->m_vidregs[reg02C]; break;
-        case    reg02E  : result=state->m_vidregs[reg02E]; break;
+        case    reg020  : result=m_vidregs[reg020]; break;
+        case    reg022  : result=m_vidregs[reg022]; break;
+        case    reg024  : result=m_vidregs[reg024]; break;
+        case    reg026  : result=m_vidregs[reg026]; break;
+        case    reg028  : result=m_hs_count; break; //result=m_vidregs[reg028]; break;
+        case    reg02A  : result=m_vidregs[reg02A]; break;
+        case    reg02C  : result=m_vidregs[reg02C]; break;
+        case    reg02E  : result=m_vidregs[reg02E]; break;
         default         : result=0; break;
     }
 
@@ -263,10 +263,10 @@ static UINT16 read_reg_00A(rmnimbus_state *state)
 
 */
 
-WRITE16_HANDLER (nimbus_video_io_w)
+WRITE16_MEMBER(rmnimbus_state::nimbus_video_io_w)
 {
-	rmnimbus_state *state = space->machine().driver_data<rmnimbus_state>();
-    int pc=cpu_get_pc(&space->device());
+    rmnimbus_state *state = machine().driver_data<rmnimbus_state>();
+	int pc=cpu_get_pc(&space.device());
 
     if(offset<reg028)
     {
@@ -279,32 +279,32 @@ WRITE16_HANDLER (nimbus_video_io_w)
 
     switch (offset)
     {
-        case    reg000  : state->m_vidregs[reg000]=data; break;
-        case    reg002  : state->m_vidregs[reg002]=data; break;
-        case    reg004  : state->m_vidregs[reg004]=data; write_reg_004(state); break;
-        case    reg006  : state->m_vidregs[reg006]=data; write_reg_006(state); break;
-        case    reg008  : state->m_vidregs[reg008]=data; break;
-        case    reg00A  : state->m_vidregs[reg00A]=data; break;
-        case    reg00C  : state->m_vidregs[reg00C]=data; break;
-        case    reg00E  : state->m_vidregs[reg00E]=data; break;
+        case    reg000  : m_vidregs[reg000]=data; break;
+        case    reg002  : m_vidregs[reg002]=data; break;
+        case    reg004  : m_vidregs[reg004]=data; write_reg_004(state); break;
+        case    reg006  : m_vidregs[reg006]=data; write_reg_006(state); break;
+        case    reg008  : m_vidregs[reg008]=data; break;
+        case    reg00A  : m_vidregs[reg00A]=data; break;
+        case    reg00C  : m_vidregs[reg00C]=data; break;
+        case    reg00E  : m_vidregs[reg00E]=data; break;
 
-        case    reg010  : state->m_vidregs[reg010]=data; write_reg_010(state); break;
-        case    reg012  : state->m_vidregs[reg012]=data; write_reg_012(state); break;
-        case    reg014  : state->m_vidregs[reg014]=data; write_reg_014(state); break;
-        case    reg016  : state->m_vidregs[reg016]=data; write_reg_016(state); break;
-        case    reg018  : state->m_vidregs[reg018]=data; break;
-        case    reg01A  : state->m_vidregs[reg01A]=data; write_reg_01A(state); break;
-        case    reg01C  : state->m_vidregs[reg01C]=data; write_reg_01C(state);break;
-        case    reg01E  : state->m_vidregs[reg01E]=data; write_reg_01E(state);break;
+        case    reg010  : m_vidregs[reg010]=data; write_reg_010(state); break;
+        case    reg012  : m_vidregs[reg012]=data; write_reg_012(state); break;
+        case    reg014  : m_vidregs[reg014]=data; write_reg_014(state); break;
+        case    reg016  : m_vidregs[reg016]=data; write_reg_016(state); break;
+        case    reg018  : m_vidregs[reg018]=data; break;
+        case    reg01A  : m_vidregs[reg01A]=data; write_reg_01A(state); break;
+        case    reg01C  : m_vidregs[reg01C]=data; write_reg_01C(state);break;
+        case    reg01E  : m_vidregs[reg01E]=data; write_reg_01E(state);break;
 
-        case    reg020  : state->m_vidregs[reg020]=data; break;
-        case    reg022  : state->m_vidregs[reg022]=data; break;
-        case    reg024  : state->m_vidregs[reg024]=data; break;
-        case    reg026  : state->m_vidregs[reg026]=data; write_reg_026(state); break;
-        case    reg028  : change_palette(space->machine(),0,data,reg028); break;
-        case    reg02A  : change_palette(space->machine(),1,data,reg02A); break;
-        case    reg02C  : change_palette(space->machine(),2,data,reg02C); break;
-        case    reg02E  : change_palette(space->machine(),3,data,reg02E); break;
+        case    reg020  : m_vidregs[reg020]=data; break;
+        case    reg022  : m_vidregs[reg022]=data; break;
+        case    reg024  : m_vidregs[reg024]=data; break;
+        case    reg026  : m_vidregs[reg026]=data; write_reg_026(state); break;
+        case    reg028  : change_palette(machine(),0,data,reg028); break;
+        case    reg02A  : change_palette(machine(),1,data,reg02A); break;
+        case    reg02C  : change_palette(machine(),2,data,reg02C); break;
+        case    reg02E  : change_palette(machine(),3,data,reg02E); break;
 
         default         : break;
     }

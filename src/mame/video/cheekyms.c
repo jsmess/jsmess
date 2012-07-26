@@ -17,6 +17,7 @@ Functions to emulate the video hardware of the machine.
 
 PALETTE_INIT( cheekyms )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i, j, bit, r, g, b;
 
 	for (i = 0; i < 6; i++)
@@ -39,27 +40,25 @@ PALETTE_INIT( cheekyms )
 }
 
 
-WRITE8_HANDLER( cheekyms_port_40_w )
+WRITE8_MEMBER(cheekyms_state::cheekyms_port_40_w)
 {
-	cheekyms_state *state = space->machine().driver_data<cheekyms_state>();
 
 	/* the lower bits probably trigger sound samples */
-	dac_data_w(state->m_dac, data ? 0x80 : 0);
+	dac_data_w(m_dac, data ? 0x80 : 0);
 }
 
 
-WRITE8_HANDLER( cheekyms_port_80_w )
+WRITE8_MEMBER(cheekyms_state::cheekyms_port_80_w)
 {
-	cheekyms_state *state = space->machine().driver_data<cheekyms_state>();
 
 	/* d0-d1 - sound enables, not sure which bit is which */
 	/* d3-d5 - man scroll amount */
 	/* d6 - palette select (selects either 0 = PROM M9, 1 = PROM M8) */
 	/* d7 - screen flip */
-	*state->m_port_80 = data;
+	*m_port_80 = data;
 
 	/* d2 - interrupt enable */
-	state->m_irq_mask = data & 4;
+	m_irq_mask = data & 4;
 }
 
 

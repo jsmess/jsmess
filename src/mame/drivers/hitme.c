@@ -38,13 +38,12 @@ static TILE_GET_INFO( get_hitme_tile_info )
 }
 
 
-static WRITE8_HANDLER( hitme_vidram_w )
+WRITE8_MEMBER(hitme_state::hitme_vidram_w)
 {
-	hitme_state *state = space->machine().driver_data<hitme_state>();
 
 	/* mark this tile dirty */
-	state->m_videoram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -73,7 +72,7 @@ static SCREEN_UPDATE_IND16( hitme )
 {
 	hitme_state *state = screen.machine().driver_data<hitme_state>();
 	/* the card width resistor comes from an input port, scaled to the range 0-25 kOhms */
-	double width_resist = input_port_read(screen.machine(), "WIDTH") * 25000 / 100;
+	double width_resist = screen.machine().root_device().ioport("WIDTH")->read() * 25000 / 100;
 	/* this triggers a oneshot for the following length of time */
 	double width_duration = 0.45 * 1000e-12 * width_resist;
 	/* the dot clock runs at the standard horizontal frequency * 320+16 clocks per scanline */
@@ -137,7 +136,7 @@ static UINT8 read_port_and_t0( running_machine &machine, int port )
 	hitme_state *state = machine.driver_data<hitme_state>();
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
-	UINT8 val = input_port_read(machine, portnames[port]);
+	UINT8 val = machine.root_device().ioport(portnames[port])->read();
 	if (machine.time() > state->m_timeout_time)
 		val ^= 0x80;
 	return val;
@@ -153,27 +152,27 @@ static UINT8 read_port_and_t0_and_hblank( running_machine &machine, int port )
 }
 
 
-static READ8_HANDLER( hitme_port_0_r )
+READ8_MEMBER(hitme_state::hitme_port_0_r)
 {
-	return read_port_and_t0_and_hblank(space->machine(), 0);
+	return read_port_and_t0_and_hblank(machine(), 0);
 }
 
 
-static READ8_HANDLER( hitme_port_1_r )
+READ8_MEMBER(hitme_state::hitme_port_1_r)
 {
-	return read_port_and_t0(space->machine(), 1);
+	return read_port_and_t0(machine(), 1);
 }
 
 
-static READ8_HANDLER( hitme_port_2_r )
+READ8_MEMBER(hitme_state::hitme_port_2_r)
 {
-	return read_port_and_t0_and_hblank(space->machine(), 2);
+	return read_port_and_t0_and_hblank(machine(), 2);
 }
 
 
-static READ8_HANDLER( hitme_port_3_r )
+READ8_MEMBER(hitme_state::hitme_port_3_r)
 {
-	return read_port_and_t0(space->machine(), 3);
+	return read_port_and_t0(machine(), 3);
 }
 
 
@@ -193,7 +192,7 @@ static WRITE8_DEVICE_HANDLER( output_port_0_w )
         system's equivalent computation, or else we will hang notes.
     */
 	hitme_state *state = device->machine().driver_data<hitme_state>();
-	UINT8 raw_game_speed = input_port_read(device->machine(), "R3");
+	UINT8 raw_game_speed = state->ioport("R3")->read();
 	double resistance = raw_game_speed * 25000 / 100;
 	attotime duration = attotime(0, ATTOSECONDS_PER_SECOND * 0.45 * 6.8e-6 * resistance * (data + 1));
 	state->m_timeout_time = device->machine().time() + duration;
@@ -224,10 +223,10 @@ static WRITE8_DEVICE_HANDLER( output_port_1_w )
     upper 8 bits.
 */
 
-static ADDRESS_MAP_START( hitme_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hitme_map, AS_PROGRAM, 8, hitme_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x09ff) AM_ROM
-	AM_RANGE(0x0c00, 0x0eff) AM_RAM_WRITE(hitme_vidram_w) AM_BASE_MEMBER(hitme_state, m_videoram)
+	AM_RANGE(0x0c00, 0x0eff) AM_RAM_WRITE(hitme_vidram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x300) AM_RAM
 	AM_RANGE(0x1400, 0x14ff) AM_READ(hitme_port_0_r)
 	AM_RANGE(0x1500, 0x15ff) AM_READ(hitme_port_1_r)
@@ -235,20 +234,20 @@ static ADDRESS_MAP_START( hitme_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1700, 0x17ff) AM_READ(hitme_port_3_r)
 	AM_RANGE(0x1800, 0x18ff) AM_READ_PORT("IN4")
 	AM_RANGE(0x1900, 0x19ff) AM_READ_PORT("IN5")
-	AM_RANGE(0x1d00, 0x1dff) AM_DEVWRITE("discrete", output_port_0_w)
-	AM_RANGE(0x1e00, 0x1fff) AM_DEVWRITE("discrete", output_port_1_w)
+	AM_RANGE(0x1d00, 0x1dff) AM_DEVWRITE_LEGACY("discrete", output_port_0_w)
+	AM_RANGE(0x1e00, 0x1fff) AM_DEVWRITE_LEGACY("discrete", output_port_1_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hitme_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( hitme_portmap, AS_IO, 8, hitme_state )
 	AM_RANGE(0x14, 0x14) AM_READ(hitme_port_0_r)
 	AM_RANGE(0x15, 0x15) AM_READ(hitme_port_1_r)
 	AM_RANGE(0x16, 0x16) AM_READ(hitme_port_2_r)
 	AM_RANGE(0x17, 0x17) AM_READ(hitme_port_3_r)
 	AM_RANGE(0x18, 0x18) AM_READ_PORT("IN4")
 	AM_RANGE(0x19, 0x19) AM_READ_PORT("IN5")
-	AM_RANGE(0x1d, 0x1d) AM_DEVWRITE("discrete", output_port_0_w)
-	AM_RANGE(0x1e, 0x1f) AM_DEVWRITE("discrete", output_port_1_w)
+	AM_RANGE(0x1d, 0x1d) AM_DEVWRITE_LEGACY("discrete", output_port_0_w)
+	AM_RANGE(0x1e, 0x1f) AM_DEVWRITE_LEGACY("discrete", output_port_1_w)
 ADDRESS_MAP_END
 
 

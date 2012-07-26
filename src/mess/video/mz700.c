@@ -127,10 +127,9 @@ SCREEN_UPDATE_IND16( mz800 )
     CGRAM
 ***************************************************************************/
 
-WRITE8_HANDLER( mz800_cgram_w )
+WRITE8_MEMBER(mz_state::mz800_cgram_w)
 {
-	mz_state *mz = space->machine().driver_data<mz_state>();
-	mz->m_cgram[offset] = data;
+	m_cgram[offset] = data;
 
-	gfx_element_mark_dirty(space->machine().gfx[0], offset/8);
+	gfx_element_mark_dirty(machine().gfx[0], offset/8);
 }

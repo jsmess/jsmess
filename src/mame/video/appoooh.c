@@ -22,6 +22,7 @@
 
 PALETTE_INIT( appoooh )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -60,6 +61,7 @@ PALETTE_INIT( appoooh )
 
 PALETTE_INIT( robowres )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -145,49 +147,43 @@ VIDEO_START( appoooh )
 	state->save_item(NAME(state->m_priority));
 }
 
-WRITE8_HANDLER( appoooh_scroll_w )
+WRITE8_MEMBER(appoooh_state::appoooh_scroll_w)
 {
-	appoooh_state *state = space->machine().driver_data<appoooh_state>();
-	state->m_scroll_x = data;
+	m_scroll_x = data;
 }
 
 
-WRITE8_HANDLER( appoooh_fg_videoram_w )
+WRITE8_MEMBER(appoooh_state::appoooh_fg_videoram_w)
 {
-	appoooh_state *state = space->machine().driver_data<appoooh_state>();
-	state->m_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( appoooh_fg_colorram_w )
+WRITE8_MEMBER(appoooh_state::appoooh_fg_colorram_w)
 {
-	appoooh_state *state = space->machine().driver_data<appoooh_state>();
-	state->m_fg_colorram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( appoooh_bg_videoram_w )
+WRITE8_MEMBER(appoooh_state::appoooh_bg_videoram_w)
 {
-	appoooh_state *state = space->machine().driver_data<appoooh_state>();
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( appoooh_bg_colorram_w )
+WRITE8_MEMBER(appoooh_state::appoooh_bg_colorram_w)
 {
-	appoooh_state *state = space->machine().driver_data<appoooh_state>();
-	state->m_bg_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( appoooh_out_w )
+WRITE8_MEMBER(appoooh_state::appoooh_out_w)
 {
-	appoooh_state *state = space->machine().driver_data<appoooh_state>();
 	/* bit 0 controls NMI */
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 
 	/* bit 1 flip screen */
-	flip_screen_set(space->machine(), data & 0x02);
+	flip_screen_set(data & 0x02);
 
 	/* bits 2-3 unknown */
 
@@ -195,13 +191,13 @@ WRITE8_HANDLER( appoooh_out_w )
 	/* TODO: understand how this works, currently the only thing I do is draw */
 	/* the front layer behind sprites when priority == 0, and invert the sprite */
 	/* order when priority == 1 */
-	state->m_priority = (data & 0x30) >> 4;
+	m_priority = (data & 0x30) >> 4;
 
 	/* bit 6 ROM bank select */
 	{
-		UINT8 *RAM = space->machine().region("maincpu")->base();
+		UINT8 *RAM = memregion("maincpu")->base();
 
-		memory_set_bankptr(space->machine(), "bank1",&RAM[data&0x40 ? 0x10000 : 0x0a000]);
+		membank("bank1")->set_base(&RAM[data&0x40 ? 0x10000 : 0x0a000]);
 	}
 
 	/* bit 7 unknown (used) */
@@ -209,8 +205,9 @@ WRITE8_HANDLER( appoooh_out_w )
 
 static void appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, const gfx_element *gfx, UINT8 *sprite )
 {
+	appoooh_state *state = gfx->machine().driver_data<appoooh_state>();
 	int offs;
-	int flipy = flip_screen_get(gfx->machine());
+	int flipy = state->flip_screen();
 
 	for (offs = 0x20 - 4; offs >= 0; offs -= 4)
 	{
@@ -240,8 +237,9 @@ static void appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &clipr
 
 static void robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, const gfx_element *gfx, UINT8 *sprite )
 {
+	appoooh_state *state = gfx->machine().driver_data<appoooh_state>();
 	int offs;
-	int flipy = flip_screen_get(gfx->machine());
+	int flipy = state->flip_screen();
 
 	for (offs = 0x20 - 4; offs >= 0; offs -= 4)
 	{

@@ -52,15 +52,20 @@ public:
 	attckufo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
-		  m_mos6560(*this, "mos6560") { }
-
-	/* memory pointers */
-	UINT8 *      m_mainram;
-	UINT8 *      m_tileram;
+		  m_mos6560(*this, "mos6560") ,
+		m_mainram(*this, "mainram"),
+		m_tileram(*this, "tileram"){ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6560_device> m_mos6560;
+
+	/* memory pointers */
+	required_shared_ptr<UINT8> m_mainram;
+	required_shared_ptr<UINT8> m_tileram;
+
+	DECLARE_READ8_MEMBER(attckufo_io_r);
+	DECLARE_WRITE8_MEMBER(attckufo_io_w);
 };
 
 
@@ -95,18 +100,18 @@ static PALETTE_INIT( attckufo )
 }
 
 
-static READ8_HANDLER(attckufo_io_r)
+READ8_MEMBER(attckufo_state::attckufo_io_r)
 {
 	switch(offset)
 	{
-		case 0: return input_port_read(space->machine(), "DSW");
-		case 2: return input_port_read(space->machine(), "INPUT");
+		case 0: return ioport("DSW")->read();
+		case 2: return ioport("INPUT")->read();
 	}
 	return 0xff;
 }
 
 
-static WRITE8_HANDLER(attckufo_io_w)
+WRITE8_MEMBER(attckufo_state::attckufo_io_w)
 {
 	/*
     offset, data:
@@ -117,12 +122,12 @@ static WRITE8_HANDLER(attckufo_io_w)
     */
 }
 
-static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu_map, AS_PROGRAM, 8, attckufo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_MEMBER(attckufo_state, m_mainram)
-	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("mos6560", mos6560_port_r, mos6560_port_w)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE_LEGACY("mos6560", mos6560_port_r, mos6560_port_w)
 	AM_RANGE(0x1400, 0x1403) AM_READWRITE(attckufo_io_r, attckufo_io_w)
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_BASE_MEMBER(attckufo_state, m_tileram)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_SHARE("tileram")
 	AM_RANGE(0x2000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 

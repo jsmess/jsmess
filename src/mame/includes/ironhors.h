@@ -8,16 +8,21 @@ class ironhors_state : public driver_device
 {
 public:
 	ironhors_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_interrupt_enable(*this, "int_enable"),
+		m_scroll(*this, "scroll"),
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"),
+		m_spriteram2(*this, "spriteram2"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT8 *    m_videoram;
-	UINT8 *    m_colorram;
-	UINT8 *    m_spriteram;
-	UINT8 *    m_spriteram2;
-	UINT8 *    m_scroll;
-	UINT8 *    m_interrupt_enable;
-	size_t     m_spriteram_size;
+	required_shared_ptr<UINT8> m_interrupt_enable;
+	required_shared_ptr<UINT8> m_scroll;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram2;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
@@ -28,16 +33,17 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_soundcpu;
+	DECLARE_WRITE8_MEMBER(ironhors_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(ironhors_videoram_w);
+	DECLARE_WRITE8_MEMBER(ironhors_colorram_w);
+	DECLARE_WRITE8_MEMBER(ironhors_charbank_w);
+	DECLARE_WRITE8_MEMBER(ironhors_palettebank_w);
+	DECLARE_WRITE8_MEMBER(ironhors_flipscreen_w);
 };
 
 
 /*----------- defined in video/ironhors.c -----------*/
 
-WRITE8_HANDLER( ironhors_videoram_w );
-WRITE8_HANDLER( ironhors_colorram_w );
-WRITE8_HANDLER( ironhors_palettebank_w );
-WRITE8_HANDLER( ironhors_charbank_w );
-WRITE8_HANDLER( ironhors_flipscreen_w );
 
 PALETTE_INIT( ironhors );
 VIDEO_START( ironhors );

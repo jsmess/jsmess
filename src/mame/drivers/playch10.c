@@ -307,48 +307,44 @@ Notes & Todo:
 /******************************************************************************/
 
 
-static WRITE8_HANDLER( up8w_w )
+WRITE8_MEMBER(playch10_state::up8w_w)
 {
-	playch10_state *state = space->machine().driver_data<playch10_state>();
-	state->m_up_8w = data & 1;
+	m_up_8w = data & 1;
 }
 
-static READ8_HANDLER( ram_8w_r )
+READ8_MEMBER(playch10_state::ram_8w_r)
 {
-	playch10_state *state = space->machine().driver_data<playch10_state>();
-	if ( offset >= 0x400 && state->m_up_8w )
-		return state->m_ram_8w[offset];
+	if ( offset >= 0x400 && m_up_8w )
+		return m_ram_8w[offset];
 
-	return state->m_ram_8w[offset & 0x3ff];
+	return m_ram_8w[offset & 0x3ff];
 }
 
-static WRITE8_HANDLER( ram_8w_w )
+WRITE8_MEMBER(playch10_state::ram_8w_w)
 {
-	playch10_state *state = space->machine().driver_data<playch10_state>();
-	if ( offset >= 0x400 && state->m_up_8w )
-		state->m_ram_8w[offset] = data;
+	if ( offset >= 0x400 && m_up_8w )
+		m_ram_8w[offset] = data;
 	else
-		state->m_ram_8w[offset & 0x3ff] = data;
+		m_ram_8w[offset & 0x3ff] = data;
 }
 
-static WRITE8_HANDLER( sprite_dma_w )
+WRITE8_MEMBER(playch10_state::sprite_dma_w)
 {
 	int source = ( data & 7 );
-	ppu2c0x_device *ppu = space->machine().device<ppu2c0x_device>("ppu");
-	ppu->spriteram_dma(space, source);
+	ppu2c0x_device *ppu = machine().device<ppu2c0x_device>("ppu");
+	ppu->spriteram_dma(&space, source);
 }
 
 /* Only used in single monitor bios */
 
-static WRITE8_HANDLER( time_w )
+WRITE8_MEMBER(playch10_state::time_w)
 {
-	playch10_state *state = space->machine().driver_data<playch10_state>();
 	if(data == 0xf)
 		data = 0;
 
-	state->m_timedata[offset] = data;
+	m_timedata[offset] = data;
 
-	popmessage("Time: %d%d%d%d",state->m_timedata[3],state->m_timedata[2],state->m_timedata[1],state->m_timedata[0]);
+	popmessage("Time: %d%d%d%d",m_timedata[3],m_timedata[2],m_timedata[1],m_timedata[0]);
 }
 
 static READ8_DEVICE_HANDLER( psg_4015_r )
@@ -369,16 +365,16 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 /******************************************************************************/
 
 /* BIOS */
-static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, playch10_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM	// 8V
-	AM_RANGE(0x8800, 0x8fff) AM_READWRITE(ram_8w_r, ram_8w_w) AM_BASE_MEMBER(playch10_state, m_ram_8w)	// 8W
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(playch10_videoram_w) AM_BASE_MEMBER(playch10_state, m_videoram)
+	AM_RANGE(0x8800, 0x8fff) AM_READWRITE(ram_8w_r, ram_8w_w) AM_SHARE("ram_8w")	// 8W
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(playch10_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(pc10_prot_r, pc10_prot_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bios_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, playch10_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("BIOS") AM_WRITE(pc10_SDCS_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("SW1") AM_WRITE(pc10_CNTRLMASK_w)
@@ -392,18 +388,18 @@ static ADDRESS_MAP_START( bios_io_map, AS_IO, 8 )
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(pc10_PPURES_w)
 	AM_RANGE(0x0b, 0x0e) AM_WRITE(pc10_CARTSEL_w)
 	AM_RANGE(0x0f, 0x0f) AM_WRITE(up8w_w)
-	AM_RANGE(0x10, 0x13) AM_WRITE(time_w) AM_BASE_MEMBER(playch10_state, m_timedata)
+	AM_RANGE(0x10, 0x13) AM_WRITE(time_w) AM_SHARE("timedata")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cart_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800) AM_BASE_MEMBER(playch10_state, m_work_ram)
-	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE_MODERN("ppu", ppu2c0x_device, read, write)
-	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE("dac", dac_w)
-	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE("nes", nes_psg_r, nes_psg_w)
+static ADDRESS_MAP_START( cart_map, AS_PROGRAM, 8, playch10_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800) AM_SHARE("work_ram")
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREADWRITE("ppu", ppu2c0x_device, read, write)
+	AM_RANGE(0x4011, 0x4011) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0x4000, 0x4013) AM_DEVREADWRITE_LEGACY("nes", nes_psg_r, nes_psg_w)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
-	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE("nes", psg_4015_r, psg_4015_w)  /* PSG status / first control register */
+	AM_RANGE(0x4015, 0x4015) AM_DEVREADWRITE_LEGACY("nes", psg_4015_r, psg_4015_w)  /* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(pc10_in0_r, pc10_in0_w)
-	AM_RANGE(0x4017, 0x4017) AM_READ(pc10_in1_r) AM_DEVWRITE("nes", psg_4017_w) /* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4017, 0x4017) AM_READ(pc10_in1_r) AM_DEVWRITE_LEGACY("nes", psg_4017_w) /* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -414,7 +410,7 @@ static INPUT_PORTS_START( playch10 )
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Channel Select") PORT_CODE(KEYCODE_0)
     PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Enter") PORT_CODE(KEYCODE_MINUS)
     PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Reset") PORT_CODE(KEYCODE_EQUALS)
-    PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(pc10_int_detect_r, NULL)	// INT Detect
+    PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, playch10_state,pc10_int_detect_r, NULL)	// INT Detect
     PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
     PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
     PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
@@ -430,33 +426,33 @@ static INPUT_PORTS_START( playch10 )
     PORT_START("SW1")
     PORT_DIPNAME( 0x3f, 0x09, "Prime Time Bonus" )
     // STANDARD TIME (no bonus)
-    PORT_DIPSETTING(    0x00, "0%" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x00, "0%" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
     // PRIME TIME (bonus) for 2 COINS
-    PORT_DIPSETTING(    0x07, "8%" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x08, "17%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x09, "25%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x10, "33%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x11, "42%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x12, "50%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x13, "58%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x14, "67%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x15, "75%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x16, "83%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x17, "92%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x18, "100%" )  PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x07, "8%" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x08, "17%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x09, "25%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x10, "33%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x11, "42%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x12, "50%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x13, "58%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x14, "67%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x15, "75%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x16, "83%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x17, "92%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x18, "100%" )  PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
     // PRIME TIME (bonus) for 4 COINS
-    PORT_DIPSETTING(    0x04, "8%" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x05, "17%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x06, "25%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x07, "33%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x08, "42%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x09, "50%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x10, "58%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x11, "67%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x12, "75%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x13, "83%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x14, "92%" )   PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x15, "100%" )  PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x04, "8%" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x05, "17%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x06, "25%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x07, "33%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x08, "42%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x09, "50%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x10, "58%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x11, "67%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x12, "75%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x13, "83%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x14, "92%" )   PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x15, "100%" )  PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
 
     PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
     PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -466,53 +462,53 @@ static INPUT_PORTS_START( playch10 )
     PORT_START("SW2")
     PORT_DIPNAME( 0x3f, 0x28, "Play Time/Coin" )
     // STANDARD TIME (no bonus)
-    PORT_DIPSETTING(    0x3f, DEF_STR( Free_Play ) )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x23, "2:00 (120)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
-    PORT_DIPSETTING(    0x21, "2:10 (130)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
-    PORT_DIPSETTING(    0x1f, "2:20 (140)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
-    PORT_DIPSETTING(    0x1d, "2:30 (150)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
-    PORT_DIPSETTING(    0x1b, "2:40 (160)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
-    PORT_DIPSETTING(    0x19, "2:50 (170)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
-    PORT_DIPSETTING(    0x17, "3:00 (180)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
-    PORT_DIPSETTING(    0x15, "3:10 (190)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
-    PORT_DIPSETTING(    0x13, "3:20 (200)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
-    PORT_DIPSETTING(    0x11, "3:30 (210)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
-    PORT_DIPSETTING(    0x0f, "3:40 (220)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
-    PORT_DIPSETTING(    0x0d, "3:50 (230)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
-    PORT_DIPSETTING(    0x0b, "4:00 (240)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
-    PORT_DIPSETTING(    0x09, "4:10 (250)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
-    PORT_DIPSETTING(    0x07, "4:20 (260)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
-    PORT_DIPSETTING(    0x05, "4:30 (270)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
-    PORT_DIPSETTING(    0x03, "4:40 (280)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
-    PORT_DIPSETTING(    0x01, "4:50 (290)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x3f, DEF_STR( Free_Play ) )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x23, "2:00 (120)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x21, "2:10 (130)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x1f, "2:20 (140)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x1d, "2:30 (150)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x1b, "2:40 (160)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x19, "2:50 (170)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x17, "3:00 (180)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x15, "3:10 (190)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x13, "3:20 (200)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x11, "3:30 (210)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x0f, "3:40 (220)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x0d, "3:50 (230)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x0b, "4:00 (240)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x09, "4:10 (250)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x07, "4:20 (260)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x05, "4:30 (270)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x03, "4:40 (280)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
+    PORT_DIPSETTING(    0x01, "4:50 (290)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0xc0 )
     // PRIME TIME (bonus) for 2 COINS
-    PORT_DIPSETTING(    0x1c, "2:00 (120)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x1e, "2:10 (130)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x20, "2:20 (140)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x22, "2:30 (150)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x24, "2:40 (160)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x26, "2:50 (170)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x28, "3:00 (180)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x2a, "3:10 (190)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x2c, "3:20 (200)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x2e, "3:30 (210)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x30, "3:40 (220)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x32, "3:50 (230)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
-    PORT_DIPSETTING(    0x34, "4:00 (240)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x1c, "2:00 (120)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x1e, "2:10 (130)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x20, "2:20 (140)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x22, "2:30 (150)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x24, "2:40 (160)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x26, "2:50 (170)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x28, "3:00 (180)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x2a, "3:10 (190)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x2c, "3:20 (200)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x2e, "3:30 (210)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x30, "3:40 (220)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x32, "3:50 (230)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
+    PORT_DIPSETTING(    0x34, "4:00 (240)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x80 )
     // PRIME TIME (bonus) for 4 COINS
-    PORT_DIPSETTING(    0x1c, "2:00 (120)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x1e, "2:10 (130)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x20, "2:20 (140)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x22, "2:30 (150)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x24, "2:40 (160)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x26, "2:50 (170)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x28, "3:00 (180)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x2a, "3:10 (190)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x2c, "3:20 (200)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x2e, "3:30 (210)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x30, "3:40 (220)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x32, "3:50 (230)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
-    PORT_DIPSETTING(    0x34, "4:00 (240)" )    PORT_CONDITION("SW2", 0xc0, PORTCOND_EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x1c, "2:00 (120)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x1e, "2:10 (130)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x20, "2:20 (140)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x22, "2:30 (150)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x24, "2:40 (160)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x26, "2:50 (170)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x28, "3:00 (180)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x2a, "3:10 (190)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x2c, "3:20 (200)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x2e, "3:30 (210)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x30, "3:40 (220)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x32, "3:50 (230)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
+    PORT_DIPSETTING(    0x34, "4:00 (240)" )    PORT_CONDITION("SW2", 0xc0, EQUALS, 0x00 )
 
     PORT_DIPNAME( 0xc0, 0x80, "Bonus" )
     PORT_DIPSETTING(    0xc0, "Standard Time" )

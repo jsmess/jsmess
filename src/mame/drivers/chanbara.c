@@ -57,14 +57,19 @@ class chanbara_state : public driver_device
 {
 public:
 	chanbara_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram"),
+		m_videoram2(*this, "videoram2"),
+		m_colorram2(*this, "colorram2"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	UINT8 *  m_videoram2;
-	UINT8 *  m_colorram;
-	UINT8 *  m_colorram2;
-	UINT8 *  m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram2;
+	required_shared_ptr<UINT8> m_colorram2;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -74,11 +79,16 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_WRITE8_MEMBER(chanbara_videoram_w);
+	DECLARE_WRITE8_MEMBER(chanbara_colorram_w);
+	DECLARE_WRITE8_MEMBER(chanbara_videoram2_w);
+	DECLARE_WRITE8_MEMBER(chanbara_colorram2_w);
 };
 
 
 static PALETTE_INIT( chanbara )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i, red, green, blue;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -91,36 +101,32 @@ static PALETTE_INIT( chanbara )
 	}
 }
 
-static WRITE8_HANDLER( chanbara_videoram_w )
+WRITE8_MEMBER(chanbara_state::chanbara_videoram_w)
 {
-	chanbara_state *state = space->machine().driver_data<chanbara_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( chanbara_colorram_w )
+WRITE8_MEMBER(chanbara_state::chanbara_colorram_w)
 {
-	chanbara_state *state = space->machine().driver_data<chanbara_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( chanbara_videoram2_w )
+WRITE8_MEMBER(chanbara_state::chanbara_videoram2_w)
 {
-	chanbara_state *state = space->machine().driver_data<chanbara_state>();
 
-	state->m_videoram2[offset] = data;
-	state->m_bg2_tilemap->mark_tile_dirty(offset);
+	m_videoram2[offset] = data;
+	m_bg2_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( chanbara_colorram2_w )
+WRITE8_MEMBER(chanbara_state::chanbara_colorram2_w)
 {
-	chanbara_state *state = space->machine().driver_data<chanbara_state>();
 
-	state->m_colorram2[offset] = data;
-	state->m_bg2_tilemap->mark_tile_dirty(offset);
+	m_colorram2[offset] = data;
+	m_bg2_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -207,18 +213,18 @@ static SCREEN_UPDATE_IND16( chanbara )
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( chanbara_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( chanbara_map, AS_PROGRAM, 8, chanbara_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(chanbara_videoram_w) AM_BASE_MEMBER(chanbara_state, m_videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(chanbara_colorram_w) AM_BASE_MEMBER(chanbara_state, m_colorram)
-	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_BASE_MEMBER(chanbara_state, m_spriteram)
-	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE(chanbara_videoram2_w) AM_BASE_MEMBER(chanbara_state, m_videoram2)
-	AM_RANGE(0x1a00, 0x1bff) AM_RAM_WRITE(chanbara_colorram2_w) AM_BASE_MEMBER(chanbara_state, m_colorram2)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(chanbara_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(chanbara_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE(chanbara_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x1a00, 0x1bff) AM_RAM_WRITE(chanbara_colorram2_w) AM_SHARE("colorram2")
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2002, 0x2002) AM_READ_PORT("P2")
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("P1")
-	AM_RANGE(0x3800, 0x3801) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x3800, 0x3801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -259,7 +265,7 @@ static INPUT_PORTS_START( chanbara )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )           /* same coinage as COIN1 */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START ("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN )
@@ -349,9 +355,9 @@ static WRITE8_DEVICE_HANDLER( chanbara_ay_out_1_w )
 
 	state->m_scrollhi = data & 0x01;
 
-	flip_screen_set(device->machine(), data & 0x02);
+	state->flip_screen_set(data & 0x02);
 
-	memory_set_bank(device->machine(), "bank1", (data & 0x04) >> 2);
+	state->membank("bank1")->set_entry((data & 0x04) >> 2);
 
 	//if (data & 0xf8)    printf("chanbara_ay_out_1_w unused bits set %02x\n", data & 0xf8);
 }
@@ -465,9 +471,9 @@ ROM_END
 
 static DRIVER_INIT(chanbara )
 {
-	UINT8	*src = machine.region("gfx4")->base();
-	UINT8	*dst = machine.region("gfx3")->base() + 0x4000;
-	UINT8	*bg = machine.region("user1")->base();
+	UINT8	*src = machine.root_device().memregion("gfx4")->base();
+	UINT8	*dst = machine.root_device().memregion("gfx3")->base() + 0x4000;
+	UINT8	*bg = machine.root_device().memregion("user1")->base();
 
 	int i;
 	for (i = 0; i < 0x1000; i++)
@@ -478,7 +484,7 @@ static DRIVER_INIT(chanbara )
 		dst[i + 0x2000] = (src[i + 0x1000] & 0x0f) << 4;
 	}
 
-	memory_configure_bank(machine, "bank1", 0, 2, &bg[0x0000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, &bg[0x0000], 0x4000);
 }
 
 GAME( 1985, chanbara, 0,  chanbara, chanbara, chanbara, ROT270, "Data East", "Chanbara", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )

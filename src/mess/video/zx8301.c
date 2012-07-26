@@ -43,7 +43,7 @@ const device_type ZX8301 = &device_creator<zx8301_device>;
 
 
 // default address map
-static ADDRESS_MAP_START( zx8301, AS_0, 8 )
+static ADDRESS_MAP_START( zx8301, AS_0, 8, zx8301_device )
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
 ADDRESS_MAP_END
 

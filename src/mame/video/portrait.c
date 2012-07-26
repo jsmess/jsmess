@@ -9,18 +9,16 @@
 #include "includes/portrait.h"
 
 
-WRITE8_HANDLER( portrait_bgvideo_write )
+WRITE8_MEMBER(portrait_state::portrait_bgvideo_write)
 {
-	portrait_state *state = space->machine().driver_data<portrait_state>();
-	state->m_background->mark_tile_dirty(offset/2);
-	state->m_bgvideoram[offset] = data;
+	m_background->mark_tile_dirty(offset/2);
+	m_bgvideoram[offset] = data;
 }
 
-WRITE8_HANDLER( portrait_fgvideo_write )
+WRITE8_MEMBER(portrait_state::portrait_fgvideo_write)
 {
-	portrait_state *state = space->machine().driver_data<portrait_state>();
-	state->m_foreground->mark_tile_dirty(offset/2);
-	state->m_fgvideoram[offset] = data;
+	m_foreground->mark_tile_dirty(offset/2);
+	m_fgvideoram[offset] = data;
 }
 
 INLINE void get_tile_info( running_machine &machine, tile_data &tileinfo, int tile_index, const UINT8 *source )
@@ -79,8 +77,9 @@ VIDEO_START( portrait )
 
 PALETTE_INIT( portrait )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
-	UINT8* lookup = machine.region("tileattr")->base();
+	UINT8* lookup = machine.root_device().memregion("tileattr")->base();
 
 	/* allocate the colortable */
 	machine.colortable = colortable_alloc(machine, 0x40);

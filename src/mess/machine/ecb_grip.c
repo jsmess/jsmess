@@ -749,8 +749,8 @@ void grip_device::device_start()
 	m_video_ram = auto_alloc_array(machine(), UINT8, VIDEORAM_SIZE);
 
 	// setup GRIP memory banking
-	memory_configure_bank(*this, "videoram", 0, 2, m_video_ram, 0x8000);
-	memory_set_bank(*this, "videoram", 0);
+	membank("videoram")->configure_entries(0, 2, m_video_ram, 0x8000);
+	membank("videoram")->set_entry(0);
 
 	// allocate keyboard scan timer
 	m_kb_timer = timer_alloc();
@@ -773,8 +773,8 @@ void grip5_state::machine_start()
     grip_device::machine_start();
 
     // setup ROM banking
-    memory_configure_bank(machine(), "eprom", 0, 2, machine().region(Z80_TAG)->base(), 0x4000);
-    memory_set_bank(*this, "eprom", 0);
+    membank("eprom")->configure_entries(0, 2, memregion(Z80_TAG)->base(), 0x4000);
+    *this.root_device().membank("eprom")->set_entry(0);
 
     // register for state saving
     save_item(NAME(m_dpage));
@@ -787,7 +787,7 @@ void grip5_state::machine_start()
 
 void grip_device::device_reset()
 {
-	m_base = input_port_read(*this, "J7");
+	m_base = ioport("J7")->read();
 }
 
 
@@ -842,7 +842,7 @@ WRITE8_MEMBER( grip_device::page_w )
 {
 	m_page = BIT(data, 7);
 
-	memory_set_bank(*this, "videoram", m_page);
+	membank("videoram")->set_entry(m_page);
 }
 
 
@@ -871,7 +871,7 @@ READ8_MEMBER( grip_device::stat_r )
 	int js0 = 0, js1 = 0;
 
 	// JS0
-	switch (input_port_read(*this, "J3A"))
+	switch (ioport("J3A")->read())
 	{
 	case 0: js0 = 0; break;
 	case 1: js0 = 1; break;
@@ -883,7 +883,7 @@ READ8_MEMBER( grip_device::stat_r )
 	data |= js0 << 4;
 
 	// JS1
-	switch (input_port_read(*this, "J3B"))
+	switch (ioport("J3B")->read())
 	{
 	case 0: js1 = 0; break;
 	case 1: js1 = 1; break;
@@ -956,7 +956,7 @@ WRITE8_MEMBER( grip_device::cxstb_w )
 
 WRITE8_MEMBER( grip5_state::eprom_w )
 {
-    memory_set_bank(machine(), "eprom", BIT(data, 0));
+    membank("eprom")->set_entry(BIT(data, 0));
 }
 
 
@@ -1084,13 +1084,13 @@ void grip_device::scan_keyboard()
 	int table = 0, row, col;
 	int keydata = -1;
 
-	if (input_port_read(*this, "ROW9") & 0x07)
+	if (ioport("ROW9")->read() & 0x07)
 	{
 		// shift, upper case
 		table = 1;
 	}
 
-	if (input_port_read(*this, "ROW9") & 0x18)
+	if (ioport("ROW9")->read() & 0x18)
 	{
 		// ctrl
 		table = 2;
@@ -1099,7 +1099,7 @@ void grip_device::scan_keyboard()
 	// scan keyboard
 	for (row = 0; row < 9; row++)
 	{
-		UINT8 data = input_port_read(*this, keynames[row]);
+		UINT8 data = ioport(keynames[row])->read();
 
 		for (col = 0; col < 8; col++)
 		{

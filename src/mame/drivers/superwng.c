@@ -32,12 +32,16 @@ class superwng_state : public driver_device
 {
 public:
 	superwng_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram_bg(*this, "videorabg"),
+		m_videoram_fg(*this, "videorafg"),
+		m_colorram_bg(*this, "colorrabg"),
+		m_colorram_fg(*this, "colorrafg"){ }
 
-	UINT8 *    m_videoram_bg;
-	UINT8 *    m_colorram_bg;
-	UINT8 *    m_videoram_fg;
-	UINT8 *    m_colorram_fg;
+	required_shared_ptr<UINT8> m_videoram_bg;
+	required_shared_ptr<UINT8> m_videoram_fg;
+	required_shared_ptr<UINT8> m_colorram_bg;
+	required_shared_ptr<UINT8> m_colorram_fg;
 
 	int			m_tile_bank;
 
@@ -50,6 +54,19 @@ public:
 	tilemap_t *	m_bg_tilemap;
 	tilemap_t *	m_fg_tilemap;
 
+	DECLARE_WRITE8_MEMBER(superwng_nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(superwng_sound_interrupt_w);
+	DECLARE_WRITE8_MEMBER(superwng_sound_nmi_clear_w);
+	DECLARE_WRITE8_MEMBER(superwng_bg_vram_w);
+	DECLARE_WRITE8_MEMBER(superwng_bg_cram_w);
+	DECLARE_WRITE8_MEMBER(superwng_fg_vram_w);
+	DECLARE_WRITE8_MEMBER(superwng_fg_cram_w);
+	DECLARE_WRITE8_MEMBER(superwng_tilebank_w);
+	DECLARE_WRITE8_MEMBER(superwng_flip_screen_w);
+	DECLARE_WRITE8_MEMBER(superwng_cointcnt1_w);
+	DECLARE_WRITE8_MEMBER(superwng_cointcnt2_w);
+	DECLARE_WRITE8_MEMBER(superwng_flip_screen_x_w);
+	DECLARE_WRITE8_MEMBER(superwng_flip_screen_y_w);
 };
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -83,14 +100,14 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO( 0, code, attr & 0xf, flipx|flipy);
 }
 
-WRITE8_HANDLER( superwng_flip_screen_x_w )
+WRITE8_MEMBER(superwng_state::superwng_flip_screen_x_w)
 {
-	flip_screen_x_set(space->machine(), ~data & 1);
+	flip_screen_x_set(~data & 1);
 }
 
-WRITE8_HANDLER( superwng_flip_screen_y_w )
+WRITE8_MEMBER(superwng_state::superwng_flip_screen_y_w)
 {
-	flip_screen_y_set(space->machine(), ~data & 1);
+	flip_screen_y_set(~data & 1);
 }
 
 static VIDEO_START( superwng )
@@ -105,7 +122,7 @@ static VIDEO_START( superwng )
 static SCREEN_UPDATE_IND16( superwng )
 {
 	superwng_state *state = screen.machine().driver_data<superwng_state>();
-	int flip=flip_screen_get(screen.machine());
+	int flip=state->flip_screen();
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 	rectangle tmp=cliprect;
@@ -189,10 +206,9 @@ PALETTE_INIT( superwng )
 	}
 }
 
-static WRITE8_HANDLER( superwng_nmi_enable_w )
+WRITE8_MEMBER(superwng_state::superwng_nmi_enable_w)
 {
-	superwng_state *state = space->machine().driver_data<superwng_state>();
-	state->m_nmi_enable = data;
+	m_nmi_enable = data;
 }
 
 static INTERRUPT_GEN( superwng_nmi_interrupt )
@@ -203,11 +219,10 @@ static INTERRUPT_GEN( superwng_nmi_interrupt )
 		nmi_line_pulse(device);
 }
 
-static WRITE8_HANDLER( superwng_sound_interrupt_w )
+WRITE8_MEMBER(superwng_state::superwng_sound_interrupt_w)
 {
-	superwng_state *state = space->machine().driver_data<superwng_state>();
-	state->m_sound_byte = data;
-	device_set_input_line(state->m_audiocpu, 0, ASSERT_LINE);
+	m_sound_byte = data;
+	device_set_input_line(m_audiocpu, 0, ASSERT_LINE);
 }
 
 static READ8_DEVICE_HANDLER( superwng_sound_byte_r )
@@ -217,10 +232,9 @@ static READ8_DEVICE_HANDLER( superwng_sound_byte_r )
 	return state->m_sound_byte;
 }
 
-static WRITE8_HANDLER( superwng_sound_nmi_clear_w )
+WRITE8_MEMBER(superwng_state::superwng_sound_nmi_clear_w)
 {
-	superwng_state *state = space->machine().driver_data<superwng_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( superwng_sound_nmi_assert )
@@ -230,67 +244,61 @@ static INTERRUPT_GEN( superwng_sound_nmi_assert )
 		device_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER(superwng_bg_vram_w)
+WRITE8_MEMBER(superwng_state::superwng_bg_vram_w)
 {
-	superwng_state *state = space->machine().driver_data<superwng_state>();
-	state->m_videoram_bg[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram_bg[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER(superwng_bg_cram_w)
+WRITE8_MEMBER(superwng_state::superwng_bg_cram_w)
 {
-	superwng_state *state = space->machine().driver_data<superwng_state>();
-	state->m_colorram_bg[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram_bg[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER(superwng_fg_vram_w)
+WRITE8_MEMBER(superwng_state::superwng_fg_vram_w)
 {
-	superwng_state *state = space->machine().driver_data<superwng_state>();
-	state->m_videoram_fg[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram_fg[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER(superwng_fg_cram_w)
+WRITE8_MEMBER(superwng_state::superwng_fg_cram_w)
 {
-	superwng_state *state = space->machine().driver_data<superwng_state>();
-	state->m_colorram_fg[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram_fg[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER(superwng_tilebank_w)
+WRITE8_MEMBER(superwng_state::superwng_tilebank_w)
 {
-	superwng_state *state = space->machine().driver_data<superwng_state>();
-	state->m_tile_bank = data;
-	state->m_bg_tilemap->mark_all_dirty();
-	state->m_fg_tilemap->mark_all_dirty();
+	m_tile_bank = data;
+	m_bg_tilemap->mark_all_dirty();
+	m_fg_tilemap->mark_all_dirty();
 }
 
-static WRITE8_HANDLER( superwng_flip_screen_w )
+WRITE8_MEMBER(superwng_state::superwng_flip_screen_w)
 {
-	superwng_state *state = space->machine().driver_data<superwng_state>();
-	flip_screen_set(space->machine(), ~data & 0x01);
-	state->m_bg_tilemap->mark_all_dirty();
-	state->m_fg_tilemap->mark_all_dirty();
+	flip_screen_set(~data & 0x01);
+	m_bg_tilemap->mark_all_dirty();
+	m_fg_tilemap->mark_all_dirty();
 }
 
-static WRITE8_HANDLER(superwng_cointcnt1_w)
+WRITE8_MEMBER(superwng_state::superwng_cointcnt1_w)
 {
-	coin_counter_w(space->machine(), 0, data);
+	coin_counter_w(machine(), 0, data);
 }
 
-static WRITE8_HANDLER(superwng_cointcnt2_w)
+WRITE8_MEMBER(superwng_state::superwng_cointcnt2_w)
 {
-	coin_counter_w(space->machine(), 1, data);
+	coin_counter_w(machine(), 1, data);
 }
 
-static ADDRESS_MAP_START( superwng_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( superwng_map, AS_PROGRAM, 8, superwng_state )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(superwng_bg_vram_w) AM_BASE_MEMBER(superwng_state, m_videoram_bg)
-	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(superwng_fg_vram_w) AM_BASE_MEMBER(superwng_state, m_videoram_fg)
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(superwng_bg_cram_w) AM_BASE_MEMBER(superwng_state, m_colorram_bg)
-	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE(superwng_fg_cram_w) AM_BASE_MEMBER(superwng_state, m_colorram_fg)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(superwng_bg_vram_w) AM_SHARE("videorabg")
+	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(superwng_fg_vram_w) AM_SHARE("videorafg")
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(superwng_bg_cram_w) AM_SHARE("colorrabg")
+	AM_RANGE(0x8c00, 0x8fff) AM_RAM_WRITE(superwng_fg_cram_w) AM_SHARE("colorrafg")
 	AM_RANGE(0x9800, 0x99ff) AM_RAM  //collision map
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa000, 0xa000) AM_WRITENOP //unknown
@@ -308,14 +316,14 @@ static ADDRESS_MAP_START( superwng_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa187, 0xa187) AM_WRITENOP //unknown , always(?) 0
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( superwng_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( superwng_sound_map, AS_PROGRAM, 8, superwng_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(superwng_sound_nmi_clear_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE("ay2", ay8910_address_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( superwng )

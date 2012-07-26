@@ -62,66 +62,62 @@ Known issues:
 #include "includes/tankbatt.h"
 
 
-static WRITE8_HANDLER( tankbatt_led_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_led_w)
 {
-	set_led_status(space->machine(), offset,data & 1);
+	set_led_status(machine(), offset,data & 1);
 }
 
-static READ8_HANDLER( tankbatt_in0_r )
+READ8_MEMBER(tankbatt_state::tankbatt_in0_r)
 {
 	int val;
 
-	val = input_port_read(space->machine(), "P1");
+	val = ioport("P1")->read();
 	return ((val << (7 - offset)) & 0x80);
 }
 
-static READ8_HANDLER( tankbatt_in1_r )
+READ8_MEMBER(tankbatt_state::tankbatt_in1_r)
 {
 	int val;
 
-	val = input_port_read(space->machine(), "P2");
+	val = ioport("P2")->read();
 	return ((val << (7 - offset)) & 0x80);
 }
 
-static READ8_HANDLER( tankbatt_dsw_r )
+READ8_MEMBER(tankbatt_state::tankbatt_dsw_r)
 {
 	int val;
 
-	val = input_port_read(space->machine(), "DSW");
+	val = ioport("DSW")->read();
 	return ((val << (7 - offset)) & 0x80);
 }
 
-static WRITE8_HANDLER( tankbatt_interrupt_enable_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_interrupt_enable_w)
 {
-	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
-	state->m_nmi_enable = !data;
-	state->m_sound_enable = !data;
+	m_nmi_enable = !data;
+	m_sound_enable = !data;
 
 	/* hack - turn off the engine noise if the normal game nmi's are disabled */
-	if (data) space->machine().device<samples_device>("samples")->stop(2);
+	if (data) machine().device<samples_device>("samples")->stop(2);
 }
 
-static WRITE8_HANDLER( tankbatt_demo_interrupt_enable_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_demo_interrupt_enable_w)
 {
-	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
-	state->m_nmi_enable = data;
+	m_nmi_enable = data;
 }
 
-static WRITE8_HANDLER( tankbatt_sh_expl_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_sh_expl_w)
 {
-	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
-	if (state->m_sound_enable)
+	if (m_sound_enable)
 	{
-		samples_device *samples = space->machine().device<samples_device>("samples");
+		samples_device *samples = machine().device<samples_device>("samples");
 		samples->start(1, 3);
 	}
 }
 
-static WRITE8_HANDLER( tankbatt_sh_engine_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_sh_engine_w)
 {
-	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
-	samples_device *samples = space->machine().device<samples_device>("samples");
-	if (state->m_sound_enable)
+	samples_device *samples = machine().device<samples_device>("samples");
+	if (m_sound_enable)
 	{
 		if (data)
 			samples->start(2, 2, true);
@@ -131,39 +127,38 @@ static WRITE8_HANDLER( tankbatt_sh_engine_w )
 	else samples->stop(2);
 }
 
-static WRITE8_HANDLER( tankbatt_sh_fire_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_sh_fire_w)
 {
-	tankbatt_state *state = space->machine().driver_data<tankbatt_state>();
-	if (state->m_sound_enable)
+	if (m_sound_enable)
 	{
-		samples_device *samples = space->machine().device<samples_device>("samples");
+		samples_device *samples = machine().device<samples_device>("samples");
 		samples->start(0, 0);
 	}
 }
 
-static WRITE8_HANDLER( tankbatt_irq_ack_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_irq_ack_w)
 {
 	/* 0x6e written at the end of the irq routine, could be either irq ack or a coin sample */
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( tankbatt_coin_counter_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0,data & 1);
-	coin_counter_w(space->machine(), 1,data & 1);
+	coin_counter_w(machine(), 0,data & 1);
+	coin_counter_w(machine(), 1,data & 1);
 }
 
-static WRITE8_HANDLER( tankbatt_coin_lockout_w )
+WRITE8_MEMBER(tankbatt_state::tankbatt_coin_lockout_w)
 {
-	coin_lockout_w(space->machine(), 0,data & 1);
-	coin_lockout_w(space->machine(), 1,data & 1);
+	coin_lockout_w(machine(), 0,data & 1);
+	coin_lockout_w(machine(), 1,data & 1);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x000f) AM_RAM AM_BASE_MEMBER(tankbatt_state, m_bulletsram) AM_SIZE_MEMBER(tankbatt_state, m_bulletsram_size)
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbatt_state )
+	AM_RANGE(0x0000, 0x000f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x0010, 0x01ff) AM_RAM
 	AM_RANGE(0x0200, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(tankbatt_videoram_w) AM_BASE_MEMBER(tankbatt_state, m_videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(tankbatt_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x0c00, 0x0c07) AM_READ(tankbatt_in0_r)
 	AM_RANGE(0x0c00, 0x0c01) AM_WRITE(tankbatt_led_w)
 	AM_RANGE(0x0c02, 0x0c02) AM_WRITE(tankbatt_coin_counter_w)
@@ -190,9 +185,9 @@ static INTERRUPT_GEN( tankbatt_interrupt )
 	if (state->m_nmi_enable) device_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 }
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(tankbatt_state::coin_inserted)
 {
-	cputag_set_input_line(field.machine(), "maincpu", 0, ASSERT_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( tankbatt )
@@ -202,8 +197,8 @@ static INPUT_PORTS_START( tankbatt )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tankbatt_state,coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, tankbatt_state,coin_inserted, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START("P2")	/* IN1 */

@@ -8,13 +8,17 @@ class gaelco_state : public driver_device
 {
 public:
 	gaelco_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_vregs(*this, "vregs"),
+		m_spriteram(*this, "spriteram"),
+		m_screen(*this, "screen"){ }
 
 	/* memory pointers */
-	UINT16 *     m_videoram;
-	UINT16 *     m_spriteram;
-	UINT16 *     m_vregs;
-	UINT16 *     m_screen;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_vregs;
+	required_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_screen;
 //  UINT16 *     paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
@@ -22,13 +26,20 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	DECLARE_WRITE16_MEMBER(bigkarnk_sound_command_w);
+	DECLARE_WRITE16_MEMBER(bigkarnk_coin_w);
+	DECLARE_WRITE16_MEMBER(OKIM6295_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(gaelco_vram_encrypted_w);
+	DECLARE_WRITE16_MEMBER(gaelco_encrypted_w);
+	DECLARE_WRITE16_MEMBER(thoop_vram_encrypted_w);
+	DECLARE_WRITE16_MEMBER(thoop_encrypted_w);
+	DECLARE_WRITE16_MEMBER(gaelco_vram_w);
 };
 
 
 
 /*----------- defined in video/gaelco.c -----------*/
 
-WRITE16_HANDLER( gaelco_vram_w );
 
 VIDEO_START( bigkarnk );
 VIDEO_START( maniacsq );

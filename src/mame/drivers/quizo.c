@@ -37,6 +37,9 @@ public:
 	UINT8 *m_videoram;
 	UINT8 m_port60;
 	UINT8 m_port70;
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_WRITE8_MEMBER(port70_w);
+	DECLARE_WRITE8_MEMBER(port60_w);
 };
 
 
@@ -48,6 +51,7 @@ static const UINT8 rombankLookup[]={ 2, 3, 4, 4, 4, 4, 4, 5, 0, 1};
 
 static PALETTE_INIT(quizo)
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	for (i = 0;i < 16;i++)
 	{
@@ -105,33 +109,30 @@ static SCREEN_UPDATE_IND16( quizo )
 	return 0;
 }
 
-static WRITE8_HANDLER(vram_w)
+WRITE8_MEMBER(quizo_state::vram_w)
 {
-	quizo_state *state = space->machine().driver_data<quizo_state>();
-	UINT8 *videoram = state->m_videoram;
-	int bank=(state->m_port70&8)?1:0;
+	UINT8 *videoram = m_videoram;
+	int bank=(m_port70&8)?1:0;
 	videoram[offset+bank*0x4000]=data;
 }
 
-static WRITE8_HANDLER(port70_w)
+WRITE8_MEMBER(quizo_state::port70_w)
 {
-	quizo_state *state = space->machine().driver_data<quizo_state>();
-	state->m_port70=data;
+	m_port70=data;
 }
 
-static WRITE8_HANDLER(port60_w)
+WRITE8_MEMBER(quizo_state::port60_w)
 {
-	quizo_state *state = space->machine().driver_data<quizo_state>();
 	if(data>9)
 	{
-		logerror("ROMBANK %x @ %x\n", data, cpu_get_pc(&space->device()));
+		logerror("ROMBANK %x @ %x\n", data, cpu_get_pc(&space.device()));
 		data=0;
 	}
-	state->m_port60=data;
-	memory_set_bankptr(space->machine(),  "bank1", &space->machine().region("user1")->base()[rombankLookup[data]*0x4000] );
+	m_port60=data;
+	membank("bank1")->set_base(&machine().root_device().memregion("user1")->base()[rombankLookup[data]*0x4000] );
 }
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, quizo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
@@ -139,12 +140,12 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( portmap, AS_IO, 8, quizo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN1")
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("IN2")
-	AM_RANGE(0x50, 0x51) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x50, 0x51) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x60, 0x60) AM_WRITE(port60_w)
 	AM_RANGE(0x70, 0x70) AM_WRITE(port70_w)
 ADDRESS_MAP_END

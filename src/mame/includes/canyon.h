@@ -21,13 +21,18 @@ class canyon_state : public driver_device
 {
 public:
 	canyon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
+	DECLARE_READ8_MEMBER(canyon_switches_r);
+	DECLARE_READ8_MEMBER(canyon_options_r);
+	DECLARE_WRITE8_MEMBER(canyon_led_w);
+	DECLARE_WRITE8_MEMBER(canyon_videoram_w);
 };
 
 
@@ -46,4 +51,3 @@ DISCRETE_SOUND_EXTERN( canyon );
 VIDEO_START( canyon );
 SCREEN_UPDATE_IND16( canyon );
 
-WRITE8_HANDLER( canyon_videoram_w );

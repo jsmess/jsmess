@@ -182,14 +182,14 @@ ROM_END
 void myarc_memory_expansion_device::device_start()
 {
 	if (VERBOSE>5) LOG("myarc memexp: start\n");
-	m_dsrrom = subregion(DSRROM)->base();
-	m_ram = subregion(RAMREGION)->base();
+	m_dsrrom = memregion(DSRROM)->base();
+	m_ram = memregion(RAMREGION)->base();
 }
 
 void myarc_memory_expansion_device::device_reset()
 {
 	if (VERBOSE>5) LOG("myarc memexp: reset\n");
-	m_size = input_port_read(*this, "SIZE");
+	m_size = ioport("SIZE")->read();
 
 	// Resetting values
 	m_bank = 0;

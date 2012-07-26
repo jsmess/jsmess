@@ -275,13 +275,13 @@ static INTERRUPT_GEN( update_pia_1 )
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA1 (COIN1) */
-	pia1->ca1_w(input_port_read(device->machine(), "IN0") & 0x02);
+	pia1->ca1_w(device->machine().root_device().ioport("IN0")->read() & 0x02);
 
 	/* CA2 - copy of PA0 (SERVICE1) */
-	pia1->ca2_w(input_port_read(device->machine(), "IN0") & 0x01);
+	pia1->ca2_w(device->machine().root_device().ioport("IN0")->read() & 0x01);
 
 	/* CB1 - (crosshatch) */
-	pia1->cb1_w(input_port_read(device->machine(), "XHATCH"));
+	pia1->cb1_w(device->machine().root_device().ioport("XHATCH")->read());
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -545,7 +545,7 @@ static READ8_DEVICE_HANDLER( gfx_rom_r )
 
 	if (state->m_gfx_rom_ctrl_mode)
 	{
-		UINT8 *rom = device->machine().region("gfx1")->base();
+		UINT8 *rom = state->memregion("gfx1")->base();
 
 		ret = rom[state->m_gfx_rom_address];
 
@@ -570,14 +570,14 @@ static READ8_DEVICE_HANDLER( gfx_rom_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( spiders_main_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE_MEMBER(spiders_state, m_ram)
-	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+static ADDRESS_MAP_START( spiders_main_map, AS_PROGRAM, 8, spiders_state )
+	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0xc020, 0xc027) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc044, 0xc047) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
-	AM_RANGE(0xc048, 0xc04b) AM_DEVREADWRITE_MODERN("pia2", pia6821_device, read_alt, write_alt)
-	AM_RANGE(0xc050, 0xc053) AM_DEVREADWRITE_MODERN("pia3", pia6821_device, read, write)
+	AM_RANGE(0xc044, 0xc047) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0xc048, 0xc04b) AM_DEVREADWRITE("pia2", pia6821_device, read_alt, write_alt)
+	AM_RANGE(0xc050, 0xc053) AM_DEVREADWRITE("pia3", pia6821_device, read, write)
 	AM_RANGE(0xc060, 0xc060) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc0a0, 0xc0a0) AM_READ_PORT("DSW3")
@@ -585,9 +585,9 @@ static ADDRESS_MAP_START( spiders_main_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( spiders_audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spiders_audio_map, AS_PROGRAM, 8, spiders_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x0083) AM_DEVREADWRITE_MODERN("pia4", pia6821_device, read, write)
+	AM_RANGE(0x0080, 0x0083) AM_DEVREADWRITE("pia4", pia6821_device, read, write)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

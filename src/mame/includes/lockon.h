@@ -19,28 +19,29 @@ class lockon_state : public driver_device
 {
 public:
 	lockon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_char_ram(*this, "char_ram"),
+		m_hud_ram(*this, "hud_ram"),
+		m_scene_ram(*this, "scene_ram"),
+		m_ground_ram(*this, "ground_ram"),
+		m_object_ram(*this, "object_ram"){ }
 
 	/* memory pointers */
-	UINT16	*m_char_ram;
-	UINT16	*m_hud_ram;
-	UINT16	*m_scene_ram;
-	UINT16	*m_ground_ram;
-	UINT16	*m_object_ram;
-
-	size_t	m_hudram_size;
-	size_t	m_objectram_size;
-	size_t	m_groundram_size;
+	required_shared_ptr<UINT16> m_char_ram;
+	required_shared_ptr<UINT16> m_hud_ram;
+	required_shared_ptr<UINT16> m_scene_ram;
+	required_shared_ptr<UINT16> m_ground_ram;
+	required_shared_ptr<UINT16> m_object_ram;
 
 	/* video-related */
-	tilemap_t   *m_tilemap;
-	UINT8	      m_ground_ctrl;
-	UINT16      m_scroll_h;
-	UINT16      m_scroll_v;
+	tilemap_t		*m_tilemap;
+	UINT8			m_ground_ctrl;
+	UINT16			m_scroll_h;
+	UINT16			m_scroll_v;
 	bitmap_ind16    *m_front_buffer;
 	bitmap_ind16    *m_back_buffer;
-	emu_timer   *m_bufend_timer;
-	emu_timer   *m_cursor_timer;
+	emu_timer		*m_bufend_timer;
+	emu_timer		*m_cursor_timer;
 
 	/* Rotation Control */
 	UINT16      m_xsal;
@@ -54,7 +55,7 @@ public:
 
 	/* Object palette RAM control */
 	UINT32      m_iden;
-	UINT8	*     m_obj_pal_ram;
+	UINT8		*m_obj_pal_ram;
 	UINT32      m_obj_pal_latch;
 	UINT32      m_obj_pal_addr;
 
@@ -73,6 +74,29 @@ public:
 	device_t *m_f2203_1r;
 	device_t *m_f2203_2r;
 	device_t *m_f2203_3r;
+	DECLARE_READ16_MEMBER(lockon_crtc_r);
+	DECLARE_WRITE16_MEMBER(lockon_crtc_w);
+	DECLARE_WRITE16_MEMBER(lockon_char_w);
+	DECLARE_WRITE16_MEMBER(lockon_scene_h_scr_w);
+	DECLARE_WRITE16_MEMBER(lockon_scene_v_scr_w);
+	DECLARE_WRITE16_MEMBER(lockon_ground_ctrl_w);
+	DECLARE_WRITE16_MEMBER(lockon_tza112_w);
+	DECLARE_READ16_MEMBER(lockon_obj_4000_r);
+	DECLARE_WRITE16_MEMBER(lockon_obj_4000_w);
+	DECLARE_WRITE16_MEMBER(lockon_fb_clut_w);
+	DECLARE_WRITE16_MEMBER(lockon_rotate_w);
+	DECLARE_WRITE16_MEMBER(adrst_w);
+	DECLARE_READ16_MEMBER(main_gnd_r);
+	DECLARE_WRITE16_MEMBER(main_gnd_w);
+	DECLARE_READ16_MEMBER(main_obj_r);
+	DECLARE_WRITE16_MEMBER(main_obj_w);
+	DECLARE_WRITE16_MEMBER(tst_w);
+	DECLARE_READ16_MEMBER(main_z80_r);
+	DECLARE_WRITE16_MEMBER(main_z80_w);
+	DECLARE_WRITE16_MEMBER(inten_w);
+	DECLARE_WRITE16_MEMBER(emres_w);
+	DECLARE_READ8_MEMBER(adc_r);
+	DECLARE_WRITE8_MEMBER(sound_vol);
 };
 
 
@@ -82,15 +106,4 @@ PALETTE_INIT( lockon );
 VIDEO_START( lockon );
 SCREEN_UPDATE_IND16( lockon );
 SCREEN_VBLANK( lockon );
-READ16_HANDLER( lockon_crtc_r );
-WRITE16_HANDLER( lockon_crtc_w );
-WRITE16_HANDLER( lockon_rotate_w );
-WRITE16_HANDLER( lockon_fb_clut_w );
-WRITE16_HANDLER( lockon_scene_h_scr_w );
-WRITE16_HANDLER( lockon_scene_v_scr_w );
-WRITE16_HANDLER( lockon_ground_ctrl_w );
-WRITE16_HANDLER( lockon_char_w );
 
-WRITE16_HANDLER( lockon_tza112_w );
-READ16_HANDLER( lockon_obj_4000_r );
-WRITE16_HANDLER( lockon_obj_4000_w );

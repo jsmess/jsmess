@@ -19,7 +19,6 @@ Command 3 does a test of the display, however the rest are a mystery.
 Paste facility was tested but doesn't work, so all code remnants removed.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/ut88.h"
 #include "formats/rk_cas.h"
@@ -41,7 +40,7 @@ static ADDRESS_MAP_START( ut88_mem, AS_PROGRAM, 8, ut88_state )
 	AM_RANGE( 0x0000, 0x07ff ) AM_RAMBANK("bank1") // First bank
 	AM_RANGE( 0x0800, 0xdfff ) AM_RAM  // RAM
 	AM_RANGE( 0xe000, 0xe7ff ) AM_RAM  // Video RAM (not used)
-	AM_RANGE( 0xe800, 0xefff ) AM_RAM AM_BASE(m_p_videoram) // Video RAM
+	AM_RANGE( 0xe800, 0xefff ) AM_RAM AM_SHARE("p_videoram") // Video RAM
 	AM_RANGE( 0xf400, 0xf7ff ) AM_RAM  // System RAM
 	AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END

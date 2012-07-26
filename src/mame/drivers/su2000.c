@@ -86,14 +86,14 @@ public:
  *
  *************************************/
 
-static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, su2000_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("mem_bank")
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0x0f0000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcat_io, AS_IO, 32 )
+static ADDRESS_MAP_START( pcat_io, AS_IO, 32, su2000_state )
 	AM_IMPORT_FROM(pcat32_io_common)
 ADDRESS_MAP_END
 
@@ -270,13 +270,13 @@ static MACHINE_START( su2000 )
 	state->m_pc_ram = auto_alloc_array_clear(machine, UINT32, PC_RAM_SIZE);
 
 	/* Conventional memory */
-	memory_set_bankptr(machine, "mem_bank", state->m_pc_ram);
+	state->membank("mem_bank")->set_base(state->m_pc_ram);
 
 	/* HMA */
 	offs_t ram_limit = 0x100000 + PC_RAM_SIZE - 0x0a0000;
 	space->install_read_bank(0x100000, ram_limit - 1, "hma_bank");
 	space->install_write_bank(0x100000, ram_limit - 1, "hma_bank");
-	memory_set_bankptr(machine, "hma_bank", state->m_pc_ram + 0xa0000);
+	state->membank("hma_bank")->set_base(state->m_pc_ram + 0xa0000);
 
 	device_set_irq_callback(machine.device("maincpu"), pc_irq_callback);
 

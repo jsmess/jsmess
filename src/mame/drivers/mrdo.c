@@ -32,22 +32,22 @@ There's a chance that certain bootlegs might have the different 8/20 MHz XTALS.
 
 /* this looks like some kind of protection. The game doesn't clear the screen */
 /* if a read from this address doesn't return the value it expects. */
-static READ8_HANDLER( mrdo_SECRE_r )
+READ8_MEMBER(mrdo_state::mrdo_SECRE_r)
 {
-	UINT8 *RAM = space->machine().region("maincpu")->base();
-	return RAM[cpu_get_reg(&space->device(), Z80_HL)];
+	UINT8 *RAM = memregion("maincpu")->base();
+	return RAM[cpu_get_reg(&space.device(), Z80_HL)];
 }
 
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mrdo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(mrdo_bgvideoram_w) AM_BASE_MEMBER(mrdo_state, m_bgvideoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(mrdo_fgvideoram_w) AM_BASE_MEMBER(mrdo_state, m_fgvideoram)
-	AM_RANGE(0x9000, 0x90ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(mrdo_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(mrdo_bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(mrdo_fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0x9000, 0x90ff) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(mrdo_flipscreen_w)	/* screen flip + playfield priority */
-	AM_RANGE(0x9801, 0x9801) AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0x9802, 0x9802) AM_DEVWRITE("sn2", sn76496_w)
+	AM_RANGE(0x9801, 0x9801) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0x9802, 0x9802) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
 	AM_RANGE(0x9803, 0x9803) AM_READ(mrdo_SECRE_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P2")

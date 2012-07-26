@@ -72,7 +72,7 @@ struct _tms7000_state
 	UINT8		irq_state[3];	/* State of the three IRQs */
 	UINT8		rf[0x80];	/* Register file (SJE) */
 	UINT8		pf[0x100];	/* Perpherial file */
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
@@ -131,10 +131,10 @@ static WRITE8_HANDLER( tms7000_internal_w );
 static READ8_HANDLER( tms70x0_pf_r );
 static WRITE8_HANDLER( tms70x0_pf_w );
 
-static ADDRESS_MAP_START(tms7000_mem, AS_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x007f)	AM_READWRITE(tms7000_internal_r, tms7000_internal_w)	/* tms7000 internal RAM */
+static ADDRESS_MAP_START(tms7000_mem, AS_PROGRAM, 8, legacy_cpu_device )
+	AM_RANGE(0x0000, 0x007f)	AM_READWRITE_LEGACY(tms7000_internal_r, tms7000_internal_w)	/* tms7000 internal RAM */
 	AM_RANGE(0x0080, 0x00ff)	AM_NOP						/* reserved */
-	AM_RANGE(0x0100, 0x01ff)	AM_READWRITE(tms70x0_pf_r, tms70x0_pf_w)				/* tms7000 internal I/O ports */
+	AM_RANGE(0x0100, 0x01ff)	AM_READWRITE_LEGACY(tms70x0_pf_r, tms70x0_pf_w)				/* tms7000 internal I/O ports */
 ADDRESS_MAP_END
 
 

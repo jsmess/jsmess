@@ -230,16 +230,20 @@ class nmg5_state : public driver_device
 {
 public:
 	nmg5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_scroll_ram(*this, "scroll_ram"),
+		m_bg_videoram(*this, "bg_videoram"),
+		m_fg_videoram(*this, "fg_videoram"),
+		m_bitmap(*this, "bitmap"){ }
 
 	/* memory pointers */
-	UINT16 *    m_fg_videoram;
-	UINT16 *    m_bg_videoram;
-	UINT16 *    m_scroll_ram;
-	UINT16 *    m_bitmap;
-	UINT16 *    m_spriteram;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_scroll_ram;
+	required_shared_ptr<UINT16> m_bg_videoram;
+	required_shared_ptr<UINT16> m_fg_videoram;
+	required_shared_ptr<UINT16> m_bitmap;
 //  UINT16 *  m_paletteram;    // currently this uses generic palette handling
-	size_t      m_spriteram_size;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -254,66 +258,66 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_soundcpu;
+	DECLARE_WRITE16_MEMBER(fg_videoram_w);
+	DECLARE_WRITE16_MEMBER(bg_videoram_w);
+	DECLARE_WRITE16_MEMBER(nmg5_soundlatch_w);
+	DECLARE_READ16_MEMBER(prot_r);
+	DECLARE_WRITE16_MEMBER(prot_w);
+	DECLARE_WRITE16_MEMBER(gfx_bank_w);
+	DECLARE_WRITE16_MEMBER(priority_reg_w);
 };
 
 
 
-static WRITE16_HANDLER( fg_videoram_w )
+WRITE16_MEMBER(nmg5_state::fg_videoram_w)
 {
-	nmg5_state *state = space->machine().driver_data<nmg5_state>();
-	COMBINE_DATA(&state->m_fg_videoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_fg_videoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( bg_videoram_w )
+WRITE16_MEMBER(nmg5_state::bg_videoram_w)
 {
-	nmg5_state *state = space->machine().driver_data<nmg5_state>();
-	COMBINE_DATA(&state->m_bg_videoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( nmg5_soundlatch_w )
+WRITE16_MEMBER(nmg5_state::nmg5_soundlatch_w)
 {
-	nmg5_state *state = space->machine().driver_data<nmg5_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, 0, data & 0xff);
-		device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_byte_w(space, 0, data & 0xff);
+		device_set_input_line(m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
-static READ16_HANDLER( prot_r )
+READ16_MEMBER(nmg5_state::prot_r)
 {
-	nmg5_state *state = space->machine().driver_data<nmg5_state>();
-	return state->m_prot_val | state->m_input_data;
+	return m_prot_val | m_input_data;
 }
 
-static WRITE16_HANDLER( prot_w )
+WRITE16_MEMBER(nmg5_state::prot_w)
 {
-	nmg5_state *state = space->machine().driver_data<nmg5_state>();
-	state->m_input_data = data & 0x0f;
+	m_input_data = data & 0x0f;
 }
 
-static WRITE16_HANDLER( gfx_bank_w )
+WRITE16_MEMBER(nmg5_state::gfx_bank_w)
 {
-	nmg5_state *state = space->machine().driver_data<nmg5_state>();
 
-	if (state->m_gfx_bank != (data & 3))
+	if (m_gfx_bank != (data & 3))
 	{
-		state->m_gfx_bank = data & 3;
-		space->machine().tilemap().mark_all_dirty();
+		m_gfx_bank = data & 3;
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-static WRITE16_HANDLER( priority_reg_w )
+WRITE16_MEMBER(nmg5_state::priority_reg_w)
 {
-	nmg5_state *state = space->machine().driver_data<nmg5_state>();
 
-	state->m_priority_reg = data & 7;
+	m_priority_reg = data & 7;
 
-	if (state->m_priority_reg == 4 || state->m_priority_reg == 5 || state->m_priority_reg == 6)
-		popmessage("unknown priority_reg value = %d\n", state->m_priority_reg);
+	if (m_priority_reg == 4 || m_priority_reg == 5 || m_priority_reg == 6)
+		popmessage("unknown priority_reg value = %d\n", m_priority_reg);
 }
 
 static WRITE8_DEVICE_HANDLER( oki_banking_w )
@@ -327,11 +331,11 @@ static WRITE8_DEVICE_HANDLER( oki_banking_w )
 
 ********************************************************************/
 
-static ADDRESS_MAP_START( nmg5_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( nmg5_map, AS_PROGRAM, 16, nmg5_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x120000, 0x12ffff) AM_RAM
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_MEMBER(nmg5_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x180000, 0x180001) AM_WRITE(nmg5_soundlatch_w)
 	AM_RANGE(0x180002, 0x180003) AM_WRITENOP
 	AM_RANGE(0x180004, 0x180005) AM_READWRITE(prot_r, prot_w)
@@ -340,18 +344,18 @@ static ADDRESS_MAP_START( nmg5_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x18000a, 0x18000b) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x18000c, 0x18000d) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x18000e, 0x18000f) AM_WRITE(priority_reg_w)
-	AM_RANGE(0x300002, 0x300009) AM_WRITEONLY AM_BASE_MEMBER(nmg5_state, m_scroll_ram)
+	AM_RANGE(0x300002, 0x300009) AM_WRITEONLY AM_SHARE("scroll_ram")
 	AM_RANGE(0x30000a, 0x30000f) AM_WRITENOP
-	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE_MEMBER(nmg5_state, m_bg_videoram)
-	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE_MEMBER(nmg5_state, m_fg_videoram)
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(nmg5_state, m_bitmap)
+	AM_RANGE(0x320000, 0x321fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0x322000, 0x323fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("bitmap")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pclubys_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pclubys_map, AS_PROGRAM, 16, nmg5_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x440000, 0x4407ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x460000, 0x4607ff) AM_RAM AM_BASE_SIZE_MEMBER(nmg5_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x440000, 0x4407ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x460000, 0x4607ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x480000, 0x480001) AM_WRITE(nmg5_soundlatch_w)
 	AM_RANGE(0x480002, 0x480003) AM_WRITENOP
 	AM_RANGE(0x480004, 0x480005) AM_READWRITE(prot_r, prot_w)
@@ -360,10 +364,10 @@ static ADDRESS_MAP_START( pclubys_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x48000a, 0x48000b) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x48000c, 0x48000d) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x48000e, 0x48000f) AM_WRITE(priority_reg_w)
-	AM_RANGE(0x500002, 0x500009) AM_WRITEONLY AM_BASE_MEMBER(nmg5_state, m_scroll_ram)
-	AM_RANGE(0x520000, 0x521fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE_MEMBER(nmg5_state, m_bg_videoram)
-	AM_RANGE(0x522000, 0x523fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE_MEMBER(nmg5_state, m_fg_videoram)
-	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_MEMBER(nmg5_state, m_bitmap)
+	AM_RANGE(0x500002, 0x500009) AM_WRITEONLY AM_SHARE("scroll_ram")
+	AM_RANGE(0x520000, 0x521fff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0x522000, 0x523fff) AM_RAM_WRITE(fg_videoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("bitmap")
 ADDRESS_MAP_END
 
 /*******************************************************************
@@ -372,22 +376,22 @@ ADDRESS_MAP_END
 
 ********************************************************************/
 
-static ADDRESS_MAP_START( nmg5_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nmg5_sound_map, AS_PROGRAM, 8, nmg5_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pclubys_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pclubys_sound_map, AS_PROGRAM, 8, nmg5_state )
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, nmg5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("oki", oki_banking_w)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
-	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_r)
-	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("oki", oki_banking_w)
+	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
+	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( nmg5 )
@@ -414,23 +418,23 @@ static INPUT_PORTS_START( nmg5 )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW2:8,7")
-	PORT_DIPSETTING(      0x0200, DEF_STR( 2C_1C ) )        PORT_CONDITION("DSW",0x4000,PORTCOND_NOTEQUALS,0x00)
-	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_1C ) )        PORT_CONDITION("DSW",0x4000,PORTCOND_NOTEQUALS,0x00)
-	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )        PORT_CONDITION("DSW",0x4000,PORTCOND_NOTEQUALS,0x00)
-	PORT_DIPSETTING(      0x0100, DEF_STR( 1C_2C ) )        PORT_CONDITION("DSW",0x4000,PORTCOND_NOTEQUALS,0x00)
-	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_1C ) )        PORT_CONDITION("DSW",0x4000,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(      0x0100, DEF_STR( 1C_3C ) )        PORT_CONDITION("DSW",0x4000,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_4C ) )        PORT_CONDITION("DSW",0x4000,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )        PORT_CONDITION("DSW",0x4000,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(      0x0200, DEF_STR( 2C_1C ) )        PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x00)
+	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_1C ) )        PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x00)
+	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )        PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x00)
+	PORT_DIPSETTING(      0x0100, DEF_STR( 1C_2C ) )        PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x00)
+	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_1C ) )        PORT_CONDITION("DSW",0x4000,EQUALS,0x00)
+	PORT_DIPSETTING(      0x0100, DEF_STR( 1C_3C ) )        PORT_CONDITION("DSW",0x4000,EQUALS,0x00)
+	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_4C ) )        PORT_CONDITION("DSW",0x4000,EQUALS,0x00)
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )        PORT_CONDITION("DSW",0x4000,EQUALS,0x00)
 	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW2:6,5")
-	PORT_DIPSETTING(      0x0800, DEF_STR( 2C_1C ) )        PORT_CONDITION("DSW",0x4000,PORTCOND_NOTEQUALS,0x00)
-	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_1C ) )        PORT_CONDITION("DSW",0x4000,PORTCOND_NOTEQUALS,0x00)
-	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )        PORT_CONDITION("DSW",0x4000,PORTCOND_NOTEQUALS,0x00)
-	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_2C ) )        PORT_CONDITION("DSW",0x4000,PORTCOND_NOTEQUALS,0x00)
-	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )        PORT_CONDITION("DSW",0x4000,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(      0x0800, DEF_STR( 3C_1C ) )        PORT_CONDITION("DSW",0x4000,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(      0x0400, DEF_STR( 2C_1C ) )        PORT_CONDITION("DSW",0x4000,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_1C ) )        PORT_CONDITION("DSW",0x4000,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(      0x0800, DEF_STR( 2C_1C ) )        PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x00)
+	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_1C ) )        PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x00)
+	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )        PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x00)
+	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_2C ) )        PORT_CONDITION("DSW",0x4000,NOTEQUALS,0x00)
+	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )        PORT_CONDITION("DSW",0x4000,EQUALS,0x00)
+	PORT_DIPSETTING(      0x0800, DEF_STR( 3C_1C ) )        PORT_CONDITION("DSW",0x4000,EQUALS,0x00)
+	PORT_DIPSETTING(      0x0400, DEF_STR( 2C_1C ) )        PORT_CONDITION("DSW",0x4000,EQUALS,0x00)
+	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_1C ) )        PORT_CONDITION("DSW",0x4000,EQUALS,0x00)
 	PORT_DIPUNUSED_DIPLOC( 0x1000, IP_ACTIVE_LOW, "SW2:4" )                               // See notes
 	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )

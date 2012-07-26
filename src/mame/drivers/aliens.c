@@ -19,47 +19,45 @@ Preliminary driver by:
 /* prototypes */
 static KONAMI_SETLINES_CALLBACK( aliens_banking );
 
-static INTERRUPT_GEN( aliens_interrupt )
+static TIMER_DEVICE_CALLBACK( aliens_scanline )
 {
-	aliens_state *state = device->machine().driver_data<aliens_state>();
+	aliens_state *state = timer.machine().driver_data<aliens_state>();
+	int scanline = param;
 
-	if (k051960_is_irq_enabled(state->m_k051960))
-		device_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
+	if(scanline == 240 && k051960_is_irq_enabled(state->m_k051960)) // vblank irq
+		cputag_set_input_line(timer.machine(), "maincpu", KONAMI_IRQ_LINE, HOLD_LINE);
+	else if(((scanline % 32) == 0) && (k051960_is_nmi_enabled(state->m_k051960))) // timer irq
+		cputag_set_input_line(timer.machine(), "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static READ8_HANDLER( bankedram_r )
+READ8_MEMBER(aliens_state::bankedram_r)
 {
-	aliens_state *state = space->machine().driver_data<aliens_state>();
-
-	if (state->m_palette_selected)
-		return space->machine().generic.paletteram.u8[offset];
+	if (m_palette_selected)
+		return m_generic_paletteram_8[offset];
 	else
-		return state->m_ram[offset];
+		return m_ram[offset];
 }
 
-static WRITE8_HANDLER( bankedram_w )
+WRITE8_MEMBER(aliens_state::bankedram_w)
 {
-	aliens_state *state = space->machine().driver_data<aliens_state>();
-
-	if (state->m_palette_selected)
-		paletteram_xBBBBBGGGGGRRRRR_be_w(space, offset, data);
+	if (m_palette_selected)
+		paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space, offset, data);
 	else
-		state->m_ram[offset] = data;
+		m_ram[offset] = data;
 }
 
-static WRITE8_HANDLER( aliens_coin_counter_w )
+WRITE8_MEMBER(aliens_state::aliens_coin_counter_w)
 {
-	aliens_state *state = space->machine().driver_data<aliens_state>();
 
 	/* bits 0-1 = coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* bit 5 = select work RAM or palette */
-	state->m_palette_selected = data & 0x20;
+	m_palette_selected = data & 0x20;
 
 	/* bit 6 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(state->m_k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(m_k052109, (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* other bits unknown */
 #if 0
@@ -71,12 +69,11 @@ static WRITE8_HANDLER( aliens_coin_counter_w )
 #endif
 }
 
-static WRITE8_HANDLER( aliens_sh_irqtrigger_w )
+WRITE8_MEMBER(aliens_state::aliens_sh_irqtrigger_w)
 {
-	aliens_state *state = space->machine().driver_data<aliens_state>();
 
-	soundlatch_w(space, offset, data);
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	soundlatch_byte_w(space, offset, data);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( aliens_snd_bankswitch_w )
@@ -93,56 +90,54 @@ static WRITE8_DEVICE_HANDLER( aliens_snd_bankswitch_w )
 }
 
 
-static READ8_HANDLER( k052109_051960_r )
+READ8_MEMBER(aliens_state::k052109_051960_r)
 {
-	aliens_state *state = space->machine().driver_data<aliens_state>();
 
-	if (k052109_get_rmrd_line(state->m_k052109) == CLEAR_LINE)
+	if (k052109_get_rmrd_line(m_k052109) == CLEAR_LINE)
 	{
 		if (offset >= 0x3800 && offset < 0x3808)
-			return k051937_r(state->m_k051960, offset - 0x3800);
+			return k051937_r(m_k051960, offset - 0x3800);
 		else if (offset < 0x3c00)
-			return k052109_r(state->m_k052109, offset);
+			return k052109_r(m_k052109, offset);
 		else
-			return k051960_r(state->m_k051960, offset - 0x3c00);
+			return k051960_r(m_k051960, offset - 0x3c00);
 	}
 	else
-		return k052109_r(state->m_k052109, offset);
+		return k052109_r(m_k052109, offset);
 }
 
-static WRITE8_HANDLER( k052109_051960_w )
+WRITE8_MEMBER(aliens_state::k052109_051960_w)
 {
-	aliens_state *state = space->machine().driver_data<aliens_state>();
 
 	if (offset >= 0x3800 && offset < 0x3808)
-		k051937_w(state->m_k051960, offset - 0x3800, data);
+		k051937_w(m_k051960, offset - 0x3800, data);
 	else if (offset < 0x3c00)
-		k052109_w(state->m_k052109, offset, data);
+		k052109_w(m_k052109, offset, data);
 	else
-		k051960_w(state->m_k051960, offset - 0x3c00, data);
+		k051960_w(m_k051960, offset - 0x3c00, data);
 }
 
-static ADDRESS_MAP_START( aliens_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_MEMBER(aliens_state, m_ram)		/* palette + work RAM */
+static ADDRESS_MAP_START( aliens_map, AS_PROGRAM, 8, aliens_state )
+	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(bankedram_r, bankedram_w) AM_SHARE("ram")		/* palette + work RAM */
 	AM_RANGE(0x0400, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")												/* banked ROM */
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")								/* banked ROM */
 	AM_RANGE(0x5f80, 0x5f80) AM_READ_PORT("DSW3")
 	AM_RANGE(0x5f81, 0x5f81) AM_READ_PORT("P1")
 	AM_RANGE(0x5f82, 0x5f82) AM_READ_PORT("P2")
 	AM_RANGE(0x5f83, 0x5f83) AM_READ_PORT("DSW2")
 	AM_RANGE(0x5f84, 0x5f84) AM_READ_PORT("DSW1")
-	AM_RANGE(0x5f88, 0x5f88) AM_READWRITE(watchdog_reset_r, aliens_coin_counter_w)		/* coin counters */
-	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE(aliens_sh_irqtrigger_w)							/* cause interrupt on audio CPU */
+	AM_RANGE(0x5f88, 0x5f88) AM_READ(watchdog_reset_r) AM_WRITE(aliens_coin_counter_w)		/* coin counters */
+	AM_RANGE(0x5f8c, 0x5f8c) AM_WRITE(aliens_sh_irqtrigger_w)						/* cause interrupt on audio CPU */
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(k052109_051960_r, k052109_051960_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROM														/* ROM e24_j02.bin */
+	AM_RANGE(0x8000, 0xffff) AM_ROM										/* ROM e24_j02.bin */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( aliens_sound_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM								/* ROM g04_b03.bin */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM								/* RAM */
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)				/* soundlatch_r */
-	AM_RANGE(0xe000, 0xe00d) AM_DEVREADWRITE("k007232", k007232_r, k007232_w)
+static ADDRESS_MAP_START( aliens_sound_map, AS_PROGRAM, 8, aliens_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM										/* ROM g04_b03.bin */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM										/* RAM */
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)							/* soundlatch_byte_r */
+	AM_RANGE(0xe000, 0xe00d) AM_DEVREADWRITE_LEGACY("k007232", k007232_r, k007232_w)
 ADDRESS_MAP_END
 
 
@@ -214,8 +209,8 @@ static const k007232_interface k007232_config =
 
 static const ym2151_interface ym2151_config =
 {
-	0,
-	aliens_snd_bankswitch_w
+	DEVCB_NULL,
+	DEVCB_HANDLER(aliens_snd_bankswitch_w)
 };
 
 
@@ -238,10 +233,10 @@ static const k051960_interface aliens_k051960_intf =
 static MACHINE_START( aliens )
 {
 	aliens_state *state = machine.driver_data<aliens_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 20, &ROM[0x10000], 0x2000);
-	memory_set_bank(machine, "bank1", 0);
+	state->membank("bank1")->configure_entries(0, 20, &ROM[0x10000], 0x2000);
+	state->membank("bank1")->set_entry(0);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
@@ -265,14 +260,14 @@ static MACHINE_CONFIG_START( aliens, aliens_state )
 
 	/* basic machine hardware */
 
-	/* external clock should be 12MHz probably, CPU internal divider and precise cycle timings */
-	/* are unknown though. 3MHz is too low, sprites flicker in the pseudo-3D levels */
-	MCFG_CPU_ADD("maincpu", KONAMI, 6000000)		/* ? */
+	MCFG_CPU_ADD("maincpu", KONAMI,XTAL_24MHz/8)		/* 052001 (verified on pcb) */
 	MCFG_CPU_PROGRAM_MAP(aliens_map)
-	MCFG_CPU_VBLANK_INT("screen", aliens_interrupt)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", aliens_scanline, "screen", 0, 1)
 
-	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz) 	/* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(aliens_sound_map)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START(aliens)
 	MCFG_MACHINE_RESET(aliens)
@@ -281,7 +276,7 @@ static MACHINE_CONFIG_START( aliens, aliens_state )
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(59.17)				/* verified on pcb */
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(14*8, (64-14)*8-1, 2*8, 30*8-1 )
@@ -297,12 +292,12 @@ static MACHINE_CONFIG_START( aliens, aliens_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_3_579545MHz)	/* verified on pcb */
 	MCFG_SOUND_CONFIG(ym2151_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MCFG_SOUND_ADD("k007232", K007232, 3579545)
+	MCFG_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)	/* verified on pcb */
 	MCFG_SOUND_CONFIG(k007232_config)
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
@@ -553,7 +548,7 @@ static KONAMI_SETLINES_CALLBACK( aliens_banking )
 		bank -= 4;
 
 	bank += (lines & 0x0f);
-	memory_set_bank(device->machine(), "bank1", bank);
+	device->machine().root_device().membank("bank1")->set_entry(bank);
 }
 
 GAME( 1990, aliens,   0,      aliens, aliens, 0, ROT0, "Konami", "Aliens (World set 1)", GAME_SUPPORTS_SAVE )

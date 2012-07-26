@@ -333,7 +333,6 @@ Notes:
    just made a copy & renamed them for now to avoid any conflicts
 */
 
-#define ADDRESS_MAP_MODERN
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/ym2151.h"
@@ -434,7 +433,7 @@ WRITE16_MEMBER( segas24_state::fdc_w )
 				break;
 			case 0x9:
 				logerror("Read multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track);
-				fdc_pt = machine().region("floppy")->base() + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
+				fdc_pt = memregion("floppy")->base() + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
 				fdc_span = track_size;
 				fdc_status = 3;
 				fdc_drq = 1;
@@ -442,7 +441,7 @@ WRITE16_MEMBER( segas24_state::fdc_w )
 				break;
 			case 0xb:
 				logerror("Write multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track);
-				fdc_pt = machine().region("floppy")->base() + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
+				fdc_pt = memregion("floppy")->base() + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
 				fdc_span = track_size;
 				fdc_status = 3;
 				fdc_drq = 1;
@@ -516,19 +515,19 @@ UINT8 segas24_state::hotrod_io_r(UINT8 port)
 	switch(port)
 	{
 	case 0:
-		return input_port_read(machine(), "P1");
+		return ioport("P1")->read();
 	case 1:
-		return input_port_read(machine(), "P2");
+		return ioport("P2")->read();
 	case 2:
-		return input_port_read_safe(machine(), "P3", 0xff);
+		return ioport("P3")->read_safe(0xff);
 	case 3:
 		return 0xff;
 	case 4:
-		return input_port_read(machine(), "SERVICE");
+		return ioport("SERVICE")->read();
 	case 5: // Dip switches
-		return input_port_read(machine(), "COINAGE");
+		return ioport("COINAGE")->read();
 	case 6:
-		return input_port_read(machine(), "DSW");
+		return ioport("DSW")->read();
 	case 7: // DAC
 		return 0xff;
 	}
@@ -542,20 +541,20 @@ UINT8 segas24_state::dcclub_io_r(UINT8 port)
 	case 0:
 	{
 		static const UINT8 pos[16] = { 0, 1, 3, 2, 6, 4, 12, 8, 9 };
-		return (input_port_read(machine(), "P1") & 0xf) | ((~pos[input_port_read(machine(), "PADDLE")>>4]<<4) & 0xf0);
+		return (ioport("P1")->read() & 0xf) | ((~pos[ioport("PADDLE")->read()>>4]<<4) & 0xf0);
 	}
 	case 1:
-		return input_port_read(machine(), "P2");
+		return ioport("P2")->read();
 	case 2:
 		return 0xff;
 	case 3:
 		return 0xff;
 	case 4:
-		return input_port_read(machine(), "SERVICE");
+		return ioport("SERVICE")->read();
 	case 5: // Dip switches
-		return input_port_read(machine(), "COINAGE");
+		return ioport("COINAGE")->read();
 	case 6:
-		return input_port_read(machine(), "DSW");
+		return ioport("DSW")->read();
 	case 7: // DAC
 		return 0xff;
 	}
@@ -574,15 +573,15 @@ UINT8 segas24_state::mahmajn_io_r(UINT8 port)
 	case 1:
 		return 0xff;
 	case 2:
-		return input_port_read(machine(), keynames[cur_input_line]);
+		return ioport(keynames[cur_input_line])->read();
 	case 3:
 		return 0xff;
 	case 4:
-		return input_port_read(machine(), "SERVICE");
+		return ioport("SERVICE")->read();
 	case 5: // Dip switches
-		return input_port_read(machine(), "COINAGE");
+		return ioport("COINAGE")->read();
 	case 6:
-		return input_port_read(machine(), "DSW");
+		return ioport("DSW")->read();
 	case 7: // DAC
 		return 0xff;
 	}
@@ -627,7 +626,7 @@ WRITE16_MEMBER( segas24_state::hotrod3_ctrl_w )
 	if(ACCESSING_BITS_0_7)
 	{
 		data &= 3;
-		hotrod_ctrl_cur = input_port_read_safe(machine(), portnames[data], 0);
+		hotrod_ctrl_cur = ioport(portnames[data])->read_safe(0);
 	}
 }
 
@@ -639,21 +638,21 @@ READ16_MEMBER( segas24_state::hotrod3_ctrl_r )
 		{
 			// Steering dials
 			case 0:
-				return input_port_read_safe(machine(), "DIAL1", 0) & 0xff;
+				return ioport("DIAL1")->read_safe(0) & 0xff;
 			case 1:
-				return input_port_read_safe(machine(), "DIAL1", 0) >> 8;
+				return ioport("DIAL1")->read_safe(0) >> 8;
 			case 2:
-				return input_port_read_safe(machine(), "DIAL2", 0) & 0xff;
+				return ioport("DIAL2")->read_safe(0) & 0xff;
 			case 3:
-				return input_port_read_safe(machine(), "DIAL2", 0) >> 8;
+				return ioport("DIAL2")->read_safe(0) >> 8;
 			case 4:
-				return input_port_read_safe(machine(), "DIAL3", 0) & 0xff;
+				return ioport("DIAL3")->read_safe(0) & 0xff;
 			case 5:
-				return input_port_read_safe(machine(), "DIAL3", 0) >> 8;
+				return ioport("DIAL3")->read_safe(0) >> 8;
 			case 6:
-				return input_port_read_safe(machine(), "DIAL4", 0) & 0xff;
+				return ioport("DIAL4")->read_safe(0) & 0xff;
 			case 7:
-				return input_port_read_safe(machine(), "DIAL4", 0) >> 8;
+				return ioport("DIAL4")->read_safe(0) >> 8;
 
 			case 8:
 			{
@@ -713,10 +712,10 @@ void segas24_state::reset_control_w(UINT8 data)
 
 void segas24_state::reset_bank()
 {
-	if (machine().region("romboard")->base())
+	if (machine().root_device().memregion("romboard")->base())
 	{
-		memory_set_bank(machine(), "bank1", curbank & 15);
-		memory_set_bank(machine(), "bank2", curbank & 15);
+		membank("bank1")->set_entry(curbank & 15);
+		membank("bank2")->set_entry(curbank & 15);
 	}
 }
 
@@ -1088,14 +1087,14 @@ WRITE16_MEMBER( segas24_state::sys16_io_w )
 
 READ16_MEMBER( segas24_state::sys16_paletteram_r )
 {
-	return machine().generic.paletteram.u16[offset];
+	return m_generic_paletteram_16[offset];
 }
 
 WRITE16_MEMBER( segas24_state::sys16_paletteram_w )
 {
 	int r, g, b;
-	COMBINE_DATA (machine().generic.paletteram.u16 + offset);
-	data = machine().generic.paletteram.u16[offset];
+	COMBINE_DATA (m_generic_paletteram_16 + offset);
+	data = m_generic_paletteram_16[offset];
 
 	r = (data & 0x00f) << 4;
 	if(data & 0x1000)
@@ -1187,7 +1186,7 @@ static ADDRESS_MAP_START( system24_cpu1_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Frame trigger position (XVOUT) */
 	AM_RANGE(0x270000, 0x270001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Synchronization mode */
 	AM_RANGE(0x280000, 0x29ffff) AM_MIRROR(0x160000) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
-	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_READWRITE(sys16_paletteram_r, sys16_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_READWRITE(sys16_paletteram_r, sys16_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_DEVREADWRITE("mixer", segas24_mixer, read, write)
 	AM_RANGE(0x600000, 0x63ffff) AM_MIRROR(0x180000) AM_DEVREADWRITE("sprite", segas24_sprite, read, write)
 	AM_RANGE(0x800000, 0x80007f) AM_MIRROR(0x1ffe00) AM_READWRITE(sys16_io_r, sys16_io_w)
@@ -1228,7 +1227,7 @@ static ADDRESS_MAP_START( system24_cpu2_map, AS_PROGRAM, 16, segas24_state )
 	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Frame trigger position (XVOUT) */
 	AM_RANGE(0x270000, 0x270001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Synchronization mode */
 	AM_RANGE(0x280000, 0x29ffff) AM_MIRROR(0x160000) AM_DEVREADWRITE("tile", segas24_tile, char_r, char_w)
-	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_READWRITE(sys16_paletteram_r, sys16_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_READWRITE(sys16_paletteram_r, sys16_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_DEVREADWRITE("mixer", segas24_mixer, read, write)
 	AM_RANGE(0x600000, 0x63ffff) AM_MIRROR(0x180000) AM_DEVREADWRITE("sprite", segas24_sprite, read, write)
 	AM_RANGE(0x800000, 0x80007f) AM_MIRROR(0x1ffe00) AM_READWRITE(sys16_io_r, sys16_io_w)
@@ -1263,13 +1262,13 @@ static MACHINE_START( system24 )
 {
 	segas24_state *state = machine.driver_data<segas24_state>();
 	if (state->track_size)
-		machine.device<nvram_device>("floppy_nvram")->set_base(machine.region("floppy")->base(), 2*state->track_size);
+		machine.device<nvram_device>("floppy_nvram")->set_base(state->memregion("floppy")->base(), 2*state->track_size);
 
-	UINT8 *usr1 = machine.region("romboard")->base();
+	UINT8 *usr1 = state->memregion("romboard")->base();
 	if (usr1)
 	{
-		memory_configure_bank(machine, "bank1", 0, 16, usr1, 0x40000);
-		memory_configure_bank(machine, "bank2", 0, 16, usr1, 0x40000);
+		state->membank("bank1")->configure_entries(0, 16, usr1, 0x40000);
+		state->membank("bank2")->configure_entries(0, 16, usr1, 0x40000);
 	}
 
 	state->vtile = machine.device<segas24_tile>("tile");
@@ -1772,19 +1771,19 @@ static INPUT_PORTS_START( qrouka )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 
 	PORT_START("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_CONDITION("DSW",0x08,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_CONDITION("DSW",0x08,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_CONDITION("DSW",0x08,EQUALS,0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_CONDITION("DSW",0x08,EQUALS,0x00)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CONDITION("DSW",0x08,PORTCOND_EQUALS,0x00)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CONDITION("DSW",0x08,PORTCOND_EQUALS,0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CONDITION("DSW",0x08,EQUALS,0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CONDITION("DSW",0x08,EQUALS,0x00)
 	/* alt coin mode */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CONDITION("DSW",0x08,PORTCOND_EQUALS,0x08)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CONDITION("DSW",0x08,PORTCOND_EQUALS,0x08)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW",0x08,PORTCOND_EQUALS,0x08)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW",0x08,PORTCOND_EQUALS,0x08)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CONDITION("DSW",0x08,EQUALS,0x08)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CONDITION("DSW",0x08,EQUALS,0x08)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW",0x08,EQUALS,0x08)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW",0x08,EQUALS,0x08)
 
 
 	PORT_INCLUDE( system24_DSW )
@@ -1934,7 +1933,7 @@ INPUT_PORTS_END
 
 static const ym2151_interface ym2151_config =
 {
-	irq_ym
+	DEVCB_LINE(irq_ym)
 };
 
 

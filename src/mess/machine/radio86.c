@@ -27,11 +27,12 @@ void radio86_init_keyboard(running_machine &machine)
 /* Driver initialization */
 DRIVER_INIT(radio86)
 {
+	radio86_state *state = machine.driver_data<radio86_state>();
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = state->memregion("maincpu")->base();
 	memset(RAM,0x0000,0x1000); // make frist page empty by default
-	memory_configure_bank(machine, "bank1", 1, 2, RAM, 0x0000);
-	memory_configure_bank(machine, "bank1", 0, 2, RAM, 0xf800);
+	state->membank("bank1")->configure_entries(1, 2, RAM, 0x0000);
+	state->membank("bank1")->configure_entries(0, 2, RAM, 0xf800);
 	radio86_init_keyboard(machine);
 }
 
@@ -46,14 +47,14 @@ static READ8_DEVICE_HANDLER (radio86_8255_portb_r2 )
 {
 	radio86_state *state = device->machine().driver_data<radio86_state>();
 	UINT8 key = 0xff;
-	if ((state->m_keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine(),"LINE0"); }
-	if ((state->m_keyboard_mask & 0x02)!=0) { key &= input_port_read(device->machine(),"LINE1"); }
-	if ((state->m_keyboard_mask & 0x04)!=0) { key &= input_port_read(device->machine(),"LINE2"); }
-	if ((state->m_keyboard_mask & 0x08)!=0) { key &= input_port_read(device->machine(),"LINE3"); }
-	if ((state->m_keyboard_mask & 0x10)!=0) { key &= input_port_read(device->machine(),"LINE4"); }
-	if ((state->m_keyboard_mask & 0x20)!=0) { key &= input_port_read(device->machine(),"LINE5"); }
-	if ((state->m_keyboard_mask & 0x40)!=0) { key &= input_port_read(device->machine(),"LINE6"); }
-	if ((state->m_keyboard_mask & 0x80)!=0) { key &= input_port_read(device->machine(),"LINE7"); }
+	if ((state->m_keyboard_mask & 0x01)!=0) { key &= state->ioport("LINE0")->read(); }
+	if ((state->m_keyboard_mask & 0x02)!=0) { key &= device->machine().root_device().ioport("LINE1")->read(); }
+	if ((state->m_keyboard_mask & 0x04)!=0) { key &= device->machine().root_device().ioport("LINE2")->read(); }
+	if ((state->m_keyboard_mask & 0x08)!=0) { key &= device->machine().root_device().ioport("LINE3")->read(); }
+	if ((state->m_keyboard_mask & 0x10)!=0) { key &= device->machine().root_device().ioport("LINE4")->read(); }
+	if ((state->m_keyboard_mask & 0x20)!=0) { key &= device->machine().root_device().ioport("LINE5")->read(); }
+	if ((state->m_keyboard_mask & 0x40)!=0) { key &= device->machine().root_device().ioport("LINE6")->read(); }
+	if ((state->m_keyboard_mask & 0x80)!=0) { key &= device->machine().root_device().ioport("LINE7")->read(); }
 	return key;
 }
 
@@ -61,7 +62,7 @@ static READ8_DEVICE_HANDLER (radio86_8255_portc_r2 )
 {
 	radio86_state *state = device->machine().driver_data<radio86_state>();
 	double level = (device->machine().device<cassette_image_device>(CASSETTE_TAG)->input());
-	UINT8 dat = input_port_read(device->machine(), "LINE8");
+	UINT8 dat = state->ioport("LINE8")->read();
 	if (level <  0) {
 		dat ^= state->m_tape_value;
 	}
@@ -107,14 +108,14 @@ static READ8_DEVICE_HANDLER (rk7007_8255_portc_r )
 	radio86_state *state = device->machine().driver_data<radio86_state>();
 	double level = (device->machine().device<cassette_image_device>(CASSETTE_TAG)->input());
 	UINT8 key = 0xff;
-	if ((state->m_keyboard_mask & 0x01)!=0) { key &= input_port_read(device->machine(),"CLINE0"); }
-	if ((state->m_keyboard_mask & 0x02)!=0) { key &= input_port_read(device->machine(),"CLINE1"); }
-	if ((state->m_keyboard_mask & 0x04)!=0) { key &= input_port_read(device->machine(),"CLINE2"); }
-	if ((state->m_keyboard_mask & 0x08)!=0) { key &= input_port_read(device->machine(),"CLINE3"); }
-	if ((state->m_keyboard_mask & 0x10)!=0) { key &= input_port_read(device->machine(),"CLINE4"); }
-	if ((state->m_keyboard_mask & 0x20)!=0) { key &= input_port_read(device->machine(),"CLINE5"); }
-	if ((state->m_keyboard_mask & 0x40)!=0) { key &= input_port_read(device->machine(),"CLINE6"); }
-	if ((state->m_keyboard_mask & 0x80)!=0) { key &= input_port_read(device->machine(),"CLINE7"); }
+	if ((state->m_keyboard_mask & 0x01)!=0) { key &= state->ioport("CLINE0")->read(); }
+	if ((state->m_keyboard_mask & 0x02)!=0) { key &= device->machine().root_device().ioport("CLINE1")->read(); }
+	if ((state->m_keyboard_mask & 0x04)!=0) { key &= device->machine().root_device().ioport("CLINE2")->read(); }
+	if ((state->m_keyboard_mask & 0x08)!=0) { key &= device->machine().root_device().ioport("CLINE3")->read(); }
+	if ((state->m_keyboard_mask & 0x10)!=0) { key &= device->machine().root_device().ioport("CLINE4")->read(); }
+	if ((state->m_keyboard_mask & 0x20)!=0) { key &= device->machine().root_device().ioport("CLINE5")->read(); }
+	if ((state->m_keyboard_mask & 0x40)!=0) { key &= device->machine().root_device().ioport("CLINE6")->read(); }
+	if ((state->m_keyboard_mask & 0x80)!=0) { key &= device->machine().root_device().ioport("CLINE7")->read(); }
 	key &= 0xe0;
 	if (level <  0) {
 		key ^= state->m_tape_value;
@@ -157,46 +158,46 @@ I8257_INTERFACE( radio86_dma )
 
 static TIMER_CALLBACK( radio86_reset )
 {
-	memory_set_bank(machine, "bank1", 0);
+	radio86_state *state = machine.driver_data<radio86_state>();
+	state->membank("bank1")->set_entry(0);
 }
 
 
-READ8_HANDLER (radio_cpu_state_r )
+READ8_MEMBER(radio86_state::radio_cpu_state_r)
 {
-	return cpu_get_reg(&space->device(), I8085_STATUS);
+	return cpu_get_reg(&space.device(), I8085_STATUS);
 }
 
-READ8_HANDLER (radio_io_r )
+READ8_MEMBER(radio86_state::radio_io_r)
 {
-	return space->machine().device("maincpu")->memory().space(AS_PROGRAM)->read_byte((offset << 8) + offset);
+	return machine().device("maincpu")->memory().space(AS_PROGRAM)->read_byte((offset << 8) + offset);
 }
 
-WRITE8_HANDLER(radio_io_w )
+WRITE8_MEMBER(radio86_state::radio_io_w)
 {
-	space->machine().device("maincpu")->memory().space(AS_PROGRAM)->write_byte((offset << 8) + offset,data);
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->write_byte((offset << 8) + offset,data);
 }
 
 MACHINE_RESET( radio86 )
 {
 	radio86_state *state = machine.driver_data<radio86_state>();
 	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(radio86_reset));
-	memory_set_bank(machine, "bank1", 1);
+	state->membank("bank1")->set_entry(1);
 
 	state->m_keyboard_mask = 0;
 	state->m_disk_sel = 0;
 }
 
 
-WRITE8_HANDLER ( radio86_pagesel )
+WRITE8_MEMBER(radio86_state::radio86_pagesel)
 {
-	radio86_state *state = space->machine().driver_data<radio86_state>();
-	state->m_disk_sel = data;
+	m_disk_sel = data;
 }
 
 static READ8_DEVICE_HANDLER (radio86_romdisk_porta_r )
 {
 	radio86_state *state = device->machine().driver_data<radio86_state>();
-	UINT8 *romdisk = device->machine().region("maincpu")->base() + 0x10000;
+	UINT8 *romdisk = state->memregion("maincpu")->base() + 0x10000;
 	if ((state->m_disk_sel & 0x0f) ==0) {
 		return romdisk[state->m_romdisk_msb*256+state->m_romdisk_lsb];
 	} else {

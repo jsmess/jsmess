@@ -57,37 +57,34 @@ Stephh's notes (based on the games M6809 code and some tests) :
  *
  *************************************/
 
-static READ8_HANDLER( mikie_sh_timer_r )
+READ8_MEMBER(mikie_state::mikie_sh_timer_r)
 {
-	mikie_state *state = space->machine().driver_data<mikie_state>();
-	int clock = state->m_audiocpu->total_cycles() / MIKIE_TIMER_RATE;
+	int clock = m_audiocpu->total_cycles() / MIKIE_TIMER_RATE;
 
 	return clock;
 }
 
-static WRITE8_HANDLER( mikie_sh_irqtrigger_w )
+WRITE8_MEMBER(mikie_state::mikie_sh_irqtrigger_w)
 {
-	mikie_state *state = space->machine().driver_data<mikie_state>();
 
-	if (state->m_last_irq == 0 && data == 1)
+	if (m_last_irq == 0 && data == 1)
 	{
 		// setting bit 0 low then high triggers IRQ on the sound CPU
-		device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+		device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 	}
 
-	state->m_last_irq = data;
+	m_last_irq = data;
 }
 
-static WRITE8_HANDLER( mikie_coin_counter_w )
+WRITE8_MEMBER(mikie_state::mikie_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset, data);
+	coin_counter_w(machine(), offset, data);
 }
 
-static WRITE8_HANDLER( irq_mask_w )
+WRITE8_MEMBER(mikie_state::irq_mask_w)
 {
-	mikie_state *state = space->machine().driver_data<mikie_state>();
 
-	state->m_irq_mask = data & 1;
+	m_irq_mask = data & 1;
 }
 
 /*************************************
@@ -96,7 +93,7 @@ static WRITE8_HANDLER( irq_mask_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( mikie_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mikie_map, AS_PROGRAM, 8, mikie_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_WRITE(mikie_coin_counter_w)
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(mikie_sh_irqtrigger_w)
@@ -105,28 +102,28 @@ static ADDRESS_MAP_START( mikie_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2100, 0x2100) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x2200, 0x2200) AM_WRITE(mikie_palettebank_w)
 	AM_RANGE(0x2300, 0x2300) AM_WRITENOP	// ???
-	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("SYSTEM") AM_WRITE(soundlatch_w)
+	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("SYSTEM") AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x2401, 0x2401) AM_READ_PORT("P1")
 	AM_RANGE(0x2402, 0x2402) AM_READ_PORT("P2")
 	AM_RANGE(0x2403, 0x2403) AM_READ_PORT("DSW3")
 	AM_RANGE(0x2500, 0x2500) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2501, 0x2501) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2800, 0x288f) AM_RAM AM_BASE_SIZE_MEMBER(mikie_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x2800, 0x288f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2890, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(mikie_colorram_w) AM_BASE_MEMBER(mikie_state, m_colorram)
-	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(mikie_videoram_w) AM_BASE_MEMBER(mikie_state, m_videoram)
+	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(mikie_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x3c00, 0x3fff) AM_RAM_WRITE(mikie_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x5fff) AM_ROM	// Machine checks for extra rom
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, mikie_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_WRITENOP	// sound command latch
 	AM_RANGE(0x8001, 0x8001) AM_WRITENOP	// ???
-	AM_RANGE(0x8002, 0x8002) AM_DEVWRITE("sn1", sn76496_w)	// trigger read of latch
-	AM_RANGE(0x8003, 0x8003) AM_READ(soundlatch_r)
-	AM_RANGE(0x8004, 0x8004) AM_DEVWRITE("sn2", sn76496_w)	// trigger read of latch
+	AM_RANGE(0x8002, 0x8002) AM_DEVWRITE_LEGACY("sn1", sn76496_w)	// trigger read of latch
+	AM_RANGE(0x8003, 0x8003) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x8004, 0x8004) AM_DEVWRITE_LEGACY("sn2", sn76496_w)	// trigger read of latch
 	AM_RANGE(0x8005, 0x8005) AM_READ(mikie_sh_timer_r)
 	AM_RANGE(0x8079, 0x8079) AM_WRITENOP	// ???
 	AM_RANGE(0xa003, 0xa003) AM_WRITENOP	// ???

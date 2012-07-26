@@ -12,7 +12,6 @@
 #ifndef __KINGSOFT__
 #define __KINGSOFT__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"
@@ -26,7 +25,7 @@
 // ======================> c64_kingsoft_cartridge_device
 
 class c64_kingsoft_cartridge_device : public device_t,
-									 public device_c64_expansion_card_interface
+									  public device_c64_expansion_card_interface
 {
 public:
 	// construction/destruction
@@ -34,13 +33,13 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete() { m_shortname = "c64_kingsoft"; }
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "c64_kingsoft"; }
 
 	// device_c64_expansion_card_interface overrides
-	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2);
-	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2);
+	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2);
+	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2);
 	virtual int c64_game_r(offs_t offset, int ba, int rw, int hiram);
 };
 

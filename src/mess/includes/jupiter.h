@@ -16,7 +16,7 @@ class jupiter2_state : public driver_device
 public:
 	jupiter2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, MCM6571AP_TAG)
+	m_maincpu(*this, MCM6571AP_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -29,7 +29,9 @@ class jupiter3_state : public driver_device
 public:
 	jupiter3_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, Z80_TAG)
+	m_maincpu(*this, Z80_TAG),
+	m_p_videoram(*this, "p_videoram"),
+	m_p_ram(*this, "p_ram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -40,9 +42,9 @@ public:
 	DECLARE_READ8_MEMBER(ff_r);
 	UINT8 m_term_data;
 
-	UINT8 *m_p_ram;
+	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<UINT8> m_p_ram;
 	const UINT8 *m_p_chargen;
-	UINT8 *m_p_videoram;
 
 	virtual void machine_reset();
 	virtual void video_start();

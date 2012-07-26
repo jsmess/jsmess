@@ -20,6 +20,7 @@
 
 PALETTE_INIT( gridlee )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -80,10 +81,9 @@ VIDEO_START( gridlee )
  *
  *************************************/
 
-WRITE8_HANDLER( gridlee_cocktail_flip_w )
+WRITE8_MEMBER(gridlee_state::gridlee_cocktail_flip_w)
 {
-	gridlee_state *state = space->machine().driver_data<gridlee_state>();
-	state->m_cocktail_flip = data & 1;
+	m_cocktail_flip = data & 1;
 }
 
 
@@ -94,15 +94,14 @@ WRITE8_HANDLER( gridlee_cocktail_flip_w )
  *
  *************************************/
 
-WRITE8_HANDLER( gridlee_videoram_w )
+WRITE8_MEMBER(gridlee_state::gridlee_videoram_w)
 {
-	gridlee_state *state = space->machine().driver_data<gridlee_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
 
 	/* expand the two pixel values into two bytes */
-	state->m_local_videoram[offset * 2 + 0] = data >> 4;
-	state->m_local_videoram[offset * 2 + 1] = data & 15;
+	m_local_videoram[offset * 2 + 0] = data >> 4;
+	m_local_videoram[offset * 2 + 1] = data & 15;
 }
 
 
@@ -113,12 +112,11 @@ WRITE8_HANDLER( gridlee_videoram_w )
  *
  *************************************/
 
-WRITE8_HANDLER( gridlee_palette_select_w )
+WRITE8_MEMBER(gridlee_state::gridlee_palette_select_w)
 {
-	gridlee_state *state = space->machine().driver_data<gridlee_state>();
 	/* update the scanline palette */
-	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos() - 1 + GRIDLEE_VBEND);
-	state->m_palettebank_vis = data & 0x3f;
+	machine().primary_screen->update_partial(machine().primary_screen->vpos() - 1 + GRIDLEE_VBEND);
+	m_palettebank_vis = data & 0x3f;
 }
 
 
@@ -160,7 +158,7 @@ SCREEN_UPDATE_IND16( gridlee )
 	}
 
 	/* draw the sprite images */
-	gfx = screen.machine().region("gfx1")->base();
+	gfx = screen.machine().root_device().memregion("gfx1")->base();
 	for (i = 0; i < 32; i++)
 	{
 		UINT8 *sprite = state->m_spriteram + i * 4;

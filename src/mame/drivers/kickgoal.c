@@ -446,32 +446,30 @@ static const UINT16 kickgoal_default_eeprom_type1[64] = {
 
 
 
-static READ16_HANDLER( kickgoal_eeprom_r )
+READ16_MEMBER(kickgoal_state::kickgoal_eeprom_r)
 {
-	kickgoal_state *state = space->machine().driver_data<kickgoal_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		return state->m_eeprom->read_bit();
+		return m_eeprom->read_bit();
 	}
 	return 0;
 }
 
 
-static WRITE16_HANDLER( kickgoal_eeprom_w )
+WRITE16_MEMBER(kickgoal_state::kickgoal_eeprom_w)
 {
-	kickgoal_state *state = space->machine().driver_data<kickgoal_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		switch (offset)
 		{
 			case 0:
-				state->m_eeprom->set_cs_line((data & 0x0001) ? CLEAR_LINE : ASSERT_LINE);
+				m_eeprom->set_cs_line((data & 0x0001) ? CLEAR_LINE : ASSERT_LINE);
 				break;
 			case 1:
-				state->m_eeprom->set_clock_line((data & 0x0001) ? ASSERT_LINE : CLEAR_LINE);
+				m_eeprom->set_clock_line((data & 0x0001) ? ASSERT_LINE : CLEAR_LINE);
 				break;
 			case 2:
-				state->m_eeprom->write_bit(data & 0x0001);
+				m_eeprom->write_bit(data & 0x0001);
 				break;
 		}
 	}
@@ -480,22 +478,22 @@ static WRITE16_HANDLER( kickgoal_eeprom_w )
 
 /* Memory Maps *****************************************************************/
 
-static ADDRESS_MAP_START( kickgoal_program_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( kickgoal_program_map, AS_PROGRAM, 16, kickgoal_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-/// AM_RANGE(0x30001e, 0x30001f) AM_DEVWRITE("oki", kickgoal_snd_w)
+/// AM_RANGE(0x30001e, 0x30001f) AM_DEVWRITE_LEGACY("oki", kickgoal_snd_w)
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("SYSTEM")
 /// AM_RANGE(0x800004, 0x800005) AM_WRITE(soundlatch_word_w)
-	AM_RANGE(0x800004, 0x800005) AM_DEVWRITE("oki", actionhw_snd_w)
+	AM_RANGE(0x800004, 0x800005) AM_DEVWRITE_LEGACY("oki", actionhw_snd_w)
 	AM_RANGE(0x900000, 0x900005) AM_WRITE(kickgoal_eeprom_w)
 	AM_RANGE(0x900006, 0x900007) AM_READ(kickgoal_eeprom_r)
-	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(kickgoal_fgram_w) AM_BASE_MEMBER(kickgoal_state, m_fgram) /* FG Layer */
-	AM_RANGE(0xa04000, 0xa07fff) AM_RAM_WRITE(kickgoal_bgram_w) AM_BASE_MEMBER(kickgoal_state, m_bgram) /* Higher BG Layer */
-	AM_RANGE(0xa08000, 0xa0bfff) AM_RAM_WRITE(kickgoal_bg2ram_w) AM_BASE_MEMBER(kickgoal_state, m_bg2ram) /* Lower BG Layer */
+	AM_RANGE(0xa00000, 0xa03fff) AM_RAM_WRITE(kickgoal_fgram_w) AM_SHARE("fgram") /* FG Layer */
+	AM_RANGE(0xa04000, 0xa07fff) AM_RAM_WRITE(kickgoal_bgram_w) AM_SHARE("bgram") /* Higher BG Layer */
+	AM_RANGE(0xa08000, 0xa0bfff) AM_RAM_WRITE(kickgoal_bg2ram_w) AM_SHARE("bg2ram") /* Lower BG Layer */
 	AM_RANGE(0xa0c000, 0xa0ffff) AM_RAM // more tilemap?
-	AM_RANGE(0xa10000, 0xa1000f) AM_WRITEONLY AM_BASE_MEMBER(kickgoal_state, m_scrram) /* Scroll Registers */
-	AM_RANGE(0xb00000, 0xb007ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(kickgoal_state, m_spriteram, m_spriteram_size) /* Sprites */
-	AM_RANGE(0xc00000, 0xc007ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram) /* Palette */ // actionhw reads this
+	AM_RANGE(0xa10000, 0xa1000f) AM_WRITEONLY AM_SHARE("scrram") /* Scroll Registers */
+	AM_RANGE(0xb00000, 0xb007ff) AM_WRITEONLY AM_SHARE("spriteram") /* Sprites */
+	AM_RANGE(0xc00000, 0xc007ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram") /* Palette */ // actionhw reads this
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -504,11 +502,11 @@ ADDRESS_MAP_END
 	/* $000 - 7FF  PIC16C57 Internal Program ROM. Note: code is 12bits wide */
 	/* $000 - 07F  PIC16C57 Internal Data RAM */
 
-static ADDRESS_MAP_START( kickgoal_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( kickgoal_sound_io_map, AS_IO, 8, kickgoal_state )
 	/* Unknown without the PIC dump */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( actionhw_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( actionhw_io_map, AS_IO, 8, kickgoal_state )
 	/* Unknown without the PIC dump */
 ADDRESS_MAP_END
 
@@ -812,7 +810,7 @@ ROM_END
 static DRIVER_INIT( kickgoal )
 {
 #if 0 /* we should find a real fix instead  */
-	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 
 	/* fix "bug" that prevents game from writing to EEPROM */
 	rom[0x12b0/2] = 0x0001;

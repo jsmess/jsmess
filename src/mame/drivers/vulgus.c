@@ -50,31 +50,31 @@ static INTERRUPT_GEN( vulgus_vblank_irq )
 	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vulgus_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xc802, 0xc803) AM_RAM AM_BASE_MEMBER(vulgus_state, m_scroll_low)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xc802, 0xc803) AM_RAM AM_SHARE("scroll_low")
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(vulgus_c804_w)
 	AM_RANGE(0xc805, 0xc805) AM_WRITE(vulgus_palette_bank_w)
-	AM_RANGE(0xc902, 0xc903) AM_RAM AM_BASE_MEMBER(vulgus_state, m_scroll_high)
-	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_BASE_SIZE_MEMBER(vulgus_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(vulgus_fgvideoram_w) AM_BASE_MEMBER(vulgus_state, m_fgvideoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(vulgus_bgvideoram_w) AM_BASE_MEMBER(vulgus_state, m_bgvideoram)
+	AM_RANGE(0xc902, 0xc903) AM_RAM AM_SHARE("scroll_high")
+	AM_RANGE(0xcc00, 0xcc7f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(vulgus_fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(vulgus_bgvideoram_w) AM_SHARE("bgvideoram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vulgus_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4000, 0x47ff) AM_WRITEONLY
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 

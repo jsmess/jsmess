@@ -8,7 +8,6 @@
 
 ***************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
@@ -88,14 +87,14 @@ READ8_MEMBER( mc10_state::mc10_bfff_r )
 {
 	UINT8 result = 0xff;
 
-	if (!BIT(m_keyboard_strobe, 0)) result &= input_port_read(machine(), "pb0");
-	if (!BIT(m_keyboard_strobe, 1)) result &= input_port_read(machine(), "pb1");
-	if (!BIT(m_keyboard_strobe, 2)) result &= input_port_read(machine(), "pb2");
-	if (!BIT(m_keyboard_strobe, 3)) result &= input_port_read(machine(), "pb3");
-	if (!BIT(m_keyboard_strobe, 4)) result &= input_port_read(machine(), "pb4");
-	if (!BIT(m_keyboard_strobe, 5)) result &= input_port_read(machine(), "pb5");
-	if (!BIT(m_keyboard_strobe, 6)) result &= input_port_read(machine(), "pb6");
-	if (!BIT(m_keyboard_strobe, 7)) result &= input_port_read(machine(), "pb7");
+	if (!BIT(m_keyboard_strobe, 0)) result &= ioport("pb0")->read();
+	if (!BIT(m_keyboard_strobe, 1)) result &= ioport("pb1")->read();
+	if (!BIT(m_keyboard_strobe, 2)) result &= ioport("pb2")->read();
+	if (!BIT(m_keyboard_strobe, 3)) result &= ioport("pb3")->read();
+	if (!BIT(m_keyboard_strobe, 4)) result &= ioport("pb4")->read();
+	if (!BIT(m_keyboard_strobe, 5)) result &= ioport("pb5")->read();
+	if (!BIT(m_keyboard_strobe, 6)) result &= ioport("pb6")->read();
+	if (!BIT(m_keyboard_strobe, 7)) result &= ioport("pb7")->read();
 
 	return result;
 }
@@ -104,21 +103,21 @@ READ8_MEMBER( mc10_state::alice90_bfff_r )
 {
 	UINT8 result = 0xff;
 
-	if (!BIT(m_keyboard_strobe, 7)) result &= input_port_read(machine(), "pb7");
+	if (!BIT(m_keyboard_strobe, 7)) result &= ioport("pb7")->read();
 	else
-	if (!BIT(m_keyboard_strobe, 6)) result &= input_port_read(machine(), "pb6");
+	if (!BIT(m_keyboard_strobe, 6)) result &= ioport("pb6")->read();
 	else
-	if (!BIT(m_keyboard_strobe, 5)) result &= input_port_read(machine(), "pb5");
+	if (!BIT(m_keyboard_strobe, 5)) result &= ioport("pb5")->read();
 	else
-	if (!BIT(m_keyboard_strobe, 4)) result &= input_port_read(machine(), "pb4");
+	if (!BIT(m_keyboard_strobe, 4)) result &= ioport("pb4")->read();
 	else
-	if (!BIT(m_keyboard_strobe, 3)) result &= input_port_read(machine(), "pb3");
+	if (!BIT(m_keyboard_strobe, 3)) result &= ioport("pb3")->read();
 	else
-	if (!BIT(m_keyboard_strobe, 2)) result &= input_port_read(machine(), "pb2");
+	if (!BIT(m_keyboard_strobe, 2)) result &= ioport("pb2")->read();
 	else
-	if (!BIT(m_keyboard_strobe, 1)) result &= input_port_read(machine(), "pb1");
+	if (!BIT(m_keyboard_strobe, 1)) result &= ioport("pb1")->read();
 	else
-	if (!BIT(m_keyboard_strobe, 0)) result &= input_port_read(machine(), "pb0");
+	if (!BIT(m_keyboard_strobe, 0)) result &= ioport("pb0")->read();
 
 	return result;
 }
@@ -165,9 +164,9 @@ READ8_MEMBER( mc10_state::mc10_port2_r )
 	UINT8 result = 0xeb;
 
 	/* bit 1, keyboard line pa6 */
-	if (!BIT(m_keyboard_strobe, 0)) result &= input_port_read(machine(), "pb0") >> 5;
-	if (!BIT(m_keyboard_strobe, 2)) result &= input_port_read(machine(), "pb2") >> 5;
-	if (!BIT(m_keyboard_strobe, 7)) result &= input_port_read(machine(), "pb7") >> 5;
+	if (!BIT(m_keyboard_strobe, 0)) result &= ioport("pb0")->read() >> 5;
+	if (!BIT(m_keyboard_strobe, 2)) result &= ioport("pb2")->read() >> 5;
+	if (!BIT(m_keyboard_strobe, 7)) result &= ioport("pb7")->read() >> 5;
 
 	/* bit 2, printer ots input */
 	result |= (m_printer->is_ready() ? 0 : 4);
@@ -248,29 +247,29 @@ static TIMER_DEVICE_CALLBACK( alice32_scanline )
 
 static DRIVER_INIT( mc10 )
 {
-	mc10_state *mc10 = machine.driver_data<mc10_state>();
+	mc10_state *state = machine.driver_data<mc10_state>();
 	address_space *prg = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* initialize keyboard strobe */
-	mc10->m_keyboard_strobe = 0x00;
+	state->m_keyboard_strobe = 0x00;
 
 	/* initialize memory */
-	mc10->m_ram_base = mc10->m_ram->pointer();
-	mc10->m_ram_size = mc10->m_ram->size();
-	mc10->m_pr_state = PRINTER_WAIT;
+	state->m_ram_base = state->m_ram->pointer();
+	state->m_ram_size = state->m_ram->size();
+	state->m_pr_state = PRINTER_WAIT;
 
-	memory_set_bankptr(machine, "bank1", mc10->m_ram_base);
+	state->membank("bank1")->set_base(state->m_ram_base);
 
 	/* initialize memory expansion */
-	if (mc10->m_ram_size == 20*1024)
-		memory_set_bankptr(machine, "bank2", mc10->m_ram_base + 0x1000);
-	else if (mc10->m_ram_size == 24*1024)
-		memory_set_bankptr(machine, "bank2", mc10->m_ram_base + 0x2000);
-	else  if (mc10->m_ram_size != 32*1024)		//ensure that is not alice90
+	if (state->m_ram_size == 20*1024)
+		state->membank("bank2")->set_base(state->m_ram_base + 0x1000);
+	else if (state->m_ram_size == 24*1024)
+		state->membank("bank2")->set_base(state->m_ram_base + 0x2000);
+	else  if (state->m_ram_size != 32*1024)		//ensure that is not alice90
 		prg->nop_readwrite(0x5000, 0x8fff);
 
 	/* register for state saving */
-	state_save_register_global(machine, mc10->m_keyboard_strobe);
+	state_save_register_global(machine, state->m_keyboard_strobe);
 
 	//for alice32 force port4 DDR to 0xff at startup
 	if (!strcmp(machine.system().name, "alice32") || !strcmp(machine.system().name, "alice90"))

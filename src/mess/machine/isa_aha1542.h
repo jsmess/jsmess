@@ -16,7 +16,6 @@
 #ifndef __AHA1542__
 #define __AHA1542__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/isa.h"

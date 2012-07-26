@@ -5,6 +5,7 @@
 
 PALETTE_INIT( fastlane )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int pal;
 
 	/* allocate the colortable */
@@ -133,18 +134,16 @@ VIDEO_START( fastlane )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( fastlane_vram1_w )
+WRITE8_MEMBER(fastlane_state::fastlane_vram1_w)
 {
-	fastlane_state *state = space->machine().driver_data<fastlane_state>();
-	state->m_videoram1[offset] = data;
-	state->m_layer0->mark_tile_dirty(offset & 0x3ff);
+	m_videoram1[offset] = data;
+	m_layer0->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( fastlane_vram2_w )
+WRITE8_MEMBER(fastlane_state::fastlane_vram2_w)
 {
-	fastlane_state *state = space->machine().driver_data<fastlane_state>();
-	state->m_videoram2[offset] = data;
-	state->m_layer1->mark_tile_dirty(offset & 0x3ff);
+	m_videoram2[offset] = data;
+	m_layer1->mark_tile_dirty(offset & 0x3ff);
 }
 
 

@@ -74,7 +74,7 @@ Offset:
 static TILE_GET_INFO( get_tile_info_0 )
 {
 	psikyo_state *state = machine.driver_data<psikyo_state>();
-	UINT16 code = ((UINT16 *)state->m_vram_0)[BYTE_XOR_BE(tile_index)];
+	UINT16 code = ((UINT16 *)state->m_vram_0.target())[BYTE_XOR_BE(tile_index)];
 	SET_TILE_INFO(
 			1,
 			(code & 0x1fff) + 0x2000 * state->m_tilemap_0_bank,
@@ -85,7 +85,7 @@ static TILE_GET_INFO( get_tile_info_0 )
 static TILE_GET_INFO( get_tile_info_1 )
 {
 	psikyo_state *state = machine.driver_data<psikyo_state>();
-	UINT16 code = ((UINT16 *)state->m_vram_1)[BYTE_XOR_BE(tile_index)];
+	UINT16 code = ((UINT16 *)state->m_vram_1.target())[BYTE_XOR_BE(tile_index)];
 	SET_TILE_INFO(
 			1,
 			(code & 0x1fff) + 0x2000 * state->m_tilemap_1_bank,
@@ -94,47 +94,45 @@ static TILE_GET_INFO( get_tile_info_1 )
 }
 
 
-WRITE32_HANDLER( psikyo_vram_0_w )
+WRITE32_MEMBER(psikyo_state::psikyo_vram_0_w)
 {
-	psikyo_state *state = space->machine().driver_data<psikyo_state>();
 
-	COMBINE_DATA(&state->m_vram_0[offset]);
+	COMBINE_DATA(&m_vram_0[offset]);
 	if (ACCESSING_BITS_16_31)
 	{
-		state->m_tilemap_0_size0->mark_tile_dirty(offset * 2);
-		state->m_tilemap_0_size1->mark_tile_dirty(offset * 2);
-		state->m_tilemap_0_size2->mark_tile_dirty(offset * 2);
-		state->m_tilemap_0_size3->mark_tile_dirty(offset * 2);
+		m_tilemap_0_size0->mark_tile_dirty(offset * 2);
+		m_tilemap_0_size1->mark_tile_dirty(offset * 2);
+		m_tilemap_0_size2->mark_tile_dirty(offset * 2);
+		m_tilemap_0_size3->mark_tile_dirty(offset * 2);
 	}
 
 	if (ACCESSING_BITS_0_15)
 	{
-		state->m_tilemap_0_size0->mark_tile_dirty(offset * 2 + 1);
-		state->m_tilemap_0_size1->mark_tile_dirty(offset * 2 + 1);
-		state->m_tilemap_0_size2->mark_tile_dirty(offset * 2 + 1);
-		state->m_tilemap_0_size3->mark_tile_dirty(offset * 2 + 1);
+		m_tilemap_0_size0->mark_tile_dirty(offset * 2 + 1);
+		m_tilemap_0_size1->mark_tile_dirty(offset * 2 + 1);
+		m_tilemap_0_size2->mark_tile_dirty(offset * 2 + 1);
+		m_tilemap_0_size3->mark_tile_dirty(offset * 2 + 1);
 	}
 }
 
-WRITE32_HANDLER( psikyo_vram_1_w )
+WRITE32_MEMBER(psikyo_state::psikyo_vram_1_w)
 {
-	psikyo_state *state = space->machine().driver_data<psikyo_state>();
 
-	COMBINE_DATA(&state->m_vram_1[offset]);
+	COMBINE_DATA(&m_vram_1[offset]);
 	if (ACCESSING_BITS_16_31)
 	{
-		state->m_tilemap_1_size0->mark_tile_dirty(offset * 2);
-		state->m_tilemap_1_size1->mark_tile_dirty(offset * 2);
-		state->m_tilemap_1_size2->mark_tile_dirty(offset * 2);
-		state->m_tilemap_1_size3->mark_tile_dirty(offset * 2);
+		m_tilemap_1_size0->mark_tile_dirty(offset * 2);
+		m_tilemap_1_size1->mark_tile_dirty(offset * 2);
+		m_tilemap_1_size2->mark_tile_dirty(offset * 2);
+		m_tilemap_1_size3->mark_tile_dirty(offset * 2);
 	}
 
 	if (ACCESSING_BITS_0_15)
 	{
-		state->m_tilemap_1_size0->mark_tile_dirty(offset * 2 + 1);
-		state->m_tilemap_1_size1->mark_tile_dirty(offset * 2 + 1);
-		state->m_tilemap_1_size2->mark_tile_dirty(offset * 2 + 1);
-		state->m_tilemap_1_size3->mark_tile_dirty(offset * 2 + 1);
+		m_tilemap_1_size0->mark_tile_dirty(offset * 2 + 1);
+		m_tilemap_1_size1->mark_tile_dirty(offset * 2 + 1);
+		m_tilemap_1_size2->mark_tile_dirty(offset * 2 + 1);
+		m_tilemap_1_size3->mark_tile_dirty(offset * 2 + 1);
 	}
 }
 
@@ -271,8 +269,8 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
 	int offs;
 	UINT16 *spritelist = (UINT16 *)(state->m_spritebuf2 + 0x1800 / 4);
-	UINT8 *TILES = machine.region("spritelut")->base();	// Sprites LUT
-	int TILES_LEN = machine.region("spritelut")->bytes();
+	UINT8 *TILES = machine.root_device().memregion("spritelut")->base();	// Sprites LUT
+	int TILES_LEN = machine.root_device().memregion("spritelut")->bytes();
 
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
@@ -334,7 +332,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		zoomx = 32 - zoomx;
 		zoomy = 32 - zoomy;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			x = width  - x - (nx * zoomx) / 2;
 			y = height - y - (ny * zoomy) / 2;
@@ -390,8 +388,8 @@ static void draw_sprites_bootleg( running_machine &machine, bitmap_ind16 &bitmap
 	static const int pri[] = { 0, 0xfc, 0xff, 0xff };
 	int offs;
 	UINT16 *spritelist = (UINT16 *)(state->m_spritebuf2 + 0x1800 / 4);
-	UINT8 *TILES = machine.region("spritelut")->base();	// Sprites LUT
-	int TILES_LEN = machine.region("spritelut")->bytes();
+	UINT8 *TILES = machine.root_device().memregion("spritelut")->base();	// Sprites LUT
+	int TILES_LEN = machine.root_device().memregion("spritelut")->bytes();
 
 	int width = machine.primary_screen->width();
 	int height = machine.primary_screen->height();
@@ -455,7 +453,7 @@ static void draw_sprites_bootleg( running_machine &machine, bitmap_ind16 &bitmap
 		zoomy = 32 - zoomy;
 
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			x = width  - x - (nx * zoomx) / 2;
 			y = height - y - (ny * zoomy) / 2;
@@ -535,7 +533,7 @@ SCREEN_UPDATE_IND16( psikyo )
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	flip_screen_set(screen.machine(), ~input_port_read(screen.machine(), "DSW") & 0x00010000);		// hardwired to a DSW bit
+	state->flip_screen_set(~screen.machine().root_device().ioport("DSW")->read() & 0x00010000);		// hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 
@@ -631,10 +629,10 @@ SCREEN_UPDATE_IND16( psikyo )
 		{
 			if (layer0_ctrl & 0x0200)
 				/* per-tile rowscroll */
-				x0 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x000/2 + i/16)];
+				x0 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x000/2 + i/16)];
 			else
 				/* per-line rowscroll */
-				x0 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x000/2 + i)];
+				x0 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x000/2 + i)];
 		}
 
 
@@ -648,10 +646,10 @@ SCREEN_UPDATE_IND16( psikyo )
 		{
 			if (layer1_ctrl & 0x0200)
 				/* per-tile rowscroll */
-				x1 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x200/2 + i/16)];
+				x1 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x200/2 + i/16)];
 			else
 				/* per-line rowscroll */
-				x1 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x200/2 + i)];
+				x1 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x200/2 + i)];
 		}
 
 
@@ -709,7 +707,7 @@ SCREEN_UPDATE_IND16( psikyo_bootleg )
 
 	tilemap_t *tmptilemap0, *tmptilemap1;
 
-	flip_screen_set(screen.machine(), ~input_port_read(screen.machine(), "DSW") & 0x00010000);		// hardwired to a DSW bit
+	state->flip_screen_set(~screen.machine().root_device().ioport("DSW")->read() & 0x00010000);		// hardwired to a DSW bit
 
 	/* Layers enable (not quite right) */
 
@@ -805,10 +803,10 @@ SCREEN_UPDATE_IND16( psikyo_bootleg )
 		{
 			if (layer0_ctrl & 0x0200)
 				/* per-tile rowscroll */
-				x0 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x000/2 + i/16)];
+				x0 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x000/2 + i/16)];
 			else
 				/* per-line rowscroll */
-				x0 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x000/2 + i)];
+				x0 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x000/2 + i)];
 		}
 
 
@@ -822,10 +820,10 @@ SCREEN_UPDATE_IND16( psikyo_bootleg )
 		{
 			if (layer1_ctrl & 0x0200)
 				/* per-tile rowscroll */
-				x1 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x200/2 + i/16)];
+				x1 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x200/2 + i/16)];
 			else
 				/* per-line rowscroll */
-				x1 = ((UINT16 *)state->m_vregs)[BYTE_XOR_BE(0x200/2 + i)];
+				x1 = ((UINT16 *)state->m_vregs.target())[BYTE_XOR_BE(0x200/2 + i)];
 		}
 
 

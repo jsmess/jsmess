@@ -36,6 +36,7 @@ public:
 	UINT16 m_potgo_value;
 	int m_cd32_shifter[2];
 	int m_oldstate[2];
+	DECLARE_WRITE32_MEMBER(aga_overlay_w);
 };
 
 
@@ -47,22 +48,22 @@ public:
 
 static void handle_cd32_joystick_cia(ami1200_state *state, UINT8 pra, UINT8 dra);
 
-static WRITE32_HANDLER( aga_overlay_w )
+WRITE32_MEMBER(ami1200_state::aga_overlay_w)
 {
 	if (ACCESSING_BITS_16_23)
 	{
 		data = (data >> 16) & 1;
 
 		/* switch banks as appropriate */
-		memory_set_bank(space->machine(), "bank1", data & 1);
+		membank("bank1")->set_entry(data & 1);
 
 		/* swap the write handlers between ROM and bank 1 based on the bit */
 		if ((data & 1) == 0)
 			/* overlay disabled, map RAM on 0x000000 */
-			space->install_write_bank(0x000000, 0x1fffff, "bank1");
+			space.install_write_bank(0x000000, 0x1fffff, "bank1");
 		else
 			/* overlay enabled, map Amiga system ROM on 0x000000 */
-			space->unmap_write(0x000000, 0x1fffff);
+			space.unmap_write(0x000000, 0x1fffff);
 	}
 }
 
@@ -119,13 +120,13 @@ static WRITE8_DEVICE_HANDLER( ami1200_cia_0_portb_w )
 	logerror("%s:CIA0_portb_w(%02x)\n", device->machine().describe_context(), data);
 }
 
-static ADDRESS_MAP_START( a1200_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( a1200_map, AS_PROGRAM, 32, ami1200_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(ami1200_state, m_chip_ram, m_chip_ram_size)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
 	AM_RANGE(0xbfa000, 0xbfa003) AM_WRITE(aga_overlay_w)
-	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16(amiga_cia_r, amiga_cia_w, 0xffffffff)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_BASE_MEMBER(ami1200_state, m_custom_regs)
-	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE16(amiga_autoconfig_r, amiga_autoconfig_w, 0xffffffff)
+	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE16_LEGACY(amiga_cia_r, amiga_cia_w, 0xffffffff)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE16_LEGACY(amiga_custom_r, amiga_custom_w, 0xffffffff) AM_SHARE("custom_regs")
+	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE16_LEGACY(amiga_autoconfig_r, amiga_autoconfig_w, 0xffffffff)
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)	/* Kickstart */
 ADDRESS_MAP_END
 
@@ -196,11 +197,11 @@ static INPUT_PORTS_START( a1200 )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("JOY0DAT")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(amiga_joystick_convert, "P1JOY")
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ami1200_state,amiga_joystick_convert, "P1JOY")
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("JOY1DAT")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(amiga_joystick_convert, "P2JOY")
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ami1200_state,amiga_joystick_convert, "P2JOY")
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("POTGO")
@@ -246,7 +247,7 @@ INPUT_PORTS_END
 
 static READ8_DEVICE_HANDLER( a1200_cia_0_portA_r )
 {
-	UINT8 ret = input_port_read(device->machine(), "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
+	UINT8 ret = device->machine().root_device().ioport("CIA0PORTA")->read() & 0xc0;	/* Gameport 1 and 0 buttons */
 	ret |= device->machine().device<amiga_fdc>("fdc")->ciaapra_r();
 	return ret;
 }
@@ -399,8 +400,8 @@ static DRIVER_INIT( a1200 )
 	amiga_machine_config(machine, &cd32_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
+	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
+	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
 
 	/* initialize keyboard */
 	amigakbd_init(machine);

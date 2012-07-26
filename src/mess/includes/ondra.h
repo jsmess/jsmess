@@ -16,6 +16,10 @@ public:
 	UINT8 m_video_enable;
 	UINT8 m_bank1_status;
 	UINT8 m_bank2_status;
+	DECLARE_READ8_MEMBER(ondra_keyboard_r);
+	DECLARE_WRITE8_MEMBER(ondra_port_03_w);
+	DECLARE_WRITE8_MEMBER(ondra_port_09_w);
+	DECLARE_WRITE8_MEMBER(ondra_port_0a_w);
 };
 
 
@@ -24,9 +28,6 @@ public:
 extern MACHINE_START( ondra );
 extern MACHINE_RESET( ondra );
 
-extern WRITE8_HANDLER( ondra_port_03_w );
-extern WRITE8_HANDLER( ondra_port_09_w );
-extern WRITE8_HANDLER( ondra_port_0a_w );
 /*----------- defined in video/ondra.c -----------*/
 
 extern VIDEO_START( ondra );

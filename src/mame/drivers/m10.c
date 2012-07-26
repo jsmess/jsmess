@@ -240,9 +240,8 @@ static MACHINE_RESET( m10 )
  *              0x06: SAUCER HIT
  */
 
-static WRITE8_HANDLER( m10_ctrl_w )
+WRITE8_MEMBER(m10_state::m10_ctrl_w)
 {
-	m10_state *state = space->machine().driver_data<m10_state>();
 
 #if DEBUG
 	if (data & 0x40)
@@ -250,13 +249,13 @@ static WRITE8_HANDLER( m10_ctrl_w )
 #endif
 
 	/* I have NO IDEA if this is correct or not */
-	state->m_bottomline = ~data & 0x20;
+	m_bottomline = ~data & 0x20;
 
-	if (input_port_read(space->machine(), "CAB") & 0x01)
-		state->m_flip = ~data & 0x10;
+	if (ioport("CAB")->read() & 0x01)
+		m_flip = ~data & 0x10;
 
-	if (!(input_port_read(space->machine(), "CAB") & 0x02))
-		space->machine().sound().system_mute(data & 0x80);
+	if (!(ioport("CAB")->read() & 0x02))
+		machine().sound().system_mute(data & 0x80);
 
 	/* sound command in lower 4 bytes */
 	switch (data & 0x07)
@@ -266,27 +265,27 @@ static WRITE8_HANDLER( m10_ctrl_w )
 			break;
 		case 0x01:
 			/* MISSILE sound */
-			state->m_samples->start(0, 0);
+			m_samples->start(0, 0);
 			break;
 		case 0x02:
 			/* EXPLOSION sound */
-			state->m_samples->start(1, 1);
+			m_samples->start(1, 1);
 			break;
 		case 0x03:
 			/* INVADER HIT sound */
-			state->m_samples->start(2, 2);
+			m_samples->start(2, 2);
 			break;
 		case 0x04:
 			/* BONUS BASE sound */
-			state->m_samples->start(3, 8);
+			m_samples->start(3, 8);
 			break;
 		case 0x05:
 			/* FLEET MOVE sound */
-			state->m_samples->start(3, 3);
+			m_samples->start(3, 3);
 			break;
 		case 0x06:
 			/* SAUCER HIT SOUND */
-			state->m_samples->start(2, 7);
+			m_samples->start(2, 7);
 			break;
 		default:
 			popmessage("Unknown sound M10: %02x\n", data & 0x07);
@@ -294,9 +293,9 @@ static WRITE8_HANDLER( m10_ctrl_w )
 	}
 	/* UFO SOUND */
 	if (data & 0x08)
-		state->m_samples->stop(4);
+		m_samples->stop(4);
 	else
-		state->m_samples->start(4, 9, true);
+		m_samples->start(4, 9, true);
 
 }
 
@@ -317,22 +316,21 @@ static WRITE8_HANDLER( m10_ctrl_w )
  *              Will be updated only in attract mode
  */
 
-static WRITE8_HANDLER( m11_ctrl_w )
+WRITE8_MEMBER(m10_state::m11_ctrl_w)
 {
-	m10_state *state = space->machine().driver_data<m10_state>();
 
 #if DEBUG
 	if (data & 0x4c)
 		popmessage("M11 ctrl: %02x",data);
 #endif
 
-	state->m_bottomline = ~data & 0x20;
+	m_bottomline = ~data & 0x20;
 
-	if (input_port_read(space->machine(), "CAB") & 0x01)
-		state->m_flip = ~data & 0x10;
+	if (ioport("CAB")->read() & 0x01)
+		m_flip = ~data & 0x10;
 
-	if (!(input_port_read(space->machine(), "CAB") & 0x02))
-		space->machine().sound().system_mute(data & 0x80);
+	if (!(ioport("CAB")->read() & 0x02))
+		machine().sound().system_mute(data & 0x80);
 }
 
 /*
@@ -350,18 +348,17 @@ static WRITE8_HANDLER( m11_ctrl_w )
  *              Will be updated only in attract mode
  */
 
-static WRITE8_HANDLER( m15_ctrl_w )
+WRITE8_MEMBER(m10_state::m15_ctrl_w)
 {
-	m10_state *state = space->machine().driver_data<m10_state>();
 
 #if DEBUG
 	if (data & 0xf0)
 		popmessage("M15 ctrl: %02x",data);
 #endif
-	if (input_port_read(space->machine(), "CAB") & 0x01)
-		state->m_flip = ~data & 0x04;
-	if (!(input_port_read(space->machine(), "CAB") & 0x02))
-		space->machine().sound().system_mute(data & 0x08);
+	if (ioport("CAB")->read() & 0x01)
+		m_flip = ~data & 0x04;
+	if (!(ioport("CAB")->read() & 0x02))
+		machine().sound().system_mute(data & 0x08);
 }
 
 
@@ -378,7 +375,7 @@ static WRITE8_HANDLER( m15_ctrl_w )
  *              Will be updated only in attract mode
  */
 
-static WRITE8_HANDLER( m10_a500_w )
+WRITE8_MEMBER(m10_state::m10_a500_w)
 {
 #if DEBUG
 	if (data & 0xfc)
@@ -386,46 +383,44 @@ static WRITE8_HANDLER( m10_a500_w )
 #endif
 }
 
-static WRITE8_HANDLER( m11_a100_w )
+WRITE8_MEMBER(m10_state::m11_a100_w)
 {
-	m10_state *state = space->machine().driver_data<m10_state>();
-	int raising_bits = data & ~state->m_last;
-	//int falling_bits = ~data & state->m_last;
+	int raising_bits = data & ~m_last;
+	//int falling_bits = ~data & m_last;
 
 	// should a falling bit stop a sample?
 	// This port is written to about 20x per vblank
 #if DEBUG
-	if ((state->m_last & 0xe8) != (data & 0xe8))
+	if ((m_last & 0xe8) != (data & 0xe8))
 		popmessage("A100: %02x\n", data);
 #endif
-	state->m_last = data;
+	m_last = data;
 
 	// audio control!
 	/* MISSILE sound */
 	if (raising_bits & 0x01)
-		state->m_samples->start(0, 0);
+		m_samples->start(0, 0);
 
 	/* EXPLOSION sound */
 	if (raising_bits & 0x02)
-		state->m_samples->start(1, 1);
+		m_samples->start(1, 1);
 
 	/* Rapidly falling parachute */
 	if (raising_bits & 0x04)
-		state->m_samples->start(3, 8);
+		m_samples->start(3, 8);
 
 	/* Background sound ? */
 	if (data & 0x10)
-		state->m_samples->start(4, 9, true);
+		m_samples->start(4, 9, true);
 	else
-		state->m_samples->stop(4);
+		m_samples->stop(4);
 
 }
 
-static WRITE8_HANDLER( m15_a100_w )
+WRITE8_MEMBER(m10_state::m15_a100_w)
 {
-	m10_state *state = space->machine().driver_data<m10_state>();
-	//int raising_bits = data & ~state->m_last;
-	int falling_bits = ~data & state->m_last;
+	//int raising_bits = data & ~m_last;
+	int falling_bits = ~data & m_last;
 
 	// should a falling bit stop a sample?
 	// Bit 4 is used
@@ -441,62 +436,60 @@ static WRITE8_HANDLER( m15_a100_w )
 	// 0x40: dot
 
 #if DEBUG
-	if ((state->m_last & 0x82) != (data & 0x82))
+	if ((m_last & 0x82) != (data & 0x82))
 		popmessage("A100: %02x\n", data);
 #endif
 	/* DOT sound */
 	if (falling_bits & 0x40)
-		state->m_samples->start(0, 0);
+		m_samples->start(0, 0);
 #if 0
 	if (raising_bits & 0x40)
-		state->m_samples->stop(0);
+		m_samples->stop(0);
 #endif
 
 	/* EXPLOSION sound */
 	if (falling_bits & 0x08)
-		state->m_samples->start(1, 1);
+		m_samples->start(1, 1);
 #if 0
 	if (raising_bits & 0x08)
-		state->m_samples->stop(1);
+		m_samples->stop(1);
 #endif
 
 	/* player changes lane */
 	if (falling_bits & 0x10)
-		state->m_samples->start(3, 3);
+		m_samples->start(3, 3);
 #if 0
 	if (raising_bits & 0x10)
-		state->m_samples->stop(3);
+		m_samples->stop(3);
 #endif
 
 	/* computer car changes lane */
 	if (falling_bits & 0x20)
-		state->m_samples->start(4, 4);
+		m_samples->start(4, 4);
 #if 0
 	if (raising_bits & 0x20)
-		state->m_samples->stop(4);
+		m_samples->stop(4);
 #endif
 
-	state->m_last = data;
+	m_last = data;
 }
 
-static READ8_HANDLER( m10_a700_r )
+READ8_MEMBER(m10_state::m10_a700_r)
 {
-	m10_state *state = space->machine().driver_data<m10_state>();
-	//LOG(("rd:%d\n",space->machine().primary_screen->vpos()));
+	//LOG(("rd:%d\n",machine().primary_screen->vpos()));
 	LOG(("clear\n"));
-	ttl74123_clear_w(state->m_ic8j1, 0, 0);
-	ttl74123_clear_w(state->m_ic8j1, 0, 1);
+	ttl74123_clear_w(m_ic8j1, 0, 0);
+	ttl74123_clear_w(m_ic8j1, 0, 1);
 	return 0x00;
 }
 
-static READ8_HANDLER( m11_a700_r )
+READ8_MEMBER(m10_state::m11_a700_r)
 {
-	m10_state *state = space->machine().driver_data<m10_state>();
-	//LOG(("rd:%d\n",space->machine().primary_screen->vpos()));
-	//device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	//LOG(("rd:%d\n",machine().primary_screen->vpos()));
+	//device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 	LOG(("clear\n"));
-	ttl74123_clear_w(state->m_ic8j1, 0, 0);
-	ttl74123_clear_w(state->m_ic8j1, 0, 1);
+	ttl74123_clear_w(m_ic8j1, 0, 0);
+	ttl74123_clear_w(m_ic8j1, 0, 1);
 	return 0x00;
 }
 
@@ -506,11 +499,10 @@ static READ8_HANDLER( m11_a700_r )
  *
  *************************************/
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(m10_state::coin_inserted)
 {
-	m10_state *state = field.machine().driver_data<m10_state>();
 	/* coin insertion causes an NMI */
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -557,12 +549,12 @@ static INTERRUPT_GEN( m15_interrupt )
  *
  *************************************/
 
-static ADDRESS_MAP_START( m10_main, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, m_memory) /* scratch ram */
-	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_BASE_MEMBER(m10_state, m_rom)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE_MEMBER(m10_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE_MEMBER(m10_state, m_colorram) /* foreground colour  */
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(m10_chargen_w) AM_BASE_MEMBER(m10_state, m_chargen) /* background ????? */
+static ADDRESS_MAP_START( m10_main, AS_PROGRAM, 8, m10_state )
+	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_SHARE("memory") /* scratch ram */
+	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_SHARE("rom")
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_SHARE("colorram") /* foreground colour  */
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(m10_chargen_w) AM_SHARE("chargen") /* background ????? */
 	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
 	AM_RANGE(0xa300, 0xa300) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa400, 0xa400) AM_WRITE(m10_ctrl_w)	/* line at bottom of screen?, sound, flip screen */
@@ -571,12 +563,12 @@ static ADDRESS_MAP_START( m10_main, AS_PROGRAM, 8 )
 	AM_RANGE(0xfc00, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m11_main, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, m_memory) /* scratch ram */
-	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_BASE_MEMBER(m10_state, m_rom)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE_MEMBER(m10_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE_MEMBER(m10_state, m_colorram) /* foreground colour  */
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_MEMBER(m10_state, m_chargen) /* background ????? */
+static ADDRESS_MAP_START( m11_main, AS_PROGRAM, 8, m10_state )
+	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_SHARE("memory") /* scratch ram */
+	AM_RANGE(0x1000, 0x2fff) AM_ROM AM_SHARE("rom")
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_SHARE("colorram") /* foreground colour  */
+	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("chargen") /* background ????? */
 	AM_RANGE(0xa100, 0xa100) AM_WRITE(m11_a100_w) /* sound writes ???? */
 	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
 	AM_RANGE(0xa300, 0xa300) AM_READ_PORT("INPUTS")
@@ -585,12 +577,12 @@ static ADDRESS_MAP_START( m11_main, AS_PROGRAM, 8 )
 	AM_RANGE(0xfc00, 0xffff) AM_ROM	/* for the reset / interrupt vectors */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m15_main, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_BASE_MEMBER(m10_state, m_memory) /* scratch ram */
-	AM_RANGE(0x1000, 0x33ff) AM_ROM AM_BASE_MEMBER(m10_state, m_rom)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_SIZE_MEMBER(m10_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_BASE_MEMBER(m10_state, m_colorram) /* foreground colour  */
-	AM_RANGE(0x5000, 0x57ff) AM_RAM_WRITE(m15_chargen_w) AM_BASE_MEMBER(m10_state, m_chargen) /* background ????? */
+static ADDRESS_MAP_START( m15_main, AS_PROGRAM, 8, m10_state )
+	AM_RANGE(0x0000, 0x02ff) AM_RAM AM_SHARE("memory") /* scratch ram */
+	AM_RANGE(0x1000, 0x33ff) AM_ROM AM_SHARE("rom")
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(m10_colorram_w) AM_SHARE("colorram") /* foreground colour  */
+	AM_RANGE(0x5000, 0x57ff) AM_RAM_WRITE(m15_chargen_w) AM_SHARE("chargen") /* background ????? */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P2")
 	AM_RANGE(0xa100, 0xa100) AM_WRITE(m15_a100_w) /* sound writes ???? */
 	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("DSW")
@@ -653,7 +645,7 @@ static INPUT_PORTS_START( skychut )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state,coin_inserted, 0)
 
 	CAB_PORTENV
 INPUT_PORTS_END
@@ -694,7 +686,7 @@ static INPUT_PORTS_START( ipminvad )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state,coin_inserted, 0)
 
 	CAB_PORTENV
 INPUT_PORTS_END
@@ -728,7 +720,7 @@ static INPUT_PORTS_START( spacbeam )
 	PORT_DIPSETTING (  0x20, "1 Coin 2 Plays" )
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state,coin_inserted, 0)
 
 	CAB_PORTENV
 INPUT_PORTS_END
@@ -768,7 +760,7 @@ static INPUT_PORTS_START( headoni )
 	PORT_DIPSETTING (  0x20, "1 Coin 2 Plays" )
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, m10_state,coin_inserted, 0)
 
 	CAB_PORTENV
 INPUT_PORTS_END

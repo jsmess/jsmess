@@ -23,111 +23,100 @@ to switch between 8*8 tiles and 16*16 tiles.
 
 /******************************************************************************/
 
-WRITE16_HANDLER( bcstory_tilebank_w )
+WRITE16_MEMBER(tumbleb_state::bcstory_tilebank_w)
 {
-	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
-	state->m_tilebank = data;
-	state->m_pf1_tilemap->mark_all_dirty();
-	state->m_pf1_alt_tilemap->mark_all_dirty();
-	state->m_pf2_tilemap->mark_all_dirty();
+	m_tilebank = data;
+	m_pf1_tilemap->mark_all_dirty();
+	m_pf1_alt_tilemap->mark_all_dirty();
+	m_pf2_tilemap->mark_all_dirty();
 }
 
-WRITE16_HANDLER( chokchok_tilebank_w )
+WRITE16_MEMBER(tumbleb_state::chokchok_tilebank_w)
 {
-	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
-	state->m_tilebank = data << 1;
-	state->m_pf1_tilemap->mark_all_dirty();
-	state->m_pf1_alt_tilemap->mark_all_dirty();
-	state->m_pf2_tilemap->mark_all_dirty();
+	m_tilebank = data << 1;
+	m_pf1_tilemap->mark_all_dirty();
+	m_pf1_alt_tilemap->mark_all_dirty();
+	m_pf2_tilemap->mark_all_dirty();
 }
 
-WRITE16_HANDLER( wlstar_tilebank_w )
+WRITE16_MEMBER(tumbleb_state::wlstar_tilebank_w)
 {
-	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
 	/* it just writes 0000 or ffff */
-	state->m_tilebank = data & 0x4000;
-	state->m_pf1_tilemap->mark_all_dirty();
-	state->m_pf1_alt_tilemap->mark_all_dirty();
-	state->m_pf2_tilemap->mark_all_dirty();
+	m_tilebank = data & 0x4000;
+	m_pf1_tilemap->mark_all_dirty();
+	m_pf1_alt_tilemap->mark_all_dirty();
+	m_pf2_tilemap->mark_all_dirty();
 }
 
 
-WRITE16_HANDLER( suprtrio_tilebank_w )
+WRITE16_MEMBER(tumbleb_state::suprtrio_tilebank_w)
 {
-	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
-	state->m_tilebank = data << 14; // shift it here, makes using bcstory_tilebank easier
-	state->m_pf1_tilemap->mark_all_dirty();
-	state->m_pf1_alt_tilemap->mark_all_dirty();
-	state->m_pf2_tilemap->mark_all_dirty();
+	m_tilebank = data << 14; // shift it here, makes using bcstory_tilebank easier
+	m_pf1_tilemap->mark_all_dirty();
+	m_pf1_alt_tilemap->mark_all_dirty();
+	m_pf2_tilemap->mark_all_dirty();
 }
 
 
-WRITE16_HANDLER( tumblepb_pf1_data_w )
+WRITE16_MEMBER(tumbleb_state::tumblepb_pf1_data_w)
 {
-	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
-	COMBINE_DATA(&state->m_pf1_data[offset]);
-	state->m_pf1_tilemap->mark_tile_dirty(offset);
-	state->m_pf1_alt_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_pf1_data[offset]);
+	m_pf1_tilemap->mark_tile_dirty(offset);
+	m_pf1_alt_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( tumblepb_pf2_data_w )
+WRITE16_MEMBER(tumbleb_state::tumblepb_pf2_data_w)
 {
-	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
-	COMBINE_DATA(&state->m_pf2_data[offset]);
-	state->m_pf2_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_pf2_data[offset]);
+	m_pf2_tilemap->mark_tile_dirty(offset);
 
-	if (state->m_pf2_alt_tilemap)
-		state->m_pf2_alt_tilemap->mark_tile_dirty(offset);
+	if (m_pf2_alt_tilemap)
+		m_pf2_alt_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE16_HANDLER( fncywld_pf1_data_w )
+WRITE16_MEMBER(tumbleb_state::fncywld_pf1_data_w)
 {
-	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
-	COMBINE_DATA(&state->m_pf1_data[offset]);
-	state->m_pf1_tilemap->mark_tile_dirty(offset / 2);
-	state->m_pf1_alt_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_pf1_data[offset]);
+	m_pf1_tilemap->mark_tile_dirty(offset / 2);
+	m_pf1_alt_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( fncywld_pf2_data_w )
+WRITE16_MEMBER(tumbleb_state::fncywld_pf2_data_w)
 {
-	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
-	COMBINE_DATA(&state->m_pf2_data[offset]);
-	state->m_pf2_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_pf2_data[offset]);
+	m_pf2_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( tumblepb_control_0_w )
+WRITE16_MEMBER(tumbleb_state::tumblepb_control_0_w)
 {
-	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
-	COMBINE_DATA(&state->m_control_0[offset]);
+	COMBINE_DATA(&m_control_0[offset]);
 }
 
 
-WRITE16_HANDLER( pangpang_pf1_data_w )
+WRITE16_MEMBER(tumbleb_state::pangpang_pf1_data_w)
 {
-	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
-	COMBINE_DATA(&state->m_pf1_data[offset]);
-	state->m_pf1_tilemap->mark_tile_dirty(offset / 2);
-	state->m_pf1_alt_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_pf1_data[offset]);
+	m_pf1_tilemap->mark_tile_dirty(offset / 2);
+	m_pf1_alt_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE16_HANDLER( pangpang_pf2_data_w )
+WRITE16_MEMBER(tumbleb_state::pangpang_pf2_data_w)
 {
-	tumbleb_state *state = space->machine().driver_data<tumbleb_state>();
 
-	COMBINE_DATA(&state->m_pf2_data[offset]);
-	state->m_pf2_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_pf2_data[offset]);
+	m_pf2_tilemap->mark_tile_dirty(offset / 2);
 
-	if (state->m_pf2_alt_tilemap)
-		state->m_pf2_alt_tilemap->mark_tile_dirty(offset / 2);
+	if (m_pf2_alt_tilemap)
+		m_pf2_alt_tilemap->mark_tile_dirty(offset / 2);
 }
 
 /******************************************************************************/
@@ -408,7 +397,7 @@ void tumbleb_draw_common(running_machine &machine, bitmap_ind16 &bitmap, const r
 	else
 		state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	machine.device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram_size/2);
+	machine.device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram.bytes()/2);
 }
 
 SCREEN_UPDATE_IND16( tumblepb )
@@ -545,7 +534,7 @@ SCREEN_UPDATE_IND16( sdfight )
 
 	tumbleb_draw_common(screen.machine(),bitmap,cliprect, offs2, -16, offs, 0);
 
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram_size/2);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram.bytes()/2);
 	return 0;
 }
 
@@ -619,7 +608,7 @@ SCREEN_UPDATE_IND16( jumppop )
 	else
 		state->m_pf1_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram_size/2);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram.bytes()/2);
 
 	return 0;
 }
@@ -637,7 +626,7 @@ SCREEN_UPDATE_IND16( suprtrio )
 	state->m_pf2_tilemap->draw(bitmap, cliprect, 0, 0);
 	state->m_pf1_alt_tilemap->draw(bitmap, cliprect, 0, 0);
 
-	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram_size/2);
+	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram, state->m_spriteram.bytes()/2);
 	return 0;
 }
 

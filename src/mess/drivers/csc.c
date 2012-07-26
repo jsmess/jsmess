@@ -9,7 +9,6 @@
     - make a better artwork
 
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -58,7 +57,7 @@ UINT16 csc_state::input_read(int index)
 		"COL_F", "COL_G", "COL_H", "COL_I"
 	};
 
-	return input_port_read(machine(), col_tag[index]);
+	return ioport(col_tag[index])->read();
 }
 
 

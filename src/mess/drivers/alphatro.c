@@ -18,7 +18,6 @@
         needed.
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -43,8 +42,9 @@ public:
 	m_crtc(*this, "crtc"),
 	m_usart(*this, "usart"),
 	m_cass(*this, CASSETTE_TAG),
-	m_beep(*this, BEEPER_TAG)
-	{ }
+	m_beep(*this, BEEPER_TAG),
+	m_p_ram(*this, "p_ram"),
+	m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -58,11 +58,11 @@ public:
 	DECLARE_READ_LINE_MEMBER(rxdata_callback);
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 
+	required_shared_ptr<UINT8> m_p_ram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	emu_timer* m_sys_timer;
 	emu_timer* m_serial_timer;  // for the usart
-	UINT8 *m_p_videoram;
 	UINT8 *m_p_chargen;
-	UINT8 *m_p_ram;
 	virtual void video_start();
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -135,14 +135,14 @@ WRITE_LINE_MEMBER( alphatro_state::txdata_callback )
 
 VIDEO_START_MEMBER( alphatro_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 static MC6845_UPDATE_ROW( alphatro_update_row )
 {
 	alphatro_state *state = device->machine().driver_data<alphatro_state>();
 	const rgb_t *pens = palette_entry_list_raw(bitmap.palette());
-	bool palette = BIT(input_port_read(device->machine(), "CONFIG"), 5);
+	bool palette = BIT(state->ioport("CONFIG")->read(), 5);
 	UINT8 chr,gfx,attr,fg,inv;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
@@ -182,8 +182,8 @@ INPUT_CHANGED_MEMBER( alphatro_state::alphatro_break )
 }
 
 static ADDRESS_MAP_START( alphatro_map, AS_PROGRAM, 8, alphatro_state )
-	AM_RANGE(0x0000, 0xefff) AM_RAM AM_BASE(m_p_ram)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE(0x0000, 0xefff) AM_RAM AM_SHARE("p_ram")
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("p_videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( alphatro_io, AS_IO, 8, alphatro_state )
@@ -351,11 +351,11 @@ void alphatro_state::machine_reset()
 {
 	// do what the IPL does
 	//  UINT8* RAM = machine().device<ram_device>("ram")->pointer();
-	UINT8* ROM = machine().region("maincpu")->base();
+	UINT8* ROM = memregion("maincpu")->base();
 	cpu_set_reg(m_maincpu, STATE_GENPC, 0xe000);
 	memcpy(m_p_ram, ROM, 0xf000); // copy BASIC to RAM, which the undumped IPL is supposed to do.
 	memcpy(m_p_videoram, ROM+0x1000, 0x1000);
-	//  memory_set_bankptr(machine(), "bank1", RAM);
+	//  membank("bank1")->set_base(RAM);
 
 	// probably not correct, exact meaning of port is unknown, vblank/vsync is too slow.
 	m_sys_timer->adjust(attotime::from_usec(10),0,attotime::from_usec(10));

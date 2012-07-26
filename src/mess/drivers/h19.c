@@ -28,7 +28,6 @@
         - When the internal keyboard works, get rid of the generic_terminal.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -53,7 +52,8 @@ public:
 	m_crtc(*this, "crtc"),
 	m_ace(*this, "ins8250"),
 	m_beep(*this, BEEPER_TAG)
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -63,7 +63,7 @@ public:
 	DECLARE_READ8_MEMBER(h19_a0_r);
 	DECLARE_WRITE8_MEMBER(h19_c0_w);
 	WRITE8_MEMBER(h19_kbd_put);
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 *m_p_chargen;
 	UINT8 m_term_data;
 	virtual void machine_reset();
@@ -108,7 +108,7 @@ static ADDRESS_MAP_START(h19_mem, AS_PROGRAM, 8, h19_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("p_videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( h19_io, AS_IO, 8, h19_state)
@@ -297,7 +297,7 @@ MACHINE_RESET_MEMBER(h19_state)
 
 VIDEO_START_MEMBER( h19_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 static MC6845_UPDATE_ROW( h19_update_row )

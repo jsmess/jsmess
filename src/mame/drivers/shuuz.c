@@ -45,15 +45,15 @@ static void update_interrupts(running_machine &machine)
  *
  *************************************/
 
-static READ16_HANDLER( shuuz_atarivc_r )
+READ16_MEMBER(shuuz_state::shuuz_atarivc_r)
 {
-	return atarivc_r(*space->machine().primary_screen, offset);
+	return atarivc_r(*machine().primary_screen, offset);
 }
 
 
-static WRITE16_HANDLER( shuuz_atarivc_w )
+WRITE16_MEMBER(shuuz_state::shuuz_atarivc_w)
 {
-	atarivc_w(*space->machine().primary_screen, offset, data, mem_mask);
+	atarivc_w(*machine().primary_screen, offset, data, mem_mask);
 }
 
 
@@ -80,7 +80,7 @@ static MACHINE_RESET( shuuz )
 }
 
 
-static WRITE16_HANDLER( latch_w )
+WRITE16_MEMBER(shuuz_state::latch_w)
 {
 }
 
@@ -92,24 +92,23 @@ static WRITE16_HANDLER( latch_w )
  *
  *************************************/
 
-static READ16_HANDLER( leta_r )
+READ16_MEMBER(shuuz_state::leta_r)
 {
-	shuuz_state *state = space->machine().driver_data<shuuz_state>();
 	/* trackball -- rotated 45 degrees? */
 	int which = offset & 1;
 
 	/* when reading the even ports, do a real analog port update */
 	if (which == 0)
 	{
-		int dx = (INT8)input_port_read(space->machine(), "TRACKX");
-		int dy = (INT8)input_port_read(space->machine(), "TRACKY");
+		int dx = (INT8)ioport("TRACKX")->read();
+		int dy = (INT8)ioport("TRACKY")->read();
 
-		state->m_cur[0] = dx + dy;
-		state->m_cur[1] = dx - dy;
+		m_cur[0] = dx + dy;
+		m_cur[1] = dx - dy;
 	}
 
 	/* clip the result to -0x3f to +0x3f to remove directional ambiguities */
-	return state->m_cur[which];
+	return m_cur[which];
 }
 
 
@@ -120,11 +119,11 @@ static READ16_HANDLER( leta_r )
  *
  *************************************/
 
-static READ16_HANDLER( special_port0_r )
+READ16_MEMBER(shuuz_state::special_port0_r)
 {
-	int result = input_port_read(space->machine(), "SYSTEM");
+	int result = ioport("SYSTEM")->read();
 
-	if ((result & 0x0800) && atarigen_get_hblank(*space->machine().primary_screen))
+	if ((result & 0x0800) && atarigen_get_hblank(*machine().primary_screen))
 		result &= ~0x0800;
 
 	return result;
@@ -138,24 +137,24 @@ static READ16_HANDLER( special_port0_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, shuuz_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
-	AM_RANGE(0x101000, 0x101fff) AM_WRITE(atarigen_eeprom_enable_w)
+	AM_RANGE(0x100000, 0x100fff) AM_READWRITE_LEGACY(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
+	AM_RANGE(0x101000, 0x101fff) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
 	AM_RANGE(0x102000, 0x102001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x103000, 0x103003) AM_READ(leta_r)
 	AM_RANGE(0x105000, 0x105001) AM_READWRITE(special_port0_r, latch_w)
 	AM_RANGE(0x105002, 0x105003) AM_READ_PORT("BUTTONS")
-	AM_RANGE(0x106000, 0x106001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x106000, 0x106001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x107000, 0x107007) AM_NOP
-	AM_RANGE(0x3e0000, 0x3e087f) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(shuuz_atarivc_r, shuuz_atarivc_w) AM_BASE_MEMBER(shuuz_state, m_atarivc_data)
-	AM_RANGE(0x3f4000, 0x3f5eff) AM_RAM_WRITE(atarigen_playfield_latched_msb_w) AM_BASE_MEMBER(shuuz_state, m_playfield)
-	AM_RANGE(0x3f5f00, 0x3f5f7f) AM_RAM AM_BASE_MEMBER(shuuz_state, m_atarivc_eof_data)
-	AM_RANGE(0x3f5f80, 0x3f5fff) AM_READWRITE(atarimo_0_slipram_r, atarimo_0_slipram_w)
-	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM_WRITE(atarigen_playfield_upper_w) AM_BASE_MEMBER(shuuz_state, m_playfield_upper)
+	AM_RANGE(0x3e0000, 0x3e087f) AM_RAM_WRITE_LEGACY(atarigen_666_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x3effc0, 0x3effff) AM_READWRITE(shuuz_atarivc_r, shuuz_atarivc_w) AM_SHARE("atarivc_data")
+	AM_RANGE(0x3f4000, 0x3f5eff) AM_RAM_WRITE_LEGACY(atarigen_playfield_latched_msb_w) AM_SHARE("playfield")
+	AM_RANGE(0x3f5f00, 0x3f5f7f) AM_RAM AM_SHARE("atarivc_eof")
+	AM_RANGE(0x3f5f80, 0x3f5fff) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)
+	AM_RANGE(0x3f6000, 0x3f7fff) AM_RAM_WRITE_LEGACY(atarigen_playfield_upper_w) AM_SHARE("playfield_upper")
 	AM_RANGE(0x3f8000, 0x3fcfff) AM_RAM
-	AM_RANGE(0x3fd000, 0x3fd3ff) AM_READWRITE(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
+	AM_RANGE(0x3fd000, 0x3fd3ff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0x3fd400, 0x3fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -172,7 +171,7 @@ static INPUT_PORTS_START( shuuz )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x07fc, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("BUTTONS")
@@ -199,7 +198,7 @@ static INPUT_PORTS_START( shuuz2 )
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Step Debug SW") PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x0600, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Playfield Debug SW") PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Reset Debug SW") PORT_CODE(KEYCODE_E)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Crosshair Debug SW") PORT_CODE(KEYCODE_C)

@@ -50,7 +50,6 @@ Apple color FPD      01           11           10   (FPD = Full Page Display)
 
 ***************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "sound/asc.h"
@@ -143,7 +142,7 @@ SCREEN_UPDATE_IND16( macprtb )
 	int y, x, b;
 	mac_state *state = screen.machine().driver_data<mac_state>();
 
-	video_ram = (const UINT16 *) state->m_vram;
+	video_ram = (const UINT16 *) state->m_vram16.target();
 
 	for (y = 0; y < 400; y++)
 	{
@@ -169,7 +168,7 @@ SCREEN_UPDATE_IND16( macpb140 )
 	int y, x, b;
 	mac_state *state = screen.machine().driver_data<mac_state>();
 
-	video_ram = (const UINT16 *) state->m_vram;
+	video_ram = (const UINT16 *) state->m_vram.target();
 
 	for (y = 0; y < 400; y++)
 	{
@@ -193,7 +192,7 @@ SCREEN_UPDATE_IND16( macpb160 )
 	int y, x;
 	UINT8 pixels;
 	mac_state *state = screen.machine().driver_data<mac_state>();
-	UINT8 *vram8 = (UINT8 *)state->m_vram;
+	UINT8 *vram8 = (UINT8 *)state->m_vram.target();
 
 	for (y = 0; y < 400; y++)
 	{
@@ -252,7 +251,7 @@ VIDEO_RESET(macrbv)
 	visarea.min_x = 0;
 	visarea.min_y = 0;
 	view = 0;
-	mac->m_rbv_montype = input_port_read_safe(machine, "MONTYPE", 2);
+	mac->m_rbv_montype = machine.root_device().ioport("MONTYPE")->read_safe(2);
 	switch (mac->m_rbv_montype)
 	{
 		case 1:	// 15" portrait display
@@ -309,7 +308,7 @@ VIDEO_RESET(macsonora)
 	visarea.min_x = 0;
 	visarea.min_y = 0;
 
-	mac->m_rbv_montype = input_port_read_safe(machine, "MONTYPE", 2);
+	mac->m_rbv_montype = machine.root_device().ioport("MONTYPE")->read_safe(2);
 	switch (mac->m_rbv_montype)
 	{
 		case 1:	// 15" portrait display
@@ -527,7 +526,7 @@ SCREEN_UPDATE_RGB32( macrbvvram )
 	{
 		case 0:	// 1bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
 			UINT8 pixels;
 
 			if (mac->m_rbv_type == RBV_TYPE_SONORA)
@@ -575,7 +574,7 @@ SCREEN_UPDATE_RGB32( macrbvvram )
 
 		case 1:	// 2bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
 			UINT8 pixels;
 
 			for (y = 0; y < 480; y++)
@@ -596,7 +595,7 @@ SCREEN_UPDATE_RGB32( macrbvvram )
 
 		case 2: // 4bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
 			UINT8 pixels;
 
 			for (y = 0; y < 480; y++)
@@ -616,7 +615,7 @@ SCREEN_UPDATE_RGB32( macrbvvram )
 
 		case 3: // 8bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
 			UINT8 pixels;
 
 			if (mac->m_rbv_type == RBV_TYPE_SONORA)
@@ -880,7 +879,7 @@ SCREEN_UPDATE_RGB32( macdafb )
 	{
 		case 0:	// 1bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
 			UINT8 pixels;
 			vram8 += mac->m_dafb_base;
 
@@ -906,7 +905,7 @@ SCREEN_UPDATE_RGB32( macdafb )
 
 		case 1:	// 2bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
 			UINT8 pixels;
 			vram8 += mac->m_dafb_base;
 
@@ -928,7 +927,7 @@ SCREEN_UPDATE_RGB32( macdafb )
 
 		case 2: // 4bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
 			UINT8 pixels;
 			vram8 += mac->m_dafb_base;
 
@@ -949,7 +948,7 @@ SCREEN_UPDATE_RGB32( macdafb )
 
 		case 3: // 8bpp
 		{
-			UINT8 *vram8 = (UINT8 *)mac->m_vram;
+			UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
 			UINT8 pixels;
 			vram8 += mac->m_dafb_base;
 
@@ -989,7 +988,7 @@ SCREEN_UPDATE_RGB32( macpbwd )    /* Color PowerBooks using an off-the-shelf WD 
 	UINT32 *scanline;
 	int x, y;
 	mac_state *mac = screen.machine().driver_data<mac_state>();
-    UINT8 *vram8 = (UINT8 *)mac->m_vram;
+    UINT8 *vram8 = (UINT8 *)mac->m_vram.target();
     UINT8 pixels;
 
 //    vram8 += 0x40000;

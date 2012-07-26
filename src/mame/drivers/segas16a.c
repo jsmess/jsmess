@@ -194,7 +194,7 @@ static const ppi8255_interface single_ppi_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, soundlatch_w),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_w),
 	DEVCB_HANDLER(video_control_w),
 	DEVCB_HANDLER(tilemap_sound_w)
 };
@@ -298,11 +298,11 @@ static READ16_HANDLER( standard_io_r )
 		case 0x1000/2:
 		{
 			static const char *const sysports[] = { "SERVICE", "P1", "UNUSED", "P2" };
-			return input_port_read(space->machine(), sysports[offset & 3]);
+			return state->ioport(sysports[offset & 3])->read();
 		}
 
 		case 0x2000/2:
-			return input_port_read(space->machine(), (offset & 1) ? "DSW2" : "DSW1");
+			return state->ioport((offset & 1) ? "DSW2" : "DSW1")->read();
 	}
 	logerror("%06X:standard_io_r - unknown read access to address %04X\n", cpu_get_pc(&space->device()), offset * 2);
 	return 0xffff;
@@ -433,7 +433,7 @@ static READ8_HANDLER( sound_data_r )
 
 	/* assert ACK */
 	ppi8255_set_port_c(state->m_ppi8255, 0x00);
-	return soundlatch_r(space, offset);
+	return state->soundlatch_byte_r(*space, offset);
 }
 
 
@@ -451,7 +451,7 @@ static WRITE8_HANDLER( n7751_command_w )
     */
 	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 
-	int numroms = space->machine().region("n7751data")->bytes() / 0x8000;
+	int numroms = state->memregion("n7751data")->bytes() / 0x8000;
 	state->m_n7751_rom_address &= 0x3fff;
 	state->m_n7751_rom_address |= (data & 0x01) << 14;
 	if (!(data & 0x02) && numroms >= 1) state->m_n7751_rom_address |= 0x00000;
@@ -496,7 +496,7 @@ static READ8_HANDLER( n7751_rom_r )
 {
 	/* read from BUS */
 	segas1x_state *state = space->machine().driver_data<segas1x_state>();
-	return space->machine().region("n7751data")->base()[state->m_n7751_rom_address];
+	return state->memregion("n7751data")->base()[state->m_n7751_rom_address];
 }
 
 
@@ -634,16 +634,16 @@ static READ16_HANDLER( aceattaa_custom_io_r )
 				{
 					switch (state->m_video_control & 0xf)
 					{
-						case 0x00: return input_port_read(space->machine(), "P1"); // "HANDX1"
-						case 0x04: return input_port_read(space->machine(), "TRACKX1");
-						case 0x08: return input_port_read(space->machine(), "TRACKY1");
-						case 0x0c: return input_port_read(space->machine(), "HANDY1");
+						case 0x00: return state->ioport("P1")->read(); // "HANDX1"
+						case 0x04: return state->ioport("TRACKX1")->read();
+						case 0x08: return state->ioport("TRACKY1")->read();
+						case 0x0c: return state->ioport("HANDY1")->read();
 					}
 					break;
 				}
 
 				case 0x02:
-					return input_port_read(space->machine(), "DIAL1") | (input_port_read(space->machine(), "DIAL2") << 4);
+					return state->ioport("DIAL1")->read() | (state->ioport("DIAL2")->read() << 4);
 					// low nibble: Sega 56pin Edge "16"-"19" // rotary switch 10positions 4bit-binary-pinout
 					// high nibble: Sega 56pin Edge "T"-"W"  // ditto
 
@@ -651,10 +651,10 @@ static READ16_HANDLER( aceattaa_custom_io_r )
 				{
 					switch (state->m_video_control & 0xf)
 					{
-						case 0x00: return input_port_read(space->machine(), "P2"); // "HANDX2"
-						case 0x04: return input_port_read(space->machine(), "TRACKX2");
-						case 0x08: return input_port_read(space->machine(), "TRACKY2");
-						case 0x0c: return input_port_read(space->machine(), "HANDY2");
+						case 0x00: return state->ioport("P2")->read(); // "HANDX2"
+						case 0x04: return state->ioport("TRACKX2")->read();
+						case 0x08: return state->ioport("TRACKY2")->read();
+						case 0x0c: return state->ioport("HANDY2")->read();
 					}
 					break;
 				}
@@ -686,9 +686,9 @@ static READ16_HANDLER( mjleague_custom_io_r )
 				/* upper bit of the trackball controls */
 				case 0:
 				{
-					UINT8 buttons = input_port_read(space->machine(), "SERVICE");
-					UINT8 analog1 = input_port_read(space->machine(), (state->m_video_control & 4) ? "ANALOGY1" : "ANALOGX1");
-					UINT8 analog2 = input_port_read(space->machine(), (state->m_video_control & 4) ? "ANALOGY2" : "ANALOGX2");
+					UINT8 buttons = state->ioport("SERVICE")->read();
+					UINT8 analog1 = state->ioport((state->m_video_control & 4) ? "ANALOGY1" : "ANALOGX1")->read();
+					UINT8 analog2 = state->ioport((state->m_video_control & 4) ? "ANALOGY2" : "ANALOGX2")->read();
 					buttons |= (analog1 & 0x80) >> 1;
 					buttons |= (analog2 & 0x80);
 					return buttons;
@@ -698,8 +698,8 @@ static READ16_HANDLER( mjleague_custom_io_r )
 				/* player 1 select switch mapped to bit 7 */
 				case 1:
 				{
-					UINT8 buttons = input_port_read(space->machine(), "BUTTONS1");
-					UINT8 analog = input_port_read(space->machine(), (state->m_video_control & 4) ? "ANALOGY1" : "ANALOGX1");
+					UINT8 buttons = state->ioport("BUTTONS1")->read();
+					UINT8 analog = state->ioport((state->m_video_control & 4) ? "ANALOGY1" : "ANALOGX1")->read();
 					return (buttons & 0x80) | (analog & 0x7f);
 				}
 
@@ -707,11 +707,11 @@ static READ16_HANDLER( mjleague_custom_io_r )
 				case 2:
 				{
 					if (state->m_video_control & 4)
-						return (input_port_read(space->machine(), "ANALOGZ1") >> 4) | (input_port_read(space->machine(), "ANALOGZ2") & 0xf0);
+						return (state->ioport("ANALOGZ1")->read() >> 4) | (state->ioport("ANALOGZ2")->read() & 0xf0);
 					else
 					{
-						UINT8 buttons1 = input_port_read(space->machine(), "BUTTONS1");
-						UINT8 buttons2 = input_port_read(space->machine(), "BUTTONS2");
+						UINT8 buttons1 = state->ioport("BUTTONS1")->read();
+						UINT8 buttons2 = state->ioport("BUTTONS2")->read();
 
 						if (!(buttons1 & 0x01))
 							state->m_last_buttons1 = 0;
@@ -739,8 +739,8 @@ static READ16_HANDLER( mjleague_custom_io_r )
 				/* player 2 select switch mapped to bit 7 */
 				case 3:
 				{
-					UINT8 buttons = input_port_read(space->machine(), "BUTTONS2");
-					UINT8 analog = input_port_read(space->machine(), (state->m_video_control & 4) ? "ANALOGY2" : "ANALOGX2");
+					UINT8 buttons = state->ioport("BUTTONS2")->read();
+					UINT8 analog = state->ioport((state->m_video_control & 4) ? "ANALOGY2" : "ANALOGX2")->read();
 					return (buttons & 0x80) | (analog & 0x7f);
 				}
 			}
@@ -773,10 +773,10 @@ static READ16_HANDLER( passsht16a_custom_io_r )
 				case 1:
 					switch ((state->m_read_port++) & 3)
 					{
-						case 0: return input_port_read(space->machine(), "P1");
-						case 1: return input_port_read(space->machine(), "P2");
-						case 2: return input_port_read(space->machine(), "P3");
-						case 3: return input_port_read(space->machine(), "P4");
+						case 0: return state->ioport("P1")->read();
+						case 1: return state->ioport("P2")->read();
+						case 2: return state->ioport("P3")->read();
+						case 3: return state->ioport("P4")->read();
 					}
 
 					break;
@@ -803,8 +803,8 @@ static READ16_HANDLER( sdi_custom_io_r )
 		case 0x1000/2:
 			switch (offset & 3)
 			{
-				case 1:	return input_port_read(space->machine(), (state->m_video_control & 4) ? "ANALOGY1" : "ANALOGX1");
-				case 3:	return input_port_read(space->machine(), (state->m_video_control & 4) ? "ANALOGY2" : "ANALOGX2");
+				case 1:	return state->ioport((state->m_video_control & 4) ? "ANALOGY1" : "ANALOGX1")->read();
+				case 3:	return state->ioport((state->m_video_control & 4) ? "ANALOGY2" : "ANALOGX2")->read();
 			}
 			break;
 	}
@@ -830,12 +830,12 @@ static READ16_HANDLER( sjryuko_custom_io_r )
 			switch (offset & 3)
 			{
 				case 1:
-					if (input_port_read_safe(space->machine(), portname[state->m_mj_input_num], 0xff) != 0xff)
+					if (state->ioport(portname[state->m_mj_input_num])->read_safe(0xff) != 0xff)
 						return 0xff & ~(1 << state->m_mj_input_num);
 					return 0xff;
 
 				case 2:
-					return input_port_read_safe(space->machine(), portname[state->m_mj_input_num], 0xff);
+					return state->ioport(portname[state->m_mj_input_num])->read_safe(0xff);
 			}
 			break;
 	}
@@ -953,7 +953,7 @@ static READ8_HANDLER( mcu_io_r )
 	{
 		case 0:
 			if (offset >= 0x0000 && offset < 0x3fff)
-				return watchdog_reset_r(space, 0);		/* unsure about this one */
+				return state->watchdog_reset_r(*space, 0);		/* unsure about this one */
 			else if (offset >= 0x4000 && offset < 0x8000)
 				return maincpu_byte_r(space->machine(), 0xc70001 ^ (offset & 0x3fff));
 			else if (offset >= 0x8000 && offset < 0xc000)
@@ -973,11 +973,11 @@ static READ8_HANDLER( mcu_io_r )
 			return maincpu_byte_r(space->machine(), 0x840001 ^ offset);
 
 		case 5:
-			return space->machine().region("maincpu")->base()[0x00000 + offset];
+			return state->memregion("maincpu")->base()[0x00000 + offset];
 		case 6:
-			return space->machine().region("maincpu")->base()[0x10000 + offset];
+			return state->memregion("maincpu")->base()[0x10000 + offset];
 		case 7:
-			return space->machine().region("maincpu")->base()[0x20000 + offset];
+			return state->memregion("maincpu")->base()[0x20000 + offset];
 
 		default:
 			logerror("%03X: MCU movx read mode %02X offset %04X\n",
@@ -1005,16 +1005,16 @@ static INTERRUPT_GEN( mcu_irq_assert )
  *
  *************************************/
 
-static ADDRESS_MAP_START( system16a_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( system16a_map, AS_PROGRAM, 16, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x380000) AM_ROM
-	AM_RANGE(0x400000, 0x407fff) AM_MIRROR(0xb88000) AM_RAM_WRITE(segaic16_tileram_0_w) AM_BASE(&segaic16_tileram_0)
-	AM_RANGE(0x410000, 0x410fff) AM_MIRROR(0xb8f000) AM_RAM_WRITE(segaic16_textram_0_w) AM_BASE(&segaic16_textram_0)
-	AM_RANGE(0x440000, 0x4407ff) AM_MIRROR(0x3bf800) AM_RAM AM_BASE(&segaic16_spriteram_0)
-	AM_RANGE(0x840000, 0x840fff) AM_MIRROR(0x3bf000) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
-	AM_RANGE(0xc40000, 0xc43fff) AM_MIRROR(0x39c000) AM_READWRITE(misc_io_r, misc_io_w)
+	AM_RANGE(0x400000, 0x407fff) AM_MIRROR(0xb88000) AM_RAM_WRITE_LEGACY(segaic16_tileram_0_w) AM_BASE_LEGACY(&segaic16_tileram_0)
+	AM_RANGE(0x410000, 0x410fff) AM_MIRROR(0xb8f000) AM_RAM_WRITE_LEGACY(segaic16_textram_0_w) AM_BASE_LEGACY(&segaic16_textram_0)
+	AM_RANGE(0x440000, 0x4407ff) AM_MIRROR(0x3bf800) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
+	AM_RANGE(0x840000, 0x840fff) AM_MIRROR(0x3bf000) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_BASE_LEGACY(&segaic16_paletteram)
+	AM_RANGE(0xc40000, 0xc43fff) AM_MIRROR(0x39c000) AM_READWRITE_LEGACY(misc_io_r, misc_io_w)
 	AM_RANGE(0xc60000, 0xc6ffff) AM_READ(watchdog_reset16_r)
-	AM_RANGE(0xc70000, 0xc73fff) AM_MIRROR(0x38c000) AM_RAM AM_BASE(&workram) AM_SHARE("nvram")
+	AM_RANGE(0xc70000, 0xc73fff) AM_MIRROR(0x38c000) AM_RAM AM_BASE_LEGACY(&workram) AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
@@ -1025,19 +1025,19 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe800, 0xe800) AM_READ(sound_data_r)
+	AM_RANGE(0xe800, 0xe800) AM_READ_LEGACY(sound_data_r)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_WRITE(n7751_command_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(sound_data_r)
+	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_WRITE_LEGACY(n7751_command_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ_LEGACY(sound_data_r)
 ADDRESS_MAP_END
 
 
@@ -1048,12 +1048,12 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( n7751_portmap, AS_IO, 8 )
-	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS)  AM_READ(n7751_rom_r)
-	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1)   AM_READ(n7751_t1_r)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1)   AM_DEVWRITE("dac", dac_w)
-	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2)   AM_DEVREADWRITE("n7751_8243", n7751_p2_r, n7751_p2_w)
-	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("n7751_8243", i8243_prog_w)
+static ADDRESS_MAP_START( n7751_portmap, AS_IO, 8, segas1x_state )
+	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS)  AM_READ_LEGACY(n7751_rom_r)
+	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1)   AM_READ_LEGACY(n7751_t1_r)
+	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1)   AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2)   AM_DEVREADWRITE_LEGACY("n7751_8243", n7751_p2_r, n7751_p2_w)
+	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE_LEGACY("n7751_8243", i8243_prog_w)
 ADDRESS_MAP_END
 
 
@@ -1064,10 +1064,10 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mcu_io_r, mcu_io_w)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READNOP AM_WRITE(mcu_control_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE_LEGACY(mcu_io_r, mcu_io_w)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READNOP AM_WRITE_LEGACY(mcu_control_w)
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READNOP	/* read during jb int0 */
 ADDRESS_MAP_END
 
@@ -1936,8 +1936,8 @@ INPUT_PORTS_END
 
 static const ym2151_interface ym2151_config =
 {
-	NULL,
-	n7751_control_w
+	DEVCB_NULL,
+	DEVCB_HANDLER(n7751_control_w)
 };
 
 

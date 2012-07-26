@@ -57,10 +57,13 @@ class wallc_state : public driver_device
 {
 public:
 	wallc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(wallc_videoram_w);
+	DECLARE_WRITE8_MEMBER(wallc_coin_counter_w);
 };
 
 
@@ -91,6 +94,7 @@ public:
 
 static PALETTE_INIT( wallc )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	static const int resistances_rg[2] = { 330, 220 };
@@ -126,12 +130,11 @@ static PALETTE_INIT( wallc )
 	}
 }
 
-static WRITE8_HANDLER( wallc_videoram_w )
+WRITE8_MEMBER(wallc_state::wallc_videoram_w)
 {
-	wallc_state *state = space->machine().driver_data<wallc_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -154,14 +157,14 @@ static SCREEN_UPDATE_IND16( wallc )
 	return 0;
 }
 
-static WRITE8_HANDLER( wallc_coin_counter_w )
+WRITE8_MEMBER(wallc_state::wallc_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0,data & 2);
+	coin_counter_w(machine(), 0,data & 2);
 }
 
-static ADDRESS_MAP_START( wallc_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wallc_map, AS_PROGRAM, 8, wallc_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(wallc_videoram_w) AM_MIRROR(0xc00) AM_BASE_MEMBER(wallc_state, m_videoram)	/* 2114, 2114 */
+	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(wallc_videoram_w) AM_MIRROR(0xc00) AM_SHARE("videoram")	/* 2114, 2114 */
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM		/* 2114, 2114 */
 
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")
@@ -172,8 +175,8 @@ static ADDRESS_MAP_START( wallc_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP
 	AM_RANGE(0xb100, 0xb100) AM_WRITE(wallc_coin_counter_w)
 	AM_RANGE(0xb200, 0xb200) AM_WRITENOP
-	AM_RANGE(0xb500, 0xb500) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0xb600, 0xb600) AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0xb500, 0xb500) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0xb600, 0xb600) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 ADDRESS_MAP_END
 
 
@@ -256,7 +259,7 @@ static DRIVER_INIT( wallc )
 	UINT8 c;
 	UINT32 i;
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	for (i=0; i<0x2000*2; i++)
 	{
@@ -271,7 +274,7 @@ static DRIVER_INIT( wallca )
 	UINT8 c;
 	UINT32 i;
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	for (i=0; i<0x4000; i++)
 	{

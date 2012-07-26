@@ -92,10 +92,9 @@
  *
  *************************************/
 
-static WRITE8_HANDLER( irobot_nvram_w )
+WRITE8_MEMBER(irobot_state::irobot_nvram_w)
 {
-	irobot_state *state = space->machine().driver_data<irobot_state>();
-	state->m_nvram[offset] = data & 0x0f;
+	m_nvram[offset] = data & 0x0f;
 }
 
 
@@ -106,15 +105,15 @@ static WRITE8_HANDLER( irobot_nvram_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( irobot_clearirq_w )
+WRITE8_MEMBER(irobot_state::irobot_clearirq_w)
 {
-    cputag_set_input_line(space->machine(), "maincpu", M6809_IRQ_LINE ,CLEAR_LINE);
+    cputag_set_input_line(machine(), "maincpu", M6809_IRQ_LINE ,CLEAR_LINE);
 }
 
 
-static WRITE8_HANDLER( irobot_clearfirq_w )
+WRITE8_MEMBER(irobot_state::irobot_clearfirq_w)
 {
-    cputag_set_input_line(space->machine(), "maincpu", M6809_FIRQ_LINE ,CLEAR_LINE);
+    cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE ,CLEAR_LINE);
 }
 
 
@@ -125,7 +124,7 @@ static WRITE8_HANDLER( irobot_clearfirq_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( irobot_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( irobot_map, AS_PROGRAM, 8, irobot_state )
     AM_RANGE(0x0000, 0x07ff) AM_RAM
     AM_RANGE(0x0800, 0x0fff) AM_RAMBANK("bank2")
     AM_RANGE(0x1000, 0x103f) AM_READ_PORT("IN0")
@@ -138,12 +137,12 @@ static ADDRESS_MAP_START( irobot_map, AS_PROGRAM, 8 )
     AM_RANGE(0x11c0, 0x11c0) AM_WRITE(irobot_rom_banksel_w)
     AM_RANGE(0x1200, 0x12ff) AM_RAM_WRITE(irobot_nvram_w) AM_SHARE("nvram")
     AM_RANGE(0x1300, 0x13ff) AM_READ(irobot_control_r)
-    AM_RANGE(0x1400, 0x143f) AM_READWRITE(quad_pokey_r, quad_pokey_w)
+    AM_RANGE(0x1400, 0x143f) AM_READWRITE_LEGACY(quad_pokey_r, quad_pokey_w)
     AM_RANGE(0x1800, 0x18ff) AM_WRITE(irobot_paletteram_w)
     AM_RANGE(0x1900, 0x19ff) AM_WRITEONLY            /* Watchdog reset */
     AM_RANGE(0x1a00, 0x1a00) AM_WRITE(irobot_clearfirq_w)
     AM_RANGE(0x1b00, 0x1bff) AM_WRITE(irobot_control_w)
-    AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_BASE_MEMBER(irobot_state, m_videoram)
+    AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_SHARE("videoram")
     AM_RANGE(0x2000, 0x3fff) AM_READWRITE(irobot_sharedmem_r, irobot_sharedmem_w)
     AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")
     AM_RANGE(0x6000, 0xffff) AM_ROM
@@ -186,7 +185,7 @@ static INPUT_PORTS_START( irobot )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* MB DONE */
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* EXT DONE */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW2") /* DSW2 - 5E*/
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Language ) )  PORT_DIPLOCATION("SW5E:1")

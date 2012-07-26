@@ -12,6 +12,7 @@
 
 PALETTE_INIT( cop01 )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -120,21 +121,19 @@ VIDEO_START( cop01 )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( cop01_background_w )
+WRITE8_MEMBER(cop01_state::cop01_background_w)
 {
-	cop01_state *state = space->machine().driver_data<cop01_state>();
-	state->m_bgvideoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_bgvideoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE8_HANDLER( cop01_foreground_w )
+WRITE8_MEMBER(cop01_state::cop01_foreground_w)
 {
-	cop01_state *state = space->machine().driver_data<cop01_state>();
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( cop01_vreg_w )
+WRITE8_MEMBER(cop01_state::cop01_vreg_w)
 {
 	/*  0x40: --xx---- sprite bank, coin counters, flip screen
      *        -----x-- flip screen
@@ -147,14 +146,13 @@ WRITE8_HANDLER( cop01_vreg_w )
      *        -------x msb xscroll
      *  0x43: xxxxxxxx yscroll
      */
-	cop01_state *state = space->machine().driver_data<cop01_state>();
-	state->m_vreg[offset] = data;
+	m_vreg[offset] = data;
 
 	if (offset == 0)
 	{
-		coin_counter_w(space->machine(), 0, data & 1);
-		coin_counter_w(space->machine(), 1, data & 2);
-		flip_screen_set(space->machine(), data & 4);
+		coin_counter_w(machine(), 0, data & 1);
+		coin_counter_w(machine(), 1, data & 2);
+		flip_screen_set(data & 4);
 	}
 }
 
@@ -171,7 +169,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	cop01_state *state = machine.driver_data<cop01_state>();
 	int offs, code, attr, sx, sy, flipx, flipy, color;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		code = state->m_spriteram[offs + 1];
 		attr = state->m_spriteram[offs + 2];
@@ -186,7 +184,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		sx = (state->m_spriteram[offs + 3] - 0x80) + 256 * (attr & 0x01);
 		sy = 240 - state->m_spriteram[offs];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

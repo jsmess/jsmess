@@ -49,10 +49,11 @@ class koikoi_state : public driver_device
 {
 public:
 	koikoi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* video-related */
 	tilemap_t  *m_tmap;
@@ -62,6 +63,9 @@ public:
 	int m_inputval;
 	int m_inputlen;
 	int m_ioram[8];
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_READ8_MEMBER(io_r);
+	DECLARE_WRITE8_MEMBER(io_w);
 };
 
 
@@ -83,6 +87,7 @@ static TILE_GET_INFO( get_tile_info )
 
 static PALETTE_INIT( koikoi )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -145,11 +150,10 @@ static SCREEN_UPDATE_IND16(koikoi)
  *
  *************************************/
 
-static WRITE8_HANDLER( vram_w )
+WRITE8_MEMBER(koikoi_state::vram_w)
 {
-	koikoi_state *state = space->machine().driver_data<koikoi_state>();
-	state->m_videoram[offset] = data;
-	state->m_tmap->mark_tile_dirty(offset & 0x3ff);
+	m_videoram[offset] = data;
+	m_tmap->mark_tile_dirty(offset & 0x3ff);
 }
 
 static READ8_DEVICE_HANDLER( input_r )
@@ -161,7 +165,7 @@ static READ8_DEVICE_HANDLER( input_r )
 
 	if (!state->m_inputcnt)
 	{
-		int key = input_port_read(device->machine(), "IN1");
+		int key = state->ioport("IN1")->read();
 		int keyval = 0; //we must return 0 (0x2 in 2nd read) to clear 4 bit at $6600 and allow next read
 
 		if (key)
@@ -195,22 +199,20 @@ static WRITE8_DEVICE_HANDLER( unknown_w )
 	//xor'ed mux select, player 1 = 1,2,4,8, player 2 = 0x10, 0x20, 0x40, 0x80
 }
 
-static READ8_HANDLER( io_r )
+READ8_MEMBER(koikoi_state::io_r)
 {
-	koikoi_state *state = space->machine().driver_data<koikoi_state>();
 	if (!offset)
-		return input_port_read(space->machine(), "IN0") ^ state->m_ioram[4]; //coin
+		return ioport("IN0")->read() ^ m_ioram[4]; //coin
 
 	return 0;
 }
 
-static WRITE8_HANDLER( io_w )
+WRITE8_MEMBER(koikoi_state::io_w)
 {
-	koikoi_state *state = space->machine().driver_data<koikoi_state>();
 	if (offset == 7 && data == 0)
-		state->m_inputcnt = 0; //reset read cycle counter
+		m_inputcnt = 0; //reset read cycle counter
 
-	state->m_ioram[offset] = data;
+	m_ioram[offset] = data;
 }
 
 /*************************************
@@ -219,19 +221,19 @@ static WRITE8_HANDLER( io_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( koikoi_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( koikoi_map, AS_PROGRAM, 8, koikoi_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(vram_w) AM_BASE_MEMBER(koikoi_state, m_videoram)
+	AM_RANGE(0x7000, 0x77ff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("DSW")
 	AM_RANGE(0x9000, 0x9007) AM_READWRITE(io_r, io_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( koikoi_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( koikoi_io_map, AS_IO, 8, koikoi_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_WRITENOP //watchdog
-	AM_RANGE(0x03, 0x03) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x06, 0x07) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 /*************************************

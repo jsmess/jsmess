@@ -19,7 +19,16 @@ class jedi_state : public driver_device
 public:
 	jedi_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") { }
+		  m_nvram(*this, "nvram") ,
+		m_foreground_bank(*this, "foreground_bank"),
+		m_video_off(*this, "video_off"),
+		m_backgroundram(*this, "backgroundram"),
+		m_paletteram(*this, "paletteram"),
+		m_foregroundram(*this, "foregroundram"),
+		m_spriteram(*this, "spriteram"),
+		m_smoothing_table(*this, "smoothing_table"),
+		m_audio_comm_stat(*this, "audio_comm_stat"),
+		m_speech_data(*this, "speech_data") { }
 
 	required_shared_ptr<UINT8> m_nvram;
 
@@ -29,22 +38,41 @@ public:
 	emu_timer *m_interrupt_timer;
 
 	/* video state */
-	UINT8 *m_foregroundram;
-	UINT8 *m_backgroundram;
-	UINT8 *m_spriteram;
-	UINT8 *m_paletteram;
-	UINT8 *m_foreground_bank;
-	UINT8 *m_video_off;
-	UINT8 *m_smoothing_table;
+	required_shared_ptr<UINT8> m_foreground_bank;
+	required_shared_ptr<UINT8> m_video_off;
+	required_shared_ptr<UINT8> m_backgroundram;
+	required_shared_ptr<UINT8> m_paletteram;
+	required_shared_ptr<UINT8> m_foregroundram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_smoothing_table;
 	UINT32 m_vscroll;
 	UINT32 m_hscroll;
 
 	/* audio state */
 	UINT8  m_audio_latch;
 	UINT8  m_audio_ack_latch;
-	UINT8 *m_audio_comm_stat;
-	UINT8 *m_speech_data;
+	required_shared_ptr<UINT8> m_audio_comm_stat;
+	required_shared_ptr<UINT8> m_speech_data;
 	UINT8  m_speech_strobe_state;
+	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
+	DECLARE_WRITE8_MEMBER(rom_banksel_w);
+	DECLARE_READ8_MEMBER(a2d_data_r);
+	DECLARE_WRITE8_MEMBER(a2d_select_w);
+	DECLARE_WRITE8_MEMBER(jedi_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(nvram_data_w);
+	DECLARE_WRITE8_MEMBER(nvram_enable_w);
+	DECLARE_WRITE8_MEMBER(jedi_vscroll_w);
+	DECLARE_WRITE8_MEMBER(jedi_hscroll_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(jedi_audio_comm_stat_r);
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_WRITE8_MEMBER(jedi_audio_reset_w);
+	DECLARE_WRITE8_MEMBER(jedi_audio_latch_w);
+	DECLARE_READ8_MEMBER(audio_latch_r);
+	DECLARE_READ8_MEMBER(jedi_audio_ack_latch_r);
+	DECLARE_WRITE8_MEMBER(audio_ack_latch_w);
+	DECLARE_WRITE8_MEMBER(speech_strobe_w);
+	DECLARE_READ8_MEMBER(speech_ready_r);
+	DECLARE_WRITE8_MEMBER(speech_reset_w);
 };
 
 
@@ -52,15 +80,9 @@ public:
 
 MACHINE_CONFIG_EXTERN( jedi_audio );
 
-WRITE8_HANDLER( jedi_audio_reset_w );
-WRITE8_HANDLER( jedi_audio_latch_w );
-READ8_HANDLER( jedi_audio_ack_latch_r );
-CUSTOM_INPUT( jedi_audio_comm_stat_r );
 
 
 /*----------- defined in video/jedi.c -----------*/
 
 MACHINE_CONFIG_EXTERN( jedi_video );
 
-WRITE8_HANDLER( jedi_vscroll_w );
-WRITE8_HANDLER( jedi_hscroll_w );

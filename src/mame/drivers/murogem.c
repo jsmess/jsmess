@@ -114,13 +114,15 @@ class murogem_state : public driver_device
 {
 public:
 	murogem_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
+	DECLARE_WRITE8_MEMBER(outport_w);
 };
 
 
-static WRITE8_HANDLER( outport_w )
+WRITE8_MEMBER(murogem_state::outport_w)
 {
 /*
    It's a Delta-Sigma DAC (1-bit/Bitstream)
@@ -129,18 +131,18 @@ static WRITE8_HANDLER( outport_w )
     7654 3210
     ---- x---   Sound DAC.
 */
-	dac_data_w(space->machine().device("dac"), data & 0x08);
+	dac_data_w(machine().device("dac"), data & 0x08);
 }
 
 
-static ADDRESS_MAP_START( murogem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( murogem_map, AS_PROGRAM, 8, murogem_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0")
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("IN1")
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(outport_w)	/* output port */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(murogem_state, m_videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

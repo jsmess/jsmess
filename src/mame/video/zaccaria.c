@@ -35,6 +35,7 @@ Here's the hookup from the proms (82s131) to the r-g-b-outputs
 ***************************************************************************/
 PALETTE_INIT( zaccaria )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i, j, k;
 	static const int resistances_rg[] = { 1200, 1000, 820 };
 	static const int resistances_b[]  = { 1000, 820 };
@@ -147,40 +148,38 @@ VIDEO_START( zaccaria )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( zaccaria_videoram_w )
+WRITE8_MEMBER(zaccaria_state::zaccaria_videoram_w)
 {
-	zaccaria_state *state = space->machine().driver_data<zaccaria_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( zaccaria_attributes_w )
+WRITE8_MEMBER(zaccaria_state::zaccaria_attributes_w)
 {
-	zaccaria_state *state = space->machine().driver_data<zaccaria_state>();
 	if (offset & 1)
 	{
-		if (state->m_attributesram[offset] != data)
+		if (m_attributesram[offset] != data)
 		{
 			int i;
 
 			for (i = offset / 2;i < 0x400;i += 32)
-				state->m_bg_tilemap->mark_tile_dirty(i);
+				m_bg_tilemap->mark_tile_dirty(i);
 		}
 	}
 	else
-		state->m_bg_tilemap->set_scrolly(offset / 2,data);
+		m_bg_tilemap->set_scrolly(offset / 2,data);
 
-	state->m_attributesram[offset] = data;
+	m_attributesram[offset] = data;
 }
 
-WRITE8_HANDLER( zaccaria_flip_screen_x_w )
+WRITE8_MEMBER(zaccaria_state::zaccaria_flip_screen_x_w)
 {
-	flip_screen_x_set(space->machine(), data & 1);
+	flip_screen_x_set(data & 1);
 }
 
-WRITE8_HANDLER( zaccaria_flip_screen_y_w )
+WRITE8_MEMBER(zaccaria_state::zaccaria_flip_screen_y_w)
 {
-	flip_screen_y_set(space->machine(), data & 1);
+	flip_screen_y_set(data & 1);
 }
 
 
@@ -208,6 +207,7 @@ offsets 1 and 2 are swapped if accessed from spriteram2
 */
 static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,UINT8 *spriteram,int color,int section)
 {
+	zaccaria_state *state = machine.driver_data<zaccaria_state>();
 	int offs,o1 = 1,o2 = 2;
 
 	if (section)
@@ -225,12 +225,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		if (sx == 1) continue;
 
-		if (flip_screen_x_get(machine))
+		if (state->flip_screen_x())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y_get(machine))
+		if (state->flip_screen_y())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

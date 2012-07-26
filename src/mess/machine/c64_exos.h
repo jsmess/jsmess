@@ -12,7 +12,6 @@
 #ifndef __EXOS__
 #define __EXOS__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"
@@ -34,11 +33,11 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "c64_exos"; }
+	virtual void device_start();
 
 	// device_c64_expansion_card_interface overrides
-	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2);
+	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2);
 	virtual int c64_game_r(offs_t offset, int ba, int rw, int hiram);
 };
 

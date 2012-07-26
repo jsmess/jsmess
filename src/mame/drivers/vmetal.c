@@ -21,7 +21,7 @@ ES-9309B-B
 |A                                           |
 |                 |--------|          1.U29  |
 |         62256   |Imagetek|                 |
-|         62256   |14220   |          2.U31  |
+|         62256   |I4220   |          2.U31  |
 |                 |        |                 |
 |                 |--------|          3.U28  |
 |                                            |
@@ -42,7 +42,7 @@ Notes:
       6264    - 8k x8 SRAM (DIP28)
       TA7222  - Toshiba TA7222 5.8 Watt Audio Power Amplifier (SIP10)
       EPM7032 - Altera EPM7032LC44-15T High Performance EEPROM-based Programmable Logic Device (PLCC44)
-      Custom  - Imagetek 14220 Graphics Controller (QFP208)
+      Custom  - Imagetek I4220 Graphics Controller (QFP208)
       VSync   - 58.2328Hz
       HSync   - 15.32kHz
       ROMs    -
@@ -83,30 +83,47 @@ class vmetal_state : public metro_state
 {
 public:
 	vmetal_state(const machine_config &mconfig, device_type type, const char *tag)
-		: metro_state(mconfig, type, tag) { }
+		: metro_state(mconfig, type, tag),
+		  m_texttileram(*this, "texttileram"),
+		  m_mid1tileram(*this, "mid1tileram"),
+		  m_mid2tileram(*this, "mid2tileram"),
+		  m_tlookup(*this, "tlookup"),
+		  m_vmetal_videoregs(*this, "vmetal_regs") { }
 
-	UINT16 *m_texttileram;
-	UINT16 *m_mid1tileram;
-	UINT16 *m_mid2tileram;
-	UINT16 *m_tlookup;
-	UINT16 *m_vmetal_videoregs;
+	required_shared_ptr<UINT16> m_texttileram;
+	required_shared_ptr<UINT16> m_mid1tileram;
+	required_shared_ptr<UINT16> m_mid2tileram;
+	required_shared_ptr<UINT16> m_tlookup;
+	required_shared_ptr<UINT16> m_vmetal_videoregs;
 
 	tilemap_t *m_texttilemap;
 	tilemap_t *m_mid1tilemap;
 	tilemap_t *m_mid2tilemap;
+	DECLARE_READ16_MEMBER(varia_crom_read);
+	DECLARE_WRITE16_MEMBER(vmetal_texttileram_w);
+	DECLARE_WRITE16_MEMBER(vmetal_mid1tileram_w);
+	DECLARE_WRITE16_MEMBER(vmetal_mid2tileram_w);
+	DECLARE_READ16_MEMBER(varia_dips_bit8_r);
+	DECLARE_READ16_MEMBER(varia_dips_bit7_r);
+	DECLARE_READ16_MEMBER(varia_dips_bit6_r);
+	DECLARE_READ16_MEMBER(varia_dips_bit5_r);
+	DECLARE_READ16_MEMBER(varia_dips_bit4_r);
+	DECLARE_READ16_MEMBER(varia_dips_bit3_r);
+	DECLARE_READ16_MEMBER(varia_dips_bit2_r);
+	DECLARE_READ16_MEMBER(varia_dips_bit1_r);
 };
 
 
-static READ16_HANDLER ( varia_crom_read )
+READ16_MEMBER(vmetal_state::varia_crom_read)
 {
 	/* game reads the cgrom, result is 7772, verified to be correct on the real board */
 
-	vmetal_state *state = space->machine().driver_data<vmetal_state>();
-	UINT8 *cgrom = space->machine().region("gfx1")->base();
+
+	UINT8 *cgrom = memregion("gfx1")->base();
 	UINT16 retdat;
 
 	offset = offset << 1;
-	offset |= (state->m_vmetal_videoregs[0x0ab / 2] & 0x7f) << 16;
+	offset |= (m_vmetal_videoregs[0x0ab / 2] & 0x7f) << 16;
 	retdat = ((cgrom[offset] << 8) | (cgrom[offset + 1]));
 	// popmessage("varia romread offset %06x data %04x", offset, retdat);
 
@@ -125,36 +142,36 @@ static void get_vmetal_tlookup(running_machine &machine, UINT16 data, UINT16 *ti
 }
 
 
-static WRITE16_HANDLER( vmetal_texttileram_w )
+WRITE16_MEMBER(vmetal_state::vmetal_texttileram_w)
 {
-	vmetal_state *state = space->machine().driver_data<vmetal_state>();
-	COMBINE_DATA(&state->m_texttileram[offset]);
-	state->m_texttilemap->mark_tile_dirty(offset);
+
+	COMBINE_DATA(&m_texttileram[offset]);
+	m_texttilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( vmetal_mid1tileram_w )
+WRITE16_MEMBER(vmetal_state::vmetal_mid1tileram_w)
 {
-	vmetal_state *state = space->machine().driver_data<vmetal_state>();
-	COMBINE_DATA(&state->m_mid1tileram[offset]);
-	state->m_mid1tilemap->mark_tile_dirty(offset);
+
+	COMBINE_DATA(&m_mid1tileram[offset]);
+	m_mid1tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( vmetal_mid2tileram_w )
+WRITE16_MEMBER(vmetal_state::vmetal_mid2tileram_w)
 {
-	vmetal_state *state = space->machine().driver_data<vmetal_state>();
-	COMBINE_DATA(&state->m_mid2tileram[offset]);
-	state->m_mid2tilemap->mark_tile_dirty(offset);
+
+	COMBINE_DATA(&m_mid2tileram[offset]);
+	m_mid2tilemap->mark_tile_dirty(offset);
 }
 
 
-static READ16_HANDLER ( varia_dips_bit8_r ) { return ((input_port_read(space->machine(), "DSW2") & 0x80) << 0) | ((input_port_read(space->machine(), "DSW1") & 0x80) >> 1); }
-static READ16_HANDLER ( varia_dips_bit7_r ) { return ((input_port_read(space->machine(), "DSW2") & 0x40) << 1) | ((input_port_read(space->machine(), "DSW1") & 0x40) >> 0); }
-static READ16_HANDLER ( varia_dips_bit6_r ) { return ((input_port_read(space->machine(), "DSW2") & 0x20) << 2) | ((input_port_read(space->machine(), "DSW1") & 0x20) << 1); }
-static READ16_HANDLER ( varia_dips_bit5_r ) { return ((input_port_read(space->machine(), "DSW2") & 0x10) << 3) | ((input_port_read(space->machine(), "DSW1") & 0x10) << 2); }
-static READ16_HANDLER ( varia_dips_bit4_r ) { return ((input_port_read(space->machine(), "DSW2") & 0x08) << 4) | ((input_port_read(space->machine(), "DSW1") & 0x08) << 3); }
-static READ16_HANDLER ( varia_dips_bit3_r ) { return ((input_port_read(space->machine(), "DSW2") & 0x04) << 5) | ((input_port_read(space->machine(), "DSW1") & 0x04) << 4); }
-static READ16_HANDLER ( varia_dips_bit2_r ) { return ((input_port_read(space->machine(), "DSW2") & 0x02) << 6) | ((input_port_read(space->machine(), "DSW1") & 0x02) << 5); }
-static READ16_HANDLER ( varia_dips_bit1_r ) { return ((input_port_read(space->machine(), "DSW2") & 0x01) << 7) | ((input_port_read(space->machine(), "DSW1") & 0x01) << 6); }
+READ16_MEMBER(vmetal_state::varia_dips_bit8_r){ return ((ioport("DSW2")->read() & 0x80) << 0) | ((ioport("DSW1")->read() & 0x80) >> 1); }
+READ16_MEMBER(vmetal_state::varia_dips_bit7_r){ return ((ioport("DSW2")->read() & 0x40) << 1) | ((ioport("DSW1")->read() & 0x40) >> 0); }
+READ16_MEMBER(vmetal_state::varia_dips_bit6_r){ return ((ioport("DSW2")->read() & 0x20) << 2) | ((ioport("DSW1")->read() & 0x20) << 1); }
+READ16_MEMBER(vmetal_state::varia_dips_bit5_r){ return ((ioport("DSW2")->read() & 0x10) << 3) | ((ioport("DSW1")->read() & 0x10) << 2); }
+READ16_MEMBER(vmetal_state::varia_dips_bit4_r){ return ((ioport("DSW2")->read() & 0x08) << 4) | ((ioport("DSW1")->read() & 0x08) << 3); }
+READ16_MEMBER(vmetal_state::varia_dips_bit3_r){ return ((ioport("DSW2")->read() & 0x04) << 5) | ((ioport("DSW1")->read() & 0x04) << 4); }
+READ16_MEMBER(vmetal_state::varia_dips_bit2_r){ return ((ioport("DSW2")->read() & 0x02) << 6) | ((ioport("DSW1")->read() & 0x02) << 5); }
+READ16_MEMBER(vmetal_state::varia_dips_bit1_r){ return ((ioport("DSW2")->read() & 0x01) << 7) | ((ioport("DSW1")->read() & 0x01) << 6); }
 
 static WRITE8_DEVICE_HANDLER( vmetal_control_w )
 {
@@ -216,22 +233,22 @@ static WRITE8_DEVICE_HANDLER( vmetal_es8712_w )
 }
 
 
-static ADDRESS_MAP_START( varia_program_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( varia_program_map, AS_PROGRAM, 16, vmetal_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(vmetal_texttileram_w) AM_BASE_MEMBER(vmetal_state, m_texttileram)
-	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(vmetal_mid1tileram_w) AM_BASE_MEMBER(vmetal_state, m_mid1tileram)
-	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(vmetal_mid2tileram_w) AM_BASE_MEMBER(vmetal_state, m_mid2tileram)
+	AM_RANGE(0x100000, 0x11ffff) AM_RAM_WRITE(vmetal_texttileram_w) AM_SHARE("texttileram")
+	AM_RANGE(0x120000, 0x13ffff) AM_RAM_WRITE(vmetal_mid1tileram_w) AM_SHARE("mid1tileram")
+	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(vmetal_mid2tileram_w) AM_SHARE("mid2tileram")
 
 	AM_RANGE(0x160000, 0x16ffff) AM_READ(varia_crom_read) // cgrom read window ..
 
-	AM_RANGE(0x170000, 0x173fff) AM_RAM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_BASE_SIZE_MEMBER(vmetal_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x170000, 0x173fff) AM_RAM_WRITE(paletteram_GGGGGRRRRRBBBBBx_word_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x174000, 0x174fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x175000, 0x177fff) AM_RAM
-	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_BASE_MEMBER(vmetal_state, m_tlookup)
-	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_BASE_MEMBER(vmetal_state, m_vmetal_videoregs)
-	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_BASE_MEMBER(vmetal_state, m_videoregs)	// Metro sprite chip Video Registers
+	AM_RANGE(0x178000, 0x1787ff) AM_RAM AM_SHARE("tlookup")
+	AM_RANGE(0x178800, 0x1796ff) AM_RAM AM_SHARE("vmetal_regs")
+	AM_RANGE(0x179700, 0x179713) AM_WRITEONLY AM_SHARE("videoregs")	// Metro sprite chip Video Registers
 
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_DEVWRITE8("essnd", vmetal_control_w, 0x00ff)
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2") AM_DEVWRITE8_LEGACY("essnd", vmetal_control_w, 0x00ff)
 	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("SYSTEM")
 
 	/* same weird way to read Dip Switches as in many games in metro.c driver - use balcube_dsw_r read handler once the driver is merged */
@@ -252,9 +269,9 @@ static ADDRESS_MAP_START( varia_program_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x31fffa, 0x31fffb) AM_READ(varia_dips_bit2_r)	// 0x40 = dip1-2  -> 0xff0085 , 0x80 = dip2-2 -> 0xff0084
 	AM_RANGE(0x31fffc, 0x31fffd) AM_READ(varia_dips_bit1_r)	// 0x40 = dip1-1  -> 0xff0085 , 0x80 = dip2-1 -> 0xff0084
 
-	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )
-	AM_RANGE(0x400002, 0x400003) AM_DEVWRITE8_MODERN("oki", okim6295_device, write, 0x00ff)	// Volume/channel info
-	AM_RANGE(0x500000, 0x50000d) AM_DEVWRITE8("essnd", vmetal_es8712_w, 0x00ff)
+	AM_RANGE(0x400000, 0x400001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
+	AM_RANGE(0x400002, 0x400003) AM_DEVWRITE8("oki", okim6295_device, write, 0x00ff)	// Volume/channel info
+	AM_RANGE(0x500000, 0x50000d) AM_DEVWRITE8_LEGACY("essnd", vmetal_es8712_w, 0x00ff)
 
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -406,8 +423,8 @@ static TILE_GET_INFO( get_vmetal_mid2tilemap_tile_info )
 static void expand_gfx1(running_machine &machine)
 {
 	metro_state *state = machine.driver_data<metro_state>();
-	UINT8 *base_gfx = machine.region("gfx1")->base();
-	UINT32 length = 2 * machine.region("gfx1")->bytes();
+	UINT8 *base_gfx = state->memregion("gfx1")->base();
+	UINT32 length = 2 * state->memregion("gfx1")->bytes();
 	state->m_expanded_gfx1 = auto_alloc_array(machine, UINT8, length);
 	for (int i = 0; i < length; i += 2)
 	{

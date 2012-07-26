@@ -34,11 +34,10 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
-	struct planet;
-
 	virtual void machine_start();
-
 	virtual void video_start();
+
+	struct planet;
 
 	void init_planet(planet &liberatr_planet, UINT8 *planet_rom);
 	void get_pens(pen_t *pens);

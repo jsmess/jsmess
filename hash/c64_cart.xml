@@ -2,6 +2,53 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 
+	Hardware to be emulated
+
+	CPU replacements:
+	- Turbo Master CPU (R65C02P4 @ 4.09 MHz)
+	- Turbo Process Accelerator (65C816P-4  @ 50kHz-4MHz)
+	- Flash 8 (65816 @ 8 MHz, 4/8 MB RAM)
+	- CMD SuperCPU 64 (65C816S, 64 KB RAM)
+	- Data 20 Z-80 Video Pak (Z80, 80 column video)
+	- Commodore CP/M (Z80)
+
+	Serial I/O:
+	- CMD SwiftLink (6551 @ 3.6864 MHz)
+	- CMD Turbo232
+	- HART (8251)
+
+	RAM expansions:
+	- CMD RAMLink
+	- CMD RAMDrive
+	- Commodore REU 1700/1750/1764
+	- Rex RAM-Floppt 256K
+	- Rex Goliath 1MB
+	- NeoRAM
+	- RAM-Cart
+
+	Hard disks:
+	- Lt. Kernal
+
+	Audio:
+	- Currah Speech 64
+	- SID Symphony
+	- MSSIAH
+	- Prophet-64
+	- Model 64 Sequencer
+	- Synthetiseur Vocal
+	- 64er MIDI
+	- FB-MIDI
+	- C-LAB MIDI
+	- JMS MIDI
+	- Datel MIDI
+	- Passport MIDI
+	- Speech Maker
+
+	EPROM burners:
+	- J-R Promenade C1
+	- Rex Quickbyte 2
+	- Rex Goliath Eprommer
+
 	Missing dumps that exist as .crt but are missing from this list:
 
 	- Ariolasoft Structured BASIC
@@ -15,6 +62,7 @@
 	List of mostly undumped cartridges:
 	http://www.retroport.de/C64_C128_Hardware.html
 	http://members.optusnet.com.au/spacetaxi64/DRIVERS/DRIVERS.htm
+	http://members.optusnet.com.au/spacetaxi64/SPEED-UP-CARTS/SPEED-C64-CPU.htm
 
 -->
 <softwarelist name="c64_cart" description="Commodore 64 cartridges">
@@ -23,30 +71,7 @@
 		<description>VizaWrite 64</description>
 		<year>1984</year>
 		<publisher>Viza Software</publisher>
-		<!--
-		|===========================|
-		|=|      LS10    LS122  C   |
-		|=|                  R      |
-		|=|                         |
-		|=|                         |
-		|=|      ROM0  ROM2  ROM1   |
-		|=|                         |
-		|=|                         |
-		|=|                         |
-		|===========================|
 
-		ROM0    - Mitsubishi M5L2764K 8Kx8 EPROM "U"
-		ROM1    - Mitsubishi M5L2764K 8Kx8 EPROM "3"
-		ROM2    - Mitsubishi M5L2764K 8Kx8 EPROM "2" (located on solder side)
-		R       - 56K
-		C       - 47uF
-
-		data and address lines are scrambled:
-		data = BITSWAP8(7,6,0,5,1,4,2,3)
-		address = BITSWAP16(15,14,13,12,7,8,6,9,5,11,4,3,2,10,1,0)
-		GAME:after reset GND for 1.1844s (74LS122 tW=0.45*R*C) then goes to Vcc
-		EXROM:GND
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="vizawrite" />
 			<feature name="game" value="0" />
@@ -67,44 +92,7 @@
 		<description>Triton QD TDOS 1.2</description>
 		<year>198?</year>
 		<publisher>Radofin</publisher>
-		<!--
-		XM-2206-A (top)
-		XM-2205-A (bottom)
-		            |===========================|
-		            |            CN4            |
-		            |                           |
-		            |      ULA                  |
-		            |                           |
-		            |      6.5MHz               |
-		            |                           |
-		            |      SSDA                 |
-		            |                 LS175     |
-		            |                 LS367     |
-		            |            CN3            |
-		            |=========|||||||||=========|
-		                      |||||||||
-		        |=============|||||||||============|
-		        |                CN2               |
-		        |       LS00     LS02     LS138    |
-		|=======|                                  |
-		|=|             LS245        ROM           |
-		|=|                                        |
-		|=|                                        |
-		|=|                                     CN1|
-		|=|                                        |
-		|=|                                        |
-		|=|                                        |
-		|=|                             SW1        |
-		|==========================================|
 
-		ROM    - Hitachi HN482764G 8Kx8 EPROM "TDOS 1.2"
-		ULA    - Ferranti ULA5RB073E1 XZ-2085-1
-		SSDA   - Motorola MC68A52P SSDA
-		CN1    - C64 expansion connector (pass-thru)
-		CN2,3  - 19x1 flat ribbon cable to other PCB
-		CN4    - 9 wires to 3" drive
-		SW1    - cartridge on/off switch
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="tdos" />
 			<feature name="game" value="1" />
@@ -117,39 +105,18 @@
 		</part>
 	</software>
 
-	<software name="cs64" supported="no">
+	<software name="cs64">
 		<description>Currah Speech 64</description>
 		<year>1984</year>
 		<publisher>Currah</publisher>
-		<!--
-		|===========================|
-		|=|                         |
-		|=|         VLSI            |
-		|=|                         |
-		|=|                         |
-		|=|         ROM             |
-		|=|                         |
-		|=|                         |
-		|=|         SP0256          |
-		|===========================|
 
-		VLSI   - General Instruments LA05-164
-		ROM    - General Instruments R09864CS-2030 8Kx8 ROM "778R01"
-		SP0256 - General Instruments SP0256A-AL2 Speech Synthesizer
-		-->
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="currah_speech_64" />
+			<feature name="slot" value="cs64" />
 			<feature name="game" value="1" />
-			<feature name="exrom" value="0" />
-			<feature name="vlsi" value="LA05-164" />
-			<feature name="speech" value="SP0256" />
+			<feature name="exrom" value="1" />
 
-			<dataarea name="roml" size="0x2000">
+			<dataarea name="romh" size="0x2000">
 				<rom name="778r01" size="0x2000" crc="e3f8abd0" sha1="dc9fc1ffb033531abec03b1a06a8d5064dd0ce61" offset="0x0000" />
-			</dataarea>
-
-			<dataarea name="sp0256" size="0x800">
-				<rom name="sp0256al2" size="0x800" crc="df8de0b0" sha1="86fb6d9fef955ac0bc76e0c45c66585946d278a1" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -189,8 +156,7 @@
 		<description>Fast Load Cartridge v2</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
-		<!--
-		-->
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="epyxfastload" />
 			<feature name="game" value="1" />
@@ -206,8 +172,7 @@
 		<description>Fast Load Cartridge v1</description>
 		<year>1984</year>
 		<publisher>Epyx</publisher>
-		<!--
-		-->
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="epyxfastload" />
 			<feature name="game" value="1" />
@@ -220,32 +185,30 @@
 	</software>
 
 	<software name="ps64" supported="no">
-		<description>PS-64 puhemoduli v2.0 (Fin)</description>
+		<description>PS-64 puhemoduli v1.0 (Fin)</description>
 		<year>1988</year>
 		<publisher>Koulun erityispalvelu</publisher>
-		<!--
-		|===========================|
-		|=|                         |
-		|=|                      SW1|
-		|=|       SC02              |
-		|=|                         |
-		|=|                      CN1|
-		|=|       ROM        LF347  |
-		|=|                         |
-		|=|                         |
-		|===========================|
 
-		SC02  - Votrax SSI-263AP Speech Synthesizer (mapped at 0xde00-0xde04)
-		ROM   - Hynix Semiconductor HY27C64D-20 8Kx8 EPROM
-		LF347 - National Instruments LF347N JFET Operational Amplifier
-		SW1   - Module on/off switch
-		CN1   - connector to C64 video/audio port
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ps64" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
-			<feature name="speech" value="SSI-263AP" />
+
+			<dataarea name="roml" size="0x2000">
+				<rom name="ps-64.bin" size="0x2000" crc="0613bd98" sha1="a255e3a42d65ffffe835d9ac06034caf371d6994" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ps64v2" cloneof="ps64" supported="no">
+		<description>PS-64 puhemoduli v2.0 (Fin)</description>
+		<year>1988</year>
+		<publisher>Koulun erityispalvelu</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ps64" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
 
 			<dataarea name="roml" size="0x2000">
 				<rom name="unlabeled" size="0x2000" crc="793ced42" sha1="8f66fde8ec8ed6fd8fb597df39d2867ecc58d7e1" offset="0x0000" />
@@ -295,22 +258,7 @@
 		<description>Pagefox (Fin)</description>
 		<year>1987</year>
 		<publisher>Scanntronik</publisher>
-		<!--
-		|===========================|
-		|=|                         |
-		|=|     RAM         LS11    |
-		|=|                         |
-		|=|                 LS139   |
-		|=|     ROM0                |
-		|=|                 LS273   |
-		|=|                         |
-		|=|     ROM1        LS00    |
-		|===========================|
 
-		RAM   - NEC D43256-12L 32Kx8 RAM
-		ROM0  - SGS M27256-2FI 32Kx8 EPROM
-		ROM1  - National Instruments NMC27C256Q 32Kx8 EPROM
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="pagefox" />
 			<feature name="game" value="0" />
@@ -329,21 +277,7 @@
 		<description>Easy Calc Result</description>
 		<year>1985</year>
 		<publisher>Handic Software</publisher>
-		<!--
-		|===========================|
-		|=|                         |
-		|=|     ROM0        LS73    |
-		|=|                         |
-		|=|                         |
-		|=|                         |
-		|=|                         |
-		|=|     ROM1        LS00    |
-		|=|                         |
-		|===========================|
 
-		ROM0  - Hitachi HN61364P 8Kx8 EPROM "CR2001"
-		ROM1  - Hitachi HN613128P 16Kx8 EPROM "CR3001"
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="easycalcres" />
 			<feature name="game" value="0" />
@@ -417,8 +351,7 @@
 		<description>Print Technik-Help</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<!--
-		-->
+
 		<part name="cart" interface="c64_cart">
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
@@ -434,38 +367,7 @@
 		<description>Multiscreen (Aus)</description>
 		<year>1987</year>
 		<publisher>Multiscreen Pty</publisher>
-		<!--
-		                |===================|
-		                |           ROM6    |
-		                |  MC14066          |
-		                |                   |
-		|===============|           ROM5    |
-		|=|                                 |
-		|=|                                 |
-		|=|    RAM         BAT      ROM4    |
-		|=|                                 |
-		|=|                                 |
-		|=|    ROM0                 ROM3    |
-		|=|                                 |
-		|=|                                 |
-		|===============|  LS138    ROM2    |
-		                |  LS138            |
-		                |  LS174            |
-		                |  LS133    ROM1    |
-		                |===================|
 
-		BAT   - BR2325 lithium battery
-		RAM   - ? 8Kx8 RAM
-		ROM0  - ? 16Kx8 EPROM
-		ROM1  - ? 32Kx8 EPROM
-		ROM2  - ? 32Kx8 EPROM
-		ROM3  - ? 32Kx8 EPROM
-		ROM4  - not populated
-		ROM5  - not populated
-		ROM6  - not populated
-
-		bankswitching latch at I/O2 ($DF00..$DFFF) (write $0D -> RAM @8000)
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="multiscreen" />
 			<feature name="game" value="0" />
@@ -479,51 +381,17 @@
 				<rom name="cart-4.bin" size="0x8000" crc="042678ef" sha1="ff2582c617f72bf57be7d76bcf8270665144f924" offset="0x14000" />
 			</dataarea>
 
-			<dataarea name="ram" size="0x2000" />
-		</part>
-		<!--
-		-->
-		<part name="driver_board" interface="device">
-			<feature name="pcb" value="RDL77" />
-			<feature name="xtal" value="4000000" />
-			<feature name="cpu" value="MC6802P" />
-			<feature name="pia1" value="MC6821P" />
-			<feature name="pia2" value="MC6821P" />
-			<feature name="ram1" value="MC6810P" />
-			<feature name="ram2" value="MC6810P" />
-
-			<dataarea name="rom" size="0x2000">
-				<rom name="1" size="0x1000" crc="35be02a8" sha1="5912bc3d8e0c0949c1e66c19116d6b71c7574e46" offset="0x0000" />
-				<rom name="1 2cr" size="0x1000" crc="76a9ac6d" sha1="87e7335e626bdb73498b46c28c7baab72df38d1f" offset="0x1000" />
-			</dataarea>
-
-			<dataarea name="ram" size="0x100" />
+			<dataarea name="nvram" size="0x2000" />
 		</part>
 	</software>
 
-	<software name="4040fast" supported="no">
+	<software name="4040fast">
 		<description>4040 + Fast Hack'Em</description>
 		<year>1990</year>
 		<publisher>Basement Boys Software</publisher>
-		<!--
-		|===========================|
-		|=|                         |
-		|=|                     SW1 |
-		|=|         ROM0            |
-		|=|                         |
-		|=|                         |
-		|=|         ROM1            |
-		|=|                         |
-		|=|                         |
-		|===========================|
 
-		ROM0,1  - National Semiconductor NMC27C64Q 8Kx8 EPROM
-		SW1     - ROM selection switch
-		EXROM:GND
-		GAME:Vcc
-		-->
 		<part name="cart" interface="c64_cart">
-			<feature name="slot" value="4040_fast_hack_em" />
+			<feature name="slot" value="sw8k" />
 			<feature name="game" value="1" />
 			<feature name="exrom" value="0" />
 
@@ -538,28 +406,7 @@
 		<description>Skærmtrolden Hugo (Den)</description>
 		<year>1990</year>
 		<publisher>SilverRock Productions</publisher>
-		<!--
-		e9048
-		|=============|
-		|=| LS00      |
-		|=|      LS273|
-		|=|           |
-		|=|           |
-		|=| ROM       |
-		|=|           |
-		|=|           |
-		|=|           |
-		|=============|
 
-		ROM     - Atmel AT27C010-25PC 128Kx8 OTP EPROM "HUGO 2012"
-
-		data and address lines are scrambled:
-		data = BITSWAP8(7,6,5,4,0,1,2,3)
-		address = BITSWAP17(D6,D5,D4,D7,12,7,6,5,4,3,2,1,0,8,9,11,10)
-
-		bankswitching latch at I/O1 ($DE00..$DEFF): D6=A16, D5=A15, D4=A14, D7=A13
-		latch is cleared to 0 on computer reset
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="silverrock" />
 			<feature name="game" value="0" />
@@ -576,21 +423,7 @@
 		<description>Chase H.Q. 2: Special Criminal Investigation</description>
 		<year>1990</year>
 		<publisher>Ocean</publisher>
-		<!--
-		|===========================|
-		|=|                   LS02  |
-		|=|                         |
-		|=|                         |
-		|=|    ROM0   ROM1          |
-		|=|                   LS273 |
-		|=|                         |
-		|=|                         |
-		|=|                         |
-		|===========================|
 
-		ROM0,1 - 28-pin ROM (Toshiba TC531000 pinout, markings scratched off)
-		bankswitch latch @ I/O1: D3-D0 = A16-A13
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ocean" />
 			<feature name="game" value="0" />
@@ -608,34 +441,11 @@
 		</part>
 	</software>
 
-	<software name="xl80" supported="no">
+	<software name="xl80">
 		<description>XL 80</description>
 		<year>1984</year>
 		<publisher>Data 20</publisher>
-		<!--
-		        |==================================|
-		        |   LS175    LS20    LS139         |
-		        |   LS157                          |
-		|=======|                                  |
-		|=|                          RAM           |
-		|=|    LS157      LS157             LS165  |
-		|=|                                        |
-		|=|                                     CN1|
-		|=|          CRTC            ROM1          |
-		|=|                                        |
-		|=|    ROM0          LS245   LS151         |
-		|=|                             14.31818MHz|
-		|=======|            LS174   LS00          |
-		        |                           HCU04  |
-		        |    LS74    LS161   LS74          |
-		        |==================================|
 
-		CRTC - Hitachi HD46505SP
-		RAM  - Toshiba TMM2016AP-12 2Kx8 Static RAM
-		ROM0 - GI 9433CS-0090 4Kx8 ROM
-		ROM1 - GI 9316CS-F67 2Kx8 ROM "DTC"
-		CN1  - RCA video output
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="xl80" />
 			<feature name="game" value="1" />
@@ -649,6 +459,7 @@
 				<rom name="dtc.u14" size="0x800" crc="9edf5e58" sha1="4b244e6d94a7653a2e52c351589f0b469119fb04" offset="0x0000" />
 			</dataarea>
 		</part>
+
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
 				<rom name="xl 80 system software.d64" size="174848" crc="7fc45fca" sha1="c8c890ecd826dd9c3b1a1254793f73dc0ef9ef95" offset="0" />
@@ -861,13 +672,7 @@
 		<description>Super Explode! v5.0</description>
 		<year>1989</year>
 		<publisher>The Soft Group</publisher>
-		<!--
-		Bankswitch register at $DF00, then executes code from the I/O2 area:
 
-		0193: lda  #$80
-		0195: sta  $DF00
-		0198: jsr  $DF15
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="super_explode" />
 			<feature name="game" value="1" />
@@ -1014,20 +819,7 @@
 		<description>Stardos</description>
 		<year>1986</year>
 		<publisher>Starpoint Software</publisher>
-		<!--
-		|===========================|
-		|=|                         |
-		|=|   LS30                  |
-		|=|               LS157     |
-		|=|          LS00           |
-		|=|   ROM                   |
-		|=|          7407           |
-		|=|                         |
-		|=|                      SW1|
-		|===========================|
 
-		ROM     - Toshiba TMM271128D-25 16Kx8 EPROM
-		-->
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="stardos" />
 			<feature name="game" value="1" />
@@ -1060,8 +852,7 @@
 		<description>RAMLink</description>
 		<year>1990</year>
 		<publisher>Creative Micro Designs</publisher>
-		<!--
-		-->
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="ramlink" />
 			<feature name="game" value="1" />
@@ -1072,9 +863,94 @@
 				<rom name="ramlink2.bin" size="0x8000" crc="ab8b6dda" sha1="e35e776387bd8b9ab16bacff70c2a3f3ef9b65bd" offset="0x8000" />
 			</dataarea>
 		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ramlink140" cloneof="ramlink" supported="no">
+		<description>RAMLink v1.40</description>
+		<year>1990</year>
+		<publisher>Creative Micro Designs</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ramlink" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="rom" size="0x10000">
+				<rom name="cmd_ramlink_dos_v140.bin" size="0x10000" crc="31d1c877" sha1="fe536cb7a14c8ecbac55ef2799267855f1447d9f" offset="0x0000" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ramlink201" cloneof="ramlink" supported="no">
+		<description>RAMLink v2.01</description>
+		<year>1990</year>
+		<publisher>Creative Micro Designs</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="ramlink" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="0" />
+
+			<dataarea name="rom" size="0x10000">
+				<rom name="cmd_ramlink_dosv201.bin" size="0x10000" crc="9810f48d" sha1="aafb1c66ea6f7d131675f6c948461ca1dc56c1e7" offset="0x0000" />
+			</dataarea>
+		</part>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="ramlink-1.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="174848">
+				<rom name="ramlink-2.d64" size="174848" crc="d0bcaff4" sha1="c1fc37670d93a9a8fe04419336f8b69b065f1d5d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supercpu" supported="no">
+		<description>SuperCPU</description>
+		<year>1997</year>
+		<publisher>Creative Micro Designs</publisher>
+
+		<part name="cart" interface="c64_cart">
+			<feature name="slot" value="supercpu" />
+			<feature name="game" value="1" />
+			<feature name="exrom" value="1" />
+
+			<dataarea name="roml" size="0x20000">
+				<rom name="supercpu_dos_204.bin" size="0x20000" crc="f4151454" sha1="6aa529a7b1b6de53e8979e407a77b4d5657727f5" offset="0" />
+			</dataarea>
+		</part>
+
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="174848">
-				<rom name="ramlink.d64" size="174848" crc="3e208761" sha1="78274ca735001cb9a7148ddb6a996f0880d8ca3c" offset="0" />
+				<rom name="cmdscpuu.d64" size="174848" crc="caad286d" sha1="2c1258505148763f13ab2fcdaf247138a933817e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1083,8 +959,7 @@
 		<description>Grappler CD</description>
 		<year>1984</year>
 		<publisher>Orange Micro</publisher>
-		<!--
-		-->
+
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="grappler" />
 			<feature name="game" value="1" />
@@ -1234,8 +1109,8 @@
 
 	<software name="flash8" supported="no">
 		<description>Flash 8</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1992</year>
+		<publisher>Elektronik-Technik-Peters</publisher>
 		<part name="cart" interface="c64_cart">
 			<feature name="slot" value="flash8" />
 			<feature name="exrom" value="0" />

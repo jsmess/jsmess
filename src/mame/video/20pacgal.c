@@ -25,7 +25,7 @@
 static void get_pens(running_machine &machine, const _20pacgal_state *state, pen_t *pens)
 {
 	offs_t offs;
-	UINT8 *color_prom = machine.region("proms")->base() + (NUM_PENS * state->m_game_selected);
+	UINT8 *color_prom = machine.root_device().memregion("proms")->base() + (NUM_PENS * state->m_game_selected);
 
 	for (offs = 0; offs < NUM_PENS ;offs++)
 	{
@@ -227,7 +227,7 @@ static void draw_chars(const _20pacgal_state *state, bitmap_rgb32 &bitmap)
 		int sy;
 		int y, x;
 
-		UINT8 *gfx = &state->m_char_gfx_ram[state->m_video_ram[0x0000 | offs] << 4];
+		UINT8 *gfx = &state->m_char_gfx_ram.target()[state->m_video_ram[0x0000 | offs] << 4];
 		UINT32 color_base = (state->m_video_ram[0x0400 | offs] & 0x3f) << 2;
 
 		/* map the offset to (x, y) character coordinates */

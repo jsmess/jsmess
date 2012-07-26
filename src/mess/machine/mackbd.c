@@ -46,7 +46,6 @@
     The T1 line is "Option".
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "mackbd.h"

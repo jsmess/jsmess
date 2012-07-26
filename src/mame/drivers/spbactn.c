@@ -131,22 +131,22 @@ cpu #0 (PC=00001A1A): unmapped memory word write to 00090030 = 00F7 & 00FF
 #include "includes/spbactn.h"
 
 
-static WRITE16_HANDLER( soundcommand_w )
+WRITE16_MEMBER(spbactn_state::soundcommand_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, offset, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_byte_w(space, offset, data & 0xff);
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
-static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16, spbactn_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
 	AM_RANGE(0x40000, 0x43fff) AM_RAM	// main ram
-	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_BASE_MEMBER(spbactn_state,m_spvideoram)
-	AM_RANGE(0x60000, 0x67fff) AM_RAM AM_BASE_MEMBER(spbactn_state,m_fgvideoram)
-	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_BASE_MEMBER(spbactn_state,m_bgvideoram)
-	AM_RANGE(0x80000, 0x827ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x50000, 0x50fff) AM_RAM AM_SHARE("spvideoram")
+	AM_RANGE(0x60000, 0x67fff) AM_RAM AM_SHARE("fgvideoram")
+	AM_RANGE(0x70000, 0x77fff) AM_RAM AM_SHARE("bgvideoram")
+	AM_RANGE(0x80000, 0x827ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x90000, 0x90001) AM_READ_PORT("IN0")
 	AM_RANGE(0x90010, 0x90011) AM_READ_PORT("IN1")
 	AM_RANGE(0x90020, 0x90021) AM_READ_PORT("SYSTEM")
@@ -186,14 +186,14 @@ static ADDRESS_MAP_START( spbactn_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xa0206, 0xa0207) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spbactn_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spbactn_sound_map, AS_PROGRAM, 8, spbactn_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ymsnd", ym3812_w)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 
 	AM_RANGE(0xfc00, 0xfc00) AM_READNOP	AM_WRITENOP /* irq ack ?? */
-	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_r)
+	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 

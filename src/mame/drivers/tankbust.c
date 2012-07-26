@@ -30,9 +30,9 @@ static TIMER_CALLBACK( soundlatch_callback )
 	state->m_latch = param;
 }
 
-static WRITE8_HANDLER( tankbust_soundlatch_w )
+WRITE8_MEMBER(tankbust_state::tankbust_soundlatch_w)
 {
-	space->machine().scheduler().synchronize(FUNC(soundlatch_callback), data);
+	machine().scheduler().synchronize(FUNC(soundlatch_callback), data);
 }
 
 static READ8_DEVICE_HANDLER( tankbust_soundlatch_r )
@@ -62,31 +62,30 @@ static TIMER_CALLBACK( soundirqline_callback )
 
 
 
-static WRITE8_HANDLER( tankbust_e0xx_w )
+WRITE8_MEMBER(tankbust_state::tankbust_e0xx_w)
 {
-	tankbust_state *state = space->machine().driver_data<tankbust_state>();
-	state->m_e0xx_data[offset] = data;
+	m_e0xx_data[offset] = data;
 
 #if 0
 	popmessage("e0: %x %x (%x cnt) %x %x %x %x",
-		state->m_e0xx_data[0], state->m_e0xx_data[1],
-		state->m_e0xx_data[2], state->m_e0xx_data[3],
-		state->m_e0xx_data[4], state->m_e0xx_data[5],
-		state->m_e0xx_data[6] );
+		m_e0xx_data[0], m_e0xx_data[1],
+		m_e0xx_data[2], m_e0xx_data[3],
+		m_e0xx_data[4], m_e0xx_data[5],
+		m_e0xx_data[6] );
 #endif
 
 	switch (offset)
 	{
 	case 0:	/* 0xe000 interrupt enable */
-		state->m_irq_mask = data & 1;
+		m_irq_mask = data & 1;
 		break;
 
-	case 1:	/* 0xe001 (value 0 then 1) written right after the soundlatch_w */
-		space->machine().scheduler().synchronize(FUNC(soundirqline_callback), data);
+	case 1:	/* 0xe001 (value 0 then 1) written right after the soundlatch_byte_w */
+		machine().scheduler().synchronize(FUNC(soundirqline_callback), data);
 		break;
 
 	case 2:	/* 0xe002 coin counter */
-		coin_counter_w(space->machine(), 0, data&1);
+		coin_counter_w(machine(), 0, data&1);
 		break;
 
 	case 6:	/* 0xe006 screen disable ?? or disable screen update */
@@ -100,16 +99,15 @@ static WRITE8_HANDLER( tankbust_e0xx_w )
 	case 7: /* 0xe007 bankswitch */
 		/* bank 1 at 0x6000-9fff = from 0x10000 when bit0=0 else from 0x14000 */
 		/* bank 2 at 0xa000-bfff = from 0x18000 when bit0=0 else from 0x1a000 */
-		memory_set_bankptr(space->machine(),  "bank1", space->machine().region("maincpu")->base() + 0x10000 + ((data&1) * 0x4000) );
-		memory_set_bankptr(space->machine(),  "bank2", space->machine().region("maincpu")->base() + 0x18000 + ((data&1) * 0x2000) ); /* verified (the game will reset after the "game over" otherwise) */
+		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x10000 + ((data&1) * 0x4000) );
+		membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base() + 0x18000 + ((data&1) * 0x2000) ); /* verified (the game will reset after the "game over" otherwise) */
 		break;
 	}
 }
 
-static READ8_HANDLER( debug_output_area_r )
+READ8_MEMBER(tankbust_state::debug_output_area_r)
 {
-	tankbust_state *state = space->machine().driver_data<tankbust_state>();
-	return state->m_e0xx_data[offset];
+	return m_e0xx_data[offset];
 }
 
 
@@ -117,6 +115,7 @@ static READ8_HANDLER( debug_output_area_r )
 
 static PALETTE_INIT( tankbust )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 128; i++)
@@ -164,27 +163,26 @@ static PALETTE_INIT( tankbust )
 }
 
 #if 0
-static READ8_HANDLER( read_from_unmapped_memory )
+READ8_MEMBER(tankbust_state::read_from_unmapped_memory)
 {
 	return 0xff;
 }
 #endif
 
-static READ8_HANDLER( some_changing_input )
+READ8_MEMBER(tankbust_state::some_changing_input)
 {
-	tankbust_state *state = space->machine().driver_data<tankbust_state>();
-	state->m_variable_data += 8;
-	return state->m_variable_data;
+	m_variable_data += 8;
+	return m_variable_data;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbust_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(tankbust_background_videoram_r, tankbust_background_videoram_w) AM_BASE_MEMBER(tankbust_state, m_videoram)
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(tankbust_background_colorram_r, tankbust_background_colorram_w) AM_BASE_MEMBER(tankbust_state, m_colorram)
-	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(tankbust_txtram_r, tankbust_txtram_w) AM_BASE_MEMBER(tankbust_state, m_txtram)
-	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_BASE_SIZE_MEMBER(tankbust_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(tankbust_background_videoram_r, tankbust_background_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(tankbust_background_colorram_r, tankbust_background_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xd000, 0xd7ff) AM_READWRITE(tankbust_txtram_r, tankbust_txtram_w) AM_SHARE("txtram")
+	AM_RANGE(0xd800, 0xd8ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe000, 0xe007) AM_READWRITE(debug_output_area_r, tankbust_e0xx_w)
 	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("INPUTS") AM_WRITE(tankbust_yscroll_w)
 	AM_RANGE(0xe801, 0xe801) AM_READ_PORT("SYSTEM")
@@ -196,16 +194,16 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	//AM_RANGE(0xf800, 0xffff) AM_READ(read_from_unmapped_memory)   /* a bug in game code ? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( port_map_cpu2, AS_IO, 8 )
+static ADDRESS_MAP_START( port_map_cpu2, AS_IO, 8, tankbust_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("ay2", ay8910_data_w)
-	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_address_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_address_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0x30, 0x30) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_address_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r, ay8910_address_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( map_cpu2, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( map_cpu2, AS_PROGRAM, 8, tankbust_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_WRITENOP	/* garbage, written in initialization loop */
 	//0x4000 and 0x4040-0x4045 seem to be used (referenced in the code)

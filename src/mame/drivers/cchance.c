@@ -46,50 +46,53 @@ public:
 
 	UINT8 m_hop_io;
 	UINT8 m_bell_io;
+	DECLARE_WRITE8_MEMBER(output_0_w);
+	DECLARE_READ8_MEMBER(input_1_r);
+	DECLARE_WRITE8_MEMBER(output_1_w);
 };
 
 
-static WRITE8_HANDLER( output_0_w )
+WRITE8_MEMBER(cchance_state::output_0_w)
 {
 
 	//---- --x- divider?
-	coin_lockout_w(space->machine(), 0, ~data & 1);
+	coin_lockout_w(machine(), 0, ~data & 1);
 
-//  coin_counter_w(space->machine(), 0, ~data & 1);
+//  coin_counter_w(machine(), 0, ~data & 1);
 }
 
 
-static READ8_HANDLER( input_1_r )
+READ8_MEMBER(cchance_state::input_1_r)
 {
-	cchance_state *state = space->machine().driver_data<cchance_state>();
-	return (state->m_hop_io) | (state->m_bell_io) | (input_port_read(space->machine(), "SP") & 0xff);
+
+	return (m_hop_io) | (m_bell_io) | (ioport("SP")->read() & 0xff);
 }
 
-static WRITE8_HANDLER( output_1_w )
+WRITE8_MEMBER(cchance_state::output_1_w)
 {
-	cchance_state *state = space->machine().driver_data<cchance_state>();
 
-	state->m_hop_io = (data & 0x40)>>4;
-	state->m_bell_io = (data & 0x80)>>4;
+
+	m_hop_io = (data & 0x40)>>4;
+	m_bell_io = (data & 0x80)>>4;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, cchance_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 
-	AM_RANGE(0xa000, 0xafff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodelow_r8, spritecodelow_w8)
-	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_DEVREADWRITE("spritegen", spritecodehigh_r8, spritecodehigh_w8)
+	AM_RANGE(0xa000, 0xafff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodelow_r8, spritecodelow_w8)
+	AM_RANGE(0xb000, 0xbfff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spritecodehigh_r8, spritecodehigh_w8)
 
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 
-	AM_RANGE(0xe000, 0xe2ff) AM_RAM AM_DEVREADWRITE("spritegen", spriteylow_r8, spriteylow_w8)
-	AM_RANGE(0xe300, 0xe303) AM_RAM AM_MIRROR(0xfc) AM_DEVWRITE("spritegen", spritectrl_w8)  /* control registers (0x80 mirror used by Arkanoid 2) */
-	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE("spritegen", spritebgflag_w8)	/* enable / disable background transparency */
+	AM_RANGE(0xe000, 0xe2ff) AM_RAM AM_DEVREADWRITE_LEGACY("spritegen", spriteylow_r8, spriteylow_w8)
+	AM_RANGE(0xe300, 0xe303) AM_RAM AM_MIRROR(0xfc) AM_DEVWRITE_LEGACY("spritegen", spritectrl_w8)  /* control registers (0x80 mirror used by Arkanoid 2) */
+	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE_LEGACY("spritegen", spritebgflag_w8)	/* enable / disable background transparency */
 
 	AM_RANGE(0xf000, 0xf000) AM_READNOP AM_WRITENOP //???
 	AM_RANGE(0xf001, 0xf001) AM_READ(input_1_r) AM_WRITE(output_0_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN0") AM_WRITE(output_1_w)
-	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xf801, 0xf801) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xf801, 0xf801) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 ADDRESS_MAP_END
 
 

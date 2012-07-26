@@ -123,7 +123,7 @@ struct _m6800_state
 	UINT8	ic_eddge;		/* InputCapture eddge , b.0=fall,b.1=raise */
 	int		sc1_state;
 
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 
 	/* Memory spaces */
@@ -1276,8 +1276,8 @@ static CPU_INIT( m6803 )
 	}
 }
 
-static ADDRESS_MAP_START(m6803_mem, AS_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x001f) AM_READWRITE(m6801_io_r, m6801_io_w)
+static ADDRESS_MAP_START(m6803_mem, AS_PROGRAM, 8, legacy_cpu_device)
+	AM_RANGE(0x0000, 0x001f) AM_READWRITE_LEGACY(m6801_io_r, m6801_io_w)
 	AM_RANGE(0x0020, 0x007f) AM_NOP        /* unused */
 	AM_RANGE(0x0080, 0x00ff) AM_RAM        /* 6803 internal RAM */
 ADDRESS_MAP_END

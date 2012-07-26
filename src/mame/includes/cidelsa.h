@@ -3,7 +3,6 @@
 #ifndef __CIDELSA__
 #define __CIDELSA__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"
@@ -71,6 +70,8 @@ public:
 	UINT8 *m_pageram;
 	UINT8 *m_pcbram;
 	UINT8 *m_charram;
+	DECLARE_CUSTOM_INPUT_MEMBER(cdp1869_pcb_r);
+	DECLARE_INPUT_CHANGED_MEMBER(ef_w);
 };
 
 class draco_state : public cidelsa_state

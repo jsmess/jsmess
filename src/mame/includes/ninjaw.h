@@ -8,11 +8,11 @@ class ninjaw_state : public driver_device
 {
 public:
 	ninjaw_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT16 *   m_spriteram;
-	size_t     m_spriteram_size;
+	required_shared_ptr<UINT16> m_spriteram;
 
 	/* misc */
 	UINT16     m_cpua_ctrl;
@@ -34,6 +34,12 @@ public:
 	device_t *m_2610_1r;
 	device_t *m_2610_2l;
 	device_t *m_2610_2r;
+	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(ninjaw_sound_w);
+	DECLARE_READ16_MEMBER(ninjaw_sound_r);
+	DECLARE_WRITE8_MEMBER(ninjaw_pancontrol);
+	DECLARE_WRITE16_MEMBER(tc0100scn_triple_screen_w);
 };
 
 

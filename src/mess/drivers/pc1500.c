@@ -9,7 +9,6 @@
 
 ****************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/lh5801/lh5801.h"
@@ -24,13 +23,13 @@ public:
 	pc1500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
-		  m_rtc(*this, "upd1990a")
-		{ }
+		  m_rtc(*this, "upd1990a"),
+		  m_lcd_data(*this, "lcd_data") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
 
-	UINT8 *m_lcd_data;
+	required_shared_ptr<UINT8> m_lcd_data;
 	UINT8 m_kb_matrix;
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -49,7 +48,7 @@ static ADDRESS_MAP_START( pc1500_mem , AS_PROGRAM, 8, pc1500_state)
 	AM_RANGE( 0x0000, 0x3fff) AM_ROM	//module ROM/RAM
 	AM_RANGE( 0x4000, 0x47ff) AM_RAM	//user RAM
 	AM_RANGE( 0x4800, 0x6fff) AM_RAM	//expansion RAM
-	AM_RANGE( 0x7000, 0x71ff) AM_RAM	AM_MIRROR(0x0600)	AM_BASE( m_lcd_data )
+	AM_RANGE( 0x7000, 0x71ff) AM_RAM	AM_MIRROR(0x0600)	AM_SHARE("lcd_data")
 	AM_RANGE( 0x7800, 0x7bff) AM_RAM	AM_REGION("maincpu", 0x7800)	AM_MIRROR(0x0400)
 	AM_RANGE( 0xa000, 0xbfff) AM_ROM	//expansion ROM
 	AM_RANGE( 0xc000, 0xffff) AM_ROM	//system ROM
@@ -68,21 +67,21 @@ UINT8 pc1500_state::pc1500_kb_r(device_t *device)
 	if (!device->started()) return 0;
 
     if (!(state->m_kb_matrix & 0x01))
-		data &= input_port_read(device->machine(), "KEY0");
+		data &= device->machine().root_device().ioport("KEY0")->read();
     if (!(state->m_kb_matrix & 0x02))
-		data &= input_port_read(device->machine(), "KEY1");
+		data &= device->machine().root_device().ioport("KEY1")->read();
     if (!(state->m_kb_matrix & 0x04))
-		data &= input_port_read(device->machine(), "KEY2");
+		data &= device->machine().root_device().ioport("KEY2")->read();
     if (!(state->m_kb_matrix & 0x08))
-		data &= input_port_read(device->machine(), "KEY3");
+		data &= device->machine().root_device().ioport("KEY3")->read();
     if (!(state->m_kb_matrix & 0x10))
-		data &= input_port_read(device->machine(), "KEY4");
+		data &= device->machine().root_device().ioport("KEY4")->read();
     if (!(state->m_kb_matrix & 0x20))
-		data &= input_port_read(device->machine(), "KEY5");
+		data &= device->machine().root_device().ioport("KEY5")->read();
     if (!(state->m_kb_matrix & 0x40))
-		data &= input_port_read(device->machine(), "KEY6");
+		data &= device->machine().root_device().ioport("KEY6")->read();
     if (!(state->m_kb_matrix & 0x80))
-		data &= input_port_read(device->machine(), "KEY7");
+		data &= state->ioport("KEY7")->read();
 
 	return data;
 }
@@ -247,7 +246,7 @@ READ8_MEMBER( pc1500_state::port_b_r )
 
 	data |= (m_rtc->tp_r()<<5);
 	data |= (m_rtc->data_out_r()<<6);
-	data |= (input_port_read(machine(), "ON")<<7);
+	data |= (ioport("ON")->read()<<7);
 
 	return data;
 }

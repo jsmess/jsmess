@@ -60,7 +60,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 {
 	gunbustr_state *state = machine.driver_data<gunbustr_state>();
 	UINT32 *spriteram32 = state->m_spriteram;
-	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
+	UINT16 *spritemap = (UINT16 *)state->memregion("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
@@ -72,7 +72,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
        while processing sprite ram and then draw them all at the end */
 	struct tempsprite *sprite_ptr = state->m_spritelist;
 
-	for (offs = (state->m_spriteram_size/4-4);offs >= 0;offs -= 4)
+	for (offs = (state->m_spriteram.bytes()/4-4);offs >= 0;offs -= 4)
 	{
 		data = spriteram32[offs+0];
 		flipx =    (data & 0x00800000) >> 23;

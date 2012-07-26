@@ -806,7 +806,7 @@ static void mcd212_process_vsr(mcd212_regs_t *mcd212, int channel, UINT8 *pixels
 {
     running_machine &machine = mcd212->machine();
     cdi_state *state = machine.driver_data<cdi_state>();
-    UINT8 *data = channel ? (UINT8*)state->m_planeb : (UINT8*)state->m_planea;
+    UINT8 *data = reinterpret_cast<UINT8 *>(channel ? state->m_planeb.target() : state->m_planea.target());
     UINT32 vsr = mcd212_get_vsr(mcd212, channel) & 0x0007ffff;
     UINT8 done = 0;
     UINT32 x = 0;
@@ -1115,7 +1115,7 @@ static void mcd212_mix_lines(mcd212_regs_t *mcd212, UINT8 *plane_a_r, UINT8 *pla
 {
     running_machine &machine = mcd212->machine();
     int x = 0;
-    UINT8 debug_mode = input_port_read(machine, "DEBUG");
+    UINT8 debug_mode = machine.root_device().ioport("DEBUG")->read();
     UINT8 global_plane_a_disable = debug_mode & 1;
     UINT8 global_plane_b_disable = debug_mode & 2;
     UINT8 debug_backdrop_enable = debug_mode & 4;

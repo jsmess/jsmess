@@ -61,10 +61,9 @@ static void videoram_write( running_machine &machine, UINT16 offset, UINT8 data,
 }
 
 
-WRITE8_HANDLER( kangaroo_videoram_w )
+WRITE8_MEMBER(kangaroo_state::kangaroo_videoram_w)
 {
-	kangaroo_state *state = space->machine().driver_data<kangaroo_state>();
-	videoram_write(space->machine(), offset, data, state->m_video_control[8]);
+	videoram_write(machine(), offset, data, m_video_control[8]);
 }
 
 
@@ -75,19 +74,18 @@ WRITE8_HANDLER( kangaroo_videoram_w )
  *
  *************************************/
 
-WRITE8_HANDLER( kangaroo_video_control_w )
+WRITE8_MEMBER(kangaroo_state::kangaroo_video_control_w)
 {
-	kangaroo_state *state = space->machine().driver_data<kangaroo_state>();
-	state->m_video_control[offset] = data;
+	m_video_control[offset] = data;
 
 	switch (offset)
 	{
 		case 5:	/* blitter start */
-			blitter_execute(space->machine());
+			blitter_execute(machine());
 			break;
 
 		case 8:	/* bank select */
-			memory_set_bank(space->machine(), "bank1", (data & 0x05) ? 0 : 1);
+			membank("bank1")->set_entry((data & 0x05) ? 0 : 1);
 			break;
 	}
 }
@@ -103,8 +101,8 @@ WRITE8_HANDLER( kangaroo_video_control_w )
 static void blitter_execute( running_machine &machine )
 {
 	kangaroo_state *state = machine.driver_data<kangaroo_state>();
-	UINT32 gfxhalfsize = machine.region("gfx1")->bytes() / 2;
-	const UINT8 *gfxbase = machine.region("gfx1")->base();
+	UINT32 gfxhalfsize = state->memregion("gfx1")->bytes() / 2;
+	const UINT8 *gfxbase = state->memregion("gfx1")->base();
 	UINT16 src = state->m_video_control[0] + 256 * state->m_video_control[1];
 	UINT16 dst = state->m_video_control[2] + 256 * state->m_video_control[3];
 	UINT8 height = state->m_video_control[5];

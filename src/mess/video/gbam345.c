@@ -11,7 +11,7 @@
 static void draw_roz_bitmap_mode_scanline(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = ((UINT16*)state->m_gba_pram)[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)state->m_gba_pram.target())[0] | 0x30000000;
 
 	draw_roz_bitmap_scanline(state, line2, y, DISPCNT_BG2_EN, state->m_BG2CNT, state->m_BG2X, state->m_BG2Y, state->m_BG2PA, state->m_BG2PB, state->m_BG2PC, state->m_BG2PD, &state->m_gfxBG2X, &state->m_gfxBG2Y, state->m_gfxBG2Changed, bpp);
 	draw_gba_oam(state, machine, lineOBJ, y);
@@ -76,7 +76,7 @@ static void draw_roz_bitmap_mode_scanline(running_machine &machine, gba_state *s
 static void draw_roz_bitmap_mode_scanline_nowindow(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = ((UINT16*)state->m_gba_pram)[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)state->m_gba_pram.target())[0] | 0x30000000;
 	int effect = state->m_BLDCNT & BLDCNT_SFX;
 
 	draw_roz_bitmap_scanline(state, line2, y, DISPCNT_BG2_EN, state->m_BG2CNT, state->m_BG2X, state->m_BG2Y, state->m_BG2PA, state->m_BG2PB, state->m_BG2PC, state->m_BG2PD, &state->m_gfxBG2X, &state->m_gfxBG2Y, state->m_gfxBG2Changed, bpp);
@@ -191,7 +191,7 @@ static void draw_roz_bitmap_mode_scanline_nowindow(running_machine &machine, gba
 static void draw_roz_bitmap_mode_scanline_all(running_machine &machine, gba_state *state, int y, UINT32* line0, UINT32* line1, UINT32* line2, UINT32* line3, UINT32* lineOBJ, UINT32* lineOBJWin, UINT32* lineMix, int bpp)
 {
 	int x = 0;
-	UINT32 backdrop = ((UINT16*)state->m_gba_pram)[0] | 0x30000000;
+	UINT32 backdrop = ((UINT16*)state->m_gba_pram.target())[0] | 0x30000000;
 	int inWindow0 = 0;
 	int inWindow1 = 0;
 	UINT8 inWin0Mask = state->m_WININ & 0x00ff;

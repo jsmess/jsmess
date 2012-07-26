@@ -298,7 +298,6 @@ covert megatech / megaplay drivers to use new code etc. etc.
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -370,8 +369,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, AS_IO, 8, systeme_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-	AM_RANGE(0x7b, 0x7b) AM_DEVWRITE_LEGACY( "sn1", sn76496_w )
-	AM_RANGE(0x7e, 0x7f) AM_DEVWRITE_LEGACY( "sn2", sn76496_w )
+	AM_RANGE(0x7b, 0x7b) AM_DEVWRITE_LEGACY("sn1", sn76496_w )
+	AM_RANGE(0x7e, 0x7f) AM_DEVWRITE_LEGACY("sn2", sn76496_w )
 	AM_RANGE(0x7e, 0x7e) AM_DEVREAD( "vdp1", sega315_5124_device, vcount_read )
 	AM_RANGE(0xba, 0xba) AM_DEVREADWRITE( "vdp1", sega315_5124_device, vram_read, vram_write )
 	AM_RANGE(0xbb, 0xbb) AM_DEVREADWRITE( "vdp1", sega315_5124_device, register_read, register_write )
@@ -428,40 +427,40 @@ WRITE8_MEMBER( systeme_state::bank_write )
 {
 	m_f7_bank_value = data;
 
-	memory_set_bankptr(machine(), "vdp1_bank", m_vdp1_vram->base() + ( ( data & 0x80 ) ? 0x4000 : 0 ) );
-	memory_set_bankptr(machine(), "vdp2_bank", m_vdp2_vram->base() + ( ( data & 0x40 ) ? 0x4000 : 0 ) );
+	membank("vdp1_bank")->set_base(m_vdp1_vram->base() + ( ( data & 0x80 ) ? 0x4000 : 0 ) );
+	membank("vdp2_bank")->set_base(m_vdp2_vram->base() + ( ( data & 0x40 ) ? 0x4000 : 0 ) );
 
-	memory_set_bank(machine(), "bank1", data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
 
 void systeme_state::driver_start()
 {
 	/* Allocate video RAM */
-	m_vdp1_vram = machine().region_alloc("vdp1_vram", 2 * 0x4000, 1, ENDIANNESS_LITTLE);
-	m_vdp2_vram = machine().region_alloc("vdp2_vram", 2 * 0x4000, 1, ENDIANNESS_LITTLE);
+	m_vdp1_vram = machine().memory().region_alloc("vdp1_vram", 2 * 0x4000, 1, ENDIANNESS_LITTLE);
+	m_vdp2_vram = machine().memory().region_alloc("vdp2_vram", 2 * 0x4000, 1, ENDIANNESS_LITTLE);
 
-	memory_configure_bank(machine(), "bank1", 0, 16, machine().region("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->configure_entries(0, 16, memregion("maincpu")->base() + 0x10000, 0x4000);
 
-	if ( !strcmp( m_system->name, "ridleofp" ) )
+	if ( !strcmp( system().name, "ridleofp" ) )
 	{
 		m_maincpu->memory().space(AS_IO)->install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(systeme_state::ridleofp_port_f8_read), this));
 		m_maincpu->memory().space(AS_IO)->install_write_handler(0xfa, 0xfa, write8_delegate(FUNC(systeme_state::ridleofp_port_fa_write), this));
 	}
-	else if ( !strcmp( m_system->name, "hangonjr" ) )
+	else if ( !strcmp( system().name, "hangonjr" ) )
 	{
 		m_maincpu->memory().space(AS_IO)->install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(systeme_state::hangonjr_port_f8_read), this));
 		m_maincpu->memory().space(AS_IO)->install_write_handler(0xfa, 0xfa, write8_delegate(FUNC(systeme_state::hangonjr_port_fa_write), this));
 	}
-	else if ( !strcmp( m_system->name, "opaopa" ) )
+	else if ( !strcmp( system().name, "opaopa" ) )
 	{
 		mc8123_decrypt_rom(machine(), "maincpu", "user1", "bank1", 8);
 	}
-	else if ( !strcmp( m_system->name, "fantzn2" ) )
+	else if ( !strcmp( system().name, "fantzn2" ) )
 	{
 		mc8123_decrypt_rom(machine(), "maincpu", "user1", NULL, 0);
 	}
-	else if ( !strcmp( m_system->name, "astrofl" ) )
+	else if ( !strcmp( system().name, "astrofl" ) )
 	{
 		sega_315_5177_decode(machine(), "maincpu");
 	}
@@ -488,10 +487,10 @@ READ8_MEMBER( systeme_state::hangonjr_port_f8_read )
 	temp = 0;
 
 	if (m_port_fa_last == 0x08)  /* 0000 1000 */ /* Angle */
-		temp = input_port_read(machine(), "IN2");
+		temp = ioport("IN2")->read();
 
 	if (m_port_fa_last == 0x09)  /* 0000 1001 */ /* Accel */
-		temp = input_port_read(machine(), "IN3");
+		temp = ioport("IN3")->read();
 
 	return temp;
 }
@@ -525,13 +524,13 @@ WRITE8_MEMBER( systeme_state::ridleofp_port_fa_write )
 
 	if (data & 1)
 	{
-		int curr = input_port_read(machine(), "IN2");
+		int curr = ioport("IN2")->read();
 		m_diff1 = ((curr - m_last1) & 0x0fff) | (curr & 0xf000);
 		m_last1 = curr;
 	}
 	if (data & 2)
 	{
-		int curr = input_port_read(machine(), "IN3") & 0x0fff;
+		int curr = ioport("IN3")->read() & 0x0fff;
 		m_diff2 = ((curr - m_last2) & 0x0fff) | (curr & 0xf000);
 		m_last2 = curr;
 	}

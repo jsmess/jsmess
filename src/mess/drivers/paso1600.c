@@ -7,7 +7,6 @@
     - identify fdc type (needs a working floppy image)
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
@@ -25,7 +24,9 @@ public:
 	m_pic(*this, "pic8259"),
 	m_dma(*this, "8237dma"),
 	m_crtc(*this, "crtc")
-	{ }
+	,
+		m_p_vram(*this, "p_vram"),
+		m_p_gvram(*this, "p_gvram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_pic;
@@ -43,12 +44,14 @@ public:
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 	UINT8 *m_p_chargen;
 	UINT8 *m_p_pcg;
-	UINT16 *m_p_vram;
-	UINT16 *m_p_gvram;
+	required_shared_ptr<UINT16> m_p_vram;
+	required_shared_ptr<UINT16> m_p_gvram;
 
 	struct{
 		UINT8 portb;
 	}m_keyb;
+	DECLARE_READ8_MEMBER(pc_dma_read_byte);
+	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 };
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
@@ -72,8 +75,8 @@ public:
 static VIDEO_START( paso1600 )
 {
 	paso1600_state *state = machine.driver_data<paso1600_state>();
-	state->m_p_chargen = machine.region("chargen")->base();
-	state->m_p_pcg = machine.region("pcg")->base();
+	state->m_p_chargen = machine.root_device().memregion("chargen")->base();
+	state->m_p_pcg = state->memregion("pcg")->base();
 }
 
 static SCREEN_UPDATE_IND16( paso1600 )
@@ -215,9 +218,9 @@ READ16_MEMBER( paso1600_state::test_hi_r )
 static ADDRESS_MAP_START(paso1600_map, AS_PROGRAM, 16, paso1600_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0x7ffff) AM_RAM
-	AM_RANGE(0xb0000,0xb0fff) AM_RAM AM_BASE(m_p_vram) // tvram
+	AM_RANGE(0xb0000,0xb0fff) AM_RAM AM_SHARE("p_vram") // tvram
 	AM_RANGE(0xbfff0,0xbffff) AM_READWRITE8(paso1600_pcg_r,paso1600_pcg_w,0xffff)
-	AM_RANGE(0xc0000,0xdffff) AM_RAM AM_BASE(m_p_gvram)// gvram
+	AM_RANGE(0xc0000,0xdffff) AM_RAM AM_SHARE("p_gvram")// gvram
 	AM_RANGE(0xe0000,0xeffff) AM_ROM AM_REGION("kanji",0)// kanji rom, banked via port 0x93
 	AM_RANGE(0xfe000,0xfffff) AM_ROM AM_REGION("ipl", 0)
 ADDRESS_MAP_END
@@ -297,31 +300,29 @@ static MACHINE_RESET(paso1600)
 {
 }
 
-static READ8_HANDLER( pc_dma_read_byte )
+READ8_MEMBER(paso1600_state::pc_dma_read_byte)
 {
-//  paso1600_state *state = space->machine().driver_data<paso1600_state>();
-	//offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+	//offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 	//  & 0xFF0000;
 
-	return space->read_byte(offset);
+	return space.read_byte(offset);
 }
 
 
-static WRITE8_HANDLER( pc_dma_write_byte )
+WRITE8_MEMBER(paso1600_state::pc_dma_write_byte)
 {
-//  paso1600_state *state = space->machine().driver_data<paso1600_state>();
-	//offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+	//offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 	//  & 0xFF0000;
 
-	space->write_byte(offset, data);
+	space.write_byte(offset, data);
 }
 
 static I8237_INTERFACE( paso1600_dma8237_interface )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
+	DEVCB_DRIVER_MEMBER(paso1600_state, pc_dma_read_byte),
+	DEVCB_DRIVER_MEMBER(paso1600_state, pc_dma_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }

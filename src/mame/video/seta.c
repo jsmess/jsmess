@@ -246,10 +246,9 @@ void seta_coin_lockout_w(running_machine &machine, int data)
 }
 
 
-WRITE16_HANDLER( seta_vregs_w )
+WRITE16_MEMBER(seta_state::seta_vregs_w)
 {
-	seta_state *state = space->machine().driver_data<seta_state>();
-	COMBINE_DATA(&state->m_vregs[offset]);
+	COMBINE_DATA(&m_vregs[offset]);
 	switch (offset)
 	{
 		case 0/2:
@@ -264,12 +263,12 @@ WRITE16_HANDLER( seta_vregs_w )
         ---- ---- ---- ---0     Coin #0 Counter     */
 			if (ACCESSING_BITS_0_7)
 			{
-				device_t *x1_010 = space->machine().device("x1snd");
-				seta_coin_lockout_w (space->machine(), data & 0x0f);
+				device_t *x1_010 = machine().device("x1snd");
+				seta_coin_lockout_w (machine(), data & 0x0f);
 				if (x1_010 != NULL)
 					seta_sound_enable_w (x1_010, data & 0x20);
-				coin_counter_w(space->machine(), 0,data & 0x01);
-				coin_counter_w(space->machine(), 1,data & 0x02);
+				coin_counter_w(machine(), 0,data & 0x01);
+				coin_counter_w(machine(), 1,data & 0x02);
 			}
 			break;
 
@@ -289,13 +288,13 @@ WRITE16_HANDLER( seta_vregs_w )
 
 				new_bank = (data >> 3) & 0x7;
 
-				if (new_bank != state->m_samples_bank)
+				if (new_bank != m_samples_bank)
 				{
-					UINT8 *rom = space->machine().region("x1snd")->base();
-					int samples_len = space->machine().region("x1snd")->bytes();
+					UINT8 *rom = memregion("x1snd")->base();
+					int samples_len = memregion("x1snd")->bytes();
 					int addr;
 
-					state->m_samples_bank = new_bank;
+					m_samples_bank = new_bank;
 
 					if (samples_len == 0x240000)	/* blandia, eightfrc */
 					{
@@ -305,7 +304,7 @@ WRITE16_HANDLER( seta_vregs_w )
 						if ( (samples_len > 0x100000) && ((addr+0x40000) <= samples_len) )
 							memcpy(&rom[0xc0000],&rom[addr],0x40000);
 						else
-							logerror("PC %06X - Invalid samples bank %02X !\n", cpu_get_pc(&space->device()), new_bank);
+							logerror("PC %06X - Invalid samples bank %02X !\n", cpu_get_pc(&space.device()), new_bank);
 					}
 					else if (samples_len == 0x480000)	/* zombraid */
 					{
@@ -402,38 +401,35 @@ static TILE_GET_INFO( get_tile_info_2 ) { get_tile_info( machine, tileinfo, tile
 static TILE_GET_INFO( get_tile_info_3 ) { get_tile_info( machine, tileinfo, tile_index, 1, 0x1000 ); }
 
 
-WRITE16_HANDLER( seta_vram_0_w )
+WRITE16_MEMBER(seta_state::seta_vram_0_w)
 {
-	seta_state *state = space->machine().driver_data<seta_state>();
 
-	COMBINE_DATA(&state->m_vram_0[offset]);
+	COMBINE_DATA(&m_vram_0[offset]);
 	if (offset & 0x1000)
-		state->m_tilemap_1->mark_tile_dirty(offset & 0x7ff);
+		m_tilemap_1->mark_tile_dirty(offset & 0x7ff);
 	else
-		state->m_tilemap_0->mark_tile_dirty(offset & 0x7ff);
+		m_tilemap_0->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE16_HANDLER( seta_vram_2_w )
+WRITE16_MEMBER(seta_state::seta_vram_2_w)
 {
-	seta_state *state = space->machine().driver_data<seta_state>();
 
-	COMBINE_DATA(&state->m_vram_2[offset]);
+	COMBINE_DATA(&m_vram_2[offset]);
 	if (offset & 0x1000)
-		state->m_tilemap_3->mark_tile_dirty(offset & 0x7ff);
+		m_tilemap_3->mark_tile_dirty(offset & 0x7ff);
 	else
-		state->m_tilemap_2->mark_tile_dirty(offset & 0x7ff);
+		m_tilemap_2->mark_tile_dirty(offset & 0x7ff);
 }
 
-WRITE16_HANDLER( twineagl_tilebank_w )
+WRITE16_MEMBER(seta_state::twineagl_tilebank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		seta_state *state = space->machine().driver_data<seta_state>();
 		data &= 0xff;
-		if (state->m_twineagl_tilebank[offset] != data)
+		if (m_twineagl_tilebank[offset] != data)
 		{
-			state->m_twineagl_tilebank[offset] = data;
-			space->machine().tilemap().mark_all_dirty();
+			m_twineagl_tilebank[offset] = data;
+			machine().tilemap().mark_all_dirty();
 		}
 	}
 }
@@ -669,6 +665,7 @@ PALETTE_INIT( zingzip )
 // color prom
 PALETTE_INIT( inttoote )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int x;
 	for (x = 0; x < 0x200 ; x++)
 	{
@@ -687,6 +684,7 @@ PALETTE_INIT( setaroul )
 
 PALETTE_INIT( usclssic )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int color, pen;
 	int x;
 
@@ -720,7 +718,7 @@ static void set_pens(running_machine &machine)
 	seta_state *state = machine.driver_data<seta_state>();
 	offs_t i;
 
-	for (i = 0; i < state->m_paletteram_size / 2; i++)
+	for (i = 0; i < state->m_paletteram.bytes() / 2; i++)
 	{
 		UINT16 data = state->m_paletteram[i];
 
@@ -734,16 +732,16 @@ static void set_pens(running_machine &machine)
 
 	if(state->m_paletteram2 != NULL)
 	{
-		for (i = 0; i < state->m_paletteram2_size / 2; i++)
+		for (i = 0; i < state->m_paletteram2.bytes() / 2; i++)
 		{
 			UINT16 data = state->m_paletteram2[i];
 
 			rgb_t color = MAKE_RGB(pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 
 			if (machine.colortable != NULL)
-				colortable_palette_set_color(machine.colortable, i + state->m_paletteram_size / 2, color);
+				colortable_palette_set_color(machine.colortable, i + state->m_paletteram.bytes() / 2, color);
 			else
-				palette_set_color(machine, i + state->m_paletteram_size / 2, color);
+				palette_set_color(machine, i + state->m_paletteram.bytes() / 2, color);
 		}
 	}
 }

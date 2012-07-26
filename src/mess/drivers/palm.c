@@ -8,7 +8,6 @@
     Additional bug fixing by R. Belmont
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -53,7 +52,7 @@ static offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, cons
 
 static INPUT_CHANGED( pen_check )
 {
-	UINT8 button = input_port_read(field.machine(), "PENB");
+	UINT8 button = field.machine().root_device().ioport("PENB")->read();
 	palm_state *state = field.machine().driver_data<palm_state>();
 
 	if(button)
@@ -64,7 +63,7 @@ static INPUT_CHANGED( pen_check )
 
 static INPUT_CHANGED( button_check )
 {
-	UINT8 button_state = input_port_read(field.machine(), "PORTD");
+	UINT8 button_state = field.machine().root_device().ioport("PORTD")->read();
 	palm_state *state = field.machine().driver_data<palm_state>();
 
 	mc68328_set_port_d_lines(state->m_lsi, button_state, (int)(FPTR)param);
@@ -102,8 +101,8 @@ static READ16_DEVICE_HANDLER( palm_spim_in )
 static void palm_spim_exchange( device_t *device )
 {
 	palm_state *state = device->machine().driver_data<palm_state>();
-	UINT8 x = input_port_read(device->machine(), "PENX");
-	UINT8 y = input_port_read(device->machine(), "PENY");
+	UINT8 x = device->machine().root_device().ioport("PENX")->read();
+	UINT8 y = state->ioport("PENY")->read();
 
 	switch( state->m_port_f_latch & 0x0f )
 	{
@@ -123,7 +122,7 @@ static MACHINE_START( palm )
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	space->install_read_bank (0x000000, machine.device<ram_device>(RAM_TAG)->size() - 1, machine.device<ram_device>(RAM_TAG)->size() - 1, 0, "bank1");
 	space->install_write_bank(0x000000, machine.device<ram_device>(RAM_TAG)->size() - 1, machine.device<ram_device>(RAM_TAG)->size() - 1, 0, "bank1");
-	memory_set_bankptr(machine, "bank1", machine.device<ram_device>(RAM_TAG)->pointer());
+	state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
 
 	state->save_item(NAME(state->m_port_f_latch));
 	state->save_item(NAME(state->m_spim_data));
@@ -135,7 +134,7 @@ static MACHINE_START( palm )
 static MACHINE_RESET( palm )
 {
     // Copy boot ROM
-	UINT8* bios = machine.region("bios")->base();
+	UINT8* bios = machine.root_device().memregion("bios")->base();
 	memset(machine.device<ram_device>(RAM_TAG)->pointer(), 0, machine.device<ram_device>(RAM_TAG)->size());
 	memcpy(machine.device<ram_device>(RAM_TAG)->pointer(), bios, 0x20000);
 

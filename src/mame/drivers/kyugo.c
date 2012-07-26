@@ -33,17 +33,17 @@
  *
  *************************************/
 
-static ADDRESS_MAP_START( kyugo_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kyugo_main_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(kyugo_bgvideoram_w) AM_BASE_MEMBER(kyugo_state, m_bgvideoram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(kyugo_bgattribram_w) AM_BASE_MEMBER(kyugo_state, m_bgattribram)
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(kyugo_fgvideoram_w) AM_BASE_MEMBER(kyugo_state, m_fgvideoram)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM_READ(kyugo_spriteram_2_r) AM_BASE_MEMBER(kyugo_state, m_spriteram_2)
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(kyugo_state, m_spriteram_1)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(kyugo_bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(kyugo_bgattribram_w) AM_SHARE("bgattribram")
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(kyugo_fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0x9800, 0x9fff) AM_RAM_READ(kyugo_spriteram_2_r) AM_SHARE("spriteram_2")
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("spriteram_1")
 	AM_RANGE(0xa800, 0xa800) AM_WRITE(kyugo_scroll_x_lo_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(kyugo_gfxctrl_w)
 	AM_RANGE(0xb800, 0xb800) AM_WRITE(kyugo_scroll_y_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(kyugo_state, m_shared_ram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("shared_ram")
 ADDRESS_MAP_END
 
 
@@ -54,20 +54,18 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static WRITE8_HANDLER( kyugo_nmi_mask_w )
+WRITE8_MEMBER(kyugo_state::kyugo_nmi_mask_w)
 {
-	kyugo_state *state = space->machine().driver_data<kyugo_state>();
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
-static WRITE8_HANDLER( kyugo_sub_cpu_control_w )
+WRITE8_MEMBER(kyugo_state::kyugo_sub_cpu_control_w)
 {
-	kyugo_state *state = space->machine().driver_data<kyugo_state>();
-	device_set_input_line(state->m_subcpu, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_subcpu, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static ADDRESS_MAP_START( kyugo_main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( kyugo_main_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x07)
 	AM_RANGE(0x00, 0x00) AM_WRITE(kyugo_nmi_mask_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(kyugo_flipscreen_w)
@@ -82,48 +80,48 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( gyrodine_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gyrodine_sub_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("P2")
 	AM_RANGE(0x8040, 0x8040) AM_READ_PORT("P1")
 	AM_RANGE(0x8080, 0x8080) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( repulse_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( repulse_sub_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P2")
 	AM_RANGE(0xc040, 0xc040) AM_READ_PORT("P1")
 	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( srdmissn_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( srdmissn_sub_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("P1")
 	AM_RANGE(0xf402, 0xf402) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( legend_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( legend_sub_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P1")
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( flashgala_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( flashgala_sub_map, AS_PROGRAM, 8, kyugo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc040, 0xc040) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("P1")
 	AM_RANGE(0xc0c0, 0xc0c0) AM_READ_PORT("P2")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("shared_ram")
 ADDRESS_MAP_END
 
 
@@ -134,42 +132,42 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static WRITE8_HANDLER( kyugo_coin_counter_w )
+WRITE8_MEMBER(kyugo_state::kyugo_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset, data & 1);
+	coin_counter_w(machine(), offset, data & 1);
 }
 
-static ADDRESS_MAP_START( gyrodine_sub_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( gyrodine_sub_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0xc0, 0xc1) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0xc0, 0xc1) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( repulse_sub_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( repulse_sub_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0xc0, 0xc1) AM_WRITE(kyugo_coin_counter_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( flashgala_sub_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( flashgala_sub_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x42, 0x42) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x42, 0x42) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0xc0, 0xc1) AM_WRITE(kyugo_coin_counter_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( srdmissn_sub_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( srdmissn_sub_portmap, AS_IO, 8, kyugo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x82, 0x82) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x84, 0x85) AM_DEVWRITE("ay2", ay8910_address_data_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x82, 0x82) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x84, 0x85) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
 	AM_RANGE(0x90, 0x91) AM_WRITE(kyugo_coin_counter_w)
 ADDRESS_MAP_END
 
@@ -517,7 +515,7 @@ static MACHINE_RESET( kyugo )
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	// must start with interrupts and sub CPU disabled
 	state->m_nmi_mask = 0;
-	kyugo_sub_cpu_control_w(space, 0, 0);
+	state->kyugo_sub_cpu_control_w(*space, 0, 0);
 
 	state->m_scroll_x_lo = 0;
 	state->m_scroll_x_hi = 0;
@@ -1376,7 +1374,8 @@ ROM_END
 static DRIVER_INIT( gyrodine )
 {
 	/* add watchdog */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xe000, 0xe000, FUNC(watchdog_reset_w));
+	kyugo_state *state = machine.driver_data<kyugo_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xe000, 0xe000, write8_delegate(FUNC(kyugo_state::watchdog_reset_w),state));
 }
 
 

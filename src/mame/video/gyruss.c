@@ -31,6 +31,7 @@
 
 PALETTE_INIT( gyruss )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_rg[3], weights_b[2];
@@ -91,11 +92,10 @@ PALETTE_INIT( gyruss )
 
 
 
-WRITE8_HANDLER( gyruss_spriteram_w )
+WRITE8_MEMBER(gyruss_state::gyruss_spriteram_w)
 {
-	gyruss_state *state = space->machine().driver_data<gyruss_state>();
-	space->machine().primary_screen->update_now();
-	state->m_spriteram[offset] = data;
+	machine().primary_screen->update_now();
+	m_spriteram[offset] = data;
 }
 
 
@@ -122,10 +122,10 @@ VIDEO_START( gyruss )
 
 
 
-READ8_HANDLER( gyruss_scanline_r )
+READ8_MEMBER(gyruss_state::gyruss_scanline_r)
 {
 	/* reads 1V - 128V */
-	return space->machine().primary_screen->vpos();
+	return machine().primary_screen->vpos();
 }
 
 

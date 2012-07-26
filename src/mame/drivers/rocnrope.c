@@ -23,18 +23,17 @@
  *************************************/
 
 /* Roc'n'Rope has the IRQ vectors in RAM. The rom contains $FFFF at this address! */
-static WRITE8_HANDLER( rocnrope_interrupt_vector_w )
+WRITE8_MEMBER(rocnrope_state::rocnrope_interrupt_vector_w)
 {
-	UINT8 *RAM = space->machine().region("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 
 	RAM[0xfff2 + offset] = data;
 }
 
-static WRITE8_HANDLER( irq_mask_w )
+WRITE8_MEMBER(rocnrope_state::irq_mask_w)
 {
-	rocnrope_state *state = space->machine().driver_data<rocnrope_state>();
 
-	state->m_irq_mask = data & 1;
+	m_irq_mask = data & 1;
 }
 
 /*************************************
@@ -43,27 +42,27 @@ static WRITE8_HANDLER( irq_mask_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( rocnrope_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rocnrope_map, AS_PROGRAM, 8, rocnrope_state )
 	AM_RANGE(0x3080, 0x3080) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3081, 0x3081) AM_READ_PORT("P1")
 	AM_RANGE(0x3082, 0x3082) AM_READ_PORT("P2")
 	AM_RANGE(0x3083, 0x3083) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW3")
-	AM_RANGE(0x4000, 0x402f) AM_RAM AM_BASE_MEMBER(rocnrope_state, m_spriteram2)
-	AM_RANGE(0x4400, 0x442f) AM_RAM AM_BASE_SIZE_MEMBER(rocnrope_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x4000, 0x402f) AM_RAM AM_SHARE("spriteram2")
+	AM_RANGE(0x4400, 0x442f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(rocnrope_colorram_w) AM_BASE_MEMBER(rocnrope_state, m_colorram)
-	AM_RANGE(0x4c00, 0x4fff) AM_RAM_WRITE(rocnrope_videoram_w) AM_BASE_MEMBER(rocnrope_state, m_videoram)
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(rocnrope_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x4c00, 0x4fff) AM_RAM_WRITE(rocnrope_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(rocnrope_flipscreen_w)
-	AM_RANGE(0x8081, 0x8081) AM_WRITE(timeplt_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
+	AM_RANGE(0x8081, 0x8081) AM_WRITE_LEGACY(timeplt_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x8082, 0x8082) AM_WRITENOP	/* interrupt acknowledge??? */
 	AM_RANGE(0x8083, 0x8083) AM_WRITENOP	/* Coin counter 1 */
 	AM_RANGE(0x8084, 0x8084) AM_WRITENOP	/* Coin counter 2 */
 	AM_RANGE(0x8087, 0x8087) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x8100, 0x8100) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x8100, 0x8100) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x8182, 0x818d) AM_WRITE(rocnrope_interrupt_vector_w)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END

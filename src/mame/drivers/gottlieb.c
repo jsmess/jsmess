@@ -222,9 +222,9 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 
 static TIMER_CALLBACK( laserdisc_bit_callback );
 static TIMER_CALLBACK( laserdisc_philips_callback );
-static READ8_HANDLER( laserdisc_status_r );
-static WRITE8_HANDLER( laserdisc_select_w );
-static WRITE8_HANDLER( laserdisc_command_w );
+
+
+
 
 
 
@@ -245,9 +245,9 @@ static MACHINE_START( gottlieb )
 	if (state->m_laserdisc != NULL)
 	{
 		/* attach to the I/O ports */
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x05805, 0x05807, 0, 0x07f8, FUNC(laserdisc_status_r));
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x05805, 0x05805, 0, 0x07f8, FUNC(laserdisc_command_w));	/* command for the player */
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x05806, 0x05806, 0, 0x07f8, FUNC(laserdisc_select_w));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x05805, 0x05807, 0, 0x07f8, read8_delegate(FUNC(gottlieb_state::laserdisc_status_r),state));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x05805, 0x05805, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::laserdisc_command_w),state));	/* command for the player */
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x05806, 0x05806, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::laserdisc_select_w),state));
 
 		/* allocate a timer for serial transmission, and one for philips code processing */
 		state->m_laserdisc_bit_timer = machine.scheduler().timer_alloc(FUNC(laserdisc_bit_callback));
@@ -290,30 +290,27 @@ static MACHINE_RESET( gottlieb )
  *
  *************************************/
 
-static CUSTOM_INPUT( analog_delta_r )
+CUSTOM_INPUT_MEMBER(gottlieb_state::analog_delta_r)
 {
-	gottlieb_state *state = field.machine().driver_data<gottlieb_state>();
 	const char *string = (const char *)param;
 	int which = string[0] - '0';
 
-	return input_port_read(field.machine(), &string[1]) - state->m_track[which];
+	return ioport(&string[1])->read() - m_track[which];
 }
 
 
-static WRITE8_HANDLER( gottlieb_analog_reset_w )
+WRITE8_MEMBER(gottlieb_state::gottlieb_analog_reset_w)
 {
-	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	/* reset the trackball counters */
-	state->m_track[0] = input_port_read_safe(space->machine(), "TRACKX", 0);
-	state->m_track[1] = input_port_read_safe(space->machine(), "TRACKY", 0);
+	m_track[0] = ioport("TRACKX")->read_safe(0);
+	m_track[1] = ioport("TRACKY")->read_safe(0);
 }
 
 
-static CUSTOM_INPUT( stooges_joystick_r )
+CUSTOM_INPUT_MEMBER(gottlieb_state::stooges_joystick_r)
 {
-	gottlieb_state *state = field.machine().driver_data<gottlieb_state>();
 	static const char *const joyport[] = { "P2JOY", "P3JOY", "P1JOY", NULL };
-	return (joyport[state->m_joystick_select & 3] != NULL) ? input_port_read(field.machine(), joyport[state->m_joystick_select & 3]) : 0xff;
+	return (joyport[m_joystick_select & 3] != NULL) ? ioport(joyport[m_joystick_select & 3])->read() : 0xff;
 }
 
 
@@ -324,17 +321,16 @@ static CUSTOM_INPUT( stooges_joystick_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( general_output_w )
+WRITE8_MEMBER(gottlieb_state::general_output_w)
 {
-	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	/* bits 0-3 control video features, and are different for laserdisc games */
-	if (state->m_laserdisc == NULL)
+	if (m_laserdisc == NULL)
 		gottlieb_video_control_w(space, offset, data);
 	else
 		gottlieb_laserdisc_video_control_w(space, offset, data);
 
 	/* bit 4 controls the coin meter */
-	coin_counter_w(space->machine(), 0, data & 0x10);
+	coin_counter_w(machine(), 0, data & 0x10);
 
 	/* bit 5 controls the knocker */
 	output_set_value("knocker0", (data >> 5) & 1);
@@ -345,20 +341,19 @@ static WRITE8_HANDLER( general_output_w )
 }
 
 
-static WRITE8_HANDLER( reactor_output_w )
+WRITE8_MEMBER(gottlieb_state::reactor_output_w)
 {
 	general_output_w(space, offset, data & ~0xe0);
-	set_led_status(space->machine(), 0, data & 0x20);
-	set_led_status(space->machine(), 1, data & 0x40);
-	set_led_status(space->machine(), 2, data & 0x80);
+	set_led_status(machine(), 0, data & 0x20);
+	set_led_status(machine(), 1, data & 0x40);
+	set_led_status(machine(), 2, data & 0x80);
 }
 
 
-static WRITE8_HANDLER( stooges_output_w )
+WRITE8_MEMBER(gottlieb_state::stooges_output_w)
 {
-	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	general_output_w(space, offset, data & ~0x60);
-	state->m_joystick_select = (data >> 5) & 0x03;
+	m_joystick_select = (data >> 5) & 0x03;
 }
 
 
@@ -369,19 +364,18 @@ static WRITE8_HANDLER( stooges_output_w )
  *
  *************************************/
 
-static READ8_HANDLER( laserdisc_status_r )
+READ8_MEMBER(gottlieb_state::laserdisc_status_r)
 {
-	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	/* IP5 reads low 8 bits of philips code */
 	if (offset == 0)
-		return state->m_laserdisc_philips_code;
+		return m_laserdisc_philips_code;
 
 	/* IP6 reads middle 8 bits of philips code */
 	if (offset == 1)
-		return state->m_laserdisc_philips_code >> 8;
+		return m_laserdisc_philips_code >> 8;
 
 	/* IP7 reads either status or audio detect, depending on the select */
-	if (state->m_laserdisc_select)
+	if (m_laserdisc_select)
 	{
 		/* bits 0-2 frame number MSN */
 		/* bit 3 audio buffer ready */
@@ -389,37 +383,35 @@ static READ8_HANDLER( laserdisc_status_r )
 		/* bit 5 disc ready */
 		/* bit 6 break in audio trasmission */
 		/* bit 7 missing audio clock */
-		return state->m_laserdisc_status;
+		return m_laserdisc_status;
 	}
 	else
 	{
-		UINT8 result = state->m_laserdisc_audio_buffer[state->m_laserdisc_audio_address++];
-		state->m_laserdisc_audio_address %= AUDIORAM_SIZE;
+		UINT8 result = m_laserdisc_audio_buffer[m_laserdisc_audio_address++];
+		m_laserdisc_audio_address %= AUDIORAM_SIZE;
 		return result;
 	}
 	return 0;
 }
 
 
-static WRITE8_HANDLER( laserdisc_select_w )
+WRITE8_MEMBER(gottlieb_state::laserdisc_select_w)
 {
-	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	/* selects between reading audio data and reading status */
-	state->m_laserdisc_select = data & 1;
+	m_laserdisc_select = data & 1;
 }
 
 
-static WRITE8_HANDLER( laserdisc_command_w )
+WRITE8_MEMBER(gottlieb_state::laserdisc_command_w)
 {
-	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
 	/* a write here latches data into a 8-bit register and starts
        a sequence of events that sends serial data to the player */
 
 	/* set a timer to clock the bits through; a total of 12 bits are clocked */
-	state->m_laserdisc_bit_timer->adjust(LASERDISC_CLOCK * 10, (12 << 16) | data);
+	m_laserdisc_bit_timer->adjust(LASERDISC_CLOCK * 10, (12 << 16) | data);
 
 	/* it also clears bit 4 of the status (will be set when transmission is complete) */
-	state->m_laserdisc_status &= ~0x10;
+	m_laserdisc_status &= ~0x10;
 }
 
 
@@ -693,23 +685,22 @@ static INTERRUPT_GEN( gottlieb_interrupt )
  *
  *************************************/
 
-static WRITE8_HANDLER( gottlieb_sh_w )
+WRITE8_MEMBER(gottlieb_state::gottlieb_sh_w)
 {
-	gottlieb_state *state = space->machine().driver_data<gottlieb_state>();
-	if (state->m_r1_sound != NULL)
-		state->m_r1_sound->write(*space, offset, data);
-	if (state->m_r2_sound != NULL)
-		state->m_r2_sound->write(*space, offset, data);
+	if (m_r1_sound != NULL)
+		m_r1_sound->write(space, offset, data);
+	if (m_r2_sound != NULL)
+		m_r2_sound->write(space, offset, data);
 }
 
-static ADDRESS_MAP_START( reactor_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( reactor_map, AS_PROGRAM, 8, gottlieb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0f00) AM_WRITEONLY AM_BASE_MEMBER(gottlieb_state, m_spriteram)							/* FRSEL */
-	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM_WRITE(gottlieb_videoram_w) AM_BASE_MEMBER(gottlieb_state, m_videoram)		/* BRSEL */
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_BASE_MEMBER(gottlieb_state, m_charram)				/* BOJRSEL1 */
-/*  AM_RANGE(0x5000, 0x5fff) AM_WRITE() */																/* BOJRSEL2 */
-	AM_RANGE(0x6000, 0x601f) AM_MIRROR(0x0fe0) AM_WRITE(gottlieb_paletteram_w) AM_BASE_GENERIC(paletteram)		/* COLSEL */
+	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0f00) AM_WRITEONLY AM_SHARE("spriteram")							/* FRSEL */
+	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM_WRITE(gottlieb_videoram_w) AM_SHARE("videoram")		/* BRSEL */
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_SHARE("charram")				/* BOJRSEL1 */
+/*  AM_RANGE(0x5000, 0x5fff) AM_WRITE_LEGACY() */																/* BOJRSEL2 */
+	AM_RANGE(0x6000, 0x601f) AM_MIRROR(0x0fe0) AM_WRITE(gottlieb_paletteram_w) AM_SHARE("paletteram")		/* COLSEL */
 	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0ff8) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x7001, 0x7001) AM_MIRROR(0x0ff8) AM_WRITE(gottlieb_analog_reset_w)						/* A1J2 interface */
 	AM_RANGE(0x7002, 0x7002) AM_MIRROR(0x0ff8) AM_WRITE(gottlieb_sh_w)									/* trackball H */
@@ -723,20 +714,20 @@ static ADDRESS_MAP_START( reactor_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( gottlieb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gottlieb_map, AS_PROGRAM, 8, gottlieb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_REGION("maincpu", 0x1000)	/* or ROM */
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_REGION("maincpu", 0x2000)	/* or ROM */
-	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0700) AM_WRITEONLY AM_BASE_MEMBER(gottlieb_state, m_spriteram)							/* FRSEL */
-	AM_RANGE(0x3800, 0x3bff) AM_MIRROR(0x0400) AM_RAM_WRITE(gottlieb_videoram_w) AM_BASE_MEMBER(gottlieb_state, m_videoram)		/* BRSEL */
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_BASE_MEMBER(gottlieb_state, m_charram)				/* BOJRSEL1 */
-	AM_RANGE(0x5000, 0x501f) AM_MIRROR(0x07e0) AM_WRITE(gottlieb_paletteram_w) AM_BASE_GENERIC(paletteram)		/* COLSEL */
+	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0700) AM_WRITEONLY AM_SHARE("spriteram")							/* FRSEL */
+	AM_RANGE(0x3800, 0x3bff) AM_MIRROR(0x0400) AM_RAM_WRITE(gottlieb_videoram_w) AM_SHARE("videoram")		/* BRSEL */
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(gottlieb_charram_w) AM_SHARE("charram")				/* BOJRSEL1 */
+	AM_RANGE(0x5000, 0x501f) AM_MIRROR(0x07e0) AM_WRITE(gottlieb_paletteram_w) AM_SHARE("paletteram")		/* COLSEL */
 	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x07f8) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5801, 0x5801) AM_MIRROR(0x07f8) AM_WRITE(gottlieb_analog_reset_w)						/* A1J2 interface */
 	AM_RANGE(0x5802, 0x5802) AM_MIRROR(0x07f8) AM_WRITE(gottlieb_sh_w)									/* OP20-27 */
 	AM_RANGE(0x5803, 0x5803) AM_MIRROR(0x07f8) AM_WRITE(general_output_w)								/* OP30-37 */
-/*  AM_RANGE(0x5804, 0x5804) AM_MIRROR(0x07f8) AM_WRITE()*/												/* OP40-47 */
+/*  AM_RANGE(0x5804, 0x5804) AM_MIRROR(0x07f8) AM_WRITE_LEGACY()*/												/* OP40-47 */
 	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x07f8) AM_READ_PORT("DSW")
 	AM_RANGE(0x5801, 0x5801) AM_MIRROR(0x07f8) AM_READ_PORT("IN1")										/* IP10-17 */
 	AM_RANGE(0x5802, 0x5802) AM_MIRROR(0x07f8) AM_READ_PORT("IN2")										/* trackball H */
@@ -785,10 +776,10 @@ static INPUT_PORTS_START( reactor )
 	PORT_BIT ( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")	/* trackball H */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "0TRACKX")
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "0TRACKX")
 
 	PORT_START("IN3")	/* trackball V */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "1TRACKY")
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
 
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
@@ -996,10 +987,10 @@ static INPUT_PORTS_START( argusg )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")	/* trackball H */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "0TRACKX")
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "0TRACKX")
 
 	PORT_START("IN3")	/* trackball V */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "1TRACKY")
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
 
 /* NOTE: Buttons are shared for both players; are mirrored to each side of the controller */
 	PORT_START("IN4")
@@ -1053,7 +1044,7 @@ static INPUT_PORTS_START( mplanets )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")	/* trackball V (dial) */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "1TRACKY")
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
 
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -1244,17 +1235,17 @@ static INPUT_PORTS_START( curvebal )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( French ) )
 	PORT_DIPNAME( 0xc2, 0x00, DEF_STR( Coinage ) )			PORT_DIPLOCATION("DSW:!6,!7,!8")
-	PORT_DIPSETTING(    0x42, "A 3/1 B 1/2" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x20)
-	PORT_DIPSETTING(    0x42, "A 4/1 B 1/1" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x82, "A 1/5 B 1/2" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x20)
-	PORT_DIPSETTING(    0x82, "A 3/1 B 1/1" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x02, "A 2/1 B 2/3" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x20)
-	PORT_DIPSETTING(    0x02, "A 2/1 B 1/1" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x42, "A 3/1 B 1/2" )	PORT_CONDITION("DSW",0x20,EQUALS,0x20)
+	PORT_DIPSETTING(    0x42, "A 4/1 B 1/1" )	PORT_CONDITION("DSW",0x20,EQUALS,0x00)
+	PORT_DIPSETTING(    0x82, "A 1/5 B 1/2" )	PORT_CONDITION("DSW",0x20,EQUALS,0x20)
+	PORT_DIPSETTING(    0x82, "A 3/1 B 1/1" )	PORT_CONDITION("DSW",0x20,EQUALS,0x00)
+	PORT_DIPSETTING(    0x02, "A 2/1 B 2/3" )	PORT_CONDITION("DSW",0x20,EQUALS,0x20)
+	PORT_DIPSETTING(    0x02, "A 2/1 B 1/1" )	PORT_CONDITION("DSW",0x20,EQUALS,0x00)
 	PORT_DIPSETTING(    0xc0, "A 2/1 B 2/1" )
-	PORT_DIPSETTING(    0x80, "A 1/1 B 1/2" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x20)
-	PORT_DIPSETTING(    0x80, "A 2/1 B 1/2" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x40, "A 1/1 B 1/3" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x20)
-	PORT_DIPSETTING(    0x40, "A 2/1 B 1/3" )	PORT_CONDITION("DSW",0x20,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x80, "A 1/1 B 1/2" )	PORT_CONDITION("DSW",0x20,EQUALS,0x20)
+	PORT_DIPSETTING(    0x80, "A 2/1 B 1/2" )	PORT_CONDITION("DSW",0x20,EQUALS,0x00)
+	PORT_DIPSETTING(    0x40, "A 1/1 B 1/3" )	PORT_CONDITION("DSW",0x20,EQUALS,0x20)
+	PORT_DIPSETTING(    0x40, "A 2/1 B 1/3" )	PORT_CONDITION("DSW",0x20,EQUALS,0x00)
 	PORT_DIPSETTING(    0x00, "A 1/1 B 1/1" )
 	PORT_DIPSETTING(    0xc2, DEF_STR( Free_Play ) )
 
@@ -1532,7 +1523,7 @@ static INPUT_PORTS_START( 3stooges )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN4")	/* joystick inputs */
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(stooges_joystick_r, NULL)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,stooges_joystick_r, NULL)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(3)
@@ -1644,7 +1635,7 @@ static INPUT_PORTS_START( wizwarz )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")	/* trackball V is a dial input */
-	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM(analog_delta_r, "1TRACKY")
+	PORT_BIT( 0xff, 0, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, gottlieb_state,analog_delta_r, "1TRACKY")
 
 	PORT_START("IN4")	/* ? */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -1750,12 +1741,6 @@ static MACHINE_CONFIG_DERIVED( gottlieb1, gottlieb_core )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( gottlieb1_votrax, gottlieb_core )
-	MCFG_GOTTLIEB_SOUND_R1_ADD_VOTRAX("r1sound")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_CONFIG_END
-
-
 static MACHINE_CONFIG_DERIVED( gottlieb2, gottlieb_core )
 	MCFG_GOTTLIEB_SOUND_R2_ADD("r2sound")
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1802,7 +1787,20 @@ static MACHINE_CONFIG_DERIVED( qbert, gottlieb1 )
 	MCFG_FRAGMENT_ADD(qbert_samples)
 MACHINE_CONFIG_END
 
+
+static MACHINE_CONFIG_DERIVED( tylz, gottlieb1 )
+	MCFG_FRAGMENT_ADD(qbert_samples)
+MACHINE_CONFIG_END
+
+
 #else
+
+
+static MACHINE_CONFIG_DERIVED( gottlieb1_votrax, gottlieb_core )
+	MCFG_GOTTLIEB_SOUND_R1_ADD_VOTRAX("r1sound")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( reactor, gottlieb1_votrax )
 
@@ -1816,6 +1814,11 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( qbert, gottlieb1_votrax )
 MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( tylz, gottlieb1_votrax )
+MACHINE_CONFIG_END
+
 
 #endif
 
@@ -2456,7 +2459,8 @@ static DRIVER_INIT( romtiles )
 static DRIVER_INIT( stooges )
 {
 	DRIVER_INIT_CALL(ramtiles);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x05803, 0x05803, 0, 0x07f8, FUNC(stooges_output_w));
+	gottlieb_state *state = machine.driver_data<gottlieb_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x05803, 0x05803, 0, 0x07f8, write8_delegate(FUNC(gottlieb_state::stooges_output_w),state));
 }
 
 
@@ -2492,7 +2496,7 @@ GAME( 1982, myqbert,   qbert,    qbert, 			qbert,    romtiles, ROT270, "Gottlieb
 GAME( 1982, qberttst,  qbert,    qbert, 			qbert,    romtiles, ROT270, "Gottlieb", "Q*bert (early test version)", GAME_IMPERFECT_SOUND )
 GAME( 1982, qbtrktst,  qbert,    qbert, 			qbert,    romtiles, ROT270, "Gottlieb", "Q*bert Board Input Test Rom", GAME_IMPERFECT_SOUND )
 GAME( 1982, insector,  0,        gottlieb1, 		insector, romtiles, ROT0,   "Gottlieb", "Insector (prototype)", 0 )
-GAME( 1982, tylz,      0,        gottlieb1_votrax,	tylz,     romtiles, ROT0,   "Mylstar",  "Tylz (prototype)", GAME_IMPERFECT_SOUND ) // modified sound hw?
+GAME( 1982, tylz,      0,        tylz,	tylz,     romtiles, ROT0,   "Mylstar",  "Tylz (prototype)", GAME_IMPERFECT_SOUND ) // modified sound hw?
 GAME( 1984, argusg,    0,        gottlieb1, 		argusg,   ramtiles, ROT0,   "Gottlieb", "Argus (Gottlieb, prototype)" , 0) // aka Guardian / Protector?
 GAME( 1983, mplanets,  0,        gottlieb1, 		mplanets, romtiles, ROT270, "Gottlieb", "Mad Planets", 0 )
 GAME( 1983, mplanetsuk,mplanets, gottlieb1, 		mplanets, romtiles, ROT270, "Gottlieb (Taitel license)", "Mad Planets (UK)", 0 )

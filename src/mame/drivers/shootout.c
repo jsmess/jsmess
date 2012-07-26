@@ -41,54 +41,54 @@
 
 /*******************************************************************************/
 
-static WRITE8_HANDLER( shootout_bankswitch_w )
+WRITE8_MEMBER(shootout_state::shootout_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
-static WRITE8_HANDLER( sound_cpu_command_w )
+WRITE8_MEMBER(shootout_state::sound_cpu_command_w)
 {
-	soundlatch_w( space, offset, data );
-	cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
+	soundlatch_byte_w( space, offset, data );
+	cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 }
 
-static WRITE8_HANDLER( shootout_flipscreen_w )
+WRITE8_MEMBER(shootout_state::shootout_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 0x01);
+	flip_screen_set(data & 0x01);
 }
 
-static WRITE8_HANDLER( shootout_coin_counter_w )
+WRITE8_MEMBER(shootout_state::shootout_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0, data);
+	coin_counter_w(machine(), 0, data);
 }
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( shootout_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( shootout_map, AS_PROGRAM, 8, shootout_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1") AM_WRITE(shootout_bankswitch_w)
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1") AM_WRITE(shootout_flipscreen_w)
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2") AM_WRITE(shootout_coin_counter_w)
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2") AM_WRITE(sound_cpu_command_w)
 	AM_RANGE(0x1004, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x19ff) AM_RAM AM_BASE_MEMBER(shootout_state,m_spriteram)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(shootout_textram_w) AM_BASE_MEMBER(shootout_state,m_textram)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(shootout_videoram_w) AM_BASE_MEMBER(shootout_state,m_videoram)
+	AM_RANGE(0x1800, 0x19ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(shootout_textram_w) AM_SHARE("textram")
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(shootout_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shootouj_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( shootouj_map, AS_PROGRAM, 8, shootout_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1")
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2")
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(shootout_coin_counter_w)
-	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE_MEMBER(shootout_state,m_spriteram)
-	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym2203_r,ym2203_w)
-	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(shootout_textram_w) AM_BASE_MEMBER(shootout_state,m_textram)
-	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(shootout_videoram_w) AM_BASE_MEMBER(shootout_state,m_videoram)
+	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r,ym2203_w)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(shootout_textram_w) AM_SHARE("textram")
+	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(shootout_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -96,19 +96,19 @@ ADDRESS_MAP_END
 /*******************************************************************************/
 
 /* same as Tryout */
-static ADDRESS_MAP_START( shootout_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( shootout_sound_map, AS_PROGRAM, 8, shootout_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2203_r,ym2203_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r,ym2203_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 	AM_RANGE(0xd000, 0xd000) AM_WRITENOP // unknown, NOT irq/nmi mask
 ADDRESS_MAP_END
 
 /*******************************************************************************/
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(shootout_state::coin_inserted)
 {
-	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( shootout )
@@ -129,8 +129,8 @@ static INPUT_PORTS_START( shootout )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, shootout_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, shootout_state,coin_inserted, 0)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -171,7 +171,7 @@ static INPUT_PORTS_START( shootout )
 	PORT_DIPSETTING(	0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Very_Hard ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) /* this is set when either coin is inserted */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( shootouj )
@@ -255,8 +255,8 @@ static const ym2203_interface ym2203_interface2 =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL,
 		DEVCB_NULL,
-		DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, shootout_bankswitch_w),
-		DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, shootout_flipscreen_w)
+		DEVCB_DRIVER_MEMBER(shootout_state, shootout_bankswitch_w),
+		DEVCB_DRIVER_MEMBER(shootout_state, shootout_flipscreen_w)
 	},
 	shootout_snd2_irq
 };
@@ -409,9 +409,9 @@ ROM_END
 static DRIVER_INIT( shootout )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	int length = machine.region("maincpu")->bytes();
+	int length = machine.root_device().memregion("maincpu")->bytes();
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length - 0x8000);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	int A;
 
 	space->set_decrypted_region(0x8000, 0xffff, decrypt);
@@ -419,13 +419,13 @@ static DRIVER_INIT( shootout )
 	for (A = 0x8000;A < length;A++)
 		decrypt[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x40) >> 1) | ((rom[A] & 0x20) << 1);
 
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
-	memory_configure_bank_decrypted(machine, "bank1", 0, 16, decrypt + 0x8000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x8000, 0x4000);
 }
 
 static DRIVER_INIT( shootouj )
 {
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 

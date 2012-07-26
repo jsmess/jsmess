@@ -27,7 +27,6 @@
 'maincpu' (0082): unmapped i/o memory write to 0024 = 06 & FF
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

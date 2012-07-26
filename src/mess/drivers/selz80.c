@@ -27,7 +27,6 @@ ToDo:
 'maincpu' (0122): unmapped i/o memory write to 0019 = 17 & FF
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -129,7 +128,7 @@ READ8_MEMBER( selz80_state::kbd_r )
 	{
 		char kbdrow[6];
 		sprintf(kbdrow,"X%X",m_digit);
-		data = input_port_read(machine(), kbdrow);
+		data = ioport(kbdrow)->read();
 	}
 	return data;
 }

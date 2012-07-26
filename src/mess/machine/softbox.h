@@ -12,7 +12,6 @@
 #ifndef __SOFTBOX__
 #define __SOFTBOX__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"

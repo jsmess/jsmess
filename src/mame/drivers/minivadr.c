@@ -18,11 +18,11 @@ class minivadr_state : public driver_device
 {
 public:
 	minivadr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	size_t   m_videoram_size;
+	required_shared_ptr<UINT8> m_videoram;
 };
 
 /*************************************
@@ -36,7 +36,7 @@ static SCREEN_UPDATE_RGB32( minivadr )
 	minivadr_state *state = screen.machine().driver_data<minivadr_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{
 		int i;
 
@@ -58,9 +58,9 @@ static SCREEN_UPDATE_RGB32( minivadr )
 }
 
 
-static ADDRESS_MAP_START( minivadr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( minivadr_map, AS_PROGRAM, 8, minivadr_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_SIZE_MEMBER(minivadr_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xe008, 0xe008) AM_READ_PORT("INPUTS") AM_WRITENOP		// W - ???
 ADDRESS_MAP_END
 

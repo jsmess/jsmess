@@ -8,12 +8,13 @@ class ksayakyu_state : public driver_device
 {
 public:
 	ksayakyu_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT8 *    m_videoram;
-	UINT8 *    m_spriteram;
-	size_t     m_spriteram_size;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	tilemap_t    *m_tilemap;
@@ -23,13 +24,17 @@ public:
 
 	/* misc */
 	int        m_sound_status;
+	DECLARE_WRITE8_MEMBER(bank_select_w);
+	DECLARE_WRITE8_MEMBER(latch_w);
+	DECLARE_READ8_MEMBER(sound_status_r);
+	DECLARE_WRITE8_MEMBER(tomaincpu_w);
+	DECLARE_WRITE8_MEMBER(ksayakyu_videoram_w);
+	DECLARE_WRITE8_MEMBER(ksayakyu_videoctrl_w);
 };
 
 
 /*----------- defined in video/ksayakyu.c -----------*/
 
-WRITE8_HANDLER( ksayakyu_videoram_w );
-WRITE8_HANDLER( ksayakyu_videoctrl_w );
 PALETTE_INIT( ksayakyu );
 VIDEO_START( ksayakyu );
 SCREEN_UPDATE_IND16( ksayakyu );

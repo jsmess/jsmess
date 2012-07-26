@@ -12,6 +12,7 @@
 
 PALETTE_INIT( finalizr )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -75,11 +76,10 @@ VIDEO_START( finalizr )
 
 
 
-WRITE8_HANDLER( finalizr_videoctrl_w )
+WRITE8_MEMBER(finalizr_state::finalizr_videoctrl_w)
 {
-	finalizr_state *state = space->machine().driver_data<finalizr_state>();
-	state->m_charbank = data & 3;
-	state->m_spriterambank = data & 8;
+	m_charbank = data & 3;
+	m_spriterambank = data & 8;
 	/* other bits unknown */
 }
 
@@ -104,7 +104,7 @@ SCREEN_UPDATE_IND16( finalizr )
 		UINT8 *sr = state->m_spriterambank ? state->m_spriteram_2 : state->m_spriteram;
 
 
-		for (offs = 0; offs <= state->m_spriteram_size - 5; offs += 5)
+		for (offs = 0; offs <= state->m_spriteram.bytes() - 5; offs += 5)
 		{
 			int sx, sy, flipx, flipy, code, color, size;
 
@@ -122,7 +122,7 @@ SCREEN_UPDATE_IND16( finalizr )
 
 			if (size >= 0x10)	/* 32x32 */
 			{
-				if (flip_screen_get(screen.machine()))
+				if (state->flip_screen())
 				{
 					sx = 256 - sx;
 					sy = 224 - sy;
@@ -153,7 +153,7 @@ SCREEN_UPDATE_IND16( finalizr )
 			}
 			else
 			{
-				if (flip_screen_get(screen.machine()))
+				if (state->flip_screen())
 				{
 					sx = ((size & 0x08) ? 280:272) - sx;
 					sy = ((size & 0x04) ? 248:240) - sy;

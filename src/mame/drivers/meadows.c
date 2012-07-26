@@ -135,23 +135,23 @@
  *
  *************************************/
 
-static READ8_HANDLER( hsync_chain_r )
+READ8_MEMBER(meadows_state::hsync_chain_r)
 {
-	UINT8 val = space->machine().primary_screen->hpos();
+	UINT8 val = machine().primary_screen->hpos();
 	return BITSWAP8(val,0,1,2,3,4,5,6,7);
 }
 
 
-static READ8_HANDLER( vsync_chain_hi_r )
+READ8_MEMBER(meadows_state::vsync_chain_hi_r)
 {
-	UINT8 val = space->machine().primary_screen->vpos();
+	UINT8 val = machine().primary_screen->vpos();
 	return ((val >> 1) & 0x08) | ((val >> 3) & 0x04) | ((val >> 5) & 0x02) | (val >> 7);
 }
 
 
-static READ8_HANDLER( vsync_chain_lo_r )
+READ8_MEMBER(meadows_state::vsync_chain_lo_r)
 {
-	UINT8 val = space->machine().primary_screen->vpos();
+	UINT8 val = machine().primary_screen->vpos();
 	return val & 0x0f;
 }
 
@@ -163,16 +163,15 @@ static READ8_HANDLER( vsync_chain_lo_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( meadows_audio_w )
+WRITE8_MEMBER(meadows_state::meadows_audio_w)
 {
-	meadows_state *state = space->machine().driver_data<meadows_state>();
 	switch (offset)
 	{
 		case 0:
-			if (state->m_0c00 == data)
+			if (m_0c00 == data)
 				break;
 			logerror("meadows_audio_w %d $%02x\n", offset, data);
-			state->m_0c00 = data;
+			m_0c00 = data;
             break;
 
 		case 1:
@@ -197,9 +196,9 @@ static WRITE8_HANDLER( meadows_audio_w )
  *
  *************************************/
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(meadows_state::coin_inserted)
 {
-	cputag_set_input_line_and_vector(field.machine(), "maincpu", 0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82);
+	cputag_set_input_line_and_vector(machine(), "maincpu", 0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82);
 }
 
 
@@ -241,37 +240,36 @@ static INTERRUPT_GEN( minferno_interrupt )
  *
  *************************************/
 
-static WRITE8_HANDLER( audio_hardware_w )
+WRITE8_MEMBER(meadows_state::audio_hardware_w)
 {
-	meadows_state *state = space->machine().driver_data<meadows_state>();
 	switch (offset & 3)
 	{
 		case 0: /* DAC */
-			meadows_sh_dac_w(space->machine(), data ^ 0xff);
+			meadows_sh_dac_w(machine(), data ^ 0xff);
             break;
 
 		case 1: /* counter clk 5 MHz / 256 */
-			if (data == state->m_0c01)
+			if (data == m_0c01)
 				break;
 			logerror("audio_w ctr1 preset $%x amp %d\n", data & 15, data >> 4);
-			state->m_0c01 = data;
-			meadows_sh_update(space->machine());
+			m_0c01 = data;
+			meadows_sh_update(machine());
 			break;
 
 		case 2: /* counter clk 5 MHz / 32 (/ 2 or / 4) */
-			if (data == state->m_0c02)
+			if (data == m_0c02)
                 break;
 			logerror("audio_w ctr2 preset $%02x\n", data);
-			state->m_0c02 = data;
-			meadows_sh_update(space->machine());
+			m_0c02 = data;
+			meadows_sh_update(machine());
             break;
 
 		case 3: /* audio enable */
-			if (data == state->m_0c03)
+			if (data == m_0c03)
                 break;
 			logerror("audio_w enable ctr2/2:%d ctr2:%d dac:%d ctr1:%d\n", data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1);
-			state->m_0c03 = data;
-			meadows_sh_update(space->machine());
+			m_0c03 = data;
+			meadows_sh_update(machine());
             break;
 	}
 }
@@ -284,15 +282,14 @@ static WRITE8_HANDLER( audio_hardware_w )
  *
  *************************************/
 
-static READ8_HANDLER( audio_hardware_r )
+READ8_MEMBER(meadows_state::audio_hardware_r)
 {
-	meadows_state *state = space->machine().driver_data<meadows_state>();
 	int data = 0;
 
 	switch (offset)
 	{
 		case 0:
-			data = state->m_0c00;
+			data = m_0c00;
             break;
 
 		case 1: break;
@@ -339,35 +336,35 @@ static PALETTE_INIT( meadows )
  *
  *************************************/
 
-static ADDRESS_MAP_START( meadows_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( meadows_main_map, AS_PROGRAM, 8, meadows_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c01, 0x0c01) AM_READ_PORT("STICK")
 	AM_RANGE(0x0c02, 0x0c02) AM_READ(hsync_chain_r)
 	AM_RANGE(0x0c03, 0x0c03) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c00, 0x0c03) AM_WRITE(meadows_audio_w)
-	AM_RANGE(0x0d00, 0x0d0f) AM_WRITE(meadows_spriteram_w) AM_BASE_MEMBER(meadows_state, m_spriteram)
+	AM_RANGE(0x0d00, 0x0d0f) AM_WRITE(meadows_spriteram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x0e00, 0x0eff) AM_RAM
 	AM_RANGE(0x1000, 0x1bff) AM_ROM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_MEMBER(meadows_state, m_videoram)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(meadows_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bowl3d_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bowl3d_main_map, AS_PROGRAM, 8, meadows_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("INPUTS1")
 	AM_RANGE(0x0c01, 0x0c01) AM_READ_PORT("INPUTS2")
 	AM_RANGE(0x0c02, 0x0c02) AM_READ(hsync_chain_r)
 	AM_RANGE(0x0c03, 0x0c03) AM_READ_PORT("DSW")
 	AM_RANGE(0x0c00, 0x0c03) AM_WRITE(meadows_audio_w)
-	AM_RANGE(0x0d00, 0x0d0f) AM_WRITE(meadows_spriteram_w) AM_BASE_MEMBER(meadows_state, m_spriteram)
+	AM_RANGE(0x0d00, 0x0d0f) AM_WRITE(meadows_spriteram_w) AM_SHARE("spriteram")
 	AM_RANGE(0x0e00, 0x0eff) AM_RAM
 	AM_RANGE(0x1000, 0x1bff) AM_ROM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_MEMBER(meadows_state, m_videoram)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(meadows_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( minferno_main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( minferno_main_map, AS_PROGRAM, 8, meadows_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x1c00, 0x1eff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_MEMBER(meadows_state, m_videoram)
+	AM_RANGE(0x1c00, 0x1eff) AM_RAM_WRITE(meadows_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1f00, 0x1f00) AM_READ_PORT("JOY1")
 	AM_RANGE(0x1f01, 0x1f01) AM_READ_PORT("JOY2")
 	AM_RANGE(0x1f02, 0x1f02) AM_READ_PORT("BUTTONS")
@@ -378,7 +375,7 @@ static ADDRESS_MAP_START( minferno_main_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( minferno_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( minferno_io_map, AS_IO, 8, meadows_state )
 	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
@@ -390,7 +387,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, meadows_state )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
 	AM_RANGE(0x0c00, 0x0c03) AM_READWRITE(audio_hardware_r, audio_hardware_w)
 	AM_RANGE(0x0e00, 0x0eff) AM_RAM
@@ -444,7 +441,7 @@ static INPUT_PORTS_START( meadows )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ))
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, meadows_state,coin_inserted, 0)
 	PORT_BIT( 0x8e, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -496,7 +493,7 @@ static INPUT_PORTS_START( bowl3d )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("FAKE")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, meadows_state,coin_inserted, 0)
 	PORT_BIT( 0x8e, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -875,12 +872,12 @@ static DRIVER_INIT( gypsyjug )
 		0x01,0x80, 0x03,0xc0, 0x03,0xc0, 0x01,0x80
 	};
 	int i;
-	UINT8 *gfx2 = machine.region("gfx2")->base();
-	UINT8 *gfx3 = machine.region("gfx3")->base();
-	UINT8 *gfx4 = machine.region("gfx4")->base();
-	UINT8 *gfx5 = machine.region("gfx5")->base();
-	int len3 = machine.region("gfx3")->bytes();
-	int len4 = machine.region("gfx4")->bytes();
+	UINT8 *gfx2 = machine.root_device().memregion("gfx2")->base();
+	UINT8 *gfx3 = machine.root_device().memregion("gfx3")->base();
+	UINT8 *gfx4 = machine.root_device().memregion("gfx4")->base();
+	UINT8 *gfx5 = machine.root_device().memregion("gfx5")->base();
+	int len3 = machine.root_device().memregion("gfx3")->bytes();
+	int len4 = machine.root_device().memregion("gfx4")->bytes();
 
 	memcpy(gfx3,gfx2,len3);
 
@@ -899,8 +896,8 @@ static DRIVER_INIT( minferno )
 	UINT8 *mem;
 
 	/* create an inverted copy of the graphics data */
-	mem = machine.region("gfx1")->base();
-	length = machine.region("gfx1")->bytes();
+	mem = machine.root_device().memregion("gfx1")->base();
+	length = machine.root_device().memregion("gfx1")->bytes();
 	for (i = 0; i < length/2; i++)
 		mem[i] = ~mem[i + length/2];
 }

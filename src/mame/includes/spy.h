@@ -8,10 +8,11 @@ class spy_state : public driver_device
 {
 public:
 	spy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ram(*this, "ram"){ }
 
 	/* memory pointers */
-	UINT8 *    m_ram;
+	required_shared_ptr<UINT8> m_ram;
 	UINT8      m_pmcram[0x800];
 //  UINT8 *    m_paletteram;    // currently this uses generic palette handling
 
@@ -32,6 +33,14 @@ public:
 	device_t *m_k007232_2;
 	device_t *m_k052109;
 	device_t *m_k051960;
+	DECLARE_READ8_MEMBER(spy_bankedram1_r);
+	DECLARE_WRITE8_MEMBER(spy_bankedram1_w);
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_WRITE8_MEMBER(spy_3f90_w);
+	DECLARE_WRITE8_MEMBER(spy_sh_irqtrigger_w);
+	DECLARE_WRITE8_MEMBER(sound_bank_w);
+	DECLARE_READ8_MEMBER(k052109_051960_r);
+	DECLARE_WRITE8_MEMBER(k052109_051960_w);
 };
 
 

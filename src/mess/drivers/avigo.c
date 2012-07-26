@@ -66,7 +66,6 @@
 
  ******************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "includes/avigo.h"
@@ -174,7 +173,7 @@ void avigo_state::refresh_memory(UINT8 bank, UINT8 chip_select)
 
 		case 0x01: // banked RAM
 			sprintf(bank_tag,"bank%d", bank);
-			memory_set_bankptr(machine(), bank_tag, m_ram_base + (((bank == 1 ? m_bank1_l : m_bank2_l) & 0x07)<<14));
+			membank(bank_tag)->set_base(m_ram_base + (((bank == 1 ? m_bank1_l : m_bank2_l) & 0x07)<<14));
 			space->install_readwrite_bank (bank * 0x4000, bank * 0x4000 + 0x3fff, bank_tag);
 			active_flash = -1;
 			break;
@@ -247,8 +246,8 @@ void avigo_state::machine_reset()
 	/* if is a cold start initialize flash contents */
 	if (!m_warm_start)
 	{
-		memcpy(m_flashes[0]->space()->get_read_ptr(0), machine().region("bios")->base() + 0x000000, 0x100000);
-		memcpy(m_flashes[1]->space()->get_read_ptr(0), machine().region("bios")->base() + 0x100000, 0x100000);
+		memcpy(m_flashes[0]->space()->get_read_ptr(0), memregion("bios")->base() + 0x000000, 0x100000);
+		memcpy(m_flashes[1]->space()->get_read_ptr(0), memregion("bios")->base() + 0x100000, 0x100000);
 	}
 
 	m_irq = 0;
@@ -268,7 +267,7 @@ void avigo_state::machine_start()
 	m_ram_base = (UINT8*)m_ram->pointer();
 
 	// bank3 always first ram bank
-	memory_set_bankptr(machine(), "bank3", m_ram_base);
+	membank("bank3")->set_base(m_ram_base);
 
 	/* keep machine pointers to flash devices */
 	m_flashes[0] = machine().device<intelfsh8_device>("flash0");
@@ -323,17 +322,17 @@ READ8_MEMBER(avigo_state::key_data_read_r)
 
 	if (!(m_key_line & 0x01))
 	{
-		data &= input_port_read(machine(), "LINE0");
+		data &= ioport("LINE0")->read();
 	}
 
 	if (!(m_key_line & 0x02))
 	{
-		data &= input_port_read(machine(), "LINE1");
+		data &= ioport("LINE1")->read();
 	}
 
 	if (!(m_key_line & 0x04))
 	{
-		data &= input_port_read(machine(), "LINE2");
+		data &= ioport("LINE2")->read();
 	}
 
 	/* bit 3 is cold/warm start */
@@ -456,14 +455,14 @@ WRITE8_MEMBER(avigo_state::ad_control_status_w)
 				if ((data & 0x08)!=0)
 				{
 					LOG(("a/d select x coordinate\n"));
-					LOG(("x coord: %d\n", input_port_read(machine(), "POSX")));
+					LOG(("x coord: %d\n", ioport("POSX")->read()));
 
 					/* on screen range 0x060->0x03a0 */
-					if (input_port_read(machine(), "LINE3") & 0x01)
+					if (ioport("LINE3")->read() & 0x01)
 					{
 						/* this might not be totally accurate because hitable screen
                         area may include the border around the screen! */
-						m_ad_value = input_port_read(machine(), "POSX");
+						m_ad_value = ioport("POSX")->read();
 					}
 					else
 					{
@@ -486,11 +485,11 @@ WRITE8_MEMBER(avigo_state::ad_control_status_w)
                     0x0350->0x03a6 is panel at bottom */
 
 					LOG(("a/d select y coordinate\n"));
-					LOG(("y coord: %d\n", input_port_read(machine(), "POSY")));
+					LOG(("y coord: %d\n", ioport("POSY")->read()));
 
-					if (input_port_read(machine(), "LINE3") & 0x01)
+					if (ioport("LINE3")->read() & 0x01)
 					{
-						m_ad_value = input_port_read(machine(), "POSY");
+						m_ad_value = ioport("POSY")->read();
 					}
 					else
 					{
@@ -660,7 +659,7 @@ INPUT_CHANGED_MEMBER( avigo_state::pen_irq )
 INPUT_CHANGED_MEMBER( avigo_state::pen_move_irq )
 {
 	// an irq is generated when the pen is down on the screen and is being moved
-	if (input_port_read(machine(), "LINE3") & 0x01)
+	if (ioport("LINE3")->read() & 0x01)
 	{
 		LOG(("pen move interrupt\n"));
 		m_irq |= (1<<6);

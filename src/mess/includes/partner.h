@@ -19,6 +19,10 @@ public:
 
 	UINT8 m_mem_page;
 	UINT8 m_win_mem_page;
+	DECLARE_READ8_MEMBER(partner_floppy_r);
+	DECLARE_WRITE8_MEMBER(partner_floppy_w);
+	DECLARE_WRITE8_MEMBER(partner_win_memory_page_w);
+	DECLARE_WRITE8_MEMBER(partner_mem_page_w);
 };
 
 
@@ -31,6 +35,4 @@ extern MACHINE_START( partner );
 extern const i8257_interface partner_dma;
 extern const wd17xx_interface partner_wd17xx_interface;
 
-extern WRITE8_HANDLER (partner_mem_page_w );
-extern WRITE8_HANDLER (partner_win_memory_page_w);
 #endif /* partner_H_ */

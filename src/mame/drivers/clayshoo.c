@@ -21,16 +21,18 @@ class clayshoo_state : public driver_device
 {
 public:
 	clayshoo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *   m_videoram;
-	size_t    m_videoram_size;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* misc */
 	emu_timer *m_analog_timer_1, *m_analog_timer_2;
 	UINT8 m_input_port_select;
 	UINT8 m_analog_port_val;
+	DECLARE_WRITE8_MEMBER(analog_reset_w);
+	DECLARE_READ8_MEMBER(analog_r);
 };
 
 
@@ -52,7 +54,7 @@ static UINT8 difficulty_input_port_r( running_machine &machine, int bit )
 	UINT8 ret = 0;
 
 	/* read fake port and remap the buttons to 2 bits */
-	UINT8	raw = input_port_read(machine, "FAKE");
+	UINT8	raw = machine.root_device().ioport("FAKE")->read();
 
 	if (raw & (1 << (bit + 1)))
 		ret = 0x03;		/* expert */
@@ -72,11 +74,11 @@ static READ8_DEVICE_HANDLER( input_port_r )
 
 	switch (state->m_input_port_select)
 	{
-	case 0x01:	ret = input_port_read(device->machine(), "IN0"); break;
-	case 0x02:	ret = input_port_read(device->machine(), "IN1"); break;
-	case 0x04:	ret = (input_port_read(device->machine(), "IN2") & 0xf0) | difficulty_input_port_r(device->machine(), 0) |
+	case 0x01:	ret = state->ioport("IN0")->read(); break;
+	case 0x02:	ret = state->ioport("IN1")->read(); break;
+	case 0x04:	ret = (state->ioport("IN2")->read() & 0xf0) | difficulty_input_port_r(device->machine(), 0) |
 					  (difficulty_input_port_r(device->machine(), 3) << 2); break;
-	case 0x08:	ret = input_port_read(device->machine(), "IN3"); break;
+	case 0x08:	ret = state->ioport("IN3")->read(); break;
 	case 0x10:
 	case 0x20:	break;	/* these two are not really used */
 	default: logerror("Unexpected port read: %02X\n", state->m_input_port_select);
@@ -107,25 +109,23 @@ static attotime compute_duration( device_t *device, int analog_pos )
 }
 
 
-static WRITE8_HANDLER( analog_reset_w )
+WRITE8_MEMBER(clayshoo_state::analog_reset_w)
 {
-	clayshoo_state *state = space->machine().driver_data<clayshoo_state>();
 
 	/* reset the analog value, and start the two times that will fire
        off in a short period proportional to the position of the
        analog control and set the appropriate bit. */
 
-	state->m_analog_port_val = 0xff;
+	m_analog_port_val = 0xff;
 
-	state->m_analog_timer_1->adjust(compute_duration(&space->device(), input_port_read(space->machine(), "AN1")), 0x02);
-	state->m_analog_timer_2->adjust(compute_duration(&space->device(), input_port_read(space->machine(), "AN2")), 0x01);
+	m_analog_timer_1->adjust(compute_duration(&space.device(), ioport("AN1")->read()), 0x02);
+	m_analog_timer_2->adjust(compute_duration(&space.device(), ioport("AN2")->read()), 0x01);
 }
 
 
-static READ8_HANDLER( analog_r )
+READ8_MEMBER(clayshoo_state::analog_r)
 {
-	clayshoo_state *state = space->machine().driver_data<clayshoo_state>();
-	return state->m_analog_port_val;
+	return m_analog_port_val;
 }
 
 
@@ -188,7 +188,7 @@ static SCREEN_UPDATE_RGB32( clayshoo )
 	clayshoo_state *state = screen.machine().driver_data<clayshoo_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{
 		int i;
 		UINT8 x = offs << 3;
@@ -216,11 +216,11 @@ static SCREEN_UPDATE_RGB32( clayshoo )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, clayshoo_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x4000, 0x47ff) AM_ROM
-	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE_SIZE_MEMBER(clayshoo_state, m_videoram, m_videoram_size)	/* 6k of video ram according to readme */
+	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("videoram")	/* 6k of video ram according to readme */
 	AM_RANGE(0x9800, 0xa800) AM_WRITENOP	  /* not really mapped, but cleared */
 	AM_RANGE(0xc800, 0xc800) AM_READWRITE(analog_r, analog_reset_w)
 ADDRESS_MAP_END
@@ -233,11 +233,11 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( main_io_map, AS_IO, 8, clayshoo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 

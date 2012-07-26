@@ -284,12 +284,14 @@ class namcos11_state : public psx_state
 public:
 	namcos11_state(const machine_config &mconfig, device_type type, const char *tag)
 		: psx_state(mconfig, type, tag),
+		m_sharedram(*this,"sharedram"),
+		m_keycus(*this,"keycus"),
 		m_maincpu(*this,"maincpu"),
 		m_mcu(*this,"c76")
 		{ }
 
-	UINT32 *m_sharedram;
-	UINT32 *m_keycus;
+	required_shared_ptr<UINT32> m_sharedram;
+	required_shared_ptr<UINT32> m_keycus;
 	size_t m_keycus_size;
 	UINT8 m_su_83;
 
@@ -297,6 +299,36 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
+	DECLARE_WRITE32_MEMBER(keycus_w);
+	DECLARE_READ32_MEMBER(keycus_c406_r);
+	DECLARE_READ32_MEMBER(keycus_c409_r);
+	DECLARE_READ32_MEMBER(keycus_c410_r);
+	DECLARE_READ32_MEMBER(keycus_c411_r);
+	DECLARE_READ32_MEMBER(keycus_c430_r);
+	DECLARE_READ32_MEMBER(keycus_c431_r);
+	DECLARE_READ32_MEMBER(keycus_c432_r);
+	DECLARE_READ32_MEMBER(keycus_c442_r);
+	DECLARE_READ32_MEMBER(keycus_c443_r);
+	DECLARE_WRITE32_MEMBER(bankswitch_rom32_w);
+	DECLARE_WRITE32_MEMBER(bankswitch_rom64_upper_w);
+	DECLARE_WRITE32_MEMBER(bankswitch_rom64_w);
+	DECLARE_WRITE32_MEMBER(lightgun_w);
+	DECLARE_READ32_MEMBER(lightgun_r);
+	DECLARE_READ16_MEMBER(c76_shared_r);
+	DECLARE_WRITE16_MEMBER(c76_shared_w);
+	DECLARE_READ16_MEMBER(c76_inputs_r);
+	DECLARE_READ8_MEMBER(dac7_r);
+	DECLARE_READ8_MEMBER(dac6_r);
+	DECLARE_READ8_MEMBER(dac5_r);
+	DECLARE_READ8_MEMBER(dac4_r);
+	DECLARE_READ8_MEMBER(dac3_r);
+	DECLARE_READ8_MEMBER(dac2_r);
+	DECLARE_READ8_MEMBER(dac1_r);
+	DECLARE_READ8_MEMBER(dac0_r);
+	DECLARE_READ8_MEMBER(pocketrc_gas_r);
+	DECLARE_READ8_MEMBER(pocketrc_steer_r);
+	DECLARE_READ16_MEMBER(c76_speedup_r);
+	DECLARE_WRITE16_MEMBER(c76_speedup_w);
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -312,20 +344,18 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 	}
 }
 
-static WRITE32_HANDLER( keycus_w )
+WRITE32_MEMBER(namcos11_state::keycus_w)
 {
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
 
-	verboselog( space->machine(), 1, "keycus_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	COMBINE_DATA( &state->m_keycus[ offset ] );
+	verboselog( machine(), 1, "keycus_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	COMBINE_DATA( &m_keycus[ offset ] );
 }
 
 /* tekken 2 */
-static READ32_HANDLER( keycus_c406_r )
+READ32_MEMBER(namcos11_state::keycus_c406_r)
 {
 	/* todo: verify behaviour */
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
-	UINT32 *namcos11_keycus = state->m_keycus;
+	UINT32 *namcos11_keycus = m_keycus;
 	UINT32 data;
 
 	data = namcos11_keycus[ offset ];
@@ -339,33 +369,31 @@ static READ32_HANDLER( keycus_c406_r )
 			( ( namcos11_keycus[ 1 ] >> 8 ) & 0xf );
 		break;
 	}
-	verboselog( space->machine(), 1, "keycus_c406_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( machine(), 1, "keycus_c406_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
 /* soul edge */
-static READ32_HANDLER( keycus_c409_r )
+READ32_MEMBER(namcos11_state::keycus_c409_r)
 {
 	/* todo: verify behaviour */
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
 	UINT32 data;
 
-	data = state->m_keycus[ offset ];
+	data = m_keycus[ offset ];
 	switch( offset )
 	{
 	case 3:
 		data = ( data & 0x0000ffff ) | 0x000f0000;
 		break;
 	}
-	verboselog( space->machine(), 1, "keycus_c409_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( machine(), 1, "keycus_c409_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
 /* dunk mania */
-static READ32_HANDLER( keycus_c410_r )
+READ32_MEMBER(namcos11_state::keycus_c410_r)
 {
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
-	UINT32 *namcos11_keycus = state->m_keycus;
+	UINT32 *namcos11_keycus = m_keycus;
 	UINT32 data;
 	UINT32 n_value;
 
@@ -393,15 +421,14 @@ static READ32_HANDLER( keycus_c410_r )
 			( ( ( n_value / 10000 ) % 10 ) << 16 );
 		break;
 	}
-	verboselog( space->machine(), 1, "keycus_c410_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( machine(), 1, "keycus_c410_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
 /* prime goal ex */
-static READ32_HANDLER( keycus_c411_r )
+READ32_MEMBER(namcos11_state::keycus_c411_r)
 {
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
-	UINT32 *namcos11_keycus = state->m_keycus;
+	UINT32 *namcos11_keycus = m_keycus;
 	UINT32 data;
 	UINT32 n_value;
 
@@ -428,15 +455,14 @@ static READ32_HANDLER( keycus_c411_r )
 		break;
 	}
 
-	verboselog( space->machine(), 1, "keycus_c411_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( machine(), 1, "keycus_c411_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
 /* xevious 3d/g */
-static READ32_HANDLER( keycus_c430_r )
+READ32_MEMBER(namcos11_state::keycus_c430_r)
 {
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
-	UINT32 *namcos11_keycus = state->m_keycus;
+	UINT32 *namcos11_keycus = m_keycus;
 	UINT32 data;
 	UINT16 n_value;
 
@@ -464,15 +490,14 @@ static READ32_HANDLER( keycus_c430_r )
 			( ( ( n_value / 1 ) % 10 ) << 16 );
 		break;
 	}
-	verboselog( space->machine(), 1, "keycus_c430_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( machine(), 1, "keycus_c430_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
 /* dancing eyes */
-static READ32_HANDLER( keycus_c431_r )
+READ32_MEMBER(namcos11_state::keycus_c431_r)
 {
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
-	UINT32 *namcos11_keycus = state->m_keycus;
+	UINT32 *namcos11_keycus = m_keycus;
 	UINT32 data;
 	UINT16 n_value;
 
@@ -498,15 +523,14 @@ static READ32_HANDLER( keycus_c431_r )
 		data = ( data & 0xffff0000 ) | ( ( n_value / 10000 ) % 10 );
 		break;
 	}
-	verboselog( space->machine(), 1, "keycus_c431_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( machine(), 1, "keycus_c431_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
 /* pocket racer */
-static READ32_HANDLER( keycus_c432_r )
+READ32_MEMBER(namcos11_state::keycus_c432_r)
 {
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
-	UINT32 *namcos11_keycus = state->m_keycus;
+	UINT32 *namcos11_keycus = m_keycus;
 	UINT32 data;
 	UINT16 n_value;
 
@@ -533,18 +557,17 @@ static READ32_HANDLER( keycus_c432_r )
 		break;
 	}
 
-	verboselog( space->machine(), 1, "keycus_c432_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( machine(), 1, "keycus_c432_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
 /* star sweep */
-static READ32_HANDLER( keycus_c442_r )
+READ32_MEMBER(namcos11_state::keycus_c442_r)
 {
 	/* todo: verify behaviour */
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
 	UINT32 data;
 
-	data = state->m_keycus[ offset ];
+	data = m_keycus[ offset ];
 
 	switch( offset )
 	{
@@ -555,18 +578,17 @@ static READ32_HANDLER( keycus_c442_r )
 		}
 		break;
 	}
-	verboselog( space->machine(), 1, "keycus_c442_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( machine(), 1, "keycus_c442_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
 /* kosodate quiz my angel 3 / point blank 2 */
-static READ32_HANDLER( keycus_c443_r )
+READ32_MEMBER(namcos11_state::keycus_c443_r)
 {
 	/* todo: verify behaviour */
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
 	UINT32 data;
 
-	data = state->m_keycus[ offset ];
+	data = m_keycus[ offset ];
 
 	switch( offset )
 	{
@@ -589,44 +611,43 @@ static READ32_HANDLER( keycus_c443_r )
 		}
 		break;
 	}
-	verboselog( space->machine(), 1, "keycus_c443_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( machine(), 1, "keycus_c443_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
 	return data;
 }
 
 INLINE void bankswitch_rom8( address_space *space, const char *bank, int n_data )
 {
-	memory_set_bank( space->machine(), bank, ( ( n_data & 0xc0 ) >> 4 ) + ( n_data & 0x03 ) );
+	space->machine().root_device().membank( bank )->set_entry( ( ( n_data & 0xc0 ) >> 4 ) + ( n_data & 0x03 ) );
 }
 
 static const char * const bankname[] = { "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
 
-static WRITE32_HANDLER( bankswitch_rom32_w )
+WRITE32_MEMBER(namcos11_state::bankswitch_rom32_w)
 {
-	verboselog( space->machine(), 2, "bankswitch_rom32_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( machine(), 2, "bankswitch_rom32_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
 	if( ACCESSING_BITS_0_15 )
 	{
-		bankswitch_rom8( space, bankname[offset * 2], data & 0xffff );
+		bankswitch_rom8( &space, bankname[offset * 2], data & 0xffff );
 	}
 	if( ACCESSING_BITS_16_31 )
 	{
-		bankswitch_rom8( space, bankname[offset * 2 + 1], data >> 16 );
+		bankswitch_rom8( &space, bankname[offset * 2 + 1], data >> 16 );
 	}
 }
 
-static WRITE32_HANDLER( bankswitch_rom64_upper_w )
+WRITE32_MEMBER(namcos11_state::bankswitch_rom64_upper_w)
 {
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
 
-	verboselog( space->machine(), 2, "bankswitch_rom64_upper_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( machine(), 2, "bankswitch_rom64_upper_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
 	if( ACCESSING_BITS_0_15 )
 	{
-		state->m_n_bankoffset = 0;
+		m_n_bankoffset = 0;
 	}
 	if( ACCESSING_BITS_16_31 )
 	{
-		state->m_n_bankoffset = 16;
+		m_n_bankoffset = 16;
 	}
 }
 
@@ -635,24 +656,24 @@ INLINE void bankswitch_rom64( address_space *space, const char *bank, int n_data
 	namcos11_state *state = space->machine().driver_data<namcos11_state>();
 
 	/* todo: verify behaviour */
-	memory_set_bank( space->machine(), bank, ( ( ( ( n_data & 0xc0 ) >> 3 ) + ( n_data & 0x07 ) ) ^ state->m_n_bankoffset ) );
+	state->membank( bank )->set_entry( ( ( ( ( n_data & 0xc0 ) >> 3 ) + ( n_data & 0x07 ) ) ^ state->m_n_bankoffset ) );
 }
 
-static WRITE32_HANDLER( bankswitch_rom64_w )
+WRITE32_MEMBER(namcos11_state::bankswitch_rom64_w)
 {
-	verboselog( space->machine(), 2, "bankswitch_rom64_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
+	verboselog( machine(), 2, "bankswitch_rom64_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
 	if( ACCESSING_BITS_0_15 )
 	{
-		bankswitch_rom64( space, bankname[offset * 2], data & 0xffff );
+		bankswitch_rom64( &space, bankname[offset * 2], data & 0xffff );
 	}
 	if( ACCESSING_BITS_16_31 )
 	{
-		bankswitch_rom64( space, bankname[offset * 2 + 1], data >> 16 );
+		bankswitch_rom64( &space, bankname[offset * 2 + 1], data >> 16 );
 	}
 }
 
-static WRITE32_HANDLER( lightgun_w )
+WRITE32_MEMBER(namcos11_state::lightgun_w)
 {
 	if( ACCESSING_BITS_0_15 )
 	{
@@ -661,41 +682,41 @@ static WRITE32_HANDLER( lightgun_w )
 		output_set_value( "recoil0", !( data & 0x02 ) );
 		output_set_value( "recoil1", !( data & 0x01 ) );
 
-		verboselog( space->machine(), 1, "lightgun_w: outputs (%08x %08x)\n", data, mem_mask );
+		verboselog( machine(), 1, "lightgun_w: outputs (%08x %08x)\n", data, mem_mask );
 	}
 	if( ACCESSING_BITS_16_31 )
 	{
-		verboselog( space->machine(), 2, "lightgun_w: start reading (%08x %08x)\n", data, mem_mask );
+		verboselog( machine(), 2, "lightgun_w: start reading (%08x %08x)\n", data, mem_mask );
 	}
 }
 
-static READ32_HANDLER( lightgun_r )
+READ32_MEMBER(namcos11_state::lightgun_r)
 {
 	UINT32 data = 0;
 	switch( offset )
 	{
 	case 0:
-		data = input_port_read( space->machine(), "GUN1X" );
+		data = ioport( "GUN1X" )->read();
 		break;
 	case 1:
-		data = ( input_port_read( space->machine(), "GUN1Y" ) ) | ( ( input_port_read( space->machine(), "GUN1Y" ) + 1 ) << 16 );
+		data = ( ioport( "GUN1Y" )->read() ) | ( ( ioport( "GUN1Y" )->read() + 1 ) << 16 );
 		break;
 	case 2:
-		data = input_port_read( space->machine(), "GUN2X" );
+		data = ioport( "GUN2X" )->read();
 		break;
 	case 3:
-		data = ( input_port_read( space->machine(), "GUN2Y" ) ) | ( ( input_port_read( space->machine(), "GUN2Y" ) + 1 ) << 16 );
+		data = ( ioport( "GUN2Y" )->read() ) | ( ( ioport( "GUN2Y" )->read() + 1 ) << 16 );
 		break;
 	}
-	verboselog( space->machine(), 2, "lightgun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "lightgun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
-static ADDRESS_MAP_START( namcos11_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( namcos11_map, AS_PROGRAM, 32, namcos11_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
-	AM_RANGE(0x1fa04000, 0x1fa0ffff) AM_RAM AM_BASE_MEMBER(namcos11_state, m_sharedram) /* shared ram with C76 */
-	AM_RANGE(0x1fa20000, 0x1fa2ffff) AM_WRITE(keycus_w) AM_BASE_SIZE_MEMBER(namcos11_state, m_keycus, m_keycus_size) /* keycus */
-	AM_RANGE(0x1fa30000, 0x1fa30fff) AM_DEVREADWRITE8("at28c16", at28c16_r, at28c16_w, 0x00ff00ff) /* eeprom */
+	AM_RANGE(0x1fa04000, 0x1fa0ffff) AM_RAM AM_SHARE("sharedram") /* shared ram with C76 */
+	AM_RANGE(0x1fa20000, 0x1fa2ffff) AM_WRITE(keycus_w) AM_SHARE("keycus") /* keycus */
+	AM_RANGE(0x1fa30000, 0x1fa30fff) AM_DEVREADWRITE8_LEGACY("at28c16", at28c16_r, at28c16_w, 0x00ff00ff) /* eeprom */
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1fbf6000, 0x1fbf6003) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
@@ -706,48 +727,48 @@ static ADDRESS_MAP_START( namcos11_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xfffe0130, 0xfffe0133) AM_WRITENOP
 ADDRESS_MAP_END
 
-static READ16_HANDLER( c76_shared_r )
+READ16_MEMBER(namcos11_state::c76_shared_r)
 {
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
-	UINT16 *share16 = (UINT16 *)state->m_sharedram;
+	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
+	UINT16 *share16 = reinterpret_cast<UINT16 *>(m_sharedram.target());
 
 	return share16[offset];
 }
 
-static WRITE16_HANDLER( c76_shared_w )
+WRITE16_MEMBER(namcos11_state::c76_shared_w)
 {
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
-	UINT16 *share16 = (UINT16 *)state->m_sharedram;
+	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
+	UINT16 *share16 = reinterpret_cast<UINT16 *>(m_sharedram.target());
 
 	COMBINE_DATA(&share16[offset]);
 }
 
-static READ16_HANDLER( c76_inputs_r )
+READ16_MEMBER(namcos11_state::c76_inputs_r)
 {
-//  logerror("'c76' Read port %d @ %06X\n", offset, cpu_get_pc(&space->device()));
+//  logerror("'c76' Read port %d @ %06X\n", offset, cpu_get_pc(&space.device()));
 
 	switch (offset)
 	{
 		case 0:
-			return input_port_read(space->machine(), "PLAYER4");
+			return ioport("PLAYER4")->read();
 
 		case 1:
-			return input_port_read(space->machine(), "SWITCH");
+			return ioport("SWITCH")->read();
 
 		case 2:
-			return input_port_read(space->machine(), "PLAYER1");
+			return ioport("PLAYER1")->read();
 
 		case 3:
-			return input_port_read(space->machine(), "PLAYER2");
+			return ioport("PLAYER2")->read();
 	}
 
 	return 0xff;
 }
 
-ADDRESS_MAP_START( c76_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE_MODERN("c352", c352_device, read, write)
-	AM_RANGE(0x001000, 0x001007) AM_READ( c76_inputs_r )
-	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE( c76_shared_r, c76_shared_w )
+ADDRESS_MAP_START( c76_map, AS_PROGRAM, 16, namcos11_state )
+	AM_RANGE(0x002000, 0x002fff) AM_DEVREADWRITE("c352", c352_device, read, write)
+	AM_RANGE(0x001000, 0x001007) AM_READ(c76_inputs_r )
+	AM_RANGE(0x004000, 0x00bfff) AM_READWRITE(c76_shared_r, c76_shared_w )
 	AM_RANGE(0x00c000, 0x00ffff) AM_ROM AM_REGION("c76", 0x40000)
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("c76", 0)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("c76", 0)
@@ -756,57 +777,57 @@ ADDRESS_MAP_START( c76_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x301000, 0x301001) AM_WRITENOP
 ADDRESS_MAP_END
 
-static READ8_HANDLER(dac7_r)		// bit 7
+READ8_MEMBER(namcos11_state::dac7_r)// bit 7
 {
-	return input_port_read_safe(space->machine(), "PLAYER3", 0xff)&0x80;
+	return ioport("PLAYER3")->read_safe(0xff)&0x80;
 }
 
-static READ8_HANDLER(dac6_r)		// bit 3
+READ8_MEMBER(namcos11_state::dac6_r)// bit 3
 {
-	return (input_port_read_safe(space->machine(), "PLAYER3", 0xff)<<4)&0x80;
+	return (ioport("PLAYER3")->read_safe(0xff)<<4)&0x80;
 }
 
-static READ8_HANDLER(dac5_r)		// bit 2
+READ8_MEMBER(namcos11_state::dac5_r)// bit 2
 {
-	return (input_port_read_safe(space->machine(), "PLAYER3", 0xff)<<5)&0x80;
+	return (ioport("PLAYER3")->read_safe(0xff)<<5)&0x80;
 }
 
-static READ8_HANDLER(dac4_r)		// bit 1
+READ8_MEMBER(namcos11_state::dac4_r)// bit 1
 {
-	return (input_port_read_safe(space->machine(), "PLAYER3", 0xff)<<6)&0x80;
+	return (ioport("PLAYER3")->read_safe(0xff)<<6)&0x80;
 }
 
-static READ8_HANDLER(dac3_r)		// bit 0
+READ8_MEMBER(namcos11_state::dac3_r)// bit 0
 {
-	return (input_port_read_safe(space->machine(), "PLAYER3", 0xff)<<7)&0x80;
+	return (ioport("PLAYER3")->read_safe(0xff)<<7)&0x80;
 }
 
-static READ8_HANDLER(dac2_r)		// bit 4
+READ8_MEMBER(namcos11_state::dac2_r)// bit 4
 {
-	return (input_port_read_safe(space->machine(), "PLAYER3", 0xff)<<3)&0x80;
+	return (ioport("PLAYER3")->read_safe(0xff)<<3)&0x80;
 }
 
-static READ8_HANDLER(dac1_r)		// bit 5
+READ8_MEMBER(namcos11_state::dac1_r)// bit 5
 {
-	return (input_port_read_safe(space->machine(), "PLAYER3", 0xff)<<2)&0x80;
+	return (ioport("PLAYER3")->read_safe(0xff)<<2)&0x80;
 }
 
-static READ8_HANDLER(dac0_r)		// bit 6
+READ8_MEMBER(namcos11_state::dac0_r)// bit 6
 {
-	return (input_port_read_safe(space->machine(), "PLAYER3", 0xff)<<1)&0x80;
+	return (ioport("PLAYER3")->read_safe(0xff)<<1)&0x80;
 }
 
-static READ8_HANDLER(pocketrc_gas_r)
+READ8_MEMBER(namcos11_state::pocketrc_gas_r)
 {
-	return input_port_read(space->machine(), "GAS");
+	return ioport("GAS")->read();
 }
 
-static READ8_HANDLER(pocketrc_steer_r)
+READ8_MEMBER(namcos11_state::pocketrc_steer_r)
 {
-	return input_port_read(space->machine(), "STEERING");
+	return ioport("STEERING")->read();
 }
 
-ADDRESS_MAP_START( c76_io_map, AS_IO, 8 )
+ADDRESS_MAP_START( c76_io_map, AS_IO, 8, namcos11_state )
 	AM_RANGE(M37710_ADC7_L, M37710_ADC7_L) AM_READ(dac7_r)
 	AM_RANGE(M37710_ADC6_L, M37710_ADC6_L) AM_READ(dac6_r)
 	AM_RANGE(M37710_ADC5_L, M37710_ADC5_L) AM_READ(dac5_r)
@@ -819,23 +840,21 @@ ADDRESS_MAP_START( c76_io_map, AS_IO, 8 )
 	AM_RANGE(M37710_ADC0_H, M37710_ADC7_H) AM_READNOP
 ADDRESS_MAP_END
 
-static READ16_HANDLER( c76_speedup_r )
+READ16_MEMBER(namcos11_state::c76_speedup_r)
 {
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
 
-	if ((cpu_get_pc(&space->device()) == 0xc153) && (!(state->m_su_83 & 0xff00)))
+	if ((cpu_get_pc(&space.device()) == 0xc153) && (!(m_su_83 & 0xff00)))
 	{
-		device_spin_until_interrupt(&space->device());
+		device_spin_until_interrupt(&space.device());
 	}
 
-	return state->m_su_83;
+	return m_su_83;
 }
 
-static WRITE16_HANDLER( c76_speedup_w )
+WRITE16_MEMBER(namcos11_state::c76_speedup_w)
 {
-	namcos11_state *state = space->machine().driver_data<namcos11_state>();
 
-	COMBINE_DATA(&state->m_su_83);
+	COMBINE_DATA(&m_su_83);
 }
 
 static void namcos11_init_common(running_machine &machine, int n_daughterboard)
@@ -847,7 +866,7 @@ static void namcos11_init_common(running_machine &machine, int n_daughterboard)
 	if (C76_SPEEDUP)
 	{
 		state->save_item( NAME(state->m_su_83) );
-		machine.device("c76")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x82, 0x83, FUNC(c76_speedup_r), FUNC(c76_speedup_w));
+		machine.device("c76")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x82, 0x83, read16_delegate(FUNC(namcos11_state::c76_speedup_r),state), write16_delegate(FUNC(namcos11_state::c76_speedup_w),state));
 	}
 
 	if (!n_daughterboard)
@@ -858,8 +877,8 @@ static void namcos11_init_common(running_machine &machine, int n_daughterboard)
 
 	// init banks
 	int bank;
-	UINT32 len = machine.region( "user2" )->bytes();
-	UINT8 *rgn = machine.region( "user2" )->base();
+	UINT32 len = machine.root_device().memregion( "user2" )->bytes();
+	UINT8 *rgn = machine.root_device().memregion( "user2" )->base();
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f000000, 0x1f0fffff, "bank1" );
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x1f100000, 0x1f1fffff, "bank2" );
@@ -872,20 +891,20 @@ static void namcos11_init_common(running_machine &machine, int n_daughterboard)
 
 	for (bank = 0; bank < 8; bank++)
 	{
-		memory_configure_bank(machine, bankname[bank], 0, len / ( 1024 * 1024 ), rgn, 1024 * 1024 );
-		memory_set_bank(machine, bankname[bank], 0 );
+		state->membank(bankname[bank])->configure_entries(0, len / ( 1024 * 1024 ), rgn, 1024 * 1024 );
+		state->membank(bankname[bank])->set_entry(0 );
 	}
 
 	if (n_daughterboard == 32)
 	{
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1fa10020, 0x1fa1002f, FUNC(bankswitch_rom32_w) );
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1fa10020, 0x1fa1002f, write32_delegate(FUNC(namcos11_state::bankswitch_rom32_w),state));
 	}
 	if (n_daughterboard == 64)
 	{
 		state->m_n_bankoffset = 0;
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f080000, 0x1f080003, FUNC(bankswitch_rom64_upper_w) );
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1f080000, 0x1f080003, write32_delegate(FUNC(namcos11_state::bankswitch_rom64_upper_w),state));
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_read(0x1fa10020, 0x1fa1002f);
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1fa10020, 0x1fa1002f, FUNC(bankswitch_rom64_w) );
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1fa10020, 0x1fa1002f, write32_delegate(FUNC(namcos11_state::bankswitch_rom64_w),state));
 		state->save_item( NAME(state->m_n_bankoffset) );
 	}
 }
@@ -897,68 +916,78 @@ static DRIVER_INIT( tekken )
 
 static DRIVER_INIT( tekken2 )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c406_r) );
+	namcos11_state *state = machine.driver_data<namcos11_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c406_r),state));
 	namcos11_init_common(machine, 32);
 }
 
 static DRIVER_INIT( souledge )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c409_r) );
+	namcos11_state *state = machine.driver_data<namcos11_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c409_r),state));
 	namcos11_init_common(machine, 32);
 }
 
 static DRIVER_INIT( dunkmnia )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c410_r) );
+	namcos11_state *state = machine.driver_data<namcos11_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c410_r),state));
 	namcos11_init_common(machine, 32);
 }
 
 static DRIVER_INIT( primglex )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c411_r) );
+	namcos11_state *state = machine.driver_data<namcos11_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c411_r),state));
 	namcos11_init_common(machine, 32);
 }
 
 static DRIVER_INIT( xevi3dg )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c430_r) );
+	namcos11_state *state = machine.driver_data<namcos11_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c430_r),state));
 	namcos11_init_common(machine, 32);
 }
 
 static DRIVER_INIT( danceyes )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c431_r) );
+	namcos11_state *state = machine.driver_data<namcos11_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c431_r),state));
 	namcos11_init_common(machine, 32);
 }
 
 static DRIVER_INIT( pocketrc )
 {
-	machine.device("c76")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC0_L, M37710_ADC0_L, FUNC(pocketrc_steer_r));
-	machine.device("c76")->memory().space(AS_IO)->install_legacy_read_handler(M37710_ADC1_L, M37710_ADC1_L, FUNC(pocketrc_gas_r));
+	namcos11_state *state = machine.driver_data<namcos11_state>();
+	machine.device("c76")->memory().space(AS_IO)->install_read_handler(M37710_ADC0_L, M37710_ADC0_L, read8_delegate(FUNC(namcos11_state::pocketrc_steer_r),state));
+	machine.device("c76")->memory().space(AS_IO)->install_read_handler(M37710_ADC1_L, M37710_ADC1_L, read8_delegate(FUNC(namcos11_state::pocketrc_gas_r),state));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c432_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c432_r),state));
 	namcos11_init_common(machine, 32);
 }
 
 static DRIVER_INIT( starswep )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c442_r) );
+	namcos11_state *state = machine.driver_data<namcos11_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c442_r),state));
 	namcos11_init_common(machine, 0);
 }
 
 static DRIVER_INIT( myangel3 )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c443_r) );
+	namcos11_state *state = machine.driver_data<namcos11_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c443_r),state));
 	namcos11_init_common(machine, 64);
 }
 
 static DRIVER_INIT( ptblank2ua )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler( 0x1fa20000, 0x1fa2ffff, FUNC(keycus_c443_r) );
+	namcos11_state *state = machine.driver_data<namcos11_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler( 0x1fa20000, 0x1fa2ffff, read32_delegate(FUNC(namcos11_state::keycus_c443_r),state));
 	namcos11_init_common(machine, 64);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f788000, 0x1f788003, FUNC(lightgun_w) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler (0x1f780000, 0x1f78000f, FUNC(lightgun_r) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1f788000, 0x1f788003, write32_delegate(FUNC(namcos11_state::lightgun_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler (0x1f780000, 0x1f78000f, read32_delegate(FUNC(namcos11_state::lightgun_r),state));
 }
 
 static MACHINE_RESET( namcos11 )

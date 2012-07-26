@@ -122,29 +122,49 @@ public:
 	tmaster_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_microtouch(*this,"microtouch")
-		{ }
+		m_microtouch(*this,"microtouch"),
+		m_regs(*this, "regs"),
+		m_galgames_ram(*this, "galgames_ram"){ }
 
-	DECLARE_WRITE8_MEMBER(microtouch_tx);
+	required_device<cpu_device> m_maincpu;
+	optional_device<microtouch_device> m_microtouch;
+	required_shared_ptr<UINT16> m_regs;
+	optional_shared_ptr<UINT16> m_galgames_ram;
 
 	int m_okibank;
 	UINT8 m_rtc_ram[8];
 	bitmap_ind16 m_bitmap[2][2];
-	UINT16 *m_regs;
 	UINT16 m_color;
 	UINT16 m_addr;
 	UINT32 m_gfx_offs;
 	UINT32 m_gfx_size;
 	int (*m_compute_addr) (UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high);
-	UINT16 *m_galgames_ram;
 	UINT16 m_galgames_cart;
 	UINT32 m_palette_offset;
 	UINT8 m_palette_index;
 	UINT8 m_palette_data[3];
 	device_t *m_duart68681;
 
-	required_device<cpu_device> m_maincpu;
-	optional_device<microtouch_device> m_microtouch;
+	DECLARE_WRITE8_MEMBER(microtouch_tx);
+	DECLARE_READ16_MEMBER(rtc_r);
+	DECLARE_WRITE16_MEMBER(rtc_w);
+	DECLARE_WRITE16_MEMBER(tmaster_color_w);
+	DECLARE_WRITE16_MEMBER(tmaster_addr_w);
+	DECLARE_WRITE16_MEMBER(tmaster_blitter_w);
+	DECLARE_READ16_MEMBER(tmaster_blitter_r);
+	DECLARE_READ16_MEMBER(tmaster_coins_r);
+	DECLARE_READ16_MEMBER(galgames_eeprom_r);
+	DECLARE_WRITE16_MEMBER(galgames_eeprom_w);
+	DECLARE_WRITE16_MEMBER(galgames_palette_offset_w);
+	DECLARE_WRITE16_MEMBER(galgames_palette_data_w);
+	DECLARE_READ16_MEMBER(galgames_okiram_r);
+	DECLARE_WRITE16_MEMBER(galgames_okiram_w);
+	DECLARE_WRITE16_MEMBER(galgames_cart_sel_w);
+	DECLARE_READ16_MEMBER(galgames_cart_clock_r);
+	DECLARE_WRITE16_MEMBER(galgames_cart_clock_w);
+	DECLARE_READ16_MEMBER(galgames_cart_data_r);
+	DECLARE_WRITE16_MEMBER(galgames_cart_data_w);
+	DECLARE_READ16_MEMBER(dummy_read_01);
 };
 
 
@@ -186,7 +206,7 @@ static void duart_tx(device_t *device, int channel, UINT8 data)
 	tmaster_state *state = device->machine().driver_data<tmaster_state>();
 	if ( channel == 0 )
 	{
-		state->m_microtouch->rx(*memory_nonspecific_space(device->machine()), 0, data);
+		state->m_microtouch->rx(*device->machine().memory().first_space(), 0, data);
 	}
 };
 
@@ -215,29 +235,27 @@ static UINT8 binary_to_BCD(UINT8 data)
 	return ((data / 10) << 4) | (data %10);
 }
 
-static READ16_HANDLER(rtc_r)
+READ16_MEMBER(tmaster_state::rtc_r)
 {
-	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	system_time systime;
 
-	space->machine().current_datetime(systime);
-	state->m_rtc_ram[0x1] = binary_to_BCD(systime.local_time.second);
-	state->m_rtc_ram[0x2] = binary_to_BCD(systime.local_time.minute);
-	state->m_rtc_ram[0x3] = binary_to_BCD(systime.local_time.hour);
-	state->m_rtc_ram[0x4] = binary_to_BCD(systime.local_time.weekday);
-	state->m_rtc_ram[0x5] = binary_to_BCD(systime.local_time.mday);
-	state->m_rtc_ram[0x6] = binary_to_BCD(systime.local_time.month+1);
-	state->m_rtc_ram[0x7] = binary_to_BCD(systime.local_time.year % 100);
+	machine().current_datetime(systime);
+	m_rtc_ram[0x1] = binary_to_BCD(systime.local_time.second);
+	m_rtc_ram[0x2] = binary_to_BCD(systime.local_time.minute);
+	m_rtc_ram[0x3] = binary_to_BCD(systime.local_time.hour);
+	m_rtc_ram[0x4] = binary_to_BCD(systime.local_time.weekday);
+	m_rtc_ram[0x5] = binary_to_BCD(systime.local_time.mday);
+	m_rtc_ram[0x6] = binary_to_BCD(systime.local_time.month+1);
+	m_rtc_ram[0x7] = binary_to_BCD(systime.local_time.year % 100);
 
-	return state->m_rtc_ram[offset];
+	return m_rtc_ram[offset];
 }
 
-static WRITE16_HANDLER(rtc_w)
+WRITE16_MEMBER(tmaster_state::rtc_w)
 {
-	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	if ( offset == 0 )
 	{
-		state->m_rtc_ram[0x0] = data & 0xff;
+		m_rtc_ram[0x0] = data & 0xff;
 	}
 }
 
@@ -347,16 +365,14 @@ static SCREEN_UPDATE_IND16( tmaster )
 	return 0;
 }
 
-static WRITE16_HANDLER( tmaster_color_w )
+WRITE16_MEMBER(tmaster_state::tmaster_color_w)
 {
-	tmaster_state *state = space->machine().driver_data<tmaster_state>();
-	COMBINE_DATA( &state->m_color );
+	COMBINE_DATA( &m_color );
 }
 
-static WRITE16_HANDLER( tmaster_addr_w )
+WRITE16_MEMBER(tmaster_state::tmaster_addr_w)
 {
-	tmaster_state *state = space->machine().driver_data<tmaster_state>();
-	COMBINE_DATA( &state->m_addr );
+	COMBINE_DATA( &m_addr );
 }
 
 static void tmaster_draw(running_machine &machine)
@@ -364,7 +380,7 @@ static void tmaster_draw(running_machine &machine)
 	tmaster_state *state = machine.driver_data<tmaster_state>();
 	int x,y,x0,x1,y0,y1,dx,dy,flipx,flipy,sx,sy,sw,sh, addr, mode, layer,buffer, color;
 
-	UINT8 *gfxdata	=	machine.region( "blitter" )->base() + state->m_gfx_offs;
+	UINT8 *gfxdata	=	state->memregion( "blitter" )->base() + state->m_gfx_offs;
 
 	UINT16 pen;
 
@@ -472,20 +488,19 @@ static void tmaster_draw(running_machine &machine)
 	}
 }
 
-static WRITE16_HANDLER( tmaster_blitter_w )
+WRITE16_MEMBER(tmaster_state::tmaster_blitter_w)
 {
-	tmaster_state *state = space->machine().driver_data<tmaster_state>();
-	COMBINE_DATA( state->m_regs + offset );
+	COMBINE_DATA( m_regs + offset );
 	switch (offset*2)
 	{
 		case 0x0e:
-			tmaster_draw(space->machine());
-			cputag_set_input_line(space->machine(), "maincpu", 2, HOLD_LINE);
+			tmaster_draw(machine());
+			cputag_set_input_line(machine(), "maincpu", 2, HOLD_LINE);
 			break;
 	}
 }
 
-static READ16_HANDLER( tmaster_blitter_r )
+READ16_MEMBER(tmaster_state::tmaster_blitter_r)
 {
 	return 0x0000;	// bit 7 = 1 -> blitter busy
 }
@@ -500,35 +515,35 @@ static READ16_HANDLER( tmaster_blitter_r )
                                 Touch Master
 ***************************************************************************/
 
-static READ16_HANDLER( tmaster_coins_r )
+READ16_MEMBER(tmaster_state::tmaster_coins_r)
 {
-	return input_port_read(space->machine(), "COIN")|(space->machine().rand()&0x0800);
+	return ioport("COIN")->read()|(machine().rand()&0x0800);
 }
 
-static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tmaster_map, AS_PROGRAM, 16, tmaster_state )
 	AM_RANGE( 0x000000, 0x1fffff ) AM_ROM
 	AM_RANGE( 0x200000, 0x27ffff ) AM_RAM
 	AM_RANGE( 0x280000, 0x28ffef ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x28fff0, 0x28ffff ) AM_READWRITE( rtc_r, rtc_w )
+	AM_RANGE( 0x28fff0, 0x28ffff ) AM_READWRITE(rtc_r, rtc_w )
 
-	AM_RANGE( 0x300010, 0x300011 ) AM_READ( tmaster_coins_r )
+	AM_RANGE( 0x300010, 0x300011 ) AM_READ(tmaster_coins_r )
 
-	AM_RANGE( 0x300020, 0x30003f ) AM_DEVREADWRITE8( "duart68681", duart68681_r, duart68681_w, 0xff )
+	AM_RANGE( 0x300020, 0x30003f ) AM_DEVREADWRITE8_LEGACY("duart68681", duart68681_r, duart68681_w, 0xff )
 
-	AM_RANGE( 0x300040, 0x300041 ) AM_DEVWRITE( "oki", tmaster_oki_bank_w )
+	AM_RANGE( 0x300040, 0x300041 ) AM_DEVWRITE_LEGACY("oki", tmaster_oki_bank_w )
 
-	AM_RANGE( 0x300070, 0x300071 ) AM_WRITE( tmaster_addr_w )
+	AM_RANGE( 0x300070, 0x300071 ) AM_WRITE(tmaster_addr_w )
 
-	AM_RANGE( 0x500000, 0x500011 ) AM_WRITE( tmaster_blitter_w ) AM_BASE_MEMBER(tmaster_state, m_regs )
-	AM_RANGE( 0x500010, 0x500011 ) AM_READ ( tmaster_blitter_r )
+	AM_RANGE( 0x500000, 0x500011 ) AM_WRITE(tmaster_blitter_w ) AM_SHARE("regs")
+	AM_RANGE( 0x500010, 0x500011 ) AM_READ(tmaster_blitter_r )
 
 	AM_RANGE( 0x580000, 0x580001 ) AM_WRITENOP // often
 
-	AM_RANGE( 0x600000, 0x601fff ) AM_RAM_WRITE( paletteram16_xBBBBBGGGGGRRRRR_word_w ) AM_BASE_GENERIC(paletteram)
+	AM_RANGE( 0x600000, 0x601fff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w ) AM_SHARE("paletteram")
 
-	AM_RANGE( 0x800000, 0x800001 ) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )
+	AM_RANGE( 0x800000, 0x800001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 
-	AM_RANGE( 0x800010, 0x800011 ) AM_WRITE( tmaster_color_w )
+	AM_RANGE( 0x800010, 0x800011 ) AM_WRITE(tmaster_color_w )
 ADDRESS_MAP_END
 
 
@@ -574,23 +589,21 @@ static const eeprom_interface galgames_eeprom_interface =
 
 static const char *const galgames_eeprom_names[5] = { GALGAMES_EEPROM_BIOS, GALGAMES_EEPROM_CART1, GALGAMES_EEPROM_CART2, GALGAMES_EEPROM_CART3, GALGAMES_EEPROM_CART4 };
 
-static READ16_HANDLER( galgames_eeprom_r )
+READ16_MEMBER(tmaster_state::galgames_eeprom_r)
 {
-	tmaster_state *state = space->machine().driver_data<tmaster_state>();
-	eeprom_device *eeprom = space->machine().device<eeprom_device>(galgames_eeprom_names[state->m_galgames_cart]);
+	eeprom_device *eeprom = machine().device<eeprom_device>(galgames_eeprom_names[m_galgames_cart]);
 
 	return eeprom->read_bit() ? 0x80 : 0x00;
 }
 
-static WRITE16_HANDLER( galgames_eeprom_w )
+WRITE16_MEMBER(tmaster_state::galgames_eeprom_w)
 {
-	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	if (data & ~0x0003)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(&space->device()),data);
+		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(&space.device()),data);
 
 	if ( ACCESSING_BITS_0_7 )
 	{
-		eeprom_device *eeprom = space->machine().device<eeprom_device>(galgames_eeprom_names[state->m_galgames_cart]);
+		eeprom_device *eeprom = machine().device<eeprom_device>(galgames_eeprom_names[m_galgames_cart]);
 
 		// latch the bit
 		eeprom->write_bit(data & 0x0001);
@@ -602,41 +615,39 @@ static WRITE16_HANDLER( galgames_eeprom_w )
 
 // BT481A Palette RAMDAC
 
-static WRITE16_HANDLER( galgames_palette_offset_w )
+WRITE16_MEMBER(tmaster_state::galgames_palette_offset_w)
 {
-	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_palette_offset = data & 0xff;
-		state->m_palette_index = 0;
+		m_palette_offset = data & 0xff;
+		m_palette_index = 0;
 	}
 }
-static WRITE16_HANDLER( galgames_palette_data_w )
+WRITE16_MEMBER(tmaster_state::galgames_palette_data_w)
 {
-	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_palette_data[state->m_palette_index] = data & 0xff;
-		if (++state->m_palette_index == 3)
+		m_palette_data[m_palette_index] = data & 0xff;
+		if (++m_palette_index == 3)
 		{
 			int palette_base;
 			for (palette_base = 0; palette_base < 0x1000; palette_base += 0x100)
-				palette_set_color(space->machine(), state->m_palette_offset + palette_base, MAKE_RGB(state->m_palette_data[0], state->m_palette_data[1], state->m_palette_data[2]));
-			state->m_palette_index = 0;
-			state->m_palette_offset++;
+				palette_set_color(machine(), m_palette_offset + palette_base, MAKE_RGB(m_palette_data[0], m_palette_data[1], m_palette_data[2]));
+			m_palette_index = 0;
+			m_palette_offset++;
 		}
 	}
 }
 
 // Sound
-static READ16_HANDLER( galgames_okiram_r )
+READ16_MEMBER(tmaster_state::galgames_okiram_r)
 {
-	return space->machine().region("oki")->base()[offset] | 0xff00;
+	return memregion("oki")->base()[offset] | 0xff00;
 }
-static WRITE16_HANDLER( galgames_okiram_w )
+WRITE16_MEMBER(tmaster_state::galgames_okiram_w)
 {
 	if (ACCESSING_BITS_0_7)
-		space->machine().region("oki")->base()[offset] = data & 0xff;
+		memregion("oki")->base()[offset] = data & 0xff;
 }
 
 // Carts (preliminary, PIC communication is not implemented)
@@ -648,13 +659,13 @@ static void galgames_update_rombank(running_machine &machine, UINT32 cart)
 
 	state->m_gfx_offs = 0x200000 * cart;
 
-	if (memory_get_bank(machine, GALGAMES_BANK_000000_R) == GALGAMES_RAM)
-		memory_set_bank(machine, GALGAMES_BANK_200000_R, GALGAMES_ROM0 + state->m_galgames_cart);	// rom
+	if (state->membank(GALGAMES_BANK_000000_R)->entry() == GALGAMES_RAM)
+		state->membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_ROM0 + state->m_galgames_cart);	// rom
 
-	memory_set_bank(machine, GALGAMES_BANK_240000_R, GALGAMES_ROM0 + state->m_galgames_cart);	// rom
+	state->membank(GALGAMES_BANK_240000_R)->set_entry(GALGAMES_ROM0 + state->m_galgames_cart);	// rom
 }
 
-static WRITE16_HANDLER( galgames_cart_sel_w )
+WRITE16_MEMBER(tmaster_state::galgames_cart_sel_w)
 {
 	// cart selection (0 1 2 3 4 7)
 
@@ -666,7 +677,7 @@ static WRITE16_HANDLER( galgames_cart_sel_w )
 		{
 			case 0x07:		// 7 resets the eeprom
 				for (i = 0; i < 5; i++)
-					space->machine().device<eeprom_device>(galgames_eeprom_names[i])->set_cs_line(ASSERT_LINE);
+					machine().device<eeprom_device>(galgames_eeprom_names[i])->set_cs_line(ASSERT_LINE);
 				break;
 
 			case 0x00:
@@ -674,27 +685,26 @@ static WRITE16_HANDLER( galgames_cart_sel_w )
 			case 0x02:
 			case 0x03:
 			case 0x04:
-				space->machine().device<eeprom_device>(galgames_eeprom_names[data & 0xff])->set_cs_line(CLEAR_LINE);
-				galgames_update_rombank(space->machine(), data & 0xff);
+				machine().device<eeprom_device>(galgames_eeprom_names[data & 0xff])->set_cs_line(CLEAR_LINE);
+				galgames_update_rombank(machine(), data & 0xff);
 				break;
 
 			default:
-				space->machine().device<eeprom_device>(galgames_eeprom_names[0])->set_cs_line(CLEAR_LINE);
-				galgames_update_rombank(space->machine(), 0);
-				logerror("%06x: unknown cart sel = %04x\n", cpu_get_pc(&space->device()), data);
+				machine().device<eeprom_device>(galgames_eeprom_names[0])->set_cs_line(CLEAR_LINE);
+				galgames_update_rombank(machine(), 0);
+				logerror("%06x: unknown cart sel = %04x\n", cpu_get_pc(&space.device()), data);
 				break;
 		}
 	}
 }
 
-static READ16_HANDLER( galgames_cart_clock_r )
+READ16_MEMBER(tmaster_state::galgames_cart_clock_r)
 {
 	return 0x0080;
 }
 
-static WRITE16_HANDLER( galgames_cart_clock_w )
+WRITE16_MEMBER(tmaster_state::galgames_cart_clock_w)
 {
-	tmaster_state *state = space->machine().driver_data<tmaster_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		// bit 3 = clock
@@ -702,55 +712,55 @@ static WRITE16_HANDLER( galgames_cart_clock_w )
 		// ROM/RAM banking
 		if ((data & 0xf7) == 0x05)
 		{
-			memory_set_bank(space->machine(), GALGAMES_BANK_000000_R, GALGAMES_RAM);	// ram
-			galgames_update_rombank(space->machine(), state->m_galgames_cart);
-			logerror("%06x: romram bank = %04x\n", cpu_get_pc(&space->device()), data);
+			membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_RAM);	// ram
+			galgames_update_rombank(machine(), m_galgames_cart);
+			logerror("%06x: romram bank = %04x\n", cpu_get_pc(&space.device()), data);
 		}
 		else
 		{
-			memory_set_bank(space->machine(), GALGAMES_BANK_000000_R, GALGAMES_ROM0);	// rom
-			memory_set_bank(space->machine(), GALGAMES_BANK_200000_R, GALGAMES_RAM);	// ram
-			logerror("%06x: unknown romram bank = %04x\n", cpu_get_pc(&space->device()), data);
+			membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_ROM0);	// rom
+			membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_RAM);	// ram
+			logerror("%06x: unknown romram bank = %04x\n", cpu_get_pc(&space.device()), data);
 		}
 	}
 }
 
-static READ16_HANDLER( galgames_cart_data_r )
+READ16_MEMBER(tmaster_state::galgames_cart_data_r)
 {
 	return 0;
 }
-static WRITE16_HANDLER( galgames_cart_data_w )
+WRITE16_MEMBER(tmaster_state::galgames_cart_data_w)
 {
 }
 
 
-static READ16_HANDLER( dummy_read_01 )
+READ16_MEMBER(tmaster_state::dummy_read_01)
 {
 	return 0x3;	// Pass the check at PC = 0xfae & a later one
 }
 
-static ADDRESS_MAP_START( galgames_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( galgames_map, AS_PROGRAM, 16, tmaster_state )
 
-	AM_RANGE( 0x000000, 0x03ffff ) AM_READ_BANK(GALGAMES_BANK_000000_R) AM_WRITE_BANK(GALGAMES_BANK_000000_W) AM_BASE_MEMBER(tmaster_state, m_galgames_ram )
+	AM_RANGE( 0x000000, 0x03ffff ) AM_READ_BANK(GALGAMES_BANK_000000_R) AM_WRITE_BANK(GALGAMES_BANK_000000_W) AM_SHARE("galgames_ram")
 	AM_RANGE( 0x040000, 0x1fffff ) AM_ROM AM_REGION( "maincpu", 0x40000 )
 	AM_RANGE( 0x200000, 0x23ffff ) AM_READ_BANK(GALGAMES_BANK_200000_R) AM_WRITE_BANK(GALGAMES_BANK_200000_W)
 	AM_RANGE( 0x240000, 0x3fffff ) AM_READ_BANK(GALGAMES_BANK_240000_R)
 
-	AM_RANGE( 0x400000, 0x400011 ) AM_WRITE( tmaster_blitter_w ) AM_BASE_MEMBER(tmaster_state, m_regs )
-	AM_RANGE( 0x400012, 0x400013 ) AM_WRITE( tmaster_addr_w )
-	AM_RANGE( 0x400014, 0x400015 ) AM_WRITE( tmaster_color_w )
-	AM_RANGE( 0x400020, 0x400021 ) AM_READ ( tmaster_blitter_r )
+	AM_RANGE( 0x400000, 0x400011 ) AM_WRITE(tmaster_blitter_w ) AM_SHARE("regs")
+	AM_RANGE( 0x400012, 0x400013 ) AM_WRITE(tmaster_addr_w )
+	AM_RANGE( 0x400014, 0x400015 ) AM_WRITE(tmaster_color_w )
+	AM_RANGE( 0x400020, 0x400021 ) AM_READ(tmaster_blitter_r )
 
-	AM_RANGE( 0x600000, 0x600001 ) AM_READ( dummy_read_01 ) AM_WRITENOP
-	AM_RANGE( 0x700000, 0x700001 ) AM_READ( dummy_read_01 ) AM_WRITENOP
+	AM_RANGE( 0x600000, 0x600001 ) AM_READ(dummy_read_01 ) AM_WRITENOP
+	AM_RANGE( 0x700000, 0x700001 ) AM_READ(dummy_read_01 ) AM_WRITENOP
 	AM_RANGE( 0x800020, 0x80003f ) AM_NOP	// ?
-	AM_RANGE( 0x900000, 0x900001 ) AM_WRITE( watchdog_reset16_w )
+	AM_RANGE( 0x900000, 0x900001 ) AM_WRITE(watchdog_reset16_w )
 
-	AM_RANGE( 0xa00000, 0xa00001 ) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )
-	AM_RANGE( 0xb00000, 0xb7ffff ) AM_READWRITE( galgames_okiram_r, galgames_okiram_w ) // (only low bytes tested) 4x N341024SJ-15
+	AM_RANGE( 0xa00000, 0xa00001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
+	AM_RANGE( 0xb00000, 0xb7ffff ) AM_READWRITE(galgames_okiram_r, galgames_okiram_w ) // (only low bytes tested) 4x N341024SJ-15
 
-	AM_RANGE( 0xc00000, 0xc00001 ) AM_WRITE( galgames_palette_offset_w )
-	AM_RANGE( 0xc00002, 0xc00003 ) AM_WRITE( galgames_palette_data_w )
+	AM_RANGE( 0xc00000, 0xc00001 ) AM_WRITE(galgames_palette_offset_w )
+	AM_RANGE( 0xc00002, 0xc00003 ) AM_WRITE(galgames_palette_data_w )
 
 	AM_RANGE( 0xd00000, 0xd00001 ) AM_READ_PORT("TRACKBALL_1_X")
 	AM_RANGE( 0xd00000, 0xd00001 ) AM_WRITENOP
@@ -761,10 +771,10 @@ static ADDRESS_MAP_START( galgames_map, AS_PROGRAM, 16 )
 	AM_RANGE( 0xd0000a, 0xd0000b ) AM_READ_PORT("P2")
 	AM_RANGE( 0xd0000c, 0xd0000d ) AM_READ_PORT("SYSTEM") AM_WRITENOP
 
-	AM_RANGE( 0xd0000e, 0xd0000f ) AM_WRITE( galgames_cart_sel_w )
-	AM_RANGE( 0xd00010, 0xd00011 ) AM_READWRITE( galgames_eeprom_r, galgames_eeprom_w )
-	AM_RANGE( 0xd00012, 0xd00013 ) AM_READWRITE( galgames_cart_data_r, galgames_cart_data_w )
-	AM_RANGE( 0xd00014, 0xd00015 ) AM_READWRITE( galgames_cart_clock_r, galgames_cart_clock_w )
+	AM_RANGE( 0xd0000e, 0xd0000f ) AM_WRITE(galgames_cart_sel_w )
+	AM_RANGE( 0xd00010, 0xd00011 ) AM_READWRITE(galgames_eeprom_r, galgames_eeprom_w )
+	AM_RANGE( 0xd00012, 0xd00013 ) AM_READWRITE(galgames_cart_data_r, galgames_cart_data_w )
+	AM_RANGE( 0xd00014, 0xd00015 ) AM_READWRITE(galgames_cart_clock_r, galgames_cart_clock_w )
 
 ADDRESS_MAP_END
 
@@ -872,7 +882,7 @@ static MACHINE_RESET( tmaster )
 {
 	tmaster_state *state = machine.driver_data<tmaster_state>();
 	state->m_gfx_offs = 0;
-	state->m_gfx_size = machine.region("blitter")->bytes();
+	state->m_gfx_size = state->memregion("blitter")->bytes();
 
 	state->m_duart68681 = machine.device( "duart68681" );
 }
@@ -941,13 +951,13 @@ static MACHINE_RESET( galgames )
 	state->m_gfx_offs = 0;
 	state->m_gfx_size = 0x200000;
 
-	memory_set_bank(machine, GALGAMES_BANK_000000_R, GALGAMES_ROM0);	// rom
-	memory_set_bank(machine, GALGAMES_BANK_000000_W, GALGAMES_RAM);		// ram
+	state->membank(GALGAMES_BANK_000000_R)->set_entry(GALGAMES_ROM0);	// rom
+	state->membank(GALGAMES_BANK_000000_W)->set_entry(GALGAMES_RAM);		// ram
 
-	memory_set_bank(machine, GALGAMES_BANK_200000_R, GALGAMES_RAM);		// ram
-	memory_set_bank(machine, GALGAMES_BANK_200000_W, GALGAMES_RAM);		// ram
+	state->membank(GALGAMES_BANK_200000_R)->set_entry(GALGAMES_RAM);		// ram
+	state->membank(GALGAMES_BANK_200000_W)->set_entry(GALGAMES_RAM);		// ram
 
-	memory_set_bank(machine, GALGAMES_BANK_240000_R, GALGAMES_ROM0);	// rom
+	state->membank(GALGAMES_BANK_240000_R)->set_entry(GALGAMES_ROM0);	// rom
 
 	galgames_update_rombank(machine, 0);
 
@@ -1611,7 +1621,7 @@ ROM_END
 
 static DRIVER_INIT( tm4k )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x834ce/2] = 0x4e75;
@@ -1632,7 +1642,7 @@ Protection resembles that of tm5k rather than tm4ka:
 
 static DRIVER_INIT( tm4ka )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x83476/2] = 0x4e75;
@@ -1654,7 +1664,7 @@ Protection starts:
 
 static DRIVER_INIT( tm4kb )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x82b7a/2] = 0x4e75;
@@ -1675,7 +1685,7 @@ Protection starts:
 
 static DRIVER_INIT( tm5k )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x96002/2] = 0x4e75;
@@ -1698,7 +1708,7 @@ Protection starts:
 
 static DRIVER_INIT( tm5kca )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x95ffe/2] = 0x4e75;
@@ -1710,7 +1720,7 @@ static DRIVER_INIT( tm5kca )
 
 static DRIVER_INIT( tm5ka )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x96b30/2] = 0x4e75;
@@ -1731,7 +1741,7 @@ Protection starts:
 
 static DRIVER_INIT( tm7k )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x81730/2] = 0x4e75;
@@ -1754,7 +1764,7 @@ Protection starts:
 
 static DRIVER_INIT( tm7ka )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x81594/2] = 0x4e75;
@@ -1777,7 +1787,7 @@ Protection starts:
 
 static DRIVER_INIT( tm7keval ) /* kit came with a security key labeled A-21657-004, which is a TM5000 key */
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x8949e/2] = 0x4e75;
@@ -1800,7 +1810,7 @@ Protection starts:
 
 static DRIVER_INIT( tm8k )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// protection
 	ROM[0x78b70/2] = 0x4e75;
@@ -1824,41 +1834,41 @@ Protection starts:
 static DRIVER_INIT( galgames )
 {
 	tmaster_state *state = machine.driver_data<tmaster_state>();
-	UINT8 *ROM	=	machine.region("maincpu")->base();
+	UINT8 *ROM	=	state->memregion("maincpu")->base();
 	int cart;
 
 	// RAM bank at 0x000000-0x03ffff and 0x200000-0x23ffff
 	// ROM bank at 0x000000-0x1fffff and 0x200000-0x3fffff (bios)
 
-	memory_configure_bank(machine, GALGAMES_BANK_000000_R, GALGAMES_RAM,  1, state->m_galgames_ram, 0x40000);
-	memory_configure_bank(machine, GALGAMES_BANK_000000_R, GALGAMES_ROM0, 1, ROM+0x000000, 0x40000);
+	state->membank(GALGAMES_BANK_000000_R)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
+	state->membank(GALGAMES_BANK_000000_R)->configure_entry(GALGAMES_ROM0, ROM+0x000000);
 
-	memory_configure_bank(machine, GALGAMES_BANK_000000_W, GALGAMES_RAM,  1, state->m_galgames_ram, 0x40000);
+	state->membank(GALGAMES_BANK_000000_W)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
 
-	memory_configure_bank(machine, GALGAMES_BANK_200000_R, GALGAMES_RAM,  1, state->m_galgames_ram, 0x40000);
-	memory_configure_bank(machine, GALGAMES_BANK_200000_R, GALGAMES_ROM0, 1, ROM+0x000000, 0x40000);
+	state->membank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
+	state->membank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_ROM0, ROM+0x000000);
 
-	memory_configure_bank(machine, GALGAMES_BANK_200000_W, GALGAMES_RAM,  1, state->m_galgames_ram, 0x40000);
+	state->membank(GALGAMES_BANK_200000_W)->configure_entry(GALGAMES_RAM,  state->m_galgames_ram);
 
-	memory_configure_bank(machine, GALGAMES_BANK_240000_R, GALGAMES_ROM0, 1, ROM+0x040000, 0x1c0000);
+	state->membank(GALGAMES_BANK_240000_R)->configure_entry(GALGAMES_ROM0, ROM+0x040000);
 
 	// More ROM banks at 0x200000-0x3fffff (carts)
 
 	for (cart = 1; cart <= 4; cart++)
 	{
-		UINT8 *CART = machine.region("maincpu")->base();
+		UINT8 *CART = state->memregion("maincpu")->base();
 
-		if  (0x200000 * (cart+1) <= machine.region("maincpu")->bytes())
+		if  (0x200000 * (cart+1) <= state->memregion("maincpu")->bytes())
 			CART += 0x200000 * cart;
 
-		memory_configure_bank(machine, GALGAMES_BANK_200000_R, GALGAMES_ROM0+cart, 1, CART,          0x40000);
-		memory_configure_bank(machine, GALGAMES_BANK_240000_R, GALGAMES_ROM0+cart, 1, CART+0x040000, 0x1c0000);
+		state->membank(GALGAMES_BANK_200000_R)->configure_entry(GALGAMES_ROM0+cart, CART);
+		state->membank(GALGAMES_BANK_240000_R)->configure_entry(GALGAMES_ROM0+cart, CART+0x040000);
 	}
 }
 
 static DRIVER_INIT( galgame2 )
 {
-	UINT16 *ROM = (UINT16 *)machine.region( "maincpu" )->base();
+	UINT16 *ROM = (UINT16 *)machine.root_device().memregion( "maincpu" )->base();
 
 	// Patch BIOS to see the game code as first cartridge (until the PIC therein is emulated)
 	ROM[0x118da/2] = 0x4a06;

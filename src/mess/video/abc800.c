@@ -92,8 +92,8 @@ void abc800c_state::hr_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
 void abc800_state::video_start()
 {
 	// find memory regions
-	m_char_rom = machine().region(MC6845_TAG)->base();
-	m_fgctl_prom = machine().region("hru2")->base();
+	m_char_rom = memregion(MC6845_TAG)->base();
+	m_fgctl_prom = memregion("hru2")->base();
 
 	// register for state saving
 	save_item(NAME(m_hrs));

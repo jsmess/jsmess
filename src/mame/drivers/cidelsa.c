@@ -45,7 +45,7 @@ WRITE8_MEMBER( draco_state::sound_bankswitch_w )
 
 	int bank = BIT(data, 3);
 
-	memory_set_bank(machine(), "bank1", bank);
+	membank("bank1")->set_entry(bank);
 }
 
 WRITE8_MEMBER( draco_state::sound_g_w )
@@ -252,7 +252,7 @@ static ADDRESS_MAP_START( draco_io_map, AS_IO, 8, draco_state )
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("ic29", cdp1852_device, read) AM_DEVWRITE("ic32", cdp1852_device, write)
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("ic30", cdp1852_device, read)
 	AM_RANGE(0x04, 0x04) AM_DEVREAD("ic31", cdp1852_device, read)
-	AM_RANGE(0x03, 0x07) AM_WRITE_BASE(cidelsa_state, cdp1869_w)
+	AM_RANGE(0x03, 0x07) AM_WRITE(cdp1869_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( draco_sound_map, AS_PROGRAM, 8, draco_state )
@@ -270,16 +270,15 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-static CUSTOM_INPUT( cdp1869_pcb_r )
+CUSTOM_INPUT_MEMBER(cidelsa_state::cdp1869_pcb_r)
 {
-	cidelsa_state *state = field.machine().driver_data<cidelsa_state>();
 
-	return state->m_cdp1869_pcb;
+	return m_cdp1869_pcb;
 }
 
-static INPUT_CHANGED( ef_w )
+INPUT_CHANGED_MEMBER(cidelsa_state::ef_w)
 {
-	cputag_set_input_line(field.machine(), CDP1802_TAG, (int)(FPTR)param, newval);
+	cputag_set_input_line(machine(), CDP1802_TAG, (int)(FPTR)param, newval);
 }
 
 static INPUT_PORTS_START( destryer )
@@ -291,7 +290,7 @@ static INPUT_PORTS_START( destryer )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) // LF
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // FR
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_pcb_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cidelsa_state,cdp1869_pcb_r, NULL)
 
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
@@ -317,9 +316,9 @@ static INPUT_PORTS_START( destryer )
 
 	PORT_START("EF")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) // inverted CDP1869 PRD, pushed
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF3)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF4)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CHANGED_MEMBER(DEVICE_SELF, cidelsa_state,ef_w, (void*)COSMAC_INPUT_LINE_EF2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cidelsa_state,ef_w, (void*)COSMAC_INPUT_LINE_EF3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cidelsa_state,ef_w, (void*)COSMAC_INPUT_LINE_EF4)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( altair )
@@ -331,7 +330,7 @@ static INPUT_PORTS_START( altair )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) // LF
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // FR
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_pcb_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cidelsa_state,cdp1869_pcb_r, NULL)
 
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
@@ -367,9 +366,9 @@ static INPUT_PORTS_START( altair )
 
 	PORT_START("EF")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) // inverted CDP1869 PRD, pushed
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF3)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF4)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CHANGED_MEMBER(DEVICE_SELF, cidelsa_state,ef_w, (void*)COSMAC_INPUT_LINE_EF2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cidelsa_state,ef_w, (void*)COSMAC_INPUT_LINE_EF3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cidelsa_state,ef_w, (void*)COSMAC_INPUT_LINE_EF4)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( draco )
@@ -381,7 +380,7 @@ static INPUT_PORTS_START( draco )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cdp1869_pcb_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cidelsa_state,cdp1869_pcb_r, NULL)
 
 	PORT_START("IN1")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
@@ -419,9 +418,9 @@ static INPUT_PORTS_START( draco )
 
 	PORT_START("EF")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) // CDP1869 PRD, pushed
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF3)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF4)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CHANGED_MEMBER(DEVICE_SELF, cidelsa_state,ef_w, (void*)COSMAC_INPUT_LINE_EF2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cidelsa_state,ef_w, (void*)COSMAC_INPUT_LINE_EF3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, cidelsa_state,ef_w, (void*)COSMAC_INPUT_LINE_EF4)
 INPUT_PORTS_END
 
 /* Machine Start */
@@ -442,8 +441,8 @@ void cidelsa_state::machine_start()
 void draco_state::machine_start()
 {
 	/* setup COP402 memory banking */
-	memory_configure_bank(machine(), "bank1", 0, 2, machine().region(COP402N_TAG)->base(), 0x400);
-	memory_set_bank(machine(), "bank1", 0);
+	membank("bank1")->configure_entries(0, 2, memregion(COP402N_TAG)->base(), 0x400);
+	membank("bank1")->set_entry(0);
 
 	/* register for state saving */
 	save_item(NAME(m_reset));

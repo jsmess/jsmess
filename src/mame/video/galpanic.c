@@ -39,7 +39,8 @@ WRITE16_HANDLER( galpanic_bgvideoram_w )
 
 WRITE16_HANDLER( galpanic_paletteram_w )
 {
-	data = COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	galpanic_state *state = space->machine().driver_data<galpanic_state>();
+	data = COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 	/* bit 0 seems to be a transparency flag for the front bitmap */
 	palette_set_color_rgb(space->machine(),offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
@@ -52,7 +53,7 @@ static void comad_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, c
 	int offs;
 	int sx=0, sy=0;
 
-	for (offs = 0;offs < state->m_spriteram_size/2;offs += 4)
+	for (offs = 0;offs < state->m_spriteram.bytes()/2;offs += 4)
 	{
 		int code,color,flipx,flipy;
 
@@ -88,7 +89,7 @@ static void draw_fgbitmap(running_machine &machine, bitmap_ind16 &bitmap, const 
 	galpanic_state *state = machine.driver_data<galpanic_state>();
 	int offs;
 
-	for (offs = 0;offs < state->m_fgvideoram_size/2;offs++)
+	for (offs = 0;offs < state->m_fgvideoram.bytes()/2;offs++)
 	{
 		int sx,sy,color;
 

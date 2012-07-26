@@ -470,7 +470,7 @@ void isa16_ide_cd_device::device_reset()
 	astring tempstring;
 	if (m_inserted_cdrom) SCSIDeleteInstance(m_inserted_cdrom);
 	SCSIAllocInstance( machine(), &SCSIClassCr589, &m_inserted_cdrom, subtag(tempstring, "cdrom"));
-	m_is_primary = (input_port_read(*this, "DSW") & 1) ? false : true;
+	m_is_primary = (ioport("DSW")->read() & 1) ? false : true;
 	if (m_is_primary) {
 		m_isa->install16_device(0x01f0, 0x01f7, 0, 0, read16_delegate(FUNC(isa16_ide_cd_device::atapi_r), this), write16_delegate(FUNC(isa16_ide_cd_device::atapi_w), this));
 		//m_isa->install16_device(0x03f0, 0x03f7, 0, 0, read16_delegate(FUNC(isa16_ide_cd_device::atapi_status_r), this), write16_delegate(FUNC(isa16_ide_cd_device::atapi_cmd_w), this));

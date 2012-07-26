@@ -189,8 +189,8 @@ void ti_speech_synthesizer_device::device_config_complete()
 
 void ti_speech_synthesizer_device::device_reset()
 {
-	m_speechrom = subregion(SPEECHROM_TAG)->base();
-	m_sprom_length = subregion(SPEECHROM_TAG)->bytes();
+	m_speechrom = memregion(SPEECHROM_TAG)->base();
+	m_sprom_length = memregion(SPEECHROM_TAG)->bytes();
 	m_sprom_address = 0;
 	m_load_pointer = 0;
 	m_rombits_count = 0;

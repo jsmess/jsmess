@@ -17,10 +17,12 @@ class tgtpanic_state : public driver_device
 {
 public:
 	tgtpanic_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ram(*this, "ram"){ }
 
-	UINT8 *m_ram;
+	required_shared_ptr<UINT8> m_ram;
 	UINT8 m_color;
+	DECLARE_WRITE8_MEMBER(color_w);
 };
 
 
@@ -66,11 +68,10 @@ static SCREEN_UPDATE_RGB32( tgtpanic )
 	return 0;
 }
 
-static WRITE8_HANDLER( color_w )
+WRITE8_MEMBER(tgtpanic_state::color_w)
 {
-	tgtpanic_state *state = space->machine().driver_data<tgtpanic_state>();
-	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-	state->m_color = data;
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_color = data;
 }
 
 
@@ -80,12 +81,12 @@ static WRITE8_HANDLER( color_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( prg_map, AS_PROGRAM, 8, tgtpanic_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE_MEMBER(tgtpanic_state, m_ram)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_SHARE("ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, tgtpanic_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(color_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")

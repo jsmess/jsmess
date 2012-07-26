@@ -147,6 +147,18 @@ public:
 
 	UINT32 m_idle_skip_ram;
 	required_device<cpu_device> m_maincpu;
+	DECLARE_READ8_MEMBER(at_page8_r);
+	DECLARE_WRITE8_MEMBER(at_page8_w);
+	DECLARE_READ8_MEMBER(pc_dma_read_byte);
+	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
+	DECLARE_WRITE32_MEMBER(bios_ram_w);
+	DECLARE_READ16_MEMBER(calchase_iocard1_r);
+	DECLARE_READ16_MEMBER(calchase_iocard2_r);
+	DECLARE_READ16_MEMBER(calchase_iocard3_r);
+	DECLARE_READ16_MEMBER(calchase_iocard4_r);
+	DECLARE_READ16_MEMBER(calchase_iocard5_r);
+	DECLARE_READ32_MEMBER(calchase_idle_skip_r);
+	DECLARE_WRITE32_MEMBER(calchase_idle_skip_w);
 };
 
 
@@ -175,46 +187,44 @@ static WRITE32_DEVICE_HANDLER(at32_dma8237_2_w)
 
 
 
-static READ8_HANDLER(at_page8_r)
+READ8_MEMBER(calchase_state::at_page8_r)
 {
-	calchase_state *state = space->machine().driver_data<calchase_state>();
-	UINT8 data = state->m_at_pages[offset % 0x10];
+	UINT8 data = m_at_pages[offset % 0x10];
 
 	switch(offset % 8) {
 	case 1:
-		data = state->m_dma_offset[(offset / 8) & 1][2];
+		data = m_dma_offset[(offset / 8) & 1][2];
 		break;
 	case 2:
-		data = state->m_dma_offset[(offset / 8) & 1][3];
+		data = m_dma_offset[(offset / 8) & 1][3];
 		break;
 	case 3:
-		data = state->m_dma_offset[(offset / 8) & 1][1];
+		data = m_dma_offset[(offset / 8) & 1][1];
 		break;
 	case 7:
-		data = state->m_dma_offset[(offset / 8) & 1][0];
+		data = m_dma_offset[(offset / 8) & 1][0];
 		break;
 	}
 	return data;
 }
 
 
-static WRITE8_HANDLER(at_page8_w)
+WRITE8_MEMBER(calchase_state::at_page8_w)
 {
-	calchase_state *state = space->machine().driver_data<calchase_state>();
-	state->m_at_pages[offset % 0x10] = data;
+	m_at_pages[offset % 0x10] = data;
 
 	switch(offset % 8) {
 	case 1:
-		state->m_dma_offset[(offset / 8) & 1][2] = data;
+		m_dma_offset[(offset / 8) & 1][2] = data;
 		break;
 	case 2:
-		state->m_dma_offset[(offset / 8) & 1][3] = data;
+		m_dma_offset[(offset / 8) & 1][3] = data;
 		break;
 	case 3:
-		state->m_dma_offset[(offset / 8) & 1][1] = data;
+		m_dma_offset[(offset / 8) & 1][1] = data;
 		break;
 	case 7:
-		state->m_dma_offset[(offset / 8) & 1][0] = data;
+		m_dma_offset[(offset / 8) & 1][0] = data;
 		break;
 	}
 }
@@ -229,23 +239,21 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 }
 
 
-static READ8_HANDLER( pc_dma_read_byte )
+READ8_MEMBER(calchase_state::pc_dma_read_byte)
 {
-	calchase_state *state = space->machine().driver_data<calchase_state>();
-	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0xFF0000;
 
-	return space->read_byte(page_offset + offset);
+	return space.read_byte(page_offset + offset);
 }
 
 
-static WRITE8_HANDLER( pc_dma_write_byte )
+WRITE8_MEMBER(calchase_state::pc_dma_write_byte)
 {
-	calchase_state *state = space->machine().driver_data<calchase_state>();
-	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0xFF0000;
 
-	space->write_byte(page_offset + offset, data);
+	space.write_byte(page_offset + offset, data);
 }
 
 static void set_dma_channel(device_t *device, int channel, int state)
@@ -263,8 +271,8 @@ static I8237_INTERFACE( dma8237_1_config )
 {
 	DEVCB_LINE(pc_dma_hrq_changed),
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
+	DEVCB_DRIVER_MEMBER(calchase_state, pc_dma_read_byte),
+	DEVCB_DRIVER_MEMBER(calchase_state, pc_dma_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
@@ -280,17 +288,6 @@ static I8237_INTERFACE( dma8237_2_config )
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL }
 };
-
-static READ32_HANDLER(at_page32_r)
-{
-	return read32le_with_read8_handler(at_page8_r, space, offset, mem_mask);
-}
-
-
-static WRITE32_HANDLER(at_page32_w)
-{
-	write32le_with_write8_handler(at_page8_w, space, offset, data, mem_mask);
-}
 
 static READ32_DEVICE_HANDLER( ide_r )
 {
@@ -342,7 +339,7 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 			//if (data & 0x10)     // enable RAM access to region 0xf0000 - 0xfffff
 			if ((data & 0x50) | (data & 0xA0))
 			{
-				memory_set_bankptr(busdevice->machine(), "bank1", state->m_bios_ram);
+				state->membank("bank1")->set_base(state->m_bios_ram);
 			}
 			else				// disable RAM access (reads go to BIOS ROM)
 			{
@@ -355,8 +352,8 @@ static void mxtc_config_w(device_t *busdevice, device_t *device, int function, i
 				}
 				#endif
 
-				//memory_set_bankptr(busdevice->machine(), "bank1", busdevice->machine().region("bios")->base() + 0x10000);
-				memory_set_bankptr(busdevice->machine(), "bank1", busdevice->machine().region("bios")->base());
+				state->membank("bank1")->set_base(busdevice->machine().root_device().memregion("bios")->base() + 0x10000);
+				state->membank("bank1")->set_base(busdevice->machine().root_device().memregion("bios")->base());
 			}
 			break;
 		}
@@ -485,40 +482,39 @@ static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int functi
 	}
 }
 
-static WRITE32_HANDLER(bios_ram_w)
+WRITE32_MEMBER(calchase_state::bios_ram_w)
 {
-	calchase_state *state = space->machine().driver_data<calchase_state>();
-	//if (state->m_mxtc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
-	       if (state->m_mxtc_config_reg[0x63] & 0x50)
+	//if (m_mxtc_config_reg[0x59] & 0x20)       // write to RAM if this region is write-enabled
+	       if (m_mxtc_config_reg[0x63] & 0x50)
 	{
-		COMBINE_DATA(state->m_bios_ram + offset);
+		COMBINE_DATA(m_bios_ram + offset);
 	}
 }
 
-static READ16_HANDLER( calchase_iocard1_r )
+READ16_MEMBER(calchase_state::calchase_iocard1_r)
 {
-	return input_port_read(space->machine(), "IOCARD1");
+	return ioport("IOCARD1")->read();
 }
 
-static READ16_HANDLER( calchase_iocard2_r )
+READ16_MEMBER(calchase_state::calchase_iocard2_r)
 {
-	return input_port_read(space->machine(), "IOCARD2");
+	return ioport("IOCARD2")->read();
 }
 
-static READ16_HANDLER( calchase_iocard3_r )
+READ16_MEMBER(calchase_state::calchase_iocard3_r)
 {
-	return input_port_read(space->machine(), "IOCARD3");
+	return ioport("IOCARD3")->read();
 }
 
 /* These two controls wheel pot or whatever this game uses ... */
-static READ16_HANDLER( calchase_iocard4_r )
+READ16_MEMBER(calchase_state::calchase_iocard4_r)
 {
-	return input_port_read(space->machine(), "IOCARD4");
+	return ioport("IOCARD4")->read();
 }
 
-static READ16_HANDLER( calchase_iocard5_r )
+READ16_MEMBER(calchase_state::calchase_iocard5_r)
 {
-	return input_port_read(space->machine(), "IOCARD5");
+	return ioport("IOCARD5")->read();
 }
 
 
@@ -527,7 +523,7 @@ static WRITE16_DEVICE_HANDLER( calchase_dac_w )
 	dac_data_16_w(device, ((data & 0xfff) << 4));
 }
 
-static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32, calchase_state )
 	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_RAM // VGA VRAM
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_RAM AM_REGION("video_bios", 0)
@@ -539,8 +535,8 @@ static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x000d0030, 0x000d0033) AM_READ16(calchase_iocard4_r, 0x0000ffff)
 	AM_RANGE(0x000d0034, 0x000d0037) AM_READ16(calchase_iocard5_r, 0x0000ffff)
 	AM_RANGE(0x000d0008, 0x000d000b) AM_WRITENOP // ???
-	AM_RANGE(0x000d0024, 0x000d0027) AM_DEVWRITE16("dac_l",calchase_dac_w,0x0000ffff)
-	AM_RANGE(0x000d0028, 0x000d002b) AM_DEVWRITE16("dac_r",calchase_dac_w,0x0000ffff)
+	AM_RANGE(0x000d0024, 0x000d0027) AM_DEVWRITE16_LEGACY("dac_l",calchase_dac_w,0x0000ffff)
+	AM_RANGE(0x000d0028, 0x000d002b) AM_DEVWRITE16_LEGACY("dac_r",calchase_dac_w,0x0000ffff)
 	AM_RANGE(0x000d0800, 0x000d0fff) AM_ROM AM_REGION("nvram",0) //
 	AM_RANGE(0x000d0800, 0x000d0fff) AM_RAM  // GAME_CMOS
 
@@ -562,22 +558,22 @@ static ADDRESS_MAP_START( calchase_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( calchase_io, AS_IO, 32)
-	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("dma8237_1", i8237_r, i8237_w, 0xffffffff)
-	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
-	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8_MODERN("rtc", mc146818_device, read, write, 0xffffffff) /* todo: nvram (CMOS Setup Save)*/
-	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,				at_page32_w)
-	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
+static ADDRESS_MAP_START( calchase_io, AS_IO, 32, calchase_state )
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8_LEGACY("dma8237_1", i8237_r, i8237_w, 0xffffffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8_LEGACY("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8_LEGACY("pit8254", pit8253_r, pit8253_w, 0xffffffff)
+	AM_RANGE(0x0060, 0x006f) AM_READWRITE_LEGACY(kbdc8042_32le_r,			kbdc8042_32le_w)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", mc146818_device, read, write, 0xffffffff) /* todo: nvram (CMOS Setup Save)*/
+	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8_LEGACY("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE_LEGACY("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
 	//AM_RANGE(0x00e8, 0x00eb) AM_NOP
 	AM_RANGE(0x00e8, 0x00ef) AM_NOP //AMI BIOS write to this ports as delays between I/O ports operations sending al value -> NEWIODELAY
 	AM_RANGE(0x0170, 0x0177) AM_NOP //To debug
-	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE("ide", ide_r, ide_w)
+	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE_LEGACY("ide", ide_r, ide_w)
 	AM_RANGE(0x0200, 0x021f) AM_NOP //To debug
 	AM_RANGE(0x0260, 0x026f) AM_NOP //To debug
-	AM_RANGE(0x0278, 0x027b) AM_WRITENOP//AM_WRITE(pnp_config_w)
+	AM_RANGE(0x0278, 0x027b) AM_WRITENOP//AM_WRITE_LEGACY(pnp_config_w)
 	AM_RANGE(0x0280, 0x0287) AM_NOP //To debug
 	AM_RANGE(0x02a0, 0x02a7) AM_NOP //To debug
 	AM_RANGE(0x02c0, 0x02c7) AM_NOP //To debug
@@ -590,10 +586,10 @@ static ADDRESS_MAP_START( calchase_io, AS_IO, 32)
 	AM_RANGE(0x0378, 0x037f) AM_NOP //To debug
 	// AM_RANGE(0x0300, 0x03af) AM_NOP
 	// AM_RANGE(0x03b0, 0x03df) AM_NOP
-	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE("ide", fdc_r, fdc_w)
+	AM_RANGE(0x03f0, 0x03f7) AM_DEVREADWRITE_LEGACY("ide", fdc_r, fdc_w)
 	AM_RANGE(0x03f8, 0x03ff) AM_NOP // To debug Serial Port COM1:
-	AM_RANGE(0x0a78, 0x0a7b) AM_WRITENOP//AM_WRITE(pnp_data_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_32le_r,	pci_32le_w)
+	AM_RANGE(0x0a78, 0x0a7b) AM_WRITENOP//AM_WRITE_LEGACY(pnp_data_w)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE_LEGACY("pcibus", pci_32le_r,	pci_32le_w)
 	AM_RANGE(0x42e8, 0x43ef) AM_NOP //To debug
 	AM_RANGE(0x43c0, 0x43cf) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x46e8, 0x46ef) AM_NOP //To debug
@@ -681,7 +677,7 @@ static INPUT_PORTS_START( calchase )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN ) // returns back to MS-DOS (likely to be unmapped and actually used as a lame protection check)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_START("IOCARD3")
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0xdfff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IOCARD4")
@@ -869,8 +865,8 @@ static const struct pit8253_config calchase_pit8254_config =
 
 static MACHINE_RESET(calchase)
 {
-	//memory_set_bankptr(machine, "bank1", machine.region("bios")->base() + 0x10000);
-	memory_set_bankptr(machine, "bank1", machine.region("bios")->base());
+	//machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("bios")->base() + 0x10000);
+	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("bios")->base());
 }
 
 static void set_gate_a20(running_machine &machine, int a20)
@@ -941,21 +937,19 @@ static MACHINE_CONFIG_START( calchase, calchase_state )
 MACHINE_CONFIG_END
 
 
-static READ32_HANDLER( calchase_idle_skip_r )
+READ32_MEMBER(calchase_state::calchase_idle_skip_r)
 {
-	calchase_state *state = space->machine().driver_data<calchase_state>();
 
-	if(cpu_get_pc(&space->device())==0x1406f48)
-		device_spin_until_interrupt(state->m_maincpu);
+	if(cpu_get_pc(&space.device())==0x1406f48)
+		device_spin_until_interrupt(m_maincpu);
 
-	return state->m_idle_skip_ram;
+	return m_idle_skip_ram;
 }
 
-static WRITE32_HANDLER( calchase_idle_skip_w )
+WRITE32_MEMBER(calchase_state::calchase_idle_skip_w)
 {
-	calchase_state *state = space->machine().driver_data<calchase_state>();
 
-	COMBINE_DATA(&state->m_idle_skip_ram);
+	COMBINE_DATA(&m_idle_skip_ram);
 }
 
 static DRIVER_INIT( calchase )
@@ -971,7 +965,7 @@ static DRIVER_INIT( calchase )
 
 	kbdc8042_init(machine, &at8042);
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x3f0b160, 0x3f0b163, FUNC(calchase_idle_skip_r), FUNC(calchase_idle_skip_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x3f0b160, 0x3f0b163, read32_delegate(FUNC(calchase_state::calchase_idle_skip_r),state), write32_delegate(FUNC(calchase_state::calchase_idle_skip_w),state));
 }
 
 ROM_START( calchase )

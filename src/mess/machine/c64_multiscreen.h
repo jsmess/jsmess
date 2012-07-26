@@ -12,9 +12,10 @@
 #ifndef __MULTISCREEN__
 #define __MULTISCREEN__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
+#include "cpu/m6800/m6800.h"
+#include "machine/6821pia.h"
 #include "machine/c64exp.h"
 
 
@@ -32,15 +33,19 @@ public:
 	// construction/destruction
 	c64_multiscreen_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+	// optional information overrides
+	virtual const rom_entry *device_rom_region() const;
+	virtual machine_config_constructor device_mconfig_additions() const;
+
 protected:
 	// device-level overrides
+	virtual void device_config_complete() { m_shortname = "c64_mscr"; }
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { m_shortname = "c64_multiscreen"; }
 
 	// device_c64_expansion_card_interface overrides
-	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2);
-	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2);
+	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2);
+	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2);
 
 private:
 	UINT8 m_bank;

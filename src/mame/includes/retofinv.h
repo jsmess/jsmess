@@ -2,12 +2,15 @@ class retofinv_state : public driver_device
 {
 public:
 	retofinv_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fg_videoram(*this, "fg_videoram"),
+		m_sharedram(*this, "sharedram"),
+		m_bg_videoram(*this, "bg_videoram"){ }
 
 	UINT8 m_cpu2_m6000;
-	UINT8 *m_fg_videoram;
-	UINT8 *m_bg_videoram;
-	UINT8 *m_sharedram;
+	required_shared_ptr<UINT8> m_fg_videoram;
+	required_shared_ptr<UINT8> m_sharedram;
+	required_shared_ptr<UINT8> m_bg_videoram;
 	UINT8 m_from_main;
 	UINT8 m_from_mcu;
 	int m_mcu_sent;
@@ -28,23 +31,36 @@ public:
 
 	UINT8 m_main_irq_mask;
 	UINT8 m_sub_irq_mask;
+	DECLARE_WRITE8_MEMBER(cpu1_reset_w);
+	DECLARE_WRITE8_MEMBER(cpu2_reset_w);
+	DECLARE_WRITE8_MEMBER(mcu_reset_w);
+	DECLARE_WRITE8_MEMBER(cpu2_m6000_w);
+	DECLARE_READ8_MEMBER(cpu0_mf800_r);
+	DECLARE_WRITE8_MEMBER(soundcommand_w);
+	DECLARE_WRITE8_MEMBER(irq0_ack_w);
+	DECLARE_WRITE8_MEMBER(irq1_ack_w);
+	DECLARE_WRITE8_MEMBER(coincounter_w);
+	DECLARE_WRITE8_MEMBER(coinlockout_w);
+	DECLARE_READ8_MEMBER(retofinv_68705_portA_r);
+	DECLARE_WRITE8_MEMBER(retofinv_68705_portA_w);
+	DECLARE_WRITE8_MEMBER(retofinv_68705_ddrA_w);
+	DECLARE_READ8_MEMBER(retofinv_68705_portB_r);
+	DECLARE_WRITE8_MEMBER(retofinv_68705_portB_w);
+	DECLARE_WRITE8_MEMBER(retofinv_68705_ddrB_w);
+	DECLARE_READ8_MEMBER(retofinv_68705_portC_r);
+	DECLARE_WRITE8_MEMBER(retofinv_68705_portC_w);
+	DECLARE_WRITE8_MEMBER(retofinv_68705_ddrC_w);
+	DECLARE_WRITE8_MEMBER(retofinv_mcu_w);
+	DECLARE_READ8_MEMBER(retofinv_mcu_r);
+	DECLARE_READ8_MEMBER(retofinv_mcu_status_r);
+	DECLARE_WRITE8_MEMBER(retofinv_bg_videoram_w);
+	DECLARE_WRITE8_MEMBER(retofinv_fg_videoram_w);
+	DECLARE_WRITE8_MEMBER(retofinv_gfx_ctrl_w);
 };
 
 
 /*----------- defined in machine/retofinv.c -----------*/
 
-READ8_HANDLER( retofinv_68705_portA_r );
-WRITE8_HANDLER( retofinv_68705_portA_w );
-WRITE8_HANDLER( retofinv_68705_ddrA_w );
-READ8_HANDLER( retofinv_68705_portB_r );
-WRITE8_HANDLER( retofinv_68705_portB_w );
-WRITE8_HANDLER( retofinv_68705_ddrB_w );
-READ8_HANDLER( retofinv_68705_portC_r );
-WRITE8_HANDLER( retofinv_68705_portC_w );
-WRITE8_HANDLER( retofinv_68705_ddrC_w );
-WRITE8_HANDLER( retofinv_mcu_w );
-READ8_HANDLER( retofinv_mcu_r );
-READ8_HANDLER( retofinv_mcu_status_r );
 
 
 /*----------- defined in video/retofinv.c -----------*/
@@ -52,6 +68,3 @@ READ8_HANDLER( retofinv_mcu_status_r );
 VIDEO_START( retofinv );
 PALETTE_INIT( retofinv );
 SCREEN_UPDATE_IND16( retofinv );
-WRITE8_HANDLER( retofinv_bg_videoram_w );
-WRITE8_HANDLER( retofinv_fg_videoram_w );
-WRITE8_HANDLER( retofinv_gfx_ctrl_w );

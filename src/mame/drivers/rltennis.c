@@ -69,33 +69,30 @@ player - when there's nothing to play - first, empty 2k of ROMs are selected.
 #define RLT_TIMER_FREQ     (RLT_REFRESH_RATE*256)
 #define RLT_XTAL           XTAL_12MHz
 
-static READ16_HANDLER( rlt_io_r )
+READ16_MEMBER(rltennis_state::rlt_io_r)
 {
-	rltennis_state *state = space->machine().driver_data<rltennis_state>();
 
-	return (input_port_read(space->machine(), "P1" )&0x1fff) | (state->m_unk_counter<<13); /* top 3 bits controls smaple address update */
+	return (ioport("P1" )->read()&0x1fff) | (m_unk_counter<<13); /* top 3 bits controls smaple address update */
 }
 
-static WRITE16_HANDLER(rlt_snd1_w)
+WRITE16_MEMBER(rltennis_state::rlt_snd1_w)
 {
-	rltennis_state *state = space->machine().driver_data<rltennis_state>();
-	COMBINE_DATA(&state->m_data760000);
+	COMBINE_DATA(&m_data760000);
 }
 
-static WRITE16_HANDLER(rlt_snd2_w)
+WRITE16_MEMBER(rltennis_state::rlt_snd2_w)
 {
-	rltennis_state *state = space->machine().driver_data<rltennis_state>();
-	COMBINE_DATA(&state->m_data740000);
+	COMBINE_DATA(&m_data740000);
 }
 
-static ADDRESS_MAP_START( rltennis_main, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( rltennis_main, AS_PROGRAM, 16, rltennis_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x700000, 0x70000f) AM_WRITE(rlt_blitter_w)
-	AM_RANGE(0x720000, 0x720001) AM_DEVWRITE8_MODERN("ramdac",ramdac_device,index_w,0x00ff)
-	AM_RANGE(0x720002, 0x720003) AM_DEVREADWRITE8_MODERN("ramdac",ramdac_device,pal_r,pal_w,0x00ff)
-	AM_RANGE(0x720006, 0x720007) AM_DEVWRITE8_MODERN("ramdac",ramdac_device,index_r_w,0x00ff)
+	AM_RANGE(0x720000, 0x720001) AM_DEVWRITE8("ramdac",ramdac_device,index_w,0x00ff)
+	AM_RANGE(0x720002, 0x720003) AM_DEVREADWRITE8("ramdac",ramdac_device,pal_r,pal_w,0x00ff)
+	AM_RANGE(0x720006, 0x720007) AM_DEVWRITE8("ramdac",ramdac_device,index_r_w,0x00ff)
 	AM_RANGE(0x740000, 0x740001) AM_WRITE(rlt_snd1_w)
 	AM_RANGE(0x760000, 0x760001) AM_WRITE(rlt_snd2_w)
 	AM_RANGE(0x780000, 0x780001) AM_WRITENOP	/* sound control, unknown, usually = 0x0044 */
@@ -165,9 +162,9 @@ static MACHINE_START( rltennis )
 	state->m_screen = machine.device(  "screen");
 	state->m_dac_1 = machine.device("dac1");
 	state->m_dac_2 = machine.device("dac2");
-	state->m_samples_1 = machine.region("samples1")->base();
-	state->m_samples_2 = machine.region("samples2")->base();
-	state->m_gfx =  machine.region("gfx1")->base();
+	state->m_samples_1 = state->memregion("samples1")->base();
+	state->m_samples_2 = state->memregion("samples2")->base();
+	state->m_gfx =  state->memregion("gfx1")->base();
 	state->m_timer = machine.scheduler().timer_alloc(FUNC(sample_player));
 }
 
@@ -177,8 +174,8 @@ static MACHINE_RESET( rltennis )
 	state->m_timer->adjust(attotime::from_hz(RLT_TIMER_FREQ));
 }
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, rltennis_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb888_w)
 ADDRESS_MAP_END
 
 static RAMDAC_INTERFACE( ramdac_intf )

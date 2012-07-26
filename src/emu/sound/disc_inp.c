@@ -55,7 +55,7 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 
 DISCRETE_STEP(dss_adjustment)
 {
-	INT32  rawportval = input_port_read_direct(m_port);
+	INT32  rawportval = m_port->read();
 
 	/* only recompute if the value changed from last time */
 	if (UNEXPECTED(rawportval != m_lastpval))
@@ -76,7 +76,7 @@ DISCRETE_RESET(dss_adjustment)
 	double min, max;
 
 	astring fulltag;
-	m_port = m_device->machine().m_portlist.find(m_device->siblingtag(fulltag, (const char *)this->custom_data()).cstr());
+	m_port = m_device->machine().root_device().ioport(m_device->siblingtag(fulltag, (const char *)this->custom_data()).cstr());
 	if (m_port == NULL)
 		fatalerror("DISCRETE_ADJUSTMENT - NODE_%d has invalid tag", this->index());
 

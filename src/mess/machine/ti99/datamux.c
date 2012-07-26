@@ -254,7 +254,7 @@ void ti99_datamux_device::device_reset(void)
 	m_space = m_cpu->memory().space(AS_PROGRAM);
 
 	m_devices.reset(); // clear the list
-	m_use32k = (input_port_read(machine(), "RAM")==1)? TRUE : FALSE;
+	m_use32k = (ioport("RAM")->read()==1);
 
 	// better use a region?
 	if (m_ram16b==NULL) m_ram16b = (UINT16*)malloc(32768);
@@ -278,7 +278,7 @@ void ti99_datamux_device::device_reset(void)
 				bool active_device = true;
 				if (list[i].setting!=NULL)
 				{
-					set = input_port_read(machine(), list[i].setting);
+					set = ioport(list[i].setting)->read();
 					active_device = ((set & list[i].set)==list[i].set) && ((set & list[i].unset)==0);
 				}
 				if (active_device)
@@ -303,6 +303,24 @@ void ti99_datamux_device::device_reset(void)
 		}
 	}
 	LOG("Datamux device count = %d\n", m_devices.count());
+}
+
+INPUT_PORTS_START( datamux )
+	PORT_START( "RAM" )	/* config */
+	PORT_CONFNAME( 0x01, 0x01, "Console 32 KiB RAM upgrade (16 bit)" )
+		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+		PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_START( "GROMENA" )
+	PORT_CONFNAME( 0x01, 0x01, "Console GROMs" )
+		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+		PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+
+INPUT_PORTS_END
+
+ioport_constructor ti99_datamux_device::device_input_ports() const
+{
+	return INPUT_PORTS_NAME(datamux);
 }
 
 const device_type DATAMUX = &device_creator<ti99_datamux_device>;

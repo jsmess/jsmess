@@ -58,7 +58,7 @@ isa8_svga_cirrus_device::isa8_svga_cirrus_device(const machine_config &mconfig, 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-static READ8_HANDLER( input_port_0_r ) { return 0xff; } //return input_port_read(space->machine(), "IN0"); }
+static READ8_HANDLER( input_port_0_r ) { return 0xff; } //return space->machine().root_device().ioport("IN0")->read(); }
 
 void isa8_svga_cirrus_device::device_start()
 {

@@ -8,16 +8,18 @@ class topspeed_state : public driver_device
 {
 public:
 	topspeed_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spritemap(*this, "spritemap"),
+		m_raster_ctrl(*this, "raster_ctrl"),
+		m_spriteram(*this, "spriteram"),
+		m_sharedram(*this, "sharedram") { }
 
 	/* memory pointers */
-	UINT16 *   m_spritemap;
-	UINT16 *   m_raster_ctrl;
-	UINT16 *   m_spriteram;
-	UINT16 *   m_sharedram;
+	required_shared_ptr<UINT16> m_spritemap;
+	required_shared_ptr<UINT16> m_raster_ctrl;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_sharedram;
 //  UINT16 *    paletteram;    // currently this uses generic palette handling
-	size_t     m_spriteram_size;
-	size_t     m_sharedram_size;
 
 	/* misc */
 	UINT16     m_cpua_ctrl;
@@ -35,6 +37,12 @@ public:
 	device_t *m_tc0220ioc;
 
 	UINT8 m_dislayer[5];
+	DECLARE_READ16_MEMBER(sharedram_r);
+	DECLARE_WRITE16_MEMBER(sharedram_w);
+	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
+	DECLARE_READ8_MEMBER(topspeed_input_bypass_r);
+	DECLARE_READ16_MEMBER(topspeed_motor_r);
+	DECLARE_WRITE16_MEMBER(topspeed_motor_w);
 };
 
 

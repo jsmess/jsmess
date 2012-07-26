@@ -91,43 +91,38 @@ VIDEO_START( vastar )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( vastar_fgvideoram_w )
+WRITE8_MEMBER(vastar_state::vastar_fgvideoram_w)
 {
-	vastar_state *state = space->machine().driver_data<vastar_state>();
 
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( vastar_bg1videoram_w )
+WRITE8_MEMBER(vastar_state::vastar_bg1videoram_w)
 {
-	vastar_state *state = space->machine().driver_data<vastar_state>();
 
-	state->m_bg1videoram[offset] = data;
-	state->m_bg1_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_bg1videoram[offset] = data;
+	m_bg1_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( vastar_bg2videoram_w )
+WRITE8_MEMBER(vastar_state::vastar_bg2videoram_w)
 {
-	vastar_state *state = space->machine().driver_data<vastar_state>();
 
-	state->m_bg2videoram[offset] = data;
-	state->m_bg2_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_bg2videoram[offset] = data;
+	m_bg2_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
-READ8_HANDLER( vastar_bg1videoram_r )
+READ8_MEMBER(vastar_state::vastar_bg1videoram_r)
 {
-	vastar_state *state = space->machine().driver_data<vastar_state>();
 
-	return state->m_bg1videoram[offset];
+	return m_bg1videoram[offset];
 }
 
-READ8_HANDLER( vastar_bg2videoram_r )
+READ8_MEMBER(vastar_state::vastar_bg2videoram_r)
 {
-	vastar_state *state = space->machine().driver_data<vastar_state>();
 
-	return state->m_bg2videoram[offset];
+	return m_bg2videoram[offset];
 }
 
 
@@ -159,7 +154,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		flipx = spriteram_3[offs] & 0x02;
 		flipy = spriteram_3[offs] & 0x01;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			flipx = !flipx;
 			flipy = !flipy;
@@ -167,7 +162,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 
 		if (spriteram_2[offs] & 0x08)	/* double width */
 		{
-			if (!flip_screen_get(machine))
+			if (!state->flip_screen())
 				sy = 224 - sy;
 
 			drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
@@ -184,7 +179,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 		}
 		else
 		{
-			if (!flip_screen_get(machine))
+			if (!state->flip_screen())
 				sy = 240 - sy;
 
 			drawgfx_transpen(bitmap,cliprect,machine.gfx[1],

@@ -33,7 +33,6 @@
     ---x      ?  IPL 0 for passive power, pull-up for soft power, file server switch for secure power
 */
 
-#define ADDRESS_MAP_MODERN
 
 //#define CUDA_SUPER_VERBOSE
 
@@ -420,7 +419,7 @@ void cuda_device::device_start()
 	save_item(NAME(disk_pram));
 
 	astring tempstring;
-	UINT8 *rom = device().machine().region(device().subtag(tempstring, CUDA_CPU_TAG))->base();
+	UINT8 *rom = device().machine().root_device().memregion(device().subtag(tempstring, CUDA_CPU_TAG))->base();
 
     if (rom)
     {

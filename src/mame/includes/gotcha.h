@@ -8,14 +8,16 @@ class gotcha_state : public driver_device
 {
 public:
 	gotcha_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fgvideoram(*this, "fgvideoram"),
+		m_bgvideoram(*this, "bgvideoram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT16 *    m_fgvideoram;
-	UINT16 *    m_bgvideoram;
-	UINT16 *    m_spriteram;
+	required_shared_ptr<UINT16> m_fgvideoram;
+	required_shared_ptr<UINT16> m_bgvideoram;
+	required_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *    m_paletteram; // currently this uses generic palette handling
-	size_t      m_spriteram_size;
 
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;
@@ -26,6 +28,12 @@ public:
 
 	/* devices */
 	device_t *m_audiocpu;
+	DECLARE_WRITE16_MEMBER(gotcha_lamps_w);
+	DECLARE_WRITE16_MEMBER(gotcha_fgvideoram_w);
+	DECLARE_WRITE16_MEMBER(gotcha_bgvideoram_w);
+	DECLARE_WRITE16_MEMBER(gotcha_gfxbank_select_w);
+	DECLARE_WRITE16_MEMBER(gotcha_gfxbank_w);
+	DECLARE_WRITE16_MEMBER(gotcha_scroll_w);
 };
 
 
@@ -35,8 +43,3 @@ public:
 VIDEO_START( gotcha );
 SCREEN_UPDATE_IND16( gotcha );
 
-WRITE16_HANDLER( gotcha_fgvideoram_w );
-WRITE16_HANDLER( gotcha_bgvideoram_w );
-WRITE16_HANDLER( gotcha_gfxbank_select_w );
-WRITE16_HANDLER( gotcha_gfxbank_w );
-WRITE16_HANDLER( gotcha_scroll_w );

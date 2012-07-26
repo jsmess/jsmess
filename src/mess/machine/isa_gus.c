@@ -1428,13 +1428,13 @@ READ8_MEMBER(isa16_gus_device::joy_r)
 		attotime new_time = machine().time();
 
 		{
-			data = input_port_read(*this, "gus_joy") | 0x0f;
+			data = ioport("gus_joy")->read() | 0x0f;
 
 			{
 				delta = ((new_time - m_joy_time) * 256 * 1000).seconds;
 
-				if (input_port_read(*this, "gus_joy_1") < delta) data &= ~0x01;
-				if (input_port_read(*this, "gus_joy_2") < delta) data &= ~0x02;
+				if (ioport("gus_joy_1")->read() < delta) data &= ~0x01;
+				if (ioport("gus_joy_2")->read() < delta) data &= ~0x02;
 			}
 		}
 		return data;

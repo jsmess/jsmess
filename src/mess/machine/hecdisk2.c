@@ -149,7 +149,7 @@ void hector_disc2_reset(running_machine &machine)
 	upd765_reset_w(machine.device("upd765"), 1);
 	upd765_reset_w(machine.device("upd765"), 0);
 	// Select ROM memory to cold restart
-	memory_set_bank(machine, "bank3", DISCII_BANK_ROM);
+	state->membank("bank3")->set_entry(DISCII_BANK_ROM);
 
 	// Clear the Hardware's buffers
 	state->m_hector_disc2_data_r_ready=0x0;	/* =ff when PC2 = true and data in read buffer (state->m_hector_disc2_data_read) */
@@ -165,14 +165,16 @@ void hector_disc2_reset(running_machine &machine)
 /*****************************************************************************/
 READ8_HANDLER( hector_disc2_io00_port_r)
 {
+	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
 	/* Switch Disc 2 to RAM to let full RAM acces */
-	memory_set_bank(space->machine(), "bank3", DISCII_BANK_RAM);
+	state->membank("bank3")->set_entry(DISCII_BANK_RAM);
 	return 0;
 }
 WRITE8_HANDLER( hector_disc2_io00_port_w)
 {
+	hec2hrp_state *state = space->machine().driver_data<hec2hrp_state>();
 	/* Switch Disc 2 to RAM to let full RAM acces */
-	memory_set_bank(space->machine(), "bank3", DISCII_BANK_RAM);
+	state->membank("bank3")->set_entry(DISCII_BANK_RAM);
 }
 READ8_HANDLER( hector_disc2_io20_port_r)
 {

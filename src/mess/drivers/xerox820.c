@@ -27,7 +27,6 @@
     - MK-83 have 256K of RAM
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -93,13 +92,13 @@ void xerox820_state::scan_keyboard()
 	int table = 0, row, col;
 	int keydata = -1;
 
-	if (input_port_read(machine(), "ROW9") & 0x07)
+	if (ioport("ROW9")->read() & 0x07)
 	{
 		/* shift, upper case */
 		table = 1;
 	}
 
-	if (input_port_read(machine(), "ROW9") & 0x18)
+	if (ioport("ROW9")->read() & 0x18)
 	{
 		/* ctrl */
 		table = 2;
@@ -108,7 +107,7 @@ void xerox820_state::scan_keyboard()
 	/* scan keyboard */
 	for (row = 0; row < 9; row++)
 	{
-		UINT8 data = input_port_read(machine(), keynames[row]);
+		UINT8 data = ioport(keynames[row])->read();
 
 		for (col = 0; col < 8; col++)
 		{
@@ -148,7 +147,7 @@ void xerox820_state::bankswitch(int bank)
 	if (bank)
 	{
 		/* ROM */
-		program->install_rom(0x0000, 0x0fff, machine().region("monitor")->base());
+		program->install_rom(0x0000, 0x0fff, memregion("monitor")->base());
 		program->unmap_readwrite(0x1000, 0x1fff);
 		program->install_ram(0x3000, 0x3fff, m_video_ram);
 	}
@@ -167,7 +166,7 @@ void xerox820ii_state::bankswitch(int bank)
 	if (bank)
 	{
 		/* ROM */
-		program->install_rom(0x0000, 0x17ff, machine().region("monitor")->base());
+		program->install_rom(0x0000, 0x17ff, memregion("monitor")->base());
 		program->unmap_readwrite(0x1800, 0x2fff);
 		program->install_ram(0x3000, 0x3fff, m_video_ram);
 		program->unmap_readwrite(0x4000, 0xbfff);
@@ -239,7 +238,7 @@ WRITE8_MEMBER( xerox820ii_state::sync_w )
 
 static ADDRESS_MAP_START( xerox820_mem, AS_PROGRAM, 8, xerox820_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -257,7 +256,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xerox820ii_mem, AS_PROGRAM, 8, xerox820ii_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x3000, 0x3fff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -274,6 +273,14 @@ static ADDRESS_MAP_START( xerox168_mem, AS_PROGRAM, 16, xerox820ii_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
 	AM_RANGE(0xff000, 0xfffff) AM_ROM AM_REGION(I8086_TAG, 0)
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mk83_mem, AS_PROGRAM, 8, xerox820_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x3000, 0x6fff) AM_RAM
+	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("video_ram")
+	AM_RANGE(0x8000, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
 
 /* Input Ports */
 
@@ -617,7 +624,7 @@ static COM8116_INTERFACE( com8116_intf )
 void xerox820_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = machine().region("chargen")->base();
+	m_char_rom = memregion("chargen")->base();
 }
 
 
@@ -885,6 +892,11 @@ static MACHINE_CONFIG_DERIVED( xerox168, xerox820ii )
 	MCFG_RAM_EXTRA_OPTIONS("320K")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( mk83, xerox820 )
+	MCFG_CPU_MODIFY(Z80_TAG)
+	MCFG_CPU_PROGRAM_MAP(mk83_mem)
+MACHINE_CONFIG_END
+
 /* ROMs */
 
 ROM_START( xerox820 )
@@ -954,8 +966,8 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME        FLAGS */
-COMP( 1981, xerox820,	0,			0,		xerox820,	xerox820,	0,		"Xerox",						"Xerox 820",	GAME_NO_SOUND)
+COMP( 1981, xerox820,   0,          0,      xerox820,   xerox820,   0,      "Xerox",                        "Xerox 820",    GAME_NO_SOUND)
 COMP( 1983, xerox820ii, xerox820,   0,      xerox820ii, xerox820,   0,      "Xerox",                        "Xerox 820-II", GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1983, xerox168,   xerox820,   0,      xerox168,   xerox820,   0,      "Xerox",                        "Xerox 16/8",   GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1980, bigboard,   0,          0,      xerox820,   xerox820,   0,      "Digital Research Computers",   "Big Board",    GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 198?, mk83,   	0,          0,      xerox820,   xerox820,   0,      "<unknown>",					"MK-83",    GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, mk83,       0,          0,      mk83,       xerox820,   0,      "Scomar",                       "MK-83",        GAME_NOT_WORKING | GAME_NO_SOUND)

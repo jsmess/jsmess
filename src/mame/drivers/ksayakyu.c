@@ -72,7 +72,7 @@ SRAM:
 #define MAIN_CLOCK XTAL_18_432MHz
 
 
-static WRITE8_HANDLER( bank_select_w )
+WRITE8_MEMBER(ksayakyu_state::bank_select_w)
 {
 	/*
         bits:
@@ -81,30 +81,27 @@ static WRITE8_HANDLER( bank_select_w )
         xxxxxxx  - unused ?
 
     */
-	memory_set_bank(space->machine(), "bank1", data & 0x01);
+	membank("bank1")->set_entry(data & 0x01);
 }
 
-static WRITE8_HANDLER( latch_w )
+WRITE8_MEMBER(ksayakyu_state::latch_w)
 {
-	ksayakyu_state *state = space->machine().driver_data<ksayakyu_state>();
-	state->m_sound_status &= ~0x80;
-	soundlatch_w(space, 0, data | 0x80);
+	m_sound_status &= ~0x80;
+	soundlatch_byte_w(space, 0, data | 0x80);
 }
 
-static READ8_HANDLER (sound_status_r)
+READ8_MEMBER(ksayakyu_state::sound_status_r)
 {
-	ksayakyu_state *state = space->machine().driver_data<ksayakyu_state>();
-	return state->m_sound_status | 4;
+	return m_sound_status | 4;
 }
 
-static WRITE8_HANDLER(tomaincpu_w)
+WRITE8_MEMBER(ksayakyu_state::tomaincpu_w)
 {
-	ksayakyu_state *state = space->machine().driver_data<ksayakyu_state>();
-	state->m_sound_status |= 0x80;
-	soundlatch_w(space, 0, data);
+	m_sound_status |= 0x80;
+	soundlatch_byte_w(space, 0, data);
 }
 
-static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8, ksayakyu_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
@@ -118,17 +115,17 @@ static ADDRESS_MAP_START( maincpu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa806, 0xa806) AM_READ(sound_status_r)
 	AM_RANGE(0xa807, 0xa807) AM_READNOP /* watchdog ? */
 	AM_RANGE(0xa808, 0xa808) AM_WRITE(bank_select_w)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(ksayakyu_videoram_w) AM_BASE_MEMBER(ksayakyu_state, m_videoram)
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE_SIZE_MEMBER(ksayakyu_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(ksayakyu_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( soundcpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( soundcpu_map, AS_PROGRAM, 8, ksayakyu_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ay1", ay8910_data_address_w)
-	AM_RANGE(0xa006, 0xa007) AM_DEVWRITE("ay2", ay8910_data_address_w)
-	AM_RANGE(0xa008, 0xa008) AM_DEVWRITE("dac", dac_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
+	AM_RANGE(0xa006, 0xa007) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
+	AM_RANGE(0xa008, 0xa008) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0xa00c, 0xa00c) AM_WRITE(tomaincpu_w)
 	AM_RANGE(0xa010, 0xa010) AM_WRITENOP //a timer of some sort?
 ADDRESS_MAP_END
@@ -191,7 +188,7 @@ static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_HANDLER(dummy1_w)
@@ -253,9 +250,9 @@ GFXDECODE_END
 static MACHINE_START( ksayakyu )
 {
 	ksayakyu_state *state = machine.driver_data<ksayakyu_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
 	state->save_item(NAME(state->m_sound_status));
 	state->save_item(NAME(state->m_video_ctrl));

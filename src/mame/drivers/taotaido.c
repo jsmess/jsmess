@@ -72,31 +72,29 @@ zooming might be wrong
 #define TAOTAIDO_SHOW_ALL_INPUTS	0
 
 
-static READ16_HANDLER( pending_command_r )
+READ16_MEMBER(taotaido_state::pending_command_r)
 {
-	taotaido_state *state = space->machine().driver_data<taotaido_state>();
 	/* Only bit 0 is tested */
-	return state->m_pending_command;
+	return m_pending_command;
 }
 
-static WRITE16_HANDLER( sound_command_w )
+WRITE16_MEMBER(taotaido_state::sound_command_w)
 {
-	taotaido_state *state = space->machine().driver_data<taotaido_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_pending_command = 1;
-		soundlatch_w(space, offset, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		m_pending_command = 1;
+		soundlatch_byte_w(space, offset, data & 0xff);
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, taotaido_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(taotaido_bgvideoram_w) AM_BASE_MEMBER(taotaido_state, m_bgram)	// bg ram?
-	AM_RANGE(0xa00000, 0xa01fff) AM_RAM AM_BASE_MEMBER(taotaido_state, m_spriteram)		// sprite ram
-	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_BASE_MEMBER(taotaido_state, m_spriteram2)		// sprite tile lookup ram
+	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(taotaido_bgvideoram_w) AM_SHARE("bgram")	// bg ram?
+	AM_RANGE(0xa00000, 0xa01fff) AM_RAM AM_SHARE("spriteram")		// sprite ram
+	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("spriteram2")		// sprite tile lookup ram
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM										// main ram
-	AM_RANGE(0xffc000, 0xffcfff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// palette ram
-	AM_RANGE(0xffe000, 0xffe3ff) AM_RAM AM_BASE_MEMBER(taotaido_state, m_scrollram)		// rowscroll / rowselect / scroll ram
+	AM_RANGE(0xffc000, 0xffcfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// palette ram
+	AM_RANGE(0xffe000, 0xffe3ff) AM_RAM AM_SHARE("scrollram")		// rowscroll / rowselect / scroll ram
 	AM_RANGE(0xffff80, 0xffff81) AM_READ_PORT("P1")
 	AM_RANGE(0xffff82, 0xffff83) AM_READ_PORT("P2")
 	AM_RANGE(0xffff84, 0xffff85) AM_READ_PORT("SYSTEM")
@@ -118,31 +116,30 @@ ADDRESS_MAP_END
 /* sound cpu - same as aerofgt */
 
 
-static WRITE8_HANDLER( pending_command_clear_w )
+WRITE8_MEMBER(taotaido_state::pending_command_clear_w)
 {
-	taotaido_state *state = space->machine().driver_data<taotaido_state>();
-	state->m_pending_command = 0;
+	m_pending_command = 0;
 }
 
-static WRITE8_HANDLER( taotaido_sh_bankswitch_w )
+WRITE8_MEMBER(taotaido_state::taotaido_sh_bankswitch_w)
 {
-	UINT8 *rom = space->machine().region("audiocpu")->base() + 0x10000;
+	UINT8 *rom = memregion("audiocpu")->base() + 0x10000;
 
-	memory_set_bankptr(space->machine(), "bank1",rom + (data & 0x03) * 0x8000);
+	membank("bank1")->set_base(rom + (data & 0x03) * 0x8000);
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, taotaido_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, taotaido_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(taotaido_sh_bankswitch_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(pending_command_clear_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_r)
+	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 

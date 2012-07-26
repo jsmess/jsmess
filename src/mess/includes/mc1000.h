@@ -1,7 +1,6 @@
 #ifndef __MC1000__
 #define __MC1000__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -33,7 +32,9 @@ public:
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_ram(*this, RAM_TAG)
-	{ }
+	,
+		m_mc6845_video_ram(*this, "mc6845_vram"),
+		m_mc6847_video_ram(*this, "mc6847_vram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
@@ -56,6 +57,7 @@ public:
 	DECLARE_READ8_MEMBER( videoram_r );
 	DECLARE_WRITE8_MEMBER( keylatch_w );
 	DECLARE_READ8_MEMBER( keydata_r );
+	DIRECT_UPDATE_MEMBER(mc1000_direct_update_handler);
 
 	void bankswitch();
 
@@ -73,8 +75,8 @@ public:
 	/* video state */
 	int m_hsync;
 	int m_vsync;
-	UINT8 *m_mc6845_video_ram;
-	UINT8 *m_mc6847_video_ram;
+	required_shared_ptr<UINT8> m_mc6845_video_ram;
+	required_shared_ptr<UINT8> m_mc6847_video_ram;
 	UINT8 m_mc6847_attr;
 };
 

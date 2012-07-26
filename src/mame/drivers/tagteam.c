@@ -30,18 +30,18 @@ TODO:
 #include "sound/dac.h"
 #include "includes/tagteam.h"
 
-static WRITE8_HANDLER( sound_command_w )
+WRITE8_MEMBER(tagteam_state::sound_command_w)
 {
-	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine(), "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
+	soundlatch_byte_w(space, offset, data);
+	cputag_set_input_line(machine(), "audiocpu", M6502_IRQ_LINE, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( irq_clear_w )
+WRITE8_MEMBER(tagteam_state::irq_clear_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tagteam_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("P2") AM_WRITE(tagteam_flipscreen_w)
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("P1") AM_WRITE(tagteam_control_w)
@@ -50,33 +50,32 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(tagteam_mirrorvideoram_r, tagteam_mirrorvideoram_w)
 	AM_RANGE(0x4400, 0x47ff) AM_READWRITE(tagteam_mirrorcolorram_r, tagteam_mirrorcolorram_w)
 	AM_RANGE(0x4800, 0x4fff) AM_READONLY
-	AM_RANGE(0x4800, 0x4bff) AM_WRITE(tagteam_videoram_w) AM_BASE_MEMBER(tagteam_state, m_videoram)
-	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(tagteam_colorram_w) AM_BASE_MEMBER(tagteam_state, m_colorram)
+	AM_RANGE(0x4800, 0x4bff) AM_WRITE(tagteam_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4c00, 0x4fff) AM_WRITE(tagteam_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( sound_nmi_mask_w )
+WRITE8_MEMBER(tagteam_state::sound_nmi_mask_w)
 {
-	tagteam_state *state = space->machine().driver_data<tagteam_state>();
 
-	state->m_sound_nmi_mask = data & 1;
+	m_sound_nmi_mask = data & 1;
 }
 
 /* Same as Syusse Oozumou */
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tagteam_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_data_address_w)
-	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_data_address_w)
-	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE("dac", dac_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
+	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
+	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE_LEGACY("dac", dac_w)
 	AM_RANGE(0x2005, 0x2005) AM_WRITE(sound_nmi_mask_w)
-	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_r)
+	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(tagteam_state::coin_inserted)
 {
-	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( bigprowr )
@@ -87,8 +86,8 @@ static INPUT_PORTS_START( bigprowr )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )	PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, tagteam_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, tagteam_state,coin_inserted, 0)
 
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )	PORT_COCKTAIL PORT_8WAY
@@ -119,7 +118,7 @@ static INPUT_PORTS_START( bigprowr )
 	PORT_DIPSETTING(    0x40, "Upright, Dual Controls" )
 //  PORT_DIPSETTING(    0x20, "Cocktail, Single Controls" ) // IMPOSSIBLE !
 	PORT_DIPSETTING(    0x60, DEF_STR( Cocktail ) )		// "Cocktail, Dual Controls"
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK  )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_VBLANK("screen")
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1")
@@ -145,14 +144,14 @@ static INPUT_PORTS_START( tagteam )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )	PORT_CONDITION("DSW2", 0xe0, PORTCOND_NOTEQUALS, 0x80)	//Mode 1
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_6C ) )	PORT_CONDITION("DSW2", 0xe0, PORTCOND_EQUALS, 0x80)	//Mode 2
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )	PORT_CONDITION("DSW2", 0xe0, NOTEQUALS, 0x80)	//Mode 1
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_6C ) )	PORT_CONDITION("DSW2", 0xe0, EQUALS, 0x80)	//Mode 2
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )	PORT_CONDITION("DSW2", 0xe0, PORTCOND_NOTEQUALS, 0x80)	//Mode 1
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) )	PORT_CONDITION("DSW2", 0xe0, PORTCOND_EQUALS, 0x80)	//Mode 2
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )	PORT_CONDITION("DSW2", 0xe0, NOTEQUALS, 0x80)	//Mode 1
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) )	PORT_CONDITION("DSW2", 0xe0, EQUALS, 0x80)	//Mode 2
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0xe0, 0x00, "Coin Mode" )			PORT_DIPLOCATION("SW2:6,7,8")

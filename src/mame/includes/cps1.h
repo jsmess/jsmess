@@ -63,28 +63,34 @@ class cps_state : public driver_device
 {
 public:
 	cps_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_gfxram(*this, "gfxram"),
+		m_cps_a_regs(*this, "cps_a_regs"),
+		m_cps_b_regs(*this, "cps_b_regs"),
+		m_qsound_sharedram1(*this, "qsound_ram1"),
+		m_qsound_sharedram2(*this, "qsound_ram2"),
+		m_objram1(*this, "objram1"),
+		m_objram2(*this, "objram2"),
+		m_output(*this, "output") { }
 
 	/* memory pointers */
 	// cps1
-	UINT16 *     m_gfxram;
-	UINT16 *     m_cps_a_regs;
-	UINT16 *     m_cps_b_regs;
+	required_shared_ptr<UINT16> m_gfxram;
+	required_shared_ptr<UINT16> m_cps_a_regs;
+	required_shared_ptr<UINT16> m_cps_b_regs;
 	UINT16 *     m_scroll1;
 	UINT16 *     m_scroll2;
 	UINT16 *     m_scroll3;
 	UINT16 *     m_obj;
 	UINT16 *     m_other;
 	UINT16 *     m_buffered_obj;
-	UINT8  *     m_qsound_sharedram1;
-	UINT8  *     m_qsound_sharedram2;
-	size_t       m_gfxram_size;
+	optional_shared_ptr<UINT8> m_qsound_sharedram1;
+	optional_shared_ptr<UINT8> m_qsound_sharedram2;
 	// cps2
-	UINT16 *     m_objram1;
-	UINT16 *     m_objram2;
-	UINT16 *     m_output;
+	optional_shared_ptr<UINT16> m_objram1;
+	optional_shared_ptr<UINT16> m_objram2;
+	optional_shared_ptr<UINT16> m_output;
 	UINT16 *     m_cps2_buffered_obj;
-	size_t       m_output_size;
 	// game-specific
 	UINT16 *     m_gigaman2_dummyqsound_ram;
 
@@ -139,17 +145,39 @@ public:
 	device_t *m_audiocpu;
 	msm5205_device *m_msm_1;	// fcrash
 	msm5205_device *m_msm_2;	// fcrash
+	DECLARE_READ16_MEMBER(cps1_hack_dsw_r);
+	DECLARE_READ16_MEMBER(forgottn_dial_0_r);
+	DECLARE_READ16_MEMBER(forgottn_dial_1_r);
+	DECLARE_WRITE16_MEMBER(forgottn_dial_0_reset_w);
+	DECLARE_WRITE16_MEMBER(forgottn_dial_1_reset_w);
+	DECLARE_WRITE8_MEMBER(cps1_snd_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(cps1_soundlatch_w);
+	DECLARE_WRITE16_MEMBER(cps1_soundlatch2_w);
+	DECLARE_WRITE16_MEMBER(cpsq_coinctrl2_w);
+	DECLARE_READ16_MEMBER(qsound_rom_r);
+	DECLARE_READ16_MEMBER(qsound_sharedram2_r);
+	DECLARE_WRITE16_MEMBER(qsound_sharedram2_w);
+	DECLARE_WRITE8_MEMBER(qsound_banksw_w);
+	DECLARE_READ16_MEMBER(sf2mdt_r);
+	DECLARE_READ16_MEMBER(cps1_dsw_r);
+	DECLARE_WRITE16_MEMBER(cps1_coinctrl_w);
+	DECLARE_READ16_MEMBER(qsound_sharedram1_r);
+	DECLARE_WRITE16_MEMBER(qsound_sharedram1_w);
+	DECLARE_WRITE16_MEMBER(cps1_cps_a_w);
+	DECLARE_READ16_MEMBER(cps1_cps_b_r);
+	DECLARE_WRITE16_MEMBER(cps1_cps_b_w);
+	DECLARE_WRITE16_MEMBER(cps1_gfxram_w);
+	DECLARE_WRITE16_MEMBER(cps2_objram_bank_w);
+	DECLARE_READ16_MEMBER(cps2_objram1_r);
+	DECLARE_READ16_MEMBER(cps2_objram2_r);
+	DECLARE_WRITE16_MEMBER(cps2_objram1_w);
+	DECLARE_WRITE16_MEMBER(cps2_objram2_w);
 };
 
 /*----------- defined in drivers/cps1.c -----------*/
 
 ADDRESS_MAP_EXTERN( qsound_sub_map, 8 );
 
-READ16_HANDLER( qsound_sharedram1_r );
-WRITE16_HANDLER( qsound_sharedram1_w );
-
-READ16_HANDLER( cps1_dsw_r );
-WRITE16_HANDLER( cps1_coinctrl_w );
 INTERRUPT_GEN( cps1_interrupt );
 
 GFXDECODE_EXTERN( cps1 );
@@ -157,19 +185,10 @@ GFXDECODE_EXTERN( cps1 );
 
 /*----------- defined in video/cps1.c -----------*/
 
-WRITE16_HANDLER( cps1_cps_a_w );
-WRITE16_HANDLER( cps1_cps_b_w );
-READ16_HANDLER( cps1_cps_b_r );
-WRITE16_HANDLER( cps1_gfxram_w );
 
 DRIVER_INIT( cps1 );
 DRIVER_INIT( cps2_video );
 
-WRITE16_HANDLER( cps2_objram_bank_w );
-READ16_HANDLER( cps2_objram1_r );
-READ16_HANDLER( cps2_objram2_r );
-WRITE16_HANDLER( cps2_objram1_w );
-WRITE16_HANDLER( cps2_objram2_w );
 
 VIDEO_START( cps1 );
 VIDEO_START( cps2 );

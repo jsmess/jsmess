@@ -3,7 +3,6 @@
 #ifndef __PC1512__
 #define __PC1512__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
@@ -152,6 +151,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dack1_w );
 	DECLARE_WRITE_LINE_MEMBER( dack2_w );
 	DECLARE_WRITE_LINE_MEMBER( dack3_w );
+	DECLARE_INPUT_CHANGED_MEMBER( mouse_button_1_changed );
+	DECLARE_INPUT_CHANGED_MEMBER( mouse_button_2_changed );
+	DECLARE_INPUT_CHANGED_MEMBER( mouse_x_changed );
+	DECLARE_INPUT_CHANGED_MEMBER( mouse_y_changed );
 
 	// system status register
 	int m_pit1;

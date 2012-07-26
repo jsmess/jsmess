@@ -119,12 +119,12 @@ READ8_MEMBER( gamepock_state::port_c_r )
 
 	if ( m_port_a & 0x80 )
 	{
-		data &= input_port_read(machine(), "IN0");
+		data &= ioport("IN0")->read();
 	}
 
 	if ( m_port_a & 0x40 )
 	{
-		data &= input_port_read(machine(), "IN1");
+		data &= ioport("IN1")->read();
 	}
 
 	return data;

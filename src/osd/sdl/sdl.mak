@@ -196,7 +196,7 @@ SYNC_IMPLEMENTATION = tc
 endif
 
 ifeq ($(TARGETOS),macosx)
-BASE_TARGETOS = macosx
+BASE_TARGETOS = unix
 DEFS += -DSDLMAME_UNIX -DSDLMAME_MACOSX -DSDLMAME_DARWIN
 DEBUGOBJS = $(SDLOBJ)/debugosx.o
 SYNC_IMPLEMENTATION = ntc
@@ -298,7 +298,7 @@ OSDCOREOBJS = \
 	$(SDLOBJ)/sdlptty_$(BASE_TARGETOS).o	\
 	$(SDLOBJ)/sdlsocket.o	\
 	$(SDLOBJ)/sdlmisc_$(BASE_TARGETOS).o	\
-	$(SDLOBJ)/sdlos_$(BASE_TARGETOS).o	\
+	$(SDLOBJ)/sdlos_$(SDLOS_TARGETOS).o	\
 	$(SDLOBJ)/sdlsync_$(SYNC_IMPLEMENTATION).o     \
 	$(SDLOBJ)/sdlwork.o
 
@@ -340,10 +340,38 @@ INCPATH += -include $(SDLSRC)/sdlprefix.h
 # BASE_TARGETOS specific configurations
 #-------------------------------------------------
 
+SDLOS_TARGETOS = $(BASE_TARGETOS)
+
 #-------------------------------------------------
 # Unix
 #-------------------------------------------------
 ifeq ($(BASE_TARGETOS),unix)
+
+#-------------------------------------------------
+# Mac OS X
+#-------------------------------------------------
+
+ifeq ($(TARGETOS),macosx)
+OSDCOREOBJS += $(SDLOBJ)/osxutils.o
+SDLOS_TARGETOS = macosx
+
+ifndef MACOSX_USE_LIBSDL
+# Compile using framework (compile using libSDL is the exception)
+LIBS += -framework SDL -framework Cocoa -framework OpenGL -lpthread
+else
+# Compile using installed libSDL (Fink or MacPorts):
+#
+# Remove the "/SDL" component from the include path so that we can compile
+# files (header files are #include "SDL/something.h", so the extra "/SDL"
+# causes a significant problem)
+INCPATH += `sdl-config --cflags | sed 's:/SDL::'`
+CCOMFLAGS += -DNO_SDL_GLEXT
+# Remove libSDLmain, as its symbols conflict with SDLMain_tmpl.m
+LIBS += `sdl-config --libs | sed 's/-lSDLmain//'` -lpthread
+DEFS += -DMACOSX_USE_LIBSDL
+endif   # MACOSX_USE_LIBSDL
+
+else   # ifeq ($(TARGETOS),macosx)
 
 DEFS += -DSDLMAME_UNIX
 DEBUGOBJS = $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
@@ -351,6 +379,28 @@ LIBGL = -lGL
 ifeq ($(NO_X11),1)
 NO_DEBUGGER = 1
 endif
+
+INCPATH += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-D[^ ]*\)::g'`
+CCOMFLAGS += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-I[^ ]*\)::g'`
+LIBS += -lm `$(SDL_CONFIG) --libs`
+
+ifeq ($(SDL_LIBVER),sdl2)
+ifdef SDL_INSTALL_ROOT
+# FIXME: remove the directfb ref. later. This is just there for now to work around an issue with SDL1.3 and SDL2.0
+INCPATH += -I$(SDL_INSTALL_ROOT)/include/directfb
+endif
+endif
+
+INCPATH += `pkg-config --cflags fontconfig`
+LIBS += `pkg-config --libs fontconfig`
+
+ifeq ($(SDL_LIBVER),sdl2)
+LIBS += -lSDL2_ttf -lutil
+else
+LIBS += -lSDL_ttf -lutil
+endif
+
+endif # not Mac OS X
 
 ifneq (,$(findstring ppc,$(UNAME)))
 # override for preprocessor weirdness on PPC Linux
@@ -377,28 +427,6 @@ CCOMFLAGS += -m32
 LDFLAGS += -m32
 endif
 endif
-
-
-INCPATH += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-D[^ ]*\)::g'`
-CCOMFLAGS += `$(SDL_CONFIG) --cflags  | sed -e 's:/SDL[2]*::' -e 's:\(-I[^ ]*\)::g'`
-LIBS += -lm `$(SDL_CONFIG) --libs`
-
-ifeq ($(SDL_LIBVER),sdl2)
-ifdef SDL_INSTALL_ROOT
-# FIXME: remove the directfb ref. later. This is just there for now to work around an issue with SDL1.3 and SDL2.0
-INCPATH += -I$(SDL_INSTALL_ROOT)/include/directfb
-endif
-endif
-
-INCPATH += `pkg-config --cflags fontconfig`
-LIBS += `pkg-config --libs fontconfig`
-
-ifeq ($(SDL_LIBVER),sdl2)
-LIBS += -lSDL2_ttf -lutil
-else
-LIBS += -lSDL_ttf -lutil
-endif
-
 
 endif # Unix
 
@@ -431,31 +459,6 @@ LIBS += -lSDL.dll
 LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
 
 endif	# Win32
-
-#-------------------------------------------------
-# Mac OS X
-#-------------------------------------------------
-
-ifeq ($(BASE_TARGETOS),macosx)
-OSDCOREOBJS += $(SDLOBJ)/osxutils.o
-
-ifndef MACOSX_USE_LIBSDL
-# Compile using framework (compile using libSDL is the exception)
-LIBS += -framework SDL -framework Cocoa -framework OpenGL -lpthread
-else
-# Compile using installed libSDL (Fink or MacPorts):
-#
-# Remove the "/SDL" component from the include path so that we can compile
-# files (header files are #include "SDL/something.h", so the extra "/SDL"
-# causes a significant problem)
-INCPATH += `sdl-config --cflags | sed 's:/SDL::'`
-CCOMFLAGS += -DNO_SDL_GLEXT
-# Remove libSDLmain, as its symbols conflict with SDLMain_tmpl.m
-LIBS += `sdl-config --libs | sed 's/-lSDLmain//'` -lpthread
-DEFS += -DMACOSX_USE_LIBSDL
-endif
-
-endif	# Mac OS X
 
 #-------------------------------------------------
 # OS/2

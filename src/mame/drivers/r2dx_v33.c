@@ -29,9 +29,24 @@ class r2dx_v33_state : public driver_device
 {
 public:
 	r2dx_v33_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"){ }
 
-	UINT16 *m_spriteram;
+	required_shared_ptr<UINT16> m_spriteram;
+	DECLARE_WRITE16_MEMBER(rdx_bg_vram_w);
+	DECLARE_WRITE16_MEMBER(rdx_md_vram_w);
+	DECLARE_WRITE16_MEMBER(rdx_fg_vram_w);
+	DECLARE_WRITE16_MEMBER(rdx_tx_vram_w);
+	DECLARE_READ16_MEMBER(rdx_v33_unknown_r);
+	DECLARE_WRITE16_MEMBER(mcu_xval_w);
+	DECLARE_WRITE16_MEMBER(mcu_yval_w);
+	DECLARE_WRITE16_MEMBER(mcu_table_w);
+	DECLARE_WRITE16_MEMBER(mcu_table2_w);
+	DECLARE_READ16_MEMBER(nzerotea_sound_comms_r);
+	DECLARE_WRITE16_MEMBER(nzerotea_sound_comms_w);
+	DECLARE_WRITE16_MEMBER(mcu_prog_w);
+	DECLARE_WRITE16_MEMBER(mcu_prog_w2);
+	DECLARE_WRITE16_MEMBER(mcu_prog_offs_w);
 };
 
 
@@ -212,7 +227,7 @@ static SCREEN_UPDATE_IND16( rdx_v33 )
 		if(frame == 5)
 		{
 			int i,data;
-			static UINT8 *rom = space->machine().region("mainprg")->base();
+			static UINT8 *rom = space->machine().root_device().memregion("mainprg")->base();
 
 			for(i=0;i<0x800;i+=2)
 			{
@@ -254,12 +269,12 @@ WRITE16_DEVICE_HANDLER( rdx_v33_eeprom_w )
 static UINT16 mcu_prog[0x800];
 static int mcu_prog_offs = 0;
 
-WRITE16_HANDLER( mcu_prog_w )
+WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w)
 {
 	mcu_prog[mcu_prog_offs*2] = data;
 }
 
-WRITE16_HANDLER( mcu_prog_w2 )
+WRITE16_MEMBER(r2dx_v33_state::mcu_prog_w2)
 {
 	mcu_prog[mcu_prog_offs*2+1] = data;
 
@@ -268,7 +283,7 @@ WRITE16_HANDLER( mcu_prog_w2 )
     {
 		char tmp[64];
         FILE *fp;
-	    sprintf(tmp,"cop3_%s.data", space->machine().system().name);
+	    sprintf(tmp,"cop3_%s.data", machine().system().name);
 
 		fp=fopen(tmp, "w+b");
         if (fp)
@@ -280,51 +295,51 @@ WRITE16_HANDLER( mcu_prog_w2 )
 #endif
 }
 
-WRITE16_HANDLER( mcu_prog_offs_w )
+WRITE16_MEMBER(r2dx_v33_state::mcu_prog_offs_w)
 {
 	mcu_prog_offs = data;
 }
 
-static WRITE16_HANDLER( rdx_bg_vram_w )
+WRITE16_MEMBER(r2dx_v33_state::rdx_bg_vram_w)
 {
 	COMBINE_DATA(&bg_vram[offset]);
 	bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( rdx_md_vram_w )
+WRITE16_MEMBER(r2dx_v33_state::rdx_md_vram_w)
 {
 	COMBINE_DATA(&md_vram[offset]);
 	md_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( rdx_fg_vram_w )
+WRITE16_MEMBER(r2dx_v33_state::rdx_fg_vram_w)
 {
 	COMBINE_DATA(&fg_vram[offset]);
 	fg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( rdx_tx_vram_w )
+WRITE16_MEMBER(r2dx_v33_state::rdx_tx_vram_w)
 {
 	COMBINE_DATA(&tx_vram[offset]);
 	tx_tilemap->mark_tile_dirty(offset);
 }
 
-static READ16_HANDLER( rdx_v33_unknown_r )
+READ16_MEMBER(r2dx_v33_state::rdx_v33_unknown_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
 
 static UINT16 mcu_xval,mcu_yval;
 
 /* something sent to the MCU for X/Y global screen calculating ... */
-static WRITE16_HANDLER( mcu_xval_w )
+WRITE16_MEMBER(r2dx_v33_state::mcu_xval_w)
 {
 	mcu_xval = data;
 	//popmessage("%04x %04x",mcu_xval,mcu_yval);
 }
 
-static WRITE16_HANDLER( mcu_yval_w )
+WRITE16_MEMBER(r2dx_v33_state::mcu_yval_w)
 {
 	mcu_yval = data;
 	//popmessage("%04x %04x",mcu_xval,mcu_yval);
@@ -333,14 +348,14 @@ static WRITE16_HANDLER( mcu_yval_w )
 static UINT16 mcu_data[9];
 
 /* 0x400-0x407 seems some DMA hook-up, 0x420-0x427 looks like some x/y sprite calculation routine */
-static WRITE16_HANDLER( mcu_table_w )
+WRITE16_MEMBER(r2dx_v33_state::mcu_table_w)
 {
 	mcu_data[offset] = data;
 
 	//popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x",mcu_data[0/2],mcu_data[2/2],mcu_data[4/2],mcu_data[6/2],mcu_data[8/2],mcu_data[0xa/2],mcu_data[0xc/2],mcu_data[0xe/2]);
 }
 
-static WRITE16_HANDLER( mcu_table2_w )
+WRITE16_MEMBER(r2dx_v33_state::mcu_table2_w)
 {
 	mcu_data[offset+4] = data;
 
@@ -348,7 +363,7 @@ static WRITE16_HANDLER( mcu_table2_w )
 }
 
 
-static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
 
 	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
@@ -360,7 +375,7 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00434, 0x00435) AM_READ(rdx_v33_unknown_r)
 	AM_RANGE(0x00436, 0x00437) AM_READ(rdx_v33_unknown_r)
 
-	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_BASE(&seibu_crtc_regs)
+	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_BASE_LEGACY(&seibu_crtc_regs)
 	AM_RANGE(0x00650, 0x0068f) AM_RAM //???
 
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
@@ -372,60 +387,60 @@ static ADDRESS_MAP_START( rdx_v33_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x006be, 0x006bf) AM_WRITENOP // MCU program related
 	AM_RANGE(0x006d8, 0x006d9) AM_WRITE(mcu_xval_w)
 	AM_RANGE(0x006da, 0x006db) AM_WRITE(mcu_yval_w)
-//  AM_RANGE(0x006dc, 0x006dd) AM_READ(rdx_v33_unknown2_r)
-//  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
+//  AM_RANGE(0x006dc, 0x006dd) AM_READ_LEGACY(rdx_v33_unknown2_r)
+//  AM_RANGE(0x006de, 0x006df) AM_WRITE_LEGACY(mcu_unkaa_w) // mcu command related?
 
-	AM_RANGE(0x00700, 0x00701) AM_DEVWRITE("eeprom", rdx_v33_eeprom_w)
-//  AM_RANGE(0x00740, 0x00741) AM_READ(rdx_v33_unknown2_r)
+	AM_RANGE(0x00700, 0x00701) AM_DEVWRITE_LEGACY("eeprom", rdx_v33_eeprom_w)
+//  AM_RANGE(0x00740, 0x00741) AM_READ_LEGACY(rdx_v33_unknown2_r)
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x00762, 0x00763) AM_READNOP
 
-	AM_RANGE(0x00780, 0x00781) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff) // single OKI chip on this version
+	AM_RANGE(0x00780, 0x00781) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff) // single OKI chip on this version
 
 	AM_RANGE(0x00800, 0x00fff) AM_RAM // copies eeprom here?
 	AM_RANGE(0x01000, 0x0bfff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE_MEMBER(r2dx_v33_state, m_spriteram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_BASE(&bg_vram)
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_BASE(&md_vram)
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(rdx_fg_vram_w) AM_BASE(&fg_vram)
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_BASE(&tx_vram)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_BASE_LEGACY(&bg_vram)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_BASE_LEGACY(&md_vram)
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(rdx_fg_vram_w) AM_BASE_LEGACY(&fg_vram)
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_BASE_LEGACY(&tx_vram)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000 )
 ADDRESS_MAP_END
 
-static READ16_HANDLER( nzerotea_sound_comms_r )
+READ16_MEMBER(r2dx_v33_state::nzerotea_sound_comms_r)
 {
 	switch(offset+0x780)
 	{
-		case (0x788/2):	return seibu_main_word_r(space,2,0xffff);
-		case (0x78c/2):	return seibu_main_word_r(space,3,0xffff);
-		case (0x794/2): return seibu_main_word_r(space,5,0xffff);
+		case (0x788/2):	return seibu_main_word_r(&space,2,0xffff);
+		case (0x78c/2):	return seibu_main_word_r(&space,3,0xffff);
+		case (0x794/2): return seibu_main_word_r(&space,5,0xffff);
 	}
 
 	return 0xffff;
 }
 
 
-static WRITE16_HANDLER( nzerotea_sound_comms_w )
+WRITE16_MEMBER(r2dx_v33_state::nzerotea_sound_comms_w)
 {
 	switch(offset+0x780)
 	{
-		case (0x780/2): { seibu_main_word_w(space,0,data,0x00ff); break; }
-		case (0x784/2): { seibu_main_word_w(space,1,data,0x00ff); break; }
-		//case (0x790/2): { seibu_main_word_w(space,4,data,0x00ff); break; }
-		case (0x794/2): { seibu_main_word_w(space,4,data,0x00ff); break; }
-		case (0x798/2): { seibu_main_word_w(space,6,data,0x00ff); break; }
+		case (0x780/2): { seibu_main_word_w(&space,0,data,0x00ff); break; }
+		case (0x784/2): { seibu_main_word_w(&space,1,data,0x00ff); break; }
+		//case (0x790/2): { seibu_main_word_w(&space,4,data,0x00ff); break; }
+		case (0x794/2): { seibu_main_word_w(&space,4,data,0x00ff); break; }
+		case (0x798/2): { seibu_main_word_w(&space,6,data,0x00ff); break; }
 	}
 }
 
-static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16, r2dx_v33_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM //stack area
 
 	/* results from cop? */
@@ -437,7 +452,7 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
 	AM_RANGE(0x00420, 0x00427) AM_WRITE(mcu_table2_w)
 
-	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_BASE(&seibu_crtc_regs)
+	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_BASE_LEGACY(&seibu_crtc_regs)
 
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
 	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
@@ -445,29 +460,29 @@ static ADDRESS_MAP_START( nzerotea_map, AS_PROGRAM, 16 )
 //  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
 //  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
 	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
-//  AM_RANGE(0x006d8, 0x006d9) AM_WRITE(bbbbll_w) // scroll?
-//  AM_RANGE(0x006dc, 0x006dd) AM_READ(nzerotea_unknown_r)
-//  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
-	//AM_RANGE(0x00700, 0x00701) AM_DEVWRITE("eeprom", rdx_v33_eeprom_w)
+//  AM_RANGE(0x006d8, 0x006d9) AM_WRITE_LEGACY(bbbbll_w) // scroll?
+//  AM_RANGE(0x006dc, 0x006dd) AM_READ_LEGACY(nzerotea_unknown_r)
+//  AM_RANGE(0x006de, 0x006df) AM_WRITE_LEGACY(mcu_unkaa_w) // mcu command related?
+	//AM_RANGE(0x00700, 0x00701) AM_DEVWRITE_LEGACY("eeprom", rdx_v33_eeprom_w)
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
-//  AM_RANGE(0x00762, 0x00763) AM_READ(nzerotea_unknown_r)
+//  AM_RANGE(0x00762, 0x00763) AM_READ_LEGACY(nzerotea_unknown_r)
 
 	AM_RANGE(0x00780, 0x0079f) AM_READWRITE(nzerotea_sound_comms_r,nzerotea_sound_comms_w)
 
 	AM_RANGE(0x00800, 0x00fff) AM_RAM
 	AM_RANGE(0x01000, 0x0bfff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE_MEMBER(r2dx_v33_state, m_spriteram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_BASE(&bg_vram)
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_BASE(&md_vram)
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(rdx_fg_vram_w) AM_BASE(&fg_vram)
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_BASE(&tx_vram)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_BASE_LEGACY(&bg_vram)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_BASE_LEGACY(&md_vram)
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(rdx_fg_vram_w) AM_BASE_LEGACY(&fg_vram)
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_BASE_LEGACY(&tx_vram)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000 )
@@ -718,20 +733,20 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT(rdx_v33)
 {
-	memory_configure_bank(machine, "bank1", 0, 0x20, machine.region("mainprg")->base(), 0x20000);
+	machine.root_device().membank("bank1")->configure_entries(0, 0x20, machine.root_device().memregion("mainprg")->base(), 0x20000);
 
 	raiden2_decrypt_sprites(machine);
 
-	memory_set_bank(machine, "bank1", 1);
+	machine.root_device().membank("bank1")->set_entry(1);
 }
 
 static DRIVER_INIT(nzerotea)
 {
-	memory_configure_bank(machine, "bank1", 0, 2, machine.region("mainprg")->base(), 0x20000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, machine.root_device().memregion("mainprg")->base(), 0x20000);
 
-	raiden2_decrypt_sprites(machine);
+	zeroteam_decrypt_sprites(machine);
 
-	memory_set_bank(machine, "bank1", 1);
+	machine.root_device().membank("bank1")->set_entry(1);
 
 }
 

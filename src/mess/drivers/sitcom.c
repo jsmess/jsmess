@@ -27,7 +27,6 @@
     scroll sideways with a message and a weblink. There are no input keys.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"

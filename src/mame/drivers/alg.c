@@ -42,6 +42,9 @@ public:
 	emu_timer *m_serial_timer;
 	UINT8 m_serial_timer_active;
 	UINT16 m_input_select;
+	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_pos_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_trigger_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_holster_r);
 };
 
 static TIMER_CALLBACK( response_timer );
@@ -58,8 +61,8 @@ static int get_lightgun_pos(screen_device &screen, int player, int *x, int *y)
 {
 	const rectangle &visarea = screen.visible_area();
 
-	int xpos = input_port_read_safe(screen.machine(), (player == 0) ? "GUN1X" : "GUN2X", 0xffffffff);
-	int ypos = input_port_read_safe(screen.machine(), (player == 0) ? "GUN1Y" : "GUN2Y", 0xffffffff);
+	int xpos = screen.machine().root_device().ioport((player == 0) ? "GUN1X" : "GUN2X")->read_safe(0xffffffff);
+	int ypos = screen.machine().root_device().ioport((player == 0) ? "GUN1Y" : "GUN2Y")->read_safe(0xffffffff);
 
 	if (xpos == -1 || ypos == -1)
 		return FALSE;
@@ -184,32 +187,29 @@ static void alg_potgo_w(running_machine &machine, UINT16 data)
 }
 
 
-static CUSTOM_INPUT( lightgun_pos_r )
+CUSTOM_INPUT_MEMBER(alg_state::lightgun_pos_r)
 {
-	alg_state *state = field.machine().driver_data<alg_state>();
 	int x = 0, y = 0;
 
 	/* get the position based on the input select */
-	get_lightgun_pos(*field.machine().primary_screen, state->m_input_select, &x, &y);
+	get_lightgun_pos(*machine().primary_screen, m_input_select, &x, &y);
 	return (y << 8) | (x >> 2);
 }
 
 
-static CUSTOM_INPUT( lightgun_trigger_r )
+CUSTOM_INPUT_MEMBER(alg_state::lightgun_trigger_r)
 {
-	alg_state *state = field.machine().driver_data<alg_state>();
 
 	/* read the trigger control based on the input select */
-	return (input_port_read(field.machine(), "TRIGGERS") >> state->m_input_select) & 1;
+	return (ioport("TRIGGERS")->read() >> m_input_select) & 1;
 }
 
 
-static CUSTOM_INPUT( lightgun_holster_r )
+CUSTOM_INPUT_MEMBER(alg_state::lightgun_holster_r)
 {
-	alg_state *state = field.machine().driver_data<alg_state>();
 
 	/* read the holster control based on the input select */
-	return (input_port_read(field.machine(), "TRIGGERS") >> (2 + state->m_input_select)) & 1;
+	return (ioport("TRIGGERS")->read() >> (2 + m_input_select)) & 1;
 }
 
 
@@ -225,7 +225,7 @@ static WRITE8_DEVICE_HANDLER( alg_cia_0_porta_w )
 	address_space *space = device->machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* switch banks as appropriate */
-	memory_set_bank(device->machine(), "bank1", data & 1);
+	device->machine().root_device().membank("bank1")->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
@@ -240,7 +240,7 @@ static WRITE8_DEVICE_HANDLER( alg_cia_0_porta_w )
 
 static READ8_DEVICE_HANDLER( alg_cia_0_porta_r )
 {
-	return input_port_read(device->machine(), "FIRE") | 0x3f;
+	return device->machine().root_device().ioport("FIRE")->read() | 0x3f;
 }
 
 
@@ -278,12 +278,12 @@ static WRITE8_DEVICE_HANDLER( alg_cia_1_porta_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map_r1, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map_r1, AS_PROGRAM, 16, alg_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(alg_state, m_chip_ram, m_chip_ram_size)
-	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE_MEMBER(alg_state, m_custom_regs)
-	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
+	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE_LEGACY(amiga_cia_r, amiga_cia_w)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")
+	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE_LEGACY(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
 
 	AM_RANGE(0xf00000, 0xf1ffff) AM_ROM AM_REGION("user2", 0)			/* Custom ROM */
@@ -291,12 +291,12 @@ static ADDRESS_MAP_START( main_map_r1, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_map_r2, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map_r2, AS_PROGRAM, 16, alg_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(alg_state, m_chip_ram, m_chip_ram_size)
-	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE_MEMBER(alg_state, m_custom_regs)
-	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
+	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE_LEGACY(amiga_cia_r, amiga_cia_w)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")
+	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE_LEGACY(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
 
 	AM_RANGE(0xf00000, 0xf3ffff) AM_ROM AM_REGION("user2", 0)			/* Custom ROM */
@@ -304,12 +304,12 @@ static ADDRESS_MAP_START( main_map_r2, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( main_map_picmatic, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map_picmatic, AS_PROGRAM, 16, alg_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(alg_state, m_chip_ram, m_chip_ram_size)
-	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE_MEMBER(alg_state, m_custom_regs)
-	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
+	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE_LEGACY(amiga_cia_r, amiga_cia_w)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(amiga_custom_r, amiga_custom_w) AM_SHARE("custom_regs")
+	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE_LEGACY(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
 
 	AM_RANGE(0xf00000, 0xf1ffff) AM_ROM AM_REGION("user2", 0)			/* Custom ROM */
@@ -326,11 +326,11 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( alg )
 	PORT_START("JOY0DAT")	/* read by Amiga core */
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(amiga_joystick_convert, "P1JOY")
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,amiga_joystick_convert, "P1JOY")
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("JOY1DAT")	/* read by Amiga core */
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(amiga_joystick_convert, "P2JOY")
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,amiga_joystick_convert, "P2JOY")
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("POTGO")		/* read by Amiga core */
@@ -341,7 +341,7 @@ static INPUT_PORTS_START( alg )
 	PORT_BIT( 0xaaff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("HVPOS")		/* read by Amiga core */
-	PORT_BIT( 0x1ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(lightgun_pos_r, NULL)
+	PORT_BIT( 0x1ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,lightgun_pos_r, NULL)
 
 	PORT_START("FIRE")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -372,13 +372,13 @@ static INPUT_PORTS_START( alg_2p )
 
 	PORT_MODIFY("POTGO")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(lightgun_trigger_r, NULL)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,lightgun_trigger_r, NULL)
 
 	PORT_MODIFY("FIRE")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("P2JOY")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(lightgun_holster_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,lightgun_holster_r, NULL)
 
 	PORT_START("GUN2X")		/* referenced by lightgun_pos_r */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
@@ -699,8 +699,8 @@ static void alg_init(running_machine &machine)
 	amiga_machine_config(machine, &alg_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
+	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
+	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
 }
 
 
@@ -713,8 +713,8 @@ static void alg_init(running_machine &machine)
 
 static DRIVER_INIT( palr1 )
 {
-	UINT32 length = machine.region("user2")->bytes();
-	UINT8 *rom = machine.region("user2")->base();
+	UINT32 length = machine.root_device().memregion("user2")->bytes();
+	UINT8 *rom = machine.root_device().memregion("user2")->base();
 	UINT8 *original = auto_alloc_array(machine, UINT8, length);
 	UINT32 srcaddr;
 
@@ -733,8 +733,8 @@ static DRIVER_INIT( palr1 )
 
 static DRIVER_INIT( palr3 )
 {
-	UINT32 length = machine.region("user2")->bytes();
-	UINT8 *rom = machine.region("user2")->base();
+	UINT32 length = machine.root_device().memregion("user2")->bytes();
+	UINT8 *rom = machine.root_device().memregion("user2")->base();
 	UINT8 *original = auto_alloc_array(machine, UINT8, length);
 	UINT32 srcaddr;
 
@@ -752,8 +752,8 @@ static DRIVER_INIT( palr3 )
 
 static DRIVER_INIT( palr6 )
 {
-	UINT32 length = machine.region("user2")->bytes();
-	UINT8 *rom = machine.region("user2")->base();
+	UINT32 length = machine.root_device().memregion("user2")->bytes();
+	UINT8 *rom = machine.root_device().memregion("user2")->base();
 	UINT8 *original = auto_alloc_array(machine, UINT8, length);
 	UINT32 srcaddr;
 
@@ -774,7 +774,7 @@ static DRIVER_INIT( palr6 )
 static DRIVER_INIT( aplatoon )
 {
 	/* NOT DONE TODO FIGURE OUT THE RIGHT ORDER!!!! */
-	UINT8 *rom = machine.region("user2")->base();
+	UINT8 *rom = machine.root_device().memregion("user2")->base();
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x40000);
 	int i;
 

@@ -50,10 +50,12 @@ class cb2001_state : public driver_device
 {
 public:
 	cb2001_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram_fg(*this, "vrafg"),
+		m_vram_bg(*this, "vrabg"){ }
 
-	UINT16 *m_vram_fg;
-	UINT16* m_vram_bg;
+	required_shared_ptr<UINT16> m_vram_fg;
+	required_shared_ptr<UINT16> m_vram_bg;
 	int m_videobank;
 	int m_videomode;
 	tilemap_t *m_reel1_tilemap;
@@ -61,6 +63,9 @@ public:
 	tilemap_t *m_reel3_tilemap;
 	int m_other1;
 	int m_other2;
+	DECLARE_WRITE16_MEMBER(cb2001_vidctrl_w);
+	DECLARE_WRITE16_MEMBER(cb2001_vidctrl2_w);
+	DECLARE_WRITE16_MEMBER(cb2001_bg_w);
 };
 
 
@@ -426,28 +431,26 @@ static SCREEN_UPDATE_RGB32(cb2001)
 /* these ports sometimes get written with similar values
  - they could be hooked up wrong, or subject to change it the code
    is being executed incorrectly */
-WRITE16_HANDLER( cb2001_vidctrl_w )
+WRITE16_MEMBER(cb2001_state::cb2001_vidctrl_w)
 {
-	cb2001_state *state = space->machine().driver_data<cb2001_state>();
 	if (mem_mask&0xff00) // video control?
 	{
 		printf("cb2001_vidctrl_w %04x %04x\n", data, mem_mask);
-		state->m_videobank = (data & 0x0800)>>11;
+		m_videobank = (data & 0x0800)>>11;
 	}
 	else // something else
-		state->m_other1 = data & 0x00ff;
+		m_other1 = data & 0x00ff;
 }
 
-WRITE16_HANDLER( cb2001_vidctrl2_w )
+WRITE16_MEMBER(cb2001_state::cb2001_vidctrl2_w)
 {
-	cb2001_state *state = space->machine().driver_data<cb2001_state>();
 	if (mem_mask&0xff00) // video control?
 	{
 		printf("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask); // i think this switches to 'reels' mode
-		state->m_videomode = (data>>8) & 0x03; // which bit??
+		m_videomode = (data>>8) & 0x03; // which bit??
 	}
 	else // something else
-		state->m_other2 = data & 0x00ff;
+		m_other2 = data & 0x00ff;
 
 //      printf("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask); // bank could be here instead
 }
@@ -523,49 +526,48 @@ static VIDEO_START(cb2001)
 	state->m_reel3_tilemap->set_scroll_cols(64);
 }
 
-WRITE16_HANDLER( cb2001_bg_w )
+WRITE16_MEMBER(cb2001_state::cb2001_bg_w)
 {
-	cb2001_state *state = space->machine().driver_data<cb2001_state>();
-	COMBINE_DATA(&state->m_vram_bg[offset]);
+	COMBINE_DATA(&m_vram_bg[offset]);
 
 	// also used for the reel tilemaps in a different mode
 /*
     if (offset<0x200/2)
     {
-        state->m_reel1_tilemap->mark_tile_dirty((offset&0xff)/2);
+        m_reel1_tilemap->mark_tile_dirty((offset&0xff)/2);
     }
     else if (offset<0x400/2)
     {
-        state->m_reel2_tilemap->mark_tile_dirty((offset&0xff)/2);
+        m_reel2_tilemap->mark_tile_dirty((offset&0xff)/2);
     }
     else if (offset<0x600/2)
     {
-        state->m_reel3_tilemap->mark_tile_dirty((offset&0xff)/2);
+        m_reel3_tilemap->mark_tile_dirty((offset&0xff)/2);
     }
     else if (offset<0x800/2)
     {
     //  reel4_tilemap->mark_tile_dirty((offset&0xff)/2);
     }
 */
-	state->m_reel1_tilemap->mark_all_dirty();
-	state->m_reel2_tilemap->mark_all_dirty();
-	state->m_reel3_tilemap->mark_all_dirty();
+	m_reel1_tilemap->mark_all_dirty();
+	m_reel2_tilemap->mark_all_dirty();
+	m_reel3_tilemap->mark_all_dirty();
 
 
 }
 
-static ADDRESS_MAP_START( cb2001_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( cb2001_map, AS_PROGRAM, 16, cb2001_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	AM_RANGE(0x20000, 0x20fff) AM_RAM AM_BASE_MEMBER(cb2001_state, m_vram_fg)
-	AM_RANGE(0x21000, 0x21fff) AM_RAM_WRITE(&cb2001_bg_w) AM_BASE_MEMBER(cb2001_state, m_vram_bg)
+	AM_RANGE(0x20000, 0x20fff) AM_RAM AM_SHARE("vrafg")
+	AM_RANGE(0x21000, 0x21fff) AM_RAM_WRITE(cb2001_bg_w) AM_SHARE("vrabg")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cb2001_io, AS_IO, 16 )
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8("ppi8255_0", ppi8255_r, ppi8255_w, 0xffff)	/* Input Ports */
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE8("ppi8255_1", ppi8255_r, ppi8255_w, 0xffff)	/* DIP switches */
-	AM_RANGE(0x20, 0x21) AM_DEVREAD8("aysnd", ay8910_r, 0xff00)
-	AM_RANGE(0x22, 0x23) AM_DEVWRITE8("aysnd", ay8910_data_address_w, 0xffff)
+static ADDRESS_MAP_START( cb2001_io, AS_IO, 16, cb2001_state )
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE8_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w, 0xffff)	/* Input Ports */
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE8_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w, 0xffff)	/* DIP switches */
+	AM_RANGE(0x20, 0x21) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0xff00)
+	AM_RANGE(0x22, 0x23) AM_DEVWRITE8_LEGACY("aysnd", ay8910_data_address_w, 0xffff)
 
 	AM_RANGE(0x30, 0x31) AM_WRITE(cb2001_vidctrl_w)
 	AM_RANGE(0x32, 0x33) AM_WRITE(cb2001_vidctrl2_w)
@@ -654,28 +656,28 @@ static INPUT_PORTS_START( cb2001 )
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, "Key In Rate" ) PORT_DIPLOCATION("DSW3:1,2")	/* OK */
-	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40) /* A-Type */
-	PORT_DIPSETTING(    0x01, "1 Coin/20 Credits" )  PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
-	PORT_DIPSETTING(    0x02, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
-	PORT_DIPSETTING(    0x03, "1 Coin/100 Credits" ) PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x40)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )     PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00) /* B-Type */
-	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x02, "1 Coin/25 Credits" )  PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40) /* A-Type */
+	PORT_DIPSETTING(    0x01, "1 Coin/20 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_DIPSETTING(    0x02, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_DIPSETTING(    0x03, "1 Coin/100 Credits" ) PORT_CONDITION("DSW2",0x40,EQUALS,0x40)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )     PORT_CONDITION("DSW2",0x40,EQUALS,0x00) /* B-Type */
+	PORT_DIPSETTING(    0x01, "1 Coin/10 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_DIPSETTING(    0x02, "1 Coin/25 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
+	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )  PORT_CONDITION("DSW2",0x40,EQUALS,0x00)
 	PORT_DIPNAME( 0x0c, 0x0c, "Coin A Rate" ) PORT_DIPLOCATION("DSW3:3,4")	/* OK */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0c, "1 Coin/10 Credits" )
 	PORT_DIPNAME( 0x30, 0x30, "Coin D Rate" ) PORT_DIPLOCATION("DSW3:5,6")	/* OK */
-	PORT_DIPSETTING(    0x30, DEF_STR( 5C_1C ) )    PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x10) /* C-Type */
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x10)
-	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x10)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x10)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )    PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x00) /* D-Type */
-	PORT_DIPSETTING(    0x10, "1 Coin/10 Credits" ) PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x20, "1 Coin/25 Credits" ) PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x30, "1 Coin/50 Credits" ) PORT_CONDITION("DSW4",0x10,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x30, DEF_STR( 5C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10) /* C-Type */
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_5C ) )    PORT_CONDITION("DSW4",0x10,EQUALS,0x00) /* D-Type */
+	PORT_DIPSETTING(    0x10, "1 Coin/10 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
+	PORT_DIPSETTING(    0x20, "1 Coin/25 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
+	PORT_DIPSETTING(    0x30, "1 Coin/50 Credits" ) PORT_CONDITION("DSW4",0x10,EQUALS,0x00)
 	PORT_DIPNAME( 0xc0, 0xc0, "Coin C Rate" ) PORT_DIPLOCATION("DSW3:7,8")	/* OK */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
@@ -774,8 +776,8 @@ static PALETTE_INIT(cb2001)
 	{
 		int r,g,b;
 
-		UINT8*proms = machine.region("proms")->base();
-		int length = machine.region("proms")->bytes();
+		UINT8*proms = machine.root_device().memregion("proms")->base();
+		int length = machine.root_device().memregion("proms")->bytes();
 		UINT16 dat;
 
 		dat = (proms[0x000+i] << 8) | proms[0x200+i];

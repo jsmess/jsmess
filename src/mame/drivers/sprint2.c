@@ -50,7 +50,7 @@ static DRIVER_INIT( dominos )
 static int service_mode(running_machine &machine)
 {
 	sprint2_state *state = machine.driver_data<sprint2_state>();
-	UINT8 v = input_port_read(machine, "INB");
+	UINT8 v = state->ioport("INB")->read();
 
 	if (GAME_IS_SPRINT1)
 	{
@@ -82,7 +82,7 @@ static INTERRUPT_GEN( sprint2 )
 
 		for (i = 0; i < 2; i++)
 		{
-			signed char delta = input_port_read(device->machine(), i ? "DIAL_P2" : "DIAL_P1") - state->m_dial[i];
+			signed char delta = state->ioport(i ? "DIAL_P2" : "DIAL_P1")->read() - state->m_dial[i];
 
 			if (delta < 0)
 			{
@@ -95,7 +95,7 @@ static INTERRUPT_GEN( sprint2 )
 
 			state->m_dial[i] += delta;
 
-			switch (input_port_read(device->machine(), i ? "GEAR_P2" : "GEAR_P1") & 15)
+			switch (device->machine().root_device().ioport(i ? "GEAR_P2" : "GEAR_P1")->read() & 15)
 			{
 			case 1: state->m_gear[i] = 1; break;
 			case 2: state->m_gear[i] = 2; break;
@@ -111,110 +111,101 @@ static INTERRUPT_GEN( sprint2 )
 
 	/* interrupts and watchdog are disabled during service mode */
 
-	watchdog_enable(device->machine(), !service_mode(device->machine()));
+	device->machine().watchdog_enable(!service_mode(device->machine()));
 
 	if (!service_mode(device->machine()))
 		device_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
-static READ8_HANDLER( sprint2_wram_r )
+READ8_MEMBER(sprint2_state::sprint2_wram_r)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	return state->m_video_ram[0x380 + offset % 0x80];
+	return m_video_ram[0x380 + offset % 0x80];
 }
 
 
-static READ8_HANDLER( sprint2_dip_r )
+READ8_MEMBER(sprint2_state::sprint2_dip_r)
 {
-	return (input_port_read(space->machine(), "DSW") << (2 * ((offset & 3) ^ 3))) & 0xc0;
+	return (ioport("DSW")->read() << (2 * ((offset & 3) ^ 3))) & 0xc0;
 }
 
 
-static READ8_HANDLER( sprint2_input_A_r )
+READ8_MEMBER(sprint2_state::sprint2_input_A_r)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	UINT8 val = input_port_read(space->machine(), "INA");
+	UINT8 val = ioport("INA")->read();
 
-	if (GAME_IS_SPRINT2)
+	if (m_game == 2)// (GAME_IS_SPRINT2)
 	{
-		if (state->m_gear[0] == 1) val &= ~0x01;
-		if (state->m_gear[1] == 1) val &= ~0x02;
-		if (state->m_gear[0] == 2) val &= ~0x04;
-		if (state->m_gear[1] == 2) val &= ~0x08;
-		if (state->m_gear[0] == 3) val &= ~0x10;
-		if (state->m_gear[1] == 3) val &= ~0x20;
+		if (m_gear[0] == 1) val &= ~0x01;
+		if (m_gear[1] == 1) val &= ~0x02;
+		if (m_gear[0] == 2) val &= ~0x04;
+		if (m_gear[1] == 2) val &= ~0x08;
+		if (m_gear[0] == 3) val &= ~0x10;
+		if (m_gear[1] == 3) val &= ~0x20;
 	}
 
 	return (val << (offset ^ 7)) & 0x80;
 }
 
 
-static READ8_HANDLER( sprint2_input_B_r )
+READ8_MEMBER(sprint2_state::sprint2_input_B_r)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	UINT8 val = input_port_read(space->machine(), "INB");
+	UINT8 val = ioport("INB")->read();
 
-	if (GAME_IS_SPRINT1)
+	if (m_game == 1) // (GAME_IS_SPRINT1)
 	{
-		if (state->m_gear[0] == 1) val &= ~0x01;
-		if (state->m_gear[0] == 2) val &= ~0x02;
-		if (state->m_gear[0] == 3) val &= ~0x04;
+		if (m_gear[0] == 1) val &= ~0x01;
+		if (m_gear[0] == 2) val &= ~0x02;
+		if (m_gear[0] == 3) val &= ~0x04;
 	}
 
 	return (val << (offset ^ 7)) & 0x80;
 }
 
 
-static READ8_HANDLER( sprint2_sync_r )
+READ8_MEMBER(sprint2_state::sprint2_sync_r)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
 	UINT8 val = 0;
 
-	if (state->m_attract != 0)
+	if (m_attract != 0)
 		val |= 0x10;
 
-	if (space->machine().primary_screen->vpos() == 261)
+	if (machine().primary_screen->vpos() == 261)
 		val |= 0x20; /* VRESET */
 
-	if (space->machine().primary_screen->vpos() >= 224)
+	if (machine().primary_screen->vpos() >= 224)
 		val |= 0x40; /* VBLANK */
 
-	if (space->machine().primary_screen->vpos() >= 131)
+	if (machine().primary_screen->vpos() >= 131)
 		val |= 0x80; /* 60 Hz? */
 
 	return val;
 }
 
 
-static READ8_HANDLER( sprint2_steering1_r )
+READ8_MEMBER(sprint2_state::sprint2_steering1_r)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	return state->m_steering[0];
+	return m_steering[0];
 }
-static READ8_HANDLER( sprint2_steering2_r )
+READ8_MEMBER(sprint2_state::sprint2_steering2_r)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	return state->m_steering[1];
+	return m_steering[1];
 }
 
 
-static WRITE8_HANDLER( sprint2_steering_reset1_w )
+WRITE8_MEMBER(sprint2_state::sprint2_steering_reset1_w)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	state->m_steering[0] |= 0x80;
+	m_steering[0] |= 0x80;
 }
-static WRITE8_HANDLER( sprint2_steering_reset2_w )
+WRITE8_MEMBER(sprint2_state::sprint2_steering_reset2_w)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	state->m_steering[1] |= 0x80;
+	m_steering[1] |= 0x80;
 }
 
 
-static WRITE8_HANDLER( sprint2_wram_w )
+WRITE8_MEMBER(sprint2_state::sprint2_wram_w)
 {
-	sprint2_state *state = space->machine().driver_data<sprint2_state>();
-	state->m_video_ram[0x380 + offset % 0x80] = data;
+	m_video_ram[0x380 + offset % 0x80] = data;
 }
 
 
@@ -246,19 +237,19 @@ static WRITE8_DEVICE_HANDLER( sprint2_skid2_w )
 }
 
 
-static WRITE8_HANDLER( sprint2_lamp1_w )
+WRITE8_MEMBER(sprint2_state::sprint2_lamp1_w)
 {
-	set_led_status(space->machine(), 0, offset & 1);
+	set_led_status(machine(), 0, offset & 1);
 }
-static WRITE8_HANDLER( sprint2_lamp2_w )
+WRITE8_MEMBER(sprint2_state::sprint2_lamp2_w)
 {
-	set_led_status(space->machine(), 1, offset & 1);
+	set_led_status(machine(), 1, offset & 1);
 }
 
 
-static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8, sprint2_state )
 	AM_RANGE(0x0000, 0x03ff) AM_READWRITE(sprint2_wram_r,sprint2_wram_w)
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sprint2_video_ram_w) AM_BASE_MEMBER(sprint2_state, m_video_ram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sprint2_video_ram_w) AM_SHARE("video_ram")
 	AM_RANGE(0x0818, 0x081f) AM_READ(sprint2_input_A_r)
 	AM_RANGE(0x0828, 0x082f) AM_READ(sprint2_input_B_r)
 	AM_RANGE(0x0830, 0x0837) AM_READ(sprint2_dip_r)
@@ -266,9 +257,9 @@ static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0880, 0x08bf) AM_READ(sprint2_steering1_r)
 	AM_RANGE(0x08c0, 0x08ff) AM_READ(sprint2_steering2_r)
 	AM_RANGE(0x0c00, 0x0fff) AM_READ(sprint2_sync_r)
-	AM_RANGE(0x0c00, 0x0c0f) AM_DEVWRITE("discrete", sprint2_attract_w)
-	AM_RANGE(0x0c10, 0x0c1f) AM_DEVWRITE("discrete", sprint2_skid1_w)
-	AM_RANGE(0x0c20, 0x0c2f) AM_DEVWRITE("discrete", sprint2_skid2_w)
+	AM_RANGE(0x0c00, 0x0c0f) AM_DEVWRITE_LEGACY("discrete", sprint2_attract_w)
+	AM_RANGE(0x0c10, 0x0c1f) AM_DEVWRITE_LEGACY("discrete", sprint2_skid1_w)
+	AM_RANGE(0x0c20, 0x0c2f) AM_DEVWRITE_LEGACY("discrete", sprint2_skid2_w)
 	AM_RANGE(0x0c30, 0x0c3f) AM_WRITE(sprint2_lamp1_w)
 	AM_RANGE(0x0c40, 0x0c4f) AM_WRITE(sprint2_lamp2_w)
 	AM_RANGE(0x0c60, 0x0c6f) AM_WRITENOP /* SPARE */
@@ -277,7 +268,7 @@ static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0d80, 0x0dff) AM_WRITE(sprint2_collision_reset2_w)
 	AM_RANGE(0x0e00, 0x0e7f) AM_WRITE(sprint2_steering_reset1_w)
 	AM_RANGE(0x0e80, 0x0eff) AM_WRITE(sprint2_steering_reset2_w)
-	AM_RANGE(0x0f00, 0x0f7f) AM_DEVWRITE("discrete", sprint2_noise_reset_w)
+	AM_RANGE(0x0f00, 0x0f7f) AM_DEVWRITE_LEGACY("discrete", sprint2_noise_reset_w)
 	AM_RANGE(0x1000, 0x13ff) AM_READ(sprint2_collision1_r)
 	AM_RANGE(0x1400, 0x17ff) AM_READ(sprint2_collision2_r)
 	AM_RANGE(0x1800, 0x1800) AM_READNOP  /* debugger ROM location? */
@@ -505,7 +496,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( sprint2, sprint2_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz / 16)
 	MCFG_CPU_PROGRAM_MAP(sprint2_map)
 	MCFG_CPU_VBLANK_INT("screen", sprint2)
 	MCFG_WATCHDOG_VBLANK_INIT(8)
@@ -659,7 +650,7 @@ ROM_START( dominos )
 ROM_END
 
 
-GAME( 1978, sprint1,  0,       sprint1, sprint1, sprint1, ROT0, "Atari", "Sprint 1", 0 )
-GAME( 1976, sprint2,  sprint1, sprint2, sprint2, sprint2, ROT0, "Atari", "Sprint 2 (set 1)", 0 )
-GAME( 1976, sprint2a, sprint1, sprint2, sprint2, sprint2, ROT0, "Atari", "Sprint 2 (set 2)", 0 )
+GAME( 1978, sprint1,  0,       sprint1, sprint1, sprint1, ROT0, "Atari (Kee Games)", "Sprint 1", 0 )
+GAME( 1976, sprint2,  sprint1, sprint2, sprint2, sprint2, ROT0, "Atari (Kee Games)", "Sprint 2 (set 1)", 0 )
+GAME( 1976, sprint2a, sprint1, sprint2, sprint2, sprint2, ROT0, "Atari (Kee Games)", "Sprint 2 (set 2)", 0 )
 GAME( 1977, dominos,  0,       dominos, dominos, dominos, ROT0, "Atari", "Dominos", 0 )

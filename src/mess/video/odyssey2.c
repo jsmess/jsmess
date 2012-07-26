@@ -142,19 +142,18 @@ PALETTE_INIT( odyssey2 )
 	}
 }
 
-READ8_HANDLER( odyssey2_video_r )
+READ8_MEMBER(odyssey2_state::odyssey2_video_r)
 {
-	odyssey2_state *state = space->machine().driver_data<odyssey2_state>();
     UINT8 data = 0;
 
     switch (offset)
     {
         case 0xa1:
-			data = state->m_control_status;
-			state->m_iff = 0;
-			cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
-			state->m_control_status &= ~ 0x08;
-			if ( space->machine().primary_screen->hpos() < I824X_START_ACTIVE_SCAN || space->machine().primary_screen->hpos() > I824X_END_ACTIVE_SCAN )
+			data = m_control_status;
+			m_iff = 0;
+			cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+			m_control_status &= ~ 0x08;
+			if ( machine().primary_screen->hpos() < I824X_START_ACTIVE_SCAN || machine().primary_screen->hpos() > I824X_END_ACTIVE_SCAN )
 			{
 				data |= 1;
 			}
@@ -162,90 +161,87 @@ READ8_HANDLER( odyssey2_video_r )
             break;
 
         case 0xa2:
-			data = state->m_collision_status;
-			state->m_collision_status = 0;
+			data = m_collision_status;
+			m_collision_status = 0;
 
             break;
 
         case 0xa4:
 
-            if ((state->m_o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
-                state->m_y_beam_pos = space->machine().primary_screen->vpos() - state->m_start_vpos;
+            if ((m_o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
+                m_y_beam_pos = machine().primary_screen->vpos() - m_start_vpos;
 
-            data = state->m_y_beam_pos;
+            data = m_y_beam_pos;
 
             break;
 
 
         case 0xa5:
 
-            if ((state->m_o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
+            if ((m_o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
 			{
-                state->m_x_beam_pos = space->machine().primary_screen->hpos();
-				if ( state->m_x_beam_pos < I824X_START_ACTIVE_SCAN )
+                m_x_beam_pos = machine().primary_screen->hpos();
+				if ( m_x_beam_pos < I824X_START_ACTIVE_SCAN )
 				{
-					state->m_x_beam_pos = state->m_x_beam_pos - I824X_START_ACTIVE_SCAN + I824X_LINE_CLOCKS;
+					m_x_beam_pos = m_x_beam_pos - I824X_START_ACTIVE_SCAN + I824X_LINE_CLOCKS;
 				}
 				else
 				{
-					state->m_x_beam_pos = state->m_x_beam_pos - I824X_START_ACTIVE_SCAN;
+					m_x_beam_pos = m_x_beam_pos - I824X_START_ACTIVE_SCAN;
 				}
 			}
 
-            data = state->m_x_beam_pos;
+            data = m_x_beam_pos;
 
             break;
 
         default:
-            data = state->m_o2_vdc.reg[offset];
+            data = m_o2_vdc.reg[offset];
     }
 
     return data;
 }
 
-WRITE8_HANDLER( odyssey2_video_w )
+WRITE8_MEMBER(odyssey2_state::odyssey2_video_w)
 {
-	odyssey2_state *state = space->machine().driver_data<odyssey2_state>();
 	/* Update the sound */
 	if( offset >= 0xa7 && offset <= 0xaa )
-		state->m_sh_channel->update();
+		m_sh_channel->update();
 
     if (offset == 0xa0) {
 
 
-        if (    state->m_o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY
+        if (    m_o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY
              && !(data & VDC_CONTROL_REG_STROBE_XY))
         {
             /* Toggling strobe bit, tuck away values */
-            state->m_x_beam_pos = space->machine().primary_screen->hpos();
-			if ( state->m_x_beam_pos < I824X_START_ACTIVE_SCAN )
+            m_x_beam_pos = machine().primary_screen->hpos();
+			if ( m_x_beam_pos < I824X_START_ACTIVE_SCAN )
 			{
-				state->m_x_beam_pos = state->m_x_beam_pos - I824X_START_ACTIVE_SCAN + 228;
+				m_x_beam_pos = m_x_beam_pos - I824X_START_ACTIVE_SCAN + 228;
 			}
 			else
 			{
-				state->m_x_beam_pos = state->m_x_beam_pos - I824X_START_ACTIVE_SCAN;
+				m_x_beam_pos = m_x_beam_pos - I824X_START_ACTIVE_SCAN;
 			}
 
-            state->m_y_beam_pos = space->machine().primary_screen->vpos() - state->m_start_vpos;
+            m_y_beam_pos = machine().primary_screen->vpos() - m_start_vpos;
         }
     }
 
-    state->m_o2_vdc.reg[offset] = data;
+    m_o2_vdc.reg[offset] = data;
 }
 
-WRITE8_HANDLER ( odyssey2_lum_w )
+WRITE8_MEMBER(odyssey2_state::odyssey2_lum_w)
 {
-	odyssey2_state *state = space->machine().driver_data<odyssey2_state>();
-	state->m_lum = data;
+	m_lum = data;
 }
 
-READ8_HANDLER( odyssey2_t1_r )
+READ8_MEMBER(odyssey2_state::odyssey2_t1_r)
 {
-	odyssey2_state *state = space->machine().driver_data<odyssey2_state>();
-	if ( space->machine().primary_screen->vpos() > state->m_start_vpos && space->machine().primary_screen->vpos() < state->m_start_vblank )
+	if ( machine().primary_screen->vpos() > m_start_vpos && machine().primary_screen->vpos() < m_start_vblank )
 	{
-		if ( space->machine().primary_screen->hpos() >= I824X_START_ACTIVE_SCAN && space->machine().primary_screen->hpos() < I824X_END_ACTIVE_SCAN )
+		if ( machine().primary_screen->hpos() >= I824X_START_ACTIVE_SCAN && machine().primary_screen->hpos() < I824X_END_ACTIVE_SCAN )
 		{
 			return 1;
 		}

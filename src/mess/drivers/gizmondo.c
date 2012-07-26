@@ -86,12 +86,12 @@ static UINT32 s3c2440_gpio_port_r( device_t *device, int port, UINT32 mask)
 			data = data & ~0x000000F2;
 			// keys
 			data |= 0x00F2;
-			if ((port_c & 0x01) == 0) data &= ~input_port_read( device->machine(), "PORTF-01");
-			if ((port_c & 0x02) == 0) data &= ~input_port_read( device->machine(), "PORTF-02");
-			if ((port_c & 0x04) == 0) data &= ~input_port_read( device->machine(), "PORTF-04");
-			if ((port_c & 0x08) == 0) data &= ~input_port_read( device->machine(), "PORTF-08");
-			if ((port_c & 0x10) == 0) data &= ~input_port_read( device->machine(), "PORTF-10");
-			data &= ~input_port_read( device->machine(), "PORTF");
+			if ((port_c & 0x01) == 0) data &= ~device->machine().root_device().ioport( "PORTF-01")->read();
+			if ((port_c & 0x02) == 0) data &= ~device->machine().root_device().ioport( "PORTF-02")->read();
+			if ((port_c & 0x04) == 0) data &= ~device->machine().root_device().ioport( "PORTF-04")->read();
+			if ((port_c & 0x08) == 0) data &= ~device->machine().root_device().ioport( "PORTF-08")->read();
+			if ((port_c & 0x10) == 0) data &= ~device->machine().root_device().ioport( "PORTF-10")->read();
+			data &= ~device->machine().root_device().ioport( "PORTF")->read();
 		}
 		break;
 		case S3C2440_GPIO_PORT_G :
@@ -99,7 +99,7 @@ static UINT32 s3c2440_gpio_port_r( device_t *device, int port, UINT32 mask)
 			data = data & ~0x00008001;
 			// keys
 			data = data | 0x8000;
-			data &= ~input_port_read( device->machine(), "PORTG");
+			data &= ~device->machine().root_device().ioport( "PORTG")->read();
 			// no sd card inserted
 			data = data | 0x0001;
 		}
@@ -151,13 +151,13 @@ static MACHINE_RESET( gizmondo )
     ADDRESS MAPS
 *******************************************************************************/
 
-static ADDRESS_MAP_START( gizmondo_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( gizmondo_map, AS_PROGRAM, 32, gizmondo_state )
 	AM_RANGE(0x00000000, 0x000007ff) AM_ROM
-	AM_RANGE(0x00000800, 0x00000fff) AM_DEVREADWRITE16_MODERN( "diskonchip", diskonchip_g3_device, sec_1_r, sec_1_w, 0xffffffff)
-	AM_RANGE(0x00001000, 0x000017ff) AM_DEVREADWRITE16_MODERN( "diskonchip", diskonchip_g3_device, sec_2_r, sec_2_w, 0xffffffff)
-	AM_RANGE(0x00001800, 0x00001fff) AM_DEVREADWRITE16_MODERN( "diskonchip", diskonchip_g3_device, sec_3_r, sec_3_w, 0xffffffff)
+	AM_RANGE(0x00000800, 0x00000fff) AM_DEVREADWRITE16( "diskonchip", diskonchip_g3_device, sec_1_r, sec_1_w, 0xffffffff)
+	AM_RANGE(0x00001000, 0x000017ff) AM_DEVREADWRITE16( "diskonchip", diskonchip_g3_device, sec_2_r, sec_2_w, 0xffffffff)
+	AM_RANGE(0x00001800, 0x00001fff) AM_DEVREADWRITE16( "diskonchip", diskonchip_g3_device, sec_3_r, sec_3_w, 0xffffffff)
 	AM_RANGE(0x30000000, 0x33ffffff) AM_RAM
-	AM_RANGE(0x34000000, 0x3413ffff) AM_READWRITE( gf4500_r, gf4500_w)
+	AM_RANGE(0x34000000, 0x3413ffff) AM_READWRITE_LEGACY(gf4500_r, gf4500_w)
 ADDRESS_MAP_END
 
 /*******************************************************************************

@@ -230,27 +230,37 @@ class nwktr_state : public driver_device
 {
 public:
 	nwktr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_work_ram(*this, "work_ram"){ }
 
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
-	UINT32 *m_work_ram;
+	required_shared_ptr<UINT32> m_work_ram;
 	int m_fpga_uploaded;
 	int m_lanc2_ram_r;
 	int m_lanc2_ram_w;
 	UINT8 *m_lanc2_ram;
 	UINT32 *m_sharc_dataram;
+	DECLARE_WRITE32_MEMBER(paletteram32_w);
+	DECLARE_READ32_MEMBER(sysreg_r);
+	DECLARE_WRITE32_MEMBER(sysreg_w);
+	DECLARE_READ32_MEMBER(lanc1_r);
+	DECLARE_WRITE32_MEMBER(lanc1_w);
+	DECLARE_READ32_MEMBER(lanc2_r);
+	DECLARE_WRITE32_MEMBER(lanc2_w);
+	DECLARE_READ32_MEMBER(dsp_dataram_r);
+	DECLARE_WRITE32_MEMBER(dsp_dataram_w);
 };
 
 
 
 
 
-static WRITE32_HANDLER( paletteram32_w )
+WRITE32_MEMBER(nwktr_state::paletteram32_w)
 {
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
-	data = space->machine().generic.paletteram.u32[offset];
-	palette_set_color_rgb(space->machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
+	data = m_generic_paletteram_32[offset];
+	palette_set_color_rgb(machine(), offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 static void voodoo_vblank_0(device_t *device, int param)
@@ -278,23 +288,23 @@ static SCREEN_UPDATE_RGB32( nwktr )
 
 /*****************************************************************************/
 
-static READ32_HANDLER( sysreg_r )
+READ32_MEMBER(nwktr_state::sysreg_r)
 {
-	device_t *adc12138 = space->machine().device("adc12138");
+	device_t *adc12138 = machine().device("adc12138");
 	UINT32 r = 0;
 	if (offset == 0)
 	{
 		if (ACCESSING_BITS_24_31)
 		{
-			r |= input_port_read(space->machine(), "IN0") << 24;
+			r |= ioport("IN0")->read() << 24;
 		}
 		if (ACCESSING_BITS_16_23)
 		{
-			r |= input_port_read(space->machine(), "IN1") << 16;
+			r |= ioport("IN1")->read() << 16;
 		}
 		if (ACCESSING_BITS_8_15)
 		{
-			r |= input_port_read(space->machine(), "IN2") << 8;
+			r |= ioport("IN2")->read() << 8;
 		}
 		if (ACCESSING_BITS_0_7)
 		{
@@ -305,25 +315,24 @@ static READ32_HANDLER( sysreg_r )
 	{
 		if (ACCESSING_BITS_24_31)
 		{
-			r |= input_port_read(space->machine(), "DSW") << 24;
+			r |= ioport("DSW")->read() << 24;
 		}
 	}
 	return r;
 }
 
-static WRITE32_HANDLER( sysreg_w )
+WRITE32_MEMBER(nwktr_state::sysreg_w)
 {
-	nwktr_state *state = space->machine().driver_data<nwktr_state>();
-	device_t *adc12138 = space->machine().device("adc12138");
+	device_t *adc12138 = machine().device("adc12138");
 	if( offset == 0 )
 	{
 		if (ACCESSING_BITS_24_31)
 		{
-			state->m_led_reg0 = (data >> 24) & 0xff;
+			m_led_reg0 = (data >> 24) & 0xff;
 		}
 		if (ACCESSING_BITS_16_23)
 		{
-			state->m_led_reg1 = (data >> 16) & 0xff;
+			m_led_reg1 = (data >> 16) & 0xff;
 		}
 		return;
 	}
@@ -345,11 +354,11 @@ static WRITE32_HANDLER( sysreg_w )
 		{
 			if (data & 0x80)	// CG Board 1 IRQ Ack
 			{
-				//cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
+				//cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
 			}
 			if (data & 0x40)	// CG Board 0 IRQ Ack
 			{
-				//cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+				//cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 			}
 		}
 		return;
@@ -366,16 +375,15 @@ static void lanc2_init(running_machine &machine)
 	state->m_lanc2_ram = auto_alloc_array(machine, UINT8, 0x8000);
 }
 
-static READ32_HANDLER( lanc1_r )
+READ32_MEMBER(nwktr_state::lanc1_r)
 {
-	nwktr_state *state = space->machine().driver_data<nwktr_state>();
 	switch (offset)
 	{
 		case 0x40/4:
 		{
 			UINT32 r = 0;
 
-			r |= (state->m_fpga_uploaded) ? (1 << 6) : 0;
+			r |= (m_fpga_uploaded) ? (1 << 6) : 0;
 			r |= 1 << 5;
 
 			return (r) << 24;
@@ -383,28 +391,27 @@ static READ32_HANDLER( lanc1_r )
 
 		default:
 		{
-			//printf("lanc1_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space->device()));
+			//printf("lanc1_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space.device()));
 			return 0xffffffff;
 		}
 	}
 }
 
-static WRITE32_HANDLER( lanc1_w )
+WRITE32_MEMBER(nwktr_state::lanc1_w)
 {
-	//printf("lanc1_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
+	//printf("lanc1_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space.device()));
 }
 
-static READ32_HANDLER( lanc2_r )
+READ32_MEMBER(nwktr_state::lanc2_r)
 {
-	nwktr_state *state = space->machine().driver_data<nwktr_state>();
 	UINT32 r = 0;
 
 	if (offset == 0)
 	{
 		if (ACCESSING_BITS_0_7)
 		{
-			r |= state->m_lanc2_ram[state->m_lanc2_ram_r & 0x7fff];
-			state->m_lanc2_ram_r++;
+			r |= m_lanc2_ram[m_lanc2_ram_r & 0x7fff];
+			m_lanc2_ram_r++;
 		}
 		else
 		{
@@ -420,14 +427,13 @@ static READ32_HANDLER( lanc2_r )
 		}
 	}
 
-	//printf("lanc2_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space->device()));
+	//printf("lanc2_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(&space.device()));
 
 	return r;
 }
 
-static WRITE32_HANDLER( lanc2_w )
+WRITE32_MEMBER(nwktr_state::lanc2_w)
 {
-	nwktr_state *state = space->machine().driver_data<nwktr_state>();
 	if (offset == 0)
 	{
 		if (ACCESSING_BITS_24_31)
@@ -443,37 +449,37 @@ static WRITE32_HANDLER( lanc2_w )
 					((value << 5) & 0x40) |
 					((value << 7) & 0x80);
 
-			state->m_fpga_uploaded = 1;
+			m_fpga_uploaded = 1;
 
-			//printf("lanc2_fpga_w: %02X at %08X\n", value, cpu_get_pc(&space->device()));
+			//printf("lanc2_fpga_w: %02X at %08X\n", value, cpu_get_pc(&space.device()));
 		}
 		else if (ACCESSING_BITS_0_7)
 		{
-			state->m_lanc2_ram[state->m_lanc2_ram_w & 0x7fff] = data & 0xff;
-			state->m_lanc2_ram_w++;
+			m_lanc2_ram[m_lanc2_ram_w & 0x7fff] = data & 0xff;
+			m_lanc2_ram_w++;
 		}
 		else
 		{
-			//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
+			//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space.device()));
 		}
 	}
 	if (offset == 4)
 	{
-		if (mame_stricmp(space->machine().system().name, "thrilld") == 0)
+		if (mame_stricmp(machine().system().name, "thrilld") == 0)
 		{
-			state->m_work_ram[(0x3ffed0/4) + 0] = 0x472a3731;
-			state->m_work_ram[(0x3ffed0/4) + 1] = 0x33202020;
-			state->m_work_ram[(0x3ffed0/4) + 2] = 0x2d2d2a2a;
-			state->m_work_ram[(0x3ffed0/4) + 3] = 0x2a207878;
+			m_work_ram[(0x3ffed0/4) + 0] = 0x472a3731;
+			m_work_ram[(0x3ffed0/4) + 1] = 0x33202020;
+			m_work_ram[(0x3ffed0/4) + 2] = 0x2d2d2a2a;
+			m_work_ram[(0x3ffed0/4) + 3] = 0x2a207878;
 
-			state->m_work_ram[(0x3fff40/4) + 0] = 0x47433731;
-			state->m_work_ram[(0x3fff40/4) + 1] = 0x33000000;
-			state->m_work_ram[(0x3fff40/4) + 2] = 0x19994a41;
-			state->m_work_ram[(0x3fff40/4) + 3] = 0x4100a9b1;
+			m_work_ram[(0x3fff40/4) + 0] = 0x47433731;
+			m_work_ram[(0x3fff40/4) + 1] = 0x33000000;
+			m_work_ram[(0x3fff40/4) + 2] = 0x19994a41;
+			m_work_ram[(0x3fff40/4) + 3] = 0x4100a9b1;
 		}
 	}
 
-	//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space->device()));
+	//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(&space.device()));
 }
 
 /*****************************************************************************/
@@ -488,20 +494,20 @@ static MACHINE_START( nwktr )
 	ppcdrc_add_fastram(machine.device("maincpu"), 0x00000000, 0x003fffff, FALSE, state->m_work_ram);
 }
 
-static ADDRESS_MAP_START( nwktr_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(nwktr_state, m_work_ram)		/* Work RAM */
-	AM_RANGE(0x74000000, 0x740000ff) AM_DEVREADWRITE("k001604", k001604_reg_r, k001604_reg_w)
-	AM_RANGE(0x74010000, 0x74017fff) AM_RAM_WRITE(paletteram32_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x74020000, 0x7403ffff) AM_DEVREADWRITE("k001604", k001604_tile_r, k001604_tile_w)
-	AM_RANGE(0x74040000, 0x7407ffff) AM_DEVREADWRITE("k001604", k001604_char_r, k001604_char_w)
-	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
-	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
+static ADDRESS_MAP_START( nwktr_map, AS_PROGRAM, 32, nwktr_state )
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("work_ram")		/* Work RAM */
+	AM_RANGE(0x74000000, 0x740000ff) AM_DEVREADWRITE_LEGACY("k001604", k001604_reg_r, k001604_reg_w)
+	AM_RANGE(0x74010000, 0x74017fff) AM_RAM_WRITE(paletteram32_w) AM_SHARE("paletteram")
+	AM_RANGE(0x74020000, 0x7403ffff) AM_DEVREADWRITE_LEGACY("k001604", k001604_tile_r, k001604_tile_w)
+	AM_RANGE(0x74040000, 0x7407ffff) AM_DEVREADWRITE_LEGACY("k001604", k001604_char_r, k001604_char_w)
+	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE_LEGACY(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
+	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE_LEGACY(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7d000000, 0x7d00ffff) AM_READ(sysreg_r)
 	AM_RANGE(0x7d010000, 0x7d01ffff) AM_WRITE(sysreg_w)
-	AM_RANGE(0x7d020000, 0x7d021fff) AM_DEVREADWRITE8("m48t58", timekeeper_r, timekeeper_w, 0xffffffff)	/* M48T58Y RTC/NVRAM */
-	AM_RANGE(0x7d030000, 0x7d030007) AM_DEVREAD("k056800", k056800_host_r)
-	AM_RANGE(0x7d030000, 0x7d030007) AM_DEVWRITE("k056800", k056800_host_w)
-	AM_RANGE(0x7d030008, 0x7d03000f) AM_DEVWRITE("k056800", k056800_host_w)
+	AM_RANGE(0x7d020000, 0x7d021fff) AM_DEVREADWRITE8_LEGACY("m48t58", timekeeper_r, timekeeper_w, 0xffffffff)	/* M48T58Y RTC/NVRAM */
+	AM_RANGE(0x7d030000, 0x7d030007) AM_DEVREAD_LEGACY("k056800", k056800_host_r)
+	AM_RANGE(0x7d030000, 0x7d030007) AM_DEVWRITE_LEGACY("k056800", k056800_host_w)
+	AM_RANGE(0x7d030008, 0x7d03000f) AM_DEVWRITE_LEGACY("k056800", k056800_host_w)
 	AM_RANGE(0x7d040000, 0x7d04ffff) AM_READWRITE(lanc1_r, lanc1_w)
 	AM_RANGE(0x7d050000, 0x7d05ffff) AM_READWRITE(lanc2_r, lanc2_w)
 	AM_RANGE(0x7e000000, 0x7e7fffff) AM_ROM AM_REGION("user2", 0)	/* Data ROM */
@@ -511,36 +517,34 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, nwktr_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		/* Work RAM */
-	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("rfsnd", rf5c400_r, rf5c400_w)		/* Ricoh RF5C400 */
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("k056800", k056800_sound_r, k056800_sound_w)
+	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE_LEGACY("rfsnd", rf5c400_r, rf5c400_w)		/* Ricoh RF5C400 */
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("k056800", k056800_sound_r, k056800_sound_w)
 	AM_RANGE(0x600000, 0x600001) AM_NOP
 ADDRESS_MAP_END
 
 /*****************************************************************************/
 
 
-static READ32_HANDLER( dsp_dataram_r )
+READ32_MEMBER(nwktr_state::dsp_dataram_r)
 {
-	nwktr_state *state = space->machine().driver_data<nwktr_state>();
-	return state->m_sharc_dataram[offset] & 0xffff;
+	return m_sharc_dataram[offset] & 0xffff;
 }
 
-static WRITE32_HANDLER( dsp_dataram_w )
+WRITE32_MEMBER(nwktr_state::dsp_dataram_w)
 {
-	nwktr_state *state = space->machine().driver_data<nwktr_state>();
-	state->m_sharc_dataram[offset] = data;
+	m_sharc_dataram[offset] = data;
 }
 
-static ADDRESS_MAP_START( sharc_map, AS_DATA, 32 )
-	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
+static ADDRESS_MAP_START( sharc_map, AS_DATA, 32, nwktr_state )
+	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE_LEGACY(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
 	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram_r, dsp_dataram_w)
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
-	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE("voodoo", nwk_voodoo_0_r, nwk_voodoo_0_w)
-	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
-	AM_RANGE(0x3500000, 0x35000ff) AM_READWRITE(K033906_0_r, K033906_0_w)
+	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE_LEGACY("voodoo", nwk_voodoo_0_r, nwk_voodoo_0_w)
+	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE_LEGACY(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
+	AM_RANGE(0x3500000, 0x35000ff) AM_READWRITE_LEGACY(K033906_0_r, K033906_0_w)
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank5")
 ADDRESS_MAP_END
 
@@ -621,11 +625,11 @@ static double adc12138_input_callback( device_t *device, UINT8 input )
 	int value = 0;
 	switch (input)
 	{
-		case 0:		value = input_port_read(device->machine(), "ANALOG1") - 0x800; break;
-		case 1:		value = input_port_read(device->machine(), "ANALOG2"); break;
-		case 2:		value = input_port_read(device->machine(), "ANALOG3"); break;
-		case 3:		value = input_port_read(device->machine(), "ANALOG4"); break;
-		case 4:		value = input_port_read(device->machine(), "ANALOG5"); break;
+		case 0:		value = device->machine().root_device().ioport("ANALOG1")->read() - 0x800; break;
+		case 1:		value = device->machine().root_device().ioport("ANALOG2")->read(); break;
+		case 2:		value = device->machine().root_device().ioport("ANALOG3")->read(); break;
+		case 3:		value = device->machine().root_device().ioport("ANALOG4")->read(); break;
+		case 4:		value = device->machine().root_device().ioport("ANALOG5")->read(); break;
 	}
 
 	return (double)(value) / 2047.0;
@@ -735,7 +739,7 @@ static DRIVER_INIT(nwktr)
 {
 	nwktr_state *state = machine.driver_data<nwktr_state>();
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_NWKTR);
-	set_cgboard_texture_bank(machine, 0, "bank5", machine.region("user5")->base());
+	set_cgboard_texture_bank(machine, 0, "bank5", state->memregion("user5")->base());
 
 	state->m_sharc_dataram = auto_alloc_array(machine, UINT32, 0x100000/4);
 	state->m_led_reg0 = state->m_led_reg1 = 0x7f;

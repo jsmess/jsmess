@@ -51,7 +51,6 @@
         should look like, but we DID NOT look at the source code.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
@@ -81,7 +80,7 @@ READ8_MEMBER( dolphin_state::dolphin_07_r )
 {
 	UINT8 keyin, i, data = 0xff;
 
-	keyin = input_port_read(machine(), "X0");
+	keyin = ioport("X0")->read();
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
 			if BIT(~keyin, i)
@@ -90,7 +89,7 @@ READ8_MEMBER( dolphin_state::dolphin_07_r )
 				break;
 			}
 
-	keyin = input_port_read(machine(), "X1");
+	keyin = ioport("X1")->read();
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
 			if BIT(~keyin, i)
@@ -99,7 +98,7 @@ READ8_MEMBER( dolphin_state::dolphin_07_r )
 				break;
 			}
 
-	data &= input_port_read(machine(), "X2");
+	data &= ioport("X2")->read();
 
 	return data;
 }

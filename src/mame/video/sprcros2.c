@@ -9,6 +9,7 @@ Super Cross II (JPN Ver.)
 
 PALETTE_INIT( sprcros2 )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -59,37 +60,33 @@ PALETTE_INIT( sprcros2 )
 	}
 }
 
-WRITE8_HANDLER( sprcros2_fgvideoram_w )
+WRITE8_MEMBER(sprcros2_state::sprcros2_fgvideoram_w)
 {
-	sprcros2_state *state = space->machine().driver_data<sprcros2_state>();
 
-	state->m_fgvideoram[offset] = data;
-	state->m_fgtilemap->mark_tile_dirty(offset&0x3ff);
+	m_fgvideoram[offset] = data;
+	m_fgtilemap->mark_tile_dirty(offset&0x3ff);
 }
 
-WRITE8_HANDLER( sprcros2_bgvideoram_w )
+WRITE8_MEMBER(sprcros2_state::sprcros2_bgvideoram_w)
 {
-	sprcros2_state *state = space->machine().driver_data<sprcros2_state>();
 
-	state->m_bgvideoram[offset] = data;
-	state->m_bgtilemap->mark_tile_dirty(offset&0x3ff);
+	m_bgvideoram[offset] = data;
+	m_bgtilemap->mark_tile_dirty(offset&0x3ff);
 }
 
-WRITE8_HANDLER( sprcros2_bgscrollx_w )
+WRITE8_MEMBER(sprcros2_state::sprcros2_bgscrollx_w)
 {
-	sprcros2_state *state = space->machine().driver_data<sprcros2_state>();
 
-	if(state->m_port7&0x02)
-		state->m_bgtilemap->set_scrollx(0, 0x100-data);
+	if(m_port7&0x02)
+		m_bgtilemap->set_scrollx(0, 0x100-data);
 	else
-		state->m_bgtilemap->set_scrollx(0, data);
+		m_bgtilemap->set_scrollx(0, data);
 }
 
-WRITE8_HANDLER( sprcros2_bgscrolly_w )
+WRITE8_MEMBER(sprcros2_state::sprcros2_bgscrolly_w)
 {
-	sprcros2_state *state = space->machine().driver_data<sprcros2_state>();
 
-	state->m_bgtilemap->set_scrolly(0, data);
+	m_bgtilemap->set_scrolly(0, data);
 }
 
 static TILE_GET_INFO( get_sprcros2_bgtile_info )
@@ -151,7 +148,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	sprcros2_state *state = machine.driver_data<sprcros2_state>();
 	int offs,sx,sy,color,flipx,flipy;
 
-	for (offs = state->m_spriteram_size-4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes()-4; offs >= 0; offs -= 4)
 	{
 		if (state->m_spriteram[offs])
 		{

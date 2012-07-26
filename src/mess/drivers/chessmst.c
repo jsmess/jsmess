@@ -8,7 +8,6 @@
 
 ****************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -226,7 +225,7 @@ READ8_MEMBER( chessmst_state::pio2_port_a_r )
 	}
 
 	if (m_matrix & 0x100)
-		data |= input_port_read(machine(), "BUTTONS");
+		data |= ioport("BUTTONS")->read();
 
 	return data;
 }

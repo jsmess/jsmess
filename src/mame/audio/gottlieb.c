@@ -38,7 +38,6 @@
     POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "includes/gottlieb.h"
@@ -162,8 +161,9 @@ logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,Phonem
 			}
 
 			mame_printf_debug("Votrax played '%s'\n", phonemes);
-			if (strcmp(phonemes, "[0] HEH3LOOW     AH1EH3I3YMTERI2NDAHN") == 0)	  /* Q-Bert - Hello, I am turned on */
-				m_samples->start(0, 42);
+
+			if (strcmp(phonemes, "[0] HEH3LOOW     AH1EH3I3YMTERI2NDAHN") == 0)	  /* Q-Bert & Tylz - Hello, I am turned on */
+                                m_samples->start(0, 42);
 			else if (strcmp(phonemes, "[0]BAH1EH1Y") == 0)							  /* Q-Bert - Bye, bye */
 				m_samples->start(0, 43);
 			else if (strcmp(phonemes, "[0]A2YHT LEH2FTTH") == 0)					  /* Reactor - Eight left */
@@ -785,7 +785,7 @@ WRITE8_MEMBER( gottlieb_sound_r2_device::speech_control_w )
 		}
 		else
 		{
-			device_t *ay = machine().device((data & 0x08) ? "ay1" : "ay2");
+			ay8913_device *ay = (data & 0x08) ? m_ay1 : m_ay2;
 			ay8910_address_w(ay, 0, m_psg_latch);
 			ay8910_data_w(ay, 0, m_psg_data_latch);
 		}

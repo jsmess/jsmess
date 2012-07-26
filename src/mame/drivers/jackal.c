@@ -83,78 +83,70 @@ Address          Dir Data     Description
  *
  *************************************/
 
-static READ8_HANDLER( topgunbl_rotary_r )
+READ8_MEMBER(jackal_state::topgunbl_rotary_r)
 {
-	return (1 << input_port_read_safe(space->machine(), offset ? "DIAL1" : "DIAL0", 0x00)) ^ 0xff;
+	return (1 << ioport(offset ? "DIAL1" : "DIAL0")->read_safe(0x00)) ^ 0xff;
 }
 
-static WRITE8_HANDLER( jackal_flipscreen_w )
+WRITE8_MEMBER(jackal_state::jackal_flipscreen_w)
 {
-	jackal_state *state = space->machine().driver_data<jackal_state>();
-	state->m_irq_enable = data & 0x02;
-	flip_screen_set(space->machine(), data & 0x08);
+	m_irq_enable = data & 0x02;
+	flip_screen_set(data & 0x08);
 }
 
-static READ8_HANDLER( jackal_zram_r )
+READ8_MEMBER(jackal_state::jackal_zram_r)
 {
-	jackal_state *state = space->machine().driver_data<jackal_state>();
-	return state->m_rambank[0x0020 + offset];
-}
-
-
-static READ8_HANDLER( jackal_voram_r )
-{
-	jackal_state *state = space->machine().driver_data<jackal_state>();
-	return state->m_rambank[0x2000 + offset];
+	return m_rambank[0x0020 + offset];
 }
 
 
-static READ8_HANDLER( jackal_spriteram_r )
+READ8_MEMBER(jackal_state::jackal_voram_r)
 {
-	jackal_state *state = space->machine().driver_data<jackal_state>();
-	return state->m_spritebank[0x3000 + offset];
+	return m_rambank[0x2000 + offset];
 }
 
 
-static WRITE8_HANDLER( jackal_rambank_w )
+READ8_MEMBER(jackal_state::jackal_spriteram_r)
 {
-	jackal_state *state = space->machine().driver_data<jackal_state>();
-	UINT8 *rgn = space->machine().region("master")->base();
+	return m_spritebank[0x3000 + offset];
+}
+
+
+WRITE8_MEMBER(jackal_state::jackal_rambank_w)
+{
+	UINT8 *rgn = memregion("master")->base();
 
 	if (data & 0x04)
 		popmessage("jackal_rambank_w %02x", data);
 
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
-	state->m_spritebank = &rgn[((data & 0x08) << 13)];
-	state->m_rambank = &rgn[((data & 0x10) << 12)];
-	memory_set_bank(space->machine(), "bank1", (data & 0x20) ? 1 : 0);
+	m_spritebank = &rgn[((data & 0x08) << 13)];
+	m_rambank = &rgn[((data & 0x10) << 12)];
+	membank("bank1")->set_entry((data & 0x20) ? 1 : 0);
 }
 
 
-static WRITE8_HANDLER( jackal_zram_w )
+WRITE8_MEMBER(jackal_state::jackal_zram_w)
 {
-	jackal_state *state = space->machine().driver_data<jackal_state>();
-	state->m_rambank[0x0020 + offset] = data;
+	m_rambank[0x0020 + offset] = data;
 }
 
 
-static WRITE8_HANDLER( jackal_voram_w )
+WRITE8_MEMBER(jackal_state::jackal_voram_w)
 {
-	jackal_state *state = space->machine().driver_data<jackal_state>();
 
 	if ((offset & 0xf800) == 0)
-		jackal_mark_tile_dirty(space->machine(), offset & 0x3ff);
+		jackal_mark_tile_dirty(machine(), offset & 0x3ff);
 
-	state->m_rambank[0x2000 + offset] = data;
+	m_rambank[0x2000 + offset] = data;
 }
 
 
-static WRITE8_HANDLER( jackal_spriteram_w )
+WRITE8_MEMBER(jackal_state::jackal_spriteram_w)
 {
-	jackal_state *state = space->machine().driver_data<jackal_state>();
-	state->m_spritebank[0x3000 + offset] = data;
+	m_spritebank[0x3000 + offset] = data;
 }
 
 /*************************************
@@ -163,8 +155,8 @@ static WRITE8_HANDLER( jackal_spriteram_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0003) AM_RAM AM_BASE_MEMBER(jackal_state, m_videoctrl)	// scroll + other things
+static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, jackal_state )
+	AM_RANGE(0x0000, 0x0003) AM_RAM AM_SHARE("videoctrl")	// scroll + other things
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(jackal_flipscreen_w)
 	AM_RANGE(0x0010, 0x0010) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0011, 0x0011) AM_READ_PORT("IN1")
@@ -182,9 +174,9 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_BASE_MEMBER(jackal_state, m_paletteram)	// self test only checks 0x4000-0x423f, 007327 should actually go up to 4fff
+static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, jackal_state )
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("paletteram")	// self test only checks 0x4000-0x423f, 007327 should actually go up to 4fff
 	AM_RANGE(0x6000, 0x605f) AM_RAM						// SOUND RAM (Self test check 0x6000-605f, 0x7c00-0x7fff)
 	AM_RANGE(0x6060, 0x7fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -336,11 +328,11 @@ static INTERRUPT_GEN( jackal_interrupt )
 static MACHINE_START( jackal )
 {
 	jackal_state *state = machine.driver_data<jackal_state>();
-	UINT8 *ROM = machine.region("master")->base();
+	UINT8 *ROM = state->memregion("master")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 1, &ROM[0x04000], 0x8000);
-	memory_configure_bank(machine, "bank1", 1, 1, &ROM[0x14000], 0x8000);
-	memory_set_bank(machine, "bank1", 0);
+	state->membank("bank1")->configure_entry(0, &ROM[0x04000]);
+	state->membank("bank1")->configure_entry(1, &ROM[0x14000]);
+	state->membank("bank1")->set_entry(0);
 
 	state->m_mastercpu = machine.device("master");
 	state->m_slavecpu = machine.device("slave");
@@ -351,7 +343,7 @@ static MACHINE_START( jackal )
 static MACHINE_RESET( jackal )
 {
 	jackal_state *state = machine.driver_data<jackal_state>();
-	UINT8 *rgn = machine.region("master")->base();
+	UINT8 *rgn = state->memregion("master")->base();
 
 	// HACK: running at the nominal clock rate, music stops working
 	// at the beginning of the game. This fixes it.

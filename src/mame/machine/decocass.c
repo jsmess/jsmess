@@ -61,7 +61,7 @@ WRITE8_HANDLER( decocass_sound_command_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
 	LOG(2,("CPU %s sound command -> $%02x\n", space->device().tag(), data));
-	soundlatch_w(space, 0, data);
+	state->soundlatch_byte_w(*space, 0, data);
 	state->m_sound_ack |= 0x80;
 	/* remove snd cpu data ack bit. i don't see it in the schems, but... */
 	state->m_sound_ack &= ~0x40;
@@ -70,7 +70,8 @@ WRITE8_HANDLER( decocass_sound_command_w )
 
 READ8_HANDLER( decocass_sound_data_r )
 {
-	UINT8 data = soundlatch2_r(space, 0);
+	decocass_state *state = space->machine().driver_data<decocass_state>();
+	UINT8 data = state->soundlatch2_byte_r(*space, 0);
 	LOG(2,("CPU %s sound data    <- $%02x\n", space->device().tag(), data));
 	return data;
 }
@@ -87,14 +88,14 @@ WRITE8_HANDLER( decocass_sound_data_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
 	LOG(2,("CPU %s sound data    -> $%02x\n", space->device().tag(), data));
-	soundlatch2_w(space, 0, data);
+	state->soundlatch2_byte_w(*space, 0, data);
 	state->m_sound_ack |= 0x40;
 }
 
 READ8_HANDLER( decocass_sound_command_r )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
-	UINT8 data = soundlatch_r(space, 0);
+	UINT8 data = state->soundlatch_byte_r(*space, 0);
 	LOG(4,("CPU %s sound command <- $%02x\n", space->device().tag(), data));
 	device_set_input_line(state->m_audiocpu, M6502_IRQ_LINE, CLEAR_LINE);
 	state->m_sound_ack &= ~0x80;
@@ -151,10 +152,10 @@ WRITE8_HANDLER( decocass_quadrature_decoder_reset_w )
 	decocass_state *state = space->machine().driver_data<decocass_state>();
 
 	/* just latch the analog controls here */
-	state->m_quadrature_decoder[0] = input_port_read(space->machine(), "AN0");
-	state->m_quadrature_decoder[1] = input_port_read(space->machine(), "AN1");
-	state->m_quadrature_decoder[2] = input_port_read(space->machine(), "AN2");
-	state->m_quadrature_decoder[3] = input_port_read(space->machine(), "AN3");
+	state->m_quadrature_decoder[0] = state->ioport("AN0")->read();
+	state->m_quadrature_decoder[1] = state->ioport("AN1")->read();
+	state->m_quadrature_decoder[2] = state->ioport("AN2")->read();
+	state->m_quadrature_decoder[3] = state->ioport("AN3")->read();
 }
 
 WRITE8_HANDLER( decocass_adc_w )
@@ -180,7 +181,7 @@ READ8_HANDLER( decocass_input_r )
 	switch (offset & 7)
 	{
 	case 0: case 1: case 2:
-		data = input_port_read(space->machine(), portnames[offset & 7]);
+		data = space->machine().root_device().ioport(portnames[offset & 7])->read();
 		break;
 	case 3: case 4: case 5: case 6:
 		data = state->m_quadrature_decoder[(offset & 7) - 3];
@@ -296,7 +297,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = space->machine().region("dongle")->base();
+		UINT8 *prom = space->machine().root_device().memregion("dongle")->base();
 
 		if (state->m_firsttime)
 		{
@@ -376,7 +377,7 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = space->machine().region("dongle")->base();
+		UINT8 *prom = space->machine().root_device().memregion("dongle")->base();
 
 		if (state->m_firsttime)
 		{
@@ -456,7 +457,7 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = space->machine().region("dongle")->base();
+		UINT8 *prom = space->machine().root_device().memregion("dongle")->base();
 
 		if (state->m_firsttime)
 		{
@@ -536,7 +537,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = space->machine().region("dongle")->base();
+		UINT8 *prom = space->machine().root_device().memregion("dongle")->base();
 
 		if (state->m_firsttime)
 		{
@@ -618,7 +619,7 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 	{
 		offs_t promaddr;
 		UINT8 save;
-		UINT8 *prom = space->machine().region("dongle")->base();
+		UINT8 *prom = space->machine().root_device().memregion("dongle")->base();
 
 		if (state->m_firsttime)
 		{
@@ -686,7 +687,7 @@ static READ8_HANDLER( decocass_type2_r )
 	{
 		if (1 == (offset & 1))
 		{
-			UINT8 *prom = space->machine().region("dongle")->base();
+			UINT8 *prom = state->memregion("dongle")->base();
 			data = prom[256 * state->m_type2_d2_latch + state->m_type2_promaddr];
 			LOG(3,("%10s 6502-PC: %04x decocass_type2_r(%02x): $%02x <- prom[%03x]\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, 256 * state->m_type2_d2_latch + state->m_type2_promaddr));
 		}
@@ -770,7 +771,7 @@ static READ8_HANDLER( decocass_type3_r )
 	{
 		if (1 == state->m_type3_pal_19)
 		{
-			UINT8 *prom = space->machine().region("dongle")->base();
+			UINT8 *prom = state->memregion("dongle")->base();
 			data = prom[state->m_type3_ctrs];
 			LOG(3,("%10s 6502-PC: %04x decocass_type3_r(%02x): $%02x <- prom[$%03x]\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, state->m_type3_ctrs));
 			if (++state->m_type3_ctrs == 4096)
@@ -1023,7 +1024,7 @@ static READ8_HANDLER( decocass_type4_r )
 	{
 		if (state->m_type4_latch)
 		{
-			UINT8 *prom = space->machine().region("dongle")->base();
+			UINT8 *prom = space->machine().root_device().memregion("dongle")->base();
 
 			data = prom[state->m_type4_ctrs];
 			LOG(3,("%10s 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- PROM[%04x]\n", space->machine().time().as_string(6), cpu_get_previouspc(&space->device()), offset, data, (data >= 32) ? data : '.', state->m_type4_ctrs));
@@ -1287,7 +1288,7 @@ WRITE8_HANDLER( decocass_e900_w )
 {
 	decocass_state *state = space->machine().driver_data<decocass_state>();
 	state->m_de0091_enable = data & 1;
-	memory_set_bank(space->machine(), "bank1", data & 1);
+	state->membank("bank1")->set_entry(data & 1);
 	/* Perhaps the second row of ROMs is enabled by another bit.
      * There is no way to verify this yet, so for now just look
      * at bit 0 to enable the daughter board at reads between
@@ -1647,7 +1648,7 @@ MACHINE_RESET( csdtenis )
 MACHINE_RESET( czeroize )
 {
 	decocass_state *state = machine.driver_data<decocass_state>();
-	UINT8 *mem = machine.region("dongle")->base();
+	UINT8 *mem = state->memregion("dongle")->base();
 	decocass_reset_common(machine);
 	LOG(0,("dongle type #3 (PAL)\n"));
 	state->m_dongle_r = decocass_type3_r;

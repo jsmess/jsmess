@@ -139,7 +139,7 @@ PALETTE_INIT( sega315_5378 )
 
 
 // default address map
-static ADDRESS_MAP_START( sega315_5124, AS_0, 8 )
+static ADDRESS_MAP_START( sega315_5124, AS_0, 8, sega315_5124_device )
 	AM_RANGE(0x0000, VRAM_SIZE-1) AM_RAM
 ADDRESS_MAP_END
 
@@ -1616,7 +1616,7 @@ void sega315_5124_device::device_start()
 
 	/* Allocate video RAM */
 	astring tempstring;
-	m_CRAM = machine().region_alloc(subtag(tempstring,"vdp_cram"), SEGA315_5378_CRAM_SIZE, 1, ENDIANNESS_LITTLE);
+	m_CRAM = machine().memory().region_alloc(subtag(tempstring,"vdp_cram"), SEGA315_5378_CRAM_SIZE, 1, ENDIANNESS_LITTLE);
 	m_line_buffer = auto_alloc_array(machine(), int, 256 * 5);
 
 	m_frame_timing = (m_is_pal) ? pal_192 : ntsc_192;

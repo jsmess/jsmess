@@ -112,15 +112,15 @@ template<class _Class, UINT8 (_Class::*_Function)(address_space &, offs_t, UINT8
 UINT8 devcb_stub(device_t *device, offs_t offset)
 {
 	_Class *target = downcast<_Class *>(device);
-	return (target->*_Function)(*memory_nonspecific_space(device->machine()), offset, 0xff);
+	return (target->*_Function)(*device->machine().memory().first_space(), offset, 0xff);
 }
 
 // static template for a read16 stub function that calls through a given READ16_MEMBER
 template<class _Class, UINT16 (_Class::*_Function)(address_space &, offs_t, UINT16)>
-UINT16 devcb_stub16(device_t *device, offs_t offset)
+UINT16 devcb_stub16(device_t *device, offs_t offset, UINT16 mask)
 {
 	_Class *target = downcast<_Class *>(device);
-	return (target->*_Function)(*memory_nonspecific_space(device->machine()), offset, 0xffff);
+	return (target->*_Function)(*device->machine().memory().first_space(), offset, mask);
 }
 
 // static template for a write_line stub function that calls through a given WRITE_LINE_MEMBER
@@ -136,15 +136,15 @@ template<class _Class, void (_Class::*_Function)(address_space &, offs_t, UINT8,
 void devcb_stub(device_t *device, offs_t offset, UINT8 data)
 {
 	_Class *target = downcast<_Class *>(device);
-	(target->*_Function)(*memory_nonspecific_space(device->machine()), offset, data, 0xff);
+	(target->*_Function)(*device->machine().memory().first_space(), offset, data, 0xff);
 }
 
 // static template for a write16 stub function that calls through a given WRITE16_MEMBER
 template<class _Class, void (_Class::*_Function)(address_space &, offs_t, UINT16, UINT16)>
-void devcb_stub16(device_t *device, offs_t offset, UINT16 data)
+void devcb_stub16(device_t *device, offs_t offset, UINT16 data, UINT16 mask)
 {
 	_Class *target = downcast<_Class *>(device);
-	(target->*_Function)(*memory_nonspecific_space(device->machine()), offset, data, 0xffff);
+	(target->*_Function)(*device->machine().memory().first_space(), offset, data, mask);
 }
 
 #define DEVCB_NULL								{ DEVCB_TYPE_NULL }
@@ -154,16 +154,19 @@ void devcb_stub16(device_t *device, offs_t offset, UINT16 data)
 #define DEVCB_LINE_MEMBER(cls,memb)				{ DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
 #define DEVCB_HANDLER(func)						{ DEVCB_TYPE_DEVICE, 0, "", #func, NULL, func, NULL }
 #define DEVCB_MEMBER(cls,memb)					{ DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
+#define DEVCB_MEMBER16(cls,memb)				{ DEVCB_TYPE_DEVICE, 0, "", #cls "::" #memb, NULL, &devcb_stub16<cls, &cls::memb>, NULL }
 
 // line or read/write handlers for the driver device
 #define DEVCB_DRIVER_LINE_MEMBER(cls,memb)		{ DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
 #define DEVCB_DRIVER_MEMBER(cls,memb)			{ DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
+#define DEVCB_DRIVER_MEMBER16(cls,memb)			{ DEVCB_TYPE_DEVICE, 0, ":", #cls "::" #memb, NULL, &devcb_stub16<cls, &cls::memb>, NULL }
 
 // line or read/write handlers for another device
 #define DEVCB_DEVICE_LINE(tag,func)				{ DEVCB_TYPE_DEVICE, 0, tag, #func, func, NULL, NULL }
 #define DEVCB_DEVICE_LINE_MEMBER(tag,cls,memb)	{ DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
 #define DEVCB_DEVICE_HANDLER(tag,func)			{ DEVCB_TYPE_DEVICE, 0, tag, #func, NULL, func, NULL }
 #define DEVCB_DEVICE_MEMBER(tag,cls,memb)		{ DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub<cls, &cls::memb>, NULL }
+#define DEVCB_DEVICE_MEMBER16(tag,cls,memb)		{ DEVCB_TYPE_DEVICE, 0, tag, #cls "::" #memb, NULL, &devcb_stub16<cls, &cls::memb>, NULL }
 
 // constant values
 #define DEVCB_CONSTANT(value)					{ DEVCB_TYPE_CONSTANT, value, NULL, NULL, NULL, NULL }
@@ -200,7 +203,7 @@ void devcb_stub16(device_t *device, offs_t offset, UINT16 data)
 // resolving a devcb may produce one of the following object types
 union devcb_resolved_objects
 {
-	const input_port_config *	port;
+	ioport_port *	port;
 	address_space *				space;
 	device_t *					device;
 	device_execute_interface *	execute;

@@ -139,21 +139,20 @@ static void f1dream_protection_w(address_space *space)
 	else if ((prevpc == 0x27f8) || (prevpc == 0x511a) || (prevpc == 0x5142) || (prevpc == 0x516a))
 	{
 		/* The main CPU stuffs the byte for the soundlatch into 0xfffffd.*/
-		soundlatch_w(space,2,state->m_ram16[0x3ffc/2]);
+		state->soundlatch_byte_w(*space,2,state->m_ram16[0x3ffc/2]);
 	}
 }
 
-static WRITE16_HANDLER( f1dream_control_w )
+WRITE16_MEMBER(tigeroad_state::f1dream_control_w)
 {
-	tigeroad_state *state = space->machine().driver_data<tigeroad_state>();
-	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",cpu_get_pc(&space->device()), state->m_ram16[0x3fe0/2]);
-	f1dream_protection_w(space);
+	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",cpu_get_pc(&space.device()), m_ram16[0x3fe0/2]);
+	f1dream_protection_w(&space);
 }
 
-static WRITE16_HANDLER( tigeroad_soundcmd_w )
+WRITE16_MEMBER(tigeroad_state::tigeroad_soundcmd_w)
 {
 	if (ACCESSING_BITS_8_15)
-		soundlatch_w(space,offset,data >> 8);
+		soundlatch_byte_w(space,offset,data >> 8);
 }
 
 static WRITE8_DEVICE_HANDLER( msm5205_w )
@@ -167,7 +166,7 @@ static WRITE8_DEVICE_HANDLER( msm5205_w )
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tigeroad_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xfe0d00, 0xfe1807) AM_RAM		/* still part of OBJ RAM */
@@ -175,35 +174,35 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM")
 /*  AM_RANGE(0xfe4002, 0xfe4003) AM_WRITE(tigeroad_soundcmd_w) added by init_tigeroad() */
 	AM_RANGE(0xfe4004, 0xfe4005) AM_READ_PORT("DSW")
-	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE(tigeroad_videoram_w) AM_BASE_MEMBER(tigeroad_state, m_videoram)
+	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE(tigeroad_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE(tigeroad_scroll_w)
 	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITEONLY    /* fe800e = watchdog or IRQ acknowledge */
-	AM_RANGE(0xff8200, 0xff867f) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE_MEMBER(tigeroad_state, m_ram16)
+	AM_RANGE(0xff8200, 0xff867f) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("ram16")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tigeroad_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, tigeroad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7f) AM_WRITE(soundlatch2_w)
+	AM_RANGE(0x7f, 0x7f) AM_WRITE(soundlatch2_byte_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sample_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sample_map, AS_PROGRAM, 8, tigeroad_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sample_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sample_port_map, AS_IO, 8, tigeroad_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("msm", msm5205_w)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_byte_r)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("msm", msm5205_w)
 ADDRESS_MAP_END
 
 
@@ -765,12 +764,14 @@ ROM_END
 
 static DRIVER_INIT( tigeroad )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe4002, 0xfe4003, FUNC(tigeroad_soundcmd_w));
+	tigeroad_state *state = machine.driver_data<tigeroad_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe4002, 0xfe4003, write16_delegate(FUNC(tigeroad_state::tigeroad_soundcmd_w),state));
 }
 
 static DRIVER_INIT( f1dream )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xfe4002, 0xfe4003, FUNC(f1dream_control_w));
+	tigeroad_state *state = machine.driver_data<tigeroad_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xfe4002, 0xfe4003, write16_delegate(FUNC(tigeroad_state::f1dream_control_w),state));
 }
 
 

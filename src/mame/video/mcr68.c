@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/mcr.h"
 #include "includes/mcr68.h"
 
 
@@ -70,7 +71,7 @@ VIDEO_START( mcr68 )
 VIDEO_START( zwackery )
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
-	const UINT8 *colordatabase = (const UINT8 *)machine.region("gfx3")->base();
+	const UINT8 *colordatabase = (const UINT8 *)state->memregion("gfx3")->base();
 	gfx_element *gfx0 = machine.gfx[0];
 	gfx_element *gfx2 = machine.gfx[2];
 	UINT8 *srcdata0, *dest0;
@@ -149,23 +150,23 @@ VIDEO_START( zwackery )
  *
  *************************************/
 
-WRITE16_HANDLER( mcr68_paletteram_w )
+WRITE16_MEMBER(mcr68_state::mcr68_paletteram_w)
 {
 	int newword;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	newword = space->machine().generic.paletteram.u16[offset];
-	palette_set_color_rgb(space->machine(), offset, pal3bit(newword >> 6), pal3bit(newword >> 0), pal3bit(newword >> 3));
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	newword = m_generic_paletteram_16[offset];
+	palette_set_color_rgb(machine(), offset, pal3bit(newword >> 6), pal3bit(newword >> 0), pal3bit(newword >> 3));
 }
 
 
-WRITE16_HANDLER( zwackery_paletteram_w )
+WRITE16_MEMBER(mcr68_state::zwackery_paletteram_w)
 {
 	int newword;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	newword = space->machine().generic.paletteram.u16[offset];
-	palette_set_color_rgb(space->machine(), offset, pal5bit(~newword >> 10), pal5bit(~newword >> 0), pal5bit(~newword >> 5));
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	newword = m_generic_paletteram_16[offset];
+	palette_set_color_rgb(machine(), offset, pal5bit(~newword >> 10), pal5bit(~newword >> 0), pal5bit(~newword >> 5));
 }
 
 
@@ -176,32 +177,29 @@ WRITE16_HANDLER( zwackery_paletteram_w )
  *
  *************************************/
 
-WRITE16_HANDLER( mcr68_videoram_w )
+WRITE16_MEMBER(mcr68_state::mcr68_videoram_w)
 {
-	mcr68_state *state = space->machine().driver_data<mcr68_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
-WRITE16_HANDLER( zwackery_videoram_w )
+WRITE16_MEMBER(mcr68_state::zwackery_videoram_w)
 {
-	mcr68_state *state = space->machine().driver_data<mcr68_state>();
-	UINT16 *videoram = state->m_videoram;
+	UINT16 *videoram = m_videoram;
 	COMBINE_DATA(&videoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE16_HANDLER( zwackery_spriteram_w )
+WRITE16_MEMBER(mcr68_state::zwackery_spriteram_w)
 {
-	mcr68_state *state = space->machine().driver_data<mcr68_state>();
 	/* yech -- Zwackery relies on the upper 8 bits of a spriteram read being $ff! */
 	/* to make this happen we always write $ff in the upper 8 bits */
-	COMBINE_DATA(&state->m_spriteram[offset]);
-	state->m_spriteram[offset] |= 0xff00;
+	COMBINE_DATA(&m_spriteram[offset]);
+	m_spriteram[offset] |= 0xff00;
 }
 
 
@@ -216,7 +214,7 @@ static void mcr68_update_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
 	rectangle sprite_clip = machine.primary_screen->visible_area();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram = state->m_spriteram;
 	int offs;
 
 	/* adjust for clipping */
@@ -227,12 +225,12 @@ static void mcr68_update_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 	machine.priority_bitmap.fill(1, sprite_clip);
 
 	/* loop over sprite RAM */
-	for (offs = state->m_spriteram_size / 2 - 4;offs >= 0;offs -= 4)
+	for (offs = state->m_spriteram.bytes() / 2 - 4;offs >= 0;offs -= 4)
 	{
 		int code, color, flipx, flipy, x, y, flags;
 
-		flags = LOW_BYTE(spriteram16[offs + 1]);
-		code = LOW_BYTE(spriteram16[offs + 2]) + 256 * ((flags >> 3) & 0x01) + 512 * ((flags >> 6) & 0x03);
+		flags = LOW_BYTE(spriteram[offs + 1]);
+		code = LOW_BYTE(spriteram[offs + 2]) + 256 * ((flags >> 3) & 0x01) + 512 * ((flags >> 6) & 0x03);
 
 		/* skip if zero */
 		if (code == 0)
@@ -246,8 +244,8 @@ static void mcr68_update_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 		color = ~flags & 0x03;
 		flipx = flags & 0x10;
 		flipy = flags & 0x20;
-		x = LOW_BYTE(spriteram16[offs + 3]) * 2 + state->m_sprite_xoffset;
-		y = (241 - LOW_BYTE(spriteram16[offs])) * 2;
+		x = LOW_BYTE(spriteram[offs + 3]) * 2 + state->m_sprite_xoffset;
+		y = (241 - LOW_BYTE(spriteram[offs])) * 2;
 
 		/* allow sprites to clip off the left side */
 		if (x > 0x1f0) x -= 0x200;
@@ -269,23 +267,23 @@ static void mcr68_update_sprites(running_machine &machine, bitmap_ind16 &bitmap,
 static void zwackery_update_sprites(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority)
 {
 	mcr68_state *state = machine.driver_data<mcr68_state>();
-	UINT16 *spriteram16 = state->m_spriteram;
+	UINT16 *spriteram = state->m_spriteram;
 	int offs;
 
 	machine.priority_bitmap.fill(1, cliprect);
 
 	/* loop over sprite RAM */
-	for (offs = state->m_spriteram_size / 2 - 4;offs >= 0;offs -= 4)
+	for (offs = state->m_spriteram.bytes() / 2 - 4;offs >= 0;offs -= 4)
 	{
 		int code, color, flipx, flipy, x, y, flags;
 
 		/* get the code and skip if zero */
-		code = LOW_BYTE(spriteram16[offs + 2]);
+		code = LOW_BYTE(spriteram[offs + 2]);
 		if (code == 0)
 			continue;
 
 		/* extract the flag bits and determine the color */
-		flags = LOW_BYTE(spriteram16[offs + 1]);
+		flags = LOW_BYTE(spriteram[offs + 1]);
 		color = ((~flags >> 2) & 0x0f) | ((flags & 0x02) << 3);
 
 		/* for low priority, draw everything but color 7 */
@@ -305,8 +303,8 @@ static void zwackery_update_sprites(running_machine &machine, bitmap_ind16 &bitm
 		/* determine flipping and coordinates */
 		flipx = ~flags & 0x40;
 		flipy = flags & 0x80;
-		x = (231 - LOW_BYTE(spriteram16[offs + 3])) * 2;
-		y = (241 - LOW_BYTE(spriteram16[offs])) * 2;
+		x = (231 - LOW_BYTE(spriteram[offs + 3])) * 2;
+		y = (241 - LOW_BYTE(spriteram[offs])) * 2;
 
 		if (x <= -32) x += 512;
 

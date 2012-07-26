@@ -26,13 +26,13 @@ class fcombat_state : public driver_device
 {
 public:
 	fcombat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT8 *    m_videoram;
-	UINT8 *    m_spriteram;
-	size_t     m_videoram_size;
-	size_t     m_spriteram_size;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	tilemap_t    *m_bgmap;
@@ -49,6 +49,17 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_READ8_MEMBER(fcombat_protection_r);
+	DECLARE_READ8_MEMBER(fcombat_port01_r);
+	DECLARE_WRITE8_MEMBER(e900_w);
+	DECLARE_WRITE8_MEMBER(ea00_w);
+	DECLARE_WRITE8_MEMBER(eb00_w);
+	DECLARE_WRITE8_MEMBER(ec00_w);
+	DECLARE_WRITE8_MEMBER(ed00_w);
+	DECLARE_READ8_MEMBER(e300_r);
+	DECLARE_WRITE8_MEMBER(ee00_w);
+	DECLARE_WRITE8_MEMBER(fcombat_videoreg_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 
@@ -59,4 +70,3 @@ PALETTE_INIT( fcombat );
 VIDEO_START( fcombat );
 SCREEN_UPDATE_IND16( fcombat );
 
-WRITE8_HANDLER( fcombat_videoreg_w );

@@ -30,6 +30,19 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	device_t *m_bsmt;
+	DECLARE_WRITE16_MEMBER(eeprom_control_w);
+	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_READ8_MEMBER(sound_command_r);
+	DECLARE_READ8_MEMBER(sound_status_r);
+	DECLARE_WRITE8_MEMBER(sound_control_w);
+	DECLARE_WRITE8_MEMBER(bsmt_data_w);
+	DECLARE_WRITE16_MEMBER(madmax_blitter_color_w);
+	DECLARE_WRITE16_MEMBER(madmax_blitter_xparam_w);
+	DECLARE_WRITE16_MEMBER(madmax_blitter_yparam_w);
+	DECLARE_WRITE16_MEMBER(madmax_blitter_vidparam_w);
+	DECLARE_WRITE16_MEMBER(madmax_blitter_unknown_w);
+	DECLARE_READ16_MEMBER(madmax_blitter_vidparam_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(sound_latch_state_r);
 };
 
 
@@ -44,10 +57,4 @@ PALETTE_INIT( dcheese );
 VIDEO_START( dcheese );
 SCREEN_UPDATE_IND16( dcheese );
 
-WRITE16_HANDLER( madmax_blitter_color_w );
-WRITE16_HANDLER( madmax_blitter_xparam_w );
-WRITE16_HANDLER( madmax_blitter_yparam_w );
-WRITE16_HANDLER( madmax_blitter_vidparam_w );
-WRITE16_HANDLER( madmax_blitter_unknown_w );
 
-READ16_HANDLER( madmax_blitter_vidparam_r );

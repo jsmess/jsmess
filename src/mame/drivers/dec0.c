@@ -173,7 +173,7 @@ Notes:
 
 /******************************************************************************/
 
-static WRITE16_HANDLER( dec0_control_w )
+WRITE16_MEMBER(dec0_state::dec0_control_w)
 {
 	switch (offset << 1)
 	{
@@ -188,47 +188,47 @@ static WRITE16_HANDLER( dec0_control_w )
 		case 4: /* 6502 sound cpu */
 			if (ACCESSING_BITS_0_7)
 			{
-				soundlatch_w(space, 0, data & 0xff);
-				cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+				soundlatch_byte_w(space, 0, data & 0xff);
+				cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			}
 			break;
 
 		case 6: /* Intel 8751 microcontroller - Bad Dudes, Heavy Barrel, Birdy Try only */
-			dec0_i8751_write(space->machine(), data);
+			dec0_i8751_write(machine(), data);
 			break;
 
 		case 8: /* Interrupt ack (VBL - IRQ 6) */
-			cputag_set_input_line(space->machine(), "maincpu", 6, CLEAR_LINE);
+			cputag_set_input_line(machine(), "maincpu", 6, CLEAR_LINE);
 			break;
 
 		case 0xa: /* Mix Psel(?). */
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space->device()),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space.device()),data,0x30c010+(offset<<1));
 			break;
 
 		case 0xc: /* Cblk - coin blockout.  Seems to be unused by the games */
 			break;
 
 		case 0xe: /* Reset Intel 8751? - not sure, all the games write here at startup */
-			dec0_i8751_reset(space->machine());
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space->device()),data,0x30c010+(offset<<1));
+			dec0_i8751_reset(machine());
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space.device()),data,0x30c010+(offset<<1));
 			break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space->device()),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space.device()),data,0x30c010+(offset<<1));
 			break;
 	}
 }
 
 
-static WRITE16_HANDLER( automat_control_w )
+WRITE16_MEMBER(dec0_state::automat_control_w)
 {
 	switch (offset << 1)
 	{
 		case 0xe: /* 6502 sound cpu */
 			if (ACCESSING_BITS_0_7)
 			{
-				soundlatch_w(space, 0, data & 0xff);
-				cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+				soundlatch_byte_w(space, 0, data & 0xff);
+				cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 			}
 			break;
 
@@ -240,7 +240,7 @@ static WRITE16_HANDLER( automat_control_w )
 			break;
 
 		case 0xa: /* Mix Psel(?). */
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space->device()),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space.device()),data,0x30c010+(offset<<1));
 			break;
 
 		case 0xc: /* Cblk - coin blockout.  Seems to be unused by the games */
@@ -248,20 +248,20 @@ static WRITE16_HANDLER( automat_control_w )
 #endif
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space->device()),data,0x30c010+(offset<<1));
+			logerror("CPU #0 PC %06x: warning - write %02x to unmapped memory address %06x\n",cpu_get_pc(&space.device()),data,0x30c010+(offset<<1));
 			break;
 	}
 }
 
-static WRITE16_HANDLER( slyspy_control_w )
+WRITE16_MEMBER(dec0_state::slyspy_control_w)
 {
     switch (offset << 1)
 	{
     	case 0:
 			if (ACCESSING_BITS_0_7)
 			{
-				soundlatch_w(space, 0, data & 0xff);
-				cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+				soundlatch_byte_w(space, 0, data & 0xff);
+				cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 			}
 			break;
 		case 2:
@@ -270,87 +270,87 @@ static WRITE16_HANDLER( slyspy_control_w )
     }
 }
 
-static WRITE16_HANDLER( midres_sound_w )
+WRITE16_MEMBER(dec0_state::midres_sound_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_byte_w(space, 0, data & 0xff);
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( dec0_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dec0_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("tilegen1", deco_bac06_pf_control_0_w)							/* text layer */
-	AM_RANGE(0x240010, 0x240017) AM_DEVWRITE("tilegen1", deco_bac06_pf_control_1_w)
-	AM_RANGE(0x242000, 0x24207f) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
-	AM_RANGE(0x242400, 0x2427ff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
+	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control_0_w)							/* text layer */
+	AM_RANGE(0x240010, 0x240017) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control_1_w)
+	AM_RANGE(0x242000, 0x24207f) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
+	AM_RANGE(0x242400, 0x2427ff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 	AM_RANGE(0x242800, 0x243fff) AM_RAM														/* Robocop only */
-	AM_RANGE(0x244000, 0x245fff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
+	AM_RANGE(0x244000, 0x245fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 
-	AM_RANGE(0x246000, 0x246007) AM_DEVWRITE("tilegen2", deco_bac06_pf_control_0_w)									/* first tile layer */
-	AM_RANGE(0x246010, 0x246017) AM_DEVWRITE("tilegen2", deco_bac06_pf_control_1_w)
-	AM_RANGE(0x248000, 0x24807f) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
-	AM_RANGE(0x248400, 0x2487ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
-	AM_RANGE(0x24a000, 0x24a7ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
+	AM_RANGE(0x246000, 0x246007) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control_0_w)									/* first tile layer */
+	AM_RANGE(0x246010, 0x246017) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control_1_w)
+	AM_RANGE(0x248000, 0x24807f) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
+	AM_RANGE(0x248400, 0x2487ff) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
+	AM_RANGE(0x24a000, 0x24a7ff) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 
-	AM_RANGE(0x24c000, 0x24c007) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_0_w)								/* second tile layer */
-	AM_RANGE(0x24c010, 0x24c017) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_1_w)
-	AM_RANGE(0x24c800, 0x24c87f) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
-	AM_RANGE(0x24cc00, 0x24cfff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
-	AM_RANGE(0x24d000, 0x24d7ff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
+	AM_RANGE(0x24c000, 0x24c007) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control_0_w)								/* second tile layer */
+	AM_RANGE(0x24c010, 0x24c017) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control_1_w)
+	AM_RANGE(0x24c800, 0x24c87f) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
+	AM_RANGE(0x24cc00, 0x24cfff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
+	AM_RANGE(0x24d000, 0x24d7ff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 
 	AM_RANGE(0x300000, 0x30001f) AM_READ(dec0_rotary_r)
 	AM_RANGE(0x30c000, 0x30c00b) AM_READ(dec0_controls_r)
 	AM_RANGE(0x30c010, 0x30c01f) AM_WRITE(dec0_control_w)									/* Priority, sound, etc. */
-	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(dec0_paletteram_rg_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x314000, 0x3147ff) AM_RAM_WRITE(dec0_paletteram_b_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE_MEMBER(dec0_state, m_ram)									/* Main ram */
-	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE_MEMBER(dec0_state, m_spriteram)								/* Sprites */
+	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(dec0_paletteram_rg_w) AM_SHARE("paletteram")
+	AM_RANGE(0x314000, 0x3147ff) AM_RAM_WRITE(dec0_paletteram_b_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_SHARE("ram")									/* Main ram */
+	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_SHARE("spriteram")								/* Sprites */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( robocop_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( robocop_sub_map, AS_PROGRAM, 8, dec0_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAM									/* Main ram */
-	AM_RANGE(0x1f2000, 0x1f3fff) AM_RAM AM_BASE_MEMBER(dec0_state, m_robocop_shared_ram)	/* Shared ram */
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
+	AM_RANGE(0x1f2000, 0x1f3fff) AM_RAM AM_SHARE("robocop_shared")	/* Shared ram */
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE_LEGACY(h6280_irq_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hippodrm_sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hippodrm_sub_map, AS_PROGRAM, 8, dec0_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x180000, 0x1800ff) AM_READWRITE(hippodrm_shared_r, hippodrm_shared_w)
-	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVWRITE("tilegen3", deco_bac06_pf_control0_8bit_packed_w)
-	AM_RANGE(0x1a0010, 0x1a001f) AM_DEVWRITE("tilegen3", deco_bac06_pf_control1_8bit_swap_w)
-	AM_RANGE(0x1a1000, 0x1a17ff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
+	AM_RANGE(0x1a0000, 0x1a0007) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control0_8bit_packed_w)
+	AM_RANGE(0x1a0010, 0x1a001f) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control1_8bit_swap_w)
+	AM_RANGE(0x1a1000, 0x1a17ff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_data_8bit_swap_r, deco_bac06_pf_data_8bit_swap_w)
 	AM_RANGE(0x1d0000, 0x1d00ff) AM_READWRITE(hippodrm_prot_r, hippodrm_prot_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8") /* Main ram */
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE_LEGACY(h6280_irq_status_w)
 	AM_RANGE(0x1ff402, 0x1ff403) AM_READ_PORT("VBLANK")
 ADDRESS_MAP_END
 
 
 
-READ16_HANDLER( slyspy_controls_r )
+READ16_MEMBER(dec0_state::slyspy_controls_r)
 {
 	switch (offset<<1)
 	{
 		case 0: /* Dip Switches */
-			return input_port_read(space->machine(), "DSW");
+			return ioport("DSW")->read();
 
 		case 2: /* Player 1 & Player 2 joysticks & fire buttons */
-			return input_port_read(space->machine(), "INPUTS");
+			return ioport("INPUTS")->read();
 
 		case 4: /* Credits */
-			return input_port_read(space->machine(), "SYSTEM");
+			return ioport("SYSTEM")->read();
 	}
 
 	logerror("Unknown control read at 30c000 %d\n", offset);
 	return ~0;
 }
 
-READ16_HANDLER( slyspy_protection_r )
+READ16_MEMBER(dec0_state::slyspy_protection_r)
 {
 	/* These values are for Boulderdash, I have no idea what they do in Slyspy */
 	switch (offset<<1) {
@@ -360,7 +360,7 @@ READ16_HANDLER( slyspy_protection_r )
 		case 6:		return 0x2;
 	}
 
-	logerror("%04x, Unknown protection read at 30c000 %d\n", cpu_get_pc(&space->device()), offset);
+	logerror("%04x, Unknown protection read at 30c000 %d\n", cpu_get_pc(&space.device()), offset);
 	return 0;
 }
 
@@ -398,43 +398,41 @@ READ16_HANDLER( slyspy_protection_r )
 
 */
 
-static WRITE16_HANDLER( unmapped_w )
+WRITE16_MEMBER(dec0_state::unmapped_w)
 {
 	// fall through for unmapped protection areas
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-	logerror("unmapped memory write to %04x = %04x in mode %d\n", 0x240000+offset*2, data, state->m_slyspy_state);
+	logerror("unmapped memory write to %04x = %04x in mode %d\n", 0x240000+offset*2, data, m_slyspy_state);
 }
 
 void slyspy_set_protection_map(running_machine& machine, int type);
 
-WRITE16_HANDLER( slyspy_state_w )
+WRITE16_MEMBER(dec0_state::slyspy_state_w)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-	state->m_slyspy_state=0;
-	slyspy_set_protection_map(space->machine(), state->m_slyspy_state);
+	m_slyspy_state=0;
+	slyspy_set_protection_map(machine(), m_slyspy_state);
 }
 
-READ16_HANDLER( slyspy_state_r )
+READ16_MEMBER(dec0_state::slyspy_state_r)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-	state->m_slyspy_state++;
-	state->m_slyspy_state=state->m_slyspy_state%4;
-	slyspy_set_protection_map(space->machine(), state->m_slyspy_state);
+	m_slyspy_state++;
+	m_slyspy_state=m_slyspy_state%4;
+	slyspy_set_protection_map(machine(), m_slyspy_state);
 
 	return 0; /* Value doesn't mater */
 }
 
 void slyspy_set_protection_map(running_machine& machine, int type)
 {
+	dec0_state *state = machine.driver_data<dec0_state>();
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	deco_bac06_device *tilegen1 = (deco_bac06_device*)space->machine().device<deco_bac06_device>("tilegen1");
 	deco_bac06_device *tilegen2 = (deco_bac06_device*)space->machine().device<deco_bac06_device>("tilegen2");
 
-	space->install_legacy_write_handler( 0x240000, 0x24ffff, FUNC(unmapped_w));
+	space->install_write_handler( 0x240000, 0x24ffff, write16_delegate(FUNC(dec0_state::unmapped_w),state));
 
-	space->install_legacy_write_handler( 0x24a000, 0x24a001, FUNC(slyspy_state_w));
-	space->install_legacy_read_handler( 0x244000, 0x244001, FUNC(slyspy_state_r));
+	space->install_write_handler( 0x24a000, 0x24a001, write16_delegate(FUNC(dec0_state::slyspy_state_w),state));
+	space->install_read_handler( 0x244000, 0x244001, read16_delegate(FUNC(dec0_state::slyspy_state_r),state));
 
 	switch (type)
 	{
@@ -495,174 +493,173 @@ void slyspy_set_protection_map(running_machine& machine, int type)
 
 
 
-static ADDRESS_MAP_START( slyspy_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( slyspy_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 
 	/* The location of p1 & pf2 can change in the 240000 - 24ffff region according to protection */
 
 	/* Pf3 is unaffected by protection */
-	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_0_w)
-	AM_RANGE(0x300010, 0x300017) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_1_w)
-	AM_RANGE(0x300800, 0x30087f) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
-	AM_RANGE(0x300c00, 0x300fff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
-	AM_RANGE(0x301000, 0x3017ff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
+	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control_0_w)
+	AM_RANGE(0x300010, 0x300017) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control_1_w)
+	AM_RANGE(0x300800, 0x30087f) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
+	AM_RANGE(0x300c00, 0x300fff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
+	AM_RANGE(0x301000, 0x3017ff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 
-	AM_RANGE(0x304000, 0x307fff) AM_RAM AM_BASE_MEMBER(dec0_state, m_ram)	/* Sly spy main ram */
-	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_BASE_MEMBER(dec0_state, m_spriteram)	/* Sprites */
-	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x304000, 0x307fff) AM_RAM AM_SHARE("ram")	/* Sly spy main ram */
+	AM_RANGE(0x308000, 0x3087ff) AM_RAM AM_SHARE("spriteram")	/* Sprites */
+	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x314000, 0x314003) AM_WRITE(slyspy_control_w)
 	AM_RANGE(0x314008, 0x31400f) AM_READ(slyspy_controls_r)
 	AM_RANGE(0x31c000, 0x31c00f) AM_READ(slyspy_protection_r) AM_WRITENOP
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( midres_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( midres_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE_MEMBER(dec0_state, m_ram)
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_MEMBER(dec0_state, m_spriteram)
-	AM_RANGE(0x140000, 0x1407ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x140000, 0x1407ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x160000, 0x160001) AM_WRITE(dec0_priority_w)
 	AM_RANGE(0x180000, 0x18000f) AM_READ(midres_controls_r)
 	AM_RANGE(0x180008, 0x18000f) AM_WRITENOP /* ?? watchdog ?? */
 	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITE(midres_sound_w)
 
-	AM_RANGE(0x200000, 0x200007) AM_DEVWRITE("tilegen2", deco_bac06_pf_control_0_w)
-	AM_RANGE(0x200010, 0x200017) AM_DEVWRITE("tilegen2", deco_bac06_pf_control_1_w)
-	AM_RANGE(0x220000, 0x2207ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
-	AM_RANGE(0x220800, 0x220fff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_r, deco_bac06_pf_data_w)	/* mirror address used in end sequence */
-	AM_RANGE(0x240000, 0x24007f) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
-	AM_RANGE(0x240400, 0x2407ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
+	AM_RANGE(0x200000, 0x200007) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control_0_w)
+	AM_RANGE(0x200010, 0x200017) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control_1_w)
+	AM_RANGE(0x220000, 0x2207ff) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
+	AM_RANGE(0x220800, 0x220fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_data_r, deco_bac06_pf_data_w)	/* mirror address used in end sequence */
+	AM_RANGE(0x240000, 0x24007f) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
+	AM_RANGE(0x240400, 0x2407ff) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 
-	AM_RANGE(0x280000, 0x280007) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_0_w)
-	AM_RANGE(0x280010, 0x280017) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_1_w)
-	AM_RANGE(0x2a0000, 0x2a07ff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
-	AM_RANGE(0x2c0000, 0x2c007f) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
-	AM_RANGE(0x2c0400, 0x2c07ff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
+	AM_RANGE(0x280000, 0x280007) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control_0_w)
+	AM_RANGE(0x280010, 0x280017) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control_1_w)
+	AM_RANGE(0x2a0000, 0x2a07ff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
+	AM_RANGE(0x2c0000, 0x2c007f) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
+	AM_RANGE(0x2c0400, 0x2c07ff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 
-	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE("tilegen1", deco_bac06_pf_control_0_w)
-	AM_RANGE(0x300010, 0x300017) AM_DEVWRITE("tilegen1", deco_bac06_pf_control_1_w)
-	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
-	AM_RANGE(0x340000, 0x34007f) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
-	AM_RANGE(0x340400, 0x3407ff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
+	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control_0_w)
+	AM_RANGE(0x300010, 0x300017) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control_1_w)
+	AM_RANGE(0x320000, 0x321fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
+	AM_RANGE(0x340000, 0x34007f) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
+	AM_RANGE(0x340400, 0x3407ff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 
 	AM_RANGE(0x320000, 0x321fff) AM_RAM
 ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( dec0_s_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dec0_s_map, AS_PROGRAM, 8, dec0_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
-	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3812_w)
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
-	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
+	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE_LEGACY("ym2", ym3812_w)
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x3800, 0x3800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /* Physical memory map (21 bits) */
-static ADDRESS_MAP_START( slyspy_s_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slyspy_s_map, AS_PROGRAM, 8, dec0_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x090000, 0x090001) AM_DEVWRITE("ym2", ym3812_w)
+	AM_RANGE(0x090000, 0x090001) AM_DEVWRITE_LEGACY("ym2", ym3812_w)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READNOP /* Protection counter */
-	AM_RANGE(0x0b0000, 0x0b0001) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0x0e0000, 0x0e0001) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x0f0000, 0x0f0001) AM_READ(soundlatch_r)
+	AM_RANGE(0x0b0000, 0x0b0001) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
+	AM_RANGE(0x0e0000, 0x0e0001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x0f0000, 0x0f0001) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE_LEGACY(h6280_irq_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( midres_s_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( midres_s_map, AS_PROGRAM, 8, dec0_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x108000, 0x108001) AM_DEVWRITE("ym2", ym3812_w)
-	AM_RANGE(0x118000, 0x118001) AM_DEVWRITE("ym1", ym2203_w)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x138000, 0x138001) AM_READ(soundlatch_r)
+	AM_RANGE(0x108000, 0x108001) AM_DEVWRITE_LEGACY("ym2", ym3812_w)
+	AM_RANGE(0x118000, 0x118001) AM_DEVWRITE_LEGACY("ym1", ym2203_w)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x138000, 0x138001) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE_LEGACY(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 
 
 
 
-static ADDRESS_MAP_START( secretab_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( secretab_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
-	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("tilegen2", deco_bac06_pf_control_0_w)
-	AM_RANGE(0x240010, 0x240017) AM_DEVWRITE("tilegen2", deco_bac06_pf_control_1_w)
-	AM_RANGE(0x246000, 0x247fff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
-//  AM_RANGE(0x240000, 0x24007f) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
-//  AM_RANGE(0x240400, 0x2407ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
+	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control_0_w)
+	AM_RANGE(0x240010, 0x240017) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control_1_w)
+	AM_RANGE(0x246000, 0x247fff) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
+//  AM_RANGE(0x240000, 0x24007f) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
+//  AM_RANGE(0x240400, 0x2407ff) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 
-//  AM_RANGE(0x200000, 0x300007) AM_DEVWRITE("tilegen1", deco_bac06_pf_control_0_w)
-//  AM_RANGE(0x300010, 0x300017) AM_DEVWRITE("tilegen1", deco_bac06_pf_control_1_w)
-	AM_RANGE(0x24e000, 0x24ffff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
-//  AM_RANGE(0x340000, 0x34007f) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
-//  AM_RANGE(0x340400, 0x3407ff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
+//  AM_RANGE(0x200000, 0x300007) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control_0_w)
+//  AM_RANGE(0x300010, 0x300017) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control_1_w)
+	AM_RANGE(0x24e000, 0x24ffff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
+//  AM_RANGE(0x340000, 0x34007f) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
+//  AM_RANGE(0x340400, 0x3407ff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 
 	AM_RANGE(0x314008, 0x31400f) AM_READ(slyspy_controls_r)
 //  AM_RANGE(0x314000, 0x314003) AM_WRITE(slyspy_control_w)
 
-	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_0_w)
-	AM_RANGE(0x300010, 0x300017) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_1_w)
-	AM_RANGE(0x300800, 0x30087f) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
-	AM_RANGE(0x300c00, 0x300fff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
-	AM_RANGE(0x301000, 0x3017ff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
-	AM_RANGE(0x301800, 0x307fff) AM_RAM AM_BASE_MEMBER(dec0_state, m_ram) /* Sly spy main ram */
-	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb08000, 0xb087ff) AM_RAM AM_BASE_MEMBER(dec0_state, m_spriteram) /* Sprites */
+	AM_RANGE(0x300000, 0x300007) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control_0_w)
+	AM_RANGE(0x300010, 0x300017) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control_1_w)
+	AM_RANGE(0x300800, 0x30087f) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
+	AM_RANGE(0x300c00, 0x300fff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
+	AM_RANGE(0x301000, 0x3017ff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
+	AM_RANGE(0x301800, 0x307fff) AM_RAM AM_SHARE("ram") /* Sly spy main ram */
+	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xb08000, 0xb087ff) AM_RAM AM_SHARE("spriteram") /* Sprites */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( automat_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( automat_map, AS_PROGRAM, 16, dec0_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 
-	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE("tilegen1", deco_bac06_pf_control_0_w)			/* text layer */
-	AM_RANGE(0x240010, 0x240017) AM_DEVWRITE("tilegen1", deco_bac06_pf_control_1_w)
-	AM_RANGE(0x242000, 0x24207f) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
-	AM_RANGE(0x242400, 0x2427ff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
+	AM_RANGE(0x240000, 0x240007) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control_0_w)			/* text layer */
+	AM_RANGE(0x240010, 0x240017) AM_DEVWRITE_LEGACY("tilegen1", deco_bac06_pf_control_1_w)
+	AM_RANGE(0x242000, 0x24207f) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
+	AM_RANGE(0x242400, 0x2427ff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
 	AM_RANGE(0x242800, 0x243fff) AM_RAM 								/* Robocop only */
-	AM_RANGE(0x244000, 0x245fff) AM_DEVREADWRITE("tilegen1", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
+	AM_RANGE(0x244000, 0x245fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 
-	AM_RANGE(0x246000, 0x246007) AM_DEVWRITE("tilegen2", deco_bac06_pf_control_0_w)			/* first tile layer */
-	AM_RANGE(0x246010, 0x246017) AM_DEVWRITE("tilegen2", deco_bac06_pf_control_1_w)
-	AM_RANGE(0x248000, 0x24807f) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
-	AM_RANGE(0x248400, 0x2487ff) AM_DEVREADWRITE("tilegen2", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
-	AM_RANGE(0x24a000, 0x24a7ff)  AM_DEVREADWRITE("tilegen2", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
+	AM_RANGE(0x246000, 0x246007) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control_0_w)			/* first tile layer */
+	AM_RANGE(0x246010, 0x246017) AM_DEVWRITE_LEGACY("tilegen2", deco_bac06_pf_control_1_w)
+	AM_RANGE(0x248000, 0x24807f) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
+	AM_RANGE(0x248400, 0x2487ff) AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
+	AM_RANGE(0x24a000, 0x24a7ff)  AM_DEVREADWRITE_LEGACY("tilegen2", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 
-	AM_RANGE(0x24c000, 0x24c007) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_0_w)			/* second tile layer */
-	AM_RANGE(0x24c010, 0x24c017) AM_DEVWRITE("tilegen3", deco_bac06_pf_control_1_w)
-	AM_RANGE(0x24c800, 0x24c87f) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
-	AM_RANGE(0x24cc00, 0x24cfff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
-	AM_RANGE(0x24d000, 0x24d7ff) AM_DEVREADWRITE("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
+	AM_RANGE(0x24c000, 0x24c007) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control_0_w)			/* second tile layer */
+	AM_RANGE(0x24c010, 0x24c017) AM_DEVWRITE_LEGACY("tilegen3", deco_bac06_pf_control_1_w)
+	AM_RANGE(0x24c800, 0x24c87f) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_colscroll_r, deco_bac06_pf_colscroll_w)
+	AM_RANGE(0x24cc00, 0x24cfff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_rowscroll_r, deco_bac06_pf_rowscroll_w)
+	AM_RANGE(0x24d000, 0x24d7ff) AM_DEVREADWRITE_LEGACY("tilegen3", deco_bac06_pf_data_r, deco_bac06_pf_data_w)
 
 	AM_RANGE(0x300000, 0x30001f) AM_READ(dec0_rotary_r)
 	AM_RANGE(0x30c000, 0x30c00b) AM_READ(dec0_controls_r)
 	AM_RANGE(0x30c000, 0x30c01f) AM_WRITE(automat_control_w)			/* Priority, sound, etc. */
-	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x310000, 0x3107ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x314000, 0x3147ff) AM_RAM
 	AM_RANGE(0x400008, 0x400009) AM_WRITE(dec0_priority_w)				// NEW
-	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_BASE_MEMBER(dec0_state, m_ram)				/* Main ram */
-	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_BASE_MEMBER(dec0_state, m_spriteram)			/* Sprites */
+	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_SHARE("ram")				/* Main ram */
+	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM AM_SHARE("spriteram")			/* Sprites */
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( automat_adpcm_w )
+WRITE8_MEMBER(dec0_state::automat_adpcm_w)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-	state->m_automat_adpcm_byte = data;
+	m_automat_adpcm_byte = data;
 }
 
-static ADDRESS_MAP_START( automat_s_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( automat_s_map, AS_PROGRAM, 8, dec0_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-//  AM_RANGE(0xc800, 0xc800) AM_WRITE(ym2203_control_port_0_w)
-//  AM_RANGE(0xc801, 0xc801) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_r)
-//  AM_RANGE(0xd000, 0xd000) AM_WRITE(ym2203_control_port_1_w)
-//  AM_RANGE(0xd001, 0xd001) AM_WRITE(ym2203_write_port_1_w)
+//  AM_RANGE(0xc800, 0xc800) AM_WRITE_LEGACY(ym2203_control_port_0_w)
+//  AM_RANGE(0xc801, 0xc801) AM_WRITE_LEGACY(ym2203_write_port_0_w)
+	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r)
+//  AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(ym2203_control_port_1_w)
+//  AM_RANGE(0xd001, 0xd001) AM_WRITE_LEGACY(ym2203_write_port_1_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(automat_adpcm_w)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, dec0_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(dec0_mcu_port_r, dec0_mcu_port_w)
 ADDRESS_MAP_END
@@ -696,7 +693,7 @@ static INPUT_PORTS_START( dec0 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dec1 )
@@ -722,7 +719,7 @@ static INPUT_PORTS_START( dec1 )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -980,7 +977,7 @@ static INPUT_PORTS_START( hippodrm )
 	PORT_DIPUNUSED_DIPLOC( 0x8000, IP_ACTIVE_LOW, "SW2:8" )	// Always OFF
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ffantasy )
@@ -1124,7 +1121,7 @@ static INPUT_PORTS_START( bouldash )
 	PORT_INCLUDE( dec1 )
 
 	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_VBLANK )		/* extremely slow palette fades with ACTIVE_HIGH */
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")		/* extremely slow palette fades with ACTIVE_HIGH */
 
 	PORT_START("DSW")
 	/* Different Coinage. Just a few combinations from manual, the rest was figured out */
@@ -3041,7 +3038,7 @@ static void dump_to_file(running_machine& machine, UINT8* ROM, int offset, int s
 
 static DRIVER_INIT( convert_robocop_gfx4_to_automat )
 {
-	UINT8* R = machine.region("gfx4")->base();
+	UINT8* R = machine.root_device().memregion("gfx4")->base();
 	int i;
 
 	for (i=0;i<0x80000;i++)
@@ -3062,10 +3059,11 @@ static DRIVER_INIT( convert_robocop_gfx4_to_automat )
 
 static DRIVER_INIT( midresb )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x00180000, 0x0018000f, FUNC(dec0_controls_r) );
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x001a0000, 0x001a000f, FUNC(dec0_rotary_r) );
+	dec0_state *state = machine.driver_data<dec0_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x00180000, 0x0018000f, read16_delegate(FUNC(dec0_state::dec0_controls_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x001a0000, 0x001a000f, read16_delegate(FUNC(dec0_state::dec0_rotary_r),state));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x00180014, 0x00180015, FUNC(midres_sound_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x00180014, 0x00180015, write16_delegate(FUNC(dec0_state::midres_sound_w),state));
 }
 
 /******************************************************************************/

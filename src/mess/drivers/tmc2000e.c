@@ -79,7 +79,7 @@ WRITE8_MEMBER( tmc2000e_state::keyboard_latch_w )
 static ADDRESS_MAP_START( tmc2000e_map, AS_PROGRAM, 8, tmc2000e_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
-	AM_RANGE(0xfc00, 0xffff) AM_WRITEONLY AM_BASE(m_colorram)
+	AM_RANGE(0xfc00, 0xffff) AM_WRITEONLY AM_SHARE("colorram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tmc2000e_io_map, AS_IO, 8, tmc2000e_state )
@@ -152,7 +152,7 @@ static CDP1864_INTERFACE( tmc2000e_cdp1864_intf )
 
 READ_LINE_MEMBER( tmc2000e_state::clear_r )
 {
-	return BIT(input_port_read(machine(), "RUN"), 0);
+	return BIT(ioport("RUN")->read(), 0);
 }
 
 READ_LINE_MEMBER( tmc2000e_state::ef2_r )
@@ -163,7 +163,7 @@ READ_LINE_MEMBER( tmc2000e_state::ef2_r )
 READ_LINE_MEMBER( tmc2000e_state::ef3_r )
 {
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~input_port_read(machine(), keynames[m_keylatch / 8]);
+	UINT8 data = ~ioport(keynames[m_keylatch / 8])->read();
 
 	return BIT(data, m_keylatch % 8);
 }
@@ -210,11 +210,8 @@ static COSMAC_INTERFACE( tmc2000e_config )
 
 void tmc2000e_state::machine_start()
 {
-	/* allocate color RAM */
-	m_colorram = auto_alloc_array(machine(), UINT8, TMC2000E_COLORRAM_SIZE);
-
 	/* register for state saving */
-	save_pointer(NAME(m_colorram), TMC2000E_COLORRAM_SIZE);
+	save_pointer(NAME(m_colorram.target()), TMC2000E_COLORRAM_SIZE);
 	save_item(NAME(m_cdp1864_efx));
 	save_item(NAME(m_keylatch));
 }

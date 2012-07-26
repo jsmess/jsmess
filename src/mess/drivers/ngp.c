@@ -94,7 +94,6 @@ the Neogeo Pocket.
 
 ******************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/tlcs900/tlcs900.h"
@@ -210,10 +209,10 @@ READ8_MEMBER( ngp_state::ngp_io_r )
 	switch( offset )
 	{
 	case 0x30:	/* Read controls */
-		data = input_port_read( machine(), "Controls" );
+		data = ioport( "Controls" )->read();
 		break;
 	case 0x31:
-		data = input_port_read( machine(), "Power" ) & 0x01;
+		data = ioport( "Power" )->read() & 0x01;
 		/* Sub-batttery OK */
 		data |= 0x02;
 		break;
@@ -532,7 +531,7 @@ WRITE8_MEMBER( ngp_state::ngp_z80_signal_main_w )
 
 static ADDRESS_MAP_START( z80_mem, AS_PROGRAM, 8, ngp_state )
 	AM_RANGE( 0x0000, 0x0FFF )	AM_RAM AM_SHARE("share1")								/* shared with tlcs900 */
-	AM_RANGE( 0x4000, 0x4001 )	AM_DEVWRITE_LEGACY( "t6w28", t6w28_w )					/* sound chip (right, left) */
+	AM_RANGE( 0x4000, 0x4001 )	AM_DEVWRITE_LEGACY("t6w28", t6w28_w )					/* sound chip (right, left) */
 	AM_RANGE( 0x8000, 0x8000 )	AM_READWRITE( ngp_z80_comm_r, ngp_z80_comm_w )	/* main-sound communication */
 	AM_RANGE( 0xc000, 0xc000 )	AM_WRITE( ngp_z80_signal_main_w )				/* signal irq to main cpu */
 ADDRESS_MAP_END
@@ -559,7 +558,7 @@ static INPUT_CHANGED( power_callback )
 	if ( state->m_io_reg[0x33] & 0x04 )
 	{
 		device_set_input_line( state->m_tlcs900, TLCS900_NMI,
-			(input_port_read(field.machine(), "Power") & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
+			(field.machine().root_device().ioport("Power")->read() & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 	}
 }
 
@@ -635,7 +634,7 @@ static SCREEN_UPDATE_IND16( ngp )
 static DEVICE_START( ngp_cart )
 {
 	ngp_state *state = device->machine().driver_data<ngp_state>();
-	UINT8 *cart = device->machine().region("cart")->base();
+	UINT8 *cart = state->memregion("cart")->base();
 
 	state->m_flash_chip[0].present = 0;
 	state->m_flash_chip[0].state = F_READ;
@@ -662,7 +661,7 @@ static DEVICE_IMAGE_LOAD( ngp_cart )
 			return IMAGE_INIT_FAIL;
 		}
 
-		if (image.fread( image.device().machine().region("cart")->base(), filesize) != filesize)
+		if (image.fread( image.device().machine().root_device().memregion("cart")->base(), filesize) != filesize)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error loading file");
 			return IMAGE_INIT_FAIL;
@@ -671,11 +670,11 @@ static DEVICE_IMAGE_LOAD( ngp_cart )
 	else
 	{
 		filesize = image.get_software_region_length("rom");
-		memcpy(image.device().machine().region("cart")->base(), image.get_software_region("rom"), filesize);
+		memcpy(image.device().machine().root_device().memregion("cart")->base(), image.get_software_region("rom"), filesize);
 	}
 
-	//printf("%2x%2x - %x - %x\n", (unsigned int) image.device().machine().region("cart")->u8(0x20), (unsigned int) image.device().machine().region("cart")->u8(0x21),
-	//        (unsigned int) image.device().machine().region("cart")->u8(0x22), (unsigned int) image.device().machine().region("cart")->u8(0x23));
+	//printf("%2x%2x - %x - %x\n", (unsigned int) image.device().machine().root_device().memregion("cart")->u8(0x20), (unsigned int) image.device().machine().root_device().memregion("cart")->u8(0x21),
+	//        (unsigned int) image.device().machine().root_device().memregion("cart")->u8(0x22), (unsigned int) image.device().machine().root_device().memregion("cart")->u8(0x23));
 	state->m_flash_chip[0].manufacturer_id = 0x98;
 	switch( filesize )
 	{

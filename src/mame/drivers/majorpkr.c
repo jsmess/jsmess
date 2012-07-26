@@ -469,10 +469,24 @@ public:
 
 	tilemap_t    *m_bg_tilemap,	*m_fg_tilemap;
 
-	UINT8 *m_videoram;
+	UINT8 m_videoram[0x1000];
 
 	required_device<okim6295_device> oki;
 
+	DECLARE_WRITE8_MEMBER(rom_bank_w);
+	DECLARE_WRITE8_MEMBER(palette_bank_w);
+	DECLARE_READ8_MEMBER(paletteram_r);
+	DECLARE_WRITE8_MEMBER(paletteram_w);
+	DECLARE_WRITE8_MEMBER(vram_bank_w);
+	DECLARE_READ8_MEMBER(vram_r);
+	DECLARE_WRITE8_MEMBER(vram_w);
+	DECLARE_WRITE8_MEMBER(vidreg_w);
+	DECLARE_READ8_MEMBER(mux_port_r);
+	DECLARE_READ8_MEMBER(mux_port2_r);
+	DECLARE_WRITE8_MEMBER(mux_sel_w);
+	DECLARE_WRITE8_MEMBER(lamps_a_w);
+	DECLARE_WRITE8_MEMBER(lamps_b_w);
+	DECLARE_WRITE8_MEMBER(pulses_w);
 };
 
 
@@ -515,9 +529,7 @@ static VIDEO_START(majorpkr)
 	state->m_fg_tilemap = tilemap_create(machine, fg_get_tile_info, tilemap_scan_rows, 16, 8, 36, 28);
 	state->m_fg_tilemap->set_transparent_pen(0);
 
-	state->machine().generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 4 * 0x800);
-
-	state->m_videoram = auto_alloc_array(machine, UINT8, 4 * 0x800); /* 2 banks in use, but the game clears 4 after boot ... */
+	state->m_generic_paletteram_8.allocate(4 * 0x800);
 }
 
 
@@ -552,74 +564,67 @@ static SCREEN_UPDATE_IND16(majorpkr)
 *         R/W Handlers        *
 ******************************/
 
-static WRITE8_HANDLER(rom_bank_w)
+WRITE8_MEMBER(majorpkr_state::rom_bank_w)
 {
-	memory_set_bank(space->machine(), "rom_bank", data & 0x3);
+	membank("rom_bank")->set_entry(data & 0x3);
 }
 
 
-static WRITE8_HANDLER(palette_bank_w)
+WRITE8_MEMBER(majorpkr_state::palette_bank_w)
 {
-	majorpkr_state *state = space->machine().driver_data<majorpkr_state>();
 
-	state->m_palette_bank=data;
+	m_palette_bank=data;
 }
 
 
-static READ8_HANDLER(paletteram_r)
+READ8_MEMBER(majorpkr_state::paletteram_r)
 {
-	majorpkr_state *state = space->machine().driver_data<majorpkr_state>();
-	return state->machine().generic.paletteram.u8[state->m_palette_bank * 0x800 + offset];
+	return m_generic_paletteram_8[m_palette_bank * 0x800 + offset];
 }
 
-static WRITE8_HANDLER(paletteram_w)
+WRITE8_MEMBER(majorpkr_state::paletteram_w)
 {
-	majorpkr_state *state = space->machine().driver_data<majorpkr_state>();
-	state->machine().generic.paletteram.u8[state->m_palette_bank * 0x800 + offset] = data;
+	m_generic_paletteram_8[m_palette_bank * 0x800 + offset] = data;
 
 	offset >>= 1;
-	int color = state->machine().generic.paletteram.u8[state->m_palette_bank * 0x800 + offset * 2] + state->machine().generic.paletteram.u8[state->m_palette_bank * 0x800 + offset * 2 + 1] * 256;
-	palette_set_color(space->machine(), offset + state->m_palette_bank * 256 * 4, MAKE_RGB(pal5bit(color >> 5), pal5bit(color >> 10), pal5bit(color)));
+	int color = m_generic_paletteram_8[m_palette_bank * 0x800 + offset * 2] + m_generic_paletteram_8[m_palette_bank * 0x800 + offset * 2 + 1] * 256;
+	palette_set_color(machine(), offset + m_palette_bank * 256 * 4, MAKE_RGB(pal5bit(color >> 5), pal5bit(color >> 10), pal5bit(color)));
 }
 
 
-static WRITE8_HANDLER(vram_bank_w)
+WRITE8_MEMBER(majorpkr_state::vram_bank_w)
 {
-	majorpkr_state *state = space->machine().driver_data<majorpkr_state>();
-	state->m_vram_bank = data;
+	m_vram_bank = data & 1;
 }
 
-static READ8_HANDLER(vram_r)
+READ8_MEMBER(majorpkr_state::vram_r)
 {
-	majorpkr_state *state = space->machine().driver_data<majorpkr_state>();
-	return state->m_videoram[state->m_vram_bank * 0x800 + offset];
+	return m_videoram[m_vram_bank * 0x800 + offset];
 }
 
-static WRITE8_HANDLER(vram_w)
+WRITE8_MEMBER(majorpkr_state::vram_w)
 {
-	majorpkr_state *state = space->machine().driver_data<majorpkr_state>();
-	state->m_videoram[state->m_vram_bank * 0x800 + offset] = data;
+	m_videoram[m_vram_bank * 0x800 + offset] = data;
 
-	if (state->m_vram_bank == 0)
+	if (m_vram_bank == 0)
 	{
-		state->m_fg_tilemap->mark_tile_dirty(offset >> 1);
+		m_fg_tilemap->mark_tile_dirty(offset >> 1);
 	}
 	else
 	{
-		if (state->m_vram_bank == 1)
+		if (m_vram_bank == 1)
 		{
-			state->m_bg_tilemap->mark_tile_dirty(offset >> 1);
+			m_bg_tilemap->mark_tile_dirty(offset >> 1);
 		}
 		else
 		{
-			//logerror("accessing vram bank %d (offset = %x , data = %x )\n", state->m_vram_bank, offset,data);
+			//logerror("accessing vram bank %d (offset = %x , data = %x )\n", m_vram_bank, offset,data);
 		}
 	}
 }
 
-static WRITE8_HANDLER(vidreg_w)
+WRITE8_MEMBER(majorpkr_state::vidreg_w)
 {
-	majorpkr_state *state = space->machine().driver_data<majorpkr_state>();
 
 /*  If bit6 is active, the screen is drawn upside down.
     (also 0xfc and 0x11 are written to the CRTC registers 0xc0 and 0xd0)
@@ -628,7 +633,7 @@ static WRITE8_HANDLER(vidreg_w)
 	if (data & 0x40)
 	{
 		/* upside down screen */
-		state->m_flip_state = 1;
+		m_flip_state = 1;
 	}
 
 /*  If bit6 is not active, the screen is drawn normally.
@@ -638,47 +643,44 @@ static WRITE8_HANDLER(vidreg_w)
 	else
 	{
 		/* normal screen */
-		state->m_flip_state = 0;
+		m_flip_state = 0;
 	}
 }
 
 
 /***** Multiplexed Ports *****/
 
-static READ8_HANDLER( mux_port_r )
+READ8_MEMBER(majorpkr_state::mux_port_r)
 {
-	majorpkr_state *state = space->machine().driver_data<majorpkr_state>();
 
-	switch( (state->m_mux_data & 0xf0) )		/* 00-10-20-30-0F-1F-2F-3F */
+	switch( (m_mux_data & 0xf0) )		/* 00-10-20-30-0F-1F-2F-3F */
 	{
-		case 0x00: return input_port_read(space->machine(), "DSW1");	/* confirmed */
-		case 0x10: return input_port_read(space->machine(), "DSW2");	/* confirmed */
-		case 0x20: return input_port_read(space->machine(), "DSW3");	/* confirmed */
-		case 0x30: return input_port_read(space->machine(), "DSW4");	/* confirmed */
+		case 0x00: return ioport("DSW1")->read();	/* confirmed */
+		case 0x10: return ioport("DSW2")->read();	/* confirmed */
+		case 0x20: return ioport("DSW3")->read();	/* confirmed */
+		case 0x30: return ioport("DSW4")->read();	/* confirmed */
 	}
 
 	return 0xff;
 }
 
-static READ8_HANDLER( mux_port2_r )
+READ8_MEMBER(majorpkr_state::mux_port2_r)
 {
-	majorpkr_state *state = space->machine().driver_data<majorpkr_state>();
 
-	if ((state->m_mux_data & 0x0f) == 4)
+	if ((m_mux_data & 0x0f) == 4)
 	{
-		return input_port_read(space->machine(), "IN0-1");
+		return ioport("IN0-1")->read();
 	}
 	else
 	{
-		return input_port_read(space->machine(), "IN0-0");
+		return ioport("IN0-0")->read();
 	}
 }
 
-static WRITE8_HANDLER( mux_sel_w )
+WRITE8_MEMBER(majorpkr_state::mux_sel_w)
 {
-	majorpkr_state *state = space->machine().driver_data<majorpkr_state>();
 
-	state->m_mux_data = data;	/* 00-10-20-30-0F-1F-2F-3F */
+	m_mux_data = data;	/* 00-10-20-30-0F-1F-2F-3F */
 }
 
 
@@ -686,7 +688,7 @@ static WRITE8_HANDLER( mux_sel_w )
 *    Lamps and Pulses    *
 *************************/
 
-static WRITE8_HANDLER( lamps_a_w )
+WRITE8_MEMBER(majorpkr_state::lamps_a_w)
 {
 /*  Lamps - Array A.
 
@@ -713,7 +715,7 @@ static WRITE8_HANDLER( lamps_a_w )
 		logerror("Lamps A: Write to 13h: %02x\n", data);
 }
 
-static WRITE8_HANDLER( lamps_b_w )
+WRITE8_MEMBER(majorpkr_state::lamps_b_w)
 {
 /*  Lamps - Array B.
 
@@ -738,7 +740,7 @@ static WRITE8_HANDLER( lamps_b_w )
 		logerror("Lamps B: Write to 14h: %02x\n", data);
 }
 
-static WRITE8_HANDLER( pulses_w )
+WRITE8_MEMBER(majorpkr_state::pulses_w)
 {
 /*  Pulses...
 
@@ -751,10 +753,10 @@ static WRITE8_HANDLER( pulses_w )
     ---x ----   Watchdog? (constant writes).
     xxx- ----   Unknown.
 */
-	coin_counter_w(space->machine(), 3, data & 0x01);		/* Credits Out (all) */
-	coin_counter_w(space->machine(), 2, data & 0x02);		/* Credits 3 */
-	coin_counter_w(space->machine(), 0, data & 0x04);		/* Credits 1 */
-	coin_counter_w(space->machine(), 1, data & 0x08);		/* Credits 2 */
+	coin_counter_w(machine(), 3, data & 0x01);		/* Credits Out (all) */
+	coin_counter_w(machine(), 2, data & 0x02);		/* Credits 3 */
+	coin_counter_w(machine(), 0, data & 0x04);		/* Credits 1 */
+	coin_counter_w(machine(), 1, data & 0x08);		/* Credits 2 */
 
 	if (data & 0xe0)
 		logerror("Pulse: Write to 10h: %02x\n", data);
@@ -765,7 +767,7 @@ static WRITE8_HANDLER( pulses_w )
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( map, AS_PROGRAM, 8, majorpkr_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_ROM AM_ROMBANK("rom_bank")
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("nvram")
@@ -794,7 +796,7 @@ ADDRESS_MAP_END
   60  W ---> PSG SN76489/96 initialization routines.
              (Maybe a leftover for different hardware).
 */
-static ADDRESS_MAP_START( portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( portmap, AS_IO, 8, majorpkr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(rom_bank_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(palette_bank_w)
@@ -811,10 +813,10 @@ static ADDRESS_MAP_START( portmap, AS_IO, 8 )
 	AM_RANGE(0x14, 0x14) AM_READ_PORT("TEST")	/* "freeze" switch */
 	AM_RANGE(0x14, 0x14) AM_WRITE(lamps_b_w)	/* lamps b out */
 
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x31, 0x31) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x30, 0x30) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x31, 0x31) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 
-	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x50, 0x50) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x60, 0x60) AM_WRITENOP	/* leftover from a PSG SN76489/96? */
 ADDRESS_MAP_END
 
@@ -1081,8 +1083,8 @@ ROM_END
 
 static DRIVER_INIT( majorpkr )
 {
-	UINT8 * ROM = (UINT8 *)machine.region("maincpu")->base();
-	memory_configure_bank(machine, "rom_bank", 0, 4, &ROM[0x10000], 0x800);
+	UINT8 * ROM = (UINT8 *)machine.root_device().memregion("maincpu")->base();
+	machine.root_device().membank("rom_bank")->configure_entries(0, 4, &ROM[0x10000], 0x800);
 }
 
 

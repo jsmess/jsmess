@@ -163,36 +163,38 @@ class _3do_state : public driver_device
 {
 public:
 	_3do_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_dram(*this, "dram"),
+		m_vram(*this, "vram"){ }
 
 	legacy_cpu_device* m_maincpu;
-	UINT32 *m_dram;
-	UINT32 *m_vram;
+	required_shared_ptr<UINT32> m_dram;
+	required_shared_ptr<UINT32> m_vram;
 	SLOW2 m_slow2;
 	MADAM m_madam;
 	CLIO m_clio;
 	SVF m_svf;
 	UINT8 m_video_bits[512];
+	DECLARE_READ32_MEMBER(_3do_nvarea_r);
+	DECLARE_WRITE32_MEMBER(_3do_nvarea_w);
+	DECLARE_READ32_MEMBER(_3do_slow2_r);
+	DECLARE_WRITE32_MEMBER(_3do_slow2_w);
+	DECLARE_READ32_MEMBER(_3do_svf_r);
+	DECLARE_WRITE32_MEMBER(_3do_svf_w);
+	DECLARE_READ32_MEMBER(_3do_madam_r);
+	DECLARE_WRITE32_MEMBER(_3do_madam_w);
+	DECLARE_READ32_MEMBER(_3do_clio_r);
+	DECLARE_WRITE32_MEMBER(_3do_clio_w);
 };
 
 /*----------- defined in machine/3do.c -----------*/
 
-READ32_HANDLER( _3do_nvarea_r );
-WRITE32_HANDLER( _3do_nvarea_w );
 
-READ32_HANDLER( _3do_slow2_r );
-WRITE32_HANDLER( _3do_slow2_w );
 void _3do_slow2_init( running_machine &machine );
 
-READ32_HANDLER( _3do_svf_r );
-WRITE32_HANDLER( _3do_svf_w );
 
-READ32_HANDLER( _3do_madam_r );
-WRITE32_HANDLER( _3do_madam_w );
 void _3do_madam_init( running_machine &machine );
 
-READ32_HANDLER( _3do_clio_r );
-WRITE32_HANDLER( _3do_clio_w );
 void _3do_clio_init( running_machine &machine, screen_device *screen );
 
 

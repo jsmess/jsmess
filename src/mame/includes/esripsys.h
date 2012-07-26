@@ -27,7 +27,8 @@ class esripsys_state : public driver_device
 {
 public:
 	esripsys_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_pal_ram(*this, "pal_ram") { }
 
 	UINT8 m_g_iodata;
 	UINT8 m_g_ioaddr;
@@ -54,7 +55,7 @@ public:
 	int m_fasel;
 	int m_fbsel;
 	int m_hblank;
-	UINT8 *m_pal_ram;
+	required_shared_ptr<UINT8> m_pal_ram;
 	int m_frame_vbl;
 	int m_12sel;
 	int m_video_firq_en;
@@ -64,6 +65,29 @@ public:
 	UINT8 *m_scale_table;
 	int m_video_firq;
 	UINT8 m_bg_intensity;
+	DECLARE_WRITE8_MEMBER(uart_w);
+	DECLARE_READ8_MEMBER(uart_r);
+	DECLARE_READ8_MEMBER(g_status_r);
+	DECLARE_WRITE8_MEMBER(g_status_w);
+	DECLARE_READ8_MEMBER(f_status_r);
+	DECLARE_WRITE8_MEMBER(f_status_w);
+	DECLARE_WRITE8_MEMBER(frame_w);
+	DECLARE_READ8_MEMBER(fdt_r);
+	DECLARE_WRITE8_MEMBER(fdt_w);
+	DECLARE_WRITE8_MEMBER(g_iobus_w);
+	DECLARE_READ8_MEMBER(g_iobus_r);
+	DECLARE_WRITE8_MEMBER(g_ioadd_w);
+	DECLARE_READ8_MEMBER(s_200e_r);
+	DECLARE_WRITE8_MEMBER(s_200e_w);
+	DECLARE_WRITE8_MEMBER(s_200f_w);
+	DECLARE_READ8_MEMBER(s_200f_r);
+	DECLARE_READ8_MEMBER(tms5220_r);
+	DECLARE_WRITE8_MEMBER(tms5220_w);
+	DECLARE_WRITE8_MEMBER(control_w);
+	DECLARE_WRITE8_MEMBER(volume_dac_w);
+	DECLARE_WRITE8_MEMBER(esripsys_bg_intensity_w);
+	DECLARE_INPUT_CHANGED_MEMBER(keypad_interrupt);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_interrupt);
 };
 
 
@@ -72,7 +96,6 @@ public:
 VIDEO_START( esripsys );
 SCREEN_UPDATE_RGB32( esripsys );
 
-WRITE8_HANDLER( esripsys_bg_intensity_w );
 INTERRUPT_GEN( esripsys_vblank_irq );
 
 int esripsys_draw(running_machine &machine, int l, int r, int fig, int attr, int addr, int col, int x_scale, int bank);

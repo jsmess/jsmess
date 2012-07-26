@@ -46,23 +46,21 @@
 ***************************************************************************/
 
 #ifdef UNUSED_FUNCTION
-READ8_HANDLER( skyfox_vregs_r )	// for debug
+READ8_MEMBER(skyfox_state::skyfox_vregs_r)// for debug
 {
-	skyfox_state *state = space->machine().driver_data<skyfox_state>();
-	return state->m_vreg[offset];
+	return m_vreg[offset];
 }
 #endif
 
-WRITE8_HANDLER( skyfox_vregs_w )
+WRITE8_MEMBER(skyfox_state::skyfox_vregs_w)
 {
-	skyfox_state *state = space->machine().driver_data<skyfox_state>();
 
-	state->m_vreg[offset] = data;
+	m_vreg[offset] = data;
 
 	switch (offset)
 	{
-		case 0:	state->m_bg_ctrl = data;	break;
-		case 1:	soundlatch_w(space, 0, data);	break;
+		case 0:	m_bg_ctrl = data;	break;
+		case 1:	soundlatch_byte_w(space, 0, data);	break;
 		case 2:	break;
 		case 3:	break;
 		case 4:	break;
@@ -91,6 +89,7 @@ WRITE8_HANDLER( skyfox_vregs_w )
 
 PALETTE_INIT( skyfox )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 256; i++)
@@ -170,7 +169,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	/* The 32x32 tiles in the 80-ff range are bankswitched */
 	int shift =(state->m_bg_ctrl & 0x80) ? (4 - 1) : 4;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int xstart, ystart, xend, yend;
 		int xinc, yinc, dx, dy;
@@ -241,7 +240,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	skyfox_state *state = machine.driver_data<skyfox_state>();
-	UINT8 *RAM = machine.region("gfx2")->base();
+	UINT8 *RAM = state->memregion("gfx2")->base();
 	int x, y, i;
 
 	/* The foreground stars (sprites) move at twice this speed when

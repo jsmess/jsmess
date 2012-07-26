@@ -11,7 +11,6 @@
 #ifndef __COCO3__
 #define __COCO3__
 
-#define ADDRESS_MAP_MODERN
 
 #include "includes/coco.h"
 #include "video/gime.h"

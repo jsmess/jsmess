@@ -642,9 +642,9 @@ static int snes_find_addon_chip( running_machine &machine )
 
 	if ((state->m_has_addon_chip >= HAS_DSP1) && (state->m_has_addon_chip <= HAS_DSP4))
 	{
-		UINT8 *dspsrc = (UINT8 *)(*machine.region("addons"));
-		UINT32 *dspprg = (UINT32 *)(*machine.region("dspprg"));
-		UINT16 *dspdata = (UINT16 *)(*machine.region("dspdata"));
+		UINT8 *dspsrc = (UINT8 *)(*machine.root_device().memregion("addons"));
+		UINT32 *dspprg = (UINT32 *)(*machine.root_device().memregion("dspprg"));
+		UINT16 *dspdata = (UINT16 *)(*machine.root_device().memregion("dspdata"));
 
 		// copy DSP program
 		for (int i = 0; i < 0x2000; i+= 4)
@@ -662,9 +662,9 @@ static int snes_find_addon_chip( running_machine &machine )
 
 	if ((state->m_has_addon_chip == HAS_ST010) || (state->m_has_addon_chip == HAS_ST011))
 	{
-		UINT8 *dspsrc = (UINT8 *)(*machine.region("addons"));
-		UINT32 *dspprg = (UINT32 *)(*machine.region("dspprg"));
-		UINT16 *dspdata = (UINT16 *)(*machine.region("dspdata"));
+		UINT8 *dspsrc = (UINT8 *)(*machine.root_device().memregion("addons"));
+		UINT32 *dspprg = (UINT32 *)(*machine.root_device().memregion("dspprg"));
+		UINT16 *dspdata = (UINT16 *)(*machine.root_device().memregion("dspdata"));
 
 		// copy DSP program
 		for (int i = 0; i < 0x10000; i+= 4)
@@ -766,7 +766,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	address_space *space = machine.device( "maincpu")->memory().space( AS_PROGRAM );
 	int total_blocks, read_blocks, has_bsx_slot = 0, st_bios = 0;
 	UINT32 offset, int_header_offs;
-	UINT8 *ROM = image.device().machine().region("cart")->base();
+	UINT8 *ROM = state->memregion("cart")->base();
 
 	if (image.software_entry() == NULL)
 		state->m_cart_size = image.length();
@@ -1151,9 +1151,9 @@ static DEVICE_IMAGE_LOAD( sufami_cart )
 	int total_blocks, read_blocks;
 	int st_bios = 0, slot_id = 0;
 	UINT32 offset, st_data_offset = 0;
-	UINT8 *ROM = image.device().machine().region(image.device().tag())->base();
+	UINT8 *ROM = image.device().machine().root_device().memregion(image.device().tag())->base();
 
-	snes_ram = machine.region("maincpu")->base();
+	snes_ram = state->memregion("maincpu")->base();
 
 	if (strcmp(image.device().tag(), ":slot_a") == 0)
 	{
@@ -1256,7 +1256,7 @@ static DEVICE_IMAGE_LOAD( bsx_cart )
 	int total_blocks, read_blocks;
 	int has_bsx_slot = 0;
 	UINT32 offset, int_header_offs;
-	UINT8 *ROM = image.device().machine().region("cart")->base();
+	UINT8 *ROM = state->memregion("cart")->base();
 
 	if (image.software_entry() == NULL)
 		state->m_cart_size = image.length();
@@ -1356,7 +1356,7 @@ static DEVICE_IMAGE_LOAD( bsx2slot_cart )
 	running_machine &machine = image.device().machine();
 	snes_state *state = machine.driver_data<snes_state>();
 	UINT32 offset, int_header_offs;
-	UINT8 *ROM = image.device().machine().region("flash")->base();
+	UINT8 *ROM = state->memregion("flash")->base();
 
 	if (image.software_entry() == NULL)
 		state->m_cart_size = image.length();
@@ -1454,14 +1454,14 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT( snes_mess )
 {
-	snes_ram = machine.region("maincpu")->base();
+	snes_ram = machine.root_device().memregion("maincpu")->base();
 	memset(snes_ram, 0, 0x1000000);
 }
 
 DRIVER_INIT( snesst )
 {
 	snes_state *state = machine.driver_data<snes_state>();
-	UINT8 *STBIOS = machine.region("sufami")->base();
+	UINT8 *STBIOS = state->memregion("sufami")->base();
 	int i, j;
 
 	state->m_cart[0].slot_in_use = 0;

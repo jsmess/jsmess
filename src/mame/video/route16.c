@@ -17,21 +17,19 @@
  *
  *************************************/
 
-WRITE8_HANDLER( route16_out0_w )
+WRITE8_MEMBER(route16_state::route16_out0_w)
 {
-	route16_state *state = space->machine().driver_data<route16_state>();
-	state->m_palette_1 = data & 0x1f;
+	m_palette_1 = data & 0x1f;
 
-	coin_counter_w(space->machine(), 0, (data >> 5) & 0x01);
+	coin_counter_w(machine(), 0, (data >> 5) & 0x01);
 }
 
 
-WRITE8_HANDLER( route16_out1_w )
+WRITE8_MEMBER(route16_state::route16_out1_w)
 {
-	route16_state *state = space->machine().driver_data<route16_state>();
-	state->m_palette_2 = data & 0x1f;
+	m_palette_2 = data & 0x1f;
 
-	state->m_flipscreen = (data >> 5) & 0x01;
+	m_flipscreen = (data >> 5) & 0x01;
 }
 
 
@@ -75,10 +73,10 @@ SCREEN_UPDATE_RGB32( route16 )
 	route16_state *state = screen.machine().driver_data<route16_state>();
 	offs_t offs;
 
-	UINT8 *color_prom1 = &screen.machine().region("proms")->base()[0x000];
-	UINT8 *color_prom2 = &screen.machine().region("proms")->base()[0x100];
+	UINT8 *color_prom1 = &screen.machine().root_device().memregion("proms")->base()[0x000];
+	UINT8 *color_prom2 = &state->memregion("proms")->base()[0x100];
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram1.bytes(); offs++)
 	{
 		int i;
 
@@ -132,10 +130,10 @@ static int video_update_stratvox_ttmahjng(running_machine &machine, bitmap_rgb32
 	route16_state *state = machine.driver_data<route16_state>();
 	offs_t offs;
 
-	UINT8 *color_prom1 = &machine.region("proms")->base()[0x000];
-	UINT8 *color_prom2 = &machine.region("proms")->base()[0x100];
+	UINT8 *color_prom1 = &state->memregion("proms")->base()[0x000];
+	UINT8 *color_prom2 = &state->memregion("proms")->base()[0x100];
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram1.bytes(); offs++)
 	{
 		int i;
 

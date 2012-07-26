@@ -132,12 +132,20 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
 		  m_oki_1(*this, "oki1"),
-		  m_oki_2(*this, "oki2") { }
+		  m_oki_2(*this, "oki2") ,
+		m_workram(*this, "workram"),
+		m_vram(*this, "vram"),
+		m_paletteram(*this, "paletteram"){ }
+
+	/* devices */
+	required_device<e132xt_device> m_maincpu;
+	required_device<okim6295_device> m_oki_1;
+	required_device<okim6295_device> m_oki_2;
 
 	/* memory pointers */
-	UINT32 *  m_vram;
-	UINT32 *  m_workram;
-	UINT32 *  m_paletteram;
+	required_shared_ptr<UINT32> m_workram;
+	required_shared_ptr<UINT32> m_vram;
+	required_shared_ptr<UINT32> m_paletteram;
 //  UINT32 *  m_nvram;    // currently this uses generic nvram handling
 
 	/* video-related */
@@ -155,124 +163,125 @@ public:
 	int       m_oki_bank_0;
 	int       m_oki_bank_1;
 
-	/* devices */
-	required_device<e132xt_device> m_maincpu;
-	required_device<okim6295_device> m_oki_1;
-	required_device<okim6295_device> m_oki_2;
+	DECLARE_WRITE32_MEMBER(gstream_palette_w);
+	DECLARE_WRITE32_MEMBER(gstream_vram_w);
+	DECLARE_WRITE32_MEMBER(gstream_tilemap1_scrollx_w);
+	DECLARE_WRITE32_MEMBER(gstream_tilemap1_scrolly_w);
+	DECLARE_WRITE32_MEMBER(gstream_tilemap2_scrollx_w);
+	DECLARE_WRITE32_MEMBER(gstream_tilemap2_scrolly_w);
+	DECLARE_WRITE32_MEMBER(gstream_tilemap3_scrollx_w);
+	DECLARE_WRITE32_MEMBER(gstream_tilemap3_scrolly_w);
+	DECLARE_WRITE32_MEMBER(gstream_oki_banking_w);
+	DECLARE_WRITE32_MEMBER(gstream_oki_4040_w);
+	DECLARE_READ32_MEMBER(gstream_speedup_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_service_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
 };
 
 
 
-static CUSTOM_INPUT( gstream_mirror_service_r )
+CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_service_r)
 {
 	int result;
 
 	/* PORT_SERVICE_NO_TOGGLE */
-	result = (input_port_read(field.machine(), "IN0") & 0x8000) >> 15;
+	result = (ioport("IN0")->read() & 0x8000) >> 15;
 
 	return ~result;
 }
 
-static CUSTOM_INPUT( gstream_mirror_r )
+CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_r)
 {
 	int result;
 
 	/* IPT_COIN1 */
-	result  = ((input_port_read(field.machine(), "IN0") & 0x200) >>  9) << 0;
+	result  = ((ioport("IN0")->read() & 0x200) >>  9) << 0;
 	/* IPT_COIN2 */
-	result |= ((input_port_read(field.machine(), "IN1") & 0x200) >>  9) << 1;
+	result |= ((ioport("IN1")->read() & 0x200) >>  9) << 1;
 	/* IPT_START1 */
-	result |= ((input_port_read(field.machine(), "IN0") & 0x400) >> 10) << 2;
+	result |= ((ioport("IN0")->read() & 0x400) >> 10) << 2;
 	/* IPT_START2 */
-	result |= ((input_port_read(field.machine(), "IN1") & 0x400) >> 10) << 3;
+	result |= ((ioport("IN1")->read() & 0x400) >> 10) << 3;
 	/* PORT_SERVICE_NO_TOGGLE */
-	result |= ((input_port_read(field.machine(), "IN0") & 0x8000) >> 15) << 6;
+	result |= ((ioport("IN0")->read() & 0x8000) >> 15) << 6;
 
 	return ~result;
 }
 
 
-static WRITE32_HANDLER( gstream_palette_w )
+WRITE32_MEMBER(gstream_state::gstream_palette_w)
 {
-	gstream_state *state = space->machine().driver_data<gstream_state>();
-	COMBINE_DATA(&state->m_paletteram[offset]);
+	COMBINE_DATA(&m_paletteram[offset]);
 
-	palette_set_color_rgb(space->machine(), offset * 2, pal5bit(state->m_paletteram[offset] >> (0 + 16)),
-									pal5bit(state->m_paletteram[offset] >> (6 + 16)),
-									pal5bit(state->m_paletteram[offset] >> (11 + 16)));
+	palette_set_color_rgb(machine(), offset * 2, pal5bit(m_paletteram[offset] >> (0 + 16)),
+									pal5bit(m_paletteram[offset] >> (6 + 16)),
+									pal5bit(m_paletteram[offset] >> (11 + 16)));
 
 
-	palette_set_color_rgb(space->machine(),offset * 2 + 1,pal5bit(state->m_paletteram[offset] >> (0)),
-									pal5bit(state->m_paletteram[offset] >> (6)),
-									pal5bit(state->m_paletteram[offset] >> (11)));
+	palette_set_color_rgb(machine(),offset * 2 + 1,pal5bit(m_paletteram[offset] >> (0)),
+									pal5bit(m_paletteram[offset] >> (6)),
+									pal5bit(m_paletteram[offset] >> (11)));
 }
 
-static WRITE32_HANDLER( gstream_vram_w )
+WRITE32_MEMBER(gstream_state::gstream_vram_w)
 {
-	gstream_state *state = space->machine().driver_data<gstream_state>();
-	COMBINE_DATA(&state->m_vram[offset]);
+	COMBINE_DATA(&m_vram[offset]);
 
 	if (ACCESSING_BITS_24_31)
 	{
 		if (offset >= 0x000 / 4 && offset < 0x400 / 4)
 		{
-			state->m_tilemap1->mark_tile_dirty(offset - (0x000 / 4));
+			m_tilemap1->mark_tile_dirty(offset - (0x000 / 4));
 		}
 		else if (offset >= 0x400 / 4 && offset < 0x800 / 4)
 		{
-			state->m_tilemap2->mark_tile_dirty(offset - (0x400 / 4));
+			m_tilemap2->mark_tile_dirty(offset - (0x400 / 4));
 		}
 		else if (offset >= 0x800 / 4 && offset < 0xc00 / 4)
 		{
-			state->m_tilemap3->mark_tile_dirty(offset - (0x800 / 4));
+			m_tilemap3->mark_tile_dirty(offset - (0x800 / 4));
 		}
 	}
 }
 
-static WRITE32_HANDLER( gstream_tilemap1_scrollx_w )
+WRITE32_MEMBER(gstream_state::gstream_tilemap1_scrollx_w)
 {
-	gstream_state *state = space->machine().driver_data<gstream_state>();
-	state->m_tmap1_scrollx = data;
+	m_tmap1_scrollx = data;
 }
 
-static WRITE32_HANDLER( gstream_tilemap1_scrolly_w )
+WRITE32_MEMBER(gstream_state::gstream_tilemap1_scrolly_w)
 {
-	gstream_state *state = space->machine().driver_data<gstream_state>();
-	state->m_tmap1_scrolly = data;
+	m_tmap1_scrolly = data;
 }
 
-static WRITE32_HANDLER( gstream_tilemap2_scrollx_w )
+WRITE32_MEMBER(gstream_state::gstream_tilemap2_scrollx_w)
 {
-	gstream_state *state = space->machine().driver_data<gstream_state>();
-	state->m_tmap2_scrollx = data;
+	m_tmap2_scrollx = data;
 }
 
-static WRITE32_HANDLER( gstream_tilemap2_scrolly_w )
+WRITE32_MEMBER(gstream_state::gstream_tilemap2_scrolly_w)
 {
-	gstream_state *state = space->machine().driver_data<gstream_state>();
-	state->m_tmap2_scrolly = data;
+	m_tmap2_scrolly = data;
 }
 
-static WRITE32_HANDLER( gstream_tilemap3_scrollx_w )
+WRITE32_MEMBER(gstream_state::gstream_tilemap3_scrollx_w)
 {
-	gstream_state *state = space->machine().driver_data<gstream_state>();
-	state->m_tmap3_scrollx = data;
+	m_tmap3_scrollx = data;
 }
 
-static WRITE32_HANDLER( gstream_tilemap3_scrolly_w )
+WRITE32_MEMBER(gstream_state::gstream_tilemap3_scrolly_w)
 {
-	gstream_state *state = space->machine().driver_data<gstream_state>();
-	state->m_tmap3_scrolly = data;
+	m_tmap3_scrolly = data;
 }
 
-static ADDRESS_MAP_START( gstream_32bit_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_BASE_MEMBER(gstream_state, m_workram) // work ram
+static ADDRESS_MAP_START( gstream_32bit_map, AS_PROGRAM, 32, gstream_state )
+	AM_RANGE(0x00000000, 0x003FFFFF) AM_RAM AM_SHARE("workram") // work ram
 //  AM_RANGE(0x40000000, 0x40FFFFFF) AM_RAM // ?? lots of data gets copied here if present, but game runs without it??
-	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE(gstream_vram_w) AM_BASE_MEMBER(gstream_state, m_vram) // video ram
+	AM_RANGE(0x80000000, 0x80003FFF) AM_RAM_WRITE(gstream_vram_w) AM_SHARE("vram") // video ram
 	AM_RANGE(0x4E000000, 0x4E1FFFFF) AM_ROM AM_REGION("user2",0) // main game rom
 	AM_RANGE(0x4F000000, 0x4F000003) AM_WRITE(gstream_tilemap3_scrollx_w)
 	AM_RANGE(0x4F200000, 0x4F200003) AM_WRITE(gstream_tilemap3_scrolly_w)
-	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_WRITE(gstream_palette_w) AM_BASE_MEMBER(gstream_state, m_paletteram)
+	AM_RANGE(0x4F400000, 0x4F406FFF) AM_RAM_WRITE(gstream_palette_w) AM_SHARE("paletteram")
 	AM_RANGE(0x4F800000, 0x4F800003) AM_WRITE(gstream_tilemap1_scrollx_w)
 	AM_RANGE(0x4FA00000, 0x4FA00003) AM_WRITE(gstream_tilemap1_scrolly_w)
 	AM_RANGE(0x4FC00000, 0x4FC00003) AM_WRITE(gstream_tilemap2_scrollx_w)
@@ -281,7 +290,7 @@ static ADDRESS_MAP_START( gstream_32bit_map, AS_PROGRAM, 32 )
 	AM_RANGE(0xFFF80000, 0xFFFFFFFF) AM_ROM AM_REGION("user1",0) // boot rom
 ADDRESS_MAP_END
 
-static WRITE32_HANDLER( gstream_oki_banking_w )
+WRITE32_MEMBER(gstream_state::gstream_oki_banking_w)
 {
 	/* OKI BANKING  (still far from perfect, based on game behaviour)
 
@@ -314,51 +323,50 @@ static WRITE32_HANDLER( gstream_oki_banking_w )
 
     Musics order is completely guessed but close to what the original PCB game should be */
 
-	gstream_state *state = space->machine().driver_data<gstream_state>();
 	static const int bank_table_0[16] = { -1, -1, -1, -1, -1, -1, 0, 0, -1, 6, 0, 5, -1, 0, 0, 0 };
 	static const int bank_table_1[16] = { -1, -1, -1, -1, -1, -1, 2, 2, -1, 0, 0, 4, -1, 1, 1, 1 };
 
 	//popmessage("oki_0 banking value = %X\noki_1 banking value = %X\n",data & 0xf,(data >> 4) & 0xf);
 
-	state->m_oki_bank_0 = bank_table_0[data & 0xf];
-	state->m_oki_bank_1 = bank_table_1[data & 0xf];		// (data >> 4) & 0xf ??
+	m_oki_bank_0 = bank_table_0[data & 0xf];
+	m_oki_bank_1 = bank_table_1[data & 0xf];		// (data >> 4) & 0xf ??
 
 	/* some values are already used in the table, so we force them manually */
 	if ((data == 0x6f) || (data == 0x6e))
 	{
-		state->m_oki_bank_0 = 0;	// level 3b-5a samples
-		state->m_oki_bank_1 = 6;		// level 3b-5a music
+		m_oki_bank_0 = 0;	// level 3b-5a samples
+		m_oki_bank_1 = 6;		// level 3b-5a music
 	}
 
 	if (data == 0x9b)
 	{
-		state->m_oki_bank_0 = 7;		// level 7 music
-		state->m_oki_bank_1 = 0;		// level 7 samples
+		m_oki_bank_0 = 7;		// level 7 music
+		m_oki_bank_1 = 0;		// level 7 samples
 	}
 
 	if (data == 0x9f)
 	{
-		state->m_oki_bank_0 = 0;		// end sequence samples
-		state->m_oki_bank_1 = 3;		// end sequence music
+		m_oki_bank_0 = 0;		// end sequence samples
+		m_oki_bank_1 = 3;		// end sequence music
 	}
 
-	state->m_oki_1->set_bank_base(state->m_oki_bank_0 * 0x40000);
-	state->m_oki_2->set_bank_base(state->m_oki_bank_1 * 0x40000);
+	m_oki_1->set_bank_base(m_oki_bank_0 * 0x40000);
+	m_oki_2->set_bank_base(m_oki_bank_1 * 0x40000);
 }
 
-static WRITE32_HANDLER( gstream_oki_4040_w )
+WRITE32_MEMBER(gstream_state::gstream_oki_4040_w)
 {
 	// data == 0 or data == 0x81
 }
 
-static ADDRESS_MAP_START( gstream_io, AS_IO, 32 )
+static ADDRESS_MAP_START( gstream_io, AS_IO, 32, gstream_state )
 	AM_RANGE(0x4000, 0x4003) AM_READ_PORT("IN0")
 	AM_RANGE(0x4010, 0x4013) AM_READ_PORT("IN1")
 	AM_RANGE(0x4020, 0x4023) AM_READ_PORT("IN2")	// extra coin switches etc
 	AM_RANGE(0x4030, 0x4033) AM_WRITE(gstream_oki_banking_w)	// oki banking
 	AM_RANGE(0x4040, 0x4043) AM_WRITE(gstream_oki_4040_w)	// ??
-	AM_RANGE(0x4050, 0x4053) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x000000ff)	// music and samples
-	AM_RANGE(0x4060, 0x4063) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x000000ff)	// music and samples
+	AM_RANGE(0x4050, 0x4053) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x000000ff)	// music and samples
+	AM_RANGE(0x4060, 0x4063) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x000000ff)	// music and samples
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gstream )
@@ -392,10 +400,10 @@ static INPUT_PORTS_START( gstream )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x7000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )	PORT_CUSTOM(gstream_mirror_service_r, NULL)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )	PORT_CUSTOM_MEMBER(DEVICE_SELF, gstream_state,gstream_mirror_service_r, NULL)
 
 	PORT_START("IN2")
-	PORT_BIT( 0x004f, IP_ACTIVE_LOW, IPT_SPECIAL )	PORT_CUSTOM(gstream_mirror_r, NULL)
+	PORT_BIT( 0x004f, IP_ACTIVE_LOW, IPT_SPECIAL )	PORT_CUSTOM_MEMBER(DEVICE_SELF, gstream_state,gstream_mirror_r, NULL)
 	PORT_BIT( 0xffb0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -627,20 +635,20 @@ ROM_START( gstream )
 	ROM_LOAD( "gstream.nv", 0x000000, 0x2000, CRC(895d724b) SHA1(97941102f94923220d9beb270939f0ad9a40fe0e) )
 ROM_END
 
-static READ32_HANDLER( gstream_speedup_r )
+READ32_MEMBER(gstream_state::gstream_speedup_r)
 {
-	gstream_state *state = space->machine().driver_data<gstream_state>();
-	if (state->m_maincpu->state(STATE_GENPC) == 0xc0001592)
+	if (m_maincpu->state(STATE_GENPC) == 0xc0001592)
 	{
-		state->m_maincpu->eat_cycles(50);
+		m_maincpu->eat_cycles(50);
 	}
 
-	return state->m_workram[0xd1ee0 / 4];
+	return m_workram[0xd1ee0 / 4];
 }
 
 static DRIVER_INIT( gstream )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xd1ee0, 0xd1ee3, FUNC(gstream_speedup_r) );
+	gstream_state *state = machine.driver_data<gstream_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xd1ee0, 0xd1ee3, read32_delegate(FUNC(gstream_state::gstream_speedup_r), state));
 }
 
 

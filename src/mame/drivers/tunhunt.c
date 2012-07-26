@@ -60,7 +60,7 @@
  *
  *************************************/
 
-static WRITE8_HANDLER( tunhunt_control_w )
+WRITE8_MEMBER(tunhunt_state::tunhunt_control_w)
 {
 	/*
         0x01    coin counter#2  "right counter"
@@ -71,12 +71,11 @@ static WRITE8_HANDLER( tunhunt_control_w )
         0x40    start LED
         0x80    in-game
     */
-	tunhunt_state *state = space->machine().driver_data<tunhunt_state>();
 
-	state->m_control = data;
-	coin_counter_w( space->machine(), 0,data&0x01 );
-	coin_counter_w( space->machine(), 1,data&0x02 );
-	set_led_status( space->machine(), 0, data&0x40 ); /* start */
+	m_control = data;
+	coin_counter_w( machine(), 0,data&0x01 );
+	coin_counter_w( machine(), 1,data&0x02 );
+	set_led_status( machine(), 0, data&0x40 ); /* start */
 }
 
 
@@ -87,40 +86,40 @@ static WRITE8_HANDLER( tunhunt_control_w )
  *
  *************************************/
 
-static READ8_HANDLER( tunhunt_button_r )
+READ8_MEMBER(tunhunt_state::tunhunt_button_r)
 {
-	int data = input_port_read(space->machine(), "IN0");
+	int data = ioport("IN0")->read();
 	return ((data>>offset)&1)?0x00:0x80;
 }
 
 
 static READ8_DEVICE_HANDLER( dsw2_0r )
 {
-	return (input_port_read(device->machine(), "DSW")&0x0100)?0x80:0x00;
+	return (device->machine().root_device().ioport("DSW")->read()&0x0100)?0x80:0x00;
 }
 
 
 static READ8_DEVICE_HANDLER( dsw2_1r )
 {
-	return (input_port_read(device->machine(), "DSW")&0x0200)?0x80:0x00;
+	return (device->machine().root_device().ioport("DSW")->read()&0x0200)?0x80:0x00;
 }
 
 
 static READ8_DEVICE_HANDLER( dsw2_2r )
 {
-	return (input_port_read(device->machine(), "DSW")&0x0400)?0x80:0x00;
+	return (device->machine().root_device().ioport("DSW")->read()&0x0400)?0x80:0x00;
 }
 
 
 static READ8_DEVICE_HANDLER( dsw2_3r )
 {
-	return (input_port_read(device->machine(), "DSW")&0x0800)?0x80:0x00;
+	return (device->machine().root_device().ioport("DSW")->read()&0x0800)?0x80:0x00;
 }
 
 
 static READ8_DEVICE_HANDLER( dsw2_4r )
 {
-	return (input_port_read(device->machine(), "DSW")&0x1000)?0x80:0x00;
+	return (device->machine().root_device().ioport("DSW")->read()&0x1000)?0x80:0x00;
 }
 
 
@@ -131,23 +130,23 @@ static READ8_DEVICE_HANDLER( dsw2_4r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE_MEMBER(tunhunt_state,m_workram) /* Work RAM */
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tunhunt_state )
+	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("workram") /* Work RAM */
 	AM_RANGE(0x1080, 0x10ff) AM_WRITEONLY
 	AM_RANGE(0x1200, 0x12ff) AM_WRITEONLY
 	AM_RANGE(0x1400, 0x14ff) AM_WRITEONLY
-	AM_RANGE(0x1600, 0x160f) AM_WRITEONLY AM_BASE_GENERIC(paletteram)	/* COLRAM (D7-D4 SHADE; D3-D0 COLOR) */
+	AM_RANGE(0x1600, 0x160f) AM_WRITEONLY AM_SHARE("paletteram")	/* COLRAM (D7-D4 SHADE; D3-D0 COLOR) */
 	AM_RANGE(0x1800, 0x1800) AM_WRITEONLY	/* SHEL0H */
 	AM_RANGE(0x1a00, 0x1a00) AM_WRITEONLY	/* SHEL1H */
 	AM_RANGE(0x1c00, 0x1c00) AM_WRITEONLY	/* MOBJV */
-	AM_RANGE(0x1e00, 0x1eff) AM_WRITE(tunhunt_videoram_w) AM_BASE_MEMBER(tunhunt_state,m_videoram)	/* ALPHA */
+	AM_RANGE(0x1e00, 0x1eff) AM_WRITE(tunhunt_videoram_w) AM_SHARE("videoram")	/* ALPHA */
 	AM_RANGE(0x2000, 0x2000) AM_WRITENOP	/* watchdog */
 	AM_RANGE(0x2000, 0x2007) AM_READ(tunhunt_button_r)
 	AM_RANGE(0x2400, 0x2400) AM_WRITENOP	/* INT ACK */
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(tunhunt_control_w)
-	AM_RANGE(0x2c00, 0x2fff) AM_WRITEONLY AM_BASE_MEMBER(tunhunt_state,m_spriteram)
-	AM_RANGE(0x3000, 0x300f) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
-	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x2c00, 0x2fff) AM_WRITEONLY AM_SHARE("spriteram")
+	AM_RANGE(0x3000, 0x300f) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x4000, 0x400f) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x5000, 0x7fff) AM_ROM
 	AM_RANGE(0xfffa, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -172,7 +171,7 @@ static INPUT_PORTS_START( tunhunt )
 	PORT_BIT ( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT ( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT ( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN1")
 	PORT_BIT( 0xff, 0x00, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)

@@ -18,17 +18,18 @@ class slapshot_state : public driver_device
 {
 public:
 	slapshot_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_color_ram(*this,"color_ram"),
+		m_spriteram(*this,"spriteram"),
+		m_spriteext(*this,"spriteext") { }
 
 	/* memory pointers */
-	UINT16 *    m_color_ram;
-	UINT16 *    m_spriteram;
-	UINT16 *    m_spriteext;
+	required_shared_ptr<UINT16> m_color_ram;
+	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<UINT16> m_spriteext;
 	UINT16 *    m_spriteram_buffered;
 	UINT16 *    m_spriteram_delayed;
 //  UINT16 *    m_paletteram;    // currently this uses generic palette handling
-	size_t      m_spriteext_size;
-	size_t      m_spriteram_size;
 
 	/* video-related */
 	struct      slapshot_tempsprite *m_spritelist;
@@ -52,6 +53,14 @@ public:
 	device_t *m_tc0480scp;
 	device_t *m_tc0360pri;
 	device_t *m_tc0640fio;
+	DECLARE_READ16_MEMBER(color_ram_word_r);
+	DECLARE_WRITE16_MEMBER(color_ram_word_w);
+	DECLARE_READ16_MEMBER(slapshot_service_input_r);
+	DECLARE_READ16_MEMBER(opwolf3_adc_r);
+	DECLARE_WRITE16_MEMBER(opwolf3_adc_req_w);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(slapshot_msb_sound_w);
+	DECLARE_READ16_MEMBER(slapshot_msb_sound_r);
 };
 
 

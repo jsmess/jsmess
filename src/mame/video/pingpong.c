@@ -32,6 +32,7 @@
 ***************************************************************************/
 PALETTE_INIT( pingpong )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -82,18 +83,16 @@ PALETTE_INIT( pingpong )
 	}
 }
 
-WRITE8_HANDLER( pingpong_videoram_w )
+WRITE8_MEMBER(pingpong_state::pingpong_videoram_w)
 {
-	pingpong_state *state = space->machine().driver_data<pingpong_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( pingpong_colorram_w )
+WRITE8_MEMBER(pingpong_state::pingpong_colorram_w)
 {
-	pingpong_state *state = space->machine().driver_data<pingpong_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -124,7 +123,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
 	{
 		int sx,sy,flipx,flipy,color,schar;
 

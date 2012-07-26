@@ -19,10 +19,10 @@
 #include "formats/orao_cas.h"
 
 /* Address maps */
-static ADDRESS_MAP_START(orao_mem, AS_PROGRAM, 8)
-    AM_RANGE( 0x0000, 0x5fff ) AM_RAM AM_BASE_MEMBER(orao_state, m_memory)
-    AM_RANGE( 0x6000, 0x7fff ) AM_RAM AM_BASE_MEMBER(orao_state, m_video_ram) // video ram
-    AM_RANGE( 0x8000, 0x9fff ) AM_READWRITE( orao_io_r, orao_io_w )
+static ADDRESS_MAP_START(orao_mem, AS_PROGRAM, 8, orao_state )
+    AM_RANGE( 0x0000, 0x5fff ) AM_RAM AM_SHARE("memory")
+    AM_RANGE( 0x6000, 0x7fff ) AM_RAM AM_SHARE("video_ram") // video ram
+    AM_RANGE( 0x8000, 0x9fff ) AM_READWRITE(orao_io_r, orao_io_w )
     AM_RANGE( 0xa000, 0xafff ) AM_RAM  // extension
     AM_RANGE( 0xb000, 0xbfff ) AM_RAM  // DOS
     AM_RANGE( 0xc000, 0xdfff ) AM_ROM

@@ -238,16 +238,16 @@ void spectrum_plus3_update_memory(running_machine &machine)
 			ram_page = state->m_port_7ffd_data & 0x07;
 			ram_data = messram + (ram_page<<14);
 
-			memory_set_bankptr(machine, "bank4", ram_data);
+			state->membank("bank4")->set_base(ram_data);
 
 			logerror("RAM at 0xc000: %02x\n", ram_page);
 
 			/* Reset memory between 0x4000 - 0xbfff in case extended paging was being used */
 			/* Bank 5 in 0x4000 - 0x7fff */
-			memory_set_bankptr(machine, "bank2", messram + (5 << 14));
+			state->membank("bank2")->set_base(messram + (5 << 14));
 
 			/* Bank 2 in 0x8000 - 0xbfff */
-			memory_set_bankptr(machine, "bank3", messram + (2 << 14));
+			state->membank("bank3")->set_base(messram + (2 << 14));
 
 
 			ROMSelection = ((state->m_port_7ffd_data >> 4) & 0x01) |
@@ -255,9 +255,9 @@ void spectrum_plus3_update_memory(running_machine &machine)
 
 			/* rom 0 is editor, rom 1 is syntax, rom 2 is DOS, rom 3 is 48 BASIC */
 
-			ChosenROM = machine.region("maincpu")->base() + 0x010000 + (ROMSelection << 14);
+			ChosenROM = machine.root_device().memregion("maincpu")->base() + 0x010000 + (ROMSelection << 14);
 
-			memory_set_bankptr(machine, "bank1", ChosenROM);
+			state->membank("bank1")->set_base(ChosenROM);
 			space->unmap_write(0x0000, 0x3fff);
 
 			logerror("rom switch: %02x\n", ROMSelection);
@@ -275,18 +275,18 @@ void spectrum_plus3_update_memory(running_machine &machine)
 			memory_selection = &spectrum_plus3_memory_selections[(MemorySelection << 2)];
 
 			ram_data = messram + (memory_selection[0] << 14);
-			memory_set_bankptr(machine, "bank1", ram_data);
+			state->membank("bank1")->set_base(ram_data);
 			/* allow writes to 0x0000-0x03fff */
 			space->install_write_bank(0x0000, 0x3fff, "bank1");
 
 			ram_data = messram + (memory_selection[1] << 14);
-			memory_set_bankptr(machine, "bank2", ram_data);
+			state->membank("bank2")->set_base(ram_data);
 
 			ram_data = messram + (memory_selection[2] << 14);
-			memory_set_bankptr(machine, "bank3", ram_data);
+			state->membank("bank3")->set_base(ram_data);
 
 			ram_data = messram + (memory_selection[3] << 14);
-			memory_set_bankptr(machine, "bank4", ram_data);
+			state->membank("bank4")->set_base(ram_data);
 
 			logerror("extended memory paging: %02x\n", MemorySelection);
 	}
@@ -340,16 +340,16 @@ static WRITE8_HANDLER(spectrum_plus3_port_1ffd_w)
 
 /* ports are not decoded full.
 The function decodes the ports appropriately */
-static ADDRESS_MAP_START (spectrum_plus3_io, AS_IO, 8)
+static ADDRESS_MAP_START (spectrum_plus3_io, AS_IO, 8, spectrum_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xfffe) AM_MASK(0xffff)
 	AM_RANGE(0x001f, 0x001f) AM_READ(spectrum_port_1f_r) AM_MIRROR(0xff00)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(spectrum_plus3_port_7ffd_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_r, ay8910_address_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(spectrum_plus3_port_1ffd_w) AM_MIRROR(0x0ffd)
-	AM_RANGE(0x2000, 0x2000) AM_READ(spectrum_plus3_port_2ffd_r) AM_MIRROR(0x0ffd)
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(spectrum_plus3_port_3ffd_r,spectrum_plus3_port_3ffd_w) AM_MIRROR(0x0ffd)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(spectrum_plus3_port_7ffd_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE_LEGACY("ay8912", ay8910_r, ay8910_address_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE_LEGACY(spectrum_plus3_port_1ffd_w) AM_MIRROR(0x0ffd)
+	AM_RANGE(0x2000, 0x2000) AM_READ_LEGACY(spectrum_plus3_port_2ffd_r) AM_MIRROR(0x0ffd)
+	AM_RANGE(0x3000, 0x3000) AM_READWRITE_LEGACY(spectrum_plus3_port_3ffd_r,spectrum_plus3_port_3ffd_w) AM_MIRROR(0x0ffd)
 ADDRESS_MAP_END
 
 static MACHINE_RESET( spectrum_plus3 )

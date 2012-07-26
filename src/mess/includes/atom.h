@@ -3,7 +3,6 @@
 #ifndef __ATOM__
 #define __ATOM__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -49,7 +48,8 @@ public:
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_centronics(*this, CENTRONICS_TAG),
 		  m_speaker(*this, SPEAKER_TAG)
-	{ }
+	,
+		m_video_ram(*this, "video_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
@@ -71,12 +71,13 @@ public:
 	DECLARE_READ8_MEMBER( printer_busy );
 	DECLARE_WRITE8_MEMBER( printer_data );
 	DECLARE_READ8_MEMBER( vdg_videoram_r );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 
 	/* eprom state */
 	int m_eprom;
 
 	/* video state */
-	UINT8 *m_video_ram;
+	required_shared_ptr<UINT8> m_video_ram;
 
 	/* keyboard state */
 	int m_keylatch;

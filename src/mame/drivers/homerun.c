@@ -53,31 +53,31 @@ static const ppi8255_interface ppi8255_intf =
 };
 
 
-static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( homerun_memmap, AS_PROGRAM, 8, homerun_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(homerun_videoram_w) AM_BASE_MEMBER(homerun_state, m_videoram)
-	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE_SIZE_MEMBER(homerun_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8000, 0x9fff) AM_RAM_WRITE(homerun_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xb000, 0xb0ff) AM_WRITE(homerun_color_w)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 ADDRESS_MAP_END
 
-static CUSTOM_INPUT( homerun_40_r )
+CUSTOM_INPUT_MEMBER(homerun_state::homerun_40_r)
 {
-	UINT8 ret = (field.machine().primary_screen->vpos() > 116) ? 1 : 0;
+	UINT8 ret = (machine().primary_screen->vpos() > 116) ? 1 : 0;
 
 	return ret;
 }
 
-static ADDRESS_MAP_START( homerun_iomap, AS_IO, 8 )
+static ADDRESS_MAP_START( homerun_iomap, AS_IO, 8, homerun_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITENOP /* ?? */
 	AM_RANGE(0x20, 0x20) AM_WRITENOP /* ?? */
-	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE_LEGACY("ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("IN0")
 	AM_RANGE(0x50, 0x50) AM_READ_PORT("IN2")
 	AM_RANGE(0x60, 0x60) AM_READ_PORT("IN1")
-	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
 static const ym2203_interface ym2203_config =
@@ -97,7 +97,7 @@ static const ym2203_interface ym2203_config =
 static INPUT_PORTS_START( homerun )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(homerun_40_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state,homerun_40_r, NULL)
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
@@ -127,7 +127,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dynashot )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(homerun_40_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state,homerun_40_r, NULL)
 	PORT_BIT( 0xb7, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -193,10 +193,10 @@ GFXDECODE_END
 static MACHINE_START( homerun )
 {
 	homerun_state *state = machine.driver_data<homerun_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 1, &ROM[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank1", 1, 7, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entry(0, &ROM[0x00000]);
+	state->membank("bank1")->configure_entries(1, 7, &ROM[0x10000], 0x4000);
 
 	state->save_item(NAME(state->m_gfx_ctrl));
 	state->save_item(NAME(state->m_gc_up));

@@ -96,90 +96,89 @@ Noted added by ClawGrip 28-Mar-2008:
 #define MSM5205_CLOCK XTAL_384kHz
 
 
-static WRITE8_HANDLER( wc90b_bankswitch_w )
+WRITE8_MEMBER(wc90b_state::wc90b_bankswitch_w)
 {
 	int bankaddress;
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	memory_set_bankptr(space->machine(), "bank1",&ROM[bankaddress]);
+	membank("bank1")->set_base(&ROM[bankaddress]);
 }
 
-static WRITE8_HANDLER( wc90b_bankswitch1_w )
+WRITE8_MEMBER(wc90b_state::wc90b_bankswitch1_w)
 {
 	int bankaddress;
-	UINT8 *ROM = space->machine().region("sub")->base();
+	UINT8 *ROM = memregion("sub")->base();
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
-	memory_set_bankptr(space->machine(), "bank2",&ROM[bankaddress]);
+	membank("bank2")->set_base(&ROM[bankaddress]);
 }
 
-static WRITE8_HANDLER( wc90b_sound_command_w )
+WRITE8_MEMBER(wc90b_state::wc90b_sound_command_w)
 {
-	soundlatch_w(space, offset, data);
-	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+	soundlatch_byte_w(space, offset, data);
+	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( adpcm_control_w )
 {
 	int bankaddress;
-	UINT8 *ROM = device->machine().region("audiocpu")->base();
+	UINT8 *ROM = device->machine().root_device().memregion("audiocpu")->base();
 
 	/* the code writes either 2 or 3 in the bottom two bits */
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	memory_set_bankptr(device->machine(), "bank3",&ROM[bankaddress]);
+	device->machine().root_device().membank("bank3")->set_base(&ROM[bankaddress]);
 
 	msm5205_reset_w(device,data & 0x08);
 }
 
-static WRITE8_HANDLER( adpcm_data_w )
+WRITE8_MEMBER(wc90b_state::adpcm_data_w)
 {
-	wc90b_state *state = space->machine().driver_data<wc90b_state>();
-	state->m_msm5205next = data;
+	m_msm5205next = data;
 }
 
 
-static ADDRESS_MAP_START( wc90b_map1, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wc90b_map1, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM /* Main RAM */
-	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(wc90b_fgvideoram_w) AM_BASE_MEMBER(wc90b_state, m_fgvideoram)
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(wc90b_bgvideoram_w) AM_BASE_MEMBER(wc90b_state, m_bgvideoram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(wc90b_txvideoram_w) AM_BASE_MEMBER(wc90b_state, m_txvideoram)
+	AM_RANGE(0xa000, 0xafff) AM_RAM_WRITE(wc90b_fgvideoram_w) AM_SHARE("fgvideoram")
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(wc90b_bgvideoram_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(wc90b_txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank1")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90b_bankswitch_w)
 	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(wc90b_sound_command_w)
-	AM_RANGE(0xfd04, 0xfd04) AM_WRITEONLY AM_BASE_MEMBER(wc90b_state, m_scroll1y)
-	AM_RANGE(0xfd06, 0xfd06) AM_WRITEONLY AM_BASE_MEMBER(wc90b_state, m_scroll1x)
-	AM_RANGE(0xfd08, 0xfd08) AM_WRITEONLY AM_BASE_MEMBER(wc90b_state, m_scroll2y)
-	AM_RANGE(0xfd0a, 0xfd0a) AM_WRITEONLY AM_BASE_MEMBER(wc90b_state, m_scroll2x)
-	AM_RANGE(0xfd0e, 0xfd0e) AM_WRITEONLY AM_BASE_MEMBER(wc90b_state, m_scroll_x_lo)
+	AM_RANGE(0xfd04, 0xfd04) AM_WRITEONLY AM_SHARE("scroll1y")
+	AM_RANGE(0xfd06, 0xfd06) AM_WRITEONLY AM_SHARE("scroll1x")
+	AM_RANGE(0xfd08, 0xfd08) AM_WRITEONLY AM_SHARE("scroll2y")
+	AM_RANGE(0xfd0a, 0xfd0a) AM_WRITEONLY AM_SHARE("scroll2x")
+	AM_RANGE(0xfd0e, 0xfd0e) AM_WRITEONLY AM_SHARE("scroll_x_lo")
 	AM_RANGE(0xfd00, 0xfd00) AM_READ_PORT("P1")
 	AM_RANGE(0xfd02, 0xfd02) AM_READ_PORT("P2")
 	AM_RANGE(0xfd06, 0xfd06) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfd08, 0xfd08) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wc90b_map2, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( wc90b_map2, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_SIZE_MEMBER(wc90b_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_be_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_byte_be_w) AM_SHARE("paletteram")
 	AM_RANGE(0xe800, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("bank2")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(wc90b_bankswitch1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, wc90b_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank3")
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("msm", adpcm_control_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE_LEGACY("msm", adpcm_control_w)
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(adpcm_data_w)
-	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 

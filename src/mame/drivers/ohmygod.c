@@ -17,37 +17,36 @@ Notes:
 #include "includes/ohmygod.h"
 
 
-static WRITE16_HANDLER( ohmygod_ctrl_w )
+WRITE16_MEMBER(ohmygod_state::ohmygod_ctrl_w)
 {
-	ohmygod_state *state = space->machine().driver_data<ohmygod_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *rom = space->machine().region("oki")->base();
+		UINT8 *rom = memregion("oki")->base();
 
 		/* ADPCM bank switch */
-		if (state->m_sndbank != ((data >> state->m_adpcm_bank_shift) & 0x0f))
+		if (m_sndbank != ((data >> m_adpcm_bank_shift) & 0x0f))
 		{
-			state->m_sndbank = (data >> state->m_adpcm_bank_shift) & 0x0f;
-			memcpy(rom + 0x20000, rom + 0x40000 + 0x20000 * state->m_sndbank, 0x20000);
+			m_sndbank = (data >> m_adpcm_bank_shift) & 0x0f;
+			memcpy(rom + 0x20000, rom + 0x40000 + 0x20000 * m_sndbank, 0x20000);
 		}
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		coin_counter_w(space->machine(), 0, data & 0x1000);
-		coin_counter_w(space->machine(), 1, data & 0x2000);
+		coin_counter_w(machine(), 0, data & 0x1000);
+		coin_counter_w(machine(), 1, data & 0x2000);
 	}
 }
 
-static ADDRESS_MAP_START( ohmygod_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ohmygod_map, AS_PROGRAM, 16, ohmygod_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x300000, 0x303fff) AM_RAM
-	AM_RANGE(0x304000, 0x307fff) AM_RAM_WRITE(ohmygod_videoram_w) AM_BASE_MEMBER(ohmygod_state, m_videoram)
+	AM_RANGE(0x304000, 0x307fff) AM_RAM_WRITE(ohmygod_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x308000, 0x30ffff) AM_RAM
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(ohmygod_scrollx_w)
 	AM_RANGE(0x400002, 0x400003) AM_WRITE(ohmygod_scrolly_w)
-	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x700000, 0x703fff) AM_RAM AM_BASE_SIZE_MEMBER(ohmygod_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x600000, 0x6007ff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x700000, 0x703fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x704000, 0x707fff) AM_RAM
 	AM_RANGE(0x708000, 0x70ffff) AM_RAM 	/* Work RAM */
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("P1")
@@ -55,7 +54,7 @@ static ADDRESS_MAP_START( ohmygod_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(ohmygod_ctrl_w)
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("DSW2")
-	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ(watchdog_reset16_r)
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(ohmygod_spritebank_w)
 ADDRESS_MAP_END
@@ -307,7 +306,7 @@ static MACHINE_START( ohmygod )
 static MACHINE_RESET( ohmygod )
 {
 	ohmygod_state *state = machine.driver_data<ohmygod_state>();
-	UINT8 *rom = machine.region("oki")->base();
+	UINT8 *rom = state->memregion("oki")->base();
 
 	state->m_sndbank = 0;
 	memcpy(rom + 0x20000, rom + 0x40000 + 0x20000 * state->m_sndbank, 0x20000);

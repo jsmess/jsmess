@@ -80,7 +80,7 @@ iq151_disc2_device::iq151_disc2_device(const machine_config &mconfig, const char
 
 void iq151_disc2_device::device_start()
 {
-	m_rom = (UINT8*)subregion("disc2")->base();
+	m_rom = (UINT8*)memregion("disc2")->base();
 }
 
 //-------------------------------------------------

@@ -19,6 +19,7 @@
 
 PALETTE_INIT( wiping )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -79,10 +80,9 @@ PALETTE_INIT( wiping )
 
 
 
-WRITE8_HANDLER( wiping_flipscreen_w )
+WRITE8_MEMBER(wiping_state::wiping_flipscreen_w)
 {
-	wiping_state *state = space->machine().driver_data<wiping_state>();
-	state->m_flipscreen = (data & 1);
+	m_flipscreen = (data & 1);
 }
 
 

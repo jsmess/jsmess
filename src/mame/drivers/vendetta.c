@@ -118,7 +118,7 @@ static const eeprom_interface eeprom_intf =
 	"0100110000000" /* unlock command */
 };
 
-static WRITE8_HANDLER( vendetta_eeprom_w )
+WRITE8_MEMBER(vendetta_state::vendetta_eeprom_w)
 {
 	/* bit 0 - VOC0 - Video banking related */
 	/* bit 1 - VOC1 - Video banking related */
@@ -129,38 +129,35 @@ static WRITE8_HANDLER( vendetta_eeprom_w )
 	/* bit 6 - IRQ enable */
 	/* bit 7 - Unused */
 
-	vendetta_state *state = space->machine().driver_data<vendetta_state>();
 
 	if (data == 0xff ) /* this is a bug in the eeprom write code */
 		return;
 
 	/* EEPROM */
-	input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+	ioport("EEPROMOUT")->write(data, 0xff);
 
-	state->m_irq_enabled = (data >> 6) & 1;
+	m_irq_enabled = (data >> 6) & 1;
 
-	vendetta_video_banking(space->machine(), data & 1);
+	vendetta_video_banking(machine(), data & 1);
 }
 
 /********************************************/
 
-static READ8_HANDLER( vendetta_K052109_r )
+READ8_MEMBER(vendetta_state::vendetta_K052109_r)
 {
-	vendetta_state *state = space->machine().driver_data<vendetta_state>();
-	return k052109_r(state->m_k052109, offset + 0x2000);
+	return k052109_r(m_k052109, offset + 0x2000);
 }
 
-static WRITE8_HANDLER( vendetta_K052109_w )
+WRITE8_MEMBER(vendetta_state::vendetta_K052109_w)
 {
-	vendetta_state *state = space->machine().driver_data<vendetta_state>();
 
 	// *************************************************************************************
 	// *  Escape Kids uses 052109's mirrored Tilemap ROM bank selector, but only during    *
 	// *  Tilemap MASK-ROM Test       (0x1d80<->0x3d80, 0x1e00<->0x3e00, 0x1f00<->0x3f00)  *
 	// *************************************************************************************
 	if ((offset == 0x1d80) || (offset == 0x1e00) || (offset == 0x1f00))
-		k052109_w(state->m_k052109, offset, data);
-	k052109_w(state->m_k052109, offset + 0x2000, data);
+		k052109_w(m_k052109, offset, data);
+	k052109_w(m_k052109, offset + 0x2000, data);
 }
 
 
@@ -172,34 +169,33 @@ static void vendetta_video_banking( running_machine &machine, int select )
 	if (select & 1)
 	{
 		space->install_read_bank(state->m_video_banking_base + 0x2000, state->m_video_banking_base + 0x2fff, "bank4" );
-		space->install_legacy_write_handler(state->m_video_banking_base + 0x2000, state->m_video_banking_base + 0x2fff, FUNC(paletteram_xBBBBBGGGGGRRRRR_be_w) );
+		space->install_write_handler(state->m_video_banking_base + 0x2000, state->m_video_banking_base + 0x2fff, write8_delegate(FUNC(vendetta_state::paletteram_xBBBBBGGGGGRRRRR_byte_be_w), state) );
 		space->install_legacy_readwrite_handler(*state->m_k053246, state->m_video_banking_base + 0x0000, state->m_video_banking_base + 0x0fff, FUNC(k053247_r), FUNC(k053247_w) );
-		memory_set_bankptr(machine, "bank4", machine.generic.paletteram.v);
+		state->membank("bank4")->set_base(state->m_generic_paletteram_8);
 	}
 	else
 	{
-		space->install_legacy_readwrite_handler(state->m_video_banking_base + 0x2000, state->m_video_banking_base + 0x2fff, FUNC(vendetta_K052109_r), FUNC(vendetta_K052109_w) );
+		space->install_readwrite_handler(state->m_video_banking_base + 0x2000, state->m_video_banking_base + 0x2fff, read8_delegate(FUNC(vendetta_state::vendetta_K052109_r),state), write8_delegate(FUNC(vendetta_state::vendetta_K052109_w),state) );
 		space->install_legacy_readwrite_handler(*state->m_k052109, state->m_video_banking_base + 0x0000, state->m_video_banking_base + 0x0fff, FUNC(k052109_r), FUNC(k052109_w) );
 	}
 }
 
-static WRITE8_HANDLER( vendetta_5fe0_w )
+WRITE8_MEMBER(vendetta_state::vendetta_5fe0_w)
 {
-	vendetta_state *state = space->machine().driver_data<vendetta_state>();
 
 	/* bit 0,1 coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* bit 2 = BRAMBK ?? */
 
 	/* bit 3 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(state->m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bit 4 = INIT ?? */
 
 	/* bit 5 = enable sprite ROM reading */
-	k053246_set_objcha_line(state->m_k053246, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	k053246_set_objcha_line(m_k053246, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( z80_nmi_callback )
@@ -208,24 +204,21 @@ static TIMER_CALLBACK( z80_nmi_callback )
 	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-static WRITE8_HANDLER( z80_arm_nmi_w )
+WRITE8_MEMBER(vendetta_state::z80_arm_nmi_w)
 {
-	vendetta_state *state = space->machine().driver_data<vendetta_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 
-	space->machine().scheduler().timer_set(attotime::from_usec(25), FUNC(z80_nmi_callback));
+	machine().scheduler().timer_set(attotime::from_usec(25), FUNC(z80_nmi_callback));
 }
 
-static WRITE8_HANDLER( z80_irq_w )
+WRITE8_MEMBER(vendetta_state::z80_irq_w)
 {
-	vendetta_state *state = space->machine().driver_data<vendetta_state>();
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
-static READ8_HANDLER( vendetta_sound_interrupt_r )
+READ8_MEMBER(vendetta_state::vendetta_sound_interrupt_r)
 {
-	vendetta_state *state = space->machine().driver_data<vendetta_state>();
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 	return 0x00;
 }
 
@@ -236,12 +229,12 @@ static READ8_DEVICE_HANDLER( vendetta_sound_r )
 
 /********************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
-	AM_RANGE(0x5f80, 0x5f9f) AM_DEVREADWRITE("k054000", k054000_r, k054000_w)
-	AM_RANGE(0x5fa0, 0x5faf) AM_DEVWRITE("k053251", k053251_w)
-	AM_RANGE(0x5fb0, 0x5fb7) AM_DEVWRITE("k053246", k053246_w)
+	AM_RANGE(0x5f80, 0x5f9f) AM_DEVREADWRITE_LEGACY("k054000", k054000_r, k054000_w)
+	AM_RANGE(0x5fa0, 0x5faf) AM_DEVWRITE_LEGACY("k053251", k053251_w)
+	AM_RANGE(0x5fb0, 0x5fb7) AM_DEVWRITE_LEGACY("k053246", k053246_w)
 	AM_RANGE(0x5fc0, 0x5fc0) AM_READ_PORT("P1")
 	AM_RANGE(0x5fc1, 0x5fc1) AM_READ_PORT("P2")
 	AM_RANGE(0x5fc2, 0x5fc2) AM_READ_PORT("P3")
@@ -251,17 +244,17 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x5fe0, 0x5fe0) AM_WRITE(vendetta_5fe0_w)
 	AM_RANGE(0x5fe2, 0x5fe2) AM_WRITE(vendetta_eeprom_w)
 	AM_RANGE(0x5fe4, 0x5fe4) AM_READWRITE(vendetta_sound_interrupt_r, z80_irq_w)
-	AM_RANGE(0x5fe6, 0x5fe7) AM_DEVREADWRITE("k053260", vendetta_sound_r, k053260_w)
-	AM_RANGE(0x5fe8, 0x5fe9) AM_DEVREAD("k053246", k053246_r)
+	AM_RANGE(0x5fe6, 0x5fe7) AM_DEVREADWRITE_LEGACY("k053260", vendetta_sound_r, k053260_w)
+	AM_RANGE(0x5fe8, 0x5fe9) AM_DEVREAD_LEGACY("k053246", k053246_r)
 	AM_RANGE(0x5fea, 0x5fea) AM_READ(watchdog_reset_r)
 	/* what is the desired effect of overlapping these memory regions anyway? */
 	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank3")
 	AM_RANGE(0x6000, 0x6fff) AM_RAMBANK("bank2")
-	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("k052109", k052109_r, k052109_w)
+	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( esckids_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( esckids_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM							// 053248 64K SRAM
 	AM_RANGE(0x3f80, 0x3f80) AM_READ_PORT("P1")
 	AM_RANGE(0x3f81, 0x3f81) AM_READ_PORT("P2")
@@ -269,30 +262,30 @@ static ADDRESS_MAP_START( esckids_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x3f83, 0x3f83) AM_READ_PORT("P4")				// ???  (But not used)
 	AM_RANGE(0x3f92, 0x3f92) AM_READ_PORT("EEPROM")
 	AM_RANGE(0x3f93, 0x3f93) AM_READ_PORT("SERVICE")
-	AM_RANGE(0x3fa0, 0x3fa7) AM_DEVWRITE("k053246", k053246_w)			// 053246 (Sprite)
-	AM_RANGE(0x3fb0, 0x3fbf) AM_DEVWRITE("k053251", k053251_w)			// 053251 (Priority Encoder)
-	AM_RANGE(0x3fc0, 0x3fcf) AM_DEVREADWRITE("k053252",k053252_r,k053252_w)				// Not Emulated (053252 ???)
+	AM_RANGE(0x3fa0, 0x3fa7) AM_DEVWRITE_LEGACY("k053246", k053246_w)			// 053246 (Sprite)
+	AM_RANGE(0x3fb0, 0x3fbf) AM_DEVWRITE_LEGACY("k053251", k053251_w)			// 053251 (Priority Encoder)
+	AM_RANGE(0x3fc0, 0x3fcf) AM_DEVREADWRITE_LEGACY("k053252",k053252_r,k053252_w)				// Not Emulated (053252 ???)
 	AM_RANGE(0x3fd0, 0x3fd0) AM_WRITE(vendetta_5fe0_w)		// Coin Counter, 052109 RMRD, 053246 OBJCHA
 	AM_RANGE(0x3fd2, 0x3fd2) AM_WRITE(vendetta_eeprom_w)	// EEPROM, Video banking
 	AM_RANGE(0x3fd4, 0x3fd4) AM_READWRITE(vendetta_sound_interrupt_r, z80_irq_w)			// Sound
-	AM_RANGE(0x3fd6, 0x3fd7) AM_DEVREADWRITE("k053260", vendetta_sound_r, k053260_w)		// Sound
-	AM_RANGE(0x3fd8, 0x3fd9) AM_DEVREAD("k053246", k053246_r)				// 053246 (Sprite)
+	AM_RANGE(0x3fd6, 0x3fd7) AM_DEVREADWRITE_LEGACY("k053260", vendetta_sound_r, k053260_w)		// Sound
+	AM_RANGE(0x3fd8, 0x3fd9) AM_DEVREAD_LEGACY("k053246", k053246_r)				// 053246 (Sprite)
 	AM_RANGE(0x3fda, 0x3fda) AM_WRITENOP				// Not Emulated (Watchdog ???)
 	/* what is the desired effect of overlapping these memory regions anyway? */
 	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK("bank3")					// 052109 (Tilemap) 0x0000-0x0fff
 	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank2")					// 052109 (Tilemap) 0x2000-0x3fff, Tilemap MASK-ROM bank selector (MASK-ROM Test)
-	AM_RANGE(0x2000, 0x5fff) AM_DEVREADWRITE("k052109", k052109_r, k052109_w)			// 052109 (Tilemap)
+	AM_RANGE(0x2000, 0x5fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)			// 052109 (Tilemap)
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")					// 053248 '975r01' 1M ROM (Banked)
 	AM_RANGE(0x8000, 0xffff) AM_ROM							// 053248 '975r01' 1M ROM (0x18000-0x1ffff)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vendetta_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xf800, 0xf801) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(z80_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_r, k053260_w)
+	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE_LEGACY("k053260", k053260_r, k053260_w)
 ADDRESS_MAP_END
 
 
@@ -329,7 +322,7 @@ static INPUT_PORTS_START( vendet4p )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* EEPROM ready */
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK ) /* not really vblank, object related. Its timed, otherwise sprites flicker */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") /* not really vblank, object related. Its timed, otherwise sprites flicker */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
@@ -385,7 +378,7 @@ static INPUT_PORTS_START( esckids )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* EEPROM ready */
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_VBLANK ) /* not really vblank, object related. Its timed, otherwise sprites flicker */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen") /* not really vblank, object related. Its timed, otherwise sprites flicker */
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START( "EEPROMOUT" )
@@ -466,12 +459,12 @@ static const k053252_interface esckids_k053252_intf =
 static MACHINE_START( vendetta )
 {
 	vendetta_state *state = machine.driver_data<vendetta_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 28, &ROM[0x10000], 0x2000);
-	memory_set_bank(machine, "bank1", 0);
+	state->membank("bank1")->configure_entries(0, 28, &ROM[0x10000], 0x2000);
+	state->membank("bank1")->set_entry(0);
 
-	machine.generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x1000);
+	state->m_generic_paletteram_8.allocate(0x1000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_audiocpu = machine.device("audiocpu");
@@ -485,7 +478,6 @@ static MACHINE_START( vendetta )
 	state->save_item(NAME(state->m_sprite_colorbase));
 	state->save_item(NAME(state->m_layer_colorbase));
 	state->save_item(NAME(state->m_layerpri));
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x1000);
 }
 
 static MACHINE_RESET( vendetta )
@@ -794,7 +786,7 @@ static KONAMI_SETLINES_CALLBACK( vendetta_banking )
 	if (lines >= 0x1c)
 		logerror("PC = %04x : Unknown bank selected %02x\n", cpu_get_pc(device), lines);
 	else
-		memory_set_bank(device->machine(), "bank1", lines);
+		device->machine().root_device().membank("bank1")->set_entry(lines);
 }
 
 static DRIVER_INIT( vendetta )

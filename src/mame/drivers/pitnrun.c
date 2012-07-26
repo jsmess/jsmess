@@ -76,28 +76,27 @@ static INTERRUPT_GEN( pitnrun_nmi_source )
 	if(state->m_nmi) device_set_input_line(device,INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static WRITE8_HANDLER( nmi_enable_w )
+WRITE8_MEMBER(pitnrun_state::nmi_enable_w)
 {
-	pitnrun_state *state = space->machine().driver_data<pitnrun_state>();
-        state->m_nmi = data & 1;
+        m_nmi = data & 1;
 }
 
-static WRITE8_HANDLER(pitnrun_hflip_w)
+WRITE8_MEMBER(pitnrun_state::pitnrun_hflip_w)
 {
-	flip_screen_x_set(space->machine(), data);
+	flip_screen_x_set(data);
 }
 
-static WRITE8_HANDLER(pitnrun_vflip_w)
+WRITE8_MEMBER(pitnrun_state::pitnrun_vflip_w)
 {
-	flip_screen_y_set(space->machine(), data);
+	flip_screen_y_set(data);
 }
 
-static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8, pitnrun_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(pitnrun_videoram_w) AM_BASE_MEMBER(pitnrun_state, m_videoram)
-	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(pitnrun_videoram2_w) AM_BASE_MEMBER(pitnrun_state, m_videoram2)
-	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_BASE_SIZE_MEMBER(pitnrun_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(pitnrun_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(pitnrun_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xa800, 0xa807) AM_WRITENOP /* Analog Sound */
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_WRITE(nmi_enable_w)
@@ -106,7 +105,7 @@ static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xb005, 0xb005) AM_WRITE(pitnrun_char_bank_select)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(pitnrun_hflip_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(pitnrun_vflip_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("INPUTS") AM_WRITE(soundlatch_w)
+	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("INPUTS") AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xc800, 0xc801) AM_WRITE(pitnrun_scroll_w)
 	AM_RANGE(0xc802, 0xc802) AM_WRITENOP/* VP(VF?)MCV - not used ?*/
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(pitnrun_mcu_data_w)
@@ -118,23 +117,23 @@ static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pitnrun_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pitnrun_sound_map, AS_PROGRAM, 8, pitnrun_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pitnrun_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( pitnrun_sound_io_map, AS_IO, 8, pitnrun_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_w)
-	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x8f, 0x8f) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_byte_w)
+	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x8f, 0x8f) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x90, 0x96) AM_WRITENOP
 	AM_RANGE(0x97, 0x97) AM_WRITENOP
 	AM_RANGE(0x98, 0x98) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pitnrun_mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pitnrun_mcu_map, AS_PROGRAM, 8, pitnrun_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(pitnrun_68705_portA_r,pitnrun_68705_portA_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(pitnrun_68705_portB_r,pitnrun_68705_portB_w)
@@ -217,8 +216,8 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

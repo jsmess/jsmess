@@ -9,11 +9,13 @@ class mogura_state : public driver_device
 {
 public:
 	mogura_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_gfxram(*this, "gfxram"),
+		m_tileram(*this, "tileram"){ }
 
 	/* memory pointers */
-	UINT8 *   m_tileram;
-	UINT8 *   m_gfxram;
+	required_shared_ptr<UINT8> m_gfxram;
+	required_shared_ptr<UINT8> m_tileram;
 
 	/* video-related */
 	tilemap_t *m_tilemap;
@@ -22,11 +24,15 @@ public:
 	device_t *m_maincpu;
 	device_t *m_dac1;
 	device_t *m_dac2;
+	DECLARE_WRITE8_MEMBER(mogura_tileram_w);
+	DECLARE_WRITE8_MEMBER(mogura_dac_w);
+	DECLARE_WRITE8_MEMBER(mogura_gfxram_w);
 };
 
 
 static PALETTE_INIT( mogura )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i, j;
 
 	j = 0;
@@ -97,38 +103,35 @@ static SCREEN_UPDATE_IND16( mogura )
 	return 0;
 }
 
-static WRITE8_HANDLER( mogura_tileram_w )
+WRITE8_MEMBER(mogura_state::mogura_tileram_w)
 {
-	mogura_state *state = space->machine().driver_data<mogura_state>();
-	state->m_tileram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset & 0x7ff);
+	m_tileram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-static WRITE8_HANDLER(mogura_dac_w)
+WRITE8_MEMBER(mogura_state::mogura_dac_w)
 {
-	mogura_state *state = space->machine().driver_data<mogura_state>();
-	dac_data_w(state->m_dac1, data & 0xf0);	/* left */
-	dac_data_w(state->m_dac2, (data & 0x0f) << 4);	/* right */
-}
-
-
-static WRITE8_HANDLER ( mogura_gfxram_w )
-{
-	mogura_state *state = space->machine().driver_data<mogura_state>();
-	state->m_gfxram[offset] = data ;
-
-	gfx_element_mark_dirty(space->machine().gfx[0], offset / 16);
+	dac_data_w(m_dac1, data & 0xf0);	/* left */
+	dac_data_w(m_dac2, (data & 0x0f) << 4);	/* right */
 }
 
 
-static ADDRESS_MAP_START( mogura_map, AS_PROGRAM, 8 )
+WRITE8_MEMBER(mogura_state::mogura_gfxram_w)
+{
+	m_gfxram[offset] = data ;
+
+	gfx_element_mark_dirty(machine().gfx[0], offset / 16);
+}
+
+
+static ADDRESS_MAP_START( mogura_map, AS_PROGRAM, 8, mogura_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM // main ram
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(mogura_gfxram_w) AM_BASE_MEMBER(mogura_state, m_gfxram) // ram based characters
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(mogura_tileram_w) AM_BASE_MEMBER(mogura_state, m_tileram) // tilemap
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(mogura_gfxram_w) AM_SHARE("gfxram") // ram based characters
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(mogura_tileram_w) AM_SHARE("tileram") // tilemap
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mogura_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mogura_io_map, AS_IO, 8, mogura_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITENOP	// ??
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("SYSTEM")

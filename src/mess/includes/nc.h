@@ -54,6 +54,25 @@ public:
 	UINT8 m_type;
 	int m_card_size;
 	int m_nc200_backlight;
+	DECLARE_READ8_MEMBER(nc_memory_management_r);
+	DECLARE_WRITE8_MEMBER(nc_memory_management_w);
+	DECLARE_WRITE8_MEMBER(nc_irq_mask_w);
+	DECLARE_WRITE8_MEMBER(nc_irq_status_w);
+	DECLARE_READ8_MEMBER(nc_irq_status_r);
+	DECLARE_READ8_MEMBER(nc_key_data_in_r);
+	DECLARE_WRITE8_MEMBER(nc_sound_w);
+	DECLARE_WRITE8_MEMBER(nc_uart_control_w);
+	DECLARE_WRITE8_MEMBER(nc100_display_memory_start_w);
+	DECLARE_WRITE8_MEMBER(nc100_uart_control_w);
+	DECLARE_WRITE8_MEMBER(nc100_poweroff_control_w);
+	DECLARE_READ8_MEMBER(nc100_card_battery_status_r);
+	DECLARE_WRITE8_MEMBER(nc100_memory_card_wait_state_w);
+	DECLARE_WRITE8_MEMBER(nc200_display_memory_start_w);
+	DECLARE_READ8_MEMBER(nc200_card_battery_status_r);
+	DECLARE_READ8_MEMBER(nc200_printer_status_r);
+	DECLARE_WRITE8_MEMBER(nc200_uart_control_w);
+	DECLARE_WRITE8_MEMBER(nc200_memory_card_wait_state_w);
+	DECLARE_WRITE8_MEMBER(nc200_poweroff_control_w);
 };
 
 

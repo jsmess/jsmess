@@ -6,7 +6,6 @@
 
 ***************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/v810/v810.h"
@@ -56,7 +55,7 @@ INPUT_PORTS_END
 
 void pcfx_state::machine_reset()
 {
-	memory_set_bankptr( machine(), "bank1", machine().region("user1")->base() );
+	membank( "bank1" )->set_base( memregion("user1")->base() );
 }
 
 UINT32 pcfx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)

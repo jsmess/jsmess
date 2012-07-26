@@ -2,16 +2,15 @@
 #include "includes/mexico86.h"
 
 
-WRITE8_HANDLER( mexico86_bankswitch_w )
+WRITE8_MEMBER(mexico86_state::mexico86_bankswitch_w)
 {
-	mexico86_state *state = space->machine().driver_data<mexico86_state>();
 
 	if ((data & 7) > 5)
 		popmessage("Switching to invalid bank!");
 
-	memory_set_bank(space->machine(), "bank1", data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 
-	state->m_charbank = BIT(data, 5);
+	m_charbank = BIT(data, 5);
 }
 
 
@@ -32,14 +31,14 @@ SCREEN_UPDATE_IND16( mexico86 )
 	sx = 0;
 
 	/* the score display seems to be outside of the main objectram. */
-	for (offs = 0; offs < state->m_objectram_size + 0x200; offs += 4)
+	for (offs = 0; offs < state->m_objectram.bytes() + 0x200; offs += 4)
 	{
 		int height;
 
-		if (offs >= state->m_objectram_size && offs < state->m_objectram_size + 0x180)
+		if (offs >= state->m_objectram.bytes() && offs < state->m_objectram.bytes() + 0x180)
 			continue;
 
-		if (offs >= state->m_objectram_size + 0x1c0)
+		if (offs >= state->m_objectram.bytes() + 0x1c0)
 			continue;
 
 		/* skip empty sprites */
@@ -111,7 +110,7 @@ SCREEN_UPDATE_IND16( kikikai )
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 	sx = 0;
-	for (offs = 0; offs < state->m_objectram_size; offs += 4)
+	for (offs = 0; offs < state->m_objectram.bytes(); offs += 4)
 	{
 		if (*(UINT32*)(state->m_objectram + offs) == 0)
 			continue;

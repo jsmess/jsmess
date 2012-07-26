@@ -47,18 +47,16 @@ PALETTE_INIT( crbaloon )
 }
 
 
-WRITE8_HANDLER( crbaloon_videoram_w )
+WRITE8_MEMBER(crbaloon_state::crbaloon_videoram_w)
 {
-	crbaloon_state *state = space->machine().driver_data<crbaloon_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( crbaloon_colorram_w )
+WRITE8_MEMBER(crbaloon_state::crbaloon_colorram_w)
 {
-	crbaloon_state *state = space->machine().driver_data<crbaloon_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -103,10 +101,10 @@ static void draw_sprite_and_check_collision(running_machine &machine, bitmap_ind
 	UINT8 color = state->m_spriteram[0] >> 4;
 	UINT8 sy = state->m_spriteram[2] - 32;
 
-	UINT8 *gfx = machine.region("gfx2")->base() + (code << 7);
+	UINT8 *gfx = state->memregion("gfx2")->base() + (code << 7);
 
 
-	if (flip_screen_get(machine))
+	if (state->flip_screen())
 		sy += 32;
 
 	/* assume no collision */

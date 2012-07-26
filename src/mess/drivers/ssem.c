@@ -4,7 +4,6 @@
     Driver by MooglyGuy
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/ssem/ssem.h"
@@ -16,9 +15,10 @@ class ssem_state : public driver_device
 {
 public:
 	ssem_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_store(*this, "store"){ }
 
-	UINT8 *m_store;
+	required_shared_ptr<UINT8> m_store;
 	UINT8 m_store_line;
 };
 
@@ -54,7 +54,7 @@ INLINE UINT32 reverse(UINT32 v)
 \****************************************************/
 
 static ADDRESS_MAP_START( ssem_map, AS_PROGRAM, 8, ssem_state )
-	AM_RANGE(0x00, 0x7f) AM_RAM AM_BASE(m_store)// Primary store
+	AM_RANGE(0x00, 0x7f) AM_RAM AM_SHARE("store")// Primary store
 ADDRESS_MAP_END
 
 /****************************************************\
@@ -82,11 +82,11 @@ enum
 static INPUT_CHANGED( panel_check )
 {
 	ssem_state *state = field.machine().driver_data<ssem_state>();
-	UINT8 edit0_state = input_port_read(field.machine(), "EDIT0");
-	UINT8 edit1_state = input_port_read(field.machine(), "EDIT1");
-	UINT8 edit2_state = input_port_read(field.machine(), "EDIT2");
-	UINT8 edit3_state = input_port_read(field.machine(), "EDIT3");
-	UINT8 misc_state = input_port_read(field.machine(), "MISC");
+	UINT8 edit0_state = field.machine().root_device().ioport("EDIT0")->read();
+	UINT8 edit1_state = field.machine().root_device().ioport("EDIT1")->read();
+	UINT8 edit2_state = field.machine().root_device().ioport("EDIT2")->read();
+	UINT8 edit3_state = field.machine().root_device().ioport("EDIT3")->read();
+	UINT8 misc_state = field.machine().root_device().ioport("MISC")->read();
 	device_t *ssem_cpu = field.machine().device("maincpu");
 
 	switch( (int)(FPTR)param )

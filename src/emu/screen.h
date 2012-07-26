@@ -61,6 +61,10 @@ enum screen_type_enum
 };
 
 
+// screen_update callback flags
+const UINT32 UPDATE_HAS_NOT_CHANGED = 0x0001;	// the video has not changed
+
+
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -223,6 +227,7 @@ public:
 	// additional helpers
 	void register_vblank_callback(vblank_state_delegate vblank_callback);
 	void register_screen_bitmap(bitmap_t &bitmap);
+	int vblank_port_read();
 
 	// internal to the video system
 	bool update_quads();

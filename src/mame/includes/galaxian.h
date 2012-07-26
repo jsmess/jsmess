@@ -37,9 +37,12 @@ class galaxian_state : public driver_device
 public:
 	galaxian_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_spriteram(*this, "spriteram") { }
+		  m_spriteram(*this, "spriteram") ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+
 	int m_bullets_base;
 	int m_numspritegens;
 	int m_counter_74ls161[2];
@@ -78,7 +81,72 @@ public:
 	UINT8 m_stars_blink_state;
 	rgb_t m_bullet_color[8];
 	UINT8 m_gfxbank[5];
-	required_shared_ptr<UINT8> m_spriteram;
+	DECLARE_WRITE8_MEMBER(galaxian_videoram_w);
+	DECLARE_WRITE8_MEMBER(galaxian_objram_w);
+	DECLARE_WRITE8_MEMBER(galaxian_flip_screen_x_w);
+	DECLARE_WRITE8_MEMBER(galaxian_flip_screen_y_w);
+	DECLARE_WRITE8_MEMBER(galaxian_flip_screen_xy_w);
+	DECLARE_WRITE8_MEMBER(galaxian_stars_enable_w);
+	DECLARE_WRITE8_MEMBER(scramble_background_enable_w);
+	DECLARE_WRITE8_MEMBER(scramble_background_red_w);
+	DECLARE_WRITE8_MEMBER(scramble_background_green_w);
+	DECLARE_WRITE8_MEMBER(scramble_background_blue_w);
+	DECLARE_WRITE8_MEMBER(galaxian_gfxbank_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(scramble_protection_alt_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(gmgalax_port_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(azurian_port_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(kingball_muxbit_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(kingball_noise_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(moonwar_dial_r);
+	DECLARE_WRITE8_MEMBER(irq_enable_w);
+	DECLARE_WRITE8_MEMBER(start_lamp_w);
+	DECLARE_WRITE8_MEMBER(coin_lock_w);
+	DECLARE_WRITE8_MEMBER(coin_count_0_w);
+	DECLARE_WRITE8_MEMBER(coin_count_1_w);
+	DECLARE_READ8_MEMBER(konami_ay8910_r);
+	DECLARE_WRITE8_MEMBER(konami_ay8910_w);
+	DECLARE_WRITE8_MEMBER(konami_sound_filter_w);
+	DECLARE_READ8_MEMBER(theend_ppi8255_r);
+	DECLARE_WRITE8_MEMBER(theend_ppi8255_w);
+	DECLARE_WRITE8_MEMBER(explorer_sound_control_w);
+	DECLARE_READ8_MEMBER(sfx_sample_io_r);
+	DECLARE_WRITE8_MEMBER(sfx_sample_io_w);
+	DECLARE_READ8_MEMBER(monsterz_protection_r);
+	DECLARE_READ8_MEMBER(frogger_ppi8255_r);
+	DECLARE_WRITE8_MEMBER(frogger_ppi8255_w);
+	DECLARE_READ8_MEMBER(frogger_ay8910_r);
+	DECLARE_WRITE8_MEMBER(frogger_ay8910_w);
+	DECLARE_WRITE8_MEMBER(froggrmc_sound_control_w);
+	DECLARE_READ8_MEMBER(frogf_ppi8255_r);
+	DECLARE_WRITE8_MEMBER(frogf_ppi8255_w);
+	DECLARE_READ8_MEMBER(turtles_ppi8255_0_r);
+	DECLARE_READ8_MEMBER(turtles_ppi8255_1_r);
+	DECLARE_WRITE8_MEMBER(turtles_ppi8255_0_w);
+	DECLARE_WRITE8_MEMBER(turtles_ppi8255_1_w);
+	DECLARE_READ8_MEMBER(scorpion_ay8910_r);
+	DECLARE_WRITE8_MEMBER(scorpion_ay8910_w);
+	DECLARE_READ8_MEMBER(scorpion_digitalker_intr_r);
+	DECLARE_WRITE8_MEMBER(zigzag_bankswap_w);
+	DECLARE_WRITE8_MEMBER(zigzag_ay8910_w);
+	DECLARE_WRITE8_MEMBER(kingball_speech_dip_w);
+	DECLARE_WRITE8_MEMBER(kingball_sound1_w);
+	DECLARE_WRITE8_MEMBER(kingball_sound2_w);
+	DECLARE_WRITE8_MEMBER(mshuttle_ay8910_cs_w);
+	DECLARE_WRITE8_MEMBER(mshuttle_ay8910_control_w);
+	DECLARE_WRITE8_MEMBER(mshuttle_ay8910_data_w);
+	DECLARE_READ8_MEMBER(mshuttle_ay8910_data_r);
+	DECLARE_READ8_MEMBER(jumpbug_protection_r);
+	DECLARE_WRITE8_MEMBER(checkman_sound_command_w);
+	DECLARE_READ8_MEMBER(checkmaj_protection_r);
+	DECLARE_READ8_MEMBER(dingo_3000_r);
+	DECLARE_READ8_MEMBER(dingo_3035_r);
+	DECLARE_READ8_MEMBER(dingoe_3001_r);
+	DECLARE_WRITE8_MEMBER(tenspot_unk_6000_w);
+	DECLARE_WRITE8_MEMBER(tenspot_unk_8000_w);
+	DECLARE_WRITE8_MEMBER(tenspot_unk_e000_w);
+	DECLARE_WRITE8_MEMBER(artic_gfxbank_w);
+	DECLARE_READ8_MEMBER(tenspot_dsw_read);
+	DECLARE_INPUT_CHANGED_MEMBER(gmgalax_game_changed);
 };
 
 
@@ -90,20 +158,9 @@ PALETTE_INIT( moonwar );
 VIDEO_START( galaxian );
 SCREEN_UPDATE_RGB32( galaxian );
 
-WRITE8_HANDLER( galaxian_videoram_w );
-WRITE8_HANDLER( galaxian_objram_w );
 
-WRITE8_HANDLER( galaxian_flip_screen_x_w );
-WRITE8_HANDLER( galaxian_flip_screen_y_w );
-WRITE8_HANDLER( galaxian_flip_screen_xy_w );
 
-WRITE8_HANDLER( galaxian_stars_enable_w );
-WRITE8_HANDLER( scramble_background_enable_w );
-WRITE8_HANDLER( scramble_background_red_w );
-WRITE8_HANDLER( scramble_background_green_w );
-WRITE8_HANDLER( scramble_background_blue_w );
 
-WRITE8_HANDLER( galaxian_gfxbank_w );
 
 TIMER_DEVICE_CALLBACK( galaxian_stars_blink_timer );
 

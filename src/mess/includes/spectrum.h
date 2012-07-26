@@ -66,7 +66,8 @@ class spectrum_state : public driver_device
 {
 public:
 	spectrum_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_video_ram(*this, "video_ram"){ }
 
 	int m_port_fe_data;
 	int m_port_7ffd_data;
@@ -81,7 +82,7 @@ public:
 	int m_frame_number;    /* Used for handling FLASH 1 */
 	int m_flash_invert;
 	UINT8 m_retrace_cycles;
-	UINT8 *m_video_ram;
+	optional_shared_ptr<UINT8> m_video_ram;
 	UINT8 *m_screen_location;
 
 	int m_ROMSelection;
@@ -99,6 +100,13 @@ public:
 
 	UINT8 *m_ram_0000;
 	UINT8 m_ram_disabled_by_beta;
+	DECLARE_WRITE8_MEMBER(spectrum_port_fe_w);
+	DECLARE_READ8_MEMBER(spectrum_port_fe_r);
+	DECLARE_READ8_MEMBER(spectrum_port_1f_r);
+	DECLARE_READ8_MEMBER(spectrum_port_7f_r);
+	DECLARE_READ8_MEMBER(spectrum_port_df_r);
+	DECLARE_READ8_MEMBER(spectrum_port_ula_r);
+	DECLARE_DIRECT_UPDATE_MEMBER(spectrum_direct);
 };
 
 
@@ -110,11 +118,6 @@ INPUT_PORTS_EXTERN( spec_plus );
 MACHINE_CONFIG_EXTERN( spectrum );
 MACHINE_RESET( spectrum );
 
-READ8_HANDLER(spectrum_port_1f_r);
-READ8_HANDLER(spectrum_port_7f_r);
-READ8_HANDLER(spectrum_port_df_r);
-READ8_HANDLER(spectrum_port_fe_r);
-WRITE8_HANDLER(spectrum_port_fe_w);
 
 /*----------- defined in drivers/spec128.c -----------*/
 

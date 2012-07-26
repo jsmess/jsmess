@@ -8,15 +8,15 @@ class brkthru_state : public driver_device
 {
 public:
 	brkthru_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_fg_videoram(*this, "fg_videoram"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT8 * m_videoram;
-	UINT8 * m_spriteram;
-	UINT8 * m_fg_videoram;
-	size_t  m_videoram_size;
-	size_t  m_spriteram_size;
-	size_t  m_fg_videoram_size;
+	required_shared_ptr<UINT8> m_fg_videoram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	tilemap_t *m_fg_tilemap;
@@ -31,14 +31,18 @@ public:
 	device_t *m_audiocpu;
 
 	UINT8   m_nmi_mask;
+	DECLARE_WRITE8_MEMBER(brkthru_1803_w);
+	DECLARE_WRITE8_MEMBER(darwin_0803_w);
+	DECLARE_WRITE8_MEMBER(brkthru_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(brkthru_bgram_w);
+	DECLARE_WRITE8_MEMBER(brkthru_fgram_w);
+	DECLARE_WRITE8_MEMBER(brkthru_1800_w);
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 };
 
 
 /*----------- defined in video/brkthru.c -----------*/
 
-WRITE8_HANDLER( brkthru_1800_w );
-WRITE8_HANDLER( brkthru_bgram_w );
-WRITE8_HANDLER( brkthru_fgram_w );
 VIDEO_START( brkthru );
 PALETTE_INIT( brkthru );
 SCREEN_UPDATE_IND16( brkthru );

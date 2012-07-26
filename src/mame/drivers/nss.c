@@ -306,18 +306,28 @@ public:
 
 	UINT8 m_m50458_rom_bank;
 	UINT8 m_vblank_bit;
+	DECLARE_READ8_MEMBER(nss_eeprom_r);
+	DECLARE_WRITE8_MEMBER(nss_eeprom_w);
+	DECLARE_READ8_MEMBER(m50458_r);
+	DECLARE_WRITE8_MEMBER(m50458_w);
+	DECLARE_READ8_MEMBER(port00_r);
+	DECLARE_READ8_MEMBER(port01_r);
+	DECLARE_READ8_MEMBER(port02_r);
+	DECLARE_READ8_MEMBER(port03_r);
+	DECLARE_WRITE8_MEMBER(port80_w);
+	DECLARE_WRITE8_MEMBER(port82_w);
 };
 
 
-static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8)
-	AM_RANGE(0x000000, 0x2fffff) AM_READWRITE(snes_r_bank1, snes_w_bank1)	/* I/O and ROM (repeats for each bank) */
-	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE(snes_r_bank2, snes_w_bank2)	/* I/O and ROM (repeats for each bank) */
-	AM_RANGE(0x400000, 0x5fffff) AM_READ(snes_r_bank3)						/* ROM (and reserved in Mode 20) */
-	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(snes_r_bank4, snes_w_bank4)	/* used by Mode 20 DSP-1 */
-	AM_RANGE(0x700000, 0x7dffff) AM_READWRITE(snes_r_bank5, snes_w_bank5)
+static ADDRESS_MAP_START( snes_map, AS_PROGRAM, 8, nss_state )
+	AM_RANGE(0x000000, 0x2fffff) AM_READWRITE_LEGACY(snes_r_bank1, snes_w_bank1)	/* I/O and ROM (repeats for each bank) */
+	AM_RANGE(0x300000, 0x3fffff) AM_READWRITE_LEGACY(snes_r_bank2, snes_w_bank2)	/* I/O and ROM (repeats for each bank) */
+	AM_RANGE(0x400000, 0x5fffff) AM_READ_LEGACY(snes_r_bank3)						/* ROM (and reserved in Mode 20) */
+	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE_LEGACY(snes_r_bank4, snes_w_bank4)	/* used by Mode 20 DSP-1 */
+	AM_RANGE(0x700000, 0x7dffff) AM_READWRITE_LEGACY(snes_r_bank5, snes_w_bank5)
 	AM_RANGE(0x7e0000, 0x7fffff) AM_RAM					/* 8KB Low RAM, 24KB High RAM, 96KB Expanded RAM */
-	AM_RANGE(0x800000, 0xbfffff) AM_READWRITE(snes_r_bank6, snes_w_bank6)	/* Mirror and ROM */
-	AM_RANGE(0xc00000, 0xffffff) AM_READWRITE(snes_r_bank7, snes_w_bank7)	/* Mirror and ROM */
+	AM_RANGE(0x800000, 0xbfffff) AM_READWRITE_LEGACY(snes_r_bank6, snes_w_bank6)	/* Mirror and ROM */
+	AM_RANGE(0xc00000, 0xffffff) AM_READWRITE_LEGACY(snes_r_bank7, snes_w_bank7)	/* Mirror and ROM */
 ADDRESS_MAP_END
 
 static READ8_DEVICE_HANDLER( spc_ram_100_r )
@@ -330,12 +340,12 @@ static WRITE8_DEVICE_HANDLER( spc_ram_100_w )
 	spc_ram_w(device, offset + 0x100, data);
 }
 
-static ADDRESS_MAP_START( spc_mem, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", spc_ram_r, spc_ram_w)	/* lower 32k ram */
-	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", spc_io_r, spc_io_w)  	/* spc io */
-	AM_RANGE(0x0100, 0xffff) AM_DEVWRITE("spc700", spc_ram_100_w)
-	AM_RANGE(0x0100, 0xffbf) AM_DEVREAD("spc700", spc_ram_100_r)
-	AM_RANGE(0xffc0, 0xffff) AM_DEVREAD("spc700", spc_ipl_r)
+static ADDRESS_MAP_START( spc_mem, AS_PROGRAM, 8, nss_state )
+	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE_LEGACY("spc700", spc_ram_r, spc_ram_w)	/* lower 32k ram */
+	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE_LEGACY("spc700", spc_io_r, spc_io_w)	/* spc io */
+	AM_RANGE(0x0100, 0xffff) AM_DEVWRITE_LEGACY("spc700", spc_ram_100_w)
+	AM_RANGE(0x0100, 0xffbf) AM_DEVREAD_LEGACY("spc700", spc_ram_100_r)
+	AM_RANGE(0xffc0, 0xffff) AM_DEVREAD_LEGACY("spc700", spc_ipl_r)
 ADDRESS_MAP_END
 
 /* NSS specific */
@@ -361,12 +371,12 @@ M50458 charset is checked at 1382, a word checksum is provided at offsets 0xffe-
 
 */
 
-static READ8_HANDLER( nss_eeprom_r )
+READ8_MEMBER(nss_state::nss_eeprom_r)
 {
 	return 0x40; // eeprom read bit
 }
 
-static WRITE8_HANDLER( nss_eeprom_w )
+WRITE8_MEMBER(nss_state::nss_eeprom_w)
 {
 	/*
     x--- ---- EEPROM CS bit?
@@ -379,18 +389,18 @@ static WRITE8_HANDLER( nss_eeprom_w )
 }
 
 
-static READ8_HANDLER( m50458_r )
+READ8_MEMBER(nss_state::m50458_r)
 {
-	nss_state *state = space->machine().driver_data<nss_state>();
-	if(state->m_m50458_rom_bank)
+
+	if(m_m50458_rom_bank)
 	{
-		UINT8 *gfx_rom = space->machine().region("m50458_gfx")->base();
+		UINT8 *gfx_rom = memregion("m50458_gfx")->base();
 
 		return gfx_rom[offset & 0xfff];
 	}
 	else
 	{
-		UINT8 *gfx_ram = space->machine().region("m50458_vram")->base();
+		UINT8 *gfx_ram = memregion("m50458_vram")->base();
 
 		return gfx_ram[offset & 0xfff];
 	}
@@ -398,21 +408,21 @@ static READ8_HANDLER( m50458_r )
 	return 0;
 }
 
-static WRITE8_HANDLER( m50458_w )
+WRITE8_MEMBER(nss_state::m50458_w)
 {
-	nss_state *state = space->machine().driver_data<nss_state>();
-	if(state->m_m50458_rom_bank)
+
+	if(m_m50458_rom_bank)
 		logerror("Warning: write to M50458 GFX ROM!\n");
 	else
 	{
-		UINT8 *gfx_ram = space->machine().region("m50458_vram")->base();
+		UINT8 *gfx_ram = memregion("m50458_vram")->base();
 
 		gfx_ram[offset & 0xfff] = data;
 	}
 }
 
 
-static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8, nss_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8fff) AM_RAM // vram perhaps?
@@ -422,26 +432,26 @@ static ADDRESS_MAP_START( bios_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_RAM AM_REGION("ibios_rom", 0x6000)
 ADDRESS_MAP_END
 
-static READ8_HANDLER( port00_r )
+READ8_MEMBER(nss_state::port00_r)
 {
-	nss_state *state = space->machine().driver_data<nss_state>();
+
 	/*
     -x-- ---- almost certainly tied to the vblank signal
     */
 
 
-	state->m_vblank_bit^=0x40;
+	m_vblank_bit^=0x40;
 
-	return state->m_vblank_bit | 0xbf;
+	return m_vblank_bit | 0xbf;
 }
 
 
-static READ8_HANDLER( port01_r )
+READ8_MEMBER(nss_state::port01_r)
 {
 	return 0xff;
 }
 
-static READ8_HANDLER( port02_r )
+READ8_MEMBER(nss_state::port02_r)
 {
 	/*
     ---- -x-- (makes the BIOS to jump at 0x4258, sets 0x80 bit 1 and then jumps to unmapped area of the BIOS (bankswitch?))
@@ -451,7 +461,7 @@ static READ8_HANDLER( port02_r )
 	return 0xfb;
 }
 
-static READ8_HANDLER( port03_r )
+READ8_MEMBER(nss_state::port03_r)
 {
 	/*
     x--- ---- EEPROM2 read bit
@@ -462,20 +472,20 @@ static READ8_HANDLER( port03_r )
 	return 0xfe;
 }
 
-static WRITE8_HANDLER( port80_w )
+WRITE8_MEMBER(nss_state::port80_w)
 {
-	nss_state *state = space->machine().driver_data<nss_state>();
+
 	/*
     ---- -x-- written when 0x9000-0x9fff is read, probably a bankswitch
     ---- --x- see port 0x02 note
     ---- ---x BIOS bankswitch
     */
 
-	memory_set_bank(space->machine(), "bank1", data & 1);
-	state->m_m50458_rom_bank = data & 4;
+	membank("bank1")->set_entry(data & 1);
+	m_m50458_rom_bank = data & 4;
 }
 
-static WRITE8_HANDLER( port82_w ) // EEPROM2?
+WRITE8_MEMBER(nss_state::port82_w)// EEPROM2?
 {
 	/*
     ---- x--- EEPROM2 clock bit?
@@ -484,7 +494,7 @@ static WRITE8_HANDLER( port82_w ) // EEPROM2?
     */
 }
 
-static ADDRESS_MAP_START( bios_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( bios_io_map, AS_IO, 8, nss_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(port00_r)
 	AM_RANGE(0x01, 0x01) AM_READ(port01_r)
@@ -500,10 +510,10 @@ ADDRESS_MAP_END
 static MACHINE_START( nss )
 {
 	nss_state *state = machine.driver_data<nss_state>();
-	UINT8 *ROM = machine.region("bios")->base();
+	UINT8 *ROM = state->memregion("bios")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x8000);
-	memory_set_bank(machine, "bank1", 0);
+	state->membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x8000);
+	state->membank("bank1")->set_entry(0);
 
 	state->m_m50458_rom_bank = 0;
 

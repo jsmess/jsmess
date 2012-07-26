@@ -17,25 +17,24 @@
 #include "sound/okim6295.h"
 #include "includes/ultraman.h"
 
-static WRITE16_HANDLER( sound_cmd_w )
+WRITE16_MEMBER(ultraman_state::sound_cmd_w)
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_w(space, 0, data & 0xff);
+		soundlatch_byte_w(space, 0, data & 0xff);
 }
 
-static WRITE16_HANDLER( sound_irq_trigger_w )
+WRITE16_MEMBER(ultraman_state::sound_irq_trigger_w)
 {
-	ultraman_state *state = space->machine().driver_data<ultraman_state>();
 
 	if (ACCESSING_BITS_0_7)
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, ultraman_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM
-	AM_RANGE(0x180000, 0x183fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette */
+	AM_RANGE(0x180000, 0x183fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")/* Palette */
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x1c0002, 0x1c0003) AM_READ_PORT("P1")
 	AM_RANGE(0x1c0004, 0x1c0005) AM_READ_PORT("P2")
@@ -45,26 +44,26 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x1c0020, 0x1c0021) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x1c0028, 0x1c0029) AM_WRITE(sound_irq_trigger_w)
 	AM_RANGE(0x1c0030, 0x1c0031) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x204000, 0x204fff) AM_DEVREADWRITE8("k051316_1", k051316_r, k051316_w, 0x00ff)	/* K051316 #0 RAM */
-	AM_RANGE(0x205000, 0x205fff) AM_DEVREADWRITE8("k051316_2", k051316_r, k051316_w, 0x00ff)	/* K051316 #1 RAM */
-	AM_RANGE(0x206000, 0x206fff) AM_DEVREADWRITE8("k051316_3", k051316_r, k051316_w, 0x00ff)	/* K051316 #2 RAM */
-	AM_RANGE(0x207f80, 0x207f9f) AM_DEVWRITE8("k051316_1", k051316_ctrl_w, 0x00ff)	/* K051316 #0 registers */
-	AM_RANGE(0x207fa0, 0x207fbf) AM_DEVWRITE8("k051316_2", k051316_ctrl_w, 0x00ff)	/* K051316 #1 registers */
-	AM_RANGE(0x207fc0, 0x207fdf) AM_DEVWRITE8("k051316_3", k051316_ctrl_w, 0x00ff)	/* K051316 #2 registers */
-	AM_RANGE(0x304000, 0x30400f) AM_DEVREADWRITE8("k051960", k051937_r, k051937_w, 0x00ff)		/* Sprite control */
-	AM_RANGE(0x304800, 0x304fff) AM_DEVREADWRITE8("k051960", k051960_r, k051960_w, 0x00ff)		/* Sprite RAM */
+	AM_RANGE(0x204000, 0x204fff) AM_DEVREADWRITE8_LEGACY("k051316_1", k051316_r, k051316_w, 0x00ff)	/* K051316 #0 RAM */
+	AM_RANGE(0x205000, 0x205fff) AM_DEVREADWRITE8_LEGACY("k051316_2", k051316_r, k051316_w, 0x00ff)	/* K051316 #1 RAM */
+	AM_RANGE(0x206000, 0x206fff) AM_DEVREADWRITE8_LEGACY("k051316_3", k051316_r, k051316_w, 0x00ff)	/* K051316 #2 RAM */
+	AM_RANGE(0x207f80, 0x207f9f) AM_DEVWRITE8_LEGACY("k051316_1", k051316_ctrl_w, 0x00ff)	/* K051316 #0 registers */
+	AM_RANGE(0x207fa0, 0x207fbf) AM_DEVWRITE8_LEGACY("k051316_2", k051316_ctrl_w, 0x00ff)	/* K051316 #1 registers */
+	AM_RANGE(0x207fc0, 0x207fdf) AM_DEVWRITE8_LEGACY("k051316_3", k051316_ctrl_w, 0x00ff)	/* K051316 #2 registers */
+	AM_RANGE(0x304000, 0x30400f) AM_DEVREADWRITE8_LEGACY("k051960", k051937_r, k051937_w, 0x00ff)		/* Sprite control */
+	AM_RANGE(0x304800, 0x304fff) AM_DEVREADWRITE8_LEGACY("k051960", k051960_r, k051960_w, 0x00ff)		/* Sprite RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ultraman_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)	/* Sound latch read */
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)	/* Sound latch read */
 //  AM_RANGE(0xd000, 0xd000) AM_WRITENOP      /* ??? */
-	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)		/* M6295 */
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)	/* YM2151 */
+	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("oki", okim6295_device, read, write)		/* M6295 */
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)	/* YM2151 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, ultraman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_WRITENOP                     /* ??? */
 ADDRESS_MAP_END

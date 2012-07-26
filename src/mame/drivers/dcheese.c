@@ -117,35 +117,33 @@ static MACHINE_START( dcheese )
  *
  *************************************/
 
-static CUSTOM_INPUT( sound_latch_state_r )
+CUSTOM_INPUT_MEMBER(dcheese_state::sound_latch_state_r)
 {
-	dcheese_state *state = field.machine().driver_data<dcheese_state>();
-	return state->m_soundlatch_full;
+	return m_soundlatch_full;
 }
 
 
-static WRITE16_HANDLER( eeprom_control_w )
+WRITE16_MEMBER(dcheese_state::eeprom_control_w)
 {
 	/* toggles bit $0100 very frequently while waiting for things */
 	/* bits $0080-$0010 are probably lamps */
 	if (ACCESSING_BITS_0_7)
 	{
-		input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
-		ticket_dispenser_w(space->machine().device("ticket"), 0, (data & 1) << 7);
+		ioport("EEPROMOUT")->write(data, 0xff);
+		machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 1) << 7);
 	}
 }
 
 
-static WRITE16_HANDLER( sound_command_w )
+WRITE16_MEMBER(dcheese_state::sound_command_w)
 {
-	dcheese_state *state = space->machine().driver_data<dcheese_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* write the latch and set the IRQ */
-		state->m_soundlatch_full = 1;
-		device_set_input_line(state->m_audiocpu, 0, ASSERT_LINE);
-		soundlatch_w(space, 0, data & 0xff);
+		m_soundlatch_full = 1;
+		device_set_input_line(m_audiocpu, 0, ASSERT_LINE);
+		soundlatch_byte_w(space, 0, data & 0xff);
 	}
 }
 
@@ -157,53 +155,50 @@ static WRITE16_HANDLER( sound_command_w )
  *
  *************************************/
 
-static READ8_HANDLER( sound_command_r )
+READ8_MEMBER(dcheese_state::sound_command_r)
 {
-	dcheese_state *state = space->machine().driver_data<dcheese_state>();
 
 	/* read the latch and clear the IRQ */
-	state->m_soundlatch_full = 0;
-	device_set_input_line(state->m_audiocpu, 0, CLEAR_LINE);
-	return soundlatch_r(space, 0);
+	m_soundlatch_full = 0;
+	device_set_input_line(m_audiocpu, 0, CLEAR_LINE);
+	return soundlatch_byte_r(space, 0);
 }
 
 
-static READ8_HANDLER( sound_status_r )
+READ8_MEMBER(dcheese_state::sound_status_r)
 {
 	/* seems to be ready signal on BSMT or latching hardware */
-	bsmt2000_device *bsmt = space->machine().device<bsmt2000_device>("bsmt");
+	bsmt2000_device *bsmt = machine().device<bsmt2000_device>("bsmt");
 	return bsmt->read_status() << 7;
 }
 
 
-static WRITE8_HANDLER( sound_control_w )
+WRITE8_MEMBER(dcheese_state::sound_control_w)
 {
-	dcheese_state *state = space->machine().driver_data<dcheese_state>();
-	UINT8 diff = data ^ state->m_sound_control;
-	state->m_sound_control = data;
+	UINT8 diff = data ^ m_sound_control;
+	m_sound_control = data;
 
 	/* bit 0x20 = LED */
 	/* bit 0x40 = BSMT2000 reset */
 	if ((diff & 0x40) && (data & 0x40))
-		state->m_bsmt->reset();
+		m_bsmt->reset();
 	if (data != 0x40 && data != 0x60)
-		logerror("%04X:sound_control_w = %02X\n", cpu_get_pc(&space->device()), data);
+		logerror("%04X:sound_control_w = %02X\n", cpu_get_pc(&space.device()), data);
 }
 
 
-static WRITE8_HANDLER( bsmt_data_w )
+WRITE8_MEMBER(dcheese_state::bsmt_data_w)
 {
-	dcheese_state *state = space->machine().driver_data<dcheese_state>();
-	bsmt2000_device *bsmt = space->machine().device<bsmt2000_device>("bsmt");
+	bsmt2000_device *bsmt = machine().device<bsmt2000_device>("bsmt");
 
 	/* writes come in pairs; even bytes latch, odd bytes write */
 	if (offset % 2 == 0)
 	{
 		bsmt->write_reg(offset / 2);
-		state->m_sound_msb_latch = data;
+		m_sound_msb_latch = data;
 	}
 	else
-		bsmt->write_data((state->m_sound_msb_latch << 8) | data);
+		bsmt->write_data((m_sound_msb_latch << 8) | data);
 }
 
 
@@ -214,7 +209,7 @@ static WRITE8_HANDLER( bsmt_data_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 16, dcheese_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
@@ -236,7 +231,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_cpu_map, AS_PROGRAM, 8, dcheese_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(sound_status_r, sound_control_w)
 	AM_RANGE(0x0800, 0x0fff) AM_READ(sound_command_r)
@@ -275,9 +270,9 @@ static INPUT_PORTS_START( dcheese )
 
 	PORT_START("240000")
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* low 5 bits read as a unit */
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* sound->main buffer status (0=empty) */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(sound_latch_state_r, NULL)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dcheese_state,sound_latch_state_r, NULL)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -324,9 +319,9 @@ static INPUT_PORTS_START( lottof2 )
 
 	PORT_START("240000")
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* low 5 bits read as a unit */
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* sound->main buffer status (0=empty) */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(sound_latch_state_r, NULL)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dcheese_state,sound_latch_state_r, NULL)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -371,9 +366,9 @@ static INPUT_PORTS_START( fredmem )
 
 	PORT_START("240000")
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* low 5 bits read as a unit */
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket", ticket_dispenser_line_r)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* sound->main buffer status (0=empty) */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(sound_latch_state_r, NULL)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dcheese_state,sound_latch_state_r, NULL)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -424,7 +419,7 @@ static MACHINE_CONFIG_START( dcheese, dcheese_state )
 	MCFG_MACHINE_START(dcheese)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
-	MCFG_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

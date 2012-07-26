@@ -2,7 +2,7 @@
 
     driver.c
 
-    Driver enumeration helpers.
+    Core driver device base class.
 
 ****************************************************************************
 
@@ -38,393 +38,700 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include <ctype.h>
+#include "drivenum.h"
+
+
+//**************************************************************************
+//  DRIVER DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  driver_device - constructor
+//-------------------------------------------------
+
+driver_device::driver_device(const machine_config &mconfig, device_type type, const char *tag)
+	: device_t(mconfig, type, "Driver Device", tag, NULL, 0),
+	  m_generic_paletteram_8(*this, "paletteram"),
+	  m_generic_paletteram2_8(*this, "paletteram2"),
+	  m_generic_paletteram_16(*this, "paletteram"),
+	  m_generic_paletteram2_16(*this, "paletteram2"),
+	  m_generic_paletteram_32(*this, "paletteram"),
+	  m_generic_paletteram2_32(*this, "paletteram2"),
+	  m_system(NULL),
+	  m_latch_clear_value(0),
+	  m_flip_screen_x(0),
+	  m_flip_screen_y(0)
+{
+	memset(m_legacy_callbacks, 0, sizeof(m_legacy_callbacks));
+	memset(m_latched_value, 0, sizeof(m_latched_value));
+	memset(m_latch_read, 0, sizeof(m_latch_read));
+}
+
+
+//-------------------------------------------------
+//  driver_device - destructor
+//-------------------------------------------------
+
+driver_device::~driver_device()
+{
+}
+
+
+//-------------------------------------------------
+//  static_set_game - set the game in the device
+//  configuration
+//-------------------------------------------------
+
+void driver_device::static_set_game(device_t &device, const game_driver &game)
+{
+	driver_device &driver = downcast<driver_device &>(device);
+
+	// set the system
+	driver.m_system = &game;
+
+	// set the short name to the game's name
+	driver.m_shortname = game.name;
+
+	// set the full name to the game's description
+	driver.m_name = game.description;
+
+	// and set the search path to include all parents
+	driver.m_searchpath = game.name;
+	for (int parent = driver_list::clone(game); parent != -1; parent = driver_list::clone(parent))
+		driver.m_searchpath.cat(";").cat(driver_list::driver(parent).name);
+}
+
+
+//-------------------------------------------------
+//  static_set_callback - set the a callback in
+//  the device configuration
+//-------------------------------------------------
+
+void driver_device::static_set_callback(device_t &device, callback_type type, legacy_callback_func callback)
+{
+	downcast<driver_device &>(device).m_legacy_callbacks[type] = callback;
+}
+
+void driver_device::static_set_callback(device_t &device, callback_type type, driver_callback_delegate callback)
+{
+	downcast<driver_device &>(device).m_callbacks[type] = callback;
+}
+
+
+//-------------------------------------------------
+//  driver_start - default implementation which
+//  does nothing
+//-------------------------------------------------
+
+void driver_device::driver_start()
+{
+}
+
+
+//-------------------------------------------------
+//  machine_start - default implementation which
+//  calls to the legacy machine_start function
+//-------------------------------------------------
+
+void driver_device::machine_start()
+{
+}
+
+
+//-------------------------------------------------
+//  sound_start - default implementation which
+//  calls to the legacy sound_start function
+//-------------------------------------------------
+
+void driver_device::sound_start()
+{
+}
+
+
+//-------------------------------------------------
+//  palette_init - default implementation which
+//  does nothing
+//-------------------------------------------------
+
+void driver_device::palette_init()
+{
+}
+
+
+//-------------------------------------------------
+//  video_start - default implementation which
+//  calls to the legacy video_start function
+//-------------------------------------------------
+
+void driver_device::video_start()
+{
+}
+
+
+//-------------------------------------------------
+//  driver_reset - default implementation which
+//  does nothing
+//-------------------------------------------------
+
+void driver_device::driver_reset()
+{
+}
+
+
+//-------------------------------------------------
+//  machine_reset - default implementation which
+//  calls to the legacy machine_reset function
+//-------------------------------------------------
+
+void driver_device::machine_reset()
+{
+}
+
+
+//-------------------------------------------------
+//  sound_reset - default implementation which
+//  calls to the legacy sound_reset function
+//-------------------------------------------------
+
+void driver_device::sound_reset()
+{
+}
+
+
+//-------------------------------------------------
+//  video_reset - default implementation which
+//  calls to the legacy video_reset function
+//-------------------------------------------------
+
+void driver_device::video_reset()
+{
+}
+
+
+//-------------------------------------------------
+//  device_rom_region - return a pointer to the
+//  game's ROMs
+//-------------------------------------------------
+
+const rom_entry *driver_device::device_rom_region() const
+{
+	return m_system->rom;
+}
+
+
+//-------------------------------------------------
+//  device_input_ports - return a pointer to the
+//  game's input ports
+//-------------------------------------------------
+
+ioport_constructor driver_device::device_input_ports() const
+{
+	return m_system->ipt;
+}
+
+
+//-------------------------------------------------
+//  device_start - device override which calls
+//  the various helpers
+//-------------------------------------------------
+
+void driver_device::device_start()
+{
+	// bind our legacy callbacks
+	for (int index = 0; index < ARRAY_LENGTH(m_legacy_callbacks); index++)
+		if (m_legacy_callbacks[index] != NULL)
+			m_callbacks[index] = driver_callback_delegate(m_legacy_callbacks[index], "legacy_callback", &machine());
+
+	// reschedule ourselves to be last
+	device_iterator iter(*this);
+	for (device_t *test = iter.first(); test != NULL; test = iter.next())
+		if (test != this && !test->started())
+			throw device_missing_dependencies();
+
+	// call the game-specific init
+	if (m_system->driver_init != NULL)
+		(*m_system->driver_init)(machine());
+
+	// finish image devices init process
+	image_postdevice_init(machine());
+
+	// call palette_init if present
+	if (!m_callbacks[CB_PALETTE_INIT].isnull())
+		m_callbacks[CB_PALETTE_INIT]();
+	else
+		palette_init();
+
+	// start the various pieces
+	driver_start();
+
+	if (!m_callbacks[CB_MACHINE_START].isnull())
+		m_callbacks[CB_MACHINE_START]();
+	else
+		machine_start();
+
+	if (!m_callbacks[CB_SOUND_START].isnull())
+		m_callbacks[CB_SOUND_START]();
+	else
+		sound_start();
+
+	if (!m_callbacks[CB_VIDEO_START].isnull())
+		m_callbacks[CB_VIDEO_START]();
+	else
+		video_start();
+
+	// save generic states
+	save_item(NAME(m_flip_screen_x));
+	save_item(NAME(m_flip_screen_y));
+}
+
+
+//-------------------------------------------------
+//  device_reset_after_children - device override
+//  which calls the various helpers; must happen
+//  after all child devices are reset
+//-------------------------------------------------
+
+void driver_device::device_reset_after_children()
+{
+	// reset each piece
+	driver_reset();
+
+	if (!m_callbacks[CB_MACHINE_RESET].isnull())
+		m_callbacks[CB_MACHINE_RESET]();
+	else
+		machine_reset();
+
+	if (!m_callbacks[CB_SOUND_RESET].isnull())
+		m_callbacks[CB_SOUND_RESET]();
+	else
+		sound_reset();
+
+	if (!m_callbacks[CB_VIDEO_RESET].isnull())
+		m_callbacks[CB_VIDEO_RESET]();
+	else
+		video_reset();
+}
 
 
 
 //**************************************************************************
-//  DRIVER LIST
+//  INTERRUPT ENABLE AND VECTOR HELPERS
 //**************************************************************************
 
 //-------------------------------------------------
-//  driver_list - constructor
+//  irq_pulse_clear - clear a "pulsed" IRQ line
 //-------------------------------------------------
 
-driver_list::driver_list()
+void driver_device::irq_pulse_clear(void *ptr, INT32 param)
 {
+	device_execute_interface *exec = reinterpret_cast<device_execute_interface *>(ptr);
+	int irqline = param;
+	exec->set_input_line(irqline, CLEAR_LINE);
 }
 
 
 //-------------------------------------------------
-//  find - find a driver by name
+//  generic_pulse_irq_line - "pulse" an IRQ line by
+//  asserting it and then clearing it x cycle(s)
+//  later
 //-------------------------------------------------
 
-int driver_list::find(const char *name)
+void driver_device::generic_pulse_irq_line(device_execute_interface &exec, int irqline, int cycles)
 {
-	// if no name, bail
-	if (name == NULL)
-		return -1;
+	assert(irqline != INPUT_LINE_NMI && irqline != INPUT_LINE_RESET && cycles > 0);
+	exec.set_input_line(irqline, ASSERT_LINE);
 
-	// create a dummy item for comparison purposes
-	game_driver driver;
-	driver.name = name;
-	game_driver *driverptr = &driver;
-
-	// binary search to find it
-	const game_driver **result = reinterpret_cast<const game_driver **>(bsearch(&driverptr, s_drivers_sorted, s_driver_count, sizeof(*s_drivers_sorted), driver_sort_callback));
-	return (result == NULL) ? -1 : result - s_drivers_sorted;
+	attotime target_time = exec.local_time() + exec.cycles_to_attotime(cycles * exec.min_cycles());
+	machine().scheduler().timer_set(target_time - machine().time(), timer_expired_delegate(FUNC(driver_device::irq_pulse_clear), this), irqline, (void *)&exec);
 }
 
 
 //-------------------------------------------------
-//  matches - true if we match, taking into
-//  account wildcards in the wildstring
+//  generic_pulse_irq_line_and_vector - "pulse" an
+//  IRQ line by asserting it and then clearing it
+//  x cycle(s) later, specifying a vector
 //-------------------------------------------------
 
-bool driver_list::matches(const char *wildstring, const char *string)
+void driver_device::generic_pulse_irq_line_and_vector(device_execute_interface &exec, int irqline, int vector, int cycles)
 {
-	// can only match internal drivers if the wildstring starts with an underscore
-	if (string[0] == '_' && (wildstring == NULL || wildstring[0] != '_'))
-		return false;
+	assert(irqline != INPUT_LINE_NMI && irqline != INPUT_LINE_RESET && cycles > 0);
+	exec.set_input_line_and_vector(irqline, ASSERT_LINE, vector);
 
-	// match everything else normally
-	return (wildstring == NULL || mame_strwildcmp(wildstring, string) == 0);
-}
-
-
-//-------------------------------------------------
-//  driver_sort_callback - compare two items in
-//  an array of game_driver pointers
-//-------------------------------------------------
-
-int driver_list::driver_sort_callback(const void *elem1, const void *elem2)
-{
-	const game_driver * const *item1 = reinterpret_cast<const game_driver * const *>(elem1);
-	const game_driver * const *item2 = reinterpret_cast<const game_driver * const *>(elem2);
-	return mame_stricmp((*item1)->name, (*item2)->name);
-}
-
-
-//-------------------------------------------------
-//  penalty_compare - compare two strings for
-//  closeness and assign a score.
-//-------------------------------------------------
-
-int driver_list::penalty_compare(const char *source, const char *target)
-{
-	int gaps = 1;
-	bool last = true;
-
-	// scan the strings
-	for ( ; *source && *target; target++)
-	{
-		// do a case insensitive match
-		bool match = (tolower((UINT8)*source) == tolower((UINT8)*target));
-
-		// if we matched, advance the source
-		if (match)
-			source++;
-
-		// if the match state changed, count gaps
-		if (match != last)
-		{
-			last = match;
-			if (!match)
-				gaps++;
-		}
-	}
-
-	// penalty if short string does not completely fit in
-	for ( ; *source; source++)
-		gaps++;
-
-	// if we matched perfectly, gaps == 0
-	if (gaps == 1 && *source == 0 && *target == 0)
-		gaps = 0;
-
-	return gaps;
+	attotime target_time = exec.local_time() + exec.cycles_to_attotime(cycles * exec.min_cycles());
+	machine().scheduler().timer_set(target_time - machine().time(), timer_expired_delegate(FUNC(driver_device::irq_pulse_clear), this), irqline, (void *)&exec);
 }
 
 
 
 //**************************************************************************
-//  DRIVER ENUMERATOR
+//  INTERRUPT GENERATION CALLBACK HELPERS
 //**************************************************************************
 
 //-------------------------------------------------
-//  driver_enumerator - constructor
+//  NMI callbacks
 //-------------------------------------------------
 
-driver_enumerator::driver_enumerator(emu_options &options)
-	: m_current(-1),
-	  m_filtered_count(0),
-	  m_options(options),
-	  m_included(global_alloc_array(UINT8, s_driver_count)),
-	  m_config(global_alloc_array_clear(machine_config *, s_driver_count))
+INTERRUPT_GEN_MEMBER( driver_device::nmi_line_pulse )	{ device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::nmi_line_assert )	{ device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE); }
+
+
+//-------------------------------------------------
+//  IRQn callbacks
+//-------------------------------------------------
+
+INTERRUPT_GEN_MEMBER( driver_device::irq0_line_hold )	{ device.execute().set_input_line(0, HOLD_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq0_line_pulse )	{ generic_pulse_irq_line(device.execute(), 0, 1); }
+INTERRUPT_GEN_MEMBER( driver_device::irq0_line_assert )	{ device.execute().set_input_line(0, ASSERT_LINE); }
+
+INTERRUPT_GEN_MEMBER( driver_device::irq1_line_hold )	{ device.execute().set_input_line(1, HOLD_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq1_line_pulse )	{ generic_pulse_irq_line(device.execute(), 1, 1); }
+INTERRUPT_GEN_MEMBER( driver_device::irq1_line_assert )	{ device.execute().set_input_line(1, ASSERT_LINE); }
+
+INTERRUPT_GEN_MEMBER( driver_device::irq2_line_hold )	{ device.execute().set_input_line(2, HOLD_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq2_line_pulse )	{ generic_pulse_irq_line(device.execute(), 2, 1); }
+INTERRUPT_GEN_MEMBER( driver_device::irq2_line_assert )	{ device.execute().set_input_line(2, ASSERT_LINE); }
+
+INTERRUPT_GEN_MEMBER( driver_device::irq3_line_hold )	{ device.execute().set_input_line(3, HOLD_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq3_line_pulse )	{ generic_pulse_irq_line(device.execute(), 3, 1); }
+INTERRUPT_GEN_MEMBER( driver_device::irq3_line_assert )	{ device.execute().set_input_line(3, ASSERT_LINE); }
+
+INTERRUPT_GEN_MEMBER( driver_device::irq4_line_hold )	{ device.execute().set_input_line(4, HOLD_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq4_line_pulse )	{ generic_pulse_irq_line(device.execute(), 4, 1); }
+INTERRUPT_GEN_MEMBER( driver_device::irq4_line_assert )	{ device.execute().set_input_line(4, ASSERT_LINE); }
+
+INTERRUPT_GEN_MEMBER( driver_device::irq5_line_hold )	{ device.execute().set_input_line(5, HOLD_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq5_line_pulse )	{ generic_pulse_irq_line(device.execute(), 5, 1); }
+INTERRUPT_GEN_MEMBER( driver_device::irq5_line_assert )	{ device.execute().set_input_line(5, ASSERT_LINE); }
+
+INTERRUPT_GEN_MEMBER( driver_device::irq6_line_hold )	{ device.execute().set_input_line(6, HOLD_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq6_line_pulse )	{ generic_pulse_irq_line(device.execute(), 6, 1); }
+INTERRUPT_GEN_MEMBER( driver_device::irq6_line_assert )	{ device.execute().set_input_line(6, ASSERT_LINE); }
+
+INTERRUPT_GEN_MEMBER( driver_device::irq7_line_hold )	{ device.execute().set_input_line(7, HOLD_LINE); }
+INTERRUPT_GEN_MEMBER( driver_device::irq7_line_pulse )	{ generic_pulse_irq_line(device.execute(), 7, 1); }
+INTERRUPT_GEN_MEMBER( driver_device::irq7_line_assert )	{ device.execute().set_input_line(7, ASSERT_LINE); }
+
+
+
+//**************************************************************************
+//  WATCHDOG READ/WRITE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  8-bit reset read/write handlers
+//-------------------------------------------------
+
+WRITE8_MEMBER( driver_device::watchdog_reset_w ) { machine().watchdog_reset(); }
+READ8_MEMBER( driver_device::watchdog_reset_r ) { machine().watchdog_reset(); return space.unmap(); }
+
+
+//-------------------------------------------------
+//  16-bit reset read/write handlers
+//-------------------------------------------------
+
+WRITE16_MEMBER( driver_device::watchdog_reset16_w ) { machine().watchdog_reset(); }
+READ16_MEMBER( driver_device::watchdog_reset16_r ) { machine().watchdog_reset(); return space.unmap(); }
+
+
+//-------------------------------------------------
+//  32-bit reset read/write handlers
+//-------------------------------------------------
+
+WRITE32_MEMBER( driver_device::watchdog_reset32_w ) { machine().watchdog_reset(); }
+READ32_MEMBER( driver_device::watchdog_reset32_r ) { machine().watchdog_reset(); return space.unmap(); }
+
+
+
+//**************************************************************************
+//  GENERIC SOUND COMMAND LATCHING
+//**************************************************************************
+
+//-------------------------------------------------
+//  soundlatch_sync_callback - time-delayed
+//  callback to set a latch value
+//-------------------------------------------------
+
+void driver_device::soundlatch_sync_callback(void *ptr, INT32 param)
 {
-	include_all();
+	UINT16 value = param >> 8;
+	int which = param & 0xff;
+
+	// if the latch hasn't been read and the value is changed, log a warning
+	if (!m_latch_read[which] && m_latched_value[which] != value)
+		logerror("Warning: sound latch %d written before being read. Previous: %02x, new: %02x\n", which, m_latched_value[which], value);
+
+	// store the new value and mark it not read
+	m_latched_value[which] = value;
+	m_latch_read[which] = 0;
 }
 
 
-driver_enumerator::driver_enumerator(emu_options &options, const char *string)
-	: m_current(-1),
-	  m_filtered_count(0),
-	  m_options(options),
-	  m_included(global_alloc_array(UINT8, s_driver_count)),
-	  m_config(global_alloc_array_clear(machine_config *, s_driver_count))
-{
-	filter(string);
-}
+//-------------------------------------------------
+//  soundlatch_byte_w - global write handlers for
+//  writing to sound latches
+//-------------------------------------------------
 
-
-driver_enumerator::driver_enumerator(emu_options &options, const game_driver &driver)
-	: m_current(-1),
-	  m_filtered_count(0),
-	  m_options(options),
-	  m_included(global_alloc_array(UINT8, s_driver_count)),
-	  m_config(global_alloc_array_clear(machine_config *, s_driver_count))
-{
-	filter(driver);
-}
+WRITE8_MEMBER( driver_device::soundlatch_byte_w )		{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 0 | (data << 8)); }
+WRITE16_MEMBER( driver_device::soundlatch_word_w )  { machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 0 | (data << 8)); }
+WRITE8_MEMBER( driver_device::soundlatch2_byte_w )		{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 1 | (data << 8)); }
+WRITE16_MEMBER( driver_device::soundlatch2_word_w ) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 1 | (data << 8)); }
+WRITE8_MEMBER( driver_device::soundlatch3_byte_w )		{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 2 | (data << 8)); }
+WRITE16_MEMBER( driver_device::soundlatch3_word_w ) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 2 | (data << 8)); }
+WRITE8_MEMBER( driver_device::soundlatch4_byte_w )	{ machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 3 | (data << 8)); }
+WRITE16_MEMBER( driver_device::soundlatch4_word_w ) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), 3 | (data << 8)); }
 
 
 //-------------------------------------------------
-//  ~driver_enumerator - destructor
+//  soundlatch_byte_r - global read handlers for
+//  reading from sound latches
 //-------------------------------------------------
 
-driver_enumerator::~driver_enumerator()
+READ8_MEMBER( driver_device::soundlatch_byte_r )		{ return m_latched_value[0]; }
+READ16_MEMBER( driver_device::soundlatch_word_r )   { return m_latched_value[0]; }
+READ8_MEMBER( driver_device::soundlatch2_byte_r )		{ return m_latched_value[1]; }
+READ16_MEMBER( driver_device::soundlatch2_word_r )  { return m_latched_value[1]; }
+READ8_MEMBER( driver_device::soundlatch3_byte_r )		{ return m_latched_value[2]; }
+READ16_MEMBER( driver_device::soundlatch3_word_r )  { return m_latched_value[2]; }
+READ8_MEMBER( driver_device::soundlatch4_byte_r )		{ return m_latched_value[3]; }
+READ16_MEMBER( driver_device::soundlatch4_word_r )  { return m_latched_value[3]; }
+
+
+//-------------------------------------------------
+//  soundlatch_clear_byte_w - global write handlers
+//  for clearing sound latches
+//-------------------------------------------------
+
+WRITE8_MEMBER( driver_device::soundlatch_clear_byte_w )  { m_latched_value[0] = m_latch_clear_value; }
+WRITE8_MEMBER( driver_device::soundlatch2_clear_byte_w ) { m_latched_value[1] = m_latch_clear_value; }
+WRITE8_MEMBER( driver_device::soundlatch3_clear_byte_w ) { m_latched_value[2] = m_latch_clear_value; }
+WRITE8_MEMBER( driver_device::soundlatch4_clear_byte_w ) { m_latched_value[3] = m_latch_clear_value; }
+
+
+
+//**************************************************************************
+//  GENERIC FLIP SCREEN HANDLING
+//**************************************************************************
+
+//-------------------------------------------------
+//  updateflip - handle global flipping
+//-------------------------------------------------
+
+void driver_device::updateflip()
 {
-	// free any configs
-	for (int index = 0; index < s_driver_count; index++)
-		global_free(m_config[index]);
+	// push the flip state to all tilemaps
+	machine().tilemap().set_flip_all((TILEMAP_FLIPX & m_flip_screen_x) | (TILEMAP_FLIPY & m_flip_screen_y));
 
-	// free the arrays
-	global_free(m_included);
-	global_free(m_config);
-}
-
-
-//-------------------------------------------------
-//  config - return a machine_config for the given
-//  driver, allocating on demand if needed
-//-------------------------------------------------
-
-machine_config &driver_enumerator::config(int index, emu_options &options) const
-{
-	assert(index >= 0 && index < s_driver_count);
-
-	// if we don't have it cached, add it
-	if (m_config[index] == NULL)
+	// flip the visible area within the screen width/height
+	int width = machine().primary_screen->width();
+	int height = machine().primary_screen->height();
+	rectangle visarea = machine().primary_screen->visible_area();
+	if (m_flip_screen_x)
 	{
-		// if our cache is full, release the head entry
-		if (m_config_cache.count() == CONFIG_CACHE_COUNT)
-		{
-			config_entry *first = m_config_cache.first();
-			m_config[first->index()] = NULL;
-			m_config_cache.remove(*first);
-		}
-
-		// allocate the config and add it to the end of the list
-		machine_config *config = m_config[index] = global_alloc(machine_config(*s_drivers_sorted[index], options));
-		m_config_cache.append(*global_alloc(config_entry(*config, index)));
+		int temp = width - visarea.min_x - 1;
+		visarea.min_x = width - visarea.max_x - 1;
+		visarea.max_x = temp;
 	}
-	return *m_config[index];
-}
-
-
-//-------------------------------------------------
-//  filter - filter the driver list against the
-//  given string
-//-------------------------------------------------
-
-int driver_enumerator::filter(const char *filterstring)
-{
-	// reset the count
-	exclude_all();
-
-	// match name against each driver in the list
-	for (int index = 0; index < s_driver_count; index++)
-		if (matches(filterstring, s_drivers_sorted[index]->name))
-			include(index);
-
-	return m_filtered_count;
-}
-
-
-//-------------------------------------------------
-//  filter - filter the driver list against the
-//  given driver
-//-------------------------------------------------
-
-int driver_enumerator::filter(const game_driver &driver)
-{
-	// reset the count
-	exclude_all();
-
-	// match name against each driver in the list
-	for (int index = 0; index < s_driver_count; index++)
-		if (s_drivers_sorted[index] == &driver)
-			include(index);
-
-	return m_filtered_count;
-}
-
-
-//-------------------------------------------------
-//  include_all - include all non-internal drivers
-//-------------------------------------------------
-
-void driver_enumerator::include_all()
-{
-	memset(m_included, 1, sizeof(m_included[0]) * s_driver_count); m_filtered_count = s_driver_count;
-	int empty = find("___empty");
-	assert(empty != -1);
-	m_included[empty] = 0;
-}
-
-
-//-------------------------------------------------
-//  next - get the next driver matching the given
-//  filter
-//-------------------------------------------------
-
-bool driver_enumerator::next()
-{
-	// always advance one
-	m_current++;
-
-	// if we have a filter, scan forward to the next match
-	while (m_current < s_driver_count)
+	if (m_flip_screen_y)
 	{
-		if (m_included[m_current])
-			break;
-		m_current++;
-	}
-
-	// return true if we end up in range
-	return (m_current >= 0 && m_current < s_driver_count);
-}
-
-
-//-------------------------------------------------
-//  next_excluded - get the next driver that is
-//  not currently included in the list
-//-------------------------------------------------
-
-bool driver_enumerator::next_excluded()
-{
-	// always advance one
-	m_current++;
-
-	// if we have a filter, scan forward to the next match
-	while (m_current < s_driver_count)
-	{
-		if (!m_included[m_current])
-			break;
-		m_current++;
+		int temp = height - visarea.min_y - 1;
+		visarea.min_y = height - visarea.max_y - 1;
+		visarea.max_y = temp;
 	}
 
-	// return true if we end up in range
-	return (m_current >= 0 && m_current < s_driver_count);
+	// reconfigure the screen with the new visible area
+	attoseconds_t period = machine().primary_screen->frame_period().attoseconds;
+	machine().primary_screen->configure(width, height, visarea, period);
 }
 
 
 //-------------------------------------------------
-//  driver_sort_callback - compare two items in
-//  an array of game_driver pointers
+//  flip_screen_set - set global flip
 //-------------------------------------------------
 
-void driver_enumerator::find_approximate_matches(const char *string, int count, int *results)
+void driver_device::flip_screen_set(UINT32 on)
 {
-#undef rand
+	// normalize to all 1
+	if (on)
+		on = ~0;
 
-	// if no name, pick random entries
-	if (string == NULL || string[0] == 0)
+	// if something's changed, handle it
+	if (m_flip_screen_x != on || m_flip_screen_y != on)
 	{
-		// seed the RNG first
-		srand(osd_ticks());
-
-		// allocate a temporary list
-		int *templist = global_alloc_array(int, m_filtered_count);
-		int arrayindex = 0;
-		for (int index = 0; index < s_driver_count; index++)
-			if (m_included[index])
-				templist[arrayindex++] = index;
-		assert(arrayindex == m_filtered_count);
-
-		// shuffle
-		for (int shufnum = 0; shufnum < 4 * s_driver_count; shufnum++)
-		{
-			int item1 = rand() % m_filtered_count;
-			int item2 = rand() % m_filtered_count;
-			int temp = templist[item1];
-			templist[item1] = templist[item2];
-			templist[item2] = temp;
-		}
-
-		// copy out the first few entries
-		for (int matchnum = 0; matchnum < count; matchnum++)
-			results[matchnum] = templist[matchnum % m_filtered_count];
-
-		global_free(templist);
-		return;
+		if (!on)
+			updateflip(); // flip visarea back
+		m_flip_screen_x = m_flip_screen_y = on;
+		updateflip();
 	}
+}
 
-	// allocate memory to track the penalty value
-	int *penalty = global_alloc_array(int, count);
 
-	// initialize everyone's states
-	for (int matchnum = 0; matchnum < count; matchnum++)
+//-------------------------------------------------
+//  flip_screen_set_no_update - set global flip
+//  do not call update_flip.
+//-------------------------------------------------
+
+void driver_device::flip_screen_set_no_update(UINT32 on)
+{
+	// flip_screen_y is not updated on purpose
+    // this function is for drivers which
+    // where writing to flip_screen_x to
+    // bypass update_flip
+	if (on)
+		on = ~0;
+	m_flip_screen_x = on;
+}
+
+
+//-------------------------------------------------
+//  flip_screen_x_set - set global horizontal flip
+//-------------------------------------------------
+
+void driver_device::flip_screen_x_set(UINT32 on)
+{
+	// normalize to all 1
+	if (on)
+		on = ~0;
+
+	// if something's changed, handle it
+	if (m_flip_screen_x != on)
 	{
-		penalty[matchnum] = 9999;
-		results[matchnum] = -1;
+		m_flip_screen_x = on;
+		updateflip();
 	}
-
-	// scan the entire drivers array
-	for (int index = 0; index < s_driver_count; index++)
-		if (m_included[index])
-		{
-			// skip things that can't run
-			if ((s_drivers_sorted[index]->flags & GAME_NO_STANDALONE) != 0)
-				continue;
-
-			// pick the best match between driver name and description
-			int curpenalty = penalty_compare(string, s_drivers_sorted[index]->description);
-			int tmp = penalty_compare(string, s_drivers_sorted[index]->name);
-			curpenalty = MIN(curpenalty, tmp);
-
-			// insert into the sorted table of matches
-			for (int matchnum = count - 1; matchnum >= 0; matchnum--)
-			{
-				// stop if we're worse than the current entry
-				if (curpenalty >= penalty[matchnum])
-					break;
-
-				// as long as this isn't the last entry, bump this one down
-				if (matchnum < count - 1)
-				{
-					penalty[matchnum + 1] = penalty[matchnum];
-					results[matchnum + 1] = results[matchnum];
-				}
-				results[matchnum] = index;
-				penalty[matchnum] = curpenalty;
-			}
-		}
-
-	// free our temp memory
-	global_free(penalty);
 }
 
 
-driver_enumerator::config_entry::config_entry(machine_config &config, int index)
-	: m_next(NULL),
-	  m_config(&config),
-	  m_index(index)
+//-------------------------------------------------
+//  flip_screen_y_set - set global vertical flip
+//-------------------------------------------------
+
+void driver_device::flip_screen_y_set(UINT32 on)
 {
+	// normalize to all 1
+	if (on)
+		on = ~0;
+
+	// if something's changed, handle it
+	if (m_flip_screen_y != on)
+	{
+		m_flip_screen_y = on;
+		updateflip();
+	}
 }
 
 
-driver_enumerator::config_entry::~config_entry()
+
+//**************************************************************************
+//  8-BIT PALETTE WRITE HANDLERS
+//**************************************************************************
+
+// 3-3-2 RGB palette write handlers
+WRITE8_MEMBER( driver_device::paletteram_BBGGGRRR_byte_w ) { palette_8bit_byte_w<3,3,2, 0,3,6>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_RRRGGGBB_byte_w ) { palette_8bit_byte_w<3,3,2, 5,2,0>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_BBGGRRII_byte_w )
 {
-	global_free(m_config);
+	m_generic_paletteram_8[offset] = data;
+	int i = (data >> 0) & 3;
+	palette_set_color_rgb(machine(), offset, pal4bit(((data >> 0) & 0x0c) | i),
+	                                   pal4bit(((data >> 2) & 0x0c) | i),
+	                                   pal4bit(((data >> 4) & 0x0c) | i));
 }
+
+
+
+//**************************************************************************
+//  16-BIT PALETTE WRITE HANDLERS
+//**************************************************************************
+
+// 4-4-4 RGB palette write handlers
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_byte_le_w ) { palette_16bit_byte_le_w<4,4,4, 0,4,8>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_byte_be_w ) { palette_16bit_byte_be_w<4,4,4, 0,4,8>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<4,4,4, 0,4,8>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<4,4,4, 0,4,8>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_xxxxBBBBGGGGRRRR_word_w ) { palette_16bit_word_w<4,4,4, 0,4,8>(space, offset, data, mem_mask); }
+
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_byte_le_w ) { palette_16bit_byte_le_w<4,4,4, 4,0,8>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_byte_be_w ) { palette_16bit_byte_be_w<4,4,4, 4,0,8>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<4,4,4, 4,0,8>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<4,4,4, 4,0,8>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_xxxxBBBBRRRRGGGG_word_w ) { palette_16bit_word_w<4,4,4, 4,0,8>(space, offset, data, mem_mask); }
+
+WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRBBBBGGGG_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<4,4,4, 8,0,4>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRBBBBGGGG_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<4,4,4, 8,0,4>(space, offset, data, mem_mask); }
+
+WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_byte_le_w ) { palette_16bit_byte_le_w<4,4,4, 8,4,0>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_byte_be_w ) { palette_16bit_byte_be_w<4,4,4, 8,4,0>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<4,4,4, 8,4,0>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<4,4,4, 8,4,0>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_xxxxRRRRGGGGBBBB_word_w ) { palette_16bit_word_w<4,4,4, 8,4,0>(space, offset, data, mem_mask); }
+
+WRITE8_MEMBER( driver_device::paletteram_RRRRGGGGBBBBxxxx_byte_be_w ) { palette_16bit_byte_be_w<4,4,4, 12,8,4>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_RRRRGGGGBBBBxxxx_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<4,4,4, 12,8,4>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_RRRRGGGGBBBBxxxx_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<4,4,4, 12,8,4>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_RRRRGGGGBBBBxxxx_word_w ) { palette_16bit_word_w<4,4,4, 12,8,4>(space, offset, data, mem_mask); }
+
+// 4-4-4-4 IRGB palette write handlers
+template<int _IShift, int _RShift, int _GShift, int _BShift>
+inline void set_color_irgb(running_machine &machine, pen_t color, UINT16 data)
+{
+	static const UINT8 ztable[16] = { 0x0, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xa, 0xb, 0xc, 0xd, 0xe, 0xf, 0x10, 0x11 };
+	UINT8 i = ztable[(data >> _IShift) & 15];
+	UINT8 r = ((data >> _RShift) & 15) * i;
+	UINT8 g = ((data >> _GShift) & 15) * i;
+	UINT8 b = ((data >> _BShift) & 15) * i;
+	palette_set_color_rgb(machine, color, r, g, b);
+}
+
+WRITE16_MEMBER( driver_device::paletteram_IIIIRRRRGGGGBBBB_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	set_color_irgb<12,8,4,0>(machine(), offset, m_generic_paletteram_16[offset]);
+}
+
+WRITE16_MEMBER( driver_device::paletteram_RRRRGGGGBBBBIIII_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	set_color_irgb<0,12,8,4>(machine(), offset, m_generic_paletteram_16[offset]);
+}
+
+// 5-5-5 RGB palette write handlers
+WRITE8_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_byte_le_w ) { palette_16bit_byte_le_w<5,5,5, 0,5,10>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_byte_be_w ) { palette_16bit_byte_be_w<5,5,5, 0,5,10>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<5,5,5, 0,5,10>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<5,5,5, 0,5,10>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_xBBBBBGGGGGRRRRR_word_w ) { palette_16bit_word_w<5,5,5, 0,5,10>(space, offset, data, mem_mask); }
+
+WRITE8_MEMBER( driver_device::paletteram_xBBBBBRRRRRGGGGG_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<5,5,5, 5,0,10>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xBBBBBRRRRRGGGGG_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<5,5,5, 5,0,10>(space, offset, data, mem_mask); }
+
+WRITE8_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_byte_le_w ) { palette_16bit_byte_le_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_byte_be_w ) { palette_16bit_byte_be_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_byte_split_lo_w ) { palette_16bit_byte_split_lo_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
+WRITE8_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_byte_split_hi_w ) { palette_16bit_byte_split_hi_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_word_w ) { palette_16bit_word_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
+WRITE32_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_dword_be_w ) { palette_16bit_dword_be_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
+WRITE32_MEMBER( driver_device::paletteram_xRRRRRGGGGGBBBBB_dword_le_w ) { palette_16bit_dword_le_w<5,5,5, 10,5,0>(space, offset, data, mem_mask); }
+
+WRITE8_MEMBER( driver_device::paletteram_xGGGGGRRRRRBBBBB_byte_le_w ) { palette_16bit_byte_le_w<5,5,5, 5,10,0>(space, offset, data, mem_mask); }
+
+WRITE16_MEMBER( driver_device::paletteram_xGGGGGRRRRRBBBBB_word_w ) { palette_16bit_word_w<5,5,5, 5,10,0>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_xGGGGGBBBBBRRRRR_word_w ) { palette_16bit_word_w<5,5,5, 0,10,5>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_RRRRRGGGGGBBBBBx_word_w ) { palette_16bit_word_w<5,5,5, 11,6,1>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_GGGGGRRRRRBBBBBx_word_w ) { palette_16bit_word_w<5,5,5, 6,11,1>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_RRRRGGGGBBBBRGBx_word_w )
+{
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	data = m_generic_paletteram_16[offset];
+	palette_set_color_rgb(machine(), offset, pal5bit(((data >> 11) & 0x1e) | ((data >> 3) & 0x01)),
+	                                    	pal5bit(((data >>  7) & 0x1e) | ((data >> 2) & 0x01)),
+	                                    	pal5bit(((data >>  3) & 0x1e) | ((data >> 1) & 0x01)));
+}
+
+
+//**************************************************************************
+//  32-BIT PALETTE WRITE HANDLERS
+//**************************************************************************
+
+// 8-8-8 RGB palette write handlers
+WRITE16_MEMBER( driver_device::paletteram_xrgb_word_be_w ) { palette_32bit_word_be_w<8,8,8, 16,8,0>(space, offset, data, mem_mask); }
+WRITE16_MEMBER( driver_device::paletteram_xbgr_word_be_w ) { palette_32bit_word_be_w<8,8,8, 0,8,16>(space, offset, data, mem_mask); }

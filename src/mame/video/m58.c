@@ -21,6 +21,7 @@
 
 PALETTE_INIT( yard )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	const UINT8 *char_lopal = color_prom + 0x000;
 	const UINT8 *char_hipal = color_prom + 0x100;
 	const UINT8 *sprite_pal = color_prom + 0x200;
@@ -103,18 +104,16 @@ PALETTE_INIT( yard )
  *
  *************************************/
 
-WRITE8_HANDLER( yard_videoram_w )
+WRITE8_MEMBER(m58_state::yard_videoram_w)
 {
-	m58_state *state = space->machine().driver_data<m58_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
-WRITE8_HANDLER( yard_scroll_panel_w )
+WRITE8_MEMBER(m58_state::yard_scroll_panel_w)
 {
-	m58_state *state = space->machine().driver_data<m58_state>();
 
 	int sx,sy,i;
 
@@ -133,7 +132,7 @@ WRITE8_HANDLER( yard_scroll_panel_w )
 		col = (data >> i) & 0x11;
 		col = ((col >> 3) | col) & 3;
 
-		state->m_scroll_panel_bitmap->pix16(sy, sx + i) = RADAR_PALETTE_BASE + (sy & 0xfc) + col;
+		m_scroll_panel_bitmap->pix16(sy, sx + i) = RADAR_PALETTE_BASE + (sy & 0xfc) + col;
 	}
 }
 
@@ -199,13 +198,13 @@ VIDEO_START( yard )
  *
  *************************************/
 
-WRITE8_HANDLER( yard_flipscreen_w )
+WRITE8_MEMBER(m58_state::yard_flipscreen_w)
 {
 	/* screen flip is handled both by software and hardware */
-	flip_screen_set(space->machine(), (data & 0x01) ^ (~input_port_read(space->machine(), "DSW2") & 0x01));
+	flip_screen_set((data & 0x01) ^ (~ioport("DSW2")->read() & 0x01));
 
-	coin_counter_w(space->machine(), 0, data & 0x02);
-	coin_counter_w(space->machine(), 1, data & 0x20);
+	coin_counter_w(machine(), 0, data & 0x02);
+	coin_counter_w(machine(), 1, data & 0x20);
 }
 
 
@@ -224,7 +223,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	int offs;
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int attr = state->m_spriteram[offs + 1];
 		int bank = (attr & 0x20) >> 5;
@@ -247,7 +246,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			code2 = code1 + 0x40;
 		}
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy2 = 192 - sy1;
@@ -281,16 +280,16 @@ static void draw_panel( running_machine &machine, bitmap_ind16 &bitmap, const re
 	{
 		const rectangle clippanel(26*8, 32*8-1,	1*8, 31*8-1);
 		const rectangle clippanelflip(0*8, 6*8-1, 1*8, 31*8-1);
-		rectangle clip = flip_screen_get(machine) ? clippanelflip : clippanel;
+		rectangle clip = state->flip_screen() ? clippanelflip : clippanel;
 		const rectangle &visarea = machine.primary_screen->visible_area();
-		int sx = flip_screen_get(machine) ? cliprect.min_x - 8 : cliprect.max_x + 1 - SCROLL_PANEL_WIDTH;
-		int yoffs = flip_screen_get(machine) ? -40 : -16;
+		int sx = state->flip_screen() ? cliprect.min_x - 8 : cliprect.max_x + 1 - SCROLL_PANEL_WIDTH;
+		int yoffs = state->flip_screen() ? -40 : -16;
 
 		clip.min_y += visarea.min_y + yoffs;
 		clip.max_y += visarea.max_y + yoffs;
 		clip &= cliprect;
 
-		copybitmap(bitmap, *state->m_scroll_panel_bitmap, flip_screen_get(machine), flip_screen_get(machine),
+		copybitmap(bitmap, *state->m_scroll_panel_bitmap, state->flip_screen(), state->flip_screen(),
 				   sx, visarea.min_y + yoffs, clip);
 	}
 }

@@ -28,12 +28,20 @@ class d9final_state : public driver_device
 {
 public:
 	d9final_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_lo_vram(*this, "lo_vram"),
+		m_hi_vram(*this, "hi_vram"),
+		m_cram(*this, "cram"){ }
 
-	UINT8 *m_lo_vram;
-	UINT8 *m_hi_vram;
-	UINT8 *m_cram;
+	required_shared_ptr<UINT8> m_lo_vram;
+	required_shared_ptr<UINT8> m_hi_vram;
+	required_shared_ptr<UINT8> m_cram;
 	tilemap_t *m_sc0_tilemap;
+	DECLARE_WRITE8_MEMBER(sc0_lovram);
+	DECLARE_WRITE8_MEMBER(sc0_hivram);
+	DECLARE_WRITE8_MEMBER(sc0_cram);
+	DECLARE_WRITE8_MEMBER(d9final_bank_w);
+	DECLARE_READ8_MEMBER(prot_latch_r);
 };
 
 
@@ -64,64 +72,61 @@ static SCREEN_UPDATE_IND16(d9final)
 	return 0;
 }
 
-static WRITE8_HANDLER( sc0_lovram )
+WRITE8_MEMBER(d9final_state::sc0_lovram)
 {
-	d9final_state *state = space->machine().driver_data<d9final_state>();
-	state->m_lo_vram[offset] = data;
-	state->m_sc0_tilemap->mark_tile_dirty(offset);
+	m_lo_vram[offset] = data;
+	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( sc0_hivram )
+WRITE8_MEMBER(d9final_state::sc0_hivram)
 {
-	d9final_state *state = space->machine().driver_data<d9final_state>();
-	state->m_hi_vram[offset] = data;
-	state->m_sc0_tilemap->mark_tile_dirty(offset);
+	m_hi_vram[offset] = data;
+	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( sc0_cram )
+WRITE8_MEMBER(d9final_state::sc0_cram)
 {
-	d9final_state *state = space->machine().driver_data<d9final_state>();
-	state->m_cram[offset] = data;
-	state->m_sc0_tilemap->mark_tile_dirty(offset);
+	m_cram[offset] = data;
+	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( d9final_bank_w )
+WRITE8_MEMBER(d9final_state::d9final_bank_w)
 {
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	UINT32 bankaddress;
 
 	bankaddress = 0x10000+(0x4000 * (data & 0x7));
-	memory_set_bankptr(space->machine(), "bank1", &ROM[bankaddress]);
+	membank("bank1")->set_base(&ROM[bankaddress]);
 }
 
 /* game checks this after three attract cycles, otherwise coin inputs stop to work. */
-static READ8_HANDLER( prot_latch_r )
+READ8_MEMBER(d9final_state::prot_latch_r)
 {
-//  printf("PC=%06x\n",cpu_get_pc(&space->device()));
+//  printf("PC=%06x\n",cpu_get_pc(&space.device()));
 
 	return 0x04;
 }
 
 
-static ADDRESS_MAP_START( d9final_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( d9final_map, AS_PROGRAM, 8, d9final_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sc0_lovram) AM_BASE_MEMBER(d9final_state, m_lo_vram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sc0_hivram) AM_BASE_MEMBER(d9final_state, m_hi_vram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sc0_cram) AM_BASE_MEMBER(d9final_state, m_cram)
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_byte_split_lo_w) AM_SHARE("paletteram")
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_byte_split_hi_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(sc0_lovram) AM_SHARE("lo_vram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(sc0_hivram) AM_SHARE("hi_vram")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sc0_cram) AM_SHARE("cram")
 	AM_RANGE(0xf000, 0xf000) AM_READ(prot_latch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( d9final_io, AS_IO, 8 )
+static ADDRESS_MAP_START( d9final_io, AS_IO, 8, d9final_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_WRITENOP //bit 0: irq enable? screen enable?
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA")
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSWB")
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWC")
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ymsnd",ym2413_w)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("ymsnd",ym2413_w)
 	AM_RANGE(0x60, 0x60) AM_READ_PORT("DSWD")
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("IN0")
 	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("IN1") AM_WRITE(d9final_bank_w)
@@ -268,9 +273,9 @@ GFXDECODE_END
 
 static MACHINE_RESET( d9final )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
-	memory_set_bankptr(machine, "bank1", &ROM[0x10000]);
+	machine.root_device().membank("bank1")->set_base(&ROM[0x10000]);
 }
 
 static MACHINE_CONFIG_START( d9final, d9final_state )

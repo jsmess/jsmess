@@ -90,54 +90,54 @@
 #include "video/decocomn.h"
 #include "video/decospr.h"
 
-static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( boogwing_map, AS_PROGRAM, 16, boogwing_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
-	AM_RANGE(0x220000, 0x220001) AM_DEVWRITE("deco_common", decocomn_priority_w)
+	AM_RANGE(0x220000, 0x220001) AM_DEVWRITE_LEGACY("deco_common", decocomn_priority_w)
 	AM_RANGE(0x220002, 0x22000f) AM_NOP
 
-	AM_RANGE(0x240000, 0x240001) AM_DEVWRITE_MODERN("spriteram", buffered_spriteram16_device, write)
+	AM_RANGE(0x240000, 0x240001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write)
 	AM_RANGE(0x242000, 0x2427ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x244000, 0x244001) AM_DEVWRITE_MODERN("spriteram2", buffered_spriteram16_device, write)
+	AM_RANGE(0x244000, 0x244001) AM_DEVWRITE("spriteram2", buffered_spriteram16_device, write)
 	AM_RANGE(0x246000, 0x2467ff) AM_RAM AM_SHARE("spriteram2")
 
 	AM_RANGE(0x24e6c0, 0x24e6c1) AM_READ_PORT("DSW")
 	AM_RANGE(0x24e138, 0x24e139) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x24e344, 0x24e345) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x24e000, 0x24e7ff) AM_WRITE(deco16_104_prot_w) AM_BASE(&deco16_prot_ram)
+	AM_RANGE(0x24e000, 0x24e7ff) AM_WRITE_LEGACY(deco16_104_prot_w) AM_BASE_LEGACY(&deco16_prot_ram)
 
-	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("tilegen1", deco16ic_pf_control_w)
-	AM_RANGE(0x264000, 0x265fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
-	AM_RANGE(0x266000, 0x267fff) AM_DEVREADWRITE("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
-	AM_RANGE(0x268000, 0x268fff) AM_RAM AM_BASE_MEMBER(boogwing_state, m_pf1_rowscroll)
-	AM_RANGE(0x26a000, 0x26afff) AM_RAM AM_BASE_MEMBER(boogwing_state, m_pf2_rowscroll)
+	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE_LEGACY("tilegen1", deco16ic_pf_control_w)
+	AM_RANGE(0x264000, 0x265fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x266000, 0x267fff) AM_DEVREADWRITE_LEGACY("tilegen1", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x268000, 0x268fff) AM_RAM AM_SHARE("pf1_rowscroll")
+	AM_RANGE(0x26a000, 0x26afff) AM_RAM AM_SHARE("pf2_rowscroll")
 
-	AM_RANGE(0x270000, 0x27000f) AM_DEVWRITE("tilegen2", deco16ic_pf_control_w)
-	AM_RANGE(0x274000, 0x275fff) AM_RAM_DEVWRITE("tilegen2", deco16ic_pf1_data_w)
-	AM_RANGE(0x276000, 0x277fff) AM_RAM_DEVWRITE("tilegen2", deco16ic_pf2_data_w)
-	AM_RANGE(0x278000, 0x278fff) AM_RAM AM_BASE_MEMBER(boogwing_state, m_pf3_rowscroll)
-	AM_RANGE(0x27a000, 0x27afff) AM_RAM AM_BASE_MEMBER(boogwing_state, m_pf4_rowscroll)
+	AM_RANGE(0x270000, 0x27000f) AM_DEVWRITE_LEGACY("tilegen2", deco16ic_pf_control_w)
+	AM_RANGE(0x274000, 0x275fff) AM_RAM_DEVWRITE_LEGACY("tilegen2", deco16ic_pf1_data_w)
+	AM_RANGE(0x276000, 0x277fff) AM_RAM_DEVWRITE_LEGACY("tilegen2", deco16ic_pf2_data_w)
+	AM_RANGE(0x278000, 0x278fff) AM_RAM AM_SHARE("pf3_rowscroll")
+	AM_RANGE(0x27a000, 0x27afff) AM_RAM AM_SHARE("pf4_rowscroll")
 
 	AM_RANGE(0x280000, 0x28000f) AM_NOP // ?
 	AM_RANGE(0x282000, 0x282001) AM_NOP // Palette setup?
-	AM_RANGE(0x282008, 0x282009) AM_DEVWRITE("deco_common", decocomn_palette_dma_w)
-	AM_RANGE(0x284000, 0x285fff) AM_DEVWRITE("deco_common", decocomn_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x282008, 0x282009) AM_DEVWRITE_LEGACY("deco_common", decocomn_palette_dma_w)
+	AM_RANGE(0x284000, 0x285fff) AM_DEVWRITE_LEGACY("deco_common", decocomn_buffered_palette_w) AM_SHARE("paletteram")
 
 	AM_RANGE(0x3c0000, 0x3c004f) AM_RAM // ?
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, boogwing_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP
-	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)
-	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
+	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
+	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
+	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
-	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(h6280_timer_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
+	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE_LEGACY(h6280_timer_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE_LEGACY(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 
@@ -148,7 +148,7 @@ static INPUT_PORTS_START( boogwing )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3")
@@ -290,8 +290,8 @@ static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 
 static const ym2151_interface ym2151_config =
 {
-	sound_irq,
-	sound_bankswitch_w
+	DEVCB_LINE(sound_irq),
+	DEVCB_HANDLER(sound_bankswitch_w)
 };
 
 
@@ -573,8 +573,8 @@ ROM_END
 
 static DRIVER_INIT( boogwing )
 {
-	const UINT8* src = machine.region("gfx6")->base();
-	UINT8* dst = machine.region("tiles2")->base() + 0x200000;
+	const UINT8* src = machine.root_device().memregion("gfx6")->base();
+	UINT8* dst = machine.root_device().memregion("tiles2")->base() + 0x200000;
 
 	deco56_decrypt_gfx(machine, "tiles1");
 	deco56_decrypt_gfx(machine, "tiles2");

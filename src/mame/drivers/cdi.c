@@ -55,88 +55,87 @@ INLINE void verboselog(running_machine &machine, int n_level, const char *s_fmt,
 *      Memory maps       *
 *************************/
 
-static ADDRESS_MAP_START( cdimono1_mem, AS_PROGRAM, 16 )
-    AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE_MEMBER(cdi_state,m_planea)
-    AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_BASE_MEMBER(cdi_state,m_planeb)
+static ADDRESS_MAP_START( cdimono1_mem, AS_PROGRAM, 16, cdi_state )
+    AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_SHARE("planea")
+    AM_RANGE(0x00200000, 0x0027ffff) AM_RAM AM_SHARE("planeb")
 #if ENABLE_UART_PRINTING
-    AM_RANGE(0x00301400, 0x00301403) AM_READ(uart_loopback_enable)
+    AM_RANGE(0x00301400, 0x00301403) AM_READ_LEGACY(uart_loopback_enable)
 #endif
-	AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE("cdic", cdic_ram_r, cdic_ram_w)
-    //AM_RANGE(0x00300000, 0x00303bff) AM_RAM AM_BASE_MEMBER(cdi_state,m_cdic_regs.ram)
-	AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE("cdic", cdic_r, cdic_w)
-	AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE("slave", slave_r, slave_w)
+	AM_RANGE(0x00300000, 0x00303bff) AM_DEVREADWRITE_LEGACY("cdic", cdic_ram_r, cdic_ram_w)
+    //AM_RANGE(0x00300000, 0x00303bff) AM_RAM AM_SHARE("cdic_regs.ram")
+	AM_RANGE(0x00303c00, 0x00303fff) AM_DEVREADWRITE_LEGACY("cdic", cdic_r, cdic_w)
+	AM_RANGE(0x00310000, 0x00317fff) AM_DEVREADWRITE_LEGACY("slave", slave_r, slave_w)
     //AM_RANGE(0x00318000, 0x0031ffff) AM_NOP
-    AM_RANGE(0x00320000, 0x00323fff) AM_DEVREADWRITE8("mk48t08", timekeeper_r, timekeeper_w, 0xff00)    /* nvram (only low bytes used) */
+    AM_RANGE(0x00320000, 0x00323fff) AM_DEVREADWRITE8_LEGACY("mk48t08", timekeeper_r, timekeeper_w, 0xff00)    /* nvram (only low bytes used) */
     AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
-    AM_RANGE(0x004fffe0, 0x004fffff) AM_READWRITE(mcd212_r, mcd212_w)
+    AM_RANGE(0x004fffe0, 0x004fffff) AM_READWRITE_LEGACY(mcd212_r, mcd212_w)
     //AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
     AM_RANGE(0x00500000, 0x00ffffff) AM_NOP
     //AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
-    AM_RANGE(0x80000000, 0x8000807f) AM_READWRITE(scc68070_periphs_r, scc68070_periphs_w)
+    AM_RANGE(0x80000000, 0x8000807f) AM_READWRITE_LEGACY(scc68070_periphs_r, scc68070_periphs_w)
 ADDRESS_MAP_END
 
 /*************************
 *      Input ports       *
 *************************/
 
-static INPUT_CHANGED( mcu_input )
+INPUT_CHANGED_MEMBER(cdi_state::mcu_input)
 {
-    cdi_state *state = field.machine().driver_data<cdi_state>();
-    scc68070_regs_t *scc68070 = &state->m_scc68070_regs;
+    scc68070_regs_t *scc68070 = &m_scc68070_regs;
 	bool send = false;
 
 	switch((FPTR)param)
 	{
 		case 0x39:
-			if(input_port_read(field.machine(), "INPUT1") & 0x01) send = true;
+			if(ioport("INPUT1")->read() & 0x01) send = true;
 			break;
 		case 0x37:
-			if(input_port_read(field.machine(), "INPUT1") & 0x02) send = true;
+			if(ioport("INPUT1")->read() & 0x02) send = true;
 			break;
 		case 0x31:
-			if(input_port_read(field.machine(), "INPUT1") & 0x04) send = true;
+			if(ioport("INPUT1")->read() & 0x04) send = true;
 			break;
 		case 0x32:
-			if(input_port_read(field.machine(), "INPUT1") & 0x08) send = true;
+			if(ioport("INPUT1")->read() & 0x08) send = true;
 			break;
 		case 0x33:
-			if(input_port_read(field.machine(), "INPUT1") & 0x10) send = true;
+			if(ioport("INPUT1")->read() & 0x10) send = true;
 			break;
 
 		case 0x30:
-			if(input_port_read(field.machine(), "INPUT2") & 0x01) send = true;
+			if(ioport("INPUT2")->read() & 0x01) send = true;
 			break;
 		case 0x38:
-			if(input_port_read(field.machine(), "INPUT2") & 0x02) send = true;
+			if(ioport("INPUT2")->read() & 0x02) send = true;
 			break;
 		case 0x34:
-			if(input_port_read(field.machine(), "INPUT2") & 0x04) send = true;
+			if(ioport("INPUT2")->read() & 0x04) send = true;
 			break;
 		case 0x35:
-			if(input_port_read(field.machine(), "INPUT2") & 0x08) send = true;
+			if(ioport("INPUT2")->read() & 0x08) send = true;
 			break;
 		case 0x36:
-			if(input_port_read(field.machine(), "INPUT2") & 0x10) send = true;
+			if(ioport("INPUT2")->read() & 0x10) send = true;
 			break;
 	}
 
 	if(send)
 	{
 		UINT8 data = (UINT8)((FPTR)param & 0x000000ff);
-		scc68070_quizard_rx(field.machine(), scc68070, data);
+		scc68070_quizard_rx(machine(), scc68070, data);
 	}
 }
 
 static INPUT_PORTS_START( cdi )
 	PORT_START("MOUSEX")
-    PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED(cdislave_device::mouse_update, 0)
+    PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER("slave", cdislave_device, mouse_update, 0)
 
 	PORT_START("MOUSEY")
-    PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED(cdislave_device::mouse_update, 0)
+    PORT_BIT(0x3ff, 0x000, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(2) PORT_CHANGED_MEMBER("slave", cdislave_device, mouse_update, 0)
 
 	PORT_START("MOUSEBTN")
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED(cdislave_device::mouse_update, 0)
-    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CHANGED(cdislave_device::mouse_update, 0)
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED_MEMBER("slave", cdislave_device, mouse_update, 0)
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CHANGED_MEMBER("slave", cdislave_device, mouse_update, 0)
 	PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("DEBUG")
@@ -173,19 +172,19 @@ static INPUT_PORTS_START( quizard )
 	PORT_INCLUDE( cdi )
 
     PORT_START("INPUT1")
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("Coin 1") PORT_CHANGED(mcu_input, (void*)0x39)
-    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Start 1") PORT_CHANGED(mcu_input, (void*)0x37)
-    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Player 1 A") PORT_CHANGED(mcu_input, (void*)0x31)
-    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Player 1 B") PORT_CHANGED(mcu_input, (void*)0x32)
-    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Player 1 C") PORT_CHANGED(mcu_input, (void*)0x33)
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("Coin 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x39)
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Start 1") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x37)
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Player 1 A") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x31)
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Player 1 B") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x32)
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Player 1 C") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x33)
     PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
     PORT_START("INPUT2")
-    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_NAME("Service") PORT_CHANGED(mcu_input, (void*)0x30)
-    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2) PORT_NAME("Start 2") PORT_CHANGED(mcu_input, (void*)0x38)
-    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Player 2 A") PORT_CHANGED(mcu_input, (void*)0x34)
-    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Player 2 B") PORT_CHANGED(mcu_input, (void*)0x35)
-    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("Player 2 C") PORT_CHANGED(mcu_input, (void*)0x36)
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_NAME("Service") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x30)
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2) PORT_NAME("Start 2") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x38)
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Player 2 A") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x34)
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Player 2 B") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x35)
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("Player 2 C") PORT_CHANGED_MEMBER(DEVICE_SELF, cdi_state,mcu_input, (void*)0x36)
     PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
@@ -200,7 +199,7 @@ static MACHINE_START( cdi )
 static MACHINE_RESET( cdi )
 {
     cdi_state *state = machine.driver_data<cdi_state>();
-    UINT16 *src   = (UINT16*)machine.region("maincpu")->base();
+    UINT16 *src   = (UINT16*)state->memregion("maincpu")->base();
     UINT16 *dst   = state->m_planea;
     //device_t *cdrom_dev = machine.device("cdrom");
     memcpy(dst, src, 0x8);
@@ -471,7 +470,7 @@ ROM_START( quizard )
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd32", 0, SHA1(31e9fa2169aa44d799c37170b238134ab738e1a1) )
+    DISK_IMAGE_READONLY( "quizrd32", 0, BAD_DUMP SHA1(31e9fa2169aa44d799c37170b238134ab738e1a1) )
 ROM_END
 
 ROM_START( quizrd22 )
@@ -485,7 +484,7 @@ ROM_START( quizrd22 )
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd22", 0, SHA1(03c8fdcf27ead6e221691111e8c679b551099543) )
+    DISK_IMAGE_READONLY( "quizrd22", 0, BAD_DUMP SHA1(03c8fdcf27ead6e221691111e8c679b551099543) )
 ROM_END
 
 ROM_START( quizrd17 )
@@ -499,7 +498,7 @@ ROM_START( quizrd17 )
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd17", 0, SHA1(4bd698f076505b4e17be978481bce027eb47123b) )
+    DISK_IMAGE_READONLY( "quizrd17", 0, BAD_DUMP SHA1(4bd698f076505b4e17be978481bce027eb47123b) )
 ROM_END
 
 ROM_START( quizrd12 ) /* CD-ROM printed 01/95 */
@@ -513,7 +512,7 @@ ROM_START( quizrd12 ) /* CD-ROM printed 01/95 */
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd12", 0, SHA1(6e41683b96b74e903040842aeb18437ad7813c82) )
+    DISK_IMAGE_READONLY( "quizrd12", 0, BAD_DUMP SHA1(6e41683b96b74e903040842aeb18437ad7813c82) )
 ROM_END
 
 ROM_START( quizrd18 ) /* CD-ROM printed ??/?? */
@@ -527,7 +526,7 @@ ROM_START( quizrd18 ) /* CD-ROM printed ??/?? */
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd18", 0, SHA1(ede873b22957f2a707bbd3039e962ef2ca5aedbd) )
+    DISK_IMAGE_READONLY( "quizrd18", 0, BAD_DUMP SHA1(ede873b22957f2a707bbd3039e962ef2ca5aedbd) )
 ROM_END
 
 ROM_START( quizrd23 ) /* CD-ROM printed ??/?? */
@@ -541,7 +540,7 @@ ROM_START( quizrd23 ) /* CD-ROM printed ??/?? */
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd23", 0, SHA1(cd909d9a54275d6f2d36e03e83eea996e781b4d3) )
+    DISK_IMAGE_READONLY( "quizrd23", 0, BAD_DUMP SHA1(cd909d9a54275d6f2d36e03e83eea996e781b4d3) )
 ROM_END
 
 ROM_START( quizrd34 ) /* CD-ROM printed ??/?? */
@@ -555,7 +554,7 @@ ROM_START( quizrd34 ) /* CD-ROM printed ??/?? */
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrd34", 0, SHA1(37ad49b72b5175afbb87141d57bc8604347fe032) )
+    DISK_IMAGE_READONLY( "quizrd34", 0, BAD_DUMP SHA1(37ad49b72b5175afbb87141d57bc8604347fe032) )
 ROM_END
 
 ROM_START( quizrr42 ) /* CD-ROM printed 09/98 */
@@ -569,7 +568,7 @@ ROM_START( quizrr42 ) /* CD-ROM printed 09/98 */
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrr42", 0, SHA1(a5d5c8950b4650b8753f9119dc7f1ccaa2aa5442) )
+    DISK_IMAGE_READONLY( "quizrr42", 0, BAD_DUMP SHA1(a5d5c8950b4650b8753f9119dc7f1ccaa2aa5442) )
 ROM_END
 
 ROM_START( quizrr41 )
@@ -583,7 +582,7 @@ ROM_START( quizrr41 )
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrr41", 0, SHA1(2c0484c6545aac8e00b318328c6edce6f5dde43d) )
+    DISK_IMAGE_READONLY( "quizrr41", 0, BAD_DUMP SHA1(2c0484c6545aac8e00b318328c6edce6f5dde43d) )
 ROM_END
 
 ROM_START( quizrr40 ) /* CD-ROM printed 07/97 */
@@ -597,7 +596,7 @@ ROM_START( quizrr40 ) /* CD-ROM printed 07/97 */
     ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 
     DISK_REGION( "cdrom" )
-    DISK_IMAGE_READONLY( "quizrr40", 0, SHA1(288cc37a994e4f1cbd47aa8c92342879c6fc0b87) )
+    DISK_IMAGE_READONLY( "quizrr40", 0, BAD_DUMP SHA1(288cc37a994e4f1cbd47aa8c92342879c6fc0b87) )
 ROM_END
 
 

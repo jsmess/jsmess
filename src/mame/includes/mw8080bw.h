@@ -35,12 +35,13 @@ class mw8080bw_state : public driver_device
 {
 public:
 	mw8080bw_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_main_ram(*this, "main_ram"),
+		m_colorram(*this, "colorram"){ }
 
 	/* memory pointers */
-	UINT8 *     m_main_ram;
-	UINT8 *     m_colorram;
-	size_t      m_main_ram_size;
+	required_shared_ptr<UINT8> m_main_ram;
+	optional_shared_ptr<UINT8> m_colorram;
 
 	/* sound-related */
 	UINT8       m_port_1_last;
@@ -75,6 +76,55 @@ public:
 	device_t *m_sn2;
 	device_t *m_sn;
 	device_t *m_discrete;
+	DECLARE_READ8_MEMBER(mw8080bw_shift_result_rev_r);
+	DECLARE_READ8_MEMBER(mw8080bw_reversable_shift_result_r);
+	DECLARE_WRITE8_MEMBER(mw8080bw_reversable_shift_count_w);
+	DECLARE_WRITE8_MEMBER(seawolf_explosion_lamp_w);
+	DECLARE_WRITE8_MEMBER(seawolf_periscope_lamp_w);
+	DECLARE_WRITE8_MEMBER(gunfight_io_w);
+	DECLARE_WRITE8_MEMBER(tornbase_io_w);
+	DECLARE_WRITE8_MEMBER(maze_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(maze_io_w);
+	DECLARE_WRITE8_MEMBER(checkmat_io_w);
+	DECLARE_WRITE8_MEMBER(spcenctr_io_w);
+	DECLARE_READ8_MEMBER(bowler_shift_result_r);
+	DECLARE_WRITE8_MEMBER(bowler_lights_1_w);
+	DECLARE_WRITE8_MEMBER(bowler_lights_2_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(seawolf_erase_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_hit_left_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_hit_right_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_pitch_left_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_pitch_right_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(tornbase_score_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(desertgu_gun_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(desertgu_dip_sw_0_1_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(dplay_pitch_left_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(dplay_pitch_right_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(clowns_controller_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_coin_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_sw6_sw7_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_sw5_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(blueshrk_coin_input_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in0_control_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in1_control_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(invaders_in2_control_r);
+	DECLARE_WRITE8_MEMBER(seawolf_audio_w);
+	DECLARE_WRITE8_MEMBER(gunfight_audio_w);
+	DECLARE_WRITE8_MEMBER(zzzap_audio_1_w);
+	DECLARE_WRITE8_MEMBER(zzzap_audio_2_w);
+	DECLARE_WRITE8_MEMBER(gmissile_audio_1_w);
+	DECLARE_WRITE8_MEMBER(gmissile_audio_2_w);
+	DECLARE_WRITE8_MEMBER(gmissile_audio_3_w);
+	DECLARE_WRITE8_MEMBER(m4_audio_1_w);
+	DECLARE_WRITE8_MEMBER(m4_audio_2_w);
+	DECLARE_WRITE8_MEMBER(clowns_audio_1_w);
+	DECLARE_WRITE8_MEMBER(phantom2_audio_1_w);
+	DECLARE_WRITE8_MEMBER(phantom2_audio_2_w);
+	DECLARE_WRITE8_MEMBER(bowler_audio_2_w);
+	DECLARE_WRITE8_MEMBER(bowler_audio_3_w);
+	DECLARE_WRITE8_MEMBER(bowler_audio_4_w);
+	DECLARE_WRITE8_MEMBER(bowler_audio_5_w);
+	DECLARE_WRITE8_MEMBER(bowler_audio_6_w);
 };
 
 
@@ -122,9 +172,6 @@ extern const char layout_invaders[];
 
 UINT8 tornbase_get_cabinet_type(running_machine &machine);
 
-CUSTOM_INPUT( invaders_in1_control_r );
-CUSTOM_INPUT( invaders_in2_control_r );
-
 int invaders_is_cabinet_cocktail(running_machine &machine);
 
 
@@ -140,17 +187,13 @@ WRITE8_DEVICE_HANDLER( midway_tone_generator_lo_w );
 WRITE8_DEVICE_HANDLER( midway_tone_generator_hi_w );
 
 MACHINE_CONFIG_EXTERN( seawolf_audio );
-WRITE8_HANDLER( seawolf_audio_w );
 
 MACHINE_CONFIG_EXTERN( gunfight_audio );
-WRITE8_HANDLER( gunfight_audio_w );
 
 MACHINE_CONFIG_EXTERN( tornbase_audio );
 WRITE8_DEVICE_HANDLER( tornbase_audio_w );
 
 MACHINE_CONFIG_EXTERN( zzzap_audio );
-WRITE8_HANDLER( zzzap_audio_1_w );
-WRITE8_HANDLER( zzzap_audio_2_w );
 
 MACHINE_CONFIG_EXTERN( maze_audio );
 void maze_write_discrete(device_t *device, UINT8 maze_tone_timing_state);
@@ -169,16 +212,10 @@ MACHINE_CONFIG_EXTERN( dplay_audio );
 WRITE8_DEVICE_HANDLER( dplay_audio_w );
 
 MACHINE_CONFIG_EXTERN( gmissile_audio );
-WRITE8_HANDLER( gmissile_audio_1_w );
-WRITE8_HANDLER( gmissile_audio_2_w );
-WRITE8_HANDLER( gmissile_audio_3_w );
 
 MACHINE_CONFIG_EXTERN( m4_audio );
-WRITE8_HANDLER( m4_audio_1_w );
-WRITE8_HANDLER( m4_audio_2_w );
 
 MACHINE_CONFIG_EXTERN( clowns_audio );
-WRITE8_HANDLER( clowns_audio_1_w );
 WRITE8_DEVICE_HANDLER( clowns_audio_2_w );
 
 MACHINE_CONFIG_EXTERN( spacwalk_audio );
@@ -198,16 +235,9 @@ WRITE8_DEVICE_HANDLER( spcenctr_audio_2_w );
 WRITE8_DEVICE_HANDLER( spcenctr_audio_3_w );
 
 MACHINE_CONFIG_EXTERN( phantom2_audio );
-WRITE8_HANDLER( phantom2_audio_1_w );
-WRITE8_HANDLER( phantom2_audio_2_w );
 
 MACHINE_CONFIG_EXTERN( bowler_audio );
 WRITE8_DEVICE_HANDLER( bowler_audio_1_w );
-WRITE8_HANDLER( bowler_audio_2_w );
-WRITE8_HANDLER( bowler_audio_3_w );
-WRITE8_HANDLER( bowler_audio_4_w );
-WRITE8_HANDLER( bowler_audio_5_w );
-WRITE8_HANDLER( bowler_audio_6_w );
 
 MACHINE_CONFIG_EXTERN( invaders_samples_audio );
 MACHINE_CONFIG_EXTERN( invaders_audio );

@@ -25,6 +25,8 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_keyboard_line;
+	DECLARE_READ8_MEMBER(pk8000_joy_1_r);
+	DECLARE_READ8_MEMBER(pk8000_joy_2_r);
 };
 
 
@@ -36,7 +38,8 @@ static cassette_image_device *cassette_device_image(running_machine &machine)
 
 static void pk8000_set_bank(running_machine &machine,UINT8 data)
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	pk8000_state *state = machine.driver_data<pk8000_state>();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 	UINT8 block1 = data & 3;
 	UINT8 block2 = (data >> 2) & 3;
@@ -45,51 +48,51 @@ static void pk8000_set_bank(running_machine &machine,UINT8 data)
 
 	switch(block1) {
 		case 0:
-				memory_set_bankptr(machine, "bank1", rom + 0x10000);
-				memory_set_bankptr(machine, "bank5", ram);
+				state->membank("bank1")->set_base(rom + 0x10000);
+				state->membank("bank5")->set_base(ram);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank1", ram);
-				memory_set_bankptr(machine, "bank5", ram);
+				state->membank("bank1")->set_base(ram);
+				state->membank("bank5")->set_base(ram);
 				break;
 	}
 
 	switch(block2) {
 		case 0:
-				memory_set_bankptr(machine, "bank2", rom + 0x14000);
-				memory_set_bankptr(machine, "bank6", ram + 0x4000);
+				state->membank("bank2")->set_base(rom + 0x14000);
+				state->membank("bank6")->set_base(ram + 0x4000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank2", ram + 0x4000);
-				memory_set_bankptr(machine, "bank6", ram + 0x4000);
+				state->membank("bank2")->set_base(ram + 0x4000);
+				state->membank("bank6")->set_base(ram + 0x4000);
 				break;
 	}
 	switch(block3) {
 		case 0:
-				memory_set_bankptr(machine, "bank3", rom + 0x18000);
-				memory_set_bankptr(machine, "bank7", ram + 0x8000);
+				state->membank("bank3")->set_base(rom + 0x18000);
+				state->membank("bank7")->set_base(ram + 0x8000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank3", ram + 0x8000);
-				memory_set_bankptr(machine, "bank7", ram + 0x8000);
+				state->membank("bank3")->set_base(ram + 0x8000);
+				state->membank("bank7")->set_base(ram + 0x8000);
 				break;
 	}
 	switch(block4) {
 		case 0:
-				memory_set_bankptr(machine, "bank4", rom + 0x1c000);
-				memory_set_bankptr(machine, "bank8", ram + 0xc000);
+				state->membank("bank4")->set_base(rom + 0x1c000);
+				state->membank("bank8")->set_base(ram + 0xc000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank4", ram + 0xc000);
-				memory_set_bankptr(machine, "bank8", ram + 0xc000);
+				state->membank("bank4")->set_base(ram + 0xc000);
+				state->membank("bank8")->set_base(ram + 0xc000);
 				break;
 	}
 }
@@ -105,7 +108,7 @@ static READ8_DEVICE_HANDLER(pk8000_80_portb_r)
 	if(state->m_keyboard_line>9) {
 		return 0xff;
 	}
-	return input_port_read(device->machine(),keynames[state->m_keyboard_line]);
+	return device->machine().root_device().ioport(keynames[state->m_keyboard_line])->read();
 }
 
 static WRITE8_DEVICE_HANDLER(pk8000_80_portc_w)
@@ -155,20 +158,20 @@ static I8255_INTERFACE( pk8000_ppi8255_interface_2 )
 	DEVCB_HANDLER(pk8000_84_portc_w)
 };
 
-static READ8_HANDLER(pk8000_joy_1_r)
+READ8_MEMBER(pk8000_state::pk8000_joy_1_r)
 {
-	UINT8 retVal = (cassette_device_image(space->machine())->input() > 0.0038 ? 0x80 : 0);
-	retVal |= input_port_read(space->machine(), "JOY1") & 0x7f;
+	UINT8 retVal = (cassette_device_image(machine())->input() > 0.0038 ? 0x80 : 0);
+	retVal |= ioport("JOY1")->read() & 0x7f;
 	return retVal;
 }
-static READ8_HANDLER(pk8000_joy_2_r)
+READ8_MEMBER(pk8000_state::pk8000_joy_2_r)
 {
-	UINT8 retVal = (cassette_device_image(space->machine())->input() > 0.0038 ? 0x80 : 0);
-	retVal |= input_port_read(space->machine(), "JOY2") & 0x7f;
+	UINT8 retVal = (cassette_device_image(machine())->input() > 0.0038 ? 0x80 : 0);
+	retVal |= ioport("JOY2")->read() & 0x7f;
 	return retVal;
 }
 
-static ADDRESS_MAP_START(pk8000_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(pk8000_mem, AS_PROGRAM, 8, pk8000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x3fff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
 	AM_RANGE( 0x4000, 0x7fff ) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
@@ -176,18 +179,18 @@ static ADDRESS_MAP_START(pk8000_mem, AS_PROGRAM, 8)
 	AM_RANGE( 0xc000, 0xffff ) AM_READ_BANK("bank4") AM_WRITE_BANK("bank8")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pk8000_io , AS_IO, 8)
+static ADDRESS_MAP_START( pk8000_io , AS_IO, 8, pk8000_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write)
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE_MODERN("ppi8255_2", i8255_device, read, write)
-	AM_RANGE(0x88, 0x88) AM_READWRITE(pk8000_video_color_r,pk8000_video_color_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
+	AM_RANGE(0x88, 0x88) AM_READWRITE_LEGACY(pk8000_video_color_r,pk8000_video_color_w)
 	AM_RANGE(0x8c, 0x8c) AM_READ(pk8000_joy_1_r)
 	AM_RANGE(0x8d, 0x8d) AM_READ(pk8000_joy_2_r)
-	AM_RANGE(0x90, 0x90) AM_READWRITE(pk8000_text_start_r,pk8000_text_start_w)
-	AM_RANGE(0x91, 0x91) AM_READWRITE(pk8000_chargen_start_r,pk8000_chargen_start_w)
-	AM_RANGE(0x92, 0x92) AM_READWRITE(pk8000_video_start_r,pk8000_video_start_w)
-	AM_RANGE(0x93, 0x93) AM_READWRITE(pk8000_color_start_r,pk8000_color_start_w)
-	AM_RANGE(0xa0, 0xbf) AM_READWRITE(pk8000_color_r,pk8000_color_w)
+	AM_RANGE(0x90, 0x90) AM_READWRITE_LEGACY(pk8000_text_start_r,pk8000_text_start_w)
+	AM_RANGE(0x91, 0x91) AM_READWRITE_LEGACY(pk8000_chargen_start_r,pk8000_chargen_start_w)
+	AM_RANGE(0x92, 0x92) AM_READWRITE_LEGACY(pk8000_video_start_r,pk8000_video_start_w)
+	AM_RANGE(0x93, 0x93) AM_READWRITE_LEGACY(pk8000_color_start_r,pk8000_color_start_w)
+	AM_RANGE(0xa0, 0xbf) AM_READWRITE_LEGACY(pk8000_color_r,pk8000_color_w)
 ADDRESS_MAP_END
 
 /*   Input ports */

@@ -31,18 +31,17 @@ Year   Game                PCB            NOTES
  *
  *************************************/
 
-static WRITE16_HANDLER( bigkarnk_sound_command_w )
+WRITE16_MEMBER(gaelco_state::bigkarnk_sound_command_w)
 {
-	gaelco_state *state = space->machine().driver_data<gaelco_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, 0, data & 0xff);
-		device_set_input_line(state->m_audiocpu, M6809_FIRQ_LINE, HOLD_LINE);
+		soundlatch_byte_w(space, 0, data & 0xff);
+		device_set_input_line(m_audiocpu, M6809_FIRQ_LINE, HOLD_LINE);
 	}
 }
 
-static WRITE16_HANDLER( bigkarnk_coin_w )
+WRITE16_MEMBER(gaelco_state::bigkarnk_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -50,19 +49,19 @@ static WRITE16_HANDLER( bigkarnk_coin_w )
 		{
 			case 0x00:	/* Coin Lockouts */
 			case 0x01:
-				coin_lockout_w(space->machine(), (offset >> 3) & 0x01, ~data & 0x01);
+				coin_lockout_w(machine(), (offset >> 3) & 0x01, ~data & 0x01);
 				break;
 			case 0x02:	/* Coin Counters */
 			case 0x03:
-				coin_counter_w(space->machine(), (offset >> 3) & 0x01, data & 0x01);
+				coin_counter_w(machine(), (offset >> 3) & 0x01, data & 0x01);
 				break;
 		}
 	}
 }
 
-static WRITE16_HANDLER( OKIM6295_bankswitch_w )
+WRITE16_MEMBER(gaelco_state::OKIM6295_bankswitch_w)
 {
-	UINT8 *RAM = space->machine().region("oki")->base();
+	UINT8 *RAM = memregion("oki")->base();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -72,47 +71,43 @@ static WRITE16_HANDLER( OKIM6295_bankswitch_w )
 
 /*********** Squash Encryption Related Code ******************/
 
-static WRITE16_HANDLER( gaelco_vram_encrypted_w )
+WRITE16_MEMBER(gaelco_state::gaelco_vram_encrypted_w)
 {
-	gaelco_state *state = space->machine().driver_data<gaelco_state>();
 
 	// mame_printf_debug("gaelco_vram_encrypted_w!!\n");
-	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
-	COMBINE_DATA(&state->m_videoram[offset]);
+	data = gaelco_decrypt(&space, offset, data, 0x0f, 0x4228);
+	COMBINE_DATA(&m_videoram[offset]);
 
-	state->m_tilemap[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);
+	m_tilemap[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);
 }
 
 
-static WRITE16_HANDLER(gaelco_encrypted_w)
+WRITE16_MEMBER(gaelco_state::gaelco_encrypted_w)
 {
-	gaelco_state *state = space->machine().driver_data<gaelco_state>();
 
 	// mame_printf_debug("gaelco_encrypted_w!!\n");
-	data = gaelco_decrypt(space, offset, data, 0x0f, 0x4228);
-	COMBINE_DATA(&state->m_screen[offset]);
+	data = gaelco_decrypt(&space, offset, data, 0x0f, 0x4228);
+	COMBINE_DATA(&m_screen[offset]);
 }
 
 /*********** Thunder Hoop Encryption Related Code ******************/
 
-static WRITE16_HANDLER( thoop_vram_encrypted_w )
+WRITE16_MEMBER(gaelco_state::thoop_vram_encrypted_w)
 {
-	gaelco_state *state = space->machine().driver_data<gaelco_state>();
 
 	// mame_printf_debug("gaelco_vram_encrypted_w!!\n");
-	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
-	COMBINE_DATA(&state->m_videoram[offset]);
+	data = gaelco_decrypt(&space, offset, data, 0x0e, 0x4228);
+	COMBINE_DATA(&m_videoram[offset]);
 
-	state->m_tilemap[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);
+	m_tilemap[offset >> 11]->mark_tile_dirty(((offset << 1) & 0x0fff) >> 2);
 }
 
-static WRITE16_HANDLER(thoop_encrypted_w)
+WRITE16_MEMBER(gaelco_state::thoop_encrypted_w)
 {
-	gaelco_state *state = space->machine().driver_data<gaelco_state>();
 
 	// mame_printf_debug("gaelco_encrypted_w!!\n");
-	data = gaelco_decrypt(space, offset, data, 0x0e, 0x4228);
-	COMBINE_DATA(&state->m_screen[offset]);
+	data = gaelco_decrypt(&space, offset, data, 0x0e, 0x4228);
+	COMBINE_DATA(&m_screen[offset]);
 }
 
 /*************************************
@@ -121,14 +116,14 @@ static WRITE16_HANDLER(thoop_encrypted_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START( bigkarnk_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bigkarnk_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM															/* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(gaelco_vram_w) AM_BASE_MEMBER(gaelco_state, m_videoram)				/* Video RAM */
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(gaelco_vram_w) AM_SHARE("videoram")				/* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM															/* Screen RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE_MEMBER(gaelco_state, m_vregs)							/* Video Registers */
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")							/* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(gaelco_state, m_spriteram)								/* Sprite RAM */
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")	/* Palette */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")								/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
@@ -139,63 +134,63 @@ static ADDRESS_MAP_START( bigkarnk_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xff8000, 0xffffff) AM_RAM															/* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigkarnk_snd_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bigkarnk_snd_map, AS_PROGRAM, 8, gaelco_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM											/* RAM */
-	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)	/* OKI6295 */
+	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE("oki", okim6295_device, read, write)	/* OKI6295 */
 //  AM_RANGE(0x0900, 0x0900) AM_WRITENOP                                    /* enable sound output? */
-	AM_RANGE(0x0a00, 0x0a01) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)		/* YM3812 */
-	AM_RANGE(0x0b00, 0x0b00) AM_READ(soundlatch_r)							/* Sound latch */
+	AM_RANGE(0x0a00, 0x0a01) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)		/* YM3812 */
+	AM_RANGE(0x0b00, 0x0b00) AM_READ(soundlatch_byte_r)							/* Sound latch */
 	AM_RANGE(0x0c00, 0xffff) AM_ROM											/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( maniacsq_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															/* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(gaelco_vram_w) AM_BASE_MEMBER(gaelco_state, m_videoram)				/* Video RAM */
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(gaelco_vram_w) AM_SHARE("videoram")				/* Video RAM */
 	AM_RANGE(0x102000, 0x103fff) AM_RAM															/* Screen RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE_MEMBER(gaelco_state, m_vregs)							/* Video Registers */
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")							/* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(gaelco_state, m_spriteram)								/* Sprite RAM */
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")	/* Palette */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")								/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)										/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)						/* OKI6295 status register */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)						/* OKI6295 status register */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM															/* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( squash_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( squash_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															/* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(gaelco_vram_encrypted_w) AM_BASE_MEMBER(gaelco_state, m_videoram)			/* Video RAM */
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(gaelco_encrypted_w) AM_BASE_MEMBER(gaelco_state, m_screen)				/* Screen RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE_MEMBER(gaelco_state, m_vregs)							/* Video Registers */
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(gaelco_vram_encrypted_w) AM_SHARE("videoram")			/* Video RAM */
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(gaelco_encrypted_w) AM_SHARE("screen")				/* Screen RAM */
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")							/* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                 /* INT 6 ACK/Watchdog timer */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(gaelco_state, m_spriteram)								/* Sprite RAM */
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")	/* Palette */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")								/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)										/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)						/* OKI6295 status register */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)						/* OKI6295 status register */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM															/* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( thoop_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( thoop_map, AS_PROGRAM, 16, gaelco_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM															/* ROM */
-	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(thoop_vram_encrypted_w) AM_BASE_MEMBER(gaelco_state, m_videoram)			/* Video RAM */
-	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(thoop_encrypted_w) AM_BASE_MEMBER(gaelco_state, m_screen)				/* Screen RAM */
-	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_BASE_MEMBER(gaelco_state, m_vregs)							/* Video Registers */
+	AM_RANGE(0x100000, 0x101fff) AM_RAM_WRITE(thoop_vram_encrypted_w) AM_SHARE("videoram")			/* Video RAM */
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(thoop_encrypted_w) AM_SHARE("screen")				/* Screen RAM */
+	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs")							/* Video Registers */
 //  AM_RANGE(0x10800c, 0x10800d) AM_WRITE(watchdog_reset_w)                                                     /* INT 6 ACK/Watchdog timer */
-	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)		/* Palette */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_BASE_MEMBER(gaelco_state, m_spriteram)								/* Sprite RAM */
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")		/* Palette */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM AM_SHARE("spriteram")								/* Sprite RAM */
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("DSW2")
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)										/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)						/* OKI6295 status register */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)						/* OKI6295 status register */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM															/* Work RAM */
 ADDRESS_MAP_END
 

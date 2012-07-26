@@ -49,6 +49,10 @@ public:
 	UINT8 m_cd_io_status;
 	UINT8 m_cd_param[8];
 	UINT8 m_cd_result[8];
+	DECLARE_READ8_MEMBER(psx_cd_r);
+	DECLARE_WRITE8_MEMBER(psx_cd_w);
+	DECLARE_DIRECT_UPDATE_MEMBER(psx_default);
+	DECLARE_DIRECT_UPDATE_MEMBER(psx_setopbase);
 };
 
 
@@ -414,23 +418,22 @@ static int load_psf( device_t *cpu, unsigned char *p_n_file, int n_len )
 	return n_return;
 }
 
-DIRECT_UPDATE_HANDLER( psx_default )
+DIRECT_UPDATE_MEMBER(psx1_state::psx_default)
 {
 	return address;
 }
 
-DIRECT_UPDATE_HANDLER( psx_setopbase )
+DIRECT_UPDATE_MEMBER(psx1_state::psx_setopbase)
 {
-	psx1_state *state = machine.driver_data<psx1_state>();
 	if( address == 0x80030000 )
 	{
-		device_t *cpu = machine.device("maincpu");
+		device_t *cpu = machine().device("maincpu");
 
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(psx_default), &machine));
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(psx1_state::psx_default), this));
 
-		if( load_psxexe( cpu, state->m_exe_buffer, state->m_exe_size ) ||
-			load_cpe( cpu, state->m_exe_buffer, state->m_exe_size ) ||
-			load_psf( cpu, state->m_exe_buffer, state->m_exe_size ) )
+		if( load_psxexe( cpu, m_exe_buffer, m_exe_size ) ||
+			load_cpe( cpu, m_exe_buffer, m_exe_size ) ||
+			load_psf( cpu, m_exe_buffer, m_exe_size ) )
 		{
 /*          DEBUGGER_BREAK; */
 
@@ -441,8 +444,8 @@ DIRECT_UPDATE_HANDLER( psx_setopbase )
 			logerror( "psx_exe_load: invalid exe\n" );
 		}
 
-		state->m_exe_size = 0;
-		free( state->m_exe_buffer );
+		m_exe_size = 0;
+		free( m_exe_buffer );
 	}
 	return address;
 }
@@ -465,7 +468,7 @@ static QUICKLOAD_LOAD( psx_exe_load )
 		return IMAGE_INIT_FAIL;
 	}
 	state->m_exe_size = quickload_size;
-	space->set_direct_update_handler(direct_update_delegate(FUNC(psx_setopbase), &image.device().machine()));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(psx1_state::psx_setopbase), state));
 
 	return IMAGE_INIT_PASS;
 }
@@ -630,7 +633,7 @@ static void psx_pad( running_machine &machine, int n_port, int n_data )
 		{
 			if( pad->n_byte < PAD_BYTES_STANDARD )
 			{
-				pad->n_shiftout = input_port_read(machine, portnames[pad->n_byte + ( n_port * PAD_BYTES_STANDARD )]);
+				pad->n_shiftout = machine.root_device().ioport(portnames[pad->n_byte + ( n_port * PAD_BYTES_STANDARD )])->read();
 				pad->n_byte++;
 				b_ack = 1;
 			}
@@ -660,7 +663,7 @@ static void psx_sio0( running_machine &machine, int n_data )
 
 static void cd_dma_read( psxcd_device *psxcd, UINT32 n_address, INT32 n_size )
 {
-	UINT8 *psxram = (UINT8 *)memory_get_shared(psxcd->machine(), "share1");
+	UINT8 *psxram = (UINT8 *)psxcd->machine().root_device().memshare("share1")->ptr();
 
 	psxcd->start_dma(psxram + n_address, n_size*4);
 }
@@ -670,21 +673,21 @@ static void cd_dma_write( psxcd_device *psxcd, UINT32 n_address, INT32 n_size )
 	printf("cd_dma_write?!: addr %x, size %x\n", n_address, n_size);
 }
 
-static READ8_HANDLER( psx_cd_r )
+READ8_MEMBER(psx1_state::psx_cd_r)
 {
-	psxcd_device *psxcd = space->machine().device<psxcd_device>(PSXCD_TAG);
+	psxcd_device *psxcd = machine().device<psxcd_device>(PSXCD_TAG);
 
 	return psxcd->read_byte(offset);
 }
 
-static WRITE8_HANDLER( psx_cd_w )
+WRITE8_MEMBER(psx1_state::psx_cd_w)
 {
-	psxcd_device *psxcd = space->machine().device<psxcd_device>(PSXCD_TAG);
+	psxcd_device *psxcd = machine().device<psxcd_device>(PSXCD_TAG);
 
 	psxcd->write_byte(offset, data);
 }
 
-static ADDRESS_MAP_START( psx_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( psx_map, AS_PROGRAM, 32, psx1_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f801800, 0x1f801803) AM_READWRITE8(psx_cd_r, psx_cd_w, 0xffffffff)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */

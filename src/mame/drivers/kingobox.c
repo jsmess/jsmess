@@ -21,34 +21,30 @@ Main CPU:
 #include "sound/dac.h"
 #include "includes/kingobox.h"
 
-static WRITE8_HANDLER( video_interrupt_w )
+WRITE8_MEMBER(kingofb_state::video_interrupt_w)
 {
-	kingofb_state *state = space->machine().driver_data<kingofb_state>();
-	device_set_input_line_and_vector(state->m_video_cpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_video_cpu, 0, HOLD_LINE, 0xff);
 }
 
-static WRITE8_HANDLER( sprite_interrupt_w )
+WRITE8_MEMBER(kingofb_state::sprite_interrupt_w)
 {
-	kingofb_state *state = space->machine().driver_data<kingofb_state>();
-	device_set_input_line_and_vector(state->m_sprite_cpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_sprite_cpu, 0, HOLD_LINE, 0xff);
 }
 
-static WRITE8_HANDLER( scroll_interrupt_w )
+WRITE8_MEMBER(kingofb_state::scroll_interrupt_w)
 {
-	kingofb_state *state = space->machine().driver_data<kingofb_state>();
 	sprite_interrupt_w(space, offset, data);
-	*state->m_scroll_y = data;
+	*m_scroll_y = data;
 }
 
-static WRITE8_HANDLER( sound_command_w )
+WRITE8_MEMBER(kingofb_state::sound_command_w)
 {
-	kingofb_state *state = space->machine().driver_data<kingofb_state>();
-	soundlatch_w(space, 0, data);
-	device_set_input_line_and_vector(state->m_audio_cpu, 0, HOLD_LINE, 0xff);
+	soundlatch_byte_w(space, 0, data);
+	device_set_input_line_and_vector(m_audio_cpu, 0, HOLD_LINE, 0xff);
 }
 
 
-static ADDRESS_MAP_START( kingobox_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kingobox_map, AS_PROGRAM, 8, kingofb_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM /* work ram */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share2") /* shared with sprite cpu */
@@ -56,7 +52,7 @@ static ADDRESS_MAP_START( kingobox_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM /* ???? */
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(kingofb_f800_w)	/* NMI enable, palette bank */
 	AM_RANGE(0xf801, 0xf801) AM_WRITENOP /* ???? */
-	AM_RANGE(0xf802, 0xf802) AM_WRITEONLY AM_BASE_MEMBER(kingofb_state, m_scroll_y)
+	AM_RANGE(0xf802, 0xf802) AM_WRITEONLY AM_SHARE("scroll_y")
 	AM_RANGE(0xf803, 0xf803) AM_WRITE(scroll_interrupt_w)
 	AM_RANGE(0xf804, 0xf804) AM_WRITE(video_interrupt_w)
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(sound_command_w) /* sound latch */
@@ -68,39 +64,39 @@ static ADDRESS_MAP_START( kingobox_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xfc05, 0xfc05) AM_READ_PORT("EXTRA")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kingobox_video_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kingobox_video_map, AS_PROGRAM, 8, kingofb_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1") /* shared with main */
-	AM_RANGE(0xc000, 0xc0ff) AM_RAM_WRITE(kingofb_videoram_w) AM_BASE_MEMBER(kingofb_state, m_videoram) /* background vram */
-	AM_RANGE(0xc400, 0xc4ff) AM_RAM_WRITE(kingofb_colorram_w) AM_BASE_MEMBER(kingofb_state, m_colorram) /* background colorram */
-	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(kingofb_videoram2_w) AM_BASE_MEMBER(kingofb_state, m_videoram2) /* foreground vram */
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(kingofb_colorram2_w) AM_BASE_MEMBER(kingofb_state, m_colorram2) /* foreground colorram */
+	AM_RANGE(0xc000, 0xc0ff) AM_RAM_WRITE(kingofb_videoram_w) AM_SHARE("videoram") /* background vram */
+	AM_RANGE(0xc400, 0xc4ff) AM_RAM_WRITE(kingofb_colorram_w) AM_SHARE("colorram") /* background colorram */
+	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(kingofb_videoram2_w) AM_SHARE("videoram2") /* foreground vram */
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(kingofb_colorram2_w) AM_SHARE("colorram2") /* foreground colorram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kingobox_sprite_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kingobox_sprite_map, AS_PROGRAM, 8, kingofb_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share2") /* shared with main */
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_SIZE_MEMBER(kingofb_state, m_spriteram, m_spriteram_size) /* sprite ram */
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("spriteram") /* sprite ram */
 	AM_RANGE(0xc400, 0xc43f) AM_RAM  /* something related to scroll? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kingobox_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( kingobox_sound_map, AS_PROGRAM, 8, kingofb_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_WRITENOP /* ??? */
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM /* work ram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kingobox_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( kingobox_sound_io_map, AS_IO, 8, kingofb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac", dac_w)
-	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("aysnd", ay8910_r, ay8910_data_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("aysnd", ay8910_address_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE_LEGACY("aysnd", ay8910_r, ay8910_data_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
 ADDRESS_MAP_END
 
 /* Ring King */
-static ADDRESS_MAP_START( ringking_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ringking_map, AS_PROGRAM, 8, kingofb_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM /* work ram */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share2") /* shared with sprite cpu */
@@ -115,33 +111,33 @@ static ADDRESS_MAP_START( ringking_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("P2")
 	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xe005, 0xe005) AM_READ_PORT("EXTRA")
-	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(kingofb_state, m_scroll_y)
+	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_SHARE("scroll_y")
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM /* ???? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ringking_video_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ringking_video_map, AS_PROGRAM, 8, kingofb_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("share1") /* shared with main */
-	AM_RANGE(0xa800, 0xa8ff) AM_RAM_WRITE(kingofb_videoram_w) AM_BASE_MEMBER(kingofb_state, m_videoram) /* background vram */
-	AM_RANGE(0xac00, 0xacff) AM_RAM_WRITE(kingofb_colorram_w) AM_BASE_MEMBER(kingofb_state, m_colorram) /* background colorram */
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(kingofb_videoram2_w) AM_BASE_MEMBER(kingofb_state, m_videoram2) /* foreground vram */
-	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE(kingofb_colorram2_w) AM_BASE_MEMBER(kingofb_state, m_colorram2) /* foreground colorram */
+	AM_RANGE(0xa800, 0xa8ff) AM_RAM_WRITE(kingofb_videoram_w) AM_SHARE("videoram") /* background vram */
+	AM_RANGE(0xac00, 0xacff) AM_RAM_WRITE(kingofb_colorram_w) AM_SHARE("colorram") /* background colorram */
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(kingofb_videoram2_w) AM_SHARE("videoram2") /* foreground vram */
+	AM_RANGE(0xa400, 0xa7ff) AM_RAM_WRITE(kingofb_colorram2_w) AM_SHARE("colorram2") /* foreground colorram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ringking_sprite_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ringking_sprite_map, AS_PROGRAM, 8, kingofb_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM /* work ram */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share2") /* shared with main */
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_BASE_SIZE_MEMBER(kingofb_state, m_spriteram, m_spriteram_size) /* sprite ram */
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_SHARE("spriteram") /* sprite ram */
 	AM_RANGE(0xa400, 0xa43f) AM_RAM /* something related to scroll? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ringking_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( ringking_sound_io_map, AS_IO, 8, kingofb_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("dac", dac_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("dac", dac_w)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
 
@@ -305,7 +301,7 @@ static INPUT_PORTS_START( ringking )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* Sound busy??? */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -443,7 +439,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r)
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r)
 };
 
 static INTERRUPT_GEN( kingofb_interrupt )
@@ -792,7 +788,7 @@ ROM_END
 static DRIVER_INIT( ringking3 )
 {
 	int i;
-	UINT8 *RAM = machine.region("proms")->base();
+	UINT8 *RAM = machine.root_device().memregion("proms")->base();
 
 	/* expand the first color PROM to look like the kingofb ones... */
 	for (i = 0; i < 0x100; i++)
@@ -802,8 +798,8 @@ static DRIVER_INIT( ringking3 )
 static DRIVER_INIT( ringkingw )
 {
 	int i,j,k;
-	UINT8 *PROMS = machine.region("proms")->base();
-	UINT8 *USER1 = machine.region("user1")->base();
+	UINT8 *PROMS = machine.root_device().memregion("proms")->base();
+	UINT8 *USER1 = machine.root_device().memregion("user1")->base();
 
 	/* change the PROMs encode in a simple format to use kingofb decode */
 	for(i = 0, j = 0; j < 0x40; i++, j++)

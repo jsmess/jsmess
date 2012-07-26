@@ -32,34 +32,33 @@ static INTERRUPT_GEN( contra_interrupt )
 		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( contra_bankswitch_w )
+WRITE8_MEMBER(contra_state::contra_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
-static WRITE8_HANDLER( contra_sh_irqtrigger_w )
+WRITE8_MEMBER(contra_state::contra_sh_irqtrigger_w)
 {
-	contra_state *state = space->machine().driver_data<contra_state>();
-	device_set_input_line(state->m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	device_set_input_line(m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( contra_coin_counter_w )
+WRITE8_MEMBER(contra_state::contra_coin_counter_w)
 {
 	if (data & 0x01)
-		coin_counter_w(space->machine(), 0, data & 0x01);
+		coin_counter_w(machine(), 0, data & 0x01);
 
 	if (data & 0x02)
-		coin_counter_w(space->machine(), 1, (data & 0x02) >> 1);
+		coin_counter_w(machine(), 1, (data & 0x02) >> 1);
 }
 
-static WRITE8_HANDLER( cpu_sound_command_w )
+WRITE8_MEMBER(contra_state::cpu_sound_command_w)
 {
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 }
 
 
 
-static ADDRESS_MAP_START( contra_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( contra_map, AS_PROGRAM, 8, contra_state )
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(contra_K007121_ctrl_0_w)
 	AM_RANGE(0x0010, 0x0010) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0011, 0x0011) AM_READ_PORT("P1")
@@ -75,19 +74,19 @@ static ADDRESS_MAP_START( contra_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x001e, 0x001e) AM_WRITENOP	/* ? */
 	AM_RANGE(0x0060, 0x0067) AM_WRITE(contra_K007121_ctrl_1_w)
 
-	AM_RANGE(0x0c00, 0x0cff) AM_RAM AM_BASE_MEMBER(contra_state, m_paletteram)
+	AM_RANGE(0x0c00, 0x0cff) AM_RAM AM_SHARE("paletteram")
 
 	AM_RANGE(0x1000, 0x1fff) AM_RAM
 
 	AM_RANGE(0x2000, 0x5fff) AM_READONLY
-	AM_RANGE(0x2000, 0x23ff) AM_WRITE(contra_fg_cram_w) AM_BASE_MEMBER(contra_state, m_fg_cram)
-	AM_RANGE(0x2400, 0x27ff) AM_WRITE(contra_fg_vram_w) AM_BASE_MEMBER(contra_state, m_fg_vram)
-	AM_RANGE(0x2800, 0x2bff) AM_WRITE(contra_text_cram_w) AM_BASE_MEMBER(contra_state, m_tx_cram)
-	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(contra_text_vram_w) AM_BASE_MEMBER(contra_state, m_tx_vram)
-	AM_RANGE(0x3000, 0x37ff) AM_WRITEONLY AM_BASE_MEMBER(contra_state, m_spriteram)/* 2nd bank is at 0x5000 */
+	AM_RANGE(0x2000, 0x23ff) AM_WRITE(contra_fg_cram_w) AM_SHARE("fg_cram")
+	AM_RANGE(0x2400, 0x27ff) AM_WRITE(contra_fg_vram_w) AM_SHARE("fg_vram")
+	AM_RANGE(0x2800, 0x2bff) AM_WRITE(contra_text_cram_w) AM_SHARE("tx_cram")
+	AM_RANGE(0x2c00, 0x2fff) AM_WRITE(contra_text_vram_w) AM_SHARE("tx_vram")
+	AM_RANGE(0x3000, 0x37ff) AM_WRITEONLY AM_SHARE("spriteram")/* 2nd bank is at 0x5000 */
 	AM_RANGE(0x3800, 0x3fff) AM_WRITEONLY // second sprite buffer
-	AM_RANGE(0x4000, 0x43ff) AM_WRITE(contra_bg_cram_w) AM_BASE_MEMBER(contra_state, m_bg_cram)
-	AM_RANGE(0x4400, 0x47ff) AM_WRITE(contra_bg_vram_w) AM_BASE_MEMBER(contra_state, m_bg_vram)
+	AM_RANGE(0x4000, 0x43ff) AM_WRITE(contra_bg_cram_w) AM_SHARE("bg_cram")
+	AM_RANGE(0x4400, 0x47ff) AM_WRITE(contra_bg_vram_w) AM_SHARE("bg_vram")
 	AM_RANGE(0x4800, 0x5fff) AM_WRITEONLY
 
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
@@ -96,9 +95,9 @@ static ADDRESS_MAP_START( contra_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0000) AM_READ(soundlatch_r)
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, contra_state )
+	AM_RANGE(0x0000, 0x0000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITENOP /* read triggers irq reset and latch read (in the hardware only). */
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -179,9 +178,9 @@ GFXDECODE_END
 static MACHINE_START( contra )
 {
 	contra_state *state = machine.driver_data<contra_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 16, &ROM[0x10000], 0x2000);
+	state->membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x2000);
 
 	state->m_audiocpu = machine.device("audiocpu");
 	state->m_k007121_1 = machine.device("k007121_1");

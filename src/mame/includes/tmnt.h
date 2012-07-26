@@ -4,16 +4,20 @@ class tmnt_state : public driver_device
 {
 public:
 	tmnt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_tmnt2_rom(*this, "tmnt2_rom"),
+		m_sunset_104000(*this, "sunset_104000"),
+		m_tmnt2_1c0800(*this, "tmnt2_1c0800"){ }
 
 	/* memory pointers */
-	UINT16 *   m_tmnt2_1c0800;
-	UINT16 *   m_sunset_104000;
-	UINT16 *   m_tmnt2_rom;
+	optional_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_tmnt2_rom;
+	optional_shared_ptr<UINT16> m_sunset_104000;
+	optional_shared_ptr<UINT16> m_tmnt2_1c0800;
 //  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 //  UINT8 *     m_nvram;    // currently cuebrick uses generic nvram handling
 //  UINT8 *     m_cuebrick_nvram;
-	UINT16 *m_spriteram;
 
 	/* video-related */
 	int        m_layer_colorbase[3];
@@ -61,6 +65,53 @@ public:
 	INT16      m_sampledata[0x40000];
 
 	UINT8      m_irq5_mask;
+	DECLARE_READ16_MEMBER(k052109_word_noA12_r);
+	DECLARE_WRITE16_MEMBER(k052109_word_noA12_w);
+	DECLARE_WRITE16_MEMBER(punkshot_k052109_word_w);
+	DECLARE_WRITE16_MEMBER(punkshot_k052109_word_noA12_w);
+	DECLARE_READ16_MEMBER(k053245_scattered_word_r);
+	DECLARE_WRITE16_MEMBER(k053245_scattered_word_w);
+	DECLARE_READ16_MEMBER(k053244_word_noA1_r);
+	DECLARE_WRITE16_MEMBER(k053244_word_noA1_w);
+	DECLARE_WRITE16_MEMBER(tmnt_sound_command_w);
+	DECLARE_READ16_MEMBER(prmrsocr_sound_r);
+	DECLARE_WRITE16_MEMBER(prmrsocr_sound_cmd_w);
+	DECLARE_WRITE16_MEMBER(prmrsocr_sound_irq_w);
+	DECLARE_WRITE8_MEMBER(prmrsocr_audio_bankswitch_w);
+	DECLARE_READ8_MEMBER(tmnt_sres_r);
+	DECLARE_WRITE8_MEMBER(tmnt_sres_w);
+	DECLARE_WRITE8_MEMBER(sound_arm_nmi_w);
+	DECLARE_READ16_MEMBER(punkshot_kludge_r);
+	DECLARE_READ16_MEMBER(ssriders_protection_r);
+	DECLARE_WRITE16_MEMBER(ssriders_protection_w);
+	DECLARE_READ16_MEMBER(blswhstl_coin_r);
+	DECLARE_READ16_MEMBER(ssriders_eeprom_r);
+	DECLARE_READ16_MEMBER(sunsetbl_eeprom_r);
+	DECLARE_WRITE16_MEMBER(blswhstl_eeprom_w);
+	DECLARE_READ16_MEMBER(thndrx2_eeprom_r);
+	DECLARE_WRITE16_MEMBER(thndrx2_eeprom_w);
+	DECLARE_WRITE16_MEMBER(prmrsocr_eeprom_w);
+	DECLARE_READ16_MEMBER(cuebrick_nv_r);
+	DECLARE_WRITE16_MEMBER(cuebrick_nv_w);
+	DECLARE_WRITE16_MEMBER(cuebrick_nvbank_w);
+	DECLARE_WRITE16_MEMBER(ssriders_soundkludge_w);
+	DECLARE_WRITE16_MEMBER(k053251_glfgreat_w);
+	DECLARE_WRITE16_MEMBER(tmnt2_1c0800_w);
+	DECLARE_READ8_MEMBER(k054539_ctrl_r);
+	DECLARE_WRITE8_MEMBER(k054539_ctrl_w);
+	DECLARE_WRITE16_MEMBER(tmnt_paletteram_word_w);
+	DECLARE_WRITE16_MEMBER(tmnt_0a0000_w);
+	DECLARE_WRITE16_MEMBER(punkshot_0a0020_w);
+	DECLARE_WRITE16_MEMBER(lgtnfght_0a0018_w);
+	DECLARE_WRITE16_MEMBER(blswhstl_700300_w);
+	DECLARE_READ16_MEMBER(glfgreat_rom_r);
+	DECLARE_WRITE16_MEMBER(glfgreat_122000_w);
+	DECLARE_WRITE16_MEMBER(ssriders_eeprom_w);
+	DECLARE_WRITE16_MEMBER(ssriders_1c0300_w);
+	DECLARE_WRITE16_MEMBER(prmrsocr_122000_w);
+	DECLARE_READ16_MEMBER(prmrsocr_rom_r);
+	DECLARE_WRITE16_MEMBER(tmnt_priority_w);
+	DECLARE_READ16_MEMBER(glfgreat_ball_r);
 };
 
 
@@ -79,19 +130,6 @@ extern void lgtnfght_sprite_callback(running_machine &machine, int *code,int *co
 extern void blswhstl_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
 extern void prmrsocr_sprite_callback(running_machine &machine, int *code,int *color,int *priority_mask);
 
-WRITE16_HANDLER( tmnt_paletteram_word_w );
-WRITE16_HANDLER( tmnt_0a0000_w );
-WRITE16_HANDLER( punkshot_0a0020_w );
-WRITE16_HANDLER( lgtnfght_0a0018_w );
-WRITE16_HANDLER( blswhstl_700300_w );
-READ16_HANDLER( glfgreat_rom_r );
-WRITE16_HANDLER( glfgreat_122000_w );
-WRITE16_HANDLER( ssriders_eeprom_w );
-WRITE16_HANDLER( ssriders_1c0300_w );
-WRITE16_HANDLER( prmrsocr_122000_w );
-WRITE16_HANDLER( tmnt_priority_w );
-READ16_HANDLER( glfgreat_ball_r );
-READ16_HANDLER( prmrsocr_rom_r );
 
 VIDEO_START( cuebrick );
 VIDEO_START( mia );

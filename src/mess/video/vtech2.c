@@ -292,22 +292,20 @@ SCREEN_UPDATE_IND16( laser )
 	return 0;
 }
 
-WRITE8_HANDLER( laser_bg_mode_w )
+WRITE8_MEMBER(vtech2_state::laser_bg_mode_w)
 {
-	vtech2_state *state = space->machine().driver_data<vtech2_state>();
-    if (state->m_laser_bg_mode != data)
+    if (m_laser_bg_mode != data)
     {
-        state->m_laser_bg_mode = data;
+        m_laser_bg_mode = data;
 		logerror("laser border:$%X mode:$%X\n", data >> 4, data & 15);
     }
 }
 
-WRITE8_HANDLER( laser_two_color_w )
+WRITE8_MEMBER(vtech2_state::laser_two_color_w)
 {
-	vtech2_state *state = space->machine().driver_data<vtech2_state>();
-	if (state->m_laser_two_color != data)
+	if (m_laser_two_color != data)
 	{
-		state->m_laser_two_color = data;
+		m_laser_two_color = data;
 		logerror("laser foreground:$%X background:$%X\n", data >> 4, data & 15);
     }
 }

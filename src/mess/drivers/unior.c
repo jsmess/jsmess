@@ -32,7 +32,6 @@ ToDo:
 - Colour?
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -42,7 +41,8 @@ class unior_state : public driver_device
 {
 public:
 	unior_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(unior_4c_w);
@@ -51,7 +51,7 @@ public:
 	DECLARE_WRITE8_MEMBER(unior_50_w);
 	DECLARE_WRITE8_MEMBER(unior_60_w);
 	UINT8 *m_p_vram;
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 *m_p_chargen;
 	UINT8 m_4c;
 	UINT8 m_cursor_col;
@@ -67,7 +67,7 @@ READ8_MEMBER( unior_state::unior_4d_r )
 {
 	char kbdrow[6];
 	sprintf(kbdrow,"X%X", m_4c&15);
-	return input_port_read(machine(), kbdrow);
+	return ioport(kbdrow)->read();
 }
 
 WRITE8_MEMBER( unior_state::unior_4c_w )
@@ -104,7 +104,7 @@ WRITE8_MEMBER( unior_state::unior_60_w )
 static ADDRESS_MAP_START( unior_mem, AS_PROGRAM, 8, unior_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xf7af) AM_RAM
-	AM_RANGE(0xf7b0, 0xf7ff) AM_RAM AM_BASE(m_p_videoram) // status line
+	AM_RANGE(0xf7b0, 0xf7ff) AM_RAM AM_SHARE("p_videoram") // status line
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_WRITE(vram_w) // main video
 ADDRESS_MAP_END
 
@@ -244,8 +244,8 @@ static MACHINE_RESET(unior)
 static VIDEO_START( unior )
 {
 	unior_state *state = machine.driver_data<unior_state>();
-	state->m_p_chargen = machine.region("chargen")->base();
-	state->m_p_vram = machine.region("vram")->base();
+	state->m_p_chargen = machine.root_device().memregion("chargen")->base();
+	state->m_p_vram = state->memregion("vram")->base();
 }
 
 static SCREEN_UPDATE_IND16( unior )

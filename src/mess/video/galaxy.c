@@ -20,7 +20,7 @@ static TIMER_CALLBACK( gal_video )
 	int y, x;
 	if (state->m_interrupts_enabled == TRUE)
 	{
-		UINT8 *gfx = machine.region("gfx1")->base();
+		UINT8 *gfx = state->memregion("gfx1")->base();
 		UINT8 dat = (state->m_latch_value & 0x3c) >> 2;
 		if ((state->m_gal_cnt >= 48 * 2) && (state->m_gal_cnt < 48 * 210))  // display on screen just state->m_first 208 lines
 		{

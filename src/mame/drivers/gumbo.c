@@ -46,39 +46,39 @@ PCB Layout
 #include "sound/okim6295.h"
 #include "includes/gumbo.h"
 
-static ADDRESS_MAP_START( gumbo_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( gumbo_map, AS_PROGRAM, 16, gumbo_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM // main ram
-	AM_RANGE(0x1b0000, 0x1b03ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1b0000, 0x1b03ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1c0100, 0x1c0101) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1c0200, 0x1c0201) AM_READ_PORT("DSW")
-	AM_RANGE(0x1c0300, 0x1c0301) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x1e0000, 0x1e0fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_BASE_MEMBER(gumbo_state, m_bg_videoram) // bg tilemap
-	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_BASE_MEMBER(gumbo_state, m_fg_videoram) // fg tilemap
+	AM_RANGE(0x1c0300, 0x1c0301) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x1e0000, 0x1e0fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_SHARE("bg_videoram") // bg tilemap
+	AM_RANGE(0x1f0000, 0x1f3fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_SHARE("fg_videoram") // fg tilemap
 ADDRESS_MAP_END
 
 /* Miss Puzzle has a different memory map */
 
-static ADDRESS_MAP_START( mspuzzle_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mspuzzle_map, AS_PROGRAM, 16, gumbo_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM // main ram
-	AM_RANGE(0x190000, 0x197fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_BASE_MEMBER(gumbo_state, m_fg_videoram) // fg tilemap
-	AM_RANGE(0x1a0000, 0x1a03ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x190000, 0x197fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_SHARE("fg_videoram") // fg tilemap
+	AM_RANGE(0x1a0000, 0x1a03ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1b0100, 0x1b0101) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1b0200, 0x1b0201) AM_READ_PORT("DSW")
-	AM_RANGE(0x1b0300, 0x1b0301) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_BASE_MEMBER(gumbo_state, m_bg_videoram) // bg tilemap
+	AM_RANGE(0x1b0300, 0x1b0301) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x1c0000, 0x1c1fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_SHARE("bg_videoram") // bg tilemap
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dblpoint_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dblpoint_map, AS_PROGRAM, 16, gumbo_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM // main ram
-	AM_RANGE(0x1b0000, 0x1b03ff) AM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1b0000, 0x1b03ff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1c0100, 0x1c0101) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1c0200, 0x1c0201) AM_READ_PORT("DSW")
-	AM_RANGE(0x1c0300, 0x1c0301) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x1e0000, 0x1e3fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_BASE_MEMBER(gumbo_state, m_fg_videoram) // fg tilemap
-	AM_RANGE(0x1f0000, 0x1f0fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_BASE_MEMBER(gumbo_state, m_bg_videoram) // bg tilemap
+	AM_RANGE(0x1c0300, 0x1c0301) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x1e0000, 0x1e3fff) AM_RAM_WRITE(gumbo_fg_videoram_w) AM_SHARE("fg_videoram") // fg tilemap
+	AM_RANGE(0x1f0000, 0x1f0fff) AM_RAM_WRITE(gumbo_bg_videoram_w) AM_SHARE("bg_videoram") // bg tilemap
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( gumbo )
@@ -102,47 +102,47 @@ static INPUT_PORTS_START( gumbo )
 
 	PORT_START("DSW")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0400, 0x0400, "Helps" )			// "Power Count" in test mode
+	PORT_DIPNAME( 0x0400, 0x0400, "Helps" )			PORT_DIPLOCATION("SW1:3")	// "Power Count" in test mode
 	PORT_DIPSETTING(      0x0000, "0" )
 	PORT_DIPSETTING(      0x0400, "1" )
-	PORT_DIPNAME( 0x0800, 0x0800, "Bonus Bar Level" )
+	PORT_DIPNAME( 0x0800, 0x0800, "Bonus Bar Level" )	PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( High ) )
-	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x3000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Picture View" )
+	PORT_DIPNAME( 0x4000, 0x4000, "Picture View" )		PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
+	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW1:8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( msbingo )
 	PORT_INCLUDE( gumbo )
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x0c00, 0x0c00, "Chance Count" )
+	PORT_DIPNAME( 0x0c00, 0x0c00, "Chance Count" )		PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x0c00, "0" )
 	PORT_DIPSETTING(      0x0800, "1" )
 	PORT_DIPSETTING(      0x0400, "2" )
 	PORT_DIPSETTING(      0x0000, "3" )
-	PORT_DIPNAME( 0x1000, 0x1000, "Play Level" )
+	PORT_DIPNAME( 0x1000, 0x1000, "Play Level" )		PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
-	PORT_DIPNAME( 0x2000, 0x2000, "Play Speed" )
+	PORT_DIPNAME( 0x2000, 0x2000, "Play Speed" )		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( High ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Left Count" )
+	PORT_DIPNAME( 0x4000, 0x4000, "Left Count" )		PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Low ) )
-	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
+	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW1:8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mspuzzle )
@@ -150,26 +150,26 @@ static INPUT_PORTS_START( mspuzzle )
 
 	PORT_MODIFY("DSW")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0300, 0x0200, "Time Mode" )
+	PORT_DIPNAME( 0x0300, 0x0200, "Time Mode" )		PORT_DIPLOCATION("SW1:1,2") /* Manual list this as "Game Level" with Levels 1 through 4 */
 	PORT_DIPSETTING(      0x0300, "0" )
 	PORT_DIPSETTING(      0x0200, "1" )
 	PORT_DIPSETTING(      0x0100, "2" )
 	PORT_DIPSETTING(      0x0000, "3" )
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Coinage ) )	PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x1000, 0x1000, "Sound Test" )
+	PORT_DIPNAME( 0x1000, 0x1000, "Sound Test" )		PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, "View Staff Credits" )
+	PORT_DIPNAME( 0x2000, 0x2000, "View Staff Credits" )	PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Picture View" )
+	PORT_DIPNAME( 0x4000, 0x4000, "Picture View" )		PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
+	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW1:8" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dblpoint )
@@ -184,19 +184,19 @@ static INPUT_PORTS_START( dblpoint )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 
 	PORT_MODIFY("DSW")
-	PORT_DIPNAME( 0x0c00, 0x0800, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0c00, 0x0800, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x0c00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x1000, 0x1000, "Sound Test" )
+	PORT_DIPNAME( 0x1000, 0x1000, "Sound Test" )		PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, "Picture View" )
+	PORT_DIPNAME( 0x2000, 0x2000, "Picture View" )		PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x4000, IP_ACTIVE_LOW )
-	PORT_SERVICE( 0x8000, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED_DIPLOC( 0x4000, IP_ACTIVE_LOW, "SW1:7" )
+	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW1:8" )
 INPUT_PORTS_END
 
 static const gfx_layout gumbo_layout =

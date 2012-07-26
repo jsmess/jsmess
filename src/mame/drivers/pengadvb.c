@@ -37,6 +37,7 @@ public:
 	UINT8 *m_main_mem;
 	UINT8 m_mem_map;
 	UINT8 m_mem_banks[4];
+	DECLARE_WRITE8_MEMBER(mem_w);
 };
 
 
@@ -59,7 +60,7 @@ static void mem_map_banks(running_machine &machine)
 		case 0:
 			// BIOS
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1" );
-			memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base());
+			state->membank("bank1")->set_base(state->memregion("maincpu")->base());
 			break;
 
 		default:
@@ -74,16 +75,16 @@ static void mem_map_banks(running_machine &machine)
 			// BIOS
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x5fff, "bank21" );
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x6000, 0x7fff, "bank22" );
-			memory_set_bankptr(machine, "bank21", machine.region("maincpu")->base() + 0x4000);
-			memory_set_bankptr(machine, "bank22", machine.region("maincpu")->base() + 0x4000 + 0x2000);
+			state->membank("bank21")->set_base(machine.root_device().memregion("maincpu")->base() + 0x4000);
+			state->membank("bank22")->set_base(machine.root_device().memregion("maincpu")->base() + 0x4000 + 0x2000);
 			break;
 
 		case 1:
 			// game
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x5fff, "bank21" );
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x6000, 0x7fff, "bank22" );
-			memory_set_bankptr(machine, "bank21", machine.region("game")->base() + state->m_mem_banks[0]*0x2000);
-			memory_set_bankptr(machine, "bank22", machine.region("game")->base() + state->m_mem_banks[1]*0x2000);
+			state->membank("bank21")->set_base(machine.root_device().memregion("game")->base() + state->m_mem_banks[0]*0x2000);
+			state->membank("bank22")->set_base(machine.root_device().memregion("game")->base() + state->m_mem_banks[1]*0x2000);
 			break;
 
 		default:
@@ -98,8 +99,8 @@ static void mem_map_banks(running_machine &machine)
 			// game
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0x9fff, "bank31" );
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xa000, 0xbfff, "bank32" );
-			memory_set_bankptr(machine, "bank31", machine.region("game")->base() + state->m_mem_banks[2]*0x2000);
-			memory_set_bankptr(machine, "bank32", machine.region("game")->base() + state->m_mem_banks[3]*0x2000);
+			state->membank("bank31")->set_base(machine.root_device().memregion("game")->base() + state->m_mem_banks[2]*0x2000);
+			state->membank("bank32")->set_base(machine.root_device().memregion("game")->base() + state->m_mem_banks[3]*0x2000);
 			break;
 
 		default:
@@ -113,7 +114,7 @@ static void mem_map_banks(running_machine &machine)
 		case 3:
 			// RAM
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xc000, 0xffff, "bank4" );
-			memory_set_bankptr(machine, "bank4", state->m_main_mem);
+			state->membank("bank4")->set_base(state->m_main_mem);
 			break;
 
 		default:
@@ -122,25 +123,24 @@ static void mem_map_banks(running_machine &machine)
 	}
 }
 
-static WRITE8_HANDLER(mem_w)
+WRITE8_MEMBER(pengadvb_state::mem_w)
 {
-	pengadvb_state *state = space->machine().driver_data<pengadvb_state>();
 	if (offset >= 0xc000)
 	{
 		// write to RAM
-		if ((state->m_mem_map >> 6 & 3) == 3)
-			state->m_main_mem[offset - 0xc000] = data;
+		if ((m_mem_map >> 6 & 3) == 3)
+			m_main_mem[offset - 0xc000] = data;
 	}
-	else if (offset >= 0x4000 && (state->m_mem_map >> (offset >> 13 & 6) & 3) == 1 && (state->m_mem_banks[(offset - 0x4000) >> 13] != (data & 0xf)))
+	else if (offset >= 0x4000 && (m_mem_map >> (offset >> 13 & 6) & 3) == 1 && (m_mem_banks[(offset - 0x4000) >> 13] != (data & 0xf)))
 	{
 		// ROM bankswitch
-		state->m_mem_banks[(offset - 0x4000) >> 13] = data & 0xf;
-		mem_map_banks(space->machine());
+		m_mem_banks[(offset - 0x4000) >> 13] = data & 0xf;
+		mem_map_banks(machine());
 	}
 }
 
 
-static ADDRESS_MAP_START( program_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( program_mem, AS_PROGRAM, 8, pengadvb_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank21")
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank22")
@@ -150,14 +150,14 @@ static ADDRESS_MAP_START( program_mem, AS_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(mem_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_mem, AS_IO, 8 )
+static ADDRESS_MAP_START( io_mem, AS_IO, 8, pengadvb_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x98, 0x98) AM_DEVREADWRITE_MODERN( "tms9928a", tms9928a_device, vram_read, vram_write )
-	AM_RANGE(0x99, 0x99) AM_DEVREADWRITE_MODERN( "tms9928a", tms9928a_device, register_read, register_write )
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0xa8, 0xab) AM_DEVREADWRITE_MODERN("ppi8255", i8255_device, read, write)
+	AM_RANGE(0x98, 0x98) AM_DEVREADWRITE( "tms9928a", tms9928a_device, vram_read, vram_write )
+	AM_RANGE(0x99, 0x99) AM_DEVREADWRITE( "tms9928a", tms9928a_device, register_read, register_write )
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0xa8, 0xab) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pengadvb )
@@ -178,7 +178,7 @@ INPUT_PORTS_END
 
 static READ8_DEVICE_HANDLER( pengadvb_psg_port_a_r )
 {
-	return input_port_read(device->machine(), "IN0");
+	return device->machine().root_device().ioport("IN0")->read();
 }
 
 static const ay8910_interface pengadvb_ay8910_interface =
@@ -212,7 +212,7 @@ static READ8_DEVICE_HANDLER( pengadvb_ppi_port_b_r )
 	i8255_device *ppi = device->machine().device<i8255_device>("ppi8255");
 	address_space *space = device->machine().firstcpu->memory().space(AS_PROGRAM);
 	if ((ppi->read(*space, 2) & 0x0f) == 0)
-		return input_port_read(device->machine(), "IN1");
+		return device->machine().root_device().ioport("IN1")->read();
 
 	return 0xff;
 }
@@ -289,8 +289,8 @@ MACHINE_CONFIG_END
 
 static void pengadvb_decrypt(running_machine &machine, const char* region)
 {
-	UINT8 *mem = machine.region(region)->base();
-	int memsize = machine.region(region)->bytes();
+	UINT8 *mem = machine.root_device().memregion(region)->base();
+	int memsize = machine.root_device().memregion(region)->bytes();
 	UINT8 *buf;
 	int i;
 

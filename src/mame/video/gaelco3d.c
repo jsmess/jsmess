@@ -30,8 +30,8 @@ gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
 	  m_screenbits(state.machine().primary_screen->width(), state.machine().primary_screen->height()),
 	  m_zbuffer(state.machine().primary_screen->width(), state.machine().primary_screen->height()),
 	  m_polygons(0),
-	  m_texture_size(state.machine().region("gfx1")->bytes()),
-	  m_texmask_size(state.machine().region("gfx2")->bytes() * 8),
+	  m_texture_size(state.machine().root_device().memregion("gfx1")->bytes()),
+	  m_texmask_size(state.machine().root_device().memregion("gfx2")->bytes() * 8),
 	  m_texture(auto_alloc_array(state.machine(), UINT8, m_texture_size)),
 	  m_texmask(auto_alloc_array(state.machine(), UINT8, m_texmask_size))
 {
@@ -39,7 +39,7 @@ gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
 	state_save_register_global_bitmap(state.machine(), &m_zbuffer);
 
 	/* first expand the pixel data */
-	UINT8 *src = state.machine().region("gfx1")->base();
+	UINT8 *src = state.machine().root_device().memregion("gfx1")->base();
 	UINT8 *dst = m_texture;
 	for (int y = 0; y < m_texture_size/4096; y += 2)
 		for (int x = 0; x < 4096; x += 2)
@@ -51,7 +51,7 @@ gaelco3d_renderer::gaelco3d_renderer(gaelco3d_state &state)
 		}
 
 	/* then expand the mask data */
-	src = state.machine().region("gfx2")->base();
+	src = state.machine().root_device().memregion("gfx2")->base();
 	dst = m_texmask;
 	for (int y = 0; y < m_texmask_size/4096; y++)
 		for (int x = 0; x < 4096; x++)
@@ -373,27 +373,26 @@ void gaelco3d_render(screen_device &screen)
  *
  *************************************/
 
-WRITE32_HANDLER( gaelco3d_render_w )
+WRITE32_MEMBER(gaelco3d_state::gaelco3d_render_w)
 {
-	gaelco3d_state *state = space->machine().driver_data<gaelco3d_state>();
 	/* append the data to our buffer */
-	state->m_polydata_buffer[state->m_polydata_count++] = data;
-	if (state->m_polydata_count >= MAX_POLYDATA)
-		fatalerror("Out of polygon buffer space!");
+	m_polydata_buffer[m_polydata_count++] = data;
+	if (m_polydata_count >= MAX_POLYDATA)
+		fatalerror("Out of polygon buffer &space!");
 
 	/* if we've accumulated a completed poly set of data, queue it */
-	if (!space->machine().video().skip_this_frame())
+	if (!machine().video().skip_this_frame())
 	{
-		if (state->m_polydata_count >= 18 && (state->m_polydata_count % 2) == 1 && IS_POLYEND(state->m_polydata_buffer[state->m_polydata_count - 2]))
+		if (m_polydata_count >= 18 && (m_polydata_count % 2) == 1 && IS_POLYEND(m_polydata_buffer[m_polydata_count - 2]))
 		{
-			state->m_poly->render_poly(*space->machine().primary_screen, &state->m_polydata_buffer[0]);
-			state->m_polydata_count = 0;
+			m_poly->render_poly(*machine().primary_screen, &m_polydata_buffer[0]);
+			m_polydata_count = 0;
 		}
-		state->m_video_changed = TRUE;
+		m_video_changed = TRUE;
 	}
 
 #if DISPLAY_STATS
-	state->m_lastscan = space->machine().primary_screen->vpos();
+	m_lastscan = machine().primary_screen->vpos();
 #endif
 }
 
@@ -405,22 +404,20 @@ WRITE32_HANDLER( gaelco3d_render_w )
  *
  *************************************/
 
-WRITE16_HANDLER( gaelco3d_paletteram_w )
+WRITE16_MEMBER(gaelco3d_state::gaelco3d_paletteram_w)
 {
-	gaelco3d_state *state = space->machine().driver_data<gaelco3d_state>();
-	state->m_poly->wait("Palette change");
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	state->m_palette[offset] = ((space->machine().generic.paletteram.u16[offset] & 0x7fe0) << 6) | (space->machine().generic.paletteram.u16[offset] & 0x1f);
+	m_poly->wait("Palette change");
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	m_palette[offset] = ((m_generic_paletteram_16[offset] & 0x7fe0) << 6) | (m_generic_paletteram_16[offset] & 0x1f);
 }
 
 
-WRITE32_HANDLER( gaelco3d_paletteram_020_w )
+WRITE32_MEMBER(gaelco3d_state::gaelco3d_paletteram_020_w)
 {
-	gaelco3d_state *state = space->machine().driver_data<gaelco3d_state>();
-	state->m_poly->wait("Palette change");
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
-	state->m_palette[offset*2+0] = ((space->machine().generic.paletteram.u32[offset] & 0x7fe00000) >> 10) | ((space->machine().generic.paletteram.u32[offset] & 0x1f0000) >> 16);
-	state->m_palette[offset*2+1] = ((space->machine().generic.paletteram.u32[offset] & 0x7fe0) << 6) | (space->machine().generic.paletteram.u32[offset] & 0x1f);
+	m_poly->wait("Palette change");
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
+	m_palette[offset*2+0] = ((m_generic_paletteram_32[offset] & 0x7fe00000) >> 10) | ((m_generic_paletteram_32[offset] & 0x1f0000) >> 16);
+	m_palette[offset*2+1] = ((m_generic_paletteram_32[offset] & 0x7fe0) << 6) | (m_generic_paletteram_32[offset] & 0x1f);
 }
 
 

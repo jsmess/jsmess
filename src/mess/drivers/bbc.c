@@ -91,12 +91,12 @@ read:
 &E0-&FF Tube ULA        Tube system interface           32 (32 bytes x  1 ) 2MHz
 ******************************************************************************/
 
-static READ8_HANDLER( bbc_fe_r )
+READ8_MEMBER(bbc_state::bbc_fe_r)
 {
 	return 0xfe;
 }
 
-static ADDRESS_MAP_START( bbca_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bbca_mem, AS_PROGRAM, 8, bbc_state )
 	ADDRESS_MAP_UNMAP_HIGH											    						/*  Hardware marked with a # is not present in a Model A        */
 
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorya1_w)						/*    0000-3fff                 Regular Ram                     */
@@ -110,15 +110,15 @@ static ADDRESS_MAP_START( bbca_mem, AS_PROGRAM, 8 )
 
 																								/*    fe00-feff                 Shiela Address Page             */
 	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(bbc_6845_r , bbc_6845_w)								/*    fe00-fe07  6845 CRTA      Video controller                */
-	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE_MODERN("acia6850", acia6850_device, status_read, control_write)
-	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE_MODERN("acia6850", acia6850_device, data_read, data_write)
+	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, status_read, control_write)
+	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, data_read, data_write)
 	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)							/*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe18, 0xfe1f) AM_NOP																/*    fe18-fe1f  INTOFF/STATID  # ECONET Interrupt Off / ID No. */
 	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE(bbc_videoULA_w)											/* R: fe20-fe2f  INTON          # ECONET Interrupt On           */
 																								/* W: fe20-fe2f  Video ULA      Video system chip               */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selecta_w)							/* R: fe30-fe3f  NC             Not Connected                   */
 																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)	/*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
+	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)	/*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
 	AM_RANGE(0xfe60, 0xfe7f) AM_NOP																/*    fe60-fe7f  6522 VIA       # USER VIA                      */
 	AM_RANGE(0xfe80, 0xfe9f) AM_NOP																/*    fe80-fe9f  8271/1770 FDC  # Floppy disc controller        */
 	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)													/*    fea0-febf  68B54 ADLC     # ECONET controller             */
@@ -129,7 +129,7 @@ static ADDRESS_MAP_START( bbca_mem, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8, bbc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorya1_w)						/*    0000-3fff                 Regular Ram                     */
@@ -144,26 +144,26 @@ static ADDRESS_MAP_START( bbcb_mem, AS_PROGRAM, 8 )
 
 																								/*    fe00-feff                 Shiela Address Page             */
 	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(bbc_6845_r, bbc_6845_w)								/*    fe00-fe07  6845 CRTC      Video controller                */
-	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE_MODERN("acia6850", acia6850_device, status_read, control_write)
-	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE_MODERN("acia6850", acia6850_device, data_read, data_write)
+	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, status_read, control_write)
+	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, data_read, data_write)
 	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)							/*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe18, 0xfe1f) AM_NOP																/*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
 	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE(bbc_videoULA_w)											/* R: fe20-fe2f  INTON          ECONET Interrupt On             */
 																								/* W: fe20-fe2f  Video ULA      Video system chip               */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectb_w)							/* R: fe30-fe3f  NC             Not Connected                   */
 																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)	/*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
-	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE_MODERN("via6522_1", via6522_device, read, write)	/*    fe60-fe7f  6522 VIA       USER VIA                        */
+	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)	/*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
+	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)	/*    fe60-fe7f  6522 VIA       USER VIA                        */
 	AM_RANGE(0xfe80, 0xfe9f) AM_READWRITE(bbc_disc_r, bbc_disc_w)								/*    fe80-fe9f  8271 FDC       Floppy disc controller          */
 	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)													/*    fea0-febf  68B54 ADLC     ECONET controller               */
-	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE("upd7002",uPD7002_r,uPD7002_w)						/*    fec0-fedf  uPD7002        Analogue to digital converter   */
+	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE_LEGACY("upd7002",uPD7002_r,uPD7002_w)						/*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)													/*    fee0-feff  Tube ULA       Tube system interface           */
 
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)									/*    ff00-ffff                 OS Rom (continued)              */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8, bbc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 
 	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybp1_w)					/*    0000-2fff                 Regular Ram                     */
@@ -178,19 +178,19 @@ static ADDRESS_MAP_START( bbcbp_mem, AS_PROGRAM, 8 )
 
 																								/*    fe00-feff                 Shiela Address Page             */
 	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(bbc_6845_r, bbc_6845_w)								/*    fe00-fe07  6845 CRTC      Video controller                */
-	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE_MODERN("acia6850", acia6850_device, status_read, control_write)
-	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE_MODERN("acia6850", acia6850_device, data_read, data_write)
+	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, status_read, control_write)
+	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, data_read, data_write)
 	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)							/*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe18, 0xfe1f) AM_NOP																/*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
 	AM_RANGE(0xfe20, 0xfe2f) AM_WRITE(bbc_videoULA_w)											/* R: fe20-fe2f  INTON          ECONET Interrupt On             */
 																								/* W: fe20-fe2f  Video ULA      Video system chip               */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectbp_w)						/* R: fe30-fe3f  NC             Not Connected                   */
 																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)	/*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
-	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE_MODERN("via6522_1", via6522_device, read, write)	/*    fe60-fe7f  6522 VIA       USER VIA                        */
+	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)	/*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
+	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)	/*    fe60-fe7f  6522 VIA       USER VIA                        */
 	AM_RANGE(0xfe80, 0xfe9f) AM_READWRITE(bbc_wd1770_read, bbc_wd1770_write)					/*    fe80-fe9f  1770 FDC       Floppy disc controller          */
 	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)													/*    fea0-febf  68B54 ADLC     ECONET controller               */
-	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE("upd7002", uPD7002_r, uPD7002_w)					/*    fec0-fedf  uPD7002        Analogue to digital converter   */
+	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE_LEGACY("upd7002", uPD7002_r, uPD7002_w)					/*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)													/*    fee0-feff  Tube ULA       Tube system interface           */
 
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)									/*    ff00-ffff                 OS Rom (continued)              */
@@ -198,7 +198,7 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8, bbc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 
 	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybp1_w)					/*    0000-2fff                 Regular Ram                     */
@@ -213,8 +213,8 @@ static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8 )
 
 																								/*    fe00-feff                 Shiela Address Page             */
 	AM_RANGE(0xfe00, 0xfe07) AM_READWRITE(bbc_6845_r, bbc_6845_w)								/*    fe00-fe07  6845 CRTC      Video controller                */
-	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE_MODERN("acia6850", acia6850_device, status_read, control_write)
-	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE_MODERN("acia6850", acia6850_device, data_read, data_write)
+	AM_RANGE(0xfe08, 0xfe08) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, status_read, control_write)
+	AM_RANGE(0xfe09, 0xfe09) AM_MIRROR(0x06) AM_DEVREADWRITE("acia6850", acia6850_device, data_read, data_write)
 	AM_RANGE(0xfe10, 0xfe17) AM_READWRITE(bbc_fe_r, bbc_SerialULA_w)							/*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe10, 0xfe17) AM_NOP																/*    fe10-fe17  Serial ULA     Serial system chip              */
 	AM_RANGE(0xfe18, 0xfe1f) AM_NOP																/*    fe18-fe1f  INTOFF/STATID  ECONET Interrupt Off / ID No.   */
@@ -222,11 +222,11 @@ static ADDRESS_MAP_START( bbcbp128_mem, AS_PROGRAM, 8 )
 																								/* W: fe20-fe2f  Video ULA      Video system chip               */
 	AM_RANGE(0xfe30, 0xfe3f) AM_READWRITE(bbc_fe_r, bbc_page_selectbp_w)						/* R: fe30-fe3f  NC             Not Connected                   */
 																								/* W: fe30-fe3f  84LS161        Paged ROM selector              */
-	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)	/*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
-	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE_MODERN("via6522_1", via6522_device, read, write)	/*    fe60-fe7f  6522 VIA       USER VIA                        */
+	AM_RANGE(0xfe40, 0xfe5f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)	/*    fe40-fe5f  6522 VIA       SYSTEM VIA                      */
+	AM_RANGE(0xfe60, 0xfe7f) AM_DEVREADWRITE("via6522_1", via6522_device, read, write)	/*    fe60-fe7f  6522 VIA       USER VIA                        */
 	AM_RANGE(0xfe80, 0xfe9f) AM_READWRITE(bbc_wd1770_read, bbc_wd1770_write)					/*    fe80-fe9f  1770 FDC       Floppy disc controller          */
 	AM_RANGE(0xfea0, 0xfebf) AM_READ(bbc_fe_r)													/*    fea0-febf  68B54 ADLC     ECONET controller               */
-	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE("upd7002", uPD7002_r, uPD7002_w)					/*    fec0-fedf  uPD7002        Analogue to digital converter   */
+	AM_RANGE(0xfec0, 0xfedf) AM_DEVREADWRITE_LEGACY("upd7002", uPD7002_r, uPD7002_w)					/*    fec0-fedf  uPD7002        Analogue to digital converter   */
 	AM_RANGE(0xfee0, 0xfeff) AM_READ(bbc_fe_r)													/*    fee0-feff  Tube ULA       Tube system interface           */
 
 	AM_RANGE(0xff00, 0xffff) AM_ROM AM_REGION("user1", 0x43f00)									/*    ff00-ffff                 OS Rom (continued)              */
@@ -258,7 +258,7 @@ ADDRESS_MAP_END
 ******************************************************************************/
 
 
-static ADDRESS_MAP_START(bbcm_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(bbcm_mem, AS_PROGRAM, 8, bbc_state )
 
 	AM_RANGE(0x0000, 0x2fff) AM_READ_BANK("bank1") AM_WRITE(bbc_memorybm1_w)					/*    0000-2fff                 Regular Ram                     */
 

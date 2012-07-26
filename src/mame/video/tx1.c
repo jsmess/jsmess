@@ -39,12 +39,12 @@ static TIMER_CALLBACK( interrupt_callback )
 }
 
 
-READ16_HANDLER( tx1_crtc_r )
+READ16_MEMBER(tx1_state::tx1_crtc_r)
 {
 	return 0xffff;
 }
 
-WRITE16_HANDLER( tx1_crtc_w )
+WRITE16_MEMBER(tx1_state::tx1_crtc_w)
 {
 if (PRINT_CRTC_DATA)
 {
@@ -112,6 +112,7 @@ enum
 
 PALETTE_INIT( tx1 )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	static const res_net_info tx1_net_info =
@@ -143,10 +144,9 @@ PALETTE_INIT( tx1 )
  *
  *************************************/
 
-WRITE16_HANDLER( tx1_bankcs_w )
+WRITE16_MEMBER(tx1_state::tx1_bankcs_w)
 {
-	tx1_state *state = space->machine().driver_data<tx1_state>();
-	vregs_t &tx1_vregs = state->m_vregs;
+	vregs_t &tx1_vregs = m_vregs;
 
 	// AAB2 = /BASET0
 	// AAB3 = /BASET
@@ -197,31 +197,27 @@ WRITE16_HANDLER( tx1_bankcs_w )
 	}
 }
 
-WRITE16_HANDLER( tx1_slincs_w )
+WRITE16_MEMBER(tx1_state::tx1_slincs_w)
 {
-	tx1_state *state = space->machine().driver_data<tx1_state>();
 	if (offset == 1)
-		state->m_vregs.slin_inc = data;
+		m_vregs.slin_inc = data;
 	else
-		state->m_vregs.slin_inc = state->m_vregs.slin_val = 0;
+		m_vregs.slin_inc = m_vregs.slin_val = 0;
 }
 
-WRITE16_HANDLER( tx1_slock_w )
+WRITE16_MEMBER(tx1_state::tx1_slock_w)
 {
-	tx1_state *state = space->machine().driver_data<tx1_state>();
-	state->m_vregs.slock = data & 1;
+	m_vregs.slock = data & 1;
 }
 
-WRITE16_HANDLER( tx1_scolst_w )
+WRITE16_MEMBER(tx1_state::tx1_scolst_w)
 {
-	tx1_state *state = space->machine().driver_data<tx1_state>();
-	state->m_vregs.scol = data & 0x0707;
+	m_vregs.scol = data & 0x0707;
 }
 
-WRITE16_HANDLER( tx1_flgcs_w )
+WRITE16_MEMBER(tx1_state::tx1_flgcs_w)
 {
-	tx1_state *state = space->machine().driver_data<tx1_state>();
-	state->m_vregs.flags = data & 0xff;
+	m_vregs.flags = data & 0xff;
 }
 
 
@@ -240,7 +236,7 @@ static void tx1_draw_char(running_machine &machine, UINT8 *bitmap)
 	UINT8 *chars, *gfx2;
 
 	/* 2bpp characters */
-	chars = machine.region("char_tiles")->base();
+	chars = state->memregion("char_tiles")->base();
 	gfx2 = chars + 0x4000;
 
 	/* X scroll value is the last word in char RAM */
@@ -420,13 +416,13 @@ static void tx1_draw_road(running_machine &machine, UINT8 *bitmap)
 	UINT8	pix[2][4][3];
 
 	/* Road slice map ROMs */
-	const UINT8 *const gfx3 = machine.region("gfx3")->base();
+	const UINT8 *const gfx3 = state->memregion("gfx3")->base();
 	const UINT8 *const rom_a = gfx3;
 	const UINT8 *const rom_b = gfx3 + 0x2000;
 	const UINT8 *const rom_c = gfx3 + 0x4000;
 
 	/* Pixel data */
-	const UINT8 *const proms = machine.region("proms")->base();
+	const UINT8 *const proms = state->memregion("proms")->base();
 	const UINT8 *const prom_a = proms + 0x1100;
 	const UINT8 *const prom_b = proms + 0x1300;
 	const UINT8 *const prom_c = proms + 0x1500;
@@ -863,18 +859,18 @@ static void tx1_draw_objects(running_machine &machine, UINT8 *bitmap)
 	UINT32 offs;
 
 	/* The many lookup table ROMs */
-	const UINT8 *const ic48 = machine.region("user3")->base();
+	const UINT8 *const ic48 = state->memregion("user3")->base();
 	const UINT8 *const ic281 = ic48 + 0x2000;
 
-	const UINT8 *const proms = machine.region("proms")->base();
+	const UINT8 *const proms = state->memregion("proms")->base();
 	const UINT8 *const ic190 = proms + 0xc00;
 	const UINT8 *const ic162 = proms + 0xe00;
 	const UINT8 *const ic25  = proms + 0x1000;
 
-	const UINT8 *const ic106 = machine.region("obj_map")->base();
+	const UINT8 *const ic106 = state->memregion("obj_map")->base();
 	const UINT8 *const ic73  = ic106 + 0x4000;
 
-	const UINT8 *const pixdata_rgn = machine.region("obj_tiles")->base();
+	const UINT8 *const pixdata_rgn = state->memregion("obj_tiles")->base();
 
 	for (offs = 0x0; offs <= 0x300; offs += 8)
 	{
@@ -1140,7 +1136,7 @@ static void tx1_combine_layers(running_machine &machine, bitmap_ind16 &bitmap, i
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
 	int x, y;
-	UINT8 *chr_pal = machine.region("proms")->base() + 0x900;
+	UINT8 *chr_pal = state->memregion("proms")->base() + 0x900;
 
 	int x_offset = screen * 256;
 
@@ -1253,6 +1249,7 @@ SCREEN_UPDATE_IND16( tx1_right )
 
 PALETTE_INIT( buggyboy )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
@@ -1303,8 +1300,8 @@ static void buggyboy_draw_char(running_machine &machine, UINT8 *bitmap, int wide
 	UINT32 x_mask;
 
 	/* 2bpp characters */
-	chars = machine.region("char_tiles")->base();
-	gfx2 = machine.region("char_tiles")->base() + 0x4000;
+	chars = state->memregion("char_tiles")->base();
+	gfx2 = state->memregion("char_tiles")->base() + 0x4000;
 
 	/* X/Y scroll values are the last word in char RAM */
 	if (wide)
@@ -1538,8 +1535,8 @@ static void buggyboy_draw_road(running_machine &machine, UINT8 *bitmap)
 	UINT32 rva20_6;
 
 	/* ROM/PROM lookup tables */
-	const UINT8 *rcols = (UINT8*)(machine.region("proms")->base() + 0x1500);
-	const UINT8 *rom   = machine.region("road")->base();
+	const UINT8 *rcols = (UINT8*)(state->memregion("proms")->base() + 0x1500);
+	const UINT8 *rom   = state->memregion("road")->base();
 	const UINT8 *prom0 = rom + 0x4000;
 	const UINT8 *prom1 = rom + 0x4200;
 	const UINT8 *prom2 = rom + 0x4400;
@@ -2170,8 +2167,8 @@ static void buggybjr_draw_road(running_machine &machine, UINT8 *bitmap, int wide
 	UINT32 rva20_6;
 
 	/* ROM/PROM lookup tables */
-	const UINT8 *rcols = (UINT8*)(machine.region("proms")->base() + 0x1500);
-	const UINT8 *rom   = machine.region("road")->base();
+	const UINT8 *rcols = (UINT8*)(state->memregion("proms")->base() + 0x1500);
+	const UINT8 *rom   = state->memregion("road")->base();
 	const UINT8 *prom0 = rom + 0x4000;
 	const UINT8 *prom1 = rom + 0x4200;
 	const UINT8 *prom2 = rom + 0x4400;
@@ -2583,17 +2580,17 @@ static void buggyboy_draw_objs(running_machine &machine, UINT8 *bitmap, int wide
 	UINT32 x_stride;
 
 	/* The many lookup table ROMs */
-	const UINT8 *const bug13  = (UINT8*)machine.region("obj_luts")->base();
+	const UINT8 *const bug13  = (UINT8*)state->memregion("obj_luts")->base();
 	const UINT8 *const bug18s = bug13 + 0x2000;
-	const UINT8 *const bb8    = (UINT8*)machine.region("proms")->base() + 0x1600;
+	const UINT8 *const bb8    = (UINT8*)state->memregion("proms")->base() + 0x1600;
 
-	const UINT8 *const bug16s = (UINT8*)machine.region("obj_map")->base();
+	const UINT8 *const bug16s = (UINT8*)state->memregion("obj_map")->base();
 	const UINT8 *const bug17s = bug16s + 0x8000;
 
-	const UINT8 *const bb9o = (UINT8*)machine.region("proms")->base() + 0x500;
+	const UINT8 *const bb9o = (UINT8*)state->memregion("proms")->base() + 0x500;
 	const UINT8 *const bb9e = bb9o + 0x800;
 
-	const UINT8 *const pixdata_rgn = (UINT8*)machine.region("obj_tiles")->base();
+	const UINT8 *const pixdata_rgn = (UINT8*)state->memregion("obj_tiles")->base();
 
 	if (wide)
 	{
@@ -2841,10 +2838,9 @@ static void buggyboy_draw_objs(running_machine &machine, UINT8 *bitmap, int wide
     /WASET  = 24A0-F, 24B0-F
     /FLAGS  = 24E0-F, 24F0-F
 */
-WRITE16_HANDLER( buggyboy_gas_w )
+WRITE16_MEMBER(tx1_state::buggyboy_gas_w)
 {
-	tx1_state *state = space->machine().driver_data<tx1_state>();
-	vregs_t &vregs = state->m_vregs;
+	vregs_t &vregs = m_vregs;
 	offset <<= 1;
 
 	switch (offset & 0xe0)
@@ -2905,7 +2901,7 @@ WRITE16_HANDLER( buggyboy_gas_w )
 		}
 		case 0xe0:
 		{
-			cputag_set_input_line(space->machine(), "math_cpu", INPUT_LINE_TEST, CLEAR_LINE);
+			cputag_set_input_line(machine(), "math_cpu", INPUT_LINE_TEST, CLEAR_LINE);
 			vregs.flags = data;
 			break;
 		}
@@ -2915,16 +2911,14 @@ WRITE16_HANDLER( buggyboy_gas_w )
 	vregs.gas = data;
 }
 
-WRITE16_HANDLER( buggyboy_sky_w )
+WRITE16_MEMBER(tx1_state::buggyboy_sky_w)
 {
-	tx1_state *state = space->machine().driver_data<tx1_state>();
-	state->m_vregs.sky = data;
+	m_vregs.sky = data;
 }
 
-WRITE16_HANDLER( buggyboy_scolst_w )
+WRITE16_MEMBER(tx1_state::buggyboy_scolst_w)
 {
-	tx1_state *state = space->machine().driver_data<tx1_state>();
-	state->m_vregs.scol = data;
+	m_vregs.scol = data;
 }
 
 
@@ -2937,7 +2931,7 @@ WRITE16_HANDLER( buggyboy_scolst_w )
 static void bb_combine_layers(running_machine &machine, bitmap_ind16 &bitmap, int screen)
 {
 	tx1_state *state = machine.driver_data<tx1_state>();
-	UINT8 *chr_pal = machine.region("proms")->base() + 0x400;
+	UINT8 *chr_pal = state->memregion("proms")->base() + 0x400;
 	UINT32 bmp_stride;
 	UINT32 x_offset;
 	UINT32 y;

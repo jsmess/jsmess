@@ -77,7 +77,7 @@ struct _m6509_Regs {
 	UINT8	nmi_state;
 	UINT8	irq_state;
 	UINT8	so_state;
-	device_irq_callback irq_callback;
+	device_irq_acknowledge_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *space;
 	direct_read_data *direct;
@@ -130,9 +130,9 @@ static WRITE8_HANDLER( m6509_write_00001 )
 	cpustate->ind_bank.b.h2=data&0xf;
 }
 
-static ADDRESS_MAP_START(m6509_mem, AS_PROGRAM, 8)
-	AM_RANGE(0x00000, 0x00000) AM_MIRROR(0xF0000) AM_READWRITE(m6509_read_00000, m6509_write_00000)
-	AM_RANGE(0x00001, 0x00001) AM_MIRROR(0xF0000) AM_READWRITE(m6509_read_00001, m6509_write_00001)
+static ADDRESS_MAP_START(m6509_mem, AS_PROGRAM, 8, legacy_cpu_device)
+	AM_RANGE(0x00000, 0x00000) AM_MIRROR(0xF0000) AM_READWRITE_LEGACY(m6509_read_00000, m6509_write_00000)
+	AM_RANGE(0x00001, 0x00001) AM_MIRROR(0xF0000) AM_READWRITE_LEGACY(m6509_read_00001, m6509_write_00001)
 ADDRESS_MAP_END
 
 static UINT8 default_rdmem_id(address_space *space, offs_t address) { return space->read_byte(address); }

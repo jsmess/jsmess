@@ -13,15 +13,14 @@ Video hardware
 
 /****************************************************************************/
 
-WRITE8_HANDLER( drmicro_videoram_w )
+WRITE8_MEMBER(drmicro_state::drmicro_videoram_w)
 {
-	drmicro_state *state = space->machine().driver_data<drmicro_state>();
-	state->m_videoram[offset] = data;
+	m_videoram[offset] = data;
 
 	if (offset < 0x800)
-		state->m_bg2->mark_tile_dirty((offset & 0x3ff));
+		m_bg2->mark_tile_dirty((offset & 0x3ff));
 	else
-		state->m_bg1->mark_tile_dirty((offset & 0x3ff));
+		m_bg1->mark_tile_dirty((offset & 0x3ff));
 }
 
 
@@ -61,6 +60,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 PALETTE_INIT( drmicro )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */

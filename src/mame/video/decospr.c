@@ -40,6 +40,8 @@
    (bootleg) nmg5.c
    (bootleg) tumbleb.c
    (bootleg) crospang.c
+   (bootleg) silvmil.c
+   (bootleg) gotcha.c
 
    to convert:
 
@@ -213,7 +215,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 	int offs, end, incr;
 
-	int flipscreen = flip_screen_get(machine());
+	int flipscreen = machine().driver_data()->flip_screen();
 
 	if (invert_flip)
 		flipscreen = !flipscreen;

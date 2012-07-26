@@ -122,10 +122,10 @@ SCREEN_UPDATE_RGB32( invadpt2 )
 
 	invadpt2_get_pens(pens);
 
-	prom = screen.machine().region("proms")->base();
+	prom = state->memregion("proms")->base();
 	color_map_base = state->m_color_map ? &prom[0x0400] : &prom[0x0000];
 
-	for (offs = 0; offs < state->m_main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram.bytes(); offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
@@ -154,10 +154,10 @@ SCREEN_UPDATE_RGB32( ballbomb )
 
 	invadpt2_get_pens(pens);
 
-	prom = screen.machine().region("proms")->base();
+	prom = state->memregion("proms")->base();
 	color_map_base = state->m_color_map ? &prom[0x0400] : &prom[0x0000];
 
-	for (offs = 0; offs < state->m_main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram.bytes(); offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
@@ -186,9 +186,9 @@ SCREEN_UPDATE_RGB32( schaser )
 
 	invadpt2_get_pens(pens);
 
-	background_map_base = screen.machine().region("proms")->base();
+	background_map_base = state->memregion("proms")->base();
 
-	for (offs = 0; offs < state->m_main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram.bytes(); offs++)
 	{
 		UINT8 back_color = 0;
 
@@ -226,7 +226,7 @@ SCREEN_UPDATE_RGB32( schasercv )
 
 	invadpt2_get_pens(pens);
 
-	for (offs = 0; offs < state->m_main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram.bytes(); offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
@@ -252,7 +252,7 @@ SCREEN_UPDATE_RGB32( rollingc )
 
 	invadpt2_get_pens(pens);
 
-	for (offs = 0; offs < state->m_main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram.bytes(); offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
@@ -279,10 +279,10 @@ SCREEN_UPDATE_RGB32( polaris )
 
 	invadpt2_get_pens(pens);
 
-	color_map_base = screen.machine().region("proms")->base();
-	cloud_gfx = screen.machine().region("user1")->base();
+	color_map_base = screen.machine().root_device().memregion("proms")->base();
+	cloud_gfx = state->memregion("user1")->base();
 
-	for (offs = 0; offs < state->m_main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram.bytes(); offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
@@ -349,7 +349,7 @@ SCREEN_UPDATE_RGB32( lupin3 )
 
 	invadpt2_get_pens(pens);
 
-	for (offs = 0; offs < state->m_main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram.bytes(); offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
@@ -374,7 +374,7 @@ SCREEN_UPDATE_RGB32( cosmo )
 
 	cosmo_get_pens(pens);
 
-	for (offs = 0; offs < state->m_main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram.bytes(); offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
@@ -403,10 +403,10 @@ SCREEN_UPDATE_RGB32( indianbt )
 
 	cosmo_get_pens(pens);
 
-	prom = screen.machine().region("proms")->base();
+	prom = state->memregion("proms")->base();
 	color_map_base = state->m_color_map ? &prom[0x0400] : &prom[0x0000];
 
-	for (offs = 0; offs < state->m_main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram.bytes(); offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;
@@ -431,7 +431,7 @@ SCREEN_UPDATE_RGB32( shuttlei )
 	pen_t pens[2] = { RGB_BLACK, RGB_WHITE };
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram.bytes(); offs++)
 	{
 		int i;
 
@@ -464,7 +464,7 @@ SCREEN_UPDATE_RGB32( sflush )
 
 	sflush_get_pens(pens);
 
-	for (offs = 0; offs < state->m_main_ram_size; offs++)
+	for (offs = 0; offs < state->m_main_ram.bytes(); offs++)
 	{
 		UINT8 y = offs >> 5;
 		UINT8 x = offs << 3;

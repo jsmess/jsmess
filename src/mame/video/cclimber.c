@@ -38,6 +38,7 @@
 ***************************************************************************/
 PALETTE_INIT( cclimber )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double weights_rg[3], weights_b[2];
@@ -114,6 +115,7 @@ PALETTE_INIT( cclimber )
 
 PALETTE_INIT( swimmer )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
@@ -182,6 +184,7 @@ PALETTE_INIT( swimmer )
 
 PALETTE_INIT( yamato )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* chars - 12 bits RGB */
@@ -249,6 +252,7 @@ PALETTE_INIT( yamato )
 
 PALETTE_INIT( toprollr )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0xa0; i++)
@@ -325,20 +329,18 @@ static void swimmer_set_background_pen(running_machine &machine)
 
 
 
-WRITE8_HANDLER( cclimber_colorram_w )
+WRITE8_MEMBER(cclimber_state::cclimber_colorram_w)
 {
-	cclimber_state *state = space->machine().driver_data<cclimber_state>();
 	/* A5 is not connected, there is only 0x200 bytes of RAM */
-	state->m_colorram[offset & ~0x20] = data;
-	state->m_colorram[offset |  0x20] = data;
+	m_colorram[offset & ~0x20] = data;
+	m_colorram[offset |  0x20] = data;
 }
 
 
-WRITE8_HANDLER( cannonb_flip_screen_w )
+WRITE8_MEMBER(cclimber_state::cannonb_flip_screen_w)
 {
-	cclimber_state *state = space->machine().driver_data<cclimber_state>();
-	state->m_flip_screen[0] = data;
-	state->m_flip_screen[1] = data;
+	m_flip_screen[0] = data;
+	m_flip_screen[1] = data;
 }
 
 
@@ -690,7 +692,7 @@ SCREEN_UPDATE_IND16( yamato )
 {
 	cclimber_state *state = screen.machine().driver_data<cclimber_state>();
 	int i;
-	UINT8 *sky_rom = screen.machine().region("user1")->base() + 0x1200;
+	UINT8 *sky_rom = state->memregion("user1")->base() + 0x1200;
 
 	for (i = 0; i < 0x100; i++)
 	{

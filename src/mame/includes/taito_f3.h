@@ -44,18 +44,19 @@ class taito_f3_state : public driver_device
 {
 public:
 	taito_f3_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_f3_ram(*this,"f3_ram") { }
 
 	UINT16 *m_videoram;
 	UINT16 *m_spriteram;
-//  size_t m_spriteram_size;
-	UINT32 m_coin_word[2];
-	UINT32 *m_f3_ram;
-	int m_f3_game;
+	optional_shared_ptr<UINT32> m_f3_ram;
 	UINT16 *m_f3_vram;
 	UINT16 *m_f3_line_ram;
 	UINT16 *m_f3_pf_data;
 	UINT16 *m_f3_pivot_ram;
+
+	UINT32 m_coin_word[2];
+	int m_f3_game;
 	tilemap_t *m_pf1_tilemap;
 	tilemap_t *m_pf2_tilemap;
 	tilemap_t *m_pf3_tilemap;
@@ -193,6 +194,32 @@ public:
 	int (*m_dpix_n[8][16])(taito_f3_state *state, UINT32 s_pix);
 	int (**m_dpix_lp[5])(taito_f3_state *state, UINT32 s_pix);
 	int (**m_dpix_sp[9])(taito_f3_state *state, UINT32 s_pix);
+
+	DECLARE_READ32_MEMBER(f3_control_r);
+	DECLARE_WRITE32_MEMBER(f3_control_w);
+	DECLARE_WRITE32_MEMBER(f3_sound_reset_0_w);
+	DECLARE_WRITE32_MEMBER(f3_sound_reset_1_w);
+	DECLARE_WRITE32_MEMBER(f3_sound_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(f3_unk_w);
+	DECLARE_READ32_MEMBER(bubsympb_oki_r);
+	DECLARE_WRITE32_MEMBER(bubsympb_oki_w);
+	DECLARE_READ16_MEMBER(f3_pf_data_r);
+	DECLARE_WRITE16_MEMBER(f3_pf_data_w);
+	DECLARE_WRITE16_MEMBER(f3_control_0_w);
+	DECLARE_WRITE16_MEMBER(f3_control_1_w);
+	DECLARE_READ16_MEMBER(f3_spriteram_r);
+	DECLARE_WRITE16_MEMBER(f3_spriteram_w);
+	DECLARE_READ16_MEMBER(f3_videoram_r);
+	DECLARE_WRITE16_MEMBER(f3_videoram_w);
+	DECLARE_READ16_MEMBER(f3_vram_r);
+	DECLARE_WRITE16_MEMBER(f3_vram_w);
+	DECLARE_READ16_MEMBER(f3_pivot_r);
+	DECLARE_WRITE16_MEMBER(f3_pivot_w);
+	DECLARE_READ16_MEMBER(f3_lineram_r);
+	DECLARE_WRITE16_MEMBER(f3_lineram_w);
+	DECLARE_WRITE32_MEMBER(f3_palette_24bit_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(f3_analog_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(f3_coin_r);
 };
 
 
@@ -202,19 +229,4 @@ VIDEO_START( f3 );
 SCREEN_UPDATE_RGB32( f3 );
 SCREEN_VBLANK( f3 );
 
-WRITE16_HANDLER( f3_control_0_w );
-WRITE16_HANDLER( f3_control_1_w );
-WRITE32_HANDLER( f3_palette_24bit_w );
-WRITE16_HANDLER( f3_pf_data_w );
-WRITE16_HANDLER( f3_vram_w );
-WRITE16_HANDLER( f3_pivot_w );
-WRITE16_HANDLER( f3_lineram_w );
-WRITE16_HANDLER( f3_videoram_w );
-WRITE16_HANDLER( f3_spriteram_w );
 
-READ16_HANDLER( f3_pf_data_r );
-READ16_HANDLER( f3_vram_r );
-READ16_HANDLER( f3_pivot_r );
-READ16_HANDLER( f3_lineram_r );
-READ16_HANDLER( f3_videoram_r );
-READ16_HANDLER( f3_spriteram_r );

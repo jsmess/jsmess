@@ -32,24 +32,21 @@ void rng_sprite_callback( running_machine &machine, int *code, int *color, int *
 	*color = state->m_sprite_colorbase | (*color & 0x001f);
 }
 
-READ16_HANDLER( rng_ttl_ram_r )
+READ16_MEMBER(rungun_state::rng_ttl_ram_r)
 {
-	rungun_state *state = space->machine().driver_data<rungun_state>();
-	return state->m_ttl_vram[offset];
+	return m_ttl_vram[offset];
 }
 
-WRITE16_HANDLER( rng_ttl_ram_w )
+WRITE16_MEMBER(rungun_state::rng_ttl_ram_w)
 {
-	rungun_state *state = space->machine().driver_data<rungun_state>();
-	COMBINE_DATA(&state->m_ttl_vram[offset]);
+	COMBINE_DATA(&m_ttl_vram[offset]);
 }
 
 /* 53936 (PSAC2) rotation/zoom plane */
-WRITE16_HANDLER(rng_936_videoram_w)
+WRITE16_MEMBER(rungun_state::rng_936_videoram_w)
 {
-	rungun_state *state = space->machine().driver_data<rungun_state>();
-	COMBINE_DATA(&state->m_936_videoram[offset]);
-	state->m_936_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_936_videoram[offset]);
+	m_936_tilemap->mark_tile_dirty(offset / 2);
 }
 
 static TILE_GET_INFO( get_rng_936_tile_info )
@@ -92,7 +89,7 @@ VIDEO_START( rng )
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	// decode the ttl layer's gfx
-	machine.gfx[gfx_index] = gfx_element_alloc(machine, &charlayout, machine.region("gfx3")->base(), machine.total_colors() / 16, 0);
+	machine.gfx[gfx_index] = gfx_element_alloc(machine, &charlayout, state->memregion("gfx3")->base(), machine.total_colors() / 16, 0);
 	state->m_ttl_gfx_index = gfx_index;
 
 	// create the tilemap

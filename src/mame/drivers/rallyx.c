@@ -204,28 +204,25 @@ TODO:
  *
  *************************************/
 
-static WRITE8_HANDLER( rallyx_interrupt_vector_w )
+WRITE8_MEMBER(rallyx_state::rallyx_interrupt_vector_w)
 {
-	rallyx_state *state = space->machine().driver_data<rallyx_state>();
 
-	device_set_input_line_vector(state->m_maincpu, 0, data);
-	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	device_set_input_line_vector(m_maincpu, 0, data);
+	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 }
 
 
-static WRITE8_HANDLER( rallyx_bang_w )
+WRITE8_MEMBER(rallyx_state::rallyx_bang_w)
 {
-	rallyx_state *state = space->machine().driver_data<rallyx_state>();
 
-	if (data == 0 && state->m_last_bang != 0)
-		state->m_samples->start(0, 0);
+	if (data == 0 && m_last_bang != 0)
+		m_samples->start(0, 0);
 
-	state->m_last_bang = data;
+	m_last_bang = data;
 }
 
-static WRITE8_HANDLER( rallyx_latch_w )
+WRITE8_MEMBER(rallyx_state::rallyx_latch_w)
 {
-	rallyx_state *state = space->machine().driver_data<rallyx_state>();
 	int bit = data & 1;
 
 	switch (offset)
@@ -235,53 +232,52 @@ static WRITE8_HANDLER( rallyx_latch_w )
 			break;
 
 		case 0x01:	/* INT ON */
-			state->m_main_irq_mask = bit;
+			m_main_irq_mask = bit;
 			if (!bit)
-				device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+				device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* SOUND ON */
 			/* this doesn't work in New Rally X so I'm not supporting it */
-//          pacman_sound_enable_w(space->machine().device("namco"), bit);
+//          pacman_sound_enable_w(machine().device("namco"), bit);
 			break;
 
 		case 0x03:	/* FLIP */
-			flip_screen_set_no_update(space->machine(), bit);
-			space->machine().tilemap().set_flip_all(bit * (TILEMAP_FLIPX | TILEMAP_FLIPY));
+			flip_screen_set_no_update(bit);
+			machine().tilemap().set_flip_all(bit * (TILEMAP_FLIPX | TILEMAP_FLIPY));
 			break;
 
 		case 0x04:
-			set_led_status(space->machine(), 0, bit);
+			set_led_status(machine(), 0, bit);
 			break;
 
 		case 0x05:
-			set_led_status(space->machine(), 1, bit);
+			set_led_status(machine(), 1, bit);
 			break;
 
 		case 0x06:
-			coin_lockout_w(space->machine(), 0, !bit);
+			coin_lockout_w(machine(), 0, !bit);
 			break;
 
 		case 0x07:
-			coin_counter_w(space->machine(), 0, bit);
+			coin_counter_w(machine(), 0, bit);
 			break;
 	}
 }
 
 
-static WRITE8_HANDLER( locomotn_latch_w )
+WRITE8_MEMBER(rallyx_state::locomotn_latch_w)
 {
-	rallyx_state *state = space->machine().driver_data<rallyx_state>();
 	int bit = data & 1;
 
 	switch (offset)
 	{
 		case 0x00:	/* SOUNDON */
-			timeplt_sh_irqtrigger_w(space,0,bit);
+			timeplt_sh_irqtrigger_w(&space,0,bit);
 			break;
 
 		case 0x01:	/* INTST */
-			state->m_main_irq_mask = bit;
+			m_main_irq_mask = bit;
 			break;
 
 		case 0x02:	/* MUT */
@@ -289,19 +285,19 @@ static WRITE8_HANDLER( locomotn_latch_w )
 			break;
 
 		case 0x03:	/* FLIP */
-			flip_screen_set_no_update(space->machine(), bit);
-			space->machine().tilemap().set_flip_all(bit * (TILEMAP_FLIPX | TILEMAP_FLIPY));
+			flip_screen_set_no_update(bit);
+			machine().tilemap().set_flip_all(bit * (TILEMAP_FLIPX | TILEMAP_FLIPY));
 			break;
 
 		case 0x04:	/* OUT1 */
-			coin_counter_w(space->machine(), 0, bit);
+			coin_counter_w(machine(), 0, bit);
 			break;
 
 		case 0x05:	/* OUT2 */
 			break;
 
 		case 0x06:	/* OUT3 */
-			coin_counter_w(space->machine(), 1,bit);
+			coin_counter_w(machine(), 1,bit);
 			break;
 
 		case 0x07:	/* STARSON */
@@ -317,39 +313,39 @@ static WRITE8_HANDLER( locomotn_latch_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( rallyx_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rallyx_map, AS_PROGRAM, 8, rallyx_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(rallyx_videoram_w) AM_BASE_MEMBER(rallyx_state, m_videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(rallyx_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("P2")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW")
-	AM_RANGE(0xa000, 0xa00f) AM_WRITEONLY AM_BASE_MEMBER(rallyx_state, m_radarattr)
+	AM_RANGE(0xa000, 0xa00f) AM_WRITEONLY AM_SHARE("radarattr")
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xa100, 0xa11f) AM_DEVWRITE("namco", pacman_sound_w)
+	AM_RANGE(0xa100, 0xa11f) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w)
 	AM_RANGE(0xa140, 0xa140) AM_WRITE(rallyx_scrolly_w)
 	AM_RANGE(0xa170, 0xa170) AM_WRITENOP			/* ? */
 	AM_RANGE(0xa180, 0xa187) AM_WRITE(rallyx_latch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, rallyx_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0, 0) AM_WRITE(rallyx_interrupt_vector_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jungler_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jungler_map, AS_PROGRAM, 8, rallyx_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(rallyx_videoram_w) AM_BASE_MEMBER(rallyx_state, m_videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(rallyx_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("P2")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa180, 0xa180) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa000, 0xa00f) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE_MEMBER(rallyx_state, m_radarattr)	// jungler writes to a03x
+	AM_RANGE(0xa000, 0xa00f) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("radarattr")	// jungler writes to a03x
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xa100, 0xa100) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xa100, 0xa100) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w)	/* only jungler and tactcian */
 	AM_RANGE(0xa140, 0xa140) AM_WRITE(rallyx_scrolly_w)	/* only jungler and tactcian */
 	AM_RANGE(0xa180, 0xa187) AM_WRITE(locomotn_latch_w)
@@ -401,37 +397,37 @@ static INPUT_PORTS_START( rallyx )
 	PORT_DIPSETTING(	0x20, "3 Cars, Medium" )
 	PORT_DIPSETTING(	0x38, "3 Cars, Hard" )
 	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(	0x02, "15000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(	0x04, "30000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(	0x06, "40000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(	0x02, "15000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x00)
+	PORT_DIPSETTING(	0x04, "30000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x00)
+	PORT_DIPSETTING(	0x06, "40000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x00)
 
-	PORT_DIPSETTING(	0x02, "20000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x08)
-	PORT_DIPSETTING(	0x04, "40000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x08)
-	PORT_DIPSETTING(	0x06, "60000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x08)
+	PORT_DIPSETTING(	0x02, "20000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x08)
+	PORT_DIPSETTING(	0x04, "40000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x08)
+	PORT_DIPSETTING(	0x06, "60000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x08)
 
-	PORT_DIPSETTING(	0x02, "10000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x10)
-	PORT_DIPSETTING(	0x04, "20000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x10)
-	PORT_DIPSETTING(	0x06, "30000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x10)
+	PORT_DIPSETTING(	0x02, "10000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x10)
+	PORT_DIPSETTING(	0x04, "20000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x10)
+	PORT_DIPSETTING(	0x06, "30000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x10)
 
-	PORT_DIPSETTING(	0x02, "15000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x18)
-	PORT_DIPSETTING(	0x04, "30000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x18)
-	PORT_DIPSETTING(	0x06, "40000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x18)
+	PORT_DIPSETTING(	0x02, "15000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x18)
+	PORT_DIPSETTING(	0x04, "30000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x18)
+	PORT_DIPSETTING(	0x06, "40000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x18)
 
-	PORT_DIPSETTING(	0x02, "20000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x20)
-	PORT_DIPSETTING(	0x04, "40000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x20)
-	PORT_DIPSETTING(	0x06, "60000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x20)
+	PORT_DIPSETTING(	0x02, "20000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x20)
+	PORT_DIPSETTING(	0x04, "40000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x20)
+	PORT_DIPSETTING(	0x06, "60000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x20)
 
-	PORT_DIPSETTING(	0x02, "10000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x28)
-	PORT_DIPSETTING(	0x04, "20000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x28)
-	PORT_DIPSETTING(	0x06, "30000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x28)
+	PORT_DIPSETTING(	0x02, "10000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x28)
+	PORT_DIPSETTING(	0x04, "20000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x28)
+	PORT_DIPSETTING(	0x06, "30000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x28)
 
-	PORT_DIPSETTING(	0x02, "15000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x30)
-	PORT_DIPSETTING(	0x04, "30000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x30)
-	PORT_DIPSETTING(	0x06, "40000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x30)
+	PORT_DIPSETTING(	0x02, "15000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x30)
+	PORT_DIPSETTING(	0x04, "30000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x30)
+	PORT_DIPSETTING(	0x06, "40000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x30)
 
-	PORT_DIPSETTING(	0x02, "20000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x38)
-	PORT_DIPSETTING(	0x04, "40000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x38)
-	PORT_DIPSETTING(	0x06, "60000" )		PORT_CONDITION("DSW", 0x38, PORTCOND_EQUALS, 0x38)
+	PORT_DIPSETTING(	0x02, "20000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x38)
+	PORT_DIPSETTING(	0x04, "40000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x38)
+	PORT_DIPSETTING(	0x06, "60000" )		PORT_CONDITION("DSW", 0x38, EQUALS, 0x38)
 	PORT_DIPSETTING(	0x00, DEF_STR( None ) )
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 INPUT_PORTS_END

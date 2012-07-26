@@ -155,6 +155,15 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "machine/beta.h"
 #include "machine/ram.h"
 
+class scorpion_state : public spectrum_state
+{
+public:
+	scorpion_state(const machine_config &mconfig, device_type type, const char *tag)
+		: spectrum_state(mconfig, type, tag) { }
+
+	DECLARE_DIRECT_UPDATE_MEMBER(scorpion_direct);
+};
+
 /****************************************************************************************************/
 /* Zs Scorpion 256 */
 
@@ -185,17 +194,17 @@ D6-D7 - not used. ( yet ? )
 
 static void scorpion_update_memory(running_machine &machine)
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
+	scorpion_state *state = machine.driver_data<scorpion_state>();
 	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
 
 	state->m_screen_location = messram + ((state->m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
-	memory_set_bankptr(machine, "bank4", messram + (((state->m_port_7ffd_data & 0x07) | ((state->m_port_1ffd_data & 0x10)>>1)) * 0x4000));
+	state->membank("bank4")->set_base(messram + (((state->m_port_7ffd_data & 0x07) | ((state->m_port_1ffd_data & 0x10)>>1)) * 0x4000));
 
 	if ((state->m_port_1ffd_data & 0x01)==0x01)
 	{
 		state->m_ram_0000 = messram+(8<<14);
-		memory_set_bankptr(machine, "bank1", messram+(8<<14));
+		state->membank("bank1")->set_base(messram+(8<<14));
 		logerror("RAM\n");
 	}
 	else
@@ -208,7 +217,7 @@ static void scorpion_update_memory(running_machine &machine)
 		{
 			state->m_ROMSelection = ((state->m_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 		}
-		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
+		state->membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
 	}
 
 
@@ -216,7 +225,7 @@ static void scorpion_update_memory(running_machine &machine)
 
 static WRITE8_HANDLER( scorpion_0000_w )
 {
-	spectrum_state *state = space->machine().driver_data<spectrum_state>();
+	scorpion_state *state = space->machine().driver_data<scorpion_state>();
 
 	if ( ! state->m_ram_0000 )
 		return;
@@ -229,33 +238,32 @@ static WRITE8_HANDLER( scorpion_0000_w )
 }
 
 
-DIRECT_UPDATE_HANDLER( scorpion_direct )
+DIRECT_UPDATE_MEMBER(scorpion_state::scorpion_direct)
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
-	device_t *beta = machine.device(BETA_DISK_TAG);
-	UINT16 pc = cpu_get_reg(machine.device("maincpu"), STATE_GENPCBASE);
+	device_t *beta = machine().device(BETA_DISK_TAG);
+	UINT16 pc = cpu_get_reg(machine().device("maincpu"), STATE_GENPCBASE);
 
-	state->m_ram_disabled_by_beta = 0;
+	m_ram_disabled_by_beta = 0;
 	if (betadisk_is_active(beta))
 	{
 		if (pc >= 0x4000)
 		{
-			state->m_ROMSelection = ((state->m_port_7ffd_data>>4) & 0x01) ? 1 : 0;
+			m_ROMSelection = ((m_port_7ffd_data>>4) & 0x01) ? 1 : 0;
 			betadisk_disable(beta);
-			state->m_ram_disabled_by_beta = 1;
-			memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
+			m_ram_disabled_by_beta = 1;
+			membank("bank1")->set_base(memregion("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
 		}
 	}
-	else if (((pc & 0xff00) == 0x3d00) && (state->m_ROMSelection==1))
+	else if (((pc & 0xff00) == 0x3d00) && (m_ROMSelection==1))
 	{
-		state->m_ROMSelection = 3;
+		m_ROMSelection = 3;
 		betadisk_enable(beta);
 	}
 	if(address<=0x3fff)
 	{
-		state->m_ram_disabled_by_beta = 1;
-		direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine.region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
-		memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base() + 0x010000 + (state->m_ROMSelection<<14));
+		m_ram_disabled_by_beta = 1;
+		direct.explicit_configure(0x0000, 0x3fff, 0x3fff, machine().root_device().memregion("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
+		membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x010000 + (m_ROMSelection<<14));
 		return ~0;
 	}
 	return address;
@@ -265,7 +273,7 @@ static TIMER_DEVICE_CALLBACK(nmi_check_callback)
 {
 	spectrum_state *state = timer.machine().driver_data<spectrum_state>();
 
-	if ((input_port_read(timer.machine(), "NMI") & 1)==1)
+	if ((timer.machine().root_device().ioport("NMI")->read() & 1)==1)
 	{
 		state->m_port_1ffd_data |= 0x02;
 		scorpion_update_memory(timer.machine());
@@ -300,24 +308,24 @@ static WRITE8_HANDLER(scorpion_port_1ffd_w)
 	}
 }
 
-static ADDRESS_MAP_START (scorpion_io, AS_IO, 8)
+static ADDRESS_MAP_START (scorpion_io, AS_IO, 8, scorpion_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_status_r,betadisk_command_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_track_r,betadisk_track_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_sector_r,betadisk_sector_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_data_r,betadisk_data_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x001f, 0x001f) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_status_r,betadisk_command_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_track_r,betadisk_track_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_sector_r,betadisk_sector_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_data_r,betadisk_data_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff)
-	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE(BETA_DISK_TAG, betadisk_state_r, betadisk_param_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(scorpion_port_7ffd_w)  AM_MIRROR(0x3ffd)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_r, ay8910_address_w) AM_MIRROR(0x3ffd)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(scorpion_port_1ffd_w) AM_MIRROR(0x0ffd)
+	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE_LEGACY(BETA_DISK_TAG, betadisk_state_r, betadisk_param_w) AM_MIRROR(0xff00)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE_LEGACY(scorpion_port_7ffd_w)  AM_MIRROR(0x3ffd)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay8912", ay8910_data_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE_LEGACY("ay8912", ay8910_r, ay8910_address_w) AM_MIRROR(0x3ffd)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE_LEGACY(scorpion_port_1ffd_w) AM_MIRROR(0x0ffd)
 ADDRESS_MAP_END
 
 
 static MACHINE_RESET( scorpion )
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
+	scorpion_state *state = machine.driver_data<scorpion_state>();
 	UINT8 *messram = machine.device<ram_device>(RAM_TAG)->pointer();
 	device_t *beta = machine.device(BETA_DISK_TAG);
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
@@ -328,15 +336,15 @@ static MACHINE_RESET( scorpion )
 
 	betadisk_disable(beta);
 	betadisk_clear_status(beta);
-	space->set_direct_update_handler(direct_update_delegate(FUNC(scorpion_direct), &machine));
+	space->set_direct_update_handler(direct_update_delegate(FUNC(scorpion_state::scorpion_direct), state));
 
 	memset(messram,0,256*1024);
 
 	/* Bank 5 is always in 0x4000 - 0x7fff */
-	memory_set_bankptr(machine, "bank2", messram + (5<<14));
+	state->membank("bank2")->set_base(messram + (5<<14));
 
 	/* Bank 2 is always in 0x8000 - 0xbfff */
-	memory_set_bankptr(machine, "bank3", messram + (2<<14));
+	state->membank("bank3")->set_base(messram + (2<<14));
 
 	state->m_port_7ffd_data = 0;
 	state->m_port_1ffd_data = 0;
@@ -401,7 +409,7 @@ static GFXDECODE_START( quorum )
 	GFXDECODE_ENTRY( "maincpu", 0x1fb00, quorum_charlayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_DERIVED( scorpion, spectrum_128 )
+static MACHINE_CONFIG_DERIVED_CLASS( scorpion, spectrum_128, scorpion_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(scorpion_io)
 

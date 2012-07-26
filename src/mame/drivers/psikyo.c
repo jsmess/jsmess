@@ -77,27 +77,25 @@ This was pointed out by Bart Puype
 
 ***************************************************************************/
 
-static CUSTOM_INPUT( z80_nmi_r )
+CUSTOM_INPUT_MEMBER(psikyo_state::z80_nmi_r)
 {
-	psikyo_state *state = field.machine().driver_data<psikyo_state>();
 	int ret = 0x00;
 
-	if (state->m_z80_nmi)
+	if (m_z80_nmi)
 	{
 		ret = 0x01;
 
 		/* main CPU might be waiting for sound CPU to finish NMI,
            so set a timer to give sound CPU a chance to run */
-		field.machine().scheduler().synchronize();
+		machine().scheduler().synchronize();
 //      logerror("%s - Read coin port during Z80 NMI\n", machine.describe_context());
 	}
 
 	return ret;
 }
 
-static CUSTOM_INPUT( mcu_status_r )
+CUSTOM_INPUT_MEMBER(psikyo_state::mcu_status_r)
 {
-	psikyo_state *state = field.machine().driver_data<psikyo_state>();
 	int ret = 0x00;
 
 	/* Don't know exactly what this bit is, but s1945 and tengai
@@ -114,33 +112,33 @@ static CUSTOM_INPUT( mcu_status_r )
 
         Interestingly, s1945jn has the code that spins on this bit,
         but said code is never reached.  Prototype? */
-	if (state->m_mcu_status)
+	if (m_mcu_status)
 		ret = 0x01;
 
-	state->m_mcu_status = !state->m_mcu_status;	/* hack */
+	m_mcu_status = !m_mcu_status;	/* hack */
 
 	return ret;
 }
 
-static READ32_HANDLER( sngkace_input_r )
+READ32_MEMBER(psikyo_state::sngkace_input_r)
 {
 	switch (offset)
 	{
-		case 0x0:	return input_port_read(space->machine(), "P1_P2");
-		case 0x1:	return input_port_read(space->machine(), "DSW");
-		case 0x2:	return input_port_read(space->machine(), "COIN");
-		default:	logerror("PC %06X - Read input %02X !\n", cpu_get_pc(&space->device()), offset * 2);
+		case 0x0:	return ioport("P1_P2")->read();
+		case 0x1:	return ioport("DSW")->read();
+		case 0x2:	return ioport("COIN")->read();
+		default:	logerror("PC %06X - Read input %02X !\n", cpu_get_pc(&space.device()), offset * 2);
 				return 0;
 	}
 }
 
-static READ32_HANDLER( gunbird_input_r )
+READ32_MEMBER(psikyo_state::gunbird_input_r)
 {
 	switch (offset)
 	{
-		case 0x0:	return input_port_read(space->machine(), "P1_P2");
-		case 0x1:	return input_port_read(space->machine(), "DSW");
-		default:	logerror("PC %06X - Read input %02X !\n", cpu_get_pc(&space->device()), offset * 2);
+		case 0x0:	return ioport("P1_P2")->read();
+		case 0x1:	return ioport("DSW")->read();
+		default:	logerror("PC %06X - Read input %02X !\n", cpu_get_pc(&space.device()), offset * 2);
 				return 0;
 	}
 }
@@ -154,20 +152,20 @@ static TIMER_CALLBACK( psikyo_soundlatch_callback )
 	state->m_z80_nmi = 1;
 }
 
-static WRITE32_HANDLER( psikyo_soundlatch_w )
+WRITE32_MEMBER(psikyo_state::psikyo_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
-		space->machine().scheduler().synchronize(FUNC(psikyo_soundlatch_callback), data & 0xff);
+		machine().scheduler().synchronize(FUNC(psikyo_soundlatch_callback), data & 0xff);
 }
 
 /***************************************************************************
                         Strikers 1945 / Tengai
 ***************************************************************************/
 
-static WRITE32_HANDLER( s1945_soundlatch_w )
+WRITE32_MEMBER(psikyo_state::s1945_soundlatch_w)
 {
 	if (ACCESSING_BITS_16_23)
-		space->machine().scheduler().synchronize(FUNC(psikyo_soundlatch_callback), (data >> 16) & 0xff);
+		machine().scheduler().synchronize(FUNC(psikyo_soundlatch_callback), (data >> 16) & 0xff);
 }
 
 static const UINT8 s1945_table[256] = {
@@ -188,9 +186,8 @@ static const UINT8 s1945j_table[256] = {
 	0x00, 0x00, 0x32, 0x90, 0x00, 0x00, 0xac, 0x64, 0x00, 0x00, 0x2b, 0xc0
 };
 
-static WRITE32_HANDLER( s1945_mcu_w )
+WRITE32_MEMBER(psikyo_state::s1945_mcu_w)
 {
-	psikyo_state *state = space->machine().driver_data<psikyo_state>();
 
 	// Accesses are always bytes, so resolve it
 	int suboff;
@@ -204,98 +201,97 @@ static WRITE32_HANDLER( s1945_mcu_w )
 	switch (offset)
 	{
 	case 0x06:
-		state->m_s1945_mcu_inlatch = data;
+		m_s1945_mcu_inlatch = data;
 		break;
 	case 0x08:
-		state->m_s1945_mcu_control = data;
+		m_s1945_mcu_control = data;
 		break;
 	case 0x09:
-		state->m_s1945_mcu_direction = data;
+		m_s1945_mcu_direction = data;
 		break;
 	case 0x07:
-		psikyo_switch_banks(space->machine(), 1, (data >> 6) & 3);
-		psikyo_switch_banks(space->machine(), 0, (data >> 4) & 3);
-		state->m_s1945_mcu_bctrl = data;
+		psikyo_switch_banks(machine(), 1, (data >> 6) & 3);
+		psikyo_switch_banks(machine(), 0, (data >> 4) & 3);
+		m_s1945_mcu_bctrl = data;
 		break;
 	case 0x0b:
-		switch (data | (state->m_s1945_mcu_direction ? 0x100 : 0))
+		switch (data | (m_s1945_mcu_direction ? 0x100 : 0))
 		{
 		case 0x11c:
-			state->m_s1945_mcu_latching = 5;
-			state->m_s1945_mcu_index = state->m_s1945_mcu_inlatch;
+			m_s1945_mcu_latching = 5;
+			m_s1945_mcu_index = m_s1945_mcu_inlatch;
 			break;
 		case 0x013:
-//          logerror("MCU: Table read index %02x\n", state->m_s1945_mcu_index);
-			state->m_s1945_mcu_latching = 1;
-			state->m_s1945_mcu_latch1 = state->m_s1945_mcu_table[state->m_s1945_mcu_index];
+//          logerror("MCU: Table read index %02x\n", m_s1945_mcu_index);
+			m_s1945_mcu_latching = 1;
+			m_s1945_mcu_latch1 = m_s1945_mcu_table[m_s1945_mcu_index];
 			break;
 		case 0x113:
-			state->m_s1945_mcu_mode = state->m_s1945_mcu_inlatch;
-			if (state->m_s1945_mcu_mode == 1)
+			m_s1945_mcu_mode = m_s1945_mcu_inlatch;
+			if (m_s1945_mcu_mode == 1)
 			{
-				state->m_s1945_mcu_latching &= ~1;
-				state->m_s1945_mcu_latch2 = 0x55;
+				m_s1945_mcu_latching &= ~1;
+				m_s1945_mcu_latch2 = 0x55;
 			}
 			else
 			{
 				// Go figure.
-				state->m_s1945_mcu_latching &= ~1;
-				state->m_s1945_mcu_latching |= 2;
+				m_s1945_mcu_latching &= ~1;
+				m_s1945_mcu_latching |= 2;
 			}
-			state->m_s1945_mcu_latching &= ~4;
-			state->m_s1945_mcu_latch1 = state->m_s1945_mcu_inlatch;
+			m_s1945_mcu_latching &= ~4;
+			m_s1945_mcu_latch1 = m_s1945_mcu_inlatch;
 			break;
 		case 0x010:
 		case 0x110:
-			state->m_s1945_mcu_latching |= 4;
+			m_s1945_mcu_latching |= 4;
 			break;
 		default:
-//          logerror("MCU: function %02x, direction %02x, latch1 %02x, latch2 %02x (%x)\n", data, state->m_s1945_mcu_direction, state->m_s1945_mcu_latch1, state->m_s1945_mcu_latch2, cpu_get_pc(&space->device()));
+//          logerror("MCU: function %02x, direction %02x, latch1 %02x, latch2 %02x (%x)\n", data, m_s1945_mcu_direction, m_s1945_mcu_latch1, m_s1945_mcu_latch2, cpu_get_pc(&space.device()));
 			break;
 		}
 		break;
 	default:
-//      logerror("MCU.w %x, %02x (%x)\n", offset, data, cpu_get_pc(&space->device()));
+//      logerror("MCU.w %x, %02x (%x)\n", offset, data, cpu_get_pc(&space.device()));
 		;
 	}
 }
 
-static READ32_HANDLER( s1945_mcu_r )
+READ32_MEMBER(psikyo_state::s1945_mcu_r)
 {
-	psikyo_state *state = space->machine().driver_data<psikyo_state>();
 
 	switch (offset)
 	{
 	case 0:
 		{
 		UINT32 res;
-		if (state->m_s1945_mcu_control & 16)
+		if (m_s1945_mcu_control & 16)
 		{
-			res = state->m_s1945_mcu_latching & 4 ? 0x0000ff00 : state->m_s1945_mcu_latch1 << 8;
-			state->m_s1945_mcu_latching |= 4;
+			res = m_s1945_mcu_latching & 4 ? 0x0000ff00 : m_s1945_mcu_latch1 << 8;
+			m_s1945_mcu_latching |= 4;
 		}
 		else
 		{
-			res = state->m_s1945_mcu_latching & 1 ? 0x0000ff00 : state->m_s1945_mcu_latch2 << 8;
-			state->m_s1945_mcu_latching |= 1;
+			res = m_s1945_mcu_latching & 1 ? 0x0000ff00 : m_s1945_mcu_latch2 << 8;
+			m_s1945_mcu_latching |= 1;
 		}
-		res |= state->m_s1945_mcu_bctrl & 0xf0;
+		res |= m_s1945_mcu_bctrl & 0xf0;
 		return res;
 	}
 	case 1:
-		return (state->m_s1945_mcu_latching << 24) | 0x08000000;
+		return (m_s1945_mcu_latching << 24) | 0x08000000;
 	}
 	return 0;
 }
 
-static READ32_HANDLER( s1945_input_r )
+READ32_MEMBER(psikyo_state::s1945_input_r)
 {
 	switch (offset)
 	{
-		case 0x0:	return input_port_read(space->machine(), "P1_P2");
-		case 0x1:	return (input_port_read(space->machine(), "DSW") & 0xffff000f) | s1945_mcu_r(space, offset - 1, mem_mask);
+		case 0x0:	return ioport("P1_P2")->read();
+		case 0x1:	return (ioport("DSW")->read() & 0xffff000f) | s1945_mcu_r(space, offset - 1, mem_mask);
 		case 0x2:	return s1945_mcu_r(space, offset - 1, mem_mask);
-		default:	logerror("PC %06X - Read input %02X !\n", cpu_get_pc(&space->device()), offset * 2);
+		default:	logerror("PC %06X - Read input %02X !\n", cpu_get_pc(&space.device()), offset * 2);
 					return 0;
 	}
 }
@@ -309,39 +305,31 @@ static READ32_HANDLER( s1945_input_r )
 
 ***************************************************************************/
 
-static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
-{
-	if (ACCESSING_BITS_16_31)
-		paletteram16_xRRRRRGGGGGBBBBB_word_w(space, offset * 2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_BITS_0_15)
-		paletteram16_xRRRRRGGGGGBBBBB_word_w(space, offset * 2 + 1, data, mem_mask);
-}
-
-static ADDRESS_MAP_START( psikyo_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( psikyo_map, AS_PROGRAM, 32, psikyo_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM														// ROM (not all used)
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_SIZE_MEMBER(psikyo_state, m_spriteram, m_spriteram_size)		// Sprites, buffered by two frames (list buffered + fb buffered)
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(psikyo_vram_0_w) AM_BASE_MEMBER(psikyo_state, m_vram_0)		// Layer 0
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(psikyo_vram_1_w) AM_BASE_MEMBER(psikyo_state, m_vram_1)		// Layer 1
-	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_BASE_MEMBER(psikyo_state, m_vregs)							// RAM + Vregs
-//  AM_RANGE(0xc00000, 0xc0000b) AM_READ(psikyo_input_r)                                    // Depends on board, see DRIVER_INIT
+	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")		// Sprites, buffered by two frames (list buffered + fb buffered)
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_dword_be_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(psikyo_vram_0_w) AM_SHARE("vram_0")		// Layer 0
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(psikyo_vram_1_w) AM_SHARE("vram_1")		// Layer 1
+	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_SHARE("vregs")							// RAM + Vregs
+//  AM_RANGE(0xc00000, 0xc0000b) AM_READ_LEGACY(psikyo_input_r)                                    // Depends on board, see DRIVER_INIT
 //  AM_RANGE(0xc00004, 0xc0000b) AM_WRITE(s1945_mcu_w)                                      // MCU on sh404, see DRIVER_INIT
 //  AM_RANGE(0xc00010, 0xc00013) AM_WRITE(psikyo_soundlatch_w)                              // Depends on board, see DRIVER_INIT
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM														// RAM
 ADDRESS_MAP_END
 
-static READ32_HANDLER( s1945bl_oki_r )
+READ32_MEMBER(psikyo_state::s1945bl_oki_r)
 {
-	UINT8 dat = space->machine().device<okim6295_device>("oki")->read(*space, 0);
+	UINT8 dat = machine().device<okim6295_device>("oki")->read(space, 0);
 	return dat << 24;
 }
 
-static WRITE32_HANDLER( s1945bl_oki_w )
+WRITE32_MEMBER(psikyo_state::s1945bl_oki_w)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		okim6295_device *oki = space->machine().device<okim6295_device>("oki");
-		oki->write(*space, 0, data >> 24);
+		okim6295_device *oki = machine().device<okim6295_device>("oki");
+		oki->write(space, 0, data >> 24);
 	}
 
 	if (ACCESSING_BITS_16_23)
@@ -349,7 +337,7 @@ static WRITE32_HANDLER( s1945bl_oki_w )
 		// not at all sure about this, it seems to write 0 too often
 		UINT8 bank = (data & 0x00ff0000) >> 16;
 		if (bank < 4)
-			memory_set_bank(space->machine(), "okibank", bank);
+			membank("okibank")->set_entry(bank);
 	}
 
 	if (ACCESSING_BITS_8_15)
@@ -359,21 +347,21 @@ static WRITE32_HANDLER( s1945bl_oki_w )
 		printf("ACCESSING_BITS_0_7 ?? %08x %08x\n", data & 0x000000ff, mem_mask);
 }
 
-static ADDRESS_MAP_START( s1945bl_oki_map, AS_0, 8 )
+static ADDRESS_MAP_START( s1945bl_oki_map, AS_0, 8, psikyo_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( psikyo_bootleg_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( psikyo_bootleg_map, AS_PROGRAM, 32, psikyo_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM														// ROM (not all used)
-	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_BASE_MEMBER(psikyo_state, m_bootleg_spritebuffer)				// RAM (it copies the spritelist here, the HW probably doesn't have automatic buffering like the originals?
+	AM_RANGE(0x200000, 0x200fff) AM_RAM AM_SHARE("boot_spritebuf")				// RAM (it copies the spritelist here, the HW probably doesn't have automatic buffering like the originals?
 
-	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_BASE_SIZE_MEMBER(psikyo_state, m_spriteram, m_spriteram_size)		// Sprites, buffered by two frames (list buffered + fb buffered)
-	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram32_xRRRRRGGGGGBBBBB_dword_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(psikyo_vram_0_w) AM_BASE_MEMBER(psikyo_state, m_vram_0)		// Layer 0
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(psikyo_vram_1_w) AM_BASE_MEMBER(psikyo_state, m_vram_1)		// Layer 1
-	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_BASE_MEMBER(psikyo_state, m_vregs)								// RAM + Vregs
-//  AM_RANGE(0xc00000, 0xc0000b) AM_READ(psikyo_input_r)                                    // Depends on board, see DRIVER_INIT
+	AM_RANGE(0x400000, 0x401fff) AM_RAM AM_SHARE("spriteram")		// Sprites, buffered by two frames (list buffered + fb buffered)
+	AM_RANGE(0x600000, 0x601fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_dword_be_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x800000, 0x801fff) AM_RAM_WRITE(psikyo_vram_0_w) AM_SHARE("vram_0")		// Layer 0
+	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(psikyo_vram_1_w) AM_SHARE("vram_1")		// Layer 1
+	AM_RANGE(0x804000, 0x807fff) AM_RAM AM_SHARE("vregs")								// RAM + Vregs
+//  AM_RANGE(0xc00000, 0xc0000b) AM_READ_LEGACY(psikyo_input_r)                                    // Depends on board, see DRIVER_INIT
 //  AM_RANGE(0xc00004, 0xc0000b) AM_WRITE(s1945_mcu_w)                                      // MCU on sh404, see DRIVER_INIT
 //  AM_RANGE(0xc00010, 0xc00013) AM_WRITE(psikyo_soundlatch_w)                              // Depends on board, see DRIVER_INIT
 
@@ -397,17 +385,15 @@ static void sound_irq( device_t *device, int irq )
 	device_set_input_line(state->m_audiocpu, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static READ8_HANDLER( psikyo_soundlatch_r )
+READ8_MEMBER(psikyo_state::psikyo_soundlatch_r)
 {
-	psikyo_state *state = space->machine().driver_data<psikyo_state>();
-	return state->m_soundlatch;
+	return m_soundlatch;
 }
 
-static WRITE8_HANDLER( psikyo_clear_nmi_w )
+WRITE8_MEMBER(psikyo_state::psikyo_clear_nmi_w)
 {
-	psikyo_state *state = space->machine().driver_data<psikyo_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
-	state->m_z80_nmi = 0;
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	m_z80_nmi = 0;
 }
 
 
@@ -415,20 +401,20 @@ static WRITE8_HANDLER( psikyo_clear_nmi_w )
                         Sengoku Ace / Samurai Aces
 ***************************************************************************/
 
-static WRITE8_HANDLER( sngkace_sound_bankswitch_w )
+WRITE8_MEMBER(psikyo_state::sngkace_sound_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x03);
+	membank("bank1")->set_entry(data & 0x03);
 }
 
-static ADDRESS_MAP_START( sngkace_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sngkace_sound_map, AS_PROGRAM, 8, psikyo_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM							// ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM							// RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")					// Banked ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sngkace_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sngkace_sound_io_map, AS_IO, 8, psikyo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sngkace_sound_bankswitch_w)
 	AM_RANGE(0x08, 0x08) AM_READ(psikyo_soundlatch_r)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(psikyo_clear_nmi_w)
@@ -439,21 +425,21 @@ ADDRESS_MAP_END
                                 Gun Bird
 ***************************************************************************/
 
-static WRITE8_HANDLER( gunbird_sound_bankswitch_w )
+WRITE8_MEMBER(psikyo_state::gunbird_sound_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", (data >> 4) & 0x03);
+	membank("bank1")->set_entry((data >> 4) & 0x03);
 }
 
-static ADDRESS_MAP_START( gunbird_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gunbird_sound_map, AS_PROGRAM, 8, psikyo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM							// ROM
 	AM_RANGE(0x8000, 0x81ff) AM_RAM							// RAM
 	AM_RANGE(0x8200, 0xffff) AM_ROMBANK("bank1")					// Banked ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gunbird_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( gunbird_sound_io_map, AS_IO, 8, psikyo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0x08, 0x08) AM_READ(psikyo_soundlatch_r)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(psikyo_clear_nmi_w)
 ADDRESS_MAP_END
@@ -462,11 +448,11 @@ ADDRESS_MAP_END
                         Strikers 1945 / Tengai
 ***************************************************************************/
 
-static ADDRESS_MAP_START( s1945_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( s1945_sound_io_map, AS_IO, 8, psikyo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_WRITENOP
-	AM_RANGE(0x08, 0x0d) AM_DEVREADWRITE("ymf", ymf278b_r, ymf278b_w)
+	AM_RANGE(0x08, 0x0d) AM_DEVREADWRITE_LEGACY("ymf", ymf278b_r, ymf278b_w)
 	AM_RANGE(0x10, 0x10) AM_READ(psikyo_soundlatch_r)
 	AM_RANGE(0x18, 0x18) AM_WRITE(psikyo_clear_nmi_w)
 ADDRESS_MAP_END
@@ -557,7 +543,7 @@ static INPUT_PORTS_START( samuraia )
 	PORT_INCLUDE(psikyo_common)
 
 	PORT_START("COIN")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_VBLANK  )	// vblank
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_VBLANK("screen")	// vblank
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )	// unused?
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -581,7 +567,7 @@ static INPUT_PORTS_START( samuraia )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(z80_nmi_r, NULL)	// From Sound CPU
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, NULL)	// From Sound CPU
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )	// unused?
 
 	PORT_MODIFY("DSW")		/* c00004 -> c00007 */
@@ -651,7 +637,7 @@ static INPUT_PORTS_START( btlkroad )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(z80_nmi_r, NULL)	// From Sound CPU
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, NULL)	// From Sound CPU
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
@@ -684,7 +670,7 @@ static INPUT_PORTS_START( btlkroad )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_VBLANK  )	// vblank   ACTIVE_HIGH fixes slowdowns, but is it right?
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_VBLANK("screen")	// vblank   ACTIVE_HIGH fixes slowdowns, but is it right?
 	// This DSW is used for debugging the game
 	PORT_DIPNAME( 0x00000100, 0x00000100, "Unknown 3-0" )	// tested!
 	PORT_DIPSETTING(          0x00000100, DEF_STR( Off ) )
@@ -738,7 +724,7 @@ static INPUT_PORTS_START( gunbird )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(z80_nmi_r, NULL)	// From Sound CPU
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, NULL)	// From Sound CPU
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW")		/* c00004 -> c00007 */
@@ -770,7 +756,7 @@ static INPUT_PORTS_START( gunbird )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_VBLANK  )	// vblank
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_VBLANK("screen")	// vblank
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )	// tested!
@@ -802,12 +788,12 @@ static INPUT_PORTS_START( s1945 )
 	PORT_MODIFY("P1_P2")			/* c00000 -> c00003 */
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mcu_status_r, NULL)
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,mcu_status_r, NULL)
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(z80_nmi_r, NULL)	// From Sound CPU
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, NULL)	// From Sound CPU
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW")		/* c00004 -> c00007 */
@@ -840,7 +826,7 @@ static INPUT_PORTS_START( s1945 )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_VBLANK  )	// vblank
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_VBLANK("screen")	// vblank
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )	// tested!
@@ -912,7 +898,7 @@ static INPUT_PORTS_START( s1945bl )
 
 	// I need to invert the Vblank on this to avoid excessive slowdown
 	PORT_MODIFY("DSW")		/* c00004 -> c00007 */
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_VBLANK  )	// vblank
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_CUSTOM  ) PORT_VBLANK("screen")	// vblank
 INPUT_PORTS_END
 
 
@@ -926,12 +912,12 @@ static INPUT_PORTS_START( tengai )
 	PORT_MODIFY("P1_P2")			/* c00000 -> c00003 */
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mcu_status_r, NULL)
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,mcu_status_r, NULL)
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(z80_nmi_r, NULL)	// From Sound CPU
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, NULL)	// From Sound CPU
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW")		/* c00004 -> c00007 */
@@ -956,7 +942,7 @@ static INPUT_PORTS_START( tengai )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_VBLANK  )	// vblank
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_CUSTOM  ) PORT_VBLANK("screen")	// vblank
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )	// tested!
@@ -1825,8 +1811,8 @@ static DRIVER_INIT( sngkace )
 	psikyo_state *state = machine.driver_data<psikyo_state>();
 
 	{
-		UINT8 *RAM = machine.region("ymsnd")->base();
-		int len = machine.region("ymsnd")->bytes();
+		UINT8 *RAM = state->memregion("ymsnd")->base();
+		int len = state->memregion("ymsnd")->bytes();
 		int i;
 
 		/* Bit 6&7 of the samples are swapped. Naughty, naughty... */
@@ -1838,21 +1824,21 @@ static DRIVER_INIT( sngkace )
 	}
 
 	/* input ports */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00000, 0xc0000b, FUNC(sngkace_input_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::sngkace_input_r),state));
 
 	/* sound latch */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00010, 0xc00013, FUNC(psikyo_soundlatch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::psikyo_soundlatch_w),state));
 
 	state->m_ka302c_banking = 0; // SH201B doesn't have any gfx banking
 
 	/* setup audiocpu banks */
-	memory_configure_bank(machine, "bank1", 0, 4, machine.region("audiocpu")->base() + 0x10000, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, machine.root_device().memregion("audiocpu")->base() + 0x10000, 0x8000);
 
 	/* Enable other regions */
 #if 0
 	if (!strcmp(machine.system().name,"sngkace"))
 	{
-		UINT8 *ROM	=	machine.region("maincpu")->base();
+		UINT8 *ROM	=	machine.root_device().memregion("maincpu")->base();
 		ROM[0x995] = 0x4e;
 		ROM[0x994] = 0x71;
 		ROM[0x997] = 0x4e;
@@ -1891,13 +1877,13 @@ static DRIVER_INIT( tengai )
 	psikyo_state *state = machine.driver_data<psikyo_state>();
 
 	/* input ports */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00000, 0xc0000b, FUNC(s1945_input_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),state));
 
 	/* sound latch */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00010, 0xc00013, FUNC(s1945_soundlatch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::s1945_soundlatch_w),state));
 
 	/* protection */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00004, 0xc0000b, FUNC(s1945_mcu_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc00004, 0xc0000b, write32_delegate(FUNC(psikyo_state::s1945_mcu_w),state));
 
 	s1945_mcu_init(machine);
 	state->m_s1945_mcu_table = 0;
@@ -1906,7 +1892,7 @@ static DRIVER_INIT( tengai )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	memory_configure_bank(machine, "bank1", 0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( gunbird )
@@ -1914,16 +1900,16 @@ static DRIVER_INIT( gunbird )
 	psikyo_state *state = machine.driver_data<psikyo_state>();
 
 	/* input ports */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00000, 0xc0000b, FUNC(gunbird_input_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::gunbird_input_r),state));
 
 	/* sound latch */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00010, 0xc00013, FUNC(psikyo_soundlatch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::psikyo_soundlatch_w),state));
 
 	state->m_ka302c_banking = 1;
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	memory_configure_bank(machine, "bank1", 0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 
@@ -1932,13 +1918,13 @@ static DRIVER_INIT( s1945 )
 	psikyo_state *state = machine.driver_data<psikyo_state>();
 
 	/* input ports */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00000, 0xc0000b, FUNC(s1945_input_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),state));
 
 	/* sound latch */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00010, 0xc00013, FUNC(s1945_soundlatch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::s1945_soundlatch_w),state));
 
 	/* protection and tile bank switching */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00004, 0xc0000b, FUNC(s1945_mcu_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc00004, 0xc0000b, write32_delegate(FUNC(psikyo_state::s1945_mcu_w),state));
 
 	s1945_mcu_init(machine);
 	state->m_s1945_mcu_table = s1945_table;
@@ -1947,7 +1933,7 @@ static DRIVER_INIT( s1945 )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	memory_configure_bank(machine, "bank1", 0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( s1945a )
@@ -1955,13 +1941,13 @@ static DRIVER_INIT( s1945a )
 	psikyo_state *state = machine.driver_data<psikyo_state>();
 
 	/* input ports */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00000, 0xc0000b, FUNC(s1945_input_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),state));
 
 	/* sound latch */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00010, 0xc00013, FUNC(s1945_soundlatch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::s1945_soundlatch_w),state));
 
 	/* protection and tile bank switching */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00004, 0xc0000b, FUNC(s1945_mcu_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc00004, 0xc0000b, write32_delegate(FUNC(psikyo_state::s1945_mcu_w),state));
 
 	s1945_mcu_init(machine);
 	state->m_s1945_mcu_table = s1945a_table;
@@ -1970,7 +1956,7 @@ static DRIVER_INIT( s1945a )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	memory_configure_bank(machine, "bank1", 0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( s1945j )
@@ -1978,13 +1964,13 @@ static DRIVER_INIT( s1945j )
 	psikyo_state *state = machine.driver_data<psikyo_state>();
 
 	/* input ports*/
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00000, 0xc0000b, FUNC(s1945_input_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::s1945_input_r),state));
 
 	/* sound latch */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00010, 0xc00013, FUNC(s1945_soundlatch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::s1945_soundlatch_w),state));
 
 	/* protection and tile bank switching */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00004, 0xc0000b, FUNC(s1945_mcu_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc00004, 0xc0000b, write32_delegate(FUNC(psikyo_state::s1945_mcu_w),state));
 
 	s1945_mcu_init(machine);
 	state->m_s1945_mcu_table = s1945j_table;
@@ -1993,7 +1979,7 @@ static DRIVER_INIT( s1945j )
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	memory_configure_bank(machine, "bank1", 0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( s1945jn )
@@ -2001,16 +1987,16 @@ static DRIVER_INIT( s1945jn )
 	psikyo_state *state = machine.driver_data<psikyo_state>();
 
 	/* input ports */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00000, 0xc0000b, FUNC(gunbird_input_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::gunbird_input_r),state));
 
 	/* sound latch */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00010, 0xc00013, FUNC(s1945_soundlatch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::s1945_soundlatch_w),state));
 
 	state->m_ka302c_banking = 1;
 
 	/* setup audiocpu banks */
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes of the rom not reachable. */
-	memory_configure_bank(machine, "bank1", 0, 4, machine.region("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000 + 0x200, 0x8000);
 }
 
 static DRIVER_INIT( s1945bl )
@@ -2018,15 +2004,15 @@ static DRIVER_INIT( s1945bl )
 	psikyo_state *state = machine.driver_data<psikyo_state>();
 
 	/* input ports */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc00000, 0xc0000b, FUNC(gunbird_input_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xc00000, 0xc0000b, read32_delegate(FUNC(psikyo_state::gunbird_input_r),state));
 
 	/* sound latch */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0xc00010, 0xc00013, FUNC(s1945_soundlatch_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0xc00010, 0xc00013, write32_delegate(FUNC(psikyo_state::s1945_soundlatch_w),state));
 
 	state->m_ka302c_banking = 1;
 
-	memory_configure_bank(machine, "okibank", 0, 4, machine.region("oki")->base() + 0x30000, 0x10000);
-	memory_set_bank(machine, "okibank", 0);
+	state->membank("okibank")->configure_entries(0, 4, state->memregion("oki")->base() + 0x30000, 0x10000);
+	state->membank("okibank")->set_entry(0);
 }
 
 

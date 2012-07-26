@@ -148,6 +148,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/8255ppi.h"
 #include "includes/turbo.h"
+#include "machine/i8279.h"
 #include "machine/segacrpt.h"
 #include "sound/samples.h"
 
@@ -452,167 +453,31 @@ static const ppi8255_interface buckrog_8255_intf[2] =
  *
  *************************************/
 
-static void update_outputs(i8279_state *chip, UINT16 which)
+WRITE8_MEMBER( turbo_state::scanlines_w )
+{
+	m_i8279_scanlines = data;
+}
+
+WRITE8_MEMBER( turbo_state::digit_w )
 {
 	static const UINT8 ls48_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
-	int i;
 
-	/* update the items in the bitmask */
-	for (i = 0; i < 16; i++)
-		if (which & (1 << i))
-		{
-			int val;
-
-			val = chip->ram[i] & 0x0f;
-			if (chip->inhibit & 0x01)
-				val = chip->clear & 0x0f;
-			output_set_digit_value(i * 2 + 0, ls48_map[val]);
-
-			val = chip->ram[i] >> 4;
-			if (chip->inhibit & 0x02)
-				val = chip->clear >> 4;
-			output_set_digit_value(i * 2 + 1, ls48_map[val]);
-		}
+	output_set_digit_value(m_i8279_scanlines * 2 + 0, ls48_map[data & 0x0f]);
+	output_set_digit_value(m_i8279_scanlines * 2 + 1, ls48_map[(data>>4) & 0x0f]);
 }
 
 
-static READ8_HANDLER( turbo_8279_r )
+static I8279_INTERFACE( turbo_i8279_intf )
 {
-	turbo_state *state = space->machine().driver_data<turbo_state>();
-	i8279_state *chip = &state->m_i8279;
-	UINT8 result = 0xff;
-	UINT8 addr;
-
-	/* read data */
-	if ((offset & 1) == 0)
-	{
-		switch (chip->command & 0xe0)
-		{
-			/* read sensor RAM */
-			case 0x40:
-				result = ~input_port_read(space->machine(), "DSW1");  /* DSW 1 - inverted! */
-				break;
-
-			/* read display RAM */
-			case 0x60:
-
-				/* set the value of the corresponding outputs */
-				addr = chip->command & 0x0f;
-				result = chip->ram[addr];
-
-				/* handle autoincrement */
-				if (chip->command & 0x10)
-					chip->command = (chip->command & 0xf0) | ((addr + 1) & 0x0f);
-				break;
-		}
-	}
-
-	/* read status word */
-	else
-	{
-		logerror("read 0xfc%02x\n", offset);
-		result = 0x10;
-	}
-	return result;
-}
-
-
-static WRITE8_HANDLER( turbo_8279_w )
-{
-	turbo_state *state = space->machine().driver_data<turbo_state>();
-	i8279_state *chip = &state->m_i8279;
-	UINT8 addr;
-
-	/* write data */
-	if ((offset & 1) == 0)
-	{
-		switch (chip->command & 0xe0)
-		{
-			/* write display RAM */
-			case 0x80:
-
-				/* set the value of the corresponding outputs */
-				addr = chip->command & 0x0f;
-				if (!(chip->inhibit & 0x04))
-					chip->ram[addr] = (chip->ram[addr] & 0xf0) | (data & 0x0f);
-				if (!(chip->inhibit & 0x08))
-					chip->ram[addr] = (chip->ram[addr] & 0x0f) | (data & 0xf0);
-				update_outputs(chip, 1 << addr);
-
-				/* handle autoincrement */
-				if (chip->command & 0x10)
-					chip->command = (chip->command & 0xf0) | ((addr + 1) & 0x0f);
-				break;
-		}
-	}
-
-	/* write command */
-	else
-	{
-		chip->command = data;
-
-		switch (data & 0xe0)
-		{
-			/* command 0: set mode */
-			/*
-                Display modes:
-
-                00 = 8 x 8-bit character display -- left entry
-                01 = 16 x 8-bit character display -- left entry
-                10 = 8 x 8-bit character display -- right entry
-                11 = 16 x 8-bit character display -- right entry
-
-                Keyboard modes:
-
-                000 = Encoded scan keyboard -- 2 key lockout
-                001 = Decoded scan keyboard -- 2 key lockout
-                010 = Encoded scan keyboard -- N-key rollover
-                011 = Decoded scan keyboard -- N-key rollover
-                100 = Encoded scan sensor matrix
-                101 = Decoded scan sensor matrix
-                110 = Strobed input, encoded display scan
-                111 = Strobed input, decoded display scan
-            */
-			case 0x00:
-				logerror("turbo_8279: display mode = %d, keyboard mode = %d\n", (data >> 3) & 3, data & 7);
-				chip->mode = data & 0x1f;
-				break;
-
-			/* command 1: program clock */
-			case 0x20:
-				logerror("turbo_8279: clock prescaler set to %02X\n", data & 0x1f);
-				chip->prescale = data & 0x1f;
-				break;
-
-			/* command 2: read FIFO/sensor RAM */
-			/* command 3: read display RAM */
-			/* command 4: write display RAM */
-			case 0x40:
-			case 0x60:
-			case 0x80:
-				break;
-
-			/* command 5: display write inhibit/blanking */
-			case 0xa0:
-				chip->inhibit = data & 0x0f;
-				update_outputs(chip, ~0);
-				logerror("turbo_8279: clock prescaler set to %02X\n", data & 0x1f);
-				break;
-
-			/* command 6: clear */
-			case 0xc0:
-				chip->clear = (data & 0x08) ? ((data & 0x04) ? 0xff : 0x20) : 0x00;
-				if (data & 0x11)
-					memset(chip->ram, chip->clear, sizeof(chip->ram));
-				break;
-
-			/* command 7: end interrupt/error mode set */
-			case 0xe0:
-				break;
-		}
-	}
-}
+	DEVCB_NULL,										// irq
+	DEVCB_DRIVER_MEMBER(turbo_state, scanlines_w),	// scan SL lines
+	DEVCB_DRIVER_MEMBER(turbo_state, digit_w),		// display A&B
+	DEVCB_NULL,										// BD
+	DEVCB_INPUT_PORT("DSW1"),						// kbd RL lines
+	DEVCB_NULL,										// Shift key
+	DEVCB_NULL										// Ctrl-Strobe line
+};
 
 
 
@@ -622,48 +487,45 @@ static WRITE8_HANDLER( turbo_8279_w )
  *
  *************************************/
 
-static READ8_HANDLER( turbo_collision_r )
+READ8_MEMBER(turbo_state::turbo_collision_r)
 {
-	turbo_state *state = space->machine().driver_data<turbo_state>();
-	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-	return input_port_read(space->machine(), "DSW3") | (state->m_turbo_collision & 15);
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	return ioport("DSW3")->read() | (m_turbo_collision & 15);
 }
 
 
-static WRITE8_HANDLER( turbo_collision_clear_w )
+WRITE8_MEMBER(turbo_state::turbo_collision_clear_w)
 {
-	turbo_state *state = space->machine().driver_data<turbo_state>();
-	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-	state->m_turbo_collision = 0;
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_turbo_collision = 0;
 }
 
 
 static READ8_DEVICE_HANDLER( turbo_analog_r )
 {
 	turbo_state *state = device->machine().driver_data<turbo_state>();
-	return input_port_read(device->machine(), "DIAL") - state->m_turbo_last_analog;
+	return state->ioport("DIAL")->read() - state->m_turbo_last_analog;
 }
 
 
-static WRITE8_HANDLER( turbo_analog_reset_w )
+WRITE8_MEMBER(turbo_state::turbo_analog_reset_w)
 {
-	turbo_state *state = space->machine().driver_data<turbo_state>();
-	state->m_turbo_last_analog = input_port_read(space->machine(), "DIAL");
+	m_turbo_last_analog = ioport("DIAL")->read();
 }
 
 
-static WRITE8_HANDLER( turbo_coin_and_lamp_w )
+WRITE8_MEMBER(turbo_state::turbo_coin_and_lamp_w)
 {
 	switch (offset & 7)
 	{
 		case 0:
-			coin_counter_w(space->machine(), 0, data & 1);
+			coin_counter_w(machine(), 0, data & 1);
 			break;
 		case 1:
-			coin_counter_w(space->machine(), 1, data & 1);
+			coin_counter_w(machine(), 1, data & 1);
 			break;
 		case 3:
-			set_led_status(space->machine(), 0, data & 1);
+			set_led_status(machine(), 0, data & 1);
 			break;
 	}
 }
@@ -676,19 +538,18 @@ static WRITE8_HANDLER( turbo_coin_and_lamp_w )
  *
  *************************************/
 
-static READ8_HANDLER( buckrog_cpu2_command_r )
+READ8_MEMBER(turbo_state::buckrog_cpu2_command_r)
 {
 	/* assert ACK */
-	turbo_state *state = space->machine().driver_data<turbo_state>();
-	ppi8255_set_port_c(space->machine().device("ppi8255_0"), 0x00);
-	return state->m_buckrog_command;
+	ppi8255_set_port_c(machine().device("ppi8255_0"), 0x00);
+	return m_buckrog_command;
 }
 
 
-static READ8_HANDLER( buckrog_port_2_r )
+READ8_MEMBER(turbo_state::buckrog_port_2_r)
 {
-	int inp1 = input_port_read(space->machine(), "DSW1");
-	int inp2 = input_port_read(space->machine(), "DSW2");
+	int inp1 = ioport("DSW1")->read();
+	int inp2 = ioport("DSW2")->read();
 
 	return  (((inp2 >> 6) & 1) << 7) |
 			(((inp2 >> 4) & 1) << 6) |
@@ -701,10 +562,10 @@ static READ8_HANDLER( buckrog_port_2_r )
 }
 
 
-static READ8_HANDLER( buckrog_port_3_r )
+READ8_MEMBER(turbo_state::buckrog_port_3_r)
 {
-	int inp1 = input_port_read(space->machine(), "DSW1");
-	int inp2 = input_port_read(space->machine(), "DSW2");
+	int inp1 = ioport("DSW1")->read();
+	int inp2 = ioport("DSW2")->read();
 
 	return  (((inp2 >> 7) & 1) << 7) |
 			(((inp2 >> 5) & 1) << 6) |
@@ -738,20 +599,21 @@ static WRITE8_DEVICE_HANDLER( buckrog_ppi8255_0_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( turbo_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( turbo_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x0700) AM_MASK(0x0f7) AM_RAM AM_BASE_MEMBER(turbo_state, m_spriteram)
+	AM_RANGE(0xa000, 0xa0ff) AM_MIRROR(0x0700) AM_MASK(0x0f7) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xa800, 0xa807) AM_MIRROR(0x07f8) AM_WRITE(turbo_coin_and_lamp_w)
-	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(turbo_state, m_sprite_position)
+	AM_RANGE(0xb000, 0xb3ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("sprite_position")
 	AM_RANGE(0xb800, 0xbfff) AM_WRITE(turbo_analog_reset_w)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(turbo_videoram_w) AM_BASE_MEMBER(turbo_state, m_videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(turbo_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe800, 0xefff) AM_WRITE(turbo_collision_clear_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf803) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xf900, 0xf903) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xfa00, 0xfa03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_2", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xfb00, 0xfb03) AM_MIRROR(0x00fc) AM_DEVREADWRITE("ppi8255_3", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xfc00, 0xfc01) AM_MIRROR(0x00fe) AM_READWRITE(turbo_8279_r, turbo_8279_w)
+	AM_RANGE(0xf800, 0xf803) AM_MIRROR(0x00fc) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xf900, 0xf903) AM_MIRROR(0x00fc) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xfa00, 0xfa03) AM_MIRROR(0x00fc) AM_DEVREADWRITE_LEGACY("ppi8255_2", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xfb00, 0xfb03) AM_MIRROR(0x00fc) AM_DEVREADWRITE_LEGACY("ppi8255_3", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_MIRROR(0x00fe) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
+	AM_RANGE(0xfc01, 0xfc01) AM_MIRROR(0x00fe) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
 	AM_RANGE(0xfd00, 0xfdff) AM_READ_PORT("INPUT")
 	AM_RANGE(0xfe00, 0xfeff) AM_READ(turbo_collision_r)
 ADDRESS_MAP_END
@@ -764,20 +626,21 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( subroc3d_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( subroc3d_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_BASE_MEMBER(turbo_state, m_sprite_position)	// CONT RAM
-	AM_RANGE(0xa400, 0xa7ff) AM_RAM AM_BASE_MEMBER(turbo_state, m_spriteram)			// CONT RAM
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_SHARE("sprite_position")	// CONT RAM
+	AM_RANGE(0xa400, 0xa7ff) AM_RAM AM_SHARE("spriteram")			// CONT RAM
 	AM_RANGE(0xa800, 0xa800) AM_MIRROR(0x07fc) AM_READ_PORT("IN0")					// INPUT 253
 	AM_RANGE(0xa801, 0xa801) AM_MIRROR(0x07fc) AM_READ_PORT("IN1")					// INPUT 253
 	AM_RANGE(0xa802, 0xa802) AM_MIRROR(0x07fc) AM_READ_PORT("DSW2")					// INPUT 253
 	AM_RANGE(0xa803, 0xa803) AM_MIRROR(0x07fc) AM_READ_PORT("DSW3")					// INPUT 253
 	AM_RANGE(0xb000, 0xb7ff) AM_RAM 												// SCRATCH
 	AM_RANGE(0xb800, 0xbfff)														// HANDLE CL
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(turbo_videoram_w) AM_BASE_MEMBER(turbo_state, m_videoram)	// FIX PAGE
-	AM_RANGE(0xe800, 0xe803) AM_MIRROR(0x07fc) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xf000, 0xf003) AM_MIRROR(0x07fc) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xf800, 0xf801) AM_MIRROR(0x07fe) AM_READWRITE(turbo_8279_r, turbo_8279_w)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(turbo_videoram_w) AM_SHARE("videoram")	// FIX PAGE
+	AM_RANGE(0xe800, 0xe803) AM_MIRROR(0x07fc) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xf000, 0xf003) AM_MIRROR(0x07fc) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x07fe) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
+	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x07fe) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
 ADDRESS_MAP_END
 
 
@@ -788,15 +651,16 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( buckrog_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( buckrog_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(turbo_videoram_w) AM_BASE_MEMBER(turbo_state, m_videoram)		// FIX PAGE
-	AM_RANGE(0xc800, 0xc803) AM_MIRROR(0x07fc) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, buckrog_ppi8255_0_w)	// 8255
-	AM_RANGE(0xd000, 0xd003) AM_MIRROR(0x07fc) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)			// 8255
-	AM_RANGE(0xd800, 0xd801) AM_MIRROR(0x07fe) AM_READWRITE(turbo_8279_r, turbo_8279_w)			// 8279
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_BASE_MEMBER(turbo_state, m_sprite_position)				// CONT RAM
-	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE_MEMBER(turbo_state, m_spriteram)						// CONT RAM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(turbo_videoram_w) AM_SHARE("videoram")		// FIX PAGE
+	AM_RANGE(0xc800, 0xc803) AM_MIRROR(0x07fc) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, buckrog_ppi8255_0_w)	// 8255
+	AM_RANGE(0xd000, 0xd003) AM_MIRROR(0x07fc) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)			// 8255
+	AM_RANGE(0xd800, 0xd800) AM_MIRROR(0x07fe) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
+	AM_RANGE(0xd801, 0xd801) AM_MIRROR(0x07fe) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("sprite_position")				// CONT RAM
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("spriteram")						// CONT RAM
 	AM_RANGE(0xe800, 0xe800) AM_MIRROR(0x07fc) AM_READ_PORT("IN0")								// INPUT
 	AM_RANGE(0xe801, 0xe801) AM_MIRROR(0x07fc) AM_READ_PORT("IN1")
 	AM_RANGE(0xe802, 0xe802) AM_MIRROR(0x07fc) AM_READ(buckrog_port_2_r)
@@ -806,14 +670,14 @@ static ADDRESS_MAP_START( buckrog_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( buckrog_cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( buckrog_cpu2_map, AS_PROGRAM, 8, turbo_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x0000, 0xdfff) AM_WRITE(buckrog_bitmap_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_MIRROR(0x1800) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( buckrog_cpu2_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( buckrog_cpu2_portmap, AS_IO, 8, turbo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READ(buckrog_cpu2_command_r)
 ADDRESS_MAP_END
@@ -1086,6 +950,8 @@ static MACHINE_CONFIG_START( turbo, turbo_state )
 	MCFG_PPI8255_ADD( "ppi8255_2", turbo_8255_intf[2] )
 	MCFG_PPI8255_ADD( "ppi8255_3", turbo_8255_intf[3] )
 
+	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, turbo_i8279_intf)	 // unknown clock
+
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 	MCFG_GFXDECODE(turbo)
@@ -1112,6 +978,8 @@ static MACHINE_CONFIG_START( subroc3d, turbo_state )
 
 	MCFG_PPI8255_ADD( "ppi8255_0", subroc3d_8255_intf[0] )
 	MCFG_PPI8255_ADD( "ppi8255_1", subroc3d_8255_intf[1] )
+
+	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, turbo_i8279_intf)	 // unknown clock
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -1146,6 +1014,8 @@ static MACHINE_CONFIG_START( buckrog, turbo_state )
 
 	MCFG_PPI8255_ADD( "ppi8255_0", buckrog_8255_intf[0] )
 	MCFG_PPI8255_ADD( "ppi8255_1", buckrog_8255_intf[1] )
+
+	MCFG_I8279_ADD("i8279", MASTER_CLOCK/4, turbo_i8279_intf)	 // unknown clock
 
 	/* video hardware */
 	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -1757,7 +1627,7 @@ static void turbo_rom_decode(running_machine &machine)
 		2,1,2,1	 /* 0x5000-0x5fff */
 	};
 
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
 	int offs, i, j;
 	UINT8 src;
 

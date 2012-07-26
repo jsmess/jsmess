@@ -13,18 +13,23 @@ class fuuki32_state : public driver_device
 {
 public:
 	fuuki32_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"),
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram"),
+		m_vregs(*this, "vregs"),
+		m_priority(*this, "priority"),
+		m_tilebank(*this, "tilebank"){ }
 
 	/* memory pointers */
-	UINT32 *    m_vram[4];
-	UINT32 *    m_vregs;
-	UINT32 *    m_priority;
-	UINT32 *    m_tilebank;
-	UINT32 *    m_spriteram;
+	required_shared_ptr_array<UINT32,4> m_vram;
+	required_shared_ptr<UINT32> m_spriteram;
+	required_shared_ptr<UINT32> m_paletteram;
+	required_shared_ptr<UINT32> m_vregs;
+	required_shared_ptr<UINT32> m_priority;
+	required_shared_ptr<UINT32> m_tilebank;
 	UINT32 *    m_buf_spriteram;
 	UINT32 *    m_buf_spriteram2;
-	UINT32 *    m_paletteram;
-	size_t      m_spriteram_size;
 
 	/* video-related */
 	tilemap_t     *m_tilemap[4];
@@ -37,15 +42,23 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
+	DECLARE_WRITE32_MEMBER(paletteram32_xRRRRRGGGGGBBBBB_dword_w);
+	DECLARE_READ32_MEMBER(snd_020_r);
+	DECLARE_WRITE32_MEMBER(snd_020_w);
+	DECLARE_WRITE32_MEMBER(fuuki32_vregs_w);
+	DECLARE_WRITE8_MEMBER(fuuki32_sound_bw_w);
+	DECLARE_READ8_MEMBER(snd_z80_r);
+	DECLARE_WRITE8_MEMBER(snd_z80_w);
+	DECLARE_WRITE8_MEMBER(snd_ymf278b_w);
+	DECLARE_WRITE32_MEMBER(fuuki32_vram_0_w);
+	DECLARE_WRITE32_MEMBER(fuuki32_vram_1_w);
+	DECLARE_WRITE32_MEMBER(fuuki32_vram_2_w);
+	DECLARE_WRITE32_MEMBER(fuuki32_vram_3_w);
 };
 
 
 /*----------- defined in video/fuuki32.c -----------*/
 
-WRITE32_HANDLER( fuuki32_vram_0_w );
-WRITE32_HANDLER( fuuki32_vram_1_w );
-WRITE32_HANDLER( fuuki32_vram_2_w );
-WRITE32_HANDLER( fuuki32_vram_3_w );
 
 VIDEO_START( fuuki32 );
 SCREEN_UPDATE_IND16( fuuki32 );

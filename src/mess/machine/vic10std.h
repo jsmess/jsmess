@@ -12,7 +12,6 @@
 #ifndef __VIC10_STD__
 #define __VIC10_STD__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/vic10exp.h"
@@ -38,18 +37,8 @@ protected:
 	virtual void device_config_complete() { m_shortname = "vic10_standard"; }
 
 	// device_vic10_expansion_card_interface overrides
-	virtual UINT8 vic10_exram_r(address_space &space, offs_t offset);
-	virtual void vic10_exram_w(address_space &space, offs_t offset, UINT8 data);
-	virtual UINT8 vic10_lorom_r(address_space &space, offs_t offset);
-	virtual UINT8 vic10_uprom_r(address_space &space, offs_t offset);
-	virtual UINT8* vic10_lorom_pointer();
-	virtual UINT8* vic10_uprom_pointer();
-	virtual UINT8* vic10_exram_pointer();
-
-private:
-	UINT8 *m_exram;
-	UINT8 *m_lorom;
-	UINT8 *m_uprom;
+	virtual UINT8 vic10_cd_r(address_space &space, offs_t offset, int lorom, int uprom, int exram);
+	virtual void vic10_cd_w(address_space &space, offs_t offset, UINT8 data, int lorom, int uprom, int exram);
 };
 
 

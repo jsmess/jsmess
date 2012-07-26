@@ -224,7 +224,7 @@ void generic_terminal_device::term_write(UINT8 data)
 ***************************************************************************/
 UINT32 generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 options = input_port_read(*this, "TERM_CONF");
+	UINT8 options = ioport("TERM_CONF")->read();
 	UINT16 cursor = m_y_pos * TERMINAL_WIDTH + m_x_pos;
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
@@ -307,12 +307,12 @@ UINT8 generic_terminal_device::keyboard_handler(UINT8 last_code, UINT8 *scan_lin
 	UINT8 code;
 	UINT8 key_code = 0;
 	UINT8 retVal = 0;
-	UINT8 shift = BIT(input_port_read(*this, "TERM_LINEC"), 1);
-	UINT8 caps  = BIT(input_port_read(*this, "TERM_LINEC"), 2);
-	UINT8 ctrl  = BIT(input_port_read(*this, "TERM_LINEC"), 0);
+	UINT8 shift = BIT(ioport("TERM_LINEC")->read(), 1);
+	UINT8 caps  = BIT(ioport("TERM_LINEC")->read(), 2);
+	UINT8 ctrl  = BIT(ioport("TERM_LINEC")->read(), 0);
 	i = *scan_line;
 	{
-		code =	input_port_read(*this, keynames[i]);
+		code =	ioport(keynames[i])->read();
 		if (code != 0)
 		{
 			if (i==0 && shift==0) {

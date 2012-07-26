@@ -21,11 +21,10 @@ static const pen_t pens_from_color_prom[] =
 };
 
 
-WRITE8_HANDLER( vicdual_palette_bank_w )
+WRITE8_MEMBER(vicdual_state::vicdual_palette_bank_w)
 {
-	vicdual_state *state = space->machine().driver_data<vicdual_state>();
-	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
-	state->m_palette_bank = data & 3;
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
+	m_palette_bank = data & 3;
 }
 
 
@@ -83,7 +82,7 @@ SCREEN_UPDATE_RGB32( vicdual_bw )
 SCREEN_UPDATE_RGB32( vicdual_color )
 {
 	vicdual_state *state = screen.machine().driver_data<vicdual_state>();
-	UINT8 *color_prom = (UINT8 *)screen.machine().region("proms")->base();
+	UINT8 *color_prom = (UINT8 *)state->memregion("proms")->base();
 	UINT8 x = 0;
 	UINT8 y = cliprect.min_y;
 	UINT8 video_data = 0;

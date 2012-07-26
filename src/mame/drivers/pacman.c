@@ -373,14 +373,14 @@ Boards:
 
 static MACHINE_RESET( mschamp )
 {
-	UINT8 *rom = machine.region("maincpu")->base() + 0x10000;
-	int whichbank = input_port_read(machine, "GAME") & 1;
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base() + 0x10000;
+	int whichbank = machine.root_device().ioport("GAME")->read() & 1;
 
-	memory_configure_bank(machine, "bank1", 0, 2, &rom[0x0000], 0x8000);
-	memory_configure_bank(machine, "bank2", 0, 2, &rom[0x4000], 0x8000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, &rom[0x0000], 0x8000);
+	machine.root_device().membank("bank2")->configure_entries(0, 2, &rom[0x4000], 0x8000);
 
-	memory_set_bank(machine, "bank1", whichbank);
-	memory_set_bank(machine, "bank2", whichbank);
+	machine.root_device().membank("bank1")->set_entry(whichbank);
+	machine.root_device().membank("bank2")->set_entry(whichbank);
 }
 
 
@@ -391,10 +391,10 @@ static MACHINE_RESET( mschamp )
  *
  *************************************/
 
-static WRITE8_HANDLER( pacman_interrupt_vector_w )
+WRITE8_MEMBER(pacman_state::pacman_interrupt_vector_w)
 {
-	device_set_input_line_vector(space->machine().device("maincpu"), 0, data);
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	device_set_input_line_vector(machine().device("maincpu"), 0, data);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -454,20 +454,20 @@ did look at(sprite buffer), was copied from Pacman.  The addresses for the varia
 to be the same as well.
 */
 
-static WRITE8_HANDLER( piranha_interrupt_vector_w)
+WRITE8_MEMBER(pacman_state::piranha_interrupt_vector_w)
 {
 	if (data == 0xfa) data = 0x78;
 	if (data == 0xfc) data = 0xfc;
-	device_set_input_line_vector(space->machine().device("maincpu"), 0, data );
+	device_set_input_line_vector(machine().device("maincpu"), 0, data );
 }
 
 
-static WRITE8_HANDLER( nmouse_interrupt_vector_w)
+WRITE8_MEMBER(pacman_state::nmouse_interrupt_vector_w)
 {
 	if (data == 0xbf) data = 0x3c;
 	if (data == 0xc6) data = 0x40;
 	if (data == 0xfc) data = 0xfc;
-	device_set_input_line_vector(space->machine().device("maincpu"), 0, data );
+	device_set_input_line_vector(machine().device("maincpu"), 0, data );
 }
 
 
@@ -477,21 +477,21 @@ static WRITE8_HANDLER( nmouse_interrupt_vector_w)
  *
  *************************************/
 
-static WRITE8_HANDLER( pacman_leds_w )
+WRITE8_MEMBER(pacman_state::pacman_leds_w)
 {
-	set_led_status(space->machine(), offset,data & 1);
+	set_led_status(machine(), offset,data & 1);
 }
 
 
-static WRITE8_HANDLER( pacman_coin_counter_w )
+WRITE8_MEMBER(pacman_state::pacman_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset,data & 1);
+	coin_counter_w(machine(), offset,data & 1);
 }
 
 
-static WRITE8_HANDLER( pacman_coin_lockout_global_w )
+WRITE8_MEMBER(pacman_state::pacman_coin_lockout_global_w)
 {
-	coin_lockout_global_w(space->machine(), ~data & 0x01);
+	coin_lockout_global_w(machine(), ~data & 0x01);
 }
 
 
@@ -502,35 +502,33 @@ static WRITE8_HANDLER( pacman_coin_lockout_global_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( alibaba_sound_w )
+WRITE8_MEMBER(pacman_state::alibaba_sound_w)
 {
 	/* since the sound region in Ali Baba is not contiguous, translate the
        offset into the 0-0x1f range */
-	pacman_state *state = space->machine().driver_data<pacman_state>();
 	if (offset < 0x10)
-		pacman_sound_w(space->machine().device("namco"), offset, data);
+		pacman_sound_w(machine().device("namco"), offset, data);
 	else if (offset < 0x20)
-		state->m_spriteram2[offset - 0x10] = data;
+		m_spriteram2[offset - 0x10] = data;
 	else
-		pacman_sound_w(space->machine().device("namco"), offset - 0x10, data);
+		pacman_sound_w(machine().device("namco"), offset - 0x10, data);
 }
 
 
-static READ8_HANDLER( alibaba_mystery_1_r )
+READ8_MEMBER(pacman_state::alibaba_mystery_1_r)
 {
 	/* The return value determines what the mystery item is.  Each bit corresponds
        to a question mark */
-	return space->machine().rand() & 0x0f;
+	return machine().rand() & 0x0f;
 }
 
 
-static READ8_HANDLER( alibaba_mystery_2_r )
+READ8_MEMBER(pacman_state::alibaba_mystery_2_r)
 {
-	pacman_state *state = space->machine().driver_data<pacman_state>();
 	/* The single bit return value determines when the mystery is lit up.
        This is certainly wrong */
-	state->m_mystery++;
-	return (state->m_mystery >> 10) & 1;
+	m_mystery++;
+	return (m_mystery >> 10) & 1;
 }
 
 
@@ -541,10 +539,10 @@ static READ8_HANDLER( alibaba_mystery_2_r )
  *
  *************************************/
 
-static READ8_HANDLER( maketrax_special_port2_r )
+READ8_MEMBER(pacman_state::maketrax_special_port2_r)
 {
-	int data = input_port_read(space->machine(), "DSW1");
-	int pc = cpu_get_previouspc(&space->device());
+	int data = ioport("DSW1")->read();
+	int pc = cpu_get_previouspc(&space.device());
 
 	if ((pc == 0x1973) || (pc == 0x2389)) return data | 0x40;
 
@@ -563,9 +561,9 @@ static READ8_HANDLER( maketrax_special_port2_r )
 }
 
 
-static READ8_HANDLER( maketrax_special_port3_r )
+READ8_MEMBER(pacman_state::maketrax_special_port3_r)
 {
-	int pc = cpu_get_previouspc(&space->device());
+	int pc = cpu_get_previouspc(&space.device());
 
 	if (pc == 0x040e) return 0x20;
 
@@ -584,10 +582,10 @@ static READ8_HANDLER( maketrax_special_port3_r )
 	}
 }
 
-static READ8_HANDLER( korosuke_special_port2_r )
+READ8_MEMBER(pacman_state::korosuke_special_port2_r)
 {
-	int data = input_port_read(space->machine(), "DSW1");
-	int pc = cpu_get_previouspc(&space->device());
+	int data = ioport("DSW1")->read();
+	int pc = cpu_get_previouspc(&space.device());
 
 	if ((pc == 0x196e) || (pc == 0x2387)) return data | 0x40;
 
@@ -605,9 +603,9 @@ static READ8_HANDLER( korosuke_special_port2_r )
 	return data;
 }
 
-static READ8_HANDLER( korosuke_special_port3_r )
+READ8_MEMBER(pacman_state::korosuke_special_port3_r)
 {
-	int pc = cpu_get_previouspc(&space->device());
+	int pc = cpu_get_previouspc(&space.device());
 
 	if (pc == 0x0445) return 0x20;
 
@@ -632,10 +630,9 @@ static READ8_HANDLER( korosuke_special_port3_r )
  *
  *************************************/
 
-static READ8_HANDLER( mschamp_kludge_r )
+READ8_MEMBER(pacman_state::mschamp_kludge_r)
 {
-	pacman_state *state = space->machine().driver_data<pacman_state>();
-	return state->m_counter++;
+	return m_counter++;
 }
 
 /************************************
@@ -645,20 +642,18 @@ static READ8_HANDLER( mschamp_kludge_r )
  ************************************/
 
 
-static WRITE8_HANDLER( bigbucks_bank_w )
+WRITE8_MEMBER(pacman_state::bigbucks_bank_w)
 {
-	pacman_state *state = space->machine().driver_data<pacman_state>();
-	state->m_bigbucks_bank = data;
+	m_bigbucks_bank = data;
 }
 
-static READ8_HANDLER( bigbucks_question_r )
+READ8_MEMBER(pacman_state::bigbucks_question_r)
 {
-	pacman_state *state = space->machine().driver_data<pacman_state>();
 
-	UINT8 *question = space->machine().region("user1")->base();
+	UINT8 *question = memregion("user1")->base();
 	UINT8 ret;
 
-	ret = question[(state->m_bigbucks_bank << 16) | (offset ^ 0xffff)];
+	ret = question[(m_bigbucks_bank << 16) | (offset ^ 0xffff)];
 
 	return ret;
 }
@@ -674,17 +669,17 @@ static INTERRUPT_GEN( s2650_interrupt )
 	device_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
 }
 
-static WRITE8_HANDLER( porky_banking_w )
+WRITE8_MEMBER(pacman_state::porky_banking_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 1);
-	memory_set_bank(space->machine(), "bank2", data & 1);
-	memory_set_bank(space->machine(), "bank3", data & 1);
-	memory_set_bank(space->machine(), "bank4", data & 1);
+	membank("bank1")->set_entry(data & 1);
+	membank("bank2")->set_entry(data & 1);
+	membank("bank3")->set_entry(data & 1);
+	membank("bank4")->set_entry(data & 1);
 }
 
-static READ8_HANDLER( drivfrcp_port1_r )
+READ8_MEMBER(pacman_state::drivfrcp_port1_r)
 {
-	switch (cpu_get_pc(&space->device()))
+	switch (cpu_get_pc(&space.device()))
 	{
 		case 0x0030:
 		case 0x0291:
@@ -694,9 +689,9 @@ static READ8_HANDLER( drivfrcp_port1_r )
 	return 0;
 }
 
-static READ8_HANDLER( _8bpm_port1_r )
+READ8_MEMBER(pacman_state::_8bpm_port1_r)
 {
-	switch (cpu_get_pc(&space->device()))
+	switch (cpu_get_pc(&space.device()))
 	{
 		case 0x0030:
 		case 0x0466:
@@ -706,9 +701,9 @@ static READ8_HANDLER( _8bpm_port1_r )
 	return 0;
 }
 
-static READ8_HANDLER( porky_port1_r )
+READ8_MEMBER(pacman_state::porky_port1_r)
 {
-	switch (cpu_get_pc(&space->device()))
+	switch (cpu_get_pc(&space.device()))
 	{
 		case 0x0034:
 			return 0x01;
@@ -727,52 +722,45 @@ static READ8_HANDLER( porky_port1_r )
  ************************************/
 
 
-static READ8_HANDLER( rocktrv2_prot1_data_r )
+READ8_MEMBER(pacman_state::rocktrv2_prot1_data_r)
 {
-	pacman_state *state = space->machine().driver_data<pacman_state>();
-	return state->m_rocktrv2_prot_data[0] >> 4;
+	return m_rocktrv2_prot_data[0] >> 4;
 }
 
-static READ8_HANDLER( rocktrv2_prot2_data_r )
+READ8_MEMBER(pacman_state::rocktrv2_prot2_data_r)
 {
-	pacman_state *state = space->machine().driver_data<pacman_state>();
-	return state->m_rocktrv2_prot_data[1] >> 4;
+	return m_rocktrv2_prot_data[1] >> 4;
 }
 
-static READ8_HANDLER( rocktrv2_prot3_data_r )
+READ8_MEMBER(pacman_state::rocktrv2_prot3_data_r)
 {
-	pacman_state *state = space->machine().driver_data<pacman_state>();
-	return state->m_rocktrv2_prot_data[2] >> 4;
+	return m_rocktrv2_prot_data[2] >> 4;
 }
 
-static READ8_HANDLER( rocktrv2_prot4_data_r )
+READ8_MEMBER(pacman_state::rocktrv2_prot4_data_r)
 {
-	pacman_state *state = space->machine().driver_data<pacman_state>();
-	return state->m_rocktrv2_prot_data[3] >> 4;
+	return m_rocktrv2_prot_data[3] >> 4;
 }
 
-static WRITE8_HANDLER( rocktrv2_prot_data_w )
+WRITE8_MEMBER(pacman_state::rocktrv2_prot_data_w)
 {
-	pacman_state *state = space->machine().driver_data<pacman_state>();
-	state->m_rocktrv2_prot_data[offset] = data;
+	m_rocktrv2_prot_data[offset] = data;
 }
 
-static WRITE8_HANDLER( rocktrv2_question_bank_w )
+WRITE8_MEMBER(pacman_state::rocktrv2_question_bank_w)
 {
-	pacman_state *state = space->machine().driver_data<pacman_state>();
-	state->m_rocktrv2_question_bank = data;
+	m_rocktrv2_question_bank = data;
 }
 
-static READ8_HANDLER( rocktrv2_question_r )
+READ8_MEMBER(pacman_state::rocktrv2_question_r)
 {
-	pacman_state *state = space->machine().driver_data<pacman_state>();
-	UINT8 *question = space->machine().region("user1")->base();
+	UINT8 *question = memregion("user1")->base();
 
-	return question[offset | (state->m_rocktrv2_question_bank * 0x8000)];
+	return question[offset | (m_rocktrv2_question_bank * 0x8000)];
 }
 
 
-static READ8_HANDLER( pacman_read_nop )
+READ8_MEMBER(pacman_state::pacman_read_nop)
 {
 	// Return value of reading the bus with no devices enabled.
 	// This seems to be common but more tests are needed. Ms Pacman reads bytes in sequence
@@ -851,22 +839,22 @@ static READ8_HANDLER( pacman_read_nop )
   vias required to lay out the aux PCB.
 */
 
-#define mspacman_enable_decode_latch(m)  memory_set_bank(m, "bank1", 1)
-#define mspacman_disable_decode_latch(m) memory_set_bank(m, "bank1", 0)
+#define mspacman_enable_decode_latch(m)  m.root_device().membank("bank1")->set_entry(1)
+#define mspacman_disable_decode_latch(m) m.root_device().membank("bank1")->set_entry(0)
 
 // any access to these ROM addresses disables the decoder, and all you see is the original Pac-Man code
-static READ8_HANDLER(  mspacman_disable_decode_r_0x0038 ) { mspacman_disable_decode_latch(space->machine()); return space->machine().region("maincpu")->base()[offset+0x0038]; }
-static READ8_HANDLER(  mspacman_disable_decode_r_0x03b0 ) { mspacman_disable_decode_latch(space->machine()); return space->machine().region("maincpu")->base()[offset+0x03b0]; }
-static READ8_HANDLER(  mspacman_disable_decode_r_0x1600 ) { mspacman_disable_decode_latch(space->machine()); return space->machine().region("maincpu")->base()[offset+0x1600]; }
-static READ8_HANDLER(  mspacman_disable_decode_r_0x2120 ) { mspacman_disable_decode_latch(space->machine()); return space->machine().region("maincpu")->base()[offset+0x2120]; }
-static READ8_HANDLER(  mspacman_disable_decode_r_0x3ff0 ) { mspacman_disable_decode_latch(space->machine()); return space->machine().region("maincpu")->base()[offset+0x3ff0]; }
-static READ8_HANDLER(  mspacman_disable_decode_r_0x8000 ) { mspacman_disable_decode_latch(space->machine()); return space->machine().region("maincpu")->base()[offset+0x8000]; }
-static READ8_HANDLER(  mspacman_disable_decode_r_0x97f0 ) { mspacman_disable_decode_latch(space->machine()); return space->machine().region("maincpu")->base()[offset+0x97f0]; }
-static WRITE8_HANDLER( mspacman_disable_decode_w )        { mspacman_disable_decode_latch(space->machine()); }
+READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x0038){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x0038]; }
+READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x03b0){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x03b0]; }
+READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x1600){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x1600]; }
+READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x2120){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x2120]; }
+READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x3ff0){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x3ff0]; }
+READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x8000){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x8000]; }
+READ8_MEMBER(pacman_state::mspacman_disable_decode_r_0x97f0){ mspacman_disable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x97f0]; }
+WRITE8_MEMBER(pacman_state::mspacman_disable_decode_w){ mspacman_disable_decode_latch(machine()); }
 
 // any access to these ROM addresses enables the decoder, and you'll see the Ms. Pac-Man code
-static READ8_HANDLER(  mspacman_enable_decode_r_0x3ff8 )  { mspacman_enable_decode_latch(space->machine()); return space->machine().region("maincpu")->base()[offset+0x3ff8+0x10000]; }
-static WRITE8_HANDLER( mspacman_enable_decode_w )         { mspacman_enable_decode_latch(space->machine()); }
+READ8_MEMBER(pacman_state::mspacman_enable_decode_r_0x3ff8){ mspacman_enable_decode_latch(machine()); return memregion("maincpu")->base()[offset+0x3ff8+0x10000]; }
+WRITE8_MEMBER(pacman_state::mspacman_enable_decode_w){ mspacman_enable_decode_latch(machine()); }
 
 
 
@@ -876,29 +864,28 @@ static WRITE8_HANDLER( mspacman_enable_decode_w )         { mspacman_enable_deco
  *
  *************************************/
 
-static WRITE8_HANDLER( irq_mask_w )
+WRITE8_MEMBER(pacman_state::irq_mask_w)
 {
-	pacman_state *state = space->machine().driver_data<pacman_state>();
 
-	state->m_irq_mask = data & 1;
+	m_irq_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( pacman_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pacman_map, AS_PROGRAM, 8, pacman_state )
 	//A lot of games don't have an a15 at the cpu.  Generally only games with a cpu daughter board can access the full 32k of romspace.
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READ(pacman_read_nop) AM_WRITENOP
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_leds_w)
 	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", pacman_sound_w)
+	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
 	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
@@ -911,21 +898,21 @@ ADDRESS_MAP_END
 // The Pacman code uses $5004 and $5005 for LED's and $5007 for coin lockout.  This hardware does not
 // exist on any Pacman or Puckman board I have seen.  DW
 
-static ADDRESS_MAP_START( birdiy_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( birdiy_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
 //  AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READ(pacman_read_nop) AM_WRITENOP
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
-//  AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", pacman_sound_enable_w)
+//  AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
 //  AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 //  AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_leds_w)
 //  AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x5080, 0x509f) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", pacman_sound_w)
+	AM_RANGE(0x5080, 0x509f) AM_MIRROR(0xaf00) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
 	AM_RANGE(0x50a0, 0x50af) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2")
 //  AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
 //  AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
@@ -936,20 +923,20 @@ static ADDRESS_MAP_START( birdiy_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_READ_PORT("DSW2")		/* DSW2 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mspacman_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
+static ADDRESS_MAP_START( mspacman_map, AS_PROGRAM, 8, pacman_state )
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READ(pacman_read_nop) AM_WRITENOP
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_leds_w)
 	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", pacman_sound_w)
+	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
 	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
@@ -975,21 +962,21 @@ static ADDRESS_MAP_START( mspacman_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( woodpek_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( woodpek_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READ(pacman_read_nop) AM_WRITENOP
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_leds_w)
 	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", pacman_sound_w)
+	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
 	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
@@ -1002,10 +989,10 @@ static ADDRESS_MAP_START( woodpek_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( alibaba_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( alibaba_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READ(pacman_read_nop) AM_WRITENOP
 	AM_RANGE(0x4c00, 0x4eef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ef0, 0x4eff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
@@ -1018,7 +1005,7 @@ static ADDRESS_MAP_START( alibaba_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2") /* actually at 5050-505f, here to point to free RAM */
 	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
-	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", pacman_sound_enable_w)
+	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf00) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
 	AM_RANGE(0x50c1, 0x50c1) AM_MIRROR(0xaf00) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x50c2, 0x50c2) AM_MIRROR(0xaf00) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x50c3, 0x50ff) AM_MIRROR(0xaf00) AM_WRITENOP
@@ -1034,20 +1021,20 @@ static ADDRESS_MAP_START( alibaba_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dremshpr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dremshpr_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x4800, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
-//  AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", pacman_sound_enable_w)
+//  AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP /* unknown */
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_leds_w)
 	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
-//  AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", pacman_sound_w)
+//  AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
 	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
@@ -1064,21 +1051,21 @@ static ADDRESS_MAP_START( dremshpr_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( epos_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( epos_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READ(pacman_read_nop) AM_WRITENOP
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_leds_w)
 	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", pacman_sound_w)
+	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
 	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
@@ -1090,13 +1077,13 @@ static ADDRESS_MAP_START( epos_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( s2650games_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( s2650games_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x0fff) AM_MIRROR(0x8000) AM_ROMBANK("bank1")
-	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0xe000) AM_WRITE(s2650games_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
+	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0xe000) AM_WRITE(s2650games_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x1400, 0x141f) AM_MIRROR(0xe000) AM_WRITE(s2650games_scroll_w)
 	AM_RANGE(0x1420, 0x148f) AM_MIRROR(0xe000) AM_WRITEONLY
 	AM_RANGE(0x1490, 0x149f) AM_MIRROR(0xe000) AM_WRITEONLY AM_SHARE("s2650_spriteram")
-	AM_RANGE(0x14a0, 0x14bf) AM_MIRROR(0xe000) AM_WRITE(s2650games_tilesbank_w) AM_BASE_MEMBER(pacman_state, m_s2650games_tileram)
+	AM_RANGE(0x14a0, 0x14bf) AM_MIRROR(0xe000) AM_WRITE(s2650games_tilesbank_w) AM_SHARE("s2650_tileram")
 	AM_RANGE(0x14c0, 0x14ff) AM_MIRROR(0xe000) AM_WRITEONLY
 	AM_RANGE(0x1500, 0x1502) AM_MIRROR(0xe000) AM_WRITENOP
 	AM_RANGE(0x1503, 0x1503) AM_MIRROR(0xe000) AM_WRITE(pacman_flipscreen_w)
@@ -1111,7 +1098,7 @@ static ADDRESS_MAP_START( s2650games_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0xe000) AM_READ_PORT("IN0")
 	AM_RANGE(0x1540, 0x1540) AM_MIRROR(0xe000) AM_READ_PORT("IN1")
 	AM_RANGE(0x1580, 0x1580) AM_MIRROR(0xe000) AM_READ_PORT("DSW0")
-	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0xe000) AM_WRITE(s2650games_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0xe000) AM_WRITE(s2650games_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1c00, 0x1fef) AM_MIRROR(0xe000) AM_RAM
 	AM_RANGE(0x1ff0, 0x1fff) AM_MIRROR(0xe000) AM_WRITEONLY AM_SHARE("spriteram")
 	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0x8000) AM_ROMBANK("bank2")
@@ -1120,18 +1107,18 @@ static ADDRESS_MAP_START( s2650games_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rocktrv2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rocktrv2_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x4c00, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_DEVWRITE("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
 	AM_RANGE(0x5003, 0x5003) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5007, 0x5007) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x5040, 0x505f) AM_DEVWRITE("namco", pacman_sound_w)
+	AM_RANGE(0x5040, 0x505f) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
 	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x5fe0, 0x5fe3) AM_WRITE(rocktrv2_prot_data_w) AM_BASE_MEMBER(pacman_state, m_rocktrv2_prot_data)
+	AM_RANGE(0x5fe0, 0x5fe3) AM_WRITE(rocktrv2_prot_data_w) AM_SHARE("rocktrv2_prot")
 	AM_RANGE(0x5ff0, 0x5ff0) AM_WRITE(rocktrv2_question_bank_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0")		/* IN0 */
 	AM_RANGE(0x5040, 0x507f) AM_READ_PORT("IN1")		/* IN1 */
@@ -1147,16 +1134,16 @@ static ADDRESS_MAP_START( rocktrv2_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bigbucks_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bigbucks_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4400, 0x47ff) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x4c00, 0x4fff) AM_RAM
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_DEVWRITE("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
 	AM_RANGE(0x5003, 0x5003) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5007, 0x5007) AM_WRITENOP /*?*/
-	AM_RANGE(0x5040, 0x505f) AM_DEVWRITE("namco", pacman_sound_w)
+	AM_RANGE(0x5040, 0x505f) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
 	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("IN0")		/* IN0 */
 	AM_RANGE(0x5040, 0x507f) AM_READ_PORT("IN1")		/* IN1 */
@@ -1168,21 +1155,21 @@ static ADDRESS_MAP_START( bigbucks_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mschamp_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mschamp_map, AS_PROGRAM, 8, pacman_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READ(pacman_read_nop) AM_WRITENOP
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_leds_w)
 	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
-	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE("namco", pacman_sound_w)
+	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_DEVWRITE_LEGACY("namco", pacman_sound_w)
 	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITEONLY AM_SHARE("spriteram2")
 	AM_RANGE(0x5070, 0x507f) AM_MIRROR(0xaf00) AM_WRITENOP
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_WRITENOP
@@ -1194,16 +1181,16 @@ static ADDRESS_MAP_START( mschamp_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crushs_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( crushs_map, AS_PROGRAM, 8, pacman_state )
 	//A lot of games don't have an a15 at the cpu.  Generally only games with a cpu daughter board can access the full 32k of romspace.
 	AM_RANGE(0x0000, 0x3fff) AM_MIRROR(0x8000) AM_ROM
-	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_BASE_MEMBER(pacman_state, m_videoram)
-	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_BASE_MEMBER(pacman_state, m_colorram)
+	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_RAM_WRITE(pacman_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READ(pacman_read_nop) AM_WRITENOP
 	AM_RANGE(0x4c00, 0x4fef) AM_MIRROR(0xa000) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_MIRROR(0xa000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xaf38) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE("namco", pacman_sound_enable_w)
+	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xaf38) AM_DEVWRITE_LEGACY("namco", pacman_sound_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITENOP
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITENOP // AM_WRITE(pacman_leds_w)
@@ -1226,63 +1213,63 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( writeport, AS_IO, 8 )
+static ADDRESS_MAP_START( writeport, AS_IO, 8, pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pacman_interrupt_vector_w)	/* Pac-Man only */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vanvan_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( vanvan_portmap, AS_IO, 8, pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE("namco", sn76496_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("sn2", sn76496_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE_LEGACY("namco", sn76496_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dremshpr_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( dremshpr_portmap, AS_IO, 8, pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x06, 0x07) AM_DEVWRITE("namco", ay8910_data_address_w)
+	AM_RANGE(0x06, 0x07) AM_DEVWRITE_LEGACY("namco", ay8910_data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( piranha_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( piranha_portmap, AS_IO, 8, pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(piranha_interrupt_vector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nmouse_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( nmouse_portmap, AS_IO, 8, pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(nmouse_interrupt_vector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( theglobp_portmap, AS_IO, 8 )
-	AM_RANGE(0x00, 0xff) AM_READ(theglobp_decrypt_rom)	/* Switch protection logic */
+static ADDRESS_MAP_START( theglobp_portmap, AS_IO, 8, pacman_state )
+	AM_RANGE(0x00, 0xff) AM_READ_LEGACY(theglobp_decrypt_rom)	/* Switch protection logic */
 	AM_IMPORT_FROM(writeport)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( acitya_portmap, AS_IO, 8 )
-	AM_RANGE(0x00, 0xff) AM_READ(acitya_decrypt_rom) /* Switch protection logic */
+static ADDRESS_MAP_START( acitya_portmap, AS_IO, 8, pacman_state )
+	AM_RANGE(0x00, 0xff) AM_READ_LEGACY(acitya_decrypt_rom) /* Switch protection logic */
 	AM_IMPORT_FROM(writeport)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mschamp_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( mschamp_portmap, AS_IO, 8, pacman_state )
 	AM_RANGE(0x00, 0x00) AM_READ(mschamp_kludge_r)
 	AM_IMPORT_FROM(writeport)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bigbucks_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( bigbucks_portmap, AS_IO, 8, pacman_state )
 	AM_RANGE(0x0000, 0xffff) AM_READ(bigbucks_question_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s2650games_writeport, AS_IO, 8 )
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_DEVWRITE("namco", sn76496_w)
+static ADDRESS_MAP_START( s2650games_writeport, AS_IO, 8, pacman_state )
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_DEVWRITE_LEGACY("namco", sn76496_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( drivfrcp_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( drivfrcp_portmap, AS_IO, 8, pacman_state )
 	AM_RANGE(0x00, 0x00) AM_READNOP
 	AM_RANGE(0x01, 0x01) AM_READ(drivfrcp_port1_r)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("Sense")
 	AM_IMPORT_FROM(s2650games_writeport)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( _8bpm_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( _8bpm_portmap, AS_IO, 8, pacman_state )
 	AM_RANGE(0x00, 0x00) AM_READNOP
 	AM_RANGE(0x01, 0x01) AM_READ(_8bpm_port1_r)
 	AM_RANGE(0xe0, 0xe0) AM_READNOP
@@ -1290,15 +1277,15 @@ static ADDRESS_MAP_START( _8bpm_portmap, AS_IO, 8 )
 	AM_IMPORT_FROM(s2650games_writeport)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( porky_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( porky_portmap, AS_IO, 8, pacman_state )
 	AM_RANGE(0x01, 0x01) AM_READ(porky_port1_r)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("Sense")
 	AM_IMPORT_FROM(s2650games_writeport)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crushs_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( crushs_portmap, AS_IO, 8, pacman_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("namco", ay8910_data_address_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("namco", ay8910_data_address_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW1")
 ADDRESS_MAP_END
@@ -2819,7 +2806,7 @@ static INPUT_PORTS_START( drivfrcp )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("Sense")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
@@ -2871,7 +2858,7 @@ static INPUT_PORTS_START( 8bpm )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("Sense")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
@@ -2923,7 +2910,7 @@ static INPUT_PORTS_START( porky )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("Sense")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
@@ -5479,7 +5466,7 @@ static void maketrax_rom_decode(running_machine &machine)
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
@@ -5501,8 +5488,9 @@ static void maketrax_rom_decode(running_machine &machine)
 static DRIVER_INIT( maketrax )
 {
 	/* set up protection handlers */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x5080, 0x50bf, FUNC(maketrax_special_port2_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x50c0, 0x50ff, FUNC(maketrax_special_port3_r));
+	pacman_state *state = machine.driver_data<pacman_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x5080, 0x50bf, read8_delegate(FUNC(pacman_state::maketrax_special_port2_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x50c0, 0x50ff, read8_delegate(FUNC(pacman_state::maketrax_special_port3_r),state));
 
 	maketrax_rom_decode(machine);
 }
@@ -5511,7 +5499,7 @@ static void korosuke_rom_decode(running_machine &machine)
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
@@ -5533,8 +5521,9 @@ static void korosuke_rom_decode(running_machine &machine)
 static DRIVER_INIT( korosuke )
 {
 	/* set up protection handlers */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x5080, 0x5080, FUNC(korosuke_special_port2_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x50c0, 0x50ff, FUNC(korosuke_special_port3_r));
+	pacman_state *state = machine.driver_data<pacman_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x5080, 0x5080, read8_delegate(FUNC(pacman_state::korosuke_special_port2_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x50c0, 0x50ff, read8_delegate(FUNC(pacman_state::korosuke_special_port3_r),state));
 
 	korosuke_rom_decode(machine);
 }
@@ -5546,10 +5535,10 @@ static DRIVER_INIT( ponpoko )
 
 	int i, j;
 	UINT8 *RAM, temp;
-	int length = machine.region("gfx1")->bytes()/2;
+	int length = machine.root_device().memregion("gfx1")->bytes()/2;
 
 	/* Characters */
-	RAM = machine.region("gfx1")->base();
+	RAM = machine.root_device().memregion("gfx1")->base();
 	for (i = 0;i < length;i += 0x10)
 	{
 		for (j = 0; j < 8; j++)
@@ -5561,7 +5550,7 @@ static DRIVER_INIT( ponpoko )
 	}
 
 	/* Sprites */
-	RAM = machine.region("gfx1")->base()+length;
+	RAM = machine.root_device().memregion("gfx1")->base()+length;
 	for (i = 0;i < length;i += 0x20)
 	{
 		for (j = 0; j < 8; j++)
@@ -5599,7 +5588,7 @@ static DRIVER_INIT( eyes )
 	/* CPU ROMs */
 
 	/* Data lines D3 and D5 swapped */
-	RAM = machine.region("maincpu")->base();
+	RAM = machine.root_device().memregion("maincpu")->base();
 	for (i = 0; i < 0x4000; i++)
 	{
 		RAM[i] = BITSWAP8(RAM[i],7,6,3,4,5,2,1,0);
@@ -5609,8 +5598,8 @@ static DRIVER_INIT( eyes )
 	/* Graphics ROMs */
 
 	/* Data lines D4 and D6 and address lines A0 and A2 are swapped */
-	RAM = machine.region("gfx1")->base();
-	len = machine.region("gfx1")->bytes();
+	RAM = machine.root_device().memregion("gfx1")->base();
+	len = machine.root_device().memregion("gfx1")->bytes();
 	for (i = 0;i < len;i += 8)
 		eyes_decode(&RAM[i]);
 }
@@ -5683,10 +5672,10 @@ static DRIVER_INIT( mspacman )
 	/* CPU ROMs */
 
 	/* Pac-Man code is in low bank */
-	ROM = machine.region("maincpu")->base();
+	ROM = machine.root_device().memregion("maincpu")->base();
 
 	/* decrypted Ms. Pac-Man code is in high bank */
-	DROM = &machine.region("maincpu")->base()[0x10000];
+	DROM = &machine.root_device().memregion("maincpu")->base()[0x10000];
 
 	/* copy ROMs into decrypted bank */
 	for (i = 0; i < 0x1000; i++)
@@ -5721,8 +5710,8 @@ static DRIVER_INIT( mspacman )
 	}
 
 	/* initialize the banks */
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x00000], 0x10000);
-	memory_set_bank(machine, "bank1", 1);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, &ROM[0x00000], 0x10000);
+	machine.root_device().membank("bank1")->set_entry(1);
 }
 
 static DRIVER_INIT( woodpek )
@@ -5733,8 +5722,8 @@ static DRIVER_INIT( woodpek )
 	/* Graphics ROMs */
 
 	/* Data lines D4 and D6 and address lines A0 and A2 are swapped */
-	RAM = machine.region("gfx1")->base();
-	len = machine.region("gfx1")->bytes();
+	RAM = machine.root_device().memregion("gfx1")->base();
+	len = machine.root_device().memregion("gfx1")->bytes();
 	for (i = 0;i < len;i += 8)
 		eyes_decode(&RAM[i]);
 }
@@ -5751,16 +5740,16 @@ static DRIVER_INIT( jumpshot )
 
 static DRIVER_INIT( drivfrcp )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
-	memory_set_bankptr(machine, "bank1", &ROM[0 * 0x2000]);
-	memory_set_bankptr(machine, "bank2", &ROM[1 * 0x2000]);
-	memory_set_bankptr(machine, "bank3", &ROM[2 * 0x2000]);
-	memory_set_bankptr(machine, "bank4", &ROM[3 * 0x2000]);
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+	machine.root_device().membank("bank1")->set_base(&ROM[0 * 0x2000]);
+	machine.root_device().membank("bank2")->set_base(&ROM[1 * 0x2000]);
+	machine.root_device().membank("bank3")->set_base(&ROM[2 * 0x2000]);
+	machine.root_device().membank("bank4")->set_base(&ROM[3 * 0x2000]);
 }
 
 static DRIVER_INIT( 8bpm )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	/* Data lines D0 and D6 swapped */
@@ -5769,15 +5758,15 @@ static DRIVER_INIT( 8bpm )
 		ROM[i] = BITSWAP8(ROM[i],7,0,5,4,3,2,1,6);
 	}
 
-	memory_set_bankptr(machine, "bank1", &ROM[0 * 0x2000]);
-	memory_set_bankptr(machine, "bank2", &ROM[1 * 0x2000]);
-	memory_set_bankptr(machine, "bank3", &ROM[2 * 0x2000]);
-	memory_set_bankptr(machine, "bank4", &ROM[3 * 0x2000]);
+	machine.root_device().membank("bank1")->set_base(&ROM[0 * 0x2000]);
+	machine.root_device().membank("bank2")->set_base(&ROM[1 * 0x2000]);
+	machine.root_device().membank("bank3")->set_base(&ROM[2 * 0x2000]);
+	machine.root_device().membank("bank4")->set_base(&ROM[3 * 0x2000]);
 }
 
 static DRIVER_INIT( porky )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	/* Data lines D0 and D4 swapped */
@@ -5786,21 +5775,21 @@ static DRIVER_INIT( porky )
 		ROM[i] = BITSWAP8(ROM[i],7,6,5,0,3,2,1,4);
 	}
 
-	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0 * 0x2000], 0x8000);
-	memory_configure_bank(machine, "bank2", 0, 2, &ROM[1 * 0x2000], 0x8000);
-	memory_configure_bank(machine, "bank3", 0, 2, &ROM[2 * 0x2000], 0x8000);
-	memory_configure_bank(machine, "bank4", 0, 2, &ROM[3 * 0x2000], 0x8000);
+	machine.root_device().membank("bank1")->configure_entries(0, 2, &ROM[0 * 0x2000], 0x8000);
+	machine.root_device().membank("bank2")->configure_entries(0, 2, &ROM[1 * 0x2000], 0x8000);
+	machine.root_device().membank("bank3")->configure_entries(0, 2, &ROM[2 * 0x2000], 0x8000);
+	machine.root_device().membank("bank4")->configure_entries(0, 2, &ROM[3 * 0x2000], 0x8000);
 
-	memory_set_bank(machine, "bank1", 0);
-	memory_set_bank(machine, "bank2", 0);
-	memory_set_bank(machine, "bank3", 0);
-	memory_set_bank(machine, "bank4", 0);
+	machine.root_device().membank("bank1")->set_entry(0);
+	machine.root_device().membank("bank2")->set_entry(0);
+	machine.root_device().membank("bank3")->set_entry(0);
+	machine.root_device().membank("bank4")->set_entry(0);
 }
 
 static DRIVER_INIT( rocktrv2 )
 {
 	/* hack to pass the rom check for the bad rom */
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0x7ffe] = 0xa7;
 	ROM[0x7fee] = 0x6d;
@@ -5812,7 +5801,7 @@ socket and run through the 74298.  Clock is tied to system clock.  */
 static DRIVER_INIT( mspacmbe )
 {
 	UINT8 temp;
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	/* Address lines A1 and A0 swapped if A2=0 */
@@ -5827,16 +5816,15 @@ static DRIVER_INIT( mspacmbe )
 	}
 }
 
-static READ8_HANDLER( cannonbp_protection_r )
+READ8_MEMBER(pacman_state::cannonbp_protection_r)
 {
-	pacman_state *state = space->machine().driver_data<pacman_state>();
 
 	/* At 6p where a rom would usually be there is an epoxy resin chip with 'Novomatic Industrie' Cannon Ball tm 1984 label. */
 	/* As I have no clue about what shall be in this chip, what follows is only a simulation which is enough to play the game. */
 	switch (offset)
 	{
 		default:
-			logerror("CPU0 %04x: Unhandled protection read, offset %04x\n", cpu_get_pc(&space->device()), offset);
+			logerror("CPU0 %04x: Unhandled protection read, offset %04x\n", cpu_get_pc(&space.device()), offset);
 			return 0x00;
 
 		case 0x0000: // unknown
@@ -5856,11 +5844,11 @@ static READ8_HANDLER( cannonbp_protection_r )
                  2BA3: 00            nop
         */
 		case 0x0004:
-			state->m_cannonb_bit_to_read = 7;
+			m_cannonb_bit_to_read = 7;
 			return 0x00;
 		case 0x0001: // affects the ball hitting the blocks as well as jump address after bonus round
-			if (cpu_get_pc(&space->device()) == 0x2b97)
-				return (BIT(0x46, state->m_cannonb_bit_to_read--) << 7);
+			if (cpu_get_pc(&space.device()) == 0x2b97)
+				return (BIT(0x46, m_cannonb_bit_to_read--) << 7);
 			else
 				return 0xff;            /* value taken from the bootlegs */
 
@@ -5879,7 +5867,8 @@ static DRIVER_INIT( cannonbp )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_ram(0x4800, 0x4bff);
 
 	/* protection? */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3000, 0x3fff, FUNC(cannonbp_protection_r));
+	pacman_state *state = machine.driver_data<pacman_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3000, 0x3fff, read8_delegate(FUNC(pacman_state::cannonbp_protection_r),state));
 }
 
 
@@ -5941,8 +5930,8 @@ GAME( 1981, piranhao, puckman,  piranha,  mspacman, eyes,     ROT90,  "GL (US Bi
 GAME( 1981, abscam,   puckman,  piranha,  mspacman, eyes,     ROT90,  "GL (US Billiards license)", "Abscam", GAME_SUPPORTS_SAVE )
 GAME( 1981, nmouse,   0	     ,  nmouse ,  nmouse,   eyes,     ROT90,  "Amenip (Palcom Queen River)", "Naughty Mouse (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, nmouseb,  nmouse ,  nmouse ,  nmouse,   eyes,     ROT90,  "Amenip Nova Games Ltd.", "Naughty Mouse (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, mspacman, 0,        mspacman, mspacman, mspacman, ROT90,  "Midway", "Ms. Pac-Man", GAME_SUPPORTS_SAVE )
-GAME( 1981, mspacmnf, mspacman, mspacman, mspacman, mspacman, ROT90,  "Midway", "Ms. Pac-Man (with speedup hack)", GAME_SUPPORTS_SAVE )
+GAME( 1981, mspacman, 0,        mspacman, mspacman, mspacman, ROT90,  "Midway / General Computer Corporation", "Ms. Pac-Man", GAME_SUPPORTS_SAVE )
+GAME( 1981, mspacmnf, mspacman, mspacman, mspacman, mspacman, ROT90,  "Midway / General Computer Corporation", "Ms. Pac-Man (with speedup hack)", GAME_SUPPORTS_SAVE )
 GAME( 1981, mspacmat, mspacman, mspacman, mspacman, mspacman, ROT90,  "hack", "Ms. Pac Attack", GAME_SUPPORTS_SAVE )
 GAME( 1981, woodpeck, 0,        woodpek,  woodpek,  woodpek,  ROT90,  "Amenip (Palcom Queen River)", "Woodpecker (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, woodpeca, woodpeck, woodpek,  woodpek,  woodpek,  ROT90,  "Amenip", "Woodpecker (set 2)", GAME_SUPPORTS_SAVE )

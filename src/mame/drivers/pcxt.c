@@ -91,6 +91,17 @@ public:
 	device_t	*m_pic8259_2;
 	device_t	*m_dma8237_1;
 	device_t	*m_dma8237_2;
+	DECLARE_READ8_MEMBER(disk_iobank_r);
+	DECLARE_WRITE8_MEMBER(disk_iobank_w);
+	DECLARE_READ8_MEMBER(fdc765_status_r);
+	DECLARE_READ8_MEMBER(fdc765_data_r);
+	DECLARE_WRITE8_MEMBER(fdc765_data_w);
+	DECLARE_WRITE8_MEMBER(drive_selection_w);
+	DECLARE_READ8_MEMBER(pc_dma_read_byte);
+	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
+	DECLARE_READ8_MEMBER(dma_page_select_r);
+	DECLARE_WRITE8_MEMBER(dma_page_select_w);
+	DECLARE_WRITE8_MEMBER(tetriskr_bg_bank_w);
 };
 
 static SCREEN_UPDATE_RGB32( tetriskr )
@@ -98,7 +109,7 @@ static SCREEN_UPDATE_RGB32( tetriskr )
 	pcxt_state *state = screen.machine().driver_data<pcxt_state>();
 	int x,y;
 	int yi;
-	const UINT8 *bg_rom = screen.machine().region("gfx2")->base();
+	const UINT8 *bg_rom = state->memregion("gfx2")->base();
 
 	//popmessage("%04x",m_start_offs);
 
@@ -132,19 +143,17 @@ static SCREEN_UPDATE_RGB32( tetriskr )
 }
 
 
-static READ8_HANDLER( disk_iobank_r )
+READ8_MEMBER(pcxt_state::disk_iobank_r)
 {
-	pcxt_state *state = space->machine().driver_data<pcxt_state>();
-	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,cpu_get_pc(&space->device()));
-	//if(offset == 0) return input_port_read(space->machine(), "DSW");
-	if(offset == 1) return input_port_read(space->machine(), "IN1");
+	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,cpu_get_pc(&space.device()));
+	//if(offset == 0) return ioport("DSW")->read();
+	if(offset == 1) return ioport("IN1")->read();
 
-	return state->m_disk_data[offset];
+	return m_disk_data[offset];
 }
 
-static WRITE8_HANDLER( disk_iobank_w )
+WRITE8_MEMBER(pcxt_state::disk_iobank_w)
 {
-	pcxt_state *state = space->machine().driver_data<pcxt_state>();
 /*
     BIOS does a single out $0310,$F0 on reset
 
@@ -175,27 +184,27 @@ static WRITE8_HANDLER( disk_iobank_w )
 	}
 	else
 	{
-		if((state->m_lastvalue == 0xF0) && (data == 0xF2))
+		if((m_lastvalue == 0xF0) && (data == 0xF2))
 			newbank = 0;
-		else if ((state->m_lastvalue == 0xF1) && (data == 0xF2))
+		else if ((m_lastvalue == 0xF1) && (data == 0xF2))
 			newbank = 1;
-		else if ((state->m_lastvalue == 0xF0) && (data == 0xF3))
+		else if ((m_lastvalue == 0xF0) && (data == 0xF3))
 			newbank = 2;
-		else if ((state->m_lastvalue == 0xF1) && (data == 0xF3))
+		else if ((m_lastvalue == 0xF1) && (data == 0xF3))
 			newbank = 3;
 	}
 
 //  printf("newbank = %d\n", newbank);
 
-	if (newbank != state->m_bank)
+	if (newbank != m_bank)
 	{
-		state->m_bank = newbank;
-		memory_set_bankptr(space->machine(),  "bank1",space->machine().region("game_prg")->base() + 0x10000 * state->m_bank );
+		m_bank = newbank;
+		membank("bank1")->set_base(machine().root_device().memregion("game_prg")->base() + 0x10000 * m_bank );
 	}
 
-	state->m_lastvalue = data;
+	m_lastvalue = data;
 
-	state->m_disk_data[offset] = data;
+	m_disk_data[offset] = data;
 }
 
 /*********************************
@@ -359,41 +368,37 @@ static const ppi8255_interface filetto_ppi8255_intf[2] =
 #define FDC_WRITE 0x40
 #define FDC_READ 0x00 /*~0x40*/
 
-static READ8_HANDLER( fdc765_status_r )
+READ8_MEMBER(pcxt_state::fdc765_status_r)
 {
-	pcxt_state *state = space->machine().driver_data<pcxt_state>();
 	UINT8 tmp;
-//  popmessage("Read FDC status @ PC=%05x",cpu_get_pc(&space->device()));
-	tmp = state->m_status | 0x80;
-	state->m_clr_status++;
-	if(state->m_clr_status == 0x10)
+//  popmessage("Read FDC status @ PC=%05x",cpu_get_pc(&space.device()));
+	tmp = m_status | 0x80;
+	m_clr_status++;
+	if(m_clr_status == 0x10)
 	{
-		state->m_status = 0;
-		state->m_clr_status = 0;
+		m_status = 0;
+		m_clr_status = 0;
 	}
 	return tmp;
 }
 
-static READ8_HANDLER( fdc765_data_r )
+READ8_MEMBER(pcxt_state::fdc765_data_r)
 {
-	pcxt_state *state = space->machine().driver_data<pcxt_state>();
-	state->m_status = (FDC_READ);
+	m_status = (FDC_READ);
 	return 0xc0;
 }
 
-static WRITE8_HANDLER( fdc765_data_w )
+WRITE8_MEMBER(pcxt_state::fdc765_data_w)
 {
-	pcxt_state *state = space->machine().driver_data<pcxt_state>();
-	state->m_status = (FDC_WRITE);
+	m_status = (FDC_WRITE);
 }
 
 
-static WRITE8_HANDLER( drive_selection_w )
+WRITE8_MEMBER(pcxt_state::drive_selection_w)
 {
-//  pcxt_state *state = space->machine().driver_data<pcxt_state>();
 
 	/* TODO: properly hook-up upd765 FDC there */
-	pic8259_ir6_w(space->machine().device("pic8259_1"), 1);
+	pic8259_ir6_w(machine().device("pic8259_1"), 1);
 }
 
 /******************
@@ -410,65 +415,61 @@ static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 }
 
 
-static READ8_HANDLER( pc_dma_read_byte )
+READ8_MEMBER(pcxt_state::pc_dma_read_byte)
 {
-	pcxt_state *state = space->machine().driver_data<pcxt_state>();
-	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0xFF0000;
 
-	return space->read_byte(page_offset + offset);
+	return space.read_byte(page_offset + offset);
 }
 
 
-static WRITE8_HANDLER( pc_dma_write_byte )
+WRITE8_MEMBER(pcxt_state::pc_dma_write_byte)
 {
-	pcxt_state *state = space->machine().driver_data<pcxt_state>();
-	offs_t page_offset = (((offs_t) state->m_dma_offset[0][state->m_dma_channel]) << 16)
+	offs_t page_offset = (((offs_t) m_dma_offset[0][m_dma_channel]) << 16)
 		& 0xFF0000;
 
-	space->write_byte(page_offset + offset, data);
+	space.write_byte(page_offset + offset, data);
 }
 
-static READ8_HANDLER(dma_page_select_r)
+READ8_MEMBER(pcxt_state::dma_page_select_r)
 {
-	pcxt_state *state = space->machine().driver_data<pcxt_state>();
-	UINT8 data = state->m_at_pages[offset % 0x10];
+	UINT8 data = m_at_pages[offset % 0x10];
 
 	switch(offset % 8) {
 	case 1:
-		data = state->m_dma_offset[(offset / 8) & 1][2];
+		data = m_dma_offset[(offset / 8) & 1][2];
 		break;
 	case 2:
-		data = state->m_dma_offset[(offset / 8) & 1][3];
+		data = m_dma_offset[(offset / 8) & 1][3];
 		break;
 	case 3:
-		data = state->m_dma_offset[(offset / 8) & 1][1];
+		data = m_dma_offset[(offset / 8) & 1][1];
 		break;
 	case 7:
-		data = state->m_dma_offset[(offset / 8) & 1][0];
+		data = m_dma_offset[(offset / 8) & 1][0];
 		break;
 	}
 	return data;
 }
 
 
-static WRITE8_HANDLER(dma_page_select_w)
+WRITE8_MEMBER(pcxt_state::dma_page_select_w)
 {
-	pcxt_state *state = space->machine().driver_data<pcxt_state>();
-	state->m_at_pages[offset % 0x10] = data;
+	m_at_pages[offset % 0x10] = data;
 
 	switch(offset % 8) {
 	case 1:
-		state->m_dma_offset[(offset / 8) & 1][2] = data;
+		m_dma_offset[(offset / 8) & 1][2] = data;
 		break;
 	case 2:
-		state->m_dma_offset[(offset / 8) & 1][3] = data;
+		m_dma_offset[(offset / 8) & 1][3] = data;
 		break;
 	case 3:
-		state->m_dma_offset[(offset / 8) & 1][1] = data;
+		m_dma_offset[(offset / 8) & 1][1] = data;
 		break;
 	case 7:
-		state->m_dma_offset[(offset / 8) & 1][0] = data;
+		m_dma_offset[(offset / 8) & 1][0] = data;
 		break;
 	}
 }
@@ -488,8 +489,8 @@ static I8237_INTERFACE( dma8237_1_config )
 {
 	DEVCB_LINE(pc_dma_hrq_changed),
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_read_byte),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pc_dma_write_byte),
+	DEVCB_DRIVER_MEMBER(pcxt_state, pc_dma_read_byte),
+	DEVCB_DRIVER_MEMBER(pcxt_state, pc_dma_write_byte),
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL },
 	{ DEVCB_LINE(pc_dack0_w), DEVCB_LINE(pc_dack1_w), DEVCB_LINE(pc_dack2_w), DEVCB_LINE(pc_dack3_w) }
@@ -533,7 +534,7 @@ static IRQ_CALLBACK(irq_callback)
 	return pic8259_acknowledge(state->m_pic8259_1);
 }
 
-static ADDRESS_MAP_START( filetto_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( filetto_map, AS_PROGRAM, 8, pcxt_state )
 	AM_RANGE(0x00000, 0x9ffff) AM_RAM //work RAM 640KB
 	AM_RANGE(0xa0000, 0xbffff) AM_RAM //CGA VRAM
 	AM_RANGE(0xc0000, 0xcffff) AM_ROMBANK("bank1")
@@ -541,16 +542,16 @@ static ADDRESS_MAP_START( filetto_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pcxt_io_common, AS_IO, 8 )
+static ADDRESS_MAP_START( pcxt_io_common, AS_IO, 8, pcxt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
-	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE("dma8237_1", i8237_r, i8237_w ) //8237 DMA Controller
-	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE("pic8259_1", pic8259_r, pic8259_w ) //8259 Interrupt control
-	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_r, pit8253_w)    //8253 PIT
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)  //PPI 8255
-	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)  //PPI 8255
-	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE_MODERN("rtc", mc146818_device, read, write)
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE_LEGACY("dma8237_1", i8237_r, i8237_w ) //8237 DMA Controller
+	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE_LEGACY("pic8259_1", pic8259_r, pic8259_w ) //8259 Interrupt control
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE_LEGACY("pit8253", pit8253_r, pit8253_w)    //8253 PIT
+	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)  //PPI 8255
+	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)  //PPI 8255
+	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE("rtc", mc146818_device, read, write)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(dma_page_select_r,dma_page_select_w)
-	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE("pic8259_2", pic8259_r, pic8259_w )
+	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE_LEGACY("pic8259_2", pic8259_r, pic8259_w )
 	AM_RANGE(0x0278, 0x027f) AM_RAM //printer (parallel) port latch
 	AM_RANGE(0x02f8, 0x02ff) AM_RAM //Modem port
 	AM_RANGE(0x0378, 0x037f) AM_RAM //printer (parallel) port
@@ -561,7 +562,7 @@ static ADDRESS_MAP_START( pcxt_io_common, AS_IO, 8 )
 	AM_RANGE(0x03f8, 0x03ff) AM_RAM //rs232c (serial) port
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( filetto_io, AS_IO, 8 )
+static ADDRESS_MAP_START( filetto_io, AS_IO, 8, pcxt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_IMPORT_FROM( pcxt_io_common )
 //  AM_RANGE(0x0200, 0x020f) AM_RAM //game port
@@ -570,14 +571,13 @@ static ADDRESS_MAP_START( filetto_io, AS_IO, 8 )
 	AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( tetriskr_bg_bank_w )
+WRITE8_MEMBER(pcxt_state::tetriskr_bg_bank_w)
 {
-	pcxt_state *state = space->machine().driver_data<pcxt_state>();
 
-	state->m_bg_bank = (data & 0x0f) ^ 8;
+	m_bg_bank = (data & 0x0f) ^ 8;
 }
 
-static ADDRESS_MAP_START( tetriskr_io, AS_IO, 8 )
+static ADDRESS_MAP_START( tetriskr_io, AS_IO, 8, pcxt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3ff)
 	AM_IMPORT_FROM( pcxt_io_common )
 	AM_RANGE(0x0200, 0x020f) AM_RAM //game port

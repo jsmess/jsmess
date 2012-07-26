@@ -320,48 +320,45 @@ TODO:
 
 
 
-static WRITE8_HANDLER( welltris_sh_bankswitch_w )
+WRITE8_MEMBER(welltris_state::welltris_sh_bankswitch_w)
 {
-	UINT8 *rom = space->machine().region("audiocpu")->base() + 0x10000;
+	UINT8 *rom = memregion("audiocpu")->base() + 0x10000;
 
-	memory_set_bankptr(space->machine(), "bank1",rom + (data & 0x03) * 0x8000);
+	membank("bank1")->set_base(rom + (data & 0x03) * 0x8000);
 }
 
 
-static WRITE16_HANDLER( sound_command_w )
+WRITE16_MEMBER(welltris_state::sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		welltris_state *state = space->machine().driver_data<welltris_state>();
 
-		state->m_pending_command = 1;
-		soundlatch_w(space, 0, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		m_pending_command = 1;
+		soundlatch_byte_w(space, 0, data & 0xff);
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
-static CUSTOM_INPUT( pending_sound_r )
+CUSTOM_INPUT_MEMBER(welltris_state::pending_sound_r)
 {
-	welltris_state *state = field.machine().driver_data<welltris_state>();
-	return state->m_pending_command ? 1 : 0;
+	return m_pending_command ? 1 : 0;
 }
 
-static WRITE8_HANDLER( pending_command_clear_w )
+WRITE8_MEMBER(welltris_state::pending_command_clear_w)
 {
-	welltris_state *state = space->machine().driver_data<welltris_state>();
 
-	state->m_pending_command = 0;
+	m_pending_command = 0;
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, welltris_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM
-	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_BASE_MEMBER(welltris_state,m_pixelram)	/* Graph_1 & 2*/
+	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_SHARE("pixelram")	/* Graph_1 & 2*/
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM								/* work */
-	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE(welltris_spriteram_w) AM_BASE_MEMBER(welltris_state,m_spriteram)			/* Sprite */
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(welltris_charvideoram_w) AM_BASE_MEMBER(welltris_state,m_charvideoram)		/* Char */
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	/* Palette */
+	AM_RANGE(0xffc000, 0xffc3ff) AM_RAM_WRITE(welltris_spriteram_w) AM_SHARE("spriteram")			/* Sprite */
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(welltris_charvideoram_w) AM_SHARE("charvideoram")		/* Char */
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	/* Palette */
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1")					/* Bottom Controls */
 	AM_RANGE(0xfff000, 0xfff001) AM_WRITE(welltris_palette_bank_w)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")					/* Top Controls */
@@ -378,17 +375,17 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfff00e, 0xfff00f) AM_WRITENOP					/* ?? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, welltris_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, welltris_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(welltris_sh_bankswitch_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
-	AM_RANGE(0x10, 0x10) AM_READ(soundlatch_r)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x10, 0x10) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x18, 0x18) AM_WRITE(pending_command_clear_w)
 ADDRESS_MAP_END
 
@@ -401,7 +398,7 @@ static INPUT_PORTS_START( welltris )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )	/* Test (used to go through tests in service mode) */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )		/* Tested at start of irq 1 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )	/* Service (adds a coin) */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(pending_sound_r, NULL)	/* pending sound command */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, welltris_state,pending_sound_r, NULL)	/* pending sound command */
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -692,7 +689,7 @@ static DRIVER_INIT( welltris )
 {
 #if WELLTRIS_4P_HACK
 	/* A Hack which shows 4 player mode in code which is disabled */
-	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	RAM[0xB91C/2] = 0x4e71;
 	RAM[0xB91E/2] = 0x4e71;
 #endif

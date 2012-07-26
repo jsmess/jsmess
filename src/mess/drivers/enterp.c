@@ -33,6 +33,7 @@
 
 static void enterprise_update_memory_page(address_space *space, offs_t page, int index)
 {
+	ep_state *state = space->machine().driver_data<ep_state>();
 	int start = (page - 1) * 0x4000;
 	int end = (page - 1) * 0x4000 + 0x3fff;
 	char page_num[10];
@@ -46,7 +47,7 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 	case 0x03:
 		space->install_read_bank(start, end, page_num);
 		space->nop_write(start, end);
-		memory_set_bankptr(space->machine(), page_num, space->machine().region("exos")->base() + (index * 0x4000));
+		state->membank(page_num)->set_base(space->machine().root_device().memregion("exos")->base() + (index * 0x4000));
 		break;
 
 	case 0x04:
@@ -55,14 +56,14 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 	case 0x07:
 		space->install_read_bank(start, end, page_num);
 		space->nop_write(start, end);
-		memory_set_bankptr(space->machine(), page_num, space->machine().region("cartridges")->base() + ((index - 0x04) * 0x4000));
+		state->membank(page_num)->set_base(space->machine().root_device().memregion("cartridges")->base() + ((index - 0x04) * 0x4000));
 		break;
 
 	case 0x20:
 	case 0x21:
 		space->install_read_bank(start, end, page_num);
 		space->nop_write(start, end);
-		memory_set_bankptr(space->machine(), page_num, space->machine().region("exdos")->base() + ((index - 0x20) * 0x4000));
+		state->membank(page_num)->set_base(state->memregion("exdos")->base() + ((index - 0x20) * 0x4000));
 		break;
 
 	case 0xf8:
@@ -73,7 +74,7 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 		if (space->machine().device<ram_device>(RAM_TAG)->size() == 128*1024)
 		{
 			space->install_readwrite_bank(start, end, page_num);
-			memory_set_bankptr(space->machine(), page_num, space->machine().device<ram_device>(RAM_TAG)->pointer() + (index - 0xf4) * 0x4000);
+			state->membank(page_num)->set_base(space->machine().device<ram_device>(RAM_TAG)->pointer() + (index - 0xf4) * 0x4000);
 		}
 		else
 		{
@@ -87,7 +88,7 @@ static void enterprise_update_memory_page(address_space *space, offs_t page, int
 	case 0xff:
 		/* basic 64k ram */
 		space->install_readwrite_bank(start, end, page_num);
-		memory_set_bankptr(space->machine(), page_num, space->machine().device<ram_device>(RAM_TAG)->pointer() + (index - 0xfc) * 0x4000);
+		state->membank(page_num)->set_base(space->machine().device<ram_device>(RAM_TAG)->pointer() + (index - 0xfc) * 0x4000);
 		break;
 
 	default:
@@ -131,13 +132,13 @@ static READ8_DEVICE_HANDLER( enterprise_dave_reg_read )
 	{
 		case 0x015:
 			/* read keyboard line */
-			dave_set_reg(device, 0x015, input_port_read(device->machine(), keynames[ep->keyboard_line]));
+			dave_set_reg(device, 0x015, device->machine().root_device().ioport(keynames[ep->keyboard_line])->read());
 			break;
 
 		case 0x016:
 		{
 			int ExternalJoystickInputs;
-			int ExternalJoystickPortInput = input_port_read(device->machine(), "JOY1");
+			int ExternalJoystickPortInput = device->machine().root_device().ioport("JOY1")->read();
 
 			if (ep->keyboard_line <= 4)
 			{
@@ -209,10 +210,9 @@ static WRITE_LINE_DEVICE_HANDLER( enterp_wd1770_drq_w )
    bit 6 - Disk change signal from disk drive
    bit 7 - DRQ from WD1770
 */
-static READ8_HANDLER( exdos_card_r )
+READ8_MEMBER(ep_state::exdos_card_r)
 {
-	ep_state *ep = space->machine().driver_data<ep_state>();
-	return ep->exdos_card_value;
+	return exdos_card_value;
 }
 
 
@@ -225,9 +225,9 @@ static READ8_HANDLER( exdos_card_r )
    bit 6 - disk change reset
    bit 7 - in use
 */
-static WRITE8_HANDLER( exdos_card_w )
+WRITE8_MEMBER(ep_state::exdos_card_w)
 {
-	device_t *fdc = space->machine().device("wd1770");
+	device_t *fdc = machine().device("wd1770");
 
 	/* drive */
 	if (BIT(data, 0)) wd17xx_set_drive(fdc, 0);
@@ -243,7 +243,7 @@ static WRITE8_HANDLER( exdos_card_w )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( enterprise_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( enterprise_mem, AS_PROGRAM, 8, ep_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank2")
 	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK("bank3")
@@ -251,12 +251,12 @@ static ADDRESS_MAP_START( enterprise_mem, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( enterprise_io, AS_IO, 8 )
+static ADDRESS_MAP_START( enterprise_io, AS_IO, 8, ep_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE("wd1770", wd17xx_r, wd17xx_w)
+	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE_LEGACY("wd1770", wd17xx_r, wd17xx_w)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0x04) AM_READWRITE(exdos_card_r, exdos_card_w)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(epnick_reg_w)
-	AM_RANGE(0xa0, 0xbf) AM_DEVREADWRITE("custom", dave_reg_r, dave_reg_w)
+	AM_RANGE(0x80, 0x8f) AM_WRITE_LEGACY(epnick_reg_w)
+	AM_RANGE(0xa0, 0xbf) AM_DEVREADWRITE_LEGACY("custom", dave_reg_r, dave_reg_w)
 ADDRESS_MAP_END
 
 

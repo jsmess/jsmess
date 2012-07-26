@@ -5,7 +5,6 @@
         20/11/2009 Skeleton driver.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/scmp/scmp.h"
@@ -47,7 +46,7 @@ READ8_MEMBER( mk14_state::keyboard_r )
 	{
 		char kbdrow[6];
 		sprintf(kbdrow,"X%X",offset);
-		return input_port_read(machine(), kbdrow);
+		return ioport(kbdrow)->read();
 	}
 	else
 		return 0xff;

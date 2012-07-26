@@ -13,7 +13,7 @@
 #include "video/cgapal.h"
 
 
-#define CGA_MONITOR		(input_port_read(space->machine(), "VIDEO") & 0x1C)
+#define CGA_MONITOR		(space->machine().root_device().ioport("VIDEO")->read() & 0x1C)
 #define CGA_MONITOR_RGB			0x00	/* Colour RGB */
 #define CGA_MONITOR_MONO		0x04	/* Greyscale RGB */
 #define CGA_MONITOR_COMPOSITE	0x08	/* Colour composite */
@@ -507,7 +507,7 @@ static READ8_HANDLER ( pc_aga_mda_r )
 			data = mc6845->register_r(*space, offset);
 			break;
 		case 10:
-			data = (input_port_read(space->machine(), "IN0") & 0x80 ) | 0x08 | aga.mda_status;
+			data = (space->machine().root_device().ioport("IN0")->read() & 0x80 ) | 0x08 | aga.mda_status;
 			aga.mda_status ^= 0x01;
 			break;
 		/* 12, 13, 14  are the LPT1 ports */
@@ -722,8 +722,8 @@ VIDEO_START( pc_aga )
 
 	memset( &aga, 0, sizeof( aga ) );
 	aga.mode = AGA_COLOR;
-	aga.mda_chr_gen = machine.region("gfx1")->base() + 0x1000;
-	aga.cga_chr_gen = machine.region("gfx1")->base();
+	aga.mda_chr_gen = machine.root_device().memregion("gfx1")->base() + 0x1000;
+	aga.cga_chr_gen = machine.root_device().memregion("gfx1")->base();
 	aga.videoram = auto_alloc_array(machine, UINT8, 0x10000);
 }
 
@@ -756,8 +756,8 @@ VIDEO_START( pc200 )
 	memset( &aga, 0, sizeof( aga ) );
 
 	aga.mode = AGA_COLOR;
-	aga.mda_chr_gen = machine.region("gfx1")->base();
-	aga.cga_chr_gen = machine.region("gfx1")->base() + 0x1000;
+	aga.mda_chr_gen = machine.root_device().memregion("gfx1")->base();
+	aga.cga_chr_gen = machine.root_device().memregion("gfx1")->base() + 0x1000;
 	aga.videoram = auto_alloc_array(machine, UINT8, 0x10000);
 }
 
@@ -884,7 +884,7 @@ READ8_HANDLER ( pc200_cga_r )
 	case 0xe:
 		// 0x20 low cga
 		// 0x10 low special
-		result = input_port_read(space->machine(), "DSW0") & 0x38;
+		result = space->machine().root_device().ioport("DSW0")->read() & 0x38;
 		break;
 
 	default:

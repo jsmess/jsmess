@@ -33,15 +33,26 @@ class tickee_state : public driver_device
 {
 public:
 	tickee_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"),
+		m_control(*this, "control"){ }
 
-	UINT16 *m_control;
-	UINT16 *m_vram;
+	required_shared_ptr<UINT16> m_vram;
+	optional_shared_ptr<UINT16> m_control;
 	emu_timer *m_setup_gun_timer;
 	int m_beamxadd;
 	int m_beamyadd;
 	int m_palette_bank;
 	UINT8 m_gunx[2];
+	DECLARE_WRITE16_MEMBER(rapidfir_transparent_w);
+	DECLARE_READ16_MEMBER(rapidfir_transparent_r);
+	DECLARE_WRITE16_MEMBER(tickee_control_w);
+	DECLARE_READ16_MEMBER(ffff_r);
+	DECLARE_READ16_MEMBER(rapidfir_gun1_r);
+	DECLARE_READ16_MEMBER(rapidfir_gun2_r);
+	DECLARE_READ16_MEMBER(ff7f_r);
+	DECLARE_WRITE16_MEMBER(ff7f_w);
+	DECLARE_WRITE16_MEMBER(rapidfir_control_w);
 };
 
 
@@ -60,8 +71,8 @@ INLINE void get_crosshair_xy(running_machine &machine, int player, int *x, int *
 {
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	*x = (((input_port_read(machine, player ? "GUNX2" : "GUNX1") & 0xff) * visarea.width()) >> 8) + visarea.min_x;
-	*y = (((input_port_read(machine, player ? "GUNY2" : "GUNY1") & 0xff) * visarea.height()) >> 8) + visarea.min_y;
+	*x = (((machine.root_device().ioport(player ? "GUNX2" : "GUNX1")->read() & 0xff) * visarea.width()) >> 8) + visarea.min_x;
+	*y = (((machine.root_device().ioport(player ? "GUNY2" : "GUNY1")->read() & 0xff) * visarea.height()) >> 8) + visarea.min_y;
 }
 
 
@@ -225,19 +236,17 @@ static MACHINE_RESET( rapidfir )
  *
  *************************************/
 
-static WRITE16_HANDLER( rapidfir_transparent_w )
+WRITE16_MEMBER(tickee_state::rapidfir_transparent_w)
 {
-	tickee_state *state = space->machine().driver_data<tickee_state>();
 	if (!(data & 0xff00)) mem_mask &= 0x00ff;
 	if (!(data & 0x00ff)) mem_mask &= 0xff00;
-	COMBINE_DATA(&state->m_vram[offset]);
+	COMBINE_DATA(&m_vram[offset]);
 }
 
 
-static READ16_HANDLER( rapidfir_transparent_r )
+READ16_MEMBER(tickee_state::rapidfir_transparent_r)
 {
-	tickee_state *state = space->machine().driver_data<tickee_state>();
-	return state->m_vram[offset];
+	return m_vram[offset];
 }
 
 
@@ -264,10 +273,9 @@ static void rapidfir_from_shiftreg(address_space *space, UINT32 address, UINT16 
  *
  *************************************/
 
-static WRITE16_HANDLER( tickee_control_w )
+WRITE16_MEMBER(tickee_state::tickee_control_w)
 {
-	tickee_state *state = space->machine().driver_data<tickee_state>();
-	UINT16 olddata = state->m_control[offset];
+	UINT16 olddata = m_control[offset];
 
 	/* offsets:
 
@@ -276,16 +284,16 @@ static WRITE16_HANDLER( tickee_control_w )
         6 = lamps? (changing all the time)
     */
 
-	COMBINE_DATA(&state->m_control[offset]);
+	COMBINE_DATA(&m_control[offset]);
 
 	if (offset == 3)
 	{
-		ticket_dispenser_w(space->machine().device("ticket1"), 0, (data & 8) << 4);
-		ticket_dispenser_w(space->machine().device("ticket2"), 0, (data & 4) << 5);
+		machine().device<ticket_dispenser_device>("ticket1")->write(space, 0, (data & 8) << 4);
+		machine().device<ticket_dispenser_device>("ticket2")->write(space, 0, (data & 4) << 5);
 	}
 
-	if (olddata != state->m_control[offset])
-		logerror("%08X:tickee_control_w(%d) = %04X (was %04X)\n", cpu_get_pc(&space->device()), offset, state->m_control[offset], olddata);
+	if (olddata != m_control[offset])
+		logerror("%08X:tickee_control_w(%d) = %04X (was %04X)\n", cpu_get_pc(&space.device()), offset, m_control[offset], olddata);
 }
 
 
@@ -296,43 +304,40 @@ static WRITE16_HANDLER( tickee_control_w )
  *
  *************************************/
 
-static READ16_HANDLER( ffff_r )
+READ16_MEMBER(tickee_state::ffff_r)
 {
 	return 0xffff;
 }
 
 
-static READ16_HANDLER( rapidfir_gun1_r )
+READ16_MEMBER(tickee_state::rapidfir_gun1_r)
 {
-	tickee_state *state = space->machine().driver_data<tickee_state>();
-	return state->m_gunx[0];
+	return m_gunx[0];
 }
 
 
-static READ16_HANDLER( rapidfir_gun2_r )
+READ16_MEMBER(tickee_state::rapidfir_gun2_r)
 {
-	tickee_state *state = space->machine().driver_data<tickee_state>();
-	return state->m_gunx[1];
+	return m_gunx[1];
 }
 
 
-static READ16_HANDLER( ff7f_r )
+READ16_MEMBER(tickee_state::ff7f_r)
 {
 	/* Ticket dispenser status? */
 	return 0xff7f;
 }
 
-static WRITE16_HANDLER( ff7f_w )
+WRITE16_MEMBER(tickee_state::ff7f_w)
 {
 	/* Ticket dispenser output? */
 }
 
-static WRITE16_HANDLER( rapidfir_control_w )
+WRITE16_MEMBER(tickee_state::rapidfir_control_w)
 {
-	tickee_state *state = space->machine().driver_data<tickee_state>();
 	/* other bits like control on tickee? */
 	if (ACCESSING_BITS_0_7)
-		state->m_palette_bank = data & 1;
+		m_palette_bank = data & 1;
 }
 
 
@@ -377,76 +382,76 @@ static WRITE16_DEVICE_HANDLER( sound_bank_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( tickee_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(tickee_state, m_vram)
+static ADDRESS_MAP_START( tickee_map, AS_PROGRAM, 16, tickee_state )
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x04100000, 0x041000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
-	AM_RANGE(0x04200000, 0x0420000f) AM_DEVREAD8("ym1", ay8910_r, 0x00ff)
-	AM_RANGE(0x04200000, 0x0420001f) AM_DEVWRITE8("ym1", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0x04200100, 0x0420010f) AM_DEVREAD8("ym2", ay8910_r, 0x00ff)
-	AM_RANGE(0x04200100, 0x0420011f) AM_DEVWRITE8("ym2", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0x04400000, 0x0440007f) AM_WRITE(tickee_control_w) AM_BASE_MEMBER(tickee_state, m_control)
+	AM_RANGE(0x04100000, 0x041000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
+	AM_RANGE(0x04200000, 0x0420000f) AM_DEVREAD8_LEGACY("ym1", ay8910_r, 0x00ff)
+	AM_RANGE(0x04200000, 0x0420001f) AM_DEVWRITE8_LEGACY("ym1", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0x04200100, 0x0420010f) AM_DEVREAD8_LEGACY("ym2", ay8910_r, 0x00ff)
+	AM_RANGE(0x04200100, 0x0420011f) AM_DEVWRITE8_LEGACY("ym2", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0x04400000, 0x0440007f) AM_WRITE(tickee_control_w) AM_SHARE("control")
 	AM_RANGE(0x04400040, 0x0440004f) AM_READ_PORT("IN2")
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP		/* seems to be a bug in their code */
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 
 /* addreses in the 04x range shifted slightly...*/
-static ADDRESS_MAP_START( ghoshunt_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(tickee_state, m_vram)
+static ADDRESS_MAP_START( ghoshunt_map, AS_PROGRAM, 16, tickee_state )
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04100000, 0x04103fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x04200000, 0x042000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
-	AM_RANGE(0x04300000, 0x0430000f) AM_DEVREAD8("ym1", ay8910_r, 0x00ff)
-	AM_RANGE(0x04300000, 0x0430001f) AM_DEVWRITE8("ym1", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0x04300100, 0x0430010f) AM_DEVREAD8("ym2", ay8910_r, 0x00ff)
-	AM_RANGE(0x04300100, 0x0430011f) AM_DEVWRITE8("ym2", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0x04500000, 0x0450007f) AM_WRITE(tickee_control_w) AM_BASE_MEMBER(tickee_state, m_control)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0x04200000, 0x042000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
+	AM_RANGE(0x04300000, 0x0430000f) AM_DEVREAD8_LEGACY("ym1", ay8910_r, 0x00ff)
+	AM_RANGE(0x04300000, 0x0430001f) AM_DEVWRITE8_LEGACY("ym1", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0x04300100, 0x0430010f) AM_DEVREAD8_LEGACY("ym2", ay8910_r, 0x00ff)
+	AM_RANGE(0x04300100, 0x0430011f) AM_DEVWRITE8_LEGACY("ym2", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0x04500000, 0x0450007f) AM_WRITE(tickee_control_w) AM_SHARE("control")
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP		/* seems to be a bug in their code */
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mouseatk_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(tickee_state, m_vram)
+static ADDRESS_MAP_START( mouseatk_map, AS_PROGRAM, 16, tickee_state )
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x04100000, 0x041000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
-	AM_RANGE(0x04200000, 0x0420000f) AM_DEVREAD8("ym", ay8910_r, 0x00ff)
-	AM_RANGE(0x04200000, 0x0420000f) AM_DEVWRITE8("ym", ay8910_address_data_w, 0x00ff)
-	AM_RANGE(0x04200100, 0x0420010f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x04400000, 0x0440007f) AM_WRITE(tickee_control_w) AM_BASE_MEMBER(tickee_state, m_control)
+	AM_RANGE(0x04100000, 0x041000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
+	AM_RANGE(0x04200000, 0x0420000f) AM_DEVREAD8_LEGACY("ym", ay8910_r, 0x00ff)
+	AM_RANGE(0x04200000, 0x0420000f) AM_DEVWRITE8_LEGACY("ym", ay8910_address_data_w, 0x00ff)
+	AM_RANGE(0x04200100, 0x0420010f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x04400000, 0x0440007f) AM_WRITE(tickee_control_w) AM_SHARE("control")
 	AM_RANGE(0x04400040, 0x0440004f) AM_READ_PORT("IN2") // ?
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP		/* seems to be a bug in their code */
 	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 
 /* newer hardware */
-static ADDRESS_MAP_START( rapidfir_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE_MEMBER(tickee_state, m_vram)
+static ADDRESS_MAP_START( rapidfir_map, AS_PROGRAM, 16, tickee_state )
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0x02000000, 0x027fffff) AM_READWRITE(rapidfir_transparent_r, rapidfir_transparent_w)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xfc000000, 0xfc00000f) AM_READ(rapidfir_gun1_r)
 	AM_RANGE(0xfc000100, 0xfc00010f) AM_READ(rapidfir_gun2_r)
 	AM_RANGE(0xfc000400, 0xfc00040f) AM_READ(ffff_r)
 	AM_RANGE(0xfc000500, 0xfc00050f) AM_NOP
 	AM_RANGE(0xfc000600, 0xfc00060f) AM_WRITE(rapidfir_control_w)
-	AM_RANGE(0xfc000700, 0xfc00070f) AM_DEVWRITE("oki", sound_bank_w)
+	AM_RANGE(0xfc000700, 0xfc00070f) AM_DEVWRITE_LEGACY("oki", sound_bank_w)
 	AM_RANGE(0xfc000800, 0xfc00080f) AM_READ_PORT("IN0")
 	AM_RANGE(0xfc000900, 0xfc00090f) AM_READ_PORT("IN1")
 	AM_RANGE(0xfc000a00, 0xfc000a0f) AM_READ_PORT("IN2")
 	AM_RANGE(0xfc000b00, 0xfc000b0f) AM_READ_PORT("DSW0")
 	AM_RANGE(0xfc000c00, 0xfc000c1f) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfc000e00, 0xfc000e1f) AM_READ(watchdog_reset16_r)
-	AM_RANGE(0xfc100000, 0xfc1000ff) AM_MIRROR(0x80000) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
+	AM_RANGE(0xfc100000, 0xfc1000ff) AM_MIRROR(0x80000) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
 	AM_RANGE(0xfc200000, 0xfc207fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xfc300000, 0xfc30000f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0xfc300000, 0xfc30000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0xfc400010, 0xfc40001f) AM_READWRITE(ff7f_r, ff7f_w)
 	AM_RANGE(0xfe000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -485,8 +490,8 @@ static INPUT_PORTS_START( tickee )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket2", ticket_dispenser_line_r) /* right ticket status */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket1", ticket_dispenser_line_r)	/* left ticket status */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket2", ticket_dispenser_device, line_r) /* right ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)	/* left ticket status */
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -543,8 +548,8 @@ static INPUT_PORTS_START( ghoshunt )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket2", ticket_dispenser_line_r)	/* right ticket status */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket1", ticket_dispenser_line_r)	/* left ticket status */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket2", ticket_dispenser_device, line_r)	/* right ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)	/* left ticket status */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xd8, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -559,8 +564,8 @@ static INPUT_PORTS_START( ghoshunt )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket2", ticket_dispenser_line_r)	/* right ticket status */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket1", ticket_dispenser_line_r)	/* left ticket status */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket2", ticket_dispenser_device, line_r)	/* right ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)	/* left ticket status */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xd8, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -604,8 +609,8 @@ static INPUT_PORTS_START( mouseatk )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket2", ticket_dispenser_line_r) /* right ticket status */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("ticket1", ticket_dispenser_line_r)	/* left ticket status */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket2", ticket_dispenser_device, line_r) /* right ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket1", ticket_dispenser_device, line_r)	/* left ticket status */
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -764,8 +769,8 @@ static MACHINE_CONFIG_START( tickee, tickee_state )
 	MCFG_MACHINE_RESET(tickee)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_TICKET_DISPENSER_ADD("ticket1", 100, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
-	MCFG_TICKET_DISPENSER_ADD("ticket2", 100, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
+	MCFG_TICKET_DISPENSER_ADD("ticket1", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
+	MCFG_TICKET_DISPENSER_ADD("ticket2", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
@@ -834,8 +839,8 @@ static MACHINE_CONFIG_START( mouseatk, tickee_state )
 	MCFG_MACHINE_RESET(tickee)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MCFG_TICKET_DISPENSER_ADD("ticket1", 100, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
-	MCFG_TICKET_DISPENSER_ADD("ticket2", 100, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
+	MCFG_TICKET_DISPENSER_ADD("ticket1", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
+	MCFG_TICKET_DISPENSER_ADD("ticket2", attotime::from_msec(100), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)

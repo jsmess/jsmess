@@ -413,7 +413,7 @@ static DEVICE_START( vt_video )
 	vt->screen = device->machine().device<screen_device>(intf->screen_tag);
 	assert(vt->screen != NULL);
 
-	vt->gfx = device->machine().region(intf->char_rom_region_tag)->base();
+	vt->gfx = device->machine().root_device().memregion(intf->char_rom_region_tag)->base();
 	assert(vt->gfx != NULL);
 
 	// LBA7 is scan line frequency update

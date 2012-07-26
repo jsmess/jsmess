@@ -25,6 +25,7 @@
 
 PALETTE_INIT( fastfred )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances[4] = { 1000, 470, 220, 100 };
 	double rweights[4], gweights[4], bweights[4];
 	int i;
@@ -204,22 +205,22 @@ WRITE8_HANDLER( fastfred_colorbank2_w )
 WRITE8_HANDLER( fastfred_flip_screen_x_w )
 {
 	fastfred_state *state = space->machine().driver_data<fastfred_state>();
-	if (flip_screen_x_get(space->machine()) != (data & 0x01))
+	if (state->flip_screen_x() != (data & 0x01))
 	{
-		flip_screen_x_set(space->machine(), data & 0x01);
+		state->flip_screen_x_set(data & 0x01);
 
-		state->m_bg_tilemap->set_flip((flip_screen_x_get(space->machine()) ? TILEMAP_FLIPX : 0) | (flip_screen_y_get(space->machine()) ? TILEMAP_FLIPY : 0));
+		state->m_bg_tilemap->set_flip((state->flip_screen_x() ? TILEMAP_FLIPX : 0) | (state->flip_screen_y() ? TILEMAP_FLIPY : 0));
 	}
 }
 
 WRITE8_HANDLER( fastfred_flip_screen_y_w )
 {
 	fastfred_state *state = space->machine().driver_data<fastfred_state>();
-	if (flip_screen_y_get(space->machine()) != (data & 0x01))
+	if (state->flip_screen_y() != (data & 0x01))
 	{
-		flip_screen_y_set(space->machine(), data & 0x01);
+		state->flip_screen_y_set(data & 0x01);
 
-		state->m_bg_tilemap->set_flip((flip_screen_x_get(space->machine()) ? TILEMAP_FLIPX : 0) | (flip_screen_y_get(space->machine()) ? TILEMAP_FLIPY : 0));
+		state->m_bg_tilemap->set_flip((state->flip_screen_x() ? TILEMAP_FLIPX : 0) | (state->flip_screen_y() ? TILEMAP_FLIPY : 0));
 	}
 }
 
@@ -238,7 +239,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	fastfred_state *state = machine.driver_data<fastfred_state>();
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		UINT8 code,sx,sy;
 		int flipx,flipy;
@@ -276,18 +277,18 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		}
 
 
-		if (flip_screen_x_get(machine))
+		if (state->flip_screen_x())
 		{
 			sx = 240 - sx;
 			flipx = !flipx;
 		}
-		if (flip_screen_y_get(machine))
+		if (state->flip_screen_y())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;
 		}
 
-		drawgfx_transpen(bitmap,flip_screen_x_get(machine) ? spritevisibleareaflipx : spritevisiblearea,machine.gfx[1],
+		drawgfx_transpen(bitmap,state->flip_screen_x() ? spritevisibleareaflipx : spritevisiblearea,machine.gfx[1],
 				code,
 				state->m_colorbank | (state->m_spriteram[offs + 2] & 0x07),
 				flipx,flipy,

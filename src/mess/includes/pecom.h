@@ -29,20 +29,24 @@ public:
 	/* timers */
 	emu_timer *m_reset_timer;	/* power on reset timer */
 
+	DECLARE_READ8_MEMBER(pecom_cdp1869_charram_r);
+	DECLARE_WRITE8_MEMBER(pecom_cdp1869_charram_w);
+	DECLARE_READ8_MEMBER(pecom_cdp1869_pageram_r);
+	DECLARE_WRITE8_MEMBER(pecom_cdp1869_pageram_w);
+	DECLARE_WRITE8_MEMBER(pecom_bank_w);
+	DECLARE_READ8_MEMBER(pecom_keyboard_r);
+	DECLARE_WRITE8_MEMBER(pecom_cdp1869_w);
 };
 
 /*----------- defined in machine/pecom.c -----------*/
 
 extern MACHINE_START( pecom );
 extern MACHINE_RESET( pecom );
-extern WRITE8_HANDLER( pecom_bank_w );
-extern READ8_HANDLER (pecom_keyboard_r);
 
 extern const cosmac_interface pecom64_cdp1802_config;
 
 /* ---------- defined in video/pecom.c ---------- */
 
-WRITE8_HANDLER( pecom_cdp1869_w );
 MACHINE_CONFIG_EXTERN( pecom_video );
 
 #endif

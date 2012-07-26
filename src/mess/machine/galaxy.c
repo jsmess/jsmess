@@ -17,27 +17,26 @@
   I/O devices
 ***************************************************************************/
 
-READ8_HANDLER( galaxy_keyboard_r )
+READ8_MEMBER(galaxy_state::galaxy_keyboard_r)
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
 	if (offset == 0)
 	{
-		double level = (space->machine().device<cassette_image_device>(CASSETTE_TAG)->input());
+		double level = (machine().device<cassette_image_device>(CASSETTE_TAG)->input());
 		return (level >  0) ? 0xfe : 0xff;
 	}
 	else
 	{
-		return input_port_read(space->machine(), keynames[(offset>>3) & 0x07]) & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
+		return ioport(keynames[(offset>>3) & 0x07])->read() & (0x01<<(offset & 0x07)) ? 0xfe : 0xff;
 	}
 }
 
-WRITE8_HANDLER( galaxy_latch_w )
+WRITE8_MEMBER(galaxy_state::galaxy_latch_w)
 {
-	galaxy_state *state = space->machine().driver_data<galaxy_state>();
 	double val = (((data >>6) & 1 ) + ((data >> 2) & 1) - 1) * 32000;
-	state->m_latch_value = data;
-	space->machine().device<cassette_image_device>(CASSETTE_TAG)->output(val);
+	m_latch_value = data;
+	machine().device<cassette_image_device>(CASSETTE_TAG)->output(val);
 }
 
 
@@ -156,9 +155,10 @@ SNAPSHOT_LOAD( galaxy )
 
 DRIVER_INIT( galaxy )
 {
+	galaxy_state *state = machine.driver_data<galaxy_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	space->install_readwrite_bank( 0x2800, 0x2800 + machine.device<ram_device>(RAM_TAG)->size() - 1, "bank1");
-	memory_set_bankptr(machine, "bank1", machine.device<ram_device>(RAM_TAG)->pointer());
+	state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
 
 	if (machine.device<ram_device>(RAM_TAG)->size() < (6 + 48) * 1024)
 	{
@@ -176,15 +176,15 @@ MACHINE_RESET( galaxy )
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* ROM 2 enable/disable */
-	if (input_port_read(machine, "ROM2")) {
+	if (machine.root_device().ioport("ROM2")->read()) {
 		space->install_read_bank(0x1000, 0x1fff, "bank10");
 	} else {
 		space->nop_read(0x1000, 0x1fff);
 	}
 	space->nop_write(0x1000, 0x1fff);
 
-	if (input_port_read(machine, "ROM2"))
-		memory_set_bankptr(machine,"bank10", machine.region("maincpu")->base() + 0x1000);
+	if (machine.root_device().ioport("ROM2")->read())
+		state->membank("bank10")->set_base(machine.root_device().memregion("maincpu")->base() + 0x1000);
 
 	device_set_irq_callback(machine.device("maincpu"), galaxy_irq_callback);
 	state->m_interrupts_enabled = TRUE;
@@ -198,7 +198,7 @@ DRIVER_INIT( galaxyp )
 MACHINE_RESET( galaxyp )
 {
 	galaxy_state *state = machine.driver_data<galaxy_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	device_set_irq_callback(machine.device("maincpu"), galaxy_irq_callback);
@@ -210,6 +210,6 @@ MACHINE_RESET( galaxyp )
 
 	space->install_read_bank(0xe000, 0xefff, "bank11");
 	space->nop_write(0xe000, 0xefff);
-	memory_set_bankptr(machine,"bank11", machine.region("maincpu")->base() + 0xe000);
+	state->membank("bank11")->set_base(state->memregion("maincpu")->base() + 0xe000);
 	state->m_interrupts_enabled = TRUE;
 }

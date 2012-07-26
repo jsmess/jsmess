@@ -428,8 +428,8 @@ void st_state::mouse_tick()
 
     */
 
-	UINT8 x = input_port_read_safe(machine(), "IKBD_MOUSEX", 0x00);
-	UINT8 y = input_port_read_safe(machine(), "IKBD_MOUSEY", 0x00);
+	UINT8 x = ioport("IKBD_MOUSEX")->read_safe(0x00);
+	UINT8 y = ioport("IKBD_MOUSEY")->read_safe(0x00);
 
 	if (m_ikbd_mouse_pc == 0)
 	{
@@ -511,21 +511,21 @@ READ8_MEMBER( st_state::ikbd_port1_r )
 	UINT8 data = 0xff;
 
 	// keyboard data
-	if (!BIT(m_ikbd_keylatch, 1)) data &= input_port_read(machine(), "P31");
-	if (!BIT(m_ikbd_keylatch, 2)) data &= input_port_read(machine(), "P32");
-	if (!BIT(m_ikbd_keylatch, 3)) data &= input_port_read(machine(), "P33");
-	if (!BIT(m_ikbd_keylatch, 4)) data &= input_port_read(machine(), "P34");
-	if (!BIT(m_ikbd_keylatch, 5)) data &= input_port_read(machine(), "P35");
-	if (!BIT(m_ikbd_keylatch, 6)) data &= input_port_read(machine(), "P36");
-	if (!BIT(m_ikbd_keylatch, 7)) data &= input_port_read(machine(), "P37");
-	if (!BIT(m_ikbd_keylatch, 8)) data &= input_port_read(machine(), "P40");
-	if (!BIT(m_ikbd_keylatch, 9)) data &= input_port_read(machine(), "P41");
-	if (!BIT(m_ikbd_keylatch, 10)) data &= input_port_read(machine(), "P42");
-	if (!BIT(m_ikbd_keylatch, 11)) data &= input_port_read(machine(), "P43");
-	if (!BIT(m_ikbd_keylatch, 12)) data &= input_port_read(machine(), "P44");
-	if (!BIT(m_ikbd_keylatch, 13)) data &= input_port_read(machine(), "P45");
-	if (!BIT(m_ikbd_keylatch, 14)) data &= input_port_read(machine(), "P46");
-	if (!BIT(m_ikbd_keylatch, 15)) data &= input_port_read(machine(), "P47");
+	if (!BIT(m_ikbd_keylatch, 1)) data &= ioport("P31")->read();
+	if (!BIT(m_ikbd_keylatch, 2)) data &= ioport("P32")->read();
+	if (!BIT(m_ikbd_keylatch, 3)) data &= ioport("P33")->read();
+	if (!BIT(m_ikbd_keylatch, 4)) data &= ioport("P34")->read();
+	if (!BIT(m_ikbd_keylatch, 5)) data &= ioport("P35")->read();
+	if (!BIT(m_ikbd_keylatch, 6)) data &= ioport("P36")->read();
+	if (!BIT(m_ikbd_keylatch, 7)) data &= ioport("P37")->read();
+	if (!BIT(m_ikbd_keylatch, 8)) data &= ioport("P40")->read();
+	if (!BIT(m_ikbd_keylatch, 9)) data &= ioport("P41")->read();
+	if (!BIT(m_ikbd_keylatch, 10)) data &= ioport("P42")->read();
+	if (!BIT(m_ikbd_keylatch, 11)) data &= ioport("P43")->read();
+	if (!BIT(m_ikbd_keylatch, 12)) data &= ioport("P44")->read();
+	if (!BIT(m_ikbd_keylatch, 13)) data &= ioport("P45")->read();
+	if (!BIT(m_ikbd_keylatch, 14)) data &= ioport("P46")->read();
+	if (!BIT(m_ikbd_keylatch, 15)) data &= ioport("P47")->read();
 
 	return data;
 }
@@ -549,7 +549,7 @@ READ8_MEMBER( st_state::ikbd_port2_r )
 
     */
 
-	UINT8 data = input_port_read_safe(machine(), "IKBD_JOY1", 0xff) & 0x06;
+	UINT8 data = ioport("IKBD_JOY1")->read_safe(0xff) & 0x06;
 
 	// serial receive
 	data |= m_ikbd_tx << 3;
@@ -636,9 +636,9 @@ READ8_MEMBER( st_state::ikbd_port4_r )
 
 	if (m_ikbd_joy) return 0xff;
 
-	UINT8 data = input_port_read_safe(machine(), "IKBD_JOY0", 0xff);
+	UINT8 data = ioport("IKBD_JOY0")->read_safe(0xff);
 
-	if ((input_port_read(machine(), "config") & 0x01) == 0)
+	if ((ioport("config")->read() & 0x01) == 0)
 	{
 		data = (data & 0xf0) | m_ikbd_mouse;
 	}
@@ -1143,7 +1143,7 @@ READ16_MEMBER( stbook_state::config_r )
 
     */
 
-	return (input_port_read(machine(), "SW400") << 8) | 0xff;
+	return (ioport("SW400")->read() << 8) | 0xff;
 }
 
 
@@ -1253,30 +1253,30 @@ static ADDRESS_MAP_START( megast_map, AS_PROGRAM, 16, megast_state )
 	AM_RANGE(0x200000, 0x3fffff) AM_RAM
 	AM_RANGE(0xfa0000, 0xfbffff) AM_ROM AM_REGION("cart", 0)
 	AM_RANGE(0xfc0000, 0xfeffff) AM_ROM AM_REGION(M68000_TAG, 0)
-//  AM_RANGE(0xff7f30, 0xff7f31) AM_READWRITE_BASE(st_state, blitter_dst_inc_y_r, blitter_dst_inc_y_w) // for TOS 1.02
-	AM_RANGE(0xff8000, 0xff8001) AM_READWRITE8_BASE(st_state, mmu_r, mmu_w, 0x00ff)
-	AM_RANGE(0xff8200, 0xff8203) AM_READWRITE8_BASE(st_state, shifter_base_r, shifter_base_w, 0x00ff)
-	AM_RANGE(0xff8204, 0xff8209) AM_READ8_BASE(st_state, shifter_counter_r, 0x00ff)
-	AM_RANGE(0xff820a, 0xff820b) AM_READWRITE8_BASE(st_state, shifter_sync_r, shifter_sync_w, 0xff00)
-	AM_RANGE(0xff8240, 0xff825f) AM_READWRITE_BASE(st_state, shifter_palette_r, shifter_palette_w)
-	AM_RANGE(0xff8260, 0xff8261) AM_READWRITE8_BASE(st_state, shifter_mode_r, shifter_mode_w, 0xff00)
-	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE_BASE(st_state, fdc_data_r, fdc_data_w)
-	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE_BASE(st_state, dma_status_r, dma_mode_w)
-	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE8_BASE(st_state, dma_counter_r, dma_base_w, 0x00ff)
+//  AM_RANGE(0xff7f30, 0xff7f31) AM_READWRITE(blitter_dst_inc_y_r, blitter_dst_inc_y_w) // for TOS 1.02
+	AM_RANGE(0xff8000, 0xff8001) AM_READWRITE8(mmu_r, mmu_w, 0x00ff)
+	AM_RANGE(0xff8200, 0xff8203) AM_READWRITE8(shifter_base_r, shifter_base_w, 0x00ff)
+	AM_RANGE(0xff8204, 0xff8209) AM_READ8(shifter_counter_r, 0x00ff)
+	AM_RANGE(0xff820a, 0xff820b) AM_READWRITE8(shifter_sync_r, shifter_sync_w, 0xff00)
+	AM_RANGE(0xff8240, 0xff825f) AM_READWRITE(shifter_palette_r, shifter_palette_w)
+	AM_RANGE(0xff8260, 0xff8261) AM_READWRITE8(shifter_mode_r, shifter_mode_w, 0xff00)
+	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(fdc_data_r, fdc_data_w)
+	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(dma_status_r, dma_mode_w)
+	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE8(dma_counter_r, dma_base_w, 0x00ff)
 	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8_LEGACY(YM2149_TAG, ay8910_r, ay8910_address_w, 0xff00)
 	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8_LEGACY(YM2149_TAG, ay8910_data_w, 0xff00)
-	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE_BASE(st_state, blitter_halftone_r, blitter_halftone_w)
-	AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE_BASE(st_state, blitter_src_inc_x_r, blitter_src_inc_x_w)
-	AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE_BASE(st_state, blitter_src_inc_y_r, blitter_src_inc_y_w)
-	AM_RANGE(0xff8a24, 0xff8a27) AM_READWRITE_BASE(st_state, blitter_src_r, blitter_src_w)
-	AM_RANGE(0xff8a28, 0xff8a2d) AM_READWRITE_BASE(st_state, blitter_end_mask_r, blitter_end_mask_w)
-	AM_RANGE(0xff8a2e, 0xff8a2f) AM_READWRITE_BASE(st_state, blitter_dst_inc_x_r, blitter_dst_inc_x_w)
-	AM_RANGE(0xff8a30, 0xff8a31) AM_READWRITE_BASE(st_state, blitter_dst_inc_y_r, blitter_dst_inc_y_w)
-	AM_RANGE(0xff8a32, 0xff8a35) AM_READWRITE_BASE(st_state, blitter_dst_r, blitter_dst_w)
-	AM_RANGE(0xff8a36, 0xff8a37) AM_READWRITE_BASE(st_state, blitter_count_x_r, blitter_count_x_w)
-	AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE_BASE(st_state, blitter_count_y_r, blitter_count_y_w)
-	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE_BASE(st_state, blitter_op_r, blitter_op_w)
-	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE_BASE(st_state, blitter_ctrl_r, blitter_ctrl_w)
+	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(blitter_halftone_r, blitter_halftone_w)
+	AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(blitter_src_inc_x_r, blitter_src_inc_x_w)
+	AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE(blitter_src_inc_y_r, blitter_src_inc_y_w)
+	AM_RANGE(0xff8a24, 0xff8a27) AM_READWRITE(blitter_src_r, blitter_src_w)
+	AM_RANGE(0xff8a28, 0xff8a2d) AM_READWRITE(blitter_end_mask_r, blitter_end_mask_w)
+	AM_RANGE(0xff8a2e, 0xff8a2f) AM_READWRITE(blitter_dst_inc_x_r, blitter_dst_inc_x_w)
+	AM_RANGE(0xff8a30, 0xff8a31) AM_READWRITE(blitter_dst_inc_y_r, blitter_dst_inc_y_w)
+	AM_RANGE(0xff8a32, 0xff8a35) AM_READWRITE(blitter_dst_r, blitter_dst_w)
+	AM_RANGE(0xff8a36, 0xff8a37) AM_READWRITE(blitter_count_x_r, blitter_count_x_w)
+	AM_RANGE(0xff8a38, 0xff8a39) AM_READWRITE(blitter_count_y_r, blitter_count_y_w)
+	AM_RANGE(0xff8a3a, 0xff8a3b) AM_READWRITE(blitter_op_r, blitter_op_w)
+	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(blitter_ctrl_r, blitter_ctrl_w)
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_device, read, write, 0x00ff)
 	AM_RANGE(0xfffa40, 0xfffa57) AM_READWRITE(fpu_r, fpu_w)
 	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_device, status_read, control_write, 0xff00)
@@ -1573,25 +1573,25 @@ static INPUT_PORTS_START( st )
 	PORT_INCLUDE( ikbd )
 
 	PORT_START("IKBD_JOY0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("config", 0x01, PORTCOND_EQUALS, 0x01) // XB
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("config", 0x01, PORTCOND_EQUALS, 0x01) // XA
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("config", 0x01, PORTCOND_EQUALS, 0x01) // YA
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("config", 0x01, PORTCOND_EQUALS, 0x01) // YB
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // XB
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // XA
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // YA
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(2) PORT_8WAY PORT_CONDITION("config", 0x01, EQUALS, 0x01) // YB
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
 
 	PORT_START("IKBD_JOY1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CONDITION("config", 0x01, PORTCOND_EQUALS, 0x01)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CONDITION("config", 0x01, EQUALS, 0x01)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 
 	PORT_START("IKBD_MOUSEX")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CONDITION("config", 0x01, PORTCOND_EQUALS, 0x00)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CONDITION("config", 0x01, EQUALS, 0x00)
 
 	PORT_START("IKBD_MOUSEY")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CONDITION("config", 0x01, PORTCOND_EQUALS, 0x00)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CONDITION("config", 0x01, EQUALS, 0x00)
 INPUT_PORTS_END
 
 
@@ -1925,7 +1925,7 @@ READ8_MEMBER( st_state::mfp_gpio_r )
 	// ring indicator
 
 	// monochrome monitor detect
-	data |= input_port_read(machine(), "config") & 0x80;
+	data |= ioport("config")->read() & 0x80;
 
 	return data;
 }
@@ -1995,7 +1995,7 @@ READ8_MEMBER( ste_state::mfp_gpio_r )
 	// ring indicator
 
 	// monochrome monitor detect, DMA sound active
-	data |= (input_port_read(machine(), "config") & 0x80) ^ (m_dmasnd_active << 7);
+	data |= (ioport("config")->read() & 0x80) ^ (m_dmasnd_active << 7);
 
 	return data;
 }

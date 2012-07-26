@@ -37,36 +37,35 @@ HW info :
 static MACHINE_RESET(ssrj)
 {
 	ssrj_state *state = machine.driver_data<ssrj_state>();
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 
 	memset(&rom[0xc000], 0 ,0x3fff); /* req for some control types */
 	state->m_oldport = 0x80;
 }
 
-static READ8_HANDLER(ssrj_wheel_r)
+READ8_MEMBER(ssrj_state::ssrj_wheel_r)
 {
-	ssrj_state *state = space->machine().driver_data<ssrj_state>();
-	int port = input_port_read(space->machine(), "IN1") - 0x80;
-	int retval = port - state->m_oldport;
+	int port = ioport("IN1")->read() - 0x80;
+	int retval = port - m_oldport;
 
-	state->m_oldport = port;
+	m_oldport = port;
 	return retval;
 }
 
-static ADDRESS_MAP_START( ssrj_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ssrj_map, AS_PROGRAM, 8, ssrj_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(ssrj_vram1_w) AM_BASE_MEMBER(ssrj_state, m_vram1)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(ssrj_vram2_w) AM_BASE_MEMBER(ssrj_state, m_vram2)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_MEMBER(ssrj_state, m_vram3)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(ssrj_vram4_w) AM_BASE_MEMBER(ssrj_state, m_vram4)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(ssrj_vram1_w) AM_SHARE("vram1")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(ssrj_vram2_w) AM_SHARE("vram2")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("vram3")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(ssrj_vram4_w) AM_SHARE("vram4")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(ssrj_state, m_scrollram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("scrollram")
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN0")
 	AM_RANGE(0xf001, 0xf001) AM_READ(ssrj_wheel_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN2")
 	AM_RANGE(0xf003, 0xf003) AM_WRITENOP /* unknown */
-	AM_RANGE(0xf401, 0xf401) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0xf400, 0xf401) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xf401, 0xf401) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0xf400, 0xf401) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0xf800, 0xf800) AM_WRITENOP /* wheel ? */
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITENOP /* unknown */
 ADDRESS_MAP_END

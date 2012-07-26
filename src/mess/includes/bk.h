@@ -12,15 +12,27 @@ class bk_state : public driver_device
 {
 public:
 	bk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bk0010_video_ram(*this, "video_ram"){ }
 
 	UINT16 m_scrool;
-	UINT16 *m_bk0010_video_ram;
+	required_shared_ptr<UINT16> m_bk0010_video_ram;
 	UINT16 m_kbd_state;
 	UINT16 m_key_code;
 	UINT16 m_key_pressed;
 	UINT16 m_key_irq_vector;
 	UINT16 m_drive;
+	DECLARE_READ16_MEMBER(bk_key_state_r);
+	DECLARE_READ16_MEMBER(bk_key_code_r);
+	DECLARE_READ16_MEMBER(bk_vid_scrool_r);
+	DECLARE_READ16_MEMBER(bk_key_press_r);
+	DECLARE_WRITE16_MEMBER(bk_key_state_w);
+	DECLARE_WRITE16_MEMBER(bk_vid_scrool_w);
+	DECLARE_WRITE16_MEMBER(bk_key_press_w);
+	DECLARE_READ16_MEMBER(bk_floppy_cmd_r);
+	DECLARE_WRITE16_MEMBER(bk_floppy_cmd_w);
+	DECLARE_READ16_MEMBER(bk_floppy_data_r);
+	DECLARE_WRITE16_MEMBER(bk_floppy_data_w);
 };
 
 
@@ -29,18 +41,7 @@ public:
 extern MACHINE_START( bk0010 );
 extern MACHINE_RESET( bk0010 );
 
-extern READ16_HANDLER (bk_key_state_r);
-extern WRITE16_HANDLER(bk_key_state_w);
-extern READ16_HANDLER (bk_key_code_r);
-extern READ16_HANDLER (bk_vid_scrool_r);
-extern WRITE16_HANDLER(bk_vid_scrool_w);
-extern READ16_HANDLER (bk_key_press_r);
-extern WRITE16_HANDLER(bk_key_press_w);
 
-extern READ16_HANDLER (bk_floppy_cmd_r);
-extern WRITE16_HANDLER(bk_floppy_cmd_w);
-extern READ16_HANDLER (bk_floppy_data_r);
-extern WRITE16_HANDLER(bk_floppy_data_w);
 
 /*----------- defined in video/bk.c -----------*/
 

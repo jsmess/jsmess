@@ -16,16 +16,16 @@
 #include "elf2.lh"
 
 #define RUN	\
-	BIT(input_port_read(machine(), "SPECIAL"), 0)
+	BIT(ioport("SPECIAL")->read(), 0)
 
 #define LOAD \
-	BIT(input_port_read(machine(), "SPECIAL"), 1)
+	BIT(ioport("SPECIAL")->read(), 1)
 
 #define MEMORY_PROTECT \
-	BIT(input_port_read(machine(), "SPECIAL"), 2)
+	BIT(ioport("SPECIAL")->read(), 2)
 
 #define INPUT \
-	BIT(input_port_read(machine(), "SPECIAL"), 3)
+	BIT(ioport("SPECIAL")->read(), 3)
 
 /* Read/Write Handlers */
 
@@ -85,14 +85,12 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-static INPUT_CHANGED( input_w )
+INPUT_CHANGED_MEMBER( elf2_state::input_w )
 {
-	elf2_state *state = field.machine().driver_data<elf2_state>();
-
 	if (newval)
 	{
 		/* assert DMAIN */
-		state->m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAIN, ASSERT_LINE);
+		m_maincpu->set_input_line(COSMAC_INPUT_LINE_DMAIN, ASSERT_LINE);
 	}
 }
 
@@ -129,7 +127,7 @@ static INPUT_PORTS_START( elf2 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("RUN") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("LOAD") PORT_CODE(KEYCODE_L) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("M/P") PORT_CODE(KEYCODE_M) PORT_TOGGLE
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("INPUT") PORT_CODE(KEYCODE_ENTER) PORT_CHANGED(input_w, 0)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("INPUT") PORT_CODE(KEYCODE_ENTER) PORT_CHANGED_MEMBER(DEVICE_SELF, elf2_state, input_w, 0)
 INPUT_PORTS_END
 
 /* CDP1802 Configuration */
@@ -247,8 +245,8 @@ void elf2_state::machine_start()
 	/* setup memory banking */
 	program->install_read_bank(0x0000, 0x00ff, "bank1");
 	program->install_write_handler(0x0000, 0x00ff, write8_delegate(FUNC(elf2_state::memory_w), this));
-	memory_configure_bank(machine(), "bank1", 0, 1, m_ram->pointer(), 0);
-	memory_set_bank(machine(), "bank1", 0);
+	membank("bank1")->configure_entry(0, m_ram->pointer());
+	membank("bank1")->set_entry(0);
 
 	/* register for state saving */
 	save_item(NAME(m_data));

@@ -190,7 +190,7 @@ UINT8 abc_sio_device::abcbus_xmemfl(offs_t offset)
 
 	if (offset >= 0x4000 && offset < 0x5000) // TODO where is this mapped?
 	{
-		data = subregion("abc80")->base()[offset & 0xfff];
+		data = memregion("abc80")->base()[offset & 0xfff];
 	}
 
 	return data;

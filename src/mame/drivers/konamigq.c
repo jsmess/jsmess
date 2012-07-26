@@ -66,34 +66,47 @@ public:
 	UINT8 m_sndtor3k[ 16 ];
 	UINT8 *m_p_n_pcmram;
 	UINT8 m_sector_buffer[ 512 ];
+	DECLARE_WRITE32_MEMBER(soundr3k_w);
+	DECLARE_READ32_MEMBER(soundr3k_r);
+	DECLARE_WRITE32_MEMBER(mb89371_w);
+	DECLARE_READ32_MEMBER(mb89371_r);
+	DECLARE_WRITE32_MEMBER(eeprom_w);
+	DECLARE_WRITE32_MEMBER(pcmram_w);
+	DECLARE_READ32_MEMBER(pcmram_r);
+	DECLARE_READ16_MEMBER(sndcomm68k_r);
+	DECLARE_WRITE16_MEMBER(sndcomm68k_w);
+	DECLARE_READ16_MEMBER(tms57002_data_word_r);
+	DECLARE_WRITE16_MEMBER(tms57002_data_word_w);
+	DECLARE_READ16_MEMBER(tms57002_status_word_r);
+	DECLARE_WRITE16_MEMBER(tms57002_control_word_w);
 };
 
 /* Sound */
 
-static WRITE32_HANDLER( soundr3k_w )
+WRITE32_MEMBER(konamigq_state::soundr3k_w)
 {
-	konamigq_state *state = space->machine().driver_data<konamigq_state>();
+
 
 	if( ACCESSING_BITS_16_31 )
 	{
-		state->m_sndto000[ ( offset << 1 ) + 1 ] = data >> 16;
+		m_sndto000[ ( offset << 1 ) + 1 ] = data >> 16;
 		if( offset == 3 )
 		{
-			cputag_set_input_line(space->machine(), "soundcpu", 1, HOLD_LINE );
+			cputag_set_input_line(machine(), "soundcpu", 1, HOLD_LINE );
 		}
 	}
 	if( ACCESSING_BITS_0_15 )
 	{
-		state->m_sndto000[ offset << 1 ] = data;
+		m_sndto000[ offset << 1 ] = data;
 	}
 }
 
-static READ32_HANDLER( soundr3k_r )
+READ32_MEMBER(konamigq_state::soundr3k_r)
 {
-	konamigq_state *state = space->machine().driver_data<konamigq_state>();
+
 	UINT32 data;
 
-	data = ( state->m_sndtor3k[ ( offset << 1 ) + 1 ] << 16 ) | state->m_sndtor3k[ offset << 1 ];
+	data = ( m_sndtor3k[ ( offset << 1 ) + 1 ] << 16 ) | m_sndtor3k[ offset << 1 ];
 
 	/* hack to help the main program start up */
 	if( offset == 1 )
@@ -106,11 +119,11 @@ static READ32_HANDLER( soundr3k_r )
 
 /* UART */
 
-static WRITE32_HANDLER( mb89371_w )
+WRITE32_MEMBER(konamigq_state::mb89371_w)
 {
 }
 
-static READ32_HANDLER( mb89371_r )
+READ32_MEMBER(konamigq_state::mb89371_r)
 {
 	return 0xffffffff;
 }
@@ -129,41 +142,41 @@ static const UINT16 konamigq_def_eeprom[64] =
 	0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa, 0xaaaa,
 };
 
-static WRITE32_HANDLER( eeprom_w )
+WRITE32_MEMBER(konamigq_state::eeprom_w)
 {
-	input_port_write(space->machine(), "EEPROMOUT", data & 0x07, 0xff);
-	cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
+	ioport("EEPROMOUT")->write(data & 0x07, 0xff);
+	cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 
 /* PCM RAM */
 
-static WRITE32_HANDLER( pcmram_w )
+WRITE32_MEMBER(konamigq_state::pcmram_w)
 {
-	konamigq_state *state = space->machine().driver_data<konamigq_state>();
+
 
 	if( ACCESSING_BITS_0_7 )
 	{
-		state->m_p_n_pcmram[ offset << 1 ] = data;
+		m_p_n_pcmram[ offset << 1 ] = data;
 	}
 	if( ACCESSING_BITS_16_23 )
 	{
-		state->m_p_n_pcmram[ ( offset << 1 ) + 1 ] = data >> 16;
+		m_p_n_pcmram[ ( offset << 1 ) + 1 ] = data >> 16;
 	}
 }
 
-static READ32_HANDLER( pcmram_r )
+READ32_MEMBER(konamigq_state::pcmram_r)
 {
-	konamigq_state *state = space->machine().driver_data<konamigq_state>();
 
-	return ( state->m_p_n_pcmram[ ( offset << 1 ) + 1 ] << 16 ) | state->m_p_n_pcmram[ offset << 1 ];
+
+	return ( m_p_n_pcmram[ ( offset << 1 ) + 1 ] << 16 ) | m_p_n_pcmram[ offset << 1 ];
 }
 
 /* Video */
 
-static ADDRESS_MAP_START( konamigq_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( konamigq_map, AS_PROGRAM, 32, konamigq_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
-	AM_RANGE(0x1f000000, 0x1f00001f) AM_READWRITE(am53cf96_r, am53cf96_w)
+	AM_RANGE(0x1f000000, 0x1f00001f) AM_READWRITE_LEGACY(am53cf96_r, am53cf96_w)
 	AM_RANGE(0x1f100000, 0x1f10000f) AM_WRITE(soundr3k_w)
 	AM_RANGE(0x1f100010, 0x1f10001f) AM_READ(soundr3k_r)
 	AM_RANGE(0x1f180000, 0x1f180003) AM_WRITE(eeprom_w)
@@ -191,44 +204,44 @@ ADDRESS_MAP_END
 
 /* SOUND CPU */
 
-static READ16_HANDLER( sndcomm68k_r )
+READ16_MEMBER(konamigq_state::sndcomm68k_r)
 {
-	konamigq_state *state = space->machine().driver_data<konamigq_state>();
 
-	return state->m_sndto000[ offset ];
+
+	return m_sndto000[ offset ];
 }
 
-static WRITE16_HANDLER( sndcomm68k_w )
+WRITE16_MEMBER(konamigq_state::sndcomm68k_w)
 {
-	konamigq_state *state = space->machine().driver_data<konamigq_state>();
 
-	state->m_sndtor3k[ offset ] = data;
+
+	m_sndtor3k[ offset ] = data;
 }
 
-static READ16_HANDLER(tms57002_data_word_r)
-{
-	return 0;
-}
-
-static WRITE16_HANDLER(tms57002_data_word_w)
-{
-}
-
-static READ16_HANDLER(tms57002_status_word_r)
+READ16_MEMBER(konamigq_state::tms57002_data_word_r)
 {
 	return 0;
 }
 
-static WRITE16_HANDLER(tms57002_control_word_w)
+WRITE16_MEMBER(konamigq_state::tms57002_data_word_w)
+{
+}
+
+READ16_MEMBER(konamigq_state::tms57002_status_word_r)
+{
+	return 0;
+}
+
+WRITE16_MEMBER(konamigq_state::tms57002_control_word_w)
 {
 }
 
 /* 68000 memory handling */
-static ADDRESS_MAP_START( konamigq_sound_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( konamigq_sound_map, AS_PROGRAM, 16, konamigq_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8_MODERN("konami1", k054539_device, read, write, 0xff00)
-	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8_MODERN("konami2", k054539_device, read, write, 0x00ff)
+	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("konami1", k054539_device, read, write, 0xff00)
+	AM_RANGE(0x200000, 0x2004ff) AM_DEVREADWRITE8("konami2", k054539_device, read, write, 0x00ff)
 	AM_RANGE(0x300000, 0x300001) AM_READWRITE(tms57002_data_word_r,tms57002_data_word_w)
 	AM_RANGE(0x400000, 0x40000f) AM_WRITE(sndcomm68k_w)
 	AM_RANGE(0x400010, 0x40001f) AM_READ(sndcomm68k_r)
@@ -308,7 +321,7 @@ static DRIVER_INIT( konamigq )
 
 	psx_driver_init(machine);
 
-	state->m_p_n_pcmram = machine.region( "shared" )->base() + 0x80000;
+	state->m_p_n_pcmram = state->memregion( "shared" )->base() + 0x80000;
 }
 
 static void konamigq_exit(running_machine &machine)

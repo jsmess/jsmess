@@ -16,7 +16,6 @@ ToDo:
 
 ***************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 #define VIDEO_START_MEMBER(name) void name::video_start()
 #define SCREEN_UPDATE_MEMBER(name) UINT32 name::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 
@@ -75,8 +74,8 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( jupiter3_mem, AS_PROGRAM, 8, jupiter3_state )
-	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE(m_p_ram)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(m_p_videoram)
+	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_SHARE("p_ram")
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("p_videoram")
 	AM_RANGE(0xe000, 0xefff) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -134,7 +133,7 @@ WRITE8_MEMBER( jupiter3_state::kbd_put )
 
 VIDEO_START_MEMBER( jupiter3_state )
 {
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 SCREEN_UPDATE_MEMBER( jupiter3_state )
@@ -241,7 +240,7 @@ void jupiter2_state::machine_start()
 
 void jupiter3_state::machine_reset()
 {
-	UINT8* ROM = machine().region(Z80_TAG)->base();
+	UINT8* ROM = memregion(Z80_TAG)->base();
 	memcpy(m_p_ram, ROM, 0x1000);
 	cpu_set_reg(m_maincpu, STATE_GENPC, 0xe000);
 }
@@ -349,7 +348,7 @@ ROM_END
 
 static DRIVER_INIT( jupiter )
 {
-	UINT8 *rom = machine.region(MCM6571AP_TAG)->base();
+	UINT8 *rom = machine.root_device().memregion(MCM6571AP_TAG)->base();
 	UINT8 inverted[0x1000];
 
 	memcpy(inverted, rom, 0x1000);
@@ -371,7 +370,7 @@ static DRIVER_INIT( jupiter )
 
 static DRIVER_INIT( jupiter3 )
 {
-	UINT8 *rom = machine.region(Z80_TAG)->base();
+	UINT8 *rom = machine.root_device().memregion(Z80_TAG)->base();
 	UINT8 inverted[0x1000];
 
 	memcpy(inverted, rom, 0x1000);

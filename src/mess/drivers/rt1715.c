@@ -35,6 +35,12 @@ public:
 
 	int m_led1_val;
 	int m_led2_val;
+	DECLARE_WRITE8_MEMBER(rt1715_floppy_enable);
+	DECLARE_READ8_MEMBER(k7658_led1_r);
+	DECLARE_READ8_MEMBER(k7658_led2_r);
+	DECLARE_READ8_MEMBER(k7658_data_r);
+	DECLARE_WRITE8_MEMBER(k7658_data_w);
+	DECLARE_WRITE8_MEMBER(rt1715_rom_disable);
 };
 
 
@@ -42,9 +48,9 @@ public:
     FLOPPY
 ***************************************************************************/
 
-static WRITE8_HANDLER( rt1715_floppy_enable )
+WRITE8_MEMBER(rt1715_state::rt1715_floppy_enable)
 {
-	logerror("%s: rt1715_floppy_enable %02x\n", space->machine().describe_context(), data);
+	logerror("%s: rt1715_floppy_enable %02x\n", machine().describe_context(), data);
 }
 
 
@@ -53,49 +59,47 @@ static WRITE8_HANDLER( rt1715_floppy_enable )
 ***************************************************************************/
 
 /* si/so led */
-static READ8_HANDLER( k7658_led1_r )
+READ8_MEMBER(rt1715_state::k7658_led1_r)
 {
-	rt1715_state *state = space->machine().driver_data<rt1715_state>();
-	state->m_led1_val ^= 1;
-	logerror("%s: k7658_led1_r %02x\n", space->machine().describe_context(), state->m_led1_val);
+	m_led1_val ^= 1;
+	logerror("%s: k7658_led1_r %02x\n", machine().describe_context(), m_led1_val);
 	return 0xff;
 }
 
 /* caps led */
-static READ8_HANDLER( k7658_led2_r )
+READ8_MEMBER(rt1715_state::k7658_led2_r)
 {
-	rt1715_state *state = space->machine().driver_data<rt1715_state>();
-	state->m_led2_val ^= 1;
-	logerror("%s: k7658_led2_r %02x\n", space->machine().describe_context(), state->m_led2_val);
+	m_led2_val ^= 1;
+	logerror("%s: k7658_led2_r %02x\n", machine().describe_context(), m_led2_val);
 	return 0xff;
 }
 
 /* read key state */
-static READ8_HANDLER( k7658_data_r )
+READ8_MEMBER(rt1715_state::k7658_data_r)
 {
 	UINT8 result = 0xff;
 
-	if (BIT(offset,  0)) result &= input_port_read(space->machine(), "row_00");
-	if (BIT(offset,  1)) result &= input_port_read(space->machine(), "row_10");
-	if (BIT(offset,  2)) result &= input_port_read(space->machine(), "row_20");
-	if (BIT(offset,  3)) result &= input_port_read(space->machine(), "row_30");
-	if (BIT(offset,  4)) result &= input_port_read(space->machine(), "row_40");
-	if (BIT(offset,  5)) result &= input_port_read(space->machine(), "row_50");
-	if (BIT(offset,  6)) result &= input_port_read(space->machine(), "row_60");
-	if (BIT(offset,  7)) result &= input_port_read(space->machine(), "row_70");
-	if (BIT(offset,  8)) result &= input_port_read(space->machine(), "row_08");
-	if (BIT(offset,  9)) result &= input_port_read(space->machine(), "row_18");
-	if (BIT(offset, 10)) result &= input_port_read(space->machine(), "row_28");
-	if (BIT(offset, 11)) result &= input_port_read(space->machine(), "row_38");
-	if (BIT(offset, 12)) result &= input_port_read(space->machine(), "row_48");
+	if (BIT(offset,  0)) result &= ioport("row_00")->read();
+	if (BIT(offset,  1)) result &= ioport("row_10")->read();
+	if (BIT(offset,  2)) result &= ioport("row_20")->read();
+	if (BIT(offset,  3)) result &= ioport("row_30")->read();
+	if (BIT(offset,  4)) result &= ioport("row_40")->read();
+	if (BIT(offset,  5)) result &= ioport("row_50")->read();
+	if (BIT(offset,  6)) result &= ioport("row_60")->read();
+	if (BIT(offset,  7)) result &= ioport("row_70")->read();
+	if (BIT(offset,  8)) result &= ioport("row_08")->read();
+	if (BIT(offset,  9)) result &= ioport("row_18")->read();
+	if (BIT(offset, 10)) result &= ioport("row_28")->read();
+	if (BIT(offset, 11)) result &= ioport("row_38")->read();
+	if (BIT(offset, 12)) result &= ioport("row_48")->read();
 
 	return result;
 }
 
 /* serial output on D0 */
-static WRITE8_HANDLER( k7658_data_w )
+WRITE8_MEMBER(rt1715_state::k7658_data_w)
 {
-	logerror("%s: k7658_data_w %02x\n", space->machine().describe_context(), BIT(data, 0));
+	logerror("%s: k7658_data_w %02x\n", machine().describe_context(), BIT(data, 0));
 }
 
 
@@ -105,22 +109,24 @@ static WRITE8_HANDLER( k7658_data_w )
 
 static MACHINE_START( rt1715 )
 {
-	memory_set_bankptr(machine, "bank2", machine.device<ram_device>(RAM_TAG)->pointer() + 0x0800);
-	memory_set_bankptr(machine, "bank3", machine.device<ram_device>(RAM_TAG)->pointer());
+	rt1715_state *state = machine.driver_data<rt1715_state>();
+	state->membank("bank2")->set_base(machine.device<ram_device>(RAM_TAG)->pointer() + 0x0800);
+	state->membank("bank3")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
 }
 
 static MACHINE_RESET( rt1715 )
 {
+	rt1715_state *state = machine.driver_data<rt1715_state>();
 	/* on reset, enable ROM */
-	memory_set_bankptr(machine, "bank1", machine.region("ipl")->base());
+	state->membank("bank1")->set_base(state->memregion("ipl")->base());
 }
 
-static WRITE8_HANDLER( rt1715_rom_disable )
+WRITE8_MEMBER(rt1715_state::rt1715_rom_disable)
 {
-	logerror("%s: rt1715_set_bank %02x\n", space->machine().describe_context(), data);
+	logerror("%s: rt1715_set_bank %02x\n", machine().describe_context(), data);
 
 	/* disable ROM, enable RAM */
-	memory_set_bankptr(space->machine(), "bank1", space->machine().device<ram_device>(RAM_TAG)->pointer());
+	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 }
 
 /***************************************************************************
@@ -178,29 +184,29 @@ static PALETTE_INIT( rt1715 )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( rt1715_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rt1715_mem, AS_PROGRAM, 8, rt1715_state )
 	AM_RANGE(0x0000, 0x07ff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank3")
 	AM_RANGE(0x0800, 0xffff) AM_RAMBANK("bank2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rt1715_io, AS_IO, 8 )
+static ADDRESS_MAP_START( rt1715_io, AS_IO, 8, rt1715_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("a71", z80pio_ba_cd_r, z80pio_ba_cd_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("a72", z80pio_ba_cd_r, z80pio_ba_cd_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("a30", z80ctc_r, z80ctc_w)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("a29", z80sio_ba_cd_r, z80sio_ba_cd_w)
-	AM_RANGE(0x18, 0x19) AM_DEVREADWRITE("a26", i8275_r, i8275_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("a71", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("a72", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("a30", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY("a29", z80sio_ba_cd_r, z80sio_ba_cd_w)
+	AM_RANGE(0x18, 0x19) AM_DEVREADWRITE_LEGACY("a26", i8275_r, i8275_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(rt1715_floppy_enable)
 	AM_RANGE(0x28, 0x28) AM_WRITE(rt1715_rom_disable)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( k7658_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( k7658_mem, AS_PROGRAM, 8, rt1715_state )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(k7658_data_w)
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0xf800) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( k7658_io, AS_IO, 8 )
+static ADDRESS_MAP_START( k7658_io, AS_IO, 8, rt1715_state )
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x8000) AM_READ(k7658_led1_r)
 	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x8000) AM_READ(k7658_led2_r)
 	AM_RANGE(0x8000, 0x9fff) AM_READ(k7658_data_r)

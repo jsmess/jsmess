@@ -15,8 +15,8 @@ static TILE_GET_INFO( get_bgtile_info )
 {
 	int code,attr,pal;
 
-	code=machine.region("user1")->base()[tile_index]; /* TTTTTTTT */
-	attr=machine.region("user2")->base()[tile_index]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
+	code=machine.root_device().memregion("user1")->base()[tile_index]; /* TTTTTTTT */
+	attr=machine.root_device().memregion("user2")->base()[tile_index]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
 	code+=(attr&3)<<8;
 	pal=(attr>>4);
 
@@ -31,8 +31,8 @@ static TILE_GET_INFO( get_fgtile_info )
 {
 	int code,attr,pal;
 
-	code=machine.region("user3")->base()[tile_index]; /* TTTTTTTT */
-	attr=machine.region("user4")->base()[tile_index]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
+	code=machine.root_device().memregion("user3")->base()[tile_index]; /* TTTTTTTT */
+	attr=machine.root_device().memregion("user4")->base()[tile_index]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
 	pal=attr>>4;
 
 	code+=(attr&3)<<8;
@@ -71,6 +71,7 @@ static TILE_GET_INFO( get_txttile_info )
 
 PALETTE_INIT(darkmist)
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -102,13 +103,14 @@ PALETTE_INIT(darkmist)
 
 static void set_pens(running_machine &machine)
 {
+	darkmist_state *state = machine.driver_data<darkmist_state>();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
 	{
-		int r = pal4bit(machine.generic.paletteram.u8[i | 0x200] >> 0);
-		int g = pal4bit(machine.generic.paletteram.u8[i | 0x000] >> 4);
-		int b = pal4bit(machine.generic.paletteram.u8[i | 0x000] >> 0);
+		int r = pal4bit(state->m_generic_paletteram_8[i | 0x200] >> 0);
+		int g = pal4bit(state->m_generic_paletteram_8[i | 0x000] >> 4);
+		int b = pal4bit(state->m_generic_paletteram_8[i | 0x000] >> 0);
 
 		colortable_palette_set_color(machine.colortable, i, MAKE_RGB(r, g, b));
 	}
@@ -163,7 +165,7 @@ SCREEN_UPDATE_IND16( darkmist)
 
 */
 		int i,fx,fy,tile,palette;
-		for(i=0;i<state->m_spriteram_size;i+=32)
+		for(i=0;i<state->m_spriteram.bytes();i+=32)
 		{
 			fy=spriteram[i+1]&0x40;
 			fx=spriteram[i+1]&0x80;

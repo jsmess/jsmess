@@ -19,7 +19,6 @@
 #ifndef __WDXT_GEN__
 #define __WDXT_GEN__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"

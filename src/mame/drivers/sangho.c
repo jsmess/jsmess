@@ -34,6 +34,8 @@ is a YM2413 compatible chip.
 
 *** the custom chip with the warning appears to control banking etc.
 
+Sexy Boom's DSW setting verified via Z80 code by stephh
+
 */
 
 #include "emu.h"
@@ -54,6 +56,10 @@ public:
 	UINT8 m_pzlestar_mem_bank;
 	UINT8 m_pzlestar_rom_bank;
 	required_device<v9938_device> m_v9938;
+	DECLARE_WRITE8_MEMBER(pzlestar_bank_w);
+	DECLARE_WRITE8_MEMBER(pzlestar_mem_bank_w);
+	DECLARE_READ8_MEMBER(pzlestar_mem_bank_r);
+	DECLARE_WRITE8_MEMBER(sexyboom_bank_w);
 };
 
 
@@ -69,13 +75,13 @@ static void pzlestar_map_banks(running_machine &machine)
 		case 0:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1");
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x3fff, "bank5");
-			memory_set_bankptr(machine, "bank1", state->m_ram);
-			memory_set_bankptr(machine, "bank5", state->m_ram);
+			state->membank("bank1")->set_base(state->m_ram);
+			state->membank("bank5")->set_base(state->m_ram);
 			break;
 		case 2:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x3fff, "bank1");
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x3fff);
-			memory_set_bankptr(machine, "bank1", machine.region("user1")->base()+ 0x10000);
+			state->membank("bank1")->set_base(state->memregion("user1")->base()+ 0x10000);
 			break;
 		case 1:
 		case 3:
@@ -91,18 +97,18 @@ static void pzlestar_map_banks(running_machine &machine)
 		case 0:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x7fff, "bank2");
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x4000, 0x7fff, "bank6");
-			memory_set_bankptr(machine, "bank2", state->m_ram + 0x4000);
-			memory_set_bankptr(machine, "bank6", state->m_ram + 0x4000);
+			state->membank("bank2")->set_base(state->m_ram + 0x4000);
+			state->membank("bank6")->set_base(state->m_ram + 0x4000);
 			break;
 		case 2:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x7fff, "bank2");
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x4000, 0x7fff);
-			memory_set_bankptr(machine, "bank2", machine.region("user1")->base()+ 0x18000);
+			state->membank("bank2")->set_base(machine.root_device().memregion("user1")->base()+ 0x18000);
 			break;
 		case 3:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x4000, 0x7fff, "bank2");
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x4000, 0x7fff);
-			memory_set_bankptr(machine, "bank2", machine.region("user1")->base()+ 0x20000 + (state->m_pzlestar_rom_bank*0x8000) + 0x4000);
+			state->membank("bank2")->set_base(machine.root_device().memregion("user1")->base()+ 0x20000 + (state->m_pzlestar_rom_bank*0x8000) + 0x4000);
 			break;
 		case 1:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_read(0x4000, 0x7fff);
@@ -117,13 +123,13 @@ static void pzlestar_map_banks(running_machine &machine)
 		case 0:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0xbfff, "bank3");
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0x8000, 0xbfff, "bank7");
-			memory_set_bankptr(machine, "bank3", state->m_ram + 0x8000);
-			memory_set_bankptr(machine, "bank7", state->m_ram + 0x8000);
+			state->membank("bank3")->set_base(state->m_ram + 0x8000);
+			state->membank("bank7")->set_base(state->m_ram + 0x8000);
 			break;
 		case 3:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0xbfff, "bank3");
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x8000, 0xbfff);
-			memory_set_bankptr(machine, "bank3", machine.region("user1")->base()+ 0x20000 + (state->m_pzlestar_rom_bank*0x8000));
+			state->membank("bank3")->set_base(machine.root_device().memregion("user1")->base()+ 0x20000 + (state->m_pzlestar_rom_bank*0x8000));
 			break;
 		case 1:
 		case 2:
@@ -139,8 +145,8 @@ static void pzlestar_map_banks(running_machine &machine)
 		case 0:
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0xc000, 0xffff, "bank4");
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(0xc000, 0xffff, "bank8");
-			memory_set_bankptr(machine, "bank4", state->m_ram + 0xc000);
-			memory_set_bankptr(machine, "bank8", state->m_ram + 0xc000);
+			state->membank("bank4")->set_base(state->m_ram + 0xc000);
+			state->membank("bank8")->set_base(state->m_ram + 0xc000);
 			break;
 		case 1:
 		case 2:
@@ -152,26 +158,23 @@ static void pzlestar_map_banks(running_machine &machine)
 
 }
 
-static WRITE8_HANDLER(pzlestar_bank_w)
+WRITE8_MEMBER(sangho_state::pzlestar_bank_w)
 {
-	sangho_state *state = space->machine().driver_data<sangho_state>();
 	logerror("rom bank %02x\n", data);
-	state->m_pzlestar_rom_bank = data;
-	pzlestar_map_banks(space->machine());
+	m_pzlestar_rom_bank = data;
+	pzlestar_map_banks(machine());
 }
 
-static WRITE8_HANDLER(pzlestar_mem_bank_w)
+WRITE8_MEMBER(sangho_state::pzlestar_mem_bank_w)
 {
-	sangho_state *state = space->machine().driver_data<sangho_state>();
 	logerror("mem bank %02x\n", data);
-	state->m_pzlestar_mem_bank = data;
-	pzlestar_map_banks(space->machine());
+	m_pzlestar_mem_bank = data;
+	pzlestar_map_banks(machine());
 }
 
-static READ8_HANDLER(pzlestar_mem_bank_r)
+READ8_MEMBER(sangho_state::pzlestar_mem_bank_r)
 {
-	sangho_state *state = space->machine().driver_data<sangho_state>();
-	return state->m_pzlestar_mem_bank;
+	return m_pzlestar_mem_bank;
 }
 
 static void sexyboom_map_bank(running_machine &machine, int bank)
@@ -190,25 +193,25 @@ static void sexyboom_map_bank(running_machine &machine, int bank)
 		if (banknum & 0x80)
 		{
 			// ram
-			memory_set_bankptr(machine, read_bank_name, &state->m_ram[(banknum & 0x7f) * 0x4000]);
+			state->membank(read_bank_name)->set_base(&state->m_ram[(banknum & 0x7f) * 0x4000]);
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_bank(bank*0x4000, (bank+1)*0x4000 - 1, write_bank_name );
-			memory_set_bankptr(machine, write_bank_name, &state->m_ram[(banknum & 0x7f) * 0x4000]);
+			state->membank(write_bank_name)->set_base(&state->m_ram[(banknum & 0x7f) * 0x4000]);
 		}
 		else
 		{
 			// rom 0
-			memory_set_bankptr(machine, read_bank_name, machine.region("user1")->base()+0x4000*banknum);
+			state->membank(read_bank_name)->set_base(machine.root_device().memregion("user1")->base()+0x4000*banknum);
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(bank*0x4000, (bank+1)*0x4000 - 1);
 		}
 	}
 	else if (banktype == 0x82)
 	{
-		memory_set_bankptr(machine, read_bank_name, machine.region("user1")->base()+0x20000+banknum*0x4000);
+		state->membank(read_bank_name)->set_base(machine.root_device().memregion("user1")->base()+0x20000+banknum*0x4000);
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(bank*0x4000, (bank+1)*0x4000 - 1);
 	}
 	else if (banktype == 0x80)
 	{
-		memory_set_bankptr(machine, read_bank_name, machine.region("user1")->base()+0x120000+banknum*0x4000);
+		state->membank(read_bank_name)->set_base(machine.root_device().memregion("user1")->base()+0x120000+banknum*0x4000);
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(bank*0x4000, (bank+1)*0x4000 - 1);
 	}
 	else
@@ -217,14 +220,13 @@ static void sexyboom_map_bank(running_machine &machine, int bank)
 	}
 }
 
-static WRITE8_HANDLER(sexyboom_bank_w)
+WRITE8_MEMBER(sangho_state::sexyboom_bank_w)
 {
-	sangho_state *state = space->machine().driver_data<sangho_state>();
-	state->m_sexyboom_bank[offset] = data;
-	sexyboom_map_bank(space->machine(), offset>>1);
+	m_sexyboom_bank[offset] = data;
+	sexyboom_map_bank(machine(), offset>>1);
 }
 
-static ADDRESS_MAP_START( sangho_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sangho_map, AS_PROGRAM, 8, sangho_state )
 	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
 	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
 	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
@@ -233,31 +235,30 @@ ADDRESS_MAP_END
 
 /* Puzzle Star Ports */
 
-static ADDRESS_MAP_START( pzlestar_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( pzlestar_io_map, AS_IO, 8, sangho_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE( "ymsnd", ym2413_w )
-	AM_RANGE( 0x91, 0x91) AM_WRITE( pzlestar_bank_w )
-	AM_RANGE( 0x98, 0x9b) AM_DEVREADWRITE_MODERN("v9938", v9938_device, read, write )
+	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
+	AM_RANGE( 0x91, 0x91) AM_WRITE(pzlestar_bank_w )
+	AM_RANGE( 0x98, 0x9b) AM_DEVREADWRITE("v9938", v9938_device, read, write )
 	AM_RANGE( 0xa0, 0xa0) AM_READ_PORT("P1")
 	AM_RANGE( 0xa1, 0xa1) AM_READ_PORT("P2")
-	AM_RANGE( 0xa8, 0xa8) AM_READWRITE( pzlestar_mem_bank_r, pzlestar_mem_bank_w )
+	AM_RANGE( 0xa8, 0xa8) AM_READWRITE(pzlestar_mem_bank_r, pzlestar_mem_bank_w )
 	AM_RANGE( 0xf7, 0xf7) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
 /* Sexy Boom Ports */
 
-static ADDRESS_MAP_START( sexyboom_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sexyboom_io_map, AS_IO, 8, sangho_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE( "ymsnd", ym2413_w )
+	AM_RANGE( 0x7c, 0x7d) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
 	AM_RANGE( 0xa0, 0xa0) AM_READ_PORT("P1")
 	AM_RANGE( 0xa1, 0xa1) AM_READ_PORT("P2")
-	AM_RANGE( 0xf0, 0xf3) AM_DEVREADWRITE_MODERN("v9938", v9938_device, read, write )
+	AM_RANGE( 0xf0, 0xf3) AM_DEVREADWRITE("v9938", v9938_device, read, write )
 	AM_RANGE( 0xf7, 0xf7) AM_READ_PORT("DSW")
-	AM_RANGE( 0xf8, 0xff) AM_WRITE( sexyboom_bank_w )
+	AM_RANGE( 0xf8, 0xff) AM_WRITE(sexyboom_bank_w )
 ADDRESS_MAP_END
 
-
-static INPUT_PORTS_START( sangho )
+static INPUT_PORTS_START( sexyboom )
     PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
     PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
@@ -291,9 +292,31 @@ static INPUT_PORTS_START( sangho )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 
 	PORT_START("DSW")
-    PORT_DIPNAME( 0x01, 0x01, "DIPS" ) /* coinage etc. */
-    PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:8,7,6")
+	PORT_DIPSETTING(    0x03, DEF_STR( Easiest ) )
+	PORT_DIPSETTING(    0x05, "Easiest (duplicate)" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, "Easy (duplicate)" )
+	PORT_DIPSETTING(    0x07, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Harder ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:5,4") /* Determined by effect, but matches Puzzle Star's manual listings */
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW1:3" )	/* Not shown in manual */
+	PORT_DIPNAME( 0x40, 0x00, "Display Numbers on Tiles" )	PORT_DIPLOCATION("SW1:2") /* As per manual */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( pzlestar )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 ) /* Start buttons don't work for Puzzle Star... not correct? */
     PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
     PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -303,16 +326,48 @@ static INPUT_PORTS_START( sangho )
     PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
     PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 ) /* Start buttons don't work for Puzzle Star... not correct? */
+    PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+    PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40, 0x40, "Display Numbers on Tiles" )
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+    PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:8,7") /* Will need verification, as other dips don't match manual */
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:6,5") /* Shown as SW1:4 & SW1:5 in manual */
+	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )		/* Actual effect on game, manual shows 1C / 2C */
+	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )		/* Actual effect on game, manual shows 3C / 1C */
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )		/* Actual effect on game & manual are the same */
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )		/* Actual effect on game, manual shows 2C / 1C */
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:4") /* Not shown in manual */
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:3") /* Not shown in manual */
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, "Display Numbers on Tiles" )	PORT_DIPLOCATION("SW1:2") /* As per manual */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )		/* Dipswitch 1:1 Not shown in manual */
 INPUT_PORTS_END
 
 
@@ -466,5 +521,5 @@ static DRIVER_INIT(sangho)
 	state->m_ram = auto_alloc_array(machine, UINT8, 0x20000);
 }
 
-GAME( 1991, pzlestar,  0,    pzlestar, sangho, sangho, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", GAME_NOT_WORKING )
-GAME( 1992, sexyboom,  0,    sexyboom, sangho, sangho, ROT270, "Sang Ho Soft", "Sexy Boom", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
+GAME( 1991, pzlestar,  0,    pzlestar, pzlestar, sangho, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", GAME_NOT_WORKING )
+GAME( 1992, sexyboom,  0,    sexyboom, sexyboom, sangho, ROT270, "Sang Ho Soft", "Sexy Boom", GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )

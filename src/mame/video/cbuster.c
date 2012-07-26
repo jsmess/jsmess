@@ -15,25 +15,26 @@
 
 static void update_24bitcol( running_machine &machine, int offset )
 {
+	cbuster_state *state = machine.driver_data<cbuster_state>();
 	UINT8 r, g, b; /* The highest palette value seems to be 0x8e */
 
-	r = (UINT8)((float)((machine.generic.paletteram.u16[offset]  >> 0) & 0xff) * 1.75);
-	g = (UINT8)((float)((machine.generic.paletteram.u16[offset]  >> 8) & 0xff) * 1.75);
-	b = (UINT8)((float)((machine.generic.paletteram2.u16[offset] >> 0) & 0xff) * 1.75);
+	r = (UINT8)((float)((state->m_generic_paletteram_16[offset]  >> 0) & 0xff) * 1.75);
+	g = (UINT8)((float)((state->m_generic_paletteram_16[offset]  >> 8) & 0xff) * 1.75);
+	b = (UINT8)((float)((state->m_generic_paletteram2_16[offset] >> 0) & 0xff) * 1.75);
 
 	palette_set_color(machine, offset, MAKE_RGB(r, g, b));
 }
 
-WRITE16_HANDLER( twocrude_palette_24bit_rg_w )
+WRITE16_MEMBER(cbuster_state::twocrude_palette_24bit_rg_w)
 {
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	update_24bitcol(space->machine(), offset);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	update_24bitcol(machine(), offset);
 }
 
-WRITE16_HANDLER( twocrude_palette_24bit_b_w )
+WRITE16_MEMBER(cbuster_state::twocrude_palette_24bit_b_w)
 {
-	COMBINE_DATA(&space->machine().generic.paletteram2.u16[offset]);
-	update_24bitcol(space->machine(), offset);
+	COMBINE_DATA(&m_generic_paletteram2_16[offset]);
+	update_24bitcol(machine(), offset);
 }
 
 
@@ -52,7 +53,7 @@ SCREEN_UPDATE_RGB32( twocrude )
 	cbuster_state *state = screen.machine().driver_data<cbuster_state>();
 	UINT16 flip = deco16ic_pf_control_r(state->m_deco_tilegen1, 0, 0xffff);
 
-	flip_screen_set(screen.machine(), !BIT(flip, 7));
+	state->flip_screen_set(!BIT(flip, 7));
 
 	screen.machine().device<decospr_device>("spritegen")->draw_sprites(bitmap, cliprect, state->m_spriteram16_buffer, 0x400);
 

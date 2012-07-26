@@ -395,6 +395,7 @@ static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap, const r
 						int sprite_y_adjust, int sprite_y_adjust_flip_screen,
 						UINT8 *sprite_ram, int interleave)
 {
+	decocass_state *state = machine.driver_data<decocass_state>();
 	int i,offs;
 
 	/* Draw the sprites */
@@ -411,7 +412,7 @@ static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap, const r
 		flipx = sprite_ram[offs + 0] & 0x04;
 		flipy = sprite_ram[offs + 0] & 0x02;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy + sprite_y_adjust_flip_screen;
@@ -428,7 +429,7 @@ static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap, const r
 				flipx,flipy,
 				sx,sy, 0);
 
-		sy += (flip_screen_get(machine) ? -256 : 256);
+		sy += (state->flip_screen() ? -256 : 256);
 
 		// Wrap around
 		drawgfx_transpen(bitmap,cliprect, machine.gfx[1],
@@ -455,7 +456,7 @@ static void draw_missiles(running_machine &machine,bitmap_ind16 &bitmap, const r
 
 		sy = 255 - missile_ram[offs + 0 * interleave];
 		sx = 255 - missile_ram[offs + 2 * interleave];
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy + missile_y_adjust_flip_screen;
@@ -471,7 +472,7 @@ static void draw_missiles(running_machine &machine,bitmap_ind16 &bitmap, const r
 
 		sy = 255 - missile_ram[offs + 1 * interleave];
 		sx = 255 - missile_ram[offs + 3 * interleave];
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy + missile_y_adjust_flip_screen;
@@ -525,13 +526,13 @@ SCREEN_UPDATE_IND16( decocass )
 	int scrollx, scrolly_l, scrolly_r;
 	rectangle clip;
 
-	if (0xc0 != (input_port_read(screen.machine(), "IN2") & 0xc0))  /* coin slots assert an NMI */
+	if (0xc0 != (screen.machine().root_device().ioport("IN2")->read() & 0xc0))  /* coin slots assert an NMI */
 		device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
 
 	if (0 == (state->m_watchdog_flip & 0x04))
-		watchdog_reset(screen.machine());
+		screen.machine().watchdog_reset();
 	else if (state->m_watchdog_count-- > 0)
-		watchdog_reset(screen.machine());
+		screen.machine().watchdog_reset();
 
 #ifdef MAME_DEBUG
 	{

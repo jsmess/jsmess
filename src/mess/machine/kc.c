@@ -299,7 +299,7 @@ void kc_state::update_0x00000()
 
 		/* yes; set address of bank */
 		space->install_read_bank(0x0000, 0x3fff, "bank1");
-		memory_set_bankptr(machine(), "bank1", m_ram_base);
+		membank("bank1")->set_base(m_ram_base);
 
 		/* write protect ram? */
 		if ((m_pio_data[0] & (1<<3)) == 0)
@@ -345,12 +345,12 @@ void kc_state::update_0x0c000()
 {
 	address_space *space = m_maincpu->memory().space( AS_PROGRAM );
 
-	if ((m_pio_data[0] & (1<<7)) && machine().region("basic")->base() != NULL)
+	if ((m_pio_data[0] & (1<<7)) && memregion("basic")->base() != NULL)
 	{
 		/* BASIC takes next priority */
         	LOG(("BASIC rom 0x0c000\n"));
 
-        memory_set_bankptr(machine(), "bank4", machine().region("basic")->base());
+        membank("bank4")->set_base(machine().root_device().memregion("basic")->base());
 		space->install_read_bank(0xc000, 0xdfff, "bank4");
 		space->unmap_write(0xc000, 0xdfff);
 	}
@@ -373,7 +373,7 @@ void kc_state::update_0x0e000()
 		/* enable CAOS rom in memory range 0x0e000-0x0ffff */
 		LOG(("CAOS rom 0x0e000\n"));
 		/* read will access the rom */
-		memory_set_bankptr(machine(), "bank5", machine().region("caos")->base() + 0x2000);
+		membank("bank5")->set_base(machine().root_device().memregion("caos")->base() + 0x2000);
 		space->install_read_bank(0xe000, 0xffff, "bank5");
 		space->unmap_write(0xe000, 0xffff);
 	}
@@ -397,7 +397,7 @@ void kc_state::update_0x08000()
         /* IRM enabled */
         LOG(("IRM enabled\n"));
 
-		memory_set_bankptr(machine(), "bank3", m_ram_base + 0x4000);
+		membank("bank3")->set_base(m_ram_base + 0x4000);
 		space->install_readwrite_bank(0x8000, 0xbfff, "bank3");
     }
     else
@@ -423,7 +423,7 @@ void kc85_4_state::update_0x04000()
 		/* yes */
 		space->install_read_bank(0x4000, 0x7fff, "bank2");
 		/* set address of bank */
-		memory_set_bankptr(machine(), "bank2", m_ram_base + 0x4000);
+		membank("bank2")->set_base(m_ram_base + 0x4000);
 
 		/* write protect ram? */
 		if ((m_port_86_data & (1<<1)) == 0)
@@ -462,7 +462,7 @@ void kc85_4_state::update_0x0c000()
 		/* CAOS rom takes priority */
 		LOG(("CAOS rom 0x0c000\n"));
 
-		memory_set_bankptr(machine(), "bank4", machine().region("caos")->base());
+		membank("bank4")->set_base(machine().root_device().memregion("caos")->base());
 		space->install_read_bank(0xc000, 0xdfff, "bank4");
 		space->unmap_write(0xc000, 0xdfff);
 	}
@@ -473,9 +473,9 @@ void kc85_4_state::update_0x0c000()
 			/* BASIC takes next priority */
 			LOG(("BASIC rom 0x0c000\n"));
 
-			int bank = machine().region("basic")->bytes() == 0x8000 ? (m_port_86_data>>5) & 0x03 : 0;
+			int bank = memregion("basic")->bytes() == 0x8000 ? (m_port_86_data>>5) & 0x03 : 0;
 
-			memory_set_bankptr(machine(), "bank4", machine().region("basic")->base() + (bank << 13));
+			membank("bank4")->set_base(machine().root_device().memregion("basic")->base() + (bank << 13));
 			space->install_read_bank(0xc000, 0xdfff, "bank4");
 			space->unmap_write(0xc000, 0xdfff);
 		}
@@ -500,12 +500,12 @@ void kc85_4_state::update_0x08000()
 
 		UINT8* ram_page = (UINT8*)kc85_4_get_video_ram_base(machine(), (m_port_84_data & 0x04), (m_port_84_data & 0x02));
 
-		memory_set_bankptr(machine(), "bank3", ram_page);
+		membank("bank3")->set_base(ram_page);
 		space->install_readwrite_bank(0x8000, 0xa7ff, "bank3");
 
 		ram_page = (UINT8*)kc85_4_get_video_ram_base(machine(), 0, 0);
 
-		memory_set_bankptr(machine(), "bank6", ram_page + 0x2800);
+		membank("bank6")->set_base(ram_page + 0x2800);
 		space->install_readwrite_bank(0xa800, 0xbfff, "bank6");
 	}
     else if (m_pio_data[1] & (1<<5))
@@ -530,8 +530,8 @@ void kc85_4_state::update_0x08000()
 			mem_ptr = m_ram_base + (ram8_block<<14);
 		}
 
-		memory_set_bankptr(machine(), "bank3", mem_ptr);
-		memory_set_bankptr(machine(), "bank6", mem_ptr + 0x2800);
+		membank("bank3")->set_base(mem_ptr);
+		membank("bank6")->set_base(mem_ptr + 0x2800);
 		space->install_read_bank(0x8000, 0xa7ff, "bank3");
 		space->install_read_bank(0xa800, 0xbfff, "bank6");
 

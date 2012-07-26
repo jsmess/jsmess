@@ -19,16 +19,14 @@ VIDEO_START( taitoz )
 ********************************************************/
 
 
-READ16_HANDLER( sci_spriteframe_r )
+READ16_MEMBER(taitoz_state::sci_spriteframe_r)
 {
-	taitoz_state *state = space->machine().driver_data<taitoz_state>();
-	return (state->m_sci_spriteframe << 8);
+	return (m_sci_spriteframe << 8);
 }
 
-WRITE16_HANDLER( sci_spriteframe_w )
+WRITE16_MEMBER(taitoz_state::sci_spriteframe_w)
 {
-	taitoz_state *state = space->machine().driver_data<taitoz_state>();
-	state->m_sci_spriteframe = (data >> 8) & 0xff;
+	m_sci_spriteframe = (data >> 8) & 0xff;
 }
 
 
@@ -149,7 +147,7 @@ confirmed
 static void contcirc_draw_sprites_16x8( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
+	UINT16 *spritemap = (UINT16 *)state->memregion("user1")->base();
 	UINT16 *spriteram = state->m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -159,7 +157,7 @@ static void contcirc_draw_sprites_16x8( running_machine &machine, bitmap_ind16 &
 	int bad_chunks;
 	static const int primasks[2] = { 0xf0, 0xfc };
 
-	for (offs = 0; offs < state->m_spriteram_size / 2; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes() / 2; offs += 4)
 	{
 		data = spriteram[offs + 0];
 		zoomy = (data & 0xfe00) >> 9;
@@ -244,7 +242,7 @@ static void contcirc_draw_sprites_16x8( running_machine &machine, bitmap_ind16 &
 static void chasehq_draw_sprites_16x16( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
+	UINT16 *spritemap = (UINT16 *)state->memregion("user1")->base();
 	UINT16 *spriteram = state->m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -254,7 +252,7 @@ static void chasehq_draw_sprites_16x16( running_machine &machine, bitmap_ind16 &
 	int bad_chunks;
 	static const int primasks[2] = { 0xf0, 0xfc };
 
-	for (offs = state->m_spriteram_size / 2 - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
 	{
 		data = spriteram[offs + 0];
 		zoomy = (data & 0xfe00) >> 9;
@@ -430,7 +428,7 @@ static void chasehq_draw_sprites_16x16( running_machine &machine, bitmap_ind16 &
 static void bshark_draw_sprites_16x8( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
+	UINT16 *spritemap = (UINT16 *)state->memregion("user1")->base();
 	UINT16 *spriteram = state->m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -440,7 +438,7 @@ static void bshark_draw_sprites_16x8( running_machine &machine, bitmap_ind16 &bi
 	int bad_chunks;
 	static const int primasks[2] = { 0xf0, 0xfc };
 
-	for (offs = state->m_spriteram_size / 2 - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() / 2 - 4; offs >= 0; offs -= 4)
 	{
 		data = spriteram[offs + 0];
 		zoomy = (data & 0x7e00) >> 9;
@@ -526,7 +524,7 @@ static void bshark_draw_sprites_16x8( running_machine &machine, bitmap_ind16 &bi
 static void sci_draw_sprites_16x8( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs )
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
+	UINT16 *spritemap = (UINT16 *)state->memregion("user1")->base();
 	UINT16 *spriteram = state->m_spriteram;
 	int offs, start_offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -631,7 +629,7 @@ static void sci_draw_sprites_16x8( running_machine &machine, bitmap_ind16 &bitma
 static void aquajack_draw_sprites_16x8(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs)
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
+	UINT16 *spritemap = (UINT16 *)state->memregion("user1")->base();
 	UINT16 *spriteram = state->m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -641,7 +639,7 @@ static void aquajack_draw_sprites_16x8(running_machine &machine, bitmap_ind16 &b
 	int bad_chunks;
 	static const int primasks[2] = { 0xf0, 0xfc };
 
-	for (offs = 0; offs < state->m_spriteram_size / 2; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes() / 2; offs += 4)
 	{
 		data = spriteram[offs + 0];
 		zoomy = (data & 0x7e00) >> 9;
@@ -726,7 +724,7 @@ static void aquajack_draw_sprites_16x8(running_machine &machine, bitmap_ind16 &b
 static void spacegun_draw_sprites_16x8(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs)
 {
 	taitoz_state *state = machine.driver_data<taitoz_state>();
-	UINT16 *spritemap = (UINT16 *)machine.region("user1")->base();
+	UINT16 *spritemap = (UINT16 *)state->memregion("user1")->base();
 	UINT16 *spriteram = state->m_spriteram;
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, curx, cury;
@@ -736,7 +734,7 @@ static void spacegun_draw_sprites_16x8(running_machine &machine, bitmap_ind16 &b
 	int bad_chunks;
 	static const int primasks[2] = { 0xf0, 0xfc };
 
-	for (offs = 0; offs < state->m_spriteram_size / 2 - 4; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes() / 2 - 4; offs += 4)
 	{
 		data = spriteram[offs + 0];
 		zoomy = (data & 0xfe00) >> 9;
@@ -821,14 +819,13 @@ static void spacegun_draw_sprites_16x8(running_machine &machine, bitmap_ind16 &b
                         SCREEN REFRESH
 **************************************************************/
 
-WRITE16_HANDLER( contcirc_out_w )
+WRITE16_MEMBER(taitoz_state::contcirc_out_w)
 {
-	taitoz_state *state = space->machine().driver_data<taitoz_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 = reset sub CPU */
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+		device_set_input_line(m_audiocpu, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bits 1-3 n.c. */
 
@@ -837,7 +834,7 @@ WRITE16_HANDLER( contcirc_out_w )
 		/* bit 5 = SCP */
 
 		/* bits 6 and 7 select the road palette bank */
-		state->m_road_palbank = (data & 0xc0) >> 6;
+		m_road_palbank = (data & 0xc0) >> 6;
 	}
 }
 

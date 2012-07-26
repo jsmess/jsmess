@@ -25,17 +25,23 @@ class cave_state : public driver_device
 {
 public:
 	cave_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag), m_int_timer(*this, "int_timer") { }
+		: driver_device(mconfig, type, tag),
+		  m_videoregs(*this, "videoregs"),
+		  m_vram(*this, "vram"),
+		  m_vctrl(*this, "vctrl"),
+		  m_spriteram(*this, "spriteram"),
+		  m_spriteram_2(*this, "spriteram_2"),
+		  m_paletteram(*this, "paletteram"),
+		  m_mirror_ram(*this, "mirror_ram"),
+		  m_int_timer(*this, "int_timer") { }
 
 	/* memory pointers */
-	UINT16 *     m_videoregs;
-	UINT16 *     m_vram[4];
-	UINT16 *     m_vctrl[4];
-	UINT16 *     m_spriteram;
-	UINT16 *     m_spriteram_2;
-	UINT16 *     m_paletteram;
-	size_t       m_spriteram_size;
-	size_t       m_paletteram_size;
+	required_shared_ptr<UINT16> m_videoregs;
+	optional_shared_ptr_array<UINT16, 4> m_vram;
+	optional_shared_ptr_array<UINT16, 4> m_vctrl;
+	required_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_spriteram_2;
+	required_shared_ptr<UINT16> m_paletteram;
 
 	/* video-related */
 	struct sprite_cave *m_sprite;
@@ -98,7 +104,7 @@ public:
 	/* game specific */
 	// sailormn
 	int          m_sailormn_tilebank;
-	UINT8        *m_mirror_ram;
+	optional_shared_ptr<UINT8> m_mirror_ram;
 	// korokoro
 	UINT16       m_leds[2];
 	int          m_hopper;
@@ -109,19 +115,52 @@ public:
 	required_device<timer_device> m_int_timer;
 	int m_rasflag;
 	int m_old_rasflag;
+	DECLARE_READ16_MEMBER(cave_irq_cause_r);
+	DECLARE_READ8_MEMBER(soundflags_r);
+	DECLARE_READ16_MEMBER(soundflags_ack_r);
+	DECLARE_WRITE16_MEMBER(sound_cmd_w);
+	DECLARE_READ8_MEMBER(soundlatch_lo_r);
+	DECLARE_READ8_MEMBER(soundlatch_hi_r);
+	DECLARE_READ16_MEMBER(soundlatch_ack_r);
+	DECLARE_WRITE8_MEMBER(soundlatch_ack_w);
+	DECLARE_WRITE16_MEMBER(gaia_coin_lsb_w);
+	DECLARE_READ16_MEMBER(donpachi_videoregs_r);
+	DECLARE_WRITE16_MEMBER(korokoro_leds_w);
+	DECLARE_WRITE16_MEMBER(pwrinst2_vctrl_0_w);
+	DECLARE_WRITE16_MEMBER(pwrinst2_vctrl_1_w);
+	DECLARE_WRITE16_MEMBER(pwrinst2_vctrl_2_w);
+	DECLARE_WRITE16_MEMBER(pwrinst2_vctrl_3_w);
+	DECLARE_READ16_MEMBER(sailormn_input0_r);
+	DECLARE_WRITE16_MEMBER(tjumpman_leds_w);
+	DECLARE_WRITE16_MEMBER(pacslot_leds_w);
+	DECLARE_WRITE8_MEMBER(hotdogst_rombank_w);
+	DECLARE_WRITE8_MEMBER(hotdogst_okibank_w);
+	DECLARE_WRITE8_MEMBER(mazinger_rombank_w);
+	DECLARE_WRITE8_MEMBER(metmqstr_rombank_w);
+	DECLARE_WRITE8_MEMBER(metmqstr_okibank0_w);
+	DECLARE_WRITE8_MEMBER(metmqstr_okibank1_w);
+	DECLARE_WRITE8_MEMBER(pwrinst2_rombank_w);
+	DECLARE_READ8_MEMBER(mirror_ram_r);
+	DECLARE_WRITE8_MEMBER(mirror_ram_w);
+	DECLARE_WRITE8_MEMBER(sailormn_rombank_w);
+	DECLARE_WRITE8_MEMBER(sailormn_okibank0_w);
+	DECLARE_WRITE8_MEMBER(sailormn_okibank1_w);
+	DECLARE_WRITE16_MEMBER(donpachi_videoregs_w);
+	DECLARE_WRITE16_MEMBER(cave_vram_0_w);
+	DECLARE_WRITE16_MEMBER(cave_vram_1_w);
+	DECLARE_WRITE16_MEMBER(cave_vram_2_w);
+	DECLARE_WRITE16_MEMBER(cave_vram_3_w);
+	DECLARE_WRITE16_MEMBER(cave_vram_0_8x8_w);
+	DECLARE_WRITE16_MEMBER(cave_vram_1_8x8_w);
+	DECLARE_WRITE16_MEMBER(cave_vram_2_8x8_w);
+	DECLARE_WRITE16_MEMBER(cave_vram_3_8x8_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(korokoro_hopper_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(tjumpman_hopper_r);
 };
 
 /*----------- defined in video/cave.c -----------*/
 
-WRITE16_HANDLER( cave_vram_0_w );
-WRITE16_HANDLER( cave_vram_1_w );
-WRITE16_HANDLER( cave_vram_2_w );
-WRITE16_HANDLER( cave_vram_3_w );
 
-WRITE16_HANDLER( cave_vram_0_8x8_w );
-WRITE16_HANDLER( cave_vram_1_8x8_w );
-WRITE16_HANDLER( cave_vram_2_8x8_w );
-WRITE16_HANDLER( cave_vram_3_8x8_w );
 
 PALETTE_INIT( cave );
 PALETTE_INIT( ddonpach );

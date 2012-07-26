@@ -75,7 +75,7 @@ static void set_palette(running_machine &machine, mystston_state *state)
 	static const int resistances_b [2] = { 3300, 1500 };
 	double weights_rg[3], weights_b[2];
 
-	UINT8 *color_prom = machine.region("proms")->base();
+	UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 
 	compute_resistor_weights(0,	255, -1.0,
 			3, resistances_rg, weights_rg, 0, 4700,
@@ -123,19 +123,18 @@ static void set_palette(running_machine &machine, mystston_state *state)
  *
  *************************************/
 
-WRITE8_HANDLER( mystston_video_control_w )
+WRITE8_MEMBER(mystston_state::mystston_video_control_w)
 {
-	mystston_state *state = space->machine().driver_data<mystston_state>();
 
-	*state->m_video_control = data;
+	*m_video_control = data;
 
 	/* D0-D1 - foreground text color */
 	/* D2 - background page select */
 	/* D3 - unused */
 
 	/* D4-D5 - coin counters in flipped order */
-	coin_counter_w(space->machine(), 0, data & 0x20);
-	coin_counter_w(space->machine(), 1, data & 0x10);
+	coin_counter_w(machine(), 0, data & 0x20);
+	coin_counter_w(machine(), 1, data & 0x10);
 
 	/* D6 - unused */
 	/* D7 - screen flip */
@@ -258,7 +257,7 @@ static SCREEN_UPDATE_IND16( mystston )
 {
 	mystston_state *state = screen.machine().driver_data<mystston_state>();
 
-	int flip = (*state->m_video_control & 0x80) ^ ((input_port_read(screen.machine(), "DSW1") & 0x20) << 2);
+	int flip = (*state->m_video_control & 0x80) ^ ((screen.machine().root_device().ioport("DSW1")->read() & 0x20) << 2);
 
 	set_palette(screen.machine(), state);
 

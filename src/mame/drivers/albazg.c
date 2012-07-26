@@ -45,12 +45,15 @@ class albazg_state : public driver_device
 {
 public:
 	albazg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_cus_ram(*this, "cus_ram"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_cus_ram;
-	UINT8 *  m_videoram;
-	UINT8 *  m_colorram;
+	required_shared_ptr<UINT8> m_cus_ram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
 //  UINT8 *  m_paletteram_2;  // currently this uses generic palette handling
 
@@ -61,6 +64,11 @@ public:
 	UINT8 m_mux_data;
 	int m_bank;
 	UINT8 m_prot_lock;
+	DECLARE_WRITE8_MEMBER(yumefuda_vram_w);
+	DECLARE_WRITE8_MEMBER(yumefuda_cram_w);
+	DECLARE_READ8_MEMBER(custom_ram_r);
+	DECLARE_WRITE8_MEMBER(custom_ram_w);
+	DECLARE_WRITE8_MEMBER(prot_lock_w);
 };
 
 static TILE_GET_INFO( y_get_bg_tile_info )
@@ -108,42 +116,37 @@ static GFXDECODE_START( yumefuda )
 GFXDECODE_END
 
 
-static WRITE8_HANDLER( yumefuda_vram_w )
+WRITE8_MEMBER(albazg_state::yumefuda_vram_w)
 {
-	albazg_state *state = space->machine().driver_data<albazg_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( yumefuda_cram_w )
+WRITE8_MEMBER(albazg_state::yumefuda_cram_w)
 {
-	albazg_state *state = space->machine().driver_data<albazg_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 /*Custom RAM (Thrash Protection)*/
-static READ8_HANDLER( custom_ram_r )
+READ8_MEMBER(albazg_state::custom_ram_r)
 {
-	albazg_state *state = space->machine().driver_data<albazg_state>();
-//  logerror("Custom RAM read at %02x PC = %x\n", offset + 0xaf80, cpu_get_pc(&space->device()));
-	return state->m_cus_ram[offset];// ^ 0x55;
+//  logerror("Custom RAM read at %02x PC = %x\n", offset + 0xaf80, cpu_get_pc(&space.device()));
+	return m_cus_ram[offset];// ^ 0x55;
 }
 
-static WRITE8_HANDLER( custom_ram_w )
+WRITE8_MEMBER(albazg_state::custom_ram_w)
 {
-	albazg_state *state = space->machine().driver_data<albazg_state>();
-//  logerror("Custom RAM write at %02x : %02x PC = %x\n", offset + 0xaf80, data, cpu_get_pc(&space->device()));
-	if(state->m_prot_lock)
-		state->m_cus_ram[offset] = data;
+//  logerror("Custom RAM write at %02x : %02x PC = %x\n", offset + 0xaf80, data, cpu_get_pc(&space.device()));
+	if(m_prot_lock)
+		m_cus_ram[offset] = data;
 }
 
 /*this might be used as NVRAM commands btw*/
-static WRITE8_HANDLER( prot_lock_w )
+WRITE8_MEMBER(albazg_state::prot_lock_w)
 {
-	albazg_state *state = space->machine().driver_data<albazg_state>();
-//  logerror("PC %04x Prot lock value written %02x\n", cpu_get_pc(&space->device()), data);
-	state->m_prot_lock = data;
+//  logerror("PC %04x Prot lock value written %02x\n", cpu_get_pc(&space.device()), data);
+	m_prot_lock = data;
 }
 
 static READ8_DEVICE_HANDLER( mux_r )
@@ -151,13 +154,13 @@ static READ8_DEVICE_HANDLER( mux_r )
 	albazg_state *state = device->machine().driver_data<albazg_state>();
 	switch(state->m_mux_data)
 	{
-		case 0x00: return input_port_read(device->machine(), "IN0");
-		case 0x01: return input_port_read(device->machine(), "IN1");
-		case 0x02: return input_port_read(device->machine(), "IN2");
-		case 0x04: return input_port_read(device->machine(), "IN3");
-		case 0x08: return input_port_read(device->machine(), "IN4");
-		case 0x10: return input_port_read(device->machine(), "IN5");
-		case 0x20: return input_port_read(device->machine(), "IN6");
+		case 0x00: return state->ioport("IN0")->read();
+		case 0x01: return state->ioport("IN1")->read();
+		case 0x02: return state->ioport("IN2")->read();
+		case 0x04: return state->ioport("IN3")->read();
+		case 0x08: return state->ioport("IN4")->read();
+		case 0x10: return state->ioport("IN5")->read();
+		case 0x20: return state->ioport("IN6")->read();
 	}
 
 	return 0xff;
@@ -175,7 +178,7 @@ static WRITE8_DEVICE_HANDLER( mux_w )
 	if( state->m_bank != new_bank)
 	{
 		state->m_bank = new_bank;
-		memory_set_bank(device->machine(), "bank1", state->m_bank);
+		state->membank("bank1")->set_entry(state->m_bank);
 	}
 
 	state->m_mux_data = data & ~0xc0;
@@ -183,12 +186,13 @@ static WRITE8_DEVICE_HANDLER( mux_w )
 
 static WRITE8_DEVICE_HANDLER( yumefuda_output_w )
 {
+	albazg_state *state = device->machine().driver_data<albazg_state>();
 	coin_counter_w(device->machine(), 0, ~data & 4);
 	coin_counter_w(device->machine(), 1, ~data & 2);
 	coin_lockout_global_w(device->machine(), data & 1);
 	//data & 0x10 hopper-c (active LOW)
 	//data & 0x08 divider (active HIGH)
-	flip_screen_set(device->machine(), ~data & 0x20);
+	state->flip_screen_set(~data & 0x20);
 }
 
 static const ay8910_interface ay8910_config =
@@ -227,26 +231,26 @@ static I8255A_INTERFACE( ppi8255_intf )
 
 /***************************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, albazg_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa7fc, 0xa7fc) AM_WRITE(prot_lock_w)
 	AM_RANGE(0xa7ff, 0xa7ff) AM_WRITE_PORT("EEPROMOUT")
-	AM_RANGE(0xaf80, 0xafff) AM_READWRITE(custom_ram_r, custom_ram_w) AM_BASE_MEMBER(albazg_state, m_cus_ram)
-	AM_RANGE(0xb000, 0xb07f) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_split1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xb080, 0xb0ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_split2_w) AM_BASE_GENERIC(paletteram2)
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(yumefuda_vram_w) AM_BASE_MEMBER(albazg_state, m_videoram)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(yumefuda_cram_w) AM_BASE_MEMBER(albazg_state, m_colorram)
+	AM_RANGE(0xaf80, 0xafff) AM_READWRITE(custom_ram_r, custom_ram_w) AM_SHARE("cus_ram")
+	AM_RANGE(0xb000, 0xb07f) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_split_lo_w) AM_SHARE("paletteram")
+	AM_RANGE(0xb080, 0xb0ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_split_hi_w) AM_SHARE("paletteram2")
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM_WRITE(yumefuda_vram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(yumefuda_cram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( port_map, AS_IO, 8, albazg_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x01, 0x01) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_MODERN("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
@@ -272,32 +276,32 @@ static INPUT_PORTS_START( yumefuda )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 BET Button") PORT_CODE(KEYCODE_3) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start") PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 BET Button") PORT_CODE(KEYCODE_3) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start") PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)
 
 	PORT_START("IN2")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)
 
 	PORT_START("IN3")
 	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start") PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 BET Button") PORT_CODE(KEYCODE_3) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("P1 Start") PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 BET Button") PORT_CODE(KEYCODE_3) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)
 
 	/* Some bits of these three are actually used if you use the Royal Panel type */
 	PORT_START("IN4")
@@ -305,10 +309,10 @@ static INPUT_PORTS_START( yumefuda )
 
 	PORT_START("IN5")
 	PORT_BIT( 0x9f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x08)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_CONDITION("DSW2", 0x08, PORTCOND_EQUALS, 0x00)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x08)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_CONDITION("DSW2", 0x08, EQUALS, 0x00)
 
 	PORT_START("IN6")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -353,9 +357,9 @@ INPUT_PORTS_END
 static MACHINE_START( yumefuda )
 {
 	albazg_state *state = machine.driver_data<albazg_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x2000);
+	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
 	state->save_item(NAME(state->m_mux_data));
 	state->save_item(NAME(state->m_bank));
@@ -428,4 +432,4 @@ ROM_START( yumefuda )
 	ROM_LOAD("zg1-007.u13", 0x000, 0x100, NO_DUMP ) //could be either PROM or PAL
 ROM_END
 
-GAME( 1991, yumefuda, 0, yumefuda, yumefuda, 0, ROT0, "Alba", "(Medal) Yumefuda [BET]", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1991, yumefuda, 0, yumefuda, yumefuda, 0, ROT0, "Alba", "Yumefuda [BET]", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )

@@ -178,7 +178,7 @@ static void apply_char_overrides(int nb_char_overrides, const char_override_t ch
 void vdt911_init(running_machine &machine)
 {
 	UINT8 *base;
-	UINT8 *chr = machine.region(vdt911_chr_region)->base();
+	UINT8 *chr = machine.root_device().memregion(vdt911_chr_region)->base();
 
 	/* set up US character definitions */
 	base = chr+vdt911_US_chr_offset;
@@ -591,7 +591,7 @@ void vdt911_keyboard(device_t *device)
 	/* read current key state */
 	for (i = 0; i < 6; i++)
 	{
-		key_buf[i] = input_port_read(device->machine(), keynames[i]);
+		key_buf[i] = device->machine().root_device().ioport(keynames[i])->read();
 	}
 
 	/* parse modifier keys */

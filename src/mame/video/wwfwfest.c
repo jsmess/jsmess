@@ -16,33 +16,30 @@
  for writes to Video Ram
 *******************************************************************************/
 
-WRITE16_HANDLER( wwfwfest_fg0_videoram_w )
+WRITE16_MEMBER(wwfwfest_state::wwfwfest_fg0_videoram_w)
 {
-	wwfwfest_state *state = space->machine().driver_data<wwfwfest_state>();
 	/* Videoram is 8 bit, upper & lower byte writes end up in the same place */
 	if (ACCESSING_BITS_8_15 && ACCESSING_BITS_0_7) {
-		COMBINE_DATA(&state->m_fg0_videoram[offset]);
+		COMBINE_DATA(&m_fg0_videoram[offset]);
 	} else if (ACCESSING_BITS_8_15) {
-		state->m_fg0_videoram[offset]=(data>>8)&0xff;
+		m_fg0_videoram[offset]=(data>>8)&0xff;
 	} else {
-		state->m_fg0_videoram[offset]=data&0xff;
+		m_fg0_videoram[offset]=data&0xff;
 	}
 
-	state->m_fg0_tilemap->mark_tile_dirty(offset/2);
+	m_fg0_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( wwfwfest_bg0_videoram_w )
+WRITE16_MEMBER(wwfwfest_state::wwfwfest_bg0_videoram_w)
 {
-	wwfwfest_state *state = space->machine().driver_data<wwfwfest_state>();
-	COMBINE_DATA(&state->m_bg0_videoram[offset]);
-	state->m_bg0_tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_bg0_videoram[offset]);
+	m_bg0_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( wwfwfest_bg1_videoram_w )
+WRITE16_MEMBER(wwfwfest_state::wwfwfest_bg1_videoram_w)
 {
-	wwfwfest_state *state = space->machine().driver_data<wwfwfest_state>();
-	COMBINE_DATA(&state->m_bg1_videoram[offset]);
-	state->m_bg1_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bg1_videoram[offset]);
+	m_bg1_tilemap->mark_tile_dirty(offset);
 }
 
 /*******************************************************************************
@@ -192,7 +189,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			number = (source[2] & 0x00ff) | (source[3] & 0x00ff) << 8;
 			colourbank = (source[4] & 0x000f);
 
-			if (flip_screen_get(machine)) {
+			if (state->flip_screen()) {
 				if (flipy) flipy=0; else flipy=1;
 				if (flipx) flipx=0; else flipx=1;
 				ypos=240-ypos-state->m_sprite_xoff;
@@ -200,7 +197,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			}
 
 			for (count=0;count<chain;count++) {
-				if (flip_screen_get(machine)) {
+				if (state->flip_screen()) {
 					if (!flipy) {
 						drawgfx_transpen(bitmap,cliprect,gfx,number+count,colourbank,flipx,flipy,xpos,ypos+(16*(chain-1))-(16*count),0);
 					} else {

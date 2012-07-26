@@ -13,11 +13,10 @@ static TILE_GET_INFO( get_oneshot_bg_tile_info )
 	SET_TILE_INFO(0, tileno, 0, 0);
 }
 
-WRITE16_HANDLER( oneshot_bg_videoram_w )
+WRITE16_MEMBER(oneshot_state::oneshot_bg_videoram_w)
 {
-	oneshot_state *state = space->machine().driver_data<oneshot_state>();
-	COMBINE_DATA(&state->m_bg_videoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 /* mid tilemap */
@@ -29,11 +28,10 @@ static TILE_GET_INFO( get_oneshot_mid_tile_info )
 	SET_TILE_INFO(0, tileno, 2, 0);
 }
 
-WRITE16_HANDLER( oneshot_mid_videoram_w )
+WRITE16_MEMBER(oneshot_state::oneshot_mid_videoram_w)
 {
-	oneshot_state *state = space->machine().driver_data<oneshot_state>();
-	COMBINE_DATA(&state->m_mid_videoram[offset]);
-	state->m_mid_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_mid_videoram[offset]);
+	m_mid_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
@@ -46,11 +44,10 @@ static TILE_GET_INFO( get_oneshot_fg_tile_info )
 	SET_TILE_INFO(0, tileno, 3, 0);
 }
 
-WRITE16_HANDLER( oneshot_fg_videoram_w )
+WRITE16_MEMBER(oneshot_state::oneshot_fg_videoram_w)
 {
-	oneshot_state *state = space->machine().driver_data<oneshot_state>();
-	COMBINE_DATA(&state->m_fg_videoram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset / 2);
+	COMBINE_DATA(&m_fg_videoram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 VIDEO_START( oneshot )
@@ -72,8 +69,8 @@ static void draw_crosshairs( running_machine &machine, bitmap_ind16 &bitmap, con
 	//int xpos,ypos;
 
 	/* get gun raw coordinates (player 1) */
-	state->m_gun_x_p1 = (input_port_read(machine, "LIGHT0_X") & 0xff) * 320 / 256;
-	state->m_gun_y_p1 = (input_port_read(machine, "LIGHT0_Y") & 0xff) * 240 / 256;
+	state->m_gun_x_p1 = (state->ioport("LIGHT0_X")->read() & 0xff) * 320 / 256;
+	state->m_gun_y_p1 = (state->ioport("LIGHT0_Y")->read() & 0xff) * 240 / 256;
 
 	/* compute the coordinates for drawing (from routine at 0x009ab0) */
 	//xpos = state->m_gun_x_p1;
@@ -87,8 +84,8 @@ static void draw_crosshairs( running_machine &machine, bitmap_ind16 &bitmap, con
 
 
 	/* get gun raw coordinates (player 2) */
-	state->m_gun_x_p2 = (input_port_read(machine, "LIGHT1_X") & 0xff) * 320 / 256;
-	state->m_gun_y_p2 = (input_port_read(machine, "LIGHT1_Y") & 0xff) * 240 / 256;
+	state->m_gun_x_p2 = (state->ioport("LIGHT1_X")->read() & 0xff) * 320 / 256;
+	state->m_gun_y_p2 = (state->ioport("LIGHT1_Y")->read() & 0xff) * 240 / 256;
 
 	/* compute the coordinates for drawing (from routine at 0x009b6e) */
 	//xpos = state->m_gun_x_p2;

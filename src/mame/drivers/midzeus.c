@@ -92,7 +92,7 @@ static MACHINE_START( midzeus )
 
 static MACHINE_RESET( midzeus )
 {
-	memcpy(ram_base, machine.region("user1")->base(), 0x40000*4);
+	memcpy(ram_base, machine.root_device().memregion("user1")->base(), 0x40000*4);
 	*ram_base <<= 1;
 	machine.device("maincpu")->reset();
 
@@ -126,25 +126,23 @@ static INTERRUPT_GEN( display_irq )
  *
  *************************************/
 
-static WRITE32_HANDLER( cmos_w )
+WRITE32_MEMBER(midzeus_state::cmos_w)
 {
-	midzeus_state *state = space->machine().driver_data<midzeus_state>();
 	if (bitlatch[2] && !cmos_protected)
-		COMBINE_DATA(&state->m_nvram[offset]);
+		COMBINE_DATA(&m_nvram[offset]);
 	else
-		logerror("%06X:timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", cpu_get_pc(&space->device()), bitlatch[2], cmos_protected);
+		logerror("%06X:timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", cpu_get_pc(&space.device()), bitlatch[2], cmos_protected);
 	cmos_protected = TRUE;
 }
 
 
-static READ32_HANDLER( cmos_r )
+READ32_MEMBER(midzeus_state::cmos_r)
 {
-	midzeus_state *state = space->machine().driver_data<midzeus_state>();
-	return state->m_nvram[offset] | 0xffffff00;
+	return m_nvram[offset] | 0xffffff00;
 }
 
 
-static WRITE32_HANDLER( cmos_protect_w )
+WRITE32_MEMBER(midzeus_state::cmos_protect_w)
 {
 	cmos_protected = FALSE;
 }
@@ -174,20 +172,18 @@ static WRITE32_DEVICE_HANDLER( zeus2_timekeeper_w )
 }
 
 
-static READ32_HANDLER( zpram_r )
+READ32_MEMBER(midzeus_state::zpram_r)
 {
-	midzeus_state *state = space->machine().driver_data<midzeus_state>();
-	return state->m_nvram[offset] | 0xffffff00;
+	return m_nvram[offset] | 0xffffff00;
 }
 
 
-static WRITE32_HANDLER( zpram_w )
+WRITE32_MEMBER(midzeus_state::zpram_w)
 {
-	midzeus_state *state = space->machine().driver_data<midzeus_state>();
 	if (bitlatch[2])
-		COMBINE_DATA(&state->m_nvram[offset]);
+		COMBINE_DATA(&m_nvram[offset]);
 	else
-		logerror("%06X:zpram_w with bitlatch[2] = %d\n", cpu_get_pc(&space->device()), bitlatch[2]);
+		logerror("%06X:zpram_w with bitlatch[2] = %d\n", cpu_get_pc(&space.device()), bitlatch[2]);
 }
 
 
@@ -198,7 +194,7 @@ static WRITE32_HANDLER( zpram_w )
  *
  *************************************/
 
-static READ32_HANDLER( bitlatches_r )
+READ32_MEMBER(midzeus_state::bitlatches_r)
 {
 	switch (offset)
 	{
@@ -228,14 +224,14 @@ static READ32_HANDLER( bitlatches_r )
 
 		/* unknown purpose */
 		default:
-			logerror("%06X:bitlatches_r(%X)\n", cpu_get_pc(&space->device()), offset);
+			logerror("%06X:bitlatches_r(%X)\n", cpu_get_pc(&space.device()), offset);
 			break;
 	}
 	return ~0;
 }
 
 
-static WRITE32_HANDLER( bitlatches_w )
+WRITE32_MEMBER(midzeus_state::bitlatches_w)
 {
 	UINT32 oldval = bitlatch[offset];
 	bitlatch[offset] = data;
@@ -245,19 +241,19 @@ static WRITE32_HANDLER( bitlatches_w )
 		/* unknown purpose */
 		default:
 			if (oldval ^ data)
-				logerror("%06X:bitlatches_w(%X) = %X\n", cpu_get_pc(&space->device()), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X\n", cpu_get_pc(&space.device()), offset, data);
 			break;
 
 		/* unknown purpose; crusnexo toggles this between 0 and 1 every 20 frames; thegrid writes 1 */
 		case 0:
 			if (data != 0 && data != 1)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(&space->device()), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(&space.device()), offset, data);
 			break;
 
 		/* unknown purpose; mk4/invasn write 1 here at initialization; crusnexo/thegrid write 3 */
 		case 1:
 			if (data != 1 && data != 3)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(&space->device()), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(&space.device()), offset, data);
 			break;
 
 		/* CMOS/ZPRAM extra enable latch; only low bit is used */
@@ -267,30 +263,30 @@ static WRITE32_HANDLER( bitlatches_w )
 		/* unknown purpose; invasn writes 2 here at startup */
 		case 4:
 			if (data != 2)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(&space->device()), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(&space.device()), offset, data);
 			break;
 
 		/* ROM bank selection on Zeus 2 */
 		case 5:
-			memory_set_bank(space->machine(), "bank1", bitlatch[offset] & 3);
+			membank("bank1")->set_entry(bitlatch[offset] & 3);
 			break;
 
 		/* unknown purpose; crusnexo/thegrid write 1 at startup */
 		case 7:
 			if (data != 1)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(&space->device()), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(&space.device()), offset, data);
 			break;
 
 		/* unknown purpose; crusnexo writes 4 at startup; thegrid writes 6 */
 		case 8:
 			if (data != 4 && data != 6)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(&space->device()), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(&space.device()), offset, data);
 			break;
 
 		/* unknown purpose; thegrid writes 1 at startup */
 		case 9:
 			if (data != 1)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(&space->device()), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(&space.device()), offset, data);
 			break;
 	}
 }
@@ -303,14 +299,14 @@ static WRITE32_HANDLER( bitlatches_w )
  *
  *************************************/
 
-static READ32_HANDLER( crusnexo_leds_r )
+READ32_MEMBER(midzeus_state::crusnexo_leds_r)
 {
 	/* reads appear to just be for synchronization */
 	return ~0;
 }
 
 
-static WRITE32_HANDLER( crusnexo_leds_w )
+WRITE32_MEMBER(midzeus_state::crusnexo_leds_w)
 {
 	int bit, led;
 
@@ -354,9 +350,9 @@ static WRITE32_HANDLER( crusnexo_leds_w )
 // read 8d0003, check bit 1, skip some stuff if 0
 // write junk to 9e0000
 
-static READ32_HANDLER( linkram_r )
+READ32_MEMBER(midzeus_state::linkram_r)
 {
-	logerror("%06X:unknown_8a000_r(%02X)\n", cpu_get_pc(&space->device()), offset);
+	logerror("%06X:unknown_8a000_r(%02X)\n", cpu_get_pc(&space.device()), offset);
 	if (offset == 0)
 		return 0x30313042;
 	else if (offset == 0x3c)
@@ -364,9 +360,9 @@ static READ32_HANDLER( linkram_r )
 	return linkram[offset];
 }
 
-static WRITE32_HANDLER( linkram_w )
+WRITE32_MEMBER(midzeus_state::linkram_w)
 {
-	logerror("%06X:unknown_8a000_w(%02X) = %08X\n", cpu_get_pc(&space->device()),  offset, data);
+	logerror("%06X:unknown_8a000_w(%02X) = %08X\n", cpu_get_pc(&space.device()),  offset, data);
 	COMBINE_DATA(&linkram[offset]);
 }
 
@@ -378,7 +374,7 @@ static WRITE32_HANDLER( linkram_w )
  *
  *************************************/
 
-static READ32_HANDLER( tms32031_control_r )
+READ32_MEMBER(midzeus_state::tms32031_control_r)
 {
 	/* watch for accesses to the timers */
 	if (offset == 0x24 || offset == 0x34)
@@ -391,13 +387,13 @@ static READ32_HANDLER( tms32031_control_r )
 
 	/* log anything else except the memory control register */
 	if (offset != 0x64)
-		logerror("%06X:tms32031_control_r(%02X)\n", cpu_get_pc(&space->device()), offset);
+		logerror("%06X:tms32031_control_r(%02X)\n", cpu_get_pc(&space.device()), offset);
 
 	return tms32031_control[offset];
 }
 
 
-static WRITE32_HANDLER( tms32031_control_w )
+WRITE32_MEMBER(midzeus_state::tms32031_control_w)
 {
 	COMBINE_DATA(&tms32031_control[offset]);
 
@@ -413,7 +409,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 			timer[which]->adjust(attotime::never);
 	}
 	else
-		logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(&space->device()), offset, data);
+		logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(&space.device()), offset, data);
 }
 
 
@@ -424,25 +420,25 @@ static WRITE32_HANDLER( tms32031_control_w )
  *
  *************************************/
 
-static CUSTOM_INPUT( custom_49way_r )
+CUSTOM_INPUT_MEMBER(midzeus_state::custom_49way_r)
 {
 	static const UINT8 translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
 	const char *namex = (const char *)param;
 	const char *namey = namex + strlen(namex) + 1;
-	return (translate49[input_port_read(field.machine(), namey) >> 4] << 4) | translate49[input_port_read(field.machine(), namex) >> 4];
+	return (translate49[ioport(namey)->read() >> 4] << 4) | translate49[ioport(namex)->read() >> 4];
 }
 
 
-static WRITE32_HANDLER( keypad_select_w )
+WRITE32_MEMBER(midzeus_state::keypad_select_w)
 {
 	if (offset == 1)
 		keypad_select = data;
 }
 
 
-static CUSTOM_INPUT( keypad_r )
+CUSTOM_INPUT_MEMBER(midzeus_state::keypad_r)
 {
-	UINT32 bits = input_port_read(field.machine(), (const char *)param);
+	UINT32 bits = ioport((const char *)param)->read();
 	UINT8 select = keypad_select;
 	while ((select & 1) != 0)
 	{
@@ -460,16 +456,16 @@ static CUSTOM_INPUT( keypad_r )
  *
  *************************************/
 
-static READ32_HANDLER( analog_r )
+READ32_MEMBER(midzeus_state::analog_r)
 {
 	static const char * const tags[] = { "ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3" };
 	if (offset < 8 || offset > 11)
-		logerror("%06X:analog_r(%X)\n", cpu_get_pc(&space->device()), offset);
-	return input_port_read(space->machine(), tags[offset & 3]);
+		logerror("%06X:analog_r(%X)\n", cpu_get_pc(&space.device()), offset);
+	return ioport(tags[offset & 3])->read();
 }
 
 
-static WRITE32_HANDLER( analog_w )
+WRITE32_MEMBER(midzeus_state::analog_w)
 {
 	/* 16 writes to the location before a read */
 }
@@ -508,7 +504,7 @@ static TIMER_CALLBACK( invasn_gun_callback )
 }
 
 
-static WRITE32_HANDLER( invasn_gun_w )
+WRITE32_MEMBER(midzeus_state::invasn_gun_w)
 {
 	UINT32 old_control = gun_control;
 	int player;
@@ -518,31 +514,31 @@ static WRITE32_HANDLER( invasn_gun_w )
 	/* bits 0-1 enable IRQs (?) */
 	/* bits 2-3 reset IRQ states */
 	gun_irq_state &= ~((gun_control >> 2) & 3);
-	update_gun_irq(space->machine());
+	update_gun_irq(machine());
 
 	for (player = 0; player < 2; player++)
 	{
 		UINT8 pmask = 0x04 << player;
 		if (((old_control ^ gun_control) & pmask) != 0 && (gun_control & pmask) == 0)
 		{
-			const rectangle &visarea = space->machine().primary_screen->visible_area();
+			const rectangle &visarea = machine().primary_screen->visible_area();
 			static const char *const names[2][2] =
 			{
 				{ "GUNX1", "GUNY1" },
 				{ "GUNX2", "GUNY2" }
 			};
-			gun_x[player] = input_port_read(space->machine(), names[player][0]) * visarea.width() / 255 + visarea.min_x + BEAM_XOFFS;
-			gun_y[player] = input_port_read(space->machine(), names[player][1]) * visarea.height() / 255 + visarea.min_y;
-			gun_timer[player]->adjust(space->machine().primary_screen->time_until_pos(MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
+			gun_x[player] = ioport(names[player][0])->read() * visarea.width() / 255 + visarea.min_x + BEAM_XOFFS;
+			gun_y[player] = ioport(names[player][1])->read() * visarea.height() / 255 + visarea.min_y;
+			gun_timer[player]->adjust(machine().primary_screen->time_until_pos(MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
 		}
 	}
 }
 
 
-static READ32_HANDLER( invasn_gun_r )
+READ32_MEMBER(midzeus_state::invasn_gun_r)
 {
-	int beamx = space->machine().primary_screen->hpos();
-	int beamy = space->machine().primary_screen->vpos();
+	int beamx = machine().primary_screen->hpos();
+	int beamy = machine().primary_screen->vpos();
 	UINT32 result = 0xffff;
 	int player;
 
@@ -564,14 +560,14 @@ static READ32_HANDLER( invasn_gun_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( zeus_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( zeus_map, AS_PROGRAM, 32, midzeus_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE(&ram_base)
+	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE_LEGACY(&ram_base)
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
-	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(&tms32031_control)
-	AM_RANGE(0x880000, 0x8803ff) AM_READWRITE(zeus_r, zeus_w) AM_BASE(&zeusbase)
+	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE_LEGACY(&tms32031_control)
+	AM_RANGE(0x880000, 0x8803ff) AM_READWRITE(zeus_r, zeus_w) AM_BASE_LEGACY(&zeusbase)
 	AM_RANGE(0x8d0000, 0x8d0004) AM_READWRITE(bitlatches_r, bitlatches_w)
-	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
+	AM_RANGE(0x990000, 0x99000f) AM_READWRITE_LEGACY(midway_ioasic_r, midway_ioasic_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
 	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(cmos_r, cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
@@ -579,19 +575,19 @@ static ADDRESS_MAP_START( zeus_map, AS_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( zeus2_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( zeus2_map, AS_PROGRAM, 32, midzeus_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE(&ram_base)
+	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_BASE_LEGACY(&ram_base)
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM
-	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE(&tms32031_control)
-	AM_RANGE(0x880000, 0x88007f) AM_READWRITE(zeus2_r, zeus2_w) AM_BASE(&zeusbase)
-	AM_RANGE(0x8a0000, 0x8a003f) AM_READWRITE(linkram_r, linkram_w) AM_BASE(&linkram)
+	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_BASE_LEGACY(&tms32031_control)
+	AM_RANGE(0x880000, 0x88007f) AM_READWRITE_LEGACY(zeus2_r, zeus2_w) AM_BASE_LEGACY(&zeusbase)
+	AM_RANGE(0x8a0000, 0x8a003f) AM_READWRITE(linkram_r, linkram_w) AM_BASE_LEGACY(&linkram)
 	AM_RANGE(0x8d0000, 0x8d000a) AM_READWRITE(bitlatches_r, bitlatches_w)
 	AM_RANGE(0x900000, 0x91ffff) AM_READWRITE(zpram_r, zpram_w) AM_SHARE("nvram") AM_MIRROR(0x020000)
-	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
+	AM_RANGE(0x990000, 0x99000f) AM_READWRITE_LEGACY(midway_ioasic_r, midway_ioasic_w)
 	AM_RANGE(0x9c0000, 0x9c000f) AM_READWRITE(analog_r, analog_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
-	AM_RANGE(0x9f0000, 0x9f7fff) AM_DEVREADWRITE("m48t35", zeus2_timekeeper_r, zeus2_timekeeper_w)
+	AM_RANGE(0x9f0000, 0x9f7fff) AM_DEVREADWRITE_LEGACY("m48t35", zeus2_timekeeper_r, zeus2_timekeeper_w)
 	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
 	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK("bank1") AM_REGION("user2", 0)
@@ -935,7 +931,7 @@ static INPUT_PORTS_START( crusnexo )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM( keypad_r, "KEYPAD" )
+	PORT_BIT( 0x0007, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, midzeus_state, keypad_r, "KEYPAD" )
 	PORT_BIT( 0xfff8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEYPAD")
@@ -1071,7 +1067,7 @@ static INPUT_PORTS_START( thegrid )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(custom_49way_r, "49WAYX\0" "49WAYY")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, midzeus_state,custom_49way_r, "49WAYX\0" "49WAYY")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("49WAYX")
@@ -1113,12 +1109,12 @@ static MACHINE_CONFIG_START( midzeus, midzeus_state )
 	MCFG_FRAGMENT_ADD(dcs2_audio_2104)
 MACHINE_CONFIG_END
 
-static READ8_HANDLER( PIC16C5X_T0_clk_r )
+READ8_MEMBER(midzeus_state::PIC16C5X_T0_clk_r)
 {
 	return 0;
 }
 
-static ADDRESS_MAP_START( pic_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( pic_io_map, AS_IO, 8, midzeus_state )
 	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
 ADDRESS_MAP_END
 
@@ -1436,7 +1432,8 @@ static DRIVER_INIT( invasn )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 468/* or 488 */, 94, NULL);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x9c0000, 0x9c0000, FUNC(invasn_gun_r), FUNC(invasn_gun_w));
+	midzeus_state *state = machine.driver_data<midzeus_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x9c0000, 0x9c0000, read32_delegate(FUNC(midzeus_state::invasn_gun_r),state), write32_delegate(FUNC(midzeus_state::invasn_gun_w),state));
 }
 
 
@@ -1444,10 +1441,10 @@ static DRIVER_INIT( crusnexo )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 472/* or 476,477,478,110 */, 99, NULL);
-	memory_configure_bank(machine, "bank1", 0, 3, machine.region("user2")->base(), 0x400000*4);
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x9b0004, 0x9b0007, FUNC(crusnexo_leds_r), FUNC(crusnexo_leds_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler    (0x8d0009, 0x8d000a, FUNC(keypad_select_w));
+	machine.root_device().membank("bank1")->configure_entries(0, 3, machine.root_device().memregion("user2")->base(), 0x400000*4);
+	midzeus_state *state = machine.driver_data<midzeus_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x9b0004, 0x9b0007, read32_delegate(FUNC(midzeus_state::crusnexo_leds_r),state), write32_delegate(FUNC(midzeus_state::crusnexo_leds_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler    (0x8d0009, 0x8d000a, write32_delegate(FUNC(midzeus_state::keypad_select_w),state));
 }
 
 
@@ -1455,7 +1452,7 @@ static DRIVER_INIT( thegrid )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 474/* or 491 */, 99, NULL);
-	memory_configure_bank(machine, "bank1", 0, 3, machine.region("user2")->base(), 0x400000*4);
+	machine.root_device().membank("bank1")->configure_entries(0, 3, machine.root_device().memregion("user2")->base(), 0x400000*4);
 }
 
 

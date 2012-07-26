@@ -9,7 +9,6 @@
 
 ***************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -32,7 +31,9 @@ public:
 		  m_ram(*this, RAM_TAG),
 		  m_wd2797(*this, "wd2797"),
 		  m_floppy(*this, FLOPPY_0)
-	{ }
+	,
+		m_mapram(*this, "mapram"),
+		m_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -51,8 +52,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( wd2797_intrq_w );
 	DECLARE_WRITE_LINE_MEMBER( wd2797_drq_w );
 
-	UINT16 *m_mapram;
-	UINT16 *m_videoram;
+	required_shared_ptr<UINT16> m_mapram;
+	required_shared_ptr<UINT16> m_videoram;
 };
 
 
@@ -65,7 +66,7 @@ WRITE16_MEMBER( unixpc_state::romlmap_w )
 	if (BIT(data, 15))
 		space.install_ram(0x000000, 0x3fffff, m_ram->pointer());
 	else
-		space.install_rom(0x000000, 0x3fffff, space.machine().region("bootrom")->base());
+		space.install_rom(0x000000, 0x3fffff, space.machine().root_device().memregion("bootrom")->base());
 }
 
 void unixpc_state::machine_reset()
@@ -155,8 +156,8 @@ UINT32 unixpc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 
 static ADDRESS_MAP_START( unixpc_mem, AS_PROGRAM, 16, unixpc_state )
 	AM_RANGE(0x000000, 0x3fffff) AM_RAMBANK("bank1")
-	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_BASE(m_mapram)
-	AM_RANGE(0x420000, 0x427fff) AM_RAM AM_BASE(m_videoram)
+	AM_RANGE(0x400000, 0x4007ff) AM_RAM AM_SHARE("mapram")
+	AM_RANGE(0x420000, 0x427fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x470000, 0x470001) AM_READ(line_printer_r)
 	AM_RANGE(0x4a0000, 0x4a0001) AM_WRITE(misc_control_w)
 	AM_RANGE(0x4e0000, 0x4e0001) AM_WRITE(disk_control_w)

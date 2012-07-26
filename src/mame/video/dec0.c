@@ -11,35 +11,35 @@
 
 /******************************************************************************/
 
-WRITE16_HANDLER( dec0_update_sprites_w )
+WRITE16_MEMBER(dec0_state::dec0_update_sprites_w)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-	memcpy(state->m_buffered_spriteram,state->m_spriteram,0x800);
+	memcpy(m_buffered_spriteram,m_spriteram,0x800);
 }
 
 /******************************************************************************/
 
 static void update_24bitcol(running_machine &machine, int offset)
 {
+	dec0_state *state = machine.driver_data<dec0_state>();
 	int r,g,b;
 
-	r = (machine.generic.paletteram.u16[offset] >> 0) & 0xff;
-	g = (machine.generic.paletteram.u16[offset] >> 8) & 0xff;
-	b = (machine.generic.paletteram2.u16[offset] >> 0) & 0xff;
+	r = (state->m_generic_paletteram_16[offset] >> 0) & 0xff;
+	g = (state->m_generic_paletteram_16[offset] >> 8) & 0xff;
+	b = (state->m_generic_paletteram2_16[offset] >> 0) & 0xff;
 
 	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
 }
 
-WRITE16_HANDLER( dec0_paletteram_rg_w )
+WRITE16_MEMBER(dec0_state::dec0_paletteram_rg_w)
 {
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	update_24bitcol(space->machine(), offset);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
+	update_24bitcol(machine(), offset);
 }
 
-WRITE16_HANDLER( dec0_paletteram_b_w )
+WRITE16_MEMBER(dec0_state::dec0_paletteram_b_w)
 {
-	COMBINE_DATA(&space->machine().generic.paletteram2.u16[offset]);
-	update_24bitcol(space->machine(), offset);
+	COMBINE_DATA(&m_generic_paletteram2_16[offset]);
+	update_24bitcol(machine(), offset);
 }
 
 /******************************************************************************/
@@ -49,7 +49,7 @@ SCREEN_UPDATE_IND16( hbarrel )
 {
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
 
-	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
+	state->flip_screen_set(screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
 	screen.machine().device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram, 0x08, 0x08, 0x0f);
@@ -67,7 +67,7 @@ SCREEN_UPDATE_IND16( hbarrel )
 SCREEN_UPDATE_IND16( baddudes )
 {
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
-	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
+	state->flip_screen_set(screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
 	/* WARNING: inverted wrt Midnight Resistance */
 	if ((state->m_pri & 0x01) == 0)
@@ -108,7 +108,7 @@ SCREEN_UPDATE_IND16( robocop )
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
 	int trans;
 
-	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
+	state->flip_screen_set(screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
 	if (state->m_pri & 0x04)
 		trans = 0x08;
@@ -153,7 +153,7 @@ SCREEN_UPDATE_IND16( birdtry )
 {
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
 
-	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
+	state->flip_screen_set(screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
 	/* This game doesn't have the extra playfield chip on the game board, but
     the palette does show through. */
@@ -169,7 +169,7 @@ SCREEN_UPDATE_IND16( birdtry )
 SCREEN_UPDATE_IND16( hippodrm )
 {
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
-	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
+	state->flip_screen_set(screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
 	if (state->m_pri & 0x01)
 	{
@@ -192,7 +192,7 @@ SCREEN_UPDATE_IND16( hippodrm )
 SCREEN_UPDATE_IND16( slyspy )
 {
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
-	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
+	state->flip_screen_set(screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
 	screen.machine().device<deco_bac06_device>("tilegen3")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	screen.machine().device<deco_bac06_device>("tilegen2")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,0, 0x00, 0x00, 0x00, 0x00);
@@ -214,7 +214,7 @@ SCREEN_UPDATE_IND16( midres )
 	dec0_state *state = screen.machine().driver_data<dec0_state>();
 	int trans;
 
-	flip_screen_set(screen.machine(), screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
+	state->flip_screen_set(screen.machine().device<deco_bac06_device>("tilegen1")->get_flip_state());
 
 	if (state->m_pri & 0x04)
 		trans = 0x00;
@@ -249,10 +249,9 @@ SCREEN_UPDATE_IND16( midres )
 }
 
 
-WRITE16_HANDLER( dec0_priority_w )
+WRITE16_MEMBER(dec0_state::dec0_priority_w)
 {
-	dec0_state *state = space->machine().driver_data<dec0_state>();
-	COMBINE_DATA(&state->m_pri);
+	COMBINE_DATA(&m_pri);
 }
 
 VIDEO_START( dec0_nodma )

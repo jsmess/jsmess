@@ -19,12 +19,14 @@
 #include "machine/eeprom.h"
 
 
-class kongambl_state : public driver_device
+class kongambl_state : public konamigx_state
 {
 public:
 	kongambl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: konamigx_state(mconfig, type, tag) { }
 
+	DECLARE_READ32_MEMBER(eeprom_r);
+	DECLARE_WRITE32_MEMBER(eeprom_w);
 };
 
 
@@ -53,11 +55,11 @@ static SCREEN_UPDATE_IND16(kongambl)
 	return 0;
 }
 
-static READ32_HANDLER( eeprom_r )
+READ32_MEMBER(kongambl_state::eeprom_r)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT32 rv = input_port_read(space->machine(), "SYSTEM") & ~0x1;
+		UINT32 rv = ioport("SYSTEM")->read() & ~0x1;
 
 		return rv;	// bit 0 freezes the game if 1
 	}
@@ -65,30 +67,30 @@ static READ32_HANDLER( eeprom_r )
 	return 0;
 }
 
-static WRITE32_HANDLER( eeprom_w )
+WRITE32_MEMBER(kongambl_state::eeprom_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		input_port_write(space->machine(), "EEPROMOUT", (data>>8)&0xf, 0xff);
+		ioport("EEPROMOUT")->write((data>>8)&0xf, 0xff);
 	}
 }
 
-static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( kongambl_map, AS_PROGRAM, 32, kongambl_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM	// main program
 	AM_RANGE(0x100000, 0x11ffff) AM_RAM	// work RAM
 
-	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE("k056832", k056832_ram_long_r, k056832_ram_long_w)
+	AM_RANGE(0x400000, 0x401fff) AM_DEVREADWRITE_LEGACY("k056832", k056832_ram_long_r, k056832_ram_long_w)
 
-	AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE("k056832", k056832_unpaged_ram_long_r, k056832_unpaged_ram_long_w)
+	AM_RANGE(0x420000, 0x43ffff) AM_DEVREADWRITE_LEGACY("k056832", k056832_unpaged_ram_long_r, k056832_unpaged_ram_long_w)
 
 	AM_RANGE(0x440000, 0x443fff) AM_RAM
 
-	AM_RANGE(0x460000, 0x47ffff) AM_RAM_WRITE(konamigx_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x460000, 0x47ffff) AM_RAM_WRITE(konamigx_palette_w) AM_SHARE("paletteram")
 
-	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE("k056832", k056832_long_w)
+	AM_RANGE(0x480000, 0x48003f) AM_DEVWRITE_LEGACY("k056832", k056832_long_w)
 
-	AM_RANGE(0x700000, 0x700003) AM_READ( eeprom_r )
-	AM_RANGE(0x780000, 0x780003) AM_WRITE( eeprom_w )
+	AM_RANGE(0x700000, 0x700003) AM_READ(eeprom_r )
+	AM_RANGE(0x780000, 0x780003) AM_WRITE(eeprom_w )
 ADDRESS_MAP_END
 
 
@@ -102,7 +104,7 @@ static INPUT_PORTS_START( kongambl )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_device, set_cs_line)
 INPUT_PORTS_END
 
-static ADDRESS_MAP_START( kongamaud_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( kongamaud_map, AS_PROGRAM, 16, kongambl_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM	// main program (mirrored?)
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM	// work RAM
 	AM_RANGE(0x200000, 0x2000ff) AM_RAM	// unknown (YMZ280b?  Shared with 68020?)

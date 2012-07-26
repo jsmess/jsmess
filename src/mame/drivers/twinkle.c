@@ -253,6 +253,17 @@ public:
 	int m_output_last[ 0x100 ];
 	int m_last_io_offset;
 	UINT8 m_sector_buffer[ 4096 ];
+	DECLARE_WRITE32_MEMBER(twinkle_io_w);
+	DECLARE_READ32_MEMBER(twinkle_io_r);
+	DECLARE_WRITE32_MEMBER(twinkle_output_w);
+	DECLARE_WRITE32_MEMBER(serial_w);
+	DECLARE_WRITE32_MEMBER(shared_psx_w);
+	DECLARE_READ32_MEMBER(shared_psx_r);
+	DECLARE_WRITE16_MEMBER(twinkle_spu_ctrl_w);
+	DECLARE_READ16_MEMBER(twinkle_waveram_r);
+	DECLARE_WRITE16_MEMBER(twinkle_waveram_w);
+	DECLARE_READ16_MEMBER(shared_68k_r);
+	DECLARE_WRITE16_MEMBER(shared_68k_w);
 };
 
 /* RTC */
@@ -417,21 +428,21 @@ static const UINT16 asciicharset[]=
 	0, //
 };
 
-static WRITE32_HANDLER( twinkle_io_w )
+WRITE32_MEMBER(twinkle_state::twinkle_io_w)
 {
-	twinkle_state *state = space->machine().driver_data<twinkle_state>();
+
 
 	if( ACCESSING_BITS_16_23 )
 	{
-		state->m_io_offset = ( data >> 16 ) & 0xff;
+		m_io_offset = ( data >> 16 ) & 0xff;
 	}
 	if( ACCESSING_BITS_0_7 )
 	{
-		if( state->m_output_last[ state->m_io_offset ] != ( data & 0xff ) )
+		if( m_output_last[ m_io_offset ] != ( data & 0xff ) )
 		{
-			state->m_output_last[ state->m_io_offset ] = ( data & 0xff );
+			m_output_last[ m_io_offset ] = ( data & 0xff );
 
-			switch( state->m_io_offset )
+			switch( m_io_offset )
 			{
 				/* ? */
 			case 0x07:
@@ -452,7 +463,7 @@ static WRITE32_HANDLER( twinkle_io_w )
 			case 0x6f:
 			case 0x77:
 			case 0x7f:
-				output_set_indexed_value( "led", ( state->m_io_offset - 7 ) / 8, asciicharset[ ( data ^ 0xff ) & 0x7f ] );
+				output_set_indexed_value( "led", ( m_io_offset - 7 ) / 8, asciicharset[ ( data ^ 0xff ) & 0x7f ] );
 				break;
 
 			case 0x87:
@@ -471,55 +482,55 @@ static WRITE32_HANDLER( twinkle_io_w )
 
 				if( ( data & 0xfe ) != 0xfe )
 				{
-					printf("%02x = %02x\n", state->m_io_offset, data & 0xff );
+					printf("%02x = %02x\n", m_io_offset, data & 0xff );
 				}
 				break;
 
 			default:
-				printf( "unknown io %02x = %02x\n", state->m_io_offset, data & 0xff );
+				printf( "unknown io %02x = %02x\n", m_io_offset, data & 0xff );
 				break;
 			}
 		}
 	}
 }
 
-static READ32_HANDLER(twinkle_io_r)
+READ32_MEMBER(twinkle_state::twinkle_io_r)
 {
-	twinkle_state *state = space->machine().driver_data<twinkle_state>();
+
 	UINT32 data = 0;
 
 	if( ACCESSING_BITS_0_7 )
 	{
-		switch( state->m_io_offset )
+		switch( m_io_offset )
 		{
 			case 0x07:
-				data |= input_port_read( space->machine(), "IN0" );
+				data |= ioport( "IN0" )->read();
 				break;
 
 			case 0x0f:
-				data |= input_port_read( space->machine(), "IN1" );
+				data |= ioport( "IN1" )->read();
 				break;
 
 			case 0x17:
-				data |= input_port_read( space->machine(), "IN2" );
+				data |= ioport( "IN2" )->read();
 				break;
 
 			case 0x1f:
-				data |= input_port_read( space->machine(), "IN3" );
+				data |= ioport( "IN3" )->read();
 				break;
 
 			case 0x27:
-				data |= input_port_read( space->machine(), "IN4" );
+				data |= ioport( "IN4" )->read();
 				break;
 
 			case 0x2f:
-				data |= input_port_read( space->machine(), "IN5" );
+				data |= ioport( "IN5" )->read();
 				break;
 
 			default:
-				if( state->m_last_io_offset != state->m_io_offset )
+				if( m_last_io_offset != m_io_offset )
 				{
-					state->m_last_io_offset = state->m_io_offset;
+					m_last_io_offset = m_io_offset;
 				}
 
 				break;
@@ -534,7 +545,7 @@ static READ32_HANDLER(twinkle_io_r)
 	return data;
 }
 
-static WRITE32_HANDLER(twinkle_output_w)
+WRITE32_MEMBER(twinkle_state::twinkle_output_w)
 {
 	switch( offset )
 	{
@@ -564,7 +575,7 @@ static WRITE32_HANDLER(twinkle_output_w)
 	}
 }
 
-static WRITE32_HANDLER(serial_w)
+WRITE32_MEMBER(twinkle_state::serial_w)
 {
 /*
     int _do = ( data >> 4 ) & 1;
@@ -575,19 +586,19 @@ static WRITE32_HANDLER(serial_w)
 */
 }
 
-static WRITE32_HANDLER(shared_psx_w)
+WRITE32_MEMBER(twinkle_state::shared_psx_w)
 {
-	twinkle_state *state = space->machine().driver_data<twinkle_state>();
+
 
 	if (mem_mask == 0xff)
 	{
-		state->m_spu_shared[offset*2] = data;
-//      printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, offset*2, mem_mask, cpu_get_pc(&space->device()));
+		m_spu_shared[offset*2] = data;
+//      printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, offset*2, mem_mask, cpu_get_pc(&space.device()));
 	}
 	else if (mem_mask == 0xff0000)
 	{
-		state->m_spu_shared[(offset*2)+1] = data;
-//      printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, (offset*2)+1, mem_mask, cpu_get_pc(&space->device()));
+		m_spu_shared[(offset*2)+1] = data;
+//      printf("shared_psx_w: %x to %x (%x), mask %x (PC=%x)\n", data, offset, (offset*2)+1, mem_mask, cpu_get_pc(&space.device()));
 	}
 	else
 	{
@@ -595,24 +606,24 @@ static WRITE32_HANDLER(shared_psx_w)
 	}
 }
 
-static READ32_HANDLER(shared_psx_r)
+READ32_MEMBER(twinkle_state::shared_psx_r)
 {
-	twinkle_state *state = space->machine().driver_data<twinkle_state>();
+
 	UINT32 result;
 
-	result = state->m_spu_shared[offset*2] | state->m_spu_shared[(offset*2)+1]<<16;
+	result = m_spu_shared[offset*2] | m_spu_shared[(offset*2)+1]<<16;
 
-//  printf("shared_psx_r: @ %x (%x %x), mask %x = %x (PC=%x)\n", offset, offset*2, (offset*2)+1, mem_mask, result, cpu_get_pc(&space->device()));
+//  printf("shared_psx_r: @ %x (%x %x), mask %x = %x (PC=%x)\n", offset, offset*2, (offset*2)+1, mem_mask, result, cpu_get_pc(&space.device()));
 
 	result = 0;	// HACK to prevent the games from freezing while we sort out the rest of the 68k's boot sequence
 
 	return result;
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32, twinkle_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f000000, 0x1f0007ff) AM_READWRITE(shared_psx_r, shared_psx_w)
-	AM_RANGE(0x1f200000, 0x1f20001f) AM_READWRITE(am53cf96_r, am53cf96_w)
+	AM_RANGE(0x1f200000, 0x1f20001f) AM_READWRITE_LEGACY(am53cf96_r, am53cf96_w)
 	AM_RANGE(0x1f20a01c, 0x1f20a01f) AM_WRITENOP /* scsi? */
 	AM_RANGE(0x1f210400, 0x1f2107ff) AM_READNOP
 	AM_RANGE(0x1f218000, 0x1f218003) AM_WRITE(watchdog_reset32_w) /* LTC1232 */
@@ -624,8 +635,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 32 )
 	AM_RANGE(0x1f260000, 0x1f260003) AM_WRITE(serial_w)
 	AM_RANGE(0x1f270000, 0x1f270003) AM_WRITE_PORT("OUTSEC")
 	AM_RANGE(0x1f280000, 0x1f280003) AM_READ_PORT("INSEC")
-	AM_RANGE(0x1f290000, 0x1f29007f) AM_DEVREADWRITE8_MODERN("rtc", rtc65271_device, rtc_r, rtc_w, 0x00ff00ff)
-	AM_RANGE(0x1f2a0000, 0x1f2a007f) AM_DEVREADWRITE8_MODERN("rtc", rtc65271_device, xram_r, xram_w, 0x00ff00ff)
+	AM_RANGE(0x1f290000, 0x1f29007f) AM_DEVREADWRITE8("rtc", rtc65271_device, rtc_r, rtc_w, 0x00ff00ff)
+	AM_RANGE(0x1f2a0000, 0x1f2a007f) AM_DEVREADWRITE8("rtc", rtc65271_device, xram_r, xram_w, 0x00ff00ff)
 	AM_RANGE(0x1f2b0000, 0x1f2b00ff) AM_WRITE(twinkle_output_w)
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("user1", 0) /* bios */
 	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
@@ -675,63 +686,63 @@ static WRITE16_DEVICE_HANDLER( twinkle_ide_w )
 
     Other bits unknown.
 */
-static WRITE16_HANDLER( twinkle_spu_ctrl_w )
+WRITE16_MEMBER(twinkle_state::twinkle_spu_ctrl_w)
 {
-	twinkle_state *state = space->machine().driver_data<twinkle_state>();
 
-	if ((!(data & 0x0080)) && (state->m_spu_ctrl & 0x0080))
+
+	if ((!(data & 0x0080)) && (m_spu_ctrl & 0x0080))
 	{
-		device_set_input_line(&space->device(), M68K_IRQ_1, CLEAR_LINE);
+		device_set_input_line(&space.device(), M68K_IRQ_1, CLEAR_LINE);
 	}
-	else if ((!(data & 0x0100)) && (state->m_spu_ctrl & 0x0100))
+	else if ((!(data & 0x0100)) && (m_spu_ctrl & 0x0100))
 	{
-		device_set_input_line(&space->device(), M68K_IRQ_2, CLEAR_LINE);
+		device_set_input_line(&space.device(), M68K_IRQ_2, CLEAR_LINE);
 	}
-	else if ((!(data & 0x0200)) && (state->m_spu_ctrl & 0x0200))
+	else if ((!(data & 0x0200)) && (m_spu_ctrl & 0x0200))
 	{
-		device_set_input_line(&space->device(), M68K_IRQ_4, CLEAR_LINE);
+		device_set_input_line(&space.device(), M68K_IRQ_4, CLEAR_LINE);
 	}
-	else if ((!(data & 0x0400)) && (state->m_spu_ctrl & 0x0400))
+	else if ((!(data & 0x0400)) && (m_spu_ctrl & 0x0400))
 	{
-		device_set_input_line(&space->device(), M68K_IRQ_6, CLEAR_LINE);
+		device_set_input_line(&space.device(), M68K_IRQ_6, CLEAR_LINE);
 	}
 
-	state->m_spu_ctrl = data;
+	m_spu_ctrl = data;
 }
 
-static READ16_HANDLER( twinkle_waveram_r )
+READ16_MEMBER(twinkle_state::twinkle_waveram_r)
 {
-	UINT16 *waveram = (UINT16 *)space->machine().region("rfsnd")->base();
+	UINT16 *waveram = (UINT16 *)machine().root_device().memregion("rfsnd")->base();
 
 	return waveram[offset];
 }
 
-static WRITE16_HANDLER( twinkle_waveram_w )
+WRITE16_MEMBER(twinkle_state::twinkle_waveram_w)
 {
-	UINT16 *waveram = (UINT16 *)space->machine().region("rfsnd")->base();
+	UINT16 *waveram = (UINT16 *)machine().root_device().memregion("rfsnd")->base();
 
 	COMBINE_DATA(&waveram[offset]);
 }
 
-static READ16_HANDLER( shared_68k_r )
+READ16_MEMBER(twinkle_state::shared_68k_r)
 {
-	twinkle_state *state = space->machine().driver_data<twinkle_state>();
+
 
 //  printf("shared_68k_r: @ %x, mask %x\n", offset, mem_mask);
 
-	return state->m_spu_shared[offset];
+	return m_spu_shared[offset];
 }
 
-static WRITE16_HANDLER( shared_68k_w )
+WRITE16_MEMBER(twinkle_state::shared_68k_w)
 {
-	twinkle_state *state = space->machine().driver_data<twinkle_state>();
+
 
 //  printf("shared_68k_w: %x to %x, mask %x\n", data, offset, mem_mask);
 
-	state->m_spu_shared[offset] = data & 0xff;
+	m_spu_shared[offset] = data & 0xff;
 }
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16, twinkle_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x13ffff) AM_RAM
 	// 220000 = LEDs?
@@ -739,11 +750,11 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 16 )
 	// 240000 = top 16 bits of DMA address?
 	// 250000 = write to initiate DMA?
 	// 260000 = ???
-	AM_RANGE(0x280000, 0x280fff) AM_READWRITE( shared_68k_r, shared_68k_w )
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("ide", twinkle_ide_r, twinkle_ide_w)
+	AM_RANGE(0x280000, 0x280fff) AM_READWRITE(shared_68k_r, shared_68k_w )
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("ide", twinkle_ide_r, twinkle_ide_w)
 	// 34000E = ???
-	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE("rfsnd", rf5c400_r, rf5c400_w)
-	AM_RANGE(0x800000, 0xffffff) AM_READWRITE( twinkle_waveram_r, twinkle_waveram_w )	// 8 MB window wave RAM
+	AM_RANGE(0x400000, 0x400fff) AM_DEVREADWRITE_LEGACY("rfsnd", rf5c400_r, rf5c400_w)
+	AM_RANGE(0x800000, 0xffffff) AM_READWRITE(twinkle_waveram_r, twinkle_waveram_w )	// 8 MB window wave RAM
 ADDRESS_MAP_END
 
 /* SCSI */
@@ -990,10 +1001,10 @@ ROM_START( bmiidx )
 	TWINKLE_BIOS
 
 	DISK_REGION( "cdrom0" )	// program
-	DISK_IMAGE_READONLY("863jaa01", 0, SHA1(aee12de1dc5dd44e5bf7b62133ed695b80999390) )
+	DISK_IMAGE_READONLY("863jaa01", 0, BAD_DUMP SHA1(aee12de1dc5dd44e5bf7b62133ed695b80999390) )
 
 	DISK_REGION( "cdrom1" ) // video CD
-	DISK_IMAGE_READONLY("863jaa04", 0, SHA1(8f6a0d2e191153032c9388b5298d8ee531b22a41) )
+	DISK_IMAGE_READONLY("863jaa04", 0, BAD_DUMP SHA1(8f6a0d2e191153032c9388b5298d8ee531b22a41) )
 
 	DISK_REGION( "drive_0" )
 	DISK_IMAGE_READONLY("c44jaa03", 0, SHA1(53e9bd25d1674a04aeec81c0224b4e4e44af802a) )	// was part of a 1st mix machine, but "c44" indicates 8th mix?
@@ -1066,7 +1077,7 @@ ROM_START( bmiidxc )
 	ROM_LOAD( "896j.pd",      0x000000, 0x000100, BAD_DUMP CRC(1e5caf37) SHA1(75b378662b651cb322e41564d3bae68cc9edadc5) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "896jaabm", 0, SHA1(af008e5bcf18da4e9aea752a712c843e37a74be5) )
+	DISK_IMAGE_READONLY( "896jaabm", 0, BAD_DUMP SHA1(af008e5bcf18da4e9aea752a712c843e37a74be5) )
 //  DISK_IMAGE_READONLY( "abmjaahd", 1, NO_DUMP )
 //  DISK_IMAGE_READONLY( "abmjaa02", 2, NO_DUMP )
 ROM_END
@@ -1078,7 +1089,7 @@ ROM_START( bmiidxc2 )
 	ROM_LOAD( "984j.pd",      0x000000, 0x000100, BAD_DUMP CRC(213843e5) SHA1(5571db155a60fa4087dd996af48e8e27fc1c518c) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "984a01bm", 0, SHA1(d9b7d74a72a76e4e9cf7725e0fb8dafcc1c87187) )
+	DISK_IMAGE_READONLY( "984a01bm", 0, BAD_DUMP SHA1(d9b7d74a72a76e4e9cf7725e0fb8dafcc1c87187) )
 //  DISK_IMAGE_READONLY( "abmjaahd", 1, NO_DUMP )
 //  DISK_IMAGE_READONLY( "abmjaa02", 2, NO_DUMP )
 ROM_END
@@ -1090,7 +1101,7 @@ ROM_START( bmiidxca )
 	ROM_LOAD( "896j.pd",      0x000000, 0x000100, BAD_DUMP CRC(1e5caf37) SHA1(75b378662b651cb322e41564d3bae68cc9edadc5) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "896jabbm", 0, SHA1(117ae4c876207bbaf9e8fe0fdf5bb161155c1bdb) )
+	DISK_IMAGE_READONLY( "896jabbm", 0, BAD_DUMP SHA1(117ae4c876207bbaf9e8fe0fdf5bb161155c1bdb) )
 //  DISK_IMAGE_READONLY( "abmjaahd", 1, NO_DUMP )
 //  DISK_IMAGE_READONLY( "abmjaa02", 2, NO_DUMP )
 ROM_END

@@ -60,7 +60,7 @@ kc_8k_device::kc_8k_device(const machine_config &mconfig, device_type type, cons
 void kc_8k_device::device_start()
 {
 	m_slot = dynamic_cast<kcexp_slot_device *>(owner());
-	m_rom = subregion(REGION_TAG)->base();
+	m_rom = memregion(REGION_TAG)->base();
 }
 
 //-------------------------------------------------

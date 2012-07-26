@@ -28,13 +28,15 @@ class dotrikun_state : public driver_device
 {
 public:
 	dotrikun_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_dotrikun_bitmap(*this, "dotrikun_bitmap"){ }
 
 	/* memory pointers */
-	UINT8 *        m_dotrikun_bitmap;
+	required_shared_ptr<UINT8> m_dotrikun_bitmap;
 
 	/* video-related */
 	UINT8          m_color;
+	DECLARE_WRITE8_MEMBER(dotrikun_color_w);
 };
 
 
@@ -44,9 +46,8 @@ public:
  *
  *************************************/
 
-static WRITE8_HANDLER( dotrikun_color_w )
+WRITE8_MEMBER(dotrikun_state::dotrikun_color_w)
 {
-	dotrikun_state *state = space->machine().driver_data<dotrikun_state>();
 	/*
     x--- ---- screen color swap?
     ---- -x-- B
@@ -54,8 +55,8 @@ static WRITE8_HANDLER( dotrikun_color_w )
     ---- ---x R
     */
 
-	state->m_color = data;
-	space->machine().primary_screen->update_partial(space->machine().primary_screen->vpos());
+	m_color = data;
+	machine().primary_screen->update_partial(machine().primary_screen->vpos());
 }
 
 
@@ -96,13 +97,13 @@ static SCREEN_UPDATE_RGB32( dotrikun )
  *
  *************************************/
 
-static ADDRESS_MAP_START( dotrikun_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dotrikun_map, AS_PROGRAM, 8, dotrikun_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x85ff) AM_RAM AM_BASE_MEMBER(dotrikun_state, m_dotrikun_bitmap)
+	AM_RANGE(0x8000, 0x85ff) AM_RAM AM_SHARE("dotrikun_bitmap")
 	AM_RANGE(0x8600, 0x87ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, dotrikun_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("INPUTS") AM_WRITE(dotrikun_color_w)
 ADDRESS_MAP_END

@@ -199,14 +199,13 @@ static IRQ_CALLBACK(ssv_irq_callback)
 	return 0;
 }
 
-static WRITE16_HANDLER( ssv_irq_ack_w )
+WRITE16_MEMBER(ssv_state::ssv_irq_ack_w)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
 	int level = ((offset * 2) & 0x70) >> 4;
 
-	state->m_requested_int &= ~(1 << level);
+	m_requested_int &= ~(1 << level);
 
-	update_irq_state(space->machine());
+	update_irq_state(machine());
 }
 
 /*
@@ -227,11 +226,10 @@ static WRITE16_HANDLER( ssv_irq_ack_w )
     ultrax:     40,00 at the start then 42,4a
     twineag2:   40,00 at the start then 42,4a
 */
-static WRITE16_HANDLER( ssv_irq_enable_w )
+WRITE16_MEMBER(ssv_state::ssv_irq_enable_w)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
 
-	COMBINE_DATA(&state->m_irq_enable);
+	COMBINE_DATA(&m_irq_enable);
 }
 
 static TIMER_DEVICE_CALLBACK( ssv_interrupt )
@@ -294,32 +292,32 @@ static TIMER_DEVICE_CALLBACK( gdfs_interrupt )
     survarts:   83
     sxyreact:   80
 */
-static WRITE16_HANDLER( ssv_lockout_w )
+WRITE16_MEMBER(ssv_state::ssv_lockout_w)
 {
 //  popmessage("%02X",data & 0xff);
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_lockout_w(space->machine(), 1,~data & 0x01);
-		coin_lockout_w(space->machine(), 0,~data & 0x02);
-		coin_counter_w(space->machine(), 1, data & 0x04);
-		coin_counter_w(space->machine(), 0, data & 0x08);
+		coin_lockout_w(machine(), 1,~data & 0x01);
+		coin_lockout_w(machine(), 0,~data & 0x02);
+		coin_counter_w(machine(), 1, data & 0x04);
+		coin_counter_w(machine(), 0, data & 0x08);
 //                        data & 0x40?
-		ssv_enable_video( space->machine(), data & 0x80);
+		ssv_enable_video( machine(), data & 0x80);
 	}
 }
 
 /* Same as above but with inverted lockout lines */
-static WRITE16_HANDLER( ssv_lockout_inv_w )
+WRITE16_MEMBER(ssv_state::ssv_lockout_inv_w)
 {
 //  popmessage("%02X",data & 0xff);
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_lockout_w(space->machine(), 1, data & 0x01);
-		coin_lockout_w(space->machine(), 0, data & 0x02);
-		coin_counter_w(space->machine(), 1, data & 0x04);
-		coin_counter_w(space->machine(), 0, data & 0x08);
+		coin_lockout_w(machine(), 1, data & 0x01);
+		coin_lockout_w(machine(), 0, data & 0x02);
+		coin_counter_w(machine(), 1, data & 0x04);
+		coin_counter_w(machine(), 0, data & 0x08);
 //                        data & 0x40?
-		ssv_enable_video( space->machine(), data & 0x80);
+		ssv_enable_video( machine(), data & 0x80);
 	}
 }
 
@@ -328,7 +326,7 @@ static MACHINE_RESET( ssv )
 	ssv_state *state = machine.driver_data<ssv_state>();
 	state->m_requested_int = 0;
 	device_set_irq_callback(machine.device("maincpu"), ssv_irq_callback);
-	memory_set_bankptr(machine, "bank1", machine.region("user1")->base());
+	state->membank("bank1")->set_base(state->memregion("user1")->base());
 }
 
 
@@ -340,32 +338,29 @@ static MACHINE_RESET( ssv )
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( dsp_prg_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( dsp_prg_map, AS_PROGRAM, 32, ssv_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("dspprg", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsp_data_map, AS_DATA, 16 )
+static ADDRESS_MAP_START( dsp_data_map, AS_DATA, 16, ssv_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("dspdata", 0)
 ADDRESS_MAP_END
 
-static READ16_HANDLER( dsp_dr_r )
+READ16_MEMBER(ssv_state::dsp_dr_r)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
 
-	return state->m_dsp->snesdsp_read(true);
+	return m_dsp->snesdsp_read(true);
 }
 
-static WRITE16_HANDLER( dsp_dr_w )
+WRITE16_MEMBER(ssv_state::dsp_dr_w)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
 
-	state->m_dsp->snesdsp_write(true, data);
+	m_dsp->snesdsp_write(true, data);
 }
 
-static READ16_HANDLER( dsp_r )
+READ16_MEMBER(ssv_state::dsp_r)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
-	UINT16 temp = state->m_dsp->dataram_r(offset/2);
+	UINT16 temp = m_dsp->dataram_r(offset/2);
 	UINT16 res;
 
 	if (offset & 1)
@@ -380,10 +375,9 @@ static READ16_HANDLER( dsp_r )
 	return res;
 }
 
-static WRITE16_HANDLER( dsp_w )
+WRITE16_MEMBER(ssv_state::dsp_w)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
-	UINT16 temp = state->m_dsp->dataram_r(offset/2);
+	UINT16 temp = m_dsp->dataram_r(offset/2);
 
 	if (offset & 1)
 	{
@@ -396,7 +390,7 @@ static WRITE16_HANDLER( dsp_w )
 		temp |= data;
 	}
 
-	state->m_dsp->dataram_w(offset/2, temp);
+	m_dsp->dataram_w(offset/2, temp);
 }
 
 /***************************************************************************
@@ -408,17 +402,17 @@ static WRITE16_HANDLER( dsp_w )
 ***************************************************************************/
 
 #ifdef UNUSED_FUNCTION
-static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
+READ16_MEMBER(ssv_state::fake_r){   return ssv_scroll[offset];  }
 #endif
 
 #define SSV_MAP( _ROM  )																							\
-	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_BASE_MEMBER(ssv_state, m_mainram)										/*  RAM     */	\
-	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_BASE_MEMBER(ssv_state, m_spriteram)										/*  Sprites */	\
-	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(paletteram16_xrgb_swap_word_w) AM_BASE_MEMBER(ssv_state, m_paletteram)	/*  Palette */	\
+	AM_RANGE(0x000000, 0x00ffff) AM_RAM AM_SHARE("mainram")										/*  RAM     */	\
+	AM_RANGE(0x100000, 0x13ffff) AM_RAM AM_SHARE("spriteram")										/*  Sprites */	\
+	AM_RANGE(0x140000, 0x15ffff) AM_RAM_WRITE(paletteram16_xrgb_swap_word_w) AM_SHARE("paletteram")	/*  Palette */	\
 	AM_RANGE(0x160000, 0x17ffff) AM_RAM																/*          */	\
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ(ssv_vblank_r			)									/*  Vblank? */	\
 /**/AM_RANGE(0x1c0002, 0x1c007f) AM_READONLY									/*  Scroll  */	\
-	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE(ssv_scroll_w) AM_BASE_MEMBER(ssv_state, m_scroll)             		/*  Scroll  */  \
+	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITE(ssv_scroll_w) AM_SHARE("scroll")          		/*  Scroll  */  \
 	AM_RANGE(0x210002, 0x210003) AM_READ_PORT("DSW1")																\
 	AM_RANGE(0x210004, 0x210005) AM_READ_PORT("DSW2")																\
 	AM_RANGE(0x210008, 0x210009) AM_READ_PORT("P1")																	\
@@ -426,22 +420,22 @@ static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
 	AM_RANGE(0x21000c, 0x21000d) AM_READ_PORT("SYSTEM")																\
 	AM_RANGE(0x21000e, 0x21000f) AM_READNOP AM_WRITE(ssv_lockout_w)								/*  Lockout */	\
 	AM_RANGE(0x210010, 0x210011) AM_WRITENOP                                                        				\
-	AM_RANGE(0x230000, 0x230071) AM_WRITEONLY AM_BASE_MEMBER(ssv_state, m_irq_vectors)	        		    /*  IRQ Vec */	\
+	AM_RANGE(0x230000, 0x230071) AM_WRITEONLY AM_SHARE("irq_vectors")	        		    /*  IRQ Vec */	\
 	AM_RANGE(0x240000, 0x240071) AM_WRITE(ssv_irq_ack_w )                               			/*  IRQ Ack */	\
 	AM_RANGE(0x260000, 0x260001) AM_WRITE(ssv_irq_enable_w)                             			/*  IRQ En  */  \
-	AM_RANGE(0x300000, 0x30007f) AM_DEVREADWRITE8("ensoniq", es5506_r, es5506_w, 0x00ff)			/*  Sound   */	\
+	AM_RANGE(0x300000, 0x30007f) AM_DEVREADWRITE8_LEGACY("ensoniq", es5506_r, es5506_w, 0x00ff)			/*  Sound   */	\
 	AM_RANGE(_ROM, 0xffffff) AM_ROMBANK("bank1")														/*  ROM     */	\
 
 /***************************************************************************
                                 Drift Out '94
 ***************************************************************************/
 
-static READ16_HANDLER( drifto94_rand_r )
+READ16_MEMBER(ssv_state::drifto94_rand_r)
 {
-	return space->machine().rand() & 0xffff;
+	return machine().rand() & 0xffff;
 }
 
-static ADDRESS_MAP_START( drifto94_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( drifto94_map, AS_PROGRAM, 16, ssv_state )
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 1 at the start
 	AM_RANGE(0x400000, 0x47ffff) AM_WRITEONLY										// ?
 	AM_RANGE(0x480000, 0x480001) AM_READWRITE(dsp_dr_r, dsp_dr_w)
@@ -465,7 +459,7 @@ static READ16_DEVICE_HANDLER( gdfs_eeprom_r )
 	static const char *const gunnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
 
 	eeprom_device *eeprom = downcast<eeprom_device *>(device);
-	return (((state->m_gdfs_lightgun_select & 1) ? 0 : 0xff) ^ input_port_read(device->machine(), gunnames[state->m_gdfs_lightgun_select])) | (eeprom->read_bit() << 8);
+	return (((state->m_gdfs_lightgun_select & 1) ? 0 : 0xff) ^ device->machine().root_device().ioport(gunnames[state->m_gdfs_lightgun_select])->read()) | (eeprom->read_bit() << 8);
 }
 
 static WRITE16_DEVICE_HANDLER( gdfs_eeprom_w )
@@ -498,22 +492,20 @@ static WRITE16_DEVICE_HANDLER( gdfs_eeprom_w )
 }
 
 
-static READ16_HANDLER( gdfs_gfxram_r )
+READ16_MEMBER(ssv_state::gdfs_gfxram_r)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
 
-	return state->m_eaglshot_gfxram[offset + state->m_gdfs_gfxram_bank * 0x100000/2];
+	return m_eaglshot_gfxram[offset + m_gdfs_gfxram_bank * 0x100000/2];
 }
 
-static WRITE16_HANDLER( gdfs_gfxram_w )
+WRITE16_MEMBER(ssv_state::gdfs_gfxram_w)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
-	offset += state->m_gdfs_gfxram_bank * 0x100000/2;
-	COMBINE_DATA(&state->m_eaglshot_gfxram[offset]);
-	gfx_element_mark_dirty(space->machine().gfx[2], offset / (16*8/2));
+	offset += m_gdfs_gfxram_bank * 0x100000/2;
+	COMBINE_DATA(&m_eaglshot_gfxram[offset]);
+	gfx_element_mark_dirty(machine().gfx[2], offset / (16*8/2));
 }
 
-static READ16_HANDLER( gdfs_blitram_r )
+READ16_MEMBER(ssv_state::gdfs_blitram_r)
 {
 	switch (offset)
 	{
@@ -522,14 +514,13 @@ static READ16_HANDLER( gdfs_blitram_r )
 			return 0;
 	}
 
-	logerror("CPU #0 PC: %06X - Blit reg read: %02X\n",cpu_get_pc(&space->device()),offset*2);
+	logerror("CPU #0 PC: %06X - Blit reg read: %02X\n",cpu_get_pc(&space.device()),offset*2);
 	return 0;
 }
 
-static WRITE16_HANDLER( gdfs_blitram_w )
+WRITE16_MEMBER(ssv_state::gdfs_blitram_w)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
-	UINT16 *gdfs_blitram = state->m_gdfs_blitram;
+	UINT16 *gdfs_blitram = m_gdfs_blitram;
 
 	COMBINE_DATA(&gdfs_blitram[offset]);
 
@@ -538,10 +529,10 @@ static WRITE16_HANDLER( gdfs_blitram_w )
 		case 0x8a/2:
 		{
 			if (data & ~0x43)
-				logerror("CPU #0 PC: %06X - Unknown gdfs_gfxram_bank bit written %04X\n",cpu_get_pc(&space->device()),data);
+				logerror("CPU #0 PC: %06X - Unknown gdfs_gfxram_bank bit written %04X\n",cpu_get_pc(&space.device()),data);
 
 			if (ACCESSING_BITS_0_7)
-				state->m_gdfs_gfxram_bank = data & 3;
+				m_gdfs_gfxram_bank = data & 3;
 		}
 		break;
 
@@ -558,12 +549,12 @@ static WRITE16_HANDLER( gdfs_blitram_w )
 			UINT32 dst	=	(gdfs_blitram[0xc4/2] + (gdfs_blitram[0xc6/2] << 16)) << 4;
 			UINT32 len	=	(gdfs_blitram[0xc8/2]) << 4;
 
-			UINT8 *rom	=	space->machine().region("gfx2")->base();
-			size_t size	=	space->machine().region("gfx2")->bytes();
+			UINT8 *rom	=	memregion("gfx2")->base();
+			size_t size	=	memregion("gfx2")->bytes();
 
 			if ( (src+len <= size) && (dst+len <= 4 * 0x100000) )
 			{
-				memcpy( &state->m_eaglshot_gfxram[dst/2], &rom[src], len );
+				memcpy( &m_eaglshot_gfxram[dst/2], &rom[src], len );
 
 				if (len % (16*8))	len = len / (16*8) + 1;
 				else				len = len / (16*8);
@@ -571,31 +562,31 @@ static WRITE16_HANDLER( gdfs_blitram_w )
 				dst /= 16*8;
 				while (len--)
 				{
-					gfx_element_mark_dirty(space->machine().gfx[2], dst);
+					gfx_element_mark_dirty(machine().gfx[2], dst);
 					dst++;
 				}
 			}
 			else
 			{
-				logerror("CPU #0 PC: %06X - Blit out of range: src %x, dst %x, len %x\n",cpu_get_pc(&space->device()),src,dst,len);
+				logerror("CPU #0 PC: %06X - Blit out of range: src %x, dst %x, len %x\n",cpu_get_pc(&space.device()),src,dst,len);
 			}
 		}
 		break;
 
 		default:
-			logerror("CPU #0 PC: %06X - Blit reg written: %02X <- %04X\n",cpu_get_pc(&space->device()),offset*2,data);
+			logerror("CPU #0 PC: %06X - Blit reg written: %02X <- %04X\n",cpu_get_pc(&space.device()),offset*2,data);
 	}
 }
 
-static ADDRESS_MAP_START( gdfs_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(gdfs_tmapram_w) AM_BASE_MEMBER(ssv_state, m_gdfs_tmapram)
+static ADDRESS_MAP_START( gdfs_map, AS_PROGRAM, 16, ssv_state )
+	AM_RANGE(0x400000, 0x41ffff) AM_RAM_WRITE(gdfs_tmapram_w) AM_SHARE("gdfs_tmapram")
 	AM_RANGE(0x420000, 0x43ffff) AM_RAM
-	AM_RANGE(0x440000, 0x44003f) AM_RAM AM_BASE_MEMBER(ssv_state, m_gdfs_tmapscroll)
-	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE("eeprom", gdfs_eeprom_w)
-	AM_RANGE(0x540000, 0x540001) AM_DEVREAD("eeprom", gdfs_eeprom_r)
+	AM_RANGE(0x440000, 0x44003f) AM_RAM AM_SHARE("gdfs_tmapscroll")
+	AM_RANGE(0x500000, 0x500001) AM_DEVWRITE_LEGACY("eeprom", gdfs_eeprom_w)
+	AM_RANGE(0x540000, 0x540001) AM_DEVREAD_LEGACY("eeprom", gdfs_eeprom_r)
 	AM_RANGE(0x600000, 0x600fff) AM_RAM
-	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_BASE_MEMBER(ssv_state, m_spriteram2)
-	AM_RANGE(0x8c0000, 0x8c00ff) AM_READWRITE(gdfs_blitram_r, gdfs_blitram_w) AM_BASE_MEMBER(ssv_state, m_gdfs_blitram)
+	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_SHARE("spriteram2")
+	AM_RANGE(0x8c0000, 0x8c00ff) AM_READWRITE(gdfs_blitram_r, gdfs_blitram_w) AM_SHARE("gdfs_blitram")
 	AM_RANGE(0x900000, 0x9fffff) AM_READWRITE(gdfs_gfxram_r, gdfs_gfxram_w)
 	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END
@@ -613,26 +604,25 @@ ADDRESS_MAP_END
     rom-board, AFAIK)
 */
 
-static READ16_HANDLER( hypreact_input_r )
+READ16_MEMBER(ssv_state::hypreact_input_r)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
-	UINT16 input_sel = *state->m_input_sel;
+	UINT16 input_sel = *m_input_sel;
 
-	if (input_sel & 0x0001)	return input_port_read(space->machine(), "KEY0");
-	if (input_sel & 0x0002)	return input_port_read(space->machine(), "KEY1");
-	if (input_sel & 0x0004)	return input_port_read(space->machine(), "KEY2");
-	if (input_sel & 0x0008)	return input_port_read(space->machine(), "KEY3");
-	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(&space->device()),input_sel);
+	if (input_sel & 0x0001)	return ioport("KEY0")->read();
+	if (input_sel & 0x0002)	return ioport("KEY1")->read();
+	if (input_sel & 0x0004)	return ioport("KEY2")->read();
+	if (input_sel & 0x0008)	return ioport("KEY3")->read();
+	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(&space.device()),input_sel);
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( hypreact_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hypreact_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)			// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                      // ? 5 at the start
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(ssv_lockout_inv_w)			// Inverted lockout lines
 //  AM_RANGE(0x280000, 0x280001) AM_READNOP                       // ? read at the start, value not used
 	AM_RANGE(0xc00000, 0xc00001) AM_READ(hypreact_input_r)				// Inputs
-	AM_RANGE(0xc00006, 0xc00007) AM_RAM AM_BASE_MEMBER(ssv_state, m_input_sel)			//
+	AM_RANGE(0xc00006, 0xc00007) AM_RAM AM_SHARE("input_sel")			//
 	AM_RANGE(0xc00008, 0xc00009) AM_NOP									//
 	SSV_MAP( 0xf00000 )
 ADDRESS_MAP_END
@@ -642,14 +632,14 @@ ADDRESS_MAP_END
                                 Hyper Reaction 2
 ***************************************************************************/
 
-static ADDRESS_MAP_START( hypreac2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hypreac2_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)				// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 5 at the start
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(ssv_lockout_inv_w)				// Inverted lockout lines
 //  AM_RANGE(0x280000, 0x280001) AM_READNOP                           // ? read at the start, value not used
 	AM_RANGE(0x500000, 0x500001) AM_READ(hypreact_input_r)					// Inputs
 	AM_RANGE(0x500002, 0x500003) AM_READ(hypreact_input_r)					// (again?)
-	AM_RANGE(0x520000, 0x520001) AM_WRITEONLY AM_BASE_MEMBER(ssv_state, m_input_sel)	// Inputs
+	AM_RANGE(0x520000, 0x520001) AM_WRITEONLY AM_SHARE("input_sel")	// Inputs
 //  0x540000, 0x540003  communication with other units
 	SSV_MAP( 0xe00000 )
 ADDRESS_MAP_END
@@ -659,13 +649,13 @@ ADDRESS_MAP_END
                                 Jan Jan Simasyo
 ***************************************************************************/
 
-static READ16_HANDLER( srmp4_input_r );
 
-static ADDRESS_MAP_START( janjans1_map, AS_PROGRAM, 16 )
+
+static ADDRESS_MAP_START( janjans1_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_WRITENOP							// koikois2 but not janjans1
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1 at the start
 	AM_RANGE(0x210006, 0x210007) AM_READNOP
-	AM_RANGE(0x800000, 0x800001) AM_WRITEONLY AM_BASE_MEMBER(ssv_state, m_input_sel)	// Inputs
+	AM_RANGE(0x800000, 0x800001) AM_WRITEONLY AM_SHARE("input_sel")	// Inputs
 	AM_RANGE(0x800002, 0x800003) AM_READ(srmp4_input_r)						// Inputs
 	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END
@@ -675,7 +665,7 @@ ADDRESS_MAP_END
                                 Keith & Lucy
 ***************************************************************************/
 
-static ADDRESS_MAP_START( keithlcy_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( keithlcy_map, AS_PROGRAM, 16, ssv_state )
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP  // ? 1 at the start
 	AM_RANGE(0x210010, 0x210011) AM_WRITENOP	//
 	AM_RANGE(0x21000e, 0x21000f) AM_READNOP	//
@@ -688,7 +678,7 @@ ADDRESS_MAP_END
                                 Meosis Magic
 ***************************************************************************/
 
-static ADDRESS_MAP_START( meosism_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( meosism_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r	)							// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 5 at the start
 //  AM_RANGE(0x280000, 0x280001) AM_READNOP                                       // ? read once, value not used
@@ -703,21 +693,19 @@ ADDRESS_MAP_END
 
 /* Monster Slider needs the RAM mirrored for the gameplay logic to work correctly */
 
-static READ16_HANDLER( ssv_mainram_r )
+READ16_MEMBER(ssv_state::ssv_mainram_r)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
 
-	return state->m_mainram[offset];
+	return m_mainram[offset];
 }
 
-static WRITE16_HANDLER( ssv_mainram_w )
+WRITE16_MEMBER(ssv_state::ssv_mainram_w)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
 
-	COMBINE_DATA(&state->m_mainram[offset]);
+	COMBINE_DATA(&m_mainram[offset]);
 }
 
-static ADDRESS_MAP_START( mslider_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mslider_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x010000, 0x01ffff) AM_READWRITE(ssv_mainram_r, ssv_mainram_w)	// RAM Mirror
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1 at the start
 	AM_RANGE(0x400000, 0x47ffff) AM_WRITEONLY							// ?
@@ -730,7 +718,7 @@ ADDRESS_MAP_END
                     Gourmet Battle Quiz Ryohrioh CooKing
 ***************************************************************************/
 
-static ADDRESS_MAP_START( ryorioh_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ryorioh_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(watchdog_reset16_w)	// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 1 at the start
 	SSV_MAP( 0xc00000 )
@@ -741,24 +729,23 @@ ADDRESS_MAP_END
                             Super Real Mahjong PIV
 ***************************************************************************/
 
-static READ16_HANDLER( srmp4_input_r )
+READ16_MEMBER(ssv_state::srmp4_input_r)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
-	UINT16 input_sel = *state->m_input_sel;
+	UINT16 input_sel = *m_input_sel;
 
-	if (input_sel & 0x0002)	return input_port_read(space->machine(), "KEY0");
-	if (input_sel & 0x0004)	return input_port_read(space->machine(), "KEY1");
-	if (input_sel & 0x0008)	return input_port_read(space->machine(), "KEY2");
-	if (input_sel & 0x0010)	return input_port_read(space->machine(), "KEY3");
-	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(&space->device()),input_sel);
+	if (input_sel & 0x0002)	return ioport("KEY0")->read();
+	if (input_sel & 0x0004)	return ioport("KEY1")->read();
+	if (input_sel & 0x0008)	return ioport("KEY2")->read();
+	if (input_sel & 0x0010)	return ioport("KEY3")->read();
+	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(&space.device()),input_sel);
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( srmp4_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( srmp4_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)				// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1,5 at the start
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ(srmp4_input_r)						// Inputs
-	AM_RANGE(0xc0000e, 0xc0000f) AM_WRITEONLY AM_BASE_MEMBER(ssv_state, m_input_sel)	// Inputs
+	AM_RANGE(0xc0000e, 0xc0000f) AM_WRITEONLY AM_SHARE("input_sel")	// Inputs
 	AM_RANGE(0xc00010, 0xc00011) AM_WRITENOP							//
 	SSV_MAP( 0xf00000 )
 ADDRESS_MAP_END
@@ -772,16 +759,16 @@ ADDRESS_MAP_END
     Interrupts aren't supported by the chip emulator yet
     (lev 5 in this case, I guess)
 */
-static READ16_HANDLER( srmp7_irqv_r )
+READ16_MEMBER(ssv_state::srmp7_irqv_r)
 {
 	return 0x0080;
 }
 
-static WRITE16_HANDLER( srmp7_sound_bank_w )
+WRITE16_MEMBER(ssv_state::srmp7_sound_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		device_t *device = space->machine().device("ensoniq");
+		device_t *device = machine().device("ensoniq");
 		int bank = 0x400000/2 * (data & 1);	// UINT16 address
 		int voice;
 		for (voice = 0; voice < 32; voice++)
@@ -790,20 +777,19 @@ static WRITE16_HANDLER( srmp7_sound_bank_w )
 //  popmessage("%04X",data);
 }
 
-static READ16_HANDLER( srmp7_input_r )
+READ16_MEMBER(ssv_state::srmp7_input_r)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
-	UINT16 input_sel = *state->m_input_sel;
+	UINT16 input_sel = *m_input_sel;
 
-	if (input_sel & 0x0002)	return input_port_read(space->machine(), "KEY0");
-	if (input_sel & 0x0004)	return input_port_read(space->machine(), "KEY1");
-	if (input_sel & 0x0008)	return input_port_read(space->machine(), "KEY2");
-	if (input_sel & 0x0010)	return input_port_read(space->machine(), "KEY3");
-	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(&space->device()),input_sel);
+	if (input_sel & 0x0002)	return ioport("KEY0")->read();
+	if (input_sel & 0x0004)	return ioport("KEY1")->read();
+	if (input_sel & 0x0008)	return ioport("KEY2")->read();
+	if (input_sel & 0x0010)	return ioport("KEY3")->read();
+	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(&space.device()),input_sel);
 	return 0xffff;
 }
 
-static ADDRESS_MAP_START( srmp7_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( srmp7_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x010000, 0x050faf) AM_RAM										// More RAM
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)				// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 0,4 at the start
@@ -812,7 +798,7 @@ static ADDRESS_MAP_START( srmp7_map, AS_PROGRAM, 16 )
 //  0x540000, 0x540003, related to lev 5 irq?
 	AM_RANGE(0x580000, 0x580001) AM_WRITE(srmp7_sound_bank_w)				// Sound Bank
 	AM_RANGE(0x600000, 0x600001) AM_READ(srmp7_input_r)						// Inputs
-	AM_RANGE(0x680000, 0x680001) AM_WRITEONLY AM_BASE_MEMBER(ssv_state, m_input_sel)	// Inputs
+	AM_RANGE(0x680000, 0x680001) AM_WRITEONLY AM_SHARE("input_sel")	// Inputs
 	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END
 
@@ -821,7 +807,7 @@ ADDRESS_MAP_END
                                 Survival Arts
 ***************************************************************************/
 
-static ADDRESS_MAP_START( survarts_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( survarts_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)	// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 0,4 at the start
 //  AM_RANGE(0x290000, 0x290001) AM_READNOP               // ?
@@ -839,41 +825,39 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static READ16_HANDLER( sxyreact_ballswitch_r )
+READ16_MEMBER(ssv_state::sxyreact_ballswitch_r)
 {
-	return input_port_read_safe(space->machine(), "SERVICE", 0);
+	return ioport("SERVICE")->read_safe(0);
 }
 
-static READ16_HANDLER( sxyreact_dial_r )
+READ16_MEMBER(ssv_state::sxyreact_dial_r)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
 
-	return ((state->m_sxyreact_serial >> 1) & 0x80);
+	return ((m_sxyreact_serial >> 1) & 0x80);
 }
 
 
-static WRITE16_HANDLER( sxyreact_dial_w )
+WRITE16_MEMBER(ssv_state::sxyreact_dial_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		ssv_state *state = space->machine().driver_data<ssv_state>();
 
 		if (data & 0x20)
-			state->m_sxyreact_serial = input_port_read_safe(space->machine(), "PADDLE", 0) & 0xff;
+			m_sxyreact_serial = ioport("PADDLE")->read_safe(0) & 0xff;
 
-		if ( (state->m_sxyreact_dial & 0x40) && !(data & 0x40) )	// $40 -> $00
-			state->m_sxyreact_serial <<= 1;						// shift 1 bit
+		if ( (m_sxyreact_dial & 0x40) && !(data & 0x40) )	// $40 -> $00
+			m_sxyreact_serial <<= 1;						// shift 1 bit
 
-		state->m_sxyreact_dial = data;
+		m_sxyreact_dial = data;
 	}
 }
 
-static WRITE16_HANDLER( sxyreact_motor_w )
+WRITE16_MEMBER(ssv_state::sxyreact_motor_w)
 {
 //  popmessage("%04X",data);   // 8 = motor on; 0 = motor off
 }
 
-static ADDRESS_MAP_START( sxyreact_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sxyreact_map, AS_PROGRAM, 16, ssv_state )
 //  AM_RANGE(0x020000, 0x03ffff) AM_READWRITE(ssv_mainram_r, ssv_mainram_w)             // sxyreac2 reads / writes here, why?
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)							// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 1 at the start
@@ -892,7 +876,7 @@ ADDRESS_MAP_END
 
 /* comes as either a standalone board or a standard SSV rom board (verified) */
 
-static ADDRESS_MAP_START( twineag2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( twineag2_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x010000, 0x03ffff) AM_RAM							// More RAM
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)	// Watchdog (also value is cmp.b with mem 8)
 	AM_RANGE(0x480000, 0x480001) AM_READWRITE(dsp_dr_r, dsp_dr_w)
@@ -907,7 +891,7 @@ ADDRESS_MAP_END
 
 /* standalone board based on SSV hardware */
 
-static ADDRESS_MAP_START( ultrax_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ultrax_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x010000, 0x03ffff) AM_RAM							// More RAM
 	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)	// Watchdog (also value is cmp.b with memory address 8)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 2,6 at the start
@@ -920,45 +904,41 @@ ADDRESS_MAP_END
 
 /* from st0016.c */
 
-static READ32_HANDLER(latch32_r)
+READ32_MEMBER(ssv_state::latch32_r)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	if(!offset)
-		state->m_latches[2]&=~2;
-	return state->m_latches[offset];
+		m_latches[2]&=~2;
+	return m_latches[offset];
 }
 
-static WRITE32_HANDLER(latch32_w)
+WRITE32_MEMBER(ssv_state::latch32_w)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	if(!offset)
-		state->m_latches[2]|=1;
-	COMBINE_DATA(&state->m_latches[offset]);
-	space->machine().scheduler().synchronize();
+		m_latches[2]|=1;
+	COMBINE_DATA(&m_latches[offset]);
+	machine().scheduler().synchronize();
 }
 
-static READ16_HANDLER(latch16_r)
+READ16_MEMBER(ssv_state::latch16_r)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	if(!offset)
-		state->m_latches[2]&=~1;
-	return state->m_latches[offset];
+		m_latches[2]&=~1;
+	return m_latches[offset];
 }
 
-static WRITE16_HANDLER(latch16_w)
+WRITE16_MEMBER(ssv_state::latch16_w)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
 
 	if(!offset)
-		state->m_latches[2]|=2;
-	state->m_latches[offset]=data;
-	space->machine().scheduler().synchronize();
+		m_latches[2]|=2;
+	m_latches[offset]=data;
+	machine().scheduler().synchronize();
 }
 
-static ADDRESS_MAP_START( jsk_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( jsk_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x050000, 0x05ffff) AM_READWRITE(ssv_mainram_r, ssv_mainram_w)	// RAM Mirror?
 	AM_RANGE(0x210000, 0x210001) AM_WRITE(watchdog_reset16_w)				// Watchdog
 	AM_RANGE(0x400000, 0x47ffff) AM_RAM										// RAM?
@@ -967,7 +947,7 @@ static ADDRESS_MAP_START( jsk_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jsk_v810_mem, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( jsk_v810_mem, AS_PROGRAM, 32, ssv_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM
 	AM_RANGE(0x80000000, 0x8001ffff) AM_RAM
 	AM_RANGE(0xc0000000, 0xc001ffff) AM_RAM
@@ -980,13 +960,12 @@ ADDRESS_MAP_END
   Eagle Shot Golf
 ***************************************************************************/
 
-static READ16_HANDLER( eaglshot_gfxrom_r )
+READ16_MEMBER(ssv_state::eaglshot_gfxrom_r)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
-	UINT8 *rom	=	space->machine().region("gfx1")->base();
-	size_t size	=	space->machine().region("gfx1")->bytes();
+	UINT8 *rom	=	memregion("gfx1")->base();
+	size_t size	=	memregion("gfx1")->bytes();
 
-	offset = offset * 2 + state->m_gfxrom_select * 0x200000;
+	offset = offset * 2 + m_gfxrom_select * 0x200000;
 
 	if (offset > size)
 		return 0xffff;
@@ -994,60 +973,55 @@ static READ16_HANDLER( eaglshot_gfxrom_r )
 	return rom[offset] + (rom[offset+1]<<8);
 }
 
-static WRITE16_HANDLER( eaglshot_gfxrom_w )
+WRITE16_MEMBER(ssv_state::eaglshot_gfxrom_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		ssv_state *state = space->machine().driver_data<ssv_state>();
-		state->m_gfxrom_select = data;
+		m_gfxrom_select = data;
 	}
 }
 
-static READ16_HANDLER( eaglshot_trackball_r )
+READ16_MEMBER(ssv_state::eaglshot_trackball_r)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
 
-	switch(state->m_trackball_select)
+	switch(m_trackball_select)
 	{
-		case 0x60:	return (input_port_read(space->machine(), "TRACKX") >> 8) & 0xff;
-		case 0x40:	return (input_port_read(space->machine(), "TRACKX") >> 0) & 0xff;
+		case 0x60:	return (ioport("TRACKX")->read() >> 8) & 0xff;
+		case 0x40:	return (ioport("TRACKX")->read() >> 0) & 0xff;
 
-		case 0x70:	return (input_port_read(space->machine(), "TRACKY") >> 8) & 0xff;
-		case 0x50:	return (input_port_read(space->machine(), "TRACKY") >> 0) & 0xff;
+		case 0x70:	return (ioport("TRACKY")->read() >> 8) & 0xff;
+		case 0x50:	return (ioport("TRACKY")->read() >> 0) & 0xff;
 	}
 	return 0;
 }
 
-static WRITE16_HANDLER( eaglshot_trackball_w )
+WRITE16_MEMBER(ssv_state::eaglshot_trackball_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		ssv_state *state = space->machine().driver_data<ssv_state>();
-		state->m_trackball_select = data;
+		m_trackball_select = data;
 	}
 }
 
 
 
-static READ16_HANDLER( eaglshot_gfxram_r )
+READ16_MEMBER(ssv_state::eaglshot_gfxram_r)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
 
-	return state->m_eaglshot_gfxram[offset + (state->m_scroll[0x76/2] & 0xf) * 0x40000/2];
+	return m_eaglshot_gfxram[offset + (m_scroll[0x76/2] & 0xf) * 0x40000/2];
 }
 
-static WRITE16_HANDLER( eaglshot_gfxram_w )
+WRITE16_MEMBER(ssv_state::eaglshot_gfxram_w)
 {
-	ssv_state *state = space->machine().driver_data<ssv_state>();
 
-	offset += (state->m_scroll[0x76/2] & 0xf) * 0x40000/2;
-	COMBINE_DATA(&state->m_eaglshot_gfxram[offset]);
-	gfx_element_mark_dirty(space->machine().gfx[0], offset / (16*8/2));
-	gfx_element_mark_dirty(space->machine().gfx[1], offset / (16*8/2));
+	offset += (m_scroll[0x76/2] & 0xf) * 0x40000/2;
+	COMBINE_DATA(&m_eaglshot_gfxram[offset]);
+	gfx_element_mark_dirty(machine().gfx[0], offset / (16*8/2));
+	gfx_element_mark_dirty(machine().gfx[1], offset / (16*8/2));
 }
 
 
-static ADDRESS_MAP_START( eaglshot_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( eaglshot_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE(eaglshot_gfxram_r, eaglshot_gfxram_w)
 	AM_RANGE(0x210000, 0x210001) AM_READNOP /*AM_READ(watchdog_reset16_r)*/					// Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 0,4 at the start
@@ -2674,9 +2648,9 @@ static void init_hypreac2(running_machine &machine)
 // massages the data from the BPMicro-compatible dump to runnable form
 static void init_st010(running_machine &machine)
 {
-	UINT8 *dspsrc = (UINT8 *)machine.region("st010")->base();
-	UINT32 *dspprg = (UINT32 *)machine.region("dspprg")->base();
-	UINT16 *dspdata = (UINT16 *)machine.region("dspdata")->base();
+	UINT8 *dspsrc = (UINT8 *)machine.root_device().memregion("st010")->base();
+	UINT32 *dspprg = (UINT32 *)machine.root_device().memregion("dspprg")->base();
+	UINT16 *dspdata = (UINT16 *)machine.root_device().memregion("dspdata")->base();
 
 	// copy DSP program
 	for (int i = 0; i < 0x10000; i+= 4)
@@ -2703,7 +2677,7 @@ static DRIVER_INIT( meosism )			{	init_ssv(machine, 0);	}
 static DRIVER_INIT( mslider )			{	init_ssv(machine, 0);	}
 static DRIVER_INIT( ryorioh )			{	init_ssv(machine, 0);	}
 static DRIVER_INIT( srmp4 )			{	init_ssv(machine, 0);
-//  ((UINT16 *)machine.region("user1")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
+//  ((UINT16 *)machine.root_device().memregion("user1")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 }
 static DRIVER_INIT( srmp7 )			{	init_ssv(machine, 0);	}
 static DRIVER_INIT( stmblade )		{	init_ssv(machine, 0); init_st010(machine); }

@@ -18,16 +18,18 @@ class astrocde_state : public driver_device
 {
 public:
 	astrocde_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_protected_ram(*this, "protected_ram"){ }
 
-	UINT8 *m_videoram;
+	optional_shared_ptr<UINT8> m_videoram;
 	UINT8 m_video_config;
 	UINT8 m_sparkle[4];
 	char m_totalword[256];
 	char *m_totalword_ptr;
 	char m_oldword[256];
 	int m_plural;
-	UINT8 *m_protected_ram;
+	optional_shared_ptr<UINT8> m_protected_ram;
 	UINT8 m_port_1_last;
 	UINT8 m_port_2_last;
 	UINT8 m_ram_write_enable;
@@ -69,6 +71,40 @@ public:
 	UINT8 m_profpac_writemode;
 	UINT16 m_profpac_writemask;
 	UINT8 m_profpac_vw;
+	DECLARE_WRITE8_MEMBER(protected_ram_enable_w);
+	DECLARE_READ8_MEMBER(protected_ram_r);
+	DECLARE_WRITE8_MEMBER(protected_ram_w);
+	DECLARE_WRITE8_MEMBER(seawolf2_lamps_w);
+	DECLARE_WRITE8_MEMBER(seawolf2_sound_1_w);
+	DECLARE_WRITE8_MEMBER(seawolf2_sound_2_w);
+	DECLARE_WRITE8_MEMBER(ebases_trackball_select_w);
+	DECLARE_WRITE8_MEMBER(ebases_coin_w);
+	DECLARE_READ8_MEMBER(spacezap_io_r);
+	DECLARE_READ8_MEMBER(wow_io_r);
+	DECLARE_READ8_MEMBER(gorf_io_1_r);
+	DECLARE_READ8_MEMBER(gorf_io_2_r);
+	DECLARE_READ8_MEMBER(robby_io_r);
+	DECLARE_READ8_MEMBER(profpac_io_1_r);
+	DECLARE_READ8_MEMBER(profpac_io_2_r);
+	DECLARE_WRITE8_MEMBER(profpac_banksw_w);
+	DECLARE_READ8_MEMBER(demndrgn_io_r);
+	DECLARE_WRITE8_MEMBER(demndrgn_sound_w);
+	DECLARE_WRITE8_MEMBER(tenpindx_sound_w);
+	DECLARE_WRITE8_MEMBER(tenpindx_lamp_w);
+	DECLARE_WRITE8_MEMBER(tenpindx_counter_w);
+	DECLARE_WRITE8_MEMBER(tenpindx_lights_w);
+	DECLARE_READ8_MEMBER(astrocade_data_chip_register_r);
+	DECLARE_WRITE8_MEMBER(astrocade_data_chip_register_w);
+	DECLARE_WRITE8_MEMBER(astrocade_funcgen_w);
+	DECLARE_WRITE8_MEMBER(astrocade_pattern_board_w);
+	DECLARE_WRITE8_MEMBER(profpac_page_select_w);
+	DECLARE_READ8_MEMBER(profpac_intercept_r);
+	DECLARE_WRITE8_MEMBER(profpac_screenram_ctrl_w);
+	DECLARE_READ8_MEMBER(profpac_videoram_r);
+	DECLARE_WRITE8_MEMBER(profpac_videoram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(ebases_trackball_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(demndragn_joystick_r);
+	DECLARE_INPUT_CHANGED_MEMBER(spacezap_monitor);
 };
 
 
@@ -83,16 +119,7 @@ VIDEO_START( profpac );
 SCREEN_UPDATE_IND16( astrocde );
 SCREEN_UPDATE_IND16( profpac );
 
-WRITE8_HANDLER( astrocade_pattern_board_w );
-READ8_HANDLER( astrocade_data_chip_register_r );
-WRITE8_HANDLER( astrocade_data_chip_register_w );
-WRITE8_HANDLER( astrocade_funcgen_w );
 
-READ8_HANDLER( profpac_videoram_r );
-WRITE8_HANDLER( profpac_videoram_w );
-READ8_HANDLER( profpac_intercept_r );
-WRITE8_HANDLER( profpac_page_select_w );
-WRITE8_HANDLER( profpac_screenram_ctrl_w );
 
 
 /*----------- defined in audio/wow.c -----------*/

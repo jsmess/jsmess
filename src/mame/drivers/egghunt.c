@@ -49,7 +49,8 @@ class egghunt_state : public driver_device
 {
 public:
 	egghunt_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_atram(*this, "atram"){ }
 
 	/* video-related */
 	tilemap_t   *m_bg_tilemap;
@@ -63,9 +64,15 @@ public:
 	device_t *m_audiocpu;
 
 	/* memory */
-	UINT8 *   m_atram;
+	required_shared_ptr<UINT8> m_atram;
 	UINT8     m_bgram[0x1000];
 	UINT8     m_spram[0x1000];
+	DECLARE_READ8_MEMBER(egghunt_bgram_r);
+	DECLARE_WRITE8_MEMBER(egghunt_bgram_w);
+	DECLARE_WRITE8_MEMBER(egghunt_atram_w);
+	DECLARE_WRITE8_MEMBER(egghunt_gfx_banking_w);
+	DECLARE_WRITE8_MEMBER(egghunt_vidram_bank_w);
+	DECLARE_WRITE8_MEMBER(egghunt_soundlatch_w);
 };
 
 
@@ -127,38 +134,35 @@ static TILE_GET_INFO( get_bg_tile_info )
 	SET_TILE_INFO(0, code, colour, 0);
 }
 
-static READ8_HANDLER( egghunt_bgram_r )
+READ8_MEMBER(egghunt_state::egghunt_bgram_r)
 {
-	egghunt_state *state = space->machine().driver_data<egghunt_state>();
-	if (state->m_vidram_bank)
+	if (m_vidram_bank)
 	{
-		return state->m_spram[offset];
+		return m_spram[offset];
 	}
 	else
 	{
-		return state->m_bgram[offset];
+		return m_bgram[offset];
 	}
 }
 
-static WRITE8_HANDLER( egghunt_bgram_w )
+WRITE8_MEMBER(egghunt_state::egghunt_bgram_w)
 {
-	egghunt_state *state = space->machine().driver_data<egghunt_state>();
-	if (state->m_vidram_bank)
+	if (m_vidram_bank)
 	{
-		state->m_spram[offset] = data;
+		m_spram[offset] = data;
 	}
 	else
 	{
-		state->m_bgram[offset] = data;
-		state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+		m_bgram[offset] = data;
+		m_bg_tilemap->mark_tile_dirty(offset / 2);
 	}
 }
 
-static WRITE8_HANDLER( egghunt_atram_w )
+WRITE8_MEMBER(egghunt_state::egghunt_atram_w)
 {
-	egghunt_state *state = space->machine().driver_data<egghunt_state>();
-	state->m_atram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_atram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -180,27 +184,24 @@ static SCREEN_UPDATE_IND16(egghunt)
 	return 0;
 }
 
-static WRITE8_HANDLER( egghunt_gfx_banking_w )
+WRITE8_MEMBER(egghunt_state::egghunt_gfx_banking_w)
 {
-	egghunt_state *state = space->machine().driver_data<egghunt_state>();
 	// data & 0x03 is used for tile banking
 	// data & 0x30 is used for sprites banking
-	state->m_gfx_banking = data & 0x33;
+	m_gfx_banking = data & 0x33;
 
-	state->m_bg_tilemap->mark_all_dirty();
+	m_bg_tilemap->mark_all_dirty();
 }
 
-static WRITE8_HANDLER( egghunt_vidram_bank_w )
+WRITE8_MEMBER(egghunt_state::egghunt_vidram_bank_w)
 {
-	egghunt_state *state = space->machine().driver_data<egghunt_state>();
-	state->m_vidram_bank = data & 1;
+	m_vidram_bank = data & 1;
 }
 
-static WRITE8_HANDLER( egghunt_soundlatch_w )
+WRITE8_MEMBER(egghunt_state::egghunt_soundlatch_w)
 {
-	egghunt_state *state = space->machine().driver_data<egghunt_state>();
-	soundlatch_w(space, 0, data);
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+	soundlatch_byte_w(space, 0, data);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
 static READ8_DEVICE_HANDLER( egghunt_okibanking_r )
@@ -217,16 +218,16 @@ static WRITE8_DEVICE_HANDLER( egghunt_okibanking_w )
 	oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
 }
 
-static ADDRESS_MAP_START( egghunt_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( egghunt_map, AS_PROGRAM, 8, egghunt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(egghunt_atram_w) AM_BASE_MEMBER(egghunt_state, m_atram)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_byte_le_w) AM_SHARE("paletteram")
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(egghunt_atram_w) AM_SHARE("atram")
 	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(egghunt_bgram_r, egghunt_bgram_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, egghunt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_WRITE(egghunt_vidram_bank_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(egghunt_gfx_banking_w)
@@ -237,11 +238,11 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	AM_RANGE(0x07, 0x07) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, egghunt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE("oki", egghunt_okibanking_r, egghunt_okibanking_w)
-	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe001, 0xe001) AM_DEVREADWRITE_LEGACY("oki", egghunt_okibanking_r, egghunt_okibanking_w)
+	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

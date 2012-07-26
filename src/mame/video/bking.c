@@ -30,6 +30,7 @@
 
 PALETTE_INIT( bking )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 220, 390, 820 };
 	static const int resistances_b [2] = { 220, 390 };
 	double rweights[3], gweights[3], bweights[2];
@@ -82,46 +83,39 @@ PALETTE_INIT( bking )
 }
 
 
-WRITE8_HANDLER( bking_xld1_w )
+WRITE8_MEMBER(bking_state::bking_xld1_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	state->m_xld1 = -data;
+	m_xld1 = -data;
 }
 
-WRITE8_HANDLER( bking_yld1_w )
+WRITE8_MEMBER(bking_state::bking_yld1_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	state->m_yld1 = -data;
+	m_yld1 = -data;
 }
 
-WRITE8_HANDLER( bking_xld2_w )
+WRITE8_MEMBER(bking_state::bking_xld2_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	state->m_xld2 = -data;
+	m_xld2 = -data;
 }
 
-WRITE8_HANDLER( bking_yld2_w )
+WRITE8_MEMBER(bking_state::bking_yld2_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	state->m_yld2 = -data;
+	m_yld2 = -data;
 }
 
-WRITE8_HANDLER( bking_xld3_w )
+WRITE8_MEMBER(bking_state::bking_xld3_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	state->m_xld3 = -data;
+	m_xld3 = -data;
 }
 
-WRITE8_HANDLER( bking_yld3_w )
+WRITE8_MEMBER(bking_state::bking_yld3_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	state->m_yld3 = -data;
+	m_yld3 = -data;
 }
 
 
-WRITE8_HANDLER( bking_cont1_w )
+WRITE8_MEMBER(bking_state::bking_cont1_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
 
 	/* D0 = COIN LOCK */
 	/* D1 = BALL 5 (Controller selection) */
@@ -129,96 +123,88 @@ WRITE8_HANDLER( bking_cont1_w )
 	/* D3 = Not Connected */
 	/* D4-D7 = CROW0-CROW3 (selects crow picture) */
 
-	coin_lockout_global_w(space->machine(), ~data & 0x01);
+	coin_lockout_global_w(machine(), ~data & 0x01);
 
-	flip_screen_set_no_update(space->machine(), data & 0x04);
+	flip_screen_set_no_update(data & 0x04);
 
-	space->machine().tilemap().set_flip_all(flip_screen_get(space->machine()) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	machine().tilemap().set_flip_all(flip_screen() ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
-	state->m_controller = data & 0x02;
+	m_controller = data & 0x02;
 
-	state->m_crow_pic = (data >> 4) & 0x0f;
+	m_crow_pic = (data >> 4) & 0x0f;
 }
 
-WRITE8_HANDLER( bking_cont2_w )
+WRITE8_MEMBER(bking_state::bking_cont2_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
 
 	/* D0-D2 = BALL10 - BALL12 (Selects player 1 ball picture) */
 	/* D3-D5 = BALL20 - BALL22 (Selects player 2 ball picture) */
 	/* D6 = HIT1 */
 	/* D7 = HIT2 */
 
-	state->m_ball1_pic = (data >> 0) & 0x07;
-	state->m_ball2_pic = (data >> 3) & 0x07;
+	m_ball1_pic = (data >> 0) & 0x07;
+	m_ball2_pic = (data >> 3) & 0x07;
 
-	state->m_hit = data >> 6;
+	m_hit = data >> 6;
 }
 
-WRITE8_HANDLER( bking_cont3_w )
+WRITE8_MEMBER(bking_state::bking_cont3_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
 
 	/* D0 = CROW INV (inverts Crow picture and coordinates) */
 	/* D1-D2 = COLOR 0 - COLOR 1 (switches 4 color palettes, global across all graphics) */
 	/* D3 = SOUND STOP */
 
-	state->m_crow_flip = ~data & 0x01;
+	m_crow_flip = ~data & 0x01;
 
-	if (state->m_palette_bank != ((data >> 1) & 0x03))
+	if (m_palette_bank != ((data >> 1) & 0x03))
 	{
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bg_tilemap->mark_all_dirty();
 	}
 
-	state->m_palette_bank = (data >> 1) & 0x03;
+	m_palette_bank = (data >> 1) & 0x03;
 
-	space->machine().sound().system_mute(data & 0x08);
+	machine().sound().system_mute(data & 0x08);
 }
 
 
-WRITE8_HANDLER( bking_msk_w )
+WRITE8_MEMBER(bking_state::bking_msk_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	state->m_pc3259_mask++;
+	m_pc3259_mask++;
 }
 
 
-WRITE8_HANDLER( bking_hitclr_w )
+WRITE8_MEMBER(bking_state::bking_hitclr_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	state->m_pc3259_mask = 0;
+	m_pc3259_mask = 0;
 
-	state->m_pc3259_output[0] = 0;
-	state->m_pc3259_output[1] = 0;
-	state->m_pc3259_output[2] = 0;
-	state->m_pc3259_output[3] = 0;
+	m_pc3259_output[0] = 0;
+	m_pc3259_output[1] = 0;
+	m_pc3259_output[2] = 0;
+	m_pc3259_output[3] = 0;
 }
 
 
-WRITE8_HANDLER( bking_playfield_w )
+WRITE8_MEMBER(bking_state::bking_playfield_w)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	state->m_playfield_ram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_playfield_ram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
 
-READ8_HANDLER( bking_input_port_5_r )
+READ8_MEMBER(bking_state::bking_input_port_5_r)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	return input_port_read(space->machine(), state->m_controller ? "TRACK1_X" : "TRACK0_X");
+	return ioport(m_controller ? "TRACK1_X" : "TRACK0_X")->read();
 }
 
-READ8_HANDLER( bking_input_port_6_r )
+READ8_MEMBER(bking_state::bking_input_port_6_r)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	return input_port_read(space->machine(), state->m_controller ? "TRACK1_Y" : "TRACK0_Y");
+	return ioport(m_controller ? "TRACK1_Y" : "TRACK0_Y")->read();
 }
 
-READ8_HANDLER( bking_pos_r )
+READ8_MEMBER(bking_state::bking_pos_r)
 {
-	bking_state *state = space->machine().driver_data<bking_state>();
-	return state->m_pc3259_output[offset / 8] << 4;
+	return m_pc3259_output[offset / 8] << 4;
 }
 
 
@@ -319,8 +305,8 @@ SCREEN_VBLANK( bking )
 			latch = 0x0400;
 		}
 
-		state->m_bg_tilemap->set_scrollx(0, flip_screen_get(screen.machine()) ? -xld : xld);
-		state->m_bg_tilemap->set_scrolly(0, flip_screen_get(screen.machine()) ? -yld : yld);
+		state->m_bg_tilemap->set_scrollx(0, state->flip_screen() ? -xld : xld);
+		state->m_bg_tilemap->set_scrolly(0, state->flip_screen() ? -yld : yld);
 
 		state->m_bg_tilemap->draw(state->m_tmp_bitmap1, rect, 0, 0);
 
@@ -329,7 +315,7 @@ SCREEN_VBLANK( bking )
 
 		if (latch != 0)
 		{
-			const UINT8* MASK = screen.machine().region("user1")->base() + 8 * state->m_hit;
+			const UINT8* MASK = screen.machine().root_device().memregion("user1")->base() + 8 * state->m_hit;
 
 			int x;
 			int y;
@@ -346,8 +332,8 @@ SCREEN_VBLANK( bking )
 						int col = (xld + x) / 8 + 1;
 						int row = (yld + y) / 8 + 0;
 
-						latch |= (flip_screen_get(screen.machine()) ? 31 - col : col) << 0;
-						latch |= (flip_screen_get(screen.machine()) ? 31 - row : row) << 5;
+						latch |= (state->flip_screen() ? 31 - col : col) << 0;
+						latch |= (state->flip_screen() ? 31 - row : row) << 5;
 
 						state->m_pc3259_output[0] = (latch >> 0x0) & 0xf;
 						state->m_pc3259_output[1] = (latch >> 0x4) & 0xf;

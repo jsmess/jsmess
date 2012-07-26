@@ -225,7 +225,7 @@ void luxor_4105_device::device_reset()
 
 void luxor_4105_device::abc1600bus_cs(UINT8 data)
 {
-	m_cs = (data == input_port_read(*this, "5E"));
+	m_cs = (data == ioport("5E")->read());
 }
 
 
@@ -296,7 +296,7 @@ UINT8 luxor_4105_device::abc1600bus_inp()
 	{
 		if (scsi_bsy_r(m_sasibus))
 		{
-			input_port_read(*this, "1E");
+			ioport("1E")->read();
 		}
 		else
 		{

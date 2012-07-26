@@ -22,11 +22,13 @@ class flyball_state : public driver_device
 {
 public:
 	flyball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_playfield_ram(*this, "playfield_ram"),
+		m_rombase(*this, "rombase"){ }
 
 	/* memory pointers */
-	UINT8 *  m_rombase;
-	UINT8 *  m_playfield_ram;
+	required_shared_ptr<UINT8> m_playfield_ram;
+	required_shared_ptr<UINT8> m_rombase;
 
 	/* video-related */
 	tilemap_t  *m_tmap;
@@ -42,6 +44,16 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_READ8_MEMBER(flyball_input_r);
+	DECLARE_READ8_MEMBER(flyball_scanline_r);
+	DECLARE_READ8_MEMBER(flyball_potsense_r);
+	DECLARE_WRITE8_MEMBER(flyball_potmask_w);
+	DECLARE_WRITE8_MEMBER(flyball_pitcher_pic_w);
+	DECLARE_WRITE8_MEMBER(flyball_ball_vert_w);
+	DECLARE_WRITE8_MEMBER(flyball_ball_horz_w);
+	DECLARE_WRITE8_MEMBER(flyball_pitcher_vert_w);
+	DECLARE_WRITE8_MEMBER(flyball_pitcher_horz_w);
+	DECLARE_WRITE8_MEMBER(flyball_misc_w);
 };
 
 
@@ -133,10 +145,10 @@ static TIMER_CALLBACK( flyball_quarter_callback	)
 
 	memset(potsense, 0, sizeof potsense);
 
-	potsense[input_port_read(machine, "STICK1_Y")] |= 1;
-	potsense[input_port_read(machine, "STICK1_X")] |= 2;
-	potsense[input_port_read(machine, "STICK0_Y")] |= 4;
-	potsense[input_port_read(machine, "STICK0_X")] |= 8;
+	potsense[state->ioport("STICK1_Y")->read()] |= 1;
+	potsense[state->ioport("STICK1_X")->read()] |= 2;
+	potsense[state->ioport("STICK0_Y")->read()] |= 4;
+	potsense[state->ioport("STICK0_X")->read()] |= 8;
 
 	for (i = 0; i < 64; i++)
 		if (potsense[i] != 0)
@@ -159,66 +171,59 @@ static TIMER_CALLBACK( flyball_quarter_callback	)
  *************************************/
 
 /* two physical buttons (start game and stop runner) share the same port bit */
-static READ8_HANDLER( flyball_input_r )
+READ8_MEMBER(flyball_state::flyball_input_r)
 {
-	return input_port_read(space->machine(), "IN0") & input_port_read(space->machine(), "IN1");
+	return ioport("IN1")->read();
 }
 
-static READ8_HANDLER( flyball_scanline_r )
+READ8_MEMBER(flyball_state::flyball_scanline_r)
 {
-	return space->machine().primary_screen->vpos() & 0x3f;
+	return machine().primary_screen->vpos() & 0x3f;
 }
 
-static READ8_HANDLER( flyball_potsense_r )
+READ8_MEMBER(flyball_state::flyball_potsense_r)
 {
-	flyball_state *state = space->machine().driver_data<flyball_state>();
-	return state->m_potsense & ~state->m_potmask;
+	return m_potsense & ~m_potmask;
 }
 
-static WRITE8_HANDLER( flyball_potmask_w )
+WRITE8_MEMBER(flyball_state::flyball_potmask_w)
 {
-	flyball_state *state = space->machine().driver_data<flyball_state>();
-	state->m_potmask |= data & 0xf;
+	m_potmask |= data & 0xf;
 }
 
-static WRITE8_HANDLER( flyball_pitcher_pic_w )
+WRITE8_MEMBER(flyball_state::flyball_pitcher_pic_w)
 {
-	flyball_state *state = space->machine().driver_data<flyball_state>();
-	state->m_pitcher_pic = data & 0xf;
+	m_pitcher_pic = data & 0xf;
 }
 
-static WRITE8_HANDLER( flyball_ball_vert_w )
+WRITE8_MEMBER(flyball_state::flyball_ball_vert_w)
 {
-	flyball_state *state = space->machine().driver_data<flyball_state>();
-	state->m_ball_vert = data;
+	m_ball_vert = data;
 }
 
-static WRITE8_HANDLER( flyball_ball_horz_w )
+WRITE8_MEMBER(flyball_state::flyball_ball_horz_w)
 {
-	flyball_state *state = space->machine().driver_data<flyball_state>();
-	state->m_ball_horz = data;
+	m_ball_horz = data;
 }
 
-static WRITE8_HANDLER( flyball_pitcher_vert_w )
+WRITE8_MEMBER(flyball_state::flyball_pitcher_vert_w)
 {
-	flyball_state *state = space->machine().driver_data<flyball_state>();
-	state->m_pitcher_vert = data;
+	m_pitcher_vert = data;
 }
 
-static WRITE8_HANDLER( flyball_pitcher_horz_w )
+WRITE8_MEMBER(flyball_state::flyball_pitcher_horz_w)
 {
-	flyball_state *state = space->machine().driver_data<flyball_state>();
-	state->m_pitcher_horz = data;
+	m_pitcher_horz = data;
 }
 
-static WRITE8_HANDLER( flyball_misc_w )
+WRITE8_MEMBER(flyball_state::flyball_misc_w)
 {
 	int bit = ~data & 1;
 
 	switch (offset)
 	{
 	case 0:
-		set_led_status(space->machine(), 0, bit);
+		set_led_status(machine(), 0, bit);
 		break;
 	case 1:
 		/* crowd very loud */
@@ -245,7 +250,7 @@ static WRITE8_HANDLER( flyball_misc_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( flyball_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( flyball_map, AS_PROGRAM, 8, flyball_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x100) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_NOP
@@ -259,8 +264,8 @@ static ADDRESS_MAP_START( flyball_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0900, 0x0900) AM_WRITE(flyball_potmask_w)
 	AM_RANGE(0x0a00, 0x0a07) AM_WRITE(flyball_misc_w)
 	AM_RANGE(0x0b00, 0x0b00) AM_READ(flyball_input_r)
-	AM_RANGE(0x0d00, 0x0eff) AM_WRITEONLY AM_BASE_MEMBER(flyball_state, m_playfield_ram)
-	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_BASE_MEMBER(flyball_state, m_rombase) /* program */
+	AM_RANGE(0x0d00, 0x0eff) AM_WRITEONLY AM_SHARE("playfield_ram")
+	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_SHARE("rombase") /* program */
 ADDRESS_MAP_END
 
 
@@ -384,7 +389,7 @@ static MACHINE_RESET( flyball )
 	int i;
 
 	/* address bits 0 through 8 are inverted */
-	UINT8* ROM = machine.region("maincpu")->base() + 0x2000;
+	UINT8* ROM = state->memregion("maincpu")->base() + 0x2000;
 
 	for (i = 0; i < 0x1000; i++)
 		state->m_rombase[i] = ROM[i ^ 0x1ff];

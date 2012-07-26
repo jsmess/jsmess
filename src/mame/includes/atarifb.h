@@ -19,15 +19,19 @@ class atarifb_state : public driver_device
 {
 public:
 	atarifb_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_alphap1_videoram(*this, "p1_videoram"),
+		m_alphap2_videoram(*this, "p2_videoram"),
+		m_field_videoram(*this, "field_videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_scroll_register(*this, "scroll_register"){ }
 
 	/* video-related */
-	UINT8 *  m_alphap1_videoram;
-	UINT8 *  m_alphap2_videoram;
-	UINT8 *  m_field_videoram;
-	UINT8 *  m_spriteram;
-	UINT8 *  m_scroll_register;
-	size_t   m_spriteram_size;
+	required_shared_ptr<UINT8> m_alphap1_videoram;
+	required_shared_ptr<UINT8> m_alphap2_videoram;
+	required_shared_ptr<UINT8> m_field_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_scroll_register;
 
 	tilemap_t  *m_alpha1_tilemap;
 	tilemap_t  *m_alpha2_tilemap;
@@ -54,25 +58,28 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_WRITE8_MEMBER(atarifb_out1_w);
+	DECLARE_WRITE8_MEMBER(atarifb4_out1_w);
+	DECLARE_WRITE8_MEMBER(abaseb_out1_w);
+	DECLARE_WRITE8_MEMBER(soccer_out1_w);
+	DECLARE_WRITE8_MEMBER(atarifb_out2_w);
+	DECLARE_WRITE8_MEMBER(soccer_out2_w);
+	DECLARE_WRITE8_MEMBER(atarifb_out3_w);
+	DECLARE_READ8_MEMBER(atarifb_in0_r);
+	DECLARE_READ8_MEMBER(atarifb_in2_r);
+	DECLARE_READ8_MEMBER(atarifb4_in0_r);
+	DECLARE_READ8_MEMBER(atarifb4_in2_r);
+	DECLARE_WRITE8_MEMBER(atarifb_alpha1_videoram_w);
+	DECLARE_WRITE8_MEMBER(atarifb_alpha2_videoram_w);
+	DECLARE_WRITE8_MEMBER(atarifb_field_videoram_w);
 };
 
 
 /*----------- defined in machine/atarifb.c -----------*/
 
-WRITE8_HANDLER( atarifb_out1_w );
-WRITE8_HANDLER( atarifb4_out1_w );
-WRITE8_HANDLER( abaseb_out1_w );
-WRITE8_HANDLER( soccer_out1_w );
 
-WRITE8_HANDLER( atarifb_out2_w );
-WRITE8_HANDLER( soccer_out2_w );
 
-WRITE8_HANDLER( atarifb_out3_w );
 
-READ8_HANDLER( atarifb_in0_r );
-READ8_HANDLER( atarifb_in2_r );
-READ8_HANDLER( atarifb4_in0_r );
-READ8_HANDLER( atarifb4_in2_r );
 
 
 /*----------- defined in audio/atarifb.c -----------*/
@@ -88,6 +95,3 @@ SCREEN_UPDATE_IND16( atarifb );
 SCREEN_UPDATE_IND16( abaseb );
 SCREEN_UPDATE_IND16( soccer );
 
-WRITE8_HANDLER( atarifb_alpha1_videoram_w );
-WRITE8_HANDLER( atarifb_alpha2_videoram_w );
-WRITE8_HANDLER( atarifb_field_videoram_w );

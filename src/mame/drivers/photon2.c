@@ -18,16 +18,20 @@ class photon2_state : public driver_device
 public:
 	photon2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
+		m_maincpu(*this,"maincpu"),
+		m_spectrum_video_ram(*this, "spectrum_vram"){ }
 
-	UINT8 *m_spectrum_video_ram;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_spectrum_video_ram;
 	int m_spectrum_frame_number;
 	int m_spectrum_flash_invert;
 	UINT8 m_spectrum_port_fe;
 	UINT8 m_nmi_enable;
 
-	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(photon2_membank_w);
+	DECLARE_READ8_MEMBER(photon2_fe_r);
+	DECLARE_WRITE8_MEMBER(photon2_fe_w);
+	DECLARE_WRITE8_MEMBER(photon2_misc_w);
 };
 
 
@@ -174,7 +178,7 @@ static SCREEN_UPDATE_IND16( spectrum )
  *
  *************************************/
 
-static WRITE8_HANDLER(photon2_membank_w)
+WRITE8_MEMBER(photon2_state::photon2_membank_w)
 {
 	int bank = 0;
 	if (data == 0)
@@ -194,27 +198,25 @@ static WRITE8_HANDLER(photon2_membank_w)
 		logerror( "Unknown banking write: %02X\n", data);
 	}
 
-	memory_set_bankptr(space->machine(), "bank1", space->machine().region("maincpu")->base() + 0x4000*bank );
+	membank("bank1")->set_base(machine().root_device().memregion("maincpu")->base() + 0x4000*bank );
 }
 
-static READ8_HANDLER(photon2_fe_r)
+READ8_MEMBER(photon2_state::photon2_fe_r)
 {
 	return 0xff;
 }
 
-static WRITE8_HANDLER(photon2_fe_w)
+WRITE8_MEMBER(photon2_state::photon2_fe_w)
 {
-	photon2_state *state = space->machine().driver_data<photon2_state>();
-	device_t *speaker = space->machine().device("speaker");
-	state->m_spectrum_port_fe = data;
+	device_t *speaker = machine().device("speaker");
+	m_spectrum_port_fe = data;
 
 	speaker_level_w(speaker, BIT(data,4));
 }
 
-static WRITE8_HANDLER(photon2_misc_w)
+WRITE8_MEMBER(photon2_state::photon2_misc_w)
 {
-	photon2_state *state = space->machine().driver_data<photon2_state>();
-	state->m_nmi_enable = !BIT(data,5);
+	m_nmi_enable = !BIT(data,5);
 }
 
 /*************************************
@@ -223,13 +225,13 @@ static WRITE8_HANDLER(photon2_misc_w)
  *
  *************************************/
 
-static ADDRESS_MAP_START (spectrum_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START (spectrum_mem, AS_PROGRAM, 8, photon2_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_BASE_MEMBER(photon2_state, m_spectrum_video_ram )
+	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_SHARE("spectrum_vram")
 	AM_RANGE(0x5b00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (spectrum_io, AS_IO, 8)
+static ADDRESS_MAP_START (spectrum_io, AS_IO, 8, photon2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x1f, 0x1f) AM_READ_PORT("JOY")
 	AM_RANGE(0x5b, 0x5b) AM_READ_PORT("COIN") AM_WRITE(photon2_misc_w)
@@ -310,7 +312,7 @@ static TIMER_DEVICE_CALLBACK( spec_interrupt_hack )
 
 static MACHINE_RESET( photon2 )
 {
-	memory_set_bankptr(machine, "bank1", machine.region("maincpu")->base());
+	machine.root_device().membank("bank1")->set_base(machine.root_device().memregion("maincpu")->base());
 }
 
 static MACHINE_CONFIG_START( photon2, photon2_state )

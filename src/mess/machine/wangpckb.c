@@ -453,22 +453,22 @@ READ8_MEMBER( wangpc_keyboard_device::kb_p1_r )
 
 	switch (m_y & 0x0f)
 	{
-		case 0: data &= input_port_read(*this, "Y0"); break;
-		case 1: data &= input_port_read(*this, "Y1"); break;
-		case 2: data &= input_port_read(*this, "Y2"); break;
-		case 3: data &= input_port_read(*this, "Y3"); break;
-		case 4: data &= input_port_read(*this, "Y4"); break;
-		case 5: data &= input_port_read(*this, "Y5"); break;
-		case 6: data &= input_port_read(*this, "Y6"); break;
-		case 7: data &= input_port_read(*this, "Y7"); break;
-		case 8: data &= input_port_read(*this, "Y8"); break;
-		case 9: data &= input_port_read(*this, "Y9"); break;
-		case 0xa: data &= input_port_read(*this, "YA"); break;
-		case 0xb: data &= input_port_read(*this, "YB"); break;
-		case 0xc: data &= input_port_read(*this, "YC"); break;
-		case 0xd: data &= input_port_read(*this, "YD"); break;
-		case 0xe: data &= input_port_read(*this, "YE"); break; // SW1?
-		case 0xf: data &= input_port_read(*this, "YF"); break; // SW2?
+		case 0: data &= ioport("Y0")->read(); break;
+		case 1: data &= ioport("Y1")->read(); break;
+		case 2: data &= ioport("Y2")->read(); break;
+		case 3: data &= ioport("Y3")->read(); break;
+		case 4: data &= ioport("Y4")->read(); break;
+		case 5: data &= ioport("Y5")->read(); break;
+		case 6: data &= ioport("Y6")->read(); break;
+		case 7: data &= ioport("Y7")->read(); break;
+		case 8: data &= ioport("Y8")->read(); break;
+		case 9: data &= ioport("Y9")->read(); break;
+		case 0xa: data &= ioport("YA")->read(); break;
+		case 0xb: data &= ioport("YB")->read(); break;
+		case 0xc: data &= ioport("YC")->read(); break;
+		case 0xd: data &= ioport("YD")->read(); break;
+		case 0xe: data &= ioport("YE")->read(); break; // SW1?
+		case 0xf: data &= ioport("YF")->read(); break; // SW2?
 	}
 
 	return data;

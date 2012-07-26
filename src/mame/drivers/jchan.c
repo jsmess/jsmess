@@ -179,6 +179,13 @@ class jchan_state : public kaneko16_state
 public:
 	jchan_state(const machine_config &mconfig, device_type type, const char *tag)
 		: kaneko16_state(mconfig, type, tag),
+		m_spriteram_1(*this, "spriteram_1"),
+		m_sprregs_1(*this, "sprregs_1"),
+		m_spriteram_2(*this, "spriteram_2"),
+		m_sprregs_2(*this, "sprregs_2"),
+		m_mainsub_shared_ram(*this, "mainsub_shared"),
+		m_mcu_ram(*this, "mcu_ram"),
+		m_ctrl(*this, "ctrl"),
 		m_maincpu(*this,"maincpu"),
 		m_subcpu(*this,"sub")
 		{ }
@@ -190,20 +197,33 @@ public:
 	UINT32* m_sprite_regs32_1;
 	UINT32* m_sprite_regs32_2;
 	int m_irq_sub_enable;
-	UINT16 *m_spriteram_1;
-	UINT16* m_sprregs_1;
-	UINT16 *m_spriteram_2;
-	UINT16* m_sprregs_2;
-	UINT16 *m_mainsub_shared_ram;
+	required_shared_ptr<UINT16> m_spriteram_1;
+	required_shared_ptr<UINT16> m_sprregs_1;
+	required_shared_ptr<UINT16> m_spriteram_2;
+	required_shared_ptr<UINT16> m_sprregs_2;
+	required_shared_ptr<UINT16> m_mainsub_shared_ram;
 	UINT8 m_nvram_data[128];
-	UINT16 *m_mcu_ram;
+	required_shared_ptr<UINT16> m_mcu_ram;
 	UINT16 m_mcu_com[4];
-	UINT16 *m_ctrl;
+	required_shared_ptr<UINT16> m_ctrl;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	sknsspr_device* m_spritegen1;
 	sknsspr_device* m_spritegen2;
+	DECLARE_WRITE16_MEMBER(jchan_mcu_com0_w);
+	DECLARE_WRITE16_MEMBER(jchan_mcu_com1_w);
+	DECLARE_WRITE16_MEMBER(jchan_mcu_com2_w);
+	DECLARE_WRITE16_MEMBER(jchan_mcu_com3_w);
+	DECLARE_READ16_MEMBER(jchan_mcu_status_r);
+	DECLARE_WRITE16_MEMBER(jchan_ctrl_w);
+	DECLARE_READ16_MEMBER(jchan_ctrl_r);
+	DECLARE_WRITE16_MEMBER(main2sub_cmd_w);
+	DECLARE_WRITE16_MEMBER(sub2main_cmd_w);
+	DECLARE_WRITE16_MEMBER(jchan_suprnova_sprite32_1_w);
+	DECLARE_WRITE16_MEMBER(jchan_suprnova_sprite32regs_1_w);
+	DECLARE_WRITE16_MEMBER(jchan_suprnova_sprite32_2_w);
+	DECLARE_WRITE16_MEMBER(jchan_suprnova_sprite32regs_2_w);
 };
 
 
@@ -240,7 +260,7 @@ static void jchan_mcu_run(running_machine &machine)
 
 		case 0x03:	// DSW
 		{
-			state->m_mcu_ram[mcu_offset] = input_port_read(machine, "DSW");
+			state->m_mcu_ram[mcu_offset] = machine.root_device().ioport("DSW")->read();
 			logerror("%s : MCU executed command: %04X %04X (read DSW)\n",machine.describe_context(),mcu_command,mcu_offset*2);
 		}
 		break;
@@ -277,14 +297,14 @@ INLINE void jchan_mcu_com_w(address_space *space, offs_t offset, UINT16 data, UI
 	jchan_mcu_run(space->machine());
 }
 
-static WRITE16_HANDLER( jchan_mcu_com0_w ) { jchan_mcu_com_w(space, offset, data, mem_mask, 0); }
-static WRITE16_HANDLER( jchan_mcu_com1_w ) { jchan_mcu_com_w(space, offset, data, mem_mask, 1); }
-static WRITE16_HANDLER( jchan_mcu_com2_w ) { jchan_mcu_com_w(space, offset, data, mem_mask, 2); }
-static WRITE16_HANDLER( jchan_mcu_com3_w ) { jchan_mcu_com_w(space, offset, data, mem_mask, 3); }
+WRITE16_MEMBER(jchan_state::jchan_mcu_com0_w){ jchan_mcu_com_w(&space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(jchan_state::jchan_mcu_com1_w){ jchan_mcu_com_w(&space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(jchan_state::jchan_mcu_com2_w){ jchan_mcu_com_w(&space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(jchan_state::jchan_mcu_com3_w){ jchan_mcu_com_w(&space, offset, data, mem_mask, 3); }
 
-static READ16_HANDLER( jchan_mcu_status_r )
+READ16_MEMBER(jchan_state::jchan_mcu_status_r)
 {
-	logerror("cpu '%s' (PC=%06X): read mcu status\n", space->device().tag(), cpu_get_previouspc(&space->device()));
+	logerror("cpu '%s' (PC=%06X): read mcu status\n", space.device().tag(), cpu_get_previouspc(&space.device()));
 	return 0;
 }
 
@@ -374,8 +394,8 @@ static SCREEN_UPDATE_IND16(jchan)
 	state->m_sprite_bitmap_1->fill(0x0000, cliprect);
 	state->m_sprite_bitmap_2->fill(0x0000, cliprect);
 
-	state->m_spritegen1->skns_draw_sprites(screen.machine(), *state->m_sprite_bitmap_1, cliprect, state->m_sprite_ram32_1, 0x4000, screen.machine().region("gfx1")->base(), screen.machine().region ("gfx1")->bytes(), state->m_sprite_regs32_1 );
-	state->m_spritegen2->skns_draw_sprites(screen.machine(), *state->m_sprite_bitmap_2, cliprect, state->m_sprite_ram32_2, 0x4000, screen.machine().region("gfx2")->base(), screen.machine().region ("gfx2")->bytes(), state->m_sprite_regs32_2 );
+	state->m_spritegen1->skns_draw_sprites(screen.machine(), *state->m_sprite_bitmap_1, cliprect, state->m_sprite_ram32_1, 0x4000, screen.machine().root_device().memregion("gfx1")->base(), screen.machine().root_device().memregion ("gfx1")->bytes(), state->m_sprite_regs32_1 );
+	state->m_spritegen2->skns_draw_sprites(screen.machine(), *state->m_sprite_bitmap_2, cliprect, state->m_sprite_ram32_2, 0x4000, screen.machine().root_device().memregion("gfx2")->base(), state->memregion ("gfx2")->bytes(), state->m_sprite_regs32_2 );
 
 	// ignoring priority bits for now - might use alpha too, check 0x8000 of palette writes
 	for (y=0;y<240;y++)
@@ -416,24 +436,24 @@ static SCREEN_UPDATE_IND16(jchan)
     $f00000 is the only location also written
 */
 
-static WRITE16_HANDLER( jchan_ctrl_w )
+WRITE16_MEMBER(jchan_state::jchan_ctrl_w)
 {
-	jchan_state *state = space->machine().driver_data<jchan_state>();
-	state->m_irq_sub_enable = data & 0x8000; // hack / guess!
+
+	m_irq_sub_enable = data & 0x8000; // hack / guess!
 }
 
-static READ16_HANDLER ( jchan_ctrl_r )
+READ16_MEMBER(jchan_state::jchan_ctrl_r)
 {
-	jchan_state *state = space->machine().driver_data<jchan_state>();
+
 	switch(offset)
 	{
-		case 0/2: return input_port_read(space->machine(), "P1");
-		case 2/2: return input_port_read(space->machine(), "P2");
-		case 4/2: return input_port_read(space->machine(), "SYSTEM");
-		case 6/2: return input_port_read(space->machine(), "EXTRA");
+		case 0/2: return ioport("P1")->read();
+		case 2/2: return ioport("P2")->read();
+		case 4/2: return ioport("SYSTEM")->read();
+		case 6/2: return ioport("EXTRA")->read();
 		default: logerror("jchan_ctrl_r unknown!"); break;
 	}
-	return state->m_ctrl[offset];
+	return m_ctrl[offset];
 }
 
 /***************************************************************************
@@ -443,98 +463,98 @@ static READ16_HANDLER ( jchan_ctrl_r )
 ***************************************************************************/
 
 /* communications - hacky! */
-static WRITE16_HANDLER( main2sub_cmd_w )
+WRITE16_MEMBER(jchan_state::main2sub_cmd_w)
 {
-	jchan_state *state = space->machine().driver_data<jchan_state>();
-	COMBINE_DATA(&state->m_mainsub_shared_ram[0x03ffe/2]);
-	cputag_set_input_line(space->machine(), "sub", 4, HOLD_LINE);
+
+	COMBINE_DATA(&m_mainsub_shared_ram[0x03ffe/2]);
+	cputag_set_input_line(machine(), "sub", 4, HOLD_LINE);
 }
 
 // is this called?
-static WRITE16_HANDLER( sub2main_cmd_w )
+WRITE16_MEMBER(jchan_state::sub2main_cmd_w)
 {
-	jchan_state *state = space->machine().driver_data<jchan_state>();
-	COMBINE_DATA(&state->m_mainsub_shared_ram[0x0000/2]);
-	cputag_set_input_line(space->machine(), "maincpu", 3, HOLD_LINE);
+
+	COMBINE_DATA(&m_mainsub_shared_ram[0x0000/2]);
+	cputag_set_input_line(machine(), "maincpu", 3, HOLD_LINE);
 }
 
 /* ram convert for suprnova (requires 32-bit stuff) */
-static WRITE16_HANDLER( jchan_suprnova_sprite32_1_w )
+WRITE16_MEMBER(jchan_state::jchan_suprnova_sprite32_1_w)
 {
-	jchan_state *state = space->machine().driver_data<jchan_state>();
-	COMBINE_DATA(&state->m_spriteram_1[offset]);
+
+	COMBINE_DATA(&m_spriteram_1[offset]);
 	offset>>=1;
-	state->m_sprite_ram32_1[offset]=(state->m_spriteram_1[offset*2+1]<<16) | (state->m_spriteram_1[offset*2]);
+	m_sprite_ram32_1[offset]=(m_spriteram_1[offset*2+1]<<16) | (m_spriteram_1[offset*2]);
 }
 
-static WRITE16_HANDLER( jchan_suprnova_sprite32regs_1_w )
+WRITE16_MEMBER(jchan_state::jchan_suprnova_sprite32regs_1_w)
 {
-	jchan_state *state = space->machine().driver_data<jchan_state>();
-	COMBINE_DATA(&state->m_sprregs_1[offset]);
+
+	COMBINE_DATA(&m_sprregs_1[offset]);
 	offset>>=1;
-	state->m_sprite_regs32_1[offset]=(state->m_sprregs_1[offset*2+1]<<16) | (state->m_sprregs_1[offset*2]);
+	m_sprite_regs32_1[offset]=(m_sprregs_1[offset*2+1]<<16) | (m_sprregs_1[offset*2]);
 }
 
-static WRITE16_HANDLER( jchan_suprnova_sprite32_2_w )
+WRITE16_MEMBER(jchan_state::jchan_suprnova_sprite32_2_w)
 {
-	jchan_state *state = space->machine().driver_data<jchan_state>();
-	COMBINE_DATA(&state->m_spriteram_2[offset]);
+
+	COMBINE_DATA(&m_spriteram_2[offset]);
 	offset>>=1;
-	state->m_sprite_ram32_2[offset]=(state->m_spriteram_2[offset*2+1]<<16) | (state->m_spriteram_2[offset*2]);
+	m_sprite_ram32_2[offset]=(m_spriteram_2[offset*2+1]<<16) | (m_spriteram_2[offset*2]);
 }
 
-static WRITE16_HANDLER( jchan_suprnova_sprite32regs_2_w )
+WRITE16_MEMBER(jchan_state::jchan_suprnova_sprite32regs_2_w)
 {
-	jchan_state *state = space->machine().driver_data<jchan_state>();
-	COMBINE_DATA(&state->m_sprregs_2[offset]);
+
+	COMBINE_DATA(&m_sprregs_2[offset]);
 	offset>>=1;
-	state->m_sprite_regs32_2[offset]=(state->m_sprregs_2[offset*2+1]<<16) | (state->m_sprregs_2[offset*2]);
+	m_sprite_regs32_2[offset]=(m_sprregs_2[offset*2+1]<<16) | (m_sprregs_2[offset*2]);
 }
 
 
-static ADDRESS_MAP_START( jchan_main, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( jchan_main, AS_PROGRAM, 16, jchan_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // Work RAM - [A] grid tested, cleared ($9d6-$a54)
 
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE_MEMBER(jchan_state, m_mcu_ram)	// MCU [G] grid tested, cleared ($a5a-$ad8)
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("mcu_ram")	// MCU [G] grid tested, cleared ($a5a-$ad8)
 	AM_RANGE(0x330000, 0x330001) AM_WRITE(jchan_mcu_com0_w)	// _[ these 2 are set to 0xFFFF
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(jchan_mcu_com1_w)	//  [ to trigger mcu to run cmd ?
 	AM_RANGE(0x350000, 0x350001) AM_WRITE(jchan_mcu_com2_w)	// _[ these 2 are set to 0xFFFF
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(jchan_mcu_com3_w)	//  [ for mcu to return its status ?
 	AM_RANGE(0x370000, 0x370001) AM_READ(jchan_mcu_status_r)
 
-	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE_MEMBER(jchan_state, m_mainsub_shared_ram) AM_SHARE("share1")
+	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("mainsub_shared")
 
 	/* 1st sprite layer */
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(jchan_suprnova_sprite32_1_w) AM_BASE_MEMBER(jchan_state, m_spriteram_1)
-	AM_RANGE(0x600000, 0x60003f) AM_RAM_WRITE(jchan_suprnova_sprite32regs_1_w) AM_BASE_MEMBER(jchan_state, m_sprregs_1)
+	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(jchan_suprnova_sprite32_1_w) AM_SHARE("spriteram_1")
+	AM_RANGE(0x600000, 0x60003f) AM_RAM_WRITE(jchan_suprnova_sprite32regs_1_w) AM_SHARE("sprregs_1")
 
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE_GENERIC(paletteram) // palette for sprites?
+	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(paletteram_xGGGGGRRRRRBBBBB_word_w) AM_SHARE("paletteram") // palette for sprites?
 
-	AM_RANGE(0xf00000, 0xf00007) AM_READWRITE(jchan_ctrl_r, jchan_ctrl_w) AM_BASE_MEMBER(jchan_state, m_ctrl)
+	AM_RANGE(0xf00000, 0xf00007) AM_READWRITE(jchan_ctrl_r, jchan_ctrl_w) AM_SHARE("ctrl")
 
 	AM_RANGE(0xf80000, 0xf80001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jchan_sub, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( jchan_sub, AS_PROGRAM, 16, jchan_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Work RAM - grid tested, cleared ($612-$6dc)
 
-	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE_MEMBER(jchan_state, m_mainsub_shared_ram) AM_SHARE("share1")
+	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_SHARE("mainsub_shared")
 
 	/* VIEW2 Tilemap - [D] grid tested, cleared ($1d84), also cleared at startup ($810-$826) */
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE_MEMBER(jchan_state, m_vram[1])	// Layers 0
-	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE_MEMBER(jchan_state, m_vram[0])	//
-	AM_RANGE(0x502000, 0x502fff) AM_RAM AM_BASE_MEMBER(jchan_state, m_vscroll[1])									//
-	AM_RANGE(0x503000, 0x503fff) AM_RAM AM_BASE_MEMBER(jchan_state, m_vscroll[0])									//
-	AM_RANGE(0x600000, 0x60001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE_MEMBER(jchan_state, m_layers_0_regs)	// Layers 0 Regs
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_SHARE("vram.1")	// Layers 0
+	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_SHARE("vram.0")	//
+	AM_RANGE(0x502000, 0x502fff) AM_RAM AM_SHARE("vscroll.1")									//
+	AM_RANGE(0x503000, 0x503fff) AM_RAM AM_SHARE("vscroll.0")									//
+	AM_RANGE(0x600000, 0x60001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_SHARE("layers_0_regs")	// Layers 0 Regs
 
 	/* background prites */
-	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(jchan_suprnova_sprite32_2_w) AM_BASE_MEMBER(jchan_state, m_spriteram_2)
-	AM_RANGE(0x780000, 0x78003f) AM_RAM_WRITE(jchan_suprnova_sprite32regs_2_w) AM_BASE_MEMBER(jchan_state, m_sprregs_2)
+	AM_RANGE(0x700000, 0x703fff) AM_RAM_WRITE(jchan_suprnova_sprite32_2_w) AM_SHARE("spriteram_2")
+	AM_RANGE(0x780000, 0x78003f) AM_RAM_WRITE(jchan_suprnova_sprite32regs_2_w) AM_SHARE("sprregs_2")
 
-	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8("ymz", ymz280b_w, 0x00ff) // sound
+	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8_LEGACY("ymz", ymz280b_w, 0x00ff) // sound
 
 	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
 ADDRESS_MAP_END
@@ -570,8 +590,8 @@ static INPUT_PORTS_START( jchan )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x8000)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x0000)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("DSW",0x8000,EQUALS,0x8000)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW",0x8000,EQUALS,0x0000)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")		/* $f00002.w (-> $2000b5.b) */
@@ -581,8 +601,8 @@ static INPUT_PORTS_START( jchan )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x8000)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x0000)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CONDITION("DSW",0x8000,EQUALS,0x8000)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW",0x8000,EQUALS,0x0000)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")	/* $f00004.b */
@@ -596,14 +616,14 @@ static INPUT_PORTS_START( jchan )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("EXTRA")		/* $f00006.b */
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x8000)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x8000)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x8000)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x8000)
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x0000)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x0000)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x0000)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x0000)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_CONDITION("DSW",0x8000,EQUALS,0x8000)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW",0x8000,EQUALS,0x8000)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_CONDITION("DSW",0x8000,EQUALS,0x8000)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW",0x8000,EQUALS,0x8000)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("DSW",0x8000,EQUALS,0x0000)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_CONDITION("DSW",0x8000,EQUALS,0x0000)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CONDITION("DSW",0x8000,EQUALS,0x0000)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_CONDITION("DSW",0x8000,EQUALS,0x0000)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )               /* duplicated Player 1 Button 4 (whatever the layout is) */
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )               /* duplicated Player 2 Button 4 (whatever the layout is) */
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -776,8 +796,8 @@ static DRIVER_INIT( jchan )
 	jchan_state *state = machine.driver_data<jchan_state>();
 	DRIVER_INIT_CALL( decrypt_toybox_rom );
 	// install these here, putting them in the memory map causes issues
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x403ffe, 0x403fff, FUNC(main2sub_cmd_w) );
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x400000, 0x400001, FUNC(sub2main_cmd_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x403ffe, 0x403fff, write16_delegate(FUNC(jchan_state::main2sub_cmd_w),state));
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_write_handler(0x400000, 0x400001, write16_delegate(FUNC(jchan_state::sub2main_cmd_w),state));
 
 
 	memset(state->m_mcu_com, 0, 4 * sizeof( UINT16 ) );

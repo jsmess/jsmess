@@ -77,6 +77,7 @@ sprites.
 
 PALETTE_INIT( ghostb )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -103,61 +104,54 @@ PALETTE_INIT( ghostb )
 	}
 }
 
-WRITE8_HANDLER( dec8_bg_data_w )
+WRITE8_MEMBER(dec8_state::dec8_bg_data_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
-	state->m_bg_data[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bg_data[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-READ8_HANDLER( dec8_bg_data_r )
+READ8_MEMBER(dec8_state::dec8_bg_data_r)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
-	return state->m_bg_data[offset];
-}
-
-
-WRITE8_HANDLER( dec8_videoram_w )
-{
-	dec8_state *state = space->machine().driver_data<dec8_state>();
-	state->m_videoram[offset] = data;
-	state->m_fix_tilemap->mark_tile_dirty(offset / 2);
-}
-
-WRITE8_HANDLER( srdarwin_videoram_w )
-{
-	dec8_state *state = space->machine().driver_data<dec8_state>();
-	state->m_videoram[offset] = data;
-	state->m_fix_tilemap->mark_tile_dirty(offset);
+	return m_bg_data[offset];
 }
 
 
-WRITE8_HANDLER( dec8_scroll2_w )
+WRITE8_MEMBER(dec8_state::dec8_videoram_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
-	state->m_scroll2[offset] = data;
+	m_videoram[offset] = data;
+	m_fix_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( srdarwin_control_w )
+WRITE8_MEMBER(dec8_state::srdarwin_videoram_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
+	m_videoram[offset] = data;
+	m_fix_tilemap->mark_tile_dirty(offset);
+}
+
+
+WRITE8_MEMBER(dec8_state::dec8_scroll2_w)
+{
+	m_scroll2[offset] = data;
+}
+
+WRITE8_MEMBER(dec8_state::srdarwin_control_w)
+{
 
 	switch (offset)
 	{
 	case 0: /* Top 3 bits - bank switch, bottom 4 - scroll MSB */
-		memory_set_bank(space->machine(), "bank1", (data >> 5));
-		state->m_scroll2[0] = data & 0xf;
+		membank("bank1")->set_entry((data >> 5));
+		m_scroll2[0] = data & 0xf;
 		return;
 
 	case 1:
-		state->m_scroll2[1] = data;
+		m_scroll2[1] = data;
 		return;
     }
 }
 
-WRITE8_HANDLER( lastmisn_control_w )
+WRITE8_MEMBER(dec8_state::lastmisn_control_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
 
 	/*
         Bit 0x0f - ROM bank switch.
@@ -166,54 +160,50 @@ WRITE8_HANDLER( lastmisn_control_w )
         Bit 0x40 - Y scroll MSB
         Bit 0x80 - Hold subcpu reset line high if clear, else low
     */
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 
-	state->m_scroll2[0] = (data >> 5) & 1;
-	state->m_scroll2[2] = (data >> 6) & 1;
+	m_scroll2[0] = (data >> 5) & 1;
+	m_scroll2[2] = (data >> 6) & 1;
 
 	if (data & 0x80)
-		device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, CLEAR_LINE);
+		device_set_input_line(m_subcpu, INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		device_set_input_line(state->m_subcpu, INPUT_LINE_RESET, ASSERT_LINE);
+		device_set_input_line(m_subcpu, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-WRITE8_HANDLER( shackled_control_w )
+WRITE8_MEMBER(dec8_state::shackled_control_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
 
 	/* Bottom 4 bits - bank switch, Bits 4 & 5 - Scroll MSBs */
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 
-	state->m_scroll2[0] = (data >> 5) & 1;
-	state->m_scroll2[2] = (data >> 6) & 1;
+	m_scroll2[0] = (data >> 5) & 1;
+	m_scroll2[2] = (data >> 6) & 1;
 }
 
-WRITE8_HANDLER( lastmisn_scrollx_w )
+WRITE8_MEMBER(dec8_state::lastmisn_scrollx_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
-	state->m_scroll2[1] = data;
+	m_scroll2[1] = data;
 }
 
-WRITE8_HANDLER( lastmisn_scrolly_w )
+WRITE8_MEMBER(dec8_state::lastmisn_scrolly_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
-	state->m_scroll2[3] = data;
+	m_scroll2[3] = data;
 }
 
-WRITE8_HANDLER( gondo_scroll_w )
+WRITE8_MEMBER(dec8_state::gondo_scroll_w)
 {
-	dec8_state *state = space->machine().driver_data<dec8_state>();
 	switch (offset)
 	{
 	case 0x0:
-		state->m_scroll2[1] = data; /* X LSB */
+		m_scroll2[1] = data; /* X LSB */
 		break;
 	case 0x8:
-		state->m_scroll2[3] = data; /* Y LSB */
+		m_scroll2[3] = data; /* Y LSB */
 		break;
 	case 0x10:
-		state->m_scroll2[0] = (data >> 0) & 1; /* Bit 0: X MSB */
-		state->m_scroll2[2] = (data >> 1) & 1; /* Bit 1: Y MSB */
+		m_scroll2[0] = (data >> 0) & 1; /* Bit 0: X MSB */
+		m_scroll2[2] = (data >> 1) & 1; /* Bit 1: Y MSB */
 		/* Bit 2 is also used in Gondo & Garyoret */
 		break;
 	}
@@ -248,7 +238,7 @@ static void srdarwin_draw_sprites( running_machine& machine, bitmap_ind16 &bitma
 		fx = buffered_spriteram[offs + 1] & 0x04;
 		multi = buffered_spriteram[offs + 1] & 0x10;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sy = 240 - sy;
 			sx = 240 - sx;
@@ -260,13 +250,13 @@ static void srdarwin_draw_sprites( running_machine& machine, bitmap_ind16 &bitma
 		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
         			code,
 				color,
-				fx,flip_screen_get(machine),
+				fx,state->flip_screen(),
 				sx,sy,0);
         if (multi)
     		drawgfx_transpen(bitmap,cliprect,machine.gfx[1],
 				code+1,
 				color,
-				fx,flip_screen_get(machine),
+				fx,state->flip_screen(),
 				sx,sy2,0);
 	}
 }
@@ -277,7 +267,7 @@ SCREEN_UPDATE_IND16( cobracom )
 {
 	dec8_state *state = screen.machine().driver_data<dec8_state>();
 
-	flip_screen_set(screen.machine(), state->m_bg_control[0] >> 7);
+	state->flip_screen_set(state->m_bg_control[0] >> 7);
 
 	screen.machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);
 	screen.machine().device<deco_mxc06_device>("spritegen")->draw_sprites(screen.machine(), bitmap, cliprect, state->m_buffered_spriteram16, 0x04, 0x00, 0x03);
@@ -357,7 +347,7 @@ VIDEO_START( ghostb )
 SCREEN_UPDATE_IND16( oscar )
 {
 	dec8_state *state = screen.machine().driver_data<dec8_state>();
-	flip_screen_set(screen.machine(), state->m_bg_control[1] >> 7);
+	state->flip_screen_set(state->m_bg_control[1] >> 7);
 
 	// we mimic the priority scheme in dec0.c, this was originally a bit different, so this could be wrong
 	screen.machine().device<deco_bac06_device>("tilegen1")->deco_bac06_pf_draw(screen.machine(),bitmap,cliprect,TILEMAP_DRAW_OPAQUE, 0x00, 0x00, 0x00, 0x00);

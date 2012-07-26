@@ -75,7 +75,7 @@ static void sprite_draw_donpachi_zbuf(running_machine &machine, int priority);
 PALETTE_INIT( cave )
 {
 	cave_state *state = machine.driver_data<cave_state>();
-	int maxpen = state->m_paletteram_size / 2;
+	int maxpen = state->m_paletteram.bytes() / 2;
 	int pen;
 
 	/* create a 1:1 palette map covering everything */
@@ -352,15 +352,15 @@ static TILE_GET_INFO( get_tile_info_1 )	{ get_tile_info(machine, tileinfo, tile_
 static TILE_GET_INFO( get_tile_info_2 )	{ get_tile_info(machine, tileinfo, tile_index, 2); }
 static TILE_GET_INFO( get_tile_info_3 )	{ get_tile_info(machine, tileinfo, tile_index, 3); }
 
-WRITE16_HANDLER( cave_vram_0_w ) { vram_w(space, offset, data, mem_mask, 0); }
-WRITE16_HANDLER( cave_vram_1_w ) { vram_w(space, offset, data, mem_mask, 1); }
-WRITE16_HANDLER( cave_vram_2_w ) { vram_w(space, offset, data, mem_mask, 2); }
-WRITE16_HANDLER( cave_vram_3_w ) { vram_w(space, offset, data, mem_mask, 3); }
+WRITE16_MEMBER(cave_state::cave_vram_0_w){ vram_w(&space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(cave_state::cave_vram_1_w){ vram_w(&space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(cave_state::cave_vram_2_w){ vram_w(&space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(cave_state::cave_vram_3_w){ vram_w(&space, offset, data, mem_mask, 3); }
 
-WRITE16_HANDLER( cave_vram_0_8x8_w ) { vram_8x8_w(space, offset, data, mem_mask, 0); }
-WRITE16_HANDLER( cave_vram_1_8x8_w ) { vram_8x8_w(space, offset, data, mem_mask, 1); }
-WRITE16_HANDLER( cave_vram_2_8x8_w ) { vram_8x8_w(space, offset, data, mem_mask, 2); }
-WRITE16_HANDLER( cave_vram_3_8x8_w ) { vram_8x8_w(space, offset, data, mem_mask, 3); }
+WRITE16_MEMBER(cave_state::cave_vram_0_8x8_w){ vram_8x8_w(&space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(cave_state::cave_vram_1_8x8_w){ vram_8x8_w(&space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(cave_state::cave_vram_2_8x8_w){ vram_8x8_w(&space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(cave_state::cave_vram_3_8x8_w){ vram_8x8_w(&space, offset, data, mem_mask, 3); }
 
 
 /***************************************************************************
@@ -515,8 +515,8 @@ static void get_sprite_info_cave( running_machine &machine )
 {
 	cave_state *state = machine.driver_data<cave_state>();
 	pen_t base_pal = 0;
-	const UINT8 *base_gfx = machine.region("sprites")->base();
-	int code_max = machine.region("sprites")->bytes() / (16*16);
+	const UINT8 *base_gfx = state->memregion("sprites")->base();
+	int code_max = state->memregion("sprites")->bytes() / (16*16);
 
 	UINT16 *source;
 	UINT16 *finish;
@@ -528,13 +528,13 @@ static void get_sprite_info_cave( running_machine &machine )
 	int max_x = machine.primary_screen->width();
 	int max_y = machine.primary_screen->height();
 
-	source = state->m_spriteram + ((state->m_spriteram_size / 2) / 2) * state->m_spriteram_bank;
+	source = state->m_spriteram + ((state->m_spriteram.bytes() / 2) / 2) * state->m_spriteram_bank;
 
 	if (state->m_videoregs[4] & 0x02)
 		if (state->m_spriteram_2)
-			source = state->m_spriteram_2 + ((state->m_spriteram_size / 2) / 2) * state->m_spriteram_bank;
+			source = state->m_spriteram_2 + ((state->m_spriteram.bytes() / 2) / 2) * state->m_spriteram_bank;
 
-	finish = source + ((state->m_spriteram_size / 2) / 2);
+	finish = source + ((state->m_spriteram.bytes() / 2) / 2);
 
 
 	for (; source < finish; source += 8)
@@ -644,8 +644,8 @@ static void get_sprite_info_donpachi( running_machine &machine )
 {
 	cave_state *state = machine.driver_data<cave_state>();
 	pen_t base_pal = 0;
-	const UINT8 *base_gfx = machine.region("sprites")->base();
-	int code_max = machine.region("sprites")->bytes() / (16*16);
+	const UINT8 *base_gfx = state->memregion("sprites")->base();
+	int code_max = state->memregion("sprites")->bytes() / (16*16);
 
 	UINT16 *source;
 	UINT16 *finish;
@@ -658,13 +658,13 @@ static void get_sprite_info_donpachi( running_machine &machine )
 	int max_x = machine.primary_screen->width();
 	int max_y = machine.primary_screen->height();
 
-	source = state->m_spriteram + ((state->m_spriteram_size / 2) / 2) * state->m_spriteram_bank;
+	source = state->m_spriteram + ((state->m_spriteram.bytes() / 2) / 2) * state->m_spriteram_bank;
 
 	if (state->m_videoregs[4] & 0x02)
 		if (state->m_spriteram_2)
-			source = state->m_spriteram_2 + ((state->m_spriteram_size / 2) / 2) * state->m_spriteram_bank;
+			source = state->m_spriteram_2 + ((state->m_spriteram.bytes() / 2) / 2) * state->m_spriteram_bank;
 
-	finish = source + ((state->m_spriteram_size / 2) / 2);
+	finish = source + ((state->m_spriteram.bytes() / 2) / 2);
 
 	for (; source < finish; source += 8)
 	{
@@ -745,7 +745,7 @@ static void sprite_init_cave( running_machine &machine )
 	state->m_sprite_zbuf_baseval = 0x10000 - MAX_SPRITE_NUM;
 	machine.primary_screen->register_screen_bitmap(state->m_sprite_zbuf);
 
-	state->m_num_sprites = state->m_spriteram_size / 0x10 / 2;
+	state->m_num_sprites = state->m_spriteram.bytes() / 0x10 / 2;
 	state->m_sprite = auto_alloc_array_clear(machine, struct sprite_cave, state->m_num_sprites);
 
 	memset(state->m_sprite_table, 0, sizeof(state->m_sprite_table));

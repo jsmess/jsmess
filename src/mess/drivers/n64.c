@@ -19,52 +19,52 @@ static READ32_HANDLER( dd_null_r )
 	return 0xffffffff;
 }
 
-static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE(&rdram)				// RDRAM
-	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
+static ADDRESS_MAP_START( n64_map, AS_PROGRAM, 32, n64_state )
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE_LEGACY(&rdram)				// RDRAM
+	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
 	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("dmem")					// RSP DMEM
 	AM_RANGE(0x04001000, 0x04001fff) AM_RAM AM_SHARE("imem")					// RSP IMEM
-	AM_RANGE(0x04040000, 0x040fffff) AM_DEVREADWRITE("rsp", n64_sp_reg_r, n64_sp_reg_w)	// RSP
-	AM_RANGE(0x04100000, 0x041fffff) AM_DEVREADWRITE("rsp", n64_dp_reg_r, n64_dp_reg_w)	// RDP
-	AM_RANGE(0x04300000, 0x043fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, mi_reg_r, mi_reg_w)	// MIPS Interface
-	AM_RANGE(0x04400000, 0x044fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, vi_reg_r, vi_reg_w)	// Video Interface
-	AM_RANGE(0x04500000, 0x045fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, ai_reg_r, ai_reg_w)	// Audio Interface
-	AM_RANGE(0x04600000, 0x046fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, pi_reg_r, pi_reg_w)	// Peripheral Interface
-	AM_RANGE(0x04700000, 0x047fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, ri_reg_r, ri_reg_w)	// RDRAM Interface
-	AM_RANGE(0x04800000, 0x048fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, si_reg_r, si_reg_w)	// Serial Interface
-	AM_RANGE(0x05000508, 0x0500050b) AM_READ(dd_null_r);
-	AM_RANGE(0x08000000, 0x0801ffff) AM_RAM AM_BASE(&n64_sram)										// Cartridge SRAM
+	AM_RANGE(0x04040000, 0x040fffff) AM_DEVREADWRITE_LEGACY("rsp", n64_sp_reg_r, n64_sp_reg_w)	// RSP
+	AM_RANGE(0x04100000, 0x041fffff) AM_DEVREADWRITE_LEGACY("rsp", n64_dp_reg_r, n64_dp_reg_w)	// RDP
+	AM_RANGE(0x04300000, 0x043fffff) AM_DEVREADWRITE("rcp", n64_periphs, mi_reg_r, mi_reg_w)	// MIPS Interface
+	AM_RANGE(0x04400000, 0x044fffff) AM_DEVREADWRITE("rcp", n64_periphs, vi_reg_r, vi_reg_w)	// Video Interface
+	AM_RANGE(0x04500000, 0x045fffff) AM_DEVREADWRITE("rcp", n64_periphs, ai_reg_r, ai_reg_w)	// Audio Interface
+	AM_RANGE(0x04600000, 0x046fffff) AM_DEVREADWRITE("rcp", n64_periphs, pi_reg_r, pi_reg_w)	// Peripheral Interface
+	AM_RANGE(0x04700000, 0x047fffff) AM_DEVREADWRITE("rcp", n64_periphs, ri_reg_r, ri_reg_w)	// RDRAM Interface
+	AM_RANGE(0x04800000, 0x048fffff) AM_DEVREADWRITE("rcp", n64_periphs, si_reg_r, si_reg_w)	// Serial Interface
+	AM_RANGE(0x05000508, 0x0500050b) AM_READ_LEGACY(dd_null_r);
+	AM_RANGE(0x08000000, 0x0801ffff) AM_RAM AM_BASE_LEGACY(&n64_sram)										// Cartridge SRAM
 	AM_RANGE(0x10000000, 0x13ffffff) AM_ROM AM_REGION("user2", 0)									// Cartridge
 	AM_RANGE(0x1fc00000, 0x1fc007bf) AM_ROM AM_REGION("user1", 0)									// PIF ROM
-	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, pif_ram_r, pif_ram_w)
+	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_DEVREADWRITE("rcp", n64_periphs, pif_ram_r, pif_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( n64dd_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE(&rdram)				// RDRAM
-	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
+static ADDRESS_MAP_START( n64dd_map, AS_PROGRAM, 32, n64_state )
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE_LEGACY(&rdram)				// RDRAM
+	AM_RANGE(0x03f00000, 0x03f00027) AM_DEVREADWRITE("rcp", n64_periphs, rdram_reg_r, rdram_reg_w)
 	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_SHARE("dmem")					// RSP DMEM
 	AM_RANGE(0x04001000, 0x04001fff) AM_RAM AM_SHARE("imem")					// RSP IMEM
-	AM_RANGE(0x04040000, 0x040fffff) AM_DEVREADWRITE("rsp", n64_sp_reg_r, n64_sp_reg_w)	// RSP
-	AM_RANGE(0x04100000, 0x041fffff) AM_DEVREADWRITE("rsp", n64_dp_reg_r, n64_dp_reg_w)	// RDP
-	AM_RANGE(0x04300000, 0x043fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, mi_reg_r, mi_reg_w)	// MIPS Interface
-	AM_RANGE(0x04400000, 0x044fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, vi_reg_r, vi_reg_w)	// Video Interface
-	AM_RANGE(0x04500000, 0x045fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, ai_reg_r, ai_reg_w)	// Audio Interface
-	AM_RANGE(0x04600000, 0x046fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, pi_reg_r, pi_reg_w)	// Peripheral Interface
-	AM_RANGE(0x04700000, 0x047fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, ri_reg_r, ri_reg_w)	// RDRAM Interface
-	AM_RANGE(0x04800000, 0x048fffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, si_reg_r, si_reg_w)	// Serial Interface
-	AM_RANGE(0x05000000, 0x05ffffff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, dd_reg_r, dd_reg_w) // 64DD Interface
+	AM_RANGE(0x04040000, 0x040fffff) AM_DEVREADWRITE_LEGACY("rsp", n64_sp_reg_r, n64_sp_reg_w)	// RSP
+	AM_RANGE(0x04100000, 0x041fffff) AM_DEVREADWRITE_LEGACY("rsp", n64_dp_reg_r, n64_dp_reg_w)	// RDP
+	AM_RANGE(0x04300000, 0x043fffff) AM_DEVREADWRITE("rcp", n64_periphs, mi_reg_r, mi_reg_w)	// MIPS Interface
+	AM_RANGE(0x04400000, 0x044fffff) AM_DEVREADWRITE("rcp", n64_periphs, vi_reg_r, vi_reg_w)	// Video Interface
+	AM_RANGE(0x04500000, 0x045fffff) AM_DEVREADWRITE("rcp", n64_periphs, ai_reg_r, ai_reg_w)	// Audio Interface
+	AM_RANGE(0x04600000, 0x046fffff) AM_DEVREADWRITE("rcp", n64_periphs, pi_reg_r, pi_reg_w)	// Peripheral Interface
+	AM_RANGE(0x04700000, 0x047fffff) AM_DEVREADWRITE("rcp", n64_periphs, ri_reg_r, ri_reg_w)	// RDRAM Interface
+	AM_RANGE(0x04800000, 0x048fffff) AM_DEVREADWRITE("rcp", n64_periphs, si_reg_r, si_reg_w)	// Serial Interface
+	AM_RANGE(0x05000000, 0x05ffffff) AM_DEVREADWRITE("rcp", n64_periphs, dd_reg_r, dd_reg_w) // 64DD Interface
 	AM_RANGE(0x06000000, 0x063fffff) AM_ROM AM_REGION("ddipl", 0)									// 64DD IPL ROM
-	AM_RANGE(0x08000000, 0x0801ffff) AM_RAM AM_BASE(&n64_sram)										// Cartridge SRAM
+	AM_RANGE(0x08000000, 0x0801ffff) AM_RAM AM_BASE_LEGACY(&n64_sram)										// Cartridge SRAM
 	AM_RANGE(0x10000000, 0x13ffffff) AM_ROM AM_REGION("user2", 0)									// Cartridge
 	AM_RANGE(0x1fc00000, 0x1fc007bf) AM_ROM AM_REGION("user1", 0)									// PIF ROM
-	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_DEVREADWRITE_MODERN("rcp", n64_periphs, pif_ram_r, pif_ram_w)
+	AM_RANGE(0x1fc007c0, 0x1fc007ff) AM_DEVREADWRITE("rcp", n64_periphs, pif_ram_r, pif_ram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rsp_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( rsp_map, AS_PROGRAM, 32, n64_state )
 	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_SHARE("dmem")
 	AM_RANGE(0x00001000, 0x00001fff) AM_RAM AM_SHARE("imem")
-	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_BASE(&rsp_dmem) AM_SHARE("dmem")
-	AM_RANGE(0x04001000, 0x04001fff) AM_RAM AM_BASE(&rsp_imem) AM_SHARE("imem")
+	AM_RANGE(0x04000000, 0x04000fff) AM_RAM AM_BASE_LEGACY(&rsp_dmem) AM_SHARE("dmem")
+	AM_RANGE(0x04001000, 0x04001fff) AM_RAM AM_BASE_LEGACY(&rsp_imem) AM_SHARE("imem")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( n64 )
@@ -163,7 +163,7 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 {
 	int i, length;
 	n64_periphs *periphs = image.device().machine().device<n64_periphs>("rcp");
-	UINT8 *cart = image.device().machine().region("user2")->base();
+	UINT8 *cart = image.device().machine().root_device().memregion("user2")->base();
 
 	if (image.software_entry() == NULL)
 	{
@@ -235,7 +235,7 @@ MACHINE_START( n64dd )
 {
 	MACHINE_START_CALL( n64 );
 
-	UINT8 *ipl = machine.region("ddipl")->base();
+	UINT8 *ipl = machine.root_device().memregion("ddipl")->base();
 
 	for (int i = 0; i < 0x400000; i += 4)
 	{
@@ -253,7 +253,7 @@ MACHINE_START( n64dd )
 static INTERRUPT_GEN( n64_reset_poll )
 {
 	n64_periphs *periphs = device->machine().device<n64_periphs>("rcp");
-	periphs->poll_reset_button((input_port_read(device->machine(), "RESET") & 1) ? true : false);
+	periphs->poll_reset_button((device->machine().root_device().ioport("RESET")->read() & 1) ? true : false);
 }
 
 static MACHINE_CONFIG_START( n64, n64_state )

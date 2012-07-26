@@ -3,7 +3,6 @@
 #ifndef __PC8001__
 #define __PC8001__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -56,6 +55,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER( port10_w );
 	DECLARE_WRITE8_MEMBER( port30_w );
+	DECLARE_READ8_MEMBER( port40_r );
+	DECLARE_WRITE8_MEMBER( port40_w );
 	DECLARE_WRITE_LINE_MEMBER( crtc_drq_w );
 	DECLARE_WRITE_LINE_MEMBER( hrq_w );
 	DECLARE_WRITE8_MEMBER( dma_mem_w );

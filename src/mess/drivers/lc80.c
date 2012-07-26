@@ -69,14 +69,14 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-static INPUT_CHANGED( trigger_reset )
+INPUT_CHANGED_MEMBER( lc80_state::trigger_reset )
 {
-	cputag_set_input_line(field.machine(), Z80_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static INPUT_CHANGED( trigger_nmi )
+INPUT_CHANGED_MEMBER( lc80_state::trigger_nmi )
 {
-	cputag_set_input_line(field.machine(), Z80_TAG, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( lc80 )
@@ -113,8 +113,8 @@ static INPUT_PORTS_START( lc80 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ADR") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RES") PORT_CODE(KEYCODE_F10) PORT_CHANGED(trigger_reset, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_ESC) PORT_CHANGED(trigger_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RES") PORT_CODE(KEYCODE_F10) PORT_CHANGED_MEMBER(DEVICE_SELF, lc80_state, trigger_reset, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_ESC) PORT_CHANGED_MEMBER(DEVICE_SELF, lc80_state, trigger_nmi, 0)
 INPUT_PORTS_END
 
 /* Z80-CTC Interface */
@@ -262,10 +262,10 @@ READ8_MEMBER( lc80_state::pio2_pb_r )
 	{
 		if (!BIT(m_digit, i))
 		{
-			if (!BIT(input_port_read(machine(), "ROW0"), i)) data &= ~0x10;
-			if (!BIT(input_port_read(machine(), "ROW1"), i)) data &= ~0x20;
-			if (!BIT(input_port_read(machine(), "ROW2"), i)) data &= ~0x40;
-			if (!BIT(input_port_read(machine(), "ROW3"), i)) data &= ~0x80;
+			if (!BIT(ioport("ROW0")->read(), i)) data &= ~0x10;
+			if (!BIT(ioport("ROW1")->read(), i)) data &= ~0x20;
+			if (!BIT(ioport("ROW2")->read(), i)) data &= ~0x40;
+			if (!BIT(ioport("ROW3")->read(), i)) data &= ~0x80;
 		}
 	}
 
@@ -300,20 +300,20 @@ void lc80_state::machine_start()
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
 	/* setup memory banking */
-	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(Z80_TAG)->base(), 0); // TODO
-	memory_configure_bank(machine(), "bank1", 1, 1, machine().region(Z80_TAG)->base(), 0);
-	memory_set_bank(machine(), "bank1", 1);
+	membank("bank1")->configure_entry(0, memregion(Z80_TAG)->base()); // TODO
+	membank("bank1")->configure_entry(1, memregion(Z80_TAG)->base());
+	membank("bank1")->set_entry(1);
 
-	memory_configure_bank(machine(), "bank2", 0, 1, machine().region(Z80_TAG)->base() + 0x800, 0); // TODO
-	memory_configure_bank(machine(), "bank2", 1, 1, machine().region(Z80_TAG)->base() + 0x800, 0);
-	memory_set_bank(machine(), "bank2", 1);
+	membank("bank2")->configure_entry(0, memregion(Z80_TAG)->base() + 0x800); // TODO
+	membank("bank2")->configure_entry(1, memregion(Z80_TAG)->base() + 0x800);
+	membank("bank2")->set_entry(1);
 
-	memory_configure_bank(machine(), "bank3", 0, 1, machine().region(Z80_TAG)->base() + 0x1000, 0); // TODO
-	memory_configure_bank(machine(), "bank3", 1, 1, machine().region(Z80_TAG)->base() + 0x1000, 0);
-	memory_set_bank(machine(), "bank3", 1);
+	membank("bank3")->configure_entry(0, memregion(Z80_TAG)->base() + 0x1000); // TODO
+	membank("bank3")->configure_entry(1, memregion(Z80_TAG)->base() + 0x1000);
+	membank("bank3")->set_entry(1);
 
-	memory_configure_bank(machine(), "bank4", 0, 1, machine().region(Z80_TAG)->base() + 0x2000, 0);
-	memory_set_bank(machine(), "bank4", 0);
+	membank("bank4")->configure_entry(0, memregion(Z80_TAG)->base() + 0x2000);
+	membank("bank4")->set_entry(0);
 
 	program->install_readwrite_bank(0x0000, 0x07ff, "bank1");
 	program->install_readwrite_bank(0x0800, 0x0fff, "bank2");

@@ -103,9 +103,9 @@ Part list of Goldstar 3DO Interactive Multiplayer
 #define X601_CLOCK		XTAL_16_9344MHz
 
 
-static ADDRESS_MAP_START( 3do_mem, AS_PROGRAM, 32)
-	AM_RANGE(0x00000000, 0x001FFFFF) AM_RAMBANK("bank1") AM_BASE_MEMBER(_3do_state,m_dram)						/* DRAM */
-	AM_RANGE(0x00200000, 0x003FFFFF) AM_RAM	AM_BASE_MEMBER(_3do_state,m_vram)									/* VRAM */
+static ADDRESS_MAP_START( 3do_mem, AS_PROGRAM, 32, _3do_state )
+	AM_RANGE(0x00000000, 0x001FFFFF) AM_RAMBANK("bank1") AM_SHARE("dram")						/* DRAM */
+	AM_RANGE(0x00200000, 0x003FFFFF) AM_RAM	AM_SHARE("vram")									/* VRAM */
 	AM_RANGE(0x03000000, 0x030FFFFF) AM_ROMBANK("bank2")									/* BIOS */
 	AM_RANGE(0x03100000, 0x0313FFFF) AM_RAM													/* Brooktree? */
 	AM_RANGE(0x03140000, 0x0315FFFF) AM_READWRITE(_3do_nvarea_r, _3do_nvarea_w)				/* NVRAM */
@@ -135,14 +135,14 @@ static MACHINE_RESET( 3do )
 
 	state->m_maincpu = downcast<legacy_cpu_device*>( machine.device("maincpu") );
 
-	memory_set_bankptr(machine, "bank2",machine.region("user1")->base());
+	state->membank("bank2")->set_base(state->memregion("user1")->base());
 
 	/* configure overlay */
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_dram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
+	state->membank("bank1")->configure_entry(0, state->m_dram);
+	state->membank("bank1")->configure_entry(1, state->memregion("user1")->base());
 
 	/* start with overlay enabled */
-	memory_set_bank(machine, "bank1", 1);
+	state->membank("bank1")->set_entry(1);
 
 	_3do_slow2_init(machine);
 	_3do_madam_init(machine);

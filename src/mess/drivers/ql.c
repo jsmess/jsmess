@@ -71,7 +71,6 @@
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -248,14 +247,14 @@ READ8_MEMBER( ql_state::ipc_bus_r )
 
 	UINT8 data = 0;
 
-	if (BIT(m_keylatch, 0)) data |= input_port_read(machine(), "ROW0") | input_port_read(machine(), "JOY0");
-	if (BIT(m_keylatch, 1)) data |= input_port_read(machine(), "ROW1") | input_port_read(machine(), "JOY1");
-	if (BIT(m_keylatch, 2)) data |= input_port_read(machine(), "ROW2");
-	if (BIT(m_keylatch, 3)) data |= input_port_read(machine(), "ROW3");
-	if (BIT(m_keylatch, 4)) data |= input_port_read(machine(), "ROW4");
-	if (BIT(m_keylatch, 5)) data |= input_port_read(machine(), "ROW5");
-	if (BIT(m_keylatch, 6)) data |= input_port_read(machine(), "ROW6");
-	if (BIT(m_keylatch, 7)) data |= input_port_read(machine(), "ROW7");
+	if (BIT(m_keylatch, 0)) data |= ioport("ROW0")->read() | ioport("JOY0")->read();
+	if (BIT(m_keylatch, 1)) data |= ioport("ROW1")->read() | ioport("JOY1")->read();
+	if (BIT(m_keylatch, 2)) data |= ioport("ROW2")->read();
+	if (BIT(m_keylatch, 3)) data |= ioport("ROW3")->read();
+	if (BIT(m_keylatch, 4)) data |= ioport("ROW4")->read();
+	if (BIT(m_keylatch, 5)) data |= ioport("ROW5")->read();
+	if (BIT(m_keylatch, 6)) data |= ioport("ROW6")->read();
+	if (BIT(m_keylatch, 7)) data |= ioport("ROW7")->read();
 
 	return data;
 }
@@ -310,20 +309,20 @@ READ8_MEMBER( ql_state::trump_card_rom_r )
 		space.unmap_readwrite(0x0c0000, 0x0fffff);
 
 	// Setup trumcard rom mapped to rom so unlink us
-	space.install_rom(0x010000, 0x018000, &machine().region(M68008_TAG)->base()[TRUMP_ROM_BASE]);
+	space.install_rom(0x010000, 0x018000, &machine().root_device().memregion(M68008_TAG)->base()[TRUMP_ROM_BASE]);
 
-	return machine().region(M68008_TAG)->base()[TRUMP_ROM_BASE+offset];
+	return memregion(M68008_TAG)->base()[TRUMP_ROM_BASE+offset];
 }
 
 READ8_MEMBER( ql_state::cart_rom_r )
 {
 	// Setup trumcard rom mapped in at $c0000
-	space.install_rom(0x0c0000, 0x0c8000, &machine().region(M68008_TAG)->base()[TRUMP_ROM_BASE]);
+	space.install_rom(0x0c0000, 0x0c8000, &machine().root_device().memregion(M68008_TAG)->base()[TRUMP_ROM_BASE]);
 
 	// Setup cart rom to rom handler, so unlink us
-	space.install_rom(0x0c000, 0x0ffff, &machine().region(M68008_TAG)->base()[CART_ROM_BASE]);
+	space.install_rom(0x0c000, 0x0ffff, &machine().root_device().memregion(M68008_TAG)->base()[CART_ROM_BASE]);
 
-	return machine().region(M68008_TAG)->base()[CART_ROM_BASE+offset];
+	return memregion(M68008_TAG)->base()[CART_ROM_BASE+offset];
 }
 
 void ql_state::trump_card_set_control(UINT8 data)
@@ -944,7 +943,7 @@ void ql_state::machine_reset()
 {
 	address_space	*program	= m_maincpu->memory().space(AS_PROGRAM);
 
-	m_disk_type=input_port_read(machine(),QL_CONFIG_PORT) & DISK_TYPE_MASK;
+	m_disk_type=ioport(QL_CONFIG_PORT)->read() & DISK_TYPE_MASK;
 	logerror("disktype=%d\n",m_disk_type);
 
 	m_printer_char=0;
@@ -979,7 +978,7 @@ void ql_state::machine_reset()
 	{
 		case DISK_TYPE_SANDY :
 			logerror("Configuring SandySuperDisk\n");
-			program->install_rom(0x0c0000, 0x0c3fff, &machine().region(M68008_TAG)->base()[SANDY_ROM_BASE]);
+			program->install_rom(0x0c0000, 0x0c3fff, &machine().root_device().memregion(M68008_TAG)->base()[SANDY_ROM_BASE]);
 			program->install_read_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, read8_delegate(FUNC(ql_state::disk_io_r), this));
 			program->install_write_handler(SANDY_IO_BASE, SANDY_IO_END, 0, 0, write8_delegate(FUNC(ql_state::disk_io_w), this));
 			m_disk_io_base=SANDY_IO_BASE;

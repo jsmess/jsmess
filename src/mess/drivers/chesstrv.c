@@ -7,7 +7,6 @@
       that is used by the Boris Diplomat.
 
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/f8/f8.h"
@@ -80,14 +79,14 @@ READ8_MEMBER( chesstrv_state::keypad_r )
 {
 	UINT8 data = 0;
 
-	data |= input_port_read(machine(), "LINE1");
-	data |= input_port_read(machine(), "LINE2");
-	data |= input_port_read(machine(), "LINE3");
-	data |= input_port_read(machine(), "LINE4");
-	data |= (input_port_read(machine(), "LINE1") ? 0x10 : 0);
-	data |= (input_port_read(machine(), "LINE2") ? 0x20 : 0);
-	data |= (input_port_read(machine(), "LINE3") ? 0x40 : 0);
-	data |= (input_port_read(machine(), "LINE4") ? 0x80 : 0);
+	data |= ioport("LINE1")->read();
+	data |= ioport("LINE2")->read();
+	data |= ioport("LINE3")->read();
+	data |= ioport("LINE4")->read();
+	data |= (ioport("LINE1")->read() ? 0x10 : 0);
+	data |= (ioport("LINE2")->read() ? 0x20 : 0);
+	data |= (ioport("LINE3")->read() ? 0x40 : 0);
+	data |= (ioport("LINE4")->read() ? 0x80 : 0);
 
 	return data;
 }
@@ -103,10 +102,10 @@ READ8_MEMBER( chesstrv_state::diplomat_keypad_r )
 
 	switch (m_matrix & 7)
 	{
-		case 0:		data |= input_port_read(machine(), "LINE1");	break;
-		case 1:		data |= input_port_read(machine(), "LINE2");	break;
-		case 2:		data |= input_port_read(machine(), "LINE3");	break;
-		case 3:		data |= input_port_read(machine(), "LINE4");	break;
+		case 0:		data |= ioport("LINE1")->read();	break;
+		case 1:		data |= ioport("LINE2")->read();	break;
+		case 2:		data |= ioport("LINE3")->read();	break;
+		case 3:		data |= ioport("LINE4")->read();	break;
 	}
 
 	return data;
@@ -203,7 +202,7 @@ static TIMER_DEVICE_CALLBACK( borisdpl_timer_interrupt )
 
 void chesstrv_state::machine_start()
 {
-	m_ram = machine().region("ram")->base();
+	m_ram = memregion("ram")->base();
 
 	save_item(NAME(m_ram_addr));
 	save_item(NAME(m_matrix));

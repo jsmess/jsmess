@@ -848,16 +848,16 @@ static WRITE8_DEVICE_HANDLER(pia1_ca2_w)
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( funworld_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( funworld_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE_MEMBER(funworld_state, m_videoram)
-	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE_MEMBER(funworld_state, m_colorram)
+	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD_LEGACY("ay8910", ay8910_r)
+	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_data_w)
+	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x4000, 0x4000) AM_READNOP
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xffff) AM_ROM
@@ -865,9 +865,9 @@ ADDRESS_MAP_END
 
 static UINT8 funquiz_question_bank = 0x80;
 
-static READ8_HANDLER( questions_r )
+READ8_MEMBER(funworld_state::questions_r)
 {
-	UINT8* quiz = space->machine().region("questions")->base();
+	UINT8* quiz = memregion("questions")->base();
 	int extraoffset = ((funquiz_question_bank & 0x1f) * 0x8000);
 
 	// if 0x80 is set, read the 2nd half of the question rom (contains header info)
@@ -876,73 +876,73 @@ static READ8_HANDLER( questions_r )
 	return quiz[offset + extraoffset];
 }
 
-static WRITE8_HANDLER( question_bank_w )
+WRITE8_MEMBER(funworld_state::question_bank_w)
 {
 //  printf("question bank write %02x\n", data);
 	funquiz_question_bank = data;
 }
 
-static ADDRESS_MAP_START( funquiz_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( funquiz_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD_LEGACY("ay8910", ay8910_r)
+	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_data_w)
+	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(question_bank_w)
 
-	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE_MEMBER(funworld_state, m_videoram)
-	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE_MEMBER(funworld_state, m_colorram)
+	AM_RANGE(0x2000, 0x2fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x3000, 0x3fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x4000, 0x7fff) AM_READ(questions_r)
 
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magicrd2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( magicrd2_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD_LEGACY("ay8910", ay8910_r)
+	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_data_w)
+	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x2c00, 0x2cff) AM_RAM	/* range for protection */
 	AM_RANGE(0x3600, 0x36ff) AM_RAM	/* some games use $3603-05 range for protection */
 	AM_RANGE(0x3c00, 0x3cff) AM_RAM	/* range for protection */
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE_MEMBER(funworld_state, m_videoram)
-	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE_MEMBER(funworld_state, m_colorram)
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cuoreuno_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cuoreuno_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD_LEGACY("ay8910", ay8910_r)
+	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_data_w)
+	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x2000, 0x2000) AM_READNOP	/* some unknown reads */
 	AM_RANGE(0x3e00, 0x3fff) AM_RAM	/* some games use $3e03-05 range for protection */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE_MEMBER(funworld_state, m_videoram)
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE_MEMBER(funworld_state, m_colorram)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( saloon_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( saloon_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
 	AM_RANGE(0x0a01, 0x0a01) AM_READ_PORT("IN1")
-	AM_RANGE(0x081c, 0x081c) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x081d, 0x081d) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x081c, 0x081c) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x081d, 0x081d) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN2")
-	AM_RANGE(0x1800, 0x1800) AM_DEVREAD("ay8910", ay8910_r)
-	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("ay8910", ay8910_address_data_w)
+	AM_RANGE(0x1800, 0x1800) AM_DEVREAD_LEGACY("ay8910", ay8910_r)
+	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_data_w)
 //  AM_RANGE(0x2000, 0x2000) AM_READNOP /* some unknown reads... maybe a DSW */
-	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE_MEMBER(funworld_state, m_videoram)
-	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE_MEMBER(funworld_state, m_colorram)
+	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -959,16 +959,16 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( witchryl_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( witchryl_map, AS_PROGRAM, 8, funworld_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD("ay8910", ay8910_r)
-	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE("ay8910", ay8910_address_data_w)
-	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE_MEMBER(funworld_state, m_videoram)
-	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE_MEMBER(funworld_state, m_colorram)
+	AM_RANGE(0x0800, 0x0803) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x0c00, 0x0c00) AM_DEVREAD_LEGACY("ay8910", ay8910_r)
+	AM_RANGE(0x0c00, 0x0c01) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_data_w)
+	AM_RANGE(0x0e00, 0x0e00) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0e01, 0x0e01) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x4000, 0x4fff) AM_RAM_WRITE(funworld_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW2")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -4346,7 +4346,7 @@ static DRIVER_INIT( tabblue )
 *****************************************************************************************************/
 
 	int x, na, nb, nad, nbd;
-	UINT8 *src = machine.region( "gfx1" )->base();
+	UINT8 *src = machine.root_device().memregion( "gfx1" )->base();
 
 
 	for (x=0x0000; x < 0x10000; x++)
@@ -4376,7 +4376,7 @@ static DRIVER_INIT( magicd2a )
 
 ******************************************************************/
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0xc1c6] = 0x92;
 }
@@ -4385,8 +4385,8 @@ static DRIVER_INIT( magicd2b )
 /*** same as blue TAB PCB, with the magicd2a patch ***/
 {
 	int x, na, nb, nad, nbd;
-	UINT8 *src = machine.region( "gfx1" )->base();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *src = machine.root_device().memregion( "gfx1" )->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	for (x=0x0000; x < 0x10000; x++)
 	{
@@ -4405,7 +4405,7 @@ static DRIVER_INIT( magicd2b )
 static DRIVER_INIT( soccernw )
 {
 /* temporary patch to avoid hardware errors for debug purposes */
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	ROM[0x80b2] = 0xa9;
 	ROM[0x80b3] = 0x00;
@@ -4440,16 +4440,16 @@ static DRIVER_INIT( saloon )
 
 *************************************************/
 {
-	UINT8 *rom = machine.region("maincpu")->base();
-	int size = machine.region("maincpu")->bytes();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	int size = machine.root_device().memregion("maincpu")->bytes();
 	int start = 0x8000;
 
-	UINT8 *gfxrom = machine.region("gfx1")->base();
-	int sizeg = machine.region("gfx1")->bytes();
+	UINT8 *gfxrom = machine.root_device().memregion("gfx1")->base();
+	int sizeg = machine.root_device().memregion("gfx1")->bytes();
 	int startg = 0;
 
-	UINT8 *prom = machine.region("proms")->base();
-	int sizep = machine.region("proms")->bytes();
+	UINT8 *prom = machine.root_device().memregion("proms")->base();
+	int sizep = machine.root_device().memregion("proms")->bytes();
 	int startp = 0;
 
 	UINT8 *buffer;
@@ -4534,7 +4534,7 @@ static DRIVER_INIT( multiwin )
 
 ******************************************************/
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	int x;
@@ -4553,7 +4553,7 @@ static DRIVER_INIT( multiwin )
 		ROM[x+0x10000] = code;
 	}
 
-	space->set_decrypted_region(0x8000, 0xffff, machine.region("maincpu")->base() + 0x18000);
+	space->set_decrypted_region(0x8000, 0xffff, machine.root_device().memregion("maincpu")->base() + 0x18000);
 }
 
 static DRIVER_INIT( royalcdc )
@@ -4567,7 +4567,7 @@ static DRIVER_INIT( royalcdc )
 
 ******************************************************/
 
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	int x;
@@ -4606,7 +4606,7 @@ static DRIVER_INIT( royalcdc )
 		ROM[x+0x10000] = code;
 	}
 
-	space->set_decrypted_region(0x6000, 0xffff, machine.region("maincpu")->base() + 0x16000);
+	space->set_decrypted_region(0x6000, 0xffff, machine.root_device().memregion("maincpu")->base() + 0x16000);
 }
 
 

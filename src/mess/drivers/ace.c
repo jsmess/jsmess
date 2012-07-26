@@ -39,7 +39,6 @@ Ports:
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -71,17 +70,17 @@ READ8_MEMBER( ace_state::io_r )
 {
 	UINT8 data = 0xff;
 
-	if (!BIT(offset, 8)) data &= input_port_read(machine(), "A8");
-	if (!BIT(offset, 9)) data &= input_port_read(machine(), "A9");
-	if (!BIT(offset, 10)) data &= input_port_read(machine(), "A10");
-	if (!BIT(offset, 11)) data &= input_port_read(machine(), "A11");
-	if (!BIT(offset, 12)) data &= input_port_read(machine(), "A12");
-	if (!BIT(offset, 13)) data &= input_port_read(machine(), "A13");
-	if (!BIT(offset, 14)) data &= input_port_read(machine(), "A14");
+	if (!BIT(offset, 8)) data &= ioport("A8")->read();
+	if (!BIT(offset, 9)) data &= ioport("A9")->read();
+	if (!BIT(offset, 10)) data &= ioport("A10")->read();
+	if (!BIT(offset, 11)) data &= ioport("A11")->read();
+	if (!BIT(offset, 12)) data &= ioport("A12")->read();
+	if (!BIT(offset, 13)) data &= ioport("A13")->read();
+	if (!BIT(offset, 14)) data &= ioport("A14")->read();
 
 	if (!BIT(offset, 15))
 	{
-		data &= input_port_read(machine(), "A15");
+		data &= ioport("A15")->read();
 
 		m_cassette->output(-1);
 		speaker_level_w(m_speaker, 0);
@@ -218,8 +217,8 @@ static WRITE8_DEVICE_HANDLER( pio_bc_w )
 
 static ADDRESS_MAP_START( ace_mem, AS_PROGRAM, 8, ace_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0400) AM_RAM AM_BASE(m_video_ram)
-	AM_RANGE(0x2800, 0x2bff) AM_MIRROR(0x0400) AM_RAM AM_BASE(m_char_ram) AM_REGION(Z80_TAG, 0xfc00)
+	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("video_ram")
+	AM_RANGE(0x2800, 0x2bff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("char_ram") AM_REGION(Z80_TAG, 0xfc00)
 	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END

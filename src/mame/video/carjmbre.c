@@ -32,6 +32,7 @@ static const res_net_info carjmbre_net_info =
 
 PALETTE_INIT( carjmbre )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine, color_prom, &carjmbre_decode_info, &carjmbre_net_info);
@@ -42,45 +43,42 @@ PALETTE_INIT( carjmbre )
 
 
 
-WRITE8_HANDLER( carjmbre_flipscreen_w )
+WRITE8_MEMBER(carjmbre_state::carjmbre_flipscreen_w)
 {
-	carjmbre_state *state = space->machine().driver_data<carjmbre_state>();
 
-	state->m_flipscreen = (data & 1) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
-	space->machine().tilemap().set_flip_all(state->m_flipscreen);
+	m_flipscreen = (data & 1) ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0;
+	machine().tilemap().set_flip_all(m_flipscreen);
 }
 
-WRITE8_HANDLER( carjmbre_bgcolor_w )
+WRITE8_MEMBER(carjmbre_state::carjmbre_bgcolor_w)
 {
-	carjmbre_state *state = space->machine().driver_data<carjmbre_state>();
 	data = ~data & 0x3f;
 
-	if (data != state->m_bgcolor)
+	if (data != m_bgcolor)
 	{
 		int i;
 
-		state->m_bgcolor = data;
+		m_bgcolor = data;
 		if (data & 3)
 			for (i = 0; i < 64; i += 4)
-				palette_set_color(space->machine(), i, palette_get_color(space->machine(), data));
+				palette_set_color(machine(), i, palette_get_color(machine(), data));
 		else
 			// restore to initial state (black)
 			for (i = 0; i < 64; i += 4)
-				palette_set_color(space->machine(), i, RGB_BLACK);
+				palette_set_color(machine(), i, RGB_BLACK);
 	}
 }
 
-WRITE8_HANDLER( carjmbre_8806_w )
+WRITE8_MEMBER(carjmbre_state::carjmbre_8806_w)
 {
 	// unknown, gets updated at same time as carjmbre_bgcolor_w
 }
 
-WRITE8_HANDLER( carjmbre_videoram_w )
+WRITE8_MEMBER(carjmbre_state::carjmbre_videoram_w)
 {
-	carjmbre_state *state = space->machine().driver_data<carjmbre_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_cj_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_videoram[offset] = data;
+	m_cj_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
@@ -131,11 +129,11 @@ SCREEN_UPDATE_IND16( carjmbre )
 	//--xx---- unused
 	//----xxxx colour
 	//+3       x pos
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		//before copying the sprites to spriteram the game reorders the first
 		//sprite to last, sprite ordering is incorrect if this isn't undone
-		troffs = (offs - 4 + state->m_spriteram_size) % state->m_spriteram_size;
+		troffs = (offs - 4 + state->m_spriteram.bytes()) % state->m_spriteram.bytes();
 
 		//unused sprites are marked with ypos <= 0x02 (or >= 0xfd if screen flipped)
 		if (state->m_spriteram[troffs] > 0x02 && state->m_spriteram[troffs] < 0xfd)

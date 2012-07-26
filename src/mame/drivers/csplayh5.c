@@ -9,6 +9,7 @@
     - fix h8 CPU core bugs, it trips various unhandled opcodes
     - Implement DVD routing and YUV decoding;
     - game timings seem busted, could be due of missing DVD hook-up
+    - csplayh8: inputs doesn't work at all, slower than the others too
 
 ***************************************************************************/
 
@@ -40,6 +41,34 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<v9958_device> m_v9958;
+	DECLARE_READ16_MEMBER(csplayh5_mux_r);
+	DECLARE_WRITE16_MEMBER(csplayh5_mux_w);
+	DECLARE_WRITE16_MEMBER(csplayh5_sound_w);
+	DECLARE_READ16_MEMBER(test_r);
+	DECLARE_READ8_MEMBER(csplayh5_sound_r);
+	DECLARE_WRITE8_MEMBER(csplayh5_soundclr_w);
+	DECLARE_READ8_MEMBER(tmpz84c011_pio_r);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_pio_w);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_pa_r);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_pb_r);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_pc_r);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_pd_r);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_pe_r);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pa_w);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pb_w);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pc_w);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pd_w);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_pe_w);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pa_r);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pb_r);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pc_r);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pd_r);
+	DECLARE_READ8_MEMBER(tmpz84c011_0_dir_pe_r);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pa_w);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pb_w);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pc_w);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pd_w);
+	DECLARE_WRITE8_MEMBER(tmpz84c011_0_dir_pe_w);
 };
 
 
@@ -60,56 +89,54 @@ static void csplayh5_vdp0_interrupt(device_t *, v99x8_device &device, int i)
        interrupts seem to be fired quite randomly */
 }
 
-static READ16_HANDLER( csplayh5_mux_r )
+READ16_MEMBER(csplayh5_state::csplayh5_mux_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	switch(state->m_mux_data)
+	switch(m_mux_data)
 	{
-		case 0x01: return input_port_read(space->machine(), "KEY0");
-		case 0x02: return input_port_read(space->machine(), "KEY1");
-		case 0x04: return input_port_read(space->machine(), "KEY2");
-		case 0x08: return input_port_read(space->machine(), "KEY3");
-		case 0x10: return input_port_read(space->machine(), "KEY4");
+		case 0x01: return ioport("KEY0")->read();
+		case 0x02: return ioport("KEY1")->read();
+		case 0x04: return ioport("KEY2")->read();
+		case 0x08: return ioport("KEY3")->read();
+		case 0x10: return ioport("KEY4")->read();
 	}
 
 	return 0xffff;
 }
 
-static WRITE16_HANDLER( csplayh5_mux_w )
+WRITE16_MEMBER(csplayh5_state::csplayh5_mux_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_mux_data = (~data & 0x1f);
+	m_mux_data = (~data & 0x1f);
 }
 
-static WRITE16_HANDLER( csplayh5_sound_w )
+WRITE16_MEMBER(csplayh5_state::csplayh5_sound_w)
 {
-	soundlatch_w(space, 0, ((data >> 8) & 0xff));
+	soundlatch_byte_w(space, 0, ((data >> 8) & 0xff));
 }
 
 
-static ADDRESS_MAP_START( csplayh5_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( csplayh5_map, AS_PROGRAM, 16, csplayh5_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("DSW") AM_WRITE(csplayh5_sound_w)
 	AM_RANGE(0x200200, 0x200201) AM_READWRITE(csplayh5_mux_r,csplayh5_mux_w)
 	AM_RANGE(0x200400, 0x200401) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0x200600, 0x200607) AM_DEVREADWRITE8_MODERN("v9958", v9958_device, read, write, 0x00ff)
+	AM_RANGE(0x200600, 0x200607) AM_DEVREADWRITE8("v9958", v9958_device, read, write, 0x00ff)
 
 	AM_RANGE(0x800000, 0xbfffff) AM_ROM AM_REGION("blit_gfx",0) // GFX ROM routes here
 
 	AM_RANGE(0xc00000, 0xc7ffff) AM_RAM AM_SHARE("nvram") AM_MIRROR(0x380000) // work RAM
 
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE_LEGACY(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 #if USE_H8
-static READ16_HANDLER( test_r )
+READ16_MEMBER(csplayh5_state::test_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static ADDRESS_MAP_START( csplayh5_sub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( csplayh5_sub_map, AS_PROGRAM, 16, csplayh5_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 
 	AM_RANGE(0x04002a, 0x04002b) AM_READ(test_r)
@@ -120,7 +147,7 @@ static ADDRESS_MAP_START( csplayh5_sub_map, AS_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( csplayh5_sub_io_map, AS_IO, 16 )
+static ADDRESS_MAP_START( csplayh5_sub_io_map, AS_IO, 16, csplayh5_state )
 
 ADDRESS_MAP_END
 #endif
@@ -141,22 +168,22 @@ sound HW is identical to Niyanpai
 
 static void csplayh5_soundbank_w(running_machine &machine, int data)
 {
-	UINT8 *SNDROM = machine.region("audiocpu")->base();
+	UINT8 *SNDROM = machine.root_device().memregion("audiocpu")->base();
 
-	memory_set_bankptr(machine, "bank1", &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
+	machine.root_device().membank("bank1")->set_base(&SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
 
-static READ8_HANDLER( csplayh5_sound_r )
+READ8_MEMBER(csplayh5_state::csplayh5_sound_r)
 {
-	return soundlatch_r(space, 0);
+	return soundlatch_byte_r(space, 0);
 }
 
-static WRITE8_HANDLER( csplayh5_soundclr_w )
+WRITE8_MEMBER(csplayh5_state::csplayh5_soundclr_w)
 {
-	soundlatch_clear_w(space, 0, 0);
+	soundlatch_clear_byte_w(space, 0, 0);
 }
 
-static READ8_HANDLER( tmpz84c011_pio_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_pio_r)
 {
 	int portdata;
 
@@ -179,7 +206,7 @@ static READ8_HANDLER( tmpz84c011_pio_r )
 			break;
 
 		default:
-			logerror("%s: TMPZ84C011_PIO Unknown Port Read %02X\n", space->machine().describe_context(), offset);
+			logerror("%s: TMPZ84C011_PIO Unknown Port Read %02X\n", machine().describe_context(), offset);
 			portdata = 0xff;
 			break;
 	}
@@ -187,18 +214,18 @@ static READ8_HANDLER( tmpz84c011_pio_r )
 	return portdata;
 }
 
-static WRITE8_HANDLER( tmpz84c011_pio_w)
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_pio_w)
 {
 	switch (offset)
 	{
 		case 0:			/* PA_0 */
-			csplayh5_soundbank_w(space->machine(), data & 0x03);
+			csplayh5_soundbank_w(machine(), data & 0x03);
 			break;
 		case 1:			/* PB_0 */
-			DAC_WRITE(space->machine().device("dac2"), 0, data);
+			DAC_WRITE(machine().device("dac2"), 0, data);
 			break;
 		case 2:			/* PC_0 */
-			DAC_WRITE(space->machine().device("dac1"), 0, data);
+			DAC_WRITE(machine().device("dac1"), 0, data);
 			break;
 		case 3:			/* PD_0 */
 			break;
@@ -207,150 +234,130 @@ static WRITE8_HANDLER( tmpz84c011_pio_w)
 			break;
 
 		default:
-			logerror("%s: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", space->machine().describe_context(), offset, data);
+			logerror("%s: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", machine().describe_context(), offset, data);
 			break;
 	}
 }
 
 
 /* CPU interface */
-static READ8_HANDLER( tmpz84c011_0_pa_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_pa_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return (tmpz84c011_pio_r(space,0) & ~state->m_pio_dir[0]) | (state->m_pio_latch[0] & state->m_pio_dir[0]);
+	return (tmpz84c011_pio_r(space,0) & ~m_pio_dir[0]) | (m_pio_latch[0] & m_pio_dir[0]);
 }
 
-static READ8_HANDLER( tmpz84c011_0_pb_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_pb_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return (tmpz84c011_pio_r(space,1) & ~state->m_pio_dir[1]) | (state->m_pio_latch[1] & state->m_pio_dir[1]);
+	return (tmpz84c011_pio_r(space,1) & ~m_pio_dir[1]) | (m_pio_latch[1] & m_pio_dir[1]);
 }
 
-static READ8_HANDLER( tmpz84c011_0_pc_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_pc_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return (tmpz84c011_pio_r(space,2) & ~state->m_pio_dir[2]) | (state->m_pio_latch[2] & state->m_pio_dir[2]);
+	return (tmpz84c011_pio_r(space,2) & ~m_pio_dir[2]) | (m_pio_latch[2] & m_pio_dir[2]);
 }
 
-static READ8_HANDLER( tmpz84c011_0_pd_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_pd_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return (tmpz84c011_pio_r(space,3) & ~state->m_pio_dir[3]) | (state->m_pio_latch[3] & state->m_pio_dir[3]);
+	return (tmpz84c011_pio_r(space,3) & ~m_pio_dir[3]) | (m_pio_latch[3] & m_pio_dir[3]);
 }
 
-static READ8_HANDLER( tmpz84c011_0_pe_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_pe_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return (tmpz84c011_pio_r(space,4) & ~state->m_pio_dir[4]) | (state->m_pio_latch[4] & state->m_pio_dir[4]);
+	return (tmpz84c011_pio_r(space,4) & ~m_pio_dir[4]) | (m_pio_latch[4] & m_pio_dir[4]);
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_pa_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_pa_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_latch[0] = data;
+	m_pio_latch[0] = data;
 	tmpz84c011_pio_w(space, 0, data);
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_pb_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_pb_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_latch[1] = data;
+	m_pio_latch[1] = data;
 	tmpz84c011_pio_w(space, 1, data);
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_pc_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_pc_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_latch[2] = data;
+	m_pio_latch[2] = data;
 	tmpz84c011_pio_w(space, 2, data);
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_pd_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_pd_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_latch[3] = data;
+	m_pio_latch[3] = data;
 	tmpz84c011_pio_w(space, 3, data);
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_pe_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_pe_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_latch[4] = data;
+	m_pio_latch[4] = data;
 	tmpz84c011_pio_w(space, 4, data);
 }
 
 
-static READ8_HANDLER( tmpz84c011_0_dir_pa_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pa_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return state->m_pio_dir[0];
+	return m_pio_dir[0];
 }
 
-static READ8_HANDLER( tmpz84c011_0_dir_pb_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pb_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return state->m_pio_dir[1];
+	return m_pio_dir[1];
 }
 
-static READ8_HANDLER( tmpz84c011_0_dir_pc_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pc_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return state->m_pio_dir[2];
+	return m_pio_dir[2];
 }
 
-static READ8_HANDLER( tmpz84c011_0_dir_pd_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pd_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return state->m_pio_dir[3];
+	return m_pio_dir[3];
 }
 
-static READ8_HANDLER( tmpz84c011_0_dir_pe_r )
+READ8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pe_r)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	return state->m_pio_dir[4];
+	return m_pio_dir[4];
 }
 
 
-static WRITE8_HANDLER( tmpz84c011_0_dir_pa_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pa_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_dir[0] = data;
+	m_pio_dir[0] = data;
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_dir_pb_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pb_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_dir[1] = data;
+	m_pio_dir[1] = data;
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_dir_pc_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pc_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_dir[2] = data;
+	m_pio_dir[2] = data;
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_dir_pd_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pd_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_dir[3] = data;
+	m_pio_dir[3] = data;
 }
 
-static WRITE8_HANDLER( tmpz84c011_0_dir_pe_w )
+WRITE8_MEMBER(csplayh5_state::tmpz84c011_0_dir_pe_w)
 {
-	csplayh5_state *state = space->machine().driver_data<csplayh5_state>();
-	state->m_pio_dir[4] = data;
+	m_pio_dir[4] = data;
 }
 
 
-static ADDRESS_MAP_START( csplayh5_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( csplayh5_sound_map, AS_PROGRAM, 8, csplayh5_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( csplayh5_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( csplayh5_sound_io_map, AS_IO, 8, csplayh5_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_0_pa_r, tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_READWRITE(tmpz84c011_0_pb_r, tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_READWRITE(tmpz84c011_0_pc_r, tmpz84c011_0_pc_w)
@@ -361,7 +368,7 @@ static ADDRESS_MAP_START( csplayh5_sound_io_map, AS_IO, 8 )
 	AM_RANGE(0x56, 0x56) AM_READWRITE(tmpz84c011_0_dir_pc_r, tmpz84c011_0_dir_pc_w)
 	AM_RANGE(0x34, 0x34) AM_READWRITE(tmpz84c011_0_dir_pd_r, tmpz84c011_0_dir_pd_w)
 	AM_RANGE(0x44, 0x44) AM_READWRITE(tmpz84c011_0_dir_pe_r, tmpz84c011_0_dir_pe_w)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ymsnd", ym3812_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 ADDRESS_MAP_END
 
 
@@ -576,7 +583,7 @@ static MACHINE_RESET( csplayh5 )
 	for (i = 0; i < 5; i++)
 	{
 		state->m_pio_dir[i] = state->m_pio_latch[i] = 0;
-		tmpz84c011_pio_w(space, i, 0);
+		state->tmpz84c011_pio_w(*space, i, 0);
 	}
 }
 
@@ -662,30 +669,55 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
-void general_init(running_machine &machine, int patchaddress)
+void general_init(running_machine &machine, int patchaddress, int patchvalue)
 {
-	UINT16 *MAINROM = (UINT16 *)machine.region("maincpu")->base();
-	UINT8 *SNDROM = machine.region("audiocpu")->base();
+	UINT16 *MAINROM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
+	UINT8 *SNDROM = machine.root_device().memregion("audiocpu")->base();
 
 	// initialize sound rom bank
 	csplayh5_soundbank_w(machine, 0);
 
 	/* patch DVD comms check */
-	MAINROM[patchaddress] = 0x6018;
+	MAINROM[patchaddress] = patchvalue;
 
 	/* patch sound program */
 	SNDROM[0x0213] = 0x00;			// DI -> NOP
 
 }
 
-static DRIVER_INIT( junai )    { general_init(machine, 0x679c/2); }
-static DRIVER_INIT( mjmania )  { general_init(machine, 0x6b96/2); }
-static DRIVER_INIT( junai2 )   { general_init(machine, 0x6588/2); }
-static DRIVER_INIT( csplayh5 ) { general_init(machine, 0x4cb4/2); }
-static DRIVER_INIT( bikiniko ) { general_init(machine, 0x585c/2); }
-static DRIVER_INIT( thenanpa ) { general_init(machine, 0x69ec/2); }
-static DRIVER_INIT( csplayh7 ) { general_init(machine, 0x7a20/2); }
-static DRIVER_INIT( fuudol )   { general_init(machine, 0x9166/2); }
+static DRIVER_INIT( csplayh1 ) { general_init(machine, 0x6880/2,0x6020); }
+
+static DRIVER_INIT( junai )    { general_init(machine, 0x679c/2,0x6018); }
+static DRIVER_INIT( mjmania )  { general_init(machine, 0x6b96/2,0x6018); }
+static DRIVER_INIT( junai2 )   { general_init(machine, 0x6588/2,0x6018); }
+static DRIVER_INIT( csplayh5 ) { general_init(machine, 0x4cb4/2,0x6018); }
+static DRIVER_INIT( bikiniko ) { general_init(machine, 0x585c/2,0x6018); }
+static DRIVER_INIT( thenanpa ) { general_init(machine, 0x69ec/2,0x6018); }
+static DRIVER_INIT( csplayh7 ) { general_init(machine, 0x7a20/2,0x6018); }
+static DRIVER_INIT( fuudol )   { general_init(machine, 0x9166/2,0x6018); }
+
+/* TODO: correct rom labels*/
+ROM_START( csplayh1 )
+	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
+	ROM_LOAD16_BYTE( "3.bin", 0x000000, 0x020000, CRC(86ac0289) SHA1(7ae3047fc7ea22705cc5b04d0ec6c792c429e8ee) )
+	ROM_LOAD16_BYTE( "2.bin", 0x000001, 0x020000, CRC(1f056e64) SHA1(7c5fb318abcd87313ef739dec191af9bcf284f24) )
+
+	ROM_REGION( 0x20000, "subcpu", 0 ) // h8, dvd player
+	ROM_LOAD16_WORD_SWAP( "u2",   0x00000, 0x20000, NO_DUMP )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
+	ROM_LOAD( "1.bin", 0x000000, 0x020000, CRC(8296d67f) SHA1(20eb944a2bd27980e1aaf60ca544059e84129760) )
+
+	ROM_REGION( 0x400000, "blit_gfx", ROMREGION_ERASEFF ) // blitter based gfxs
+    ROM_LOAD16_BYTE( "4.bin", 0x000000, 0x080000, CRC(2e63ee15) SHA1(78fefbc277234458212cded997d393bd8b82cf76) )
+    ROM_LOAD16_BYTE( "8.bin", 0x000001, 0x080000, CRC(a8567f1b) SHA1(2a854ef8b1988ad097bbcbeddc4b275ad738e1e1) )
+
+	DISK_REGION( "dvd" )
+	DISK_IMAGE( "csplayh8", 0, SHA1(d6514882c2626e62c5079df9ac68ecb70fc33209) )
+
+	ROM_REGION( 0x1000, "gal", ROMREGION_ERASE00 )
+	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, NO_DUMP )
+ROM_END
 
 ROM_START( junai )
 	ROM_REGION( 0x40000, "maincpu", 0 ) // tmp68301 prg
@@ -859,6 +891,9 @@ ROM_START( fuudol )
 	ROM_LOAD( "gal16v8b.ic8", 0x000000, 0x0008c1, CRC(30719630) SHA1(a8c7b6d0304c38691775c5af6c32fbeeefd9f9fa) )
 ROM_END
 
+// 1995
+GAME( 1995, csplayh1,   0,   csplayh5,  csplayh5,  csplayh1,                ROT0, "Sphinx/AV Japan/Astro System Japan",   "Super CD Dai8dan Mahjong Hanafuda Cosplay Tengoku (Japan)", GAME_NOT_WORKING )
+
 // 1998
 // 01 : Mahjong Gal-pri - World Gal-con Grandprix : Nichibutsu/Just&Just
 // 02 : Sengoku Mahjong Kurenai Otome-tai : Nichibutsu/Just&Just
@@ -870,7 +905,7 @@ ROM_END
 
 // 1999
 /* 07 */ GAME( 1999, mjmania,   0,   csplayh5,  csplayh5,  mjmania,     	ROT0, "Sphinx/Just&Just", "Mahjong Mania - Kairakukan e Youkoso (Japan)", GAME_NOT_WORKING )
-// 08 : Renai Mahjong Idol Gakuen : Nichibutsu/eic
+///* 08 */ GAME( 1995, renaimj,   0,   csplayh5,  csplayh5,  renaimj,         ROT0, "Nichibutsu/eic",   "Renai Mahjong Idol Gakuen (Japan)", GAME_NOT_WORKING )
 /* 09 */ GAME( 1999, bikiniko,  0,   csplayh5,  csplayh5,  bikiniko,		ROT0, "Nichibutsu/eic",   "BiKiNikko - Okinawa de Ippai Shichaimashita (Japan)", GAME_NOT_WORKING )
 // 10 : Mahjong Hanafuda Cosplay Tengoku 6 - Junai hen : Nichibutsu/eic
 /* 11 */ GAME( 1999, thenanpa,  0,   csplayh5,  csplayh5,  thenanpa,        ROT0, "Nichibutsu/Love Factory/eic", "The Nanpa (Japan)", GAME_NOT_WORKING )

@@ -36,6 +36,7 @@
 
 PALETTE_INIT( firetrap )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 
@@ -143,54 +144,47 @@ VIDEO_START( firetrap )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( firetrap_fgvideoram_w )
+WRITE8_MEMBER(firetrap_state::firetrap_fgvideoram_w)
 {
-	firetrap_state *state = space->machine().driver_data<firetrap_state>();
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( firetrap_bg1videoram_w )
+WRITE8_MEMBER(firetrap_state::firetrap_bg1videoram_w)
 {
-	firetrap_state *state = space->machine().driver_data<firetrap_state>();
-	state->m_bg1videoram[offset] = data;
-	state->m_bg1_tilemap->mark_tile_dirty(offset & 0x6ff);
+	m_bg1videoram[offset] = data;
+	m_bg1_tilemap->mark_tile_dirty(offset & 0x6ff);
 }
 
-WRITE8_HANDLER( firetrap_bg2videoram_w )
+WRITE8_MEMBER(firetrap_state::firetrap_bg2videoram_w)
 {
-	firetrap_state *state = space->machine().driver_data<firetrap_state>();
-	state->m_bg2videoram[offset] = data;
-	state->m_bg2_tilemap->mark_tile_dirty(offset & 0x6ff);
+	m_bg2videoram[offset] = data;
+	m_bg2_tilemap->mark_tile_dirty(offset & 0x6ff);
 }
 
 
-WRITE8_HANDLER( firetrap_bg1_scrollx_w )
+WRITE8_MEMBER(firetrap_state::firetrap_bg1_scrollx_w)
 {
-	firetrap_state *state = space->machine().driver_data<firetrap_state>();
-	state->m_scroll1_x[offset] = data;
-	state->m_bg1_tilemap->set_scrollx(0, state->m_scroll1_x[0] | (state->m_scroll1_x[1] << 8));
+	m_scroll1_x[offset] = data;
+	m_bg1_tilemap->set_scrollx(0, m_scroll1_x[0] | (m_scroll1_x[1] << 8));
 }
 
-WRITE8_HANDLER( firetrap_bg1_scrolly_w )
+WRITE8_MEMBER(firetrap_state::firetrap_bg1_scrolly_w)
 {
-	firetrap_state *state = space->machine().driver_data<firetrap_state>();
-	state->m_scroll1_y[offset] = data;
-	state->m_bg1_tilemap->set_scrolly(0, -(state->m_scroll1_y[0] | (state->m_scroll1_y[1] << 8)));
+	m_scroll1_y[offset] = data;
+	m_bg1_tilemap->set_scrolly(0, -(m_scroll1_y[0] | (m_scroll1_y[1] << 8)));
 }
 
-WRITE8_HANDLER( firetrap_bg2_scrollx_w )
+WRITE8_MEMBER(firetrap_state::firetrap_bg2_scrollx_w)
 {
-	firetrap_state *state = space->machine().driver_data<firetrap_state>();
-	state->m_scroll2_x[offset] = data;
-	state->m_bg2_tilemap->set_scrollx(0, state->m_scroll2_x[0] | (state->m_scroll2_x[1] << 8));
+	m_scroll2_x[offset] = data;
+	m_bg2_tilemap->set_scrollx(0, m_scroll2_x[0] | (m_scroll2_x[1] << 8));
 }
 
-WRITE8_HANDLER( firetrap_bg2_scrolly_w )
+WRITE8_MEMBER(firetrap_state::firetrap_bg2_scrolly_w)
 {
-	firetrap_state *state = space->machine().driver_data<firetrap_state>();
-	state->m_scroll2_y[offset] = data;
-	state->m_bg2_tilemap->set_scrolly(0, -(state->m_scroll2_y[0] | (state->m_scroll2_y[1] << 8)));
+	m_scroll2_y[offset] = data;
+	m_bg2_tilemap->set_scrolly(0, -(m_scroll2_y[0] | (m_scroll2_y[1] << 8)));
 }
 
 
@@ -205,7 +199,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	firetrap_state *state = machine.driver_data<firetrap_state>();
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int sx, sy, flipx, flipy, code, color;
 
@@ -218,7 +212,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		color = ((state->m_spriteram[offs + 1] & 0x08) >> 2) | (state->m_spriteram[offs + 1] & 0x01);
 		flipx = state->m_spriteram[offs + 1] & 0x04;
 		flipy = state->m_spriteram[offs + 1] & 0x02;
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -228,7 +222,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 		if (state->m_spriteram[offs + 1] & 0x10)	/* double width */
 		{
-			if (flip_screen_get(machine)) sy -= 16;
+			if (state->flip_screen()) sy -= 16;
 
 			drawgfx_transpen(bitmap,cliprect,machine.gfx[3],
 					code & ~1,

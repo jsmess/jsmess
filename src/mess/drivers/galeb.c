@@ -22,19 +22,19 @@ GFXDECODE_END
 
 static WRITE8_DEVICE_HANDLER( galeb_dac_data_w ) { dac_data_w(device, data); }
 
-static READ8_HANDLER( galeb_keyboard_r )
+READ8_MEMBER(galeb_state::galeb_keyboard_r)
 {
 	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
-	return input_port_read(space->machine(), keynames[offset]);
+	return ioport(keynames[offset])->read();
 }
 
 /* Address maps */
-static ADDRESS_MAP_START(galeb_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(galeb_mem, AS_PROGRAM, 8, galeb_state )
     AM_RANGE( 0x0000, 0x1fff ) AM_RAM  // RAM
-    AM_RANGE( 0xbfe0, 0xbfe7 ) AM_READ ( galeb_keyboard_r )
-    AM_RANGE( 0xbfe0, 0xbfe0 ) AM_DEVWRITE("dac", galeb_dac_data_w )
-    AM_RANGE( 0xb000, 0xb3ff ) AM_RAM  AM_BASE_MEMBER(galeb_state, m_video_ram) // video ram
+    AM_RANGE( 0xbfe0, 0xbfe7 ) AM_READ(galeb_keyboard_r )
+    AM_RANGE( 0xbfe0, 0xbfe0 ) AM_DEVWRITE_LEGACY("dac", galeb_dac_data_w )
+    AM_RANGE( 0xb000, 0xb3ff ) AM_RAM  AM_SHARE("video_ram") // video ram
     AM_RANGE( 0xc000, 0xc7ff ) AM_ROM  // BASIC 01 ROM
     AM_RANGE( 0xc800, 0xcfff ) AM_ROM  // BASIC 02 ROM
     AM_RANGE( 0xd000, 0xd7ff ) AM_ROM  // BASIC 03 ROM

@@ -60,46 +60,52 @@ class dmndrby_state : public driver_device
 {
 public:
 	dmndrby_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_scroll_ram(*this, "scroll_ram"),
+		m_sprite_ram(*this, "sprite_ram"),
+		m_dderby_vidchars(*this, "vidchars"),
+		m_dderby_vidattribs(*this, "vidattribs"){ }
 
-	UINT8* m_dderby_vidchars;
-	UINT8* m_scroll_ram;
-	UINT8* m_dderby_vidattribs;
-	UINT8* m_sprite_ram;
+	required_shared_ptr<UINT8> m_scroll_ram;
+	required_shared_ptr<UINT8> m_sprite_ram;
+	required_shared_ptr<UINT8> m_dderby_vidchars;
+	required_shared_ptr<UINT8> m_dderby_vidattribs;
 	UINT8 *m_racetrack_tilemap_rom;
 	tilemap_t *m_racetrack_tilemap;
 	UINT8 m_io_port[8];
 	int m_bg;
+	DECLARE_WRITE8_MEMBER(dderby_sound_w);
+	DECLARE_READ8_MEMBER(input_r);
+	DECLARE_WRITE8_MEMBER(output_w);
 };
 
 
-static WRITE8_HANDLER( dderby_sound_w )
+WRITE8_MEMBER(dmndrby_state::dderby_sound_w)
 {
-	soundlatch_w(space,0,data);
-	cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+	soundlatch_byte_w(space,0,data);
+	cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 }
 
 
-static READ8_HANDLER( input_r )
+READ8_MEMBER(dmndrby_state::input_r)
 {
 	switch(offset & 7)
 	{
-		case 0: return input_port_read(space->machine(), "IN0");
-		case 1: return input_port_read(space->machine(), "IN1");
-		case 2: return input_port_read(space->machine(), "IN2");
-		case 3: return input_port_read(space->machine(), "IN3");
-		case 4: return input_port_read(space->machine(), "IN4");
-		case 5: return input_port_read(space->machine(), "IN5");
-		case 6: return input_port_read(space->machine(), "IN6");
-		case 7: return input_port_read(space->machine(), "IN7");
+		case 0: return ioport("IN0")->read();
+		case 1: return ioport("IN1")->read();
+		case 2: return ioport("IN2")->read();
+		case 3: return ioport("IN3")->read();
+		case 4: return ioport("IN4")->read();
+		case 5: return ioport("IN5")->read();
+		case 6: return ioport("IN6")->read();
+		case 7: return ioport("IN7")->read();
 	}
 
 	return 0xff;
 }
 
-static WRITE8_HANDLER( output_w )
+WRITE8_MEMBER(dmndrby_state::output_w)
 {
-	dmndrby_state *state = space->machine().driver_data<dmndrby_state>();
 	/*
     ---- x--- refill meter [4]
     ---- x--- token out meter [5]
@@ -111,11 +117,11 @@ static WRITE8_HANDLER( output_w )
     ---- --x- coin lockout [0-3]
     ---- ---x lamp [0-6]
     */
-	state->m_io_port[offset] = data;
-//  popmessage("%02x|%02x|%02x|%02x|%02x|%02x|%02x|%02x|",state->m_io_port[0],state->m_io_port[1],state->m_io_port[2],state->m_io_port[3],state->m_io_port[4],state->m_io_port[5],state->m_io_port[6],state->m_io_port[7]);
+	m_io_port[offset] = data;
+//  popmessage("%02x|%02x|%02x|%02x|%02x|%02x|%02x|%02x|",m_io_port[0],m_io_port[1],m_io_port[2],m_io_port[3],m_io_port[4],m_io_port[5],m_io_port[6],m_io_port[7]);
 }
 
-static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, dmndrby_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc007) AM_READ(input_r)
@@ -126,18 +132,18 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8 )
 	AM_RANGE(0xca01, 0xca01) AM_WRITENOP //watchdog
 	AM_RANGE(0xca02, 0xca02) AM_RAM_WRITE(dderby_sound_w)
 	AM_RANGE(0xca03, 0xca03) AM_WRITENOP//(timer_irq_w) //???
-	AM_RANGE(0xcc00, 0xcc05) AM_RAM AM_BASE_MEMBER(dmndrby_state, m_scroll_ram)
-	AM_RANGE(0xce08, 0xce1f) AM_RAM AM_BASE_MEMBER(dmndrby_state, m_sprite_ram) // horse sprites
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_BASE_MEMBER(dmndrby_state, m_dderby_vidchars) // char ram
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_BASE_MEMBER(dmndrby_state, m_dderby_vidattribs) // colours/ attrib ram
+	AM_RANGE(0xcc00, 0xcc05) AM_RAM AM_SHARE("scroll_ram")
+	AM_RANGE(0xce08, 0xce1f) AM_RAM AM_SHARE("sprite_ram") // horse sprites
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM AM_SHARE("vidchars") // char ram
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM AM_SHARE("vidattribs") // colours/ attrib ram
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dderby_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dderby_sound_map, AS_PROGRAM, 8, dmndrby_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x1000) AM_RAM //???
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)
-	AM_RANGE(0x4001, 0x4001) AM_DEVREAD("ay1", ay8910_r)
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x4001, 0x4001) AM_DEVREAD_LEGACY("ay1", ay8910_r)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -203,14 +209,14 @@ static INPUT_PORTS_START( dderby )
 	PORT_DIPSETTING(    0x04, "480p (cash + tokens)" )
 	PORT_DIPSETTING(    0x00, "600p (cash + tokens)" )
 	PORT_DIPNAME( 0x30, 0x00, "Percentage Payout" )
-	PORT_DIPSETTING(    0x00, "76%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_LESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x10, "80%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_LESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x20, "86%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_LESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x30, "88%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_LESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x00, "78%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_NOTLESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x10, "82%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_NOTLESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x20, "86%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_NOTLESSTHAN, 0x80)
-	PORT_DIPSETTING(    0x30, "90%" )	PORT_CONDITION("DSW1", 0xc0, PORTCOND_NOTLESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x00, "76%" )	PORT_CONDITION("DSW1", 0xc0, LESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x10, "80%" )	PORT_CONDITION("DSW1", 0xc0, LESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x20, "86%" )	PORT_CONDITION("DSW1", 0xc0, LESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x30, "88%" )	PORT_CONDITION("DSW1", 0xc0, LESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x00, "78%" )	PORT_CONDITION("DSW1", 0xc0, NOTLESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x10, "82%" )	PORT_CONDITION("DSW1", 0xc0, NOTLESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x20, "86%" )	PORT_CONDITION("DSW1", 0xc0, NOTLESSTHAN, 0x80)
+	PORT_DIPSETTING(    0x30, "90%" )	PORT_CONDITION("DSW1", 0xc0, NOTLESSTHAN, 0x80)
 	PORT_DIPNAME( 0xc0, 0x80, "Price Per Game" )
 	PORT_DIPSETTING(    0x00, "2p" )
 	PORT_DIPSETTING(    0x40, "5p" )
@@ -332,7 +338,7 @@ static TILE_GET_INFO( get_dmndrby_tile_info )
 static VIDEO_START(dderby)
 {
 	dmndrby_state *state = machine.driver_data<dmndrby_state>();
-	state->m_racetrack_tilemap_rom = machine.region("user1")->base();
+	state->m_racetrack_tilemap_rom = state->memregion("user1")->base();
 	state->m_racetrack_tilemap = tilemap_create(machine,get_dmndrby_tile_info,tilemap_scan_rows,16,16, 16, 512);
 	state->m_racetrack_tilemap->mark_all_dirty();
 
@@ -438,6 +444,7 @@ wouldnt like to say its the most effective way though...
 // copied from elsewhere. surely incorrect
 static PALETTE_INIT( dmnderby )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -479,7 +486,7 @@ static PALETTE_INIT( dmnderby )
 	}
 
 	/* color_prom now points to the beginning of the lookup table */
-	color_prom = machine.region("proms2")->base();
+	color_prom = machine.root_device().memregion("proms2")->base();
 
 	/* normal tiles use colors 0-15 */
 	for (i = 0x000; i < 0x300; i++)

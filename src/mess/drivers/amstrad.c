@@ -164,7 +164,7 @@ static DRIVER_INIT( aleste )
 /* Memory is banked in 16k blocks. However, the multiface
 pages the memory in 8k blocks! The ROM can
 be paged into bank 0 and bank 3. */
-static ADDRESS_MAP_START(amstrad_mem, AS_PROGRAM, 8)
+static ADDRESS_MAP_START(amstrad_mem, AS_PROGRAM, 8, amstrad_state )
 	AM_RANGE(0x00000, 0x01fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank9")
 	AM_RANGE(0x02000, 0x03fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank10")
 	AM_RANGE(0x04000, 0x05fff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank11")
@@ -178,8 +178,8 @@ ADDRESS_MAP_END
 /* I've handled the I/O ports in this way, because the ports
 are not fully decoded by the CPC h/w. Doing it this way means
 I can decode it myself and a lot of  software should work */
-static ADDRESS_MAP_START(amstrad_io, AS_IO, 8)
-	AM_RANGE(0x0000, 0xffff) AM_READWRITE( amstrad_cpc_io_r, amstrad_cpc_io_w )
+static ADDRESS_MAP_START(amstrad_io, AS_IO, 8, amstrad_state )
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(amstrad_cpc_io_r, amstrad_cpc_io_w )
 ADDRESS_MAP_END
 
 
@@ -317,9 +317,8 @@ INPUT_PORTS_END
 static INPUT_CHANGED( cpc_monitor_changed )
 {
 	running_machine &machine = field.machine();
-	const UINT8	*color_prom = NULL;
 
-	if ( (input_port_read(machine, "green_display")) & 0x01 )
+	if ( (machine.root_device().ioport("green_display")->read()) & 0x01 )
 	{
 		PALETTE_INIT_CALL( amstrad_cpc_green );
 	}
@@ -774,8 +773,8 @@ static const ay8910_interface ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, amstrad_psg_porta_read),	/* portA read */
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, amstrad_psg_porta_read),	/* portB read */
+	DEVCB_DRIVER_MEMBER(amstrad_state, amstrad_psg_porta_read),	/* portA read */
+	DEVCB_DRIVER_MEMBER(amstrad_state, amstrad_psg_porta_read),	/* portB read */
 	DEVCB_NULL,					/* portA write */
 	DEVCB_NULL					/* portB write */
 };

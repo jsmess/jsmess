@@ -128,7 +128,7 @@ READ8_MEMBER( pc1640_state::iga_r )
         */
 
 		// switch sense
-		data |= BIT(input_port_read(machine(), "SW"), ((m_egc_ctrl >> 2) & 0x03) ^ 0x03);
+		data |= BIT(ioport("SW")->read(), ((m_egc_ctrl >> 2) & 0x03) ^ 0x03);
 		break;
 
 	case 0x15: // Sequencer Data Register

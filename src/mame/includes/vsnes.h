@@ -2,10 +2,12 @@ class vsnes_state : public driver_device
 {
 public:
 	vsnes_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_work_ram(*this, "work_ram"),
+		m_work_ram_1(*this, "work_ram_1"){ }
 
-	UINT8 *m_work_ram;
-	UINT8 *m_work_ram_1;
+	required_shared_ptr<UINT8> m_work_ram;
+	optional_shared_ptr<UINT8> m_work_ram_1;
 	int m_coin;
 	int m_do_vrom_bank;
 	int m_input_latch[4];
@@ -35,6 +37,40 @@ public:
 	int m_supxevs_prot_index;
 	int m_security_counter;
 	int m_ret;
+	DECLARE_WRITE8_MEMBER(sprite_dma_0_w);
+	DECLARE_WRITE8_MEMBER(sprite_dma_1_w);
+	DECLARE_WRITE8_MEMBER(vsnes_coin_counter_w);
+	DECLARE_READ8_MEMBER(vsnes_coin_counter_r);
+	DECLARE_WRITE8_MEMBER(vsnes_coin_counter_1_w);
+	DECLARE_WRITE8_MEMBER(vsnes_in0_w);
+	DECLARE_READ8_MEMBER(vsnes_in0_r);
+	DECLARE_READ8_MEMBER(vsnes_in1_r);
+	DECLARE_WRITE8_MEMBER(vsnes_in0_1_w);
+	DECLARE_READ8_MEMBER(vsnes_in0_1_r);
+	DECLARE_READ8_MEMBER(vsnes_in1_1_r);
+	DECLARE_READ8_MEMBER(gun_in0_r);
+	DECLARE_WRITE8_MEMBER(vsnes_nt0_w);
+	DECLARE_WRITE8_MEMBER(vsnes_nt1_w);
+	DECLARE_READ8_MEMBER(vsnes_nt0_r);
+	DECLARE_READ8_MEMBER(vsnes_nt1_r);
+	DECLARE_WRITE8_MEMBER(vsnormal_vrom_banking);
+	DECLARE_WRITE8_MEMBER(gun_in0_w);
+	DECLARE_WRITE8_MEMBER(vskonami_rom_banking);
+	DECLARE_WRITE8_MEMBER(vsgshoe_gun_in0_w);
+	DECLARE_WRITE8_MEMBER(drmario_rom_banking);
+	DECLARE_WRITE8_MEMBER(vsvram_rom_banking);
+	DECLARE_WRITE8_MEMBER(mapper4_w);
+	DECLARE_READ8_MEMBER(rbi_hack_r);
+	DECLARE_READ8_MEMBER(supxevs_read_prot_1_r);
+	DECLARE_READ8_MEMBER(supxevs_read_prot_2_r);
+	DECLARE_READ8_MEMBER(supxevs_read_prot_3_r);
+	DECLARE_READ8_MEMBER(supxevs_read_prot_4_r);
+	DECLARE_READ8_MEMBER(tko_security_r);
+	DECLARE_WRITE8_MEMBER(mapper68_rom_banking);
+	DECLARE_WRITE8_MEMBER(set_bnglngby_irq_w);
+	DECLARE_READ8_MEMBER(set_bnglngby_irq_r);
+	DECLARE_WRITE8_MEMBER(vsdual_vrom_banking);
+	void v_set_mirroring(int ppu, int mirroring);
 };
 
 
@@ -73,9 +109,3 @@ DRIVER_INIT( vsgshoe );
 DRIVER_INIT( vsfdf );
 DRIVER_INIT( vsdual );
 
-READ8_HANDLER( vsnes_in0_r );
-READ8_HANDLER( vsnes_in1_r );
-READ8_HANDLER( vsnes_in0_1_r );
-READ8_HANDLER( vsnes_in1_1_r );
-WRITE8_HANDLER( vsnes_in0_w );
-WRITE8_HANDLER( vsnes_in0_1_w );

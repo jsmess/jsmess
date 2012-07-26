@@ -12,7 +12,6 @@
 #ifndef __COMX_FD__
 #define __COMX_FD__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "formats/basicdsk.h"

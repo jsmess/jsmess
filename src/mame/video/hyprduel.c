@@ -61,11 +61,10 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
                             Palette GGGGGRRRRRBBBBBx
 ***************************************************************************/
 
-WRITE16_HANDLER( hyprduel_paletteram_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_paletteram_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	data = COMBINE_DATA(&state->m_paletteram[offset]);
-	palette_set_color_rgb(space->machine(), offset, pal5bit(data >> 6), pal5bit(data >> 11), pal5bit(data >> 1));
+	data = COMBINE_DATA(&m_paletteram[offset]);
+	palette_set_color_rgb(machine(), offset, pal5bit(data >> 6), pal5bit(data >> 11), pal5bit(data >> 1));
 }
 
 
@@ -275,35 +274,31 @@ static TILE_GET_INFO( get_tile_info_2_8bit )
 	get_tile_info_8bit(machine, tileinfo, tile_index, 2, state->m_vram_2);
 }
 
-WRITE16_HANDLER( hyprduel_vram_0_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_vram_0_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	hyprduel_vram_w(space->machine(), offset, data, mem_mask, 0, state->m_vram_0);
+	hyprduel_vram_w(machine(), offset, data, mem_mask, 0, m_vram_0);
 }
 
-WRITE16_HANDLER( hyprduel_vram_1_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_vram_1_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	hyprduel_vram_w(space->machine(), offset, data, mem_mask, 1, state->m_vram_1);
+	hyprduel_vram_w(machine(), offset, data, mem_mask, 1, m_vram_1);
 }
 
-WRITE16_HANDLER( hyprduel_vram_2_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_vram_2_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	hyprduel_vram_w(space->machine(), offset, data, mem_mask, 2, state->m_vram_2);
+	hyprduel_vram_w(machine(), offset, data, mem_mask, 2, m_vram_2);
 }
 
 
 /* Dirty the relevant tilemap when its window changes */
-WRITE16_HANDLER( hyprduel_window_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_window_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	UINT16 olddata = state->m_window[offset];
-	UINT16 newdata = COMBINE_DATA(&state->m_window[offset]);
+	UINT16 olddata = m_window[offset];
+	UINT16 newdata = COMBINE_DATA(&m_window[offset]);
 	if (newdata != olddata)
 	{
 		offset /= 2;
-		state->m_bg_tilemap[offset]->mark_all_dirty();
+		m_bg_tilemap[offset]->mark_all_dirty();
 	}
 }
 
@@ -353,8 +348,8 @@ static void hyprduel_postload(running_machine &machine)
 
 static void expand_gfx1(hyprduel_state &state)
 {
-	UINT8 *base_gfx = state.machine().region("gfx1")->base();
-	UINT32 length = 2 * state.machine().region("gfx1")->bytes();
+	UINT8 *base_gfx = state.machine().root_device().memregion("gfx1")->base();
+	UINT32 length = 2 * state.machine().root_device().memregion("gfx1")->bytes();
 	state.m_expanded_gfx1 = auto_alloc_array(state.machine(), UINT8, length);
 	for (int i = 0; i < length; i += 2)
 	{
@@ -369,11 +364,11 @@ static VIDEO_START( common_14220 )
 	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 	expand_gfx1(*state);
 	alloc_empty_tiles(machine);
-	state->m_tiletable_old = auto_alloc_array(machine, UINT16, state->m_tiletable_size / 2);
-	state->m_dirtyindex = auto_alloc_array(machine, UINT8, state->m_tiletable_size / 4);
+	state->m_tiletable_old = auto_alloc_array(machine, UINT16, state->m_tiletable.bytes() / 2);
+	state->m_dirtyindex = auto_alloc_array(machine, UINT8, state->m_tiletable.bytes() / 4);
 
-	state->save_pointer(NAME(state->m_tiletable_old), state->m_tiletable_size / 2);
-	state->save_pointer(NAME(state->m_dirtyindex), state->m_tiletable_size / 4);
+	state->save_pointer(NAME(state->m_tiletable_old), state->m_tiletable.bytes() / 2);
+	state->save_pointer(NAME(state->m_dirtyindex), state->m_tiletable.bytes() / 4);
 
 	state->m_bg_tilemap[0] = tilemap_create(machine, get_tile_info_0_8bit, tilemap_scan_rows, 8, 8, WIN_NX, WIN_NY);
 	state->m_bg_tilemap[1] = tilemap_create(machine, get_tile_info_1_8bit, tilemap_scan_rows, 8, 8, WIN_NX, WIN_NY);
@@ -477,13 +472,13 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 {
 	hyprduel_state *state = machine.driver_data<hyprduel_state>();
 	UINT8 *base_gfx4 = state->m_expanded_gfx1;
-	UINT8 *base_gfx8 = machine.region("gfx1")->base();
-	UINT32 gfx_size = machine.region("gfx1")->bytes();
+	UINT8 *base_gfx8 = state->memregion("gfx1")->base();
+	UINT32 gfx_size = state->memregion("gfx1")->bytes();
 
 	int max_x = machine.primary_screen->width();
 	int max_y = machine.primary_screen->height();
 
-	int max_sprites = state->m_spriteram_size / 8;
+	int max_sprites = state->m_spriteram.bytes() / 8;
 	int sprites = state->m_videoregs[0x00 / 2] % max_sprites;
 
 	int color_start = ((state->m_videoregs[0x08 / 2] & 0xf) << 4) + 0x100;
@@ -562,7 +557,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 			UINT32 gfxstart = (8 * 8 * 4 / 8) * (((attr & 0x000f) << 16) + code);
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				flipx = !flipx;		x = max_x - x - width;
 				flipy = !flipy;		y = max_y - y - height;
@@ -616,34 +611,32 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
                                 Screen Drawing
 ***************************************************************************/
 
-WRITE16_HANDLER( hyprduel_scrollreg_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_scrollreg_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
-	UINT16 window = state->m_window[offset];
+	UINT16 window = m_window[offset];
 
-	COMBINE_DATA(&state->m_scroll[offset]);
+	COMBINE_DATA(&m_scroll[offset]);
 
 	if (offset & 0x01)
-		state->m_bg_tilemap[offset / 2]->set_scrollx(0, state->m_scroll[offset] - window - (window & 7));
+		m_bg_tilemap[offset / 2]->set_scrollx(0, m_scroll[offset] - window - (window & 7));
 	else
-		state->m_bg_tilemap[offset / 2]->set_scrolly(0, state->m_scroll[offset] - window - (window & 7));
+		m_bg_tilemap[offset / 2]->set_scrolly(0, m_scroll[offset] - window - (window & 7));
 }
 
-WRITE16_HANDLER( hyprduel_scrollreg_init_w )
+WRITE16_MEMBER(hyprduel_state::hyprduel_scrollreg_init_w)
 {
-	hyprduel_state *state = space->machine().driver_data<hyprduel_state>();
 	int i;
 
 	for (i = 0; i < 3; i++)
 	{
-		UINT16 wx = state->m_window[i * 2 + 1];
-		UINT16 wy = state->m_window[i * 2 + 0];
+		UINT16 wx = m_window[i * 2 + 1];
+		UINT16 wy = m_window[i * 2 + 0];
 
-		state->m_scroll[i * 2 + 1] = data;
-		state->m_scroll[i * 2 + 0] = data;
+		m_scroll[i * 2 + 1] = data;
+		m_scroll[i * 2 + 0] = data;
 
-		state->m_bg_tilemap[i]->set_scrollx(0, data - wx - (wx & 7));
-		state->m_bg_tilemap[i]->set_scrolly(0, data - wy - (wy & 7));
+		m_bg_tilemap[i]->set_scrollx(0, data - wx - (wx & 7));
+		m_bg_tilemap[i]->set_scrolly(0, data - wy - (wy & 7));
 	}
 }
 
@@ -694,8 +687,8 @@ SCREEN_UPDATE_IND16( hyprduel )
 	{
 		int dirty = 0;
 
-		memset(state->m_dirtyindex, 0, state->m_tiletable_size / 4);
-		for (i = 0; i < state->m_tiletable_size / 4; i++)
+		memset(state->m_dirtyindex, 0, state->m_tiletable.bytes() / 4);
+		for (i = 0; i < state->m_tiletable.bytes() / 4; i++)
 		{
 			UINT32 tile_new = (state->m_tiletable[2 * i + 0] << 16 ) + state->m_tiletable[2 * i + 1];
 			UINT32 tile_old = (state->m_tiletable_old[2 * i + 0] << 16 ) + state->m_tiletable_old[2 * i + 1];
@@ -706,7 +699,7 @@ SCREEN_UPDATE_IND16( hyprduel )
 				dirty = 1;
 			}
 		}
-		memcpy(state->m_tiletable_old, state->m_tiletable, state->m_tiletable_size);
+		memcpy(state->m_tiletable_old, state->m_tiletable, state->m_tiletable.bytes());
 
 		if (dirty)
 		{
@@ -736,7 +729,7 @@ SCREEN_UPDATE_IND16( hyprduel )
         ---- ---- ---- ---0     Flip  Screen    */
 	if (screenctrl & 2)
 		return 0;
-	flip_screen_set(screen.machine(), screenctrl & 1);
+	state->flip_screen_set(screenctrl & 1);
 
 #if 0
 if (screen.machine().input().code_pressed(KEYCODE_Z))

@@ -92,13 +92,12 @@ Notes:
 #include "includes/jailbrek.h"
 
 
-static WRITE8_HANDLER( ctrl_w )
+WRITE8_MEMBER(jailbrek_state::ctrl_w)
 {
-	jailbrek_state *state = space->machine().driver_data<jailbrek_state>();
 
-	state->m_nmi_enable = data & 0x01;
-	state->m_irq_enable = data & 0x02;
-	flip_screen_set(space->machine(), data & 0x08);
+	m_nmi_enable = data & 0x01;
+	m_irq_enable = data & 0x02;
+	flip_screen_set(data & 0x08);
 }
 
 static INTERRUPT_GEN( jb_interrupt )
@@ -130,28 +129,28 @@ static WRITE8_DEVICE_HANDLER( jailbrek_speech_w )
 	vlm5030_rst(device, (data >> 2) & 1);
 }
 
-static ADDRESS_MAP_START( jailbrek_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(jailbrek_colorram_w) AM_BASE_MEMBER(jailbrek_state, m_colorram)
-	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(jailbrek_videoram_w) AM_BASE_MEMBER(jailbrek_state, m_videoram)
-	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(jailbrek_state, m_spriteram, m_spriteram_size)
+static ADDRESS_MAP_START( jailbrek_map, AS_PROGRAM, 8, jailbrek_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(jailbrek_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x0800, 0x0fff) AM_RAM_WRITE(jailbrek_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x10c0, 0x14ff) AM_RAM /* ??? */
 	AM_RANGE(0x1500, 0x1fff) AM_RAM /* work ram */
-	AM_RANGE(0x2000, 0x203f) AM_RAM AM_BASE_MEMBER(jailbrek_state, m_scroll_x)
+	AM_RANGE(0x2000, 0x203f) AM_RAM AM_SHARE("scroll_x")
 	AM_RANGE(0x2040, 0x2040) AM_WRITENOP /* ??? */
 	AM_RANGE(0x2041, 0x2041) AM_WRITENOP /* ??? */
-	AM_RANGE(0x2042, 0x2042) AM_RAM AM_BASE_MEMBER(jailbrek_state, m_scroll_dir) /* bit 2 = scroll direction */
+	AM_RANGE(0x2042, 0x2042) AM_RAM AM_SHARE("scroll_dir") /* bit 2 = scroll direction */
 	AM_RANGE(0x2043, 0x2043) AM_WRITENOP /* ??? */
 	AM_RANGE(0x2044, 0x2044) AM_WRITE(ctrl_w) /* irq, nmi enable, screen flip */
 	AM_RANGE(0x3000, 0x307f) AM_RAM /* related to sprites? */
-	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW2") AM_DEVWRITE("snsnd", sn76496_w)
+	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW2") AM_DEVWRITE_LEGACY("snsnd", sn76496_w)
 	AM_RANGE(0x3200, 0x3200) AM_READ_PORT("DSW3") AM_WRITENOP /* mirror of the previous? */
 	AM_RANGE(0x3300, 0x3300) AM_READ_PORT("SYSTEM") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3301, 0x3301) AM_READ_PORT("P1")
 	AM_RANGE(0x3302, 0x3302) AM_READ_PORT("P2")
 	AM_RANGE(0x3303, 0x3303) AM_READ_PORT("DSW1")
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("vlm", jailbrek_speech_w) /* speech pins */
-	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE("vlm", vlm5030_data_w) /* speech data */
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("vlm", jailbrek_speech_r)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("vlm", jailbrek_speech_w) /* speech pins */
+	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w) /* speech data */
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD_LEGACY("vlm", jailbrek_speech_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -405,7 +404,7 @@ ROM_END
 
 static DRIVER_INIT( jailbrek )
 {
-	UINT8 *SPEECH_ROM = machine.region("vlm")->base();
+	UINT8 *SPEECH_ROM = machine.root_device().memregion("vlm")->base();
 	int ind;
 
     /*
@@ -417,7 +416,7 @@ static DRIVER_INIT( jailbrek )
        represents address line A13.)
     */
 
-    if (machine.region("vlm")->bytes() == 0x4000)
+    if (machine.root_device().memregion("vlm")->bytes() == 0x4000)
     {
         for (ind = 0; ind < 0x2000; ++ind)
         {

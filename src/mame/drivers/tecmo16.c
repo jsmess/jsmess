@@ -32,28 +32,28 @@ Notes:
 
 /******************************************************************************/
 
-static WRITE16_HANDLER( tecmo16_sound_command_w )
+WRITE16_MEMBER(tecmo16_state::tecmo16_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, 0x00, data & 0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_byte_w(space, 0x00, data & 0xff);
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( fstarfrc_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( fstarfrc_map, AS_PROGRAM, 16, tecmo16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* Main RAM */
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(tecmo16_charram_w) AM_BASE_MEMBER(tecmo16_state, m_charram)
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(tecmo16_videoram_w) AM_BASE_MEMBER(tecmo16_state, m_videoram)
-	AM_RANGE(0x120800, 0x120fff) AM_RAM_WRITE(tecmo16_colorram_w) AM_BASE_MEMBER(tecmo16_state, m_colorram)
-	AM_RANGE(0x121000, 0x1217ff) AM_RAM_WRITE(tecmo16_videoram2_w) AM_BASE_MEMBER(tecmo16_state, m_videoram2)
-	AM_RANGE(0x121800, 0x121fff) AM_RAM_WRITE(tecmo16_colorram2_w) AM_BASE_MEMBER(tecmo16_state, m_colorram2)
+	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(tecmo16_charram_w) AM_SHARE("charram")
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM_WRITE(tecmo16_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x120800, 0x120fff) AM_RAM_WRITE(tecmo16_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x121000, 0x1217ff) AM_RAM_WRITE(tecmo16_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x121800, 0x121fff) AM_RAM_WRITE(tecmo16_colorram2_w) AM_SHARE("colorram2")
 	AM_RANGE(0x122000, 0x127fff) AM_RAM	/* work area */
-	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE_SIZE_MEMBER(tecmo16_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x150000, 0x150001) AM_WRITE(tecmo16_flipscreen_w)
 	AM_RANGE(0x150010, 0x150011) AM_WRITE(tecmo16_sound_command_w)
 	AM_RANGE(0x150030, 0x150031) AM_READ_PORT("DSW2") AM_WRITENOP	/* ??? */
@@ -66,17 +66,17 @@ static ADDRESS_MAP_START( fstarfrc_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x16001e, 0x16001f) AM_WRITE(tecmo16_scroll2_y_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ginkun_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ginkun_map, AS_PROGRAM, 16, tecmo16_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM	/* Main RAM */
-	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(tecmo16_charram_w) AM_BASE_MEMBER(tecmo16_state, m_charram)
-	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(tecmo16_videoram_w) AM_BASE_MEMBER(tecmo16_state, m_videoram)
-	AM_RANGE(0x121000, 0x121fff) AM_RAM_WRITE(tecmo16_colorram_w) AM_BASE_MEMBER(tecmo16_state, m_colorram)
-	AM_RANGE(0x122000, 0x122fff) AM_RAM_WRITE(tecmo16_videoram2_w) AM_BASE_MEMBER(tecmo16_state, m_videoram2)
-	AM_RANGE(0x123000, 0x123fff) AM_RAM_WRITE(tecmo16_colorram2_w) AM_BASE_MEMBER(tecmo16_state, m_colorram2)
+	AM_RANGE(0x110000, 0x110fff) AM_RAM_WRITE(tecmo16_charram_w) AM_SHARE("charram")
+	AM_RANGE(0x120000, 0x120fff) AM_RAM_WRITE(tecmo16_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x121000, 0x121fff) AM_RAM_WRITE(tecmo16_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x122000, 0x122fff) AM_RAM_WRITE(tecmo16_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0x123000, 0x123fff) AM_RAM_WRITE(tecmo16_colorram2_w) AM_SHARE("colorram2")
 	AM_RANGE(0x124000, 0x124fff) AM_RAM	/* extra RAM for Riot */
-	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_BASE_SIZE_MEMBER(tecmo16_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x130000, 0x130fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x150000, 0x150001) AM_WRITE(tecmo16_flipscreen_w)
 	AM_RANGE(0x150010, 0x150011) AM_WRITE(tecmo16_sound_command_w)
 	AM_RANGE(0x150020, 0x150021) AM_READ_PORT("EXTRA") AM_WRITENOP	/* ??? */
@@ -91,12 +91,12 @@ static ADDRESS_MAP_START( ginkun_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x16001e, 0x16001f) AM_WRITE(tecmo16_scroll2_y_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tecmo16_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xfbff) AM_RAM	/* Sound RAM */
-	AM_RANGE(0xfc00, 0xfc00) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xfc04, 0xfc05) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0xfc08, 0xfc08) AM_READ(soundlatch_r)
+	AM_RANGE(0xfc00, 0xfc00) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xfc04, 0xfc05) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xfc08, 0xfc08) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xfc0c, 0xfc0c) AM_NOP
 	AM_RANGE(0xfffe, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -368,7 +368,7 @@ static void irqhandler(device_t *device, int irq)
 
 static const ym2151_interface ym2151_config =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 /******************************************************************************/

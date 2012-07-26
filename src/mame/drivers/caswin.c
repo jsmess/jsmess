@@ -51,11 +51,20 @@ class caswin_state : public driver_device
 {
 public:
 	caswin_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_sc0_vram(*this, "sc0_vram"),
+		m_sc0_attr(*this, "sc0_attr"){ }
 
-	UINT8 *m_sc0_vram;
-	UINT8 *m_sc0_attr;
+	required_shared_ptr<UINT8> m_sc0_vram;
+	required_shared_ptr<UINT8> m_sc0_attr;
 	tilemap_t *m_sc0_tilemap;
+	DECLARE_WRITE8_MEMBER(sc0_vram_w);
+	DECLARE_WRITE8_MEMBER(sc0_attr_w);
+	DECLARE_WRITE8_MEMBER(vvillage_scroll_w);
+	DECLARE_WRITE8_MEMBER(vvillage_vregs_w);
+	DECLARE_READ8_MEMBER(vvillage_rng_r);
+	DECLARE_WRITE8_MEMBER(vvillage_output_w);
+	DECLARE_WRITE8_MEMBER(vvillage_lamps_w);
 };
 
 
@@ -86,31 +95,29 @@ static SCREEN_UPDATE_IND16(vvillage)
 	return 0;
 }
 
-static WRITE8_HANDLER( sc0_vram_w )
+WRITE8_MEMBER(caswin_state::sc0_vram_w)
 {
-	caswin_state *state = space->machine().driver_data<caswin_state>();
-	state->m_sc0_vram[offset] = data;
-	state->m_sc0_tilemap->mark_tile_dirty(offset);
+	m_sc0_vram[offset] = data;
+	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( sc0_attr_w )
+WRITE8_MEMBER(caswin_state::sc0_attr_w)
 {
-	caswin_state *state = space->machine().driver_data<caswin_state>();
-	state->m_sc0_attr[offset] = data;
-	state->m_sc0_tilemap->mark_tile_dirty(offset);
+	m_sc0_attr[offset] = data;
+	m_sc0_tilemap->mark_tile_dirty(offset);
 }
 
 /*These two are tested during the two cherry sub-games.I really don't know what is supposed to do...*/
-static WRITE8_HANDLER( vvillage_scroll_w )
+WRITE8_MEMBER(caswin_state::vvillage_scroll_w)
 {
 	//...
 }
 
 /*---- --x- window effect? */
 /*---- ---x flip screen */
-static WRITE8_HANDLER( vvillage_vregs_w )
+WRITE8_MEMBER(caswin_state::vvillage_vregs_w)
 {
-	flip_screen_set(space->machine(), data & 1);
+	flip_screen_set(data & 1);
 }
 
 /**********************
@@ -119,21 +126,21 @@ static WRITE8_HANDLER( vvillage_vregs_w )
 *
 **********************/
 
-static READ8_HANDLER( vvillage_rng_r )
+READ8_MEMBER(caswin_state::vvillage_rng_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static WRITE8_HANDLER( vvillage_output_w )
+WRITE8_MEMBER(caswin_state::vvillage_output_w)
 {
-	coin_counter_w(space->machine(), 0,data & 1);
-	coin_counter_w(space->machine(), 1,data & 1);
+	coin_counter_w(machine(), 0,data & 1);
+	coin_counter_w(machine(), 1,data & 1);
 	// data & 4 payout counter
-	coin_lockout_w(space->machine(), 0,data & 0x20);
-	coin_lockout_w(space->machine(), 1,data & 0x20);
+	coin_lockout_w(machine(), 0,data & 0x20);
+	coin_lockout_w(machine(), 1,data & 0x20);
 }
 
-static WRITE8_HANDLER( vvillage_lamps_w )
+WRITE8_MEMBER(caswin_state::vvillage_lamps_w)
 {
 	/*
     ---x ---- lamp button 5
@@ -142,25 +149,25 @@ static WRITE8_HANDLER( vvillage_lamps_w )
     ---- --x- lamp button 2
     ---- ---x lamp button 1
     */
-	set_led_status(space->machine(), 0, data & 0x01);
-	set_led_status(space->machine(), 1, data & 0x02);
-	set_led_status(space->machine(), 2, data & 0x04);
-	set_led_status(space->machine(), 3, data & 0x08);
-	set_led_status(space->machine(), 4, data & 0x10);
+	set_led_status(machine(), 0, data & 0x01);
+	set_led_status(machine(), 1, data & 0x02);
+	set_led_status(machine(), 2, data & 0x04);
+	set_led_status(machine(), 3, data & 0x08);
+	set_led_status(machine(), 4, data & 0x10);
 }
 
-static ADDRESS_MAP_START( vvillage_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( vvillage_mem, AS_PROGRAM, 8, caswin_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_READ(vvillage_rng_r) //accessed by caswin only
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(sc0_vram_w) AM_BASE_MEMBER(caswin_state, m_sc0_vram)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(sc0_attr_w) AM_BASE_MEMBER(caswin_state, m_sc0_attr)
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(sc0_vram_w) AM_SHARE("sc0_vram")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(sc0_attr_w) AM_SHARE("sc0_attr")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vvillage_io, AS_IO, 8 )
+static ADDRESS_MAP_START( vvillage_io, AS_IO, 8, caswin_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01,0x01) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x02,0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x01,0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x02,0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0x10,0x10) AM_READ_PORT("IN0")
 	AM_RANGE(0x11,0x11) AM_READ_PORT("IN1")
 	AM_RANGE(0x10,0x10) AM_WRITE(vvillage_scroll_w)
@@ -267,6 +274,7 @@ static const ay8910_interface ay8910_config =
 
 static PALETTE_INIT( caswin )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
 

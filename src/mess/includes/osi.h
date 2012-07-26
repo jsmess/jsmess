@@ -3,7 +3,6 @@
 #ifndef __OSI__
 #define __OSI__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -34,8 +33,9 @@ public:
 		  m_maincpu(*this, M6502_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_discrete(*this, DISCRETE_TAG),
-		  m_ram(*this, RAM_TAG)
-	{ }
+		  m_ram(*this, RAM_TAG),
+		m_video_ram(*this, "video_ram"),
+		m_color_ram(*this, "color_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
@@ -59,8 +59,8 @@ public:
 	/* video state */
 	int m_32;
 	int m_coloren;
-	UINT8 *m_video_ram;
-	UINT8 *m_color_ram;
+	required_shared_ptr<UINT8> m_video_ram;
+	optional_shared_ptr<UINT8> m_color_ram;
 
 	/* floppy state */
 	int m_fdc_index;

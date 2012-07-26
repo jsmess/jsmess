@@ -200,20 +200,36 @@ class witch_state : public driver_device
 {
 public:
 	witch_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_gfx0_vram(*this, "gfx0_vram"),
+		m_gfx0_cram(*this, "gfx0_cram"),
+		m_gfx1_vram(*this, "gfx1_vram"),
+		m_gfx1_cram(*this, "gfx1_cram"),
+		m_sprite_ram(*this, "sprite_ram"){ }
 
 	tilemap_t *m_gfx0a_tilemap;
 	tilemap_t *m_gfx0b_tilemap;
 	tilemap_t *m_gfx1_tilemap;
-	UINT8 *m_gfx0_cram;
-	UINT8 *m_gfx0_vram;
-	UINT8 *m_gfx1_cram;
-	UINT8 *m_gfx1_vram;
-	UINT8 *m_sprite_ram;
+	required_shared_ptr<UINT8> m_gfx0_vram;
+	required_shared_ptr<UINT8> m_gfx0_cram;
+	required_shared_ptr<UINT8> m_gfx1_vram;
+	required_shared_ptr<UINT8> m_gfx1_cram;
+	required_shared_ptr<UINT8> m_sprite_ram;
 	int m_scrollx;
 	int m_scrolly;
 	UINT8 m_reg_a002;
 	int m_bank;
+	DECLARE_WRITE8_MEMBER(gfx0_vram_w);
+	DECLARE_WRITE8_MEMBER(gfx0_cram_w);
+	DECLARE_READ8_MEMBER(gfx0_vram_r);
+	DECLARE_READ8_MEMBER(gfx0_cram_r);
+	DECLARE_WRITE8_MEMBER(gfx1_vram_w);
+	DECLARE_WRITE8_MEMBER(gfx1_cram_w);
+	DECLARE_READ8_MEMBER(gfx1_vram_r);
+	DECLARE_READ8_MEMBER(gfx1_cram_r);
+	DECLARE_READ8_MEMBER(read_a00x);
+	DECLARE_WRITE8_MEMBER(write_a00x);
+	DECLARE_READ8_MEMBER(prot_read_700x);
 };
 
 
@@ -273,111 +289,101 @@ static TILE_GET_INFO( get_gfx1_tile_info )
 			0);
 }
 
-static WRITE8_HANDLER( gfx0_vram_w )
+WRITE8_MEMBER(witch_state::gfx0_vram_w)
 {
-	witch_state *state = space->machine().driver_data<witch_state>();
-	state->m_gfx0_vram[offset] = data;
-	state->m_gfx0a_tilemap->mark_tile_dirty(offset);
-	state->m_gfx0b_tilemap->mark_tile_dirty(offset);
+	m_gfx0_vram[offset] = data;
+	m_gfx0a_tilemap->mark_tile_dirty(offset);
+	m_gfx0b_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( gfx0_cram_w )
+WRITE8_MEMBER(witch_state::gfx0_cram_w)
 {
-	witch_state *state = space->machine().driver_data<witch_state>();
-	state->m_gfx0_cram[offset] = data;
-	state->m_gfx0a_tilemap->mark_tile_dirty(offset);
-	state->m_gfx0b_tilemap->mark_tile_dirty(offset);
+	m_gfx0_cram[offset] = data;
+	m_gfx0a_tilemap->mark_tile_dirty(offset);
+	m_gfx0b_tilemap->mark_tile_dirty(offset);
 }
-static READ8_HANDLER( gfx0_vram_r )
+READ8_MEMBER(witch_state::gfx0_vram_r)
 {
-	witch_state *state = space->machine().driver_data<witch_state>();
-	return state->m_gfx0_vram[offset];
+	return m_gfx0_vram[offset];
 }
 
-static READ8_HANDLER( gfx0_cram_r )
+READ8_MEMBER(witch_state::gfx0_cram_r)
 {
-	witch_state *state = space->machine().driver_data<witch_state>();
-	return state->m_gfx0_cram[offset];
+	return m_gfx0_cram[offset];
 }
 
 #define FIX_OFFSET() do { \
-	offset=(((offset + ((state->m_scrolly & 0xf8) << 2) ) & 0x3e0)+((offset + (state->m_scrollx >> 3) ) & 0x1f)+32)&0x3ff; } while(0)
+	offset=(((offset + ((m_scrolly & 0xf8) << 2) ) & 0x3e0)+((offset + (m_scrollx >> 3) ) & 0x1f)+32)&0x3ff; } while(0)
 
-static WRITE8_HANDLER( gfx1_vram_w )
+WRITE8_MEMBER(witch_state::gfx1_vram_w)
 {
-	witch_state *state = space->machine().driver_data<witch_state>();
 	FIX_OFFSET();
-	state->m_gfx1_vram[offset] = data;
-	state->m_gfx1_tilemap->mark_tile_dirty(offset);
+	m_gfx1_vram[offset] = data;
+	m_gfx1_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( gfx1_cram_w )
+WRITE8_MEMBER(witch_state::gfx1_cram_w)
 {
-	witch_state *state = space->machine().driver_data<witch_state>();
 	FIX_OFFSET();
-	state->m_gfx1_cram[offset] = data;
-	state->m_gfx1_tilemap->mark_tile_dirty(offset);
+	m_gfx1_cram[offset] = data;
+	m_gfx1_tilemap->mark_tile_dirty(offset);
 }
-static READ8_HANDLER( gfx1_vram_r )
+READ8_MEMBER(witch_state::gfx1_vram_r)
 {
-	witch_state *state = space->machine().driver_data<witch_state>();
 	FIX_OFFSET();
-	return state->m_gfx1_vram[offset];
+	return m_gfx1_vram[offset];
 }
 
-static READ8_HANDLER( gfx1_cram_r )
+READ8_MEMBER(witch_state::gfx1_cram_r)
 {
-	witch_state *state = space->machine().driver_data<witch_state>();
 	FIX_OFFSET();
-	return state->m_gfx1_cram[offset];
+	return m_gfx1_cram[offset];
 }
 
-static READ8_HANDLER(read_a00x)
+READ8_MEMBER(witch_state::read_a00x)
 {
-	witch_state *state = space->machine().driver_data<witch_state>();
 	switch(offset)
 	{
-		case 0x02: return state->m_reg_a002;
-		case 0x04: return input_port_read(space->machine(), "A004");
-		case 0x05: return input_port_read(space->machine(), "A005");
-		case 0x0c: return input_port_read(space->machine(), "SERVICE");	// stats / reset
-		case 0x0e: return input_port_read(space->machine(), "A00E");		// coin/reset
+		case 0x02: return m_reg_a002;
+		case 0x04: return ioport("A004")->read();
+		case 0x05: return ioport("A005")->read();
+		case 0x0c: return ioport("SERVICE")->read();	// stats / reset
+		case 0x0e: return ioport("A00E")->read();		// coin/reset
 	}
 
 	if(offset == 0x00) //muxed with A002?
 	{
-		switch(state->m_reg_a002 & 0x3f)
+		switch(m_reg_a002 & 0x3f)
 		{
 		case 0x3b:
-			return input_port_read(space->machine(), "UNK");	//bet10 / pay out
+			return ioport("UNK")->read();	//bet10 / pay out
 		case 0x3e:
-			return input_port_read(space->machine(), "INPUTS");	//TODO : trace f564
+			return ioport("INPUTS")->read();	//TODO : trace f564
 		case 0x3d:
-			return input_port_read(space->machine(), "A005");
+			return ioport("A005")->read();
 		default:
-			logerror("A000 read with mux=0x%02x\n", state->m_reg_a002 & 0x3f);
+			logerror("A000 read with mux=0x%02x\n", m_reg_a002 & 0x3f);
 		}
 	}
 	return 0xff;
 }
 
-static WRITE8_HANDLER(write_a00x)
+WRITE8_MEMBER(witch_state::write_a00x)
 {
-	witch_state *state = space->machine().driver_data<witch_state>();
 	switch(offset)
 	{
-		case 0x02: //A002 bit 7&6 = state->m_bank ????
+		case 0x02: //A002 bit 7&6 = m_bank ????
 		{
 			int newbank;
-			state->m_reg_a002 = data;
+			m_reg_a002 = data;
 			newbank = (data>>6)&3;
 
-			if(newbank != state->m_bank)
+			if(newbank != m_bank)
 			{
-				UINT8 *ROM = space->machine().region("maincpu")->base();
-				state->m_bank = newbank;
+				UINT8 *ROM = memregion("maincpu")->base();
+				m_bank = newbank;
 				ROM = &ROM[0x10000+0x8000 * newbank + UNBANKED_SIZE];
-				memory_set_bankptr(space->machine(), "bank1",ROM);
+				membank("bank1")->set_base(ROM);
 			}
 		}
 		break;
@@ -386,12 +392,12 @@ static WRITE8_HANDLER(write_a00x)
 		break;
 
 		case 0x08: //A008
-			device_set_input_line(&space->device(),0,CLEAR_LINE);
+			device_set_input_line(&space.device(),0,CLEAR_LINE);
 		break;
 	}
 }
 
-static READ8_HANDLER(prot_read_700x)
+READ8_MEMBER(witch_state::prot_read_700x)
 {
 /*
     Code @$21a looks like simple protection check.
@@ -403,7 +409,7 @@ static READ8_HANDLER(prot_read_700x)
     Otherwise later in game some I/O (controls) reads are skipped.
 */
 
-  switch(cpu_get_pc(&space->device()))
+  switch(cpu_get_pc(&space.device()))
   {
 	case 0x23f:
 	case 0x246:
@@ -413,7 +419,7 @@ static READ8_HANDLER(prot_read_700x)
 	case 0x25e:
 		return offset;//enough to pass...
   }
-  return space->machine().region("sub")->base()[0x7000+offset];
+  return memregion("sub")->base()[0x7000+offset];
 }
 
 /*
@@ -459,30 +465,30 @@ static const ym2203_interface ym2203_interface_1 =
 	NULL
 };
 
-static ADDRESS_MAP_START( map_main, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( map_main, AS_PROGRAM, 8, witch_state )
 	AM_RANGE(0x0000, UNBANKED_SIZE-1) AM_ROM
 	AM_RANGE(UNBANKED_SIZE, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
 	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(read_a00x, write_a00x)
-	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(gfx0_vram_r, gfx0_vram_w) AM_BASE_MEMBER(witch_state, m_gfx0_vram)
-	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(gfx0_cram_r, gfx0_cram_w) AM_BASE_MEMBER(witch_state, m_gfx0_cram)
-	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(gfx1_vram_r, gfx1_vram_w) AM_BASE_MEMBER(witch_state, m_gfx1_vram)
-	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(gfx1_cram_r, gfx1_cram_w) AM_BASE_MEMBER(witch_state, m_gfx1_cram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_MEMBER(witch_state, m_sprite_ram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0xc000, 0xc3ff) AM_READWRITE(gfx0_vram_r, gfx0_vram_w) AM_SHARE("gfx0_vram")
+	AM_RANGE(0xc400, 0xc7ff) AM_READWRITE(gfx0_cram_r, gfx0_cram_w) AM_SHARE("gfx0_cram")
+	AM_RANGE(0xc800, 0xcbff) AM_READWRITE(gfx1_vram_r, gfx1_vram_w) AM_SHARE("gfx1_vram")
+	AM_RANGE(0xcc00, 0xcfff) AM_READWRITE(gfx1_cram_r, gfx1_cram_w) AM_SHARE("gfx1_cram")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_SHARE("sprite_ram")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w) AM_SHARE("paletteram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w) AM_SHARE("paletteram2")
 	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf180, 0xffff) AM_RAM AM_SHARE("share2")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( map_sub, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( map_sub, AS_PROGRAM, 8, witch_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
-	AM_RANGE(0x8010, 0x8016) AM_DEVREADWRITE("essnd", read_8010, es8712_w)
+	AM_RANGE(0x8000, 0x8001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x8008, 0x8009) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0x8010, 0x8016) AM_DEVREADWRITE_LEGACY("essnd", read_8010, es8712_w)
 	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(read_a00x, write_a00x)
 	AM_RANGE(0xf000, 0xf0ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf180, 0xffff) AM_RAM AM_SHARE("share2")
@@ -864,10 +870,10 @@ ROM_END
 static DRIVER_INIT(witch)
 {
 	witch_state *state = machine.driver_data<witch_state>();
-	UINT8 *ROM = (UINT8 *)machine.region("maincpu")->base();
-	memory_set_bankptr(machine, "bank1", &ROM[0x10000+UNBANKED_SIZE]);
+	UINT8 *ROM = (UINT8 *)state->memregion("maincpu")->base();
+	state->membank("bank1")->set_base(&ROM[0x10000+UNBANKED_SIZE]);
 
-	machine.device("sub")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x7000, 0x700f, FUNC(prot_read_700x));
+	machine.device("sub")->memory().space(AS_PROGRAM)->install_read_handler(0x7000, 0x700f, read8_delegate(FUNC(witch_state::prot_read_700x), state));
 	state->m_bank = -1;
 }
 

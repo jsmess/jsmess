@@ -12,7 +12,6 @@
 
 ****************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -63,7 +62,7 @@ READ8_MEMBER( pc2000_state::key_matrix_r )
 
 	for (int line=0; line<8; line++)
 		if (m_mux_data & (1<<line))
-			data &= input_port_read(machine(), bitnames[offset][line]);
+			data &= ioport(bitnames[offset][line])->read();
 
 	return data;
 }
@@ -75,18 +74,18 @@ WRITE8_MEMBER( pc2000_state::key_matrix_w )
 
 WRITE8_MEMBER( pc2000_state::rombank1_w )
 {
-	memory_set_bank(machine(), "bank1", data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
 WRITE8_MEMBER( pc2000_state::rombank2_w )
 {
 	if (data == 0x80)
 	{
-		memory_set_bank(machine(), "bank2", data & 0x10);	//cartridge
+		membank("bank2")->set_entry(data & 0x10);	//cartridge
 	}
 	else
 	{
-		memory_set_bank(machine(), "bank2", data & 0x0f);
+		membank("bank2")->set_entry(data & 0x0f);
 	}
 }
 
@@ -281,19 +280,19 @@ INPUT_PORTS_END
 
 void pc2000_state::machine_start()
 {
-	UINT8 *bios = machine().region("bios")->base();
-	UINT8 *cart = machine().region("cart")->base();
+	UINT8 *bios = memregion("bios")->base();
+	UINT8 *cart = memregion("cart")->base();
 
-	memory_configure_bank(machine(), "bank1", 0, 0x10, bios, 0x4000);
-	memory_configure_bank(machine(), "bank2", 0, 0x10, bios, 0x4000);
-	memory_configure_bank(machine(), "bank2", 0x10, 1, cart, 0x4000);
+	membank("bank1")->configure_entries(0, 0x10, bios, 0x4000);
+	membank("bank2")->configure_entries(0, 0x10, bios, 0x4000);
+	membank("bank2")->configure_entry(0x10, cart);
 }
 
 void pc2000_state::machine_reset()
 {
 	//set the initial bank
-	memory_set_bank(machine(), "bank1", 0);
-	memory_set_bank(machine(), "bank2", 0);
+	membank("bank1")->set_entry(0);
+	membank("bank2")->set_entry(0);
 }
 
 static PALETTE_INIT( pc2000 )

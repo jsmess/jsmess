@@ -201,6 +201,7 @@ static const res_net_info radarscp_grid_net_info =
 
 PALETTE_INIT( dkong2b)
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	dkong_state *state = machine.driver_data<dkong_state>();
 	rgb_t	*rgb;
 	int i;
@@ -231,6 +232,7 @@ PALETTE_INIT( dkong2b)
 #ifdef UNUSED_FUNCTION
 PALETTE_INIT( dkong4b )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	dkong_state *state = machine.driver_data<dkong_state>();
 	int i;
 	int r,g,b;
@@ -270,6 +272,7 @@ PALETTE_INIT( dkong4b )
 
 PALETTE_INIT( radarscp )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	dkong_state *state = machine.driver_data<dkong_state>();
 	int i;
 	int r,g,b;
@@ -334,6 +337,7 @@ PALETTE_INIT( radarscp )
 
 PALETTE_INIT( radarscp1 )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	dkong_state *state = machine.driver_data<dkong_state>();
 	int i;
 	int r,g,b;
@@ -434,6 +438,7 @@ PALETTE_INIT( radarscp1 )
 
 PALETTE_INIT( dkong3 )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	dkong_state *state = machine.driver_data<dkong_state>();
 	rgb_t	*rgb;
 
@@ -472,85 +477,77 @@ static TILE_GET_INFO( radarscp1_bg_tile_info )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( dkong_videoram_w )
+WRITE8_MEMBER(dkong_state::dkong_videoram_w)
 {
-	dkong_state *state = space->machine().driver_data<dkong_state>();
 
-	if (state->m_video_ram[offset] != data)
+	if (m_video_ram[offset] != data)
 	{
-		state->m_video_ram[offset] = data;
-		state->m_bg_tilemap->mark_tile_dirty(offset);
+		m_video_ram[offset] = data;
+		m_bg_tilemap->mark_tile_dirty(offset);
 	}
 }
 
-WRITE8_HANDLER( dkongjr_gfxbank_w )
+WRITE8_MEMBER(dkong_state::dkongjr_gfxbank_w)
 {
-	dkong_state *state = space->machine().driver_data<dkong_state>();
 
-	if (state->m_gfx_bank != (data & 0x01))
+	if (m_gfx_bank != (data & 0x01))
 	{
-		state->m_gfx_bank = data & 0x01;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_gfx_bank = data & 0x01;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( dkong3_gfxbank_w )
+WRITE8_MEMBER(dkong_state::dkong3_gfxbank_w)
 {
-	dkong_state *state = space->machine().driver_data<dkong_state>();
 
-	if (state->m_gfx_bank != (~data & 0x01))
+	if (m_gfx_bank != (~data & 0x01))
 	{
-		state->m_gfx_bank = ~data & 0x01;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_gfx_bank = ~data & 0x01;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( dkong_palettebank_w )
+WRITE8_MEMBER(dkong_state::dkong_palettebank_w)
 {
-	dkong_state *state = space->machine().driver_data<dkong_state>();
 	int newbank;
 
-	newbank = state->m_palette_bank;
+	newbank = m_palette_bank;
 
 	if (data & 1)
 		newbank |= 1 << offset;
 	else
 		newbank &= ~(1 << offset);
 
-	if (state->m_palette_bank != newbank)
+	if (m_palette_bank != newbank)
 	{
-		state->m_palette_bank = newbank;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_palette_bank = newbank;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( radarscp_grid_enable_w )
+WRITE8_MEMBER(dkong_state::radarscp_grid_enable_w)
 {
-	dkong_state *state = space->machine().driver_data<dkong_state>();
 
-	state->m_grid_on = data & 0x01;
+	m_grid_on = data & 0x01;
 }
 
-WRITE8_HANDLER( radarscp_grid_color_w )
+WRITE8_MEMBER(dkong_state::radarscp_grid_color_w)
 {
-	dkong_state *state = space->machine().driver_data<dkong_state>();
 
-	state->m_grid_col = (data & 0x07) ^ 0x07;
-	/* popmessage("Gridcol: %d", state->m_grid_col); */
+	m_grid_col = (data & 0x07) ^ 0x07;
+	/* popmessage("Gridcol: %d", m_grid_col); */
 }
 
-WRITE8_HANDLER( dkong_flipscreen_w )
+WRITE8_MEMBER(dkong_state::dkong_flipscreen_w)
 {
-	dkong_state *state = space->machine().driver_data<dkong_state>();
 
-	state->m_flip = ~data & 0x01;
+	m_flip = ~data & 0x01;
 }
 
-WRITE8_HANDLER( dkong_spritebank_w )
+WRITE8_MEMBER(dkong_state::dkong_spritebank_w)
 {
-	dkong_state *state = space->machine().driver_data<dkong_state>();
 
-	state->m_sprite_bank = data & 0x01;
+	m_sprite_bank = data & 0x01;
 }
 
 /***************************************************************************
@@ -883,25 +880,22 @@ static TIMER_CALLBACK( scanline_callback )
 static void check_palette(running_machine &machine)
 {
 	dkong_state *state = machine.driver_data<dkong_state>();
-	const input_port_config *port;
+	ioport_port *port;
 	int newset;
 
-	port = machine.port("VIDHW");
+	port = state->ioport("VIDHW");
 	if (port != NULL)
 	{
-		newset = input_port_read_direct(port);
+		newset = port->read();
 		if (newset != state->m_vidhw)
 		{
-			const UINT8 *color_prom;
 			state->m_vidhw = newset;
 			switch (newset)
 			{
 				case 0x00:
-					color_prom = machine.region("proms")->base();
 					PALETTE_INIT_CALL(radarscp);
 					break;
 				case 0x01:
-					color_prom = machine.region("proms")->base();
 					PALETTE_INIT_CALL(dkong2b);
 					break;
 			}
@@ -943,8 +937,8 @@ VIDEO_START( dkong )
 	{
 		case HARDWARE_TRS02:
 			machine.primary_screen->register_screen_bitmap(state->m_bg_bits);
-			state->m_gfx3 = machine.region("gfx3")->base();
-			state->m_gfx3_len = machine.region("gfx3")->bytes();
+			state->m_gfx3 = state->memregion("gfx3")->base();
+			state->m_gfx3_len = state->memregion("gfx3")->bytes();
 		    /* fall through */
 		case HARDWARE_TKG04:
 		case HARDWARE_TKG02:
@@ -956,9 +950,9 @@ VIDEO_START( dkong )
 			state->m_bg_tilemap->set_scrolldx(0, 128);
 
 			machine.primary_screen->register_screen_bitmap(state->m_bg_bits);
-			state->m_gfx4 = machine.region("gfx4")->base();
-			state->m_gfx3 = machine.region("gfx3")->base();
-			state->m_gfx3_len = machine.region("gfx3")->bytes();
+			state->m_gfx4 = state->memregion("gfx4")->base();
+			state->m_gfx3 = state->memregion("gfx3")->base();
+			state->m_gfx3_len = state->memregion("gfx3")->bytes();
 
 			break;
 		default:
@@ -1002,7 +996,7 @@ SCREEN_UPDATE_IND16( pestplce )
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
 	/* Draw the sprites. */
-	for (offs = 0;offs < state->m_sprite_ram_size;offs += 4)
+	for (offs = 0;offs < state->m_sprite_ram.bytes();offs += 4)
 	{
 		if (state->m_sprite_ram[offs])
 		{

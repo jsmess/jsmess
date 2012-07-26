@@ -10,8 +10,8 @@
 #include "includes/exedexes.h"
 
 
-#define TileMap(offs) (machine.region("gfx5")->base()[offs])
-#define BackTileMap(offs) (machine.region("gfx5")->base()[offs+0x4000])
+#define TileMap(offs) (machine.root_device().memregion("gfx5")->base()[offs])
+#define BackTileMap(offs) (machine.root_device().memregion("gfx5")->base()[offs+0x4000])
 
 
 /***************************************************************************
@@ -33,6 +33,7 @@
 
 PALETTE_INIT( exedexes )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -80,51 +81,47 @@ PALETTE_INIT( exedexes )
 	}
 }
 
-WRITE8_HANDLER( exedexes_videoram_w )
+WRITE8_MEMBER(exedexes_state::exedexes_videoram_w)
 {
-	exedexes_state *state = space->machine().driver_data<exedexes_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( exedexes_colorram_w )
+WRITE8_MEMBER(exedexes_state::exedexes_colorram_w)
 {
-	exedexes_state *state = space->machine().driver_data<exedexes_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( exedexes_c804_w )
+WRITE8_MEMBER(exedexes_state::exedexes_c804_w)
 {
-	exedexes_state *state = space->machine().driver_data<exedexes_state>();
 
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
-	coin_lockout_w(space->machine(), 0, data & 0x04);
-	coin_lockout_w(space->machine(), 1, data & 0x08);
+	coin_lockout_w(machine(), 0, data & 0x04);
+	coin_lockout_w(machine(), 1, data & 0x08);
 
 	/* bit 7 is text enable */
-	state->m_chon = data & 0x80;
+	m_chon = data & 0x80;
 
 	/* other bits seem to be unused */
 }
 
-WRITE8_HANDLER( exedexes_gfxctrl_w )
+WRITE8_MEMBER(exedexes_state::exedexes_gfxctrl_w)
 {
-	exedexes_state *state = space->machine().driver_data<exedexes_state>();
 
 	/* bit 4 is bg enable */
-	state->m_sc2on = data & 0x10;
+	m_sc2on = data & 0x10;
 
 	/* bit 5 is fg enable */
-	state->m_sc1on = data & 0x20;
+	m_sc1on = data & 0x20;
 
 	/* bit 6 is sprite enable */
-	state->m_objon = data & 0x40;
+	m_objon = data & 0x40;
 
 	/* other bits seem to be unused */
 }
@@ -132,7 +129,7 @@ WRITE8_HANDLER( exedexes_gfxctrl_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *tilerom = machine.region("gfx5")->base();
+	UINT8 *tilerom = machine.root_device().memregion("gfx5")->base();
 
 	int attr = tilerom[tile_index];
 	int code = attr & 0x3f;
@@ -144,7 +141,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code = machine.region("gfx5")->base()[tile_index];
+	int code = machine.root_device().memregion("gfx5")->base()[tile_index];
 
 	SET_TILE_INFO(2, code, 0, 0);
 }

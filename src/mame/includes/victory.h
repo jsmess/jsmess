@@ -33,10 +33,12 @@ class victory_state : public driver_device
 {
 public:
 	victory_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_videoram(*this, "videoram"),
+		  m_charram(*this, "charram") { }
 
-	UINT8 *m_videoram;
-	UINT8 *m_charram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_charram;
 	UINT16 m_paletteram[0x40];
 	UINT8 *m_bgbitmap;
 	UINT8 *m_fgbitmap;
@@ -54,6 +56,10 @@ public:
 	UINT8 m_scrolly;
 	UINT8 m_video_control;
 	struct micro_t m_micro;
+	DECLARE_WRITE8_MEMBER(lamp_control_w);
+	DECLARE_WRITE8_MEMBER(victory_paletteram_w);
+	DECLARE_READ8_MEMBER(victory_video_control_r);
+	DECLARE_WRITE8_MEMBER(victory_video_control_w);
 };
 
 
@@ -63,6 +69,3 @@ VIDEO_START( victory );
 SCREEN_UPDATE_IND16( victory );
 INTERRUPT_GEN( victory_vblank_interrupt );
 
-READ8_HANDLER( victory_video_control_r );
-WRITE8_HANDLER( victory_video_control_w );
-WRITE8_HANDLER( victory_paletteram_w );

@@ -526,18 +526,18 @@
  *************************************/
 
 static WRITE8_DEVICE_HANDLER( pia_porta_out );
-static WRITE8_HANDLER( pia_portb_out );
+
 
 static const pia6821_interface pia_interface =
 {
 	DEVCB_NULL,		/* port A in */
-	DEVCB_DEVICE_LINE("ticket", ticket_dispenser_line_r),			/* port B in */
+	DEVCB_DEVICE_LINE_MEMBER("ticket", ticket_dispenser_device, line_r),			/* port B in */
 	DEVCB_NULL,		/* line CA1 in */
 	DEVCB_NULL,		/* line CB1 in */
 	DEVCB_NULL,		/* line CA2 in */
 	DEVCB_NULL,		/* line CB2 in */
 	DEVCB_HANDLER(pia_porta_out),		/* port A out */
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pia_portb_out),		/* port B out */
+	DEVCB_DRIVER_MEMBER(itech8_state, pia_portb_out),		/* port B out */
 	DEVCB_NULL,		/* line CA2 out */
 	DEVCB_NULL,		/* port CB2 out */
 	DEVCB_NULL,		/* IRQA */
@@ -556,7 +556,7 @@ static const via6522_interface via_interface =
 {
 	/*inputs : A/B         */ DEVCB_NULL, DEVCB_NULL,
 	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
-	/*outputs: A/B         */ DEVCB_NULL, DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, pia_portb_out),
+	/*outputs: A/B         */ DEVCB_NULL, DEVCB_DRIVER_MEMBER(itech8_state, pia_portb_out),
 	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL,
 	/*irq                  */ DEVCB_CPU_INPUT_LINE("soundcpu", M6809_FIRQ_LINE)
 };
@@ -620,10 +620,10 @@ static INTERRUPT_GEN( generate_nmi )
 }
 
 
-static WRITE8_HANDLER( itech8_nmi_ack_w )
+WRITE8_MEMBER(itech8_state::itech8_nmi_ack_w)
 {
 /* doesn't seem to hold for every game (e.g., hstennis) */
-/*  cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);*/
+/*  cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);*/
 }
 
 
@@ -657,7 +657,7 @@ static MACHINE_RESET( itech8 )
 	/* make sure bank 0 is selected */
 	if (main_cpu_type == M6809 || main_cpu_type == HD6309)
 	{
-		memory_set_bankptr(machine, "bank1", &machine.region("maincpu")->base()[0x4000]);
+		state->membank("bank1")->set_base(&state->memregion("maincpu")->base()[0x4000]);
 		machine.device("maincpu")->reset();
 	}
 
@@ -701,21 +701,21 @@ static TIMER_CALLBACK( behind_the_beam_update )
  *
  *************************************/
 
-static WRITE8_HANDLER( blitter_w )
+WRITE8_MEMBER(itech8_state::blitter_w)
 {
 	/* bit 0x20 on address 7 controls CPU banking */
 	if (offset / 2 == 7)
-		memory_set_bankptr(space->machine(), "bank1", &space->machine().region("maincpu")->base()[0x4000 + 0xc000 * ((data >> 5) & 1)]);
+		membank("bank1")->set_base(&machine().root_device().memregion("maincpu")->base()[0x4000 + 0xc000 * ((data >> 5) & 1)]);
 
 	/* the rest is handled by the video hardware */
 	itech8_blitter_w(space, offset, data);
 }
 
 
-static WRITE8_HANDLER( rimrockn_bank_w )
+WRITE8_MEMBER(itech8_state::rimrockn_bank_w)
 {
 	/* banking is controlled here instead of by the blitter output */
-	memory_set_bankptr(space->machine(), "bank1", &space->machine().region("maincpu")->base()[0x4000 + 0xc000 * (data & 3)]);
+	membank("bank1")->set_base(&machine().root_device().memregion("maincpu")->base()[0x4000 + 0xc000 * (data & 3)]);
 }
 
 
@@ -726,10 +726,9 @@ static WRITE8_HANDLER( rimrockn_bank_w )
  *
  *************************************/
 
-static CUSTOM_INPUT( special_r )
+CUSTOM_INPUT_MEMBER(itech8_state::special_r)
 {
-	itech8_state *state = field.machine().driver_data<itech8_state>();
-	return state->m_pia_portb_data & 0x01;
+	return m_pia_portb_data & 0x01;
 }
 
 
@@ -747,18 +746,17 @@ static WRITE8_DEVICE_HANDLER( pia_porta_out )
 }
 
 
-static WRITE8_HANDLER( pia_portb_out )
+WRITE8_MEMBER(itech8_state::pia_portb_out)
 {
-	itech8_state *state = space->machine().driver_data<itech8_state>();
 	logerror("PIA port B write = %02x\n", data);
 
 	/* bit 0 provides feedback to the main CPU */
 	/* bit 4 controls the ticket dispenser */
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
-	state->m_pia_portb_data = data;
-	ticket_dispenser_w(space->machine().device("ticket"), 0, (data & 0x10) << 3);
-	coin_counter_w(space->machine(), 0, (data & 0x20) >> 5);
+	m_pia_portb_data = data;
+	machine().device<ticket_dispenser_device>("ticket")->write(space, 0, (data & 0x10) << 3);
+	coin_counter_w(machine(), 0, (data & 0x20) >> 5);
 }
 
 
@@ -772,7 +770,7 @@ static WRITE8_DEVICE_HANDLER( ym2203_portb_out )
 	/* bit 6 controls the diagnostic sound LED */
 	/* bit 7 controls the ticket dispenser */
 	state->m_pia_portb_data = data;
-	ticket_dispenser_w(device->machine().device("ticket"), 0, data & 0x80);
+	device->machine().device<ticket_dispenser_device>("ticket")->write(*device->machine().memory().first_space(), 0, data & 0x80);
 	coin_counter_w(device->machine(), 0, (data & 0x20) >> 5);
 }
 
@@ -792,28 +790,33 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 }
 
 
-static WRITE8_HANDLER( sound_data_w )
+WRITE8_MEMBER(itech8_state::sound_data_w)
 {
-	space->machine().scheduler().synchronize(FUNC(delayed_sound_data_w), data);
+	machine().scheduler().synchronize(FUNC(delayed_sound_data_w), data);
 }
 
 
-static WRITE8_HANDLER( gtg2_sound_data_w )
+WRITE8_MEMBER(itech8_state::gtg2_sound_data_w)
 {
 	/* on the later GTG2 board, they swizzle the data lines */
 	data = ((data & 0x80) >> 7) |
 	       ((data & 0x5d) << 1) |
 	       ((data & 0x20) >> 3) |
 	       ((data & 0x02) << 5);
-	space->machine().scheduler().synchronize(FUNC(delayed_sound_data_w), data);
+	machine().scheduler().synchronize(FUNC(delayed_sound_data_w), data);
 }
 
 
-static READ8_HANDLER( sound_data_r )
+READ8_MEMBER(itech8_state::sound_data_r)
 {
-	itech8_state *state = space->machine().driver_data<itech8_state>();
-	cputag_set_input_line(space->machine(), "soundcpu", M6809_IRQ_LINE, CLEAR_LINE);
-	return state->m_sound_data;
+	cputag_set_input_line(machine(), "soundcpu", M6809_IRQ_LINE, CLEAR_LINE);
+	return m_sound_data;
+}
+
+
+WRITE8_MEMBER(itech8_state::grom_bank_w)
+{
+	m_grom_bank = data;
 }
 
 
@@ -824,22 +827,21 @@ static READ8_HANDLER( sound_data_r )
  *
  *************************************/
 
-static WRITE16_HANDLER( grom_bank16_w )
+WRITE16_MEMBER(itech8_state::grom_bank16_w)
 {
-	itech8_state *state = space->machine().driver_data<itech8_state>();
 	if (ACCESSING_BITS_8_15)
-		*state->m_grom_bank = data >> 8;
+		m_grom_bank = data >> 8;
 }
 
 
-static WRITE16_HANDLER( display_page16_w )
+WRITE16_MEMBER(itech8_state::display_page16_w)
 {
 	if (ACCESSING_BITS_8_15)
 		itech8_page_w(space, 0, ~data >> 8);
 }
 
 
-static WRITE16_HANDLER( palette16_w )
+WRITE16_MEMBER(itech8_state::palette16_w)
 {
 	if (ACCESSING_BITS_8_15)
 		itech8_palette_w(space, offset / 8, data >> 8);
@@ -854,15 +856,15 @@ static WRITE16_HANDLER( palette16_w )
  *************************************/
 
 /*------ common layout with TMS34061 at 0000 ------*/
-static ADDRESS_MAP_START( tmslo_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tmslo_map, AS_PROGRAM, 8, itech8_state )
 	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
 	AM_RANGE(0x1100, 0x1100) AM_WRITENOP
 	AM_RANGE(0x1120, 0x1120) AM_WRITE(sound_data_w)
-	AM_RANGE(0x1140, 0x1140) AM_READ_PORT("40") AM_WRITEONLY AM_BASE_MEMBER(itech8_state, m_grom_bank)
+	AM_RANGE(0x1140, 0x1140) AM_READ_PORT("40") AM_WRITE(grom_bank_w)
 	AM_RANGE(0x1160, 0x1160) AM_READ_PORT("60") AM_WRITE(itech8_page_w)
-	AM_RANGE(0x1180, 0x1180) AM_READ_PORT("80") AM_WRITE(tms34061_latch_w)
+	AM_RANGE(0x1180, 0x1180) AM_READ_PORT("80") AM_WRITE_LEGACY(tms34061_latch_w)
 	AM_RANGE(0x11a0, 0x11a0) AM_WRITE(itech8_nmi_ack_w)
-	AM_RANGE(0x11c0, 0x11df) AM_READWRITE(itech8_blitter_r, blitter_w)
+	AM_RANGE(0x11c0, 0x11df) AM_READ(itech8_blitter_r) AM_WRITE(blitter_w)
 	AM_RANGE(0x11e0, 0x11ff) AM_WRITE(itech8_palette_w)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
@@ -870,15 +872,15 @@ ADDRESS_MAP_END
 
 
 /*------ common layout with TMS34061 at 1000 ------*/
-static ADDRESS_MAP_START( tmshi_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tmshi_map, AS_PROGRAM, 8, itech8_state )
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
 	AM_RANGE(0x0100, 0x0100) AM_WRITENOP
 	AM_RANGE(0x0120, 0x0120) AM_WRITE(sound_data_w)
-	AM_RANGE(0x0140, 0x0140) AM_READ_PORT("40") AM_WRITEONLY AM_BASE_MEMBER(itech8_state, m_grom_bank)
+	AM_RANGE(0x0140, 0x0140) AM_READ_PORT("40") AM_WRITE(grom_bank_w)
 	AM_RANGE(0x0160, 0x0160) AM_READ_PORT("60") AM_WRITE(itech8_page_w)
-	AM_RANGE(0x0180, 0x0180) AM_READ_PORT("80") AM_WRITE(tms34061_latch_w)
+	AM_RANGE(0x0180, 0x0180) AM_READ_PORT("80") AM_WRITE_LEGACY(tms34061_latch_w)
 	AM_RANGE(0x01a0, 0x01a0) AM_WRITE(itech8_nmi_ack_w)
-	AM_RANGE(0x01c0, 0x01df) AM_READWRITE(itech8_blitter_r, blitter_w)
+	AM_RANGE(0x01c0, 0x01df) AM_READ(itech8_blitter_r) AM_WRITE(blitter_w)
 	AM_RANGE(0x01e0, 0x01ff) AM_WRITE(itech8_palette_w)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
@@ -886,15 +888,15 @@ ADDRESS_MAP_END
 
 
 /*------ Golden Tee Golf II 1992 layout ------*/
-static ADDRESS_MAP_START( gtg2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gtg2_map, AS_PROGRAM, 8, itech8_state )
 	AM_RANGE(0x0100, 0x0100) AM_READ_PORT("40") AM_WRITE(itech8_nmi_ack_w)
 	AM_RANGE(0x0120, 0x0120) AM_READ_PORT("60") AM_WRITE(itech8_page_w)
 	AM_RANGE(0x0140, 0x015f) AM_WRITE(itech8_palette_w)
 	AM_RANGE(0x0140, 0x0140) AM_READ_PORT("80")
-	AM_RANGE(0x0160, 0x0160) AM_WRITEONLY AM_BASE_MEMBER(itech8_state, m_grom_bank)
-	AM_RANGE(0x0180, 0x019f) AM_READWRITE(itech8_blitter_r, blitter_w)
+	AM_RANGE(0x0160, 0x0160) AM_WRITE(grom_bank_w)
+	AM_RANGE(0x0180, 0x019f) AM_READ(itech8_blitter_r) AM_WRITE(blitter_w)
 	AM_RANGE(0x01c0, 0x01c0) AM_WRITE(gtg2_sound_data_w)
-	AM_RANGE(0x01e0, 0x01e0) AM_WRITE(tms34061_latch_w)
+	AM_RANGE(0x01e0, 0x01e0) AM_WRITE_LEGACY(tms34061_latch_w)
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
@@ -902,14 +904,14 @@ ADDRESS_MAP_END
 
 
 /*------ Ninja Clowns layout ------*/
-static ADDRESS_MAP_START( ninclown_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ninclown_map, AS_PROGRAM, 16, itech8_state )
 	AM_RANGE(0x000000, 0x00007f) AM_RAM AM_REGION("maincpu", 0)
 	AM_RANGE(0x000080, 0x003fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x004000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100080, 0x100081) AM_WRITE8(sound_data_w, 0xff00)
-	AM_RANGE(0x100100, 0x100101) AM_READ_PORT("40") AM_WRITE(grom_bank16_w) AM_BASE_MEMBER(itech8_state, m_grom_bank)
+	AM_RANGE(0x100100, 0x100101) AM_READ_PORT("40") AM_WRITE(grom_bank16_w)
 	AM_RANGE(0x100180, 0x100181) AM_READ_PORT("60") AM_WRITE(display_page16_w)
-	AM_RANGE(0x100240, 0x100241) AM_WRITE8(tms34061_latch_w, 0xff00)
+	AM_RANGE(0x100240, 0x100241) AM_WRITE8_LEGACY(tms34061_latch_w, 0xff00)
 	AM_RANGE(0x100280, 0x100281) AM_READ_PORT("80") AM_WRITENOP
 	AM_RANGE(0x100300, 0x10031f) AM_READWRITE8(itech8_blitter_r, itech8_blitter_w, 0xffff)
 	AM_RANGE(0x100380, 0x1003ff) AM_WRITE(palette16_w)
@@ -925,46 +927,46 @@ ADDRESS_MAP_END
  *************************************/
 
 /*------ YM2203-based sound ------*/
-static ADDRESS_MAP_START( sound2203_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound2203_map, AS_PROGRAM, 8, itech8_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0002) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0002) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 /*------ YM2608B-based sound ------*/
-static ADDRESS_MAP_START( sound2608b_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound2608b_map, AS_PROGRAM, 8, itech8_state )
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP
 	AM_RANGE(0x2000, 0x2000) AM_READ(sound_data_r)
-	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE("ymsnd", ym2608_r, ym2608_w)
+	AM_RANGE(0x4000, 0x4003) AM_DEVREADWRITE_LEGACY("ymsnd", ym2608_r, ym2608_w)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 /*------ YM3812-based sound ------*/
-static ADDRESS_MAP_START( sound3812_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound3812_map, AS_PROGRAM, 8, itech8_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_MODERN("pia", pia6821_device, read, write)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 /*------ external YM3812-based sound board ------*/
-static ADDRESS_MAP_START( sound3812_external_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound3812_external_map, AS_PROGRAM, 8, itech8_state )
 	AM_RANGE(0x0000, 0x0000) AM_WRITENOP
 	AM_RANGE(0x1000, 0x1000) AM_READ(sound_data_r)
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0x5000, 0x500f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x5000, 0x500f) AM_DEVREADWRITE("via6522_0", via6522_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -976,14 +978,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( slikz80_mem_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slikz80_mem_map, AS_PROGRAM, 8, itech8_state )
 	AM_RANGE(0x0000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( slikz80_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( slikz80_io_map, AS_IO, 8, itech8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(slikz80_port_r, slikz80_port_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE_LEGACY(slikz80_port_r, slikz80_port_w)
 ADDRESS_MAP_END
 
 
@@ -996,7 +998,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wfortune )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(special_r, NULL)	/* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, NULL)	/* input from sound board */
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
@@ -1025,7 +1027,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( grmatch )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(special_r, NULL)	/* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, NULL)	/* input from sound board */
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x08, "Adjustments Lockout" )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
@@ -1063,7 +1065,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( stratab )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(special_r, NULL)	/* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, NULL)	/* input from sound board */
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
@@ -1098,16 +1100,16 @@ static INPUT_PORTS_START( stratab )
 INPUT_PORTS_END
 
 
-static CUSTOM_INPUT( gtg_mux )
+CUSTOM_INPUT_MEMBER(itech8_state::gtg_mux)
 {
 	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
-	return input_port_read(field.machine(), tag1) & input_port_read(field.machine(), tag2);
+	return ioport(tag2)->read();
 }
 
 static INPUT_PORTS_START( gtg )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(special_r, NULL)	/* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, NULL)	/* input from sound board */
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
@@ -1118,7 +1120,7 @@ static INPUT_PORTS_START( gtg )
 	PORT_START("60")
 	/* it is still unknown how the second player inputs are muxed in */
 	/* currently we map both sets of controls to the same inputs */
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gtg_mux, "P1\0P2")
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,gtg_mux, "P1\0P2")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1144,7 +1146,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gtgt )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(special_r, NULL)	/* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, NULL)	/* input from sound board */
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
@@ -1171,7 +1173,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gtg2t )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(special_r, NULL)	/* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, NULL)	/* input from sound board */
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
@@ -1208,7 +1210,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( slikshot )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(special_r, NULL)	/* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, NULL)	/* input from sound board */
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
@@ -1235,7 +1237,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dynobop )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(special_r, NULL)	/* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, NULL)	/* input from sound board */
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
@@ -1262,7 +1264,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( sstrike )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(special_r, NULL)	/* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, NULL)	/* input from sound board */
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
@@ -1289,7 +1291,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( pokrdice )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(special_r, NULL)	/* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, NULL)	/* input from sound board */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Lower Right") PORT_CODE(KEYCODE_3_PAD)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
@@ -1318,7 +1320,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( hstennis )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(special_r, NULL)	/* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, NULL)	/* input from sound board */
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Upright ) )
@@ -1353,7 +1355,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( arlingtn )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(special_r, NULL)	/* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, NULL)	/* input from sound board */
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	/* see code at e23c */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -1384,7 +1386,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( peggle )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(special_r, NULL)	/* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, NULL)	/* input from sound board */
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
@@ -1406,7 +1408,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( pegglet )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(special_r, NULL)	/* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, NULL)	/* input from sound board */
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
@@ -1428,7 +1430,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( neckneck )
 	PORT_START("40")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(special_r, NULL)	/* input from sound board */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, NULL)	/* input from sound board */
 	PORT_BIT( 0x06, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )	/* see code at e23c */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -1469,7 +1471,7 @@ static INPUT_PORTS_START( rimrockn )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(special_r, NULL)	/* input from sound board */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, itech8_state,special_r, NULL)	/* input from sound board */
 
 	PORT_START("80")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1691,7 +1693,7 @@ static MACHINE_CONFIG_START( itech8_core_lo, itech8_state )
 	MCFG_MACHINE_RESET(itech8)
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")
 
-	MCFG_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
 	MCFG_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
@@ -2633,8 +2635,9 @@ ROM_END
 
 static DRIVER_INIT( grmatch )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0160, 0x0160, FUNC(grmatch_palette_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0180, 0x0180, FUNC(grmatch_xscroll_w));
+	itech8_state *state = machine.driver_data<itech8_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0160, 0x0160, write8_delegate(FUNC(itech8_state::grmatch_palette_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0180, 0x0180, write8_delegate(FUNC(itech8_state::grmatch_xscroll_w),state));
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x01e0, 0x01ff);
 }
 
@@ -2685,6 +2688,7 @@ static DRIVER_INIT( neckneck )
 
 static DRIVER_INIT( rimrockn )
 {
+	itech8_state *state = machine.driver_data<itech8_state>();
 	/* additional input ports */
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port (0x0161, 0x0161, "161");
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port (0x0162, 0x0162, "162");
@@ -2693,8 +2697,8 @@ static DRIVER_INIT( rimrockn )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_port (0x0165, 0x0165, "165");
 
 	/* different banking mechanism (disable the old one) */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01a0, 0x01a0, FUNC(rimrockn_bank_w));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01c0, 0x01df, FUNC(itech8_blitter_w));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x01a0, 0x01a0, write8_delegate(FUNC(itech8_state::rimrockn_bank_w),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x01c0, 0x01df, write8_delegate(FUNC(itech8_state::itech8_blitter_w),state));
 }
 
 

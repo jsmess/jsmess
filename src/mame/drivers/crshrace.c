@@ -136,67 +136,64 @@ Dip locations verified with Service Mode.
 #define CRSHRACE_3P_HACK	0
 
 
-static READ16_HANDLER( extrarom1_r )
+READ16_MEMBER(crshrace_state::extrarom1_r)
 {
-	UINT8 *rom = space->machine().region("user1")->base();
+	UINT8 *rom = memregion("user1")->base();
 
 	offset *= 2;
 
 	return rom[offset] | (rom[offset + 1] << 8);
 }
 
-static READ16_HANDLER( extrarom2_r )
+READ16_MEMBER(crshrace_state::extrarom2_r)
 {
-	UINT8 *rom = space->machine().region("user2")->base();
+	UINT8 *rom = memregion("user2")->base();
 
 	offset *= 2;
 
 	return rom[offset] | (rom[offset + 1] << 8);
 }
 
-static WRITE8_HANDLER( crshrace_sh_bankswitch_w )
+WRITE8_MEMBER(crshrace_state::crshrace_sh_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x03);
+	membank("bank1")->set_entry(data & 0x03);
 }
 
-static WRITE16_HANDLER( sound_command_w )
+WRITE16_MEMBER(crshrace_state::sound_command_w)
 {
-	crshrace_state *state = space->machine().driver_data<crshrace_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_pending_command = 1;
-		soundlatch_w(space, offset, data & 0xff);
-		state->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+		m_pending_command = 1;
+		soundlatch_byte_w(space, offset, data & 0xff);
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
-static CUSTOM_INPUT( country_sndpending_r )
+CUSTOM_INPUT_MEMBER(crshrace_state::country_sndpending_r)
 {
-	crshrace_state *state = field.machine().driver_data<crshrace_state>();
-	return state->m_pending_command;
+	return m_pending_command;
 }
 
-static WRITE8_HANDLER( pending_command_clear_w )
+WRITE8_MEMBER(crshrace_state::pending_command_clear_w)
 {
-	crshrace_state *state = space->machine().driver_data<crshrace_state>();
-	state->m_pending_command = 0;
+	m_pending_command = 0;
 }
 
 
 
-static ADDRESS_MAP_START( crshrace_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( crshrace_map, AS_PROGRAM, 16, crshrace_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x300000, 0x3fffff) AM_READ(extrarom1_r)
 	AM_RANGE(0x400000, 0x4fffff) AM_READ(extrarom2_r)
 	AM_RANGE(0x500000, 0x5fffff) AM_READ(extrarom2_r)	/* mirror */
 	AM_RANGE(0xa00000, 0xa0ffff) AM_RAM AM_SHARE("spriteram2")
-	AM_RANGE(0xd00000, 0xd01fff) AM_RAM_WRITE(crshrace_videoram1_w) AM_BASE_MEMBER(crshrace_state, m_videoram1)
+	AM_RANGE(0xd00000, 0xd01fff) AM_RAM_WRITE(crshrace_videoram1_w) AM_SHARE("videoram1")
 	AM_RANGE(0xe00000, 0xe01fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM
 	AM_RANGE(0xffc000, 0xffc001) AM_WRITE(crshrace_roz_bank_w)
-	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(crshrace_videoram2_w) AM_BASE_MEMBER(crshrace_state, m_videoram2)
-	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(crshrace_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xffe000, 0xffefff) AM_RAM_WRITE(paletteram_xGGGGGBBBBBRRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1") AM_WRITE(crshrace_gfxctrl_w)
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW0")
@@ -204,21 +201,21 @@ static ADDRESS_MAP_START( crshrace_map, AS_PROGRAM, 16 )
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("P3")
-	AM_RANGE(0xfff020, 0xfff03f) AM_DEVWRITE("k053936", k053936_ctrl_w)
+	AM_RANGE(0xfff020, 0xfff03f) AM_DEVWRITE_LEGACY("k053936", k053936_ctrl_w)
 	AM_RANGE(0xfff044, 0xfff047) AM_WRITEONLY	// ??? moves during race
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, crshrace_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, crshrace_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(crshrace_sh_bankswitch_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, pending_command_clear_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_byte_r) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 ADDRESS_MAP_END
 
 
@@ -274,7 +271,7 @@ static INPUT_PORTS_START( crshrace )
 	PORT_DIPNAME( 0x0100, 0x0100, "Coin Slot" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0100, "Same" )
 	PORT_DIPSETTING(      0x0000, "Individual" )
-	PORT_DIPNAME( 0x0e00, 0x0e00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:2,3,4") PORT_CONDITION("DSW0", 0x0100, PORTCOND_EQUALS, 0x0100)
+	PORT_DIPNAME( 0x0e00, 0x0e00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:2,3,4") PORT_CONDITION("DSW0", 0x0100, EQUALS, 0x0100)
 	PORT_DIPSETTING(      0x0a00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_1C ) )
@@ -283,7 +280,7 @@ static INPUT_PORTS_START( crshrace )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x7000, 0x7000, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,6,7") PORT_CONDITION("DSW0", 0x0100, PORTCOND_EQUALS, 0x0100)
+	PORT_DIPNAME( 0x7000, 0x7000, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,6,7") PORT_CONDITION("DSW0", 0x0100, EQUALS, 0x0100)
 	PORT_DIPSETTING(      0x5000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x6000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x7000, DEF_STR( 1C_1C ) )
@@ -292,7 +289,7 @@ static INPUT_PORTS_START( crshrace )
 	PORT_DIPSETTING(      0x2000, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0e00, 0x0e00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:2,3,4") PORT_CONDITION("DSW0", 0x0100, PORTCOND_NOTEQUALS, 0x0100)
+	PORT_DIPNAME( 0x0e00, 0x0e00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:2,3,4") PORT_CONDITION("DSW0", 0x0100, NOTEQUALS, 0x0100)
 	PORT_DIPSETTING(      0x0a00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_1C ) )
@@ -301,7 +298,7 @@ static INPUT_PORTS_START( crshrace )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
-	PORT_DIPUNUSED_DIPLOC( 0x7000, 0x7000, "SW1:5,6,7") PORT_CONDITION("DSW0", 0x0100, PORTCOND_NOTEQUALS, 0x0100)
+	PORT_DIPUNUSED_DIPLOC( 0x7000, 0x7000, "SW1:5,6,7") PORT_CONDITION("DSW0", 0x0100, NOTEQUALS, 0x0100)
 	PORT_DIPNAME( 0x8000, 0x8000, "2 to Start, 1 to Cont." ) PORT_DIPLOCATION("SW1:8")	// Other desc. was too long !
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -366,7 +363,7 @@ static INPUT_PORTS_START( crshrace )
     PORT_DIPSETTING(      0x0e00, "5" )
     PORT_DIPSETTING(      0x0f00, "5" )
 */
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(country_sndpending_r, NULL)	/* pending sound command */
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, crshrace_state,country_sndpending_r, NULL)	/* pending sound command */
 INPUT_PORTS_END
 
 /* Same as 'crshrace', but additional "unknown" Dip Switch (see notes) */
@@ -445,7 +442,7 @@ static MACHINE_START( crshrace )
 {
 	crshrace_state *state = machine.driver_data<crshrace_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 4, machine.region("audiocpu")->base() + 0x10000, 0x8000);
+	state->membank("bank1")->configure_entries(0, 4, state->memregion("audiocpu")->base() + 0x10000, 0x8000);
 
 	state->save_item(NAME(state->m_roz_bank));
 	state->save_item(NAME(state->m_gfxctrl));
@@ -580,7 +577,7 @@ ROM_END
 void crshrace_patch_code( UINT16 offset )
 {
 	/* A hack which shows 3 player mode in code which is disabled */
-	UINT16 *RAM = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *RAM = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	RAM[(offset + 0)/2] = 0x4e71;
 	RAM[(offset + 2)/2] = 0x4e71;
 	RAM[(offset + 4)/2] = 0x4e71;

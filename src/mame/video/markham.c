@@ -13,6 +13,7 @@
 
 PALETTE_INIT( markham )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -39,19 +40,18 @@ PALETTE_INIT( markham )
 	}
 }
 
-WRITE8_HANDLER( markham_videoram_w )
+WRITE8_MEMBER(markham_state::markham_videoram_w)
 {
-	markham_state *state = space->machine().driver_data<markham_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( markham_flipscreen_w )
+WRITE8_MEMBER(markham_state::markham_flipscreen_w)
 {
-	if (flip_screen_get(space->machine()) != (data & 0x01))
+	if (flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(space->machine(), data & 0x01);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(data & 0x01);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -84,15 +84,15 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int chr = spriteram[offs + 1];
 		int col = spriteram[offs + 2];
 
-		int fx = flip_screen_get(machine);
-		int fy = flip_screen_get(machine);
+		int fx = state->flip_screen();
+		int fy = state->flip_screen();
 
 		int x = spriteram[offs + 3];
 		int y = spriteram[offs + 0];
 		int px, py;
 		col &= 0x3f ;
 
-		if (flip_screen_get(machine) == 0)
+		if (state->flip_screen() == 0)
 		{
 			px = x - 2;
 			py = 240 - y;

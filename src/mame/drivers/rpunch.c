@@ -132,7 +132,7 @@ static void ym2151_irq_gen(device_t *device, int state)
 
 static MACHINE_RESET( rpunch )
 {
-	UINT8 *snd = machine.region("upd")->base();
+	UINT8 *snd = machine.root_device().memregion("upd")->base();
 	memcpy(snd, snd + 0x20000, 0x20000);
 }
 
@@ -144,9 +144,9 @@ static MACHINE_RESET( rpunch )
  *
  *************************************/
 
-static CUSTOM_INPUT( hi_bits_r )
+CUSTOM_INPUT_MEMBER(rpunch_state::hi_bits_r)
 {
-	return input_port_read(field.machine(), "SERVICE");
+	return ioport("SERVICE")->read();
 }
 
 
@@ -165,26 +165,24 @@ static TIMER_CALLBACK( sound_command_w_callback )
 }
 
 
-static WRITE16_HANDLER( sound_command_w )
+WRITE16_MEMBER(rpunch_state::sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
-		space->machine().scheduler().synchronize(FUNC(sound_command_w_callback), data & 0xff);
+		machine().scheduler().synchronize(FUNC(sound_command_w_callback), data & 0xff);
 }
 
 
-static READ8_HANDLER( sound_command_r )
+READ8_MEMBER(rpunch_state::sound_command_r)
 {
-	rpunch_state *state = space->machine().driver_data<rpunch_state>();
-	state->m_sound_busy = 0;
-	cputag_set_input_line(space->machine(), "audiocpu", 0, (state->m_ym2151_irq | state->m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
-	return state->m_sound_data;
+	m_sound_busy = 0;
+	cputag_set_input_line(machine(), "audiocpu", 0, (m_ym2151_irq | m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	return m_sound_data;
 }
 
 
-static READ16_HANDLER( sound_busy_r )
+READ16_MEMBER(rpunch_state::sound_busy_r)
 {
-	rpunch_state *state = space->machine().driver_data<rpunch_state>();
-	return state->m_sound_busy;
+	return m_sound_busy;
 }
 
 
@@ -200,7 +198,7 @@ static WRITE8_DEVICE_HANDLER( upd_control_w )
 	rpunch_state *state = device->machine().driver_data<rpunch_state>();
 	if ((data & 1) != state->m_upd_rom_bank)
 	{
-		UINT8 *snd = device->machine().region("upd")->base();
+		UINT8 *snd = state->memregion("upd")->base();
 		state->m_upd_rom_bank = data & 1;
 		memcpy(snd, snd + 0x20000 * (state->m_upd_rom_bank + 1), 0x20000);
 	}
@@ -223,13 +221,13 @@ static WRITE8_DEVICE_HANDLER( upd_data_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, rpunch_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x04ffff) AM_RAM AM_BASE_MEMBER(rpunch_state, m_bitmapram) AM_SIZE_MEMBER(rpunch_state, m_bitmapram_size)
-	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_BASE_MEMBER(rpunch_state, m_spriteram)
-	AM_RANGE(0x080000, 0x083fff) AM_RAM_WRITE(rpunch_videoram_w) AM_BASE_MEMBER(rpunch_state, m_videoram)
-	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x040000, 0x04ffff) AM_RAM AM_SHARE("bitmapram")
+	AM_RANGE(0x060000, 0x060fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x080000, 0x083fff) AM_RAM_WRITE(rpunch_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0c0000, 0x0c0007) AM_WRITE(rpunch_scrollreg_w)
 	AM_RANGE(0x0c0008, 0x0c0009) AM_WRITE(rpunch_crtc_data_w)
 	AM_RANGE(0x0c000c, 0x0c000d) AM_WRITE(rpunch_videoreg_w)
@@ -251,12 +249,12 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, rpunch_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xf200, 0xf200) AM_READ(sound_command_r)
-	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("upd", upd_control_w)
-	AM_RANGE(0xf600, 0xf600) AM_DEVWRITE("upd", upd_data_w)
+	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE_LEGACY("upd", upd_control_w)
+	AM_RANGE(0xf600, 0xf600) AM_DEVWRITE_LEGACY("upd", upd_data_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -277,7 +275,7 @@ static INPUT_PORTS_START( rpunch )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(hi_bits_r, NULL)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rpunch_state,hi_bits_r, NULL)
 
 	PORT_START("P2")	/* c001a lower 8 bits */
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
@@ -287,7 +285,7 @@ static INPUT_PORTS_START( rpunch )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(hi_bits_r, NULL)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rpunch_state,hi_bits_r, NULL)
 
 	PORT_START("SERVICE")	/* c0018/c001a upper 8 bits */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
@@ -451,7 +449,7 @@ GFXDECODE_END
 
 static const ym2151_interface ym2151_config =
 {
-	ym2151_irq_gen
+	DEVCB_LINE(ym2151_irq_gen)
 };
 
 
@@ -707,7 +705,7 @@ static DRIVER_INIT( svolley )
 	/* the main differences between Super Volleyball and Rabbit Punch are */
 	/* the lack of direct-mapped bitmap and a different palette base for sprites */
 	state->m_sprite_palette = 0x080;
-	state->m_bitmapram = NULL;
+	state->m_bitmapram.set_target(NULL, 0);
 }
 
 

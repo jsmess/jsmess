@@ -268,7 +268,6 @@ disabled). Perhaps power on/off related??
 
 ******************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
@@ -357,14 +356,14 @@ void nakajies_state::update_banks()
 			m_bank_base[i] = m_rom_base + ( ( ( ( m_bank[i] & 0x0f ) ^ 0xf ) << 17 ) % m_rom_size );
 		}
 	}
-	memory_set_bankptr( machine(), "bank0", m_bank_base[0] );
-	memory_set_bankptr( machine(), "bank1", m_bank_base[1] );
-	memory_set_bankptr( machine(), "bank2", m_bank_base[2] );
-	memory_set_bankptr( machine(), "bank3", m_bank_base[3] );
-	memory_set_bankptr( machine(), "bank4", m_bank_base[4] );
-	memory_set_bankptr( machine(), "bank5", m_bank_base[5] );
-	memory_set_bankptr( machine(), "bank6", m_bank_base[6] );
-	memory_set_bankptr( machine(), "bank7", m_bank_base[7] );
+	membank( "bank0" )->set_base( m_bank_base[0] );
+	membank( "bank1" )->set_base( m_bank_base[1] );
+	membank( "bank2" )->set_base( m_bank_base[2] );
+	membank( "bank3" )->set_base( m_bank_base[3] );
+	membank( "bank4" )->set_base( m_bank_base[4] );
+	membank( "bank5" )->set_base( m_bank_base[5] );
+	membank( "bank6" )->set_base( m_bank_base[6] );
+	membank( "bank7" )->set_base( m_bank_base[7] );
 }
 
 void nakajies_state::bank_w( UINT8 banknr, offs_t offset, UINT8 data )
@@ -484,7 +483,7 @@ READ8_MEMBER( nakajies_state::keyboard_r )
 	static const char *const bitnames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4",
 											"ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
 
-	return (m_matrix > 0x00) ? input_port_read(machine(), bitnames[m_matrix - 1]) : 0;
+	return (m_matrix > 0x00) ? ioport(bitnames[m_matrix - 1])->read() : 0;
 }
 
 
@@ -502,7 +501,7 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( trigger_irq )
 {
 	nakajies_state *state = field.machine().driver_data<nakajies_state>();
-	UINT8 irqs = input_port_read( field.machine(), "debug" );
+	UINT8 irqs = field.machine().root_device().ioport( "debug" )->read();
 
 	state->m_irq_active |= irqs;
 	state->nakajies_update_irqs(field.machine());
@@ -624,8 +623,8 @@ INPUT_PORTS_END
 
 void nakajies_state::machine_start()
 {
-	m_rom_base = machine().region("bios")->base();
-	m_rom_size = machine().region("bios")->bytes();
+	m_rom_base = memregion("bios")->base();
+	m_rom_size = memregion("bios")->bytes();
 
 	const char *gamename = machine().system().name;
 
@@ -634,7 +633,7 @@ void nakajies_state::machine_start()
 	{
 		m_ram_size = 256 * 1024;
 	}
-	m_ram_base = machine().region_alloc( "mainram", m_ram_size, 1, ENDIANNESS_LITTLE )->base();
+	m_ram_base = machine().memory().region_alloc( "mainram", m_ram_size, 1, ENDIANNESS_LITTLE )->base();
 }
 
 

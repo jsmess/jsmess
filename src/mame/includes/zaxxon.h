@@ -8,11 +8,14 @@ class zaxxon_state : public driver_device
 {
 public:
 	zaxxon_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_colorram(*this, "colorram"){ }
 
-	UINT8 *m_colorram;
-	UINT8 *m_videoram;
-	UINT8 *m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_colorram;
 
 	UINT8 m_int_enabled;
 	UINT8 m_coin_status[3];
@@ -34,6 +37,24 @@ public:
 	const UINT8 *m_color_codes;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(int_enable_w);
+	DECLARE_READ8_MEMBER(razmataz_counter_r);
+	DECLARE_WRITE8_MEMBER(zaxxon_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(zaxxon_coin_enable_w);
+	DECLARE_WRITE8_MEMBER(zaxxon_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(zaxxon_fg_color_w);
+	DECLARE_WRITE8_MEMBER(zaxxon_bg_position_w);
+	DECLARE_WRITE8_MEMBER(zaxxon_bg_color_w);
+	DECLARE_WRITE8_MEMBER(zaxxon_bg_enable_w);
+	DECLARE_WRITE8_MEMBER(congo_fg_bank_w);
+	DECLARE_WRITE8_MEMBER(congo_color_bank_w);
+	DECLARE_WRITE8_MEMBER(zaxxon_videoram_w);
+	DECLARE_WRITE8_MEMBER(congo_colorram_w);
+	DECLARE_WRITE8_MEMBER(congo_sprite_custom_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(razmataz_dial_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(zaxxon_coin_r);
+	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
+	DECLARE_INPUT_CHANGED_MEMBER(zaxxon_coin_inserted);
 };
 
 
@@ -52,18 +73,8 @@ MACHINE_CONFIG_EXTERN( congo_samples );
 
 /*----------- defined in video/zaxxon.c -----------*/
 
-WRITE8_HANDLER( zaxxon_flipscreen_w );
-WRITE8_HANDLER( zaxxon_fg_color_w );
-WRITE8_HANDLER( zaxxon_bg_position_w );
-WRITE8_HANDLER( zaxxon_bg_color_w );
-WRITE8_HANDLER( zaxxon_bg_enable_w );
 
-WRITE8_HANDLER( zaxxon_videoram_w );
-WRITE8_HANDLER( congo_colorram_w );
 
-WRITE8_HANDLER( congo_fg_bank_w );
-WRITE8_HANDLER( congo_color_bank_w );
-WRITE8_HANDLER( congo_sprite_custom_w );
 
 PALETTE_INIT( zaxxon );
 

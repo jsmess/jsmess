@@ -27,7 +27,7 @@ static TIMER_CALLBACK(pc_turbo_callback)
 	struct pc_turbo_info *ti = (struct pc_turbo_info *) ptr;
 	int val;
 
-	val = input_port_read(machine, ti->port) & ti->mask;
+	val = machine.root_device().ioport(ti->port)->read() & ti->mask;
 
 	if (val != ti->cur_val)
 	{

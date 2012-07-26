@@ -27,7 +27,7 @@
 
 PALETTE_INIT( dcheese )
 {
-	const UINT16 *src = (UINT16 *)machine.region("user1")->base();
+	const UINT16 *src = (UINT16 *)machine.root_device().memregion("user1")->base();
 	int i;
 
 	/* really 65536 colors, but they don't use the later ones so we can stay */
@@ -168,8 +168,8 @@ static void do_blit( running_machine &machine )
 	INT32 dxdy = (INT32)(((state->m_blitter_xparam[6] & 0x0fff) | ((state->m_blitter_xparam[7] & 0x0fff) << 12)) << 12) >> 12;
 	INT32 dydx = (INT32)(((state->m_blitter_yparam[4] & 0x0fff) | ((state->m_blitter_yparam[5] & 0x0fff) << 12)) << 12) >> 12;
 	INT32 dydy = (INT32)(((state->m_blitter_yparam[6] & 0x0fff) | ((state->m_blitter_yparam[7] & 0x0fff) << 12)) << 12) >> 12;
-	UINT8 *src = machine.region("gfx1")->base();
-	UINT32 pagemask = (machine.region("gfx1")->bytes() - 1) / 0x40000;
+	UINT8 *src = state->memregion("gfx1")->base();
+	UINT32 pagemask = (state->memregion("gfx1")->bytes() - 1) / 0x40000;
 	int xstart = state->m_blitter_xparam[14];
 	int xend = state->m_blitter_xparam[15] + 1;
 	int ystart = state->m_blitter_yparam[14];
@@ -234,31 +234,27 @@ static void do_blit( running_machine &machine )
  *
  *************************************/
 
-WRITE16_HANDLER( madmax_blitter_color_w )
+WRITE16_MEMBER(dcheese_state::madmax_blitter_color_w)
 {
-	dcheese_state *state = space->machine().driver_data<dcheese_state>();
-	COMBINE_DATA(&state->m_blitter_color[offset]);
+	COMBINE_DATA(&m_blitter_color[offset]);
 }
 
 
-WRITE16_HANDLER( madmax_blitter_xparam_w )
+WRITE16_MEMBER(dcheese_state::madmax_blitter_xparam_w)
 {
-	dcheese_state *state = space->machine().driver_data<dcheese_state>();
-	COMBINE_DATA(&state->m_blitter_xparam[offset]);
+	COMBINE_DATA(&m_blitter_xparam[offset]);
 }
 
 
-WRITE16_HANDLER( madmax_blitter_yparam_w )
+WRITE16_MEMBER(dcheese_state::madmax_blitter_yparam_w)
 {
-	dcheese_state *state = space->machine().driver_data<dcheese_state>();
-	COMBINE_DATA(&state->m_blitter_yparam[offset]);
+	COMBINE_DATA(&m_blitter_yparam[offset]);
 }
 
 
-WRITE16_HANDLER( madmax_blitter_vidparam_w )
+WRITE16_MEMBER(dcheese_state::madmax_blitter_vidparam_w)
 {
-	dcheese_state *state = space->machine().driver_data<dcheese_state>();
-	COMBINE_DATA(&state->m_blitter_vidparam[offset]);
+	COMBINE_DATA(&m_blitter_vidparam[offset]);
 
 	switch (offset)
 	{
@@ -274,7 +270,7 @@ WRITE16_HANDLER( madmax_blitter_vidparam_w )
 			break;
 
 		case 0x22/2:		/* scanline interrupt */
-			update_scanline_irq(space->machine());
+			update_scanline_irq(machine());
 			break;
 
 		case 0x24/2:		/* writes here after writing to 0x28 */
@@ -286,40 +282,40 @@ WRITE16_HANDLER( madmax_blitter_vidparam_w )
 			break;
 
 		case 0x38/2:		/* blit */
-			do_blit(space->machine());
+			do_blit(machine());
 			break;
 
 		case 0x3e/2:		/* clear */
-			do_clear(space->machine());
+			do_clear(machine());
 			break;
 
 		default:
-			logerror("%06X:write to %06X = %04X & %04x\n", cpu_get_pc(&space->device()), 0x2a0000 + 2 * offset, data, mem_mask);
+			logerror("%06X:write to %06X = %04X & %04x\n", cpu_get_pc(&space.device()), 0x2a0000 + 2 * offset, data, mem_mask);
 			break;
 	}
 }
 
 
-WRITE16_HANDLER( madmax_blitter_unknown_w )
+WRITE16_MEMBER(dcheese_state::madmax_blitter_unknown_w)
 {
 	/* written to just before the blitter command register is written */
-	logerror("%06X:write to %06X = %04X & %04X\n", cpu_get_pc(&space->device()), 0x300000 + 2 * offset, data, mem_mask);
+	logerror("%06X:write to %06X = %04X & %04X\n", cpu_get_pc(&space.device()), 0x300000 + 2 * offset, data, mem_mask);
 }
 
 
-READ16_HANDLER( madmax_blitter_vidparam_r )
+READ16_MEMBER(dcheese_state::madmax_blitter_vidparam_r)
 {
 	/* analog inputs seem to be hooked up here -- might not actually map to blitter */
 	if (offset == 0x02/2)
-		return input_port_read(space->machine(), "2a0002");
+		return ioport("2a0002")->read();
 	if (offset == 0x0e/2)
-		return input_port_read(space->machine(), "2a000e");
+		return ioport("2a000e")->read();
 
 	/* early code polls on this bit, wants it to be 0 */
 	if (offset == 0x36/2)
 		return 0xffff ^ (1 << 5);
 
 	/* log everything else */
-	logerror("%06X:read from %06X\n", cpu_get_pc(&space->device()), 0x2a0000 + 2 * offset);
+	logerror("%06X:read from %06X\n", cpu_get_pc(&space.device()), 0x2a0000 + 2 * offset);
 	return 0xffff;
 }

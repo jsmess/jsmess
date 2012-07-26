@@ -25,27 +25,27 @@ todo:
 
 
 /* input ports are rotated 90 degrees */
-static READ8_HANDLER( input_port_r )
+READ8_MEMBER(gomoku_state::input_port_r)
 {
 	int i, res;
 	static const char *const portnames[] = { "IN0", "IN1", "DSW", "UNUSED0", "UNUSED1", "UNUSED2", "UNUSED3", "UNUSED4" };
 
 	res = 0;
 	for (i = 0; i < 8; i++)
-		res |= ((input_port_read_safe(space->machine(), portnames[i], 0xff) >> offset) & 1) << i;
+		res |= ((ioport(portnames[i])->read_safe(0xff) >> offset) & 1) << i;
 
 	return res;
 }
 
 
-static ADDRESS_MAP_START( gomoku_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gomoku_map, AS_PROGRAM, 8, gomoku_state )
 	AM_RANGE(0x0000, 0x47ff) AM_ROM
 	AM_RANGE(0x4800, 0x4fff) AM_RAM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(gomoku_videoram_w) AM_BASE_MEMBER(gomoku_state, m_videoram)
-	AM_RANGE(0x5400, 0x57ff) AM_RAM_WRITE(gomoku_colorram_w) AM_BASE_MEMBER(gomoku_state, m_colorram)
-	AM_RANGE(0x5800, 0x58ff) AM_RAM_WRITE(gomoku_bgram_w) AM_BASE_MEMBER(gomoku_state, m_bgram)
-	AM_RANGE(0x6000, 0x601f) AM_DEVWRITE("gomoku", gomoku_sound1_w)
-	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE("gomoku", gomoku_sound2_w)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(gomoku_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x5400, 0x57ff) AM_RAM_WRITE(gomoku_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x5800, 0x58ff) AM_RAM_WRITE(gomoku_bgram_w) AM_SHARE("bgram")
+	AM_RANGE(0x6000, 0x601f) AM_DEVWRITE_LEGACY("gomoku", gomoku_sound1_w)
+	AM_RANGE(0x6800, 0x681f) AM_DEVWRITE_LEGACY("gomoku", gomoku_sound2_w)
 	AM_RANGE(0x7000, 0x7000) AM_WRITENOP
 	AM_RANGE(0x7001, 0x7001) AM_WRITE(gomoku_flipscreen_w)
 	AM_RANGE(0x7002, 0x7002) AM_WRITE(gomoku_bg_dispsw_w)

@@ -27,6 +27,8 @@
 #include "includes/dc.h"
 #include "imagedev/chd_cd.h"
 #include "machine/maple-dc.h"
+#include "machine/dc-ctrl.h"
+
 #define CPU_CLOCK (200000000)
 
 // things from mess/machine/dc.c
@@ -111,14 +113,14 @@ static READ64_HANDLER( dc_arm_r )
 {
 	dc_state *state = space->machine().driver_data<dc_state>();
 
-	return *((UINT64 *)state->dc_sound_ram+offset);
+	return *((UINT64 *)state->dc_sound_ram.target()+offset);
 }
 
 static WRITE64_HANDLER( dc_arm_w )
 {
 	dc_state *state = space->machine().driver_data<dc_state>();
 
-	COMBINE_DATA((UINT64 *)state->dc_sound_ram + offset);
+	COMBINE_DATA((UINT64 *)state->dc_sound_ram.target() + offset);
 }
 
 
@@ -156,52 +158,52 @@ static WRITE64_HANDLER( dc_arm_w )
 	}
  }
 
-static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START( dc_map, AS_PROGRAM, 64, dc_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM	AM_WRITENOP				// BIOS
 	AM_RANGE(0x00200000, 0x0021ffff) AM_ROM AM_REGION("maincpu", 0x200000)	// flash
-	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
-	AM_RANGE(0x005f6c00, 0x005f6cff) AM_DEVREADWRITE32_MODERN( "maple_dc", maple_dc_device, sb_mdstar_r, sb_mdstar_w, U64(0xffffffff00000000) )
-	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE( dc_mess_gdrom_r, dc_mess_gdrom_w )
-	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE( dc_mess_g1_ctrl_r, dc_mess_g1_ctrl_w )
-	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE( dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE( pvr_ta_r, pvr_ta_w )
-	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE( dc_modem_r, dc_modem_w )
-	AM_RANGE(0x00700000, 0x00707fff) AM_DEVREADWRITE("aica", dc_aica_reg_r, dc_aica_reg_w )
-	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE( dc_rtc_r, dc_rtc_w )
-	AM_RANGE(0x00800000, 0x009fffff) AM_READWRITE( dc_arm_r, dc_arm_w )
+	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE_LEGACY(dc_sysctrl_r, dc_sysctrl_w )
+	AM_RANGE(0x005f6c00, 0x005f6cff) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
+	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE_LEGACY(dc_mess_gdrom_r, dc_mess_gdrom_w )
+	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE_LEGACY(dc_mess_g1_ctrl_r, dc_mess_g1_ctrl_w )
+	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE_LEGACY(dc_g2_ctrl_r, dc_g2_ctrl_w )
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE_LEGACY(pvr_ctrl_r, pvr_ctrl_w )
+	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE_LEGACY(pvr_ta_r, pvr_ta_w )
+	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE_LEGACY(dc_modem_r, dc_modem_w )
+	AM_RANGE(0x00700000, 0x00707fff) AM_DEVREADWRITE_LEGACY("aica", dc_aica_reg_r, dc_aica_reg_w )
+	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE_LEGACY(dc_rtc_r, dc_rtc_w )
+	AM_RANGE(0x00800000, 0x009fffff) AM_READWRITE_LEGACY(dc_arm_r, dc_arm_w )
 
 	/* Area 1 */
-	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_BASE_MEMBER( dc_state, dc_texture_ram )      // texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_BASE_MEMBER( dc_state, dc_framebuffer_ram ) // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
+	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
+	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE("frameram") // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
 
 	/* Area 3 */
-	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE("share4") AM_BASE(&dc_ram)
+	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_SHARE("share4") AM_BASE_LEGACY(&dc_ram)
 	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE("share4")// extra ram on Naomi (mirror on DC)
 	AM_RANGE(0x0e000000, 0x0effffff) AM_RAM AM_SHARE("share4")// mirror
 	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE("share4")// mirror
 
 	/* Area 4 */
-	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
-	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x117fffff) AM_WRITE( ta_texture_directpath0_w ) AM_MIRROR(0x00800000)  // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
+	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE_LEGACY(ta_fifo_poly_w )
+	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE_LEGACY(ta_fifo_yuv_w )
+	AM_RANGE(0x11000000, 0x117fffff) AM_WRITE_LEGACY(ta_texture_directpath0_w ) AM_MIRROR(0x00800000)  // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
 
-	AM_RANGE(0x12000000, 0x127fffff) AM_WRITE( ta_fifo_poly_w )
-	AM_RANGE(0x12800000, 0x12ffffff) AM_WRITE( ta_fifo_yuv_w )
-	AM_RANGE(0x13000000, 0x137fffff) AM_WRITE( ta_texture_directpath1_w ) AM_MIRROR(0x00800000) // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
+	AM_RANGE(0x12000000, 0x127fffff) AM_WRITE_LEGACY(ta_fifo_poly_w )
+	AM_RANGE(0x12800000, 0x12ffffff) AM_WRITE_LEGACY(ta_fifo_yuv_w )
+	AM_RANGE(0x13000000, 0x137fffff) AM_WRITE_LEGACY(ta_texture_directpath1_w ) AM_MIRROR(0x00800000) // access to texture / fraembfufer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
 
 	AM_RANGE(0x8c000000, 0x8cffffff) AM_RAM AM_SHARE("share4")	// another RAM mirror
 
 	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dc_port, AS_IO, 64 )
-	AM_RANGE(0x00000000, 0x00000007) AM_READWRITE( dc_pdtra_r, dc_pdtra_w )
+static ADDRESS_MAP_START( dc_port, AS_IO, 64, dc_state )
+	AM_RANGE(0x00000000, 0x00000007) AM_READWRITE_LEGACY(dc_pdtra_r, dc_pdtra_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(dc_state, dc_sound_ram)		/* shared with SH-4 */
-	AM_RANGE(0x00800000, 0x00807fff) AM_DEVREADWRITE("aica", dc_arm_aica_r, dc_arm_aica_w)
+static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32, dc_state )
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("dc_sound_ram")		/* shared with SH-4 */
+	AM_RANGE(0x00800000, 0x00807fff) AM_DEVREADWRITE_LEGACY("aica", dc_arm_aica_r, dc_arm_aica_w)
 ADDRESS_MAP_END
 
 static MACHINE_RESET( dc_console )
@@ -247,7 +249,11 @@ static MACHINE_CONFIG_START( dc, dc_state )
 	MCFG_MACHINE_START( dc )
 	MCFG_MACHINE_RESET( dc_console )
 
-	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu" )
+	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
+	MCFG_DC_CONTROLLER_ADD("dcctrl0", "maple_dc", 0, "P1:0", "P1:1", "P1:A0", "P1:A1", "P1:A2", "P1:A3", "P1:A4", "P1:A5")
+	MCFG_DC_CONTROLLER_ADD("dcctrl1", "maple_dc", 1, "P2:0", "P2:1", "P2:A0", "P2:A1", "P2:A2", "P2:A3", "P2:A4", "P2:A5")
+	MCFG_DC_CONTROLLER_ADD("dcctrl2", "maple_dc", 2, "P3:0", "P3:1", "P3:A0", "P3:A1", "P3:A2", "P3:A3", "P3:A4", "P3:A5")
+	MCFG_DC_CONTROLLER_ADD("dcctrl3", "maple_dc", 3, "P4:0", "P4:1", "P4:A0", "P4:A1", "P4:A2", "P4:A3", "P4:A4", "P4:A5")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -302,7 +308,7 @@ ROM_START( dcprt )
 ROM_END
 
 static INPUT_PORTS_START( dc )
-	PORT_START("P1L")
+	PORT_START("P1:0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -311,7 +317,7 @@ static INPUT_PORTS_START( dc )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_START("P1H")
+	PORT_START("P1:1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -321,7 +327,7 @@ static INPUT_PORTS_START( dc )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
 
-	PORT_START("P2L")
+	PORT_START("P2:0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -330,7 +336,7 @@ static INPUT_PORTS_START( dc )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_START("P2H")
+	PORT_START("P2:1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE2 )
@@ -340,7 +346,7 @@ static INPUT_PORTS_START( dc )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 
-	PORT_START("P3L")
+	PORT_START("P3:0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
@@ -349,7 +355,7 @@ static INPUT_PORTS_START( dc )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
-	PORT_START("P3H")
+	PORT_START("P3:1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )
@@ -359,7 +365,7 @@ static INPUT_PORTS_START( dc )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(3)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(3)
 
-	PORT_START("P4L")
+	PORT_START("P4:0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
@@ -368,7 +374,7 @@ static INPUT_PORTS_START( dc )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
-	PORT_START("P4H")
+	PORT_START("P4:1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN4 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE4 )

@@ -39,7 +39,6 @@
 
 
  ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/compis.h"
 
@@ -87,7 +86,7 @@ static SCREEN_UPDATE_IND16( compis2 ) // temporary
 {
 	compis_state *state = screen.machine().driver_data<compis_state>();
 	UINT8 *m_p_chargen;
-	m_p_chargen = screen.machine().region("maincpu")->base()+0xca70; //bios0
+	m_p_chargen = state->memregion("maincpu")->base()+0xca70; //bios0
 	if (m_p_chargen[0x214] != 0x08) m_p_chargen+= 0x10; //bios1
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0,x;
@@ -359,7 +358,7 @@ static const floppy_interface compis_floppy_interface =
 
 static ADDRESS_MAP_START( upd7220_map, AS_0, 8, compis_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1ffff)
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x00000, 0x1ffff) AM_RAM AM_SHARE("video_ram")
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( compis, compis_state )

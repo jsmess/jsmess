@@ -90,19 +90,22 @@ class warpspeed_state : public driver_device
 {
 public:
 	warpspeed_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_workram(*this, "workram"){ }
 
-	UINT8		*m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t	*m_text_tilemap;
 	tilemap_t	*m_starfield_tilemap;
-	UINT8		*m_workram;
+	required_shared_ptr<UINT8> m_workram;
 	UINT8		m_regs[0x28];
+	DECLARE_WRITE8_MEMBER(warpspeed_hardware_w);
+	DECLARE_WRITE8_MEMBER(warpspeed_vidram_w);
 };
 
-static WRITE8_HANDLER( warpspeed_hardware_w )
+WRITE8_MEMBER(warpspeed_state::warpspeed_hardware_w)
 {
-	warpspeed_state *state = space->machine().driver_data<warpspeed_state>();
-	state->m_regs[offset] = data;
+	m_regs[offset] = data;
 }
 
 static TILE_GET_INFO( get_warpspeed_text_tile_info )
@@ -118,17 +121,16 @@ static TILE_GET_INFO( get_warpspeed_starfield_tile_info )
 	UINT8 code = 0x3f;
 	if ( tile_index & 1 )
 	{
-		code = machine.region("starfield")->base()[tile_index >> 1] & 0x3f;
+		code = machine.root_device().memregion("starfield")->base()[tile_index >> 1] & 0x3f;
 	}
 	SET_TILE_INFO(1, code, 0, 0);
 }
 
-static WRITE8_HANDLER( warpspeed_vidram_w )
+WRITE8_MEMBER(warpspeed_state::warpspeed_vidram_w)
 {
-	warpspeed_state *state = space->machine().driver_data<warpspeed_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_text_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_text_tilemap->mark_tile_dirty(offset);
 }
 
 static VIDEO_START( warpspeed )
@@ -213,19 +215,19 @@ static SCREEN_UPDATE_IND16( warpspeed )
 	return 0;
 }
 
-static ADDRESS_MAP_START( warpspeed_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( warpspeed_map, AS_PROGRAM, 8, warpspeed_state )
 	AM_RANGE(0x0000, 0x0dff) AM_ROM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE( warpspeed_vidram_w ) AM_BASE_MEMBER(warpspeed_state, m_videoram)
-	AM_RANGE(0x1c00, 0x1cff) AM_RAM AM_BASE_MEMBER(warpspeed_state, m_workram)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(warpspeed_vidram_w ) AM_SHARE("videoram")
+	AM_RANGE(0x1c00, 0x1cff) AM_RAM AM_SHARE("workram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START ( warpspeed_io_map, AS_IO, 8)
+static ADDRESS_MAP_START ( warpspeed_io_map, AS_IO, 8, warpspeed_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN2")
-	AM_RANGE(0x00, 0x27) AM_WRITE( warpspeed_hardware_w )
+	AM_RANGE(0x00, 0x27) AM_WRITE(warpspeed_hardware_w )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( warpspeed )
@@ -241,7 +243,7 @@ static INPUT_PORTS_START( warpspeed )
 	PORT_START("IN2")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x7e, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x07, 0x00, "Coin/Time" )

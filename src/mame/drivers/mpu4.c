@@ -464,11 +464,11 @@ static MACHINE_RESET( mpu4 )
 
 	/* init rom bank, some games don't set this, and will assume bank 0,set 0 */
 	{
-		UINT8 *rom = machine.region("maincpu")->base();
+		UINT8 *rom = state->memregion("maincpu")->base();
 
-		memory_configure_bank(machine, "bank1", 0, 8, &rom[0x01000], 0x10000);
+		state->membank("bank1")->configure_entries(0, 8, &rom[0x01000], 0x10000);
 
-		memory_set_bank(machine, "bank1", 0);
+		state->membank("bank1")->set_entry(0);
 		machine.device("maincpu")->reset();
 	}
 }
@@ -517,27 +517,25 @@ However, there is no evidence to suggest this was ever implemented.
 The controls for it exist however, in the form of the Soundboard PIA CB2 pin, which is
 used in some cabinets instead of the main control.
 */
-static WRITE8_HANDLER( bankswitch_w )
+WRITE8_MEMBER(mpu4_state::bankswitch_w)
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 //  printf("bank %02x\n", data);
 
-	state->m_pageval = (data & 0x03);
-	memory_set_bank(space->machine(), "bank1", (state->m_pageval + (state->m_pageset ? 4 : 0)) & 0x07);
+	m_pageval = (data & 0x03);
+	membank("bank1")->set_entry((m_pageval + (m_pageset ? 4 : 0)) & 0x07);
 }
 
 
-static READ8_HANDLER( bankswitch_r )
+READ8_MEMBER(mpu4_state::bankswitch_r)
 {
-	return memory_get_bank(space->machine(), "bank1");
+	return membank("bank1")->entry();
 }
 
 
-static WRITE8_HANDLER( bankset_w )
+WRITE8_MEMBER(mpu4_state::bankset_w)
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
-	state->m_pageval = (data - 2);//writes 2 and 3, to represent 0 and 1 - a hangover from the half page design?
-	memory_set_bank(space->machine(), "bank1", (state->m_pageval + (state->m_pageset ? 4 : 0)) & 0x07);
+	m_pageval = (data - 2);//writes 2 and 3, to represent 0 and 1 - a hangover from the half page design?
+	membank("bank1")->set_entry((m_pageval + (m_pageset ? 4 : 0)) & 0x07);
 }
 
 
@@ -912,7 +910,7 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_r )
 	}
 	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",device->machine().describe_context()));
 
-	return input_port_read(device->machine(), "AUX1")|state->m_aux1_input;
+	return device->machine().root_device().ioport("AUX1")->read()|state->m_aux1_input;
 }
 
 static WRITE8_DEVICE_HANDLER( pia_ic5_porta_w )
@@ -1101,7 +1099,7 @@ READ8_DEVICE_HANDLER( pia_ic5_portb_r )
 	coin_lockout_w(device->machine(), 1, (pia_ic5->b_output() & 0x02) );
 	coin_lockout_w(device->machine(), 2, (pia_ic5->b_output() & 0x04) );
 	coin_lockout_w(device->machine(), 3, (pia_ic5->b_output() & 0x08) );
-	return input_port_read(device->machine(), "AUX2") | state->m_aux2_input;
+	return device->machine().root_device().ioport("AUX2")->read() | state->m_aux2_input;
 }
 
 
@@ -1417,8 +1415,8 @@ static READ8_DEVICE_HANDLER( pia_ic8_porta_r )
 /* The orange inputs are polled twice as often as the black ones, for reasons of efficiency.
    This is achieved via connecting every input line to an AND gate, thus allowing two strobes
    to represent each orange input bank (strobes are active low). */
-	pia_ic5->cb1_w(input_port_read(device->machine(), "AUX2") & 0x80);
-	return input_port_read(device->machine(), portnames[state->m_input_strobe]);
+	pia_ic5->cb1_w(device->machine().root_device().ioport("AUX2")->read() & 0x80);
+	return device->machine().root_device().ioport(portnames[state->m_input_strobe])->read();
 }
 
 
@@ -1562,7 +1560,7 @@ static WRITE_LINE_DEVICE_HANDLER( pia_gb_cb2_w )
 	if (mstate->m_bwb_bank)
 	{
 		mstate->m_pageval = state;
-		memory_set_bank(device->machine(), "bank1", (mstate->m_pageval + (mstate->m_pageset ? 4 : 0)) & 0x07);
+		mstate->membank("bank1")->set_entry((mstate->m_pageval + (mstate->m_pageset ? 4 : 0)) & 0x07);
 	}
 }
 
@@ -1616,28 +1614,27 @@ static WRITE8_DEVICE_HANDLER( ic3ss_o3_callback )
 /* This is a bit of a cheat - since we don't clock into the OKI chip directly, we need to
 calculate the oscillation frequency in advance. We're running the timer for interrupt
 purposes, but the frequency calculation is done by plucking the values out as they are written.*/
-WRITE8_HANDLER( ic3ss_w )
+WRITE8_MEMBER(mpu4_state::ic3ss_w)
 {
-	device_t *ic3ss = space->machine().device("ptm_ic3ss");
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
+	device_t *ic3ss = machine().device("ptm_ic3ss");
 	downcast<ptm6840_device *>(ic3ss)->write(offset,data);
-	device_t *msm6376 = space->machine().device("msm6376");
+	device_t *msm6376 = machine().device("msm6376");
 
 	if (offset == 3)
 	{
-		state->m_t1 = data;
+		m_t1 = data;
 	}
 	if (offset == 6)
 	{
-		state->m_t3h = data;
+		m_t3h = data;
 	}
 	if (offset == 7)
 	{
-		state->m_t3l = data;
+		m_t3l = data;
 	}
 
-	float num = (1720000/((state->m_t3l + 1)*(state->m_t3h + 1)));
-	float denom1 = ((state->m_t3h *(state->m_t3l + 1)+ 1)/(2*(state->m_t1 + 1)));
+	float num = (1720000/((m_t3l + 1)*(m_t3h + 1)));
+	float denom1 = ((m_t3h *(m_t3l + 1)+ 1)/(2*(m_t1 + 1)));
 
 	int denom2 = denom1 +0.5;//need to round up, this gives same precision as chip
 	int freq=num*denom2;
@@ -2357,15 +2354,14 @@ there are again fixed call values.
 */
 
 
-static WRITE8_HANDLER( characteriser_w )
+WRITE8_MEMBER(mpu4_state::characteriser_w)
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	int x;
 	int call=data;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(&space->device()),offset,data));
-	if (!state->m_current_chr_table)
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(&space.device()),offset,data));
+	if (!m_current_chr_table)
 	{
-		logerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
+		logerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space.device()));
 		return;
 	}
 
@@ -2376,16 +2372,16 @@ static WRITE8_HANDLER( characteriser_w )
 		{
 			if (call == 0)
 			{
-				state->m_prot_col = 0;
+				m_prot_col = 0;
 			}
 			else
 			{
-				for (x = state->m_prot_col; x < 64; x++)
+				for (x = m_prot_col; x < 64; x++)
 				{
-					if	(state->m_current_chr_table[(x)].call == call)
+					if	(m_current_chr_table[(x)].call == call)
 					{
-						state->m_prot_col = x;
-						LOG_CHR(("Characteriser find column %02X\n",state->m_prot_col));
+						m_prot_col = x;
+						LOG_CHR(("Characteriser find column %02X\n",m_prot_col));
 						break;
 					}
 				}
@@ -2399,47 +2395,46 @@ static WRITE8_HANDLER( characteriser_w )
 		// Rather than the search strategy, we can map the calls directly here. Note that they are hex versions of the square number series
 		{
 			case 0x00:
-			state->m_lamp_col = 0;
+			m_lamp_col = 0;
 			break;
 			case 0x01:
-			state->m_lamp_col = 1;
+			m_lamp_col = 1;
 			break;
 			case 0x04:
-			state->m_lamp_col = 2;
+			m_lamp_col = 2;
 			break;
 			case 0x09:
-			state->m_lamp_col = 3;
+			m_lamp_col = 3;
 			break;
 			case 0x10:
-			state->m_lamp_col = 4;
+			m_lamp_col = 4;
 			break;
 			case 0x19:
-			state->m_lamp_col = 5;
+			m_lamp_col = 5;
 			break;
 			case 0x24:
-			state->m_lamp_col = 6;
+			m_lamp_col = 6;
 			break;
 			case 0x31:
-			state->m_lamp_col = 7;
+			m_lamp_col = 7;
 			break;
 		}
-		LOG_CHR(("Characteriser find 2 column %02X\n",state->m_lamp_col));
+		LOG_CHR(("Characteriser find 2 column %02X\n",m_lamp_col));
 	}
 }
 
 
-static READ8_HANDLER( characteriser_r )
+READ8_MEMBER(mpu4_state::characteriser_r)
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
-	if (!state->m_current_chr_table)
+	if (!m_current_chr_table)
 	{
-		logerror("No Characteriser Table @ %04x", cpu_get_previouspc(&space->device()));
+		logerror("No Characteriser Table @ %04x", cpu_get_previouspc(&space.device()));
 
 		/* a cheat ... many early games use a standard check */
-		int addr = cpu_get_reg(&space->device(), M6809_X);
+		int addr = cpu_get_reg(&space.device(), M6809_X);
 		if ((addr>=0x800) && (addr<=0xfff)) return 0x00; // prevent recursion, only care about ram/rom areas for this cheat.
 
-		UINT8 ret = space->read_byte(addr);
+		UINT8 ret = space.read_byte(addr);
 		logerror(" (returning %02x)",ret);
 
 		logerror("\n");
@@ -2450,13 +2445,13 @@ static READ8_HANDLER( characteriser_r )
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 	if (offset == 0)
 	{
-		LOG_CHR(("Characteriser read data %02X \n",state->m_current_chr_table[state->m_prot_col].response));
-		return state->m_current_chr_table[state->m_prot_col].response;
+		LOG_CHR(("Characteriser read data %02X \n",m_current_chr_table[m_prot_col].response));
+		return m_current_chr_table[m_prot_col].response;
 	}
 	if (offset == 3)
 	{
-		LOG_CHR(("Characteriser read data off 3 %02X \n",state->m_current_chr_table[state->m_lamp_col+64].response));
-		return state->m_current_chr_table[state->m_lamp_col+64].response;
+		LOG_CHR(("Characteriser read data off 3 %02X \n",m_current_chr_table[m_lamp_col+64].response));
+		return m_current_chr_table[m_lamp_col+64].response;
 	}
 	return 0;
 }
@@ -2499,58 +2494,56 @@ and two holding the appropriate call and response pairs for the two stages of op
 */
 
 
-static WRITE8_HANDLER( bwb_characteriser_w )
+WRITE8_MEMBER(mpu4_state::bwb_characteriser_w)
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	int x;
 	int call=data;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", cpu_get_previouspc(&space->device()),offset,data));
-	if (!state->m_current_chr_table)
-		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space->device()));
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X \n", cpu_get_previouspc(&space.device()),offset,data));
+	if (!m_current_chr_table)
+		fatalerror("No Characteriser Table @ %04x\n", cpu_get_previouspc(&space.device()));
 
 	if ((offset & 0x3f)== 0)//initialisation is always at 0x800
 	{
-		if (!state->m_chr_state)
+		if (!m_chr_state)
 		{
-			state->m_chr_state=1;
-			state->m_chr_counter=0;
+			m_chr_state=1;
+			m_chr_counter=0;
 		}
 		if (call == 0)
 		{
-			state->m_init_col ++;
+			m_init_col ++;
 		}
 		else
 		{
-			state->m_init_col =0;
+			m_init_col =0;
 		}
 	}
 
-	state->m_chr_value = space->machine().rand();
+	m_chr_value = machine().rand();
 	for (x = 0; x < 4; x++)
 	{
-		if	(state->m_current_chr_table[(x)].call == call)
+		if	(m_current_chr_table[(x)].call == call)
 		{
 			if (x == 0) // reinit
 			{
-				state->m_bwb_return = 0;
+				m_bwb_return = 0;
 			}
-			state->m_chr_value = bwb_chr_table_common[(state->m_bwb_return)];
-			state->m_bwb_return++;
+			m_chr_value = bwb_chr_table_common[(m_bwb_return)];
+			m_bwb_return++;
 			break;
 		}
 	}
 }
 
-static READ8_HANDLER( bwb_characteriser_r )
+READ8_MEMBER(mpu4_state::bwb_characteriser_r)
 {
-	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 
 
 	if (offset ==0)
 	{
-		switch (state->m_chr_counter)
+		switch (m_chr_counter)
 		{
 			case 6:
 			case 13:
@@ -2558,38 +2551,38 @@ static READ8_HANDLER( bwb_characteriser_r )
 			case 27:
 			case 34:
 			{
-				return state->m_bwb_chr_table1[(((state->m_chr_counter + 1) / 7) - 1)].response;
+				return m_bwb_chr_table1[(((m_chr_counter + 1) / 7) - 1)].response;
 				break;
 			}
 			default:
 			{
-				if (state->m_chr_counter > 34)
+				if (m_chr_counter > 34)
 				{
-					state->m_chr_counter = 35;
-					state->m_chr_state = 2;
+					m_chr_counter = 35;
+					m_chr_state = 2;
 				}
-				state->m_chr_counter ++;
-				return state->m_chr_value;
+				m_chr_counter ++;
+				return m_chr_value;
 			}
 		}
 	}
 	else
 	{
-		return state->m_chr_value;
+		return m_chr_value;
 	}
 }
 
 /* Common configurations */
 
-static WRITE8_HANDLER( mpu4_ym2413_w )
+WRITE8_MEMBER(mpu4_state::mpu4_ym2413_w)
 {
-	device_t *ym = space->machine().device("ym2413");
+	device_t *ym = machine().device("ym2413");
 	if (ym) ym2413_w(ym,offset,data);
 }
 
-static READ8_HANDLER( mpu4_ym2413_r )
+READ8_MEMBER(mpu4_state::mpu4_ym2413_r)
 {
-//  device_t *ym = space->machine().device("ym2413");
+//  device_t *ym = machine().device("ym2413");
 //  return ym2413_read(ym,offset);
 	return 0xff;
 }
@@ -2597,23 +2590,26 @@ static READ8_HANDLER( mpu4_ym2413_r )
 
 void mpu4_install_mod4yam_space(address_space *space)
 {
-	space->install_legacy_read_handler(0x0880, 0x0882, FUNC(mpu4_ym2413_r));
-	space->install_legacy_write_handler(0x0880, 0x0881, FUNC(mpu4_ym2413_w));
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
+	space->install_read_handler(0x0880, 0x0882, read8_delegate(FUNC(mpu4_state::mpu4_ym2413_r),state));
+	space->install_write_handler(0x0880, 0x0881, write8_delegate(FUNC(mpu4_state::mpu4_ym2413_w),state));
 }
 
 void mpu4_install_mod4oki_space(address_space *space)
 {
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
 	pia6821_device *pia_ic4ss = space->machine().device<pia6821_device>("pia_ic4ss");
 	ptm6840_device *ptm_ic3ss = space->machine().device<ptm6840_device>("ptm_ic3ss");
 
 	space->install_readwrite_handler(0x0880, 0x0883, 0, 0, read8_delegate(FUNC(pia6821_device::read), pia_ic4ss), write8_delegate(FUNC(pia6821_device::write), pia_ic4ss));
 	space->install_read_handler(0x08c0, 0x08c7, 0, 0, read8_delegate(FUNC(ptm6840_device::read), ptm_ic3ss));
-	space->install_legacy_write_handler(0x08c0, 0x08c7, 0, 0, FUNC(ic3ss_w));
+	space->install_write_handler(0x08c0, 0x08c7, 0, 0, write8_delegate(FUNC(mpu4_state::ic3ss_w),state));
 }
 
 void mpu4_install_mod4bwb_space(address_space *space)
 {
-	space->install_legacy_readwrite_handler(0x0810, 0x0810, 0, 0, FUNC(bwb_characteriser_r),FUNC(bwb_characteriser_w));
+	mpu4_state *state = space->machine().driver_data<mpu4_state>();
+	space->install_readwrite_handler(0x0810, 0x0810, 0, 0, read8_delegate(FUNC(mpu4_state::bwb_characteriser_r),state),write8_delegate(FUNC(mpu4_state::bwb_characteriser_w),state));
 	mpu4_install_mod4oki_space(space);
 }
 
@@ -2639,7 +2635,6 @@ static void mpu4_config_common_reels(running_machine &machine,int reels)
 	{
 		stepper_config(machine, n, &barcrest_reel_interface);
 	}
-	awp_reel_setup();
 }
 
 MACHINE_START( mod2     )
@@ -2779,7 +2774,6 @@ static DRIVER_INIT (m_oldtmr)
 	stepper_config(machine, 4, &barcrest_opto1_interface);
 	stepper_config(machine, 5, &barcrest_opto1_interface);
 
-	awp_reel_setup();
 	state->m_current_chr_table = oldtmr_data;
 }
 
@@ -2872,16 +2866,16 @@ static DRIVER_INIT( m4default_bigbank )
 	mpu4_state *state = machine.driver_data<mpu4_state>();
 	DRIVER_INIT_CALL(m4default);
 	state->m_bwb_bank=1;
-	space->install_legacy_write_handler(0x0858, 0x0858, 0, 0, FUNC(bankswitch_w));
-	space->install_legacy_write_handler(0x0878, 0x0878, 0, 0, FUNC(bankset_w));
+	space->install_write_handler(0x0858, 0x0858, 0, 0, write8_delegate(FUNC(mpu4_state::bankswitch_w),state));
+	space->install_write_handler(0x0878, 0x0878, 0, 0, write8_delegate(FUNC(mpu4_state::bankset_w),state));
 }
 
-static READ8_HANDLER( crystal_sound_r )
+READ8_MEMBER(mpu4_state::crystal_sound_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static WRITE8_HANDLER( crystal_sound_w )
+WRITE8_MEMBER(mpu4_state::crystal_sound_w)
 {
 	printf("crystal_sound_w %02x\n",data);
 }
@@ -2889,10 +2883,10 @@ static WRITE8_HANDLER( crystal_sound_w )
 static DRIVER_INIT (m_frkstn)
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-
+	mpu4_state *state = machine.driver_data<mpu4_state>();
 	DRIVER_INIT_CALL(m4default_bigbank);
-	space->install_legacy_read_handler(0x0880, 0x0880, 0, 0, FUNC(crystal_sound_r));
-	space->install_legacy_write_handler(0x0881, 0x0881, 0, 0, FUNC(crystal_sound_w));
+	space->install_read_handler(0x0880, 0x0880, 0, 0, read8_delegate(FUNC(mpu4_state::crystal_sound_r),state));
+	space->install_write_handler(0x0881, 0x0881, 0, 0, write8_delegate(FUNC(mpu4_state::crystal_sound_w),state));
 }
 
 /* generate a 50 Hz signal (based on an RC time) */
@@ -2908,18 +2902,18 @@ TIMER_DEVICE_CALLBACK( gen_50hz )
 	update_meters(state);//run at 100Hz to sync with PIAs
 }
 
-static ADDRESS_MAP_START( mpu4_memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mpu4_memmap, AS_PROGRAM, 8, mpu4_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0800, 0x0810) AM_READWRITE(characteriser_r,characteriser_w)
 	AM_RANGE(0x0850, 0x0850) AM_READWRITE(bankswitch_r,bankswitch_w)	/* write bank (rom page select) */
-/*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE(68681_duart_r,68681_duart_w) */ //Runs hoppers
-	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE_MODERN("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE_MODERN("pia_ic3", pia6821_device, read, write)		/* PIA6821 IC3 */
-	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE_MODERN("pia_ic4", pia6821_device, read, write)		/* PIA6821 IC4 */
-	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE_MODERN("pia_ic5", pia6821_device, read, write)		/* PIA6821 IC5 */
-	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE_MODERN("pia_ic6", pia6821_device, read, write)		/* PIA6821 IC6 */
-	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE_MODERN("pia_ic7", pia6821_device, read, write)		/* PIA6821 IC7 */
-	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE_MODERN("pia_ic8", pia6821_device, read, write)		/* PIA6821 IC8 */
+/*  AM_RANGE(0x08e0, 0x08e7) AM_READWRITE_LEGACY(68681_duart_r,68681_duart_w) */ //Runs hoppers
+	AM_RANGE(0x0900, 0x0907) AM_DEVREADWRITE("ptm_ic2", ptm6840_device, read, write)/* PTM6840 IC2 */
+	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE("pia_ic3", pia6821_device, read, write)		/* PIA6821 IC3 */
+	AM_RANGE(0x0b00, 0x0b03) AM_DEVREADWRITE("pia_ic4", pia6821_device, read, write)		/* PIA6821 IC4 */
+	AM_RANGE(0x0c00, 0x0c03) AM_DEVREADWRITE("pia_ic5", pia6821_device, read, write)		/* PIA6821 IC5 */
+	AM_RANGE(0x0d00, 0x0d03) AM_DEVREADWRITE("pia_ic6", pia6821_device, read, write)		/* PIA6821 IC6 */
+	AM_RANGE(0x0e00, 0x0e03) AM_DEVREADWRITE("pia_ic7", pia6821_device, read, write)		/* PIA6821 IC7 */
+	AM_RANGE(0x0f00, 0x0f03) AM_DEVREADWRITE("pia_ic8", pia6821_device, read, write)		/* PIA6821 IC8 */
 	AM_RANGE(0x1000, 0xffff) AM_ROMBANK("bank1")	/* 64k  paged ROM (4 pages)  */
 ADDRESS_MAP_END
 
@@ -15237,13 +15231,13 @@ void descramble_crystal( UINT8* region, int start, int end, UINT8 extra_xor)
 DRIVER_INIT( crystal )
 {
 	DRIVER_INIT_CALL(m_frkstn);
-	descramble_crystal(machine.region( "maincpu" )->base(), 0x0000, 0x10000, 0x00);
+	descramble_crystal(machine.root_device().memregion( "maincpu" )->base(), 0x0000, 0x10000, 0x00);
 }
 
 DRIVER_INIT( crystali )
 {
 	DRIVER_INIT_CALL(m_frkstn);
-	descramble_crystal(machine.region( "maincpu" )->base(), 0x0000, 0x10000, 0xff); // invert after decrypt?!
+	descramble_crystal(machine.root_device().memregion( "maincpu" )->base(), 0x0000, 0x10000, 0xff); // invert after decrypt?!
 }
 
 

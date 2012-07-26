@@ -241,9 +241,11 @@ class goldngam_state : public driver_device
 {
 public:
 	goldngam_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT16 *m_videoram;
+	required_shared_ptr<UINT16> m_videoram;
+	DECLARE_READ16_MEMBER(unk_r);
 };
 
 
@@ -262,7 +264,8 @@ static SCREEN_UPDATE_IND16( goldngam )
 
 	int x, y;
 
-	UINT8 *tmp = (UINT8 *) state->m_videoram;
+	// ERROR: This cast is NOT endian-safe without the use of BYTE/WORD/DWORD_XOR_* macros!
+	UINT8 *tmp = reinterpret_cast<UINT8 *>(state->m_videoram.target());
 	int index = 0;
 
 	for(y = 0; y < 512; ++y)
@@ -289,24 +292,24 @@ static PALETTE_INIT( goldngam )
 * Memory Map Information *
 *************************/
 
-static READ16_HANDLER(unk_r)
+READ16_MEMBER(goldngam_state::unk_r)
 {
-    int test1 = (space->machine().rand() & 0xae00);
+    int test1 = (machine().rand() & 0xae00);
 //  popmessage("VAL = %02x", test1);
 
 	return test1;
 }
 
-static ADDRESS_MAP_START( swisspkr_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( swisspkr_map, AS_PROGRAM, 16, goldngam_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x400002, 0x400003) AM_NOP // hopper status read ?
 	AM_RANGE(0x40000c, 0x40000d) AM_READ(unk_r)
 	AM_RANGE(0x40000e, 0x40000f) AM_READ_PORT("DSW2")	// not sure...
-	AM_RANGE(0x402000, 0x402001) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
-	AM_RANGE(0x402000, 0x402003) AM_DEVWRITE8("aysnd", ay8910_address_data_w, 0x00ff) //wrong
+	AM_RANGE(0x402000, 0x402001) AM_DEVREAD8_LEGACY("aysnd", ay8910_r, 0x00ff)
+	AM_RANGE(0x402000, 0x402003) AM_DEVWRITE8_LEGACY("aysnd", ay8910_address_data_w, 0x00ff) //wrong
 
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_MEMBER(goldngam_state, m_videoram)
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x500200, 0x50020f) AM_RAM //?
 	AM_RANGE(0x503000, 0x503001) AM_RAM //int ack ?
 	AM_RANGE(0x503002, 0x503003) AM_RAM //int ack ?
@@ -347,10 +350,10 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( moviecrd_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( moviecrd_map, AS_PROGRAM, 16, goldngam_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_MEMBER(goldngam_state, m_videoram)
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x503000, 0x5031ff) AM_RAM //int ack ?
 ADDRESS_MAP_END
 

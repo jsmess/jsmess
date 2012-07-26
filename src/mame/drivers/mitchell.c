@@ -110,9 +110,8 @@ static NVRAM_HANDLER( mitchell )
 	}
 }
 
-static READ8_HANDLER( pang_port5_r )
+READ8_MEMBER(mitchell_state::pang_port5_r)
 {
-	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 
 	/* bits 0 and (sometimes) 3 are checked in the interrupt handler.
         bit 3 is checked before updating the palette so it really seems to be vblank.
@@ -121,7 +120,7 @@ static READ8_HANDLER( pang_port5_r )
         otherwise music doesn't work.
     */
 
-	return (input_port_read(space->machine(), "SYS0") & 0xfe) | (state->m_irq_source & 1);
+	return (ioport("SYS0")->read() & 0xfe) | (m_irq_source & 1);
 }
 
 static WRITE8_DEVICE_HANDLER( eeprom_cs_w )
@@ -149,9 +148,9 @@ static WRITE8_DEVICE_HANDLER( eeprom_serial_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( pang_bankswitch_w )
+WRITE8_MEMBER(mitchell_state::pang_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
 /*************************************
@@ -160,32 +159,31 @@ static WRITE8_HANDLER( pang_bankswitch_w )
  *
  *************************************/
 
-static READ8_HANDLER( block_input_r )
+READ8_MEMBER(mitchell_state::block_input_r)
 {
-	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 	static const char *const dialnames[] = { "DIAL1", "DIAL2" };
 	static const char *const portnames[] = { "IN1", "IN2" };
 
-	if (state->m_dial_selected)
+	if (m_dial_selected)
 	{
-		int delta = (input_port_read(space->machine(), dialnames[offset]) - state->m_dial[offset]) & 0xff;
+		int delta = (ioport(dialnames[offset])->read() - m_dial[offset]) & 0xff;
 
 		if (delta & 0x80)
 		{
 			delta = (-delta) & 0xff;
-			if (state->m_dir[offset])
+			if (m_dir[offset])
 			{
 			/* don't report movement on a direction change, otherwise it will stutter */
-				state->m_dir[offset] = 0;
+				m_dir[offset] = 0;
 				delta = 0;
 			}
 		}
 		else if (delta > 0)
 		{
-			if (!state->m_dir[offset])
+			if (!m_dir[offset])
 			{
 			/* don't report movement on a direction change, otherwise it will stutter */
-				state->m_dir[offset] = 1;
+				m_dir[offset] = 1;
 				delta = 0;
 			}
 		}
@@ -196,35 +194,33 @@ static READ8_HANDLER( block_input_r )
 	}
 	else
 	{
-		int res = input_port_read(space->machine(), portnames[offset]) & 0xf7;
+		int res = ioport(portnames[offset])->read() & 0xf7;
 
-		if (state->m_dir[offset])
+		if (m_dir[offset])
 			res |= 0x08;
 
 		return res;
 	}
 }
 
-static WRITE8_HANDLER( block_dial_control_w )
+WRITE8_MEMBER(mitchell_state::block_dial_control_w)
 {
-	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 
 	if (data == 0x08)
 	{
 		/* reset the dial counters */
-		state->m_dial[0] = input_port_read(space->machine(), "DIAL1");
-		state->m_dial[1] = input_port_read(space->machine(), "DIAL2");
+		m_dial[0] = ioport("DIAL1")->read();
+		m_dial[1] = ioport("DIAL2")->read();
 	}
 	else if (data == 0x80)
-		state->m_dial_selected = 0;
+		m_dial_selected = 0;
 	else
-		state->m_dial_selected = 1;
+		m_dial_selected = 1;
 }
 
 
-static READ8_HANDLER( mahjong_input_r )
+READ8_MEMBER(mitchell_state::mahjong_input_r)
 {
-	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 	int i;
 	static const char *const keynames[2][5] =
 			{
@@ -234,57 +230,54 @@ static READ8_HANDLER( mahjong_input_r )
 
 	for (i = 0; i < 5; i++)
 	{
-		if (state->m_keymatrix & (0x80 >> i))
-			return input_port_read(space->machine(), keynames[offset][i]);
+		if (m_keymatrix & (0x80 >> i))
+			return ioport(keynames[offset][i])->read();
 	}
 
 	return 0xff;
 }
 
-static WRITE8_HANDLER( mahjong_input_select_w )
+WRITE8_MEMBER(mitchell_state::mahjong_input_select_w)
 {
-	mitchell_state *state = space->machine().driver_data<mitchell_state>();
-	state->m_keymatrix = data;
+	m_keymatrix = data;
 }
 
 
-static READ8_HANDLER( input_r )
+READ8_MEMBER(mitchell_state::input_r)
 {
-	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 
-	switch (state->m_input_type)
+	switch (m_input_type)
 	{
 		case 0:
 		default:
-			return input_port_read(space->machine(), portnames[offset]);
+			return ioport(portnames[offset])->read();
 		case 1:		/* Mahjong games */
 			if (offset)
 				return mahjong_input_r(space, offset - 1);
 			else
-				return input_port_read(space->machine(), "IN0");
+				return ioport("IN0")->read();
 			break;
 		case 2:		/* Block Block - dial control */
 			if (offset)
 				return block_input_r(space, offset - 1);
 			else
-				return input_port_read(space->machine(), "IN0");
+				return ioport("IN0")->read();
 			break;
 		case 3:		/* Super Pang - simulate START 1 press to initialize EEPROM */
-			return input_port_read(space->machine(), portnames[offset]);
+			return ioport(portnames[offset])->read();
 	}
 }
 
 
-static WRITE8_HANDLER( input_w )
+WRITE8_MEMBER(mitchell_state::input_w)
 {
-	mitchell_state *state = space->machine().driver_data<mitchell_state>();
 
-	switch (state->m_input_type)
+	switch (m_input_type)
 	{
 		case 0:
 		default:
-			logerror("PC %04x: write %02x to port 01\n", cpu_get_pc(&space->device()), data);
+			logerror("PC %04x: write %02x to port 01\n", cpu_get_pc(&space.device()), data);
 			break;
 		case 1:
 			mahjong_input_select_w(space, offset, data);
@@ -302,82 +295,81 @@ static WRITE8_HANDLER( input_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( mgakuen_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mgakuen_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(mgakuen_paletteram_r, mgakuen_paletteram_w)	/* palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w) AM_BASE_MEMBER(mitchell_state, m_colorram) /* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(mgakuen_videoram_r, mgakuen_videoram_w) AM_BASE_SIZE_MEMBER(mitchell_state, m_videoram, m_videoram_size) /* char RAM */
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w) AM_SHARE("colorram") /* Attribute RAM */
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(mgakuen_videoram_r, mgakuen_videoram_w) AM_SHARE("videoram") /* char RAM */
 	AM_RANGE(0xe000, 0xefff) AM_RAM	/* Work RAM */
 	AM_RANGE(0xf000, 0xffff) AM_READWRITE(mgakuen_objram_r, mgakuen_objram_w)	/* OBJ RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mitchell_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mitchell_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r,pang_paletteram_w) /* Banked palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r,pang_colorram_w) AM_BASE_MEMBER(mitchell_state, m_colorram) /* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r,pang_videoram_w) AM_BASE_SIZE_MEMBER(mitchell_state, m_videoram, m_videoram_size)/* Banked char / OBJ RAM */
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r,pang_colorram_w) AM_SHARE("colorram") /* Attribute RAM */
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r,pang_videoram_w) AM_SHARE("videoram")/* Banked char / OBJ RAM */
 	AM_RANGE(0xe000, 0xffff) AM_RAM	/* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mitchell_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mitchell_io_map, AS_IO, 8, mitchell_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)	/* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x00, 0x02) AM_READ(input_r)			/* The Mahjong games and Block Block need special input treatment */
 	AM_RANGE(0x01, 0x01) AM_WRITE(input_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)	/* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ymsnd", ym2413_data_port_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ymsnd", ym2413_register_port_w)
-	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("ymsnd", ym2413_data_port_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("ymsnd", ym2413_register_port_w)
+	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r) AM_DEVWRITE("oki", okim6295_device, write)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP				/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)	/* Video RAM bank register */
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("eeprom", eeprom_cs_w)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("eeprom", eeprom_clock_w)
-	AM_RANGE(0x18, 0x18) AM_DEVWRITE("eeprom", eeprom_serial_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE_LEGACY("eeprom", eeprom_cs_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("eeprom", eeprom_clock_w)
+	AM_RANGE(0x18, 0x18) AM_DEVWRITE_LEGACY("eeprom", eeprom_serial_w)
 ADDRESS_MAP_END
 
 /* spangbl */
-static ADDRESS_MAP_START( spangbl_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spangbl_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1") AM_WRITENOP
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(pang_paletteram_r, pang_paletteram_w)	/* Banked palette RAM */
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w)	AM_BASE_MEMBER(mitchell_state, m_colorram)/* Attribute RAM */
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r, pang_videoram_w)	AM_BASE_SIZE_MEMBER(mitchell_state, m_videoram, m_videoram_size) /* Banked char / OBJ RAM */
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(pang_colorram_r, pang_colorram_w)	AM_SHARE("colorram")/* Attribute RAM */
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(pang_videoram_r, pang_videoram_w)	AM_SHARE("videoram") /* Banked char / OBJ RAM */
 	AM_RANGE(0xe000, 0xffff) AM_RAM		/* Work RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spangbl_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( spangbl_io_map, AS_IO, 8, mitchell_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x02) AM_READ(input_r)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pangbl_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)      /* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ymsnd", ym2413_data_port_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ymsnd", ym2413_register_port_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("ymsnd", ym2413_data_port_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("ymsnd", ym2413_register_port_w)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("SYS0")
 	AM_RANGE(0x06, 0x06) AM_WRITENOP	/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)      /* Video RAM bank register */
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("eeprom", eeprom_cs_w)
-	AM_RANGE(0x10, 0x10) AM_DEVWRITE("eeprom", eeprom_clock_w)
-	AM_RANGE(0x18, 0x18) AM_DEVWRITE("eeprom", eeprom_serial_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE_LEGACY("eeprom", eeprom_cs_w)
+	AM_RANGE(0x10, 0x10) AM_DEVWRITE_LEGACY("eeprom", eeprom_clock_w)
+	AM_RANGE(0x18, 0x18) AM_DEVWRITE_LEGACY("eeprom", eeprom_serial_w)
 ADDRESS_MAP_END
 
 
 #ifdef UNUSED_FUNCTION
-static WRITE8_HANDLER( spangbl_msm5205_data_w )
+WRITE8_MEMBER(mitchell_state::spangbl_msm5205_data_w)
 {
-	mitchell_state *state = space->machine().driver_data<mitchell_state>();
-	state->m_sample_buffer = data;
+	m_sample_buffer = data;
 }
 #endif
 
-static ADDRESS_MAP_START( spangbl_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spangbl_sound_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-//  AM_RANGE(0xec00, 0xec00) AM_WRITE( spangbl_msm5205_data_w )
+//  AM_RANGE(0xec00, 0xec00) AM_WRITE(spangbl_msm5205_data_w )
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spangbl_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( spangbl_sound_io_map, AS_IO, 8, mitchell_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -389,22 +381,21 @@ static WRITE8_DEVICE_HANDLER( oki_banking_w )
 	state->m_oki->set_bank_base(0x40000 * (data & 3));
 }
 
-static ADDRESS_MAP_START( mstworld_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mstworld_sound_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE("oki", oki_banking_w)
-	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0x9000, 0x9000) AM_DEVWRITE_LEGACY("oki", oki_banking_w)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER(mstworld_sound_w)
+WRITE8_MEMBER(mitchell_state::mstworld_sound_w)
 {
-	mitchell_state *state = space->machine().driver_data<mitchell_state>();
-	soundlatch_w(space, 0, data);
-	device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+	soundlatch_byte_w(space, 0, data);
+	device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 }
 
-static ADDRESS_MAP_START( mstworld_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mstworld_io_map, AS_IO, 8, mitchell_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(mstworld_gfxctrl_w)	/* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -429,7 +420,7 @@ static INPUT_PORTS_START( mj_common )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
@@ -679,7 +670,7 @@ static INPUT_PORTS_START( pang )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
@@ -730,7 +721,7 @@ static INPUT_PORTS_START( mstworld )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 
@@ -846,7 +837,7 @@ static INPUT_PORTS_START( qtono1 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
@@ -886,7 +877,7 @@ static INPUT_PORTS_START( block )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
@@ -928,7 +919,7 @@ static INPUT_PORTS_START( blockjoy )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 
@@ -2114,14 +2105,14 @@ ROM_END
 static void bootleg_decode( running_machine &machine )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, machine.region("maincpu")->base() + 0x50000);
-	memory_configure_bank_decrypted(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x60000, 0x4000);
+	space->set_decrypted_region(0x0000, 0x7fff, machine.root_device().memregion("maincpu")->base() + 0x50000);
+	machine.root_device().membank("bank1")->configure_decrypted_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x60000, 0x4000);
 }
 
 
 static void configure_banks( running_machine &machine )
 {
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -2170,7 +2161,7 @@ static DRIVER_INIT( spang )
 	mitchell_state *state = machine.driver_data<mitchell_state>();
 	state->m_input_type = 3;
 	state->m_nvram_size = 0x80;
-	state->m_nvram = &machine.region("maincpu")->base()[0xe000];	/* NVRAM */
+	state->m_nvram = &state->memregion("maincpu")->base()[0xe000];	/* NVRAM */
 	spang_decode(machine);
 	configure_banks(machine);
 }
@@ -2180,7 +2171,7 @@ static DRIVER_INIT( spangbl )
 	mitchell_state *state = machine.driver_data<mitchell_state>();
 	state->m_input_type = 3;
 	state->m_nvram_size = 0x80;
-	state->m_nvram = &machine.region("maincpu")->base()[0xe000];	/* NVRAM */
+	state->m_nvram = &state->memregion("maincpu")->base()[0xe000];	/* NVRAM */
 	bootleg_decode(machine);
 	configure_banks(machine);
 }
@@ -2190,7 +2181,7 @@ static DRIVER_INIT( spangj )
 	mitchell_state *state = machine.driver_data<mitchell_state>();
 	state->m_input_type = 3;
 	state->m_nvram_size = 0x80;
-	state->m_nvram = &machine.region("maincpu")->base()[0xe000];	/* NVRAM */
+	state->m_nvram = &state->memregion("maincpu")->base()[0xe000];	/* NVRAM */
 	spangj_decode(machine);
 	configure_banks(machine);
 }
@@ -2199,7 +2190,7 @@ static DRIVER_INIT( sbbros )
 	mitchell_state *state = machine.driver_data<mitchell_state>();
 	state->m_input_type = 3;
 	state->m_nvram_size = 0x80;
-	state->m_nvram = &machine.region("maincpu")->base()[0xe000];	/* NVRAM */
+	state->m_nvram = &state->memregion("maincpu")->base()[0xe000];	/* NVRAM */
 	sbbros_decode(machine);
 	configure_banks(machine);
 }
@@ -2264,7 +2255,7 @@ static DRIVER_INIT( block )
 	mitchell_state *state = machine.driver_data<mitchell_state>();
 	state->m_input_type = 2;
 	state->m_nvram_size = 0x80;
-	state->m_nvram = &machine.region("maincpu")->base()[0xff80];	/* NVRAM */
+	state->m_nvram = &state->memregion("maincpu")->base()[0xff80];	/* NVRAM */
 	block_decode(machine);
 	configure_banks(machine);
 }
@@ -2273,7 +2264,7 @@ static DRIVER_INIT( blockbl )
 	mitchell_state *state = machine.driver_data<mitchell_state>();
 	state->m_input_type = 2;
 	state->m_nvram_size = 0x80;
-	state->m_nvram = &machine.region("maincpu")->base()[0xff80];	/* NVRAM */
+	state->m_nvram = &state->memregion("maincpu")->base()[0xff80];	/* NVRAM */
 	bootleg_decode(machine);
 	configure_banks(machine);
 }
@@ -2281,9 +2272,9 @@ static DRIVER_INIT( blockbl )
 static DRIVER_INIT( mstworld )
 {
 	/* descramble the program rom .. */
-	int len = machine.region("maincpu")->bytes();
+	int len = machine.root_device().memregion("maincpu")->bytes();
 	UINT8* source = auto_alloc_array(machine, UINT8, len);
-	UINT8* dst = machine.region("maincpu")->base() ;
+	UINT8* dst = machine.root_device().memregion("maincpu")->base() ;
 	int x;
 
 	static const int tablebank[]=

@@ -379,7 +379,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 
-	soundlatch_w(space, 0, param);
+	state->soundlatch_byte_w(*space, 0, param);
 	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -403,7 +403,7 @@ static READ8_HANDLER( sound_data_r )
 	segas1x_state *state = space->machine().driver_data<segas1x_state>();
 
 	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_r(space, offset);
+	return state->soundlatch_byte_r(*space, offset);
 }
 
 
@@ -451,7 +451,7 @@ static READ16_HANDLER( adc_r )
 	int which = (state->m_iochip_regs[0][2] >> 2) & 7;
 
 	/* on the write, latch the selected input port and stash the value */
-	int value = input_port_read_safe(space->machine(), ports[which], 0x0010);
+	int value = state->ioport(ports[which])->read_safe(0x0010);
 
 	/* reverse some port values */
 	if (state->m_adc_reverse[which])
@@ -512,11 +512,11 @@ static READ16_HANDLER( iochip_0_r )
                 D6: /INTR of ADC0804
                 D5-D0: CN C pin 24-19 (switch state 0= open, 1= closed)
             */
-			return iochip_r(space->machine(), 0, 0, input_port_read(space->machine(), "IO0PORTA"));
+			return iochip_r(space->machine(), 0, 0, space->machine().root_device().ioport("IO0PORTA")->read());
 
 		case 1:
 			/* I/O port: CN C pins 17,15,13,11,9,7,5,3 */
-			return iochip_r(space->machine(), 0, 1, input_port_read(space->machine(), "IO0PORTB"));
+			return iochip_r(space->machine(), 0, 1, space->machine().root_device().ioport("IO0PORTB")->read());
 
 		case 2:
 			/* Output port */
@@ -563,7 +563,7 @@ static WRITE16_HANDLER( iochip_0_w )
                 D1: (CONT) - affects sprite hardware
                 D0: Sound section reset (1= normal operation, 0= reset)
             */
-			if (((oldval ^ data) & 0x40) && !(data & 0x40)) watchdog_reset_w(space,0,0);
+			if (((oldval ^ data) & 0x40) && !(data & 0x40)) state->watchdog_reset_w(*space,0,0);
 			segaic16_set_display_enable(space->machine(), data & 0x20);
 			device_set_input_line(state->m_soundcpu, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			return;
@@ -588,19 +588,19 @@ static READ16_HANDLER( iochip_1_r )
 	{
 		case 0:
 			/* Input port: switches, CN D pin A1-8 (switch state 1= open, 0= closed) */
-			return iochip_r(space->machine(), 1, 0, input_port_read(space->machine(), "IO1PORTA"));
+			return iochip_r(space->machine(), 1, 0, space->machine().root_device().ioport("IO1PORTA")->read());
 
 		case 1:
 			/* Input port: switches, CN D pin A9-16 (switch state 1= open, 0= closed) */
-			return iochip_r(space->machine(), 1, 1, input_port_read(space->machine(), "IO1PORTB"));
+			return iochip_r(space->machine(), 1, 1, space->machine().root_device().ioport("IO1PORTB")->read());
 
 		case 2:
 			/* Input port: DIP switches (1= off, 0= on) */
-			return iochip_r(space->machine(), 1, 2, input_port_read(space->machine(), "IO1PORTC"));
+			return iochip_r(space->machine(), 1, 2, space->machine().root_device().ioport("IO1PORTC")->read());
 
 		case 3:
 			/* Input port: DIP switches (1= off, 0= on) */
-			return iochip_r(space->machine(), 1, 3, input_port_read(space->machine(), "IO1PORTD"));
+			return iochip_r(space->machine(), 1, 3, space->machine().root_device().ioport("IO1PORTD")->read());
 
 		case 4:
 			/* Unused */
@@ -710,33 +710,33 @@ static WRITE16_HANDLER( smgp_excs_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("backup1")
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("backup2")
-	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM_WRITE(segaic16_tileram_0_w) AM_BASE(&segaic16_tileram_0)
-	AM_RANGE(0x0d0000, 0x0d0fff) AM_MIRROR(0x00f000) AM_RAM_WRITE(segaic16_textram_0_w) AM_BASE(&segaic16_textram_0)
-	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE("5248_main", segaic16_multiply_r, segaic16_multiply_w)
-	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("5249_main", segaic16_divide_r, segaic16_divide_w)
-	AM_RANGE(0x0e8000, 0x0e801f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("5250_main", segaic16_compare_timer_r, segaic16_compare_timer_w)
-	AM_RANGE(0x100000, 0x100fff) AM_MIRROR(0x00f000) AM_RAM AM_BASE(&segaic16_spriteram_0)
-	AM_RANGE(0x110000, 0x11ffff) AM_WRITE(segaic16_sprites_draw_0_w)
-	AM_RANGE(0x120000, 0x123fff) AM_MIRROR(0x00c000) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
-	AM_RANGE(0x130000, 0x13ffff) AM_READWRITE(adc_r, adc_w)
-	AM_RANGE(0x140000, 0x14000f) AM_MIRROR(0x00fff0) AM_READWRITE(iochip_0_r, iochip_0_w)
-	AM_RANGE(0x150000, 0x15000f) AM_MIRROR(0x00fff0) AM_READWRITE(iochip_1_r, iochip_1_w)
-	AM_RANGE(0x160000, 0x16ffff) AM_WRITE(iocontrol_w)
+	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM_WRITE_LEGACY(segaic16_tileram_0_w) AM_BASE_LEGACY(&segaic16_tileram_0)
+	AM_RANGE(0x0d0000, 0x0d0fff) AM_MIRROR(0x00f000) AM_RAM_WRITE_LEGACY(segaic16_textram_0_w) AM_BASE_LEGACY(&segaic16_textram_0)
+	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE_LEGACY("5248_main", segaic16_multiply_r, segaic16_multiply_w)
+	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE_LEGACY("5249_main", segaic16_divide_r, segaic16_divide_w)
+	AM_RANGE(0x0e8000, 0x0e801f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE_LEGACY("5250_main", segaic16_compare_timer_r, segaic16_compare_timer_w)
+	AM_RANGE(0x100000, 0x100fff) AM_MIRROR(0x00f000) AM_RAM AM_BASE_LEGACY(&segaic16_spriteram_0)
+	AM_RANGE(0x110000, 0x11ffff) AM_WRITE_LEGACY(segaic16_sprites_draw_0_w)
+	AM_RANGE(0x120000, 0x123fff) AM_MIRROR(0x00c000) AM_RAM_WRITE_LEGACY(segaic16_paletteram_w) AM_BASE_LEGACY(&segaic16_paletteram)
+	AM_RANGE(0x130000, 0x13ffff) AM_READWRITE_LEGACY(adc_r, adc_w)
+	AM_RANGE(0x140000, 0x14000f) AM_MIRROR(0x00fff0) AM_READWRITE_LEGACY(iochip_0_r, iochip_0_w)
+	AM_RANGE(0x150000, 0x15000f) AM_MIRROR(0x00fff0) AM_READWRITE_LEGACY(iochip_1_r, iochip_1_w)
+	AM_RANGE(0x160000, 0x16ffff) AM_WRITE_LEGACY(iocontrol_w)
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM AM_REGION("sub", 0x00000)
 	AM_RANGE(0x280000, 0x283fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x2a0000, 0x2a3fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0x2e0000, 0x2e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE("5248_subx", segaic16_multiply_r, segaic16_multiply_w)
-	AM_RANGE(0x2e4000, 0x2e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("5249_subx", segaic16_divide_r, segaic16_divide_w)
-	AM_RANGE(0x2e8000, 0x2e800f) AM_MIRROR(0x003ff0) AM_DEVREADWRITE("5250_subx", segaic16_compare_timer_r, segaic16_compare_timer_w)
-	AM_RANGE(0x2ec000, 0x2ecfff) AM_MIRROR(0x001000) AM_RAM AM_SHARE("share5") AM_BASE(&segaic16_roadram_0)
-	AM_RANGE(0x2ee000, 0x2effff) AM_READWRITE(segaic16_road_control_0_r, segaic16_road_control_0_w)
-//  AM_RANGE(0x2f0000, 0x2f3fff) AM_READWRITE(excs_r, excs_w)
+	AM_RANGE(0x2e0000, 0x2e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE_LEGACY("5248_subx", segaic16_multiply_r, segaic16_multiply_w)
+	AM_RANGE(0x2e4000, 0x2e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE_LEGACY("5249_subx", segaic16_divide_r, segaic16_divide_w)
+	AM_RANGE(0x2e8000, 0x2e800f) AM_MIRROR(0x003ff0) AM_DEVREADWRITE_LEGACY("5250_subx", segaic16_compare_timer_r, segaic16_compare_timer_w)
+	AM_RANGE(0x2ec000, 0x2ecfff) AM_MIRROR(0x001000) AM_RAM AM_SHARE("share5") AM_BASE_LEGACY(&segaic16_roadram_0)
+	AM_RANGE(0x2ee000, 0x2effff) AM_READWRITE_LEGACY(segaic16_road_control_0_r, segaic16_road_control_0_w)
+//  AM_RANGE(0x2f0000, 0x2f3fff) AM_READWRITE_LEGACY(excs_r, excs_w)
 	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("backup1")
 	AM_RANGE(0x3fc000, 0x3fffff) AM_RAM AM_SHARE("backup2")
 ADDRESS_MAP_END
@@ -749,18 +749,18 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE("5248_subx", segaic16_multiply_r, segaic16_multiply_w)
-	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE("5249_subx", segaic16_divide_r, segaic16_divide_w)
-	AM_RANGE(0x0e8000, 0x0e800f) AM_MIRROR(0x003ff0) AM_DEVREADWRITE("5250_subx", segaic16_compare_timer_r, segaic16_compare_timer_w)
+	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE_LEGACY("5248_subx", segaic16_multiply_r, segaic16_multiply_w)
+	AM_RANGE(0x0e4000, 0x0e401f) AM_MIRROR(0x003fe0) AM_DEVREADWRITE_LEGACY("5249_subx", segaic16_divide_r, segaic16_divide_w)
+	AM_RANGE(0x0e8000, 0x0e800f) AM_MIRROR(0x003ff0) AM_DEVREADWRITE_LEGACY("5250_subx", segaic16_compare_timer_r, segaic16_compare_timer_w)
 	AM_RANGE(0x0ec000, 0x0ecfff) AM_MIRROR(0x001000) AM_RAM AM_SHARE("share5")
-	AM_RANGE(0x0ee000, 0x0effff) AM_READWRITE(segaic16_road_control_0_r, segaic16_road_control_0_w)
-//  AM_RANGE(0x0f0000, 0x0f3fff) AM_READWRITE(excs_r, excs_w)
+	AM_RANGE(0x0ee000, 0x0effff) AM_READWRITE_LEGACY(segaic16_road_control_0_r, segaic16_road_control_0_w)
+//  AM_RANGE(0x0f0000, 0x0f3fff) AM_READWRITE_LEGACY(excs_r, excs_w)
 ADDRESS_MAP_END
 
 
@@ -771,18 +771,18 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE("pcm", sega_pcm_r, sega_pcm_w)
+	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x0700) AM_DEVREADWRITE_LEGACY("pcm", sega_pcm_r, sega_pcm_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
-	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(sound_data_r)
+	AM_RANGE(0x00, 0x01) AM_MIRROR(0x3e) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ_LEGACY(sound_data_r)
 ADDRESS_MAP_END
 
 
@@ -793,13 +793,13 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( smgp_comm_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( smgp_comm_map, AS_PROGRAM, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( smgp_comm_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( smgp_comm_portmap, AS_IO, 8, segas1x_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -1236,7 +1236,7 @@ INPUT_PORTS_END
 
 static const ym2151_interface ym2151_config =
 {
-	sound_cpu_irq
+	DEVCB_LINE(sound_cpu_irq)
 };
 
 

@@ -22,11 +22,13 @@ class mosaicf2_state : public driver_device
 public:
 	mosaicf2_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu") { }
+		  m_maincpu(*this, "maincpu") ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
 	required_device<e132xn_device>	m_maincpu;
-	UINT32 *  m_videoram;
+	required_shared_ptr<UINT32> m_videoram;
+	DECLARE_READ32_MEMBER(f32_input_port_1_r);
 };
 
 
@@ -52,34 +54,34 @@ static SCREEN_UPDATE_IND16( mosaicf2 )
 
 
 
-static ADDRESS_MAP_START( common_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( common_map, AS_PROGRAM, 32, mosaicf2_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
-	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_BASE_MEMBER(mosaicf2_state, m_videoram)
+	AM_RANGE(0x40000000, 0x4003ffff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x80000000, 0x80ffffff) AM_ROM AM_REGION("user2",0)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
-static READ32_HANDLER( f32_input_port_1_r )
+READ32_MEMBER(mosaicf2_state::f32_input_port_1_r)
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
-	mosaicf2_state *state = space->machine().driver_data<mosaicf2_state>();
-	offs_t pc = state->m_maincpu->pc();
+
+	offs_t pc = m_maincpu->pc();
 	if ((pc == 0x000379de) || (pc == 0x000379cc) )
-		state->m_maincpu->eat_cycles(100);
+		m_maincpu->eat_cycles(100);
 	//else printf("PC %08x\n", pc );
-	return input_port_read(space->machine(), "SYSTEM_P2");
+	return ioport("SYSTEM_P2")->read();
 }
 
 
-static ADDRESS_MAP_START( mosaicf2_io, AS_IO, 32 )
-	AM_RANGE(0x4000, 0x4003) AM_DEVREAD8_MODERN("oki", okim6295_device, read, 0x000000ff)
-	AM_RANGE(0x4810, 0x4813) AM_DEVREAD8("ymsnd", ym2151_status_port_r, 0x000000ff)
+static ADDRESS_MAP_START( mosaicf2_io, AS_IO, 32, mosaicf2_state )
+	AM_RANGE(0x4000, 0x4003) AM_DEVREAD8("oki", okim6295_device, read, 0x000000ff)
+	AM_RANGE(0x4810, 0x4813) AM_DEVREAD8_LEGACY("ymsnd", ym2151_status_port_r, 0x000000ff)
 	AM_RANGE(0x5000, 0x5003) AM_READ_PORT("P1")
 	AM_RANGE(0x5200, 0x5203) AM_READ(f32_input_port_1_r)
 	AM_RANGE(0x5400, 0x5403) AM_READ_PORT("EEPROMIN")
-	AM_RANGE(0x6000, 0x6003) AM_DEVWRITE8_MODERN("oki", okim6295_device, write, 0x000000ff)
-	AM_RANGE(0x6800, 0x6803) AM_DEVWRITE8("ymsnd", ym2151_data_port_w, 0x000000ff)
-	AM_RANGE(0x6810, 0x6813) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x000000ff)
+	AM_RANGE(0x6000, 0x6003) AM_DEVWRITE8("oki", okim6295_device, write, 0x000000ff)
+	AM_RANGE(0x6800, 0x6803) AM_DEVWRITE8_LEGACY("ymsnd", ym2151_data_port_w, 0x000000ff)
+	AM_RANGE(0x6810, 0x6813) AM_DEVWRITE8_LEGACY("ymsnd", ym2151_register_port_w, 0x000000ff)
 	AM_RANGE(0x7000, 0x7003) AM_WRITE_PORT("EEPROMCLK")
 	AM_RANGE(0x7200, 0x7203) AM_WRITE_PORT("EEPROMCS")
 	AM_RANGE(0x7400, 0x7403) AM_WRITE_PORT("EEPROMOUT")
@@ -105,7 +107,7 @@ static INPUT_PORTS_START( mosaicf2 )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000400, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00007800, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)

@@ -19,22 +19,22 @@
 #include "machine/ram.h"
 #include "imagedev/flopdrv.h"
 
-static READ8_HANDLER (b2m_keyboard_r )
+READ8_MEMBER(b2m_state::b2m_keyboard_r)
 {
 	UINT8 key = 0x00;
 	if (offset < 0x100) {
-		if ((offset & 0x01)!=0) { key |= input_port_read(space->machine(),"LINE0"); }
-		if ((offset & 0x02)!=0) { key |= input_port_read(space->machine(),"LINE1"); }
-		if ((offset & 0x04)!=0) { key |= input_port_read(space->machine(),"LINE2"); }
-		if ((offset & 0x08)!=0) { key |= input_port_read(space->machine(),"LINE3"); }
-		if ((offset & 0x10)!=0) { key |= input_port_read(space->machine(),"LINE4"); }
-		if ((offset & 0x20)!=0) { key |= input_port_read(space->machine(),"LINE5"); }
-		if ((offset & 0x40)!=0) { key |= input_port_read(space->machine(),"LINE6"); }
-		if ((offset & 0x80)!=0) { key |= input_port_read(space->machine(),"LINE7"); }
+		if ((offset & 0x01)!=0) { key |= ioport("LINE0")->read(); }
+		if ((offset & 0x02)!=0) { key |= ioport("LINE1")->read(); }
+		if ((offset & 0x04)!=0) { key |= ioport("LINE2")->read(); }
+		if ((offset & 0x08)!=0) { key |= ioport("LINE3")->read(); }
+		if ((offset & 0x10)!=0) { key |= ioport("LINE4")->read(); }
+		if ((offset & 0x20)!=0) { key |= ioport("LINE5")->read(); }
+		if ((offset & 0x40)!=0) { key |= ioport("LINE6")->read(); }
+		if ((offset & 0x80)!=0) { key |= ioport("LINE7")->read(); }
 	} else {
-		if ((offset & 0x01)!=0) { key |= input_port_read(space->machine(),"LINE8"); }
-		if ((offset & 0x02)!=0) { key |= input_port_read(space->machine(),"LINE9"); }
-		if ((offset & 0x04)!=0) { key |= input_port_read(space->machine(),"LINE10"); }
+		if ((offset & 0x01)!=0) { key |= ioport("LINE8")->read(); }
+		if ((offset & 0x02)!=0) { key |= ioport("LINE9")->read(); }
+		if ((offset & 0x04)!=0) { key |= ioport("LINE10")->read(); }
 	}
 	return key;
 }
@@ -43,6 +43,7 @@ static READ8_HANDLER (b2m_keyboard_r )
 static void b2m_set_bank(running_machine &machine,int bank)
 {
 	UINT8 *rom;
+	b2m_state *state =  machine.driver_data<b2m_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	UINT8 *ram = machine.device<ram_device>(RAM_TAG)->pointer();
 
@@ -52,78 +53,78 @@ static void b2m_set_bank(running_machine &machine,int bank)
 	space->install_write_bank(0x7000, 0xdfff, "bank4");
 	space->install_write_bank(0xe000, 0xffff, "bank5");
 
-	rom = machine.region("maincpu")->base();
+	rom = state->memregion("maincpu")->base();
 	switch(bank) {
 		case 0 :
 		case 1 :
 						space->unmap_write(0xe000, 0xffff);
 
-						memory_set_bankptr(machine, "bank1", ram);
-						memory_set_bankptr(machine, "bank2", ram + 0x2800);
-						memory_set_bankptr(machine, "bank3", ram + 0x3000);
-						memory_set_bankptr(machine, "bank4", ram + 0x7000);
-						memory_set_bankptr(machine, "bank5", rom + 0x10000);
+						state->membank("bank1")->set_base(ram);
+						state->membank("bank2")->set_base(ram + 0x2800);
+						state->membank("bank3")->set_base(ram + 0x3000);
+						state->membank("bank4")->set_base(ram + 0x7000);
+						state->membank("bank5")->set_base(rom + 0x10000);
 						break;
 #if 0
 		case 1 :
 						space->unmap_write(0x3000, 0x6fff);
 						space->unmap_write(0xe000, 0xffff);
 
-						memory_set_bankptr(machine, "bank1", ram);
-						memory_set_bankptr(machine, "bank2", ram + 0x2800);
-						memory_set_bankptr(machine, "bank3", rom + 0x12000);
-						memory_set_bankptr(machine, "bank4", rom + 0x16000);
-						memory_set_bankptr(machine, "bank5", rom + 0x10000);
+						state->membank("bank1")->set_base(ram);
+						state->membank("bank2")->set_base(ram + 0x2800);
+						state->membank("bank3")->set_base(rom + 0x12000);
+						state->membank("bank4")->set_base(rom + 0x16000);
+						state->membank("bank5")->set_base(rom + 0x10000);
 						break;
 #endif
 		case 2 :
 						space->unmap_write(0x2800, 0x2fff);
 						space->unmap_write(0xe000, 0xffff);
 
-						memory_set_bankptr(machine, "bank1", ram);
-						space->install_legacy_read_handler(0x2800, 0x2fff, FUNC(b2m_keyboard_r));
-						memory_set_bankptr(machine, "bank3", ram + 0x10000);
-						memory_set_bankptr(machine, "bank4", ram + 0x7000);
-						memory_set_bankptr(machine, "bank5", rom + 0x10000);
+						state->membank("bank1")->set_base(ram);
+						space->install_read_handler(0x2800, 0x2fff, read8_delegate(FUNC(b2m_state::b2m_keyboard_r),state));
+						state->membank("bank3")->set_base(ram + 0x10000);
+						state->membank("bank4")->set_base(ram + 0x7000);
+						state->membank("bank5")->set_base(rom + 0x10000);
 						break;
 		case 3 :
 						space->unmap_write(0x2800, 0x2fff);
 						space->unmap_write(0xe000, 0xffff);
 
-						memory_set_bankptr(machine, "bank1", ram);
-						space->install_legacy_read_handler(0x2800, 0x2fff, FUNC(b2m_keyboard_r));
-						memory_set_bankptr(machine, "bank3", ram + 0x14000);
-						memory_set_bankptr(machine, "bank4", ram + 0x7000);
-						memory_set_bankptr(machine, "bank5", rom + 0x10000);
+						state->membank("bank1")->set_base(ram);
+						space->install_read_handler(0x2800, 0x2fff, read8_delegate(FUNC(b2m_state::b2m_keyboard_r),state));
+						state->membank("bank3")->set_base(ram + 0x14000);
+						state->membank("bank4")->set_base(ram + 0x7000);
+						state->membank("bank5")->set_base(rom + 0x10000);
 						break;
 		case 4 :
 						space->unmap_write(0x2800, 0x2fff);
 						space->unmap_write(0xe000, 0xffff);
 
-						memory_set_bankptr(machine, "bank1", ram);
-						space->install_legacy_read_handler(0x2800, 0x2fff, FUNC(b2m_keyboard_r));
-						memory_set_bankptr(machine, "bank3", ram + 0x18000);
-						memory_set_bankptr(machine, "bank4", ram + 0x7000);
-						memory_set_bankptr(machine, "bank5", rom + 0x10000);
+						state->membank("bank1")->set_base(ram);
+						space->install_read_handler(0x2800, 0x2fff, read8_delegate(FUNC(b2m_state::b2m_keyboard_r),state));
+						state->membank("bank3")->set_base(ram + 0x18000);
+						state->membank("bank4")->set_base(ram + 0x7000);
+						state->membank("bank5")->set_base(rom + 0x10000);
 
 						break;
 		case 5 :
 						space->unmap_write(0x2800, 0x2fff);
 						space->unmap_write(0xe000, 0xffff);
 
-						memory_set_bankptr(machine, "bank1", ram);
-						space->install_legacy_read_handler(0x2800, 0x2fff, FUNC(b2m_keyboard_r));
-						memory_set_bankptr(machine, "bank3", ram + 0x1c000);
-						memory_set_bankptr(machine, "bank4", ram + 0x7000);
-						memory_set_bankptr(machine, "bank5", rom + 0x10000);
+						state->membank("bank1")->set_base(ram);
+						space->install_read_handler(0x2800, 0x2fff, read8_delegate(FUNC(b2m_state::b2m_keyboard_r),state));
+						state->membank("bank3")->set_base(ram + 0x1c000);
+						state->membank("bank4")->set_base(ram + 0x7000);
+						state->membank("bank5")->set_base(rom + 0x10000);
 
 						break;
 		case 6 :
-						memory_set_bankptr(machine, "bank1", ram);
-						memory_set_bankptr(machine, "bank2", ram + 0x2800);
-						memory_set_bankptr(machine, "bank3", ram + 0x3000);
-						memory_set_bankptr(machine, "bank4", ram + 0x7000);
-						memory_set_bankptr(machine, "bank5", ram + 0xe000);
+						state->membank("bank1")->set_base(ram);
+						state->membank("bank2")->set_base(ram + 0x2800);
+						state->membank("bank3")->set_base(ram + 0x3000);
+						state->membank("bank4")->set_base(ram + 0x7000);
+						state->membank("bank5")->set_base(ram + 0xe000);
 						break;
 		case 7 :
 						space->unmap_write(0x0000, 0x27ff);
@@ -132,11 +133,11 @@ static void b2m_set_bank(running_machine &machine,int bank)
 						space->unmap_write(0x7000, 0xdfff);
 						space->unmap_write(0xe000, 0xffff);
 
-						memory_set_bankptr(machine, "bank1", rom + 0x10000);
-						memory_set_bankptr(machine, "bank2", rom + 0x10000);
-						memory_set_bankptr(machine, "bank3", rom + 0x10000);
-						memory_set_bankptr(machine, "bank4", rom + 0x10000);
-						memory_set_bankptr(machine, "bank5", rom + 0x10000);
+						state->membank("bank1")->set_base(rom + 0x10000);
+						state->membank("bank2")->set_base(rom + 0x10000);
+						state->membank("bank3")->set_base(rom + 0x10000);
+						state->membank("bank4")->set_base(rom + 0x10000);
+						state->membank("bank5")->set_base(rom + 0x10000);
 						break;
 	}
 }
@@ -244,7 +245,7 @@ static READ8_DEVICE_HANDLER (b2m_romdisk_porta_r )
 {
 	b2m_state *state = device->machine().driver_data<b2m_state>();
 
-	UINT8 *romdisk = device->machine().region("maincpu")->base() + 0x12000;
+	UINT8 *romdisk = state->memregion("maincpu")->base() + 0x12000;
 	return romdisk[state->m_b2m_romdisk_msb*256+state->m_b2m_romdisk_lsb];
 }
 
@@ -282,9 +283,8 @@ DRIVER_INIT( b2m )
 	state->m_vblank_state = 0;
 }
 
-WRITE8_HANDLER ( b2m_palette_w )
+WRITE8_MEMBER(b2m_state::b2m_palette_w)
 {
-	b2m_state *state = space->machine().driver_data<b2m_state>();
 
 	UINT8 b = (3 - ((data >> 6) & 3)) * 0x55;
 	UINT8 g = (3 - ((data >> 4) & 3)) * 0x55;
@@ -292,31 +292,28 @@ WRITE8_HANDLER ( b2m_palette_w )
 
 	UINT8 bw = (3 - (data & 3)) * 0x55;
 
-	state->m_b2m_color[offset & 3] = data;
+	m_b2m_color[offset & 3] = data;
 
-	if (input_port_read(space->machine(),"MONITOR")==1) {
-		palette_set_color_rgb(space->machine(),offset, r, g, b);
+	if (ioport("MONITOR")->read()==1) {
+		palette_set_color_rgb(machine(),offset, r, g, b);
 	} else {
-		palette_set_color_rgb(space->machine(),offset, bw, bw, bw);
+		palette_set_color_rgb(machine(),offset, bw, bw, bw);
 	}
 }
 
-READ8_HANDLER ( b2m_palette_r )
+READ8_MEMBER(b2m_state::b2m_palette_r)
 {
-	b2m_state *state = space->machine().driver_data<b2m_state>();
-	return state->m_b2m_color[offset];
+	return m_b2m_color[offset];
 }
 
-WRITE8_HANDLER ( b2m_localmachine_w )
+WRITE8_MEMBER(b2m_state::b2m_localmachine_w)
 {
-	b2m_state *state = space->machine().driver_data<b2m_state>();
-	state->m_b2m_localmachine = data;
+	m_b2m_localmachine = data;
 }
 
-READ8_HANDLER ( b2m_localmachine_r )
+READ8_MEMBER(b2m_state::b2m_localmachine_r)
 {
-	b2m_state *state = space->machine().driver_data<b2m_state>();
-	return state->m_b2m_localmachine;
+	return m_b2m_localmachine;
 }
 
 static void b2m_postload(b2m_state *state)

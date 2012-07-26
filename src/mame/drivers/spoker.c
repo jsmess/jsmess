@@ -26,13 +26,16 @@ class spoker_state : public driver_device
 {
 public:
 	spoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg_tile_ram(*this, "bg_tile_ram"),
+		m_fg_tile_ram(*this, "fg_tile_ram"),
+		m_fg_color_ram(*this, "fg_color_ram"){ }
 
-	UINT8   *m_bg_tile_ram;
+	required_shared_ptr<UINT8> m_bg_tile_ram;
 	tilemap_t *m_bg_tilemap;
 
-	UINT8 *m_fg_tile_ram;
-	UINT8 *m_fg_color_ram;
+	required_shared_ptr<UINT8> m_fg_tile_ram;
+	required_shared_ptr<UINT8> m_fg_color_ram;
 	tilemap_t *m_fg_tilemap;
 
 	int m_video_enable;
@@ -40,14 +43,22 @@ public:
 	int m_hopper;
 	UINT8 m_igs_magic[2];
 	UINT8 m_out[3];
+	DECLARE_WRITE8_MEMBER(bg_tile_w);
+	DECLARE_WRITE8_MEMBER(fg_tile_w);
+	DECLARE_WRITE8_MEMBER(fg_color_w);
+	DECLARE_WRITE8_MEMBER(spoker_nmi_and_coins_w);
+	DECLARE_WRITE8_MEMBER(spoker_video_and_leds_w);
+	DECLARE_WRITE8_MEMBER(spoker_leds_w);
+	DECLARE_WRITE8_MEMBER(spoker_magic_w);
+	DECLARE_READ8_MEMBER(spoker_magic_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
 };
 
-static WRITE8_HANDLER( bg_tile_w )
+WRITE8_MEMBER(spoker_state::bg_tile_w)
 {
-	spoker_state *state = space->machine().driver_data<spoker_state>();
 
-	state->m_bg_tile_ram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tile_ram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -64,20 +75,18 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(0, code, (4*(code >> 14)+3), 0);
 }
 
-static WRITE8_HANDLER( fg_tile_w )
+WRITE8_MEMBER(spoker_state::fg_tile_w)
 {
-	spoker_state *state = space->machine().driver_data<spoker_state>();
 
-	state->m_fg_tile_ram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_tile_ram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( fg_color_w )
+WRITE8_MEMBER(spoker_state::fg_color_w)
 {
-	spoker_state *state = space->machine().driver_data<spoker_state>();
 
-	state->m_fg_color_ram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_color_ram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
 static VIDEO_START(spoker)
@@ -103,13 +112,10 @@ static SCREEN_UPDATE_IND16(spoker)
                                 Memory Maps
 ***************************************************************************/
 
-static CUSTOM_INPUT( hopper_r )
+CUSTOM_INPUT_MEMBER(spoker_state::hopper_r)
 {
-	running_machine &machine = field.machine();
-	spoker_state *state = machine.driver_data<spoker_state>();
-
-	if (state->m_hopper) return !(machine.primary_screen->frame_number()%10);
-	return machine.input().code_pressed(KEYCODE_H);
+	if (m_hopper) return !(machine().primary_screen->frame_number()%10);
+	return machine().input().code_pressed(KEYCODE_H);
 }
 
 static void show_out(UINT8 *out)
@@ -119,97 +125,92 @@ static void show_out(UINT8 *out)
 #endif
 }
 
-static WRITE8_HANDLER( spoker_nmi_and_coins_w )
+WRITE8_MEMBER(spoker_state::spoker_nmi_and_coins_w)
 {
-	spoker_state *state = space->machine().driver_data<spoker_state>();
 
 	if ((data) & (0x22))
 	{
-		logerror("PC %06X: nmi_and_coins = %02x\n",cpu_get_pc(&space->device()),data);
+		logerror("PC %06X: nmi_and_coins = %02x\n",cpu_get_pc(&space.device()),data);
 //      popmessage("%02x",data);
 	}
 
-	coin_counter_w(space->machine(), 0,		data & 0x01);	// coin_a
-	coin_counter_w(space->machine(), 1,		data & 0x04);	// coin_c
-	coin_counter_w(space->machine(), 2,		data & 0x08);	// key in
-	coin_counter_w(space->machine(), 3,		data & 0x10);	// coin out mech
+	coin_counter_w(machine(), 0,		data & 0x01);	// coin_a
+	coin_counter_w(machine(), 1,		data & 0x04);	// coin_c
+	coin_counter_w(machine(), 2,		data & 0x08);	// key in
+	coin_counter_w(machine(), 3,		data & 0x10);	// coin out mech
 
-	set_led_status(space->machine(), 6,		data & 0x40);	// led for coin out / hopper active
+	set_led_status(machine(), 6,		data & 0x40);	// led for coin out / hopper active
 
-	if(((state->m_nmi_ack & 0x80) == 0) && data & 0x80)
-		cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	if(((m_nmi_ack & 0x80) == 0) && data & 0x80)
+		cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
 
-	state->m_nmi_ack = data & 0x80;     // nmi acknowledge, 0 -> 1
+	m_nmi_ack = data & 0x80;     // nmi acknowledge, 0 -> 1
 
-	state->m_out[0] = data;
-	show_out(state->m_out);
+	m_out[0] = data;
+	show_out(m_out);
 }
 
-static WRITE8_HANDLER( spoker_video_and_leds_w )
+WRITE8_MEMBER(spoker_state::spoker_video_and_leds_w)
 {
-	spoker_state *state = space->machine().driver_data<spoker_state>();
 
-	set_led_status(space->machine(), 4,	  data & 0x01);	// start?
-	set_led_status(space->machine(), 5,	  data & 0x04);	// l_bet?
+	set_led_status(machine(), 4,	  data & 0x01);	// start?
+	set_led_status(machine(), 5,	  data & 0x04);	// l_bet?
 
-	state->m_video_enable	=	  data & 0x40;
-	state->m_hopper			=	(~data)& 0x80;
+	m_video_enable	=	  data & 0x40;
+	m_hopper			=	(~data)& 0x80;
 
-	state->m_out[1] = data;
-	show_out(state->m_out);
+	m_out[1] = data;
+	show_out(m_out);
 }
 
-static WRITE8_HANDLER( spoker_leds_w )
+WRITE8_MEMBER(spoker_state::spoker_leds_w)
 {
-	spoker_state *state = space->machine().driver_data<spoker_state>();
 
-	set_led_status(space->machine(), 0, data & 0x01);	// stop_1
-	set_led_status(space->machine(), 1, data & 0x02);	// stop_2
-	set_led_status(space->machine(), 2, data & 0x04);	// stop_3
-	set_led_status(space->machine(), 3, data & 0x08);	// stop
+	set_led_status(machine(), 0, data & 0x01);	// stop_1
+	set_led_status(machine(), 1, data & 0x02);	// stop_2
+	set_led_status(machine(), 2, data & 0x04);	// stop_3
+	set_led_status(machine(), 3, data & 0x08);	// stop
 	// data & 0x10?
 
-	state->m_out[2] = data;
-	show_out(state->m_out);
+	m_out[2] = data;
+	show_out(m_out);
 }
 
-static WRITE8_HANDLER( spoker_magic_w )
+WRITE8_MEMBER(spoker_state::spoker_magic_w)
 {
-	spoker_state *state = space->machine().driver_data<spoker_state>();
 
-	state->m_igs_magic[offset] = data;
+	m_igs_magic[offset] = data;
 
 	if (offset == 0)
 		return;
 
-	switch(state->m_igs_magic[0])
+	switch(m_igs_magic[0])
 	{
 		case 0x01:
 			break;
 
 		default:
 //          popmessage("magic %x <- %04x",igs_magic[0],data);
-			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(&space->device()), state->m_igs_magic[0], data);
+			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(&space.device()), m_igs_magic[0], data);
 	}
 }
 
-static READ8_HANDLER( spoker_magic_r )
+READ8_MEMBER(spoker_state::spoker_magic_r)
 {
-	spoker_state *state = space->machine().driver_data<spoker_state>();
 
-	switch(state->m_igs_magic[0])
+	switch(m_igs_magic[0])
 	{
 		case 0x00:
-			if ( !(state->m_igs_magic[1] & 0x01) )	return input_port_read(space->machine(), "DSW1");
-			if ( !(state->m_igs_magic[1] & 0x02) )	return input_port_read(space->machine(), "DSW2");
-			if ( !(state->m_igs_magic[1] & 0x04) )	return input_port_read(space->machine(), "DSW3");
-			if ( !(state->m_igs_magic[1] & 0x08) )	return input_port_read(space->machine(), "DSW4");
-			if ( !(state->m_igs_magic[1] & 0x10) )	return input_port_read(space->machine(), "DSW5");
-			logerror("%06x: warning, reading dsw with igs_magic[1] = %02x\n", cpu_get_pc(&space->device()), state->m_igs_magic[1]);
+			if ( !(m_igs_magic[1] & 0x01) )	return ioport("DSW1")->read();
+			if ( !(m_igs_magic[1] & 0x02) )	return ioport("DSW2")->read();
+			if ( !(m_igs_magic[1] & 0x04) )	return ioport("DSW3")->read();
+			if ( !(m_igs_magic[1] & 0x08) )	return ioport("DSW4")->read();
+			if ( !(m_igs_magic[1] & 0x10) )	return ioport("DSW5")->read();
+			logerror("%06x: warning, reading dsw with igs_magic[1] = %02x\n", cpu_get_pc(&space.device()), m_igs_magic[1]);
 			break;
 
 		default:
-			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(&space->device()), state->m_igs_magic[0]);
+			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(&space.device()), m_igs_magic[0]);
 	}
 
 	return 0;
@@ -218,49 +219,49 @@ static READ8_HANDLER( spoker_magic_r )
 
 
 
-static ADDRESS_MAP_START( spoker_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( spoker_map, AS_PROGRAM, 8, spoker_state )
 	AM_RANGE( 0x00000, 0x0f3ff ) AM_ROM
 	AM_RANGE( 0x0f400, 0x0ffff ) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( spoker_portmap, AS_IO, 8, spoker_state )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs
 
-	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
-	AM_RANGE( 0x2400, 0x27ff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
+	AM_RANGE( 0x2000, 0x23ff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w ) AM_SHARE("paletteram")
+	AM_RANGE( 0x2400, 0x27ff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w ) AM_SHARE("paletteram2")
 
-	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE( bg_tile_w ) AM_BASE_MEMBER( spoker_state,m_bg_tile_ram )
+	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE(bg_tile_w ) AM_SHARE("bg_tile_ram")
 
-	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE( fg_tile_w )  AM_BASE_MEMBER( spoker_state,m_fg_tile_ram )
+	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 
 	/* TODO: ppi #1 */
-	AM_RANGE( 0x6480, 0x6480 ) AM_WRITE( spoker_nmi_and_coins_w )
+	AM_RANGE( 0x6480, 0x6480 ) AM_WRITE(spoker_nmi_and_coins_w )
 	AM_RANGE( 0x6481, 0x6481 ) AM_READ_PORT( "SERVICE" )
 	AM_RANGE( 0x6482, 0x6482 ) AM_READ_PORT( "COINS" )
 
 	/* TODO: ppi #2 */
 	AM_RANGE( 0x6490, 0x6490 ) AM_READ_PORT( "BUTTONS1" )
-	AM_RANGE( 0x6491, 0x6491 ) AM_WRITE( spoker_video_and_leds_w )
-	AM_RANGE( 0x6492, 0x6492 ) AM_WRITE( spoker_leds_w )
+	AM_RANGE( 0x6491, 0x6491 ) AM_WRITE(spoker_video_and_leds_w )
+	AM_RANGE( 0x6492, 0x6492 ) AM_WRITE(spoker_leds_w )
 
 	AM_RANGE( 0x64a0, 0x64a0 ) AM_READ_PORT( "BUTTONS2" )
 
-	AM_RANGE( 0x64b0, 0x64b1 ) AM_DEVWRITE( "ymsnd", ym2413_w )
+	AM_RANGE( 0x64b0, 0x64b1 ) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w )
 
-	AM_RANGE( 0x64c0, 0x64c0 ) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE( 0x64c0, 0x64c0 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
-	AM_RANGE( 0x64d0, 0x64d1 ) AM_READWRITE( spoker_magic_r, spoker_magic_w )	// DSW1-5
+	AM_RANGE( 0x64d0, 0x64d1 ) AM_READWRITE(spoker_magic_r, spoker_magic_w )	// DSW1-5
 
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE( fg_color_w ) AM_BASE_MEMBER( spoker_state,m_fg_color_ram )
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8, spoker_state )
 //  AM_RANGE( 0x1000, 0x1fff ) AM_WRITENOP
 
-	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split1_w ) AM_BASE_GENERIC( paletteram )
-	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE( paletteram_xBBBBBGGGGGRRRRR_split2_w ) AM_BASE_GENERIC( paletteram2 )
+	AM_RANGE( 0x2000, 0x27ff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_lo_w ) AM_SHARE("paletteram")
+	AM_RANGE( 0x2800, 0x2fff ) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_split_hi_w ) AM_SHARE("paletteram2")
 
-	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE( bg_tile_w ) AM_BASE_MEMBER( spoker_state,m_bg_tile_ram )
+	AM_RANGE( 0x3000, 0x33ff ) AM_RAM_WRITE(bg_tile_w ) AM_SHARE("bg_tile_ram")
 
 	AM_RANGE( 0x4000, 0x4000 ) AM_READ_PORT( "DSW1" )
 	AM_RANGE( 0x4001, 0x4001 ) AM_READ_PORT( "DSW2" )
@@ -270,18 +271,18 @@ static ADDRESS_MAP_START( 3super8_portmap, AS_IO, 8 )
 
 //  AM_RANGE( 0x4000, 0x40ff ) AM_WRITENOP
 
-	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE( fg_tile_w )  AM_BASE_MEMBER( spoker_state,m_fg_tile_ram )
+	AM_RANGE( 0x5000, 0x5fff ) AM_RAM_WRITE(fg_tile_w )  AM_SHARE("fg_tile_ram")
 
 	AM_RANGE( 0x6480, 0x6480 ) AM_READ_PORT( "IN0" )
 	AM_RANGE( 0x6490, 0x6490 ) AM_READ_PORT( "IN1" )
-	AM_RANGE( 0x6491, 0x6491 ) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE( 0x6491, 0x6491 ) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE( 0x64a0, 0x64a0 ) AM_READ_PORT( "IN2" )
-	AM_RANGE( 0x64b0, 0x64b0 ) AM_WRITE( spoker_leds_w )
+	AM_RANGE( 0x64b0, 0x64b0 ) AM_WRITE(spoker_leds_w )
 	AM_RANGE( 0x64c0, 0x64c0 ) AM_READNOP //irq ack?
 
 	AM_RANGE( 0x64f0, 0x64f0 ) AM_WRITE(spoker_nmi_and_coins_w )
 
-	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE( fg_color_w ) AM_BASE_MEMBER( spoker_state,m_fg_color_ram )
+	AM_RANGE( 0x7000, 0x7fff ) AM_RAM_WRITE(fg_color_w ) AM_SHARE("fg_color_ram")
 ADDRESS_MAP_END
 
 
@@ -331,7 +332,7 @@ static INPUT_PORTS_START( spoker )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Memory Clear")	// stats, memory
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM( hopper_r, (void *)0 ) PORT_NAME("HPSW")	// hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,spoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")	// hopper sensor
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )
@@ -400,7 +401,7 @@ static INPUT_PORTS_START( 3super8 )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM( hopper_r, (void *)0 ) PORT_NAME("HPSW")	// hopper sensor
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL  ) PORT_CUSTOM_MEMBER(DEVICE_SELF,spoker_state,hopper_r, (void *)0 ) PORT_NAME("HPSW")	// hopper sensor
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1   )
@@ -574,7 +575,7 @@ MACHINE_CONFIG_END
 static DRIVER_INIT( spk116it )
 {
 	int A;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 
 	for (A = 0;A < 0x10000;A++)
@@ -681,7 +682,7 @@ ROM_END
 
 static DRIVER_INIT( 3super8 )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	/* Decryption is probably done using one macrocell/output on an address decoding pal which we do not have a dump of */
@@ -699,8 +700,8 @@ static DRIVER_INIT( 3super8 )
 
 	/* cheesy hack: take gfx roms from spk116it and rearrange them for this game needs */
 	{
-		UINT8 *src = machine.region("rep_gfx")->base();
-		UINT8 *dst = machine.region("gfx1")->base();
+		UINT8 *src = machine.root_device().memregion("rep_gfx")->base();
+		UINT8 *dst = machine.root_device().memregion("gfx1")->base();
 		UINT8 x;
 
 		for(x=0;x<3;x++)

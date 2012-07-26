@@ -3,7 +3,6 @@
     Driver for Casio PV-1000
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -18,7 +17,8 @@ class pv1000_state : public driver_device
 {
 public:
 	pv1000_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	DECLARE_WRITE8_MEMBER(pv1000_io_w);
 	DECLARE_READ8_MEMBER(pv1000_io_r);
@@ -38,13 +38,13 @@ public:
 
 	device_t *m_maincpu;
 	screen_device *m_screen;
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 };
 
 
 static ADDRESS_MAP_START( pv1000, AS_PROGRAM, 8, pv1000_state )
 	AM_RANGE( 0x0000, 0x3fff ) AM_MIRROR( 0x4000 ) AM_ROM AM_REGION( "cart", 0 )
-	AM_RANGE( 0xb800, 0xbbff ) AM_RAM AM_BASE( m_p_videoram )
+	AM_RANGE( 0xb800, 0xbbff ) AM_RAM AM_SHARE("p_videoram")
 	AM_RANGE( 0xbc00, 0xbfff ) AM_RAM_WRITE( pv1000_gfxram_w ) AM_REGION( "gfxram", 0 )
 ADDRESS_MAP_END
 
@@ -57,7 +57,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER( pv1000_state::pv1000_gfxram_w )
 {
-	UINT8 *gfxram = machine().region( "gfxram" )->base();
+	UINT8 *gfxram = memregion( "gfxram" )->base();
 
 	gfxram[ offset ] = data;
 	gfx_element_mark_dirty(machine().gfx[1], offset/32);
@@ -106,19 +106,19 @@ READ8_MEMBER( pv1000_state::pv1000_io_r )
 		data = 0;
 		if ( m_io_regs[5] & 0x08 )
 		{
-			data = input_port_read( machine(), "IN3" );
+			data = ioport( "IN3" )->read();
 		}
 		if ( m_io_regs[5] & 0x04 )
 		{
-			data = input_port_read( machine(), "IN2" );
+			data = ioport( "IN2" )->read();
 		}
 		if ( m_io_regs[5] & 0x02 )
 		{
-			data = input_port_read( machine(), "IN1" );
+			data = ioport( "IN1" )->read();
 		}
 		if ( m_io_regs[5] & 0x01 )
 		{
-			data = input_port_read( machine(), "IN0" );
+			data = ioport( "IN0" )->read();
 		}
 		m_fd_data = 0;
 		break;
@@ -170,7 +170,7 @@ static PALETTE_INIT( pv1000 )
 
 static DEVICE_IMAGE_LOAD( pv1000_cart )
 {
-	UINT8 *cart = image.device().machine().region("cart")->base();
+	UINT8 *cart = image.device().machine().root_device().memregion("cart")->base();
 	UINT32 size;
 
 	if (image.software_entry() == NULL)

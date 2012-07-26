@@ -8,23 +8,26 @@ class markham_state : public driver_device
 {
 public:
 	markham_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram"),
+		m_xscroll(*this, "xscroll"){ }
 
 	/* memory pointers */
-	UINT8 *    m_videoram;
-	UINT8 *    m_spriteram;
-	UINT8 *    m_xscroll;
-	size_t     m_spriteram_size;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_xscroll;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
+	DECLARE_READ8_MEMBER(markham_e004_r);
+	DECLARE_WRITE8_MEMBER(markham_videoram_w);
+	DECLARE_WRITE8_MEMBER(markham_flipscreen_w);
 };
 
 
 /*----------- defined in video/markham.c -----------*/
 
-WRITE8_HANDLER( markham_videoram_w );
-WRITE8_HANDLER( markham_flipscreen_w );
 
 PALETTE_INIT( markham );
 VIDEO_START( markham );

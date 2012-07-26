@@ -169,7 +169,7 @@ void tmc2000_state::bankswitch()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
-	UINT8 *rom = machine().region(CDP1802_TAG)->base();
+	UINT8 *rom = memregion(CDP1802_TAG)->base();
 
 	if (m_roc)
 	{
@@ -322,14 +322,11 @@ static INPUT_PORTS_START( tmc1800 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 INPUT_PORTS_END
 
-static INPUT_CHANGED( tmc2000_run_pressed )
+INPUT_CHANGED_MEMBER( tmc2000_state::run_pressed )
 {
-	running_machine &machine = field.machine();
-	tmc2000_state *state = machine.driver_data<tmc2000_state>();
-
 	if (oldval && !newval)
 	{
-		state->machine_reset();
+		machine_reset();
 	}
 }
 
@@ -355,7 +352,7 @@ static INPUT_PORTS_START( tmc2000 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 
 	PORT_START("RUN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE PORT_CHANGED(tmc2000_run_pressed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE PORT_CHANGED_MEMBER(DEVICE_SELF, tmc2000_state, run_pressed, 0)
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
@@ -418,33 +415,27 @@ static INPUT_PORTS_START( tmc2000 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 INPUT_PORTS_END
 
-static INPUT_CHANGED( run_pressed )
+INPUT_CHANGED_MEMBER( nano_state::run_pressed )
 {
-	running_machine &machine = field.machine();
-	nano_state *state = machine.driver_data<nano_state>();
-
 	if (oldval && !newval)
 	{
-		state->machine_reset();
+		machine_reset();
 	}
 }
 
-static INPUT_CHANGED( monitor_pressed )
+INPUT_CHANGED_MEMBER( nano_state::monitor_pressed )
 {
-	running_machine &machine = field.machine();
-	nano_state *state = machine.driver_data<nano_state>();
-
 	if (oldval && !newval)
 	{
-		state->machine_reset();
+		machine_reset();
 
-		state->m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF4, CLEAR_LINE);
+		m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF4, CLEAR_LINE);
 	}
 	else if (!oldval && newval)
 	{
 		// TODO: what are the correct values?
 		int t = RES_K(27) * CAP_U(1) * 1000; // t = R26 * C1
-		state->m_ef4_timer->adjust(attotime::from_msec(t));
+		timer_set(attotime::from_msec(t), TIMER_ID_EF4);
 	}
 }
 
@@ -470,10 +461,10 @@ static INPUT_PORTS_START( nano )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
 
 	PORT_START("RUN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RUN") PORT_CODE(KEYCODE_R) PORT_CHANGED(run_pressed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("RUN") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, nano_state, run_pressed, 0)
 
 	PORT_START("MONITOR")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("MONITOR") PORT_CODE(KEYCODE_M) PORT_CHANGED(monitor_pressed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("MONITOR") PORT_CODE(KEYCODE_M) PORT_CHANGED_MEMBER(DEVICE_SELF, nano_state, monitor_pressed, 0)
 INPUT_PORTS_END
 
 /* CDP1802 Interfaces */
@@ -482,7 +473,7 @@ INPUT_PORTS_END
 
 READ_LINE_MEMBER( tmc1800_state::clear_r )
 {
-	return BIT(input_port_read(machine(), "RUN"), 0);
+	return BIT(ioport("RUN")->read(), 0);
 }
 
 READ_LINE_MEMBER( tmc1800_state::ef2_r )
@@ -493,7 +484,7 @@ READ_LINE_MEMBER( tmc1800_state::ef2_r )
 READ_LINE_MEMBER( tmc1800_state::ef3_r )
 {
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~input_port_read(machine(), keynames[m_keylatch / 8]);
+	UINT8 data = ~ioport(keynames[m_keylatch / 8])->read();
 
 	return BIT(data, m_keylatch % 8);
 }
@@ -523,7 +514,7 @@ static COSMAC_INTERFACE( tmc1800_config )
 
 READ_LINE_MEMBER( osc1000b_state::clear_r )
 {
-	return BIT(input_port_read(machine(), "RUN"), 0);
+	return BIT(ioport("RUN")->read(), 0);
 }
 
 READ_LINE_MEMBER( osc1000b_state::ef2_r )
@@ -534,7 +525,7 @@ READ_LINE_MEMBER( osc1000b_state::ef2_r )
 READ_LINE_MEMBER( osc1000b_state::ef3_r )
 {
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~input_port_read(machine(), keynames[m_keylatch / 8]);
+	UINT8 data = ~ioport(keynames[m_keylatch / 8])->read();
 
 	return BIT(data, m_keylatch % 8);
 }
@@ -564,7 +555,7 @@ static COSMAC_INTERFACE( osc1000b_config )
 
 READ_LINE_MEMBER( tmc2000_state::clear_r )
 {
-	return BIT(input_port_read(machine(), "RUN"), 0);
+	return BIT(ioport("RUN")->read(), 0);
 }
 
 READ_LINE_MEMBER( tmc2000_state::ef2_r )
@@ -575,7 +566,7 @@ READ_LINE_MEMBER( tmc2000_state::ef2_r )
 READ_LINE_MEMBER( tmc2000_state::ef3_r )
 {
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~input_port_read(machine(), keynames[m_keylatch / 8]);
+	UINT8 data = ~ioport(keynames[m_keylatch / 8])->read();
 
 	return BIT(data, m_keylatch % 8);
 }
@@ -618,15 +609,10 @@ static COSMAC_INTERFACE( tmc2000_config )
 
 // OSCOM Nano
 
-static TIMER_CALLBACK( nano_ef4_tick )
-{
-	cputag_set_input_line(machine, CDP1802_TAG, COSMAC_INPUT_LINE_EF4, ASSERT_LINE);
-}
-
 READ_LINE_MEMBER( nano_state::clear_r )
 {
-	int run = BIT(input_port_read(machine(), "RUN"), 0);
-	int monitor = BIT(input_port_read(machine(), "MONITOR"), 0);
+	int run = BIT(ioport("RUN")->read(), 0);
+	int monitor = BIT(ioport("MONITOR")->read(), 0);
 
 	return run & monitor;
 }
@@ -639,7 +625,7 @@ READ_LINE_MEMBER( nano_state::ef2_r )
 READ_LINE_MEMBER( nano_state::ef3_r )
 {
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
-	UINT8 data = ~input_port_read(machine(), keynames[m_keylatch / 8]);
+	UINT8 data = ~ioport(keynames[m_keylatch / 8])->read();
 
 	return BIT(data, m_keylatch % 8);
 }
@@ -734,11 +720,18 @@ void tmc2000_state::machine_reset()
 
 // OSCOM Nano
 
+void nano_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_ID_EF4:
+		m_maincpu->set_input_line(COSMAC_INPUT_LINE_EF4, ASSERT_LINE);
+		break;
+	}
+}
+
 void nano_state::machine_start()
 {
-	/* allocate monitor timer */
-	m_ef4_timer = machine().scheduler().timer_alloc(FUNC(nano_ef4_tick));
-
 	/* register for state saving */
 	save_item(NAME(m_keylatch));
 }
@@ -753,7 +746,7 @@ void nano_state::machine_reset()
 
 	/* enable ROM */
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine().region(CDP1802_TAG)->base();
+	UINT8 *rom = memregion(CDP1802_TAG)->base();
 	program->install_rom(0x0000, 0x01ff, 0, 0x7e00, rom);
 }
 
@@ -770,7 +763,7 @@ static const cassette_interface tmc1800_cassette_interface =
 
 static QUICKLOAD_LOAD( tmc1800 )
 {
-	UINT8 *ptr = image.device().machine().region(CDP1802_TAG)->base();
+	UINT8 *ptr = image.device().machine().root_device().memregion(CDP1802_TAG)->base();
 	int size = image.length();
 
 	if (size > image.device().machine().device<ram_device>(RAM_TAG)->size())

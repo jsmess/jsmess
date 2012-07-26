@@ -69,15 +69,15 @@ static UINT8 read_keyboard(running_machine &machine, UINT16 keylatch)
 {
 	UINT8 data = 0xff;
 
-	if (!BIT(keylatch, 0)) data &= input_port_read(machine, "KEY0");
-	if (!BIT(keylatch, 1)) data &= input_port_read(machine, "KEY1");
-	if (!BIT(keylatch, 2)) data &= input_port_read(machine, "KEY2");
-	if (!BIT(keylatch, 3)) data &= input_port_read(machine, "KEY3");
-	if (!BIT(keylatch, 4)) data &= input_port_read(machine, "KEY4");
-	if (!BIT(keylatch, 5)) data &= input_port_read(machine, "KEY5");
-	if (!BIT(keylatch, 6)) data &= input_port_read(machine, "KEY6");
-	if (!BIT(keylatch, 7)) data &= input_port_read(machine, "KEY7");
-	if (!BIT(keylatch, 8)) data &= input_port_read(machine, "KEY8");
+	if (!BIT(keylatch, 0)) data &= machine.root_device().ioport("KEY0")->read();
+	if (!BIT(keylatch, 1)) data &= machine.root_device().ioport("KEY1")->read();
+	if (!BIT(keylatch, 2)) data &= machine.root_device().ioport("KEY2")->read();
+	if (!BIT(keylatch, 3)) data &= machine.root_device().ioport("KEY3")->read();
+	if (!BIT(keylatch, 4)) data &= machine.root_device().ioport("KEY4")->read();
+	if (!BIT(keylatch, 5)) data &= machine.root_device().ioport("KEY5")->read();
+	if (!BIT(keylatch, 6)) data &= machine.root_device().ioport("KEY6")->read();
+	if (!BIT(keylatch, 7)) data &= machine.root_device().ioport("KEY7")->read();
+	if (!BIT(keylatch, 8)) data &= machine.root_device().ioport("KEY8")->read();
 
 	return data;
 }
@@ -123,7 +123,7 @@ void pc8201_state::bankswitch(UINT8 data)
 		program->unmap_write(0x0000, 0x7fff);
 	}
 
-	memory_set_bank(machine(), "bank1", rom_bank);
+	membank("bank1")->set_entry(rom_bank);
 
 	switch (ram_bank)
 	{
@@ -158,7 +158,7 @@ void pc8201_state::bankswitch(UINT8 data)
 		break;
 	}
 
-	memory_set_bank(machine(), "bank2", ram_bank);
+	membank("bank2")->set_entry(ram_bank);
 }
 
 WRITE8_MEMBER( pc8201_state::bank_w )
@@ -274,7 +274,7 @@ READ8_MEMBER( kc85_state::uart_status_r )
 	data |= 0x20;
 
 	// low power sensor
-	data |= BIT(input_port_read(machine(), "BATTERY"), 0) << 7;
+	data |= BIT(ioport("BATTERY")->read(), 0) << 7;
 
 	return data;
 }
@@ -316,7 +316,7 @@ READ8_MEMBER( pc8201_state::uart_status_r )
 	data |= 0x20;
 
 	// low power sensor
-	data |= BIT(input_port_read(machine(), "BATTERY"), 0) << 7;
+	data |= BIT(ioport("BATTERY")->read(), 0) << 7;
 
 	return data;
 }
@@ -391,7 +391,7 @@ READ8_MEMBER( pc8201_state::romrd_r )
 
 	if (m_rom_sel)
 	{
-		data = machine().region("option")->base()[m_rom_addr & 0x1ffff];
+		data = memregion("option")->base()[m_rom_addr & 0x1ffff];
 	}
 
 	return data;
@@ -435,7 +435,7 @@ WRITE8_MEMBER( kc85_state::ctrl_w )
     */
 
 	/* ROM bank selection */
-	memory_set_bank(machine(), "bank1", BIT(data, 0));
+	membank("bank1")->set_entry(BIT(data, 0));
 
 	/* printer strobe */
 	m_centronics->strobe_w(BIT(data, 1));
@@ -470,7 +470,7 @@ void tandy200_state::bankswitch(UINT8 data)
 	{
 		program->install_read_bank(0x0000, 0x7fff, "bank1");
 		program->unmap_write(0x0000, 0x7fff);
-		memory_set_bank(machine(), "bank1", rom_bank);
+		membank("bank1")->set_entry(rom_bank);
 	}
 
 	if (m_ram->size() < ((ram_bank + 1) * 24 * 1024))
@@ -481,7 +481,7 @@ void tandy200_state::bankswitch(UINT8 data)
 	else
 	{
 		program->install_readwrite_bank(0xa000, 0xffff, "bank2");
-		memory_set_bank(machine(), "bank2", ram_bank);
+		membank("bank2")->set_entry(ram_bank);
 	}
 }
 
@@ -606,9 +606,9 @@ static ADDRESS_MAP_START( pc8201_io, AS_IO, 8, pc8201_state )
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_READWRITE(bank_r, bank_w)
 	AM_RANGE(0xb0, 0xb7) AM_MIRROR(0x08) AM_DEVREADWRITE(I8155_TAG, i8155_device, io_r, io_w)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x0f) AM_DEVREADWRITE(IM6402_TAG, im6402_device, read, write)
-	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READ(uart_status_r) AM_WRITE_BASE(kc85_state, uart_ctrl_w)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READ_BASE(kc85_state, keyboard_r)
-	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE_BASE(kc85_state, lcd_r, lcd_w)
+	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_READ(uart_status_r) AM_WRITE(uart_ctrl_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_READ(keyboard_r)
+	AM_RANGE(0xf0, 0xf1) AM_MIRROR(0x0e) AM_READWRITE(lcd_r, lcd_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tandy200_io, AS_IO, 8, tandy200_state )
@@ -1136,9 +1136,9 @@ void kc85_state::machine_start()
 	/* configure ROM banking */
 	program->install_read_bank(0x0000, 0x7fff, "bank1");
 	program->unmap_write(0x0000, 0x7fff);
-	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(I8085_TAG)->base(), 0);
-	memory_configure_bank(machine(), "bank1", 1, 1, machine().region("option")->base(), 0);
-	memory_set_bank(machine(), "bank1", 0);
+	membank("bank1")->configure_entry(0, memregion(I8085_TAG)->base());
+	membank("bank1")->configure_entry(1, memregion("option")->base());
+	membank("bank1")->set_entry(0);
 
 	/* configure RAM banking */
 	switch (m_ram->size())
@@ -1153,8 +1153,8 @@ void kc85_state::machine_start()
 		break;
 	}
 
-	memory_configure_bank(machine(), "bank2", 0, 1, m_ram->pointer(), 0);
-	memory_set_bank(machine(), "bank2", 0);
+	membank("bank2")->configure_entry(0, m_ram->pointer());
+	membank("bank2")->set_entry(0);
 
 	/* register for state saving */
 	save_item(NAME(m_bank));
@@ -1172,15 +1172,15 @@ void pc8201_state::machine_start()
 	m_rtc->oe_w(1);
 
 	/* configure ROM banking */
-	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(I8085_TAG)->base(), 0);
-	memory_configure_bank(machine(), "bank1", 1, 1, machine().region("option")->base(), 0);
-	memory_configure_bank(machine(), "bank1", 2, 2, ram + 0x8000, 0x8000);
-	memory_set_bank(machine(), "bank1", 0);
+	membank("bank1")->configure_entry(0, memregion(I8085_TAG)->base());
+	membank("bank1")->configure_entry(1, memregion("option")->base());
+	membank("bank1")->configure_entries(2, 2, ram + 0x8000, 0x8000);
+	membank("bank1")->set_entry(0);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine(), "bank2", 0, 1, ram, 0);
-	memory_configure_bank(machine(), "bank2", 2, 2, ram + 0x8000, 0x8000);
-	memory_set_bank(machine(), "bank2", 0);
+	membank("bank2")->configure_entry(0, ram);
+	membank("bank2")->configure_entries(2, 2, ram + 0x8000, 0x8000);
+	membank("bank2")->set_entry(0);
 
 	bankswitch(0);
 
@@ -1203,9 +1203,9 @@ void trsm100_state::machine_start()
 	/* configure ROM banking */
 	program->install_read_bank(0x0000, 0x7fff, "bank1");
 	program->unmap_write(0x0000, 0x7fff);
-	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(I8085_TAG)->base(), 0);
-	memory_configure_bank(machine(), "bank1", 1, 1, machine().region("option")->base(), 0);
-	memory_set_bank(machine(), "bank1", 0);
+	membank("bank1")->configure_entry(0, memregion(I8085_TAG)->base());
+	membank("bank1")->configure_entry(1, memregion("option")->base());
+	membank("bank1")->set_entry(0);
 
 	/* configure RAM banking */
 	switch (m_ram->size())
@@ -1230,8 +1230,8 @@ void trsm100_state::machine_start()
 		break;
 	}
 
-	memory_configure_bank(machine(), "bank2", 0, 1, m_ram->pointer(), 0);
-	memory_set_bank(machine(), "bank2", 0);
+	membank("bank2")->configure_entry(0, m_ram->pointer());
+	membank("bank2")->set_entry(0);
 
 	/* register for state saving */
 	save_item(NAME(m_bank));
@@ -1243,14 +1243,14 @@ void trsm100_state::machine_start()
 void tandy200_state::machine_start()
 {
 	/* configure ROM banking */
-	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(I8085_TAG)->base(), 0);
-	memory_configure_bank(machine(), "bank1", 1, 1, machine().region(I8085_TAG)->base() + 0x10000, 0);
-	memory_configure_bank(machine(), "bank1", 2, 1, machine().region("option")->base(), 0);
-	memory_set_bank(machine(), "bank1", 0);
+	membank("bank1")->configure_entry(0, memregion(I8085_TAG)->base());
+	membank("bank1")->configure_entry(1, memregion(I8085_TAG)->base() + 0x10000);
+	membank("bank1")->configure_entry(2, memregion("option")->base());
+	membank("bank1")->set_entry(0);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine(), "bank2", 0, 3, m_ram->pointer(), 0x6000);
-	memory_set_bank(machine(), "bank2", 0);
+	membank("bank2")->configure_entries(0, 3, m_ram->pointer(), 0x6000);
+	membank("bank2")->set_entry(0);
 
 	/* register for state saving */
 	save_item(NAME(m_bank));

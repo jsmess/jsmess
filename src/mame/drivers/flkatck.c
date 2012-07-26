@@ -28,18 +28,18 @@ static INTERRUPT_GEN( flkatck_interrupt )
 		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( flkatck_bankswitch_w )
+WRITE8_MEMBER(flkatck_state::flkatck_bankswitch_w)
 {
 	/* bits 3-4: coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x08);
-	coin_counter_w(space->machine(), 1, data & 0x10);
+	coin_counter_w(machine(), 0, data & 0x08);
+	coin_counter_w(machine(), 1, data & 0x10);
 
 	/* bits 0-1: bank # */
 	if ((data & 0x03) != 0x03)	/* for safety */
-		memory_set_bank(space->machine(), "bank1", data & 0x03);
+		membank("bank1")->set_entry(data & 0x03);
 }
 
-static READ8_HANDLER( flkatck_ls138_r )
+READ8_MEMBER(flkatck_state::flkatck_ls138_r)
 {
 	int data = 0;
 
@@ -47,22 +47,21 @@ static READ8_HANDLER( flkatck_ls138_r )
 	{
 		case 0x00:
 			if (offset & 0x02)
-				data = input_port_read(space->machine(), (offset & 0x01) ? "COIN" : "DSW3");
+				data = ioport((offset & 0x01) ? "COIN" : "DSW3")->read();
 			else
-				data = input_port_read(space->machine(), (offset & 0x01) ? "P2" : "P1");
+				data = ioport((offset & 0x01) ? "P2" : "P1")->read();
 			break;
 		case 0x01:
 			if (offset & 0x02)
-				data = input_port_read(space->machine(), (offset & 0x01) ? "DSW1" : "DSW2");
+				data = ioport((offset & 0x01) ? "DSW1" : "DSW2")->read();
 			break;
 	}
 
 	return data;
 }
 
-static WRITE8_HANDLER( flkatck_ls138_w )
+WRITE8_MEMBER(flkatck_state::flkatck_ls138_w)
 {
-	flkatck_state *state = space->machine().driver_data<flkatck_state>();
 
 	switch ((offset & 0x1c) >> 2)
 	{
@@ -70,10 +69,10 @@ static WRITE8_HANDLER( flkatck_ls138_w )
 			flkatck_bankswitch_w(space, 0, data);
 			break;
 		case 0x05:	/* sound code number */
-			soundlatch_w(space, 0, data);
+			soundlatch_byte_w(space, 0, data);
 			break;
 		case 0x06:	/* Cause interrupt on audio CPU */
-			device_set_input_line(state->m_audiocpu, 0, HOLD_LINE);
+			device_set_input_line(m_audiocpu, 0, HOLD_LINE);
 			break;
 		case 0x07:	/* watchdog reset */
 			watchdog_reset_w(space, 0, data);
@@ -82,40 +81,38 @@ static WRITE8_HANDLER( flkatck_ls138_w )
 }
 
 /* Protection - an external multiplyer connected to the sound CPU */
-static READ8_HANDLER( multiply_r )
+READ8_MEMBER(flkatck_state::multiply_r)
 {
-	flkatck_state *state = space->machine().driver_data<flkatck_state>();
-	return (state->m_multiply_reg[0] * state->m_multiply_reg[1]) & 0xff;
+	return (m_multiply_reg[0] * m_multiply_reg[1]) & 0xff;
 }
 
-static WRITE8_HANDLER( multiply_w )
+WRITE8_MEMBER(flkatck_state::multiply_w)
 {
-	flkatck_state *state = space->machine().driver_data<flkatck_state>();
-	state->m_multiply_reg[offset] = data;
+	m_multiply_reg[offset] = data;
 }
 
 
-static ADDRESS_MAP_START( flkatck_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( flkatck_map, AS_PROGRAM, 8, flkatck_state )
 	AM_RANGE(0x0000, 0x0007) AM_RAM_WRITE(flkatck_k007121_regs_w)									/* 007121 registers */
 	AM_RANGE(0x0008, 0x03ff) AM_RAM																	/* RAM */
 	AM_RANGE(0x0400, 0x041f) AM_READWRITE(flkatck_ls138_r, flkatck_ls138_w)							/* inputs, DIPS, bankswitch, counters, sound command */
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_le_w) AM_BASE_GENERIC(paletteram)	/* palette */
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_le_w) AM_SHARE("paletteram")	/* palette */
 	AM_RANGE(0x1000, 0x1fff) AM_RAM																	/* RAM */
-	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(flkatck_k007121_w) AM_BASE_MEMBER(flkatck_state, m_k007121_ram)					/* Video RAM (007121) */
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(flkatck_k007121_w) AM_SHARE("k007121_ram")					/* Video RAM (007121) */
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("bank1")															/* banked ROM */
 	AM_RANGE(0x6000, 0xffff) AM_ROM																	/* ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( flkatck_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( flkatck_sound_map, AS_PROGRAM, 8, flkatck_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM												/* ROM */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM												/* RAM */
 	AM_RANGE(0x9000, 0x9000) AM_READWRITE(multiply_r, multiply_w)				/* ??? */
 //  AM_RANGE(0x9001, 0x9001) AM_RAM                                             /* ??? */
 	AM_RANGE(0x9004, 0x9004) AM_READNOP											/* ??? */
 	AM_RANGE(0x9006, 0x9006) AM_WRITENOP										/* ??? */
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)								/* soundlatch_r */
-	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("konami", k007232_r, k007232_w)	/* 007232 registers */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)			/* YM2151 */
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)								/* soundlatch_byte_r */
+	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE_LEGACY("konami", k007232_r, k007232_w)	/* 007232 registers */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)			/* YM2151 */
 ADDRESS_MAP_END
 
 
@@ -198,9 +195,9 @@ static const k007232_interface k007232_config =
 static MACHINE_START( flkatck )
 {
 	flkatck_state *state = machine.driver_data<flkatck_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x10000], 0x2000);
+	state->membank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x2000);
 
 	state->m_audiocpu = machine.device("audiocpu");
 	state->m_k007121 = machine.device("k007121");

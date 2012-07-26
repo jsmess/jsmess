@@ -7,14 +7,17 @@ class chaknpop_state : public driver_device
 {
 public:
 	chaknpop_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_mcu_ram(*this, "mcu_ram"),
+		m_tx_ram(*this, "tx_ram"),
+		m_attr_ram(*this, "attr_ram"),
+		m_spr_ram(*this, "spr_ram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_mcu_ram;
-	UINT8 *  m_tx_ram;
-	UINT8 *  m_spr_ram;
-	UINT8 *  m_attr_ram;
-	size_t   m_spr_ram_size;
+	required_shared_ptr<UINT8> m_mcu_ram;
+	required_shared_ptr<UINT8> m_tx_ram;
+	required_shared_ptr<UINT8> m_attr_ram;
+	required_shared_ptr<UINT8> m_spr_ram;
 
 	/* mcu-related */
 	UINT8 m_mcu_seed;
@@ -31,18 +34,23 @@ public:
 	UINT8    m_gfxmode;
 	UINT8    m_flip_x;
 	UINT8    m_flip_y;
+	DECLARE_WRITE8_MEMBER(coinlock_w);
+	DECLARE_READ8_MEMBER(chaknpop_mcu_port_a_r);
+	DECLARE_READ8_MEMBER(chaknpop_mcu_port_b_r);
+	DECLARE_READ8_MEMBER(chaknpop_mcu_port_c_r);
+	DECLARE_WRITE8_MEMBER(chaknpop_mcu_port_a_w);
+	DECLARE_WRITE8_MEMBER(chaknpop_mcu_port_b_w);
+	DECLARE_WRITE8_MEMBER(chaknpop_mcu_port_c_w);
+	DECLARE_READ8_MEMBER(chaknpop_gfxmode_r);
+	DECLARE_WRITE8_MEMBER(chaknpop_gfxmode_w);
+	DECLARE_WRITE8_MEMBER(chaknpop_txram_w);
+	DECLARE_WRITE8_MEMBER(chaknpop_attrram_w);
 };
 
 
 
 /*----------- defined in machine/chaknpop.c -----------*/
 
-READ8_HANDLER( chaknpop_mcu_port_a_r );
-READ8_HANDLER( chaknpop_mcu_port_b_r );
-READ8_HANDLER( chaknpop_mcu_port_c_r );
-WRITE8_HANDLER( chaknpop_mcu_port_a_w );
-WRITE8_HANDLER( chaknpop_mcu_port_b_w );
-WRITE8_HANDLER( chaknpop_mcu_port_c_w );
 
 
 /*----------- defined in video/chaknpop.c -----------*/
@@ -51,7 +59,3 @@ PALETTE_INIT( chaknpop );
 VIDEO_START( chaknpop );
 SCREEN_UPDATE_IND16( chaknpop );
 
-READ8_HANDLER( chaknpop_gfxmode_r );
-WRITE8_HANDLER( chaknpop_gfxmode_w );
-WRITE8_HANDLER( chaknpop_txram_w );
-WRITE8_HANDLER( chaknpop_attrram_w );

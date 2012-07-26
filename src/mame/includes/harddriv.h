@@ -26,6 +26,15 @@ public:
 		  m_dsp32(*this, "dsp32"),
 		  m_ds4cpu1(*this, "ds4cpu1"),
 		  m_ds4cpu2(*this, "ds4cpu2"),
+		  m_msp_ram(*this, "msp_ram"),
+		  m_adsp_data_memory(*this, "adsp_data"),
+		  m_adsp_pgm_memory(*this, "adsp_pgm_memory"),
+		  m_sounddsp_ram(*this, "sounddsp_ram"),
+		  m_gsp_vram(*this, "gsp_vram", 16),
+		  m_gsp_control_lo(*this, "gsp_control_lo"),
+		  m_gsp_control_hi(*this, "gsp_control_hi"),
+		  m_gsp_paletteram_lo(*this, "gsp_palram_lo"),
+		  m_gsp_paletteram_hi(*this, "gsp_palram_hi"),
 		  m_duart_timer(*this, "duart_timer") { }
 
 	required_device<cpu_device> m_maincpu;
@@ -42,15 +51,15 @@ public:
 	UINT8					m_hd34010_host_access;
 	UINT8					m_dsk_pio_access;
 
-	UINT16 *				m_msp_ram;
+	optional_shared_ptr<UINT16> m_msp_ram;
 	UINT16 *				m_dsk_ram;
 	UINT16 *				m_dsk_rom;
 	UINT16 *				m_dsk_zram;
 	UINT16 *				m_m68k_slapstic_base;
 	UINT16 *				m_m68k_sloop_alt_base;
 
-	UINT16 *				m_adsp_data_memory;
-	UINT32 *				m_adsp_pgm_memory;
+	optional_shared_ptr<UINT16> m_adsp_data_memory;
+	optional_shared_ptr<UINT32> m_adsp_pgm_memory;
 
 	UINT16 *				m_gsp_protection;
 
@@ -70,15 +79,14 @@ public:
 	UINT32					m_msp_speedup_count[4];
 	UINT32					m_adsp_speedup_count[4];
 
-	UINT16 *				m_sounddsp_ram;
+	optional_shared_ptr<UINT16> m_sounddsp_ram;
 
 	UINT8					m_gsp_multisync;
-	UINT8 *					m_gsp_vram;
-	UINT16 *				m_gsp_control_lo;
-	UINT16 *				m_gsp_control_hi;
-	UINT16 *				m_gsp_paletteram_lo;
-	UINT16 *				m_gsp_paletteram_hi;
-	size_t					m_gsp_vram_size;
+	optional_shared_ptr<UINT8> m_gsp_vram;
+	optional_shared_ptr<UINT16> m_gsp_control_lo;
+	optional_shared_ptr<UINT16> m_gsp_control_hi;
+	optional_shared_ptr<UINT16> m_gsp_paletteram_lo;
+	optional_shared_ptr<UINT16> m_gsp_paletteram_hi;
 
 	/* machine state */
 	UINT8					m_irq_state;
@@ -168,6 +176,33 @@ public:
 
 	INT8					m_gfx_finescroll;
 	UINT8					m_gfx_palettebank;
+	DECLARE_READ16_MEMBER(steeltal_dummy_r);
+	DECLARE_READ16_MEMBER(hd68k_snd_data_r);
+	DECLARE_READ16_MEMBER(hd68k_snd_status_r);
+	DECLARE_WRITE16_MEMBER(hd68k_snd_data_w);
+	DECLARE_WRITE16_MEMBER(hd68k_snd_reset_w);
+	DECLARE_READ16_MEMBER(hdsnd68k_data_r);
+	DECLARE_WRITE16_MEMBER(hdsnd68k_data_w);
+	DECLARE_READ16_MEMBER(hdsnd68k_switches_r);
+	DECLARE_READ16_MEMBER(hdsnd68k_320port_r);
+	DECLARE_READ16_MEMBER(hdsnd68k_status_r);
+	DECLARE_WRITE16_MEMBER(hdsnd68k_latches_w);
+	DECLARE_WRITE16_MEMBER(hdsnd68k_speech_w);
+	DECLARE_WRITE16_MEMBER(hdsnd68k_irqclr_w);
+	DECLARE_READ16_MEMBER(hdsnd68k_320ram_r);
+	DECLARE_WRITE16_MEMBER(hdsnd68k_320ram_w);
+	DECLARE_READ16_MEMBER(hdsnd68k_320ports_r);
+	DECLARE_WRITE16_MEMBER(hdsnd68k_320ports_w);
+	DECLARE_READ16_MEMBER(hdsnd68k_320com_r);
+	DECLARE_WRITE16_MEMBER(hdsnd68k_320com_w);
+	DECLARE_READ16_MEMBER(hdsnddsp_get_bio);
+	DECLARE_WRITE16_MEMBER(hdsnddsp_comport_w);
+	DECLARE_WRITE16_MEMBER(hdsnddsp_mute_w);
+	DECLARE_WRITE16_MEMBER(hdsnddsp_gen68kirq_w);
+	DECLARE_WRITE16_MEMBER(hdsnddsp_soundaddr_w);
+	DECLARE_READ16_MEMBER(hdsnddsp_rom_r);
+	DECLARE_READ16_MEMBER(hdsnddsp_comram_r);
+	DECLARE_READ16_MEMBER(hdsnddsp_compare_r);
 };
 
 
@@ -296,40 +331,14 @@ READ16_HANDLER( hdds3_speedup_r );
 
 void hdsnd_init(running_machine &machine);
 
-READ16_HANDLER( hd68k_snd_data_r );
-READ16_HANDLER( hd68k_snd_status_r );
-WRITE16_HANDLER( hd68k_snd_data_w );
-WRITE16_HANDLER( hd68k_snd_reset_w );
 
-READ16_HANDLER( hdsnd68k_data_r );
-WRITE16_HANDLER( hdsnd68k_data_w );
 
-READ16_HANDLER( hdsnd68k_switches_r );
-READ16_HANDLER( hdsnd68k_320port_r );
-READ16_HANDLER( hdsnd68k_status_r );
 
-WRITE16_HANDLER( hdsnd68k_latches_w );
-WRITE16_HANDLER( hdsnd68k_speech_w );
-WRITE16_HANDLER( hdsnd68k_irqclr_w );
 
-READ16_HANDLER( hdsnd68k_320ram_r );
-WRITE16_HANDLER( hdsnd68k_320ram_w );
-READ16_HANDLER( hdsnd68k_320ports_r );
-WRITE16_HANDLER( hdsnd68k_320ports_w );
-READ16_HANDLER( hdsnd68k_320com_r );
-WRITE16_HANDLER( hdsnd68k_320com_w );
 
-READ16_HANDLER( hdsnddsp_get_bio );
 
 WRITE16_DEVICE_HANDLER( hdsnddsp_dac_w );
-WRITE16_HANDLER( hdsnddsp_comport_w );
-WRITE16_HANDLER( hdsnddsp_mute_w );
-WRITE16_HANDLER( hdsnddsp_gen68kirq_w );
-WRITE16_HANDLER( hdsnddsp_soundaddr_w );
 
-READ16_HANDLER( hdsnddsp_rom_r );
-READ16_HANDLER( hdsnddsp_comram_r );
-READ16_HANDLER( hdsnddsp_compare_r );
 
 
 /*----------- defined in video/harddriv.c -----------*/

@@ -12,7 +12,6 @@
 #ifndef __C64_4KSA__
 #define __C64_4KSA__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64user.h"
@@ -39,8 +38,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "c64_4ksa"; }
+	virtual void device_start();
 
 	// device_c64_user_port_interface overrides
 	virtual UINT8 c64_pb_r(address_space &space, offs_t offset);

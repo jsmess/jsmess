@@ -66,10 +66,8 @@ VIDEO_START( flstory )
 	state->m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
 	state->m_bg_tilemap->set_scroll_cols(32);
 
-	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	machine.generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x200);
-	state_save_register_global_pointer(machine, machine.generic.paletteram2.u8, 0x200);
+	state->m_generic_paletteram_8.allocate(0x200);
+	state->m_generic_paletteram2_8.allocate(0x200);
 }
 
 VIDEO_START( rumba )
@@ -81,10 +79,8 @@ VIDEO_START( rumba )
 	state->m_bg_tilemap->set_transmask(1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
 	state->m_bg_tilemap->set_scroll_cols(32);
 
-	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	machine.generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x200);
-	state_save_register_global_pointer(machine, machine.generic.paletteram2.u8, 0x200);
+	state->m_generic_paletteram_8.allocate(0x200);
+	state->m_generic_paletteram2_8.allocate(0x200);
 }
 
 VIDEO_START( victnine )
@@ -93,88 +89,79 @@ VIDEO_START( victnine )
 	state->m_bg_tilemap = tilemap_create(machine, victnine_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->m_bg_tilemap->set_scroll_cols(32);
 
-	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	machine.generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x200);
-	state_save_register_global_pointer(machine, machine.generic.paletteram2.u8, 0x200);
+	state->m_generic_paletteram_8.allocate(0x200);
+	state->m_generic_paletteram2_8.allocate(0x200);
 }
 
-WRITE8_HANDLER( flstory_videoram_w )
+WRITE8_MEMBER(flstory_state::flstory_videoram_w)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( flstory_palette_w )
+WRITE8_MEMBER(flstory_state::flstory_palette_w)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
 	if (offset & 0x100)
-		paletteram_xxxxBBBBGGGGRRRR_split2_w(space, (offset & 0xff) + (state->m_palette_bank << 8),data);
+		paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w(space, (offset & 0xff) + (m_palette_bank << 8),data);
 	else
-		paletteram_xxxxBBBBGGGGRRRR_split1_w(space, (offset & 0xff) + (state->m_palette_bank << 8),data);
+		paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w(space, (offset & 0xff) + (m_palette_bank << 8),data);
 }
 
-READ8_HANDLER( flstory_palette_r )
+READ8_MEMBER(flstory_state::flstory_palette_r)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
 	if (offset & 0x100)
-		return space->machine().generic.paletteram2.u8[ (offset & 0xff) + (state->m_palette_bank << 8) ];
+		return m_generic_paletteram2_8[ (offset & 0xff) + (m_palette_bank << 8) ];
 	else
-		return space->machine().generic.paletteram.u8  [ (offset & 0xff) + (state->m_palette_bank << 8) ];
+		return m_generic_paletteram_8  [ (offset & 0xff) + (m_palette_bank << 8) ];
 }
 
-WRITE8_HANDLER( flstory_gfxctrl_w )
+WRITE8_MEMBER(flstory_state::flstory_gfxctrl_w)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
-	if (state->m_gfxctrl == data)
+	if (m_gfxctrl == data)
 		return;
-	state->m_gfxctrl = data;
+	m_gfxctrl = data;
 
-	state->m_flipscreen = (~data & 0x01);
-	if (state->m_char_bank != ((data & 0x10) >> 4))
+	m_flipscreen = (~data & 0x01);
+	if (m_char_bank != ((data & 0x10) >> 4))
 	{
-		state->m_char_bank = (data & 0x10) >> 4;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_char_bank = (data & 0x10) >> 4;
+		m_bg_tilemap->mark_all_dirty();
 	}
-	state->m_palette_bank = (data & 0x20) >> 5;
+	m_palette_bank = (data & 0x20) >> 5;
 
-	flip_screen_set(space->machine(), state->m_flipscreen);
+	flip_screen_set(m_flipscreen);
 
-//popmessage("%04x: gfxctrl = %02x\n", cpu_get_pc(&space->device()), data);
+//popmessage("%04x: gfxctrl = %02x\n", cpu_get_pc(&space.device()), data);
 
 }
 
-READ8_HANDLER( victnine_gfxctrl_r )
+READ8_MEMBER(flstory_state::victnine_gfxctrl_r)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
-	return state->m_gfxctrl;
+	return m_gfxctrl;
 }
 
-WRITE8_HANDLER( victnine_gfxctrl_w )
+WRITE8_MEMBER(flstory_state::victnine_gfxctrl_w)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
-	if (state->m_gfxctrl == data)
+	if (m_gfxctrl == data)
 		return;
-	state->m_gfxctrl = data;
+	m_gfxctrl = data;
 
-	state->m_palette_bank = (data & 0x20) >> 5;
+	m_palette_bank = (data & 0x20) >> 5;
 
 	if (data & 0x04)
 	{
-		state->m_flipscreen = (data & 0x01);
-		flip_screen_set(space->machine(), state->m_flipscreen);
+		m_flipscreen = (data & 0x01);
+		flip_screen_set(m_flipscreen);
 	}
 
-//popmessage("%04x: gfxctrl = %02x\n", cpu_get_pc(&space->device()), data);
+//popmessage("%04x: gfxctrl = %02x\n", cpu_get_pc(&space.device()), data);
 
 }
 
-WRITE8_HANDLER( flstory_scrlram_w )
+WRITE8_MEMBER(flstory_state::flstory_scrlram_w)
 {
-	flstory_state *state = space->machine().driver_data<flstory_state>();
-	state->m_scrlram[offset] = data;
-	state->m_bg_tilemap->set_scrolly(offset, data);
+	m_scrlram[offset] = data;
+	m_bg_tilemap->set_scrolly(offset, data);
 }
 
 
@@ -185,7 +172,7 @@ static void flstory_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 
 	for (i = 0; i < 0x20; i++)
 	{
-		int pr = state->m_spriteram[state->m_spriteram_size - 1 - i];
+		int pr = state->m_spriteram[state->m_spriteram.bytes() - 1 - i];
 		int offs = (pr & 0x1f) * 4;
 
 		if ((pr & 0x80) == pri)
@@ -242,7 +229,7 @@ static void victnine_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 
 	for (i = 0; i < 0x20; i++)
 	{
-		int pr = state->m_spriteram[state->m_spriteram_size - 1 - i];
+		int pr = state->m_spriteram[state->m_spriteram.bytes() - 1 - i];
 		int offs = (pr & 0x1f) * 4;
 
 		//if ((pr & 0x80) == pri)

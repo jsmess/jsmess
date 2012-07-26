@@ -72,8 +72,8 @@
      341S0285 - No version (x.xx) - PMac 4400 + Mac clones ("Cuda Lite" with 768 bytes more ROM + PS/2 keyboard/mouse support)
      341S0060 - 0x00020028 (2.40) - Performa/Quadra 6xx, PMac 6200, x400, some x500, Pippin, "Gossamer" G3, others?
                                     (verified found in PMac 5500-225, G3-333)
-     341S0417 - 0x???????? (?.??) - Color Classic
      341S0788 - 0x00020025 (2.37) - LC 475/575/Quadra 605, Quadra 660AV/840AV, PMac 7200
+     341S0417 - 0x00020023 (2.35) - Color Classic
 
      Caboose version spotting:
      341S0853 - 0x0100 (1.00) - Quadra 950
@@ -88,7 +88,6 @@
 
 ****************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include <time.h>
 
@@ -212,6 +211,7 @@ void mac_fdc_set_enable_lines(device_t *device, int enable_mask)
 static void mac_install_memory(running_machine &machine, offs_t memory_begin, offs_t memory_end,
 	offs_t memory_size, void *memory_data, int is_rom, const char *bank)
 {
+	mac_state *state = machine.driver_data<mac_state>();
 	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	offs_t memory_mask;
 
@@ -228,7 +228,7 @@ static void mac_install_memory(running_machine &machine, offs_t memory_begin, of
 		space->install_read_bank(memory_begin, memory_end, memory_mask, 0, bank);
 	}
 
-	memory_set_bankptr(machine, bank, memory_data);
+	state->membank(bank)->set_base(memory_data);
 
 	if (LOG_MEMORY)
 	{
@@ -390,8 +390,8 @@ void mac_state::v8_resize()
 	if (is_rom)
 	{
 		/* ROM mirror */
-		memory_size = machine().region("bootrom")->bytes();
-		memory_data = machine().region("bootrom")->base();
+		memory_size = memregion("bootrom")->bytes();
+		memory_data = memregion("bootrom")->base();
 		is_rom = TRUE;
 	}
 	else
@@ -469,8 +469,8 @@ void mac_state::set_memory_overlay(int overlay)
 		if (overlay)
 		{
 			/* ROM mirror */
-			memory_size = machine().region("bootrom")->bytes();
-			memory_data = machine().region("bootrom")->base();
+			memory_size = memregion("bootrom")->bytes();
+			memory_data = memregion("bootrom")->base();
 			is_rom = TRUE;
 		}
 		else
@@ -585,7 +585,7 @@ static int scan_keyboard(running_machine &machine)
 
 	for (i=0; i<7; i++)
 	{
-		keybuf = input_port_read(machine, keynames[i]);
+		keybuf = machine.root_device().ioport(keynames[i])->read();
 
 		if (keybuf != mac->m_key_matrix[i])
 		{
@@ -856,8 +856,8 @@ void mac_state::mouse_callback()
 	int		x_needs_update = 0, y_needs_update = 0;
 	mac_state *mac = machine().driver_data<mac_state>();
 
-	new_mx = input_port_read(machine(), "MOUSE1");
-	new_my = input_port_read(machine(), "MOUSE2");
+	new_mx = ioport("MOUSE1")->read();
+	new_my = ioport("MOUSE2")->read();
 
 	/* see if it moved in the x coord */
 	if (new_mx != last_mx)
@@ -1380,7 +1380,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 				val |= 0x20;
 			if (mac->m_mouse_bit_x)	/* Mouse X2 */
 				val |= 0x10;
-			if ((input_port_read(device->machine(), "MOUSE0") & 0x01) == 0)
+			if ((device->machine().root_device().ioport("MOUSE0")->read() & 0x01) == 0)
 				val |= 0x08;
 		}
 		if (mac->m_rtc_data_out)
@@ -1984,38 +1984,36 @@ static void mac_state_load(mac_state *mac)
 }
 
 
-DIRECT_UPDATE_HANDLER (overlay_opbaseoverride)
+DIRECT_UPDATE_MEMBER(mac_state::overlay_opbaseoverride)
 {
-	mac_state *mac = machine.driver_data<mac_state>();
-
-	if (mac->m_overlay != -1)
+	if (m_overlay != -1)
 	{
-		if ((mac->m_model == MODEL_MAC_PORTABLE) || (mac->m_model == MODEL_MAC_PB100))
+		if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100))
 		{
 			if ((address >= 0x900000) && (address <= 0x9fffff))
 			{
-				mac->set_memory_overlay(0);		// kill the overlay
+				set_memory_overlay(0);		// kill the overlay
 			}
 		}
-		else if ((mac->m_model == MODEL_MAC_SE) || (mac->m_model == MODEL_MAC_CLASSIC))
+		else if ((m_model == MODEL_MAC_SE) || (m_model == MODEL_MAC_CLASSIC))
 		{
 			if ((address >= 0x400000) && (address <= 0x4fffff))
 			{
-				mac->set_memory_overlay(0);		// kill the overlay
+				set_memory_overlay(0);		// kill the overlay
 			}
 		}
-		else if ((mac->m_model == MODEL_MAC_LC) || (mac->m_model == MODEL_MAC_LC_II) || (mac->m_model == MODEL_MAC_CLASSIC_II) || (mac->m_model == MODEL_MAC_COLOR_CLASSIC))
+		else if ((m_model == MODEL_MAC_LC) || (m_model == MODEL_MAC_LC_II) || (m_model == MODEL_MAC_CLASSIC_II) || (m_model == MODEL_MAC_COLOR_CLASSIC))
 		{
 			if (((address >= 0xa00000) && (address <= 0xafffff)) || ((address >= 0x40a00000) && (address <= 0x40afffff)))
 			{
-				mac->set_memory_overlay(0);		// kill the overlay
+				set_memory_overlay(0);		// kill the overlay
 			}
 		}
 		else
 		{
 			if ((address >= 0x40000000) && (address <= 0x4fffffff))
 			{
-				mac->set_memory_overlay(0);		// kill the overlay
+				set_memory_overlay(0);		// kill the overlay
 			}
 		}
 	}
@@ -2097,7 +2095,7 @@ static void mac_driver_init(running_machine &machine, model_t model)
 
 		/* set up ROM at 0x400000-0x43ffff (-0x5fffff for mac 128k/512k/512ke) */
 		mac_install_memory(machine, 0x400000, (model >= MODEL_MAC_PLUS) ? 0x43ffff : 0x5fffff,
-			machine.region("bootrom")->bytes(), machine.region("bootrom")->base(), TRUE, "bank3");
+			machine.root_device().memregion("bootrom")->bytes(), machine.root_device().memregion("bootrom")->base(), TRUE, "bank3");
 	}
 
 	mac->m_overlay = -1;
@@ -2112,7 +2110,7 @@ static void mac_driver_init(running_machine &machine, model_t model)
 	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || (model == MODEL_MAC_LC_III_PLUS) || ((mac->m_model >= MODEL_MAC_II) && (mac->m_model <= MODEL_MAC_SE30)) ||
 	    (model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100) || (model == MODEL_MAC_PB140) || (model == MODEL_MAC_PB160) || (model == MODEL_MAC_PBDUO_210) || (model >= MODEL_MAC_QUADRA_700 && model <= MODEL_MAC_QUADRA_800))
 	{
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(overlay_opbaseoverride), &machine));
+		machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(mac_state::overlay_opbaseoverride), mac));
 	}
 
 	/* setup keyboard */

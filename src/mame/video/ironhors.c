@@ -18,6 +18,7 @@
 
 PALETTE_INIT( ironhors )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances[4] = { 2000, 1000, 470, 220 };
 	double rweights[4], gweights[4], bweights[4];
 	int i;
@@ -78,45 +79,41 @@ PALETTE_INIT( ironhors )
 	}
 }
 
-WRITE8_HANDLER( ironhors_videoram_w )
+WRITE8_MEMBER(ironhors_state::ironhors_videoram_w)
 {
-	ironhors_state *state = space->machine().driver_data<ironhors_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( ironhors_colorram_w )
+WRITE8_MEMBER(ironhors_state::ironhors_colorram_w)
 {
-	ironhors_state *state = space->machine().driver_data<ironhors_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( ironhors_charbank_w )
+WRITE8_MEMBER(ironhors_state::ironhors_charbank_w)
 {
-	ironhors_state *state = space->machine().driver_data<ironhors_state>();
-	if (state->m_charbank != (data & 0x03))
+	if (m_charbank != (data & 0x03))
 	{
-		state->m_charbank = data & 0x03;
-		space->machine().tilemap().mark_all_dirty();
+		m_charbank = data & 0x03;
+		machine().tilemap().mark_all_dirty();
 	}
 
-	state->m_spriterambank = data & 0x08;
+	m_spriterambank = data & 0x08;
 
 	/* other bits unknown */
 }
 
-WRITE8_HANDLER( ironhors_palettebank_w )
+WRITE8_MEMBER(ironhors_state::ironhors_palettebank_w)
 {
-	ironhors_state *state = space->machine().driver_data<ironhors_state>();
-	if (state->m_palettebank != (data & 0x07))
+	if (m_palettebank != (data & 0x07))
 	{
-		state->m_palettebank = data & 0x07;
-		space->machine().tilemap().mark_all_dirty();
+		m_palettebank = data & 0x07;
+		machine().tilemap().mark_all_dirty();
 	}
 
-	coin_counter_w(space->machine(), 0, data & 0x10);
-	coin_counter_w(space->machine(), 1, data & 0x20);
+	coin_counter_w(machine(), 0, data & 0x10);
+	coin_counter_w(machine(), 1, data & 0x20);
 
 	/* bit 6 unknown - set after game over */
 
@@ -124,12 +121,12 @@ WRITE8_HANDLER( ironhors_palettebank_w )
 		popmessage("ironhors_palettebank_w %02x",data);
 }
 
-WRITE8_HANDLER( ironhors_flipscreen_w )
+WRITE8_MEMBER(ironhors_state::ironhors_flipscreen_w)
 {
-	if (flip_screen_get(space->machine()) != (~data & 0x08))
+	if (flip_screen() != (~data & 0x08))
 	{
-		flip_screen_set(space->machine(), ~data & 0x08);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(~data & 0x08);
+		machine().tilemap().mark_all_dirty();
 	}
 
 	/* other bits are used too, but unknown */
@@ -166,7 +163,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	else
 		sr = state->m_spriteram2;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 5)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 5)
 	{
 		int sx = sr[offs + 3];
 		int sy = sr[offs + 2];
@@ -174,9 +171,9 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int flipy = sr[offs + 4] & 0x40;
 		int code = (sr[offs] << 2) + ((sr[offs + 1] & 0x03) << 10) + ((sr[offs + 1] & 0x0c) >> 2);
 		int color = ((sr[offs + 1] & 0xf0) >> 4) + 16 * state->m_palettebank;
-	//  int mod = flip_screen_get(machine) ? -8 : 8;
+	//  int mod = state->flip_screen() ? -8 : 8;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -196,7 +193,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 			case 0x04:	/* 16x8 */
 				{
-					if (flip_screen_get(machine)) sy += 8; // this fixes the train wheels' position
+					if (state->flip_screen()) sy += 8; // this fixes the train wheels' position
 
 					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 							code & ~1,
@@ -278,7 +275,7 @@ static void farwest_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 	UINT8 *sr = state->m_spriteram2;
 	UINT8 *sr2 = state->m_spriteram;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int sx = sr[offs + 2];
 		int sy = sr[offs + 1];
@@ -287,9 +284,9 @@ static void farwest_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 		int code = (sr[offs] << 2) + ((sr2[offs] & 0x03) << 10) + ((sr2[offs] & 0x0c) >> 2);
 		int color = ((sr2[offs] & 0xf0) >> 4) + 16 * state->m_palettebank;
 
-	//  int mod = flip_screen_get() ? -8 : 8;
+	//  int mod = flip_screen() ? -8 : 8;
 
-//      if (flip_screen_get())
+//      if (flip_screen())
 		{
 		//  sx = 240 - sx;
 			sy = 240 - sy;
@@ -309,7 +306,7 @@ static void farwest_draw_sprites( running_machine &machine, bitmap_ind16 &bitmap
 
 			case 0x04:	/* 16x8 */
 				{
-					if (flip_screen_get(machine)) sy += 8; // this fixes the train wheels' position
+					if (state->flip_screen()) sy += 8; // this fixes the train wheels' position
 
 					drawgfx_transpen(bitmap,cliprect,machine.gfx[2],
 							code & ~1,

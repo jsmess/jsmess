@@ -38,30 +38,22 @@ Notes:
 #include "machine/nvram.h"
 
 
-#define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
-#if SIGNED_DAC
-#define DAC_WRITE	dac_signed_w
-#else
-#define DAC_WRITE	dac_w
-#endif
-
-
-static WRITE8_HANDLER( nbmj8991_soundbank_w )
+WRITE8_MEMBER(nbmj8991_state::nbmj8991_soundbank_w)
 {
-	if (!(data & 0x80)) soundlatch_clear_w(space, 0, 0);
-	memory_set_bank(space->machine(), "bank1", data & 0x03);
+	if (!(data & 0x80)) soundlatch_clear_byte_w(space, 0, 0);
+	membank("bank1")->set_entry(data & 0x03);
 }
 
-static WRITE8_HANDLER( nbmj8991_sound_w )
+WRITE8_MEMBER(nbmj8991_state::nbmj8991_sound_w)
 {
-	soundlatch_w(space, 0, data);
+	soundlatch_byte_w(space, 0, data);
 }
 
-static READ8_HANDLER( nbmj8991_sound_r )
+READ8_MEMBER(nbmj8991_state::nbmj8991_sound_r)
 {
 	int data;
 
-	data = soundlatch_r(space,0);
+	data = soundlatch_byte_r(space,0);
 	return data;
 }
 
@@ -70,8 +62,8 @@ static MACHINE_RESET( nbmj8991 )
 	device_t *audiocpu = machine.device("audiocpu");
 	if (audiocpu != NULL && audiocpu->type() == Z80)
 	{
-		memory_configure_bank(machine, "bank1", 0, 4, machine.region("audiocpu")->base() + 0x8000, 0x8000);
-		memory_set_bank(machine, "bank1", 0);
+		machine.root_device().membank("bank1")->configure_entries(0, 4, machine.root_device().memregion("audiocpu")->base() + 0x8000, 0x8000);
+		machine.root_device().membank("bank1")->set_entry(0);
 	}
 	MACHINE_RESET_CALL(nb1413m3);
 }
@@ -108,7 +100,7 @@ static DRIVER_INIT( vanilla )
 
 static DRIVER_INIT( finalbny )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	for (i = 0xf800; i < 0x10000; i++) ROM[i] = 0x00;
@@ -134,7 +126,7 @@ static DRIVER_INIT( hyouban )
 static DRIVER_INIT( galkaika )
 {
 #if 1
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
@@ -145,7 +137,7 @@ static DRIVER_INIT( galkaika )
 static DRIVER_INIT( tokyogal )
 {
 #if 1
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
@@ -156,7 +148,7 @@ static DRIVER_INIT( tokyogal )
 static DRIVER_INIT( tokimbsj )
 {
 #if 1
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
 	// Patch to IM2 -> IM1
 	ROM[0x0002] = 0x56;
@@ -190,139 +182,139 @@ static DRIVER_INIT( av2mj2rg )
 }
 
 
-static ADDRESS_MAP_START( pstadium_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pstadium_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")	// finalbny
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( triplew1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( triplew1_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf200, 0xf20f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")	// mjgottub
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( triplew2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( triplew2_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf400, 0xf40f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjlstory_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mjlstory_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf700, 0xf70f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( galkoku_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( galkoku_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(nbmj8991_palette_type1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(nbmj8991_palette_type1_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")	// hyouban
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( galkaika_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( galkaika_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
-	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(nbmj8991_palette_type2_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(nbmj8991_palette_type2_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")	// tokimbsj
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tokyogal_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tokyogal_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(nbmj8991_palette_type2_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(nbmj8991_palette_type2_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf400, 0xf40f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( av2mj1bb_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( av2mj1bb_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf500, 0xf50f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( av2mj2rg_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( av2mj2rg_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
-	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_SHARE("paletteram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( galkoku_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( galkoku_io_map, AS_IO, 8, nbmj8991_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x7f) AM_READWRITE(nb1413m3_sndrom_r,nbmj8991_blitter_w)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("fmsnd", ym3812_w)
-	AM_RANGE(0x90, 0x90) AM_READ(nb1413m3_inputport0_r)
-	AM_RANGE(0xa0, 0xa0) AM_READWRITE(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_READWRITE(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
-	AM_RANGE(0xc0, 0xc0) AM_READWRITE(nb1413m3_inputport3_r,nb1413m3_nmi_clock_w)
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", DAC_WRITE)
+	AM_RANGE(0x00, 0x7f) AM_READ_LEGACY(nb1413m3_sndrom_r) AM_WRITE(nbmj8991_blitter_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("fmsnd", ym3812_w)
+	AM_RANGE(0x90, 0x90) AM_READ_LEGACY(nb1413m3_inputport0_r)
+	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
+	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
+	AM_RANGE(0xc0, 0xc0) AM_READWRITE_LEGACY(nb1413m3_inputport3_r,nb1413m3_nmi_clock_w)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
 //  AM_RANGE(0xe0, 0xe0) AM_WRITENOP
-	AM_RANGE(0xf0, 0xf0) AM_READWRITE(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
-	AM_RANGE(0xf1, 0xf1) AM_READ(nb1413m3_dipsw2_r)
+	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
+	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hyouban_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( hyouban_io_map, AS_IO, 8, nbmj8991_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x7f) AM_READWRITE(nb1413m3_sndrom_r,nbmj8991_blitter_w)
-	AM_RANGE(0x81, 0x81) AM_DEVREAD("fmsnd", ay8910_r)
-	AM_RANGE(0x82, 0x83) AM_DEVWRITE("fmsnd", ay8910_data_address_w)
-	AM_RANGE(0x90, 0x90) AM_READ(nb1413m3_inputport0_r)
-	AM_RANGE(0xa0, 0xa0) AM_READWRITE(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_READWRITE(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
-	AM_RANGE(0xc0, 0xc0) AM_READWRITE(nb1413m3_inputport3_r,nb1413m3_nmi_clock_w)
-	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE("dac", DAC_WRITE)
+	AM_RANGE(0x00, 0x7f) AM_READ_LEGACY(nb1413m3_sndrom_r) AM_WRITE(nbmj8991_blitter_w)
+	AM_RANGE(0x81, 0x81) AM_DEVREAD_LEGACY("fmsnd", ay8910_r)
+	AM_RANGE(0x82, 0x83) AM_DEVWRITE_LEGACY("fmsnd", ay8910_data_address_w)
+	AM_RANGE(0x90, 0x90) AM_READ_LEGACY(nb1413m3_inputport0_r)
+	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
+	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_sndrombank1_w)
+	AM_RANGE(0xc0, 0xc0) AM_READWRITE_LEGACY(nb1413m3_inputport3_r,nb1413m3_nmi_clock_w)
+	AM_RANGE(0xd0, 0xd0) AM_DEVWRITE_LEGACY("dac", dac_w)
 //  AM_RANGE(0xe0, 0xe0) AM_WRITENOP
-	AM_RANGE(0xf0, 0xf0) AM_READWRITE(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
-	AM_RANGE(0xf1, 0xf1) AM_READ(nb1413m3_dipsw2_r)
+	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
+	AM_RANGE(0xf1, 0xf1) AM_READ_LEGACY(nb1413m3_dipsw2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pstadium_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( pstadium_io_map, AS_IO, 8, nbmj8991_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_WRITE(nbmj8991_blitter_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(nbmj8991_sound_w)
-	AM_RANGE(0x90, 0x90) AM_READ(nb1413m3_inputport0_r)
-	AM_RANGE(0xa0, 0xa0) AM_READWRITE(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_READ(nb1413m3_inputport2_r) //AM_WRITENOP
-	AM_RANGE(0xc0, 0xc0) AM_READ(nb1413m3_inputport3_r)
+	AM_RANGE(0x90, 0x90) AM_READ_LEGACY(nb1413m3_inputport0_r)
+	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
+	AM_RANGE(0xb0, 0xb0) AM_READ_LEGACY(nb1413m3_inputport2_r) //AM_WRITENOP
+	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(nb1413m3_inputport3_r)
 //  AM_RANGE(0xd0, 0xd0) AM_WRITENOP
-	AM_RANGE(0xf0, 0xf0) AM_READWRITE(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
-	AM_RANGE(0xf8, 0xf8) AM_READ(nb1413m3_dipsw2_r)
+	AM_RANGE(0xf0, 0xf0) AM_READWRITE_LEGACY(nb1413m3_dipsw1_r,nb1413m3_outcoin_w)
+	AM_RANGE(0xf8, 0xf8) AM_READ_LEGACY(nb1413m3_dipsw2_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( av2mj1bb_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( av2mj1bb_io_map, AS_IO, 8, nbmj8991_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x7f) AM_WRITE(nbmj8991_blitter_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(nbmj8991_sound_w)
-	AM_RANGE(0x90, 0x90) AM_READ(nb1413m3_inputport0_r)
-	AM_RANGE(0xa0, 0xa0) AM_READWRITE(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_READWRITE(nb1413m3_inputport2_r,nb1413m3_vcrctrl_w)
-	AM_RANGE(0xc0, 0xc0) AM_READ(nb1413m3_inputport3_r)
+	AM_RANGE(0x90, 0x90) AM_READ_LEGACY(nb1413m3_inputport0_r)
+	AM_RANGE(0xa0, 0xa0) AM_READWRITE_LEGACY(nb1413m3_inputport1_r,nb1413m3_inputportsel_w)
+	AM_RANGE(0xb0, 0xb0) AM_READWRITE_LEGACY(nb1413m3_inputport2_r,nb1413m3_vcrctrl_w)
+	AM_RANGE(0xc0, 0xc0) AM_READ_LEGACY(nb1413m3_inputport3_r)
 //  AM_RANGE(0xd0, 0xd0) AM_WRITENOP
-	AM_RANGE(0xf0, 0xf0) AM_READ(nb1413m3_dipsw1_r)
+	AM_RANGE(0xf0, 0xf0) AM_READ_LEGACY(nb1413m3_dipsw1_r)
 //  AM_RANGE(0xf0, 0xf0) AM_WRITENOP
-	AM_RANGE(0xf8, 0xf8) AM_READ(nb1413m3_dipsw2_r)
+	AM_RANGE(0xf8, 0xf8) AM_READ_LEGACY(nb1413m3_dipsw2_r)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nbmj8991_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nbmj8991_sound_map, AS_PROGRAM, 8, nbmj8991_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nbmj8991_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( nbmj8991_sound_io_map, AS_IO, 8, nbmj8991_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(nbmj8991_sound_r) AM_DEVWRITE("dac1", DAC_WRITE)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac2", DAC_WRITE)
+	AM_RANGE(0x00, 0x00) AM_READ(nbmj8991_sound_r) AM_DEVWRITE_LEGACY("dac1", dac_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("dac2", dac_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(nbmj8991_soundbank_w)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("fmsnd", ym3812_w)
+	AM_RANGE(0x80, 0x81) AM_DEVWRITE_LEGACY("fmsnd", ym3812_w)
 ADDRESS_MAP_END
 
 

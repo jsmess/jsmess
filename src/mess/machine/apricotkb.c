@@ -293,19 +293,19 @@ UINT8 apricot_keyboard_device::read_keyboard()
 {
 	UINT8 data = 0xff;
 
-	if (!BIT(m_kb_y, 0)) data &= input_port_read(machine(), "Y0");
-	if (!BIT(m_kb_y, 1)) data &= input_port_read(machine(), "Y1");
-	if (!BIT(m_kb_y, 2)) data &= input_port_read(machine(), "Y2");
-	if (!BIT(m_kb_y, 3)) data &= input_port_read(machine(), "Y3");
-	if (!BIT(m_kb_y, 4)) data &= input_port_read(machine(), "Y4");
-	if (!BIT(m_kb_y, 5)) data &= input_port_read(machine(), "Y5");
-	if (!BIT(m_kb_y, 6)) data &= input_port_read(machine(), "Y6");
-	if (!BIT(m_kb_y, 7)) data &= input_port_read(machine(), "Y7");
-	if (!BIT(m_kb_y, 8)) data &= input_port_read(machine(), "Y8");
-	if (!BIT(m_kb_y, 9)) data &= input_port_read(machine(), "Y9");
-	if (!BIT(m_kb_y, 10)) data &= input_port_read(machine(), "YA");
-	if (!BIT(m_kb_y, 11)) data &= input_port_read(machine(), "YB");
-	if (!BIT(m_kb_y, 12)) data &= input_port_read(machine(), "YC");
+	if (!BIT(m_kb_y, 0)) data &= ioport("Y0")->read();
+	if (!BIT(m_kb_y, 1)) data &= ioport("Y1")->read();
+	if (!BIT(m_kb_y, 2)) data &= ioport("Y2")->read();
+	if (!BIT(m_kb_y, 3)) data &= ioport("Y3")->read();
+	if (!BIT(m_kb_y, 4)) data &= ioport("Y4")->read();
+	if (!BIT(m_kb_y, 5)) data &= ioport("Y5")->read();
+	if (!BIT(m_kb_y, 6)) data &= ioport("Y6")->read();
+	if (!BIT(m_kb_y, 7)) data &= ioport("Y7")->read();
+	if (!BIT(m_kb_y, 8)) data &= ioport("Y8")->read();
+	if (!BIT(m_kb_y, 9)) data &= ioport("Y9")->read();
+	if (!BIT(m_kb_y, 10)) data &= ioport("YA")->read();
+	if (!BIT(m_kb_y, 11)) data &= ioport("YB")->read();
+	if (!BIT(m_kb_y, 12)) data &= ioport("YC")->read();
 
 	return data;
 }
@@ -347,7 +347,7 @@ READ8_MEMBER( apricot_keyboard_device::kb_p6_r )
 
     */
 
-	UINT8 modifiers = input_port_read(machine(), "MODIFIERS");
+	UINT8 modifiers = ioport("MODIFIERS")->read();
 
 	return modifiers << 1;
 }

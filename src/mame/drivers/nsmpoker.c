@@ -68,11 +68,17 @@ class nsmpoker_state : public driver_device
 {
 public:
 	nsmpoker_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE8_MEMBER(nsmpoker_videoram_w);
+	DECLARE_WRITE8_MEMBER(nsmpoker_colorram_w);
+	DECLARE_WRITE8_MEMBER(debug_w);
+	DECLARE_READ8_MEMBER(debug_r);
 };
 
 
@@ -81,19 +87,17 @@ public:
 *************************/
 
 
-static WRITE8_HANDLER( nsmpoker_videoram_w )
+WRITE8_MEMBER(nsmpoker_state::nsmpoker_videoram_w)
 {
-	nsmpoker_state *state = space->machine().driver_data<nsmpoker_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-static WRITE8_HANDLER( nsmpoker_colorram_w )
+WRITE8_MEMBER(nsmpoker_state::nsmpoker_colorram_w)
 {
-	nsmpoker_state *state = space->machine().driver_data<nsmpoker_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -145,14 +149,14 @@ static INTERRUPT_GEN( nsmpoker_interrupt )
 	device_set_input_line_and_vector(device, 0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
 }
 
-//static WRITE8_HANDLER( debug_w )
+//WRITE8_MEMBER(nsmpoker_state::debug_w)
 //{
 //  popmessage("written : %02X", data);
 //}
 
-static READ8_HANDLER( debug_r )
+READ8_MEMBER(nsmpoker_state::debug_r)
 {
-	return space->machine().rand() & 0xff;
+	return machine().rand() & 0xff;
 }
 
 
@@ -160,15 +164,15 @@ static READ8_HANDLER( debug_r )
 * Memory Map Information *
 *************************/
 
-static ADDRESS_MAP_START( nsmpoker_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nsmpoker_map, AS_PROGRAM, 8, nsmpoker_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x9000, 0xafff) AM_RAM	// OK... cleared at beginning.
 	AM_RANGE(0xb000, 0xcfff) AM_ROM	// WRONG... just to map the last rom somewhere.
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(nsmpoker_videoram_w) AM_BASE_MEMBER(nsmpoker_state, m_videoram) // WRONG... just a placeholder.
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(nsmpoker_colorram_w) AM_BASE_MEMBER(nsmpoker_state, m_colorram) // WRONG... just a placeholder.
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(nsmpoker_videoram_w) AM_SHARE("videoram") // WRONG... just a placeholder.
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(nsmpoker_colorram_w) AM_SHARE("colorram") // WRONG... just a placeholder.
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nsmpoker_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( nsmpoker_portmap, AS_IO, 8, nsmpoker_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_READ(debug_r)	// kind of trap at beginning
 ADDRESS_MAP_END

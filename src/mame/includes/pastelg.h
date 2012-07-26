@@ -19,6 +19,18 @@ public:
 	UINT8 *m_videoram;
 	UINT8 *m_clut;
 	int m_flipscreen_old;
+	DECLARE_READ8_MEMBER(pastelg_sndrom_r);
+	DECLARE_READ8_MEMBER(pastelg_irq_ack_r);
+	DECLARE_READ8_MEMBER(threeds_inputport1_r);
+	DECLARE_READ8_MEMBER(threeds_inputport2_r);
+	DECLARE_WRITE8_MEMBER(threeds_inputportsel_w);
+	DECLARE_WRITE8_MEMBER(pastelg_clut_w);
+	DECLARE_WRITE8_MEMBER(pastelg_blitter_w);
+	DECLARE_WRITE8_MEMBER(threeds_romsel_w);
+	DECLARE_WRITE8_MEMBER(threeds_output_w);
+	DECLARE_READ8_MEMBER(threeds_rom_readback_r);
+	DECLARE_WRITE8_MEMBER(pastelg_romsel_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_hackbusyflag_r);
 };
 
 
@@ -28,11 +40,5 @@ PALETTE_INIT( pastelg );
 SCREEN_UPDATE_IND16( pastelg );
 VIDEO_START( pastelg );
 
-WRITE8_HANDLER( pastelg_clut_w );
-WRITE8_HANDLER( pastelg_romsel_w );
-WRITE8_HANDLER( threeds_romsel_w );
-WRITE8_HANDLER( threeds_output_w );
-WRITE8_HANDLER( pastelg_blitter_w );
-READ8_HANDLER( threeds_rom_readback_r );
 
 int pastelg_blitter_src_addr_r(address_space *space);

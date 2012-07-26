@@ -151,6 +151,7 @@ public:
 	jankenmn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_CUSTOM_INPUT_MEMBER(jankenmn_hopper_status_r);
 };
 
 
@@ -214,10 +215,10 @@ static WRITE8_DEVICE_HANDLER( jankenmn_lamps3_w )
 	// d0, d6, d7: N/C?
 }
 
-static CUSTOM_INPUT( jankenmn_hopper_status_r )
+CUSTOM_INPUT_MEMBER(jankenmn_state::jankenmn_hopper_status_r)
 {
 	// temp workaround, needs hopper
-	return field.machine().rand();
+	return machine().rand();
 }
 
 
@@ -225,17 +226,17 @@ static CUSTOM_INPUT( jankenmn_hopper_status_r )
 *           Memory Map Definition            *
 *********************************************/
 
-static ADDRESS_MAP_START( jankenmn_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jankenmn_map, AS_PROGRAM, 8, jankenmn_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jankenmn_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( jankenmn_port_map, AS_IO, 8, jankenmn_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_MODERN("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_MODERN("ppi8255_1", i8255_device, read, write)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x30, 0x30) AM_WRITENOP // ???
 ADDRESS_MAP_END
 
@@ -251,7 +252,7 @@ static INPUT_PORTS_START( jankenmn )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_C) PORT_NAME("Paa (Paper)")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN3 ) // 100 yen coin
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(jankenmn_hopper_status_r, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, jankenmn_state,jankenmn_hopper_status_r, NULL)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 ) // 10 yen coin
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) // 10 yen coin
 

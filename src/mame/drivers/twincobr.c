@@ -274,13 +274,13 @@ Shark   Zame
 
 /***************************** 68000 Memory Map *****************************/
 
-static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 16, twincobr_state )
 	AM_RANGE(0x000000, 0x02ffff) AM_ROM
 	AM_RANGE(0x030000, 0x033fff) AM_RAM		/* 68K and DSP shared RAM */
 	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x050000, 0x050dff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x060000, 0x060001) AM_DEVWRITE8_MODERN("crtc", mc6845_device, address_w, 0x00ff)
-	AM_RANGE(0x060002, 0x060003) AM_DEVWRITE8_MODERN("crtc", mc6845_device, register_w, 0x00ff)
+	AM_RANGE(0x050000, 0x050dff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x060000, 0x060001) AM_DEVWRITE8("crtc", mc6845_device, address_w, 0x00ff)
+	AM_RANGE(0x060002, 0x060003) AM_DEVWRITE8("crtc", mc6845_device, register_w, 0x00ff)
 	AM_RANGE(0x070000, 0x070003) AM_WRITE(twincobr_txscroll_w)	/* text layer scroll */
 	AM_RANGE(0x070004, 0x070005) AM_WRITE(twincobr_txoffs_w)	/* offset in text video RAM */
 	AM_RANGE(0x072000, 0x072003) AM_WRITE(twincobr_bgscroll_w)	/* bg layer scroll */
@@ -304,14 +304,14 @@ ADDRESS_MAP_END
 
 /***************************** Z80 Memory Map *******************************/
 
-static ADDRESS_MAP_START( sound_program_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_program_map, AS_PROGRAM, 8, twincobr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(twincobr_state, m_sharedram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("sharedram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, twincobr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("SYSTEM")			/* Twin Cobra - Coin/Start */
 	AM_RANGE(0x20, 0x20) AM_WRITE(twincobr_coin_w)		/* Twin Cobra coin count-lockout */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSWA")
@@ -321,13 +321,13 @@ ADDRESS_MAP_END
 
 /***************************** TMS32010 Memory Map **************************/
 
-static ADDRESS_MAP_START( DSP_program_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( DSP_program_map, AS_PROGRAM, 16, twincobr_state )
 	AM_RANGE(0x000, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
 	/* $000 - 08F  TMS32010 Internal Data RAM in Data Address Space */
 
-static ADDRESS_MAP_START( DSP_io_map, AS_IO, 16 )
+static ADDRESS_MAP_START( DSP_io_map, AS_IO, 16, twincobr_state )
 	AM_RANGE(0, 0) AM_WRITE(twincobr_dsp_addrsel_w)
 	AM_RANGE(1, 1) AM_READWRITE(twincobr_dsp_r, twincobr_dsp_w)
 	AM_RANGE(2, 2) AM_READWRITE(fsharkbt_dsp_r, fsharkbt_dsp_w)
@@ -338,7 +338,7 @@ ADDRESS_MAP_END
 
 /******************* Flying Shark Bootleg i8741 Memory Map *******************/
 
-static ADDRESS_MAP_START( fsharkbt_i8741_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( fsharkbt_i8741_io_map, AS_IO, 8, twincobr_state )
 	/* IO map unknown as program code isn't dumped */
 ADDRESS_MAP_END
 
@@ -390,7 +390,7 @@ static INPUT_PORTS_START( twincobr )
 
 	PORT_START("VBLANK")
 	PORT_BIT( 0x7f, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 /* verified from M68000 and Z80 code */
@@ -425,7 +425,7 @@ static INPUT_PORTS_START( gulfwar2 )
 
 	PORT_MODIFY("VBLANK")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 
@@ -471,7 +471,7 @@ static INPUT_PORTS_START( fshark )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 /* verified from M68000 code */

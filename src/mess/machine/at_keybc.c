@@ -3,7 +3,6 @@
     IBM PC AT compatibles 8042 keyboard controller
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "at_keybc.h"

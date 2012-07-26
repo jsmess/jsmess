@@ -80,16 +80,23 @@ class statriv2_state : public driver_device
 {
 public:
 	statriv2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_question_offset(*this, "question_offset"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_tilemap;
-	UINT8 *m_question_offset;
+	required_shared_ptr<UINT8> m_question_offset;
 	UINT8 m_question_offset_low;
 	UINT8 m_question_offset_mid;
 	UINT8 m_question_offset_high;
 	UINT8 m_latched_coin;
 	UINT8 m_last_coin;
+	DECLARE_WRITE8_MEMBER(statriv2_videoram_w);
+	DECLARE_READ8_MEMBER(question_data_r);
+	DECLARE_READ8_MEMBER(laserdisc_io_r);
+	DECLARE_WRITE8_MEMBER(laserdisc_io_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(latched_coin_r);
 };
 
 
@@ -161,12 +168,11 @@ static VIDEO_START( vertical )
  *
  *************************************/
 
-static WRITE8_HANDLER( statriv2_videoram_w )
+WRITE8_MEMBER(statriv2_state::statriv2_videoram_w)
 {
-	statriv2_state *state = space->machine().driver_data<statriv2_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
 
@@ -198,7 +204,7 @@ static SCREEN_UPDATE_IND16( statriv2 )
 static INTERRUPT_GEN( statriv2_interrupt )
 {
 	statriv2_state *state = device->machine().driver_data<statriv2_state>();
-	UINT8 new_coin = input_port_read(device->machine(), "COIN");
+	UINT8 new_coin = state->ioport("COIN")->read();
 
 	/* check the coin inputs once per frame */
 	state->m_latched_coin |= new_coin & (new_coin ^ state->m_last_coin);
@@ -216,20 +222,19 @@ static INTERRUPT_GEN( statriv2_interrupt )
  *
  *************************************/
 
-static READ8_HANDLER( question_data_r )
+READ8_MEMBER(statriv2_state::question_data_r)
 {
-	statriv2_state *state = space->machine().driver_data<statriv2_state>();
-	const UINT8 *qrom = space->machine().region("questions")->base();
-	UINT32 qromsize = space->machine().region("questions")->bytes();
+	const UINT8 *qrom = memregion("questions")->base();
+	UINT32 qromsize = memregion("questions")->bytes();
 	UINT32 address;
 
-	if (state->m_question_offset_high == 0xff)
-		state->m_question_offset[state->m_question_offset_low]++;
+	if (m_question_offset_high == 0xff)
+		m_question_offset[m_question_offset_low]++;
 
-	address = state->m_question_offset[state->m_question_offset_low];
-	address |= state->m_question_offset[state->m_question_offset_mid] << 8;
-	if (state->m_question_offset_high != 0xff)
-		address |= state->m_question_offset[state->m_question_offset_high] << 16;
+	address = m_question_offset[m_question_offset_low];
+	address |= m_question_offset[m_question_offset_mid] << 8;
+	if (m_question_offset_high != 0xff)
+		address |= m_question_offset[m_question_offset_high] << 16;
 
 	return (address < qromsize) ? qrom[address] : 0xff;
 }
@@ -242,10 +247,9 @@ static READ8_HANDLER( question_data_r )
  *
  *************************************/
 
-static CUSTOM_INPUT( latched_coin_r )
+CUSTOM_INPUT_MEMBER(statriv2_state::latched_coin_r)
 {
-	statriv2_state *state = field.machine().driver_data<statriv2_state>();
-	return state->m_latched_coin;
+	return m_latched_coin;
 }
 
 
@@ -288,28 +292,28 @@ static const ppi8255_interface ppi8255_intf =
  *
  *************************************/
 
-static ADDRESS_MAP_START( statriv2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( statriv2_map, AS_PROGRAM, 8, statriv2_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x48ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(statriv2_videoram_w) AM_BASE_MEMBER(statriv2_state, m_videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(statriv2_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( statriv2_io_map, AS_IO, 8 )
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi", ppi8255_r, ppi8255_w)
-	AM_RANGE(0x28, 0x2b) AM_READ(question_data_r) AM_WRITEONLY AM_BASE_MEMBER(statriv2_state, m_question_offset)
-	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE("tms", tms9927_r, tms9927_w)
+static ADDRESS_MAP_START( statriv2_io_map, AS_IO, 8, statriv2_state )
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_LEGACY("ppi", ppi8255_r, ppi8255_w)
+	AM_RANGE(0x28, 0x2b) AM_READ(question_data_r) AM_WRITEONLY AM_SHARE("question_offset")
+	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xb1, 0xb1) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE_LEGACY("tms", tms9927_r, tms9927_w)
 ADDRESS_MAP_END
 
 #ifdef UNUSED_CODE
-static ADDRESS_MAP_START( statusbj_io, AS_IO, 8 )
+static ADDRESS_MAP_START( statusbj_io, AS_IO, 8, statriv2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xb1, 0xb1) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE("tms", tms9927_r, tms9927_w)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_LEGACY("ppi", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xb0, 0xb1) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xb1, 0xb1) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0xc0, 0xcf) AM_DEVREADWRITE_LEGACY("tms", tms9927_r, tms9927_w)
 ADDRESS_MAP_END
 #endif
 
@@ -335,7 +339,7 @@ static INPUT_PORTS_START( statusbj )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state,latched_coin_r, "COIN")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -368,7 +372,7 @@ static INPUT_PORTS_START( funcsino )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Stand")         PORT_CODE(KEYCODE_4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Select Game")   PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state,latched_coin_r, "COIN")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x10, 0x10, "DIP switch? 10" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -443,7 +447,7 @@ static INPUT_PORTS_START( statriv2 )
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Play 1000")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(latched_coin_r, "COIN")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, statriv2_state,latched_coin_r, "COIN")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )
 	PORT_DIPNAME( 0x20, 0x20, "Show Correct Answer" )
@@ -1098,8 +1102,8 @@ static DRIVER_INIT( addr_lmhe )
     *                                                   *
     \***************************************************/
 
-	UINT8 *qrom = machine.region("questions")->base();
-	UINT32 length = machine.region("questions")->bytes();
+	UINT8 *qrom = machine.root_device().memregion("questions")->base();
+	UINT32 length = machine.root_device().memregion("questions")->bytes();
 	UINT32 address;
 
 	for (address = 0; address < length; address++)
@@ -1109,24 +1113,25 @@ static DRIVER_INIT( addr_lmhe )
 }
 
 
-static READ8_HANDLER( laserdisc_io_r )
+READ8_MEMBER(statriv2_state::laserdisc_io_r)
 {
 	UINT8 result = 0x00;
 	if (offset == 1)
 		result = 0x18;
-	mame_printf_debug("%s:ld read ($%02X) = %02X\n", space->machine().describe_context(), 0x28 + offset, result);
+	mame_printf_debug("%s:ld read ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, result);
 	return result;
 }
 
-static WRITE8_HANDLER( laserdisc_io_w )
+WRITE8_MEMBER(statriv2_state::laserdisc_io_w)
 {
-	mame_printf_debug("%s:ld write ($%02X) = %02X\n", space->machine().describe_context(), 0x28 + offset, data);
+	mame_printf_debug("%s:ld write ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, data);
 }
 
 static DRIVER_INIT( laserdisc )
 {
 	address_space *iospace = machine.device("maincpu")->memory().space(AS_IO);
-	iospace->install_legacy_readwrite_handler(0x28, 0x2b, FUNC(laserdisc_io_r), FUNC(laserdisc_io_w));
+	statriv2_state *state = machine.driver_data<statriv2_state>();
+	iospace->install_readwrite_handler(0x28, 0x2b, read8_delegate(FUNC(statriv2_state::laserdisc_io_r), state), write8_delegate(FUNC(statriv2_state::laserdisc_io_w), state));
 }
 
 

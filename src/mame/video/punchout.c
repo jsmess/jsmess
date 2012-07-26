@@ -166,41 +166,36 @@ VIDEO_START( armwrest )
 
 
 
-WRITE8_HANDLER( punchout_bg_top_videoram_w )
+WRITE8_MEMBER(punchout_state::punchout_bg_top_videoram_w)
 {
-	punchout_state *state = space->machine().driver_data<punchout_state>();
-	state->m_bg_top_videoram[offset] = data;
-	state->m_bg_top_tilemap->mark_tile_dirty(offset/2);
+	m_bg_top_videoram[offset] = data;
+	m_bg_top_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_HANDLER( punchout_bg_bot_videoram_w )
+WRITE8_MEMBER(punchout_state::punchout_bg_bot_videoram_w)
 {
-	punchout_state *state = space->machine().driver_data<punchout_state>();
-	state->m_bg_bot_videoram[offset] = data;
-	state->m_bg_bot_tilemap->mark_tile_dirty(offset/2);
+	m_bg_bot_videoram[offset] = data;
+	m_bg_bot_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_HANDLER( armwrest_fg_videoram_w )
+WRITE8_MEMBER(punchout_state::armwrest_fg_videoram_w)
 {
-	punchout_state *state = space->machine().driver_data<punchout_state>();
-	state->m_armwrest_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset/2);
+	m_armwrest_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_HANDLER( punchout_spr1_videoram_w )
+WRITE8_MEMBER(punchout_state::punchout_spr1_videoram_w)
 {
-	punchout_state *state = space->machine().driver_data<punchout_state>();
-	state->m_spr1_videoram[offset] = data;
-	state->m_spr1_tilemap->mark_tile_dirty(offset/4);
-	if (state->m_spr1_tilemap_flipx)
-		state->m_spr1_tilemap_flipx->mark_tile_dirty(offset/4);
+	m_spr1_videoram[offset] = data;
+	m_spr1_tilemap->mark_tile_dirty(offset/4);
+	if (m_spr1_tilemap_flipx)
+		m_spr1_tilemap_flipx->mark_tile_dirty(offset/4);
 }
 
-WRITE8_HANDLER( punchout_spr2_videoram_w )
+WRITE8_MEMBER(punchout_state::punchout_spr2_videoram_w)
 {
-	punchout_state *state = space->machine().driver_data<punchout_state>();
-	state->m_spr2_videoram[offset] = data;
-	state->m_spr2_tilemap->mark_tile_dirty(offset/4);
+	m_spr2_videoram[offset] = data;
+	m_spr2_tilemap->mark_tile_dirty(offset/4);
 }
 
 
@@ -332,7 +327,7 @@ static void punchout_copy_top_palette(running_machine &machine, int bank)
 {
 	punchout_state *state = machine.driver_data<punchout_state>();
 	int i;
-	const UINT8 *color_prom = machine.region("proms")->base();
+	const UINT8 *color_prom = state->memregion("proms")->base();
 
 	// top monitor palette
 	for (i = 0; i < 0x100; i++)
@@ -352,7 +347,7 @@ static void punchout_copy_bot_palette(running_machine &machine, int bank)
 {
 	punchout_state *state = machine.driver_data<punchout_state>();
 	int i;
-	const UINT8 *color_prom = machine.region("proms")->base() + 0x600;
+	const UINT8 *color_prom = state->memregion("proms")->base() + 0x600;
 
 	// bottom monitor palette
 	for (i = 0; i < 0x100; i++)

@@ -5,7 +5,6 @@
         09/12/2009 Skeleton driver.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -20,14 +19,15 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_terminal(*this, TERMINAL_TAG)
-	{ }
+	,
+		m_p_ram(*this, "p_ram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	DECLARE_WRITE16_MEMBER( dual68_terminal_w );
 	//UINT8 m_term_data;
-	UINT16* m_p_ram;
+	required_shared_ptr<UINT16> m_p_ram;
 };
 
 
@@ -39,7 +39,7 @@ WRITE16_MEMBER( dual68_state::dual68_terminal_w )
 
 static ADDRESS_MAP_START(dual68_mem, AS_PROGRAM, 16, dual68_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM AM_BASE(m_p_ram)
+	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM AM_SHARE("p_ram")
 	AM_RANGE(0x00080000, 0x00081fff) AM_ROM AM_REGION("user1",0)
 	AM_RANGE(0x007f0000, 0x007f0001) AM_WRITE(dual68_terminal_w)
 	AM_RANGE(0x00800000, 0x00801fff) AM_ROM AM_REGION("user1",0)
@@ -63,9 +63,9 @@ INPUT_PORTS_END
 static MACHINE_RESET(dual68)
 {
 	dual68_state *state = machine.driver_data<dual68_state>();
-	UINT8* user1 = machine.region("user1")->base();
+	UINT8* user1 = state->memregion("user1")->base();
 
-	memcpy((UINT8*)state->m_p_ram,user1,0x2000);
+	memcpy((UINT8*)state->m_p_ram.target(),user1,0x2000);
 
 	machine.device("maincpu")->reset();
 }

@@ -3,7 +3,6 @@
 #ifndef __TMC1800__
 #define __TMC1800__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"
@@ -111,6 +110,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( rdata_r );
 	DECLARE_READ_LINE_MEMBER( bdata_r );
 	DECLARE_READ_LINE_MEMBER( gdata_r );
+	DECLARE_INPUT_CHANGED_MEMBER( run_pressed );
 
 	void bankswitch();
 
@@ -142,10 +142,16 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void machine_start();
 	virtual void machine_reset();
 
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	enum
+	{
+		TIMER_ID_EF4
+	};
 
 	DECLARE_WRITE8_MEMBER( keylatch_w );
 	DECLARE_WRITE8_MEMBER( bankswitch_w );
@@ -153,12 +159,11 @@ public:
 	DECLARE_READ_LINE_MEMBER( ef2_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_WRITE_LINE_MEMBER( q_w );
+	DECLARE_INPUT_CHANGED_MEMBER( run_pressed );
+	DECLARE_INPUT_CHANGED_MEMBER( monitor_pressed );
 
 	/* keyboard state */
 	int m_keylatch;			/* key latch */
-
-	/* timers */
-	emu_timer *m_ef4_timer;	/* EF4 line RC timer */
 };
 
 /* ---------- defined in video/tmc1800.c ---------- */

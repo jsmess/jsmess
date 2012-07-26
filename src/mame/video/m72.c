@@ -110,7 +110,7 @@ static void register_savestate(running_machine &machine)
 	state->save_item(NAME(state->m_scrolly1));
 	state->save_item(NAME(state->m_scrollx2));
 	state->save_item(NAME(state->m_scrolly2));
-	state->save_pointer(NAME(state->m_buffered_spriteram), state->m_spriteram_size/2);
+	state->save_pointer(NAME(state->m_buffered_spriteram), state->m_spriteram.bytes()/2);
 }
 
 
@@ -120,7 +120,7 @@ VIDEO_START( m72 )
 	state->m_bg_tilemap = tilemap_create(machine, m72_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 	state->m_fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
-	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram_size/2);
+	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram.bytes()/2);
 
 	state->m_fg_tilemap->set_transmask(0,0xffff,0x0001);
 	state->m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
@@ -131,7 +131,7 @@ VIDEO_START( m72 )
 	//state->m_bg_tilemap->set_transmask(2,0x0001,0xfffe);
 	state->m_bg_tilemap->set_transmask(2,0x0007,0xfff8);
 
-	memset(state->m_buffered_spriteram,0,state->m_spriteram_size);
+	memset(state->m_buffered_spriteram,0,state->m_spriteram.bytes());
 
 	state->m_fg_tilemap->set_scrolldx(0,0);
 	state->m_fg_tilemap->set_scrolldy(-128,16);
@@ -157,7 +157,7 @@ VIDEO_START( rtype2 )
 	state->m_bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 	state->m_fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
-	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram_size/2);
+	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram.bytes()/2);
 
 	state->m_fg_tilemap->set_transmask(0,0xffff,0x0001);
 	state->m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
@@ -167,7 +167,7 @@ VIDEO_START( rtype2 )
 	state->m_bg_tilemap->set_transmask(1,0x00ff,0xff00);
 	state->m_bg_tilemap->set_transmask(2,0x0001,0xfffe);
 
-	memset(state->m_buffered_spriteram,0,state->m_spriteram_size);
+	memset(state->m_buffered_spriteram,0,state->m_spriteram.bytes());
 
 	state->m_fg_tilemap->set_scrolldx(4,0);
 	state->m_fg_tilemap->set_scrolldy(-128,16);
@@ -206,7 +206,7 @@ VIDEO_START( majtitle )
 	state->m_bg_tilemap = tilemap_create(machine, rtype2_get_bg_tile_info,majtitle_scan_rows,8,8,128,64);
 	state->m_fg_tilemap = tilemap_create(machine, rtype2_get_fg_tile_info,tilemap_scan_rows,8,8,64,64);
 
-	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram_size/2);
+	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram.bytes()/2);
 
 	state->m_fg_tilemap->set_transmask(0,0xffff,0x0001);
 	state->m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
@@ -216,7 +216,7 @@ VIDEO_START( majtitle )
 	state->m_bg_tilemap->set_transmask(1,0x00ff,0xff00);
 	state->m_bg_tilemap->set_transmask(2,0x0001,0xfffe);
 
-	memset(state->m_buffered_spriteram,0,state->m_spriteram_size);
+	memset(state->m_buffered_spriteram,0,state->m_spriteram.bytes());
 
 	state->m_fg_tilemap->set_scrolldx(4,0);
 	state->m_fg_tilemap->set_scrolldy(-128,16);
@@ -233,7 +233,7 @@ VIDEO_START( hharry )
 	state->m_bg_tilemap = tilemap_create(machine, hharry_get_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 	state->m_fg_tilemap = tilemap_create(machine, m72_get_fg_tile_info,   tilemap_scan_rows,8,8,64,64);
 
-	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram_size/2);
+	state->m_buffered_spriteram = auto_alloc_array(machine, UINT16, state->m_spriteram.bytes()/2);
 
 	state->m_fg_tilemap->set_transmask(0,0xffff,0x0001);
 	state->m_fg_tilemap->set_transmask(1,0x00ff,0xff01);
@@ -243,7 +243,7 @@ VIDEO_START( hharry )
 	state->m_bg_tilemap->set_transmask(1,0x00ff,0xff00);
 	state->m_bg_tilemap->set_transmask(2,0x0001,0xfffe);
 
-	memset(state->m_buffered_spriteram,0,state->m_spriteram_size);
+	memset(state->m_buffered_spriteram,0,state->m_spriteram.bytes());
 
 	state->m_fg_tilemap->set_scrolldx(4,0);
 	state->m_fg_tilemap->set_scrolldy(-128,16);
@@ -261,20 +261,20 @@ VIDEO_START( hharry )
 
 ***************************************************************************/
 
-READ16_HANDLER( m72_palette1_r )
+READ16_MEMBER(m72_state::m72_palette1_r)
 {
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	return space->machine().generic.paletteram.u16[offset] | 0xffe0;	/* only D0-D4 are connected */
+	return m_generic_paletteram_16[offset] | 0xffe0;	/* only D0-D4 are connected */
 }
 
-READ16_HANDLER( m72_palette2_r )
+READ16_MEMBER(m72_state::m72_palette2_r)
 {
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	return space->machine().generic.paletteram2.u16[offset] | 0xffe0;	/* only D0-D4 are connected */
+	return m_generic_paletteram2_16[offset] | 0xffe0;	/* only D0-D4 are connected */
 }
 
 INLINE void changecolor(running_machine &machine,int color,int r,int g,int b)
@@ -282,129 +282,119 @@ INLINE void changecolor(running_machine &machine,int color,int r,int g,int b)
 	palette_set_color_rgb(machine,color,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
-WRITE16_HANDLER( m72_palette1_w )
+WRITE16_MEMBER(m72_state::m72_palette1_w)
 {
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 	offset &= 0x0ff;
-	changecolor(space->machine(),
+	changecolor(machine(),
 			offset,
-			space->machine().generic.paletteram.u16[offset + 0x000],
-			space->machine().generic.paletteram.u16[offset + 0x200],
-			space->machine().generic.paletteram.u16[offset + 0x400]);
+			m_generic_paletteram_16[offset + 0x000],
+			m_generic_paletteram_16[offset + 0x200],
+			m_generic_paletteram_16[offset + 0x400]);
 }
 
-WRITE16_HANDLER( m72_palette2_w )
+WRITE16_MEMBER(m72_state::m72_palette2_w)
 {
 	/* A9 isn't connected, so 0x200-0x3ff mirrors 0x000-0x1ff etc. */
 	offset &= ~0x100;
 
-	COMBINE_DATA(&space->machine().generic.paletteram2.u16[offset]);
+	COMBINE_DATA(&m_generic_paletteram2_16[offset]);
 	offset &= 0x0ff;
-	changecolor(space->machine(),
+	changecolor(machine(),
 			offset + 256,
-			space->machine().generic.paletteram2.u16[offset + 0x000],
-			space->machine().generic.paletteram2.u16[offset + 0x200],
-			space->machine().generic.paletteram2.u16[offset + 0x400]);
+			m_generic_paletteram2_16[offset + 0x000],
+			m_generic_paletteram2_16[offset + 0x200],
+			m_generic_paletteram2_16[offset + 0x400]);
 }
 
-WRITE16_HANDLER( m72_videoram1_w )
+WRITE16_MEMBER(m72_state::m72_videoram1_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	COMBINE_DATA(&state->m_videoram1[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_videoram1[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( m72_videoram2_w )
+WRITE16_MEMBER(m72_state::m72_videoram2_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	COMBINE_DATA(&state->m_videoram2[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset/2);
+	COMBINE_DATA(&m_videoram2[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE16_HANDLER( m72_irq_line_w )
+WRITE16_MEMBER(m72_state::m72_irq_line_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	COMBINE_DATA(&state->m_raster_irq_position);
+	COMBINE_DATA(&m_raster_irq_position);
 }
 
-WRITE16_HANDLER( m72_scrollx1_w )
+WRITE16_MEMBER(m72_state::m72_scrollx1_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	COMBINE_DATA(&state->m_scrollx1);
+	COMBINE_DATA(&m_scrollx1);
 }
 
-WRITE16_HANDLER( m72_scrollx2_w )
+WRITE16_MEMBER(m72_state::m72_scrollx2_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	COMBINE_DATA(&state->m_scrollx2);
+	COMBINE_DATA(&m_scrollx2);
 }
 
-WRITE16_HANDLER( m72_scrolly1_w )
+WRITE16_MEMBER(m72_state::m72_scrolly1_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	COMBINE_DATA(&state->m_scrolly1);
+	COMBINE_DATA(&m_scrolly1);
 }
 
-WRITE16_HANDLER( m72_scrolly2_w )
+WRITE16_MEMBER(m72_state::m72_scrolly2_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
-	COMBINE_DATA(&state->m_scrolly2);
+	COMBINE_DATA(&m_scrolly2);
 }
 
-WRITE16_HANDLER( m72_dmaon_w )
+WRITE16_MEMBER(m72_state::m72_dmaon_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	if (ACCESSING_BITS_0_7)
-		memcpy(state->m_buffered_spriteram, state->m_spriteram, state->m_spriteram_size);
+		memcpy(m_buffered_spriteram, m_spriteram, m_spriteram.bytes());
 }
 
 
-WRITE16_HANDLER( m72_port02_w )
+WRITE16_MEMBER(m72_state::m72_port02_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data & 0xe0) logerror("write %02x to port 02\n",data);
 
 		/* bits 0/1 are coin counters */
-		coin_counter_w(space->machine(), 0,data & 0x01);
-		coin_counter_w(space->machine(), 1,data & 0x02);
+		coin_counter_w(machine(), 0,data & 0x01);
+		coin_counter_w(machine(), 1,data & 0x02);
 
 		/* bit 2 is flip screen (handled both by software and hardware) */
-		flip_screen_set(space->machine(), ((data & 0x04) >> 2) ^ ((~input_port_read(space->machine(), "DSW") >> 8) & 1));
+		flip_screen_set(((data & 0x04) >> 2) ^ ((~ioport("DSW")->read() >> 8) & 1));
 
 		/* bit 3 is display disable */
-		state->m_video_off = data & 0x08;
+		m_video_off = data & 0x08;
 
 		/* bit 4 resets sound CPU (active low) */
 		if (data & 0x10)
-			cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cputag_set_input_line(space->machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(machine(), "soundcpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* bit 5 = "bank"? */
 	}
 }
 
-WRITE16_HANDLER( rtype2_port02_w )
+WRITE16_MEMBER(m72_state::rtype2_port02_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data & 0xe0) logerror("write %02x to port 02\n",data);
 
 		/* bits 0/1 are coin counters */
-		coin_counter_w(space->machine(), 0,data & 0x01);
-		coin_counter_w(space->machine(), 1,data & 0x02);
+		coin_counter_w(machine(), 0,data & 0x01);
+		coin_counter_w(machine(), 1,data & 0x02);
 
 		/* bit 2 is flip screen (handled both by software and hardware) */
-		flip_screen_set(space->machine(), ((data & 0x04) >> 2) ^ ((~input_port_read(space->machine(), "DSW") >> 8) & 1));
+		flip_screen_set(((data & 0x04) >> 2) ^ ((~ioport("DSW")->read() >> 8) & 1));
 
 		/* bit 3 is display disable */
-		state->m_video_off = data & 0x08;
+		m_video_off = data & 0x08;
 
 		/* other bits unknown */
 	}
@@ -413,13 +403,12 @@ WRITE16_HANDLER( rtype2_port02_w )
 
 
 /* the following is mostly a kludge. This register seems to be used for something else */
-WRITE16_HANDLER( majtitle_gfx_ctrl_w )
+WRITE16_MEMBER(m72_state::majtitle_gfx_ctrl_w)
 {
-	m72_state *state = space->machine().driver_data<m72_state>();
 	if (ACCESSING_BITS_8_15)
 	{
-		if (data & 0xff00) state->m_majtitle_rowscroll = 1;
-		else state->m_majtitle_rowscroll = 0;
+		if (data & 0xff00) m_majtitle_rowscroll = 1;
+		else m_majtitle_rowscroll = 0;
 	}
 }
 
@@ -437,7 +426,7 @@ static void m72_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,cons
 	int offs;
 
 	offs = 0;
-	while (offs < state->m_spriteram_size/2)
+	while (offs < state->m_spriteram.bytes()/2)
 	{
 		int code,color,sx,sy,flipx,flipy,w,h,x,y;
 
@@ -453,7 +442,7 @@ static void m72_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,cons
 		h = 1 << ((spriteram[offs+2] & 0x3000) >> 12);
 		sy -= 16 * h;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 512 - 16*w - sx;
 			sy = 284 - 16*h - sy;
@@ -490,7 +479,7 @@ static void majtitle_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	UINT16 *spriteram16_2 = state->m_spriteram2;
 	int offs;
 
-	for (offs = 0;offs < state->m_spriteram_size;offs += 4)
+	for (offs = 0;offs < state->m_spriteram.bytes();offs += 4)
 	{
 		int code,color,sx,sy,flipx,flipy,w,h,x,y;
 
@@ -506,7 +495,7 @@ static void majtitle_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		h = 1 << ((spriteram16_2[offs+2] & 0x3000) >> 12);
 		sy -= 16 * h;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 512 - 16*w - sx;
 			sy = 256 - 16*h - sy;

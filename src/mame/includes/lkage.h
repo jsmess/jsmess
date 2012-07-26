@@ -3,12 +3,16 @@ class lkage_state : public driver_device
 {
 public:
 	lkage_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vreg(*this, "vreg"),
+		m_scroll(*this, "scroll"),
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *      m_scroll;
-	UINT8 *      m_vreg;
-	UINT8 *      m_videoram;
-	UINT8 *      m_spriteram;
+	required_shared_ptr<UINT8> m_vreg;
+	required_shared_ptr<UINT8> m_scroll;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
 //  UINT8 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
@@ -48,27 +52,35 @@ public:
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
 	device_t *m_mcu;
+	DECLARE_WRITE8_MEMBER(lkage_sound_command_w);
+	DECLARE_WRITE8_MEMBER(lkage_sh_nmi_disable_w);
+	DECLARE_WRITE8_MEMBER(lkage_sh_nmi_enable_w);
+	DECLARE_READ8_MEMBER(sound_status_r);
+	DECLARE_READ8_MEMBER(port_fetch_r);
+	DECLARE_READ8_MEMBER(fake_mcu_r);
+	DECLARE_WRITE8_MEMBER(fake_mcu_w);
+	DECLARE_READ8_MEMBER(fake_status_r);
+	DECLARE_READ8_MEMBER(lkage_68705_port_a_r);
+	DECLARE_WRITE8_MEMBER(lkage_68705_port_a_w);
+	DECLARE_WRITE8_MEMBER(lkage_68705_ddr_a_w);
+	DECLARE_READ8_MEMBER(lkage_68705_port_b_r);
+	DECLARE_WRITE8_MEMBER(lkage_68705_port_b_w);
+	DECLARE_WRITE8_MEMBER(lkage_68705_ddr_b_w);
+	DECLARE_READ8_MEMBER(lkage_68705_port_c_r);
+	DECLARE_WRITE8_MEMBER(lkage_68705_port_c_w);
+	DECLARE_WRITE8_MEMBER(lkage_68705_ddr_c_w);
+	DECLARE_WRITE8_MEMBER(lkage_mcu_w);
+	DECLARE_READ8_MEMBER(lkage_mcu_r);
+	DECLARE_READ8_MEMBER(lkage_mcu_status_r);
+	DECLARE_WRITE8_MEMBER(lkage_videoram_w);
 };
 
 /*----------- defined in machine/lkage.c -----------*/
 
-READ8_HANDLER( lkage_68705_port_a_r );
-WRITE8_HANDLER( lkage_68705_port_a_w );
-READ8_HANDLER( lkage_68705_port_b_r );
-WRITE8_HANDLER( lkage_68705_port_b_w );
-READ8_HANDLER( lkage_68705_port_c_r );
-WRITE8_HANDLER( lkage_68705_port_c_w );
-WRITE8_HANDLER( lkage_68705_ddr_a_w );
-WRITE8_HANDLER( lkage_68705_ddr_b_w );
-WRITE8_HANDLER( lkage_68705_ddr_c_w );
-WRITE8_HANDLER( lkage_mcu_w );
-READ8_HANDLER( lkage_mcu_r );
-READ8_HANDLER( lkage_mcu_status_r );
 
 
 /*----------- defined in video/lkage.c -----------*/
 
-WRITE8_HANDLER( lkage_videoram_w );
 VIDEO_START( lkage );
 SCREEN_UPDATE_IND16( lkage );
 

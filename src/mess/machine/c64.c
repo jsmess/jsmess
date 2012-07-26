@@ -53,11 +53,11 @@ static void c64_nmi( running_machine &machine )
 	device_t *cia_1 = machine.device("cia_1");
 	int cia1irq = mos6526_irq_r(cia_1);
 
-	if (state->m_nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
+	if (state->m_nmilevel != (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq)	/* KEY_RESTORE */
 	{
-		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq);
+		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq);
 
-		state->m_nmilevel = (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq;
+		state->m_nmilevel = (machine.root_device().ioport("SPECIAL")->read() & 0x80) || cia1irq;
 	}
 }
 
@@ -309,9 +309,9 @@ READ8_HANDLER( c64_read_io )
 	else if (offset < 0xd00)
 		{
 			if (offset & 1)
-				cia_set_port_mask_value(cia_0, 1, input_port_read(space->machine(), "CTRLSEL") & 0x80 ? c64_keyline[9] : c64_keyline[8] );
+				cia_set_port_mask_value(cia_0, 1, space->machine().root_device().ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[9] : c64_keyline[8] );
 			else
-				cia_set_port_mask_value(cia_0, 0, input_port_read(space->machine(), "CTRLSEL") & 0x80 ? c64_keyline[8] : c64_keyline[9] );
+				cia_set_port_mask_value(cia_0, 0, state->ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[8] : c64_keyline[9] );
 
 			return mos6526_r(cia_0, offset);
 		}
@@ -466,9 +466,9 @@ static void c64_bankswitch( running_machine &machine, int reset )
 	{
 			state->m_io_enabled = 1;		// charen has no effect in ultimax_mode
 
-			memory_set_bankptr(machine, "bank1", state->m_roml);
-			memory_set_bankptr(machine, "bank3", state->m_memory + 0xa000);
-			memory_set_bankptr(machine, "bank4", state->m_romh);
+			state->membank("bank1")->set_base(state->m_roml);
+			state->membank("bank3")->set_base(state->m_memory + 0xa000);
+			state->membank("bank4")->set_base(state->m_romh);
 			machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xe000, 0xffff);
 	}
 	else
@@ -476,22 +476,22 @@ static void c64_bankswitch( running_machine &machine, int reset )
 		/* 0x8000-0x9000 */
 		if (loram && hiram && !state->m_exrom)
 		{
-			memory_set_bankptr(machine, "bank1", state->m_roml);
+			state->membank("bank1")->set_base(state->m_roml);
 		}
 		else
 		{
-			memory_set_bankptr(machine, "bank1", state->m_memory + 0x8000);
+			state->membank("bank1")->set_base(state->m_memory + 0x8000);
 		}
 
 		/* 0xa000 */
 		if (hiram && !state->m_game && !state->m_exrom)
-			memory_set_bankptr(machine, "bank3", state->m_romh);
+			state->membank("bank3")->set_base(state->m_romh);
 
 		else if (loram && hiram && state->m_game)
-			memory_set_bankptr(machine, "bank3", state->m_basic);
+			state->membank("bank3")->set_base(state->m_basic);
 
 		else
-			memory_set_bankptr(machine, "bank3", state->m_memory + 0xa000);
+			state->membank("bank3")->set_base(state->m_memory + 0xa000);
 
 		/* 0xd000 */
 		// RAM
@@ -521,8 +521,8 @@ static void c64_bankswitch( running_machine &machine, int reset )
 		}
 
 		/* 0xe000-0xf000 */
-		memory_set_bankptr(machine, "bank4", hiram ? state->m_kernal : state->m_memory + 0xe000);
-		memory_set_bankptr(machine, "bank5", state->m_memory + 0xe000);
+		state->membank("bank4")->set_base(hiram ? state->m_kernal : state->m_memory + 0xe000);
+		state->membank("bank5")->set_base(state->m_memory + 0xe000);
 	}
 
 	/* make sure the opbase function gets called each time */
@@ -620,39 +620,39 @@ int c64_paddle_read( device_t *device, int which )
 	running_machine &machine = device->machine();
 	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
 	UINT8 cia0porta = mos6526_pa_r(machine.device("cia_0"), 0);
-	int controller1 = input_port_read(machine, "CTRLSEL") & 0x07;
-	int controller2 = input_port_read(machine, "CTRLSEL") & 0x70;
+	int controller1 = machine.root_device().ioport("CTRLSEL")->read() & 0x07;
+	int controller2 = machine.root_device().ioport("CTRLSEL")->read() & 0x70;
 	/* Notice that only a single input is defined for Mouse & Lightpen in both ports */
 	switch (controller1)
 	{
 		case 0x01:
 			if (which)
-				pot2 = input_port_read(machine, "PADDLE2");
+				pot2 = machine.root_device().ioport("PADDLE2")->read();
 			else
-				pot1 = input_port_read(machine, "PADDLE1");
+				pot1 = machine.root_device().ioport("PADDLE1")->read();
 			break;
 
 		case 0x02:
 			if (which)
-				pot2 = input_port_read(machine, "TRACKY");
+				pot2 = machine.root_device().ioport("TRACKY")->read();
 			else
-				pot1 = input_port_read(machine, "TRACKX");
+				pot1 = machine.root_device().ioport("TRACKX")->read();
 			break;
 
 		case 0x03:
-			if (which && (input_port_read(machine, "JOY1_2B") & 0x20))	/* Joy1 Button 2 */
+			if (which && (machine.root_device().ioport("JOY1_2B")->read() & 0x20))	/* Joy1 Button 2 */
 				pot1 = 0x00;
 			break;
 
 		case 0x04:
 			if (which)
-				pot2 = input_port_read(machine, "LIGHTY");
+				pot2 = machine.root_device().ioport("LIGHTY")->read();
 			else
-				pot1 = input_port_read(machine, "LIGHTX");
+				pot1 = machine.root_device().ioport("LIGHTX")->read();
 			break;
 
 		case 0x06:
-			if (which && (input_port_read(machine, "OTHER") & 0x04))	/* Lightpen Signal */
+			if (which && (machine.root_device().ioport("OTHER")->read() & 0x04))	/* Lightpen Signal */
 				pot2 = 0x00;
 			break;
 
@@ -669,32 +669,32 @@ int c64_paddle_read( device_t *device, int which )
 	{
 		case 0x10:
 			if (which)
-				pot4 = input_port_read(machine, "PADDLE4");
+				pot4 = machine.root_device().ioport("PADDLE4")->read();
 			else
-				pot3 = input_port_read(machine, "PADDLE3");
+				pot3 = machine.root_device().ioport("PADDLE3")->read();
 			break;
 
 		case 0x20:
 			if (which)
-				pot4 = input_port_read(machine, "TRACKY");
+				pot4 = machine.root_device().ioport("TRACKY")->read();
 			else
-				pot3 = input_port_read(machine, "TRACKX");
+				pot3 = machine.root_device().ioport("TRACKX")->read();
 			break;
 
 		case 0x30:
-			if (which && (input_port_read(machine, "JOY2_2B") & 0x20))	/* Joy2 Button 2 */
+			if (which && (machine.root_device().ioport("JOY2_2B")->read() & 0x20))	/* Joy2 Button 2 */
 				pot4 = 0x00;
 			break;
 
 		case 0x40:
 			if (which)
-				pot4 = input_port_read(machine, "LIGHTY");
+				pot4 = machine.root_device().ioport("LIGHTY")->read();
 			else
-				pot3 = input_port_read(machine, "LIGHTX");
+				pot3 = machine.root_device().ioport("LIGHTX")->read();
 			break;
 
 		case 0x60:
-			if (which && (input_port_read(machine, "OTHER") & 0x04))	/* Lightpen Signal */
+			if (which && (machine.root_device().ioport("OTHER")->read() & 0x04))	/* Lightpen Signal */
 				pot4 = 0x00;
 			break;
 
@@ -707,7 +707,7 @@ int c64_paddle_read( device_t *device, int which )
 			break;
 	}
 
-	if (input_port_read(machine, "CTRLSEL") & 0x80)		/* Swap */
+	if (machine.root_device().ioport("CTRLSEL")->read() & 0x80)		/* Swap */
 	{
 		temp = pot1; pot1 = pot3; pot3 = temp;
 		temp = pot2; pot2 = pot4; pot4 = temp;
@@ -759,7 +759,7 @@ static void c64_common_driver_init( running_machine &machine )
 
 	if (!state->m_ultimax)
 	{
-		UINT8 *mem = machine.region("maincpu")->base();
+		UINT8 *mem = state->memregion("maincpu")->base();
 		state->m_basic    = mem + 0x10000;
 		state->m_kernal   = mem + 0x12000;
 		state->m_chargen  = mem + 0x14000;
@@ -1026,7 +1026,7 @@ static int c64_crt_load( device_image_interface &image )
 	const char *filetype = image.filetype();
 	int address = 0, new_start = 0;
 	// int lbank_end_addr = 0, hbank_end_addr = 0;
-	UINT8 *cart_cpy = image.device().machine().region("user1")->base();
+	UINT8 *cart_cpy = state->memregion("user1")->base();
 
 	/* We support .crt files */
 	if (!mame_stricmp(filetype, "crt"))
@@ -1288,7 +1288,7 @@ static int c64_crt_load( device_image_interface &image )
 
 INLINE void load_cartridge_region(device_image_interface &image, const char *name, offs_t offset, size_t size)
 {
-	UINT8 *cart = image.device().machine().region("user1")->base();
+	UINT8 *cart = image.device().machine().root_device().memregion("user1")->base();
 	UINT8 *rom = image.get_software_region(name);
 	memcpy(cart + offset, rom, size);
 }
@@ -1296,14 +1296,14 @@ INLINE void load_cartridge_region(device_image_interface &image, const char *nam
 INLINE void map_cartridge_roml(running_machine &machine, offs_t offset)
 {
 	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
-	UINT8 *cart = machine.region("user1")->base();
+	UINT8 *cart = state->memregion("user1")->base();
 	memcpy(state->m_roml, cart + offset, 0x2000);
 }
 
 INLINE void map_cartridge_romh(running_machine &machine, offs_t offset)
 {
 	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
-	UINT8 *cart = machine.region("user1")->base();
+	UINT8 *cart = state->memregion("user1")->base();
 	memcpy(state->m_romh, cart + offset, 0x2000);
 }
 
@@ -1348,7 +1348,7 @@ static void load_vizawrite_cartridge(device_image_interface &image)
 
 	UINT8 *roml = image.get_software_region("roml");
 	UINT8 *romh = image.get_software_region("romh");
-	UINT8 *decrypted = image.device().machine().region("user1")->base();
+	UINT8 *decrypted = image.device().machine().root_device().memregion("user1")->base();
 
 	// decrypt ROMs
 	for (offs_t offset = 0; offset < 0x2000; offset++)
@@ -1398,7 +1398,7 @@ static void load_hugo_cartridge(device_image_interface &image)
 		BITSWAP8(_data,7,6,5,4,0,1,2,3)
 
 	UINT8 *roml = image.get_software_region("roml");
-	UINT8 *decrypted = image.device().machine().region("user1")->base();
+	UINT8 *decrypted = image.device().machine().root_device().memregion("user1")->base();
 
 	// decrypt ROMs
 	for (offs_t offset = 0; offset < 0x20000; offset++)
@@ -1464,7 +1464,7 @@ static WRITE8_HANDLER( pagefox_bank_w )
     */
 
 	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
-	UINT8 *cart = space->machine().region("user1")->base();
+	UINT8 *cart = state->memregion("user1")->base();
 
 	if (data == 0xff)
 	{
@@ -1516,7 +1516,7 @@ static void load_pagefox_cartridge(device_image_interface &image)
 static WRITE8_HANDLER( multiscreen_bank_w )
 {
 	legacy_c64_state *state = space->machine().driver_data<legacy_c64_state>();
-	UINT8 *cart = space->machine().region("user1")->base();
+	UINT8 *cart = state->memregion("user1")->base();
 	int bank = data & 0x0f;
 	offs_t address = bank * 0x4000;
 
@@ -1715,7 +1715,7 @@ static WRITE8_HANDLER( fc3_bank_w )
 	// not working:
 
 	UINT8 bank = data & 0x3f;
-	UINT8 *cart = space->machine().region("user1")->base();
+	UINT8 *cart = state->memregion("user1")->base();
 
 	if (data & 0x40)
 	{
@@ -1745,7 +1745,7 @@ static WRITE8_HANDLER( ocean1_bank_w )
 	// not working: Pang, Robocop 2, Toki
 
 	UINT8 bank = data & 0x3f;
-	UINT8 *cart = space->machine().region("user1")->base();
+	UINT8 *cart = state->memregion("user1")->base();
 
 	switch (state->m_cart.bank[bank].addr)
 	{
@@ -1780,7 +1780,7 @@ static WRITE8_HANDLER( funplay_bank_w )
 	// not working:
 
 	UINT8 bank = data & 0x39, real_bank = 0;
-	UINT8 *cart = space->machine().region("user1")->base();
+	UINT8 *cart = state->memregion("user1")->base();
 
 	/* This should be written after the bankswitch has happened. We log it to see if it is really working */
 	if (data == 0x86)
@@ -1810,7 +1810,7 @@ static WRITE8_HANDLER( supergames_bank_w )
 	// not working:
 
 	UINT8 bank = data & 0x03, bit2 = data & 0x04;
-	UINT8 *cart = space->machine().region("user1")->base();
+	UINT8 *cart = state->memregion("user1")->base();
 
 	if (data & 0x04)
 	{
@@ -1849,7 +1849,7 @@ static WRITE8_HANDLER( c64gs_bank_w )
 	// not working: The Last Ninja Remix
 
 	UINT8 bank = offset & 0xff;
-	UINT8 *cart = space->machine().region("user1")->base();
+	UINT8 *cart = state->memregion("user1")->base();
 
 	if (bank > 0x3f)
 		logerror("Warning: This cart type should have at most 64 banks and the cart looked for bank %d... Something strange is going on!\n", bank);
@@ -1873,7 +1873,7 @@ static READ8_HANDLER( dinamic_bank_r )
 	// not working:
 
 	UINT8 bank = offset & 0xff;
-	UINT8 *cart = space->machine().region("user1")->base();
+	UINT8 *cart = state->memregion("user1")->base();
 
 	if (bank > 0xf)
 		logerror("Warning: This cart type should have 16 banks and the cart looked for bank %d... Something strange is going on!\n", bank);
@@ -1898,7 +1898,7 @@ static READ8_HANDLER( zaxxon_bank_r )
 	// not working:
 
 	UINT8 bank;
-	UINT8 *cart = space->machine().region("user1")->base();
+	UINT8 *cart = state->memregion("user1")->base();
 
 	if (offset < 0x1000)
 		bank = 0;
@@ -1921,7 +1921,7 @@ static WRITE8_HANDLER( domark_bank_w )
 	// not working:
 
 	UINT8 bank = data & 0x7f;
-	UINT8 *cart = space->machine().region("user1")->base();
+	UINT8 *cart = state->memregion("user1")->base();
 
 	if (data & 0x80)
 	{
@@ -1944,7 +1944,7 @@ static WRITE8_HANDLER( comal80_bank_w )
 	// not working:
 
 	UINT8 bank = data & 0x83;
-	UINT8 *cart = space->machine().region("user1")->base();
+	UINT8 *cart = state->memregion("user1")->base();
 
 	/* only valid values 0x80, 0x81, 0x82, 0x83 */
 	if (!(bank & 0x80))

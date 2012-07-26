@@ -303,18 +303,18 @@ READ8_MEMBER( v1050_keyboard_device::kb_p1_r )
 
 	switch (m_y)
 	{
-		case 0: data &= input_port_read(*this, "X0"); break;
-		case 1: data &= input_port_read(*this, "X1"); break;
-		case 2: data &= input_port_read(*this, "X2"); break;
-		case 3: data &= input_port_read(*this, "X3"); break;
-		case 4: data &= input_port_read(*this, "X4"); break;
-		case 5: data &= input_port_read(*this, "X5"); break;
-		case 6: data &= input_port_read(*this, "X6"); break;
-		case 7: data &= input_port_read(*this, "X7"); break;
-		case 8: data &= input_port_read(*this, "X8"); break;
-		case 9: data &= input_port_read(*this, "X9"); break;
-		case 0xa: data &= input_port_read(*this, "XA"); break;
-		case 0xb: data &= input_port_read(*this, "XB"); break;
+		case 0: data &= ioport("X0")->read(); break;
+		case 1: data &= ioport("X1")->read(); break;
+		case 2: data &= ioport("X2")->read(); break;
+		case 3: data &= ioport("X3")->read(); break;
+		case 4: data &= ioport("X4")->read(); break;
+		case 5: data &= ioport("X5")->read(); break;
+		case 6: data &= ioport("X6")->read(); break;
+		case 7: data &= ioport("X7")->read(); break;
+		case 8: data &= ioport("X8")->read(); break;
+		case 9: data &= ioport("X9")->read(); break;
+		case 0xa: data &= ioport("XA")->read(); break;
+		case 0xb: data &= ioport("XB")->read(); break;
 	}
 
 	return data;

@@ -27,6 +27,99 @@ void vic10_state::check_interrupts()
 }
 
 
+//**************************************************************************
+//  MEMORY MANAGEMENT
+//**************************************************************************
+
+//-------------------------------------------------
+//  read -
+//-------------------------------------------------
+
+READ8_MEMBER( vic10_state::read )
+{
+	// TODO this is really handled by the PLA
+
+	UINT8 data = 0;
+	int lorom = 1, uprom = 1, exram = 1;
+
+	if (offset < 0x800)
+	{
+		data = m_ram->pointer()[offset];
+	}
+	else if (offset < 0x1000)
+	{
+		exram = 0;
+	}
+	else if (offset >= 0x8000 && offset < 0xa000)
+	{
+		lorom = 0;
+	}
+	else if (offset >= 0xd000 && offset < 0xd400)
+	{
+		data = vic2_port_r(m_vic, offset & 0x3f);
+	}
+	else if (offset >= 0xd400 && offset < 0xd800)
+	{
+		data = sid6581_r(m_sid, offset & 0x1f);
+	}
+	else if (offset >= 0xd800 && offset < 0xdc00)
+	{
+		data = m_color_ram[offset & 0x3ff];
+	}
+	else if (offset >= 0xdc00 && offset < 0xe000)
+	{
+		data = mos6526_r(m_cia, offset & 0x0f);
+	}
+	else if (offset >= 0xe000)
+	{
+		uprom = 0;
+	}
+
+	data |= m_exp->cd_r(space, offset, lorom, uprom, exram);
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  write -
+//-------------------------------------------------
+
+WRITE8_MEMBER( vic10_state::write )
+{
+	// TODO this is really handled by the PLA
+
+	int lorom = 1, uprom = 1, exram = 1;
+
+	if (offset < 0x800)
+	{
+		m_ram->pointer()[offset] = data;
+	}
+	else if (offset < 0x1000)
+	{
+		exram = 0;
+	}
+	else if (offset >= 0xd000 && offset < 0xd400)
+	{
+		vic2_port_w(m_vic, offset & 0x3f, data);
+	}
+	else if (offset >= 0xd400 && offset < 0xd800)
+	{
+		sid6581_w(m_sid, offset & 0x1f, data);
+	}
+	else if (offset >= 0xd800 && offset < 0xdc00)
+	{
+		m_color_ram[offset & 0x3ff] = data & 0x0f;
+	}
+	else if (offset >= 0xdc00 && offset < 0xe000)
+	{
+		mos6526_w(m_cia, offset & 0x0f, data);
+	}
+
+	m_exp->cd_w(space, offset, data, lorom, uprom, exram);
+}
+
+
 
 //**************************************************************************
 //  ADDRESS MAPS
@@ -37,14 +130,7 @@ void vic10_state::check_interrupts()
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( vic10_mem, AS_PROGRAM, 8, vic10_state )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x0fff) AM_DEVREADWRITE(VIC10_EXPANSION_SLOT_TAG, vic10_expansion_slot_device, exram_r, exram_w)
-	AM_RANGE(0x8000, 0x9fff) AM_DEVREADWRITE(VIC10_EXPANSION_SLOT_TAG, vic10_expansion_slot_device, lorom_r, lorom_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_DEVREADWRITE_LEGACY(MOS6566_TAG, vic2_port_r, vic2_port_w)
-	AM_RANGE(0xd400, 0xd7ff) AM_DEVREADWRITE_LEGACY(MOS6581_TAG, sid6581_r, sid6581_w)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM AM_BASE(m_color_ram)
-	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE_LEGACY(MOS6526_TAG, mos6526_r, mos6526_w)
-	AM_RANGE(0xe000, 0xffff) AM_DEVREADWRITE(VIC10_EXPANSION_SLOT_TAG, vic10_expansion_slot_device, uprom_r, uprom_w)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
 
@@ -112,17 +198,17 @@ static INTERRUPT_GEN( vic10_frame_interrupt )
 
 READ8_MEMBER( vic10_state::vic_lightpen_x_cb )
 {
-	return input_port_read(machine(), "LIGHTX") & ~0x01;
+	return ioport("LIGHTX")->read() & ~0x01;
 }
 
 READ8_MEMBER( vic10_state::vic_lightpen_y_cb )
 {
-	return input_port_read(machine(), "LIGHTY") & ~0x01;
+	return ioport("LIGHTY")->read() & ~0x01;
 }
 
 READ8_MEMBER( vic10_state::vic_lightpen_button_cb )
 {
-	return input_port_read(machine(), "OTHER") & 0x04;
+	return ioport("OTHER")->read() & 0x04;
 }
 
 READ8_MEMBER( vic10_state::vic_dma_read )
@@ -149,7 +235,7 @@ WRITE_LINE_MEMBER( vic10_state::vic_irq_w )
 
 READ8_MEMBER( vic10_state::vic_rdy_cb )
 {
-	return input_port_read(machine(), "CYCLES") & 0x07;
+	return ioport("CYCLES")->read() & 0x07;
 }
 
 static const vic2_interface vic_intf =
@@ -178,39 +264,39 @@ static int vic10_paddle_read( device_t *device, int which )
 
 	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
 	UINT8 cia0porta = mos6526_pa_r(state->m_cia, 0);
-	int controller1 = input_port_read(machine, "CTRLSEL") & 0x07;
-	int controller2 = input_port_read(machine, "CTRLSEL") & 0x70;
+	int controller1 = machine.root_device().ioport("CTRLSEL")->read() & 0x07;
+	int controller2 = machine.root_device().ioport("CTRLSEL")->read() & 0x70;
 	// Notice that only a single input is defined for Mouse & Lightpen in both ports
 	switch (controller1)
 	{
 		case 0x01:
 			if (which)
-				pot2 = input_port_read(machine, "PADDLE2");
+				pot2 = machine.root_device().ioport("PADDLE2")->read();
 			else
-				pot1 = input_port_read(machine, "PADDLE1");
+				pot1 = machine.root_device().ioport("PADDLE1")->read();
 			break;
 
 		case 0x02:
 			if (which)
-				pot2 = input_port_read(machine, "TRACKY");
+				pot2 = machine.root_device().ioport("TRACKY")->read();
 			else
-				pot1 = input_port_read(machine, "TRACKX");
+				pot1 = machine.root_device().ioport("TRACKX")->read();
 			break;
 
 		case 0x03:
-			if (which && (input_port_read(machine, "JOY1_2B") & 0x20))	// Joy1 Button 2
+			if (which && (machine.root_device().ioport("JOY1_2B")->read() & 0x20))	// Joy1 Button 2
 				pot1 = 0x00;
 			break;
 
 		case 0x04:
 			if (which)
-				pot2 = input_port_read(machine, "LIGHTY");
+				pot2 = machine.root_device().ioport("LIGHTY")->read();
 			else
-				pot1 = input_port_read(machine, "LIGHTX");
+				pot1 = machine.root_device().ioport("LIGHTX")->read();
 			break;
 
 		case 0x06:
-			if (which && (input_port_read(machine, "OTHER") & 0x04))	// Lightpen Signal
+			if (which && (machine.root_device().ioport("OTHER")->read() & 0x04))	// Lightpen Signal
 				pot2 = 0x00;
 			break;
 
@@ -227,32 +313,32 @@ static int vic10_paddle_read( device_t *device, int which )
 	{
 		case 0x10:
 			if (which)
-				pot4 = input_port_read(machine, "PADDLE4");
+				pot4 = machine.root_device().ioport("PADDLE4")->read();
 			else
-				pot3 = input_port_read(machine, "PADDLE3");
+				pot3 = machine.root_device().ioport("PADDLE3")->read();
 			break;
 
 		case 0x20:
 			if (which)
-				pot4 = input_port_read(machine, "TRACKY");
+				pot4 = machine.root_device().ioport("TRACKY")->read();
 			else
-				pot3 = input_port_read(machine, "TRACKX");
+				pot3 = machine.root_device().ioport("TRACKX")->read();
 			break;
 
 		case 0x30:
-			if (which && (input_port_read(machine, "JOY2_2B") & 0x20))	// Joy2 Button 2
+			if (which && (machine.root_device().ioport("JOY2_2B")->read() & 0x20))	// Joy2 Button 2
 				pot4 = 0x00;
 			break;
 
 		case 0x40:
 			if (which)
-				pot4 = input_port_read(machine, "LIGHTY");
+				pot4 = machine.root_device().ioport("LIGHTY")->read();
 			else
-				pot3 = input_port_read(machine, "LIGHTX");
+				pot3 = machine.root_device().ioport("LIGHTX")->read();
 			break;
 
 		case 0x60:
-			if (which && (input_port_read(machine, "OTHER") & 0x04))	// Lightpen Signal
+			if (which && (machine.root_device().ioport("OTHER")->read() & 0x04))	// Lightpen Signal
 				pot4 = 0x00;
 			break;
 
@@ -265,7 +351,7 @@ static int vic10_paddle_read( device_t *device, int which )
 			break;
 	}
 
-	if (input_port_read(machine, "CTRLSEL") & 0x80)		// Swap
+	if (machine.root_device().ioport("CTRLSEL")->read() & 0x80)		// Swap
 	{
 		temp = pot1; pot1 = pot3; pot3 = temp;
 		temp = pot2; pot2 = pot4; pot4 = temp;
@@ -498,6 +584,9 @@ static VIC10_EXPANSION_INTERFACE( expansion_intf )
 
 void vic10_state::machine_start()
 {
+	// allocate memory
+	m_color_ram = auto_alloc_array(machine(), UINT8, 0x400);
+
 	// state saving
 	save_item(NAME(m_cia_irq));
 	save_item(NAME(m_vic_irq));
@@ -515,7 +604,7 @@ void vic10_state::machine_start()
 
 static MACHINE_CONFIG_START( vic10, vic10_state )
 	// basic hardware
-	MCFG_CPU_ADD(M6510_TAG, M6510, XTAL_8MHz/8)
+	MCFG_CPU_ADD(M6510_TAG, M6510, VIC6566_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(vic10_mem)
 	MCFG_CPU_CONFIG(cpu_intf)
 	MCFG_CPU_VBLANK_INT(SCREEN_TAG, vic10_frame_interrupt)
@@ -523,7 +612,7 @@ static MACHINE_CONFIG_START( vic10, vic10_state )
 
 	// video hardware
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(VIC6567_VRETRACERATE)
+	MCFG_SCREEN_REFRESH_RATE(VIC6566_VRETRACERATE)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(VIC6567_COLUMNS, VIC6567_LINES)
 	MCFG_SCREEN_VISIBLE_AREA(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1)
@@ -536,14 +625,14 @@ static MACHINE_CONFIG_START( vic10, vic10_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(MOS6581_TAG, SID6581, XTAL_8MHz/8)
+	MCFG_SOUND_ADD(MOS6581_TAG, SID6581, VIC6566_CLOCK)
 	MCFG_SOUND_CONFIG(sid_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 	MCFG_SOUND_ADD("dac", DAC, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
-	MCFG_MOS6526R1_ADD(MOS6526_TAG, XTAL_8MHz/8, cia_intf)
+	MCFG_MOS6526R1_ADD(MOS6526_TAG, VIC6566_CLOCK, cia_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface)
 	MCFG_TIMER_ADD(TIMER_C1531_TAG, cassette_tick)
 	MCFG_VIC10_EXPANSION_SLOT_ADD(VIC10_EXPANSION_SLOT_TAG, expansion_intf, vic10_expansion_cards, NULL, NULL)

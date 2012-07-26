@@ -74,12 +74,16 @@ class lgp_state : public driver_device
 public:
 	lgp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_laserdisc(*this, "laserdisc") { }
+		  m_laserdisc(*this, "laserdisc") ,
+		m_tile_ram(*this, "tile_ram"),
+		m_tile_control_ram(*this, "tile_ctrl_ram"){ }
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
-	UINT8 *m_tile_ram;
-	UINT8 *m_tile_control_ram;
+	required_shared_ptr<UINT8> m_tile_ram;
+	required_shared_ptr<UINT8> m_tile_control_ram;
 	emu_timer *m_irq_timer;
+	DECLARE_READ8_MEMBER(ldp_read);
+	DECLARE_WRITE8_MEMBER(ldp_write);
 };
 
 
@@ -122,16 +126,14 @@ static SCREEN_UPDATE_IND16( lgp )
 
 /* MEMORY HANDLERS */
 /* Main Z80 R/W */
-static READ8_HANDLER(ldp_read)
+READ8_MEMBER(lgp_state::ldp_read)
 {
-	lgp_state *state = space->machine().driver_data<lgp_state>();
-	return state->m_laserdisc->status_r();
+	return m_laserdisc->status_r();
 }
 
-static WRITE8_HANDLER(ldp_write)
+WRITE8_MEMBER(lgp_state::ldp_write)
 {
-	lgp_state *state = space->machine().driver_data<lgp_state>();
-	state->m_laserdisc->data_w(data);
+	m_laserdisc->data_w(data);
 }
 
 
@@ -139,10 +141,10 @@ static WRITE8_HANDLER(ldp_write)
 
 
 /* PROGRAM MAPS */
-static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8, lgp_state )
 	AM_RANGE(0x0000,0x7fff) AM_ROM
-	AM_RANGE(0xe000,0xe3ff) AM_RAM AM_BASE_MEMBER(lgp_state, m_tile_ram)
-	AM_RANGE(0xe400,0xe7ff) AM_RAM AM_BASE_MEMBER(lgp_state, m_tile_control_ram)
+	AM_RANGE(0xe000,0xe3ff) AM_RAM AM_SHARE("tile_ram")
+	AM_RANGE(0xe400,0xe7ff) AM_RAM AM_SHARE("tile_ctrl_ram")
 
 //  AM_RANGE(0xef00,0xef00) AM_READ_PORT("IN_TEST")
 	AM_RANGE(0xef80,0xef80) AM_READWRITE(ldp_read,ldp_write)
@@ -155,7 +157,7 @@ static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf000,0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_program_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_program_map, AS_PROGRAM, 8, lgp_state )
 	AM_RANGE(0x0000,0x3fff) AM_ROM
 	AM_RANGE(0x8000,0x83ff) AM_RAM
 	AM_RANGE(0x8400,0x8407) AM_RAM		/* Needs handler!  Communications? */
@@ -164,13 +166,13 @@ ADDRESS_MAP_END
 
 
 /* IO MAPS */
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( main_io_map, AS_IO, 8, lgp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0xfd,0xfd) AM_READ_PORT("IN_TEST")
 //  AM_RANGE(0xfe,0xfe) AM_READ_PORT("IN_TEST")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, lgp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 

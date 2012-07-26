@@ -73,12 +73,13 @@ class dkong_state : public driver_device
 {
 public:
 	dkong_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_video_ram(*this,"video_ram"),
+		m_sprite_ram(*this,"sprite_ram") { }
 
 	/* memory pointers */
-	UINT8 *           m_video_ram;
-	UINT8 *           m_sprite_ram;
-	size_t            m_sprite_ram_size;
+	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<UINT8> m_sprite_ram;
 
 	/* devices */
 	device_t *m_dev_n2a03a;
@@ -198,19 +199,38 @@ public:
 
 	/* reverse address lookup map - hunchbkd */
 	INT16             m_rev_map[0x200];
+	DECLARE_READ8_MEMBER(hb_dma_read_byte);
+	DECLARE_WRITE8_MEMBER(hb_dma_write_byte);
+	DECLARE_WRITE8_MEMBER(dkong3_coin_counter_w);
+	DECLARE_READ8_MEMBER(dkong_in2_r);
+	DECLARE_READ8_MEMBER(dkongjr_in2_r);
+	DECLARE_READ8_MEMBER(s2650_mirror_r);
+	DECLARE_WRITE8_MEMBER(s2650_mirror_w);
+	DECLARE_READ8_MEMBER(epos_decrypt_rom);
+	DECLARE_WRITE8_MEMBER(s2650_data_w);
+	DECLARE_WRITE8_MEMBER(s2650_fo_w);
+	DECLARE_READ8_MEMBER(s2650_port0_r);
+	DECLARE_READ8_MEMBER(s2650_port1_r);
+	DECLARE_WRITE8_MEMBER(dkong3_2a03_reset_w);
+	DECLARE_READ8_MEMBER(strtheat_inputport_0_r);
+	DECLARE_READ8_MEMBER(strtheat_inputport_1_r);
+	DECLARE_WRITE8_MEMBER(nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(braze_a15_w);
+	DECLARE_WRITE8_MEMBER(dkong_videoram_w);
+	DECLARE_WRITE8_MEMBER(dkongjr_gfxbank_w);
+	DECLARE_WRITE8_MEMBER(dkong3_gfxbank_w);
+	DECLARE_WRITE8_MEMBER(dkong_palettebank_w);
+	DECLARE_WRITE8_MEMBER(radarscp_grid_enable_w);
+	DECLARE_WRITE8_MEMBER(radarscp_grid_color_w);
+	DECLARE_WRITE8_MEMBER(dkong_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(dkong_spritebank_w);
+	DECLARE_WRITE8_MEMBER(dkong_voice_w);
+	DECLARE_WRITE8_MEMBER(dkong_audio_irq_w);
 };
 
 /*----------- defined in video/dkong.c -----------*/
 
-WRITE8_HANDLER( radarscp_grid_enable_w );
-WRITE8_HANDLER( radarscp_grid_color_w );
-WRITE8_HANDLER( dkong_flipscreen_w );
-WRITE8_HANDLER( dkongjr_gfxbank_w );
-WRITE8_HANDLER( dkong3_gfxbank_w );
-WRITE8_HANDLER( dkong_spritebank_w );
-WRITE8_HANDLER( dkong_palettebank_w );
 
-WRITE8_HANDLER( dkong_videoram_w );
 
 PALETTE_INIT( dkong2b );
 PALETTE_INIT( radarscp );
@@ -224,7 +244,6 @@ SCREEN_UPDATE_IND16( spclforc );
 
 /*----------- defined in audio/dkong.c -----------*/
 
-WRITE8_HANDLER( dkong_audio_irq_w );
 
 MACHINE_CONFIG_EXTERN( radarscp_audio );
 MACHINE_CONFIG_EXTERN( dkong2b_audio );

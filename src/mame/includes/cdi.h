@@ -16,10 +16,12 @@ class cdi_state : public driver_device
 {
 public:
     cdi_state(const machine_config &mconfig, device_type type, const char *tag)
-        : driver_device(mconfig, type, tag) { }
+        : driver_device(mconfig, type, tag) ,
+		m_planea(*this, "planea"),
+		m_planeb(*this, "planeb"){ }
 
-    UINT16 *m_planea;
-    UINT16 *m_planeb;
+	required_shared_ptr<UINT16> m_planea;
+	required_shared_ptr<UINT16> m_planeb;
 
     dmadac_sound_device *m_dmadac[2];
 
@@ -29,6 +31,7 @@ public:
     scc68070_regs_t m_scc68070_regs;
     mcd212_regs_t m_mcd212_regs;
     mcd212_ab_t m_mcd212_ab;
+	DECLARE_INPUT_CHANGED_MEMBER(mcu_input);
 };
 
 /*----------- debug defines -----------*/

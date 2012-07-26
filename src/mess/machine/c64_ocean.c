@@ -7,6 +7,28 @@
 
 **********************************************************************/
 
+/*
+
+    Chase H.Q. 2: Special Criminal Investigation
+
+    PCB Layout
+    ----------
+
+    |===========================|
+    |=|                   LS02  |
+    |=|                         |
+    |=|                         |
+    |=|    ROM0   ROM1          |
+    |=|                   LS273 |
+    |=|                         |
+    |=|                         |
+    |=|                         |
+    |===========================|
+
+    ROM0,1 - 28-pin ROM (Toshiba TC531000 pinout, markings scratched off)
+
+*/
+
 #include "c64_ocean.h"
 
 
@@ -59,7 +81,7 @@ void c64_ocean_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_ocean_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
+UINT8 c64_ocean_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
 
@@ -86,7 +108,7 @@ UINT8 c64_ocean_cartridge_device::c64_cd_r(address_space &space, offs_t offset, 
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_ocean_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)
+void c64_ocean_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{

@@ -12,16 +12,21 @@ class embargo_state : public driver_device
 {
 public:
 	embargo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	size_t   m_videoram_size;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* misc */
 	UINT8    m_dial_enable_1;
 	UINT8    m_dial_enable_2;
 	UINT8    m_input_select;
+	DECLARE_READ8_MEMBER(input_port_bit_r);
+	DECLARE_READ8_MEMBER(dial_r);
+	DECLARE_WRITE8_MEMBER(port_1_w);
+	DECLARE_WRITE8_MEMBER(port_2_w);
+	DECLARE_WRITE8_MEMBER(input_select_w);
 };
 
 
@@ -36,7 +41,7 @@ static SCREEN_UPDATE_RGB32( embargo )
 	embargo_state *state = screen.machine().driver_data<embargo_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{
 		int i;
 
@@ -65,16 +70,14 @@ static SCREEN_UPDATE_RGB32( embargo )
  *
  *************************************/
 
-static READ8_HANDLER( input_port_bit_r )
+READ8_MEMBER(embargo_state::input_port_bit_r)
 {
-	embargo_state *state = space->machine().driver_data<embargo_state>();
-	return (input_port_read(space->machine(), "IN1") << (7 - state->m_input_select)) & 0x80;
+	return (ioport("IN1")->read() << (7 - m_input_select)) & 0x80;
 }
 
 
-static READ8_HANDLER( dial_r )
+READ8_MEMBER(embargo_state::dial_r)
 {
-	embargo_state *state = space->machine().driver_data<embargo_state>();
 
 	UINT8 lo = 0;
 	UINT8 hi = 0;
@@ -92,16 +95,16 @@ static READ8_HANDLER( dial_r )
 		0x09, 0x0a, 0x08, 0x09, 0x08, 0x05, 0x07, 0x06
 	};
 
-	if (state->m_dial_enable_1 && !state->m_dial_enable_2)
+	if (m_dial_enable_1 && !m_dial_enable_2)
 	{
-		lo = input_port_read(space->machine(), "DIAL0");
-		hi = input_port_read(space->machine(), "DIAL1");
+		lo = ioport("DIAL0")->read();
+		hi = ioport("DIAL1")->read();
 	}
 
-	if (state->m_dial_enable_2 && !state->m_dial_enable_1)
+	if (m_dial_enable_2 && !m_dial_enable_1)
 	{
-		lo = input_port_read(space->machine(), "DIAL2");
-		hi = input_port_read(space->machine(), "DIAL3");
+		lo = ioport("DIAL2")->read();
+		hi = ioport("DIAL3")->read();
 	}
 
 	lo = 12 * lo / 256;
@@ -124,24 +127,21 @@ static READ8_HANDLER( dial_r )
 }
 
 
-static WRITE8_HANDLER( port_1_w )
+WRITE8_MEMBER(embargo_state::port_1_w)
 {
-	embargo_state *state = space->machine().driver_data<embargo_state>();
-	state->m_dial_enable_1 = data & 0x01; /* other bits unknown */
+	m_dial_enable_1 = data & 0x01; /* other bits unknown */
 }
 
 
-static WRITE8_HANDLER( port_2_w )
+WRITE8_MEMBER(embargo_state::port_2_w)
 {
-	embargo_state *state = space->machine().driver_data<embargo_state>();
-	state->m_dial_enable_2 = data & 0x01; /* other bits unknown */
+	m_dial_enable_2 = data & 0x01; /* other bits unknown */
 }
 
 
-static WRITE8_HANDLER( input_select_w )
+WRITE8_MEMBER(embargo_state::input_select_w)
 {
-	embargo_state *state = space->machine().driver_data<embargo_state>();
-	state->m_input_select = data & 0x07;
+	m_input_select = data & 0x07;
 }
 
 
@@ -152,10 +152,10 @@ static WRITE8_HANDLER( input_select_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, embargo_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1e00, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_SIZE_MEMBER(embargo_state, m_videoram, m_videoram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 
@@ -166,7 +166,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( main_io_map, AS_IO, 8, embargo_state )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0") AM_WRITE(port_1_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(dial_r, port_2_w)
 	AM_RANGE(0x03, 0x03) AM_WRITENOP /* always 0xFE */

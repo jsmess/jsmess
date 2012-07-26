@@ -106,14 +106,19 @@ class jollyjgr_state : public driver_device
 {
 public:
 	jollyjgr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram"),
+		m_bitmap(*this, "bitmap"),
+		m_bulletram(*this, "bulletram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	UINT8 *  m_colorram;
-	UINT8 *  m_spriteram;
-	UINT8 *  m_bulletram;
-	UINT8 *  m_bitmap;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_bitmap;
+	optional_shared_ptr<UINT8> m_bulletram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -125,6 +130,10 @@ public:
 	UINT8      m_bitmap_disable;
 	UINT8      m_tilemap_bank;
 	UINT8      m_pri;
+	DECLARE_WRITE8_MEMBER(jollyjgr_videoram_w);
+	DECLARE_WRITE8_MEMBER(jollyjgr_attrram_w);
+	DECLARE_WRITE8_MEMBER(jollyjgr_misc_w);
+	DECLARE_WRITE8_MEMBER(jollyjgr_coin_lookout_w);
 };
 
 
@@ -134,16 +143,14 @@ public:
  *
  *************************************/
 
-static WRITE8_HANDLER( jollyjgr_videoram_w )
+WRITE8_MEMBER(jollyjgr_state::jollyjgr_videoram_w)
 {
-	jollyjgr_state *state = space->machine().driver_data<jollyjgr_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( jollyjgr_attrram_w )
+WRITE8_MEMBER(jollyjgr_state::jollyjgr_attrram_w)
 {
-	jollyjgr_state *state = space->machine().driver_data<jollyjgr_state>();
 
 	if (offset & 1)
 	{
@@ -151,38 +158,37 @@ static WRITE8_HANDLER( jollyjgr_attrram_w )
 		int i;
 
 		for (i = offset >> 1; i < 0x0400; i += 32)
-			state->m_bg_tilemap->mark_tile_dirty(i);
+			m_bg_tilemap->mark_tile_dirty(i);
 	}
 	else
 	{
-		state->m_bg_tilemap->set_scrolly(offset >> 1, data);
+		m_bg_tilemap->set_scrolly(offset >> 1, data);
 	}
 
-	state->m_colorram[offset] = data;
+	m_colorram[offset] = data;
 }
 
-static WRITE8_HANDLER( jollyjgr_misc_w )
+WRITE8_MEMBER(jollyjgr_state::jollyjgr_misc_w)
 {
-	jollyjgr_state *state = space->machine().driver_data<jollyjgr_state>();
 
 	// they could be swapped, because it always set "data & 3"
-	state->m_flip_x = data & 1;
-	state->m_flip_y = data & 2;
+	m_flip_x = data & 1;
+	m_flip_y = data & 2;
 
 	// same for these two (used by Frog & Spiders)
-	state->m_bitmap_disable = data & 0x40;
-	state->m_tilemap_bank = data & 0x20;
+	m_bitmap_disable = data & 0x40;
+	m_tilemap_bank = data & 0x20;
 
-	state->m_pri = data & 4;
+	m_pri = data & 4;
 
-	state->m_bg_tilemap->set_flip((state->m_flip_x ? TILEMAP_FLIPX : 0) | (state->m_flip_y ? TILEMAP_FLIPY : 0));
+	m_bg_tilemap->set_flip((m_flip_x ? TILEMAP_FLIPX : 0) | (m_flip_y ? TILEMAP_FLIPY : 0));
 
-	state->m_nmi_enable = data & 0x80;
+	m_nmi_enable = data & 0x80;
 }
 
-static WRITE8_HANDLER( jollyjgr_coin_lookout_w )
+WRITE8_MEMBER(jollyjgr_state::jollyjgr_coin_lookout_w)
 {
-	coin_lockout_global_w(space->machine(), data & 1);
+	coin_lockout_global_w(machine(), data & 1);
 
 	/* bits 4, 5, 6 and 7 are used too */
 }
@@ -193,40 +199,40 @@ static WRITE8_HANDLER( jollyjgr_coin_lookout_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( jollyjgr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jollyjgr_map, AS_PROGRAM, 8, jollyjgr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8ff8, 0x8ff8) AM_READ_PORT("DSW1")
 	AM_RANGE(0x8ff9, 0x8ff9) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x8ff8, 0x8ff8) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0x8ffa, 0x8ffa) AM_READ_PORT("SYSTEM") AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x8ff8, 0x8ff8) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x8ffa, 0x8ffa) AM_READ_PORT("SYSTEM") AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 	AM_RANGE(0x8ffc, 0x8ffc) AM_WRITE(jollyjgr_misc_w)
 	AM_RANGE(0x8ffd, 0x8ffd) AM_WRITE(jollyjgr_coin_lookout_w)
 	AM_RANGE(0x8fff, 0x8fff) AM_READ_PORT("DSW2")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_BASE_MEMBER(jollyjgr_state, m_videoram)
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_BASE_MEMBER(jollyjgr_state, m_colorram)
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE_MEMBER(jollyjgr_state, m_spriteram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_SHARE("colorram")
+	AM_RANGE(0x9840, 0x987f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9880, 0x9bff) AM_RAM
-	AM_RANGE(0xa000, 0xffff) AM_RAM AM_BASE_MEMBER(jollyjgr_state, m_bitmap)
+	AM_RANGE(0xa000, 0xffff) AM_RAM AM_SHARE("bitmap")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fspider_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( fspider_map, AS_PROGRAM, 8, jollyjgr_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8ff8, 0x8ff8) AM_READ_PORT("DSW1")
 	AM_RANGE(0x8ff9, 0x8ff9) AM_READ_PORT("INPUTS")
-	AM_RANGE(0x8ff8, 0x8ff8) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0x8ffa, 0x8ffa) AM_READ_PORT("SYSTEM") AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x8ff8, 0x8ff8) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x8ffa, 0x8ffa) AM_READ_PORT("SYSTEM") AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 	AM_RANGE(0x8ffc, 0x8ffc) AM_WRITE(jollyjgr_misc_w)
 	AM_RANGE(0x8ffd, 0x8ffd) AM_WRITE(jollyjgr_coin_lookout_w)
 	AM_RANGE(0x8fff, 0x8fff) AM_READ_PORT("DSW2")
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_BASE_MEMBER(jollyjgr_state, m_videoram)
-	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_BASE_MEMBER(jollyjgr_state, m_colorram)
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE_MEMBER(jollyjgr_state, m_spriteram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(jollyjgr_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9800, 0x983f) AM_RAM_WRITE(jollyjgr_attrram_w) AM_SHARE("colorram")
+	AM_RANGE(0x9840, 0x987f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x9880, 0x989f) AM_RAM // ?
-	AM_RANGE(0x98a0, 0x98af) AM_RAM AM_BASE_MEMBER(jollyjgr_state, m_bulletram)
+	AM_RANGE(0x98a0, 0x98af) AM_RAM AM_SHARE("bulletram")
 	AM_RANGE(0x98b0, 0x9bff) AM_RAM // ?
-	AM_RANGE(0xa000, 0xffff) AM_RAM AM_BASE_MEMBER(jollyjgr_state, m_bitmap)
+	AM_RANGE(0xa000, 0xffff) AM_RAM AM_SHARE("bitmap")
 ADDRESS_MAP_END
 
 
@@ -396,6 +402,7 @@ INPUT_PORTS_END
 
 static PALETTE_INIT( jollyjgr )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* tilemap / sprites palette */

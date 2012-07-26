@@ -16,6 +16,7 @@
 
 static PALETTE_INIT( madalien )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -91,7 +92,7 @@ static TILEMAP_MAPPER( scan_mode3 )
 static TILE_GET_INFO( get_tile_info_BG_1 )
 {
 	madalien_state *state = machine.driver_data<madalien_state>();
-	UINT8 *map = machine.region("user1")->base() + ((*state->m_video_flags & 0x08) << 6);
+	UINT8 *map = state->memregion("user1")->base() + ((*state->m_video_flags & 0x08) << 6);
 
 	SET_TILE_INFO(1, map[tile_index], BIT(*state->m_video_flags, 2) ? 2 : 0, 0);
 }
@@ -100,7 +101,7 @@ static TILE_GET_INFO( get_tile_info_BG_1 )
 static TILE_GET_INFO( get_tile_info_BG_2 )
 {
 	madalien_state *state = machine.driver_data<madalien_state>();
-	UINT8 *map = machine.region("user1")->base() + ((*state->m_video_flags & 0x08) << 6) + 0x80;
+	UINT8 *map = state->memregion("user1")->base() + ((*state->m_video_flags & 0x08) << 6) + 0x80;
 
 	SET_TILE_INFO(1, map[tile_index], BIT(*state->m_video_flags, 2) ? 2 : 0, 0);
 }
@@ -112,11 +113,10 @@ static TILE_GET_INFO( get_tile_info_FG )
 	SET_TILE_INFO(0, state->m_videoram[tile_index], 0, 0);
 }
 
-WRITE8_HANDLER( madalien_videoram_w )
+WRITE8_MEMBER(madalien_state::madalien_videoram_w)
 {
-	madalien_state *state = space->machine().driver_data<madalien_state>();
-	state->m_videoram[offset] = data;
-	state->m_tilemap_fg->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_tilemap_fg->mark_tile_dirty(offset);
 }
 
 
@@ -243,18 +243,17 @@ static void draw_foreground(running_machine &machine, bitmap_ind16 &bitmap, cons
 }
 
 
-WRITE8_HANDLER( madalien_charram_w )
+WRITE8_MEMBER(madalien_state::madalien_charram_w)
 {
-	madalien_state *state = space->machine().driver_data<madalien_state>();
-	state->m_charram[offset] = data;
-	gfx_element_mark_dirty(space->machine().gfx[0], (offset/8) & 0xff);
+	m_charram[offset] = data;
+	gfx_element_mark_dirty(machine().gfx[0], (offset/8) & 0xff);
 }
 
 
 static SCREEN_UPDATE_IND16( madalien )
 {
 	madalien_state *state = screen.machine().driver_data<madalien_state>();
-	int flip = BIT(input_port_read(screen.machine(), "DSW"), 6) && BIT(*state->m_video_control, 0);
+	int flip = BIT(screen.machine().root_device().ioport("DSW")->read(), 6) && BIT(*state->m_video_control, 0);
 
 	// bits #0 and #1 define scrolling mode
 	//

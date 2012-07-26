@@ -4,20 +4,19 @@
 #include "includes/pokechmp.h"
 
 
-WRITE8_HANDLER( pokechmp_videoram_w )
+WRITE8_MEMBER(pokechmp_state::pokechmp_videoram_w)
 {
-	pokechmp_state *state = space->machine().driver_data<pokechmp_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( pokechmp_flipscreen_w )
+WRITE8_MEMBER(pokechmp_state::pokechmp_flipscreen_w)
 {
-	if (flip_screen_get(space->machine()) != (data & 0x80))
+	if (flip_screen() != (data & 0x80))
 	{
-		flip_screen_set(space->machine(), data & 0x80);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(data & 0x80);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -44,7 +43,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = 0;offs < state->m_spriteram_size;offs += 4)
+	for (offs = 0;offs < state->m_spriteram.bytes();offs += 4)
 	{
 		if (spriteram[offs] != 0xf8)
 		{
@@ -56,7 +55,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 
 			flipx = spriteram[offs+1] & 0x04;
 			flipy = spriteram[offs+1] & 0x02;
-			if (flip_screen_get(machine)) {
+			if (state->flip_screen()) {
 				sx=240-sx;
 				sy=240-sy;
 				if (flipx) flipx=0; else flipx=1;

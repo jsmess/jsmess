@@ -30,7 +30,6 @@
 
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -94,8 +93,8 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(systec)
 {
-	UINT8 *m_p_maincpu = machine.region("maincpu")->base();
-	UINT8 *m_p_roms = machine.region("roms")->base();
+	UINT8 *m_p_maincpu = machine.root_device().memregion("maincpu")->base();
+	UINT8 *m_p_roms = machine.root_device().memregion("roms")->base();
 	memcpy(m_p_maincpu, m_p_roms, 0x2000);
 }
 

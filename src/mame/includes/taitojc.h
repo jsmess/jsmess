@@ -4,7 +4,13 @@ class taitojc_state : public driver_device
 {
 public:
 	taitojc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"),
+		m_objlist(*this, "objlist"),
+		m_f3_shared_ram(*this, "f3_shared_ram"),
+		m_main_ram(*this, "main_ram"),
+		m_dsp_shared_ram(*this, "dsp_shared_ram"),
+		m_palette_ram(*this, "palette_ram") { }
 
 	int m_texture_x;
 	int m_texture_y;
@@ -27,8 +33,8 @@ public:
 	bitmap_ind16 m_framebuffer;
 	bitmap_ind16 m_zbuffer;
 
-	UINT32 *m_vram;
-	UINT32 *m_objlist;
+	required_shared_ptr<UINT32> m_vram;
+	required_shared_ptr<UINT32> m_objlist;
 
 	//int debug_tex_pal;
 
@@ -40,10 +46,10 @@ public:
 
 	poly_manager *m_poly;
 
-	UINT32 *m_f3_shared_ram;
-	UINT32 *m_main_ram;
-	UINT16 *m_dsp_shared_ram;
-	UINT32 *m_palette_ram;
+	optional_shared_ptr<UINT32> m_f3_shared_ram;
+	required_shared_ptr<UINT32> m_main_ram;
+	required_shared_ptr<UINT16> m_dsp_shared_ram;
+	required_shared_ptr<UINT32> m_palette_ram;
 
 	UINT16 *m_polygon_fifo;
 	int m_polygon_fifo_ptr;
@@ -60,15 +66,54 @@ public:
 	double m_speed_meter;
 	double m_brake_meter;
 	UINT32 m_outputs;
+	DECLARE_READ32_MEMBER(taitojc_palette_r);
+	DECLARE_WRITE32_MEMBER(taitojc_palette_w);
+	DECLARE_READ32_MEMBER(jc_control_r);
+	DECLARE_WRITE32_MEMBER(jc_coin_counters_w);
+	DECLARE_WRITE32_MEMBER(jc_control_w);
+	DECLARE_WRITE32_MEMBER(jc_control1_w);
+	DECLARE_READ32_MEMBER(mcu_comm_r);
+	DECLARE_WRITE32_MEMBER(mcu_comm_w);
+	DECLARE_READ8_MEMBER(jc_pcbid_r);
+	DECLARE_READ32_MEMBER(dsp_shared_r);
+	DECLARE_WRITE32_MEMBER(dsp_shared_w);
+	DECLARE_READ32_MEMBER(f3_share_r);
+	DECLARE_WRITE32_MEMBER(f3_share_w);
+	DECLARE_WRITE32_MEMBER(jc_meters_w);
+	DECLARE_READ32_MEMBER(jc_lan_r);
+	DECLARE_READ8_MEMBER(hc11_comm_r);
+	DECLARE_WRITE8_MEMBER(hc11_comm_w);
+	DECLARE_READ8_MEMBER(hc11_data_r);
+	DECLARE_WRITE8_MEMBER(hc11_data_w);
+	DECLARE_READ8_MEMBER(hc11_analog_r);
+	DECLARE_READ16_MEMBER(dsp_rom_r);
+	DECLARE_WRITE16_MEMBER(dsp_rom_w);
+	DECLARE_WRITE16_MEMBER(dsp_texture_w);
+	DECLARE_READ16_MEMBER(dsp_texaddr_r);
+	DECLARE_WRITE16_MEMBER(dsp_texaddr_w);
+	DECLARE_WRITE16_MEMBER(dsp_polygon_fifo_w);
+	DECLARE_READ16_MEMBER(dsp_unk_r);
+	DECLARE_WRITE16_MEMBER(dsp_viewport_w);
+	DECLARE_WRITE16_MEMBER(dsp_projection_w);
+	DECLARE_READ16_MEMBER(dsp_projection_r);
+	DECLARE_WRITE16_MEMBER(dsp_unk2_w);
+	DECLARE_WRITE16_MEMBER(dsp_intersection_w);
+	DECLARE_READ16_MEMBER(dsp_intersection_r);
+	DECLARE_READ16_MEMBER(dsp_to_main_r);
+	DECLARE_WRITE16_MEMBER(dsp_to_main_w);
+	DECLARE_READ16_MEMBER(taitojc_dsp_idle_skip_r);
+	DECLARE_READ16_MEMBER(dendego2_dsp_idle_skip_r);
+	DECLARE_WRITE16_MEMBER(dsp_idle_skip_w);
+	DECLARE_READ32_MEMBER(taitojc_tile_r);
+	DECLARE_READ32_MEMBER(taitojc_char_r);
+	DECLARE_WRITE32_MEMBER(taitojc_tile_w);
+	DECLARE_WRITE32_MEMBER(taitojc_char_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(mascon_state_r);
 };
 
 
 /*----------- defined in video/taitojc.c -----------*/
 
-READ32_HANDLER(taitojc_tile_r);
-WRITE32_HANDLER(taitojc_tile_w);
-READ32_HANDLER(taitojc_char_r);
-WRITE32_HANDLER(taitojc_char_w);
 void taitojc_clear_frame(running_machine &machine);
 void taitojc_render_polygons(running_machine &machine, UINT16 *polygon_fifo, int length);
 

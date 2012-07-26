@@ -3,7 +3,6 @@
 #ifndef __INTERPOD__
 #define __INTERPOD__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -15,6 +14,7 @@
 #include "machine/c8280.h"
 #include "machine/d9060.h"
 #include "machine/cbmiec.h"
+#include "machine/cbmipt.h"
 #include "machine/ieee488.h"
 
 
@@ -63,7 +63,6 @@ protected:
 	required_device<via6522_device> m_via;
 	required_device<riot6532_device> m_riot;
 	required_device<acia6850_device> m_acia;
-	required_device<cbm_iec_device> m_iec;
 	required_device<ieee488_device> m_ieee;
 };
 

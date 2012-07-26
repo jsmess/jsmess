@@ -3,7 +3,6 @@
 #ifndef __VIC10__
 #define __VIC10__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "includes/cbm.h"
@@ -52,6 +51,9 @@ public:
 	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void check_interrupts();
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
 	DECLARE_READ8_MEMBER( vic_lightpen_x_cb );
 	DECLARE_READ8_MEMBER( vic_lightpen_y_cb );

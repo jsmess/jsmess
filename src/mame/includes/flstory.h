@@ -3,17 +3,19 @@ class flstory_state : public driver_device
 {
 public:
 	flstory_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_scrlram(*this, "scrlram"),
+		m_workram(*this, "workram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	UINT8 *  m_workram;
-	UINT8 *  m_scrlram;
-	UINT8 *  m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_scrlram;
+	optional_shared_ptr<UINT8> m_workram;
 //  UINT8 *  m_paletteram;    // currently this uses generic palette handling
 //  UINT8 *  m_paletteram_2;  // currently this uses generic palette handling
-	size_t   m_videoram_size;
-	size_t   m_spriteram_size;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
@@ -64,29 +66,45 @@ public:
 	UINT8 m_mcu_bb_res;
 	UINT8 m_mcu_b5_res;
 	UINT8 m_mcu_b6_res;
+	DECLARE_READ8_MEMBER(from_snd_r);
+	DECLARE_READ8_MEMBER(snd_flag_r);
+	DECLARE_WRITE8_MEMBER(to_main_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(nmi_disable_w);
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_READ8_MEMBER(rumba_mcu_r);
+	DECLARE_WRITE8_MEMBER(rumba_mcu_w);
+	DECLARE_READ8_MEMBER(flstory_68705_port_a_r);
+	DECLARE_WRITE8_MEMBER(flstory_68705_port_a_w);
+	DECLARE_WRITE8_MEMBER(flstory_68705_ddr_a_w);
+	DECLARE_READ8_MEMBER(flstory_68705_port_b_r);
+	DECLARE_WRITE8_MEMBER(flstory_68705_port_b_w);
+	DECLARE_WRITE8_MEMBER(flstory_68705_ddr_b_w);
+	DECLARE_READ8_MEMBER(flstory_68705_port_c_r);
+	DECLARE_WRITE8_MEMBER(flstory_68705_port_c_w);
+	DECLARE_WRITE8_MEMBER(flstory_68705_ddr_c_w);
+	DECLARE_WRITE8_MEMBER(flstory_mcu_w);
+	DECLARE_READ8_MEMBER(flstory_mcu_r);
+	DECLARE_READ8_MEMBER(flstory_mcu_status_r);
+	DECLARE_WRITE8_MEMBER(onna34ro_mcu_w);
+	DECLARE_READ8_MEMBER(onna34ro_mcu_r);
+	DECLARE_READ8_MEMBER(onna34ro_mcu_status_r);
+	DECLARE_WRITE8_MEMBER(victnine_mcu_w);
+	DECLARE_READ8_MEMBER(victnine_mcu_r);
+	DECLARE_READ8_MEMBER(victnine_mcu_status_r);
+	DECLARE_WRITE8_MEMBER(flstory_videoram_w);
+	DECLARE_WRITE8_MEMBER(flstory_palette_w);
+	DECLARE_READ8_MEMBER(flstory_palette_r);
+	DECLARE_WRITE8_MEMBER(flstory_gfxctrl_w);
+	DECLARE_READ8_MEMBER(victnine_gfxctrl_r);
+	DECLARE_WRITE8_MEMBER(victnine_gfxctrl_w);
+	DECLARE_WRITE8_MEMBER(flstory_scrlram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(victnine_mcu_status_bit01_r);
 };
 
 
 /*----------- defined in machine/flstory.c -----------*/
 
-READ8_HANDLER( flstory_68705_port_a_r );
-WRITE8_HANDLER( flstory_68705_port_a_w );
-READ8_HANDLER( flstory_68705_port_b_r );
-WRITE8_HANDLER( flstory_68705_port_b_w );
-READ8_HANDLER( flstory_68705_port_c_r );
-WRITE8_HANDLER( flstory_68705_port_c_w );
-WRITE8_HANDLER( flstory_68705_ddr_a_w );
-WRITE8_HANDLER( flstory_68705_ddr_b_w );
-WRITE8_HANDLER( flstory_68705_ddr_c_w );
-WRITE8_HANDLER( flstory_mcu_w );
-READ8_HANDLER( flstory_mcu_r );
-READ8_HANDLER( flstory_mcu_status_r );
-WRITE8_HANDLER( onna34ro_mcu_w );
-READ8_HANDLER( onna34ro_mcu_r );
-READ8_HANDLER( onna34ro_mcu_status_r );
-WRITE8_HANDLER( victnine_mcu_w );
-READ8_HANDLER( victnine_mcu_r );
-READ8_HANDLER( victnine_mcu_status_r );
 
 
 /*----------- defined in video/flstory.c -----------*/
@@ -98,10 +116,3 @@ SCREEN_UPDATE_IND16( victnine );
 VIDEO_START( rumba );
 SCREEN_UPDATE_IND16( rumba );
 
-WRITE8_HANDLER( flstory_videoram_w );
-READ8_HANDLER( flstory_palette_r );
-WRITE8_HANDLER( flstory_palette_w );
-WRITE8_HANDLER( flstory_gfxctrl_w );
-WRITE8_HANDLER( flstory_scrlram_w );
-READ8_HANDLER( victnine_gfxctrl_r );
-WRITE8_HANDLER( victnine_gfxctrl_w );

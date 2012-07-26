@@ -279,7 +279,14 @@ class sfbonus_state : public driver_device
 {
 public:
 	sfbonus_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_nvram(*this, "nvram"),
+		m_1800_regs(*this, "1800_regs"),
+		m_vregs(*this, "vregs"),
+		m_2801_regs(*this, "2801_regs"),
+		m_2c01_regs(*this, "2c01_regs"),
+		m_3000_regs(*this, "3000_regs"),
+		m_3800_regs(*this, "3800_regs"){ }
 
 	bitmap_ind16 *m_temp_reel_bitmap;
 	tilemap_t *m_tilemap;
@@ -293,14 +300,25 @@ public:
 	UINT8 *m_reel3_ram;
 	UINT8 *m_reel4_ram;
 	UINT8* m_videoram;
-	UINT8 *m_vregs;
-	UINT8 *m_nvram;
-	size_t m_nvram_size;
-	UINT8* m_1800_regs;
-	UINT8* m_3800_regs;
-	UINT8* m_3000_regs;
-	UINT8* m_2801_regs;
-	UINT8* m_2c01_regs;
+	required_shared_ptr<UINT8> m_nvram;
+	required_shared_ptr<UINT8> m_1800_regs;
+	required_shared_ptr<UINT8> m_vregs;
+	required_shared_ptr<UINT8> m_2801_regs;
+	required_shared_ptr<UINT8> m_2c01_regs;
+	required_shared_ptr<UINT8> m_3000_regs;
+	required_shared_ptr<UINT8> m_3800_regs;
+	DECLARE_WRITE8_MEMBER(sfbonus_videoram_w);
+	DECLARE_WRITE8_MEMBER(sfbonus_bank_w);
+	DECLARE_READ8_MEMBER(sfbonus_2800_r);
+	DECLARE_READ8_MEMBER(sfbonus_2801_r);
+	DECLARE_READ8_MEMBER(sfbonus_2c00_r);
+	DECLARE_READ8_MEMBER(sfbonus_2c01_r);
+	DECLARE_READ8_MEMBER(sfbonus_3800_r);
+	DECLARE_WRITE8_MEMBER(sfbonus_1800_w);
+	DECLARE_WRITE8_MEMBER(sfbonus_3800_w);
+	DECLARE_WRITE8_MEMBER(sfbonus_3000_w);
+	DECLARE_WRITE8_MEMBER(sfbonus_2801_w);
+	DECLARE_WRITE8_MEMBER(sfbonus_2c01_w);
 };
 
 
@@ -702,48 +720,47 @@ static TILE_GET_INFO( get_sfbonus_reel4_tile_info )
 }
 
 
-static WRITE8_HANDLER( sfbonus_videoram_w )
+WRITE8_MEMBER(sfbonus_state::sfbonus_videoram_w)
 {
-	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
 	if (offset<0x4000) /* 0x0000 - 0x3fff */
 	{
-		state->m_tilemap_ram[offset] = data;
-		state->m_tilemap->mark_tile_dirty(offset/2);
+		m_tilemap_ram[offset] = data;
+		m_tilemap->mark_tile_dirty(offset/2);
 	}
 	else if (offset<0x4800) /* 0x4000 - 0x47ff */
 	{
 		offset-=0x4000;
 
-		state->m_reel_ram[offset] = data;
-		state->m_reel_tilemap->mark_tile_dirty(offset/2);
+		m_reel_ram[offset] = data;
+		m_reel_tilemap->mark_tile_dirty(offset/2);
 	}
 	else if (offset<0x5000)  /* 0x4800 - 0x4fff */
 	{
 		offset-=0x4800;
 
-		state->m_reel2_ram[offset] = data;
-		state->m_reel2_tilemap->mark_tile_dirty(offset/2);
+		m_reel2_ram[offset] = data;
+		m_reel2_tilemap->mark_tile_dirty(offset/2);
 	}
 	else if (offset<0x5800) /* 0x5000 - 0x57ff */
 	{
 		offset-=0x5000;
 
-		state->m_reel3_ram[offset] = data;
-		state->m_reel3_tilemap->mark_tile_dirty(offset/2);
+		m_reel3_ram[offset] = data;
+		m_reel3_tilemap->mark_tile_dirty(offset/2);
 	}
 	else if (offset<0x6000) /* 0x5800 - 0x5fff */
 	{
 		offset-=0x5800;
 
-		state->m_reel4_ram[offset] = data;
-		state->m_reel4_tilemap->mark_tile_dirty(offset/2);
+		m_reel4_ram[offset] = data;
+		m_reel4_tilemap->mark_tile_dirty(offset/2);
 	}
 	else if (offset<0x8000)
 	{
 		offset -=0x6000;
 		// scroll regs etc.
 		//logerror("access vram at [%04x] <- %02x\n",offset,data);
-		state->m_videoram[offset] = data;
+		m_videoram[offset] = data;
 	}
 	else
 	{
@@ -1056,82 +1073,77 @@ static SCREEN_UPDATE_IND16(sfbonus)
 
 
 
-static ADDRESS_MAP_START( sfbonus_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sfbonus_map, AS_PROGRAM, 8, sfbonus_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROMBANK("bank1") AM_WRITE(sfbonus_videoram_w)
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_MEMBER(sfbonus_state, m_nvram) AM_SIZE_MEMBER(sfbonus_state, m_nvram_size)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( sfbonus_bank_w )
+WRITE8_MEMBER(sfbonus_state::sfbonus_bank_w)
 {
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	UINT8 bank;
 
 	bank = data & 7;
 
-	memory_set_bankptr(space->machine(), "bank1", &ROM[bank * 0x10000]);
+	membank("bank1")->set_base(&ROM[bank * 0x10000]);
 }
 
 
 
-static READ8_HANDLER( sfbonus_2800_r )
+READ8_MEMBER(sfbonus_state::sfbonus_2800_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static READ8_HANDLER( sfbonus_2801_r )
+READ8_MEMBER(sfbonus_state::sfbonus_2801_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static READ8_HANDLER( sfbonus_2c00_r )
+READ8_MEMBER(sfbonus_state::sfbonus_2c00_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static READ8_HANDLER( sfbonus_2c01_r )
+READ8_MEMBER(sfbonus_state::sfbonus_2c01_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static READ8_HANDLER( sfbonus_3800_r )
+READ8_MEMBER(sfbonus_state::sfbonus_3800_r)
 {
 	return 0xff;
 }
 
 
 // lamps and coin counters
-static WRITE8_HANDLER( sfbonus_1800_w )
+WRITE8_MEMBER(sfbonus_state::sfbonus_1800_w)
 {
-	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
-	state->m_1800_regs[offset] = data;
+	m_1800_regs[offset] = data;
 }
 
-static WRITE8_HANDLER( sfbonus_3800_w )
+WRITE8_MEMBER(sfbonus_state::sfbonus_3800_w)
 {
-	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
-	state->m_3800_regs[offset] = data;
+	m_3800_regs[offset] = data;
 }
 
-static WRITE8_HANDLER( sfbonus_3000_w )
+WRITE8_MEMBER(sfbonus_state::sfbonus_3000_w)
 {
-	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
-	state->m_3000_regs[offset] = data;
+	m_3000_regs[offset] = data;
 }
 
-static WRITE8_HANDLER( sfbonus_2801_w )
+WRITE8_MEMBER(sfbonus_state::sfbonus_2801_w)
 {
-	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
-	state->m_2801_regs[offset] = data;
+	m_2801_regs[offset] = data;
 }
 
-static WRITE8_HANDLER( sfbonus_2c01_w )
+WRITE8_MEMBER(sfbonus_state::sfbonus_2c01_w)
 {
-	sfbonus_state *state = space->machine().driver_data<sfbonus_state>();
-	state->m_2c01_regs[offset] = data;
+	m_2c01_regs[offset] = data;
 }
 
 
-static ADDRESS_MAP_START( sfbonus_io, AS_IO, 8 )
+static ADDRESS_MAP_START( sfbonus_io, AS_IO, 8, sfbonus_state )
 	AM_RANGE(0x0400, 0x0400) AM_READ_PORT("KEY1")
 	AM_RANGE(0x0408, 0x0408) AM_READ_PORT("KEY2")
 	AM_RANGE(0x0410, 0x0410) AM_READ_PORT("KEY3")
@@ -1142,27 +1154,27 @@ static ADDRESS_MAP_START( sfbonus_io, AS_IO, 8 )
 	AM_RANGE(0x0430, 0x0430) AM_READ_PORT("SWITCH4")
 	AM_RANGE(0x0438, 0x0438) AM_READ_PORT("SWITCH5")
 
-	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 
-	AM_RANGE(0x0c00, 0x0c00) AM_DEVWRITE_MODERN("ramdac", ramdac_device, index_w)
-	AM_RANGE(0x0c01, 0x0c01) AM_DEVWRITE_MODERN("ramdac", ramdac_device, pal_w)
-	AM_RANGE(0x0c02, 0x0c02) AM_DEVWRITE_MODERN("ramdac", ramdac_device, mask_w)
+	AM_RANGE(0x0c00, 0x0c00) AM_DEVWRITE("ramdac", ramdac_device, index_w)
+	AM_RANGE(0x0c01, 0x0c01) AM_DEVWRITE("ramdac", ramdac_device, pal_w)
+	AM_RANGE(0x0c02, 0x0c02) AM_DEVWRITE("ramdac", ramdac_device, mask_w)
 
-	AM_RANGE(0x1800, 0x1807) AM_WRITE(sfbonus_1800_w) AM_BASE_MEMBER(sfbonus_state, m_1800_regs) // lamps and coin counters
+	AM_RANGE(0x1800, 0x1807) AM_WRITE(sfbonus_1800_w) AM_SHARE("1800_regs") // lamps and coin counters
 
-	AM_RANGE(0x2400, 0x241f) AM_RAM AM_BASE_MEMBER(sfbonus_state, m_vregs)
+	AM_RANGE(0x2400, 0x241f) AM_RAM AM_SHARE("vregs")
 
 	AM_RANGE(0x2800, 0x2800) AM_READ(sfbonus_2800_r)
-	AM_RANGE(0x2801, 0x2801) AM_READ(sfbonus_2801_r) AM_WRITE(sfbonus_2801_w) AM_BASE_MEMBER(sfbonus_state, m_2801_regs)
+	AM_RANGE(0x2801, 0x2801) AM_READ(sfbonus_2801_r) AM_WRITE(sfbonus_2801_w) AM_SHARE("2801_regs")
 
 	AM_RANGE(0x2c00, 0x2c00) AM_READ(sfbonus_2c00_r)
-	AM_RANGE(0x2c01, 0x2c01) AM_READ(sfbonus_2c01_r) AM_WRITE(sfbonus_2c01_w) AM_BASE_MEMBER(sfbonus_state, m_2c01_regs)
+	AM_RANGE(0x2c01, 0x2c01) AM_READ(sfbonus_2c01_r) AM_WRITE(sfbonus_2c01_w) AM_SHARE("2c01_regs")
 
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(sfbonus_3000_w) AM_BASE_MEMBER(sfbonus_state, m_3000_regs)
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(sfbonus_3000_w) AM_SHARE("3000_regs")
 	AM_RANGE(0x3400, 0x3400) AM_WRITE(sfbonus_bank_w)
 	AM_RANGE(0x3800, 0x3800) AM_READ(sfbonus_3800_r)
 
-	AM_RANGE(0x3800, 0x3807) AM_WRITE(sfbonus_3800_w) AM_BASE_MEMBER(sfbonus_state, m_3800_regs)
+	AM_RANGE(0x3800, 0x3807) AM_WRITE(sfbonus_3800_w) AM_SHARE("3800_regs")
 ADDRESS_MAP_END
 
 
@@ -1202,37 +1214,37 @@ GFXDECODE_END
 
 static MACHINE_RESET( sfbonus )
 {
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
-	memory_set_bankptr(machine, "bank1", &ROM[0]);
+	machine.root_device().membank("bank1")->set_base(&ROM[0]);
 }
 
 static NVRAM_HANDLER( sfbonus )
 {
 	sfbonus_state *state = machine.driver_data<sfbonus_state>();
 	if (read_or_write)
-		file->write(state->m_nvram,state->m_nvram_size);
+		file->write(state->m_nvram,state->m_nvram.bytes());
 	else
 	{
 		if (file)
 		{
-			memset(state->m_nvram,0x00,state->m_nvram_size);
-			file->read(state->m_nvram,state->m_nvram_size);
+			memset(state->m_nvram,0x00,state->m_nvram.bytes());
+			file->read(state->m_nvram,state->m_nvram.bytes());
 		}
 		else
 		{
-			UINT8* defaultram = machine.region("defaults")->base();
-			memset(state->m_nvram,0x00,state->m_nvram_size);
+			UINT8* defaultram = machine.root_device().memregion("defaults")->base();
+			memset(state->m_nvram,0x00,state->m_nvram.bytes());
 
 			if (defaultram)
 				if ((defaultram[0x02]==0x00) && (defaultram[0x03]==0x00)) // hack! rom region optional regions get cleared with garbage if no rom is present, this is not good!
-					memcpy(state->m_nvram, machine.region("defaults")->base(), machine.region("defaults")->bytes());
+					memcpy(state->m_nvram, machine.root_device().memregion("defaults")->base(), machine.root_device().memregion("defaults")->bytes());
 		}
 	}
 }
 
-static ADDRESS_MAP_START( ramdac_map, AS_0, 8 )
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE_MODERN("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+static ADDRESS_MAP_START( ramdac_map, AS_0, 8, sfbonus_state )
+	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
 ADDRESS_MAP_END
 
 static RAMDAC_INTERFACE( ramdac_intf )
@@ -4883,6 +4895,64 @@ ROM_START( fb5v )
 	ROM_LOAD_OPTIONAL( "fb515sh.id", 0x00, 0x20, CRC(d20771d2) SHA1(6a61d89d1c583c587106003849091a6c4f8b0faf) )
 ROM_END
 
+/* Fun River */
+ROM_START( funriver )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "frd14r.bin", 0x00000, 0x80000, CRC(03ffabcc) SHA1(0e65be88dc4158f77082e5b50836197dd0e397da) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "frrom2.bin", 0x00000, 0x40000, CRC(9ce6b729) SHA1(9a81bac5233268816bff406748e181436e2e61ea) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "frrom3.bin", 0x00000, 0x80000, CRC(6e8aba12) SHA1(3d0fe4af974bbcdf332fdcb12d3b43a04c92ddfb) )
+	ROM_LOAD16_BYTE( "frrom4.bin", 0x00001, 0x80000, CRC(a9e1310e) SHA1(246781415911c9d3b77669f58e492ec599adf384) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "frrom5.bin", 0x00000, 0x80000, CRC(0bf20cd9) SHA1(b2482c37af89c4b08e0f7e6e3c9c0be396a43516) )
+	ROM_LOAD16_BYTE( "frrom6.bin", 0x00001, 0x80000, CRC(86a57fb9) SHA1(ca6a3a50ff47a0344ab4fd206e275319e1d571b3) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fr14r.id", 0x00, 0x20, CRC(1542e2bc) SHA1(56e615866d451abd2d6c2d689a85bdca447c2538) )
+ROM_END
+
+ROM_START( funriverd1 )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "frd13r.bin", 0x00000, 0x80000, CRC(9d2a1f7a) SHA1(28c5b6c2bdb400a9cca337608c78ce954917b156) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "frrom2.bin", 0x00000, 0x40000, CRC(9ce6b729) SHA1(9a81bac5233268816bff406748e181436e2e61ea) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "frrom3.bin", 0x00000, 0x80000, CRC(6e8aba12) SHA1(3d0fe4af974bbcdf332fdcb12d3b43a04c92ddfb) )
+	ROM_LOAD16_BYTE( "frrom4.bin", 0x00001, 0x80000, CRC(a9e1310e) SHA1(246781415911c9d3b77669f58e492ec599adf384) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "frrom5.bin", 0x00000, 0x80000, CRC(0bf20cd9) SHA1(b2482c37af89c4b08e0f7e6e3c9c0be396a43516) )
+	ROM_LOAD16_BYTE( "frrom6.bin", 0x00001, 0x80000, CRC(86a57fb9) SHA1(ca6a3a50ff47a0344ab4fd206e275319e1d571b3) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fr13r.id", 0x00, 0x20, CRC(71238f75) SHA1(d6907da137d2a019f0a0aea95da83d505f11866e) )
+ROM_END
+
+ROM_START( funriverv )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "frv14r.bin", 0x00000, 0x80000, CRC(5629d38e) SHA1(6404f70d94b1ec39d1df4e00c620eb5498d3ff83) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "frrom2.bin", 0x00000, 0x40000, CRC(9ce6b729) SHA1(9a81bac5233268816bff406748e181436e2e61ea) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "frrom3.bin", 0x00000, 0x80000, CRC(6e8aba12) SHA1(3d0fe4af974bbcdf332fdcb12d3b43a04c92ddfb) )
+	ROM_LOAD16_BYTE( "frrom4.bin", 0x00001, 0x80000, CRC(a9e1310e) SHA1(246781415911c9d3b77669f58e492ec599adf384) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "frrom5.bin", 0x00000, 0x80000, CRC(0bf20cd9) SHA1(b2482c37af89c4b08e0f7e6e3c9c0be396a43516) )
+	ROM_LOAD16_BYTE( "frrom6.bin", 0x00001, 0x80000, CRC(86a57fb9) SHA1(ca6a3a50ff47a0344ab4fd206e275319e1d571b3) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "fr14r.id", 0x00, 0x20, CRC(1542e2bc) SHA1(56e615866d451abd2d6c2d689a85bdca447c2538) )
+ROM_END
+
 /* Fruit Bonus '06 - 10th anniversary */
 ROM_START( fb6 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
@@ -5584,44 +5654,6 @@ ROM_START( version4o )
 	ROM_LOAD_OPTIONAL( "fcs40r1.id", 0x00, 0x20, CRC(b3638cdb) SHA1(283824c57f3f62f6e2b505f6e13b100a7d7f33af) )
 ROM_END
 
-ROM_START( funriver )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "frd14r.bin", 0x00000, 0x80000, CRC(03ffabcc) SHA1(0e65be88dc4158f77082e5b50836197dd0e397da) )
-
-	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "frrom2.bin", 0x00000, 0x40000, NO_DUMP )
-
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "frrom3.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "frrom4.bin", 0x00001, 0x80000, NO_DUMP )
-
-	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "frrom5.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "frrom6.bin", 0x00001, 0x80000, NO_DUMP )
-
-	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
-	ROM_LOAD_OPTIONAL( "fr14r.id", 0x00, 0x20, CRC(1542e2bc) SHA1(56e615866d451abd2d6c2d689a85bdca447c2538) )
-ROM_END
-
-ROM_START( funriverv )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "frv14r.bin", 0x00000, 0x80000, CRC(5629d38e) SHA1(6404f70d94b1ec39d1df4e00c620eb5498d3ff83) )
-
-	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "frrom2.bin", 0x00000, 0x40000, NO_DUMP )
-
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "frrom3.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "frrom4.bin", 0x00001, 0x80000, NO_DUMP )
-
-	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "frrom5.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "frrom6.bin", 0x00001, 0x80000, NO_DUMP )
-
-	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
-	ROM_LOAD_OPTIONAL( "fr14r.id", 0x00, 0x20, CRC(1542e2bc) SHA1(56e615866d451abd2d6c2d689a85bdca447c2538) )
-ROM_END
-
 ROM_START( spooky )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "snd204r.bin", 0x00000, 0x80000, CRC(0e737c07) SHA1(50b55390f6ae6ae661d020dabd685651a7f160b2) )
@@ -5701,9 +5733,9 @@ static DRIVER_INIT( sfbonus_common)
 
 	// dummy.rom helper
 	{
-		UINT8 *ROM = machine.region("maincpu")->base();
-		int length = machine.region("maincpu")->bytes();
-		UINT8* ROM2 = machine.region("user1")->base();
+		UINT8 *ROM = state->memregion("maincpu")->base();
+		int length = state->memregion("maincpu")->bytes();
+		UINT8* ROM2 = state->memregion("user1")->base();
 
 		if (ROM2)
 		{
@@ -5753,9 +5785,9 @@ static void sfbonus_bitswap( running_machine& machine,
 {
 
 	int i;
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
 
-	for(i = 0; i < machine.region("maincpu")->bytes(); i++)
+	for(i = 0; i < machine.root_device().memregion("maincpu")->bytes(); i++)
 	{
 		UINT8 x = ROM[i];
 
@@ -6115,6 +6147,10 @@ GAME( 2005, fb5c,        fb5,      sfbonus,    amcoe1_reels3,    fb5,           
 GAME( 2005, fb5d,        fb5,      sfbonus,    amcoe1_reels3,    fb5d,            ROT0,  "Amcoe", "Fruit Bonus 2005 (Version 1.5SH, set 3)", 0)
 GAME( 2005, fb5v,        fb5,      sfbonus,    amcoe1_reels3,    fb5v,            ROT0,  "Amcoe", "Fruit Bonus 2005 (Version 1.5SH Dual)", 0)
 
+GAME( 2005, funriver,    0,        sfbonus,    amcoe1_reels3,    funriver,        ROT0,  "Amcoe", "Fun River (Version 1.4R CGA)", 0)
+GAME( 2005, funriverv,   funriver, sfbonus,    amcoe1_reels3,    funriverv,       ROT0,  "Amcoe", "Fun River (Version 1.4R Dual)", 0)
+GAME( 2005, funriverd1,  funriver, sfbonus,    amcoe1_reels3,    funriver,        ROT0,  "Amcoe", "Fun River (Version 1.3R CGA)", 0)
+
 GAME( 2006, fb6,         0,        sfbonus,    amcoe1_reels3,    fb6,             ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7E CGA)", 0)
 GAME( 2006, fb6v,        fb6,      sfbonus,    amcoe1_reels3,    fb6v3,           ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7E Dual)", 0)
 GAME( 2006, fb6d1,       fb6,      sfbonus,    amcoe1_reels3,    fb6d,            ROT0,  "Amcoe", "Fruit Bonus '06 - 10th anniversary (Version 1.7R CGA)", 0)
@@ -6152,9 +6188,6 @@ GAME( 200?, fbdeluxeo,   fbdeluxe, sfbonus,    amcoe1_reels3,    fbdeluxe,      
 GAME( 200?, fb3g,        0,        sfbonus,    amcoe1_reels3,    fb3g,            ROT0,  "Amcoe", "Fruit Bonus 3G (Version 1.0.3)", 0) /* After Around The World */
 
 // no graphic / sound roms dumped for these sets, but functional program roms & descramble are in place
-GAME( 2005, funriver,    0,        sfbonus,    amcoe1_reels3,    funriver,        ROT0,  "Amcoe", "Fun River (Version 1.4R CGA)", GAME_NOT_WORKING)
-GAME( 2005, funriverv,   funriver, sfbonus,    amcoe1_reels3,    funriverv,       ROT0,  "Amcoe", "Fun River (Version 1.4R Dual)", GAME_NOT_WORKING)
-
 GAME( 2006, version4,    0,        sfbonus,    amcoe1_reels3,    version4,        ROT0,  "Amcoe", "Version 4 (Version 4.3R CGA)",  GAME_NOT_WORKING)
 GAME( 2006, version4v,   version4, sfbonus,    amcoe1_reels3,    version4v,       ROT0,  "Amcoe", "Version 4 (Version 4.3R Dual)", GAME_NOT_WORKING)
 GAME( 2006, version4d2,  version4, sfbonus,    amcoe1_reels3,    version4d2,      ROT0,  "Amcoe", "Version 4 (Version 4.3E CGA)",  GAME_NOT_WORKING)

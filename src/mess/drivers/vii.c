@@ -65,7 +65,6 @@ Detailed list of bugs:
 
 
 *******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/unsp/unsp.h"
@@ -88,8 +87,12 @@ class vii_state : public driver_device
 public:
 	vii_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
-	{ }
+	m_maincpu(*this, "maincpu"),
+		m_p_ram(*this, "p_ram"),
+		m_p_rowscroll(*this, "p_rowscroll"),
+		m_p_palette(*this, "p_palette"),
+		m_p_spriteram(*this, "p_spriteram"),
+		m_p_cart(*this, "p_cart"){ }
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_READ16_MEMBER(vii_video_r);
@@ -100,11 +103,11 @@ public:
 	DECLARE_WRITE16_MEMBER(vii_io_w);
 	DECLARE_WRITE16_MEMBER(vii_rowscroll_w);
 	DECLARE_WRITE16_MEMBER(vii_spriteram_w);
-	UINT16 *m_p_ram;
-	UINT16 *m_p_cart;
-	UINT16 *m_p_rowscroll;
-	UINT16 *m_p_palette;
-	UINT16 *m_p_spriteram;
+	required_shared_ptr<UINT16> m_p_ram;
+	required_shared_ptr<UINT16> m_p_rowscroll;
+	required_shared_ptr<UINT16> m_p_palette;
+	required_shared_ptr<UINT16> m_p_spriteram;
+	required_shared_ptr<UINT16> m_p_cart;
 
 	UINT32 m_current_bank;
 
@@ -544,7 +547,7 @@ WRITE16_MEMBER( vii_state::vii_audio_w )
 
 void vii_state::vii_switch_bank(UINT32 bank)
 {
-	UINT8 *cart = machine().region("cart")->base();
+	UINT8 *cart = memregion("cart")->base();
 
 	if(bank != m_current_bank)
 	{
@@ -580,7 +583,7 @@ void vii_state::vii_do_gpio(UINT32 offset)
 	{
 		if(index == 0)
 		{
-			UINT16 temp = input_port_read(machine(), "P1");
+			UINT16 temp = ioport("P1")->read();
 			what |= (temp & 0x0001) ? 0x8000 : 0;
 			what |= (temp & 0x0002) ? 0x4000 : 0;
 			what |= (temp & 0x0004) ? 0x2000 : 0;
@@ -855,14 +858,14 @@ WRITE16_MEMBER( vii_state::vii_spriteram_w )
 */
 
 static ADDRESS_MAP_START( vii_mem, AS_PROGRAM, 16, vii_state )
-	AM_RANGE( 0x000000, 0x004fff ) AM_RAM AM_BASE(m_p_ram)
+	AM_RANGE( 0x000000, 0x004fff ) AM_RAM AM_SHARE("p_ram")
 	AM_RANGE( 0x005000, 0x0051ff ) AM_READWRITE(vii_video_r, vii_video_w)
-	AM_RANGE( 0x005200, 0x0055ff ) AM_RAM AM_BASE(m_p_rowscroll)
-	AM_RANGE( 0x005600, 0x0057ff ) AM_RAM AM_BASE(m_p_palette)
-	AM_RANGE( 0x005800, 0x005fff ) AM_RAM AM_BASE(m_p_spriteram)
+	AM_RANGE( 0x005200, 0x0055ff ) AM_RAM AM_SHARE("p_rowscroll")
+	AM_RANGE( 0x005600, 0x0057ff ) AM_RAM AM_SHARE("p_palette")
+	AM_RANGE( 0x005800, 0x005fff ) AM_RAM AM_SHARE("p_spriteram")
 	AM_RANGE( 0x006000, 0x006fff ) AM_READWRITE(vii_audio_r, vii_audio_w)
 	AM_RANGE( 0x007000, 0x007fff ) AM_READWRITE(vii_io_r,    vii_io_w)
-	AM_RANGE( 0x008000, 0x7fffff ) AM_ROM AM_BASE(m_p_cart)
+	AM_RANGE( 0x008000, 0x7fffff ) AM_ROM AM_SHARE("p_cart")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vii )
@@ -914,7 +917,7 @@ INPUT_PORTS_END
 static DEVICE_IMAGE_LOAD( vii_cart )
 {
 	vii_state *state = image.device().machine().driver_data<vii_state>();
-	UINT8 *cart = image.device().machine().region( "cart" )->base();
+	UINT8 *cart = state->memregion( "cart" )->base();
 	if (image.software_entry() == NULL)
 	{
 		int size = image.length();
@@ -948,7 +951,7 @@ static DEVICE_IMAGE_LOAD( vii_cart )
 static DEVICE_IMAGE_LOAD( vsmile_cart )
 {
 	vii_state *state = image.device().machine().driver_data<vii_state>();
-	UINT8 *cart = image.device().machine().region( "cart" )->base();
+	UINT8 *cart = state->memregion( "cart" )->base();
 	if (image.software_entry() == NULL)
 	{
 		int size = image.length();
@@ -993,7 +996,7 @@ static MACHINE_START( vii )
 	state->m_controller_input[6] = 0xff;
 	state->m_controller_input[7] = 0;
 
-	UINT8 *rom = machine.region( "cart" )->base();
+	UINT8 *rom = state->memregion( "cart" )->base();
 	if (rom)
 	{ // to prevent batman crash
 		memcpy(state->m_p_cart, rom + 0x4000*2, (0x400000 - 0x4000) * 2);
@@ -1020,7 +1023,7 @@ static INTERRUPT_GEN( vii_vblank )
 	UINT32 z = device->machine().rand() & 0x3ff;
 
 
-	state->m_controller_input[0] = input_port_read(device->machine(), "P1");
+	state->m_controller_input[0] = state->ioport("P1")->read();
 	state->m_controller_input[1] = (UINT8)x;
 	state->m_controller_input[2] = (UINT8)y;
 	state->m_controller_input[3] = (UINT8)z;

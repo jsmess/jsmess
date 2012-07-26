@@ -56,6 +56,19 @@ public:
 	UINT8 *m_pcart;
 	UINT32 m_pcart_rom_size;
 	SVI318_FDC_STRUCT m_fdc;
+	DECLARE_WRITE8_MEMBER(svi318_ppi_w);
+	DECLARE_READ8_MEMBER(svi318_psg_port_a_r);
+	DECLARE_WRITE8_MEMBER(svi318_psg_port_b_w);
+	DECLARE_WRITE8_MEMBER(svi318_fdc_drive_motor_w);
+	DECLARE_WRITE8_MEMBER(svi318_fdc_density_side_w);
+	DECLARE_READ8_MEMBER(svi318_fdc_irqdrq_r);
+	DECLARE_WRITE8_MEMBER(svi806_ram_enable_w);
+	DECLARE_WRITE8_MEMBER(svi318_writemem1);
+	DECLARE_WRITE8_MEMBER(svi318_writemem2);
+	DECLARE_WRITE8_MEMBER(svi318_writemem3);
+	DECLARE_WRITE8_MEMBER(svi318_writemem4);
+	DECLARE_READ8_MEMBER(svi318_io_ext_r);
+	DECLARE_WRITE8_MEMBER(svi318_io_ext_w);
 };
 
 
@@ -74,17 +87,8 @@ DEVICE_START( svi318_cart );
 DEVICE_IMAGE_LOAD( svi318_cart );
 DEVICE_IMAGE_UNLOAD( svi318_cart );
 
-WRITE8_HANDLER( svi318_writemem1 );
-WRITE8_HANDLER( svi318_writemem2 );
-WRITE8_HANDLER( svi318_writemem3 );
-WRITE8_HANDLER( svi318_writemem4 );
 
-READ8_HANDLER( svi318_io_ext_r );
-WRITE8_HANDLER( svi318_io_ext_w );
 
-WRITE8_HANDLER( svi318_ppi_w );
-WRITE8_HANDLER( svi318_psg_port_b_w );
-READ8_HANDLER( svi318_psg_port_a_r );
 
 int svi318_cassette_present(running_machine &machine, int id);
 

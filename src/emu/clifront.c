@@ -189,7 +189,7 @@ int cli_frontend::execute(int argc, char **argv)
 										const char *interface = image->image_interface();
 										if (interface != NULL)
 										{
-											if (!strcmp(interface, swpart->interface_))
+											if (softlist_contain_interface(interface, swpart->interface_))
 											{
 												const char *option = m_options.value(image->brief_instance_name());
 												// mount only if not already mounted
@@ -1131,7 +1131,7 @@ void cli_frontend::output_single_softlist(FILE *out,software_list *list, const c
 
 				while( flist )
 				{
-					fprintf( out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist->name, flist->value );
+					fprintf( out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist->name, xml_normalize_string(flist->value) );
 					flist = flist->next;
 				}
 			}

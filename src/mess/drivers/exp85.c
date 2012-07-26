@@ -16,7 +16,6 @@
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -47,21 +46,21 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-static INPUT_CHANGED( trigger_reset )
+INPUT_CHANGED_MEMBER( exp85_state::trigger_reset )
 {
-	cputag_set_input_line(field.machine(), I8085A_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static INPUT_CHANGED( trigger_rst75 )
+INPUT_CHANGED_MEMBER( exp85_state::trigger_rst75 )
 {
-	cputag_set_input_line(field.machine(), I8085A_TAG, I8085_RST75_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(I8085_RST75_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( exp85 )
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("R") PORT_CODE(KEYCODE_F1) PORT_CHANGED(trigger_reset, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("I") PORT_CODE(KEYCODE_F2) PORT_CHANGED(trigger_rst75, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("R") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, exp85_state, trigger_reset, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("I") PORT_CODE(KEYCODE_F2) PORT_CHANGED_MEMBER(DEVICE_SELF, exp85_state, trigger_rst75, 0)
 INPUT_PORTS_END
 
 /* 8155 Interface */
@@ -185,9 +184,9 @@ void exp85_state::machine_start()
 	/* setup memory banking */
 	program->install_read_bank(0x0000, 0x07ff, "bank1");
 	program->unmap_write(0x0000, 0x07ff);
-	memory_configure_bank(machine(), "bank1", 0, 1, machine().region(I8085A_TAG)->base() + 0xf000, 0);
-	memory_configure_bank(machine(), "bank1", 1, 1, machine().region(I8085A_TAG)->base(), 0);
-	memory_set_bank(machine(), "bank1", 0);
+	membank("bank1")->configure_entry(0, memregion(I8085A_TAG)->base() + 0xf000);
+	membank("bank1")->configure_entry(1, memregion(I8085A_TAG)->base());
+	membank("bank1")->set_entry(0);
 }
 
 /* Machine Driver */

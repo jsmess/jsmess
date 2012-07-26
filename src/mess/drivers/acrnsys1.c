@@ -38,7 +38,6 @@ Example usage: Turn on. Press -. Mode letter will show 'A'. Type in an address
 Note that left-most digit is not wired up, and therefore will always be blank.
 
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
@@ -81,7 +80,7 @@ READ8_MEMBER( acrnsys1_state::ins8154_b1_port_a_r )
 		{
 			char kbdrow[6];
 			sprintf(kbdrow,"X%X",i);
-			data = (input_port_read(machine(), kbdrow) & 0x38) | m_digit;
+			data = (ioport(kbdrow)->read() & 0x38) | m_digit;
 			break;
 		}
 	}

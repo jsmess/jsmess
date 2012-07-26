@@ -43,9 +43,9 @@ void mystston_on_scanline_interrupt(running_machine &machine)
 }
 
 
-static WRITE8_HANDLER( irq_clear_w )
+WRITE8_MEMBER(mystston_state::irq_clear_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 
@@ -56,10 +56,10 @@ static WRITE8_HANDLER( irq_clear_w )
  *
  *************************************/
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(mystston_state::coin_inserted)
 {
 	/* coin insertion causes an NMI */
-	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -70,25 +70,24 @@ static INPUT_CHANGED( coin_inserted )
  *
  *************************************/
 
-static WRITE8_HANDLER( mystston_ay8910_select_w )
+WRITE8_MEMBER(mystston_state::mystston_ay8910_select_w)
 {
-	mystston_state *state = space->machine().driver_data<mystston_state>();
 
 	/* bit 5 goes to 8910 #0 BDIR pin */
-	if (((*state->m_ay8910_select & 0x20) == 0x20) && ((data & 0x20) == 0x00))
+	if (((*m_ay8910_select & 0x20) == 0x20) && ((data & 0x20) == 0x00))
 	{
 		/* bit 4 goes to the 8910 #0 BC1 pin */
-		ay8910_data_address_w(space->machine().device("ay1"), *state->m_ay8910_select >> 4, *state->m_ay8910_data);
+		ay8910_data_address_w(machine().device("ay1"), *m_ay8910_select >> 4, *m_ay8910_data);
 	}
 
 	/* bit 7 goes to 8910 #1 BDIR pin */
-	if (((*state->m_ay8910_select & 0x80) == 0x80) && ((data & 0x80) == 0x00))
+	if (((*m_ay8910_select & 0x80) == 0x80) && ((data & 0x80) == 0x00))
 	{
 		/* bit 6 goes to the 8910 #1 BC1 pin */
-		ay8910_data_address_w(space->machine().device("ay2"), *state->m_ay8910_select >> 6, *state->m_ay8910_data);
+		ay8910_data_address_w(machine().device("ay2"), *m_ay8910_select >> 6, *m_ay8910_data);
 	}
 
-	*state->m_ay8910_select = data;
+	*m_ay8910_select = data;
 }
 
 
@@ -99,19 +98,19 @@ static WRITE8_HANDLER( mystston_ay8910_select_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, mystston_state )
 	AM_RANGE(0x0000, 0x077f) AM_RAM
-	AM_RANGE(0x0780, 0x07df) AM_RAM AM_BASE_MEMBER(mystston_state, m_spriteram)
+	AM_RANGE(0x0780, 0x07df) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x07e0, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_BASE_MEMBER(mystston_state, m_fg_videoram)
-	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_BASE_MEMBER(mystston_state, m_bg_videoram)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x1f8f) AM_READ_PORT("IN0") AM_WRITE(mystston_video_control_w) AM_BASE_MEMBER(mystston_state, m_video_control)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("fg_videoram")
+	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("bg_videoram")
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x1f8f) AM_READ_PORT("IN0") AM_WRITE(mystston_video_control_w) AM_SHARE("video_control")
 	AM_RANGE(0x2010, 0x2010) AM_MIRROR(0x1f8f) AM_READ_PORT("IN1") AM_WRITE(irq_clear_w)
-	AM_RANGE(0x2020, 0x2020) AM_MIRROR(0x1f8f) AM_READ_PORT("DSW0") AM_WRITEONLY AM_BASE_MEMBER(mystston_state, m_scroll)
-	AM_RANGE(0x2030, 0x2030) AM_MIRROR(0x1f8f) AM_READ_PORT("DSW1") AM_WRITEONLY AM_BASE_MEMBER(mystston_state, m_ay8910_data)
-	AM_RANGE(0x2040, 0x2040) AM_MIRROR(0x1f8f) AM_READNOP AM_WRITE(mystston_ay8910_select_w) AM_BASE_MEMBER(mystston_state, m_ay8910_select)
+	AM_RANGE(0x2020, 0x2020) AM_MIRROR(0x1f8f) AM_READ_PORT("DSW0") AM_WRITEONLY AM_SHARE("scroll")
+	AM_RANGE(0x2030, 0x2030) AM_MIRROR(0x1f8f) AM_READ_PORT("DSW1") AM_WRITEONLY AM_SHARE("ay8910_data")
+	AM_RANGE(0x2040, 0x2040) AM_MIRROR(0x1f8f) AM_READNOP AM_WRITE(mystston_ay8910_select_w) AM_SHARE("ay8910_select")
 	AM_RANGE(0x2050, 0x2050) AM_MIRROR(0x1f8f) AM_NOP
-	AM_RANGE(0x2060, 0x207f) AM_MIRROR(0x1f80) AM_RAM AM_BASE_MEMBER(mystston_state, m_paletteram)
+	AM_RANGE(0x2060, 0x207f) AM_MIRROR(0x1f80) AM_RAM AM_SHARE("paletteram")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -131,8 +130,8 @@ static INPUT_PORTS_START( mystston )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, mystston_state,coin_inserted, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, mystston_state,coin_inserted, 0)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
@@ -178,7 +177,7 @@ static INPUT_PORTS_START( mystston )
 	PORT_DIPNAME(0x40, 0x00, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(   0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(   0x40, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 

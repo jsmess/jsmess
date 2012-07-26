@@ -3,7 +3,6 @@
 #ifndef __ETI660__
 #define __ETI660__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/cosmac/cosmac.h"

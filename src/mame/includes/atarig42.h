@@ -10,7 +10,8 @@ class atarig42_state : public atarigen_state
 {
 public:
 	atarig42_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag) { }
+		: atarigen_state(mconfig, type, tag),
+		  m_mo_command(*this, "mo_command") { }
 
 	UINT16			m_playfield_base;
 
@@ -21,7 +22,7 @@ public:
 	UINT16			m_playfield_yscroll;
 
 	UINT8			m_analog_data;
-	UINT16 *		m_mo_command;
+	required_shared_ptr<UINT16> m_mo_command;
 
 	int 			m_sloop_bank;
 	int 			m_sloop_next_bank;
@@ -31,6 +32,18 @@ public:
 
 	device_t *		m_rle;
 	UINT32			m_last_accesses[8];
+	DECLARE_READ16_MEMBER(special_port2_r);
+	DECLARE_WRITE16_MEMBER(a2d_select_w);
+	DECLARE_READ16_MEMBER(a2d_data_r);
+	DECLARE_WRITE16_MEMBER(io_latch_w);
+	DECLARE_WRITE16_MEMBER(mo_command_w);
+	DECLARE_READ16_MEMBER(roadriot_sloop_data_r);
+	DECLARE_WRITE16_MEMBER(roadriot_sloop_data_w);
+	DECLARE_READ16_MEMBER(guardians_sloop_data_r);
+	DECLARE_WRITE16_MEMBER(guardians_sloop_data_w);
+	void roadriot_sloop_tweak(int offset);
+	void guardians_sloop_tweak(int offset);
+	DECLARE_DIRECT_UPDATE_MEMBER(atarig42_sloop_direct_handler);
 };
 
 

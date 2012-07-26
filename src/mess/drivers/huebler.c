@@ -18,7 +18,6 @@
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -35,7 +34,7 @@ void amu880_state::scan_keyboard()
 {
 	static const char *const keynames[] = { "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12", "Y13", "Y14", "Y15" };
 
-	UINT8 data = input_port_read(machine(), keynames[m_key_a8 ? m_key_d6 : m_key_d7]);
+	UINT8 data = ioport(keynames[m_key_a8 ? m_key_d6 : m_key_d7])->read();
 
 	int a8 = (data & 0x0f) == 0x0f;
 
@@ -79,7 +78,7 @@ READ8_MEMBER( amu880_state::keyboard_r )
 
     */
 
-	UINT8 special = input_port_read(machine(), "SPECIAL");
+	UINT8 special = ioport("SPECIAL")->read();
 
 	int ctrl = BIT(special, 0);
 	int shift = BIT(special, 2) & BIT(special, 1);
@@ -95,7 +94,7 @@ READ8_MEMBER( amu880_state::keyboard_r )
 static ADDRESS_MAP_START( amu880_mem, AS_PROGRAM, 8, amu880_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xf000, 0xfbff) AM_ROM
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -223,7 +222,7 @@ INPUT_PORTS_END
 void amu880_state::video_start()
 {
 	// find memory regions
-	m_char_rom = machine().region("chargen")->base();
+	m_char_rom = memregion("chargen")->base();
 }
 
 UINT32 amu880_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -351,7 +350,7 @@ static const z80_daisy_config amu880_daisy_chain[] =
 void amu880_state::machine_start()
 {
 	/* find memory regions */
-	m_kb_rom = machine().region("keyboard")->base();
+	m_kb_rom = memregion("keyboard")->base();
 
 	/* register for state saving */
 	save_item(NAME(m_key_d6));

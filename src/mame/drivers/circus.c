@@ -50,19 +50,19 @@ D000      Paddle Position and Interrupt Reset (where applicable)
 #include "crash.lh"
 
 
-static READ8_HANDLER( circus_paddle_r )
+READ8_MEMBER(circus_state::circus_paddle_r)
 {
 	// also clears irq
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
-	return input_port_read(space->machine(), "PADDLE");
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
+	return ioport("PADDLE")->read();
 }
 
-static ADDRESS_MAP_START( circus_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( circus_map, AS_PROGRAM, 8, circus_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(circus_clown_x_w)
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(circus_clown_y_w)
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(circus_videoram_w) AM_BASE_MEMBER(circus_state, m_videoram)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(circus_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0x8000) AM_RAM_WRITE(circus_clown_z_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW")
@@ -96,7 +96,7 @@ static INPUT_PORTS_START( circus )
 	PORT_DIPSETTING(	0x00, "Single Line" )
 	PORT_DIPSETTING(	0x20, "Super Bonus" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "14A:1" ) /* Not mentioned in the manual */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 115, IPT_PADDLE ) PORT_MINMAX(64,167) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
@@ -130,7 +130,7 @@ static INPUT_PORTS_START( robotbwl )
 	PORT_DIPSETTING(	0x20, "5 seconds" )
 	PORT_DIPSETTING(	0x40, "7 seconds" )
 	PORT_DIPSETTING(	0x60, "9 seconds" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -164,7 +164,7 @@ static INPUT_PORTS_START( crash )
 	PORT_DIPSETTING(	0x10, "Credit Awarded" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "14A:2" ) /* Not mentioned in the manual */
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "14A:1" ) /* Not mentioned in the manual */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -204,7 +204,7 @@ static INPUT_PORTS_START( ripcord )
 	PORT_DIPSETTING(	0x00, "No Award" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "14A:2" ) /* Not mentioned in the manual */
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "14A:1" ) /* Not mentioned in the manual */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 115, IPT_PADDLE ) PORT_MINMAX(64,167) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE
@@ -457,7 +457,7 @@ ROM_START( circus )
 	ROM_LOAD( "9012.14d",	0x0000, 0x0200, CRC(2fde3930) SHA1(a21e2d342f16a39a07edf4bea8d698a52216ecba) )
 ROM_END
 
-ROM_START( circusse )
+ROM_START( springbd )
 	ROM_REGION( 0x10000, "maincpu", 0 ) // code
 	ROM_LOAD( "93448.1a",	0x1000, 0x0200, CRC(44d65ccd) SHA1(0eb2515444486a4656a4accec555501e75b39a74) )
 	ROM_LOAD( "93448.2a",	0x1200, 0x0200, CRC(b8acdbc5) SHA1(634bb11089f7a57a316b6829954cc4da4523f267) )
@@ -591,7 +591,7 @@ static DRIVER_INIT( ripcord )
 
 
 GAMEL(1977, circus,   0,      circus,   circus,   circus,   ROT0, "Exidy / Taito", "Circus / Acrobat TV", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_circus )
-GAMEL(1977, circusse, circus, circus,   circus,   circus,   ROT0, "bootleg (Sub-Electro)", "Circus (Sub-Electro bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_circus ) // looks like a text hack, but we've seen 2 identical copies so it's worth supporting
+GAMEL(1977, springbd, circus, circus,   circus,   circus,   ROT0, "bootleg (Sub-Electro)", "Springboard (bootleg of Circus)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_circus ) // looks like a text hack, but we've seen 2 identical copies so it's worth supporting
 GAME( 1977, robotbwl, 0,      robotbwl, robotbwl, robotbwl, ROT0, "Exidy", "Robot Bowl", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAMEL(1979, crash,    0,      crash,    crash,    crash,    ROT0, "Exidy", "Crash", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_crash )
 GAMEL(1979, smash,    crash,  crash,    crash,    crash,    ROT0, "bootleg", "Smash (Crash bootleg)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND, layout_crash ) // looks like a text hack, but it also had a different bezel

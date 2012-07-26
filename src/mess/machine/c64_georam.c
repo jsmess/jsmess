@@ -41,7 +41,7 @@ c64_georam_cartridge_device::c64_georam_cartridge_device(const machine_config &m
 void c64_georam_cartridge_device::device_start()
 {
 	// allocate memory
-	m_ram = auto_alloc_array(machine(), UINT8, 0x80000);
+	c64_ram_pointer(machine(), 0x80000);
 
 	// state saving
 	save_item(NAME(m_bank));
@@ -62,7 +62,7 @@ void c64_georam_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_georam_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
+UINT8 c64_georam_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
 
@@ -80,7 +80,7 @@ UINT8 c64_georam_cartridge_device::c64_cd_r(address_space &space, offs_t offset,
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_georam_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)
+void c64_georam_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{

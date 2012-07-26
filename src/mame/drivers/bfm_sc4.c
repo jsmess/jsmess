@@ -4,109 +4,238 @@
 
     Skeleton Driver
 
-    THIS DRIVER IS NONE FUNCTIONAL, THERE IS NO EMULATION CODE.
+    THIS DRIVER IS NOT WORKING
 
     -----------------
 
-    what's the difference between this and Scorpion 5? Later revisons of many games appear
-    to be on the latter.
-
-    Scorpion 4:::
-
-    Main CPU is a MC68307FG16, present on Motherboard
-
-    Configuration is SC4 motherboard + game card
-
-    The game card contains the program roms, sound rom and YMZ280B
-
-    Adder 4 video board adds an additional card with a MC68340PV25E (25.175Mhz)
-
-    -------------------------------
-
-    This is currently a mess of Scorpion 4, Scorpion 5 and Scorpion 5 Adder 5 games.
-    I think some games might use multiple boards of different techs linked up via
-    serial ports, but I'm not sure
-
-    THIS NEEDS SORTING OUT, TIDYING UP and PROPERLY DOCUMENTING
-
-    Sorting Tips:
-    Scorpion 5 sets seem to have SC5 as the first bytes (when interleaved)
-    Larger roms seem to be Adder 5 (and also have SC5 at the start)
-
-    Other roms are SC4? Some games are on both platforms - check..
-    even within many 'SC5' sets there are roms without SC5 in the header
-    these are either SC4 versions, or maybe some additional HW? - check...
-
-    SC5 stuff seems to use opcodes which don't exist in the 68020, are these
-    68340 based, or something else with additional opcodes (coldfire?)
+    This file contains the set lists only, for the actual hardware
+    emulation see bfm_sc4h.c
 
 
-    -------------------------------
+    note: default Jackpot keys are set to whatever value the game
+          mentions it should be using with none present, many
+          games accept multiple keys
+
 */
 
-#define ADDRESS_MAP_MODERN
-
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 #include "includes/bfm_sc45.h"
 
 
-class sc4_state : public driver_device
+bool compare_mbus(UINT16* rom)
 {
-public:
-	sc4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
-	{ }
+	for (int i=0;i<11;i++)
+	{
+		if (rom[0] != 0xb109)
+			return false;
 
-protected:
+		if (rom[3] != 0x6612)
+			return false;
 
-	// devices
-	required_device<cpu_device> m_maincpu;
+		if (rom[7] != 0x0c81)
+			return false;
+
+		if (rom[10] != 0x66ea)
+			return false;
+	}
+
+	return true;
+}
+
+void find_mbus(sc4_state *state, UINT16* rom)
+{
+	for (int i=0;i<(0x100000-0x40)/2;i++)
+	{
+		bool found = compare_mbus(&rom[i]);
+
+		if (found==true)
+		{
+			printf("x found at %08x\n", i*2);
+			state->m_chk41addr = i*2;
+		}
+	}
+}
+
+
+// addrxor used for endianness stuff, mode used for when we have a missing pair half
+int find_project_string(running_machine &machine, int addrxor, int mode)
+{
+	// search for the title
+	const int strlength = 14;
+	char title_string[] = "PROJECT NUMBER";
+	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
+	int size = machine.root_device().memregion( "maincpu" )->bytes();
+
+	int search_start = 0;
+	int search_step = 1;
+
+	if (mode==1)
+	{
+		search_start = 0;
+		search_step = 2;
+	}
+
+	if (mode==2)
+	{
+		search_start = 1;
+		search_step = 2;
+	}
+
+	for (int i=0;i<size-strlength;i++)
+	{
+	//  printf("%02x", src[i]);
+
+		int j;
+		int found = 1;
+		for (j=search_start;j<strlength;j+=search_step)
+		{
+			UINT8 rom = src[(i+j)^addrxor];
+			UINT8 chr = title_string[j];
+
+			if (rom != chr)
+			{
+				found = 0;
+				break;
+			}
+		}
+
+		if (found!=0)
+		{
+
+			int end=0;
+			int count = 0;
+			int blankcount = 0;
+			printf("ID String @ %08x\n", i);
+
+			if (mode==2)
+			{
+				count = -1;
+			}
+
+			while (!end)
+			{
+				UINT8 rom;
+				int addr;
+				if (mode==0)
+				{
+					addr = (i+count)^addrxor;
+					rom = src[addr];
+				}
+				else if (mode == 1)
+				{
+					addr = (i+count)^addrxor;
+
+					if (addr&1)
+						rom = src[addr];
+					else
+						rom = '_';
+				}
+				else
+				{
+					addr = (i+count)^addrxor;
+
+					if (addr&1)
+						rom = '_';
+					else
+						rom = src[addr];
+				}
+
+
+				//if (rom==0xff)
+				//  end = 1;
+				//else
+				{
+					if ((rom>=0x20) && (rom<0x7f))
+					{
+						printf("%c", rom);
+						blankcount = 0;
+					}
+					else
+					{
+						blankcount++;
+						if (blankcount<10) printf(" ");
+					}
+				}
+
+				count++;
+
+				if (count>=0x100)
+					end = 1;
+			}
+			printf("\n");
+
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+/* default reels */
+const stepper_interface* default_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
 };
 
-class sc4_adder4_state : public sc4_state
-{
-public:
-	sc4_adder4_state(const machine_config &mconfig, device_type type, const char *tag)
-		: sc4_state(mconfig, type, tag),
-		  m_adder4cpu(*this, "adder4")
-	{ }
-
-protected:
-
-	// devices
-	required_device<cpu_device> m_adder4cpu;
-};
-
-
-static ADDRESS_MAP_START( sc4_map, AS_PROGRAM, 16, sc4_state )
-	AM_RANGE(0x0000000, 0x2fffff) AM_ROM
-	AM_RANGE(0x0000000, 0x80ffff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sc4_adder4_map, AS_PROGRAM, 32, sc4_adder4_state )
-	AM_RANGE(0x000000, 0x2fffff) AM_ROM
-ADDRESS_MAP_END
-
-
-
-static INPUT_PORTS_START(  sc4 )
+/* default inputs */
+INPUT_PORTS_START( sc4 )
+	PORT_INCLUDE ( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x00, "Jackpot Key" )
+	SC4_JACKPOT_KEY_SETTINGS
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( sc4, sc4_state )
-	MCFG_CPU_ADD("maincpu", M68307, 16000000)	 // 68307! (EC000 core)
-	MCFG_CPU_PROGRAM_MAP(sc4_map)
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	/* unknown sound */
-MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED_CLASS( sc4_adder4, sc4, sc4_adder4_state )
-	MCFG_CPU_ADD("adder4", M68340, 25175000)	 // 68340 (CPU32 core)
-	MCFG_CPU_PROGRAM_MAP(sc4_adder4_map)
-MACHINE_CONFIG_END
+DRIVER_INIT( sc4 )
+{
+	UINT8 *src = machine.root_device().memregion( "maincpu" )->base();
+	// SC4 identification sequence 0x80 0x00 0xf0 0x7d
+	if (((src[0] == 0x80) && (src[2] == 0xf0)) || ((src[1] == 0x00) && (src[3] == 0x7d)))
+	{
+		printf("Confirmed SC4 ROM\n");
+	}
+	else
+	{
+		printf("NOT AN SC4 ROM!!!!!\n");
+	}
+
+	// there is usually a string in the rom with identification info, often also saying which sound rom should be used!
+	// find it.
+
+	int found = find_project_string(machine, 1, 0);
+	if (!found)
+		printf("Normal rom pair string not found, checking mismatched / missing rom string\n");
+
+	// help identify roms where one of the pair is missing too
+	if (!found)
+	{
+		 found = find_project_string(machine, 1, 1);
+		 found = find_project_string(machine, 1, 2);
+	}
+
+	if (!found)
+		printf("No suitable string found\n");
+
+
+	sc4_state *state = machine.driver_data<sc4_state>();
+
+	state->m_reel_setup = default_reel_configs;
+
+}
+
+DRIVER_INIT( sc4mbus )
+{
+	DRIVER_INIT_CALL( sc4 );
+	sc4_state *state = machine.driver_data<sc4_state>();
+	UINT16 *rom = (UINT16 *)state->memregion("maincpu")->base();
+	find_mbus(state, rom);
+}
 
 
 ROM_START( sc4tst )
@@ -1463,7 +1592,7 @@ ROM_START( sc4cburn )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "96000038.lo", 0x00001, 0x080000, CRC(e311ce43) SHA1(c9395c886d76a8aabe35a874f10489cdc02bbd35) )
 	ROM_LOAD16_BYTE( "96000039.hi", 0x00000, 0x080000, CRC(0f3815a9) SHA1(7b30e5f246a953c864a074981718f9540ba22daf) )
-	sc_cburn_others
+	sc_hotpr_others
 ROM_END
 
 
@@ -1471,7 +1600,7 @@ ROM_START( sc4cburna )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "96000040.odd", 0x00001, 0x080000, CRC(da99424b) SHA1(3c74bf35f64a3bc7d301f53a4307c8c4c73059c9) )
 	ROM_LOAD16_BYTE( "96000041.evn", 0x00000, 0x080000, CRC(49c6d054) SHA1(88985743f6e56f5c9557a75bb8e0861659d5be28) )
-	sc_cburn_others
+	sc_hotpr_others
 ROM_END
 
 
@@ -2237,7 +2366,7 @@ ROM_START( sc4cashg )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95408508.lo", 0x00001, 0x080000, CRC(6d96beb0) SHA1(da274c53fce937e01a095693003ecb67379a7980) )
 	ROM_LOAD16_BYTE( "95408509.hi", 0x00000, 0x080000, CRC(084450b4) SHA1(553b2a10e36b0c1f26b0c05c4d2b218f4c5b24b1) )
-	sc_cashm_others
+	sc_cashm_german_others
 ROM_END
 
 
@@ -2328,7 +2457,35 @@ ROM_START( sc4cckeyk )
 	sc_cckey_others
 ROM_END
 
+ROM_START( sc4cckeyl )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412918.lo", 0x00001, 0x080000, CRC(b268d275) SHA1(70b31512c0d8c8e0bf644fa1d5ea723c35c2a629) )
+    ROM_LOAD16_BYTE( "95412919.hi", 0x00000, 0x080000, CRC(d96df890) SHA1(65f8d2b4840efd5c3fe65b00ecbf2df7ac81cbe6) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
 
+
+ROM_START( sc4cckeym )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412920.lo", 0x00001, 0x080000, CRC(e047005e) SHA1(b3de1d863cda1945e1207b3df51a8b5172e65bb8) )
+    ROM_LOAD16_BYTE( "95412921.hi", 0x00000, 0x080000, CRC(7b903100) SHA1(1df4a5ded5cc195ee020f302870eb8bf4c8a14d3) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+
+ROM_START( sc4cckeyn )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413918.lo", 0x00001, 0x080000, CRC(9062cdaa) SHA1(b8249ca6590aef5041315f1dbbdc019ffb5e8ac2) )
+    ROM_LOAD16_BYTE( "95413919.hi", 0x00000, 0x080000, CRC(de714343) SHA1(95f605d91e43c3bcd2a2799ecf385f1e75cc5413) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cckeyo )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413920.lo", 0x00001, 0x080000, CRC(deae622a) SHA1(7f8f7b93c734278d24f69fd4a491b3d4133d8b1d) )
+    ROM_LOAD16_BYTE( "95413921.hi", 0x00000, 0x080000, CRC(92671c85) SHA1(4444e3a54393f8fb824eeebfed8f2cbaf07e83ea) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
 
 
 ROM_START( sc4ckx )
@@ -2981,7 +3138,19 @@ ROM_START( sc4crcph )
 	sc_crcp_others
 ROM_END
 
+ROM_START( sc4crcpi )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95426474.lo", 0x00001, 0x080000, CRC(aa0a4d1d) SHA1(20ad278517287b3cbcd9f8275814635ea3ecb766) )
+    ROM_LOAD16_BYTE( "95426475.hi", 0x00000, 0x080000, CRC(ec216472) SHA1(19c4806834348d68e5d80234cd14ecde9cf8112c) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
 
+ROM_START( sc4crcpj )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95427474.lo", 0x00001, 0x080000, CRC(e73365df) SHA1(6d8d918368350da76eec60b71c0dab6de7b970c7) )
+    ROM_LOAD16_BYTE( "95427475.hi", 0x00000, 0x080000, CRC(58fd6031) SHA1(beef4a6fd5e0d7bc68e9628073c0ce0035bd9168) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
 
 
 ROM_START( sc4crgc )
@@ -3393,9 +3562,42 @@ ROM_START( sc4cclimp )
 	sc_cclim_others
 ROM_END
 
+ROM_START( sc4cclimq )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412772.lo", 0x00001, 0x080000, CRC(905a1d80) SHA1(04aee5ffb26a3f8c6def2f725f08ca1d8e6b61fd) )
+    ROM_LOAD16_BYTE( "95412773.hi", 0x00000, 0x080000, CRC(4aa622ee) SHA1(e999a9ae0e8ef2eb73a9115cd7bf7a8e3904a40b) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cclimr )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412777.hi", 0x00000, 0x080000, CRC(e0e74ca2) SHA1(797fda3a4634bdd3f8ab0b31f7b880c8dbf23904) )
+    ROM_LOAD16_BYTE( "95412776.lo", 0x00001, 0x080000, CRC(4aac0ecd) SHA1(192cce8dfc93f44063134bae948d29d10528b83e) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cclims )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412780.lo", 0x00001, 0x080000, CRC(978b1de6) SHA1(e601fbcb188a170f82b9e1092328cb5aea41b899) )
+    ROM_LOAD16_BYTE( "95412781.hi", 0x00000, 0x080000, CRC(7b241139) SHA1(62bbf20c3ad5ac251a0e0e017ca0b380ebf671b9) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cclimt )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413772.lo", 0x00001, 0x080000, CRC(3edcdd60) SHA1(40e30b4aba9fc05c781fba6a9d2089dcf1962a76) )
+    ROM_LOAD16_BYTE( "95413773.hi", 0x00000, 0x080000, CRC(6da80d25) SHA1(3467e24b60e0f6a7ae07555fc54a8a5bc3f25fed) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
 
 
 
+ROM_START( sc4cclimu )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413776.lo", 0x00001, 0x080000, CRC(4d339ce0) SHA1(f3152fbd69d277dd0e32179ab4f0c0b7148faa0b) )
+    ROM_LOAD16_BYTE( "95413777.hi", 0x00000, 0x080000, CRC(5875fc90) SHA1(996df61833df07f512c1039563917d40e6788f87) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
 
 ROM_START( sc4cfqps )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -3449,7 +3651,7 @@ ROM_END
 ROM_START( sc4cfqpsg )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95420324.lo", 0x00001, 0x080000, CRC(14f2328e) SHA1(95a05b37e21ce3c729f2000baeb1308008ad13c2) )
-	ROM_LOAD16_BYTE( "95420325.hi", 0x00000, 0x080000, NO_DUMP ) // 95420325.hi missing (but we have a combined 95420324.bin???, check it)
+	ROM_LOAD16_BYTE( "95420325.hi", 0x00000, 0x080000, CRC(4759bfec) SHA1(0fabe8b9005d05ca7466446719b834120ee3ab9a) )
 	sc_cfqps_others
 ROM_END
 
@@ -3490,6 +3692,137 @@ ROM_START( sc4cfcas )
 	ROM_LOAD16_BYTE( "95406711.hi", 0x00000, 0x080000, CRC(e18c86fa) SHA1(fdff43a1b07e2c0ac99a0a35e547ef1839c87778) )
 	sc_cfcla_others
 ROM_END
+
+
+ROM_START( sc4cfcasa )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95410450.lo", 0x00001, 0x080000, CRC(fc8a8427) SHA1(63bd12570a4f9d0a29e7e05a833976697db68e15) )
+    ROM_LOAD16_BYTE( "95410451.hi", 0x00000, 0x080000, CRC(99e8270f) SHA1(4529aecc88afc4739ddd5fd072241d577c455a8f) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cfcasb )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95410453.hi", 0x00000, 0x080000, CRC(83ceb620) SHA1(a47f4972ef26593e0b9ce13ea4b3f1dc439925f5) )
+    ROM_LOAD16_BYTE( "95410452.lo", 0x00001, 0x080000, CRC(59a7f7cd) SHA1(1a40c341f4797e7ec8441f31bc83a59f37eba8fa) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cfcasc )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95410530.lo", 0x00001, 0x080000, CRC(0559f269) SHA1(7c9766294f64f35e337796a24955d916231ed89d) )
+    ROM_LOAD16_BYTE( "95410531.hi", 0x00000, 0x080000, CRC(5f204ab2) SHA1(b4ba89d8d90175c68eac5346f51dd59465415d69) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cfcasd )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95410532.lo", 0x00001, 0x080000, CRC(022b90e3) SHA1(dd8823b75a90896ee843139b696ee5e73f299a87) )
+    ROM_LOAD16_BYTE( "95410533.hi", 0x00000, 0x080000, CRC(af410ed5) SHA1(38bbd77789c9db49861dbf72cd23443ad5cfedfb) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cfcase )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95411450.lo", 0x00001, 0x080000, CRC(11cef6cf) SHA1(5364455b3ea34a11844b3b42c1a45a15c2bf126c) )
+    ROM_LOAD16_BYTE( "95411451.hi", 0x00000, 0x080000, CRC(f6d4c9e3) SHA1(5011b066375c7faa408ffbd1965c3b5d46836a72) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cfcasf )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95411452.lo", 0x00001, 0x080000, CRC(9bd4d90f) SHA1(3a0c3e66a937ecf6d92cd2937a8d942cc40cf436) )
+    ROM_LOAD16_BYTE( "95411453.hi", 0x00000, 0x080000, CRC(d2c3aa4a) SHA1(a23c425f2df44525a4d1d95bdfd7ce4985f6a475) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cfcasg )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95411530.lo", 0x00001, 0x080000, CRC(3543eb62) SHA1(d0b7afb5e731fbfd12109ba090037d98c69b8a26) )
+    ROM_LOAD16_BYTE( "95411531.hi", 0x00000, 0x080000, CRC(3c7955db) SHA1(41e92ed095c81e2f635d1a939c26bbe160eae756) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cfcash )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95411532.lo", 0x00001, 0x080000, CRC(525652ce) SHA1(da5a87c2ac2c2387f267837ceaaf6fbb42019036) )
+    ROM_LOAD16_BYTE( "95411533.hi", 0x00000, 0x080000, CRC(2834b509) SHA1(e50e94bda43814268d95cddb42a586bdf73b5efb) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cfcasi )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412738.lo", 0x00001, 0x080000, CRC(3d4acd70) SHA1(3c8396c51b584bf651f7da99fba055ba39d22af9) )
+    ROM_LOAD16_BYTE( "95412739.hi", 0x00000, 0x080000, CRC(4d66828e) SHA1(456bd9038fb329c821eb4fd6d19fd41cc6d1ac93) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cfcasj )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412740.lo", 0x00001, 0x080000, CRC(0840e5f9) SHA1(b5dfb30eb91e9f1133fd7ac58ff00186602fc64d) )
+    ROM_LOAD16_BYTE( "95412741.hi", 0x00000, 0x080000, CRC(23a85755) SHA1(5ed609ae4ac78294a11fbccd0a024513f97c7d72) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cfcask )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412754.lo", 0x00001, 0x080000, CRC(9a98fa55) SHA1(5db2401b1bf5904dffc771b54676e87c8eb279a7) )
+    ROM_LOAD16_BYTE( "95412755.hi", 0x00000, 0x080000, CRC(9495327b) SHA1(91571feb8d7718bee50ac29f29ef79628f9119cc) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cfcasl )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412764.lo", 0x00001, 0x080000, CRC(46e535cc) SHA1(016232c6b235338f3affe913df08e13889d85f8d) )
+    ROM_LOAD16_BYTE( "95412765.hi", 0x00000, 0x080000, CRC(e907ee58) SHA1(9e9988b3c1f8fb4188a8e48338ece87a23181b87) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cfcasm )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412766.lo", 0x00001, 0x080000, CRC(32339b1f) SHA1(5cdcf2e88bf887d7acc0a33b27ed722d5cba0dfd) )
+    ROM_LOAD16_BYTE( "95412767.hi", 0x00000, 0x080000, CRC(8f43e454) SHA1(c4fd0f210fc7074d435362162306b574d8a63d14) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+
+
+ROM_START( sc4cfcasn )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413738.lo", 0x00001, 0x080000, CRC(1367c7a9) SHA1(5089435b654173d3005d583fa530eda9a192937d) )
+    ROM_LOAD16_BYTE( "95413739.hi", 0x00000, 0x080000, CRC(eb8885e8) SHA1(0cc3d06956bfba56a1ed7315fe4fe3617d484b8f) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+
+ROM_START( sc4cfcaso )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413740.lo", 0x00001, 0x080000, CRC(5a6465d1) SHA1(9981d9cf86514617a8aa3cb6730e0543b929399e) )
+    ROM_LOAD16_BYTE( "95413741.hi", 0x00000, 0x080000, CRC(7655f0d1) SHA1(9d64022d5ea8407eaa5a1d94dede93744845c83a) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cfcasp )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413754.lo", 0x00001, 0x080000, CRC(17404e08) SHA1(d90399b069328200ff76663062dba12f3394e842) )
+    ROM_LOAD16_BYTE( "95413755.hi", 0x00000, 0x080000, CRC(861fb2d1) SHA1(2e4555e8754dbb758819dfa9c1a2e3eb09eacf5f) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cfcasq )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413762.lo", 0x00001, 0x080000, CRC(f1e94a7f) SHA1(1c8e0579b61d558ee862b948df3c08812b61b3eb) )
+    ROM_LOAD16_BYTE( "95413763.hi", 0x00000, 0x080000, CRC(ec7006df) SHA1(164d2078b5a626c0a7d3aa176bc9ab5570e628c1) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4cfcasr )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413764.lo", 0x00001, 0x080000, CRC(0f652c25) SHA1(cf240682e214f1eaead7010d32a6056d8965a654) )
+    ROM_LOAD16_BYTE( "95413765.hi", 0x00000, 0x080000, CRC(3fc85422) SHA1(6f14fb68c327b52495386680d1de46006f1e4841) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
 
 ROM_START( sc4cfcla )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -4016,7 +4349,35 @@ ROM_START( sc4crzkys )
 	sc_crzky_others
 ROM_END
 
+ROM_START( sc4crzkyt )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412768.lo", 0x00001, 0x080000, CRC(8c0e64b9) SHA1(e67d84d384d4c5bb43c45768d538048fc456b90f) )
+    ROM_LOAD16_BYTE( "95412769.hi", 0x00000, 0x080000, CRC(e474d8fb) SHA1(55457253310084b51a7f0b3ad55cd56699505e66) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
 
+ROM_START( sc4crzkyu )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412770.lo", 0x00001, 0x080000, CRC(3d588dea) SHA1(0ccb0f2e4997340602ac095b94eb796a289e1125) )
+    ROM_LOAD16_BYTE( "95412771.hi", 0x00000, 0x080000, CRC(38deb018) SHA1(5ee9403b969dcccbc7387071923eb3bc4fab8c86) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4crzkyv )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413394.lo", 0x00001, 0x080000, CRC(482b8cd6) SHA1(aca9f1ac29d8323b215ed6b62621e357d03e6b60) )
+    ROM_LOAD16_BYTE( "95413395.hi", 0x00000, 0x080000, CRC(fecb656d) SHA1(99f52e5c61e71f032e579bc2bc08f415350459f8) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+
+
+ROM_START( sc4crzkyw )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413396.lo", 0x00001, 0x080000, CRC(02cc445f) SHA1(2ca7589b403e2308d11de81400c4bd5811a3d1c1) )
+    ROM_LOAD16_BYTE( "95413397.hi", 0x00000, 0x080000, CRC(88774042) SHA1(3c75da111da7bdbf68bcbc08fc6db26122b04b0b) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
 
 
 ROM_START( sc4crzwl )
@@ -4588,34 +4949,6 @@ ROM_START( sc4easye )
 	sc_easy_others
 ROM_END
 
-ROM_START( sc4eascs )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95406688.lo", 0x00001, 0x080000, CRC(ce13282c) SHA1(2e778af1de70d3e5d11df54ff85fc50645d85f08) )
-	ROM_LOAD16_BYTE( "95406689.hi", 0x00000, 0x080000, CRC(a05771f9) SHA1(7c234c49ad2d74ba150cc73da4adbfe733c5b224) )
-	sc_easy_others
-ROM_END
-
-ROM_START( sc4eascsa )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95406690.lo", 0x00001, 0x080000, CRC(d72a4e94) SHA1(ef7ad4e2662b68679b84eb9418c1e9fb7c84e29c) )
-	ROM_LOAD16_BYTE( "95406691.hi", 0x00000, 0x080000, CRC(9ecd06c6) SHA1(83ef6bbd7a0c84b3e8c40217aa86d9c14b4521a5) )
-	sc_easy_others
-ROM_END
-
-ROM_START( sc4eascsb )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95406884.lo", 0x00001, 0x080000, CRC(c17c9f70) SHA1(20c68c07be855e2f7aff1154072ad60140987c5a) )
-	ROM_LOAD16_BYTE( "95406885.hi", 0x00000, 0x080000, CRC(26702794) SHA1(06bcad6234be52f812b4fa3468adca13b16afbe4) )
-	sc_easy_others
-ROM_END
-
-ROM_START( sc4eascsc )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95406886.lo", 0x00001, 0x080000, CRC(37e0a39a) SHA1(5430af8a09719883a16e88e3c63dfe4f67f7c231) )
-	ROM_LOAD16_BYTE( "95406887.hi", 0x00000, 0x080000, CRC(8e11985d) SHA1(7122d1fdf48953adee04d915f61be4e87d80cd26) )
-	sc_easy_others
-ROM_END
-
 ROM_START( sc4easyf )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95407026.lo", 0x00001, 0x080000, CRC(3c207a4f) SHA1(9c8c100765b84ed50c2faa81b26efa8e639ef994) )
@@ -4623,60 +4956,90 @@ ROM_START( sc4easyf )
 	sc_easy_others
 ROM_END
 
+
+ROM_START( sc4eascs )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95406688.lo", 0x00001, 0x080000, CRC(ce13282c) SHA1(2e778af1de70d3e5d11df54ff85fc50645d85f08) )
+	ROM_LOAD16_BYTE( "95406689.hi", 0x00000, 0x080000, CRC(a05771f9) SHA1(7c234c49ad2d74ba150cc73da4adbfe733c5b224) )
+	PR1326_CAS_EASY_STREAK_SOUNDS11
+ROM_END
+
+ROM_START( sc4eascsa )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95406690.lo", 0x00001, 0x080000, CRC(d72a4e94) SHA1(ef7ad4e2662b68679b84eb9418c1e9fb7c84e29c) )
+	ROM_LOAD16_BYTE( "95406691.hi", 0x00000, 0x080000, CRC(9ecd06c6) SHA1(83ef6bbd7a0c84b3e8c40217aa86d9c14b4521a5) )
+	PR1326_CAS_EASY_STREAK_SOUNDS11
+ROM_END
+
+ROM_START( sc4eascsb )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95406884.lo", 0x00001, 0x080000, CRC(c17c9f70) SHA1(20c68c07be855e2f7aff1154072ad60140987c5a) )
+	ROM_LOAD16_BYTE( "95406885.hi", 0x00000, 0x080000, CRC(26702794) SHA1(06bcad6234be52f812b4fa3468adca13b16afbe4) )
+	PR1326_CAS_EASY_STREAK_SOUNDS11
+ROM_END
+
+ROM_START( sc4eascsc )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95406886.lo", 0x00001, 0x080000, CRC(37e0a39a) SHA1(5430af8a09719883a16e88e3c63dfe4f67f7c231) )
+	ROM_LOAD16_BYTE( "95406887.hi", 0x00000, 0x080000, CRC(8e11985d) SHA1(7122d1fdf48953adee04d915f61be4e87d80cd26) )
+	PR1326_CAS_EASY_STREAK_SOUNDS11
+ROM_END
+
+
 ROM_START( sc4eascsd )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95407688.lo", 0x00001, 0x080000, CRC(802b17b9) SHA1(ee56083fdb1d45c27095c7561690d1a39154c0e6) )
 	ROM_LOAD16_BYTE( "95407689.hi", 0x00000, 0x080000, CRC(713a971c) SHA1(05cd1f6feec4c5296fe9da82a860d56117939cdb) )
-	sc_easy_others
+	PR1326_CAS_EASY_STREAK_SOUNDS11
 ROM_END
 
 ROM_START( sc4eascse )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95407690.lo", 0x00001, 0x080000, CRC(37218f3f) SHA1(3fe41a27f60b621f4d39eb8c9cc27a56481227b5) )
 	ROM_LOAD16_BYTE( "95407691.hi", 0x00000, 0x080000, CRC(1986504b) SHA1(126fc4486bcd2931849b2b51c694bb54403d7a8e) )
-	sc_easy_others
+	PR1326_CAS_EASY_STREAK_SOUNDS11
 ROM_END
 
 ROM_START( sc4eascsf )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95407884.lo", 0x00001, 0x080000, CRC(24c50f8a) SHA1(75f98fc5dcffad2f47c012be66c157bd73f00cf3) )
 	ROM_LOAD16_BYTE( "95407885.hi", 0x00000, 0x080000, CRC(c3e37e0e) SHA1(eebd6264ee9efb955fee96017af2ea2678bbca8b) )
-	sc_easy_others
+	PR1326_CAS_EASY_STREAK_SOUNDS11
 ROM_END
 
 ROM_START( sc4eascsg )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95407886.lo", 0x00001, 0x080000, CRC(3a41067c) SHA1(2e776a26a2436ba969220bf41832875a9bcd588c) )
 	ROM_LOAD16_BYTE( "95407887.hi", 0x00000, 0x080000, CRC(8c087f60) SHA1(4c0624d4c56d64008b12c8435f901fb732bbe506) )
-	sc_easy_others
+	PR1326_CAS_EASY_STREAK_SOUNDS11
 ROM_END
 
 ROM_START( sc4eascsh )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1326p11.hi", 0x00000, 0x080000, CRC(873c7a05) SHA1(201c287c36bf11832ea3736cee7a4b8bbe9f4254) )
 	ROM_LOAD16_BYTE( "p1326p11.lo", 0x00001, 0x080000, CRC(14101cd8) SHA1(b808c8447047b98306843e01fa3f2722e9d37769) )
-	sc_easy_others
+	PR1326_CAS_EASY_STREAK_SOUNDS11
 ROM_END
 
 ROM_START( sc4eascsi )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1326p41.hi", 0x00000, 0x080000, CRC(490e389d) SHA1(e1cfe5a64804662e637e3f05eea13902e4ba55a8) )
 	ROM_LOAD16_BYTE( "p1326p41.lo", 0x00001, 0x080000, CRC(764150c3) SHA1(1f22f22c72379ec9c1ca0da787366a8368c56303) )
-	sc_easy_others
+	PR1326_CAS_EASY_STREAK_SOUNDS11
 ROM_END
 
 ROM_START( sc4eascsj )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1326s11.hi", 0x00000, 0x080000, CRC(ae417ea4) SHA1(ba3876cfc9d7787d3a14b100f3f9e185b08cd207) )
 	ROM_LOAD16_BYTE( "p1326s11.lo", 0x00001, 0x080000, CRC(3a5cbcd0) SHA1(c36979d9b0045dbb103a665bde5a97a0a4a3b9b0) )
-	sc_easy_others
+	PR1326_CAS_EASY_STREAK_SOUNDS11
 ROM_END
 
 ROM_START( sc4eascsk )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1326s41.hi", 0x00000, 0x080000, CRC(e74d9798) SHA1(67a43317844a455addb624deea516354854ee0a8) )
 	ROM_LOAD16_BYTE( "p1326s41.lo", 0x00001, 0x080000, CRC(b74196f7) SHA1(67ab1a115bb2656951f187f47d6c4b9dca7481c0) )
-	sc_easy_others
+	PR1326_CAS_EASY_STREAK_SOUNDS11
 ROM_END
 
 
@@ -4838,20 +5201,6 @@ ROM_START( sc4feverh )
 	sc_fever_others
 ROM_END
 
-ROM_START( sc4feveri )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95406360.lo", 0x00001, 0x080000, CRC(b0ab3f6b) SHA1(48bb1faba0917d16558221f4c0d1cd6a3fa72767) )
-	ROM_LOAD16_BYTE( "95406361.hi", 0x00000, 0x080000, CRC(88874cc3) SHA1(8afe9b666eac553380f9bb80459491a7b4811793) )
-	sc_fever_others
-ROM_END
-
-ROM_START( sc4feverj )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95406782.lo", 0x00001, 0x080000, CRC(7346b7d3) SHA1(24ff011729419b454430d7c4f92c4618338d7ec0) )
-	ROM_LOAD16_BYTE( "95406783.hi", 0x00000, 0x080000, CRC(fe3d7b7c) SHA1(7618444990a85d227850009393e130d128fe035f) )
-	sc_fever_others
-ROM_END
-
 ROM_START( sc4feverk )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95407012.lo", 0x00001, 0x080000, CRC(d6c56e82) SHA1(9e3fa0cfc7c9541b9637110677fa0b2f0911e450) )
@@ -4859,11 +5208,27 @@ ROM_START( sc4feverk )
 	sc_fever_others
 ROM_END
 
+
+ROM_START( sc4feveri )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95406360.lo", 0x00001, 0x080000, CRC(b0ab3f6b) SHA1(48bb1faba0917d16558221f4c0d1cd6a3fa72767) )
+	ROM_LOAD16_BYTE( "95406361.hi", 0x00000, 0x080000, CRC(88874cc3) SHA1(8afe9b666eac553380f9bb80459491a7b4811793) )
+	sc_fever7157_others
+ROM_END
+
+ROM_START( sc4feverj )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95406782.lo", 0x00001, 0x080000, CRC(7346b7d3) SHA1(24ff011729419b454430d7c4f92c4618338d7ec0) )
+	ROM_LOAD16_BYTE( "95406783.hi", 0x00000, 0x080000, CRC(fe3d7b7c) SHA1(7618444990a85d227850009393e130d128fe035f) )
+	sc_fever7157_others
+ROM_END
+
+
 ROM_START( sc4feverl )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95408920.lo", 0x00001, 0x080000, CRC(e29cf521) SHA1(c0b2211030caf5ff37bb6ffb813a0dfd7b72963d) )
 	ROM_LOAD16_BYTE( "95408921.hi", 0x00000, 0x080000, CRC(db3025ee) SHA1(e21f56adee4eda6a77618e82f6b029955e939741) )
-	sc_fever_others
+	sc_fever7157_others
 ROM_END
 
 
@@ -8538,6 +8903,33 @@ ROM_START( sc4luckb0 )
 	sc_luckb_others
 ROM_END
 
+ROM_START( sc4luckb1 )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412784.lo", 0x00001, 0x080000, CRC(5aa0e877) SHA1(61f5feb82da6120e9dc1e035ecc5014c0312cfe5) )
+    ROM_LOAD16_BYTE( "95412785.hi", 0x00000, 0x080000, CRC(71a8f0a7) SHA1(f15e021e2fd036e3b8e6df527dce247dcbcae183) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4luckb2 )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412786.lo", 0x00001, 0x080000, CRC(ef399481) SHA1(46f896e061b1e0952f344d8263733b4767f4fd33) )
+    ROM_LOAD16_BYTE( "95412787.hi", 0x00000, 0x080000, CRC(afba8e8f) SHA1(5263a8909e930eba04c9d2dd3cc561bc05dd98bc) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4luckb3 )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413784.lo", 0x00001, 0x080000, CRC(1f6e5750) SHA1(bf66ec55f95263b9609d540ff80ff6e30b412c8f) )
+    ROM_LOAD16_BYTE( "95413785.hi", 0x00000, 0x080000, CRC(1d94f72f) SHA1(cdb6f996738d24c5067930ef24699d851a0bbdc6) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4luckb4 )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413786.lo", 0x00001, 0x080000, CRC(afb1726c) SHA1(676e27a33da21a728129d179339aab761485b22d) )
+    ROM_LOAD16_BYTE( "95413787.hi", 0x00000, 0x080000, CRC(c3a6cc83) SHA1(399629c1a80790d4590b97d800f4dcf0ff7f7180) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
 
 
 
@@ -8880,74 +9272,103 @@ ROM_START( sc4mgr )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95406738.lo", 0x00001, 0x080000, CRC(91e156b8) SHA1(3439f79e68c445960cf41b1f8a2b60e166e28024) )
 	ROM_LOAD16_BYTE( "95406739.hi", 0x00000, 0x080000, CRC(2e2ba90c) SHA1(cc09e392dbba2f75ed72fbff8c0ec6e47922cc0b) )
-	sc_mgr_others
+	PR1132_MONEY_GO_ROUND_SOUNDS11
 ROM_END
 
 ROM_START( sc4mgra )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95407738.lo", 0x00001, 0x080000, CRC(6a1a091d) SHA1(93371ab90612ae6000d3cc6c3ddca8f90db803db) )
 	ROM_LOAD16_BYTE( "95407739.hi", 0x00000, 0x080000, CRC(cf883e87) SHA1(74edbaff54944f2a1ed6e7d99bbd9047dbd9fb4b) )
-	sc_mgr_others
-ROM_END
-
-ROM_START( sc4mgrb )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95410592.lo", 0x00001, 0x080000, CRC(578476ff) SHA1(ca115ed9a04efea369de6dbc7e0c999b0276e24e) )
-	ROM_LOAD16_BYTE( "95410593.hi", 0x00000, 0x080000, CRC(63bc7162) SHA1(15629023e84ae7a1b19201d24c0f74edd45c05e3) )
-	sc_mgr_others
-ROM_END
-
-ROM_START( sc4mgrc )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95410594.lo", 0x00001, 0x080000, CRC(5d5ef370) SHA1(46253f4e6ac2b226b9cfb0c318dc3537700ab3db) )
-	ROM_LOAD16_BYTE( "95410595.hi", 0x00000, 0x080000, CRC(b24010eb) SHA1(ea3ea23665a5b9dcc5f861aad720313f832ee248) )
-	sc_mgr_others
-ROM_END
-
-ROM_START( sc4mgrd )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95411592.lo", 0x00001, 0x080000, CRC(d7865d1f) SHA1(203ef7d6ed1babd74c2d5dcc497347fa13a4c909) )
-	ROM_LOAD16_BYTE( "95411593.hi", 0x00000, 0x080000, CRC(57ceb99e) SHA1(6997e1e3dbe389d990c97eebd7397546e33bfb73) )
-	sc_mgr_others
-ROM_END
-
-ROM_START( sc4mgre )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95411594.lo", 0x00001, 0x080000, CRC(34ec80ae) SHA1(61373d443505f7656e56d1f0fe0ffdc61153db47) )
-	ROM_LOAD16_BYTE( "95411595.hi", 0x00000, 0x080000, CRC(78f7e5f8) SHA1(4993018f22d7223b1b0e1ed11899564298d666e6) )
-	sc_mgr_others
-ROM_END
-
-ROM_START( sc4mgrf )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95412214.lo", 0x00001, 0x080000, CRC(569b2591) SHA1(0e5c1e14e9b8de49e02a1efc02f50b6d632a2fa5) )
-	ROM_LOAD16_BYTE( "95412215.hi", 0x00000, 0x080000, CRC(cff9aefa) SHA1(c8a973429cec99010a4886ad88cde820ecbdf435) )
-	sc_mgr_others
-ROM_END
-
-ROM_START( sc4mgrg )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95413214.lo", 0x00001, 0x080000, CRC(645e63ff) SHA1(78e7e7a210eed5e8086483f7e8dac2a8f2cc4b91) )
-	ROM_LOAD16_BYTE( "95413215.hi", 0x00000, 0x080000, CRC(1ce43623) SHA1(9748d4df64f4282a141ca2907630badfdeb5c3bd) )
-	sc_mgr_others
+	PR1132_MONEY_GO_ROUND_SOUNDS11
 ROM_END
 
 ROM_START( sc4mgrh )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1132p72.hi", 0x00000, 0x080000, CRC(9cbaee34) SHA1(1d5713a4cd1f74c97b0879c2850fa994639f2370) )
 	ROM_LOAD16_BYTE( "p1132p72.lo", 0x00001, 0x080000, CRC(fb327c69) SHA1(b799290d2e4d0f071e7d97ab4817d8fdc14f9c2c) )
-	sc_mgr_others
+	PR1132_MONEY_GO_ROUND_SOUNDS11
 ROM_END
 
 ROM_START( sc4mgri )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1132s72.hi", 0x00000, 0x080000, CRC(06f9462c) SHA1(865c4cab26b9265e0da1e53bdbd9fa1df1e1ea34) )
 	ROM_LOAD16_BYTE( "p1132s72.lo", 0x00001, 0x080000, CRC(3392c0b4) SHA1(231cd4ad13cb71d44e1bb0d6b4eb22ecd5240d8c) )
-	sc_mgr_others
+	PR1132_MONEY_GO_ROUND_SOUNDS11
+ROM_END
+
+ROM_START( sc4mgrb )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95410592.lo", 0x00001, 0x080000, CRC(578476ff) SHA1(ca115ed9a04efea369de6dbc7e0c999b0276e24e) )
+	ROM_LOAD16_BYTE( "95410593.hi", 0x00000, 0x080000, CRC(63bc7162) SHA1(15629023e84ae7a1b19201d24c0f74edd45c05e3) )
+	PR1132_MONEY_GO_ROUND_SOUNDS11_ALT
+ROM_END
+
+ROM_START( sc4mgrc )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95410594.lo", 0x00001, 0x080000, CRC(5d5ef370) SHA1(46253f4e6ac2b226b9cfb0c318dc3537700ab3db) )
+	ROM_LOAD16_BYTE( "95410595.hi", 0x00000, 0x080000, CRC(b24010eb) SHA1(ea3ea23665a5b9dcc5f861aad720313f832ee248) )
+	PR1132_MONEY_GO_ROUND_SOUNDS11_ALT
+ROM_END
+
+ROM_START( sc4mgrd )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95411592.lo", 0x00001, 0x080000, CRC(d7865d1f) SHA1(203ef7d6ed1babd74c2d5dcc497347fa13a4c909) )
+	ROM_LOAD16_BYTE( "95411593.hi", 0x00000, 0x080000, CRC(57ceb99e) SHA1(6997e1e3dbe389d990c97eebd7397546e33bfb73) )
+	PR1132_MONEY_GO_ROUND_SOUNDS11_ALT
+ROM_END
+
+ROM_START( sc4mgre )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95411594.lo", 0x00001, 0x080000, CRC(34ec80ae) SHA1(61373d443505f7656e56d1f0fe0ffdc61153db47) )
+	ROM_LOAD16_BYTE( "95411595.hi", 0x00000, 0x080000, CRC(78f7e5f8) SHA1(4993018f22d7223b1b0e1ed11899564298d666e6) )
+	PR1132_MONEY_GO_ROUND_SOUNDS11_ALT
+ROM_END
+
+ROM_START( sc4mgrf )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95412214.lo", 0x00001, 0x080000, CRC(569b2591) SHA1(0e5c1e14e9b8de49e02a1efc02f50b6d632a2fa5) )
+	ROM_LOAD16_BYTE( "95412215.hi", 0x00000, 0x080000, CRC(cff9aefa) SHA1(c8a973429cec99010a4886ad88cde820ecbdf435) )
+	PR1132_MONEY_GO_ROUND_SOUNDS11_ALT
+ROM_END
+
+ROM_START( sc4mgrg )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95413214.lo", 0x00001, 0x080000, CRC(645e63ff) SHA1(78e7e7a210eed5e8086483f7e8dac2a8f2cc4b91) )
+	ROM_LOAD16_BYTE( "95413215.hi", 0x00000, 0x080000, CRC(1ce43623) SHA1(9748d4df64f4282a141ca2907630badfdeb5c3bd) )
+	PR1132_MONEY_GO_ROUND_SOUNDS11_ALT
 ROM_END
 
 
 
+ROM_START( sc4mgrj )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412804.lo", 0x00001, 0x080000, CRC(0948aa27) SHA1(14a779bbe176e525b53ce9c7a0ac46d043afb47d) )
+    ROM_LOAD16_BYTE( "95412805.hi", 0x00000, 0x080000, CRC(5e7bf5e1) SHA1(f03880f80a154c408717c8d53121d1bde2e62ab5) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+
+ROM_START( sc4mgrk )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412808.lo", 0x00001, 0x080000, CRC(e500f4cf) SHA1(3d0738ab1b927887f257fe063b57ee4a76be6808) )
+    ROM_LOAD16_BYTE( "95412809.hi", 0x00000, 0x080000, CRC(4556db34) SHA1(a06dfa1a2389f0ae185b6cc520b7dca75dd9dd6a) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4mgrl )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413804.lo", 0x00001, 0x080000, CRC(9c1261ca) SHA1(50cce10f8736e982346aba313abd2e761d7286fc) )
+    ROM_LOAD16_BYTE( "95413805.hi", 0x00000, 0x080000, CRC(ae77f9cf) SHA1(e88d82e8711b81dce306db558c03141699b2a813) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+
+ROM_START( sc4mgrm )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413808.lo", 0x00001, 0x080000, CRC(80630b04) SHA1(9393d9be92aca4eb4f4a774868fe8b6698139b67) )
+    ROM_LOAD16_BYTE( "95413809.hi", 0x00000, 0x080000, CRC(cf0a0b46) SHA1(434acbbe97748b96853f288b14cebcce02151515) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
 
 
 
@@ -9815,42 +10236,42 @@ ROM_START( sc4pacmn )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95400861.lo", 0x00001, 0x080000, CRC(e4949979) SHA1(a00bcd8c839b14b9e1e4b21a8c78a9be789e0cf7) )
 	ROM_LOAD16_BYTE( "95400862.hi", 0x00000, 0x080000, CRC(b1cd18f0) SHA1(b34a7d5595d3abad45e0cd027c217ac5b2bb3088) )
-	sc_pacmn_others
+	PACMAN_SOUNDS
 ROM_END
 
 ROM_START( sc4pacmna )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95402111.lo", 0x00001, 0x080000, CRC(e88b337a) SHA1(ecf7c3fb5e68fba9cbccada502022ae942992699) )
 	ROM_LOAD16_BYTE( "95402112.hi", 0x00000, 0x080000, CRC(1f17de1d) SHA1(6576f40cf4dc8fd3de1fd121d5a4c19536da87c5) )
-	sc_pacmn_others
+	PACMAN_SOUNDS
 ROM_END
 
 ROM_START( sc4pacmnb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95403111.lo", 0x00001, 0x080000, CRC(259141c0) SHA1(4bb6d8614696548f1f81f6c2045bde45d4316927) )
 	ROM_LOAD16_BYTE( "95403112.hi", 0x00000, 0x080000, CRC(26c12768) SHA1(41dbde2bbc7df5bb9e50d9380f8199345ae1989c) )
-	sc_pacmn_others
+	PACMAN_SOUNDS
 ROM_END
 
-ROM_START( sc4pacmnc )
+ROM_START( sc4pacqp )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "96000001.lo", 0x00001, 0x080000, CRC(250b6446) SHA1(d4aaaf1f0eb6833fb90bdfcc46100853db007c98) )
 	ROM_LOAD16_BYTE( "96000002.hi", 0x00000, 0x080000, CRC(85aded4d) SHA1(a087e3e82664806858f2b36917a56d5326c79544) )
-	sc_pacmn_others
+	QPS_PACP_SOUNDS
 ROM_END
 
-ROM_START( sc4pacmnd )
+ROM_START( sc4pacqpa )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "96000016.odd", 0x00001, 0x080000, CRC(4e1d764e) SHA1(9c2a5ae820a95448558ed12cbe87a9353c054d44) )
 	ROM_LOAD16_BYTE( "96000017.evn", 0x00000, 0x080000, CRC(eaf93528) SHA1(d4464eae9cd015e33f305d0458086e845199b8cd) )
-	sc_pacmn_others
+	QPS_PACP_SOUNDS
 ROM_END
 
-ROM_START( sc4pacmne )
+ROM_START( sc4pacqpb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "96003001.lo", 0x00001, 0x080000, CRC(70e21196) SHA1(0b7098da61df73f72ba459b1e8e9b6e92aef07d8) )
 	ROM_LOAD16_BYTE( "96003002.hi", 0x00000, 0x080000, CRC(4ebbe216) SHA1(aca58b3a2d8368014b738ce15d677dbcca885cc5) )
-	sc_pacmn_others
+	QPS_PACP_SOUNDS
 ROM_END
 
 
@@ -10129,12 +10550,6 @@ ROM_START( sc4pgoldd )
 	sc_pgold_others
 ROM_END
 
-ROM_START( sc4pglcs )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95406734.lo", 0x00001, 0x080000, CRC(e983d8db) SHA1(045c1f73cacfdcbdfbea74ed23287120433e3341) )
-	ROM_LOAD16_BYTE( "95406735.hi", 0x00000, 0x080000, CRC(c082ae45) SHA1(5985b87924d44155f55806772e406d3dcaf6b506) )
-	sc_pgold_others
-ROM_END
 
 ROM_START( sc4pgoldf )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -10143,18 +10558,25 @@ ROM_START( sc4pgoldf )
 	sc_pgold_others
 ROM_END
 
+ROM_START( sc4pglcs )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95406734.lo", 0x00001, 0x080000, CRC(e983d8db) SHA1(045c1f73cacfdcbdfbea74ed23287120433e3341) )
+	ROM_LOAD16_BYTE( "95406735.hi", 0x00000, 0x080000, CRC(c082ae45) SHA1(5985b87924d44155f55806772e406d3dcaf6b506) )
+	SC4_95004316_CAS_PHAR_GOLD_PR1261
+ROM_END
+
 ROM_START( sc4pglcsa )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95408068.lo", 0x00001, 0x080000, CRC(8932a906) SHA1(eca4706dd62e089ad9ce781b2ede0759dbe44bd9) )
 	ROM_LOAD16_BYTE( "95408069.hi", 0x00000, 0x080000, CRC(f56fff18) SHA1(e123bd7f1af75218dbbef82b33e7c21d882f8105) )
-	sc_pgold_others
+	SC4_95004316_CAS_PHAR_GOLD_PR1261
 ROM_END
 
 ROM_START( sc4pglcsb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95408144.lo", 0x00001, 0x080000, CRC(ee67e3d6) SHA1(963160426e1b2d4399132ff0df9662dc1d46c121) )
 	ROM_LOAD16_BYTE( "95408145.hi", 0x00000, 0x080000, CRC(b6e8a6d8) SHA1(d443aac2967229de4d6feae634efae9f3cd2f361) )
-	sc_pgold_others
+	SC4_95004316_CAS_PHAR_GOLD_PR1261
 ROM_END
 
 
@@ -10375,31 +10797,43 @@ ROM_START( sc4pogbl )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95422368.lo", 0x00001, 0x080000, CRC(3d34c353) SHA1(9bab4bf469ed5c877bfb567e0cc4155b0dc37ac1) )
 	ROM_LOAD16_BYTE( "95422369.hi", 0x00000, 0x080000, CRC(98b01d37) SHA1(cd7d8334c7dd0078cebf066cc1ae0cc503743036) )
-	sc_pogbl_others
+	PR3082_C_POTS_OF_GOLD_SOUNDS11
 ROM_END
 
 ROM_START( sc4pogbla )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95422932.lo", 0x00001, 0x080000, CRC(2c5ea61c) SHA1(56a8e6b8392ca76c864eab8060ce1cfbe04b9e54) )
 	ROM_LOAD16_BYTE( "95422933.hi", 0x00000, 0x080000, CRC(ec3d6a90) SHA1(5b030940775fdb4286efdd7357a276707d9eabde) )
-	sc_pogbl_others
+	PR3082_C_POTS_OF_GOLD_SOUNDS11
 ROM_END
 
 ROM_START( sc4pogblb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95423368.lo", 0x00001, 0x080000, CRC(0c9a2240) SHA1(eab6b824b87a570b4236b649d138bb6babf6d766) )
 	ROM_LOAD16_BYTE( "95423369.hi", 0x00000, 0x080000, CRC(dd96eb1f) SHA1(c2fae68a39ddf476ac11fc03158ed5ecfbc6fc1a) )
-	sc_pogbl_others
+	PR3082_C_POTS_OF_GOLD_SOUNDS11
 ROM_END
 
 ROM_START( sc4pogblc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95423932.lo", 0x00001, 0x080000, CRC(03cacc64) SHA1(99b776c529115da34413b507cdc20491bfdbd09e) )
 	ROM_LOAD16_BYTE( "95423933.hi", 0x00000, 0x080000, CRC(45faea1b) SHA1(1c6d8072086e2e0345bbae42978338eaa15e8304) )
-	sc_pogbl_others
+	PR3082_C_POTS_OF_GOLD_SOUNDS11
 ROM_END
 
+ROM_START( sc4pogbld )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95426590.lo", 0x00001, 0x080000, CRC(4bd1ca29) SHA1(9d9a3e14027b259c614780681d337d9004e5dbfd) )
+    ROM_LOAD16_BYTE( "95426591.hi", 0x00000, 0x080000, CRC(3e550a37) SHA1(48e2371953744e2d3b59833388be66484293dfe9) )
+    PR3082_C_POTS_OF_GOLD_SOUNDS11
+ROM_END
 
+ROM_START( sc4pogble )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95427590.lo", 0x00001, 0x080000, CRC(0a7f6c5f) SHA1(cf8eb884d1980a1e136d2b1e52ba4d7dc7904896) )
+    ROM_LOAD16_BYTE( "95427591.hi", 0x00000, 0x080000, CRC(8802578a) SHA1(71c16bb83b858d42846703387976460812234771) )
+    PR3082_C_POTS_OF_GOLD_SOUNDS11
+ROM_END
 
 
 ROM_START( sc4pwcrz )
@@ -13940,21 +14374,21 @@ ROM_START( sc4vmclb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95404686.lo", 0x00001, 0x080000, CRC(f3d7d462) SHA1(3de86eab8cab50924d5186b57863260dfd555bd7) )
 	ROM_LOAD16_BYTE( "95404687.hi", 0x00000, 0x080000, CRC(07d6f891) SHA1(1b5ce61733b3c2adbda439dbca857693d34e3022) )
-	sc_vmclb_others
+	PR7132_CLUB_VIVA_SOUNDS11
 ROM_END
 
 ROM_START( sc4vmclba )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "viva_mex.hi", 0x00000, 0x080000, CRC(521cea58) SHA1(a2a193c23843195e6f7ef666f3785869e11c9baa) )
 	ROM_LOAD16_BYTE( "viva_mex.lo", 0x00001, 0x080000, CRC(ca5260f1) SHA1(1f2901e76db3c2cd615cf1efafc7e965c1ac48f1) )
-	sc_vmclb_others
+	PR7132_CLUB_VIVA_SOUNDS11
 ROM_END
 
 ROM_START( sc4vmclbb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95405686.lo", 0x00001, 0x080000, CRC(5852e489) SHA1(987918f92b2cd53e09696ccf795f0e50ee44cde4) )
 	ROM_LOAD16_BYTE( "95405687.hi", 0x00000, 0x080000, CRC(c73c6888) SHA1(6be3c7285ec975a4798c9ff9d59da3466e3b545a) )
-	sc_vmclb_others
+	PR7132_CLUB_VIVA_SOUNDS11
 ROM_END
 
 
@@ -14316,6 +14750,35 @@ ROM_START( sc4wldbnm )
 ROM_END
 
 
+ROM_START( sc4wldbnn )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412798.lo", 0x00001, 0x080000, CRC(b1faf86e) SHA1(59d28f3cc7e6102b6ab30cf8f3cf3ff330400935) )
+    ROM_LOAD16_BYTE( "95412799.hi", 0x00000, 0x080000, CRC(154696d1) SHA1(e36ac082a4d9217609d480c8ebe2a62ca5e05030) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+
+ROM_START( sc4wldbno )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412802.lo", 0x00001, 0x080000, CRC(0707c737) SHA1(ab2b5654593af4b2ef3b967b922a140d254832cd) )
+    ROM_LOAD16_BYTE( "95412803.hi", 0x00000, 0x080000, CRC(7cba6d55) SHA1(7770f2cb130f54f4f43004b78e1494d0d067f444) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+
+ROM_START( sc4wldbnp )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413798.lo", 0x00001, 0x080000, CRC(78d31c7e) SHA1(4ce9b96b039c2e70b53b7446cc7701cfa0d21f69) )
+    ROM_LOAD16_BYTE( "95413799.hi", 0x00000, 0x080000, CRC(969a883b) SHA1(9e23f39bdb3ac8819f2910d3ae86ffc63e36d78b) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4wldbnq )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413802.lo", 0x00001, 0x080000, CRC(cda11a90) SHA1(fcf4728cbc93b537283b06f7234dfdd1b1c986fe) )
+    ROM_LOAD16_BYTE( "95413803.hi", 0x00000, 0x080000, CRC(4e53c2cc) SHA1(9f844af4abb60c4616c840075e7f7bbadaad70be) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
 
 
 ROM_START( sc4wthng )
@@ -15898,6 +16361,13 @@ ROM_START( sc4cblas )
 ROM_END
 
 
+ROM_START( sc4cblasa )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95418020.lo", 0x00001, 0x080000, CRC(156f98d1) SHA1(7f7af9b194bd2866f82c7fcd6a19196b2bc7451c) )
+    ROM_LOAD16_BYTE( "95418021.hi", 0x00000, 0x080000, CRC(b6a36c59) SHA1(4d0764c1cf3a0036379e29fee244a075a4412800) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
 
 ROM_START( sc4casxt )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -16399,14 +16869,14 @@ ROM_START( sc4czfr )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95402217.lo", 0x00001, 0x080000, CRC(5f86e26e) SHA1(293d3700844dcfaf2a5c6e9a4ee817893e11cf1b) )
 	ROM_LOAD16_BYTE( "95402218.hi", 0x00000, 0x080000, CRC(72792a3e) SHA1(efbf3fcf7f7b40424c8b7fa46d35c9bb484fe431) )
-	sc_czfr_others
+	SOUND_95004150_CRAZY_FRUITS_PR6982
 ROM_END
 
 ROM_START( sc4czfra )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95406394.lo", 0x00001, 0x080000, CRC(c07a8695) SHA1(3670e547530452f21a937f34072d812f25a480ce) )
 	ROM_LOAD16_BYTE( "95406395.hi", 0x00000, 0x080000, CRC(e469252b) SHA1(a7861f3d215c70b57263501af158f86257bf37c0) )
-	sc_czfr_others
+	PR1152_CRAZY_FRUITS_SOUNDS11
 ROM_END
 
 ROM_START( sc4czfrb )
@@ -16427,7 +16897,7 @@ ROM_START( sc4czfrd )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95401701.lo", 0x00001, 0x080000, CRC(5c09007e) SHA1(d69290225f08ed5dcf0204bd96f7f09a73c2f243) )
 	ROM_LOAD16_BYTE( "95401702.hi", 0x00000, 0x080000, NO_DUMP )
-	sc_czfr_others
+	SOUND_95004150_CRAZY_FRUITS_PR6982
 ROM_END
 
 
@@ -16451,7 +16921,7 @@ ROM_START( sc4dnd )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95418430.lo", 0x00001, 0x080000, CRC(16632394) SHA1(76fc5f14d2b0895959580979d9973094fa10c63a) )
 	ROM_LOAD16_BYTE( "95418431.hi", 0x00000, 0x080000, CRC(25e91233) SHA1(8814c4f48299f07e1836ff4e86ceead5fc91e7c9) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 
@@ -16459,7 +16929,7 @@ ROM_START( sc4dnda )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95418628.lo", 0x00001, 0x080000, CRC(534e6f8b) SHA1(8b89b691eac6415344e5e91a6682cd2030ffba6e) )
 	ROM_LOAD16_BYTE( "95418629.hi", 0x00000, 0x080000, NO_DUMP )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 
@@ -16467,7 +16937,7 @@ ROM_START( sc4dndb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95419430.lo", 0x00001, 0x080000, CRC(1a510dfc) SHA1(e4620c76a56539e93d90d7f9729b4daab2278256) )
 	ROM_LOAD16_BYTE( "95419431.hi", 0x00000, 0x080000, CRC(d4f546b5) SHA1(10d9df4dec30f9f1a9ffecd8c74de491a20ddf56) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 
@@ -16476,7 +16946,7 @@ ROM_START( sc4dndc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95419628.lo", 0x00001, 0x080000, CRC(5a6f07e9) SHA1(db21ee37d9a4fd421593fc9eb8ef27bad6788c4e) )
 	ROM_LOAD16_BYTE( "95419629.hi", 0x00000, 0x080000, CRC(cdf330d0) SHA1(aa5030ae3ec64ce4ead9688e51bfcd8ff1bbf543) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 
@@ -16484,114 +16954,127 @@ ROM_START( sc4dndd )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95422036.lo", 0x00001, 0x080000, CRC(b1d048dc) SHA1(bde75f8797ebd668eb8c9cf6c05da562874df540) )
 	ROM_LOAD16_BYTE( "95422037.hi", 0x00000, 0x080000, CRC(2d881f97) SHA1(aec94590f8cd7d21b386804b05bd53c9dee17968) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 ROM_START( sc4dnde )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95422866.lo", 0x00001, 0x080000, CRC(9fd063d1) SHA1(6e7dc034c2b6da609b5f200e4ede20faecf1104c) )
 	ROM_LOAD16_BYTE( "95422867.hi", 0x00000, 0x080000, CRC(982b5826) SHA1(46be9e735c16300553a4b37d6d98ff97cdb43aed) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 ROM_START( sc4dndf )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95422890.lo", 0x00001, 0x080000, CRC(ae29311c) SHA1(1bdd12b2cd2e96d4704da044b251fdb111ee0cb1) )
 	ROM_LOAD16_BYTE( "95422891.hi", 0x00000, 0x080000, CRC(d79559eb) SHA1(ef5f27b5b84bf1072f1b5a13ee17143a06515712) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 ROM_START( sc4dndg )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95423036.lo", 0x00001, 0x080000, CRC(e484b7fb) SHA1(6489fe890ca6cfeb4eb2043253c6bd0bab185724) )
 	ROM_LOAD16_BYTE( "95423037.hi", 0x00000, 0x080000, CRC(e2c36879) SHA1(8978ed2c7c1510b62eedb0353e435b89b648670a) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 ROM_START( sc4dndh )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95423866.lo", 0x00001, 0x080000, CRC(f99b2b86) SHA1(f04e154c1887d4225075802e3618261bf444ae26) )
 	ROM_LOAD16_BYTE( "95423867.hi", 0x00000, 0x080000, CRC(fe6b1130) SHA1(2de60e150829acde7f7f3453fd5397ed549ab421) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 ROM_START( sc4dndi )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95423890.lo", 0x00001, 0x080000, CRC(9b6d3415) SHA1(b14bc3ede63184f7d3be0703e7170f85671350d5) )
 	ROM_LOAD16_BYTE( "95423891.hi", 0x00000, 0x080000, CRC(58c37a50) SHA1(09fde3c464bab08b95e2609cde64cf2fc4ddce7e) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 ROM_START( sc4dndj )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95426154.lo", 0x00001, 0x080000, CRC(17169e09) SHA1(e9e6752ab858c1d14253d27842c269c8e9e6fb5f) )
 	ROM_LOAD16_BYTE( "95426155.hi", 0x00000, 0x080000, CRC(7eb7893e) SHA1(a97f35be2d494da19dcb6f4b235a83d46fabba3e) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 ROM_START( sc4dndk )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95426170.lo", 0x00001, 0x080000, CRC(99951add) SHA1(640401c6b412dd0d2a186a134e4fb77c92001614) )
 	ROM_LOAD16_BYTE( "95426171.hi", 0x00000, 0x080000, CRC(eb65bbe5) SHA1(f8c384086a335a02985ed938b405fffd4aa37bbb) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 ROM_START( sc4dndl )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95427154.lo", 0x00001, 0x080000, CRC(745ac559) SHA1(3fff27727fdf6b34f4500bc42dacacb9a807e848) )
 	ROM_LOAD16_BYTE( "95427155.hi", 0x00000, 0x080000, CRC(15a28fd8) SHA1(4fe2fb60d447bfcc4996643badcf5440b76a951d) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 ROM_START( sc4dndm )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95427170.lo", 0x00001, 0x080000, CRC(65cf387c) SHA1(3436e81927c00551d3eaa7d21922187ac9b93bf5) )
 	ROM_LOAD16_BYTE( "95427171.hi", 0x00000, 0x080000, CRC(f4021af5) SHA1(15eb7c36da5ab02a14021ec02af5861431bb318b) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 ROM_START( sc4dndn )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95422038.lo", 0x00001, 0x080000, CRC(c75da829) SHA1(b240a1aa1056c3227a23ae1df37eacece7832a97) )
 	ROM_LOAD16_BYTE( "95422039.hi", 0x00000, 0x080000, CRC(c9c8661b) SHA1(c8ad798e4807da659015a9925cdb0eb6e837a9af) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 ROM_START( sc4dndo )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95423038.lo", 0x00001, 0x080000, CRC(00adce65) SHA1(917a882f6e28198795ee056914433dd1ce361803) )
 	ROM_LOAD16_BYTE( "95423039.hi", 0x00000, 0x080000, CRC(556af108) SHA1(7a88c1311ab7aa7773dd6b70a3891ebbe2d340d1) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 ROM_START( sc4dndcs )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95418528.lo", 0x00001, 0x080000, CRC(d0192ab5) SHA1(b1e98d901ea0ea0010f02e76c296418da775a8c6) )
 	ROM_LOAD16_BYTE( "95418529.hi", 0x00000, 0x080000, CRC(10ce1fa8) SHA1(a207f8c1b4fa40f95f5c3cba64648f87efa5d903) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 ROM_START( sc4dndcsa )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95418752.lo", 0x00001, 0x080000, CRC(ea381dee) SHA1(e68557b00fbbac86d7c153470050da0980751fa1) )
 	ROM_LOAD16_BYTE( "95418753.hi", 0x00000, 0x080000, CRC(de953115) SHA1(98443f633997be3e7a8c43e6692a9dd0c4fcf0b1) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 ROM_START( sc4dndcsb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95419528.lo", 0x00001, 0x080000, CRC(0498ed27) SHA1(cab277385393410dbe54a72f7f778d67aeb42ba1) )
 	ROM_LOAD16_BYTE( "95419529.hi", 0x00000, 0x080000, CRC(524a6e36) SHA1(0f8639a83eefcb3cf8f7541a2a77e984cf1688d5) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
 ROM_START( sc4dndcsc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95419752.lo", 0x00001, 0x080000, CRC(c06b60aa) SHA1(b40e4412db1f57511e0b2586fd65df56874a23bb) )
 	ROM_LOAD16_BYTE( "95419753.hi", 0x00000, 0x080000, CRC(76da2127) SHA1(2a06c5fb329a6045671f92073c2e1dd78dc79769) )
-	sc_dnd_others
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
 ROM_END
 
+ROM_START( sc4dndcsd )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95422796.lo", 0x00001, 0x080000, CRC(e868d7b2) SHA1(9bfab76066bdd8c0189a3b076cb5fcaf9b319974) )
+    ROM_LOAD16_BYTE( "95422797.hi", 0x00000, 0x080000, CRC(7814d075) SHA1(2a5b3e2e9c6a2a1823ce952d978287c012e6bdb8) )
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
+ROM_END
+
+ROM_START( sc4dndcse )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95423796.lo", 0x00001, 0x080000, CRC(804c03c4) SHA1(f73c9655c1206334afeb6bbd73bd24579eb1d67c) )
+    ROM_LOAD16_BYTE( "95423797.hi", 0x00000, 0x080000, CRC(c5b8ef0a) SHA1(5ae7be45364c8db8425b1ea08d8705c1fe2e032a) )
+	PR1907_DEAL_OR_NO_DEAL_SOUNDS11
+ROM_END
 
 
 ROM_START( sc4dndbb )
@@ -16852,8 +17335,26 @@ ROM_START( sc4dndhfi )
 	sc_dndhf_others
 ROM_END
 
+ROM_START( sc4dndhfj )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95423799.hi", 0x00000, 0x080000, CRC(922bf36c) SHA1(18bb9e38340dd0fd7e95fc0f70d0a47ef98f6d9c) )
+    ROM_LOAD16_BYTE( "95423798.lo", 0x00001, 0x080000, CRC(310e7ab7) SHA1(8ec44acd16dbe22837d365970e496640d1250355) )
+    sc_dndhf_others
+ROM_END
 
+ROM_START( sc4dndhfk )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95428082.lo", 0x00001, 0x080000, CRC(161690d0) SHA1(a9eb5d47b067897803814f7c5d5e3436002f278b) )
+    ROM_LOAD16_BYTE( "95428083.hi", 0x00000, 0x080000, CRC(72520ead) SHA1(bbaeeaddc98530eb879596a4526d0101a7912d20) )
+    sc_dndhf_others
+ROM_END
 
+ROM_START( sc4dndhfl )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95429082.lo", 0x00001, 0x080000, CRC(5172b542) SHA1(f460fe62b12d709d528135603252951d306c64c9) )
+    ROM_LOAD16_BYTE( "95429083.hi", 0x00000, 0x080000, CRC(26040dae) SHA1(9302efb1a92e5c31dc22d0a6b4cc51f26c4bf5ab) )
+    sc_dndhf_others
+ROM_END
 
 
 ROM_START( sc4dndys )
@@ -16877,7 +17378,12 @@ ROM_START( sc4dndysb )
 	sc_dndys_others
 ROM_END
 
-
+ROM_START( sc4dndysc )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95426066.lo", 0x00001, 0x080000, CRC(9f388484) SHA1(abbf996d8dfca49302eada0d669477ceb6a74706) )
+    ROM_LOAD16_BYTE( "95426067.hi", 0x00000, 0x080000, CRC(9f5164c4) SHA1(ed68a46a05bcca3ed1478b6a31ca59cd870ebf7e) )
+	sc_dndys_others
+ROM_END
 
 ROM_START( sc4dndlp )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -17125,6 +17631,8 @@ ROM_START( sc4dndccf )
 	ROM_LOAD16_BYTE( "95427323.hi", 0x00000, 0x080000, CRC(93dc915a) SHA1(cefd62f72d322a7c5729857bec05fc240bdae853) )
 	sc_dndcc_others
 ROM_END
+
+
 
 
 
@@ -17896,6 +18404,19 @@ ROM_START( sc4fguyc )
 	sc_fguy_others
 ROM_END
 
+ROM_START( sc4fguyd )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95426070.lo", 0x00001, 0x080000, CRC(fa164ebd) SHA1(b50b261ea503b1f56b99d692805fb90ca67e22e6) )
+    ROM_LOAD16_BYTE( "95426071.hi", 0x00000, 0x080000, CRC(304dc4dc) SHA1(045f639ffae4ac54e6554ca5c9a11516f0561e64) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4fguye )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95427070.lo", 0x00001, 0x080000, CRC(916479f9) SHA1(d9f9a48c671ba046469ddcdcdfbf6de0c7ec703d) )
+    ROM_LOAD16_BYTE( "95427071.hi", 0x00000, 0x080000, CRC(85306584) SHA1(f844c345330b5d0983dacb693aa5bacaf5fd60b5) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
 
 ROM_START( sc4fbspn )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -18175,28 +18696,28 @@ ROM_START( sc4gbcas )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95404206.lo", 0x00001, 0x080000, CRC(bb853407) SHA1(498aad2cf2948d7fbef673186823af6a7dbefd95) )
 	ROM_LOAD16_BYTE( "95404207.hi", 0x00000, 0x080000, CRC(e4e3f4e0) SHA1(ab8a8eeb5661d6cd3ba5d25f2082c06ac8c343ac) )
-	sc_gball_pthers
+	PR1034_GOLDEN_BALLS_SOUNDS11
 ROM_END
 
 ROM_START( sc4gbcasa )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95404208.lo", 0x00001, 0x080000, CRC(fc080cdf) SHA1(86084d70e6a68afe3f788661b78cfb8df3bb8104) )
 	ROM_LOAD16_BYTE( "95404209.hi", 0x00000, 0x080000, CRC(6e4d776f) SHA1(0e09b78e138215ceb693bc86a3fe6d7320da9431) )
-	sc_gball_pthers
+	PR1034_GOLDEN_BALLS_SOUNDS11
 ROM_END
 
 ROM_START( sc4gbcasb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95405206.lo", 0x00001, 0x080000, CRC(79f07bc2) SHA1(e85ddf4c18573894ecd51fec283cc46becb8aacc) )
 	ROM_LOAD16_BYTE( "95405207.hi", 0x00000, 0x080000, CRC(2c295913) SHA1(a8bf658c6ec248e7f53485ce778e9679eae62504) )
-	sc_gball_pthers
+	PR1034_GOLDEN_BALLS_SOUNDS11
 ROM_END
 
 ROM_START( sc4gbcasc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95405208.lo", 0x00001, 0x080000, CRC(3e7d431a) SHA1(b7975bbbf369d2eb6b8fad5c7200e0007ce2365b) )
 	ROM_LOAD16_BYTE( "95405209.hi", 0x00000, 0x080000, CRC(a687da9c) SHA1(99cbc48fe2c9c28fb3b68107402af10c2a7f39fa) )
-	sc_gball_pthers
+	PR1034_GOLDEN_BALLS_SOUNDS11
 ROM_END
 
 ROM_START( sc4gball )
@@ -18228,12 +18749,28 @@ ROM_START( sc4gballc )
 ROM_END
 
 
-ROM_START( sc4ggame )
+ROM_START( sc4ggtb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95404762.lo", 0x00001, 0x080000, CRC(613941b4) SHA1(4cc1441b94913d597aa88e973f4514f7278a7cc9) )
 	ROM_LOAD16_BYTE( "95404763.hi", 0x00000, 0x080000, CRC(dbec56ec) SHA1(bb8f2395afe8d5193320d627ef722c1105b02826) )
 	sc_ggame_others
 ROM_END
+
+ROM_START( sc4ggtba )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95408086.lo", 0x00001, 0x080000, CRC(cd0b1ea9) SHA1(ebb5023afa24876d97417db50aa675ec29c0351b) )
+	ROM_LOAD16_BYTE( "95408087.hi", 0x00000, 0x080000, CRC(0a21efb4) SHA1(5765431cfc61521d55e00d7fdd2e08f0ef37d12c) )
+	sc_ggame_others
+ROM_END
+
+ROM_START( sc4ggtbb )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95414970.lo", 0x00001, 0x080000, CRC(ab09550b) SHA1(004f858e5bcda93653efa511f66d33cbe20a44d1) )
+	ROM_LOAD16_BYTE( "95414971.hi", 0x00000, 0x080000, CRC(e137aff0) SHA1(50a2a6819034ca5b04c704da7cfaf029bdc031b2) )
+	sc_ggame_others
+ROM_END
+
+
 
 ROM_START( sc4ggamea )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -18263,12 +18800,6 @@ ROM_START( sc4ggamed )
 	sc_ggame_others
 ROM_END
 
-ROM_START( sc4ggamee )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95408086.lo", 0x00001, 0x080000, CRC(cd0b1ea9) SHA1(ebb5023afa24876d97417db50aa675ec29c0351b) )
-	ROM_LOAD16_BYTE( "95408087.hi", 0x00000, 0x080000, CRC(0a21efb4) SHA1(5765431cfc61521d55e00d7fdd2e08f0ef37d12c) )
-	sc_ggame_others
-ROM_END
 
 ROM_START( sc4ggamef )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -18284,7 +18815,7 @@ ROM_START( sc4ggameg )
 	sc_ggame_others
 ROM_END
 
-ROM_START( sc4ggameh )
+ROM_START( sc4ggame )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95414396.lo", 0x00001, 0x080000, CRC(1160d686) SHA1(b531823f970e09c808e2efb284951c79091b44b1) )
 	ROM_LOAD16_BYTE( "95414397.hi", 0x00000, 0x080000, CRC(886f6d1f) SHA1(532f53d2c9956212ea0086b92c1dad38b417ad9e) )
@@ -18335,12 +18866,6 @@ ROM_END
 
 
 
-ROM_START( sc4ggameo )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95414970.lo", 0x00001, 0x080000, CRC(ab09550b) SHA1(004f858e5bcda93653efa511f66d33cbe20a44d1) )
-	ROM_LOAD16_BYTE( "95414971.hi", 0x00000, 0x080000, CRC(e137aff0) SHA1(50a2a6819034ca5b04c704da7cfaf029bdc031b2) )
-	sc_ggame_others
-ROM_END
 
 
 ROM_START( sc4ggamep )
@@ -18588,14 +19113,21 @@ ROM_END
 
 
 
-ROM_START( sc4ggg )
+ROM_START( sc4gggtb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95420668.lo", 0x00001, 0x080000, CRC(afef1626) SHA1(00d676d0ed36ddf4255d26779b3319f61319a9cb) )
 	ROM_LOAD16_BYTE( "95420669.hi", 0x00000, 0x080000, CRC(6e273bf4) SHA1(35ba48892d9ea3ebcb00fe33c75ee8e7949ab421) )
 	sc_ggg_others
 ROM_END
 
-ROM_START( sc4ggga )
+ROM_START( sc4gggtba )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95421668.lo", 0x00001, 0x080000, CRC(6f4964c8) SHA1(14948920079694791a66dfd1f07b22badb37bc57) )
+	ROM_LOAD16_BYTE( "95421669.hi", 0x00000, 0x080000, CRC(23e030cf) SHA1(85c70ee8f906b48fb75692ec9e58e9072b1a731d) )
+	sc_ggg_others
+ROM_END
+
+ROM_START( sc4ggg )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95420672.lo", 0x00001, 0x080000, CRC(88dd2622) SHA1(dc30308638d602b76e828cf6c98605a9fb7589b6) )
 	ROM_LOAD16_BYTE( "95420673.hi", 0x00000, 0x080000, CRC(309a5f9c) SHA1(8592127022c84bc6c36b744d8fa0d44a1bc38ea0) )
@@ -18659,12 +19191,7 @@ ROM_START( sc4gggi )
 	sc_ggg_others
 ROM_END
 
-ROM_START( sc4gggj )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95421668.lo", 0x00001, 0x080000, CRC(6f4964c8) SHA1(14948920079694791a66dfd1f07b22badb37bc57) )
-	ROM_LOAD16_BYTE( "95421669.hi", 0x00000, 0x080000, CRC(23e030cf) SHA1(85c70ee8f906b48fb75692ec9e58e9072b1a731d) )
-	sc_ggg_others
-ROM_END
+
 
 ROM_START( sc4gggk )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -18802,33 +19329,6 @@ ROM_START( sc4hapnta )
 	sc_hapnt_others
 ROM_END
 
-ROM_START( sc4hntcs )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95410960.lo", 0x00001, 0x080000, CRC(09417c00) SHA1(6d10896bf290c58b6fdb5d735b423a9d2d7db5d7) )
-	ROM_LOAD16_BYTE( "95410961.hi", 0x00000, 0x080000, CRC(1611d748) SHA1(b5ae00a1e1adaf7af912b3f21fb0cb7b414996b3) )
-	sc_hapnt_others
-ROM_END
-
-ROM_START( sc4hntcsa )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95410962.lo", 0x00001, 0x080000, CRC(64cecf4d) SHA1(63f9f5fda15e99a249ea869105461c6d1db0a01a) )
-	ROM_LOAD16_BYTE( "95410963.hi", 0x00000, 0x080000, CRC(758108b0) SHA1(4de01d82d5ff01adfa3907adb46d666dd9979734) )
-	sc_hapnt_others
-ROM_END
-
-ROM_START( sc4hntcsb )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95410964.lo", 0x00001, 0x080000, CRC(fbf06b79) SHA1(8130b8e9f5f18399963db8206f0d6c9ed0312fce) )
-	ROM_LOAD16_BYTE( "95410965.hi", 0x00000, 0x080000, CRC(a91e7166) SHA1(accaa8c05fe6754b4ac1cf6eee5713de239968ce) )
-	sc_hapnt_others
-ROM_END
-
-ROM_START( sc4hntcsc )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95411960.lo", 0x00001, 0x080000, CRC(e4f6033a) SHA1(4bde8c65639e952e4120c9a538d709a88e2a7982) )
-	ROM_LOAD16_BYTE( "95411961.hi", 0x00000, 0x080000, CRC(f17e876d) SHA1(d90123e04cbf6935ee9cb62abbfa5cabed83c5b5) )
-	sc_hapnt_others
-ROM_END
 
 ROM_START( sc4hapntb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -18858,97 +19358,156 @@ ROM_START( sc4hapnte )
 	sc_hapnt_others
 ROM_END
 
+
+ROM_START( sc4hntcs )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95410960.lo", 0x00001, 0x080000, CRC(09417c00) SHA1(6d10896bf290c58b6fdb5d735b423a9d2d7db5d7) )
+	ROM_LOAD16_BYTE( "95410961.hi", 0x00000, 0x080000, CRC(1611d748) SHA1(b5ae00a1e1adaf7af912b3f21fb0cb7b414996b3) )
+	PR1327_CAS_HAPPY_NOTES_SOUNDS11
+ROM_END
+
+ROM_START( sc4hntcsa )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95410962.lo", 0x00001, 0x080000, CRC(64cecf4d) SHA1(63f9f5fda15e99a249ea869105461c6d1db0a01a) )
+	ROM_LOAD16_BYTE( "95410963.hi", 0x00000, 0x080000, CRC(758108b0) SHA1(4de01d82d5ff01adfa3907adb46d666dd9979734) )
+	PR1327_CAS_HAPPY_NOTES_SOUNDS11
+ROM_END
+
+ROM_START( sc4hntcsb )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95410964.lo", 0x00001, 0x080000, CRC(fbf06b79) SHA1(8130b8e9f5f18399963db8206f0d6c9ed0312fce) )
+	ROM_LOAD16_BYTE( "95410965.hi", 0x00000, 0x080000, CRC(a91e7166) SHA1(accaa8c05fe6754b4ac1cf6eee5713de239968ce) )
+	PR1327_CAS_HAPPY_NOTES_SOUNDS11
+ROM_END
+
+ROM_START( sc4hntcsc )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95411960.lo", 0x00001, 0x080000, CRC(e4f6033a) SHA1(4bde8c65639e952e4120c9a538d709a88e2a7982) )
+	ROM_LOAD16_BYTE( "95411961.hi", 0x00000, 0x080000, CRC(f17e876d) SHA1(d90123e04cbf6935ee9cb62abbfa5cabed83c5b5) )
+	PR1327_CAS_HAPPY_NOTES_SOUNDS11
+ROM_END
+
 ROM_START( sc4hntcsd )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1327p12.hi", 0x00000, 0x080000, CRC(734e60a9) SHA1(911f6c78654020c03b3e906aaf37ce3751f1cd85) )
 	ROM_LOAD16_BYTE( "p1327p12.lo", 0x00001, 0x080000, CRC(d1d169e0) SHA1(41540cee7ca0fbe2c93a1c55f0f9e9c933ed3f3b) )
-	sc_hapnt_others
+	PR1327_CAS_HAPPY_NOTES_SOUNDS11
 ROM_END
 
 ROM_START( sc4hntcse )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1327p13.hi", 0x00000, 0x080000, CRC(d3141aff) SHA1(7c75e47e1a36979177c220edacc5256342c3405c) )
 	ROM_LOAD16_BYTE( "p1327p13.lo", 0x00001, 0x080000, CRC(b80f3b5f) SHA1(8b1a3daadb67b2d147184ab7213abe9c29791c6e) )
-	sc_hapnt_others
+	PR1327_CAS_HAPPY_NOTES_SOUNDS11
 ROM_END
 
 ROM_START( sc4hntcsf )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1327p41.hi", 0x00000, 0x080000, CRC(0a0305da) SHA1(c4ed571484d13fed4adc83d96efabe060a6452a5) )
 	ROM_LOAD16_BYTE( "p1327p41.lo", 0x00001, 0x080000, CRC(f0001712) SHA1(5be70eaedca55c4098f236763206cf32bb1c2f4d) )
-	sc_hapnt_others
+	PR1327_CAS_HAPPY_NOTES_SOUNDS11
 ROM_END
 
 ROM_START( sc4hntcsg )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1327p42.hi", 0x00000, 0x080000, CRC(c6e34460) SHA1(63ae0930b7b0c104edee067a0e13c0a90c2d027c) )
 	ROM_LOAD16_BYTE( "p1327p42.lo", 0x00001, 0x080000, CRC(5e055385) SHA1(e42d7a0668bd1069c20bd519c37c1fcacabffca2) )
-	sc_hapnt_others
+	PR1327_CAS_HAPPY_NOTES_SOUNDS11
 ROM_END
 
 ROM_START( sc4hntcsh )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1327p61.hi", 0x00000, 0x080000, CRC(27a9e9a7) SHA1(9489bc73a3c806de974a82397c0d9907bcb3b9e5) )
 	ROM_LOAD16_BYTE( "p1327p61.lo", 0x00001, 0x080000, CRC(13e3aa1e) SHA1(8bd97ebaa6b56e7c846cde2f0b61173c0332c120) )
-	sc_hapnt_others
+	PR1327_CAS_HAPPY_NOTES_SOUNDS11
 ROM_END
 
 ROM_START( sc4hntcsi )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1327p71.hi", 0x00000, 0x080000, CRC(d9dd087b) SHA1(872a52bcb42df863407ecb796c8768a02d3614d9) )
 	ROM_LOAD16_BYTE( "p1327p71.lo", 0x00001, 0x080000, CRC(6cbef7a3) SHA1(11b6dfd24595fd10ce31e3f6361c6e9a7880c6c9) )
-	sc_hapnt_others
+	PR1327_CAS_HAPPY_NOTES_SOUNDS11
 ROM_END
 
 ROM_START( sc4hntcsj )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1327s12.hi", 0x00000, 0x080000, CRC(9aae872b) SHA1(fbd5e402d76bfc2b6e99667b6c97f851fc482abb) )
 	ROM_LOAD16_BYTE( "p1327s12.lo", 0x00001, 0x080000, CRC(c964b987) SHA1(422b59e1ca2f3105ab28b33f4e95314ee525882f) )
-	sc_hapnt_others
+	PR1327_CAS_HAPPY_NOTES_SOUNDS11
 ROM_END
 
 ROM_START( sc4hntcsk )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1327s13.hi", 0x00000, 0x080000, CRC(fc9dcc8a) SHA1(20605e20cdb643384f6c268d9e52b362d7369786) )
 	ROM_LOAD16_BYTE( "p1327s13.lo", 0x00001, 0x080000, CRC(e2327afa) SHA1(bd1c0334fbc5ae4c386ad389c0ec619344c26656) )
-	sc_hapnt_others
+	PR1327_CAS_HAPPY_NOTES_SOUNDS11
 ROM_END
 
 ROM_START( sc4hntcsl )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1327s41.hi", 0x00000, 0x080000, CRC(cd03727a) SHA1(fcc802a62d60bb084ea3451730bc685212510320) )
 	ROM_LOAD16_BYTE( "p1327s41.lo", 0x00001, 0x080000, CRC(346db912) SHA1(83435a6bb3e557a04040cd221474df23c39aa507) )
-	sc_hapnt_others
+	PR1327_CAS_HAPPY_NOTES_SOUNDS11
 ROM_END
 
 ROM_START( sc4hntcsm )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1327s42.hi", 0x00000, 0x080000, CRC(2e737e11) SHA1(d1447129e4e1c888527371f1c5625d3e33d9d187) )
 	ROM_LOAD16_BYTE( "p1327s42.lo", 0x00001, 0x080000, CRC(3916863f) SHA1(d0949fcc6414f42d292a04bd0d056cc51a10371c) )
-	sc_hapnt_others
+	PR1327_CAS_HAPPY_NOTES_SOUNDS11
 ROM_END
 
 ROM_START( sc4hntcsn )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1327s61.hi", 0x00000, 0x080000, CRC(d3429de9) SHA1(4e5f6df4a557dd0aa061a0b7c4d30b8f01f1d958) )
 	ROM_LOAD16_BYTE( "p1327s61.lo", 0x00001, 0x080000, CRC(76e3c418) SHA1(1ec77288096715894e0e179024205fa9dfaf3909) )
-	sc_hapnt_others
+	PR1327_CAS_HAPPY_NOTES_SOUNDS11
 ROM_END
 
 ROM_START( sc4hntcso )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1327s71.hi", 0x00000, 0x080000, CRC(2d367c35) SHA1(547ba184d465d90296150595f35a5c4b012108c6) )
 	ROM_LOAD16_BYTE( "p1327s71.lo", 0x00001, 0x080000, CRC(09be99a5) SHA1(d9ad6f8e4487c7fdf129478ac967d4c0aa96a0f9) )
-	sc_hapnt_others
+	PR1327_CAS_HAPPY_NOTES_SOUNDS11
 ROM_END
 
+ROM_START( sc4hntcsp )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412788.lo", 0x00001, 0x080000, CRC(0d8a0e36) SHA1(258ec8aea8f820919e106eda3e774054bb3758cb) )
+    ROM_LOAD16_BYTE( "95412789.hi", 0x00000, 0x080000, CRC(0b15f31a) SHA1(051e047374fc3848a052b85bc54fb2a940fcd2f5) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+
+ROM_START( sc4hntcsq )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95412792.lo", 0x00001, 0x080000, CRC(bebb8a6d) SHA1(e1009ff6af9f9cf5df3d3f35dcac254e9ba25a84) )
+    ROM_LOAD16_BYTE( "95412793.hi", 0x00000, 0x080000, CRC(fd18bea6) SHA1(94f3cf2ed593705a3caa788b3b55864f5726bb75) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+
+ROM_START( sc4hntcsr )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413788.lo", 0x00001, 0x080000, CRC(223e4033) SHA1(47a335ef0d6964c7ef2ab8e4308323ac9269d98b) )
+    ROM_LOAD16_BYTE( "95413789.hi", 0x00000, 0x080000, CRC(51709e9c) SHA1(d9e3b4ebcf7acf0fc8bc546019b93338fe1a60e6) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+
+ROM_START( sc4hntcss )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95413792.lo", 0x00001, 0x080000, CRC(1dfb13f0) SHA1(aab4c67090ea5024fe8ac1b36855398cbd8f0eed) )
+    ROM_LOAD16_BYTE( "95413793.hi", 0x00000, 0x080000, CRC(57bf0935) SHA1(34ed890464aafd08e41d622367cc82898e9e07de) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
 
 
 ROM_START( sc4hellb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95406678.lo", 0x00001, 0x080000, CRC(82fa3872) SHA1(c1de9c35998c710f22eb95283a5a21d8e22c3c30) )
 	ROM_LOAD16_BYTE( "95406679.hi", 0x00000, 0x080000, CRC(5b0767c6) SHA1(3a0245ba5822ab3faa74a1f06a3c1648fa97ee40) )
-	sc_hellb_others
+	SC4_95004211_HELLS_BELLS_PR6945
 ROM_END
 
 ROM_START( sc4hellba )
@@ -19337,6 +19896,19 @@ ROM_START( sc4ijobk )
 	sc_ijob_others
 ROM_END
 
+ROM_START( sc4ijobl )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95426078.lo", 0x00001, 0x080000, CRC(42ea72a3) SHA1(da088b0322fe3fc89348f63d7b342d68be37906b) )
+    ROM_LOAD16_BYTE( "95426079.hi", 0x00000, 0x080000, CRC(49c8cf07) SHA1(af9a27e36ca5652ac542ad69b9987dd454b5bb7d) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+ROM_START( sc4ijobm )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95427079.hi", 0x00000, 0x080000, CRC(ff90a41d) SHA1(cc3011bdee10214c2de15683c436f1819a3b0e89) )
+    ROM_LOAD16_BYTE( "95427078.lo", 0x00001, 0x080000, CRC(9b27c381) SHA1(f9a66f13d3ea1ca206ec2904e6944ed41fe83e63) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
 
 ROM_START( sc4jjok )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -20224,7 +20796,26 @@ ROM_START( sc4mhpk )
 	sc_mhp_others
 ROM_END
 
+ROM_START( sc4mhpl )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95419854.lo", 0x00001, 0x080000, CRC(8a7b8323) SHA1(7927df3bb734548c8464ca94a188f597b4d8f6aa) )
+    ROM_LOAD16_BYTE( "95419855.hi", 0x00000, 0x080000, CRC(52609c25) SHA1(af11b20e91f1a70dedd9570e9a14a6ff769641cc) )
+    sc_mhp_others
+ROM_END
 
+ROM_START( sc4mhpm )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95422770.lo", 0x00001, 0x080000, CRC(7aa35ca2) SHA1(67be41eb0d19b4bf1e5013249f08eb761c5c1276) )
+    ROM_LOAD16_BYTE( "95422771.hi", 0x00000, 0x080000, CRC(30a79dad) SHA1(4854f4427cf46bbe874b2937c22261df4c21af4e) )
+    sc_mhp_others
+ROM_END
+
+ROM_START( sc4mhpn )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95423770.lo", 0x00001, 0x080000, CRC(fb478f7a) SHA1(cbf813b0ccfcaf6ce1a241c9479dc75d3623043c) )
+    ROM_LOAD16_BYTE( "95423771.hi", 0x00000, 0x080000, CRC(6217ded1) SHA1(c96041c00211a0cc938267cc39e968cdb93b48f0) )
+   sc_mhp_others
+ROM_END
 
 
 ROM_START( sc4mmb )
@@ -20764,69 +21355,89 @@ ROM_START( sc4popeyc )
 	sc_popey_others
 ROM_END
 
+ROM_START( sc4popeyd )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95426090.lo", 0x00001, 0x080000, CRC(f2439f57) SHA1(28c85aa4af37e0b6f4e593758c290d1dfabc01b3) )
+    ROM_LOAD16_BYTE( "95426091.hi", 0x00000, 0x080000, CRC(7fd3b733) SHA1(0f3fe3048c4b258c44b6f664249a16885033e242) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
 
+ROM_START( sc4popeye )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95427090.lo", 0x00001, 0x080000, CRC(d18c6d3c) SHA1(5173df9b9c7a260153f03fa363eedad5eb3f3799) )
+    ROM_LOAD16_BYTE( "95427091.hi", 0x00000, 0x080000, CRC(6476ffc9) SHA1(ade7583943bd32bcada8d0cb33489ab50471f2e7) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
 
 ROM_START( sc4pog )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95418748.lo", 0x00001, 0x080000, CRC(e4532be2) SHA1(8e30052f398da4b5503f43b4da84515aea0609e4) )
 	ROM_LOAD16_BYTE( "95418749.hi", 0x00000, 0x080000, CRC(ddd43bef) SHA1(e8a987a01d3d5ec34fbb2f7751ae0c5738fe2d0e) )
-	sc_pog_others
+	PR1918_POTS_OF_GOLD_SOUNDS11
 ROM_END
-
-
 
 ROM_START( sc4poga )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95418832.lo", 0x00001, 0x080000, CRC(8cf1e293) SHA1(c3dcb8da31a4509b6845f0c3df9058f82a369919) )
 	ROM_LOAD16_BYTE( "95418833.hi", 0x00000, 0x080000, CRC(d314c0ae) SHA1(06307af500d28d05518c67f554955567d2d0e1ca) )
-	sc_pog_others
+	PR1918_POTS_OF_GOLD_SOUNDS11
 ROM_END
 
 ROM_START( sc4pogb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95419748.lo", 0x00001, 0x080000, CRC(4a18ab52) SHA1(9230678bf1103a509a6d633ee23f314cee98df4b) )
 	ROM_LOAD16_BYTE( "95419749.hi", 0x00000, 0x080000, CRC(b288ef47) SHA1(419f22abe8bd8b5dd79e5b1610a6c4551af1abe8) )
-	sc_pog_others
+	PR1918_POTS_OF_GOLD_SOUNDS11
 ROM_END
-
-
 
 ROM_START( sc4pogc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95419832.lo", 0x00001, 0x080000, CRC(7e455361) SHA1(5f0ecd8ff94c720b378ea5b7523b9a8fc89e10c4) )
 	ROM_LOAD16_BYTE( "95419833.hi", 0x00000, 0x080000, CRC(36999e53) SHA1(e818fd7f758f312fe1308bd9c448e70b02fb991e) )
-	sc_pog_others
+	PR1918_POTS_OF_GOLD_SOUNDS11
 ROM_END
 
 ROM_START( sc4pogd )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95422098.lo", 0x00001, 0x080000, CRC(df9436de) SHA1(007f9b44c213975114e93300482238ecfb22e62e) )
 	ROM_LOAD16_BYTE( "95422099.hi", 0x00000, 0x080000, CRC(f943ec13) SHA1(d422a99531ae4ef7b04faa63aae3fa19b5135e7c) )
-	sc_pog_others
+	PR1918_POTS_OF_GOLD_SOUNDS11
 ROM_END
 
 ROM_START( sc4poge )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95423098.lo", 0x00001, 0x080000, CRC(5115ce33) SHA1(0038f1b1f7849f526ad857a0613ae5d9fd0160fe) )
 	ROM_LOAD16_BYTE( "95423099.hi", 0x00000, 0x080000, CRC(8f28229d) SHA1(c3a26273baf1c081cedc01446846115acad1e318) )
-	sc_pog_others
+	PR1918_POTS_OF_GOLD_SOUNDS11
 ROM_END
 
 ROM_START( sc4pogf )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1938p42.hi", 0x00000, 0x080000, CRC(c5798bd9) SHA1(4031e72a04db4b8a0248c47a62ec2e9c275e8b73) )
 	ROM_LOAD16_BYTE( "p1938p42.lo", 0x00001, 0x080000, CRC(72bfe669) SHA1(8f9b384c67cb0ee70b004195b05a4271a9a08ffe) )
-	sc_pog_others
+	PR1918_POTS_OF_GOLD_SOUNDS11
 ROM_END
 
 ROM_START( sc4pogg )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "p1938s42.hi", 0x00000, 0x080000, CRC(ae02b67f) SHA1(c873985cc941a6ce334b4ce23db1117bcaf95fad) )
 	ROM_LOAD16_BYTE( "p1938s42.lo", 0x00001, 0x080000, CRC(4e80e631) SHA1(8fe73e1fa1961b1ea693e394f88e453daf065305) )
-	sc_pog_others
+	PR1918_POTS_OF_GOLD_SOUNDS11
 ROM_END
 
+ROM_START( sc4pogh )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95422750.lo", 0x00001, 0x080000, CRC(72e10a5e) SHA1(2182fe643ae0442b1a116737d3a8c37af783a58f) )
+    ROM_LOAD16_BYTE( "95422751.hi", 0x00000, 0x080000, CRC(2c304af5) SHA1(fc2d659c0c372b9f2516cd60a4b0c568992288c7) )
+    PR1918_POTS_OF_GOLD_SOUNDS11
+ROM_END
 
+ROM_START( sc4pogi )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95423750.lo", 0x00001, 0x080000, CRC(70582a43) SHA1(c84b5fdb729abc7f1ea82857bd717013199b04a4) )
+    ROM_LOAD16_BYTE( "95423751.hi", 0x00000, 0x080000, CRC(92f59096) SHA1(53f2ee3f11e119ca0daa7305f52f31e22a6f8315) )
+    PR1918_POTS_OF_GOLD_SOUNDS11
+ROM_END
 
 ROM_START( sc4pwrpl )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -21287,6 +21898,14 @@ ROM_START( sc4showte )
 	sc_showt_others
 ROM_END
 
+ROM_START( sc4showtf )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95423654.lo", 0x00001, 0x080000, CRC(15648452) SHA1(72619130fbcde1fb0b2f90f02769cbd0f6f1e64e) )
+    ROM_LOAD16_BYTE( "95423655.hi", 0x00000, 0x080000, CRC(9f6c934b) SHA1(28315b8bdc91355506ca150e1aeb3161e573bc5c) )
+    ROM_REGION( 0x400000, "ymz", ROMREGION_ERASE00)
+ROM_END
+
+
 ROM_START( sc4slad )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95410302.lo", 0x00001, 0x080000, CRC(e32e673f) SHA1(a7ca66b1f7a0d82980ee897833adf0841ee7e112) )
@@ -21746,84 +22365,86 @@ ROM_START( sc4vivam )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95400703.lo", 0x00001, 0x080000, CRC(611bee94) SHA1(207bad11a23fd88258ceb8adccd24ca09dd35600) )
 	ROM_LOAD16_BYTE( "95400704.hi", 0x00000, 0x080000, CRC(62c4d22d) SHA1(e6a75ab77cdb01399f87a6b17d1f6b240c8e3fb2) )
-	sc_vivam_others
+	PR6907_VIVA_MEXICO_SOUNDS11
 ROM_END
 
 ROM_START( sc4vivama )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95400705.lo", 0x00001, 0x080000, CRC(23f82b23) SHA1(9a18705864c53609164720f48017a3f758e3c07e) )
 	ROM_LOAD16_BYTE( "95400706.hi", 0x00000, 0x080000, CRC(254244ea) SHA1(a861ff07ddefcc645cfe97990ad321968ac8352d) )
-	sc_vivam_others
-ROM_END
-
-ROM_START( sc4vivcs )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95400985.lo", 0x00001, 0x080000, CRC(d2ccb5df) SHA1(40eaeaf23431846aed70a535dddc8ab4452c6934) )
-	ROM_LOAD16_BYTE( "95400986.hi", 0x00000, 0x080000, CRC(4d1a78d6) SHA1(0765bd2db52752fff21b7909f98536a788f54f58) )
-	sc_vivam_others
+	PR6907_VIVA_MEXICO_SOUNDS11
 ROM_END
 
 ROM_START( sc4vivamb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95401703.lo", 0x00001, 0x080000, CRC(bdd484d4) SHA1(48a5501f06a0992e95f9f1c2bbe2d6efeb4ea47d) )
 	ROM_LOAD16_BYTE( "95401704.hi", 0x00000, 0x080000, CRC(3aa93ae9) SHA1(4b98f5c1ebfd3326bbcb1d45d7adb788892a814d) )
-	sc_vivam_others
+	PR6907_VIVA_MEXICO_SOUNDS11
 ROM_END
 
 ROM_START( sc4vivamc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95401705.lo", 0x00001, 0x080000, CRC(583e6e00) SHA1(825d99d46adf12dfc3f7aa25e32a4faa28ae2535) )
 	ROM_LOAD16_BYTE( "95401706.hi", 0x00000, 0x080000, CRC(b9e0ca1c) SHA1(4c7f655e53d8f1bf3afdafcd1296b0f182626e61) )
-	sc_vivam_others
+	PR6907_VIVA_MEXICO_SOUNDS11
 ROM_END
+
+
+ROM_START( sc4vivcs )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95400985.lo", 0x00001, 0x080000, CRC(d2ccb5df) SHA1(40eaeaf23431846aed70a535dddc8ab4452c6934) )
+	ROM_LOAD16_BYTE( "95400986.hi", 0x00000, 0x080000, CRC(4d1a78d6) SHA1(0765bd2db52752fff21b7909f98536a788f54f58) )
+	PR6927_CASINO_VMEXICO_SOUNDS11
+ROM_END
+
 
 ROM_START( sc4vivcsa )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95401985.lo", 0x00001, 0x080000, CRC(d7307e01) SHA1(06adc3c22000062beb4d16df6470a582fcd77fb6) )
 	ROM_LOAD16_BYTE( "95401986.hi", 0x00000, 0x080000, CRC(b27ebf71) SHA1(f90d908d1fdab7f81903a7af5c699bbbde1a7157) )
-	sc_vivam_others
+	PR6927_CASINO_VMEXICO_SOUNDS11
 ROM_END
 
 ROM_START( sc4vivcsb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95406530.lo", 0x00001, 0x080000, CRC(d7b0d682) SHA1(ea6a2d919a4066eb278bc6a74b354678afb264da) )
 	ROM_LOAD16_BYTE( "95406531.hi", 0x00000, 0x080000, CRC(6ced2032) SHA1(d89aa8d3d2a6aea92650634e9af63ded26b10265) )
-	sc_vivam_others
+	PR6927_CASINO_VMEXICO_SOUNDS21
 ROM_END
 
 ROM_START( sc4vivcsc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95407530.lo", 0x00001, 0x080000, CRC(f679842e) SHA1(eb11a0478295e7cc091d45957a6d1313098884b4) )
 	ROM_LOAD16_BYTE( "95407531.hi", 0x00000, 0x080000, CRC(3924f97f) SHA1(9c4b99e36b723adb53c0f229c95afa55a35c26ed) )
-	sc_vivam_others
+	PR6927_CASINO_VMEXICO_SOUNDS21
 ROM_END
 
 ROM_START( sc4vivcsd )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95410054.lo", 0x00001, 0x080000, CRC(6133a322) SHA1(fef8a250a15234c4edc9f0503b95d5fc39295383) )
 	ROM_LOAD16_BYTE( "95410055.hi", 0x00000, 0x080000, CRC(4aca6d50) SHA1(99e91c14cf19f4b14797f2b9ada0a1c7dc527e30) )
-	sc_vivam_others
+	PR6927_CASINO_VMEXICO_SOUNDS21
 ROM_END
 
 ROM_START( sc4vivcse )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95410058.lo", 0x00001, 0x080000, CRC(5688892a) SHA1(68edeb781623b9c5622f8523612faf7f9e012f3b) )
 	ROM_LOAD16_BYTE( "95410059.hi", 0x00000, 0x080000, CRC(4aa40ae2) SHA1(f9068b542697c188e26847205b7c72f518f987dc) )
-	sc_vivam_others
+	PR6927_CASINO_VMEXICO_SOUNDS21
 ROM_END
 
 ROM_START( sc4vivcsf )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95411054.lo", 0x00001, 0x080000, CRC(0bb6da59) SHA1(21fc9b6a2e294b7ec25054bc3c08e72806e85c3f) )
 	ROM_LOAD16_BYTE( "95411055.hi", 0x00000, 0x080000, CRC(3acd1951) SHA1(9250c42d28a6eb4364b3c30557d8270e85a56263) )
-	sc_vivam_others
+	PR6927_CASINO_VMEXICO_SOUNDS21
 ROM_END
 
 ROM_START( sc4vivcsg )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95411058.lo", 0x00001, 0x080000, CRC(e98505e3) SHA1(6254c7016672a92e189970fcf79e3c3414bb7436) )
 	ROM_LOAD16_BYTE( "95411059.hi", 0x00000, 0x080000, CRC(cedaf6bd) SHA1(9d459d8896d577d373e989042167ea46078de564) )
-	sc_vivam_others
+	PR6927_CASINO_VMEXICO_SOUNDS21
 ROM_END
 
 
@@ -22179,14 +22800,6 @@ ROM_START( sc4dndbe )
 	sc_dndbe_others
 ROM_END
 
-/*
-ROM_START( sc4dndbea )
-    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-    ROM_LOAD16_BYTE( "95418410.lo", 0x00001, 0x080000, CRC(ddd534d0) SHA1(1c8acd74d79fc7f169ed54e2d603100775610e5a) )
-    ROM_LOAD16_BYTE( "95418411.hi", 0x00000, 0x080000, CRC(5346fd2a) SHA1(ada8ed84a173bf3f68af0a2e1b92dbfe94f2d6c9) )
-    sc_dndbe_others
-ROM_END
-*/
 
 ROM_START( sc4dndbeb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
@@ -22332,58 +22945,56 @@ ROM_START( sc4mowowc )
 ROM_END
 
 
-ROM_START( sc4mowowd )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95418078.lo", 0x00001, 0x080000, CRC(73044155) SHA1(f86e25c7c02f65e2f99b3e7b3b7192d2b5fc0b54) )
-	ROM_LOAD16_BYTE( "95418079.hi", 0x00000, 0x080000, CRC(1d260113) SHA1(834fec1e07e9a2f59adbb052e51dc03493dcee9e) )
-	sc_mowow_others
-ROM_END
-
-ROM_START( sc4mowowe )
-	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "95419078.lo", 0x00001, 0x080000, CRC(9205e5fb) SHA1(e77062edcc51e44612c558ee593028934835a41d) )
-	ROM_LOAD16_BYTE( "95419079.hi", 0x00000, 0x080000, CRC(f80fae88) SHA1(c483f89204489775458112d7ed34ad778d3c9e71) )
-	sc_mowow_others
-ROM_END
-
-ROM_START( sc4mowowf )
+ROM_START( sc4mwwtb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95424056.lo", 0x00001, 0x080000, CRC(255586e1) SHA1(caa32b86ab5f726174bb45402a015e2ae1b6ff68) )
 	ROM_LOAD16_BYTE( "95424057.hi", 0x00000, 0x080000, CRC(be45b2b1) SHA1(5d17963f705f8bcaa7a93af2c2621677a57ef039) )
-	sc_mowow_others
+	WHEEL_OF_WEALTH_WOWT_SOUNDS
 ROM_END
 
-ROM_START( sc4mowowg )
+ROM_START( sc4mwwtba )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95424214.lo", 0x00001, 0x080000, CRC(a8b93c99) SHA1(83e6fa6751634f64d285ba6f93b8d52690c17d4a) )
 	ROM_LOAD16_BYTE( "95424215.hi", 0x00000, 0x080000, CRC(05c523d6) SHA1(558031df5270567ca2bd88a389b33cfae34b7967) )
-	sc_mowow_others
+	WHEEL_OF_WEALTH_WOWT_SOUNDS
 ROM_END
 
-ROM_START( sc4mowowh )
+ROM_START( sc4mwwtbb )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95424512.lo", 0x00001, 0x080000, CRC(14b7ef71) SHA1(675345c95d2a68d1b3092d564a9c6192a7390486) )
 	ROM_LOAD16_BYTE( "95424513.hi", 0x00000, 0x080000, CRC(dd7c5383) SHA1(fad0cbba52a5c2746d325f437f9d85bee5776201) )
-	sc_mowow_others
+	WHEEL_OF_WEALTH_WOWT_SOUNDS
 ROM_END
 
-ROM_START( sc4mowowi )
+ROM_START( sc4mwwtbc )
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95425056.lo", 0x00001, 0x080000, CRC(b2c7fe92) SHA1(00e27916482a5fcabde46da8e139b49f789837a8) )
 	ROM_LOAD16_BYTE( "95425057.hi", 0x00000, 0x080000, CRC(8946e5d6) SHA1(1426c7ea7ded18b03bab7b08d0d13021bc8aa75b) )
-	sc_mowow_others
+	WHEEL_OF_WEALTH_WOWT_SOUNDS
 ROM_END
 
-ROM_START( sc4mowowj ) // these were in the dnd perfect game set
+ROM_START( sc4mwwtbd ) // these were in the dnd perfect game set
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "95425512.lo", 0x00001, 0x080000, CRC(1e66031a) SHA1(b149806fe7c0a996dfda4abcd00aa7ae9b126a7b) )
 	ROM_LOAD16_BYTE( "95425513.hi", 0x00000, 0x080000, CRC(a668aaae) SHA1(593f846687aa7d851fb38e62046c6174dfa088f5) )
-	sc_mowow_others
+	WHEEL_OF_WEALTH_WOWT_SOUNDS
 ROM_END
 
 
 
+ROM_START( sc4bwow )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95418078.lo", 0x00001, 0x080000, CRC(73044155) SHA1(f86e25c7c02f65e2f99b3e7b3b7192d2b5fc0b54) )
+	ROM_LOAD16_BYTE( "95418079.hi", 0x00000, 0x080000, CRC(1d260113) SHA1(834fec1e07e9a2f59adbb052e51dc03493dcee9e) )
+	PR1706_WHEEL_OF_WEALTH_SOUNDS11
+ROM_END
 
+ROM_START( sc4bwowa )
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "95419078.lo", 0x00001, 0x080000, CRC(9205e5fb) SHA1(e77062edcc51e44612c558ee593028934835a41d) )
+	ROM_LOAD16_BYTE( "95419079.hi", 0x00000, 0x080000, CRC(f80fae88) SHA1(c483f89204489775458112d7ed34ad778d3c9e71) )
+	PR1706_WHEEL_OF_WEALTH_SOUNDS11
+ROM_END
 
 
 
@@ -22458,7 +23069,55 @@ ROM_START( sc4nunsmj )
 	sc_nunsm_others
 ROM_END
 
-/********* UNSORTED *************/
+
+
+
+ROM_START( sc4clbmn )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95418938.lo", 0x00001, 0x080000, CRC(59faf394) SHA1(a61158d582de97b0e1e613a984504066e56e237e) )
+    ROM_LOAD16_BYTE( "95418939.hi", 0x00000, 0x080000, CRC(ff6df292) SHA1(5d97c45b250ac7276520ead111186fb27846b085) )
+	sc_clbmn_others
+ROM_END
+
+ROM_START( sc4clbmna )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95419938.lo", 0x00001, 0x080000, CRC(e3316610) SHA1(b651136355adc6da794ce669bfaa9551c567d133) )
+    ROM_LOAD16_BYTE( "95419939.hi", 0x00000, 0x080000, CRC(54eda019) SHA1(762def4d175722222a8b17dd4278bc49f0f3b873) )
+	sc_clbmn_others
+ROM_END
+
+ROM_START( sc4clbmnb )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95422126.lo", 0x00001, 0x080000, CRC(09ddd2a8) SHA1(20bad26635c6277a2d556afaf52ffd38ee2ec99c) )
+    ROM_LOAD16_BYTE( "95422127.hi", 0x00000, 0x080000, CRC(b5f1deb6) SHA1(adf483b3194f17428c6f128378725c65ef186f65) )
+	sc_clbmn_others
+ROM_END
+
+ROM_START( sc4clbmnc )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95423126.lo", 0x00001, 0x080000, CRC(02953434) SHA1(329944baf10c305597bf137bfc9c6fdce2e30bd2) )
+    ROM_LOAD16_BYTE( "95423127.hi", 0x00000, 0x080000, CRC(6f03e758) SHA1(7317bd88df1c1c3f378cbbe30982c3e1479a1dc4) )
+	sc_clbmn_others
+ROM_END
+
+
+
+
+ROM_START( sc4boomb )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95426488.lo", 0x00001, 0x080000, CRC(b5ddf816) SHA1(3817eedab684ae06f3b079993d800c4000cf46dd) )
+    ROM_LOAD16_BYTE( "95426489.hi", 0x00000, 0x080000, CRC(c84a8b41) SHA1(86f2f14f9a66aa616f579c835d8111751f36a84e) )
+    sc_mobob_others
+ROM_END
+
+
+ROM_START( sc4boomba )
+    ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF)
+    ROM_LOAD16_BYTE( "95427489.hi", 0x00000, 0x080000, CRC(6dc23ad0) SHA1(5318dfffca7211600e0f64ea0ef1f45701f57401) )
+    ROM_LOAD16_BYTE( "95427488.lo", 0x00001, 0x080000, CRC(5ac5adbd) SHA1(a4cf828eb3d5d8e2603a1921e6f63e04348beb26) )
+    sc_mobob_others
+ROM_END
+
 
 
 ROM_START( ad4film )
@@ -22506,9 +23165,6 @@ ROM_START( sc_unsrt )
 	ROM_LOAD( "95008136.bin", 0x0000, 0x100000, CRC(456cc709) SHA1(85ae7a81fbd1dc13b4395baefea82ba31e6c4d3f) )
 	// Cash Splash (Qps)
 	ROM_LOAD( "95008403.bin", 0x0000, 0x0facbf, CRC(cf3969bb) SHA1(4cb6fb4e536882a11bb6c1548ffb94daea70ca5f) )
-	// Casino Viva Mexico
-	ROM_LOAD( "95004209.lo", 0x00001, 0x080000, CRC(40247425) SHA1(54c8540f9ce45b8b02f6616233b81e33af804f63) )
-	ROM_LOAD( "95004210.hi", 0x00000, 0x080000, CRC(6f6ce2c8) SHA1(7e9ce336a1307b8290196d58c7419996d0758ab9) )
 	// Casino Triple Classic (Bellfruit)
 	// 95008423.bin =
 	// 95008423.bin          sc4bar7    Bar 7's (Bellfruit) (Scorpion 4)
@@ -22516,8 +23172,6 @@ ROM_START( sc_unsrt )
 	// 95008423.bin          sc4goldw   Golden Winner (Bellfruit) (Scorpion 4)
 	// Champion Chips (Bellfruit)
 	ROM_LOAD( "95008558.bin", 0x0000, 0x100000, CRC(6c032de9) SHA1(3aed801f8b6f2d62fffa03054afd8ff1c3ff3ac3) )
-	// Clever Clogs (Mazooma)
-	ROM_LOAD( "95008361.bin", 0x0000, 0x0ff54f, CRC(d1cc7b58) SHA1(32328e0e56bbf65e91e32de8802edce38f0abc65) )
 	// Costa Del Dosh (Bellfruit)
 	ROM_LOAD( "95008420.bin", 0x0000, 0x100000, CRC(cce5f09a) SHA1(8b1f30eb1c48a3e3c6c403f28e97918ddac51033) )
 	// Deal Or No Deal Red Hot (Bellfruit)
@@ -22590,152 +23244,6 @@ ROM_START( sc_unsrt )
 ROM_END
 
 
-// addrxor used for endianness stuff, mode used for when we have a missing pair half
-int find_project_string(running_machine &machine, int addrxor, int mode)
-{
-	// search for the title
-	const int strlength = 14;
-	char title_string[] = "PROJECT NUMBER";
-	UINT8 *src = machine.region( "maincpu" )->base();
-	int size = machine.region( "maincpu" )->bytes();
-
-	int search_start = 0;
-	int search_step = 1;
-
-	if (mode==1)
-	{
-		search_start = 0;
-		search_step = 2;
-	}
-
-	if (mode==2)
-	{
-		search_start = 1;
-		search_step = 2;
-	}
-
-	for (int i=0;i<size-strlength;i++)
-	{
-	//  printf("%02x", src[i]);
-
-		int j;
-		int found = 1;
-		for (j=search_start;j<strlength;j+=search_step)
-		{
-			UINT8 rom = src[(i+j)^addrxor];
-			UINT8 chr = title_string[j];
-
-			if (rom != chr)
-			{
-				found = 0;
-				break;
-			}
-		}
-
-		if (found!=0)
-		{
-
-			int end=0;
-			int count = 0;
-			int blankcount = 0;
-			printf("ID String @ %08x\n", i);
-
-			if (mode==2)
-			{
-				count = -1;
-			}
-
-			while (!end)
-			{
-				UINT8 rom;
-				int addr;
-				if (mode==0)
-				{
-					addr = (i+count)^addrxor;
-					rom = src[addr];
-				}
-				else if (mode == 1)
-				{
-					addr = (i+count)^addrxor;
-
-					if (addr&1)
-						rom = src[addr];
-					else
-						rom = '_';
-				}
-				else
-				{
-					addr = (i+count)^addrxor;
-
-					if (addr&1)
-						rom = '_';
-					else
-						rom = src[addr];
-				}
-
-
-				//if (rom==0xff)
-				//  end = 1;
-				//else
-				{
-					if ((rom>=0x20) && (rom<0x7f))
-					{
-						printf("%c", rom);
-						blankcount = 0;
-					}
-					else
-					{
-						blankcount++;
-						if (blankcount<10) printf(" ");
-					}
-				}
-
-				count++;
-
-				if (count>=0x100)
-					end = 1;
-			}
-			printf("\n");
-
-			return 1;
-		}
-	}
-
-	return 0;
-}
-
-DRIVER_INIT( sc4 )
-{
-	UINT8 *src = machine.region( "maincpu" )->base();
-	// SC4 identification sequence 0x80 0x00 0xf0 0x7d
-	if (((src[0] == 0x80) && (src[2] == 0xf0)) || ((src[1] == 0x00) && (src[3] == 0x7d)))
-	{
-		printf("Confirmed SC4 ROM\n");
-	}
-	else
-	{
-		printf("NOT AN SC4 ROM!!!!!\n");
-	}
-
-	// there is usually a string in the rom with identification info, often also saying which sound rom should be used!
-	// find it.
-
-	int found = find_project_string(machine, 1, 0);
-	if (!found)
-		printf("Normal rom pair string not found, checking mismatched / missing rom string\n");
-
-	// help identify roms where one of the pair is missing too
-	if (!found)
-	{
-		 found = find_project_string(machine, 1, 1);
-		 found = find_project_string(machine, 1, 2);
-	}
-
-	if (!found)
-		printf("No suitable string found\n");
-
-}
-
 /* Scorpion 4 */
 
 GAME( 200?, sc4tst		,0,			sc4, sc4, sc4, ROT0, "BFM","Scorpion 4 Test Rig (Bellfruit) (Scorpion ?)", GAME_IS_SKELETON_MECHANICAL )
@@ -22768,31 +23276,63 @@ GAME( 200?, sc4pstatj	,sc4pstat,	sc4, sc4, sc4, ROT0, "QPS","Paystation (V041) (
 GAME( 200?, sc4pstato	,sc4pstat,	sc4, sc4, sc4, ROT0, "QPS","Paystation (V042) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4pstatq	,sc4pstat,	sc4, sc4, sc4, ROT0, "QPS","Paystation (V042) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
+const stepper_interface* sc4cvani_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_200step_reel,
+	0,
+};
+
+static DRIVER_INIT( sc4cvani )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4 );
+	state->m_reel_setup = sc4cvani_reel_configs;
+}
 
 // PR2052 CASHLVANIA         VANIASND           CASH'!'VANIA
-GAME( 200?, sc4cvani	,0,			sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvania	,sc4cvani,	sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvanib	,sc4cvani,	sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvanic	,sc4cvani,	sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvanid	,sc4cvani,	sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvanie	,sc4cvani,	sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvanif	,sc4cvani,	sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvanig	,sc4cvani,	sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvanih	,sc4cvani,	sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvanii	,sc4cvani,	sc4, sc4, sc4, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvani	,0,			sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvania	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvanib	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvanic	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvanid	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvanie	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvanif	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvanig	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvanih	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvanii	,sc4cvani,	sc4, sc4, sc4cvani, ROT0, "QPS","Cashvania (Qps) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 
+const stepper_interface* sc4cvclb_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_200step_reel,
+};
+
+static DRIVER_INIT( sc4cvclb )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4 );
+	state->m_reel_setup = sc4cvclb_reel_configs;
+}
 
 // PRXXXX CLUBCASHLVANIA V1.0         CLUBVANIASND         CLUB  CASH!VANIA
-GAME( 200?, sc4cvclb	,0,			sc4, sc4, sc4, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvclba	,sc4cvclb,	sc4, sc4, sc4, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvclbc	,sc4cvclb,	sc4, sc4, sc4, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvclbd	,sc4cvclb,	sc4, sc4, sc4, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvclb	,0,			sc4, sc4, sc4cvclb, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvclba	,sc4cvclb,	sc4, sc4, sc4cvclb, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvclbc	,sc4cvclb,	sc4, sc4, sc4cvclb, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvclbd	,sc4cvclb,	sc4, sc4, sc4cvclb, ROT0, "QPS","Cashvania Club (V1.0) (Qps) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 // PRXXXX CLUBCASHLVANIA V2.0         CLUBVANIASND         CLUB  CASH!VANIA
-GAME( 200?, sc4cvclbb	,sc4cvclb,	sc4, sc4, sc4, ROT0, "QPS","Cashvania Club (V2.0) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvclbe	,sc4cvclb,	sc4, sc4, sc4, ROT0, "QPS","Cashvania Club (V2.0) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvclbb	,sc4cvclb,	sc4, sc4, sc4cvclb, ROT0, "QPS","Cashvania Club (V2.0) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvclbe	,sc4cvclb,	sc4, sc4, sc4cvclb, ROT0, "QPS","Cashvania Club (V2.0) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 // PRXXXX CLUBCASHLVANIA 411         CLUBVANIASND         CLUB  CASH!VANIA
-GAME( 200?, sc4cvclbf	,sc4cvclb,	sc4, sc4, sc4, ROT0, "QPS","Cashvania Club (V411) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cvclbg	,sc4cvclb,	sc4, sc4, sc4, ROT0, "QPS","Cashvania Club (V411) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvclbf	,sc4cvclb,	sc4, sc4, sc4cvclb, ROT0, "QPS","Cashvania Club (V411) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cvclbg	,sc4cvclb,	sc4, sc4, sc4cvclb, ROT0, "QPS","Cashvania Club (V411) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR6912 SOUTH PARK         PR6912 SOUTH PARK SOUNDS11            SOUTH PARK
 GAME( 200?, sc4spark	,0,			sc4, sc4, sc4, ROT0, "BFM","South Park (BFM) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -22817,8 +23357,6 @@ GAME( 200?, sc4gslamd	,sc4gslam,	sc4, sc4, sc4, ROT0, "BFM","Grandslam Club (BFM
 GAME( 200?, sc4gslame	,sc4gslam,	sc4, sc4, sc4, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4gslamf	,sc4gslam,	sc4, sc4, sc4, ROT0, "BFM","Grandslam Club (BFM) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1227 4PLAY ART13         95004313 4PLAY PR1227
-GAME( 200?, sc4ivply	,0,			sc4, sc4, sc4, ROT0, "BFM","4 Play (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2540 ABRACADABRA         ABRA SOUNDS         ABRACADABRA
 GAME( 200?, sc4abra		,0,			sc4, sc4, sc4, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -22828,36 +23366,17 @@ GAME( 200?, sc4abrac	,sc4abra,	sc4, sc4, sc4, ROT0, "Qps","Abracadabra (Qps) (Sc
 GAME( 200?, sc4abrad	,sc4abra,	sc4, sc4, sc4, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4abrae	,sc4abra,	sc4, sc4, sc4, ROT0, "Qps","Abracadabra (Qps) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2070 ACES HIGH         ACEHI SOUNDS            ACES HIGH
-GAME( 200?, sc4acesh	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4acesha	,sc4acesh,	sc4, sc4, sc4, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4aceshb	,sc4acesh,	sc4, sc4, sc4, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4aceshc	,sc4acesh,	sc4, sc4, sc4, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2118 ADRENALIN         COTL SOUNDS         ADRENALIN
-GAME( 200?, sc4adren	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4adrena	,sc4adren,	sc4, sc4, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4adrenb	,sc4adren,	sc4, sc4, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4adrenc	,sc4adren,	sc4, sc4, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR7068 ALADDIN'S CAVE         CAVE SOUNDS
 GAME( 200?, sc4alad		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Aladdin's Cave (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4alada	,sc4alad,	sc4, sc4, sc4, ROT0, "Mazooma","Aladdin's Cave (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2154 CLUB AROUND BOAR         CLB AROUND BOARD  CLUB  AROU SOUNDS
-GAME( 200?, sc4a40cl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4a40cla	,sc4a40cl,	sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4a40clb	,sc4a40cl,	sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days Club (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4a40clc	,sc4a40cl,	sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days Club (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-
- // PR1225 AZTEC CASINO
-GAME( 200?, sc4aztec	,0,			sc4, sc4, sc4, ROT0, "BFM","Aztec (Casino) (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
- // PR1215 AZTEC EURO
-GAME( 200?, sc4azteca	,sc4aztec,	sc4, sc4, sc4, ROT0, "BFM","Aztec (Euro) (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2538 BACK OF THE NET V011         BACKOFTHENETSND         BACK OF THE NET
-GAME( 200?, sc4botn		,0,			sc4, sc4, sc4, ROT0, "Qps","Back Of The Net (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4botna	,sc4botn,	sc4, sc4, sc4, ROT0, "Qps","Back Of The Net (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4botn		,0,			sc4, sc4, sc4mbus, ROT0, "Qps","Back Of The Net (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4botna	,sc4botn,	sc4, sc4, sc4mbus, ROT0, "Qps","Back Of The Net (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 
 // PR2034 BANK ROLL         ROL SOUNDS          BANK ROLL
 GAME( 200?, sc4broll	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -22866,48 +23385,10 @@ GAME( 200?, sc4brollb	,sc4broll,	sc4, sc4, sc4, ROT0, "Mazooma","Bank Roll (Mazo
 GAME( 200?, sc4brollc	,sc4broll,	sc4, sc4, sc4, ROT0, "Mazooma","Bank Roll (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 
-// PR???? BANKETYBANK V1.0         BANKETYBANKSND           BANKETY BANK
-GAME( 200?, sc4bankb	,0,			sc4, sc4, sc4, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bankba	,sc4bankb,	sc4, sc4, sc4, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-
-// PR2094 BEDAZZLED         BEDZ SOUNDS         BEDAZZLED
-GAME( 200?, sc4bed		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4beda		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bedb		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bedc		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bedd		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bede		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-
-
-// PR2102 CLUB BEDAZZLED         CBED SOUNDS         CLUB BEDAZZLED
-GAME( 200?, sc4bedcl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-// PR2102 CLUB BEDAZZLED         CLUB BEDAZZLED  CLUB  CBED SOUNDS         CLUB BEDAZZLED
-GAME( 200?, sc4bedcla	,sc4bedcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bedclb	,sc4bedcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bedclc	,sc4bedcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bedcld	,sc4bedcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-
-// PR2083 BIG BLASTER         BBST SOUNDS         BIG BLASTER
-GAME( 200?, sc4bblas	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bblasa	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bblasb	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bblasc	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bblasd	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bblase	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bblasf	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-
 // PR2501 BIG DEAL         BIGDEALSND             BIG DEAL
 GAME( 200?, sc4bigdl	,0,			sc4, sc4, sc4, ROT0, "Qps","Big Deal (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4bigdla	,sc4bigdl,	sc4, sc4, sc4, ROT0, "Qps","Big Deal (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-
-// PR21xx BINGO BELLE         SSPT SOUNDS         BINGO BELLE
-GAME( 200?, sc4bingb	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bingo Belle (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bingba	,sc4bingb,	sc4, sc4, sc4, ROT0, "Mazooma","Bingo Belle (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-
-// PR???? BANKETYBANK 011         BANKETYBANKSND           BANKETY BANK
-GAME( 200?, sc4bb		,0,			sc4, sc4, sc4, ROT0, "Qps","Blankety Bank (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bba		,sc4bb,		sc4, sc4, sc4, ROT0, "Qps","Blankety Bank (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PRXXXX CLUB BANKETY BANK VER1.0         CLUBBANKSND         CLUB BANKETYBANK
 GAME( 200?, sc4bbclb	,0,			sc4, sc4, sc4, ROT0, "Qps","Blankety Bank Club (V1.0) (Qps) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
@@ -22935,29 +23416,55 @@ GAME( 200?, sc4bluec	,sc4blue,	sc4, sc4, sc4, ROT0, "Mazooma","Blue Rinse (Mazoo
 GAME( 200?, sc4blued	,sc4blue,	sc4, sc4, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4bluee	,sc4blue,	sc4, sc4, sc4, ROT0, "Mazooma","Blue Rinse (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2298 CLUB BOBBY DAZZLER         CLUB BOB DAZZLER  CLUB  CLUBBOBD SOUNDS
-GAME( 200?, sc4bobcl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bobcla	,sc4bobcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+const stepper_interface* sc4bonbx_reel_configs[6] =
+{
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	0,
+	0,
+	0,
+};
+
+static DRIVER_INIT( sc4bonbxm )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4bonbx_reel_configs;
+}
+
+static DRIVER_INIT( sc4bonbx )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4 );
+	state->m_reel_setup = sc4bonbx_reel_configs;
+}
+
+INPUT_PORTS_START( sc4bonbx4 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0a, "Jackpot Key" ) // default to 4GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
 
 // PR7036GOLDEN X         GOLDEN X  ARCADE  BARX SOUNDS         GOLDEN X
-GAME( 200?, sc4bonbx	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bonbxc	,sc4bonbx,	sc4, sc4, sc4, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bonbxd	,sc4bonbx,	sc4, sc4, sc4, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bonbxe	,sc4bonbx,	sc4, sc4, sc4, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bonbxf	,sc4bonbx,	sc4, sc4, sc4, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bonbx	,0,			sc4, sc4bonbx4, sc4bonbxm, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bonbxc	,sc4bonbx,	sc4, sc4, sc4bonbxm, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bonbxd	,sc4bonbx,	sc4, sc4, sc4bonbxm, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bonbxe	,sc4bonbx,	sc4, sc4, sc4bonbxm, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bonbxf	,sc4bonbx,	sc4, sc4, sc4bonbxm, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 // PR7036GOLDEN X         BARX SOUNDS         GOLDEN X
-GAME( 200?, sc4bonbxa	,sc4bonbx,	sc4, sc4, sc4, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bonbxb	,sc4bonbx,	sc4, sc4, sc4, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bonbxg	,sc4bonbx,	sc4, sc4, sc4, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bonbxh	,sc4bonbx,	sc4, sc4, sc4, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bonbxi	,sc4bonbx,	sc4, sc4, sc4, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bonbxj	,sc4bonbx,	sc4, sc4, sc4, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bonbxk	,sc4bonbx,	sc4, sc4, sc4, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bonbxl	,sc4bonbx,	sc4, sc4, sc4, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bonbxa	,sc4bonbx,	sc4, sc4, sc4bonbx, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bonbxb	,sc4bonbx,	sc4, sc4, sc4bonbx, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bonbxg	,sc4bonbx,	sc4, sc4, sc4bonbx, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bonbxh	,sc4bonbx,	sc4, sc4, sc4bonbx, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bonbxi	,sc4bonbx,	sc4, sc4, sc4bonbx, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bonbxj	,sc4bonbx,	sc4, sc4, sc4bonbx, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bonbxk	,sc4bonbx,	sc4, sc4, sc4bonbx, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bonbxl	,sc4bonbx,	sc4, sc4, sc4bonbx, ROT0, "Mazooma","Bonus Bar X (Mazooma) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2033 BREAK THE SPELL         SPELL SOUNDS         BREAK THE SPELL
-GAME( 200?, sc4brksp	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4brkspa	,sc4brksp,	sc4, sc4, sc4, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2023.GERMAN BRIX...........PR2023,German BRIX,......PR2023 SOUNDS V1  (non-standard header)
 GAME( 200?, sc4brix		,0,			sc4, sc4, sc4, ROT0, "Nova","Brix (German) (Nova) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -22970,17 +23477,6 @@ GAME( 200?, sc4bugsa	,sc4bugs,	sc4, sc4, sc4, ROT0, "BFM","Bugs Money (Bellfruit
 GAME( 200?, sc4bugsb	,sc4bugs,	sc4, sc4, sc4, ROT0, "BFM","Bugs Money (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4bugsc	,sc4bugs,	sc4, sc4, sc4, ROT0, "BFM","Bugs Money (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1753 CLUB BULLSEYE         BULLSEYE  CLUB  PR1751 BULLSEYE SOUNDS11         BULLSYE
-GAME( 200?, sc4bulcl	,0,			sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulcla	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulclb	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulclc	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulcld	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulcle	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulclf	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulclg	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulclh	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulcli	,sc4bulcl,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR7017CASINO CAN CAN CASH          PR7017,Casino CAN CAN CASH,         LINE SOUNDS         CAN CAN CASH
 GAME( 200?, sc4canca	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Can Can Cash Casino (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -22998,9 +23494,6 @@ GAME( 200?, sc4captnd	,sc4captn,	sc4, sc4, sc4, ROT0, "Qps","Captain Cash (Qps) 
 GAME( 200?, sc4captne	,sc4captn,	sc4, sc4, sc4, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4captnf	,sc4captn,	sc4, sc4, sc4, ROT0, "Qps","Captain Cash (Qps) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1113 CARRY ON WINNING         PR1113 CARRY ON WINNING SOUNDS11
-GAME( 200?, sc4carry	,0,			sc4, sc4, sc4, ROT0, "BFM","Carry On Winning (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4carrya	,sc4carry,	sc4, sc4, sc4, ROT0, "BFM","Carry On Winning (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2534 CASH AND MOUSE V041         CASHANDMOUSESND          CASH AND MOUSE
 GAME( 200?, sc4cmous	,0,			sc4, sc4, sc4, ROT0, "Qps","Cash & Mouse (V041) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23009,10 +23502,22 @@ GAME( 200?, sc4cmousb	,sc4cmous,	sc4, sc4, sc4, ROT0, "Qps","Cash & Mouse (V041)
 GAME( 200?, sc4cmousa	,sc4cmous,	sc4, sc4, sc4, ROT0, "Qps","Cash & Mouse (V011) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cmousc	,sc4cmous,	sc4, sc4, sc4, ROT0, "Qps","Cash & Mouse (V011) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
+
+// PR6911 HOT PROPERTY         PR6911 HOT PROPERTY SOUNDS11           HOT PROPERTY
+GAME( 200?, sc4hotpr	,0,			sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hotpra	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hotprb	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hotprc	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hotprd	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hotpre	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+
+// is this some kind of reworked version of Hot Property?
+
 // PR6911 HOT PROPERTY         PR6911 HOT PROPERTY SOUNDS11        $$  CASH 'N' BURN
-GAME( 200?, sc4cburn	,0,			sc4, sc4, sc4, ROT0, "Qps","Cash 'n' Burn (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cburn	,sc4hotpr,	sc4, sc4, sc4, ROT0, "Qps","Cash 'n' Burn (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 // PR6911 HOT PROPERTY V4.0         PR6911 HOT PROPERTY SOUNDS11        $   CASH 'N' BURN
-GAME( 200?, sc4cburna	,sc4cburn,	sc4, sc4, sc4, ROT0, "Qps","Cash 'n' Burn (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cburna	,sc4hotpr,	sc4, sc4, sc4, ROT0, "Qps","Cash 'n' Burn (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 
 // PR6815 CASH N FRUIT         PR6815 CASH N FRUIT SOUNDS11
 GAME( 200?, sc4cnfr		,0,			sc4, sc4, sc4, ROT0, "BFM","Cash 'n' Fruit (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23060,20 +23565,6 @@ GAME( 200?, sc4cadq		,sc4cad,	sc4, sc4, sc4, ROT0, "Qps","Cash Adder (V043) (Qps
 GAME( 200?, sc4cadcl	,0,			sc4, sc4, sc4, ROT0, "Qps","Cash Adder Club (411) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cadcla	,sc4cadcl,	sc4, sc4, sc4, ROT0, "Qps","Cash Adder Club (411) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1349 CLUB CASH BAZAAR         PR1349 CLUB CASH BAZAAR SOUNDS11
-GAME( 200?, sc4cbaz		,0,			sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbaza	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbazb	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbazc	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbazd	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbaze	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbazf	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbazg	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbazh	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbazi	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
-// PR1349 CLUB CASH BAZAAR         CLUB CASH BAZAAR  CLUB  PR1349 CLUB CASH BAZAAR SOUNDS11
-GAME( 200?, sc4cbazj	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cbazk	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR7038 CASH CONNEXION         MTOM SOUNDS
 GAME( 200?, sc4cconx	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cash Connexion (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23087,19 +23578,7 @@ GAME( 200?, sc4ccrus	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cash Crusaders (Mazoo
 GAME( 200?, sc4ccrusa	,sc4ccrus,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Crusaders (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4ccrusb	,sc4ccrus,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Crusaders (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2020 CASH ERUPTION         ERUP SOUNDS          CASH  ERUPTION
-GAME( 200?, sc4cerup	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cash Eruption (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2076 CASH EXPLOSION         CEXP SOUNDS         CASH EXPLSION
-GAME( 200?, sc4cexpl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cexpla	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cexplb	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cexplc	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cexplf	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cexplg	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-//  PR2120 CASH EXPLOSION         CEXP SOUNDS         CASH EXPLSION
-GAME( 200?, sc4cexpld	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2120) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cexple	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2120) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR7108 CASH IN HAND         PR7108 CASH IN HAND SOUNDS11           CASH IN HAND
 GAME( 200?, sc4chand	,0,			sc4, sc4, sc4, ROT0, "BFM","Cash In Hand (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23119,15 +23598,6 @@ GAME( 200?, sc4cinvg	,sc4cinv,	sc4, sc4, sc4, ROT0, "BFM","Cash Invaders (Bellfr
 GAME( 200?, sc4cinvh	,sc4cinv,	sc4, sc4, sc4, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cinvi	,sc4cinv,	sc4, sc4, sc4, ROT0, "BFM","Cash Invaders (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2118 CASH ON THE LASH         COTL SOUNDS         CASH ON THE LASH
-GAME( 200?, sc4clash	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clasha	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clashb	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clashc	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clashd	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clashe	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clashf	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clashg	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
 
 // PR2061 CASHRAKER         RAKERSND             CASHRAKER
@@ -23153,9 +23623,6 @@ GAME( 200?, sc4crcld	,sc4crcl,	sc4, sc4, sc4, ROT0, "Qps","Cash Raker Club (V1.3
 GAME( 200?, sc4crcle	,sc4crcl,	sc4, sc4, sc4, ROT0, "Qps","Cash Raker Club (411) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4crclf	,sc4crcl,	sc4, sc4, sc4, ROT0, "Qps","Cash Raker Club (411) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2038E Dutch12 Cashanova  (not a standard string)
-GAME( 200?, sc4cashn	,0,			sc4, sc4, sc4, ROT0, "Mazooma / Eurocoin","Cashanova (Dutch) (Mazooma / Eurocoin) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
-
 // PR2022 GERMAN CASHANOVA (not a standard string)
 GAME( 200?, sc4cashg	,0,			sc4, sc4, sc4, ROT0, "Mazooma / Nova","Cashanova (German) (Mazooma / Nova) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
@@ -23168,23 +23635,10 @@ GAME( 200?, sc4cashmd	,sc4cashm,	sc4, sc4, sc4, ROT0, "Mazooma","Cashanova (Mazo
 GAME( 200?, sc4cashme	,sc4cashm,	sc4, sc4, sc4, ROT0, "Mazooma","Cashanova (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 
-// PR1426 CASINO CRAZY FRUITS GOLD         PR1426 CRAZY F GOLD SOUNDS11      CRAZY FRUIT GOLD  S.SITE  (set was marked as Casino Crazy Keys)
-GAME( 200?, sc4cckey	,0,		sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeya	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeyb	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeyc	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeyd	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeye	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeyf	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeyg	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeyh	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeyi	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeyj	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cckeyk	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2360 CASINO KING X         BARKX SOUNDS         8  KING X
-GAME( 200?, sc4ckx		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Casino King X (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ckxd		,sc4ckx,	sc4, sc4, sc4, ROT0, "Mazooma","Casino King X (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ckx		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Casino King X (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // Top Box
+GAME( 200?, sc4ckxd		,sc4ckx,	sc4, sc4, sc4, ROT0, "Mazooma","Casino King X (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // Top Box
 // PR2360 CASINO KING X         KING X  MAZ BARKX SOUNDS         KING X 3P
 GAME( 200?, sc4ckxa		,sc4ckx,	sc4, sc4, sc4, ROT0, "Mazooma","Casino King X (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4ckxb		,sc4ckx,	sc4, sc4, sc4, ROT0, "Mazooma","Casino King X (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
@@ -23193,15 +23647,6 @@ GAME( 200?, sc4ckxe		,sc4ckx,	sc4, sc4, sc4, ROT0, "Mazooma","Casino King X (Maz
 GAME( 200?, sc4ckxf		,sc4ckx,	sc4, sc4, sc4, ROT0, "Mazooma","Casino King X (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4ckxg		,sc4ckx,	sc4, sc4, sc4, ROT0, "Mazooma","Casino King X (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2062 CASINO ROYALE         CROY SOUNDS           CASINO ROYALE
-GAME( 200?, sc4casry	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2062) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4casryc	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2062) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-// PR2075 CASINO ROYALE         DUCRV46     CROY  CROY SOUNDS           CASINO ROYALE  (Jumping Bean copyright?)
-GAME( 200?, sc4casryd	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2075) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4casrye	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2075) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-// PR2073, CZECH CASINO ROYALE.......................CROY SOUNDS... (not standard header)
-GAME( 200?, sc4casrya	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2073) (Czech) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4casryb	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2073) (Czech) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR7060CASINO CHICKEN DALES         TTTWO SOUNDS         CHICKEN DALES
 GAME( 200?, sc4chick	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Chickendales (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
@@ -23258,32 +23703,13 @@ GAME( 200?, sc4cclash	,sc4cclas,	sc4, sc4, sc4, ROT0, "BFM","Club Class (65% Fer
 GAME( 200?, sc4cclasp	,sc4cclas,	sc4, sc4, sc4, ROT0, "BFM","Club Class (65% Ferry) (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 
-// PR2383 CLUBCLOUSEAU         CLUBCLOUSEAU  CLUB  CCLOU SOUNDS         CLUB CLOSEAU
-GAME( 200?, sc4clclo	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Club Clouseau (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2237 CLUB CLUEDO         CLUB CLUEDO CLUB  CCLU SOUNDS         CLUB CLUEDO
-GAME( 200?, sc4clucl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cluedo Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clucla	,sc4clucl,	sc4, sc4, sc4, ROT0, "Mazooma","Cluedo Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1208 COLOSSUS         95004235 COLOSSUS PR7155             COLOSSUS
-GAME( 200?, sc4colos	,0,			sc4, sc4, sc4, ROT0, "BFM","Colossus (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4colos	,0,			sc4, sc4, sc4, ROT0, "BFM","Colossus (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
 
-// PR1621 CLUB COOL JEWELS         PR1621 COOL SOUNDS11         CLUB COOL JEWELS  CLUB
-GAME( 200?, sc4cjcl		,0,			sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cjcla	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cjclb	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cjclc	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cjcld	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cjcle	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cjclf	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1036 CLUB COP THE LOT         PR1036 CLOT SOUNDS11           COP THE LOT
-GAME( 200?, sc4ctlcl	,0,			sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ctlcla	,sc4ctlcl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-// PR1036 CLUB COP THE LOT         COP THE LOT CLUB  PR1036 CLOT SOUNDS11           COP THE LOT
-GAME( 200?, sc4ctlclb	,sc4ctlcl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ctlclc	,sc4ctlcl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR6837 CLASSIC CLUB COPS AND ROBBERS         PR6837 COPS SOUNDS11         COPS AND ROBBERS
 GAME( 200?, sc4crcc		,0,			sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Classic (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23292,61 +23718,8 @@ GAME( 200?, sc4crcca	,sc4crcc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club
 GAME( 200?, sc4crccb	,sc4crcc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Classic (65%) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4crccc	,sc4crcc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Classic (65%) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR3241 CLUB COPS AND ROBBERS PLATINUM SCORP4         COPS & ROBRS PLT  CLUB  PR3241 C N R PLATINUM SOUNDS11      COPS AND ROBBERS
-GAME( 200?, sc4crcp		,0,			sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crcpa	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crcpc	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crcpd	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crcpe	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crcpf	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crcpg	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crcph	,sc4crcp,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-
-// PR1348 CLUB COPS AND ROBBERS GOLD         PR1348 CCRG SOUNDS11         COPS AND ROBBERS
-GAME( 200?, sc4crgc		,0,			sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgca	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcb	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcc	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcd	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgce	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcf	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcg	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgch	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgci	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcj	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgck	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcl	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcm	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgco	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcq	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 16)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgct	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 17)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcw	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 18)", GAME_IS_SKELETON_MECHANICAL )
-// PR1348 CLUB COPS AND ROBBERS GOLD         COPS & ROBRS GLD  CLUB  PR1348 CCRG SOUNDS11         COPS AND ROBBERS
-GAME( 200?, sc4crgcn	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 19)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcp	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 20)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcr	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 21)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcu	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 22)", GAME_IS_SKELETON_MECHANICAL )
-// PR1348 !500 CLUB COPS AND ROBBERS GOLD         COPS & ROBRS GLD  CLUB  PR1348 CCRG SOUNDS11         COPS AND ROBBERS
-GAME( 200?, sc4crgcs	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 23)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crgcv	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 24)", GAME_IS_SKELETON_MECHANICAL )
 
 
-// PR2383 CLUBCORONATIONSTREET         CLUBCORONATIONST  CLUB  CCORO SOUNDS         CLUB CORO ST
-GAME( 200?, sc4corcl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Coronation Street Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4corcla	,sc4corcl,	sc4, sc4, sc4, ROT0, "Mazooma","Coronation Street Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-
-//  PR2058 COUNT YER CASH         PR2058 COUNT YER CASH SOUNDS11
-GAME( 200?, sc4cyc		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cyca		,sc4cyc,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cycb		,sc4cyc,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cycc		,sc4cyc,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cycd		,sc4cyc,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-
-// PR2092 CLUB COUNT YER CASH         COUNT YER CASH  CLUB  CLCC SOUNDS
-GAME( 200?, sc4cyccl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cyccla	,sc4cyccl,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cycclb	,sc4cyccl,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cycclc	,sc4cyccl,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR6906 CRAZY CASINO SP98         PR6906 CRCS SOUNDS11
 GAME( 200?, sc4crzcs	,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Casino SP98 (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23374,6 +23747,13 @@ GAME( 200?, sc4cclimg	,sc4cclim,	sc4, sc4, sc4, ROT0, "BFM","Crazy Climber (Bell
 GAME( 200?, sc4cclimj	,sc4cclim,	sc4, sc4, sc4, ROT0, "BFM","Crazy Climber (Bellfruit) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cclimk	,sc4cclim,	sc4, sc4, sc4, ROT0, "BFM","Crazy Climber (Bellfruit) (Scorpion 4) (set 16)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4ccliml	,sc4cclim,	sc4, sc4, sc4, ROT0, "BFM","Crazy Climber (Bellfruit) (Scorpion 4) (set 17)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cclimq	,sc4cclim,	sc4, sc4, sc4, ROT0, "BFM","Crazy Climber (Bellfruit) (Scorpion 4) (set 18)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cclimr	,sc4cclim,	sc4, sc4, sc4, ROT0, "BFM","Crazy Climber (Bellfruit) (Scorpion 4) (set 19)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cclims	,sc4cclim,	sc4, sc4, sc4, ROT0, "BFM","Crazy Climber (Bellfruit) (Scorpion 4) (set 20)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cclimt	,sc4cclim,	sc4, sc4, sc4, ROT0, "BFM","Crazy Climber (Bellfruit) (Scorpion 4) (set 21)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cclimu	,sc4cclim,	sc4, sc4, sc4, ROT0, "BFM","Crazy Climber (Bellfruit) (Scorpion 4) (set 22)", GAME_IS_SKELETON_MECHANICAL )
+
+
 
 // PR6813 CRAZY FRUITS         PR6813 CRAZY FRUITS SOUNDS11
 GAME( 200?, sc4cfqps	,0,			sc4, sc4, sc4, ROT0, "Qps","Crazy Fruits (PR6813) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23392,45 +23772,46 @@ GAME( 200?, sc4cfqpsi	,sc4cfqps,	sc4, sc4, sc4, ROT0, "Qps","Crazy Fruits V1.0 (
 GAME( 200?, sc4cfqpsj	,sc4cfqps,	sc4, sc4, sc4, ROT0, "Qps","Crazy Fruits SP98 (PR4613) (Qps) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR6923 CASINO CRAZY FRUITS         PR6923 CRAZY FRUITS SOUNDS11
-GAME( 200?, sc4cfcas	,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcas	,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasa	,sc4cfcas,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasb	,sc4cfcas,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasc	,sc4cfcas,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasd	,sc4cfcas,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcase	,sc4cfcas,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasf	,sc4cfcas,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasg	,sc4cfcas,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcash	,sc4cfcas,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasi	,sc4cfcas,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasj	,sc4cfcas,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcask	,sc4cfcas,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasl	,sc4cfcas,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasm	,sc4cfcas,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasn	,sc4cfcas,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcaso	,sc4cfcas,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 16)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasp	,sc4cfcas,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 17)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasq	,sc4cfcas,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 18)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfcasr	,sc4cfcas,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Casino (Bellfruit) (Scorpion 4) (set 19)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1396 CLASSIC CRAZY FRUITS         PR1396 CLSIC CRAZY FRUITS SND11
-GAME( 200?, sc4cfcla	,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfclab	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfclac	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfclad	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfclae	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfclaf	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR6931 CLUB CRAZY FRUITS         PR6931 CRZY SOUNDS11
 GAME( 200?, sc4cfclb	,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cfclba	,sc4cfclb,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4cfclbb	,sc4cfclb,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 
-//  PR1107 CRAZY FRUITS DOWNUNDER         PR1107 DOWN UNDER SOUNDS11
-GAME( 200?, sc4cfdu		,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfdua	,sc4cfdu,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfdub	,sc4cfdu,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfduc	,sc4cfdu,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1620 CLUB CRAZY FRUITS GOLD         PR1620 CRAZY SOUNDS11         CRAZY FRUITS  CLUB
-GAME( 200?, sc4cfgcl	,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfgcla	,sc4cfgcl,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfgclb	,sc4cfgcl,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4cfgclc	,sc4cfgcl,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR7141 CRAZY GANG         PR7141 CRAZY GANG SOUNDS11            CRAZY GANG
-GAME( 200?, sc4crzgn	,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crzgn	,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 1, Top Box)", GAME_IS_SKELETON_MECHANICAL ) // Top Box
 GAME( 200?, sc4crzgna	,sc4crzgn,	sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crzgnb	,sc4crzgn,	sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crzgnb	,sc4crzgn,	sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 3, Top Box)", GAME_IS_SKELETON_MECHANICAL ) // Top Box
 GAME( 200?, sc4crzgnc	,sc4crzgn,	sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4crzgnd	,sc4crzgn,	sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4crzgne	,sc4crzgn,	sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4crzgnf	,sc4crzgn,	sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crzgng	,sc4crzgn,	sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crzgng	,sc4crzgn,	sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 8, Top Box)", GAME_IS_SKELETON_MECHANICAL ) // Top Box
 GAME( 200?, sc4crzgnh	,sc4crzgn,	sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4crzgni	,sc4crzgn,	sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crzgnj	,sc4crzgn,	sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crzgnj	,sc4crzgn,	sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 11, Top Box)", GAME_IS_SKELETON_MECHANICAL ) // Top Box
 GAME( 200?, sc4crzgnk	,sc4crzgn,	sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4crzgnl	,sc4crzgn,	sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4crzgnm	,sc4crzgn,	sc4, sc4, sc4, ROT0, "BFM","Crazy Gang (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
@@ -23472,6 +23853,8 @@ GAME( 200?, sc4crzkyh	,sc4crzky,	sc4, sc4, sc4, ROT0, "BFM","Crazy Keys Casino (
 GAME( 200?, sc4crzkyl	,sc4crzky,	sc4, sc4, sc4, ROT0, "BFM","Crazy Keys Casino (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4crzkym	,sc4crzky,	sc4, sc4, sc4, ROT0, "BFM","Crazy Keys Casino (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4crzkyn	,sc4crzky,	sc4, sc4, sc4, ROT0, "BFM","Crazy Keys Casino (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crzkyt	,sc4crzky,	sc4, sc4, sc4, ROT0, "BFM","Crazy Keys Casino (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crzkyu	,sc4crzky,	sc4, sc4, sc4, ROT0, "BFM","Crazy Keys Casino (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
 // PR1128 CASINO CRAZY KEYS         CRAZY KEYS  ARCADE  PR1128 CRAZY KEYS SOUNDS11
 GAME( 200?, sc4crzkyi	,sc4crzky,	sc4, sc4, sc4, ROT0, "BFM","Crazy Keys Casino Arcade (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4crzkyj	,sc4crzky,	sc4, sc4, sc4, ROT0, "BFM","Crazy Keys Casino Arcade (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
@@ -23481,6 +23864,9 @@ GAME( 200?, sc4crzkyp	,sc4crzky,	sc4, sc4, sc4, ROT0, "BFM","Crazy Keys Casino A
 GAME( 200?, sc4crzkyq	,sc4crzky,	sc4, sc4, sc4, ROT0, "BFM","Crazy Keys Casino Arcade (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4crzkyr	,sc4crzky,	sc4, sc4, sc4, ROT0, "BFM","Crazy Keys Casino Arcade (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4crzkys	,sc4crzky,	sc4, sc4, sc4, ROT0, "BFM","Crazy Keys Casino Arcade (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crzkyv	,sc4crzky,	sc4, sc4, sc4, ROT0, "BFM","Crazy Keys Casino Arcade (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crzkyw	,sc4crzky,	sc4, sc4, sc4, ROT0, "BFM","Crazy Keys Casino Arcade (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+
 
 //  PR7001 IT'S A CRAZY WORLD         CRAZY WORLD SOUNDS
 GAME( 200?, sc4crzwl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Crazy World (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23502,8 +23888,6 @@ GAME( 200?, sc4cccshe	,sc4cccsh,	sc4, sc4, sc4, ROT0, "Mazooma","Criss Cross Cas
 
 
 
-// PR1221 CRISSCROSSCRAZY  ART13         95004282 CRISSCROSS PR1161
-GAME( 200?, sc4ccc		,0,			sc4, sc4, sc4, ROT0, "BFM","Criss Cross Crazy (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
 
 
@@ -23531,14 +23915,8 @@ GAME( 200?, sc4deepia	,sc4deepi,	sc4, sc4, sc4, ROT0, "Mazooma","Deep Impact (Ma
 GAME( 200?, sc4deepib	,sc4deepi,	sc4, sc4, sc4, ROT0, "Mazooma","Deep Impact (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4deepid	,sc4deepi,	sc4, sc4, sc4, ROT0, "Mazooma","Deep Impact (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1006  DEMOLITION DERBY         PR1006 DEMDERBY SOUNDS11
-GAME( 200?, sc4derby	,0,			sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4derbya	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4derbyb	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4derbyc	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4derbyd	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4derbye	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
+// gives an 'init comms' countdown
 // PR1439 DIAMONDS & RUBIES         PR1436 TRIPLE CASINO SOUNDS11
 GAME( 200?, sc4druby	,0,			sc4, sc4, sc4, ROT0, "BFM","Diamonds & Rubys (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4drubya	,sc4druby,	sc4, sc4, sc4, ROT0, "BFM","Diamonds & Rubys (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
@@ -23553,8 +23931,6 @@ GAME( 200?, sc4discob	,sc4disco,	sc4, sc4, sc4, ROT0, "Mazooma","Disco Inferno (
 GAME( 200?, sc4discoc	,sc4disco,	sc4, sc4, sc4, ROT0, "Mazooma","Disco Inferno (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4discod	,sc4disco,	sc4, sc4, sc4, ROT0, "Mazooma","Disco Inferno (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR2558 DOUBLE DIAMOND 011         DOUBLEDIAMONDSND          DOUBLE DIAMOND
-GAME( 200?, sc4dbldm	,0,			sc4, sc4, sc4, ROT0, "Qps","Double Diamond (Qps) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR7060 DOUBLE FRENZY         DFRZYSND
 GAME( 200?, sc4dblfr	,0,			sc4, sc4, sc4, ROT0, "Qps","Double Frenzy (PR7060) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23576,31 +23952,20 @@ GAME( 200?, sc4darwc	,sc4darw,	sc4, sc4, sc4, ROT0, "Qps","Dough & Arrow (Qps) (
 GAME( 200?, sc4duckq	,0,			sc4, sc4, sc4, ROT0, "Qps","Ducks Of Hazzard (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4duckqa	,sc4duckq,	sc4, sc4, sc4, ROT0, "Qps","Ducks Of Hazzard (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1104 DYNAMITE         PR1104 DYNAMITE SOUNDS11
-GAME( 200?, sc4dyna		,0,			sc4, sc4, sc4, ROT0, "BFM","Dynamite (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dynaa	,sc4dyna,	sc4, sc4, sc4, ROT0, "BFM","Dynamite (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1017 EASY STREAK         PR1017 EASY STREAK SOUNDS11           EASY STREAK
-GAME( 200?, sc4easy		,0,			sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4easya	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4easyb	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4easyc	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4easyd	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4easye	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4easyf	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-// PR1326 CASINO EASY STREAK         PR1326 EASY STREAK SOUNDS11
-GAME( 200?, sc4eascs	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4eascsa	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4eascsb	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4eascsc	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4eascsd	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4eascse	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4eascsf	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4eascsg	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4eascsh	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4eascsi	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4eascsj	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4eascsk	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+// PR1326 CASINO EASY STREAK         PR1326 EASY STREAK SOUNDS11  (actually expects PR1326_CAS_EASY_STREAK_SOUNDS11 ? )
+GAME( 200?, sc4eascs	,0,     	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4eascsa	,sc4eascs,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4eascsb	,sc4eascs,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4eascsc	,sc4eascs,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4eascsd	,sc4eascs,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4eascse	,sc4eascs,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4eascsf	,sc4eascs,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4eascsg	,sc4eascs,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4eascsh	,sc4eascs,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4eascsi	,sc4eascs,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4eascsj	,sc4eascs,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4eascsk	,sc4eascs,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak Casino (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
 
 
 // PR2071 FAST 'N' FURIOUS         FNF SOUNDS         FAST 'N' FURIOUS
@@ -23629,9 +23994,9 @@ GAME( 200?, sc4feverg	,sc4fever,	sc4, sc4, sc4, ROT0, "BFM","Fever (PR1007) (Bel
 GAME( 200?, sc4feverh	,sc4fever,	sc4, sc4, sc4, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4feverk	,sc4fever,	sc4, sc4, sc4, ROT0, "BFM","Fever (PR1007) (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 //  PR1202 FEVER         95004239 FEVER PR7157
-GAME( 200?, sc4feveri	,sc4fever,	sc4, sc4, sc4, ROT0, "BFM","Fever (PR1202) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4feverj	,sc4fever,	sc4, sc4, sc4, ROT0, "BFM","Fever (PR1202) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4feverl	,sc4fever,	sc4, sc4, sc4, ROT0, "BFM","Fever (PR1202) (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4feveri	,sc4fever,	sc4, sc4, sc4, ROT0, "BFM","Fever (PR1202) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // Not English
+GAME( 200?, sc4feverj	,sc4fever,	sc4, sc4, sc4, ROT0, "BFM","Fever (PR1202) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // Not English
+GAME( 200?, sc4feverl	,sc4fever,	sc4, sc4, sc4, ROT0, "BFM","Fever (PR1202) (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
 // PR7119 FEVER_PITCH         PR7119 FEVER PITCH SOUNDS11
 GAME( 200?, sc4fpitc	,0,			sc4, sc4, sc4, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23648,8 +24013,8 @@ GAME( 200?, sc4fpitcj	,sc4fpitc,	sc4, sc4, sc4, ROT0, "BFM","Fever Pitch (Bellfr
 GAME( 200?, sc4fpitck	,sc4fpitc,	sc4, sc4, sc4, ROT0, "BFM","Fever Pitch (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1216 FEVER ART12         95004318 FEVER T N PR1251
-GAME( 200?, sc4fevnx	,0,			sc4, sc4, sc4, ROT0, "BFM","Fever The Next (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4fevnxa	,sc4fevnx,	sc4, sc4, sc4, ROT0, "BFM","Fever The Next (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4fevnx	,0,			sc4, sc4, sc4, ROT0, "BFM","Fever The Next (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // Not English
+GAME( 200?, sc4fevnxa	,sc4fevnx,	sc4, sc4, sc4, ROT0, "BFM","Fever The Next (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
 // PR6835 FIRE CRACKER         PR6835 FIRE SOUNDS11
 GAME( 200?, sc4fcc		,0,			sc4, sc4, sc4, ROT0, "BFM","Firecracker Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23755,9 +24120,9 @@ GAME( 200?, sc4fullti	,sc4fullt,	sc4, sc4, sc4, ROT0, "Qps","Full Throttle (013)
 
 
 // PR1224 THE GAME CASINO         95004285 THEGAME PR1153
-GAME( 200?, sc4gamcs	,0,			sc4, sc4, sc4, ROT0, "BFM","The Game Casino (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gamcs	,0,			sc4, sc4, sc4, ROT0, "BFM","The Game Casino (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 // PR1213 THE GAME         95004285 THEGAME PR1153
-GAME( 200?, sc4game		,0,			sc4, sc4, sc4, ROT0, "BFM","The Game (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4game		,0,			sc4, sc4, sc4, ROT0, "BFM","The Game (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
 
 // PR2162 GETTIN' ZIGGY         ZIGY SOUNDS         GETTIN' ZIGGY
@@ -23844,12 +24209,12 @@ GAME( 200?, sc4gshotb	,sc4gshot,	sc4, sc4, sc4, ROT0, "Qps","Golden Shot (Qps) (
 GAME( 200?, sc4gshota	,sc4gshot,	sc4, sc4, sc4, ROT0, "Qps","Golden Shot Arcade (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4gshotc	,sc4gshot,	sc4, sc4, sc4, ROT0, "Qps","Golden Shot Arcade (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1431 GOLDEN WINNER         PR1431 GOLDEN WINNER SND11
+// PR1431 GOLDEN WINNER         PR1431 GOLDEN WINNER SND11   // these show nothing
 GAME( 200?, sc4goldw	,0,			sc4, sc4, sc4, ROT0, "BFM","Golden Winner (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4goldwa	,sc4goldw,	sc4, sc4, sc4, ROT0, "BFM","Golden Winner (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4goldwb	,sc4goldw,	sc4, sc4, sc4, ROT0, "BFM","Golden Winner (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4goldwc	,sc4goldw,	sc4, sc4, sc4, ROT0, "BFM","Golden Winner (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-// PR1437 GOLDEN WINNER         PR1436 TRIPLE CASINO SOUNDS11
+// PR1437 GOLDEN WINNER         PR1436 TRIPLE CASINO SOUNDS11  // these show init comms
 GAME( 200?, sc4goldwd	,sc4goldw,	sc4, sc4, sc4, ROT0, "BFM","Golden Winner (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4goldwe	,sc4goldw,	sc4, sc4, sc4, ROT0, "BFM","Golden Winner (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4goldwf	,sc4goldw,	sc4, sc4, sc4, ROT0, "BFM","Golden Winner (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
@@ -23882,7 +24247,7 @@ GAME( 200?, sc4gx3f		,sc4gx3,	sc4, sc4, sc4, ROT0, "Mazooma","Golden X Triple (M
 GAME( 200?, sc4gx3g		,sc4gx3,	sc4, sc4, sc4, ROT0, "Mazooma","Golden X Triple (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1211 GOUDKOORTS         95004288 GOUDKOORTS PR1151
-GAME( 200?, sc4goud		,0,			sc4, sc4, sc4, ROT0, "BFM","Goudkoorts (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4goud		,0,			sc4, sc4, sc4, ROT0, "BFM","Goudkoorts (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
 // PR7019 GRAB A GRANNY         GRANNY SOUNDS
 GAME( 200?, sc4gag		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Grab A Granny (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -23923,7 +24288,7 @@ GAME( 200?, sc4hfcl		,0,			sc4, sc4, sc4, ROT0, "BFM","Happy Fruits Club (Bellfr
 GAME( 200?, sc4hfcla	,sc4hfcl,	sc4, sc4, sc4, ROT0, "BFM","Happy Fruits Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1216 HEATWAVE ART 12         95004287 HEATWAVE PR1156
-GAME( 200?, sc4heatw	,0,			sc4, sc4, sc4, ROT0, "BFM","Heatwave (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4heatw	,0,			sc4, sc4, sc4, ROT0, "BFM","Heatwave (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
 // PR1254 HELLRAISER ART12         95004326 HELLRAISER PR1254
 GAME( 200?, sc4helrd	,0,			sc4, sc4, sc4, ROT0, "BFM","Hellraiser (Bellfruit) [Dutch] (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
@@ -23965,7 +24330,7 @@ GAME( 200?, sc4hi5e		,sc4hi5,	sc4, sc4, sc4, ROT0, "BFM","High 5 (Bellfruit) (Sc
 GAME( 200?, sc4hi5f		,sc4hi5,	sc4, sc4, sc4, ROT0, "BFM","High 5 (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4hi5g		,sc4hi5,	sc4, sc4, sc4, ROT0, "BFM","High 5 (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
-
+// mux row error
 //  PR2066 HIGHLY SPRUNG         HIGH SOUNDS          HIGHLY SPRUNG
 GAME( 200?, sc4sprng	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Highly Sprung (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
@@ -23997,19 +24362,12 @@ GAME( 200?, sc4holywa	,sc4holyw,	sc4, sc4, sc4, ROT0, "BFM","Hollywood (Bellfrui
 GAME( 200?, sc4holywb	,sc4holyw,	sc4, sc4, sc4, ROT0, "BFM","Hollywood (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4holywc	,sc4holyw,	sc4, sc4, sc4, ROT0, "BFM","Hollywood (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR6911 HOT PROPERTY         PR6911 HOT PROPERTY SOUNDS11           HOT PROPERTY
-GAME( 200?, sc4hotpr	,0,			sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hotpra	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hotprb	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hotprc	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hotprd	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hotpre	,sc4hotpr,	sc4, sc4, sc4, ROT0, "BFM","Hot Property (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 //  PR1759 CLUB HOT SIX         HOT SIX CLUB  PR1759 HOSX SOUNDS11
-GAME( 200?, sc4h6cl		,0,			sc4, sc4, sc4, ROT0, "BFM","Hot Six Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4h6cla	,sc4h6cl,	sc4, sc4, sc4, ROT0, "BFM","Hot Six Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4h6clb	,sc4h6cl,	sc4, sc4, sc4, ROT0, "BFM","Hot Six Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4h6clc	,sc4h6cl,	sc4, sc4, sc4, ROT0, "BFM","Hot Six Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4h6cl		,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Hot Six Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4h6cla	,sc4h6cl,	sc4, sc4, sc4mbus, ROT0, "BFM","Hot Six Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4h6clb	,sc4h6cl,	sc4, sc4, sc4mbus, ROT0, "BFM","Hot Six Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4h6clc	,sc4h6cl,	sc4, sc4, sc4mbus, ROT0, "BFM","Hot Six Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2036 HYDE & STREAK         HYDE SOUNDS          HYDE & STREAK
 GAME( 200?, sc4hyde		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Hyde & Streak (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -24022,7 +24380,7 @@ GAME( 200?, sc4hyper	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Hyperactive (Mazooma)
 GAME( 200?, sc4hypera	,sc4hyper,	sc4, sc4, sc4, ROT0, "Mazooma","Hyperactive (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2403 CLUB ITALIAN JOB         CLUB ITALIAN JOB  CLUB  CLUB ITJB SOUNDS
-GAME( 200?, sc4ijclb	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Italian Job Club (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ijclb	,0,			sc4, sc4, sc4mbus, ROT0, "Mazooma","Italian Job Club (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2078 JACK THE KIPPER         JKIP SOUNDS         JACK THE KIPPER
 GAME( 200?, sc4jack		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -24035,16 +24393,16 @@ GAME( 200?, sc4jackf	,sc4jack,	sc4, sc4, sc4, ROT0, "Mazooma","Jack The Kipper (
 GAME( 200?, sc4jackg	,sc4jack,	sc4, sc4, sc4, ROT0, "Mazooma","Jack The Kipper (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1304 JACKPOT JUNCTION         PR1304 JACKPOT JUNCTION SOUNDS11
-GAME( 200?, sc4jjunc	,0,			sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4jjunca	,sc4jjunc,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4jjuncb	,sc4jjunc,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4jjuncc	,sc4jjunc,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4jjuncd	,sc4jjunc,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4jjunce	,sc4jjunc,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4jjuncf	,sc4jjunc,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4jjuncg	,sc4jjunc,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4jjunch	,sc4jjunc,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4jjunci	,sc4jjunc,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc4jjunc	,0,			sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc4jjunca	,sc4jjunc,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc4jjuncb	,sc4jjunc,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc4jjuncc	,sc4jjunc,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc4jjuncd	,sc4jjunc,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc4jjunce	,sc4jjunc,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc4jjuncf	,sc4jjunc,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc4jjuncg	,sc4jjunc,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc4jjunch	,sc4jjunc,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2002, sc4jjunci	,sc4jjunc,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1422 CLUB JACKPOT JUNCTION          PR1422 JACKPOT JUNCTION SOUNDS11
 GAME( 200?, sc4jjucl	,0,			sc4, sc4, sc4, ROT0, "BFM","Jackpot Junction Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -24162,8 +24520,8 @@ GAME( 200?, sc4knokb	,sc4knok,	sc4, sc4, sc4, ROT0, "Mazooma","Knockout (PR2057)
 GAME( 200?, sc4knokc	,sc4knok,	sc4, sc4, sc4, ROT0, "Mazooma","Knockout (PR2057) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1209 LAS VEGAS         95004261 LASVEGAS PR7159
-GAME( 200?, sc4lasv		,0,			sc4, sc4, sc4, ROT0, "BFM","Las Vegas (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4lasva	,sc4lasv,	sc4, sc4, sc4, ROT0, "BFM","Las Vegas (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4lasv		,0,			sc4, sc4, sc4, ROT0, "BFM","Las Vegas (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // Not English
+GAME( 200?, sc4lasva	,sc4lasv,	sc4, sc4, sc4, ROT0, "BFM","Las Vegas (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
 // PR1001  LET IT ROLL         PR1001 LETITROLL SOUNDS11
 GAME( 200?, sc4lir		,0,			sc4, sc4, sc4, ROT0, "BFM","Let It Roll (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -24199,7 +24557,7 @@ GAME( 200?, sc4ldcasd	,sc4ldcas,	sc4, sc4, sc4, ROT0, "Mazooma","Line Dancer Cas
 GAME( 200?, sc4ldcase	,sc4ldcas,	sc4, sc4, sc4, ROT0, "Mazooma","Line Dancer Casino (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2421 LITTLEDEVIL         CLUB LITTLEDEVIL  CLUB  CLILDEV SOUNDS         CLUB LITTLEDEVIL
-GAME( 200?, sc4ldvcl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Little Devil Club (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ldvcl	,0,			sc4, sc4, sc4mbus, ROT0, "Mazooma","Little Devil Club (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1108 LOCKBUSTER         PR1108 LOCKBUSTER SOUNDS11
 GAME( 200?, sc4lockb	,0,			sc4, sc4, sc4, ROT0, "BFM","Lock Buster (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -24284,37 +24642,60 @@ GAME( 200?, sc4luck7c	,sc4luck7,	sc4, sc4, sc4, ROT0, "Mazooma","Lucky 7s (Mazoo
 // PR2085  LUCKY SEVENS         LUCKY SEVENS  ARCADE  LUCKY SOUNDS         LUCKY SEVENS
 GAME( 200?, sc4luck7d	,sc4luck7,	sc4, sc4, sc4, ROT0, "Mazooma","Lucky 7s (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 
+const stepper_interface* sc4luckb_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_200step_reel,
+	0,
+	0,
+};
+
+static DRIVER_INIT( sc4luckb )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4 );
+	state->m_reel_setup = sc4luckb_reel_configs;
+}
+
 
 // PR1033 CASINO LUCKY BALLS         PR1033 LUCKY BALLS SOUNDS11
-GAME( 200?, sc4luckb	,0,			sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckba	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbb	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbc	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbd	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbe	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbf	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbg	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbh	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbi	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbj	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbk	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbl	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbm	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbn	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbo	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 16)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbp	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 17)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbt	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 18)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbu	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 19)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbv	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 20)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbw	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 21)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbx	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 22)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckb	,0,			sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckba	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbb	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbc	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbd	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbe	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbf	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbg	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbh	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbi	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbj	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbk	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbl	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbm	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbn	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbo	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 16)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbp	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 17)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbt	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 18)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbu	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 19)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbv	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 20)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbw	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 21)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbx	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 22)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckb1	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 23)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckb2	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 24)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckb3	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 25)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckb4	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino (Bellfruit) (Scorpion 4) (set 26)", GAME_IS_SKELETON_MECHANICAL )
+
 // PR1033 CASINO LUCKY BALLS         PR1033 LUCKY BALLS SOUNDS11       LUCKY BALLS ARCADE
-GAME( 200?, sc4luckbq	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbr	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbs	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckby	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4luckbz	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL ) // incomplete pairing
-GAME( 200?, sc4luckb0	,sc4luckb,	sc4, sc4, sc4, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbq	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbr	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbs	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckby	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4luckbz	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL ) // incomplete pairing
+GAME( 200?, sc4luckb0	,sc4luckb,	sc4, sc4, sc4luckb, ROT0, "BFM","Lucky Balls Casino Arcade (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+
 
 // PR2535 MAGIC CIRCLE STANDARD 011         MAGICSND
 GAME( 200?, sc4magci	,0,			sc4, sc4, sc4, ROT0, "Qps","Magic Circle (011) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -24372,10 +24753,10 @@ GAME( 200?, sc4maxccb	,sc4maxcc,	sc4, sc4, sc4, ROT0, "Mazooma","Maximus Cash Cl
 GAME( 200?, sc4maxccc	,sc4maxcc,	sc4, sc4, sc4, ROT0, "Mazooma","Maximus Cash Club (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1217 MILJONAIRSART12         95004305 MILJONAIRE PR1157
-GAME( 200?, sc4miljo	,0,			sc4, sc4, sc4, ROT0, "BFM","Miljonairs (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4miljo	,0,			sc4, sc4, sc4, ROT0, "BFM","Miljonairs (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
 // PR1223 MILJONAIRS         95004305 MILJONAIRE PR1157
-GAME( 200?, sc4milja	,0,			sc4, sc4, sc4, ROT0, "BFM","Miljonairs Arcade (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4milja	,0,			sc4, sc4, sc4, ROT0, "BFM","Miljonairs Arcade (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
 // PR6904 MONEY BAGS         PR6904 MONEY BAGS SOUNDS11
 GAME( 200?, sc4mbags	,0,			sc4, sc4, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -24383,18 +24764,47 @@ GAME( 200?, sc4mbagsa	,sc4mbags,	sc4, sc4, sc4, ROT0, "BFM","Money Bags (Bellfru
 GAME( 200?, sc4mbagsb	,sc4mbags,	sc4, sc4, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4mbagsc	,sc4mbags,	sc4, sc4, sc4, ROT0, "BFM","Money Bags (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
+
+const stepper_interface* sc4mgr_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_200step_reel,
+	0,
+	0,
+};
+
+static DRIVER_INIT( sc4mgr )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4 );
+	state->m_reel_setup = sc4mgr_reel_configs;
+}
+
+static DRIVER_INIT( sc4mgrm )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4mgr_reel_configs;
+}
+
 // PR1132 CASINO MONEY GO ROUND         PR1132 MONEY GO ROUND SOUNDS11
-GAME( 200?, sc4mgr		,0,			sc4, sc4, sc4, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mgra		,sc4mgr,	sc4, sc4, sc4, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mgrh		,sc4mgr,	sc4, sc4, sc4, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mgri		,sc4mgr,	sc4, sc4, sc4, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mgr		,0,			sc4, sc4, sc4mgr, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mgra		,sc4mgr,	sc4, sc4, sc4mgr, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mgrh		,sc4mgr,	sc4, sc4, sc4mgr, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mgri		,sc4mgr,	sc4, sc4, sc4mgr, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 // PR1132 CASINO MONEY GO ROUND         PR1132 MONEY GO ROUND SOUNDS11    MONEY GO ROUND  S.SITE
-GAME( 200?, sc4mgrb		,sc4mgr,	sc4, sc4, sc4, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mgrc		,sc4mgr,	sc4, sc4, sc4, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mgrd		,sc4mgr,	sc4, sc4, sc4, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mgre		,sc4mgr,	sc4, sc4, sc4, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mgrf		,sc4mgr,	sc4, sc4, sc4, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mgrg		,sc4mgr,	sc4, sc4, sc4, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mgrb		,sc4mgr,	sc4, sc4, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mgrc		,sc4mgr,	sc4, sc4, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mgrd		,sc4mgr,	sc4, sc4, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mgre		,sc4mgr,	sc4, sc4, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mgrf		,sc4mgr,	sc4, sc4, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mgrg		,sc4mgr,	sc4, sc4, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mgrj	    ,sc4mgr,	sc4, sc4, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mgrk	    ,sc4mgr,	sc4, sc4, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mgrl	    ,sc4mgr,	sc4, sc4, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mgrm	    ,sc4mgr,	sc4, sc4, sc4mgrm, ROT0, "BFM","Money Go Round Casino (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
 
 
 // PR1325 CASINO MONEY SPIDER         PR1325 MONEYSPIDER SOUNDS11
@@ -24551,14 +24961,16 @@ GAME( 200?, sc4outlwb	,sc4outlw,	sc4, sc4, sc4, ROT0, "BFM","Outlaw (Bellfruit) 
 GAME( 200?, sc4outlwc	,sc4outlw,	sc4, sc4, sc4, ROT0, "BFM","Outlaw (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 
+// PR7072 PAC MAN         PACP SOUNDS             PAC-MAN
+GAME( 200?, sc4pacqp	,0,	        sc4, sc4, sc4, ROT0, "QPS","Pac Man (PR7072) (QPS) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pacqpa	,sc4pacqp,	sc4, sc4, sc4, ROT0, "QPS","Pac Man (PR7072) (QPS) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pacqpb	,sc4pacqp,	sc4, sc4, sc4, ROT0, "QPS","Pac Man (PR7072) (QPS) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
 // PR7026 PACMAN         PACMAN SOUNDS
-GAME( 200?, sc4pacmn	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Pac Man (PR7026) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pacmn	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Pac Man (PR7026) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // this set doesn't start, CPU ends up dead?
 GAME( 200?, sc4pacmna	,sc4pacmn,	sc4, sc4, sc4, ROT0, "Mazooma","Pac Man (PR7026) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4pacmnb	,sc4pacmn,	sc4, sc4, sc4, ROT0, "Mazooma","Pac Man (PR7026) (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-// PR7072 PAC MAN         PACP SOUNDS             PAC-MAN
-GAME( 200?, sc4pacmnc	,sc4pacmn,	sc4, sc4, sc4, ROT0, "Mazooma","Pac Man (PR7072) (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4pacmnd	,sc4pacmn,	sc4, sc4, sc4, ROT0, "Mazooma","Pac Man (PR7072) (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4pacmne	,sc4pacmn,	sc4, sc4, sc4, ROT0, "Mazooma","Pac Man (PR7072) (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+
 
 // PR7049CASINO PACMAN         PACMAN SOUNDS
 GAME( 200?, sc4paccs	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Pac Man Casino (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -24600,20 +25012,39 @@ GAME( 200?, sc4pmania	,sc4pmani,	sc4, sc4, sc4, ROT0, "Mazooma","Pac Mania (Mazo
 GAME( 200?, sc4party	,0,			sc4, sc4, sc4, ROT0, "Nova","Party Time (German) (Nova) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
 //  PR1205 PAY TIME         95004224 PAYTIME PR7156             PAY TIME
-GAME( 200?, sc4paytm	,0,			sc4, sc4, sc4, ROT0, "BFM","Pay Time (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4paytm	,0,			sc4, sc4, sc4, ROT0, "BFM","Pay Time (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // Not English
+
+const stepper_interface* sc4pgold_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_200step_reel,
+	0,
+};
+
+static DRIVER_INIT( sc4pgold )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4pgold_reel_configs;
+}
 
 // PR1012 PHARAOH'S GOLD         PR1012 PHARAOHS GOLD SOUNDS11
-GAME( 200?, sc4pgold	,0,			sc4, sc4, sc4, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4pgolda	,sc4pgold,	sc4, sc4, sc4, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4pgoldb	,sc4pgold,	sc4, sc4, sc4, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4pgoldc	,sc4pgold,	sc4, sc4, sc4, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4pgoldd	,sc4pgold,	sc4, sc4, sc4, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4pgoldf	,sc4pgold,	sc4, sc4, sc4, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pgold	,0,			sc4, sc4, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pgolda	,sc4pgold,	sc4, sc4, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pgoldb	,sc4pgold,	sc4, sc4, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pgoldc	,sc4pgold,	sc4, sc4, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pgoldd	,sc4pgold,	sc4, sc4, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pgoldf	,sc4pgold,	sc4, sc4, sc4pgold, ROT0, "BFM","Pharaoh's Gold (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
+
+// same name, but a different game? (Less reels..)
 //  PR1261 PHARAOH'S GOLD         95004316 CAS PHAR GOLD PR1261
-GAME( 200?, sc4pglcs	,0,			sc4, sc4, sc4, ROT0, "BFM","Pharaoh's Gold Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4pglcsa	,sc4pglcs,	sc4, sc4, sc4, ROT0, "BFM","Pharaoh's Gold Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4pglcsb	,sc4pglcs,	sc4, sc4, sc4, ROT0, "BFM","Pharaoh's Gold Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pglcs	,0,			sc4, sc4, sc4, ROT0, "BFM","Pharaoh's Gold Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // Not English
+GAME( 200?, sc4pglcsa	,sc4pglcs,	sc4, sc4, sc4, ROT0, "BFM","Pharaoh's Gold Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // Not English
+GAME( 200?, sc4pglcsb	,sc4pglcs,	sc4, sc4, sc4, ROT0, "BFM","Pharaoh's Gold Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
 
 
@@ -24661,10 +25092,12 @@ GAME( 200?, sc4potsh	,0,			sc4, sc4, sc4, ROT0, "Qps","Pot Shot (Qps) (Scorpion 
 GAME( 200?, sc4potsha	,sc4potsh,	sc4, sc4, sc4, ROT0, "Qps","Pot Shot (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR3083 CLUB POTS OF GOLD         POTS OF GOLD  CLUB  PR3082 C POTS OF GOLD SOUNDS11      POTS OF GOLD
-GAME( 200?, sc4pogbl	,0,			sc4, sc4, sc4, ROT0, "BFM","Pots Of Gold Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4pogbla	,sc4pogbl,	sc4, sc4, sc4, ROT0, "BFM","Pots Of Gold Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4pogblb	,sc4pogbl,	sc4, sc4, sc4, ROT0, "BFM","Pots Of Gold Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4pogblc	,sc4pogbl,	sc4, sc4, sc4, ROT0, "BFM","Pots Of Gold Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pogbl	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Pots Of Gold Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pogbla	,sc4pogbl,	sc4, sc4, sc4mbus, ROT0, "BFM","Pots Of Gold Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pogblb	,sc4pogbl,	sc4, sc4, sc4mbus, ROT0, "BFM","Pots Of Gold Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pogblc	,sc4pogbl,	sc4, sc4, sc4mbus, ROT0, "BFM","Pots Of Gold Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pogbld	,sc4pogbl,	sc4, sc4, sc4mbus, ROT0, "BFM","Pots Of Gold Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pogble	,sc4pogbl,	sc4, sc4, sc4mbus, ROT0, "BFM","Pots Of Gold Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR6810 POWER CRAZY         PR6810 POWER SOUNDS11
 GAME( 200?, sc4pwcrz	,0,			sc4, sc4, sc4, ROT0, "BFM","Power Crazy (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -24740,15 +25173,15 @@ GAME( 200?, sc4quidrb	,sc4quidr,	sc4, sc4, sc4, ROT0, "Qps","Quid Rock (Qps) (Sc
 GAME( 200?, sc4quidrc	,sc4quidr,	sc4, sc4, sc4, ROT0, "Qps","Quid Rock (Qps) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1206 RED ALERT         95004266 REDALERT PR1051
-GAME( 200?, sc4redad	,0,			sc4, sc4, sc4, ROT0, "BFM","Red Alert (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4redada	,sc4redad,	sc4, sc4, sc4, ROT0, "BFM","Red Alert (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4redad	,0,			sc4, sc4, sc4, ROT0, "BFM","Red Alert (Dutch) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // Not English
+GAME( 200?, sc4redada	,sc4redad,	sc4, sc4, sc4, ROT0, "BFM","Red Alert (Dutch) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
 // PR2542 RED DRAGON 011         REDDRAGONSND           RED   DRAGON
-GAME( 200?, sc4rdrag	,0,			sc4, sc4, sc4, ROT0, "Qps","Red Dragon (011) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4rdraga	,sc4rdrag,	sc4, sc4, sc4, ROT0, "Qps","Red Dragon (011) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4rdrag	,0,			sc4, sc4, sc4mbus, ROT0, "Qps","Red Dragon (011) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4rdraga	,sc4rdrag,	sc4, sc4, sc4mbus, ROT0, "Qps","Red Dragon (011) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 // PR2542 RED DRAGON 021         REDDRAGONSND           RED   DRAGON
-GAME( 200?, sc4rdragc	,sc4rdrag,	sc4, sc4, sc4, ROT0, "Qps","Red Dragon (021) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4rdragf	,sc4rdrag,	sc4, sc4, sc4, ROT0, "Qps","Red Dragon (021) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4rdragc	,sc4rdrag,	sc4, sc4, sc4mbus, ROT0, "Qps","Red Dragon (021) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4rdragf	,sc4rdrag,	sc4, sc4, sc4mbus, ROT0, "Qps","Red Dragon (021) (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // QPS160 CLUB RED DRAGON 411         CLUBREDDRAGONSND         CLUB RED DRAGON
 GAME( 200?, sc4rdrcl	,0,			sc4, sc4, sc4, ROT0, "Qps","Red Dragon Club (411) (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -24795,10 +25228,10 @@ GAME( 200?, sc4rotcc	,sc4rotc,	sc4, sc4, sc4, ROT0, "Mazooma","Return Of The Cou
 GAME( 200?, sc4rotcd	,sc4rotc,	sc4, sc4, sc4, ROT0, "Mazooma","Return Of The Count (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1252 REVOLUTION  NEXT         95004320 REVOLUTIONTN PR1252
-GAME( 200?, sc4rvlnx	,0,			sc4, sc4, sc4, ROT0, "BFM","Revolution The Next (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4rvlnx	,0,			sc4, sc4, sc4, ROT0, "BFM","Revolution The Next (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
 // PR1203 REVOLUTION         95004259 REVOLUTION PR7158
-GAME( 200?, sc4rvl		,0,			sc4, sc4, sc4, ROT0, "BFM","Revolution (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4rvl		,0,			sc4, sc4, sc4, ROT0, "BFM","Revolution (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
 // PR2020 REVOLVER         REV SOUNDS               REVOLVER
 GAME( 200?, sc4revo		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Revolver (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -24824,7 +25257,7 @@ GAME( 200?, sc4richk	,sc4rich,	sc4, sc4, sc4, ROT0, "BFM","Rich Geezer (Bellfrui
 GAME( 200?, sc4richl	,sc4rich,	sc4, sc4, sc4, ROT0, "BFM","Rich Geezer (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1222    RIO GRANDE         95004309 RIO GRANDE SOUNDS11
-GAME( 200?, sc4rio		,0,			sc4, sc4, sc4, ROT0, "BFM","Rio Grande (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4rio		,0,			sc4, sc4, sc4, ROT0, "BFM","Rio Grande (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
 // PR2089 RISE TO THE TOP         RISE SOUNDS         RISE TO THE TOP
 GAME( 200?, sc4rttt		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Rise To The Top (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -24892,26 +25325,42 @@ GAME( 200?, sc4rbankb	,sc4rbank,	sc4, sc4, sc4, ROT0, "BFM","Royle Banker (Bellf
 GAME( 200?, sc4rbankc	,sc4rbank,	sc4, sc4, sc4, ROT0, "BFM","Royle Banker (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 
+const stepper_interface* sc4royle_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_200step_reel,
+	0,
+};
+
+static DRIVER_INIT( sc4royle )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4royle_reel_configs;
+}
 
 // PR1102 ROYLEFAMILY         PR1102 ROYLEFAMILY SOUNDS11
-GAME( 200?, sc4royle	,0,			sc4, sc4, sc4, ROT0, "BFM","Royle Family (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4roylea	,sc4royle,	sc4, sc4, sc4, ROT0, "BFM","Royle Family (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4royleb	,sc4royle,	sc4, sc4, sc4, ROT0, "BFM","Royle Family (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4roylec	,sc4royle,	sc4, sc4, sc4, ROT0, "BFM","Royle Family (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4royled	,sc4royle,	sc4, sc4, sc4, ROT0, "BFM","Royle Family (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4roylee	,sc4royle,	sc4, sc4, sc4, ROT0, "BFM","Royle Family (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4royleh	,sc4royle,	sc4, sc4, sc4, ROT0, "BFM","Royle Family (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4roylei	,sc4royle,	sc4, sc4, sc4, ROT0, "BFM","Royle Family (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4royle	,0,			sc4, sc4, sc4royle, ROT0, "BFM","Royle Family (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4roylea	,sc4royle,	sc4, sc4, sc4royle, ROT0, "BFM","Royle Family (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4royleb	,sc4royle,	sc4, sc4, sc4royle, ROT0, "BFM","Royle Family (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4roylec	,sc4royle,	sc4, sc4, sc4royle, ROT0, "BFM","Royle Family (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4royled	,sc4royle,	sc4, sc4, sc4royle, ROT0, "BFM","Royle Family (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4roylee	,sc4royle,	sc4, sc4, sc4royle, ROT0, "BFM","Royle Family (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4royleh	,sc4royle,	sc4, sc4, sc4royle, ROT0, "BFM","Royle Family (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4roylei	,sc4royle,	sc4, sc4, sc4royle, ROT0, "BFM","Royle Family (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 // PR1102 ROYLEFAMILY REV2         PR1102 ROYLEFAMILY SOUNDS11
-GAME( 200?, sc4roylef	,sc4royle,	sc4, sc4, sc4, ROT0, "BFM","Royle Family (REV 2) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4royleg	,sc4royle,	sc4, sc4, sc4, ROT0, "BFM","Royle Family (REV 2) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4roylej	,sc4royle,	sc4, sc4, sc4, ROT0, "BFM","Royle Family (REV 2) (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4roylek	,sc4royle,	sc4, sc4, sc4, ROT0, "BFM","Royle Family (REV 2) (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4roylel	,sc4royle,	sc4, sc4, sc4, ROT0, "BFM","Royle Family (REV 2) (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4roylem	,sc4royle,	sc4, sc4, sc4, ROT0, "BFM","Royle Family (REV 2) (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4roylef	,sc4royle,	sc4, sc4, sc4royle, ROT0, "BFM","Royle Family (REV 2) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4royleg	,sc4royle,	sc4, sc4, sc4royle, ROT0, "BFM","Royle Family (REV 2) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4roylej	,sc4royle,	sc4, sc4, sc4royle, ROT0, "BFM","Royle Family (REV 2) (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4roylek	,sc4royle,	sc4, sc4, sc4royle, ROT0, "BFM","Royle Family (REV 2) (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4roylel	,sc4royle,	sc4, sc4, sc4royle, ROT0, "BFM","Royle Family (REV 2) (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4roylem	,sc4royle,	sc4, sc4, sc4royle, ROT0, "BFM","Royle Family (REV 2) (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR7141 SHAKE RATTLE ROLL         LINE SOUNDS         *  SHAKE RATT ROLL
-GAME( 200?, sc4srrmz	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Shake Rattle Roll (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4srrmz	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Shake Rattle Roll (Mazooma) (Scorpion 4) (set 1, Top Box)", GAME_IS_SKELETON_MECHANICAL )
 // PR7079CASINO SHAKE RATTLE AND ROL         PR7079,Casino SHAKE RATTLE AND ROLL,         LINE SOUNDS         ROCK AND ROLL
 GAME( 200?, sc4srrmza	,sc4srrmz,	sc4, sc4, sc4, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4srrmzb	,sc4srrmz,	sc4, sc4, sc4, ROT0, "Mazooma","Shake Rattle Roll Casino (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
@@ -24936,10 +25385,10 @@ GAME( 200?, sc4srrmzl	,sc4srrmz,	sc4, sc4, sc4, ROT0, "Mazooma","Shake Rattle Ro
 GAME( 200?, sc4srrmzm	,sc4srrmz,	sc4, sc4, sc4, ROT0, "Mazooma","Shake Rattle Roll Arcade (Mazooma) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
 
 //  PR2117 SIDE SPLITTER         SSPT SOUNDS         SIDE SPLITTER
-GAME( 200?, sc4sidsp	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Side Splitter (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4sidspa	,sc4sidsp,	sc4, sc4, sc4, ROT0, "Mazooma","Side Splitter (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4sidspb	,sc4sidsp,	sc4, sc4, sc4, ROT0, "Mazooma","Side Splitter (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4sidspc	,sc4sidsp,	sc4, sc4, sc4, ROT0, "Mazooma","Side Splitter (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4sidsp	,0,			sc4, sc4, sc4mbus, ROT0, "Mazooma","Side Splitter (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4sidspa	,sc4sidsp,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Side Splitter (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4sidspb	,sc4sidsp,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Side Splitter (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4sidspc	,sc4sidsp,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Side Splitter (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR7076 GERMAN SINBAD2001         PR7076,German SINBAD2001,         PR7076 SOUNDS V1
 GAME( 200?, sc4s2k		,0,			sc4, sc4, sc4, ROT0, "Nova","Sinbad 2000 (German) (Nova) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
@@ -24973,22 +25422,22 @@ GAME( 200?, sc4srrc		,sc4srr,	sc4, sc4, sc4, ROT0, "BFM","Snake Rattle 'n' Roll 
 
 
 // PR1423 CLUB SNAKES N LADDERS         PR1423 CSNK SOUNDS11         SNAKES N LADDERS
-GAME( 200?, sc4slc		,0,			sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4slcb		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4slcc		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4slce		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4slci		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4slcm		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4slcn		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2003, sc4slc		,0,			sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2003, sc4slcb		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2003, sc4slcc		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2003, sc4slce		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2003, sc4slci		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2003, sc4slcm		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2003, sc4slcn		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
 // PR1423 CLUB SNAKES N LADDERS         SNAKES N LADDERS  CLUB  PR1423 CSNK SOUNDS11         SNAKES N LADDERS
-GAME( 200?, sc4slca		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4slcd		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4slcf		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4slcg		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4slch		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4slcj		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4slck		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4slcl		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2003, sc4slca		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2003, sc4slcd		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2003, sc4slcf		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2003, sc4slcg		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2003, sc4slch		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2003, sc4slcj		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2003, sc4slck		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 2003, sc4slcl		,sc4slc,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders Club (Bellfruit) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1010  SOLID GOLD         PR1010 SOLID GOLD SOUNDS11
 GAME( 200?, sc4solgl	,0,			sc4, sc4, sc4, ROT0, "BFM","Solid Gold (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -25038,12 +25487,12 @@ GAME( 200?, sc4starpj	,sc4starp,	sc4, sc4, sc4, ROT0, "BFM","Starprize (Bellfrui
 GAME( 200?, sc4starpk	,sc4starp,	sc4, sc4, sc4, ROT0, "BFM","Starprize (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1219 STARS 'N BARS         95004290 STARSNBARS PR1159
-GAME( 200?, sc4strbr	,0,			sc4, sc4, sc4, ROT0, "BFM","Stars 'n' Bars (PR1219) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4strbrb	,sc4strbr,	sc4, sc4, sc4, ROT0, "BFM","Stars 'n' Bars (PR1219) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4strbr	,0,			sc4, sc4, sc4, ROT0, "BFM","Stars 'n' Bars (PR1219) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // Not English
+GAME( 200?, sc4strbrb	,sc4strbr,	sc4, sc4, sc4, ROT0, "BFM","Stars 'n' Bars (PR1219) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 // PR1263 SNBA ART13 STARS 'N' BARS ARCADE - ART13         95004290 STARSNBARS PR1159
-GAME( 200?, sc4strbra	,sc4strbr,	sc4, sc4, sc4, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4strbrc	,sc4strbr,	sc4, sc4, sc4, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4strbrd	,sc4strbr,	sc4, sc4, sc4, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4strbra	,sc4strbr,	sc4, sc4, sc4, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // Not English
+GAME( 200?, sc4strbrc	,sc4strbr,	sc4, sc4, sc4, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // Not English
+GAME( 200?, sc4strbrd	,sc4strbr,	sc4, sc4, sc4, ROT0, "BFM","Stars 'n' Bars Arcade (PR1263) (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
 // PR2005 STIR CRAZY         STIR SOUNDS           STIR  CRAZY
 GAME( 200?, sc4stirc	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Stir Crazy (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -25328,7 +25777,7 @@ GAME( 200?, sc4tfclb	,0,			sc4, sc4, sc4, ROT0, "BFM","Tutti Frutti Club (Bellfr
 GAME( 200?, sc4tfclba	,sc4tfclb,	sc4, sc4, sc4, ROT0, "BFM","Tutti Frutti Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1214 TWILIGHT         95004299 TWILIGHT PR1154
-GAME( 200?, sc4twilt	,0,			sc4, sc4, sc4, ROT0, "BFM","Twilight (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4twilt	,0,			sc4, sc4, sc4, ROT0, "BFM","Twilight (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
 // PR7022 UP FOR GRABS         GRAB SOUNDS
 GAME( 200?, sc4ufg		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Up For Grabs (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -25430,11 +25879,16 @@ GAME( 200?, sc4wldbnf	,sc4wldbn,	sc4, sc4, sc4, ROT0, "BFM","Wild Bunch (Bellfru
 GAME( 200?, sc4wldbni	,sc4wldbn,	sc4, sc4, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4wldbnj	,sc4wldbn,	sc4, sc4, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4wldbnk	,sc4wldbn,	sc4, sc4, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4wldbnn	,sc4wldbn,	sc4, sc4, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4wldbno	,sc4wldbn,	sc4, sc4, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4wldbnp	,sc4wldbn,	sc4, sc4, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4wldbnq	,sc4wldbn,	sc4, sc4, sc4, ROT0, "BFM","Wild Bunch (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
+
 // PR7144 WILD BUNCH         PR7144 WILD BUNCH SOUNDS11        CAS WILD BUNCH  S.SITE
-GAME( 200?, sc4wldbng	,sc4wldbn,	sc4, sc4, sc4, ROT0, "BFM","Wild Bunch Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4wldbnh	,sc4wldbn,	sc4, sc4, sc4, ROT0, "BFM","Wild Bunch Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4wldbnl	,sc4wldbn,	sc4, sc4, sc4, ROT0, "BFM","Wild Bunch Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4wldbnm	,sc4wldbn,	sc4, sc4, sc4, ROT0, "BFM","Wild Bunch Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4wldbng	,sc4wldbn,	sc4, sc4, sc4mbus, ROT0, "BFM","Wild Bunch Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4wldbnh	,sc4wldbn,	sc4, sc4, sc4mbus, ROT0, "BFM","Wild Bunch Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4wldbnl	,sc4wldbn,	sc4, sc4, sc4mbus, ROT0, "BFM","Wild Bunch Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4wldbnm	,sc4wldbn,	sc4, sc4, sc4mbus, ROT0, "BFM","Wild Bunch Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR7110 WILD THING         PR7110 WILD THING SOUNDS11
 GAME( 200?, sc4wthng	,0,			sc4, sc4, sc4, ROT0, "BFM","Wild Thing (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -25655,8 +26109,8 @@ GAME( 200?, sc4adjbh	,sc4adjb,	sc4, sc4, sc4, ROT0, "BFM","Ant & Dec's Jiggy Ban
 GAME( 200?, sc4adjbi	,sc4adjb,	sc4, sc4, sc4, ROT0, "BFM","Ant & Dec's Jiggy Bank (Bellfruit) (Scorpion 4) (Set 10)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1940 AWP ANT N DECS WTAD S4         PR1940 ADSNT SHOWTIME SOUNDS11    ANTNDECSWTAD  S.SITE
-GAME( 200?, sc4adwta	,0,			sc4, sc4, sc4, ROT0, "BFM","Ant & Dec's Saturday Night Takeaway Win The Ads (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4adwtaa	,sc4adwta,	sc4, sc4, sc4, ROT0, "BFM","Ant & Dec's Saturday Night Takeaway Win The Ads (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4adwta	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Ant & Dec's Saturday Night Takeaway Win The Ads (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4adwtaa	,sc4adwta,	sc4, sc4, sc4mbus, ROT0, "BFM","Ant & Dec's Saturday Night Takeaway Win The Ads (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 
 
@@ -25684,8 +26138,8 @@ GAME( 200?, sc4bar7d	,sc4bar7,	sc4, sc4, sc4, ROT0, "BFM","Bar 7's (PR1438) (Bel
 GAME( 200?, sc4bar7e	,sc4bar7,	sc4, sc4, sc4, ROT0, "BFM","Bar 7's (PR1438) (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1724 AWP BATTLESHIPS AND CRUISERS S4         PR1704 B AND C SOUNDS11         BATTLESHIPSCRUIS  S.SITE
-GAME( 200?, sc4batl		,0,			sc4, sc4, sc4, ROT0, "BFM","Battleships & Cruisers (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4batla	,sc4batl,	sc4, sc4, sc4, ROT0, "BFM","Battleships & Cruisers (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4batl		,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Battleships & Cruisers (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4batla	,sc4batl,	sc4, sc4, sc4mbus, ROT0, "BFM","Battleships & Cruisers (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2170 BOBBY DAZZLER         BOBD SOUNDS                 BOBBY  DAZZLER
 GAME( 200?, sc4bob		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bobby Dazzler (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -25699,27 +26153,44 @@ GAME( 200?, sc4bobg		,sc4bob,	sc4, sc4, sc4, ROT0, "Mazooma","Bobby Dazzler (Maz
 GAME( 200?, sc4bobh		,sc4bob,	sc4, sc4, sc4, ROT0, "Mazooma","Bobby Dazzler (Mazooma) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4bobi		,sc4bob,	sc4, sc4, sc4, ROT0, "Mazooma","Bobby Dazzler (Mazooma) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 
+const stepper_interface* sc4bull_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_200step_reel,
+	0,
+};
+
+static DRIVER_INIT( sc4bull )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4bull_reel_configs;
+}
+
 // PR1722 AWP BULLSEYE SCORP4         PR1702 BULLSEYE SOUNDS11         BULLSEYE  S.SITE
-GAME( 200?, sc4bull		,0,			sc4, sc4, sc4, ROT0, "BFM","Bullseye (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulla	,sc4bull,	sc4, sc4, sc4, ROT0, "BFM","Bullseye (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bullb	,sc4bull,	sc4, sc4, sc4, ROT0, "BFM","Bullseye (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bullc	,sc4bull,	sc4, sc4, sc4, ROT0, "BFM","Bullseye (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bull		,0,			sc4, sc4, sc4bull, ROT0, "BFM","Bullseye (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulla	,sc4bull,	sc4, sc4, sc4bull, ROT0, "BFM","Bullseye (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bullb	,sc4bull,	sc4, sc4, sc4bull, ROT0, "BFM","Bullseye (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bullc	,sc4bull,	sc4, sc4, sc4bull, ROT0, "BFM","Bullseye (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1740 AWP BULLSEYE CLASSIC SCORP4         PR1702 BULLSEYE SOUNDS11         BULLSEYE CLASSIC  S.SITE
-GAME( 200?, sc4bulcs	,0,			sc4, sc4, sc4, ROT0, "BFM","Bullseye Classic (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulcsa	,sc4bulcs,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Classic (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulcsb	,sc4bulcs,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Classic (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bulcsc	,sc4bulcs,	sc4, sc4, sc4, ROT0, "BFM","Bullseye Classic (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulcs	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Bullseye Classic (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulcsa	,sc4bulcs,	sc4, sc4, sc4mbus, ROT0, "BFM","Bullseye Classic (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulcsb	,sc4bulcs,	sc4, sc4, sc4mbus, ROT0, "BFM","Bullseye Classic (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulcsc	,sc4bulcs,	sc4, sc4, sc4mbus, ROT0, "BFM","Bullseye Classic (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1930 AWP BUTCH CASHIDY AND THE SUNDANCE QUID S4         PR1910 B C AND THE S Q SOUNDS11   BUTCH N SUNDANCE  S.SITE
-GAME( 200?, sc4butch	,0,			sc4, sc4, sc4, ROT0, "BFM","Butch Cashidy & The Sundance Quid (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4butcha	,sc4butch,	sc4, sc4, sc4, ROT0, "BFM","Butch Cashidy & The Sundance Quid (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4butchb	,sc4butch,	sc4, sc4, sc4, ROT0, "BFM","Butch Cashidy & The Sundance Quid (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4butchc	,sc4butch,	sc4, sc4, sc4, ROT0, "BFM","Butch Cashidy & The Sundance Quid (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4butchd	,sc4butch,	sc4, sc4, sc4, ROT0, "BFM","Butch Cashidy & The Sundance Quid (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4butche	,sc4butch,	sc4, sc4, sc4, ROT0, "BFM","Butch Cashidy & The Sundance Quid (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4butchf	,sc4butch,	sc4, sc4, sc4, ROT0, "BFM","Butch Cashidy & The Sundance Quid (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4butchg	,sc4butch,	sc4, sc4, sc4, ROT0, "BFM","Butch Cashidy & The Sundance Quid (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4butch	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Butch Cashidy & The Sundance Quid (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4butcha	,sc4butch,	sc4, sc4, sc4mbus, ROT0, "BFM","Butch Cashidy & The Sundance Quid (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4butchb	,sc4butch,	sc4, sc4, sc4mbus, ROT0, "BFM","Butch Cashidy & The Sundance Quid (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4butchc	,sc4butch,	sc4, sc4, sc4mbus, ROT0, "BFM","Butch Cashidy & The Sundance Quid (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4butchd	,sc4butch,	sc4, sc4, sc4mbus, ROT0, "BFM","Butch Cashidy & The Sundance Quid (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4butche	,sc4butch,	sc4, sc4, sc4mbus, ROT0, "BFM","Butch Cashidy & The Sundance Quid (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4butchf	,sc4butch,	sc4, sc4, sc4mbus, ROT0, "BFM","Butch Cashidy & The Sundance Quid (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4butchg	,sc4butch,	sc4, sc4, sc4mbus, ROT0, "BFM","Butch Cashidy & The Sundance Quid (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
 
 
@@ -25758,7 +26229,8 @@ GAME( 200?, sc4cariqf	,sc4cariq,	sc4, sc4, sc4, ROT0, "Qps","Caribbean Cash (Qps
 GAME( 200?, sc4cariqg	,sc4cariq,	sc4, sc4, sc4, ROT0, "Qps","Caribbean Cash (Qps) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1683 BLAS14
-GAME( 200?, sc4cblas	,0,			sc4, sc4, sc4, ROT0, "BFM","Cash Blast (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cblas	,0,			sc4, sc4, sc4, ROT0, "Voodoo Games","Cash Blast (Voodoo Games) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cblasa	,sc4cblas,	sc4, sc4, sc4, ROT0, "Voodoo Games","Cash Blast (Voodoo Games) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2338 XTRAVAGANZA         XTRV SOUNDS         XTRAVAGANZA
 GAME( 200?, sc4casxt	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Casino Xtravaganza (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -25769,14 +26241,14 @@ GAME( 200?, sc4casxtd	,sc4casxt,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Xtravaga
 GAME( 200?, sc4casxte	,sc4casxt,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Xtravaganza (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1731 AWP CHAV IT SCORP4         PR1711 CHAV IT SOUNDS11         CHAV IT S.SITE
-GAME( 200?, sc4chavi	,0,			sc4, sc4, sc4, ROT0, "BFM","Chav It (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4chavia	,sc4chavi,	sc4, sc4, sc4, ROT0, "BFM","Chav It (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4chavib	,sc4chavi,	sc4, sc4, sc4, ROT0, "BFM","Chav It (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4chavic	,sc4chavi,	sc4, sc4, sc4, ROT0, "BFM","Chav It (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4chavid	,sc4chavi,	sc4, sc4, sc4, ROT0, "BFM","Chav It (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4chavie	,sc4chavi,	sc4, sc4, sc4, ROT0, "BFM","Chav It (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4chavif	,sc4chavi,	sc4, sc4, sc4, ROT0, "BFM","Chav It (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4chavig	,sc4chavi,	sc4, sc4, sc4, ROT0, "BFM","Chav It (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4chavi	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Chav It (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4chavia	,sc4chavi,	sc4, sc4, sc4mbus, ROT0, "BFM","Chav It (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4chavib	,sc4chavi,	sc4, sc4, sc4mbus, ROT0, "BFM","Chav It (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4chavic	,sc4chavi,	sc4, sc4, sc4mbus, ROT0, "BFM","Chav It (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4chavid	,sc4chavi,	sc4, sc4, sc4mbus, ROT0, "BFM","Chav It (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4chavie	,sc4chavi,	sc4, sc4, sc4mbus, ROT0, "BFM","Chav It (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4chavif	,sc4chavi,	sc4, sc4, sc4mbus, ROT0, "BFM","Chav It (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4chavig	,sc4chavi,	sc4, sc4, sc4mbus, ROT0, "BFM","Chav It (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2305 CHAVVY CHASE         CHVY SOUNDS
 GAME( 200?, sc4chavy	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Chavy Chase (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -25818,14 +26290,14 @@ GAME( 200?, sc4ctld		,sc4ctl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot (Bellfruit
 GAME( 200?, sc4ctle		,sc4ctl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR3035 AWP COPS AND ROBBERS SAFE CRACKER S4         PR3005 SAFE CRACKER SOUNDS11      SAFE CRACKER  S.SITE
-GAME( 200?, sc4crsc		,0,			sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crsca	,sc4crsc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crscb	,sc4crsc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crscc	,sc4crsc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crscd	,sc4crsc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crsce	,sc4crsc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crscf	,sc4crsc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4crscg	,sc4crsc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crsc		,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crsca	,sc4crsc,	sc4, sc4, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crscb	,sc4crsc,	sc4, sc4, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crscc	,sc4crsc,	sc4, sc4, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crscd	,sc4crsc,	sc4, sc4, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crsce	,sc4crsc,	sc4, sc4, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crscf	,sc4crsc,	sc4, sc4, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crscg	,sc4crsc,	sc4, sc4, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Safe Cracker (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2252 CORONATION  ST         CORRY SOUNDS                 CORONATION  ST
 GAME( 200?, sc4coro		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Coronation Street (PR2252) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -25866,195 +26338,859 @@ GAME( 200?, sc4czfrc	,sc4czfr,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits (PR6813)
 GAME( 200?, sc4crnjw	,0,			sc4, sc4, sc4, ROT0, "BFM","Crown Jewels (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4crnjwa	,sc4crnjw,	sc4, sc4, sc4, ROT0, "BFM","Crown Jewels (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1927 AWP DEAL OR NO DEAL S4         PR1907 DEAL OR NO DEAL SOUNDS11
-GAME( 200?, sc4dnd		,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dnda		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // incomplete pairing
-GAME( 200?, sc4dndb		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndc		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndd		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dnde		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndf		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndg		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndh		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndi		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndj		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndk		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndl		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndm		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndn		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndo		,sc4dnd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (set 16)", GAME_IS_SKELETON_MECHANICAL )
+const stepper_interface* sc4dnd_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+};
 
+static DRIVER_INIT( sc4dnd )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dnd_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dnd25 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0a, "Jackpot Key" ) // default to 25GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sc4dnd35 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0c, "Jackpot Key" ) // default to 35GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+// PR1927 AWP DEAL OR NO DEAL S4         PR1907 DEAL OR NO DEAL SOUNDS11
+GAME( 200?, sc4dnd		,0,			sc4, sc4dnd25, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL016, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DONL 016
+GAME( 200?, sc4dndb		,sc4dnd,	sc4, sc4dnd25, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL016, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DONL 016
+GAME( 200?, sc4dnde		,sc4dnd,	sc4, sc4dnd25, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL017, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DONL 017
+GAME( 200?, sc4dndh		,sc4dnd,	sc4, sc4dnd25, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL017, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DONL 017
+GAME( 200?, sc4dndf		,sc4dnd,	sc4, sc4dnd25, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL018, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DONL 018
+GAME( 200?, sc4dndi		,sc4dnd,	sc4, sc4dnd25, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL018, set 2)", GAME_IS_SKELETON_MECHANICAL )// DONL 018
+GAME( 200?, sc4dndd		,sc4dnd,	sc4, sc4dnd35, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL402, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DONL 402
+GAME( 200?, sc4dndg		,sc4dnd,	sc4, sc4dnd35, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL402, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DONL 402
+GAME( 200?, sc4dndj		,sc4dnd,	sc4, sc4dnd35, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL406, set 1)", GAME_IS_SKELETON_MECHANICAL )// DONL 406
+GAME( 200?, sc4dndl		,sc4dnd,	sc4, sc4dnd35, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL406, set 2)", GAME_IS_SKELETON_MECHANICAL )// DONL 406
+GAME( 200?, sc4dndc		,sc4dnd,	sc4, sc4dnd35, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL422, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DONL 422
+GAME( 200?, sc4dnda		,sc4dnd,	sc4, sc4dnd35, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL422, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DONL 422, incomplete pairing
+GAME( 200?, sc4dndn		,sc4dnd,	sc4, sc4dnd35, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL424, set 1)", GAME_IS_SKELETON_MECHANICAL )// DONL 424
+GAME( 200?, sc4dndo		,sc4dnd,	sc4, sc4dnd35, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL424, set 2)", GAME_IS_SKELETON_MECHANICAL )// DONL 424
+GAME( 200?, sc4dndk		,sc4dnd,	sc4, sc4dnd35, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL428, set 1)", GAME_IS_SKELETON_MECHANICAL )// DONL 428
+GAME( 200?, sc4dndm		,sc4dnd,	sc4, sc4dnd35, sc4dnd, ROT0, "BFM","Deal Or No Deal (Bellfruit) (Scorpion 4) (DONL428, set 2)", GAME_IS_SKELETON_MECHANICAL )// DONL 428
+
+const stepper_interface* sc4dndcs_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+};
+
+static DRIVER_INIT( sc4dndcs )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dndcs_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dndcs5 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x08, "Jackpot Key" ) // default to 5GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
 
 // PR1967 AWP CLASSIC DEAL OR NO DEAL S4         PR1907 DEAL OR NO DEAL SOUNDS11
-GAME( 200?, sc4dndcs	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndcsa	,sc4dndcs,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndcsb	,sc4dndcs,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndcsc	,sc4dndcs,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dndcs	,0,			sc4, sc4dndcs5, sc4dndcs, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD211, set 1)", GAME_IS_SKELETON_MECHANICAL ) // CLDD 211
+GAME( 200?, sc4dndcsb	,sc4dndcs,	sc4, sc4dndcs5, sc4dndcs, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD211, set 2)", GAME_IS_SKELETON_MECHANICAL ) // CLDD 211
+GAME( 200?, sc4dndcsa	,sc4dndcs,	sc4, sc4dndcs5, sc4dndcs, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD212, set 1)", GAME_IS_SKELETON_MECHANICAL ) // CLDD 212
+GAME( 200?, sc4dndcsc	,sc4dndcs,	sc4, sc4dndcs5, sc4dndcs, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD212, set 2)", GAME_IS_SKELETON_MECHANICAL ) // CLDD 212
+GAME( 200?, sc4dndcsd	,sc4dndcs,	sc4, sc4dndcs5, sc4dndcs, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD215, set 1)", GAME_IS_SKELETON_MECHANICAL ) // CLDD 215
+GAME( 200?, sc4dndcse	,sc4dndcs,	sc4, sc4dndcs5, sc4dndcs, ROT0, "BFM","Deal Or No Deal Classic (Bellfruit) (Scorpion 4) (CLDD215, set 2)", GAME_IS_SKELETON_MECHANICAL ) // CLDD 215
+
+const stepper_interface* sc4dndbb_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+};
+
+static DRIVER_INIT( sc4dndbb )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dndbb_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dndbb35 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0c, "Jackpot Key" ) // default to 35GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sc4dndbb70 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0d, "Jackpot Key" ) // default to 70GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
 
 // PR3229 AWP DEAL OR NO DEAL BREAK THE BANK SCORP4         PR3209 BREAK THE BANK SOUNDS11
-GAME( 200?, sc4dndbb	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbba	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbbb	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbbc	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbbd	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbbe	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbbf	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbbg	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbbh	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbbi	,sc4dndbb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dndbb	,0,			sc4, sc4dndbb35, sc4dndbb, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE471, set 1)", GAME_IS_SKELETON_MECHANICAL ) // CRBE 471
+GAME( 200?, sc4dndbbb	,sc4dndbb,	sc4, sc4dndbb35, sc4dndbb, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE471, set 2)", GAME_IS_SKELETON_MECHANICAL ) // CRBE 471
+GAME( 200?, sc4dndbba	,sc4dndbb,	sc4, sc4dndbb35, sc4dndbb, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE472, set 1)", GAME_IS_SKELETON_MECHANICAL ) // CRBE 472
+GAME( 200?, sc4dndbbc	,sc4dndbb,	sc4, sc4dndbb35, sc4dndbb, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE472, set 2)", GAME_IS_SKELETON_MECHANICAL ) // CRBE 472
+GAME( 200?, sc4dndbbd	,sc4dndbb,	sc4, sc4dndbb35, sc4dndbb, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE473, set 1)", GAME_IS_SKELETON_MECHANICAL ) // CRBE 473
+GAME( 200?, sc4dndbbg	,sc4dndbb,	sc4, sc4dndbb35, sc4dndbb, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE473, set 2)", GAME_IS_SKELETON_MECHANICAL ) // CRBE 473
+GAME( 200?, sc4dndbbe	,sc4dndbb,	sc4, sc4dndbb70, sc4dndbb, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE571, set 1)", GAME_IS_SKELETON_MECHANICAL ) // CRBE 571
+GAME( 200?, sc4dndbbh	,sc4dndbb,	sc4, sc4dndbb70, sc4dndbb, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE571, set 2)", GAME_IS_SKELETON_MECHANICAL ) // CRBE 571
+GAME( 200?, sc4dndbbf	,sc4dndbb,	sc4, sc4dndbb70, sc4dndbb, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE572, set 1)", GAME_IS_SKELETON_MECHANICAL ) // CRBE 572
+GAME( 200?, sc4dndbbi	,sc4dndbb,	sc4, sc4dndbb70, sc4dndbb, ROT0, "BFM","Deal Or No Deal Break The Bank (Bellfruit) (Scorpion 4) (CRBE572, set 2)", GAME_IS_SKELETON_MECHANICAL )// CRBE 572
+
+const stepper_interface* sc4dndcl_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+};
+
+static DRIVER_INIT( sc4dndcl )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dndcl_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dndcl250 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x03, "Jackpot Key" ) // default to 250GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sc4dndcl500 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x07, "Jackpot Key" ) // default to 500GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
 
 // PR1949 CLUB DEAL OR NO DEAL         DEAL OR NO DEAL CLUB  PR1949 DEAL O N D SOUNDS11
-GAME( 200?, sc4dndcl	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndcla	,sc4dndcl,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndclb	,sc4dndcl,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndclc	,sc4dndcl,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndcld	,sc4dndcl,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndcle	,sc4dndcl,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndclf	,sc4dndcl,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndclg	,sc4dndcl,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dndclc	,sc4dndcl,	sc4, sc4,         sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL181, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 181 CLUB $500 (no key req?)
+GAME( 200?, sc4dndclg	,sc4dndcl,	sc4, sc4,         sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL181, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 181 CLUB $500 (no key req?)
+GAME( 200?, sc4dndcla	,sc4dndcl,	sc4, sc4dndcl500, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL212, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 212 CLUB ?500
+GAME( 200?, sc4dndcle	,sc4dndcl,	sc4, sc4dndcl500, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL212, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 212 CLUB ?500
+GAME( 200?, sc4dndcl	,0,			sc4, sc4dndcl250, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL313, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 313 CLUB ?250
+GAME( 200?, sc4dndcld	,sc4dndcl,	sc4, sc4dndcl250, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL313, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 313 CLUB ?250
+GAME( 200?, sc4dndclb	,sc4dndcl,	sc4, sc4dndcl250, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL391, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 391 CLUB ?250
+GAME( 200?, sc4dndclf	,sc4dndcl,	sc4, sc4dndcl250, sc4dndcl, ROT0, "BFM","Deal Or No Deal Club (Bellfruit) (Scorpion 4) (DNDL391, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DNDL 391 CLUB ?250
+
+const stepper_interface* sc4dnddd_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+};
+
+static DRIVER_INIT( sc4dnddd )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dnddd_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dnddd35 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0c, "Jackpot Key" ) // default to 35GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sc4dnddd70 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0d, "Jackpot Key" ) // default to 70GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
 
 // PR3235 AWP DEAL OR NO DEAL DOUBLE S4         PR3215 DOND DOUBLE SOUNDS11       DOUBLE DOND S.SITE
-GAME( 200?, sc4dnddd	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dnddda	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndddb	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndddc	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndddd	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dnddde	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndddf	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndddg	,sc4dnddd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dnddd	,0,			sc4, sc4dnddd35, sc4dnddd, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO471, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DDNO 471
+GAME( 200?, sc4dndddd	,sc4dnddd,	sc4, sc4dnddd35, sc4dnddd, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO471, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DDNO 471
+GAME( 200?, sc4dnddda	,sc4dnddd,	sc4, sc4dnddd70, sc4dnddd, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO571, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DDNO 571
+GAME( 200?, sc4dnddde	,sc4dnddd,	sc4, sc4dnddd70, sc4dnddd, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO571, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DDNO 571
+GAME( 200?, sc4dndddb	,sc4dnddd,	sc4, sc4dnddd70, sc4dnddd, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO572, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DDNO 572
+GAME( 200?, sc4dndddf	,sc4dnddd,	sc4, sc4dnddd70, sc4dnddd, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO572, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DDNO 572
+GAME( 200?, sc4dndddc	,sc4dnddd,	sc4, sc4dnddd70, sc4dnddd, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO573, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DDNO 573
+GAME( 200?, sc4dndddg	,sc4dnddd,	sc4, sc4dnddd70, sc4dnddd, ROT0, "BFM","Deal Or No Deal Double Deal Or No Deal (Bellfruit) (Scorpion 4) (DDNO573, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DDNO 573
+
+const stepper_interface* sc4dndhf_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+};
+
+static DRIVER_INIT( sc4dndhf )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dndhf_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dndhf35 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0c, "Jackpot Key" ) // default to 35GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sc4dndhf70 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0d, "Jackpot Key" ) // default to 70GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
 
 // PR3038 DEAL OR NO DEAL HALL OF FAME SCORP4         PR3008 HALL OF FAME SOUNDS11      HALL OF FAME  S.SITE
-GAME( 200?, sc4dndhf	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndhfa	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndhfb	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndhfc	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndhfd	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndhfe	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndhff	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndhfg	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndhfh	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndhfi	,sc4dndhf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dndhff	,sc4dndhf,	sc4, sc4dndhf35, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA471, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DNHA 471
+GAME( 200?, sc4dndhfh	,sc4dndhf,	sc4, sc4dndhf35, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA471, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DNHA 471
+GAME( 200?, sc4dndhfg	,sc4dndhf,	sc4, sc4dndhf35, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA472, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DNHA 472
+GAME( 200?, sc4dndhfi	,sc4dndhf,	sc4, sc4dndhf35, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA472, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DNHA 472
+GAME( 200?, sc4dndhf	,0,			sc4, sc4dndhf35, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA473, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DNHA 473
+GAME( 200?, sc4dndhfa	,sc4dndhf,	sc4, sc4dndhf35, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA473, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DNHA 473
+GAME( 200?, sc4dndhfj	,sc4dndhf,	sc4, sc4dndhf35, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA476)",        GAME_IS_SKELETON_MECHANICAL ) // DNHA 476
+GAME( 200?, sc4dndhfb	,sc4dndhf,	sc4, sc4dndhf35, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA477, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DNHA 477
+GAME( 200?, sc4dndhfd	,sc4dndhf,	sc4, sc4dndhf35, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA477, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DNHA 477
+GAME( 200?, sc4dndhfc	,sc4dndhf,	sc4, sc4dndhf70, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA571, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DNHA 571
+GAME( 200?, sc4dndhfe	,sc4dndhf,	sc4, sc4dndhf70, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA571, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DNHA 571
+GAME( 200?, sc4dndhfk	,sc4dndhf,	sc4, sc4dndhf70, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA572, set 1, bad?)", GAME_IS_SKELETON_MECHANICAL ) // error 51 (bad rom?)
+GAME( 200?, sc4dndhfl	,sc4dndhf,	sc4, sc4dndhf70, sc4dndhf, ROT0, "BFM","Deal Or No Deal Hall Of Fame (Bellfruit) (Scorpion 4) (DNHA572, set 2, bad?)", GAME_IS_SKELETON_MECHANICAL ) // error 51 (bad rom?)
+
+const stepper_interface* sc4dndys_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_48step,
+};
+
+static DRIVER_INIT( sc4dndys )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dndys_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dndys35 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0c, "Jackpot Key" ) // default to 35GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+
+INPUT_PORTS_START( sc4dndys70 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0d, "Jackpot Key" ) // default to 70GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
 
 // PR3227 AWP DEAL OR NO DEAL ITS YOUR SHOW SCORP4         PR3207 ITS YOUR SHOW SOUNDS11     ITS YOUR SHOW S.SITE
-GAME( 200?, sc4dndys	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndysa	,sc4dndys,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndysb	,sc4dndys,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dndys	,0,			sc4, sc4dndys70, sc4dndys, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (DOBO571, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DOBO 571
+GAME( 200?, sc4dndysb	,sc4dndys,	sc4, sc4dndys70, sc4dndys, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (DOBO571, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DOBO 571
+GAME( 200?, sc4dndysa	,sc4dndys,	sc4, sc4dndys35, sc4dndys, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (DOBO474, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DOBO 474
+GAME( 200?, sc4dndysc	,sc4dndys,	sc4, sc4dndys35, sc4dndys, ROT0, "BFM","Deal Or No Deal It's Your Show (Bellfruit) (Scorpion 4) (DOBO474, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DOBO 474
+
+const stepper_interface* sc4dndlp_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+};
+
+static DRIVER_INIT( sc4dndlp )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dndlp_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dndlp70 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0d, "Jackpot Key" ) // default to 70GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+
 
 // PR3212 AWP DEAL OR NO DEAL LETS PLAY DEAL OR NO DEAL SCORP4         PR3212 LETS PLAY DOND SOUNDS11    LETS PLAY DOND  S.SITE
-GAME( 200?, sc4dndlp	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndlpa	,sc4dndlp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndlpb	,sc4dndlp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndlpc	,sc4dndlp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndlpd	,sc4dndlp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndlpe	,sc4dndlp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dndlp	,0,			sc4, sc4dndlp70, sc4dndlp, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (LPDN571, set 1)", GAME_IS_SKELETON_MECHANICAL )// LPDN 571
+GAME( 200?, sc4dndlpc	,sc4dndlp,	sc4, sc4dndlp70, sc4dndlp, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (LPDN571, set 2)", GAME_IS_SKELETON_MECHANICAL )// LPDN 571
+GAME( 200?, sc4dndlpa	,sc4dndlp,	sc4, sc4dndlp70, sc4dndlp, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (LPDN572, set 1)", GAME_IS_SKELETON_MECHANICAL )// LPDN 572
+GAME( 200?, sc4dndlpd	,sc4dndlp,	sc4, sc4dndlp70, sc4dndlp, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (LPDN572, set 2)", GAME_IS_SKELETON_MECHANICAL )// LPDN 572
+GAME( 200?, sc4dndlpb	,sc4dndlp,	sc4, sc4dndlp70, sc4dndlp, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (LPDN573, set 1)", GAME_IS_SKELETON_MECHANICAL )// LPDN 573
+GAME( 200?, sc4dndlpe	,sc4dndlp,	sc4, sc4dndlp70, sc4dndlp, ROT0, "BFM","Deal Or No Deal Let's Play Deal Or No Deal (Bellfruit) (Scorpion 4) (LPDN573, set 2)", GAME_IS_SKELETON_MECHANICAL )// LPDN 573
+
+const stepper_interface* sc4dndra_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+};
+
+static DRIVER_INIT( sc4dndra )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dndra_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dndra35 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0c, "Jackpot Key" ) // default to 35GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sc4dndra70 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0d, "Jackpot Key" ) // default to 70GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
 
 // PR3221 AWP DEAL OR NO DEAL RED ALERT SCORP4         PR3201 DOND RED ALERT SOUNDS11    RED ALERT S.SITE
-GAME( 200?, sc4dndra	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndraa	,sc4dndra,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndrab	,sc4dndra,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndrac	,sc4dndra,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndrad	,sc4dndra,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndrae	,sc4dndra,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dndra	,0,			sc4, sc4dndra35, sc4dndra, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT471, set 1)", GAME_IS_SKELETON_MECHANICAL ) // REDT 471
+GAME( 200?, sc4dndraa	,sc4dndra,	sc4, sc4dndra35, sc4dndra, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT471, set 2)", GAME_IS_SKELETON_MECHANICAL ) // REDT 471
+GAME( 200?, sc4dndrab	,sc4dndra,	sc4, sc4dndra35, sc4dndra, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT474, set 1)", GAME_IS_SKELETON_MECHANICAL ) // REDT 474
+GAME( 200?, sc4dndrad	,sc4dndra,	sc4, sc4dndra35, sc4dndra, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT474, set 2)", GAME_IS_SKELETON_MECHANICAL ) // REDT 474
+GAME( 200?, sc4dndrac	,sc4dndra,	sc4, sc4dndra70, sc4dndra, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT572, set 1)", GAME_IS_SKELETON_MECHANICAL ) // REDT 572
+GAME( 200?, sc4dndrae	,sc4dndra,	sc4, sc4dndra70, sc4dndra, ROT0, "BFM","Deal Or No Deal Red Alert (Bellfruit) (Scorpion 4) (REDT572, set 2)", GAME_IS_SKELETON_MECHANICAL ) // REDT 572
+
+const stepper_interface* sc4dndbd_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+};
+
+static DRIVER_INIT( sc4dndbd )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dndbd_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dndbd35 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0c, "Jackpot Key" ) // default to 35GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sc4dndbd70 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0d, "Jackpot Key" ) // default to 70GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
 
 
 // PR3230 AWP DEAL OR NO DEAL THE BIG DEAL SCORP4         PR3210 THE BIG DEAL SOUNDS11      THE BIG DEAL  S.SITE
-GAME( 200?, sc4dndbd	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbda	,sc4dndbd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbdb	,sc4dndbd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbdc	,sc4dndbd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbdd	,sc4dndbd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbde	,sc4dndbd,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dndbd	,0,			sc4, sc4dndbd35, sc4dndbd, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA471, set 1)", GAME_IS_SKELETON_MECHANICAL ) // BGDA 471
+GAME( 200?, sc4dndbda	,sc4dndbd,	sc4, sc4dndbd35, sc4dndbd, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA471, set 2)", GAME_IS_SKELETON_MECHANICAL ) // BGDA 471
+GAME( 200?, sc4dndbdb	,sc4dndbd,	sc4, sc4dndbd35, sc4dndbd, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA472, set 1)", GAME_IS_SKELETON_MECHANICAL ) // BGDA 472
+GAME( 200?, sc4dndbdd	,sc4dndbd,	sc4, sc4dndbd35, sc4dndbd, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA472, set 2)", GAME_IS_SKELETON_MECHANICAL ) // BGDA 472
+GAME( 200?, sc4dndbdc	,sc4dndbd,	sc4, sc4dndbd70, sc4dndbd, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA571, set 1)", GAME_IS_SKELETON_MECHANICAL ) // BGDA 571
+GAME( 200?, sc4dndbde	,sc4dndbd,	sc4, sc4dndbd70, sc4dndbd, ROT0, "BFM","Deal Or No Deal The Big Deal (Bellfruit) (Scorpion 4) (BGDA571, set 2)", GAME_IS_SKELETON_MECHANICAL ) // BGDA 571
+
+const stepper_interface* sc4dndbr_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+};
+
+static DRIVER_INIT( sc4dndbr )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dndbr_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dndbr35 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0c, "Jackpot Key" ) // default to 35GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sc4dndbr70 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0d, "Jackpot Key" ) // default to 70GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
 
 // PR3041 AWP DEAL OR NO DEAL THE BIG REDS S4         PR3011 THE BIG REDS SOUNDS11      THE BIG REDS  S.SITE
-GAME( 200?, sc4dndbr	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbra	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbrb	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbrc	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbrd	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbre	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbrf	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbrg	,sc4dndbr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dndbr	,0,			sc4, sc4dndbr35, sc4dndbr, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD471, set 1)", GAME_IS_SKELETON_MECHANICAL ) // BIGD 471
+GAME( 200?, sc4dndbrb	,sc4dndbr,	sc4, sc4dndbr35, sc4dndbr, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD471, set 2)", GAME_IS_SKELETON_MECHANICAL ) // BIGD 471
+GAME( 200?, sc4dndbra	,sc4dndbr,	sc4, sc4dndbr35, sc4dndbr, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD472, set 1)", GAME_IS_SKELETON_MECHANICAL ) // BIGD 472
+GAME( 200?, sc4dndbrc	,sc4dndbr,	sc4, sc4dndbr35, sc4dndbr, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD472, set 2)", GAME_IS_SKELETON_MECHANICAL ) // BIGD 472
+GAME( 200?, sc4dndbrd	,sc4dndbr,	sc4, sc4dndbr35, sc4dndbr, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD475, set 1)", GAME_IS_SKELETON_MECHANICAL ) // BIGD 475
+GAME( 200?, sc4dndbrf	,sc4dndbr,	sc4, sc4dndbr35, sc4dndbr, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD475, set 2)", GAME_IS_SKELETON_MECHANICAL ) // BIGD 475
+GAME( 200?, sc4dndbre	,sc4dndbr,	sc4, sc4dndbr70, sc4dndbr, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD571, set 1)", GAME_IS_SKELETON_MECHANICAL ) // BIGD 571
+GAME( 200?, sc4dndbrg	,sc4dndbr,	sc4, sc4dndbr70, sc4dndbr, ROT0, "BFM","Deal Or No Deal The Big Reds (Bellfruit) (Scorpion 4) (BIGD571, set 2)", GAME_IS_SKELETON_MECHANICAL ) // BIGD 571
+
+const stepper_interface* sc4dndcc_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+};
+
+static DRIVER_INIT( sc4dndcc )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dndcc_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dndcc35 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0c, "Jackpot Key" ) // default to 35GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sc4dndcc70 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0d, "Jackpot Key" ) // default to 70GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
 
 // PR3047 AWP DEAL OR NO DEAL THE CRAZY CHAIR SCORP4         PR3017 CRAZY CHAIR SOUNDS11       CRAZY CHAIR S.SITE
-GAME( 200?, sc4dndcc	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndcca	,sc4dndcc,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndccb	,sc4dndcc,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL ) // incomplete pairing
-GAME( 200?, sc4dndccc	,sc4dndcc,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndccd	,sc4dndcc,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndcce	,sc4dndcc,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndccf	,sc4dndcc,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dndcc	,0,			sc4, sc4dndcc35, sc4dndcc, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR471, set 1)", GAME_IS_SKELETON_MECHANICAL ) // CRZR 471
+GAME( 200?, sc4dndccb	,sc4dndcc,	sc4, sc4dndcc35, sc4dndcc, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR471, set 2)", GAME_IS_SKELETON_MECHANICAL ) // CRZR 471, incomplete pairing
+GAME( 200?, sc4dndcca	,sc4dndcc,	sc4, sc4dndcc35, sc4dndcc, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR474)",        GAME_IS_SKELETON_MECHANICAL ) // CRZR 474
+GAME( 200?, sc4dndccc	,sc4dndcc,	sc4, sc4dndcc35, sc4dndcc, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR475, set 1)", GAME_IS_SKELETON_MECHANICAL ) // CRZR 475
+GAME( 200?, sc4dndcce	,sc4dndcc,	sc4, sc4dndcc35, sc4dndcc, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR475, set 2)", GAME_IS_SKELETON_MECHANICAL ) // CRZR 475
+GAME( 200?, sc4dndccd	,sc4dndcc,	sc4, sc4dndcc70, sc4dndcc, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR571, set 1)", GAME_IS_SKELETON_MECHANICAL ) // CRZR 571
+GAME( 200?, sc4dndccf	,sc4dndcc,	sc4, sc4dndcc70, sc4dndcc, ROT0, "BFM","Deal Or No Deal The Crazy Chair (Bellfruit) (Scorpion 4) (CRZR571, set 2)", GAME_IS_SKELETON_MECHANICAL ) // CRZR 571
+
+const stepper_interface* sc4dnddw_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_48step,
+	&starpoint_interface_200step_reel,
+};
+
+static DRIVER_INIT( sc4dnddw )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dnddw_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dnddw35 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0c, "Jackpot Key" ) // default to 35GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sc4dnddw70 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0d, "Jackpot Key" ) // default to 70GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
 
 // PR3043 AWP THE DEAL WHEEL S4         PR3202 THE DEAL WHEEL SOUNDS11    THE DEAL WHEEL  S.SITE
-GAME( 200?, sc4dnddw	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dnddwa	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dnddwb	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dnddwc	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dnddwd	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dnddwe	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dnddwf	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dnddwg	,sc4dnddw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dnddw	,0,			sc4, sc4dnddw35, sc4dnddw, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN471, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DOFN 471
+GAME( 200?, sc4dnddwb	,sc4dnddw,	sc4, sc4dnddw35, sc4dnddw, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN471, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DOFN 471
+GAME( 200?, sc4dnddwa	,sc4dnddw,	sc4, sc4dnddw35, sc4dnddw, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN473, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DOFN 473
+GAME( 200?, sc4dnddwc	,sc4dnddw,	sc4, sc4dnddw35, sc4dnddw, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN473, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DOFN 473
+GAME( 200?, sc4dnddwd	,sc4dnddw,	sc4, sc4dnddw35, sc4dnddw, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN475, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DOFN 475
+GAME( 200?, sc4dnddwf	,sc4dnddw,	sc4, sc4dnddw35, sc4dnddw, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN475, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DOFN 475
+GAME( 200?, sc4dnddwe	,sc4dnddw,	sc4, sc4dnddw70, sc4dnddw, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN572, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DOFN 572
+GAME( 200?, sc4dnddwg	,sc4dnddw,	sc4, sc4dnddw70, sc4dnddw, ROT0, "BFM","Deal Or No Deal The Deal Wheel (Bellfruit) (Scorpion 4) (DOFN572, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DOFN 572
+
+const stepper_interface* sc4dnddf_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_48step,
+};
+
+static DRIVER_INIT( sc4dnddf )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dnddf_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dnddf35 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0c, "Jackpot Key" ) // default to 35GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sc4dnddf70 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0d, "Jackpot Key" ) // default to 70GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
 
 // PR3044 AWP DEAL OR NO DEAL THE DREAM FACTORY SCORP4         PR3014 DREAM FACTORY SOUNDS11     DREAM FACTORY S.SITE
-GAME( 200?, sc4dnddf	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dnddfa	,sc4dnddf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // incomplete pairing
-GAME( 200?, sc4dnddfb	,sc4dnddf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dnddfc	,sc4dnddf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dnddfd	,sc4dnddf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dnddfe	,sc4dnddf,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dnddf	,0,			sc4, sc4dnddf35, sc4dnddf, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC471, set 1)", GAME_IS_SKELETON_MECHANICAL ) // TDFC 471
+GAME( 200?, sc4dnddfa	,sc4dnddf,	sc4, sc4dnddf35, sc4dnddf, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC471, set 2)", GAME_IS_SKELETON_MECHANICAL ) // TDFC 471, incomplete pairing
+GAME( 200?, sc4dnddfb	,sc4dnddf,	sc4, sc4dnddf35, sc4dnddf, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC475, set 1)", GAME_IS_SKELETON_MECHANICAL ) // TDFC 475
+GAME( 200?, sc4dnddfd	,sc4dnddf,	sc4, sc4dnddf35, sc4dnddf, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC475, set 2)", GAME_IS_SKELETON_MECHANICAL ) // TDFC 475
+GAME( 200?, sc4dnddfc	,sc4dnddf,	sc4, sc4dnddf70, sc4dnddf, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC571, set 1)", GAME_IS_SKELETON_MECHANICAL ) // TDFC 571
+GAME( 200?, sc4dnddfe	,sc4dnddf,	sc4, sc4dnddf70, sc4dnddf, ROT0, "BFM","Deal Or No Deal The Dream Factory (Bellfruit) (Scorpion 4) (TDFC571, set 2)", GAME_IS_SKELETON_MECHANICAL ) // TDFC 571
+
+const stepper_interface* sc4dndpg_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+};
+
+static DRIVER_INIT( sc4dndpg )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dndpg_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dndpg35 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0c, "Jackpot Key" ) // default to 35GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sc4dndpg70 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0d, "Jackpot Key" ) // default to 70GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
 
 // PR3240 AWP DEAL OR NO DEAL THE PERFECT GAME SCORP4         PR3220 DOND PERFECT SOUNDS11      THE PERFECT GAME  S.SITE
-GAME( 200?, sc4dndpg	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndpga	,sc4dndpg,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndpgb	,sc4dndpg,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndpgc	,sc4dndpg,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndpgd	,sc4dndpg,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndpge	,sc4dndpg,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dndpg	,0,			sc4, sc4dndpg35, sc4dndpg, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPBG471, set 1)", GAME_IS_SKELETON_MECHANICAL ) // TPGB 471
+GAME( 200?, sc4dndpgc	,sc4dndpg,	sc4, sc4dndpg35, sc4dndpg, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPBG471, set 2)", GAME_IS_SKELETON_MECHANICAL ) // TPBG 471
+GAME( 200?, sc4dndpga	,sc4dndpg,	sc4, sc4dndpg70, sc4dndpg, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPBG571, set 1)", GAME_IS_SKELETON_MECHANICAL ) // TPGB 571
+GAME( 200?, sc4dndpgd	,sc4dndpg,	sc4, sc4dndpg70, sc4dndpg, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPGB571, set 2)", GAME_IS_SKELETON_MECHANICAL ) // TPGB 571
+GAME( 200?, sc4dndpgb	,sc4dndpg,	sc4, sc4dndpg70, sc4dndpg, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPBG572, set 1)", GAME_IS_SKELETON_MECHANICAL ) // TPGB 572
+GAME( 200?, sc4dndpge	,sc4dndpg,	sc4, sc4dndpg70, sc4dndpg, ROT0, "BFM","Deal Or No Deal The Perfect Game (Bellfruit) (Scorpion 4) (TPGB572, set 2)", GAME_IS_SKELETON_MECHANICAL ) // TPGB 572
 
+const stepper_interface* sc4dndtp_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+};
+
+static DRIVER_INIT( sc4dndtp )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dndtp_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dndtp35 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0c, "Jackpot Key" ) // default to 35GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
 
 // PR3033 AWP DOND THE POWER 5 SCORP4         PR3033 POWER FIVE SOUNDS11        DOND THE POWER 5  S.SITE
-GAME( 200?, sc4dndtp	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndtpa	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndtpb	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndtpc	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndtpd	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndtpe	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndtpf	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndtpg	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndtph	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndtpi	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndtpj	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndtpk	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndtpl	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndtpm	,sc4dndtp,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Power (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dndtp	,0,			sc4, sc4dndtp35, sc4dndtp, ROT0, "BFM","Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV411, set 1)", GAME_IS_SKELETON_MECHANICAL ) // TPRV 411
+GAME( 200?, sc4dndtpe	,sc4dndtp,	sc4, sc4dndtp35, sc4dndtp, ROT0, "BFM","Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV411, set 2)", GAME_IS_SKELETON_MECHANICAL ) // TPRV 411
+GAME( 200?, sc4dndtpa	,sc4dndtp,	sc4, sc4dndtp35, sc4dndtp, ROT0, "BFM","Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV412, set 1)", GAME_IS_SKELETON_MECHANICAL ) // TPRV 412
+GAME( 200?, sc4dndtpf	,sc4dndtp,	sc4, sc4dndtp35, sc4dndtp, ROT0, "BFM","Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV412, set 2)", GAME_IS_SKELETON_MECHANICAL ) // TPRV 412
+GAME( 200?, sc4dndtpb	,sc4dndtp,	sc4, sc4dndtp35, sc4dndtp, ROT0, "BFM","Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV413, set 1)", GAME_IS_SKELETON_MECHANICAL ) // TPRV 413
+GAME( 200?, sc4dndtpg	,sc4dndtp,	sc4, sc4dndtp35, sc4dndtp, ROT0, "BFM","Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV413, set 2)", GAME_IS_SKELETON_MECHANICAL ) // TPRV 413
+GAME( 200?, sc4dndtpc	,sc4dndtp,	sc4, sc4dndtp35, sc4dndtp, ROT0, "BFM","Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV414, set 1, bad)", GAME_IS_SKELETON_MECHANICAL ) // TPRV 414 EEPROM error (bad rom?) (botched release?)
+GAME( 200?, sc4dndtph	,sc4dndtp,	sc4, sc4dndtp35, sc4dndtp, ROT0, "BFM","Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV414, set 2, bad)", GAME_IS_SKELETON_MECHANICAL ) // TPRV 414 EEPROM error (bad rom?) (botched release?)
+GAME( 200?, sc4dndtpd	,sc4dndtp,	sc4, sc4dndtp35, sc4dndtp, ROT0, "BFM","Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV415, set 1)", GAME_IS_SKELETON_MECHANICAL ) // TPRV 415
+GAME( 200?, sc4dndtpi	,sc4dndtp,	sc4, sc4dndtp35, sc4dndtp, ROT0, "BFM","Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV415, set 2)", GAME_IS_SKELETON_MECHANICAL )// TPRV 415
+GAME( 200?, sc4dndtpl	,sc4dndtp,	sc4, sc4dndtp35, sc4dndtp, ROT0, "BFM","Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV416, set 1)", GAME_IS_SKELETON_MECHANICAL )// TPRV 416
+GAME( 200?, sc4dndtpm	,sc4dndtp,	sc4, sc4dndtp35, sc4dndtp, ROT0, "BFM","Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV416, set 2)", GAME_IS_SKELETON_MECHANICAL )// TPRV 416
+GAME( 200?, sc4dndtpj	,sc4dndtp,	sc4, sc4dndtp35, sc4dndtp, ROT0, "BFM","Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV41A, set 1)", GAME_IS_SKELETON_MECHANICAL )// TPRV 41A
+GAME( 200?, sc4dndtpk	,sc4dndtp,	sc4, sc4dndtp35, sc4dndtp, ROT0, "BFM","Deal Or No Deal The Power 5 (Bellfruit) (Scorpion 4) (TPRV41A, set 2)", GAME_IS_SKELETON_MECHANICAL )// TPRV 41A
+
+
+const stepper_interface* sc4dndww_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+};
+
+static DRIVER_INIT( sc4dndww )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dndww_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dndww35 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0c, "Jackpot Key" ) // default to 35GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
 
 
 // PR3006 AWP DEAL OR NO DEAL THE WALK OF WEALTH SCORP4         PR3006 WALK OF WEALTH SOUNDS11    WALK OF WEALTH  S.SITE
-GAME( 200?, sc4dndww	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndwwa	,sc4dndww,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndwwb	,sc4dndww,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndwwc	,sc4dndww,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndwwd	,sc4dndww,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndwwe	,sc4dndww,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dndww	,0,			sc4, sc4dndww35, sc4dndww, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH411, set 1)", GAME_IS_SKELETON_MECHANICAL ) // TWOH 411
+GAME( 200?, sc4dndwwb	,sc4dndww,	sc4, sc4dndww35, sc4dndww, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH411, set 2)", GAME_IS_SKELETON_MECHANICAL ) // TWOH 411
+GAME( 200?, sc4dndwwa	,sc4dndww,	sc4, sc4dndww35, sc4dndww, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH412, set 1)", GAME_IS_SKELETON_MECHANICAL ) // TWOH 412
+GAME( 200?, sc4dndwwe	,sc4dndww,	sc4, sc4dndww35, sc4dndww, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH412, set 2)", GAME_IS_SKELETON_MECHANICAL ) // TWOH 412
+GAME( 200?, sc4dndwwc	,sc4dndww,	sc4, sc4dndww35, sc4dndww, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH415, set 1)", GAME_IS_SKELETON_MECHANICAL ) // TWOH 415
+GAME( 200?, sc4dndwwd	,sc4dndww,	sc4, sc4dndww35, sc4dndww, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth (Bellfruit) (Scorpion 4) (TWOH415, set 2)", GAME_IS_SKELETON_MECHANICAL ) // TWOH 415
+
+const stepper_interface* sc4dndcw_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+};
+
+static DRIVER_INIT( sc4dndcw )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dndcw_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dndcw5 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x08, "Jackpot Key" ) // default to 5GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
 
 // PR3027 AWP CLASSIC DEAL OR NO DEAL THE WALK OF WEALTH SCORP4         PR3006 WALK OF WEALTH SOUNDS11    WALK OF WEALTH  S.SITE
-GAME( 200?, sc4dndcw	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndcwa	,sc4dndcw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndcwb	,sc4dndcw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndcwc	,sc4dndcw,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dndcw	,0,			sc4, sc4dndcw5, sc4dndcw, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (CWOH271, set 1)", GAME_IS_SKELETON_MECHANICAL ) // CWOH 271
+GAME( 200?, sc4dndcwb	,sc4dndcw,	sc4, sc4dndcw5, sc4dndcw, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (CWOH271, set 2)", GAME_IS_SKELETON_MECHANICAL ) // CWOH 271
+GAME( 200?, sc4dndcwa	,sc4dndcw,	sc4, sc4dndcw5, sc4dndcw, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (CWOH272, set 1)", GAME_IS_SKELETON_MECHANICAL ) // CWOH 272
+GAME( 200?, sc4dndcwc	,sc4dndcw,	sc4, sc4dndcw5, sc4dndcw, ROT0, "BFM","Deal Or No Deal The Walk Of Wealth Classic (Bellfruit) (Scorpion 4) (CWOH272, set 2)", GAME_IS_SKELETON_MECHANICAL ) // CWOH 272
+
+const stepper_interface* sc4dndtr_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+};
+
+static DRIVER_INIT( sc4dndtr )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dndtr_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dndtr70 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0d, "Jackpot Key" ) // default to 70GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
 
 // PR3329 DOND THINK RED S4         PR3304 THINK RED SOUNDS11         THINK RED S.SITE
-GAME( 200?, sc4dndtr	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Think Red (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndtra	,sc4dndtr,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Think Red (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dndtr	,0,			sc4, sc4dndtr70, sc4dndtr, ROT0, "BFM","Deal Or No Deal Think Red (Bellfruit) (Scorpion 4) (THRE571, set 1)", GAME_IS_SKELETON_MECHANICAL ) // THRE 571
+GAME( 200?, sc4dndtra	,sc4dndtr,	sc4, sc4dndtr70, sc4dndtr, ROT0, "BFM","Deal Or No Deal Think Red (Bellfruit) (Scorpion 4) (THRE571, set 2)", GAME_IS_SKELETON_MECHANICAL ) // THRE 571
+
+const stepper_interface* sc4dndwb_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_48step,
+	&starpoint_interface_200step_reel,
+};
+
+static DRIVER_INIT( sc4dndwb )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dndwb_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dndwb35 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0c, "Jackpot Key" ) // default to 35GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
 
 // PR1982 AWP DEAL OR NO DEAL WHATS IN YOUR BOX SCORP4         PR1962 WHATS IN Y BOX SOUNDS11    WHATS IN YOUR BX  S.SITE
-GAME( 200?, sc4dndwb	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndwba	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndwbb	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndwbc	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndwbd	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndwbe	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndwbf	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndwbg	,sc4dndwb,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dndwb	,0,			sc4, sc4dndwb35, sc4dndwb, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX412, set 1)", GAME_IS_SKELETON_MECHANICAL ) // WIYX 412
+GAME( 200?, sc4dndwbb	,sc4dndwb,	sc4, sc4dndwb35, sc4dndwb, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX412, set 2)", GAME_IS_SKELETON_MECHANICAL ) // WIYX 412
+GAME( 200?, sc4dndwba	,sc4dndwb,	sc4, sc4dndwb35, sc4dndwb, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX414, set 1)", GAME_IS_SKELETON_MECHANICAL ) // WIYX 414
+GAME( 200?, sc4dndwbc	,sc4dndwb,	sc4, sc4dndwb35, sc4dndwb, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX414, set 2)", GAME_IS_SKELETON_MECHANICAL ) // WIYX 414
+GAME( 200?, sc4dndwbd	,sc4dndwb,	sc4, sc4dndwb35, sc4dndwb, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX415, set 1)", GAME_IS_SKELETON_MECHANICAL ) // WIYX 415
+GAME( 200?, sc4dndwbe	,sc4dndwb,	sc4, sc4dndwb35, sc4dndwb, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX415, set 2)", GAME_IS_SKELETON_MECHANICAL ) // WIYX 415
+GAME( 200?, sc4dndwbf	,sc4dndwb,	sc4, sc4dndwb35, sc4dndwb, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX419, set 1)", GAME_IS_SKELETON_MECHANICAL ) // WIYX 419
+GAME( 200?, sc4dndwbg	,sc4dndwb,	sc4, sc4dndwb35, sc4dndwb, ROT0, "BFM","Deal Or No Deal What's In Your Box (Bellfruit) (Scorpion 4) (WIYX419, set 2)", GAME_IS_SKELETON_MECHANICAL ) // WIYX 419
+
+const stepper_interface* sc4dndbe_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+};
+
+static DRIVER_INIT( sc4dndbe )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dndbe_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dndbe25 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0a, "Jackpot Key" ) // default to 25GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sc4dndbe35 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0c, "Jackpot Key" ) // default to 35GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+// PR1935 AWP DEAL OR NO DEAL BEAT THE BANKER S4         PR1915 BEAT THE BANKER SOUNDS11   BEAT THE BANKER S.SITE
+GAME( 200?, sc4dndbe	,0,			sc4, sc4dndbe25, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK012, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DBTK 012
+GAME( 200?, sc4dndbec	,sc4dndbe,	sc4, sc4dndbe25, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK012, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DBTK 012
+GAME( 200?, sc4dndbeg	,sc4dndbe,	sc4, sc4dndbe25, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK013, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DBTK 013
+GAME( 200?, sc4dndbek	,sc4dndbe,	sc4, sc4dndbe25, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK013, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DBTK 013
+GAME( 200?, sc4dndbeh	,sc4dndbe,	sc4, sc4dndbe25, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK014, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DBTK 014
+GAME( 200?, sc4dndbel	,sc4dndbe,	sc4, sc4dndbe25, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK014, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DBTK 014
+GAME( 200?, sc4dndbeb	,sc4dndbe,	sc4, sc4dndbe35, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK422, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DBTK 422
+GAME( 200?, sc4dndbed	,sc4dndbe,	sc4, sc4dndbe35, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK422, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DBTK 422
+GAME( 200?, sc4dndbee	,sc4dndbe,	sc4, sc4dndbe35, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK423, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DBTK 423
+GAME( 200?, sc4dndbei	,sc4dndbe,	sc4, sc4dndbe35, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK423, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DBTK 423
+GAME( 200?, sc4dndbef	,sc4dndbe,	sc4, sc4dndbe35, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK425, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DBTK 425
+GAME( 200?, sc4dndbej	,sc4dndbe,	sc4, sc4dndbe35, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK425, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DBTK 425
+GAME( 200?, sc4dndbem	,sc4dndbe,	sc4, sc4dndbe35, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK426, set 1)", GAME_IS_SKELETON_MECHANICAL ) // DBTK 426
+GAME( 200?, sc4dndben	,sc4dndbe,	sc4, sc4dndbe35, sc4dndbe, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (DBTK426, set 2)", GAME_IS_SKELETON_MECHANICAL ) // DBTK 426
+
+const stepper_interface* sc4dndbc_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+};
+
+static DRIVER_INIT( sc4dndbc )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4dndbc_reel_configs;
+}
+
+INPUT_PORTS_START( sc4dndbc70 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0d, "Jackpot Key" ) // default to 70GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+
+// PR3337 AWP DEAL OR NO DEAL BOX CLEVER SCORP4         PR3312 DOND BOXCLEVER SOUNDS11    BOX CLEVER  S.SITE
+GAME( 200?, sc4dndbc	,0,			sc4, sc4dndbc70, sc4dndbc, ROT0, "BFM","Deal Or No Deal Box Clever (Bellfruit) (Scorpion 4) (BOXR571, set 1)", GAME_IS_SKELETON_MECHANICAL ) // BOXR 571
+GAME( 200?, sc4dndbca	,sc4dndbc,	sc4, sc4dndbc70, sc4dndbc, ROT0, "BFM","Deal Or No Deal Box Clever (Bellfruit) (Scorpion 4) (BOXR571, set 2)", GAME_IS_SKELETON_MECHANICAL ) // BOXR 571
+
 
 // PR1307 AWP DIAMOND MINE         PR1307 DIAM MINE SOUNDS11
 GAME( 200?, sc4dmine	,0,			sc4, sc4, sc4, ROT0, "BFM","Diamond Mine (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26077,26 +27213,26 @@ GAME( 200?, sc4ddoshm	,sc4ddosh,	sc4, sc4, sc4, ROT0, "BFM","Doctor Dosh (Bellfr
 GAME( 200?, sc4ddoshn	,sc4ddosh,	sc4, sc4, sc4, ROT0, "BFM","Doctor Dosh (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4ddosho	,sc4ddosh,	sc4, sc4, sc4, ROT0, "BFM","Doctor Dosh (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 // PR1309 AWP DOCTOR DOSH         PR1309 DOCTOR DOSH SOUNDS11       DOCTOR DOSH S.SITE
-GAME( 200?, sc4ddoshf	,sc4ddosh,	sc4, sc4, sc4, ROT0, "BFM","Doctor Dosh (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ddoshg	,sc4ddosh,	sc4, sc4, sc4, ROT0, "BFM","Doctor Dosh (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ddoshh	,sc4ddosh,	sc4, sc4, sc4, ROT0, "BFM","Doctor Dosh (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ddoshi	,sc4ddosh,	sc4, sc4, sc4, ROT0, "BFM","Doctor Dosh (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ddoshj	,sc4ddosh,	sc4, sc4, sc4, ROT0, "BFM","Doctor Dosh (Bellfruit) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ddoshk	,sc4ddosh,	sc4, sc4, sc4, ROT0, "BFM","Doctor Dosh (Bellfruit) (Scorpion 4) (set 16)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ddoshf	,sc4ddosh,	sc4, sc4, sc4mbus, ROT0, "BFM","Doctor Dosh (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ddoshg	,sc4ddosh,	sc4, sc4, sc4mbus, ROT0, "BFM","Doctor Dosh (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ddoshh	,sc4ddosh,	sc4, sc4, sc4mbus, ROT0, "BFM","Doctor Dosh (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ddoshi	,sc4ddosh,	sc4, sc4, sc4mbus, ROT0, "BFM","Doctor Dosh (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ddoshj	,sc4ddosh,	sc4, sc4, sc4mbus, ROT0, "BFM","Doctor Dosh (Bellfruit) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ddoshk	,sc4ddosh,	sc4, sc4, sc4mbus, ROT0, "BFM","Doctor Dosh (Bellfruit) (Scorpion 4) (set 16)", GAME_IS_SKELETON_MECHANICAL )
 
 
 
 // PR1736 AWP DOUGH HO HO S4         PR1716 DOUGH HO HO SOUNDS11       DOUGH HO HO S.SITE
-GAME( 200?, sc4dhh		,0,			sc4, sc4, sc4, ROT0, "BFM","Dough Ho Ho (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dhha		,sc4dhh,	sc4, sc4, sc4, ROT0, "BFM","Dough Ho Ho (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dhhb		,sc4dhh,	sc4, sc4, sc4, ROT0, "BFM","Dough Ho Ho (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dhhc		,sc4dhh,	sc4, sc4, sc4, ROT0, "BFM","Dough Ho Ho (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dhhd		,sc4dhh,	sc4, sc4, sc4, ROT0, "BFM","Dough Ho Ho (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dhhe		,sc4dhh,	sc4, sc4, sc4, ROT0, "BFM","Dough Ho Ho (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dhh		,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Dough Ho Ho (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dhha		,sc4dhh,	sc4, sc4, sc4mbus, ROT0, "BFM","Dough Ho Ho (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dhhb		,sc4dhh,	sc4, sc4, sc4mbus, ROT0, "BFM","Dough Ho Ho (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dhhc		,sc4dhh,	sc4, sc4, sc4mbus, ROT0, "BFM","Dough Ho Ho (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dhhd		,sc4dhh,	sc4, sc4, sc4mbus, ROT0, "BFM","Dough Ho Ho (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dhhe		,sc4dhh,	sc4, sc4, sc4mbus, ROT0, "BFM","Dough Ho Ho (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1615 AWP DOUGH SELECTA SCORP4         PR1615 DOUGH SELECTA SOUNDS11     DOUGH SELECTA S.SITE
-GAME( 200?, sc4dough	,0,			sc4, sc4, sc4, ROT0, "BFM","Dough Selecta (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dougha	,sc4dough,	sc4, sc4, sc4, ROT0, "BFM","Dough Selecta (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dough	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Dough Selecta (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dougha	,sc4dough,	sc4, sc4, sc4mbus, ROT0, "BFM","Dough Selecta (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2118 DUCKS OF HAZZARD         DUCKSOFHAZZARDSND         DUCKS OF HAZZARD
 GAME( 200?, sc4ducks	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Ducks Of Hazzard (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26120,17 +27256,50 @@ GAME( 200?, sc4evole	,sc4evol,	sc4, sc4, sc4, ROT0, "Qps","Evolution (Qps) (Scor
 GAME( 200?, sc4evolf	,sc4evol,	sc4, sc4, sc4, ROT0, "Qps","Evolution (Qps) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4evolg	,sc4evol,	sc4, sc4, sc4, ROT0, "Qps","Evolution (Qps) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
+const stepper_interface* sc4fguy_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+};
+
+static DRIVER_INIT( sc4fguy )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4fguy_reel_configs;
+}
+
+INPUT_PORTS_START( sc4fguy35 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0c, "Jackpot Key" ) // default to 35GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
+INPUT_PORTS_START( sc4fguy70 )
+	PORT_INCLUDE( sc4_base )
+	PORT_MODIFY("IN-5")
+	PORT_DIPNAME( 0x0f, 0x0d, "Jackpot Key" ) // default to 70GBP key
+	SC4_JACKPOT_KEY_SETTINGS
+INPUT_PORTS_END
+
 // PR3233 AWP FAMILY GUY S4         PR3213 FAMILY GUY SOUNDS11        FAMILY GUY  S.SITE
-GAME( 200?, sc4fguy		,0,			sc4, sc4, sc4, ROT0, "BFM","Family Guy (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4fguya	,sc4fguy,	sc4, sc4, sc4, ROT0, "BFM","Family Guy (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4fguyb	,sc4fguy,	sc4, sc4, sc4, ROT0, "BFM","Family Guy (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4fguyc	,sc4fguy,	sc4, sc4, sc4, ROT0, "BFM","Family Guy (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4fguy		,0,			sc4, sc4fguy35, sc4fguy, ROT0, "BFM","Family Guy (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // FAMY 471
+GAME( 200?, sc4fguyb	,sc4fguy,	sc4, sc4fguy35, sc4fguy, ROT0, "BFM","Family Guy (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL ) // FAMY 471
+GAME( 200?, sc4fguya	,sc4fguy,	sc4, sc4fguy70, sc4fguy, ROT0, "BFM","Family Guy (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // FAMY 572
+GAME( 200?, sc4fguyc	,sc4fguy,	sc4, sc4fguy70, sc4fguy, ROT0, "BFM","Family Guy (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL ) // FAMY 572
+GAME( 200?, sc4fguyd	,sc4fguy,	sc4, sc4, sc4fguy, ROT0, "BFM","Family Guy (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4fguye	,sc4fguy,	sc4, sc4, sc4fguy, ROT0, "BFM","Family Guy (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1721 AWP FAT BOY SPIN SCORP4         PR1701 FAT BOY SPIN SOUNDS11      FAT BOY SPIN  S.SITE
-GAME( 200?, sc4fbspn	,0,			sc4, sc4, sc4, ROT0, "BFM","Fat Boy Spin (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4fbspna	,sc4fbspn,	sc4, sc4, sc4, ROT0, "BFM","Fat Boy Spin (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4fbspnb	,sc4fbspn,	sc4, sc4, sc4, ROT0, "BFM","Fat Boy Spin (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4fbspnc	,sc4fbspn,	sc4, sc4, sc4, ROT0, "BFM","Fat Boy Spin (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4fbspn	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Fat Boy Spin (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4fbspna	,sc4fbspn,	sc4, sc4, sc4mbus, ROT0, "BFM","Fat Boy Spin (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4fbspnb	,sc4fbspn,	sc4, sc4, sc4mbus, ROT0, "BFM","Fat Boy Spin (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4fbspnc	,sc4fbspn,	sc4, sc4, sc4mbus, ROT0, "BFM","Fat Boy Spin (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2328 FULL METAL JACKPOT         FULLM SOUNDS         F METAL JACKPOT
 GAME( 200?, sc4fmj		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Full Metal Jackpot (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26148,89 +27317,223 @@ GAME( 200?, sc4glade	,sc4glad,	sc4, sc4, sc4, ROT0, "Mazooma","Gladiator (Mazoom
 GAME( 200?, sc4gladf	,sc4glad,	sc4, sc4, sc4, ROT0, "Mazooma","Gladiator (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4gladg	,sc4glad,	sc4, sc4, sc4, ROT0, "Mazooma","Gladiator (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
+const stepper_interface* sc4gd_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_200step_reel,
+	0,
+};
+
+static DRIVER_INIT( sc4gd )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4 );
+	state->m_reel_setup = sc4gd_reel_configs;
+}
+
 // PR1016 GOLD DIGGER         PR1016 GOLD DIGGER SOUNDS11
-GAME( 200?, sc4gd		,0,			sc4, sc4, sc4, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gda		,sc4gd,		sc4, sc4, sc4, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gdb		,sc4gd,		sc4, sc4, sc4, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gdc		,sc4gd,		sc4, sc4, sc4, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gdd		,sc4gd,		sc4, sc4, sc4, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gde		,sc4gd,		sc4, sc4, sc4, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gdf		,sc4gd,		sc4, sc4, sc4, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gdg		,sc4gd,		sc4, sc4, sc4, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gd		,0,			sc4, sc4, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gda		,sc4gd,		sc4, sc4, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gdb		,sc4gd,		sc4, sc4, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gdc		,sc4gd,		sc4, sc4, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gdd		,sc4gd,		sc4, sc4, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gde		,sc4gd,		sc4, sc4, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gdf		,sc4gd,		sc4, sc4, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gdg		,sc4gd,		sc4, sc4, sc4gd, ROT0, "BFM","Gold Digger (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2056  GOLDEN X         BARX SOUNDS         GOLDEN X  (are these really Gold Diggers?)
 GAME( 200?, sc4gdmz		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Gold Diggers? / Golden X Game (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4gdmza	,sc4gdmz,	sc4, sc4, sc4, ROT0, "Mazooma","Gold Diggers? / Golden X Game (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
+const stepper_interface* sc4gdclb_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_200step_reel,
+};
+
+static DRIVER_INIT( sc4gdclb )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4 );
+	state->m_reel_setup = sc4gdclb_reel_configs;
+}
+
+
 // PR1137 CLUB GOLD DIGGER         PR1137 GOLDD CL SOUNDS11
-GAME( 200?, sc4gdclb	,0,			sc4, sc4, sc4, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gdclba	,sc4gdclb,	sc4, sc4, sc4, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gdclbb	,sc4gdclb,	sc4, sc4, sc4, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gdclbc	,sc4gdclb,	sc4, sc4, sc4, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gdclbd	,sc4gdclb,	sc4, sc4, sc4, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gdclbe	,sc4gdclb,	sc4, sc4, sc4, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gdclbf	,sc4gdclb,	sc4, sc4, sc4, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gdclbg	,sc4gdclb,	sc4, sc4, sc4, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gdclbh	,sc4gdclb,	sc4, sc4, sc4, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gdclbi	,sc4gdclb,	sc4, sc4, sc4, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gdclbj	,sc4gdclb,	sc4, sc4, sc4, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gdclbk	,sc4gdclb,	sc4, sc4, sc4, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gdclb	,0,			sc4, sc4, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gdclba	,sc4gdclb,	sc4, sc4, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gdclbb	,sc4gdclb,	sc4, sc4, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gdclbc	,sc4gdclb,	sc4, sc4, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gdclbd	,sc4gdclb,	sc4, sc4, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gdclbe	,sc4gdclb,	sc4, sc4, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gdclbf	,sc4gdclb,	sc4, sc4, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gdclbg	,sc4gdclb,	sc4, sc4, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gdclbh	,sc4gdclb,	sc4, sc4, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gdclbi	,sc4gdclb,	sc4, sc4, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gdclbj	,sc4gdclb,	sc4, sc4, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gdclbk	,sc4gdclb,	sc4, sc4, sc4gdclb, ROT0, "BFM","Gold Digger Club (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
 
+const stepper_interface* sc4gbcas_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_200step_reel,
+	0,
+	0,
+};
+
+static DRIVER_INIT( sc4gbcas )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4 );
+	state->m_reel_setup = sc4gbcas_reel_configs;
+}
+
+// this one is a variation of lucky balls
 // PR1034 CASINO GOLDEN BALLS         PR1034 GOLDEN BALLS SOUNDS11
-GAME( 200?, sc4gbcas	,0,			sc4, sc4, sc4, ROT0, "BFM","Golden Balls Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gbcasa	,sc4gbcas,	sc4, sc4, sc4, ROT0, "BFM","Golden Balls Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gbcasb	,sc4gbcas,	sc4, sc4, sc4, ROT0, "BFM","Golden Balls Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gbcasc	,sc4gbcas,	sc4, sc4, sc4, ROT0, "BFM","Golden Balls Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gbcas	,0,			sc4, sc4, sc4gbcas, ROT0, "BFM","Golden Balls Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gbcasa	,sc4gbcas,	sc4, sc4, sc4gbcas, ROT0, "BFM","Golden Balls Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gbcasb	,sc4gbcas,	sc4, sc4, sc4gbcas, ROT0, "BFM","Golden Balls Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gbcasc	,sc4gbcas,	sc4, sc4, sc4gbcas, ROT0, "BFM","Golden Balls Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
+
+const stepper_interface* sc4gball_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_48step,
+	0,
+};
+
+static DRIVER_INIT( sc4gball )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4 );
+	state->m_reel_setup = sc4gball_reel_configs;
+}
+
+// this is a football themed game...
 // PR1604 AWP GOLDEN BALLS         PR1604 GOLDEN BALLS SOUNDS12      GOLDEN BALLS  S.SITE
-GAME( 200?, sc4gball	,0,			sc4, sc4, sc4, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gballa	,sc4gball,	sc4, sc4, sc4, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gballb	,sc4gball,	sc4, sc4, sc4, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gballc	,sc4gball,	sc4, sc4, sc4, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gball	,0,			sc4, sc4, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gballa	,sc4gball,	sc4, sc4, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gballb	,sc4gball,	sc4, sc4, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gballc	,sc4gball,	sc4, sc4, sc4gball, ROT0, "BFM","Golden Balls (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+const stepper_interface* sc4gunp_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+};
+
+static DRIVER_INIT( sc4gunp )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4gunp_reel_configs;
+}
 
 // PR3046 AWP THE GUNPOWDER SLOT S4         PR3016 GUNPOWDER SLOT SOUNDS11    GUNPOWDER SLOT  S.SITE
-GAME( 200?, sc4gunp		,0,			sc4, sc4, sc4, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gunpa	,sc4gunp,	sc4, sc4, sc4, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gunpb	,sc4gunp,	sc4, sc4, sc4, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gunpc	,sc4gunp,	sc4, sc4, sc4, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gunpd	,sc4gunp,	sc4, sc4, sc4, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gunpe	,sc4gunp,	sc4, sc4, sc4, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gunpf	,sc4gunp,	sc4, sc4, sc4, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4gunpg	,sc4gunp,	sc4, sc4, sc4, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gunp		,0,			sc4, sc4, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gunpa	,sc4gunp,	sc4, sc4, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gunpb	,sc4gunp,	sc4, sc4, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gunpc	,sc4gunp,	sc4, sc4, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gunpd	,sc4gunp,	sc4, sc4, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gunpe	,sc4gunp,	sc4, sc4, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gunpf	,sc4gunp,	sc4, sc4, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gunpg	,sc4gunp,	sc4, sc4, sc4gunp, ROT0, "BFM","Gunpowder Slot (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
+const stepper_interface* sc4hapnt_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_48step,
+	0,
+};
 
+static DRIVER_INIT( sc4hapnt )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4hapnt_reel_configs;
+}
 
 // PR1306 AWP HAPPY NOTES         PR1306 HAPPY NOTES SOUNDS11
-GAME( 200?, sc4hapnt	,0,			sc4, sc4, sc4, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hapnta	,sc4hapnt,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hapntb	,sc4hapnt,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hapntc	,sc4hapnt,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hapntd	,sc4hapnt,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hapnte	,sc4hapnt,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hapnt	,0,			sc4, sc4, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hapnta	,sc4hapnt,	sc4, sc4, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hapntb	,sc4hapnt,	sc4, sc4, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hapntc	,sc4hapnt,	sc4, sc4, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hapntd	,sc4hapnt,	sc4, sc4, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hapnte	,sc4hapnt,	sc4, sc4, sc4hapnt, ROT0, "BFM","Happy Notes (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+
+const stepper_interface* sc4hntcs_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	0,
+};
+
+static DRIVER_INIT( sc4hntcsm )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4hntcs_reel_configs;
+}
+
+
+static DRIVER_INIT( sc4hntcs )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4 );
+	state->m_reel_setup = sc4hntcs_reel_configs;
+}
+
 // PR1327 CASINO HAPPY NOTES         HAPPY NOTES S.SITE  PR1327 CAS_HAPPY_NOTES SOUNDS11
-GAME( 200?, sc4hntcs	,0,			sc4, sc4, sc4, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hntcsa	,sc4hntcs,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hntcsb	,sc4hntcs,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hntcsc	,sc4hntcs,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcs	,0,			sc4, sc4, sc4hntcsm, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcsa	,sc4hntcs,	sc4, sc4, sc4hntcsm, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcsb	,sc4hntcs,	sc4, sc4, sc4hntcsm, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcsc	,sc4hntcs,	sc4, sc4, sc4hntcsm, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 // PR1327 CASINO HAPPY NOTES         PR1327 CAS_HAPPY_NOTES SOUNDS11
-GAME( 200?, sc4hntcsd	,sc4hntcs,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hntcse	,sc4hntcs,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hntcsf	,sc4hntcs,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hntcsg	,sc4hntcs,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hntcsh	,sc4hntcs,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hntcsi	,sc4hntcs,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hntcsj	,sc4hntcs,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hntcsk	,sc4hntcs,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hntcsl	,sc4hntcs,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hntcsm	,sc4hntcs,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hntcsn	,sc4hntcs,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hntcso	,sc4hntcs,	sc4, sc4, sc4, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 16)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcsd	,sc4hntcs,	sc4, sc4, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcse	,sc4hntcs,	sc4, sc4, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcsf	,sc4hntcs,	sc4, sc4, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcsg	,sc4hntcs,	sc4, sc4, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcsh	,sc4hntcs,	sc4, sc4, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcsi	,sc4hntcs,	sc4, sc4, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcsj	,sc4hntcs,	sc4, sc4, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcsk	,sc4hntcs,	sc4, sc4, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcsl	,sc4hntcs,	sc4, sc4, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcsm	,sc4hntcs,	sc4, sc4, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcsn	,sc4hntcs,	sc4, sc4, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcso	,sc4hntcs,	sc4, sc4, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 16)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcsp	,sc4hntcs,	sc4, sc4, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 17)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcsq	,sc4hntcs,	sc4, sc4, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 18)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcsr	,sc4hntcs,	sc4, sc4, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 19)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hntcss	,sc4hntcs,	sc4, sc4, sc4hntcs, ROT0, "BFM","Happy Notes Casino (Bellfruit) (Scorpion 4) (set 20)", GAME_IS_SKELETON_MECHANICAL )
 
 
 
 
 // PR1201 HELLS BELLS         95004211 HELLS BELLS PR6945         HELLS  BELLS  (non english?)
-GAME( 200?, sc4hellb	,0,			sc4, sc4, sc4, ROT0, "BFM","Hells Bells (PR1201) (Dutch?) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hellb	,0,			sc4, sc4, sc4, ROT0, "BFM / Eurocoin","Hells Bells (PR1201) (Dutch?) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 // PR1419 AWP HELLS BELLS         PR1402 HELLS BELLS SOUNDS11
 GAME( 200?, sc4hellba	,sc4hellb,	sc4, sc4, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4hellbb	,sc4hellb,	sc4, sc4, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
@@ -26239,14 +27542,31 @@ GAME( 200?, sc4hellbd	,sc4hellb,	sc4, sc4, sc4, ROT0, "BFM","Hells Bells (PR1419
 GAME( 200?, sc4hellbe	,sc4hellb,	sc4, sc4, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4hellbf	,sc4hellb,	sc4, sc4, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 // PR1419 AWP HELLS BELLS         PR1402 HELLS BELLS SOUNDS11       HELLS BELLS S.SITE
-GAME( 200?, sc4hellbg	,sc4hellb,	sc4, sc4, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hellbh	,sc4hellb,	sc4, sc4, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hellbi	,sc4hellb,	sc4, sc4, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hellbj	,sc4hellb,	sc4, sc4, sc4, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hellbg	,sc4hellb,	sc4, sc4, sc4mbus, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hellbh	,sc4hellb,	sc4, sc4, sc4mbus, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hellbi	,sc4hellb,	sc4, sc4, sc4mbus, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hellbj	,sc4hellb,	sc4, sc4, sc4mbus, ROT0, "BFM","Hells Bells (PR1419) (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+
+const stepper_interface* sc4hill_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_200step_reel,
+	0,
+};
+
+static DRIVER_INIT( sc4hill )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4hill_reel_configs;
+}
 
 // PR1643 AWP HILLBILLIONAIRE SCORP4         PR1613 HILLBILLIONAIRE SOUNDS11   HILLBILLIONAIRE S.SITE
-GAME( 200?, sc4hill		,0,			sc4, sc4, sc4, ROT0, "BFM","Hill Billionaire (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hilla	,sc4hill,	sc4, sc4, sc4, ROT0, "BFM","Hill Billionaire (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hill		,0,			sc4, sc4, sc4hill, ROT0, "BFM","Hill Billionaire (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hilla	,sc4hill,	sc4, sc4, sc4hill, ROT0, "BFM","Hill Billionaire (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2176 HISSING QUID         VIPA SOUNDS         HISSING QUID
 GAME( 200?, sc4hiss		,0,			sc4, sc4, sc4, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26259,18 +27579,18 @@ GAME( 200?, sc4hissf	,sc4hiss,	sc4, sc4, sc4, ROT0, "Qps","Hissing Quid (Qps) (S
 GAME( 200?, sc4hissg	,sc4hiss,	sc4, sc4, sc4, ROT0, "Qps","Hissing Quid (Qps) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1936 AWP HOT DOG SCORP4         PR1916 HOT DOG SOUNDS11         HOT DOG S.SITE
-GAME( 200?, sc4hotdg	,0,			sc4, sc4, sc4, ROT0, "BFM","Hot Dog (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hotdga	,sc4hotdg,	sc4, sc4, sc4, ROT0, "BFM","Hot Dog (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // incomplete pairing
-GAME( 200?, sc4hotdgb	,sc4hotdg,	sc4, sc4, sc4, ROT0, "BFM","Hot Dog (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hotdgc	,sc4hotdg,	sc4, sc4, sc4, ROT0, "BFM","Hot Dog (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hotdg	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Hot Dog (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hotdga	,sc4hotdg,	sc4, sc4, sc4mbus, ROT0, "BFM","Hot Dog (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // incomplete pairing
+GAME( 200?, sc4hotdgb	,sc4hotdg,	sc4, sc4, sc4mbus, ROT0, "BFM","Hot Dog (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hotdgc	,sc4hotdg,	sc4, sc4, sc4mbus, ROT0, "BFM","Hot Dog (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1733 AWP HOT ROD SCORP4         PR1713 HOT ROD SOUNDS11         HOT ROD S.SITE
-GAME( 200?, sc4hotrd	,0,			sc4, sc4, sc4, ROT0, "BFM","Hot Rod (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hotrda	,sc4hotrd,	sc4, sc4, sc4, ROT0, "BFM","Hot Rod (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hotrd	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Hot Rod (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hotrda	,sc4hotrd,	sc4, sc4, sc4mbus, ROT0, "BFM","Hot Rod (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR3231 AWP HOT SHOT SCORP4         PR3211 HOT SHOT SOUNDS11         HOT SHOT  S.SITE
-GAME( 200?, sc4hotsh	,0,			sc4, sc4, sc4, ROT0, "BFM","Hot Shots (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4hotsha	,sc4hotsh,	sc4, sc4, sc4, ROT0, "BFM","Hot Shots (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hotsh	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Hot Shots (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4hotsha	,sc4hotsh,	sc4, sc4, sc4mbus, ROT0, "BFM","Hot Shots (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1311 HOT WAD         PR1311 HOT WAD SOUNDS11
 GAME( 200?, sc4hotwd	,0,			sc4, sc4, sc4, ROT0, "BFM","Hot Wad (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26294,18 +27614,20 @@ GAME( 200?, sc4inspn	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Inner Spin (Mazooma) 
 GAME( 200?, sc4inspna	,sc4inspn,	sc4, sc4, sc4, ROT0, "Mazooma","Inner Spin (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2366 AWP THE ITALIAN JOB S4         PR2366 THE ITALIAN JOB SOUNDS11   ITALIAN JOB S.SITE
-GAME( 200?, sc4ijob		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ijoba	,sc4ijob,	sc4, sc4, sc4, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ijobb	,sc4ijob,	sc4, sc4, sc4, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ijobc	,sc4ijob,	sc4, sc4, sc4, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ijobd	,sc4ijob,	sc4, sc4, sc4, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ijobe	,sc4ijob,	sc4, sc4, sc4, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ijobf	,sc4ijob,	sc4, sc4, sc4, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ijobg	,sc4ijob,	sc4, sc4, sc4, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ijobh	,sc4ijob,	sc4, sc4, sc4, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ijobi	,sc4ijob,	sc4, sc4, sc4, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ijobj	,sc4ijob,	sc4, sc4, sc4, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ijobk	,sc4ijob,	sc4, sc4, sc4, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ijob		,0,			sc4, sc4, sc4mbus, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ijoba	,sc4ijob,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ijobb	,sc4ijob,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ijobc	,sc4ijob,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ijobd	,sc4ijob,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ijobe	,sc4ijob,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ijobf	,sc4ijob,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ijobg	,sc4ijob,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ijobh	,sc4ijob,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ijobi	,sc4ijob,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ijobj	,sc4ijob,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ijobk	,sc4ijob,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ijobl	,sc4ijob,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ijobm	,sc4ijob,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Italian Job (Mazooma) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
 
 
 // PR1609 JACKPOT JOKERS         PR1609 JACKPOT JOKERS SOUNDS11    JACKPOT JOKERS  S.SITE
@@ -26314,10 +27636,10 @@ GAME( 200?, sc4jjoka	,sc4jjok,	sc4, sc4, sc4, ROT0, "BFM","Jackpot Jokers (Bellf
 
 
 // PR2376 LITTLE DEVIL         LDEVIL SOUNDS         LITTLE DEVIL
-GAME( 200?, sc4ldvl		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Little Devil (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ldvla	,sc4ldvl,	sc4, sc4, sc4, ROT0, "Mazooma","Little Devil (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ldvlb	,sc4ldvl,	sc4, sc4, sc4, ROT0, "Mazooma","Little Devil (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ldvlc	,sc4ldvl,	sc4, sc4, sc4, ROT0, "Mazooma","Little Devil (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ldvl		,0,			sc4, sc4, sc4mbus, ROT0, "Mazooma","Little Devil (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ldvla	,sc4ldvl,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Little Devil (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ldvlb	,sc4ldvl,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Little Devil (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ldvlc	,sc4ldvl,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Little Devil (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1427 AWP RETURN OF THE KING         PR1413 RETURN OF THE  SOUNDS11    RETURN OF KING  S.SITE
 GAME( 200?, sc4lotrr	,0,			sc4, sc4, sc4, ROT0, "BFM","Lord Of The Rings - Return Of The King (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26328,14 +27650,14 @@ GAME( 200?, sc4lotrrd	,sc4lotrr,	sc4, sc4, sc4, ROT0, "BFM","Lord Of The Rings -
 GAME( 200?, sc4lotrre	,sc4lotrr,	sc4, sc4, sc4, ROT0, "BFM","Lord Of The Rings - Return Of The King (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR3034 AWP MANIC MINER SCORP4         PR3004 MANIC MINER SOUNDS11       MANIC MINER S.SITE
-GAME( 200?, sc4manic	,0,			sc4, sc4, sc4, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4manica	,sc4manic,	sc4, sc4, sc4, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4manicb	,sc4manic,	sc4, sc4, sc4, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4manicc	,sc4manic,	sc4, sc4, sc4, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4manicd	,sc4manic,	sc4, sc4, sc4, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4manice	,sc4manic,	sc4, sc4, sc4, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4manicf	,sc4manic,	sc4, sc4, sc4, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4manicg	,sc4manic,	sc4, sc4, sc4, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4manic	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4manica	,sc4manic,	sc4, sc4, sc4mbus, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4manicb	,sc4manic,	sc4, sc4, sc4mbus, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4manicc	,sc4manic,	sc4, sc4, sc4mbus, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4manicd	,sc4manic,	sc4, sc4, sc4mbus, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4manice	,sc4manic,	sc4, sc4, sc4mbus, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4manicf	,sc4manic,	sc4, sc4, sc4mbus, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4manicg	,sc4manic,	sc4, sc4, sc4mbus, ROT0, "BFM","Manic Miner (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2282 MENTALMONEYMONSTERS         MMMO SOUNDS          MONEY MONSTERS
 GAME( 200?, sc4mmm		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Mental Money Monsters (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26359,7 +27681,7 @@ GAME( 200?, sc4mmadf	,sc4mmad,	sc4, sc4, sc4, ROT0, "Mazooma","Money Madness (PR
 GAME( 200?, sc4mmadg	,sc4mmad,	sc4, sc4, sc4, ROT0, "Mazooma","Money Madness (PR0000) (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL ) // incomplete pairing
 
 // PR1218 MONEY SPINNER ART12         95004291 MONEYSPINNER PR1158
-GAME( 200?, sc4monsp	,0,			sc4, sc4, sc4, ROT0, "BFM","Money Spinner (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4monsp	,0,			sc4, sc4, sc4, ROT0, "BFM","Money Spinner (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // Not English
 
 GAME( 200?, sc4monop	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Monopoly (PR2056) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // PR2056  MONOP  TRIPLE         MONO SOUNDS         MONOP TRIPLE
 GAME( 200?, sc4monopa	,sc4monop,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly (PR2056) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // PR2056  MONOP  TRIPLE         MONO SOUNDS         MONOP TRIPLE
@@ -26441,31 +27763,34 @@ GAME( 200?, sc4mcasu	,sc4mcas,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Casino (
 GAME( 200?, sc4mcas4	,sc4mcas,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Casino (PR2056) (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )// ^^
 
 // PR3333 AWP MONOPOLY DOUBLE MONEY S4         PR3308 MPOLY D MONEY SOUNDS11     DOUBLE MONEY  S.SITE
-GAME( 200?, sc4mdm		,0,			sc4, sc4, sc4, ROT0, "BFM","Monopoly Double Money (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mdma		,sc4mdm,	sc4, sc4, sc4, ROT0, "BFM","Monopoly Double Money (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mdm		,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Double Money (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mdma		,sc4mdm,	sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Double Money (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2380 MONOPOLY HERE AND NOW         MR2R SOUNDS         NITH
-GAME( 200?, sc4mhn		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Here & Now (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mhna		,sc4mhn,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Here & Now (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mhn		,0,			sc4, sc4, sc4mbus, ROT0, "Mazooma","Monopoly Here & Now (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mhna		,sc4mhn,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Monopoly Here & Now (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2345 AWP MONOPOLY HOT PROPERTY S4         PR2345 HOT PROPERTY SOUNDS11      HOT PROPERTY  S.SITE
-GAME( 200?, sc4mhp		,0,			sc4, sc4, sc4, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mhpa		,sc4mhp,	sc4, sc4, sc4, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mhpb		,sc4mhp,	sc4, sc4, sc4, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mhpc		,sc4mhp,	sc4, sc4, sc4, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mhpd		,sc4mhp,	sc4, sc4, sc4, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mhpe		,sc4mhp,	sc4, sc4, sc4, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mhpf		,sc4mhp,	sc4, sc4, sc4, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mhpg		,sc4mhp,	sc4, sc4, sc4, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mhph		,sc4mhp,	sc4, sc4, sc4, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mhpi		,sc4mhp,	sc4, sc4, sc4, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mhpj		,sc4mhp,	sc4, sc4, sc4, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mhpk		,sc4mhp,	sc4, sc4, sc4, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mhp		,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // 471
+GAME( 200?, sc4mhpa		,sc4mhp,	sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // 472
+GAME( 200?, sc4mhpb		,sc4mhp,	sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL ) // 271
+GAME( 200?, sc4mhpc		,sc4mhp,	sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL ) // 471
+GAME( 200?, sc4mhpd		,sc4mhp,	sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL ) // 472
+GAME( 200?, sc4mhpe		,sc4mhp,	sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL ) // 271
+GAME( 200?, sc4mhpf		,sc4mhp,	sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL ) // 475
+GAME( 200?, sc4mhpg		,sc4mhp,	sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL ) // 571
+GAME( 200?, sc4mhph		,sc4mhp,	sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL ) // 572
+GAME( 200?, sc4mhpi		,sc4mhp,	sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL ) // 475
+GAME( 200?, sc4mhpj		,sc4mhp,	sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL ) // 571
+GAME( 200?, sc4mhpk		,sc4mhp,	sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL ) // 572
+GAME( 200?, sc4mhpl	    ,sc4mhp,	sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL ) // 411
+GAME( 200?, sc4mhpm	    ,sc4mhp,	sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL ) // 272
+GAME( 200?, sc4mhpn	    ,sc4mhp,	sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Hot Property (Bellfruit) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL ) // 272
 
 
 // PR1931 AWP MONOLOLY MONEY BAGS SCORP4         PR1911 MPOLY MONEYBAGS SOUNDS11   MONEYBAGS S.SITE
-GAME( 200?, sc4mmb		,0,			sc4, sc4, sc4, ROT0, "BFM","Monopoly Money Bags (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4mmba		,sc4mmb,	sc4, sc4, sc4, ROT0, "BFM","Monopoly Money Bags (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mmb		,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Money Bags (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mmba		,sc4mmb,	sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Money Bags (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2363 RED HOT MONOP         MONOPOLY  ARCADE  MONO SOUNDS         MONOPOLY
 GAME( 200?, sc4mrh		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Red Hot (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26485,14 +27810,14 @@ GAME( 200?, sc4mr2re	,sc4mr2r,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Road To 
 
 
 // PR3032 AWP NIGHTMARE ON ELM STREET S4         PR3002 ELM STREET SOUNDS11        NIGHTMARE ELM ST  S.SITE
-GAME( 200?, sc4nmare	,0,			sc4, sc4, sc4, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4nmarea	,sc4nmare,	sc4, sc4, sc4, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4nmareb	,sc4nmare,	sc4, sc4, sc4, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4nmarec	,sc4nmare,	sc4, sc4, sc4, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4nmare	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4nmarea	,sc4nmare,	sc4, sc4, sc4mbus, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4nmareb	,sc4nmare,	sc4, sc4, sc4mbus, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4nmarec	,sc4nmare,	sc4, sc4, sc4mbus, ROT0, "BFM","A Nightmare On Elm Street (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1612 PICK OF THE PACK         PR1612 PICK OF THE PACK SOUNDS11  PICK OF THE PACK  S.SITE
-GAME( 200?, sc4potp		,0,			sc4, sc4, sc4, ROT0, "BFM","Pick Of The Pack (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4potpa	,sc4potp,	sc4, sc4, sc4, ROT0, "BFM","Pick Of The Pack (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4potp		,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Pick Of The Pack (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4potpa	,sc4potp,	sc4, sc4, sc4mbus, ROT0, "BFM","Pick Of The Pack (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2562 PINK PANTHER         PINK SOUNDS         PINK PANTHER
 GAME( 200?, sc4pp		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Pink Panther (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26518,14 +27843,14 @@ GAME( 200?, sc4ppcrtb	,sc4ppcr,	sc4, sc4, sc4, ROT0, "Mazooma","Pink Panther Clo
 
 
 // PR2407 AWP PINK PANTHER CRACK THE CODE SCORP4         PR2407 CRACK THE CODE SOUNDS11    CRACK THE CODE  S.SITE
-GAME( 200?, sc4ppctc	,0,			sc4, sc4, sc4, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ppctca	,sc4ppctc,	sc4, sc4, sc4, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ppctcb	,sc4ppctc,	sc4, sc4, sc4, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ppctcc	,sc4ppctc,	sc4, sc4, sc4, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ppctcd	,sc4ppctc,	sc4, sc4, sc4, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ppctce	,sc4ppctc,	sc4, sc4, sc4, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ppctcf	,sc4ppctc,	sc4, sc4, sc4, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ppctcg	,sc4ppctc,	sc4, sc4, sc4, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ppctc	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ppctca	,sc4ppctc,	sc4, sc4, sc4mbus, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ppctcb	,sc4ppctc,	sc4, sc4, sc4mbus, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ppctcc	,sc4ppctc,	sc4, sc4, sc4mbus, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ppctcd	,sc4ppctc,	sc4, sc4, sc4mbus, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ppctce	,sc4ppctc,	sc4, sc4, sc4mbus, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ppctcf	,sc4ppctc,	sc4, sc4, sc4mbus, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ppctcg	,sc4ppctc,	sc4, sc4, sc4mbus, ROT0, "BFM","Pink Panther Crack The Code (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
 
 // PR2330 PINK PANTHER DYM         PINK PANTHER DYM  QPS DYMT SOUNDS         PINK PANTHER DYM    -
@@ -26564,22 +27889,26 @@ GAME( 200?, sc4ponye	,sc4pony,	sc4, sc4, sc4, ROT0, "BFM","Pony Express (Bellfru
 
 
 // PR2417 AWP POPEYE S4         PR2417 POPEYE SOUNDS11         POPEYE  S.SITE
-GAME( 200?, sc4popey	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4popeya	,sc4popey,	sc4, sc4, sc4, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4popeyb	,sc4popey,	sc4, sc4, sc4, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4popeyc	,sc4popey,	sc4, sc4, sc4, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4popey	,0,			sc4, sc4, sc4mbus, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4popeya	,sc4popey,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4popeyb	,sc4popey,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4popeyc	,sc4popey,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4popeyd	,sc4popey,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4popeye	,sc4popey,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Popeye (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 
 
 // PR1938 AWP POTS OF GOLD SCORP4         PR1918 POTS OF GOLD SOUNDS11      POTS OF GOLD  S.SITE
-GAME( 200?, sc4pog		,0,			sc4, sc4, sc4, ROT0, "BFM","Pots Of Gold (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4poga		,sc4pog,	sc4, sc4, sc4, ROT0, "BFM","Pots Of Gold (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4pogb		,sc4pog,	sc4, sc4, sc4, ROT0, "BFM","Pots Of Gold (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4pogc		,sc4pog,	sc4, sc4, sc4, ROT0, "BFM","Pots Of Gold (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4pogd		,sc4pog,	sc4, sc4, sc4, ROT0, "BFM","Pots Of Gold (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4poge		,sc4pog,	sc4, sc4, sc4, ROT0, "BFM","Pots Of Gold (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4pogf		,sc4pog,	sc4, sc4, sc4, ROT0, "BFM","Pots Of Gold (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4pogg		,sc4pog,	sc4, sc4, sc4, ROT0, "BFM","Pots Of Gold (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pog		,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Pots Of Gold (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4poga		,sc4pog,	sc4, sc4, sc4mbus, ROT0, "BFM","Pots Of Gold (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pogb		,sc4pog,	sc4, sc4, sc4mbus, ROT0, "BFM","Pots Of Gold (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pogc		,sc4pog,	sc4, sc4, sc4mbus, ROT0, "BFM","Pots Of Gold (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pogd		,sc4pog,	sc4, sc4, sc4mbus, ROT0, "BFM","Pots Of Gold (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4poge		,sc4pog,	sc4, sc4, sc4mbus, ROT0, "BFM","Pots Of Gold (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pogf		,sc4pog,	sc4, sc4, sc4mbus, ROT0, "BFM","Pots Of Gold (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pogg		,sc4pog,	sc4, sc4, sc4mbus, ROT0, "BFM","Pots Of Gold (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pogh	    ,sc4pog,	sc4, sc4, sc4mbus, ROT0, "BFM","Pots Of Gold (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pogi	    ,sc4pog,	sc4, sc4, sc4mbus, ROT0, "BFM","Pots Of Gold (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2272 POWER PLAY         PPLY SOUNDS
 GAME( 200?, sc4pwrpl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Power Play (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26589,15 +27918,15 @@ GAME( 200?, sc4pwrplc	,sc4pwrpl,	sc4, sc4, sc4, ROT0, "Mazooma","Power Play (Maz
 
 
 // PR1614 AWP POWERBALL         POWERBALL S.SITE  PR1614 POWERBALL SOUNDS11
-GAME( 200?, sc4pwrbl	,0,			sc4, sc4, sc4, ROT0, "BFM","Powerball (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4pwrbla	,sc4pwrbl,	sc4, sc4, sc4, ROT0, "BFM","Powerball (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pwrbl	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Powerball (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4pwrbla	,sc4pwrbl,	sc4, sc4, sc4mbus, ROT0, "BFM","Powerball (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 
 // PR2342 QUID VICIOUS         QUIDV SOUNDS         QUID VICIOUS
-GAME( 200?, sc4quidv	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4quidva	,sc4quidv,	sc4, sc4, sc4, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4quidvb	,sc4quidv,	sc4, sc4, sc4, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4quidvc	,sc4quidv,	sc4, sc4, sc4, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4quidv	,0,			sc4, sc4, sc4mbus, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4quidva	,sc4quidv,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4quidvb	,sc4quidv,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4quidvc	,sc4quidv,	sc4, sc4, sc4mbus, ROT0, "Mazooma","Quid Vicious (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2077  RED HOT X         REDX SOUNDS         RED HOT X
 GAME( 200?, sc4rhx		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Red Hot X (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26644,14 +27973,14 @@ GAME( 200?, sc4redsqc	,sc4redsq,	sc4, sc4, sc4, ROT0, "Mazooma","Red Square (Maz
 
 
 // PR3256 CLUB RONNIE O SULLIVANS TOURNAMENT SCORP4         RONNIE OSULLIVAN  CLUB  PR3256 RONNIE O SOUNDS11         RONNIE SULLIVAN
-GAME( 200?, sc4rosts	,0,			sc4, sc4, sc4, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4rostsa	,sc4rosts,	sc4, sc4, sc4, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4rostsb	,sc4rosts,	sc4, sc4, sc4, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4rostsc	,sc4rosts,	sc4, sc4, sc4, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4rostsd	,sc4rosts,	sc4, sc4, sc4, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4rostse	,sc4rosts,	sc4, sc4, sc4, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4rostsf	,sc4rosts,	sc4, sc4, sc4, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4rostsg	,sc4rosts,	sc4, sc4, sc4, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4rosts	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4rostsa	,sc4rosts,	sc4, sc4, sc4mbus, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4rostsb	,sc4rosts,	sc4, sc4, sc4mbus, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4rostsc	,sc4rosts,	sc4, sc4, sc4mbus, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4rostsd	,sc4rosts,	sc4, sc4, sc4mbus, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4rostse	,sc4rosts,	sc4, sc4, sc4mbus, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4rostsf	,sc4rosts,	sc4, sc4, sc4mbus, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4rostsg	,sc4rosts,	sc4, sc4, sc4mbus, ROT0, "BFM","Ronnie O'Sullivan's Tournament Snooker (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
 
 // PR2311 ROVERS RETURN         ROVERS RETURN SOUNDS         ROVERS RETURN
@@ -26665,12 +27994,13 @@ GAME( 200?, sc4rovrte	,sc4rovrt,	sc4, sc4, sc4, ROT0, "Mazooma","Rovers Return (
 
 
 // PR3043 AWP SHOW TIME S4         PR3013 SHOWTIME SOUNDS11         SHOW TIME S.SITE
-GAME( 200?, sc4showt	,0,			sc4, sc4, sc4, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4showta	,sc4showt,	sc4, sc4, sc4, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4showtb	,sc4showt,	sc4, sc4, sc4, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4showtc	,sc4showt,	sc4, sc4, sc4, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4showtd	,sc4showt,	sc4, sc4, sc4, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4showte	,sc4showt,	sc4, sc4, sc4, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4showt	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4showta	,sc4showt,	sc4, sc4, sc4mbus, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4showtb	,sc4showt,	sc4, sc4, sc4mbus, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4showtc	,sc4showt,	sc4, sc4, sc4mbus, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4showtd	,sc4showt,	sc4, sc4, sc4mbus, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4showte	,sc4showt,	sc4, sc4, sc4mbus, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4showtf	,sc4showt,	sc4, sc4, sc4mbus, ROT0, "BFM","Showtime (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1411 AWP SNAKES AND LADDERS         PR1411 SNAKES A L SOUNDS11        SNAKES & LADDERS  S.SITE
 GAME( 200?, sc4slad		,0,			sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26685,10 +28015,10 @@ GAME( 200?, sc4sladh	,sc4slad,	sc4, sc4, sc4, ROT0, "BFM","Snakes & Ladders (Bel
 
 
 // PR1921 AWP SPICE IT UP SCORP4         PR1901 SPICE IT UP SOUNDS11       SPICE IT UP S.SITE
-GAME( 200?, sc4spice	,0,			sc4, sc4, sc4, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4spicea	,sc4spice,	sc4, sc4, sc4, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4spiceb	,sc4spice,	sc4, sc4, sc4, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4spicec	,sc4spice,	sc4, sc4, sc4, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4spice	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4spicea	,sc4spice,	sc4, sc4, sc4mbus, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4spiceb	,sc4spice,	sc4, sc4, sc4mbus, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4spicec	,sc4spice,	sc4, sc4, sc4mbus, ROT0, "BFM","Spice It Up (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2232 SPIN WHEN YOU'RE WINNING         SPIN SOUNDS
 GAME( 200?, sc4swywm	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Spin When Your Winning (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26718,8 +28048,8 @@ GAME( 200?, sc4susj		,sc4sus,	sc4, sc4, sc4, ROT0, "Qps","Suits U Sir (Qps) (Sco
 GAME( 200?, sc4susk		,sc4sus,	sc4, sc4, sc4, ROT0, "Qps","Suits U Sir (Qps) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR3081 CLUB SUPER SLAM         SUPER SLAM  CLUB  PR3080 SUPER SLAM SOUNDS11
-GAME( 200?, sc4sslam	,0,			sc4, sc4, sc4, ROT0, "BFM","Super Slam (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4sslama	,sc4sslam,	sc4, sc4, sc4, ROT0, "BFM","Super Slam (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4sslam	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Super Slam (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4sslama	,sc4sslam,	sc4, sc4, sc4mbus, ROT0, "BFM","Super Slam (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2235 SWITCHBACK         SWBK SOUNDS         SWITCHBACK
 GAME( 200?, sc4swbak	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Switch Back (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26728,24 +28058,24 @@ GAME( 200?, sc4swbakb	,sc4swbak,	sc4, sc4, sc4, ROT0, "Mazooma","Switch Back (Ma
 GAME( 200?, sc4swbakc	,sc4swbak,	sc4, sc4, sc4, ROT0, "Mazooma","Switch Back (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1714 AWP TAKE THE PIECE S4         PR1714 TAKE THE PIECE SOUNDS11    TAKETHEPIECE  S.SITE
-GAME( 200?, sc4ttpie	,0,			sc4, sc4, sc4, ROT0, "BFM","Take The Piece (Bellfruit) (PR1714) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ttpiec	,sc4ttpie,	sc4, sc4, sc4, ROT0, "BFM","Take The Piece (Bellfruit) (PR1714) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ttpie	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Take The Piece (Bellfruit) (PR1714) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ttpiec	,sc4ttpie,	sc4, sc4, sc4mbus, ROT0, "BFM","Take The Piece (Bellfruit) (PR1714) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 // PR1734 AWP TAKE THE PIECE S4         PR1714 TAKE THE PIECE SOUNDS11    TAKETHEPIECE  S.SITE
-GAME( 200?, sc4ttpiea	,sc4ttpie,	sc4, sc4, sc4, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ttpieb	,sc4ttpie,	sc4, sc4, sc4, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ttpied	,sc4ttpie,	sc4, sc4, sc4, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ttpiee	,sc4ttpie,	sc4, sc4, sc4, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ttpief	,sc4ttpie,	sc4, sc4, sc4, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4ttpieg	,sc4ttpie,	sc4, sc4, sc4, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ttpiea	,sc4ttpie,	sc4, sc4, sc4mbus, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ttpieb	,sc4ttpie,	sc4, sc4, sc4mbus, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ttpied	,sc4ttpie,	sc4, sc4, sc4mbus, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ttpiee	,sc4ttpie,	sc4, sc4, sc4mbus, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ttpief	,sc4ttpie,	sc4, sc4, sc4mbus, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ttpieg	,sc4ttpie,	sc4, sc4, sc4mbus, ROT0, "BFM","Take The Piece (Bellfruit) (PR1734) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR3031 AWP TAKE YOUR PICK S4         PR3001 TAKE YOUR PICK SOUNDS11    TAKE YOUR PICK  S.SITE
-GAME( 200?, sc4typ		,0,			sc4, sc4, sc4, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4typa		,sc4typ,	sc4, sc4, sc4, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4typb		,sc4typ,	sc4, sc4, sc4, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4typc		,sc4typ,	sc4, sc4, sc4, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4typ		,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4typa		,sc4typ,	sc4, sc4, sc4mbus, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4typb		,sc4typ,	sc4, sc4, sc4mbus, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4typc		,sc4typ,	sc4, sc4, sc4mbus, ROT0, "BFM","Take Your Pick (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2056  GOLD X TRIPLE         BARX SOUNDS         J  GOLD X TRIPLE  (is this really a game called Top Box or just the top box roms for one of the Golden X Game sets)
-GAME( 200?, sc4tbox		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Top Box (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4tbox		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Gold X Triple Top Box (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR2211 TOP OF THE SHOTS         TOTS SOUNDS         TOP OF THE SHOTS
 GAME( 200?, sc4tpsht	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Top Of The Shots (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26797,24 +28127,24 @@ GAME( 200?, sc4adsnt	,0,			sc4, sc4, sc4, ROT0, "BFM","Ant & Dec's Saturday Nigh
 GAME( 200?, sc4adsnta	,sc4adsnt,	sc4, sc4, sc4, ROT0, "BFM","Ant & Dec's Saturday Night Takeaway (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1728 AWP BULLY'S PRIZE BOARD         PR1708 B PRIZE BOARD SOUNDS11     BULLYSPRIZEBOARD  S.SITE
-GAME( 200?, sc4bpb		,0,			sc4, sc4, sc4, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bpbc		,sc4bpb,	sc4, sc4, sc4, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bpb		,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bpbc		,sc4bpb,	sc4, sc4, sc4mbus, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 // PR1728 AWP BULLY'S PRIZE BOARD S4         PR1708 B PRIZE BOARD SOUNDS11     BULLYSPRIZEBOARD  S.SITE
-GAME( 200?, sc4bpba		,sc4bpb,	sc4, sc4, sc4, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bpbb		,sc4bpb,	sc4, sc4, sc4, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bpbd		,sc4bpb,	sc4, sc4, sc4, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bpbe		,sc4bpb,	sc4, sc4, sc4, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bpba		,sc4bpb,	sc4, sc4, sc4mbus, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bpbb		,sc4bpb,	sc4, sc4, sc4mbus, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bpbd		,sc4bpb,	sc4, sc4, sc4mbus, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bpbe		,sc4bpb,	sc4, sc4, sc4mbus, ROT0, "BFM","Bully's Prize Board (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR3040 AWP BULLYS STAR PRIZE SCORP4         PR3012 BULLYS STAR P SOUNDS11     BULLYS STARPRIZE  S.SITE
-GAME( 200?, sc4bsp		,0,			sc4, sc4, sc4, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bspa		,sc4bsp,	sc4, sc4, sc4, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bspb		,sc4bsp,	sc4, sc4, sc4, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bspc		,sc4bsp,	sc4, sc4, sc4, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bspd		,sc4bsp,	sc4, sc4, sc4, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bspg		,sc4bsp,	sc4, sc4, sc4, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bsp		,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bspa		,sc4bsp,	sc4, sc4, sc4mbus, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bspb		,sc4bsp,	sc4, sc4, sc4mbus, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bspc		,sc4bsp,	sc4, sc4, sc4mbus, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bspd		,sc4bsp,	sc4, sc4, sc4mbus, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bspg		,sc4bsp,	sc4, sc4, sc4mbus, ROT0, "BFM","Bully's Star Prize (PR3040) (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 // PR3042 AWP BULLYS STAR PRIZE SCORP4         PR3012 BULLYS STAR P SOUNDS11     BULLYS STARPRIZE  S.SITE
-GAME( 200?, sc4bspe		,sc4bsp,	sc4, sc4, sc4, ROT0, "BFM","Bully's Star Prize (PR3042) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4bspf		,sc4bsp,	sc4, sc4, sc4, ROT0, "BFM","Bully's Star Prize (PR3042) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bspe		,sc4bsp,	sc4, sc4, sc4mbus, ROT0, "BFM","Bully's Star Prize (PR3042) (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bspf		,sc4bsp,	sc4, sc4, sc4mbus, ROT0, "BFM","Bully's Star Prize (PR3042) (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 
 // PR1316 AWP CHAIN REACTION         PR1312 CHAIN REACT SOUNDS11
@@ -26824,14 +28154,14 @@ GAME( 200?, sc4chainb	,sc4chain,	sc4, sc4, sc4, ROT0, "BFM","Chain Reaction (Bel
 GAME( 200?, sc4chainc	,sc4chain,	sc4, sc4, sc4, ROT0, "BFM","Chain Reaction (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1727 AWP CLOWN AROUND SCORP4         PR1707 CLOWN AROUND SOUNDS11      CLOWN AROUND  S.SITE
-GAME( 200?, sc4clown	,0,			sc4, sc4, sc4, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clowna	,sc4clown,	sc4, sc4, sc4, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clownb	,sc4clown,	sc4, sc4, sc4, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clownc	,sc4clown,	sc4, sc4, sc4, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clownd	,sc4clown,	sc4, sc4, sc4, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clowne	,sc4clown,	sc4, sc4, sc4, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clownf	,sc4clown,	sc4, sc4, sc4, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4clowng	,sc4clown,	sc4, sc4, sc4, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clown	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clowna	,sc4clown,	sc4, sc4, sc4mbus, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clownb	,sc4clown,	sc4, sc4, sc4mbus, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clownc	,sc4clown,	sc4, sc4, sc4mbus, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clownd	,sc4clown,	sc4, sc4, sc4mbus, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clowne	,sc4clown,	sc4, sc4, sc4mbus, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clownf	,sc4clown,	sc4, sc4, sc4mbus, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clowng	,sc4clown,	sc4, sc4, sc4mbus, ROT0, "BFM","Clown Around (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
 
 // PR1412 AWP COPS AND ROBBERS         PR1412 COPS AND ROBBERS SOUNDS11  COPS AND ROBBERS  S.SITE
 GAME( 200?, sc4copsr	,0,			sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26845,37 +28175,39 @@ GAME( 200?, sc4copsrg	,sc4copsr,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers (B
 GAME( 200?, sc4copsrh	,sc4copsr,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4copsri	,sc4copsr,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
 
-// PR1935 AWP DEAL OR NO DEAL BEAT THE BANKER S4         PR1915 BEAT THE BANKER SOUNDS11   BEAT THE BANKER S.SITE
-GAME( 200?, sc4dndbe	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbeb	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbec	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbed	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbee	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbef	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbeg	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbeh	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbei	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbej	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbek	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbel	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbem	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndben	,sc4dndbe,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Beat The Banker (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
+/* wrong sound roms */
+GAME( 200?, sc4mowow	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2118) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // PR2118 MONOPOLY WOTW         WOTW SOUNDS         MONOPOLY WOTW   8P
+GAME( 200?, sc4mowowa	,sc4mowow,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2118) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // ^^
+GAME( 200?, sc4mowowb	,sc4mowow,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2118) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL ) // ^^
+GAME( 200?, sc4mowowc	,sc4mowow,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2118) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL ) // ^^
 
-// PR3337 AWP DEAL OR NO DEAL BOX CLEVER SCORP4         PR3312 DOND BOXCLEVER SOUNDS11    BOX CLEVER  S.SITE
-GAME( 200?, sc4dndbc	,0,			sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Box Clever (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 200?, sc4dndbca	,sc4dndbc,	sc4, sc4, sc4, ROT0, "BFM","Deal Or No Deal Box Clever (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4mwwtb	,0,     	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2389, Top Box) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // PR2389  WHEEL OF WEALTH         WOWT SOUNDS         WHEEL OF WEAL
+GAME( 200?, sc4mwwtba	,sc4mwwtb,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2389, Top Box) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // ^^
+GAME( 200?, sc4mwwtbb	,sc4mwwtb,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2389, Top Box) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL ) // ^^
+GAME( 200?, sc4mwwtbc	,sc4mwwtb,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2389, Top Box) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4mwwtbd	,sc4mwwtb,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (PR2389, Top Box) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )// ^^
 
-GAME( 200?, sc4mowow	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // PR2118 MONOPOLY WOTW         WOTW SOUNDS         MONOPOLY WOTW   8P
-GAME( 200?, sc4mowowa	,sc4mowow,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, sc4mowowb	,sc4mowow,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, sc4mowowc	,sc4mowow,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, sc4mowowd	,sc4mowow,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL ) // PR1726 AWP WHEEL OF WEALTH         PR1706 WHEEL OF WEALTH SOUNDS11   WHEEL OF WEALTH S.SITE
-GAME( 200?, sc4mowowe	,sc4mowow,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, sc4mowowf	,sc4mowow,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL ) // PR2389  WHEEL OF WEALTH         WOWT SOUNDS         WHEEL OF WEAL
-GAME( 200?, sc4mowowg	,sc4mowow,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, sc4mowowh	,sc4mowow,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, sc4mowowi	,sc4mowow,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4mowowj	,sc4mowow,	sc4, sc4, sc4, ROT0, "Mazooma","Monopoly Wheel Of Wealth (Mazooma) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )// ^^
+
+const stepper_interface* sc4bwow_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	0,
+	&starpoint_interface_48step,
+	&starpoint_interface_200step_reel,
+};
+
+static DRIVER_INIT( sc4bwow )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4bwow_reel_configs;
+}
+
+GAME( 200?, sc4bwow	  ,0,	    sc4, sc4, sc4bwow, ROT0, "BFM","Wheel Of Wealth (Bellfruit) (PR1726) (Scorpion 4) (WHEL013, set 1)", GAME_IS_SKELETON_MECHANICAL ) // PR1726 AWP WHEEL OF WEALTH         PR1706 WHEEL OF WEALTH SOUNDS11   WHEEL OF WEALTH S.SITE
+GAME( 200?, sc4bwowa  ,sc4bwow,	sc4, sc4, sc4bwow, ROT0, "BFM","Wheel Of Wealth (Bellfruit) (PR1726) (Scorpion 4) (WHEL013, set 2)", GAME_IS_SKELETON_MECHANICAL ) // ^^
+
 
 // PR2166 NUN N ROSES          NANR SOUNDS         NUNS N ROSES
 GAME( 200?, sc4nunsm	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Nuns 'n' Roses (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
@@ -26908,79 +28240,465 @@ GAME( 200?, sc4gncc		,sc4gnc,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Club (
 GAME( 200?, sc4gncd		,sc4gnc,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, sc4gnce		,sc4gnc,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Club (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
 
-GAME( 200?, sc4ggame	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // PR2056  GOLD X TRIPLE         BARX SOUNDS         GOLD X TRIPLE
-GAME( 200?, sc4ggamee	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, sc4ggameo	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 16)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggameh	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL ) // PR2056  GOLDEN X         GOLDEN GAME ARCADE  BARX SOUNDS         GOLDEN X
-GAME( 200?, sc4ggamei	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggamel	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggamem	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggamep	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 17)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggameq	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 18)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggamer	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 19)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggamew	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 24)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggamex	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 25)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggamey	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 26)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggamez	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 27)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggame1	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 29)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggame2	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 30)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggame7	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 35)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggame8	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 36)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggame9	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 37)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggameaa	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 38)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggameab	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 39)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggameac	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 40)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggamead	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 41)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggameae	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 42)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggamea	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // PR2056  GOLDEN X         BARX SOUNDS         GOLDEN X
-GAME( 200?, sc4ggameb	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, sc4ggamec	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, sc4ggamed	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, sc4ggamef	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, sc4ggameg	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, sc4ggamej	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggamek	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggamen	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggames	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 20)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggamet	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 21)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggameu	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 22)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggamev	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 23)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggame0	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 28)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggame3	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 31)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggame4	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 32)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggame5	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 33)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggame6	,sc4ggame,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (Scorpion 4) (set 34)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggtb	    ,0,			sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, Top Box) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // PR2056  GOLD X TRIPLE         BARX SOUNDS         GOLD X TRIPLE
+GAME( 200?, sc4ggtba	,sc4ggtb,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, Top Box) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // ^^
+GAME( 200?, sc4ggtbb	,sc4ggtb,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, Top Box) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )// ^^
+
+const stepper_interface* sc4ggame_reel_configs[6] =
+{
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	0,
+	0,
+	0,
+};
+
+static DRIVER_INIT( sc4ggamem )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4mbus );
+	state->m_reel_setup = sc4ggame_reel_configs;
+}
+
+static DRIVER_INIT( sc4ggame )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4 );
+	state->m_reel_setup = sc4ggame_reel_configs;
+}
+
+// 25GBP sets
+// PR2056  GOLDEN X         GOLDEN GAME ARCADE  BARX SOUNDS         GOLDEN X
+GAME( 200?, sc4ggame	,0,	        sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (GLDX, 25GBP, set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ggamei	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (GLDX, 25GBP, set 2)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggamep	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (GLDX, 25GBP, set 3)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggameq	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (GLDX, 25GBP, set 4)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggamer	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (GLDX, 25GBP, set 5)", GAME_IS_SKELETON_MECHANICAL )// ^^
+// 35GBP sets
+GAME( 200?, sc4ggame7	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (GLDX, 35GBP, set 1)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggame8	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (GLDX, 35GBP, set 2)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggame9	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (GLDX, 35GBP, set 3)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggameaa	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (GLDX, 35GBP, set 4)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggameab	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (GLDX, 35GBP, set 5)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggameac	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (GLDX, 35GBP, set 6)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggamead	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (GLDX, 35GBP, set 7)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggameae	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (GLDX, 35GBP, set 8)", GAME_IS_SKELETON_MECHANICAL )// ^^
+// pay unit error
+GAME( 200?, sc4ggamel	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggamem	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggamew	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggamex	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggamey	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggamez	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggame1	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggame2	,sc4ggame,	sc4, sc4, sc4ggamem, ROT0, "Mazooma","Golden Game (Mazooma) (PR2056, newer?) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )// ^^
+// 25GBP, no 41 check
+// PR2056  GOLDEN X         BARX SOUNDS         GOLDEN X
+GAME( 200?, sc4ggamea	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 25GBP, set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ggameb	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 25GBP, set 2)", GAME_IS_SKELETON_MECHANICAL ) // ^^
+GAME( 200?, sc4ggamec	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 25GBP, set 3)", GAME_IS_SKELETON_MECHANICAL ) // ^^
+GAME( 200?, sc4ggamed	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 25GBP, set 4)", GAME_IS_SKELETON_MECHANICAL ) // ^^
+GAME( 200?, sc4ggames	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 25GBP, set 5)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggamet	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 25GBP, set 6)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggameu	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 25GBP, set 7)", GAME_IS_SKELETON_MECHANICAL )// ^^
+// 30GBP, no 41 check
+GAME( 200?, sc4ggamef	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 30GBP, set 1)", GAME_IS_SKELETON_MECHANICAL ) // ^^
+GAME( 200?, sc4ggameg	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 30GBP, set 2)", GAME_IS_SKELETON_MECHANICAL ) // ^^
+GAME( 200?, sc4ggamej	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 30GBP, set 3)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggamek	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 30GBP, set 4)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggamev	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 30GBP, set 5)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggame3	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 30GBP, set 6)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggame4	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 30GBP, set 7)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggame5	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 30GBP, set 8)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggame6	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (GLDX, 30GBP, set 9)", GAME_IS_SKELETON_MECHANICAL )// ^^
+// pay unit error
+GAME( 200?, sc4ggamen	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggame0	,sc4ggame,	sc4, sc4, sc4ggame,  ROT0, "Mazooma","Golden Game (Mazooma) (PR2056) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )// ^^
+
 
 // these were in the above sets
-GAME( 200?, sc4ggdlx	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )// PR2201  GOLDEN X         GOLDEN GAME MAZ GXDX SOUNDS         GOLDEN GAME DLX
-GAME( 200?, sc4ggdlxc	,sc4ggdlx,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggdlxa	,sc4ggdlx,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )// PR2201  GOLDEN X         GOLDEN GAME DLX MAZ GXDX SOUNDS         GOLDEN X
-GAME( 200?, sc4ggdlxb	,sc4ggdlx,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggdlxd	,sc4ggdlx,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggdlxe	,sc4ggdlx,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggdlxf	,sc4ggdlx,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )// PR2201  GOLDEN GAME DELUXE         GOLDEN GAME MAZ GXDX SOUNDS         GOLDEN GAME DLX
-GAME( 200?, sc4ggdlxg	,sc4ggdlx,	sc4, sc4, sc4, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )// ^^
+// PR2201  GOLDEN X         GOLDEN GAME MAZ GXDX SOUNDS         GOLDEN GAME DLX
+GAME( 200?, sc4ggdlx	,0,			sc4, sc4, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ggdlxc	,sc4ggdlx,	sc4, sc4, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )// ^^
+// PR2201  GOLDEN X         GOLDEN GAME DLX MAZ GXDX SOUNDS         GOLDEN X
+GAME( 200?, sc4ggdlxa	,sc4ggdlx,	sc4, sc4, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ggdlxb	,sc4ggdlx,	sc4, sc4, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggdlxd	,sc4ggdlx,	sc4, sc4, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4ggdlxe	,sc4ggdlx,	sc4, sc4, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )// ^^
+// PR2201  GOLDEN GAME DELUXE         GOLDEN GAME MAZ GXDX SOUNDS         GOLDEN GAME DLX
+GAME( 200?, sc4ggdlxf	,sc4ggdlx,	sc4, sc4, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ggdlxg	,sc4ggdlx,	sc4, sc4, sc4ggame, ROT0, "Mazooma","Golden Game Deluxe (Mazooma) (PR2201) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )// ^^
+
+const stepper_interface* sc4gggtb_reel_configs[6] =
+{
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+	&starpoint_interface_48step,
+};
+
+static DRIVER_INIT( sc4gggtb )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4 );
+	state->m_reel_setup = sc4gggtb_reel_configs;
+}
+
 // most of these look similar
-GAME( 200?, sc4ggg		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL ) // PR2056  GOLD X TRIPLE         BARX SOUNDS           GOLD X TRIPLE
-GAME( 200?, sc4gggj		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4ggga		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // PR2056  GOLDEN X         GOLDEN GAME ARCADE  BARX SOUNDS         GOLDEN X
-GAME( 200?, sc4gggb		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, sc4gggc		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, sc4gggd		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, sc4ggge		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, sc4gggf		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, sc4gggk		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4gggl		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4gggm		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4gggn		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4gggo		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 16)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4gggp		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 17)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4gggg		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL ) // PR2353 GRAND GOLDEN GAME         GRAND GOLDEN GAME MAZ BARX SOUNDS         GOLDEN GAME
-GAME( 200?, sc4gggh		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL ) // ^^
-GAME( 200?, sc4gggi		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4gggq		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 18)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4gggr		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 19)", GAME_IS_SKELETON_MECHANICAL )// ^^
-GAME( 200?, sc4gggs		,sc4ggg,	sc4, sc4, sc4, ROT0, "Mazooma","Grand Golden Game (Mazooma) (Scorpion 4) (set 20)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4gggtb		,0,			sc4, sc4, sc4gggtb, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2056, Top Box) (Scorpion 4) (GGGT, set 1)", GAME_IS_SKELETON_MECHANICAL ) // PR2056  GOLD X TRIPLE         BARX SOUNDS           GOLD X TRIPLE
+GAME( 200?, sc4gggtba		,sc4ggg,	sc4, sc4, sc4gggtb, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2056, Top Box) (Scorpion 4) (GGGT, set 2)", GAME_IS_SKELETON_MECHANICAL )// ^^
+
+
+const stepper_interface* sc4ggg_reel_configs[6] =
+{
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	&starpoint_interface_200step_reel,
+	0,
+	0,
+	0,
+};
+
+static DRIVER_INIT( sc4ggg )
+{
+	sc4_state *state = machine.driver_data<sc4_state>();
+	DRIVER_INIT_CALL( sc4 );
+	state->m_reel_setup = sc4ggg_reel_configs;
+}
+
+// do these sets have the wrong project name / ID strings? they boot at GGGB (Grand Golden Game) but their product ID in the header suggests standard Golden Game
+// PR2056  GOLDEN X         GOLDEN GAME ARCADE  BARX SOUNDS         GOLDEN X
+GAME( 200?, sc4ggg		,0,     	sc4, sc4, sc4ggg, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2056) (Scorpion 4) (GGGB, 35GBP, set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4gggb		,sc4ggg,	sc4, sc4, sc4ggg, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2056) (Scorpion 4) (GGGB, 35GBP, set 2)", GAME_IS_SKELETON_MECHANICAL ) // ^^
+GAME( 200?, sc4gggc		,sc4ggg,	sc4, sc4, sc4ggg, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2056) (Scorpion 4) (GGGB, 35GBP, set 3)", GAME_IS_SKELETON_MECHANICAL ) // ^^
+GAME( 200?, sc4gggd		,sc4ggg,	sc4, sc4, sc4ggg, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2056) (Scorpion 4) (GGGB, 35GBP, set 4)", GAME_IS_SKELETON_MECHANICAL ) // ^^
+GAME( 200?, sc4ggge		,sc4ggg,	sc4, sc4, sc4ggg, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2056) (Scorpion 4) (GGGB, 35GBP, set 5)", GAME_IS_SKELETON_MECHANICAL ) // ^^
+GAME( 200?, sc4gggf		,sc4ggg,	sc4, sc4, sc4ggg, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2056) (Scorpion 4) (GGGB, 35GBP, set 6)", GAME_IS_SKELETON_MECHANICAL ) // ^^
+GAME( 200?, sc4gggk		,sc4ggg,	sc4, sc4, sc4ggg, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2056) (Scorpion 4) (GGGB, 35GBP, set 7)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4gggl		,sc4ggg,	sc4, sc4, sc4ggg, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2056) (Scorpion 4) (GGGB, 35GBP, set 8)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4gggm		,sc4ggg,	sc4, sc4, sc4ggg, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2056) (Scorpion 4) (GGGB, 35GBP, set 9)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4gggn		,sc4ggg,	sc4, sc4, sc4ggg, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2056) (Scorpion 4) (GGGB, 35GBP, set 10)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4gggo		,sc4ggg,	sc4, sc4, sc4ggg, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2056) (Scorpion 4) (GGGB, 35GBP, set 11)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4gggp		,sc4ggg,	sc4, sc4, sc4ggg, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2056) (Scorpion 4) (GGGB, 35GBP, set 12)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4gggg		,sc4ggg,	sc4, sc4, sc4ggg, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2056) (Scorpion 4) (GGGB, 35GBP, set 13)", GAME_IS_SKELETON_MECHANICAL )
+// PR2353 GRAND GOLDEN GAME         GRAND GOLDEN GAME MAZ BARX SOUNDS         GOLDEN GAME
+GAME( 200?, sc4gggh		,sc4ggg,	sc4, sc4, sc4ggg, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2353) (Scorpion 4) (GGGB, 35GBP, set 1)", GAME_IS_SKELETON_MECHANICAL ) // ^^
+GAME( 200?, sc4gggi		,sc4ggg,	sc4, sc4, sc4ggg, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2353) (Scorpion 4) (GGGB, 35GBP, set 2)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4gggq		,sc4ggg,	sc4, sc4, sc4ggg, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2353) (Scorpion 4) (GGGB, 35GBP, set 3)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4gggr		,sc4ggg,	sc4, sc4, sc4ggg, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2353) (Scorpion 4) (GGGB, 35GBP, set 4)", GAME_IS_SKELETON_MECHANICAL )// ^^
+GAME( 200?, sc4gggs		,sc4ggg,	sc4, sc4, sc4ggg, ROT0, "Mazooma","Grand Golden Game (Mazooma) (PR2353) (Scorpion 4) (GGGB, 35GBP, set 5)", GAME_IS_SKELETON_MECHANICAL )// ^^
+
+
+// PR1227 4PLAY ART13         95004313 4PLAY PR1227
+GAME( 200?, sc4ivply	,0,			sc4, sc4, sc4, ROT0, "BFM","4 Play (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // not english
+
+// PR2070 ACES HIGH         ACEHI SOUNDS            ACES HIGH
+GAME( 200?, sc4acesh	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4acesha	,sc4acesh,	sc4, sc4, sc4, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4aceshb	,sc4acesh,	sc4, sc4, sc4, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4aceshc	,sc4acesh,	sc4, sc4, sc4, ROT0, "Mazooma","Aces High (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2118 ADRENALIN         COTL SOUNDS         ADRENALIN
+GAME( 200?, sc4adren	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4adrena	,sc4adren,	sc4, sc4, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4adrenb	,sc4adren,	sc4, sc4, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4adrenc	,sc4adren,	sc4, sc4, sc4, ROT0, "Mazooma","Adrenalin (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2154 CLUB AROUND BOAR         CLB AROUND BOARD  CLUB  AROU SOUNDS
+GAME( 200?, sc4a40cl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4a40cla	,sc4a40cl,	sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4a40clb	,sc4a40cl,	sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days Club (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4a40clc	,sc4a40cl,	sc4, sc4, sc4, ROT0, "Mazooma","Around The Board In 40 Days Club (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+ // PR1225 AZTEC CASINO
+GAME( 200?, sc4aztec	,0,			sc4, sc4, sc4, ROT0, "BFM","Aztec (Casino) (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+ // PR1215 AZTEC EURO
+GAME( 200?, sc4azteca	,sc4aztec,	sc4, sc4, sc4, ROT0, "BFM","Aztec (Euro) (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // not english
+
+// PR???? BANKETYBANK V1.0         BANKETYBANKSND           BANKETY BANK
+GAME( 200?, sc4bankb	,0,			sc4, sc4, sc4, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bankba	,sc4bankb,	sc4, sc4, sc4, ROT0, "Qps","Bankety Bank (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2094 BEDAZZLED         BEDZ SOUNDS         BEDAZZLED
+GAME( 200?, sc4bed		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4beda		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bedb		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bedc		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bedd		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bede		,sc4bed,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2102 CLUB BEDAZZLED         CBED SOUNDS         CLUB BEDAZZLED
+GAME( 200?, sc4bedcl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+// PR2102 CLUB BEDAZZLED         CLUB BEDAZZLED  CLUB  CBED SOUNDS         CLUB BEDAZZLED
+GAME( 200?, sc4bedcla	,sc4bedcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bedclb	,sc4bedcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bedclc	,sc4bedcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bedcld	,sc4bedcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bedazzled Club (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2083 BIG BLASTER         BBST SOUNDS         BIG BLASTER
+GAME( 200?, sc4bblas	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bblasa	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bblasb	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bblasc	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bblasd	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bblase	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bblasf	,sc4bblas,	sc4, sc4, sc4, ROT0, "Mazooma","Big Blaster (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR21xx BINGO BELLE         SSPT SOUNDS         BINGO BELLE
+GAME( 200?, sc4bingb	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bingo Belle (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bingba	,sc4bingb,	sc4, sc4, sc4, ROT0, "Mazooma","Bingo Belle (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR???? BANKETYBANK 011         BANKETYBANKSND           BANKETY BANK
+GAME( 200?, sc4bb		,0,			sc4, sc4, sc4, ROT0, "Qps","Blankety Bank (Qps) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bba		,sc4bb,		sc4, sc4, sc4, ROT0, "Qps","Blankety Bank (Qps) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2298 CLUB BOBBY DAZZLER         CLUB BOB DAZZLER  CLUB  CLUBBOBD SOUNDS
+GAME( 200?, sc4bobcl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bobcla	,sc4bobcl,	sc4, sc4, sc4, ROT0, "Mazooma","Bobby Dazzler Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2033 BREAK THE SPELL         SPELL SOUNDS         BREAK THE SPELL
+GAME( 200?, sc4brksp	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4brkspa	,sc4brksp,	sc4, sc4, sc4, ROT0, "Mazooma","Break The Spell (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR1753 CLUB BULLSEYE         BULLSEYE  CLUB  PR1751 BULLSEYE SOUNDS11         BULLSYE
+GAME( 200?, sc4bulcl	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulcla	,sc4bulcl,	sc4, sc4, sc4mbus, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulclb	,sc4bulcl,	sc4, sc4, sc4mbus, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulclc	,sc4bulcl,	sc4, sc4, sc4mbus, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulcld	,sc4bulcl,	sc4, sc4, sc4mbus, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulcle	,sc4bulcl,	sc4, sc4, sc4mbus, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulclf	,sc4bulcl,	sc4, sc4, sc4mbus, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulclg	,sc4bulcl,	sc4, sc4, sc4mbus, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulclh	,sc4bulcl,	sc4, sc4, sc4mbus, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4bulcli	,sc4bulcl,	sc4, sc4, sc4mbus, ROT0, "BFM","Bullseye Club (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR1113 CARRY ON WINNING         PR1113 CARRY ON WINNING SOUNDS11
+GAME( 200?, sc4carry	,0,			sc4, sc4, sc4, ROT0, "BFM","Carry On Winning (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4carrya	,sc4carry,	sc4, sc4, sc4, ROT0, "BFM","Carry On Winning (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR1349 CLUB CASH BAZAAR         PR1349 CLUB CASH BAZAAR SOUNDS11
+GAME( 200?, sc4cbaz		,0,			sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbaza	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbazb	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbazc	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbazd	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbaze	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbazf	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbazg	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbazh	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbazi	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+// PR1349 CLUB CASH BAZAAR         CLUB CASH BAZAAR  CLUB  PR1349 CLUB CASH BAZAAR SOUNDS11
+GAME( 200?, sc4cbazj	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cbazk	,sc4cbaz,	sc4, sc4, sc4, ROT0, "BFM","Cash Bazaar Club (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR2020 CASH ERUPTION         ERUP SOUNDS          CASH  ERUPTION
+GAME( 200?, sc4cerup	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cash Eruption (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR2076 CASH EXPLOSION         CEXP SOUNDS         CASH EXPLSION
+GAME( 200?, sc4cexpl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cexpla	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cexplb	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cexplc	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cexplf	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cexplg	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2076) (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+//  PR2120 CASH EXPLOSION         CEXP SOUNDS         CASH EXPLSION
+GAME( 200?, sc4cexpld	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2120) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cexple	,sc4cexpl,	sc4, sc4, sc4, ROT0, "Mazooma","Cash Explosion (PR2120) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR2118 CASH ON THE LASH         COTL SOUNDS         CASH ON THE LASH
+GAME( 200?, sc4clash	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clasha	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clashb	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clashc	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clashd	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clashe	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clashf	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clashg	,sc4clash,	sc4, sc4, sc4, ROT0, "Mazooma","Cash On The Lash (Mazooma) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2038E Dutch12 Cashanova  (not a standard string)
+GAME( 200?, sc4cashn	,0,			sc4, sc4, sc4, ROT0, "Mazooma / Eurocoin","Cashanova (Dutch) (Mazooma / Eurocoin) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR1426 CASINO CRAZY FRUITS GOLD         PR1426 CRAZY F GOLD SOUNDS11      CRAZY FRUIT GOLD  S.SITE  (set was marked as Casino Crazy Keys)
+GAME( 200?, sc4cckey	,0,		    sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeya	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyb	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyc	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyd	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeye	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyf	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyg	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyh	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyi	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyj	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyk	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyl	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeym	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyn	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cckeyo	,sc4cckey,	sc4, sc4, sc4, ROT0, "BFM","Casino Crazy Fruits Gold (Bellfruit) (Scorpion 4) (set 16)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2062 CASINO ROYALE         CROY SOUNDS           CASINO ROYALE
+GAME( 200?, sc4casry	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2062) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4casryc	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2062) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+// PR2075 CASINO ROYALE         DUCRV46     CROY  CROY SOUNDS           CASINO ROYALE  (Jumping Bean copyright?)
+GAME( 200?, sc4casryd	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2075) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4casrye	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2075) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+// PR2073, CZECH CASINO ROYALE.......................CROY SOUNDS... (not standard header)
+GAME( 200?, sc4casrya	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2073) (Czech) (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4casryb	,sc4casry,	sc4, sc4, sc4, ROT0, "Mazooma","Casino Royale (PR2073) (Czech) (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2383 CLUBCLOUSEAU         CLUBCLOUSEAU  CLUB  CCLOU SOUNDS         CLUB CLOSEAU
+GAME( 200?, sc4clclo	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Club Clouseau (Mazooma) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR2237 CLUB CLUEDO         CLUB CLUEDO CLUB  CCLU SOUNDS         CLUB CLUEDO
+GAME( 200?, sc4clucl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Cluedo Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clucla	,sc4clucl,	sc4, sc4, sc4, ROT0, "Mazooma","Cluedo Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+
+// PR1621 CLUB COOL JEWELS         PR1621 COOL SOUNDS11         CLUB COOL JEWELS  CLUB
+GAME( 200?, sc4cjcl		,0,			sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cjcla	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cjclb	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cjclc	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cjcld	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cjcle	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cjclf	,sc4cjcl,	sc4, sc4, sc4, ROT0, "BFM","Cool Jewels Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR1036 CLUB COP THE LOT         PR1036 CLOT SOUNDS11           COP THE LOT
+GAME( 200?, sc4ctlcl	,0,			sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ctlcla	,sc4ctlcl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+// PR1036 CLUB COP THE LOT         COP THE LOT CLUB  PR1036 CLOT SOUNDS11           COP THE LOT
+// shows nothing, but alarms, do these go with the ad4 video roms?
+GAME( 200?, sc4ctlclb	,sc4ctlcl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4ctlclc	,sc4ctlcl,	sc4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+
+
+// PR3241 CLUB COPS AND ROBBERS PLATINUM SCORP4         COPS & ROBRS PLT  CLUB  PR3241 C N R PLATINUM SOUNDS11      COPS AND ROBBERS
+GAME( 200?, sc4crcp		,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crcpa	,sc4crcp,	sc4, sc4, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crcpc	,sc4crcp,	sc4, sc4, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crcpd	,sc4crcp,	sc4, sc4, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crcpe	,sc4crcp,	sc4, sc4, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crcpf	,sc4crcp,	sc4, sc4, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crcpg	,sc4crcp,	sc4, sc4, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crcph	,sc4crcp,	sc4, sc4, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crcpi	,sc4crcp,	sc4, sc4, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crcpj	,sc4crcp,	sc4, sc4, sc4mbus, ROT0, "BFM","Cops 'n' Robbers Club Platinum (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR1348 CLUB COPS AND ROBBERS GOLD         PR1348 CCRG SOUNDS11         COPS AND ROBBERS
+GAME( 200?, sc4crgc		,0,			sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgca	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcb	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcc	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcd	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgce	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcf	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcg	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgch	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgci	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 10)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcj	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgck	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 12)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcl	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 13)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcm	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 14)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgco	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 15)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcq	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 16)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgct	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 17)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcw	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 18)", GAME_IS_SKELETON_MECHANICAL )
+// PR1348 CLUB COPS AND ROBBERS GOLD         COPS & ROBRS GLD  CLUB  PR1348 CCRG SOUNDS11         COPS AND ROBBERS
+GAME( 200?, sc4crgcn	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 19)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcp	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 20)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcr	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 21)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcu	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 22)", GAME_IS_SKELETON_MECHANICAL )
+// PR1348 !500 CLUB COPS AND ROBBERS GOLD         COPS & ROBRS GLD  CLUB  PR1348 CCRG SOUNDS11         COPS AND ROBBERS
+GAME( 200?, sc4crgcs	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 23)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4crgcv	,sc4crgc,	sc4, sc4, sc4, ROT0, "BFM","Cops 'n' Robbers Gold Club (Bellfruit) (Scorpion 4) (set 24)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2383 CLUBCORONATIONSTREET         CLUBCORONATIONST  CLUB  CCORO SOUNDS         CLUB CORO ST
+GAME( 200?, sc4corcl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Coronation Street Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4corcla	,sc4corcl,	sc4, sc4, sc4, ROT0, "Mazooma","Coronation Street Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+//  PR2058 COUNT YER CASH         PR2058 COUNT YER CASH SOUNDS11
+GAME( 200?, sc4cyc		,0,			sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cyca		,sc4cyc,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cycb		,sc4cyc,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cycc		,sc4cyc,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cycd		,sc4cyc,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash (Mazooma) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2092 CLUB COUNT YER CASH         COUNT YER CASH  CLUB  CLCC SOUNDS
+GAME( 200?, sc4cyccl	,0,			sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cyccla	,sc4cyccl,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cycclb	,sc4cyccl,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cycclc	,sc4cyccl,	sc4, sc4, sc4, ROT0, "Mazooma","Count Yer Cash Club (Mazooma) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR1396 CLASSIC CRAZY FRUITS         PR1396 CLSIC CRAZY FRUITS SND11
+GAME( 200?, sc4cfcla	,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfclab	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfclac	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfclad	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfclae	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfclaf	,sc4cfcla,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Classic (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+
+
+//  PR1107 CRAZY FRUITS DOWNUNDER         PR1107 DOWN UNDER SOUNDS11
+GAME( 200?, sc4cfdu		,0,			sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfdua	,sc4cfdu,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfdub	,sc4cfdu,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfduc	,sc4cfdu,	sc4, sc4, sc4, ROT0, "BFM","Crazy Fruits Down Under (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR1620 CLUB CRAZY FRUITS GOLD         PR1620 CRAZY SOUNDS11         CRAZY FRUITS  CLUB
+GAME( 200?, sc4cfgcl	,0,			sc4, sc4, sc4mbus, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfgcla	,sc4cfgcl,	sc4, sc4, sc4mbus, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfgclb	,sc4cfgcl,	sc4, sc4, sc4mbus, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4cfgclc	,sc4cfgcl,	sc4, sc4, sc4mbus, ROT0, "BFM","Crazy Fruits Gold Club (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR1221 CRISSCROSSCRAZY  ART13         95004282 CRISSCROSS PR1161
+GAME( 200?, sc4ccc		,0,			sc4, sc4, sc4, ROT0, "BFM","Criss Cross Crazy (Bellfruit) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL ) // not english
+
+// PR1006  DEMOLITION DERBY         PR1006 DEMDERBY SOUNDS11
+GAME( 200?, sc4derby	,0,			sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4derbya	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4derbyb	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4derbyc	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4derbyd	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4derbye	,sc4derby,	sc4, sc4, sc4, ROT0, "BFM","Demolition Derby (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR2558 DOUBLE DIAMOND 011         DOUBLEDIAMONDSND          DOUBLE DIAMOND
+GAME( 200?, sc4dbldm	,0,			sc4, sc4, sc4, ROT0, "Qps","Double Diamond (Qps) (Scorpion 4)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR1104 DYNAMITE         PR1104 DYNAMITE SOUNDS11
+GAME( 200?, sc4dyna		,0,			sc4, sc4, sc4, ROT0, "BFM","Dynamite (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4dynaa	,sc4dyna,	sc4, sc4, sc4, ROT0, "BFM","Dynamite (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+// PR1017 EASY STREAK         PR1017 EASY STREAK SOUNDS11           EASY STREAK
+GAME( 200?, sc4easy		,0,			sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4easya	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4easyb	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4easyc	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4easyd	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4easye	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4easyf	,sc4easy,	sc4, sc4, sc4, ROT0, "BFM","Easy Streak (Bellfruit) (Scorpion 4) (set 11)", GAME_IS_SKELETON_MECHANICAL )
+
+//PROJECT NUMBER PR1955 CLUB MONEYBAGS         MONEY BAGS  CLUB  PR1955 C M MONEYBAGS SOUNDS11       DEAL OR NO DEAL   5-10-20   10-20-30   20-30-50  30-50-100
+GAME( 200?, sc4clbmn	,0,	        sc4, sc4, sc4mbus, ROT0, "BFM","Club Moneybags (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clbmna	,sc4clbmn,	sc4, sc4, sc4mbus, ROT0, "BFM","Club Moneybags (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clbmnb	,sc4clbmn,	sc4, sc4, sc4mbus, ROT0, "BFM","Club Moneybags (Bellfruit) (Scorpion 4) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4clbmnc	,sc4clbmn,	sc4, sc4, sc4mbus, ROT0, "BFM","Club Moneybags (Bellfruit) (Scorpion 4) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+//PROJECT NUMBER PR3332 AWP MONOPOLY BOOM OR BUST S4         PR3307 MPOLY BOOM OR B SOUNDS11   BOOM OR BUST  S.SITE
+GAME( 200?, sc4boomb	,0, 	    sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Boom Or Bust (Bellfruit) (Scorpion 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 200?, sc4boomba	,sc4boomb,	sc4, sc4, sc4mbus, ROT0, "BFM","Monopoly Boom Or Bust (Bellfruit) (Scorpion 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 
 /* Scorpion 4 + Adder 4 */
@@ -26990,3 +28708,6 @@ GAME( 200?, ad4film		,0,			sc4_adder4, sc4, sc4, ROT0, "BFM","Film Premiere (Vid
 GAME( 200?, ad4filma	,ad4film,	sc4_adder4, sc4, sc4, ROT0, "BFM","Film Premiere (Video?) (Bellfruit) (Adder 4) (set 2)", GAME_IS_SKELETON_MECHANICAL ) // ^^
 GAME( 200?, ad4ctl		,0,			sc4_adder4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 200?, ad4ctla		,ad4ctl,	sc4_adder4, sc4, sc4, ROT0, "BFM","Cop The Lot Club (Video) (Bellfruit) (Adder 4) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+
+

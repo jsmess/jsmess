@@ -21,12 +21,12 @@
  *
  *************************************/
 
-READ16_HANDLER( lockon_crtc_r )
+READ16_MEMBER(lockon_state::lockon_crtc_r)
 {
 	return 0xffff;
 }
 
-WRITE16_HANDLER( lockon_crtc_w )
+WRITE16_MEMBER(lockon_state::lockon_crtc_w)
 {
 #if 0
 	data &= 0xff;
@@ -100,6 +100,7 @@ static const res_net_info lockon_pd_net_info =
 
 PALETTE_INIT( lockon )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 1024; ++i)
@@ -132,11 +133,10 @@ PALETTE_INIT( lockon )
  *
  *************************************/
 
-WRITE16_HANDLER( lockon_char_w )
+WRITE16_MEMBER(lockon_state::lockon_char_w)
 {
-	lockon_state *state = space->machine().driver_data<lockon_state>();
-	state->m_char_ram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_char_ram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_lockon_tile_info )
@@ -156,16 +156,14 @@ static TILE_GET_INFO( get_lockon_tile_info )
 
 *******************************************************************************************/
 
-WRITE16_HANDLER( lockon_scene_h_scr_w )
+WRITE16_MEMBER(lockon_state::lockon_scene_h_scr_w)
 {
-	lockon_state *state = space->machine().driver_data<lockon_state>();
-	state->m_scroll_h = data & 0x1ff;
+	m_scroll_h = data & 0x1ff;
 }
 
-WRITE16_HANDLER( lockon_scene_v_scr_w )
+WRITE16_MEMBER(lockon_state::lockon_scene_v_scr_w)
 {
-	lockon_state *state = space->machine().driver_data<lockon_state>();
-	state->m_scroll_v = data & 0x81ff;
+	m_scroll_v = data & 0x81ff;
 }
 
 static void scene_draw( running_machine &machine )
@@ -174,7 +172,7 @@ static void scene_draw( running_machine &machine )
 	UINT32 y;
 
 	/* 3bpp characters */
-	const UINT8 *const gfx1 = machine.region("gfx2")->base();
+	const UINT8 *const gfx1 = state->memregion("gfx2")->base();
 	const UINT8 *const gfx2 = gfx1 + 0x10000;
 	const UINT8 *const gfx3 = gfx1 + 0x20000;
 	const UINT8 *const clut = gfx1 + 0x30000;
@@ -279,10 +277,9 @@ static void scene_draw( running_machine &machine )
 
  *******************************************************************************************/
 
-WRITE16_HANDLER( lockon_ground_ctrl_w )
+WRITE16_MEMBER(lockon_state::lockon_ground_ctrl_w)
 {
-	lockon_state *state = space->machine().driver_data<lockon_state>();
-	state->m_ground_ctrl = data & 0xff;
+	m_ground_ctrl = data & 0xff;
 }
 
 static TIMER_CALLBACK( bufend_callback )
@@ -311,7 +308,7 @@ static void ground_draw( running_machine &machine )
 	lockon_state *state = machine.driver_data<lockon_state>();
 
 	/* ROM pointers */
-	const UINT8 *const gfx_rom  = machine.region("gfx4")->base();
+	const UINT8 *const gfx_rom  = state->memregion("gfx4")->base();
 	const UINT8 *const lut_rom  = gfx_rom + 0x30000 + ((state->m_ground_ctrl >> 2) & 0x3 ? 0x10000 : 0);
 	const UINT8 *const clut_rom = gfx_rom + 0x50000;
 
@@ -438,12 +435,12 @@ static void objects_draw( running_machine &machine )
 	UINT32 offs;
 	lockon_state *state = machine.driver_data<lockon_state>();
 
-	const UINT8  *const romlut = machine.region("user1")->base();
-	const UINT16 *const chklut = (UINT16*)machine.region("user2")->base();
-	const UINT8  *const gfxrom = machine.region("gfx5")->base();
-	const UINT8  *const sproms = machine.region("proms")->base() + 0x800;
+	const UINT8  *const romlut = state->memregion("user1")->base();
+	const UINT16 *const chklut = (UINT16*)state->memregion("user2")->base();
+	const UINT8  *const gfxrom = state->memregion("gfx5")->base();
+	const UINT8  *const sproms = state->memregion("proms")->base() + 0x800;
 
-	for (offs = 0; offs < state->m_objectram_size; offs += 4)
+	for (offs = 0; offs < state->m_object_ram.bytes(); offs += 4)
 	{
 		UINT32 y;
 		UINT32 xpos;
@@ -608,30 +605,27 @@ static void objects_draw( running_machine &machine )
 }
 
 /* The mechanism used by the object CPU to update the object ASICs palette RAM */
-WRITE16_HANDLER( lockon_tza112_w )
+WRITE16_MEMBER(lockon_state::lockon_tza112_w)
 {
-	lockon_state *state = space->machine().driver_data<lockon_state>();
 
-	if (state->m_iden)
+	if (m_iden)
 	{
-		state->m_obj_pal_latch = data & 0xff;
-		state->m_obj_pal_addr = offset & 0xf;
-		objects_draw(space->machine());
+		m_obj_pal_latch = data & 0xff;
+		m_obj_pal_addr = offset & 0xf;
+		objects_draw(machine());
 	}
 }
 
-READ16_HANDLER( lockon_obj_4000_r )
+READ16_MEMBER(lockon_state::lockon_obj_4000_r)
 {
-	lockon_state *state = space->machine().driver_data<lockon_state>();
 
-	device_set_input_line(state->m_object, NEC_INPUT_LINE_POLL, CLEAR_LINE);
+	device_set_input_line(m_object, NEC_INPUT_LINE_POLL, CLEAR_LINE);
 	return 0xffff;
 }
 
-WRITE16_HANDLER( lockon_obj_4000_w )
+WRITE16_MEMBER(lockon_state::lockon_obj_4000_w)
 {
-	lockon_state *state = space->machine().driver_data<lockon_state>();
-	state->m_iden = data & 1;
+	m_iden = data & 1;
 }
 
 
@@ -657,30 +651,29 @@ WRITE16_HANDLER( lockon_obj_4000_w )
 
 *******************************************************************************************/
 
-WRITE16_HANDLER( lockon_fb_clut_w )
+WRITE16_MEMBER(lockon_state::lockon_fb_clut_w)
 {
 	rgb_t color;
 
-	color = palette_get_color(space->machine(), 0x300 + (data & 0xff));
-	palette_set_color(space->machine(), 0x400 + offset, color);
+	color = palette_get_color(machine(), 0x300 + (data & 0xff));
+	palette_set_color(machine(), 0x400 + offset, color);
 }
 
 /* Rotation control register */
-WRITE16_HANDLER( lockon_rotate_w )
+WRITE16_MEMBER(lockon_state::lockon_rotate_w)
 {
-	lockon_state *state = space->machine().driver_data<lockon_state>();
 
 	switch (offset & 7)
 	{
-		case 0: state->m_xsal  = data & 0x1ff;	break;
-		case 1: state->m_x0ll  = data & 0xff;	break;
-		case 2: state->m_dx0ll = data & 0x1ff;	break;
-		case 3: state->m_dxll  = data & 0x1ff;	break;
+		case 0: m_xsal  = data & 0x1ff;	break;
+		case 1: m_x0ll  = data & 0xff;	break;
+		case 2: m_dx0ll = data & 0x1ff;	break;
+		case 3: m_dxll  = data & 0x1ff;	break;
 
-		case 4: state->m_ysal  = data & 0x1ff;	break;
-		case 5: state->m_y0ll  = data & 0xff;	break;
-		case 6: state->m_dy0ll =	data & 0x1ff;	break;
-		case 7: state->m_dyll  = data & 0x3ff;	break;
+		case 4: m_ysal  = data & 0x1ff;	break;
+		case 5: m_y0ll  = data & 0xff;	break;
+		case 6: m_dy0ll =	data & 0x1ff;	break;
+		case 7: m_dyll  = data & 0x3ff;	break;
 	}
 }
 
@@ -806,10 +799,10 @@ static void rotate_draw( running_machine &machine, bitmap_ind16 &bitmap, const r
 static void hud_draw( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	lockon_state *state = machine.driver_data<lockon_state>();
-	UINT8	*tile_rom = machine.region("gfx3")->base();
+	UINT8	*tile_rom = state->memregion("gfx3")->base();
 	UINT32 offs;
 
-	for (offs = 0x0; offs <= state->m_hudram_size; offs += 2)
+	for (offs = 0x0; offs <= state->m_hud_ram.bytes(); offs += 2)
 	{
 		UINT32 y;
 		UINT32 y_pos;

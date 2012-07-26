@@ -41,15 +41,15 @@ static void update_interrupts(running_machine &machine)
 static void scanline_update(screen_device &screen, int scanline)
 {
 	/* generate 32V signals */
-	if ((scanline & 32) == 0 && !(input_port_read(screen.machine(), "P1") & 0x800))
+	if ((scanline & 32) == 0 && !(screen.machine().root_device().ioport("P1")->read() & 0x800))
 		atarigen_scanline_int_gen(screen.machine().device("maincpu"));
 }
 
 
-static WRITE16_HANDLER( interrupt_ack_w )
+WRITE16_MEMBER(klax_state::interrupt_ack_w)
 {
-	atarigen_scanline_int_ack_w(space, offset, data, mem_mask);
-	atarigen_video_int_ack_w(space, offset, data, mem_mask);
+	atarigen_scanline_int_ack_w(&space, offset, data, mem_mask);
+	atarigen_video_int_ack_w(&space, offset, data, mem_mask);
 }
 
 
@@ -83,20 +83,20 @@ static MACHINE_RESET( klax )
  *
  *************************************/
 
-static ADDRESS_MAP_START( klax_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( klax_map, AS_PROGRAM, 16, klax_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r,atarigen_eeprom_w) AM_SHARE("eeprom")
-	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(atarigen_eeprom_enable_w)
-	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("P1") AM_WRITE(klax_latch_w)
+	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE_LEGACY(atarigen_eeprom_r,atarigen_eeprom_w) AM_SHARE("eeprom")
+	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE_LEGACY(atarigen_eeprom_enable_w)
+	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("P1") AM_WRITE_LEGACY(klax_latch_w)
 	AM_RANGE(0x260002, 0x260003) AM_READ_PORT("P2")
-	AM_RANGE(0x270000, 0x270001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x270000, 0x270001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x2e0000, 0x2e0001) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(interrupt_ack_w)
-	AM_RANGE(0x3e0000, 0x3e07ff) AM_RAM_WRITE(atarigen_expanded_666_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x3f0000, 0x3f0f7f) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(klax_state, m_playfield)
-	AM_RANGE(0x3f0f80, 0x3f0fff) AM_READWRITE(atarimo_0_slipram_r, atarimo_0_slipram_w)
-	AM_RANGE(0x3f1000, 0x3f1fff) AM_RAM_WRITE(atarigen_playfield_upper_w) AM_BASE_MEMBER(klax_state, m_playfield_upper)
-	AM_RANGE(0x3f2000, 0x3f27ff) AM_READWRITE(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
+	AM_RANGE(0x3e0000, 0x3e07ff) AM_RAM_WRITE_LEGACY(atarigen_expanded_666_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0x3f0000, 0x3f0f7f) AM_RAM_WRITE_LEGACY(atarigen_playfield_w) AM_SHARE("playfield")
+	AM_RANGE(0x3f0f80, 0x3f0fff) AM_READWRITE_LEGACY(atarimo_0_slipram_r, atarimo_0_slipram_w)
+	AM_RANGE(0x3f1000, 0x3f1fff) AM_RAM_WRITE_LEGACY(atarigen_playfield_upper_w) AM_SHARE("playfield_upper")
+	AM_RANGE(0x3f2000, 0x3f27ff) AM_READWRITE_LEGACY(atarimo_0_spriteram_r, atarimo_0_spriteram_w)
 	AM_RANGE(0x3f2800, 0x3f3fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -115,7 +115,7 @@ static INPUT_PORTS_START( klax )
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0600, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)

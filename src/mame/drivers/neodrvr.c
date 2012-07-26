@@ -500,6 +500,7 @@
     . NEO-AEG PROG4096 B
     . NEO-AEG PROGGS
     . NEO-AEG PROGTOP2
+    . NEO-AEG PROGEOP (1999.4.2)
     . NEO-AEG PROGLBA (1999.7.6)
     . NEO-AEG PROGRK
     . NEO-AEG PROGRKB
@@ -5774,9 +5775,10 @@ ROM_END
  . NGM-2410
  NEO-MVS PROGBK1 / NEO-MVS CHA512Y
  . NGH-2410
+ NEO-AEG PROGBK1Y / NEO-AEG CHA512Y
 ****************************************/
 
-ROM_START( mslug2 )
+ROM_START( mslug2 ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x300000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "241-p1.p1",  0x000000, 0x100000, CRC(2a53c5da) SHA1(5a6aba482cac588a6c2c51179c95b487c6e11899) ) /* TC538200 */
 	ROM_LOAD16_WORD_SWAP( "241-p2.sp2", 0x100000, 0x200000, CRC(38883f44) SHA1(fcf34b8c6e37774741542393b963635412484a27) ) /* TC5316200 */
@@ -6126,11 +6128,12 @@ ROM_END
 /****************************************
  ID-0250
  . NGM-2500
- NEO-MVS PROGEOP / NEO-MVS CHA512Y
+ NEO-MVS PROGEOP (1999.2.2) / NEO-MVS CHA512Y
  . NGH-2500
+ NEO-AEG PROGEOP (1999.4.2) / NEO-AEG CHA512Y
 ****************************************/
 
-ROM_START( mslugx )
+ROM_START( mslugx ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x500000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "250-p1.p1",  0x000000, 0x100000, CRC(81f1f60b) SHA1(4c19f2e9824e606178ac1c9d4b0516fbaa625035) ) /* TC538200 */
 	ROM_LOAD16_WORD_SWAP( "250-p2.ep1", 0x100000, 0x400000, CRC(1fda2e12) SHA1(18aaa7a3ba8da99f78c430e9be69ccde04bc04d9) ) /* TC5332205 */
@@ -6380,9 +6383,10 @@ ROM_END
  . NGM-2530
  NEO-MVS PROGLBA (NEO-SMA) (LBA-SUB) / NEO-MVS CHAFIO (1999.6.14) (NEO-CMC 7042)
  . NGH-2530
+ NEO-AEG PROGLBA (NEO-SMA) / NEO-AEG CHAFIO (1999.8.10) (NEO-CMC 7042)
 ****************************************/
 
-ROM_START( garou ) /* Original Version - Encrypted GFX */ /* later revision */
+ROM_START( garou ) /* Original Version - Encrypted GFX */ /* MVS VERSION - later revision */
 	ROM_REGION( 0x900000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "kf.neo-sma", 0x0c0000, 0x040000, CRC(98bc93dc) SHA1(01fe3d18b50f770e131e8d8eeff4c630ba8c9551) )	/* stored in the custom chip */
 	ROM_LOAD16_WORD_SWAP( "253-ep1.p1", 0x100000, 0x200000, CRC(ea3171a4) SHA1(bbda40f652baa0dc5fc6a006c001a1bdb0df43f6) ) /* M27C160 */
@@ -6420,7 +6424,7 @@ ROM_START( garou ) /* Original Version - Encrypted GFX */ /* later revision */
 	ROM_LOAD16_BYTE( "253-c8.c8", 0x3000001, 0x800000, CRC(21a11303) SHA1(fd61221ad257c185ef5c1f9694bd6b840b591af3) ) /* Plane 2,3 */ /* TC5364205 */
 ROM_END
 
-ROM_START( garouo ) /* Original Version - Encrypted GFX */ /* earlier revision */
+ROM_START( garouh ) /* Original Version - Encrypted GFX */ /* MVS AND AES VERSION - earlier revision */
 	ROM_REGION( 0x900000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "ke.neo-sma", 0x0c0000, 0x040000, CRC(96c72233) SHA1(29e19effd40fdf7e5144332396857f4ad0eff13e) )	/* stored in the custom chip */
 	ROM_LOAD16_WORD_SWAP( "253-p1.p1",  0x100000, 0x400000, CRC(18ae5d7e) SHA1(bdb58ec9137d8653979b47132f2d10e1cc6aaa24) ) /* mask rom TC5332205 */
@@ -7681,6 +7685,44 @@ ROM_START( vlinero ) /* MVS ONLY RELEASE */
 ROM_END
 
 
+	/* Vektorlogic games, unlicensed */
+
+
+/****************************************
+ NSBP ??
+ PROGRAM CART REVISION 2.0 (C) VEKTORLOGIC 2004 / GRAPHICS CART REVISION 1.2 (C) VEKTORLOGIC 2004
+****************************************/
+
+// this doesn't boot, protection like kof98?
+// you can force it to boot with a simple debugger trick, but then it resets when starting a game
+ROM_START( sbp ) /* Unlicensed, no official game ID # */ /* MVS ONLY VERSION */
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "001-003-02a.u2", 0x000000, 0x080000, CRC(d054d264) SHA1(d1b4bc626d000e0679def0545940fa75035921ab) ) /* HN27C4096HG */
+
+	ROM_REGION( 0x20000, "fixed", 0 )
+	ROM_LOAD( "001-003-02b.u2", 0x000000, 0x20000, CRC(2fd04b2a) SHA1(1acb446704ab56d0a33df7c48855aa8d00fd5a3c) ) /* M27C4001 */
+	ROM_IGNORE(0x20000)
+	ROM_IGNORE(0x20000)
+	ROM_IGNORE(0x20000)
+
+	ROM_REGION( 0x20000, "fixedbios", 0 )
+	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
+	ROM_Y_ZOOM
+
+	NEO_BIOS_AUDIO_512K( "001-003-01b.u1", CRC(7b1f86f7) SHA1(15b6af7f9fbd0f1f6a1ecd912200ca8d0af2da2a) ) /* M27C4001 */
+
+	ROM_REGION( 0x800000, "ymsnd", 0 )
+	ROM_LOAD( "001-003-12a.u12", 0x000000, 0x400000, CRC(c96723b9) SHA1(52eec88550781d45f84efbf9b905d7e7912e96fa) ) /* M27C322 */
+	ROM_LOAD( "001-003-13a.u13", 0x400000, 0x400000, CRC(08c339a5) SHA1(badc9510ae243ef2a7877977eb36efa81b1489fe) ) /* M27C322 */
+
+	NO_DELTAT_REGION
+
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "001-003-03b.u3", 0x000000, 0x200000, CRC(44791317) SHA1(9e773eb9aae5ee767213bd17348ff8a312e9cb16) ) /* Plane 0,1 */ /* M27C160 */
+	ROM_LOAD16_BYTE( "001-003-04b.u4", 0x000001, 0x200000, CRC(a3a1c0df) SHA1(3b1e5be673f7cbb04199a805b0e0de93dad8cb8c) ) /* Plane 2,3 */ /* M27C160 */
+ROM_END
+
+
 	/* Jamma PCB sets */
 
 
@@ -8873,35 +8915,6 @@ ROM_START( diggerma ) /* Unlicensed Prototype, no official game ID # */
 	ROM_LOAD16_BYTE( "dig-c2.bin", 0x000001, 0x080000, CRC(3e632161) SHA1(83711c4286fb1d9f3f91414ac6e5fed36618033e) ) /* Plane 2,3 */
 ROM_END
 
-// this doesn't boot, protection like kof98?
-// you can force it to boot with a simple debugger trick, but then it resets when starting a game
-ROM_START( sbp ) /* Unlicensed, no official game ID # */
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "2a.bin", 0x000000, 0x080000, CRC(d054d264) SHA1(d1b4bc626d000e0679def0545940fa75035921ab) )
-
-	ROM_REGION( 0x20000, "fixed", 0 )
-	ROM_LOAD( "2b.bin",       0x000000, 0x20000, CRC(2fd04b2a) SHA1(1acb446704ab56d0a33df7c48855aa8d00fd5a3c) )
-	ROM_IGNORE(0x20000)
-	ROM_IGNORE(0x20000)
-	ROM_IGNORE(0x20000)
-
-	ROM_REGION( 0x20000, "fixedbios", 0 )
-	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
-	ROM_Y_ZOOM
-
-	NEO_BIOS_AUDIO_512K( "1b.bin", CRC(7b1f86f7) SHA1(15b6af7f9fbd0f1f6a1ecd912200ca8d0af2da2a) )
-
-	ROM_REGION( 0x800000, "ymsnd", 0 )
-	ROM_LOAD( "12a.bin", 0x000000, 0x400000, CRC(c96723b9) SHA1(52eec88550781d45f84efbf9b905d7e7912e96fa) )
-	ROM_LOAD( "13a.bin", 0x400000, 0x400000, CRC(08c339a5) SHA1(badc9510ae243ef2a7877977eb36efa81b1489fe) )
-
-	NO_DELTAT_REGION
-
-	ROM_REGION( 0x400000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "3b.bin", 0x000000, 0x200000, CRC(44791317) SHA1(9e773eb9aae5ee767213bd17348ff8a312e9cb16) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "4b.bin", 0x000001, 0x200000, CRC(a3a1c0df) SHA1(3b1e5be673f7cbb04199a805b0e0de93dad8cb8c) ) /* Plane 2,3 */
-ROM_END
-
 
 /****************************************************************************/
 
@@ -8992,7 +9005,7 @@ static INPUT_PORTS_START( mjneogeo )
 	PORT_DIPNAME( 0x0080, 0x0080, "Freeze" ) PORT_DIPLOCATION("SW:8")
 	PORT_DIPSETTING(	  0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mahjong_controller_r, NULL)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,mahjong_controller_r, NULL)
 
 	STANDARD_IN1
 
@@ -9051,7 +9064,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( irrmaze )
 	PORT_START("IN0")
 	STANDARD_DIPS
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(multiplexed_controller_r, (void *)0)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)0)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0fff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -9066,7 +9079,7 @@ static INPUT_PORTS_START( irrmaze )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_memcard_status, NULL)
+	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_memcard_status, NULL)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	STANDARD_IN3
@@ -9093,11 +9106,11 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( popbounc )
 	PORT_START("IN0")
 	STANDARD_DIPS
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(multiplexed_controller_r, (void *)0)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)0)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(multiplexed_controller_r, (void *)1)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,multiplexed_controller_r, (void *)1)
 
 	STANDARD_IN2
 
@@ -9153,13 +9166,13 @@ static INPUT_PORTS_START( vliner )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* this bit is used.. */
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* this bit is used.. */
-	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_memcard_status, NULL)
+	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_memcard_status, NULL)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_calendar_status, NULL)
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_audio_result, NULL)
+	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_calendar_status, NULL)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_audio_result, NULL)
 
 	STANDARD_IN4
 
@@ -9192,7 +9205,7 @@ static INPUT_PORTS_START( jockeygp )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Next Game") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* game freezes with this bit enabled */
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Previous Game") PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_memcard_status, NULL)
+	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, neogeo_state,get_memcard_status, NULL)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	STANDARD_IN3
@@ -9252,14 +9265,14 @@ static DRIVER_INIT( garou )
 	garou_install_protection(machine);
 }
 
-static DRIVER_INIT( garouo )
+static DRIVER_INIT( garouh )
 {
 	neogeo_state *state = machine.driver_data<neogeo_state>();
 	DRIVER_INIT_CALL(neogeo);
-	garouo_decrypt_68k(machine);
+	garouh_decrypt_68k(machine);
 	state->m_fixed_layer_bank_type = 1;
 	kof99_neogeo_gfx_decrypt(machine, 0x06);
-	garouo_install_protection(machine);
+	garouh_install_protection(machine);
 }
 
 static DRIVER_INIT( garoubl )
@@ -9443,8 +9456,8 @@ static DRIVER_INIT( kof2002b )
 	kof2002_decrypt_68k(machine);
 	neo_pcm2_swap(machine, 0);
 	neogeo_cmc50_m1_decrypt(machine);
-	kof2002b_gfx_decrypt(machine, machine.region("sprites")->base(),0x4000000);
-	kof2002b_gfx_decrypt(machine, machine.region("fixed")->base(),0x20000);
+	kof2002b_gfx_decrypt(machine, machine.root_device().memregion("sprites")->base(),0x4000000);
+	kof2002b_gfx_decrypt(machine, machine.root_device().memregion("fixed")->base(),0x20000);
 }
 
 static DRIVER_INIT( kf2k2pls )
@@ -9546,8 +9559,8 @@ static DRIVER_INIT( mslug5 )
 
 static TIMER_CALLBACK( ms5pcb_bios_timer_callback )
 {
-	int harddip3 = input_port_read(machine, "HARDDIP") & 1;
-	memory_set_bankptr(machine, NEOGEO_BANK_BIOS, machine.region("mainbios")->base() + 0x20000 + harddip3 * 0x20000);
+	int harddip3 = machine.root_device().ioport("HARDDIP")->read() & 1;
+	machine.root_device().membank(NEOGEO_BANK_BIOS)->set_base(machine.root_device().memregion("mainbios")->base() + 0x20000 + harddip3 * 0x20000);
 }
 
 static DRIVER_INIT( ms5pcb )
@@ -9583,8 +9596,8 @@ static DRIVER_INIT( ms5plus )
 
 static TIMER_CALLBACK( svcpcb_bios_timer_callback )
 {
-	int harddip3 = input_port_read(machine, "HARDDIP") & 1;
-	memory_set_bankptr(machine, NEOGEO_BANK_BIOS, machine.region("mainbios")->base() + 0x20000 + harddip3 * 0x20000);
+	int harddip3 = machine.root_device().ioport("HARDDIP")->read() & 1;
+	machine.root_device().membank(NEOGEO_BANK_BIOS)->set_base(machine.root_device().memregion("mainbios")->base() + 0x20000 + harddip3 * 0x20000);
 }
 
 static DRIVER_INIT( svcpcb )
@@ -9687,7 +9700,7 @@ static DRIVER_INIT( kf2k3pcb )
        incorrect */
 	{
 		int i;
-		UINT8* rom = machine.region("audiocpu")->base();
+		UINT8* rom = state->memregion("audiocpu")->base();
 		for (i = 0; i < 0x90000; i++)
 		{
 			rom[i] = BITSWAP8(rom[i], 5, 6, 1, 4, 3, 0, 7, 2);
@@ -9822,7 +9835,7 @@ static DRIVER_INIT( mvs )
 
 static READ16_HANDLER( sbp_lowerrom_r )
 {
-	UINT16* rom = (UINT16*)space->machine().region("maincpu")->base();
+	UINT16* rom = (UINT16*)space->machine().root_device().memregion("maincpu")->base();
 	UINT16 origdata = rom[(offset+(0x200/2))];
 	UINT16 data =  BITSWAP16(origdata, 11,10,9,8,15,14,13,12,3,2,1,0,7,6,5,4);
 	int realoffset = 0x200+(offset*2);
@@ -9868,7 +9881,7 @@ static DRIVER_INIT(sbp )
 
 	/* the game code clears the text overlay used ingame immediately after writing it.. why? protection? sloppy code that the hw ignores? imperfect emulation? */
 	{
-		UINT16* rom = (UINT16*)machine.region("maincpu")->base();
+		UINT16* rom = (UINT16*)machine.root_device().memregion("maincpu")->base();
 
 		rom[0x2a6f8/2] = 0x4e71;
 		rom[0x2a6fa/2] = 0x4e71;
@@ -9901,7 +9914,7 @@ void mvs_install_protection(device_image_interface& image)
 		else if(strcmp(crypt_feature,"kof99_prot") == 0)	{ neo_gameinit = driver_init_kof99; }
 		else if(strcmp(crypt_feature,"kof99k_prot") == 0)	{ neo_gameinit = driver_init_kof99k; }
 		else if(strcmp(crypt_feature,"garou_prot") == 0)	{ neo_gameinit = driver_init_garou; }
-		else if(strcmp(crypt_feature,"garouo_prot") == 0)	{ neo_gameinit = driver_init_garouo; }
+		else if(strcmp(crypt_feature,"garouh_prot") == 0)	{ neo_gameinit = driver_init_garouh; }
 		else if(strcmp(crypt_feature,"garoubl_prot") == 0)	{ neo_gameinit = driver_init_garoubl; }
 		else if(strcmp(crypt_feature,"mslug3_prot") == 0)	{ neo_gameinit = driver_init_mslug3; }
 		else if(strcmp(crypt_feature,"mslug3h_prot") == 0)	{ neo_gameinit = driver_init_mslug3h; }
@@ -10053,21 +10066,21 @@ GAME( 1997, irrmaze,   neogeo,   neogeo,   irrmaze,  neogeo,   ROT0, "SNK / Saur
 GAME( 1998, rbff2,     neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - the newcomers (NGM-2400)", GAME_SUPPORTS_SAVE )
 GAME( 1998, rbff2h,    rbff2,    neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - the newcomers (NGH-2400)", GAME_SUPPORTS_SAVE )
 GAME( 1998, rbff2k,    rbff2,    neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers (Korean release)", GAME_SUPPORTS_SAVE ) // no Japanese title / mode
-GAME( 1998, mslug2,    neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Metal Slug 2 - Super Vehicle-001/II", GAME_SUPPORTS_SAVE )
+GAME( 1998, mslug2,    neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Metal Slug 2 - Super Vehicle-001/II (NGM-2410)(NGH-2410)", GAME_SUPPORTS_SAVE )
 GAME( 1998, kof98,     neogeo,   neogeo,   neogeo,   kof98,    ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - dream match never ends (NGM-2420)", GAME_SUPPORTS_SAVE )
 GAME( 1998, kof98k,    kof98,    neogeo,   neogeo,   kof98,    ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - dream match never ends (Korean board)", GAME_SUPPORTS_SAVE )
 GAME( 1998, kof98ka,   kof98,    neogeo,   neogeo,   kof98,    ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - dream match never ends (Korean board 2)", GAME_SUPPORTS_SAVE )
 GAME( 1998, kof98h,    kof98,    neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - dream match never ends (NGH-2420)", GAME_SUPPORTS_SAVE )
 GAME( 1998, lastbld2,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The Last Blade 2 / Bakumatsu Roman - Dai Ni Maku Gekka no Kenshi (NGM-2430)(NGH-2430)", GAME_SUPPORTS_SAVE )
 GAME( 1998, neocup98,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Neo-Geo Cup '98 - The Road to the Victory", GAME_SUPPORTS_SAVE )
-GAME( 1999, mslugx,    neogeo,   neogeo,   neogeo,   mslugx,   ROT0, "SNK", "Metal Slug X - Super Vehicle-001", GAME_SUPPORTS_SAVE )
-GAME( 1999, kof99,     neogeo,   neogeo,   neogeo,   kof99,    ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (set 1)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
-GAME( 1999, kof99h,    kof99,    neogeo,   neogeo,   kof99,    ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (set 2)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX, crashes going into attract demo */
+GAME( 1999, mslugx,    neogeo,   neogeo,   neogeo,   mslugx,   ROT0, "SNK", "Metal Slug X - Super Vehicle-001 (NGM-2500)(NGH-2500)", GAME_SUPPORTS_SAVE )
+GAME( 1999, kof99,     neogeo,   neogeo,   neogeo,   kof99,    ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (NGM-2510)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 1999, kof99h,    kof99,    neogeo,   neogeo,   kof99,    ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (NGH-2510)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX, crashes going into attract demo */
 GAME( 1999, kof99e,    kof99,    neogeo,   neogeo,   kof99,    ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (earlier)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
 GAME( 1999, kof99k,    kof99,    neogeo,   neogeo,   kof99k,   ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (Korean release)" , GAME_SUPPORTS_SAVE )	/* Encrypted GFX */
 GAME( 1999, kof99p,    kof99,    neogeo,   neogeo,   neogeo,   ROT0, "SNK", "The King of Fighters '99 - Millennium Battle (prototype)", GAME_SUPPORTS_SAVE )
-GAME( 1999, garou,     neogeo,   neogeo,   neogeo,   garou,    ROT0, "SNK", "Garou - Mark of the Wolves (set 1)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
-GAME( 1999, garouo,    garou,    neogeo,   neogeo,   garouo,   ROT0, "SNK", "Garou - Mark of the Wolves (set 2)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 1999, garou,     neogeo,   neogeo,   neogeo,   garou,    ROT0, "SNK", "Garou - Mark of the Wolves (NGM-2530)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
+GAME( 1999, garouh,    garou,    neogeo,   neogeo,   garouh,   ROT0, "SNK", "Garou - Mark of the Wolves (NGM-2530)(NGH-2530)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX */
 GAME( 1999, garoup,    garou,    neogeo,   neogeo,   neogeo,   ROT0, "SNK", "Garou - Mark of the Wolves (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1999, garoubl,   garou,    neogeo,   neogeo,   garoubl,  ROT0, "bootleg", "Garou - Mark of the Wolves (bootleg)", GAME_SUPPORTS_SAVE ) /* Bootleg of garoup */
 GAME( 2000, mslug3,    neogeo,   neogeo,   neogeo,   mslug3,   ROT0, "SNK", "Metal Slug 3 (NGM-2560)" , GAME_SUPPORTS_SAVE ) /* Encrypted Code & GFX */

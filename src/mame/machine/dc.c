@@ -102,6 +102,14 @@ void naomi_g1_irq(running_machine &machine)
 	dc_update_interrupt_status(machine);
 }
 
+void dc_maple_irq(running_machine &machine)
+{
+	dc_state *state = machine.driver_data<dc_state>();
+
+	state->dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_MAPLE;
+	dc_update_interrupt_status(machine);
+}
+
 static TIMER_CALLBACK( ch2_dma_irq )
 {
 	dc_state *state = machine.driver_data<dc_state>();
@@ -810,7 +818,7 @@ MACHINE_START( dc )
 	state_save_register_global_pointer(machine,state->tafifo_buff,32);
 	state_save_register_global(machine, state->scanline);
 	state_save_register_global(machine, state->next_y);
-	state_save_register_global_pointer(machine,state->dc_sound_ram,sizeof(state->dc_sound_ram));
+	state_save_register_global_pointer(machine,state->dc_sound_ram.target(),state->dc_sound_ram.bytes());
 }
 
 MACHINE_RESET( dc )

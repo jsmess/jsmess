@@ -1272,6 +1272,13 @@ WRITE8_DEVICE_HANDLER( sp0256_ALD_w )
 	return;
 }
 
+READ_LINE_DEVICE_HANDLER( sp0256_lrq_r )
+{
+    sp0256_state *sp = get_safe_token(device);
+
+    return sp->lrq == 0x8000;
+}
+
 READ_LINE_DEVICE_HANDLER( sp0256_sby_r )
 {
 	sp0256_state *sp = get_safe_token(device);
@@ -1348,6 +1355,14 @@ WRITE16_DEVICE_HANDLER( spb640_w )
 
 		return;
 	}
+}
+
+void sp0256_set_clock(device_t *device, int clock)
+{
+    sp0256_state *sp = get_safe_token(device);
+
+    device->set_unscaled_clock(clock);
+    sp->stream->set_sample_rate(clock / CLOCK_DIVIDER);
 }
 
 /**************************************************************************

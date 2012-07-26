@@ -119,10 +119,10 @@ DIP locations verified for:
 #include "includes/punchout.h"
 
 
-static CUSTOM_INPUT( punchout_vlm5030_busy_r )
+CUSTOM_INPUT_MEMBER(punchout_state::punchout_vlm5030_busy_r)
 {
 	/* bit 4 of DSW1 is busy pin level */
-	return (vlm5030_bsy(field.machine().device("vlm"))) ? 0x00 : 0x01;
+	return (vlm5030_bsy(machine().device("vlm"))) ? 0x00 : 0x01;
 }
 
 static WRITE8_DEVICE_HANDLER( punchout_speech_reset_w )
@@ -140,65 +140,64 @@ static WRITE8_DEVICE_HANDLER( punchout_speech_vcu_w )
 	vlm5030_vcu( device, data & 0x01 );
 }
 
-static WRITE8_HANDLER( punchout_2a03_reset_w )
+WRITE8_MEMBER(punchout_state::punchout_2a03_reset_w)
 {
 	if (data & 1)
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 
-static READ8_HANDLER( spunchout_rp5c01_r )
+READ8_MEMBER(punchout_state::spunchout_rp5c01_r)
 {
-	punchout_state *state = space->machine().driver_data<punchout_state>();
-	logerror("%04x: prot_r %x\n", cpu_get_previouspc(&space->device()), offset);
+	logerror("%04x: prot_r %x\n", cpu_get_previouspc(&space.device()), offset);
 
 	if (offset <= 0x0c)
 	{
-		switch (state->m_rp5c01_mode_sel & 3)
+		switch (m_rp5c01_mode_sel & 3)
 		{
 			case 0:	// time
 				switch ( offset )
 				{
 					case 0x00:	// 1-second counter
-						return state->m_rp5c01_mem[0x00];
+						return m_rp5c01_mem[0x00];
 
 					case 0x01:	// 10-second counter
-						return state->m_rp5c01_mem[0x01] & 0x7;
+						return m_rp5c01_mem[0x01] & 0x7;
 
 					case 0x02:	// 1-minute counter
-						return state->m_rp5c01_mem[0x02];
+						return m_rp5c01_mem[0x02];
 
 					case 0x03:	// 10-minute counter
-						return state->m_rp5c01_mem[0x03] & 0x07;
+						return m_rp5c01_mem[0x03] & 0x07;
 
 					case 0x04:	// 1-hour counter
-						return state->m_rp5c01_mem[0x04];
+						return m_rp5c01_mem[0x04];
 
 					case 0x05:	// 10-hour counter
-						return state->m_rp5c01_mem[0x05] & 0x03;
+						return m_rp5c01_mem[0x05] & 0x03;
 
 					case 0x06:	// day-of-the-week counter
-						return state->m_rp5c01_mem[0x06] & 0x07;
+						return m_rp5c01_mem[0x06] & 0x07;
 
 					case 0x07:	// 1-day counter
-						return state->m_rp5c01_mem[0x07];
+						return m_rp5c01_mem[0x07];
 
 					case 0x08:	// 10-day counter
-						return state->m_rp5c01_mem[0x08] & 0x03;
+						return m_rp5c01_mem[0x08] & 0x03;
 
 					case 0x09:	// 1-month counter
-						return state->m_rp5c01_mem[0x09];
+						return m_rp5c01_mem[0x09];
 
 					case 0x0a:	// 10-month counter
-						return state->m_rp5c01_mem[0x0a] & 0x01;
+						return m_rp5c01_mem[0x0a] & 0x01;
 
 					case 0x0b:	// 1-year counter
-						return state->m_rp5c01_mem[0x0b];
+						return m_rp5c01_mem[0x0b];
 
 					case 0x0c:	// 10-year counter
-						return state->m_rp5c01_mem[0x0c];
+						return m_rp5c01_mem[0x0c];
 				}
 				break;
 
@@ -212,34 +211,34 @@ static READ8_HANDLER( spunchout_rp5c01_r )
 						return 0x00;
 
 					case 0x02:	// 1-minute alarm register
-						return state->m_rp5c01_mem[0x12];
+						return m_rp5c01_mem[0x12];
 
 					case 0x03:	// 10-minute alarm register
-						return state->m_rp5c01_mem[0x13] & 0x07;
+						return m_rp5c01_mem[0x13] & 0x07;
 
 					case 0x04:	// 1-hour alarm register
-						return state->m_rp5c01_mem[0x14];
+						return m_rp5c01_mem[0x14];
 
 					case 0x05:	// 10-hour alarm register
-						return state->m_rp5c01_mem[0x15] & 0x03;
+						return m_rp5c01_mem[0x15] & 0x03;
 
 					case 0x06:	// day-of-the-week alarm register
-						return state->m_rp5c01_mem[0x16] & 0x07;
+						return m_rp5c01_mem[0x16] & 0x07;
 
 					case 0x07:	// 1-day alarm register
-						return state->m_rp5c01_mem[0x17];
+						return m_rp5c01_mem[0x17];
 
 					case 0x08:	// 10-day alarm register
-						return state->m_rp5c01_mem[0x18] & 0x03;
+						return m_rp5c01_mem[0x18] & 0x03;
 
 					case 0x09:	// n/a
 						return 0x00;
 
 					case 0x0a:	// /12/24 select register
-						return state->m_rp5c01_mem[0x1a] & 0x01;
+						return m_rp5c01_mem[0x1a] & 0x01;
 
 					case 0x0b:	// leap year count
-						return state->m_rp5c01_mem[0x1b] & 0x03;
+						return m_rp5c01_mem[0x1b] & 0x03;
 
 					case 0x0c:	// n/a
 						return 0x00;
@@ -248,32 +247,31 @@ static READ8_HANDLER( spunchout_rp5c01_r )
 
 			case 2:	// RAM BLOCK 10
 			case 3:	// RAM BLOCK 11
-				return state->m_rp5c01_mem[0x10 * (state->m_rp5c01_mode_sel & 3) + offset];
+				return m_rp5c01_mem[0x10 * (m_rp5c01_mode_sel & 3) + offset];
 		}
 	}
 	else if (offset == 0x0d)
 	{
-		return state->m_rp5c01_mode_sel;
+		return m_rp5c01_mode_sel;
 	}
 
-	logerror("Read from unknown protection? port %02x ( selector = %02x )\n", offset, state->m_rp5c01_mode_sel );
+	logerror("Read from unknown protection? port %02x ( selector = %02x )\n", offset, m_rp5c01_mode_sel );
 	return 0;
 }
 
-static WRITE8_HANDLER( spunchout_rp5c01_w )
+WRITE8_MEMBER(punchout_state::spunchout_rp5c01_w)
 {
-	punchout_state *state = space->machine().driver_data<punchout_state>();
 	data &= 0x0f;
 
-	logerror("%04x: prot_w %x = %02x\n",cpu_get_previouspc(&space->device()),offset,data);
+	logerror("%04x: prot_w %x = %02x\n",cpu_get_previouspc(&space.device()),offset,data);
 
 	if (offset <= 0x0c)
 	{
-		state->m_rp5c01_mem[0x10 * (state->m_rp5c01_mode_sel & 3) + offset] = data;
+		m_rp5c01_mem[0x10 * (m_rp5c01_mode_sel & 3) + offset] = data;
 	}
 	else if (offset == 0x0d)
 	{
-		state->m_rp5c01_mode_sel = data;
+		m_rp5c01_mode_sel = data;
 		logerror("MODE: Timer EN = %d  Alarm EN = %d  MODE %d\n",BIT(data,3),BIT(data,2),data&3);
 	}
 	else if (offset == 0x0e)
@@ -286,7 +284,7 @@ static WRITE8_HANDLER( spunchout_rp5c01_w )
 	}
 }
 
-static READ8_HANDLER( spunchout_exp_r )
+READ8_MEMBER(punchout_state::spunchout_exp_r)
 {
 	// bit 7 = DATA OUT from RP5H01
 	// bit 6 = COUNTER OUT from RP5H01
@@ -300,82 +298,81 @@ static READ8_HANDLER( spunchout_exp_r )
 	/* PC = 0x0313 */
 	/* (ret or 0x10) -> (D7DF),(D7A0) - (D7DF),(D7A0) = 0d0h(ret nc) */
 
-	if (cpu_get_previouspc(&space->device()) == 0x0313)
+	if (cpu_get_previouspc(&space.device()) == 0x0313)
 		ret |= 0xc0;
 
 	return ret;
 }
 
-static WRITE8_HANDLER( spunchout_exp_w )
+WRITE8_MEMBER(punchout_state::spunchout_exp_w)
 {
 	spunchout_rp5c01_w( space, offset >> 4, data );
 }
 
 
 
-static ADDRESS_MAP_START( punchout_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( punchout_map, AS_PROGRAM, 8, punchout_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_BASE_MEMBER(punchout_state, m_bg_top_videoram)
-	AM_RANGE(0xdff0, 0xdff7) AM_BASE_MEMBER(punchout_state, m_spr1_ctrlram)
-	AM_RANGE(0xdff8, 0xdffc) AM_BASE_MEMBER(punchout_state, m_spr2_ctrlram)
-	AM_RANGE(0xdffd, 0xdffd) AM_BASE_MEMBER(punchout_state, m_palettebank)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(punchout_spr1_videoram_w) AM_BASE_MEMBER(punchout_state, m_spr1_videoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(punchout_spr2_videoram_w) AM_BASE_MEMBER(punchout_state, m_spr2_videoram)
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(punchout_bg_bot_videoram_w) AM_BASE_MEMBER(punchout_state, m_bg_bot_videoram)	// also contains scroll RAM
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_SHARE("bg_top_videoram")
+	AM_RANGE(0xdff0, 0xdff7) AM_SHARE("spr1_ctrlram")
+	AM_RANGE(0xdff8, 0xdffc) AM_SHARE("spr2_ctrlram")
+	AM_RANGE(0xdffd, 0xdffd) AM_SHARE("palettebank")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(punchout_spr1_videoram_w) AM_SHARE("spr1_videoram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(punchout_spr2_videoram_w) AM_SHARE("spr2_videoram")
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(punchout_bg_bot_videoram_w) AM_SHARE("bg_bot_videoram")	// also contains scroll RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( armwrest_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( armwrest_map, AS_PROGRAM, 8, punchout_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(armwrest_fg_videoram_w) AM_BASE_MEMBER(punchout_state, m_armwrest_fg_videoram)
-	AM_RANGE(0xdff0, 0xdff7) AM_BASE_MEMBER(punchout_state, m_spr1_ctrlram)
-	AM_RANGE(0xdff8, 0xdffc) AM_BASE_MEMBER(punchout_state, m_spr2_ctrlram)
-	AM_RANGE(0xdffd, 0xdffd) AM_BASE_MEMBER(punchout_state, m_palettebank)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(punchout_spr1_videoram_w) AM_BASE_MEMBER(punchout_state, m_spr1_videoram)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(punchout_spr2_videoram_w) AM_BASE_MEMBER(punchout_state, m_spr2_videoram)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(punchout_bg_bot_videoram_w) AM_BASE_MEMBER(punchout_state, m_bg_bot_videoram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_BASE_MEMBER(punchout_state, m_bg_top_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(armwrest_fg_videoram_w) AM_SHARE("armwrest_fgram")
+	AM_RANGE(0xdff0, 0xdff7) AM_SHARE("spr1_ctrlram")
+	AM_RANGE(0xdff8, 0xdffc) AM_SHARE("spr2_ctrlram")
+	AM_RANGE(0xdffd, 0xdffd) AM_SHARE("palettebank")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(punchout_spr1_videoram_w) AM_SHARE("spr1_videoram")
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(punchout_spr2_videoram_w) AM_SHARE("spr2_videoram")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(punchout_bg_bot_videoram_w) AM_SHARE("bg_bot_videoram")
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_SHARE("bg_top_videoram")
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( nmi_mask_w )
+WRITE8_MEMBER(punchout_state::nmi_mask_w)
 {
-	punchout_state *state = space->machine().driver_data<punchout_state>();
 
-	state->m_nmi_mask = data & 1;
+	m_nmi_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( punchout_io_map, AS_IO, 8, punchout_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x00, 0x01) AM_WRITENOP	/* the 2A03 #1 is not present */
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW2") AM_WRITE(soundlatch_w)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(soundlatch2_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("vlm", vlm5030_data_w)	/* VLM5030 */
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW2") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("vlm", vlm5030_data_w)	/* VLM5030 */
 //  AM_RANGE(0x05, 0x05) AM_WRITENOP  /* unused */
 //  AM_RANGE(0x06, 0x06) AM_WRITENOP
 	AM_RANGE(0x08, 0x08) AM_WRITE(nmi_mask_w)
 	AM_RANGE(0x09, 0x09) AM_WRITENOP	/* watchdog reset, seldom used because 08 clears the watchdog as well */
 	AM_RANGE(0x0a, 0x0a) AM_WRITENOP	/* ?? */
 	AM_RANGE(0x0b, 0x0b) AM_WRITE(punchout_2a03_reset_w)
-	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("vlm", punchout_speech_reset_w)	/* VLM5030 */
-	AM_RANGE(0x0d, 0x0d) AM_DEVWRITE("vlm", punchout_speech_st_w)	/* VLM5030 */
-	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("vlm", punchout_speech_vcu_w)	/* VLM5030 */
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE_LEGACY("vlm", punchout_speech_reset_w)	/* VLM5030 */
+	AM_RANGE(0x0d, 0x0d) AM_DEVWRITE_LEGACY("vlm", punchout_speech_st_w)	/* VLM5030 */
+	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE_LEGACY("vlm", punchout_speech_vcu_w)	/* VLM5030 */
 	AM_RANGE(0x0f, 0x0f) AM_WRITENOP	/* enable NVRAM ? */
 
 	/* protection ports - Super Punchout only (move to install handler?) */
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0xf0) AM_MASK(0xf0) AM_READWRITE(spunchout_exp_r, spunchout_exp_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( punchout_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( punchout_sound_map, AS_PROGRAM, 8, punchout_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch_r)
-	AM_RANGE(0x4017, 0x4017) AM_READ(soundlatch2_r)
-	AM_RANGE(0x4000, 0x4017) AM_DEVREADWRITE("nes", nes_psg_r,nes_psg_w)
+	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x4017, 0x4017) AM_READ(soundlatch2_byte_r)
+	AM_RANGE(0x4000, 0x4017) AM_DEVREADWRITE_LEGACY("nes", nes_psg_r,nes_psg_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -440,7 +437,7 @@ static INPUT_PORTS_START( punchout )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( Free_Play ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(punchout_vlm5030_busy_r, NULL)	/* VLM5030 busy signal */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, punchout_state,punchout_vlm5030_busy_r, NULL)	/* VLM5030 busy signal */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "R18:!1" )		/* Not documented, R18 resistor */
 	PORT_DIPNAME( 0x80, 0x00, "Copyright" )				PORT_DIPLOCATION("R19:!1") /* Not documented, R19 resistor */
@@ -871,7 +868,7 @@ bit 3210 5432  L  R  C
 	PORT_DIPSETTING(    0x0d, "1101" )
 	PORT_DIPSETTING(    0x0e, "1110" )
 	PORT_DIPSETTING(    0x0f, "1111" )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(punchout_vlm5030_busy_r, NULL)	/* VLM5030 busy signal */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, punchout_state,punchout_vlm5030_busy_r, NULL)	/* VLM5030 busy signal */
 	PORT_DIPNAME( 0x40, 0x00, "Coin Slots" )			PORT_DIPLOCATION("R18:!1") /* R18 resistor */
 	PORT_DIPSETTING(    0x40, "1" )
 	PORT_DIPSETTING(    0x00, "2" )

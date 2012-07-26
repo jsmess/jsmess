@@ -27,24 +27,22 @@ static MACHINE_RESET( tank8 )
 }
 
 
-static READ8_HANDLER( tank8_collision_r )
+READ8_MEMBER(tank8_state::tank8_collision_r)
 {
-	tank8_state *state = space->machine().driver_data<tank8_state>();
-	return state->m_collision_index;
+	return m_collision_index;
 }
 
-static WRITE8_HANDLER( tank8_lockout_w )
+WRITE8_MEMBER(tank8_state::tank8_lockout_w)
 {
-	coin_lockout_w(space->machine(), offset, ~data & 1);
+	coin_lockout_w(machine(), offset, ~data & 1);
 }
 
 
-static WRITE8_HANDLER( tank8_int_reset_w )
+WRITE8_MEMBER(tank8_state::tank8_int_reset_w)
 {
-	tank8_state *state = space->machine().driver_data<tank8_state>();
-	state->m_collision_index &= ~0x3f;
+	m_collision_index &= ~0x3f;
 
-	cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 }
 
 static WRITE8_DEVICE_HANDLER( tank8_crash_w )
@@ -96,7 +94,7 @@ static WRITE8_DEVICE_HANDLER( tank8_motor_w )
 	discrete_sound_w(device, NODE_RELATIVE(TANK8_MOTOR1_EN, offset), data);
 }
 
-static ADDRESS_MAP_START( tank8_cpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tank8_cpu_map, AS_PROGRAM, 8, tank8_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 	AM_RANGE(0x0400, 0x17ff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_ROM
@@ -116,20 +114,20 @@ static ADDRESS_MAP_START( tank8_cpu_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1c0b, 0x1c0b) AM_READ_PORT("RC")
 	AM_RANGE(0x1c0f, 0x1c0f) AM_READ_PORT("VBLANK")
 
-	AM_RANGE(0x1800, 0x1bff) AM_WRITE(tank8_video_ram_w) AM_BASE_MEMBER(tank8_state, m_video_ram)
-	AM_RANGE(0x1c00, 0x1c0f) AM_WRITEONLY AM_BASE_MEMBER(tank8_state, m_pos_h_ram)
-	AM_RANGE(0x1c10, 0x1c1f) AM_WRITEONLY AM_BASE_MEMBER(tank8_state, m_pos_v_ram)
-	AM_RANGE(0x1c20, 0x1c2f) AM_WRITEONLY AM_BASE_MEMBER(tank8_state, m_pos_d_ram)
+	AM_RANGE(0x1800, 0x1bff) AM_WRITE(tank8_video_ram_w) AM_SHARE("video_ram")
+	AM_RANGE(0x1c00, 0x1c0f) AM_WRITEONLY AM_SHARE("pos_h_ram")
+	AM_RANGE(0x1c10, 0x1c1f) AM_WRITEONLY AM_SHARE("pos_v_ram")
+	AM_RANGE(0x1c20, 0x1c2f) AM_WRITEONLY AM_SHARE("pos_d_ram")
 
 	AM_RANGE(0x1c30, 0x1c37) AM_WRITE(tank8_lockout_w)
 	AM_RANGE(0x1d00, 0x1d00) AM_WRITE(tank8_int_reset_w)
-	AM_RANGE(0x1d01, 0x1d01) AM_DEVWRITE("discrete", tank8_crash_w)
-	AM_RANGE(0x1d02, 0x1d02) AM_DEVWRITE("discrete", tank8_explosion_w)
-	AM_RANGE(0x1d03, 0x1d03) AM_DEVWRITE("discrete", tank8_bugle_w)
-	AM_RANGE(0x1d04, 0x1d04) AM_DEVWRITE("discrete", tank8_bug_w)
-	AM_RANGE(0x1d05, 0x1d05) AM_WRITEONLY AM_BASE_MEMBER(tank8_state, m_team)
-	AM_RANGE(0x1d06, 0x1d06) AM_DEVWRITE("discrete", tank8_attract_w)
-	AM_RANGE(0x1e00, 0x1e07) AM_DEVWRITE("discrete", tank8_motor_w)
+	AM_RANGE(0x1d01, 0x1d01) AM_DEVWRITE_LEGACY("discrete", tank8_crash_w)
+	AM_RANGE(0x1d02, 0x1d02) AM_DEVWRITE_LEGACY("discrete", tank8_explosion_w)
+	AM_RANGE(0x1d03, 0x1d03) AM_DEVWRITE_LEGACY("discrete", tank8_bugle_w)
+	AM_RANGE(0x1d04, 0x1d04) AM_DEVWRITE_LEGACY("discrete", tank8_bug_w)
+	AM_RANGE(0x1d05, 0x1d05) AM_WRITEONLY AM_SHARE("team")
+	AM_RANGE(0x1d06, 0x1d06) AM_DEVWRITE_LEGACY("discrete", tank8_attract_w)
+	AM_RANGE(0x1e00, 0x1e07) AM_DEVWRITE_LEGACY("discrete", tank8_motor_w)
 
 ADDRESS_MAP_END
 
@@ -259,7 +257,7 @@ static INPUT_PORTS_START( tank8 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME( "RC 8" )
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("CRASH")
 	PORT_ADJUSTER( 50, "Crash, Explosion Volume" )
@@ -466,10 +464,10 @@ ROM_END
 
 static DRIVER_INIT( decode )
 {
-	const UINT8* DECODE = machine.region("user1")->base();
+	const UINT8* DECODE = machine.root_device().memregion("user1")->base();
 
-	UINT8* p1 = machine.region("maincpu")->base() + 0x00000;
-	UINT8* p2 = machine.region("maincpu")->base() + 0x10000;
+	UINT8* p1 = machine.root_device().memregion("maincpu")->base() + 0x00000;
+	UINT8* p2 = machine.root_device().memregion("maincpu")->base() + 0x10000;
 
 	int i;
 
@@ -484,8 +482,8 @@ static DRIVER_INIT( decode )
 }
 
 
-GAME( 1976, tank8,    0,        tank8,    tank8,    0,	      ROT0, "Atari", "Tank 8 (set 1)", 0)
-GAME( 1976, tank8a,   tank8,    tank8,    tank8,    decode,   ROT0, "Atari", "Tank 8 (set 2)",  GAME_NOT_WORKING )
-GAME( 1976, tank8b,   tank8,    tank8,    tank8,    decode,   ROT0, "Atari", "Tank 8 (set 3)",  GAME_NOT_WORKING )
-GAME( 1976, tank8c,   tank8,    tank8,    tank8,    0,        ROT0, "Atari", "Tank 8 (set 4)",  GAME_NOT_WORKING )
-GAME( 1976, tank8d,   tank8,    tank8,    tank8,    0,        ROT0, "Atari", "Tank 8 (set 5)",  GAME_NOT_WORKING )
+GAME( 1976, tank8,    0,        tank8,    tank8,    0,	      ROT0, "Atari (Kee Games)", "Tank 8 (set 1)", 0)
+GAME( 1976, tank8a,   tank8,    tank8,    tank8,    decode,   ROT0, "Atari (Kee Games)", "Tank 8 (set 2)",  GAME_NOT_WORKING )
+GAME( 1976, tank8b,   tank8,    tank8,    tank8,    decode,   ROT0, "Atari (Kee Games)", "Tank 8 (set 3)",  GAME_NOT_WORKING )
+GAME( 1976, tank8c,   tank8,    tank8,    tank8,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 4)",  GAME_NOT_WORKING )
+GAME( 1976, tank8d,   tank8,    tank8,    tank8,    0,        ROT0, "Atari (Kee Games)", "Tank 8 (set 5)",  GAME_NOT_WORKING )

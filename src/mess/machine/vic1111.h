@@ -12,7 +12,6 @@
 #ifndef __VIC1111__
 #define __VIC1111__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/vic20exp.h"
@@ -38,10 +37,8 @@ protected:
 	virtual void device_config_complete() { m_shortname = "vic1111"; }
 
 	// device_vic20_expansion_card_interface overrides
-	virtual UINT8 vic20_blk1_r(address_space &space, offs_t offset);
-	virtual void vic20_blk1_w(address_space &space, offs_t offset, UINT8 data);
-	virtual UINT8 vic20_blk2_r(address_space &space, offs_t offset);
-	virtual void vic20_blk2_w(address_space &space, offs_t offset, UINT8 data);
+	virtual UINT8 vic20_cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);
+	virtual void vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);
 };
 
 

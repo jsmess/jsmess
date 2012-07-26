@@ -98,32 +98,28 @@
 #include "includes/lucky74.h"
 
 
-WRITE8_HANDLER( lucky74_fg_videoram_w )
+WRITE8_MEMBER(lucky74_state::lucky74_fg_videoram_w)
 {
-	lucky74_state *state = space->machine().driver_data<lucky74_state>();
-	state->m_fg_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( lucky74_fg_colorram_w )
+WRITE8_MEMBER(lucky74_state::lucky74_fg_colorram_w)
 {
-	lucky74_state *state = space->machine().driver_data<lucky74_state>();
-	state->m_fg_colorram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fg_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( lucky74_bg_videoram_w )
+WRITE8_MEMBER(lucky74_state::lucky74_bg_videoram_w)
 {
-	lucky74_state *state = space->machine().driver_data<lucky74_state>();
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( lucky74_bg_colorram_w )
+WRITE8_MEMBER(lucky74_state::lucky74_bg_colorram_w)
 {
-	lucky74_state *state = space->machine().driver_data<lucky74_state>();
-	state->m_bg_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -133,6 +129,7 @@ PALETTE_INIT( lucky74 )
    We're constructing a double-sized palette with one half for each state.
 */
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	static const int resistances_rgb[4] = { 2000, 1000, 470, 220 };
 	double weights_r[4], weights_g[4], weights_b[4];

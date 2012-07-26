@@ -29,6 +29,8 @@ public:
 	DECLARE_READ_LINE_MEMBER( sid_r );
 	DECLARE_WRITE_LINE_MEMBER( sod_w );
 	DECLARE_WRITE_LINE_MEMBER( terminal_w );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	DECLARE_INPUT_CHANGED_MEMBER( trigger_rst75 );
 
 	/* cassette state */
 	int m_tape_control;

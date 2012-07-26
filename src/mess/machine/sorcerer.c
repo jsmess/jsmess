@@ -134,7 +134,8 @@ static TIMER_CALLBACK(sorcerer_cassette_tc)
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
 static TIMER_CALLBACK( sorcerer_reset )
 {
-	memory_set_bank(machine, "boot", 0);
+	sorcerer_state *state = machine.driver_data<sorcerer_state>();
+	state->membank("boot")->set_entry(0);
 }
 
 WRITE8_MEMBER(sorcerer_state::sorcerer_fc_w)
@@ -175,7 +176,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 		m_serial_timer->adjust(attotime::zero);
 #endif
 
-		UINT8 sound = input_port_read(machine(), "CONFIG") & 8;
+		UINT8 sound = ioport("CONFIG")->read() & 8;
 
 		m_cass1->change_state(
 			((BIT(data,4)) && (sound)) ? CASSETTE_SPEAKER_ENABLED : CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
@@ -215,7 +216,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_fe_w)
 WRITE8_MEMBER(sorcerer_state::sorcerer_ff_w)
 {
 	/* reading the config switch */
-	switch (input_port_read(machine(), "CONFIG") & 0x06)
+	switch (ioport("CONFIG")->read() & 0x06)
 	{
 		case 0: /* speaker */
 			dac_data_w(m_dac, data);
@@ -274,10 +275,10 @@ READ8_MEMBER(sorcerer_state::sorcerer_fe_r)
 	};
 
 	/* bit 5 - vsync (inverted) */
-	data |= (((~input_port_read(machine(), "VS")) & 0x01)<<5);
+	data |= (((~ioport("VS")->read()) & 0x01)<<5);
 
 	/* bits 4..0 - keyboard data */
-	data |= (input_port_read(machine(), keynames[m_keyboard_line]) & 0x1f);
+	data |= (ioport(keynames[m_keyboard_line])->read() & 0x1f);
 
 	return data;
 }
@@ -305,7 +306,7 @@ READ8_MEMBER(sorcerer_state::sorcerer_ff_r)
 SNAPSHOT_LOAD(sorcerer)
 {
 	device_t *cpu = image.device().machine().device("maincpu");
-	UINT8 *RAM = image.device().machine().region(cpu->tag())->base();
+	UINT8 *RAM = image.device().machine().root_device().memregion(cpu->tag())->base();
 	address_space *space = cpu->memory().space(AS_PROGRAM);
 	UINT8 header[28];
 	unsigned char s_byte;
@@ -421,6 +422,6 @@ MACHINE_RESET( sorcerer )
 	state->m_fe = 0xff;
 	state->sorcerer_fe_w(*space, 0, 0, 0xff);
 
-	memory_set_bank(machine, "boot", 1);
+	state->membank("boot")->set_entry(1);
 	machine.scheduler().timer_set(attotime::from_usec(10), FUNC(sorcerer_reset));
 }

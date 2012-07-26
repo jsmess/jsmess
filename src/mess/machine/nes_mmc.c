@@ -260,16 +260,16 @@ static void wram_bank( running_machine &machine, int bank, int source )
 		bank &= (state->m_wram_size / 0x2000) - 1;
 		state->m_prg_bank[4] = state->m_prgram_bank5_start + bank;
 	}
-	memory_set_bank(machine, "bank5", state->m_prg_bank[4]);
+	state->membank("bank5")->set_entry(state->m_prg_bank[4]);
 }
 
 INLINE void prg_bank_refresh( running_machine &machine )
 {
 	nes_state *state = machine.driver_data<nes_state>();
-	memory_set_bank(machine, "bank1", state->m_prg_bank[0]);
-	memory_set_bank(machine, "bank2", state->m_prg_bank[1]);
-	memory_set_bank(machine, "bank3", state->m_prg_bank[2]);
-	memory_set_bank(machine, "bank4", state->m_prg_bank[3]);
+	state->membank("bank1")->set_entry(state->m_prg_bank[0]);
+	state->membank("bank2")->set_entry(state->m_prg_bank[1]);
+	state->membank("bank3")->set_entry(state->m_prg_bank[2]);
+	state->membank("bank4")->set_entry(state->m_prg_bank[3]);
 }
 
 /* PRG ROM in 8K, 16K or 32K blocks */
@@ -371,7 +371,7 @@ static void prg8_67( running_machine &machine, int bank )
 	bank &= ((state->m_prg_chunks << 1) - 1);
 
 	state->m_prg_bank[4] = bank;
-	memory_set_bank(machine, "bank5", state->m_prg_bank[4]);
+	state->membank("bank5")->set_entry(state->m_prg_bank[4]);
 }
 
 /* We also define an additional helper to map 8k PRG-ROM to one of the banks (passed as parameter) */

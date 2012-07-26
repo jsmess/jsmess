@@ -24,9 +24,12 @@ class gridlee_state : public driver_device
 {
 public:
 	gridlee_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
 	cpu_device *m_maincpu;
 	UINT8 m_last_analog_input[2];
 	UINT8 m_last_analog_output[2];
@@ -39,7 +42,15 @@ public:
 	UINT8 m_cocktail_flip;
 	UINT8 *m_local_videoram;
 	UINT8 m_palettebank_vis;
-	UINT8 *m_spriteram;
+
+	DECLARE_READ8_MEMBER(analog_port_r);
+	DECLARE_READ8_MEMBER(random_num_r);
+	DECLARE_WRITE8_MEMBER(led_0_w);
+	DECLARE_WRITE8_MEMBER(led_1_w);
+	DECLARE_WRITE8_MEMBER(gridlee_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(gridlee_cocktail_flip_w);
+	DECLARE_WRITE8_MEMBER(gridlee_videoram_w);
+	DECLARE_WRITE8_MEMBER(gridlee_palette_select_w);
 };
 
 
@@ -58,6 +69,3 @@ PALETTE_INIT( gridlee );
 VIDEO_START( gridlee );
 SCREEN_UPDATE_IND16( gridlee );
 
-WRITE8_HANDLER( gridlee_cocktail_flip_w );
-WRITE8_HANDLER( gridlee_videoram_w );
-WRITE8_HANDLER( gridlee_palette_select_w );

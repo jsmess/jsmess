@@ -14,6 +14,7 @@
 
 PALETTE_INIT( jackal )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -63,7 +64,7 @@ void jackal_mark_tile_dirty( running_machine &machine, int offset )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	UINT8 *RAM = machine.region("master")->base();
+	UINT8 *RAM = machine.root_device().memregion("master")->base();
 
 	int attr = RAM[0x2000 + tile_index];
 	int code = RAM[0x2400 + tile_index] + ((attr & 0xc0) << 2) + ((attr & 0x30) << 6);
@@ -82,7 +83,7 @@ VIDEO_START( jackal )
 static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	jackal_state *state = machine.driver_data<jackal_state>();
-	UINT8 *RAM = machine.region("master")->base();
+	UINT8 *RAM = state->memregion("master")->base();
 	int i;
 
 	state->m_scrollram = &RAM[0x0020];
@@ -119,6 +120,7 @@ static void draw_background( running_machine &machine, bitmap_ind16 &bitmap, con
 
 static void draw_sprites_region( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *sram, int length, int bank )
 {
+	jackal_state *state = machine.driver_data<jackal_state>();
 	int offs;
 
 	for (offs = 0; offs < length; offs += 5)
@@ -137,7 +139,7 @@ static void draw_sprites_region( running_machine &machine, bitmap_ind16 &bitmap,
 		if (sy > 0xf0)
 			sy = sy - 256;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -150,7 +152,7 @@ static void draw_sprites_region( running_machine &machine, bitmap_ind16 &bitmap,
 			int spritenum = sn1 * 4 + ((sn2 & (8 + 4)) >> 2) + ((sn2 & (2 + 1)) << 10);
 			int mod = -8;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				sx += 8;
 				sy -= 8;
@@ -159,7 +161,7 @@ static void draw_sprites_region( running_machine &machine, bitmap_ind16 &bitmap,
 
 			if ((attr & 0x0C) == 0x0C)
 			{
-				if (flip_screen_get(machine)) sy += 16;
+				if (state->flip_screen()) sy += 16;
 				DRAW_SPRITE(bank + 1, spritenum, sx, sy)
 			}
 
@@ -182,7 +184,7 @@ static void draw_sprites_region( running_machine &machine, bitmap_ind16 &bitmap,
 
 			if (attr & 0x10)
 			{
-				if (flip_screen_get(machine))
+				if (state->flip_screen())
 				{
 					sx -= 16;
 					sy -= 16;
@@ -204,7 +206,7 @@ static void draw_sprites_region( running_machine &machine, bitmap_ind16 &bitmap,
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	jackal_state *state = machine.driver_data<jackal_state>();
-	UINT8 *RAM = machine.region("master")->base();
+	UINT8 *RAM = state->memregion("master")->base();
 	UINT8 *sr, *ss;
 
 	if (state->m_videoctrl[0x03] & 0x08)

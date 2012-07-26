@@ -4,7 +4,6 @@ Template for skeleton drivers
 
 ***************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -24,7 +23,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	// screen updates
-	bool screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// driver_device overrides
@@ -39,7 +38,7 @@ void xxx_state::video_start()
 
 }
 
-bool xxx_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+UINT32 xxx_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	return 0;
 }

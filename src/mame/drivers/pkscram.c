@@ -21,48 +21,51 @@ class pkscram_state : public driver_device
 {
 public:
 	pkscram_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_pkscramble_fgtilemap_ram(*this, "fgtilemap_ram"),
+		m_pkscramble_mdtilemap_ram(*this, "mdtilemap_ram"),
+		m_pkscramble_bgtilemap_ram(*this, "bgtilemap_ram"){ }
 
 	UINT16 m_out;
 	UINT8 m_interrupt_line_active;
-	UINT16* m_pkscramble_fgtilemap_ram;
-	UINT16* m_pkscramble_mdtilemap_ram;
-	UINT16* m_pkscramble_bgtilemap_ram;
+	required_shared_ptr<UINT16> m_pkscramble_fgtilemap_ram;
+	required_shared_ptr<UINT16> m_pkscramble_mdtilemap_ram;
+	required_shared_ptr<UINT16> m_pkscramble_bgtilemap_ram;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_md_tilemap;
 	tilemap_t *m_bg_tilemap;
+	DECLARE_WRITE16_MEMBER(pkscramble_fgtilemap_w);
+	DECLARE_WRITE16_MEMBER(pkscramble_mdtilemap_w);
+	DECLARE_WRITE16_MEMBER(pkscramble_bgtilemap_w);
+	DECLARE_WRITE16_MEMBER(pkscramble_output_w);
 };
 
 
 enum { interrupt_scanline=192 };
 
 
-static WRITE16_HANDLER( pkscramble_fgtilemap_w )
+WRITE16_MEMBER(pkscram_state::pkscramble_fgtilemap_w)
 {
-	pkscram_state *state = space->machine().driver_data<pkscram_state>();
-	COMBINE_DATA(&state->m_pkscramble_fgtilemap_ram[offset]);
-	state->m_fg_tilemap->mark_tile_dirty(offset >> 1);
+	COMBINE_DATA(&m_pkscramble_fgtilemap_ram[offset]);
+	m_fg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-static WRITE16_HANDLER( pkscramble_mdtilemap_w )
+WRITE16_MEMBER(pkscram_state::pkscramble_mdtilemap_w)
 {
-	pkscram_state *state = space->machine().driver_data<pkscram_state>();
-	COMBINE_DATA(&state->m_pkscramble_mdtilemap_ram[offset]);
-	state->m_md_tilemap->mark_tile_dirty(offset >> 1);
+	COMBINE_DATA(&m_pkscramble_mdtilemap_ram[offset]);
+	m_md_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-static WRITE16_HANDLER( pkscramble_bgtilemap_w )
+WRITE16_MEMBER(pkscram_state::pkscramble_bgtilemap_w)
 {
-	pkscram_state *state = space->machine().driver_data<pkscram_state>();
-	COMBINE_DATA(&state->m_pkscramble_bgtilemap_ram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset >> 1);
+	COMBINE_DATA(&m_pkscramble_bgtilemap_ram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
 // input bit 0x20 in port1 should stay low until bit 0x20 is written here, then
 // it should stay high for some time (currently we cheat keeping the input always active)
-static WRITE16_HANDLER( pkscramble_output_w )
+WRITE16_MEMBER(pkscram_state::pkscramble_output_w)
 {
-	pkscram_state *state = space->machine().driver_data<pkscram_state>();
 	// OUTPUT
 	// BIT
 	// 0x0001 -> STL
@@ -83,27 +86,27 @@ static WRITE16_HANDLER( pkscramble_output_w )
 	// 0x2000 -> vblank interrupt enable
 	// 0x4000 -> set on every second frame - not used
 
-	state->m_out = data;
+	m_out = data;
 
-	if (!(state->m_out & 0x2000) && state->m_interrupt_line_active)
+	if (!(m_out & 0x2000) && m_interrupt_line_active)
 	{
-	    cputag_set_input_line(space->machine(), "maincpu", 1, CLEAR_LINE);
-		state->m_interrupt_line_active = 0;
+	    cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE);
+		m_interrupt_line_active = 0;
 	}
 
-	coin_counter_w(space->machine(), 0, data & 0x80);
+	coin_counter_w(machine(), 0, data & 0x80);
 }
 
-static ADDRESS_MAP_START( pkscramble_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pkscramble_map, AS_PROGRAM, 16, pkscram_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ffff)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x040000, 0x0400ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x041000, 0x043fff) AM_RAM // main ram
-	AM_RANGE(0x044000, 0x044fff) AM_RAM_WRITE(pkscramble_fgtilemap_w) AM_BASE_MEMBER(pkscram_state, m_pkscramble_fgtilemap_ram) // fg tilemap
-	AM_RANGE(0x045000, 0x045fff) AM_RAM_WRITE(pkscramble_mdtilemap_w) AM_BASE_MEMBER(pkscram_state, m_pkscramble_mdtilemap_ram) // md tilemap (just a copy of fg?)
-	AM_RANGE(0x046000, 0x046fff) AM_RAM_WRITE(pkscramble_bgtilemap_w) AM_BASE_MEMBER(pkscram_state, m_pkscramble_bgtilemap_ram) // bg tilemap
+	AM_RANGE(0x044000, 0x044fff) AM_RAM_WRITE(pkscramble_fgtilemap_w) AM_SHARE("fgtilemap_ram") // fg tilemap
+	AM_RANGE(0x045000, 0x045fff) AM_RAM_WRITE(pkscramble_mdtilemap_w) AM_SHARE("mdtilemap_ram") // md tilemap (just a copy of fg?)
+	AM_RANGE(0x046000, 0x046fff) AM_RAM_WRITE(pkscramble_bgtilemap_w) AM_SHARE("bgtilemap_ram") // bg tilemap
 	AM_RANGE(0x047000, 0x047fff) AM_RAM // unused
-	AM_RANGE(0x048000, 0x048fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x048000, 0x048fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x049000, 0x049001) AM_READ_PORT("DSW")
 	AM_RANGE(0x049004, 0x049005) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x049008, 0x049009) AM_WRITE(pkscramble_output_w)
@@ -112,7 +115,7 @@ static ADDRESS_MAP_START( pkscramble_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x049018, 0x049019) AM_WRITENOP
 	AM_RANGE(0x04901c, 0x04901d) AM_WRITENOP
 	AM_RANGE(0x049020, 0x049021) AM_WRITENOP
-	AM_RANGE(0x04900c, 0x04900f) AM_DEVREADWRITE8("ymsnd", ym2203_r, ym2203_w, 0x00ff)
+	AM_RANGE(0x04900c, 0x04900f) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2203_r, ym2203_w, 0x00ff)
 	AM_RANGE(0x052086, 0x052087) AM_WRITENOP
 ADDRESS_MAP_END
 

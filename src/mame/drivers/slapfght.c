@@ -269,66 +269,66 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "includes/slapfght.h"
 
 
-static ADDRESS_MAP_START( perfrman_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( perfrman_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x880f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8810, 0x8fff) AM_RAMBANK("bank1") /* Shared RAM with sound CPU */
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_videoram)
-	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_colorram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(slapfight_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x9800, 0x9fff) AM_RAM_WRITE(slapfight_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tigerh_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tigerh_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc810, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_colorram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrollx_lo)
-	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrollx_hi)
-	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrolly)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_fixvideoram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_fixcolorram)
+	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_SHARE("scrollx_lo")
+	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_SHARE("scrollx_hi")
+	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_SHARE("scrolly")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_SHARE("fixvideoram")
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_SHARE("fixcolorram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slapfght_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slapfght_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc810, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_colorram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrollx_lo)
-	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrollx_hi)
-	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrolly)
+	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_SHARE("scrollx_lo")
+	AM_RANGE(0xe801, 0xe801) AM_WRITEONLY AM_SHARE("scrollx_hi")
+	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_SHARE("scrolly")
 //  AM_RANGE(0xe803, 0xe803) AM_READWRITE(slapfight_mcu_r, slapfight_mcu_w)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_fixvideoram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_fixcolorram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_SHARE("fixvideoram")
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_SHARE("fixcolorram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slapfighb2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slapfighb2_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xc810, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_videoram)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_colorram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(slapfight_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(slapfight_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrollx_hi)
-	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrolly)
-	AM_RANGE(0xe803, 0xe803) AM_WRITEONLY AM_BASE_MEMBER(slapfght_state, m_slapfight_scrollx_lo)
+	AM_RANGE(0xe800, 0xe800) AM_WRITEONLY AM_SHARE("scrollx_hi")
+	AM_RANGE(0xe802, 0xe802) AM_WRITEONLY AM_SHARE("scrolly")
+	AM_RANGE(0xe803, 0xe803) AM_WRITEONLY AM_SHARE("scrollx_lo")
 	AM_RANGE(0xec00, 0xefff) AM_ROM // it reads a copy of the logo from here!
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_fixvideoram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_BASE_MEMBER(slapfght_state, m_slapfight_fixcolorram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(slapfight_fixram_w) AM_SHARE("fixvideoram")
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(slapfight_fixcol_w) AM_SHARE("fixcolorram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slapfght_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( slapfght_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(slapfight_port_00_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
@@ -341,7 +341,7 @@ static ADDRESS_MAP_START( slapfght_io_map, AS_IO, 8 )
 	AM_RANGE(0x0c, 0x0d) AM_WRITE(slapfight_palette_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slapfight_m68705_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slapfight_m68705_map, AS_PROGRAM, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(slapfight_68705_portA_r, slapfight_68705_portA_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(slapfight_68705_portB_r, slapfight_68705_portB_w)
@@ -353,21 +353,21 @@ static ADDRESS_MAP_START( slapfight_m68705_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
-static READ8_HANDLER(tigerh_status_r)
+READ8_MEMBER(slapfght_state::tigerh_status_r)
 {
 	return (slapfight_port_00_r(space, 0) & 0xf9)| ((tigerh_mcu_status_r(space, 0)));
 }
 
-static ADDRESS_MAP_START( tigerh_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( tigerh_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(tigerh_status_r, slapfight_port_00_w)	/* status register */
+	AM_RANGE(0x00, 0x00) AM_READ(tigerh_status_r) AM_WRITE(slapfight_port_00_w)	/* status register */
 	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(slapfight_flipscreen_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(slapfight_port_06_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(slapfight_port_07_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tigerhb_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( tigerhb_io_map, AS_IO, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(slapfight_port_00_r, slapfight_port_00_w)	/* status register */
 	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
@@ -376,7 +376,7 @@ static ADDRESS_MAP_START( tigerhb_io_map, AS_IO, 8 )
 	AM_RANGE(0x07, 0x07) AM_WRITE(slapfight_port_07_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tigerh_m68705_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( tigerh_m68705_map, AS_PROGRAM, 8, slapfght_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(tigerh_68705_portA_r,tigerh_68705_portA_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(tigerh_68705_portB_r,tigerh_68705_portB_w)
@@ -388,28 +388,28 @@ static ADDRESS_MAP_START( tigerh_m68705_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( perfrman_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( perfrman_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8800, 0x880f) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x8810, 0x8fff) AM_RAMBANK("bank1") /* Shared RAM with main CPU */
-	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0xa081, 0xa081) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0xa082, 0xa082) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0xa091, 0xa091) AM_DEVREAD("ay2", ay8910_r)
-	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE("ay2", ay8910_data_w)
+	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0xa081, 0xa081) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0xa082, 0xa082) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0xa091, 0xa091) AM_DEVREAD_LEGACY("ay2", ay8910_r)
+	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
 	AM_RANGE(0xa0e0, 0xa0e0) AM_WRITE(getstar_sh_intenable_w) /* maybe a0f0 also -LE */
 //  AM_RANGE(0xa0f0, 0xa0f0) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slapfght_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slapfght_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0xa081, 0xa081) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0xa082, 0xa082) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0xa091, 0xa091) AM_DEVREAD("ay2", ay8910_r)
-	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE("ay2", ay8910_data_w)
+	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0xa081, 0xa081) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0xa082, 0xa082) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0xa091, 0xa091) AM_DEVREAD_LEGACY("ay2", ay8910_r)
+	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
 	AM_RANGE(0xa0e0, 0xa0e0) AM_WRITE(getstar_sh_intenable_w) /* maybe a0f0 also -LE */
 //  AM_RANGE(0xa0f0, 0xa0f0) AM_WRITENOP
 	AM_RANGE(0xc800, 0xc80f) AM_RAM AM_SHARE("share1")
@@ -1740,16 +1740,18 @@ ROM_END
 
 static DRIVER_INIT( tigerh )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe803, 0xe803, FUNC(tigerh_mcu_r), FUNC(tigerh_mcu_w)  );
+	slapfght_state *state = machine.driver_data<slapfght_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerh_mcu_r),state), write8_delegate(FUNC(slapfght_state::tigerh_mcu_w),state));
 }
 
 static DRIVER_INIT( tigerhb )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe803, 0xe803, FUNC(tigerhb_e803_r), FUNC(tigerhb_e803_w)  );
+	slapfght_state *state = machine.driver_data<slapfght_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::tigerhb_e803_r),state), write8_delegate(FUNC(slapfght_state::tigerhb_e803_w),state));
 }
 
 
-static READ8_HANDLER( gtstarb1_port_0_read )
+READ8_MEMBER(slapfght_state::gtstarb1_port_0_read)
 {
 	/* The bootleg has it's own 'protection' on startup ?
         6D1A: 06 04         ld   b,$04
@@ -1770,10 +1772,10 @@ static READ8_HANDLER( gtstarb1_port_0_read )
         6D38: 20 F8         jr   nz,$6D32
         6D3A: 10 E0         djnz $6D1C
     */
-	if (cpu_get_pc(&space->device()) == 0x6d1e) return 0;
-	if (cpu_get_pc(&space->device()) == 0x6d24) return 6;
-	if (cpu_get_pc(&space->device()) == 0x6d2c) return 2;
-	if (cpu_get_pc(&space->device()) == 0x6d34) return 4;
+	if (cpu_get_pc(&space.device()) == 0x6d1e) return 0;
+	if (cpu_get_pc(&space.device()) == 0x6d24) return 6;
+	if (cpu_get_pc(&space.device()) == 0x6d2c) return 2;
+	if (cpu_get_pc(&space.device()) == 0x6d34) return 4;
 
 	/* The bootleg hangs in the "test mode" before diplaying (wrong) lives settings :
         6AD4: DB 00         in   a,($00)
@@ -1794,19 +1796,20 @@ static READ8_HANDLER( gtstarb1_port_0_read )
         6AF7: 20 FA         jr   nz,$6AF3
        This seems to be what used to be the MCU status.
     */
-	if (cpu_get_pc(&space->device()) == 0x6ad6) return 2; /* bit 1 must be ON */
-	if (cpu_get_pc(&space->device()) == 0x6ae4) return 2; /* bit 1 must be ON */
-	if (cpu_get_pc(&space->device()) == 0x6af5) return 0; /* bit 2 must be OFF */
+	if (cpu_get_pc(&space.device()) == 0x6ad6) return 2; /* bit 1 must be ON */
+	if (cpu_get_pc(&space.device()) == 0x6ae4) return 2; /* bit 1 must be ON */
+	if (cpu_get_pc(&space.device()) == 0x6af5) return 0; /* bit 2 must be OFF */
 
-	logerror("Port Read PC=%04x\n",cpu_get_pc(&space->device()));
+	logerror("Port Read PC=%04x\n",cpu_get_pc(&space.device()));
 
 	return 0;
 }
 
 static void getstar_init( running_machine &machine )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe803, 0xe803, FUNC(getstar_e803_r), FUNC(getstar_e803_w) );
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x00, FUNC(slapfight_port_00_r) );
+	slapfght_state *state = machine.driver_data<slapfght_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::getstar_e803_r),state), write8_delegate(FUNC(slapfght_state::getstar_e803_w),state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::slapfight_port_00_r),state));
 }
 
 static DRIVER_INIT( getstar )
@@ -1826,13 +1829,13 @@ static DRIVER_INIT( getstarj )
 static DRIVER_INIT( gtstarb1 )
 {
 	slapfght_state *state = machine.driver_data<slapfght_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
 	state->m_getstar_id = GTSTARB1;
 	getstar_init(machine);
 
 	/* specific handlers for this bootleg */
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x0, 0x0, FUNC(gtstarb1_port_0_read) );
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x0, 0x0, read8_delegate(FUNC(slapfght_state::gtstarb1_port_0_read),state));
 	/* requires this or it gets stuck with 'rom test' on screen */
 	/* it is possible the program roms are slighly corrupt like the gfx roms, or
        that the bootleg simply shouldn't execute the code due to the modified roms */
@@ -1849,13 +1852,15 @@ static DRIVER_INIT( gtstarb2 )
 
 static DRIVER_INIT( slapfigh )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0xe803, 0xe803, FUNC(slapfight_mcu_r), FUNC(slapfight_mcu_w) );
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x00, FUNC(slapfight_mcu_status_r) );
+	slapfght_state *state = machine.driver_data<slapfght_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0xe803, 0xe803, read8_delegate(FUNC(slapfght_state::slapfight_mcu_r),state), write8_delegate(FUNC(slapfght_state::slapfight_mcu_w),state));
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::slapfight_mcu_status_r),state));
 }
 
 static DRIVER_INIT( perfrman )
 {
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x00, 0x00, FUNC(perfrman_port_00_r) );
+	slapfght_state *state = machine.driver_data<slapfght_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x00, 0x00, read8_delegate(FUNC(slapfght_state::perfrman_port_00_r),state));
 }
 
 /*  ( YEAR  NAME        PARENT    MACHINE     INPUT     INIT      MONITOR  COMPANY    FULLNAME     FLAGS ) */

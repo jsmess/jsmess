@@ -39,7 +39,6 @@
       not the case here, so the emulation hangs.
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
@@ -58,8 +57,8 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_cass(*this, CASSETTE_TAG),
 		  m_pia(*this, "pia"),
-		  m_speaker(*this, SPEAKER_TAG)
-	{ }
+		  m_speaker(*this, SPEAKER_TAG),
+		  m_videoram(*this, "videoram") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -76,7 +75,7 @@ public:
 	UINT8 m_keylatch;
 	UINT8 m_screen_on;
 	UINT8 m_rtc;
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 };
 
 
@@ -84,7 +83,7 @@ public:
 
 static ADDRESS_MAP_START( d6800_map, AS_PROGRAM, 8, d6800_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
-	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_BASE( m_videoram )
+	AM_RANGE(0x0100, 0x01ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x0200, 0x07ff) AM_RAM
 	AM_RANGE(0x8010, 0x8013) AM_DEVREADWRITE("pia", pia6821_device, read, write)
 	AM_RANGE(0xc000, 0xc3ff) AM_MIRROR(0x3c00) AM_ROM
@@ -165,17 +164,17 @@ READ_LINE_MEMBER( d6800_state::d6800_rtc_pulse )
 
 READ_LINE_MEMBER( d6800_state::d6800_keydown_r )
 {
-	UINT8 data = input_port_read(machine(), "LINE0")
-	           & input_port_read(machine(), "LINE1")
-	           & input_port_read(machine(), "LINE2")
-	           & input_port_read(machine(), "LINE3");
+	UINT8 data = ioport("LINE0")->read()
+	           & ioport("LINE1")->read()
+	           & ioport("LINE2")->read()
+	           & ioport("LINE3")->read();
 
 	return (data==0xff) ? 0 : 1;
 }
 
 READ_LINE_MEMBER( d6800_state::d6800_fn_key_r )
 {
-	return input_port_read(machine(), "SPECIAL");
+	return ioport("SPECIAL")->read();
 }
 
 WRITE_LINE_MEMBER( d6800_state::d6800_screen_w )
@@ -210,10 +209,10 @@ READ8_MEMBER( d6800_state::d6800_keyboard_r )
 {
 	UINT8 data = 15;
 
-	if (!BIT(m_keylatch, 4)) data &= input_port_read(machine(), "LINE0");
-	if (!BIT(m_keylatch, 5)) data &= input_port_read(machine(), "LINE1");
-	if (!BIT(m_keylatch, 6)) data &= input_port_read(machine(), "LINE2");
-	if (!BIT(m_keylatch, 7)) data &= input_port_read(machine(), "LINE3");
+	if (!BIT(m_keylatch, 4)) data &= ioport("LINE0")->read();
+	if (!BIT(m_keylatch, 5)) data &= ioport("LINE1")->read();
+	if (!BIT(m_keylatch, 6)) data &= ioport("LINE2")->read();
+	if (!BIT(m_keylatch, 7)) data &= ioport("LINE3")->read();
 
 	return data | m_keylatch;
 }

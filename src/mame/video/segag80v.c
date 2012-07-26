@@ -110,7 +110,7 @@ INLINE int adjust_xy(segag80v_state *state, int rawx, int rawy, int *outx, int *
 static void sega_generate_vector_list(running_machine &machine)
 {
 	segag80v_state *state = machine.driver_data<segag80v_state>();
-	UINT8 *sintable = machine.region("proms")->base();
+	UINT8 *sintable = state->memregion("proms")->base();
 	double total_time = 1.0 / (double)IRQ_CLOCK;
 	UINT16 symaddr = 0;
 	UINT8 *vectorram = state->m_vectorram;
@@ -326,7 +326,7 @@ static void sega_generate_vector_list(running_machine &machine)
 VIDEO_START( segag80v )
 {
 	segag80v_state *state = machine.driver_data<segag80v_state>();
-	assert_always(state->m_vectorram_size != 0, "vectorram==0");
+	assert_always(state->m_vectorram.bytes() != 0, "vectorram==0");
 
 	state->m_min_x =machine.primary_screen->visible_area().min_x;
 	state->m_min_y =machine.primary_screen->visible_area().min_y;

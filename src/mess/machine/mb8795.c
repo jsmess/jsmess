@@ -1,4 +1,3 @@
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "mb8795.h"

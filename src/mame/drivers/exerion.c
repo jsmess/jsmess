@@ -130,19 +130,17 @@ Stephh's notes (based on the games Z80 code and some tests) :
  *************************************/
 
 /* Players inputs are muxed at 0xa000 */
-static CUSTOM_INPUT( exerion_controls_r )
+CUSTOM_INPUT_MEMBER(exerion_state::exerion_controls_r)
 {
 	static const char *const inname[2] = { "P1", "P2" };
-	exerion_state *state = field.machine().driver_data<exerion_state>();
-	return input_port_read(field.machine(), inname[state->m_cocktail_flip]) & 0x3f;
+	return ioport(inname[m_cocktail_flip])->read() & 0x3f;
 }
 
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(exerion_state::coin_inserted)
 {
-	exerion_state *state = field.machine().driver_data<exerion_state>();
 	/* coin insertion causes an NMI */
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -167,20 +165,19 @@ static WRITE8_DEVICE_HANDLER( exerion_portb_w )
 {
 	exerion_state *state = device->machine().driver_data<exerion_state>();
 	/* pull the expected value from the ROM */
-	state->m_porta = device->machine().region("maincpu")->base()[0x5f76];
+	state->m_porta = state->memregion("maincpu")->base()[0x5f76];
 	state->m_portb = data;
 
 	logerror("Port B = %02X\n", data);
 }
 
 
-static READ8_HANDLER( exerion_protection_r )
+READ8_MEMBER(exerion_state::exerion_protection_r)
 {
-	exerion_state *state = space->machine().driver_data<exerion_state>();
-	if (cpu_get_pc(&space->device()) == 0x4143)
-		return space->machine().region("maincpu")->base()[0x33c0 + (state->m_main_ram[0xd] << 2) + offset];
+	if (cpu_get_pc(&space.device()) == 0x4143)
+		return memregion("maincpu")->base()[0x33c0 + (m_main_ram[0xd] << 2) + offset];
 	else
-		return state->m_main_ram[0x8 + offset];
+		return m_main_ram[0x8 + offset];
 }
 
 
@@ -191,21 +188,21 @@ static READ8_HANDLER( exerion_protection_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, exerion_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6008, 0x600b) AM_READ(exerion_protection_r)
-	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_MEMBER(exerion_state, m_main_ram)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_SIZE_MEMBER(exerion_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x8800, 0x887f) AM_RAM AM_BASE_SIZE_MEMBER(exerion_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_SHARE("main_ram")
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x8800, 0x887f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x8800, 0x8bff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(exerion_videoreg_w)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0xd800, 0xd801) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0xd802, 0xd802) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0xd800, 0xd801) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0xd802, 0xd802) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 ADDRESS_MAP_END
 
 
@@ -216,10 +213,10 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, exerion_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0x800c) AM_WRITE(exerion_video_latch_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(exerion_video_timing_r)
 ADDRESS_MAP_END
@@ -235,7 +232,7 @@ ADDRESS_MAP_END
 /* verified from Z80 code */
 static INPUT_PORTS_START( exerion )
 	PORT_START("IN0")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(exerion_controls_r, (void *)0)
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exerion_state,exerion_controls_r, (void *)0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
@@ -264,7 +261,7 @@ static INPUT_PORTS_START( exerion )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) )          /* see notes */
 	PORT_DIPSETTING(    0x0e, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 4C_1C ) )
@@ -277,7 +274,7 @@ static INPUT_PORTS_START( exerion )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exerion_state,coin_inserted, 0)
 
 	PORT_START("P1")          /* fake input port */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
@@ -561,8 +558,8 @@ static DRIVER_INIT( exerion )
 
 	/* make a temporary copy of the character data */
 	src = temp;
-	dst = machine.region("gfx1")->base();
-	length = machine.region("gfx1")->bytes();
+	dst = machine.root_device().memregion("gfx1")->base();
+	length = machine.root_device().memregion("gfx1")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the characters */
@@ -579,8 +576,8 @@ static DRIVER_INIT( exerion )
 
 	/* make a temporary copy of the sprite data */
 	src = temp;
-	dst = machine.region("gfx2")->base();
-	length = machine.region("gfx2")->bytes();
+	dst = machine.root_device().memregion("gfx2")->base();
+	length = machine.root_device().memregion("gfx2")->bytes();
 	memcpy(src, dst, length);
 
 	/* decode the sprites */
@@ -602,7 +599,7 @@ static DRIVER_INIT( exerion )
 
 static DRIVER_INIT( exerionb )
 {
-	UINT8 *ram = machine.region("maincpu")->base();
+	UINT8 *ram = machine.root_device().memregion("maincpu")->base();
 	int addr;
 
 	/* the program ROMs have data lines D1 and D2 swapped. Decode them. */

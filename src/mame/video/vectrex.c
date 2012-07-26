@@ -107,39 +107,38 @@ static TIMER_CALLBACK(lightpen_trigger)
 
 *********************************************************************/
 
-READ8_HANDLER(vectrex_via_r)
+READ8_MEMBER(vectrex_state::vectrex_via_r)
 {
-	via6522_device *via = space->machine().device<via6522_device>("via6522_0");
-	return via->read(*space, offset);
+	via6522_device *via = machine().device<via6522_device>("via6522_0");
+	return via->read(space, offset);
 }
 
-WRITE8_HANDLER(vectrex_via_w)
+WRITE8_MEMBER(vectrex_state::vectrex_via_w)
 {
-	vectrex_state *state = space->machine().driver_data<vectrex_state>();
-	via6522_device *via = space->machine().device<via6522_device>("via6522_0");
+	via6522_device *via = machine().device<via6522_device>("via6522_0");
 	attotime period;
 
 	switch (offset)
 	{
 	case 8:
-		state->m_via_timer2 = (state->m_via_timer2 & 0xff00) | data;
+		m_via_timer2 = (m_via_timer2 & 0xff00) | data;
 		break;
 
 	case 9:
-		state->m_via_timer2 = (state->m_via_timer2 & 0x00ff) | (data << 8);
+		m_via_timer2 = (m_via_timer2 & 0x00ff) | (data << 8);
 
-		period = (attotime::from_hz(space->machine().device("maincpu")->unscaled_clock()) * state->m_via_timer2);
+		period = (attotime::from_hz(machine().device("maincpu")->unscaled_clock()) * m_via_timer2);
 
-		if (state->m_reset_refresh)
-			state->m_refresh->adjust(period, 0, period);
+		if (m_reset_refresh)
+			m_refresh->adjust(period, 0, period);
 		else
-			state->m_refresh->adjust(
-								  min(period, state->m_refresh->remaining()),
+			m_refresh->adjust(
+								  min(period, m_refresh->remaining()),
 								  0,
 								  period);
 		break;
 	}
-	via->write(*space, offset, data);
+	via->write(space, offset, data);
 }
 
 
@@ -387,6 +386,14 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 		}
 	}
 
+	/* Cartridge bank-switching */
+	if (state->m_64k_cart && ((data ^ state->m_via_out[PORTB]) & 0x40))
+	{
+		device_t &root_device = device->machine().root_device();
+
+		root_device.membank("bank1")->set_base(root_device.memregion("maincpu")->base() + ((data & 0x40) ? 0x10000 : 0x0000));
+	}
+
 	/* Sound */
 	if (data & 0x10)
 	{
@@ -436,12 +443,12 @@ static WRITE8_DEVICE_HANDLER(v_via_cb2_w)
 		/* Check lightpen */
 		if (state->m_lightpen_port != 0)
 		{
-			state->m_lightpen_down = input_port_read(device->machine(), "LPENCONF") & 0x10;
+			state->m_lightpen_down = state->ioport("LPENCONF")->read() & 0x10;
 
 			if (state->m_lightpen_down)
 			{
-				state->m_pen_x = input_port_read(device->machine(), "LPENX") * (state->m_x_max / 0xff);
-				state->m_pen_y = input_port_read(device->machine(), "LPENY") * (state->m_y_max / 0xff);
+				state->m_pen_x = state->ioport("LPENX")->read() * (state->m_x_max / 0xff);
+				state->m_pen_y = state->ioport("LPENY")->read() * (state->m_y_max / 0xff);
 
 				dx = abs(state->m_pen_x - state->m_x_int);
 				dy = abs(state->m_pen_y - state->m_y_int);
@@ -470,7 +477,7 @@ const via6522_interface spectrum1_via6522_interface =
 };
 
 
-WRITE8_HANDLER(raaspec_led_w)
+WRITE8_MEMBER(vectrex_state::raaspec_led_w)
 {
 	logerror("Spectrum I+ LED: %i%i%i%i%i%i%i%i\n",
 			 (data>>7)&0x1, (data>>6)&0x1, (data>>5)&0x1, (data>>4)&0x1,

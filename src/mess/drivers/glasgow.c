@@ -45,7 +45,6 @@ R.Schaefer Oct 2010
 4. Save states added.
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -81,6 +80,8 @@ public:
 	UINT8 m_led7;
 	UINT8 m_irq_flag;
 	UINT16 m_beeper;
+	DECLARE_READ16_MEMBER(read_test);
+	DECLARE_READ16_MEMBER(read_board_amsterd);
 };
 
 
@@ -118,10 +119,10 @@ READ16_MEMBER( glasgow_state::glasgow_keys_r )
 	/* See if any keys pressed */
 	data = 3;
 
-	if (mboard_key_select == input_port_read(machine(), "LINE0"))
+	if (mboard_key_select == ioport("LINE0")->read())
 		data &= 1;
 
-	if (mboard_key_select == input_port_read(machine(), "LINE1"))
+	if (mboard_key_select == ioport("LINE1")->read())
 		data &= 2;
 
 	return data << 8;
@@ -180,9 +181,9 @@ READ16_MEMBER( glasgow_state::read_newkeys16 )  //Amsterdam, Roma
 	UINT16 data;
 
 	if (mboard_key_selector == 0)
-		data = input_port_read(machine(), "LINE0");
+		data = ioport("LINE0")->read();
 	else
-		data = input_port_read(machine(), "LINE1");
+		data = ioport("LINE1")->read();
 
 	logerror("read Keyboard Offset = %x Data = %x Select = %x \n", offset, data, mboard_key_selector);
 	data <<= 8;
@@ -191,7 +192,7 @@ READ16_MEMBER( glasgow_state::read_newkeys16 )  //Amsterdam, Roma
 
 
 #ifdef UNUSED_FUNCTION
-READ16_HANDLER(read_test)
+READ16_MEMBER(glasgow_state::read_test)
 {
 	logerror("read test Offset = %x Data = %x\n  ",offset,data);
 	return 0xffff;    // Mephisto need it for working
@@ -243,10 +244,10 @@ READ32_MEMBER( glasgow_state::read_newkeys32 ) // Dallas 32, Roma 32
 	UINT32 data;
 
 	if (mboard_key_selector == 0)
-		data = input_port_read(machine(), "LINE0");
+		data = ioport("LINE0")->read();
 	else
-		data = input_port_read(machine(), "LINE1");
-	//if (mboard_key_selector == 1) data = input_port_read(machine, "LINE0"); else data = 0;
+		data = ioport("LINE1")->read();
+	//if (mboard_key_selector == 1) data = machine.root_device().ioport("LINE0")->read(); else data = 0;
 	if(data)
 		logerror("read Keyboard Offset = %x Data = %x\n", offset, data);
 	data <<= 24;
@@ -254,7 +255,7 @@ READ32_MEMBER( glasgow_state::read_newkeys32 ) // Dallas 32, Roma 32
 }
 
 #ifdef UNUSED_FUNCTION
-READ16_HANDLER(read_board_amsterd)
+READ16_MEMBER(glasgow_state::read_board_amsterd)
 {
 	logerror("read board amsterdam Offset = %x \n  ", offset);
 	return 0xffff;

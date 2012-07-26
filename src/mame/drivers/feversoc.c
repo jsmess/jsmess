@@ -68,10 +68,14 @@ class feversoc_state : public driver_device
 {
 public:
 	feversoc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"){ }
 
 	UINT16 m_x;
-	UINT32 *m_spriteram;
+	required_shared_ptr<UINT32> m_spriteram;
+	DECLARE_WRITE32_MEMBER(fs_paletteram_w);
+	DECLARE_READ32_MEMBER(in0_r);
+	DECLARE_WRITE32_MEMBER(output_w);
 };
 
 
@@ -112,64 +116,63 @@ static SCREEN_UPDATE_IND16( feversoc )
 	return 0;
 }
 
-static WRITE32_HANDLER( fs_paletteram_w )
+WRITE32_MEMBER(feversoc_state::fs_paletteram_w)
 {
 	int r,g,b;
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&m_generic_paletteram_32[offset]);
 
-	r = ((space->machine().generic.paletteram.u32[offset] & 0x001f0000)>>16) << 3;
-	g = ((space->machine().generic.paletteram.u32[offset] & 0x03e00000)>>16) >> 2;
-	b = ((space->machine().generic.paletteram.u32[offset] & 0x7c000000)>>16) >> 7;
+	r = ((m_generic_paletteram_32[offset] & 0x001f0000)>>16) << 3;
+	g = ((m_generic_paletteram_32[offset] & 0x03e00000)>>16) >> 2;
+	b = ((m_generic_paletteram_32[offset] & 0x7c000000)>>16) >> 7;
 
-	palette_set_color(space->machine(),offset*2+0,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset*2+0,MAKE_RGB(r,g,b));
 
-	r = (space->machine().generic.paletteram.u32[offset] & 0x001f) << 3;
-	g = (space->machine().generic.paletteram.u32[offset] & 0x03e0) >> 2;
-	b = (space->machine().generic.paletteram.u32[offset] & 0x7c00) >> 7;
+	r = (m_generic_paletteram_32[offset] & 0x001f) << 3;
+	g = (m_generic_paletteram_32[offset] & 0x03e0) >> 2;
+	b = (m_generic_paletteram_32[offset] & 0x7c00) >> 7;
 
-	palette_set_color(space->machine(),offset*2+1,MAKE_RGB(r,g,b));
+	palette_set_color(machine(),offset*2+1,MAKE_RGB(r,g,b));
 }
 
-static READ32_HANDLER( in0_r )
+READ32_MEMBER(feversoc_state::in0_r)
 {
-	feversoc_state *state = space->machine().driver_data<feversoc_state>();
 
-	state->m_x^=0x40; //vblank? eeprom read bit?
-	return (input_port_read(space->machine(), "IN0") | state->m_x) | (input_port_read(space->machine(), "IN1")<<16);
+	m_x^=0x40; //vblank? eeprom read bit?
+	return (ioport("IN1")->read()<<16);
 }
 
-static WRITE32_HANDLER( output_w )
+WRITE32_MEMBER(feversoc_state::output_w)
 {
 	if(ACCESSING_BITS_16_31)
 	{
 		/* probably eeprom stuff too */
-		coin_lockout_w(space->machine(), 0,~data>>16 & 0x40);
-		coin_lockout_w(space->machine(), 1,~data>>16 & 0x40);
-		coin_counter_w(space->machine(), 0,data>>16 & 1);
+		coin_lockout_w(machine(), 0,~data>>16 & 0x40);
+		coin_lockout_w(machine(), 1,~data>>16 & 0x40);
+		coin_counter_w(machine(), 0,data>>16 & 1);
 		//data>>16 & 2 coin out
-		coin_counter_w(space->machine(), 1,data>>16 & 4);
+		coin_counter_w(machine(), 1,data>>16 & 4);
 		//data>>16 & 8 coin hopper
-		okim6295_device *oki = space->machine().device<okim6295_device>("oki");
+		okim6295_device *oki = machine().device<okim6295_device>("oki");
 		oki->set_bank_base(0x40000 * (((data>>16) & 0x20)>>5));
 	}
 	if(ACCESSING_BITS_0_15)
 	{
 		/* -xxx xxxx lamps*/
-		coin_counter_w(space->machine(), 2,data & 0x2000); //key in
+		coin_counter_w(machine(), 2,data & 0x2000); //key in
 		//data & 0x4000 key out
 	}
 }
 
-static ADDRESS_MAP_START( feversoc_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( feversoc_map, AS_PROGRAM, 32, feversoc_state )
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
 	AM_RANGE(0x02000000, 0x0203dfff) AM_RAM //work ram
-	AM_RANGE(0x0203e000, 0x0203ffff) AM_RAM AM_BASE_MEMBER(feversoc_state, m_spriteram)
+	AM_RANGE(0x0203e000, 0x0203ffff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x06000000, 0x06000003) AM_WRITE(output_w)
 	AM_RANGE(0x06000004, 0x06000007) AM_WRITENOP //???
 	AM_RANGE(0x06000008, 0x0600000b) AM_READ(in0_r)
-	AM_RANGE(0x0600000c, 0x0600000f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff0000)
+	AM_RANGE(0x0600000c, 0x0600000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff0000)
 //  AM_RANGE(0x06010000, 0x06017fff) AM_RAM //contains RISE11 keys and other related stuff.
-	AM_RANGE(0x06018000, 0x06019fff) AM_RAM_WRITE(fs_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x06018000, 0x06019fff) AM_RAM_WRITE(fs_paletteram_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
 static const gfx_layout spi_spritelayout =
@@ -295,7 +298,7 @@ ROM_END
 
 static DRIVER_INIT( feversoc )
 {
-	seibuspi_rise11_sprite_decrypt_feversoc(machine.region("gfx1")->base(), 0x200000);
+	seibuspi_rise11_sprite_decrypt_feversoc(machine.root_device().memregion("gfx1")->base(), 0x200000);
 }
 
 GAME( 2004, feversoc,  0,       feversoc,  feversoc,  feversoc, ROT0, "Seibu Kaihatsu", "Fever Soccer", 0 )

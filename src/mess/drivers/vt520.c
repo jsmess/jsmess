@@ -5,7 +5,6 @@
         02/07/2009 Skeleton driver.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/ram.h"
@@ -51,10 +50,11 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(vt520)
 {
+	vt520_state *state = machine.driver_data<vt520_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = state->memregion("maincpu")->base();
 	space->unmap_write(0x0000, 0xffff);
-	memory_set_bankptr(machine, "bank1", rom + 0x70000);
+	state->membank("bank1")->set_base(rom + 0x70000);
 }
 
 static VIDEO_START( vt520 )

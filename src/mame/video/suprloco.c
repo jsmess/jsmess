@@ -30,6 +30,7 @@
 ***************************************************************************/
 PALETTE_INIT( suprloco )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 
@@ -110,25 +111,22 @@ VIDEO_START( suprloco )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( suprloco_videoram_w )
+WRITE8_MEMBER(suprloco_state::suprloco_videoram_w)
 {
-	suprloco_state *state = space->machine().driver_data<suprloco_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset/2);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset/2);
 }
 
-WRITE8_HANDLER( suprloco_scrollram_w )
+WRITE8_MEMBER(suprloco_state::suprloco_scrollram_w)
 {
-	suprloco_state *state = space->machine().driver_data<suprloco_state>();
-	int adj = flip_screen_get(space->machine()) ? -8 : 8;
+	int adj = flip_screen() ? -8 : 8;
 
-	state->m_scrollram[offset] = data;
-	state->m_bg_tilemap->set_scrollx(offset, data - adj);
+	m_scrollram[offset] = data;
+	m_bg_tilemap->set_scrollx(offset, data - adj);
 }
 
-WRITE8_HANDLER( suprloco_control_w )
+WRITE8_MEMBER(suprloco_state::suprloco_control_w)
 {
-	suprloco_state *state = space->machine().driver_data<suprloco_state>();
 	/* There is probably a palette select in here */
 
 	/* Bit 0   - coin counter A */
@@ -139,24 +137,23 @@ WRITE8_HANDLER( suprloco_control_w )
 	/* Bit 6   - probably unused */
 	/* Bit 7   - flip screen */
 
-	if ((state->m_control & 0x10) != (data & 0x10))
+	if ((m_control & 0x10) != (data & 0x10))
 	{
 		/*logerror("Bit 4 = %d\n", (data >> 4) & 1); */
 	}
 
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
-	flip_screen_set(space->machine(), data & 0x80);
+	flip_screen_set(data & 0x80);
 
-	state->m_control = data;
+	m_control = data;
 }
 
 
-READ8_HANDLER( suprloco_control_r )
+READ8_MEMBER(suprloco_state::suprloco_control_r)
 {
-	suprloco_state *state = space->machine().driver_data<suprloco_state>();
-	return state->m_control;
+	return m_control;
 }
 
 
@@ -177,7 +174,7 @@ INLINE void draw_pixel(bitmap_ind16 &bitmap,const rectangle &cliprect,int x,int 
 static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect,int spr_number)
 {
 	suprloco_state *state = machine.driver_data<suprloco_state>();
-	int flip = flip_screen_get(machine);
+	int flip = state->flip_screen();
 	int sx,sy,col,row,height,src,adjy,dy;
 	UINT8 *spr_reg;
 	UINT8 *gfx2;
@@ -195,7 +192,7 @@ static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap,const rec
 	sx = spr_reg[SPR_X];
 	sy = spr_reg[SPR_Y_TOP] + 1;
 
-	if (!flip_screen_get(machine))
+	if (!state->flip_screen())
 	{
 		adjy = sy;
 		dy = 1;
@@ -206,7 +203,7 @@ static void draw_sprite(running_machine &machine, bitmap_ind16 &bitmap,const rec
 		dy = -1;
 	}
 
-	gfx2 = machine.region("gfx2")->base();
+	gfx2 = machine.root_device().memregion("gfx2")->base();
 	for (row = 0;row < height;row++,adjy+=dy)
 	{
 		int color1,color2,flipx;
@@ -256,7 +253,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	UINT8 *spr_reg;
 
 
-	for (spr_number = 0;spr_number < (state->m_spriteram_size >> 4);spr_number++)
+	for (spr_number = 0;spr_number < (state->m_spriteram.bytes() >> 4);spr_number++)
 	{
 		spr_reg = state->m_spriteram + 0x10 * spr_number;
 		if (spr_reg[SPR_X] != 0xff)

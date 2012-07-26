@@ -11,11 +11,10 @@
 
 /******************************************************************************/
 
-WRITE16_HANDLER (sshangha_video_w)
+WRITE16_MEMBER(sshangha_state::sshangha_video_w)
 {
-	sshangha_state *state = space->machine().driver_data<sshangha_state>();
 	/* 0x4: Special video mode, other bits unknown */
-	state->m_video_control=data;
+	m_video_control=data;
 //  popmessage("%04x",data);
 }
 
@@ -39,7 +38,7 @@ SCREEN_UPDATE_RGB32( sshangha )
 	if (state->m_spriteram2 != NULL)
 		screen.machine().device<decospr_device>("spritegen2")->draw_sprites(bitmap, cliprect, state->m_spriteram2, 0x800, true);
 
-	screen.machine().tilemap().set_flip_all(flip_screen_x_get(screen.machine()) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
+	screen.machine().tilemap().set_flip_all(state->flip_screen_x() ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
 	bitmap.fill(get_black_pen(screen.machine()), cliprect);
 

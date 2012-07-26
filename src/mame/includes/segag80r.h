@@ -10,7 +10,12 @@ class segag80r_state : public driver_device
 {
 public:
 	segag80r_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_mainram(*this, "mainram"),
+		m_videoram(*this, "videoram"){ }
+
+	required_shared_ptr<UINT8> m_mainram;
+	required_shared_ptr<UINT8> m_videoram;
 
 	UINT8 m_sound_state[2];
 	UINT8 m_sound_rate;
@@ -22,9 +27,7 @@ public:
 	sound_stream *m_sega005_stream;
 	UINT8 m_n7751_command;
 	UINT8 m_n7751_busy;
-	UINT8 *m_videoram;
 	segag80_decrypt_func m_decrypt;
-	UINT8 *m_mainram;
 	UINT8 m_background_pcb;
 	double m_rweights[3];
 	double m_gweights[3];
@@ -45,6 +48,33 @@ public:
 	UINT16 m_bg_scrollx;
 	UINT16 m_bg_scrolly;
 	UINT8 m_pignewt_bg_color_offset;
+	DECLARE_WRITE8_MEMBER(mainram_w);
+	DECLARE_WRITE8_MEMBER(vidram_w);
+	DECLARE_WRITE8_MEMBER(monsterb_vidram_w);
+	DECLARE_WRITE8_MEMBER(pignewt_vidram_w);
+	DECLARE_WRITE8_MEMBER(sindbadm_vidram_w);
+	DECLARE_READ8_MEMBER(mangled_ports_r);
+	DECLARE_READ8_MEMBER(spaceod_mangled_ports_r);
+	DECLARE_READ8_MEMBER(spaceod_port_fc_r);
+	DECLARE_WRITE8_MEMBER(coin_count_w);
+	DECLARE_WRITE8_MEMBER(segag80r_videoram_w);
+	DECLARE_READ8_MEMBER(segag80r_video_port_r);
+	DECLARE_WRITE8_MEMBER(segag80r_video_port_w);
+	DECLARE_READ8_MEMBER(spaceod_back_port_r);
+	DECLARE_WRITE8_MEMBER(spaceod_back_port_w);
+	DECLARE_WRITE8_MEMBER(monsterb_videoram_w);
+	DECLARE_WRITE8_MEMBER(monsterb_back_port_w);
+	DECLARE_WRITE8_MEMBER(pignewt_videoram_w);
+	DECLARE_WRITE8_MEMBER(pignewt_back_color_w);
+	DECLARE_WRITE8_MEMBER(pignewt_back_port_w);
+	DECLARE_WRITE8_MEMBER(sindbadm_videoram_w);
+	DECLARE_WRITE8_MEMBER(sindbadm_back_port_w);
+	DECLARE_WRITE8_MEMBER(astrob_sound_w);
+	DECLARE_WRITE8_MEMBER(spaceod_sound_w);
+	DECLARE_READ8_MEMBER(n7751_rom_r);
+	DECLARE_READ8_MEMBER(n7751_command_r);
+	DECLARE_READ8_MEMBER(n7751_t1_r);
+	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
 };
 
 
@@ -55,9 +85,7 @@ MACHINE_CONFIG_EXTERN( 005_sound_board );
 MACHINE_CONFIG_EXTERN( spaceod_sound_board );
 MACHINE_CONFIG_EXTERN( monsterb_sound_board );
 
-WRITE8_HANDLER( astrob_sound_w );
 
-WRITE8_HANDLER( spaceod_sound_w );
 
 
 /*----------- defined in video/segag80r.c -----------*/
@@ -71,29 +99,17 @@ WRITE8_HANDLER( spaceod_sound_w );
 
 INTERRUPT_GEN( segag80r_vblank_start );
 
-WRITE8_HANDLER( segag80r_videoram_w );
 
-READ8_HANDLER( segag80r_video_port_r );
-WRITE8_HANDLER( segag80r_video_port_w );
 
 VIDEO_START( segag80r );
 SCREEN_UPDATE_IND16( segag80r );
 
 
-READ8_HANDLER( spaceod_back_port_r );
-WRITE8_HANDLER( spaceod_back_port_w );
 
 
-WRITE8_HANDLER( monsterb_videoram_w );
-WRITE8_HANDLER( monsterb_back_port_w );
 
 
-WRITE8_HANDLER( pignewt_videoram_w );
-WRITE8_HANDLER( pignewt_back_port_w );
-WRITE8_HANDLER( pignewt_back_color_w );
 
 
 INTERRUPT_GEN( sindbadm_vblank_start );
 
-WRITE8_HANDLER( sindbadm_videoram_w );
-WRITE8_HANDLER( sindbadm_back_port_w );

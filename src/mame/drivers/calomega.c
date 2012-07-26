@@ -660,7 +660,7 @@
 static WRITE_LINE_DEVICE_HANDLER( tx_rx_clk )
 {
 	int trx_clk;
-	UINT8 dsw2 = input_port_read(device->machine(), "SW2");
+	UINT8 dsw2 = device->machine().root_device().ioport("SW2")->read();
 	trx_clk = UART_CLOCK * dsw2 / 128;
 	acia6850_device *acia = downcast<acia6850_device *>(device);
 	acia->set_rx_clock(trx_clk);
@@ -673,13 +673,13 @@ static READ8_DEVICE_HANDLER( s903_mux_port_r )
 	calomega_state *state = device->machine().driver_data<calomega_state>();
 	switch( state->m_s903_mux_data & 0xf0 )	/* bits 4-7 */
 	{
-		case 0x10: return input_port_read(device->machine(), "IN0-0");
-		case 0x20: return input_port_read(device->machine(), "IN0-1");
-		case 0x40: return input_port_read(device->machine(), "IN0-2");
-		case 0x80: return input_port_read(device->machine(), "IN0-3");
+		case 0x10: return state->ioport("IN0-0")->read();
+		case 0x20: return state->ioport("IN0-1")->read();
+		case 0x40: return state->ioport("IN0-2")->read();
+		case 0x80: return state->ioport("IN0-3")->read();
 	}
 
-	return input_port_read(device->machine(), "FRQ");	/* bit7 used for 50/60 Hz selector */
+	return device->machine().root_device().ioport("FRQ")->read();	/* bit7 used for 50/60 Hz selector */
 }
 
 static WRITE8_DEVICE_HANDLER( s903_mux_w )
@@ -695,13 +695,13 @@ static READ8_DEVICE_HANDLER( s905_mux_port_r )
 	calomega_state *state = device->machine().driver_data<calomega_state>();
 	switch( state->m_s905_mux_data & 0x0f )	/* bits 0-3 */
 	{
-		case 0x01: return input_port_read(device->machine(), "IN0-0");
-		case 0x02: return input_port_read(device->machine(), "IN0-1");
-		case 0x04: return input_port_read(device->machine(), "IN0-2");
-		case 0x08: return input_port_read(device->machine(), "IN0-3");
+		case 0x01: return state->ioport("IN0-0")->read();
+		case 0x02: return state->ioport("IN0-1")->read();
+		case 0x04: return state->ioport("IN0-2")->read();
+		case 0x08: return state->ioport("IN0-3")->read();
 	}
 
-	return input_port_read(device->machine(), "FRQ");	/* bit6 used for 50/60 Hz selector */
+	return device->machine().root_device().ioport("FRQ")->read();	/* bit6 used for 50/60 Hz selector */
 }
 
 static WRITE8_DEVICE_HANDLER( s905_mux_w )
@@ -717,7 +717,7 @@ static READ8_DEVICE_HANDLER( pia0_ain_r )
 {
 	/* Valid input port. Each polled value is stored at $0538 */
 	logerror("PIA0: Port A in\n");
-	return input_port_read(device->machine(), "IN0");
+	return device->machine().root_device().ioport("IN0")->read();
 }
 
 static READ8_DEVICE_HANDLER( pia0_bin_r )
@@ -835,56 +835,56 @@ static WRITE8_DEVICE_HANDLER( lamps_905_w )
 *             Memory map information             *
 *************************************************/
 
-static ADDRESS_MAP_START( sys903_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sys903_map, AS_PROGRAM, 8, calomega_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0840, 0x0841) AM_DEVWRITE("ay8912", ay8910_address_data_w)
-	AM_RANGE(0x0880, 0x0880) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x08c4, 0x08c7) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
-	AM_RANGE(0x08c8, 0x08cb) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
-	AM_RANGE(0x08d0, 0x08d0) AM_DEVREADWRITE_MODERN("acia6850_0", acia6850_device, status_read, control_write)
-	AM_RANGE(0x08d1, 0x08d1) AM_DEVREADWRITE_MODERN("acia6850_0", acia6850_device, data_read, data_write)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE_MEMBER(calomega_state, m_videoram)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE_MEMBER(calomega_state, m_colorram)
+	AM_RANGE(0x0840, 0x0841) AM_DEVWRITE_LEGACY("ay8912", ay8910_address_data_w)
+	AM_RANGE(0x0880, 0x0880) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x08c4, 0x08c7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x08c8, 0x08cb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x08d0, 0x08d0) AM_DEVREADWRITE("acia6850_0", acia6850_device, status_read, control_write)
+	AM_RANGE(0x08d1, 0x08d1) AM_DEVREADWRITE("acia6850_0", acia6850_device, data_read, data_write)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x1800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( s903mod_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( s903mod_map, AS_PROGRAM, 8, calomega_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x0840, 0x0841) AM_DEVWRITE("ay8912", ay8910_address_data_w)
-	AM_RANGE(0x0880, 0x0880) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x08c4, 0x08c7) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
-	AM_RANGE(0x08c8, 0x08cb) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE_MEMBER(calomega_state, m_videoram)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE_MEMBER(calomega_state, m_colorram)
+	AM_RANGE(0x0840, 0x0841) AM_DEVWRITE_LEGACY("ay8912", ay8910_address_data_w)
+	AM_RANGE(0x0880, 0x0880) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x08c4, 0x08c7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x08c8, 0x08cb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x1800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sys905_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sys905_map, AS_PROGRAM, 8, calomega_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x1040, 0x1041) AM_DEVWRITE("ay8912", ay8910_address_data_w)
-	AM_RANGE(0x1080, 0x1080) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x1081, 0x1081) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x10c4, 0x10c7) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
-	AM_RANGE(0x10c8, 0x10cb) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE_MEMBER(calomega_state, m_videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE_MEMBER(calomega_state, m_colorram)
+	AM_RANGE(0x1040, 0x1041) AM_DEVWRITE_LEGACY("ay8912", ay8910_address_data_w)
+	AM_RANGE(0x1080, 0x1080) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x1081, 0x1081) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x10c4, 0x10c7) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x10c8, 0x10cb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(calomega_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(calomega_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x2800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sys906_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sys906_map, AS_PROGRAM, 8, calomega_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x280c, 0x280f) AM_DEVREADWRITE_MODERN("pia0", pia6821_device, read, write)
-	AM_RANGE(0x2824, 0x2827) AM_DEVREADWRITE_MODERN("pia1", pia6821_device, read, write)
-	AM_RANGE(0x2c04, 0x2c04) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x2c05, 0x2c05) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
-	AM_RANGE(0x2c08, 0x2c09) AM_DEVREADWRITE("ay8912", ay8910_r, ay8910_address_data_w)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE_MEMBER(calomega_state, m_videoram)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE_MEMBER(calomega_state, m_colorram)
+	AM_RANGE(0x280c, 0x280f) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
+	AM_RANGE(0x2824, 0x2827) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
+	AM_RANGE(0x2c04, 0x2c04) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x2c05, 0x2c05) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x2c08, 0x2c09) AM_DEVREADWRITE_LEGACY("ay8912", ay8910_r, ay8910_address_data_w)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(calomega_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(calomega_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -3918,7 +3918,7 @@ static DRIVER_INIT( standard )
 {
 	/* background color is adjusted through RGB pots */
 	int x;
-	UINT8 *BPR = machine.region( "proms" )->base();
+	UINT8 *BPR = machine.root_device().memregion( "proms" )->base();
 
 	for (x = 0x0000; x < 0x0400; x++)
 	{
@@ -3930,7 +3930,7 @@ static DRIVER_INIT( standard )
 static DRIVER_INIT( elgrande )
 {
 	int x;
-	UINT8 *BPR = machine.region( "proms" )->base();
+	UINT8 *BPR = machine.root_device().memregion( "proms" )->base();
 
 	/* background color is adjusted through RGB pots */
 	for (x = 0x0000; x < 0x0400; x++)
@@ -3944,7 +3944,7 @@ static DRIVER_INIT( jjpoker )
 {
 	/* background color is adjusted through RGB pots */
 	int x;
-	UINT8 *BPR = machine.region( "proms" )->base();
+	UINT8 *BPR = machine.root_device().memregion( "proms" )->base();
 
 	for (x = 0x0000; x < 0x0400; x++)
 	{
@@ -3957,7 +3957,7 @@ static DRIVER_INIT( comg080 )
 {
 	/* background color is adjusted through RGB pots */
 	int x;
-	UINT8 *BPR = machine.region( "proms" )->base();
+	UINT8 *BPR = machine.root_device().memregion( "proms" )->base();
 
 	for (x = 0x0000; x < 0x0400; x++)
 	{
@@ -3969,7 +3969,7 @@ static DRIVER_INIT( comg080 )
        Start = $2042;  NMI = $26f8;
        Also a fake vector at $3ff8-$3ff9. The code checks these values to continue.
     */
-	UINT8 *PRGROM = machine.region( "maincpu" )->base();
+	UINT8 *PRGROM = machine.root_device().memregion( "maincpu" )->base();
 
 	PRGROM[0x3ff8] = 0x8e; /* checked by code */
 	PRGROM[0x3ff9] = 0x97; /* checked by code */

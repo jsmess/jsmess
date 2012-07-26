@@ -28,7 +28,7 @@ static TIMER_DEVICE_CALLBACK( higemaru_scanline )
 }
 
 
-static ADDRESS_MAP_START( higemaru_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( higemaru_map, AS_PROGRAM, 8, higemaru_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")
@@ -36,11 +36,11 @@ static ADDRESS_MAP_START( higemaru_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(higemaru_c800_w)
-	AM_RANGE(0xc801, 0xc802) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0xc803, 0xc804) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(higemaru_videoram_w) AM_BASE_MEMBER(higemaru_state, m_videoram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(higemaru_colorram_w) AM_BASE_MEMBER(higemaru_state, m_colorram)
-	AM_RANGE(0xd880, 0xd9ff) AM_RAM AM_BASE_SIZE_MEMBER(higemaru_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xc801, 0xc802) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0xc803, 0xc804) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(higemaru_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(higemaru_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xd880, 0xd9ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 

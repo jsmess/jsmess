@@ -117,7 +117,7 @@ WRITE8_MEMBER( phc25_state::port40_w )
 static ADDRESS_MAP_START( phc25_mem, AS_PROGRAM, 8, phc25_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_REGION(Z80_TAG, 0)
-	AM_RANGE(0x6000, 0x77ff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x6000, 0x77ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -322,7 +322,7 @@ static const mc6847_interface pal_vdg_intf =
 void phc25_state::video_start()
 {
 	/* find memory regions */
-	m_char_rom = machine().region(Z80_TAG)->base() + 0x5000;
+	m_char_rom = memregion(Z80_TAG)->base() + 0x5000;
 }
 
 /* AY-3-8910 Interface */

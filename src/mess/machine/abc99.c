@@ -47,7 +47,6 @@ Notes:
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "abc99.h"
@@ -234,14 +233,12 @@ machine_config_constructor abc99_device::device_mconfig_additions() const
 
 
 //-------------------------------------------------
-//  INPUT_PORTS( abc99 )
+//  INPUT_CHANGED_MEMBER( keyboard_reset )
 //-------------------------------------------------
 
-INPUT_CHANGED( abc99_device::keyboard_reset )
+INPUT_CHANGED_MEMBER( abc99_device::keyboard_reset )
 {
-    abc99_device *keyboard = static_cast<abc99_device *>(field.machine().device(ABC99_TAG));
-
-	device_set_input_line(keyboard->m_mousecpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_mousecpu, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -436,7 +433,7 @@ INPUT_PORTS_START( abc99 )
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1)
 
 	PORT_START("J4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Keyboard Reset") PORT_CHANGED(abc99_device::keyboard_reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Keyboard Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, abc99_device, keyboard_reset, 0)
 INPUT_PORTS_END
 
 
@@ -696,7 +693,7 @@ READ8_MEMBER( abc99_device::z2_p2_r )
 
     */
 
-	UINT8 data = input_port_read(*this, "Z14") << 5;
+	UINT8 data = ioport("Z14")->read() << 5;
 
 	return data;
 }
@@ -746,7 +743,7 @@ READ8_MEMBER( abc99_device::z5_p1_r )
 	UINT8 data = 0;
 
 	// mouse buttons
-	data |= (input_port_read(*this, "MOUSEB") & 0x07) << 4;
+	data |= (ioport("MOUSEB")->read() & 0x07) << 4;
 
 	// serial input
 	data |= m_si << 7;

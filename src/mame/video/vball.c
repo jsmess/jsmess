@@ -49,26 +49,23 @@ VIDEO_START( vb )
 	state->m_vb_spprombank=0xff;
 }
 
-WRITE8_HANDLER( vb_videoram_w )
+WRITE8_MEMBER(vball_state::vb_videoram_w)
 {
-	vball_state *state = space->machine().driver_data<vball_state>();
-	state->m_vb_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_vb_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 #ifdef UNUSED_FUNCTION
-READ8_HANDLER( vb_attrib_r )
+READ8_MEMBER(vball_state::vb_attrib_r)
 {
-	vball_state *state = space->machine().driver_data<vball_state>();
-	return state->m_vb_attribram[offset];
+	return m_vb_attribram[offset];
 }
 #endif
 
-WRITE8_HANDLER( vb_attrib_w )
+WRITE8_MEMBER(vball_state::vb_attrib_w)
 {
-	vball_state *state = space->machine().driver_data<vball_state>();
-	state->m_vb_attribram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_vb_attribram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 void vb_bgprombank_w( running_machine &machine, int bank )
@@ -79,7 +76,7 @@ void vb_bgprombank_w( running_machine &machine, int bank )
 
 	if (bank==state->m_vb_bgprombank) return;
 
-	color_prom = machine.region("proms")->base() + bank*0x80;
+	color_prom = state->memregion("proms")->base() + bank*0x80;
 	for (i=0;i<128;i++, color_prom++) {
 		palette_set_color_rgb(machine,i,pal4bit(color_prom[0] >> 0),pal4bit(color_prom[0] >> 4),
 				       pal4bit(color_prom[0x800] >> 0));
@@ -96,7 +93,7 @@ void vb_spprombank_w( running_machine &machine, int bank )
 
 	if (bank==state->m_vb_spprombank) return;
 
-	color_prom = machine.region("proms")->base()+0x400 + bank*0x80;
+	color_prom = state->memregion("proms")->base()+0x400 + bank*0x80;
 	for (i=128;i<256;i++,color_prom++)	{
 		palette_set_color_rgb(machine,i,pal4bit(color_prom[0] >> 0),pal4bit(color_prom[0] >> 4),
 				       pal4bit(color_prom[0x800] >> 0));
@@ -124,7 +121,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 /*  240-Y    S|X|CLR|WCH WHICH    240-X
     xxxxxxxx x|x|xxx|xxx xxxxxxxx xxxxxxxx
 */
-	for (i = 0;i < state->m_spriteram_size;i += 4)
+	for (i = 0;i < state->m_spriteram.bytes();i += 4)
 	{
 		int attr = src[i+1];
 		int which = src[i+2]+((attr & 0x07)<<8);
@@ -136,7 +133,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		int flipy = 0;
 		int dy = -16;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

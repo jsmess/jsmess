@@ -203,7 +203,6 @@
                  MB81416-10 x12 (GRAM)
 
 ************************************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "includes/x1.h"
 
@@ -344,7 +343,7 @@ static void draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,const 
 			int width = BIT(state->m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 7);
 			int height = BIT(state->m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 6);
 			int pcg_bank = BIT(state->m_avram[((x+y*x_size)+mc6845_start_addr) & 0x7ff], 5);
-			UINT8 *gfx_data = machine.region(pcg_bank ? "pcg" : "cgrom")->base();
+			UINT8 *gfx_data = machine.root_device().memregion(pcg_bank ? "pcg" : "cgrom")->base();
 			int	knj_enable = 0;
 			int knj_side = 0;
 			int knj_bank = 0;
@@ -358,7 +357,7 @@ static void draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,const 
 				knj_bank = state->m_kvram[((x+y*x_size)+mc6845_start_addr) & 0x7ff] & 0x0f;
 				if(knj_enable)
 				{
-					gfx_data = machine.region("kanji")->base();
+					gfx_data = state->memregion("kanji")->base();
 					tile = ((tile + (knj_bank << 8)) << 1) + (knj_side & 1);
 				}
 			}
@@ -569,16 +568,16 @@ UINT16 x1_state::check_keyboard_press()
 {
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;
-	UINT8 keymod = input_port_read(machine(),"key_modifiers") & 0x1f;
-	UINT32 pad = input_port_read(machine(),"tenkey");
-	UINT32 f_key = input_port_read(machine(), "f_keys");
+	UINT8 keymod = ioport("key_modifiers")->read() & 0x1f;
+	UINT32 pad = ioport("tenkey")->read();
+	UINT32 f_key = ioport("f_keys")->read();
 	scancode = 0;
 
 	for(port_i=0;port_i<3;port_i++)
 	{
 		for(i=0;i<32;i++)
 		{
-			if((input_port_read(machine(), portnames[port_i])>>i) & 1)
+			if((ioport(portnames[port_i])->read()>>i) & 1)
 			{
 				//key_flag = 1;
 				if(keymod & 0x02)  // shift not pressed
@@ -644,7 +643,7 @@ UINT8 x1_state::check_keyboard_shift()
     ---- ---x CTRL ON
     */
 
-	val |= input_port_read(machine(), "key_modifiers") & 0x1f;
+	val |= ioport("key_modifiers")->read() & 0x1f;
 
 	if(check_keyboard_press() != 0)
 		val &= ~0x40;
@@ -667,7 +666,7 @@ UINT8 x1_state::get_game_key(UINT8 port)
 
 	if (port == 0)
 	{
-		UINT32 key3 = input_port_read(machine(), "key3");
+		UINT32 key3 = ioport("key3")->read();
 		if(key3 & 0x00020000) ret |= 0x80;  // Q
 		if(key3 & 0x00800000) ret |= 0x40;  // W
 		if(key3 & 0x00000020) ret |= 0x20;  // E
@@ -680,7 +679,7 @@ UINT8 x1_state::get_game_key(UINT8 port)
 	else
 	if (port == 1)
 	{
-		UINT32 pad = input_port_read(machine(), "tenkey");
+		UINT32 pad = ioport("tenkey")->read();
 		if(pad & 0x00000080) ret |= 0x80;  // Tenkey 7
 		if(pad & 0x00000010) ret |= 0x40;  // Tenkey 4
 		if(pad & 0x00000002) ret |= 0x20;  // Tenkey 1
@@ -693,9 +692,9 @@ UINT8 x1_state::get_game_key(UINT8 port)
 	else
 	if (port == 2)
 	{
-		UINT32 key1 = input_port_read(machine(), "key1");
-		UINT32 key2 = input_port_read(machine(), "key2");
-		UINT32 pad = input_port_read(machine(), "tenkey");
+		UINT32 key1 = ioport("key1")->read();
+		UINT32 key2 = ioport("key2")->read();
+		UINT32 pad = ioport("tenkey")->read();
 		if(key1 & 0x08000000) ret |= 0x80;  // ESC
 		if(key2 & 0x00020000) ret |= 0x40;  // 1
 		if(pad & 0x00000400) ret |= 0x20;  // Tenkey -
@@ -966,7 +965,7 @@ WRITE8_MEMBER( x1_state::x1_sub_io_w )
 
 READ8_MEMBER( x1_state::x1_rom_r )
 {
-	UINT8 *rom = machine().region("cart_img")->base();
+	UINT8 *rom = memregion("cart_img")->base();
 
 //  printf("%06x\n",m_rom_index[0]<<16|m_rom_index[1]<<8|m_rom_index[2]<<0);
 
@@ -1124,7 +1123,7 @@ READ8_MEMBER( x1_state::x1_pcg_r )
 
 	if(addr == 0 && m_scrn_reg.pcg_mode) // Kanji ROM read, X1Turbo only
 	{
-		gfx_data = machine().region("kanji")->base();
+		gfx_data = memregion("kanji")->base();
 		pcg_offset = (m_tvram[check_chr_addr()]+(m_kvram[check_chr_addr()]<<8)) & 0xfff;
 		pcg_offset*=0x20;
 		pcg_offset+=(offset & 0x0f);
@@ -1137,7 +1136,7 @@ READ8_MEMBER( x1_state::x1_pcg_r )
 		UINT8 y_char_size;
 
 		/* addr == 0 reads from the ANK rom */
-		gfx_data = machine().region((addr == 0) ? "cgrom" : "pcg")->base();
+		gfx_data = memregion((addr == 0) ? "cgrom" : "pcg")->base();
 		y_char_size = ((m_crtc_vreg[9]+1) > 8) ? 8 : m_crtc_vreg[9]+1;
 		if(y_char_size == 0) { y_char_size = 1; }
 		pcg_offset = m_tvram[get_pcg_addr(m_crtc_vreg[1], y_char_size)]*8;
@@ -1152,7 +1151,7 @@ READ8_MEMBER( x1_state::x1_pcg_r )
 WRITE8_MEMBER( x1_state::x1_pcg_w )
 {
 	int addr,pcg_offset;
-	UINT8 *PCG_RAM = machine().region("pcg")->base();
+	UINT8 *PCG_RAM = memregion("pcg")->base();
 
 	addr = (offset & 0x300) >> 8;
 
@@ -1447,7 +1446,7 @@ static UINT16 jis_convert(int kanji_addr)
 
 READ8_MEMBER( x1_state::x1_kanji_r )
 {
-	UINT8 *kanji_rom = machine().region("kanji")->base();
+	UINT8 *kanji_rom = memregion("kanji")->base();
 	UINT8 res;
 
 	res = kanji_rom[jis_convert(m_kanji_addr & 0xfff0)+(offset*0x10)+(m_kanji_addr & 0xf)];
@@ -1490,7 +1489,7 @@ WRITE8_MEMBER( x1_state::x1_kanji_w )
 
 READ8_MEMBER( x1_state::x1_emm_r )
 {
-	UINT8 *emm_ram = machine().region("emm")->base();
+	UINT8 *emm_ram = memregion("emm")->base();
 	UINT8 res;
 
 	if(offset & ~3)
@@ -1515,7 +1514,7 @@ READ8_MEMBER( x1_state::x1_emm_r )
 
 WRITE8_MEMBER( x1_state::x1_emm_w )
 {
-	UINT8 *emm_ram = machine().region("emm")->base();
+	UINT8 *emm_ram = memregion("emm")->base();
 
 	if(offset & ~3)
 	{
@@ -1546,7 +1545,7 @@ READ8_MEMBER( x1_state::x1turbo_bank_r )
 
 WRITE8_MEMBER( x1_state::x1turbo_bank_w )
 {
-	//UINT8 *RAM = machine().region("x1_cpu")->base();
+	//UINT8 *RAM = memregion("x1_cpu")->base();
 	/*
     --x- ---- BML5: latch bit (doesn't have any real function)
     ---x ---- BMCS: select bank RAM, active low
@@ -1560,11 +1559,11 @@ WRITE8_MEMBER( x1_state::x1turbo_bank_w )
 /* TODO: waitstate penalties */
 READ8_MEMBER( x1_state::x1_mem_r )
 {
-	UINT8 *wram = machine().region("wram")->base();
+	UINT8 *wram = memregion("wram")->base();
 
 	if((offset & 0x8000) == 0 && (m_ram_bank == 0))
 	{
-		UINT8 *ipl = machine().region("ipl")->base();
+		UINT8 *ipl = memregion("ipl")->base();
 		return ipl[offset]; //ROM
 	}
 
@@ -1573,7 +1572,7 @@ READ8_MEMBER( x1_state::x1_mem_r )
 
 WRITE8_MEMBER( x1_state::x1_mem_w )
 {
-	UINT8 *wram = machine().region("wram")->base();
+	UINT8 *wram = memregion("wram")->base();
 
 	wram[offset] = data; //RAM
 }
@@ -1582,7 +1581,7 @@ READ8_MEMBER( x1_state::x1turbo_mem_r )
 {
 	if((m_ex_bank & 0x10) == 0)
 	{
-		UINT8 *wram = machine().region("wram")->base();
+		UINT8 *wram = memregion("wram")->base();
 
 		return wram[offset+((m_ex_bank & 0xf)*0x10000)];
 	}
@@ -1594,7 +1593,7 @@ WRITE8_MEMBER( x1_state::x1turbo_mem_w )
 {
 	if((m_ex_bank & 0x10) == 0)
 	{
-		UINT8 *wram = machine().region("wram")->base();
+		UINT8 *wram = memregion("wram")->base();
 
 		wram[offset+((m_ex_bank & 0xf)*0x10000)] = data; //RAM
 	}
@@ -1686,7 +1685,7 @@ READ8_MEMBER( x1_state::x1turbo_io_r )
 	m_io_bank_mode = 0; //any read disables the extended mode.
 
 	// a * at the end states devices used on plain X1 too
-	if(offset == 0x0700)							{ return (ym2151_r(machine().device("ym"), offset-0x0700) & 0x7f) | (input_port_read(machine(), "SOUND_SW") & 0x80); }
+	if(offset == 0x0700)							{ return (ym2151_r(machine().device("ym"), offset-0x0700) & 0x7f) | (ioport("SOUND_SW")->read() & 0x80); }
 	else if(offset == 0x0701)		                { return ym2151_r(machine().device("ym"), offset-0x0700); }
 	//0x704 is FM sound detection port on X1 turboZ
 	else if(offset >= 0x0704 && offset <= 0x0707)   { return z80ctc_r(m_ctc, offset-0x0704); }
@@ -1716,7 +1715,7 @@ READ8_MEMBER( x1_state::x1turbo_io_r )
 	else if(offset == 0x1fc5)						{ return x1turbo_gfxpal_r(space,0); } // Z only!
 //  else if(offset >= 0x1fd0 && offset <= 0x1fdf)   { return x1_scrn_r(space,offset-0x1fd0); } //Z only
 	else if(offset == 0x1fe0)						{ return x1turboz_blackclip_r(space,0); }
-	else if(offset == 0x1ff0)						{ return input_port_read(machine(), "X1TURBO_DSW"); }
+	else if(offset == 0x1ff0)						{ return ioport("X1TURBO_DSW")->read(); }
 	else if(offset >= 0x2000 && offset <= 0x2fff)	{ return m_avram[offset & 0x7ff]; }
 	else if(offset >= 0x3000 && offset <= 0x37ff)	{ return m_tvram[offset & 0x7ff]; }
 	else if(offset >= 0x3800 && offset <= 0x3fff)	{ return m_kvram[offset & 0x7ff]; }
@@ -2411,11 +2410,11 @@ TIMER_DEVICE_CALLBACK(x1_keyboard_callback)
 {
 	x1_state *state = timer.machine().driver_data<x1_state>();
 	address_space *space = timer.machine().device("x1_cpu")->memory().space(AS_PROGRAM);
-	UINT32 key1 = input_port_read(timer.machine(),"key1");
-	UINT32 key2 = input_port_read(timer.machine(),"key2");
-	UINT32 key3 = input_port_read(timer.machine(),"key3");
-	UINT32 key4 = input_port_read(timer.machine(),"tenkey");
-	UINT32 f_key = input_port_read(timer.machine(), "f_keys");
+	UINT32 key1 = timer.machine().root_device().ioport("key1")->read();
+	UINT32 key2 = timer.machine().root_device().ioport("key2")->read();
+	UINT32 key3 = timer.machine().root_device().ioport("key3")->read();
+	UINT32 key4 = timer.machine().root_device().ioport("tenkey")->read();
+	UINT32 f_key = timer.machine().root_device().ioport("f_keys")->read();
 
 	if(state->m_key_irq_vector)
 	{
@@ -2469,8 +2468,8 @@ TIMER_CALLBACK(x1_rtc_increment)
 MACHINE_RESET( x1 )
 {
 	x1_state *state = machine.driver_data<x1_state>();
-	//UINT8 *ROM = machine.region("x1_cpu")->base();
-	UINT8 *PCG_RAM = machine.region("pcg")->base();
+	//UINT8 *ROM = machine.root_device().memregion("x1_cpu")->base();
+	UINT8 *PCG_RAM = state->memregion("pcg")->base();
 	int i;
 
 	memset(state->m_gfx_bitmap_ram,0x00,0xc000*2);
@@ -2765,8 +2764,8 @@ ROM_END
 DRIVER_INIT( x1_kanji )
 {
 	UINT32 i,j,k,l;
-	UINT8 *kanji = machine.region("kanji")->base();
-	UINT8 *raw_kanji = machine.region("raw_kanji")->base();
+	UINT8 *kanji = machine.root_device().memregion("kanji")->base();
+	UINT8 *raw_kanji = machine.root_device().memregion("raw_kanji")->base();
 
 	k = 0;
 	for(l=0;l<2;l++)

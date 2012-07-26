@@ -9,44 +9,41 @@
 #include "emu.h"
 #include "includes/bombjack.h"
 
-WRITE8_HANDLER( bombjack_videoram_w )
+WRITE8_MEMBER(bombjack_state::bombjack_videoram_w)
 {
-	bombjack_state *state = space->machine().driver_data<bombjack_state>();
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( bombjack_colorram_w )
+WRITE8_MEMBER(bombjack_state::bombjack_colorram_w)
 {
-	bombjack_state *state = space->machine().driver_data<bombjack_state>();
-	state->m_colorram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( bombjack_background_w )
+WRITE8_MEMBER(bombjack_state::bombjack_background_w)
 {
-	bombjack_state *state = space->machine().driver_data<bombjack_state>();
 
-	if (state->m_background_image != data)
+	if (m_background_image != data)
 	{
-		state->m_background_image = data;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_background_image = data;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( bombjack_flipscreen_w )
+WRITE8_MEMBER(bombjack_state::bombjack_flipscreen_w)
 {
-	if (flip_screen_get(space->machine()) != (data & 0x01))
+	if (flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(space->machine(), data & 0x01);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(data & 0x01);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	bombjack_state *state = machine.driver_data<bombjack_state>();
-	UINT8 *tilerom = machine.region("gfx4")->base();
+	UINT8 *tilerom = state->memregion("gfx4")->base();
 
 	int offs = (state->m_background_image & 0x07) * 0x200 + tile_index;
 	int code = (state->m_background_image & 0x10) ? tilerom[offs] : 0;
@@ -80,7 +77,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	bombjack_state *state = machine.driver_data<bombjack_state>();
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 
 /*
@@ -109,7 +106,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		flipx = state->m_spriteram[offs + 1] & 0x40;
 		flipy = state->m_spriteram[offs + 1] & 0x80;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			if (state->m_spriteram[offs + 1] & 0x20)
 			{

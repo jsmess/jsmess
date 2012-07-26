@@ -39,11 +39,22 @@ class midvunit_state : public driver_device
 public:
 	midvunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_nvram(*this, "nvram") { }
+		  m_nvram(*this, "nvram"),
+		  m_ram_base(*this, "ram_base"),
+		  m_fastram_base(*this, "fastram_base"),
+		  m_tms32031_control(*this, "32031_control"),
+		  m_midvplus_misc(*this, "midvplus_misc"),
+		  m_videoram(*this, "videoram", 32),
+		  m_textureram(*this, "textureram") { }
 
 	optional_shared_ptr<UINT32>	m_nvram;
-	UINT32 *m_ram_base;
-	UINT32 *m_fastram_base;
+	required_shared_ptr<UINT32> m_ram_base;
+	optional_shared_ptr<UINT32> m_fastram_base;
+	required_shared_ptr<UINT32> m_tms32031_control;
+	optional_shared_ptr<UINT32> m_midvplus_misc;
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT32> m_textureram;
+
 	UINT8 m_cmos_protected;
 	UINT16 m_control_data;
 	UINT8 m_adc_data;
@@ -52,13 +63,9 @@ public:
 	UINT8 m_shifter_state;
 	timer_device *m_timer[2];
 	double m_timer_rate;
-	UINT32 *m_tms32031_control;
-	UINT32 *m_midvplus_misc;
 	UINT16 m_bit_index;
 	int m_lastval;
 	UINT32 *m_generic_speedup;
-	UINT16 *m_videoram;
-	UINT32 *m_textureram;
 	UINT16 m_video_regs[16];
 	UINT16 m_dma_data[16];
 	UINT8 m_dma_data_index;
@@ -66,29 +73,51 @@ public:
 	UINT8 m_video_changed;
 	emu_timer *m_scanline_timer;
 	midvunit_renderer *m_poly;
+	DECLARE_WRITE32_MEMBER(midvunit_dma_queue_w);
+	DECLARE_READ32_MEMBER(midvunit_dma_queue_entries_r);
+	DECLARE_READ32_MEMBER(midvunit_dma_trigger_r);
+	DECLARE_WRITE32_MEMBER(midvunit_page_control_w);
+	DECLARE_READ32_MEMBER(midvunit_page_control_r);
+	DECLARE_WRITE32_MEMBER(midvunit_video_control_w);
+	DECLARE_READ32_MEMBER(midvunit_scanline_r);
+	DECLARE_WRITE32_MEMBER(midvunit_videoram_w);
+	DECLARE_READ32_MEMBER(midvunit_videoram_r);
+	DECLARE_WRITE32_MEMBER(midvunit_paletteram_w);
+	DECLARE_WRITE32_MEMBER(midvunit_textureram_w);
+	DECLARE_READ32_MEMBER(midvunit_textureram_r);
+	DECLARE_READ32_MEMBER(port0_r);
+	DECLARE_READ32_MEMBER(midvunit_adc_r);
+	DECLARE_WRITE32_MEMBER(midvunit_adc_w);
+	DECLARE_WRITE32_MEMBER(midvunit_cmos_protect_w);
+	DECLARE_WRITE32_MEMBER(midvunit_cmos_w);
+	DECLARE_READ32_MEMBER(midvunit_cmos_r);
+	DECLARE_WRITE32_MEMBER(midvunit_control_w);
+	DECLARE_WRITE32_MEMBER(crusnwld_control_w);
+	DECLARE_WRITE32_MEMBER(midvunit_sound_w);
+	DECLARE_READ32_MEMBER(tms32031_control_r);
+	DECLARE_WRITE32_MEMBER(tms32031_control_w);
+	DECLARE_READ32_MEMBER(crusnwld_serial_status_r);
+	DECLARE_READ32_MEMBER(crusnwld_serial_data_r);
+	DECLARE_WRITE32_MEMBER(crusnwld_serial_data_w);
+	DECLARE_READ32_MEMBER(bit_data_r);
+	DECLARE_WRITE32_MEMBER(bit_reset_w);
+	DECLARE_READ32_MEMBER(offroadc_serial_status_r);
+	DECLARE_READ32_MEMBER(offroadc_serial_data_r);
+	DECLARE_WRITE32_MEMBER(offroadc_serial_data_w);
+	DECLARE_READ32_MEMBER(midvplus_misc_r);
+	DECLARE_WRITE32_MEMBER(midvplus_misc_w);
+	DECLARE_READ32_MEMBER(generic_speedup_r);
 };
 
 
 
 /*----------- defined in video/midvunit.c -----------*/
 
-WRITE32_HANDLER( midvunit_dma_queue_w );
-READ32_HANDLER( midvunit_dma_queue_entries_r );
-READ32_HANDLER( midvunit_dma_trigger_r );
 
-WRITE32_HANDLER( midvunit_page_control_w );
-READ32_HANDLER( midvunit_page_control_r );
 
-WRITE32_HANDLER( midvunit_video_control_w );
-READ32_HANDLER( midvunit_scanline_r );
 
-WRITE32_HANDLER( midvunit_videoram_w );
-READ32_HANDLER( midvunit_videoram_r );
 
-WRITE32_HANDLER( midvunit_paletteram_w );
 
-WRITE32_HANDLER( midvunit_textureram_w );
-READ32_HANDLER( midvunit_textureram_r );
 
 VIDEO_START( midvunit );
 SCREEN_UPDATE_IND16( midvunit );

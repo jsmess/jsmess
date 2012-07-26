@@ -1,5 +1,3 @@
-#define ADDRESS_MAP_MODERN
-
 #include "emu.h"
 #include "sound/cdp1869.h"
 #include "includes/tmc600.h"
@@ -72,7 +70,7 @@ WRITE8_MEMBER( tmc600_state::page_ram_w )
 }
 
 static ADDRESS_MAP_START( cdp1869_page_ram, AS_0, 8, tmc600_state )
-	AM_RANGE(0x000, 0x3ff) AM_MIRROR(0x400) AM_RAM AM_BASE(m_page_ram) AM_WRITE(page_ram_w)
+	AM_RANGE(0x000, 0x3ff) AM_MIRROR(0x400) AM_RAM AM_SHARE("page_ram") AM_WRITE(page_ram_w)
 ADDRESS_MAP_END
 
 static CDP1869_CHAR_RAM_READ( tmc600_char_ram_r )
@@ -117,7 +115,7 @@ void tmc600_state::video_start()
 	m_color_ram = auto_alloc_array(machine(), UINT8, TMC600_PAGE_RAM_SIZE);
 
 	// find memory regions
-	m_char_rom = machine().region("chargen")->base();
+	m_char_rom = memregion("chargen")->base();
 
 	// register for state saving
 	save_pointer(NAME(m_color_ram), TMC600_PAGE_RAM_SIZE);

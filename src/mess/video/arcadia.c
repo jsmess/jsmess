@@ -316,53 +316,53 @@ READ8_MEMBER( arcadia_state::arcadia_video_r )
 	switch (offset)
 	{
 	case 0xff: data=m_charline|0xf0;break;
-	case 0x100: data=input_port_read(machine(), "controller1_col1");break;
-	case 0x101: data=input_port_read(machine(), "controller1_col2");break;
-	case 0x102: data=input_port_read(machine(), "controller1_col3");break;
-	case 0x103: data=input_port_read(machine(), "controller1_extra");break;
-	case 0x104: data=input_port_read(machine(), "controller2_col1");break;
-	case 0x105: data=input_port_read(machine(), "controller2_col2");break;
-	case 0x106: data=input_port_read(machine(), "controller2_col3");break;
-	case 0x107: data=input_port_read(machine(), "controller2_extra");break;
-	case 0x108: data=input_port_read(machine(), "panel");break;
+	case 0x100: data=ioport("controller1_col1")->read();break;
+	case 0x101: data=ioport("controller1_col2")->read();break;
+	case 0x102: data=ioport("controller1_col3")->read();break;
+	case 0x103: data=ioport("controller1_extra")->read();break;
+	case 0x104: data=ioport("controller2_col1")->read();break;
+	case 0x105: data=ioport("controller2_col2")->read();break;
+	case 0x106: data=ioport("controller2_col3")->read();break;
+	case 0x107: data=ioport("controller2_extra")->read();break;
+	case 0x108: data=ioport("panel")->read();break;
 #if 0
 	case 0x1fe:
 		if (m_ad_select)
-			data=input_port_read(machine(), "controller1_joy_y")<<3;
+			data=ioport("controller1_joy_y")->read()<<3;
 		else
-			data=input_port_read(machine(), "controller1_joy_x")<<3;
+			data=ioport("controller1_joy_x")->read()<<3;
 		break;
 	case 0x1ff:
 		if (m_ad_select)
-			data=input_port_read(machine(), "controller2_joy_y")<<3;
+			data=ioport("controller2_joy_y")->read()<<3;
 		else
-			data=input_port_read(machine(), "controller2_joy_x")<<3;
+			data=ioport("controller2_joy_x")->read()<<3;
 		break;
 #else
 	case 0x1fe:
 		data = 0x80;
 		if (m_ad_select)
 		{
-			if (input_port_read(machine(), "joysticks")&0x10) data=0;
-			if (input_port_read(machine(), "joysticks")&0x20) data=0xff;
+			if (ioport("joysticks")->read()&0x10) data=0;
+			if (ioport("joysticks")->read()&0x20) data=0xff;
 		}
 		else
 		{
-			if (input_port_read(machine(), "joysticks")&0x40) data=0xff;
-			if (input_port_read(machine(), "joysticks")&0x80) data=0;
+			if (ioport("joysticks")->read()&0x40) data=0xff;
+			if (ioport("joysticks")->read()&0x80) data=0;
 		}
 		break;
 	case 0x1ff:
 		data = 0x6f; // 0x7f too big for alien invaders (move right)
 		if (m_ad_select)
 		{
-			if (input_port_read(machine(), "joysticks")&0x1) data=0;
-			if (input_port_read(machine(), "joysticks")&0x2) data=0xff;
+			if (ioport("joysticks")->read()&0x1) data=0;
+			if (ioport("joysticks")->read()&0x2) data=0xff;
 		}
 		else
 		{
-			if (input_port_read(machine(), "joysticks")&0x4) data=0xff;
-			if (input_port_read(machine(), "joysticks")&0x8) data=0;
+			if (ioport("joysticks")->read()&0x4) data=0xff;
+			if (ioport("joysticks")->read()&0x8) data=0;
 		}
 		break;
 #endif

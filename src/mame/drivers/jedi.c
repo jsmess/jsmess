@@ -140,9 +140,9 @@ static TIMER_CALLBACK( generate_interrupt )
 }
 
 
-static WRITE8_HANDLER( main_irq_ack_w )
+WRITE8_MEMBER(jedi_state::main_irq_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -162,7 +162,7 @@ static MACHINE_START( jedi )
 	state->m_interrupt_timer->adjust(machine.primary_screen->time_until_pos(32), 32);
 
 	/* configure the banks */
-	memory_configure_bank(machine, "bank1", 0, 3, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	state->membank("bank1")->configure_entries(0, 3, state->memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	/* set up save state */
 	state->save_item(NAME(state->m_nvram_enabled));
@@ -193,11 +193,11 @@ static MACHINE_RESET( jedi )
  *
  *************************************/
 
-static WRITE8_HANDLER( rom_banksel_w )
+WRITE8_MEMBER(jedi_state::rom_banksel_w)
 {
-	if (data & 0x01) memory_set_bank(space->machine(), "bank1", 0);
-	if (data & 0x02) memory_set_bank(space->machine(), "bank1", 1);
-	if (data & 0x04) memory_set_bank(space->machine(), "bank1", 2);
+	if (data & 0x01) membank("bank1")->set_entry(0);
+	if (data & 0x02) membank("bank1")->set_entry(1);
+	if (data & 0x04) membank("bank1")->set_entry(2);
 }
 
 
@@ -208,32 +208,30 @@ static WRITE8_HANDLER( rom_banksel_w )
  *
  *************************************/
 
-static READ8_HANDLER( a2d_data_r )
+READ8_MEMBER(jedi_state::a2d_data_r)
 {
-	jedi_state *state = space->machine().driver_data<jedi_state>();
 	UINT8 ret = 0;
 
-	switch (state->m_a2d_select)
+	switch (m_a2d_select)
 	{
-		case 0: ret = input_port_read(space->machine(), "STICKY"); break;
-		case 2: ret = input_port_read(space->machine(), "STICKX"); break;
+		case 0: ret = ioport("STICKY")->read(); break;
+		case 2: ret = ioport("STICKX")->read(); break;
 	}
 
 	return ret;
 }
 
 
-static WRITE8_HANDLER( a2d_select_w )
+WRITE8_MEMBER(jedi_state::a2d_select_w)
 {
-	jedi_state *state = space->machine().driver_data<jedi_state>();
 
-	state->m_a2d_select = offset;
+	m_a2d_select = offset;
 }
 
 
-static WRITE8_HANDLER( jedi_coin_counter_w )
+WRITE8_MEMBER(jedi_state::jedi_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset, data);
+	coin_counter_w(machine(), offset, data);
 }
 
 
@@ -244,20 +242,18 @@ static WRITE8_HANDLER( jedi_coin_counter_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( nvram_data_w )
+WRITE8_MEMBER(jedi_state::nvram_data_w)
 {
-	jedi_state *state = space->machine().driver_data<jedi_state>();
 
-	if (state->m_nvram_enabled)
-		state->m_nvram[offset] = data;
+	if (m_nvram_enabled)
+		m_nvram[offset] = data;
 }
 
 
-static WRITE8_HANDLER( nvram_enable_w )
+WRITE8_MEMBER(jedi_state::nvram_enable_w)
 {
-	jedi_state *state = space->machine().driver_data<jedi_state>();
 
-	state->m_nvram_enabled = ~offset & 1;
+	m_nvram_enabled = ~offset & 1;
 }
 
 
@@ -268,7 +264,7 @@ static WRITE8_HANDLER( nvram_enable_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, jedi_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0300) AM_RAM_WRITE(nvram_data_w) AM_SHARE("nvram")
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03fe) AM_READ_PORT("0c00") AM_WRITENOP
@@ -284,19 +280,19 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1e00, 0x1e00) AM_MIRROR(0x007f) AM_READNOP AM_WRITE(main_irq_ack_w)
 	AM_RANGE(0x1e80, 0x1e81) AM_MIRROR(0x0078) AM_READNOP AM_WRITE(jedi_coin_counter_w)
 	AM_RANGE(0x1e82, 0x1e83) AM_MIRROR(0x0078) AM_NOP	/* write: LED control - not used */
-	AM_RANGE(0x1e84, 0x1e84) AM_MIRROR(0x0078) AM_READNOP AM_WRITEONLY AM_BASE_MEMBER(jedi_state, m_foreground_bank)
+	AM_RANGE(0x1e84, 0x1e84) AM_MIRROR(0x0078) AM_READNOP AM_WRITEONLY AM_SHARE("foreground_bank")
 	AM_RANGE(0x1e85, 0x1e85) AM_MIRROR(0x0078) AM_NOP
 	AM_RANGE(0x1e86, 0x1e86) AM_MIRROR(0x0078) AM_READNOP AM_WRITE(jedi_audio_reset_w)
-	AM_RANGE(0x1e87, 0x1e87) AM_MIRROR(0x0078) AM_READNOP AM_WRITEONLY AM_BASE_MEMBER(jedi_state, m_video_off)
+	AM_RANGE(0x1e87, 0x1e87) AM_MIRROR(0x0078) AM_READNOP AM_WRITEONLY AM_SHARE("video_off")
 	AM_RANGE(0x1f00, 0x1f00) AM_MIRROR(0x007f) AM_READNOP AM_WRITE(jedi_audio_latch_w)
 	AM_RANGE(0x1f80, 0x1f80) AM_MIRROR(0x007f) AM_READNOP AM_WRITE(rom_banksel_w)
-	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE_MEMBER(jedi_state, m_backgroundram)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_MEMBER(jedi_state, m_paletteram)
-	AM_RANGE(0x3000, 0x37bf) AM_RAM AM_BASE_MEMBER(jedi_state, m_foregroundram)
-	AM_RANGE(0x37c0, 0x3bff) AM_RAM AM_BASE_MEMBER(jedi_state, m_spriteram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_SHARE("backgroundram")
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_SHARE("paletteram")
+	AM_RANGE(0x3000, 0x37bf) AM_RAM AM_SHARE("foregroundram")
+	AM_RANGE(0x37c0, 0x3bff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3c00, 0x3c01) AM_MIRROR(0x00fe) AM_READNOP AM_WRITE(jedi_vscroll_w)
 	AM_RANGE(0x3d00, 0x3d01) AM_MIRROR(0x00fe) AM_READNOP AM_WRITE(jedi_hscroll_w)
-	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x01ff) AM_WRITEONLY AM_BASE_MEMBER(jedi_state, m_smoothing_table)
+	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x01ff) AM_WRITEONLY AM_SHARE("smoothing_table")
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -324,8 +320,8 @@ static INPUT_PORTS_START( jedi )
 	PORT_BIT( 0x03, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_BIT( 0x18, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(jedi_audio_comm_stat_r, NULL)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x60, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,jedi_state,jedi_audio_comm_stat_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("STICKY")	/* analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)

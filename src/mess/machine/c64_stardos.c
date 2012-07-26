@@ -7,6 +7,26 @@
 
 **********************************************************************/
 
+/*
+
+    PCB Layout
+    ----------
+
+    |===========================|
+    |=|                         |
+    |=|   LS30                  |
+    |=|               LS157     |
+    |=|          LS00           |
+    |=|   ROM                   |
+    |=|          7407           |
+    |=|                         |
+    |=|                      SW1|
+    |===========================|
+
+    ROM     - Toshiba TMM271128D-25 16Kx8 EPROM
+
+*/
+
 #include "c64_stardos.h"
 
 
@@ -128,7 +148,7 @@ void c64_stardos_cartridge_device::device_start()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_stardos_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
+UINT8 c64_stardos_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
 
@@ -154,7 +174,7 @@ UINT8 c64_stardos_cartridge_device::c64_cd_r(address_space &space, offs_t offset
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_stardos_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)
+void c64_stardos_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{

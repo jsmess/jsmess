@@ -40,9 +40,9 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-static INPUT_CHANGED( trigger_reset )
+INPUT_CHANGED_MEMBER( beta_state::trigger_reset )
 {
-	cputag_set_input_line(field.machine(), M6502_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( beta )
@@ -79,7 +79,7 @@ static INPUT_PORTS_START( beta )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_R) PORT_CHANGED(trigger_reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RESET") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, beta_state, trigger_reset, 0)
 INPUT_PORTS_END
 
 /* M6532 Interface */
@@ -115,14 +115,14 @@ READ8_MEMBER( beta_state::riot_pa_r )
 
 	switch (m_ls145_p)
 	{
-	case 6: data &= input_port_read(machine(), "Q6"); break;
-	case 7: data &= input_port_read(machine(), "Q7"); break;
-	case 8: data &= input_port_read(machine(), "Q8"); break;
-	case 9: data &= input_port_read(machine(), "Q9"); break;
+	case 6: data &= ioport("Q6")->read(); break;
+	case 7: data &= ioport("Q7")->read(); break;
+	case 8: data &= ioport("Q8")->read(); break;
+	case 9: data &= ioport("Q9")->read(); break;
 	default:
 		if (!m_eprom_oe && !m_eprom_ce)
 		{
-			data = machine().region(EPROM_TAG)->base()[m_eprom_addr & 0x7ff];
+			data = memregion(EPROM_TAG)->base()[m_eprom_addr & 0x7ff];
 			popmessage("EPROM read %04x = %02x\n", m_eprom_addr & 0x7ff, data);
 		}
 	}
@@ -209,7 +209,7 @@ WRITE8_MEMBER( beta_state::riot_pb_w )
 	if (BIT(data, 6) && (!BIT(m_old_data, 7) && BIT(data, 7)))
 	{
 		popmessage("EPROM write %04x = %02x\n", m_eprom_addr & 0x7ff, m_eprom_data);
-		machine().region(EPROM_TAG)->base()[m_eprom_addr & 0x7ff] &= m_eprom_data;
+		memregion(EPROM_TAG)->base()[m_eprom_addr & 0x7ff] &= m_eprom_data;
 	}
 
 	m_old_data = data;
@@ -228,7 +228,7 @@ static const riot6532_interface beta_riot_interface =
 
 static DEVICE_IMAGE_UNLOAD( beta_eprom )
 {
-	UINT8 *ptr = image.device().machine().region(EPROM_TAG)->base();
+	UINT8 *ptr = image.device().machine().root_device().memregion(EPROM_TAG)->base();
 
 	image.fwrite(ptr, 0x800);
 }

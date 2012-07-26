@@ -469,7 +469,7 @@
 
 */
 
-static WRITE8_HANDLER( ampoker2_port30_w )
+WRITE8_MEMBER(ampoker2_state::ampoker2_port30_w)
 /*-------------------------------------------------
     PORT_30 C000H         ;OUTPUT PORT 30H
 ---------------------------------------------------
@@ -483,7 +483,7 @@ static WRITE8_HANDLER( ampoker2_port30_w )
 }
 
 
-static WRITE8_HANDLER( ampoker2_port31_w )
+WRITE8_MEMBER(ampoker2_state::ampoker2_port31_w)
 /*-------------------------------------------------
     PORT_31 C001H         ;OUTPUT PORT 31H
 ---------------------------------------------------
@@ -501,7 +501,7 @@ static WRITE8_HANDLER( ampoker2_port31_w )
 }
 
 
-static WRITE8_HANDLER( ampoker2_port32_w )
+WRITE8_MEMBER(ampoker2_state::ampoker2_port32_w)
 /*-------------------------------------------------
     PORT_32 C002H         ;OUTPUT PORT 32H
 ---------------------------------------------------
@@ -516,7 +516,7 @@ static WRITE8_HANDLER( ampoker2_port32_w )
 }
 
 
-static WRITE8_HANDLER( ampoker2_port33_w )
+WRITE8_MEMBER(ampoker2_state::ampoker2_port33_w)
 /*-------------------------------------------------
     PORT_33 C003H         ;OUTPUT PORT 33H
 ---------------------------------------------------
@@ -530,7 +530,7 @@ static WRITE8_HANDLER( ampoker2_port33_w )
 }
 
 
-static WRITE8_HANDLER( ampoker2_port34_w )
+WRITE8_MEMBER(ampoker2_state::ampoker2_port34_w)
 /*-------------------------------------------------
     PORT_34 C004H         ;OUTPUT PORT 34H
 ---------------------------------------------------
@@ -545,7 +545,7 @@ static WRITE8_HANDLER( ampoker2_port34_w )
 }
 
 
-static WRITE8_HANDLER( ampoker2_port35_w )
+WRITE8_MEMBER(ampoker2_state::ampoker2_port35_w)
 /*-------------------------------------------------
     PORT_35 C005H         ;OUTPUT PORT 35H
 ---------------------------------------------------
@@ -559,7 +559,7 @@ static WRITE8_HANDLER( ampoker2_port35_w )
 }
 
 
-static WRITE8_HANDLER( ampoker2_port36_w )
+WRITE8_MEMBER(ampoker2_state::ampoker2_port36_w)
 /*-------------------------------------------------
     PORT_36 C006H         ;OUTPUT PORT 36H
 ---------------------------------------------------
@@ -577,7 +577,7 @@ static WRITE8_HANDLER( ampoker2_port36_w )
 }
 
 
-static WRITE8_HANDLER( ampoker2_watchdog_reset_w )
+WRITE8_MEMBER(ampoker2_state::ampoker2_watchdog_reset_w)
 /*-------------------------------------------------
     PORT_37 C007H         ;OUTPUT PORT 37H
 ---------------------------------------------------
@@ -588,7 +588,7 @@ static WRITE8_HANDLER( ampoker2_watchdog_reset_w )
 
 	if (((data >> 3) & 0x01) == 0)		/* check for refresh value (0x08) */
 	{
-		watchdog_reset(space->machine());
+		machine().watchdog_reset();
 //      popmessage("%02x", data);
 	}
 	else
@@ -602,13 +602,13 @@ static WRITE8_HANDLER( ampoker2_watchdog_reset_w )
 * Memory map information *
 *************************/
 
-static ADDRESS_MAP_START( ampoker2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ampoker2_map, AS_PROGRAM, 8, ampoker2_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(ampoker2_videoram_w) AM_BASE_MEMBER(ampoker2_state, m_videoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(ampoker2_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ampoker2_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( ampoker2_io_map, AS_IO, 8, ampoker2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x0f) AM_WRITENOP				/* inexistent in the real hardware */
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
@@ -620,16 +620,16 @@ static ADDRESS_MAP_START( ampoker2_io_map, AS_IO, 8 )
 	AM_RANGE(0x16, 0x16) AM_READ_PORT("IN6")
 	AM_RANGE(0x17, 0x17) AM_READ_PORT("IN7")
 //  AM_RANGE(0x21, 0x21) AM_WRITENOP                    /* undocumented, write 0x1a after each reset */
-	AM_RANGE(0x30, 0x30) AM_WRITE (ampoker2_port30_w)	/* see write handlers */
-	AM_RANGE(0x31, 0x31) AM_WRITE (ampoker2_port31_w)	/* see write handlers */
-	AM_RANGE(0x32, 0x32) AM_WRITE (ampoker2_port32_w)	/* see write handlers */
-	AM_RANGE(0x33, 0x33) AM_WRITE (ampoker2_port33_w)	/* see write handlers */
-	AM_RANGE(0x34, 0x34) AM_WRITE (ampoker2_port34_w)	/* see write handlers */
-	AM_RANGE(0x35, 0x35) AM_WRITE (ampoker2_port35_w)	/* see write handlers */
-	AM_RANGE(0x36, 0x36) AM_WRITE (ampoker2_port36_w)	/* see write handlers */
+	AM_RANGE(0x30, 0x30) AM_WRITE(ampoker2_port30_w)	/* see write handlers */
+	AM_RANGE(0x31, 0x31) AM_WRITE(ampoker2_port31_w)	/* see write handlers */
+	AM_RANGE(0x32, 0x32) AM_WRITE(ampoker2_port32_w)	/* see write handlers */
+	AM_RANGE(0x33, 0x33) AM_WRITE(ampoker2_port33_w)	/* see write handlers */
+	AM_RANGE(0x34, 0x34) AM_WRITE(ampoker2_port34_w)	/* see write handlers */
+	AM_RANGE(0x35, 0x35) AM_WRITE(ampoker2_port35_w)	/* see write handlers */
+	AM_RANGE(0x36, 0x36) AM_WRITE(ampoker2_port36_w)	/* see write handlers */
 	AM_RANGE(0x37, 0x37) AM_WRITE(ampoker2_watchdog_reset_w)
-	AM_RANGE(0x38, 0x39) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x3A, 0x3A) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x38, 0x39) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x3A, 0x3A) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 ADDRESS_MAP_END
 
 /*
@@ -703,10 +703,10 @@ static INPUT_PORTS_START( ampoker2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Out") PORT_CODE(KEYCODE_G)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Supervisor Key") PORT_TOGGLE PORT_CODE(KEYCODE_0)
 	PORT_DIPNAME( 0x08, 0x08, "Remote Credits" ) PORT_DIPLOCATION("SW1:1") /* DSW1 */
-	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1", 0x08, PORTCOND_EQUALS,0x08)
-	PORT_DIPSETTING(    0x00, "Cred x  50" ) PORT_CONDITION("IN1", 0x08, PORTCOND_EQUALS,0x08)
-	PORT_DIPSETTING(    0x08, "Cred x  20" ) PORT_CONDITION("IN1", 0x08, PORTCOND_EQUALS,0x00) /* x100 in ampkr95 */
-	PORT_DIPSETTING(    0x00, "Remote Off" ) PORT_CONDITION("IN1", 0x08, PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1", 0x08, EQUALS,0x08)
+	PORT_DIPSETTING(    0x00, "Cred x  50" ) PORT_CONDITION("IN1", 0x08, EQUALS,0x08)
+	PORT_DIPSETTING(    0x08, "Cred x  20" ) PORT_CONDITION("IN1", 0x08, EQUALS,0x00) /* x100 in ampkr95 */
+	PORT_DIPSETTING(    0x00, "Remote Off" ) PORT_CONDITION("IN1", 0x08, EQUALS,0x00)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Black Card")
 
 	PORT_START("IN4")
@@ -788,10 +788,10 @@ static INPUT_PORTS_START( ampkr95 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Out") PORT_CODE(KEYCODE_G)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Supervisor Key") PORT_TOGGLE PORT_CODE(KEYCODE_0)
 	PORT_DIPNAME( 0x08, 0x08, "Remote Credits" ) PORT_DIPLOCATION("SW1:1") /* DSW1 */
-	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1",0x08,PORTCOND_EQUALS,0x08)
-	PORT_DIPSETTING(    0x00, "Cred x  50" ) PORT_CONDITION("IN1",0x08,PORTCOND_EQUALS,0x08)
-	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1",0x08,PORTCOND_EQUALS,0x00) /* x100 in ampkr95 */
-	PORT_DIPSETTING(    0x00, "Remote Off" ) PORT_CONDITION("IN1",0x08,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1",0x08,EQUALS,0x08)
+	PORT_DIPSETTING(    0x00, "Cred x  50" ) PORT_CONDITION("IN1",0x08,EQUALS,0x08)
+	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1",0x08,EQUALS,0x00) /* x100 in ampkr95 */
+	PORT_DIPSETTING(    0x00, "Remote Off" ) PORT_CONDITION("IN1",0x08,EQUALS,0x00)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW ) PORT_NAME("Black Card")
 
 	PORT_START("IN4")
@@ -873,10 +873,10 @@ static INPUT_PORTS_START( sigmapkr )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Hopper Out") PORT_CODE(KEYCODE_G)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Supervisor Key") PORT_TOGGLE PORT_CODE(KEYCODE_0)
 	PORT_DIPNAME( 0x08, 0x08, "Remote Credits" ) PORT_DIPLOCATION("SW1:1") /* DSW1 */
-	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1",0x08,PORTCOND_EQUALS,0x08)
-	PORT_DIPSETTING(    0x00, "Cred x  50" ) PORT_CONDITION("IN1",0x08,PORTCOND_EQUALS,0x08)
-	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1",0x08,PORTCOND_EQUALS,0x00) /* x100 in ampkr95 */
-	PORT_DIPSETTING(    0x00, "Remote Off" ) PORT_CONDITION("IN1",0x08,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1",0x08,EQUALS,0x08)
+	PORT_DIPSETTING(    0x00, "Cred x  50" ) PORT_CONDITION("IN1",0x08,EQUALS,0x08)
+	PORT_DIPSETTING(    0x08, "Cred x 100" ) PORT_CONDITION("IN1",0x08,EQUALS,0x00) /* x100 in ampkr95 */
+	PORT_DIPSETTING(    0x00, "Remote Off" ) PORT_CONDITION("IN1",0x08,EQUALS,0x00)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Double") PORT_CODE(KEYCODE_S)
 
 	PORT_START("IN4")
@@ -1405,8 +1405,8 @@ ROM_END
 static DRIVER_INIT( rabbitpk )
 {
 
-	UINT8 *rom = machine.region("maincpu")->base();
-	int size = machine.region("maincpu")->bytes();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	int size = machine.root_device().memregion("maincpu")->bytes();
 	int start = 0;
 	int i;
 
@@ -1457,7 +1457,7 @@ static DRIVER_INIT( piccolop )
 
 */
 
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	/* NOP'ing the mortal jump... */
 	rom[0x154b] = 0x00;

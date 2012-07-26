@@ -60,7 +60,7 @@ Notes:
 
 static DRIVER_INIT( hardhead )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x8000; i++)
@@ -75,15 +75,15 @@ static DRIVER_INIT( hardhead )
 			rom[i] = BITSWAP8(rom[i], 7,6,5,3,4,2,1,0) ^ 0x58;
 	}
 
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /* Non encrypted bootleg */
 static DRIVER_INIT( hardhedb )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, machine.region("maincpu")->base() + 0x48000);
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	space->set_decrypted_region(0x0000, 0x7fff, machine.root_device().memregion("maincpu")->base() + 0x48000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /***************************************************************************
@@ -95,8 +95,8 @@ static DRIVER_INIT( hardhedb )
 static UINT8 *brickzn_decrypt(running_machine &machine)
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8	*RAM	=	machine.region("maincpu")->base();
-	size_t	size	=	machine.region("maincpu")->bytes();
+	UINT8	*RAM	=	machine.root_device().memregion("maincpu")->base();
+	size_t	size	=	machine.root_device().memregion("maincpu")->bytes();
 	UINT8   *decrypt = auto_alloc_array(machine, UINT8, size);
 	int i;
 
@@ -137,7 +137,7 @@ static UINT8 *brickzn_decrypt(running_machine &machine)
 
 static DRIVER_INIT( brickzn )
 {
-	UINT8	*RAM	=	machine.region("maincpu")->base();
+	UINT8	*RAM	=	machine.root_device().memregion("maincpu")->base();
 	UINT8   *decrypt = brickzn_decrypt(machine);
 	int i;
 
@@ -162,13 +162,13 @@ static DRIVER_INIT( brickzn )
 	decrypt[0x24b5] = 0x00;	// HALT -> NOP
 	decrypt[0x2583] = 0x00;	// HALT -> NOP
 
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
-	memory_configure_bank_decrypted(machine, "bank1", 0, 16, decrypt + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x10000, 0x4000);
 }
 
 static DRIVER_INIT( brickzn3 )
 {
-	UINT8	*RAM	=	machine.region("maincpu")->base();
+	UINT8	*RAM	=	machine.root_device().memregion("maincpu")->base();
 	UINT8   *decrypt = brickzn_decrypt(machine);
 	int i;
 
@@ -193,8 +193,8 @@ static DRIVER_INIT( brickzn3 )
 	decrypt[0x2487] = 0x00;	// HALT -> NOP
 	decrypt[0x256c] = 0x00;	// HALT -> NOP
 
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
-	memory_configure_bank_decrypted(machine, "bank1", 0, 16, decrypt + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x10000, 0x4000);
 }
 
 
@@ -205,8 +205,8 @@ static DRIVER_INIT( brickzn3 )
 static DRIVER_INIT( hardhea2 )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8	*RAM	=	machine.region("maincpu")->base();
-	size_t	size	=	machine.region("maincpu")->bytes();
+	UINT8	*RAM	=	machine.root_device().memregion("maincpu")->base();
+	size_t	size	=	machine.root_device().memregion("maincpu")->bytes();
 	UINT8   *decrypt =	auto_alloc_array(machine, UINT8, size);
 	UINT8 x;
 	int i;
@@ -280,8 +280,8 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x41;
 	}
 
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
-	memory_configure_bank(machine, "bank2", 0, 2, auto_alloc_array(machine, UINT8, 0x2000 * 2), 0x2000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank2")->configure_entries(0, 2, auto_alloc_array(machine, UINT8, 0x2000 * 2), 0x2000);
 }
 
 
@@ -292,8 +292,8 @@ rom13:  0?, 1y, 2n, 3n      ?,?,?,? (palettes)
 static DRIVER_INIT( starfigh )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8	*RAM	=	machine.region("maincpu")->base();
-	size_t	size	=	machine.region("maincpu")->bytes();
+	UINT8	*RAM	=	machine.root_device().memregion("maincpu")->base();
+	size_t	size	=	machine.root_device().memregion("maincpu")->bytes();
 	UINT8   *decrypt =	auto_alloc_array(machine, UINT8, size);
 	UINT8 x;
 	int i;
@@ -349,7 +349,7 @@ static DRIVER_INIT( starfigh )
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x45;
 	}
 
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 
@@ -360,8 +360,8 @@ static DRIVER_INIT( starfigh )
 static DRIVER_INIT( sparkman )
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	UINT8	*RAM	=	machine.region("maincpu")->base();
-	size_t	size	=	machine.region("maincpu")->bytes();
+	UINT8	*RAM	=	machine.root_device().memregion("maincpu")->base();
+	size_t	size	=	machine.root_device().memregion("maincpu")->bytes();
 	UINT8   *decrypt =	auto_alloc_array(machine, UINT8, size);
 	UINT8 x;
 	int i;
@@ -417,7 +417,7 @@ static DRIVER_INIT( sparkman )
 			RAM[i] = BITSWAP8(RAM[i], 5,6,7,4,3,2,1,0) ^ 0x44;
 	}
 
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /***************************************************************************
@@ -432,10 +432,9 @@ static DRIVER_INIT( sparkman )
                                 Hard Head
 ***************************************************************************/
 
-static READ8_HANDLER( hardhead_protection_r )
+READ8_MEMBER(suna8_state::hardhead_protection_r)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
-	UINT8 protection_val = state->m_protection_val;
+	UINT8 protection_val = m_protection_val;
 
 	if (protection_val & 0x80)
 		return	((~offset & 0x20)			?	0x20 : 0) |
@@ -446,12 +445,11 @@ static READ8_HANDLER( hardhead_protection_r )
 				(((offset ^ protection_val) & 0x01)	?	0x84 : 0);
 }
 
-static WRITE8_HANDLER( hardhead_protection_w )
+WRITE8_MEMBER(suna8_state::hardhead_protection_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	if (data & 0x80)	state->m_protection_val = data;
-	else				state->m_protection_val = offset & 1;
+	if (data & 0x80)	m_protection_val = data;
+	else				m_protection_val = offset & 1;
 }
 
 
@@ -467,18 +465,17 @@ static WRITE8_HANDLER( hardhead_protection_w )
                                 Hard Head
 ***************************************************************************/
 
-static READ8_HANDLER( hardhead_ip_r )
+READ8_MEMBER(suna8_state::hardhead_ip_r)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	switch (*state->m_hardhead_ip)
+	switch (*m_hardhead_ip)
 	{
-		case 0:	return input_port_read(space->machine(), "P1");
-		case 1:	return input_port_read(space->machine(), "P2");
-		case 2:	return input_port_read(space->machine(), "DSW1");
-		case 3:	return input_port_read(space->machine(), "DSW2");
+		case 0:	return ioport("P1")->read();
+		case 1:	return ioport("P2")->read();
+		case 2:	return ioport("DSW1")->read();
+		case 3:	return ioport("DSW2")->read();
 		default:
-			logerror("CPU #0 - PC %04X: Unknown IP read: %02X\n", cpu_get_pc(&space->device()), *state->m_hardhead_ip);
+			logerror("CPU #0 - PC %04X: Unknown IP read: %02X\n", cpu_get_pc(&space.device()), *m_hardhead_ip);
 			return 0xff;
 	}
 }
@@ -488,12 +485,12 @@ static READ8_HANDLER( hardhead_ip_r )
     ---4 ----
     ---- 3210   ROM Bank
 */
-static WRITE8_HANDLER( hardhead_bankswitch_w )
+WRITE8_MEMBER(suna8_state::hardhead_bankswitch_w)
 {
 	int bank = data & 0x0f;
 
-	if (data & ~0xef)	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(&space->device()),data);
-	memory_set_bank(space->machine(), "bank1", bank);
+	if (data & ~0xef)	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(&space.device()),data);
+	membank("bank1")->set_entry(bank);
 }
 
 
@@ -503,31 +500,31 @@ static WRITE8_HANDLER( hardhead_bankswitch_w )
     ---- -2--   Flip Screen
     ---- --10
 */
-static WRITE8_HANDLER( hardhead_flipscreen_w )
+WRITE8_MEMBER(suna8_state::hardhead_flipscreen_w)
 {
-	flip_screen_set(space->machine(),     data & 0x04);
-	coin_lockout_w ( space->machine(), 0,	data & 0x08);
-	coin_lockout_w ( space->machine(), 1,	data & 0x10);
+	flip_screen_set(data & 0x04);
+	coin_lockout_w ( machine(), 0,	data & 0x08);
+	coin_lockout_w ( machine(), 1,	data & 0x10);
 }
 
-static ADDRESS_MAP_START( hardhead_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hardhead_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")						// Banked ROM
 	AM_RANGE(0xc000, 0xd7ff) AM_RAM								// RAM
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)	// Palette
-	AM_RANGE(0xda00, 0xda00) AM_RAM_READ(hardhead_ip_r) AM_BASE_MEMBER(suna8_state, m_hardhead_ip)	// Input Port Select
-	AM_RANGE(0xda80, 0xda80) AM_READWRITE(soundlatch2_r, hardhead_bankswitch_w	)	// ROM Banking
-	AM_RANGE(0xdb00, 0xdb00) AM_WRITE(soundlatch_w			)	// To Sound CPU
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0xda00, 0xda00) AM_RAM_READ(hardhead_ip_r) AM_SHARE("hardhead_ip")	// Input Port Select
+	AM_RANGE(0xda80, 0xda80) AM_READ(soundlatch2_byte_r) AM_WRITE(hardhead_bankswitch_w	)	// ROM Banking
+	AM_RANGE(0xdb00, 0xdb00) AM_WRITE(soundlatch_byte_w			)	// To Sound CPU
 	AM_RANGE(0xdb80, 0xdb80) AM_WRITE(hardhead_flipscreen_w	)	// Flip Screen + Coin Lockout
 	AM_RANGE(0xdc00, 0xdc00) AM_NOP								// <- R (after bank select)
 	AM_RANGE(0xdc80, 0xdc80) AM_NOP								// <- R (after bank select)
 	AM_RANGE(0xdd00, 0xdd00) AM_NOP								// <- R (after ip select)
 	AM_RANGE(0xdd80, 0xddff) AM_READWRITE(hardhead_protection_r, hardhead_protection_w	)	// Protection
-	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(suna8_spriteram_w) AM_BASE_MEMBER(suna8_state, m_spriteram)	// Sprites
+	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(suna8_spriteram_w) AM_SHARE("spriteram")	// Sprites
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hardhead_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( hardhead_io_map, AS_IO, 8, suna8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READNOP	// ? IRQ Ack
 ADDRESS_MAP_END
@@ -543,18 +540,18 @@ ADDRESS_MAP_END
     ---- 3---
     ---- -210   ROM Bank
 */
-static WRITE8_HANDLER( rranger_bankswitch_w )
+WRITE8_MEMBER(suna8_state::rranger_bankswitch_w)
 {
 	int bank = data & 0x07;
 	if ((~data & 0x10) && (bank >= 4))	bank += 4;
 
-	if (data & ~0xf7)	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(&space->device()),data);
+	if (data & ~0xf7)	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(&space.device()),data);
 
-	memory_set_bank(space->machine(), "bank1", bank);
+	membank("bank1")->set_entry(bank);
 
-	flip_screen_set(space->machine(),     data & 0x20);
-	coin_lockout_w ( space->machine(), 0,	data & 0x40);
-	coin_lockout_w ( space->machine(), 1,	data & 0x80);
+	flip_screen_set(data & 0x20);
+	coin_lockout_w ( machine(), 0,	data & 0x40);
+	coin_lockout_w ( machine(), 1,	data & 0x80);
 }
 
 /*
@@ -565,23 +562,23 @@ static WRITE8_HANDLER( rranger_bankswitch_w )
     ---- --1-   1 -> Interlude screens
     ---- ---0
 */
-static READ8_HANDLER( rranger_soundstatus_r )
+READ8_MEMBER(suna8_state::rranger_soundstatus_r)
 {
-	soundlatch2_r(space, offset);
+	soundlatch2_byte_r(space, offset);
 	return 0x02;
 }
 
-static WRITE8_HANDLER( sranger_prot_w )
+WRITE8_MEMBER(suna8_state::sranger_prot_w)
 {
 	/* check code at 0x2ce2 (in sranger), protection is so dire that I can't even exactly
        estabilish if what I'm doing can be considered or not a kludge... -AS */
-	space->write_byte(0xcd99,0xff);
+	space.write_byte(0xcd99,0xff);
 }
 
-static ADDRESS_MAP_START( rranger_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rranger_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")						// Banked ROM
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE(watchdog_reset_r, soundlatch_w)	// To Sound CPU
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(watchdog_reset_r, soundlatch_byte_w)	// To Sound CPU
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(rranger_bankswitch_w	)	// ROM Banking
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P1")					// P1 (Inputs)
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("P2")					// P2
@@ -590,13 +587,13 @@ static ADDRESS_MAP_START( rranger_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc280, 0xc280) AM_WRITENOP	// ? NMI Ack
 	AM_RANGE(0xc280, 0xc280) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE(0xc2c0, 0xc2c0) AM_READ_PORT("DSW2")				// DSW 2
-	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram)	// Palette
+	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xc800, 0xdfff) AM_RAM								// RAM
-	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(suna8_spriteram_w) AM_BASE_MEMBER(suna8_state, m_spriteram)	// Sprites
+	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(suna8_spriteram_w) AM_SHARE("spriteram")	// Sprites
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( rranger_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( rranger_io_map, AS_IO, 8, suna8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READNOP	// ? IRQ Ack
 ADDRESS_MAP_END
@@ -608,22 +605,21 @@ ADDRESS_MAP_END
 /*
 ?
 */
-static READ8_HANDLER( brickzn_c140_r )
+READ8_MEMBER(suna8_state::brickzn_c140_r)
 {
 	return 0xff;
 }
 
 /*
 */
-static WRITE8_HANDLER( brickzn_palettebank_w )
+WRITE8_MEMBER(suna8_state::brickzn_palettebank_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	state->m_palettebank = (data >> 1) & 1;
-	if (data & ~0x02)	logerror("CPU #0 - PC %04X: unknown palettebank bits: %02X\n",cpu_get_pc(&space->device()),data);
+	m_palettebank = (data >> 1) & 1;
+	if (data & ~0x02)	logerror("CPU #0 - PC %04X: unknown palettebank bits: %02X\n",cpu_get_pc(&space.device()),data);
 
 	/* Also used as soundlatch - depending on c0c0? */
-	soundlatch_w(space,0,data);
+	soundlatch_byte_w(space,0,data);
 }
 
 /*
@@ -631,38 +627,35 @@ static WRITE8_HANDLER( brickzn_palettebank_w )
     ---- --1-   Ram Bank
     ---- ---0   Flip Screen
 */
-static WRITE8_HANDLER( brickzn_spritebank_w )
+WRITE8_MEMBER(suna8_state::brickzn_spritebank_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	state->m_spritebank = (data >> 1) & 1;
-	if (data & ~0x03)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(&space->device()),data);
-	flip_screen_set(space->machine(),  data & 0x01 );
+	m_spritebank = (data >> 1) & 1;
+	if (data & ~0x03)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(&space.device()),data);
+	flip_screen_set(data & 0x01 );
 }
 
-static WRITE8_HANDLER( brickzn_unknown_w )
+WRITE8_MEMBER(suna8_state::brickzn_unknown_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	state->m_unknown = data;
+	m_unknown = data;
 }
 
 /*
     7654 ----
     ---- 3210   ROM Bank
 */
-static WRITE8_HANDLER( brickzn_rombank_w )
+WRITE8_MEMBER(suna8_state::brickzn_rombank_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 	int bank = data & 0x0f;
 
-	if (data & ~0x0f)	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(&space->device()),data);
+	if (data & ~0x0f)	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(&space.device()),data);
 
-	memory_set_bank(space->machine(), "bank1", bank);
-	state->m_rombank = data;
+	membank("bank1")->set_entry(bank);
+	m_rombank = data;
 }
 
-static ADDRESS_MAP_START( brickzn_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( brickzn_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM										// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")								// Banked ROM
 	AM_RANGE(0xc040, 0xc040) AM_WRITE(brickzn_rombank_w				)	// ROM Bank
@@ -676,7 +669,7 @@ static ADDRESS_MAP_START( brickzn_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc108, 0xc108) AM_READ_PORT("TRACK1")					// P1 (Analog)
 	AM_RANGE(0xc10c, 0xc10c) AM_READ_PORT("TRACK2")					// P2
 	AM_RANGE(0xc140, 0xc140) AM_READ(brickzn_c140_r)				// ???
-	AM_RANGE(0xc600, 0xc7ff) AM_READWRITE(suna8_banked_paletteram_r, brickzn_banked_paletteram_w)	// Palette (Banked)
+	AM_RANGE(0xc600, 0xc7ff) AM_READWRITE(banked_paletteram_r, brickzn_banked_paletteram_w)	// Palette (Banked)
 	AM_RANGE(0xc800, 0xdfff) AM_RAM									// RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)	// Sprites (Banked)
 ADDRESS_MAP_END
@@ -687,30 +680,29 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /* Probably wrong: */
-static WRITE8_HANDLER( hardhea2_nmi_w )
+WRITE8_MEMBER(suna8_state::hardhea2_nmi_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	state->m_nmi_enable = data & 0x01;
-//  if (data & ~0x01)   logerror("CPU #0 - PC %04X: unknown nmi bits: %02X\n",cpu_get_pc(&space->device()),data);
+	m_nmi_enable = data & 0x01;
+//  if (data & ~0x01)   logerror("CPU #0 - PC %04X: unknown nmi bits: %02X\n",cpu_get_pc(&space.device()),data);
 }
 
 /*
     7654 321-
     ---- ---0   Flip Screen
 */
-static WRITE8_HANDLER( hardhea2_flipscreen_w )
+WRITE8_MEMBER(suna8_state::hardhea2_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 0x01);
-	if (data & ~0x01)	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(&space->device()),data);
+	flip_screen_set(data & 0x01);
+	if (data & ~0x01)	logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(&space.device()),data);
 }
 
-static WRITE8_HANDLER( hardhea2_leds_w )
+WRITE8_MEMBER(suna8_state::hardhea2_leds_w)
 {
-	set_led_status(space->machine(), 0, data & 0x01);
-	set_led_status(space->machine(), 1, data & 0x02);
-	coin_counter_w(space->machine(), 0, data & 0x04);
-	if (data & ~0x07)	logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(&space->device()),data);
+	set_led_status(machine(), 0, data & 0x01);
+	set_led_status(machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x04);
+	if (data & ~0x07)	logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(&space.device()),data);
 }
 
 /*
@@ -718,55 +710,51 @@ static WRITE8_HANDLER( hardhea2_leds_w )
     ---- --1-   Ram Bank
     ---- ---0   Ram Bank?
 */
-static WRITE8_HANDLER( hardhea2_spritebank_w )
+WRITE8_MEMBER(suna8_state::hardhea2_spritebank_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	state->m_spritebank = (data >> 1) & 1;
-	if (data & ~0x02)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(&space->device()),data);
+	m_spritebank = (data >> 1) & 1;
+	if (data & ~0x02)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(&space.device()),data);
 }
 
 /*
     7654 ----
     ---- 3210   ROM Bank
 */
-static WRITE8_HANDLER( hardhea2_rombank_w )
+WRITE8_MEMBER(suna8_state::hardhea2_rombank_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 	int bank = data & 0x0f;
 
-	if (data & ~0x0f)	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(&space->device()),data);
+	if (data & ~0x0f)	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(&space.device()),data);
 
-	memory_set_bank(space->machine(), "bank1", bank);
+	membank("bank1")->set_entry(bank);
 
-	state->m_rombank = data;
+	m_rombank = data;
 }
 
-static WRITE8_HANDLER( hardhea2_spritebank_0_w )
+WRITE8_MEMBER(suna8_state::hardhea2_spritebank_0_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	state->m_spritebank = 0;
+	m_spritebank = 0;
 }
-static WRITE8_HANDLER( hardhea2_spritebank_1_w )
+WRITE8_MEMBER(suna8_state::hardhea2_spritebank_1_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	state->m_spritebank = 1;
+	m_spritebank = 1;
 }
 
-static WRITE8_HANDLER( hardhea2_rambank_0_w )
+WRITE8_MEMBER(suna8_state::hardhea2_rambank_0_w)
 {
-	memory_set_bank(space->machine(), "bank2", 0);
+	membank("bank2")->set_entry(0);
 }
 
-static WRITE8_HANDLER( hardhea2_rambank_1_w )
+WRITE8_MEMBER(suna8_state::hardhea2_rambank_1_w)
 {
-	memory_set_bank(space->machine(), "bank2", 1);
+	membank("bank2")->set_entry(1);
 }
 
 
-static ADDRESS_MAP_START( hardhea2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hardhea2_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM									// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")							// Banked ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")						// P1 (Inputs)
@@ -785,7 +773,7 @@ static ADDRESS_MAP_START( hardhea2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc380, 0xc380) AM_WRITE(hardhea2_nmi_w				)	// ? NMI related ?
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(hardhea2_leds_w				)	// Leds + Coin Counter
 	AM_RANGE(0xc480, 0xc480) AM_WRITENOP	// ~ROM Bank
-	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_w				)	// To Sound CPU
+	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_byte_w				)	// To Sound CPU
 
 	// *** Protection
 	AM_RANGE(0xc50f, 0xc50f) AM_WRITE(hardhea2_spritebank_1_w )
@@ -801,7 +789,7 @@ static ADDRESS_MAP_START( hardhea2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc533, 0xc533) AM_WRITE(hardhea2_rambank_0_w )
 	// Protection ***
 
-	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram	)	// Palette (Banked??)
+	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram"	)	// Palette (Banked??)
 	AM_RANGE(0xc800, 0xdfff) AM_RAMBANK("bank2")							// RAM (Banked?)
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)	// Sprites (Banked)
 ADDRESS_MAP_END
@@ -811,22 +799,20 @@ ADDRESS_MAP_END
                                 Star Fighter
 ***************************************************************************/
 
-static WRITE8_HANDLER( starfigh_spritebank_latch_w )
+WRITE8_MEMBER(suna8_state::starfigh_spritebank_latch_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	state->m_spritebank_latch = (data >> 2) & 1;
-	if (data & ~0x04)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(&space->device()),data);
+	m_spritebank_latch = (data >> 2) & 1;
+	if (data & ~0x04)	logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(&space.device()),data);
 }
 
-static WRITE8_HANDLER( starfigh_spritebank_w )
+WRITE8_MEMBER(suna8_state::starfigh_spritebank_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	state->m_spritebank = state->m_spritebank_latch;
+	m_spritebank = m_spritebank_latch;
 }
 
-static ADDRESS_MAP_START( starfigh_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( starfigh_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM										// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")								// Banked ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")						// P1 (Inputs)
@@ -838,8 +824,8 @@ static ADDRESS_MAP_START( starfigh_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc280, 0xc280) AM_WRITE(hardhea2_rombank_w			)	// ROM Bank (?mirrored up to c2ff?)
 	AM_RANGE(0xc300, 0xc300) AM_WRITE(hardhea2_flipscreen_w			)	// Flip Screen
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(hardhea2_leds_w				)	// Leds + Coin Counter
-	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_w					)	// To Sound CPU
-	AM_RANGE(0xc600, 0xc7ff) AM_READWRITE(suna8_banked_paletteram_r, paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram	)	// Palette (Banked??)
+	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_byte_w					)	// To Sound CPU
+	AM_RANGE(0xc600, 0xc7ff) AM_READWRITE(banked_paletteram_r, paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram"	)	// Palette (Banked??)
 	AM_RANGE(0xc800, 0xdfff) AM_RAM									// RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)	// Sprites (Banked)
 ADDRESS_MAP_END
@@ -869,51 +855,49 @@ Thrash protection code snippet:
 */
 
 /* This is a command-based protection. */
-static WRITE8_HANDLER( sparkman_cmd_prot_w )
+WRITE8_MEMBER(suna8_state::sparkman_cmd_prot_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
 	switch(data)
 	{
-		case 0xa6: state->m_nmi_enable = 1; break;
-		case 0x00: state->m_nmi_enable = 0; break;
-		case 0x18: state->m_trash_prot = 0; break;
-		case 0xce: state->m_trash_prot = 0; break;
-		case 0x81: state->m_trash_prot = 1; break;
-		case 0x99: state->m_trash_prot = 1; break;
-		case 0x54: state->m_spritebank = 1; break;
-		default: logerror("CPU #0 - PC %04X: unknown protection command: %02X\n",cpu_get_pc(&space->device()),data);
+		case 0xa6: m_nmi_enable = 1; break;
+		case 0x00: m_nmi_enable = 0; break;
+		case 0x18: m_trash_prot = 0; break;
+		case 0xce: m_trash_prot = 0; break;
+		case 0x81: m_trash_prot = 1; break;
+		case 0x99: m_trash_prot = 1; break;
+		case 0x54: m_spritebank = 1; break;
+		default: logerror("CPU #0 - PC %04X: unknown protection command: %02X\n",cpu_get_pc(&space.device()),data);
 	}
 }
 
-static WRITE8_HANDLER( suna8_wram_w )
+WRITE8_MEMBER(suna8_state::suna8_wram_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	if (!state->m_trash_prot)
-		state->m_wram[offset] = data;
+	if (!m_trash_prot)
+		m_wram[offset] = data;
 }
 
 /*
     7654 321-
     ---- ---0   Flip Screen
 */
-static WRITE8_HANDLER( sparkman_flipscreen_w )
+WRITE8_MEMBER(suna8_state::sparkman_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 0x01);
-	//if (data & ~0x01)     logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(&space->device()),data);
+	flip_screen_set(data & 0x01);
+	//if (data & ~0x01)     logerror("CPU #0 - PC %04X: unknown flipscreen bits: %02X\n",cpu_get_pc(&space.device()),data);
 }
 
-static WRITE8_HANDLER( sparkman_leds_w )
+WRITE8_MEMBER(suna8_state::sparkman_leds_w)
 {
-	set_led_status(space->machine(), 0, data & 0x01);
-	set_led_status(space->machine(), 1, data & 0x02);
-	//if (data & ~0x03) logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(&space->device()),data);
+	set_led_status(machine(), 0, data & 0x01);
+	set_led_status(machine(), 1, data & 0x02);
+	//if (data & ~0x03) logerror("CPU#0  - PC %06X: unknown leds bits: %02X\n",cpu_get_pc(&space.device()),data);
 }
 
-static WRITE8_HANDLER( sparkman_coin_counter_w )
+WRITE8_MEMBER(suna8_state::sparkman_coin_counter_w)
 {
-	coin_counter_w(space->machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 0, data & 0x01);
 }
 
 /*
@@ -921,47 +905,44 @@ static WRITE8_HANDLER( sparkman_coin_counter_w )
     ---- --1-   Ram Bank
     ---- ---0   Ram Bank?
 */
-static WRITE8_HANDLER( sparkman_spritebank_w )
+WRITE8_MEMBER(suna8_state::sparkman_spritebank_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
 	if(data == 0xf7) //???
-		state->m_spritebank = 0;
+		m_spritebank = 0;
 	else
-		state->m_spritebank = (data) & 1;
-	//if (data & ~0x02)     logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(&space->device()),data);
+		m_spritebank = (data) & 1;
+	//if (data & ~0x02)     logerror("CPU #0 - PC %04X: unknown spritebank bits: %02X\n",cpu_get_pc(&space.device()),data);
 }
 
 /*
     7654 ----
     ---- 3210   ROM Bank
 */
-static WRITE8_HANDLER( sparkman_rombank_w )
+WRITE8_MEMBER(suna8_state::sparkman_rombank_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 	int bank = data & 0x0f;
 
-	//if (data & ~0x0f)     logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(&space->device()),data);
+	//if (data & ~0x0f)     logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(&space.device()),data);
 
-	memory_set_bank(space->machine(), "bank1", bank);
-	state->m_rombank = data;
+	membank("bank1")->set_entry(bank);
+	m_rombank = data;
 }
 
-static READ8_HANDLER( sparkman_c0a3_r )
+READ8_MEMBER(suna8_state::sparkman_c0a3_r)
 {
-	return (space->machine().primary_screen->frame_number() & 1) ? 0x80 : 0;
+	return (machine().primary_screen->frame_number() & 1) ? 0x80 : 0;
 }
 
 #if 0
-static WRITE8_HANDLER( sparkman_en_trash_w )
+WRITE8_MEMBER(suna8_state::sparkman_en_trash_w)
 {
-	suna8_state *state = space->machine().driver_data<suna8_state>();
 
-	state->m_trash_prot = 1;
+	m_trash_prot = 1;
 }
 #endif
 
-static ADDRESS_MAP_START( sparkman_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sparkman_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM									// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")							// Banked ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("P1")						// P1 (Inputs)
@@ -976,9 +957,9 @@ static ADDRESS_MAP_START( sparkman_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc380, 0xc3ff) AM_WRITE(sparkman_cmd_prot_w		)	// Protection
 	AM_RANGE(0xc400, 0xc400) AM_WRITE(sparkman_leds_w			)	// Leds
 	AM_RANGE(0xc480, 0xc480) AM_WRITE(sparkman_coin_counter_w   )   // Coin Counter
-	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_w				)	// To Sound CPU
-	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_be_w) AM_BASE_GENERIC(paletteram	)	// Palette (Banked??)
-	AM_RANGE(0xc800, 0xdfff) AM_RAM_WRITE(suna8_wram_w) AM_BASE_MEMBER(suna8_state, m_wram)								// RAM
+	AM_RANGE(0xc500, 0xc500) AM_WRITE(soundlatch_byte_w				)	// To Sound CPU
+	AM_RANGE(0xc600, 0xc7ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_byte_be_w) AM_SHARE("paletteram"	)	// Palette (Banked??)
+	AM_RANGE(0xc800, 0xdfff) AM_RAM_WRITE(suna8_wram_w) AM_SHARE("wram")								// RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(suna8_banked_spriteram_r, suna8_banked_spriteram_w)	// Sprites (Banked)
 ADDRESS_MAP_END
 
@@ -995,18 +976,18 @@ ADDRESS_MAP_END
                                 Hard Head
 ***************************************************************************/
 
-static ADDRESS_MAP_START( hardhead_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hardhead_sound_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM	// ROM
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
-	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("aysnd", ay8910_address_data_w		)
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ymsnd", ym3812_r, ym3812_w)
+	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w		)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM	// RAM
-	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("ymsnd", ym3812_status_port_r)	// ? unsure
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch2_w				)	//
-	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_r				)	// From Main CPU
+	AM_RANGE(0xc800, 0xc800) AM_DEVREAD_LEGACY("ymsnd", ym3812_status_port_r)	// ? unsure
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch2_byte_w				)	//
+	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r				)	// From Main CPU
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( hardhead_sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( hardhead_sound_io_map, AS_IO, 8, suna8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_READNOP	// ? IRQ Ack
 ADDRESS_MAP_END
@@ -1016,13 +997,13 @@ ADDRESS_MAP_END
                                 Rough Ranger
 ***************************************************************************/
 
-static ADDRESS_MAP_START( rranger_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rranger_sound_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM	// ROM
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ym1", ym2203_w			)	// Samples + Music
-	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ym2", ym2203_w			)	// Music + FX
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE_LEGACY("ym1", ym2203_w			)	// Samples + Music
+	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE_LEGACY("ym2", ym2203_w			)	// Music + FX
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM	// RAM
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch2_w				)	// To Sound CPU
-	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_r				)	// From Main CPU
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch2_byte_w				)	// To Sound CPU
+	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_byte_r				)	// From Main CPU
 ADDRESS_MAP_END
 
 
@@ -1030,33 +1011,33 @@ ADDRESS_MAP_END
                                 Brick Zone
 ***************************************************************************/
 
-static ADDRESS_MAP_START( brickzn_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( brickzn_sound_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM	// ROM
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ymsnd", ym3812_w	)
-	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("aysnd", ay8910_address_data_w		)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w	)
+	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w		)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM	// RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch2_w				)	// To PCM CPU
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r				)	// From Main CPU
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch2_byte_w				)	// To PCM CPU
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r				)	// From Main CPU
 ADDRESS_MAP_END
 
 
 /* PCM Z80 , 4 DACs (4 bits per sample), NO RAM !! */
 
-static ADDRESS_MAP_START( brickzn_pcm_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( brickzn_pcm_map, AS_PROGRAM, 8, suna8_state )
 	AM_RANGE(0x0000, 0xffff) AM_ROM	// ROM
 ADDRESS_MAP_END
 
 
-static WRITE8_HANDLER( brickzn_pcm_w )
+WRITE8_MEMBER(suna8_state::brickzn_pcm_w)
 {
 	static const char *const dacs[] = { "dac1", "dac2", "dac3", "dac4" };
-	dac_signed_data_w( space->machine().device(dacs[offset & 3]), (data & 0xf) * 0x11 );
+	dac_signed_data_w( machine().device(dacs[offset & 3]), (data & 0xf) * 0x11 );
 }
 
 
-static ADDRESS_MAP_START( brickzn_pcm_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( brickzn_pcm_io_map, AS_IO, 8, suna8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r		)	// From Sound CPU
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_byte_r		)	// From Sound CPU
 	AM_RANGE(0x00, 0x03) AM_WRITE(brickzn_pcm_w		)	// 4 x DAC
 ADDRESS_MAP_END
 
@@ -1348,7 +1329,7 @@ static INPUT_PORTS_START( hardhea2 )
 	PORT_BIT(  0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT(  0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT(  0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT(  0x40, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT(  0x40, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT(  0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 INPUT_PORTS_END
@@ -1697,8 +1678,9 @@ static TIMER_DEVICE_CALLBACK( hardhea2_interrupt )
 
 static MACHINE_RESET( hardhea2 )
 {
+	suna8_state *state = machine.driver_data<suna8_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	hardhea2_rambank_0_w(space,0,0);
+	state->hardhea2_rambank_0_w(*space,0,0);
 }
 
 static MACHINE_CONFIG_DERIVED( hardhea2, brickzn )
@@ -2373,7 +2355,7 @@ ROM_END
 
 static DRIVER_INIT( suna8 )
 {
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 /* Working Games */

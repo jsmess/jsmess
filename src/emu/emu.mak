@@ -71,6 +71,7 @@ EMUOBJS = \
 	$(EMUOBJ)/distate.o \
 	$(EMUOBJ)/drawgfx.o \
 	$(EMUOBJ)/driver.o \
+	$(EMUOBJ)/drivenum.o \
 	$(EMUOBJ)/emualloc.o \
 	$(EMUOBJ)/emucore.o \
 	$(EMUOBJ)/emuopts.o \
@@ -109,7 +110,6 @@ EMUOBJS = \
 	$(EMUOBJ)/uimenu.o \
 	$(EMUOBJ)/validity.o \
 	$(EMUOBJ)/video.o \
-	$(EMUOBJ)/watchdog.o \
 	$(EMUOBJ)/debug/debugcmd.o \
 	$(EMUOBJ)/debug/debugcon.o \
 	$(EMUOBJ)/debug/debugcpu.o \
@@ -133,7 +133,6 @@ EMUSOUNDOBJS = \
 	$(EMUOBJ)/sound/wavwrite.o \
 
 EMUAUDIOOBJS = \
-	$(EMUAUDIO)/generic.o \
 
 EMUDRIVEROBJS = \
 	$(EMUDRIVERS)/empty.o \

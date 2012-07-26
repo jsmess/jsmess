@@ -247,13 +247,18 @@ public:
 	/* these are used in the mapper 20 handlers */
 	int     m_fds_last_side;
 	int     m_fds_count;
+	DECLARE_READ8_MEMBER(nes_IN0_r);
+	DECLARE_READ8_MEMBER(nes_IN1_r);
+	DECLARE_WRITE8_MEMBER(nes_IN0_w);
+	DECLARE_WRITE8_MEMBER(nes_IN1_w);
+	DECLARE_READ8_MEMBER(nes_fds_r);
+	DECLARE_WRITE8_MEMBER(nes_fds_w);
+	DECLARE_WRITE8_MEMBER(nes_vh_sprite_dma_w);
 };
 
 
 /*----------- defined in machine/nes.c -----------*/
 
-WRITE8_HANDLER ( nes_IN0_w );
-WRITE8_HANDLER ( nes_IN1_w );
 
 /* protos */
 
@@ -267,8 +272,6 @@ MACHINE_RESET( nes );
 
 DRIVER_INIT( famicom );
 
-READ8_HANDLER( nes_IN0_r );
-READ8_HANDLER( nes_IN1_r );
 
 int nes_ppu_vidaccess( device_t *device, int address, int data );
 

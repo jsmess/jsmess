@@ -64,12 +64,12 @@ void atari_interrupt_cb(device_t *device, int mask)
 
 READ8_DEVICE_HANDLER(atari_pia_pa_r)
 {
-	return input_port_read_safe(device->machine(), "djoy_0_1", 0);
+	return device->machine().root_device().ioport("djoy_0_1")->read_safe(0);
 }
 
 READ8_DEVICE_HANDLER(atari_pia_pb_r)
 {
-	return input_port_read_safe(device->machine(), "djoy_2_3", 0);
+	return device->machine().root_device().ioport("djoy_2_3")->read_safe(0);
 }
 
 WRITE8_DEVICE_HANDLER(a600xl_pia_pb_w) { a600xl_mmu(device->machine(), data); }
@@ -112,7 +112,7 @@ void a600xl_mmu(running_machine &machine, UINT8 new_mmu)
 		logerror("%s MMU SELFTEST ROM\n", machine.system().name);
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x5000, 0x57ff, "bank2");
 		machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x5000, 0x57ff);
-		memory_set_bankptr(machine, "bank2", machine.region("maincpu")->base() + 0x5000);
+		machine.root_device().membank("bank2")->set_base(machine.root_device().memregion("maincpu")->base() + 0x5000);
 	}
 }
 
@@ -169,7 +169,7 @@ void a800_handle_keyboard(running_machine &machine)
 	/* check keyboard */
 	for( i = 0; i < 8; i++ )
 	{
-		ipt = input_port_read_safe(machine, tag[i], 0);
+		ipt = machine.root_device().ioport(tag[i])->read_safe(0);
 
 		if( ipt )
 		{
@@ -183,11 +183,11 @@ void a800_handle_keyboard(running_machine &machine)
 			atari_code = i*8 + count;
 
 			/* SHIFT */
-			if(input_port_read_safe(machine, "fake", 0) & 0x01)
+			if(machine.root_device().ioport("fake")->read_safe(0) & 0x01)
 				atari_code |= 0x40;
 
 			/* CTRL */
-			if(input_port_read_safe(machine, "fake", 0) & 0x02)
+			if(machine.root_device().ioport("fake")->read_safe(0) & 0x02)
 				atari_code |= 0x80;
 
 			if( atari_code != AKEY_NONE )
@@ -251,7 +251,7 @@ void a5200_handle_keypads(running_machine &machine)
 	/* check keypad */
 	for( i = 0; i < 4; i++ )
 	{
-		ipt = input_port_read_safe(machine, tag[i], 0);
+		ipt = machine.root_device().ioport(tag[i])->read_safe(0);
 
 		if( ipt )
 		{
@@ -281,7 +281,7 @@ void a5200_handle_keypads(running_machine &machine)
 	}
 
 	/* check top button */
-	if ((input_port_read(machine, "djoy_b") & 0x10) == 0)
+	if ((machine.root_device().ioport("djoy_b")->read() & 0x10) == 0)
 	{
 		if (atari_last == 0xfe)
 			return;
@@ -316,7 +316,7 @@ static void pokey_reset(running_machine &machine)
 
 static UINT8 console_read(address_space *space)
 {
-	return input_port_read(space->machine(), "console");
+	return space->machine().root_device().ioport("console")->read();
 }
 
 
@@ -342,7 +342,7 @@ void atari_machine_start(running_machine &machine)
 
 	/* GTIA */
 	memset(&gtia_intf, 0, sizeof(gtia_intf));
-	if (machine.port("console") != NULL)
+	if (machine.root_device().ioport("console") != NULL)
 		gtia_intf.console_read = console_read;
 	if (machine.device("dac") != NULL)
 		gtia_intf.console_write = console_write;

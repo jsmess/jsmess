@@ -22,11 +22,15 @@ class ltcasino_state : public driver_device
 {
 public:
 	ltcasino_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_tile_num_ram(*this, "tile_nuram"),
+		m_tile_atr_ram(*this, "tile_atr_ram"){ }
 
-	UINT8 *m_tile_num_ram;
-	UINT8 *m_tile_atr_ram;
+	required_shared_ptr<UINT8> m_tile_num_ram;
+	required_shared_ptr<UINT8> m_tile_atr_ram;
 	tilemap_t *m_tilemap;
+	DECLARE_WRITE8_MEMBER(ltcasino_tile_num_w);
+	DECLARE_WRITE8_MEMBER(ltcasino_tile_atr_w);
 };
 
 
@@ -52,27 +56,25 @@ static VIDEO_START(ltcasino)
 }
 
 
-static WRITE8_HANDLER( ltcasino_tile_num_w )
+WRITE8_MEMBER(ltcasino_state::ltcasino_tile_num_w)
 {
-	ltcasino_state *state = space->machine().driver_data<ltcasino_state>();
-	state->m_tile_num_ram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_tile_num_ram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( ltcasino_tile_atr_w )
+WRITE8_MEMBER(ltcasino_state::ltcasino_tile_atr_w)
 {
-	ltcasino_state *state = space->machine().driver_data<ltcasino_state>();
-	state->m_tile_atr_ram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_tile_atr_ram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 
-static ADDRESS_MAP_START( ltcasino_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ltcasino_map, AS_PROGRAM, 8, ltcasino_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xcfff) AM_ROM
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ltcasino_tile_num_w) AM_BASE_MEMBER(ltcasino_state, m_tile_num_ram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(ltcasino_tile_num_w) AM_SHARE("tile_nuram")
 	AM_RANGE(0xd800, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ltcasino_tile_atr_w) AM_BASE_MEMBER(ltcasino_state, m_tile_atr_ram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(ltcasino_tile_atr_w) AM_SHARE("tile_atr_ram")
 	AM_RANGE(0xe800, 0xebff) AM_RAM
 
 	AM_RANGE(0xec00, 0xec00) AM_READ_PORT("IN0")
@@ -82,9 +84,9 @@ static ADDRESS_MAP_START( ltcasino_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xec10, 0xec10) AM_READ_PORT("IN4")
 	AM_RANGE(0xec12, 0xec12) AM_READ_PORT("IN5")
 
-	AM_RANGE(0xec20, 0xec20) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0xec20, 0xec20) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0xec21, 0xec21) AM_READ_PORT("BUTTONS") //ltcasino -> pc: F3F3 (A in service) and F3FD (B in service)
-	AM_RANGE(0xec20, 0xec21) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0xec20, 0xec21) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 	AM_RANGE(0xec3e, 0xec3e) AM_READNOP //not used
 	AM_RANGE(0xec30, 0xec3f) AM_RAM
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -710,7 +712,7 @@ ROM_END
 static DRIVER_INIT(mv4in1)
 {
 	int i;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	for(i=0;i<0x10000;i++)
 		rom[i]=BITSWAP8(rom[i],7,6,5,4,3,1,2,0);
 }
@@ -718,5 +720,5 @@ static DRIVER_INIT(mv4in1)
 
 
 GAME( 1982, ltcasino, 0, ltcasino, ltcasino, 0, ROT0, "Digital Controls Inc.", "Little Casino (older)", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS  )
-GAME( 1983, mv4in1,  ltcasino,  ltcasino, mv4in1, mv4in1, ROT0, "Entertainment Enterprises", "Mini Vegas 4in1", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, mv4in1,  ltcasino,  ltcasino, mv4in1, mv4in1, ROT0, "Entertainment Enterprises, Ltd.", "Mini Vegas 4in1", GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
 GAME( 1984, ltcasinn, 0, ltcasino, ltcasinn, 0, ROT0, "Digital Controls Inc.", "Little Casino (newer)", GAME_NOT_WORKING )

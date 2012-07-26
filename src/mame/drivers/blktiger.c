@@ -26,65 +26,61 @@ Protection comms between main cpu and i8751
 
 **************************************************/
 
-static READ8_HANDLER( blktiger_from_mcu_r )
+READ8_MEMBER(blktiger_state::blktiger_from_mcu_r)
 {
-	blktiger_state *state = space->machine().driver_data<blktiger_state>();
-	return state->m_i8751_latch;
+	return m_i8751_latch;
 }
 
-static WRITE8_HANDLER( blktiger_to_mcu_w )
+WRITE8_MEMBER(blktiger_state::blktiger_to_mcu_w)
 {
-	blktiger_state *state = space->machine().driver_data<blktiger_state>();
-	device_set_input_line(state->m_mcu, MCS51_INT1_LINE, ASSERT_LINE);
-	state->m_z80_latch = data;
+	device_set_input_line(m_mcu, MCS51_INT1_LINE, ASSERT_LINE);
+	m_z80_latch = data;
 }
 
-static READ8_HANDLER( blktiger_from_main_r )
+READ8_MEMBER(blktiger_state::blktiger_from_main_r)
 {
-	blktiger_state *state = space->machine().driver_data<blktiger_state>();
-	device_set_input_line(state->m_mcu, MCS51_INT1_LINE, CLEAR_LINE);
+	device_set_input_line(m_mcu, MCS51_INT1_LINE, CLEAR_LINE);
 	//printf("%02x read\n",latch);
-	return state->m_z80_latch;
+	return m_z80_latch;
 }
 
-static WRITE8_HANDLER( blktiger_to_main_w )
+WRITE8_MEMBER(blktiger_state::blktiger_to_main_w)
 {
-	blktiger_state *state = space->machine().driver_data<blktiger_state>();
 	//printf("%02x write\n",data);
-	state->m_i8751_latch = data;
+	m_i8751_latch = data;
 }
 
 
 
-static WRITE8_HANDLER( blktiger_bankswitch_w )
+WRITE8_MEMBER(blktiger_state::blktiger_bankswitch_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
-static WRITE8_HANDLER( blktiger_coinlockout_w )
+WRITE8_MEMBER(blktiger_state::blktiger_coinlockout_w)
 {
-	if (input_port_read(space->machine(), "COIN_LOCKOUT") & 0x01)
+	if (ioport("COIN_LOCKOUT")->read() & 0x01)
 	{
-		coin_lockout_w(space->machine(), 0,~data & 0x01);
-		coin_lockout_w(space->machine(), 1,~data & 0x02);
+		coin_lockout_w(machine(), 0,~data & 0x01);
+		coin_lockout_w(machine(), 1,~data & 0x02);
 	}
 }
 
 
-static ADDRESS_MAP_START( blktiger_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( blktiger_map, AS_PROGRAM, 8, blktiger_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(blktiger_bgvideoram_r, blktiger_bgvideoram_w)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(blktiger_txvideoram_w) AM_BASE_MEMBER(blktiger_state, m_txvideoram)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_split2_w) AM_BASE_GENERIC(paletteram2)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(blktiger_txvideoram_w) AM_SHARE("txvideoram")
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_byte_split_lo_w) AM_SHARE("paletteram")
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_byte_split_hi_w) AM_SHARE("paletteram2")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blktiger_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( blktiger_io_map, AS_IO, 8, blktiger_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")	AM_WRITE(soundlatch_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")	AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")	AM_WRITE(blktiger_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0")	AM_WRITE(blktiger_coinlockout_w)
@@ -99,9 +95,9 @@ static ADDRESS_MAP_START( blktiger_io_map, AS_IO, 8 )
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(blktiger_screen_layout_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blktigerbl_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( blktigerbl_io_map, AS_IO, 8, blktiger_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")	AM_WRITE(soundlatch_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")	AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")	AM_WRITE(blktiger_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0")	AM_WRITE(blktiger_coinlockout_w)
@@ -116,19 +112,19 @@ static ADDRESS_MAP_START( blktigerbl_io_map, AS_IO, 8 )
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(blktiger_screen_layout_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blktiger_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( blktiger_sound_map, AS_PROGRAM, 8, blktiger_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0xe002, 0xe003) AM_DEVREADWRITE("ym2", ym2203_r, ym2203_w)
+	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0xe002, 0xe003) AM_DEVREADWRITE_LEGACY("ym2", ym2203_r, ym2203_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blktiger_mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( blktiger_mcu_map, AS_PROGRAM, 8, blktiger_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( blktiger_mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( blktiger_mcu_io_map, AS_IO, 8, blktiger_state )
 	AM_RANGE(MCS51_PORT_P0,MCS51_PORT_P0) AM_READWRITE(blktiger_from_main_r,blktiger_to_main_w)
 	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P3) AM_WRITENOP	/* other ports unknown */
 ADDRESS_MAP_END
@@ -287,7 +283,7 @@ static MACHINE_START( blktiger )
 	state->m_mcu = machine.device("mcu");
 
 	/* configure bankswitching */
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	state->membank("bank1")->configure_entries(0, 16, state->memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	state->save_item(NAME(state->m_scroll_bank));
 	state->save_item(NAME(state->m_screen_layout));
@@ -305,7 +301,7 @@ static MACHINE_RESET( blktiger )
 	blktiger_state *state = machine.driver_data<blktiger_state>();
 
 	/* configure bankswitching */
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	state->membank("bank1")->configure_entries(0, 16, state->memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	state->m_scroll_x[0] = 0;
 	state->m_scroll_x[1] = 0;

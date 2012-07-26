@@ -401,7 +401,6 @@
 
 
 ************************************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 
 #define MASTER_CLOCK	XTAL_10MHz			/* unknown */
@@ -423,8 +422,14 @@ public:
 	avt_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this,"maincpu"),
-		m_crtc(*this, "crtc")
-		{ }
+		m_crtc(*this, "crtc"),
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"){ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<mc6845_device> m_crtc;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
 
 	DECLARE_WRITE8_MEMBER(avt_6845_address_w);
 	DECLARE_WRITE8_MEMBER(avt_6845_data_w);
@@ -432,13 +437,10 @@ public:
 	DECLARE_WRITE8_MEMBER(avt_videoram_w);
 	DECLARE_WRITE8_MEMBER(avt_colorram_w);
 
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
 	tilemap_t *m_bg_tilemap;
 	UINT8 m_crtc_vreg[0x100],m_crtc_index;
 
-	required_device<cpu_device> m_maincpu;
-	required_device<mc6845_device> m_crtc;
+	DECLARE_WRITE8_MEMBER(debug_w);
 };
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
@@ -529,6 +531,7 @@ static SCREEN_UPDATE_IND16( avt )
 
 static PALETTE_INIT( avt )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 /*  prom bits
     7654 3210
     ---- ---x   Intensity?.
@@ -582,7 +585,7 @@ static PALETTE_INIT( avt )
 *            Read / Write Handlers            *
 **********************************************/
 
-//static WRITE8_HANDLER( debug_w )
+//WRITE8_MEMBER(avt_state::debug_w)
 //{
 //  popmessage("written : %02X", data);
 //}
@@ -614,8 +617,8 @@ static ADDRESS_MAP_START( avt_map, AS_PROGRAM, 8, avt_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM // AM_SHARE("nvram")
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(avt_videoram_w) AM_BASE(m_videoram)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(avt_colorram_w) AM_BASE(m_colorram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(avt_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(avt_colorram_w) AM_SHARE("colorram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( avt_portmap, AS_IO, 8, avt_state )

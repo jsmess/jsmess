@@ -38,29 +38,36 @@ class rmhaihai_state : public driver_device
 {
 public:
 	rmhaihai_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"){ }
 
 	int m_gfxbank;
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
 	tilemap_t *m_bg_tilemap;
 	int m_keyboard_cmd;
+	DECLARE_WRITE8_MEMBER(rmhaihai_videoram_w);
+	DECLARE_WRITE8_MEMBER(rmhaihai_colorram_w);
+	DECLARE_READ8_MEMBER(keyboard_r);
+	DECLARE_WRITE8_MEMBER(keyboard_w);
+	DECLARE_READ8_MEMBER(samples_r);
+	DECLARE_WRITE8_MEMBER(ctrl_w);
+	DECLARE_WRITE8_MEMBER(themj_rombank_w);
 };
 
 
 
-static WRITE8_HANDLER( rmhaihai_videoram_w )
+WRITE8_MEMBER(rmhaihai_state::rmhaihai_videoram_w)
 {
-	rmhaihai_state *state = space->machine().driver_data<rmhaihai_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( rmhaihai_colorram_w )
+WRITE8_MEMBER(rmhaihai_state::rmhaihai_colorram_w)
 {
-	rmhaihai_state *state = space->machine().driver_data<rmhaihai_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -90,13 +97,12 @@ static SCREEN_UPDATE_IND16( rmhaihai )
 
 
 
-static READ8_HANDLER( keyboard_r )
+READ8_MEMBER(rmhaihai_state::keyboard_r)
 {
-	rmhaihai_state *state = space->machine().driver_data<rmhaihai_state>();
 	static const char *const keynames[] = { "KEY0", "KEY1" };
 
-	logerror("%04x: keyboard_r\n",cpu_get_pc(&space->device()));
-	switch(cpu_get_pc(&space->device()))
+	logerror("%04x: keyboard_r\n",cpu_get_pc(&space.device()));
+	switch(cpu_get_pc(&space.device()))
 	{
 		/* read keyboard */
 		case 0x0aba:	// rmhaihai, rmhaisei
@@ -108,9 +114,9 @@ static READ8_HANDLER( keyboard_r )
 
 			for (i = 0; i < 31; i++)
 			{
-				if (input_port_read(space->machine(), keynames[i/16]) & (1 << (i & 15))) return i+1;
+				if (ioport(keynames[i/16])->read() & (1 << (i & 15))) return i+1;
 			}
-			if (input_port_read(space->machine(), "KEY1") & 0x8000) return 0x80;	// coin
+			if (ioport("KEY1")->read() & 0x8000) return 0x80;	// coin
 			return 0;
 		}
 		case 0x5c7b:	// rmhaihai, rmhaisei, rmhaijin
@@ -120,20 +126,20 @@ static READ8_HANDLER( keyboard_r )
 
 
 		case 0x13a:	// additional checks done by rmhaijin
-			if (state->m_keyboard_cmd == 0x3b) return 0xdd;
-			if (state->m_keyboard_cmd == 0x85) return 0xdc;
-			if (state->m_keyboard_cmd == 0xf2) return 0xd6;
-			if (state->m_keyboard_cmd == 0xc1) return 0x8f;
-			if (state->m_keyboard_cmd == 0xd0) return 0x08;
+			if (m_keyboard_cmd == 0x3b) return 0xdd;
+			if (m_keyboard_cmd == 0x85) return 0xdc;
+			if (m_keyboard_cmd == 0xf2) return 0xd6;
+			if (m_keyboard_cmd == 0xc1) return 0x8f;
+			if (m_keyboard_cmd == 0xd0) return 0x08;
 			return 0;
 
 		case 0x140:	// additional checks done by rmhaisei
 		case 0x155:	// additional checks done by themj, but they are patched out!
-			if (state->m_keyboard_cmd == 0x11) return 0x57;
-			if (state->m_keyboard_cmd == 0x3e) return 0xda;
-			if (state->m_keyboard_cmd == 0x48) return 0x74;
-			if (state->m_keyboard_cmd == 0x5d) return 0x46;
-			if (state->m_keyboard_cmd == 0xd0) return 0x08;
+			if (m_keyboard_cmd == 0x11) return 0x57;
+			if (m_keyboard_cmd == 0x3e) return 0xda;
+			if (m_keyboard_cmd == 0x48) return 0x74;
+			if (m_keyboard_cmd == 0x5d) return 0x46;
+			if (m_keyboard_cmd == 0xd0) return 0x08;
 			return 0;
 	}
 
@@ -141,16 +147,15 @@ static READ8_HANDLER( keyboard_r )
 	return 0;
 }
 
-static WRITE8_HANDLER( keyboard_w )
+WRITE8_MEMBER(rmhaihai_state::keyboard_w)
 {
-	rmhaihai_state *state = space->machine().driver_data<rmhaihai_state>();
-logerror("%04x: keyboard_w %02x\n",cpu_get_pc(&space->device()),data);
-	state->m_keyboard_cmd = data;
+logerror("%04x: keyboard_w %02x\n",cpu_get_pc(&space.device()),data);
+	m_keyboard_cmd = data;
 }
 
-static READ8_HANDLER( samples_r )
+READ8_MEMBER(rmhaihai_state::samples_r)
 {
-	return space->machine().region("adpcm")->base()[offset];
+	return memregion("adpcm")->base()[offset];
 }
 
 static WRITE8_DEVICE_HANDLER( adpcm_w )
@@ -160,78 +165,78 @@ static WRITE8_DEVICE_HANDLER( adpcm_w )
 	msm5205_vclk_w (device,(data>>4)&1); /* bit4     */
 }
 
-static WRITE8_HANDLER( ctrl_w )
+WRITE8_MEMBER(rmhaihai_state::ctrl_w)
 {
-	rmhaihai_state *state = space->machine().driver_data<rmhaihai_state>();
-	flip_screen_set(space->machine(), data & 0x01);
+	flip_screen_set(data & 0x01);
 
 	// (data & 0x02) is switched on and off in service mode
 
-	coin_lockout_w(space->machine(), 0, ~data & 0x04);
-	coin_counter_w(space->machine(), 0, data & 0x08);
+	coin_lockout_w(machine(), 0, ~data & 0x04);
+	coin_counter_w(machine(), 0, data & 0x08);
 
 	// (data & 0x10) is medal in service mode
 
-	state->m_gfxbank = (data & 0x40) >> 6;	/* rmhaisei only */
+	m_gfxbank = (data & 0x40) >> 6;	/* rmhaisei only */
 }
 
-static WRITE8_HANDLER( themj_rombank_w )
+WRITE8_MEMBER(rmhaihai_state::themj_rombank_w)
 {
-	UINT8 *rom = space->machine().region("maincpu")->base() + 0x10000;
+	UINT8 *rom = memregion("maincpu")->base() + 0x10000;
 	int bank = data & 0x03;
 logerror("banksw %d\n",bank);
-	memory_set_bankptr(space->machine(), "bank1", rom + bank*0x4000);
-	memory_set_bankptr(space->machine(), "bank2", rom + bank*0x4000 + 0x2000);
+	membank("bank1")->set_base(rom + bank*0x4000);
+	membank("bank2")->set_base(rom + bank*0x4000 + 0x2000);
 }
 
 static MACHINE_RESET( themj )
 {
-	themj_rombank_w(machine.device("maincpu")->memory().space(AS_IO), 0, 0);
+	rmhaihai_state *state = machine.driver_data<rmhaihai_state>();
+	state->themj_rombank_w(*machine.device("maincpu")->memory().space(AS_IO), 0, 0);
 }
 
 
 
-static ADDRESS_MAP_START( rmhaihai_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rmhaihai_map, AS_PROGRAM, 8, rmhaihai_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(rmhaihai_colorram_w) AM_BASE_MEMBER(rmhaihai_state, m_colorram)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(rmhaihai_videoram_w) AM_BASE_MEMBER(rmhaihai_state, m_videoram)
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(rmhaihai_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(rmhaihai_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xb83c, 0xb83c) AM_WRITENOP	// ??
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITENOP	// ??
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_ROM			/* rmhaisei only */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rmhaihai_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( rmhaihai_io_map, AS_IO, 8, rmhaihai_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r) AM_WRITENOP	// ??
 	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE(keyboard_w)	// ??
-	AM_RANGE(0x8020, 0x8020) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x8040, 0x8040) AM_DEVWRITE("msm", adpcm_w)
+	AM_RANGE(0x8020, 0x8020) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x8040, 0x8040) AM_DEVWRITE_LEGACY("msm", adpcm_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITENOP	// ??
 	AM_RANGE(0xbc04, 0xbc04) AM_WRITENOP	// ??
 	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITENOP	// ??
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( themj_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( themj_map, AS_PROGRAM, 8, rmhaihai_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xa7ff) AM_RAM
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(rmhaihai_colorram_w) AM_BASE_MEMBER(rmhaihai_state, m_colorram)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(rmhaihai_videoram_w) AM_BASE_MEMBER(rmhaihai_state, m_videoram)
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(rmhaihai_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(rmhaihai_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank2")
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( themj_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( themj_io_map, AS_IO, 8, rmhaihai_state )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r) AM_WRITENOP	// ??
 	AM_RANGE(0x8001, 0x8001) AM_READNOP AM_WRITE(keyboard_w)	// ??
-	AM_RANGE(0x8020, 0x8020) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x8040, 0x8040) AM_DEVWRITE("msm", adpcm_w)
+	AM_RANGE(0x8020, 0x8020) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x8020, 0x8021) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x8040, 0x8040) AM_DEVWRITE_LEGACY("msm", adpcm_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITENOP	// ??
 	AM_RANGE(0x80a0, 0x80a0) AM_WRITE(themj_rombank_w)
@@ -660,8 +665,8 @@ ROM_END
 
 static DRIVER_INIT( rmhaihai )
 {
-	UINT8 *rom = machine.region("gfx1")->base();
-	int size = machine.region("gfx1")->bytes();
+	UINT8 *rom = machine.root_device().memregion("gfx1")->base();
+	int size = machine.root_device().memregion("gfx1")->bytes();
 	int a,b;
 
 	size /= 2;

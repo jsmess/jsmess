@@ -46,32 +46,29 @@ PALETTE_INIT( blueprnt )
 	}
 }
 
-WRITE8_HANDLER( blueprnt_videoram_w )
+WRITE8_MEMBER(blueprnt_state::blueprnt_videoram_w)
 {
-	blueprnt_state *state = space->machine().driver_data<blueprnt_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( blueprnt_colorram_w )
+WRITE8_MEMBER(blueprnt_state::blueprnt_colorram_w)
 {
-	blueprnt_state *state = space->machine().driver_data<blueprnt_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( blueprnt_flipscreen_w )
+WRITE8_MEMBER(blueprnt_state::blueprnt_flipscreen_w)
 {
-	blueprnt_state *state = space->machine().driver_data<blueprnt_state>();
 
-	flip_screen_set(space->machine(), ~data & 0x02);
+	flip_screen_set(~data & 0x02);
 
-	if (state->m_gfx_bank != ((data & 0x04) >> 2))
+	if (m_gfx_bank != ((data & 0x04) >> 2))
 	{
-		state->m_gfx_bank = ((data & 0x04) >> 2);
-		space->machine().tilemap().mark_all_dirty();
+		m_gfx_bank = ((data & 0x04) >> 2);
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -103,7 +100,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	blueprnt_state *state = machine.driver_data<blueprnt_state>();
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int code = state->m_spriteram[offs + 1];
 		int sx = state->m_spriteram[offs + 3];
@@ -111,7 +108,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int flipx = state->m_spriteram[offs + 2] & 0x40;
 		int flipy = state->m_spriteram[offs + 2 - 4] & 0x80;	// -4? Awkward, isn't it?
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 248 - sx;
 			sy = 240 - sy;
@@ -129,7 +126,7 @@ SCREEN_UPDATE_IND16( blueprnt )
 	blueprnt_state *state = screen.machine().driver_data<blueprnt_state>();
 	int i;
 
-	if (flip_screen_get(screen.machine()))
+	if (state->flip_screen())
 		for (i = 0; i < 32; i++)
 			state->m_bg_tilemap->set_scrolly(i, state->m_scrollram[32 - i]);
 	else

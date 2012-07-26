@@ -142,6 +142,14 @@ public:
 	UINT8		m_vram_page;
 
 	keyboard_t	m_keyboard;
+	DECLARE_READ8_MEMBER(mbcpic8259_r);
+	DECLARE_WRITE8_MEMBER(mbcpic8259_w);
+	DECLARE_READ8_MEMBER(mbcpit8253_r);
+	DECLARE_WRITE8_MEMBER(mbcpit8253_w);
+	DECLARE_READ8_MEMBER(mbc55x_disk_r);
+	DECLARE_WRITE8_MEMBER(mbc55x_disk_w);
+	DECLARE_READ8_MEMBER(mbc55x_kb_usart_r);
+	DECLARE_WRITE8_MEMBER(mbc55x_kb_usart_w);
 };
 
 /* IO chips */
@@ -190,16 +198,8 @@ MACHINE_START(mbc55x);
 #define RAM_BANK_COUNT	15
 
 
-READ8_HANDLER(pit8253_r);
-WRITE8_HANDLER(pit8253_w);
 READ8_HANDLER(ppi8255_r);
 WRITE8_HANDLER(ppi8255_w);
-READ8_HANDLER(pic8259_r);
-WRITE8_HANDLER(pic8259_w);
-READ8_HANDLER(mbc55x_disk_r);
-WRITE8_HANDLER(mbc55x_disk_w);
-READ8_HANDLER(mbc55x_kb_usart_r);
-WRITE8_HANDLER(mbc55x_kb_usart_w);
 
 /* Floppy drive interface */
 

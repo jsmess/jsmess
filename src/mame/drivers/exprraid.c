@@ -217,13 +217,12 @@ Stephh's notes (based on the games M6502 code and some tests) :
 /* Emulate Protection ( only for original express raider, code is cracked on the bootleg */
 /*****************************************************************************************/
 
-static READ8_HANDLER( exprraid_protection_r )
+READ8_MEMBER(exprraid_state::exprraid_protection_r)
 {
-	exprraid_state *state = space->machine().driver_data<exprraid_state>();
 	switch (offset)
 	{
 	case 0:
-		return state->m_main_ram[0x02a9];
+		return m_main_ram[0x02a9];
 	case 1:
 		return 0x02;
 	}
@@ -231,23 +230,22 @@ static READ8_HANDLER( exprraid_protection_r )
 	return 0;
 }
 
-static WRITE8_HANDLER( sound_cpu_command_w )
+WRITE8_MEMBER(exprraid_state::sound_cpu_command_w)
 {
-	exprraid_state *state = space->machine().driver_data<exprraid_state>();
-	soundlatch_w(space, 0, data);
-	device_set_input_line(state->m_slave, INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_byte_w(space, 0, data);
+	device_set_input_line(m_slave, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static READ8_HANDLER( vblank_r )
+READ8_MEMBER(exprraid_state::vblank_r)
 {
-	return input_port_read(space->machine(), "IN0");
+	return ioport("IN0")->read();
 }
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x05ff) AM_RAM AM_BASE_MEMBER(exprraid_state, m_main_ram)
-	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_BASE_SIZE_MEMBER(exprraid_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(exprraid_videoram_w) AM_BASE_MEMBER(exprraid_state, m_videoram)
-	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(exprraid_colorram_w) AM_BASE_MEMBER(exprraid_state, m_colorram)
+static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, exprraid_state )
+	AM_RANGE(0x0000, 0x05ff) AM_RAM AM_SHARE("main_ram")
+	AM_RANGE(0x0600, 0x07ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x0800, 0x0bff) AM_RAM_WRITE(exprraid_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x0c00, 0x0fff) AM_RAM_WRITE(exprraid_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x1317, 0x1317) AM_READNOP // ???
 	AM_RANGE(0x1700, 0x1700) AM_READNOP // ???
 	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("DSW0")	/* DSW 0 */
@@ -266,53 +264,51 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( master_io_map, AS_IO, 8, exprraid_state )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, exprraid_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE("ym1", ym2203_r, ym2203_w)
-	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ym2", ym3526_r, ym3526_w)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
+	AM_RANGE(0x2000, 0x2001) AM_DEVREADWRITE_LEGACY("ym1", ym2203_r, ym2203_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE_LEGACY("ym2", ym3526_r, ym3526_w)
+	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static INPUT_CHANGED( coin_inserted_deco16 )
+INPUT_CHANGED_MEMBER(exprraid_state::coin_inserted_deco16)
 {
-	exprraid_state *state = field.machine().driver_data<exprraid_state>();
-	device_set_input_line(state->m_maincpu, DECO16_IRQ_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_maincpu, DECO16_IRQ_LINE, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static INPUT_CHANGED( coin_inserted_nmi )
+INPUT_CHANGED_MEMBER(exprraid_state::coin_inserted_nmi)
 {
-	exprraid_state *state = field.machine().driver_data<exprraid_state>();
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	device_set_input_line(m_maincpu, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( exprraid )
 	PORT_START("IN0")	/* 0x3800 */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW0")	/* 0x1800 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )           PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW0",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW0",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW0",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW0",0x10,EQUALS,0x00)
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW0",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW0",0x10,EQUALS,0x00)
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSW0",0x10,EQUALS,0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) ) PORT_CONDITION("DSW0",0x10,EQUALS,0x00)
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )           PORT_DIPLOCATION("SW1:3,4")
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
-	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x00)
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) PORT_CONDITION("DSW0",0x10,EQUALS,0x00)
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) ) PORT_CONDITION("DSW0",0x10,EQUALS,0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW0",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW0",0x10,EQUALS,0x00)
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW0",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW0",0x10,EQUALS,0x00)
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW0",0x10,EQUALS,0x10)
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW0",0x10,EQUALS,0x10)
 	PORT_DIPNAME( 0x10, 0x10, "Coin Mode" )                 PORT_DIPLOCATION("SW1:5")     /* see notes */
 	PORT_DIPSETTING(    0x10, "Mode 1" )
 	PORT_DIPSETTING(    0x00, "Mode 2" )
@@ -341,8 +337,8 @@ static INPUT_PORTS_START( exprraid )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted_deco16, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(coin_inserted_deco16, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state,coin_inserted_deco16, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state,coin_inserted_deco16, 0)
 
 	PORT_START("DSW1")	/* 0x1803 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW2:1,2")
@@ -370,8 +366,8 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( exprboot )
 	PORT_INCLUDE( exprraid )
 	PORT_MODIFY("IN2")	/* 0x1802 */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted_nmi, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted_nmi, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state,coin_inserted_nmi, 0)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, exprraid_state,coin_inserted_nmi, 0)
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =
@@ -455,7 +451,7 @@ static INTERRUPT_GEN( exprraid_interrupt )
 {
 	exprraid_state *state = device->machine().driver_data<exprraid_state>();
 
-	if ((~input_port_read(device->machine(), "IN2")) & 0xc0)
+	if ((~state->ioport("IN2")->read()) & 0xc0)
 	{
 		if (state->m_coin == 0)
 		{
@@ -736,7 +732,7 @@ static void exprraid_gfx_expand(running_machine &machine)
 {
 	/* Expand the background rom so we can use regular decode routines */
 
-	UINT8	*gfx = machine.region("gfx3")->base();
+	UINT8	*gfx = machine.root_device().memregion("gfx3")->base();
 	int offs = 0x10000 - 0x1000;
 	int i;
 
@@ -755,7 +751,7 @@ static void exprraid_gfx_expand(running_machine &machine)
 
 static DRIVER_INIT( wexpress )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	/* HACK: this set uses M6502 irq vectors but DECO CPU-16 opcodes??? */
 	rom[0xfff7] = rom[0xfffa];
@@ -777,13 +773,15 @@ static DRIVER_INIT( exprraid )
 
 static DRIVER_INIT( wexpressb )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x3800, 0x3800, FUNC(vblank_r));
+	exprraid_state *state = machine.driver_data<exprraid_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x3800, 0x3800, read8_delegate(FUNC(exprraid_state::vblank_r),state));
 	exprraid_gfx_expand(machine);
 }
 
 static DRIVER_INIT( wexpressb2 )
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xFFC0, 0xFFC0, FUNC(vblank_r));
+	exprraid_state *state = machine.driver_data<exprraid_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xFFC0, 0xFFC0, read8_delegate(FUNC(exprraid_state::vblank_r),state));
 	exprraid_gfx_expand(machine);
 }
 

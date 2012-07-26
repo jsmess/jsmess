@@ -71,7 +71,7 @@ static void theglobp_decrypt_rom_8(running_machine &machine)
 	int mem;
 	UINT8 *RAM;
 
-	RAM = machine.region("maincpu")->base();
+	RAM = machine.root_device().memregion("maincpu")->base();
 
 
 	for (mem=0;mem<0x4000;mem++)
@@ -108,7 +108,7 @@ static void theglobp_decrypt_rom_9(running_machine &machine)
 	int mem;
 	UINT8 *RAM;
 
-	RAM = machine.region("maincpu")->base();
+	RAM = machine.root_device().memregion("maincpu")->base();
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -143,7 +143,7 @@ static void theglobp_decrypt_rom_A(running_machine &machine)
 	int mem;
 	UINT8 *RAM;
 
-	RAM = machine.region("maincpu")->base();
+	RAM = machine.root_device().memregion("maincpu")->base();
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -178,7 +178,7 @@ static void theglobp_decrypt_rom_B(running_machine &machine)
 	int mem;
 	UINT8 *RAM;
 
-	RAM = machine.region("maincpu")->base();
+	RAM = machine.root_device().memregion("maincpu")->base();
 
 	for (mem=0;mem<0x4000;mem++)
 	{
@@ -222,10 +222,10 @@ READ8_HANDLER( theglobp_decrypt_rom )
 
 	switch(state->m_counter)
 	{
-		case 0x08:	memory_set_bank (space->machine(), "bank1", 0);		break;
-		case 0x09:	memory_set_bank (space->machine(), "bank1", 1);		break;
-		case 0x0A:	memory_set_bank (space->machine(), "bank1", 2);		break;
-		case 0x0B:	memory_set_bank (space->machine(), "bank1", 3);		break;
+		case 0x08:	state->membank ("bank1")->set_entry (0);		break;
+		case 0x09:	state->membank ("bank1")->set_entry (1);		break;
+		case 0x0A:	state->membank ("bank1")->set_entry (2);		break;
+		case 0x0B:	state->membank ("bank1")->set_entry (3);		break;
 		default:
 			logerror("Invalid counter = %02X\n",state->m_counter);
 			break;
@@ -238,7 +238,7 @@ READ8_HANDLER( theglobp_decrypt_rom )
 MACHINE_START( theglobp )
 {
 	pacman_state *state = machine.driver_data<pacman_state>();
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = state->memregion("maincpu")->base();
 
 	/* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -248,7 +248,7 @@ MACHINE_START( theglobp )
 	theglobp_decrypt_rom_A(machine);
 	theglobp_decrypt_rom_B(machine);
 
-	memory_configure_bank(machine, "bank1", 0, 4, &RAM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 4, &RAM[0x10000], 0x4000);
 
 	state_save_register_global(machine, state->m_counter);
 }
@@ -259,5 +259,5 @@ MACHINE_RESET( theglobp )
 	pacman_state *state = machine.driver_data<pacman_state>();
 	/* The initial state of the counter is 0x0A */
 	state->m_counter = 0x0A;
-	memory_set_bank(machine, "bank1", 2);
+	state->membank("bank1")->set_entry(2);
 }

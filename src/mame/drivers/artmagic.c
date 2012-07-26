@@ -94,15 +94,15 @@ static MACHINE_RESET( artmagic )
  *
  *************************************/
 
-static READ16_HANDLER( tms_host_r )
+READ16_MEMBER(artmagic_state::tms_host_r)
 {
-	return tms34010_host_r(space->machine().device("tms"), offset);
+	return tms34010_host_r(machine().device("tms"), offset);
 }
 
 
-static WRITE16_HANDLER( tms_host_w )
+WRITE16_MEMBER(artmagic_state::tms_host_w)
 {
-	tms34010_host_w(space->machine().device("tms"), offset, data);
+	tms34010_host_w(machine().device("tms"), offset, data);
 }
 
 
@@ -113,19 +113,18 @@ static WRITE16_HANDLER( tms_host_w )
  *
  *************************************/
 
-static WRITE16_HANDLER( control_w )
+WRITE16_MEMBER(artmagic_state::control_w)
 {
-	artmagic_state *state = space->machine().driver_data<artmagic_state>();
-	COMBINE_DATA(&state->m_control[offset]);
+	COMBINE_DATA(&m_control[offset]);
 
 	/* OKI banking here */
 	if (offset == 0)
 	{
-		okim6295_device *oki = space->machine().device<okim6295_device>("oki");
+		okim6295_device *oki = machine().device<okim6295_device>("oki");
 		oki->set_bank_base((((data >> 4) & 1) * 0x40000) % oki->region()->bytes());
 	}
 
-	logerror("%06X:control_w(%d) = %04X\n", cpu_get_pc(&space->device()), offset, data);
+	logerror("%06X:control_w(%d) = %04X\n", cpu_get_pc(&space.device()), offset, data);
 }
 
 
@@ -143,18 +142,17 @@ static TIMER_CALLBACK( irq_off )
 	update_irq_state(machine);
 }
 
-static READ16_HANDLER( ultennis_hack_r )
+READ16_MEMBER(artmagic_state::ultennis_hack_r)
 {
-	artmagic_state *state = space->machine().driver_data<artmagic_state>();
 	/* IRQ5 points to: jsr (a5); rte */
-	UINT32 pc = cpu_get_pc(&space->device());
+	UINT32 pc = cpu_get_pc(&space.device());
 	if (pc == 0x18c2 || pc == 0x18e4)
 	{
-		state->m_hack_irq = 1;
-		update_irq_state(space->machine());
-		space->machine().scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off));
+		m_hack_irq = 1;
+		update_irq_state(machine());
+		machine().scheduler().timer_set(attotime::from_usec(1), FUNC(irq_off));
 	}
-	return input_port_read(space->machine(), "300000");
+	return ioport("300000")->read();
 }
 
 
@@ -385,34 +383,32 @@ static void stonebal_protection(running_machine &machine)
 }
 
 
-static CUSTOM_INPUT( prot_r )
+CUSTOM_INPUT_MEMBER(artmagic_state::prot_r)
 {
-	artmagic_state *state = field.machine().driver_data<artmagic_state>();
-	return state->m_prot_output_bit;
+	return m_prot_output_bit;
 }
 
 
-static WRITE16_HANDLER( protection_bit_w )
+WRITE16_MEMBER(artmagic_state::protection_bit_w)
 {
-	artmagic_state *state = space->machine().driver_data<artmagic_state>();
 	/* shift in the new bit based on the offset */
-	state->m_prot_input[state->m_prot_input_index] <<= 1;
-	state->m_prot_input[state->m_prot_input_index] |= offset;
+	m_prot_input[m_prot_input_index] <<= 1;
+	m_prot_input[m_prot_input_index] |= offset;
 
 	/* clock out the next bit based on the offset */
-	state->m_prot_output_bit = state->m_prot_output[state->m_prot_output_index] & 0x01;
-	state->m_prot_output[state->m_prot_output_index] >>= 1;
+	m_prot_output_bit = m_prot_output[m_prot_output_index] & 0x01;
+	m_prot_output[m_prot_output_index] >>= 1;
 
 	/* are we done with a whole byte? */
-	if (++state->m_prot_bit_index == 8)
+	if (++m_prot_bit_index == 8)
 	{
 		/* add the data and process it */
-		state->m_prot_input_index++;
-		state->m_prot_output_index++;
-		state->m_prot_bit_index = 0;
+		m_prot_input_index++;
+		m_prot_output_index++;
+		m_prot_bit_index = 0;
 
 		/* update the protection state */
-		(*state->m_protection_handler)(space->machine());
+		(*m_protection_handler)(machine());
 	}
 }
 
@@ -424,7 +420,7 @@ static WRITE16_HANDLER( protection_bit_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x220000, 0x23ffff) AM_RAM
 	AM_RANGE(0x240000, 0x240fff) AM_RAM AM_SHARE("nvram")
@@ -434,14 +430,14 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("300006")
 	AM_RANGE(0x300008, 0x300009) AM_READ_PORT("300008")
 	AM_RANGE(0x30000a, 0x30000b) AM_READ_PORT("30000a")
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_BASE_MEMBER(artmagic_state, m_control)
+	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_SHARE("control")
 	AM_RANGE(0x300004, 0x300007) AM_WRITE(protection_bit_w)
-	AM_RANGE(0x360000, 0x360001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x360000, 0x360001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x380000, 0x380007) AM_READWRITE(tms_host_r, tms_host_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( stonebal_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( stonebal_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM
 	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("nvram")
@@ -453,18 +449,18 @@ static ADDRESS_MAP_START( stonebal_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x30000a, 0x30000b) AM_READ_PORT("30000a")
 	AM_RANGE(0x30000c, 0x30000d) AM_READ_PORT("30000c")
 	AM_RANGE(0x30000e, 0x30000f) AM_READ_PORT("30000e")
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_BASE_MEMBER(artmagic_state, m_control)
+	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_SHARE("control")
 	AM_RANGE(0x300004, 0x300007) AM_WRITE(protection_bit_w)
-	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x380000, 0x380007) AM_READWRITE(tms_host_r, tms_host_w)
 ADDRESS_MAP_END
 
-static READ16_HANDLER(unk_r)
+READ16_MEMBER(artmagic_state::unk_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static ADDRESS_MAP_START( shtstar_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( shtstar_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM
 	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("nvram")
@@ -479,9 +475,9 @@ static ADDRESS_MAP_START( shtstar_map, AS_PROGRAM, 16 )
 	AM_RANGE(0x3c0012, 0x3c0013) AM_READ(unk_r)
 	AM_RANGE(0x3c0014, 0x3c0015) AM_NOP
 
-	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_BASE_MEMBER(artmagic_state, m_control)
+	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_SHARE("control")
 	AM_RANGE(0x3c0004, 0x3c0007) AM_WRITE(protection_bit_w)
-	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x380000, 0x380007) AM_READWRITE(tms_host_r, tms_host_w)
 ADDRESS_MAP_END
 
@@ -506,22 +502,22 @@ static const tms34010_config tms_config =
 };
 
 
-static ADDRESS_MAP_START( tms_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(artmagic_state, m_vram0)
-	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_BASE_MEMBER(artmagic_state, m_vram1)
+static ADDRESS_MAP_START( tms_map, AS_PROGRAM, 16, artmagic_state )
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("vram0")
+	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_SHARE("vram1")
 	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE(artmagic_blitter_r, artmagic_blitter_w)
-	AM_RANGE(0x00c00000, 0x00c000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0x00c00000, 0x00c000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( stonebal_tms_map, AS_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(artmagic_state, m_vram0)
-	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_BASE_MEMBER(artmagic_state, m_vram1)
+static ADDRESS_MAP_START( stonebal_tms_map, AS_PROGRAM, 16, artmagic_state )
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("vram0")
+	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_SHARE("vram1")
 	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE(artmagic_blitter_r, artmagic_blitter_w)
-	AM_RANGE(0x00c00000, 0x00c000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
-	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
+	AM_RANGE(0x00c00000, 0x00c000ff) AM_DEVREADWRITE8_LEGACY("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
+	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE_LEGACY(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -533,16 +529,16 @@ ADDRESS_MAP_END
  *************************************/
 
 /* see adp.c */
-static ADDRESS_MAP_START( shtstar_subcpu_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( shtstar_subcpu_map, AS_PROGRAM, 16, artmagic_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shtstar_guncpu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( shtstar_guncpu_map, AS_PROGRAM, 8, artmagic_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shtstar_guncpu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( shtstar_guncpu_io_map, AS_IO, 8, artmagic_state )
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 ADDRESS_MAP_END
 
@@ -632,7 +628,7 @@ static INPUT_PORTS_START( cheesech )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("30000a")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(prot_r, NULL)	/* protection data */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, artmagic_state,prot_r, NULL)	/* protection data */
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* protection ready */
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -824,7 +820,7 @@ static INPUT_PORTS_START( shtstar )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("3c000a")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(prot_r, NULL)	/* protection data */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, artmagic_state,prot_r, NULL)	/* protection data */
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* protection ready */
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1172,7 +1168,7 @@ static DRIVER_INIT( ultennis )
 	state->m_protection_handler = ultennis_protection;
 
 	/* additional (protection?) hack */
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x300000, 0x300001, FUNC(ultennis_hack_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0x300000, 0x300001, read16_delegate(FUNC(artmagic_state::ultennis_hack_r),state));
 }
 
 

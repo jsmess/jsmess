@@ -170,23 +170,33 @@ class cybertnk_state : public driver_device
 {
 public:
 	cybertnk_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spr_ram(*this, "spr_ram"),
+		m_tx_vram(*this, "tx_vram"),
+		m_bg_vram(*this, "bg_vram"),
+		m_fg_vram(*this, "fg_vram"),
+		m_io_ram(*this, "io_ram"),
+		m_roadram(*this, "roadram"){ }
 
 	tilemap_t *m_tx_tilemap;
-	UINT16 *m_tx_vram;
-	UINT16 *m_bg_vram;
-	UINT16 *m_fg_vram;
-	UINT16 *m_spr_ram;
-	UINT16 *m_io_ram;
-	UINT16 *m_roadram;
+	required_shared_ptr<UINT16> m_spr_ram;
+	required_shared_ptr<UINT16> m_tx_vram;
+	required_shared_ptr<UINT16> m_bg_vram;
+	required_shared_ptr<UINT16> m_fg_vram;
+	required_shared_ptr<UINT16> m_io_ram;
+	required_shared_ptr<UINT16> m_roadram;
 	int m_test_x;
 	int m_test_y;
 	int m_start_offs;
 	int m_color_pen;
+	DECLARE_WRITE16_MEMBER(tx_vram_w);
+	DECLARE_READ16_MEMBER(io_r);
+	DECLARE_WRITE16_MEMBER(io_w);
+	DECLARE_READ8_MEMBER(soundport_r);
 };
 
 
-#define LOG_UNKNOWN_WRITE logerror("unknown io write CPU '%s':%08x  0x%08x 0x%04x & 0x%04x\n", space->device().tag(), cpu_get_pc(&space->device()), offset*2, data, mem_mask);
+#define LOG_UNKNOWN_WRITE logerror("unknown io write CPU '%s':%08x  0x%08x 0x%04x & 0x%04x\n", space.device().tag(), cpu_get_pc(&space.device()), offset*2, data, mem_mask);
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
@@ -284,7 +294,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 	/* non-tile based spriteram (BARE-BONES, looks pretty complex) */
 	if(1)
 	{
-		const UINT8 *blit_ram = screen.machine().region("spr_gfx")->base();
+		const UINT8 *blit_ram = screen.machine().root_device().memregion("spr_gfx")->base();
 		int offs,x,y,z,xsize,ysize,yi,xi,col_bank,fx,zoom;
 		UINT32 spr_offs,spr_offs_helper;
 		int xf,yf,xz,yz;
@@ -416,7 +426,7 @@ static UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const r
 		if(0) //sprite gfx debug viewer
 		{
 			int x,y,count;
-			const UINT8 *blit_ram = screen.machine().region("spr_gfx")->base();
+			const UINT8 *blit_ram = screen.machine().root_device().memregion("spr_gfx")->base();
 
 			if(screen.machine().input().code_pressed(KEYCODE_Z))
 			state->m_test_x++;
@@ -510,37 +520,35 @@ static SCREEN_UPDATE_IND16( cybertnk_left ) { return update_screen(screen, bitma
 static SCREEN_UPDATE_IND16( cybertnk_right ) { return update_screen(screen, bitmap, cliprect, -256); }
 
 
-static WRITE16_HANDLER( tx_vram_w )
+WRITE16_MEMBER(cybertnk_state::tx_vram_w)
 {
-	cybertnk_state *state = space->machine().driver_data<cybertnk_state>();
-	COMBINE_DATA(&state->m_tx_vram[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tx_vram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
-static READ16_HANDLER( io_r )
+READ16_MEMBER(cybertnk_state::io_r)
 {
-	cybertnk_state *state = space->machine().driver_data<cybertnk_state>();
 	switch( offset )
 	{
 		case 2/2:
-			return input_port_read(space->machine(), "DSW1");
+			return ioport("DSW1")->read();
 
 		// 0x00110007 is controller device select
 		// 0x001100D5 is controller data
 		// 0x00110004 low is controller data ready
 		case 4/2:
-			switch( (state->m_io_ram[6/2]) & 0xff )
+			switch( (m_io_ram[6/2]) & 0xff )
 			{
 				case 0:
-					state->m_io_ram[0xd4/2] = input_port_read(space->machine(), "TRAVERSE");
+					m_io_ram[0xd4/2] = ioport("TRAVERSE")->read();
 					break;
 
 				case 0x20:
-					state->m_io_ram[0xd4/2] = input_port_read(space->machine(), "ELEVATE");
+					m_io_ram[0xd4/2] = ioport("ELEVATE")->read();
 					break;
 
 				case 0x40:
-					state->m_io_ram[0xd4/2] = input_port_read(space->machine(), "ACCEL");
+					m_io_ram[0xd4/2] = ioport("ACCEL")->read();
 					break;
 
 				case 0x42:
@@ -548,11 +556,11 @@ static READ16_HANDLER( io_r )
 					// controller return value is stored in $42(a6)
 					// but I don't see it referenced again.
 					//popmessage("unknown controller device 0x42");
-					state->m_io_ram[0xd4/2] = 0;
+					m_io_ram[0xd4/2] = 0;
 					break;
 
 				case 0x60:
-					state->m_io_ram[0xd4/2] = input_port_read(space->machine(), "HANDLE");
+					m_io_ram[0xd4/2] = ioport("HANDLE")->read();
 					break;
 
 				//default:
@@ -561,36 +569,35 @@ static READ16_HANDLER( io_r )
 			return 0;
 
 		case 6/2:
-			return input_port_read(space->machine(), "IN0"); // high half
+			return ioport("IN0")->read(); // high half
 
 		case 8/2:
-			return input_port_read(space->machine(), "IN0"); // low half
+			return ioport("IN0")->read(); // low half
 
 		case 0xa/2:
-			return input_port_read(space->machine(), "DSW2");
+			return ioport("DSW2")->read();
 
 		case 0xd4/2:
-			return state->m_io_ram[offset]; // controller data
+			return m_io_ram[offset]; // controller data
 
 		default:
 		{
 			//popmessage("unknown io read 0x%08x", offset);
-			return state->m_io_ram[offset];
+			return m_io_ram[offset];
 		}
 	}
 }
 
-static WRITE16_HANDLER( io_w )
+WRITE16_MEMBER(cybertnk_state::io_w)
 {
-	cybertnk_state *state = space->machine().driver_data<cybertnk_state>();
-	COMBINE_DATA(&state->m_io_ram[offset]);
+	COMBINE_DATA(&m_io_ram[offset]);
 
 	switch( offset )
 	{
 		case 0/2:
 			// sound data
 			if (ACCESSING_BITS_0_7)
-				cputag_set_input_line(space->machine(), "audiocpu", 0, HOLD_LINE);
+				cputag_set_input_line(machine(), "audiocpu", 0, HOLD_LINE);
 			else
 				LOG_UNKNOWN_WRITE
 			break;
@@ -644,7 +651,7 @@ static WRITE16_HANDLER( io_w )
 		case 0x80/2:
 		case 0x82/2:
 		case 0x84/2:
-			popmessage("%02x %02x %02x %02x %02x %02x %02x",state->m_io_ram[0x40/2],state->m_io_ram[0x42/2],state->m_io_ram[0x44/2],state->m_io_ram[0x46/2],state->m_io_ram[0x48/2],state->m_io_ram[0x4a/2],state->m_io_ram[0x4c/2]);
+			popmessage("%02x %02x %02x %02x %02x %02x %02x",m_io_ram[0x40/2],m_io_ram[0x42/2],m_io_ram[0x44/2],m_io_ram[0x46/2],m_io_ram[0x48/2],m_io_ram[0x4a/2],m_io_ram[0x4c/2]);
 			break;
 
 		default:
@@ -653,39 +660,38 @@ static WRITE16_HANDLER( io_w )
 	}
 }
 
-static READ8_HANDLER( soundport_r )
+READ8_MEMBER(cybertnk_state::soundport_r)
 {
-	cybertnk_state *state = space->machine().driver_data<cybertnk_state>();
-	return state->m_io_ram[0] & 0xff;
+	return m_io_ram[0] & 0xff;
 }
 
-static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( master_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x087fff) AM_RAM /*Work RAM*/
-	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_BASE_MEMBER(cybertnk_state, m_spr_ram) // non-tile based sprite ram
-	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE(tx_vram_w) AM_BASE_MEMBER(cybertnk_state, m_tx_vram)
-	AM_RANGE(0x0c4000, 0x0c5fff) AM_RAM AM_BASE_MEMBER(cybertnk_state, m_bg_vram)
-	AM_RANGE(0x0c8000, 0x0c9fff) AM_RAM AM_BASE_MEMBER(cybertnk_state, m_fg_vram)
+	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_SHARE("spr_ram") // non-tile based sprite ram
+	AM_RANGE(0x0c0000, 0x0c1fff) AM_RAM_WRITE(tx_vram_w) AM_SHARE("tx_vram")
+	AM_RANGE(0x0c4000, 0x0c5fff) AM_RAM AM_SHARE("bg_vram")
+	AM_RANGE(0x0c8000, 0x0c9fff) AM_RAM AM_SHARE("fg_vram")
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_RAM AM_SHARE("sharedram")
-	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x110000, 0x1101ff) AM_READWRITE(io_r,io_w) AM_BASE_MEMBER(cybertnk_state, m_io_ram)
+	AM_RANGE(0x100000, 0x107fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x110000, 0x1101ff) AM_READWRITE(io_r,io_w) AM_SHARE("io_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_mem, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( slave_mem, AS_PROGRAM, 16, cybertnk_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM /*Work RAM*/
-	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM AM_BASE_MEMBER(cybertnk_state, m_roadram)
+	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM AM_SHARE("roadram")
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x140000, 0x140003) AM_NOP /*Watchdog? Written during loops and interrupts*/
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8, cybertnk_state )
 	AM_RANGE(0x0000, 0x7fff ) AM_ROM
 	AM_RANGE(0x8000, 0x9fff ) AM_RAM
 	AM_RANGE(0xa001, 0xa001 ) AM_READ(soundport_r)
 	AM_RANGE(0xa005, 0xa006 ) AM_NOP
-	AM_RANGE(0xa000, 0xa001 ) AM_DEVREADWRITE("ym1", y8950_r, y8950_w)
-	AM_RANGE(0xc000, 0xc001 ) AM_DEVREADWRITE("ym2", y8950_r, y8950_w)
+	AM_RANGE(0xa000, 0xa001 ) AM_DEVREADWRITE_LEGACY("ym1", y8950_r, y8950_w)
+	AM_RANGE(0xc000, 0xc001 ) AM_DEVREADWRITE_LEGACY("ym2", y8950_r, y8950_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cybertnk )
@@ -1008,7 +1014,7 @@ DRIVER_INIT( cybertnk )
     UINT8* road_data;
     int i;
 
-    road_data = machine.region("road_data")->base();
+    road_data = machine.root_device().memregion("road_data")->base();
     for (i=0;i < 0x40000;i++)
     {
         road_data[i] = BITSWAP8(road_data[i],3,2,1,0,7,6,5,4);

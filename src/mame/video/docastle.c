@@ -31,6 +31,7 @@
 
 PALETTE_INIT( docastle )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 256; i++)
@@ -62,48 +63,42 @@ PALETTE_INIT( docastle )
 	}
 }
 
-WRITE8_HANDLER( docastle_videoram_w )
+WRITE8_MEMBER(docastle_state::docastle_videoram_w)
 {
-	docastle_state *state = space->machine().driver_data<docastle_state>();
-	state->m_videoram[offset] = data;
-	state->m_do_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_do_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( docastle_colorram_w )
+WRITE8_MEMBER(docastle_state::docastle_colorram_w)
 {
-	docastle_state *state = space->machine().driver_data<docastle_state>();
-	state->m_colorram[offset] = data;
-	state->m_do_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_do_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_HANDLER( docastle_flipscreen_off_r )
+READ8_MEMBER(docastle_state::docastle_flipscreen_off_r)
 {
-	docastle_state *state = space->machine().driver_data<docastle_state>();
-	flip_screen_set(space->machine(), 0);
-	state->m_do_tilemap->mark_all_dirty();
+	flip_screen_set(0);
+	m_do_tilemap->mark_all_dirty();
 	return 0;
 }
 
-READ8_HANDLER( docastle_flipscreen_on_r )
+READ8_MEMBER(docastle_state::docastle_flipscreen_on_r)
 {
-	docastle_state *state = space->machine().driver_data<docastle_state>();
-	flip_screen_set(space->machine(), 1);
-	state->m_do_tilemap->mark_all_dirty();
+	flip_screen_set(1);
+	m_do_tilemap->mark_all_dirty();
 	return 1;
 }
 
-WRITE8_HANDLER( docastle_flipscreen_off_w )
+WRITE8_MEMBER(docastle_state::docastle_flipscreen_off_w)
 {
-	docastle_state *state = space->machine().driver_data<docastle_state>();
-	flip_screen_set(space->machine(), 0);
-	state->m_do_tilemap->mark_all_dirty();
+	flip_screen_set(0);
+	m_do_tilemap->mark_all_dirty();
 }
 
-WRITE8_HANDLER( docastle_flipscreen_on_w )
+WRITE8_MEMBER(docastle_state::docastle_flipscreen_on_w)
 {
-	docastle_state *state = space->machine().driver_data<docastle_state>();
-	flip_screen_set(space->machine(), 1);
-	state->m_do_tilemap->mark_all_dirty();
+	flip_screen_set(1);
+	m_do_tilemap->mark_all_dirty();
 }
 
 static TILE_GET_INFO( get_tile_info )
@@ -139,7 +134,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	machine.priority_bitmap.fill(1);
 
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int sx, sy, flipx, flipy, code, color;
 
@@ -196,7 +191,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 			flipy = state->m_spriteram[offs + 2] & 0x80;
 		}
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

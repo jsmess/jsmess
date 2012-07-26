@@ -43,7 +43,6 @@
     - Keyboard autorepeat
 
 *******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -118,8 +117,8 @@ public:
 
 VIDEO_START_MEMBER( mycom_state )
 {
-	m_p_videoram = machine().region("vram")->base();
-	m_p_chargen = machine().region("chargen")->base();
+	m_p_videoram = memregion("vram")->base();
+	m_p_chargen = memregion("chargen")->base();
 }
 
 static MC6845_UPDATE_ROW( mycom_update_row )
@@ -182,8 +181,8 @@ WRITE8_MEMBER( mycom_state::mycom_00_w )
 {
 	switch(data)
 	{
-		case 0x00: memory_set_bank(machine(), "boot", 1); break;
-		case 0x01: memory_set_bank(machine(), "boot", 0); break;
+		case 0x00: membank("boot")->set_entry(1); break;
+		case 0x01: membank("boot")->set_entry(0); break;
 		case 0x02: m_upper_sw = 0x10000; break;
 		case 0x03: m_upper_sw = 0x0c000; break;
 	}
@@ -500,7 +499,7 @@ static TIMER_DEVICE_CALLBACK( mycom_kbd )
 	UINT8 x, y, scancode = 0;
 	UINT16 pressed[9];
 	char kbdrow[3];
-	UINT8 modifiers = input_port_read(timer.machine(), "XX");
+	UINT8 modifiers = timer.machine().root_device().ioport("XX")->read();
 	UINT8 shift_pressed = (modifiers & 2) >> 1;
 	state->m_keyb_press_flag = 0;
 
@@ -508,7 +507,7 @@ static TIMER_DEVICE_CALLBACK( mycom_kbd )
 	for (x = 0; x < 9; x++)
 	{
 		sprintf(kbdrow,"X%d",x);
-		pressed[x] = (input_port_read(timer.machine(), kbdrow));
+		pressed[x] = (timer.machine().root_device().ioport(kbdrow)->read());
 	}
 
 	/* find what has changed */
@@ -538,20 +537,21 @@ static TIMER_DEVICE_CALLBACK( mycom_kbd )
 
 MACHINE_START_MEMBER(mycom_state)
 {
-	m_p_ram = machine().region("maincpu")->base();
+	m_p_ram = memregion("maincpu")->base();
 }
 
 MACHINE_RESET_MEMBER(mycom_state)
 {
-	memory_set_bank(machine(), "boot", 1);
+	membank("boot")->set_entry(1);
 	m_upper_sw = 0x10000;
 	m_0a = 0;
 }
 
 static DRIVER_INIT( mycom )
 {
-	UINT8 *RAM = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "boot", 0, 2, &RAM[0x0000], 0x10000);
+	mycom_state *state = machine.driver_data<mycom_state>();
+	UINT8 *RAM = state->memregion("maincpu")->base();
+	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
 static MACHINE_CONFIG_START( mycom, mycom_state )

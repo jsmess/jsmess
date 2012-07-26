@@ -1416,14 +1416,14 @@ static READ64_HANDLER( naomi_arm_r )
 {
 	dc_state *state = space->machine().driver_data<dc_state>();
 
-	return *((UINT64 *)state->dc_sound_ram+offset);
+	return *(reinterpret_cast<UINT64 *>(state->dc_sound_ram.target())+offset);
 }
 
 static WRITE64_HANDLER( naomi_arm_w )
 {
 	dc_state *state = space->machine().driver_data<dc_state>();
 
-	COMBINE_DATA((UINT64 *)state->dc_sound_ram + offset);
+	COMBINE_DATA(reinterpret_cast<UINT64 *>(state->dc_sound_ram.target()) + offset);
 }
 
 static READ64_HANDLER( naomi_unknown1_r )
@@ -1551,43 +1551,43 @@ static WRITE64_DEVICE_HANDLER( eeprom_93c46a_w )
  * Naomi 1 address map
  */
 
-static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START( naomi_map, AS_PROGRAM, 64, dc_state )
 	/* Area 0 */
 	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) // BIOS
 
 	AM_RANGE(0x00200000, 0x00207fff) AM_MIRROR(0x02000000) AM_RAM                                             // bios uses it (battery backed ram ?)
-	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
+	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_MIRROR(0x02000000) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", naomi_board, submap, U64(0x0000ffff0000ffff) )
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, U64(0xffffffffffffffff) )
-	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE( dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_MIRROR(0x02000000) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_READWRITE( pvr_ta_r, pvr_ta_w )
-	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE( dc_modem_r, dc_modem_w )
-	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_DEVREADWRITE( "aica", dc_aica_reg_r, dc_aica_reg_w )
-	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_READWRITE( dc_rtc_r, dc_rtc_w )
-	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE( naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
+	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(dc_g2_ctrl_r, dc_g2_ctrl_w )
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(pvr_ctrl_r, pvr_ctrl_w )
+	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(pvr_ta_r, pvr_ta_w )
+	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(dc_modem_r, dc_modem_w )
+	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_DEVREADWRITE_LEGACY("aica", dc_aica_reg_r, dc_aica_reg_w )
+	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(dc_rtc_r, dc_rtc_w )
+	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
 
 	/* External Device */
 	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM	// Naomi 2 BIOS tests this, needs to read back as written
-	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
+	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
 	/* Area 1 */
-	AM_RANGE(0x04000000, 0x04ffffff) AM_MIRROR(0x02000000) AM_RAM AM_BASE_MEMBER( dc_state,dc_texture_ram )      // texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x05ffffff) AM_MIRROR(0x02000000) AM_RAM AM_BASE_MEMBER( dc_state,dc_framebuffer_ram ) // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
+	AM_RANGE(0x04000000, 0x04ffffff) AM_MIRROR(0x02000000) AM_RAM AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
+	AM_RANGE(0x05000000, 0x05ffffff) AM_MIRROR(0x02000000) AM_RAM AM_SHARE("frameram") // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
 
 	/* Area 2*/
 	AM_RANGE(0x08000000, 0x09ffffff) AM_MIRROR(0x02000000) AM_NOP // 'Unassigned'
 
 	/* Area 3 */
-	AM_RANGE(0x0c000000, 0x0dffffff) AM_MIRROR(0xa2000000) AM_RAM AM_BASE(&naomi_ram64)
+	AM_RANGE(0x0c000000, 0x0dffffff) AM_MIRROR(0xa2000000) AM_RAM AM_BASE_LEGACY(&naomi_ram64)
 
 	/* Area 4 */
-	AM_RANGE(0x10000000, 0x107fffff) AM_MIRROR(0x02000000) AM_WRITE( ta_fifo_poly_w )
-	AM_RANGE(0x10800000, 0x10ffffff) AM_MIRROR(0x02000000) AM_WRITE( ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x11ffffff) AM_WRITE( ta_texture_directpath0_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
+	AM_RANGE(0x10000000, 0x107fffff) AM_MIRROR(0x02000000) AM_WRITE_LEGACY(ta_fifo_poly_w )
+	AM_RANGE(0x10800000, 0x10ffffff) AM_MIRROR(0x02000000) AM_WRITE_LEGACY(ta_fifo_yuv_w )
+	AM_RANGE(0x11000000, 0x11ffffff) AM_WRITE_LEGACY(ta_texture_directpath0_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
-	AM_RANGE(0x13000000, 0x13ffffff) AM_WRITE( ta_texture_directpath1_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
+	AM_RANGE(0x13000000, 0x13ffffff) AM_WRITE_LEGACY(ta_texture_directpath1_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
 
 	/* Area 5 */
 	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
@@ -1603,53 +1603,53 @@ ADDRESS_MAP_END
  * Naomi 2 address map
  */
 
-static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64, dc_state )
 	/* Area 0 */
 	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) // BIOS
 
 	AM_RANGE(0x00200000, 0x00207fff) AM_MIRROR(0x02000000) AM_RAM                                             // bios uses it (battery backed ram ?)
-	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
+	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_MIRROR(0x02000000) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", naomi_board, submap, U64(0x0000ffff0000ffff) )
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, U64(0xffffffffffffffff) )
-	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE( dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE( pvr_ta_r, pvr_ta_w )
-	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE( dc_modem_r, dc_modem_w )
-	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_DEVREADWRITE( "aica", dc_aica_reg_r, dc_aica_reg_w )
-	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_READWRITE( dc_rtc_r, dc_rtc_w )
-	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE( naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
+	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(dc_g2_ctrl_r, dc_g2_ctrl_w )
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE_LEGACY(pvr_ctrl_r, pvr_ctrl_w )
+	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE_LEGACY(pvr_ta_r, pvr_ta_w )
+	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(dc_modem_r, dc_modem_w )
+	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_DEVREADWRITE_LEGACY("aica", dc_aica_reg_r, dc_aica_reg_w )
+	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(dc_rtc_r, dc_rtc_w )
+	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
 
 	/* External Device */
 	AM_RANGE(0x01010098, 0x0101009f) AM_MIRROR(0x02000000) AM_RAM	// Naomi 2 BIOS tests this, needs to read back as written
-	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
+	AM_RANGE(0x0103ff00, 0x0103ffff) AM_MIRROR(0x02000000) AM_READWRITE_LEGACY(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
-//  AM_RANGE(0x025f6800, 0x025f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w ) // second PVR DMA!
-//  AM_RANGE(0x025f7c00, 0x025f7cff) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
-	AM_RANGE(0x025f8000, 0x025f9fff) AM_READWRITE( pvr2_ta_r, pvr2_ta_w )
+//  AM_RANGE(0x025f6800, 0x025f69ff) AM_READWRITE_LEGACY(dc_sysctrl_r, dc_sysctrl_w ) // second PVR DMA!
+//  AM_RANGE(0x025f7c00, 0x025f7cff) AM_READWRITE_LEGACY(pvr_ctrl_r, pvr_ctrl_w )
+	AM_RANGE(0x025f8000, 0x025f9fff) AM_READWRITE_LEGACY(pvr2_ta_r, pvr2_ta_w )
 
 	/* Area 1 */
-	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM AM_BASE_MEMBER( dc_state, dc_texture_ram )      // texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_BASE_MEMBER( dc_state, dc_framebuffer_ram ) // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
-	AM_RANGE(0x06000000, 0x06ffffff) AM_RAM AM_BASE_MEMBER( dc_state, pvr2_texture_ram )   // 64 bit access 2nd PVR RAM
-	AM_RANGE(0x07000000, 0x07ffffff) AM_RAM AM_BASE_MEMBER( dc_state, pvr2_framebuffer_ram )// 32 bit access 2nd PVR RAM
+	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
+	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE("frameram") // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
+	AM_RANGE(0x06000000, 0x06ffffff) AM_RAM AM_SHARE("textureram2")   // 64 bit access 2nd PVR RAM
+	AM_RANGE(0x07000000, 0x07ffffff) AM_RAM AM_SHARE("frameram2")// 32 bit access 2nd PVR RAM
 
 	/* Area 2*/
-	AM_RANGE(0x085f6800, 0x085f69ff) AM_WRITE( dc_sysctrl_w ) // writes to BOTH PVRs
-	AM_RANGE(0x085f8000, 0x085f9fff) AM_WRITE( pvrs_ta_w ) // writes to BOTH PVRs
-	AM_RANGE(0x08800000, 0x088000ff) AM_READWRITE32( elan_regs_r, elan_regs_w, U64(0xffffffffffffffff) ) // T&L chip registers
+	AM_RANGE(0x085f6800, 0x085f69ff) AM_WRITE_LEGACY(dc_sysctrl_w ) // writes to BOTH PVRs
+	AM_RANGE(0x085f8000, 0x085f9fff) AM_WRITE_LEGACY(pvrs_ta_w ) // writes to BOTH PVRs
+	AM_RANGE(0x08800000, 0x088000ff) AM_READWRITE32_LEGACY(elan_regs_r, elan_regs_w, U64(0xffffffffffffffff) ) // T&L chip registers
 //  AM_RANGE(0x09000000, 0x09??????) T&L command processing
-    AM_RANGE(0x0a000000, 0x0bffffff) AM_RAM AM_BASE_MEMBER( dc_state, elan_ram ) // T&L chip RAM
+    AM_RANGE(0x0a000000, 0x0bffffff) AM_RAM AM_SHARE("elan_ram") // T&L chip RAM
 
 	/* Area 3 */
-	AM_RANGE(0x0c000000, 0x0dffffff) AM_MIRROR(0xa2000000) AM_RAM AM_BASE(&naomi_ram64)
+	AM_RANGE(0x0c000000, 0x0dffffff) AM_MIRROR(0xa2000000) AM_RAM AM_BASE_LEGACY(&naomi_ram64)
 
 	/* Area 4 */
-	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
-	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x11ffffff) AM_WRITE( ta_texture_directpath0_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
+	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE_LEGACY(ta_fifo_poly_w )
+	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE_LEGACY(ta_fifo_yuv_w )
+	AM_RANGE(0x11000000, 0x11ffffff) AM_WRITE_LEGACY(ta_texture_directpath0_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
-	AM_RANGE(0x13000000, 0x13ffffff) AM_WRITE( ta_texture_directpath1_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
+	AM_RANGE(0x13000000, 0x13ffffff) AM_WRITE_LEGACY(ta_texture_directpath1_w ) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
 
 	/* Area 5 */
 	//AM_RANGE(0x14000000, 0x17ffffff) AM_NOP // MPX Ext.
@@ -1662,8 +1662,8 @@ static ADDRESS_MAP_START( naomi2_map, AS_PROGRAM, 64 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( naomi_port, AS_IO, 64 )
-	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE("main_eeprom", eeprom_93c46a_r, eeprom_93c46a_w)
+static ADDRESS_MAP_START( naomi_port, AS_IO, 64, dc_state )
+	AM_RANGE(0x00, 0x0f) AM_DEVREADWRITE_LEGACY("main_eeprom", eeprom_93c46a_r, eeprom_93c46a_w)
 ADDRESS_MAP_END
 
 /*
@@ -1726,7 +1726,7 @@ static READ64_HANDLER( aw_modem_r )
 
 	if (reg == 0x280/4)
 	{
-		UINT32 coins = input_port_read(space->machine(), "COINS");
+		UINT32 coins = space->machine().root_device().ioport("COINS")->read();
 
 		if (coins & 0x01)
 		{
@@ -1755,36 +1755,36 @@ static WRITE64_HANDLER( aw_modem_w )
 	mame_printf_verbose("MODEM: [%08x=%x] write %" I64FMT "x to %x, mask %" I64FMT "x\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }
 
-static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64 )
+static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64, dc_state )
 	/* Area 0 */
-	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE( aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
-	AM_RANGE(0xa0000000, 0xa001ffff) AM_READWRITE( aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
+	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE_LEGACY(aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
+	AM_RANGE(0xa0000000, 0xa001ffff) AM_READWRITE_LEGACY(aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
 
 	AM_RANGE(0x00200000, 0x0021ffff) AM_RAM 	// battery backed up RAM
-	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
+	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE_LEGACY(dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_MIRROR(0x02000000) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
 	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", aw_rom_board, submap, U64(0x0000ffff0000ffff) )
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, U64(0xffffffffffffffff) )
-	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE( dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE( pvr_ta_r, pvr_ta_w )
-	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE( aw_modem_r, aw_modem_w )
-	AM_RANGE(0x00700000, 0x00707fff) AM_DEVREADWRITE( "aica", dc_aica_reg_r, dc_aica_reg_w )
-	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE( dc_rtc_r, dc_rtc_w )
-	AM_RANGE(0x00800000, 0x00ffffff) AM_READWRITE( naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
+	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE_LEGACY(dc_g2_ctrl_r, dc_g2_ctrl_w )
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE_LEGACY(pvr_ctrl_r, pvr_ctrl_w )
+	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE_LEGACY(pvr_ta_r, pvr_ta_w )
+	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE_LEGACY(aw_modem_r, aw_modem_w )
+	AM_RANGE(0x00700000, 0x00707fff) AM_DEVREADWRITE_LEGACY("aica", dc_aica_reg_r, dc_aica_reg_w )
+	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE_LEGACY(dc_rtc_r, dc_rtc_w )
+	AM_RANGE(0x00800000, 0x00ffffff) AM_READWRITE_LEGACY(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
 
 
-	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
+	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE_LEGACY(naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
 
 	/* Area 1 - half the texture memory, like dreamcast, not naomi */
-	AM_RANGE(0x04000000, 0x047fffff) AM_RAM	AM_MIRROR(0x00800000) AM_BASE_MEMBER( dc_state, dc_texture_ram )      // texture memory 64 bit access
-	AM_RANGE(0x05000000, 0x057fffff) AM_RAM AM_MIRROR(0x00800000) AM_BASE_MEMBER( dc_state, dc_framebuffer_ram ) // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
+	AM_RANGE(0x04000000, 0x047fffff) AM_RAM	AM_MIRROR(0x00800000) AM_SHARE("dc_texture_ram")      // texture memory 64 bit access
+	AM_RANGE(0x05000000, 0x057fffff) AM_RAM AM_MIRROR(0x00800000) AM_SHARE("frameram") // apparently this actually accesses the same memory as the 64-bit texture memory access, but in a different format, keep it apart for now
 
 	/* Area 2*/
 	AM_RANGE(0x08000000, 0x0bffffff) AM_NOP // 'Unassigned'
 
 	/* Area 3 */
-	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_BASE(&naomi_ram64) AM_SHARE("share4")
+	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM AM_BASE_LEGACY(&naomi_ram64) AM_SHARE("share4")
 	AM_RANGE(0x0d000000, 0x0dffffff) AM_RAM AM_SHARE("share4")// extra ram on Naomi (mirror on DC)
 	AM_RANGE(0x0e000000, 0x0effffff) AM_RAM AM_SHARE("share4")// mirror
 	AM_RANGE(0x0f000000, 0x0fffffff) AM_RAM AM_SHARE("share4")// mirror
@@ -1793,11 +1793,11 @@ static ADDRESS_MAP_START( aw_map, AS_PROGRAM, 64 )
 	AM_RANGE(0x8d000000, 0x8dffffff) AM_RAM AM_SHARE("share4") // RAM access through cache
 
 	/* Area 4 - half the texture memory, like dreamcast, not naomi */
-	AM_RANGE(0x10000000, 0x107fffff) AM_MIRROR(0x02000000) AM_WRITE( ta_fifo_poly_w )
-	AM_RANGE(0x10800000, 0x10ffffff) AM_MIRROR(0x02000000) AM_WRITE( ta_fifo_yuv_w )
-	AM_RANGE(0x11000000, 0x117fffff) AM_WRITE( ta_texture_directpath0_w ) AM_MIRROR(0x00800000)  // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
+	AM_RANGE(0x10000000, 0x107fffff) AM_MIRROR(0x02000000) AM_WRITE_LEGACY(ta_fifo_poly_w )
+	AM_RANGE(0x10800000, 0x10ffffff) AM_MIRROR(0x02000000) AM_WRITE_LEGACY(ta_fifo_yuv_w )
+	AM_RANGE(0x11000000, 0x117fffff) AM_WRITE_LEGACY(ta_texture_directpath0_w ) AM_MIRROR(0x00800000)  // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
-	AM_RANGE(0x13000000, 0x137fffff) AM_WRITE( ta_texture_directpath1_w ) AM_MIRROR(0x00800000) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
+	AM_RANGE(0x13000000, 0x137fffff) AM_WRITE_LEGACY(ta_texture_directpath1_w ) AM_MIRROR(0x00800000) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue
 
 
 	/* Area 5 */
@@ -1827,10 +1827,10 @@ static const aica_interface aica_config =
 };
 
 
-static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( dc_audio_map, AS_PROGRAM, 32, dc_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE_MEMBER( dc_state, dc_sound_ram )                /* shared with SH-4 */
-	AM_RANGE(0x00800000, 0x00807fff) AM_DEVREADWRITE("aica", dc_arm_aica_r, dc_arm_aica_w)
+	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_SHARE("dc_sound_ram")                /* shared with SH-4 */
+	AM_RANGE(0x00800000, 0x00807fff) AM_DEVREADWRITE_LEGACY("aica", dc_arm_aica_r, dc_arm_aica_w)
 ADDRESS_MAP_END
 
 /*
@@ -2512,7 +2512,7 @@ static MACHINE_CONFIG_START( naomi_aw_base, dc_state )
 	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MCFG_CPU_PROGRAM_MAP(dc_audio_map)
 
-	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu" )
+	MCFG_MAPLE_DC_ADD( "maple_dc", "maincpu", dc_maple_irq )
 
 	MCFG_MACHINE_START( dc )
 	MCFG_MACHINE_RESET( naomi )
@@ -2664,6 +2664,7 @@ EPR-21576d - NAOMI BOOT ROM 1999 06/04  1.40 (Japan)
 EPR-21576b - NAOMI BOOT ROM 1999 02/15  1.20 (Japan)
 EPR-21576a - NAOMI BOOT ROM 1999 01/14  1.10 (Japan)
 EPR-21576  - NAOMI BOOT ROM 1998 12/18  1.00 (Japan)
+EPR-21577h - NAOMI BOOT ROM 2002 07/08  1.8- (USA)
 EPR-21577g - NAOMI BOOT ROM 2001 09/10  1.70 (USA)
 EPR-21577e - NAOMI BOOT ROM 2000 08/25  1.50 (USA)
 EPR-21577d - NAOMI BOOT ROM 1999 06/04  1.40 (USA)
@@ -2672,7 +2673,7 @@ EPR-21578h - NAOMI BOOT ROM 2002 07/08  1.8- (Export)
 EPR-21578g - NAOMI BOOT ROM 2001 09/10  1.70 (Export)
 EPR-21578e - NAOMI BOOT ROM 2000 08/25  1.50 (Export)
 EPR-21578d - NAOMI BOOT ROM 1999 06/04  1.40 (Export)
-EPR-21578b - NAOMI BOOT ROM 1999 02/15  1.20 (Export) <-- Also found as EPR-21578A
+EPR-21578a - NAOMI BOOT ROM 1999 02/15  1.20 (Export) <-- Also found as EPR-21578A
 EPR-21579d - NAOMI BOOT ROM 1999 06/04  1.40 (Korea)
 EPR-21579  - NAOMI BOOT ROM 1999 01/14  1.10 (Korea)
 EPR-21580  - No known dump (Australia)
@@ -2733,41 +2734,43 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
 #define NAOMI_BIOS \
 	ROM_REGION( 0x200000, "maincpu", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "epr-21576h (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-21576h.ic27",  0x000000, 0x200000, CRC(d4895685) SHA1(91424d481ff99a8d3f4c45cea6d3f0eada049a6d) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-21576h.ic27", 0x000000, 0x200000, CRC(d4895685) SHA1(91424d481ff99a8d3f4c45cea6d3f0eada049a6d) ) \
 	ROM_SYSTEM_BIOS( 1, "bios1", "epr-21576g (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21576g.ic27",  0x000000, 0x200000, CRC(d2a1c6bf) SHA1(6d27d71aec4dfba98f66316ae74a1426d567698a) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21576g.ic27", 0x000000, 0x200000, CRC(d2a1c6bf) SHA1(6d27d71aec4dfba98f66316ae74a1426d567698a) ) \
 	ROM_SYSTEM_BIOS( 2, "bios2", "epr-21576e (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-21576e.ic27",  0x000000, 0x200000, CRC(08c0add7) SHA1(e7c1a7673cb2ccb21748ef44105e46d1bad7266d) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-21576e.ic27", 0x000000, 0x200000, CRC(08c0add7) SHA1(e7c1a7673cb2ccb21748ef44105e46d1bad7266d) ) \
 	ROM_SYSTEM_BIOS( 3, "bios3", "epr-21576d (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-21576d.ic27",  0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-21576d.ic27", 0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
 	ROM_SYSTEM_BIOS( 4, "bios4", "epr-21576b (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-21576b.ic27",  0x000000, 0x200000, CRC(755a6e07) SHA1(7e8b8ccfc063144d89668e7224dcd8a36c54f3b3) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-21576b.ic27", 0x000000, 0x200000, CRC(755a6e07) SHA1(7e8b8ccfc063144d89668e7224dcd8a36c54f3b3) ) \
 	ROM_SYSTEM_BIOS( 5, "bios5", "epr-21576a (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-21576a.ic27",  0x000000, 0x200000, CRC(cedfe439) SHA1(f27798bf3d890863ef0c1d9dcb4e7782249dca27) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-21576a.ic27", 0x000000, 0x200000, CRC(cedfe439) SHA1(f27798bf3d890863ef0c1d9dcb4e7782249dca27) ) \
 	ROM_SYSTEM_BIOS( 6, "bios6", "epr-21576 (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-21576.ic27", 0x000000, 0x200000, CRC(9dad3495) SHA1(5fb66f9a2b68d120f059c72758e65d34f461044a) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-21576.ic27",  0x000000, 0x200000, CRC(9dad3495) SHA1(5fb66f9a2b68d120f059c72758e65d34f461044a) ) \
 	ROM_SYSTEM_BIOS( 7, "bios7", "epr-21578h (Export)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 7, "epr-21578h.ic27", 0x000000, 0x200000, CRC(7b452946) SHA1(8e9f153bbada24b37066dc45b64a7bf0d4f26a9b) ) \
 	ROM_SYSTEM_BIOS( 8, "bios8", "epr-21578g (Export)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-21578g.ic27", 0x000000, 0x200000, CRC(55413214) SHA1(bd2748365a9fc1821c9369aa7155d7c41c4df43e) ) \
 	ROM_SYSTEM_BIOS( 9, "bios9", "epr-21578e (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-21578e.ic27",  0x000000, 0x200000, CRC(087f09a3) SHA1(0418eb2cf9766f0b1b874a4e92528779e22c0a4a) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-21578e.ic27", 0x000000, 0x200000, CRC(087f09a3) SHA1(0418eb2cf9766f0b1b874a4e92528779e22c0a4a) ) \
 	ROM_SYSTEM_BIOS( 10, "bios10", "epr-21578d (Export)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 10, "epr-21578d.ic27",  0x000000, 0x200000, CRC(dfd5f42a) SHA1(614a0db4743a5e5a206190d6786ade24325afbfd) ) \
 	ROM_SYSTEM_BIOS( 11, "bios11", "epr-21578b (Export)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 11, "epr-21578b.ic27",  0x000000, 0x200000, CRC(6c9aad83) SHA1(555918de76d8dbee2a97d8a95297ef694b3e803f) ) \
-	ROM_SYSTEM_BIOS( 12, "bios12", "epr-21577g (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 12, "epr-21577g.ic27",  0x000000, 0x200000, CRC(25f64af7) SHA1(99f9e6cc0642319bd2da492611220540add573e8) ) \
-	ROM_SYSTEM_BIOS( 13, "bios13", "epr-21577e (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 13, "epr-21577e.ic27",  0x000000, 0x200000, CRC(cf36e97b) SHA1(b085305982e7572e58b03a9d35f17ae319c3bbc6) ) \
-	ROM_SYSTEM_BIOS( 14, "bios14", "epr-21577d (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 14, "epr-21577d.ic27",  0x000000, 0x200000, CRC(60ddcbbe) SHA1(58b15096d269d6df617ca1810b66b47deb184958) ) \
-	ROM_SYSTEM_BIOS( 15, "bios15", "epr-21579d (Korea)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 15, "epr-21579d.ic27",  0x000000, 0x200000, CRC(33513691) SHA1(b1d8c7c516e1471a788fcf7a02a794ad2f05aeeb) ) \
-	ROM_SYSTEM_BIOS( 16, "bios16", "epr-21579 (Korea)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 16, "epr-21579.ic27",  0x000000, 0x200000, CRC(71f9c918) SHA1(d15af8b947f41eea7c203b565cd403e3f37a2017) ) \
-	ROM_SYSTEM_BIOS( 17, "bios17", "Naomi Dev BIOS" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 17,  "dcnaodev.bios", 0x000000, 0x080000, CRC(7a50fab9) SHA1(ef79f448e0bf735d1264ad4f051d24178822110f) ) /* This one comes from a dev / beta board. The eprom was a 27C4096 */
+	ROM_SYSTEM_BIOS( 12, "bios12", "epr-21577h (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 12, "epr-21577h.ic27",  0x000000, 0x200000, CRC(fdf17452) SHA1(5f3e4b677f0046ce690a4f096b0481e5dd8bb6e6) ) \
+	ROM_SYSTEM_BIOS( 13, "bios13", "epr-21577g (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 13, "epr-21577g.ic27",  0x000000, 0x200000, CRC(25f64af7) SHA1(99f9e6cc0642319bd2da492611220540add573e8) ) \
+	ROM_SYSTEM_BIOS( 14, "bios14", "epr-21577e (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 14, "epr-21577e.ic27",  0x000000, 0x200000, CRC(cf36e97b) SHA1(b085305982e7572e58b03a9d35f17ae319c3bbc6) ) \
+	ROM_SYSTEM_BIOS( 15, "bios15", "epr-21577d (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 15, "epr-21577d.ic27",  0x000000, 0x200000, CRC(60ddcbbe) SHA1(58b15096d269d6df617ca1810b66b47deb184958) ) \
+	ROM_SYSTEM_BIOS( 16, "bios16", "epr-21579d (Korea)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 16, "epr-21579d.ic27",  0x000000, 0x200000, CRC(33513691) SHA1(b1d8c7c516e1471a788fcf7a02a794ad2f05aeeb) ) \
+	ROM_SYSTEM_BIOS( 17, "bios17", "epr-21579 (Korea)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 17, "epr-21579.ic27",  0x000000, 0x200000, CRC(71f9c918) SHA1(d15af8b947f41eea7c203b565cd403e3f37a2017) ) \
+	ROM_SYSTEM_BIOS( 18, "bios18", "Naomi Dev BIOS" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 18,  "dcnaodev.bios", 0x000000, 0x080000, CRC(7a50fab9) SHA1(ef79f448e0bf735d1264ad4f051d24178822110f) ) /* This one comes from a dev / beta board. The eprom was a 27C4096 */
 
 
 // bios for House of the Dead 2
@@ -2798,29 +2801,31 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
 #define NAOMIGD_BIOS \
 	ROM_REGION( 0x200000, "maincpu", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "epr-21576e (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-21576e.bin",  0x000000, 0x200000, CRC(08c0add7) SHA1(e7c1a7673cb2ccb21748ef44105e46d1bad7266d) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-21576e.ic27",  0x000000, 0x200000, CRC(08c0add7) SHA1(e7c1a7673cb2ccb21748ef44105e46d1bad7266d) ) \
 	ROM_SYSTEM_BIOS( 1, "bios1", "epr-21576g (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21576g.bin",  0x000000, 0x200000, CRC(d2a1c6bf) SHA1(6d27d71aec4dfba98f66316ae74a1426d567698a) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 1, "epr-21576g.ic27",  0x000000, 0x200000, CRC(d2a1c6bf) SHA1(6d27d71aec4dfba98f66316ae74a1426d567698a) ) \
 	ROM_SYSTEM_BIOS( 2, "bios2", "epr-21576h (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-21576h.bin",  0x000000, 0x200000, CRC(d4895685) SHA1(91424d481ff99a8d3f4c45cea6d3f0eada049a6d) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-21576h.ic27",  0x000000, 0x200000, CRC(d4895685) SHA1(91424d481ff99a8d3f4c45cea6d3f0eada049a6d) ) \
 	ROM_SYSTEM_BIOS( 3, "bios3", "epr-21576d (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-21576d.bin",  0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-21576d.ic27",  0x000000, 0x200000, CRC(3b2afa7b) SHA1(d007e1d321c198a38c5baff86eb2ab84385d150a) ) \
 	ROM_SYSTEM_BIOS( 4, "bios4", "epr-21578h (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-21578h.ic27", 0x000000, 0x200000, CRC(7b452946) SHA1(8e9f153bbada24b37066dc45b64a7bf0d4f26a9b) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-21578h.ic27",  0x000000, 0x200000, CRC(7b452946) SHA1(8e9f153bbada24b37066dc45b64a7bf0d4f26a9b) ) \
 	ROM_SYSTEM_BIOS( 5, "bios5", "epr-21578g (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-21578g.ic27", 0x000000, 0x200000, CRC(55413214) SHA1(bd2748365a9fc1821c9369aa7155d7c41c4df43e) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-21578g.ic27",  0x000000, 0x200000, CRC(55413214) SHA1(bd2748365a9fc1821c9369aa7155d7c41c4df43e) ) \
 	ROM_SYSTEM_BIOS( 6, "bios6", "epr-21578e (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-21578e.bin",  0x000000, 0x200000, CRC(087f09a3) SHA1(0418eb2cf9766f0b1b874a4e92528779e22c0a4a) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-21578e.ic27",  0x000000, 0x200000, CRC(087f09a3) SHA1(0418eb2cf9766f0b1b874a4e92528779e22c0a4a) ) \
 	ROM_SYSTEM_BIOS( 7, "bios7", "epr-21578d (Export)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 7, "epr-21578d.bin",  0x000000, 0x200000, CRC(dfd5f42a) SHA1(614a0db4743a5e5a206190d6786ade24325afbfd) ) \
-	ROM_SYSTEM_BIOS( 8, "bios8", "epr-21577g (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-21577g.bin",  0x000000, 0x200000, CRC(25f64af7) SHA1(99f9e6cc0642319bd2da492611220540add573e8) ) \
-	ROM_SYSTEM_BIOS( 9, "bios9", "epr-21577e (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-21577e.bin",  0x000000, 0x200000, CRC(cf36e97b) SHA1(b085305982e7572e58b03a9d35f17ae319c3bbc6) ) \
-	ROM_SYSTEM_BIOS( 10, "bios10", "epr-21577d (USA)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 10, "epr-21577d.bin",  0x000000, 0x200000, CRC(60ddcbbe) SHA1(58b15096d269d6df617ca1810b66b47deb184958) ) \
-	ROM_SYSTEM_BIOS( 11, "bios11", "epr-21579d (Korea)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 11, "epr-21579d.ic27",  0x000000, 0x200000, CRC(33513691) SHA1(b1d8c7c516e1471a788fcf7a02a794ad2f05aeeb) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 7, "epr-21578d.ic27",  0x000000, 0x200000, CRC(dfd5f42a) SHA1(614a0db4743a5e5a206190d6786ade24325afbfd) ) \
+	ROM_SYSTEM_BIOS( 8, "bios8", "epr-21577h (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 8, "epr-21577h.ic27",  0x000000, 0x200000, CRC(fdf17452) SHA1(5f3e4b677f0046ce690a4f096b0481e5dd8bb6e6) ) \
+	ROM_SYSTEM_BIOS( 9, "bios9", "epr-21577g (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 9, "epr-21577g.ic27",  0x000000, 0x200000, CRC(25f64af7) SHA1(99f9e6cc0642319bd2da492611220540add573e8) ) \
+	ROM_SYSTEM_BIOS( 10, "bios10", "epr-21577e (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 10, "epr-21577e.ic27",  0x000000, 0x200000, CRC(cf36e97b) SHA1(b085305982e7572e58b03a9d35f17ae319c3bbc6) ) \
+	ROM_SYSTEM_BIOS( 11, "bios11", "epr-21577d (USA)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 11, "epr-21577d.ic27",  0x000000, 0x200000, CRC(60ddcbbe) SHA1(58b15096d269d6df617ca1810b66b47deb184958) ) \
+	ROM_SYSTEM_BIOS( 12, "bios12", "epr-21579d (Korea)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 12, "epr-21579d.ic27",  0x000000, 0x200000, CRC(33513691) SHA1(b1d8c7c516e1471a788fcf7a02a794ad2f05aeeb) ) \
 	ROM_REGION( 0x200000, "user2", 0) \
 	ROM_LOAD16_WORD_SWAP( "fpr-23489c.ic14", 0x000000, 0x200000, CRC(bc38bea1) SHA1(b36fcc6902f397d9749e9d02de1bbb7a5e29d468) )
 
@@ -5518,7 +5523,34 @@ ROM_START( toukon4 )
     ROM_LOAD( "tr4ae-key.bin", 0x000000, 0x000004, CRC(986a7cee) SHA1(70c3ff80f86de6a0655251658c66a156fb644995) )
 ROM_END
 
+ROM_START( ninjaslt )
+    NAOMI_BIOS
+    NAOMI_DEFAULT_EEPROM
+
+    ROM_REGION( 0xb000000, "rom_board", ROMREGION_ERASEFF)
+    ROM_LOAD( "nja3vera_fl1.2d", 0x0800000, 0x0800000, CRC(442cb858) SHA1(8244871bdb0b49e14ea400d63fe759754a530410) )
+    ROM_LOAD( "nja3vera_fl2.2c", 0x1000000, 0x0800000, CRC(1f81f46b) SHA1(7677f881b84233f3f95a792f9be6f618cba6d586) )
+    ROM_LOAD( "nja3vera_fl3.2b", 0x1800000, 0x0800000, CRC(24974c3d) SHA1(cd64dec682688e26fca91873e5e7b6e0d931d1ce) )
+    ROM_LOAD( "nja1ma2.4l",      0x2000000, 0x1000000, CRC(5af34ea0) SHA1(b49a50e995cb6682782b0643d40001b9bffe0118) )
+    ROM_LOAD( "nja1ma3.4k",      0x3000000, 0x1000000, CRC(504a89b3) SHA1(e0b90542f80527e998db7ee3bb75e36c375cacba) )
+    ROM_LOAD( "nja1ma4.4j",      0x4000000, 0x1000000, CRC(d5c2799a) SHA1(ce46c1aa38479d9e5e350573bc6b214979b88dbc) )
+    ROM_LOAD( "nja1ma5.4h",      0x5000000, 0x1000000, CRC(cf5df4d3) SHA1(220bc51979d2c5f753fc6b544bb38c0c306bbcb8) )
+    ROM_LOAD( "nja1ma6.4f",      0x6000000, 0x1000000, CRC(5daa6ed4) SHA1(139a68ea0cb5c071beeffb893533302fa80bc3f8) )
+    ROM_LOAD( "nja1ma7.4e",      0x7000000, 0x1000000, CRC(d866cfa8) SHA1(a57a761cef0eaaada088a6091ec2324c112253fc) )
+    ROM_LOAD( "nja1ma8.4d",      0x8000000, 0x1000000, CRC(1c959b74) SHA1(f1ff82c26df6250e1d8c23214f7827278cd572db) )
+    ROM_LOAD( "nja1ma9.4c",      0x9000000, 0x1000000, CRC(8abed815) SHA1(5e1b208d23a17ba743d0507d963be42e7828755f) )
+    ROM_LOAD( "nja1ma10.4b",     0xa000000, 0x1000000, CRC(f14d2073) SHA1(b4a8cd585794be149b616119df3f75c0fb30e2f0) )
+
+    // this is a hack because we don't support the 8MB shift feature in naomibd yet (this also causes IC1 to show BAD
+    // in the ROM test - it is not bad and does not need a redump)
+    ROM_COPY( "rom_board", 0x800000, 0x000000, 0x800000 )
+
+    ROM_REGION( 4, "rom_key", 0 )
+    ROM_LOAD( "nja3-key.bin", 0x000000, 0x000004, CRC(e6997eb0) SHA1(c866a5069e28939be5a8fc867bc14791decac3c8) )
+ROM_END
+
 // this one's weird: the rom test checksum for IC 1 matches a screenshot from h/w, but on h/w it says ---- instead of BAD.
+// this is likely due to the missing 8MB shift feature as with ninjaslt.
 ROM_START( mazan )
     NAOMI_BIOS
     NAOMI_DEFAULT_EEPROM
@@ -6083,7 +6115,7 @@ ROM_START( azumanga )
 	NAOMI_DEFAULT_EEPROM
 
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gdl-0018", 0, BAD_DUMP SHA1(3e40ca7d43173fe7048d199fdc127b9411e10360) )
+	DISK_IMAGE_READONLY( "gdl-0018", 0, SHA1(857d405b733c1de3534275a91afb939aec4e1279) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	//PIC16C622A (317-5091-JPN)
@@ -7361,7 +7393,7 @@ ROM_END
 
 static DRIVER_INIT( atomiswave )
 {
-	UINT64 *ROM = (UINT64 *)machine.region("awflash")->base();
+	UINT64 *ROM = (UINT64 *)machine.root_device().memregion("awflash")->base();
 
 	// patch out long startup delay
 	ROM[0x98e/8] = (ROM[0x98e/8] & U64(0xffffffffffff)) | (UINT64)0x0009<<48;
@@ -7905,7 +7937,7 @@ ROM_END
 /* Cart games on Namco custom ROM board */
 /* 25209801 */ GAME( 2000, wldkicks, naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "World Kicks (WK1 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 25349801 */ GAME( 2000, toukon4,  naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "Shin Nihon Pro Wrestling Toukon Retsuden 4 Arcade Edition (TRF1 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
-/* 25469801 */
+/* 25469801 */ GAME( 2000, ninjaslt, naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "Ninja Assault (NJA3 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 25709801 */ GAME( 2001, gunsur2,  naomi, naomi,   naomi,    naomi,    ROT0, "Capcom / Namco", "Gun Survivor 2 Biohazard Code: Veronica (BHF1 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 /* 25869812 */ GAME( 2002, mazan,    naomi, naomim2, naomi,    naomi,    ROT0, "Capcom / Namco", "Mazan: Flash of the Blade (MAZ1 Ver. A)", GAME_UNEMULATED_PROTECTION|GAME_FLAGS )
 

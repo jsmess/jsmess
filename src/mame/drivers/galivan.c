@@ -35,45 +35,45 @@ Takahiro Nogi (nogi@kt.rim.or.jp) 1999/12/17 -
 #include "includes/nb1414m4.h"
 
 
-static WRITE8_HANDLER( galivan_sound_command_w )
+WRITE8_MEMBER(galivan_state::galivan_sound_command_w)
 {
-	soundlatch_w(space,0,((data & 0x7f) << 1) | 1);
+	soundlatch_byte_w(space,0,((data & 0x7f) << 1) | 1);
 }
 
-static READ8_HANDLER( soundlatch_clear_r )
+READ8_MEMBER(galivan_state::soundlatch_clear_r)
 {
-	soundlatch_clear_w(space, 0, 0);
+	soundlatch_clear_byte_w(space, 0, 0);
 	return 0;
 }
 
-static READ8_HANDLER( IO_port_c0_r )
+READ8_MEMBER(galivan_state::IO_port_c0_r)
 {
 	return (0x58); /* To Avoid Reset on Ufo Robot dangar */
 }
 
 
 
-static ADDRESS_MAP_START( galivan_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( galivan_map, AS_PROGRAM, 8, galivan_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE(galivan_videoram_w) AM_BASE_SIZE_MEMBER(galivan_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xd800, 0xdfff) AM_WRITE(galivan_videoram_w) AM_SHARE("videoram")
 
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_BASE_SIZE_MEMBER(galivan_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xe0ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe100, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ninjemak_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ninjemak_map, AS_PROGRAM, 8, galivan_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xd800, 0xdfff) AM_WRITE(galivan_videoram_w) AM_BASE_SIZE_MEMBER(galivan_state, m_videoram, m_videoram_size)
+	AM_RANGE(0xd800, 0xdfff) AM_WRITE(galivan_videoram_w) AM_SHARE("videoram")
 
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_SIZE_MEMBER(galivan_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe200, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, galivan_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
@@ -89,14 +89,13 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	AM_RANGE(0xc0, 0xc0) AM_READ(IO_port_c0_r) /* dangar needs to return 0x58 */
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( blit_trigger_w )
+WRITE8_MEMBER(galivan_state::blit_trigger_w)
 {
-	galivan_state *state = space->machine().driver_data<galivan_state>();
 
-	nb_1414m4_exec(space,(state->m_videoram[0] << 8) | (state->m_videoram[1] & 0xff),state->m_videoram,state->m_scrollx,state->m_scrolly,state->m_tx_tilemap);
+	nb_1414m4_exec(&space,(m_videoram[0] << 8) | (m_videoram[1] & 0xff),m_videoram,m_scrollx,m_scrolly,m_tx_tilemap);
 }
 
-static ADDRESS_MAP_START( ninjemak_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( ninjemak_io_map, AS_IO, 8, galivan_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1") AM_WRITE(ninjemak_gfxbank_w)
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
@@ -108,18 +107,18 @@ static ADDRESS_MAP_START( ninjemak_io_map, AS_IO, 8 )
 //  AM_RANGE(0x87, 0x87) AM_WRITENOP         // ??
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, galivan_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, galivan_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("dac1", dac_w)
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("dac2", dac_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("dac1", dac_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE_LEGACY("dac2", dac_w)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
+	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_byte_r)
 ADDRESS_MAP_END
 
 
@@ -381,9 +380,9 @@ static MACHINE_START( galivan )
 	galivan_state *state = machine.driver_data<galivan_state>();
 
 	/* configure ROM banking */
-	UINT8 *rombase = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 2, &rombase[0x10000], 0x2000);
-	memory_set_bank(machine, "bank1", 0);
+	UINT8 *rombase = state->memregion("maincpu")->base();
+	state->membank("bank1")->configure_entries(0, 2, &rombase[0x10000], 0x2000);
+	state->membank("bank1")->set_entry(0);
 
 	/* register for saving */
 	state->save_item(NAME(state->m_scrollx));
@@ -398,9 +397,9 @@ static MACHINE_START( ninjemak )
 	galivan_state *state = machine.driver_data<galivan_state>();
 
 	/* configure ROM banking */
-	UINT8 *rombase = machine.region("maincpu")->base();
-	memory_configure_bank(machine, "bank1", 0, 4, &rombase[0x10000], 0x2000);
-	memory_set_bank(machine, "bank1", 0);
+	UINT8 *rombase = state->memregion("maincpu")->base();
+	state->membank("bank1")->configure_entries(0, 4, &rombase[0x10000], 0x2000);
+	state->membank("bank1")->set_entry(0);
 
 	/* register for saving */
 	state->save_item(NAME(state->m_scrollx));
@@ -1032,75 +1031,74 @@ ROM_START( youmab2 )
 ROM_END
 
 
-static WRITE8_HANDLER( youmab_extra_bank_w )
+WRITE8_MEMBER(galivan_state::youmab_extra_bank_w)
 {
 	if (data == 0xff)
-		memory_set_bank(space->machine(), "bank2", 1);
+		membank("bank2")->set_entry(1);
 	else if (data == 0x00)
-		memory_set_bank(space->machine(), "bank2", 0);
+		membank("bank2")->set_entry(0);
 	else
 		printf("data %03x\n", data);
 }
 
-static READ8_HANDLER( youmab_8a_r )
+READ8_MEMBER(galivan_state::youmab_8a_r)
 {
-	return space->machine().rand();
+	return machine().rand();
 }
 
-static WRITE8_HANDLER( youmab_81_w )
+WRITE8_MEMBER(galivan_state::youmab_81_w)
 {
 	// ??
 }
 
 /* scrolling is tied to a serial port, reads from 0xe43d-0xe43e-0xe43f-0xe440 */
-static WRITE8_HANDLER( youmab_84_w )
+WRITE8_MEMBER(galivan_state::youmab_84_w)
 {
-	galivan_state *state = space->machine().driver_data<galivan_state>();
 
-	state->m_shift_val &= ~((0x80 >> 7) << state->m_shift_scroll);
-	state->m_shift_val |= (((data & 0x80) >> 7) << state->m_shift_scroll);
+	m_shift_val &= ~((0x80 >> 7) << m_shift_scroll);
+	m_shift_val |= (((data & 0x80) >> 7) << m_shift_scroll);
 
-	state->m_shift_scroll++;
+	m_shift_scroll++;
 
-	//popmessage("%08x",state->m_shift_val);
+	//popmessage("%08x",m_shift_val);
 
-	//if(state->m_shift_scroll == 25)
+	//if(m_shift_scroll == 25)
 }
 
-static WRITE8_HANDLER( youmab_86_w )
+WRITE8_MEMBER(galivan_state::youmab_86_w)
 {
-	galivan_state *state = space->machine().driver_data<galivan_state>();
 
 	/* latch values */
 	{
-		state->m_scrolly = (state->m_shift_val & 0x0003ff);
-		state->m_scrollx = (state->m_shift_val & 0x7ffc00) >> 10;
+		m_scrolly = (m_shift_val & 0x0003ff);
+		m_scrollx = (m_shift_val & 0x7ffc00) >> 10;
 
-		//popmessage("%08x %08x %08x",state->m_scrollx,state->m_scrolly,state->m_shift_val);
+		//popmessage("%08x %08x %08x",m_scrollx,m_scrolly,m_shift_val);
 	}
 
-	state->m_shift_val = 0;
-	state->m_shift_scroll = 0;
+	m_shift_val = 0;
+	m_shift_scroll = 0;
 }
 
 static DRIVER_INIT( youmab )
 {
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x82, 0x82, FUNC(youmab_extra_bank_w)); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
+	galivan_state *state = machine.driver_data<galivan_state>();
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x82, 0x82, write8_delegate(FUNC(galivan_state::youmab_extra_bank_w),state)); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x0000, 0x7fff, "bank3");
-	memory_set_bankptr(machine,  "bank3", machine.region("maincpu")->base());
+	state->membank("bank3")->set_base(state->memregion("maincpu")->base());
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x8000, 0xbfff, "bank2");
-	memory_configure_bank(machine, "bank2", 0, 2, machine.region("user2")->base(), 0x4000);
-	memory_set_bank(machine, "bank2", 0);
+	state->membank("bank2")->configure_entries(0, 2, state->memregion("user2")->base(), 0x4000);
+	state->membank("bank2")->set_entry(0);
 
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x81, 0x81, FUNC(youmab_81_w)); // ?? often, alternating values
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x84, 0x84, FUNC(youmab_84_w)); // ?? often, sequence..
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x81, 0x81, write8_delegate(FUNC(galivan_state::youmab_81_w),state)); // ?? often, alternating values
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x84, 0x84, write8_delegate(FUNC(galivan_state::youmab_84_w),state)); // ?? often, sequence..
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_write(0xd800, 0xd81f); // scrolling isn't here..
 
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_read_handler(0x8a, 0x8a, FUNC(youmab_8a_r)); // ???
+	machine.device("maincpu")->memory().space(AS_IO)->install_read_handler(0x8a, 0x8a, read8_delegate(FUNC(galivan_state::youmab_8a_r),state)); // ???
 
-	machine.device("maincpu")->memory().space(AS_IO)->install_legacy_write_handler(0x86, 0x86, FUNC(youmab_86_w));
+	machine.device("maincpu")->memory().space(AS_IO)->install_write_handler(0x86, 0x86, write8_delegate(FUNC(galivan_state::youmab_86_w),state));
 
 }
 

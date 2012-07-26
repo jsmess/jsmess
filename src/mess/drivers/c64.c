@@ -40,7 +40,7 @@
 
 void c64_state::check_interrupts()
 {
-	int restore = BIT(input_port_read(machine(), "SPECIAL"), 7);
+	int restore = BIT(ioport("SPECIAL")->read(), 7);
 
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_cia1_irq | m_vic_irq | m_exp_irq);
 	m_maincpu->set_input_line(INPUT_LINE_NMI, m_cia2_irq | restore | m_exp_nmi);
@@ -61,7 +61,7 @@ void c64_state::check_interrupts()
 void c64_state::bankswitch(offs_t offset, offs_t va, int rw, int aec, int ba, int cas, int *casram, int *basic, int *kernal, int *charom, int *grw, int *io, int *roml, int *romh)
 {
 	int game = m_exp->game_r(offset, rw, ba, m_hiram);
-	int exrom = m_exp->exrom_r();
+	int exrom = m_exp->exrom_r(offset, rw, ba, m_hiram);
 
 	UINT16 input = VA12 << 15 | VA13 << 14 | game << 13 | exrom << 12 | rw << 11 | aec << 10 | ba << 9 | A12 << 8 | A13 << 7 | A14 << 6 | A15 << 5 | m_va14 << 4 | m_charen << 3 | m_hiram << 2 | m_loram << 1 | cas;
 	UINT8 data = m_pla->read(input);
@@ -81,7 +81,7 @@ void c64_state::bankswitch(offs_t offset, offs_t va, int rw, int aec, int ba, in
 //  read_memory -
 //-------------------------------------------------
 
-UINT8 c64_state::read_memory(address_space &space, offs_t offset, int casram, int basic, int kernal, int charom, int io, int roml, int romh)
+UINT8 c64_state::read_memory(address_space &space, offs_t offset, int ba, int casram, int basic, int kernal, int charom, int io, int roml, int romh)
 {
 	int io1 = 1;
 	int io2 = 1;
@@ -125,9 +125,9 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int casram, in
 			{
 			case 0: // CIA1
 				if (offset & 1)
-					cia_set_port_mask_value(m_cia1, 1, input_port_read(machine(), "CTRLSEL") & 0x80 ? c64_keyline[9] : c64_keyline[8] );
+					cia_set_port_mask_value(m_cia1, 1, ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[9] : c64_keyline[8] );
 				else
-					cia_set_port_mask_value(m_cia1, 0, input_port_read(machine(), "CTRLSEL") & 0x80 ? c64_keyline[8] : c64_keyline[9] );
+					cia_set_port_mask_value(m_cia1, 0, ioport("CTRLSEL")->read() & 0x80 ? c64_keyline[8] : c64_keyline[9] );
 
 				data = mos6526_r(m_cia1, offset & 0x0f);
 				break;
@@ -148,7 +148,7 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int casram, in
 		}
 	}
 
-	data |= m_exp->cd_r(space, offset, roml, romh, io1, io2);
+	data |= m_exp->cd_r(space, offset, ba, roml, romh, io1, io2);
 
 	return data;
 }
@@ -164,7 +164,7 @@ READ8_MEMBER( c64_state::read )
 
 	bankswitch(offset, 0, 1, 0, 1, 0, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
 
-	return read_memory(space, offset, casram, basic, kernal, charom, io, roml, romh);
+	return read_memory(space, offset, 1, casram, basic, kernal, charom, io, roml, romh);
 }
 
 
@@ -224,7 +224,7 @@ WRITE8_MEMBER( c64_state::write )
 		}
 	}
 
-	m_exp->cd_w(space, offset, data, roml, romh, io1, io2);
+	m_exp->cd_w(space, offset, data, 1, roml, romh, io1, io2);
 }
 
 
@@ -369,17 +369,17 @@ static INTERRUPT_GEN( c64_frame_interrupt )
 
 READ8_MEMBER( c64_state::vic_lightpen_x_cb )
 {
-	return input_port_read(machine(), "LIGHTX") & ~0x01;
+	return ioport("LIGHTX")->read() & ~0x01;
 }
 
 READ8_MEMBER( c64_state::vic_lightpen_y_cb )
 {
-	return input_port_read(machine(), "LIGHTY") & ~0x01;
+	return ioport("LIGHTY")->read() & ~0x01;
 }
 
 READ8_MEMBER( c64_state::vic_lightpen_button_cb )
 {
-	return input_port_read(machine(), "OTHER") & 0x04;
+	return ioport("OTHER")->read() & 0x04;
 }
 
 READ8_MEMBER( c64_state::vic_dma_read )
@@ -390,7 +390,7 @@ READ8_MEMBER( c64_state::vic_dma_read )
 
 	bankswitch(0, offset, 1, 1, 0, 0, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
 
-	return read_memory(space, offset, casram, basic, kernal, charom, io, roml, romh);
+	return read_memory(space, offset, 0, casram, basic, kernal, charom, io, roml, romh);
 }
 
 READ8_MEMBER( c64_state::vic_dma_read_color )
@@ -407,7 +407,7 @@ WRITE_LINE_MEMBER( c64_state::vic_irq_w )
 
 READ8_MEMBER( c64_state::vic_rdy_cb )
 {
-	return input_port_read(machine(), "CYCLES") & 0x07;
+	return ioport("CYCLES")->read() & 0x07;
 }
 
 static const vic2_interface vic_ntsc_intf =
@@ -450,39 +450,39 @@ static int paddle_read( device_t *device, int which )
 
 	int pot1 = 0xff, pot2 = 0xff, pot3 = 0xff, pot4 = 0xff, temp;
 	UINT8 cia0porta = mos6526_pa_r(state->m_cia1, 0);
-	int controller1 = input_port_read(machine, "CTRLSEL") & 0x07;
-	int controller2 = input_port_read(machine, "CTRLSEL") & 0x70;
+	int controller1 = machine.root_device().ioport("CTRLSEL")->read() & 0x07;
+	int controller2 = machine.root_device().ioport("CTRLSEL")->read() & 0x70;
 	// Notice that only a single input is defined for Mouse & Lightpen in both ports
 	switch (controller1)
 	{
 		case 0x01:
 			if (which)
-				pot2 = input_port_read(machine, "PADDLE2");
+				pot2 = machine.root_device().ioport("PADDLE2")->read();
 			else
-				pot1 = input_port_read(machine, "PADDLE1");
+				pot1 = machine.root_device().ioport("PADDLE1")->read();
 			break;
 
 		case 0x02:
 			if (which)
-				pot2 = input_port_read(machine, "TRACKY");
+				pot2 = machine.root_device().ioport("TRACKY")->read();
 			else
-				pot1 = input_port_read(machine, "TRACKX");
+				pot1 = machine.root_device().ioport("TRACKX")->read();
 			break;
 
 		case 0x03:
-			if (which && (input_port_read(machine, "JOY1_2B") & 0x20))	// Joy1 Button 2
+			if (which && (machine.root_device().ioport("JOY1_2B")->read() & 0x20))	// Joy1 Button 2
 				pot1 = 0x00;
 			break;
 
 		case 0x04:
 			if (which)
-				pot2 = input_port_read(machine, "LIGHTY");
+				pot2 = machine.root_device().ioport("LIGHTY")->read();
 			else
-				pot1 = input_port_read(machine, "LIGHTX");
+				pot1 = machine.root_device().ioport("LIGHTX")->read();
 			break;
 
 		case 0x06:
-			if (which && (input_port_read(machine, "OTHER") & 0x04))	// Lightpen Signal
+			if (which && (machine.root_device().ioport("OTHER")->read() & 0x04))	// Lightpen Signal
 				pot2 = 0x00;
 			break;
 
@@ -499,32 +499,32 @@ static int paddle_read( device_t *device, int which )
 	{
 		case 0x10:
 			if (which)
-				pot4 = input_port_read(machine, "PADDLE4");
+				pot4 = machine.root_device().ioport("PADDLE4")->read();
 			else
-				pot3 = input_port_read(machine, "PADDLE3");
+				pot3 = machine.root_device().ioport("PADDLE3")->read();
 			break;
 
 		case 0x20:
 			if (which)
-				pot4 = input_port_read(machine, "TRACKY");
+				pot4 = machine.root_device().ioport("TRACKY")->read();
 			else
-				pot3 = input_port_read(machine, "TRACKX");
+				pot3 = machine.root_device().ioport("TRACKX")->read();
 			break;
 
 		case 0x30:
-			if (which && (input_port_read(machine, "JOY2_2B") & 0x20))	// Joy2 Button 2
+			if (which && (machine.root_device().ioport("JOY2_2B")->read() & 0x20))	// Joy2 Button 2
 				pot4 = 0x00;
 			break;
 
 		case 0x40:
 			if (which)
-				pot4 = input_port_read(machine, "LIGHTY");
+				pot4 = machine.root_device().ioport("LIGHTY")->read();
 			else
-				pot3 = input_port_read(machine, "LIGHTX");
+				pot3 = machine.root_device().ioport("LIGHTX")->read();
 			break;
 
 		case 0x60:
-			if (which && (input_port_read(machine, "OTHER") & 0x04))	// Lightpen Signal
+			if (which && (machine.root_device().ioport("OTHER")->read() & 0x04))	// Lightpen Signal
 				pot4 = 0x00;
 			break;
 
@@ -537,7 +537,7 @@ static int paddle_read( device_t *device, int which )
 			break;
 	}
 
-	if (input_port_read(machine, "CTRLSEL") & 0x80)		// Swap
+	if (machine.root_device().ioport("CTRLSEL")->read() & 0x80)		// Swap
 	{
 		temp = pot1; pot1 = pot3; pot3 = temp;
 		temp = pot2; pot2 = pot4; pot4 = temp;
@@ -866,7 +866,7 @@ static const m6502_interface sx64_cpu_intf =
 
 
 //-------------------------------------------------
-//  m6502_interface c64g_cpu_intf
+//  m6502_interface c64gs_cpu_intf
 //-------------------------------------------------
 
 READ8_MEMBER( c64gs_state::cpu_r )
@@ -1022,9 +1022,9 @@ void c64_state::machine_start()
 	cbm_common_init();
 
 	// find memory regions
-	m_basic = machine().region("basic")->base();
-	m_kernal = machine().region("kernal")->base();
-	m_charom = machine().region("charom")->base();
+	m_basic = memregion("basic")->base();
+	m_kernal = memregion("kernal")->base();
+	m_charom = memregion("charom")->base();
 
 	// allocate memory
 	m_color_ram = auto_alloc_array(machine(), UINT8, 0x400);
@@ -1055,8 +1055,8 @@ void c64c_state::machine_start()
 	c64_state::machine_start();
 
 	// find memory regions
-	m_basic = machine().region(M6510_TAG)->base();
-	m_kernal = machine().region(M6510_TAG)->base() + 0x2000;
+	m_basic = memregion(M6510_TAG)->base();
+	m_kernal = memregion(M6510_TAG)->base() + 0x2000;
 }
 
 
@@ -1116,10 +1116,12 @@ static MACHINE_CONFIG_START( ntsc, c64_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface)
 	MCFG_TIMER_ADD(TIMER_C1531_TAG, cassette_tick)
 	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "NTSC")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "NTSC")
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
@@ -1184,10 +1186,12 @@ static MACHINE_CONFIG_START( ntsc_sx, sx64_state )
 	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
 	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
 	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "NTSC")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "NTSC")
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
@@ -1243,10 +1247,12 @@ static MACHINE_CONFIG_START( ntsc_dx, sx64_state )
 	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, sx1541_iec_devices, "sx1541", NULL)
 	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
 	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "NTSC")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "NTSC")
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
@@ -1299,10 +1305,12 @@ static MACHINE_CONFIG_START( ntsc_c, c64c_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface)
 	MCFG_TIMER_ADD(TIMER_C1531_TAG, cassette_tick)
 	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6567_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "NTSC")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "NTSC")
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
@@ -1355,10 +1363,12 @@ static MACHINE_CONFIG_START( pal, c64_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface)
 	MCFG_TIMER_ADD(TIMER_C1531_TAG, cassette_tick)
 	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
@@ -1414,10 +1424,12 @@ static MACHINE_CONFIG_START( pal_sx, sx64_state )
 	MCFG_CBM_IEC_SLOT_ADD("iec9", 9, cbm_iec_devices, NULL, NULL)
 	MCFG_CBM_IEC_SLOT_ADD("iec10", 10, cbm_iec_devices, NULL, NULL)
 	MCFG_CBM_IEC_SLOT_ADD("iec11", 11, cbm_iec_devices, NULL, NULL)
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
@@ -1470,10 +1482,12 @@ static MACHINE_CONFIG_START( pal_c, c64c_state )
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_interface)
 	MCFG_TIMER_ADD(TIMER_C1531_TAG, cassette_tick)
 	MCFG_CBM_IEC_ADD(iec_intf, "c1541")
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
 	MCFG_SOFTWARE_LIST_ADD("disk_list", "c64_flop")
@@ -1523,10 +1537,12 @@ static MACHINE_CONFIG_START( pal_gs, c64gs_state )
 	MCFG_MOS6526R1_ADD(MOS6526_1_TAG, VIC6569_CLOCK, cia1_intf)
 	MCFG_MOS6526R1_ADD(MOS6526_2_TAG, VIC6569_CLOCK, cia2_intf)
 	MCFG_CBM_IEC_BUS_ADD(iec_intf)
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, expansion_intf, c64_expansion_cards, NULL, NULL)
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, VIC6569_CLOCK, expansion_intf, c64_expansion_cards, NULL, NULL)
 	MCFG_C64_USER_PORT_ADD(C64_USER_PORT_TAG, user_intf, c64_user_port_cards, NULL, NULL)
 
 	// software list
+	MCFG_SOFTWARE_LIST_ADD("cart_list_vic10", "vic10")
+	MCFG_SOFTWARE_LIST_FILTER("cart_list_vic10", "PAL")
 	MCFG_SOFTWARE_LIST_ADD("cart_list_c64", "c64_cart")
 	MCFG_SOFTWARE_LIST_FILTER("cart_list_c64", "PAL")
 

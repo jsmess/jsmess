@@ -109,17 +109,16 @@ static TIMER_CALLBACK( pce_cd_cdda_fadein_callback );
 static TIMER_CALLBACK( pce_cd_adpcm_fadeout_callback );
 static TIMER_CALLBACK( pce_cd_adpcm_fadein_callback );
 
-static WRITE8_HANDLER( pce_sf2_banking_w )
+WRITE8_MEMBER(pce_state::pce_sf2_banking_w)
 {
-	memory_set_bankptr( space->machine(), "bank2", space->machine().region("user1")->base() + offset * 0x080000 + 0x080000 );
-	memory_set_bankptr( space->machine(), "bank3", space->machine().region("user1")->base() + offset * 0x080000 + 0x088000 );
-	memory_set_bankptr( space->machine(), "bank4", space->machine().region("user1")->base() + offset * 0x080000 + 0x0D0000 );
+	membank( "bank2" )->set_base( memregion("user1")->base() + offset * 0x080000 + 0x080000 );
+	membank( "bank3" )->set_base( memregion("user1")->base() + offset * 0x080000 + 0x088000 );
+	membank( "bank4" )->set_base( memregion("user1")->base() + offset * 0x080000 + 0x0D0000 );
 }
 
-static WRITE8_HANDLER( pce_cartridge_ram_w )
+WRITE8_MEMBER(pce_state::pce_cartridge_ram_w)
 {
-	pce_state *state = space->machine().driver_data<pce_state>();
-	state->m_cartridge_ram[offset] = data;
+	m_cartridge_ram[offset] = data;
 }
 
 DEVICE_IMAGE_LOAD(pce_cart)
@@ -132,7 +131,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 	logerror("*** DEVICE_IMAGE_LOAD(pce_cart) : %s\n", image.filename());
 
 	/* open file to get size */
-	ROM = image.device().machine().region("user1")->base();
+	ROM = state->memregion("user1")->base();
 
 	if (image.software_entry() == NULL)
 		size = image.length();
@@ -213,23 +212,23 @@ DEVICE_IMAGE_LOAD(pce_cart)
 			memcpy(ROM + 0x080000, ROM, 0x080000);
 	}
 
-	memory_set_bankptr(image.device().machine(), "bank1", ROM);
-	memory_set_bankptr(image.device().machine(), "bank2", ROM + 0x080000);
-	memory_set_bankptr(image.device().machine(), "bank3", ROM + 0x088000);
-	memory_set_bankptr(image.device().machine(), "bank4", ROM + 0x0d0000);
+	state->membank("bank1")->set_base(ROM);
+	state->membank("bank2")->set_base(ROM + 0x080000);
+	state->membank("bank3")->set_base(ROM + 0x088000);
+	state->membank("bank4")->set_base(ROM + 0x0d0000);
 
 	/* Check for Street fighter 2 */
 	if (size == PCE_ROM_MAXSIZE)
 	{
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x01ff0, 0x01ff3, FUNC(pce_sf2_banking_w));
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x01ff0, 0x01ff3, write8_delegate(FUNC(pce_state::pce_sf2_banking_w),state));
 	}
 
 	/* Check for Populous */
 	if (!memcmp(ROM + 0x1F26, "POPULOUS", 8))
 	{
 		state->m_cartridge_ram = auto_alloc_array(image.device().machine(), UINT8, 0x8000);
-		memory_set_bankptr(image.device().machine(), "bank2", state->m_cartridge_ram);
-		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x080000, 0x087FFF, FUNC(pce_cartridge_ram_w));
+		state->membank("bank2")->set_base(state->m_cartridge_ram);
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x080000, 0x087FFF, write8_delegate(FUNC(pce_state::pce_cartridge_ram_w),state));
 	}
 
 	/* Check for CD system card */
@@ -243,9 +242,9 @@ DEVICE_IMAGE_LOAD(pce_cart)
 		if(state->m_sys3_card)
 		{
 			state->m_cartridge_ram = auto_alloc_array(image.device().machine(), UINT8, 0x30000);
-			memory_set_bankptr(image.device().machine(), "bank4", state->m_cartridge_ram);
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x0D0000, 0x0FFFFF, FUNC(pce_cartridge_ram_w));
-			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x080000, 0x087FFF, FUNC(pce_cd_acard_wram_r),FUNC(pce_cd_acard_wram_w));
+			state->membank("bank4")->set_base(state->m_cartridge_ram);
+			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x0D0000, 0x0FFFFF, write8_delegate(FUNC(pce_state::pce_cartridge_ram_w),state));
+			image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x080000, 0x087FFF, read8_delegate(FUNC(pce_state::pce_cd_acard_wram_r),state),write8_delegate(FUNC(pce_state::pce_cd_acard_wram_w),state));
 		}
 	}
 	return 0;
@@ -296,58 +295,56 @@ MACHINE_RESET( mess_pce )
 
 	/* Note: Arcade Card BIOS contents are the same as System 3, only internal HW differs.
        We use a category to select between modes (some games can be run in either S-CD or A-CD modes) */
-	state->m_acard = input_port_read(machine, "A_CARD") & 1;
+	state->m_acard = machine.root_device().ioport("A_CARD")->read() & 1;
 }
 
 /* todo: how many input ports does the PCE have? */
-WRITE8_HANDLER ( mess_pce_joystick_w )
+WRITE8_MEMBER(pce_state::mess_pce_joystick_w)
 {
-	pce_state *state = space->machine().driver_data<pce_state>();
 	int joy_i;
-	UINT8 joy_type = input_port_read(space->machine(),"JOY_TYPE");
+	UINT8 joy_type = ioport("JOY_TYPE")->read();
 
-	h6280io_set_buffer(&space->device(), data);
+	h6280io_set_buffer(&space.device(), data);
 
     /* bump counter on a low-to-high transition of bit 1 */
-    if ((!state->m_joystick_data_select) && (data & JOY_CLOCK))
+    if ((!m_joystick_data_select) && (data & JOY_CLOCK))
     {
-        state->m_joystick_port_select = (state->m_joystick_port_select + 1) & 0x07;
+        m_joystick_port_select = (m_joystick_port_select + 1) & 0x07;
     }
 
     /* do we want buttons or direction? */
-    state->m_joystick_data_select = data & JOY_CLOCK;
+    m_joystick_data_select = data & JOY_CLOCK;
 
     /* clear counter if bit 2 is set */
     if (data & JOY_RESET)
     {
-		state->m_joystick_port_select = 0;
+		m_joystick_port_select = 0;
 
 		for (joy_i = 0; joy_i < 5; joy_i++)
 		{
 			if (((joy_type >> (joy_i*2)) & 3) == 2)
-        		state->m_joy_6b_packet[joy_i] ^= 1;
+        		m_joy_6b_packet[joy_i] ^= 1;
 		}
     }
 }
 
-READ8_HANDLER ( mess_pce_joystick_r )
+READ8_MEMBER(pce_state::mess_pce_joystick_r)
 {
-	pce_state *state = space->machine().driver_data<pce_state>();
 	static const char *const joyname[4][5] = {
 		{ "JOY_P1", "JOY_P2", "JOY_P3", "JOY_P4", "JOY_P5" },
 		{ },
 		{ "JOY6B_P1", "JOY6B_P2", "JOY6B_P3", "JOY6B_P4", "JOY6B_P5" },
 		{ }
 	};
-	UINT8 joy_type = input_port_read(space->machine(), "JOY_TYPE");
+	UINT8 joy_type = ioport("JOY_TYPE")->read();
 	UINT8 ret, data;
 
-	if (state->m_joystick_port_select <= 4)
+	if (m_joystick_port_select <= 4)
 	{
-		switch((joy_type >> (state->m_joystick_port_select*2)) & 3)
+		switch((joy_type >> (m_joystick_port_select*2)) & 3)
 		{
 			case 0: //2-buttons pad
-				data = input_port_read(space->machine(), joyname[0][state->m_joystick_port_select]);
+				data = ioport(joyname[0][m_joystick_port_select])->read();
 				break;
 			case 2: //6-buttons pad
 				/*
@@ -357,7 +354,7 @@ READ8_HANDLER ( mess_pce_joystick_r )
                 Note that six buttons pad just doesn't work with (almost?) every single 2-button-only games, it's really just an after-thought and it is like this
                 on real HW.
                 */
-				data = input_port_read(space->machine(), joyname[2][state->m_joystick_port_select]) >> (state->m_joy_6b_packet[state->m_joystick_port_select]*8);
+				data = ioport(joyname[2][m_joystick_port_select])->read() >> (m_joy_6b_packet[m_joystick_port_select]*8);
 				break;
 			default:
 				data = 0xff;
@@ -368,10 +365,10 @@ READ8_HANDLER ( mess_pce_joystick_r )
 		data = 0xff;
 
 
-	if (state->m_joystick_data_select)
+	if (m_joystick_data_select)
 		data >>= 4;
 
-	ret = (data & 0x0f) | state->m_io_port_options;
+	ret = (data & 0x0f) | m_io_port_options;
 #ifdef UNIFIED_PCE
 	ret &= ~0x40;
 #endif
@@ -383,17 +380,18 @@ static void pce_set_cd_bram( running_machine &machine )
 {
 	pce_state *state = machine.driver_data<pce_state>();
 	pce_cd_t &pce_cd = state->m_cd;
-	memory_set_bankptr( machine, "bank10", pce_cd.bram + ( pce_cd.bram_locked ? PCE_BRAM_SIZE : 0 ) );
+	state->membank( "bank10" )->set_base( pce_cd.bram + ( pce_cd.bram_locked ? PCE_BRAM_SIZE : 0 ) );
 }
 
-static void adpcm_stop(running_machine &machine)
+static void adpcm_stop(running_machine &machine, UINT8 irq_flag)
 {
 	pce_state *state = machine.driver_data<pce_state>();
 	pce_cd_t &pce_cd = state->m_cd;
 	pce_cd.regs[0x0c] |= PCE_CD_ADPCM_STOP_FLAG;
 	pce_cd.regs[0x0c] &= ~PCE_CD_ADPCM_PLAY_FLAG;
 	//pce_cd.regs[0x03] = (pce_cd.regs[0x03] & ~0x0c) | (PCE_CD_SAMPLE_STOP_PLAY);
-	pce_cd_set_irq_line( machine, PCE_CD_IRQ_SAMPLE_FULL_PLAY, ASSERT_LINE );
+	if(irq_flag)
+		pce_cd_set_irq_line( machine, PCE_CD_IRQ_SAMPLE_FULL_PLAY, ASSERT_LINE );
 	pce_cd.regs[0x0d] &= ~0x60;
 	pce_cd.msm_idle = 1;
 }
@@ -446,7 +444,7 @@ static void pce_cd_msm5205_int(device_t *device)
 		{
 			//pce_cd_set_irq_line( device->machine(), PCE_CD_IRQ_SAMPLE_HALF_PLAY, CLEAR_LINE );
 			//pce_cd_set_irq_line( device->machine(), PCE_CD_IRQ_SAMPLE_FULL_PLAY, CLEAR_LINE );
-			adpcm_stop(device->machine());
+			adpcm_stop(device->machine(),1);
 			msm5205_reset_w(device, 1);
 		}
 	}
@@ -1228,10 +1226,9 @@ static void pce_cd_init( running_machine &machine )
 	pce_cd.adpcm_fadein_timer->adjust(attotime::never);
 }
 
-WRITE8_HANDLER( pce_cd_bram_w )
+WRITE8_MEMBER(pce_state::pce_cd_bram_w)
 {
-	pce_state *state = space->machine().driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
+	pce_cd_t &pce_cd = m_cd;
 	if ( ! pce_cd.bram_locked )
 	{
 		pce_cd.bram[ offset ] = data;
@@ -1331,28 +1328,27 @@ static TIMER_CALLBACK( pce_cd_adpcm_fadein_callback )
 }
 
 
-WRITE8_HANDLER( pce_cd_intf_w )
+WRITE8_MEMBER(pce_state::pce_cd_intf_w)
 {
-	pce_state *state = space->machine().driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
-	pce_cd_update(space->machine());
+	pce_cd_t &pce_cd = m_cd;
+	pce_cd_update(machine());
 
-	if(offset & 0x200 && state->m_sys3_card && state->m_acard) // route Arcade Card handling ports
+	if(offset & 0x200 && m_sys3_card && m_acard) // route Arcade Card handling ports
 		return pce_cd_acard_w(space,offset,data);
 
-	logerror("%04X: write to CD interface offset %02X, data %02X\n", cpu_get_pc(&space->device()), offset, data );
+	logerror("%04X: write to CD interface offset %02X, data %02X\n", cpu_get_pc(&space.device()), offset, data );
 
 	switch( offset & 0xf )
 	{
 	case 0x00:	/* CDC status */
 		/* select device (which bits??) */
 		pce_cd.scsi_SEL = 1;
-		pce_cd_update(space->machine());
+		pce_cd_update(machine());
 		pce_cd.scsi_SEL = 0;
 		pce_cd.adpcm_dma_timer->adjust(attotime::never); // stop ADPCM DMA here
 		/* any write here clears CD transfer irqs */
 		pce_cd.regs[0x03] &= ~0x70;
-		cputag_set_input_line(space->machine(), "maincpu", 1, CLEAR_LINE );
+		cputag_set_input_line(machine(), "maincpu", 1, CLEAR_LINE );
 		break;
 	case 0x01:	/* CDC command / status / data */
 		break;
@@ -1364,7 +1360,7 @@ WRITE8_HANDLER( pce_cd_intf_w )
 				/* bit 2 - ?? irq */
 		pce_cd.scsi_ACK = data & 0x80;
 		/* Don't set or reset any irq lines, but just verify the current state */
-		pce_cd_set_irq_line( space->machine(), 0, 0 );
+		pce_cd_set_irq_line( machine(), 0, 0 );
 		break;
 	case 0x03:	/* BRAM lock / CD status / IRQ - Read Only register */
 		break;
@@ -1378,7 +1374,7 @@ WRITE8_HANDLER( pce_cd_intf_w )
 		if ( data & 0x80 )
 		{
 			pce_cd.bram_locked = 0;
-			pce_set_cd_bram(space->machine());
+			pce_set_cd_bram(machine());
 		}
 		break;
 	case 0x08:	/* ADPCM address (LSB) / CD data */
@@ -1386,7 +1382,7 @@ WRITE8_HANDLER( pce_cd_intf_w )
 	case 0x09:	/* ADPCM address (MSB) */
 		break;
 	case 0x0A:	/* ADPCM RAM data port */
-		pce_cd_set_adpcm_ram_byte(space->machine(), data);
+		pce_cd_set_adpcm_ram_byte(machine(), data);
 		break;
 	case 0x0B:	/* ADPCM DMA control */
 		if ( data & 0x03 )
@@ -1408,29 +1404,29 @@ WRITE8_HANDLER( pce_cd_intf_w )
 			pce_cd.msm_end_addr = 0;
 			pce_cd.msm_half_addr = 0;
 			pce_cd.msm_nibble = 0;
-			adpcm_stop(space->machine());
-			msm5205_reset_w( space->machine().device( "msm5205"), 1 );
+			adpcm_stop(machine(), 0);
+			msm5205_reset_w( machine().device( "msm5205"), 1 );
 		}
-
-		if(data & 0x20)
-			pce_cd.msm_half_addr = (pce_cd.adpcm_read_ptr + (pce_cd.adpcm_length / ((data & 0x40) ? 2 : 1))) & 0xffff;
 
 		if ( ( data & 0x40) && ((pce_cd.regs[0x0D] & 0x40) == 0) ) // ADPCM play
 		{
 			pce_cd.msm_start_addr = (pce_cd.adpcm_read_ptr);
 			pce_cd.msm_end_addr = (pce_cd.adpcm_read_ptr + pce_cd.adpcm_length) & 0xffff;
+			pce_cd.msm_half_addr = (pce_cd.adpcm_read_ptr + (pce_cd.adpcm_length / 2)) & 0xffff;
 			pce_cd.msm_nibble = 0;
-			adpcm_play(space->machine());
-			msm5205_reset_w( space->machine().device( "msm5205"), 0 );
+			adpcm_play(machine());
+			msm5205_reset_w( machine().device( "msm5205"), 0 );
 
 			//popmessage("%08x %08x",pce_cd.adpcm_read_ptr,pce_cd.adpcm_length);
 		}
 		else if ( (data & 0x40) == 0 )
 		{
 			/* used by Buster Bros to cancel an in-flight sample */
-			adpcm_stop(space->machine());
-			msm5205_reset_w( space->machine().device( "msm5205"), 1 );
+			adpcm_stop(machine(), 0);
+			msm5205_reset_w( machine().device( "msm5205"), 1 );
 		}
+
+		pce_cd.msm_repeat = (data & 0x20) >> 5;
 
 		if ( data & 0x10 ) //ADPCM set length
 		{
@@ -1449,7 +1445,7 @@ WRITE8_HANDLER( pce_cd_intf_w )
 		break;
 	case 0x0E:	/* ADPCM playback rate */
 		pce_cd.adpcm_clock_divider = 0x10 - ( data & 0x0F );
-		msm5205_change_clock_w(space->machine().device("msm5205"), (PCE_CD_CLOCK / 6) / pce_cd.adpcm_clock_divider);
+		msm5205_change_clock_w(machine().device("msm5205"), (PCE_CD_CLOCK / 6) / pce_cd.adpcm_clock_divider);
 		break;
 	case 0x0F:	/* ADPCM and CD audio fade timer */
 		/* TODO: timers needs HW tests */
@@ -1516,7 +1512,7 @@ WRITE8_HANDLER( pce_cd_intf_w )
 		return;
 	}
 	pce_cd.regs[offset & 0xf] = data;
-	pce_cd_update(space->machine());
+	pce_cd_update(machine());
 }
 
 static TIMER_CALLBACK( pce_cd_clear_ack )
@@ -1582,28 +1578,27 @@ static UINT8 pce_cd_get_adpcm_ram_byte(running_machine &machine)
 	}
 }
 
-READ8_HANDLER( pce_cd_intf_r )
+READ8_MEMBER(pce_state::pce_cd_intf_r)
 {
-	pce_state *state = space->machine().driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
+	pce_cd_t &pce_cd = m_cd;
 	UINT8 data = pce_cd.regs[offset & 0x0F];
 
-	pce_cd_update(space->machine());
+	pce_cd_update(machine());
 
-	if(offset & 0x200 && state->m_sys3_card && state->m_acard) // route Arcade Card handling ports
+	if(offset & 0x200 && m_sys3_card && m_acard) // route Arcade Card handling ports
 		return pce_cd_acard_r(space,offset);
 
-	logerror("%04X: read from CD interface offset %02X\n", cpu_get_pc(&space->device()), offset );
+	logerror("%04X: read from CD interface offset %02X\n", cpu_get_pc(&space.device()), offset );
 
-	if((offset & 0xc0) == 0xc0 && state->m_sys3_card) //System 3 Card header handling
+	if((offset & 0xc0) == 0xc0 && m_sys3_card) //System 3 Card header handling
 	{
 		switch(offset & 0xcf)
 		{
 			case 0xc1: return 0xaa;
 			case 0xc2: return 0x55;
 			case 0xc3: return 0x00;
-			case 0xc5: return (state->m_sys3_card & 2) ? 0x55 : 0xaa;
-			case 0xc6: return (state->m_sys3_card & 2) ? 0xaa : 0x55;
+			case 0xc5: return (m_sys3_card & 2) ? 0x55 : 0xaa;
+			case 0xc6: return (m_sys3_card & 2) ? 0xaa : 0x55;
 			case 0xc7: return 0x03;
 		}
 	}
@@ -1626,7 +1621,7 @@ READ8_HANDLER( pce_cd_intf_r )
 		/* bit 4 set when CD motor is on */
 		/* bit 2 set when less than half of the ADPCM data is remaining ?? */
 		pce_cd.bram_locked = 1;
-		pce_set_cd_bram(space->machine());
+		pce_set_cd_bram(machine());
 		data = data & 0x6E;
 		data |= ( pce_cd.cd_motor_on ? 0x10 : 0 );
 		pce_cd.regs[0x03] ^= 0x02;			/* TODO: get rid of this hack */
@@ -1640,10 +1635,10 @@ READ8_HANDLER( pce_cd_intf_r )
 		data = ( pce_cd.bram_locked ? ( data & 0x7F ) : ( data | 0x80 ) );
 		break;
 	case 0x08:	/* ADPCM address (LSB) / CD data */
-		data = pce_cd_get_cd_data_byte(space->machine());
+		data = pce_cd_get_cd_data_byte(machine());
 		break;
 	case 0x0A:	/* ADPCM RAM data port */
-		data = pce_cd_get_adpcm_ram_byte(space->machine());
+		data = pce_cd_get_adpcm_ram_byte(machine());
 		break;
 	case 0x0B:	/* ADPCM DMA control */
 		break;
@@ -1671,10 +1666,9 @@ PC Engine Arcade Card emulation
 
 */
 
-READ8_HANDLER( pce_cd_acard_r )
+READ8_MEMBER(pce_state::pce_cd_acard_r)
 {
-	pce_state *state = space->machine().driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
+	pce_cd_t &pce_cd = m_cd;
 	UINT8 r_num;
 
 	if((offset & 0x2e0) == 0x2e0)
@@ -1736,10 +1730,9 @@ READ8_HANDLER( pce_cd_acard_r )
 	return 0;
 }
 
-WRITE8_HANDLER( pce_cd_acard_w )
+WRITE8_MEMBER(pce_state::pce_cd_acard_w)
 {
-	pce_state *state = space->machine().driver_data<pce_state>();
-	pce_cd_t &pce_cd = state->m_cd;
+	pce_cd_t &pce_cd = m_cd;
 	UINT8 w_num;
 
 	if((offset & 0x2e0) == 0x2e0)
@@ -1820,12 +1813,12 @@ WRITE8_HANDLER( pce_cd_acard_w )
 	}
 }
 
-READ8_HANDLER( pce_cd_acard_wram_r )
+READ8_MEMBER(pce_state::pce_cd_acard_wram_r)
 {
 	return pce_cd_intf_r(space,0x200 | (offset & 0x6000) >> 9);
 }
 
-WRITE8_HANDLER( pce_cd_acard_wram_w )
+WRITE8_MEMBER(pce_state::pce_cd_acard_wram_w)
 {
 	pce_cd_intf_w(space,0x200 | (offset & 0x6000) >> 9,data);
 }

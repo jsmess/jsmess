@@ -64,8 +64,9 @@ static DEVICE_START( irem_audio )
 
 WRITE8_HANDLER( irem_sound_cmd_w )
 {
+	driver_device *drvstate = space->machine().driver_data<driver_device>();
 	if ((data & 0x80) == 0)
-		soundlatch_w(space, 0, data & 0x7f);
+		drvstate->soundlatch_byte_w(*space, 0, data & 0x7f);
 	else
 		cputag_set_input_line(space->machine(), "iremsound", 0, ASSERT_LINE);
 }
@@ -250,7 +251,7 @@ static const ay8910_interface irem_ay8910_interface_1 =
 {
 	AY8910_SINGLE_OUTPUT | AY8910_DISCRETE_OUTPUT,
 	{470, 0, 0},
-	DEVCB_MEMORY_HANDLER("iremsound", PROGRAM, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("irem_audio", ay8910_0_portb_w)
@@ -377,31 +378,31 @@ DISCRETE_SOUND_END
 
 /* complete address map verified from Moon Patrol/10 Yard Fight schematics */
 /* large map uses 8k ROMs, small map uses 4k ROMs; this is selected via a jumper */
-static ADDRESS_MAP_START( m52_small_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( m52_small_sound_map, AS_PROGRAM, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x0fff) AM_DEVWRITE("irem_audio", m52_adpcm_w)
-	AM_RANGE(0x1000, 0x1fff) AM_WRITE(sound_irq_ack_w)
+	AM_RANGE(0x0000, 0x0fff) AM_DEVWRITE_LEGACY("irem_audio", m52_adpcm_w)
+	AM_RANGE(0x1000, 0x1fff) AM_WRITE_LEGACY(sound_irq_ack_w)
 	AM_RANGE(0x2000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m52_large_sound_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_DEVWRITE("irem_audio", m52_adpcm_w)
-	AM_RANGE(0x2000, 0x3fff) AM_WRITE(sound_irq_ack_w)
+static ADDRESS_MAP_START( m52_large_sound_map, AS_PROGRAM, 8, driver_device )
+	AM_RANGE(0x0000, 0x1fff) AM_DEVWRITE_LEGACY("irem_audio", m52_adpcm_w)
+	AM_RANGE(0x2000, 0x3fff) AM_WRITE_LEGACY(sound_irq_ack_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 /* complete address map verified from Kid Niki schematics */
-static ADDRESS_MAP_START( m62_sound_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0xf7fc) AM_WRITE(sound_irq_ack_w)
-	AM_RANGE(0x0801, 0x0802) AM_MIRROR(0xf7fc) AM_DEVWRITE("irem_audio", m62_adpcm_w)
+static ADDRESS_MAP_START( m62_sound_map, AS_PROGRAM, 8, driver_device )
+	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0xf7fc) AM_WRITE_LEGACY(sound_irq_ack_w)
+	AM_RANGE(0x0801, 0x0802) AM_MIRROR(0xf7fc) AM_DEVWRITE_LEGACY("irem_audio", m62_adpcm_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( irem_sound_portmap, AS_IO, 8 )
-	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVREADWRITE("irem_audio", m6803_port1_r, m6803_port1_w)
-	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_DEVREADWRITE("irem_audio", m6803_port2_r, m6803_port2_w)
+static ADDRESS_MAP_START( irem_sound_portmap, AS_IO, 8, driver_device )
+	AM_RANGE(M6801_PORT1, M6801_PORT1) AM_DEVREADWRITE_LEGACY("irem_audio", m6803_port1_r, m6803_port1_w)
+	AM_RANGE(M6801_PORT2, M6801_PORT2) AM_DEVREADWRITE_LEGACY("irem_audio", m6803_port2_r, m6803_port2_w)
 ADDRESS_MAP_END
 
 

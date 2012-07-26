@@ -30,7 +30,7 @@ static SCREEN_UPDATE_IND16( lastbank )
 	return 0;
 }
 
-static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8, lastbank_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM /* TODO: ROM banks! */
 
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
@@ -40,17 +40,17 @@ static ADDRESS_MAP_START( lastbank_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xfdff) AM_RAM
 
-	//AM_RANGE(0xfe00, 0xfe03) AM_READWRITE(taitol_bankc_r, taitol_bankc_w)
-	//AM_RANGE(0xfe04, 0xfe04) AM_READWRITE(taitol_control_r, taitol_control_w)
+	//AM_RANGE(0xfe00, 0xfe03) AM_READWRITE_LEGACY(taitol_bankc_r, taitol_bankc_w)
+	//AM_RANGE(0xfe04, 0xfe04) AM_READWRITE_LEGACY(taitol_control_r, taitol_control_w)
 
-	//AM_RANGE(0xff00, 0xff02) AM_READWRITE(irq_adr_r, irq_adr_w)
-	//AM_RANGE(0xff03, 0xff03) AM_READWRITE(irq_enable_r, irq_enable_w)
-	//AM_RANGE(0xff04, 0xff07) AM_READWRITE(rambankswitch_r, rambankswitch_w)
-	//AM_RANGE(0xff08, 0xff08) AM_READWRITE(rombankswitch_r, rombankswitch_w)
+	//AM_RANGE(0xff00, 0xff02) AM_READWRITE_LEGACY(irq_adr_r, irq_adr_w)
+	//AM_RANGE(0xff03, 0xff03) AM_READWRITE_LEGACY(irq_enable_r, irq_enable_w)
+	//AM_RANGE(0xff04, 0xff07) AM_READWRITE_LEGACY(rambankswitch_r, rambankswitch_w)
+	//AM_RANGE(0xff08, 0xff08) AM_READWRITE_LEGACY(rombankswitch_r, rombankswitch_w)
 
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lastbank_io, AS_IO, 8 )
+static ADDRESS_MAP_START( lastbank_io, AS_IO, 8, lastbank_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 ADDRESS_MAP_END

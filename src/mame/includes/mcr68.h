@@ -1,4 +1,6 @@
 #include "machine/6821pia.h"
+#include "audio/midway.h"
+#include "audio/williams.h"
 
 struct counter_state
 {
@@ -14,9 +16,21 @@ class mcr68_state : public driver_device
 {
 public:
 	mcr68_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_chip_squeak_deluxe(*this, "csd"),
+		m_sounds_good(*this, "sg"),
+		m_turbo_chip_squeak(*this, "tcs"),
+		m_cvsd_sound(*this, "cvsd"),
+		  m_videoram(*this, "videoram"),
+		  m_spriteram(*this, "spriteram") { }
 
-	UINT16 *m_videoram;
+	optional_device<midway_chip_squeak_deluxe_device> m_chip_squeak_deluxe;
+	optional_device<midway_sounds_good_device> m_sounds_good;
+	optional_device<midway_turbo_chip_squeak_device> m_turbo_chip_squeak;
+	optional_device<williams_cvsd_sound_device> m_cvsd_sound;
+
+	required_shared_ptr<UINT16> m_videoram;
+	required_shared_ptr<UINT16> m_spriteram;
 	UINT16 m_control_word;
 	UINT8 m_protection_data[5];
 	attotime m_timing_factor;
@@ -38,8 +52,32 @@ public:
 	attotime m_m6840_internal_counter_period;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	UINT16 *m_spriteram;
-	size_t m_spriteram_size;
+	DECLARE_READ16_MEMBER(zwackery_6840_r);
+	DECLARE_WRITE16_MEMBER(xenophobe_control_w);
+	DECLARE_WRITE16_MEMBER(blasted_control_w);
+	DECLARE_READ16_MEMBER(spyhunt2_port_0_r);
+	DECLARE_READ16_MEMBER(spyhunt2_port_1_r);
+	DECLARE_WRITE16_MEMBER(spyhunt2_control_w);
+	DECLARE_READ16_MEMBER(archrivl_port_1_r);
+	DECLARE_WRITE16_MEMBER(archrivl_control_w);
+	DECLARE_WRITE16_MEMBER(pigskin_protection_w);
+	DECLARE_READ16_MEMBER(pigskin_protection_r);
+	DECLARE_READ16_MEMBER(pigskin_port_1_r);
+	DECLARE_READ16_MEMBER(pigskin_port_2_r);
+	DECLARE_READ16_MEMBER(trisport_port_1_r);
+	DECLARE_WRITE16_MEMBER(mcr68_6840_upper_w);
+	DECLARE_WRITE16_MEMBER(mcr68_6840_lower_w);
+	DECLARE_READ16_MEMBER(mcr68_6840_upper_r);
+	DECLARE_READ16_MEMBER(mcr68_6840_lower_r);
+	DECLARE_WRITE8_MEMBER(mcr68_6840_w_common);
+	DECLARE_READ16_MEMBER(mcr68_6840_r_common);
+	void reload_count(int counter);
+	UINT16 compute_counter(int counter);
+	DECLARE_WRITE16_MEMBER(mcr68_paletteram_w);
+	DECLARE_WRITE16_MEMBER(zwackery_paletteram_w);
+	DECLARE_WRITE16_MEMBER(mcr68_videoram_w);
+	DECLARE_WRITE16_MEMBER(zwackery_videoram_w);
+	DECLARE_WRITE16_MEMBER(zwackery_spriteram_w);
 };
 
 
@@ -60,25 +98,16 @@ MACHINE_RESET( mcr68 );
 MACHINE_START( zwackery );
 MACHINE_RESET( zwackery );
 
-WRITE16_HANDLER( mcr68_6840_upper_w );
-WRITE16_HANDLER( mcr68_6840_lower_w );
-READ16_HANDLER( mcr68_6840_upper_r );
-READ16_HANDLER( mcr68_6840_lower_r );
 
 INTERRUPT_GEN( mcr68_interrupt );
 
 
 /*----------- defined in video/mcr68.c -----------*/
 
-WRITE16_HANDLER( mcr68_paletteram_w );
-WRITE16_HANDLER( mcr68_videoram_w );
 
 VIDEO_START( mcr68 );
 SCREEN_UPDATE_IND16( mcr68 );
 
-WRITE16_HANDLER( zwackery_paletteram_w );
-WRITE16_HANDLER( zwackery_videoram_w );
-WRITE16_HANDLER( zwackery_spriteram_w );
 
 VIDEO_START( zwackery );
 SCREEN_UPDATE_IND16( zwackery );

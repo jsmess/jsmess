@@ -21,7 +21,6 @@
 
 ****************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -37,7 +36,7 @@ READ8_MEMBER( pc4_state::kb_r )
 
 	for (int line=0; line<8; line++)
 		if (!(offset & (1<<line)))
-			data &= input_port_read(machine(), bitnames[line]);
+			data &= ioport(bitnames[line])->read();
 
 	return data;
 }
@@ -45,7 +44,7 @@ READ8_MEMBER( pc4_state::kb_r )
 WRITE8_MEMBER( pc4_state::bank_w )
 {
 	//printf("set bank %x\n", data);
-	memory_set_bank(machine(), "rombank", data&0x07);
+	membank("rombank")->set_entry(data&0x07);
 }
 
 WRITE8_MEMBER( pc4_state::beep_w )
@@ -180,10 +179,10 @@ GFXDECODE_END
 
 void pc4_state::machine_start()
 {
-	UINT8* rom_base = (UINT8 *)machine().region("maincpu")->base();
+	UINT8* rom_base = (UINT8 *)machine().root_device().memregion("maincpu")->base();
 
-	memory_configure_bank(machine(), "rombank", 0, 8, rom_base, 0x4000);
-	memory_set_bank(machine(), "rombank", 0);
+	membank("rombank")->configure_entries(0, 8, rom_base, 0x4000);
+	membank("rombank")->set_entry(0);
 
 	m_busy_timer = timer_alloc(BUSY_TIMER);
 	m_blink_timer = timer_alloc(BLINKING_TIMER);

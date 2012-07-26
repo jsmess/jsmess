@@ -52,7 +52,6 @@
         Two Z8 for power management and character recognition
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z180/z180.h"
@@ -110,7 +109,7 @@ void pda600_state::machine_reset()
 
 void pda600_state::video_start()
 {
-	m_video_ram = machine().region("videoram")->base();
+	m_video_ram = memregion("videoram")->base();
 }
 
 UINT32 pda600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

@@ -37,7 +37,7 @@ PALETTE_INIT( channelf )
 VIDEO_START( channelf )
 {
 	channelf_state *state = machine.driver_data<channelf_state>();
-	state->m_p_videoram = machine.region("vram")->base();
+	state->m_p_videoram = state->memregion("vram")->base();
 }
 
 static int recalc_palette_offset(int reg1, int reg2)

@@ -22,11 +22,10 @@
  *
  *************************************/
 
-WRITE8_HANDLER( redalert_bitmap_videoram_w )
+WRITE8_MEMBER(redalert_state::redalert_bitmap_videoram_w)
 {
-	redalert_state *state = space->machine().driver_data<redalert_state>();
-	state->m_bitmap_videoram[offset     ] = data;
-	state->m_bitmap_colorram[offset >> 3] = *state->m_bitmap_color & 0x07;
+	m_bitmap_videoram[offset     ] = data;
+	m_bitmap_colorram[offset >> 3] = *m_bitmap_color & 0x07;
 }
 
 
@@ -52,7 +51,7 @@ static void get_pens(running_machine &machine, pen_t *pens)
 	double charmap_b_weights[2];
 	double back_r_weight[1];
 	double back_gb_weight[1];
-	const UINT8 *prom = machine.region("proms")->base();
+	const UINT8 *prom = machine.root_device().memregion("proms")->base();
 
 	scaler = compute_resistor_weights(0, 0xff, -1,
 									  1, resistances_bitmap,     bitmap_weight,      470, 0,
@@ -117,7 +116,7 @@ static void get_panther_pens(running_machine &machine, pen_t *pens)
 	double charmap_b_weights[2];
 	double back_r_weight[1];
 	double back_gb_weight[1];
-	const UINT8 *prom = machine.region("proms")->base();
+	const UINT8 *prom = machine.root_device().memregion("proms")->base();
 
 	scaler = compute_resistor_weights(0, 0xff, -1,
 									  1, resistances_bitmap,     bitmap_weight,      470, 0,

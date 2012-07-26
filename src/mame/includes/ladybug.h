@@ -10,14 +10,17 @@ class ladybug_state : public driver_device
 {
 public:
 	ladybug_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram"),
+		m_grid_data(*this, "grid_data"){ }
 
 	/* memory pointers */
-	UINT8 *    m_videoram;
-	UINT8 *    m_colorram;
-	UINT8 *    m_spriteram;
-	UINT8 *    m_grid_data;
-	size_t     m_spriteram_size;
+	required_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_grid_data;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
@@ -41,15 +44,27 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_READ8_MEMBER(sraider_sound_low_r);
+	DECLARE_READ8_MEMBER(sraider_sound_high_r);
+	DECLARE_WRITE8_MEMBER(sraider_sound_low_w);
+	DECLARE_WRITE8_MEMBER(sraider_sound_high_w);
+	DECLARE_READ8_MEMBER(sraider_8005_r);
+	DECLARE_WRITE8_MEMBER(sraider_misc_w);
+	DECLARE_WRITE8_MEMBER(ladybug_videoram_w);
+	DECLARE_WRITE8_MEMBER(ladybug_colorram_w);
+	DECLARE_WRITE8_MEMBER(ladybug_flipscreen_w);
+	DECLARE_WRITE8_MEMBER(sraider_io_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(ladybug_p1_control_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(ladybug_p2_control_r);
+	DECLARE_INPUT_CHANGED_MEMBER(coin1_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(coin2_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
+	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
 };
 
 
 /*----------- defined in video/ladybug.c -----------*/
 
-WRITE8_HANDLER( ladybug_videoram_w );
-WRITE8_HANDLER( ladybug_colorram_w );
-WRITE8_HANDLER( ladybug_flipscreen_w );
-WRITE8_HANDLER( sraider_io_w );
 
 PALETTE_INIT( ladybug );
 VIDEO_START( ladybug );

@@ -130,16 +130,16 @@ void v1050_state::bankswitch()
 	if (BIT(m_bank, 0))
 	{
 		program->install_readwrite_bank(0x0000, 0x1fff, "bank1");
-		memory_set_bank(machine(), "bank1", bank);
+		membank("bank1")->set_entry(bank);
 	}
 	else
 	{
 		program->install_read_bank(0x0000, 0x1fff, "bank1");
 		program->unmap_write(0x0000, 0x1fff);
-		memory_set_bank(machine(), "bank1", 3);
+		membank("bank1")->set_entry(3);
 	}
 
-	memory_set_bank(machine(), "bank2", bank);
+	membank("bank2")->set_entry(bank);
 
 	if (bank == 2)
 	{
@@ -149,11 +149,11 @@ void v1050_state::bankswitch()
 	{
 		program->install_readwrite_bank(0x4000, 0x7fff, "bank3");
 		program->install_readwrite_bank(0x8000, 0xbfff, "bank4");
-		memory_set_bank(machine(), "bank3", bank);
-		memory_set_bank(machine(), "bank4", bank);
+		membank("bank3")->set_entry(bank);
+		membank("bank4")->set_entry(bank);
 	}
 
-	memory_set_bank(machine(), "bank5", bank);
+	membank("bank5")->set_entry(bank);
 }
 
 // Keyboard HACK
@@ -227,7 +227,7 @@ void v1050_state::scan_keyboard()
 	int table = 0, row, col;
 	int keydata = 0xff;
 
-	UINT8 line_mod = input_port_read(machine(), "ROW12");
+	UINT8 line_mod = ioport("ROW12")->read();
 
 	if((line_mod & 0x07) && (line_mod & 0x18))
 	{
@@ -245,7 +245,7 @@ void v1050_state::scan_keyboard()
 	// scan keyboard
 	for (row = 0; row < 12; row++)
 	{
-		UINT8 data = input_port_read(machine(), keynames[row]);
+		UINT8 data = ioport(keynames[row])->read();
 
 		for (col = 0; col < 8; col++)
 		{
@@ -454,7 +454,7 @@ static ADDRESS_MAP_START( v1050_io, AS_IO, 8, v1050_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( v1050_crt_mem, AS_PROGRAM, 8, v1050_state )
-	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(videoram_r, videoram_w) AM_BASE(m_video_ram)
+	AM_RANGE(0x0000, 0x7fff) AM_READWRITE(videoram_r, videoram_w) AM_SHARE("video_ram")
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE(H46505_TAG, mc6845_device, address_w)
 	AM_RANGE(0x8001, 0x8001) AM_DEVREADWRITE(H46505_TAG, mc6845_device, register_r, register_w)
 	AM_RANGE(0x9000, 0x9003) AM_DEVREADWRITE(I8255A_M6502_TAG, i8255_device, read, write)
@@ -699,7 +699,7 @@ WRITE8_MEMBER( v1050_state::misc_ppi_pa_w )
 static WRITE8_DEVICE_HANDLER( misc_ppi_pb_w )
 {
 	centronics_device *centronics = device->machine().device<centronics_device>(CENTRONICS_TAG);
-	centronics->write( *memory_nonspecific_space(device->machine()) , 0, ~data & 0xff);
+	centronics->write( *device->machine().memory().first_space() , 0, ~data & 0xff);
 }
 
 static READ8_DEVICE_HANDLER( misc_ppi_pc_r )
@@ -1044,22 +1044,22 @@ void v1050_state::machine_start()
 	// setup memory banking
 	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 
-	memory_configure_bank(machine(), "bank1", 0, 2, ram, 0x10000);
-	memory_configure_bank(machine(), "bank1", 2, 1, ram + 0x1c000, 0);
-	memory_configure_bank(machine(), "bank1", 3, 1, machine().region(Z80_TAG)->base(), 0);
+	membank("bank1")->configure_entries(0, 2, ram, 0x10000);
+	membank("bank1")->configure_entry(2, ram + 0x1c000);
+	membank("bank1")->configure_entry(3, memregion(Z80_TAG)->base());
 
 	program->install_readwrite_bank(0x2000, 0x3fff, "bank2");
-	memory_configure_bank(machine(), "bank2", 0, 2, ram + 0x2000, 0x10000);
-	memory_configure_bank(machine(), "bank2", 2, 1, ram + 0x1e000, 0);
+	membank("bank2")->configure_entries(0, 2, ram + 0x2000, 0x10000);
+	membank("bank2")->configure_entry(2, ram + 0x1e000);
 
 	program->install_readwrite_bank(0x4000, 0x7fff, "bank3");
-	memory_configure_bank(machine(), "bank3", 0, 2, ram + 0x4000, 0x10000);
+	membank("bank3")->configure_entries(0, 2, ram + 0x4000, 0x10000);
 
 	program->install_readwrite_bank(0x8000, 0xbfff, "bank4");
-	memory_configure_bank(machine(), "bank4", 0, 2, ram + 0x8000, 0x10000);
+	membank("bank4")->configure_entries(0, 2, ram + 0x8000, 0x10000);
 
 	program->install_readwrite_bank(0xc000, 0xffff, "bank5");
-	memory_configure_bank(machine(), "bank5", 0, 3, ram + 0xc000, 0);
+	membank("bank5")->configure_entries(0, 3, ram + 0xc000, 0);
 
 	bankswitch();
 

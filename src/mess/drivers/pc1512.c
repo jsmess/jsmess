@@ -319,7 +319,7 @@ READ8_MEMBER( pc1512_state::printer_r )
 
         */
 
-		data |= input_port_read(machine(), "LK") & 0x07;
+		data |= ioport("LK")->read() & 0x07;
 
 		data |= m_centronics->fault_r() << 3;
 		data |= m_centronics->vcc_r() << 4;
@@ -404,7 +404,7 @@ READ8_MEMBER( pc1640_state::printer_r )
         */
 		data = m_printer_control;
 		data |= m_opt << 5;
-		data |= (input_port_read(machine(), "SW") & 0x60) << 1;
+		data |= (ioport("SW")->read() & 0x60) << 1;
 		break;
 
 	default:
@@ -571,7 +571,7 @@ READ8_MEMBER( pc1640_state::io_r )
 	}
 	else if (!BIT(offset, 7))
 	{
-		UINT16 sw = input_port_read(machine(), "SW");
+		UINT16 sw = ioport("SW")->read();
 
 		if (!BIT(offset, 14))
 		{
@@ -669,11 +669,9 @@ ADDRESS_MAP_END
 //  INPUT_CHANGED( mouse_button_1_changed )
 //-------------------------------------------------
 
-static INPUT_CHANGED( mouse_button_1_changed )
+INPUT_CHANGED_MEMBER( pc1512_state::mouse_button_1_changed )
 {
-	pc1512_state *state = field.machine().driver_data<pc1512_state>();
-
-	state->m_kb->m1_w(newval);
+	m_kb->m1_w(newval);
 }
 
 
@@ -681,11 +679,9 @@ static INPUT_CHANGED( mouse_button_1_changed )
 //  INPUT_CHANGED( mouse_button_2_changed )
 //-------------------------------------------------
 
-static INPUT_CHANGED( mouse_button_2_changed )
+INPUT_CHANGED_MEMBER( pc1512_state::mouse_button_2_changed )
 {
-	pc1512_state *state = field.machine().driver_data<pc1512_state>();
-
-	state->m_kb->m2_w(newval);
+	m_kb->m2_w(newval);
 }
 
 
@@ -693,14 +689,12 @@ static INPUT_CHANGED( mouse_button_2_changed )
 //  INPUT_CHANGED( mouse_x_changed )
 //-------------------------------------------------
 
-static INPUT_CHANGED( mouse_x_changed )
+INPUT_CHANGED_MEMBER( pc1512_state::mouse_x_changed )
 {
-	pc1512_state *state = field.machine().driver_data<pc1512_state>();
-
 	if (newval > oldval)
-		state->m_mouse_x++;
+		m_mouse_x++;
 	else
-		state->m_mouse_x--;
+		m_mouse_x--;
 }
 
 
@@ -708,14 +702,12 @@ static INPUT_CHANGED( mouse_x_changed )
 //  INPUT_CHANGED( mouse_y_changed )
 //-------------------------------------------------
 
-static INPUT_CHANGED( mouse_y_changed )
+INPUT_CHANGED_MEMBER( pc1512_state::mouse_y_changed )
 {
-	pc1512_state *state = field.machine().driver_data<pc1512_state>();
-
 	if (newval > oldval)
-		state->m_mouse_y--;
+		m_mouse_y--;
 	else
-		state->m_mouse_y++;
+		m_mouse_y++;
 }
 
 
@@ -725,14 +717,14 @@ static INPUT_CHANGED( mouse_y_changed )
 
 static INPUT_PORTS_START( mouse )
 	PORT_START("MOUSEB")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Left Mouse Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED(mouse_button_1_changed, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Right Mouse Button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED(mouse_button_2_changed, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Left Mouse Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc1512_state, mouse_button_1_changed, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Right Mouse Button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CHANGED_MEMBER(DEVICE_SELF, pc1512_state, mouse_button_2_changed, 0)
 
 	PORT_START("MOUSEX")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CHANGED(mouse_x_changed, 0)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc1512_state, mouse_x_changed, 0)
 
 	PORT_START("MOUSEY")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CHANGED(mouse_y_changed, 0)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(5) PORT_MINMAX(0, 255) PORT_PLAYER(1) PORT_CHANGED_MEMBER(DEVICE_SELF, pc1512_state, mouse_y_changed, 0)
 INPUT_PORTS_END
 
 
@@ -789,7 +781,7 @@ static INPUT_PORTS_START( pc1640 )
 	PORT_DIPSETTING(	0x00, "Diagnostic Mode" )
 
 	PORT_START("SW")
-	PORT_DIPNAME( 0x0f, 0x09, "Initial Display Mode" ) PORT_DIPLOCATION("SW:1,2,3,4") PORT_CONDITION("SW", 0x200, PORTCOND_EQUALS, 0x200)
+	PORT_DIPNAME( 0x0f, 0x09, "Initial Display Mode" ) PORT_DIPLOCATION("SW:1,2,3,4") PORT_CONDITION("SW", 0x200, EQUALS, 0x200)
 	PORT_DIPSETTING(	0x0b, "Internal MD, External CGA80" )
 	PORT_DIPSETTING(	0x0a, "Internal MD, External CGA40" )
 	PORT_DIPSETTING(	0x09, "Internal ECD350, External MDA/HERC" )
@@ -802,23 +794,23 @@ static INPUT_PORTS_START( pc1640 )
 	PORT_DIPSETTING(	0x02, "External MDA/HERC, Internal ECD200" )
 	PORT_DIPSETTING(	0x01, "External MDA/HERC, Internal CD80" )
 	PORT_DIPSETTING(	0x00, "External MDA/HERC, Internal CD40" )
-	PORT_DIPNAME( 0x10, 0x10, "MC6845 Mode" ) PORT_DIPLOCATION("SW:5") PORT_CONDITION("SW", 0x200, PORTCOND_EQUALS, 0x200)
+	PORT_DIPNAME( 0x10, 0x10, "MC6845 Mode" ) PORT_DIPLOCATION("SW:5") PORT_CONDITION("SW", 0x200, EQUALS, 0x200)
 	PORT_DIPSETTING(	0x10, "EGA" )
 	PORT_DIPSETTING(	0x00, "CGA/MDA/HERC" )
-	PORT_DIPNAME( 0x60, 0x00, "Font" ) PORT_DIPLOCATION("SW:6,7") PORT_CONDITION("SW", 0x300, PORTCOND_EQUALS, 0x300)
+	PORT_DIPNAME( 0x60, 0x00, "Font" ) PORT_DIPLOCATION("SW:6,7") PORT_CONDITION("SW", 0x300, EQUALS, 0x300)
 	PORT_DIPSETTING(	0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(	0x60, "Danish" )
 	PORT_DIPSETTING(	0x40, "Portuguese" )
 	PORT_DIPSETTING(	0x20, "Greek" )
-	PORT_DIPNAME( 0x60, 0x60, "Default Display Mode" ) PORT_DIPLOCATION("SW:6,7") PORT_CONDITION("SW", 0x200, PORTCOND_EQUALS, 0x000)
+	PORT_DIPNAME( 0x60, 0x60, "Default Display Mode" ) PORT_DIPLOCATION("SW:6,7") PORT_CONDITION("SW", 0x200, EQUALS, 0x000)
 	PORT_DIPSETTING(	0x60, "External EGA" )
 	PORT_DIPSETTING(	0x40, "External CGA in 40 Column Mode" )
 	PORT_DIPSETTING(	0x20, "External CGA in 80 Column Mode" )
 	PORT_DIPSETTING(	0x00, "External Monochrome Adapter" )
-	PORT_DIPNAME( 0x80, 0x00, "Monitor" ) PORT_DIPLOCATION("SW:8") PORT_CONDITION("SW", 0x200, PORTCOND_EQUALS, 0x200)
+	PORT_DIPNAME( 0x80, 0x00, "Monitor" ) PORT_DIPLOCATION("SW:8") PORT_CONDITION("SW", 0x200, EQUALS, 0x200)
 	PORT_DIPSETTING(	0x80, "CD (Standard RGB)" )
 	PORT_DIPSETTING(	0x00, "ECD (Enhanced RGB)" )
-	PORT_DIPNAME( 0x100, 0x100, "Foreign Fonts" ) PORT_DIPLOCATION("SW:9") PORT_CONDITION("SW", 0x200, PORTCOND_EQUALS, 0x200)
+	PORT_DIPNAME( 0x100, 0x100, "Foreign Fonts" ) PORT_DIPLOCATION("SW:9") PORT_CONDITION("SW", 0x200, EQUALS, 0x200)
 	PORT_DIPSETTING(	 0x100, "Enabled" )
 	PORT_DIPSETTING(	 0x000, "Disabled" )
 	PORT_DIPNAME( 0x200, 0x200, "Internal Graphics Adapter" ) PORT_DIPLOCATION("SW:10")

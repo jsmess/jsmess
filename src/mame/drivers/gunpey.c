@@ -59,6 +59,10 @@ public:
 
 	UINT16 *m_blit_buffer;
 	UINT16 m_blit_ram[0x10];
+	DECLARE_WRITE8_MEMBER(gunpey_status_w);
+	DECLARE_READ8_MEMBER(gunpey_status_r);
+	DECLARE_READ8_MEMBER(gunpey_inputs_r);
+	DECLARE_WRITE8_MEMBER(gunpey_blitter_w);
 };
 
 
@@ -100,11 +104,11 @@ static SCREEN_UPDATE_RGB32( gunpey )
 	return 0;
 }
 
-static WRITE8_HANDLER( gunpey_status_w )
+WRITE8_MEMBER(gunpey_state::gunpey_status_w)
 {
 }
 
-static READ8_HANDLER( gunpey_status_r )
+READ8_MEMBER(gunpey_state::gunpey_status_r)
 {
 	if(offset == 1)
 		return 0x54;
@@ -112,26 +116,25 @@ static READ8_HANDLER( gunpey_status_r )
 	return 0x00;
 }
 
-static READ8_HANDLER( gunpey_inputs_r )
+READ8_MEMBER(gunpey_state::gunpey_inputs_r)
 {
 	switch(offset+0x7f40)
 	{
-		case 0x7f40: return input_port_read(space->machine(), "DSW1");
-		case 0x7f41: return input_port_read(space->machine(), "DSW2");
-		case 0x7f42: return input_port_read(space->machine(), "P1");
-		case 0x7f43: return input_port_read(space->machine(), "P2");
-		case 0x7f44: return input_port_read(space->machine(), "SYSTEM");
+		case 0x7f40: return ioport("DSW1")->read();
+		case 0x7f41: return ioport("DSW2")->read();
+		case 0x7f42: return ioport("P1")->read();
+		case 0x7f43: return ioport("P2")->read();
+		case 0x7f44: return ioport("SYSTEM")->read();
 	}
 
 	return 0xff;
 }
 
-static WRITE8_HANDLER( gunpey_blitter_w )
+WRITE8_MEMBER(gunpey_state::gunpey_blitter_w)
 {
-	gunpey_state *state = space->machine().driver_data<gunpey_state>();
-	UINT16 *blit_buffer = state->m_blit_buffer;
-	UINT16 *blit_ram = state->m_blit_ram;
-	UINT8 *blit_rom = space->machine().region("blit_data")->base();
+	UINT16 *blit_buffer = m_blit_buffer;
+	UINT16 *blit_ram = m_blit_ram;
+	UINT8 *blit_rom = memregion("blit_data")->base();
 	int x,y;
 
 	blit_ram[offset] = data;
@@ -181,23 +184,23 @@ static WRITE8_HANDLER( gunpey_blitter_w )
 
 /***************************************************************************************/
 
-static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mem_map, AS_PROGRAM, 16, gunpey_state )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 //  AM_RANGE(0x50000, 0x500ff) AM_RAM
 //  AM_RANGE(0x50100, 0x502ff) AM_NOP
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 16 )
+static ADDRESS_MAP_START( io_map, AS_IO, 16, gunpey_state )
 	AM_RANGE(0x7f40, 0x7f45) AM_READ8(gunpey_inputs_r,0xffff)
 
-//  AM_RANGE(0x7f48, 0x7f48) AM_WRITE(output_w)
-	AM_RANGE(0x7f80, 0x7f81) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0xffff)
+//  AM_RANGE(0x7f48, 0x7f48) AM_WRITE_LEGACY(output_w)
+	AM_RANGE(0x7f80, 0x7f81) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0xffff)
 
-	AM_RANGE(0x7f88, 0x7f89) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0xff00)
+	AM_RANGE(0x7f88, 0x7f89) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 
-	AM_RANGE(0x7fc8, 0x7fc9) AM_READWRITE8( gunpey_status_r,  gunpey_status_w, 0xffff )
-	AM_RANGE(0x7fd0, 0x7fdf) AM_WRITE8( gunpey_blitter_w, 0xffff )
+	AM_RANGE(0x7fc8, 0x7fc9) AM_READWRITE8(gunpey_status_r,  gunpey_status_w, 0xffff )
+	AM_RANGE(0x7fd0, 0x7fdf) AM_WRITE8(gunpey_blitter_w, 0xffff )
 ADDRESS_MAP_END
 
 
@@ -304,7 +307,7 @@ INPUT_PORTS_END
 static PALETTE_INIT( gunpey )
 {
 	int i,r,g,b,val;
-	UINT8 *blit_rom = machine.region("blit_data")->base();
+	UINT8 *blit_rom = machine.root_device().memregion("blit_data")->base();
 
 	for (i = 0; i < 512; i+=2)
 	{
@@ -381,7 +384,7 @@ ROM_END
 
 static DRIVER_INIT( gunpey )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	/* patch SLOOOOW cycle checks ... */
 	rom[0x848b5] = 0x7e;

@@ -77,7 +77,7 @@ void px8_state::bankswitch()
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 *ram = m_ram->pointer();
-	UINT8 *ipl_rom = machine().region(UPD70008_TAG)->base();
+	UINT8 *ipl_rom = memregion(UPD70008_TAG)->base();
 
 	if (!m_bank0)
 	{
@@ -452,16 +452,16 @@ UINT8 px8_state::krtn_read()
 
 	switch (m_ksc)
 	{
-	case 0: data = input_port_read(machine(), "KSC0"); break;
-	case 1: data = input_port_read(machine(), "KSC1"); break;
-	case 2: data = input_port_read(machine(), "KSC2"); break;
-	case 3: data = input_port_read(machine(), "KSC3"); break;
-	case 4: data = input_port_read(machine(), "KSC4"); break;
-	case 5: data = input_port_read(machine(), "KSC5"); break;
-	case 6: data = input_port_read(machine(), "KSC6"); break;
-	case 7: data = input_port_read(machine(), "KSC7"); break;
-	case 8: data = input_port_read(machine(), "KSC8"); break;
-	case 9: data = input_port_read(machine(), "SW4");  break;
+	case 0: data = ioport("KSC0")->read(); break;
+	case 1: data = ioport("KSC1")->read(); break;
+	case 2: data = ioport("KSC2")->read(); break;
+	case 3: data = ioport("KSC3")->read(); break;
+	case 4: data = ioport("KSC4")->read(); break;
+	case 5: data = ioport("KSC5")->read(); break;
+	case 6: data = ioport("KSC6")->read(); break;
+	case 7: data = ioport("KSC7")->read(); break;
+	case 8: data = ioport("KSC8")->read(); break;
+	case 9: data = ioport("SW4")->read();  break;
 	}
 
 	return data;
@@ -531,7 +531,7 @@ static ADDRESS_MAP_START( px8_slave_mem, AS_PROGRAM, 8, px8_state )
 	AM_RANGE(0x0020, 0x0023) AM_READWRITE(gah40s_r, gah40s_w)
 //  AM_RANGE(0x0024, 0x0027) AM_DEVREADWRITE_LEGACY(SED1320_TAG, )
 	AM_RANGE(0x0028, 0x0028) AM_WRITE(gah40s_ier_w)
-	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE(m_video_ram)
+	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x9800, 0xefff) AM_NOP
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(HD6303_TAG, 0) /* internal mask rom */
 ADDRESS_MAP_END

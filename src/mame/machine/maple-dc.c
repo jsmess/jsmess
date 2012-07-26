@@ -1,4 +1,3 @@
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "maple-dc.h"
@@ -20,6 +19,12 @@ void maple_dc_device::static_set_maincpu_tag(device_t &device, const char *mainc
 	maple_dc.maincpu_tag = maincpu_tag;
 }
 
+void maple_dc_device::static_set_irq_cb(device_t &device, void (*irq_cb)(running_machine &))
+{
+	maple_dc_device &maple_dc = downcast<maple_dc_device &>(device);
+	maple_dc.irq_cb = irq_cb;
+}
+
 maple_dc_device::maple_dc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
 	: device_t(mconfig, MAPLE_DC, "MAPLE_DC", tag, owner, clock)
 {
@@ -27,6 +32,7 @@ maple_dc_device::maple_dc_device(const machine_config &mconfig, const char *tag,
 	// condition with the maple devices call to register_port.
 	memset(devices, 0, sizeof(devices));
 	cpu = 0;
+	irq_cb = 0;
 }
 
 void maple_dc_device::register_port(int port, maple_device *device)
@@ -86,6 +92,8 @@ void maple_dc_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	case DMA_DONE:
 		dma_state = DMA_IDLE;
 		mdst = 0;
+		if(irq_cb)
+			irq_cb(machine());
 		break;
 
 	default:

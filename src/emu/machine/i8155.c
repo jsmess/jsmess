@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    Intel 8155 - 2048-Bit Static MOS RAM with I/O Ports and Timer emulation
+    Intel 8155/8156 - 2048-Bit Static MOS RAM with I/O Ports and Timer emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -19,15 +19,16 @@
 #include "i8155.h"
 
 
-// device type definition
+// device type definitions
 const device_type I8155 = &device_creator<i8155_device>;
+const device_type I8156 = &device_creator<i8155_device>;
 
 
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 enum
 {
@@ -98,7 +99,7 @@ enum
 //**************************************************************************
 
 // default address map
-static ADDRESS_MAP_START( i8155, AS_0, 8 )
+static ADDRESS_MAP_START( i8155, AS_0, 8, i8155_device )
 	AM_RANGE(0x00, 0xff) AM_RAM
 ADDRESS_MAP_END
 
@@ -158,36 +159,19 @@ inline UINT8 i8155_device::read_port(int port)
 {
 	UINT8 data = 0;
 
-	switch (port)
+	switch (get_port_mode(port))
 	{
-	case PORT_A:
-	case PORT_B:
-		switch (get_port_mode(port))
-		{
-		case PORT_MODE_INPUT:
-			data = m_in_port_func[port](0);
-			break;
-
-		case PORT_MODE_OUTPUT:
-			data = m_output[port];
-			break;
-		}
+	case PORT_MODE_INPUT:
+		data = m_in_port_func[port](0);
 		break;
 
-	case PORT_C:
-		switch (get_port_mode(PORT_C))
-		{
-		case PORT_MODE_INPUT:
-			data = m_in_port_func[port](0) & 0x3f;
-			break;
+	case PORT_MODE_OUTPUT:
+		data = m_output[port];
+		break;
 
-		case PORT_MODE_OUTPUT:
-			data = m_output[port] & 0x3f;
-			break;
-
-		default:
-			logerror("8155 '%s' Unsupported Port C mode!\n", tag());
-		}
+	default:
+		// strobed mode not implemented yet
+		logerror("8155 '%s' Unsupported Port C mode!\n", tag());
 		break;
 	}
 
@@ -385,7 +369,7 @@ READ8_MEMBER( i8155_device::io_r )
 {
 	UINT8 data = 0;
 
-	switch (offset & 0x03)
+	switch (offset & 0x07)
 	{
 	case REGISTER_STATUS:
 		data = m_status;
@@ -403,7 +387,15 @@ READ8_MEMBER( i8155_device::io_r )
 		break;
 
 	case REGISTER_PORT_C:
-		data = read_port(PORT_C);
+		data = read_port(PORT_C) | 0xc0;
+		break;
+
+	case REGISTER_TIMER_LOW:
+		data = m_counter & 0xff;
+		break;
+
+	case REGISTER_TIMER_HIGH:
+		data = (m_counter >> 8 & 0x3f) | get_timer_mode();
 		break;
 	}
 
@@ -476,7 +468,7 @@ void i8155_device::register_w(int offset, UINT8 data)
 			else
 			{
 				// load mode and CNT length and start immediately after loading (if timer is not running)
-				m_counter = m_count_length;
+				m_counter = m_count_length & 0x3fff;
 				m_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
 			}
 			break;
@@ -492,7 +484,7 @@ void i8155_device::register_w(int offset, UINT8 data)
 		break;
 
 	case REGISTER_PORT_C:
-		write_port(PORT_C, data);
+		write_port(PORT_C, data & 0x3f);
 		break;
 
 	case REGISTER_TIMER_LOW:

@@ -140,6 +140,11 @@ public:
 
 	int m_latch;
 	unsigned int m_acrtc_data;
+	DECLARE_WRITE8_MEMBER(acrtc_w);
+	DECLARE_READ8_MEMBER(acrtc_r);
+	DECLARE_READ8_MEMBER(unk_f700_r);
+	DECLARE_WRITE8_MEMBER(unk_f710_w);
+	DECLARE_READ8_MEMBER(unk_f721_r);
 };
 
 
@@ -234,47 +239,46 @@ static PALETTE_INIT( jwildb52 )
 *      ACRTC Access      *
 *************************/
 
-static WRITE8_HANDLER(acrtc_w)
+WRITE8_MEMBER(sigmab52_state::acrtc_w)
 {
-	sigmab52_state *state = space->machine().driver_data<sigmab52_state>();
-	device_t *hd63484 = space->machine().device("hd63484");
+	device_t *hd63484 = machine().device("hd63484");
 	if(!offset)
 	{
 		//address select
 		hd63484_address_w(hd63484, 0, data, 0x00ff);
-		state->m_latch = 0;
+		m_latch = 0;
 	}
 	else
 	{
-		if(!state->m_latch)
+		if(!m_latch)
 		{
-			state->m_acrtc_data = data;
+			m_acrtc_data = data;
 
 		}
 
 		else
 		{
-			state->m_acrtc_data <<= 8;
-			state->m_acrtc_data |= data;
+			m_acrtc_data <<= 8;
+			m_acrtc_data |= data;
 
-			hd63484_data_w(hd63484, 0, state->m_acrtc_data, 0xffff);
+			hd63484_data_w(hd63484, 0, m_acrtc_data, 0xffff);
 		}
 
-		state->m_latch ^= 1;
+		m_latch ^= 1;
 	}
 }
 
-static READ8_HANDLER(acrtc_r)
+READ8_MEMBER(sigmab52_state::acrtc_r)
 {
 	if(offset&1)
 	{
-		device_t *hd63484 = space->machine().device("hd63484");
+		device_t *hd63484 = machine().device("hd63484");
 		return hd63484_data_r(hd63484, 0, 0xff);
 	}
 
 	else
 	{
-		return 0x7b; //fake status read (instead HD63484_status_r(space, 0, 0xff); )
+		return 0x7b; //fake status read (instead HD63484_status_r(&space, 0, 0xff); )
 	}
 }
 
@@ -283,17 +287,17 @@ static READ8_HANDLER(acrtc_r)
 *      Misc Handlers     *
 *************************/
 
-static READ8_HANDLER(unk_f700_r)
+READ8_MEMBER(sigmab52_state::unk_f700_r)
 {
 	return 0x7f;
 }
 
-static WRITE8_HANDLER(unk_f710_w)
+WRITE8_MEMBER(sigmab52_state::unk_f710_w)
 {
-	memory_set_bankptr(space->machine(), "bank1" ,&space->machine().region("maincpu")->base()[0x10000 + ((data&0x80)?0x4000:0x0000)]);
+	membank("bank1" )->set_base(&machine().root_device().memregion("maincpu")->base()[0x10000 + ((data&0x80)?0x4000:0x0000)]);
 }
 
-static READ8_HANDLER(unk_f721_r)
+READ8_MEMBER(sigmab52_state::unk_f721_r)
 {
 	return 0x04;	// test is stuck. feeding bit3 the error message appear...
 }
@@ -303,7 +307,7 @@ static READ8_HANDLER(unk_f721_r)
 *      Memory Maps       *
 *************************/
 
-static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8, sigmab52_state )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank1")
 
@@ -313,8 +317,8 @@ static ADDRESS_MAP_START( jwildb52_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xf710, 0xf710) AM_WRITE(unk_f710_w)
 	AM_RANGE(0xf721, 0xf721) AM_READ(unk_f721_r)
 
-	//AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("hd63484", hd63484_status_r, hd63484_address_w)
-	//AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("hd63484", hd63484_data_r, hd63484_data_w)
+	//AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_status_r, hd63484_address_w)
+	//AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_data_r, hd63484_data_w)
 
 	AM_RANGE(0xf730, 0xf731) AM_READWRITE(acrtc_r, acrtc_w)
 	AM_RANGE(0xf740, 0xf740) AM_READ_PORT("IN0")
@@ -348,7 +352,7 @@ ADDRESS_MAP_END
 */
 
 #ifdef UNUSED_CODE
-static ADDRESS_MAP_START( sound_prog_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_prog_map, AS_PROGRAM, 8, sigmab52_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 #endif
@@ -538,11 +542,11 @@ static INTERRUPT_GEN( timer_irq )
 
 static MACHINE_START(jwildb52)
 {
-	memory_set_bankptr(machine, "bank1", &machine.region("maincpu")->base()[0x10000 + 0x0000]);
+	machine.root_device().membank("bank1")->set_base(&machine.root_device().memregion("maincpu")->base()[0x10000 + 0x0000]);
 
-	memory_set_bankptr(machine, "bank2", &machine.region("maincpu")->base()[0x10000 + 0xf800]);
+	machine.root_device().membank("bank2")->set_base(&machine.root_device().memregion("maincpu")->base()[0x10000 + 0xf800]);
 
-	memory_set_bankptr(machine, "bank3", &machine.region("maincpu")->base()[0x10000 + 0x8000]);
+	machine.root_device().membank("bank3")->set_base(&machine.root_device().memregion("maincpu")->base()[0x10000 + 0x8000]);
 
 /*
 
@@ -556,7 +560,7 @@ static MACHINE_START(jwildb52)
 */
 
 	{
-		UINT16 *rom = (UINT16*)machine.region("gfx1")->base();
+		UINT16 *rom = (UINT16*)machine.root_device().memregion("gfx1")->base();
 		int i;
 
 		device_t *hd63484 = machine.device("hd63484");

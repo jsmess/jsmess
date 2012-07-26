@@ -210,17 +210,18 @@ class gamecom_state : public driver_device
 public:
 	gamecom_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
-	{ }
+	m_maincpu(*this, "maincpu"),
+	m_p_nvram(*this,"p_nvram"),
+	m_p_videoram(*this,"p_videoram") { }
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER( gamecom_internal_r );
 	DECLARE_READ8_MEMBER( gamecom_pio_r );
 	DECLARE_WRITE8_MEMBER( gamecom_internal_w );
 	DECLARE_WRITE8_MEMBER( gamecom_pio_w );
-	UINT8 *m_p_nvram;
+	required_shared_ptr<UINT8> m_p_nvram;
 	UINT8 *m_p_ram;
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 *m_cartridge1;
 	UINT8 *m_cartridge2;
 	UINT8 *m_cartridge;

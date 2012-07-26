@@ -65,28 +65,28 @@ static WRITE16_DEVICE_HANDLER( eeprom_data_w )
 	eeprom->write_bit(data & 0x01);
 }
 
-static WRITE16_HANDLER( xorworld_irq2_ack_w )
+WRITE16_MEMBER(xorworld_state::xorworld_irq2_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 2, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 2, CLEAR_LINE);
 }
 
-static WRITE16_HANDLER( xorworld_irq6_ack_w )
+WRITE16_MEMBER(xorworld_state::xorworld_irq6_ack_w)
 {
-	cputag_set_input_line(space->machine(), "maincpu", 6, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", 6, CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( xorworld_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( xorworld_map, AS_PROGRAM, 16, xorworld_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1")
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P2")
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW")
-	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8("saa", saa1099_data_w, 0x00ff)
-	AM_RANGE(0x800002, 0x800003) AM_DEVWRITE8("saa", saa1099_control_w, 0x00ff)
-	AM_RANGE(0xa00008, 0xa00009) AM_DEVWRITE("eeprom", eeprom_chip_select_w)
-	AM_RANGE(0xa0000a, 0xa0000b) AM_DEVWRITE("eeprom", eeprom_serial_clock_w)
-	AM_RANGE(0xa0000c, 0xa0000d) AM_DEVWRITE("eeprom", eeprom_data_w)
-	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM_WRITE(xorworld_videoram16_w) AM_BASE_MEMBER(xorworld_state, m_videoram)
-	AM_RANGE(0xffc800, 0xffc87f) AM_RAM	AM_BASE_MEMBER(xorworld_state, m_spriteram)
+	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE8_LEGACY("saa", saa1099_data_w, 0x00ff)
+	AM_RANGE(0x800002, 0x800003) AM_DEVWRITE8_LEGACY("saa", saa1099_control_w, 0x00ff)
+	AM_RANGE(0xa00008, 0xa00009) AM_DEVWRITE_LEGACY("eeprom", eeprom_chip_select_w)
+	AM_RANGE(0xa0000a, 0xa0000b) AM_DEVWRITE_LEGACY("eeprom", eeprom_serial_clock_w)
+	AM_RANGE(0xa0000c, 0xa0000d) AM_DEVWRITE_LEGACY("eeprom", eeprom_data_w)
+	AM_RANGE(0xffc000, 0xffc7ff) AM_RAM_WRITE(xorworld_videoram16_w) AM_SHARE("videoram")
+	AM_RANGE(0xffc800, 0xffc87f) AM_RAM	AM_SHARE("spriteram")
 	AM_RANGE(0xffc880, 0xffc881) AM_WRITE(xorworld_irq2_ack_w)
 	AM_RANGE(0xffc882, 0xffc883) AM_WRITE(xorworld_irq6_ack_w)
 	AM_RANGE(0xffc884, 0xffffff) AM_RAM
@@ -223,7 +223,7 @@ static DRIVER_INIT( xorworld )
 	/*  patch some strange protection (without this, strange characters appear
         after level 5 and some pieces don't rotate properly some times) */
 
-	UINT16 *rom = (UINT16 *)(machine.region("maincpu")->base() + 0x1390);
+	UINT16 *rom = (UINT16 *)(machine.root_device().memregion("maincpu")->base() + 0x1390);
 
 	PATCH(0x4239); PATCH(0x00ff); PATCH(0xe196);	/* clr.b $ffe196 */
 	PATCH(0x4239); PATCH(0x00ff); PATCH(0xe197);	/* clr.b $ffe197 */

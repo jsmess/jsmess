@@ -1,18 +1,16 @@
 #include "emu.h"
 #include "includes/higemaru.h"
 
-WRITE8_HANDLER( higemaru_videoram_w )
+WRITE8_MEMBER(higemaru_state::higemaru_videoram_w)
 {
-	higemaru_state *state = space->machine().driver_data<higemaru_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( higemaru_colorram_w )
+WRITE8_MEMBER(higemaru_state::higemaru_colorram_w)
 {
-	higemaru_state *state = space->machine().driver_data<higemaru_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 /***************************************************************************
@@ -23,6 +21,7 @@ WRITE8_HANDLER( higemaru_colorram_w )
 
 PALETTE_INIT( higemaru )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -73,21 +72,20 @@ PALETTE_INIT( higemaru )
 	}
 }
 
-WRITE8_HANDLER( higemaru_c800_w )
+WRITE8_MEMBER(higemaru_state::higemaru_c800_w)
 {
-	higemaru_state *state = space->machine().driver_data<higemaru_state>();
 	if (data & 0x7c)
 		logerror("c800 = %02x\n",data);
 
 	/* bits 0 and 1 are coin counters */
-	coin_counter_w(space->machine(), 0,data & 2);
-	coin_counter_w(space->machine(), 1,data & 1);
+	coin_counter_w(machine(), 0,data & 2);
+	coin_counter_w(machine(), 1,data & 1);
 
 	/* bit 7 flips screen */
-	if (flip_screen_get(space->machine()) != (data & 0x80))
+	if (flip_screen() != (data & 0x80))
 	{
-		flip_screen_set(space->machine(), data & 0x80);
-		state->m_bg_tilemap->mark_all_dirty();
+		flip_screen_set(data & 0x80);
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
@@ -112,7 +110,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram_size - 16; offs >= 0; offs -= 16)
+	for (offs = state->m_spriteram.bytes() - 16; offs >= 0; offs -= 16)
 	{
 		int code,col,sx,sy,flipx,flipy;
 
@@ -122,7 +120,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		sy = spriteram[offs + 8];
 		flipx = spriteram[offs + 4] & 0x10;
 		flipy = spriteram[offs + 4] & 0x20;
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;

@@ -35,7 +35,7 @@
 static WRITE8_DEVICE_HANDLER( mquake_cia_0_porta_w )
 {
 	/* switch banks as appropriate */
-	memory_set_bank(device->machine(), "bank1", data & 1);
+	device->machine().root_device().membank("bank1")->set_entry(data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
@@ -87,14 +87,14 @@ static WRITE8_DEVICE_HANDLER( mquake_cia_0_portb_w )
 
 static READ8_HANDLER( es5503_sample_r )
 {
-	UINT8 *rom = space->machine().region("es5503")->base();
+	UINT8 *rom = space->machine().root_device().memregion("es5503")->base();
 	es5503_device *es5503 = space->machine().device<es5503_device>("es5503");
 
 	return rom[offset + (es5503->get_channel_strobe() * 0x10000)];
 }
 
-static ADDRESS_MAP_START( mquake_es5503_map, AS_0, 8 )
-	AM_RANGE(0x000000, 0x1ffff) AM_READ(es5503_sample_r)
+static ADDRESS_MAP_START( mquake_es5503_map, AS_0, 8, amiga_state )
+	AM_RANGE(0x000000, 0x1ffff) AM_READ_LEGACY(es5503_sample_r)
 ADDRESS_MAP_END
 
 static WRITE16_HANDLER( output_w )
@@ -107,7 +107,7 @@ static WRITE16_HANDLER( output_w )
 static READ16_HANDLER( coin_chip_r )
 {
 	if (offset == 1)
-		return input_port_read(space->machine(), "COINCHIP");
+		return space->machine().root_device().ioport("COINCHIP")->read();
 	logerror("%06x:coin_chip_r(%02x) & %04x\n", cpu_get_pc(&space->device()), offset, mem_mask);
 	return 0xffff;
 }
@@ -131,20 +131,20 @@ static WRITE16_HANDLER( coin_chip_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, amiga_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(amiga_state, m_chip_ram, m_chip_ram_size)
-	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w)  AM_BASE_MEMBER(amiga_state, m_custom_regs)
-	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_SHARE("chip_ram")
+	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE_LEGACY(amiga_cia_r, amiga_cia_w)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE_LEGACY(amiga_custom_r, amiga_custom_w)  AM_SHARE("custom_regs")
+	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE_LEGACY(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
 
 	AM_RANGE(0x200000, 0x203fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x204000, 0x2041ff) AM_DEVREADWRITE8_MODERN("es5503", es5503_device, read, write, 0x00ff)
+	AM_RANGE(0x204000, 0x2041ff) AM_DEVREADWRITE8("es5503", es5503_device, read, write, 0x00ff)
 	AM_RANGE(0x282000, 0x282001) AM_READ_PORT("SW.LO")
 	AM_RANGE(0x282002, 0x282003) AM_READ_PORT("SW.HI")
-	AM_RANGE(0x284000, 0x28400f) AM_WRITE(output_w)
-	AM_RANGE(0x286000, 0x28600f) AM_READWRITE(coin_chip_r, coin_chip_w)
+	AM_RANGE(0x284000, 0x28400f) AM_WRITE_LEGACY(output_w)
+	AM_RANGE(0x286000, 0x28600f) AM_READWRITE_LEGACY(coin_chip_r, coin_chip_w)
 	AM_RANGE(0x300000, 0x3bffff) AM_ROM AM_REGION("user2", 0)
 	AM_RANGE(0xf00000, 0xfbffff) AM_ROM AM_REGION("user2", 0)			/* Custom ROM */
 ADDRESS_MAP_END
@@ -164,11 +164,11 @@ static INPUT_PORTS_START( mquake )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)			/* JS1SW */
 
 	PORT_START("JOY0DAT")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(amiga_joystick_convert, "P1JOY")
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, amiga_state,amiga_joystick_convert, "P1JOY")
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("JOY1DAT")
-	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(amiga_joystick_convert, "P2JOY")
+	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, amiga_state,amiga_joystick_convert, "P2JOY")
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("P1JOY")
@@ -444,8 +444,8 @@ static DRIVER_INIT(mquake)
 	amiga_machine_config(machine, &mquake_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, state->m_chip_ram, 0);
-	memory_configure_bank(machine, "bank1", 1, 1, machine.region("user1")->base(), 0);
+	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
+	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
 }
 
 

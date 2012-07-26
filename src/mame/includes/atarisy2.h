@@ -10,12 +10,16 @@ class atarisy2_state : public atarigen_state
 {
 public:
 	atarisy2_state(const machine_config &mconfig, device_type type, const char *tag)
-		: atarigen_state(mconfig, type, tag) { }
+		: atarigen_state(mconfig, type, tag),
+		  m_slapstic_base(*this, "slapstic_base"),
+		  m_bankselect(*this, "bankselect"),
+		  m_rombank1(*this, "rombank1"),
+		  m_rombank2(*this, "rombank2") { }
 
-	UINT16 *		m_slapstic_base;
+	required_shared_ptr<UINT16> m_slapstic_base;
 
 	UINT8			m_interrupt_enable;
-	UINT16 *		m_bankselect;
+	required_shared_ptr<UINT16> m_bankselect;
 
 	INT8			m_pedal_count;
 
@@ -26,8 +30,8 @@ public:
 	UINT8			m_p2portwr_state;
 	UINT8			m_p2portrd_state;
 
-	UINT16 *		m_rombank1;
-	UINT16 *		m_rombank2;
+	required_shared_ptr<UINT16> m_rombank1;
+	required_shared_ptr<UINT16> m_rombank2;
 
 	UINT8			m_sound_reset_state;
 
@@ -45,6 +49,25 @@ public:
 	UINT32			m_spin_center_count;
 
 	UINT16			m_vram[0x8000/2];
+	DECLARE_WRITE16_MEMBER(int0_ack_w);
+	DECLARE_WRITE16_MEMBER(int1_ack_w);
+	DECLARE_WRITE16_MEMBER(int_enable_w);
+	DECLARE_WRITE16_MEMBER(bankselect_w);
+	DECLARE_READ16_MEMBER(switch_r);
+	DECLARE_READ8_MEMBER(switch_6502_r);
+	DECLARE_WRITE8_MEMBER(switch_6502_w);
+	DECLARE_WRITE16_MEMBER(adc_strobe_w);
+	DECLARE_READ16_MEMBER(adc_r);
+	DECLARE_READ8_MEMBER(leta_r);
+	DECLARE_WRITE8_MEMBER(mixer_w);
+	DECLARE_WRITE8_MEMBER(sound_reset_w);
+	DECLARE_READ16_MEMBER(sound_r);
+	DECLARE_WRITE8_MEMBER(sound_6502_w);
+	DECLARE_READ8_MEMBER(sound_6502_r);
+	DECLARE_WRITE8_MEMBER(tms5220_w);
+	DECLARE_WRITE8_MEMBER(tms5220_strobe_w);
+	DECLARE_WRITE8_MEMBER(coincount_w);
+	DECLARE_DIRECT_UPDATE_MEMBER(atarisy2_direct_handler);
 };
 
 

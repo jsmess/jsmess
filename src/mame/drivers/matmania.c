@@ -44,18 +44,16 @@ The driver has been updated accordingly.
  *
  *************************************/
 
-static WRITE8_HANDLER( matmania_sh_command_w )
+WRITE8_MEMBER(matmania_state::matmania_sh_command_w)
 {
-	matmania_state *state = space->machine().driver_data<matmania_state>();
-	soundlatch_w(space, offset, data);
-	device_set_input_line(state->m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
+	soundlatch_byte_w(space, offset, data);
+	device_set_input_line(m_audiocpu, M6502_IRQ_LINE, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( maniach_sh_command_w )
+WRITE8_MEMBER(matmania_state::maniach_sh_command_w)
 {
-	matmania_state *state = space->machine().driver_data<matmania_state>();
-	soundlatch_w(space, offset, data);
-	device_set_input_line(state->m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
+	soundlatch_byte_w(space, offset, data);
+	device_set_input_line(m_audiocpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -65,69 +63,69 @@ static WRITE8_HANDLER( maniach_sh_command_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( matmania_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( matmania_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x0000, 0x077f) AM_RAM
-	AM_RANGE(0x0780, 0x07df) AM_WRITEONLY AM_BASE_SIZE_MEMBER(matmania_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE_MEMBER(matmania_state, m_videoram2, m_videoram2_size)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE_MEMBER(matmania_state, m_colorram2)
-	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE_SIZE_MEMBER(matmania_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x2200, 0x23ff) AM_RAM AM_BASE_MEMBER(matmania_state, m_colorram)
-	AM_RANGE(0x2400, 0x25ff) AM_RAM AM_BASE_SIZE_MEMBER(matmania_state, m_videoram3, m_videoram3_size)
-	AM_RANGE(0x2600, 0x27ff) AM_RAM AM_BASE_MEMBER(matmania_state, m_colorram3)
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_BASE_MEMBER(matmania_state, m_pageselect)
+	AM_RANGE(0x0780, 0x07df) AM_WRITEONLY AM_SHARE("spriteram")
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram2")
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_SHARE("colorram2")
+	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x2200, 0x23ff) AM_RAM AM_SHARE("colorram")
+	AM_RANGE(0x2400, 0x25ff) AM_RAM AM_SHARE("videoram3")
+	AM_RANGE(0x2600, 0x27ff) AM_RAM AM_SHARE("colorram3")
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_SHARE("pageselect")
 	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1") AM_WRITE(matmania_sh_command_w)
-	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE_MEMBER(matmania_state, m_scroll)
+	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1") AM_WRITENOP /* ?? */
-	AM_RANGE(0x3050, 0x307f) AM_WRITE(matmania_paletteram_w) AM_BASE_MEMBER(matmania_state, m_paletteram)
+	AM_RANGE(0x3050, 0x307f) AM_WRITE(matmania_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maniach_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( maniach_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x0000, 0x077f) AM_RAM
-	AM_RANGE(0x0780, 0x07df) AM_RAM AM_BASE_SIZE_MEMBER(matmania_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_SIZE_MEMBER(matmania_state, m_videoram2, m_videoram2_size)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE_MEMBER(matmania_state, m_colorram2)
-	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_BASE_SIZE_MEMBER(matmania_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x2200, 0x23ff) AM_RAM AM_BASE_MEMBER(matmania_state, m_colorram)
-	AM_RANGE(0x2400, 0x25ff) AM_RAM AM_BASE_SIZE_MEMBER(matmania_state, m_videoram3, m_videoram3_size)
-	AM_RANGE(0x2600, 0x27ff) AM_RAM AM_BASE_MEMBER(matmania_state, m_colorram3)
-	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_BASE_MEMBER(matmania_state, m_pageselect)
+	AM_RANGE(0x0780, 0x07df) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("videoram2")
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_SHARE("colorram2")
+	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x2200, 0x23ff) AM_RAM AM_SHARE("colorram")
+	AM_RANGE(0x2400, 0x25ff) AM_RAM AM_SHARE("videoram3")
+	AM_RANGE(0x2600, 0x27ff) AM_RAM AM_SHARE("colorram3")
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0") AM_WRITEONLY AM_SHARE("pageselect")
 	AM_RANGE(0x3010, 0x3010) AM_READ_PORT("IN1") AM_WRITE(maniach_sh_command_w)
-	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_BASE_MEMBER(matmania_state, m_scroll)
+	AM_RANGE(0x3020, 0x3020) AM_READ_PORT("DSW2") AM_WRITEONLY AM_SHARE("scroll")
 	AM_RANGE(0x3030, 0x3030) AM_READ_PORT("DSW1") AM_WRITENOP	/* ?? */
-	AM_RANGE(0x3040, 0x3040) AM_READWRITE(maniach_mcu_r,maniach_mcu_w)
-	AM_RANGE(0x3041, 0x3041) AM_READ(maniach_mcu_status_r)
-	AM_RANGE(0x3050, 0x307f) AM_WRITE(matmania_paletteram_w) AM_BASE_MEMBER(matmania_state, m_paletteram)
+	AM_RANGE(0x3040, 0x3040) AM_READWRITE_LEGACY(maniach_mcu_r,maniach_mcu_w)
+	AM_RANGE(0x3041, 0x3041) AM_READ_LEGACY(maniach_mcu_status_r)
+	AM_RANGE(0x3050, 0x307f) AM_WRITE(matmania_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( matmania_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( matmania_sound_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_data_address_w)
-	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE("ay2", ay8910_data_address_w)
-	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE("dac", dac_signed_w)
-	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_r)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
+	AM_RANGE(0x2002, 0x2003) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
+	AM_RANGE(0x2004, 0x2004) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
+	AM_RANGE(0x2007, 0x2007) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( maniach_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( maniach_sound_map, AS_PROGRAM, 8, matmania_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ymsnd", ym3526_w)
-	AM_RANGE(0x2002, 0x2002) AM_DEVWRITE("dac", dac_signed_w)
-	AM_RANGE(0x2004, 0x2004) AM_READ(soundlatch_r)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)
+	AM_RANGE(0x2002, 0x2002) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
+	AM_RANGE(0x2004, 0x2004) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( maniach_mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( maniach_mcu_map, AS_PROGRAM, 8, matmania_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(maniach_68705_port_a_r,maniach_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(maniach_68705_port_b_r,maniach_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(maniach_68705_port_c_r,maniach_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(maniach_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(maniach_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(maniach_68705_ddr_c_w)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE_LEGACY(maniach_68705_port_a_r,maniach_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE_LEGACY(maniach_68705_port_b_r,maniach_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE_LEGACY(maniach_68705_port_c_r,maniach_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE_LEGACY(maniach_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE_LEGACY(maniach_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE_LEGACY(maniach_68705_ddr_c_w)
 	AM_RANGE(0x0010, 0x007f) AM_RAM
 	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
@@ -178,7 +176,7 @@ static INPUT_PORTS_START( matmania )
 	PORT_DIPSETTING(   0x00, DEF_STR( Upright ) )		/* The default setting should be cocktail. */
 	PORT_DIPSETTING(   0x20, DEF_STR( Cocktail ) )
 	PORT_SERVICE_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW1:7" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )		/* Listed as always ON among DIPs in the manual */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")		/* Listed as always ON among DIPs in the manual */
 
 	PORT_START("DSW2")
 	PORT_DIPNAME(0x03, 0x02, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:1,2")

@@ -16,59 +16,51 @@ Functions to emulate the video hardware of the machine.
   Memory handlers
 ***************************************************************************/
 
-READ8_HANDLER ( exzisus_videoram_0_r )
+READ8_MEMBER(exzisus_state::exzisus_videoram_0_r)
 {
-	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	return state->m_videoram0[offset];
+	return m_videoram0[offset];
 }
 
 
-READ8_HANDLER ( exzisus_videoram_1_r )
+READ8_MEMBER(exzisus_state::exzisus_videoram_1_r)
 {
-	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	return state->m_videoram1[offset];
+	return m_videoram1[offset];
 }
 
 
-READ8_HANDLER ( exzisus_objectram_0_r )
+READ8_MEMBER(exzisus_state::exzisus_objectram_0_r)
 {
-	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	return state->m_objectram0[offset];
+	return m_objectram0[offset];
 }
 
 
-READ8_HANDLER ( exzisus_objectram_1_r )
+READ8_MEMBER(exzisus_state::exzisus_objectram_1_r)
 {
-	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	return state->m_objectram1[offset];
+	return m_objectram1[offset];
 }
 
 
-WRITE8_HANDLER( exzisus_videoram_0_w )
+WRITE8_MEMBER(exzisus_state::exzisus_videoram_0_w)
 {
-	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	state->m_videoram0[offset] = data;
+	m_videoram0[offset] = data;
 }
 
 
-WRITE8_HANDLER( exzisus_videoram_1_w )
+WRITE8_MEMBER(exzisus_state::exzisus_videoram_1_w)
 {
-	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	state->m_videoram1[offset] = data;
+	m_videoram1[offset] = data;
 }
 
 
-WRITE8_HANDLER( exzisus_objectram_0_w )
+WRITE8_MEMBER(exzisus_state::exzisus_objectram_0_w)
 {
-	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	state->m_objectram0[offset] = data;
+	m_objectram0[offset] = data;
 }
 
 
-WRITE8_HANDLER( exzisus_objectram_1_w )
+WRITE8_MEMBER(exzisus_state::exzisus_objectram_1_w)
 {
-	exzisus_state *state = space->machine().driver_data<exzisus_state>();
-	state->m_objectram1[offset] = data;
+	m_objectram1[offset] = data;
 }
 
 
@@ -88,7 +80,7 @@ SCREEN_UPDATE_IND16( exzisus )
 
 	/* ---------- 1st TC0010VCU ---------- */
 	sx = 0;
-	for (offs = 0 ; offs < state->m_objectram_size0 ; offs += 4)
+	for (offs = 0 ; offs < state->m_objectram0.bytes() ; offs += 4)
     {
 		int height;
 
@@ -139,7 +131,7 @@ SCREEN_UPDATE_IND16( exzisus )
 				x = (sx + (xc << 3)) & 0xff;
 				y = (sy + (yc << 3)) & 0xff;
 
-				if (flip_screen_get(screen.machine()))
+				if (state->flip_screen())
 				{
 					x = 248 - x;
 					y = 248 - y;
@@ -148,7 +140,7 @@ SCREEN_UPDATE_IND16( exzisus )
 				drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[0],
 						code & 0x3fff,
 						color,
-						flip_screen_get(screen.machine()), flip_screen_get(screen.machine()),
+						state->flip_screen(), state->flip_screen(),
 						x, y, 15);
 				goffs += 2;
 			}
@@ -158,7 +150,7 @@ SCREEN_UPDATE_IND16( exzisus )
 
 	/* ---------- 2nd TC0010VCU ---------- */
 	sx = 0;
-	for (offs = 0 ; offs < state->m_objectram_size1 ; offs += 4)
+	for (offs = 0 ; offs < state->m_objectram1.bytes() ; offs += 4)
     {
 		int height;
 
@@ -208,7 +200,7 @@ SCREEN_UPDATE_IND16( exzisus )
 				x = (sx + (xc << 3)) & 0xff;
 				y = (sy + (yc << 3)) & 0xff;
 
-				if (flip_screen_get(screen.machine()))
+				if (state->flip_screen())
 				{
 					x = 248 - x;
 					y = 248 - y;
@@ -217,7 +209,7 @@ SCREEN_UPDATE_IND16( exzisus )
 				drawgfx_transpen(bitmap, cliprect, screen.machine().gfx[1],
 						code & 0x3fff,
 						color,
-						flip_screen_get(screen.machine()), flip_screen_get(screen.machine()),
+						state->flip_screen(), state->flip_screen(),
 						x, y, 15);
 				goffs += 2;
 			}

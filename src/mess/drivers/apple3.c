@@ -18,10 +18,11 @@
 #include "formats/ap2_dsk.h"
 #include "machine/6551acia.h"
 #include "machine/6522via.h"
+#include "machine/a2bus.h"
 #include "machine/ram.h"
 #include "devices/appldriv.h"
 
-static ADDRESS_MAP_START( apple3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( apple3_map, AS_PROGRAM, 8, apple3_state )
 	AM_RANGE(0x0000, 0x00FF) AM_READWRITE(apple3_00xx_r, apple3_00xx_w)
 	AM_RANGE(0x0100, 0x01FF) AM_RAMBANK("bank2")
 	AM_RANGE(0x0200, 0x1FFF) AM_RAMBANK("bank3")
@@ -35,33 +36,11 @@ ADDRESS_MAP_END
  * different memory locations */
 static const m6502_interface apple3_m6502_interface =
 {
-	apple3_indexed_read,	/* read_indexed_func */
-	apple3_indexed_write,	/* write_indexed_func */
-	DEVCB_NULL,				/* port_read_func */
-	DEVCB_NULL				/* port_write_func */
+	NULL,	/* read_indexed_func */
+	NULL,	/* write_indexed_func */
+	DEVCB_DRIVER_MEMBER(apple3_state, apple3_indexed_read),				/* port_read_func */
+	DEVCB_DRIVER_MEMBER(apple3_state, apple3_indexed_write)				/* port_write_func */
 };
-
-#ifdef UNUSED_FUNCTION
-static void apple3_floppy_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
-{
-    switch(state)
-    {
-        case MESS_DEVINFO_INT_COUNT:                            info->i = 4; break;
-
-        case MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVIDEND:  info->i = 1; break;
-        case MESS_DEVINFO_INT_APPLE525_SPINFRACT_DIVISOR:   info->i = 4; break;
-
-        case MESS_DEVINFO_STR_NAME+0:                       strcpy(info->s = device_temp_str(), "slot6disk1"); break;
-        case MESS_DEVINFO_STR_NAME+1:                       strcpy(info->s = device_temp_str(), "slot6disk2"); break;
-        case MESS_DEVINFO_STR_SHORT_NAME+0:                 strcpy(info->s = device_temp_str(), "s6d1"); break;
-        case MESS_DEVINFO_STR_SHORT_NAME+1:                 strcpy(info->s = device_temp_str(), "s6d2"); break;
-        case MESS_DEVINFO_STR_DESCRIPTION+0:                    strcpy(info->s = device_temp_str(), "Slot 6 Disk #1"); break;
-        case MESS_DEVINFO_STR_DESCRIPTION+1:                    strcpy(info->s = device_temp_str(), "Slot 6 Disk #2"); break;
-
-        default:                                        apple525_device_getinfo(devclass, state, info); break;
-    }
-}
-#endif
 
 static const floppy_interface apple3_floppy_interface =
 {
@@ -74,6 +53,15 @@ static const floppy_interface apple3_floppy_interface =
 	LEGACY_FLOPPY_OPTIONS_NAME(apple2),
 	NULL,
 	NULL
+};
+
+static const struct a2bus_interface a2bus_intf =
+{
+	// interrupt lines
+//  DEVCB_HANDLER(a2bus_irq_w),
+//  DEVCB_HANDLER(a2bus_nmi_w)
+    DEVCB_NULL,
+    DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( apple3, apple3_state )
@@ -98,6 +86,9 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_PALETTE_INIT( apple2 )
 
 	MCFG_VIDEO_START( apple3 )
+
+    /* slot bus */
+    MCFG_A2BUS_BUS_ADD("a2bus", "maincpu", a2bus_intf)
 
 	/* fdc */
 	MCFG_APPLEFDC_ADD("fdc", apple3_fdc_interface)

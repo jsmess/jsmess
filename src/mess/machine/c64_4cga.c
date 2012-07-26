@@ -87,15 +87,15 @@ void c64_4cga_device::device_start()
 
 UINT8 c64_4cga_device::c64_pb_r(address_space &space, offs_t offset)
 {
-	UINT8 data = input_port_read(*this, "FIRE");
+	UINT8 data = ioport("FIRE")->read();
 
 	if (m_port)
 	{
-		data &= input_port_read(*this, "JOY3");
+		data &= ioport("JOY3")->read();
 	}
 	else
 	{
-		data &= input_port_read(*this, "JOY4");
+		data &= ioport("JOY4")->read();
 	}
 
 	return data;

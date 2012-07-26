@@ -165,8 +165,8 @@ void cage_init(running_machine &machine, offs_t speedup)
 
 	state->irqhandler = NULL;
 
-	memory_set_bankptr(machine, "bank10", machine.region("cageboot")->base());
-	memory_set_bankptr(machine, "bank11", machine.region("cage")->base());
+	machine.root_device().membank("bank10")->set_base(machine.root_device().memregion("cageboot")->base());
+	machine.root_device().membank("bank11")->set_base(machine.root_device().memregion("cage")->base());
 
 	state->cpu = machine.device<cpu_device>("cage");
 	cage_cpu_clock_period = attotime::from_hz(state->cpu->clock());
@@ -529,7 +529,8 @@ static WRITE32_HANDLER( cage_to_main_w )
 	cage_t *state = &cage;
 	if (LOG_COMM)
 		logerror("%06X:Data from CAGE = %04X\n", cpu_get_pc(&space->device()), data);
-	soundlatch_word_w(space, 0, data, mem_mask);
+	driver_device *drvstate = space->machine().driver_data<driver_device>();
+	drvstate->soundlatch_word_w(*space, 0, data, mem_mask);
 	state->cage_to_cpu_ready = 1;
 	update_control_lines(space->machine());
 }
@@ -550,11 +551,12 @@ static READ32_HANDLER( cage_io_status_r )
 UINT16 cage_main_r(address_space *space)
 {
 	cage_t *state = &cage;
+	driver_device *drvstate = space->machine().driver_data<driver_device>();
 	if (LOG_COMM)
-		logerror("%s:main read data = %04X\n", space->machine().describe_context(), soundlatch_word_r(space, 0, 0));
+		logerror("%s:main read data = %04X\n", space->machine().describe_context(), drvstate->soundlatch_word_r(*space, 0, 0));
 	state->cage_to_cpu_ready = 0;
 	update_control_lines(space->machine());
-	return soundlatch_word_r(space, 0, 0xffff);
+	return drvstate->soundlatch_word_r(*space, 0, 0xffff);
 }
 
 
@@ -653,26 +655,26 @@ static const tms3203x_config cage_config =
 };
 
 
-static ADDRESS_MAP_START( cage_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( cage_map, AS_PROGRAM, 32, driver_device )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200000) AM_WRITENOP
 	AM_RANGE(0x400000, 0x47ffff) AM_ROMBANK("bank10")
-	AM_RANGE(0x808000, 0x8080ff) AM_READWRITE(tms32031_io_r, tms32031_io_w)
+	AM_RANGE(0x808000, 0x8080ff) AM_READWRITE_LEGACY(tms32031_io_r, tms32031_io_w)
 	AM_RANGE(0x809800, 0x809fff) AM_RAM
-	AM_RANGE(0xa00000, 0xa00000) AM_READWRITE(cage_from_main_r, cage_to_main_w)
+	AM_RANGE(0xa00000, 0xa00000) AM_READWRITE_LEGACY(cage_from_main_r, cage_to_main_w)
 	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cage_map_seattle, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( cage_map_seattle, AS_PROGRAM, 32, driver_device )
 	AM_RANGE(0x000000, 0x00ffff) AM_RAM
 	AM_RANGE(0x200000, 0x200000) AM_WRITENOP
 	AM_RANGE(0x400000, 0x47ffff) AM_ROMBANK("bank10")
-	AM_RANGE(0x808000, 0x8080ff) AM_READWRITE(tms32031_io_r, tms32031_io_w)
+	AM_RANGE(0x808000, 0x8080ff) AM_READWRITE_LEGACY(tms32031_io_r, tms32031_io_w)
 	AM_RANGE(0x809800, 0x809fff) AM_RAM
-	AM_RANGE(0xa00000, 0xa00000) AM_READWRITE(cage_from_main_r, cage_from_main_ack_w)
-	AM_RANGE(0xa00001, 0xa00001) AM_WRITE(cage_to_main_w)
-	AM_RANGE(0xa00003, 0xa00003) AM_READ(cage_io_status_r)
+	AM_RANGE(0xa00000, 0xa00000) AM_READWRITE_LEGACY(cage_from_main_r, cage_from_main_ack_w)
+	AM_RANGE(0xa00001, 0xa00001) AM_WRITE_LEGACY(cage_to_main_w)
+	AM_RANGE(0xa00003, 0xa00003) AM_READ_LEGACY(cage_io_status_r)
 	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 

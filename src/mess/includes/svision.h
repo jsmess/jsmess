@@ -32,15 +32,21 @@ class svision_state : public driver_device
 {
 public:
 	svision_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_reg(*this, "reg"),
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_reg;
+	required_shared_ptr<UINT8> m_reg;
+	required_shared_ptr<UINT8> m_videoram;
 	device_t *m_sound;
 	int *m_dma_finished;
 	svision_t m_svision;
 	svision_pet_t m_pet;
 	tvlink_t m_tvlink;
+	DECLARE_READ8_MEMBER(svision_r);
+	DECLARE_WRITE8_MEMBER(svision_w);
+	DECLARE_READ8_MEMBER(tvlink_r);
+	DECLARE_WRITE8_MEMBER(tvlink_w);
 };
 
 

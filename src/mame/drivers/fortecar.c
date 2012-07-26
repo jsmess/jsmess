@@ -330,13 +330,11 @@ class fortecar_state : public driver_device
 public:
 	fortecar_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
-
-	UINT8 *m_vram;
-	size_t m_vram_size;
+		m_maincpu(*this,"maincpu"),
+		m_vram(*this, "vram"){ }
 
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_vram;
 };
 
 
@@ -374,6 +372,7 @@ static SCREEN_UPDATE_IND16(fortecar)
 
 static PALETTE_INIT( fortecar )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 /* Video resistors...
 
 O1 (LS374) R1K  RED
@@ -510,7 +509,7 @@ Seems to work properly, but must be checked closely...
 */
 	if (((data >> 7) & 0x01) == 0)		/* check for bit7 */
 	{
-		watchdog_reset(device->machine());
+		device->machine().watchdog_reset();
 	}
 
 //  logerror("AY port B write %02x\n",data);
@@ -558,22 +557,22 @@ static const eeprom_interface forte_eeprom_intf =
 };
 
 
-static ADDRESS_MAP_START( fortecar_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( fortecar_map, AS_PROGRAM, 8, fortecar_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xd800, 0xffff) AM_RAM AM_BASE_SIZE_MEMBER(fortecar_state, m_vram,m_vram_size)
+	AM_RANGE(0xd800, 0xffff) AM_RAM AM_SHARE("vram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fortecar_ports, AS_IO, 8 )
+static ADDRESS_MAP_START( fortecar_ports, AS_IO, 8, fortecar_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)	// pc=444
-	AM_RANGE(0x21, 0x21) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE("fcppi0", ppi8255_r, ppi8255_w)//M5L8255AP
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("crtc", mc6845_device, address_w)	// pc=444
+	AM_RANGE(0x21, 0x21) AM_DEVWRITE("crtc", mc6845_device, register_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE_LEGACY("fcppi0", ppi8255_r, ppi8255_w)//M5L8255AP
 //  AM_RANGE(0x80, 0x81) //8251A UART
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE_MODERN("rtc", v3021_device, read, write)
+	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("rtc", v3021_device, read, write)
 	AM_RANGE(0xa1, 0xa1) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 /*
@@ -674,7 +673,7 @@ static MACHINE_RESET(fortecar)
 	int i;
 
 	/* apparently there's a random fill in there (checked thru trojan TODO: extract proper algorythm) */
-	for(i=0;i<state->m_vram_size;i++)
+	for(i=0;i<state->m_vram.bytes();i++)
 		state->m_vram[i] = machine.rand();
 }
 

@@ -2,15 +2,21 @@ class liberate_state : public driver_device
 {
 public:
 	liberate_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_paletteram(*this, "paletteram"),
+		m_bg_vram(*this, "bg_vram"),
+		m_colorram(*this, "colorram"),
+		m_videoram(*this, "videoram"),
+		m_spriteram(*this, "spriteram"),
+		m_scratchram(*this, "scratchram"){ }
 
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
-	UINT8 *m_paletteram;
-	UINT8 *m_spriteram;
-	UINT8 *m_scratchram;
+	optional_shared_ptr<UINT8> m_paletteram;
+	optional_shared_ptr<UINT8> m_bg_vram; /* prosport */
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_scratchram;
 	UINT8 *m_charram;	/* prosoccr */
-	UINT8 *m_bg_vram; /* prosport */
 
 	UINT8 m_io_ram[16];
 
@@ -25,6 +31,23 @@ public:
 
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
+	DECLARE_READ8_MEMBER(deco16_bank_r);
+	DECLARE_READ8_MEMBER(deco16_io_r);
+	DECLARE_WRITE8_MEMBER(deco16_bank_w);
+	DECLARE_READ8_MEMBER(prosoccr_bank_r);
+	DECLARE_READ8_MEMBER(prosoccr_charram_r);
+	DECLARE_WRITE8_MEMBER(prosoccr_charram_w);
+	DECLARE_WRITE8_MEMBER(prosoccr_char_bank_w);
+	DECLARE_WRITE8_MEMBER(prosoccr_io_bank_w);
+	DECLARE_READ8_MEMBER(prosport_charram_r);
+	DECLARE_WRITE8_MEMBER(prosport_charram_w);
+	DECLARE_WRITE8_MEMBER(deco16_io_w);
+	DECLARE_WRITE8_MEMBER(prosoccr_io_w);
+	DECLARE_WRITE8_MEMBER(prosport_io_w);
+	DECLARE_WRITE8_MEMBER(liberate_videoram_w);
+	DECLARE_WRITE8_MEMBER(liberate_colorram_w);
+	DECLARE_WRITE8_MEMBER(prosport_bg_vram_w);
+	DECLARE_WRITE8_MEMBER(prosport_paletteram_w);
 };
 
 
@@ -40,11 +63,4 @@ VIDEO_START( prosport );
 VIDEO_START( boomrang );
 VIDEO_START( liberate );
 
-WRITE8_HANDLER( deco16_io_w );
-WRITE8_HANDLER( prosoccr_io_w );
-WRITE8_HANDLER( prosport_io_w );
-WRITE8_HANDLER( prosport_paletteram_w );
-WRITE8_HANDLER( prosport_bg_vram_w );
-WRITE8_HANDLER( liberate_videoram_w );
-WRITE8_HANDLER( liberate_colorram_w );
 

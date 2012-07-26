@@ -68,11 +68,11 @@ static READ8_DEVICE_HANDLER( input_mux0_r )
 
 	/* low value in the given bit selects */
 	if (!(state->m_input_mux & 0x01))
-		return input_port_read(device->machine(), "MUX0");
+		return state->ioport("MUX0")->read();
 	else if (!(state->m_input_mux & 0x02))
-		return input_port_read(device->machine(), "MUX1");
+		return state->ioport("MUX1")->read();
 	else if (!(state->m_input_mux & 0x04))
-		return input_port_read(device->machine(), "MUX2");
+		return state->ioport("MUX2")->read();
 	return 0xff;
 }
 
@@ -136,7 +136,7 @@ static WRITE8_DEVICE_HANDLER( shr_w )
 
 	/* bit 3 = watchdog */
 	if (data & 0x08)
-		watchdog_reset(device->machine());
+		device->machine().watchdog_reset();
 
 	/* bit 2-0 = SH0-2 */
 	state->m_sh = data & 0x07;
@@ -150,30 +150,28 @@ static WRITE8_DEVICE_HANDLER( shr_w )
  *
  *************************************/
 
-static READ8_HANDLER( ioread )
+READ8_MEMBER(dribling_state::ioread)
 {
-	dribling_state *state = space->machine().driver_data<dribling_state>();
 
 	if (offset & 0x08)
-		return ppi8255_r(state->m_ppi_0, offset & 3);
+		return ppi8255_r(m_ppi_0, offset & 3);
 	else if (offset & 0x10)
-		return ppi8255_r(state->m_ppi_1, offset & 3);
+		return ppi8255_r(m_ppi_1, offset & 3);
 	return 0xff;
 }
 
 
-static WRITE8_HANDLER( iowrite )
+WRITE8_MEMBER(dribling_state::iowrite)
 {
-	dribling_state *state = space->machine().driver_data<dribling_state>();
 
 	if (offset & 0x08)
-		ppi8255_w(state->m_ppi_0, offset & 3, data);
+		ppi8255_w(m_ppi_0, offset & 3, data);
 	else if (offset & 0x10)
-		ppi8255_w(state->m_ppi_1, offset & 3, data);
+		ppi8255_w(m_ppi_1, offset & 3, data);
 	else if (offset & 0x40)
 	{
-		state->m_dr = state->m_ds;
-		state->m_ds = data;
+		m_dr = m_ds;
+		m_ds = data;
 	}
 }
 
@@ -213,15 +211,15 @@ static const ppi8255_interface ppi8255_intf[2] =
  *
  *************************************/
 
-static ADDRESS_MAP_START( dribling_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( dribling_map, AS_PROGRAM, 8, dribling_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(dribling_state, m_videoram)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(dribling_colorram_w) AM_BASE_MEMBER(dribling_state, m_colorram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(dribling_colorram_w) AM_SHARE("colorram")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, dribling_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_READWRITE(ioread, iowrite)
 ADDRESS_MAP_END

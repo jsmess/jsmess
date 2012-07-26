@@ -242,10 +242,10 @@ DIP locations verified for:
  *
  *************************************/
 
-static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_MEMBER(balsente_state, m_spriteram)
-	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(balsente_videoram_w) AM_BASE_MEMBER(balsente_state, m_videoram)
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(balsente_paletteram_w) AM_BASE_GENERIC(paletteram)
+static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, balsente_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x0800, 0x7fff) AM_RAM_WRITE(balsente_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(balsente_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x9000, 0x9007) AM_WRITE(balsente_adc_select_w)
 	AM_RANGE(0x9400, 0x9401) AM_READ(balsente_adc_data_r)
 	AM_RANGE(0x9800, 0x987f) AM_WRITE(balsente_misc_output_w)
@@ -272,7 +272,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8, balsente_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x5fff) AM_RAM
 	AM_RANGE(0x6000, 0x7fff) AM_WRITE(balsente_m6850_sound_w)
@@ -280,7 +280,7 @@ static ADDRESS_MAP_START( cpu2_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cpu2_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( cpu2_io_map, AS_IO, 8, balsente_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_READWRITE(balsente_counter_8253_r, balsente_counter_8253_w)
 	AM_RANGE(0x08, 0x0f) AM_READ(balsente_counter_state_r)
@@ -299,10 +299,10 @@ ADDRESS_MAP_END
  *************************************/
 
 /* CPU 1 read addresses */
-static ADDRESS_MAP_START( shrike68k_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( shrike68k_map, AS_PROGRAM, 16, balsente_state )
 	AM_RANGE(0x000000, 0x003fff) AM_ROM
-	AM_RANGE(0x010000, 0x01001f) AM_RAM AM_BASE_MEMBER(balsente_state, m_shrike_io)
-	AM_RANGE(0x018000, 0x018fff) AM_RAM AM_BASE_MEMBER(balsente_state, m_shrike_shared)
+	AM_RANGE(0x010000, 0x01001f) AM_RAM AM_SHARE("shrike_io")
+	AM_RANGE(0x018000, 0x018fff) AM_RAM AM_SHARE("shrike_shared")
 ADDRESS_MAP_END
 
 
@@ -385,7 +385,7 @@ static INPUT_PORTS_START( sentetst )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x38, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	/* Analog ports */
 	PORT_START("AN0")
@@ -877,7 +877,7 @@ static INPUT_PORTS_START( nstocker )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "G1:7" )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(nstocker_bits_r, NULL)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, balsente_state,nstocker_bits_r, NULL)
 
 	/* cheese alert -- we have to map this to player 2 so that it doesn't interfere with
        the crosshair controls */
@@ -2079,8 +2079,8 @@ static void expand_roms(running_machine &machine, UINT8 cd_rom_mask)
 
 	UINT8 *temp = auto_alloc_array(machine, UINT8, 0x20000);
 	{
-		UINT8 *rom = machine.region("maincpu")->base();
-		UINT32 len = machine.region("maincpu")->bytes();
+		UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+		UINT32 len = machine.root_device().memregion("maincpu")->bytes();
 		UINT32 base;
 
 		for (base = 0x10000; base < len; base += 0x30000)
@@ -2154,7 +2154,7 @@ static DRIVER_INIT( stocker )  { expand_roms(machine, EXPAND_ALL);  config_shoot
 static DRIVER_INIT( triviag1 ) { expand_roms(machine, EXPAND_ALL);  config_shooter_adc(machine, FALSE, 0 /* noanalog */); }
 static DRIVER_INIT( triviag2 )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	memcpy(&rom[0x20000], &rom[0x28000], 0x4000);
 	memcpy(&rom[0x24000], &rom[0x28000], 0x4000);
 	expand_roms(machine, EXPAND_NONE); config_shooter_adc(machine, FALSE, 0 /* noanalog */);
@@ -2166,48 +2166,55 @@ static DRIVER_INIT( minigolf2 ) { expand_roms(machine, 0x0c);        config_shoo
 static DRIVER_INIT( toggle )   { expand_roms(machine, EXPAND_ALL);  config_shooter_adc(machine, FALSE, 0 /* noanalog */); }
 static DRIVER_INIT( nametune )
 {
+	balsente_state *state = machine.driver_data<balsente_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->install_legacy_write_handler(0x9f00, 0x9f00, FUNC(balsente_rombank2_select_w));
+	space->install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),state));
 	expand_roms(machine, EXPAND_NONE | SWAP_HALVES); config_shooter_adc(machine, FALSE, 0 /* noanalog */);
 }
 static DRIVER_INIT( nstocker )
 {
+	balsente_state *state = machine.driver_data<balsente_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->install_legacy_write_handler(0x9f00, 0x9f00, FUNC(balsente_rombank2_select_w));
+	space->install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),state));
 	expand_roms(machine, EXPAND_NONE | SWAP_HALVES); config_shooter_adc(machine, TRUE, 1);
 }
 static DRIVER_INIT( sfootbal )
 {
+	balsente_state *state = machine.driver_data<balsente_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->install_legacy_write_handler(0x9f00, 0x9f00, FUNC(balsente_rombank2_select_w));
+	space->install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),state));
 	expand_roms(machine, EXPAND_ALL  | SWAP_HALVES); config_shooter_adc(machine, FALSE, 0);
 }
 static DRIVER_INIT( spiker )
 {
+	balsente_state *state = machine.driver_data<balsente_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->install_legacy_readwrite_handler(0x9f80, 0x9f8f, FUNC(spiker_expand_r), FUNC(spiker_expand_w));
-	space->install_legacy_write_handler(0x9f00, 0x9f00, FUNC(balsente_rombank2_select_w));
+	space->install_readwrite_handler(0x9f80, 0x9f8f, read8_delegate(FUNC(balsente_state::spiker_expand_r),state), write8_delegate(FUNC(balsente_state::spiker_expand_w),state));
+	space->install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),state));
 	expand_roms(machine, EXPAND_ALL  | SWAP_HALVES); config_shooter_adc(machine, FALSE, 1);
 }
 static DRIVER_INIT( stompin )
 {
+	balsente_state *state = machine.driver_data<balsente_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->install_legacy_write_handler(0x9f00, 0x9f00, FUNC(balsente_rombank2_select_w));
+	space->install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),state));
 	expand_roms(machine, 0x0c | SWAP_HALVES); config_shooter_adc(machine, FALSE, 32);
 }
 static DRIVER_INIT( rescraid ) { expand_roms(machine, EXPAND_NONE); config_shooter_adc(machine, FALSE, 0 /* noanalog */); }
 static DRIVER_INIT( grudge )
 {
+	balsente_state *state = machine.driver_data<balsente_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->install_legacy_read_handler(0x9400, 0x9400, FUNC(grudge_steering_r));
+	space->install_read_handler(0x9400, 0x9400, read8_delegate(FUNC(balsente_state::grudge_steering_r),state));
 	expand_roms(machine, EXPAND_NONE); config_shooter_adc(machine, FALSE, 0);
 }
 static DRIVER_INIT( shrike )
 {
+	balsente_state *state = machine.driver_data<balsente_state>();
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->install_legacy_readwrite_handler(0x9e00, 0x9fff, FUNC(shrike_shared_6809_r), FUNC(shrike_shared_6809_w));
-	space->install_legacy_write_handler(0x9e01, 0x9e01, FUNC(shrike_sprite_select_w) );
-	machine.device("68k")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x10000, 0x1001f, FUNC(shrike_io_68k_r), FUNC(shrike_io_68k_w));
+	space->install_readwrite_handler(0x9e00, 0x9fff, read8_delegate(FUNC(balsente_state::shrike_shared_6809_r),state), write8_delegate(FUNC(balsente_state::shrike_shared_6809_w),state));
+	space->install_write_handler(0x9e01, 0x9e01, write8_delegate(FUNC(balsente_state::shrike_sprite_select_w),state));
+	machine.device("68k")->memory().space(AS_PROGRAM)->install_readwrite_handler(0x10000, 0x1001f, read16_delegate(FUNC(balsente_state::shrike_io_68k_r),state), write16_delegate(FUNC(balsente_state::shrike_io_68k_w),state));
 
 	expand_roms(machine, EXPAND_ALL);  config_shooter_adc(machine, FALSE, 32);
 }

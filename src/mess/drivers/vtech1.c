@@ -161,7 +161,8 @@ public:
 		  m_speaker(*this, SPEAKER_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_printer(*this, "printer")
-	{ }
+	,
+		m_videoram(*this, "videoram"){ }
 
 	/* devices */
 	required_device<mc6847_base_device> m_mc6847;
@@ -171,8 +172,7 @@ public:
 
 	UINT8 *m_ram;
 	UINT32 m_ram_size;
-	UINT8 *m_videoram;
-	size_t m_videoram_size;
+	required_shared_ptr<UINT8> m_videoram;
 
 	/* floppy */
 	int m_drive;
@@ -187,6 +187,16 @@ public:
 	int m_fdc_write;
 	int m_fdc_offs;
 	int m_fdc_latch;
+	DECLARE_READ8_MEMBER(vtech1_fdc_r);
+	DECLARE_WRITE8_MEMBER(vtech1_fdc_w);
+	DECLARE_READ8_MEMBER(vtech1_serial_r);
+	DECLARE_WRITE8_MEMBER(vtech1_serial_w);
+	DECLARE_READ8_MEMBER(vtech1_lightpen_r);
+	DECLARE_READ8_MEMBER(vtech1_joystick_r);
+	DECLARE_READ8_MEMBER(vtech1_keyboard_r);
+	DECLARE_WRITE8_MEMBER(vtech1_latch_w);
+	DECLARE_WRITE8_MEMBER(vtech1_memory_bank_w);
+	DECLARE_WRITE8_MEMBER(vtech1_video_bank_w);
 };
 
 
@@ -309,47 +319,46 @@ static void vtech1_put_track(running_machine &machine)
 	}
 }
 
-static READ8_HANDLER( vtech1_fdc_r )
+READ8_MEMBER(vtech1_state::vtech1_fdc_r)
 {
-	vtech1_state *vtech1 = space->machine().driver_data<vtech1_state>();
 	int data = 0xff;
 
 	switch (offset)
 	{
 	case 1: /* data (read-only) */
-		if (vtech1->m_fdc_bits > 0)
+		if (m_fdc_bits > 0)
 		{
-			if( vtech1->m_fdc_status & 0x80 )
-				vtech1->m_fdc_bits--;
-			data = (vtech1->m_data >> vtech1->m_fdc_bits) & 0xff;
+			if( m_fdc_status & 0x80 )
+				m_fdc_bits--;
+			data = (m_data >> m_fdc_bits) & 0xff;
 			if (LOG_VTECH1_FDC) {
 				logerror("vtech1_fdc_r bits %d%d%d%d%d%d%d%d\n",
 					(data>>7)&1,(data>>6)&1,(data>>5)&1,(data>>4)&1,
 					(data>>3)&1,(data>>2)&1,(data>>1)&1,(data>>0)&1 );
 			}
 		}
-		if (vtech1->m_fdc_bits == 0)
+		if (m_fdc_bits == 0)
 		{
-			vtech1->m_data = vtech1->m_fdc_data[vtech1->m_fdc_offs];
+			m_data = m_fdc_data[m_fdc_offs];
 			if (LOG_VTECH1_FDC)
-				logerror("vtech1_fdc_r %d : data ($%04X) $%02X\n", offset, vtech1->m_fdc_offs, vtech1->m_data);
-			if(vtech1->m_fdc_status & 0x80)
+				logerror("vtech1_fdc_r %d : data ($%04X) $%02X\n", offset, m_fdc_offs, m_data);
+			if(m_fdc_status & 0x80)
 			{
-				vtech1->m_fdc_bits = 8;
-				vtech1->m_fdc_offs = (vtech1->m_fdc_offs + 1) % TRKSIZE_FM;
+				m_fdc_bits = 8;
+				m_fdc_offs = (m_fdc_offs + 1) % TRKSIZE_FM;
 			}
-			vtech1->m_fdc_status &= ~0x80;
+			m_fdc_status &= ~0x80;
 		}
 		break;
 	case 2: /* polling (read-only) */
 		/* fake */
-		if (vtech1->m_drive >= 0)
-			vtech1->m_fdc_status |= 0x80;
-		data = vtech1->m_fdc_status;
+		if (m_drive >= 0)
+			m_fdc_status |= 0x80;
+		data = m_fdc_status;
 		break;
 	case 3: /* write protect status (read-only) */
-		if (vtech1->m_drive >= 0)
-			data = vtech1->m_fdc_wrprot[vtech1->m_drive];
+		if (m_drive >= 0)
+			data = m_fdc_wrprot[m_drive];
 		if (LOG_VTECH1_FDC)
 			logerror("vtech1_fdc_r %d : write_protect $%02X\n", offset, data);
 		break;
@@ -357,98 +366,97 @@ static READ8_HANDLER( vtech1_fdc_r )
 	return data;
 }
 
-static WRITE8_HANDLER( vtech1_fdc_w )
+WRITE8_MEMBER(vtech1_state::vtech1_fdc_w)
 {
-	vtech1_state *vtech1 = space->machine().driver_data<vtech1_state>();
 	int drive;
 
 	switch (offset)
 	{
 	case 0: /* latch (write-only) */
 		drive = (data & 0x10) ? 0 : (data & 0x80) ? 1 : -1;
-		if (drive != vtech1->m_drive)
+		if (drive != m_drive)
 		{
-			vtech1->m_drive = drive;
-			if (vtech1->m_drive >= 0)
-				vtech1_get_track(space->machine());
+			m_drive = drive;
+			if (m_drive >= 0)
+				vtech1_get_track(machine());
 		}
-		if (vtech1->m_drive >= 0)
+		if (m_drive >= 0)
 		{
-			if ((PHI0(data) && !(PHI1(data) || PHI2(data) || PHI3(data)) && PHI1(vtech1->m_fdc_latch)) ||
-				(PHI1(data) && !(PHI0(data) || PHI2(data) || PHI3(data)) && PHI2(vtech1->m_fdc_latch)) ||
-				(PHI2(data) && !(PHI0(data) || PHI1(data) || PHI3(data)) && PHI3(vtech1->m_fdc_latch)) ||
-				(PHI3(data) && !(PHI0(data) || PHI1(data) || PHI2(data)) && PHI0(vtech1->m_fdc_latch)))
+			if ((PHI0(data) && !(PHI1(data) || PHI2(data) || PHI3(data)) && PHI1(m_fdc_latch)) ||
+				(PHI1(data) && !(PHI0(data) || PHI2(data) || PHI3(data)) && PHI2(m_fdc_latch)) ||
+				(PHI2(data) && !(PHI0(data) || PHI1(data) || PHI3(data)) && PHI3(m_fdc_latch)) ||
+				(PHI3(data) && !(PHI0(data) || PHI1(data) || PHI2(data)) && PHI0(m_fdc_latch)))
 			{
-				if (vtech1->m_fdc_track_x2[vtech1->m_drive] > 0)
-					vtech1->m_fdc_track_x2[vtech1->m_drive]--;
+				if (m_fdc_track_x2[m_drive] > 0)
+					m_fdc_track_x2[m_drive]--;
 				if (LOG_VTECH1_FDC)
-					logerror("vtech1_fdc_w(%d) $%02X drive %d: stepout track #%2d.%d\n", offset, data, vtech1->m_drive, vtech1->m_fdc_track_x2[vtech1->m_drive]/2,5*(vtech1->m_fdc_track_x2[vtech1->m_drive]&1));
-				if ((vtech1->m_fdc_track_x2[vtech1->m_drive] & 1) == 0)
-					vtech1_get_track(space->machine());
+					logerror("vtech1_fdc_w(%d) $%02X drive %d: stepout track #%2d.%d\n", offset, data, m_drive, m_fdc_track_x2[m_drive]/2,5*(m_fdc_track_x2[m_drive]&1));
+				if ((m_fdc_track_x2[m_drive] & 1) == 0)
+					vtech1_get_track(machine());
 			}
 			else
-			if ((PHI0(data) && !(PHI1(data) || PHI2(data) || PHI3(data)) && PHI3(vtech1->m_fdc_latch)) ||
-				(PHI1(data) && !(PHI0(data) || PHI2(data) || PHI3(data)) && PHI0(vtech1->m_fdc_latch)) ||
-				(PHI2(data) && !(PHI0(data) || PHI1(data) || PHI3(data)) && PHI1(vtech1->m_fdc_latch)) ||
-				(PHI3(data) && !(PHI0(data) || PHI1(data) || PHI2(data)) && PHI2(vtech1->m_fdc_latch)))
+			if ((PHI0(data) && !(PHI1(data) || PHI2(data) || PHI3(data)) && PHI3(m_fdc_latch)) ||
+				(PHI1(data) && !(PHI0(data) || PHI2(data) || PHI3(data)) && PHI0(m_fdc_latch)) ||
+				(PHI2(data) && !(PHI0(data) || PHI1(data) || PHI3(data)) && PHI1(m_fdc_latch)) ||
+				(PHI3(data) && !(PHI0(data) || PHI1(data) || PHI2(data)) && PHI2(m_fdc_latch)))
 			{
-				if (vtech1->m_fdc_track_x2[vtech1->m_drive] < 2*40)
-					vtech1->m_fdc_track_x2[vtech1->m_drive]++;
+				if (m_fdc_track_x2[m_drive] < 2*40)
+					m_fdc_track_x2[m_drive]++;
 				if (LOG_VTECH1_FDC)
-					logerror("vtech1_fdc_w(%d) $%02X drive %d: stepin track #%2d.%d\n", offset, data, vtech1->m_drive, vtech1->m_fdc_track_x2[vtech1->m_drive]/2,5*(vtech1->m_fdc_track_x2[vtech1->m_drive]&1));
-				if ((vtech1->m_fdc_track_x2[vtech1->m_drive] & 1) == 0)
-					vtech1_get_track(space->machine());
+					logerror("vtech1_fdc_w(%d) $%02X drive %d: stepin track #%2d.%d\n", offset, data, m_drive, m_fdc_track_x2[m_drive]/2,5*(m_fdc_track_x2[m_drive]&1));
+				if ((m_fdc_track_x2[m_drive] & 1) == 0)
+					vtech1_get_track(machine());
 			}
 			if ((data & 0x40) == 0)
 			{
-				vtech1->m_data <<= 1;
-				if ((vtech1->m_fdc_latch ^ data) & 0x20)
-					vtech1->m_data |= 1;
-				if ((vtech1->m_fdc_edge ^= 1) == 0)
+				m_data <<= 1;
+				if ((m_fdc_latch ^ data) & 0x20)
+					m_data |= 1;
+				if ((m_fdc_edge ^= 1) == 0)
 				{
-					vtech1->m_fdc_bits--;
+					m_fdc_bits--;
 
-					if (vtech1->m_fdc_bits == 0)
+					if (m_fdc_bits == 0)
 					{
 						UINT8 value = 0;
-						vtech1->m_data &= 0xffff;
-						if (vtech1->m_data & 0x4000 ) value |= 0x80;
-						if (vtech1->m_data & 0x1000 ) value |= 0x40;
-						if (vtech1->m_data & 0x0400 ) value |= 0x20;
-						if (vtech1->m_data & 0x0100 ) value |= 0x10;
-						if (vtech1->m_data & 0x0040 ) value |= 0x08;
-						if (vtech1->m_data & 0x0010 ) value |= 0x04;
-						if (vtech1->m_data & 0x0004 ) value |= 0x02;
-						if (vtech1->m_data & 0x0001 ) value |= 0x01;
+						m_data &= 0xffff;
+						if (m_data & 0x4000 ) value |= 0x80;
+						if (m_data & 0x1000 ) value |= 0x40;
+						if (m_data & 0x0400 ) value |= 0x20;
+						if (m_data & 0x0100 ) value |= 0x10;
+						if (m_data & 0x0040 ) value |= 0x08;
+						if (m_data & 0x0010 ) value |= 0x04;
+						if (m_data & 0x0004 ) value |= 0x02;
+						if (m_data & 0x0001 ) value |= 0x01;
 						if (LOG_VTECH1_FDC)
-							logerror("vtech1_fdc_w(%d) data($%04X) $%02X <- $%02X ($%04X)\n", offset, vtech1->m_fdc_offs, vtech1->m_fdc_data[vtech1->m_fdc_offs], value, vtech1->m_data);
-						vtech1->m_fdc_data[vtech1->m_fdc_offs] = value;
-						vtech1->m_fdc_offs = (vtech1->m_fdc_offs + 1) % TRKSIZE_FM;
-						vtech1->m_fdc_write++;
-						vtech1->m_fdc_bits = 8;
+							logerror("vtech1_fdc_w(%d) data($%04X) $%02X <- $%02X ($%04X)\n", offset, m_fdc_offs, m_fdc_data[m_fdc_offs], value, m_data);
+						m_fdc_data[m_fdc_offs] = value;
+						m_fdc_offs = (m_fdc_offs + 1) % TRKSIZE_FM;
+						m_fdc_write++;
+						m_fdc_bits = 8;
 					}
 				}
 			}
 			/* change of write signal? */
-			if ((vtech1->m_fdc_latch ^ data) & 0x40)
+			if ((m_fdc_latch ^ data) & 0x40)
 			{
 				/* falling edge? */
-				if (vtech1->m_fdc_latch & 0x40)
+				if (m_fdc_latch & 0x40)
 				{
-					vtech1->m_fdc_start = vtech1->m_fdc_offs;
-					vtech1->m_fdc_edge = 0;
+					m_fdc_start = m_fdc_offs;
+					m_fdc_edge = 0;
 				}
 				else
 				{
 					/* data written to track before? */
-					if (vtech1->m_fdc_write)
-						vtech1_put_track(space->machine());
+					if (m_fdc_write)
+						vtech1_put_track(machine());
 				}
-				vtech1->m_fdc_bits = 8;
-				vtech1->m_fdc_write = 0;
+				m_fdc_bits = 8;
+				m_fdc_write = 0;
 			}
 		}
-		vtech1->m_fdc_latch = data;
+		m_fdc_latch = data;
 		break;
 	}
 }
@@ -489,13 +497,13 @@ static WRITE8_DEVICE_HANDLER( vtech1_strobe_w )
     RS232 SERIAL
 ***************************************************************************/
 
-static READ8_HANDLER( vtech1_serial_r )
+READ8_MEMBER(vtech1_state::vtech1_serial_r)
 {
 	logerror("vtech1_serial_r offset $%02x\n", offset);
 	return 0xff;
 }
 
-static WRITE8_HANDLER( vtech1_serial_w )
+WRITE8_MEMBER(vtech1_state::vtech1_serial_w)
 {
 	logerror("vtech1_serial_w $%02x, offset %02x\n", data, offset);
 }
@@ -505,44 +513,43 @@ static WRITE8_HANDLER( vtech1_serial_w )
     INPUTS
 ***************************************************************************/
 
-static READ8_HANDLER( vtech1_lightpen_r )
+READ8_MEMBER(vtech1_state::vtech1_lightpen_r)
 {
 	logerror("vtech1_lightpen_r(%d)\n", offset);
 	return 0xff;
 }
 
-static READ8_HANDLER( vtech1_joystick_r )
+READ8_MEMBER(vtech1_state::vtech1_joystick_r)
 {
 	int result = 0xff;
 
-	if (!BIT(offset, 0)) result &= input_port_read(space->machine(), "joystick_0");
-	if (!BIT(offset, 1)) result &= input_port_read(space->machine(), "joystick_0_arm");
-	if (!BIT(offset, 2)) result &= input_port_read(space->machine(), "joystick_1");
-	if (!BIT(offset, 3)) result &= input_port_read(space->machine(), "joystick_1_arm");
+	if (!BIT(offset, 0)) result &= ioport("joystick_0")->read();
+	if (!BIT(offset, 1)) result &= ioport("joystick_0_arm")->read();
+	if (!BIT(offset, 2)) result &= ioport("joystick_1")->read();
+	if (!BIT(offset, 3)) result &= ioport("joystick_1_arm")->read();
 
 	return result;
 }
 
-static READ8_HANDLER( vtech1_keyboard_r )
+READ8_MEMBER(vtech1_state::vtech1_keyboard_r)
 {
-	vtech1_state *vtech1 = space->machine().driver_data<vtech1_state>();
 	UINT8 result = 0x3f;
 
 	/* bit 0 to 5, keyboard input */
-	if (!BIT(offset, 0)) result &= input_port_read(space->machine(), "keyboard_0");
-	if (!BIT(offset, 1)) result &= input_port_read(space->machine(), "keyboard_1");
-	if (!BIT(offset, 2)) result &= input_port_read(space->machine(), "keyboard_2");
-	if (!BIT(offset, 3)) result &= input_port_read(space->machine(), "keyboard_3");
-	if (!BIT(offset, 4)) result &= input_port_read(space->machine(), "keyboard_4");
-	if (!BIT(offset, 5)) result &= input_port_read(space->machine(), "keyboard_5");
-	if (!BIT(offset, 6)) result &= input_port_read(space->machine(), "keyboard_6");
-	if (!BIT(offset, 7)) result &= input_port_read(space->machine(), "keyboard_7");
+	if (!BIT(offset, 0)) result &= ioport("keyboard_0")->read();
+	if (!BIT(offset, 1)) result &= ioport("keyboard_1")->read();
+	if (!BIT(offset, 2)) result &= ioport("keyboard_2")->read();
+	if (!BIT(offset, 3)) result &= ioport("keyboard_3")->read();
+	if (!BIT(offset, 4)) result &= ioport("keyboard_4")->read();
+	if (!BIT(offset, 5)) result &= ioport("keyboard_5")->read();
+	if (!BIT(offset, 6)) result &= ioport("keyboard_6")->read();
+	if (!BIT(offset, 7)) result &= ioport("keyboard_7")->read();
 
 	/* bit 6, cassette input */
-	result |= ((vtech1->m_cassette->input()) > 0 ? 1 : 0) << 6;
+	result |= ((m_cassette->input()) > 0 ? 1 : 0) << 6;
 
 	/* bit 7, field sync */
-	result |= vtech1->m_mc6847->fs_r() << 7;
+	result |= m_mc6847->fs_r() << 7;
 
 	return result;
 }
@@ -552,29 +559,28 @@ static READ8_HANDLER( vtech1_keyboard_r )
     I/O LATCH
 ***************************************************************************/
 
-static WRITE8_HANDLER( vtech1_latch_w )
+WRITE8_MEMBER(vtech1_state::vtech1_latch_w)
 {
-	vtech1_state *vtech1 = space->machine().driver_data<vtech1_state>();
 
 	if (LOG_VTECH1_LATCH)
 		logerror("vtech1_latch_w $%02X\n", data);
 
 	/* bit 1, SHRG mod (if installed) */
-	if (vtech1->m_videoram_size == 0x2000)
+	if (m_videoram.bytes() == 0x2000)
 	{
-		vtech1->m_mc6847->gm0_w(BIT(data, 1));
-		vtech1->m_mc6847->gm2_w(BIT(data, 1));
+		m_mc6847->gm0_w(BIT(data, 1));
+		m_mc6847->gm2_w(BIT(data, 1));
 	}
 
 	/* bit 2, cassette out */
-	vtech1->m_cassette->output( BIT(data, 2) ? +1.0 : -1.0);
+	m_cassette->output( BIT(data, 2) ? +1.0 : -1.0);
 
 	/* bit 3 and 4, vdc mode control lines */
-	vtech1->m_mc6847->ag_w(BIT(data, 3));
-	vtech1->m_mc6847->css_w(BIT(data, 4));
+	m_mc6847->ag_w(BIT(data, 3));
+	m_mc6847->css_w(BIT(data, 4));
 
 	/* bit 0 and 5, speaker */
-	speaker_level_w(vtech1->m_speaker, (BIT(data, 5) << 1) | BIT(data, 0));
+	speaker_level_w(m_speaker, (BIT(data, 5) << 1) | BIT(data, 0));
 }
 
 
@@ -582,21 +588,20 @@ static WRITE8_HANDLER( vtech1_latch_w )
     MEMORY BANKING
 ***************************************************************************/
 
-static WRITE8_HANDLER( vtech1_memory_bank_w )
+WRITE8_MEMBER(vtech1_state::vtech1_memory_bank_w)
 {
-	vtech1_state *vtech1 = space->machine().driver_data<vtech1_state>();
 
 	logerror("vtech1_memory_bank_w $%02X\n", data);
 
 	if (data >= 1)
-		if ((data <= 3 && vtech1->m_ram_size == 66*1024) || (vtech1->m_ram_size == 4098*1024))
-			memory_set_bank(space->machine(), "bank3", data - 1);
+		if ((data <= 3 && m_ram_size == 66*1024) || (m_ram_size == 4098*1024))
+			membank("bank3")->set_entry(data - 1);
 }
 
-static WRITE8_HANDLER( vtech1_video_bank_w )
+WRITE8_MEMBER(vtech1_state::vtech1_video_bank_w)
 {
 	logerror("vtech1_video_bank_w $%02X\n", data);
-	memory_set_bank(space->machine(), "bank4", data & 0x03);
+	membank("bank4")->set_entry(data & 0x03);
 }
 
 
@@ -621,51 +626,51 @@ static READ8_DEVICE_HANDLER( vtech1_mc6847_videoram_r )
 
 static DRIVER_INIT( vtech1 )
 {
-	vtech1_state *vtech1 = machine.driver_data<vtech1_state>();
+	vtech1_state *state = machine.driver_data<vtech1_state>();
 	address_space *prg = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	int id;
 
 	/* ram */
-	vtech1->m_ram = machine.device<ram_device>(RAM_TAG)->pointer();
-	vtech1->m_ram_size = machine.device<ram_device>(RAM_TAG)->size();
+	state->m_ram = machine.device<ram_device>(RAM_TAG)->pointer();
+	state->m_ram_size = machine.device<ram_device>(RAM_TAG)->size();
 
 	/* setup memory banking */
-	memory_set_bankptr(machine, "bank1", vtech1->m_ram);
+	state->membank("bank1")->set_base(state->m_ram);
 
 	/* 16k memory expansion? */
-	if (vtech1->m_ram_size == 18*1024 || vtech1->m_ram_size == 22*1024 || vtech1->m_ram_size == 32*1024)
+	if (state->m_ram_size == 18*1024 || state->m_ram_size == 22*1024 || state->m_ram_size == 32*1024)
 	{
-		offs_t base = 0x7800 + (vtech1->m_ram_size - 0x4000);
+		offs_t base = 0x7800 + (state->m_ram_size - 0x4000);
 		prg->install_readwrite_bank(base, base + 0x3fff, "bank2");
-		memory_set_bankptr(machine, "bank2", vtech1->m_ram + base - 0x7800);
+		state->membank("bank2")->set_base(state->m_ram + base - 0x7800);
 	}
 
 	/* 64k expansion? */
-	if (vtech1->m_ram_size >= 66*1024)
+	if (state->m_ram_size >= 66*1024)
 	{
 		/* install fixed first bank */
 		prg->install_readwrite_bank(0x8000, 0xbfff, "bank2");
-		memory_set_bankptr(machine, "bank2", vtech1->m_ram + 0x800);
+		state->membank("bank2")->set_base(state->m_ram + 0x800);
 
 		/* install the others, dynamically banked in */
 		prg->install_readwrite_bank(0xc000, 0xffff, "bank3");
-		memory_configure_bank(machine, "bank3", 0, (vtech1->m_ram_size - 0x4800) / 0x4000, vtech1->m_ram + 0x4800, 0x4000);
-		memory_set_bank(machine, "bank3", 0);
+		state->membank("bank3")->configure_entries(0, (state->m_ram_size - 0x4800) / 0x4000, state->m_ram + 0x4800, 0x4000);
+		state->membank("bank3")->set_entry(0);
 	}
 
 	/* initialize floppy */
-	vtech1->m_drive = -1;
-	vtech1->m_fdc_track_x2[0] = 80;
-	vtech1->m_fdc_track_x2[1] = 80;
-	vtech1->m_fdc_wrprot[0] = 0x80;
-	vtech1->m_fdc_wrprot[1] = 0x80;
-	vtech1->m_fdc_status = 0;
-	vtech1->m_fdc_edge = 0;
-	vtech1->m_fdc_bits = 8;
-	vtech1->m_fdc_start = 0;
-	vtech1->m_fdc_write = 0;
-	vtech1->m_fdc_offs = 0;
-	vtech1->m_fdc_latch = 0;
+	state->m_drive = -1;
+	state->m_fdc_track_x2[0] = 80;
+	state->m_fdc_track_x2[1] = 80;
+	state->m_fdc_wrprot[0] = 0x80;
+	state->m_fdc_wrprot[1] = 0x80;
+	state->m_fdc_status = 0;
+	state->m_fdc_edge = 0;
+	state->m_fdc_bits = 8;
+	state->m_fdc_start = 0;
+	state->m_fdc_write = 0;
+	state->m_fdc_offs = 0;
+	state->m_fdc_latch = 0;
 
 	for(id=0;id<2;id++)
 	{
@@ -675,62 +680,62 @@ static DRIVER_INIT( vtech1 )
 
 static DRIVER_INIT( vtech1h )
 {
-	vtech1_state *vtech1 = machine.driver_data<vtech1_state>();
+	vtech1_state *state = machine.driver_data<vtech1_state>();
 	address_space *prg = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
 	DRIVER_INIT_CALL(vtech1);
 
 	/* the SHRG mod replaces the standard videoram chip with an 8k chip */
-	vtech1->m_videoram_size = 0x2000;
-	vtech1->m_videoram = auto_alloc_array(machine, UINT8, vtech1->m_videoram_size);
+	//state->m_videoram_size = 0x2000;
+	//state->m_videoram = auto_alloc_array(machine, UINT8, state->m_videoram_size);
 
 	prg->install_readwrite_bank(0x7000, 0x77ff, "bank4");
-	memory_configure_bank(machine, "bank4", 0, 4, vtech1->m_videoram, 0x800);
-	memory_set_bank(machine, "bank4", 0);
+	state->membank("bank4")->configure_entries(0, 4, state->m_videoram, 0x800);
+	state->membank("bank4")->set_entry(0);
 }
 
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( laser110_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( laser110_mem, AS_PROGRAM, 8, vtech1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM	/* basic rom */
 	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
 	AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
 	AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
-	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_MEMBER(vtech1_state, m_videoram) /* (6847) */
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("videoram") /* (6847) */
 	AM_RANGE(0x7800, 0x7fff) AM_RAMBANK("bank1") /* 2k user ram */
 	AM_RANGE(0x8000, 0xbfff) AM_NOP /* 16k ram expansion */
 	AM_RANGE(0xc000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( laser210_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( laser210_mem, AS_PROGRAM, 8, vtech1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM	/* basic rom */
 	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
 	AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
 	AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
-	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_MEMBER(vtech1_state, m_videoram) /* U7 (6847) */
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("videoram") /* U7 (6847) */
 	AM_RANGE(0x7800, 0x8fff) AM_RAMBANK("bank1") /* 6k user ram */
 	AM_RANGE(0x9000, 0xcfff) AM_NOP /* 16k ram expansion */
 	AM_RANGE(0xd000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( laser310_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( laser310_mem, AS_PROGRAM, 8, vtech1_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM	/* basic rom */
 	AM_RANGE(0x4000, 0x5fff) AM_ROM	/* dos rom or other catridges */
 	AM_RANGE(0x6000, 0x67ff) AM_ROM	/* reserved for cartridges */
 	AM_RANGE(0x6800, 0x6fff) AM_READWRITE(vtech1_keyboard_r, vtech1_latch_w)
-	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_MEMBER(vtech1_state, m_videoram) /* (6847) */
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("videoram") /* (6847) */
 	AM_RANGE(0x7800, 0xb7ff) AM_RAMBANK("bank1") /* 16k user ram */
 	AM_RANGE(0xb800, 0xf7ff) AM_NOP /* 16k ram expansion */
 	AM_RANGE(0xf8ff, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vtech1_io, AS_IO, 8 )
+static ADDRESS_MAP_START( vtech1_io, AS_IO, 8, vtech1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("centronics", vtech1_printer_r)
-	AM_RANGE(0x0d, 0x0d) AM_DEVWRITE("centronics", vtech1_strobe_w)
-	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE_MODERN("centronics", centronics_device, write)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD_LEGACY("centronics", vtech1_printer_r)
+	AM_RANGE(0x0d, 0x0d) AM_DEVWRITE_LEGACY("centronics", vtech1_strobe_w)
+	AM_RANGE(0x0e, 0x0e) AM_DEVWRITE("centronics", centronics_device, write)
 	AM_RANGE(0x10, 0x1f) AM_READWRITE(vtech1_fdc_r, vtech1_fdc_w)
 	AM_RANGE(0x20, 0x2f) AM_READ(vtech1_joystick_r)
 	AM_RANGE(0x30, 0x3f) AM_READWRITE(vtech1_serial_r, vtech1_serial_w)
@@ -738,7 +743,7 @@ static ADDRESS_MAP_START( vtech1_io, AS_IO, 8 )
 	AM_RANGE(0x70, 0x7f) AM_WRITE(vtech1_memory_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( vtech1_shrg_io, AS_IO, 8 )
+static ADDRESS_MAP_START( vtech1_shrg_io, AS_IO, 8, vtech1_state )
 	AM_IMPORT_FROM(vtech1_io)
 	AM_RANGE(0xd0, 0xdf) AM_WRITE(vtech1_video_bank_w)
 ADDRESS_MAP_END

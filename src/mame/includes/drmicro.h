@@ -25,6 +25,9 @@ public:
 
 	/* devices */
 	device_t *m_msm;
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_WRITE8_MEMBER(pcm_set_w);
+	DECLARE_WRITE8_MEMBER(drmicro_videoram_w);
 };
 
 
@@ -34,4 +37,3 @@ PALETTE_INIT( drmicro );
 VIDEO_START( drmicro );
 SCREEN_UPDATE_IND16( drmicro );
 
-WRITE8_HANDLER( drmicro_videoram_w );

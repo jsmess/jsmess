@@ -16,7 +16,6 @@ Models:
             a string of numbers.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/t11/t11.h"

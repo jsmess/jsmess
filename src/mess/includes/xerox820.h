@@ -29,7 +29,8 @@ public:
 		  m_ram(*this, RAM_TAG),
 		  m_floppy0(*this, FLOPPY_0),
 		  m_floppy1(*this, FLOPPY_1)
-	{ }
+	,
+		m_video_ram(*this, "video_ram"){ }
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -62,7 +63,7 @@ public:
 	int m_keydata;						/* keyboard data */
 
 	/* video state */
-	UINT8 *m_video_ram;					/* video RAM */
+	required_shared_ptr<UINT8> m_video_ram; 					/* video RAM */
 	UINT8 *m_char_rom;					/* character ROM */
 	UINT8 m_scroll;						/* vertical scroll */
 	UINT8 m_framecnt;

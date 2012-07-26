@@ -67,6 +67,7 @@ protected:
 	virtual void device_start(void);
 	virtual void device_stop(void);
 	virtual void device_reset(void);
+	ioport_constructor device_input_ports() const;
 
 private:
 	/* All devices that are attached to the 8-bit bus. */
@@ -86,7 +87,7 @@ private:
 	UINT16 *m_ram16b;
 
 	/* Use the memory expansion? */
-	int m_use32k;
+	bool m_use32k;
 
 	/* Reference to the CPU; avoid lookups. */
 	device_t *m_cpu;

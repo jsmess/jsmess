@@ -281,7 +281,7 @@ static READ16_HANDLER( aladmdb_r )
 	md_boot_state *state = space->machine().driver_data<md_boot_state>();
 	if (cpu_get_pc(&space->device())==0x1b2a56)
 	{
-		state->m_aladmdb_mcu_port = input_port_read(space->machine(), "MCU");
+		state->m_aladmdb_mcu_port = state->ioport("MCU")->read();
 
 		if (state->m_aladmdb_mcu_port & 0x100)
 			return ((state->m_aladmdb_mcu_port & 0x0f) | 0x100); // coin inserted, calculate the number of coins
@@ -289,7 +289,7 @@ static READ16_HANDLER( aladmdb_r )
 			return (0x100); //MCU status, needed if you fall into a pitfall
 	}
 	if (cpu_get_pc(&space->device())==0x1b2a72) return 0x0000;
-	if (cpu_get_pc(&space->device())==0x1b2d24) return (input_port_read(space->machine(), "MCU") & 0x00f0) | 0x1200;    // difficulty
+	if (cpu_get_pc(&space->device())==0x1b2d24) return (space->machine().root_device().ioport("MCU")->read() & 0x00f0) | 0x1200;    // difficulty
 	if (cpu_get_pc(&space->device())==0x1b2d4e) return 0x0000;
 
 	logerror("aladbl_r : %06x\n",cpu_get_pc(&space->device()));
@@ -300,19 +300,19 @@ static READ16_HANDLER( aladmdb_r )
 static READ16_HANDLER( mk3mdb_dsw_r )
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
-	return input_port_read(space->machine(), dswname[offset]);
+	return space->machine().root_device().ioport(dswname[offset])->read();
 }
 
 static READ16_HANDLER( ssf2mdb_dsw_r )
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
-	return input_port_read(space->machine(), dswname[offset]);
+	return space->machine().root_device().ioport(dswname[offset])->read();
 }
 
 static READ16_HANDLER( srmdb_dsw_r )
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
-	return input_port_read(space->machine(), dswname[offset]);
+	return space->machine().root_device().ioport(dswname[offset])->read();
 }
 
 static READ16_HANDLER( topshoot_200051_r )
@@ -659,7 +659,7 @@ static DRIVER_INIT( aladmdb )
      * Game does a check @ 1afc00 with work RAM fff57c that makes it play like the original console version (i.e. 8 energy hits instead of 2)
      */
 	#if ENERGY_CONSOLE_MODE
-	UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+	UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 	rom[0x1afc08/2] = 0x6600;
 	#endif
 
@@ -675,7 +675,7 @@ static DRIVER_INIT( aladmdb )
 // after this decode look like intentional changes
 static DRIVER_INIT( mk3mdb )
 {
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	for (int x = 0x000001; x < 0x100001; x += 2)
 	{
@@ -726,7 +726,7 @@ static DRIVER_INIT( ssf2mdb )
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_bank(0x400000, 0x5fffff, "bank5");
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x400000, 0x5fffff);
 
-	memory_set_bankptr(machine,  "bank5", machine.region( "maincpu" )->base() + 0x400000 );
+	machine.root_device().membank("bank5")->set_base(machine.root_device().memregion( "maincpu" )->base() + 0x400000 );
 
 	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0x770070, 0x770075, FUNC(ssf2mdb_dsw_r) );
 
@@ -736,7 +736,7 @@ static DRIVER_INIT( ssf2mdb )
 
 static DRIVER_INIT( srmdb )
 {
-	UINT8* rom = machine.region("maincpu")->base();
+	UINT8* rom = machine.root_device().memregion("maincpu")->base();
 
 	/* todo, reduce bitswaps to single swap */
 	for (int x = 0x00001; x < 0x40000; x += 2)

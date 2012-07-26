@@ -16,43 +16,43 @@ Quiz Gekiretsu Scramble (Gakuen Paradise 2) (c) 1993 Face
 
 #define MCLK 16000000
 
-static WRITE8_HANDLER( quizdna_rombank_w )
+WRITE8_MEMBER(quizdna_state::quizdna_rombank_w)
 {
-	UINT8 *ROM = space->machine().region("maincpu")->base();
-	memory_set_bankptr(space->machine(), "bank1",&ROM[0x10000+0x4000*(data & 0x3f)]);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->set_base(&ROM[0x10000+0x4000*(data & 0x3f)]);
 }
 
-static WRITE8_HANDLER( gekiretu_rombank_w )
+WRITE8_MEMBER(quizdna_state::gekiretu_rombank_w)
 {
-	UINT8 *ROM = space->machine().region("maincpu")->base();
-	memory_set_bankptr(space->machine(), "bank1",&ROM[0x10000+0x4000*((data & 0x3f) ^ 0x0a)]);
+	UINT8 *ROM = memregion("maincpu")->base();
+	membank("bank1")->set_base(&ROM[0x10000+0x4000*((data & 0x3f) ^ 0x0a)]);
 }
 
 /****************************************************************************/
 
-static ADDRESS_MAP_START( quizdna_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( quizdna_map, AS_PROGRAM, 8, quizdna_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(quizdna_fg_ram_w)
 	AM_RANGE(0xa000, 0xbfff) AM_WRITE(quizdna_bg_ram_w)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE_SIZE_MEMBER(quizdna_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xe200, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(paletteram_xBGR_RRRR_GGGG_BBBB_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(paletteram_xBGR_RRRR_GGGG_BBBB_w) AM_SHARE("paletteram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gekiretu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( gekiretu_map, AS_PROGRAM, 8, quizdna_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(quizdna_fg_ram_w)
 	AM_RANGE(0xa000, 0xbfff) AM_WRITE(quizdna_bg_ram_w)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(paletteram_xBGR_RRRR_GGGG_BBBB_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_BASE_SIZE_MEMBER(quizdna_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(paletteram_xBGR_RRRR_GGGG_BBBB_w) AM_SHARE("paletteram")
+	AM_RANGE(0xf000, 0xf1ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xf200, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quizdna_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( quizdna_io_map, AS_IO, 8, quizdna_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_WRITE(quizdna_bg_xscroll_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(quizdna_bg_yscroll_w)
@@ -63,11 +63,11 @@ static ADDRESS_MAP_START( quizdna_io_map, AS_IO, 8 )
 	AM_RANGE(0x91, 0x91) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(quizdna_rombank_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
-	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gakupara_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( gakupara_io_map, AS_IO, 8, quizdna_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(quizdna_bg_xscroll_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(quizdna_bg_yscroll_w)
@@ -78,11 +78,11 @@ static ADDRESS_MAP_START( gakupara_io_map, AS_IO, 8 )
 	AM_RANGE(0x91, 0x91) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(quizdna_rombank_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
-	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gekiretu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( gekiretu_io_map, AS_IO, 8, quizdna_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_WRITE(quizdna_bg_xscroll_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(quizdna_bg_yscroll_w)
@@ -93,8 +93,8 @@ static ADDRESS_MAP_START( gekiretu_io_map, AS_IO, 8 )
 	AM_RANGE(0x91, 0x91) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(gekiretu_rombank_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
-	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0xf0, 0xf0) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 

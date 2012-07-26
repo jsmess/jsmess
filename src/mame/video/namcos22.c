@@ -268,16 +268,14 @@ UpdateVideoMixer( running_machine &machine )
 	}
 }
 
-READ32_HANDLER( namcos22_gamma_r )
+READ32_MEMBER(namcos22_state::namcos22_gamma_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	return state->m_gamma[offset];
+	return m_gamma[offset];
 }
 
-WRITE32_HANDLER( namcos22_gamma_w )
+WRITE32_MEMBER(namcos22_state::namcos22_gamma_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	COMBINE_DATA( &state->m_gamma[offset] );
+	COMBINE_DATA( &m_gamma[offset] );
 }
 
 static struct
@@ -863,7 +861,7 @@ ApplyGamma( running_machine &machine, bitmap_rgb32 &bitmap )
 	}
 	else
 	{ /* system 22 */
-		const UINT8 *rlut = 0x000+(const UINT8 *)machine.region("user1")->base();
+		const UINT8 *rlut = 0x000+(const UINT8 *)machine.root_device().memregion("user1")->base();
 		const UINT8 *glut = 0x100+rlut;
 		const UINT8 *blut = 0x200+rlut;
 		for( y=0; y<bitmap.height(); y++ )
@@ -1230,24 +1228,22 @@ namcos22_point_rom_r( running_machine &machine, offs_t offs )
 }
 
 
-WRITE32_HANDLER( namcos22s_czram_w )
+WRITE32_MEMBER(namcos22_state::namcos22s_czram_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	int bank = nthword(state->m_czattr,0xa/2)&3;
-	UINT16 *czram = state->m_banked_czram[bank];
+	int bank = nthword(m_czattr,0xa/2)&3;
+	UINT16 *czram = m_banked_czram[bank];
 	UINT32 dat = (czram[offset*2]<<16)|czram[offset*2+1];
 	UINT32 prev = dat;
 	COMBINE_DATA( &dat );
 	czram[offset*2] = dat>>16;
 	czram[offset*2+1] = dat&0xffff;
-	state->m_cz_was_written[bank] |= (prev^dat);
+	m_cz_was_written[bank] |= (prev^dat);
 }
 
-READ32_HANDLER( namcos22s_czram_r )
+READ32_MEMBER(namcos22_state::namcos22s_czram_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	int bank = nthword(state->m_czattr,0xa/2)&3;
-	const UINT16 *czram = state->m_banked_czram[bank];
+	int bank = nthword(m_czattr,0xa/2)&3;
+	const UINT16 *czram = m_banked_czram[bank];
 	return (czram[offset*2]<<16)|czram[offset*2+1];
 }
 
@@ -1745,10 +1741,9 @@ DrawSprites( running_machine &machine, bitmap_rgb32 &bitmap, const rectangle &cl
 	}
 } /* DrawSprites */
 
-READ32_HANDLER( namcos22s_vics_control_r )
+READ32_MEMBER(namcos22_state::namcos22s_vics_control_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	UINT32 ret = state->m_vics_control[offset];
+	UINT32 ret = m_vics_control[offset];
 
 	switch (offset*4)
 	{
@@ -1770,10 +1765,9 @@ READ32_HANDLER( namcos22s_vics_control_r )
 	return ret;
 }
 
-WRITE32_HANDLER( namcos22s_vics_control_w )
+WRITE32_MEMBER(namcos22_state::namcos22s_vics_control_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	COMBINE_DATA(&state->m_vics_control[offset]);
+	COMBINE_DATA(&m_vics_control[offset]);
 }
 
 
@@ -1788,9 +1782,9 @@ static void UpdatePalette(running_machine &machine)
 			for( j=0; j<4; j++ )
 			{
 				int which = i*4+j;
-				int r = nthbyte(machine.generic.paletteram.u32,which+0x00000);
-				int g = nthbyte(machine.generic.paletteram.u32,which+0x08000);
-				int b = nthbyte(machine.generic.paletteram.u32,which+0x10000);
+				int r = nthbyte(state->m_generic_paletteram_32,which+0x00000);
+				int g = nthbyte(state->m_generic_paletteram_32,which+0x08000);
+				int b = nthbyte(state->m_generic_paletteram_32,which+0x10000);
 				palette_set_color( machine,which,MAKE_RGB(r,g,b) );
 			}
 			state->m_dirtypal[i] = 0;
@@ -1811,33 +1805,30 @@ static TILE_GET_INFO( TextTilemapGetInfo )
 	SET_TILE_INFO( GFX_CHAR,data&0x03ff,data>>12,TILE_FLIPYX((data&0x0c00)>>10) );
 }
 
-READ32_HANDLER( namcos22_textram_r )
+READ32_MEMBER(namcos22_state::namcos22_textram_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	return state->m_textram[offset];
+	return m_textram[offset];
 }
 
-WRITE32_HANDLER( namcos22_textram_w )
+WRITE32_MEMBER(namcos22_state::namcos22_textram_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	COMBINE_DATA( &state->m_textram[offset] );
-	state->m_bgtilemap->mark_tile_dirty(offset*2 );
-	state->m_bgtilemap->mark_tile_dirty(offset*2+1 );
+	COMBINE_DATA( &m_textram[offset] );
+	m_bgtilemap->mark_tile_dirty(offset*2 );
+	m_bgtilemap->mark_tile_dirty(offset*2+1 );
 }
 
-READ32_HANDLER( namcos22_tilemapattr_r )
+READ32_MEMBER(namcos22_state::namcos22_tilemapattr_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 
 	switch (offset)
 	{
 		case 2:
 		{
-			UINT16 lo,hi = (state->m_tilemapattr[offset] & 0xffff0000) >> 16;
+			UINT16 lo,hi = (m_tilemapattr[offset] & 0xffff0000) >> 16;
 			// assume current scanline, 0x1ff if in vblank (used in alpinesa)
 			// or maybe relative to posirq?
-			if (space->machine().primary_screen->vblank()) lo = 0x1ff;
-			else lo = space->machine().primary_screen->vpos() >> 1;
+			if (machine().primary_screen->vblank()) lo = 0x1ff;
+			else lo = machine().primary_screen->vpos() >> 1;
 			// dirtdash has slowdowns if high bit is clear, why??
 			return hi<<16 | lo | 0x8000;
 		}
@@ -1851,10 +1842,10 @@ READ32_HANDLER( namcos22_tilemapattr_r )
 			break;
 	}
 
-	return state->m_tilemapattr[offset];
+	return m_tilemapattr[offset];
 }
 
-WRITE32_HANDLER( namcos22_tilemapattr_w )
+WRITE32_MEMBER(namcos22_state::namcos22_tilemapattr_w)
 {
 	/*
     0.hiword    R/W     x offset
@@ -1866,9 +1857,8 @@ WRITE32_HANDLER( namcos22_tilemapattr_w )
     3.hiword    ?       unused?
     3.loword    R       ???
     */
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	COMBINE_DATA( &state->m_tilemapattr[offset] );
-//  popmessage("%08x\n%08x\n%08x\n%08x\n",state->m_tilemapattr[0],state->m_tilemapattr[1],state->m_tilemapattr[2],state->m_tilemapattr[3]);
+	COMBINE_DATA( &m_tilemapattr[offset] );
+//  popmessage("%08x\n%08x\n%08x\n%08x\n",m_tilemapattr[0],m_tilemapattr[1],m_tilemapattr[2],m_tilemapattr[3]);
 }
 
 
@@ -1902,40 +1892,38 @@ low byte of each word:
 
 */
 
-READ32_HANDLER( namcos22s_spotram_r )
+READ32_MEMBER(namcos22_state::namcos22s_spotram_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 	if (offset == 1)
 	{
 		// read
-		if (state->m_spot_read_address >= SPOTRAM_SIZE)
+		if (m_spot_read_address >= SPOTRAM_SIZE)
 		{
-			state->m_spot_read_address = 0;
+			m_spot_read_address = 0;
 		}
-		return state->m_spotram[state->m_spot_read_address++] << 16;
+		return m_spotram[m_spot_read_address++] << 16;
 	}
 	return 0;
 }
 
-WRITE32_HANDLER( namcos22s_spotram_w )
+WRITE32_MEMBER(namcos22_state::namcos22s_spotram_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 	if (offset == 0)
 	{
 		if (ACCESSING_BITS_16_31)
 		{
 			// set address
-			state->m_spot_read_address  = data>>(16+1);
-			state->m_spot_write_address = data>>(16+1);
+			m_spot_read_address  = data>>(16+1);
+			m_spot_write_address = data>>(16+1);
 		}
 		else
 		{
 			// write
-			if (state->m_spot_write_address >= SPOTRAM_SIZE)
+			if (m_spot_write_address >= SPOTRAM_SIZE)
 			{
-				state->m_spot_write_address = 0;
+				m_spot_write_address = 0;
 			}
-			state->m_spotram[state->m_spot_write_address++] = data;
+			m_spotram[m_spot_write_address++] = data;
 		}
 	}
 	else
@@ -1943,7 +1931,7 @@ WRITE32_HANDLER( namcos22s_spotram_w )
 		if (ACCESSING_BITS_0_15)
 		{
 			// enable
-			state->m_spot_enable = data & 1;
+			m_spot_enable = data & 1;
 		}
 	}
 }
@@ -2438,15 +2426,13 @@ BlitPolyObject( running_machine &machine, bitmap_rgb32 &bitmap, int code, float 
 
 /*******************************************************************************/
 
-READ32_HANDLER( namcos22_dspram_r )
+READ32_MEMBER(namcos22_state::namcos22_dspram_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	return state->m_polygonram[offset] | 0xff000000; // only d0-23 are connected
+	return m_polygonram[offset] | 0xff000000; // only d0-23 are connected
 }
 
-WRITE32_HANDLER( namcos22_dspram_w )
+WRITE32_MEMBER(namcos22_state::namcos22_dspram_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
 	if (mem_mask & 0x00ff0000)
 	{
 		// sign extend or crop
@@ -2457,7 +2443,7 @@ WRITE32_HANDLER( namcos22_dspram_w )
 			data &= 0xffffff;
 	}
 
-	COMBINE_DATA( &state->m_polygonram[offset] );
+	COMBINE_DATA( &m_polygonram[offset] );
 }
 
 /*******************************************************************************/
@@ -2624,7 +2610,7 @@ static void
 SimulateSlaveDSP( running_machine &machine, bitmap_rgb32 &bitmap )
 {
 	namcos22_state *state = machine.driver_data<namcos22_state>();
-	const INT32 *pSource = 0x300 + (INT32 *)state->m_polygonram;
+	const INT32 *pSource = 0x300 + (INT32 *)state->m_polygonram.target();
 	INT16 len;
 
 	matrix3d_Identity( state->m_mViewMatrix );
@@ -2663,7 +2649,7 @@ SimulateSlaveDSP( running_machine &machine, bitmap_rgb32 &bitmap )
 			break;
 
 		default:
-			logerror( "unk 3d data(%d) addr=0x%x!", len, (int)(pSource-(INT32*)state->m_polygonram) );
+			logerror( "unk 3d data(%d) addr=0x%x!", len, (int)(pSource-(INT32*)state->m_polygonram.target()) );
 			{
 				int i;
 				for( i=0; i<len; i++ )
@@ -2679,7 +2665,7 @@ SimulateSlaveDSP( running_machine &machine, bitmap_rgb32 &bitmap )
 		pSource += len;
 		pSource++; /* always 0xffff */
 		next = (INT16)*pSource++; /* link to next command */
-		if( (next&0x7fff) != (pSource - (INT32 *)state->m_polygonram) )
+		if( (next&0x7fff) != (pSource - (INT32 *)state->m_polygonram.target()) )
 		{ /* end of list */
 			break;
 		}
@@ -2706,29 +2692,26 @@ namcos22_enable_slave_simulation( running_machine &machine, int enable )
 
 /*********************************************************************************************/
 
-READ32_HANDLER( namcos22_cgram_r )
+READ32_MEMBER(namcos22_state::namcos22_cgram_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	return state->m_cgram[offset];
+	return m_cgram[offset];
 }
 
-WRITE32_HANDLER( namcos22_cgram_w )
+WRITE32_MEMBER(namcos22_state::namcos22_cgram_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	COMBINE_DATA( &state->m_cgram[offset] );
-	gfx_element_mark_dirty(space->machine().gfx[GFX_CHAR],offset/32);
+	COMBINE_DATA( &m_cgram[offset] );
+	gfx_element_mark_dirty(machine().gfx[GFX_CHAR],offset/32);
 }
 
-READ32_HANDLER( namcos22_paletteram_r )
+READ32_MEMBER(namcos22_state::namcos22_paletteram_r)
 {
-	return space->machine().generic.paletteram.u32[offset];
+	return m_generic_paletteram_32[offset];
 }
 
-WRITE32_HANDLER( namcos22_paletteram_w )
+WRITE32_MEMBER(namcos22_state::namcos22_paletteram_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	COMBINE_DATA( &space->machine().generic.paletteram.u32[offset] );
-	state->m_dirtypal[offset&(0x7fff/4)] = 1;
+	COMBINE_DATA( &m_generic_paletteram_32[offset] );
+	m_dirtypal[offset&(0x7fff/4)] = 1;
 }
 
 static void namcos22_reset(running_machine &machine)
@@ -2758,10 +2741,10 @@ static VIDEO_START( common )
 	for (code = 0; code < machine.gfx[GFX_TEXTURE_TILE]->total_elements; code++)
 		gfx_element_decode(machine.gfx[GFX_TEXTURE_TILE], code);
 
-	Prepare3dTexture(machine, machine.region("textilemap")->base(), machine.gfx[GFX_TEXTURE_TILE]->gfxdata );
+	Prepare3dTexture(machine, state->memregion("textilemap")->base(), machine.gfx[GFX_TEXTURE_TILE]->gfxdata );
 	state->m_dirtypal = auto_alloc_array(machine, UINT8, NAMCOS22_PALETTE_SIZE/4);
-	state->m_mPtRomSize = machine.region("pointrom")->bytes()/3;
-	state->m_mpPolyL = machine.region("pointrom")->base();
+	state->m_mPtRomSize = state->memregion("pointrom")->bytes()/3;
+	state->m_mpPolyL = state->memregion("pointrom")->base();
 	state->m_mpPolyM = state->m_mpPolyL + state->m_mPtRomSize;
 	state->m_mpPolyH = state->m_mpPolyM + state->m_mPtRomSize;
 
@@ -2769,7 +2752,7 @@ static VIDEO_START( common )
 	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(namcos22_reset), &machine));
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(namcos22_exit), &machine));
 
-	gfx_element_set_source(machine.gfx[GFX_CHAR], (UINT8 *)state->m_cgram);
+	gfx_element_set_source(machine.gfx[GFX_CHAR], (UINT8 *)state->m_cgram.target());
 }
 
 VIDEO_START( namcos22 )
@@ -2918,17 +2901,15 @@ SCREEN_UPDATE_RGB32( namcos22 )
 	return 0;
 }
 
-WRITE16_HANDLER( namcos22_dspram16_bank_w )
+WRITE16_MEMBER(namcos22_state::namcos22_dspram16_bank_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	COMBINE_DATA( &state->m_dspram_bank );
+	COMBINE_DATA( &m_dspram_bank );
 }
 
-READ16_HANDLER( namcos22_dspram16_r )
+READ16_MEMBER(namcos22_state::namcos22_dspram16_r)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	UINT32 value = state->m_polygonram[offset];
-	switch( state->m_dspram_bank )
+	UINT32 value = m_polygonram[offset];
+	switch( m_dspram_bank )
 	{
 	case 0:
 		value &= 0xffff;
@@ -2939,7 +2920,7 @@ READ16_HANDLER( namcos22_dspram16_r )
 		break;
 
 	case 2:
-		state->m_mUpperWordLatch = value>>16;
+		m_mUpperWordLatch = value>>16;
 		value &= 0xffff;
 		break;
 
@@ -2949,13 +2930,12 @@ READ16_HANDLER( namcos22_dspram16_r )
 	return (UINT16)value;
 } /* namcos22_dspram16_r */
 
-WRITE16_HANDLER( namcos22_dspram16_w )
+WRITE16_MEMBER(namcos22_state::namcos22_dspram16_w)
 {
-	namcos22_state *state = space->machine().driver_data<namcos22_state>();
-	UINT32 value = state->m_polygonram[offset];
+	UINT32 value = m_polygonram[offset];
 	UINT16 lo = value&0xffff;
 	UINT16 hi = value>>16;
-	switch( state->m_dspram_bank )
+	switch( m_dspram_bank )
 	{
 	case 0:
 		COMBINE_DATA( &lo );
@@ -2967,11 +2947,11 @@ WRITE16_HANDLER( namcos22_dspram16_w )
 
 	case 2:
 		COMBINE_DATA( &lo );
-		hi = state->m_mUpperWordLatch;
+		hi = m_mUpperWordLatch;
 		break;
 
 	default:
 		break;
 	}
-	state->m_polygonram[offset] = (hi<<16)|lo;
+	m_polygonram[offset] = (hi<<16)|lo;
 } /* namcos22_dspram16_w */

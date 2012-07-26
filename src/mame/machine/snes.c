@@ -577,9 +577,9 @@ READ8_HANDLER( snes_r_io )
 
 		case 0x4100:		/* NSS Dip-Switches */
 			{
-				const input_port_config *port = space->machine().port("DSW");
+				ioport_port *port = state->ioport("DSW");
 				if (port != NULL)
-					return input_port_read(space->machine(), "DSW");
+					return space->machine().root_device().ioport("DSW")->read();
 				else
 					return snes_open_bus_r(space, 0);
 			}
@@ -1644,8 +1644,8 @@ static void nss_io_read( running_machine &machine )
 
 	for (port = 0; port < 2; port++)
 	{
-		state->m_data1[port] = input_port_read(machine, portnames[port][0]) | (input_port_read(machine, portnames[port][1]) << 8);
-		state->m_data2[port] = input_port_read(machine, portnames[port][2]) | (input_port_read(machine, portnames[port][3]) << 8);
+		state->m_data1[port] = state->ioport(portnames[port][0])->read() | (state->ioport(portnames[port][1])->read() << 8);
+		state->m_data2[port] = state->ioport(portnames[port][2])->read() | (state->ioport(portnames[port][3])->read() << 8);
 
 		// avoid sending signals that could crash games
 		// if left, no right
@@ -1838,13 +1838,13 @@ static void snes_init_ram( running_machine &machine )
 }
 
 
-DIRECT_UPDATE_HANDLER( snes_spc_direct )
+DIRECT_UPDATE_MEMBER(snes_state::snes_spc_direct)
 {
-	direct.explicit_configure(0x0000, 0xffff, 0xffff, spc_get_ram(machine.device("spc700")));
+	direct.explicit_configure(0x0000, 0xffff, 0xffff, spc_get_ram(machine().device("spc700")));
 	return ~0;
 }
 
-DIRECT_UPDATE_HANDLER( snes_direct )
+DIRECT_UPDATE_MEMBER(snes_state::snes_direct)
 {
 	direct.explicit_configure(0x0000, 0xffff, 0xffff, snes_ram);
 	return ~0;
@@ -1860,8 +1860,8 @@ MACHINE_START( snes )
 	state->m_spc700 = machine.device<snes_sound_device>("spc700");
 	state->m_superfx = machine.device<cpu_device>("superfx");
 
-	state->m_maincpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(snes_direct), &machine));
-	state->m_soundcpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(snes_spc_direct), &machine));
+	state->m_maincpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(snes_state::snes_direct), state));
+	state->m_soundcpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(snes_state::snes_spc_direct), state));
 
 	// power-on sets these registers like this
 	snes_ram[WRIO] = 0xff;
@@ -1998,7 +1998,7 @@ DRIVER_INIT( snes )
 	UINT16 total_blocks, read_blocks;
 	UINT8 *rom;
 
-	rom = machine.region("user3")->base();
+	rom = state->memregion("user3")->base();
 	snes_ram = auto_alloc_array_clear(machine, UINT8, 0x1400000);
 
 	/* all NSS games seem to use MODE 20 */
@@ -2007,7 +2007,7 @@ DRIVER_INIT( snes )
 	state->m_has_addon_chip = HAS_NONE;
 
 	/* Find the number of blocks in this ROM */
-	total_blocks = (machine.region("user3")->bytes() / 0x8000);
+	total_blocks = (state->memregion("user3")->bytes() / 0x8000);
 	read_blocks = 0;
 
 	/* Loading all the data blocks from cart, we only partially cover banks 0x00 to 0x7f. Therefore, we
@@ -2064,7 +2064,7 @@ DRIVER_INIT( snes_hirom )
 	UINT16 total_blocks, read_blocks;
 	UINT8  *rom;
 
-	rom = machine.region("user3")->base();
+	rom = state->memregion("user3")->base();
 	snes_ram = auto_alloc_array(machine, UINT8, 0x1400000);
 	memset(snes_ram, 0, 0x1400000);
 
@@ -2073,7 +2073,7 @@ DRIVER_INIT( snes_hirom )
 	state->m_has_addon_chip = HAS_NONE;
 
 	/* Find the number of blocks in this ROM */
-	total_blocks = (machine.region("user3")->bytes() / 0x10000);
+	total_blocks = (state->memregion("user3")->bytes() / 0x10000);
 	read_blocks = 0;
 
 	/* See above for details about the way we fill banks 0x00 to 0x7f */

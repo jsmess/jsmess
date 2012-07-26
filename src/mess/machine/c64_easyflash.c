@@ -51,9 +51,14 @@ machine_config_constructor c64_easyflash_cartridge_device::device_mconfig_additi
 //  INPUT_PORTS( c64_easyflash )
 //-------------------------------------------------
 
-INPUT_CHANGED( c64_easyflash_cartridge_device::reset )
+INPUT_CHANGED_MEMBER( c64_easyflash_cartridge_device::reset )
 {
-	// TODO
+	if (!newval)
+	{
+		device_reset();
+	}
+
+	m_slot->reset_w(newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( c64_easyflash )
@@ -63,7 +68,7 @@ static INPUT_PORTS_START( c64_easyflash )
 	PORT_DIPSETTING(    0x01, "Boot" )
 
 	PORT_START("RESET")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Reset") PORT_CHANGED(c64_easyflash_cartridge_device::reset, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Reset") PORT_CHANGED_MEMBER(DEVICE_SELF, c64_easyflash_cartridge_device, reset, 0)
 INPUT_PORTS_END
 
 
@@ -103,7 +108,8 @@ c64_easyflash_cartridge_device::c64_easyflash_cartridge_device(const machine_con
 
 void c64_easyflash_cartridge_device::device_start()
 {
-	m_ram = auto_alloc_array(machine(), UINT8, 0x100);
+	// allocate memory
+	c64_ram_pointer(machine(), 0x100);
 
 	// state saving
 	save_item(NAME(m_bank));
@@ -126,7 +132,7 @@ void c64_easyflash_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_easyflash_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
+UINT8 c64_easyflash_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
 
@@ -153,7 +159,7 @@ UINT8 c64_easyflash_cartridge_device::c64_cd_r(address_space &space, offs_t offs
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_easyflash_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)
+void c64_easyflash_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{
@@ -217,7 +223,7 @@ void c64_easyflash_cartridge_device::c64_cd_w(address_space &space, offs_t offse
 //  c64_exrom_r - EXROM read
 //-------------------------------------------------
 
-int c64_easyflash_cartridge_device::c64_exrom_r()
+int c64_easyflash_cartridge_device::c64_exrom_r(offs_t offset, int ba, int rw, int hiram)
 {
 	return !BIT(m_mode, 1);
 }
@@ -229,5 +235,5 @@ int c64_easyflash_cartridge_device::c64_exrom_r()
 
 int c64_easyflash_cartridge_device::c64_game_r(offs_t offset, int ba, int rw, int hiram)
 {
-	return !(BIT(m_mode, 0) | !(BIT(m_mode, 2) | input_port_read(device(), "JP1")));
+	return !(BIT(m_mode, 0) | !(BIT(m_mode, 2) | device().ioport("JP1")->read()));
 }

@@ -47,7 +47,6 @@ Status 19-09-2011
 -- Of the remainder, some freeze at start
 
 ******************************************************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
@@ -75,7 +74,8 @@ public:
 	m_pia1(*this, "pia_1"),
 	m_cass(*this, CASSETTE_TAG),
 	m_fdc(*this, "wd179x")
-	{ }
+	,
+		m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_crtc;
@@ -124,7 +124,7 @@ public:
 	unsigned char m_keyboard_data;
 	unsigned char m_pad_data;
 	UINT8 m_mc6847_css;
-	UINT8 *m_p_videoram;
+	required_shared_ptr<UINT8> m_p_videoram;
 	UINT8 m_apf_ints;
 	void apf_update_ints(UINT8 intnum);
 };
@@ -149,13 +149,13 @@ READ8_MEMBER( apf_state::apf_m1000_pia_in_a_func)
 	UINT8 data=~0;
 
 	if (!BIT(m_pad_data, 3))
-		data &= input_port_read(machine(), "joy3");
+		data &= ioport("joy3")->read();
 	if (!BIT(m_pad_data, 2))
-		data &= input_port_read(machine(), "joy2");
+		data &= ioport("joy2")->read();
 	if (!BIT(m_pad_data, 1))
-		data &= input_port_read(machine(), "joy1");
+		data &= ioport("joy1")->read();
 	if (!BIT(m_pad_data, 0))
-		data &= input_port_read(machine(), "joy0");
+		data &= ioport("joy0")->read();
 
 	return data;
 }
@@ -311,7 +311,7 @@ WRITE8_MEMBER( apf_state::apf_imagination_pia_out_b_func)
 	static const char *const keynames[] = { "key0", "key1", "key2", "key3", "key4", "key5", "key6", "key7" };
 
 	keyboard_line = data & 0x07;
-	m_keyboard_data = input_port_read(machine(), keynames[keyboard_line]);
+	m_keyboard_data = ioport(keynames[keyboard_line])->read();
 
 	/* bit 4: cassette motor control */
 	m_cass->change_state(BIT(data, 4) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -427,7 +427,7 @@ READ8_MEMBER( apf_state::apf_wd179x_data_r)
 }
 
 static ADDRESS_MAP_START( apf_imagination_map, AS_PROGRAM, 8, apf_state )
-	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE(m_p_videoram) AM_MIRROR(0x1c00)
+	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_SHARE("p_videoram") AM_MIRROR(0x1c00)
 	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
 	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
 	AM_RANGE( 0x06000, 0x063ff) AM_DEVREADWRITE("pia_1", pia6821_device, read, write)
@@ -445,7 +445,7 @@ static ADDRESS_MAP_START( apf_imagination_map, AS_PROGRAM, 8, apf_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( apf_m1000_map, AS_PROGRAM, 8, apf_state )
-	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_BASE(m_p_videoram)  AM_MIRROR(0x1c00)
+	AM_RANGE( 0x00000, 0x003ff) AM_RAM AM_SHARE("p_videoram")  AM_MIRROR(0x1c00)
 	AM_RANGE( 0x02000, 0x03fff) AM_DEVREADWRITE("pia_0", pia6821_device, read, write)
 	AM_RANGE( 0x04000, 0x047ff) AM_ROM AM_REGION("maincpu", 0x10000) AM_MIRROR(0x1800)
 	AM_RANGE( 0x06800, 0x077ff) AM_ROM

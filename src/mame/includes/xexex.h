@@ -10,11 +10,13 @@ class xexex_state : public driver_device
 {
 public:
 	xexex_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_workram(*this, "workram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT16 *    m_workram;
-	UINT16 *    m_spriteram;
+	required_shared_ptr<UINT16> m_workram;
+	required_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *    m_paletteram;    // currently this uses generic palette handling
 
 	/* video-related */
@@ -46,6 +48,18 @@ public:
 	device_t *m_k053251;
 	device_t *m_k053252;
 	device_t *m_k054338;
+	DECLARE_READ16_MEMBER(K053247_scattered_word_r);
+	DECLARE_WRITE16_MEMBER(K053247_scattered_word_w);
+	DECLARE_READ16_MEMBER(spriteram_mirror_r);
+	DECLARE_WRITE16_MEMBER(spriteram_mirror_w);
+	DECLARE_READ16_MEMBER(xexex_waitskip_r);
+	DECLARE_READ16_MEMBER(control2_r);
+	DECLARE_WRITE16_MEMBER(control2_w);
+	DECLARE_WRITE16_MEMBER(sound_cmd1_w);
+	DECLARE_WRITE16_MEMBER(sound_cmd2_w);
+	DECLARE_WRITE16_MEMBER(sound_irq_w);
+	DECLARE_READ16_MEMBER(sound_status_r);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 };
 
 

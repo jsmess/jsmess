@@ -92,6 +92,7 @@ N *drummania 10thMIX                            2004.04
 P Fisherman's Bait                              1998.06    GE765 UA          765 UA B02
 P Fisherman's Bait 2                            1998       GC865 UA          865 UA B02
 P Fisherman's Bait Marlin Challenge             1999       GX889             889 AA/EA/JA/UA(needs redump)
+P Gachagachamp                                  1999.01    GQ877 JA          GE877-JA(PCMCIA card)
 A GUITARFREAKS                                  1999.02    GQ886 EA/JA/UA    886 ** C02
 A GUITARFREAKS 2ndMIX                           1999.07    GQ883 JA          929 JB B02(needs redump)
 A *GUITARFREAKS 2ndMIX Link ver.                1999.09
@@ -107,7 +108,6 @@ N GUITARFREAKS 10thMIX                          2003.10    GCD10 JA          D10
 N *GUITARFREAKS 11thMIX                         2004.04
 G *Gun Mania                                    2000.07    G?906 JA          (no CD)
 ? *Gun Mania Zone Plus                          2000.10
-P *Gachaga Champ                                1999.01
 P Hyper Bishi Bashi Champ                       1998.07    GC908 JA          908    A02
 P Jikkyou Powerful Pro Yakyuu EX                1998.04    GX802 JA          802 JA B02
 P *Jikkyou Powerful Pro Yakyuu EX 98            1998.08
@@ -170,7 +170,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
   |   058232         |056879 |    |3644|                            SM5877   |
   |                  |       |    |----|         ADC0834                LM358|
   |                  |-------|            ADM485           CN4               |
-  |                                                         CN3      CN17    |
+  |                              CN5                        CN3      CN17    |
   |                                TEST_SW  DIP4 USB   CN8     RCA-L/R   CN9 |
   |--|          JAMMA            |-------------------------------------------|
      |---------------------------|
@@ -208,7 +208,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
   LA4705    - Sanyo LA4705 15W 2-channel power amplifier (SIP18)
   LM358     - National Semiconductor LM358 low power dual operational amplifier (SOIC8, @ 33C)
   CXD2925Q  - Sony CXD2925Q SPU (QFP100, @ 15Q)
-  CXD8561Q  - Sony CXD8561Q GPU (QFP208, @ 10M)
+  CXD8561Q  - Sony CXD8561Q GPU (QFP208, @ 10M) Also found CXD8561BQ in some units
   CXD8530CQ - Sony CXD8530CQ R3000-based CPU (QFP208, @ 17M)
   9536      - Xilinx XC9536 in-system-programmable CPLD (PLCC44, @ 22J)
   3644      - Hitachi H8/3644 HD6473644H microcontroller with 32k ROM & 1k RAM (QFP64, @ 18E,
@@ -226,12 +226,13 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
               is updated with the new game data
   29F016      Fujitsu 29F016A-90PFTN 2M x8 FlashROM (TSOP48, @ 27H/J/L/M & 31H/J/L/M)
               Also found Sharp LH28F016S (2M x8 TSOP40) in some units
-  KM416V256 - Samsung Electronics KM416V256BT-7 256k x 16 DRAM (TSOP44/40, @ 11Q)
-  KM48V514  - Samsung Electronics KM48V514BJ-6 512k x 8 EDO DRAM (SOJ28, @ 16G/H, 14G/H, 12G/H, 9G/H)
+  KM416V256 - Samsung Electronics KM416V256BT-7 256k x 16 DRAM (TSOP44/40, @ 11Q labelled 'SPUDR4M')
+  KM48V514  - Samsung Electronics KM48V514BJ-6 512k x 8 EDO DRAM (SOJ28, @ 16G/H, 14G/H, 12G/H, 9G/H labelled 'HDR4M8SJ')
+              Also found NEC 424805AL-A60 in some units
   32M       - NEC D481850GF-A12 128k x 32Bit x 2 Banks SGRAM (QFP100, @ 4P & 4L)
-
+              Also found Samsung KM4132G271Q-12 in some units
   Software  -
-              - 700A01.22G 4M MaskROM (DIP32, @ 22G)
+              - 700A01.22G 4M MaskROM (DIP32, @ 22G). AMD 27C040 is also used
               - SONY ATAPI CDROM drive, with CDROM disc containing program + graphics + sound
                 Some System 573 units contain a CR-583 drive dated October 1997, some contain a
                 CR-587 drive dated March 1998. Note that the CR-587 will not read CDR discs ;-)
@@ -269,6 +270,24 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
         C2242      - 2SC2242 Transistor
         PC817      - Sharp PC817 Photo-coupler IC (DIP4)
         PAL        - AMD PALCE16V8Q, stamped 'E765Bx' (DIP20)
+
+
+ GE877-PWB(C) (C)1998 KONAMI
+  |----------------------|
+|--       JAMMA OUT      --|
+|                          |
+|      CN6                 |
+|     CN5  CN4  CN3  CN2   |
+|                          |
+|                          |
+|         JAMMA IN         |
+|--------------------------|
+ Notes: This PCB is used for Gachagachamp. No ICs.
+
+        CN5 - To control lever unit (1P). uses 9 pins out of 15 pins of B15P-SHF-1AA
+        CN6 - To control lever unit (2P). uses 9 pins out of 14 pins of B14P-SHF-1AA
+        (CN4, CN3, CN2 is printed pattern only, no actual connector)
+
 
 
   Digital I/O PCB
@@ -329,6 +348,79 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
   CN3         - Connector joining this PCB to the MAIN PCB
   HYC24855    - ?
   RCA-L/R     - RCA connectors for left/right audio output
+
+  Drummania 10th Mix Multisession
+  -------------------------------
+
+  This box is used with multi-session System 573 games.
+
+  Main board is standard GX700 PCB with CDROM (Drummania 10th Mix Multisession)
+  and Digital I/O Board GX894-PWB(B)A
+  BIOS is on a small plug-in daughterboard.
+  Daughterboard contains one EPROM, one PAL22V10, 2 logic chips and a PIC16F84.
+  The dumps provided are the EPROM dumped separately and a dump of the 'board'
+  with it plugged in (reading may be affected by the PIC)
+
+
+  PCB Layout of External Multisession Box
+  ---------------------------------------
+
+  GXA25-PWB(A)(C)2000 KONAMI
+  |--------------------------------------------------------------------------|
+  |CN9  ADM232  LS273        PC16552          PC16552         XC9536(1)  CN13|
+  |DSW(8)  LS245   LS273            18.432MHz                        DS2401  |
+  |         |-------|      |-------|       |-------|      |-------|          |
+  | MB3793  |TOSHIBA|      |TOSHIBA|       |TOSHIBA|      |TOSHIBA|M48T58Y.6T|
+  |         |TC9446F|      |TC9446F|       |TC9446F|      |TC9446F|          |
+  |         |-016   |      |-016   |       |-016   |      |-016   |      CN12|
+  |         |-------|      |-------|       |-------|      |-------|          |
+  |       LV14                    XC9572XL                                   |
+  | CN16                 CN17                 CN18             CN19 XC9536(2)|
+  |PQ30RV21        LCX245   LCX245                                       CN11|
+  |                                  33.8688MHz              PQ30RV21        |
+  |    8.25MHz   HY57V641620                                                 |
+  |  |------------|     HY57V641620   XC2S200                                |
+  |  |TOSHIBA     |                                          FLASH.20T       |
+  |  |TMPR3927AF  |                                                      CN10|
+  |  |            |                                                          |
+  |  |            |                                     LS245   F245  F245   |
+  |  |            |HY57V641620  LCX245     DIP40                             |
+  |  |------------|     HY57V641620  LCX245                   ATAPI44        |
+  |                             LCX245              LED(HDD)  ATAPI40        |
+  |    CN7                      LCX245      CN14    LED(CD)           CN5    |
+  |--------------------------------------------------------------------------|
+  Notes: (all IC's shown)
+          TMPR3927     - Toshiba TMPR3927AF Risc Microprocessor (QFP240)
+          FLASH.20T    - Fujitsu 29F400TC Flash ROM (TSOP48)
+          ATAPI44      - IDE44 44-pin laptop type HDD connector (not used)
+          ATAPI40      - IDE40 40-pin flat cable HDD connector used for connection of CDROM drive
+          XC9572XL     - XILINX XC9572XL In-system Programmable CPLD stamped 'XA25A1' (TQFP100)
+          XC9536(1)    - XILINX CPLD stamped 'XA25A3' (PLCC44)
+          XC9536(2)    - XILINX CPLD stamped 'XA25A2' (PLCC44)
+          XC2S200      - XILINX XC2S200 SPARTAN FPGA (QFP208)
+          DS2401       - MAXIM Dallas DS2401 Silicon Serial Number (SOIC6)
+          M48T58Y      - ST M48T58Y Timekeeper NVRAM 8k bytes x8-bit (DIP28). Chip appears empty (0x04 fill) or unused
+          MB3793       - Fujitsu MB3793 Power-Voltage Monitoring IC with Watchdog Timer (SOIC8)
+          DIP40        - Empty DIP40 socket
+          HY57V641620  - Hyundai/Hynix HY57V641620 4 Banks x 1M x 16Bit Synchronous DRAM
+          PC16552D     - National PC16552D Dual Universal Asynchronous Receiver/Transmitter with FIFO's
+          TC9446F      - Toshiba TC9446F-016 Audio Digital Processor for Decode of Dolby Digital (AC-3) MPEG2 Audio
+          CN16-CN19    - Connector for sub board (3 of them are present). One board connects via a thin cable from
+                         CN1 to the main board to a connector on the security board labelled 'AMP BOX'.
+
+  Sub Board Layout
+  ----------------
+
+  GXA25-PWB(B) (C) 2000 KONAMI
+  |---------------------------------|
+  | TLP2630  LV14          ADM232   |
+  |CN2                           CN1|
+  |A2430         AK5330             |
+  |                                 |
+  |                          RCA L/R|
+  |ZUS1R50505        6379A          |
+  |                          LM358  |
+  |---------------------------------|
 
   */
 
@@ -446,6 +538,33 @@ public:
 	int m_tank_shutter_position;
 	int m_cable_holder_release;
 	double m_pad_position[ 6 ];
+	DECLARE_CUSTOM_INPUT_MEMBER(gn845pwbb_read);
+	DECLARE_CUSTOM_INPUT_MEMBER(gunmania_tank_shutter_sensor);
+	DECLARE_CUSTOM_INPUT_MEMBER(gunmania_cable_holder_sensor);
+	DECLARE_WRITE32_MEMBER(mb89371_w);
+	DECLARE_READ32_MEMBER(mb89371_r);
+	DECLARE_READ32_MEMBER(jamma_r);
+	DECLARE_READ32_MEMBER(control_r);
+	DECLARE_WRITE32_MEMBER(control_w);
+	DECLARE_READ32_MEMBER(atapi_r);
+	DECLARE_WRITE32_MEMBER(atapi_w);
+	DECLARE_WRITE32_MEMBER(atapi_reset_w);
+	DECLARE_WRITE32_MEMBER(security_w);
+	DECLARE_READ32_MEMBER(security_r);
+	DECLARE_READ32_MEMBER(flash_r);
+	DECLARE_WRITE32_MEMBER(flash_w);
+	DECLARE_READ32_MEMBER(ge765pwbba_r);
+	DECLARE_WRITE32_MEMBER(ge765pwbba_w);
+	DECLARE_READ32_MEMBER(gx700pwbf_io_r);
+	DECLARE_WRITE32_MEMBER(gx700pwbf_io_w);
+	DECLARE_READ32_MEMBER(gtrfrks_io_r);
+	DECLARE_WRITE32_MEMBER(gtrfrks_io_w);
+	DECLARE_READ32_MEMBER(gx894pwbba_r);
+	DECLARE_WRITE32_MEMBER(gx894pwbba_w);
+	DECLARE_WRITE32_MEMBER(dmx_io_w);
+	DECLARE_WRITE32_MEMBER(mamboagg_io_w);
+	DECLARE_WRITE32_MEMBER(gunmania_w);
+	DECLARE_READ32_MEMBER(gunmania_r);
 };
 
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, const char *s_fmt, ... )
@@ -463,28 +582,26 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine &machine, int n_level, 
 
 static const char *const diskregions[] = { ":cdrom0", ":cdrom1" };
 
-static WRITE32_HANDLER( mb89371_w )
+WRITE32_MEMBER(ksys573_state::mb89371_w)
 {
-	verboselog( space->machine(), 2, "mb89371_w %08x %08x %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "mb89371_w %08x %08x %08x\n", offset, mem_mask, data );
 }
 
-static READ32_HANDLER( mb89371_r )
+READ32_MEMBER(ksys573_state::mb89371_r)
 {
 	UINT32 data = 0xffffffff;
-	verboselog( space->machine(), 2, "mb89371_r %08x %08x %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "mb89371_r %08x %08x %08x\n", offset, mem_mask, data );
 	return data;
 }
 
-static READ32_HANDLER( jamma_r )
+READ32_MEMBER(ksys573_state::jamma_r)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
-	running_machine &machine = space->machine();
-	int security_cart_number = state->m_security_cart_number;
-	UINT32 data = input_port_read(machine, "IN1");
+	int security_cart_number = m_security_cart_number;
+	UINT32 data = ioport("IN1")->read();
 	data |= 0x000000c0;
 
-	ds2401_device *ds2401 = space->machine().device<ds2401_device>(security_cart_number ? "game_id" : "install_id");
-	device_secure_serial_flash *secflash = space->machine().device<device_secure_serial_flash>(security_cart_number ? "game_eeprom" : "install_eeprom");
+	ds2401_device *ds2401 = machine().device<ds2401_device>(security_cart_number ? "game_id" : "install_id");
+	device_secure_serial_flash *secflash = machine().device<device_secure_serial_flash>(security_cart_number ? "game_eeprom" : "install_eeprom");
 
 	if( ds2401 )
 	{
@@ -494,71 +611,69 @@ static READ32_HANDLER( jamma_r )
 	if( secflash )
 		data |= secflash->sda_r() << 18;
 
-	if( state->m_flash_device[1][0] == NULL )
+	if( m_flash_device[1][0] == NULL )
 	{
 		data |= ( 1 << 26 );
 	}
-	if( state->m_flash_device[2][0] == NULL )
+	if( m_flash_device[2][0] == NULL )
 	{
 		data |= ( 1 << 27 );
 	}
 
-	verboselog( machine, 2, "jamma_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "jamma_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	return data;
 }
 
-static READ32_HANDLER( control_r )
+READ32_MEMBER(ksys573_state::control_r)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
 
-	verboselog( space->machine(), 2, "control_r( %08x, %08x ) %08x\n", offset, mem_mask, state->m_control );
+	verboselog( machine(), 2, "control_r( %08x, %08x ) %08x\n", offset, mem_mask, m_control );
 
-	return state->m_control;
+	return m_control;
 }
 
-static WRITE32_HANDLER( control_w )
+WRITE32_MEMBER(ksys573_state::control_w)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
 	UINT32 control;
-	int old_bank = state->m_flash_bank;
+	int old_bank = m_flash_bank;
 
-	COMBINE_DATA(&state->m_control);
-	control = state->m_control;
+	COMBINE_DATA(&m_control);
+	control = m_control;
 
-	verboselog( space->machine(), 2, "control_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "control_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
-	state->m_flash_bank = -1;
+	m_flash_bank = -1;
 
 	// zs01 only, others are reached through security_w
-	device_secure_serial_flash *secflash = space->machine().device<device_secure_serial_flash>(state->m_security_cart_number ? "game_eeprom" : "install_eeprom");
+	device_secure_serial_flash *secflash = machine().device<device_secure_serial_flash>(m_security_cart_number ? "game_eeprom" : "install_eeprom");
 	if( dynamic_cast<zs01_device *>(secflash) )
 		secflash->sda_w( !( ( control >> 6 ) & 1 ) ); /* 0x40 */
 
-	if( state->m_flash_device[0][0] != NULL && ( control & ~0x43 ) == 0x00 )
+	if( m_flash_device[0][0] != NULL && ( control & ~0x43 ) == 0x00 )
 	{
-		state->m_flash_bank = (0 << 8) + ( ( control & 3 ) * 2 );
-		if( state->m_flash_bank != old_bank ) verboselog( space->machine(), 1, "onboard %d\n", control & 3 );
+		m_flash_bank = (0 << 8) + ( ( control & 3 ) * 2 );
+		if( m_flash_bank != old_bank ) verboselog( machine(), 1, "onboard %d\n", control & 3 );
 	}
-	else if( state->m_flash_device[1][0] != NULL && ( control & ~0x47 ) == 0x10 )
+	else if( m_flash_device[1][0] != NULL && ( control & ~0x47 ) == 0x10 )
 	{
-		state->m_flash_bank = (1 << 8) + ( ( control & 7 ) * 2 );
-		if( state->m_flash_bank != old_bank ) verboselog( space->machine(), 1, "pccard1 %d\n", control & 7 );
+		m_flash_bank = (1 << 8) + ( ( control & 7 ) * 2 );
+		if( m_flash_bank != old_bank ) verboselog( machine(), 1, "pccard1 %d\n", control & 7 );
 	}
-	else if( state->m_flash_device[2][0] != NULL && ( control & ~0x47 ) == 0x20 )
+	else if( m_flash_device[2][0] != NULL && ( control & ~0x47 ) == 0x20 )
 	{
-		state->m_flash_bank = (2 << 8) + ( ( control & 7 ) * 2 );
-		if( state->m_flash_bank != old_bank ) verboselog( space->machine(), 1, "pccard2 %d\n", control & 7 );
+		m_flash_bank = (2 << 8) + ( ( control & 7 ) * 2 );
+		if( m_flash_bank != old_bank ) verboselog( machine(), 1, "pccard2 %d\n", control & 7 );
 	}
-	else if( state->m_flash_device[3][0] != NULL && ( control & ~0x47 ) == 0x20 )
+	else if( m_flash_device[3][0] != NULL && ( control & ~0x47 ) == 0x20 )
 	{
-		state->m_flash_bank = (3 << 8) + ( ( control & 7 ) * 2 );
-		if( state->m_flash_bank != old_bank ) verboselog( space->machine(), 1, "pccard3 %d\n", control & 7 );
+		m_flash_bank = (3 << 8) + ( ( control & 7 ) * 2 );
+		if( m_flash_bank != old_bank ) verboselog( machine(), 1, "pccard3 %d\n", control & 7 );
 	}
-	else if( state->m_flash_device[4][0] != NULL && ( control & ~0x47 ) == 0x28 )
+	else if( m_flash_device[4][0] != NULL && ( control & ~0x47 ) == 0x28 )
 	{
-		state->m_flash_bank = (4 << 8) + ( ( control & 7 ) * 2 );
-		if( state->m_flash_bank != old_bank ) verboselog( space->machine(), 1, "pccard4 %d\n", control & 7 );
+		m_flash_bank = (4 << 8) + ( ( control & 7 ) * 2 );
+		if( m_flash_bank != old_bank ) verboselog( machine(), 1, "pccard4 %d\n", control & 7 );
 	}
 }
 
@@ -630,11 +745,9 @@ static TIMER_CALLBACK( atapi_xfer_end )
 	verboselog( machine, 2, "atapi_xfer_end: %d %d\n", state->m_atapi_xferlen, state->m_atapi_xfermod );
 }
 
-static READ32_HANDLER( atapi_r )
+READ32_MEMBER(ksys573_state::atapi_r)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
-	UINT8 *atapi_regs = state->m_atapi_regs;
-	running_machine &machine = space->machine();
+	UINT8 *atapi_regs = m_atapi_regs;
 	int reg, data;
 
 	if (mem_mask == 0x0000ffff)	// word-wide command read
@@ -642,28 +755,28 @@ static READ32_HANDLER( atapi_r )
 //      mame_printf_debug("ATAPI: packet read = %04x\n", atapi_data[atapi_data_ptr]);
 
 		// assert IRQ and drop DRQ
-		if (state->m_atapi_data_ptr == 0 && state->m_atapi_data_len == 0)
+		if (m_atapi_data_ptr == 0 && m_atapi_data_len == 0)
 		{
 			// get the data from the device
-			if( state->m_atapi_xferlen > 0 )
+			if( m_atapi_xferlen > 0 )
 			{
-				SCSIReadData( state->m_inserted_cdrom, state->m_atapi_data, state->m_atapi_xferlen );
-				state->m_atapi_data_len = state->m_atapi_xferlen;
+				SCSIReadData( m_inserted_cdrom, m_atapi_data, m_atapi_xferlen );
+				m_atapi_data_len = m_atapi_xferlen;
 			}
 
-			if (state->m_atapi_xfermod > MAX_TRANSFER_SIZE)
+			if (m_atapi_xfermod > MAX_TRANSFER_SIZE)
 			{
-				state->m_atapi_xferlen = MAX_TRANSFER_SIZE;
-				state->m_atapi_xfermod = state->m_atapi_xfermod - MAX_TRANSFER_SIZE;
+				m_atapi_xferlen = MAX_TRANSFER_SIZE;
+				m_atapi_xfermod = m_atapi_xfermod - MAX_TRANSFER_SIZE;
 			}
 			else
 			{
-				state->m_atapi_xferlen = state->m_atapi_xfermod;
-				state->m_atapi_xfermod = 0;
+				m_atapi_xferlen = m_atapi_xfermod;
+				m_atapi_xfermod = 0;
 			}
 
-			verboselog( machine, 2, "atapi_r: atapi_xferlen=%d\n", state->m_atapi_xferlen );
-			if( state->m_atapi_xferlen != 0 )
+			verboselog( machine(), 2, "atapi_r: atapi_xferlen=%d\n", m_atapi_xferlen );
+			if( m_atapi_xferlen != 0 )
 			{
 				atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
 				atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
@@ -675,27 +788,27 @@ static READ32_HANDLER( atapi_r )
 				atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
 			}
 
-			atapi_regs[ATAPI_REG_COUNTLOW] = state->m_atapi_xferlen & 0xff;
-			atapi_regs[ATAPI_REG_COUNTHIGH] = (state->m_atapi_xferlen>>8)&0xff;
+			atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
+			atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
 
-			psx_irq_set(space->machine(), 0x400);
+			psx_irq_set(machine(), 0x400);
 		}
 
-		if( state->m_atapi_data_ptr < state->m_atapi_data_len )
+		if( m_atapi_data_ptr < m_atapi_data_len )
 		{
-			data = state->m_atapi_data[state->m_atapi_data_ptr++];
-			data |= ( state->m_atapi_data[state->m_atapi_data_ptr++] << 8 );
-			if( state->m_atapi_data_ptr >= state->m_atapi_data_len )
+			data = m_atapi_data[m_atapi_data_ptr++];
+			data |= ( m_atapi_data[m_atapi_data_ptr++] << 8 );
+			if( m_atapi_data_ptr >= m_atapi_data_len )
 			{
-//              verboselog( machine, 2, "atapi_r: read all bytes\n" );
-				state->m_atapi_data_ptr = 0;
-				state->m_atapi_data_len = 0;
+//              verboselog( machine(), 2, "atapi_r: read all bytes\n" );
+				m_atapi_data_ptr = 0;
+				m_atapi_data_len = 0;
 
-				if( state->m_atapi_xferlen == 0 )
+				if( m_atapi_xferlen == 0 )
 				{
 					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
-					psx_irq_set(space->machine(), 0x400);
+					psx_irq_set(machine(), 0x400);
 				}
 			}
 		}
@@ -720,106 +833,104 @@ static READ32_HANDLER( atapi_r )
 		switch( reg )
 		{
 		case ATAPI_REG_DATA:
-			verboselog( machine, 1, "atapi_r: data=%02x\n", data );
+			verboselog( machine(), 1, "atapi_r: data=%02x\n", data );
 			break;
 		case ATAPI_REG_ERRFEAT:
-			verboselog( machine, 1, "atapi_r: errfeat=%02x\n", data );
+			verboselog( machine(), 1, "atapi_r: errfeat=%02x\n", data );
 			break;
 		case ATAPI_REG_INTREASON:
-			verboselog( machine, 1, "atapi_r: intreason=%02x\n", data );
+			verboselog( machine(), 1, "atapi_r: intreason=%02x\n", data );
 			break;
 		case ATAPI_REG_SAMTAG:
-			verboselog( machine, 1, "atapi_r: samtag=%02x\n", data );
+			verboselog( machine(), 1, "atapi_r: samtag=%02x\n", data );
 			break;
 		case ATAPI_REG_COUNTLOW:
-			verboselog( machine, 1, "atapi_r: countlow=%02x\n", data );
+			verboselog( machine(), 1, "atapi_r: countlow=%02x\n", data );
 			break;
 		case ATAPI_REG_COUNTHIGH:
-			verboselog( machine, 1, "atapi_r: counthigh=%02x\n", data );
+			verboselog( machine(), 1, "atapi_r: counthigh=%02x\n", data );
 			break;
 		case ATAPI_REG_DRIVESEL:
-			verboselog( machine, 1, "atapi_r: drivesel=%02x\n", data );
+			verboselog( machine(), 1, "atapi_r: drivesel=%02x\n", data );
 			break;
 		case ATAPI_REG_CMDSTATUS:
-			verboselog( machine, 1, "atapi_r: cmdstatus=%02x\n", data );
+			verboselog( machine(), 1, "atapi_r: cmdstatus=%02x\n", data );
 			break;
 		}
 
-//      mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, cpu_get_pc(&space->device()));
+//      mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, cpu_get_pc(&space.device()));
 
 		data <<= shift;
 	}
 
-	verboselog( machine, 2, "atapi_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "atapi_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
-static WRITE32_HANDLER( atapi_w )
+WRITE32_MEMBER(ksys573_state::atapi_w)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
-	UINT8 *atapi_regs = state->m_atapi_regs;
-	UINT8 *atapi_data = state->m_atapi_data;
-	running_machine &machine = space->machine();
+	UINT8 *atapi_regs = m_atapi_regs;
+	UINT8 *atapi_data = m_atapi_data;
 	int reg;
 
-	verboselog( machine, 2, "atapi_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "atapi_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	if (mem_mask == 0x0000ffff)	// word-wide command write
 	{
-		verboselog( machine, 2, "atapi_w: data=%04x\n", data );
+		verboselog( machine(), 2, "atapi_w: data=%04x\n", data );
 
 //      mame_printf_debug("ATAPI: packet write %04x\n", data);
-		atapi_data[state->m_atapi_data_ptr++] = data & 0xff;
-		atapi_data[state->m_atapi_data_ptr++] = data >> 8;
+		atapi_data[m_atapi_data_ptr++] = data & 0xff;
+		atapi_data[m_atapi_data_ptr++] = data >> 8;
 
-		if (state->m_atapi_cdata_wait)
+		if (m_atapi_cdata_wait)
 		{
-//          mame_printf_debug("ATAPI: waiting, ptr %d wait %d\n", state->m_atapi_data_ptr, state->m_atapi_cdata_wait);
-			if (state->m_atapi_data_ptr == state->m_atapi_cdata_wait)
+//          mame_printf_debug("ATAPI: waiting, ptr %d wait %d\n", m_atapi_data_ptr, m_atapi_cdata_wait);
+			if (m_atapi_data_ptr == m_atapi_cdata_wait)
 			{
 				// send it to the device
-				SCSIWriteData( state->m_inserted_cdrom, atapi_data, state->m_atapi_cdata_wait );
+				SCSIWriteData( m_inserted_cdrom, atapi_data, m_atapi_cdata_wait );
 
 				// assert IRQ
-				psx_irq_set(space->machine(), 0x400);
+				psx_irq_set(machine(), 0x400);
 
 				// not sure here, but clear DRQ at least?
 				atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 			}
 		}
 
-		else if ( state->m_atapi_data_ptr == 12 )
+		else if ( m_atapi_data_ptr == 12 )
 		{
 			int phase;
 
-			verboselog( machine, 2, "atapi_w: command %02x\n", atapi_data[0]&0xff );
+			verboselog( machine(), 2, "atapi_w: command %02x\n", atapi_data[0]&0xff );
 
 			// reset data pointer for reading SCSI results
-			state->m_atapi_data_ptr = 0;
-			state->m_atapi_data_len = 0;
+			m_atapi_data_ptr = 0;
+			m_atapi_data_len = 0;
 
 			// send it to the SCSI device
-			SCSISetCommand( state->m_inserted_cdrom, state->m_atapi_data, 12 );
-			SCSIExecCommand( state->m_inserted_cdrom, &state->m_atapi_xferlen );
-			SCSIGetPhase( state->m_inserted_cdrom, &phase );
+			SCSISetCommand( m_inserted_cdrom, m_atapi_data, 12 );
+			SCSIExecCommand( m_inserted_cdrom, &m_atapi_xferlen );
+			SCSIGetPhase( m_inserted_cdrom, &phase );
 
-			if (state->m_atapi_xferlen != -1)
+			if (m_atapi_xferlen != -1)
 			{
-//              mame_printf_debug("ATAPI: SCSI command %02x returned %d bytes from the device\n", atapi_data[0]&0xff, state->m_atapi_xferlen);
+//              mame_printf_debug("ATAPI: SCSI command %02x returned %d bytes from the device\n", atapi_data[0]&0xff, m_atapi_xferlen);
 
 				// store the returned command length in the ATAPI regs, splitting into
 				// multiple transfers if necessary
-				state->m_atapi_xfermod = 0;
-				if (state->m_atapi_xferlen > MAX_TRANSFER_SIZE)
+				m_atapi_xfermod = 0;
+				if (m_atapi_xferlen > MAX_TRANSFER_SIZE)
 				{
-					state->m_atapi_xfermod = state->m_atapi_xferlen - MAX_TRANSFER_SIZE;
-					state->m_atapi_xferlen = MAX_TRANSFER_SIZE;
+					m_atapi_xfermod = m_atapi_xferlen - MAX_TRANSFER_SIZE;
+					m_atapi_xferlen = MAX_TRANSFER_SIZE;
 				}
 
-				atapi_regs[ATAPI_REG_COUNTLOW] = state->m_atapi_xferlen & 0xff;
-				atapi_regs[ATAPI_REG_COUNTHIGH] = (state->m_atapi_xferlen>>8)&0xff;
+				atapi_regs[ATAPI_REG_COUNTLOW] = m_atapi_xferlen & 0xff;
+				atapi_regs[ATAPI_REG_COUNTHIGH] = (m_atapi_xferlen>>8)&0xff;
 
-				if (state->m_atapi_xferlen == 0)
+				if (m_atapi_xferlen == 0)
 				{
 					// if no data to return, set the registers properly
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY;
@@ -835,7 +946,7 @@ static WRITE32_HANDLER( atapi_w )
 				switch( phase )
 				{
 				case SCSI_PHASE_DATAOUT:
-					state->m_atapi_cdata_wait = state->m_atapi_xferlen;
+					m_atapi_cdata_wait = m_atapi_xferlen;
 					break;
 				}
 
@@ -849,12 +960,12 @@ static WRITE32_HANDLER( atapi_w )
 
 					case 0x45: // PLAY
 						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
-						state->m_atapi_timer->adjust( downcast<cpu_device *>(&space->device())->cycles_to_attotime( ATAPI_CYCLES_PER_SECTOR ) );
+						m_atapi_timer->adjust( downcast<cpu_device *>(&space.device())->cycles_to_attotime( ATAPI_CYCLES_PER_SECTOR ) );
 						break;
 				}
 
 				// assert IRQ
-				psx_irq_set(space->machine(), 0x400);
+				psx_irq_set(machine(), 0x400);
 			}
 			else
 			{
@@ -879,37 +990,37 @@ static WRITE32_HANDLER( atapi_w )
 		switch( reg )
 		{
 		case ATAPI_REG_DATA:
-			verboselog( machine, 1, "atapi_w: data=%02x\n", data );
+			verboselog( machine(), 1, "atapi_w: data=%02x\n", data );
 			break;
 		case ATAPI_REG_ERRFEAT:
-			verboselog( machine, 1, "atapi_w: errfeat=%02x\n", data );
+			verboselog( machine(), 1, "atapi_w: errfeat=%02x\n", data );
 			break;
 		case ATAPI_REG_INTREASON:
-			verboselog( machine, 1, "atapi_w: intreason=%02x\n", data );
+			verboselog( machine(), 1, "atapi_w: intreason=%02x\n", data );
 			break;
 		case ATAPI_REG_SAMTAG:
-			verboselog( machine, 1, "atapi_w: samtag=%02x\n", data );
+			verboselog( machine(), 1, "atapi_w: samtag=%02x\n", data );
 			break;
 		case ATAPI_REG_COUNTLOW:
-			verboselog( machine, 1, "atapi_w: countlow=%02x\n", data );
+			verboselog( machine(), 1, "atapi_w: countlow=%02x\n", data );
 			break;
 		case ATAPI_REG_COUNTHIGH:
-			verboselog( machine, 1, "atapi_w: counthigh=%02x\n", data );
+			verboselog( machine(), 1, "atapi_w: counthigh=%02x\n", data );
 			break;
 		case ATAPI_REG_DRIVESEL:
-			verboselog( machine, 1, "atapi_w: drivesel=%02x\n", data );
+			verboselog( machine(), 1, "atapi_w: drivesel=%02x\n", data );
 			break;
 		case ATAPI_REG_CMDSTATUS:
-			verboselog( machine, 1, "atapi_w: cmdstatus=%02x\n", data );
+			verboselog( machine(), 1, "atapi_w: cmdstatus=%02x\n", data );
 			break;
 		}
 
 		atapi_regs[reg] = data;
-//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, cpu_get_pc(&space->device()));
+//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, cpu_get_pc(&space.device()));
 
 		if (reg == ATAPI_REG_CMDSTATUS)
 		{
-//          mame_printf_debug("ATAPI command %x issued! (PC=%x)\n", data, cpu_get_pc(&space->device()));
+//          mame_printf_debug("ATAPI command %x issued! (PC=%x)\n", data, cpu_get_pc(&space.device()));
 
 			switch (data)
 			{
@@ -917,27 +1028,27 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
 
-					state->m_atapi_data_ptr = 0;
-					state->m_atapi_data_len = 0;
+					m_atapi_data_ptr = 0;
+					m_atapi_data_len = 0;
 
 					/* we have no data */
-					state->m_atapi_xferlen = 0;
-					state->m_atapi_xfermod = 0;
+					m_atapi_xferlen = 0;
+					m_atapi_xfermod = 0;
 
-					state->m_atapi_cdata_wait = 0;
+					m_atapi_cdata_wait = 0;
 					break;
 
 				case 0xa1:	// IDENTIFY PACKET DEVICE
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
 
-					state->m_atapi_data_ptr = 0;
-					state->m_atapi_data_len = 512;
+					m_atapi_data_ptr = 0;
+					m_atapi_data_len = 512;
 
 					/* we have no data */
-					state->m_atapi_xferlen = 0;
-					state->m_atapi_xfermod = 0;
+					m_atapi_xferlen = 0;
+					m_atapi_xfermod = 0;
 
-					memset( atapi_data, 0, state->m_atapi_data_len );
+					memset( atapi_data, 0, m_atapi_data_len );
 
 					atapi_data[ 0 ^ 1 ] = 0x85;	// ATAPI device, cmd set 5 compliant, DRQ within 3 ms of PACKET command
 					atapi_data[ 1 ^ 1 ] = 0x00;
@@ -971,16 +1082,16 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_regs[ATAPI_REG_COUNTLOW] = 0;
 					atapi_regs[ATAPI_REG_COUNTHIGH] = 2;
 
-					psx_irq_set(space->machine(), 0x400);
+					psx_irq_set(machine(), 0x400);
 					break;
 
 				case 0xef:	// SET FEATURES
 					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 
-					state->m_atapi_data_ptr = 0;
-					state->m_atapi_data_len = 0;
+					m_atapi_data_ptr = 0;
+					m_atapi_data_len = 0;
 
-					psx_irq_set(space->machine(), 0x400);
+					psx_irq_set(machine(), 0x400);
 					break;
 
 				default:
@@ -1046,16 +1157,15 @@ static void atapi_init(running_machine &machine)
 	state->save_item( NAME(state->m_atapi_xfermod) );
 }
 
-static WRITE32_HANDLER( atapi_reset_w )
+WRITE32_MEMBER(ksys573_state::atapi_reset_w)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
-	UINT8 *atapi_regs = state->m_atapi_regs;
+	UINT8 *atapi_regs = m_atapi_regs;
 
-	verboselog( space->machine(), 2, "atapi_reset_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "atapi_reset_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	if (data)
 	{
-		verboselog( space->machine(), 2, "atapi_reset_w: reset\n" );
+		verboselog( machine(), 2, "atapi_reset_w: reset\n" );
 
 //      mame_printf_debug("ATAPI reset\n");
 
@@ -1064,12 +1174,12 @@ static WRITE32_HANDLER( atapi_reset_w )
 		atapi_regs[ATAPI_REG_COUNTLOW] = 0x14;
 		atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb;
 
-		state->m_atapi_data_ptr = 0;
-		state->m_atapi_data_len = 0;
-		state->m_atapi_cdata_wait = 0;
+		m_atapi_data_ptr = 0;
+		m_atapi_data_len = 0;
+		m_atapi_cdata_wait = 0;
 
-		state->m_atapi_xferlen = 0;
-		state->m_atapi_xfermod = 0;
+		m_atapi_xferlen = 0;
+		m_atapi_xfermod = 0;
 	}
 }
 
@@ -1092,19 +1202,17 @@ static void cdrom_dma_write( ksys573_state *state, UINT32 n_address, INT32 n_siz
 	state->m_atapi_timer->adjust(state->machine().device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (state->m_atapi_xferlen/2048))));
 }
 
-static WRITE32_HANDLER( security_w )
+WRITE32_MEMBER(ksys573_state::security_w)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
-	int security_cart_number = state->m_security_cart_number;
-	running_machine &machine = space->machine();
-	COMBINE_DATA( &state->m_n_security_control );
+	int security_cart_number = m_security_cart_number;
+	COMBINE_DATA( &m_n_security_control );
 
-	verboselog( space->machine(), 2, "security_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "security_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	if( ACCESSING_BITS_0_15 )
 	{
-		ds2401_device *ds2401 = space->machine().device<ds2401_device>(security_cart_number ? "game_id" : "install_id");
-		device_secure_serial_flash *secflash = space->machine().device<device_secure_serial_flash>(security_cart_number ? "game_eeprom" : "install_eeprom");
+		ds2401_device *ds2401 = machine().device<ds2401_device>(security_cart_number ? "game_id" : "install_id");
+		device_secure_serial_flash *secflash = machine().device<device_secure_serial_flash>(security_cart_number ? "game_eeprom" : "install_eeprom");
 
 		if( secflash ) {
 			if( !dynamic_cast<zs01_device *>(secflash) )
@@ -1119,37 +1227,35 @@ static WRITE32_HANDLER( security_w )
 			ds2401->write(!( ( data >> 4 ) & 1 ));
 		}
 
-		if( state->m_security_callback != NULL )
+		if( m_security_callback != NULL )
 		{
-			(*state->m_security_callback)( machine, data & 0xff );
+			(*m_security_callback)( machine(), data & 0xff );
 		}
 	}
 
-	input_port_write_safe( machine, "OUT1", data, mem_mask );
+	machine().root_device().ioport("OUT1")->write_safe( data, mem_mask );
 }
 
-static READ32_HANDLER( security_r )
+READ32_MEMBER(ksys573_state::security_r)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
 
-	UINT32 data = state->m_n_security_control;
-	verboselog( space->machine(), 2, "security_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	UINT32 data = m_n_security_control;
+	verboselog( machine(), 2, "security_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
-static READ32_HANDLER( flash_r )
+READ32_MEMBER(ksys573_state::flash_r)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
 	UINT32 data = 0;
 
-	if( state->m_flash_bank < 0 )
+	if( m_flash_bank < 0 )
 	{
-		mame_printf_debug( "%08x: flash_r( %08x, %08x ) no bank selected %08x\n", cpu_get_pc(&space->device()), offset, mem_mask, state->m_control );
+		mame_printf_debug( "%08x: flash_r( %08x, %08x ) no bank selected %08x\n", cpu_get_pc(&space.device()), offset, mem_mask, m_control );
 		data = 0xffffffff;
 	}
 	else
 	{
-		fujitsu_29f016a_device **flash_base = &state->m_flash_device[state->m_flash_bank >> 8][state->m_flash_bank & 0xff];
+		fujitsu_29f016a_device **flash_base = &m_flash_device[m_flash_bank >> 8][m_flash_bank & 0xff];
 		int adr = offset * 2;
 
 		if( ACCESSING_BITS_0_7 )
@@ -1170,24 +1276,23 @@ static READ32_HANDLER( flash_r )
 		}
 	}
 
-	verboselog( space->machine(), 2, "flash_r( %08x, %08x, %08x) bank = %08x\n", offset, mem_mask, data, state->m_flash_bank );
+	verboselog( machine(), 2, "flash_r( %08x, %08x, %08x) bank = %08x\n", offset, mem_mask, data, m_flash_bank );
 
 	return data;
 }
 
-static WRITE32_HANDLER( flash_w )
+WRITE32_MEMBER(ksys573_state::flash_w)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
 
-	verboselog( space->machine(), 2, "flash_w( %08x, %08x, %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "flash_w( %08x, %08x, %08x\n", offset, mem_mask, data );
 
-	if( state->m_flash_bank < 0 )
+	if( m_flash_bank < 0 )
 	{
-		mame_printf_debug( "%08x: flash_w( %08x, %08x, %08x ) no bank selected %08x\n", cpu_get_pc(&space->device()), offset, mem_mask, data, state->m_control );
+		mame_printf_debug( "%08x: flash_w( %08x, %08x, %08x ) no bank selected %08x\n", cpu_get_pc(&space.device()), offset, mem_mask, data, m_control );
 	}
 	else
 	{
-		fujitsu_29f016a_device **flash_base = &state->m_flash_device[state->m_flash_bank >> 8][state->m_flash_bank & 0xff];
+		fujitsu_29f016a_device **flash_base = &m_flash_device[m_flash_bank >> 8][m_flash_bank & 0xff];
 		int adr = offset * 2;
 
 		if( ACCESSING_BITS_0_7 )
@@ -1209,20 +1314,20 @@ static WRITE32_HANDLER( flash_w )
 	}
 }
 
-static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( konami573_map, AS_PROGRAM, 32, ksys573_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
-	AM_RANGE(0x1f000000, 0x1f3fffff) AM_READWRITE( flash_r, flash_w )
+	AM_RANGE(0x1f000000, 0x1f3fffff) AM_READWRITE(flash_r, flash_w )
 	AM_RANGE(0x1f400000, 0x1f400003) AM_READ_PORT( "IN0" ) AM_WRITE_PORT( "OUT0" )
-	AM_RANGE(0x1f400004, 0x1f400007) AM_READ( jamma_r )
+	AM_RANGE(0x1f400004, 0x1f400007) AM_READ(jamma_r )
 	AM_RANGE(0x1f400008, 0x1f40000b) AM_READ_PORT( "IN2" )
 	AM_RANGE(0x1f40000c, 0x1f40000f) AM_READ_PORT( "IN3" )
-	AM_RANGE(0x1f480000, 0x1f48000f) AM_READWRITE( atapi_r, atapi_w )	// IDE controller, used mostly in ATAPI mode (only 3 pure IDE commands seen so far)
-	AM_RANGE(0x1f500000, 0x1f500003) AM_READWRITE( control_r, control_w )	// Konami can't make a game without a "control" register.
-	AM_RANGE(0x1f560000, 0x1f560003) AM_WRITE( atapi_reset_w )
+	AM_RANGE(0x1f480000, 0x1f48000f) AM_READWRITE(atapi_r, atapi_w )	// IDE controller, used mostly in ATAPI mode (only 3 pure IDE commands seen so far)
+	AM_RANGE(0x1f500000, 0x1f500003) AM_READWRITE(control_r, control_w )	// Konami can't make a game without a "control" register.
+	AM_RANGE(0x1f560000, 0x1f560003) AM_WRITE(atapi_reset_w )
 	AM_RANGE(0x1f5c0000, 0x1f5c0003) AM_WRITENOP				// watchdog?
-	AM_RANGE(0x1f620000, 0x1f623fff) AM_DEVREADWRITE8("m48t58", timekeeper_r, timekeeper_w, 0x00ff00ff)
+	AM_RANGE(0x1f620000, 0x1f623fff) AM_DEVREADWRITE8_LEGACY("m48t58", timekeeper_r, timekeeper_w, 0x00ff00ff)
 	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE(mb89371_r, mb89371_w)
-	AM_RANGE(0x1f6a0000, 0x1f6a0003) AM_READWRITE( security_r, security_w )
+	AM_RANGE(0x1f6a0000, 0x1f6a0003) AM_READWRITE(security_r, security_w )
 	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_ROM AM_SHARE("share2") AM_REGION("bios", 0)
 	AM_RANGE(0x80000000, 0x803fffff) AM_RAM AM_SHARE("share1") /* ram mirror */
 	AM_RANGE(0x9fc00000, 0x9fc7ffff) AM_ROM AM_SHARE("share2") /* bios mirror */
@@ -1261,8 +1366,8 @@ static void *atapi_get_device(running_machine &machine)
 static void update_mode( running_machine &machine )
 {
 	ksys573_state *state = machine.driver_data<ksys573_state>();
-	int cart = input_port_read(machine, "CART");
-	int cd = input_port_read( machine, "CD" );
+	int cart = state->ioport("CART")->read();
+	int cd = state->ioport( "CD" )->read();
 	SCSIInstance *new_cdrom;
 
 	if( state->machine().device<device_secure_serial_flash>("game_eeprom") )
@@ -1376,16 +1481,16 @@ todo:
 
 */
 
-static READ32_HANDLER( ge765pwbba_r )
+READ32_MEMBER(ksys573_state::ge765pwbba_r)
 {
-	device_t *upd4701 = space->machine().device("upd4701");
+	device_t *upd4701 = machine().device("upd4701");
 	UINT32 data = 0;
 
 	switch (offset)
 	{
 	case 0x26:
-		upd4701_y_add(upd4701, 0, input_port_read_safe(space->machine(), "uPD4701_y", 0), 0xffff);
-		upd4701_switches_set(upd4701, 0, input_port_read_safe(space->machine(), "uPD4701_switches", 0));
+		upd4701_y_add(upd4701, 0, ioport("uPD4701_y")->read_safe(0), 0xffff);
+		upd4701_switches_set(upd4701, 0, ioport("uPD4701_switches")->read_safe(0));
 
 		upd4701_cs_w(upd4701, 0, 0);
 		upd4701_xy_w(upd4701, 0, 1);
@@ -1406,17 +1511,17 @@ static READ32_HANDLER( ge765pwbba_r )
 		break;
 
 	default:
-		verboselog(space->machine(), 0, "ge765pwbba_r: unhandled offset %08x %08x\n", offset, mem_mask);
+		verboselog(machine(), 0, "ge765pwbba_r: unhandled offset %08x %08x\n", offset, mem_mask);
 		break;
 	}
 
-	verboselog(space->machine(), 2, "ge765pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data);
+	verboselog(machine(), 2, "ge765pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data);
 	return data;
 }
 
-static WRITE32_HANDLER( ge765pwbba_w )
+WRITE32_MEMBER(ksys573_state::ge765pwbba_w)
 {
-	device_t *upd4701 = space->machine().device("upd4701");
+	device_t *upd4701 = machine().device("upd4701");
 	switch (offset)
 	{
 	case 0x04:
@@ -1445,17 +1550,18 @@ static WRITE32_HANDLER( ge765pwbba_w )
 		break;
 
 	default:
-		verboselog(space->machine(), 0, "ge765pwbba_w: unhandled offset %08x %08x %08x\n", offset, mem_mask, data);
+		verboselog(machine(), 0, "ge765pwbba_w: unhandled offset %08x %08x %08x\n", offset, mem_mask, data);
 		break;
 	}
 
-	verboselog(space->machine(), 2, "ge765pwbba_w( %08x, %08x, %08x )\n", offset, mem_mask, data);
+	verboselog(machine(), 2, "ge765pwbba_w( %08x, %08x, %08x )\n", offset, mem_mask, data);
 }
 
 static DRIVER_INIT( ge765pwbba )
 {
+	ksys573_state *state = machine.driver_data<ksys573_state>();
 	DRIVER_INIT_CALL(konami573);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f640000, 0x1f6400ff, FUNC(ge765pwbba_r), FUNC(ge765pwbba_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f640000, 0x1f6400ff, read32_delegate(FUNC(ksys573_state::ge765pwbba_r),state), write32_delegate(FUNC(ksys573_state::ge765pwbba_w),state));
 }
 
 /*
@@ -1466,7 +1572,7 @@ Analogue I/O board
 
 */
 
-static READ32_HANDLER( gx700pwbf_io_r )
+READ32_MEMBER(ksys573_state::gx700pwbf_io_r)
 {
 	UINT32 data = 0;
 	switch( offset )
@@ -1492,7 +1598,7 @@ static READ32_HANDLER( gx700pwbf_io_r )
 		break;
 	}
 
-	verboselog( space->machine(), 2, "gx700pwbf_io_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "gx700pwbf_io_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	return data;
 }
@@ -1518,9 +1624,9 @@ static void gx700pwbf_output( running_machine &machine, int offset, UINT8 data )
 	state->m_gx700pwbf_output_data[ offset ] = data;
 }
 
-static WRITE32_HANDLER( gx700pwbf_io_w )
+WRITE32_MEMBER(ksys573_state::gx700pwbf_io_w)
 {
-	verboselog( space->machine(), 2, "gx700pwbf_io_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "gx700pwbf_io_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	switch( offset )
 	{
@@ -1528,28 +1634,28 @@ static WRITE32_HANDLER( gx700pwbf_io_w )
 
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx700pwbf_output( space->machine(), 0, data & 0xff );
+			gx700pwbf_output( machine(), 0, data & 0xff );
 		}
 		break;
 
 	case 0x22:
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx700pwbf_output( space->machine(), 1, data & 0xff );
+			gx700pwbf_output( machine(), 1, data & 0xff );
 		}
 		break;
 
 	case 0x24:
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx700pwbf_output( space->machine(), 2, data & 0xff );
+			gx700pwbf_output( machine(), 2, data & 0xff );
 		}
 		break;
 
 	case 0x26:
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx700pwbf_output( space->machine(), 3, data & 0xff );
+			gx700pwbf_output( machine(), 3, data & 0xff );
 		}
 		break;
 
@@ -1567,7 +1673,7 @@ static void gx700pwfbf_init( running_machine &machine, void (*output_callback_fu
 
 	state->m_gx700pwfbf_output_callback = output_callback_func;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f640000, 0x1f6400ff, FUNC(gx700pwbf_io_r), FUNC(gx700pwbf_io_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f640000, 0x1f6400ff, read32_delegate(FUNC(ksys573_state::gx700pwbf_io_r),state), write32_delegate(FUNC(ksys573_state::gx700pwbf_io_w),state));
 
 	state->save_item( NAME(state->m_gx700pwbf_output_data) );
 }
@@ -1649,11 +1755,10 @@ static void gn845pwbb_clk_w( running_machine &machine, int offset, int data )
 		state->m_stage[ offset ].state, state->m_stage[ offset ].DO, state->m_stage[ offset ].shift, state->m_stage[ offset ].bit, state->m_stage_mask );
 }
 
-static CUSTOM_INPUT( gn845pwbb_read )
+CUSTOM_INPUT_MEMBER(ksys573_state::gn845pwbb_read)
 {
-	ksys573_state *state = field.machine().driver_data<ksys573_state>();
 
-	return input_port_read(field.machine(), "STAGE") & state->m_stage_mask;
+	return ioport("STAGE")->read() & m_stage_mask;
 }
 
 static void gn845pwbb_output_callback( running_machine &machine, int offset, int data )
@@ -1765,7 +1870,7 @@ todo:
 
 */
 
-static READ32_HANDLER( gtrfrks_io_r )
+READ32_MEMBER(ksys573_state::gtrfrks_io_r)
 {
 	UINT32 data = 0;
 	switch( offset )
@@ -1774,17 +1879,17 @@ static READ32_HANDLER( gtrfrks_io_r )
 		break;
 
 	default:
-		verboselog( space->machine(), 0, "gtrfrks_io_r: unhandled offset %08x, %08x\n", offset, mem_mask );
+		verboselog( machine(), 0, "gtrfrks_io_r: unhandled offset %08x, %08x\n", offset, mem_mask );
 		break;
 	}
 
-	verboselog( space->machine(), 2, "gtrfrks_io_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "gtrfrks_io_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
-static WRITE32_HANDLER( gtrfrks_io_w )
+WRITE32_MEMBER(ksys573_state::gtrfrks_io_w)
 {
-	verboselog( space->machine(), 2, "gtrfrks_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "gtrfrks_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	switch( offset )
 	{
@@ -1799,7 +1904,7 @@ static WRITE32_HANDLER( gtrfrks_io_w )
 		break;
 
 	default:
-		verboselog( space->machine(), 0, "gtrfrks_io_w: unhandled offset %08x, %08x\n", offset, mem_mask );
+		verboselog( machine(), 0, "gtrfrks_io_w: unhandled offset %08x, %08x\n", offset, mem_mask );
 		break;
 	}
 }
@@ -1807,15 +1912,14 @@ static WRITE32_HANDLER( gtrfrks_io_w )
 static DRIVER_INIT( gtrfrks )
 {
 	DRIVER_INIT_CALL(konami573);
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f600000, 0x1f6000ff, FUNC(gtrfrks_io_r), FUNC(gtrfrks_io_w) );
+	ksys573_state *state = machine.driver_data<ksys573_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f600000, 0x1f6000ff, read32_delegate(FUNC(ksys573_state::gtrfrks_io_r),state), write32_delegate(FUNC(ksys573_state::gtrfrks_io_w),state));
 }
 
 /* GX894 digital i/o */
 
-static READ32_HANDLER( gx894pwbba_r )
+READ32_MEMBER(ksys573_state::gx894pwbba_r)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
 	UINT32 data = 0;
 
 	switch( offset )
@@ -1832,7 +1936,7 @@ static READ32_HANDLER( gx894pwbba_r )
 	case 0x2b:
 		if( ACCESSING_BITS_0_15 )
 		{
-			mas3507d_device *mas3507d = space->machine().device<mas3507d_device>("mpeg");
+			mas3507d_device *mas3507d = machine().device<mas3507d_device>("mpeg");
 			data |= mas3507d->i2c_scl_r() << 13;
 			data |= mas3507d->i2c_sda_r() << 12;
 		}
@@ -1844,8 +1948,8 @@ static READ32_HANDLER( gx894pwbba_r )
 	case 0x2d:
 		if( ACCESSING_BITS_0_15 )
 		{
-			data |= state->m_gx894_ram[ state->m_gx894_ram_read_offset / 2 ];
-			state->m_gx894_ram_read_offset += 2;
+			data |= m_gx894_ram[ m_gx894_ram_read_offset / 2 ];
+			m_gx894_ram_read_offset += 2;
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
@@ -1893,7 +1997,7 @@ static READ32_HANDLER( gx894pwbba_r )
 	case 0x3b:
 		if( ACCESSING_BITS_16_31 )
 		{
-			data |= space->machine().device<ds2401_device>("digital_id")->read() << 28;
+			data |= machine().device<ds2401_device>("digital_id")->read() << 28;
 		}
 		break;
 	case 0x3d:
@@ -1916,8 +2020,8 @@ static READ32_HANDLER( gx894pwbba_r )
 		break;
 	}
 
-	verboselog( space->machine(), 2, "gx894pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
-//  printf( "%08x: gx894pwbba_r( %08x, %08x ) %08x\n", cpu_get_pc(&space->device()), offset, mem_mask, data );
+	verboselog( machine(), 2, "gx894pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
+//  printf( "%08x: gx894pwbba_r( %08x, %08x ) %08x\n", cpu_get_pc(&space.device()), offset, mem_mask, data );
 	return data;
 }
 
@@ -1953,11 +2057,10 @@ static void gx894pwbba_output( running_machine &machine, int offset, UINT8 data 
 	state->m_gx894pwbba_output_data[ offset ] = data;
 }
 
-static WRITE32_HANDLER( gx894pwbba_w )
+WRITE32_MEMBER(ksys573_state::gx894pwbba_w)
 {
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
 	char buff[33];
-	UINT32 olda=state->m_a,oldb=state->m_b,oldc=state->m_c,oldd=state->m_d;
+	UINT32 olda=m_a,oldb=m_b,oldc=m_c,oldd=m_d;
 
 //  printf( "gx894pwbba_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
@@ -1966,7 +2069,7 @@ static WRITE32_HANDLER( gx894pwbba_w )
 		return;
 	}
 
-	verboselog( space->machine(), 2, "gx894pwbba_w( %08x, %08x, %08x) %s\n", offset, mem_mask, data, binary( buff, data ) );
+	verboselog( machine(), 2, "gx894pwbba_w( %08x, %08x, %08x) %s\n", offset, mem_mask, data, binary( buff, data ) );
 
 	switch( offset )
 	{
@@ -1988,7 +2091,7 @@ static WRITE32_HANDLER( gx894pwbba_w )
 		break;
 	case 0x2b:
 		if(ACCESSING_BITS_0_15) {
-			mas3507d_device *mas3507d = space->machine().device<mas3507d_device>("mpeg");
+			mas3507d_device *mas3507d = machine().device<mas3507d_device>("mpeg");
 			mas3507d->i2c_scl_w(data & 0x2000);
 			mas3507d->i2c_sda_w(data & 0x1000);
 		}
@@ -2003,32 +2106,32 @@ static WRITE32_HANDLER( gx894pwbba_w )
 	case 0x2c:
 		if( ACCESSING_BITS_0_15 )
 		{
-			state->m_gx894_ram_write_offset &= 0x0000ffff;
-			state->m_gx894_ram_write_offset |= ( data & 0x0000ffff ) << 16;
+			m_gx894_ram_write_offset &= 0x0000ffff;
+			m_gx894_ram_write_offset |= ( data & 0x0000ffff ) << 16;
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
-			state->m_gx894_ram_write_offset &= 0xffff0000;
-			state->m_gx894_ram_write_offset |= ( data & 0xffff0000 ) >> 16;
+			m_gx894_ram_write_offset &= 0xffff0000;
+			m_gx894_ram_write_offset |= ( data & 0xffff0000 ) >> 16;
 		}
 		break;
 	case 0x2d:
 		if( ACCESSING_BITS_0_15 )
 		{
-			state->m_gx894_ram[ state->m_gx894_ram_write_offset / 2 ] = data & 0xffff;
-			state->m_gx894_ram_write_offset += 2;
+			m_gx894_ram[ m_gx894_ram_write_offset / 2 ] = data & 0xffff;
+			m_gx894_ram_write_offset += 2;
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
-			state->m_gx894_ram_read_offset &= 0x0000ffff;
-			state->m_gx894_ram_read_offset |= ( data & 0xffff0000 ) << 0;
+			m_gx894_ram_read_offset &= 0x0000ffff;
+			m_gx894_ram_read_offset |= ( data & 0xffff0000 ) << 0;
 		}
 		break;
 	case 0x2e:
 		if( ACCESSING_BITS_0_15 )
 		{
-			state->m_gx894_ram_read_offset &= 0xffff0000;
-			state->m_gx894_ram_read_offset |= ( data & 0x0000ffff ) >> 0;
+			m_gx894_ram_read_offset &= 0xffff0000;
+			m_gx894_ram_read_offset |= ( data & 0x0000ffff ) >> 0;
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
@@ -2038,24 +2141,24 @@ static WRITE32_HANDLER( gx894pwbba_w )
 	case 0x38:
 		if( ACCESSING_BITS_16_31 )
 		{
-			gx894pwbba_output( space->machine(), 0, ( data >> 28 ) & 0xf );
+			gx894pwbba_output( machine(), 0, ( data >> 28 ) & 0xf );
 		}
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx894pwbba_output( space->machine(), 1, ( data >> 12 ) & 0xf );
+			gx894pwbba_output( machine(), 1, ( data >> 12 ) & 0xf );
 		}
-		COMBINE_DATA( &state->m_a );
+		COMBINE_DATA( &m_a );
 		break;
 	case 0x39:
 		if( ACCESSING_BITS_16_31 )
 		{
-			gx894pwbba_output( space->machine(), 7, ( data >> 28 ) & 0xf );
+			gx894pwbba_output( machine(), 7, ( data >> 28 ) & 0xf );
 		}
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx894pwbba_output( space->machine(), 3, ( data >> 12 ) & 0xf );
+			gx894pwbba_output( machine(), 3, ( data >> 12 ) & 0xf );
 		}
-		COMBINE_DATA( &state->m_b );
+		COMBINE_DATA( &m_b );
 		break;
 	case 0x3a:
 		if( ACCESSING_BITS_16_31 )
@@ -2066,7 +2169,7 @@ static WRITE32_HANDLER( gx894pwbba_w )
 			logerror("FPGA MPEG key 3/3 %02x\n", data & 0xff);
 		if( ACCESSING_BITS_16_31 )
 		{
-			space->machine().device<ds2401_device>("digital_id")->write( !( ( data >> 28 ) & 1 ) );
+			machine().device<ds2401_device>("digital_id")->write( !( ( data >> 28 ) & 1 ) );
 		}
 		break;
 	case 0x3e:
@@ -2078,39 +2181,39 @@ static WRITE32_HANDLER( gx894pwbba_w )
 			/* 15 */
 
 			/* fpga */
-			state->m_s = ( state->m_s >> 1 ) | ( ( data & 0x8000 ) >> 8 );
-			state->m_f++;
-			if( state->m_f == 8 )
+			m_s = ( m_s >> 1 ) | ( ( data & 0x8000 ) >> 8 );
+			m_f++;
+			if( m_f == 8 )
 			{
 //              printf( "%04x %02x\n", o, s );
-				state->m_c = 0;
-				state->m_f = 0;
-				state->m_o++;
+				m_c = 0;
+				m_f = 0;
+				m_o++;
 			}
 		}
 
 		if( ACCESSING_BITS_16_31 )
 		{
-			gx894pwbba_output( space->machine(), 4, ( data >> 28 ) & 0xf );
+			gx894pwbba_output( machine(), 4, ( data >> 28 ) & 0xf );
 		}
-		COMBINE_DATA( &state->m_c );
+		COMBINE_DATA( &m_c );
 		break;
 	case 0x3f:
 		if( ACCESSING_BITS_16_31 )
 		{
-			gx894pwbba_output( space->machine(), 2, ( data >> 28 ) & 0xf );
+			gx894pwbba_output( machine(), 2, ( data >> 28 ) & 0xf );
 		}
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx894pwbba_output( space->machine(), 5, ( data >> 12 ) & 0xf );
+			gx894pwbba_output( machine(), 5, ( data >> 12 ) & 0xf );
 		}
-		COMBINE_DATA( &state->m_d );
+		COMBINE_DATA( &m_d );
 		break;
 	default:
 //      printf( "write offset %08x\n", offset );
 		break;
 	}
-	if( state->m_a != olda || state->m_b != oldb || state->m_c != oldc || state->m_d != oldd )
+	if( m_a != olda || m_b != oldb || m_c != oldc || m_d != oldd )
 	{
 //      printf( "%08x %08x %08x %08x\n", a, b, c, d );
 	}
@@ -2123,7 +2226,7 @@ static void gx894pwbba_init( running_machine &machine, void (*output_callback_fu
 
 	state->m_gx894pwbba_output_callback = output_callback_func;
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f640000, 0x1f6400ff, FUNC(gx894pwbba_r), FUNC(gx894pwbba_w) );
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f640000, 0x1f6400ff, read32_delegate(FUNC(ksys573_state::gx894pwbba_r),state), write32_delegate(FUNC(ksys573_state::gx894pwbba_w),state));
 
 	state->m_gx894_ram_write_offset = 0;
 	state->m_gx894_ram_read_offset = 0;
@@ -2149,8 +2252,8 @@ static DRIVER_INIT( gtrfrkdigital )
 	DRIVER_INIT_CALL(konami573);
 
 	gx894pwbba_init( machine, NULL );
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f600000, 0x1f6000ff, FUNC(gtrfrks_io_r), FUNC(gtrfrks_io_w) );
+	ksys573_state *state = machine.driver_data<ksys573_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f600000, 0x1f6000ff, read32_delegate(FUNC(ksys573_state::gtrfrks_io_r),state), write32_delegate(FUNC(ksys573_state::gtrfrks_io_w),state) );
 }
 
 /* ddr solo */
@@ -2415,9 +2518,9 @@ static void dmx_output_callback( running_machine &machine, int offset, int data 
 	}
 }
 
-static WRITE32_HANDLER( dmx_io_w )
+WRITE32_MEMBER(ksys573_state::dmx_io_w)
 {
-	verboselog( space->machine(), 2, "dmx_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "dmx_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	switch( offset )
 	{
@@ -2432,7 +2535,7 @@ static WRITE32_HANDLER( dmx_io_w )
 		break;
 
 	default:
-		verboselog( space->machine(), 0, "dmx_io_w: unhandled offset %08x, %08x\n", offset, mem_mask );
+		verboselog( machine(), 0, "dmx_io_w: unhandled offset %08x, %08x\n", offset, mem_mask );
 		break;
 	}
 }
@@ -2442,8 +2545,8 @@ static DRIVER_INIT( dmx )
 	DRIVER_INIT_CALL(konami573);
 
 	gx894pwbba_init( machine, dmx_output_callback );
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f600000, 0x1f6000ff, FUNC(dmx_io_w) );
+	ksys573_state *state = machine.driver_data<ksys573_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1f600000, 0x1f6000ff, write32_delegate(FUNC(ksys573_state::dmx_io_w),state) );
 }
 
 /* salary man champ */
@@ -2579,9 +2682,9 @@ static void mamboagg_output_callback( running_machine &machine, int offset, int 
 	}
 }
 
-static WRITE32_HANDLER( mamboagg_io_w )
+WRITE32_MEMBER(ksys573_state::mamboagg_io_w)
 {
-	verboselog( space->machine(), 2, "mamboagg_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "mamboagg_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
 
 	switch( offset )
 	{
@@ -2592,7 +2695,7 @@ static WRITE32_HANDLER( mamboagg_io_w )
 		break;
 
 	default:
-		verboselog( space->machine(), 0, "mamboagg_io_w: unhandled offset %08x, %08x\n", offset, mem_mask );
+		verboselog( machine(), 0, "mamboagg_io_w: unhandled offset %08x, %08x\n", offset, mem_mask );
 		break;
 	}
 }
@@ -2602,8 +2705,8 @@ static DRIVER_INIT( mamboagg )
 	DRIVER_INIT_CALL(konami573);
 
 	gx894pwbba_init( machine, mamboagg_output_callback );
-
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_write_handler(0x1f600000, 0x1f6000ff, FUNC(mamboagg_io_w) );
+	ksys573_state *state = machine.driver_data<ksys573_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_write_handler(0x1f600000, 0x1f6000ff, write32_delegate(FUNC(ksys573_state::mamboagg_io_w),state));
 }
 
 
@@ -2614,7 +2717,7 @@ static double punchmania_inputs_callback( device_t *device, UINT8 input )
 {
 	ksys573_state *state = device->machine().driver_data<ksys573_state>();
 	double *pad_position = state->m_pad_position;
-	int pads = input_port_read(device->machine(), "PADS");
+	int pads = state->ioport("PADS")->read();
 	for( int i = 0; i < 6; i++ )
 	{
 		if( ( pads & ( 1 << i ) ) != 0 )
@@ -2785,11 +2888,10 @@ static DRIVER_INIT( punchmania )
 
 /* GunMania */
 
-static WRITE32_HANDLER( gunmania_w )
+WRITE32_MEMBER(ksys573_state::gunmania_w)
 {
 	char s[ 1024 ] = "";
-	ksys573_state *state = space->machine().driver_data<ksys573_state>();
-	ds2401_device *ds2401 = space->machine().device<ds2401_device>("gunmania_id");
+	ds2401_device *ds2401 = machine().device<ds2401_device>("gunmania_id");
 
 	switch( offset )
 	{
@@ -2803,13 +2905,13 @@ static WRITE32_HANDLER( gunmania_w )
 		case 0x20:
 			strcat( s, "cable holder motor release " );
 
-			state->m_cable_holder_release = 1;
+			m_cable_holder_release = 1;
 			break;
 
 		case 0x80:
 			strcat( s, "cable holder motor catch " );
 
-			state->m_cable_holder_release = 0;
+			m_cable_holder_release = 0;
 			break;
 
 		case 0xa0:
@@ -2837,9 +2939,9 @@ static WRITE32_HANDLER( gunmania_w )
 		case 0x02:
 			strcat( s, "tank shutter motor close " );
 
-			if( state->m_tank_shutter_position > 0 )
+			if( m_tank_shutter_position > 0 )
 			{
-				state->m_tank_shutter_position--;
+				m_tank_shutter_position--;
 			}
 
 			break;
@@ -2847,9 +2949,9 @@ static WRITE32_HANDLER( gunmania_w )
 		case 0x08:
 			strcat( s, "tank shutter motor open " );
 
-			if( state->m_tank_shutter_position < 100 )
+			if( m_tank_shutter_position < 100 )
 			{
-				state->m_tank_shutter_position++;
+				m_tank_shutter_position++;
 			}
 
 			break;
@@ -2874,14 +2976,13 @@ static WRITE32_HANDLER( gunmania_w )
 		break;
 	}
 
-	verboselog( space->machine(), 2, "gunmania_w %08x %08x %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "gunmania_w %08x %08x %08x\n", offset, mem_mask, data );
 }
 
-static CUSTOM_INPUT( gunmania_tank_shutter_sensor )
+CUSTOM_INPUT_MEMBER(ksys573_state::gunmania_tank_shutter_sensor)
 {
-	ksys573_state *state = field.machine().driver_data<ksys573_state>();
 
-	if( state->m_tank_shutter_position == 0 )
+	if( m_tank_shutter_position == 0 )
 	{
 		return 1;
 	}
@@ -2889,42 +2990,42 @@ static CUSTOM_INPUT( gunmania_tank_shutter_sensor )
 	return 0;
 }
 
-static CUSTOM_INPUT( gunmania_cable_holder_sensor )
+CUSTOM_INPUT_MEMBER(ksys573_state::gunmania_cable_holder_sensor)
 {
-	ksys573_state *state = field.machine().driver_data<ksys573_state>();
 
-	return state->m_cable_holder_release;
+	return m_cable_holder_release;
 }
 
-static READ32_HANDLER( gunmania_r )
+READ32_MEMBER(ksys573_state::gunmania_r)
 {
 	UINT32 data = 0;
-	ds2401_device *ds2401 = space->machine().device<ds2401_device>("gunmania_id");
+	ds2401_device *ds2401 = machine().device<ds2401_device>("gunmania_id");
 
 	switch( offset )
 	{
 	case 0x20:
-		data = input_port_read( space->machine(), "GUNX" ) | ds2401->read() << 7;
+		data = ioport( "GUNX" )->read() | ds2401->read() << 7;
 		break;
 
 	case 0x22:
-		data = input_port_read( space->machine(), "GUNY" ) | input_port_read( space->machine(), "SENSOR" );
+		data = ioport( "SENSOR" )->read();
 		break;
 
 	case 0x34:
-		data = input_port_read( space->machine(), "ENCODER" );
+		data = ioport( "ENCODER" )->read();
 		popmessage( "encoder %04x", data );
 		break;
 	}
 
-	verboselog( space->machine(), 2, "gunmania_r %08x %08x %08x\n", offset, mem_mask, data );
+	verboselog( machine(), 2, "gunmania_r %08x %08x %08x\n", offset, mem_mask, data );
 	return data;
 }
 
 static DRIVER_INIT( gunmania )
 {
 	DRIVER_INIT_CALL(konami573);
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler( 0x1f640000, 0x1f6400ff, FUNC(gunmania_r), FUNC(gunmania_w) );
+	ksys573_state *state = machine.driver_data<ksys573_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_handler( 0x1f640000, 0x1f6400ff, read32_delegate(FUNC(ksys573_state::gunmania_r),state), write32_delegate(FUNC(ksys573_state::gunmania_w),state));
 }
 
 /* ADC0834 Interface */
@@ -2934,13 +3035,13 @@ static double analogue_inputs_callback( device_t *device, UINT8 input )
 	switch (input)
 	{
 	case ADC083X_CH0:
-		return (double)( 5 * input_port_read_safe( device->machine(), "analog0", 0 ) ) / 255.0;
+		return (double)( 5 * device->machine().root_device().ioport( "analog0" )->read_safe( 0 ) ) / 255.0;
 	case ADC083X_CH1:
-		return (double)( 5 * input_port_read_safe( device->machine(), "analog1", 0 ) ) / 255.0;
+		return (double)( 5 * device->machine().root_device().ioport( "analog1" )->read_safe( 0 ) ) / 255.0;
 	case ADC083X_CH2:
-		return (double)( 5 * input_port_read_safe( device->machine(), "analog2", 0 ) ) / 255.0;
+		return (double)( 5 * device->machine().root_device().ioport( "analog2" )->read_safe( 0 ) ) / 255.0;
 	case ADC083X_CH3:
-		return (double)( 5 * input_port_read_safe( device->machine(), "analog3", 0 ) ) / 255.0;
+		return (double)( 5 * device->machine().root_device().ioport( "analog3" )->read_safe( 0 ) ) / 255.0;
 	case ADC083X_AGND:
 		return 0;
 	case ADC083X_VREF:
@@ -3338,7 +3439,7 @@ static INPUT_PORTS_START( ddr )
 	PORT_INCLUDE( konami573 )
 
 	PORT_MODIFY("IN2")
-	PORT_BIT( 0x00000f0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gn845pwbb_read, NULL)
+	PORT_BIT( 0x00000f0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ksys573_state,gn845pwbb_read, NULL)
 
 	PORT_START( "STAGE" )
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_16WAY PORT_PLAYER(1)
@@ -3484,11 +3585,11 @@ static INPUT_PORTS_START( gunmania )
 	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME( "Bullet Tube-1 Sensor" )
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME( "Bullet Tube-2 Sensor" )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME( "Safety Sensor Under" )
-	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM( gunmania_tank_shutter_sensor, NULL )
+	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,ksys573_state,gunmania_tank_shutter_sensor, NULL )
 
 	PORT_MODIFY("IN3")
 	PORT_BIT( 0x0d000b00, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM( gunmania_cable_holder_sensor, NULL )
+	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,ksys573_state,gunmania_cable_holder_sensor, NULL )
 
 	PORT_START("GUNX")
 	PORT_BIT( 0x7f, 0x2f, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0x00,0x5f) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(1)
@@ -3606,7 +3707,7 @@ ROM_START( bassangl )
 	ROM_LOAD( "ge765ja.u1", 0x000000, 0x000224, BAD_DUMP CRC(ee1b32a7) SHA1(c0f6b14b054f5a95ce474e794a3e0ca78faac681) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "765jaa02", 0, SHA1(4291711b1025733cb97f6da5dc3b03c189fcc37c) )
+	DISK_IMAGE_READONLY( "765jaa02", 0, BAD_DUMP SHA1(4291711b1025733cb97f6da5dc3b03c189fcc37c) )
 ROM_END
 
 ROM_START( bassang2 )
@@ -3616,21 +3717,21 @@ ROM_START( bassang2 )
 	ROM_LOAD( "gc865ja.u1", 0x000000, 0x000224, BAD_DUMP CRC(095cbfb5) SHA1(529ce0a7b0986cf7e64c37f466d6c2dac95cea7f) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "865jaa02", 0, SHA1(b98d9aa54f13aa73bea580d6494cb6a7f3217be3) )
+	DISK_IMAGE_READONLY( "865jaa02", 0, BAD_DUMP SHA1(b98d9aa54f13aa73bea580d6494cb6a7f3217be3) )
 ROM_END
 
 ROM_START( cr589fw )
 	SYS573_BIOS_A
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "700b04", 0, SHA1(2f65f62eb7ae202153a8544989675989ed33316f) )
+	DISK_IMAGE_READONLY( "700b04", 0, BAD_DUMP SHA1(2f65f62eb7ae202153a8544989675989ed33316f) )
 ROM_END
 
 ROM_START( cr589fwa )
 	SYS573_BIOS_A
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "700a04", 0, SHA1(554481f48eeb5daf8b4e7be2d66840d6c8454a52) )
+	DISK_IMAGE_READONLY( "700a04", 0, BAD_DUMP SHA1(554481f48eeb5daf8b4e7be2d66840d6c8454a52) )
 ROM_END
 
 ROM_START( darkhleg )
@@ -3640,7 +3741,7 @@ ROM_START( darkhleg )
 	ROM_LOAD( "gx706ja.u1", 0x000000, 0x000224, BAD_DUMP CRC(72b42574) SHA1(79dc959f0ce95ccb9ac0dbf0a72aec973e91bc56) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "706jaa02", 0, SHA1(58bd06855988250028086cba6b3670372b9d96a0) )
+	DISK_IMAGE_READONLY( "706jaa02", 0, BAD_DUMP SHA1(58bd06855988250028086cba6b3670372b9d96a0) )
 ROM_END
 
 ROM_START( ddrextrm )
@@ -3654,7 +3755,7 @@ ROM_START( ddrextrm )
 	ROM_LOAD( "gcc36ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "c36jaa02", 0, SHA1(edeb45fff0e66151b1ba2fd67542064ccddb031e) )
+	DISK_IMAGE_READONLY( "c36jaa02", 0, BAD_DUMP SHA1(edeb45fff0e66151b1ba2fd67542064ccddb031e) )
 ROM_END
 
 ROM_START( ddru )
@@ -3674,7 +3775,7 @@ ROM_START( ddrj )
 	ROM_LOAD( "gc845jb.u1",   0x000000, 0x000224, BAD_DUMP CRC(a16f42b8) SHA1(da4f1eb3eb2b28cb3a0bc74bb9b9945970f56ac2) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "845jba02", 0, SHA1(2d10378c89fe85682f262f0987f8366b9ea72f11) )
+	DISK_IMAGE_READONLY( "845jba02", 0, BAD_DUMP SHA1(2d10378c89fe85682f262f0987f8366b9ea72f11) )
 ROM_END
 
 ROM_START( ddrja )
@@ -3701,7 +3802,7 @@ ROM_START( ddrja )
 	ROM_LOAD( "gc845jaa.27h",  0x000000, 0x200000, NO_DUMP )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "845jaa02", 0, SHA1(37ca16be25bee39a5692dee2fa5f0fa0addfaaca) )
+	DISK_IMAGE_READONLY( "845jaa02", 0, BAD_DUMP SHA1(37ca16be25bee39a5692dee2fa5f0fa0addfaaca) )
 
 	DISK_REGION( "cdrom1" )
 	DISK_IMAGE_READONLY( "845jaa01", 1, NO_DUMP ) // if this even exists
@@ -3731,7 +3832,7 @@ ROM_START( ddrjb )
 	ROM_LOAD( "gc845jab.27h",  0x000000, 0x200000, NO_DUMP )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "845jab02", 0, SHA1(7bdcef37bf376c23153dfd1580de5666cc681335) )
+	DISK_IMAGE_READONLY( "845jab02", 0, BAD_DUMP SHA1(7bdcef37bf376c23153dfd1580de5666cc681335) )
 
 	DISK_REGION( "cdrom1" )
 	DISK_IMAGE_READONLY( "845jab01", 1, NO_DUMP ) // if this even exists
@@ -3744,7 +3845,7 @@ ROM_START( ddra )
 	ROM_LOAD( "gn845aa.u1",   0x000000, 0x000224, BAD_DUMP CRC(327c4851) SHA1(f0939224af706fd103a67aae9c96518c1db90ac9) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "845aaa02", 0, SHA1(839e2f8698a1561ac364998b8b3158ef0dee6998) )
+	DISK_IMAGE_READONLY( "845aaa02", 0, BAD_DUMP SHA1(839e2f8698a1561ac364998b8b3158ef0dee6998) )
 ROM_END
 
 ROM_START( ddr2m )
@@ -3754,7 +3855,7 @@ ROM_START( ddr2m )
 	ROM_LOAD( "gn895jaa.u1",  0x000000, 0x000224, BAD_DUMP CRC(363f427e) SHA1(adec886a07b9bd91f142f286b04fc6582205f037) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "895jaa02", 0, SHA1(cfe3a6f3ed62ba388b07045e29e22472d17dcfe4) )
+	DISK_IMAGE_READONLY( "895jaa02", 0, BAD_DUMP SHA1(cfe3a6f3ed62ba388b07045e29e22472d17dcfe4) )
 ROM_END
 
 ROM_START( ddr2mc )
@@ -3764,10 +3865,10 @@ ROM_START( ddr2mc )
 	ROM_LOAD( "gn896ja.u1",  0x000000, 0x000224, BAD_DUMP CRC(cbc984c5) SHA1(6c0cd78a41000999b4ffbd9fb3707738b50a9b50) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "896jaa01", 0, SHA1(f802a0e2ba0147eb71c54d92af409c3010a5715f) )
+	DISK_IMAGE_READONLY( "896jaa01", 0, BAD_DUMP SHA1(f802a0e2ba0147eb71c54d92af409c3010a5715f) )
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "895jaa02", 1, SHA1(cfe3a6f3ed62ba388b07045e29e22472d17dcfe4) )
+	DISK_IMAGE_READONLY( "895jaa02", 1, BAD_DUMP SHA1(cfe3a6f3ed62ba388b07045e29e22472d17dcfe4) )
 ROM_END
 
 ROM_START( ddr2mc2 )
@@ -3777,10 +3878,10 @@ ROM_START( ddr2mc2 )
 	ROM_LOAD( "ge984ja.u1",  0x000000, 0x000224, BAD_DUMP CRC(cbc984c5) SHA1(6c0cd78a41000999b4ffbd9fb3707738b50a9b50) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "984jaa01", 0, SHA1(5505c28be27bfa9648060fd799bcf0c2c5f608ed) )
+	DISK_IMAGE_READONLY( "984jaa01", 0, BAD_DUMP SHA1(5505c28be27bfa9648060fd799bcf0c2c5f608ed) )
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "895jaa02", 1, SHA1(cfe3a6f3ed62ba388b07045e29e22472d17dcfe4) )
+	DISK_IMAGE_READONLY( "895jaa02", 1, BAD_DUMP SHA1(cfe3a6f3ed62ba388b07045e29e22472d17dcfe4) )
 ROM_END
 
 ROM_START( ddr2ml )
@@ -3796,7 +3897,7 @@ ROM_START( ddr2ml )
 	DISK_IMAGE_READONLY( "885jab01", 0, SHA1(c2bbb9e2e6f34e07f57e7076726af81df39f55c9) )
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "885jaa02", 0, SHA1(5d187aea247eefc5c065566ab277acd8c942ba27) )
+	DISK_IMAGE_READONLY( "885jaa02", 0, BAD_DUMP SHA1(5d187aea247eefc5c065566ab277acd8c942ba27) )
 ROM_END
 
 ROM_START( ddr2mla )
@@ -3809,7 +3910,7 @@ ROM_START( ddr2mla )
 	ROM_LOAD( "ge885jaa.u1",  0x000000, 0x000224, BAD_DUMP CRC(cbc984c5) SHA1(6c0cd78a41000999b4ffbd9fb3707738b50a9b50) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "885jaa02", 0, SHA1(5d187aea247eefc5c065566ab277acd8c942ba27) )
+	DISK_IMAGE_READONLY( "885jaa02", 0, BAD_DUMP SHA1(5d187aea247eefc5c065566ab277acd8c942ba27) )
 ROM_END
 
 ROM_START( ddr3ma )
@@ -3829,7 +3930,7 @@ ROM_START( ddr3ma )
 	ROM_LOAD( "gn887aa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "887aaa02", 0, SHA1(c4136305b97123f5dfe3ecd34a10ddda0180da3d) )
+	DISK_IMAGE_READONLY( "887aaa02", 0, BAD_DUMP SHA1(c4136305b97123f5dfe3ecd34a10ddda0180da3d) )
 ROM_END
 
 ROM_START( ddr3mj )
@@ -3849,7 +3950,7 @@ ROM_START( ddr3mj )
 	ROM_LOAD( "gn887ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "887jaa02", 0, SHA1(2d1bf2a1566292dc869afaa6486f5ecd3973ff62) )
+	DISK_IMAGE_READONLY( "887jaa02", 0, BAD_DUMP SHA1(2d1bf2a1566292dc869afaa6486f5ecd3973ff62) )
 ROM_END
 
 ROM_START( ddr3mk )
@@ -3869,7 +3970,7 @@ ROM_START( ddr3mk )
 	ROM_LOAD( "gn887kb.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "887kba02", 0, SHA1(92a3844fab24f46c16dd96f9474d95fd001df603) )
+	DISK_IMAGE_READONLY( "887kba02", 0, BAD_DUMP SHA1(92a3844fab24f46c16dd96f9474d95fd001df603) )
 ROM_END
 
 ROM_START( ddr3mka )
@@ -3889,7 +3990,7 @@ ROM_START( ddr3mka )
 	ROM_LOAD( "gn887ka.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "887kaa02", 0, SHA1(a80930dd66c2e2326e8792f2e7cf9116d9cd752c) )
+	DISK_IMAGE_READONLY( "887kaa02", 0, BAD_DUMP SHA1(a80930dd66c2e2326e8792f2e7cf9116d9cd752c) )
 ROM_END
 
 ROM_START( ddr3mp )
@@ -3909,7 +4010,7 @@ ROM_START( ddr3mp )
 	ROM_LOAD( "gca22ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "a22jaa02", 0, SHA1(2bf07d08f6acee562024b418b453d654fc40f8dd) )
+	DISK_IMAGE_READONLY( "a22jaa02", 0, BAD_DUMP SHA1(2bf07d08f6acee562024b418b453d654fc40f8dd) )
 ROM_END
 
 ROM_START( ddr4m )
@@ -3949,7 +4050,7 @@ ROM_START( ddr4mj )
 	ROM_LOAD( "gca33ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "a33jaa02", 0, SHA1(9d9fb5e65f1532f358e9c273c56d11389d11fd79) )
+	DISK_IMAGE_READONLY( "a33jaa02", 0, BAD_DUMP SHA1(9d9fb5e65f1532f358e9c273c56d11389d11fd79) )
 ROM_END
 
 ROM_START( ddr4ms )
@@ -3969,7 +4070,7 @@ ROM_START( ddr4ms )
 	ROM_LOAD( "gca33ab.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "a33aba02", 0, SHA1(cc7349cbee37bfb101480497e99f1f52acb4ffa1) )
+	DISK_IMAGE_READONLY( "a33aba02", 0, BAD_DUMP SHA1(cc7349cbee37bfb101480497e99f1f52acb4ffa1) )
 ROM_END
 
 ROM_START( ddr4msj )
@@ -4012,7 +4113,7 @@ ROM_START( ddr4mp )
 	ROM_LOAD( "gca34ja.22h",  0x000000, 0x002000, CRC(80575c1f) SHA1(a0594ca0f75bc7d49b645e835e9fa48a73c3c9c7) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "a34jaa02", 0, SHA1(1d5f9eb633f054ddbf9fba55d53e4ee263ba91dd) )
+	DISK_IMAGE_READONLY( "a34jaa02", 0, BAD_DUMP SHA1(1d5f9eb633f054ddbf9fba55d53e4ee263ba91dd) )
 ROM_END
 
 ROM_START( ddr4mps )
@@ -4049,7 +4150,7 @@ ROM_START( ddr5m )
 	ROM_LOAD( "gca27ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "a27jaa02", 0, SHA1(0324973c98b82b72b22d2f0cd43e1924b83be667) )
+	DISK_IMAGE_READONLY( "a27jaa02", 0, BAD_DUMP SHA1(0324973c98b82b72b22d2f0cd43e1924b83be667) )
 ROM_END
 
 ROM_START( ddrbocd )
@@ -4059,10 +4160,10 @@ ROM_START( ddrbocd )
 	ROM_LOAD( "gn895jaa.u1",  0x000000, 0x000224, BAD_DUMP CRC(363f427e) SHA1(adec886a07b9bd91f142f286b04fc6582205f037) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "892jaa01", 0, SHA1(46ace0feef48a2a6643c3cb4ac9164ba0beeea94) )
+	DISK_IMAGE_READONLY( "892jaa01", 0, BAD_DUMP SHA1(46ace0feef48a2a6643c3cb4ac9164ba0beeea94) )
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "895jaa02", 1, SHA1(cfe3a6f3ed62ba388b07045e29e22472d17dcfe4) )
+	DISK_IMAGE_READONLY( "895jaa02", 1, BAD_DUMP SHA1(cfe3a6f3ed62ba388b07045e29e22472d17dcfe4) )
 ROM_END
 
 ROM_START( ddrs2k )
@@ -4082,7 +4183,7 @@ ROM_START( ddrs2k )
 	ROM_LOAD( "gc905aa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "905aaa02", 0, SHA1(1fc0f3fcc7d5d23711967023ff02c1fc76479024) )
+	DISK_IMAGE_READONLY( "905aaa02", 0, BAD_DUMP SHA1(1fc0f3fcc7d5d23711967023ff02c1fc76479024) )
 ROM_END
 
 ROM_START( ddrs2kj )
@@ -4102,7 +4203,7 @@ ROM_START( ddrs2kj )
 	ROM_LOAD( "gc905aa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "905jaa02", 0, SHA1(84931345611574afd53976a0807f4163348e3c15) )
+	DISK_IMAGE_READONLY( "905jaa02", 0, BAD_DUMP SHA1(84931345611574afd53976a0807f4163348e3c15) )
 ROM_END
 
 ROM_START( ddrmax )
@@ -4116,7 +4217,7 @@ ROM_START( ddrmax )
 	ROM_LOAD( "gcb19ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "b19jaa02", 0, SHA1(a156ebdef395747c64e1829237e4e7932ae251a8) )
+	DISK_IMAGE_READONLY( "b19jaa02", 0, BAD_DUMP SHA1(a156ebdef395747c64e1829237e4e7932ae251a8) )
 ROM_END
 
 ROM_START( ddrmax2 )
@@ -4130,7 +4231,7 @@ ROM_START( ddrmax2 )
 	ROM_LOAD( "gcb20ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "b20jaa02", 0, SHA1(3f378e922e3182f980d07d6b2b524e33c5a00549) )
+	DISK_IMAGE_READONLY( "b20jaa02", 0, BAD_DUMP SHA1(3f378e922e3182f980d07d6b2b524e33c5a00549) )
 ROM_END
 
 ROM_START( ddrsbm )
@@ -4144,7 +4245,7 @@ ROM_START( ddrsbm )
 	ROM_LOAD( "gq894ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "894jaa02", 0, SHA1(3b2e061996d12f0e7367a579208eb746d849e070) )
+	DISK_IMAGE_READONLY( "894jaa02", 0, BAD_DUMP SHA1(3b2e061996d12f0e7367a579208eb746d849e070) )
 ROM_END
 
 ROM_START( ddrusa )
@@ -4158,7 +4259,7 @@ ROM_START( ddrusa )
 	ROM_LOAD( "gka44ua.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "a44uaa02", 0, SHA1(2cdbe1c62d16a2be65adb7e11331fce5c8e45504) )
+	DISK_IMAGE_READONLY( "a44uaa02", 0, BAD_DUMP SHA1(2cdbe1c62d16a2be65adb7e11331fce5c8e45504) )
 ROM_END
 
 ROM_START( drmn )
@@ -4176,7 +4277,7 @@ ROM_START( drmn )
 	ROM_LOAD( "gq881ja.22h",  0x000000, 0x002000, CRC(e834d5ec) SHA1(1c845811e43d7dfec657da288b5a38b8bc9c8366) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "881jad01", 0, SHA1(7d9d47bef636dbaa8d578f34ea9489e349d3d6df) ) // upgrade or bootleg?
+	DISK_IMAGE_READONLY( "881jad01", 0, BAD_DUMP SHA1(7d9d47bef636dbaa8d578f34ea9489e349d3d6df) ) // upgrade or bootleg?
 
 	DISK_REGION( "cdrom1" )
 	DISK_IMAGE_READONLY( "881jaa02", 1, NO_DUMP )
@@ -4199,7 +4300,7 @@ ROM_START( drmn2m )
 	ROM_LOAD( "gn912ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "912jab02", 0, SHA1(19dfae94b63468d3e16d3cc4a3eeae60d5dff1d7) )
+	DISK_IMAGE_READONLY( "912jab02", 0, BAD_DUMP SHA1(19dfae94b63468d3e16d3cc4a3eeae60d5dff1d7) )
 ROM_END
 
 ROM_START( drmn2mpu )
@@ -4219,10 +4320,10 @@ ROM_START( drmn2mpu )
 	ROM_LOAD( "gn912ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "912jab02", 0, SHA1(19dfae94b63468d3e16d3cc4a3eeae60d5dff1d7) )
+	DISK_IMAGE_READONLY( "912jab02", 0, BAD_DUMP SHA1(19dfae94b63468d3e16d3cc4a3eeae60d5dff1d7) )
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "912za01",  1, SHA1(033a310006efe164cc6a8276de42a5d555f9fea9) )
+	DISK_IMAGE_READONLY( "912za01",  1, BAD_DUMP SHA1(033a310006efe164cc6a8276de42a5d555f9fea9) )
 ROM_END
 
 ROM_START( drmn3m )
@@ -4242,7 +4343,7 @@ ROM_START( drmn3m )
 	ROM_LOAD( "gca23ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "a23jaa02", 0, SHA1(89e365f61a4db889621d7d9d9917bcfa2c09704e) )
+	DISK_IMAGE_READONLY( "a23jaa02", 0, BAD_DUMP SHA1(89e365f61a4db889621d7d9d9917bcfa2c09704e) )
 ROM_END
 
 ROM_START( drmn4m )
@@ -4261,10 +4362,10 @@ ROM_START( drmn4m )
 	ROM_LOAD( "gea25jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "a25jaa02", 0, SHA1(8a0b761d1c282d927e2daf92519654a1c91ee1ab) )
+	DISK_IMAGE_READONLY( "a25jaa02", 0, BAD_DUMP SHA1(8a0b761d1c282d927e2daf92519654a1c91ee1ab) )
 
 	DISK_REGION( "multisession" )
-	DISK_IMAGE_READONLY( "a25jba02", 0, SHA1(5f4aae359da610352c1004cfa1a32064d8f55d0e) )
+	DISK_IMAGE_READONLY( "a25jba02", 0, BAD_DUMP SHA1(5f4aae359da610352c1004cfa1a32064d8f55d0e) )
 ROM_END
 
 ROM_START( drmn5m )
@@ -4278,10 +4379,10 @@ ROM_START( drmn5m )
 	ROM_LOAD( "gcb05jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "b05jaa02", 0, SHA1(7a6e7940d1441cff1d9be1bc3affc029fe6dc9e4) )
+	DISK_IMAGE_READONLY( "b05jaa02", 0, BAD_DUMP SHA1(7a6e7940d1441cff1d9be1bc3affc029fe6dc9e4) )
 
 	DISK_REGION( "multisession" )
-	DISK_IMAGE_READONLY( "b05jba02", 0, SHA1(822149db553ca78ad8174719a657dbbd2776b922) )
+	DISK_IMAGE_READONLY( "b05jba02", 0, BAD_DUMP SHA1(822149db553ca78ad8174719a657dbbd2776b922) )
 ROM_END
 
 ROM_START( drmn6m )
@@ -4300,10 +4401,10 @@ ROM_START( drmn6m )
 	ROM_LOAD( "gcb16jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "b16jaa02", 0, SHA1(fa0862a9bd3a48d4f6e7b44b11ad387acc05037e) )
+	DISK_IMAGE_READONLY( "b16jaa02", 0, BAD_DUMP SHA1(fa0862a9bd3a48d4f6e7b44b11ad387acc05037e) )
 
 	DISK_REGION( "multisession" )
-	DISK_IMAGE_READONLY( "b16jba02", 0, SHA1(07de74a3ca384407d99c433110085208a458653e) )
+	DISK_IMAGE_READONLY( "b16jba02", 0, BAD_DUMP SHA1(07de74a3ca384407d99c433110085208a458653e) )
 ROM_END
 
 ROM_START( drmn7m )
@@ -4322,10 +4423,10 @@ ROM_START( drmn7m )
 	ROM_LOAD( "gcc07jba.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "c07jca02", 0, SHA1(1f27e0a22c7f4f37ec3a09984ce197e390340d27) )
+	DISK_IMAGE_READONLY( "c07jca02", 0, BAD_DUMP SHA1(1f27e0a22c7f4f37ec3a09984ce197e390340d27) )
 
 	DISK_REGION( "multisession" )
-	DISK_IMAGE_READONLY( "c07jda02", 0, SHA1(7c22ebbda11bdaf85c3441d7a6f3497994cd957f) )
+	DISK_IMAGE_READONLY( "c07jda02", 0, BAD_DUMP SHA1(7c22ebbda11bdaf85c3441d7a6f3497994cd957f) )
 ROM_END
 
 ROM_START( drmn7ma )
@@ -4344,10 +4445,10 @@ ROM_START( drmn7ma )
 	ROM_LOAD( "gcc07jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "c07jaa02", 0, SHA1(96c410745d1fd14059bf11987655ed998a9b79dd) )
+	DISK_IMAGE_READONLY( "c07jaa02", 0, BAD_DUMP SHA1(96c410745d1fd14059bf11987655ed998a9b79dd) )
 
 	DISK_REGION( "multisession" )
-	DISK_IMAGE_READONLY( "c07jba02", 0, SHA1(25e1a3ff7886c409d16e40ca1798b01b11546755) )
+	DISK_IMAGE_READONLY( "c07jba02", 0, BAD_DUMP SHA1(25e1a3ff7886c409d16e40ca1798b01b11546755) )
 ROM_END
 
 ROM_START( drmn8m )
@@ -4361,10 +4462,10 @@ ROM_START( drmn8m )
 	ROM_LOAD( "gcc38jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "c38jaa02", 0, SHA1(d19ae541557405a4484145f4237f3c868375c72e) )
+	DISK_IMAGE_READONLY( "c38jaa02", 0, BAD_DUMP SHA1(d19ae541557405a4484145f4237f3c868375c72e) )
 
 	DISK_REGION( "multisession" )
-	DISK_IMAGE_READONLY( "c38jba02", 0, SHA1(d963064678978d489474d1ca22c1f249c6f60232) )
+	DISK_IMAGE_READONLY( "c38jba02", 0, BAD_DUMP SHA1(d963064678978d489474d1ca22c1f249c6f60232) )
 ROM_END
 
 ROM_START( drmn9m )
@@ -4378,7 +4479,7 @@ ROM_START( drmn9m )
 	ROM_LOAD( "gcd09jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "d09jaa02", 0, SHA1(33f3e48ed5a8becd8c4714413e454328d8d5baae) )
+	DISK_IMAGE_READONLY( "d09jaa02", 0, BAD_DUMP SHA1(33f3e48ed5a8becd8c4714413e454328d8d5baae) )
 
 	DISK_REGION( "multisession" )
 	DISK_IMAGE_READONLY( "d09jba02", 0, NO_DUMP )
@@ -4395,7 +4496,7 @@ ROM_START( drmn10m )
 	ROM_LOAD( "gcd40jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "d40jaa02", 0, SHA1(68b2038f0cd2d461f608945d1e243f2b6979efaa) )
+	DISK_IMAGE_READONLY( "d40jaa02", 0, BAD_DUMP SHA1(68b2038f0cd2d461f608945d1e243f2b6979efaa) )
 
 	DISK_REGION( "multisession" )
 	DISK_IMAGE_READONLY( "d40jba02", 0, BAD_DUMP SHA1(0ded9e0a6c77b181e7b6beb1dbdfa17dee4acd90) )
@@ -4426,7 +4527,7 @@ ROM_START( dmx2m )
 	ROM_LOAD( "gca39ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "a39jaa02", 0, SHA1(3d021448df857c12f6d46a20e14ae0fc6d342dcc) )
+	DISK_IMAGE_READONLY( "a39jaa02", 0, BAD_DUMP SHA1(3d021448df857c12f6d46a20e14ae0fc6d342dcc) )
 ROM_END
 
 ROM_START( dmx2majp )
@@ -4445,7 +4546,7 @@ ROM_START( dmx2majp )
 	ROM_LOAD( "gca38ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "a38jaa02", 0, SHA1(d26c481ef8a70bba75bcdf41f9ceb3a49c245986) )
+	DISK_IMAGE_READONLY( "a38jaa02", 0, BAD_DUMP SHA1(d26c481ef8a70bba75bcdf41f9ceb3a49c245986) )
 ROM_END
 
 ROM_START( dncfrks )
@@ -4487,7 +4588,7 @@ ROM_START( dsem2 )
 	ROM_LOAD( "gkc23ea.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "c23eaa02", 0, SHA1(46868c97530db5be1b43ffa32744e3e12495c243) )
+	DISK_IMAGE_READONLY( "c23eaa02", 0, BAD_DUMP SHA1(46868c97530db5be1b43ffa32744e3e12495c243) )
 ROM_END
 
 ROM_START( dsfdct )
@@ -4507,7 +4608,7 @@ ROM_START( dsfdct )
 	ROM_LOAD( "gc910jc.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "910jca02", 0, SHA1(0c868f3c9f696d291e8f27687e3ad83e453a4894) )
+	DISK_IMAGE_READONLY( "910jca02", 0, BAD_DUMP SHA1(0c868f3c9f696d291e8f27687e3ad83e453a4894) )
 ROM_END
 
 ROM_START( dsfdcta )
@@ -4526,7 +4627,7 @@ ROM_START( dsfdcta )
 	ROM_LOAD( "gc910ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "910jaa02", 0, SHA1(70851c383e3876c4a697a99706fbaae2dafcb0e0) )
+	DISK_IMAGE_READONLY( "910jaa02", 0, BAD_DUMP SHA1(70851c383e3876c4a697a99706fbaae2dafcb0e0) )
 ROM_END
 
 ROM_START( dsfdr )
@@ -4546,7 +4647,7 @@ ROM_START( dsfdr )
 	ROM_LOAD( "gca37ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "a37jaa02", 0, SHA1(c6a23b910e884aa0d4afc388dbc8379e0d09611a) )
+	DISK_IMAGE_READONLY( "a37jaa02", 0, BAD_DUMP SHA1(c6a23b910e884aa0d4afc388dbc8379e0d09611a) )
 ROM_END
 
 ROM_START( dsftkd )
@@ -4559,7 +4660,7 @@ ROM_START( dsftkd )
 	ROM_LOAD( "gn884ja.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "884jaa02", 0, SHA1(80f02fcb7ea5b6394a2a58f12b73d87a1826d7f4) )
+	DISK_IMAGE_READONLY( "884jaa02", 0, BAD_DUMP SHA1(80f02fcb7ea5b6394a2a58f12b73d87a1826d7f4) )
 ROM_END
 
 ROM_START( dstage )
@@ -4579,7 +4680,7 @@ ROM_START( fbait2bc )
 	ROM_LOAD( "gc865ua.u1", 0x000000, 0x000224, BAD_DUMP CRC(ea8f0b4b) SHA1(363b1ea1a520b239ba8bca867366bbe8a9977a43) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "865uab02", 0, SHA1(d14dc066d4c16fba1e9b31d5f042ad249c4b5137) )
+	DISK_IMAGE_READONLY( "865uab02", 0, BAD_DUMP SHA1(d14dc066d4c16fba1e9b31d5f042ad249c4b5137) )
 ROM_END
 
 ROM_START( fbaitbc )
@@ -4589,7 +4690,7 @@ ROM_START( fbaitbc )
 	ROM_LOAD( "ge765ua.u1", 0x000000, 0x000224, BAD_DUMP CRC(588748c6) SHA1(ea1ead61e0dcb324ef7b6106cae00bcf6702d6c4) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "765uab02", 0, SHA1(07b09e763e4b90108aa924b518221b16667a7133) )
+	DISK_IMAGE_READONLY( "765uab02", 0, BAD_DUMP SHA1(07b09e763e4b90108aa924b518221b16667a7133) )
 ROM_END
 
 ROM_START( fbaitmc )
@@ -4647,7 +4748,7 @@ ROM_START( fghtmn )
 	ROM_LOAD( "gq918eaa.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "918xxb02", 0, SHA1(8ced8952fff3e70ce0621a491f0973af5a6ccd82) )
+	DISK_IMAGE_READONLY( "918xxb02", 0, BAD_DUMP SHA1(8ced8952fff3e70ce0621a491f0973af5a6ccd82) )
 ROM_END
 
 ROM_START( fghtmna )
@@ -4665,7 +4766,7 @@ ROM_START( fghtmna )
 	ROM_LOAD( "gq918aaa.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "918xxb02", 0, SHA1(8ced8952fff3e70ce0621a491f0973af5a6ccd82) )
+	DISK_IMAGE_READONLY( "918xxb02", 0, BAD_DUMP SHA1(8ced8952fff3e70ce0621a491f0973af5a6ccd82) )
 ROM_END
 
 ROM_START( fghtmnk )
@@ -4683,7 +4784,7 @@ ROM_START( fghtmnk )
 	ROM_LOAD( "gq918kaa.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "918xxb02", 0, SHA1(8ced8952fff3e70ce0621a491f0973af5a6ccd82) )
+	DISK_IMAGE_READONLY( "918xxb02", 0, BAD_DUMP SHA1(8ced8952fff3e70ce0621a491f0973af5a6ccd82) )
 ROM_END
 
 ROM_START( fghtmnu )
@@ -4701,7 +4802,7 @@ ROM_START( fghtmnu )
 	ROM_LOAD( "gq918uaa.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "918xxb02", 0, SHA1(8ced8952fff3e70ce0621a491f0973af5a6ccd82) )
+	DISK_IMAGE_READONLY( "918xxb02", 0, BAD_DUMP SHA1(8ced8952fff3e70ce0621a491f0973af5a6ccd82) )
 ROM_END
 
 ROM_START( gtrfrks )
@@ -4711,7 +4812,7 @@ ROM_START( gtrfrks )
 	ROM_LOAD( "gq886eac.u1",  0x000000, 0x000224, BAD_DUMP CRC(06bd6c4f) SHA1(61930e467ad135e2f31393ff5af981ed52f3bef9) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "886__c02", 0, SHA1(80293512c4b914ef98acb1bbc7e3a2ed944a0dad) )
+	DISK_IMAGE_READONLY( "886__c02", 0, BAD_DUMP SHA1(80293512c4b914ef98acb1bbc7e3a2ed944a0dad) )
 ROM_END
 
 ROM_START( gtrfrksu )
@@ -4721,7 +4822,7 @@ ROM_START( gtrfrksu )
 	ROM_LOAD( "gq886uac.u1",  0x000000, 0x000224, BAD_DUMP CRC(143eaa55) SHA1(51a4fa3693f1cb1646a8986003f9b6cc1ae8b630) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "886__c02", 0, SHA1(80293512c4b914ef98acb1bbc7e3a2ed944a0dad) )
+	DISK_IMAGE_READONLY( "886__c02", 0, BAD_DUMP SHA1(80293512c4b914ef98acb1bbc7e3a2ed944a0dad) )
 ROM_END
 
 ROM_START( gtrfrksj )
@@ -4731,7 +4832,7 @@ ROM_START( gtrfrksj )
 	ROM_LOAD( "gq886jac.u1",  0x000000, 0x000224, BAD_DUMP CRC(11ffd43d) SHA1(27f4f4d782604379254fb98c3c57e547aa4b321f) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "886__c02", 0, SHA1(80293512c4b914ef98acb1bbc7e3a2ed944a0dad) )
+	DISK_IMAGE_READONLY( "886__c02", 0, BAD_DUMP SHA1(80293512c4b914ef98acb1bbc7e3a2ed944a0dad) )
 ROM_END
 
 ROM_START( gtrfrksa )
@@ -4741,7 +4842,7 @@ ROM_START( gtrfrksa )
 	ROM_LOAD( "gq886aac.u1",  0x000000, 0x000224, BAD_DUMP CRC(efa51ee9) SHA1(3374d936de69c287e0161bc526546441c2943555) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "886__c02", 0, SHA1(80293512c4b914ef98acb1bbc7e3a2ed944a0dad) )
+	DISK_IMAGE_READONLY( "886__c02", 0, BAD_DUMP SHA1(80293512c4b914ef98acb1bbc7e3a2ed944a0dad) )
 ROM_END
 
 ROM_START( gtrfrk2m )
@@ -4774,10 +4875,10 @@ ROM_START( gtrfrk3m )
 	ROM_LOAD( "ge949jab.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "949jac01", 0, SHA1(ff017dd5c0ecbdb8935d0d4656a45e9fab10ef82) )
+	DISK_IMAGE_READONLY( "949jac01", 0, BAD_DUMP SHA1(ff017dd5c0ecbdb8935d0d4656a45e9fab10ef82) )
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "949jab02", 1, SHA1(ad629c9bafbdc4bf6c679918a5fae2bcfdb39332) )
+	DISK_IMAGE_READONLY( "949jab02", 1, BAD_DUMP SHA1(ad629c9bafbdc4bf6c679918a5fae2bcfdb39332) )
 ROM_END
 
 ROM_START( gtfrk3ma )
@@ -4797,7 +4898,7 @@ ROM_START( gtfrk3ma )
 	ROM_LOAD( "ge949jab.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "949jab02", 0, SHA1(ad629c9bafbdc4bf6c679918a5fae2bcfdb39332) )
+	DISK_IMAGE_READONLY( "949jab02", 0, BAD_DUMP SHA1(ad629c9bafbdc4bf6c679918a5fae2bcfdb39332) )
 ROM_END
 
 ROM_START( gtfrk3mb )
@@ -4811,7 +4912,7 @@ ROM_START( gtfrk3mb )
 	ROM_LOAD( "ge949jaa.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "949jaz02", 0, SHA1(b0c786ba420a34fcbd16bc36a137f6ae87b7dfa8) )
+	DISK_IMAGE_READONLY( "949jaz02", 0, BAD_DUMP SHA1(b0c786ba420a34fcbd16bc36a137f6ae87b7dfa8) )
 ROM_END
 
 ROM_START( gtrfrk4m )
@@ -4831,7 +4932,7 @@ ROM_START( gtrfrk4m )
 	ROM_LOAD( "gea24ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "a24jaa02", 0, SHA1(bc0303f5a6a19484cd35890cc9934ee0bcabb2ad) )
+	DISK_IMAGE_READONLY( "a24jaa02", 0, BAD_DUMP SHA1(bc0303f5a6a19484cd35890cc9934ee0bcabb2ad) )
 ROM_END
 
 ROM_START( gtrfrk5m )
@@ -4850,7 +4951,7 @@ ROM_START( gtrfrk5m )
 	ROM_LOAD( "gea26jaa.u6",    0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "a26jaa02", 0, SHA1(9909e08abff780db6fd7a5fbcc57ffbe14ae08ce) )
+	DISK_IMAGE_READONLY( "a26jaa02", 0, BAD_DUMP SHA1(9909e08abff780db6fd7a5fbcc57ffbe14ae08ce) )
 ROM_END
 
 ROM_START( gtrfrk6m )
@@ -4864,7 +4965,7 @@ ROM_START( gtrfrk6m )
 	ROM_LOAD( "gcb06ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "b06jaa02", 0, SHA1(2ea53ef492da63183a28c54afde07fce323fe42e) )
+	DISK_IMAGE_READONLY( "b06jaa02", 0, BAD_DUMP SHA1(2ea53ef492da63183a28c54afde07fce323fe42e) )
 ROM_END
 
 ROM_START( gtrfrk7m )
@@ -4883,7 +4984,7 @@ ROM_START( gtrfrk7m )
 	ROM_LOAD( "gcb17jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "b17jaa02", 0, SHA1(d38dc22011b71b0e4167f1728a8794ea4b9c5396) )
+	DISK_IMAGE_READONLY( "b17jaa02", 0, BAD_DUMP SHA1(d38dc22011b71b0e4167f1728a8794ea4b9c5396) )
 ROM_END
 
 ROM_START( gtrfrk8m )
@@ -4902,7 +5003,7 @@ ROM_START( gtrfrk8m )
 	ROM_LOAD( "gcc08jba.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "c08jba02", 0, SHA1(8e352ed8ade581b7c9bb579fc56003ea1831202c) )
+	DISK_IMAGE_READONLY( "c08jba02", 0, BAD_DUMP SHA1(8e352ed8ade581b7c9bb579fc56003ea1831202c) )
 ROM_END
 
 ROM_START( gtrfrk8ma )
@@ -4921,7 +5022,7 @@ ROM_START( gtrfrk8ma )
 	ROM_LOAD( "gcc08jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "c08jaa02", 0, SHA1(7a1d97f74ec4d643ff7d3981d66b551cbf9e57f0) )
+	DISK_IMAGE_READONLY( "c08jaa02", 0, BAD_DUMP SHA1(7a1d97f74ec4d643ff7d3981d66b551cbf9e57f0) )
 ROM_END
 
 ROM_START( gtrfrk9m )
@@ -4935,7 +5036,7 @@ ROM_START( gtrfrk9m )
 	ROM_LOAD( "gcc39jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "c39jaa02", 0, SHA1(d0696b29976a6bc01c3a1fefe09dbee721ff3ffb) )
+	DISK_IMAGE_READONLY( "c39jaa02", 0, BAD_DUMP SHA1(d0696b29976a6bc01c3a1fefe09dbee721ff3ffb) )
 ROM_END
 
 ROM_START( gtfrk10m )
@@ -4949,10 +5050,10 @@ ROM_START( gtfrk10m )
 	ROM_LOAD( "gcd10jab.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "d10jab01", 0, SHA1(c84858b412f0798a65cf3059c743501f32ad7280) )
+	DISK_IMAGE_READONLY( "d10jab01", 0, BAD_DUMP SHA1(c84858b412f0798a65cf3059c743501f32ad7280) )
 
 	DISK_REGION( "cdrom1" )
-	DISK_IMAGE_READONLY( "d10jaa02", 1, SHA1(d4e4460ca3edc1b365af593757557c6cf5b7b3ec) )
+	DISK_IMAGE_READONLY( "d10jaa02", 1, BAD_DUMP SHA1(d4e4460ca3edc1b365af593757557c6cf5b7b3ec) )
 ROM_END
 
 ROM_START( gtfrk10ma )
@@ -4966,7 +5067,7 @@ ROM_START( gtfrk10ma )
 	ROM_LOAD( "gcd10jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "d10jaa02", 0, SHA1(d4e4460ca3edc1b365af593757557c6cf5b7b3ec) )
+	DISK_IMAGE_READONLY( "d10jaa02", 0, BAD_DUMP SHA1(d4e4460ca3edc1b365af593757557c6cf5b7b3ec) )
 ROM_END
 
 ROM_START( gtfrk10mb )
@@ -4980,7 +5081,7 @@ ROM_START( gtfrk10mb )
 	ROM_LOAD( "gcd10jab.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "d10jba02", 0, SHA1(80893da422268cc1f89688289cdec981c4f9feb2) )
+	DISK_IMAGE_READONLY( "d10jba02", 0, BAD_DUMP SHA1(80893da422268cc1f89688289cdec981c4f9feb2) )
 ROM_END
 
 ROM_START( gtfrk11m )
@@ -4994,7 +5095,7 @@ ROM_START( gtfrk11m )
 	ROM_LOAD( "gcd39ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "d39jaa02", 0, SHA1(7a87ee331ba0301bb8724c398e6c77cfb9c172a7) )
+	DISK_IMAGE_READONLY( "d39jaa02", 0, BAD_DUMP SHA1(7a87ee331ba0301bb8724c398e6c77cfb9c172a7) )
 ROM_END
 
 ROM_START( gunmania )
@@ -5071,7 +5172,7 @@ ROM_START( hyperbbck )
 	ROM_LOAD( "gx908ka.u1",  0x000000, 0x000084, BAD_DUMP CRC(f4f37fe1) SHA1(30f90cdb2d092e4f8d6c14cfd4ca4945e6d352cb) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "908a02", 0, SHA1(573194ca9938c30415fc88dcc0c0152dd3024d71) )
+	DISK_IMAGE_READONLY( "908a02", 0, BAD_DUMP SHA1(573194ca9938c30415fc88dcc0c0152dd3024d71) )
 ROM_END
 
 ROM_START( konam80a )
@@ -5158,7 +5259,7 @@ ROM_START( pbballex )
 	ROM_LOAD( "gx802ja.u1", 0x000000, 0x000224, BAD_DUMP CRC(ea8bdda3) SHA1(780034ab08871631ef0e3e9b779ca89e016c26a8) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "802jab02", 0, SHA1(bcc2b6c3515e2420eef9fdf8b28115368a428a92) )
+	DISK_IMAGE_READONLY( "802jab02", 0, BAD_DUMP SHA1(bcc2b6c3515e2420eef9fdf8b28115368a428a92) )
 ROM_END
 
 ROM_START( pcnfrk3m )
@@ -5178,7 +5279,7 @@ ROM_START( pcnfrk3m )
 	ROM_LOAD( "gca23ka.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "a23kaa02", 0, SHA1(5b853cc25eb583ed36d8cd402235b4f5c9ce065a) )
+	DISK_IMAGE_READONLY( "a23kaa02", 0, BAD_DUMP SHA1(5b853cc25eb583ed36d8cd402235b4f5c9ce065a) )
 ROM_END
 
 ROM_START( pnchmn )
@@ -5196,7 +5297,7 @@ ROM_START( pnchmn )
 	ROM_LOAD( "gq918jaa.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "918xxb02", 0, SHA1(8ced8952fff3e70ce0621a491f0973af5a6ccd82) )
+	DISK_IMAGE_READONLY( "918xxb02", 0, BAD_DUMP SHA1(8ced8952fff3e70ce0621a491f0973af5a6ccd82) )
 ROM_END
 
 ROM_START( pnchmna )
@@ -5232,7 +5333,7 @@ ROM_START( pnchmn2 )
 	ROM_LOAD( "gqa09ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
 	DISK_REGION( "cdrom0" )
-	DISK_IMAGE_READONLY( "a09jaa02", 0, SHA1(b085fbe76d5ef87578744b45b874b5f79147e586) )
+	DISK_IMAGE_READONLY( "a09jaa02", 0, BAD_DUMP SHA1(b085fbe76d5ef87578744b45b874b5f79147e586) )
 ROM_END
 
 ROM_START( salarymc )

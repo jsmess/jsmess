@@ -30,6 +30,7 @@
 
 PALETTE_INIT( yiear )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -59,32 +60,30 @@ PALETTE_INIT( yiear )
 	}
 }
 
-WRITE8_HANDLER( yiear_videoram_w )
+WRITE8_MEMBER(yiear_state::yiear_videoram_w)
 {
-	yiear_state *state = space->machine().driver_data<yiear_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER( yiear_control_w )
+WRITE8_MEMBER(yiear_state::yiear_control_w)
 {
-	yiear_state *state = space->machine().driver_data<yiear_state>();
 	/* bit 0 flips screen */
-	if (flip_screen_get(space->machine()) != (data & 0x01))
+	if (flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(space->machine(), data & 0x01);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(data & 0x01);
+		machine().tilemap().mark_all_dirty();
 	}
 
 	/* bit 1 is NMI enable */
-	state->m_yiear_nmi_enable = data & 0x02;
+	m_yiear_nmi_enable = data & 0x02;
 
 	/* bit 2 is IRQ enable */
-	state->m_yiear_irq_enable = data & 0x04;
+	m_yiear_irq_enable = data & 0x04;
 
 	/* bits 3 and 4 are coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x08);
-	coin_counter_w(space->machine(), 1, data & 0x10);
+	coin_counter_w(machine(), 0, data & 0x08);
+	coin_counter_w(machine(), 1, data & 0x10);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -112,7 +111,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	UINT8 *spriteram_2 = state->m_spriteram2;
 	int offs;
 
-	for (offs = state->m_spriteram_size - 2; offs >= 0; offs -= 2)
+	for (offs = state->m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
 	{
 		int attr = spriteram[offs];
 		int code = spriteram_2[offs + 1] + 256 * (attr & 0x01);
@@ -122,7 +121,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 		int sy = 240 - spriteram[offs + 1];
 		int sx = spriteram_2[offs];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sy = 240 - sy;
 			flipy = !flipy;

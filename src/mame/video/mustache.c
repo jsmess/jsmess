@@ -12,6 +12,7 @@
 
 PALETTE_INIT(mustache)
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < 256;i++)
@@ -43,39 +44,36 @@ PALETTE_INIT(mustache)
 	}
 }
 
-WRITE8_HANDLER( mustache_videoram_w )
+WRITE8_MEMBER(mustache_state::mustache_videoram_w)
 {
-	mustache_state *state = space->machine().driver_data<mustache_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset / 2);
+	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-WRITE8_HANDLER (mustache_video_control_w)
+WRITE8_MEMBER(mustache_state::mustache_video_control_w)
 {
-	mustache_state *state = space->machine().driver_data<mustache_state>();
-	if (flip_screen_get(space->machine()) != (data & 0x01))
+	if (flip_screen() != (data & 0x01))
 	{
-		flip_screen_set(space->machine(), data & 0x01);
-		space->machine().tilemap().mark_all_dirty();
+		flip_screen_set(data & 0x01);
+		machine().tilemap().mark_all_dirty();
 	}
 
 	/* tile bank */
 
-	if ((state->m_control_byte ^ data) & 0x08)
+	if ((m_control_byte ^ data) & 0x08)
 	{
-		state->m_control_byte = data;
-		space->machine().tilemap().mark_all_dirty();
+		m_control_byte = data;
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( mustache_scroll_w )
+WRITE8_MEMBER(mustache_state::mustache_scroll_w)
 {
-	mustache_state *state = space->machine().driver_data<mustache_state>();
-	state->m_bg_tilemap->set_scrollx(0, 0x100 - data);
-	state->m_bg_tilemap->set_scrollx(1, 0x100 - data);
-	state->m_bg_tilemap->set_scrollx(2, 0x100 - data);
-	state->m_bg_tilemap->set_scrollx(3, 0x100);
+	m_bg_tilemap->set_scrollx(0, 0x100 - data);
+	m_bg_tilemap->set_scrollx(1, 0x100 - data);
+	m_bg_tilemap->set_scrollx(2, 0x100 - data);
+	m_bg_tilemap->set_scrollx(3, 0x100);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -109,7 +107,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = 0;offs < state->m_spriteram_size;offs += 4)
+	for (offs = 0;offs < state->m_spriteram.bytes();offs += 4)
 	{
 		int sy = 240-spriteram[offs];
 		int sx = 240-spriteram[offs+3];
@@ -124,12 +122,12 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		if ((state->m_control_byte & 0xa))
 			clip.max_y = visarea.max_y;
 		else
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 				clip.min_y = visarea.min_y + 56;
 			else
 				clip.max_y = visarea.max_y - 56;
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -138,7 +136,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 		drawgfx_transpen(bitmap,clip,gfx,
 				code,
 				color,
-				flip_screen_get(machine),flip_screen_get(machine),
+				state->flip_screen(),state->flip_screen(),
 				sx,sy,0);
 	}
 }

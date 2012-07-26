@@ -7,11 +7,10 @@ Atari Orbit video emulation
 #include "emu.h"
 #include "includes/orbit.h"
 
-WRITE8_HANDLER( orbit_playfield_w )
+WRITE8_MEMBER(orbit_state::orbit_playfield_w)
 {
-	orbit_state *state = space->machine().driver_data<orbit_state>();
-	state->m_playfield_ram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_playfield_ram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -83,7 +82,7 @@ SCREEN_UPDATE_IND16( orbit )
 {
 	orbit_state *state = screen.machine().driver_data<orbit_state>();
 
-	state->m_flip_screen = input_port_read(screen.machine(), "DSW2") & 8;
+	state->m_flip_screen = screen.machine().root_device().ioport("DSW2")->read() & 8;
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 

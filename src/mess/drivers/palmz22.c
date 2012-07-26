@@ -159,7 +159,7 @@ static UINT32 s3c2410_gpio_port_r( device_t *device, int port, UINT32 mask)
 		break;
 		case S3C2410_GPIO_PORT_F :
 		{
-			data = (data & ~0xFF) | (input_port_read( device->machine(), "PORT-F") & 0xFF);
+			data = (data & ~0xFF) | (device->machine().root_device().ioport( "PORT-F")->read() & 0xFF);
 		}
 		break;
 		case S3C2410_GPIO_PORT_G :
@@ -213,8 +213,8 @@ static READ32_DEVICE_HANDLER( s3c2410_adc_data_r )
 	{
 		case 0 + 0 : data = 0x2EE + (PALM_Z22_BATTERY_LEVEL * 0xFF / 100); break;
 		case 0 + 1 : data = 0; break;
-		case 2 + 0 : data = input_port_read( device->machine(), "PENX"); break;
-		case 2 + 1 : data = 0x3FF - input_port_read( device->machine(), "PENY"); break;
+		case 2 + 0 : data = device->machine().root_device().ioport( "PENX")->read(); break;
+		case 2 + 1 : data = 0x3FF - device->machine().root_device().ioport( "PENY")->read(); break;
 	}
 	verboselog( device->machine(), 5,  "s3c2410_adc_data_r %08X\n", data);
 	return data;
@@ -242,7 +242,7 @@ static MACHINE_START( palmz22 )
 	palmz22_state *state = machine.driver_data<palmz22_state>();
 	state->m_s3c2410 = machine.device( "s3c2410");
 	state->m_nand = machine.device<nand_device>("nand");
-	state->m_nand->set_data_ptr( machine.region("nand")->base());
+	state->m_nand->set_data_ptr( state->memregion("nand")->base());
 }
 
 static MACHINE_RESET( palmz22 )
@@ -256,7 +256,7 @@ static MACHINE_RESET( palmz22 )
     ADDRESS MAPS
 ***************************************************************************/
 
-static ADDRESS_MAP_START( palmz22_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( palmz22_map, AS_PROGRAM, 32, palmz22_state )
 	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM
 ADDRESS_MAP_END
 

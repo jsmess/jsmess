@@ -36,15 +36,21 @@ class jongkyo_state : public driver_device
 {
 public:
 	jongkyo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
 	/* misc */
 	UINT8    m_rom_bank;
 	UINT8    m_mux_data;
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	UINT8    m_videoram2[0x4000];
+	DECLARE_WRITE8_MEMBER(bank_select_w);
+	DECLARE_WRITE8_MEMBER(mux_w);
+	DECLARE_WRITE8_MEMBER(jongkyo_coin_counter_w);
+	DECLARE_WRITE8_MEMBER(videoram2_w);
+	DECLARE_WRITE8_MEMBER(unknown_w);
 };
 
 
@@ -109,30 +115,28 @@ static SCREEN_UPDATE_IND16( jongkyo )
  *
  *************************************/
 
-static WRITE8_HANDLER( bank_select_w )
+WRITE8_MEMBER(jongkyo_state::bank_select_w)
 {
-	jongkyo_state *state = space->machine().driver_data<jongkyo_state>();
 	int mask = 1 << (offset >> 1);
 
-	state->m_rom_bank &= ~mask;
+	m_rom_bank &= ~mask;
 
 	if (offset & 1)
-		state->m_rom_bank |= mask;
+		m_rom_bank |= mask;
 
-	memory_set_bank(space->machine(), "bank1", state->m_rom_bank);
+	membank("bank1")->set_entry(m_rom_bank);
 }
 
-static WRITE8_HANDLER( mux_w )
+WRITE8_MEMBER(jongkyo_state::mux_w)
 {
-	jongkyo_state *state = space->machine().driver_data<jongkyo_state>();
-	state->m_mux_data = ~data;
-	//  printf("%02x\n", state->m_mux_data);
+	m_mux_data = ~data;
+	//  printf("%02x\n", m_mux_data);
 }
 
-static WRITE8_HANDLER( jongkyo_coin_counter_w )
+WRITE8_MEMBER(jongkyo_state::jongkyo_coin_counter_w)
 {
 	/* bit 1 = coin counter */
-	coin_counter_w(space->machine(), 0, data & 2);
+	coin_counter_w(machine(), 0, data & 2);
 
 	/* bit 2 always set? */
 }
@@ -140,50 +144,49 @@ static WRITE8_HANDLER( jongkyo_coin_counter_w )
 static READ8_DEVICE_HANDLER( input_1p_r )
 {
 	jongkyo_state *state = device->machine().driver_data<jongkyo_state>();
-	UINT8 cr_clear = input_port_read(device->machine(), "CR_CLEAR");
+	UINT8 cr_clear = state->ioport("CR_CLEAR")->read();
 
 	switch (state->m_mux_data)
 	{
-		case 0x01: return input_port_read(device->machine(), "PL1_1") | cr_clear;
-		case 0x02: return input_port_read(device->machine(), "PL1_2") | cr_clear;
-		case 0x04: return input_port_read(device->machine(), "PL1_3") | cr_clear;
-		case 0x08: return input_port_read(device->machine(), "PL1_4") | cr_clear;
-		case 0x10: return input_port_read(device->machine(), "PL1_5") | cr_clear;
-		case 0x20: return input_port_read(device->machine(), "PL1_6") | cr_clear;
+		case 0x01: return state->ioport("PL1_1")->read() | cr_clear;
+		case 0x02: return state->ioport("PL1_2")->read() | cr_clear;
+		case 0x04: return state->ioport("PL1_3")->read() | cr_clear;
+		case 0x08: return state->ioport("PL1_4")->read() | cr_clear;
+		case 0x10: return state->ioport("PL1_5")->read() | cr_clear;
+		case 0x20: return state->ioport("PL1_6")->read() | cr_clear;
 	}
 	//  printf("%04x\n", state->m_mux_data);
 
-	return (input_port_read(device->machine(), "PL1_1") & input_port_read(device->machine(), "PL1_2") & input_port_read(device->machine(), "PL1_3") &
-	       input_port_read(device->machine(), "PL1_4") & input_port_read(device->machine(), "PL1_5") & input_port_read(device->machine(), "PL1_6")) | cr_clear;
+	return (state->ioport("PL1_1")->read() & state->ioport("PL1_2")->read() & state->ioport("PL1_3")->read() &
+	       state->ioport("PL1_4")->read() & state->ioport("PL1_5")->read() & state->ioport("PL1_6")->read()) | cr_clear;
 }
 
 static READ8_DEVICE_HANDLER( input_2p_r )
 {
 	jongkyo_state *state = device->machine().driver_data<jongkyo_state>();
-	UINT8 coin_port = input_port_read(device->machine(), "COINS");
+	UINT8 coin_port = state->ioport("COINS")->read();
 
 	switch (state->m_mux_data)
 	{
-		case 0x01: return input_port_read(device->machine(), "PL2_1") | coin_port;
-		case 0x02: return input_port_read(device->machine(), "PL2_2") | coin_port;
-		case 0x04: return input_port_read(device->machine(), "PL2_3") | coin_port;
-		case 0x08: return input_port_read(device->machine(), "PL2_4") | coin_port;
-		case 0x10: return input_port_read(device->machine(), "PL2_5") | coin_port;
-		case 0x20: return input_port_read(device->machine(), "PL2_6") | coin_port;
+		case 0x01: return state->ioport("PL2_1")->read() | coin_port;
+		case 0x02: return state->ioport("PL2_2")->read() | coin_port;
+		case 0x04: return state->ioport("PL2_3")->read() | coin_port;
+		case 0x08: return state->ioport("PL2_4")->read() | coin_port;
+		case 0x10: return state->ioport("PL2_5")->read() | coin_port;
+		case 0x20: return state->ioport("PL2_6")->read() | coin_port;
 	}
 	//  printf("%04x\n", state->m_mux_data);
 
-	return (input_port_read(device->machine(), "PL2_1") & input_port_read(device->machine(), "PL2_2") & input_port_read(device->machine(), "PL2_3") &
-	       input_port_read(device->machine(), "PL2_4") & input_port_read(device->machine(), "PL2_5") & input_port_read(device->machine(), "PL2_6")) | coin_port;
+	return (state->ioport("PL2_1")->read() & state->ioport("PL2_2")->read() & state->ioport("PL2_3")->read() &
+	       state->ioport("PL2_4")->read() & state->ioport("PL2_5")->read() & state->ioport("PL2_6")->read()) | coin_port;
 }
 
-static WRITE8_HANDLER( videoram2_w )
+WRITE8_MEMBER(jongkyo_state::videoram2_w)
 {
-	jongkyo_state *state = space->machine().driver_data<jongkyo_state>();
-	state->m_videoram2[offset] = data;
+	m_videoram2[offset] = data;
 }
 
-static WRITE8_HANDLER( unknown_w )
+WRITE8_MEMBER(jongkyo_state::unknown_w)
 {
 	switch (offset)
 	{
@@ -217,20 +220,20 @@ static WRITE8_HANDLER( unknown_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( jongkyo_memmap, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jongkyo_memmap, AS_PROGRAM, 8, jongkyo_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITE(videoram2_w) // wrong, this doesn't seem to be video ram on write..
 	AM_RANGE(0x4000, 0x6bff) AM_ROM // fixed rom
 	AM_RANGE(0x6c00, 0x6fff) AM_ROMBANK("bank1")	// banked (8 banks)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_MEMBER(jongkyo_state, m_videoram)
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jongkyo_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( jongkyo_portmap, AS_IO, 8, jongkyo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// R 01 keyboard
-	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW") AM_WRITE(jongkyo_coin_counter_w)
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0") AM_WRITE(mux_w)
@@ -427,7 +430,7 @@ INPUT_PORTS_END
 static PALETTE_INIT(jongkyo)
 {
 	int i;
-	UINT8* proms = machine.region("proms")->base();
+	UINT8* proms = machine.root_device().memregion("proms")->base();
 	for (i = 0; i < 0x40; i++)
 	{
 		int data = proms[i];
@@ -547,7 +550,7 @@ ROM_END
 static DRIVER_INIT( jongkyo )
 {
 	int i;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	/* first of all, do a simple bitswap */
 	for (i = 0x6000; i < 0x9000; ++i)

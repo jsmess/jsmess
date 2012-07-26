@@ -46,6 +46,7 @@ static const res_net_info popper_net_info =
 
 PALETTE_INIT( popper )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	rgb_t	*rgb;
 
 	rgb = compute_res_net_all(machine, color_prom, &popper_decode_info, &popper_net_info);
@@ -54,69 +55,62 @@ PALETTE_INIT( popper )
 	auto_free(machine, rgb);
 }
 
-WRITE8_HANDLER( popper_ol_videoram_w )
+WRITE8_MEMBER(popper_state::popper_ol_videoram_w)
 {
-	popper_state *state = space->machine().driver_data<popper_state>();
 
-	state->m_ol_videoram[offset] = data;
-	state->m_ol_p123_tilemap->mark_tile_dirty(offset);
-	state->m_ol_p0_tilemap->mark_tile_dirty(offset);
+	m_ol_videoram[offset] = data;
+	m_ol_p123_tilemap->mark_tile_dirty(offset);
+	m_ol_p0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( popper_videoram_w )
+WRITE8_MEMBER(popper_state::popper_videoram_w)
 {
-	popper_state *state = space->machine().driver_data<popper_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_p123_tilemap->mark_tile_dirty(offset);
-	state->m_p0_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_p123_tilemap->mark_tile_dirty(offset);
+	m_p0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( popper_ol_attribram_w )
+WRITE8_MEMBER(popper_state::popper_ol_attribram_w)
 {
-	popper_state *state = space->machine().driver_data<popper_state>();
 
-	state->m_ol_attribram[offset] = data;
-	state->m_ol_p123_tilemap->mark_tile_dirty(offset);
-	state->m_ol_p0_tilemap->mark_tile_dirty(offset);
+	m_ol_attribram[offset] = data;
+	m_ol_p123_tilemap->mark_tile_dirty(offset);
+	m_ol_p0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( popper_attribram_w )
+WRITE8_MEMBER(popper_state::popper_attribram_w)
 {
-	popper_state *state = space->machine().driver_data<popper_state>();
 
-	state->m_attribram[offset] = data;
-	state->m_p123_tilemap->mark_tile_dirty(offset);
-	state->m_p0_tilemap->mark_tile_dirty(offset);
+	m_attribram[offset] = data;
+	m_p123_tilemap->mark_tile_dirty(offset);
+	m_p0_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( popper_flipscreen_w )
+WRITE8_MEMBER(popper_state::popper_flipscreen_w)
 {
-	popper_state *state = space->machine().driver_data<popper_state>();
 
-	state->m_flipscreen = data;
-	space->machine().tilemap().set_flip_all(state->m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
+	m_flipscreen = data;
+	machine().tilemap().set_flip_all(m_flipscreen ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
-	if (state->m_flipscreen)
-		state->m_tilemap_clip.min_x = state->m_tilemap_clip.max_x - 15;
+	if (m_flipscreen)
+		m_tilemap_clip.min_x = m_tilemap_clip.max_x - 15;
 	else
-		state->m_tilemap_clip.max_x = 15;
+		m_tilemap_clip.max_x = 15;
 }
 
-WRITE8_HANDLER( popper_e002_w )
+WRITE8_MEMBER(popper_state::popper_e002_w)
 {
-	popper_state *state = space->machine().driver_data<popper_state>();
-	state->m_e002 = data;
+	m_e002 = data;
 }
 
-WRITE8_HANDLER( popper_gfx_bank_w )
+WRITE8_MEMBER(popper_state::popper_gfx_bank_w)
 {
-	popper_state *state = space->machine().driver_data<popper_state>();
 
-	if (state->m_gfx_bank != data)
+	if (m_gfx_bank != data)
 	{
-		state->m_gfx_bank = data;
-		space->machine().tilemap().mark_all_dirty();
+		m_gfx_bank = data;
+		machine().tilemap().mark_all_dirty();
 	}
 }
 
@@ -209,7 +203,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap,const r
 	popper_state *state = machine.driver_data<popper_state>();
 	int offs, sx, sy, flipx, flipy;
 
-	for (offs = 0; offs < state->m_spriteram_size - 4; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes() - 4; offs += 4)
 	{
 		//if y position is in the current strip
 		if (state->m_spriteram[offs + 1] && (((state->m_spriteram[offs] + (state->m_flipscreen ? 2 : 0)) & 0xf0) == (0x0f - offs / 0x80) << 4))

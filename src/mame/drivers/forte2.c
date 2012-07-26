@@ -37,18 +37,18 @@ public:
 
 
 
-static ADDRESS_MAP_START( program_mem, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( program_mem, AS_PROGRAM, 8, forte2_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_mem, AS_IO, 8 )
+static ADDRESS_MAP_START( io_mem, AS_IO, 8, forte2_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x98, 0x98) AM_DEVREADWRITE_MODERN( "tms9928a", tms9928a_device, vram_read, vram_write )
-	AM_RANGE(0x99, 0x99) AM_DEVREADWRITE_MODERN( "tms9928a", tms9928a_device, register_read, register_write )
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x98, 0x98) AM_DEVREADWRITE( "tms9928a", tms9928a_device, vram_read, vram_write )
+	AM_RANGE(0x99, 0x99) AM_DEVREADWRITE( "tms9928a", tms9928a_device, register_read, register_write )
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 
 /* Ports a8-ab are originally for communicating with the i8255 PPI on MSX.
 Since this arcade board doesn't have one, those ports should be unmapped. */
@@ -72,7 +72,7 @@ INPUT_PORTS_END
 static READ8_DEVICE_HANDLER(forte2_ay8910_read_input)
 {
 	forte2_state *state = device->machine().driver_data<forte2_state>();
-	return input_port_read(device->machine(), "IN0") | (state->m_input_mask&0x3f);
+	return state->ioport("IN0")->read() | (state->m_input_mask&0x3f);
 }
 
 static WRITE8_DEVICE_HANDLER( forte2_ay8910_set_input_mask )
@@ -144,8 +144,8 @@ MACHINE_CONFIG_END
 static DRIVER_INIT(pesadelo)
 {
 	int i;
-	UINT8 *mem = machine.region("maincpu")->base();
-	int memsize = machine.region("maincpu")->bytes();
+	UINT8 *mem = machine.root_device().memregion("maincpu")->base();
+	int memsize = machine.root_device().memregion("maincpu")->bytes();
 	UINT8 *buf;
 
 	// data swap

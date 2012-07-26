@@ -109,23 +109,29 @@ ui_menu_main::ui_menu_main(running_machine &machine, render_container *container
 
 void ui_menu_main::populate()
 {
-	input_field_config *field;
-	input_port_config *port;
+	ioport_field *field;
+	ioport_port *port;
 	int has_configs = false;
 	int has_analog = false;
 	int has_dips = false;
+	int has_bioses = false;
 	astring menu_text;
 	/* scan the input port array to see what options we need to enable */
-	for (port = machine().m_portlist.first(); port != NULL; port = port->next())
-		for (field = port->fieldlist().first(); field != NULL; field = field->next())
+	for (port = machine().ioport().first_port(); port != NULL; port = port->next())
+		for (field = port->first_field(); field != NULL; field = field->next())
 		{
-			if (field->type == IPT_DIPSWITCH)
+			if (field->type() == IPT_DIPSWITCH)
 				has_dips = true;
-			if (field->type == IPT_CONFIG)
+			if (field->type() == IPT_CONFIG)
 				has_configs = true;
-			if (input_type_is_analog(field->type))
+			if (field->is_analog())
 				has_analog = true;
 		}
+	device_iterator deviter(machine().root_device());
+	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+		if (device->rom_region())
+			for (const rom_entry *rom = device->rom_region(); !ROMENTRY_ISEND(rom); rom++)
+				if (ROMENTRY_ISSYSTEM_BIOS(rom)) { has_bioses= true; break; }
 
 	/* add input menu items */
 	item_append("Input (general)", NULL, 0, (void *)INPUT_GROUPS);
@@ -168,6 +174,9 @@ void ui_menu_main::populate()
 			item_append("Bitbanger Control", NULL, 0, (void *)MESS_MENU_BITBANGER_CONTROL);
 	}
 
+	if (has_bioses)
+		item_append("Bios Selection", NULL, 0, (void *)BIOS_SELECTION);
+
 	slot_interface_iterator slotiter(machine().root_device());
 	if (slotiter.first() != NULL)
 	{
@@ -183,7 +192,7 @@ void ui_menu_main::populate()
 	}
 
 	/* add keyboard mode menu */
-	if (input_machine_has_keyboard(machine()) && inputx_can_post(machine()))
+	if (machine().ioport().has_keyboard() && machine().ioport().natkeyboard().can_post())
 		item_append("Keyboard Mode", NULL, 0, (void *)KEYBOARD_MODE);
 
 	/* add sliders menu */
@@ -305,6 +314,10 @@ void ui_menu_main::handle()
 
 		case SELECT_GAME:
 			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_select_game(machine(), container, 0)));
+			break;
+
+		case BIOS_SELECTION:
+			ui_menu::stack_push(auto_alloc_clear(machine(), ui_menu_bios_selection(machine(), container)));
 			break;
 
 		default:
@@ -466,6 +479,76 @@ void ui_menu_slot_devices::handle()
 	}
 }
 
+/*-------------------------------------------------
+    ui_menu_bios_selection - populates the main
+    bios selection menu
+-------------------------------------------------*/
+
+ui_menu_bios_selection::ui_menu_bios_selection(running_machine &machine, render_container *container) : ui_menu(machine, container)
+{
+}
+
+void ui_menu_bios_selection::populate()
+{
+	/* cycle through all devices for this system */
+	device_iterator deviter(machine().root_device());
+	for (device_t *device = deviter.first(); device != NULL; device = deviter.next())
+	{
+		if (device->rom_region()) {
+			const char *val = "default";
+			for (const rom_entry *rom = device->rom_region(); !ROMENTRY_ISEND(rom); rom++)
+			{
+				if (ROMENTRY_ISSYSTEM_BIOS(rom) && ROM_GETBIOSFLAGS(rom)==device->system_bios())
+				{
+					val = ROM_GETHASHDATA(rom);
+				}
+			}
+			item_append(strcmp(device->tag(),":")==0 ? "driver" : device->tag()+1, val, MENU_FLAG_LEFT_ARROW | MENU_FLAG_RIGHT_ARROW, (void *)device);
+		}
+	}
+
+	item_append(MENU_SEPARATOR_ITEM, NULL, 0, NULL);
+	item_append("Reset",  NULL, 0, NULL);
+}
+
+ui_menu_bios_selection::~ui_menu_bios_selection()
+{
+}
+
+/*-------------------------------------------------
+    ui_menu_bios_selection - menu that
+-------------------------------------------------*/
+
+void ui_menu_bios_selection::handle()
+{
+	/* process the menu */
+	const ui_menu_event *menu_event = process(0);
+
+	if (menu_event != NULL && menu_event->itemref != NULL)
+	{
+		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT) {
+			device_t *dev = (device_t *)menu_event->itemref;
+			int cnt = 0;
+			for (const rom_entry *rom = dev->rom_region(); !ROMENTRY_ISEND(rom); rom++)
+			{
+				if (ROMENTRY_ISSYSTEM_BIOS(rom)) cnt ++;
+			}
+			int val = dev->system_bios() + ((menu_event->iptkey == IPT_UI_LEFT) ? -1 : +1);
+			if (val<1) val=cnt;
+			if (val>cnt) val=1;
+			dev->set_system_bios(val);
+			if (strcmp(dev->tag(),":")==0) {
+				astring error;
+				machine().options().set_value("bios", val-1, OPTION_PRIORITY_CMDLINE, error);
+				assert(!error);
+			}
+			reset(UI_MENU_RESET_REMEMBER_REF);
+		}
+	} else if (menu_event != NULL && menu_event->iptkey == IPT_UI_SELECT) {
+		machine().schedule_hard_reset();
+	}
+}
+
 ui_menu_network_devices::ui_menu_network_devices(running_machine &machine, render_container *container) : ui_menu(machine, container)
 {
 }
@@ -588,10 +671,10 @@ void ui_menu_input_general::populate()
 	suborder[SEQ_TYPE_INCREMENT] = 2;
 
 	/* iterate over the input ports and add menu items */
-	for (input_type_entry *entry = input_type_list(machine()).first(); entry != NULL; entry = entry->next())
+	for (input_type_entry *entry = machine().ioport().first_type(); entry != NULL; entry = entry->next())
 
 		/* add if we match the group and we have a valid name */
-		if (entry->group == group && entry->name != NULL && entry->name[0] != 0)
+		if (entry->group() == group && entry->name() != NULL && entry->name()[0] != 0)
 		{
 			input_seq_type seqtype;
 
@@ -606,11 +689,11 @@ void ui_menu_input_general::populate()
 				if(pollingitem && pollingref == entry && pollingseq == seqtype)
 					pollingitem = item;
 				item->seqtype = seqtype;
-				item->seq = input_type_seq(machine(), entry->type, entry->player, seqtype);
-				item->defseq = &entry->defseq[seqtype];
+				item->seq = machine().ioport().type_seq(entry->type(), entry->player(), seqtype);
+				item->defseq = &entry->defseq(seqtype);
 				item->sortorder = sortorder * 4 + suborder[seqtype];
-				item->type = input_type_is_analog(entry->type) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
-				item->name = entry->name;
+				item->type = ioport_manager::type_is_analog(entry->type()) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
+				item->name = entry->name();
 				item->next = itemlist;
 				itemlist = item;
 
@@ -640,8 +723,8 @@ ui_menu_input_specific::ui_menu_input_specific(running_machine &machine, render_
 void ui_menu_input_specific::populate()
 {
 	input_item_data *itemlist = NULL;
-	input_field_config *field;
-	input_port_config *port;
+	ioport_field *field;
+	ioport_port *port;
 	int suborder[SEQ_TYPE_TOTAL];
 	astring tempstring;
 
@@ -651,23 +734,23 @@ void ui_menu_input_specific::populate()
 	suborder[SEQ_TYPE_INCREMENT] = 2;
 
 	/* iterate over the input ports and add menu items */
-	for (port = machine().m_portlist.first(); port != NULL; port = port->next())
-		for (field = port->fieldlist().first(); field != NULL; field = field->next())
+	for (port = machine().ioport().first_port(); port != NULL; port = port->next())
+		for (field = port->first_field(); field != NULL; field = field->next())
 		{
-			const char *name = input_field_name(field);
+			const char *name = field->name();
 
 			/* add if we match the group and we have a valid name */
-			if (name != NULL && input_condition_true(machine(), &field->condition, port->owner()) &&
-				((field->type == IPT_OTHER && field->name != NULL) || input_type_group(machine(), field->type, field->player) != IPG_INVALID))
+			if (name != NULL && field->enabled() &&
+				((field->type() == IPT_OTHER && field->name() != NULL) || machine().ioport().type_group(field->type(), field->player()) != IPG_INVALID))
 			{
 				input_seq_type seqtype;
 				UINT16 sortorder;
 
 				/* determine the sorting order */
-				if (field->type >= IPT_START1 && field->type <= __ipt_analog_end)
-					sortorder = (field->type << 2) | (field->player << 12);
+				if (field->type() >= IPT_START1 && field->type() < IPT_ANALOG_LAST)
+					sortorder = (field->type() << 2) | (field->player() << 12);
 				else
-					sortorder = field->type | 0xf000;
+					sortorder = field->type() | 0xf000;
 
 				/* loop over all sequence types */
 				for (seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; seqtype++)
@@ -679,10 +762,10 @@ void ui_menu_input_specific::populate()
 					item->seqtype = seqtype;
 					if(pollingitem && pollingref == field && pollingseq == seqtype)
 						pollingitem = item;
-					item->seq = input_field_seq(field, seqtype);
-					item->defseq = &get_field_default_seq(field, seqtype);
+					item->seq = field->seq(seqtype);
+					item->defseq = &field->defseq(seqtype);
 					item->sortorder = sortorder + suborder[seqtype];
-					item->type = input_type_is_analog(field->type) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
+					item->type = field->is_analog() ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 					item->name = name;
 					item->next = itemlist;
 					itemlist = item;
@@ -730,19 +813,6 @@ void ui_menu_input::toggle_none_default(input_seq &selected_seq, input_seq &orig
 	/* otherwise, toggle to "none" */
 	else
 		selected_seq.reset();
-}
-
-/*-------------------------------------------------
-    get_field_default_seq - return a pointer
-    to the default sequence for the given field
--------------------------------------------------*/
-
-const input_seq &ui_menu_input::get_field_default_seq(input_field_config *field, input_seq_type seqtype)
-{
-	if (field->seq[seqtype].is_default())
-		return input_type_seq(field->machine(), field->type, field->player, seqtype);
-	else
-		return field->seq[seqtype];
 }
 
 void ui_menu_input::handle()
@@ -833,16 +903,16 @@ void ui_menu_input::handle()
 void ui_menu_input_general::update_input(struct input_item_data *seqchangeditem)
 {
 	const input_type_entry *entry = (const input_type_entry *)seqchangeditem->ref;
-	input_type_set_seq(machine(), entry->type, entry->player, seqchangeditem->seqtype, &seqchangeditem->seq);
+	machine().ioport().set_type_seq(entry->type(), entry->player(), seqchangeditem->seqtype, seqchangeditem->seq);
 }
 
 void ui_menu_input_specific::update_input(struct input_item_data *seqchangeditem)
 {
-	input_field_user_settings settings;
+	ioport_field::user_settings settings;
 
-	input_field_get_user_settings((input_field_config *)seqchangeditem->ref, &settings);
+	((ioport_field *)seqchangeditem->ref)->get_user_settings(settings);
 	settings.seq[seqchangeditem->seqtype] = seqchangeditem->seq;
-	input_field_set_user_settings((input_field_config *)seqchangeditem->ref, &settings);
+	((ioport_field *)seqchangeditem->ref)->set_user_settings(settings);
 }
 
 
@@ -964,29 +1034,29 @@ void ui_menu_settings::handle()
 	/* handle events */
 	if (menu_event != NULL && menu_event->itemref != NULL)
 	{
-		input_field_config *field = (input_field_config *)menu_event->itemref;
-		input_field_user_settings settings;
+		ioport_field *field = (ioport_field *)menu_event->itemref;
+		ioport_field::user_settings settings;
 		int changed = false;
 
 		switch (menu_event->iptkey)
 		{
 			/* if selected, reset to default value */
 			case IPT_UI_SELECT:
-				input_field_get_user_settings(field, &settings);
-				settings.value = field->defvalue;
-				input_field_set_user_settings(field, &settings);
+				field->get_user_settings(settings);
+				settings.value = field->defvalue();
+				field->set_user_settings(settings);
 				changed = true;
 				break;
 
 			/* left goes to previous setting */
 			case IPT_UI_LEFT:
-				input_field_select_previous_setting(field);
+				field->select_previous_setting();
 				changed = true;
 				break;
 
 			/* right goes to next setting */
 			case IPT_UI_RIGHT:
-				input_field_select_next_setting(field);
+				field->select_next_setting();
 				changed = true;
 				break;
 		}
@@ -1010,8 +1080,8 @@ ui_menu_settings::ui_menu_settings(running_machine &machine, render_container *c
 
 void ui_menu_settings::populate()
 {
-	input_field_config *field;
-	input_port_config *port;
+	ioport_field *field;
+	ioport_port *port;
 	dip_descriptor **diplist_tailptr;
 
 	/* reset the dip switch tracking */
@@ -1020,40 +1090,40 @@ void ui_menu_settings::populate()
 	diplist_tailptr = &diplist;
 
 	/* loop over input ports and set up the current values */
-	for (port = machine().m_portlist.first(); port != NULL; port = port->next())
-		for (field = port->fieldlist().first(); field != NULL; field = field->next())
-			if (field->type == type && input_condition_true(machine(), &field->condition, port->owner()))
+	for (port = machine().ioport().first_port(); port != NULL; port = port->next())
+		for (field = port->first_field(); field != NULL; field = field->next())
+			if (field->type() == type && field->enabled())
 			{
 				UINT32 flags = 0;
 
 				/* set the left/right flags appropriately */
-				if (input_field_has_previous_setting(field))
+				if (field->has_previous_setting())
 					flags |= MENU_FLAG_LEFT_ARROW;
-				if (input_field_has_next_setting(field))
+				if (field->has_next_setting())
 					flags |= MENU_FLAG_RIGHT_ARROW;
 
 				/* add the menu item */
-				item_append(input_field_name(field), input_field_setting_name(field), flags, (void *)field);
+				item_append(field->name(), field->setting_name(), flags, (void *)field);
 
 				/* for DIP switches, build up the model */
-				if (type == IPT_DIPSWITCH && field->diploclist().count() != 0)
+				if (type == IPT_DIPSWITCH && field->first_diplocation() != NULL)
 				{
-					const input_field_diplocation *diploc;
-					input_field_user_settings settings;
-					UINT32 accummask = field->mask;
+					const ioport_diplocation *diploc;
+					ioport_field::user_settings settings;
+					UINT32 accummask = field->mask();
 
 					/* get current settings */
-					input_field_get_user_settings(field, &settings);
+					field->get_user_settings(settings);
 
 					/* iterate over each bit in the field */
-					for (diploc = field->diploclist().first(); diploc != NULL; diploc = diploc->next())
+					for (diploc = field->first_diplocation(); diploc != NULL; diploc = diploc->next())
 					{
 						UINT32 mask = accummask & ~(accummask - 1);
 						dip_descriptor *dip;
 
 						/* find the matching switch name */
 						for (dip = diplist; dip != NULL; dip = dip->next)
-							if (strcmp(dip->name, diploc->swname) == 0)
+							if (strcmp(dip->name, diploc->name()) == 0)
 								break;
 
 						/* allocate new if none */
@@ -1061,7 +1131,7 @@ void ui_menu_settings::populate()
 						{
 							dip = (dip_descriptor *)m_pool_alloc(sizeof(*dip));
 							dip->next = NULL;
-							dip->name = diploc->swname;
+							dip->name = diploc->name();
 							dip->mask = dip->state = 0;
 							*diplist_tailptr = dip;
 							diplist_tailptr = &dip->next;
@@ -1070,9 +1140,9 @@ void ui_menu_settings::populate()
 						}
 
 						/* apply the bits */
-						dip->mask |= 1 << (diploc->swnum - 1);
-						if (((settings.value & mask) != 0 && !diploc->invert) || ((settings.value & mask) == 0 && diploc->invert))
-							dip->state |= 1 << (diploc->swnum - 1);
+						dip->mask |= 1 << (diploc->number() - 1);
+						if (((settings.value & mask) != 0 && !diploc->inverted()) || ((settings.value & mask) == 0 && diploc->inverted()))
+							dip->state |= 1 << (diploc->number() - 1);
 
 						/* clear the relevant bit in the accumulated mask */
 						accummask &= ~mask;
@@ -1094,7 +1164,7 @@ ui_menu_settings::~ui_menu_settings()
 
 void ui_menu_settings_dip_switches::custom_render(void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2)
 {
-	input_field_config *field = (input_field_config *)selectedref;
+	ioport_field *field = (ioport_field *)selectedref;
 	dip_descriptor *dip;
 
 	/* add borders */
@@ -1110,14 +1180,14 @@ void ui_menu_settings_dip_switches::custom_render(void *selectedref, float top, 
 	{
 		if (mame_stricmp(dip->name, "FAKE") != 0)
 		{
-			const input_field_diplocation *diploc;
+			const ioport_diplocation *diploc;
 			UINT32 selectedmask = 0;
 
 			/* determine the mask of selected bits */
 			if (field != NULL)
-				for (diploc = field->diploclist().first(); diploc != NULL; diploc = diploc->next())
-					if (strcmp(dip->name, diploc->swname) == 0)
-						selectedmask |= 1 << (diploc->swnum - 1);
+				for (diploc = field->first_diplocation(); diploc != NULL; diploc = diploc->next())
+					if (strcmp(dip->name, diploc->name()) == 0)
+						selectedmask |= 1 << (diploc->number() - 1);
 
 			/* draw one switch */
 			custom_render_one(x1, y1, x2, y1 + DIP_SWITCH_HEIGHT, dip, selectedmask);
@@ -1239,10 +1309,10 @@ void ui_menu_analog::handle()
 		/* if things changed, update */
 		if (newval != data->cur)
 		{
-			input_field_user_settings settings;
+			ioport_field::user_settings settings;
 
 			/* get the settings and set the new value */
-			input_field_get_user_settings(data->field, &settings);
+			data->field->get_user_settings(settings);
 			switch (data->type)
 			{
 				case ANALOG_ITEM_KEYSPEED:		settings.delta = newval;		break;
@@ -1250,7 +1320,7 @@ void ui_menu_analog::handle()
 				case ANALOG_ITEM_REVERSE:		settings.reverse = newval;		break;
 				case ANALOG_ITEM_SENSITIVITY:	settings.sensitivity = newval;	break;
 			}
-			input_field_set_user_settings(data->field, &settings);
+			data->field->set_user_settings(settings);
 
 			/* rebuild the menu */
 			reset(UI_MENU_RESET_REMEMBER_POSITION);
@@ -1270,26 +1340,26 @@ ui_menu_analog::ui_menu_analog(running_machine &machine, render_container *conta
 
 void ui_menu_analog::populate()
 {
-	input_field_config *field;
-	input_port_config *port;
+	ioport_field *field;
+	ioport_port *port;
 	astring subtext;
 	astring text;
 
 	/* loop over input ports and add the items */
-	for (port = machine().m_portlist.first(); port != NULL; port = port->next())
-		for (field = port->fieldlist().first(); field != NULL; field = field->next())
-			if (input_type_is_analog(field->type) && input_condition_true(machine(), &field->condition, port->owner()))
+	for (port = machine().ioport().first_port(); port != NULL; port = port->next())
+		for (field = port->first_field(); field != NULL; field = field->next())
+			if (field->is_analog() && field->enabled())
 			{
-				input_field_user_settings settings;
+				ioport_field::user_settings settings;
 				int use_autocenter = false;
 				int type;
 
 				/* based on the type, determine if we enable autocenter */
-				switch (field->type)
+				switch (field->type())
 				{
 					case IPT_POSITIONAL:
 					case IPT_POSITIONAL_V:
-						if (field->flags & ANALOG_FLAG_WRAPS)
+						if (field->analog_wraps())
 							break;
 
 					case IPT_AD_STICK_X:
@@ -1302,10 +1372,13 @@ void ui_menu_analog::populate()
 					case IPT_PEDAL3:
 						use_autocenter = true;
 						break;
+
+					default:
+						break;
 				}
 
 				/* get the user settings */
-				input_field_get_user_settings(field, &settings);
+				field->get_user_settings(settings);
 
 				/* iterate over types */
 				for (type = 0; type < ANALOG_ITEM_COUNT; type++)
@@ -1324,39 +1397,39 @@ void ui_menu_analog::populate()
 						{
 							default:
 							case ANALOG_ITEM_KEYSPEED:
-								text.printf("%s Digital Speed", input_field_name(field));
+								text.printf("%s Digital Speed", field->name());
 								subtext.printf("%d", settings.delta);
 								data->min = 0;
 								data->max = 255;
 								data->cur = settings.delta;
-								data->defvalue = field->delta;
+								data->defvalue = field->delta();
 								break;
 
 							case ANALOG_ITEM_CENTERSPEED:
-								text.printf("%s Autocenter Speed", input_field_name(field));
+								text.printf("%s Autocenter Speed", field->name());
 								subtext.printf("%d", settings.centerdelta);
 								data->min = 0;
 								data->max = 255;
 								data->cur = settings.centerdelta;
-								data->defvalue = field->centerdelta;
+								data->defvalue = field->centerdelta();
 								break;
 
 							case ANALOG_ITEM_REVERSE:
-								text.printf("%s Reverse", input_field_name(field));
+								text.printf("%s Reverse", field->name());
 								subtext.cpy(settings.reverse ? "On" : "Off");
 								data->min = 0;
 								data->max = 1;
 								data->cur = settings.reverse;
-								data->defvalue = ((field->flags & ANALOG_FLAG_REVERSE) != 0);
+								data->defvalue = field->analog_reverse();
 								break;
 
 							case ANALOG_ITEM_SENSITIVITY:
-								text.printf("%s Sensitivity", input_field_name(field));
+								text.printf("%s Sensitivity", field->name());
 								subtext.printf("%d", settings.sensitivity);
 								data->min = 1;
 								data->max = 255;
 								data->cur = settings.sensitivity;
-								data->defvalue = field->sensitivity;
+								data->defvalue = field->sensitivity();
 								break;
 						}
 
@@ -2631,18 +2704,18 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	const game_driver *driver;
 	float width, maxwidth;
 	float x1, y1, x2, y2;
-	char tempbuf[5][256];
+	astring tempbuf[5];
 	rgb_t color;
 	int line;
 
 	/* display the current typeahead */
 	if (search[0] != 0)
-		sprintf(&tempbuf[0][0], "Type name or select: %s_", search);
+		tempbuf[0].printf("Type name or select: %s_", search);
 	else
-		sprintf(&tempbuf[0][0], "Type name or select: (random)");
+		tempbuf[0].printf("Type name or select: (random)");
 
 	/* get the size of the text */
-	ui_draw_text_full(container, &tempbuf[0][0], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	ui_draw_text_full(container, tempbuf[0], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 					  DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = MAX(width, origx2 - origx1);
@@ -2663,7 +2736,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	y2 -= UI_BOX_TB_BORDER;
 
 	/* draw the text within it */
-	ui_draw_text_full(container, &tempbuf[0][0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+	ui_draw_text_full(container, tempbuf[0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 					  DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 
 	/* determine the text to render below */
@@ -2673,21 +2746,21 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		const char *gfxstat, *soundstat;
 
 		/* first line is game name */
-		sprintf(&tempbuf[0][0], "%-.100s", driver->description);
+		tempbuf[0].printf("%-.100s", driver->description);
 
 		/* next line is year, manufacturer */
-		sprintf(&tempbuf[1][0], "%s, %-.100s", driver->year, driver->manufacturer);
+		tempbuf[1].printf("%s, %-.100s", driver->year, driver->manufacturer);
 
 		/* next line source path */
-		sprintf(&tempbuf[2][0], "Driver: %-.100s", strrchr(driver->source_file, '/')+1);
+		tempbuf[2].printf("Driver: %-.100s", core_filename_extract_base(tempbuf[3], driver->source_file).cstr());
 
 		/* next line is overall driver status */
 		if (driver->flags & GAME_NOT_WORKING)
-			strcpy(&tempbuf[3][0], "Overall: NOT WORKING");
+			tempbuf[3].cpy("Overall: NOT WORKING");
 		else if (driver->flags & GAME_UNEMULATED_PROTECTION)
-			strcpy(&tempbuf[3][0], "Overall: Unemulated Protection");
+			tempbuf[3].cpy("Overall: Unemulated Protection");
 		else
-			strcpy(&tempbuf[3][0], "Overall: Working");
+			tempbuf[3].cpy("Overall: Working");
 
 		/* next line is graphics, sound status */
 		if (driver->flags & (GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS))
@@ -2702,30 +2775,30 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 		else
 			soundstat = "OK";
 
-		sprintf(&tempbuf[4][0], "Gfx: %s, Sound: %s", gfxstat, soundstat);
+		tempbuf[4].printf("Gfx: %s, Sound: %s", gfxstat, soundstat);
 	}
 	else
 	{
 		const char *s = emulator_info::get_copyright();
 		line = 0;
-		int col = 0;
 
 		/* first line is version string */
-		sprintf(&tempbuf[line++][0], "%s %s", emulator_info::get_applongname(), build_version);
+		tempbuf[line++].printf("%s %s", emulator_info::get_applongname(), build_version);
 
 		/* output message */
 		while (line < ARRAY_LENGTH(tempbuf))
 		{
-			if (*s == 0 || *s == '\n')
-			{
-				tempbuf[line++][col] = 0;
-				col = 0;
-			}
-			else
-				tempbuf[line][col++] = *s;
+			if (!(*s == 0 || *s == '\n'))
+				tempbuf[line].cat(*s);
 
-			if (*s != 0)
+			if (*s == '\n')
+			{
+				line++;
 				s++;
+			} else if (*s != 0)
+				s++;
+			else
+				line++;
 		}
 	}
 
@@ -2733,7 +2806,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	maxwidth = origx2 - origx1;
 	for (line = 0; line < 4; line++)
 	{
-		ui_draw_text_full(container, &tempbuf[line][0], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		ui_draw_text_full(container, tempbuf[line], 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						  DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = MAX(maxwidth, width);
@@ -2764,7 +2837,7 @@ void ui_menu_select_game::custom_render(void *selectedref, float top, float bott
 	/* draw all lines */
 	for (line = 0; line < 4; line++)
 	{
-		ui_draw_text_full(container, &tempbuf[line][0], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
+		ui_draw_text_full(container, tempbuf[line], x1, y1, x2 - x1, JUSTIFY_CENTER, WRAP_TRUNCATE,
 						  DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 		y1 += ui_get_line_height(machine());
 	}

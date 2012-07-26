@@ -100,7 +100,7 @@ static const eeprom_interface eeprom_interface_93C66 =
 
 
 
-static READ32_HANDLER( eolith_custom_r )
+READ32_MEMBER(eolith_state::eolith_custom_r)
 {
 	/*
         bit 3 = eeprom bit
@@ -110,42 +110,41 @@ static READ32_HANDLER( eolith_custom_r )
         bit 8 = ???
         bit 9 = ???
     */
-	eolith_speedup_read(space);
+	eolith_speedup_read(&space);
 
-	return (input_port_read(space->machine(), "IN0") & ~0x300) | (space->machine().rand() & 0x300);
+	return (ioport("IN0")->read() & ~0x300) | (machine().rand() & 0x300);
 }
 
-static WRITE32_HANDLER( systemcontrol_w )
+WRITE32_MEMBER(eolith_state::systemcontrol_w)
 {
-	eolith_state *state = space->machine().driver_data<eolith_state>();
-	state->m_buffer = (data & 0x80) >> 7;
-	coin_counter_w(space->machine(), 0, data & state->m_coin_counter_bit);
-	set_led_status(space->machine(), 0, data & 1);
+	m_buffer = (data & 0x80) >> 7;
+	coin_counter_w(machine(), 0, data & m_coin_counter_bit);
+	set_led_status(machine(), 0, data & 1);
 
-	input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+	ioport("EEPROMOUT")->write(data, 0xff);
 
 	// bit 0x100 and 0x040 ?
 }
 
-static READ32_HANDLER( hidctch3_pen1_r )
+READ32_MEMBER(eolith_state::hidctch3_pen1_r)
 {
 	//320 x 240
-	int xpos = input_port_read(space->machine(), "PEN_X_P1");
-	int ypos = input_port_read(space->machine(), "PEN_Y_P1");
+	int xpos = ioport("PEN_X_P1")->read();
+	int ypos = ioport("PEN_Y_P1")->read();
 
 	return xpos + (ypos*168*2);
 }
 
-static READ32_HANDLER( hidctch3_pen2_r )
+READ32_MEMBER(eolith_state::hidctch3_pen2_r)
 {
 	//320 x 240
-	int xpos = input_port_read(space->machine(), "PEN_X_P2");
-	int ypos = input_port_read(space->machine(), "PEN_Y_P2");
+	int xpos = ioport("PEN_X_P2")->read();
+	int ypos = ioport("PEN_Y_P2")->read();
 
 	return xpos + (ypos*168*2);
 }
 
-static ADDRESS_MAP_START( eolith_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( eolith_map, AS_PROGRAM, 32, eolith_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM // fort2b wants ram here
 	AM_RANGE(0x40000000, 0x401fffff) AM_RAM
 	AM_RANGE(0x90000000, 0x9003ffff) AM_READWRITE(eolith_vram_r, eolith_vram_w)
@@ -168,7 +167,7 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(eolith_speedup_getvblank, NULL)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith_state, eolith_speedup_getvblank, NULL)
 	PORT_BIT( 0x00003f80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00008000, IP_ACTIVE_LOW )
@@ -206,7 +205,7 @@ static INPUT_PORTS_START( ironfort )
 	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(eolith_speedup_getvblank, NULL)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith_state, eolith_speedup_getvblank, NULL)
 	PORT_BIT( 0x00003f80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -389,7 +388,7 @@ static INPUT_PORTS_START( stealsee )
 	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_device, read_bit)
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(stealsee_speedup_getvblank, NULL)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, eolith_state, stealsee_speedup_getvblank, NULL)
 	PORT_BIT( 0x00003f80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00008000, IP_ACTIVE_LOW )
@@ -1310,7 +1309,7 @@ static DRIVER_INIT( landbrka )
 	//it fails compares with memories:
 	//$4002d338 -> $4002d348 .... $4002d33f -> $4002d34f
 	//related with bits 0x100 - 0x200 read at startup from input(0) ?
-	UINT32 *rombase = (UINT32*)machine.region("maincpu")->base();
+	UINT32 *rombase = (UINT32*)state->memregion("maincpu")->base();
 	rombase[0x14f00/4] = (rombase[0x14f00/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 
 	state->m_coin_counter_bit = 0x2000;
@@ -1320,7 +1319,7 @@ static DRIVER_INIT( landbrka )
 static DRIVER_INIT( hidctch2 )
 {
 	//it fails compares in memory like in landbrka
-	UINT32 *rombase = (UINT32*)machine.region("maincpu")->base();
+	UINT32 *rombase = (UINT32*)machine.root_device().memregion("maincpu")->base();
 	rombase[0xbcc8/4] = (rombase[0xbcc8/4] & 0xffff) | 0x03000000; /* Change BR to NOP */
 	init_eolith_speedup(machine);
 }
@@ -1331,11 +1330,12 @@ static DRIVER_INIT( hidctch3 )
 
 	// It is not clear why the first reads are needed too
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfce00000, 0xfce00003, FUNC(hidctch3_pen1_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfce80000, 0xfce80003, FUNC(hidctch3_pen1_r));
+	eolith_state *state = machine.driver_data<eolith_state>();
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfce00000, 0xfce00003, read32_delegate(FUNC(eolith_state::hidctch3_pen1_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfce80000, 0xfce80003, read32_delegate(FUNC(eolith_state::hidctch3_pen1_r),state));
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfcf00000, 0xfcf00003, FUNC(hidctch3_pen2_r));
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xfcf80000, 0xfcf80003, FUNC(hidctch3_pen2_r));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfcf00000, 0xfcf00003, read32_delegate(FUNC(eolith_state::hidctch3_pen2_r),state));
+	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_read_handler(0xfcf80000, 0xfcf80003, read32_delegate(FUNC(eolith_state::hidctch3_pen2_r),state));
 
 	init_eolith_speedup(machine);
 }

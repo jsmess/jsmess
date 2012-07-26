@@ -10,10 +10,9 @@
 #include "includes/cosmic.h"
 
 
-WRITE8_HANDLER( cosmic_color_register_w )
+WRITE8_MEMBER(cosmic_state::cosmic_color_register_w)
 {
-	cosmic_state *state = space->machine().driver_data<cosmic_state>();
-	state->m_color_registers[offset] = data ? 1 : 0;
+	m_color_registers[offset] = data ? 1 : 0;
 }
 
 
@@ -21,7 +20,7 @@ static pen_t panic_map_color( running_machine &machine, UINT8 x, UINT8 y )
 {
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	offs_t offs = (state->m_color_registers[0] << 9) | (state->m_color_registers[2] << 10) | ((x >> 4) << 5) | (y >> 3);
-	pen_t pen = machine.region("user1")->base()[offs];
+	pen_t pen = state->memregion("user1")->base()[offs];
 
 	if (state->m_color_registers[1])
 		pen >>= 4;
@@ -33,7 +32,7 @@ static pen_t cosmica_map_color( running_machine &machine, UINT8 x, UINT8 y )
 {
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	offs_t offs = (state->m_color_registers[0] << 9) | ((x >> 4) << 5) | (y >> 3);
-	pen_t pen = machine.region("user1")->base()[offs];
+	pen_t pen = state->memregion("user1")->base()[offs];
 
 	if (state->m_color_registers[1]) // 0 according to the schematics, but that breaks alien formation colors
 		pen >>= 4;
@@ -45,7 +44,7 @@ static pen_t cosmicg_map_color( running_machine &machine, UINT8 x, UINT8 y )
 {
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	offs_t offs = (state->m_color_registers[0] << 8) | (state->m_color_registers[1] << 9) | ((y >> 4) << 4) | (x >> 4);
-	pen_t pen = machine.region("user1")->base()[offs];
+	pen_t pen = state->memregion("user1")->base()[offs];
 
 	/* the upper 4 bits are for cocktail mode support */
 	return pen & 0x0f;
@@ -55,7 +54,7 @@ static pen_t magspot_map_color( running_machine &machine, UINT8 x, UINT8 y )
 {
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	offs_t offs = (state->m_color_registers[0] << 9) | ((x >> 3) << 4) | (y >> 4);
-	pen_t pen = machine.region("user1")->base()[offs];
+	pen_t pen = state->memregion("user1")->base()[offs];
 
 	if (state->m_color_registers[1])
 		pen >>= 4;
@@ -78,6 +77,7 @@ static pen_t magspot_map_color( running_machine &machine, UINT8 x, UINT8 y )
 
 PALETTE_INIT( panic )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	int i;
 
@@ -120,6 +120,7 @@ PALETTE_INIT( panic )
 
 PALETTE_INIT( cosmica )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	int i;
 
@@ -181,6 +182,7 @@ PALETTE_INIT( cosmicg )
 
 PALETTE_INIT( magspot )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	int i;
 
@@ -215,6 +217,7 @@ PALETTE_INIT( magspot )
 
 PALETTE_INIT( nomnlnd )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	int i;
 
@@ -244,10 +247,9 @@ PALETTE_INIT( nomnlnd )
 }
 
 
-WRITE8_HANDLER( cosmic_background_enable_w )
+WRITE8_MEMBER(cosmic_state::cosmic_background_enable_w)
 {
-	cosmic_state *state = space->machine().driver_data<cosmic_state>();
-	state->m_background_enable = data;
+	m_background_enable = data;
 }
 
 
@@ -256,7 +258,7 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const r
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{
 		int i;
 		UINT8 data = state->m_videoram[offs];
@@ -270,7 +272,7 @@ static void draw_bitmap( running_machine &machine, bitmap_ind16 &bitmap, const r
 		{
 			if (data & 0x80)
 			{
-				if (flip_screen_get(machine))
+				if (state->flip_screen())
 					bitmap.pix16(255-y, 255-x) = pen;
 				else
 					bitmap.pix16(y, x) = pen;
@@ -288,7 +290,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 	cosmic_state *state = machine.driver_data<cosmic_state>();
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4;offs >= 0;offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4;offs >= 0;offs -= 4)
 	{
 		if (state->m_spriteram[offs] != 0)
         {
@@ -319,9 +321,10 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 static void cosmica_draw_starfield( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
+	cosmic_state *state = screen.machine().driver_data<cosmic_state>();
 	UINT8 y = 0;
 	UINT8 map = 0;
-	UINT8 *PROM = screen.machine().region("user2")->base();
+	UINT8 *PROM = state->memregion("user2")->base();
 
 	while (1)
 	{
@@ -335,7 +338,7 @@ static void cosmica_draw_starfield( screen_device &screen, bitmap_ind16 &bitmap,
 			UINT8 x1;
 			int hc, hb_;
 
-			if (flip_screen_get(screen.machine()))
+			if (state->flip_screen())
 				x1 = x - screen.frame_number();
 			else
 				x1 = x + screen.frame_number();
@@ -368,9 +371,10 @@ static void cosmica_draw_starfield( screen_device &screen, bitmap_ind16 &bitmap,
 
 static void devzone_draw_grid( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
+	cosmic_state *state = machine.driver_data<cosmic_state>();
 	UINT8 y;
-	UINT8 *horz_PROM = machine.region("user2")->base();
-	UINT8 *vert_PROM = machine.region("user3")->base();
+	UINT8 *horz_PROM = state->memregion("user2")->base();
+	UINT8 *vert_PROM = state->memregion("user3")->base();
 	offs_t horz_addr = 0;
 
 	UINT8 count = 0;
@@ -406,7 +410,7 @@ static void devzone_draw_grid( running_machine &machine, bitmap_ind16 &bitmap, c
 				if (!(vert_data & horz_data & 0x80))	/* NAND gate */
 				{
 					/* blue */
-					if (flip_screen_get(machine))
+					if (state->flip_screen())
 						bitmap.pix16(255-y, 255-x) = 4;
 					else
 						bitmap.pix16(y, x) = 4;
@@ -426,9 +430,10 @@ static void devzone_draw_grid( running_machine &machine, bitmap_ind16 &bitmap, c
 
 static void nomnlnd_draw_background( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
+	cosmic_state *state = screen.machine().driver_data<cosmic_state>();
 	UINT8 y = 0;
 	UINT8 water = screen.frame_number();
-	UINT8 *PROM = screen.machine().region("user2")->base();
+	UINT8 *PROM = state->memregion("user2")->base();
 
 	/* all positioning is via logic gates:
 
@@ -491,7 +496,7 @@ static void nomnlnd_draw_background( screen_device &screen, bitmap_ind16 &bitmap
 				if ((!hd_) & hc_ & (!hb_))
 				{
 					offs_t offs = ((x >> 3) & 0x03) | ((y & 0x1f) << 2) |
-					              (flip_screen_get(screen.machine()) ? 0x80 : 0);
+					              (state->flip_screen() ? 0x80 : 0);
 
 					UINT8 plane1 = PROM[offs         ] << (x & 0x07);
 					UINT8 plane2 = PROM[offs | 0x0400] << (x & 0x07);
@@ -525,7 +530,7 @@ static void nomnlnd_draw_background( screen_device &screen, bitmap_ind16 &bitmap
 
 			if (color != 0)
 			{
-				if (flip_screen_get(screen.machine()))
+				if (state->flip_screen())
 					bitmap.pix16(255-y, 255-x) = color;
 				else
 					bitmap.pix16(y, x) = color;

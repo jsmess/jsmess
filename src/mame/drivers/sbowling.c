@@ -49,11 +49,12 @@ class sbowling_state : public driver_device
 public:
 	sbowling_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu")
-		{ }
+		m_maincpu(*this, "maincpu"),
+		m_videoram(*this, "videoram"){ }
 
 	int m_bgmap;
-	UINT8 *m_videoram;
+	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_videoram;
 
 	int m_sbw_system;
 	tilemap_t *m_sb_tilemap;
@@ -62,13 +63,19 @@ public:
 	UINT8 m_pix_sh;
 	UINT8 m_pix[2];
 
-	required_device<cpu_device> m_maincpu;
+	DECLARE_WRITE8_MEMBER(sbw_videoram_w);
+	DECLARE_WRITE8_MEMBER(pix_shift_w);
+	DECLARE_WRITE8_MEMBER(pix_data_w);
+	DECLARE_READ8_MEMBER(pix_data_r);
+	DECLARE_WRITE8_MEMBER(system_w);
+	DECLARE_WRITE8_MEMBER(graph_control_w);
+	DECLARE_READ8_MEMBER(controls_r);
 };
 
 static TILE_GET_INFO( get_sb_tile_info )
 {
 	sbowling_state *state = machine.driver_data<sbowling_state>();
-	UINT8 *rom = machine.region("user1")->base();
+	UINT8 *rom = state->memregion("user1")->base();
 	int tileno = rom[tile_index + state->m_bgmap * 1024];
 
 	SET_TILE_INFO(0, tileno, 0, 0);
@@ -84,25 +91,24 @@ static void plot_pixel_sbw(bitmap_ind16 *tmpbitmap, int x, int y, int col, int f
 	tmpbitmap->pix16(y, x) = col;
 }
 
-static WRITE8_HANDLER( sbw_videoram_w )
+WRITE8_MEMBER(sbowling_state::sbw_videoram_w)
 {
-	sbowling_state *state = space->machine().driver_data<sbowling_state>();
-	int flip = flip_screen_get(space->machine());
+	int flip = flip_screen();
 	int x,y,i,v1,v2;
 
-	state->m_videoram[offset] = data;
+	m_videoram[offset] = data;
 
 	offset &= 0x1fff;
 
 	y = offset / 32;
 	x = (offset % 32) * 8;
 
-	v1 = state->m_videoram[offset];
-	v2 = state->m_videoram[offset+0x2000];
+	v1 = m_videoram[offset];
+	v2 = m_videoram[offset+0x2000];
 
 	for (i = 0; i < 8; i++)
 	{
-		plot_pixel_sbw(state->m_tmpbitmap, x++, y, state->m_color_prom_address | ( ((v1&1)*0x20) | ((v2&1)*0x40) ), flip);
+		plot_pixel_sbw(m_tmpbitmap, x++, y, m_color_prom_address | ( ((v1&1)*0x20) | ((v2&1)*0x40) ), flip);
 		v1 >>= 1;
 		v2 >>= 1;
 	}
@@ -126,28 +132,25 @@ static VIDEO_START(sbowling)
 	state->m_sb_tilemap = tilemap_create(machine, get_sb_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-static WRITE8_HANDLER( pix_shift_w )
+WRITE8_MEMBER(sbowling_state::pix_shift_w)
 {
-	sbowling_state *state = space->machine().driver_data<sbowling_state>();
 
-	state->m_pix_sh = data;
+	m_pix_sh = data;
 }
-static WRITE8_HANDLER( pix_data_w )
+WRITE8_MEMBER(sbowling_state::pix_data_w)
 {
-	sbowling_state *state = space->machine().driver_data<sbowling_state>();
 
-	state->m_pix[0] = state->m_pix[1];
-	state->m_pix[1] = data;
+	m_pix[0] = m_pix[1];
+	m_pix[1] = data;
 }
-static READ8_HANDLER( pix_data_r )
+READ8_MEMBER(sbowling_state::pix_data_r)
 {
-	sbowling_state *state = space->machine().driver_data<sbowling_state>();
 	UINT32 p1, p0;
 	int res;
-	int sh = state->m_pix_sh & 7;
+	int sh = m_pix_sh & 7;
 
-	p1 = state->m_pix[1];
-	p0 = state->m_pix[0];
+	p1 = m_pix[1];
+	p0 = m_pix[0];
 
 	res = (((p1 << (sh+8)) | (p0 << sh)) & 0xff00) >> 8;
 
@@ -169,7 +172,7 @@ static TIMER_DEVICE_CALLBACK( sbw_interrupt )
 
 }
 
-static WRITE8_HANDLER (system_w)
+WRITE8_MEMBER(sbowling_state::system_w)
 {
 	/*
         76543210
@@ -178,20 +181,20 @@ static WRITE8_HANDLER (system_w)
         -----x-- 1 ?
         ----x--- flip screen/controls
     */
-	sbowling_state *state = space->machine().driver_data<sbowling_state>();
 
-	flip_screen_set(space->machine(), data&1);
 
-	if ((state->m_sbw_system^data)&1)
+	flip_screen_set(data&1);
+
+	if ((m_sbw_system^data)&1)
 	{
 		int offs;
 		for (offs = 0;offs < 0x4000; offs++)
-			sbw_videoram_w(space, offs, state->m_videoram[offs]);
+			sbw_videoram_w(space, offs, m_videoram[offs]);
 	}
-	state->m_sbw_system = data;
+	m_sbw_system = data;
 }
 
-static WRITE8_HANDLER(graph_control_w)
+WRITE8_MEMBER(sbowling_state::graph_control_w)
 {
 	/*
         76543210
@@ -201,34 +204,33 @@ static WRITE8_HANDLER(graph_control_w)
         xx------ color PROM address lines A4,A3
     */
 
-	sbowling_state *state = space->machine().driver_data<sbowling_state>();
 
-	state->m_color_prom_address = ((data&0x07)<<7) | ((data&0xc0)>>3);
 
-	state->m_bgmap = ((data>>4)^3) & 0x3;
-	state->m_sb_tilemap->mark_all_dirty();
+	m_color_prom_address = ((data&0x07)<<7) | ((data&0xc0)>>3);
+
+	m_bgmap = ((data>>4)^3) & 0x3;
+	m_sb_tilemap->mark_all_dirty();
 }
 
-static READ8_HANDLER (controls_r)
+READ8_MEMBER(sbowling_state::controls_r)
 {
-	sbowling_state *state = space->machine().driver_data<sbowling_state>();
 
-	if (state->m_sbw_system & 2)
-		return input_port_read(space->machine(), "TRACKY");
+	if (m_sbw_system & 2)
+		return ioport("TRACKY")->read();
 	else
-		return input_port_read(space->machine(), "TRACKX");
+		return ioport("TRACKX")->read();
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sbowling_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(sbw_videoram_w) AM_BASE_MEMBER(sbowling_state,m_videoram)
-	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xf801, 0xf801) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x8000, 0xbfff) AM_RAM_WRITE(sbw_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xf800, 0xf801) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xf801, 0xf801) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 	AM_RANGE(0xfc00, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( port_map, AS_IO, 8, sbowling_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(controls_r, pix_data_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(pix_data_r, pix_shift_w)
@@ -340,6 +342,7 @@ GFXDECODE_END
 
 static PALETTE_INIT( sbowling )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	static const int resistances_rg[3] = { 470, 270, 100 };

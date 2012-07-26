@@ -4,13 +4,15 @@ class docastle_state : public driver_device
 {
 public:
 	docastle_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram;
-	UINT8 *  m_colorram;
-	UINT8 *  m_spriteram;
-	size_t   m_spriteram_size;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_spriteram;
 
 	/* video-related */
 	tilemap_t  *m_do_tilemap;
@@ -26,25 +28,25 @@ public:
 	/* devices */
 	cpu_device *m_maincpu;
 	cpu_device *m_slave;
+	DECLARE_READ8_MEMBER(docastle_shared0_r);
+	DECLARE_READ8_MEMBER(docastle_shared1_r);
+	DECLARE_WRITE8_MEMBER(docastle_shared0_w);
+	DECLARE_WRITE8_MEMBER(docastle_shared1_w);
+	DECLARE_WRITE8_MEMBER(docastle_nmitrigger_w);
+	DECLARE_WRITE8_MEMBER(docastle_videoram_w);
+	DECLARE_WRITE8_MEMBER(docastle_colorram_w);
+	DECLARE_READ8_MEMBER(docastle_flipscreen_off_r);
+	DECLARE_READ8_MEMBER(docastle_flipscreen_on_r);
+	DECLARE_WRITE8_MEMBER(docastle_flipscreen_off_w);
+	DECLARE_WRITE8_MEMBER(docastle_flipscreen_on_w);
 };
 
 
 /*----------- defined in machine/docastle.c -----------*/
 
-READ8_HANDLER( docastle_shared0_r );
-READ8_HANDLER( docastle_shared1_r );
-WRITE8_HANDLER( docastle_shared0_w );
-WRITE8_HANDLER( docastle_shared1_w );
-WRITE8_HANDLER( docastle_nmitrigger_w );
 
 /*----------- defined in video/docastle.c -----------*/
 
-WRITE8_HANDLER( docastle_videoram_w );
-WRITE8_HANDLER( docastle_colorram_w );
-READ8_HANDLER( docastle_flipscreen_off_r );
-READ8_HANDLER( docastle_flipscreen_on_r );
-WRITE8_HANDLER( docastle_flipscreen_off_w );
-WRITE8_HANDLER( docastle_flipscreen_on_w );
 
 PALETTE_INIT( docastle );
 VIDEO_START( docastle );

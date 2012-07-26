@@ -61,7 +61,11 @@ struct _sp0256_interface
 
 void sp0256_bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length);
 
+void sp0256_set_clock(device_t *device, int clock);
+
 WRITE8_DEVICE_HANDLER( sp0256_ALD_w );
+
+READ_LINE_DEVICE_HANDLER( sp0256_lrq_r );
 READ_LINE_DEVICE_HANDLER( sp0256_sby_r );
 
 READ16_DEVICE_HANDLER( spb640_r );

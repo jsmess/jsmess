@@ -55,7 +55,6 @@
 
 *  (driver structure copied from vtech1.c)
 ******************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 /* Core includes */
 #include "emu.h"

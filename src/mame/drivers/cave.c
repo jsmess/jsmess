@@ -166,22 +166,21 @@ static void sound_irq_gen( device_t *device, int state )
 
 /* Reads the cause of the interrupt and clears the state */
 
-static READ16_HANDLER( cave_irq_cause_r )
+READ16_MEMBER(cave_state::cave_irq_cause_r)
 {
-	cave_state *state = space->machine().driver_data<cave_state>();
 	int result = 0x0003;
 
-	if (state->m_vblank_irq)
+	if (m_vblank_irq)
 		result ^= 0x01;
-	if (state->m_unknown_irq)
+	if (m_unknown_irq)
 		result ^= 0x02;
 
 	if (offset == 4/2)
-		state->m_vblank_irq = 0;
+		m_vblank_irq = 0;
 	if (offset == 6/2)
-		state->m_unknown_irq = 0;
+		m_unknown_irq = 0;
 
-	update_irq_state(space->machine());
+	update_irq_state(machine());
 
 /*
     sailormn and agallet wait for bit 2 of $b80001 to go 1 -> 0.
@@ -191,7 +190,7 @@ static READ16_HANDLER( cave_irq_cause_r )
 	if (offset == 0)
 	{
 		result &= ~4;
-		result |= (state->m_agallet_vblank_irq ? 0 : 4);
+		result |= (m_agallet_vblank_irq ? 0 : 4);
 	}
 
 	return result;
@@ -209,82 +208,75 @@ static READ16_HANDLER( cave_irq_cause_r )
 /*  We need a FIFO buffer for sailormn, where the inter-CPUs
     communication is *really* tight */
 
-static READ8_HANDLER( soundflags_r )
+READ8_MEMBER(cave_state::soundflags_r)
 {
 	// bit 2 is low: can read command (lo)
 	// bit 3 is low: can read command (hi)
-//  cave_state *state = space->machine().driver_data<cave_state>();
-//  return  (state->m_sound_flag1 ? 0 : 4) |
-//          (state->m_sound_flag2 ? 0 : 8) ;
+//  return  (m_sound_flag1 ? 0 : 4) |
+//          (m_sound_flag2 ? 0 : 8) ;
 return 0;
 }
 
-static READ16_HANDLER( soundflags_ack_r )
+READ16_MEMBER(cave_state::soundflags_ack_r)
 {
 	// bit 0 is low: can write command
 	// bit 1 is low: can read answer
-	cave_state *state = space->machine().driver_data<cave_state>();
-//  return  ((state->m_sound_flag1 | state->m_sound_flag2) ? 1 : 0) |
-//          ((state->m_soundbuf_len > 0) ? 0 : 2) ;
+//  return  ((m_sound_flag1 | m_sound_flag2) ? 1 : 0) |
+//          ((m_soundbuf_len > 0) ? 0 : 2) ;
 
-	return ((state->m_soundbuf_len > 0) ? 0 : 2) ;
+	return ((m_soundbuf_len > 0) ? 0 : 2) ;
 }
 
 /* Main CPU: write a 16 bit sound latch and generate a NMI on the sound CPU */
-static WRITE16_HANDLER( sound_cmd_w )
+WRITE16_MEMBER(cave_state::sound_cmd_w)
 {
-	cave_state *state = space->machine().driver_data<cave_state>();
-//  state->m_sound_flag1 = 1;
-//  state->m_sound_flag2 = 1;
+//  m_sound_flag1 = 1;
+//  m_sound_flag2 = 1;
 	soundlatch_word_w(space, offset, data, mem_mask);
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
-	device_spin_until_time(&space->device(), attotime::from_usec(50));	// Allow the other cpu to reply
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+	device_spin_until_time(&space.device(), attotime::from_usec(50));	// Allow the other cpu to reply
 }
 
 /* Sound CPU: read the low 8 bits of the 16 bit sound latch */
-static READ8_HANDLER( soundlatch_lo_r )
+READ8_MEMBER(cave_state::soundlatch_lo_r)
 {
-//  cave_state *state = space->machine().driver_data<cave_state>();
-//  state->m_sound_flag1 = 0;
+//  m_sound_flag1 = 0;
 	return soundlatch_word_r(space, offset, 0x00ff) & 0xff;
 }
 
 /* Sound CPU: read the high 8 bits of the 16 bit sound latch */
-static READ8_HANDLER( soundlatch_hi_r )
+READ8_MEMBER(cave_state::soundlatch_hi_r)
 {
-//  cave_state *state = space->machine().driver_data<cave_state>();
-//  state->m_sound_flag2 = 0;
+//  m_sound_flag2 = 0;
 	return soundlatch_word_r(space, offset, 0xff00) >> 8;
 }
 
 /* Main CPU: read the latch written by the sound CPU (acknowledge) */
-static READ16_HANDLER( soundlatch_ack_r )
+READ16_MEMBER(cave_state::soundlatch_ack_r)
 {
-	cave_state *state = space->machine().driver_data<cave_state>();
-	if (state->m_soundbuf_len > 0)
+	if (m_soundbuf_len > 0)
 	{
-		UINT8 data = state->m_soundbuf_data[0];
-		memmove(state->m_soundbuf_data, state->m_soundbuf_data + 1, (32 - 1) * sizeof(state->m_soundbuf_data[0]));
-		state->m_soundbuf_len--;
+		UINT8 data = m_soundbuf_data[0];
+		memmove(m_soundbuf_data, m_soundbuf_data + 1, (32 - 1) * sizeof(m_soundbuf_data[0]));
+		m_soundbuf_len--;
 		return data;
 	}
 	else
 	{
-		logerror("CPU #1 - PC %04X: Sound Buffer 2 Underflow Error\n", cpu_get_pc(&space->device()));
+		logerror("CPU #1 - PC %04X: Sound Buffer 2 Underflow Error\n", cpu_get_pc(&space.device()));
 		return 0xff;
 	}
 }
 
 
 /* Sound CPU: write latch for the main CPU (acknowledge) */
-static WRITE8_HANDLER( soundlatch_ack_w )
+WRITE8_MEMBER(cave_state::soundlatch_ack_w)
 {
-	cave_state *state = space->machine().driver_data<cave_state>();
-	state->m_soundbuf_data[state->m_soundbuf_len] = data;
-	if (state->m_soundbuf_len < 32)
-		state->m_soundbuf_len++;
+	m_soundbuf_data[m_soundbuf_len] = data;
+	if (m_soundbuf_len < 32)
+		m_soundbuf_len++;
 	else
-		logerror("CPU #1 - PC %04X: Sound Buffer 2 Overflow Error\n", cpu_get_pc(&space->device()));
+		logerror("CPU #1 - PC %04X: Sound Buffer 2 Overflow Error\n", cpu_get_pc(&space.device()));
 }
 
 
@@ -368,12 +360,12 @@ static WRITE16_DEVICE_HANDLER( cave_eeprom_lsb_w )
 }
 
 /*  - No eeprom or lockouts */
-static WRITE16_HANDLER( gaia_coin_lsb_w )
+WRITE16_MEMBER(cave_state::gaia_coin_lsb_w)
 {
 	if (ACCESSING_BITS_0_7)  // odd address
 	{
-		coin_counter_w(space->machine(), 1, data & 0x0002);
-		coin_counter_w(space->machine(), 0, data & 0x0001);
+		coin_counter_w(machine(), 1, data & 0x0002);
+		coin_counter_w(machine(), 0, data & 0x0001);
 	}
 }
 
@@ -436,24 +428,24 @@ static const eeprom_interface eeprom_interface_93C46_pacslot =
                                 Dangan Feveron
 ***************************************************************************/
 
-static ADDRESS_MAP_START( dfeveron_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( dfeveron_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																	// RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
-/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_spriteram, m_spriteram_size)		// Sprites
-/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_BASE_MEMBER(cave_state, m_spriteram_2)							// Sprites?
-/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, m_vram[0])			// Layer 0
-/**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE_MEMBER(cave_state, m_vram[1])			// Layer 1
-/**/AM_RANGE(0x708000, 0x708fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
+/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram")		// Sprites
+/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2")							// Sprites?
+/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")			// Layer 0
+/**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")			// Layer 1
+/**/AM_RANGE(0x708000, 0x708fff) AM_RAM AM_SHARE("paletteram")	// Palette
 /**/AM_RANGE(0x710000, 0x710bff) AM_READONLY															// ?
 	AM_RANGE(0x710c00, 0x710fff) AM_RAM																	// ?
 	AM_RANGE(0x800000, 0x800007) AM_READ(cave_irq_cause_r)												// IRQ Cause
-	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_BASE_MEMBER(cave_state, m_videoregs)						// Video Regs
-/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[0])								// Layer 0 Control
-/**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[1])								// Layer 1 Control
+	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_SHARE("videoregs")						// Video Regs
+/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl.0")								// Layer 0 Control
+/**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl.1")								// Layer 1 Control
 	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("IN0")													// Inputs
 	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("IN1")													// Inputs + EEPROM
-	AM_RANGE(0xc00000, 0xc00001) AM_DEVWRITE("eeprom", cave_eeprom_msb_w)								// EEPROM
+	AM_RANGE(0xc00000, 0xc00001) AM_DEVWRITE_LEGACY("eeprom", cave_eeprom_msb_w)								// EEPROM
 ADDRESS_MAP_END
 
 
@@ -461,24 +453,24 @@ ADDRESS_MAP_END
                                 Dodonpachi
 ***************************************************************************/
 
-static ADDRESS_MAP_START( ddonpach_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( ddonpach_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																	// RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
-/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_spriteram, m_spriteram_size)		// Sprites
-/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_BASE_MEMBER(cave_state, m_spriteram_2)							// Sprites?
-/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, m_vram[0])			// Layer 0
-/**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE_MEMBER(cave_state, m_vram[1])			// Layer 1
-/**/AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(cave_vram_2_8x8_w) AM_BASE_MEMBER(cave_state, m_vram[2])		// Layer 2
+	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
+/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram")		// Sprites
+/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2")							// Sprites?
+/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")			// Layer 0
+/**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")			// Layer 1
+/**/AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(cave_vram_2_8x8_w) AM_SHARE("vram.2")		// Layer 2
 	AM_RANGE(0x800000, 0x800007) AM_READ(cave_irq_cause_r)												// IRQ Cause
-	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_BASE_MEMBER(cave_state, m_videoregs)						// Video Regs
-/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[0])								// Layer 0 Control
-/**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[1])								// Layer 1 Control
-/**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[2])								// Layer 2 Control
-/**/AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_SHARE("videoregs")						// Video Regs
+/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl.0")								// Layer 0 Control
+/**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl.1")								// Layer 1 Control
+/**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl.2")								// Layer 2 Control
+/**/AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("IN0")													// Inputs
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("IN1")													// Inputs + EEPROM
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE("eeprom", cave_eeprom_msb_w)								// EEPROM
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE_LEGACY("eeprom", cave_eeprom_msb_w)								// EEPROM
 ADDRESS_MAP_END
 
 
@@ -486,7 +478,7 @@ ADDRESS_MAP_END
                                     Donpachi
 ***************************************************************************/
 
-static READ16_HANDLER( donpachi_videoregs_r )
+READ16_MEMBER(cave_state::donpachi_videoregs_r)
 {
 	switch (offset)
 	{
@@ -500,10 +492,9 @@ static READ16_HANDLER( donpachi_videoregs_r )
 }
 
 #if 0
-WRITE16_HANDLER( donpachi_videoregs_w )
+WRITE16_MEMBER(cave_state::donpachi_videoregs_w)
 {
-	cave_state *state = space->machine().driver_data<cave_state>();
-	COMBINE_DATA(&state->m_videoregs[offset]);
+	COMBINE_DATA(&m_videoregs[offset]);
 
 	switch (offset)
 	{
@@ -512,25 +503,25 @@ WRITE16_HANDLER( donpachi_videoregs_w )
 }
 #endif
 
-static ADDRESS_MAP_START( donpachi_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( donpachi_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																		// RAM
-	AM_RANGE(0x200000, 0x207fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE_MEMBER(cave_state, m_vram[1])				// Layer 1
-	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, m_vram[0])				// Layer 0
-	AM_RANGE(0x400000, 0x407fff) AM_RAM_WRITE(cave_vram_2_8x8_w) AM_BASE_MEMBER(cave_state, m_vram[2])			// Layer 2
-	AM_RANGE(0x500000, 0x507fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_spriteram, m_spriteram_size)			// Sprites
-	AM_RANGE(0x508000, 0x50ffff) AM_RAM AM_BASE_MEMBER(cave_state, m_spriteram_2)								// Sprites?
-/**/AM_RANGE(0x600000, 0x600005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[1])									// Layer 1 Control
-/**/AM_RANGE(0x700000, 0x700005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[0])									// Layer 0 Control
-/**/AM_RANGE(0x800000, 0x800005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[2])									// Layer 2 Control
-	AM_RANGE(0x900000, 0x90007f) AM_RAM_READ(donpachi_videoregs_r) AM_BASE_MEMBER(cave_state, m_videoregs)	// Video Regs
-/**/AM_RANGE(0xa08000, 0xa08fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_paletteram, m_paletteram_size)		// Palette
-	AM_RANGE(0xb00000, 0xb00003) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)					// M6295
-	AM_RANGE(0xb00010, 0xb00013) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff)					//
-	AM_RANGE(0xb00020, 0xb0002f) AM_DEVWRITE("nmk112", nmk112_okibank_lsb_w)								//
+	AM_RANGE(0x200000, 0x207fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")				// Layer 1
+	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")				// Layer 0
+	AM_RANGE(0x400000, 0x407fff) AM_RAM_WRITE(cave_vram_2_8x8_w) AM_SHARE("vram.2")			// Layer 2
+	AM_RANGE(0x500000, 0x507fff) AM_RAM AM_SHARE("spriteram")			// Sprites
+	AM_RANGE(0x508000, 0x50ffff) AM_RAM AM_SHARE("spriteram_2")								// Sprites?
+/**/AM_RANGE(0x600000, 0x600005) AM_RAM AM_SHARE("vctrl.1")									// Layer 1 Control
+/**/AM_RANGE(0x700000, 0x700005) AM_RAM AM_SHARE("vctrl.0")									// Layer 0 Control
+/**/AM_RANGE(0x800000, 0x800005) AM_RAM AM_SHARE("vctrl.2")									// Layer 2 Control
+	AM_RANGE(0x900000, 0x90007f) AM_RAM_READ(donpachi_videoregs_r) AM_SHARE("videoregs")	// Video Regs
+/**/AM_RANGE(0xa08000, 0xa08fff) AM_RAM AM_SHARE("paletteram")		// Palette
+	AM_RANGE(0xb00000, 0xb00003) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)					// M6295
+	AM_RANGE(0xb00010, 0xb00013) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)					//
+	AM_RANGE(0xb00020, 0xb0002f) AM_DEVWRITE_LEGACY("nmk112", nmk112_okibank_lsb_w)								//
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")														// Inputs
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")														// Inputs + EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE("eeprom", cave_eeprom_msb_w)									// EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE_LEGACY("eeprom", cave_eeprom_msb_w)									// EEPROM
 ADDRESS_MAP_END
 
 
@@ -538,24 +529,24 @@ ADDRESS_MAP_END
                                     Esprade
 ***************************************************************************/
 
-static ADDRESS_MAP_START( esprade_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( esprade_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																	// RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
-/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_spriteram, m_spriteram_size)		// Sprites
-/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_BASE_MEMBER(cave_state, m_spriteram_2)							// Sprites?
-/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, m_vram[0])			// Layer 0
-/**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE_MEMBER(cave_state, m_vram[1])			// Layer 1
-/**/AM_RANGE(0x700000, 0x707fff) AM_RAM_WRITE(cave_vram_2_w) AM_BASE_MEMBER(cave_state, m_vram[2])			// Layer 2
+	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
+/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram")		// Sprites
+/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2")							// Sprites?
+/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")			// Layer 0
+/**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")			// Layer 1
+/**/AM_RANGE(0x700000, 0x707fff) AM_RAM_WRITE(cave_vram_2_w) AM_SHARE("vram.2")			// Layer 2
 	AM_RANGE(0x800000, 0x800007) AM_READ(cave_irq_cause_r)												// IRQ Cause
-	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_BASE_MEMBER(cave_state, m_videoregs)						// Video Regs
-/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[0])								// Layer 0 Control
-/**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[1])								// Layer 1 Control
-/**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[2])								// Layer 2 Control
-/**/AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_SHARE("videoregs")						// Video Regs
+/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl.0")								// Layer 0 Control
+/**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl.1")								// Layer 1 Control
+/**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl.2")								// Layer 2 Control
+/**/AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xd00000, 0xd00001) AM_READ_PORT("IN0" )													// Inputs
 	AM_RANGE(0xd00002, 0xd00003) AM_READ_PORT("IN1" )													// Inputs + EEPROM
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE("eeprom", cave_eeprom_msb_w)								// EEPROM
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE_LEGACY("eeprom", cave_eeprom_msb_w)								// EEPROM
 ADDRESS_MAP_END
 
 
@@ -563,24 +554,24 @@ ADDRESS_MAP_END
                                     Gaia Crusaders
 ***************************************************************************/
 
-static ADDRESS_MAP_START( gaia_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( gaia_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																	// RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
-	AM_RANGE(0x400000, 0x407fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_spriteram, m_spriteram_size)		// Sprite bank 1
-	AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_BASE_MEMBER(cave_state, m_spriteram_2)							// Sprite bank 2
-	AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, m_vram[0])			// Layer 0
+	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
+	AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram")		// Sprite bank 1
+	AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2")							// Sprite bank 2
+	AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")			// Layer 0
 	AM_RANGE(0x508000, 0x50ffff) AM_RAM																	// More Layer 0, Tested but not used?
-	AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE_MEMBER(cave_state, m_vram[1])			// Layer 1
+	AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")			// Layer 1
 	AM_RANGE(0x608000, 0x60ffff) AM_RAM																	// More Layer 1, Tested but not used?
-	AM_RANGE(0x700000, 0x707fff) AM_RAM_WRITE(cave_vram_2_w) AM_BASE_MEMBER(cave_state, m_vram[2])			// Layer 2
+	AM_RANGE(0x700000, 0x707fff) AM_RAM_WRITE(cave_vram_2_w) AM_SHARE("vram.2")			// Layer 2
 	AM_RANGE(0x708000, 0x70ffff) AM_RAM																	// More Layer 2, Tested but not used?
 	AM_RANGE(0x800000, 0x800007) AM_READ(cave_irq_cause_r)												// IRQ Cause
-	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_BASE_MEMBER(cave_state, m_videoregs)						// Video Regs
-/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[0])								// Layer 0 Control
-/**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[1])								// Layer 1 Control
-/**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[2])								// Layer 2 Control
-	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x800000, 0x80007f) AM_WRITEONLY AM_SHARE("videoregs")						// Video Regs
+/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl.0")								// Layer 0 Control
+/**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl.1")								// Layer 1 Control
+/**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl.2")								// Layer 2 Control
+	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xd00010, 0xd00011) AM_READ_PORT("IN0")													// Inputs
 	AM_RANGE(0xd00010, 0xd00011) AM_WRITE(gaia_coin_lsb_w)												// Coin counter only
 	AM_RANGE(0xd00012, 0xd00013) AM_READ_PORT("IN1")													// Inputs
@@ -593,23 +584,23 @@ ADDRESS_MAP_END
                                     Guwange
 ***************************************************************************/
 
-static ADDRESS_MAP_START( guwange_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( guwange_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																	// ROM
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM																	// RAM
 	AM_RANGE(0x300000, 0x300007) AM_READ(cave_irq_cause_r)												// IRQ Cause
-	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_BASE_MEMBER(cave_state, m_videoregs)						// Video Regs
-/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_spriteram, m_spriteram_size)		// Sprites
-/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_BASE_MEMBER(cave_state, m_spriteram_2)							// Sprites?
-/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, m_vram[0])			// Layer 0
-/**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE_MEMBER(cave_state, m_vram[1])			// Layer 1
-/**/AM_RANGE(0x700000, 0x707fff) AM_RAM_WRITE(cave_vram_2_w) AM_BASE_MEMBER(cave_state, m_vram[2])			// Layer 2
-	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
-/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[0])								// Layer 0 Control
-/**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[1])								// Layer 1 Control
-/**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[2])								// Layer 2 Control
-/**/AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_SHARE("videoregs")						// Video Regs
+/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram")		// Sprites
+/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2")							// Sprites?
+/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")			// Layer 0
+/**/AM_RANGE(0x600000, 0x607fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")			// Layer 1
+/**/AM_RANGE(0x700000, 0x707fff) AM_RAM_WRITE(cave_vram_2_w) AM_SHARE("vram.2")			// Layer 2
+	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
+/**/AM_RANGE(0x900000, 0x900005) AM_RAM AM_SHARE("vctrl.0")								// Layer 0 Control
+/**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl.1")								// Layer 1 Control
+/**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl.2")								// Layer 2 Control
+/**/AM_RANGE(0xc00000, 0xc0ffff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xd00010, 0xd00011) AM_READ_PORT("IN0")													// Inputs
-	AM_RANGE(0xd00010, 0xd00011) AM_DEVWRITE("eeprom", cave_eeprom_lsb_w)								// EEPROM
+	AM_RANGE(0xd00010, 0xd00011) AM_DEVWRITE_LEGACY("eeprom", cave_eeprom_lsb_w)								// EEPROM
 	AM_RANGE(0xd00012, 0xd00013) AM_READ_PORT("IN1")													// Inputs + EEPROM
 //  AM_RANGE(0xd00012, 0xd00013) AM_WRITENOP                                                            // ?
 //  AM_RANGE(0xd00014, 0xd00015) AM_WRITENOP                                                            // ? $800068 in dfeveron ? probably Watchdog
@@ -620,26 +611,26 @@ ADDRESS_MAP_END
                                 Hotdog Storm
 ***************************************************************************/
 
-static ADDRESS_MAP_START( hotdogst_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( hotdogst_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																	// ROM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM																	// RAM
-/**/AM_RANGE(0x408000, 0x408fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_paletteram, m_paletteram_size)	// Palette
-/**/AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, m_vram[0])			// Layer 0
-/**/AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE_MEMBER(cave_state, m_vram[1])			// Layer 1
-/**/AM_RANGE(0x980000, 0x987fff) AM_RAM_WRITE(cave_vram_2_w) AM_BASE_MEMBER(cave_state, m_vram[2])			// Layer 2
+/**/AM_RANGE(0x408000, 0x408fff) AM_RAM AM_SHARE("paletteram")	// Palette
+/**/AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")			// Layer 0
+/**/AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")			// Layer 1
+/**/AM_RANGE(0x980000, 0x987fff) AM_RAM_WRITE(cave_vram_2_w) AM_SHARE("vram.2")			// Layer 2
 	AM_RANGE(0xa80000, 0xa80007) AM_READ(cave_irq_cause_r)												// IRQ Cause
 //  AM_RANGE(0xa8006e, 0xa8006f) AM_READ(soundlatch_ack_r)                                              // From Sound CPU
 	AM_RANGE(0xa8006e, 0xa8006f) AM_WRITE(sound_cmd_w)													// To Sound CPU
-	AM_RANGE(0xa80000, 0xa8007f) AM_WRITEONLY AM_BASE_MEMBER(cave_state, m_videoregs)						// Video Regs
-/**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[0])								// Layer 0 Control
-/**/AM_RANGE(0xb80000, 0xb80005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[1])								// Layer 1 Control
-/**/AM_RANGE(0xc00000, 0xc00005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[2])								// Layer 2 Control
+	AM_RANGE(0xa80000, 0xa8007f) AM_WRITEONLY AM_SHARE("videoregs")						// Video Regs
+/**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl.0")								// Layer 0 Control
+/**/AM_RANGE(0xb80000, 0xb80005) AM_RAM AM_SHARE("vctrl.1")								// Layer 1 Control
+/**/AM_RANGE(0xc00000, 0xc00005) AM_RAM AM_SHARE("vctrl.2")								// Layer 2 Control
 	AM_RANGE(0xc80000, 0xc80001) AM_READ_PORT("IN0")													// Inputs
 	AM_RANGE(0xc80002, 0xc80003) AM_READ_PORT("IN1")													// Inputs + EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE("eeprom", hotdogst_eeprom_msb_w)							// EEPROM
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE_LEGACY("eeprom", hotdogst_eeprom_msb_w)							// EEPROM
 	AM_RANGE(0xd00002, 0xd00003) AM_WRITENOP															// ???
-/**/AM_RANGE(0xf00000, 0xf07fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_spriteram, m_spriteram_size)		// Sprites
-/**/AM_RANGE(0xf08000, 0xf0ffff) AM_RAM AM_BASE_MEMBER(cave_state, m_spriteram_2)							// Sprites?
+/**/AM_RANGE(0xf00000, 0xf07fff) AM_RAM AM_SHARE("spriteram")		// Sprites
+/**/AM_RANGE(0xf08000, 0xf0ffff) AM_RAM AM_SHARE("spriteram_2")							// Sprites?
 ADDRESS_MAP_END
 
 
@@ -655,28 +646,27 @@ static void show_leds(running_machine &machine)
 #endif
 }
 
-static WRITE16_HANDLER( korokoro_leds_w )
+WRITE16_MEMBER(cave_state::korokoro_leds_w)
 {
-	cave_state *state = space->machine().driver_data<cave_state>();
-	COMBINE_DATA(&state->m_leds[0]);
+	COMBINE_DATA(&m_leds[0]);
 
-	set_led_status(space->machine(), 0, data & 0x8000);
-	set_led_status(space->machine(), 1, data & 0x4000);
-	set_led_status(space->machine(), 2, data & 0x1000);	// square button
-	set_led_status(space->machine(), 3, data & 0x0800);	// round  button
-//  coin_lockout_w(space->machine(), 1, ~data & 0x0200);   // coin lockouts?
-//  coin_lockout_w(space->machine(), 0, ~data & 0x0100);
+	set_led_status(machine(), 0, data & 0x8000);
+	set_led_status(machine(), 1, data & 0x4000);
+	set_led_status(machine(), 2, data & 0x1000);	// square button
+	set_led_status(machine(), 3, data & 0x0800);	// round  button
+//  coin_lockout_w(machine(), 1, ~data & 0x0200);   // coin lockouts?
+//  coin_lockout_w(machine(), 0, ~data & 0x0100);
 
-//  coin_counter_w(space->machine(), 2, data & 0x0080);
-//  coin_counter_w(space->machine(), 1, data & 0x0020);
-	coin_counter_w(space->machine(), 0, data & 0x0010);
+//  coin_counter_w(machine(), 2, data & 0x0080);
+//  coin_counter_w(machine(), 1, data & 0x0020);
+	coin_counter_w(machine(), 0, data & 0x0010);
 
-	set_led_status(space->machine(), 5, data & 0x0008);
-	set_led_status(space->machine(), 6, data & 0x0004);
-	set_led_status(space->machine(), 7, data & 0x0002);
-	set_led_status(space->machine(), 8, data & 0x0001);
+	set_led_status(machine(), 5, data & 0x0008);
+	set_led_status(machine(), 6, data & 0x0004);
+	set_led_status(machine(), 7, data & 0x0002);
+	set_led_status(machine(), 8, data & 0x0001);
 
-	show_leds(space->machine());
+	show_leds(machine());
 }
 
 
@@ -706,45 +696,44 @@ static WRITE16_DEVICE_HANDLER( korokoro_eeprom_msb_w )
 	}
 }
 
-static CUSTOM_INPUT( korokoro_hopper_r )
+CUSTOM_INPUT_MEMBER(cave_state::korokoro_hopper_r)
 {
-	cave_state *state = field.machine().driver_data<cave_state>();
-	return state->m_hopper ? 1 : 0;
+	return m_hopper ? 1 : 0;
 }
 
 
-static ADDRESS_MAP_START( korokoro_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( korokoro_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
-	AM_RANGE(0x100000, 0x107fff) AM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, m_vram[0])					// Layer 0
-	AM_RANGE(0x140000, 0x140005) AM_WRITEONLY AM_BASE_MEMBER(cave_state, m_vctrl[0])							// Layer 0 Control
-	AM_RANGE(0x180000, 0x187fff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(cave_state, m_spriteram, m_spriteram_size)	// Sprites
+	AM_RANGE(0x100000, 0x107fff) AM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")					// Layer 0
+	AM_RANGE(0x140000, 0x140005) AM_WRITEONLY AM_SHARE("vctrl.0")							// Layer 0 Control
+	AM_RANGE(0x180000, 0x187fff) AM_WRITEONLY AM_SHARE("spriteram")	// Sprites
 	AM_RANGE(0x1c0000, 0x1c0007) AM_READ(cave_irq_cause_r)													// IRQ Cause
-	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITEONLY AM_BASE_MEMBER(cave_state, m_videoregs)							// Video Regs
-	AM_RANGE(0x200000, 0x207fff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(cave_state, m_paletteram, m_paletteram_size)	// Palette
-//  AM_RANGE(0x240000, 0x240003) AM_DEVREAD8( "ymz", ymz280b_r, 0x00ff)                                     // YMZ280
-	AM_RANGE(0x240000, 0x240003) AM_DEVWRITE8( "ymz", ymz280b_w, 0x00ff)									// YMZ280
+	AM_RANGE(0x1c0000, 0x1c007f) AM_WRITEONLY AM_SHARE("videoregs")							// Video Regs
+	AM_RANGE(0x200000, 0x207fff) AM_WRITEONLY AM_SHARE("paletteram")	// Palette
+//  AM_RANGE(0x240000, 0x240003) AM_DEVREAD8_LEGACY("ymz", ymz280b_r, 0x00ff)                                     // YMZ280
+	AM_RANGE(0x240000, 0x240003) AM_DEVWRITE8_LEGACY("ymz", ymz280b_w, 0x00ff)									// YMZ280
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("IN0")														// Inputs + ???
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1")														// Inputs + EEPROM
 	AM_RANGE(0x280008, 0x280009) AM_WRITE(korokoro_leds_w)													// Leds
-	AM_RANGE(0x28000a, 0x28000b) AM_DEVWRITE("eeprom", korokoro_eeprom_msb_w)								// EEPROM
+	AM_RANGE(0x28000a, 0x28000b) AM_DEVWRITE_LEGACY("eeprom", korokoro_eeprom_msb_w)								// EEPROM
 	AM_RANGE(0x28000c, 0x28000d) AM_WRITENOP																// 0 (watchdog?)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM																		// RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crusherm_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( crusherm_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																		// ROM
-	AM_RANGE(0x100000, 0x107fff) AM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, m_vram[0])					// Layer 0
-	AM_RANGE(0x140000, 0x140005) AM_WRITEONLY AM_BASE_MEMBER(cave_state, m_vctrl[0])							// Layer 0 Control
-	AM_RANGE(0x180000, 0x187fff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(cave_state, m_spriteram, m_spriteram_size)	// Sprites
-	AM_RANGE(0x200000, 0x207fff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(cave_state, m_paletteram, m_paletteram_size)	// Palette
-	AM_RANGE(0x240000, 0x240003) AM_DEVWRITE8( "ymz", ymz280b_w, 0x00ff)									// YMZ280
+	AM_RANGE(0x100000, 0x107fff) AM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")					// Layer 0
+	AM_RANGE(0x140000, 0x140005) AM_WRITEONLY AM_SHARE("vctrl.0")							// Layer 0 Control
+	AM_RANGE(0x180000, 0x187fff) AM_WRITEONLY AM_SHARE("spriteram")	// Sprites
+	AM_RANGE(0x200000, 0x207fff) AM_WRITEONLY AM_SHARE("paletteram")	// Palette
+	AM_RANGE(0x240000, 0x240003) AM_DEVWRITE8_LEGACY("ymz", ymz280b_w, 0x00ff)									// YMZ280
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("IN0")														// Inputs + ???
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("IN1")														// Inputs + EEPROM
 	AM_RANGE(0x280008, 0x280009) AM_WRITE(korokoro_leds_w)													// Leds
-	AM_RANGE(0x28000a, 0x28000b) AM_DEVWRITE("eeprom", korokoro_eeprom_msb_w)								// EEPROM
+	AM_RANGE(0x28000a, 0x28000b) AM_DEVWRITE_LEGACY("eeprom", korokoro_eeprom_msb_w)								// EEPROM
 	AM_RANGE(0x28000c, 0x28000d) AM_WRITENOP																// 0 (watchdog?)
 	AM_RANGE(0x300000, 0x300007) AM_READ(cave_irq_cause_r)													// IRQ Cause
-	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_BASE_MEMBER(cave_state, m_videoregs)							// Video Regs
+	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_SHARE("videoregs")							// Video Regs
 	AM_RANGE(0x340000, 0x34ffff) AM_RAM																		// RAM
 ADDRESS_MAP_END
 
@@ -752,23 +741,23 @@ ADDRESS_MAP_END
                                 Mazinger Z
 ***************************************************************************/
 
-static ADDRESS_MAP_START( mazinger_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mazinger_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																	// RAM
-/**/AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_spriteram, m_spriteram_size)		// Sprites
-/**/AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_BASE_MEMBER(cave_state, m_spriteram_2)							// Sprites?
+/**/AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram")		// Sprites
+/**/AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2")							// Sprites?
 	AM_RANGE(0x300000, 0x300007) AM_READ(cave_irq_cause_r)												// IRQ Cause
 	AM_RANGE(0x300068, 0x300069) AM_WRITE(watchdog_reset16_w)											// Watchdog
 	AM_RANGE(0x30006e, 0x30006f) AM_READWRITE(soundlatch_ack_r, sound_cmd_w)							// From Sound CPU
-	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_BASE_MEMBER(cave_state, m_videoregs)						// Video Regs
-	AM_RANGE(0x400000, 0x407fff) AM_RAM_WRITE(cave_vram_1_8x8_w) AM_BASE_MEMBER(cave_state, m_vram[1])		// Layer 1
-/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_8x8_w) AM_BASE_MEMBER(cave_state, m_vram[0])		// Layer 0
-/**/AM_RANGE(0x600000, 0x600005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[1])								// Layer 1 Control
-/**/AM_RANGE(0x700000, 0x700005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[0])								// Layer 0 Control
+	AM_RANGE(0x300000, 0x30007f) AM_WRITEONLY AM_SHARE("videoregs")						// Video Regs
+	AM_RANGE(0x400000, 0x407fff) AM_RAM_WRITE(cave_vram_1_8x8_w) AM_SHARE("vram.1")		// Layer 1
+/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_8x8_w) AM_SHARE("vram.0")		// Layer 0
+/**/AM_RANGE(0x600000, 0x600005) AM_RAM AM_SHARE("vctrl.1")								// Layer 1 Control
+/**/AM_RANGE(0x700000, 0x700005) AM_RAM AM_SHARE("vctrl.0")								// Layer 0 Control
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("IN0")													// Inputs
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("IN1")													// Inputs + EEPROM
-	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE("eeprom", cave_eeprom_msb_w)								// EEPROM
-/**/AM_RANGE(0xc08000, 0xc0ffff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE_LEGACY("eeprom", cave_eeprom_msb_w)								// EEPROM
+/**/AM_RANGE(0xc08000, 0xc0ffff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0xd00000, 0xd7ffff) AM_ROMBANK("bank1")													// ROM
 ADDRESS_MAP_END
 
@@ -777,31 +766,31 @@ ADDRESS_MAP_END
                                 Metamoqester
 ***************************************************************************/
 
-static ADDRESS_MAP_START( metmqstr_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( metmqstr_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM																	// ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_ROM																	// ROM
-	AM_RANGE(0x408000, 0x408fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x408000, 0x408fff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x600000, 0x600001) AM_READ(watchdog_reset16_r)											// Watchdog?
-	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_2_w) AM_BASE_MEMBER(cave_state, m_vram[2])			// Layer 2
+	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_2_w) AM_SHARE("vram.2")			// Layer 2
 	AM_RANGE(0x888000, 0x88ffff) AM_RAM																	//
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE_MEMBER(cave_state, m_vram[1])			// Layer 1
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")			// Layer 1
 	AM_RANGE(0x908000, 0x90ffff) AM_RAM																	//
-	AM_RANGE(0x980000, 0x987fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, m_vram[0])			// Layer 0
+	AM_RANGE(0x980000, 0x987fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")			// Layer 0
 	AM_RANGE(0x988000, 0x98ffff) AM_RAM																	//
 	AM_RANGE(0xa80000, 0xa80007) AM_READ(cave_irq_cause_r)												// IRQ Cause
 	AM_RANGE(0xa80068, 0xa80069) AM_WRITE(watchdog_reset16_w)											// Watchdog?
 	AM_RANGE(0xa8006c, 0xa8006d) AM_READ(soundflags_ack_r) AM_WRITENOP									// Communication
 	AM_RANGE(0xa8006e, 0xa8006f) AM_READWRITE(soundlatch_ack_r, sound_cmd_w)							// From Sound CPU
-	AM_RANGE(0xa80000, 0xa8007f) AM_WRITEONLY AM_BASE_MEMBER(cave_state, m_videoregs)						// Video Regs
-/**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[2])								// Layer 2 Control
-/**/AM_RANGE(0xb80000, 0xb80005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[1])								// Layer 1 Control
-/**/AM_RANGE(0xc00000, 0xc00005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[0])								// Layer 0 Control
+	AM_RANGE(0xa80000, 0xa8007f) AM_WRITEONLY AM_SHARE("videoregs")						// Video Regs
+/**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl.2")								// Layer 2 Control
+/**/AM_RANGE(0xb80000, 0xb80005) AM_RAM AM_SHARE("vctrl.1")								// Layer 1 Control
+/**/AM_RANGE(0xc00000, 0xc00005) AM_RAM AM_SHARE("vctrl.0")								// Layer 0 Control
 	AM_RANGE(0xc80000, 0xc80001) AM_READ_PORT("IN0")													// Inputs
 	AM_RANGE(0xc80002, 0xc80003) AM_READ_PORT("IN1")													// Inputs + EEPROM
-	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE("eeprom", metmqstr_eeprom_msb_w)							// EEPROM
-	AM_RANGE(0xf00000, 0xf07fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_spriteram, m_spriteram_size)		// Sprites
-	AM_RANGE(0xf08000, 0xf0ffff) AM_RAM AM_BASE_MEMBER(cave_state, m_spriteram_2)							// RAM
+	AM_RANGE(0xd00000, 0xd00001) AM_DEVWRITE_LEGACY("eeprom", metmqstr_eeprom_msb_w)							// EEPROM
+	AM_RANGE(0xf00000, 0xf07fff) AM_RAM AM_SHARE("spriteram")		// Sprites
+	AM_RANGE(0xf08000, 0xf0ffff) AM_RAM AM_SHARE("spriteram_2")							// RAM
 ADDRESS_MAP_END
 
 
@@ -832,34 +821,34 @@ INLINE void vctrl_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem
 	}
 	COMBINE_DATA(&VCTRL[offset]);
 }
-static WRITE16_HANDLER( pwrinst2_vctrl_0_w )	{ vctrl_w(space, offset, data, mem_mask, 0); }
-static WRITE16_HANDLER( pwrinst2_vctrl_1_w )	{ vctrl_w(space, offset, data, mem_mask, 1); }
-static WRITE16_HANDLER( pwrinst2_vctrl_2_w )	{ vctrl_w(space, offset, data, mem_mask, 2); }
-static WRITE16_HANDLER( pwrinst2_vctrl_3_w )	{ vctrl_w(space, offset, data, mem_mask, 3); }
+WRITE16_MEMBER(cave_state::pwrinst2_vctrl_0_w){ vctrl_w(&space, offset, data, mem_mask, 0); }
+WRITE16_MEMBER(cave_state::pwrinst2_vctrl_1_w){ vctrl_w(&space, offset, data, mem_mask, 1); }
+WRITE16_MEMBER(cave_state::pwrinst2_vctrl_2_w){ vctrl_w(&space, offset, data, mem_mask, 2); }
+WRITE16_MEMBER(cave_state::pwrinst2_vctrl_3_w){ vctrl_w(&space, offset, data, mem_mask, 3); }
 
-static ADDRESS_MAP_START( pwrinst2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pwrinst2_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM																		// ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM																		// RAM
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("IN0")														// Inputs
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("IN1")														//
 	AM_RANGE(0x600000, 0x6fffff) AM_ROM AM_REGION("user1", 0)												// extra data ROM space
-	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE("eeprom", cave_eeprom_msb_w)									// EEPROM
-	AM_RANGE(0x800000, 0x807fff) AM_RAM_WRITE(cave_vram_2_w) AM_BASE_MEMBER(cave_state, m_vram[2])				// Layer 2
-	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, m_vram[0])				// Layer 0
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE_MEMBER(cave_state, m_vram[1])				// Layer 1
-	AM_RANGE(0x980000, 0x987fff) AM_RAM_WRITE(cave_vram_3_8x8_w) AM_BASE_MEMBER(cave_state, m_vram[3])			// Layer 3
-	AM_RANGE(0xa00000, 0xa07fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_spriteram, m_spriteram_size)			// Sprites
-	AM_RANGE(0xa08000, 0xa0ffff) AM_RAM AM_BASE_MEMBER(cave_state, m_spriteram_2)								// Sprites?
+	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE_LEGACY("eeprom", cave_eeprom_msb_w)									// EEPROM
+	AM_RANGE(0x800000, 0x807fff) AM_RAM_WRITE(cave_vram_2_w) AM_SHARE("vram.2")				// Layer 2
+	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")				// Layer 0
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")				// Layer 1
+	AM_RANGE(0x980000, 0x987fff) AM_RAM_WRITE(cave_vram_3_8x8_w) AM_SHARE("vram.3")			// Layer 3
+	AM_RANGE(0xa00000, 0xa07fff) AM_RAM AM_SHARE("spriteram")			// Sprites
+	AM_RANGE(0xa08000, 0xa0ffff) AM_RAM AM_SHARE("spriteram_2")								// Sprites?
 	AM_RANGE(0xa10000, 0xa1ffff) AM_RAM																		// Sprites?
-	AM_RANGE(0xa80000, 0xa8007f) AM_RAM_READ(donpachi_videoregs_r) AM_BASE_MEMBER(cave_state, m_videoregs)	// Video Regs
-/**/AM_RANGE(0xb00000, 0xb00005) AM_RAM_WRITE(pwrinst2_vctrl_2_w) AM_BASE_MEMBER(cave_state, m_vctrl[2])		// Layer 2 Control
-/**/AM_RANGE(0xb80000, 0xb80005) AM_RAM_WRITE(pwrinst2_vctrl_0_w) AM_BASE_MEMBER(cave_state, m_vctrl[0])		// Layer 0 Control
-/**/AM_RANGE(0xc00000, 0xc00005) AM_RAM_WRITE(pwrinst2_vctrl_1_w) AM_BASE_MEMBER(cave_state, m_vctrl[1])		// Layer 1 Control
-/**/AM_RANGE(0xc80000, 0xc80005) AM_RAM_WRITE(pwrinst2_vctrl_3_w) AM_BASE_MEMBER(cave_state, m_vctrl[3])		// Layer 3 Control
+	AM_RANGE(0xa80000, 0xa8007f) AM_RAM_READ(donpachi_videoregs_r) AM_SHARE("videoregs")	// Video Regs
+/**/AM_RANGE(0xb00000, 0xb00005) AM_RAM_WRITE(pwrinst2_vctrl_2_w) AM_SHARE("vctrl.2")		// Layer 2 Control
+/**/AM_RANGE(0xb80000, 0xb80005) AM_RAM_WRITE(pwrinst2_vctrl_0_w) AM_SHARE("vctrl.0")		// Layer 0 Control
+/**/AM_RANGE(0xc00000, 0xc00005) AM_RAM_WRITE(pwrinst2_vctrl_1_w) AM_SHARE("vctrl.1")		// Layer 1 Control
+/**/AM_RANGE(0xc80000, 0xc80005) AM_RAM_WRITE(pwrinst2_vctrl_3_w) AM_SHARE("vctrl.3")		// Layer 3 Control
 	AM_RANGE(0xd80000, 0xd80001) AM_READ(soundlatch_ack_r)													// ? From Sound CPU
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(sound_cmd_w)														// To Sound CPU
-	AM_RANGE(0xe80000, 0xe80001) AM_DEVREAD("eeprom", pwrinst2_eeprom_r)									// EEPROM
-	AM_RANGE(0xf00000, 0xf04fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_paletteram, m_paletteram_size)		// Palette
+	AM_RANGE(0xe80000, 0xe80001) AM_DEVREAD_LEGACY("eeprom", pwrinst2_eeprom_r)									// EEPROM
+	AM_RANGE(0xf00000, 0xf04fff) AM_RAM AM_SHARE("paletteram")		// Palette
 ADDRESS_MAP_END
 
 
@@ -867,39 +856,39 @@ ADDRESS_MAP_END
                                 Sailor Moon
 ***************************************************************************/
 
-static READ16_HANDLER( sailormn_input0_r )
+READ16_MEMBER(cave_state::sailormn_input0_r)
 {
 //  watchdog_reset16_r(0, 0);    // written too rarely for mame.
-	return input_port_read(space->machine(), "IN0");
+	return ioport("IN0")->read();
 }
 
-static ADDRESS_MAP_START( sailormn_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sailormn_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																	// RAM
 	AM_RANGE(0x110000, 0x110001) AM_RAM																	// (agallet)
 	AM_RANGE(0x200000, 0x3fffff) AM_ROM																	// ROM
 	AM_RANGE(0x400000, 0x407fff) AM_RAM																	// (agallet)
-	AM_RANGE(0x408000, 0x40bfff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x408000, 0x40bfff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x40c000, 0x40ffff) AM_RAM																	// (agallet)
 	AM_RANGE(0x410000, 0x410001) AM_RAM																	// (agallet)
-	AM_RANGE(0x500000, 0x507fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_spriteram, m_spriteram_size)		// Sprites
-	AM_RANGE(0x508000, 0x50ffff) AM_RAM AM_BASE_MEMBER(cave_state, m_spriteram_2)							// Sprites?
+	AM_RANGE(0x500000, 0x507fff) AM_RAM AM_SHARE("spriteram")		// Sprites
+	AM_RANGE(0x508000, 0x50ffff) AM_RAM AM_SHARE("spriteram_2")							// Sprites?
 	AM_RANGE(0x510000, 0x510001) AM_RAM																	// (agallet)
 	AM_RANGE(0x600000, 0x600001) AM_READ(sailormn_input0_r)												// Inputs + Watchdog!
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("IN1")													// Inputs + EEPROM
-	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE("eeprom", sailormn_eeprom_msb_w)							// EEPROM
-	AM_RANGE(0x800000, 0x807fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, m_vram[0])			// Layer 0
-	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_1_w) AM_BASE_MEMBER(cave_state, m_vram[1])			// Layer 1
-	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_2_w) AM_BASE_MEMBER(cave_state, m_vram[2])			// Layer 2
+	AM_RANGE(0x700000, 0x700001) AM_DEVWRITE_LEGACY("eeprom", sailormn_eeprom_msb_w)							// EEPROM
+	AM_RANGE(0x800000, 0x807fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")			// Layer 0
+	AM_RANGE(0x880000, 0x887fff) AM_RAM_WRITE(cave_vram_1_w) AM_SHARE("vram.1")			// Layer 1
+	AM_RANGE(0x900000, 0x907fff) AM_RAM_WRITE(cave_vram_2_w) AM_SHARE("vram.2")			// Layer 2
 	AM_RANGE(0x908000, 0x908001) AM_RAM																	// (agallet)
-/**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[0])								// Layer 0 Control
-/**/AM_RANGE(0xa80000, 0xa80005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[1])								// Layer 1 Control
-/**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[2])								// Layer 2 Control
+/**/AM_RANGE(0xa00000, 0xa00005) AM_RAM AM_SHARE("vctrl.0")								// Layer 0 Control
+/**/AM_RANGE(0xa80000, 0xa80005) AM_RAM AM_SHARE("vctrl.1")								// Layer 1 Control
+/**/AM_RANGE(0xb00000, 0xb00005) AM_RAM AM_SHARE("vctrl.2")								// Layer 2 Control
 	AM_RANGE(0xb80000, 0xb80007) AM_READ(cave_irq_cause_r)												// IRQ Cause (bit 2 tested!)
 	AM_RANGE(0xb8006c, 0xb8006d) AM_READ(soundflags_ack_r)												// Communication
 	AM_RANGE(0xb8006e, 0xb8006f) AM_READ(soundlatch_ack_r)												// From Sound CPU
 	AM_RANGE(0xb8006e, 0xb8006f) AM_WRITE(sound_cmd_w)													// To Sound CPU
-	AM_RANGE(0xb80000, 0xb8007f) AM_WRITEONLY AM_BASE_MEMBER(cave_state, m_videoregs)						// Video Regs
+	AM_RANGE(0xb80000, 0xb8007f) AM_WRITEONLY AM_SHARE("videoregs")						// Video Regs
 ADDRESS_MAP_END
 
 
@@ -926,47 +915,45 @@ static WRITE16_DEVICE_HANDLER( tjumpman_eeprom_lsb_w )
 	}
 }
 
-static WRITE16_HANDLER( tjumpman_leds_w )
+WRITE16_MEMBER(cave_state::tjumpman_leds_w)
 {
-	cave_state *state = space->machine().driver_data<cave_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		set_led_status(space->machine(), 0,	data & 0x0001);	// suru
-		set_led_status(space->machine(), 1,	data & 0x0002);	// shinai
-		set_led_status(space->machine(), 2,	data & 0x0004);	// payout
-		set_led_status(space->machine(), 3,	data & 0x0008);	// go
-		set_led_status(space->machine(), 4,	data & 0x0010);	// 1 bet
-		set_led_status(space->machine(), 5,	data & 0x0020);	// medal
-		state->m_hopper	=					data & 0x0040;	// hopper
-		set_led_status(space->machine(), 6,	data & 0x0080);	// 3 bet
+		set_led_status(machine(), 0,	data & 0x0001);	// suru
+		set_led_status(machine(), 1,	data & 0x0002);	// shinai
+		set_led_status(machine(), 2,	data & 0x0004);	// payout
+		set_led_status(machine(), 3,	data & 0x0008);	// go
+		set_led_status(machine(), 4,	data & 0x0010);	// 1 bet
+		set_led_status(machine(), 5,	data & 0x0020);	// medal
+		m_hopper	=					data & 0x0040;	// hopper
+		set_led_status(machine(), 6,	data & 0x0080);	// 3 bet
 	}
 
 //  popmessage("led %04X", data);
 }
 
-static CUSTOM_INPUT( tjumpman_hopper_r )
+CUSTOM_INPUT_MEMBER(cave_state::tjumpman_hopper_r)
 {
-	cave_state *state = field.machine().driver_data<cave_state>();
-	return (state->m_hopper && !(field.machine().primary_screen->frame_number() % 10)) ? 0 : 1;
+	return (m_hopper && !(machine().primary_screen->frame_number() % 10)) ? 0 : 1;
 }
 
-static ADDRESS_MAP_START( tjumpman_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( tjumpman_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")												// RAM
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_spriteram, m_spriteram_size)		// Sprites
-	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_BASE_MEMBER(cave_state, m_spriteram_2)							// Sprite bank 2
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram")		// Sprites
+	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2")							// Sprite bank 2
 	AM_RANGE(0x304000, 0x307fff) AM_WRITE(cave_vram_0_w)												// Layer 0 - 16x16 tiles mapped here
-	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, m_vram[0])			// Layer 0
-	AM_RANGE(0x400000, 0x400005) AM_WRITEONLY AM_BASE_MEMBER(cave_state, m_vctrl[0])						// Layer 0 Control
-	AM_RANGE(0x500000, 0x50ffff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")			// Layer 0
+	AM_RANGE(0x400000, 0x400005) AM_WRITEONLY AM_SHARE("vctrl.0")						// Layer 0 Control
+	AM_RANGE(0x500000, 0x50ffff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("IN0")													// Inputs + EEPROM + Hopper
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("IN1")													// Inputs
 	AM_RANGE(0x700000, 0x700007) AM_READ(cave_irq_cause_r)												// IRQ Cause
 	AM_RANGE(0x700068, 0x700069) AM_WRITE(watchdog_reset16_w)											// Watchdog
-	AM_RANGE(0x700000, 0x70007f) AM_WRITEONLY AM_BASE_MEMBER(cave_state, m_videoregs)						// Video Regs
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)	// M6295
+	AM_RANGE(0x700000, 0x70007f) AM_WRITEONLY AM_SHARE("videoregs")						// Video Regs
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)	// M6295
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(tjumpman_leds_w)												// Leds + Hopper
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE("eeprom", tjumpman_eeprom_lsb_w)							// EEPROM
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE_LEGACY("eeprom", tjumpman_eeprom_lsb_w)							// EEPROM
 ADDRESS_MAP_END
 
 
@@ -974,39 +961,38 @@ ADDRESS_MAP_END
                                    Pac-Slot
 ***************************************************************************/
 
-static WRITE16_HANDLER( pacslot_leds_w )
+WRITE16_MEMBER(cave_state::pacslot_leds_w)
 {
-	cave_state *state = space->machine().driver_data<cave_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		set_led_status(space->machine(), 0,	data & 0x0001);	// pac-man
-		set_led_status(space->machine(), 1,	data & 0x0002);	// ms. pac-man
-		set_led_status(space->machine(), 2,	data & 0x0004);	// payout
-		set_led_status(space->machine(), 3,	data & 0x0008);	// start
-		set_led_status(space->machine(), 4,	data & 0x0010);	// bet
-		set_led_status(space->machine(), 5,	data & 0x0020);	// medal
-		state->m_hopper	=					data & 0x0040;	// hopper
+		set_led_status(machine(), 0,	data & 0x0001);	// pac-man
+		set_led_status(machine(), 1,	data & 0x0002);	// ms. pac-man
+		set_led_status(machine(), 2,	data & 0x0004);	// payout
+		set_led_status(machine(), 3,	data & 0x0008);	// start
+		set_led_status(machine(), 4,	data & 0x0010);	// bet
+		set_led_status(machine(), 5,	data & 0x0020);	// medal
+		m_hopper	=					data & 0x0040;	// hopper
 	}
 
 //  popmessage("led %04X", data);
 }
 
-static ADDRESS_MAP_START( pacslot_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( pacslot_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")												// RAM
-	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_spriteram, m_spriteram_size)		// Sprites
-	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_BASE_MEMBER(cave_state, m_spriteram_2)							// Sprite bank 2
-	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, m_vram[0])			// Layer 0
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_SHARE("spriteram")		// Sprites
+	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_SHARE("spriteram_2")							// Sprite bank 2
+	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")			// Layer 0
 	AM_RANGE(0x400000, 0x400007) AM_READ(cave_irq_cause_r)												// IRQ Cause
 	AM_RANGE(0x400068, 0x400069) AM_WRITE(watchdog_reset16_w)											// Watchdog
-	AM_RANGE(0x400000, 0x40007f) AM_WRITEONLY AM_BASE_MEMBER(cave_state, m_videoregs)						// Video Regs
-	AM_RANGE(0x500000, 0x500005) AM_WRITEONLY AM_BASE_MEMBER(cave_state, m_vctrl[0])						// Layer 0 Control
-	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x400000, 0x40007f) AM_WRITEONLY AM_SHARE("videoregs")						// Video Regs
+	AM_RANGE(0x500000, 0x500005) AM_WRITEONLY AM_SHARE("vctrl.0")						// Layer 0 Control
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("IN0")													// Inputs + EEPROM + Hopper
 	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("IN1")													// Inputs
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)	// M6295
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)	// M6295
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(pacslot_leds_w)												// Leds + Hopper
-	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE("eeprom", tjumpman_eeprom_lsb_w)							// EEPROM
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE_LEGACY("eeprom", tjumpman_eeprom_lsb_w)							// EEPROM
 ADDRESS_MAP_END
 
 
@@ -1014,20 +1000,20 @@ ADDRESS_MAP_END
                                     Uo Poko
 ***************************************************************************/
 
-static ADDRESS_MAP_START( uopoko_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( uopoko_map, AS_PROGRAM, 16, cave_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM																	// ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM																	// RAM
-	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
-/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_spriteram, m_spriteram_size)		// Sprites
-/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_BASE_MEMBER(cave_state, m_spriteram_2)							// Sprites?
-/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, m_vram[0])			// Layer 0
+	AM_RANGE(0x300000, 0x300003) AM_DEVREADWRITE8_LEGACY("ymz", ymz280b_r, ymz280b_w, 0x00ff)					// YMZ280
+/**/AM_RANGE(0x400000, 0x407fff) AM_RAM AM_SHARE("spriteram")		// Sprites
+/**/AM_RANGE(0x408000, 0x40ffff) AM_RAM AM_SHARE("spriteram_2")							// Sprites?
+/**/AM_RANGE(0x500000, 0x507fff) AM_RAM_WRITE(cave_vram_0_w) AM_SHARE("vram.0")			// Layer 0
 	AM_RANGE(0x600000, 0x600007) AM_READ(cave_irq_cause_r)												// IRQ Cause
-	AM_RANGE(0x600000, 0x60007f) AM_WRITEONLY AM_BASE_MEMBER(cave_state, m_videoregs)						// Video Regs
-/**/AM_RANGE(0x700000, 0x700005) AM_RAM AM_BASE_MEMBER(cave_state, m_vctrl[0])								// Layer 0 Control
-/**/AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, m_paletteram, m_paletteram_size)	// Palette
+	AM_RANGE(0x600000, 0x60007f) AM_WRITEONLY AM_SHARE("videoregs")						// Video Regs
+/**/AM_RANGE(0x700000, 0x700005) AM_RAM AM_SHARE("vctrl.0")								// Layer 0 Control
+/**/AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("paletteram")	// Palette
 	AM_RANGE(0x900000, 0x900001) AM_READ_PORT("IN0")													// Inputs
 	AM_RANGE(0x900002, 0x900003) AM_READ_PORT("IN1")													// Inputs + EEPROM
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE("eeprom", cave_eeprom_msb_w)								// EEPROM
+	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE_LEGACY("eeprom", cave_eeprom_msb_w)								// EEPROM
 ADDRESS_MAP_END
 
 
@@ -1041,12 +1027,12 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-static ADDRESS_MAP_START( oki_map, AS_0, 8 )
+static ADDRESS_MAP_START( oki_map, AS_0, 8, cave_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("bank3")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank4")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( oki2_map, AS_0, 8 )
+static ADDRESS_MAP_START( oki2_map, AS_0, 8, cave_state )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROMBANK("bank5")
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank6")
 ADDRESS_MAP_END
@@ -1056,35 +1042,35 @@ ADDRESS_MAP_END
                                 Hotdog Storm
 ***************************************************************************/
 
-static WRITE8_HANDLER( hotdogst_rombank_w )
+WRITE8_MEMBER(cave_state::hotdogst_rombank_w)
 {
 	if (data & ~0x0f)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space->device()), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space.device()), data);
 
-	memory_set_bank(space->machine(), "bank2", data & 0x0f);
+	membank("bank2")->set_entry(data & 0x0f);
 }
 
-static WRITE8_HANDLER( hotdogst_okibank_w )
+WRITE8_MEMBER(cave_state::hotdogst_okibank_w)
 {
 	int bank1 = (data >> 0) & 0x3;
 	int bank2 = (data >> 4) & 0x3;
-	memory_set_bank(space->machine(), "bank3", bank1);
-	memory_set_bank(space->machine(), "bank4", bank2);
+	membank("bank3")->set_entry(bank1);
+	membank("bank4")->set_entry(bank2);
 }
 
-static ADDRESS_MAP_START( hotdogst_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( hotdogst_sound_map, AS_PROGRAM, 8, cave_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM					// ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")	// ROM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM					// RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hotdogst_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( hotdogst_sound_portmap, AS_IO, 8, cave_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(hotdogst_rombank_w)					// ROM bank
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r)						// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r)						//
-	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)	//
-	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)	// M6295
+	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)	//
+	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE("oki", okim6295_device, read, write)	// M6295
 	AM_RANGE(0x70, 0x70) AM_WRITE(hotdogst_okibank_w)					// Samples bank
 ADDRESS_MAP_END
 
@@ -1093,29 +1079,29 @@ ADDRESS_MAP_END
                                 Mazinger Z
 ***************************************************************************/
 
-static WRITE8_HANDLER( mazinger_rombank_w )
+WRITE8_MEMBER(cave_state::mazinger_rombank_w)
 {
 	if (data & ~0x07)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space->device()), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space.device()), data);
 
-	memory_set_bank(space->machine(), "bank2", data & 0x07);
+	membank("bank2")->set_entry(data & 0x07);
 }
 
-static ADDRESS_MAP_START( mazinger_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mazinger_sound_map, AS_PROGRAM, 8, cave_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM					// ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")	// ROM (Banked)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM					// RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM					// RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mazinger_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( mazinger_sound_portmap, AS_IO, 8, cave_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(mazinger_rombank_w)	// ROM bank
 	AM_RANGE(0x10, 0x10) AM_WRITE(soundlatch_ack_w)		// To Main CPU
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r)		// From Main CPU
-	AM_RANGE(0x50, 0x51) AM_DEVWRITE("ymsnd", ym2203_w)	// YM2203
-	AM_RANGE(0x52, 0x53) AM_DEVREAD("ymsnd", ym2203_r)	// YM2203
-	AM_RANGE(0x70, 0x70) AM_DEVWRITE_MODERN("oki", okim6295_device, write)	// M6295
+	AM_RANGE(0x50, 0x51) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w)	// YM2203
+	AM_RANGE(0x52, 0x53) AM_DEVREAD_LEGACY("ymsnd", ym2203_r)	// YM2203
+	AM_RANGE(0x70, 0x70) AM_DEVWRITE("oki", okim6295_device, write)	// M6295
 	AM_RANGE(0x74, 0x74) AM_WRITE(hotdogst_okibank_w)	// Samples bank
 ADDRESS_MAP_END
 
@@ -1124,46 +1110,46 @@ ADDRESS_MAP_END
                                 Metamoqester
 ***************************************************************************/
 
-static WRITE8_HANDLER( metmqstr_rombank_w )
+WRITE8_MEMBER(cave_state::metmqstr_rombank_w)
 {
 	if (data & ~0x0f)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space->device()), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space.device()), data);
 
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
-static WRITE8_HANDLER( metmqstr_okibank0_w )
+WRITE8_MEMBER(cave_state::metmqstr_okibank0_w)
 {
 	int bank1 = (data >> 0) & 0x7;
 	int bank2 = (data >> 4) & 0x7;
-	memory_set_bank(space->machine(), "bank3", bank1);
-	memory_set_bank(space->machine(), "bank4", bank2);
+	membank("bank3")->set_entry(bank1);
+	membank("bank4")->set_entry(bank2);
 }
 
-static WRITE8_HANDLER( metmqstr_okibank1_w )
+WRITE8_MEMBER(cave_state::metmqstr_okibank1_w)
 {
 	int bank1 = (data >> 0) & 0x7;
 	int bank2 = (data >> 4) & 0x7;
-	memory_set_bank(space->machine(), "bank5", bank1);
-	memory_set_bank(space->machine(), "bank6", bank2);
+	membank("bank5")->set_entry(bank1);
+	membank("bank6")->set_entry(bank2);
 }
 
-static ADDRESS_MAP_START( metmqstr_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( metmqstr_sound_map, AS_PROGRAM, 8, cave_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM					// ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")	// ROM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM					// RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( metmqstr_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( metmqstr_sound_portmap, AS_IO, 8, cave_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(metmqstr_rombank_w)					// Rom Bank
 	AM_RANGE(0x20, 0x20) AM_READ(soundflags_r)							// Communication
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r)						// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r)						//
-	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)	// YM2151
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE_MODERN("oki1", okim6295_device, write)				// M6295 #0
+	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)	// YM2151
+	AM_RANGE(0x60, 0x60) AM_DEVWRITE("oki1", okim6295_device, write)				// M6295 #0
 	AM_RANGE(0x70, 0x70) AM_WRITE(metmqstr_okibank0_w)					// Samples Bank #0
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE_MODERN("oki2", okim6295_device, write)				// M6295 #1
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE("oki2", okim6295_device, write)				// M6295 #1
 	AM_RANGE(0x90, 0x90) AM_WRITE(metmqstr_okibank1_w)					// Samples Bank #1
 ADDRESS_MAP_END
 
@@ -1172,26 +1158,26 @@ ADDRESS_MAP_END
                                 Power Instinct 2
 ***************************************************************************/
 
-static WRITE8_HANDLER( pwrinst2_rombank_w )
+WRITE8_MEMBER(cave_state::pwrinst2_rombank_w)
 {
 	if (data & ~0x07)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space->device()), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space.device()), data);
 
-	memory_set_bank(space->machine(), "bank1", data & 0x07);
+	membank("bank1")->set_entry(data & 0x07);
 }
 
-static ADDRESS_MAP_START( pwrinst2_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pwrinst2_sound_map, AS_PROGRAM, 8, cave_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM					// ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")	// ROM (Banked)
 	AM_RANGE(0xe000, 0xffff) AM_RAM					// RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pwrinst2_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( pwrinst2_sound_portmap, AS_IO, 8, cave_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)	// M6295
-	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)	//
-	AM_RANGE(0x10, 0x17) AM_DEVWRITE("nmk112", nmk112_okibank_w)			// Samples bank
-	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)		//
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("oki1", okim6295_device, read, write)	// M6295
+	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("oki2", okim6295_device, read, write)	//
+	AM_RANGE(0x10, 0x17) AM_DEVWRITE_LEGACY("nmk112", nmk112_okibank_w)			// Samples bank
+	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)		//
 	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch_ack_w)							// To Main CPU
 //  AM_RANGE(0x51, 0x51) AM_WRITENOP                                         // ?? volume
 	AM_RANGE(0x80, 0x80) AM_WRITE(pwrinst2_rombank_w)						// ROM bank
@@ -1204,60 +1190,58 @@ ADDRESS_MAP_END
                                 Sailor Moon
 ***************************************************************************/
 
-static READ8_HANDLER( mirror_ram_r )
+READ8_MEMBER(cave_state::mirror_ram_r)
 {
-	cave_state *state = space->machine().driver_data<cave_state>();
-	return state->m_mirror_ram[offset];
+	return m_mirror_ram[offset];
 }
 
-static WRITE8_HANDLER( mirror_ram_w )
+WRITE8_MEMBER(cave_state::mirror_ram_w)
 {
-	cave_state *state = space->machine().driver_data<cave_state>();
-	state->m_mirror_ram[offset] = data;
+	m_mirror_ram[offset] = data;
 }
 
-static WRITE8_HANDLER( sailormn_rombank_w )
+WRITE8_MEMBER(cave_state::sailormn_rombank_w)
 {
 	if (data & ~0x1f)
-		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space->device()), data);
+		logerror("CPU #1 - PC %04X: Bank %02X\n", cpu_get_pc(&space.device()), data);
 
-	memory_set_bank(space->machine(), "bank1", data & 0x1f);
+	membank("bank1")->set_entry(data & 0x1f);
 }
 
-static WRITE8_HANDLER( sailormn_okibank0_w )
+WRITE8_MEMBER(cave_state::sailormn_okibank0_w)
 {
 	int bank1 = (data >> 0) & 0xf;
 	int bank2 = (data >> 4) & 0xf;
-	memory_set_bank(space->machine(), "bank3", bank1);
-	memory_set_bank(space->machine(), "bank4", bank2);
+	membank("bank3")->set_entry(bank1);
+	membank("bank4")->set_entry(bank2);
 }
 
-static WRITE8_HANDLER( sailormn_okibank1_w )
+WRITE8_MEMBER(cave_state::sailormn_okibank1_w)
 {
 	int bank1 = (data >> 0) & 0xf;
 	int bank2 = (data >> 4) & 0xf;
-	memory_set_bank(space->machine(), "bank5", bank1);
-	memory_set_bank(space->machine(), "bank6", bank2);
+	membank("bank5")->set_entry(bank1);
+	membank("bank6")->set_entry(bank2);
 }
 
-static ADDRESS_MAP_START( sailormn_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sailormn_sound_map, AS_PROGRAM, 8, cave_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM										// ROM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")						// ROM (Banked)
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(mirror_ram_r, mirror_ram_w) AM_BASE_MEMBER(cave_state, m_mirror_ram)	// RAM
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(mirror_ram_r, mirror_ram_w) AM_SHARE("mirror_ram")	// RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(mirror_ram_r, mirror_ram_w)	// Mirrored RAM (agallet)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sailormn_sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sailormn_sound_portmap, AS_IO, 8, cave_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sailormn_rombank_w)						// Rom Bank
 	AM_RANGE(0x10, 0x10) AM_WRITE(soundlatch_ack_w)							// To Main CPU
 	AM_RANGE(0x20, 0x20) AM_READ(soundflags_r)								// Communication
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r)							// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r)							//
-	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)		// YM2151
-	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)	// M6295 #0
+	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE_LEGACY("ymsnd", ym2151_r, ym2151_w)		// YM2151
+	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE("oki1", okim6295_device, read, write)	// M6295 #0
 	AM_RANGE(0x70, 0x70) AM_WRITE(sailormn_okibank0_w)						// Samples Bank #0
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)	// M6295 #1
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki2", okim6295_device, read, write)	// M6295 #1
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(sailormn_okibank1_w)						// Samples Bank #1
 ADDRESS_MAP_END
 
@@ -1377,14 +1361,14 @@ static INPUT_PORTS_START( gaia )
 	PORT_DIPSETTING(      0x0200, "4" )
 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0400, "150k/300k" ) PORT_CONDITION("DSW", 0xe000, PORTCOND_EQUALS, 0xc000)
-	PORT_DIPSETTING(      0x0400, "150k/350k" ) PORT_CONDITION("DSW", 0xe000, PORTCOND_EQUALS, 0xa000)
-	PORT_DIPSETTING(      0x0400, "150k/350k" ) PORT_CONDITION("DSW", 0xe000, PORTCOND_EQUALS, 0xe000)
-	PORT_DIPSETTING(      0x0400, "150k/400k" ) PORT_CONDITION("DSW", 0xe000, PORTCOND_EQUALS, 0x6000)
-	PORT_DIPSETTING(      0x0400, "150k/400k" ) PORT_CONDITION("DSW", 0xe000, PORTCOND_EQUALS, 0x8000)
-	PORT_DIPSETTING(      0x0400, "150k/400k" ) PORT_CONDITION("DSW", 0xe000, PORTCOND_EQUALS, 0x2000)
-	PORT_DIPSETTING(      0x0400, "200k/500k" ) PORT_CONDITION("DSW", 0xe000, PORTCOND_EQUALS, 0x4000)
-	PORT_DIPSETTING(      0x0400, "200k/500k" ) PORT_CONDITION("DSW", 0xe000, PORTCOND_EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0400, "150k/300k" ) PORT_CONDITION("DSW", 0xe000, EQUALS, 0xc000)
+	PORT_DIPSETTING(      0x0400, "150k/350k" ) PORT_CONDITION("DSW", 0xe000, EQUALS, 0xa000)
+	PORT_DIPSETTING(      0x0400, "150k/350k" ) PORT_CONDITION("DSW", 0xe000, EQUALS, 0xe000)
+	PORT_DIPSETTING(      0x0400, "150k/400k" ) PORT_CONDITION("DSW", 0xe000, EQUALS, 0x6000)
+	PORT_DIPSETTING(      0x0400, "150k/400k" ) PORT_CONDITION("DSW", 0xe000, EQUALS, 0x8000)
+	PORT_DIPSETTING(      0x0400, "150k/400k" ) PORT_CONDITION("DSW", 0xe000, EQUALS, 0x2000)
+	PORT_DIPSETTING(      0x0400, "200k/500k" ) PORT_CONDITION("DSW", 0xe000, EQUALS, 0x4000)
+	PORT_DIPSETTING(      0x0400, "200k/500k" ) PORT_CONDITION("DSW", 0xe000, EQUALS, 0x0000)
 	PORT_DIPNAME( 0x1800, 0x1800, "Damage" )					PORT_DIPLOCATION("SW2:4,5")
 	PORT_DIPSETTING(      0x1800, "+0" )
 	PORT_DIPSETTING(      0x1000, "+1" )
@@ -1410,10 +1394,10 @@ static INPUT_PORTS_START( theroes )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Chinese ) )
 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0400, "150k/300k" ) PORT_CONDITION("DSW", 0xc000, PORTCOND_EQUALS, 0x8000)
-	PORT_DIPSETTING(      0x0400, "150k/350k" ) PORT_CONDITION("DSW", 0xc000, PORTCOND_EQUALS, 0xc000)
-	PORT_DIPSETTING(      0x0400, "150k/400k" ) PORT_CONDITION("DSW", 0xc000, PORTCOND_EQUALS, 0x4000)
-	PORT_DIPSETTING(      0x0400, "200k/500k" ) PORT_CONDITION("DSW", 0xc000, PORTCOND_EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0400, "150k/300k" ) PORT_CONDITION("DSW", 0xc000, EQUALS, 0x8000)
+	PORT_DIPSETTING(      0x0400, "150k/350k" ) PORT_CONDITION("DSW", 0xc000, EQUALS, 0xc000)
+	PORT_DIPSETTING(      0x0400, "150k/400k" ) PORT_CONDITION("DSW", 0xc000, EQUALS, 0x4000)
+	PORT_DIPSETTING(      0x0400, "200k/500k" ) PORT_CONDITION("DSW", 0xc000, EQUALS, 0x0000)
 	PORT_DIPUNKNOWN_DIPLOC( 0x2000, 0x2000, "SW2:6" )
 	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Very_Easy ) )
@@ -1491,7 +1475,7 @@ static INPUT_PORTS_START( korokoro )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SERVICE2 )	// service medal out?
 	PORT_SERVICE( 0x2000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 )	// service coin
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )	PORT_CUSTOM(korokoro_hopper_r, NULL) // motor / hopper status ???
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SPECIAL )	PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,korokoro_hopper_r, NULL) // motor / hopper status ???
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1522,7 +1506,7 @@ static INPUT_PORTS_START( tjumpman )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME( DEF_STR( Yes ) ) PORT_CODE(KEYCODE_Y)	// suru ("do")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "1 Bet" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM(tjumpman_hopper_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, NULL)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1547,7 +1531,7 @@ static INPUT_PORTS_START( pacslot )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME( "Pac-Man" ) PORT_CODE(KEYCODE_Y)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "Bet" )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM(tjumpman_hopper_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cave_state,tjumpman_hopper_r, NULL)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1844,7 +1828,7 @@ static void irqhandler(device_t *device, int irq)
 
 static const ym2151_interface ym2151_config =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static const ym2203_interface ym2203_config =
@@ -2601,8 +2585,8 @@ MACHINE_CONFIG_END
 /* 4 bits -> 8 bits. Even and odd pixels are swapped */
 static void unpack_sprites(running_machine &machine)
 {
-	const UINT32 len	=	machine.region("sprites")->bytes();
-	UINT8 *rgn			=	machine.region       ("sprites")->base();
+	const UINT32 len	=	machine.root_device().memregion("sprites")->bytes();
+	UINT8 *rgn			=	machine.root_device().memregion       ("sprites")->base();
 	UINT8 *src			=	rgn + len / 2 - 1;
 	UINT8 *dst			=	rgn + len - 1;
 
@@ -2618,8 +2602,8 @@ static void unpack_sprites(running_machine &machine)
 /* 4 bits -> 8 bits. Even and odd pixels and even and odd words, are swapped */
 static void ddonpach_unpack_sprites(running_machine &machine)
 {
-	const UINT32 len	=	machine.region("sprites")->bytes();
-	UINT8 *rgn			=	machine.region       ("sprites")->base();
+	const UINT32 len	=	machine.root_device().memregion("sprites")->bytes();
+	UINT8 *rgn			=	machine.root_device().memregion       ("sprites")->base();
 	UINT8 *src			=	rgn + len / 2 - 1;
 	UINT8 *dst			=	rgn + len - 1;
 
@@ -2642,8 +2626,8 @@ static void ddonpach_unpack_sprites(running_machine &machine)
 /* 2 pages of 4 bits -> 8 bits */
 static void esprade_unpack_sprites(running_machine &machine)
 {
-	UINT8 *src		=	machine.region("sprites")->base();
-	UINT8 *dst		=	src + machine.region("sprites")->bytes();
+	UINT8 *src		=	machine.root_device().memregion("sprites")->base();
+	UINT8 *dst		=	src + machine.root_device().memregion("sprites")->bytes();
 
 	while(src < dst)
 	{
@@ -4431,8 +4415,8 @@ ROM_END
    Expand the 2 bit part into a 4 bit layout, so we can decode it */
 static void sailormn_unpack_tiles( running_machine &machine, const char *region )
 {
-	const UINT32 len	=	machine.region(region)->bytes();
-	UINT8 *rgn		=	machine.region(region)->base();
+	const UINT32 len	=	machine.root_device().memregion(region)->bytes();
+	UINT8 *rgn		=	machine.root_device().memregion(region)->base();
 	UINT8 *src		=	rgn + (len/4)*3 - 1;
 	UINT8 *dst		=	rgn + (len/4)*4 - 2;
 
@@ -4462,19 +4446,19 @@ static void init_cave(running_machine &machine)
 
 static DRIVER_INIT( agallet )
 {
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = machine.root_device().memregion("audiocpu")->base();
 	init_cave(machine);
 
-	memory_configure_bank(machine, "bank1", 0, 0x02, &ROM[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank1", 2, 0x1e, &ROM[0x10000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(0, 0x02, &ROM[0x00000], 0x4000);
+	machine.root_device().membank("bank1")->configure_entries(2, 0x1e, &ROM[0x10000], 0x4000);
 
-	ROM = machine.region("oki1")->base();
-	memory_configure_bank(machine, "bank3", 0, 0x10, &ROM[0x00000], 0x20000);
-	memory_configure_bank(machine, "bank4", 0, 0x10, &ROM[0x00000], 0x20000);
+	ROM = machine.root_device().memregion("oki1")->base();
+	machine.root_device().membank("bank3")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	machine.root_device().membank("bank4")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
-	ROM = machine.region("oki2")->base();
-	memory_configure_bank(machine, "bank5", 0, 0x10, &ROM[0x00000], 0x20000);
-	memory_configure_bank(machine, "bank6", 0, 0x10, &ROM[0x00000], 0x20000);
+	ROM = machine.root_device().memregion("oki2")->base();
+	machine.root_device().membank("bank5")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	machine.root_device().membank("bank6")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
 	sailormn_unpack_tiles(machine, "layer2");
 
@@ -4530,7 +4514,7 @@ static DRIVER_INIT( esprade )
 
 #if 0		//ROM PATCH
 	{
-		UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+		UINT16 *rom = (UINT16 *)state->memregion("maincpu")->base();
 		rom[0x118A/2] = 0x4e71;			//palette fix   118A: 5548              SUBQ.W  #2,A0       --> NOP
 	}
 #endif
@@ -4560,16 +4544,16 @@ static DRIVER_INIT( guwange )
 static DRIVER_INIT( hotdogst )
 {
 	cave_state *state = machine.driver_data<cave_state>();
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 
 	init_cave(machine);
 
-	memory_configure_bank(machine, "bank2", 0, 0x2, &ROM[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank2", 2, 0xe, &ROM[0x10000], 0x4000);
+	state->membank("bank2")->configure_entries(0, 0x2, &ROM[0x00000], 0x4000);
+	state->membank("bank2")->configure_entries(2, 0xe, &ROM[0x10000], 0x4000);
 
-	ROM = machine.region("oki")->base();
-	memory_configure_bank(machine, "bank3", 0, 4, &ROM[0x00000], 0x20000);
-	memory_configure_bank(machine, "bank4", 0, 4, &ROM[0x00000], 0x20000);
+	ROM = state->memregion("oki")->base();
+	state->membank("bank3")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
+	state->membank("bank4")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
 
 	unpack_sprites(machine);
 	state->m_spritetype[0] = 2;	// Normal sprites with different position handling
@@ -4579,19 +4563,19 @@ static DRIVER_INIT( hotdogst )
 static DRIVER_INIT( mazinger )
 {
 	cave_state *state = machine.driver_data<cave_state>();
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 	UINT8 *buffer;
-	UINT8 *src = machine.region("sprites")->base();
-	int len = machine.region("sprites")->bytes();
+	UINT8 *src = state->memregion("sprites")->base();
+	int len = state->memregion("sprites")->bytes();
 
 	init_cave(machine);
 
-	memory_configure_bank(machine, "bank2", 0, 2, &ROM[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank2", 2, 6, &ROM[0x10000], 0x4000);
+	state->membank("bank2")->configure_entries(0, 2, &ROM[0x00000], 0x4000);
+	state->membank("bank2")->configure_entries(2, 6, &ROM[0x10000], 0x4000);
 
-	ROM = machine.region("oki")->base();
-	memory_configure_bank(machine, "bank3", 0, 4, &ROM[0x00000], 0x20000);
-	memory_configure_bank(machine, "bank4", 0, 4, &ROM[0x00000], 0x20000);
+	ROM = state->memregion("oki")->base();
+	state->membank("bank3")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
+	state->membank("bank4")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
 
 	/* decrypt sprites */
 	buffer = auto_alloc_array(machine, UINT8, len);
@@ -4609,27 +4593,27 @@ static DRIVER_INIT( mazinger )
 	state->m_time_vblank_irq = 2100;
 
 	/* setup extra ROM */
-	memory_set_bankptr(machine, "bank1",machine.region("user1")->base());
+	state->membank("bank1")->set_base(machine.root_device().memregion("user1")->base());
 }
 
 
 static DRIVER_INIT( metmqstr )
 {
 	cave_state *state = machine.driver_data<cave_state>();
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 
 	init_cave(machine);
 
-	memory_configure_bank(machine, "bank1", 0, 0x2, &ROM[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank1", 2, 0xe, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 0x2, &ROM[0x00000], 0x4000);
+	state->membank("bank1")->configure_entries(2, 0xe, &ROM[0x10000], 0x4000);
 
-	ROM = machine.region("oki1")->base();
-	memory_configure_bank(machine, "bank3", 0, 8, &ROM[0x00000], 0x20000);
-	memory_configure_bank(machine, "bank4", 0, 8, &ROM[0x00000], 0x20000);
+	ROM = state->memregion("oki1")->base();
+	state->membank("bank3")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
+	state->membank("bank4")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
 
-	ROM = machine.region("oki2")->base();
-	memory_configure_bank(machine, "bank5", 0, 8, &ROM[0x00000], 0x20000);
-	memory_configure_bank(machine, "bank6", 0, 8, &ROM[0x00000], 0x20000);
+	ROM = state->memregion("oki2")->base();
+	state->membank("bank5")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
+	state->membank("bank6")->configure_entries(0, 8, &ROM[0x00000], 0x20000);
 
 	unpack_sprites(machine);
 	state->m_spritetype[0] = 2;	// Normal sprites with different position handling
@@ -4641,16 +4625,16 @@ static DRIVER_INIT( metmqstr )
 static DRIVER_INIT( pwrinst2j )
 {
 	cave_state *state = machine.driver_data<cave_state>();
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 	UINT8 *buffer;
-	UINT8 *src = machine.region("sprites")->base();
-	int len = machine.region("sprites")->bytes();
+	UINT8 *src = state->memregion("sprites")->base();
+	int len = state->memregion("sprites")->bytes();
 	int i, j;
 
 	init_cave(machine);
 
-	memory_configure_bank(machine, "bank1", 0, 3, &ROM[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank1", 3, 5, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 3, &ROM[0x00000], 0x4000);
+	state->membank("bank1")->configure_entries(3, 5, &ROM[0x10000], 0x4000);
 
 	buffer = auto_alloc_array(machine, UINT8, len);
 	{
@@ -4680,7 +4664,7 @@ static DRIVER_INIT( pwrinst2 )
 
 #if 1		//ROM PATCH
 	{
-		UINT16 *rom = (UINT16 *)machine.region("maincpu")->base();
+		UINT16 *rom = (UINT16 *)machine.root_device().memregion("maincpu")->base();
 		rom[0xd46c / 2] = 0xd482;			// kurara dash fix  0xd400 -> 0xd482
 	}
 #endif
@@ -4690,23 +4674,23 @@ static DRIVER_INIT( pwrinst2 )
 static DRIVER_INIT( sailormn )
 {
 	cave_state *state = machine.driver_data<cave_state>();
-	UINT8 *ROM = machine.region("audiocpu")->base();
+	UINT8 *ROM = state->memregion("audiocpu")->base();
 	UINT8 *buffer;
-	UINT8 *src = machine.region("sprites")->base();
-	int len = machine.region("sprites")->bytes();
+	UINT8 *src = state->memregion("sprites")->base();
+	int len = state->memregion("sprites")->bytes();
 
 	init_cave(machine);
 
-	memory_configure_bank(machine, "bank1", 0, 0x02, &ROM[0x00000], 0x4000);
-	memory_configure_bank(machine, "bank1", 2, 0x1e, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 0x02, &ROM[0x00000], 0x4000);
+	state->membank("bank1")->configure_entries(2, 0x1e, &ROM[0x10000], 0x4000);
 
-	ROM = machine.region("oki1")->base();
-	memory_configure_bank(machine, "bank3", 0, 0x10, &ROM[0x00000], 0x20000);
-	memory_configure_bank(machine, "bank4", 0, 0x10, &ROM[0x00000], 0x20000);
+	ROM = state->memregion("oki1")->base();
+	state->membank("bank3")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	state->membank("bank4")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
-	ROM = machine.region("oki2")->base();
-	memory_configure_bank(machine, "bank5", 0, 0x10, &ROM[0x00000], 0x20000);
-	memory_configure_bank(machine, "bank6", 0, 0x10, &ROM[0x00000], 0x20000);
+	ROM = state->memregion("oki2")->base();
+	state->membank("bank5")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
+	state->membank("bank6")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
 	/* decrypt sprites */
 	buffer = auto_alloc_array(machine, UINT8, len);

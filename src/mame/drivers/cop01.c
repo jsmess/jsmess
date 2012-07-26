@@ -70,51 +70,47 @@ Mighty Guy board layout:
  *
  *************************************/
 
-static WRITE8_HANDLER( cop01_sound_command_w )
+WRITE8_MEMBER(cop01_state::cop01_sound_command_w)
 {
-	cop01_state *state = space->machine().driver_data<cop01_state>();
-	soundlatch_w(space, offset, data);
-	device_set_input_line(state->m_audiocpu, 0, ASSERT_LINE );
+	soundlatch_byte_w(space, offset, data);
+	device_set_input_line(m_audiocpu, 0, ASSERT_LINE );
 }
 
-static READ8_HANDLER( cop01_sound_command_r )
+READ8_MEMBER(cop01_state::cop01_sound_command_r)
 {
-	cop01_state *state = space->machine().driver_data<cop01_state>();
-	int res = (soundlatch_r(space, offset) & 0x7f) << 1;
+	int res = (soundlatch_byte_r(space, offset) & 0x7f) << 1;
 
 	/* bit 0 seems to be a timer */
-	if ((state->m_audiocpu->total_cycles() / TIMER_RATE) & 1)
+	if ((m_audiocpu->total_cycles() / TIMER_RATE) & 1)
 	{
-		if (state->m_pulse == 0)
+		if (m_pulse == 0)
 			res |= 1;
 
-		state->m_pulse = 1;
+		m_pulse = 1;
 	}
 	else
-		state->m_pulse = 0;
+		m_pulse = 0;
 
 	return res;
 }
 
 
-static CUSTOM_INPUT( mightguy_area_r )
+CUSTOM_INPUT_MEMBER(cop01_state::mightguy_area_r)
 {
 	int bit_mask = (FPTR)param;
-	return (input_port_read(field.machine(), "FAKE") & bit_mask) ? 0x01 : 0x00;
+	return (ioport("FAKE")->read() & bit_mask) ? 0x01 : 0x00;
 }
 
-static WRITE8_HANDLER( cop01_irq_ack_w )
+WRITE8_MEMBER(cop01_state::cop01_irq_ack_w)
 {
-	cop01_state *state = space->machine().driver_data<cop01_state>();
 
-	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE );
+	device_set_input_line(m_maincpu, 0, CLEAR_LINE );
 }
 
-static READ8_HANDLER( cop01_sound_irq_ack_w )
+READ8_MEMBER(cop01_state::cop01_sound_irq_ack_w)
 {
-	cop01_state *state = space->machine().driver_data<cop01_state>();
 
-	device_set_input_line(state->m_audiocpu, 0, CLEAR_LINE );
+	device_set_input_line(m_audiocpu, 0, CLEAR_LINE );
 	return 0;
 }
 
@@ -124,15 +120,15 @@ static READ8_HANDLER( cop01_sound_irq_ack_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( cop01_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cop01_map, AS_PROGRAM, 8, cop01_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM /* c000-c7ff in cop01 */
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(cop01_background_w) AM_BASE_MEMBER(cop01_state, m_bgvideoram)
-	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(cop01_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(cop01_foreground_w) AM_BASE_MEMBER(cop01_state, m_fgvideoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(cop01_background_w) AM_SHARE("bgvideoram")
+	AM_RANGE(0xe000, 0xe0ff) AM_WRITEONLY AM_SHARE("spriteram")
+	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(cop01_foreground_w) AM_SHARE("fgvideoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( io_map, AS_IO, 8, cop01_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
@@ -144,7 +140,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8 )
 	AM_RANGE(0x45, 0x45) AM_WRITE(cop01_irq_ack_w) /* ? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mightguy_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mightguy_io_map, AS_IO, 8, cop01_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
@@ -156,31 +152,30 @@ static ADDRESS_MAP_START( mightguy_io_map, AS_IO, 8 )
 	AM_RANGE(0x45, 0x45) AM_WRITE(cop01_irq_ack_w) /* ? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cop01_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_READ(cop01_sound_irq_ack_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( audio_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( audio_io_map, AS_IO, 8, cop01_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("ay3", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE_LEGACY("ay3", ay8910_address_data_w)
 	AM_RANGE(0x06, 0x06) AM_READ(cop01_sound_command_r)
 ADDRESS_MAP_END
 
 
 /* this just gets some garbage out of the YM3526 */
-static READ8_HANDLER( kludge )
+READ8_MEMBER(cop01_state::kludge)
 {
-	cop01_state *state = space->machine().driver_data<cop01_state>();
-	return state->m_timer++;
+	return m_timer++;
 }
 
-static ADDRESS_MAP_START( mightguy_audio_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mightguy_audio_io_map, AS_IO, 8, cop01_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ymsnd", ym3526_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ymsnd", ym3526_w)
 	AM_RANGE(0x02, 0x02) AM_WRITENOP	/* 1412M2? */
 	AM_RANGE(0x03, 0x03) AM_WRITENOP	/* 1412M2? */
 	AM_RANGE(0x03, 0x03) AM_READ(kludge)	/* 1412M2? */
@@ -331,7 +326,7 @@ static INPUT_PORTS_START( mightguy )
 	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mightguy_area_r, (void *)0x04)	// "Start Area" - see fake Dip Switch
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cop01_state,mightguy_area_r, (void *)0x04)	// "Start Area" - see fake Dip Switch
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -349,8 +344,8 @@ static INPUT_PORTS_START( mightguy )
 	PORT_DIPSETTING(	0x20, DEF_STR( Normal ) )
 	PORT_DIPSETTING(	0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(	0x00, "Invincibility")
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mightguy_area_r, (void *)0x01)	// "Start Area" - see fake Dip Switch
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mightguy_area_r, (void *)0x02)	// "Start Area" - see fake Dip Switch
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cop01_state,mightguy_area_r, (void *)0x01)	// "Start Area" - see fake Dip Switch
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cop01_state,mightguy_area_r, (void *)0x02)	// "Start Area" - see fake Dip Switch
 
 	PORT_START("FAKE")	/* FAKE Dip Switch */
 	PORT_DIPNAME( 0x07, 0x07, "Starting Area" )
@@ -659,7 +654,7 @@ static DRIVER_INIT( mightguy )
 #if MIGHTGUY_HACK
 	/* This is a hack to fix the game code to get a fully working
        "Starting Area" fake Dip Switch */
-	UINT8 *RAM = (UINT8 *)machine.region("maincpu")->base();
+	UINT8 *RAM = (UINT8 *)machine.root_device().memregion("maincpu")->base();
 	RAM[0x00e4] = 0x07;	// rlca
 	RAM[0x00e5] = 0x07;	// rlca
 	RAM[0x00e6] = 0x07;	// rlca

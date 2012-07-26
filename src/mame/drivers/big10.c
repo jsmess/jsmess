@@ -72,6 +72,7 @@ public:
 
 	required_device<v9938_device> m_v9938;
 	UINT8 m_mux_data;
+	DECLARE_READ8_MEMBER(mux_r);
 };
 
 
@@ -114,17 +115,16 @@ static WRITE8_DEVICE_HANDLER( mux_w )
 	state->m_mux_data = ~data;
 }
 
-static READ8_HANDLER( mux_r )
+READ8_MEMBER(big10_state::mux_r)
 {
-	big10_state *state = space->machine().driver_data<big10_state>();
-	switch(state->m_mux_data)
+	switch(m_mux_data)
 	{
-		case 1: return input_port_read(space->machine(), "IN1");
-		case 2: return input_port_read(space->machine(), "IN2");
-		case 4: return input_port_read(space->machine(), "IN3");
+		case 1: return ioport("IN1")->read();
+		case 2: return ioport("IN2")->read();
+		case 4: return ioport("IN3")->read();
 	}
 
-	return state->m_mux_data;
+	return m_mux_data;
 }
 
 
@@ -132,19 +132,19 @@ static READ8_HANDLER( mux_r )
 *             Memory Map              *
 **************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, big10_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io, AS_IO, 8 )
+static ADDRESS_MAP_START( main_io, AS_IO, 8, big10_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(mux_r)			/* present in test mode */
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")	/* coins and service */
-	AM_RANGE(0x98, 0x9b) AM_DEVREADWRITE_MODERN("v9938", v9938_device, read, write)
-	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0xa2, 0xa2) AM_DEVREAD("aysnd", ay8910_r) /* Dip-Switches routes here. */
+	AM_RANGE(0x98, 0x9b) AM_DEVREADWRITE("v9938", v9938_device, read, write)
+	AM_RANGE(0xa0, 0xa1) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0xa2, 0xa2) AM_DEVREAD_LEGACY("aysnd", ay8910_r) /* Dip-Switches routes here. */
 ADDRESS_MAP_END
 
 

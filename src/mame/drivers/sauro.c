@@ -128,34 +128,34 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "machine/nvram.h"
 
 
-static WRITE8_HANDLER( sauro_sound_command_w )
+WRITE8_MEMBER(sauro_state::sauro_sound_command_w)
 {
 	data |= 0x80;
-	soundlatch_w(space, offset, data);
+	soundlatch_byte_w(space, offset, data);
 }
 
-static READ8_HANDLER( sauro_sound_command_r )
+READ8_MEMBER(sauro_state::sauro_sound_command_r)
 {
-	int ret	= soundlatch_r(space, offset);
-	soundlatch_clear_w(space, offset, 0);
+	int ret	= soundlatch_byte_r(space, offset);
+	soundlatch_clear_byte_w(space, offset, 0);
 	return ret;
 }
 
-static WRITE8_HANDLER( sauro_coin1_w )
+WRITE8_MEMBER(sauro_state::sauro_coin1_w)
 {
-	coin_counter_w(space->machine(), 0, data);
-	coin_counter_w(space->machine(), 0, 0); // to get the coin counter working in sauro, as it doesn't write 0
+	coin_counter_w(machine(), 0, data);
+	coin_counter_w(machine(), 0, 0); // to get the coin counter working in sauro, as it doesn't write 0
 }
 
-static WRITE8_HANDLER( sauro_coin2_w )
+WRITE8_MEMBER(sauro_state::sauro_coin2_w)
 {
-	coin_counter_w(space->machine(), 1, data);
-	coin_counter_w(space->machine(), 1, 0); // to get the coin counter working in sauro, as it doesn't write 0
+	coin_counter_w(machine(), 1, data);
+	coin_counter_w(machine(), 1, 0); // to get the coin counter working in sauro, as it doesn't write 0
 }
 
-static WRITE8_HANDLER( flip_screen_w )
+WRITE8_MEMBER(sauro_state::flip_screen_w)
 {
-	flip_screen_set(space->machine(), data);
+	flip_screen_set(data);
 }
 
 static WRITE8_DEVICE_HANDLER( adpcm_w )
@@ -163,17 +163,17 @@ static WRITE8_DEVICE_HANDLER( adpcm_w )
 	sp0256_ALD_w(device, 0, data);
 }
 
-static ADDRESS_MAP_START( sauro_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sauro_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe800, 0xebff) AM_RAM AM_BASE_SIZE_MEMBER(sauro_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(tecfri_videoram_w) AM_BASE_MEMBER(sauro_state, m_videoram)
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(tecfri_colorram_w) AM_BASE_MEMBER(sauro_state, m_colorram)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(tecfri_videoram2_w) AM_BASE_MEMBER(sauro_state, m_videoram2)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(tecfri_colorram2_w) AM_BASE_MEMBER(sauro_state, m_colorram2)
+	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(tecfri_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(tecfri_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(tecfri_videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(tecfri_colorram2_w) AM_SHARE("colorram2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sauro_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sauro_io_map, AS_IO, 8, sauro_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW2")
@@ -198,28 +198,28 @@ static ADDRESS_MAP_START( sauro_io_map, AS_IO, 8 )
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sauro_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sauro_sound_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ymsnd", ym3812_w)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("speech", adpcm_w)
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE_LEGACY("speech", adpcm_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ(sauro_sound_command_r)
 	AM_RANGE(0xe000, 0xe006) AM_WRITENOP	/* echo from write to e0000 */
 	AM_RANGE(0xe00e, 0xe00f) AM_WRITENOP
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( trckydoc_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( trckydoc_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe800, 0xebff) AM_RAM AM_MIRROR(0x400) AM_BASE_SIZE_MEMBER(sauro_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(tecfri_videoram_w) AM_BASE_MEMBER(sauro_state, m_videoram)
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(tecfri_colorram_w) AM_BASE_MEMBER(sauro_state, m_colorram)
+	AM_RANGE(0xe800, 0xebff) AM_RAM AM_MIRROR(0x400) AM_SHARE("spriteram")
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(tecfri_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(tecfri_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf808, 0xf808) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("P1")
 	AM_RANGE(0xf818, 0xf818) AM_READ_PORT("P2")
-	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE("ymsnd", ym3812_w)
+	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
 	AM_RANGE(0xf828, 0xf828) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xf830, 0xf830) AM_WRITE(tecfri_scroll_bg_w)
 	AM_RANGE(0xf838, 0xf838) AM_WRITENOP				/* only written at startup */
@@ -554,7 +554,7 @@ static DRIVER_INIT( tecfri )
 	/* This game doesn't like all memory to be initialized to zero, it won't
        initialize the high scores */
 
-	UINT8 *RAM = machine.region("maincpu")->base();
+	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
 
 	memset(&RAM[0xe000], 0, 0x100);
 	RAM[0xe000] = 1;

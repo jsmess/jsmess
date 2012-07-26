@@ -11,7 +11,6 @@ BASIC-31 (and variants) as found on the below url, are homebrews.
 http://dsaprojects.110mb.com/electronics/8031-ah/8031-bas.html
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"

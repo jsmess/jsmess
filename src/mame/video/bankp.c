@@ -35,6 +35,7 @@
 
 PALETTE_INIT( bankp )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -80,59 +81,53 @@ PALETTE_INIT( bankp )
 	/* the bottom half of the PROM seems to be not used */
 }
 
-WRITE8_HANDLER( bankp_scroll_w )
+WRITE8_MEMBER(bankp_state::bankp_scroll_w)
 {
-	bankp_state *state = space->machine().driver_data<bankp_state>();
 
-	state->m_scroll_x = data;
+	m_scroll_x = data;
 }
 
-WRITE8_HANDLER( bankp_videoram_w )
+WRITE8_MEMBER(bankp_state::bankp_videoram_w)
 {
-	bankp_state *state = space->machine().driver_data<bankp_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( bankp_colorram_w )
+WRITE8_MEMBER(bankp_state::bankp_colorram_w)
 {
-	bankp_state *state = space->machine().driver_data<bankp_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( bankp_videoram2_w )
+WRITE8_MEMBER(bankp_state::bankp_videoram2_w)
 {
-	bankp_state *state = space->machine().driver_data<bankp_state>();
 
-	state->m_videoram2[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram2[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( bankp_colorram2_w )
+WRITE8_MEMBER(bankp_state::bankp_colorram2_w)
 {
-	bankp_state *state = space->machine().driver_data<bankp_state>();
 
-	state->m_colorram2[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram2[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( bankp_out_w )
+WRITE8_MEMBER(bankp_state::bankp_out_w)
 {
-	bankp_state *state = space->machine().driver_data<bankp_state>();
 	/* bits 0-1 are playfield priority */
 	/* TODO: understand how this works */
-	state->m_priority = data & 0x03;
+	m_priority = data & 0x03;
 
 	/* bits 2-3 unknown (2 is used) */
 
 	/* bit 4 controls NMI */
-	state->m_nmi_mask = (data & 0x10) >> 4;
+	m_nmi_mask = (data & 0x10) >> 4;
 
 	/* bit 5 controls screen flip */
-	flip_screen_set(space->machine(), data & 0x20);
+	flip_screen_set(data & 0x20);
 
 	/* bits 6-7 unknown */
 }
@@ -177,7 +172,7 @@ SCREEN_UPDATE_IND16( bankp )
 {
 	bankp_state *state = screen.machine().driver_data<bankp_state>();
 
-	if (flip_screen_get(screen.machine()))
+	if (state->flip_screen())
 	{
 		state->m_fg_tilemap->set_scrollx(0, -state->m_scroll_x);
 		state->m_bg_tilemap->set_scrollx(0, 0);

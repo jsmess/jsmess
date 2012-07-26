@@ -102,11 +102,11 @@ coco_state::coco_state(const machine_config &mconfig, device_type type, const ch
 
 void coco_state::analog_port_start(analog_input_t *analog, const char *rx_tag, const char *ry_tag, const char *lx_tag, const char *ly_tag, const char *buttons_tag)
 {
-	analog->m_input[0][0] = machine().port(rx_tag);
-	analog->m_input[0][1] = machine().port(ry_tag);
-	analog->m_input[1][0] = machine().port(lx_tag);
-	analog->m_input[1][1] = machine().port(ly_tag);
-	analog->m_buttons = machine().port(buttons_tag);
+	analog->m_input[0][0] =  machine().root_device().ioport(rx_tag);
+	analog->m_input[0][1] =  machine().root_device().ioport(ry_tag);
+	analog->m_input[1][0] =  machine().root_device().ioport(lx_tag);
+	analog->m_input[1][1] =  machine().root_device().ioport(ly_tag);
+	analog->m_buttons =  machine().root_device().ioport(buttons_tag);
 }
 
 
@@ -125,7 +125,7 @@ void coco_state::device_start()
 	{
 		char name[32];
 		snprintf(name, sizeof(name) / sizeof(name[0]), "row%d", i);
-		m_keyboard[i] = machine().port(name);
+		m_keyboard[i] =  machine().root_device().ioport(name);
 	}
 
 	/* look up analog ports */
@@ -137,8 +137,8 @@ void coco_state::device_start()
 		DIECOM_LIGHTGUN_LX_TAG, DIECOM_LIGHTGUN_LY_TAG, DIECOM_LIGHTGUN_BUTTONS_TAG);
 
 	/* look up miscellaneous controls */
-	m_joystick_type_control = machine().port(CTRL_SEL_TAG);
-	m_joystick_hires_control = machine().port(HIRES_INTF_TAG);
+	m_joystick_type_control =  machine().root_device().ioport(CTRL_SEL_TAG);
+	m_joystick_hires_control =  machine().root_device().ioport(HIRES_INTF_TAG);
 
 	/* timers */
 	m_hiresjoy_transition_timer[0] = timer_alloc(TIMER_HIRES_JOYSTICK_X);
@@ -721,7 +721,7 @@ coco_state::joystick_type_t coco_state::joystick_type(int index)
 {
 	assert((index == 0) || (index == 1));
 	return (m_joystick_type_control != NULL)
-		? (joystick_type_t) ((input_port_read_direct(m_joystick_type_control) >> (index * 4)) & 0x0F)
+		? (joystick_type_t) ((m_joystick_type_control->read() >> (index * 4)) & 0x0F)
 		: JOYSTICK_NONE;
 }
 
@@ -734,7 +734,7 @@ coco_state::joystick_type_t coco_state::joystick_type(int index)
 coco_state::hires_type_t coco_state::hires_interface_type(void)
 {
 	return (m_joystick_hires_control != NULL)
-		? (hires_type_t) input_port_read_direct(m_joystick_hires_control)
+		? (hires_type_t) m_joystick_hires_control->read()
 		: HIRES_NONE;
 }
 
@@ -865,7 +865,7 @@ void coco_state::poll_keyboard(void)
 	/* poll the keyboard, and update PA6-PA0 accordingly*/
 	for (int i = 0; i < sizeof(m_keyboard) / sizeof(m_keyboard[0]); i++)
 	{
-		input_port_value value = input_port_read_direct(m_keyboard[i]);
+		int value = m_keyboard[i]->read();
 		if ((value | pia0_pb) != 0xFF)
 		{
 			pia0_pa &= ~(0x01 << i);

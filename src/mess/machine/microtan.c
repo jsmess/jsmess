@@ -134,7 +134,7 @@ static UINT8 read_dsw(running_machine &machine)
 	{
 		case MACHINE_PHASE_RESET:
 		case MACHINE_PHASE_RUNNING:
-			result = input_port_read(machine, "DSW");
+			result = machine.root_device().ioport("DSW")->read();
 			break;
 
 		default:
@@ -163,7 +163,7 @@ static cassette_image_device *cassette_device_image(running_machine &machine)
  **************************************************************/
 static READ8_DEVICE_HANDLER (via_0_in_a )
 {
-    int data = input_port_read(device->machine(), "JOY");
+    int data = device->machine().root_device().ioport("JOY")->read();
     LOG(("microtan_via_0_in_a %02X\n", data));
     return data;
 }
@@ -345,27 +345,26 @@ static TIMER_CALLBACK(microtan_read_cassette)
 		via_0->write_cb2(1);
 }
 
-READ8_HANDLER( microtan_sound_r )
+READ8_MEMBER(microtan_state::microtan_sound_r)
 {
     int data = 0xff;
     LOG(("microtan_sound_r: -> %02x\n", data));
     return data;
 }
 
-WRITE8_HANDLER( microtan_sound_w )
+WRITE8_MEMBER(microtan_state::microtan_sound_w)
 {
     LOG(("microtan_sound_w: <- %02x\n", data));
 }
 
 
- READ8_HANDLER ( microtan_bffx_r )
+READ8_MEMBER(microtan_state::microtan_bffx_r)
 {
-	microtan_state *state = space->machine().driver_data<microtan_state>();
     int data = 0xff;
     switch( offset & 3 )
     {
     case  0: /* BFF0: read enables chunky graphics */
-        state->m_chunky_graphics = 1;
+        m_chunky_graphics = 1;
         LOG(("microtan_bff0_r: -> %02x (chunky graphics on)\n", data));
         break;
     case  1: /* BFF1: read undefined (?) */
@@ -375,7 +374,7 @@ WRITE8_HANDLER( microtan_sound_w )
         LOG(("microtan_bff2_r: -> %02x\n", data));
         break;
     default: /* BFF3: read keyboard ASCII value */
-        data = state->m_keyboard_ascii;
+        data = m_keyboard_ascii;
         LOG(("microtan_bff3_r: -> %02x (keyboard ASCII)\n", data));
     }
     return data;
@@ -388,29 +387,28 @@ static TIMER_CALLBACK(microtan_pulse_nmi)
     cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE8_HANDLER ( microtan_bffx_w )
+WRITE8_MEMBER(microtan_state::microtan_bffx_w)
 {
-	microtan_state *state = space->machine().driver_data<microtan_state>();
     switch( offset & 3 )
     {
     case 0: /* BFF0: write reset keyboard interrupt flag */
         /* This removes bit 7 from the ASCII value of the last key pressed. */
         LOG(("microtan_bff0_w: %d <- %02x (keyboard IRQ clear )\n", offset, data));
-        state->m_keyboard_ascii &= ~0x80;
-        state->m_kbd_irq_line = CLEAR_LINE;
-        microtan_set_irq_line(space->machine());
+        m_keyboard_ascii &= ~0x80;
+        m_kbd_irq_line = CLEAR_LINE;
+        microtan_set_irq_line(machine());
         break;
     case 1: /* BFF1: write delayed NMI */
         LOG(("microtan_bff1_w: %d <- %02x (delayed NMI)\n", offset, data));
-        space->machine().scheduler().timer_set(space->machine().device<cpu_device>("maincpu")->cycles_to_attotime(8), FUNC(microtan_pulse_nmi));
+        machine().scheduler().timer_set(machine().device<cpu_device>("maincpu")->cycles_to_attotime(8), FUNC(microtan_pulse_nmi));
         break;
     case 2: /* BFF2: write keypad column write (what is this meant for?) */
         LOG(("microtan_bff2_w: %d <- %02x (keypad column)\n", offset, data));
-        state->m_keypad_column = data;
+        m_keypad_column = data;
         break;
     default: /* BFF3: write disable chunky graphics */
         LOG(("microtan_bff3_w: %d <- %02x (chunky graphics off)\n", offset, data));
-        state->m_chunky_graphics = 0;
+        m_chunky_graphics = 0;
     }
 }
 
@@ -441,12 +439,12 @@ INTERRUPT_GEN( microtan_interrupt )
 
 
     row = 9;
-    newvar = input_port_read(device->machine(), "ROW8");
+    newvar = device->machine().root_device().ioport("ROW8")->read();
     chg = state->m_keyrows[--row] ^ newvar;
 
 	while ( !chg && row > 0)
 	{
-		newvar = input_port_read(device->machine(), keynames[row - 1]);
+		newvar = device->machine().root_device().ioport(keynames[row - 1])->read();
 		chg = state->m_keyrows[--row] ^ newvar;
 	}
     if (!chg)
@@ -516,7 +514,7 @@ INTERRUPT_GEN( microtan_interrupt )
 DRIVER_INIT( microtan )
 {
 	microtan_state *state = machine.driver_data<microtan_state>();
-    UINT8 *dst = machine.region("gfx2")->base();
+    UINT8 *dst = state->memregion("gfx2")->base();
     int i;
     address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 
@@ -581,7 +579,7 @@ MACHINE_RESET( microtan )
 
 	for (i = 1; i < 10;  i++)
 	{
-		state->m_keyrows[i] = input_port_read(machine, keynames[i-1]);
+		state->m_keyrows[i] = machine.root_device().ioport(keynames[i-1])->read();
 	}
 	set_led_status(machine, 1, (state->m_keyrows[3] & 0x80) ? 0 : 1);
 }

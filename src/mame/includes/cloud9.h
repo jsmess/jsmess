@@ -13,12 +13,17 @@ public:
 	cloud9_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		  m_maincpu(*this, "maincpu"),
-		  m_nvram(*this, "nvram") { }
+		  m_nvram(*this, "nvram") ,
+		m_spriteram(*this, "spriteram"),
+		m_paletteram(*this, "paletteram"){ }
 
+	/* devices */
+	required_device<m6502_device> m_maincpu;
+	required_device<x2212_device> m_nvram;
 	/* memory pointers */
 	UINT8 *     m_videoram;
-	UINT8 *     m_spriteram;
-	UINT8 *     m_paletteram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_paletteram;
 
 	/* video-related */
 	const UINT8 *m_syncprom;
@@ -37,9 +42,19 @@ public:
 	emu_timer   *m_irq_timer;
 	UINT8       m_irq_state;
 
-	/* devices */
-	required_device<m6502_device> m_maincpu;
-	required_device<x2212_device> m_nvram;
+	DECLARE_WRITE8_MEMBER(irq_ack_w);
+	DECLARE_WRITE8_MEMBER(cloud9_led_w);
+	DECLARE_WRITE8_MEMBER(cloud9_coin_counter_w);
+	DECLARE_READ8_MEMBER(leta_r);
+	DECLARE_WRITE8_MEMBER(nvram_recall_w);
+	DECLARE_WRITE8_MEMBER(nvram_store_w);
+	DECLARE_WRITE8_MEMBER(cloud9_video_control_w);
+	DECLARE_WRITE8_MEMBER(cloud9_paletteram_w);
+	DECLARE_WRITE8_MEMBER(cloud9_videoram_w);
+	DECLARE_READ8_MEMBER(cloud9_bitmode_r);
+	DECLARE_WRITE8_MEMBER(cloud9_bitmode_w);
+	DECLARE_WRITE8_MEMBER(cloud9_bitmode_addr_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
 };
 
 
@@ -48,11 +63,5 @@ public:
 VIDEO_START( cloud9 );
 SCREEN_UPDATE_IND16( cloud9 );
 
-WRITE8_HANDLER( cloud9_video_control_w );
 
-WRITE8_HANDLER( cloud9_paletteram_w );
-WRITE8_HANDLER( cloud9_videoram_w );
 
-READ8_HANDLER( cloud9_bitmode_r );
-WRITE8_HANDLER( cloud9_bitmode_w );
-WRITE8_HANDLER( cloud9_bitmode_addr_w );

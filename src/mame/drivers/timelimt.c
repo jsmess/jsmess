@@ -21,7 +21,7 @@ Notes:
 
 static MACHINE_START( timelimt )
 {
-	soundlatch_setclearedvalue( machine, 0 );
+	machine.driver_data<timelimt_state>()->soundlatch_setclearedvalue( 0 );
 }
 
 static MACHINE_RESET( timelimt )
@@ -30,32 +30,31 @@ static MACHINE_RESET( timelimt )
 	state->m_nmi_enabled = 0;
 }
 
-static WRITE8_HANDLER( nmi_enable_w )
+WRITE8_MEMBER(timelimt_state::nmi_enable_w)
 {
-	timelimt_state *state = space->machine().driver_data<timelimt_state>();
-	state->m_nmi_enabled = data & 1;	/* bit 0 = nmi enable */
+	m_nmi_enabled = data & 1;	/* bit 0 = nmi enable */
 }
 
-static WRITE8_HANDLER( sound_reset_w )
+WRITE8_MEMBER(timelimt_state::sound_reset_w)
 {
 	if (data & 1)
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, timelimt_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM		/* rom */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM		/* ram */
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(timelimt_videoram_w) AM_BASE_MEMBER(timelimt_state, m_videoram)	/* video ram */
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(timelimt_bg_videoram_w) AM_BASE_MEMBER(timelimt_state, m_bg_videoram) AM_SIZE_MEMBER(timelimt_state, m_bg_videoram_size)/* background ram */
-	AM_RANGE(0x9800, 0x98ff) AM_RAM AM_BASE_SIZE_MEMBER(timelimt_state, m_spriteram, m_spriteram_size)	/* sprite ram */
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(timelimt_videoram_w) AM_SHARE("videoram")	/* video ram */
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(timelimt_bg_videoram_w) AM_SHARE("bg_videoram")/* background ram */
+	AM_RANGE(0x9800, 0x98ff) AM_RAM AM_SHARE("spriteram")	/* sprite ram */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW")
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(nmi_enable_w)	/* nmi enable */
 	AM_RANGE(0xb003, 0xb003) AM_WRITE(sound_reset_w)/* sound reset ? */
-	AM_RANGE(0xb800, 0xb800) AM_WRITE(soundlatch_w) /* sound write */
+	AM_RANGE(0xb800, 0xb800) AM_WRITE(soundlatch_byte_w) /* sound write */
 	AM_RANGE(0xb800, 0xb800) AM_READNOP		/* NMI ack? */
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(timelimt_scroll_x_lsb_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(timelimt_scroll_x_msb_w)
@@ -64,21 +63,21 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xc804, 0xc804) AM_WRITENOP		/* ???? not used */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( main_io_map, AS_IO, 8, timelimt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, timelimt_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, timelimt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_w)
-	AM_RANGE(0x8c, 0x8d) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_address_data_w)
-	AM_RANGE(0x8e, 0x8f) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_address_data_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_byte_w)
+	AM_RANGE(0x8c, 0x8d) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r, ay8910_address_data_w)
+	AM_RANGE(0x8e, 0x8f) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_address_data_w)
 ADDRESS_MAP_END
 
 /***************************************************************************/
@@ -211,7 +210,7 @@ static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_MEMORY_HANDLER("audiocpu", PROGRAM, soundlatch_r),
+	DEVCB_DRIVER_MEMBER(driver_device, soundlatch_byte_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL

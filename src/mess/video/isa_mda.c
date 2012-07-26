@@ -197,7 +197,7 @@ void isa8_mda_device::device_reset()
 	m_pixel = 0;
 
 	astring tempstring;
-	m_chr_gen = machine().region(subtag(tempstring, "gfx1"))->base();
+	m_chr_gen = memregion(subtag(tempstring, "gfx1"))->base();
 }
 
 /***************************************************************************
@@ -598,7 +598,7 @@ void isa8_hercules_device::device_reset()
 	m_configuration_switch = 0;
 
 	astring tempstring;
-	m_chr_gen = machine().region(subtag(tempstring, "gfx1"))->base();
+	m_chr_gen = memregion(subtag(tempstring, "gfx1"))->base();
 }
 
 /***************************************************************************

@@ -110,7 +110,6 @@
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "includes/micronic.h"
@@ -124,7 +123,7 @@ READ8_MEMBER( micronic_state::keypad_r )
 	for (bit = 0; bit < 8; bit++)
 		if (m_kp_matrix & (1 << bit))
 			for (port = 0; port < 6; port++)
-				data |= input_port_read(machine(), bitnames[port]) & (0x01 << bit) ? 0x01 << port : 0x00;
+				data |= ioport(bitnames[port])->read() & (0x01 << bit) ? 0x01 << port : 0x00;
 	return data;
 }
 
@@ -157,19 +156,19 @@ WRITE8_MEMBER( micronic_state::beep_w )
 
 READ8_MEMBER( micronic_state::irq_flag_r )
 {
-	return (input_port_read(machine(), "BACKBATTERY")<<4) | (input_port_read(machine(), "MAINBATTERY")<<3) | (keypad_r(space, offset) ? 0 : 1);
+	return (ioport("BACKBATTERY")->read()<<4) | (ioport("MAINBATTERY")->read()<<3) | (keypad_r(space, offset) ? 0 : 1);
 }
 
 WRITE8_MEMBER( micronic_state::bank_select_w )
 {
 	if (data < 2)
 	{
-		memory_set_bank(machine(), "bank1", data);
+		membank("bank1")->set_entry(data);
 		m_maincpu->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x7fff);
 	}
 	else
 	{
-		memory_set_bank(machine(), "bank1", (data <= m_banks_num) ? data : m_banks_num);
+		membank("bank1")->set_entry((data <= m_banks_num) ? data : m_banks_num);
 		m_maincpu->memory().space(AS_PROGRAM)->install_write_bank(0x0000, 0x7fff, "bank1");
 	}
 }
@@ -210,7 +209,7 @@ WRITE8_MEMBER( micronic_state::rtc_data_w )
 
 static ADDRESS_MAP_START(micronic_mem, AS_PROGRAM, 8, micronic_state)
 	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank1")
-	AM_RANGE(0x8000, 0xffff) AM_RAM	 AM_BASE(m_ram_base)
+	AM_RANGE(0x8000, 0xffff) AM_RAM	 AM_SHARE("ram_base")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(micronic_io, AS_IO, 8, micronic_state)
@@ -330,11 +329,11 @@ static HD61830_INTERFACE( lcdc_intf )
 void micronic_state::machine_start()
 {
 	/* ROM banks */
-	memory_configure_bank(machine(), "bank1", 0x00, 0x02, machine().region(Z80_TAG)->base(), 0x10000);
+	membank("bank1")->configure_entries(0x00, 0x02, memregion(Z80_TAG)->base(), 0x10000);
 
 	/* RAM banks */
 	m_banks_num = (m_ram->size()>>15) + 1;
-	memory_configure_bank(machine(), "bank1", 0x02, m_banks_num - 1, m_ram->pointer(), 0x8000);
+	membank("bank1")->configure_entries(0x02, m_banks_num - 1, m_ram->pointer(), 0x8000);
 
 	/* register for state saving */
 //  save_item(NAME(state->));
@@ -342,7 +341,7 @@ void micronic_state::machine_start()
 
 void micronic_state::machine_reset()
 {
-	memory_set_bank(machine(), "bank1", 0);
+	membank("bank1")->set_entry(0);
 	m_maincpu->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x7fff);
 }
 

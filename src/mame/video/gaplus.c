@@ -25,6 +25,7 @@
 
 PALETTE_INIT( gaplus )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -197,24 +198,21 @@ VIDEO_START( gaplus )
 
 ***************************************************************************/
 
-READ8_HANDLER( gaplus_videoram_r )
+READ8_MEMBER(gaplus_state::gaplus_videoram_r)
 {
-	gaplus_state *state = space->machine().driver_data<gaplus_state>();
-	return state->m_videoram[offset];
+	return m_videoram[offset];
 }
 
-WRITE8_HANDLER( gaplus_videoram_w )
+WRITE8_MEMBER(gaplus_state::gaplus_videoram_w)
 {
-	gaplus_state *state = space->machine().driver_data<gaplus_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( gaplus_starfield_control_w )
+WRITE8_MEMBER(gaplus_state::gaplus_starfield_control_w)
 {
-	gaplus_state *state = space->machine().driver_data<gaplus_state>();
 	offset &= 3;
-	state->m_starfield_control[offset] = data;
+	m_starfield_control[offset] = data;
 }
 
 
@@ -282,7 +280,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap, const r
 			int duplicate = spriteram_3[offs] & 0x80;
 			int x,y;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				flipx ^= 1;
 				flipy ^= 1;
@@ -311,7 +309,7 @@ SCREEN_UPDATE_IND16( gaplus )
 {
 	gaplus_state *state = screen.machine().driver_data<gaplus_state>();
 	/* flip screen control is embedded in RAM */
-	flip_screen_set(screen.machine(), state->m_spriteram[0x1f7f-0x800] & 1);
+	state->flip_screen_set(state->m_spriteram[0x1f7f-0x800] & 1);
 
 	bitmap.fill(0, cliprect);
 

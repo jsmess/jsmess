@@ -23,6 +23,7 @@
 
 PALETTE_INIT( digdug )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	machine.colortable = colortable_alloc(machine, 32);
@@ -89,7 +90,7 @@ static TILEMAP_MAPPER( tilemap_scan )
 
 static TILE_GET_INFO( bg_get_tile_info )
 {
-	UINT8 *rom = machine.region("gfx4")->base();
+	UINT8 *rom = machine.root_device().memregion("gfx4")->base();
 	digdug_state *state =  machine.driver_data<digdug_state>();
 
 	int code = rom[tile_index | (state->m_bg_select << 10)];
@@ -129,9 +130,9 @@ static TILE_GET_INFO( tx_get_tile_info )
        characters when screen is flipped, we have to flip them back. */
 	SET_TILE_INFO(
 			0,
-			(code & 0x7f) | (flip_screen_get(machine) ? 0x80 : 0),
+			(code & 0x7f) | (state->flip_screen() ? 0x80 : 0),
 			color,
-			flip_screen_get(machine) ? TILE_FLIPX : 0);
+			state->flip_screen() ? TILE_FLIPX : 0);
 }
 
 
@@ -227,7 +228,7 @@ WRITE8_HANDLER( digdug_PORT_w )
 			break;
 
 		case 7:	/* FLIP */
-			flip_screen_set(space->machine(), data & 1);
+			state->flip_screen_set(data & 1);
 			break;
 	}
 }
@@ -252,7 +253,7 @@ static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap, const r
 	rectangle visarea = cliprect;
 	visarea.min_x = 2*8;
 	visarea.max_x = 34*8-1;
-	if (flip_screen_get(machine))
+	if (state->flip_screen())
 	{
 		visarea.min_x += 12*8;
 		visarea.max_x += 12*8;
@@ -280,7 +281,7 @@ static void draw_sprites(running_machine& machine, bitmap_ind16 &bitmap, const r
 		sy -= 16 * size;
 		sy = (sy & 0xff) - 32;	// fix wraparound
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			flipx ^= 1;
 			flipy ^= 1;

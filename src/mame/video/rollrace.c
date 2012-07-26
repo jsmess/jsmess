@@ -22,6 +22,7 @@
 ***************************************************************************/
 PALETTE_INIT( rollrace )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 
@@ -52,53 +53,46 @@ PALETTE_INIT( rollrace )
 	}
 }
 
-WRITE8_HANDLER( rollrace_charbank_w)
+WRITE8_MEMBER(rollrace_state::rollrace_charbank_w)
 {
-	rollrace_state *state = space->machine().driver_data<rollrace_state>();
 
-	state->m_ra_charbank[offset&1] = data;
-	state->m_ra_chrbank = state->m_ra_charbank[0] | (state->m_ra_charbank[1] << 1) ;
+	m_ra_charbank[offset&1] = data;
+	m_ra_chrbank = m_ra_charbank[0] | (m_ra_charbank[1] << 1) ;
 }
 
 
-WRITE8_HANDLER( rollrace_bkgpen_w)
+WRITE8_MEMBER(rollrace_state::rollrace_bkgpen_w)
 {
-	rollrace_state *state = space->machine().driver_data<rollrace_state>();
-	state->m_ra_bkgpen = data;
+	m_ra_bkgpen = data;
 }
 
-WRITE8_HANDLER(rollrace_spritebank_w)
+WRITE8_MEMBER(rollrace_state::rollrace_spritebank_w)
 {
-	rollrace_state *state = space->machine().driver_data<rollrace_state>();
-	state->m_ra_spritebank = data;
+	m_ra_spritebank = data;
 }
 
-WRITE8_HANDLER(rollrace_backgroundpage_w)
+WRITE8_MEMBER(rollrace_state::rollrace_backgroundpage_w)
 {
-	rollrace_state *state = space->machine().driver_data<rollrace_state>();
 
-	state->m_ra_bkgpage = data & 0x1f;
-	state->m_ra_bkgflip = ( data & 0x80 ) >> 7;
+	m_ra_bkgpage = data & 0x1f;
+	m_ra_bkgflip = ( data & 0x80 ) >> 7;
 
 	/* 0x80 flip vertical */
 }
 
-WRITE8_HANDLER( rollrace_backgroundcolor_w )
+WRITE8_MEMBER(rollrace_state::rollrace_backgroundcolor_w)
 {
-	rollrace_state *state = space->machine().driver_data<rollrace_state>();
-	state->m_ra_bkgcol = data;
+	m_ra_bkgcol = data;
 }
 
-WRITE8_HANDLER( rollrace_flipy_w )
+WRITE8_MEMBER(rollrace_state::rollrace_flipy_w)
 {
-	rollrace_state *state = space->machine().driver_data<rollrace_state>();
-	state->m_ra_flipy = data & 0x01;
+	m_ra_flipy = data & 0x01;
 }
 
-WRITE8_HANDLER( rollrace_flipx_w )
+WRITE8_MEMBER(rollrace_state::rollrace_flipx_w)
 {
-	rollrace_state *state = space->machine().driver_data<rollrace_state>();
-	state->m_ra_flipx = data & 0x01;
+	m_ra_flipx = data & 0x01;
 }
 
 SCREEN_UPDATE_IND16( rollrace )
@@ -109,7 +103,7 @@ SCREEN_UPDATE_IND16( rollrace )
 	int sx, sy;
 	int scroll;
 	int col;
-	const UINT8 *mem = screen.machine().region("user1")->base();
+	const UINT8 *mem = state->memregion("user1")->base();
 
 	/* fill in background colour*/
 	bitmap.fill(state->m_ra_bkgpen, cliprect);

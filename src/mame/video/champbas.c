@@ -22,6 +22,7 @@
 
 PALETTE_INIT( champbas )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -74,6 +75,7 @@ PALETTE_INIT( champbas )
 
 PALETTE_INIT( exctsccr )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	/* allocate the colortable */
@@ -161,34 +163,31 @@ VIDEO_START( exctsccr )
 
 
 
-WRITE8_HANDLER( champbas_bg_videoram_w )
+WRITE8_MEMBER(champbas_state::champbas_bg_videoram_w)
 {
-	champbas_state *state = space->machine().driver_data<champbas_state>();
-	state->m_bg_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_bg_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( champbas_gfxbank_w )
+WRITE8_MEMBER(champbas_state::champbas_gfxbank_w)
 {
-	champbas_state *state = space->machine().driver_data<champbas_state>();
 	data &= 1;
-	if (state->m_gfx_bank != data)
+	if (m_gfx_bank != data)
 	{
-		state->m_gfx_bank = data;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_gfx_bank = data;
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( champbas_palette_bank_w )
+WRITE8_MEMBER(champbas_state::champbas_palette_bank_w)
 {
-	champbas_state *state = space->machine().driver_data<champbas_state>();
-	state->m_palette_bank = data & 1;
-	state->m_bg_tilemap->set_palette_offset(state->m_palette_bank << 8);
+	m_palette_bank = data & 1;
+	m_bg_tilemap->set_palette_offset(m_palette_bank << 8);
 }
 
-WRITE8_HANDLER( champbas_flipscreen_w )
+WRITE8_MEMBER(champbas_state::champbas_flipscreen_w)
 {
-	flip_screen_set(space->machine(), ~data & 1);
+	flip_screen_set(~data & 1);
 }
 
 
@@ -199,7 +198,7 @@ static void champbas_draw_sprites( running_machine &machine, bitmap_ind16 &bitma
 	int offs;
 	const gfx_element* const gfx = machine.gfx[1];
 
-	for (offs = state->m_spriteram_size - 2; offs >= 0; offs -= 2)
+	for (offs = state->m_spriteram.bytes() - 2; offs >= 0; offs -= 2)
 	{
 		int code = (state->m_spriteram[offs] >> 2) | (state->m_gfx_bank << 6);
 		int color = (state->m_spriteram[offs + 1] & 0x1f) | (state->m_palette_bank << 6);

@@ -12,7 +12,6 @@
 #ifndef __VW64__
 #define __VW64__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "machine/c64exp.h"
@@ -34,14 +33,14 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete() { m_shortname = "c64_vizawrite"; }
 	virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-	virtual void device_config_complete() { m_shortname = "c64_vizawrite"; }
 
 	// device_c64_expansion_card_interface overrides
-	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2);
-	virtual int c64_exrom_r() { return 0; }
+	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2);
+	virtual int c64_exrom_r(offs_t offset, int ba, int rw, int hiram) { return 0; }
 
 private:
 	emu_timer *m_game_timer;

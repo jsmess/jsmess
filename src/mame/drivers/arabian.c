@@ -98,11 +98,10 @@ static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
  *
  *************************************/
 
-static READ8_HANDLER( mcu_port_r_r )
+READ8_MEMBER(arabian_state::mcu_port_r_r)
 {
-	arabian_state *state = space->machine().driver_data<arabian_state>();
 
-	UINT8 val = state->m_mcu_port_r[offset];
+	UINT8 val = m_mcu_port_r[offset];
 
 	/* RAM mode is enabled */
 	if (offset == 0)
@@ -111,44 +110,42 @@ static READ8_HANDLER( mcu_port_r_r )
 	return val;
 }
 
-static WRITE8_HANDLER( mcu_port_r_w )
+WRITE8_MEMBER(arabian_state::mcu_port_r_w)
 {
-	arabian_state *state = space->machine().driver_data<arabian_state>();
 
 	if (offset == 0)
 	{
-		UINT32 ram_addr = ((state->m_mcu_port_p & 7) << 8) | state->m_mcu_port_o;
+		UINT32 ram_addr = ((m_mcu_port_p & 7) << 8) | m_mcu_port_o;
 
 		if (~data & 2)
-			state->m_custom_cpu_ram[ram_addr] = 0xf0 | state->m_mcu_port_r[3];
+			m_custom_cpu_ram[ram_addr] = 0xf0 | m_mcu_port_r[3];
 
-		state->m_flip_screen = data & 8;
+		m_flip_screen = data & 8;
 	}
 
-	state->m_mcu_port_r[offset] = data & 0x0f;
+	m_mcu_port_r[offset] = data & 0x0f;
 }
 
-static READ8_HANDLER( mcu_portk_r )
+READ8_MEMBER(arabian_state::mcu_portk_r)
 {
-	arabian_state *state = space->machine().driver_data<arabian_state>();
 	UINT8 val = 0xf;
 
-	if (~state->m_mcu_port_r[0] & 1)
+	if (~m_mcu_port_r[0] & 1)
 	{
-		UINT32 ram_addr = ((state->m_mcu_port_p & 7) << 8) | state->m_mcu_port_o;
-		val = state->m_custom_cpu_ram[ram_addr];
+		UINT32 ram_addr = ((m_mcu_port_p & 7) << 8) | m_mcu_port_o;
+		val = m_custom_cpu_ram[ram_addr];
 	}
 	else
 	{
 		static const char *const comnames[] = { "COM0", "COM1", "COM2", "COM3", "COM4", "COM5" };
-		UINT8 sel = ((state->m_mcu_port_r[2] << 4) | state->m_mcu_port_r[1]) & 0x3f;
+		UINT8 sel = ((m_mcu_port_r[2] << 4) | m_mcu_port_r[1]) & 0x3f;
 		int i;
 
 		for (i = 0; i < 6; ++i)
 		{
 			if (~sel & (1 << i))
 			{
-				val = input_port_read(space->machine(), comnames[i]);
+				val = ioport(comnames[i])->read();
 				break;
 			}
 		}
@@ -157,21 +154,19 @@ static READ8_HANDLER( mcu_portk_r )
 	return val & 0x0f;
 }
 
-static WRITE8_HANDLER( mcu_port_o_w )
+WRITE8_MEMBER(arabian_state::mcu_port_o_w)
 {
-	arabian_state *state = space->machine().driver_data<arabian_state>();
 	UINT8 out = data & 0x0f;
 
 	if (data & 0x10)
-		state->m_mcu_port_o = (state->m_mcu_port_o & 0x0f) | (out << 4);
+		m_mcu_port_o = (m_mcu_port_o & 0x0f) | (out << 4);
 	else
-		state->m_mcu_port_o = (state->m_mcu_port_o & 0xf0) | out;
+		m_mcu_port_o = (m_mcu_port_o & 0xf0) | out;
 }
 
-static WRITE8_HANDLER( mcu_port_p_w )
+WRITE8_MEMBER(arabian_state::mcu_port_p_w)
 {
-	arabian_state *state = space->machine().driver_data<arabian_state>();
-	state->m_mcu_port_p = data & 0x0f;
+	m_mcu_port_p = data & 0x0f;
 }
 
 
@@ -182,13 +177,13 @@ static WRITE8_HANDLER( mcu_port_p_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, arabian_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(arabian_videoram_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x01ff) AM_READ_PORT("IN0")
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x01ff) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd000, 0xd7ff) AM_MIRROR(0x0800) AM_RAM AM_BASE_MEMBER(arabian_state, m_custom_cpu_ram)
-	AM_RANGE(0xe000, 0xe007) AM_MIRROR(0x0ff8) AM_WRITE(arabian_blitter_w) AM_BASE_MEMBER(arabian_state, m_blitter)
+	AM_RANGE(0xd000, 0xd7ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("custom_cpu_ram")
+	AM_RANGE(0xe000, 0xe007) AM_MIRROR(0x0ff8) AM_WRITE(arabian_blitter_w) AM_SHARE("blitter")
 ADDRESS_MAP_END
 
 
@@ -199,9 +194,9 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_io_map, AS_IO, 8 )
-	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0x01ff) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0xca00, 0xca00) AM_MIRROR(0x01ff) AM_DEVWRITE("aysnd", ay8910_data_w)
+static ADDRESS_MAP_START( main_io_map, AS_IO, 8, arabian_state )
+	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0x01ff) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0xca00, 0xca00) AM_MIRROR(0x01ff) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 ADDRESS_MAP_END
 
 
@@ -212,7 +207,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, arabian_state )
 	AM_RANGE(MB88_PORTK,  MB88_PORTK ) AM_READ(mcu_portk_r)
 	AM_RANGE(MB88_PORTO,  MB88_PORTO ) AM_WRITE(mcu_port_o_w)
 	AM_RANGE(MB88_PORTP,  MB88_PORTP ) AM_WRITE(mcu_port_p_w)

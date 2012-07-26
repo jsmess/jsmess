@@ -117,7 +117,7 @@ void atarigen_init(running_machine &machine)
 
 	/* allocate timers for all screens */
 	screen_device_iterator iter(machine.root_device());
-	assert(iter.count() < ARRAY_LENGTH(state->m_screen_timer));
+	assert(iter.count() <= ARRAY_LENGTH(state->m_screen_timer));
 	for (i = 0, screen = iter.first(); screen != NULL; i++, screen = iter.next())
 	{
 		state->m_screen_timer[i].screen = screen;
@@ -345,6 +345,8 @@ static TIMER_CALLBACK( scanline_interrupt_callback )
 void atarigen_eeprom_reset(atarigen_state *state)
 {
 	state->m_eeprom_unlocked = 0;
+	if (state->m_eeprom == NULL && state->m_eeprom32 != NULL)
+		state->m_eeprom.set_target(reinterpret_cast<UINT16 *>(state->m_eeprom32.target()), state->m_eeprom32.bytes());
 }
 
 
@@ -453,21 +455,19 @@ static void slapstic_postload(running_machine &machine)
 }
 
 
-DIRECT_UPDATE_HANDLER( atarigen_slapstic_setdirect )
+DIRECT_UPDATE_MEMBER(atarigen_state::atarigen_slapstic_setdirect)
 {
-	atarigen_state *state = machine.driver_data<atarigen_state>();
-
 	/* if we jump to an address in the slapstic region, tweak the slapstic
        at that address and return ~0; this will cause us to be called on
        subsequent fetches as well */
-	address &= ~state->m_slapstic_mirror;
-	if (address >= state->m_slapstic_base && address < state->m_slapstic_base + 0x8000)
+	address &= ~m_slapstic_mirror;
+	if (address >= m_slapstic_base && address < m_slapstic_base + 0x8000)
 	{
 		offs_t pc = cpu_get_previouspc(&direct.space().device());
-		if (pc != state->m_slapstic_last_pc || address != state->m_slapstic_last_address)
+		if (pc != m_slapstic_last_pc || address != m_slapstic_last_address)
 		{
-			state->m_slapstic_last_pc = pc;
-			state->m_slapstic_last_address = address;
+			m_slapstic_last_pc = pc;
+			m_slapstic_last_address = address;
 			atarigen_slapstic_r(&direct.space(), (address >> 1) & 0x3fff, 0xffff);
 		}
 		return ~0;
@@ -512,7 +512,7 @@ void atarigen_slapstic_init(device_t *device, offs_t base, offs_t mirror, int ch
 		state->m_slapstic_mirror = mirror;
 
 		address_space *space = downcast<cpu_device *>(device)->space(AS_PROGRAM);
-		space->set_direct_update_handler(direct_update_delegate(FUNC(atarigen_slapstic_setdirect), &device->machine()));
+		space->set_direct_update_handler(direct_update_delegate(FUNC(atarigen_state::atarigen_slapstic_setdirect), state));
 	}
 }
 
@@ -990,7 +990,7 @@ void atarivc_reset(screen_device &screen, UINT16 *eof_data, int playfields)
 	atarigen_state *state = screen.machine().driver_data<atarigen_state>();
 
 	/* this allows us to manually reset eof_data to NULL if it's not used */
-	state->m_atarivc_eof_data = eof_data;
+	state->m_atarivc_eof_data.set_target(eof_data, 0x100);
 	state->m_atarivc_playfields = playfields;
 
 	/* clear the RAM we use */
@@ -1395,10 +1395,11 @@ void atarigen_halt_until_hblank_0(screen_device &screen)
 
 WRITE16_HANDLER( atarigen_666_paletteram_w )
 {
+	atarigen_state *state = space->machine().driver_data<atarigen_state>();
 	int newword, r, g, b;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
-	newword = space->machine().generic.paletteram.u16[offset];
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
+	newword = state->m_generic_paletteram_16[offset];
 
 	r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 1);
 	g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
@@ -1415,12 +1416,13 @@ WRITE16_HANDLER( atarigen_666_paletteram_w )
 
 WRITE16_HANDLER( atarigen_expanded_666_paletteram_w )
 {
-	COMBINE_DATA(&space->machine().generic.paletteram.u16[offset]);
+	atarigen_state *state = space->machine().driver_data<atarigen_state>();
+	COMBINE_DATA(&state->m_generic_paletteram_16[offset]);
 
 	if (ACCESSING_BITS_8_15)
 	{
 		int palentry = offset / 2;
-		int newword = (space->machine().generic.paletteram.u16[palentry * 2] & 0xff00) | (space->machine().generic.paletteram.u16[palentry * 2 + 1] >> 8);
+		int newword = (state->m_generic_paletteram_16[palentry * 2] & 0xff00) | (state->m_generic_paletteram_16[palentry * 2 + 1] >> 8);
 
 		int r, g, b;
 
@@ -1439,13 +1441,14 @@ WRITE16_HANDLER( atarigen_expanded_666_paletteram_w )
 
 WRITE32_HANDLER( atarigen_666_paletteram32_w )
 {
+	atarigen_state *state = space->machine().driver_data<atarigen_state>();
 	int newword, r, g, b;
 
-	COMBINE_DATA(&space->machine().generic.paletteram.u32[offset]);
+	COMBINE_DATA(&state->m_generic_paletteram_32[offset]);
 
 	if (ACCESSING_BITS_16_31)
 	{
-		newword = space->machine().generic.paletteram.u32[offset] >> 16;
+		newword = state->m_generic_paletteram_32[offset] >> 16;
 
 		r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 1);
 		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
@@ -1456,7 +1459,7 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 
 	if (ACCESSING_BITS_0_15)
 	{
-		newword = space->machine().generic.paletteram.u32[offset] & 0xffff;
+		newword = state->m_generic_paletteram_32[offset] & 0xffff;
 
 		r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 1);
 		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);

@@ -51,10 +51,11 @@ class chinsan_state : public driver_device
 {
 public:
 	chinsan_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_video(*this, "video"){ }
 
 	/* memory pointers */
-	UINT8 *  m_video;
+	required_shared_ptr<UINT8> m_video;
 
 	/* misc */
 	UINT8    m_port_select;
@@ -62,6 +63,10 @@ public:
 	UINT8    m_adpcm_idle;
 	UINT8	 m_adpcm_data;
 	UINT8    m_trigger;
+	DECLARE_WRITE8_MEMBER(ctrl_w);
+	DECLARE_WRITE8_MEMBER(chinsan_port00_w);
+	DECLARE_READ8_MEMBER(chinsan_input_port_0_r);
+	DECLARE_READ8_MEMBER(chinsan_input_port_1_r);
 };
 
 
@@ -73,7 +78,7 @@ public:
 
 static PALETTE_INIT( chinsan )
 {
-	UINT8 *src = machine.region( "color_proms" )->base();
+	UINT8 *src = machine.root_device().memregion( "color_proms" )->base();
 	int i;
 
 	for (i = 0; i < 0x100; i++)
@@ -112,9 +117,9 @@ static SCREEN_UPDATE_IND16( chinsan )
  *
  *************************************/
 
-static WRITE8_HANDLER( ctrl_w )
+WRITE8_MEMBER(chinsan_state::ctrl_w)
 {
-	memory_set_bank(space->machine(), "bank1", data >> 6);
+	membank("bank1")->set_entry(data >> 6);
 }
 
 static WRITE8_DEVICE_HANDLER( ym_port_w1 )
@@ -141,11 +146,10 @@ static const ym2203_interface ym2203_config =
 	},
 };
 
-static WRITE8_HANDLER( chinsan_port00_w )
+WRITE8_MEMBER(chinsan_state::chinsan_port00_w)
 {
-	chinsan_state *state = space->machine().driver_data<chinsan_state>();
 
-	state->m_port_select = data;
+	m_port_select = data;
 
 	if (
 	   (data != 0x40) &&
@@ -159,68 +163,66 @@ static WRITE8_HANDLER( chinsan_port00_w )
 
 }
 
-static READ8_HANDLER( chinsan_input_port_0_r )
+READ8_MEMBER(chinsan_state::chinsan_input_port_0_r)
 {
-	chinsan_state *state = space->machine().driver_data<chinsan_state>();
 
 	//return 0xff; // the inputs don't seem to work, so just return ff for now
 
-	switch (state->m_port_select)
+	switch (m_port_select)
 	{
 		/* i doubt these are both really the same.. */
 		case 0x40:
 		case 0x4f:
-			return input_port_read(space->machine(), "MAHJONG_P2_1");
+			return ioport("MAHJONG_P2_1")->read();
 
 		case 0x53:
-			return input_port_read(space->machine(), "MAHJONG_P2_2");
+			return ioport("MAHJONG_P2_2")->read();
 
 		case 0x57:
-			return input_port_read(space->machine(), "MAHJONG_P2_3");
+			return ioport("MAHJONG_P2_3")->read();
 
 		case 0x5b:
-			return input_port_read(space->machine(), "MAHJONG_P2_4");
+			return ioport("MAHJONG_P2_4")->read();
 
 		case 0x5d:
-			return input_port_read(space->machine(), "MAHJONG_P2_5");
+			return ioport("MAHJONG_P2_5")->read();
 
 		case 0x5e:
-			return input_port_read(space->machine(), "MAHJONG_P2_6");
+			return ioport("MAHJONG_P2_6")->read();
 	}
 
-	printf("chinsan_input_port_0_r unk_r %02x\n", state->m_port_select);
-	return space->machine().rand();
+	printf("chinsan_input_port_0_r unk_r %02x\n", m_port_select);
+	return machine().rand();
 }
 
-static READ8_HANDLER( chinsan_input_port_1_r )
+READ8_MEMBER(chinsan_state::chinsan_input_port_1_r)
 {
-	chinsan_state *state = space->machine().driver_data<chinsan_state>();
 
-	switch (state->m_port_select)
+	switch (m_port_select)
 	{
 		/* i doubt these are both really the same.. */
 		case 0x40:
 		case 0x4f:
-			return input_port_read(space->machine(), "MAHJONG_P1_1");
+			return ioport("MAHJONG_P1_1")->read();
 
 		case 0x53:
-			return input_port_read(space->machine(), "MAHJONG_P1_2");
+			return ioport("MAHJONG_P1_2")->read();
 
 		case 0x57:
-			return input_port_read(space->machine(), "MAHJONG_P1_3");
+			return ioport("MAHJONG_P1_3")->read();
 
 		case 0x5b:
-			return input_port_read(space->machine(), "MAHJONG_P1_4");
+			return ioport("MAHJONG_P1_4")->read();
 
 		case 0x5d:
-			return input_port_read(space->machine(), "MAHJONG_P1_5");
+			return ioport("MAHJONG_P1_5")->read();
 
 		case 0x5e:
-			return input_port_read(space->machine(), "MAHJONG_P1_6");
+			return ioport("MAHJONG_P1_6")->read();
 	}
 
-	printf("chinsan_input_port_1_r unk_r %02x\n", state->m_port_select);
-	return space->machine().rand();
+	printf("chinsan_input_port_1_r unk_r %02x\n", m_port_select);
+	return machine().rand();
 }
 
 static WRITE8_DEVICE_HANDLER( chin_adpcm_w )
@@ -237,20 +239,20 @@ static WRITE8_DEVICE_HANDLER( chin_adpcm_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( chinsan_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( chinsan_map, AS_PROGRAM, 8, chinsan_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_BASE_MEMBER(chinsan_state, m_video)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE("video")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( chinsan_io, AS_IO, 8 )
+static ADDRESS_MAP_START( chinsan_io, AS_IO, 8, chinsan_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(chinsan_port00_w)
 	AM_RANGE(0x01, 0x01) AM_READ(chinsan_input_port_0_r)
 	AM_RANGE(0x02, 0x02) AM_READ(chinsan_input_port_1_r)
-	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("adpcm", chin_adpcm_w)
+	AM_RANGE(0x10, 0x11) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("adpcm", chin_adpcm_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(ctrl_w)	// ROM bank + unknown stuff (input mutliplex?)
 ADDRESS_MAP_END
 
@@ -539,7 +541,7 @@ static void chin_adpcm_int( device_t *device )
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().region("adpcm")->base();
+		UINT8 *ROM = device->machine().root_device().memregion("adpcm")->base();
 
 		state->m_adpcm_data = ((state->m_trigger ? (ROM[state->m_adpcm_pos] & 0x0f) : (ROM[state->m_adpcm_pos] & 0xf0) >> 4));
 		msm5205_data_w(device, state->m_adpcm_data & 0xf);
@@ -569,7 +571,7 @@ static MACHINE_START( chinsan )
 {
 	chinsan_state *state = machine.driver_data<chinsan_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 4, machine.region("maincpu")->base() + 0x10000, 0x4000);
+	state->membank("bank1")->configure_entries(0, 4, state->memregion("maincpu")->base() + 0x10000, 0x4000);
 
 	state->save_item(NAME(state->m_adpcm_idle));
 	state->save_item(NAME(state->m_port_select));

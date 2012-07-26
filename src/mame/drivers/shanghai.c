@@ -34,6 +34,8 @@ public:
 	shanghai_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_WRITE16_MEMBER(shanghai_coin_w);
+	DECLARE_READ16_MEMBER(kothello_hd63484_status_r);
 };
 
 
@@ -123,32 +125,32 @@ static INTERRUPT_GEN( shanghai_interrupt )
 	device_set_input_line_and_vector(device,0,HOLD_LINE,0x80);
 }
 
-static WRITE16_HANDLER( shanghai_coin_w )
+WRITE16_MEMBER(shanghai_state::shanghai_coin_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		coin_counter_w(space->machine(), 0,data & 1);
-		coin_counter_w(space->machine(), 1,data & 2);
+		coin_counter_w(machine(), 0,data & 1);
+		coin_counter_w(machine(), 1,data & 2);
 	}
 }
 
-static ADDRESS_MAP_START( shanghai_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( shanghai_map, AS_PROGRAM, 16, shanghai_state )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( shangha2_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( shangha2_map, AS_PROGRAM, 16, shanghai_state )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
-	AM_RANGE(0x04000, 0x041ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x04000, 0x041ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( shanghai_portmap, AS_IO, 16 )
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("hd63484", hd63484_status_r, hd63484_address_w)
-	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("hd63484", hd63484_data_r, hd63484_data_w)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8("ymsnd", ym2203_r, ym2203_w, 0x00ff)
+static ADDRESS_MAP_START( shanghai_portmap, AS_IO, 16, shanghai_state )
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_status_r, hd63484_address_w)
+	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_data_r, hd63484_data_w)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2203_r, ym2203_w, 0x00ff)
 	AM_RANGE(0x40, 0x41) AM_READ_PORT("P1")
 	AM_RANGE(0x44, 0x45) AM_READ_PORT("P2")
 	AM_RANGE(0x48, 0x49) AM_READ_PORT("SYSTEM")
@@ -156,31 +158,31 @@ static ADDRESS_MAP_START( shanghai_portmap, AS_IO, 16 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( shangha2_portmap, AS_IO, 16 )
+static ADDRESS_MAP_START( shangha2_portmap, AS_IO, 16, shanghai_state )
 	AM_RANGE(0x00, 0x01) AM_READ_PORT("P1")
 	AM_RANGE(0x10, 0x11) AM_READ_PORT("P2")
 	AM_RANGE(0x20, 0x21) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x30, 0x31) AM_DEVREADWRITE("hd63484", hd63484_status_r, hd63484_address_w)
-	AM_RANGE(0x32, 0x33) AM_DEVREADWRITE("hd63484", hd63484_data_r, hd63484_data_w)
-	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8("ymsnd", ym2203_r, ym2203_w, 0x00ff)
+	AM_RANGE(0x30, 0x31) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_status_r, hd63484_address_w)
+	AM_RANGE(0x32, 0x33) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_data_r, hd63484_data_w)
+	AM_RANGE(0x40, 0x43) AM_DEVREADWRITE8_LEGACY("ymsnd", ym2203_r, ym2203_w, 0x00ff)
 	AM_RANGE(0x50, 0x51) AM_WRITE(shanghai_coin_w)
 ADDRESS_MAP_END
 
-static READ16_HANDLER( kothello_hd63484_status_r )
+READ16_MEMBER(shanghai_state::kothello_hd63484_status_r)
 {
 	return 0xff22;	/* write FIFO ready + command end + read FIFO ready */
 }
 
-static ADDRESS_MAP_START( kothello_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( kothello_map, AS_PROGRAM, 16, shanghai_state )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
-	AM_RANGE(0x08010, 0x08011) AM_READ(kothello_hd63484_status_r) AM_DEVWRITE("hd63484", hd63484_address_w)
-	AM_RANGE(0x08012, 0x08013) AM_DEVREADWRITE("hd63484", hd63484_data_r, hd63484_data_w)
+	AM_RANGE(0x08010, 0x08011) AM_READ(kothello_hd63484_status_r) AM_DEVWRITE_LEGACY("hd63484", hd63484_address_w)
+	AM_RANGE(0x08012, 0x08013) AM_DEVREADWRITE_LEGACY("hd63484", hd63484_data_r, hd63484_data_w)
 	AM_RANGE(0x09010, 0x09011) AM_READ_PORT("P1")
 	AM_RANGE(0x09012, 0x09013) AM_READ_PORT("P2")
 	AM_RANGE(0x09014, 0x09015) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x09016, 0x0901f) AM_WRITENOP // 0x9016 is set to 0 at the boot
-	AM_RANGE(0x0a000, 0x0a1ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x0b010, 0x0b01f) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0a000, 0x0a1ff) AM_WRITE(paletteram_xxxxBBBBGGGGRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0b010, 0x0b01f) AM_READWRITE_LEGACY(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 

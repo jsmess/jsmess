@@ -13,34 +13,29 @@ Namco System 21 Video Hardware
 
 #define FRAMEBUFFER_SIZE_IN_BYTES (sizeof(UINT16)*NAMCOS21_POLY_FRAME_WIDTH*NAMCOS21_POLY_FRAME_HEIGHT)
 
-READ16_HANDLER(winrun_gpu_color_r)
+READ16_MEMBER(namcos21_state::winrun_gpu_color_r)
 {
-	namcos21_state *state = space->machine().driver_data<namcos21_state>();
-	return state->m_winrun_color;
+	return m_winrun_color;
 }
 
-WRITE16_HANDLER(winrun_gpu_color_w)
+WRITE16_MEMBER(namcos21_state::winrun_gpu_color_w)
 {
-	namcos21_state *state = space->machine().driver_data<namcos21_state>();
-	COMBINE_DATA( &state->m_winrun_color );
+	COMBINE_DATA( &m_winrun_color );
 }
 
-READ16_HANDLER(winrun_gpu_register_r)
+READ16_MEMBER(namcos21_state::winrun_gpu_register_r)
 {
-	namcos21_state *state = space->machine().driver_data<namcos21_state>();
-	return state->m_winrun_gpu_register[offset];
+	return m_winrun_gpu_register[offset];
 }
 
-WRITE16_HANDLER(winrun_gpu_register_w)
+WRITE16_MEMBER(namcos21_state::winrun_gpu_register_w)
 {
-	namcos21_state *state = space->machine().driver_data<namcos21_state>();
-	COMBINE_DATA( &state->m_winrun_gpu_register[offset] );
+	COMBINE_DATA( &m_winrun_gpu_register[offset] );
 }
 
-WRITE16_HANDLER( winrun_gpu_videoram_w)
+WRITE16_MEMBER(namcos21_state::winrun_gpu_videoram_w)
 {
-	namcos21_state *state = space->machine().driver_data<namcos21_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	int color = data>>8;
 	int mask  = data&0xff;
 	int i;
@@ -53,10 +48,9 @@ WRITE16_HANDLER( winrun_gpu_videoram_w)
 	}
 } /* winrun_gpu_videoram_w */
 
-READ16_HANDLER( winrun_gpu_videoram_r )
+READ16_MEMBER(namcos21_state::winrun_gpu_videoram_r)
 {
-	namcos21_state *state = space->machine().driver_data<namcos21_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 	return videoram[offset]<<8;
 } /* winrun_gpu_videoram_r */
 
@@ -137,6 +131,7 @@ VIDEO_START( namcos21 )
 static void
 update_palette( running_machine &machine )
 {
+	namcos21_state *state = machine.driver_data<namcos21_state>();
 	int i;
 	INT16 data1,data2;
 	int r,g,b;
@@ -160,8 +155,8 @@ update_palette( running_machine &machine )
     */
 	for( i=0; i<NAMCOS21_NUM_COLORS; i++ )
 	{
-		data1 = machine.generic.paletteram.u16[0x00000/2+i];
-		data2 = machine.generic.paletteram.u16[0x10000/2+i];
+		data1 = state->m_generic_paletteram_16[0x00000/2+i];
+		data2 = state->m_generic_paletteram_16[0x10000/2+i];
 
 		r = data1>>8;
 		g = data1&0xff;

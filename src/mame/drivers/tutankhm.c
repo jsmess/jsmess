@@ -72,13 +72,12 @@ static INTERRUPT_GEN( tutankhm_interrupt )
 }
 
 
-static WRITE8_HANDLER( irq_enable_w )
+WRITE8_MEMBER(tutankhm_state::irq_enable_w)
 {
-	tutankhm_state *state = space->machine().driver_data<tutankhm_state>();
 
-	state->m_irq_enable = data & 1;
-	if (!state->m_irq_enable)
-		device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	m_irq_enable = data & 1;
+	if (!m_irq_enable)
+		device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 }
 
 
@@ -88,9 +87,9 @@ static WRITE8_HANDLER( irq_enable_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( tutankhm_bankselect_w )
+WRITE8_MEMBER(tutankhm_state::tutankhm_bankselect_w)
 {
-	memory_set_bank(space->machine(), "bank1", data & 0x0f);
+	membank("bank1")->set_entry(data & 0x0f);
 }
 
 
@@ -100,15 +99,15 @@ static WRITE8_HANDLER( tutankhm_bankselect_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( sound_mute_w )
+WRITE8_MEMBER(tutankhm_state::sound_mute_w)
 {
-	space->machine().sound().system_mute(data & 1);
+	machine().sound().system_mute(data & 1);
 }
 
 
-static WRITE8_HANDLER( tutankhm_coin_counter_w )
+WRITE8_MEMBER(tutankhm_state::tutankhm_coin_counter_w)
 {
-	coin_counter_w(space->machine(), offset ^ 1, data);
+	coin_counter_w(machine(), offset ^ 1, data);
 }
 
 
@@ -118,10 +117,10 @@ static WRITE8_HANDLER( tutankhm_coin_counter_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_MEMBER(tutankhm_state, m_videoram)
-	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x00f0) AM_RAM AM_BASE_MEMBER(tutankhm_state, m_paletteram)
-	AM_RANGE(0x8100, 0x8100) AM_MIRROR(0x000f) AM_RAM AM_BASE_MEMBER(tutankhm_state, m_scroll)
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tutankhm_state )
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x00f0) AM_RAM AM_SHARE("paletteram")
+	AM_RANGE(0x8100, 0x8100) AM_MIRROR(0x000f) AM_RAM AM_SHARE("scroll")
 	AM_RANGE(0x8120, 0x8120) AM_MIRROR(0x000f) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8160, 0x8160) AM_MIRROR(0x000f) AM_READ_PORT("DSW2")	/* DSW2 (inverted bits) */
 	AM_RANGE(0x8180, 0x8180) AM_MIRROR(0x000f) AM_READ_PORT("IN0")	/* IN0 I/O: Coin slots, service, 1P/2P buttons */
@@ -135,8 +134,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x8206, 0x8206) AM_MIRROR(0x00f8) AM_WRITE(tutankhm_flip_screen_x_w)
 	AM_RANGE(0x8207, 0x8207) AM_MIRROR(0x00f8) AM_WRITE(tutankhm_flip_screen_y_w)
 	AM_RANGE(0x8300, 0x8300) AM_MIRROR(0x00ff) AM_WRITE(tutankhm_bankselect_w)
-	AM_RANGE(0x8600, 0x8600) AM_MIRROR(0x00ff) AM_WRITE(timeplt_sh_irqtrigger_w)
-	AM_RANGE(0x8700, 0x8700) AM_MIRROR(0x00ff) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x8600, 0x8600) AM_MIRROR(0x00ff) AM_WRITE_LEGACY(timeplt_sh_irqtrigger_w)
+	AM_RANGE(0x8700, 0x8700) AM_MIRROR(0x00ff) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xffff) AM_ROM
@@ -199,7 +198,7 @@ static MACHINE_START( tutankhm )
 {
 	tutankhm_state *state = machine.driver_data<tutankhm_state>();
 
-	memory_configure_bank(machine, "bank1", 0, 16, machine.region("maincpu")->base() + 0x10000, 0x1000);
+	state->membank("bank1")->configure_entries(0, 16, state->memregion("maincpu")->base() + 0x10000, 0x1000);
 
 	state->m_maincpu = machine.device<cpu_device>("maincpu");
 

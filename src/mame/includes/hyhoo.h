@@ -2,9 +2,10 @@ class hyhoo_state : public driver_device
 {
 public:
 	hyhoo_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_clut(*this, "clut"){ }
 
-	UINT8 *m_clut;
+	required_shared_ptr<UINT8> m_clut;
 	int m_blitter_destx;
 	int m_blitter_desty;
 	int m_blitter_sizex;
@@ -17,6 +18,8 @@ public:
 	int m_highcolorflag;
 	int m_flipscreen;
 	bitmap_rgb32 m_tmpbitmap;
+	DECLARE_WRITE8_MEMBER(hyhoo_blitter_w);
+	DECLARE_WRITE8_MEMBER(hyhoo_romsel_w);
 };
 
 
@@ -25,5 +28,3 @@ public:
 SCREEN_UPDATE_RGB32( hyhoo );
 VIDEO_START( hyhoo );
 
-WRITE8_HANDLER( hyhoo_blitter_w );
-WRITE8_HANDLER( hyhoo_romsel_w );

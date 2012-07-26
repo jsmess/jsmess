@@ -67,10 +67,15 @@ static int vectrex_verify_cart(char *data)
 DEVICE_IMAGE_LOAD(vectrex_cart)
 {
 	vectrex_state *state = image.device().machine().driver_data<vectrex_state>();
-	UINT8 *mem = image.device().machine().region("maincpu")->base();
+	UINT8 *mem = state->memregion("maincpu")->base();
 	if (image.software_entry() == NULL)
 	{
 		image.fread( mem, 0x8000);
+		if (image.length() > 0x8000)
+		{
+			image.fread( mem+0x10000, 0x8000);
+			state->m_64k_cart = 1;
+		}
 	} else {
 		int size = image.get_software_region_length("rom");
 		memcpy(mem, image.get_software_region("rom"), size);
@@ -81,6 +86,10 @@ DEVICE_IMAGE_LOAD(vectrex_cart)
 	{
 		logerror("Invalid image!\n");
 		return IMAGE_INIT_FAIL;
+	}
+
+	if (memcmp(mem + 0x06,"SRAM",4)) {
+		image.device().machine().device("maincpu")->memory().space(AS_PROGRAM)->unmap_write(0x0000, 0x7fff);
 	}
 
 	/* If VIA T2 starts, reset refresh timer.
@@ -125,7 +134,7 @@ DEVICE_IMAGE_LOAD(vectrex_cart)
 void vectrex_configuration(running_machine &machine)
 {
 	vectrex_state *state = machine.driver_data<vectrex_state>();
-	unsigned char cport = input_port_read(machine, "3DCONF");
+	unsigned char cport = state->ioport("3DCONF")->read();
 
 	/* Vectrex 'dipswitch' configuration */
 
@@ -202,7 +211,7 @@ void vectrex_configuration(running_machine &machine)
 		state->m_beam_color = RGB_WHITE;
 		state->m_imager_colors[0] = state->m_imager_colors[1] = state->m_imager_colors[2] = state->m_imager_colors[3] = state->m_imager_colors[4] = state->m_imager_colors[5] = RGB_WHITE;
 	}
-	state->m_lightpen_port = input_port_read(machine, "LPENCONF") & 0x03;
+	state->m_lightpen_port = machine.root_device().ioport("LPENCONF")->read() & 0x03;
 }
 
 
@@ -224,7 +233,7 @@ READ8_DEVICE_HANDLER(vectrex_via_pb_r)
 	int pot;
 	static const char *const ctrlnames[] = { "CONTR1X", "CONTR1Y", "CONTR2X", "CONTR2Y" };
 
-	pot = input_port_read(device->machine(), ctrlnames[(state->m_via_out[PORTB] & 0x6) >> 1]) - 0x80;
+	pot = device->machine().root_device().ioport(ctrlnames[(state->m_via_out[PORTB] & 0x6) >> 1])->read() - 0x80;
 
 	if (pot > (signed char)state->m_via_out[PORTA])
 		state->m_via_out[PORTB] |= 0x20;
@@ -253,7 +262,7 @@ READ8_DEVICE_HANDLER(vectrex_via_pa_r)
 READ8_DEVICE_HANDLER(vectrex_s1_via_pb_r)
 {
 	vectrex_state *state = device->machine().driver_data<vectrex_state>();
-	return (state->m_via_out[PORTB] & ~0x40) | (input_port_read(device->machine(), "COIN") & 0x40);
+	return (state->m_via_out[PORTB] & ~0x40) | (state->ioport("COIN")->read() & 0x40);
 }
 
 
@@ -306,20 +315,19 @@ TIMER_CALLBACK(vectrex_imager_eye)
 }
 
 
-WRITE8_HANDLER(vectrex_psg_port_w)
+WRITE8_MEMBER(vectrex_state::vectrex_psg_port_w)
 {
-	vectrex_state *state = space->machine().driver_data<vectrex_state>();
 	double wavel, ang_acc, tmp;
 	int mcontrol;
 
 	mcontrol = data & 0x40; /* IO6 controls the imager motor */
 
-	if (!mcontrol && mcontrol ^ state->m_old_mcontrol)
+	if (!mcontrol && mcontrol ^ m_old_mcontrol)
 	{
-		state->m_old_mcontrol = mcontrol;
-		tmp = space->machine().time().as_double();
-		wavel = tmp - state->m_sl;
-		state->m_sl = tmp;
+		m_old_mcontrol = mcontrol;
+		tmp = machine().time().as_double();
+		wavel = tmp - m_sl;
+		m_sl = tmp;
 
 		if (wavel < 1)
 		{
@@ -329,22 +337,22 @@ WRITE8_HANDLER(vectrex_psg_port_w)
                of the whole thing and some constants of the motor's torque/speed curve.
                pwl is the negative pulse width and wavel is the whole wavelength. */
 
-			ang_acc = (50.0 - 1.55 * state->m_imager_freq) / MMI;
-			state->m_imager_freq += ang_acc * state->m_pwl + DAMPC * state->m_imager_freq / MMI * wavel;
+			ang_acc = (50.0 - 1.55 * m_imager_freq) / MMI;
+			m_imager_freq += ang_acc * m_pwl + DAMPC * m_imager_freq / MMI * wavel;
 
-			if (state->m_imager_freq > 1)
+			if (m_imager_freq > 1)
 			{
-				state->m_imager_timer->adjust(
-									  attotime::from_double(MIN(1.0 / state->m_imager_freq, state->m_imager_timer->remaining().as_double())),
+				m_imager_timer->adjust(
+									  attotime::from_double(MIN(1.0 / m_imager_freq, m_imager_timer->remaining().as_double())),
 									  2,
-									  attotime::from_double(1.0 / state->m_imager_freq));
+									  attotime::from_double(1.0 / m_imager_freq));
 			}
 		}
 	}
-	if (mcontrol && mcontrol ^ state->m_old_mcontrol)
+	if (mcontrol && mcontrol ^ m_old_mcontrol)
 	{
-		state->m_old_mcontrol = mcontrol;
-		state->m_pwl = space->machine().time().as_double() - state->m_sl;
+		m_old_mcontrol = mcontrol;
+		m_pwl = machine().time().as_double() - m_sl;
 	}
 }
 
@@ -353,6 +361,7 @@ DRIVER_INIT(vectrex)
 	vectrex_state *state = machine.driver_data<vectrex_state>();
 	int i;
 
+	state->m_64k_cart = 0;
 	state->m_imager_angles = unknown_game_angles;
 	state->m_beam_color = RGB_WHITE;
 	for (i=0; i<ARRAY_LENGTH(state->m_imager_colors); i++)

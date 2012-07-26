@@ -53,13 +53,13 @@ and 2764 eprom (swapped D3/D4 and D5/D6 data lines)
 #include "includes/travrusa.h"
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, travrusa_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(travrusa_videoram_w) AM_BASE_MEMBER(travrusa_state, m_videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(travrusa_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(travrusa_scroll_x_low_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(travrusa_scroll_x_high_w)
-	AM_RANGE(0xc800, 0xc9ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(travrusa_state, m_spriteram, m_spriteram_size)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(irem_sound_cmd_w)
+	AM_RANGE(0xc800, 0xc9ff) AM_WRITEONLY AM_SHARE("spriteram")
+	AM_RANGE(0xd000, 0xd000) AM_WRITE_LEGACY(irem_sound_cmd_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(travrusa_flipscreen_w)	/* + coin counters - not written by shtrider */
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("SYSTEM")		/* IN0 */
 	AM_RANGE(0xd001, 0xd001) AM_READ_PORT("P1")			/* IN1 */
@@ -453,7 +453,7 @@ ROM_END
 static DRIVER_INIT( motorace )
 {
 	int A, j;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 	UINT8 *buffer = auto_alloc_array(machine, UINT8, 0x2000);
 
 	memcpy(buffer, rom, 0x2000);
@@ -471,7 +471,7 @@ static DRIVER_INIT( motorace )
 static DRIVER_INIT( shtridra )
 {
 	int A;
-	UINT8 *rom = machine.region("maincpu")->base();
+	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
 
 	/* D3/D4  and  D5/D6 swapped */
 	for (A = 0; A < 0x2000; A++)

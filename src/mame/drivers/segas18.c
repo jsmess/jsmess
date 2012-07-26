@@ -142,7 +142,7 @@ static void sound_w(running_machine &machine, UINT8 data)
 	segas1x_state *state = machine.driver_data<segas1x_state>();
 	address_space *space = state->m_maincpu->memory().space(AS_PROGRAM);
 
-	soundlatch_w(space, 0, data & 0xff);
+	state->soundlatch_byte_w(*space, 0, data & 0xff);
 	device_set_input_line(state->m_soundcpu, INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -252,7 +252,7 @@ static READ16_HANDLER( io_chip_r )
 				return state->m_misc_io_data[offset];
 
 			/* otherwise, return an input port */
-			return input_port_read(space->machine(), portnames[offset]);
+			return space->machine().root_device().ioport(portnames[offset])->read();
 
 		/* 'SEGA' protection */
 		case 0x10/2:
@@ -359,7 +359,7 @@ static READ16_HANDLER( misc_io_r )
 
 		/* video control latch */
 		case 0x2000/2:
-			return input_port_read(space->machine(), portnames[offset & 1]);
+			return space->machine().root_device().ioport(portnames[offset & 1])->read();
 	}
 	if (state->m_custom_io_r)
 		return state->m_custom_io_r(space, offset, mem_mask);
@@ -429,7 +429,7 @@ static WRITE16_HANDLER( rom_5987_bank_w )
 	/* sprite banking */
 	else
 	{
-		int maxbanks = space->machine().region("gfx2")->bytes() / 0x40000;
+		int maxbanks = space->machine().root_device().memregion("gfx2")->bytes() / 0x40000;
 		if (data >= maxbanks)
 			data = 255;
 		segaic16_sprites_set_bank(space->machine(), 0, (offset - 8) * 2 + 0, data * 2 + 0);
@@ -450,13 +450,13 @@ static READ16_HANDLER( ddcrew_custom_io_r )
 	switch (offset)
 	{
 		case 0x3020/2:
-			return input_port_read(space->machine(), "P3");
+			return space->machine().root_device().ioport("P3")->read();
 
 		case 0x3022/2:
-			return input_port_read(space->machine(), "P4");
+			return space->machine().root_device().ioport("P4")->read();
 
 		case 0x3024/2:
-			return input_port_read(space->machine(), "P34START");
+			return space->machine().root_device().ioport("P34START")->read();
 	}
 	return segaic16_open_bus_r(space, 0, mem_mask);
 }
@@ -494,19 +494,19 @@ static WRITE16_HANDLER( lghost_custom_io_w )
 	switch (offset)
 	{
 		case 0x3010/2:
-			state->m_lghost_value = 255 - input_port_read(space->machine(), "GUNY1");
+			state->m_lghost_value = 255 - state->ioport("GUNY1")->read();
 			break;
 
 		case 0x3012/2:
-			state->m_lghost_value = input_port_read(space->machine(), "GUNX1");
+			state->m_lghost_value = state->ioport("GUNX1")->read();
 			break;
 
 		case 0x3014/2:
-			state->m_lghost_value = 255 - input_port_read(space->machine(), state->m_lghost_select ? "GUNY3" : "GUNY2");
+			state->m_lghost_value = 255 - state->ioport(state->m_lghost_select ? "GUNY3" : "GUNY2")->read();
 			break;
 
 		case 0x3016/2:
-			state->m_lghost_value = input_port_read(space->machine(), state->m_lghost_select ? "GUNX3" : "GUNX2");
+			state->m_lghost_value = state->ioport(state->m_lghost_select ? "GUNX3" : "GUNX2")->read();
 			break;
 
 		case 0x3020/2:
@@ -530,22 +530,22 @@ static READ16_HANDLER( wwally_custom_io_r )
 	switch (offset)
 	{
 		case 0x3000/2:
-			return (input_port_read(space->machine(), "TRACKX1") - state->m_wwally_last_x[0]) & 0xff;
+			return (state->ioport("TRACKX1")->read() - state->m_wwally_last_x[0]) & 0xff;
 
 		case 0x3004/2:
-			return (input_port_read(space->machine(), "TRACKY1") - state->m_wwally_last_y[0]) & 0xff;
+			return (state->ioport("TRACKY1")->read() - state->m_wwally_last_y[0]) & 0xff;
 
 		case 0x3008/2:
-			return (input_port_read(space->machine(), "TRACKX2") - state->m_wwally_last_x[1]) & 0xff;
+			return (state->ioport("TRACKX2")->read() - state->m_wwally_last_x[1]) & 0xff;
 
 		case 0x300c/2:
-			return (input_port_read(space->machine(), "TRACKY2") - state->m_wwally_last_y[1]) & 0xff;
+			return (state->ioport("TRACKY2")->read() - state->m_wwally_last_y[1]) & 0xff;
 
 		case 0x3010/2:
-			return (input_port_read(space->machine(), "TRACKX3") - state->m_wwally_last_x[2]) & 0xff;
+			return (state->ioport("TRACKX3")->read() - state->m_wwally_last_x[2]) & 0xff;
 
 		case 0x3014/2:
-			return (input_port_read(space->machine(), "TRACKY3") - state->m_wwally_last_y[2]) & 0xff;
+			return (state->ioport("TRACKY3")->read() - state->m_wwally_last_y[2]) & 0xff;
 	}
 	return segaic16_open_bus_r(space, 0, mem_mask);
 }
@@ -559,20 +559,20 @@ static WRITE16_HANDLER( wwally_custom_io_w )
 	{
 		case 0x3000/2:
 		case 0x3004/2:
-			state->m_wwally_last_x[0] = input_port_read(space->machine(), "TRACKX1");
-			state->m_wwally_last_y[0] = input_port_read(space->machine(), "TRACKY1");
+			state->m_wwally_last_x[0] = state->ioport("TRACKX1")->read();
+			state->m_wwally_last_y[0] = state->ioport("TRACKY1")->read();
 			break;
 
 		case 0x3008/2:
 		case 0x300c/2:
-			state->m_wwally_last_x[1] = input_port_read(space->machine(), "TRACKX2");
-			state->m_wwally_last_y[1] = input_port_read(space->machine(), "TRACKY2");
+			state->m_wwally_last_x[1] = state->ioport("TRACKX2")->read();
+			state->m_wwally_last_y[1] = state->ioport("TRACKY2")->read();
 			break;
 
 		case 0x3010/2:
 		case 0x3014/2:
-			state->m_wwally_last_x[2] = input_port_read(space->machine(), "TRACKX3");
-			state->m_wwally_last_y[2] = input_port_read(space->machine(), "TRACKY3");
+			state->m_wwally_last_x[2] = state->ioport("TRACKX3")->read();
+			state->m_wwally_last_y[2] = state->ioport("TRACKY3")->read();
 			break;
 	}
 }
@@ -587,7 +587,7 @@ static WRITE16_HANDLER( wwally_custom_io_w )
 
 static WRITE8_HANDLER( soundbank_w )
 {
-	memory_set_bankptr(space->machine(), "bank1", space->machine().region("soundcpu")->base() + 0x10000 + 0x2000 * data);
+	space->machine().root_device().membank("bank1")->set_base(space->machine().root_device().memregion("soundcpu")->base() + 0x10000 + 0x2000 * data);
 }
 
 
@@ -606,9 +606,9 @@ static WRITE8_HANDLER( mcu_data_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( system18_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( system18_map, AS_PROGRAM, 16, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0xffffff) AM_READWRITE(segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w)
+	AM_RANGE(0x000000, 0xffffff) AM_READWRITE_LEGACY(segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w)
 ADDRESS_MAP_END
 
 
@@ -619,22 +619,22 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("soundcpu", 0x10000)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_DEVWRITE("rfsnd", rf5c68_w)
-	AM_RANGE(0xd000, 0xdfff) AM_DEVREADWRITE("rfsnd", rf5c68_mem_r, rf5c68_mem_w)
+	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_DEVWRITE_LEGACY("rfsnd", rf5c68_w)
+	AM_RANGE(0xd000, 0xdfff) AM_DEVREADWRITE_LEGACY("rfsnd", rf5c68_mem_r, rf5c68_mem_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym1", ym3438_r, ym3438_w)
-	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym2", ym3438_r, ym3438_w)
-	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1f) AM_WRITE(soundbank_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_READWRITE(soundlatch_r, mcu_data_w)
+	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY("ym1", ym3438_r, ym3438_w)
+	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY("ym2", ym3438_r, ym3438_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1f) AM_WRITE_LEGACY(soundbank_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_READ(soundlatch_byte_r) AM_WRITE_LEGACY(mcu_data_w)
 ADDRESS_MAP_END
 
 
@@ -645,10 +645,10 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, segas1x_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	/* port 2 not used for high order address byte */
-	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0xff00) AM_READWRITE(segaic16_memory_mapper_r, segaic16_memory_mapper_w)
+	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0xff00) AM_READWRITE_LEGACY(segaic16_memory_mapper_r, segaic16_memory_mapper_w)
 ADDRESS_MAP_END
 
 

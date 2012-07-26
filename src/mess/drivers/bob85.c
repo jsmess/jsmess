@@ -6,7 +6,6 @@
         12/05/2009 Skeleton driver.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
@@ -38,9 +37,9 @@ public:
 READ8_MEMBER(bob85_state::bob85_keyboard_r)
 {
 	UINT8 retVal = 0;
-	UINT8 line0 = input_port_read(machine(), "LINE0");
-	UINT8 line1 = input_port_read(machine(), "LINE1");
-	UINT8 line2 = input_port_read(machine(), "LINE2");
+	UINT8 line0 = ioport("LINE0")->read();
+	UINT8 line1 = ioport("LINE1")->read();
+	UINT8 line2 = ioport("LINE2")->read();
 
 	if (line0)
 	{

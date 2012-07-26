@@ -1,4 +1,3 @@
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "mie.h"
@@ -102,7 +101,7 @@ void mie_device::device_start()
 	maple_device::device_start();
 	cpu = subdevice<z80_device>("mie");
 	timer = timer_alloc(0);
-	cpu->set_irq_callback(irq_callback_1);
+	cpu->set_irq_acknowledge_callback(irq_callback_1);
 	jvs = machine().device<mie_jvs_device>(jvs_name);
 
 	save_item(NAME(gpiodir));
@@ -203,7 +202,7 @@ READ8_MEMBER(mie_device::read_78xx)
 READ8_MEMBER(mie_device::gpio_r)
 {
 	if(gpiodir & (1 << offset))
-		return gpio_name[offset] ? input_port_read(machine(), gpio_name[offset]) : 0xff;
+		return gpio_name[offset] ? ioport(gpio_name[offset])->read() : 0xff;
 	else
 		return gpio_val[offset];
 }
@@ -212,7 +211,7 @@ WRITE8_MEMBER(mie_device::gpio_w)
 {
 	gpio_val[offset] = data;
 	if(!(gpiodir & (1 << offset)) && gpio_name[offset])
-		input_port_write(machine(), gpio_name[offset], data, 0xff);
+		ioport(gpio_name[offset])->write(data, 0xff);
 }
 
 READ8_MEMBER(mie_device::gpiodir_r)

@@ -86,15 +86,14 @@ static void update_misc_flags(running_machine &machine, UINT8 val)
 }
 
 
-static WRITE8_HANDLER( orbit_misc_w )
+WRITE8_MEMBER(orbit_state::orbit_misc_w)
 {
-	orbit_state *state = space->machine().driver_data<orbit_state>();
 	UINT8 bit = offset >> 1;
 
 	if (offset & 1)
-		update_misc_flags(space->machine(), state->m_misc_flags | (1 << bit));
+		update_misc_flags(machine(), m_misc_flags | (1 << bit));
 	else
-		update_misc_flags(space->machine(), state->m_misc_flags & ~(1 << bit));
+		update_misc_flags(machine(), m_misc_flags & ~(1 << bit));
 }
 
 
@@ -105,7 +104,7 @@ static WRITE8_HANDLER( orbit_misc_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( orbit_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( orbit_map, AS_PROGRAM, 8, orbit_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0700) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x07ff) AM_READ_PORT("P1")
@@ -113,13 +112,13 @@ static ADDRESS_MAP_START( orbit_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0x07ff) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x07ff) AM_READ_PORT("DSW2")
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x07ff) AM_READ_PORT("BUTTONS")
-	AM_RANGE(0x3000, 0x33bf) AM_MIRROR(0x0400) AM_RAM_WRITE(orbit_playfield_w) AM_BASE_MEMBER(orbit_state, m_playfield_ram)
-	AM_RANGE(0x33c0, 0x33ff) AM_MIRROR(0x0400) AM_RAM AM_BASE_MEMBER(orbit_state, m_sprite_ram)
-	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x00ff) AM_DEVWRITE("discrete", orbit_note_w)
-	AM_RANGE(0x3900, 0x3900) AM_MIRROR(0x00ff) AM_DEVWRITE("discrete", orbit_noise_amp_w)
-	AM_RANGE(0x3a00, 0x3a00) AM_MIRROR(0x00ff) AM_DEVWRITE("discrete", orbit_note_amp_w)
+	AM_RANGE(0x3000, 0x33bf) AM_MIRROR(0x0400) AM_RAM_WRITE(orbit_playfield_w) AM_SHARE("playfield_ram")
+	AM_RANGE(0x33c0, 0x33ff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("sprite_ram")
+	AM_RANGE(0x3800, 0x3800) AM_MIRROR(0x00ff) AM_DEVWRITE_LEGACY("discrete", orbit_note_w)
+	AM_RANGE(0x3900, 0x3900) AM_MIRROR(0x00ff) AM_DEVWRITE_LEGACY("discrete", orbit_noise_amp_w)
+	AM_RANGE(0x3a00, 0x3a00) AM_MIRROR(0x00ff) AM_DEVWRITE_LEGACY("discrete", orbit_note_amp_w)
 	AM_RANGE(0x3c00, 0x3c0f) AM_MIRROR(0x00f0) AM_WRITE(orbit_misc_w)
-	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00ff) AM_DEVWRITE("discrete", orbit_noise_rst_w)
+	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00ff) AM_DEVWRITE_LEGACY("discrete", orbit_noise_rst_w)
 	AM_RANGE(0x3f00, 0x3f00) AM_MIRROR(0x00ff) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
@@ -188,7 +187,7 @@ static INPUT_PORTS_START( orbit )
 	PORT_DIPNAME( 0x40, 0x40, "DIAG TEST" ) /* should be off */
 	PORT_DIPSETTING( 0x40, DEF_STR( Off ))
 	PORT_DIPSETTING( 0x00, DEF_STR( On ))
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("BUTTONS")	/* 2800 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Game 7 / Strong Gravity") PORT_CODE(KEYCODE_7_PAD)

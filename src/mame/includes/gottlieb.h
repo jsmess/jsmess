@@ -2,6 +2,37 @@
 
     Gottlieb hardware
 
+****************************************************************************
+
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
 ***************************************************************************/
 
 #include "cpu/i86/i86.h"
@@ -207,7 +238,10 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_laserdisc(*this, "laserdisc"),
 		  m_r1_sound(*this, "r1sound"),
-		  m_r2_sound(*this, "r2sound") { }
+		  m_r2_sound(*this, "r2sound"),
+		  m_videoram(*this, "videoram"),
+		  m_charram(*this, "charram"),
+		  m_spriteram(*this, "spriteram") { }
 
 	// devices
 	required_device<i8088_device> m_maincpu;
@@ -215,7 +249,10 @@ public:
 	optional_device<gottlieb_sound_r1_device> m_r1_sound;
 	optional_device<gottlieb_sound_r2_device> m_r2_sound;
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_charram;
+	required_shared_ptr<UINT8> m_spriteram;
+
 	UINT8 m_joystick_select;
 	UINT8 m_track[2];
 	emu_timer *m_laserdisc_bit_timer;
@@ -233,23 +270,31 @@ public:
 	UINT8 m_laserdisc_audio_bit_count;
 	UINT8 m_gfxcharlo;
 	UINT8 m_gfxcharhi;
-	UINT8 *m_charram;
 	UINT8 m_background_priority;
 	UINT8 m_spritebank;
 	UINT8 m_transparent0;
 	tilemap_t *m_bg_tilemap;
 	double m_weights[4];
-	UINT8 *m_spriteram;
+	DECLARE_WRITE8_MEMBER(gottlieb_analog_reset_w);
+	DECLARE_WRITE8_MEMBER(general_output_w);
+	DECLARE_WRITE8_MEMBER(reactor_output_w);
+	DECLARE_WRITE8_MEMBER(stooges_output_w);
+	DECLARE_READ8_MEMBER(laserdisc_status_r);
+	DECLARE_WRITE8_MEMBER(laserdisc_select_w);
+	DECLARE_WRITE8_MEMBER(laserdisc_command_w);
+	DECLARE_WRITE8_MEMBER(gottlieb_sh_w);
+	DECLARE_WRITE8_MEMBER(gottlieb_paletteram_w);
+	DECLARE_WRITE8_MEMBER(gottlieb_video_control_w);
+	DECLARE_WRITE8_MEMBER(gottlieb_laserdisc_video_control_w);
+	DECLARE_WRITE8_MEMBER(gottlieb_videoram_w);
+	DECLARE_WRITE8_MEMBER(gottlieb_charram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(analog_delta_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(stooges_joystick_r);
 };
 
 
 /*----------- defined in video/gottlieb.c -----------*/
 
-extern WRITE8_HANDLER( gottlieb_videoram_w );
-extern WRITE8_HANDLER( gottlieb_charram_w );
-extern WRITE8_HANDLER( gottlieb_video_control_w );
-extern WRITE8_HANDLER( gottlieb_laserdisc_video_control_w );
-extern WRITE8_HANDLER( gottlieb_paletteram_w );
 
 VIDEO_START( gottlieb );
 VIDEO_START( screwloo );

@@ -54,35 +54,34 @@ TODO:
 #include "includes/sonson.h"
 
 
-static WRITE8_HANDLER( sonson_sh_irqtrigger_w )
+WRITE8_MEMBER(sonson_state::sonson_sh_irqtrigger_w)
 {
-	sonson_state *state = space->machine().driver_data<sonson_state>();
 	data &= 1;
 
-	if (state->m_last_irq == 0 && data == 1)
+	if (m_last_irq == 0 && data == 1)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		device_set_input_line(state->m_audiocpu, M6809_FIRQ_LINE, HOLD_LINE);
+		device_set_input_line(m_audiocpu, M6809_FIRQ_LINE, HOLD_LINE);
 	}
 
-	state->m_last_irq = data;
+	m_last_irq = data;
 }
 
-static WRITE8_HANDLER( sonson_coin1_counter_w )
+WRITE8_MEMBER(sonson_state::sonson_coin1_counter_w)
 {
-	coin_counter_w(space->machine(), 0, data & 1);
+	coin_counter_w(machine(), 0, data & 1);
 }
 
-static WRITE8_HANDLER( sonson_coin2_counter_w )
+WRITE8_MEMBER(sonson_state::sonson_coin2_counter_w)
 {
-	coin_counter_w(space->machine(), 1, data & 1);
+	coin_counter_w(machine(), 1, data & 1);
 }
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, sonson_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(sonson_videoram_w) AM_BASE_SIZE_MEMBER(sonson_state, m_videoram, m_videoram_size)
-	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(sonson_colorram_w) AM_BASE_MEMBER(sonson_state, m_colorram)
-	AM_RANGE(0x2020, 0x207f) AM_RAM AM_BASE_SIZE_MEMBER(sonson_state, m_spriteram, m_spriteram_size)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(sonson_videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(sonson_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x2020, 0x207f) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(sonson_scrollx_w)
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P1")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("P2")
@@ -90,7 +89,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x3005, 0x3005) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3006, 0x3006) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3008, 0x3008) AM_WRITENOP	// might be Y scroll, but the game always sets it to 0
-	AM_RANGE(0x3010, 0x3010) AM_WRITE(soundlatch_w)
+	AM_RANGE(0x3010, 0x3010) AM_WRITE(soundlatch_byte_w)
 	AM_RANGE(0x3018, 0x3018) AM_WRITE(sonson_flipscreen_w)
 	AM_RANGE(0x3019, 0x3019) AM_WRITE(sonson_sh_irqtrigger_w)
 	AM_RANGE(0x301e, 0x301e) AM_WRITE(sonson_coin2_counter_w)
@@ -98,11 +97,11 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, sonson_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

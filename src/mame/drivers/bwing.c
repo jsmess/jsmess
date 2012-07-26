@@ -43,62 +43,56 @@ static INTERRUPT_GEN ( bwp3_interrupt )
 //****************************************************************************
 // Memory and I/O Handlers
 
-static WRITE8_HANDLER( bwp12_sharedram1_w )
+WRITE8_MEMBER(bwing_state::bwp12_sharedram1_w)
 {
-	bwing_state *state = space->machine().driver_data<bwing_state>();
-	state->m_bwp1_sharedram1[offset] = state->m_bwp2_sharedram1[offset] = data;
+	m_bwp1_sharedram1[offset] = m_bwp2_sharedram1[offset] = data;
 }
 
-static WRITE8_HANDLER( bwp3_u8F_w )
+WRITE8_MEMBER(bwing_state::bwp3_u8F_w)
 {
-	bwing_state *state = space->machine().driver_data<bwing_state>();
-	state->m_bwp3_u8F_d = data;  // prepares custom chip for various operations
+	m_bwp3_u8F_d = data;  // prepares custom chip for various operations
 }
 
-static WRITE8_HANDLER( bwp3_nmimask_w )
+WRITE8_MEMBER(bwing_state::bwp3_nmimask_w)
 {
-	bwing_state *state = space->machine().driver_data<bwing_state>();
-	state->m_bwp3_nmimask = data & 0x80;
+	m_bwp3_nmimask = data & 0x80;
 }
 
-static WRITE8_HANDLER( bwp3_nmiack_w )
+WRITE8_MEMBER(bwing_state::bwp3_nmiack_w)
 {
-	bwing_state *state = space->machine().driver_data<bwing_state>();
-	device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
+	device_set_input_line(m_audiocpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
-static READ8_HANDLER( bwp1_io_r )
+READ8_MEMBER(bwing_state::bwp1_io_r)
 {
-	bwing_state *state = space->machine().driver_data<bwing_state>();
 
-	if (offset == 0) return(input_port_read(space->machine(), "DSW0"));
-	if (offset == 1) return(input_port_read(space->machine(), "DSW1"));
-	if (offset == 2) return(input_port_read(space->machine(), "IN0"));
-	if (offset == 3) return(input_port_read(space->machine(), "IN1"));
-	if (offset == 4) return(input_port_read(space->machine(), "IN2"));
+	if (offset == 0) return(ioport("DSW0")->read());
+	if (offset == 1) return(ioport("DSW1")->read());
+	if (offset == 2) return(ioport("IN0")->read());
+	if (offset == 3) return(ioport("IN1")->read());
+	if (offset == 4) return(ioport("IN2")->read());
 
-	return((state->m_bwp123_membase[0])[0x1b00 + offset]);
+	return((m_bwp123_membase[0])[0x1b00 + offset]);
 }
 
 
-static WRITE8_HANDLER( bwp1_ctrl_w )
+WRITE8_MEMBER(bwing_state::bwp1_ctrl_w)
 {
-	bwing_state *state = space->machine().driver_data<bwing_state>();
 
 	switch (offset)
 	{
 		// MSSTB
-		case 0: device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, ASSERT_LINE); break;
+		case 0: device_set_input_line(m_subcpu, M6809_IRQ_LINE, ASSERT_LINE); break;
 
 		// IRQACK
-		case 1: device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, CLEAR_LINE); break;
+		case 1: device_set_input_line(m_maincpu, M6809_IRQ_LINE, CLEAR_LINE); break;
 
 		// FIRQACK
-		case 2: device_set_input_line(state->m_maincpu, M6809_FIRQ_LINE, CLEAR_LINE); break;
+		case 2: device_set_input_line(m_maincpu, M6809_FIRQ_LINE, CLEAR_LINE); break;
 
 		// NMIACK
-		case 3: device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE); break;
+		case 3: device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE); break;
 
 		// SWAP(bank-swaps sprite RAM between 1800 & 1900; ignored bc. they're treated as a single chunk.)
 		case 4: break;
@@ -106,11 +100,11 @@ static WRITE8_HANDLER( bwp1_ctrl_w )
 		// SNDREQ
 		case 5:
 			if (data == 0x80) // protection trick to screw CPU1 & 3
-				device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, ASSERT_LINE); // SNMI
+				device_set_input_line(m_subcpu, INPUT_LINE_NMI, ASSERT_LINE); // SNMI
 			else
 			{
-				soundlatch_w(space, 0, data);
-				device_set_input_line(state->m_audiocpu, DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
+				soundlatch_byte_w(space, 0, data);
+				device_set_input_line(m_audiocpu, DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
 			}
 		break;
 
@@ -122,28 +116,27 @@ static WRITE8_HANDLER( bwp1_ctrl_w )
 	}
 
 	#if BW_DEBUG
-		(state->m_bwp123_membase[0])[0x1c00 + offset] = data;
+		(m_bwp123_membase[0])[0x1c00 + offset] = data;
 	#endif
 }
 
 
-static WRITE8_HANDLER( bwp2_ctrl_w )
+WRITE8_MEMBER(bwing_state::bwp2_ctrl_w)
 {
-	bwing_state *state = space->machine().driver_data<bwing_state>();
 	switch (offset)
 	{
-		case 0: device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, ASSERT_LINE); break; // SMSTB
+		case 0: device_set_input_line(m_maincpu, M6809_IRQ_LINE, ASSERT_LINE); break; // SMSTB
 
-		case 1: device_set_input_line(state->m_subcpu, M6809_FIRQ_LINE, CLEAR_LINE); break;
+		case 1: device_set_input_line(m_subcpu, M6809_FIRQ_LINE, CLEAR_LINE); break;
 
-		case 2: device_set_input_line(state->m_subcpu, M6809_IRQ_LINE, CLEAR_LINE); break;
+		case 2: device_set_input_line(m_subcpu, M6809_IRQ_LINE, CLEAR_LINE); break;
 
-		case 3: device_set_input_line(state->m_subcpu, INPUT_LINE_NMI, CLEAR_LINE); break;
+		case 3: device_set_input_line(m_subcpu, INPUT_LINE_NMI, CLEAR_LINE); break;
 	}
 
 	#if BW_DEBUG
 	{
-		(state->m_bwp123_membase[1])[0x1800 + offset] = data;
+		(m_bwp123_membase[1])[0x1800 + offset] = data;
 	}
 	#endif
 }
@@ -152,14 +145,14 @@ static WRITE8_HANDLER( bwp2_ctrl_w )
 // CPU Memory Maps
 
 // Main CPU
-static ADDRESS_MAP_START( bwp1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bwp1_map, AS_PROGRAM, 8, bwing_state )
 	AM_RANGE(0x1b00, 0x1b07) AM_READ(bwp1_io_r)
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_BASE_MEMBER(bwing_state, m_bwp1_sharedram1)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_SHARE("bwp1_sharedram1")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(bwing_videoram_w) AM_BASE_MEMBER(bwing_state, m_videoram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(bwing_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE(bwing_spriteram_w) AM_BASE_MEMBER(bwing_state, m_spriteram)
-	AM_RANGE(0x1a00, 0x1aff) AM_RAM_WRITE(bwing_paletteram_w) AM_BASE_MEMBER(bwing_state, m_paletteram)
+	AM_RANGE(0x1800, 0x19ff) AM_RAM_WRITE(bwing_spriteram_w) AM_SHARE("spriteram")
+	AM_RANGE(0x1a00, 0x1aff) AM_RAM_WRITE(bwing_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0x1b00, 0x1b07) AM_RAM_WRITE(bwing_scrollreg_w)
 	AM_RANGE(0x1c00, 0x1c07) AM_RAM_WRITE(bwp1_ctrl_w)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(bwing_scrollram_r, bwing_scrollram_w)
@@ -168,8 +161,8 @@ ADDRESS_MAP_END
 
 
 // Sub CPU
-static ADDRESS_MAP_START( bwp2_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_BASE_MEMBER(bwing_state, m_bwp2_sharedram1)
+static ADDRESS_MAP_START( bwp2_map, AS_PROGRAM, 8, bwing_state )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM_WRITE(bwp12_sharedram1_w) AM_SHARE("bwp2_sharedram1")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1800, 0x1803) AM_WRITE(bwp2_ctrl_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
@@ -177,35 +170,35 @@ ADDRESS_MAP_END
 
 
 // Sound CPU
-static ADDRESS_MAP_START( bwp3_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bwp3_map, AS_PROGRAM, 8, bwing_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x0200) AM_DEVWRITE("dac", dac_signed_w)
+	AM_RANGE(0x0200, 0x0200) AM_DEVWRITE_LEGACY("dac", dac_signed_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(bwp3_nmiack_w)
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_data_w)
-	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_address_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(bwp3_nmimask_w)
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_BASE_SIZE_MEMBER(bwing_state, m_bwp3_rombase, m_bwp3_romsize)
+	AM_RANGE(0xe000, 0xffff) AM_ROM AM_SHARE("bwp3_rombase")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bwp3_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( bwp3_io_map, AS_IO, 8, bwing_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("VBLANK") AM_WRITE(bwp3_u8F_w)
 ADDRESS_MAP_END
 
 //****************************************************************************
 // I/O Port Maps
 
-static INPUT_CHANGED( coin_inserted )
+INPUT_CHANGED_MEMBER(bwing_state::coin_inserted)
 {
-	cputag_set_input_line(field.machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static INPUT_CHANGED( tilt_pressed )
+INPUT_CHANGED_MEMBER(bwing_state::tilt_pressed)
 {
-	cputag_set_input_line(field.machine(), "maincpu", M6809_FIRQ_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", M6809_FIRQ_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_PORTS_START( bwing )
@@ -279,20 +272,20 @@ static INPUT_PORTS_START( bwing )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, bwing_state,coin_inserted, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED_MEMBER(DEVICE_SELF, bwing_state,coin_inserted, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_TILT ) PORT_CHANGED(tilt_pressed,0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_TILT ) PORT_CHANGED_MEMBER(DEVICE_SELF, bwing_state,tilt_pressed,0)
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("EXTRA") // a matter of taste
 	PORT_DIPNAME( 0x07, 0x00, "RGB" )
@@ -577,7 +570,7 @@ static void fix_bwp3( running_machine &machine )
 {
 	bwing_state *state = machine.driver_data<bwing_state>();
 	UINT8 *rom = state->m_bwp3_rombase;
-	int i, j = state->m_bwp3_romsize;
+	int i, j = state->m_bwp3_rombase.bytes();
 
 	// swap nibbles
 	for (i = 0; i < j; i++)
@@ -593,9 +586,9 @@ static DRIVER_INIT( bwing )
 {
 	bwing_state *state = machine.driver_data<bwing_state>();
 
-	state->m_bwp123_membase[0] = machine.region("maincpu")->base();
-	state->m_bwp123_membase[1] = machine.region("sub")->base();
-	state->m_bwp123_membase[2] = machine.region("audiocpu")->base();
+	state->m_bwp123_membase[0] = state->memregion("maincpu")->base();
+	state->m_bwp123_membase[1] = state->memregion("sub")->base();
+	state->m_bwp123_membase[2] = state->memregion("audiocpu")->base();
 
 	fix_bwp3(machine);
 }

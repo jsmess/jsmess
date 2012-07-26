@@ -307,22 +307,18 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::keyboard_clock_w )
 						pic8259_ir1_w(m_pic8259, 1);
 						m_ppi_shift_enable = 0;
 						m_ppi_clock_signal = 0;
-						m_kb_set_clock_signal_func(m_ppi_clock_signal);
+						m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
 					}
 				}
 			}
 		}
 	}
-
-	m_kb_set_clock_signal_func(m_ppi_clock_signal);
 }
 
 
 WRITE_LINE_MEMBER( ibm5160_mb_device::keyboard_data_w )
 {
 	m_ppi_data_signal = state;
-
-	m_kb_set_data_signal_func(m_ppi_data_signal);
 }
 
 READ8_MEMBER (ibm5160_mb_device::pc_ppi_porta_r)
@@ -340,7 +336,7 @@ READ8_MEMBER (ibm5160_mb_device::pc_ppi_porta_r)
          *      01 - color 40x25
          * 6-7  The number of floppy disk drives
          */
-		data = input_port_read(*this, "DSW0");
+		data = ioport("DSW0")->read();
 	}
 	else
 	{
@@ -362,13 +358,13 @@ READ8_MEMBER ( ibm5160_mb_device::pc_ppi_portc_r )
 	if (m_ppi_portc_switch_high)
 	{
 		/* read hi nibble of S2 */
-		data = (data & 0xf0) | ((input_port_read(*this, "DSW0") >> 4) & 0x0f);
+		data = (data & 0xf0) | ((ioport("DSW0")->read() >> 4) & 0x0f);
 		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
 	}
 	else
 	{
 		/* read lo nibble of S2 */
-		data = (data & 0xf0) | (input_port_read(*this, "DSW0") & 0x0f);
+		data = (data & 0xf0) | (ioport("DSW0")->read() & 0x0f);
 		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
 	}
 
@@ -393,7 +389,7 @@ WRITE8_MEMBER( ibm5160_mb_device::pc_ppi_portb_w )
 	pc_speaker_set_spkrdata( data & 0x02 );
 
 	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
-	m_kb_set_clock_signal_func(m_ppi_clock_signal);
+	m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
 
 	/* If PB7 is set clear the shift register and reset the IRQ line */
 	if ( m_ppi_keyboard_clear )
@@ -431,6 +427,12 @@ static const isa8bus_interface isabus_intf =
 	DEVCB_DEVICE_LINE("dma8237", i8237_dreq3_w)
 };
 
+static const pc_kbdc_interface pc_kbdc_intf =
+{
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, keyboard_clock_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, ibm5160_mb_device, keyboard_data_w)
+};
+
 /**********************************************************
  *
  * NMI handling
@@ -465,6 +467,9 @@ static MACHINE_CONFIG_FRAGMENT( ibm5160_mb_config )
 	MCFG_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
 
 	MCFG_ISA8_BUS_ADD("isa", "maincpu", isabus_intf)
+
+	MCFG_PC_KBDC_ADD("pc_kbdc", pc_kbdc_intf)
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
@@ -539,7 +544,8 @@ ibm5160_mb_device::ibm5160_mb_device(const machine_config &mconfig, const char *
 		m_pit8253(*this, "pit8253"),
 		m_ppi8255(*this, "ppi8255"),
 		m_speaker(*this, SPEAKER_TAG),
-		m_isabus(*this, "isa")
+		m_isabus(*this, "isa"),
+		m_pc_kbdc(*this, "pc_kbdc")
 {
 }
 
@@ -579,38 +585,11 @@ void ibm5160_mb_device::install_device_write(device_t *dev, offs_t start, offs_t
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void ibm5160_mb_device::device_config_complete()
-{
-	// inherit a copy of the static data
-	const motherboard_interface *intf = reinterpret_cast<const motherboard_interface *>(static_config());
-	if (intf != NULL)
-	{
-		*static_cast<motherboard_interface *>(this) = *intf;
-	}
-
-	// or initialize to defaults if none provided
-	else
-	{
-    	memset(&m_kb_set_clock_signal_cb, 0, sizeof(m_kb_set_clock_signal_cb));
-    	memset(&m_kb_set_data_signal_cb, 0, sizeof(m_kb_set_data_signal_cb));
-	}
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void ibm5160_mb_device::device_start()
 {
-	// resolve callbacks
-	m_kb_set_clock_signal_func.resolve(m_kb_set_clock_signal_cb, *this);
-	m_kb_set_data_signal_func.resolve(m_kb_set_data_signal_cb,  *this);
-
 	install_device(m_dma8237, 0x0000, 0x000f, 0, 0, FUNC(i8237_r), FUNC(i8237_w) );
 	install_device(m_pic8259, 0x0020, 0x0021, 0, 0, FUNC(pic8259_r), FUNC(pic8259_w) );
 	install_device(m_pit8253, 0x0040, 0x0043, 0, 0, FUNC(pit8253_r), FUNC(pit8253_w) );
@@ -634,7 +613,7 @@ void ibm5160_mb_device::device_start()
 	install_device_write(this,    0x00a0, 0x00a1, 0, 0, FUNC(nmi_enable_w));
 	/* MESS managed RAM */
 	if ( machine().device<ram_device>(RAM_TAG)->pointer() )
-		memory_set_bankptr( machine(), "bank10", machine().device<ram_device>(RAM_TAG)->pointer() );
+		membank( "bank10" )->set_base( machine().device<ram_device>(RAM_TAG)->pointer() );
 }
 
 IRQ_CALLBACK(ibm5160_mb_device::pc_irq_callback)
@@ -745,7 +724,7 @@ READ8_MEMBER (ibm5150_mb_device::pc_ppi_porta_r)
          *      01 - color 40x25
          * 6-7  The number of floppy disk drives
          */
-		data = input_port_read(*this, "DSW0") & 0xF3;
+		data = ioport("DSW0")->read() & 0xF3;
 		switch ( machine().device<ram_device>(RAM_TAG)->size() )
 		{
 		case 16 * 1024:
@@ -810,7 +789,7 @@ READ8_MEMBER ( ibm5150_mb_device::pc_ppi_portc_r )
 	else
 	{
 		/* read lo nibble of S2 */
-		data = (data & 0xf0) | (input_port_read(*this, "DSW0") & 0x0f);
+		data = (data & 0xf0) | (ioport("DSW0")->read() & 0x0f);
 		PIO_LOG(1,"PIO_C_r (lo)",("$%02x\n", data));
 	}
 
@@ -853,7 +832,7 @@ WRITE8_MEMBER( ibm5150_mb_device::pc_ppi_portb_w )
 	m_cassette->change_state(( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 
 	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
-		m_kb_set_clock_signal_func(m_ppi_clock_signal);
+	m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
 
 
 	/* If PB7 is set clear the shift register and reset the IRQ line */

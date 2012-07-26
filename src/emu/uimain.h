@@ -15,6 +15,7 @@
 #define __UIMAIN_H__
 
 #include "crsshair.h"
+#include "drivenum.h"
 
 class ui_menu_main : public ui_menu {
 public:
@@ -46,6 +47,7 @@ private:
 		CHEAT,
 		MEMORY_CARD,
 		SELECT_GAME,
+		BIOS_SELECTION,
 	};
 };
 
@@ -119,7 +121,6 @@ protected:
 	void populate_and_sort(struct input_item_data *itemlist);
 	virtual void update_input(struct input_item_data *seqchangeditem) = 0;
 	void toggle_none_default(input_seq &selected_seq, input_seq &original_seq, const input_seq &selected_defseq);
-	const input_seq &get_field_default_seq(input_field_config *field, input_seq_type seqtype);
 
 protected:
 	const void *		pollingref;
@@ -210,7 +211,7 @@ private:
 
 	/* internal analog menu item data */
 	struct analog_item_data {
-		input_field_config *field;
+		ioport_field *field;
 		int					type;
 		int					min, max;
 		int					cur;
@@ -363,6 +364,15 @@ private:
 	void build_driver_list();
 };
 
+class ui_menu_bios_selection : public ui_menu {
+public:
+	ui_menu_bios_selection(running_machine &machine, render_container *container);
+	virtual ~ui_menu_bios_selection();
+	virtual void populate();
+	virtual void handle();
+
+private:
+};
 /* force game select menu */
 void ui_menu_force_game_select(running_machine &machine, render_container *container);
 

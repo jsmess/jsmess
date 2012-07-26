@@ -96,13 +96,13 @@ bool apexc_cylinder_image_device::call_load()
 	/* load RAM contents */
 	m_writable = !is_readonly();
 
-	fread( machine().region("maincpu")->base(), /*0x8000*/0x1000);
+	fread( memregion("maincpu")->base(), /*0x8000*/0x1000);
 #ifdef LSB_FIRST
 	{	/* fix endianness */
 		UINT32 *RAM;
 		int i;
 
-		RAM = (UINT32 *)(*machine().region("maincpu"));
+		RAM = (UINT32 *)(*machine().root_device().memregion("maincpu"));
 
 		for (i=0; i < /*0x2000*/0x0400; i++)
 			RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
@@ -126,14 +126,14 @@ void apexc_cylinder_image_device::call_unload()
 			UINT32 *RAM;
 			int i;
 
-			RAM = (UINT32 *)(*machine().region("maincpu"));
+			RAM = (UINT32 *)(*machine().root_device().memregion("maincpu"));
 
 			for (i=0; i < /*0x2000*/0x0400; i++)
 				RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
 		}
 #endif
 		/* write */
-		fwrite(machine().region("maincpu")->base(), /*0x8000*/0x1000);
+		fwrite(machine().root_device().memregion("maincpu")->base(), /*0x8000*/0x1000);
 	}
 }
 
@@ -404,7 +404,7 @@ static INTERRUPT_GEN( apexc_interrupt )
 
 
 	/* read new state of edit keys */
-	edit_keys = input_port_read(device->machine(), "data");
+	edit_keys = device->machine().root_device().ioport("data")->read();
 
 	/* toggle data reg according to transitions */
 	state->m_panel_data_reg ^= edit_keys & (~state->m_old_edit_keys);
@@ -414,7 +414,7 @@ static INTERRUPT_GEN( apexc_interrupt )
 
 
 	/* read new state of control keys */
-	control_keys = input_port_read(device->machine(), "panel");
+	control_keys = state->ioport("panel")->read();
 
 	/* compute transitions */
 	control_transitions = control_keys & (~state->m_old_control_keys);
@@ -823,7 +823,7 @@ static DRIVER_INIT(apexc)
 		0x00
 	};
 
-	dst = machine.region("gfx1")->base();
+	dst = machine.root_device().memregion("gfx1")->base();
 
 	memcpy(dst, fontdata6x8, apexcfontdata_size);
 }
@@ -844,7 +844,7 @@ static GFXDECODE_START( apexc )
 GFXDECODE_END
 
 
-static ADDRESS_MAP_START(apexc_mem_map, AS_PROGRAM, 32)
+static ADDRESS_MAP_START(apexc_mem_map, AS_PROGRAM, 32, apexc_state )
 #if 0
 	AM_RANGE(0x0000, 0x03ff) AM_RAM	/* 1024 32-bit words (expandable to 8192) */
 	AM_RANGE(0x0400, 0x1fff) AM_NOP
@@ -854,9 +854,9 @@ static ADDRESS_MAP_START(apexc_mem_map, AS_PROGRAM, 32)
 #endif
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(apexc_io_map, AS_IO, 8)
-	AM_RANGE(0x00, 0x00) AM_DEVREAD("tape_reader",tape_read)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("tape_puncher",tape_write)
+static ADDRESS_MAP_START(apexc_io_map, AS_IO, 8, apexc_state )
+	AM_RANGE(0x00, 0x00) AM_DEVREAD_LEGACY("tape_reader",tape_read)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("tape_puncher",tape_write)
 ADDRESS_MAP_END
 
 

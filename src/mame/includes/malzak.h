@@ -23,11 +23,18 @@ public:
 	device_t *m_s2636_0;
 	device_t *m_s2636_1;
 	device_t *m_saa5050;
+	DECLARE_READ8_MEMBER(fake_VRLE_r);
+	DECLARE_READ8_MEMBER(s2636_portA_r);
+	DECLARE_READ8_MEMBER(s2650_data_r);
+	DECLARE_WRITE8_MEMBER(port40_w);
+	DECLARE_WRITE8_MEMBER(port60_w);
+	DECLARE_WRITE8_MEMBER(portc0_w);
+	DECLARE_READ8_MEMBER(collision_r);
+	DECLARE_WRITE8_MEMBER(malzak_playfield_w);
 };
 
 
 /*----------- defined in video/malzak.c -----------*/
 
-WRITE8_HANDLER( malzak_playfield_w );
 
 SCREEN_UPDATE_IND16( malzak );

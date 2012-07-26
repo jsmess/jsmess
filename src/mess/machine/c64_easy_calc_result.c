@@ -7,6 +7,27 @@
 
 **********************************************************************/
 
+/*
+
+    PCB Layout
+    ----------
+
+    |===========================|
+    |=|                         |
+    |=|     ROM0        LS73    |
+    |=|                         |
+    |=|                         |
+    |=|                         |
+    |=|                         |
+    |=|     ROM1        LS00    |
+    |=|                         |
+    |===========================|
+
+    ROM0  - Hitachi HN61364P 8Kx8 EPROM "CR2001"
+    ROM1  - Hitachi HN613128P 16Kx8 EPROM "CR3001"
+
+*/
+
 #include "c64_easy_calc_result.h"
 
 
@@ -59,7 +80,7 @@ void c64_easy_calc_result_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_easy_calc_result_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int roml, int romh, int io1, int io2)
+UINT8 c64_easy_calc_result_cartridge_device::c64_cd_r(address_space &space, offs_t offset, int ba, int roml, int romh, int io1, int io2)
 {
 	UINT8 data = 0;
 
@@ -80,7 +101,7 @@ UINT8 c64_easy_calc_result_cartridge_device::c64_cd_r(address_space &space, offs
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_easy_calc_result_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int roml, int romh, int io1, int io2)
+void c64_easy_calc_result_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1)
 	{

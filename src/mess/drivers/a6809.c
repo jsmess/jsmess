@@ -8,7 +8,6 @@
     http://acorn.chriswhy.co.uk/8bit_Upgrades/Acorn_6809_CPU.html
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"

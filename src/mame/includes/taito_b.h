@@ -3,11 +3,13 @@ class taitob_state : public driver_device
 {
 public:
 	taitob_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_pixelram(*this, "pixelram"){ }
 
 	/* memory pointers */
-	UINT16 *      m_spriteram;
-	UINT16 *      m_pixelram;
+	required_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<UINT16> m_pixelram;
 //  UINT16 *      m_paletteram;   // this currently uses generic palette handlers
 
 	/* video-related */
@@ -35,18 +37,36 @@ public:
 	device_t *m_tc0180vcu;
 	device_t *m_tc0640fio;
 	device_t *m_tc0220ioc;
+	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_READ16_MEMBER(tracky1_hi_r);
+	DECLARE_READ16_MEMBER(tracky1_lo_r);
+	DECLARE_READ16_MEMBER(trackx1_hi_r);
+	DECLARE_READ16_MEMBER(trackx1_lo_r);
+	DECLARE_READ16_MEMBER(tracky2_hi_r);
+	DECLARE_READ16_MEMBER(tracky2_lo_r);
+	DECLARE_READ16_MEMBER(trackx2_hi_r);
+	DECLARE_READ16_MEMBER(trackx2_lo_r);
+	DECLARE_WRITE16_MEMBER(gain_control_w);
+	DECLARE_READ16_MEMBER(eep_latch_r);
+	DECLARE_WRITE16_MEMBER(eeprom_w);
+	DECLARE_READ16_MEMBER(player_34_coin_ctrl_r);
+	DECLARE_WRITE16_MEMBER(player_34_coin_ctrl_w);
+	DECLARE_READ16_MEMBER(pbobble_input_bypass_r);
+	DECLARE_WRITE16_MEMBER(spacedxo_tc0220ioc_w);
+	DECLARE_WRITE16_MEMBER(realpunc_output_w);
+	DECLARE_WRITE16_MEMBER(hitice_pixelram_w);
+	DECLARE_WRITE16_MEMBER(hitice_pixel_scroll_w);
+	DECLARE_WRITE16_MEMBER(realpunc_video_ctrl_w);
+	DECLARE_READ16_MEMBER(tc0180vcu_framebuffer_word_r);
+	DECLARE_WRITE16_MEMBER(tc0180vcu_framebuffer_word_w);
+	DECLARE_INPUT_CHANGED_MEMBER(realpunc_sensor);
 };
 
 
 /*----------- defined in video/taito_b.c -----------*/
 
-READ16_HANDLER( tc0180vcu_framebuffer_word_r );
-WRITE16_HANDLER( tc0180vcu_framebuffer_word_w );
 
-WRITE16_HANDLER( hitice_pixelram_w );
-WRITE16_HANDLER( hitice_pixel_scroll_w );
 
-WRITE16_HANDLER( realpunc_video_ctrl_w );
 
 VIDEO_START( taitob_color_order0 );
 VIDEO_START( taitob_color_order1 );

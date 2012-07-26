@@ -132,24 +132,21 @@ e000 - e7ff        R/W      Work RAM
  *************************************/
 
 
-static CUSTOM_INPUT( ninjakun_io_A002_ctrl_r )
+CUSTOM_INPUT_MEMBER(nova2001_state::ninjakun_io_A002_ctrl_r)
 {
-	nova2001_state *state = field.machine().driver_data<nova2001_state>();
-	return state->m_ninjakun_io_a002_ctrl;
+	return m_ninjakun_io_a002_ctrl;
 }
 
-static WRITE8_HANDLER( ninjakun_cpu1_io_A002_w )
+WRITE8_MEMBER(nova2001_state::ninjakun_cpu1_io_A002_w)
 {
-	nova2001_state *state = space->machine().driver_data<nova2001_state>();
-	if( data == 0x80 ) state->m_ninjakun_io_a002_ctrl |= 0x01;
-	if( data == 0x40 ) state->m_ninjakun_io_a002_ctrl &= ~0x02;
+	if( data == 0x80 ) m_ninjakun_io_a002_ctrl |= 0x01;
+	if( data == 0x40 ) m_ninjakun_io_a002_ctrl &= ~0x02;
 }
 
-static WRITE8_HANDLER( ninjakun_cpu2_io_A002_w )
+WRITE8_MEMBER(nova2001_state::ninjakun_cpu2_io_A002_w)
 {
-	nova2001_state *state = space->machine().driver_data<nova2001_state>();
-	if( data == 0x40 ) state->m_ninjakun_io_a002_ctrl |= 0x02;
-	if( data == 0x80 ) state->m_ninjakun_io_a002_ctrl &= ~0x01;
+	if( data == 0x40 ) m_ninjakun_io_a002_ctrl |= 0x02;
+	if( data == 0x80 ) m_ninjakun_io_a002_ctrl &= ~0x01;
 }
 
 
@@ -175,16 +172,16 @@ static MACHINE_START( ninjakun )
  *
  *************************************/
 
-static ADDRESS_MAP_START( nova2001_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nova2001_map, AS_PROGRAM, 8, nova2001_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_BASE_MEMBER(nova2001_state, m_fg_videoram)
-	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(nova2001_bg_videoram_w) AM_BASE_MEMBER(nova2001_state, m_bg_videoram)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_BASE_MEMBER(nova2001_state, m_spriteram)
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0xa800, 0xafff) AM_RAM_WRITE(nova2001_bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xb800, 0xbfff) AM_WRITE(nova2001_flipscreen_w)
-	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay1", ay8910_r, ay8910_data_w)
-	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE("ay2", ay8910_r, ay8910_data_w)
-	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0xc003, 0xc003) AM_DEVWRITE("ay2", ay8910_address_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE_LEGACY("ay1", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xc001, 0xc001) AM_DEVREADWRITE_LEGACY("ay2", ay8910_r, ay8910_data_w)
+	AM_RANGE(0xc002, 0xc002) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0xc003, 0xc003) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
 	AM_RANGE(0xc004, 0xc004) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xc006, 0xc006) AM_READ_PORT("IN0")
 	AM_RANGE(0xc007, 0xc007) AM_READ_PORT("IN1")
@@ -193,87 +190,87 @@ static ADDRESS_MAP_START( nova2001_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ninjakun_cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ninjakun_cpu1_map, AS_PROGRAM, 8, nova2001_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x8003, 0x8003) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x8001, 0x8001) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x8003, 0x8003) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2") AM_WRITE(ninjakun_cpu1_io_A002_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(pkunwar_flipscreen_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_BASE_MEMBER(nova2001_state, m_fg_videoram) AM_SHARE("share1")
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_BASE_MEMBER(nova2001_state, m_bg_videoram) AM_SHARE("share2")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_MEMBER(nova2001_state, m_spriteram) AM_SHARE("share3")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_BASE_GENERIC(paletteram) AM_SHARE("share4")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("share5")
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("share6")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ninjakun_cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ninjakun_cpu2_map, AS_PROGRAM, 8, nova2001_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x7fff) AM_ROM AM_REGION("maincpu", 0x2000)
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x8003, 0x8003) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x8001, 0x8001) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x8003, 0x8003) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2") AM_WRITE(ninjakun_cpu2_io_A002_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(nova2001_flipscreen_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_SHARE("share1")
-	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_SHARE("share2")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("share3")
-	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_SHARE("share4")
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_SHARE("paletteram")
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM AM_SHARE("share6") /* swapped wrt CPU1 */
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_SHARE("share5") /* swapped wrt CPU1 */
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( pkunwar_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( pkunwar_map, AS_PROGRAM, 8, nova2001_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(nova2001_state, m_spriteram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(nova2001_bg_videoram_w) AM_BASE_MEMBER(nova2001_state, m_bg_videoram)
-	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0xa001, 0xa001) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0xa003, 0xa003) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(nova2001_bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0xa000, 0xa001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0xa001, 0xa001) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0xa002, 0xa003) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0xa003, 0xa003) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pkunwar_io, AS_IO, 8 )
+static ADDRESS_MAP_START( pkunwar_io, AS_IO, 8, nova2001_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pkunwar_flipscreen_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( raiders5_cpu1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( raiders5_cpu1_map, AS_PROGRAM, 8, nova2001_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(nova2001_state, m_spriteram)
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_BASE_MEMBER(nova2001_state, m_fg_videoram)
-	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_BASE_MEMBER(nova2001_state, m_bg_videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(nova2001_scroll_x_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(nova2001_scroll_y_w)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(pkunwar_flipscreen_w)
-	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0xc001, 0xc001) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0xc003, 0xc003) AM_DEVREAD("ay2", ay8910_r)
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0xc001, 0xc001) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0xc002, 0xc003) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0xc003, 0xc003) AM_DEVREAD_LEGACY("ay2", ay8910_r)
+	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(ninjakun_paletteram_w) AM_SHARE("paletteram")
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("fg_videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( raiders5_cpu2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( raiders5_cpu2_map, AS_PROGRAM, 8, nova2001_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_address_data_w)
-	AM_RANGE(0x8001, 0x8001) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE("ay2", ay8910_address_data_w)
-	AM_RANGE(0x8003, 0x8003) AM_DEVREAD("ay2", ay8910_r)
+	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE_LEGACY("ay1", ay8910_address_data_w)
+	AM_RANGE(0x8001, 0x8001) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x8002, 0x8003) AM_DEVWRITE_LEGACY("ay2", ay8910_address_data_w)
+	AM_RANGE(0x8003, 0x8003) AM_DEVREAD_LEGACY("ay2", ay8910_r)
 	AM_RANGE(0x9000, 0x9000) AM_READNOP /* unknown */
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("fg_videoram")
 	AM_RANGE(0xc000, 0xc000) AM_READNOP /* unknown */
 	AM_RANGE(0xc800, 0xc800) AM_READNOP /* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READNOP /* unknown */
@@ -282,7 +279,7 @@ static ADDRESS_MAP_START( raiders5_cpu2_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(pkunwar_flipscreen_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( raiders5_io, AS_IO, 8 )
+static ADDRESS_MAP_START( raiders5_io, AS_IO, 8, nova2001_state )
 	AM_RANGE(0x00, 0x00) AM_READNOP /* unknown */
 ADDRESS_MAP_END
 
@@ -318,7 +315,7 @@ static INPUT_PORTS_START( nova2001 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x78, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:1")
@@ -384,8 +381,8 @@ static INPUT_PORTS_START( ninjakun )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_START("IN2")	/* 0xa002 */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_VBLANK )
-	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ninjakun_io_A002_ctrl_r, NULL)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, nova2001_state,ninjakun_io_A002_ctrl_r, NULL)
 
 	PORT_START("DSW1") // printed "SW 2"
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )  PORT_DIPLOCATION("SW2:1")
@@ -445,7 +442,7 @@ static INPUT_PORTS_START( pkunwar )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
@@ -494,7 +491,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( raiders5 )
 	PORT_START("IN0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -640,8 +637,8 @@ static const ay8910_interface nova2001_ay8910_interface_1 =
 	AY8910_DEFAULT_LOADS,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, nova2001_scroll_x_w),
-	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, nova2001_scroll_y_w)
+	DEVCB_DRIVER_MEMBER(nova2001_state, nova2001_scroll_x_w),
+	DEVCB_DRIVER_MEMBER(nova2001_state, nova2001_scroll_y_w)
 };
 
 static const ay8910_interface nova2001_ay8910_interface_2 =
@@ -983,9 +980,9 @@ This code is overly generic because it is used for several games in ninjakd2.c
 
 static void lineswap_gfx_roms(running_machine &machine, const char *region, const int bit)
 {
-	const int length = machine.region(region)->bytes();
+	const int length = machine.root_device().memregion(region)->bytes();
 
-	UINT8* const src = machine.region(region)->base();
+	UINT8* const src = machine.root_device().memregion(region)->base();
 
 	UINT8* const temp = auto_alloc_array(machine, UINT8, length);
 

@@ -64,11 +64,11 @@ class z80ne_state : public driver_device
 public:
 	z80ne_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_vdg(*this, "mc6847")
-	{}
+		  m_vdg(*this, "mc6847"),
+		  m_videoram(*this,"videoram") {}
 
 	optional_device<mc6847_base_device> m_vdg;
-	UINT8 *m_videoram;
+	optional_shared_ptr<UINT8> m_videoram;
 	UINT8 m_lx383_scan_counter;
 	UINT8 m_lx383_key[LX383_KEYS];
 	int m_lx383_downsampler;
@@ -80,20 +80,23 @@ public:
 	emu_timer *m_cassette_timer;
 	cass_data_t m_cass_data;
 	wd17xx_state_t m_wd17xx_state;
+	DECLARE_READ8_MEMBER(lx383_r);
+	DECLARE_WRITE8_MEMBER(lx383_w);
+	DECLARE_READ8_MEMBER(lx385_data_r);
+	DECLARE_READ8_MEMBER(lx385_ctrl_r);
+	DECLARE_WRITE8_MEMBER(lx385_data_w);
+	DECLARE_WRITE8_MEMBER(lx385_ctrl_w);
+	DECLARE_READ8_MEMBER(lx388_data_r);
+	DECLARE_READ8_MEMBER(lx388_read_field_sync);
+	DECLARE_DIRECT_UPDATE_MEMBER(z80ne_default);
+	DECLARE_DIRECT_UPDATE_MEMBER(z80ne_nmi_delay_count);
+	DECLARE_DIRECT_UPDATE_MEMBER(z80ne_reset_delay_count);
 };
 
 
 /*----------- defined in machine/z80ne.c -----------*/
 
-READ8_HANDLER(lx383_r);
-WRITE8_HANDLER(lx383_w);
-READ8_HANDLER(lx385_data_r);
-WRITE8_HANDLER(lx385_data_w);
-READ8_HANDLER(lx385_ctrl_r);
-WRITE8_HANDLER(lx385_ctrl_w);
 READ8_DEVICE_HANDLER(lx388_mc6847_videoram_r);
-READ8_HANDLER(lx388_data_r);
-READ8_HANDLER(lx388_read_field_sync);
 READ8_DEVICE_HANDLER(lx390_fdc_r);
 WRITE8_DEVICE_HANDLER(lx390_fdc_w);
 READ8_DEVICE_HANDLER(lx390_reset_bank);

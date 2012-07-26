@@ -327,57 +327,81 @@ class hornet_state : public driver_device
 {
 public:
 	hornet_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_workram(*this, "workram"),
+		  m_sharc_dataram0(*this, "sharc_dataram0"),
+		  m_sharc_dataram1(*this, "sharc_dataram1") { }
 
 	UINT8 m_led_reg0;
 	UINT8 m_led_reg1;
-	UINT32 *m_workram;
-	UINT32 *m_sharc_dataram[2];
+	required_shared_ptr<UINT32> m_workram;
+	required_shared_ptr<UINT32> m_sharc_dataram0;
+	optional_shared_ptr<UINT32> m_sharc_dataram1;
 	UINT8 *m_jvs_sdata;
 	UINT32 m_jvs_sdata_ptr;
 	emu_timer *m_sound_irq_timer;
 	UINT16 m_gn680_latch;
 	UINT16 m_gn680_ret0;
 	UINT16 m_gn680_ret1;
+	DECLARE_READ32_MEMBER(hornet_k037122_sram_r);
+	DECLARE_WRITE32_MEMBER(hornet_k037122_sram_w);
+	DECLARE_READ32_MEMBER(hornet_k037122_char_r);
+	DECLARE_WRITE32_MEMBER(hornet_k037122_char_w);
+	DECLARE_READ32_MEMBER(hornet_k037122_reg_r);
+	DECLARE_WRITE32_MEMBER(hornet_k037122_reg_w);
+	DECLARE_READ8_MEMBER(sysreg_r);
+	DECLARE_WRITE8_MEMBER(sysreg_w);
+	DECLARE_WRITE32_MEMBER(comm1_w);
+	DECLARE_WRITE32_MEMBER(comm_rombank_w);
+	DECLARE_READ32_MEMBER(comm0_unk_r);
+	DECLARE_READ32_MEMBER(gun_r);
+	DECLARE_WRITE32_MEMBER(gun_w);
+	DECLARE_WRITE16_MEMBER(gn680_sysctrl);
+	DECLARE_READ16_MEMBER(gn680_latch_r);
+	DECLARE_WRITE16_MEMBER(gn680_latch_w);
+	DECLARE_READ32_MEMBER(dsp_dataram0_r);
+	DECLARE_WRITE32_MEMBER(dsp_dataram0_w);
+	DECLARE_READ32_MEMBER(dsp_dataram1_r);
+	DECLARE_WRITE32_MEMBER(dsp_dataram1_w);
 };
 
 
 
 
-static READ32_HANDLER( hornet_k037122_sram_r )
+READ32_MEMBER(hornet_state::hornet_k037122_sram_r)
 {
-	device_t *k037122 = space->machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	device_t *k037122 = machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	return k037122_sram_r(k037122, offset, mem_mask);
 }
 
-static WRITE32_HANDLER( hornet_k037122_sram_w )
+WRITE32_MEMBER(hornet_state::hornet_k037122_sram_w)
 {
-	device_t *k037122 = space->machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	device_t *k037122 = machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	k037122_sram_w(k037122, offset, data, mem_mask);
 }
 
 
-static READ32_HANDLER( hornet_k037122_char_r )
+READ32_MEMBER(hornet_state::hornet_k037122_char_r)
 {
-	device_t *k037122 = space->machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	device_t *k037122 = machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	return k037122_char_r(k037122, offset, mem_mask);
 }
 
-static WRITE32_HANDLER( hornet_k037122_char_w )
+WRITE32_MEMBER(hornet_state::hornet_k037122_char_w)
 {
-	device_t *k037122 = space->machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	device_t *k037122 = machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	k037122_char_w(k037122, offset, data, mem_mask);
 }
 
-static READ32_HANDLER( hornet_k037122_reg_r )
+READ32_MEMBER(hornet_state::hornet_k037122_reg_r)
 {
-	device_t *k037122 = space->machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	device_t *k037122 = machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	return k037122_reg_r(k037122, offset, mem_mask);
 }
 
-static WRITE32_HANDLER( hornet_k037122_reg_w )
+WRITE32_MEMBER(hornet_state::hornet_k037122_reg_w)
 {
-	device_t *k037122 = space->machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
+	device_t *k037122 = machine().device(get_cgboard_id() ? "k037122_2" : "k037122_1");
 	k037122_reg_w(k037122, offset, data, mem_mask);
 }
 
@@ -435,19 +459,19 @@ static SCREEN_UPDATE_RGB32( hornet_2board )
 
 /*****************************************************************************/
 
-static READ8_HANDLER( sysreg_r )
+READ8_MEMBER(hornet_state::sysreg_r)
 {
 	UINT8 r = 0;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
-	device_t *adc12138 = space->machine().device("adc12138");
-	eeprom_device *eeprom = space->machine().device<eeprom_device>("eeprom");
+	device_t *adc12138 = machine().device("adc12138");
+	eeprom_device *eeprom = machine().device<eeprom_device>("eeprom");
 
 	switch (offset)
 	{
 		case 0:	/* I/O port 0 */
 		case 1:	/* I/O port 1 */
 		case 2:	/* I/O port 2 */
-			r = input_port_read(space->machine(), portnames[offset]);
+			r = ioport(portnames[offset])->read();
 			break;
 
 		case 3:	/* I/O port 3 */
@@ -465,25 +489,24 @@ static READ8_HANDLER( sysreg_r )
 			break;
 
 		case 4:	/* I/O port 4 - DIP switches */
-			r = input_port_read(space->machine(), "DSW");
+			r = ioport("DSW")->read();
 			break;
 	}
 	return r;
 }
 
-static WRITE8_HANDLER( sysreg_w )
+WRITE8_MEMBER(hornet_state::sysreg_w)
 {
-	hornet_state *state = space->machine().driver_data<hornet_state>();
-	device_t *adc12138 = space->machine().device("adc12138");
+	device_t *adc12138 = machine().device("adc12138");
 
 	switch (offset)
 	{
 		case 0:	/* LED Register 0 */
-			state->m_led_reg0 = data;
+			m_led_reg0 = data;
 			break;
 
 		case 1:	/* LED Register 1 */
-			state->m_led_reg1 = data;
+			m_led_reg1 = data;
 			break;
 
 		case 2: /* Parallel data register */
@@ -501,7 +524,7 @@ static WRITE8_HANDLER( sysreg_w )
                 0x02 = LAMP1
                 0x01 = LAMP0
             */
-			input_port_write(space->machine(), "EEPROMOUT", data, 0xff);
+			ioport("EEPROMOUT")->write(data, 0xff);
 			mame_printf_debug("System register 0 = %02X\n", data);
 			break;
 
@@ -521,7 +544,7 @@ static WRITE8_HANDLER( sysreg_w )
 			adc1213x_di_w(adc12138, 0, (data >> 1) & 0x1);
 			adc1213x_sclk_w(adc12138, 0, data & 0x1);
 
-			cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+			cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 1 = %02X\n", data);
 			break;
 
@@ -544,7 +567,7 @@ static WRITE8_HANDLER( sysreg_w )
                 0x80 = WDTCLK
             */
 			if (data & 0x80)
-				watchdog_reset(space->machine());
+				machine().watchdog_reset();
 			break;
 
 		case 7:	/* CG Control Register */
@@ -556,9 +579,9 @@ static WRITE8_HANDLER( sysreg_w )
                 0x01 = EXRGB
             */
 			if (data & 0x80)
-				cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
+				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)
-				cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+				cputag_set_input_line(machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
 			break;
 	}
@@ -566,56 +589,54 @@ static WRITE8_HANDLER( sysreg_w )
 
 /*****************************************************************************/
 
-static WRITE32_HANDLER( comm1_w )
+WRITE32_MEMBER(hornet_state::comm1_w)
 {
 	printf("comm1_w: %08X, %08X, %08X\n", offset, data, mem_mask);
 }
 
-static WRITE32_HANDLER( comm_rombank_w )
+WRITE32_MEMBER(hornet_state::comm_rombank_w)
 {
 	int bank = data >> 24;
-	UINT8 *usr3 = space->machine().region("user3")->base();
+	UINT8 *usr3 = memregion("user3")->base();
 	if (usr3 != NULL)
-		memory_set_bank(space->machine(), "bank1", bank & 0x7f);
+		membank("bank1")->set_entry(bank & 0x7f);
 }
 
-static READ32_HANDLER( comm0_unk_r )
+READ32_MEMBER(hornet_state::comm0_unk_r)
 {
 //  printf("comm0_unk_r: %08X, %08X\n", offset, mem_mask);
 	return 0xffffffff;
 }
 
 
-static READ32_HANDLER(gun_r)
+READ32_MEMBER(hornet_state::gun_r)
 {
-	hornet_state *state = space->machine().driver_data<hornet_state>();
-	return state->m_gn680_ret0<<16 | state->m_gn680_ret1;
+	return m_gn680_ret0<<16 | m_gn680_ret1;
 }
 
-static WRITE32_HANDLER(gun_w)
+WRITE32_MEMBER(hornet_state::gun_w)
 {
-	hornet_state *state = space->machine().driver_data<hornet_state>();
 	if (mem_mask == 0xffff0000)
 	{
-		state->m_gn680_latch = data>>16;
-		cputag_set_input_line(space->machine(), "gn680", M68K_IRQ_6, HOLD_LINE);
+		m_gn680_latch = data>>16;
+		cputag_set_input_line(machine(), "gn680", M68K_IRQ_6, HOLD_LINE);
 	}
 }
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( hornet_map, AS_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE_MEMBER(hornet_state, m_workram)		/* Work RAM */
+static ADDRESS_MAP_START( hornet_map, AS_PROGRAM, 32, hornet_state )
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("workram")		/* Work RAM */
 	AM_RANGE(0x74000000, 0x740000ff) AM_READWRITE(hornet_k037122_reg_r, hornet_k037122_reg_w)
 	AM_RANGE(0x74020000, 0x7403ffff) AM_READWRITE(hornet_k037122_sram_r, hornet_k037122_sram_w)
 	AM_RANGE(0x74040000, 0x7407ffff) AM_READWRITE(hornet_k037122_char_r, hornet_k037122_char_w)
 	AM_RANGE(0x74080000, 0x7408000f) AM_READWRITE(gun_r, gun_w)
-	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
-	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
+	AM_RANGE(0x78000000, 0x7800ffff) AM_READWRITE_LEGACY(cgboard_dsp_shared_r_ppc, cgboard_dsp_shared_w_ppc)
+	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE_LEGACY(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7d000000, 0x7d00ffff) AM_READ8(sysreg_r, 0xffffffff)
 	AM_RANGE(0x7d010000, 0x7d01ffff) AM_WRITE8(sysreg_w, 0xffffffff)
-	AM_RANGE(0x7d020000, 0x7d021fff) AM_DEVREADWRITE8("m48t58", timekeeper_r, timekeeper_w, 0xffffffff)	/* M48T58Y RTC/NVRAM */
-	AM_RANGE(0x7d030000, 0x7d030007) AM_DEVREADWRITE("k056800", k056800_host_r, k056800_host_w)
+	AM_RANGE(0x7d020000, 0x7d021fff) AM_DEVREADWRITE8_LEGACY("m48t58", timekeeper_r, timekeeper_w, 0xffffffff)	/* M48T58Y RTC/NVRAM */
+	AM_RANGE(0x7d030000, 0x7d030007) AM_DEVREADWRITE_LEGACY("k056800", k056800_host_r, k056800_host_w)
 	AM_RANGE(0x7d042000, 0x7d043fff) AM_RAM				/* COMM BOARD 0 */
 	AM_RANGE(0x7d044000, 0x7d044007) AM_READ(comm0_unk_r)
 	AM_RANGE(0x7d048000, 0x7d048003) AM_WRITE(comm1_w)
@@ -628,11 +649,11 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( sound_memmap, AS_PROGRAM, 16, hornet_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM		/* Work RAM */
-	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("rfsnd", rf5c400_r, rf5c400_w)		/* Ricoh RF5C400 */
-	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE("k056800", k056800_sound_r, k056800_sound_w)
+	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE_LEGACY("rfsnd", rf5c400_r, rf5c400_w)		/* Ricoh RF5C400 */
+	AM_RANGE(0x300000, 0x30000f) AM_DEVREADWRITE_LEGACY("k056800", k056800_sound_r, k056800_sound_w)
 	AM_RANGE(0x480000, 0x480001) AM_WRITENOP
 	AM_RANGE(0x4c0000, 0x4c0001) AM_WRITENOP
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP
@@ -641,37 +662,35 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static WRITE16_HANDLER(gn680_sysctrl)
+WRITE16_MEMBER(hornet_state::gn680_sysctrl)
 {
 	// bit 15 = watchdog toggle
 	// lower 4 bits = LEDs?
 }
 
-static READ16_HANDLER(gn680_latch_r)
+READ16_MEMBER(hornet_state::gn680_latch_r)
 {
-	hornet_state *state = space->machine().driver_data<hornet_state>();
-	cputag_set_input_line(space->machine(), "gn680", M68K_IRQ_6, CLEAR_LINE);
+	cputag_set_input_line(machine(), "gn680", M68K_IRQ_6, CLEAR_LINE);
 
-	return state->m_gn680_latch;
+	return m_gn680_latch;
 }
 
-static WRITE16_HANDLER(gn680_latch_w)
+WRITE16_MEMBER(hornet_state::gn680_latch_w)
 {
-	hornet_state *state = space->machine().driver_data<hornet_state>();
 	if (offset)
 	{
-		state->m_gn680_ret1 = data;
+		m_gn680_ret1 = data;
 	}
 	else
 	{
-		state->m_gn680_ret0 = data;
+		m_gn680_ret0 = data;
 	}
 }
 
 // WORD at 30000e: IRQ 4 tests bits 6 and 7, IRQ5 tests bits 4 and 5
 // (vsync and hsync status for each of the two screens?)
 
-static ADDRESS_MAP_START( gn680_memmap, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( gn680_memmap, AS_PROGRAM, 16, hornet_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x200000, 0x203fff) AM_RAM
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(gn680_sysctrl)
@@ -682,47 +701,43 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
-static READ32_HANDLER( dsp_dataram0_r )
+READ32_MEMBER(hornet_state::dsp_dataram0_r)
 {
-	hornet_state *state = space->machine().driver_data<hornet_state>();
-	return state->m_sharc_dataram[0][offset] & 0xffff;
+	return m_sharc_dataram0[offset] & 0xffff;
 }
 
-static WRITE32_HANDLER( dsp_dataram0_w )
+WRITE32_MEMBER(hornet_state::dsp_dataram0_w)
 {
-	hornet_state *state = space->machine().driver_data<hornet_state>();
-	state->m_sharc_dataram[0][offset] = data;
+	m_sharc_dataram0[offset] = data;
 }
 
-static READ32_HANDLER( dsp_dataram1_r )
+READ32_MEMBER(hornet_state::dsp_dataram1_r)
 {
-	hornet_state *state = space->machine().driver_data<hornet_state>();
-	return state->m_sharc_dataram[1][offset] & 0xffff;
+	return m_sharc_dataram1[offset] & 0xffff;
 }
 
-static WRITE32_HANDLER( dsp_dataram1_w )
+WRITE32_MEMBER(hornet_state::dsp_dataram1_w)
 {
-	hornet_state *state = space->machine().driver_data<hornet_state>();
-	state->m_sharc_dataram[1][offset] = data;
+	m_sharc_dataram1[offset] = data;
 }
 
-static ADDRESS_MAP_START( sharc0_map, AS_DATA, 32 )
-	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
-	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w) AM_BASE_MEMBER(hornet_state, m_sharc_dataram[0])
+static ADDRESS_MAP_START( sharc0_map, AS_DATA, 32, hornet_state )
+	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE_LEGACY(cgboard_0_shared_sharc_r, cgboard_0_shared_sharc_w)
+	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram0_r, dsp_dataram0_w) AM_SHARE("sharc_dataram0")
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
-	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE("voodoo0", voodoo_r, voodoo_w)
-	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
-	AM_RANGE(0x3500000, 0x35000ff) AM_READWRITE(K033906_0_r, K033906_0_w)
+	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE_LEGACY("voodoo0", voodoo_r, voodoo_w)
+	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE_LEGACY(cgboard_0_comm_sharc_r, cgboard_0_comm_sharc_w)
+	AM_RANGE(0x3500000, 0x35000ff) AM_READWRITE_LEGACY(K033906_0_r, K033906_0_w)
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank5")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sharc1_map, AS_DATA, 32 )
-	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE(cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
-	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w) AM_BASE_MEMBER(hornet_state, m_sharc_dataram[1])
+static ADDRESS_MAP_START( sharc1_map, AS_DATA, 32, hornet_state )
+	AM_RANGE(0x0400000, 0x041ffff) AM_READWRITE_LEGACY(cgboard_1_shared_sharc_r, cgboard_1_shared_sharc_w)
+	AM_RANGE(0x0500000, 0x05fffff) AM_READWRITE(dsp_dataram1_r, dsp_dataram1_w) AM_SHARE("sharc_dataram1")
 	AM_RANGE(0x1400000, 0x14fffff) AM_RAM
-	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE("voodoo1", voodoo_r, voodoo_w)
-	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE(cgboard_1_comm_sharc_r, cgboard_1_comm_sharc_w)
-	AM_RANGE(0x3500000, 0x35000ff) AM_READWRITE(K033906_1_r, K033906_1_w)
+	AM_RANGE(0x2400000, 0x27fffff) AM_DEVREADWRITE_LEGACY("voodoo1", voodoo_r, voodoo_w)
+	AM_RANGE(0x3400000, 0x34000ff) AM_READWRITE_LEGACY(cgboard_1_comm_sharc_r, cgboard_1_comm_sharc_w)
+	AM_RANGE(0x3500000, 0x35000ff) AM_READWRITE_LEGACY(K033906_1_r, K033906_1_w)
 	AM_RANGE(0x3600000, 0x37fffff) AM_ROMBANK("bank6")
 ADDRESS_MAP_END
 
@@ -878,18 +893,18 @@ static MACHINE_START( hornet )
 
 static MACHINE_RESET( hornet )
 {
-	UINT8 *usr3 = machine.region("user3")->base();
-	UINT8 *usr5 = machine.region("user5")->base();
+	UINT8 *usr3 = machine.root_device().memregion("user3")->base();
+	UINT8 *usr5 = machine.root_device().memregion("user5")->base();
 	if (usr3 != NULL)
 	{
-		memory_configure_bank(machine, "bank1", 0, machine.region("user3")->bytes() / 0x40000, usr3, 0x40000);
-		memory_set_bank(machine, "bank1", 0);
+		machine.root_device().membank("bank1")->configure_entries(0, machine.root_device().memregion("user3")->bytes() / 0x40000, usr3, 0x40000);
+		machine.root_device().membank("bank1")->set_entry(0);
 	}
 
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
-		memory_set_bankptr(machine, "bank5", usr5);
+		machine.root_device().membank("bank5")->set_base(usr5);
 }
 
 static double adc12138_input_callback( device_t *device, UINT8 input )
@@ -999,19 +1014,19 @@ MACHINE_CONFIG_END
 
 static MACHINE_RESET( hornet_2board )
 {
-	UINT8 *usr3 = machine.region("user3")->base();
-	UINT8 *usr5 = machine.region("user5")->base();
+	UINT8 *usr3 = machine.root_device().memregion("user3")->base();
+	UINT8 *usr5 = machine.root_device().memregion("user5")->base();
 
 	if (usr3 != NULL)
 	{
-		memory_configure_bank(machine, "bank1", 0, machine.region("user3")->bytes() / 0x40000, usr3, 0x40000);
-		memory_set_bank(machine, "bank1", 0);
+		machine.root_device().membank("bank1")->configure_entries(0, machine.root_device().memregion("user3")->bytes() / 0x40000, usr3, 0x40000);
+		machine.root_device().membank("bank1")->set_entry(0);
 	}
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 	cputag_set_input_line(machine, "dsp2", INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
-		memory_set_bankptr(machine, "bank5", usr5);
+		machine.root_device().membank("bank5")->set_base(usr5);
 }
 
 static MACHINE_CONFIG_DERIVED( hornet_2board, hornet )
@@ -1229,7 +1244,7 @@ static DRIVER_INIT(hornet)
 {
 	hornet_state *state = machine.driver_data<hornet_state>();
 	init_konami_cgboard(machine, 1, CGBOARD_TYPE_HORNET);
-	set_cgboard_texture_bank(machine, 0, "bank5", machine.region("user5")->base());
+	set_cgboard_texture_bank(machine, 0, "bank5", state->memregion("user5")->base());
 
 	state->m_led_reg0 = state->m_led_reg1 = 0x7f;
 
@@ -1240,8 +1255,8 @@ static DRIVER_INIT(hornet_2board)
 {
 	hornet_state *state = machine.driver_data<hornet_state>();
 	init_konami_cgboard(machine, 2, CGBOARD_TYPE_HORNET);
-	set_cgboard_texture_bank(machine, 0, "bank5", machine.region("user5")->base());
-	set_cgboard_texture_bank(machine, 1, "bank6", machine.region("user5")->base());
+	set_cgboard_texture_bank(machine, 0, "bank5", state->memregion("user5")->base());
+	set_cgboard_texture_bank(machine, 1, "bank6", state->memregion("user5")->base());
 
 	state->m_led_reg0 = state->m_led_reg1 = 0x7f;
 

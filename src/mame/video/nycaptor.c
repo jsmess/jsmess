@@ -23,18 +23,18 @@ static int nycaptor_spot( running_machine &machine )
 		return state->m_sharedram[0x299] ? state->m_sharedram[0x298] : 0;
 	else
 		return 0;
+
+    return 0;
 }
 
-WRITE8_HANDLER(nycaptor_spriteram_w)
+WRITE8_MEMBER(nycaptor_state::nycaptor_spriteram_w)
 {
-	nycaptor_state *state = space->machine().driver_data<nycaptor_state>();
-	state->m_spriteram[offset] = data;
+	m_spriteram[offset] = data;
 }
 
-READ8_HANDLER(nycaptor_spriteram_r)
+READ8_MEMBER(nycaptor_state::nycaptor_spriteram_r)
 {
-	nycaptor_state *state = space->machine().driver_data<nycaptor_state>();
-	return state->m_spriteram[offset];
+	return m_spriteram[offset];
 }
 
 static TILE_GET_INFO( get_tile_info )
@@ -84,87 +84,77 @@ VIDEO_START( nycaptor )
 	state->m_bg_tilemap->set_transmask(2, 0xfffc, 0x0003);//split 2
 	state->m_bg_tilemap->set_transmask(3, 0xfff0, 0x000f);//split 3
 
-	machine.generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
-	machine.generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x200);
+	state->m_generic_paletteram_8.allocate(0x200);
+	state->m_generic_paletteram2_8.allocate(0x200);
 	state->m_bg_tilemap->set_scroll_cols(32);
 
 	state->save_pointer(NAME(state->m_spriteram), 160);
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x200);
-	state_save_register_global_pointer(machine, machine.generic.paletteram2.u8, 0x200);
 }
 
-WRITE8_HANDLER( nycaptor_videoram_w )
+WRITE8_MEMBER(nycaptor_state::nycaptor_videoram_w)
 {
-	nycaptor_state *state = space->machine().driver_data<nycaptor_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset >> 1);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-READ8_HANDLER( nycaptor_videoram_r )
+READ8_MEMBER(nycaptor_state::nycaptor_videoram_r)
 {
-	nycaptor_state *state = space->machine().driver_data<nycaptor_state>();
-	return state->m_videoram[offset];
+	return m_videoram[offset];
 }
 
-WRITE8_HANDLER( nycaptor_palette_w )
+WRITE8_MEMBER(nycaptor_state::nycaptor_palette_w)
 {
-	nycaptor_state *state = space->machine().driver_data<nycaptor_state>();
 
-	if (state->m_gametype == 2) //colt
+	if (m_gametype == 2) //colt
 		return;
 
 	if (offset & 0x100)
-		paletteram_xxxxBBBBGGGGRRRR_split2_w(space, (offset & 0xff) + (state->m_palette_bank << 8), data);
+		paletteram_xxxxBBBBGGGGRRRR_byte_split_hi_w(space, (offset & 0xff) + (m_palette_bank << 8), data);
 	else
-		paletteram_xxxxBBBBGGGGRRRR_split1_w(space, (offset & 0xff) + (state->m_palette_bank << 8), data);
+		paletteram_xxxxBBBBGGGGRRRR_byte_split_lo_w(space, (offset & 0xff) + (m_palette_bank << 8), data);
 }
 
-READ8_HANDLER( nycaptor_palette_r )
+READ8_MEMBER(nycaptor_state::nycaptor_palette_r)
 {
-	nycaptor_state *state = space->machine().driver_data<nycaptor_state>();
 
 	if (offset & 0x100)
-		return space->machine().generic.paletteram2.u8[(offset & 0xff) + (state->m_palette_bank << 8)];
+		return m_generic_paletteram2_8[(offset & 0xff) + (m_palette_bank << 8)];
 	else
-		return space->machine().generic.paletteram.u8 [(offset & 0xff) + (state->m_palette_bank << 8)];
+		return m_generic_paletteram_8 [(offset & 0xff) + (m_palette_bank << 8)];
 }
 
-WRITE8_HANDLER( nycaptor_gfxctrl_w )
+WRITE8_MEMBER(nycaptor_state::nycaptor_gfxctrl_w)
 {
-	nycaptor_state *state = space->machine().driver_data<nycaptor_state>();
 
-	if (state->m_gfxctrl == data)
+	if (m_gfxctrl == data)
 		return;
 
-	state->m_gfxctrl = data;
+	m_gfxctrl = data;
 
-	if (state->m_char_bank != ((data & 0x18) >> 3))
+	if (m_char_bank != ((data & 0x18) >> 3))
 	{
-		state->m_char_bank = ((data & 0x18) >> 3);
-		state->m_bg_tilemap->mark_all_dirty();
+		m_char_bank = ((data & 0x18) >> 3);
+		m_bg_tilemap->mark_all_dirty();
 	}
 
-	state->m_palette_bank = BIT(data, 5);
+	m_palette_bank = BIT(data, 5);
 
 }
 
-READ8_HANDLER( nycaptor_gfxctrl_r )
+READ8_MEMBER(nycaptor_state::nycaptor_gfxctrl_r)
 {
-	nycaptor_state *state = space->machine().driver_data<nycaptor_state>();
-	return state->m_gfxctrl;
+	return m_gfxctrl;
 }
 
-READ8_HANDLER( nycaptor_scrlram_r )
+READ8_MEMBER(nycaptor_state::nycaptor_scrlram_r)
 {
-	nycaptor_state *state = space->machine().driver_data<nycaptor_state>();
-	return state->m_scrlram[offset];
+	return m_scrlram[offset];
 }
 
-WRITE8_HANDLER( nycaptor_scrlram_w )
+WRITE8_MEMBER(nycaptor_state::nycaptor_scrlram_w)
 {
-	nycaptor_state *state = space->machine().driver_data<nycaptor_state>();
-	state->m_scrlram[offset] = data;
-	state->m_bg_tilemap->set_scrolly(offset, data);
+	m_scrlram[offset] = data;
+	m_bg_tilemap->set_scrolly(offset, data);
 }
 
 static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
@@ -275,7 +265,7 @@ SCREEN_UPDATE_IND16( nycaptor )
 		draw_sprites(screen.machine(), bitmap, cliprect, 7);
 	}
 	else
-	#endif
+#endif
 	switch (nycaptor_spot(screen.machine()) & 3)
 	{
 	case 0:

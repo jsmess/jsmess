@@ -58,7 +58,7 @@ const device_type HD61830 = &device_creator<hd61830_device>;
 
 
 // default address map
-static ADDRESS_MAP_START( hd61830, AS_0, 8 )
+static ADDRESS_MAP_START( hd61830, AS_0, 8, hd61830_device )
 	AM_RANGE(0x0000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -478,7 +478,7 @@ void hd61830_device::draw_char(bitmap_ind16 &bitmap, const rectangle &cliprect, 
 					addr = 160*7 + (md - 0xe0) * 11 + cl;
 				}
 
-				data = subregion("hd61830")->u8(addr);
+				data = memregion("hd61830")->u8(addr);
 			}
 
 			int cursor = m_mcr & MODE_CURSOR;

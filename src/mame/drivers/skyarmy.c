@@ -33,24 +33,33 @@ class skyarmy_state : public driver_device
 {
 public:
 	skyarmy_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_colorram(*this, "colorram"),
+		m_spriteram(*this, "spriteram"),
+		m_scrollram(*this, "scrollram"){ }
 
-	UINT8 *m_spriteram;
-	UINT8 *m_videoram;
-	UINT8 *m_colorram;
-	UINT8 *m_scrollram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_scrollram;
 	tilemap_t* m_tilemap;
 	int m_nmi;
+	DECLARE_WRITE8_MEMBER(skyarmy_flip_screen_x_w);
+	DECLARE_WRITE8_MEMBER(skyarmy_flip_screen_y_w);
+	DECLARE_WRITE8_MEMBER(skyarmy_videoram_w);
+	DECLARE_WRITE8_MEMBER(skyarmy_colorram_w);
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
 };
 
-static WRITE8_HANDLER( skyarmy_flip_screen_x_w )
+WRITE8_MEMBER(skyarmy_state::skyarmy_flip_screen_x_w)
 {
-	flip_screen_x_set(space->machine(), data & 0x01);
+	flip_screen_x_set(data & 0x01);
 }
 
-static WRITE8_HANDLER( skyarmy_flip_screen_y_w )
+WRITE8_MEMBER(skyarmy_state::skyarmy_flip_screen_y_w)
 {
-	flip_screen_y_set(space->machine(), data & 0x01);
+	flip_screen_y_set(data & 0x01);
 }
 
 static TILE_GET_INFO( get_skyarmy_tile_info )
@@ -62,24 +71,23 @@ static TILE_GET_INFO( get_skyarmy_tile_info )
 	SET_TILE_INFO( 0, code, attr, 0);
 }
 
-static WRITE8_HANDLER( skyarmy_videoram_w )
+WRITE8_MEMBER(skyarmy_state::skyarmy_videoram_w)
 {
-	skyarmy_state *state = space->machine().driver_data<skyarmy_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( skyarmy_colorram_w )
+WRITE8_MEMBER(skyarmy_state::skyarmy_colorram_w)
 {
-	skyarmy_state *state = space->machine().driver_data<skyarmy_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_tilemap->mark_tile_dirty(offset);
 }
 
 static PALETTE_INIT( skyarmy )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < 32;i++)
@@ -154,21 +162,20 @@ static INTERRUPT_GEN( skyarmy_nmi_source )
 }
 
 
-static WRITE8_HANDLER( nmi_enable_w )
+WRITE8_MEMBER(skyarmy_state::nmi_enable_w)
 {
-	skyarmy_state *state = space->machine().driver_data<skyarmy_state>();
 
-	state->m_nmi=data & 1;
+	m_nmi=data & 1;
 }
 
 
-static ADDRESS_MAP_START( skyarmy_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( skyarmy_map, AS_PROGRAM, 8, skyarmy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(skyarmy_videoram_w) AM_BASE_MEMBER(skyarmy_state,m_videoram) /* Video RAM */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(skyarmy_colorram_w) AM_BASE_MEMBER(skyarmy_state,m_colorram) /* Color RAM */
-	AM_RANGE(0x9800, 0x983f) AM_RAM AM_BASE_MEMBER(skyarmy_state,m_spriteram) /* Sprites */
-	AM_RANGE(0x9840, 0x985f) AM_RAM AM_BASE_MEMBER(skyarmy_state,m_scrollram)  /* Scroll RAM */
+	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(skyarmy_videoram_w) AM_SHARE("videoram") /* Video RAM */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(skyarmy_colorram_w) AM_SHARE("colorram") /* Color RAM */
+	AM_RANGE(0x9800, 0x983f) AM_RAM AM_SHARE("spriteram") /* Sprites */
+	AM_RANGE(0x9840, 0x985f) AM_RAM AM_SHARE("scrollram")  /* Scroll RAM */
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW")
 	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P1")
 	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("P2")
@@ -179,10 +186,10 @@ static ADDRESS_MAP_START( skyarmy_map, AS_PROGRAM, 8 )
 	AM_RANGE(0xa007, 0xa007) AM_WRITENOP
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( skyarmy_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( skyarmy_io_map, AS_IO, 8, skyarmy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x05) AM_DEVWRITE("aysnd", ay8910_address_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVREAD("aysnd", ay8910_r)
+	AM_RANGE(0x04, 0x05) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x06, 0x06) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
 ADDRESS_MAP_END
 
 

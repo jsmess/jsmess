@@ -27,7 +27,6 @@
 *
 ******************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 // port 40 read reads eprom socket pins 11-13, 15-19 (i.e. pin D0 to pin D7)
 
 // port 40 write writes eprom socket pins 11-13, 15-19 (i.e. pin D0 to pin D7)
@@ -73,7 +72,8 @@ public:
 		  m_terminal(*this, TERMINAL_TAG),
 		  m_speaker(*this, "speaker"),
 		  m_acia(*this, "acia")
-	{ }
+		//, m_main_ram(*this, "main_ram")
+		{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_terminal;
@@ -107,7 +107,7 @@ public:
 	UINT8 m_speaker_state;
 	// ram stuff for banking
 	UINT8 m_ram_bank;
-	UINT8 *m_main_ram;
+	//required_shared_ptr<UINT8> m_main_ram;
 	// states
 	UINT8 m_kbd;
 	UINT8 m_kbd_row;
@@ -133,18 +133,18 @@ static TIMER_CALLBACK( ep804_kbd_callback )
 	machine.scheduler().timer_set(attotime::from_hz(10000), FUNC(ep804_kbd_callback));
     // 74C923 4 by 5 key encoder.
     // if previous key is still held, bail out
-	if (input_port_read(machine, keynames[state->m_kbd_row]))
-		if (state->digel804_convert_col_to_bin(input_port_read(machine, keynames[state->m_kbd_row]), state->m_kbd_row) == state->m_kbd)
+	if (machine.root_device().ioport(keynames[state->m_kbd_row])->read())
+		if (state->digel804_convert_col_to_bin(machine.root_device().ioport(keynames[state->m_kbd_row])->read(), state->m_kbd_row) == state->m_kbd)
 			return;
 
 	state->m_kbd_row++;
 	state->m_kbd_row &= 3;
 
 	/* see if a key pressed */
-	if (input_port_read(machine, keynames[state->m_kbd_row]))
+	if (machine.root_device().ioport(keynames[state->m_kbd_row])->read())
 	{
 		fprintf(stderr,"DEBUG: key was pressed!\n");
-		state->m_kbd = state->digel804_convert_col_to_bin(input_port_read(machine, keynames[state->m_kbd_row]), state->m_kbd_row);
+		state->m_kbd = state->digel804_convert_col_to_bin(machine.root_device().ioport(keynames[state->m_kbd_row])->read(), state->m_kbd_row);
 		state->m_key_intq = 0;
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);//ASSERT_LINE);
 	}
@@ -174,7 +174,7 @@ static DRIVER_INIT( digel804 )
 	state->m_powerfail_state = 1; // "O11"
 	state->m_chipinsert_state = 0; // PIN
 	state->m_ram_bank = 0;
-	memory_set_bankptr( machine, "bankedram", machine.region("user_ram")->base() + ( state->m_ram_bank * 0x10000 ));
+	state->membank( "bankedram" )->set_base( state->memregion("user_ram")->base() + ( state->m_ram_bank * 0x10000 ));
 	machine.scheduler().timer_set(attotime::from_hz(10000), FUNC(ep804_kbd_callback));
 }
 
@@ -290,7 +290,7 @@ WRITE8_MEMBER( digel804_state::op43 )
 	m_ram_bank = data&7;
 	if ((data&0xF8)!=0)
 		logerror("Digel804: port 0x43 ram bank had unexpected data %02x written to it!\n", data);
-	memory_set_bankptr( machine(), "bankedram", machine().region("user_ram")->base() + ( m_ram_bank * 0x10000 ));
+	membank( "bankedram" )->set_base( memregion("user_ram")->base() + ( m_ram_bank * 0x10000 ));
 
 }
 
@@ -437,10 +437,10 @@ WRITE8_MEMBER( digel804_state::acia_control_w )
 static ADDRESS_MAP_START(z80_mem_804_1_4, AS_PROGRAM, 8, digel804_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM // 3f in mapper = rom J3
-	//AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_main_ram) // 6f in mapper = RAM L3 (6164)
-	//AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(m_main_ram) // 77 in mapper = RAM M3 (6164)
-	//AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE(m_main_ram) // 7b in mapper = RAM N3 (6164)
-	//AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(m_main_ram) // 7d in mapper = RAM O3 (6164)
+	//AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("main_ram") // 6f in mapper = RAM L3 (6164)
+	//AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("main_ram") // 77 in mapper = RAM M3 (6164)
+	//AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("main_ram") // 7b in mapper = RAM N3 (6164)
+	//AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("main_ram") // 7d in mapper = RAM O3 (6164)
 	AM_RANGE(0x4000,0xbfff) AM_RAMBANK("bankedram")
 	// c000-cfff is open bus in mapper, 7f
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM // 7e in mapper = RAM P3 (6116)
@@ -452,10 +452,10 @@ static ADDRESS_MAP_START(z80_mem_804_1_2, AS_PROGRAM, 8, digel804_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM // 3f in mapper = rom J3
 	AM_RANGE(0x2000, 0x3fff) AM_ROM // 5f in mapper = rom K3
-	//AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(m_main_ram) // 6f in mapper = RAM L3 (6164)
-	//AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(m_main_ram) // 77 in mapper = RAM M3 (6164)
-	//AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE(m_main_ram) // 7b in mapper = RAM N3 (6164)
-	//AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(m_main_ram) // 7d in mapper = RAM O3 (6164)
+	//AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("main_ram") // 6f in mapper = RAM L3 (6164)
+	//AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("main_ram") // 77 in mapper = RAM M3 (6164)
+	//AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("main_ram") // 7b in mapper = RAM N3 (6164)
+	//AM_RANGE(0xa000, 0xbfff) AM_RAM AM_SHARE("main_ram") // 7d in mapper = RAM O3 (6164)
 	AM_RANGE(0x4000,0xbfff) AM_RAMBANK("bankedram")
 	// c000-cfff is open bus in mapper, 7f
 	//AM_RANGE(0xc000, 0xc7ff) AM_RAM // hack for now to test, since sometimes it writes to c3ff

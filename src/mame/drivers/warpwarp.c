@@ -149,18 +149,17 @@ static INTERRUPT_GEN( vblank_irq )
 
 
 /* B&W Games I/O */
-static READ8_HANDLER( geebee_in_r )
+READ8_MEMBER(warpwarp_state::geebee_in_r)
 {
-	warpwarp_state *state = space->machine().driver_data<warpwarp_state>();
 	int res;
 	static const char *const portnames[] = { "SW0", "SW1", "DSW2", "PLACEHOLDER" };	// "IN1" & "IN2" are read separately when offset==3
 
 	offset &= 3;
-	res = input_port_read_safe(space->machine(), portnames[offset], 0);
+	res = ioport(portnames[offset])->read_safe(0);
 	if (offset == 3)
 	{
-		res = input_port_read(space->machine(), (flip_screen_get(space->machine()) & 1) ? "IN2" : "IN1");	// read player 2 input in cocktail mode
-		if (state->m_handle_joystick)
+		res = ioport((flip_screen() & 1) ? "IN2" : "IN1")->read();	// read player 2 input in cocktail mode
+		if (m_handle_joystick)
 		{
 			/* map digital two-way joystick to two fixed VOLIN values */
 			if (res & 2) return 0x9f;
@@ -171,59 +170,57 @@ static READ8_HANDLER( geebee_in_r )
 	return res;
 }
 
-static WRITE8_HANDLER( geebee_out6_w )
+WRITE8_MEMBER(warpwarp_state::geebee_out6_w)
 {
-	warpwarp_state *state = space->machine().driver_data<warpwarp_state>();
 	switch (offset & 3)
 	{
 		case 0:
-			state->m_ball_h = data;
+			m_ball_h = data;
 			break;
 		case 1:
-			state->m_ball_v = data;
+			m_ball_v = data;
 			break;
 		case 2:
 			/* n.c. */
 			break;
 		case 3:
-			geebee_sound_w(space->machine().device("geebee"),0,data);
+			geebee_sound_w(machine().device("geebee"),0,data);
 			break;
 	}
 }
 
-static WRITE8_HANDLER( geebee_out7_w )
+WRITE8_MEMBER(warpwarp_state::geebee_out7_w)
 {
-	warpwarp_state *state = space->machine().driver_data<warpwarp_state>();
 	switch (offset & 7)
 	{
 		case 0:
-			set_led_status(space->machine(), 0,data & 1);
+			set_led_status(machine(), 0,data & 1);
 			break;
 		case 1:
-			set_led_status(space->machine(), 1,data & 1);
+			set_led_status(machine(), 1,data & 1);
 			break;
 		case 2:
-			set_led_status(space->machine(), 2,data & 1);
+			set_led_status(machine(), 2,data & 1);
 			break;
 		case 3:
-			coin_counter_w(space->machine(), 0,data & 1);
+			coin_counter_w(machine(), 0,data & 1);
 			break;
 		case 4:
-			if (strcmp(space->machine().system().name, "geebeeb"))
-				coin_lockout_global_w(space->machine(), ~data & 1);
+			if (strcmp(machine().system().name, "geebeeb"))
+				coin_lockout_global_w(machine(), ~data & 1);
 			break;
 		case 5:
-			if( state->m_geebee_bgw != (data & 1) )
-				space->machine().tilemap().mark_all_dirty();
-			state->m_geebee_bgw = data & 1;
+			if( m_geebee_bgw != (data & 1) )
+				machine().tilemap().mark_all_dirty();
+			m_geebee_bgw = data & 1;
 			break;
 		case 6:
-			state->m_ball_on = data & 1;
+			m_ball_on = data & 1;
 			if (~data & 1)
-				cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 			break;
 		case 7:
-			flip_screen_set(space->machine(), data & 1);
+			flip_screen_set(data & 1);
 			break;
 	}
 }
@@ -232,15 +229,15 @@ static WRITE8_HANDLER( geebee_out7_w )
 /* Color Games I/O */
 
 /* Read Switch Inputs */
-static READ8_HANDLER( warpwarp_sw_r )
+READ8_MEMBER(warpwarp_state::warpwarp_sw_r)
 {
-	return (input_port_read(space->machine(), "IN0") >> (offset & 7)) & 1;
+	return (ioport("IN0")->read() >> (offset & 7)) & 1;
 }
 
 /* Read Dipswitches */
 static READ8_DEVICE_HANDLER( warpwarp_dsw1_r )
 {
-	return (input_port_read(device->machine(), "DSW1") >> (offset & 7)) & 1;
+	return (device->machine().root_device().ioport("DSW1")->read() >> (offset & 7)) & 1;
 }
 
 /* Read mux Controller Inputs */
@@ -249,7 +246,7 @@ static READ8_DEVICE_HANDLER( warpwarp_vol_r )
 	warpwarp_state *state = device->machine().driver_data<warpwarp_state>();
 	int res;
 
-	res = input_port_read(device->machine(), (flip_screen_get(device->machine()) & 1) ? "VOLIN2" : "VOLIN1");
+	res = state->ioport((state->flip_screen() & 1) ? "VOLIN2" : "VOLIN1")->read();
 	if (state->m_handle_joystick)
 	{
 		if (res & 1) return 0x0f;
@@ -261,19 +258,18 @@ static READ8_DEVICE_HANDLER( warpwarp_vol_r )
 	return res;
 }
 
-static WRITE8_HANDLER( warpwarp_out0_w )
+WRITE8_MEMBER(warpwarp_state::warpwarp_out0_w)
 {
-	warpwarp_state *state = space->machine().driver_data<warpwarp_state>();
 	switch (offset & 3)
 	{
 		case 0:
-			state->m_ball_h = data;
+			m_ball_h = data;
 			break;
 		case 1:
-			state->m_ball_v = data;
+			m_ball_v = data;
 			break;
 		case 2:
-			warpwarp_sound_w(space->machine().device("warpwarp"),0,data);
+			warpwarp_sound_w(machine().device("warpwarp"),0,data);
 			break;
 		case 3:
 			watchdog_reset_w(space,0,data);
@@ -281,45 +277,44 @@ static WRITE8_HANDLER( warpwarp_out0_w )
 	}
 }
 
-static WRITE8_HANDLER( warpwarp_out3_w )
+WRITE8_MEMBER(warpwarp_state::warpwarp_out3_w)
 {
-	warpwarp_state *state = space->machine().driver_data<warpwarp_state>();
 	switch (offset & 7)
 	{
 		case 0:
-			set_led_status(space->machine(), 0,data & 1);
+			set_led_status(machine(), 0,data & 1);
 			break;
 		case 1:
-			set_led_status(space->machine(), 1,data & 1);
+			set_led_status(machine(), 1,data & 1);
 			break;
 		case 2:
-			set_led_status(space->machine(), 2,data & 1);
+			set_led_status(machine(), 2,data & 1);
 			break;
 		case 3:
 			/* n.c. */
 			break;
 		case 4:
-			coin_lockout_global_w(space->machine(), ~data & 1);
+			coin_lockout_global_w(machine(), ~data & 1);
 			break;
 		case 5:
-			coin_counter_w(space->machine(), 0,data & 1);
+			coin_counter_w(machine(), 0,data & 1);
 			break;
 		case 6:
-			state->m_ball_on = data & 1;
+			m_ball_on = data & 1;
 			if (~data & 1)
-				cputag_set_input_line(space->machine(), "maincpu", 0, CLEAR_LINE);
+				cputag_set_input_line(machine(), "maincpu", 0, CLEAR_LINE);
 			break;
 		case 7:
-			flip_screen_set(space->machine(), data & 1);
+			flip_screen_set(data & 1);
 			break;
 	}
 }
 
 
 
-static ADDRESS_MAP_START( geebee_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( geebee_map, AS_PROGRAM, 8, warpwarp_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x400) AM_RAM_WRITE(geebee_videoram_w) AM_BASE_MEMBER(warpwarp_state, m_geebee_videoram) // mirror used by kaitei due to a bug
+	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x400) AM_RAM_WRITE(geebee_videoram_w) AM_SHARE("geebee_videoram") // mirror used by kaitei due to a bug
 	AM_RANGE(0x3000, 0x37ff) AM_ROM	AM_REGION("gfx1", 0) // 3000-33ff in geebee
     AM_RANGE(0x4000, 0x40ff) AM_RAM
 	AM_RANGE(0x5000, 0x53ff) AM_READ(geebee_in_r)
@@ -327,32 +322,32 @@ static ADDRESS_MAP_START( geebee_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x7fff) AM_WRITE(geebee_out7_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( geebee_port_map, AS_IO, 8 )
+static ADDRESS_MAP_START( geebee_port_map, AS_IO, 8, warpwarp_state )
 	AM_RANGE(0x50, 0x53) AM_READ(geebee_in_r)
 	AM_RANGE(0x60, 0x6f) AM_WRITE(geebee_out6_w)
 	AM_RANGE(0x70, 0x7f) AM_WRITE(geebee_out7_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( bombbee_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( bombbee_map, AS_PROGRAM, 8, warpwarp_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_BASE_MEMBER(warpwarp_state, m_videoram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0x6000, 0x600f) AM_READWRITE(warpwarp_sw_r, warpwarp_out0_w)
-	AM_RANGE(0x6010, 0x601f) AM_DEVREADWRITE("warpwarp", warpwarp_vol_r, warpwarp_music1_w)
-	AM_RANGE(0x6020, 0x602f) AM_DEVREADWRITE("warpwarp", warpwarp_dsw1_r, warpwarp_music2_w)
+	AM_RANGE(0x6010, 0x601f) AM_DEVREADWRITE_LEGACY("warpwarp", warpwarp_vol_r, warpwarp_music1_w)
+	AM_RANGE(0x6020, 0x602f) AM_DEVREADWRITE_LEGACY("warpwarp", warpwarp_dsw1_r, warpwarp_music2_w)
 	AM_RANGE(0x6030, 0x603f) AM_WRITE(warpwarp_out3_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( warpwarp_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( warpwarp_map, AS_PROGRAM, 8, warpwarp_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_BASE_MEMBER(warpwarp_state, m_videoram)
+	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0xc000, 0xc00f) AM_READWRITE(warpwarp_sw_r, warpwarp_out0_w)
-	AM_RANGE(0xc010, 0xc01f) AM_DEVREADWRITE("warpwarp", warpwarp_vol_r, warpwarp_music1_w)
-	AM_RANGE(0xc020, 0xc02f) AM_DEVREADWRITE("warpwarp", warpwarp_dsw1_r, warpwarp_music2_w)
+	AM_RANGE(0xc010, 0xc01f) AM_DEVREADWRITE_LEGACY("warpwarp", warpwarp_vol_r, warpwarp_music1_w)
+	AM_RANGE(0xc020, 0xc02f) AM_DEVREADWRITE_LEGACY("warpwarp", warpwarp_dsw1_r, warpwarp_music2_w)
 	AM_RANGE(0xc030, 0xc03f) AM_WRITE(warpwarp_out3_w)
 ADDRESS_MAP_END
 
@@ -384,14 +379,14 @@ static INPUT_PORTS_START( geebee )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0x30, 0x10, "Replay" )		PORT_DIPLOCATION("DSW2:5,6")	// awards 1 credit
-	PORT_DIPSETTING(    0x10, "40k 80k" )		PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x20, "70k 140k" )		PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x30, "100k 200k" )		PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )	PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x10, "60k 120k" )		PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x02)
-	PORT_DIPSETTING(    0x20, "100k 200k" )		PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x02)
-	PORT_DIPSETTING(    0x30, "150k 300k" )		PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x02)
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )	PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x10, "40k 80k" )		PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x20, "70k 140k" )		PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x30, "100k 200k" )		PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )	PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, "60k 120k" )		PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x20, "100k 200k" )		PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x30, "150k 300k" )		PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )	PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -406,14 +401,14 @@ static INPUT_PORTS_START( geebeeb )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x30, 0x10, "Replay" )		// awards 1 credit
-	PORT_DIPSETTING(    0x10, "40k" )			PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x20, "70k" )			PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x30, "100k" )			PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )	PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x10, "60k" )			PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x02)
-	PORT_DIPSETTING(    0x20, "100k" )			PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x02)
-	PORT_DIPSETTING(    0x30, "150k" )			PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x02)
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )	PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x10, "40k" )			PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x20, "70k" )			PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x30, "100k" )			PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )	PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x10, "60k" )			PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x20, "100k" )			PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x30, "150k" )			PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )	PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( navarone )
@@ -437,14 +432,14 @@ static INPUT_PORTS_START( navarone )
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("DSW2:3,4")
-	PORT_DIPSETTING(    0x04, "5000" )			PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x08, "6000" )			PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x0c, "7000" )			PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )	PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x04, "6000" )			PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x02)
-	PORT_DIPSETTING(    0x08, "7000" )			PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x02)
-	PORT_DIPSETTING(    0x0c, "8000" )			PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x02)
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )	PORT_CONDITION("DSW2", 0x02, PORTCOND_EQUALS, 0x02)
+	PORT_DIPSETTING(    0x04, "5000" )			PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x08, "6000" )			PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x0c, "7000" )			PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )	PORT_CONDITION("DSW2", 0x02, EQUALS, 0x00)
+	PORT_DIPSETTING(    0x04, "6000" )			PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x08, "7000" )			PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x0c, "8000" )			PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )	PORT_CONDITION("DSW2", 0x02, EQUALS, 0x02)
 	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Coinage ) )		PORT_DIPLOCATION("DSW2:5,6")
 	PORT_DIPSETTING(    0x30, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )
@@ -666,14 +661,14 @@ static INPUT_PORTS_START( warpwarp )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x0c, "5" )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("DSW1:5,6")
-	PORT_DIPSETTING(    0x00, "8k 30k 30k+" )	PORT_CONDITION("DSW1", 0x0c, PORTCOND_NOTEQUALS, 0x0c)
-	PORT_DIPSETTING(    0x10, "10k 40k 40k+" )	PORT_CONDITION("DSW1", 0x0c, PORTCOND_NOTEQUALS, 0x0c)
-	PORT_DIPSETTING(    0x20, "15k 60k 60k+" )	PORT_CONDITION("DSW1", 0x0c, PORTCOND_NOTEQUALS, 0x0c)
-	PORT_DIPSETTING(0x30, DEF_STR( None ) )	PORT_CONDITION("DSW1", 0x0c, PORTCOND_NOTEQUALS, 0x0c)
-	PORT_DIPSETTING(    0x00, "30k" )			PORT_CONDITION("DSW1", 0x0c, PORTCOND_EQUALS, 0x0c)
-	PORT_DIPSETTING(    0x10, "40k" )			PORT_CONDITION("DSW1", 0x0c, PORTCOND_EQUALS, 0x0c)
-	PORT_DIPSETTING(    0x20, "60k" )			PORT_CONDITION("DSW1", 0x0c, PORTCOND_EQUALS, 0x0c)
-	PORT_DIPSETTING(    0x30, DEF_STR( None ) )	PORT_CONDITION("DSW1", 0x0c, PORTCOND_EQUALS, 0x0c)
+	PORT_DIPSETTING(    0x00, "8k 30k 30k+" )	PORT_CONDITION("DSW1", 0x0c, NOTEQUALS, 0x0c)
+	PORT_DIPSETTING(    0x10, "10k 40k 40k+" )	PORT_CONDITION("DSW1", 0x0c, NOTEQUALS, 0x0c)
+	PORT_DIPSETTING(    0x20, "15k 60k 60k+" )	PORT_CONDITION("DSW1", 0x0c, NOTEQUALS, 0x0c)
+	PORT_DIPSETTING(0x30, DEF_STR( None ) )	PORT_CONDITION("DSW1", 0x0c, NOTEQUALS, 0x0c)
+	PORT_DIPSETTING(    0x00, "30k" )			PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x0c)
+	PORT_DIPSETTING(    0x10, "40k" )			PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x0c)
+	PORT_DIPSETTING(    0x20, "60k" )			PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x0c)
+	PORT_DIPSETTING(    0x30, DEF_STR( None ) )	PORT_CONDITION("DSW1", 0x0c, EQUALS, 0x0c)
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("DSW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

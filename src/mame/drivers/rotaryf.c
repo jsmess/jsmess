@@ -21,13 +21,11 @@ class rotaryf_state : public driver_device
 public:
 	rotaryf_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this,"maincpu")
-		{ }
-
-	UINT8 *m_videoram;
-	size_t m_videoram_size;
+		m_maincpu(*this,"maincpu"),
+		m_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
+	required_shared_ptr<UINT8> m_videoram;
 };
 
 
@@ -68,7 +66,7 @@ static SCREEN_UPDATE_RGB32( rotaryf )
 	rotaryf_state *state = screen.machine().driver_data<rotaryf_state>();
 	offs_t offs;
 
-	for (offs = 0; offs < state->m_videoram_size; offs++)
+	for (offs = 0; offs < state->m_videoram.bytes(); offs++)
 	{
 		int i;
 
@@ -90,17 +88,17 @@ static SCREEN_UPDATE_RGB32( rotaryf )
 }
 
 
-static ADDRESS_MAP_START( rotaryf_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( rotaryf_map, AS_PROGRAM, 8, rotaryf_state )
 	AM_RANGE(0x0000, 0x17ff) AM_MIRROR(0x4000) AM_ROM
-//  AM_RANGE(0x6ffb, 0x6ffb) AM_READ(random_r) ??
-//  AM_RANGE(0x6ffd, 0x6ffd) AM_READ(random_r) ??
-//  AM_RANGE(0x6fff, 0x6fff) AM_READ(random_r) ??
+//  AM_RANGE(0x6ffb, 0x6ffb) AM_READ_LEGACY(random_r) ??
+//  AM_RANGE(0x6ffd, 0x6ffd) AM_READ_LEGACY(random_r) ??
+//  AM_RANGE(0x6fff, 0x6fff) AM_READ_LEGACY(random_r) ??
 	AM_RANGE(0x7000, 0x73ff) AM_RAM // clears to 1ff ?
-	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x4000) AM_RAM AM_BASE_MEMBER(rotaryf_state, m_videoram) AM_SIZE_MEMBER(rotaryf_state, m_videoram_size)
+	AM_RANGE(0x8000, 0x9fff) AM_MIRROR(0x4000) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xa000, 0xa1ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rotaryf_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( rotaryf_io_map, AS_IO, 8, rotaryf_state )
 //  AM_RANGE(0x00, 0x00) AM_READ_PORT("UNK")
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("COIN")
 	AM_RANGE(0x26, 0x26) AM_READ_PORT("DSW")

@@ -19,7 +19,6 @@
     - Blank the display if digits aren't being refreshed
 
 ***************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -235,7 +234,7 @@ static TIMER_DEVICE_CALLBACK( keyboard_callback )
 	for (i = 0; i < 4; i++)
 	{
 		sprintf(kbdrow,"X%X",i);
-		inp = input_port_read(timer.machine(), kbdrow);
+		inp = timer.machine().root_device().ioport(kbdrow)->read();
 
 		for (j = 0; j < 5; j++)
 			if (BIT(inp, j))

@@ -77,14 +77,14 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-static INPUT_CHANGED( trigger_nmi )
+INPUT_CHANGED_MEMBER( mpf1_state::trigger_nmi )
 {
-	cputag_set_input_line(field.machine(), Z80_TAG, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-static INPUT_CHANGED( trigger_irq )
+INPUT_CHANGED_MEMBER( mpf1_state::trigger_irq )
 {
-	cputag_set_input_line(field.machine(), Z80_TAG, INPUT_LINE_IRQ0, newval ? CLEAR_LINE : ASSERT_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( mpf1 )
@@ -140,8 +140,8 @@ static INPUT_PORTS_START( mpf1 )
 
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("USER KEY") PORT_CODE(KEYCODE_U)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MONI") PORT_CODE(KEYCODE_M) PORT_CHANGED(trigger_nmi, 0)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INTR") PORT_CODE(KEYCODE_I) PORT_CHANGED(trigger_irq, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MONI") PORT_CODE(KEYCODE_M) PORT_CHANGED_MEMBER(DEVICE_SELF, mpf1_state, trigger_nmi, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INTR") PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, mpf1_state, trigger_irq, 0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mpf1b )
@@ -197,8 +197,8 @@ static INPUT_PORTS_START( mpf1b )
 
 	PORT_START("SPECIAL")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MONI") PORT_CODE(KEYCODE_M) PORT_CHANGED(trigger_nmi, 0)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INTR") PORT_CODE(KEYCODE_I) PORT_CHANGED(trigger_irq, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("MONI") PORT_CODE(KEYCODE_M) PORT_CHANGED_MEMBER(DEVICE_SELF, mpf1_state, trigger_nmi, 0)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INTR") PORT_CODE(KEYCODE_I) PORT_CHANGED_MEMBER(DEVICE_SELF, mpf1_state, trigger_irq, 0)
 INPUT_PORTS_END
 
 /* Intel 8255A Interface */
@@ -220,15 +220,15 @@ READ8_MEMBER( mpf1_state::ppi_pa_r )
 	UINT8 data = 0x7f;
 
 	/* bit 0 to 5, keyboard rows 0 to 5 */
-	if (!BIT(m_lednum, 0)) data &= input_port_read(machine(), "PC0");
-	if (!BIT(m_lednum, 1)) data &= input_port_read(machine(), "PC1");
-	if (!BIT(m_lednum, 2)) data &= input_port_read(machine(), "PC2");
-	if (!BIT(m_lednum, 3)) data &= input_port_read(machine(), "PC3");
-	if (!BIT(m_lednum, 4)) data &= input_port_read(machine(), "PC4");
-	if (!BIT(m_lednum, 5)) data &= input_port_read(machine(), "PC5");
+	if (!BIT(m_lednum, 0)) data &= ioport("PC0")->read();
+	if (!BIT(m_lednum, 1)) data &= ioport("PC1")->read();
+	if (!BIT(m_lednum, 2)) data &= ioport("PC2")->read();
+	if (!BIT(m_lednum, 3)) data &= ioport("PC3")->read();
+	if (!BIT(m_lednum, 4)) data &= ioport("PC4")->read();
+	if (!BIT(m_lednum, 5)) data &= ioport("PC5")->read();
 
 	/* bit 6, user key */
-	data &= input_port_read(machine(), "SPECIAL") & 1 ? 0xff : 0xbf;
+	data &= ioport("SPECIAL")->read() & 1 ? 0xff : 0xbf;
 
 	/* bit 7, tape input */
 	data |= ((m_cassette)->input() > 0 ? 1 : 0) << 7;
@@ -462,17 +462,15 @@ ROM_END
 
 /* System Drivers */
 
-DIRECT_UPDATE_HANDLER( mpf1_direct_update_handler )
+DIRECT_UPDATE_MEMBER(mpf1_state::mpf1_direct_update_handler)
 {
-	mpf1_state *state = machine.driver_data<mpf1_state>();
-
-	if (!state->m_break)
+	if (!m_break)
 	{
-		state->m_m1++;
+		m_m1++;
 
-		if (state->m_m1 == 5)
+		if (m_m1 == 5)
 		{
-			state->m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+			m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		}
 	}
 
@@ -483,7 +481,7 @@ static DRIVER_INIT( mpf1 )
 {
 	mpf1_state *state = machine.driver_data<mpf1_state>();
 
-	state->m_maincpu->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(mpf1_direct_update_handler), &machine));
+	state->m_maincpu->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(mpf1_state::mpf1_direct_update_handler), state));
 }
 
 COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  mpf1, "Multitech", "Micro Professor 1", 0)

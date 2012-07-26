@@ -17,18 +17,16 @@
 #include "includes/calomega.h"
 
 
-WRITE8_HANDLER( calomega_videoram_w )
+WRITE8_MEMBER(calomega_state::calomega_videoram_w)
 {
-	calomega_state *state = space->machine().driver_data<calomega_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( calomega_colorram_w )
+WRITE8_MEMBER(calomega_state::calomega_colorram_w)
 {
-	calomega_state *state = space->machine().driver_data<calomega_state>();
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
@@ -72,6 +70,7 @@ SCREEN_UPDATE_IND16( calomega )
 
 PALETTE_INIT( calomega )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 /*  prom bits
     7654 3210
     ---- ---x   red component.

@@ -24,14 +24,14 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
-#include "sound/okim6295.h"
+#include "sound/okiadpcm.h"
 #include "includes/mjkjidai.h"
 
 /* Start of ADPCM custom chip code */
 typedef struct _mjkjidai_adpcm_state mjkjidai_adpcm_state;
 struct _mjkjidai_adpcm_state
 {
-	adpcm_state m_adpcm;
+	oki_adpcm_state m_adpcm;
 	sound_stream *m_stream;
 	UINT32 m_current;
 	UINT32 m_end;
@@ -74,7 +74,7 @@ static DEVICE_START( mjkjidai_adpcm )
 
 	state->m_playing = 0;
 	state->m_stream = device->machine().sound().stream_alloc(*device, 0, 1, device->clock(), state, mjkjidai_adpcm_callback);
-	state->m_base = machine.region("adpcm")->base();
+	state->m_base = machine.root_device().memregion("adpcm")->base();
 	state->m_adpcm.reset();
 }
 
@@ -113,44 +113,42 @@ static WRITE8_DEVICE_HANDLER( adpcm_w )
 /* End of ADPCM custom chip code */
 
 
-static READ8_HANDLER( keyboard_r )
+READ8_MEMBER(mjkjidai_state::keyboard_r)
 {
-	mjkjidai_state *state = space->machine().driver_data<mjkjidai_state>();
 	int res = 0x3f,i;
 	static const char *const keynames[] = { "PL2_1", "PL2_2", "PL2_3", "PL2_4", "PL2_5", "PL2_6", "PL1_1", "PL1_2", "PL1_3", "PL1_4", "PL1_5", "PL1_6" };
 
-//  logerror("%04x: keyboard_r\n", cpu_get_pc(&space->device()));
+//  logerror("%04x: keyboard_r\n", cpu_get_pc(&space.device()));
 
 	for (i = 0; i < 12; i++)
 	{
-		if (~state->m_keyb & (1 << i))
+		if (~m_keyb & (1 << i))
 		{
-			res = input_port_read(space->machine(), keynames[i]) & 0x3f;
+			res = ioport(keynames[i])->read() & 0x3f;
 			break;
 		}
 	}
 
-	res |= (input_port_read(space->machine(), "IN3") & 0xc0);
+	res |= (ioport("IN3")->read() & 0xc0);
 
-	if (state->m_nvram_init_count)
+	if (m_nvram_init_count)
 	{
-		state->m_nvram_init_count--;
+		m_nvram_init_count--;
 		res &= 0xbf;
 	}
 
 	return res;
 }
 
-static WRITE8_HANDLER( keyboard_select_w )
+WRITE8_MEMBER(mjkjidai_state::keyboard_select_w)
 {
-	mjkjidai_state *state = space->machine().driver_data<mjkjidai_state>();
 
-//  logerror("%04x: keyboard_select %d = %02x\n",cpu_get_pc(&space->device()),offset,data);
+//  logerror("%04x: keyboard_select %d = %02x\n",cpu_get_pc(&space.device()),offset,data);
 
 	switch (offset)
 	{
-		case 0: state->m_keyb = (state->m_keyb & 0xff00) | (data);      break;
-		case 1: state->m_keyb = (state->m_keyb & 0x00ff) | (data << 8); break;
+		case 0: m_keyb = (m_keyb & 0xff00) | (data);      break;
+		case 1: m_keyb = (m_keyb & 0x00ff) | (data << 8); break;
 	}
 }
 
@@ -159,9 +157,9 @@ static NVRAM_HANDLER( mjkjidai )
 	mjkjidai_state *state = machine.driver_data<mjkjidai_state>();
 
 	if (read_or_write)
-		file->write(state->m_nvram, state->m_nvram_size);
+		file->write(state->m_nvram, state->m_nvram.bytes());
 	else if (file)
-		file->read(state->m_nvram, state->m_nvram_size);
+		file->read(state->m_nvram, state->m_nvram.bytes());
 	else
 	{
 		state->m_nvram_init_count = 1;
@@ -170,18 +168,18 @@ static NVRAM_HANDLER( mjkjidai )
 
 
 
-static ADDRESS_MAP_START( mjkjidai_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mjkjidai_map, AS_PROGRAM, 8, mjkjidai_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM	AM_BASE_SIZE_MEMBER(mjkjidai_state,m_nvram,m_nvram_size)	// cleared and initialized on startup if bit 6 if port 00 is 0
-	AM_RANGE(0xe000, 0xe01f) AM_RAM AM_BASE_MEMBER(mjkjidai_state,m_spriteram1)			// shared with tilemap ram
-	AM_RANGE(0xe800, 0xe81f) AM_RAM AM_BASE_MEMBER(mjkjidai_state,m_spriteram2)		// shared with tilemap ram
-	AM_RANGE(0xf000, 0xf01f) AM_RAM AM_BASE_MEMBER(mjkjidai_state,m_spriteram3)		// shared with tilemap ram
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mjkjidai_videoram_w) AM_BASE_MEMBER(mjkjidai_state,m_videoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM	AM_SHARE("nvram")	// cleared and initialized on startup if bit 6 if port 00 is 0
+	AM_RANGE(0xe000, 0xe01f) AM_RAM AM_SHARE("spriteram1")			// shared with tilemap ram
+	AM_RANGE(0xe800, 0xe81f) AM_RAM AM_SHARE("spriteram2")		// shared with tilemap ram
+	AM_RANGE(0xf000, 0xf01f) AM_RAM AM_SHARE("spriteram3")		// shared with tilemap ram
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(mjkjidai_videoram_w) AM_SHARE("videoram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjkjidai_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( mjkjidai_io_map, AS_IO, 8, mjkjidai_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(keyboard_r)
 	AM_RANGE(0x01, 0x01) AM_READNOP	// ???
@@ -190,9 +188,9 @@ static ADDRESS_MAP_START( mjkjidai_io_map, AS_IO, 8 )
 	AM_RANGE(0x10, 0x10) AM_WRITE(mjkjidai_ctrl_w)	// rom bank, coin counter, flip screen etc
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0")
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN1")
-	AM_RANGE(0x20, 0x20) AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0x30, 0x30) AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0x40, 0x40) AM_DEVWRITE("adpcm", adpcm_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0x30, 0x30) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE_LEGACY("adpcm", adpcm_w)
 ADDRESS_MAP_END
 
 

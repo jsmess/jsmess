@@ -45,12 +45,24 @@ public:
 		: driver_device(mconfig, type, tag),
 		  m_mfpdev(*this, MC68901_TAG),
 		  m_rtc(*this, RP5C15_TAG),
-		  m_nvram(*this, "nvram")
+		  m_nvram16(*this, "nvram16"),
+		  m_nvram32(*this, "nvram32"),
+		  m_gvram16(*this, "gvram16"),
+		  m_tvram16(*this, "tvram16"),
+		  m_gvram32(*this, "gvram32"),
+		  m_tvram32(*this, "tvram32")
 	{ }
 
 	required_device<mc68901_device> m_mfpdev;
 	required_device<rp5c15_device> m_rtc;
-	required_shared_ptr<UINT32>	m_nvram;
+
+	optional_shared_ptr<UINT16>	m_nvram16;
+	optional_shared_ptr<UINT32>	m_nvram32;
+
+	optional_shared_ptr<UINT16> m_gvram16;
+	optional_shared_ptr<UINT16> m_tvram16;
+	optional_shared_ptr<UINT32> m_gvram32;
+	optional_shared_ptr<UINT32> m_tvram32;
 
 	DECLARE_WRITE_LINE_MEMBER( mfp_tdo_w );
 	DECLARE_READ8_MEMBER( mfp_gpio_r );
@@ -231,8 +243,6 @@ public:
 	emu_timer* m_scanline_timer;
 	emu_timer* m_raster_irq;
 	emu_timer* m_vblank_irq;
-	UINT16* m_gvram;
-	UINT16* m_tvram;
 	UINT16* m_spriteram;
 	UINT16* m_spritereg;
 	tilemap_t* m_bg0_8;
@@ -241,6 +251,7 @@ public:
 	tilemap_t* m_bg1_16;
 	int m_sprite_shift;
 	int m_oddscanline;
+	bool m_is_32bit;
 };
 
 

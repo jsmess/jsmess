@@ -133,7 +133,6 @@
 
 ******************************************************************************************/
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "includes/liberatr.h"
@@ -183,8 +182,8 @@ WRITE8_MEMBER( liberatr_state::trackball_reset_w )
 	/* input becomes the starting point for the trackball counters */
 	if (((data ^ m_ctrld) & 0x10) && (data & 0x10))
 	{
-		UINT8 trackball = input_port_read(machine(), "FAKE");
-		UINT8 switches = input_port_read(machine(), "IN0");
+		UINT8 trackball = ioport("FAKE")->read();
+		UINT8 switches = ioport("IN0")->read();
 		m_trackball_offset = ((trackball & 0xf0) - (switches & 0xf0)) | ((trackball - switches) & 0x0f);
 	}
 	m_ctrld = data & 0x10;
@@ -196,13 +195,13 @@ READ8_MEMBER( liberatr_state::port0_r )
 	/* if ctrld is high, the /ld signal on the LS191 is NOT set, meaning that the trackball is counting */
 	if (m_ctrld)
 	{
-		UINT8 trackball = input_port_read(machine(), "FAKE");
+		UINT8 trackball = ioport("FAKE")->read();
 		return ((trackball & 0xf0) - (m_trackball_offset & 0xf0)) | ((trackball - m_trackball_offset) & 0x0f);
 	}
 
 	/* otherwise, the LS191 is simply passing through the raw switch inputs */
 	else
-		return input_port_read(machine(), "IN0");
+		return ioport("IN0")->read();
 }
 
 
@@ -218,20 +217,20 @@ static ADDRESS_MAP_START( liberatr_map, AS_PROGRAM, 8, liberatr_state )
 	AM_RANGE(0x0001, 0x0001) AM_RAM AM_SHARE("ycoord")
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(bitmap_xy_r, bitmap_xy_w)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(bitmap_w) AM_SHARE("bitmapram")	/* overlapping for my convenience */
-	AM_RANGE(0x4000, 0x403f) AM_READ_BASE(atarigen_state, earom_r)
+	AM_RANGE(0x4000, 0x403f) AM_READ(earom_r)
 	AM_RANGE(0x5000, 0x5000) AM_READ(port0_r)
 	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN1")
 	AM_RANGE(0x6000, 0x600f) AM_WRITEONLY AM_SHARE("base_ram")
 	AM_RANGE(0x6200, 0x621f) AM_WRITEONLY AM_SHARE("colorram")
 	AM_RANGE(0x6400, 0x6400) AM_WRITENOP
-	AM_RANGE(0x6600, 0x6600) AM_WRITE_BASE(atarigen_state, earom_control_w)
+	AM_RANGE(0x6600, 0x6600) AM_WRITE(earom_control_w)
 	AM_RANGE(0x6800, 0x6800) AM_WRITEONLY AM_SHARE("planet_frame")
-	AM_RANGE(0x6a00, 0x6a00) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x6a00, 0x6a00) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x6c00, 0x6c01) AM_WRITE(led_w)
 	AM_RANGE(0x6c04, 0x6c04) AM_WRITE(trackball_reset_w)
 	AM_RANGE(0x6c05, 0x6c06) AM_WRITE(coin_counter_w)
 	AM_RANGE(0x6c07, 0x6c07) AM_WRITEONLY AM_SHARE("planet_select")
-	AM_RANGE(0x6e00, 0x6e3f) AM_WRITE_BASE(atarigen_state, earom_w)
+	AM_RANGE(0x6e00, 0x6e3f) AM_WRITE(earom_w)
 	AM_RANGE(0x7000, 0x701f) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x7800, 0x781f) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x8000, 0xefff) AM_ROM
@@ -256,15 +255,15 @@ static ADDRESS_MAP_START( liberat2_map, AS_PROGRAM, 8, liberatr_state )
 	AM_RANGE(0x4000, 0x400f) AM_WRITEONLY AM_SHARE("base_ram")
 	AM_RANGE(0x4200, 0x421f) AM_WRITEONLY AM_SHARE("colorram")
 	AM_RANGE(0x4400, 0x4400) AM_WRITENOP
-	AM_RANGE(0x4600, 0x4600) AM_WRITE_BASE(atarigen_state, earom_control_w)
-	AM_RANGE(0x4800, 0x483f) AM_READ_BASE(atarigen_state, earom_r)
+	AM_RANGE(0x4600, 0x4600) AM_WRITE(earom_control_w)
+	AM_RANGE(0x4800, 0x483f) AM_READ(earom_r)
 	AM_RANGE(0x4800, 0x4800) AM_WRITEONLY AM_SHARE("planet_frame")
-	AM_RANGE(0x4a00, 0x4a00) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x4a00, 0x4a00) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x4c00, 0x4c01) AM_WRITE(led_w)
 	AM_RANGE(0x4c04, 0x4c04) AM_WRITE(trackball_reset_w)
 	AM_RANGE(0x4c05, 0x4c06) AM_WRITE(coin_counter_w)
 	AM_RANGE(0x4c07, 0x4c07) AM_WRITEONLY AM_SHARE("planet_select")
-	AM_RANGE(0x4e00, 0x4e3f) AM_WRITE_BASE(atarigen_state, earom_w)
+	AM_RANGE(0x4e00, 0x4e3f) AM_WRITE(earom_w)
 	AM_RANGE(0x5000, 0x501f) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x5800, 0x581f) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
 	//AM_RANGE(0x6000, 0x601f) AM_WRITE(pokey1_w) /* bug ??? */
@@ -301,7 +300,7 @@ static INPUT_PORTS_START( liberatr )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH,IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW1")			/* IN2  -  Game Option switches DSW @ D4 on PCB */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
@@ -390,7 +389,7 @@ static MACHINE_CONFIG_START( liberatr, liberatr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16) /* 1.25Mhz divided from 20Mhz master clock */
 	MCFG_CPU_PROGRAM_MAP(liberatr_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)
+	MCFG_DEVICE_PERIODIC_INT_DRIVER(driver_device,irq0_line_hold,4*60)
 
 	MCFG_ER2055_ADD("earom")
 

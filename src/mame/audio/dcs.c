@@ -431,50 +431,50 @@ static void sdrc_remap_memory(running_machine &machine);
  *************************************/
 
 /* DCS 2k memory map */
-static ADDRESS_MAP_START( dcs_2k_program_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( dcs_2k_program_map, AS_PROGRAM, 32, driver_device )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("dcsint")
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("dcsext")
 	AM_RANGE(0x1000, 0x17ff) AM_RAM AM_SHARE("dcsext")
 	AM_RANGE(0x1800, 0x1fff) AM_RAM AM_SHARE("dcsext")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dcs_2k_data_map, AS_DATA, 16 )
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
+static ADDRESS_MAP_START( dcs_2k_data_map, AS_DATA, 16, driver_device )
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_READWRITE_LEGACY(dcs_dataram_r, dcs_dataram_w)
 	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("databank")
-	AM_RANGE(0x3000, 0x33ff) AM_WRITE(dcs_data_bank_select_w)
-	AM_RANGE(0x3400, 0x37ff) AM_READWRITE(input_latch_r, output_latch_w)
+	AM_RANGE(0x3000, 0x33ff) AM_WRITE_LEGACY(dcs_data_bank_select_w)
+	AM_RANGE(0x3400, 0x37ff) AM_READWRITE_LEGACY(input_latch_r, output_latch_w)
 	AM_RANGE(0x3800, 0x39ff) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
 
 /* DCS 2k with UART memory map */
-static ADDRESS_MAP_START( dcs_2k_uart_data_map, AS_DATA, 16 )
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
+static ADDRESS_MAP_START( dcs_2k_uart_data_map, AS_DATA, 16, driver_device )
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_READWRITE_LEGACY(dcs_dataram_r, dcs_dataram_w)
 	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("databank")
-	AM_RANGE(0x3000, 0x33ff) AM_WRITE(dcs_data_bank_select_w)
+	AM_RANGE(0x3000, 0x33ff) AM_WRITE_LEGACY(dcs_data_bank_select_w)
 	AM_RANGE(0x3400, 0x3402) AM_NOP								/* UART (ignored) */
-	AM_RANGE(0x3403, 0x3403) AM_READWRITE(input_latch_r, output_latch_w)
+	AM_RANGE(0x3403, 0x3403) AM_READWRITE_LEGACY(input_latch_r, output_latch_w)
 	AM_RANGE(0x3404, 0x3405) AM_NOP								/* UART (ignored) */
 	AM_RANGE(0x3800, 0x39ff) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
 
 /* DCS 8k memory map */
-static ADDRESS_MAP_START( dcs_8k_program_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( dcs_8k_program_map, AS_PROGRAM, 32, driver_device )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("dcsint")
 	AM_RANGE(0x0800, 0x1fff) AM_RAM AM_SHARE("dcsext")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dcs_8k_data_map, AS_DATA, 16 )
+static ADDRESS_MAP_START( dcs_8k_data_map, AS_DATA, 16, driver_device )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x1fff) AM_READWRITE(dcs_dataram_r, dcs_dataram_w)
+	AM_RANGE(0x0800, 0x1fff) AM_READWRITE_LEGACY(dcs_dataram_r, dcs_dataram_w)
 	AM_RANGE(0x2000, 0x2fff) AM_ROMBANK("databank")
-	AM_RANGE(0x3000, 0x33ff) AM_WRITE(dcs_data_bank_select_w)
-	AM_RANGE(0x3400, 0x37ff) AM_READWRITE(input_latch_r, output_latch_w)
+	AM_RANGE(0x3000, 0x33ff) AM_WRITE_LEGACY(dcs_data_bank_select_w)
+	AM_RANGE(0x3400, 0x37ff) AM_READWRITE_LEGACY(input_latch_r, output_latch_w)
 	AM_RANGE(0x3800, 0x39ff) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
 
@@ -485,39 +485,39 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dcs2_2115_program_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( dcs2_2115_program_map, AS_PROGRAM, 32, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAM	AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dcs2_2104_program_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( dcs2_2104_program_map, AS_PROGRAM, 32, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x01ff) AM_RAM	AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dcs2_2115_data_map, AS_DATA, 16 )
+static ADDRESS_MAP_START( dcs2_2115_data_map, AS_DATA, 16, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
-	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)
-	AM_RANGE(0x0402, 0x0402) AM_READWRITE(output_control_r, output_control_w)
-	AM_RANGE(0x0403, 0x0403) AM_READ(latch_status_r)
-	AM_RANGE(0x0404, 0x0407) AM_READ(fifo_input_r)
-	AM_RANGE(0x0480, 0x0483) AM_READWRITE(sdrc_r, sdrc_w)
+	AM_RANGE(0x0400, 0x0400) AM_READWRITE_LEGACY(input_latch_r, input_latch_ack_w)
+	AM_RANGE(0x0401, 0x0401) AM_WRITE_LEGACY(output_latch_w)
+	AM_RANGE(0x0402, 0x0402) AM_READWRITE_LEGACY(output_control_r, output_control_w)
+	AM_RANGE(0x0403, 0x0403) AM_READ_LEGACY(latch_status_r)
+	AM_RANGE(0x0404, 0x0407) AM_READ_LEGACY(fifo_input_r)
+	AM_RANGE(0x0480, 0x0483) AM_READWRITE_LEGACY(sdrc_r, sdrc_w)
 	AM_RANGE(0x3800, 0x39ff) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dcs2_2104_data_map, AS_DATA, 16 )
+static ADDRESS_MAP_START( dcs2_2104_data_map, AS_DATA, 16, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
-	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)
-	AM_RANGE(0x0402, 0x0402) AM_READWRITE(output_control_r, output_control_w)
-	AM_RANGE(0x0403, 0x0403) AM_READ(latch_status_r)
-	AM_RANGE(0x0404, 0x0407) AM_READ(fifo_input_r)
-	AM_RANGE(0x0480, 0x0483) AM_READWRITE(sdrc_r, sdrc_w)
+	AM_RANGE(0x0400, 0x0400) AM_READWRITE_LEGACY(input_latch_r, input_latch_ack_w)
+	AM_RANGE(0x0401, 0x0401) AM_WRITE_LEGACY(output_latch_w)
+	AM_RANGE(0x0402, 0x0402) AM_READWRITE_LEGACY(output_control_r, output_control_w)
+	AM_RANGE(0x0403, 0x0403) AM_READ_LEGACY(latch_status_r)
+	AM_RANGE(0x0404, 0x0407) AM_READ_LEGACY(fifo_input_r)
+	AM_RANGE(0x0480, 0x0483) AM_READWRITE_LEGACY(sdrc_r, sdrc_w)
 	AM_RANGE(0x3800, 0x38ff) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
 
@@ -528,28 +528,28 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( dsio_program_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( dsio_program_map, AS_PROGRAM, 32, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM	AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dsio_data_map, AS_DATA, 16 )
+static ADDRESS_MAP_START( dsio_data_map, AS_DATA, 16, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x03ff) AM_RAMBANK("databank")
 	AM_RANGE(0x0400, 0x3fdf) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( dsio_io_map, AS_IO, 16 )
+static ADDRESS_MAP_START( dsio_io_map, AS_IO, 16, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
-	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)
-	AM_RANGE(0x0402, 0x0402) AM_READWRITE(output_control_r, output_control_w)
-	AM_RANGE(0x0403, 0x0403) AM_READ(latch_status_r)
-	AM_RANGE(0x0404, 0x0407) AM_READ(fifo_input_r)
-	AM_RANGE(0x0480, 0x0483) AM_READWRITE(dsio_r, dsio_w)
+	AM_RANGE(0x0400, 0x0400) AM_READWRITE_LEGACY(input_latch_r, input_latch_ack_w)
+	AM_RANGE(0x0401, 0x0401) AM_WRITE_LEGACY(output_latch_w)
+	AM_RANGE(0x0402, 0x0402) AM_READWRITE_LEGACY(output_control_r, output_control_w)
+	AM_RANGE(0x0403, 0x0403) AM_READ_LEGACY(latch_status_r)
+	AM_RANGE(0x0404, 0x0407) AM_READ_LEGACY(fifo_input_r)
+	AM_RANGE(0x0480, 0x0483) AM_READWRITE_LEGACY(dsio_r, dsio_w)
 ADDRESS_MAP_END
 
 
@@ -560,28 +560,28 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( denver_program_map, AS_PROGRAM, 32 )
+static ADDRESS_MAP_START( denver_program_map, AS_PROGRAM, 32, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM	AM_SHARE("dcsint")
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( denver_data_map, AS_DATA, 16 )
+static ADDRESS_MAP_START( denver_data_map, AS_DATA, 16, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("databank")
 	AM_RANGE(0x0800, 0x3fdf) AM_RAM
-	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE(adsp_control_r, adsp_control_w)
+	AM_RANGE(0x3fe0, 0x3fff) AM_READWRITE_LEGACY(adsp_control_r, adsp_control_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( denver_io_map, AS_IO, 16 )
+static ADDRESS_MAP_START( denver_io_map, AS_IO, 16, driver_device )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0400, 0x0400) AM_READWRITE(input_latch_r, input_latch_ack_w)
-	AM_RANGE(0x0401, 0x0401) AM_WRITE(output_latch_w)
-	AM_RANGE(0x0402, 0x0402) AM_READWRITE(output_control_r, output_control_w)
-	AM_RANGE(0x0403, 0x0403) AM_READ(latch_status_r)
-	AM_RANGE(0x0404, 0x0407) AM_READ(fifo_input_r)
-	AM_RANGE(0x0480, 0x0483) AM_READWRITE(denver_r, denver_w)
+	AM_RANGE(0x0400, 0x0400) AM_READWRITE_LEGACY(input_latch_r, input_latch_ack_w)
+	AM_RANGE(0x0401, 0x0401) AM_WRITE_LEGACY(output_latch_w)
+	AM_RANGE(0x0402, 0x0402) AM_READWRITE_LEGACY(output_control_r, output_control_w)
+	AM_RANGE(0x0403, 0x0403) AM_READ_LEGACY(latch_status_r)
+	AM_RANGE(0x0404, 0x0407) AM_READ_LEGACY(fifo_input_r)
+	AM_RANGE(0x0480, 0x0483) AM_READWRITE_LEGACY(denver_r, denver_w)
 ADDRESS_MAP_END
 
 
@@ -821,7 +821,7 @@ static TIMER_CALLBACK( dcs_reset )
 		/* rev 1: just reset the bank to 0 */
 		case 1:
 			dcs.sounddata_bank = 0;
-			memory_set_bank(machine, "databank", 0);
+			machine.root_device().membank("databank")->set_entry(0);
 			break;
 
 		/* rev 2: reset the SDRC ASIC */
@@ -943,8 +943,8 @@ void dcs_init(running_machine &machine)
 	memset(&dcs, 0, sizeof(dcs));
 	dcs.sram = NULL;
 
-	dcs.internal_program_ram = (UINT32 *)memory_get_shared(machine, "dcsint");
-	dcs.external_program_ram = (UINT32 *)memory_get_shared(machine, "dcsext");
+	dcs.internal_program_ram = (UINT32 *)machine.root_device().memshare("dcsint")->ptr();
+	dcs.external_program_ram = (UINT32 *)machine.root_device().memshare("dcsext")->ptr();
 
 	/* find the DCS CPU and the sound ROMs */
 	dcs.cpu = machine.device<adsp21xx_device>("dcs");
@@ -955,12 +955,12 @@ void dcs_init(running_machine &machine)
 	dcs.dmadac[0] = machine.device<dmadac_sound_device>("dac");
 
 	/* configure boot and sound ROMs */
-	dcs.bootrom = (UINT16 *)machine.region("dcs")->base();
-	dcs.bootrom_words = machine.region("dcs")->bytes() / 2;
+	dcs.bootrom = (UINT16 *)machine.root_device().memregion("dcs")->base();
+	dcs.bootrom_words = machine.root_device().memregion("dcs")->bytes() / 2;
 	dcs.sounddata = dcs.bootrom;
 	dcs.sounddata_words = dcs.bootrom_words;
 	dcs.sounddata_banks = dcs.sounddata_words / 0x1000;
-	memory_configure_bank(machine, "databank", 0, dcs.sounddata_banks, dcs.sounddata, 0x1000*2);
+	machine.root_device().membank("databank")->configure_entries(0, dcs.sounddata_banks, dcs.sounddata, 0x1000*2);
 
 	/* create the timers */
 	dcs.internal_timer = machine.device<timer_device>("dcs_int_timer");
@@ -982,8 +982,8 @@ void dcs2_init(running_machine &machine, int dram_in_mb, offs_t polling_offset)
 	int soundbank_words;
 
 	memset(&dcs, 0, sizeof(dcs));
-	dcs.internal_program_ram = (UINT32 *)memory_get_shared(machine, "dcsint");
-	dcs.external_program_ram = (UINT32 *)memory_get_shared(machine, "dcsext");
+	dcs.internal_program_ram = (UINT32 *)machine.root_device().memshare("dcsint")->ptr();
+	dcs.external_program_ram = (UINT32 *)machine.root_device().memshare("dcsext")->ptr();
 
 	/* find the DCS CPU and the sound ROMs */
 	dcs.cpu = machine.device<adsp21xx_device>("dcs2");
@@ -1008,8 +1008,8 @@ void dcs2_init(running_machine &machine, int dram_in_mb, offs_t polling_offset)
 	dcs.dmadac[1] = machine.device<dmadac_sound_device>("dac2");
 
 	/* always boot from the base of "dcs" */
-	dcs.bootrom = (UINT16 *)machine.region("dcs")->base();
-	dcs.bootrom_words = machine.region("dcs")->bytes() / 2;
+	dcs.bootrom = (UINT16 *)machine.root_device().memregion("dcs")->base();
+	dcs.bootrom_words = machine.root_device().memregion("dcs")->bytes() / 2;
 
 	/* supports both RAM and ROM variants */
 	if (dram_in_mb != 0)
@@ -1024,7 +1024,7 @@ void dcs2_init(running_machine &machine, int dram_in_mb, offs_t polling_offset)
 	}
 	dcs.sounddata_banks = dcs.sounddata_words / soundbank_words;
 	if (dcs.rev != 2)
-		memory_configure_bank(machine, "databank", 0, dcs.sounddata_banks, dcs.sounddata, soundbank_words*2);
+		machine.root_device().membank("databank")->configure_entries(0, dcs.sounddata_banks, dcs.sounddata, soundbank_words*2);
 
 	/* allocate memory for the SRAM */
 	dcs.sram = auto_alloc_array(machine, UINT16, 0x8000*4/2);
@@ -1085,7 +1085,7 @@ static WRITE16_HANDLER( dcs_dataram_w )
 static WRITE16_HANDLER( dcs_data_bank_select_w )
 {
 	dcs.sounddata_bank = data & 0x7ff;
-	memory_set_bank(space->machine(), "databank", dcs.sounddata_bank % dcs.sounddata_banks);
+	space->machine().root_device().membank("databank")->set_entry(dcs.sounddata_bank % dcs.sounddata_banks);
 
 	/* bit 11 = sound board led */
 #if 0
@@ -1112,15 +1112,15 @@ INLINE void sdrc_update_bank_pointers(running_machine &machine)
 		{
 			/* ROM-based; use the memory page to select from ROM */
 			if (SDRC_ROM_MS == 1 && SDRC_ROM_ST != 3)
-				memory_set_bankptr(machine, "rompage", &dcs.sounddata[(SDRC_EPM_PG * pagesize) % dcs.sounddata_words]);
+				machine.root_device().membank("rompage")->set_base(&dcs.sounddata[(SDRC_EPM_PG * pagesize) % dcs.sounddata_words]);
 		}
 		else
 		{
 			/* RAM-based; use the ROM page to select from ROM, and the memory page to select from RAM */
 			if (SDRC_ROM_MS == 1 && SDRC_ROM_ST != 3)
-				memory_set_bankptr(machine, "rompage", &dcs.bootrom[(SDRC_ROM_PG * 4096 /*pagesize*/) % dcs.bootrom_words]);
+				machine.root_device().membank("rompage")->set_base(&dcs.bootrom[(SDRC_ROM_PG * 4096 /*pagesize*/) % dcs.bootrom_words]);
 			if (SDRC_DM_ST != 0)
-				memory_set_bankptr(machine, "drampage", &dcs.sounddata[(SDRC_DM_PG * 1024) % dcs.sounddata_words]);
+				machine.root_device().membank("drampage")->set_base(&dcs.sounddata[(SDRC_DM_PG * 1024) % dcs.sounddata_words]);
 		}
 	}
 }
@@ -1362,7 +1362,7 @@ static WRITE16_HANDLER( dsio_w )
 		/* offset 2 controls RAM pages */
 		case 2:
 			dsio.reg[2] = data;
-			memory_set_bank(space->machine(), "databank", DSIO_DM_PG % dcs.sounddata_banks);
+			space->machine().root_device().membank("databank")->set_entry(DSIO_DM_PG % dcs.sounddata_banks);
 			break;
 	}
 }
@@ -1429,7 +1429,7 @@ static WRITE16_HANDLER( denver_w )
 		/* offset 2 controls RAM pages */
 		case 2:
 			dsio.reg[2] = data;
-			memory_set_bank(space->machine(), "databank", DENV_DM_PG % dcs.sounddata_bank);
+			space->machine().root_device().membank("databank")->set_entry(DENV_DM_PG % dcs.sounddata_bank);
 			break;
 
 		/* offset 3 controls FIFO reset */

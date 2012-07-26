@@ -233,37 +233,35 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( visicom_map, AS_PROGRAM, 8, visicom_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x1000, 0x10ff) AM_RAM
-	AM_RANGE(0x1100, 0x11ff) AM_RAM AM_BASE(m_color_ram)
-	AM_RANGE(0x1300, 0x13ff) AM_RAM AM_BASE(m_color_ram1)
+	AM_RANGE(0x1100, 0x11ff) AM_RAM AM_SHARE("color_ram")
+	AM_RANGE(0x1300, 0x13ff) AM_RAM AM_SHARE("color_ram1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( visicom_io_map, AS_IO, 8, visicom_state )
-	AM_RANGE(0x01, 0x01) AM_WRITE_BASE(studio2_state, dispon_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE_BASE(studio2_state, keylatch_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(dispon_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpt02_map, AS_PROGRAM, 8, mpt02_state )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x09ff) AM_RAM
-	AM_RANGE(0x0b00, 0x0b3f) AM_RAM AM_BASE(m_color_ram)
+	AM_RANGE(0x0b00, 0x0b3f) AM_RAM AM_SHARE("color_ram")
 	AM_RANGE(0x0c00, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mpt02_io_map, AS_IO, 8, mpt02_state )
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispon_r, step_bgcolor_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE_BASE(studio2_state, keylatch_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(keylatch_w)
 	AM_RANGE(0x04, 0x04) AM_DEVREADWRITE(CDP1864_TAG, cdp1864_device, dispoff_r, tone_latch_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
 
-static INPUT_CHANGED( reset_w )
+INPUT_CHANGED_MEMBER( studio2_state::reset_w )
 {
-	studio2_state *state = field.machine().driver_data<studio2_state>();
-
 	if (oldval && !newval)
 	{
-		state->machine_reset();
+		machine_reset();
 	}
 }
 
@@ -293,7 +291,7 @@ static INPUT_PORTS_START( studio2 )
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("B 9") PORT_CODE(KEYCODE_3_PAD)
 
 	PORT_START("CLEAR")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Clear") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHANGED(reset_w, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Clear") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHANGED_MEMBER(DEVICE_SELF, studio2_state, reset_w, 0)
 INPUT_PORTS_END
 
 /* Video */
@@ -352,17 +350,17 @@ static CDP1864_INTERFACE( mpt02_cdp1864_intf )
 
 READ_LINE_MEMBER( studio2_state::clear_r )
 {
-	return BIT(input_port_read(machine(), "CLEAR"), 0);
+	return BIT(ioport("CLEAR")->read(), 0);
 }
 
 READ_LINE_MEMBER( studio2_state::ef3_r )
 {
-	return BIT(input_port_read(machine(), "A"), m_keylatch);
+	return BIT(ioport("A")->read(), m_keylatch);
 }
 
 READ_LINE_MEMBER( studio2_state::ef4_r )
 {
-	return BIT(input_port_read(machine(), "B"), m_keylatch);
+	return BIT(ioport("B")->read(), m_keylatch);
 }
 
 WRITE_LINE_MEMBER( studio2_state::q_w )
@@ -439,7 +437,7 @@ DEVICE_IMAGE_LOAD( studio2_cart_load )
 		// WARNING: list code currently assume that cart mapping starts at 0x400.
 		// the five dumps currently available work like this, but the .st2 format
 		// allows for more freedom... how was the content of a real cart mapped?
-		UINT8 *ptr = ((UINT8 *) image.device().machine().region(CDP1802_TAG)->base()) + 0x400;
+		UINT8 *ptr = ((UINT8 *) image.device().machine().root_device().memregion(CDP1802_TAG)->base()) + 0x400;
 		memcpy(ptr, image.get_software_region("rom"), image.get_software_region_length("rom"));
 		return IMAGE_INIT_PASS;
 	}

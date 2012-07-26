@@ -237,85 +237,80 @@ Country :
 
 /******************************************************************************/
 
-static READ16_HANDLER( sound_status_r )
+READ16_MEMBER(bbusters_state::sound_status_r)
 {
-	bbusters_state *state = space->machine().driver_data<bbusters_state>();
 
-	return state->m_sound_status;
+	return m_sound_status;
 }
 
-static WRITE8_HANDLER( sound_status_w )
+WRITE8_MEMBER(bbusters_state::sound_status_w)
 {
-	bbusters_state *state = space->machine().driver_data<bbusters_state>();
 
-	state->m_sound_status = data;
+	m_sound_status = data;
 }
 
-static WRITE16_HANDLER( sound_cpu_w )
+WRITE16_MEMBER(bbusters_state::sound_cpu_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(space, 0, data&0xff);
-		cputag_set_input_line(space->machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_byte_w(space, 0, data&0xff);
+		cputag_set_input_line(machine(), "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 /* Eprom is byte wide, top half of word _must_ be 0xff */
-static READ16_HANDLER( eprom_r )
+READ16_MEMBER(bbusters_state::eprom_r)
 {
-	bbusters_state *state = space->machine().driver_data<bbusters_state>();
 
-	return (state->m_eprom_data[offset]&0xff) | 0xff00;
+	return (m_eprom_data[offset]&0xff) | 0xff00;
 }
 
-static READ16_HANDLER( control_3_r )
+READ16_MEMBER(bbusters_state::control_3_r)
 {
-	bbusters_state *state = space->machine().driver_data<bbusters_state>();
 	static const char *const port[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2", "GUNX3", "GUNY3" };
 
-	UINT16 retdata = input_port_read(space->machine(), port[state->m_gun_select]);
+	UINT16 retdata = ioport(port[m_gun_select])->read();
 
 	retdata >>=1; // by lowering the precision of the gun reading hardware the game seems to work better
 
 	return retdata;
 }
 
-static WRITE16_HANDLER( gun_select_w )
+WRITE16_MEMBER(bbusters_state::gun_select_w)
 {
-	bbusters_state *state = space->machine().driver_data<bbusters_state>();
 
-	logerror("%08x: gun r\n",cpu_get_pc(&space->device()));
+	logerror("%08x: gun r\n",cpu_get_pc(&space.device()));
 
-	device_set_input_line(&space->device(), 2, HOLD_LINE);
+	device_set_input_line(&space.device(), 2, HOLD_LINE);
 
-	state->m_gun_select = data & 0xff;
+	m_gun_select = data & 0xff;
 }
 
-static WRITE16_HANDLER( two_gun_output_w )
+WRITE16_MEMBER(bbusters_state::two_gun_output_w)
 {
 	output_set_value("Player1_Gun_Recoil",(data & 0x01));
 	output_set_value("Player2_Gun_Recoil",(data & 0x02)>>1);
 }
 
-static WRITE16_HANDLER( three_gun_output_w )
+WRITE16_MEMBER(bbusters_state::three_gun_output_w)
 {
 	output_set_value("Player1_Gun_Recoil",(data & 0x01));
 	output_set_value("Player2_Gun_Recoil",(data & 0x02)>>1);
 	output_set_value("Player3_Gun_Recoil",(data & 0x04)>>2);
 }
 
-static READ16_HANDLER( kludge_r )
+READ16_MEMBER(bbusters_state::kludge_r)
 {
 	// might latch the gun value?
 	return 0x0000;
 }
 
-static READ16_HANDLER( mechatt_gun_r )
+READ16_MEMBER(bbusters_state::mechatt_gun_r)
 {
 	int x, y;
 
-	x = input_port_read(space->machine(), offset ? "GUNX2" : "GUNX1");
-	y = input_port_read(space->machine(), offset ? "GUNY2" : "GUNY1");
+	x = ioport(offset ? "GUNX2" : "GUNX1")->read();
+	y = ioport(offset ? "GUNY2" : "GUNY1")->read();
 
 	/* Todo - does the hardware really clamp like this? */
 	x += 0x18;
@@ -327,20 +322,20 @@ static READ16_HANDLER( mechatt_gun_r )
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( bbusters_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( bbusters_map, AS_PROGRAM, 16, bbusters_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_BASE_MEMBER(bbusters_state, m_ram)
-	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(bbusters_video_w) AM_BASE_MEMBER(bbusters_state, m_videoram)
+	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(bbusters_video_w) AM_SHARE("videoram")
 	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0a1000, 0x0a7fff) AM_RAM		/* service mode */
 	AM_RANGE(0x0a8000, 0x0a8fff) AM_RAM AM_SHARE("spriteram2")
 	AM_RANGE(0x0a9000, 0x0affff) AM_RAM		/* service mode */
-	AM_RANGE(0x0b0000, 0x0b1fff) AM_RAM_WRITE(bbusters_pf1_w) AM_BASE_MEMBER(bbusters_state, m_pf1_data)
-	AM_RANGE(0x0b2000, 0x0b3fff) AM_RAM_WRITE(bbusters_pf2_w) AM_BASE_MEMBER(bbusters_state, m_pf2_data)
+	AM_RANGE(0x0b0000, 0x0b1fff) AM_RAM_WRITE(bbusters_pf1_w) AM_SHARE("pf1_data")
+	AM_RANGE(0x0b2000, 0x0b3fff) AM_RAM_WRITE(bbusters_pf2_w) AM_SHARE("pf2_data")
 	AM_RANGE(0x0b4000, 0x0b5fff) AM_RAM		/* service mode */
-	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITEONLY AM_BASE_MEMBER(bbusters_state, m_pf1_scroll_data)
-	AM_RANGE(0x0b8008, 0x0b800b) AM_WRITEONLY AM_BASE_MEMBER(bbusters_state, m_pf2_scroll_data)
-	AM_RANGE(0x0d0000, 0x0d0fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITEONLY AM_SHARE("pf1_scroll_data")
+	AM_RANGE(0x0b8008, 0x0b800b) AM_WRITEONLY AM_SHARE("pf2_scroll_data")
+	AM_RANGE(0x0d0000, 0x0d0fff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("COINS")	/* Coins */
 	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("IN0")	/* Player 1 & 2 */
 	AM_RANGE(0x0e0004, 0x0e0005) AM_READ_PORT("IN1")	/* Player 3 */
@@ -357,17 +352,17 @@ ADDRESS_MAP_END
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( mechatt_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mechatt_map, AS_PROGRAM, 16, bbusters_state )
 	AM_RANGE(0x000000, 0x06ffff) AM_ROM
-	AM_RANGE(0x070000, 0x07ffff) AM_RAM AM_BASE_MEMBER(bbusters_state, m_ram)
-	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(bbusters_video_w) AM_BASE_MEMBER(bbusters_state, m_videoram)
+	AM_RANGE(0x070000, 0x07ffff) AM_RAM AM_SHARE("ram")
+	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(bbusters_video_w) AM_SHARE("videoram")
 	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x0a1000, 0x0a7fff) AM_WRITENOP
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(bbusters_pf1_w) AM_BASE_MEMBER(bbusters_state, m_pf1_data)
-	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITEONLY AM_BASE_MEMBER(bbusters_state, m_pf1_scroll_data)
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM_WRITE(bbusters_pf2_w) AM_BASE_MEMBER(bbusters_state, m_pf2_data)
-	AM_RANGE(0x0c8000, 0x0c8003) AM_WRITEONLY AM_BASE_MEMBER(bbusters_state, m_pf2_scroll_data)
-	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(bbusters_pf1_w) AM_SHARE("pf1_data")
+	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITEONLY AM_SHARE("pf1_scroll_data")
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM_WRITE(bbusters_pf2_w) AM_SHARE("pf2_data")
+	AM_RANGE(0x0c8000, 0x0c8003) AM_WRITEONLY AM_SHARE("pf2_scroll_data")
+	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(paletteram_RRRRGGGGBBBBxxxx_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ_PORT("IN0")
 	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0e0004, 0x0e0007) AM_READ(mechatt_gun_r)
@@ -378,21 +373,21 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bbusters_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(soundlatch_r, sound_status_w)
+	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r) AM_WRITE(sound_status_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, bbusters_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0xc0, 0xc1) AM_WRITENOP /* -> Main CPU */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sounda_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( sounda_portmap, AS_IO, 8, bbusters_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2608_r, ym2608_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("ymsnd", ym2608_r, ym2608_w)
 	AM_RANGE(0xc0, 0xc1) AM_WRITENOP /* -> Main CPU */
 ADDRESS_MAP_END
 

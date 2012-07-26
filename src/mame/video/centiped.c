@@ -147,13 +147,12 @@ VIDEO_START( bullsdrt )
  *
  *************************************/
 
-WRITE8_HANDLER( centiped_videoram_w )
+WRITE8_MEMBER(centiped_state::centiped_videoram_w)
 {
-	centiped_state *state = space->machine().driver_data<centiped_state>();
-	UINT8 *videoram = state->m_videoram;
+	UINT8 *videoram = m_videoram;
 
 	videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -164,11 +163,10 @@ WRITE8_HANDLER( centiped_videoram_w )
  *
  *************************************/
 
-WRITE8_HANDLER( centiped_flip_screen_w )
+WRITE8_MEMBER(centiped_state::centiped_flip_screen_w)
 {
-	centiped_state *state = space->machine().driver_data<centiped_state>();
 
-	state->m_flipscreen = data >> 7;
+	m_flipscreen = data >> 7;
 }
 
 
@@ -179,12 +177,11 @@ WRITE8_HANDLER( centiped_flip_screen_w )
  *
  *************************************/
 
-WRITE8_HANDLER( bullsdrt_tilesbank_w )
+WRITE8_MEMBER(centiped_state::bullsdrt_tilesbank_w)
 {
-	centiped_state *state = space->machine().driver_data<centiped_state>();
 
-	state->m_bullsdrt_tiles_bankram[offset] = data;
-	state->m_bg_tilemap->mark_all_dirty();
+	m_bullsdrt_tiles_bankram[offset] = data;
+	m_bg_tilemap->mark_all_dirty();
 }
 
 
@@ -195,11 +192,10 @@ WRITE8_HANDLER( bullsdrt_tilesbank_w )
  *
  *************************************/
 
-WRITE8_HANDLER( bullsdrt_sprites_bank_w )
+WRITE8_MEMBER(centiped_state::bullsdrt_sprites_bank_w)
 {
-	centiped_state *state = space->machine().driver_data<centiped_state>();
 
-	state->m_bullsdrt_sprites_bank = data;
+	m_bullsdrt_sprites_bank = data;
 }
 
 
@@ -227,9 +223,9 @@ WRITE8_HANDLER( bullsdrt_sprites_bank_w )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( centiped_paletteram_w )
+WRITE8_MEMBER(centiped_state::centiped_paletteram_w)
 {
-	space->machine().generic.paletteram.u8[offset] = data;
+	m_generic_paletteram_8[offset] = data;
 
 	/* bit 2 of the output palette RAM is always pulled high, so we ignore */
 	/* any palette changes unless the write is to a palette RAM address */
@@ -254,7 +250,7 @@ WRITE8_HANDLER( centiped_paletteram_w )
 
 		/* character colors, set directly */
 		if ((offset & 0x08) == 0)
-			palette_set_color(space->machine(), offset & 0x03, color);
+			palette_set_color(machine(), offset & 0x03, color);
 
 		/* sprite colors - set all the applicable ones */
 		else
@@ -266,13 +262,13 @@ WRITE8_HANDLER( centiped_paletteram_w )
 			for (i = 0; i < 0x100; i += 4)
 			{
 				if (offset == ((i >> 2) & 0x03))
-					palette_set_color(space->machine(), i + 4 + 1, color);
+					palette_set_color(machine(), i + 4 + 1, color);
 
 				if (offset == ((i >> 4) & 0x03))
-					palette_set_color(space->machine(), i + 4 + 2, color);
+					palette_set_color(machine(), i + 4 + 2, color);
 
 				if (offset == ((i >> 6) & 0x03))
-					palette_set_color(space->machine(), i + 4 + 3, color);
+					palette_set_color(machine(), i + 4 + 3, color);
 			}
 		}
 	}
@@ -294,6 +290,7 @@ WRITE8_HANDLER( centiped_paletteram_w )
 
 PALETTE_INIT( warlords )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < machine.total_colors(); i++)
@@ -405,20 +402,20 @@ static void melliped_mazeinv_set_color(running_machine &machine, offs_t offset, 
 }
 
 
-WRITE8_HANDLER( milliped_paletteram_w )
+WRITE8_MEMBER(centiped_state::milliped_paletteram_w)
 {
-	space->machine().generic.paletteram.u8[offset] = data;
+	m_generic_paletteram_8[offset] = data;
 
-	melliped_mazeinv_set_color(space->machine(), offset, data);
+	melliped_mazeinv_set_color(machine(), offset, data);
 }
 
 
-WRITE8_HANDLER( mazeinv_paletteram_w )
+WRITE8_MEMBER(centiped_state::mazeinv_paletteram_w)
 {
-	space->machine().generic.paletteram.u8[offset] = data;
+	m_generic_paletteram_8[offset] = data;
 
 	/* the value passed in is a look-up index into the color PROM */
-	melliped_mazeinv_set_color(space->machine(), offset, ~space->machine().region("proms")->base()[~data & 0x0f]);
+	melliped_mazeinv_set_color(machine(), offset, ~machine().root_device().memregion("proms")->base()[~data & 0x0f]);
 }
 
 
@@ -465,7 +462,7 @@ SCREEN_UPDATE_IND16( warlords )
 {
 	centiped_state *state = screen.machine().driver_data<centiped_state>();
 	UINT8 *spriteram = state->m_spriteram;
-	int upright_mode = input_port_read(screen.machine(), "IN0") & 0x80;
+	int upright_mode = screen.machine().root_device().ioport("IN0")->read() & 0x80;
 	int offs;
 
 	/* if the cocktail/upright switch flipped, force refresh */

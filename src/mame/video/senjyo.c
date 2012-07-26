@@ -126,47 +126,41 @@ VIDEO_START( senjyo )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( senjyo_fgvideoram_w )
+WRITE8_MEMBER(senjyo_state::senjyo_fgvideoram_w)
 {
-	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
-	state->m_fgvideoram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fgvideoram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_HANDLER( senjyo_fgcolorram_w )
+WRITE8_MEMBER(senjyo_state::senjyo_fgcolorram_w)
 {
-	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
-	state->m_fgcolorram[offset] = data;
-	state->m_fg_tilemap->mark_tile_dirty(offset);
+	m_fgcolorram[offset] = data;
+	m_fg_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_HANDLER( senjyo_bg1videoram_w )
+WRITE8_MEMBER(senjyo_state::senjyo_bg1videoram_w)
 {
-	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
-	state->m_bg1videoram[offset] = data;
-	state->m_bg1_tilemap->mark_tile_dirty(offset);
+	m_bg1videoram[offset] = data;
+	m_bg1_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_HANDLER( senjyo_bg2videoram_w )
+WRITE8_MEMBER(senjyo_state::senjyo_bg2videoram_w)
 {
-	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
-	state->m_bg2videoram[offset] = data;
-	state->m_bg2_tilemap->mark_tile_dirty(offset);
+	m_bg2videoram[offset] = data;
+	m_bg2_tilemap->mark_tile_dirty(offset);
 }
-WRITE8_HANDLER( senjyo_bg3videoram_w )
+WRITE8_MEMBER(senjyo_state::senjyo_bg3videoram_w)
 {
-	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
-	state->m_bg3videoram[offset] = data;
-	state->m_bg3_tilemap->mark_tile_dirty(offset);
+	m_bg3videoram[offset] = data;
+	m_bg3_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( senjyo_bgstripes_w )
+WRITE8_MEMBER(senjyo_state::senjyo_bgstripes_w)
 {
-	senjyo_state *state = space->machine().driver_data<senjyo_state>();
 
-	*state->m_bgstripesram = data;
+	*m_bgstripesram = data;
 }
 
 /***************************************************************************
@@ -185,7 +179,7 @@ static void draw_bgbitmap(running_machine &machine, bitmap_ind16 &bitmap,const r
 		bitmap.fill(0, cliprect);
 	else
 	{
-		int flip = flip_screen_get(machine);
+		int flip = state->flip_screen();
 
 		pen = 0;
 		count = 0;
@@ -226,7 +220,7 @@ static void draw_radar(running_machine &machine,bitmap_ind16 &bitmap,const recta
 				sx = (8 * (offs % 8) + x) + 256-64;
 				sy = ((offs & 0x1ff) / 8) + 96;
 
-				if (flip_screen_get(machine))
+				if (state->flip_screen())
 				{
 					sx = 255 - sx;
 					sy = 255 - sy;
@@ -243,7 +237,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = state->m_spriteram_size - 4; offs >= 0; offs -= 4)
+	for (offs = state->m_spriteram.bytes() - 4; offs >= 0; offs -= 4)
 	{
 		int big,sx,sy,flipx,flipy;
 
@@ -261,7 +255,7 @@ static void draw_sprites(running_machine &machine, bitmap_ind16 &bitmap,const re
 			flipx = spriteram[offs+1] & 0x40;
 			flipy = spriteram[offs+1] & 0x80;
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen())
 			{
 				flipx = !flipx;
 				flipy = !flipy;
@@ -299,7 +293,7 @@ SCREEN_UPDATE_IND16( senjyo )
 	palette_set_color(screen.machine(),513,MAKE_RGB(0xff,0xff,0x00));	/* yellow for player */
 
 	{
-		int flip = flip_screen_get(screen.machine());
+		int flip = state->flip_screen();
 		int scrollx,scrolly;
 
 		for (i = 0;i < 32;i++)

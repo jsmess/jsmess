@@ -90,75 +90,72 @@ EB26IC73.BIN    27C240      /  Main Program
 
 /*** SOUND *******************************************************************/
 
-static WRITE16_HANDLER( sound_command_w )
+WRITE16_MEMBER(suprslam_state::sound_command_w)
 {
-	suprslam_state *state = space->machine().driver_data<suprslam_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		state->m_pending_command = 1;
-		soundlatch_w(space, offset, data & 0xff);
-		device_set_input_line(state->m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
+		m_pending_command = 1;
+		soundlatch_byte_w(space, offset, data & 0xff);
+		device_set_input_line(m_audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 #if 0
-static READ16_HANDLER( pending_command_r )
+READ16_MEMBER(suprslam_state::pending_command_r)
 {
-	suprslam_state *state = space->machine().driver_data<suprslam_state>();
 	return pending_command;
 }
 #endif
 
-static WRITE8_HANDLER( pending_command_clear_w )
+WRITE8_MEMBER(suprslam_state::pending_command_clear_w)
 {
-	suprslam_state *state = space->machine().driver_data<suprslam_state>();
-	state->m_pending_command = 0;
+	m_pending_command = 0;
 }
 
-static WRITE8_HANDLER( suprslam_sh_bankswitch_w )
+WRITE8_MEMBER(suprslam_state::suprslam_sh_bankswitch_w)
 {
-	UINT8 *RAM = space->machine().region("audiocpu")->base();
+	UINT8 *RAM = memregion("audiocpu")->base();
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x8000;
-	memory_set_bankptr(space->machine(), "bank1",&RAM[bankaddress]);
+	membank("bank1")->set_base(&RAM[bankaddress]);
 }
 
 /*** MEMORY MAPS *************************************************************/
 
-static ADDRESS_MAP_START( suprslam_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( suprslam_map, AS_PROGRAM, 16, suprslam_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0xfb0000, 0xfb1fff) AM_RAM AM_BASE_MEMBER(suprslam_state, m_spriteram)
-	AM_RANGE(0xfc0000, 0xfcffff) AM_RAM AM_BASE_MEMBER(suprslam_state, m_sp_videoram)
+	AM_RANGE(0xfb0000, 0xfb1fff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0xfc0000, 0xfcffff) AM_RAM AM_SHARE("sp_videoram")
 	AM_RANGE(0xfd0000, 0xfdffff) AM_RAM
-	AM_RANGE(0xfe0000, 0xfe0fff) AM_RAM_WRITE(suprslam_screen_videoram_w) AM_BASE_MEMBER(suprslam_state, m_screen_videoram)
-	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(suprslam_bg_videoram_w) AM_BASE_MEMBER(suprslam_state, m_bg_videoram)
-	AM_RANGE(0xff2000, 0xff203f) AM_RAM AM_BASE_MEMBER(suprslam_state,m_screen_vregs)
+	AM_RANGE(0xfe0000, 0xfe0fff) AM_RAM_WRITE(suprslam_screen_videoram_w) AM_SHARE("screen_videoram")
+	AM_RANGE(0xff0000, 0xff1fff) AM_RAM_WRITE(suprslam_bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0xff2000, 0xff203f) AM_RAM AM_SHARE("screen_vregs")
 //  AM_RANGE(0xff3000, 0xff3001) AM_WRITENOP // sprite buffer trigger?
-	AM_RANGE(0xff8000, 0xff8fff) AM_DEVREADWRITE("k053936", k053936_linectrl_r, k053936_linectrl_w)
+	AM_RANGE(0xff8000, 0xff8fff) AM_DEVREADWRITE_LEGACY("k053936", k053936_linectrl_r, k053936_linectrl_w)
 	AM_RANGE(0xff9000, 0xff9001) AM_WRITE(sound_command_w)
-	AM_RANGE(0xffa000, 0xffafff) AM_RAM_WRITE(paletteram16_xGGGGGBBBBBRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xffd000, 0xffd01f) AM_DEVWRITE("k053936", k053936_ctrl_w)
+	AM_RANGE(0xffa000, 0xffafff) AM_RAM_WRITE(paletteram_xGGGGGBBBBBRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0xffd000, 0xffd01f) AM_DEVWRITE_LEGACY("k053936", k053936_ctrl_w)
 	AM_RANGE(0xffe000, 0xffe001) AM_WRITE(suprslam_bank_w)
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1")
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff008, 0xfff009) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITEONLY AM_BASE_MEMBER(suprslam_state, m_spr_ctrl)
+	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITEONLY AM_SHARE("spr_ctrl")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, suprslam_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
 	AM_RANGE(0x7800, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, suprslam_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(suprslam_sh_bankswitch_w)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, pending_command_clear_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
+	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_byte_r) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("ymsnd", ym2610_r, ym2610_w)
 ADDRESS_MAP_END
 
 /*** INPUT PORTS *************************************************************/

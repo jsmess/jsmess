@@ -163,6 +163,14 @@ public:
 	pen_t m_pens[NUM_PENS];
 
 	UINT8 m_atamanot_prot_state;
+	DECLARE_WRITE8_MEMBER(ssingles_videoram_w);
+	DECLARE_WRITE8_MEMBER(ssingles_colorram_w);
+	DECLARE_READ8_MEMBER(c000_r);
+	DECLARE_READ8_MEMBER(c001_r);
+	DECLARE_WRITE8_MEMBER(c001_w);
+	DECLARE_READ8_MEMBER(atamanot_prot_r);
+	DECLARE_WRITE8_MEMBER(atamanot_prot_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(controls_r);
 };
 
 //fake palette
@@ -185,7 +193,7 @@ static MC6845_UPDATE_ROW( ssingles_update_row )
 	UINT32 tile_address;
 	UINT16 cell,palette;
 	UINT8 b0,b1;
-	const UINT8 *gfx = device->machine().region("gfx1")->base();
+	const UINT8 *gfx = state->memregion("gfx1")->base();
 
 	for(cx=0;cx<x_count;++cx)
 	{
@@ -223,7 +231,7 @@ static MC6845_UPDATE_ROW( atamanot_update_row )
 	UINT32 tile_address;
 	UINT16 cell,palette;
 	UINT8 b0,b1;
-	const UINT8 *gfx = device->machine().region("gfx1")->base();
+	const UINT8 *gfx = state->memregion("gfx1")->base();
 
 	for(cx=0;cx<x_count;++cx)
 	{
@@ -283,20 +291,18 @@ static const mc6845_interface atamanot_mc6845_intf =
 };
 
 
-static WRITE8_HANDLER(ssingles_videoram_w)
+WRITE8_MEMBER(ssingles_state::ssingles_videoram_w)
 {
-	ssingles_state *state = space->machine().driver_data<ssingles_state>();
-	UINT8 *vram = space->machine().region("vram")->base();
+	UINT8 *vram = memregion("vram")->base();
 	vram[offset] = data;
-	state->m_videoram[offset]=data;
+	m_videoram[offset]=data;
 }
 
-static WRITE8_HANDLER(ssingles_colorram_w)
+WRITE8_MEMBER(ssingles_state::ssingles_colorram_w)
 {
-	ssingles_state *state = space->machine().driver_data<ssingles_state>();
-	UINT8 *cram = space->machine().region("cram")->base();
+	UINT8 *cram = memregion("cram")->base();
 	cram[offset] = data;
-	state->m_colorram[offset]=data;
+	m_colorram[offset]=data;
 }
 
 
@@ -314,32 +320,29 @@ static VIDEO_START(ssingles)
 }
 
 
-static READ8_HANDLER(c000_r)
+READ8_MEMBER(ssingles_state::c000_r)
 {
-	ssingles_state *state = space->machine().driver_data<ssingles_state>();
 
-	return state->m_prot_data;
+	return m_prot_data;
 }
 
-static READ8_HANDLER(c001_r)
+READ8_MEMBER(ssingles_state::c001_r)
 {
-	ssingles_state *state = space->machine().driver_data<ssingles_state>();
 
-	state->m_prot_data=0xc4;
+	m_prot_data=0xc4;
 	return 0;
 }
 
-static WRITE8_HANDLER(c001_w)
+WRITE8_MEMBER(ssingles_state::c001_w)
 {
-	ssingles_state *state = space->machine().driver_data<ssingles_state>();
 
-	state->m_prot_data^=data^0x11;
+	m_prot_data^=data^0x11;
 }
 
-static CUSTOM_INPUT(controls_r)
+CUSTOM_INPUT_MEMBER(ssingles_state::controls_r)
 {
 	int data = 7;
-	switch(input_port_read(field.machine(), "EXTRA"))		//multiplexed
+	switch(ioport("EXTRA")->read())		//multiplexed
 	{
 		case 0x01: data = 1; break;
 		case 0x02: data = 2; break;
@@ -353,25 +356,24 @@ static CUSTOM_INPUT(controls_r)
 	return data;
 }
 
-static ADDRESS_MAP_START( ssingles_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( ssingles_map, AS_PROGRAM, 8, ssingles_state )
 	AM_RANGE(0x0000, 0x00ff) AM_WRITE(ssingles_videoram_w)
 	AM_RANGE(0x0800, 0x08ff) AM_WRITE(ssingles_colorram_w)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xc000, 0xc000) AM_READ( c000_r )
-	AM_RANGE(0xc001, 0xc001) AM_READWRITE( c001_r, c001_w )
+	AM_RANGE(0xc000, 0xc000) AM_READ(c000_r )
+	AM_RANGE(0xc001, 0xc001) AM_READWRITE(c001_r, c001_w )
 	AM_RANGE(0x6000, 0xbfff) AM_ROM
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER( atamanot_prot_r )
+READ8_MEMBER(ssingles_state::atamanot_prot_r)
 {
-	ssingles_state *state = space->machine().driver_data<ssingles_state>();
 	static const char prot_id[] = { "PROGRAM BY KOYAMA" };
 
-	logerror("%04x %02x\n",offset,state->m_atamanot_prot_state);
+	logerror("%04x %02x\n",offset,m_atamanot_prot_state);
 
-	switch(state->m_atamanot_prot_state)
+	switch(m_atamanot_prot_state)
 	{
 		case 0x20:
 		case 0x21:
@@ -386,15 +388,14 @@ static READ8_HANDLER( atamanot_prot_r )
 	return 0;
 }
 
-static WRITE8_HANDLER( atamanot_prot_w )
+WRITE8_MEMBER(ssingles_state::atamanot_prot_w)
 {
-	ssingles_state *state = space->machine().driver_data<ssingles_state>();
 
-	state->m_atamanot_prot_state = data;
+	m_atamanot_prot_state = data;
 }
 
 
-static ADDRESS_MAP_START( atamanot_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( atamanot_map, AS_PROGRAM, 8, ssingles_state )
 	AM_RANGE(0x0000, 0x00ff) AM_WRITE(ssingles_videoram_w)
 	AM_RANGE(0x0800, 0x08ff) AM_WRITE(ssingles_colorram_w)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -403,45 +404,45 @@ static ADDRESS_MAP_START( atamanot_map, AS_PROGRAM, 8 )
 //  AM_RANGE(0x6000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_READ(atamanot_prot_r)
 //  AM_RANGE(0x8000, 0x9fff) AM_ROM AM_REGION("question",0x10000)
-//  AM_RANGE(0xc000, 0xc000) AM_READ( c000_r )
-//  AM_RANGE(0xc001, 0xc001) AM_READWRITE( c001_r, c001_w )
+//  AM_RANGE(0xc000, 0xc000) AM_READ(c000_r )
+//  AM_RANGE(0xc001, 0xc001) AM_READWRITE(c001_r, c001_w )
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ssingles_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( ssingles_io_map, AS_IO, 8, ssingles_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay2", ay8910_address_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
 	AM_RANGE(0x08, 0x08) AM_READNOP
-	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay2", ay8910_data_w)
+	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
 	AM_RANGE(0x16, 0x16) AM_READ_PORT("DSW0")
 	AM_RANGE(0x18, 0x18) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1c, 0x1c) AM_READ_PORT("INPUTS")
 //  AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
-	AM_RANGE(0xfe, 0xfe) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0xff, 0xff) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
+	AM_RANGE(0xfe, 0xfe) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0xff, 0xff) AM_DEVWRITE("crtc", mc6845_device, register_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( atamanot_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( atamanot_io_map, AS_IO, 8, ssingles_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVWRITE("ay1", ay8910_address_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay1", ay8910_data_w)
-	AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay2", ay8910_address_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE_LEGACY("ay1", ay8910_address_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE_LEGACY("ay1", ay8910_data_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE_LEGACY("ay2", ay8910_address_w)
 	AM_RANGE(0x08, 0x08) AM_READNOP
-	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay2", ay8910_data_w)
+	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE_LEGACY("ay2", ay8910_data_w)
 	AM_RANGE(0x16, 0x16) AM_READ_PORT("DSW0")
 	AM_RANGE(0x18, 0x18) AM_READ_PORT("DSW1") AM_WRITE(atamanot_prot_w)
 	AM_RANGE(0x1c, 0x1c) AM_READ_PORT("INPUTS")
 //  AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
-	AM_RANGE(0xfe, 0xfe) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0xff, 0xff) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
+	AM_RANGE(0xfe, 0xfe) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0xff, 0xff) AM_DEVWRITE("crtc", mc6845_device, register_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ssingles )
 	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) //must be LOW
-	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(controls_r, NULL)
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ssingles_state,controls_r, NULL)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 )
@@ -690,6 +691,6 @@ static DRIVER_INIT(ssingles)
 	state->save_item(NAME(state->m_colorram));
 }
 
-GAME( 1983, ssingles, 0, ssingles, ssingles, ssingles, ROT90, "Ent. Ent. Ltd", "Swinging Singles", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1983, ssingles, 0, ssingles, ssingles, ssingles, ROT90, "Entertainment Enterprises, Ltd.", "Swinging Singles", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
 GAME( 1983, atamanot, 0, atamanot, ssingles, ssingles, ROT90, "Yachiyo Denki / Uni Enterprize", "Computer Quiz Atama no Taisou (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 

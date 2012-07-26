@@ -25,64 +25,60 @@ static INTERRUPT_GEN( surpratk_interrupt )
 		device_set_input_line(device, 0, HOLD_LINE);
 }
 
-static READ8_HANDLER( bankedram_r )
+READ8_MEMBER(surpratk_state::bankedram_r)
 {
-	surpratk_state *state = space->machine().driver_data<surpratk_state>();
 
-	if (state->m_videobank & 0x02)
+	if (m_videobank & 0x02)
 	{
-		if (state->m_videobank & 0x04)
-			return space->machine().generic.paletteram.u8[offset + 0x0800];
+		if (m_videobank & 0x04)
+			return m_generic_paletteram_8[offset + 0x0800];
 		else
-			return space->machine().generic.paletteram.u8[offset];
+			return m_generic_paletteram_8[offset];
 	}
-	else if (state->m_videobank & 0x01)
-		return k053245_r(state->m_k053244, offset);
+	else if (m_videobank & 0x01)
+		return k053245_r(m_k053244, offset);
 	else
-		return state->m_ram[offset];
+		return m_ram[offset];
 }
 
-static WRITE8_HANDLER( bankedram_w )
+WRITE8_MEMBER(surpratk_state::bankedram_w)
 {
-	surpratk_state *state = space->machine().driver_data<surpratk_state>();
 
-	if (state->m_videobank & 0x02)
+	if (m_videobank & 0x02)
 	{
-		if (state->m_videobank & 0x04)
-			paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset + 0x0800,data);
+		if (m_videobank & 0x04)
+			paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space,offset + 0x0800,data);
 		else
-			paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset,data);
+			paletteram_xBBBBBGGGGGRRRRR_byte_be_w(space,offset,data);
 	}
-	else if (state->m_videobank & 0x01)
-		k053245_w(state->m_k053244, offset, data);
+	else if (m_videobank & 0x01)
+		k053245_w(m_k053244, offset, data);
 	else
-		state->m_ram[offset] = data;
+		m_ram[offset] = data;
 }
 
-static WRITE8_HANDLER( surpratk_videobank_w )
+WRITE8_MEMBER(surpratk_state::surpratk_videobank_w)
 {
-	surpratk_state *state = space->machine().driver_data<surpratk_state>();
 
-	logerror("%04x: videobank = %02x\n",cpu_get_pc(&space->device()),data);
+	logerror("%04x: videobank = %02x\n",cpu_get_pc(&space.device()),data);
 	/* bit 0 = select 053245 at 0000-07ff */
 	/* bit 1 = select palette at 0000-07ff */
 	/* bit 2 = select palette bank 0 or 1 */
-	state->m_videobank = data;
+	m_videobank = data;
 }
 
-static WRITE8_HANDLER( surpratk_5fc0_w )
+WRITE8_MEMBER(surpratk_state::surpratk_5fc0_w)
 {
-	surpratk_state *state = space->machine().driver_data<surpratk_state>();
 
 	if ((data & 0xf4) != 0x10)
-		logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(&space->device()),data);
+		logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(&space.device()),data);
 
 	/* bit 0/1 = coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x01);
-	coin_counter_w(space->machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+	coin_counter_w(machine(), 1, data & 0x02);
 
 	/* bit 3 = enable char ROM reading through the video RAM */
-	k052109_set_rmrd_line(state->m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	k052109_set_rmrd_line(m_k052109, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* other bits unknown */
 }
@@ -90,8 +86,8 @@ static WRITE8_HANDLER( surpratk_5fc0_w )
 
 /********************************************/
 
-static ADDRESS_MAP_START( surpratk_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(bankedram_r, bankedram_w) AM_BASE_MEMBER(surpratk_state, m_ram)
+static ADDRESS_MAP_START( surpratk_map, AS_PROGRAM, 8, surpratk_state )
+	AM_RANGE(0x0000, 0x07ff) AM_READWRITE(bankedram_r, bankedram_w) AM_SHARE("ram")
 	AM_RANGE(0x0800, 0x1fff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK("bank1")					/* banked ROM */
 	AM_RANGE(0x5f8c, 0x5f8c) AM_READ_PORT("P1")
@@ -99,12 +95,12 @@ static ADDRESS_MAP_START( surpratk_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x5f8e, 0x5f8e) AM_READ_PORT("DSW3")
 	AM_RANGE(0x5f8f, 0x5f8f) AM_READ_PORT("DSW1")
 	AM_RANGE(0x5f90, 0x5f90) AM_READ_PORT("DSW2")
-	AM_RANGE(0x5fa0, 0x5faf) AM_DEVREADWRITE("k053244", k053244_r, k053244_w)
-	AM_RANGE(0x5fb0, 0x5fbf) AM_DEVWRITE("k053251", k053251_w)
-	AM_RANGE(0x5fc0, 0x5fc0) AM_READWRITE(watchdog_reset_r, surpratk_5fc0_w)
-	AM_RANGE(0x5fd0, 0x5fd1) AM_DEVWRITE("ymsnd", ym2151_w)
+	AM_RANGE(0x5fa0, 0x5faf) AM_DEVREADWRITE_LEGACY("k053244", k053244_r, k053244_w)
+	AM_RANGE(0x5fb0, 0x5fbf) AM_DEVWRITE_LEGACY("k053251", k053251_w)
+	AM_RANGE(0x5fc0, 0x5fc0) AM_READ(watchdog_reset_r) AM_WRITE(surpratk_5fc0_w)
+	AM_RANGE(0x5fd0, 0x5fd1) AM_DEVWRITE_LEGACY("ymsnd", ym2151_w)
 	AM_RANGE(0x5fc4, 0x5fc4) AM_WRITE(surpratk_videobank_w)
-	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("k052109", k052109_r, k052109_w)
+	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE_LEGACY("k052109", k052109_r, k052109_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM					/* ROM */
 ADDRESS_MAP_END
 
@@ -170,7 +166,7 @@ static void irqhandler( device_t *device, int linestate )
 
 static const ym2151_interface ym2151_config =
 {
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 
@@ -195,13 +191,13 @@ static const k05324x_interface surpratk_k05324x_intf =
 static MACHINE_START( surpratk )
 {
 	surpratk_state *state = machine.driver_data<surpratk_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 28, &ROM[0x10000], 0x2000);
-	memory_configure_bank(machine, "bank1", 28, 4, &ROM[0x08000], 0x2000);
-	memory_set_bank(machine, "bank1", 0);
+	state->membank("bank1")->configure_entries(0, 28, &ROM[0x10000], 0x2000);
+	state->membank("bank1")->configure_entries(28, 4, &ROM[0x08000], 0x2000);
+	state->membank("bank1")->set_entry(0);
 
-	machine.generic.paletteram.u8 = auto_alloc_array_clear(machine, UINT8, 0x1000);
+	state->m_generic_paletteram_8.allocate(0x1000);
 
 	state->m_maincpu = machine.device("maincpu");
 	state->m_k053244 = machine.device("k053244");
@@ -212,7 +208,6 @@ static MACHINE_START( surpratk )
 	state->save_item(NAME(state->m_sprite_colorbase));
 	state->save_item(NAME(state->m_layer_colorbase));
 	state->save_item(NAME(state->m_layerpri));
-	state_save_register_global_pointer(machine, machine.generic.paletteram.u8, 0x1000);
 }
 
 static MACHINE_RESET( surpratk )
@@ -328,7 +323,7 @@ ROM_END
 static KONAMI_SETLINES_CALLBACK( surpratk_banking )
 {
 	logerror("%04x: setlines %02x\n",cpu_get_pc(device), lines);
-	memory_set_bank(device->machine(), "bank1", lines & 0x1f);
+	device->machine().root_device().membank("bank1")->set_entry(lines & 0x1f);
 }
 
 

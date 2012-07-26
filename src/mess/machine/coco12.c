@@ -42,7 +42,7 @@ void coco12_state::configure_sam()
 	cococart_slot_device *cart = m_cococart;
 	UINT8 *ram = m_ram->pointer();
 	UINT32 ram_size = m_ram->size();
-	UINT8 *rom = machine().region(MAINCPU_TAG)->base();
+	UINT8 *rom = memregion(MAINCPU_TAG)->base();
 	UINT8 *cart_rom = cart->get_cart_base();
 
 	m_sam->configure_bank(0, ram, ram_size, false);			// $0000-$7FFF

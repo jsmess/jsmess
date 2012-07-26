@@ -78,18 +78,25 @@ class kingdrby_state : public driver_device
 {
 public:
 	kingdrby_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_vram(*this, "vram"),
+		m_attr(*this, "attr"),
+		m_spriteram(*this, "spriteram"){ }
 
 	UINT8 m_sound_cmd;
-	UINT8 *m_vram;
-	UINT8 *m_attr;
+	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<UINT8> m_attr;
 	tilemap_t *m_sc0_tilemap;
 	tilemap_t *m_sc0w_tilemap;
 	tilemap_t *m_sc1_tilemap;
 	UINT8 m_p1_hopper;
 	UINT8 m_p2_hopper;
 	UINT8 m_mux_data;
-	UINT8 *m_spriteram;
+	required_shared_ptr<UINT8> m_spriteram;
+	DECLARE_WRITE8_MEMBER(sc0_vram_w);
+	DECLARE_WRITE8_MEMBER(sc0_attr_w);
+	DECLARE_WRITE8_MEMBER(led_array_w);
+	DECLARE_WRITE8_MEMBER(kingdrbb_lamps_w);
 };
 
 
@@ -233,22 +240,20 @@ static SCREEN_UPDATE_IND16(kingdrby)
 	return 0;
 }
 
-static WRITE8_HANDLER( sc0_vram_w )
+WRITE8_MEMBER(kingdrby_state::sc0_vram_w)
 {
-	kingdrby_state *state = space->machine().driver_data<kingdrby_state>();
-	state->m_vram[offset] = data;
-	state->m_sc0_tilemap->mark_tile_dirty(offset);
-	state->m_sc0w_tilemap->mark_tile_dirty(offset);
-	state->m_sc1_tilemap->mark_tile_dirty(offset);
+	m_vram[offset] = data;
+	m_sc0_tilemap->mark_tile_dirty(offset);
+	m_sc0w_tilemap->mark_tile_dirty(offset);
+	m_sc1_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE8_HANDLER( sc0_attr_w )
+WRITE8_MEMBER(kingdrby_state::sc0_attr_w)
 {
-	kingdrby_state *state = space->machine().driver_data<kingdrby_state>();
-	state->m_attr[offset] = data;
-	state->m_sc0_tilemap->mark_tile_dirty(offset);
-	state->m_sc0w_tilemap->mark_tile_dirty(offset);
-	state->m_sc1_tilemap->mark_tile_dirty(offset);
+	m_attr[offset] = data;
+	m_sc0_tilemap->mark_tile_dirty(offset);
+	m_sc0w_tilemap->mark_tile_dirty(offset);
+	m_sc1_tilemap->mark_tile_dirty(offset);
 }
 
 /*************************************
@@ -262,7 +267,7 @@ static WRITE8_HANDLER( sc0_attr_w )
 static READ8_DEVICE_HANDLER( hopper_io_r )
 {
 	kingdrby_state *state = device->machine().driver_data<kingdrby_state>();
-	return (input_port_read(device->machine(),"HPIO") & 0x3f) | state->m_p1_hopper | state->m_p2_hopper;
+	return (state->ioport("HPIO")->read() & 0x3f) | state->m_p1_hopper | state->m_p2_hopper;
 }
 
 static WRITE8_DEVICE_HANDLER( hopper_io_w )
@@ -279,7 +284,7 @@ static WRITE8_DEVICE_HANDLER( sound_cmd_w )
 	cputag_set_input_line(device->machine(), "soundcpu", INPUT_LINE_NMI, PULSE_LINE);
 	state->m_sound_cmd = data;
 	/* soundlatch is unneeded since we are already using perfect interleave. */
-	// soundlatch_w(space,0, data);
+	// soundlatch_byte_w(space,0, data);
 }
 
 
@@ -295,9 +300,9 @@ static READ8_DEVICE_HANDLER( input_mux_r )
 {
 	kingdrby_state *state = device->machine().driver_data<kingdrby_state>();
 	if(state->m_mux_data & 0x80)
-		return input_port_read(device->machine(),"MUX0");
+		return state->ioport("MUX0")->read();
 	else
-		return input_port_read(device->machine(),"MUX1");
+		return state->ioport("MUX1")->read();
 }
 
 static READ8_DEVICE_HANDLER( key_matrix_r )
@@ -305,8 +310,8 @@ static READ8_DEVICE_HANDLER( key_matrix_r )
 	UINT16 p1_val,p2_val;
 	UINT8 p1_res,p2_res;
 
-	p1_val = input_port_read(device->machine(),"KEY_1P");
-	p2_val = input_port_read(device->machine(),"KEY_2P");
+	p1_val = device->machine().root_device().ioport("KEY_1P")->read();
+	p2_val = device->machine().root_device().ioport("KEY_2P")->read();
 
 	p1_res = 0;
 	p2_res = 0;
@@ -361,7 +366,7 @@ static READ8_DEVICE_HANDLER( sound_cmd_r )
 static const UINT8 led_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
 
-static WRITE8_HANDLER( led_array_w )
+WRITE8_MEMBER(kingdrby_state::led_array_w)
 {
 	/*
     offset = directly tied with the button (i.e. offset 1 = 1-2, offset 2 = 1-3 etc.)
@@ -381,48 +386,48 @@ static WRITE8_HANDLER( led_array_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, kingdrby_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM AM_MIRROR(0xc00) AM_SHARE("share1")
-	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(sc0_vram_w) AM_BASE_MEMBER(kingdrby_state, m_vram)
-	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(sc0_attr_w) AM_BASE_MEMBER(kingdrby_state, m_attr)
+	AM_RANGE(0x4000, 0x43ff) AM_RAM_WRITE(sc0_vram_w) AM_SHARE("vram")
+	AM_RANGE(0x5000, 0x53ff) AM_RAM_WRITE(sc0_attr_w) AM_SHARE("attr")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( master_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( master_io_map, AS_IO, 8, kingdrby_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_NOP //interrupt ack
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, kingdrby_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom, tested for the post check
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("nvram") //backup ram
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* I/O Ports */
-	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* I/O Ports */
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* I/O Ports */
+	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w)	/* I/O Ports */
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_BASE_MEMBER(kingdrby_state, m_spriteram)
-	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x7801, 0x780f) AM_WRITE(led_array_w)
 	AM_RANGE(0x7a00, 0x7a00) AM_RAM //buffer for the key matrix
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( kingdrbb_lamps_w )
+WRITE8_MEMBER(kingdrby_state::kingdrbb_lamps_w)
 {
 	// (same as the inputs but active high)
 }
 
-static ADDRESS_MAP_START( slave_1986_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( slave_1986_map, AS_PROGRAM, 8, kingdrby_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom tested for the post check
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_SHARE("nvram") //backup ram
-	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* I/O Ports */
-//  AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w) /* I/O Ports */
+	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE_LEGACY("ppi8255_0", ppi8255_r, ppi8255_w)	/* I/O Ports */
+//  AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE_LEGACY("ppi8255_1", ppi8255_r, ppi8255_w) /* I/O Ports */
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_BASE_MEMBER(kingdrby_state, m_spriteram)
-	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE_MODERN("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
 	AM_RANGE(0x7800, 0x7800) AM_READ_PORT("KEY0")
     AM_RANGE(0x7801, 0x7801) AM_READ_PORT("KEY1")
 	AM_RANGE(0x7802, 0x7802) AM_READ_PORT("KEY2")
@@ -432,30 +437,30 @@ static ADDRESS_MAP_START( slave_1986_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( slave_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( slave_io_map, AS_IO, 8, kingdrby_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_NOP //interrupt ack
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, kingdrby_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, kingdrby_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_r)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_data_address_w)
+	AM_RANGE(0x40, 0x40) AM_DEVREAD_LEGACY("aysnd", ay8910_r)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cowrace_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( cowrace_sound_map, AS_PROGRAM, 8, kingdrby_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cowrace_sound_io, AS_IO, 8 )
+static ADDRESS_MAP_START( cowrace_sound_io, AS_IO, 8, kingdrby_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ym2203_w)
+	AM_RANGE(0x40, 0x41) AM_DEVWRITE_LEGACY("aysnd", ym2203_w)
 ADDRESS_MAP_END
 
 
@@ -551,7 +556,7 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) //2p hopper i/o
 
 	PORT_START("IN1")	// ppi0 (5001)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VBLANK ) //?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") //?
 	PORT_DIPNAME( 0x02, 0x02, "IN1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -734,7 +739,7 @@ static INPUT_PORTS_START( kingdrbb )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN1")	// ppi0 (5001)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VBLANK ) //?
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen") //?
 	PORT_DIPNAME( 0x02, 0x02, "IN1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -949,6 +954,7 @@ static const ym2203_interface cowrace_ym2203_interface =
 
 static PALETTE_INIT(kingdrby)
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
 
@@ -974,8 +980,8 @@ static PALETTE_INIT(kingdrby)
 
 static PALETTE_INIT(kingdrbb)
 {
-	UINT8 *raw_prom = machine.region("raw_prom")->base();
-	UINT8 *prom = machine.region("proms")->base();
+	UINT8 *raw_prom = machine.root_device().memregion("raw_prom")->base();
+	UINT8 *prom = machine.root_device().memregion("proms")->base();
 	int	bit0, bit1, bit2 , r, g, b;
 	int	i;
 

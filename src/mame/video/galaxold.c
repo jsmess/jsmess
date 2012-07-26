@@ -7,7 +7,7 @@
 #include "emu.h"
 #include "includes/galaxold.h"
 
-#define STARS_COLOR_BASE		(machine.region("proms")->bytes())
+#define STARS_COLOR_BASE		(machine.root_device().memregion("proms")->bytes())
 #define BULLETS_COLOR_BASE		(STARS_COLOR_BASE + 64)
 #define BACKGROUND_COLOR_BASE	(BULLETS_COLOR_BASE + 2)
 
@@ -94,11 +94,12 @@ static void dambustr_draw_background(running_machine &machine, bitmap_ind16 &bit
 ***************************************************************************/
 PALETTE_INIT( galaxold )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i, len;
 
 
 	/* first, the character/sprite palette */
-	len = machine.region("proms")->bytes();
+	len = machine.root_device().memregion("proms")->bytes();
 	for (i = 0;i < len;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
@@ -168,11 +169,12 @@ PALETTE_INIT( stratgyx )
 
 PALETTE_INIT( rockclim )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i, len;
 
 
 	/* first, the character/sprite palette */
-	len = machine.region("proms")->bytes();
+	len = machine.root_device().memregion("proms")->bytes();
 	for (i = 0;i < len;i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
@@ -216,6 +218,7 @@ PALETTE_INIT( rockclim )
 ***************************************************************************/
 PALETTE_INIT( darkplnt )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 
@@ -335,11 +338,12 @@ PALETTE_INIT( mariner )
 /* swapped r/g/b hook-up */
 PALETTE_INIT( dambustr )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int base = BACKGROUND_COLOR_BASE;
 	int i, len;
 
 	/* first, the character/sprite palette */
-	len = machine.region("proms")->bytes();
+	len = machine.root_device().memregion("proms")->bytes();
 
 	for (i = 0;i < len;i++)
 	{
@@ -749,11 +753,10 @@ VIDEO_START( ad2083 )
 }
 
 
-WRITE8_HANDLER( racknrol_tiles_bank_w )
+WRITE8_MEMBER(galaxold_state::racknrol_tiles_bank_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_racknrol_tiles_bank[offset] = data;
-	state->m_bg_tilemap->mark_all_dirty();
+	m_racknrol_tiles_bank[offset] = data;
+	m_bg_tilemap->mark_all_dirty();
 }
 
 static TILE_GET_INFO( racknrol_get_tile_info )
@@ -839,24 +842,21 @@ VIDEO_START( dambustr )
 }
 
 
-WRITE8_HANDLER( galaxold_videoram_w )
+WRITE8_MEMBER(galaxold_state::galaxold_videoram_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-READ8_HANDLER( galaxold_videoram_r )
+READ8_MEMBER(galaxold_state::galaxold_videoram_r)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	return state->m_videoram[offset];
+	return m_videoram[offset];
 }
 
 
-WRITE8_HANDLER( galaxold_attributesram_w )
+WRITE8_MEMBER(galaxold_state::galaxold_attributesram_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	if (state->m_attributesram[offset] != data)
+	if (m_attributesram[offset] != data)
 	{
 		if (offset & 0x01)
 		{
@@ -864,165 +864,151 @@ WRITE8_HANDLER( galaxold_attributesram_w )
 			int i;
 
 			for (i = offset >> 1; i < 0x0400; i += 32)
-				state->m_bg_tilemap->mark_tile_dirty(i);
+				m_bg_tilemap->mark_tile_dirty(i);
 		}
 		else
 		{
-			if (state->m_modify_ypos)
+			if (m_modify_ypos)
 			{
-				(*state->m_modify_ypos)(&data);
+				(*m_modify_ypos)(&data);
 			}
 
-			state->m_bg_tilemap->set_scrolly(offset >> 1, data);
+			m_bg_tilemap->set_scrolly(offset >> 1, data);
 		}
 
-		state->m_attributesram[offset] = data;
+		m_attributesram[offset] = data;
 	}
 }
 
 
-WRITE8_HANDLER( galaxold_flip_screen_x_w )
+WRITE8_MEMBER(galaxold_state::galaxold_flip_screen_x_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	if (state->m_flipscreen_x != (data & 0x01))
+	if (m_flipscreen_x != (data & 0x01))
 	{
-		state->m_flipscreen_x = data & 0x01;
+		m_flipscreen_x = data & 0x01;
 
-		state->m_bg_tilemap->set_flip((state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
+		m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
 	}
 }
 
-WRITE8_HANDLER( galaxold_flip_screen_y_w )
+WRITE8_MEMBER(galaxold_state::galaxold_flip_screen_y_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	if (state->m_flipscreen_y != (data & 0x01))
+	if (m_flipscreen_y != (data & 0x01))
 	{
-		state->m_flipscreen_y = data & 0x01;
+		m_flipscreen_y = data & 0x01;
 
-		state->m_bg_tilemap->set_flip((state->m_flipscreen_x ? TILEMAP_FLIPX : 0) | (state->m_flipscreen_y ? TILEMAP_FLIPY : 0));
+		m_bg_tilemap->set_flip((m_flipscreen_x ? TILEMAP_FLIPX : 0) | (m_flipscreen_y ? TILEMAP_FLIPY : 0));
 	}
 }
 
 
 #ifdef UNUSED_FUNCTION
-WRITE8_HANDLER( gteikob2_flip_screen_x_w )
+WRITE8_MEMBER(galaxold_state::gteikob2_flip_screen_x_w)
 {
 	galaxold_flip_screen_x_w(space, offset, ~data);
 }
 
-WRITE8_HANDLER( gteikob2_flip_screen_y_w )
+WRITE8_MEMBER(galaxold_state::gteikob2_flip_screen_y_w)
 {
 	galaxold_flip_screen_y_w(space, offset, ~data);
 }
 #endif
 
 
-WRITE8_HANDLER( hotshock_flip_screen_w )
+WRITE8_MEMBER(galaxold_state::hotshock_flip_screen_w)
 {
 	galaxold_flip_screen_x_w(space, offset, data);
 	galaxold_flip_screen_y_w(space, offset, data);
 }
 
 
-WRITE8_HANDLER( scrambold_background_enable_w )
+WRITE8_MEMBER(galaxold_state::scrambold_background_enable_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_background_enable = data & 0x01;
+	m_background_enable = data & 0x01;
 }
 
-WRITE8_HANDLER( scrambold_background_red_w )
+WRITE8_MEMBER(galaxold_state::scrambold_background_red_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_background_red = data & 0x01;
+	m_background_red = data & 0x01;
 }
 
-WRITE8_HANDLER( scrambold_background_green_w )
+WRITE8_MEMBER(galaxold_state::scrambold_background_green_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_background_green = data & 0x01;
+	m_background_green = data & 0x01;
 }
 
-WRITE8_HANDLER( scrambold_background_blue_w )
+WRITE8_MEMBER(galaxold_state::scrambold_background_blue_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_background_blue = data & 0x01;
+	m_background_blue = data & 0x01;
 }
 
 
-WRITE8_HANDLER( galaxold_stars_enable_w )
+WRITE8_MEMBER(galaxold_state::galaxold_stars_enable_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_stars_on = data & 0x01;
+	m_stars_on = data & 0x01;
 
-	if (!state->m_stars_on)
+	if (!m_stars_on)
 	{
-		state->m_stars_scrollpos = 0;
+		m_stars_scrollpos = 0;
 	}
 }
 
 
-WRITE8_HANDLER( darkplnt_bullet_color_w )
+WRITE8_MEMBER(galaxold_state::darkplnt_bullet_color_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_darkplnt_bullet_color = data & 0x01;
+	m_darkplnt_bullet_color = data & 0x01;
 }
 
 
 
-WRITE8_HANDLER( galaxold_gfxbank_w )
+WRITE8_MEMBER(galaxold_state::galaxold_gfxbank_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	if (state->m_gfxbank[offset] != data)
+	if (m_gfxbank[offset] != data)
 	{
-		state->m_gfxbank[offset] = data;
+		m_gfxbank[offset] = data;
 
-		state->m_bg_tilemap->mark_all_dirty();
+		m_bg_tilemap->mark_all_dirty();
 	}
 }
 
-WRITE8_HANDLER( rockclim_videoram_w )
+WRITE8_MEMBER(galaxold_state::rockclim_videoram_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_rockclim_videoram[offset] = data;
-	state->m_rockclim_tilemap->mark_tile_dirty(offset);
+	m_rockclim_videoram[offset] = data;
+	m_rockclim_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_HANDLER( rockclim_scroll_w )
+WRITE8_MEMBER(galaxold_state::rockclim_scroll_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
 	switch(offset&3)
 	{
-		case 0: state->m_rockclim_h=(state->m_rockclim_h&0xff00)|data;state->m_rockclim_tilemap ->set_scrollx(0, state->m_rockclim_h );break;
-		case 1:	state->m_rockclim_h=(state->m_rockclim_h&0xff)|(data<<8);state->m_rockclim_tilemap ->set_scrollx(0, state->m_rockclim_h );break;
-		case 2:	state->m_rockclim_v=(state->m_rockclim_v&0xff00)|data;state->m_rockclim_tilemap ->set_scrolly(0, state->m_rockclim_v );break;
-		case 3:	state->m_rockclim_v=(state->m_rockclim_v&0xff)|(data<<8);state->m_rockclim_tilemap ->set_scrolly(0, state->m_rockclim_v );break;
+		case 0: m_rockclim_h=(m_rockclim_h&0xff00)|data;m_rockclim_tilemap ->set_scrollx(0, m_rockclim_h );break;
+		case 1:	m_rockclim_h=(m_rockclim_h&0xff)|(data<<8);m_rockclim_tilemap ->set_scrollx(0, m_rockclim_h );break;
+		case 2:	m_rockclim_v=(m_rockclim_v&0xff00)|data;m_rockclim_tilemap ->set_scrolly(0, m_rockclim_v );break;
+		case 3:	m_rockclim_v=(m_rockclim_v&0xff)|(data<<8);m_rockclim_tilemap ->set_scrolly(0, m_rockclim_v );break;
 	}
 
 }
 
 
-READ8_HANDLER( rockclim_videoram_r )
+READ8_MEMBER(galaxold_state::rockclim_videoram_r)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	return state->m_rockclim_videoram[offset];
+	return m_rockclim_videoram[offset];
 }
 
 
-WRITE8_HANDLER( dambustr_bg_split_line_w )
+WRITE8_MEMBER(galaxold_state::dambustr_bg_split_line_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_dambustr_bg_split_line = data;
+	m_dambustr_bg_split_line = data;
 }
 
 
-WRITE8_HANDLER( dambustr_bg_color_w )
+WRITE8_MEMBER(galaxold_state::dambustr_bg_color_w)
 {
-	galaxold_state *state = space->machine().driver_data<galaxold_state>();
-	state->m_dambustr_bg_color_1 = (BIT(data,2)<<2) | (BIT(data,1)<<1) | BIT(data,0);
-	state->m_dambustr_bg_color_2 = (BIT(data,6)<<2) | (BIT(data,5)<<1) | BIT(data,4);
-	state->m_dambustr_bg_priority = BIT(data,3);
-	state->m_dambustr_char_bank = BIT(data,7);
-	state->m_bg_tilemap->mark_all_dirty();
+	m_dambustr_bg_color_1 = (BIT(data,2)<<2) | (BIT(data,1)<<1) | BIT(data,0);
+	m_dambustr_bg_color_2 = (BIT(data,6)<<2) | (BIT(data,5)<<1) | BIT(data,4);
+	m_dambustr_bg_priority = BIT(data,3);
+	m_dambustr_char_bank = BIT(data,7);
+	m_bg_tilemap->mark_all_dirty();
 }
 
 
@@ -1057,7 +1043,7 @@ static void mariner_modify_charcode(running_machine &machine, UINT16 *code, UINT
 
 	/* bit 0 of the PROM controls character banking */
 
-	prom = machine.region("user2")->base();
+	prom = machine.root_device().memregion("user2")->base();
 
 	*code |= ((prom[x] & 0x01) << 8);
 }
@@ -1177,9 +1163,10 @@ static void darkplnt_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap
 
 static void dambustr_draw_bullets(running_machine &machine, bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y)
 {
+	galaxold_state *state = machine.driver_data<galaxold_state>();
 	int i, color;
 
-	if (flip_screen_x_get(machine))  x++;
+	if (state->flip_screen_x())  x++;
 
 	x = x - 6;
 
@@ -1243,7 +1230,7 @@ static void stratgyx_draw_background(running_machine &machine, bitmap_ind16 &bit
                  the green gun if BCG is asserted
        bits 2-7 are unconnected */
 
-	prom = machine.region("user1")->base();
+	prom = state->memregion("user1")->base();
 
 	for (x = 0; x < 32; x++)
 	{
@@ -1318,7 +1305,7 @@ static void mariner_draw_background(running_machine &machine, bitmap_ind16 &bitm
        line (column) of the screen.  The first 0x20 bytes for unflipped,
        and the 2nd 0x20 bytes for flipped screen. */
 
-	prom = machine.region("user1")->base();
+	prom = state->memregion("user1")->base();
 
 	if (state->m_flipscreen_x)
 	{
@@ -1357,7 +1344,7 @@ static void dambustr_draw_background(running_machine &machine, bitmap_ind16 &bit
 	int col1 = base + state->m_dambustr_bg_color_1;
 	int col2 = base + state->m_dambustr_bg_color_2;
 
-	if (flip_screen_x_get(machine))
+	if (state->flip_screen_x())
 	{
 		bitmap.plot_box(  0, 0, 256-state->m_dambustr_bg_split_line, 256, col2);
 		bitmap.plot_box(256-state->m_dambustr_bg_split_line, 0, state->m_dambustr_bg_split_line, 256, col1);
@@ -1374,7 +1361,7 @@ static void dambustr_draw_upper_background(running_machine &machine, bitmap_ind1
 {
 	galaxold_state *state = machine.driver_data<galaxold_state>();
 
-	if (flip_screen_x_get(machine))
+	if (state->flip_screen_x())
 	{
 		rectangle clip(254 - state->m_dambustr_bg_split_line, state->m_dambustr_bg_split_line, 0, 255);
 		copybitmap(bitmap, *state->m_dambustr_tmpbitmap, 0, 0, 0, 0, clip);
@@ -1619,7 +1606,7 @@ static void mariner_draw_stars(running_machine &machine, bitmap_ind16 &bitmap, c
 
 	/* bit 2 of the PROM controls star visibility */
 
-	prom = machine.region("user2")->base();
+	prom = machine.root_device().memregion("user2")->base();
 
 	for (offs = 0;offs < STAR_COUNT;offs++)
 	{
@@ -1707,7 +1694,7 @@ static void draw_bullets_common(running_machine &machine, bitmap_ind16 &bitmap, 
 	int offs;
 
 
-	for (offs = 0;offs < state->m_bulletsram_size;offs += 4)
+	for (offs = 0;offs < state->m_bulletsram.bytes();offs += 4)
 	{
 		UINT8 sx,sy;
 
@@ -1810,11 +1797,11 @@ SCREEN_UPDATE_IND16( galaxold )
 	}
 
 
-	draw_sprites(screen.machine(), bitmap, state->m_spriteram, state->m_spriteram_size);
+	draw_sprites(screen.machine(), bitmap, state->m_spriteram, state->m_spriteram.bytes());
 
 	if (state->m_spriteram2_present)
 	{
-		draw_sprites(screen.machine(), bitmap, state->m_spriteram2, state->m_spriteram2_size);
+		draw_sprites(screen.machine(), bitmap, state->m_spriteram2, state->m_spriteram2.bytes());
 	}
 	return 0;
 }
@@ -1843,7 +1830,7 @@ SCREEN_UPDATE_IND16( dambustr )
 		draw_bullets_common(screen.machine(), bitmap, cliprect);
 	}
 
-	draw_sprites(screen.machine(), bitmap, state->m_spriteram, state->m_spriteram_size);
+	draw_sprites(screen.machine(), bitmap, state->m_spriteram, state->m_spriteram.bytes());
 
 	if (state->m_dambustr_bg_priority)
 	{

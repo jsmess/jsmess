@@ -22,7 +22,6 @@
 
 */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
@@ -126,15 +125,15 @@ void tek4051_state::bankswitch(UINT8 data)
 	switch (lbs)
 	{
 	case LBS_RBC:
-		program->install_rom(0x8800, 0xa7ff, machine().region(MC6800_TAG)->base() + 0x800);
+		program->install_rom(0x8800, 0xa7ff, memregion(MC6800_TAG)->base() + 0x800);
 		break;
 
 	case LBS_BSOFL:
-		program->install_rom(0x8800, 0xa7ff, machine().region("020_0147_00")->base());
+		program->install_rom(0x8800, 0xa7ff, memregion("020_0147_00")->base());
 		break;
 
 	case LBS_BSCOM:
-		program->install_rom(0x8800, 0xa7ff, machine().region("672_0799_08")->base());
+		program->install_rom(0x8800, 0xa7ff, memregion("672_0799_08")->base());
 		break;
 
 	default:
@@ -642,7 +641,7 @@ READ8_MEMBER( tek4051_state::kb_pia_pa_r )
     */
 
 	UINT8 data = 0;
-	UINT8 special = input_port_read(machine(), "SPECIAL");
+	UINT8 special = ioport("SPECIAL")->read();
 
 	// keyboard column
 	data = m_kc;
@@ -671,7 +670,7 @@ READ8_MEMBER( tek4051_state::kb_pia_pb_r )
     */
 
 	UINT8 data = 0;
-	UINT8 special = input_port_read(machine(), "SPECIAL");
+	UINT8 special = ioport("SPECIAL")->read();
 
 	// shift
 	data |= (BIT(special, 0) & BIT(special, 1));

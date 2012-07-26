@@ -321,7 +321,7 @@ TIMER_DEVICE_CALLBACK( a7800_interrupt )
 {
 	a7800_state *state = timer.machine().driver_data<a7800_state>();
 	int frame_scanline;
-	UINT8 *ROM = timer.machine().region("maincpu")->base();
+	UINT8 *ROM = timer.machine().root_device().memregion("maincpu")->base();
 	address_space* space = timer.machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	state->m_maria_scanline++;
@@ -440,14 +440,13 @@ SCREEN_UPDATE_IND16( a7800 )
 
 /****** MARIA ***************************************/
 
- READ8_HANDLER( a7800_MARIA_r )
+READ8_MEMBER(a7800_state::a7800_MARIA_r)
 {
-	a7800_state *state = space->machine().driver_data<a7800_state>();
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	switch (offset)
 	{
 		case 0x08:
-			return state->m_maria_vblank;
+			return m_maria_vblank;
 
 		default:
 			logerror("undefined MARIA read %x\n",offset);
@@ -455,130 +454,129 @@ SCREEN_UPDATE_IND16( a7800 )
 	}
 }
 
-WRITE8_HANDLER( a7800_MARIA_w )
+WRITE8_MEMBER(a7800_state::a7800_MARIA_w)
 {
-	a7800_state *state = space->machine().driver_data<a7800_state>();
-	UINT8 *ROM = space->machine().region("maincpu")->base();
+	UINT8 *ROM = memregion("maincpu")->base();
 	switch (offset)
 	{
 		case 0x00:
-			state->m_maria_backcolor = data;
-			// 20030621 ericball added state->m_maria_palette[pal][0] to make kanagroo mode easier
-			state->m_maria_palette[0][0]=state->m_maria_backcolor;
-			state->m_maria_palette[1][0]=state->m_maria_backcolor;
-			state->m_maria_palette[2][0]=state->m_maria_backcolor;
-			state->m_maria_palette[3][0]=state->m_maria_backcolor;
-			state->m_maria_palette[4][0]=state->m_maria_backcolor;
-			state->m_maria_palette[5][0]=state->m_maria_backcolor;
-			state->m_maria_palette[6][0]=state->m_maria_backcolor;
-			state->m_maria_palette[7][0]=state->m_maria_backcolor;
+			m_maria_backcolor = data;
+			// 20030621 ericball added m_maria_palette[pal][0] to make kanagroo mode easier
+			m_maria_palette[0][0]=m_maria_backcolor;
+			m_maria_palette[1][0]=m_maria_backcolor;
+			m_maria_palette[2][0]=m_maria_backcolor;
+			m_maria_palette[3][0]=m_maria_backcolor;
+			m_maria_palette[4][0]=m_maria_backcolor;
+			m_maria_palette[5][0]=m_maria_backcolor;
+			m_maria_palette[6][0]=m_maria_backcolor;
+			m_maria_palette[7][0]=m_maria_backcolor;
 			break;
 		case 0x01:
-			state->m_maria_palette[0][1] = data;
+			m_maria_palette[0][1] = data;
 			break;
 		case 0x02:
-			state->m_maria_palette[0][2] = data;
+			m_maria_palette[0][2] = data;
 			break;
 		case 0x03:
-			state->m_maria_palette[0][3] = data;
+			m_maria_palette[0][3] = data;
 			break;
 		case 0x04:
-			device_spin_until_trigger(space->machine().device("maincpu"), TRIGGER_HSYNC);
-			state->m_maria_wsync=1;
+			device_spin_until_trigger(machine().device("maincpu"), TRIGGER_HSYNC);
+			m_maria_wsync=1;
 			break;
 
 		case 0x05:
-			state->m_maria_palette[1][1] = data;
+			m_maria_palette[1][1] = data;
 			break;
 		case 0x06:
-			state->m_maria_palette[1][2] = data;
+			m_maria_palette[1][2] = data;
 			break;
 		case 0x07:
-			state->m_maria_palette[1][3] = data;
+			m_maria_palette[1][3] = data;
 			break;
 
 		case 0x09:
-			state->m_maria_palette[2][1] = data;
+			m_maria_palette[2][1] = data;
 			break;
 		case 0x0A:
-			state->m_maria_palette[2][2] = data;
+			m_maria_palette[2][2] = data;
 			break;
 		case 0x0B:
-			state->m_maria_palette[2][3] = data;
+			m_maria_palette[2][3] = data;
 			break;
 
 		case 0x0D:
-			state->m_maria_palette[3][1] = data;
+			m_maria_palette[3][1] = data;
 			break;
 		case 0x0E:
-			state->m_maria_palette[3][2] = data;
+			m_maria_palette[3][2] = data;
 			break;
 		case 0x0F:
-			state->m_maria_palette[3][3] = data;
+			m_maria_palette[3][3] = data;
 			break;
 
 		case 0x11:
-			state->m_maria_palette[4][1] = data;
+			m_maria_palette[4][1] = data;
 			break;
 		case 0x12:
-			state->m_maria_palette[4][2] = data;
+			m_maria_palette[4][2] = data;
 			break;
 		case 0x13:
-			state->m_maria_palette[4][3] = data;
+			m_maria_palette[4][3] = data;
 			break;
 		case 0x14:
-			state->m_maria_charbase = (data << 8);
+			m_maria_charbase = (data << 8);
 			break;
 		case 0x15:
-			state->m_maria_palette[5][1] = data;
+			m_maria_palette[5][1] = data;
 			break;
 		case 0x16:
-			state->m_maria_palette[5][2] = data;
+			m_maria_palette[5][2] = data;
 			break;
 		case 0x17:
-			state->m_maria_palette[5][3] = data;
+			m_maria_palette[5][3] = data;
 			break;
 
 		case 0x19:
-			state->m_maria_palette[6][1] = data;
+			m_maria_palette[6][1] = data;
 			break;
 		case 0x1A:
-			state->m_maria_palette[6][2] = data;
+			m_maria_palette[6][2] = data;
 			break;
 		case 0x1B:
-			state->m_maria_palette[6][3] = data;
+			m_maria_palette[6][3] = data;
 			break;
 
 		case 0x1C:
 			/*logerror("MARIA CTRL=%x\n",data);*/
-			state->m_maria_color_kill = data & 0x80;
+			m_maria_color_kill = data & 0x80;
 			if ((data & 0x60) == 0x40)
-				state->m_maria_dmaon = 1;
+				m_maria_dmaon = 1;
 			else
-				state->m_maria_dmaon = state->m_maria_dodma = 0;
+				m_maria_dmaon = m_maria_dodma = 0;
 
-			state->m_maria_cwidth = data & 0x10;
-			state->m_maria_bcntl = data & 0x08;
-			state->m_maria_kangaroo = data & 0x04;
-			state->m_maria_rm = data & 0x03;
+			m_maria_cwidth = data & 0x10;
+			m_maria_bcntl = data & 0x08;
+			m_maria_kangaroo = data & 0x04;
+			m_maria_rm = data & 0x03;
 
 			/*logerror( "MARIA CTRL: CK:%d DMA:%d CW:%d BC:%d KM:%d RM:%d\n",
-                    state->m_maria_color_kill ? 1 : 0,
+                    m_maria_color_kill ? 1 : 0,
                     ( data & 0x60 ) >> 5,
-                    state->m_maria_cwidth ? 1 : 0,
-                    state->m_maria_bcntl ? 1 : 0,
-                    state->m_maria_kangaroo ? 1 : 0,
-                    state->m_maria_rm );*/
+                    m_maria_cwidth ? 1 : 0,
+                    m_maria_bcntl ? 1 : 0,
+                    m_maria_kangaroo ? 1 : 0,
+                    m_maria_rm );*/
 
 			break;
 		case 0x1D:
-			state->m_maria_palette[7][1] = data;
+			m_maria_palette[7][1] = data;
 			break;
 		case 0x1E:
-			state->m_maria_palette[7][2] = data;
+			m_maria_palette[7][2] = data;
 			break;
 		case 0x1F:
-			state->m_maria_palette[7][3] = data;
+			m_maria_palette[7][3] = data;
 			break;
 	}
 	ROM[ 0x20 + offset ] = data;

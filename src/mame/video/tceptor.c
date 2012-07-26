@@ -20,6 +20,7 @@
 
 PALETTE_INIT( tceptor )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	tceptor_state *state = machine.driver_data<tceptor_state>();
 	int i;
 
@@ -115,7 +116,7 @@ static TILE_GET_INFO( get_tx_tile_info )
 	SET_TILE_INFO(0, code, color, 0);
 }
 
-static void tile_mark_dirty(tceptor_state *state, int offset)
+void tceptor_state::tile_mark_dirty(int offset)
 {
 	int x = -1;
 	int y = -1;
@@ -138,27 +139,25 @@ static void tile_mark_dirty(tceptor_state *state, int offset)
 	}
 
 	if (x >= 0)
-		state->m_tx_tilemap->mark_tile_dirty(x * 28 + y);
+		m_tx_tilemap->mark_tile_dirty(x * 28 + y);
 }
 
 
-WRITE8_HANDLER( tceptor_tile_ram_w )
+WRITE8_MEMBER(tceptor_state::tceptor_tile_ram_w)
 {
-	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	if (state->m_tile_ram[offset] != data)
+	if (m_tile_ram[offset] != data)
 	{
-		state->m_tile_ram[offset] = data;
-		tile_mark_dirty(state, offset);
+		m_tile_ram[offset] = data;
+		tile_mark_dirty(offset);
 	}
 }
 
-WRITE8_HANDLER( tceptor_tile_attr_w )
+WRITE8_MEMBER(tceptor_state::tceptor_tile_attr_w)
 {
-	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	if (state->m_tile_attr[offset] != data)
+	if (m_tile_attr[offset] != data)
 	{
-		state->m_tile_attr[offset] = data;
-		tile_mark_dirty(state, offset);
+		m_tile_attr[offset] = data;
+		tile_mark_dirty(offset);
 	}
 }
 
@@ -185,45 +184,43 @@ static TILE_GET_INFO( get_bg2_tile_info )
 	SET_TILE_INFO(state->m_bg, code, color, 0);
 }
 
-WRITE8_HANDLER( tceptor_bg_ram_w )
+WRITE8_MEMBER(tceptor_state::tceptor_bg_ram_w)
 {
-	tceptor_state *state = space->machine().driver_data<tceptor_state>();
-	state->m_bg_ram[offset] = data;
+	m_bg_ram[offset] = data;
 
 	offset /= 2;
 	if (offset < 0x800)
-		state->m_bg1_tilemap->mark_tile_dirty(offset);
+		m_bg1_tilemap->mark_tile_dirty(offset);
 	else
-		state->m_bg2_tilemap->mark_tile_dirty(offset - 0x800);
+		m_bg2_tilemap->mark_tile_dirty(offset - 0x800);
 }
 
-WRITE8_HANDLER( tceptor_bg_scroll_w )
+WRITE8_MEMBER(tceptor_state::tceptor_bg_scroll_w)
 {
-	tceptor_state *state = space->machine().driver_data<tceptor_state>();
 	switch (offset)
 	{
 	case 0:
-		state->m_bg1_scroll_x &= 0xff;
-		state->m_bg1_scroll_x |= data << 8;
+		m_bg1_scroll_x &= 0xff;
+		m_bg1_scroll_x |= data << 8;
 		break;
 	case 1:
-		state->m_bg1_scroll_x &= 0xff00;
-		state->m_bg1_scroll_x |= data;
+		m_bg1_scroll_x &= 0xff00;
+		m_bg1_scroll_x |= data;
 		break;
 	case 2:
-		state->m_bg1_scroll_y = data;
+		m_bg1_scroll_y = data;
 		break;
 
 	case 4:
-		state->m_bg2_scroll_x &= 0xff;
-		state->m_bg2_scroll_x |= data << 8;
+		m_bg2_scroll_x &= 0xff;
+		m_bg2_scroll_x |= data << 8;
 		break;
 	case 5:
-		state->m_bg2_scroll_x &= 0xff00;
-		state->m_bg2_scroll_x |= data;
+		m_bg2_scroll_x &= 0xff00;
+		m_bg2_scroll_x |= data;
 		break;
 	case 6:
-		state->m_bg2_scroll_y = data;
+		m_bg2_scroll_y = data;
 		break;
 	}
 }
@@ -246,7 +243,7 @@ static void decode_bg(running_machine &machine, const char * region)
 	};
 
 	int gfx_index = state->m_bg;
-	UINT8 *src = machine.region(region)->base() + 0x8000;
+	UINT8 *src = machine.root_device().memregion(region)->base() + 0x8000;
 	UINT8 *buffer;
 	int len = 0x8000;
 	int i;
@@ -264,7 +261,7 @@ static void decode_bg(running_machine &machine, const char * region)
 	auto_free(machine, buffer);
 
 	/* decode the graphics */
-	machine.gfx[gfx_index] = gfx_element_alloc(machine, &bg_layout, machine.region(region)->base(), 64, 2048);
+	machine.gfx[gfx_index] = gfx_element_alloc(machine, &bg_layout, machine.root_device().memregion(region)->base(), 64, 2048);
 }
 
 static void decode_sprite(running_machine &machine, int gfx_index, const gfx_layout *layout, const void *data)
@@ -294,8 +291,8 @@ static void decode_sprite16(running_machine &machine, const char * region)
 		2*16*16
 	};
 
-	UINT8 *src = machine.region(region)->base();
-	int len = machine.region(region)->bytes();
+	UINT8 *src = machine.root_device().memregion(region)->base();
+	int len = machine.root_device().memregion(region)->bytes();
 	UINT8 *dst;
 	int i, y;
 
@@ -346,8 +343,8 @@ static void decode_sprite32(running_machine &machine, const char * region)
 		2*32*32
 	};
 
-	UINT8 *src = machine.region(region)->base();
-	int len = machine.region(region)->bytes();
+	UINT8 *src = machine.root_device().memregion(region)->base();
+	int len = machine.root_device().memregion(region)->bytes();
 	int total = spr32_layout.total;
 	int size = spr32_layout.charincrement / 8;
 	UINT8 *dst;

@@ -5,12 +5,21 @@ class segas1x_bootleg_state : public driver_device
 {
 public:
 	segas1x_bootleg_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_textram(*this, "textram"),
+		m_bg0_tileram(*this, "bg0_tileram"),
+		m_bg1_tileram(*this, "bg1_tileram"),
+		m_tileram(*this, "tileram"),
+		m_goldnaxeb2_bgpage(*this, "gab2_bgpage"),
+		m_goldnaxeb2_fgpage(*this, "gab2_fgpage"){ }
 
-	UINT16 *    m_bg0_tileram;
-	UINT16 *    m_bg1_tileram;
-	UINT16 *    m_textram;
-	UINT16 *    m_tileram;
+	required_shared_ptr<UINT16> m_textram;
+	optional_shared_ptr<UINT16> m_bg0_tileram;
+	optional_shared_ptr<UINT16> m_bg1_tileram;
+	optional_shared_ptr<UINT16> m_tileram;
+	optional_shared_ptr<UINT16> m_goldnaxeb2_bgpage;
+	optional_shared_ptr<UINT16> m_goldnaxeb2_fgpage;
+
 
 	UINT16 m_coinctrl;
 
@@ -22,9 +31,6 @@ public:
 	int m_beautyb_unkx;
 
 	int m_shinobl_kludge;
-
-	UINT16* m_goldnaxeb2_fgpage;
-	UINT16* m_goldnaxeb2_bgpage;
 
 	int m_eswat_tilebank0;
 
@@ -98,6 +104,52 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_soundcpu;
+	DECLARE_WRITE16_MEMBER(sound_command_nmi_w);
+	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_WRITE16_MEMBER(sys16_coinctrl_w);
+	DECLARE_READ16_MEMBER(passht4b_service_r);
+	DECLARE_READ16_MEMBER(passht4b_io1_r);
+	DECLARE_READ16_MEMBER(passht4b_io2_r);
+	DECLARE_READ16_MEMBER(passht4b_io3_r);
+	DECLARE_WRITE16_MEMBER(sys16_tilebank_w);
+	DECLARE_WRITE8_MEMBER(tturfbl_msm5205_data_w);
+	DECLARE_READ8_MEMBER(tturfbl_soundbank_r);
+	DECLARE_WRITE8_MEMBER(tturfbl_soundbank_w);
+	DECLARE_WRITE16_MEMBER(s16bl_bgpage_w);
+	DECLARE_WRITE16_MEMBER(s16bl_fgpage_w);
+	DECLARE_WRITE16_MEMBER(s16bl_fgscrollx_bank_w);
+	DECLARE_WRITE16_MEMBER(s16bl_fgscrollx_w);
+	DECLARE_WRITE16_MEMBER(s16bl_fgscrolly_w);
+	DECLARE_WRITE16_MEMBER(s16bl_bgscrollx_w);
+	DECLARE_WRITE16_MEMBER(s16bl_bgscrolly_w);
+	DECLARE_WRITE16_MEMBER(datsu_page0_w);
+	DECLARE_WRITE16_MEMBER(datsu_page1_w);
+	DECLARE_WRITE16_MEMBER(datsu_page2_w);
+	DECLARE_WRITE16_MEMBER(datsu_page3_w);
+	DECLARE_WRITE16_MEMBER(goldnaxeb2_fgscrollx_w);
+	DECLARE_WRITE16_MEMBER(goldnaxeb2_bgscrollx_w);
+	DECLARE_WRITE16_MEMBER(goldnaxeb2_fgscrolly_w);
+	DECLARE_WRITE16_MEMBER(goldnaxeb2_bgscrolly_w);
+	DECLARE_WRITE16_MEMBER(goldnaxeb2_fgpage_w);
+	DECLARE_WRITE16_MEMBER(goldnaxeb2_bgpage_w);
+	DECLARE_WRITE16_MEMBER(eswat_tilebank0_w);
+	DECLARE_READ16_MEMBER(beautyb_unkx_r);
+	DECLARE_WRITE16_MEMBER(sys18_refreshenable_w);
+	DECLARE_WRITE16_MEMBER(sys18_tilebank_w);
+	DECLARE_READ8_MEMBER(system18_bank_r);
+	DECLARE_WRITE8_MEMBER(sys18_soundbank_w);
+	DECLARE_WRITE16_MEMBER(sound_command_irq_w);
+	DECLARE_WRITE8_MEMBER(shdancbl_msm5205_data_w);
+	DECLARE_READ8_MEMBER(shdancbl_soundbank_r);
+	DECLARE_WRITE8_MEMBER(shdancbl_bankctrl_w);
+	DECLARE_WRITE16_MEMBER(sys16_paletteram_w);
+	DECLARE_WRITE16_MEMBER(sys16_tileram_w);
+	DECLARE_WRITE16_MEMBER(sys16_textram_w);
+	DECLARE_WRITE16_MEMBER(s16a_bootleg_bgscrolly_w);
+	DECLARE_WRITE16_MEMBER(s16a_bootleg_bgscrollx_w);
+	DECLARE_WRITE16_MEMBER(s16a_bootleg_fgscrolly_w);
+	DECLARE_WRITE16_MEMBER(s16a_bootleg_fgscrollx_w);
+	DECLARE_WRITE16_MEMBER(s16a_bootleg_tilemapselect_w);
 };
 
 /*----------- defined in video/system16.c -----------*/
@@ -108,15 +160,8 @@ extern VIDEO_START( s16a_bootleg_shinobi );
 extern VIDEO_START( s16a_bootleg_passsht );
 extern SCREEN_UPDATE_IND16( s16a_bootleg );
 extern SCREEN_UPDATE_IND16( s16a_bootleg_passht4b );
-extern WRITE16_HANDLER( s16a_bootleg_tilemapselect_w );
-extern WRITE16_HANDLER( s16a_bootleg_bgscrolly_w );
-extern WRITE16_HANDLER( s16a_bootleg_bgscrollx_w );
-extern WRITE16_HANDLER( s16a_bootleg_fgscrolly_w );
-extern WRITE16_HANDLER( s16a_bootleg_fgscrollx_w );
 
 /* video hardware */
-extern WRITE16_HANDLER( sys16_tileram_w );
-extern WRITE16_HANDLER( sys16_textram_w );
 
 /* "normal" video hardware */
 extern VIDEO_START( system16 );

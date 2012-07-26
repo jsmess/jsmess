@@ -105,7 +105,7 @@ static MC6845_UPDATE_ROW( dgnbeta_update_row )
 	int i;
 	if(IsTextMode)
 	{
-		UINT8 *chr_gen = device->machine().region("gfx1")->base();
+		UINT8 *chr_gen = state->memregion("gfx1")->base();
 		for ( i = 0; i < x_count; i++ )
 		{
 			UINT32 offset = ( ( ma + i ) | ((state->m_GCtrl & GCtrlAddrLines)<<8)) << 1;

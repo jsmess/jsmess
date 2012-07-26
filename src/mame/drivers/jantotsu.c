@@ -119,6 +119,12 @@ public:
 	UINT8    m_col_bank;
 	UINT8    m_display_on;
 	UINT8    m_bitmap[0x8000];
+	DECLARE_READ8_MEMBER(jantotsu_bitmap_r);
+	DECLARE_WRITE8_MEMBER(jantotsu_bitmap_w);
+	DECLARE_WRITE8_MEMBER(bankaddr_w);
+	DECLARE_READ8_MEMBER(jantotsu_mux_r);
+	DECLARE_WRITE8_MEMBER(jantotsu_mux_w);
+	DECLARE_READ8_MEMBER(jantotsu_dsw2_r);
 };
 
 
@@ -170,25 +176,22 @@ static SCREEN_UPDATE_RGB32(jantotsu)
 }
 
 /* banked vram */
-static READ8_HANDLER( jantotsu_bitmap_r )
+READ8_MEMBER(jantotsu_state::jantotsu_bitmap_r)
 {
-	jantotsu_state *state = space->machine().driver_data<jantotsu_state>();
-	return state->m_bitmap[offset + ((state->m_vram_bank & 3) * 0x2000)];
+	return m_bitmap[offset + ((m_vram_bank & 3) * 0x2000)];
 }
 
-static WRITE8_HANDLER( jantotsu_bitmap_w )
+WRITE8_MEMBER(jantotsu_state::jantotsu_bitmap_w)
 {
-	jantotsu_state *state = space->machine().driver_data<jantotsu_state>();
-	state->m_bitmap[offset + ((state->m_vram_bank & 3) * 0x2000)] = data;
+	m_bitmap[offset + ((m_vram_bank & 3) * 0x2000)] = data;
 }
 
-static WRITE8_HANDLER( bankaddr_w )
+WRITE8_MEMBER(jantotsu_state::bankaddr_w)
 {
-	jantotsu_state *state = space->machine().driver_data<jantotsu_state>();
 
-	state->m_vram_bank = ((data & 0xc0) >> 6);
+	m_vram_bank = ((data & 0xc0) >> 6);
 
-	state->m_display_on = (data & 2);
+	m_display_on = (data & 2);
 
 	/* bit 0 is unknown */
 	if(data & 0x3c)
@@ -197,6 +200,7 @@ static WRITE8_HANDLER( bankaddr_w )
 
 static PALETTE_INIT( jantotsu )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int	bit0, bit1, bit2, r, g, b;
 	int	i;
 
@@ -227,38 +231,36 @@ static PALETTE_INIT( jantotsu )
  *************************************/
 
 /*Multiplexer is mapped as 6-bits reads,bits 6 & 7 are always connected to the coin mechs.*/
-static READ8_HANDLER( jantotsu_mux_r )
+READ8_MEMBER(jantotsu_state::jantotsu_mux_r)
 {
-	jantotsu_state *state = space->machine().driver_data<jantotsu_state>();
 	const char *const portnames[] = { "PL1_1", "PL1_2", "PL1_3", "PL1_4",
 									  "PL2_1", "PL2_2", "PL2_3", "PL2_4" };
 	UINT8 i,res;
 
-	//  printf("%02x\n", state->m_mux_data);
-	res = input_port_read(space->machine(), "COINS");
+	//  printf("%02x\n", m_mux_data);
+	res = ioport("COINS")->read();
 
 	for(i=0;i<8;i++)
 	{
-		if((~state->m_mux_data) & (1 << i))
-			res |= input_port_read(space->machine(), portnames[i]);
+		if((~m_mux_data) & (1 << i))
+			res |= ioport(portnames[i])->read();
 	}
 
 	return res;
 }
 
-static WRITE8_HANDLER( jantotsu_mux_w )
+WRITE8_MEMBER(jantotsu_state::jantotsu_mux_w)
 {
-	jantotsu_state *state = space->machine().driver_data<jantotsu_state>();
-	state->m_mux_data = data;
+	m_mux_data = data;
 }
 
 /*If bits 6 & 7 doesn't return 0x80,the game hangs until this bit is set,
   so I'm guessing that these bits can't be read by the z80 at all but directly
   hard-wired to the video chip. However I need the schematics / pcb snaps and/or
   a side-by-side test (to know if the background colors really works) to be sure. */
-static READ8_HANDLER( jantotsu_dsw2_r )
+READ8_MEMBER(jantotsu_state::jantotsu_dsw2_r)
 {
-	return (input_port_read(space->machine(), "DSW2") & 0x3f) | 0x80;
+	return (ioport("DSW2")->read() & 0x3f) | 0x80;
 }
 
 static WRITE8_DEVICE_HANDLER( jan_adpcm_w )
@@ -298,7 +300,7 @@ static void jan_adpcm_int( device_t *device )
 	}
 	else
 	{
-		UINT8 *ROM = device->machine().region("adpcm")->base();
+		UINT8 *ROM = device->machine().root_device().memregion("adpcm")->base();
 
 		state->m_adpcm_data = ((state->m_adpcm_trigger ? (ROM[state->m_adpcm_pos] & 0x0f) : (ROM[state->m_adpcm_pos] & 0xf0) >> 4));
 		msm5205_data_w(device, state->m_adpcm_data & 0xf);
@@ -319,17 +321,17 @@ static void jan_adpcm_int( device_t *device )
  *
  *************************************/
 
-static ADDRESS_MAP_START( jantotsu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( jantotsu_map, AS_PROGRAM, 8, jantotsu_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(jantotsu_bitmap_r, jantotsu_bitmap_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( jantotsu_io, AS_IO, 8 )
+static ADDRESS_MAP_START( jantotsu_io, AS_IO, 8, jantotsu_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0x01, 0x01) AM_READ(jantotsu_dsw2_r) AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0x02, 0x03) AM_DEVWRITE("adpcm", jan_adpcm_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0x01, 0x01) AM_READ(jantotsu_dsw2_r) AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0x02, 0x03) AM_DEVWRITE_LEGACY("adpcm", jan_adpcm_w)
 	AM_RANGE(0x04, 0x04) AM_READWRITE(jantotsu_mux_r, jantotsu_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(bankaddr_w)
 ADDRESS_MAP_END
@@ -488,7 +490,7 @@ static MACHINE_RESET( jantotsu )
 	jantotsu_state *state = machine.driver_data<jantotsu_state>();
 
 	/*Load hard-wired background color.*/
-	state->m_col_bank = (input_port_read(machine, "DSW2") & 0xc0) >> 3;
+	state->m_col_bank = (state->ioport("DSW2")->read() & 0xc0) >> 3;
 
 	state->m_vram_bank = 0;
 	state->m_mux_data = 0;

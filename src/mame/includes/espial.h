@@ -8,15 +8,22 @@ class espial_state : public driver_device
 {
 public:
 	espial_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"),
+		m_attributeram(*this, "attributeram"),
+		m_scrollram(*this, "scrollram"),
+		m_spriteram_1(*this, "spriteram_1"),
+		m_spriteram_2(*this, "spriteram_2"),
+		m_spriteram_3(*this, "spriteram_3"),
+		m_colorram(*this, "colorram"){ }
 
-	UINT8 *   m_videoram;
-	UINT8 *   m_colorram;
-	UINT8 *   m_attributeram;
-	UINT8 *   m_scrollram;
-	UINT8 *   m_spriteram_1;
-	UINT8 *   m_spriteram_2;
-	UINT8 *   m_spriteram_3;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_attributeram;
+	required_shared_ptr<UINT8> m_scrollram;
+	required_shared_ptr<UINT8> m_spriteram_1;
+	required_shared_ptr<UINT8> m_spriteram_2;
+	required_shared_ptr<UINT8> m_spriteram_3;
+	required_shared_ptr<UINT8> m_colorram;
 
 	/* video-related */
 	tilemap_t   *m_bg_tilemap;
@@ -30,6 +37,14 @@ public:
 	/* devices */
 	device_t *m_maincpu;
 	device_t *m_audiocpu;
+	DECLARE_WRITE8_MEMBER(espial_master_interrupt_mask_w);
+	DECLARE_WRITE8_MEMBER(espial_master_soundlatch_w);
+	DECLARE_WRITE8_MEMBER(espial_sound_nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(espial_videoram_w);
+	DECLARE_WRITE8_MEMBER(espial_colorram_w);
+	DECLARE_WRITE8_MEMBER(espial_attributeram_w);
+	DECLARE_WRITE8_MEMBER(espial_scrollram_w);
+	DECLARE_WRITE8_MEMBER(espial_flipscreen_w);
 };
 
 /*----------- defined in video/espial.c -----------*/
@@ -37,9 +52,4 @@ public:
 PALETTE_INIT( espial );
 VIDEO_START( espial );
 VIDEO_START( netwars );
-WRITE8_HANDLER( espial_videoram_w );
-WRITE8_HANDLER( espial_colorram_w );
-WRITE8_HANDLER( espial_attributeram_w );
-WRITE8_HANDLER( espial_scrollram_w );
-WRITE8_HANDLER( espial_flipscreen_w );
 SCREEN_UPDATE_IND16( espial );

@@ -19,6 +19,7 @@
 
 PALETTE_INIT( m52 )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	const UINT8 *char_pal = color_prom + 0x000;
 	const UINT8 *back_pal = color_prom + 0x200;
 	const UINT8 *sprite_pal = color_prom + 0x220;
@@ -172,9 +173,8 @@ VIDEO_START( m52 )
  *
  *************************************/
 
-WRITE8_HANDLER( m52_scroll_w )
+WRITE8_MEMBER(m52_state::m52_scroll_w)
 {
-	m52_state *state = space->machine().driver_data<m52_state>();
 /*
     According to the schematics there is only one video register that holds the X scroll value
     with a NAND gate on the V64 and V128 lines to control when it's read, and when
@@ -182,10 +182,10 @@ WRITE8_HANDLER( m52_scroll_w )
 
     So we set the first 3 quarters to 255 and the last to the scroll value
 */
-	state->m_bg_tilemap->set_scrollx(0, 255);
-	state->m_bg_tilemap->set_scrollx(1, 255);
-	state->m_bg_tilemap->set_scrollx(2, 255);
-	state->m_bg_tilemap->set_scrollx(3, -data);
+	m_bg_tilemap->set_scrollx(0, 255);
+	m_bg_tilemap->set_scrollx(1, 255);
+	m_bg_tilemap->set_scrollx(2, 255);
+	m_bg_tilemap->set_scrollx(3, -data);
 }
 
 
@@ -196,21 +196,19 @@ WRITE8_HANDLER( m52_scroll_w )
  *
  *************************************/
 
-WRITE8_HANDLER( m52_videoram_w )
+WRITE8_MEMBER(m52_state::m52_videoram_w)
 {
-	m52_state *state = space->machine().driver_data<m52_state>();
 
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
-WRITE8_HANDLER( m52_colorram_w )
+WRITE8_MEMBER(m52_state::m52_colorram_w)
 {
-	m52_state *state = space->machine().driver_data<m52_state>();
 
-	state->m_colorram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	m_colorram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
 
@@ -224,15 +222,14 @@ WRITE8_HANDLER( m52_colorram_w )
 /* This looks like some kind of protection implemented by a custom chip on the
    scroll board. It mangles the value written to the port m52_bg1xpos_w, as
    follows: result = popcount(value & 0x7f) ^ (value >> 7) */
-READ8_HANDLER( m52_protection_r )
+READ8_MEMBER(m52_state::m52_protection_r)
 {
-	m52_state *state = space->machine().driver_data<m52_state>();
 	int popcount = 0;
 	int temp;
 
-	for (temp = state->m_bg1xpos & 0x7f; temp != 0; temp >>= 1)
+	for (temp = m_bg1xpos & 0x7f; temp != 0; temp >>= 1)
 		popcount += temp & 1;
-	return popcount ^ (state->m_bg1xpos >> 7);
+	return popcount ^ (m_bg1xpos >> 7);
 }
 
 
@@ -243,34 +240,29 @@ READ8_HANDLER( m52_protection_r )
  *
  *************************************/
 
-WRITE8_HANDLER( m52_bg1ypos_w )
+WRITE8_MEMBER(m52_state::m52_bg1ypos_w)
 {
-	m52_state *state = space->machine().driver_data<m52_state>();
-	state->m_bg1ypos = data;
+	m_bg1ypos = data;
 }
 
-WRITE8_HANDLER( m52_bg1xpos_w )
+WRITE8_MEMBER(m52_state::m52_bg1xpos_w)
 {
-	m52_state *state = space->machine().driver_data<m52_state>();
-	state->m_bg1xpos = data;
+	m_bg1xpos = data;
 }
 
-WRITE8_HANDLER( m52_bg2xpos_w )
+WRITE8_MEMBER(m52_state::m52_bg2xpos_w)
 {
-	m52_state *state = space->machine().driver_data<m52_state>();
-	state->m_bg2xpos = data;
+	m_bg2xpos = data;
 }
 
-WRITE8_HANDLER( m52_bg2ypos_w )
+WRITE8_MEMBER(m52_state::m52_bg2ypos_w)
 {
-	m52_state *state = space->machine().driver_data<m52_state>();
-	state->m_bg2ypos = data;
+	m_bg2ypos = data;
 }
 
-WRITE8_HANDLER( m52_bgcontrol_w )
+WRITE8_MEMBER(m52_state::m52_bgcontrol_w)
 {
-	m52_state *state = space->machine().driver_data<m52_state>();
-	state->m_bgcontrol = data;
+	m_bgcontrol = data;
 }
 
 
@@ -281,18 +273,18 @@ WRITE8_HANDLER( m52_bgcontrol_w )
  *
  *************************************/
 
-WRITE8_HANDLER( m52_flipscreen_w )
+WRITE8_MEMBER(m52_state::m52_flipscreen_w)
 {
 	/* screen flip is handled both by software and hardware */
-	flip_screen_set(space->machine(), (data & 0x01) ^ (~input_port_read(space->machine(), "DSW2") & 0x01));
+	flip_screen_set((data & 0x01) ^ (~ioport("DSW2")->read() & 0x01));
 
-	coin_counter_w(space->machine(), 0, data & 0x02);
-	coin_counter_w(space->machine(), 1, data & 0x20);
+	coin_counter_w(machine(), 0, data & 0x02);
+	coin_counter_w(machine(), 1, data & 0x20);
 }
 
-WRITE8_HANDLER( alpha1v_flipscreen_w )
+WRITE8_MEMBER(m52_state::alpha1v_flipscreen_w)
 {
-	flip_screen_set(space->machine(), data & 0x01);
+	flip_screen_set(data & 0x01);
 }
 
 
@@ -308,7 +300,8 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 	rectangle rect;
 	const rectangle &visarea = machine.primary_screen->visible_area();
 
-	if (flip_screen_get(machine))
+	m52_state *state = machine.driver_data<m52_state>();
+	if (state->flip_screen())
 	{
 		xpos = 255 - xpos;
 		ypos = 255 - ypos - BGHEIGHT;
@@ -322,23 +315,23 @@ static void draw_background(running_machine &machine, bitmap_ind16 &bitmap, cons
 	drawgfx_transpen(bitmap, cliprect,
 		machine.gfx[image],
 		0, 0,
-		flip_screen_get(machine),
-		flip_screen_get(machine),
+		state->flip_screen(),
+		state->flip_screen(),
 		xpos,
 		ypos, 0);
 
 	drawgfx_transpen(bitmap, cliprect,
 		machine.gfx[image],
 		0, 0,
-		flip_screen_get(machine),
-		flip_screen_get(machine),
+		state->flip_screen(),
+		state->flip_screen(),
 		xpos - 256,
 		ypos, 0);
 
 	rect.min_x = visarea.min_x;
 	rect.max_x = visarea.max_x;
 
-	if (flip_screen_get(machine))
+	if (state->flip_screen())
 	{
 		rect.min_y = ypos - BGHEIGHT;
 		rect.max_y = ypos - 1;
@@ -379,7 +372,7 @@ SCREEN_UPDATE_IND16( m52 )
 			draw_background(screen.machine(), bitmap, cliprect, state->m_bg1xpos, state->m_bg1ypos, 4); /* cityscape */
 	}
 
-	state->m_bg_tilemap->set_flip(flip_screen_get(screen.machine()) ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
+	state->m_bg_tilemap->set_flip(state->flip_screen() ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
 	state->m_bg_tilemap->draw(bitmap, cliprect, 0, 0);
 
@@ -403,7 +396,7 @@ SCREEN_UPDATE_IND16( m52 )
 			clip.min_y = 128, clip.max_y = 255;
 
 		/* adjust for flipping */
-		if (flip_screen_get(screen.machine()))
+		if (state->flip_screen())
 		{
 			int temp = clip.min_y;
 			clip.min_y = 255 - clip.max_y;

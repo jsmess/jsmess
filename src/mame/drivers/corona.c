@@ -331,6 +331,19 @@ public:
 	UINT8 m_lamp;
 	UINT8 m_lamp_old;
 	int m_input_selector;
+	DECLARE_WRITE8_MEMBER(blitter_y_w);
+	DECLARE_WRITE8_MEMBER(blitter_unk_w);
+	DECLARE_WRITE8_MEMBER(blitter_x_w);
+	DECLARE_WRITE8_MEMBER(blitter_aux_w);
+	DECLARE_READ8_MEMBER(blitter_status_r);
+	DECLARE_WRITE8_MEMBER(blitter_trig_wdht_w);
+	DECLARE_WRITE8_MEMBER(sound_latch_w);
+	DECLARE_READ8_MEMBER(sound_latch_r);
+	DECLARE_WRITE8_MEMBER(ball_w);
+	DECLARE_READ8_MEMBER(mux_port_r);
+	DECLARE_WRITE8_MEMBER(mux_port_w);
+	DECLARE_WRITE8_MEMBER(wc_meters_w);
+	void blitter_execute(int x, int y, int color, int width, int flag);
 };
 
 
@@ -340,6 +353,7 @@ public:
 
 static PALETTE_INIT( winner )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int bit6, bit7, bit0, bit1, r, g, b;
 	int i;
 
@@ -365,43 +379,39 @@ static PALETTE_INIT( winner )
 	}
 }
 
-static WRITE8_HANDLER( blitter_y_w )
+WRITE8_MEMBER(corona_state::blitter_y_w)
 {
-	corona_state *state = space->machine().driver_data<corona_state>();
-	state->m_blitter_y_reg = data;
+	m_blitter_y_reg = data;
 }
 
-static WRITE8_HANDLER( blitter_unk_w )
+WRITE8_MEMBER(corona_state::blitter_unk_w)
 {
-	corona_state *state = space->machine().driver_data<corona_state>();
-	state->m_blitter_unk_reg = data;
+	m_blitter_unk_reg = data;
 }
 
-static WRITE8_HANDLER( blitter_x_w )
+WRITE8_MEMBER(corona_state::blitter_x_w)
 {
-	corona_state *state = space->machine().driver_data<corona_state>();
-	state->m_blitter_x_reg = data;
+	m_blitter_x_reg = data;
 }
 
-static WRITE8_HANDLER( blitter_aux_w )
+WRITE8_MEMBER(corona_state::blitter_aux_w)
 {
-	corona_state *state = space->machine().driver_data<corona_state>();
-	state->m_blitter_aux_reg = data;
+	m_blitter_aux_reg = data;
 }
 
-static READ8_HANDLER( blitter_status_r )
+READ8_MEMBER(corona_state::blitter_status_r)
 {
 /* code checks bit 6 and/or bit 7 */
-	//return space->machine().rand() & 0xc0;
+	//return machine().rand() & 0xc0;
 	/*
         x--- ---- blitter busy
         -x-- ---- vblank
     */
 
-	return 0x80 | ((space->machine().primary_screen->vblank() & 1) << 6);
+	return 0x80 | ((machine().primary_screen->vblank() & 1) << 6);
 }
 
-static void blitter_execute(corona_state *state, int x, int y, int color, int width, int flag)
+void corona_state::blitter_execute(int x, int y, int color, int width, int flag)
 {
 	int i;
 	int xdir = (flag & 0x10)    ? -1 : 1;
@@ -419,7 +429,7 @@ static void blitter_execute(corona_state *state, int x, int y, int color, int wi
 
 		for(yp = 0; yp < 0x100; yp++)
 			for(xp = 0; xp < 0x100; xp++)
-				state->m_videobuf[(yp & 0x1ff) * 512 + (xp & 0x1ff)] = color;
+				m_videobuf[(yp & 0x1ff) * 512 + (xp & 0x1ff)] = color;
 	}
 	else /* line shape */
 	{
@@ -427,7 +437,7 @@ static void blitter_execute(corona_state *state, int x, int y, int color, int wi
 
 		for(i = 0; i < width; i++)
 		{
-			state->m_videobuf[(y & 0x1ff) * 512 + (x & 0x1ff)] = color;
+			m_videobuf[(y & 0x1ff) * 512 + (x & 0x1ff)] = color;
 
 			if(flag & 0x40) { x+=xdir; }
 			if(flag & 0x80) { y+=ydir; }
@@ -435,10 +445,9 @@ static void blitter_execute(corona_state *state, int x, int y, int color, int wi
 	}
 }
 
-static WRITE8_HANDLER( blitter_trig_wdht_w)
+WRITE8_MEMBER(corona_state::blitter_trig_wdht_w)
 {
-	corona_state *state = space->machine().driver_data<corona_state>();
-	blitter_execute(state, state->m_blitter_x_reg, 0x100 - state->m_blitter_y_reg, state->m_blitter_aux_reg & 0xf, data, state->m_blitter_aux_reg & 0xf0);
+	blitter_execute(m_blitter_x_reg, 0x100 - m_blitter_y_reg, m_blitter_aux_reg & 0xf, data, m_blitter_aux_reg & 0xf0);
 }
 
 static VIDEO_START(winner)
@@ -476,52 +485,49 @@ static SCREEN_UPDATE_IND16(luckyrlt)
 *           Read & Write Handlers          *
 *******************************************/
 
-static WRITE8_HANDLER( sound_latch_w )
+WRITE8_MEMBER(corona_state::sound_latch_w)
 {
-	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine(), "soundcpu", 0, ASSERT_LINE);
+	soundlatch_byte_w(space, 0, data & 0xff);
+	cputag_set_input_line(machine(), "soundcpu", 0, ASSERT_LINE);
 }
 
-static READ8_HANDLER( sound_latch_r )
+READ8_MEMBER(corona_state::sound_latch_r)
 {
-	cputag_set_input_line(space->machine(), "soundcpu", 0, CLEAR_LINE);
-	return soundlatch_r(space, 0);
+	cputag_set_input_line(machine(), "soundcpu", 0, CLEAR_LINE);
+	return soundlatch_byte_r(space, 0);
 }
 
 
-static WRITE8_HANDLER( ball_w )
+WRITE8_MEMBER(corona_state::ball_w)
 {
-	corona_state *state = space->machine().driver_data<corona_state>();
-	state->m_lamp = data;
+	m_lamp = data;
 
 	output_set_lamp_value(data, 1);
-	output_set_lamp_value(state->m_lamp_old, 0);
-	state->m_lamp_old = state->m_lamp;
+	output_set_lamp_value(m_lamp_old, 0);
+	m_lamp_old = m_lamp;
 }
 
 
 /********  Multiplexed Inputs  ********/
 
 
-static READ8_HANDLER( mux_port_r )
+READ8_MEMBER(corona_state::mux_port_r)
 {
-	corona_state *state = space->machine().driver_data<corona_state>();
-	switch( state->m_input_selector )
+	switch( m_input_selector )
 	{
-		case 0x01: return input_port_read(space->machine(), "IN0-1");
-		case 0x02: return input_port_read(space->machine(), "IN0-2");
-		case 0x04: return input_port_read(space->machine(), "IN0-3");
-		case 0x08: return input_port_read(space->machine(), "IN0-4");
-		case 0x10: return input_port_read(space->machine(), "IN0-5");
-		case 0x20: return input_port_read(space->machine(), "IN0-6");
+		case 0x01: return ioport("IN0-1")->read();
+		case 0x02: return ioport("IN0-2")->read();
+		case 0x04: return ioport("IN0-3")->read();
+		case 0x08: return ioport("IN0-4")->read();
+		case 0x10: return ioport("IN0-5")->read();
+		case 0x20: return ioport("IN0-6")->read();
 	}
 
 	return 0xff;
 }
 
-static WRITE8_HANDLER( mux_port_w )
+WRITE8_MEMBER(corona_state::mux_port_w)
 {
-	corona_state *state = space->machine().driver_data<corona_state>();
 /*  - bits -
     7654 3210
     --xx xxxx   Input selector.
@@ -531,15 +537,15 @@ static WRITE8_HANDLER( mux_port_w )
    Data is written inverted.
 
 */
-	state->m_input_selector = (data ^ 0xff) & 0x3f;	/* Input Selector,  */
+	m_input_selector = (data ^ 0xff) & 0x3f;	/* Input Selector,  */
 
-	coin_counter_w(space->machine(), 0, (data ^ 0xff) & 0x40);	/* Credits In (mechanical meters) */
-	coin_counter_w(space->machine(), 1, (data ^ 0xff) & 0x80);	/* Credits Out (mechanical meters) */
+	coin_counter_w(machine(), 0, (data ^ 0xff) & 0x40);	/* Credits In (mechanical meters) */
+	coin_counter_w(machine(), 1, (data ^ 0xff) & 0x80);	/* Credits Out (mechanical meters) */
 
-//  logerror("muxsel: %02x \n", state->m_input_selector);
+//  logerror("muxsel: %02x \n", m_input_selector);
 }
 
-static WRITE8_HANDLER( wc_meters_w )
+WRITE8_MEMBER(corona_state::wc_meters_w)
 {
 /*  - bits -
     7654 3210
@@ -552,9 +558,9 @@ static WRITE8_HANDLER( wc_meters_w )
    Data is written inverted.
 
 */
-	coin_counter_w(space->machine(), 0, (data ^ 0xff) & 0x01);	/* Credits In */
-	coin_counter_w(space->machine(), 1, (data ^ 0xff) & 0x02);	/* Credits In (through Coin 3) */
-	coin_counter_w(space->machine(), 2, (data ^ 0xff) & 0x04);	/* Credits Out */
+	coin_counter_w(machine(), 0, (data ^ 0xff) & 0x01);	/* Credits In */
+	coin_counter_w(machine(), 1, (data ^ 0xff) & 0x02);	/* Credits In (through Coin 3) */
+	coin_counter_w(machine(), 2, (data ^ 0xff) & 0x04);	/* Credits Out */
 
 //  popmessage("meters: %02x", (data ^ 0xff));
 }
@@ -597,13 +603,13 @@ static WRITE8_DEVICE_HANDLER(ay_port_b_out)
   RAM data is relocated to B800-B8FF
 
 */
-static ADDRESS_MAP_START( winner81_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( winner81_map, AS_PROGRAM, 8, corona_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xb800, 0xb8ff) AM_RAM // copied from 8000 (0x10 bytes, repeated)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( winner81_cpu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( winner81_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x70, 0x70) AM_WRITE(blitter_x_w)
 	AM_RANGE(0x71, 0x71) AM_WRITE(blitter_unk_w)
@@ -625,15 +631,15 @@ static ADDRESS_MAP_START( winner81_cpu_io_map, AS_IO, 8 )
 	AM_RANGE(0xef, 0xef) AM_WRITE(wc_meters_w)	/* meters: coin1 = bit0, coin2 = bit1, coinout = bit2 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(  winner81_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START(  winner81_sound_map, AS_PROGRAM, 8, corona_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(  winner81_sound_cpu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START(  winner81_sound_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 /*  Winners Circle 1982
@@ -654,13 +660,13 @@ ADDRESS_MAP_END
          FE ---> Sound Latch (writes 01, 02 and 03 during attract)...
 */
 
-static ADDRESS_MAP_START( winner82_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( winner82_map, AS_PROGRAM, 8, corona_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0x80ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( winner82_cpu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( winner82_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_x_w)
 	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_y_w)
@@ -679,15 +685,15 @@ static ADDRESS_MAP_START( winner82_cpu_io_map, AS_IO, 8 )
 	AM_RANGE(0xff, 0xff) AM_READ_PORT("DSW2")	/* no idea */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( winner82_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( winner82_sound_map, AS_PROGRAM, 8, corona_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( winner82_sound_cpu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( winner82_sound_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x02, 0x03) AM_WRITENOP	/* socket for another ay, inited but never played */
 ADDRESS_MAP_END
 
@@ -718,13 +724,13 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( re800_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( re800_map, AS_PROGRAM, 8, corona_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram") //801a comm?
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( re800_cpu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( re800_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_x_w)
 	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_y_w)
@@ -740,15 +746,15 @@ static ADDRESS_MAP_START( re800_cpu_io_map, AS_IO, 8 )
 	AM_RANGE(0xff, 0xff) AM_WRITE(ball_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( re800_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( re800_sound_map, AS_PROGRAM, 8, corona_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( re800_sound_cpu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( re800_sound_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 
@@ -778,12 +784,12 @@ ADDRESS_MAP_END
 
 */
 
-static ADDRESS_MAP_START( luckyrlt_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( luckyrlt_map, AS_PROGRAM, 8, corona_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( luckyrlt_cpu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( luckyrlt_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(blitter_x_w)
 	AM_RANGE(0xf1, 0xf1) AM_WRITE(blitter_y_w)
@@ -800,15 +806,15 @@ static ADDRESS_MAP_START( luckyrlt_cpu_io_map, AS_IO, 8 )
 	AM_RANGE(0xfe, 0xfe) AM_WRITE(sound_latch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( luckyrlt_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( luckyrlt_sound_map, AS_PROGRAM, 8, corona_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( luckyrlt_sound_cpu_io_map, AS_IO, 8 )
+static ADDRESS_MAP_START( luckyrlt_sound_cpu_io_map, AS_IO, 8, corona_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sound_latch_r)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_address_data_w)
+	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_data_w)
 ADDRESS_MAP_END
 
 

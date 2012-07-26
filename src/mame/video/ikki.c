@@ -13,6 +13,7 @@ Video hardware driver by Uki
 
 PALETTE_INIT( ikki )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	ikki_state *state = machine.driver_data<ikki_state>();
 	int i;
 
@@ -55,10 +56,9 @@ PALETTE_INIT( ikki )
 	}
 }
 
-WRITE8_HANDLER( ikki_scrn_ctrl_w )
+WRITE8_MEMBER(ikki_state::ikki_scrn_ctrl_w)
 {
-	ikki_state *state = space->machine().driver_data<ikki_state>();
-	state->m_flipscreen = (data >> 2) & 1;
+	m_flipscreen = (data >> 2) & 1;
 }
 
 
@@ -71,7 +71,7 @@ static void draw_sprites( running_machine &machine, bitmap_ind16 &bitmap, const 
 
 	state->m_sprite_bitmap.fill(state->m_punch_through_pen, cliprect);
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int code = (spriteram[offs + 2] & 0x80) | (spriteram[offs + 1] >> 1);
 		int color = spriteram[offs + 2] & 0x3f;
@@ -128,11 +128,11 @@ SCREEN_UPDATE_IND16( ikki )
 {
 	ikki_state *state = screen.machine().driver_data<ikki_state>();
 	offs_t offs;
-	UINT8 *VIDEOATTR = screen.machine().region("user1")->base();
+	UINT8 *VIDEOATTR = state->memregion("user1")->base();
 
 	/* draw bg layer */
 
-	for (offs = 0; offs < (state->m_videoram_size / 2); offs++)
+	for (offs = 0; offs < (state->m_videoram.bytes() / 2); offs++)
 	{
 		int color, bank;
 
@@ -189,7 +189,7 @@ SCREEN_UPDATE_IND16( ikki )
 
 	/* mask sprites */
 
-	for (offs = 0; offs < (state->m_videoram_size / 2); offs++)
+	for (offs = 0; offs < (state->m_videoram.bytes() / 2); offs++)
 	{
 		int sx = offs / 32;
 		int sy = offs % 32;

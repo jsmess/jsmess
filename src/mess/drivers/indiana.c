@@ -9,7 +9,6 @@
         as it only uses registers C,D,E,F.
 
 ****************************************************************************/
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"

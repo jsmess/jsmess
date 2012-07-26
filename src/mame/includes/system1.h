@@ -2,17 +2,23 @@ class system1_state : public driver_device
 {
 public:
 	system1_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_ram(*this, "ram"),
+		m_spriteram(*this, "spriteram"),
+		m_nob_mcu_latch(*this, "nob_mcu_latch"),
+		m_nob_mcu_status(*this, "nob_mcu_status"){ }
+
+	required_shared_ptr<UINT8> m_ram;
+	required_shared_ptr<UINT8> m_spriteram;
+	optional_shared_ptr<UINT8> m_nob_mcu_latch;
+	optional_shared_ptr<UINT8> m_nob_mcu_status;
 
 	UINT8 *m_videoram;
 	void (*m_videomode_custom)(running_machine &machine, UINT8 data, UINT8 prevdata);
 	UINT8 m_mute_xor;
-	UINT8 *m_ram;
 	UINT8 m_dakkochn_mux_data;
 	UINT8 m_videomode_prev;
 	UINT8 m_mcu_control;
-	UINT8 *m_nob_mcu_status;
-	UINT8 *m_nob_mcu_latch;
 	UINT8 m_nob_maincpu_latch;
 	int m_nobb_inport23_step;
 	UINT8 *m_mix_collide;
@@ -24,7 +30,34 @@ public:
 	UINT8 m_videoram_bank;
 	tilemap_t *m_tilemap_page[8];
 	UINT8 m_tilemap_pages;
-	UINT8 *m_spriteram;
+
+	DECLARE_WRITE8_MEMBER(videomode_w);
+	DECLARE_READ8_MEMBER(sound_data_r);
+	DECLARE_WRITE8_MEMBER(soundport_w);
+	DECLARE_WRITE8_MEMBER(mcu_control_w);
+	DECLARE_WRITE8_MEMBER(mcu_io_w);
+	DECLARE_READ8_MEMBER(mcu_io_r);
+	DECLARE_WRITE8_MEMBER(nob_mcu_control_p2_w);
+	DECLARE_READ8_MEMBER(nob_maincpu_latch_r);
+	DECLARE_WRITE8_MEMBER(nob_maincpu_latch_w);
+	DECLARE_READ8_MEMBER(nob_mcu_status_r);
+	DECLARE_READ8_MEMBER(nobb_inport1c_r);
+	DECLARE_READ8_MEMBER(nobb_inport22_r);
+	DECLARE_READ8_MEMBER(nobb_inport23_r);
+	DECLARE_WRITE8_MEMBER(nobb_outport24_w);
+	DECLARE_READ8_MEMBER(nob_start_r);
+	DECLARE_WRITE8_MEMBER(system1_videomode_w);
+	DECLARE_READ8_MEMBER(system1_mixer_collision_r);
+	DECLARE_WRITE8_MEMBER(system1_mixer_collision_w);
+	DECLARE_WRITE8_MEMBER(system1_mixer_collision_reset_w);
+	DECLARE_READ8_MEMBER(system1_sprite_collision_r);
+	DECLARE_WRITE8_MEMBER(system1_sprite_collision_w);
+	DECLARE_WRITE8_MEMBER(system1_sprite_collision_reset_w);
+	DECLARE_READ8_MEMBER(system1_videoram_r);
+	DECLARE_WRITE8_MEMBER(system1_videoram_w);
+	DECLARE_WRITE8_MEMBER(system1_paletteram_w);
+	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_data_r);
+	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_status_r);
 };
 
 
@@ -33,20 +66,10 @@ public:
 VIDEO_START( system1 );
 VIDEO_START( system2 );
 
-WRITE8_HANDLER( system1_videomode_w );
-WRITE8_HANDLER( system1_paletteram_w );
 
-READ8_HANDLER( system1_videoram_r );
-WRITE8_HANDLER( system1_videoram_w );
 WRITE8_DEVICE_HANDLER( system1_videoram_bank_w );
 
-READ8_HANDLER( system1_mixer_collision_r );
-WRITE8_HANDLER( system1_mixer_collision_w );
-WRITE8_HANDLER( system1_mixer_collision_reset_w );
 
-READ8_HANDLER( system1_sprite_collision_r );
-WRITE8_HANDLER( system1_sprite_collision_w );
-WRITE8_HANDLER( system1_sprite_collision_reset_w );
 
 SCREEN_UPDATE_IND16( system1 );
 SCREEN_UPDATE_IND16( system2 );

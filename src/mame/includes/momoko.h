@@ -8,16 +8,18 @@ class momoko_state : public driver_device
 {
 public:
 	momoko_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_spriteram(*this, "spriteram"),
+		m_videoram(*this, "videoram"),
+		m_bg_scrolly(*this, "bg_scrolly"),
+		m_bg_scrollx(*this, "bg_scrollx"){ }
 
 	/* memory pointers */
-	UINT8 *        m_bg_scrollx;
-	UINT8 *        m_bg_scrolly;
-	UINT8 *        m_videoram;
-	UINT8 *        m_spriteram;
+	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<UINT8> m_bg_scrolly;
+	required_shared_ptr<UINT8> m_bg_scrollx;
 //  UINT8 *        paletteram;    // currently this uses generic palette handling
-	size_t         m_spriteram_size;
-	size_t         m_videoram_size;
 
 	/* video-related */
 	UINT8          m_fg_scrollx;
@@ -30,20 +32,21 @@ public:
 	UINT8          m_bg_mask;
 	UINT8          m_fg_mask;
 	UINT8          m_flipscreen;
+	DECLARE_WRITE8_MEMBER(momoko_bg_read_bank_w);
+	DECLARE_WRITE8_MEMBER(momoko_fg_scrollx_w);
+	DECLARE_WRITE8_MEMBER(momoko_fg_scrolly_w);
+	DECLARE_WRITE8_MEMBER(momoko_fg_select_w);
+	DECLARE_WRITE8_MEMBER(momoko_text_scrolly_w);
+	DECLARE_WRITE8_MEMBER(momoko_text_mode_w);
+	DECLARE_WRITE8_MEMBER(momoko_bg_scrollx_w);
+	DECLARE_WRITE8_MEMBER(momoko_bg_scrolly_w);
+	DECLARE_WRITE8_MEMBER(momoko_bg_select_w);
+	DECLARE_WRITE8_MEMBER(momoko_bg_priority_w);
+	DECLARE_WRITE8_MEMBER(momoko_flipscreen_w);
 };
 
 
 /*----------- defined in video/momoko.c -----------*/
 
-WRITE8_HANDLER( momoko_fg_scrollx_w );
-WRITE8_HANDLER( momoko_fg_scrolly_w );
-WRITE8_HANDLER( momoko_text_scrolly_w );
-WRITE8_HANDLER( momoko_text_mode_w );
-WRITE8_HANDLER( momoko_bg_scrollx_w );
-WRITE8_HANDLER( momoko_bg_scrolly_w );
-WRITE8_HANDLER( momoko_flipscreen_w );
-WRITE8_HANDLER( momoko_fg_select_w);
-WRITE8_HANDLER( momoko_bg_select_w);
-WRITE8_HANDLER( momoko_bg_priority_w);
 
 SCREEN_UPDATE_IND16( momoko );

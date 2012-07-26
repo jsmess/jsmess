@@ -18,26 +18,24 @@
  *
  *************************************/
 
-WRITE8_HANDLER( crgolf_videoram_w )
+WRITE8_MEMBER(crgolf_state::crgolf_videoram_w)
 {
-	crgolf_state *state = space->machine().driver_data<crgolf_state>();
 
-	if (*state->m_screen_select & 1)
-		state->m_videoram_b[offset] = data;
+	if (*m_screen_select & 1)
+		m_videoram_b[offset] = data;
 	else
-		state->m_videoram_a[offset] = data;
+		m_videoram_a[offset] = data;
 }
 
 
-READ8_HANDLER( crgolf_videoram_r )
+READ8_MEMBER(crgolf_state::crgolf_videoram_r)
 {
-	crgolf_state *state = space->machine().driver_data<crgolf_state>();
 	UINT8 ret;
 
-	if (*state->m_screen_select & 1)
-		ret = state->m_videoram_b[offset];
+	if (*m_screen_select & 1)
+		ret = m_videoram_b[offset];
 	else
-		ret = state->m_videoram_a[offset];
+		ret = m_videoram_a[offset];
 
 	return ret;
 }
@@ -53,7 +51,7 @@ READ8_HANDLER( crgolf_videoram_r )
 static void get_pens( running_machine &machine, pen_t *pens )
 {
 	offs_t offs;
-	const UINT8 *prom = machine.region("proms")->base();
+	const UINT8 *prom = machine.root_device().memregion("proms")->base();
 
 	for (offs = 0; offs < NUM_PENS; offs++)
 	{

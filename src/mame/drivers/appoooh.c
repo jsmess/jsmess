@@ -177,7 +177,7 @@ static void appoooh_adpcm_int(device_t *device)
 	{
 		if (state->m_adpcm_data == 0xffffffff)
 		{
-			UINT8 *RAM = device->machine().region("adpcm")->base();
+			UINT8 *RAM = state->memregion("adpcm")->base();
 
 			state->m_adpcm_data = RAM[state->m_adpcm_address++];
 			msm5205_data_w(device, state->m_adpcm_data >> 4);
@@ -197,13 +197,12 @@ static void appoooh_adpcm_int(device_t *device)
 }
 
 /* adpcm address write */
-static WRITE8_HANDLER( appoooh_adpcm_w )
+WRITE8_MEMBER(appoooh_state::appoooh_adpcm_w)
 {
-	appoooh_state *state = space->machine().driver_data<appoooh_state>();
 
-	state->m_adpcm_address = data << 8;
-	msm5205_reset_w(state->m_adpcm, 0);
-	state->m_adpcm_data = 0xffffffff;
+	m_adpcm_address = data << 8;
+	msm5205_reset_w(m_adpcm, 0);
+	m_adpcm_data = 0xffffffff;
 }
 
 
@@ -213,27 +212,27 @@ static WRITE8_HANDLER( appoooh_adpcm_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, appoooh_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xefff) AM_RAM /* RAM ? */
 
-	AM_RANGE(0xf000, 0xf01f) AM_BASE_MEMBER(appoooh_state, m_spriteram)
-	AM_RANGE(0xf020, 0xf3ff) AM_WRITE(appoooh_fg_videoram_w) AM_BASE_MEMBER(appoooh_state, m_fg_videoram)
-	AM_RANGE(0xf420, 0xf7ff) AM_WRITE(appoooh_fg_colorram_w) AM_BASE_MEMBER(appoooh_state, m_fg_colorram)
-	AM_RANGE(0xf800, 0xf81f) AM_BASE_MEMBER(appoooh_state, m_spriteram_2)
-	AM_RANGE(0xf820, 0xfbff) AM_WRITE(appoooh_bg_videoram_w) AM_BASE_MEMBER(appoooh_state, m_bg_videoram)
-	AM_RANGE(0xfc20, 0xffff) AM_WRITE(appoooh_bg_colorram_w) AM_BASE_MEMBER(appoooh_state, m_bg_colorram)
+	AM_RANGE(0xf000, 0xf01f) AM_SHARE("spriteram")
+	AM_RANGE(0xf020, 0xf3ff) AM_WRITE(appoooh_fg_videoram_w) AM_SHARE("fg_videoram")
+	AM_RANGE(0xf420, 0xf7ff) AM_WRITE(appoooh_fg_colorram_w) AM_SHARE("fg_colorram")
+	AM_RANGE(0xf800, 0xf81f) AM_SHARE("spriteram_2")
+	AM_RANGE(0xf820, 0xfbff) AM_WRITE(appoooh_bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0xfc20, 0xffff) AM_WRITE(appoooh_bg_colorram_w) AM_SHARE("bg_colorram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( main_portmap, AS_IO, 8 )
+static ADDRESS_MAP_START( main_portmap, AS_IO, 8, appoooh_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE(0x02, 0x02) AM_DEVWRITE("sn3", sn76496_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_DEVWRITE_LEGACY("sn1", sn76496_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_DEVWRITE_LEGACY("sn2", sn76496_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE_LEGACY("sn3", sn76496_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(appoooh_adpcm_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("BUTTON3") AM_WRITE(appoooh_out_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(appoooh_scroll_w) /* unknown */
@@ -605,7 +604,7 @@ static DRIVER_INIT(robowres)
 static DRIVER_INIT(robowresb)
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->set_decrypted_region(0x0000, 0x7fff, machine.region("maincpu")->base() + 0x1c000);
+	space->set_decrypted_region(0x0000, 0x7fff, machine.root_device().memregion("maincpu")->base() + 0x1c000);
 }
 
 

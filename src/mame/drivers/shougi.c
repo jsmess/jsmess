@@ -91,13 +91,25 @@ class shougi_state : public driver_device
 {
 public:
 	shougi_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram(*this, "videoram"){ }
 
-	UINT8 *m_videoram;
+	required_shared_ptr<UINT8> m_videoram;
 	int m_nmi_enabled;
 	//UINT8 *m_cpu_sharedram;
 	//UINT8 m_cpu_sharedram_control_val;
 	int m_r;
+	DECLARE_WRITE8_MEMBER(cpu_sharedram_sub_w);
+	DECLARE_WRITE8_MEMBER(cpu_sharedram_main_w);
+	DECLARE_READ8_MEMBER(cpu_sharedram_r);
+	DECLARE_WRITE8_MEMBER(cpu_shared_ctrl_sub_w);
+	DECLARE_WRITE8_MEMBER(cpu_shared_ctrl_main_w);
+	DECLARE_WRITE8_MEMBER(shougi_watchdog_reset_w);
+	DECLARE_WRITE8_MEMBER(shougi_mcu_halt_off_w);
+	DECLARE_WRITE8_MEMBER(shougi_mcu_halt_on_w);
+	DECLARE_WRITE8_MEMBER(nmi_disable_and_clear_line_w);
+	DECLARE_WRITE8_MEMBER(nmi_enable_w);
+	DECLARE_READ8_MEMBER(dummy_r);
 };
 
 
@@ -121,6 +133,7 @@ public:
 
 static PALETTE_INIT( shougi )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 	static const int resistances_b[2]  = { 470, 220 };
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -194,71 +207,69 @@ static SCREEN_UPDATE_IND16( shougi )
 //to do:
 // add separate sharedram/r/w() for both CPUs and use control value to verify access
 
-static WRITE8_HANDLER ( cpu_sharedram_sub_w )
+WRITE8_MEMBER(shougi_state::cpu_sharedram_sub_w)
 {
 	if (cpu_sharedram_control_val!=0) logerror("sub CPU access to shared RAM when access set for main cpu\n");
 	cpu_sharedram[offset] = data;
 }
 
-static WRITE8_HANDLER ( cpu_sharedram_main_w )
+WRITE8_MEMBER(shougi_state::cpu_sharedram_main_w)
 {
 	if (cpu_sharedram_control_val!=1) logerror("main CPU access to shared RAM when access set for sub cpu\n");
 	cpu_sharedram[offset] = data;
 }
 
-static READ8_HANDLER ( cpu_sharedram_r )
+READ8_MEMBER(shougi_state::cpu_sharedram_r)
 {
 	return cpu_sharedram[offset];
 }
 
 #endif
 
-static WRITE8_HANDLER ( cpu_shared_ctrl_sub_w )
+WRITE8_MEMBER(shougi_state::cpu_shared_ctrl_sub_w)
 {
 	//cpu_sharedram_control_val = 0;
 	//logerror("cpu_sharedram_ctrl=SUB");
 }
 
-static WRITE8_HANDLER ( cpu_shared_ctrl_main_w )
+WRITE8_MEMBER(shougi_state::cpu_shared_ctrl_main_w)
 {
 	//cpu_sharedram_control_val = 1;
 	//logerror("cpu_sharedram_ctrl=MAIN");
 }
 
-static WRITE8_HANDLER( shougi_watchdog_reset_w )
+WRITE8_MEMBER(shougi_state::shougi_watchdog_reset_w)
 {
 	watchdog_reset_w(space,0,data);
 }
 
-static WRITE8_HANDLER( shougi_mcu_halt_off_w )
+WRITE8_MEMBER(shougi_state::shougi_mcu_halt_off_w)
 {
 	/* logerror("mcu HALT OFF"); */
-	cputag_set_input_line(space->machine(), "mcu", INPUT_LINE_HALT, CLEAR_LINE);
+	cputag_set_input_line(machine(), "mcu", INPUT_LINE_HALT, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( shougi_mcu_halt_on_w )
+WRITE8_MEMBER(shougi_state::shougi_mcu_halt_on_w)
 {
 	/* logerror("mcu HALT ON"); */
-	cputag_set_input_line(space->machine(), "mcu", INPUT_LINE_HALT,ASSERT_LINE);
+	cputag_set_input_line(machine(), "mcu", INPUT_LINE_HALT,ASSERT_LINE);
 }
 
 
-static WRITE8_HANDLER( nmi_disable_and_clear_line_w )
+WRITE8_MEMBER(shougi_state::nmi_disable_and_clear_line_w)
 {
-	shougi_state *state = space->machine().driver_data<shougi_state>();
 
-	state->m_nmi_enabled = 0; /* disable NMIs */
+	m_nmi_enabled = 0; /* disable NMIs */
 
 	/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
-	cputag_set_input_line(space->machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
-	cputag_set_input_line(space->machine(), "sub", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(machine(), "maincpu", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(machine(), "sub", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( nmi_enable_w )
+WRITE8_MEMBER(shougi_state::nmi_enable_w)
 {
-	shougi_state *state = space->machine().driver_data<shougi_state>();
 
-	state->m_nmi_enabled = 1; /* enable NMIs */
+	m_nmi_enabled = 1; /* enable NMIs */
 }
 
 static INTERRUPT_GEN( shougi_vblank_nmi )
@@ -274,7 +285,7 @@ static INTERRUPT_GEN( shougi_vblank_nmi )
 }
 
 
-static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM		/* 2114 x 2 (0x400 x 4bit each) */
 
@@ -294,37 +305,36 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8 )
 
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1")
 	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_WRITE(shougi_watchdog_reset_w)	/* game won't boot if watchdog doesn't work */
-	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("aysnd", ay8910_address_w)
-	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE("aysnd", ay8910_data_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE_LEGACY("aysnd", ay8910_address_w)
+	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE_LEGACY("aysnd", ay8910_data_w)
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1") /* 2114 x 2 (0x400 x 4bit each) */
 	AM_RANGE(0x7800, 0x7bff) AM_RAM AM_SHARE("share2") /* 2114 x 2 (0x400 x 4bit each) */
 
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE_MEMBER(shougi_state,m_videoram)	/* 4116 x 16 (32K) */
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_SHARE("videoram")	/* 4116 x 16 (32K) */
 ADDRESS_MAP_END
 
 /* sub */
-static READ8_HANDLER ( dummy_r )
+READ8_MEMBER(shougi_state::dummy_r)
 {
-	shougi_state *state = space->machine().driver_data<shougi_state>();
-	state->m_r ^= 1;
+	m_r ^= 1;
 
-	if(state->m_r)
+	if(m_r)
 		return 0xff;
 	else
 		return 0;
 }
 
-static ADDRESS_MAP_START( readport_sub, AS_IO, 8 )
+static ADDRESS_MAP_START( readport_sub, AS_IO, 8, shougi_state )
 	ADDRESS_MAP_GLOBAL_MASK( 0x00ff )
 	AM_RANGE(0x00, 0x00) AM_READ(dummy_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE("share2") /* 2114 x 2 (0x400 x 4bit each) */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 

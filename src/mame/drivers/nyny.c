@@ -88,13 +88,17 @@ class nyny_state : public driver_device
 {
 public:
 	nyny_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_videoram1(*this, "videoram1"),
+		m_colorram1(*this, "colorram1"),
+		m_videoram2(*this, "videoram2"),
+		m_colorram2(*this, "colorram2"){ }
 
 	/* memory pointers */
-	UINT8 *  m_videoram1;
-	UINT8 *  m_videoram2;
-	UINT8 *  m_colorram1;
-	UINT8 *  m_colorram2;
+	required_shared_ptr<UINT8> m_videoram1;
+	required_shared_ptr<UINT8> m_colorram1;
+	required_shared_ptr<UINT8> m_videoram2;
+	required_shared_ptr<UINT8> m_colorram2;
 
 	/* video-related */
 	int      m_flipscreen;
@@ -111,6 +115,11 @@ public:
 	pia6821_device *m_pia1;
 	pia6821_device *m_pia2;
 	pen_t m_pens[NUM_PENS];
+	DECLARE_WRITE8_MEMBER(audio_1_command_w);
+	DECLARE_WRITE8_MEMBER(audio_1_answer_w);
+	DECLARE_WRITE8_MEMBER(audio_2_command_w);
+	DECLARE_READ8_MEMBER(nyny_pia_1_2_r);
+	DECLARE_WRITE8_MEMBER(nyny_pia_1_2_w);
 };
 
 
@@ -121,7 +130,7 @@ public:
  *************************************/
 
 static WRITE_LINE_DEVICE_HANDLER( flipscreen_w );
-static WRITE8_HANDLER( audio_2_command_w );
+
 
 
 /*************************************
@@ -160,13 +169,13 @@ static INTERRUPT_GEN( update_pia_1 )
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA0 (COIN1) */
-	state->m_pia1->ca1_w(input_port_read(device->machine(), "IN0") & 0x01);
+	state->m_pia1->ca1_w(state->ioport("IN0")->read() & 0x01);
 
 	/* CA2 - copy of PA1 (SERVICE1) */
-	state->m_pia1->ca2_w(input_port_read(device->machine(), "IN0") & 0x02);
+	state->m_pia1->ca2_w(state->ioport("IN0")->read() & 0x02);
 
 	/* CB1 - (crosshatch) */
-	state->m_pia1->cb1_w(input_port_read(device->machine(), "CROSS"));
+	state->m_pia1->cb1_w(state->ioport("CROSS")->read());
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -214,7 +223,7 @@ static WRITE8_DEVICE_HANDLER( pia_2_port_b_w )
 	state->m_star_enable = data & 0x10;
 
 	/* bits 5-7 go to the music board connector */
-	audio_2_command_w(state->m_maincpu->memory().space(AS_PROGRAM), 0, data & 0xe0);
+	state->audio_2_command_w(*state->m_maincpu->memory().space(AS_PROGRAM), 0, data & 0xe0);
 }
 
 
@@ -434,21 +443,19 @@ static const mc6845_interface mc6845_intf =
  *
  *************************************/
 
-static WRITE8_HANDLER( audio_1_command_w )
+WRITE8_MEMBER(nyny_state::audio_1_command_w)
 {
-	nyny_state *state = space->machine().driver_data<nyny_state>();
 
-	soundlatch_w(space, 0, data);
-	device_set_input_line(state->m_audiocpu, M6800_IRQ_LINE, HOLD_LINE);
+	soundlatch_byte_w(space, 0, data);
+	device_set_input_line(m_audiocpu, M6800_IRQ_LINE, HOLD_LINE);
 }
 
 
-static WRITE8_HANDLER( audio_1_answer_w )
+WRITE8_MEMBER(nyny_state::audio_1_answer_w)
 {
-	nyny_state *state = space->machine().driver_data<nyny_state>();
 
-	soundlatch3_w(space, 0, data);
-	device_set_input_line(state->m_maincpu, M6809_IRQ_LINE, HOLD_LINE);
+	soundlatch3_byte_w(space, 0, data);
+	device_set_input_line(m_maincpu, M6809_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -489,12 +496,11 @@ static const ay8910_interface ay8910_64_interface =
  *
  *************************************/
 
-static WRITE8_HANDLER( audio_2_command_w )
+WRITE8_MEMBER(nyny_state::audio_2_command_w)
 {
-	nyny_state *state = space->machine().driver_data<nyny_state>();
 
-	soundlatch2_w(space, 0, (data & 0x60) >> 5);
-	device_set_input_line(state->m_audiocpu2, M6800_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+	soundlatch2_byte_w(space, 0, (data & 0x60) >> 5);
+	device_set_input_line(m_audiocpu2, M6800_IRQ_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -505,40 +511,38 @@ static WRITE8_HANDLER( audio_2_command_w )
  *
  *************************************/
 
-static READ8_HANDLER( nyny_pia_1_2_r )
+READ8_MEMBER(nyny_state::nyny_pia_1_2_r)
 {
-	nyny_state *state = space->machine().driver_data<nyny_state>();
 	UINT8 ret = 0;
 
 	/* the address bits are directly connected to the chip selects */
-	if (BIT(offset, 2))  ret = state->m_pia1->read(*memory_nonspecific_space(space->machine()), offset & 0x03);
-	if (BIT(offset, 3))  ret = state->m_pia2->read_alt(*memory_nonspecific_space(space->machine()), offset & 0x03);
+	if (BIT(offset, 2))  ret = m_pia1->read(space, offset & 0x03);
+	if (BIT(offset, 3))  ret = m_pia2->read_alt(space, offset & 0x03);
 
 	return ret;
 }
 
 
-static WRITE8_HANDLER( nyny_pia_1_2_w )
+WRITE8_MEMBER(nyny_state::nyny_pia_1_2_w)
 {
-	nyny_state *state = space->machine().driver_data<nyny_state>();
 
 	/* the address bits are directly connected to the chip selects */
-	if (BIT(offset, 2))  state->m_pia1->write(*memory_nonspecific_space(space->machine()), offset & 0x03, data);
-	if (BIT(offset, 3))  state->m_pia2->write_alt(*memory_nonspecific_space(space->machine()), offset & 0x03, data);
+	if (BIT(offset, 2))  m_pia1->write(space, offset & 0x03, data);
+	if (BIT(offset, 3))  m_pia2->write_alt(space, offset & 0x03, data);
 }
 
 
-static ADDRESS_MAP_START( nyny_main_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_MEMBER(nyny_state, m_videoram1)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE_MEMBER(nyny_state, m_colorram1)
-	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE_MEMBER(nyny_state, m_videoram2)
-	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE_MEMBER(nyny_state, m_colorram2)
+static ADDRESS_MAP_START( nyny_main_map, AS_PROGRAM, 8, nyny_state )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("videoram1")
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("colorram1")
+	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_SHARE("videoram2")
+	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_SHARE("colorram2")
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa0ff) AM_RAM AM_SHARE("nvram") /* SRAM (coin counter, shown when holding F2) */
-	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x00fe) AM_DEVWRITE_MODERN("crtc", mc6845_device, address_w)
-	AM_RANGE(0xa101, 0xa101) AM_MIRROR(0x00fe) AM_DEVWRITE_MODERN("crtc", mc6845_device, register_w)
+	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x00fe) AM_DEVWRITE("crtc", mc6845_device, address_w)
+	AM_RANGE(0xa101, 0xa101) AM_MIRROR(0x00fe) AM_DEVWRITE("crtc", mc6845_device, register_w)
 	AM_RANGE(0xa200, 0xa20f) AM_MIRROR(0x00f0) AM_READWRITE(nyny_pia_1_2_r, nyny_pia_1_2_w)
-	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x00ff) AM_READWRITE(soundlatch3_r, audio_1_command_w)
+	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x00ff) AM_READ(soundlatch3_byte_r) AM_WRITE(audio_1_command_w)
 	AM_RANGE(0xa400, 0xa7ff) AM_NOP
 	AM_RANGE(0xa800, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
@@ -546,16 +550,16 @@ static ADDRESS_MAP_START( nyny_main_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nyny_audio_1_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nyny_audio_1_map, AS_PROGRAM, 8, nyny_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READWRITE(soundlatch_r, audio_1_answer_w)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READ(soundlatch_byte_r) AM_WRITE(audio_1_answer_w)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0fff) AM_READ_PORT("SW3")
-	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffc) AM_DEVREAD("ay1", ay8910_r)
-	AM_RANGE(0x3000, 0x3001) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay1", ay8910_data_address_w)
-	AM_RANGE(0x3002, 0x3002) AM_MIRROR(0x0ffc) AM_DEVREAD("ay2", ay8910_r)
-	AM_RANGE(0x3002, 0x3003) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay2", ay8910_data_address_w)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffc) AM_DEVREAD_LEGACY("ay1", ay8910_r)
+	AM_RANGE(0x3000, 0x3001) AM_MIRROR(0x0ffc) AM_DEVWRITE_LEGACY("ay1", ay8910_data_address_w)
+	AM_RANGE(0x3002, 0x3002) AM_MIRROR(0x0ffc) AM_DEVREAD_LEGACY("ay2", ay8910_r)
+	AM_RANGE(0x3002, 0x3003) AM_MIRROR(0x0ffc) AM_DEVWRITE_LEGACY("ay2", ay8910_data_address_w)
 	AM_RANGE(0x4000, 0x4fff) AM_NOP
 	AM_RANGE(0x5000, 0x57ff) AM_MIRROR(0x0800) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_MIRROR(0x0800) AM_ROM
@@ -563,13 +567,13 @@ static ADDRESS_MAP_START( nyny_audio_1_map, AS_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( nyny_audio_2_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( nyny_audio_2_map, AS_PROGRAM, 8, nyny_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_RAM		/* internal RAM */
 	AM_RANGE(0x0080, 0x0fff) AM_NOP
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READ(soundlatch2_r)
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD("ay3", ay8910_r)
-	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0ffe) AM_DEVWRITE("ay3", ay8910_data_address_w)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_READ(soundlatch2_byte_r)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_DEVREAD_LEGACY("ay3", ay8910_r)
+	AM_RANGE(0x2000, 0x2001) AM_MIRROR(0x0ffe) AM_DEVWRITE_LEGACY("ay3", ay8910_data_address_w)
 	AM_RANGE(0x3000, 0x6fff) AM_NOP
 	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_ROM
 ADDRESS_MAP_END

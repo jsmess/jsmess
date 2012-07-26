@@ -12,10 +12,14 @@ class orao_state : public driver_device
 {
 public:
 	orao_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_memory(*this, "memory"),
+		m_video_ram(*this, "video_ram"){ }
 
-	UINT8 *m_memory;
-	UINT8 *m_video_ram;
+	required_shared_ptr<UINT8> m_memory;
+	required_shared_ptr<UINT8> m_video_ram;
+	DECLARE_READ8_MEMBER(orao_io_r);
+	DECLARE_WRITE8_MEMBER(orao_io_w);
 };
 
 
@@ -26,8 +30,6 @@ extern MACHINE_RESET( orao );
 
 extern DRIVER_INIT( orao103 );
 
-extern READ8_HANDLER( orao_io_r );
-extern WRITE8_HANDLER( orao_io_w );
 
 
 /*----------- defined in video/orao.c -----------*/

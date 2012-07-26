@@ -59,6 +59,7 @@ tilt the mirror up and down, and the monitor left and right.
 
 static PALETTE_INIT( stactics )
 {
+	const UINT8 *color_prom = machine.root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < 0x400; i++)
@@ -89,17 +90,16 @@ static PALETTE_INIT( stactics )
  *
  *************************************/
 
-WRITE8_HANDLER( stactics_scroll_ram_w )
+WRITE8_MEMBER(stactics_state::stactics_scroll_ram_w)
 {
-	stactics_state *state = space->machine().driver_data<stactics_state>();
 
 	if (data & 0x01)
 	{
 		switch (offset >> 8)
 		{
-			case 4: state->m_y_scroll_d = offset & 0xff; break;
-			case 5: state->m_y_scroll_e = offset & 0xff; break;
-			case 6: state->m_y_scroll_f = offset & 0xff; break;
+			case 4: m_y_scroll_d = offset & 0xff; break;
+			case 5: m_y_scroll_e = offset & 0xff; break;
+			case 6: m_y_scroll_f = offset & 0xff; break;
 		}
 	}
 }
@@ -112,11 +112,10 @@ WRITE8_HANDLER( stactics_scroll_ram_w )
  *
  *************************************/
 
-CUSTOM_INPUT( stactics_get_frame_count_d3 )
+CUSTOM_INPUT_MEMBER(stactics_state::stactics_get_frame_count_d3)
 {
-	stactics_state *state = field.machine().driver_data<stactics_state>();
 
-	return (state->m_frame_count >> 3) & 0x01;
+	return (m_frame_count >> 3) & 0x01;
 }
 
 
@@ -127,9 +126,8 @@ CUSTOM_INPUT( stactics_get_frame_count_d3 )
  *
  *************************************/
 
-WRITE8_HANDLER( stactics_speed_latch_w )
+WRITE8_MEMBER(stactics_state::stactics_speed_latch_w)
 {
-	stactics_state *state = space->machine().driver_data<stactics_state>();
 
 	/* This writes to a shift register which is clocked by   */
 	/* a 555 oscillator.  This value determines the speed of */
@@ -150,39 +148,35 @@ WRITE8_HANDLER( stactics_speed_latch_w )
 			num_rising_edges++;
 	}
 
-	state->m_beam_states_per_frame = num_rising_edges*19/8;
+	m_beam_states_per_frame = num_rising_edges*19/8;
 }
 
 
-WRITE8_HANDLER( stactics_shot_trigger_w )
+WRITE8_MEMBER(stactics_state::stactics_shot_trigger_w)
 {
-	stactics_state *state = space->machine().driver_data<stactics_state>();
 
-	state->m_shot_standby = 0;
+	m_shot_standby = 0;
 }
 
 
-WRITE8_HANDLER( stactics_shot_flag_clear_w )
+WRITE8_MEMBER(stactics_state::stactics_shot_flag_clear_w)
 {
-	stactics_state *state = space->machine().driver_data<stactics_state>();
 
-	state->m_shot_arrive = 0;
+	m_shot_arrive = 0;
 }
 
 
-CUSTOM_INPUT( stactics_get_shot_standby )
+CUSTOM_INPUT_MEMBER(stactics_state::stactics_get_shot_standby)
 {
-	stactics_state *state = field.machine().driver_data<stactics_state>();
 
-	return state->m_shot_standby;
+	return m_shot_standby;
 }
 
 
-CUSTOM_INPUT( stactics_get_not_shot_arrive )
+CUSTOM_INPUT_MEMBER(stactics_state::stactics_get_not_shot_arrive)
 {
-	stactics_state *state = field.machine().driver_data<stactics_state>();
 
-	return !state->m_shot_arrive;
+	return !m_shot_arrive;
 }
 
 
@@ -312,7 +306,7 @@ static void set_indicator_leds(int data, const char *output_name, int base_index
 static void update_artwork(running_machine &machine, stactics_state *state)
 {
 	int i;
-	UINT8 *beam_region = machine.region("user1")->base();
+	UINT8 *beam_region = machine.root_device().memregion("user1")->base();
 
 	/* set the lamps first */
 	output_set_indexed_value("base_lamp", 4, state->m_lamps[0] & 0x01);

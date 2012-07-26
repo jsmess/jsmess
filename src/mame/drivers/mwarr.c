@@ -50,20 +50,30 @@ class mwarr_state : public driver_device
 {
 public:
 	mwarr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_bg_videoram(*this, "bg_videoram"),
+		m_mlow_videoram(*this, "mlow_videoram"),
+		m_mhigh_videoram(*this, "mhigh_videoram"),
+		m_tx_videoram(*this, "tx_videoram"),
+		m_bg_scrollram(*this, "bg_scrollram"),
+		m_mlow_scrollram(*this, "mlow_scrollram"),
+		m_mhigh_scrollram(*this, "mhigh_scrollram"),
+		m_vidattrram(*this, "vidattrram"),
+		m_spriteram(*this, "spriteram"),
+		m_mwarr_ram(*this, "mwarr_ram"){ }
 
 	/* memory pointers */
-	UINT16 *m_bg_videoram;
-	UINT16 *m_mlow_videoram;
-	UINT16 *m_mhigh_videoram;
-	UINT16 *m_tx_videoram;
-	UINT16 *m_bg_scrollram;
-	UINT16 *m_mlow_scrollram;
-	UINT16 *m_mhigh_scrollram;
-	UINT16 *m_vidattrram;
-	UINT16 *m_spriteram;
+	required_shared_ptr<UINT16> m_bg_videoram;
+	required_shared_ptr<UINT16> m_mlow_videoram;
+	required_shared_ptr<UINT16> m_mhigh_videoram;
+	required_shared_ptr<UINT16> m_tx_videoram;
+	required_shared_ptr<UINT16> m_bg_scrollram;
+	required_shared_ptr<UINT16> m_mlow_scrollram;
+	required_shared_ptr<UINT16> m_mhigh_scrollram;
+	required_shared_ptr<UINT16> m_vidattrram;
+	required_shared_ptr<UINT16> m_spriteram;
 //  UINT16 *m_paletteram;    // currently this uses generic palette handling
-	UINT16 *m_mwarr_ram;
+	required_shared_ptr<UINT16> m_mwarr_ram;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
@@ -75,6 +85,12 @@ public:
 	int m_which;
 
 	UINT16 m_sprites_buffer[0x800];
+	DECLARE_WRITE16_MEMBER(bg_videoram_w);
+	DECLARE_WRITE16_MEMBER(mlow_videoram_w);
+	DECLARE_WRITE16_MEMBER(mhigh_videoram_w);
+	DECLARE_WRITE16_MEMBER(tx_videoram_w);
+	DECLARE_WRITE16_MEMBER(sprites_commands_w);
+	DECLARE_WRITE16_MEMBER(mwarr_brightness_w);
 };
 
 
@@ -84,36 +100,32 @@ public:
  *
  *************************************/
 
-static WRITE16_HANDLER( bg_videoram_w )
+WRITE16_MEMBER(mwarr_state::bg_videoram_w)
 {
-	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
-	COMBINE_DATA(&state->m_bg_videoram[offset]);
-	state->m_bg_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_bg_videoram[offset]);
+	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( mlow_videoram_w )
+WRITE16_MEMBER(mwarr_state::mlow_videoram_w)
 {
-	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
-	COMBINE_DATA(&state->m_mlow_videoram[offset]);
-	state->m_mlow_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_mlow_videoram[offset]);
+	m_mlow_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( mhigh_videoram_w )
+WRITE16_MEMBER(mwarr_state::mhigh_videoram_w)
 {
-	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
-	COMBINE_DATA(&state->m_mhigh_videoram[offset]);
-	state->m_mhigh_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_mhigh_videoram[offset]);
+	m_mhigh_tilemap->mark_tile_dirty(offset);
 }
 
-static WRITE16_HANDLER( tx_videoram_w )
+WRITE16_MEMBER(mwarr_state::tx_videoram_w)
 {
-	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
-	COMBINE_DATA(&state->m_tx_videoram[offset]);
-	state->m_tx_tilemap->mark_tile_dirty(offset);
+	COMBINE_DATA(&m_tx_videoram[offset]);
+	m_tx_tilemap->mark_tile_dirty(offset);
 }
 
 static WRITE16_DEVICE_HANDLER( oki1_bank_w )
@@ -121,11 +133,10 @@ static WRITE16_DEVICE_HANDLER( oki1_bank_w )
 	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 3));
 }
 
-static WRITE16_HANDLER( sprites_commands_w )
+WRITE16_MEMBER(mwarr_state::sprites_commands_w)
 {
-	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 
-	if (state->m_which)
+	if (m_which)
 	{
 		int i;
 
@@ -135,9 +146,9 @@ static WRITE16_HANDLER( sprites_commands_w )
 			/* clear sprites on screen */
 			for (i = 0; i < 0x800; i++)
 			{
-				state->m_sprites_buffer[i] = 0;
+				m_sprites_buffer[i] = 0;
 			}
-			state->m_which = 0;
+			m_which = 0;
 			break;
 
 		default:
@@ -146,7 +157,7 @@ static WRITE16_HANDLER( sprites_commands_w )
 			/* refresh sprites on screen */
 			for (i = 0; i < 0x800; i++)
 			{
-				state->m_sprites_buffer[i] = state->m_spriteram[i];
+				m_sprites_buffer[i] = m_spriteram[i];
 			}
 			break;
 
@@ -156,21 +167,20 @@ static WRITE16_HANDLER( sprites_commands_w )
 		}
 	}
 
-	state->m_which ^= 1;
+	m_which ^= 1;
 }
 
-static WRITE16_HANDLER( mwarr_brightness_w )
+WRITE16_MEMBER(mwarr_state::mwarr_brightness_w)
 {
-	mwarr_state *state = space->machine().driver_data<mwarr_state>();
 	int i;
 	double brightness;
 
-	COMBINE_DATA(&state->m_mwarr_ram[0x14 / 2]);
+	COMBINE_DATA(&m_mwarr_ram[0x14 / 2]);
 
 	brightness = (double)(data & 0xff);
 	for (i = 0; i < 0x800; i++)
 	{
-		palette_set_pen_contrast(space->machine(), i, brightness/255);
+		palette_set_pen_contrast(machine(), i, brightness/255);
 	}
 }
 
@@ -181,27 +191,27 @@ static WRITE16_HANDLER( mwarr_brightness_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( mwarr_map, AS_PROGRAM, 16 )
+static ADDRESS_MAP_START( mwarr_map, AS_PROGRAM, 16, mwarr_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(bg_videoram_w) AM_BASE_MEMBER(mwarr_state, m_bg_videoram)
-	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(mlow_videoram_w) AM_BASE_MEMBER(mwarr_state, m_mlow_videoram)
-	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(mhigh_videoram_w) AM_BASE_MEMBER(mwarr_state, m_mhigh_videoram)
-	AM_RANGE(0x101800, 0x1027ff) AM_RAM_WRITE(tx_videoram_w) AM_BASE_MEMBER(mwarr_state, m_tx_videoram)
-	AM_RANGE(0x103000, 0x1033ff) AM_RAM AM_BASE_MEMBER(mwarr_state, m_bg_scrollram)
-	AM_RANGE(0x103400, 0x1037ff) AM_RAM AM_BASE_MEMBER(mwarr_state, m_mlow_scrollram)
-	AM_RANGE(0x103800, 0x103bff) AM_RAM AM_BASE_MEMBER(mwarr_state, m_mhigh_scrollram)
-	AM_RANGE(0x103c00, 0x103fff) AM_RAM AM_BASE_MEMBER(mwarr_state, m_vidattrram)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x108000, 0x108fff) AM_RAM AM_BASE_MEMBER(mwarr_state, m_spriteram)
+	AM_RANGE(0x100000, 0x1007ff) AM_RAM_WRITE(bg_videoram_w) AM_SHARE("bg_videoram")
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(mlow_videoram_w) AM_SHARE("mlow_videoram")
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(mhigh_videoram_w) AM_SHARE("mhigh_videoram")
+	AM_RANGE(0x101800, 0x1027ff) AM_RAM_WRITE(tx_videoram_w) AM_SHARE("tx_videoram")
+	AM_RANGE(0x103000, 0x1033ff) AM_RAM AM_SHARE("bg_scrollram")
+	AM_RANGE(0x103400, 0x1037ff) AM_RAM AM_SHARE("mlow_scrollram")
+	AM_RANGE(0x103800, 0x103bff) AM_RAM AM_SHARE("mhigh_scrollram")
+	AM_RANGE(0x103c00, 0x103fff) AM_RAM AM_SHARE("vidattrram")
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_word_w) AM_SHARE("paletteram")
+	AM_RANGE(0x108000, 0x108fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x110000, 0x110001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x110002, 0x110003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x110004, 0x110005) AM_READ_PORT("DSW")
-	AM_RANGE(0x110010, 0x110011) AM_DEVWRITE("oki2", oki1_bank_w)
+	AM_RANGE(0x110010, 0x110011) AM_DEVWRITE_LEGACY("oki2", oki1_bank_w)
 	AM_RANGE(0x110014, 0x110015) AM_WRITE(mwarr_brightness_w)
 	AM_RANGE(0x110016, 0x110017) AM_WRITE(sprites_commands_w)
-	AM_RANGE(0x110000, 0x11ffff) AM_RAM AM_BASE_MEMBER(mwarr_state, m_mwarr_ram)
-	AM_RANGE(0x180000, 0x180001) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0x190000, 0x190001) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x110000, 0x11ffff) AM_RAM AM_SHARE("mwarr_ram")
+	AM_RANGE(0x180000, 0x180001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x190000, 0x190001) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -233,7 +243,7 @@ static INPUT_PORTS_START( mwarr )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SPECIAL ) // otherwise it doesn't boot
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 

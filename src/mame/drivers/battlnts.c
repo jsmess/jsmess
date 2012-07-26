@@ -32,20 +32,19 @@ static INTERRUPT_GEN( battlnts_interrupt )
 		device_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
-static WRITE8_HANDLER( battlnts_sh_irqtrigger_w )
+WRITE8_MEMBER(battlnts_state::battlnts_sh_irqtrigger_w)
 {
-	battlnts_state *state = space->machine().driver_data<battlnts_state>();
-	device_set_input_line_and_vector(state->m_audiocpu, 0, HOLD_LINE, 0xff);
+	device_set_input_line_and_vector(m_audiocpu, 0, HOLD_LINE, 0xff);
 }
 
-static WRITE8_HANDLER( battlnts_bankswitch_w )
+WRITE8_MEMBER(battlnts_state::battlnts_bankswitch_w)
 {
 	/* bits 6 & 7 = bank number */
-	memory_set_bank(space->machine(), "bank1", (data & 0xc0) >> 6);
+	membank("bank1")->set_entry((data & 0xc0) >> 6);
 
 	/* bits 4 & 5 = coin counters */
-	coin_counter_w(space->machine(), 0, data & 0x10);
-	coin_counter_w(space->machine(), 1, data & 0x20);
+	coin_counter_w(machine(), 0, data & 0x10);
+	coin_counter_w(machine(), 1, data & 0x20);
 
 	/* other bits unknown */
 }
@@ -57,12 +56,12 @@ static WRITE8_HANDLER( battlnts_bankswitch_w )
  *
  *************************************/
 
-static ADDRESS_MAP_START( battlnts_map, AS_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE("k007342", k007342_r, k007342_w)	/* Color RAM + Video RAM */
-	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE("k007420", k007420_r, k007420_w)	/* Sprite RAM */
-	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE("k007342", k007342_scroll_r, k007342_scroll_w)		/* Scroll RAM */
-	AM_RANGE(0x2400, 0x24ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_be_w) AM_BASE_GENERIC(paletteram)/* palette */
-	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE("k007342", k007342_vreg_w) 			/* Video Registers */
+static ADDRESS_MAP_START( battlnts_map, AS_PROGRAM, 8, battlnts_state )
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREADWRITE_LEGACY("k007342", k007342_r, k007342_w)	/* Color RAM + Video RAM */
+	AM_RANGE(0x2000, 0x21ff) AM_DEVREADWRITE_LEGACY("k007420", k007420_r, k007420_w)	/* Sprite RAM */
+	AM_RANGE(0x2200, 0x23ff) AM_DEVREADWRITE_LEGACY("k007342", k007342_scroll_r, k007342_scroll_w)		/* Scroll RAM */
+	AM_RANGE(0x2400, 0x24ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_be_w) AM_SHARE("paletteram")/* palette */
+	AM_RANGE(0x2600, 0x2607) AM_DEVWRITE_LEGACY("k007342", k007342_vreg_w)			/* Video Registers */
 	AM_RANGE(0x2e00, 0x2e00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2e01, 0x2e01) AM_READ_PORT("P2")
 	AM_RANGE(0x2e02, 0x2e02) AM_READ_PORT("P1")
@@ -71,18 +70,18 @@ static ADDRESS_MAP_START( battlnts_map, AS_PROGRAM, 8 )
 	AM_RANGE(0x2e08, 0x2e08) AM_WRITE(battlnts_bankswitch_w)	/* bankswitch control */
 	AM_RANGE(0x2e0c, 0x2e0c) AM_WRITE(battlnts_spritebank_w)	/* sprite bank select */
 	AM_RANGE(0x2e10, 0x2e10) AM_WRITE(watchdog_reset_w)			/* watchdog reset */
-	AM_RANGE(0x2e14, 0x2e14) AM_WRITE(soundlatch_w)				/* sound code # */
+	AM_RANGE(0x2e14, 0x2e14) AM_WRITE(soundlatch_byte_w)				/* sound code # */
 	AM_RANGE(0x2e18, 0x2e18) AM_WRITE(battlnts_sh_irqtrigger_w)	/* cause interrupt on audio CPU */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")						/* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM								/* ROM 777e02.bin */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( battlnts_sound_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( battlnts_sound_map, AS_PROGRAM, 8, battlnts_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM							/* ROM 777c01.rom */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM							/* RAM */
-	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", ym3812_r, ym3812_w)		/* YM3812 (chip 1) */
-	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym2", ym3812_r, ym3812_w)		/* YM3812 (chip 2) */
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)			/* soundlatch_r */
+	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE_LEGACY("ym1", ym3812_r, ym3812_w)		/* YM3812 (chip 1) */
+	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE_LEGACY("ym2", ym3812_r, ym3812_w)		/* YM3812 (chip 2) */
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)			/* soundlatch_byte_r */
 ADDRESS_MAP_END
 
 /*************************************
@@ -225,9 +224,9 @@ static const k007420_interface bladestl_k007420_intf =
 static MACHINE_START( battlnts )
 {
 	battlnts_state *state = machine.driver_data<battlnts_state>();
-	UINT8 *ROM = machine.region("maincpu")->base();
+	UINT8 *ROM = state->memregion("maincpu")->base();
 
-	memory_configure_bank(machine, "bank1", 0, 4, &ROM[0x10000], 0x4000);
+	state->membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
 	state->m_audiocpu = machine.device("audiocpu");
 	state->m_k007342 = machine.device("k007342");
@@ -405,7 +404,7 @@ static void shuffle( UINT8 *buf, int len )
 static DRIVER_INIT( rackemup )
 {
 	/* rearrange char ROM */
-	shuffle(machine.region("gfx1")->base(), machine.region("gfx1")->bytes());
+	shuffle(machine.root_device().memregion("gfx1")->base(), machine.root_device().memregion("gfx1")->bytes());
 }
 
 

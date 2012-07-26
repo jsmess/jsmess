@@ -79,46 +79,42 @@ VIDEO_START( superqix )
 
 ***************************************************************************/
 
-WRITE8_HANDLER( superqix_videoram_w )
+WRITE8_MEMBER(superqix_state::superqix_videoram_w)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
-	state->m_videoram[offset] = data;
-	state->m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
+	m_videoram[offset] = data;
+	m_bg_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
 
-WRITE8_HANDLER( superqix_bitmapram_w )
+WRITE8_MEMBER(superqix_state::superqix_bitmapram_w)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
-	if (state->m_bitmapram[offset] != data)
+	if (m_bitmapram[offset] != data)
 	{
 		int x = 2 * (offset % 128);
 		int y = offset / 128 + 16;
 
-		state->m_bitmapram[offset] = data;
+		m_bitmapram[offset] = data;
 
-		state->m_fg_bitmap[0]->pix16(y, x)     = data >> 4;
-		state->m_fg_bitmap[0]->pix16(y, x + 1) = data & 0x0f;
+		m_fg_bitmap[0]->pix16(y, x)     = data >> 4;
+		m_fg_bitmap[0]->pix16(y, x + 1) = data & 0x0f;
 	}
 }
 
-WRITE8_HANDLER( superqix_bitmapram2_w )
+WRITE8_MEMBER(superqix_state::superqix_bitmapram2_w)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
-	if (data != state->m_bitmapram2[offset])
+	if (data != m_bitmapram2[offset])
 	{
 		int x = 2 * (offset % 128);
 		int y = offset / 128 + 16;
 
-		state->m_bitmapram2[offset] = data;
+		m_bitmapram2[offset] = data;
 
-		state->m_fg_bitmap[1]->pix16(y, x)     = data >> 4;
-		state->m_fg_bitmap[1]->pix16(y, x + 1) = data & 0x0f;
+		m_fg_bitmap[1]->pix16(y, x)     = data >> 4;
+		m_fg_bitmap[1]->pix16(y, x + 1) = data & 0x0f;
 	}
 }
 
-WRITE8_HANDLER( pbillian_0410_w )
+WRITE8_MEMBER(superqix_state::pbillian_0410_w)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
 	/*
      -------0  ? [not used]
      ------1-  coin counter 1
@@ -128,33 +124,32 @@ WRITE8_HANDLER( pbillian_0410_w )
      --5-----  flip screen
     */
 
-	coin_counter_w(space->machine(), 0,data & 0x02);
-	coin_counter_w(space->machine(), 1,data & 0x04);
+	coin_counter_w(machine(), 0,data & 0x02);
+	coin_counter_w(machine(), 1,data & 0x04);
 
-	memory_set_bank(space->machine(), "bank1", (data & 0x08) >> 3);
+	membank("bank1")->set_entry((data & 0x08) >> 3);
 
-	state->m_nmi_mask = data & 0x10;
-	flip_screen_set(space->machine(), data & 0x20);
+	m_nmi_mask = data & 0x10;
+	flip_screen_set(data & 0x20);
 }
 
-WRITE8_HANDLER( superqix_0410_w )
+WRITE8_MEMBER(superqix_state::superqix_0410_w)
 {
-	superqix_state *state = space->machine().driver_data<superqix_state>();
 	/* bits 0-1 select the tile bank */
-	if (state->m_gfxbank != (data & 0x03))
+	if (m_gfxbank != (data & 0x03))
 	{
-		state->m_gfxbank = data & 0x03;
-		state->m_bg_tilemap->mark_all_dirty();
+		m_gfxbank = data & 0x03;
+		m_bg_tilemap->mark_all_dirty();
 	}
 
 	/* bit 2 selects which of the two bitmaps to display (for 2 players game) */
-	state->m_show_bitmap = (data & 0x04) >> 2;
+	m_show_bitmap = (data & 0x04) >> 2;
 
 	/* bit 3 enables NMI */
-	state->m_nmi_mask = data & 0x08;
+	m_nmi_mask = data & 0x08;
 
 	/* bits 4-5 control ROM bank */
-	memory_set_bank(space->machine(), "bank1", (data & 0x30) >> 4);
+	membank("bank1")->set_entry((data & 0x30) >> 4);
 }
 
 
@@ -171,7 +166,7 @@ static void pbillian_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int attr = spriteram[offs + 3];
 		int code = ((spriteram[offs] & 0xfc) >> 2) + 64 * (attr & 0x0f);
@@ -179,7 +174,7 @@ static void pbillian_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		int sx = spriteram[offs + 1] + 256 * (spriteram[offs] & 0x01);
 		int sy = spriteram[offs + 2];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -188,7 +183,7 @@ static void pbillian_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		drawgfx_transpen(bitmap,cliprect, machine.gfx[1],
 				code,
 				color,
-				flip_screen_get(machine), flip_screen_get(machine),
+				state->flip_screen(), state->flip_screen(),
 				sx, sy, 0);
 	}
 }
@@ -199,7 +194,7 @@ static void superqix_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 	UINT8 *spriteram = state->m_spriteram;
 	int offs;
 
-	for (offs = 0; offs < state->m_spriteram_size; offs += 4)
+	for (offs = 0; offs < state->m_spriteram.bytes(); offs += 4)
 	{
 		int attr = spriteram[offs + 3];
 		int code = spriteram[offs] + 256 * (attr & 0x01);
@@ -209,7 +204,7 @@ static void superqix_draw_sprites(running_machine &machine, bitmap_ind16 &bitmap
 		int sx = spriteram[offs + 1];
 		int sy = spriteram[offs + 2];
 
-		if (flip_screen_get(machine))
+		if (state->flip_screen())
 		{
 			sx = 240 - sx;
 			sy = 240 - sy;
@@ -238,7 +233,7 @@ SCREEN_UPDATE_IND16( superqix )
 {
 	superqix_state *state = screen.machine().driver_data<superqix_state>();
 	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
-	copybitmap_trans(bitmap,*state->m_fg_bitmap[state->m_show_bitmap],flip_screen_get(screen.machine()),flip_screen_get(screen.machine()),0,0,cliprect,0);
+	copybitmap_trans(bitmap,*state->m_fg_bitmap[state->m_show_bitmap],state->flip_screen(),state->flip_screen(),0,0,cliprect,0);
 	superqix_draw_sprites(screen.machine(), bitmap,cliprect);
 	state->m_bg_tilemap->draw(bitmap, cliprect, TILEMAP_DRAW_LAYER0, 0);
 	return 0;

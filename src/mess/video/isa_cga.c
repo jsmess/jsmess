@@ -144,10 +144,10 @@ INPUT_PORTS_END
 
 
 /* Dipswitch for font selection */
-#define CGA_FONT        (input_port_read(*this, "cga_config") & m_font_selection_mask)
+#define CGA_FONT        (ioport("cga_config")->read() & m_font_selection_mask)
 
 /* Dipswitch for monitor selection */
-#define CGA_MONITOR     (input_port_read(*this, "cga_config")&0x1C)
+#define CGA_MONITOR     (ioport("cga_config")->read()&0x1C)
 #define CGA_MONITOR_RGB         0x00    /* Colour RGB */
 #define CGA_MONITOR_MONO        0x04    /* Greyscale RGB */
 #define CGA_MONITOR_COMPOSITE   0x08    /* Colour composite */
@@ -157,7 +157,7 @@ INPUT_PORTS_END
 
 /* Dipswitch for chipset selection */
 /* TODO: Get rid of this; these should be handled by separate classes */
-#define CGA_CHIPSET     (input_port_read(*this, "cga_config") & 0xE0)
+#define CGA_CHIPSET     (ioport("cga_config")->read() & 0xE0)
 #define CGA_CHIPSET_IBM         0x00    /* Original IBM CGA */
 #define CGA_CHIPSET_PC1512      0x20    /* PC1512 CGA subset */
 #define CGA_CHIPSET_PC200       0x40    /* PC200 in CGA mode */
@@ -732,7 +732,7 @@ void isa8_cga_device::device_start()
 	}
 
 	astring tempstring;
-	m_chr_gen_base = machine().region(subtag(tempstring, "gfx1"))->base();
+	m_chr_gen_base = memregion(subtag(tempstring, "gfx1"))->base();
 	m_chr_gen = m_chr_gen_base + m_chr_gen_offset[1];
 }
 
@@ -1858,7 +1858,7 @@ WRITE8_MEMBER( isa8_cga_pc1512_device::io_write )
 		}
 		else
 		{
-			memory_set_bankptr(machine(),"bank1", m_vram + isa8_cga_pc1512_device::vram_offset[0]);
+			membank("bank1")->set_base(m_vram + isa8_cga_pc1512_device::vram_offset[0]);
 		}
 		m_mode_control = data;
 		switch( m_mode_control & 0x3F )
@@ -1916,7 +1916,7 @@ WRITE8_MEMBER( isa8_cga_pc1512_device::io_write )
 		m_read = data;
 		if ( ( m_mode_control & 0x12 ) == 0x12 )
 		{
-			memory_set_bankptr(machine(),"bank1", m_vram + isa8_cga_pc1512_device::vram_offset[data & 3]);
+			membank("bank1")->set_base(m_vram + isa8_cga_pc1512_device::vram_offset[data & 3]);
 		}
 		break;
 
@@ -2031,6 +2031,6 @@ void isa8_cga_pc1512_device::device_reset()
 		m_mc6845_locked_register[i] = 0;
 	}
 
-	memory_set_bankptr(machine(), "bank1", m_vram + isa8_cga_pc1512_device::vram_offset[0]);
+	membank("bank1")->set_base(m_vram + isa8_cga_pc1512_device::vram_offset[0]);
 }
 

@@ -12,7 +12,6 @@
 #ifndef __C1571__
 #define __C1571__
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"

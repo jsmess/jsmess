@@ -19,12 +19,15 @@ class destroyr_state : public driver_device
 {
 public:
 	destroyr_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag) ,
+		m_alpha_num_ram(*this, "alpha_nuram"),
+		m_major_obj_ram(*this, "major_obj_ram"),
+		m_minor_obj_ram(*this, "minor_obj_ram"){ }
 
 	/* memory pointers */
-	UINT8 *        m_major_obj_ram;
-	UINT8 *        m_minor_obj_ram;
-	UINT8 *        m_alpha_num_ram;
+	required_shared_ptr<UINT8> m_alpha_num_ram;
+	required_shared_ptr<UINT8> m_major_obj_ram;
+	required_shared_ptr<UINT8> m_minor_obj_ram;
 
 	/* video-related */
 	int            m_cursor;
@@ -39,6 +42,12 @@ public:
 
 	/* devices */
 	device_t *m_maincpu;
+	DECLARE_WRITE8_MEMBER(destroyr_misc_w);
+	DECLARE_WRITE8_MEMBER(destroyr_cursor_load_w);
+	DECLARE_WRITE8_MEMBER(destroyr_interrupt_ack_w);
+	DECLARE_WRITE8_MEMBER(destroyr_output_w);
+	DECLARE_READ8_MEMBER(destroyr_input_r);
+	DECLARE_READ8_MEMBER(destroyr_scanline_r);
 };
 
 
@@ -137,7 +146,7 @@ static TIMER_CALLBACK( destroyr_frame_callback )
 	state->m_potsense[1] = 0;
 
 	/* PCB supports two dials, but cab has only got one */
-	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(input_port_read(machine, "PADDLE")), FUNC(destroyr_dial_callback));
+	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(state->ioport("PADDLE")->read()), FUNC(destroyr_dial_callback));
 	machine.scheduler().timer_set(machine.primary_screen->time_until_pos(0), FUNC(destroyr_frame_callback));
 }
 
@@ -160,49 +169,46 @@ static MACHINE_RESET( destroyr )
 }
 
 
-static WRITE8_HANDLER( destroyr_misc_w )
+WRITE8_MEMBER(destroyr_state::destroyr_misc_w)
 {
-	destroyr_state *state = space->machine().driver_data<destroyr_state>();
 
 	/* bits 0 to 2 connect to the sound circuits */
-	state->m_attract = data & 0x01;
-	state->m_noise = data & 0x02;
-	state->m_motor_speed = data & 0x04;
-	state->m_potmask[0] = data & 0x08;
-	state->m_wavemod = data & 0x10;
-	state->m_potmask[1] = data & 0x20;
+	m_attract = data & 0x01;
+	m_noise = data & 0x02;
+	m_motor_speed = data & 0x04;
+	m_potmask[0] = data & 0x08;
+	m_wavemod = data & 0x10;
+	m_potmask[1] = data & 0x20;
 
-	coin_lockout_w(space->machine(), 0, !state->m_attract);
-	coin_lockout_w(space->machine(), 1, !state->m_attract);
+	coin_lockout_w(machine(), 0, !m_attract);
+	coin_lockout_w(machine(), 1, !m_attract);
 }
 
 
-static WRITE8_HANDLER( destroyr_cursor_load_w )
+WRITE8_MEMBER(destroyr_state::destroyr_cursor_load_w)
 {
-	destroyr_state *state = space->machine().driver_data<destroyr_state>();
-	state->m_cursor = data;
+	m_cursor = data;
 	watchdog_reset_w(space, offset, data);
 }
 
 
-static WRITE8_HANDLER( destroyr_interrupt_ack_w )
+WRITE8_MEMBER(destroyr_state::destroyr_interrupt_ack_w)
 {
-	destroyr_state *state = space->machine().driver_data<destroyr_state>();
-	device_set_input_line(state->m_maincpu, 0, CLEAR_LINE);
+	device_set_input_line(m_maincpu, 0, CLEAR_LINE);
 }
 
 
-static WRITE8_HANDLER( destroyr_output_w )
+WRITE8_MEMBER(destroyr_state::destroyr_output_w)
 {
 	if (offset & 8) destroyr_misc_w(space, 8, data);
 
 	else switch (offset & 7)
 	{
 	case 0:
-		set_led_status(space->machine(), 0, data & 1);
+		set_led_status(machine(), 0, data & 1);
 		break;
 	case 1:
-		set_led_status(space->machine(), 1, data & 1); /* no second LED present on cab */
+		set_led_status(machine(), 1, data & 1); /* no second LED present on cab */
 		break;
 	case 2:
 		/* bit 0 => songate */
@@ -226,22 +232,21 @@ static WRITE8_HANDLER( destroyr_output_w )
 }
 
 
-static READ8_HANDLER( destroyr_input_r )
+READ8_MEMBER(destroyr_state::destroyr_input_r)
 {
-	destroyr_state *state = space->machine().driver_data<destroyr_state>();
 
 	if (offset & 1)
 	{
-		return input_port_read(space->machine(), "IN1");
+		return ioport("IN1")->read();
 	}
 
 	else
 	{
-		UINT8 ret = input_port_read(space->machine(), "IN0");
+		UINT8 ret = ioport("IN0")->read();
 
-		if (state->m_potsense[0] && state->m_potmask[0])
+		if (m_potsense[0] && m_potmask[0])
 			ret |= 4;
-		if (state->m_potsense[1] && state->m_potmask[1])
+		if (m_potsense[1] && m_potmask[1])
 			ret |= 8;
 
 		return ret;
@@ -249,22 +254,22 @@ static READ8_HANDLER( destroyr_input_r )
 }
 
 
-static READ8_HANDLER( destroyr_scanline_r )
+READ8_MEMBER(destroyr_state::destroyr_scanline_r)
 {
-	return space->machine().primary_screen->vpos();
+	return machine().primary_screen->vpos();
 }
 
 
-static ADDRESS_MAP_START( destroyr_map, AS_PROGRAM, 8 )
+static ADDRESS_MAP_START( destroyr_map, AS_PROGRAM, 8, destroyr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0xf00) AM_RAM
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(destroyr_input_r, destroyr_output_w)
 	AM_RANGE(0x2000, 0x2fff) AM_READ_PORT("IN2")
-	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0xf00) AM_WRITEONLY AM_BASE_MEMBER(destroyr_state, m_alpha_num_ram)
-	AM_RANGE(0x4000, 0x401f) AM_MIRROR(0xfe0) AM_WRITEONLY AM_BASE_MEMBER(destroyr_state, m_major_obj_ram)
+	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0xf00) AM_WRITEONLY AM_SHARE("alpha_nuram")
+	AM_RANGE(0x4000, 0x401f) AM_MIRROR(0xfe0) AM_WRITEONLY AM_SHARE("major_obj_ram")
 	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0xff8) AM_WRITE(destroyr_cursor_load_w)
 	AM_RANGE(0x5001, 0x5001) AM_MIRROR(0xff8) AM_WRITE(destroyr_interrupt_ack_w)
-	AM_RANGE(0x5002, 0x5007) AM_MIRROR(0xff8) AM_WRITEONLY AM_BASE_MEMBER(destroyr_state, m_minor_obj_ram)
+	AM_RANGE(0x5002, 0x5007) AM_MIRROR(0xff8) AM_WRITEONLY AM_SHARE("minor_obj_ram")
 	AM_RANGE(0x6000, 0x6fff) AM_READ(destroyr_scanline_r)
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
@@ -292,7 +297,7 @@ static INPUT_PORTS_START( destroyr )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:4,3")

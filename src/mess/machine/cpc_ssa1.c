@@ -5,7 +5,6 @@
  *
  */
 
-#define ADDRESS_MAP_MODERN
 
 #include "emu.h"
 #include "cpc_ssa1.h"
@@ -88,14 +87,14 @@ WRITE_LINE_MEMBER(cpc_dkspeech_device::sby_cb)
 
 static sp0256_interface sp0256_intf =
 {
-	DEVCB_LINE_MEMBER(cpc_ssa1_device,lrq_cb),
-	DEVCB_LINE_MEMBER(cpc_ssa1_device,sby_cb)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,cpc_ssa1_device,lrq_cb),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,cpc_ssa1_device,sby_cb)
 };
 
 static sp0256_interface sp0256_dk_intf =
 {
-	DEVCB_LINE_MEMBER(cpc_dkspeech_device,lrq_cb),
-	DEVCB_LINE_MEMBER(cpc_dkspeech_device,sby_cb)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,cpc_dkspeech_device,lrq_cb),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER,cpc_dkspeech_device,sby_cb)
 };
 
 //-------------------------------------------------
@@ -191,7 +190,7 @@ void cpc_ssa1_device::device_start()
 	address_space* space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
-	m_rom = subregion("sp0256")->base();
+	m_rom = memregion("sp0256")->base();
 
 //  m_sp0256_device = subdevice("sp0256");
 
@@ -205,7 +204,7 @@ void cpc_dkspeech_device::device_start()
 	address_space* space = cpu->memory().space(AS_IO);
 	m_slot = dynamic_cast<cpc_expansion_slot_device *>(owner());
 
-	m_rom = subregion("sp0256")->base();
+	m_rom = memregion("sp0256")->base();
 
 //  m_sp0256_device = subdevice("sp0256");
 
