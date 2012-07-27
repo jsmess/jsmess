@@ -485,6 +485,8 @@ UINT32 uv201_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		UINT8 rp_lo = RAM_XORD(RAM_RP_LO);
 		UINT16 rp = ((rp_hi_color << 8) | rp_lo) & 0x1fff;
 
+		if (rp < 0x800) rp |= 0x2000;
+
 		UINT8 dx_int_xcopy = RAM_XORD(RAM_DX_INT_XCOPY);
 		int color = ((dx_int_xcopy & 0x60) >> 2) | (BIT(rp_hi_color, 5) << 2) | (BIT(rp_hi_color, 6) << 1) | (BIT(rp_hi_color, 7));
 		UINT8 dx = dx_int_xcopy & 0x1f;
