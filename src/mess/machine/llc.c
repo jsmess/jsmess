@@ -51,7 +51,24 @@ static READ8_DEVICE_HANDLER (llc1_port2_a_r)
 
 static READ8_DEVICE_HANDLER (llc1_port1_a_r)
 {
-	return 0;
+	llc_state *state = device->machine().driver_data<llc_state>();
+	UINT8 data = 0;
+	if (!BIT(state->m_porta, 4))
+		data = state->ioport("X4")->read();
+	if (!BIT(state->m_porta, 5))
+		data = state->ioport("X5")->read();
+	if (!BIT(state->m_porta, 6))
+		data = state->ioport("X6")->read();
+	if (data & 0xf0)
+		data = (data >> 4) | 0x80;
+
+	return data;
+}
+
+static WRITE8_DEVICE_HANDLER (llc1_port1_a_w)
+{
+	llc_state *state = device->machine().driver_data<llc_state>();
+	state->m_porta = data;
 }
 
 static READ8_DEVICE_HANDLER (llc1_port1_b_r)
@@ -86,8 +103,8 @@ Z80CTC_INTERFACE( llc1_ctc_intf )
 {
 	0,
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg1_w),
+	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg3_w),
 	DEVCB_NULL
 };
 
@@ -95,7 +112,7 @@ Z80PIO_INTERFACE( llc1_z80pio1_intf )
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
 	DEVCB_HANDLER(llc1_port1_a_r),
-	DEVCB_NULL,
+	DEVCB_HANDLER(llc1_port1_a_w),
 	DEVCB_NULL,
 	DEVCB_HANDLER(llc1_port1_b_r),
 	DEVCB_HANDLER(llc1_port1_b_w),

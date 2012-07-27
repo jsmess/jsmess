@@ -22,6 +22,8 @@ public:
 	UINT8 m_llc1_key_state;
 	DECLARE_WRITE8_MEMBER(llc2_rom_disable_w);
 	DECLARE_WRITE8_MEMBER(llc2_basic_enable_w);
+//private:
+	UINT8 m_porta;
 };
 
 
