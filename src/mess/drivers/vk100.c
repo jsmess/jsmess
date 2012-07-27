@@ -947,16 +947,16 @@ ROM_START( vk100 )
      * 3 pattern function bits from WOPS (F0 "N" is a6, F1 and F2 are a7 and a8
      * and one bit from the lsb of the pattern register shifter (a9)
 i.e. addr bits 9876543210
-               ||||||\\\\- input from ram A
-               ||||\\----- bit select (from x reg lsb)
-               |||\------- negate N \___ low 3 bits of WOPS
-               |\\-------- function /
-               \---------- pattern bit P
-          functions are:
-          Overlay: M=A|(P^N)
-          Replace: M=P^N
-          Complement: M=A^(P^N)
-          Erase: M=N
+     *         ||||||\\\\- input from ram A
+     *         ||||\\----- bit select (from x reg lsb)
+     *         |||\------- negate N \___ low 3 bits of WOPS
+     *         |\\-------- function /
+     *         \---------- pattern bit P
+     *    functions are:
+     *    Overlay: M=A|(P^N)
+     *    Replace: M=P^N
+     *    Complement: M=A^(P^N)
+     *    Erase: M=N
      */
 	ROM_LOAD( "wb8201_656f1.m1-7643-5.pr4.ic17", 0x0000, 0x0400, CRC(e8ecf59f) SHA1(49e9d109dad3d203d45471a3f4ca4985d556161f)) // label verified from nigwil's board
 
@@ -966,37 +966,17 @@ i.e. addr bits 9876543210
 	ROM_LOAD( "wb---0_060b1.6309.pr2.ic77", 0x0000, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label verified from nigwil's board
 
 	ROM_REGION( 0x400, "proms", ROMREGION_ERASEFF )
-	// not sure what this prom is, it may relate somehow to addressing or modifying vram, or the systat b register and dipswitches. (256*4, 82s129)
+	// not sure what this prom is, it may relate somehow to addressing or modifying vram, or the systat b register. (256*4, 82s129)
 	ROM_LOAD( "wb8151_573a2.6301.pr3.ic44", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4)) // label verified from nigwil's and andy's board
-	/* this is the "VECTOR ROM" (256*8, 82s135) which runs the vector generator state machine
-	 * the vector rom bits are complex and are unfortunately poorly documented
-	 * in the tech manual. see figure 5-23.
-	 * addr bits: 76543210
-	 *            ||||\\\\-- To sync counter, which counts 0xC 0x3 0x2 0x1 0x0 0x5 0x4 0xB 0xA 0x9 0x8 0xD in that order
-	 *            ||\\------ ?VG_MODE?
-	 *            |\-------- CARRY_IN
-	 *            \--------- ?
-	 *
-	 * data bits: 76543210
-	 *            |||||||\-- ? MAYBE WRT L
-	 *            ||||||\--- ? MAYBE related to the dir rom PIXEL WRT (ahead by 2 clocks?)
-	 *            |||||\---- ? MAYBE /SYSTAT_A WRT (ahead by 2 clocks?)
-	 *            ||||\----- /LD ERROR (strobes calculated value into the vgERR register)
-	 *            |||\------ ? MAYBE STROBE L (delayed by 2 clocks?)
-	 *            ||\------- ? possibly carry out
-	 *            |\-------- C0 (high during DVM read, low otherwise)
-	 *            \--------- ? 
-	 */
-	ROM_LOAD( "wb8146_058b1.6309.pr1.ic99", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))  // label verified from nigwil's and andy's board
 	/* this is the "DIRECTION ROM"  == mb6309 (256x8, 82s135)
-	 * see figure 5-24 on pahe 5-39
+	 * see figure 5-24 on page 5-39
 	 * It tells the direction and enable for counting on the X and Y counters
 	 * and also handles the non-math related parts of the bresenham line algorithm
 	 * addr bits: 76543210
 	 *            ||||\\\\-- DIR (vgDIR register low 4 bits)
 	 *            |||\------ ERROR CARRY (strobed in by STROBE L from the error counter's adder)
 	 *            ||\------- Y0 (the otherwise unused lsb of the Y register, used for bresenham)
-	 *            |\-------- feedback bit from d5 gated by vclk
+	 *            |\-------- feedback bit from d5 gated by V CLK
 	 *            \--------- GND; the second half of the prom is blank (0x00)
 	 * data bits: 76543210
 	 *            |||||||\-- ENA X (enables change on X counter)
@@ -1005,25 +985,50 @@ i.e. addr bits 9876543210
 	 *            ||||\----- X DIRECTION (high is count down, low is count up)
 	 *            |||\------ PIXEL WRT
 	 *            ||\------- feedback bit to a6
-	 *            |\-------- UNUSED?
-	 *            \--------- UNUSED?
+	 *            |\-------- UNUSED, always 0
+	 *            \--------- UNUSED, always 0
 	 */
-	ROM_LOAD( "wb8141_059b1.tbp18s22.pr5.ic108", 0x0200, 0x0100, CRC(4b63857a) SHA1(3217247d983521f0b0499b5c4ef6b5de9844c465))  // label verified from andy's board
+	ROM_LOAD( "wb8141_059b1.tbp18s22.pr5.ic108", 0x0100, 0x0100, CRC(4b63857a) SHA1(3217247d983521f0b0499b5c4ef6b5de9844c465))  // label verified from andy's board
+	/* this is the "VECTOR ROM" (256*8, 82s135) which runs the vector generator state machine
+	 * the vector rom bits are complex and are unfortunately poorly documented
+	 * in the tech manual. see figure 5-23.
+	 * addr bits: 76543210
+	 *            ||||\\\\-- To sync counter, which counts 0xC 0x3 0x2 0x1 0x0 0x5 0x4 0xB 0xA 0x9 0x8 0xD in that order
+	 *            ||\\------ VG_MODE 
+	 *            |\-------- CARRY_IN (when set, only one /LD ERROR pulse occurs instead of two)
+	 *            \--------- ? possibly tied or somehow pulsed by sync rom d7? /LD ERROR only goes active (low) when this is unset
+	 *
+	 * data bits: 76543210
+	 *            |||||||\-- WRITE (fig 5-20, page 5-32)
+	 *            ||||||\--- ? MAYBE related to the dir rom PIXEL WRT or an active low /CLR on the WRT L line [active low, sync addr 011]
+	 *            |||||\---- ? MAYBE related to the dir rom PIXEL WRT or an active low /CLR on the WRT L line [active low, sync addr 011]
+	 *            ||||\----- /LD ERROR (strobes a value into the vgERR register)
+	 *            |||\------ likely CLK ERROR, also strobes a value into the vgERR register but from the adder and not the bus
+	 *            ||\------- ? possibly drives a4 on the sync rom, only low for VG_MOVE?
+	 *            |\-------- C0 (high during DVM read, low otherwise)
+	 *            \--------- ? (active low at same cycle as bit 4)
+	 */
+	ROM_LOAD( "wb8146_058b1.6309.pr1.ic99", 0x0200, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))  // label verified from nigwil's and andy's board
 	/* this is the "SYNC ROM" == mb6331 (32x8, 82s123)
 	 * It generates the ram RAS/CAS and a few other signals, see figure 5-20 on page 5-32
 	 * The exact pins for each signal are not documented.
 	 * addr bits: 43210
 	 *            |\\\\-- To sync counter, which counts 0xC 0x3 0x2 0x1 0x0 0x5 0x4 0xB 0xA 0x9 0x8 0xD in that order
-	 *            \------ ? (not grounded)
+	 *            \------ likely tied to /RESET, /GO, vblank, or possibly a read of SYSTAT A or writes to the vector regs
+	 *                      when high: the sync rom matches figure 5-20 (page 5-32) and 5-23 (page 5-38)
+	 *                      when low: RA/RB is fixed on WOPS in the register file
+	 *                                LD SHFR does NOT output pulses
+	 *                                WRT/RD is held at /RD so writes to vram do nothing
+	 *                    it is also possible this is tied to vector rom d5
 	 * data bits: 76543210
-	 *            |||||||\-- ? wrt/rd
-	 *            ||||||\--- ? /RAS
-	 *            |||||\---- ? /CAS
-	 *            ||||\----- ? ld shfr
-	 *            |||\------ ? strobe
-	 *            ||\------- ? write
-	 *            |\-------- ? ra\__selects which slot of the 8x4 register file (du, dvm, dir, or wops) is selected
-	 *            \--------- ? rb/
+	 *            |||||||\-- WRT/RD (write high when x,y (vg) drives vram, read low when ma (crtc) drives vram)
+	 *            ||||||\--- /RAS
+	 *            |||||\---- STROBE aka STROBE L
+	 *            ||||\----- LD SHFR
+	 *            |||\------ /CAS
+	 *            ||\------- RA\__selects which slot of the 8x4 register file (du, dvm, dir, or wops) is selected
+	 *            |\-------- RB/
+	 *            \--------- vector rom "write signal"? (mentioned on page 5-35 last paragraph?) (this is off by one cycle though...) [active low, sync addr 011]
 	 */
 	ROM_LOAD( "wb8-14_297a1.74s288.pr6.ic89", 0x0300, 0x0020, CRC(e2f7c566) SHA1(a4c3dc5d07667141ad799168a862cb3c489b4934)) // label verified from nigwil's and andy's board
 ROM_END
