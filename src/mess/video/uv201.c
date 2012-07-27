@@ -192,21 +192,36 @@ void uv201_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 void uv201_device::initialize_palette()
 {
-	static const UINT8 INTENSITY[] = { 0x90, 0xb0, 0xd0, 0xff };
+	UINT8 offlointensity = 0x00;
+	UINT8 offhiintensity = 0xc0;
+
+	UINT8 onlointensity = 0xa0;
+	UINT8 onhiintensity = 0xff;
 
 	for (int i = 0; i < 4; i++)
 	{
 		int offset = i * 8;
-		UINT8 value = INTENSITY[i];
+		UINT8 onvalue, offvalue;
 
-		palette_set_color_rgb(machine(), offset + 0, 0,		0,		0);		// black
-		palette_set_color_rgb(machine(), offset + 1, value,	0,		0);		// red
-		palette_set_color_rgb(machine(), offset + 2, 0,		value,	0);		// green
-		palette_set_color_rgb(machine(), offset + 3, value,	value,	0);		// red-green
-		palette_set_color_rgb(machine(), offset + 4, 0,		0,		value); // blue
-		palette_set_color_rgb(machine(), offset + 5, value,	0,		value); // red-blue
-		palette_set_color_rgb(machine(), offset + 6, 0,		value,	value); // green-blue
-		palette_set_color_rgb(machine(), offset + 7, value,	value,	value); // white
+		if (offset < 16)
+		{
+			offvalue = offlointensity;
+			onvalue = onlointensity;
+		}
+		else
+		{
+			offvalue = offhiintensity;
+			onvalue = onhiintensity;
+		}
+
+		palette_set_color_rgb(machine(), offset + 0, offvalue, offvalue, offvalue); // black
+		palette_set_color_rgb(machine(), offset + 1, onvalue, offvalue, offvalue); // red
+		palette_set_color_rgb(machine(), offset + 2, offvalue, onvalue, offvalue); // green
+		palette_set_color_rgb(machine(), offset + 3, onvalue, onvalue, offvalue); // red-green
+		palette_set_color_rgb(machine(), offset + 4, offvalue, offvalue, onvalue); // blue
+		palette_set_color_rgb(machine(), offset + 5, onvalue, offvalue, onvalue); // red-blue
+		palette_set_color_rgb(machine(), offset + 6, offvalue, onvalue, onvalue); // green-blue
+		palette_set_color_rgb(machine(), offset + 7, onvalue, onvalue, onvalue); // white
 	}
 }
 
@@ -293,8 +308,8 @@ READ8_MEMBER( uv201_device::read )
 
             bit     signal      description
 
-            0       Y-C8        current Y counter high order (MSB) bit
-            1       Y-F8        Y freeze high order (MSB) bit
+            0       Y-F8        Y freeze high order (MSB) bit
+            1       Y-C8        current Y counter high order (MSB) bit
             2
             3
             4
@@ -304,7 +319,7 @@ READ8_MEMBER( uv201_device::read )
 
         */
 
-		data = (get_field() << 7) | BIT(m_freeze_y, 8) << 1 | BIT(get_field_vpos(), 8);
+		data = (get_field() << 7) | (BIT(get_field_vpos(), 8) << 1) | BIT(m_freeze_y, 8);
 
 		if (LOG) logerror("Y-Freeze High %02x\n", data);
 		break;

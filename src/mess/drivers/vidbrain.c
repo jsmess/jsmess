@@ -233,11 +233,15 @@ WRITE8_MEMBER( vidbrain_state::f3853_w )
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( vidbrain_mem, AS_PROGRAM, 8, vidbrain_state )
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0xc000) AM_ROM
-	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0300) AM_DEVREADWRITE(UV201_TAG, uv201_device, read, write)
-	AM_RANGE(0x0c00, 0x0fff) AM_MIRROR(0xe000) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_MIRROR(0xe000) AM_ROM
-	AM_RANGE(0x2000, 0x27ff) AM_MIRROR(0xc000) AM_ROM
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+	AM_RANGE(0x0000, 0x07ff) AM_ROM
+	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x2300) AM_DEVREADWRITE(UV201_TAG, uv201_device, read, write)
+	AM_RANGE(0x0c00, 0x0fff) AM_MIRROR(0x2000) AM_RAM
+	AM_RANGE(0x1000, 0x17ff) AM_ROM
+	AM_RANGE(0x1800, 0x1fff) AM_ROM // RAM for Timeshare
+	AM_RANGE(0x2000, 0x27ff) AM_ROM
+	AM_RANGE(0x3000, 0x37ff) AM_UNMAP
+	AM_RANGE(0x3800, 0x3fff) AM_RAM // RAM for Money Minder
 ADDRESS_MAP_END
 
 
