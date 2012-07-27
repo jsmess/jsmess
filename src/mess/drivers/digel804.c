@@ -73,7 +73,8 @@ public:
 		  m_maincpu(*this, "maincpu"),
 		  m_terminal(*this, TERMINAL_TAG),
 		  m_speaker(*this, "speaker"),
-		  m_acia(*this, "acia")
+		  m_acia(*this, "acia"),
+		  m_vfd(*this, "vfd")
 		//, m_main_ram(*this, "main_ram")
 		{ }
 
@@ -81,6 +82,7 @@ public:
 	required_device<device_t> m_terminal;
 	required_device<device_t> m_speaker;
 	required_device<acia6551_device> m_acia;
+	required_device<roc10937_t> m_vfd;
 	DECLARE_READ8_MEMBER( ip40 );
 	DECLARE_WRITE8_MEMBER( op40 );
 	DECLARE_WRITE8_MEMBER( op41 );
@@ -161,7 +163,6 @@ static TIMER_CALLBACK( ep804_kbd_callback )
 static DRIVER_INIT( digel804 )
 {
 	digel804_state *state = machine.driver_data<digel804_state>();
-	ROC10937_init(0,0,0); // TODO: replace this with a proper device
 	state->vfd_old = state->vfd_data = state->vfd_count = 0;
 	state->m_speaker_state = 0;
 	//state->port43_rtn = 0xEE;//0xB6;
@@ -185,7 +186,7 @@ static DRIVER_INIT( digel804 )
 static MACHINE_RESET( digel804 )
 {
 	digel804_state *state = machine.driver_data<digel804_state>();
-	ROC10937_reset(0); // TODO: replace this with a proper device
+	state->m_vfd->reset();
 	state->vfd_old = state->vfd_data = state->vfd_count = 0;
 }
 
@@ -263,7 +264,8 @@ READ8_MEMBER( digel804_state::ip43 )
 
     */
 	// HACK to dump display contents to stderr
-	fprintf(stderr,"%s\n",ROC10937_get_string(0));
+//  FIXME : not sure what to do here with the new device! 201207
+//	fprintf(stderr,"%s\n",ROC10937_get_string(0));
 #ifdef PORT43_R_VERBOSE
 	logerror("Digel804: returning %02X for port 43 status read\n", port43_rtn);
 #endif
@@ -329,7 +331,7 @@ WRITE8_MEMBER( digel804_state::op44 ) // state write
 #ifdef VFD_VERBOSE
 			logerror("Digel804: Full byte written to port 44 vfd: %02X '%c'\n", vfd_data, vfd_data);
 #endif
-			ROC10937_newdata(0,vfd_data);
+			m_vfd->shift_data(vfd_data? 1 : 0);
 			vfd_data = 0;
 			vfd_count = 0;
 		}
@@ -570,6 +572,7 @@ static MACHINE_CONFIG_START( ep804, digel804_state )
 	MCFG_CPU_IO_MAP(z80_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 	MCFG_MACHINE_RESET(digel804)
+	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, digel804_terminal_intf)
