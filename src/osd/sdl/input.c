@@ -36,6 +36,7 @@
 
 // Emscripten requires the SDL2 API for inputs, but nothing else
 #ifdef SDLMAME_EMSCRIPTEN
+#undef SDLMAME_SDL2
 #define SDLMAME_SDL2 1
 #endif
 
@@ -1221,7 +1222,7 @@ sdl_window_info *sdlinput_get_focus_window(running_machine &machine)
 //  sdlinput_poll
 //============================================================
 
-#if (SDLMAME_SDL2)
+#if (SDLMAME_SDL2) && !defined(SDLMAME_EMSCRIPTEN)
 INLINE sdl_window_info * window_from_id(Uint32 windowID)
 {
 	sdl_window_info *w;
@@ -1511,7 +1512,7 @@ void sdlinput_poll(running_machine &machine)
 			devinfo->joystick.balls[event.jball.ball * 2] = event.jball.xrel * INPUT_RELATIVE_PER_PIXEL;
 			devinfo->joystick.balls[event.jball.ball * 2 + 1] = event.jball.yrel * INPUT_RELATIVE_PER_PIXEL;
 			break;
-#if (!SDLMAME_SDL2)
+#if (!SDLMAME_SDL2) || defined(SDLMAME_EMSCRIPTEN)
 		case SDL_APPMOUSEFOCUS:
 			app_has_mouse_focus = event.active.gain;
 			if (!event.active.gain)
@@ -1588,7 +1589,7 @@ void sdlinput_poll(running_machine &machine)
 #endif
 		}
 	}
-#if (SDLMAME_SDL2)
+#if (SDLMAME_SDL2) && !defined(SDLMAME_EMSCRIPTEN)
 	resize_all_windows();
 #endif
 }
