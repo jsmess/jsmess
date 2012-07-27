@@ -19,8 +19,6 @@
   B.C. Story            (c) 1997 SemiCom
   MuHanSeungBu          (c) 1997 SemiCom (Korea Only)
   Date Quiz Go Go       (c) 1998 SemiCom (Korea Only)
-  Jumping Pop           (c) 2001 ESD
-
 
   [1] has the same sprites as the bootlegs, not much else is the same tho
 
@@ -37,7 +35,6 @@
   be a bug in their code
 
   Emulation by Bryan McPhail, mish@tendril.co.uk
-  Jumping Pop sound emulation by R. Belmont
 
 
 Stephh's notes (based on the games M68000 code and some tests) :
@@ -259,13 +256,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
     and 2 buttons are required to exit some choices of "Test Mode".
 
 
-12) 'jumppop'
-
-  - It's difficult to find a name for DSW B-3. All I can tell is that,
-    when it is set to "2", the girls aren't nude, but less dressed ;)
-
-  - The game needs more investigation to get similar infos to "Tumble Pop" bootlegs/ripoffs.
-
 
 
  MuHanSeungBu
@@ -273,12 +263,6 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
  Unfinished Test Mode, Hangs with black screen, same as a real PCB.
 
-
- Jumping Pop
- -----------
-
- Jumping Pop is a complete rip-off of Tumble Pop, not even the levels have
- been changed, it simply has different hardware and new 8bpp backgrounds!
 
 
  Pang Pang
@@ -346,12 +330,6 @@ WRITE16_MEMBER(tumbleb_state::tumblepb_oki_w)
 READ16_MEMBER(tumbleb_state::tumblepb_prot_r)
 {
 	return ~0;
-}
-
-WRITE16_MEMBER(tumbleb_state::jumppop_sound_w)
-{
-	soundlatch_byte_w(space, 0, data & 0xff);
-	device_set_input_line(m_audiocpu, 0, ASSERT_LINE);
 }
 
 /******************************************************************************/
@@ -719,21 +697,6 @@ static ADDRESS_MAP_START( htchctch_main_map, AS_PROGRAM, 16, tumbleb_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( jumppop_main_map, AS_PROGRAM, 16, tumbleb_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
-	AM_RANGE(0x160000, 0x160fff) AM_RAM AM_SHARE("spriteram") /* Bootleg sprite buffer */
-	AM_RANGE(0x180000, 0x180001) AM_NOP	/* IRQ ack? */
-	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("PLAYERS")
-	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("DSW")
-	AM_RANGE(0x18000c, 0x18000d) AM_WRITE(jumppop_sound_w)
-	AM_RANGE(0x1a0000, 0x1a7fff) AM_RAM
-	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE(tumblepb_pf2_data_w) AM_SHARE("pf2_data")
-	AM_RANGE(0x320000, 0x323fff) AM_RAM_WRITE(tumblepb_pf1_data_w) AM_SHARE("pf1_data")
-	AM_RANGE(0x380000, 0x38000f) AM_WRITEONLY AM_SHARE("control")
-ADDRESS_MAP_END
 
 WRITE16_MEMBER(tumbleb_state::jumpkids_sound_w)
 {
@@ -806,33 +769,6 @@ static ADDRESS_MAP_START( suprtrio_sound_map, AS_PROGRAM, 8, tumbleb_state )
 	//AM_RANGE(0xf006, 0xf006) ??
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_byte_r)
 	AM_RANGE(0xf00e, 0xf00e) AM_WRITE(oki_sound_bank_w)
-ADDRESS_MAP_END
-
-WRITE8_MEMBER(tumbleb_state::jumppop_z80_bank_w)
-{
-	membank("bank1")->set_base(machine().root_device().memregion("audiocpu")->base() + 0x10000 + (0x4000 * data));
-}
-
-static ADDRESS_MAP_START( jumppop_sound_map, AS_PROGRAM, 8, tumbleb_state )
-	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xf800, 0xffff) AM_RAM
-ADDRESS_MAP_END
-
-READ8_MEMBER(tumbleb_state::jumppop_z80latch_r)
-{
-	device_set_input_line(m_audiocpu, 0, CLEAR_LINE);
-	return soundlatch_byte_r(space, 0);
-}
-
-static ADDRESS_MAP_START( jumppop_sound_io_map, AS_IO, 8, tumbleb_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVWRITE_LEGACY("ymsnd", ym3812_w)
-	AM_RANGE(0x02, 0x02) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0x03, 0x03) AM_READ(jumppop_z80latch_r)
-	AM_RANGE(0x04, 0x04) AM_NOP
-	AM_RANGE(0x05, 0x05) AM_WRITE(jumppop_z80_bank_w)
-	AM_RANGE(0x06, 0x06) AM_NOP
 ADDRESS_MAP_END
 
 /* Jump Kids */
@@ -1861,78 +1797,6 @@ static INPUT_PORTS_START( dquizgo )
 	PORT_DIPSETTING(      0x8000, "5" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( jumppop )
-	PORT_START("PLAYERS")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("DSW")
-	PORT_SERVICE_DIPLOC( 0x0001, IP_ACTIVE_LOW, "SWA:1" )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SWA:2")
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x001c, 0x001c, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SWA:3,4,5")
-	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x001c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0014, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x00e0, 0x00e0, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SWA:6,7,8")
-	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x00e0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x00a0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SWB:1")
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SWB:2")
-	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0400, 0x0400, "Picture Viewer" )        PORT_DIPLOCATION("SWB:3")
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, "BG Type" )               PORT_DIPLOCATION("SWB:4")     // See notes
-	PORT_DIPSETTING(      0x0800, "1" )
-	PORT_DIPSETTING(      0x0000, "2" )
-	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SWB:5,6")
-	PORT_DIPSETTING(      0x2000, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x3000, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Lives ) )        PORT_DIPLOCATION("SWB:7,8")
-	PORT_DIPSETTING(      0x8000, "1" )
-	PORT_DIPSETTING(      0x0000, "2" )
-	PORT_DIPSETTING(      0xc000, "3" )
-	PORT_DIPSETTING(      0x4000, "4" )
-INPUT_PORTS_END
 
 /******************************************************************************/
 
@@ -1947,16 +1811,6 @@ static const gfx_layout tcharlayout =
 	16*8
 };
 
-static const gfx_layout jumppop_tcharlayout =
-{
-	8,8,
-	RGN_FRAC(1,2),
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+8,0,8,RGN_FRAC(1,2)+16,RGN_FRAC(1,2)+24,16,24 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
 
 static const gfx_layout tlayout =
 {
@@ -1985,23 +1839,6 @@ static const gfx_layout suprtrio_tlayout =
 };
 
 
-static const gfx_layout jumpop_tlayout =
-{
-	16,16,
-	RGN_FRAC(1,2),
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+8,0,8,RGN_FRAC(1,2)+16,RGN_FRAC(1,2)+24,16,24,
-	256+RGN_FRAC(1,2)+0,256+RGN_FRAC(1,2)+8,256+0,256+8,256+RGN_FRAC(1,2)+16,256+RGN_FRAC(1,2)+24,256+16,256+24
-	},
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
-	512+0*32, 512+1*32, 512+2*32, 512+3*32, 512+4*32, 512+5*32, 512+6*32, 512+7*32
-	},
-	128*8
-};
-
-
-
 static GFXDECODE_START( tumbleb )
 	GFXDECODE_ENTRY( "gfx1", 0, tcharlayout, 256, 16 )	/* Characters 8x8 */
 	GFXDECODE_ENTRY( "gfx1", 0, tlayout,     512, 16 )	/* Tiles 16x16 */
@@ -2022,14 +1859,6 @@ static GFXDECODE_START( fncywld )
 	GFXDECODE_ENTRY( "gfx1", 0, tlayout,     0x200, 0x40 )	/* Tiles 16x16 */
 	GFXDECODE_ENTRY( "gfx2", 0, tlayout,     0x000, 0x40 )	/* Sprites 16x16 */
 GFXDECODE_END
-
-static GFXDECODE_START( jumppop )
-	GFXDECODE_ENTRY( "gfx1", 0, jumppop_tcharlayout,0x100, 0x40 )	/* Characters 8x8 */
-	GFXDECODE_ENTRY( "gfx1", 0, jumpop_tlayout,		0x100, 0x40 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx1", 0, jumpop_tlayout,		0x100, 0x40 )	/* Tiles 16x16 */
-	GFXDECODE_ENTRY( "gfx2", 0, tlayout,			0x000, 0x40 )	/* Sprites 16x16 */
-GFXDECODE_END
-
 
 /******************************************************************************/
 
@@ -2328,48 +2157,6 @@ static MACHINE_CONFIG_DERIVED( metlsavr, cookbib )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( jumppop, tumbleb_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 16000000)
-	MCFG_CPU_PROGRAM_MAP(jumppop_main_map)
-	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
-
-	MCFG_CPU_ADD("audiocpu", Z80, 3500000) /* verified */
-	MCFG_CPU_PROGRAM_MAP(jumppop_sound_map)
-	MCFG_CPU_IO_MAP(jumppop_sound_io_map)
-	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 1953)	/* measured */
-
-	MCFG_MACHINE_START(tumbleb)
-	MCFG_MACHINE_RESET(tumbleb)
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
-	MCFG_SCREEN_SIZE(40*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
-	MCFG_SCREEN_UPDATE_STATIC(jumppop)
-
-	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
-	decospr_device::set_gfx_region(*device, 3);
-	decospr_device::set_is_bootleg(*device, true);
-
-	MCFG_GFXDECODE(jumppop)
-	MCFG_PALETTE_LENGTH(1024)
-
-	MCFG_VIDEO_START(jumppop)
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MCFG_SOUND_ADD("ymsnd", YM3812, 3500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.70)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.70)
-
-	MCFG_OKIM6295_ADD("oki", 875000, OKIM6295_PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( suprtrio, tumbleb_state )
 
@@ -2622,80 +2409,6 @@ ROM_START( pangpang )
 	ROM_RELOAD(0x80000,0x80000)
 ROM_END
 
-/*
-
-Jumping Pop
-ESD, 2001
-
-PCB Layout
-----------
-
-|------------------------------------------------------|
-| TDA1519A                62256         PAL            |
-| SAMPLES.BIN YM3014      62256         BG0.BIN        |
-|             YM3812    |---------|     BG1.BIN        |
-|6295   Z80   6116      |         |                    |
-|          Z80_PRG.BIN  |A40MX04  |PAL                 |
-|                       |         |                    |
-|J                      |         |                    |
-|A PAL                  |---------|                    |
-|M                           6116                      |
-|M                           6116                      |
-|A     14MHz                 6116                      |
-|      16MHz                 6116|---------|           |
-|      68K_PRG.BIN        PAL    |         |           |
-|                         PAL    |A40MX04  |           |
-|              |-----|    PAL    |         |  SP0.BIN  |
-|      62256   |68000|           |         |  SP1.BIN  |
-|DIP1  62256   |     |           |---------|           |
-|      PAL     |-----|           6116  6116            |
-|DIP2  PAL                       6116  6116            |
-|------------------------------------------------------|
-Notes:
-      68000   - Motorola MC68EC000FU10, running at 16.000MHz (QFP64)
-      YM3812  - Yamaha YM3812, running at 3.500MHz [14 / 4] (DIP24)
-      YM3012  - Yamaha YM3012 16bit Serial DAC (DIP8)
-      Z80     - Zilog Z84C0006FEC, running at 3.500MHz [14 / 4] (QFP44)
-      6295    - Oki M6295, running at 875kHz [14 / 16], samples rate 6.628787879kHz [875000 /132] (QFP44)
-      A40MX04 - Actel A40MX04-F FPGA (x2, PLCC84)
-      TDA1519A- Philips TDA1519A Dual 6W Power Amplifier
-      DIP1/2  - 8 Position Dip Switch
-      62256   - 8K x8 SRAM (x4, DIP28)
-      6116    - 2K x8 SRAM (x9, DIP24)
-      VSync   - 60Hz
-
-      ROMs -
-              Filename      Type                                      Use
-              ---------------------------------------------------------------------------
-              68K_PRG.BIN   Hitachi HN27C4096 256K x16 EPROM          68000 Program
-              Z80_PRG.BIN   Atmel AT27C020 256K x8 OTP MASKROM        Z80 Program
-              SAMPLES.BIN   Atmel AT27C020 256K x8 OTP MASKROM        Oki M6295 Samples
-              BG0/1.BIN     Macronix 29F8100MC 1M x8 SOP44 FlashROM   Background Graphics
-              SP0/1.BIN     Macronix 29F8100MC 1M x8 SOP44 FlashROM   Sprite Graphics
-
-              Note there are no IC locations on the PCB, so the extension of the ROMs is just 'BIN'
-
-*/
-
-ROM_START( jumppop )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_WORD_SWAP ("68k_prg.bin", 0x00000, 0x80000, CRC(123536b9) SHA1(3597dec81e98d7bdf4ea9053983e62f127defcb7) )
-
-	ROM_REGION( 0x80000, "audiocpu", 0 ) /* Z80 code */
-	ROM_LOAD( "z80_prg.bin", 0x00000, 0x40000, CRC(a88d4424) SHA1(eefb5ac79632931a36f360713c482cd079891f91) )
-	ROM_RELOAD( 0x10000, 0x40000)
-
-	ROM_REGION( 0x200000, "gfx1", 0 )
-	ROM_LOAD( "bg0.bin", 0x000000, 0x100000, CRC(35a1363d) SHA1(66c550b0bdea7c8b079f186f5e044f731d31bc58) )
-	ROM_LOAD( "bg1.bin", 0x100000, 0x100000, CRC(5b37f943) SHA1(fe73b839f29d4c32823418711b22f85a5f583ec2) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD( "sp0.bin", 0x000000, 0x100000, CRC(7c5d0633) SHA1(1fba60073d1d5d4dbd217fde181fa73a9d92bdc6) )
-	ROM_LOAD( "sp1.bin", 0x100000, 0x100000, CRC(7eae782e) SHA1(a33c544ad9516ec409c209968e72f63e7cdb934b) )
-
-	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
-	ROM_LOAD( "samples.bin", 0x00000, 0x40000, CRC(066f30a7) SHA1(6bdd0210001c597819f7132ffa1dc1b1d55b4e0a) )
-ROM_END
 
 /**************************************
 
@@ -3794,8 +3507,6 @@ GAME( 1994, metlsavr, 0,       metlsavr,    metlsavr, chokchok, ROT0, "First Amu
 GAME( 1994, pangpang, 0,       pangpang,    tumblepb, tumbleb2, ROT0, "Dong Gue La Mi Ltd.", "Pang Pang", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  ) // PIC is protected, sound simulation not 100%
 GAME( 1994, suprtrio, 0,       suprtrio,    suprtrio, suprtrio, ROT0, "Gameace", "Super Trio", GAME_SUPPORTS_SAVE )
 GAME( 1996, fncywld,  0,       fncywld,     fncywld,  fncywld,  ROT0, "Unico",   "Fancy World - Earth of Crisis" , GAME_SUPPORTS_SAVE ) // game says 1996, testmode 1995?
-GAME( 2001, jumppop,  0,       jumppop,     jumppop,  0,        ORIENTATION_FLIP_X, "ESD", "Jumping Pop", GAME_SUPPORTS_SAVE )
-
 // Should also be 'Magicball Fighting' (c)1994
 GAME( 1995, wlstar,   0,       cookbib_mcu, wlstar,   wlstar,   ROT0, "Mijin",   "Wonder League Star - Sok-Magicball Fighting (Korea)", GAME_SUPPORTS_SAVE ) // translates to 'Wonder League Star - Return of Magicball Fighting'
 GAME( 1995, htchctch, 0,       htchctch,    htchctch, htchctch, ROT0, "SemiCom", "Hatch Catch" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets

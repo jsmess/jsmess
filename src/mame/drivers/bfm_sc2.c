@@ -257,7 +257,6 @@ public:
 	DECLARE_WRITE8_MEMBER(payout_latch_w);
 	DECLARE_WRITE8_MEMBER(payout_triac_w);
 	DECLARE_WRITE8_MEMBER(payout_select_w);
-	DECLARE_WRITE8_MEMBER(vfd2_data_w);
 	DECLARE_WRITE8_MEMBER(vfd_reset_w);
 	DECLARE_READ8_MEMBER(uart1stat_r);
 	DECLARE_READ8_MEMBER(uart1data_r);
@@ -273,7 +272,10 @@ public:
 	DECLARE_READ8_MEMBER(vid_uart_ctrl_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(vfd_status_r);
-	DECLARE_WRITE8_MEMBER(vfd1_data_w);
+	DECLARE_WRITE8_MEMBER(vfd1_bd1_w);
+	DECLARE_WRITE8_MEMBER(vfd1_dmd_w);
+	DECLARE_WRITE8_MEMBER(dmd_reset_w);
+	DECLARE_WRITE8_MEMBER(vfd2_data_w);
 	DECLARE_WRITE8_MEMBER(e2ram_w);
 	DECLARE_READ8_MEMBER(direct_input_r);
 	DECLARE_READ8_MEMBER(sc3_expansion_r);
@@ -940,18 +942,10 @@ WRITE8_MEMBER(bfm_sc2_state::payout_select_w)
 
 
 ///////////////////////////////////////////////////////////////////////////
-
+//TODO: Change this!
 WRITE8_MEMBER(bfm_sc2_state::vfd2_data_w)
 {
 	m_vfd1->write_char(data);
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-WRITE8_MEMBER(bfm_sc2_state::vfd_reset_w)
-{
-	m_vfd0->reset();
-	m_vfd1->reset();
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1170,19 +1164,21 @@ READ8_MEMBER(bfm_sc2_state::vfd_status_r)
 	return result;
 }
 
-WRITE8_MEMBER(bfm_sc2_state::vfd1_data_w)
+WRITE8_MEMBER(bfm_sc2_state::vfd1_bd1_w)
 {
-
-	if (machine().device("matrix"))
-	{
-		BFM_dm01_writedata(machine(),data);
-	}
-	else
-	{
-		m_vfd0->write_char(data);
-	}
+    m_vfd0->write_char(data);
 }
 
+WRITE8_MEMBER(bfm_sc2_state::vfd_reset_w)
+{
+	m_vfd0->reset();
+	m_vfd1->reset();
+}
+
+WRITE8_MEMBER(bfm_sc2_state::vfd1_dmd_w)
+{
+	BFM_dm01_writedata(machine(),data);
+}
 
 //
 WRITE8_MEMBER(bfm_sc2_state::e2ram_w)
@@ -1458,14 +1454,14 @@ static ADDRESS_MAP_START( sc2_basemap, AS_PROGRAM, 8, bfm_sc2_state )
 	AM_RANGE(0x2500, 0x2500) AM_READWRITE(uart1data_r, uart1data_w)
 	AM_RANGE(0x2600, 0x2600) AM_READWRITE(uart2stat_r, uart2ctrl_w)	/* mc6850 compatible uart */
 	AM_RANGE(0x2700, 0x2700) AM_READWRITE(uart2data_r, uart2data_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(vfd1_data_w)					/* vfd1 data */
+	AM_RANGE(0x2800, 0x2800) AM_WRITE(vfd1_bd1_w)					/* vfd1 data */
 	AM_RANGE(0x2900, 0x2900) AM_WRITE(vfd_reset_w)					/* vfd1+vfd2 reset line */
 	AM_RANGE(0x2A00, 0x2AFF) AM_WRITE(nec_latch_w)
 	AM_RANGE(0x2B00, 0x2BFF) AM_WRITE(nec_reset_w)
 	AM_RANGE(0x2C00, 0x2C00) AM_WRITE(unlock_w)						/* custom chip unlock */
 	AM_RANGE(0x2D00, 0x2D01) AM_DEVWRITE_LEGACY("ymsnd", ym2413_w)
 	AM_RANGE(0x2E00, 0x2E00) AM_WRITE(bankswitch_w)					/* write bank (rom page select for 0x6000 - 0x7fff ) */
-	AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)					/* vfd2 data */
+	//AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)				/* vfd2 data (not usually connected!)*/
 
 	AM_RANGE(0x3FFE, 0x3FFE) AM_READ(direct_input_r )
 	AM_RANGE(0x3FFF, 0x3FFF) AM_READ(coin_input_r)
@@ -3678,6 +3674,20 @@ static INPUT_PORTS_START( scorpion3 )
 
 INPUT_PORTS_END
 
+WRITE8_MEMBER(bfm_sc2_state::dmd_reset_w)
+{
+//TODO: Reset callback for DMD
+}
+
+static MACHINE_START( sc2dmd )
+{
+	bfm_sc2_state *state = machine.driver_data<bfm_sc2_state>();
+
+	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	space->install_write_handler(0x2800, 0x2800, 0, 0, write8_delegate(FUNC(bfm_sc2_state::vfd1_dmd_w),state));
+	space->install_write_handler(0x2900, 0x2900, 0, 0, write8_delegate(FUNC(bfm_sc2_state::dmd_reset_w),state));
+}
+
 /* machine driver for scorpion2 board */
 
 static MACHINE_CONFIG_START( scorpion2, bfm_sc2_state )
@@ -3721,13 +3731,11 @@ static MACHINE_CONFIG_START( scorpion2_dm01, bfm_sc2_state )
 	MCFG_CPU_PERIODIC_INT(timer_irq, 1000 )
 	MCFG_WATCHDOG_TIME_INIT(PERIOD_OF_555_MONOSTABLE(120000,100e-9))
 
-	MCFG_BFMBD1_ADD("vfd0",0)
-	MCFG_BFMBD1_ADD("vfd1",1)
-
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("ymsnd",YM2413, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
+	MCFG_MACHINE_START(sc2dmd)
 	MCFG_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -3773,6 +3781,7 @@ static void sc2awpdmd_common_init(running_machine &machine,int reels, int decryp
 		stepper_config(machine, n, &starpoint_interface_48step);
 	}
 }
+
 
 
 static DRIVER_INIT (bbrkfst)
@@ -4462,9 +4471,6 @@ ROM_END
 ROM_START( sc2cshcl1 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "club_cashino_std_ac_var_ass.bin", 0x0000, 0x010000, CRC(0e9fad24) SHA1(d14569f106ba29f9cb7769234f5531382e28bd69) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 )
-	ROM_LOAD( "club_cashino_dat_ac_var_ass.bin", 0x0000, 0x010000, CRC(b529604e) SHA1(87f8dca7e570472697de2cbe7565a038503a6251) )
 
 	ROM_REGION( 0x80000, "upd", 0 )
 	ROM_LOAD( "cashsnd", 0x0000, 0x080000, CRC(807d37a6) SHA1(bd5f7c39a64a562e96a850a2cc82bfe3f74f1e54) )
@@ -5388,13 +5394,6 @@ ROM_END
 ROM_START( sc2cops )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cops & robbers 10 p1 (27512)", 0x0000, 0x010000, CRC(2a74bf68) SHA1(e6d0cf5c26815184d74bc2b1769d13321ce5e33a) )
-
-	ROM_REGION( 0x10000, "altrevs", 0 )
-	// are these different HW? (SC1?) Will add in next pass
-	ROM_LOAD( "cop56cp1", 0x0000, 0x008000, CRC(214edd7d) SHA1(007c17cc522c8f0d30bc1fd08bb18850344f62ad) )
-	ROM_LOAD( "cop56cp2", 0x0000, 0x008000, CRC(c862ee34) SHA1(e807d1072953e67581ce0181bfd82a7efcee7bf0) )
-	ROM_LOAD( "cops & robbers 5p v1-3 a (27256)", 0x0000, 0x008000, CRC(29513083) SHA1(f2ce0b573d6756e7d835488b8d8eed3266787255) )
-	ROM_LOAD( "cops & robbers 5p v1-3 b (27256)", 0x0000, 0x008000, CRC(6f5425d6) SHA1(7673841ccfe16eaa0a5cfca1596383f7711f2dbe) )
 
 	ROM_REGION( 0x20000, "matrix", 0 )
 	ROM_LOAD( "95000578.p1", 0x0000, 0x010000, CRC(bdd56a09) SHA1(92d0416578c55075a127f1c2af8d6de5216dd189) )//official part number for cops-and-robbers-mtx-ass.bin, cops & robbers 10 p2 (27512

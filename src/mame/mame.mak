@@ -826,6 +826,7 @@ $(MAMEOBJ)/jpm.a: \
 	$(DRIVERS)/jpmsys5.o \
 	$(DRIVERS)/jpmmps.o \
 	$(DRIVERS)/jpms80.o \
+	$(DRIVERS)/jpmsru.o \
 	$(DRIVERS)/jpmimpct.o $(VIDEO)/jpmimpct.o \
 	$(DRIVERS)/pluto5.o \
 	$(DRIVERS)/jpmsys7.o \
@@ -886,7 +887,6 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/konamigv.o \
 	$(DRIVERS)/konamigx.o $(MACHINE)/konamigx.o $(VIDEO)/konamigx.o \
 	$(DRIVERS)/konamim2.o \
-	$(DRIVERS)/kongambl.o \
 	$(DRIVERS)/kontest.o \
 	$(DRIVERS)/konendev.o \
 	$(DRIVERS)/ksys573.o $(MACHINE)/zs01.o \
@@ -920,6 +920,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/simpsons.o $(MACHINE)/simpsons.o $(VIDEO)/simpsons.o \
 	$(DRIVERS)/spy.o $(VIDEO)/spy.o \
 	$(DRIVERS)/surpratk.o $(VIDEO)/surpratk.o \
+	$(DRIVERS)/tasman.o \
 	$(DRIVERS)/tgtpanic.o \
 	$(DRIVERS)/thunderx.o $(VIDEO)/thunderx.o \
 	$(DRIVERS)/timeplt.o $(AUDIO)/timeplt.o $(VIDEO)/timeplt.o \
@@ -1878,8 +1879,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/umipoker.o \
 	$(DRIVERS)/unkfr.o \
 	$(DRIVERS)/unkhorse.o \
-	$(DRIVERS)/unkpcp.o \
-	$(DRIVERS)/usgames.o $(VIDEO)/usgames.o \
+ 	$(DRIVERS)/usgames.o $(VIDEO)/usgames.o \
 	$(DRIVERS)/vamphalf.o \
 	$(DRIVERS)/vcombat.o \
 	$(DRIVERS)/vectrex.o $(VIDEO)/vectrex.o $(MACHINE)/vectrex.o \
@@ -1913,6 +1913,8 @@ $(DRIVERS)/30test.o:	$(LAYOUT)/30test.lh
 $(DRIVERS)/8080bw.o:	$(LAYOUT)/invrvnge.lh \
 			$(LAYOUT)/shuttlei.lh \
 			$(LAYOUT)/cosmicm.lh
+
+$(DRIVERS)/aces1.o:	$(LAYOUT)/aces1.lh
 
 $(DRIVERS)/acefruit.o:	$(LAYOUT)/sidewndr.lh
 
@@ -2212,7 +2214,7 @@ $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
 
 $(DRIVERS)/peyper.o:    $(LAYOUT)/peyper.lh
 
-$(MACHINE)/megadriv.o:   $(LAYOUT)/megacd.lh
+$(MACHINE)/megadriv.o:  $(LAYOUT)/megacd.lh
 
 
 #-------------------------------------------------

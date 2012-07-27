@@ -8,6 +8,8 @@
 
   AY8910?
 
+  TMS9902
+  (is there a 9901 as well?)
 
  ---
 
@@ -20,6 +22,7 @@
 #include "emu.h"
 #include "cpu/tms9900/tms9900l.h"
 #include "sound/ay8910.h"
+#include "machine/tms9902.h"
 
 class jpms80_state : public driver_device
 {
@@ -41,7 +44,15 @@ static ADDRESS_MAP_START( jpms80_map, AS_PROGRAM, 8, jpms80_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jpms80_io_map, AS_IO, 8, jpms80_state )
-
+	ADDRESS_MAP_GLOBAL_MASK(0x1ff)
+//	AM_RANGE(0x0000, 0x000f) // I/O & Optic (in) / Reels (out)
+//	AM_RANGE(0x0050, 0x0050) // INT1 enable (lv3)
+//	AM_RANGE(0x0051, 0x0051) // INT2 enable (lv4)
+//	AM_RANGE(0x0052, 0x0052) // Watchdog
+//	AM_RANGE(0x0053, 0x0053) // I/O Enable
+//	AM_RANGE(0x0140, 0x015f) // AY
+	AM_RANGE(0x01e0, 0x01ff) AM_DEVREADWRITE("tms9902duart", tms9902_device, cruread, cruwrite)
+//  Lamps, Meters etc. can move around	
 ADDRESS_MAP_END
 
 
@@ -63,6 +74,16 @@ static const ay8910_interface ay8910_interface_jpm =
 // these are wrong
 #define MAIN_CLOCK 2000000
 #define SOUND_CLOCK 2000000
+#define DUART_CLOCK 2000000
+
+static const tms9902_interface tms9902_config =
+{
+	DEVCB_NULL,				/*int_callback,*/	/* called when interrupt pin state changes */
+	DEVCB_NULL,				/*rcv_callback,*/	/* called when a character shall be received  */
+	DEVCB_NULL,				/* called when a character is transmitted */
+	DEVCB_NULL				/* called for setting interface parameters and line states */
+};
+
 
 static MACHINE_CONFIG_START( jpms80, jpms80_state )
 	/* basic machine hardware */
@@ -72,42 +93,12 @@ static MACHINE_CONFIG_START( jpms80, jpms80_state )
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_TMS9902_ADD("tms9902duart", tms9902_config,	DUART_CLOCK)
+
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
 	MCFG_SOUND_CONFIG(ay8910_interface_jpm)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
-
-
-static ADDRESS_MAP_START( jpms_older_e00_map, AS_PROGRAM, 8, jpms80_state )
-	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0e00, 0x0eff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( jpms_older_e00_io, AS_IO, 8, jpms80_state )
-ADDRESS_MAP_END
-
-
-static MACHINE_CONFIG_START( jpms_older_e00, jpms80_state )
-	MCFG_CPU_ADD("maincpu", TMS9995L, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(jpms_older_e00_map)
-	MCFG_CPU_IO_MAP(jpms_older_e00_io)
-MACHINE_CONFIG_END
-
-static ADDRESS_MAP_START( jpms_older_c00_map, AS_PROGRAM, 8, jpms80_state )
-	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x0c00, 0x0eff) AM_RAM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( jpms_older_c00_io, AS_IO, 8, jpms80_state )
-ADDRESS_MAP_END
-
-
-static MACHINE_CONFIG_START( jpms_older_c00, jpms80_state )
-	MCFG_CPU_ADD("maincpu", TMS9995L, MAIN_CLOCK)
-	MCFG_CPU_PROGRAM_MAP(jpms_older_c00_map)
-	MCFG_CPU_IO_MAP(jpms_older_c00_io)
-MACHINE_CONFIG_END
-
 
 DRIVER_INIT( jpms80 )
 {
@@ -315,60 +306,3 @@ GAME(198?, j80alad	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Aladdin's Cave (PCP
 GAME(198?, j80fortr	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Fortune Trail (Jpm)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j80mster	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Masterspy (Pcp)",						GAME_IS_SKELETON_MECHANICAL )
 GAME(198?, j80plsnd	,0			,jpms80,jpms80,jpms80,ROT0,   "Jpm","Plus Nudge (Jpm)",						GAME_IS_SKELETON_MECHANICAL )
-
-
-/* Not 100% sure what the stuff below is on, the profiles don't quite match System 85 */
-
-
-
-ROM_START( j_ewnud )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ewn1a26", 0x0000, 0x000400, CRC(a92760b7) SHA1(dfef0dab7799a4b4975755c1584efca81a3798c4) )
-	ROM_LOAD( "ewn26.2", 0x0400, 0x000400, CRC(bd24e59e) SHA1(038ed23283a7b61e873f543de32b685630fcdb97) )
-	ROM_LOAD( "ewn26.3", 0x0800, 0x000400, CRC(a3280b35) SHA1(2771c81735c69ae3efb02715ac97901dae434e72) )
-ROM_END
-
-ROM_START( j_ewnda )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ewn1.bin", 0x0000, 0x000400, CRC(84ce735e) SHA1(98bae928246050ae88518ca511447fbef5c810f5) )
-	ROM_LOAD( "ewn2.bin", 0x0400, 0x000400, CRC(4c121f5e) SHA1(1221ff91ff9e352efeabb26a60eab93aae5bca5e) )
-	ROM_LOAD( "ewn3.bin", 0x0800, 0x000400, CRC(bef3a938) SHA1(6a6844203c6361b65f5b07853d9dbe18a29ebc44) )
-ROM_END
-
-
-
-ROM_START( j_luckac )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "la1.bin", 0x0000, 0x000400, CRC(21076280) SHA1(d5cf25d289f03c743f4428273ac002df3164c344) )
-	ROM_LOAD( "la2.bin", 0x0400, 0x000400, CRC(cae10bc1) SHA1(a740946437a3b277b714f13d001783987f57bc77) )
-	ROM_LOAD( "la3.bin", 0x0800, 0x000400, CRC(cb9362ac) SHA1(a16d43ba01b24e1b515881957c1559d33a03bcc4) )
-ROM_END
-
-
-
-ROM_START( j_plus2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "plus2_1.bin", 0x0000, 0x000400, CRC(f635174d) SHA1(9478aabc0eaa25d4ae44d2385e738584f03f6647) )
-	ROM_LOAD( "plus2_2.bin", 0x0400, 0x000400, CRC(0999d32f) SHA1(e08c852f8f3aff8ab7b73e9c0b0502ab91f9e844) )
-	ROM_LOAD( "plus2_3.bin", 0x0800, 0x000400, CRC(d3dfd6ab) SHA1(4cf0f8977fb2c023bf2ccc8d9d74352ce32206bf) )
-	ROM_LOAD( "plus2_4.bin", 0x0c00, 0x000400, CRC(8b6922b4) SHA1(7b7fc7b0708bf96846860254fea957bcbc952923) )
-ROM_END
-
-
-
-ROM_START( j_super2 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "super2_1.bin", 0x0000, 0x000400, CRC(a1df2719) SHA1(eed80329c14ef6c272a8c622e8a4bc7d14ac87e6) )
-	ROM_LOAD( "super2_2.bin", 0x0400, 0x000400, CRC(0fd5ddd0) SHA1(e8d31b009b29486d36d11052af857c609a7f1f84) )
-	ROM_LOAD( "super2_3.bin", 0x0800, 0x000400, CRC(ddd998d3) SHA1(5964da70ae4c2f174dc3d1494fc67579c221a7b7) )
-ROM_END
-
-
-
-GAME(198?, j_ewnud	,0			,jpms_older_e00,jpms80,jpms80,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 1)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j_ewnda	,j_ewnud	,jpms_older_e00,jpms80,jpms80,ROT0,   "Barcrest?","Each Way Nudger (Barcrest?, set 2)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j_luckac	,0			,jpms_older_e00,jpms80,jpms80,ROT0,   "<unknown>","Lucky Aces (Unk)",						GAME_IS_SKELETON_MECHANICAL )
-GAME(198?, j_super2	,0			,jpms_older_e00,jpms80,jpms80,ROT0,   "Jpm","Super 2 (Jpm)",						GAME_IS_SKELETON_MECHANICAL )
-
-// this one is different again?
-GAME(198?, j_plus2	,0			,jpms_older_c00,jpms80,jpms80,ROT0,   "Jpm","Plus 2 (Jpm)",						GAME_IS_SKELETON_MECHANICAL )

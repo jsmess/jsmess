@@ -308,17 +308,6 @@ INLINE void MODIFY_ARP(tms32025_state *cpustate, int data)
 	cpustate->STR0 |= 0x0400;
 }
 
-
-#ifdef UNUSED_FUNCTION
-INLINE void MODIFY_ARB(tms32025_state *cpustate, int data)
-{
-	cpustate->STR1 &= ~ARB_REG;
-	cpustate->STR1 |= ((data << 13) & ARB_REG);
-	cpustate->STR1 |= 0x0180;
-}
-#endif
-
-
 INLINE UINT16 M_RDROM(tms32025_state *cpustate, offs_t addr)
 {
 	UINT16 *ram;
@@ -413,9 +402,6 @@ INLINE void MODIFY_AR_ARP(tms32025_state *cpustate)
 		case 0x70: /* 111   *BR0+    */
 			cpustate->AR[ARP] += reverse_carry_add(cpustate->AR[ARP],cpustate->AR[0]);
 			break;
-
-		default:
-			break;
 	}
 
 	if( !cpustate->mHackIgnoreARP )
@@ -449,7 +435,7 @@ INLINE void CALCULATE_SUB_CARRY(tms32025_state *cpustate)
 
 INLINE void CALCULATE_ADD_OVERFLOW(tms32025_state *cpustate, INT32 addval)
 {
-	if ((INT32)(~(cpustate->oldacc.d ^ addval) & (cpustate->oldacc.d ^ cpustate->ACC.d)) < 0)
+	if ((INT32)((cpustate->ACC.d ^ addval) & (cpustate->oldacc.d ^ cpustate->ACC.d)) < 0)
 	{
 		SET0(cpustate, OV_FLAG);
 		if (OVM)
@@ -566,6 +552,11 @@ INLINE void PUTDATA_SST(tms32025_state *cpustate, UINT16 data)
 }
 
 
+
+/****************************************************************************
+ *	Emulate the Instructions
+ ****************************************************************************/
+
 /* The following functions are here to fill the void for the */
 /* opcode call functions. These functions are never actually called. */
 static void opcodes_CE(tms32025_state *cpustate) { }
@@ -587,12 +578,11 @@ static void abst(tms32025_state *cpustate)
 	}
 	CLR1(cpustate, C_FLAG);
 }
-static void add(tms32025_state *cpustate)		/* #### add carry support - see page 3-31 (70) #### */
-{						/* page 10-13 (348) spru031d */
+static void add(tms32025_state *cpustate)
+{
 	cpustate->oldacc.d = cpustate->ACC.d;
 	GETDATA(cpustate, (cpustate->opcode.b.h & 0xf), SXM);
 	cpustate->ACC.d += cpustate->ALU.d;
-
 	CALCULATE_ADD_OVERFLOW(cpustate, cpustate->ALU.d);
 	CALCULATE_ADD_CARRY(cpustate);
 }
@@ -600,25 +590,24 @@ static void addc(tms32025_state *cpustate)
 {
 	cpustate->oldacc.d = cpustate->ACC.d;
 	GETDATA(cpustate, 0, 0);
-	if (CARRY) cpustate->ALU.d++;
+	if (CARRY) cpustate->ACC.d++;
 	cpustate->ACC.d += cpustate->ALU.d;
 	CALCULATE_ADD_OVERFLOW(cpustate, cpustate->ALU.d);
-	CALCULATE_ADD_CARRY(cpustate);
+	if (cpustate->ACC.d == cpustate->oldacc.d) {}	/* edge case, carry remains same */
+	else CALCULATE_ADD_CARRY(cpustate);
 }
 static void addh(tms32025_state *cpustate)
 {
 	cpustate->oldacc.d = cpustate->ACC.d;
 	GETDATA(cpustate, 0, 0);
 	cpustate->ACC.w.h += cpustate->ALU.w.l;
-	if ((INT16)(~(cpustate->oldacc.w.h ^ cpustate->ALU.w.l) & (cpustate->oldacc.w.h ^ cpustate->ACC.w.h)) < 0) {
+	if ( (UINT16)(cpustate->oldacc.w.h) > (UINT16)(cpustate->ACC.w.h) ) {
+		SET1(cpustate, C_FLAG);	/* Carry flag is not cleared, if no carry occurred */
+	}
+	if ((INT16)((cpustate->ACC.w.h ^ cpustate->ALU.w.l) & (cpustate->oldacc.w.h ^ cpustate->ACC.w.h)) < 0) {
 		SET0(cpustate, OV_FLAG);
-		if (OVM)
-			cpustate->ACC.w.h = ((INT16)cpustate->oldacc.w.h < 0) ? 0x8000 : 0x7fff;
+		if (OVM) cpustate->ACC.w.h = ((INT16)cpustate->oldacc.w.h < 0) ? 0x8000 : 0x7fff;
 	}
-	if ( ((INT16)(cpustate->oldacc.w.h) < 0) && ((INT16)(cpustate->ACC.w.h) >= 0) ) {
-		SET1(cpustate, C_FLAG);
-	}
-	/* Carry flag is not cleared, if no carry occurred */
 }
 static void addk(tms32025_state *cpustate)
 {
@@ -671,7 +660,6 @@ static void andk(tms32025_state *cpustate)
 	cpustate->PC++;
 	cpustate->ALU.d <<= (cpustate->opcode.b.h & 0xf);
 	cpustate->ACC.d &= cpustate->ALU.d;
-	cpustate->ACC.d &= 0x7fffffff;
 }
 static void apac(tms32025_state *cpustate)
 {
@@ -846,7 +834,6 @@ static void cmpr(tms32025_state *cpustate)
 		case 03:	if ( (UINT16)(cpustate->AR[ARP]) != (UINT16)(cpustate->AR[0]) ) SET1(cpustate, TC_FLAG);
 					else CLR1(cpustate, TC_FLAG);
 					break;
-		default:	break;
 	}
 }
 static void cnfd(tms32025_state *cpustate)	/** next two fetches need to use previous CNF value ! **/
@@ -976,8 +963,6 @@ static void conf(tms32025_state *cpustate)	/** Need to reconfigure the memory bl
 					cpustate->pgmmap[510] = &cpustate->intRAM[0x700];	/* B3 */
 					cpustate->pgmmap[511] = &cpustate->intRAM[0x780];	/* B3 */
 					break;
-
-		default:	break;
 	}
 }
 static void dint(tms32025_state *cpustate)
@@ -1024,16 +1009,11 @@ static void lact(tms32025_state *cpustate)
 }
 static void lalk(tms32025_state *cpustate)
 {
-	if (SXM) {
-		cpustate->ALU.d = (INT16)M_RDOP_ARG(cpustate->PC);
-		cpustate->ACC.d = cpustate->ALU.d << (cpustate->opcode.b.h & 0xf);
-	}
-	else {
-		cpustate->ALU.d = (UINT16)M_RDOP_ARG(cpustate->PC);
-		cpustate->ACC.d = cpustate->ALU.d << (cpustate->opcode.b.h & 0xf);
-		cpustate->ACC.d &= 0x7fffffff;
-	}
+	if (SXM) cpustate->ALU.d =  (INT16)M_RDOP_ARG(cpustate->PC);
+	else     cpustate->ALU.d = (UINT16)M_RDOP_ARG(cpustate->PC);
 	cpustate->PC++;
+	cpustate->ALU.d <<= (cpustate->opcode.b.h & 0xf);
+	cpustate->ACC.d = cpustate->ALU.d;
 }
 static void lar_ar0(tms32025_state *cpustate)	{ GETDATA(cpustate, 0, 0); cpustate->AR[0] = cpustate->ALU.w.l; }
 static void lar_ar1(tms32025_state *cpustate)	{ GETDATA(cpustate, 0, 0); cpustate->AR[1] = cpustate->ALU.w.l; }
@@ -1228,16 +1208,13 @@ static void nop(tms32025_state *cpustate) { }   // NOP is a subset of the MAR in
 */
 static void norm(tms32025_state *cpustate)
 {
-	UINT32 acc = cpustate->ACC.d;
-
-	if( acc == 0 || ((acc^(acc<<1))&(1<<31))!=0 ) {
-		SET1(cpustate, TC_FLAG); /* 1 -> TC */
-	}
-	else {
-		CLR1(cpustate, TC_FLAG); /* 0 -> TC */
-		cpustate->ACC.d <<= 1; /* (ACC)*2 -> ACC */
+	if (cpustate->ACC.d !=0 && (INT32)(cpustate->ACC.d ^ (cpustate->ACC.d << 1)) >= 0)
+	{
+		CLR1(cpustate, TC_FLAG);
+		cpustate->ACC.d <<= 1;
 		MODIFY_AR_ARP(cpustate);
 	}
+	else SET1(cpustate, TC_FLAG);
 }
 static void or_(tms32025_state *cpustate)
 {
@@ -1249,7 +1226,7 @@ static void ork(tms32025_state *cpustate)
 	cpustate->ALU.d = (UINT16)M_RDOP_ARG(cpustate->PC);
 	cpustate->PC++;
 	cpustate->ALU.d <<= (cpustate->opcode.b.h & 0xf);
-	cpustate->ACC.d |=  (cpustate->ALU.d & 0x7fffffff);
+	cpustate->ACC.d |=  (cpustate->ALU.d);
 }
 static void out(tms32025_state *cpustate)
 {
@@ -1373,7 +1350,7 @@ static void sblk(tms32025_state *cpustate)
 	CALCULATE_SUB_OVERFLOW(cpustate, cpustate->ALU.d);
 	CALCULATE_SUB_CARRY(cpustate);
 }
-static void sbrk_tms(tms32025_state *cpustate)
+static void sbrk_ar(tms32025_state *cpustate)
 {
 	cpustate->AR[ARP] -= cpustate->opcode.b.l;
 }
@@ -1463,7 +1440,7 @@ static void sst1(tms32025_state *cpustate)
 	PUTDATA_SST(cpustate, cpustate->STR1);
 }
 static void ssxm(tms32025_state *cpustate)
-{	/** Check instruction description, and make sure right instructions use SXM */
+{
 	SET1(cpustate, SXM_FLAG);
 }
 static void stc(tms32025_state *cpustate)
@@ -1486,44 +1463,42 @@ static void subb(tms32025_state *cpustate)
 {
 	cpustate->oldacc.d = cpustate->ACC.d;
 	GETDATA(cpustate, 0, 0);
-	if (CARRY == 0) cpustate->ALU.d--;
+	if (CARRY == 0) cpustate->ACC.d--;
 	cpustate->ACC.d -= cpustate->ALU.d;
 	CALCULATE_SUB_OVERFLOW(cpustate, cpustate->ALU.d);
-	CALCULATE_SUB_CARRY(cpustate);
+	if (cpustate->ACC.d == cpustate->oldacc.d) {}	/* edge case, carry remains same */
+	else CALCULATE_SUB_CARRY(cpustate);
 }
 static void subc(tms32025_state *cpustate)
 {
-	PAIR temp_alu;
 	cpustate->oldacc.d = cpustate->ACC.d;
 	GETDATA(cpustate, 15, SXM);
 	cpustate->ACC.d -= cpustate->ALU.d;		/* Temporary switch to ACC. Actual calculation is done as (ACC)-[mem] -> ALU, will be preserved later on. */
-	temp_alu.d = cpustate->ACC.d;
 	if ((INT32)((cpustate->oldacc.d ^ cpustate->ALU.d) & (cpustate->oldacc.d ^ cpustate->ACC.d)) < 0) {
 		SET0(cpustate, OV_FLAG);			/* Not affected by OVM */
 	}
 	CALCULATE_SUB_CARRY(cpustate);
 	if( cpustate->oldacc.d >= cpustate->ALU.d ) {
-		cpustate->ACC.d = (cpustate->oldacc.d - cpustate->ALU.d)*2+1;
+		cpustate->ALU.d = cpustate->ACC.d;
+		cpustate->ACC.d = cpustate->ACC.d << 1 | 1;
 	}
 	else {
-		cpustate->ACC.d = cpustate->oldacc.d*2;
+		cpustate->ALU.d = cpustate->ACC.d;
+		cpustate->ACC.d = cpustate->oldacc.d << 1;
 	}
-	cpustate->ALU.d = temp_alu.d;
 }
 static void subh(tms32025_state *cpustate)
 {
 	cpustate->oldacc.d = cpustate->ACC.d;
 	GETDATA(cpustate, 0, 0);
 	cpustate->ACC.w.h -= cpustate->ALU.w.l;
+	if ( (UINT16)(cpustate->oldacc.w.h) < (UINT16)(cpustate->ACC.w.h) ) {
+		CLR1(cpustate, C_FLAG);	/* Carry flag is not affected, if no borrow occurred */
+	}
 	if ((INT16)((cpustate->oldacc.w.h ^ cpustate->ALU.w.l) & (cpustate->oldacc.w.h ^ cpustate->ACC.w.h)) < 0) {
 		SET0(cpustate, OV_FLAG);
-		if (OVM)
-			cpustate->ACC.w.h = ((INT16)cpustate->oldacc.w.h < 0) ? 0x8000 : 0x7fff;
+		if (OVM) cpustate->ACC.w.h = ((INT16)cpustate->oldacc.w.h < 0) ? 0x8000 : 0x7fff;
 	}
-	if ( ((INT16)(cpustate->oldacc.w.h) >= 0) && ((INT16)(cpustate->ACC.w.h) < 0) ) {
-		CLR1(cpustate, C_FLAG);
-	}
-	/* Carry flag is not affected, if no borrow occurred */
 }
 static void subk(tms32025_state *cpustate)
 {
@@ -1588,12 +1563,10 @@ static void xor_(tms32025_state *cpustate)
 }
 static void xork(tms32025_state *cpustate)
 {
-	cpustate->oldacc.d = cpustate->ACC.d;
 	cpustate->ALU.d = M_RDOP_ARG(cpustate->PC);
 	cpustate->PC++;
 	cpustate->ALU.d <<= (cpustate->opcode.b.h & 0xf);
 	cpustate->ACC.d ^= cpustate->ALU.d;
-	cpustate->ACC.d |= (cpustate->oldacc.d & 0x80000000);
 }
 static void zalh(tms32025_state *cpustate)
 {
@@ -1636,7 +1609,7 @@ static const tms32025_opcode opcode_main[256]=
 /*60*/ {1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},{1*CLK, sacl		},
 /*68*/ {1*CLK, sach		},{1*CLK, sach		},{1*CLK, sach		},{1*CLK, sach		},{1*CLK, sach		},{1*CLK, sach		},{1*CLK, sach		},{1*CLK, sach		},
 /*70*/ {1*CLK, sar_ar0	},{1*CLK, sar_ar1	},{1*CLK, sar_ar2	},{1*CLK, sar_ar3	},{1*CLK, sar_ar4	},{1*CLK, sar_ar5	},{1*CLK, sar_ar6	},{1*CLK, sar_ar7	},
-/*78*/ {1*CLK, sst		},{1*CLK, sst1		},{1*CLK, popd		},{1*CLK, zalr		},{1*CLK, spl		},{1*CLK, sph		},{1*CLK, adrk		},{1*CLK, sbrk_tms	},
+/*78*/ {1*CLK, sst		},{1*CLK, sst1		},{1*CLK, popd		},{1*CLK, zalr		},{1*CLK, spl		},{1*CLK, sph		},{1*CLK, adrk		},{1*CLK, sbrk_ar	},
 /*80*/ {2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},
 /*88*/ {2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},{2*CLK, in		},
 /*90*/ {1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},{1*CLK, bit		},
@@ -1699,7 +1672,7 @@ static const tms32025_opcode_Dx opcode_Dx_subset[8]=	/* Instructions living unde
 
 
 /****************************************************************************
- *  Inits CPU emulation
+ *  Initialise the CPU emulation
  ****************************************************************************/
 static CPU_INIT( tms32025 )
 {
@@ -1761,7 +1734,7 @@ static CPU_RESET( tms32025 )
 {
 	tms32025_state *cpustate = get_safe_token(device);
 
-	SET_PC(0);			/* Starting address on a reset */
+	SET_PC(0);					/* Starting address on a reset */
 	cpustate->STR0 |= 0x0600;	/* INTM and unused bit set to 1 */
 	cpustate->STR0 &= 0xefff;	/* OV cleared to 0. Remaining bits undefined */
 	cpustate->STR1 |= 0x07f0;	/* SXM, C, HM, FSM, XF and unused bits set to 1 */
@@ -1779,6 +1752,7 @@ static CPU_RESET( tms32025 )
 
 	cpustate->idle = 0;
 	cpustate->hold = 0;
+	cpustate->tms32025_dec_cycles = 0;
 	cpustate->init_load_addr = 1;
 
 	/* Reset the Data/Program address banks */
@@ -1829,7 +1803,7 @@ static CPU_EXIT( tms32025 )
 /****************************************************************************
  *  Issue an interrupt if necessary
  ****************************************************************************/
-static int process_IRQs(tms32025_state *cpustate)
+INLINE int process_IRQs(tms32025_state *cpustate)
 {
 	/********** Interrupt Flag Register (IFR) **********
         |  5  |  4  |  3  |  2  |  1  |  0  |
@@ -2022,6 +1996,15 @@ static CPU_EXECUTE( tms32025 )
 
 
 		if (cpustate->init_load_addr == 2) {		/* Repeat next instruction */
+			/****************************************************\
+			******* These instructions are not repeatable ********
+			** ADLK, ANDK, LALK, LRLK, ORK,  SBLK, XORK 		**
+			** ADDK, ADRK, LACK, LARK, LDPK, MPYK, RPTK 		**
+			** SBRK, SPM,  SUBK, ZAC,  IDLE, RPT,  TRAP 		**
+			** BACC, CALA, RET									**
+			** B,    BANZ, BBNZ, BBZ,  BC,   BGEZ, BGZ,  BIOZ	**
+			** BNC,  BNV,  BNZ,  BV,   BZ,   CALL, BLEZ, BLZ	**
+			\****************************************************/
 			cpustate->PREVPC = cpustate->PC;
 
 			debugger_instruction_hook(device, cpustate->PC);
@@ -2040,16 +2023,6 @@ static CPU_EXECUTE( tms32025 )
 						cpustate->tms32025_dec_cycles += (1*CLK);
 					}
 					(*opcode_CE_subset[cpustate->opcode.b.l].function)(cpustate);
-				}
-				if ((cpustate->opcode.w.l & 0xf0f8) == 0xd000)
-				{							/* Do all valid 0xDxxx Opcodes */
-					if (cpustate->init_load_addr) {
-						cpustate->tms32025_dec_cycles += (1*CLK);
-					}
-					else {
-						cpustate->tms32025_dec_cycles += (1*CLK);
-					}
-					(*opcode_Dx_subset[cpustate->opcode.b.l].function)(cpustate);
 				}
 				else
 				{							/* Do all other opcodes */
@@ -2099,7 +2072,6 @@ static void set_irq_line(tms32025_state *cpustate, int irqline, int state)
 	if (state != CLEAR_LINE)
 	{
 		cpustate->IFR |= (1 << irqline);
-//      cpustate->IFR &= 0x07;
 	}
 }
 

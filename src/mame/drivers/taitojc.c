@@ -14,7 +14,7 @@ Taito custom chips on this hardware:
 TODO:
 - dendego intro object RAM usage has various gfx bugs (check video file)
 - dendego title screen builds up and it shouldn't
-- dendego attract mode train doesn't ride, the doors light doesn't turn on.
+- dendego attract mode train doesn't ride
 - landgear has some weird crashes (after playing one round, after a couple of loops in attract mode) (needs testing -AS)
 - landgear has huge 3d problems on gameplay (CPU comms?)
 - dangcurv DSP program crashes very soon due to undumped rom, so no 3d is currently shown.
@@ -110,7 +110,6 @@ Bottom board: JCG DAUGHTERL PCB-C K91E0677A
 
 Notes:
       All 3K files are PALs type PALCE 16V8 and saved in Jedec format.
-      MC68HC11: Microcontroller with 64k internal ROM (not read but probably protected anyway ;-)
       ROMs .36-.39 are 27C4001, main program.
       ROMs .5-.7, .9-.12, .18-.20, .22-.25 are 16M MASK, graphics.
       ROMs .32-.35 are 16M MASK, ES5505 samples.
@@ -246,7 +245,6 @@ Bottom board: JCG DAUGHTER PCB-L K91E0603A
 
 Notes:
       All 3K files are PALs type PALCE 16V8 and saved in Jedec format.
-      MC68HC11: Surface-mounted QFP80 microcontroller with 64k internal ROM (not read but very likely protected)
       ROMs .36-.39 are 27C4001, main program.
       ROM .65 is 27C512, 68HC11 MCU program.
       ROMs .30-.31 are 27C2001, sound program.
@@ -350,7 +348,6 @@ Notes:
       All 3K files are PALs type PALCE 16V8 and saved in Jedec format.
       6264: 8K x8 SRAM
       SMC_COM20020I: Network communmication IC
-      MC68HC11: Microcontroller with 64k internal ROM capability (not read but probably protected anyway ;-)
       ROMs .36-.39 are 27C4001, main program.
       ROMs .5-.12, .18-.25 are 16M MASK, graphics.
       ROMs .32-.35 are 16M MASK, sound data.
@@ -711,18 +708,18 @@ READ8_MEMBER(taitojc_state::jc_pcbid_r)
 /*
 
 Some games (Dangerous Curves, Side by Side, Side by Side 2) were released as Twin cabinets,
-allowing 2 players to compete eachother.
+allowing 2 players to compete eachother via a SMSC COM20020I network IC
 
 Not emulated yet...
 
 */
 
-READ32_MEMBER(taitojc_state::jc_lan_r)
+READ8_MEMBER(taitojc_state::jc_lan_r)
 {
-	return 0xffffffff;
+	return 0xff;
 }
 
-WRITE32_MEMBER(taitojc_state::jc_lan_w)
+WRITE8_MEMBER(taitojc_state::jc_lan_w)
 {
 }
 
@@ -741,7 +738,7 @@ static ADDRESS_MAP_START( taitojc_map, AS_PROGRAM, 32, taitojc_state )
 	AM_RANGE(0x0660004c, 0x0660004f) AM_WRITE_PORT("EEPROMOUT")
 	AM_RANGE(0x06800000, 0x06800003) AM_WRITENOP // irq mask/ack? a watchdog?
 	AM_RANGE(0x06a00000, 0x06a01fff) AM_READWRITE(snd_share_r, snd_share_w) AM_SHARE("snd_shared")
-	AM_RANGE(0x06c00000, 0x06c0001f) AM_READWRITE(jc_lan_r, jc_lan_w)
+	AM_RANGE(0x06c00000, 0x06c0001f) AM_READWRITE8(jc_lan_r, jc_lan_w, 0x00ff0000)
 	AM_RANGE(0x08000000, 0x080fffff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x10000000, 0x10001fff) AM_READWRITE(dsp_shared_r, dsp_shared_w)
 ADDRESS_MAP_END
@@ -1000,7 +997,7 @@ WRITE16_MEMBER(taitojc_state::dsp_unk2_w)
 	if (offset == 0)
 	{
 		taitojc_clear_frame(machine());
-		taitojc_render_polygons(machine(), m_polygon_fifo, m_polygon_fifo_ptr);
+		m_renderer->render_polygons(machine(), m_polygon_fifo, m_polygon_fifo_ptr);
 
 		m_polygon_fifo_ptr = 0;
 	}
@@ -1148,17 +1145,17 @@ static INPUT_PORTS_START( sidebs )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("View Switch")
 
 	PORT_MODIFY("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Shift Up")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Shift Down")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Up")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_NAME("Shift Down")
 
 	PORT_START("ANALOG1")		// Steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_NAME("Steering Wheel")
 
 	PORT_START("ANALOG2")		// Acceleration
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(75) PORT_KEYDELTA(25) PORT_NAME("Gas Pedal")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_NAME("Gas Pedal")
 
 	PORT_START("ANALOG3")		// Brake
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(75) PORT_KEYDELTA(25) PORT_NAME("Brake Pedal")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_NAME("Brake Pedal")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dangcurv )
@@ -1172,17 +1169,17 @@ static INPUT_PORTS_START( dangcurv )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Rear Switch")
 
 	PORT_MODIFY("BUTTONS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Shift Up")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Shift Down")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Up")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_NAME("Shift Down")
 
 	PORT_START("ANALOG1")		// Steering
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(35) PORT_KEYDELTA(10) PORT_REVERSE PORT_NAME("Steering Wheel")
 
 	PORT_START("ANALOG2")		// Acceleration
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(75) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("Gas Pedal")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL )  PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("Gas Pedal")
 
 	PORT_START("ANALOG3")		// Brake
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(75) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("Brake Pedal")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("Brake Pedal")
 INPUT_PORTS_END
 
 
@@ -1289,7 +1286,7 @@ static MACHINE_CONFIG_DERIVED( dendego, taitojc )
 
 	/* sound hardware */
 	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
-	MCFG_OKIM6295_ADD("oki", 32000000/32, OKIM6295_PIN7_HIGH)
+	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "subwoofer", 0.20)
 MACHINE_CONFIG_END
 

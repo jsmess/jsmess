@@ -348,27 +348,6 @@ WRITE8_MEMBER(combatsc_state::combatsc_portA_w)
 	/* unknown. always write 0 */
 }
 
-READ8_MEMBER(combatsc_state::combatsc_ym2203_r)
-{
-	device_t *device = machine().device("ymsnd");
-	int status = ym2203_r(device,offset);
-
-	if (cpu_get_pc(m_audiocpu) == 0x334)
-	{
-		if (m_boost)
-		{
-			m_boost = 0;
-			m_interleave_timer->adjust(attotime::zero, 0, m_audiocpu->cycles_to_attotime(80));
-		}
-		else if (status & 2)
-		{
-			m_boost = 1;
-			m_interleave_timer->adjust(attotime::zero);
-		}
-	}
-
-	return status;
-}
 
 /*************************************
  *
@@ -423,14 +402,16 @@ static ADDRESS_MAP_START( combatsc_sound_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(combatsc_voice_reset_w)			/* upd7759 reset? */
 
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)								/* soundlatch_byte_r? */
-	AM_RANGE(0xe000, 0xe001) AM_READ(combatsc_ym2203_r) AM_DEVWRITE_LEGACY("ymsnd", ym2203_w)	/* YM 2203 intercepted */
+	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE_LEGACY("ymsnd", ym2203_r, ym2203_w)	/* YM 2203 intercepted */
 ADDRESS_MAP_END
 
 WRITE8_MEMBER(combatsc_state::combatscb_dac_w)
 {
 	device_t *device = machine().device("msm5205");
-	if(data & 0xe0)
+	if(data & 0x60)
 		printf("%02x\n",data);
+
+	membank("bl_abank")->set_entry((data & 0x80) >> 7);
 
 	//msm5205_reset_w(device, (data >> 4) & 1);
 	msm5205_data_w(device, (data & 0x0f));
@@ -445,6 +426,7 @@ static ADDRESS_MAP_START( combatscb_sound_map, AS_PROGRAM, 8, combatsc_state )
 	AM_RANGE(0x9008, 0x9009) AM_DEVREAD_LEGACY("ymsnd", ym2203_r)					/* ??? */
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(combatscb_dac_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)						/* soundlatch_byte_r? */
+	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bl_abank")
 ADDRESS_MAP_END
 
 /*************************************
@@ -718,6 +700,12 @@ static MACHINE_START( combatsc )
 	state->save_item(NAME(state->m_sign));
 }
 
+static MACHINE_START( combatscb )
+{
+	combatsc_state *state = machine.driver_data<combatsc_state>();
+	MACHINE_START_CALL( combatsc );
+	state->membank("bl_abank")->configure_entries(0, 2, state->memregion("audiocpu")->base() + 0x8000, 0x4000);
+}
 
 static MACHINE_RESET( combatsc )
 {
@@ -805,11 +793,11 @@ static MACHINE_CONFIG_START( combatscb, combatsc_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80,3579545)	/* 3.579545 MHz */
 	MCFG_CPU_PROGRAM_MAP(combatscb_sound_map)
-	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4800) // controls BGM tempo
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,3800) // controls BGM tempo
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))
 
-	MCFG_MACHINE_START(combatsc)
+	MCFG_MACHINE_START(combatscb)
 	MCFG_MACHINE_RESET(combatsc)
 
 	/* video hardware */

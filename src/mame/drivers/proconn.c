@@ -21,6 +21,7 @@ class proconn_state : public driver_device
 public:
 	proconn_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_vfd(*this, "vfd"),
 		  m_maincpu(*this, "maincpu"),
 		  m_z80pio_1(*this, "z80pio_1"),
 		  m_z80pio_2(*this, "z80pio_2"),
@@ -32,6 +33,7 @@ public:
 		  m_ay(*this, "aysnd")
 	{ }
 
+	optional_device<roc10937_t> m_vfd;
 
 	DECLARE_WRITE8_MEMBER( ay_w0 ) { ay8910_address_data_w(m_ay, 0, data); }
 	DECLARE_WRITE8_MEMBER( ay_w1 ) { ay8910_address_data_w(m_ay, 1, data); }
@@ -258,10 +260,15 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 static WRITE8_DEVICE_HANDLER( serial_transmit )
 {
-//  if (offset == 0)
+	proconn_state *state = device->machine().driver_data<proconn_state>();
+
+//Don't like the look of this, should be a clock somewhere
+//  if (offset == 0)	
+//		state->m_vfd->write_char( data );
+
+	for (int i=0; i<8;i++)
 	{
-		ROC10937_newdata(0, data);
-		ROC10937_draw_16seg(0);
+		state->m_vfd->shift_data( (data & (1<<i))?0:1  );
 	}
 }
 
@@ -300,13 +307,8 @@ static const z80_daisy_config z80_daisy_chain[] =
 
 static MACHINE_RESET( proconn )
 {
-	ROC10937_reset(0);
-	ROC10937_draw_16seg(0);
-}
-
-static MACHINE_START( proconn )
-{
-	ROC10937_init(0, ROCKWELL10937,1);
+	proconn_state *state = machine.driver_data<proconn_state>();
+	state->m_vfd->reset();	// reset display1
 }
 
 static MACHINE_CONFIG_START( proconn, proconn_state )
@@ -314,7 +316,8 @@ static MACHINE_CONFIG_START( proconn, proconn_state )
 	MCFG_CPU_CONFIG(z80_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(proconn_map)
 	MCFG_CPU_IO_MAP(proconn_portmap)
-
+	MCFG_ROC10937_ADD("vfd",0,LEFT_TO_RIGHT)
+	
 	MCFG_Z80PIO_ADD( "z80pio_1", 4000000, pio_interface_1 ) /* ?? Mhz */
 	MCFG_Z80PIO_ADD( "z80pio_2", 4000000, pio_interface_2 ) /* ?? Mhz */
 	MCFG_Z80PIO_ADD( "z80pio_3", 4000000, pio_interface_3 ) /* ?? Mhz */
@@ -325,7 +328,6 @@ static MACHINE_CONFIG_START( proconn, proconn_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MCFG_MACHINE_START( proconn )
 	MCFG_MACHINE_RESET( proconn )
 
 	MCFG_DEFAULT_LAYOUT(layout_awpvid16)
@@ -448,7 +450,7 @@ ROM_START( pr_7hvn )
 	ROM_LOAD( "777 heaven pc90 8t 5c 5p (27512)", 0x0000, 0x010000, CRC(47214e06) SHA1(318f7d9891e7d37e2956c462bd04137af5bf972b) )
 	ROM_LOAD( "777 heaven pc90 v110 (27256)", 0x0000, 0x008000, CRC(2c7966a4) SHA1(67b10adf1440fd31e94c88b61f341734b381ca3f) )
 	ROM_LOAD( "777 heaven pc90 v23-0 (27256)", 0x0000, 0x008000, CRC(68c01ea5) SHA1(744346bedc54cda397f3974b93f932f1ffec4411) )
-	ROM_LOAD( "7775prb", 0x0000, 0x010000, CRC(cc6cb41e) SHA1(7b9e4d9cfdb4071c83081a1306ffa7e0be3938aa) )
+	ROM_LOAD( "7775prb", 0x0000, 0x010000, CRC(cc6cb41e) SHA1(7b9e4d9cfdb4071c83081a1306ffa7e0be3938aa) )//5p 3 pound cash 105
 	ROM_LOAD( "777620p", 0x0000, 0x008000, CRC(83f3f72e) SHA1(ffa8a63bd81b5d316d21b3834939318a4079e024) )
 	ROM_LOAD( "777h54", 0x0000, 0x010000, CRC(b813bec1) SHA1(3926b9cd9f452f3291ee26c14809b0a717c794b9) )
 	ROM_LOAD( "777hea5p", 0x0000, 0x008000, CRC(cbbccb11) SHA1(3ed9bc244bafdb059c2d7d0303cc3483a9f12d62) )
@@ -950,6 +952,21 @@ ROM_START( pr_qksht )
 ROM_END
 
 
+ROM_START( pr_sptb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "simplythebest091a20pn.bin", 0x0000, 0x010000, CRC(8402d11f) SHA1(bc10f29c546fda03e18238811956c56546fa8bef) ) // wrong hardware
+ROM_END
+
+ROM_START( pr_trktr )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "305a30pn.121", 0x00000, 0x010000, CRC(8ed1467c) SHA1(572a84bfaa5a2cef49404425058b96e1e0102cca) )
+ROM_END
+
+ROM_START( pr_trktp )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "305a30pn.990", 0x00000, 0x010000, CRC(5448e7d5) SHA1(81414083341364c011ab814a3f57d0831edb3036) )
+ROM_END
+
 DRIVER_INIT( proconn )
 {
 }
@@ -1004,11 +1021,14 @@ GAME( 199?, pr_sevml		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Sevens 
 GAME( 199?, pr_theme		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Theme Park (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_ttrai		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Treasure Trail (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_trpx			,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Triple X (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1999, pr_trktr		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Trick or Treat (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 1999, pr_trktp		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Trick or Treat (Protocol?) (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_walls		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Wall Street (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_whlft		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Wheel Of Fortune (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_wldkn		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Wild Kings (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_nifty		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Nifty Fifty (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_upnun		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Up & Under (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_sptb			,0			,proconn	,proconn	,proconn	,ROT0	,"Pcp", "Simply the Best (Pcp) (PROCONN?)",GAME_IS_SKELETON_MECHANICAL ) // not 100% sure this belongs here
 
 // Some of these are PC98 hardware.. I don't know how / if that differs
 GAME( 199?, pr_bears		,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear Streak (Coinworld)",GAME_IS_SKELETON_MECHANICAL )

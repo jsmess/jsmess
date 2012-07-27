@@ -548,7 +548,7 @@ INLINE UINT32 compute_spr(UINT32 spr)
     ppcdrc_init - initialize the processor
 -------------------------------------------------*/
 
-static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback)
+static void ppcdrc_init(powerpc_flavor flavor, UINT32 cap, int tb_divisor, legacy_cpu_device *device, device_irq_acknowledge_callback irqcallback)
 {
 	powerpc_state *ppc;
 	drcbe_info beinfo;
@@ -1486,6 +1486,10 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
 			{
 				UML_TEST(block, I0, 3);											// test    i0,3
 				UML_JMPc(block, COND_NZ, alignex = label++);									// jmp     alignex,nz
+
+				/* word aligned accesses need to be broken up */
+				UML_TEST(block, I0, 4);											// test    i0,4
+				UML_JMPc(block, COND_NZ, unaligned = label++);					// jmp     unaligned, nz
 			}
 
 			/* unaligned 2 and 4 byte accesses need to be broken up */
@@ -1768,6 +1772,33 @@ static void static_generate_memory_accessor(powerpc_state *ppc, int mode, int si
 				UML_CALLH(block, *masked);													// callh   masked
 				UML_SHR(block, I0, I0, 8);									// shr     i0,i0,8
 				UML_OR(block, I0, I0, mem(&ppc->impstate->tempdata.w.l));			// or      i0,i0,[tempdata]
+			}
+		}
+		else if (size == 8)
+		{
+			if (iswrite)
+			{
+				UML_MOV(block, mem(&ppc->impstate->tempaddr), I0);						// mov     [tempaddr],i0
+				UML_DMOV(block, mem(&ppc->impstate->tempdata.d), I1);					// dmov    [tempdata],i1
+				UML_DSHR(block, I1, I1, 32);											// dshr    i1,i1,32
+				UML_DMOV(block, I2, U64(0x00000000ffffffff));							// dmov    i2,0x00000000ffffffff
+				UML_CALLH(block, *masked);												// callh   masked
+				UML_ADD(block, I0, mem(&ppc->impstate->tempaddr), 4);					// add     i0,[tempaddr],4
+				UML_DSHL(block, I1, mem(&ppc->impstate->tempdata.d), 32);				// dshl    i1,[tempdata],32
+				UML_DMOV(block, I2, U64(0xffffffff00000000));							// dmov    i2,0xffffffff00000000
+				UML_CALLH(block, *masked);												// callh   masked
+			}
+			else
+			{
+				UML_MOV(block, mem(&ppc->impstate->tempaddr), I0);						// mov     [tempaddr],i0
+				UML_DMOV(block, I2, U64(0x00000000ffffffff));							// mov     i2,0x00000000ffffffff
+				UML_CALLH(block, *masked);												// callh   masked
+				UML_DSHL(block, mem(&ppc->impstate->tempdata.d), I0, 32);				// dshl    [tempdata],i0,32
+				UML_ADD(block, I0, mem(&ppc->impstate->tempaddr), 4);					// add     i0,[tempaddr],4
+				UML_DMOV(block, I2, U64(0xffffffff00000000));							// dmov    i2,0xffffffff00000000
+				UML_CALLH(block, *masked);												// callh   masked
+				UML_DSHR(block, I0, I0, 32);											// dshr    i0,i0,32
+				UML_DOR(block, I0, I0, mem(&ppc->impstate->tempdata.d));				// dor     i0,i0,[tempdata]
 			}
 		}
 		UML_RET(block);																		// ret
@@ -3593,6 +3624,11 @@ static int generate_instruction_1f(powerpc_state *ppc, drcuml_block *block, comp
 			return FALSE;
 
 		case 0x036:	/* DCBST */
+			UML_ADD(block, I0, R32Z(G_RA(op)), R32(G_RB(op)));							// add     i0,ra,rb
+			UML_MOV(block, mem(&ppc->param0), I0);										// mov     [param0],i0
+			UML_CALLC(block, (c_function)ppccom_dcstore_callback, ppc);
+			return TRUE;
+
 		case 0x056:	/* DCBF */
 		case 0x0f6:	/* DCBTST */
 		case 0x116:	/* DCBT */
@@ -4645,7 +4681,7 @@ CPU_GET_INFO( ppc603r )
 
 static CPU_INIT( ppc604 )
 {
-	ppcdrc_init(PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED, 4, device, irqcallback);
+	ppcdrc_init(PPC_MODEL_604, PPCCAP_OEA | PPCCAP_VEA | PPCCAP_FPU | PPCCAP_MISALIGNED | PPCCAP_604_MMU, 4, device, irqcallback);
 }
 
 

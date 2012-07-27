@@ -56,7 +56,7 @@ These are the specifications of the Axell AG-1 AX51102A, it should be very simil
 Drawing technique:               Sprite system
 Buffer drawing method:           Double frame buffer
 Configuration of the character:  Configured from 2 or more cells, a cell can be set in units of each dot a horizontal, vertical from 1 to 256 dots
-Maximum character size:          4096 ? 4096 dot
+Maximum character size:          4096 x 4096 dot
 Display the number of sprite:    Up to 127 sheets (register 2KB)
 Maximum drawing speed:           Dot sec / 2500-35000000 highest
 Color depth:                     32,768 colors (5 bits for each RGB)
@@ -66,7 +66,7 @@ Semi-transparent processing:     Gradation in the unit cell or 32 character
 Intensity modulation:            Gradation in the unit cell or 32 character
 Other Features:                  Rotation, DMA, BitBLT, Built-in flip
 Display resolution:              100 to 600 dots horizontal, 120 to 800 dots vertical
-Virtual screen size:             Up to 4096 ? 4096 dot
+Virtual screen size:             Up to 4096 x 4096 dot
 CGRAM space:                     4M-bit minimum, 32M-bit maximum
 Operating frequency:             Up to 76MHz
 Release:                         November 1999
@@ -250,30 +250,30 @@ static const ymz280b_interface ymz280b_intf =
 
 static INPUT_PORTS_START( gunpey )
 	PORT_START("DSW1")	// IN0 - 7f40
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x00, "Difficulty (vs. mode)" )
+	PORT_DIPNAME( 0x0c, 0x00, "Difficulty (vs. mode)" )	PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(    0x04, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x30, 0x00, "Matches (vs. mode)?" )
+	PORT_DIPNAME( 0x30, 0x00, "Matches (vs. mode)?" )	PORT_DIPLOCATION("SW1:5,6")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x20, "3" )
 	PORT_DIPSETTING(    0x30, "5" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW2")	// IN1 - 7f41
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
@@ -282,7 +282,7 @@ static INPUT_PORTS_START( gunpey )
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SW2:4,5,6")
 	PORT_DIPSETTING(    0x38, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )
@@ -291,10 +291,10 @@ static INPUT_PORTS_START( gunpey )
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 

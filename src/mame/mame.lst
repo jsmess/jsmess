@@ -1742,7 +1742,8 @@ rtypeleoj		// (c) 1992 Irem (Japan)
 inthunt			// (c) 1993 Irem (World)
 inthuntu		// (c) 1993 Irem (US)
 kaiteids		// (c) 1993 Irem (Japan)
-nbbatman		// (c) 1993 Irem America (US)
+nbbatman		// (c) 1993 Irem (World)
+nbbatmanu		// (c) 1993 Irem America (US)
 leaguemn		// (c) 1993 Irem (Japan)
 ssoldier		// (c) 1993 Irem America (US)
 psoldier		// (c) 1993 Irem (Japan)
@@ -1853,6 +1854,7 @@ lkageoo			// A54 (c) 1984 Taito Corporation
 lkageb			// bootleg
 lkageb2			// bootleg
 lkageb3			// bootleg
+skydest			// PD0 (c) 1985 Taito Corporation
 bygone			// prototype ? A53 (c) 1985 Taito Corporation
 msisaac			// A34 (c) 1985 Taito Corporation
 retofinv		// A37 (c) 1985 Taito Corporation
@@ -4351,6 +4353,8 @@ abcop			// 1990.?? A.B.Cop (World, FD1094, decrypted)
 				// 1990.10 GP Rider (Japan)
 gprider			// 1990.?? GP Rider (World, FD1094, decrypted)
 gprideru		// 1990.12 GP Rider (US, FD1094, decrypted)
+rascot			// 1991.?? Royal Ascot (Japan)
+
 
 // Y-Board
 				// 1988.05 Galaxy Force (Japan)
@@ -5497,6 +5501,7 @@ tumbleb			// bootleg
 tumbleb2		// bootleg
 jumpkids		// (c) 1993 Comad
 jumppop			// (c) 2001 ESD
+jumppope		// (c) 2001 Emag Soft (on original ESD 11-09-98 hardware)
 pangpang		// (c) 1994 Dong Gue La Mi Ltd.
 fncywld			// (c) 1996 Unico
 suprtrio		// (c) 1994 GameAce
@@ -7721,6 +7726,7 @@ deadang			// (c) 1988 Seibu Kaihatsu
 leadang			// (c) 1988 Seibu Kaihatsu
 ghunter			// (c) 1988 Seibu Kaihatsu + Segasa/Sonic license
 dynduke			// (c) 1989 Seibu Kaihatsu
+dyndukea		// (c) 1989 Seibu Kaihatsu
 dyndukej		// (c) 1989 Seibu Kaihatsu
 dyndukeu		// (c) 1989 Seibu Kaihatsu + Fabtek license
 dbldynj			// (c) 1989 Seibu Kaihatsu
@@ -8618,6 +8624,7 @@ dharma			// (c) 1994
 dharmak			// (c) 1994
 lastfort		// (c) 1994
 lastforte		// (c) 1994
+lastfortea		// (c) 1994
 lastfortk		// (c) 1994
 lastfortg		// (c) 1994
 toride2g		// (c) 1994
@@ -9361,6 +9368,7 @@ j2adnoteg
 j2adnoteh
 j2adnotei
 j2bankch	// Bank Chase (Jpm)
+j2bankrd	// Bank Raid (Jpm)
 j2bigbnk	// Big Banker (Jpm)
 j2bigbox	// Big Box (Jpm)
 j2bigbuk	// Big Buck$ (Jpm)
@@ -9375,6 +9383,7 @@ j2cashtk	// Cash Track (Jpm)
 j2cashtd	// Cash Track Deluxe (Jpm)
 j2coppot	// Copper Pot (Jpm)
 j2coprun	// Copper Run (Jpm)
+j2cprndx	// Copper Run Deluxe (Jpm)
 j2crkbnk	// Crack The Bank (Jpm)
 j2droplt	// Drop The Lot (Jpm)
 j2dropld	// Drop The Lot Deluxe (Jpm)
@@ -9386,6 +9395,7 @@ j2fqueen	// Find The Queen (Jpm)
 j2fiveal	// Five Alive (Jpm)
 j2fiveln	// Five Liner (Jpm) [Mps]
 j2fws		// Five Way Shuffle (Jpm)
+j2fwsa
 j2frmtch	// Fruit Match (Jpm)
 j2fullhs	// Full House Club (Jpm)
 j2ghostb	// Ghostbuster (Jpm)
@@ -9406,14 +9416,18 @@ j2kingcl	// King Of Clubs (Jpm)
 j2litean	// Lite A Nudge (Jpm)
 j2lovsht	// Loot Shoot (Jpm)
 j2lovshd	// Loot Shoot Deluxe (Jpm)
+j2luckar	// Lucky Arrows (Jpm)
 j2lucky2	// Lucky 2s (Jpm)
 j2monblt	// Money Belt (Jpm)
 j2mongam	// Money Game (Jpm)
 j2mongmd	// Money Game Deluxe (Jpm)
 j2multwn	// Multi Win (Jpm)
 j2notexc	// Note Exchange (Jpm)
+j2notexca
+j2notexcb
 j2notesh	// Note Shoot (Jpm)
 j2nudbnz	// Nudge Bonanza Deluxe (Jpm)
+j2nudbnza
 j2nuddup	// Nudge Double Up (Jpm)
 j2nuddud	// Nudge Double Up Deluxe (Jpm)
 j2nudup3	// Nudge Double Up MkIII (Jpm)
@@ -9425,6 +9439,7 @@ j2potlck	// Pot Luck (Jpm)
 j2pndrsh	// Pound Rush (Jpm)
 j2pyramd	// Pyramid (Jpm)
 j2reelbn	// Reel Bingo Club (Jpm)
+j2reelbna
 j2reelbo	// Reel Bonus (Jpm)
 j2reelmg	// Reel Magic (Jpm)
 j2reelmgd	// Reel Magic (Jpm) [Dutch]
@@ -9433,6 +9448,7 @@ j2reelmo	// Reel Money (Jpm) [Mps]
 j2rotnot	// Rota Note (Jpm)
 j2roulcl	// Roulette Club (Jpm)
 j2rdclb		// Royal Deal Club (Jpm)
+j2sldgld	// Solid Gold (Jpm)
 j2slvrgh	// Silver Ghost (Jpm)
 j2spcrsv	// Special Reserve (Jpm)
 j2stahed	// Streets Ahead (Jpm)
@@ -9469,6 +9485,7 @@ j2silvcl	// Silver Classic (Pcp)
 j2silvsh	// Silver Shot (Pcp)
 j2sstrea	// Supa Streak (Pcp)
 j2tstplt	// Test Pilot (Pcp)
+j2tstplta
 
 j2bonanz	// Bonanza (Eurocoin)
 j2supchy	// Super Cherry (Eurocoin)
@@ -10278,7 +10295,7 @@ cecmatch		// (c) 1993 Coastal Amusements
 f15se			// (c) 1991 Microprose Games Inc.
 f15se21			// (c) 1991 Microprose Games Inc.
 botss			// (c) 1992 Microprose Games Inc.
-botssa			// (c) 1992 Microprose Games Inc.
+botss11			// (c) 1992 Microprose Games Inc.
 tankbatl		// (c) 1992 Microprose Games Inc.
 dynadice		// ?
 atamanot		// (c) 1983 Yachiyo Denki / Uni Enterprize
@@ -11034,17 +11051,16 @@ wtiger			// (c) 2001
 
 // Aristocrat Mk6 hardware
 aristmk6
-antcleo
-50lions
-50lionsa
-choysun
-cristals
-indianmm
-wheregld
-whalecsh
-wildways
-thaiprin
-
+antcleo			// (c) 2004
+50lions			// (c) 2002
+50lionsa		// (c) 2003
+choysun			// (c) 2003
+crystals		// (c) 2003
+indianmm		// (c) 2003
+wheregld		// (c) 2004
+whalecsh		// (c) 2002
+wildways		// (c) 2003
+thaiprin		// (c) 2003
 
 // Eagle
 janshi
@@ -12069,6 +12085,8 @@ sc1clbtma
 sc1clbw		// Club Wise (Bellfruit)
 sc1clbwa
 sc1clbwb
+sc1cops 	// Cops 'n' Robbers (Bellfruit)
+sc1copsa
 sc1copdd	// Cops 'n' Robbers Deluxe (Bellfruit) [Dutch]
 sc1copdx	// Cops 'n' Robbers Deluxe (Bellfruit)
 sc1count	// Count Cash Club (Bellfruit)
@@ -17738,6 +17756,7 @@ mv1guac		// Give Us A Clue
 mv1guaca	//
 mv1sfx		// Special Effects
 mv1sfxa		//
+mv1sfx2
 mv1wc		// World Cup
 
 // Maygay 68K based SWP hardware
@@ -17962,6 +17981,7 @@ m3tst		// MPU3 Unit Test (Program 5) (Barcrest)
 
 m3autort	// Autoroute (Barcrest)
 m3big20j	// Big 20 Joker (Barcrest)
+m3biggam	// The Big Game (Barcrest)
 m3bigsht	// Big Shot (Barcrest)
 m3blkhle	// Black Hole (Barcrest)
 m3cabret	// Cabaret (Barcrest)
@@ -18062,6 +18082,7 @@ m4clr		// MPU4 Meter Clear ROM
 m4tenten	// 10 X 10 (Barcrest)
 m421club	// 21 Club (Barcrest)
 m4actbnk	// Action Bank (Barcrest)
+m4actbnka
 m4actclb	// Action Club (Barcrest)
 m4actnot	// Action Note (Barcrest)
 m4actpak	// Action Pack (Barcrest)
@@ -19338,99 +19359,552 @@ acefruit	// (c) 1982? ACE
 
 // Ace System 1
 
-ac1cshtw	// Cash Towers (Ace)
 ac1clbmn	// Club Money (Ace)
+ac1clbmna	//
 ac1gogld	// Go For Gold (Ace)
+ac1goglda	//
 ac1hotpf	// Hot Profit (Ace)
 ac1pster	// Pound Sterling (Ace)
 ac1pstrt	// Pound Stretcher (Pcp)
 ac1primt	// Primetime (Ace)
+ac1primta	//
 ac1taklv	// Take It Or Leave It (Ace)
-
 ac1bbclb	// Big Break Club (Ace)
+ac1bbclba	//
 ac1clbsv	// Club Sovereign (Ace)
 ac1clbxt	// Club Xtra (Ace)
+ac1clbxta	//
 ac1piaca	// Play It Again Casino (Ace)
 ac1piacl	// Play It Again Club (Ace)
+ac1piacla	//
+ac1piaclb	//
+ac1piaclc	//
 ac1prmcl	// Premier Club (Ace)
+ac1prmcla	//
+ac1prmclb	//
+ac1prmclc	//
 ac1rundx	// Runner Deluxe Club (Ace)
+ac1rundxa	//
 ac1totb		// Top Of The Bill (Ace)
-ac1sptb		// Simply The Best (Pcp)
 ac1shid		// Super Hi De Hi (Ace)
-
+ac1shida	//
+ac1bluec	// Blue Chip (Pcp)
+ac1blueca	//
+ac1bluecb	//
+ac1bluecc	//
+ac1bluecd	//
+ac1dbldx	// Double Deluxe (Pcp)
+ac1nudbk	// Nudge Break (Pcp)
+ac1nudbka	//
+ac1nudbkb	//
+ac1nudbkc	//
+ac1nudbkd	//
+ac1sstrk	// Starstruck (Pcp)
+ac1sstrka	//
+ac1sstrkb	//
+ac1xpres	// Xpress (Pcp)
+ac1roll		// Roll Up (Pcp)
+ac1rolla	//
+ac1rollb	//
+ac1hideh	// Hi De Hi Deluxe
+ac1hideha	//
 
 // Ace 'sp.ACE system'
 
 sp_cbowl		// Cash Bowl (Ace)
+sp_cbowla		//
+sp_cbowlb		//
+sp_cbowlc		//
+sp_cbowld		//
+sp_cbowle		//
+sp_cbowlf		//
+sp_cbowlg		//
+sp_cbowlh		//
+sp_cbowli		//
+sp_cbowlj		//
+sp_cbowlk		//
+sp_cbowll		//
+sp_cbowlm		//
+sp_cbowln		//
+sp_cbowlo		//
+sp_cbowlp		//
+sp_cbowlq		//
+sp_cbowlr		//
+sp_cbowls		//
+sp_cbowlt		//
+sp_cbowlu		//
 sp_crime		// Crime Watch (Ace)
+sp_crimea		//
+sp_crimeb		//
+sp_crimec		//
+sp_crimed		//
+sp_crimee		//
+sp_crimef		//
+sp_crimeg		//
+sp_crimeh		//
 sp_emmrd		// Emmerdale (Ace)
+sp_emmrda		//
+sp_emmrdb		//
+sp_emmrdc		//
+sp_emmrdd		//
+sp_emmrde		//
+sp_emmrdf		//
+sp_emmrdg		//
+sp_emmrdh		//
+sp_emmrdi		//
+sp_emmrdj		//
+sp_emmrdk		//
+sp_emmrdl		//
+sp_emmrdm		//
+sp_emmrdn		//
+sp_emmrdo		//
+sp_woolp		// Woolpack (Ace)
+sp_woolpa		//
+sp_woolpb		//
+sp_woolpc		//
+sp_woolpd		//
+sp_woolpe		//
+sp_woolpf		//
+sp_woolpg		//
+sp_woolph		//
+sp_woolpi		//
+sp_woolpj		//
+sp_woolpk		//
+sp_woolpl		//
+sp_woolpm		//
+sp_woolpn		//
+sp_woolpo		//
+sp_zigzg		// Zig Zag (Ace)
+sp_zigzga		//
+sp_zigzgb		//
+sp_zigzgc		//
+sp_zigzgd		//
+sp_zigzge		//
+sp_zigzgf		//
+sp_zigzgg		//
+sp_zigzgh		//
+sp_zigzgi		//
+sp_zigzgj		//
+sp_zigzgk		//
+sp_zigzgl		//
+sp_zigzgm		//
 sp_goldm		// Golden Mile (Ace)
+sp_goldma		//
+sp_goldmb		//
+sp_goldmc		//
+sp_goldmd		//
+sp_goldme		//
+sp_goldmf		//
+sp_goldmg		//
+sp_goldmh		//
+sp_goldmi		//
+sp_goldmj		//
+sp_goldmk		//
+sp_goldml		//
+sp_goldmm		//
+sp_goldmn		//
+sp_goldmo		//
+sp_goldmp		//
+sp_goldmq		//
+sp_goldmr		//
+sp_goldms		//
+sp_goldmt		//
+sp_goldmu		//
+sp_goldmv		//
+sp_goldmw		//
+sp_goldmx		//
+sp_goldmy		//
+sp_goldmz		//
+sp_goldm0		//
+sp_goldm1		//
+sp_goldm2		//
+sp_goldm3		//
 sp_gnat			// Grand National (Ace)
+sp_gnata		//
+sp_gnatb		//
+sp_gnatc		//
+sp_gnatd		//
+sp_gnate		//
+sp_gnatf		//
+sp_gnatg		//
+sp_gnath		//
+sp_gnati		//
+sp_gnatj		//
+sp_gnatk		//
+sp_gnatl		//
+sp_gnatm		//
+sp_gnatn		//
+sp_gnato		//
+sp_przna		// Prize National (Ace)
+sp_prznaa		//
+sp_prznab		//
+sp_prznac		//
+sp_prznad		//
+sp_prznae		//
+sp_prznaf		//
+sp_prznag		//
 sp_gprix		// Grand Prix (Ace)
+sp_gprixa		//
+sp_gprixb		//
+sp_gprixc		//
+sp_gprixd		//
+sp_gprixe		//
+sp_gprixf		//
+sp_gprixg		//
+sp_gprixh		//
 sp_hideh		// Hi De Hi (Ace)
+sp_hideha		//
+sp_hidehb		//
+sp_hidehc		//
+sp_hidehd		//
+sp_hidehe		//
+sp_hidehf		//
+sp_hidehg		//
+sp_hidehh		//
+sp_hidehi		//
+sp_hidehj		//
+sp_hidehk		//
+sp_hidehl		//
+sp_hidehm		//
+sp_hidehn		//
+sp_hideho		//
+sp_hidehp		//
 sp_hifly		// Hi Flyer (Ace) [Mps]
+sp_hiflya		//
+sp_hiflyb		//
+sp_hiflyc		//
+sp_hiflyd		//
+sp_hiflye		//
+sp_hiflyf		//
+sp_hiflyg		//
+sp_hiflyh		//
+sp_hiflyi		//
+sp_hiflyj		//
+sp_hiflyk		//
+sp_hiflyl		//
+sp_hiflym		//
+sp_hiflyn		//
+sp_hiflyo		//
+sp_hiflyp		//
 sp_juras		// Jurassic Trial (Ace)
 sp_openb		// Open The Box (Ace)
+sp_openba		//
+sp_openbb		//
+sp_openbc		//
+sp_openbd		//
+sp_openbe		//
+sp_openbf		//
+sp_openbg		//
+sp_openbh		//
+sp_openbi		//
 sp_payrs		// Payrise (Ace)
+sp_payrsa		//
+sp_payrsb		//
+sp_payrsc		//
+sp_payrsd		//
+sp_payrse		//
+sp_payrsf		//
+sp_payrsg		//
+sp_payrsh		//
 sp_playa		// Play It Again (Ace)
 sp_playaa		//
 sp_playab		//
+sp_playac		//
+sp_playad		//
+sp_playae		//
+sp_playaf		//
+sp_playag		//
+sp_playah		//
+sp_playai		//
 sp_spell		// Spellbound (Ace)
+sp_spella		//
+sp_spellb		//
+sp_spellc		//
+sp_spelld		//
+sp_spelle		//
+sp_spellf		//
+sp_spellg		//
+sp_spelli		//
+sp_spellj		//
 sp_swop			// Swop Shop (Ace)
+sp_swopa		//
+sp_swopb		//
+sp_swopc		//
+sp_swopd		//
+sp_swope		//
+sp_swopf		//
+sp_swopg		//
 sp_timem		// Time Machine (Ace)
+sp_timema		//
+sp_timemb		//
+sp_timemc		//
+sp_timemd		//
+sp_timeme		//
+sp_timemf		//
+sp_timemg		//
+sp_timemh		//
+sp_timemi		//
+sp_timemj		//
+sp_timemk		//
 sp_tz			// Twilight Zone (Ace)
+sp_tza			//
+sp_tzb			//
+sp_tzc			//
+sp_tzd			//
+sp_tze			//
+sp_tzf			//
+sp_tzg			//
+sp_tzh			//
 sp_tzbwb		//
 sp_tzfe			// Twilight Zone - Further Encounters (Ace)
-sp_beau			//Beau Peep (Ace)
-sp_bigbd		//Big Break Deluxe Club (Ace)
-sp_brkbk		//Break The Bank (Ace)
-sp_camel		//Camelot (Ace)
-sp_clbna		//Club National (Ace)
-sp_coder		//Code Red (Ace)
-sp_criss		//Criss Cross Cash (Ace)
-sp_daytr		//Daytripper (Ace)
-sp_donky		//Donkey Derby (Ace)
-sp_dyour		//Double Your Money (Ace)
-sp_festi		//Festival (Ace)
-sp_beau2		//Further Adventures Of Beau Peep (Ace)
-sp_ghost		//Ghost Trapper (Ace)
-sp_globe		//Globe Trotter (Ace)
-sp_gol			//Gol (Ace)
-sp_golda		//Golden Arrow Club (Ace)
-sp_golds		//Golden Streak (Ace)
-sp_goldt		//Golden Touch (Golden Streak?) (Ace)
-sp_here			//Here We Go (Ace)
-sp_holid		//Holiday Club (Ace)
-sp_lotto		//Lotto (Ace)
-sp_magmo		//Magic Money (Ace)
-sp_megmo		//Mega Money (Ace)
-sp_monma		//Money Magic (Ace)
-sp_monmo		//Money Mountain (Ace)
-sp_nudex		//Nudge Explosion (Ace)
-sp_onbox		//On The Box (Ace)
-sp_piste		//On The Piste (Ace)
-sp_pound		//Pound For Pound (Ace)
-sp_przna		//Prize National (Ace)
-sp_road			//Road To Hell (Ace)
-sp_skylm		//Sky's The Limit Club, The (Ace)
-sp_tkpik		//Take Your Pick (Ace)
-sp_woolp		//Woolpack (Emmerdale?) (Ace) // roms all contain Emmerdale strings??
-sp_zigzg		//Zig Zag (Emmerdale?) (Ace) // roms all contain Emmerdale strings??
-sp_cw			//Crime Watch (Ace)
-sp_atw
-sp_five
-sp_crun
-sp_carry
-sp_front
+sp_tzfea		//
+sp_tzfeb		//
+sp_tzfec		//
+sp_tzfed		//
+sp_tzfee		//
+sp_tzfef		//
+sp_tzfeg		//
+sp_tzfeh		//
+sp_tzfei		//
+sp_tzfej		//
+sp_tzfek		//
+sp_tzfel		//
+sp_tzfem		//
+sp_tzfen		//
+sp_tzfeo		//
+sp_tzfep		//
+sp_tzfeq		//
+sp_tzfer		//
+sp_tzfes		//
+sp_tzfet		//
+sp_tzfeu		//
+sp_beau			// Beau Peep (Ace)
+sp_beaua		// 
+sp_beaub		// 
+sp_beauc		// 
+sp_beaud		// 
+sp_beaue		// 
+sp_beauf		// 
+sp_beaug		// 
+sp_beauh		// 
+sp_bigbd		// Big Break Deluxe Club (Ace)
+sp_bigbda		//
+sp_brkbk		// Break The Bank (Ace)
+sp_brkbka		//
+sp_brkbkb		//
+sp_brkbkc		//
+sp_brkbkd		//
+sp_camel		// Camelot (Ace)
+sp_camela		//
+sp_camelb		//
+sp_camelc		//
+sp_cameld		//
+sp_camele		//
+sp_camelf		//
+sp_camelg		//
+sp_camelh		//
+sp_cameli		//
+sp_camelj		//
+sp_camelk		//
+sp_camell		//
+sp_camelm		//
+sp_cameln		//
+sp_camelo		//
+sp_clbna		// Club National (Ace)
+sp_clbnaa		//
+sp_coder		// Code Red (Ace)
+sp_codera		//
+sp_coderb		//
+sp_coderc		//
+sp_coderd		//
+sp_codere		//
+sp_coderf		//
+sp_coderg		//
+sp_criss		// Criss Cross Cash (Ace)
+sp_crissa		//
+sp_crissb		//
+sp_crissc		//
+sp_crissd		//
+sp_crisse		//
+sp_crissf		//
+sp_crissg		//
+sp_daytr		// Daytripper (Ace)
+sp_daytra		//
+sp_daytrb		//
+sp_daytrc		//
+sp_donky		// Donkey Derby (Ace)
+sp_donkya		//
+sp_donkyb		//
+sp_donkyc		//
+sp_donkyd		//
+sp_donkye		//
+sp_donkyf		//
+sp_donkyg		//
+sp_dyour		// Double Your Money (Ace)
+sp_festi		// Festival (Ace)
+sp_beau2		// Further Adventures Of Beau Peep (Ace)
+sp_beau2a		//
+sp_beau2b		//
+sp_beau2c		//
+sp_beau2d		//
+sp_beau2e		//
+sp_beau2f		//
+sp_ghost		// Ghost Trapper (Ace)
+sp_ghosta		//
+sp_ghostb		//
+sp_ghostc		//
+sp_ghostd		//
+sp_ghoste		//
+sp_ghostf		//
+sp_ghostg		//
+sp_ghosth		//
+sp_ghosti		//
+sp_ghostj		//
+sp_ghostk		//
+sp_ghostl		//
+sp_ghostm		//
+sp_ghostn		//
+sp_ghosto		//
+sp_ghostp		//
+sp_ghostq		//
+sp_ghostr		//
+sp_ghosts		//
+sp_globe		// Globe Trotter (Ace)
+sp_globea		//
+sp_globeb		//
+sp_globec		//
+sp_globed		//
+sp_globee		//
+sp_globef		//
+sp_globeg		//
+sp_gol			// Gol (Ace)
+sp_golda		// Golden Arrow Club (Ace)
+sp_goldaa		//
+sp_golds		// Golden Streak (Ace)
+sp_goldsa		// 
+sp_goldsb		// 
+sp_goldsc		// 
+sp_goldsd		// 
+sp_goldse		// 
+sp_goldsf		// 
+sp_goldsg		// 
+sp_goldsh		// 
+sp_goldt		// Golden Touch (Golden Streak) (Ace)
+sp_here			// Here We Go (Ace)
+sp_herea		//
+sp_hereb		//
+sp_herec		//
+sp_hered		//
+sp_heree		//
+sp_heref		//
+sp_hereg		//
+sp_holid		// Holiday Club (Ace)
+sp_holida		//
+sp_lotto		// Lotto (Ace)
+sp_magmo		// Magic Money (Ace)
+sp_magmoa		//
+sp_magmob		//
+sp_magmoc		//
+sp_magmod		//
+sp_megmo		// Mega Money (Ace)
+sp_megmoa		//
+sp_megmob		//
+sp_megmoc		//
+sp_megmod		//
+sp_megmoe		//
+sp_megmof		//
+sp_megmog		//
+sp_monma		// Money Magic (Ace)
+sp_monmaa		//
+sp_monmab		//
+sp_monmac		//
+sp_monmad		//
+sp_monmo		// Money Mountain (Ace)
+sp_monmoa		//
+sp_monmob		//
+sp_monmoc		//
+sp_monmod		//
+sp_monmoe		//
+sp_monmof		//
+sp_monmog		//
+sp_nudex		// Nudge Explosion (Ace)
+sp_nudexa		//
+sp_onbox		// On The Box (Ace)
+sp_onboxa		//
+sp_onboxb		//
+sp_onboxc		//
+sp_onboxd		//
+sp_onboxe		//
+sp_onboxf		//
+sp_onboxg		//
+sp_onboxh		//
+sp_onboxi		//
+sp_onboxj		//
+sp_onboxk		//
+sp_onboxl		//
+sp_onboxm		//
+sp_onboxn		//
+sp_piste		// On The Piste (Ace)
+sp_pistea		//
+sp_pisteb		//
+sp_pistec		//
+sp_pisted		//
+sp_pistee		//
+sp_pistef		//
+sp_pisteg		//
+sp_pisteh		//
+sp_pistei		//
+sp_pistej		//
+sp_pistek		//
+sp_pistel		//
+sp_pistem		//
+sp_pisten		//
+sp_pisteo		//
+sp_pistep		//
+sp_pound		// Pound For Pound (Ace)
+sp_pounda		//
+sp_poundb		//
+sp_poundc		//
+sp_poundd		//
+sp_pounde		//
+sp_poundf		//
+sp_poundg		//
+sp_poundh		//
+sp_poundi		//
+sp_poundj		//
+sp_poundk		//
+sp_poundl		//
+sp_poundm		//
+sp_poundn		//
+sp_poundo		//
+sp_poundp		//
+sp_poundbwb		//
+sp_poundbwba	//
+sp_poundbwbb	//
+sp_poundbwbc	//
+sp_poundbwbd	//
+sp_poundbwbe	//
+sp_poundbwbf	//
+sp_road			// Road To Hell (Ace)
+sp_skylm		// Sky's The Limit Club, The (Ace)
+sp_skylma		// 
+sp_tkpik		// Take Your Pick (Ace)
+sp_tkpika		//
+sp_tkpikb		//
+sp_tkpikc		//
+sp_tkpikd		//
+sp_tkpike		//
+sp_tkpikf		//
+sp_carry		// Carry On (PCP)
+sp_carrya		//
+sp_front		// Final Frontier (Bwb)
+sp_atw			// Around the World (Crystal)
+sp_five			// Fiver Fever (Crystal)
+sp_fivea		// 
+sp_crun			// Cash Run (Crystal)
+sp_cruna		//
+sp_crunb		//
 
-// Unknown PCP
-
-up_bluec		// Blue Chip (Pcp)
-up_dbldx		// Double Deluxe (Pcp)
-up_nudbk		// Nudge Break (Pcp)
-up_sstrk		// Starstruck (Pcp)
-up_xpres		// Xpress (Pcp)
-up_roll			// Roll Up (Pcp)
 
 // Project - PROCONN
 
@@ -19484,6 +19958,8 @@ pr_sevml		// Sevens & Melons (Project)
 pr_theme		// Theme Park (Project)
 pr_ttrai		// Treasure Trail (Project)
 pr_trpx			// Triple X (Project)
+pr_trktr		// Trick or Treat (Project)
+pr_trktp
 pr_walls		// Wall Street (Project)
 pr_whlft		// Wheel Of Fortune (Project)
 pr_wldkn		// Wild Kings (Project)
@@ -19495,6 +19971,7 @@ pr_fspot		// Fun Spot (Coinworld)
 pr_gnuc			// Golden Nugget (Coinworld)
 pr_magln		// Magic Lines (Coinworld)
 pr_swop			// Swop It (Ace)
+pr_sptb			// Simply The Best (Pcp)
 
 /* Astra */
 
@@ -21477,3 +21954,4 @@ nfsug                   // Need For Speed: Underground Install (2 Discs) (v1.1)
 
 // TTL logic games
 pong			// (c) 1972 Atari
+pongf			// (c) 1972 Atari - no subcycles

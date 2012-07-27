@@ -125,7 +125,24 @@ enum
 	PPC_IOCR,
 	PPC_TBL,
 	PPC_TBH,
-	PPC_DEC
+	PPC_DEC,
+
+	PPC_SR0,
+	PPC_SR1,
+	PPC_SR2,
+	PPC_SR3,
+	PPC_SR4,
+	PPC_SR5,
+	PPC_SR6,
+	PPC_SR7,
+	PPC_SR8,
+	PPC_SR9,
+	PPC_SR10,
+	PPC_SR11,
+	PPC_SR12,
+	PPC_SR13,
+	PPC_SR14,
+	PPC_SR15
 };
 
 
@@ -155,6 +172,7 @@ struct _powerpc_config
 	write32_device_func	dcr_write_func;
 };
 
+typedef void (*ppc_dcstore_handler)(device_t *device, UINT32 address);
 
 
 /***************************************************************************
@@ -167,6 +185,8 @@ void ppcdrc_add_hotspot(device_t *device, offs_t pc, UINT32 opcode, UINT32 cycle
 
 void ppc4xx_spu_set_tx_handler(device_t *device, ppc4xx_spu_tx_handler handler);
 void ppc4xx_spu_receive_byte(device_t *device, UINT8 byteval);
+
+void ppc_set_dcstore_callback(device_t *device, ppc_dcstore_handler handler);
 
 
 DECLARE_LEGACY_CPU_DEVICE(PPC403GA, ppc403ga);

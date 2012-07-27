@@ -137,63 +137,45 @@ class wardner_state : public twincobr_state
 public:
 	wardner_state(const machine_config &mconfig, device_type type, const char *tag)
 		: twincobr_state(mconfig, type,tag),
-		  m_rambase_ae00(*this, "rambase_ae00"),
-		  m_rambase_c000(*this, "rambase_c000") { }
+		  m_rambase_c000(*this, "rambase_c000")
+	{ 
+	}
 
-	required_shared_ptr<UINT8> m_rambase_ae00;
 	required_shared_ptr<UINT8> m_rambase_c000;
+	UINT8 *m_ROM;
+
 	DECLARE_WRITE8_MEMBER(wardner_ramrom_bank_sw);
+	DECLARE_READ8_MEMBER(wardner_bank_r);
 };
 
 
-WRITE8_MEMBER(wardner_state::wardner_ramrom_bank_sw)
+READ8_MEMBER( wardner_state::wardner_bank_r )
 {
-	if (m_wardner_membank != data) {
-		int bankaddress = 0;
+	if (m_wardner_membank == 0)
+	{
+		// RAM mapped (plus fallthroughs to bits of ROM bank 0)
+		int addr = offset + 0x8000;
 
-		address_space *mainspace;
-		UINT8 *RAM = memregion("maincpu")->base();
+		// 0x8000 - 0x8fff (sprites)
+		if ((addr >= 0x8000) && (addr < 0x9000))
+			return wardner_sprite_r(space, addr - 0x8000);
 
-		mainspace = machine().device("maincpu")->memory().space(AS_PROGRAM);
-		m_wardner_membank = data;
+		// 0xa000 - 0xafff (paletteram)
+		else if ((addr >= 0xa000) && (addr < 0xb000))
+			return m_generic_paletteram_8[addr - 0xa000];
 
-		if (data)
-		{
-			mainspace->install_read_bank(0x8000, 0xffff, "bank1");
-			switch (data)
-			{
-				case 2:  bankaddress = 0x10000; break;
-				case 3:  bankaddress = 0x18000; break;
-				case 4:  bankaddress = 0x20000; break;
-				case 5:  bankaddress = 0x28000; break;
-				case 7:  bankaddress = 0x38000; break;
-				case 1:  bankaddress = 0x08000; break; /* not used */
-				case 6:  bankaddress = 0x30000; break; /* not used */
-				default: bankaddress = 0x00000; break; /* not used */
-			}
-			membank("bank1")->set_base(&RAM[bankaddress]);
-		}
-		else
-		{
-			mainspace->install_read_handler(0x8000, 0x8fff, read8_delegate(FUNC(wardner_state::wardner_sprite_r),this));
-			mainspace->install_read_bank(0xa000, 0xadff, "bank4");
-			mainspace->install_read_bank(0xae00, 0xafff, "bank2");
-			mainspace->install_read_bank(0xc000, 0xc7ff, "bank3");
-			membank("bank1")->set_base(&RAM[0x0000]);
-			membank("bank2")->set_base(m_rambase_ae00);
-			membank("bank3")->set_base(m_rambase_c000);
-			membank("bank4")->set_base(m_generic_paletteram_8);
-		}
+		// 0xc000 - 0xc7ff (z80 shared ram)
+		else if ((addr >= 0xc000) && (addr < 0xc800))
+			return m_rambase_c000[addr - 0xc000];
 	}
+	
+	// ROM bank mapped
+	return m_ROM[m_wardner_membank * 0x8000 + offset];
 }
 
-void wardner_restore_bank(running_machine &machine)
+WRITE8_MEMBER(wardner_state::wardner_ramrom_bank_sw)
 {
-	wardner_state *state = machine.driver_data<wardner_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-
-	state->wardner_ramrom_bank_sw(*space,0,1);	/* Dummy value to ensure restoration */
-	state->wardner_ramrom_bank_sw(*space,0,state->m_wardner_membank);
+	m_wardner_membank = data & 7;
 }
 
 
@@ -202,13 +184,10 @@ void wardner_restore_bank(running_machine &machine)
 static ADDRESS_MAP_START( main_program_map, AS_PROGRAM, 8, wardner_state )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
 	AM_RANGE(0x7000, 0x7fff) AM_RAM
-
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1") /* Overlapped RAM/Banked ROM - See below */
-
+	AM_RANGE(0x8000, 0xffff) AM_READ(wardner_bank_r) /* Overlapped RAM/Banked ROM */
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(wardner_sprite_w) AM_SHARE("spriteram8")
 	AM_RANGE(0x9000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xadff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_le_w) AM_SHARE("paletteram")
-	AM_RANGE(0xae00, 0xafff) AM_RAM AM_SHARE("rambase_ae00")
+	AM_RANGE(0xa000, 0xafff) AM_WRITE(paletteram_xBBBBBGGGGGRRRRR_byte_le_w) AM_SHARE("paletteram")
 	AM_RANGE(0xb000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE("rambase_c000") /* Shared RAM with Sound Z80 */
 	AM_RANGE(0xc800, 0xffff) AM_ROM
@@ -422,7 +401,7 @@ static MACHINE_CONFIG_START( wardner, wardner_state )
 	/* Data Map is internal to the CPU */
 	MCFG_CPU_IO_MAP(DSP_io_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(6000))						/* 100 CPU slices per frame */
+	MCFG_QUANTUM_TIME(attotime::from_hz(6000))		/* 100 CPU slices per frame */
 
 	MCFG_MACHINE_RESET(wardner)
 
@@ -616,7 +595,9 @@ ROM_END
 
 static DRIVER_INIT( wardner )
 {
-	wardner_driver_savestate(machine);	/* Save-State stuff in src/machine/twincobr.c */
+	wardner_state *state = machine.driver_data<wardner_state>();
+	state->m_ROM = machine.root_device().memregion("maincpu")->base();
+	twincobr_driver_savestate(machine);	/* Save-State stuff in src/machine/twincobr.c */
 }
 
 

@@ -440,7 +440,7 @@ void mpu4_stepper_reset(mpu4_state *state)
 static MACHINE_RESET( mpu4 )
 {
 	mpu4_state *state = machine.driver_data<mpu4_state>();
-	ROC10937_reset(0);	/* reset display1 */
+	state->m_vfd->reset();
 
 	mpu4_stepper_reset(state);
 
@@ -612,6 +612,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic3_portb_w)
 		{
 			/* Some games (like Connect 4) use 'programmable' LED displays, built from light display lines in section 2. */
 			/* These are mostly low-tech machines, where such wiring proved cheaper than an extender card */
+			/* TODO: replace this with 'segment' lamp masks, to make it more generic */
 			UINT8 pled_segs[2] = {0,0};
 
 			static const int lamps1[8] = { 106, 107, 108, 109, 104, 105, 110, 133 };
@@ -643,7 +644,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic3_cb2_w)
 // DM Data pin A
 	if ( !state )
 	{
-		ROC10937_reset(0);
+		m_vfd->reset();
 	}
 }
 
@@ -790,16 +791,16 @@ READ8_MEMBER(mpu4_state::pia_ic4_portb_r)
 	if (!m_reel_mux)
 	{
 		if ( m_optic_pattern & 0x01 ) m_ic4_input_b |=  0x40; /* reel A tab */
-		else							   m_ic4_input_b &= ~0x40;
+		else						  m_ic4_input_b &= ~0x40;
 
 		if ( m_optic_pattern & 0x02 ) m_ic4_input_b |=  0x20; /* reel B tab */
-		else							   m_ic4_input_b &= ~0x20;
+		else						  m_ic4_input_b &= ~0x20;
 
 		if ( m_optic_pattern & 0x04 ) m_ic4_input_b |=  0x10; /* reel C tab */
-		else							   m_ic4_input_b &= ~0x10;
+		else						  m_ic4_input_b &= ~0x10;
 
 		if ( m_optic_pattern & 0x08 ) m_ic4_input_b |=  0x08; /* reel D tab */
-		else							   m_ic4_input_b &= ~0x08;
+		else						  m_ic4_input_b &= ~0x08;
 
 	}
 	else
@@ -814,7 +815,7 @@ READ8_MEMBER(mpu4_state::pia_ic4_portb_r)
 		}
 	}
 	if ( m_signal_50hz )			m_ic4_input_b |=  0x04; /* 50 Hz */
-	else								m_ic4_input_b &= ~0x04;
+	else							m_ic4_input_b &= ~0x04;
 
 	if (m_ic4_input_b & 0x02)
 	{
@@ -961,7 +962,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic5_porta_w)
 		if (mame_stricmp(machine().system().name, "m4gambal") == 0)
 		{
 		/* The 'Gamball' device is a unique piece of mechanical equipment, designed to
-        provide a truly fair hi-lo gamble for an AWP machine(). Functionally, it consists of
+        provide a truly fair hi-lo gamble for an AWP. Functionally, it consists of
         a ping-pong ball or similar enclosed in the machine's backbox, on a platform with 12
         holes. When the low 4 bytes of AUX1 are triggered, this fires the ball out from the
         hole it's currently in, to land in another. Landing in the same hole causes the machine to
@@ -971,7 +972,7 @@ WRITE8_MEMBER(mpu4_state::pia_ic5_porta_w)
         of making the game fair, short of simulating the physics of a bouncing ball ;)*/
 		if (data & 0x0f)
 		{
-			switch (machine().rand() & 0x2)
+			switch ((machine().rand()>>5) % 0x3)
 			{
 				case 0x00: //Top row
 				{
@@ -1340,12 +1341,6 @@ all eight meters are driven from this port, giving the 8 line driver chip
 	}
 }
 
-
-
-
-
-
-
 WRITE_LINE_MEMBER(mpu4_state::pia_ic7_ca2_w)
 {
 	mpu4_state *drvstate = machine().driver_data<mpu4_state>();
@@ -1430,11 +1425,10 @@ WRITE_LINE_MEMBER(mpu4_state::pia_ic8_cb2_w)
 	{
 		if (!m_alpha_clock)//falling edge
 		{
-			ROC10937_shift_data(0, m_alpha_data_line?0:1);
+			m_vfd->shift_data(m_alpha_data_line?0:1);
 		}
 	}
 	m_alpha_clock = state;
-	ROC10937_draw_16seg(0);
 }
 
 
@@ -1507,7 +1501,7 @@ READ8_MEMBER(mpu4_state::pia_gb_portb_r)
 	//
 
 	if ( okim6376_nar_r(msm6376) ) data |= 0x80;
-	else							data &= ~0x80;
+	else						   data &= ~0x80;
 
 	if ( okim6376_busy_r(msm6376) )	data |= 0x40;
 	else							data &= ~0x40;
@@ -2588,9 +2582,6 @@ void mpu4_config_common(running_machine &machine)
 	/* setup 8 mechanical meters */
 	MechMtr_config(machine,8);
 
-	/* setup the standard oki MSC1937 display */
-	ROC10937_init(0, MSC1937,0);
-
 }
 
 static void mpu4_config_common_reels(running_machine &machine,int reels)
@@ -2839,7 +2830,7 @@ READ8_MEMBER(mpu4_state::crystal_sound_r)
 {
 	return machine().rand();
 }
-
+//this may be a YMZ280B
 WRITE8_MEMBER(mpu4_state::crystal_sound_w)
 {
 	printf("crystal_sound_w %02x\n",data);
@@ -2895,6 +2886,7 @@ const ay8910_interface ay8910_config =
 MACHINE_CONFIG_FRAGMENT( mpu4_common )
 	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, attotime::from_hz(100))
 
+	MCFG_MSC1937_ADD("vfd",0,LEFT_TO_RIGHT)
 	/* 6840 PTM */
 	MCFG_PTM6840_ADD("ptm_ic2", ptm_ic2_intf)
 
@@ -3163,6 +3155,16 @@ ROM_START( m4actbnk )
 	ROM_LOAD( "abank.hex", 0x0000, 0x00a000, CRC(2cd1a269) SHA1(5ce22b2736844a2de6cda04abdd0fe435391e033) )
 	ROM_LOAD( "acty.p1", 0x0000, 0x010000, CRC(0ab8ff54) SHA1(7dc16ef1bbed2a5b2da3bf9eb4bbaf87b176954f) )
 	ROM_LOAD( "actad.p1", 0x0000, 0x010000, CRC(a8dfdf77) SHA1(92e9f0f3837e466c0c6d98b890234d80318ef236) )
+
+	ROM_REGION( 0x100000, "msm6376", 0 )
+	ROM_LOAD( "actsnd.p1", 0x000000, 0x080000, CRC(34777fea) SHA1(be784e73586719219ae5c1a3841f0e44edb6b497) )
+	ROM_LOAD( "actsnd.p2", 0x080000, 0x080000, CRC(2e832d40) SHA1(622b2c9694714446dbf67beb67d03af97d14ece7) )
+ROM_END
+
+ROM_START( m4actbnka )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ac30_prom2.bin", 0x0000, 0x04000, CRC(595615cd) SHA1(42d2028d11e2160c67f0dfde5a1ad805c0dc0fe1) )
+	ROM_LOAD( "ac30_prom1.bin", 0x4000, 0x08000, CRC(6765aef1) SHA1(4158bd2ff65434f040ef6505adc5026710031756) )
 
 	ROM_REGION( 0x100000, "msm6376", 0 )
 	ROM_LOAD( "actsnd.p1", 0x000000, 0x080000, CRC(34777fea) SHA1(be784e73586719219ae5c1a3841f0e44edb6b497) )
@@ -13736,9 +13738,12 @@ ROM_START( m4twstr )
 	ROM_LOAD( "fda103p.bin", 0x0000, 0x010000, CRC(61e9a21d) SHA1(940abedbbfaa40534c8be7136369cbf404e4c9a8) )
 	ROM_LOAD( "fds103.bin", 0x0000, 0x010000, CRC(4282cba9) SHA1(a664d342482e50604f9a585a1887f342b95caf00) )
 	ROM_LOAD( "fds103p.bin", 0x0000, 0x010000, CRC(764bd0a8) SHA1(cea826c94ce28ab3e47071846756a7e1effa5d1b) )
+	ROM_LOAD( "twisterprog.bin", 0x0000, 0x010000, CRC(96209a3e) SHA1(434aa824a517929d9ace959b06f2d38464a54541) )
 
+	
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	ROM_LOAD( "twistersound.bin", 0x000000, 0x100000, CRC(5aa2729b) SHA1(cf490ec6c75c038addcff24655cd6e498cad60c1) )
+	
 ROM_END
 
 
@@ -13752,7 +13757,7 @@ ROM_START( m4twstcl )
 	ROM_LOAD( "fl106p.bin", 0x0000, 0x010000, CRC(93dd36e7) SHA1(eded1b5748cb24af80ab392a5fd4d2cc312a66a2) )
 
 	ROM_REGION( 0x100000, "msm6376", ROMREGION_ERASE00 )
-	/* missing? */
+	ROM_LOAD( "twistersound.bin", 0x000000, 0x100000, CRC(5aa2729b) SHA1(cf490ec6c75c038addcff24655cd6e498cad60c1) )//From original, may be wrong
 ROM_END
 
 
@@ -15216,7 +15221,8 @@ GAME( 198?, m4clr,        0, mod2    ,   mpu4,       0,       ROT0, "Barcrest","
 /* I don't actually think all of these are Barcrest, some are mislabeled */
 GAME(199?, m4tenten	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","10 X 10 (Barcrest) (MPU4)",						GAME_FLAGS|GAME_NO_SOUND )  // gives WRONG SOUND, NEEDS V1 (can be skipped with 1)
 GAME(199?, m421club	,0			,mod4yam	,mpu4				,m4default			,ROT0,   "Barcrest","21 Club (Barcrest) [DTW, Dutch] (MPU4)",						GAME_FLAGS|GAME_NO_SOUND ) // not english
-GAME(199?, m4actbnk	,0			,mod4oki	,mpu4jackpot8tkn	,m4default			,ROT0,   "Barcrest","Action Bank (Barcrest) [ACT] (MPU4)",						GAME_FLAGS ) // set jackpot key to 8GBP TOKEN
+GAME(199?, m4actbnk	,0			,mod4oki	,mpu4jackpot8tkn	,m4default			,ROT0,   "Barcrest","Action Bank (Barcrest) [ACT] (set 1) (MPU4)",						GAME_FLAGS ) // set jackpot key to 8GBP TOKEN
+GAME(199?, m4actbnka,m4actbnk	,mod4oki	,mpu4jackpot8tkn	,m4default			,ROT0,   "Barcrest","Action Bank (Barcrest) [ACT] (set 2) (MPU4)",						GAME_FLAGS ) // set jackpot key to 8GBP TOKEN
 GAME(199?, m4actclb	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Action Club (Barcrest) (MPU4)",						GAME_FLAGS )
 GAME(199?, m4actnot	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Action Note (Barcrest) [AN 1.2] (MPU4)",						GAME_FLAGS )
 GAME(199?, m4actpak	,0			,mod2   	,mpu4				,m4default			,ROT0,   "Barcrest","Action Pack (Barcrest) (MPU4)",						GAME_FLAGS )
@@ -15685,10 +15691,10 @@ GAME(199?, m4hisprtb, m4hisprt,	mod4oki, mpu4, m4default, ROT0,   "Empire","High
 GAME(199?, m4hisprtc, m4hisprt,	mod4oki, mpu4, m4default, ROT0,   "Empire","High Spirits (Empire) (MPU4, set 4)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4hisprtd, m4hisprt,	mod4oki, mpu4, m4default, ROT0,   "Empire","High Spirits (Empire) (MPU4, set 5)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4hisprte, m4hisprt,	mod4oki, mpu4, m4default, ROT0,   "Empire","High Spirits (Empire) (MPU4, set 6)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4hotcsh,  0,		mod4oki, mpu4, m4default, ROT0,   "Empire","Hot Cash (Empire) (MPU4, set 1)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4hotcsha, m4hotcsh, mod4oki, mpu4, m4default, ROT0,   "Empire","Hot Cash (Empire) (MPU4, set 2)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4hotcshb, m4hotcsh,	mod4oki, mpu4, m4default, ROT0,   "Empire","Hot Cash (Empire) (MPU4, set 3)",   GAME_FLAGS|GAME_NO_SOUND )
-GAME(199?, m4hotcshc, m4hotcsh,	mod4oki, mpu4, m4default, ROT0,   "Empire","Hot Cash (Empire) (MPU4, set 4)",   GAME_FLAGS|GAME_NO_SOUND )
+GAME(1996, m4hotcsh,  0,		mod4oki, mpu4, m4default, ROT0,   "Empire","Hot Cash (Empire) (MPU4, set 1)",   GAME_FLAGS|GAME_NO_SOUND )
+GAME(1996, m4hotcsha, m4hotcsh, mod4oki, mpu4, m4default, ROT0,   "Empire","Hot Cash (Empire) (MPU4, set 2)",   GAME_FLAGS|GAME_NO_SOUND )
+GAME(1996, m4hotcshb, m4hotcsh,	mod4oki, mpu4, m4default, ROT0,   "Empire","Hot Cash (Empire) (MPU4, set 3)",   GAME_FLAGS|GAME_NO_SOUND )
+GAME(1996, m4hotcshc, m4hotcsh,	mod4oki, mpu4, m4default, ROT0,   "Empire","Hot Cash (Empire) (MPU4, set 4)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4monspn,  0,		mod4oki, mpu4, m4default, ROT0,   "Empire","Money Spinner (Empire) (MPU4, set 1)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4monspna, m4monspn,	mod4oki, mpu4, m4default, ROT0,   "Empire","Money Spinner (Empire) (MPU4, set 2)",   GAME_FLAGS|GAME_NO_SOUND )
 GAME(199?, m4monspnb, m4monspn,	mod4oki, mpu4, m4default, ROT0,   "Empire","Money Spinner (Empire) (MPU4, set 3)",   GAME_FLAGS|GAME_NO_SOUND )
