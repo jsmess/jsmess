@@ -20,11 +20,15 @@
 
 // screen parameters
 #define SCREEN_WIDTH				232
+#define SCREEN_HEIGHT				262
+#define VISAREA_WIDTH				193
 #define VBLANK_WIDTH				21
 #define HBLANK_WIDTH				39
 #define HSYNC_WIDTH					18
 #define HFP_WIDTH					16
 #define HBP_WIDTH					5
+#define HBLANK_END					HSYNC_WIDTH + HFP_WIDTH
+#define HBLANK_START				HBLANK_END + VISAREA_WIDTH
 
 
 // write-only registers
@@ -163,6 +167,9 @@ void uv201_device::device_start()
 void uv201_device::device_reset()
 {
 	m_out_ext_int_func(CLEAR_LINE);
+	
+	m_out_hblank_func(1);
+	m_timer_hblank_off->adjust(attotime::from_ticks( HBLANK_END, m_clock ));
 }
 
 
@@ -172,16 +179,34 @@ void uv201_device::device_reset()
 
 void uv201_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if ((m_cmd & COMMAND_INT) && !(m_cmd & COMMAND_FRZ))
+	int scanline = m_screen->vpos();
+
+	switch (id)
 	{
-		int scanline = get_field_vpos();
+	case TIMER_Y_ODD:
+	case TIMER_Y_EVEN:
+		if ((m_cmd & COMMAND_INT) && !(m_cmd & COMMAND_FRZ))
+		{
+			if (LOG) logerror("Y-Interrupt at scanline %u\n", scanline);
 
-		if (LOG) logerror("Y-Interrupt at scanline %u\n", scanline);
+			m_freeze_y = scanline;
 
-		m_freeze_y = scanline;
+			m_out_ext_int_func(ASSERT_LINE);
+			m_out_ext_int_func(CLEAR_LINE);
+		}
+		break;
 
-		m_out_ext_int_func(ASSERT_LINE);
-		m_out_ext_int_func(CLEAR_LINE);
+	case TIMER_HBLANK_ON:
+		m_out_hblank_func(1);
+
+		m_timer_hblank_off->adjust(attotime::from_ticks( HBLANK_WIDTH, m_clock ) );
+		break;
+
+	case TIMER_HBLANK_OFF:
+		m_out_hblank_func(0);
+
+		m_timer_hblank_on->adjust(attotime::from_ticks( VISAREA_WIDTH, m_clock ) );
+		break;
 	}
 }
 
@@ -234,10 +259,10 @@ int uv201_device::get_field_vpos()
 {
 	int vpos = m_screen->vpos();
 
-	if (vpos >= 262)
+	if (vpos >= SCREEN_HEIGHT)
 	{
 		// even field
-		vpos -= 262;
+		vpos -= SCREEN_HEIGHT;
 	}
 
 	return vpos;
@@ -250,7 +275,7 @@ int uv201_device::get_field_vpos()
 
 int uv201_device::get_field()
 {
-	return m_screen->vpos() < 262;
+	return m_screen->vpos() < SCREEN_HEIGHT;
 }
 
 
@@ -263,7 +288,7 @@ void uv201_device::set_y_interrupt()
 	int scanline = ((m_cmd & COMMAND_YINT_H_O) << 1) | m_y_int;
 
 	m_timer_y_odd->adjust(m_screen->time_until_pos(scanline), 0, m_screen->frame_period());
-	//m_timer_y_even->adjust(m_screen->time_until_pos(scanline + 262), 0, m_screen->frame_period());
+	//m_timer_y_even->adjust(m_screen->time_until_pos(scanline + SCREEN_HEIGHT), 0, m_screen->frame_period());
 }
 
 
@@ -480,9 +505,9 @@ UINT32 uv201_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		return 0;
 	}
 
-	for (int y = 0; y < 262; y++)
+	for (int y = 0; y < SCREEN_HEIGHT; y++)
 	{
-		for (int x = 0; x < 193; x++)
+		for (int x = 0; x < VISAREA_WIDTH; x++)
 		{
 			int pixel = m_bg;
 			DRAW_PIXEL(y, x);
@@ -512,7 +537,7 @@ UINT32 uv201_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 		if (LOG) logerror("Object %u xord %u y %u x %u dy %u dx %u xcopy %u color %u rp %04x\n", i, xord, y, x, dy, dx, xcopy, color, rp);
 
 		if (rp == 0) continue;
-		if (y > 262) continue;
+		if (y > SCREEN_HEIGHT) continue;
 
 		for (int sy = 0; sy < dy; sy++)
 		{
