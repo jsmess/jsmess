@@ -415,7 +415,7 @@ static void dump_buffer(UINT8 *buffer, UINT16 length) {
 	}
 	if(offset % 16)
 		logerror("%.*s", (16 - (offset % 16)) * 3, "                                                     ");
-	logerror("%.*s\n", offset % 16 ? offset % 16 : 16, ascii_dump);
+	logerror("%.*s\n", (offset % 16) ? (offset % 16) : 16, ascii_dump);
 }
 
 
