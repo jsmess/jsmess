@@ -1247,16 +1247,41 @@ WRITE8_DEVICE_HANDLER( mc1502_wd17xx_aux_w )
 
 	// SIDE ONE
 	wd17xx_set_side(device, BIT(data, 1));
+
+	// bits 2, 3 -- motor on (drive 0, 1)
+
+	// DRIVE SEL
+	wd17xx_set_drive(device, BIT(data, 4));
 }
 
+/*
+ * Accesses to this port block (halt the CPU until DRQ, INTRQ or MOTOR ON)
+ */
 READ8_DEVICE_HANDLER( mc1502_wd17xx_drq_r )
 {
 	UINT8 data;
+	UINT64 newpc;
 
 	data = wd17xx_drq_r(device);
+	if (!data && !wd17xx_intrq_r(device)) {
+		/* fake cpu halt by resetting PC one insn back */
+		newpc = cpu_get_reg( device->machine().firstcpu, STATE_GENPC );
+		cpu_set_reg( device->machine().firstcpu, STATE_GENPC, newpc - 1 );
+	}
 
 	return data;
 }
+
+READ8_DEVICE_HANDLER( mc1502_wd17xx_motor_r )
+{
+	UINT8 data;
+
+	/* fake motor being always on */
+	data = 1;
+
+	return data;
+}
+
 
 /**********************************************************
  *
@@ -1428,7 +1453,7 @@ MACHINE_RESET( pc )
 	st->m_u73_q2 = 0;
 	st->m_out1 = 0;
 	st->m_pc_spkrdata = 0;
-	st->m_pc_input = 0;
+	st->m_pc_input = 1;
 	st->m_dma_channel = 0;
 	memset(st->m_dma_offset,0,sizeof(st->m_dma_offset));
 	st->m_ppi_portc_switch_high = 0;
@@ -1490,7 +1515,7 @@ MACHINE_RESET( pcjr )
 	st->m_u73_q2 = 0;
 	st->m_out1 = 0;
 	st->m_pc_spkrdata = 0;
-	st->m_pc_input = 0;
+	st->m_pc_input = 1;
 	st->m_dma_channel = 0;
 	memset(st->m_memboard,0xc,sizeof(st->m_memboard));	// check
 	memset(st->m_dma_offset,0,sizeof(st->m_dma_offset));
