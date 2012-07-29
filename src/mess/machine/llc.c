@@ -18,29 +18,15 @@ static READ8_DEVICE_HANDLER (llc1_port2_b_r)
 {
 	llc_state *state = device->machine().driver_data<llc_state>();
 	UINT8 retVal = 0;
-	if (state->m_s_code!=0)
+
+	if (state->m_term_status)
 	{
-		if (state->m_llc1_key_state == 0)
-		{
-			state->m_llc1_key_state = 1;
-			retVal = 0x5F;
-		}
-		else
-		if (state->m_llc1_key_state == 1)
-		{
-			state->m_llc1_key_state++;
-		}
-		else
-		{
-			state->m_llc1_key_state = 0;
-			retVal = state->m_s_code;
-			state->m_s_code =0;
-		}
+		retVal = state->m_term_status;
+		state->m_term_status = 0;
 	}
 	else
-	{
-		state->m_llc1_key_state = 0;
-	}
+		retVal = state->m_term_data;
+
 	return retVal;
 }
 
@@ -69,11 +55,6 @@ static WRITE8_DEVICE_HANDLER (llc1_port1_a_w)
 {
 	llc_state *state = device->machine().driver_data<llc_state>();
 	state->m_porta = data;
-}
-
-static READ8_DEVICE_HANDLER (llc1_port1_b_r)
-{
-	return 0;
 }
 
 static WRITE8_DEVICE_HANDLER (llc1_port1_b_w)
@@ -116,7 +97,7 @@ Z80PIO_INTERFACE( llc1_z80pio1_intf )
 	DEVCB_HANDLER(llc1_port1_a_r),
 	DEVCB_HANDLER(llc1_port1_a_w),
 	DEVCB_NULL,
-	DEVCB_HANDLER(llc1_port1_b_r),
+	DEVCB_NULL,
 	DEVCB_HANDLER(llc1_port1_b_w),
 	DEVCB_NULL
 };
@@ -140,36 +121,8 @@ MACHINE_RESET( llc1 )
 {
 }
 
-static TIMER_CALLBACK(keyboard_callback)
-{
-	llc_state *state = machine.driver_data<llc_state>();
-	int i,j;
-	UINT8 c;
-	static const char *const keynames[] = {
-		"LINE0", "LINE1", "LINE2", "LINE3", "LINE4",
-		"LINE5", "LINE6", "LINE7", "LINE8", "LINE9", "LINE10", "LINE11"
-	};
-
-	for(i = 0; i < 12; i++)
-	{
-		c = machine.root_device().ioport(keynames[i])->read();
-		if (c != 0)
-		{
-			for(j = 0; j < 8; j++)
-			{
-				if (c == (1 << j))
-				{
-					state->m_s_code = j + i*8;
-					break;
-				}
-			}
-		}
-	}
-}
-
 MACHINE_START(llc1)
 {
-	machine.scheduler().timer_pulse(attotime::from_hz(5), FUNC(keyboard_callback));
 }
 
 Z80CTC_INTERFACE( llc2_ctc_intf )

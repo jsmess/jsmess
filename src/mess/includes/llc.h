@@ -18,12 +18,13 @@ public:
 		m_video_ram(*this, "video_ram"){ }
 
 	optional_shared_ptr<UINT8> m_video_ram;
-	UINT8 m_s_code;
-	UINT8 m_llc1_key_state;
 	DECLARE_WRITE8_MEMBER(llc2_rom_disable_w);
 	DECLARE_WRITE8_MEMBER(llc2_basic_enable_w);
-//private:
+	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_porta;
+	UINT8 m_term_data;
+	UINT8 m_term_status;
+private:
 };
 
 
