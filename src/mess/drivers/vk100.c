@@ -966,12 +966,33 @@ i.e. addr bits 9876543210
 	ROM_LOAD( "wb---0_060b1.6309.pr2.ic77", 0x0000, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label verified from nigwil's board
 
 	ROM_REGION( 0x400, "proms", ROMREGION_ERASEFF )
-	// not sure what this prom is, it may relate somehow to addressing or modifying vram, or the systat b register. (256*4, 82s129)
+	/* some sort of synchronizer or counter rom (256*4, 82s129)
+	 * control bits:
+	 *            /CE1 ----- ?
+	 *            /CE2 ----- ?
+	 * addr bits: 76543210
+	 *            |||||||\-- ?
+	 *            ||||||\--- ?
+	 *            |||||\---- ?
+	 *            ||||\----- ?
+	 *            |||\------ ?
+	 *            ||\------- ?
+	 *            |\-------- ?
+	 *            \--------- Connects to the SYNC ROM A4 (what drives this?)
+	 * data bits: 3210
+	 *            |||\-- ?
+	 *            ||\--- ?
+	 *            |\---- ?
+	 *            \----- ?
+	 */
 	ROM_LOAD( "wb8151_573a2.6301.pr3.ic44", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4)) // label verified from nigwil's and andy's board
 	/* this is the "DIRECTION ROM"  == mb6309 (256x8, 82s135)
 	 * see figure 5-24 on page 5-39
 	 * It tells the direction and enable for counting on the X and Y counters
 	 * and also handles the non-math related parts of the bresenham line algorithm
+	 * control bits:
+	 *            /CE1 ----- ?
+	 *            /CE2 ----- ?
 	 * addr bits: 76543210
 	 *            ||||\\\\-- DIR (vgDIR register low 4 bits)
 	 *            |||\------ ERROR CARRY (strobed in by STROBE L from the error counter's adder)
@@ -992,43 +1013,62 @@ i.e. addr bits 9876543210
 	/* this is the "VECTOR ROM" (256*8, 82s135) which runs the vector generator state machine
 	 * the vector rom bits are complex and are unfortunately poorly documented
 	 * in the tech manual. see figure 5-23.
+	 * control bits:
+	 *            /CE1 ----- ?
+	 *            /CE2 ----- ?
 	 * addr bits: 76543210
 	 *            ||||\\\\-- To sync counter, which counts 0xC 0x3 0x2 0x1 0x0 0x5 0x4 0xB 0xA 0x9 0x8 0xD in that order
-	 *            ||\\------ VG_MODE 
+	 *            |||\------ A0\__Address lsb bits of the execute write, i.e. VG_MODE
+	 *            ||\------- A1/
 	 *            |\-------- CARRY_IN (when set, only one /LD ERROR pulse occurs instead of two)
 	 *            \--------- ? possibly tied or somehow pulsed by sync rom d7? /LD ERROR only goes active (low) when this is unset
 	 *
 	 * data bits: 76543210
-	 *            |||||||\-- WRITE (fig 5-20, page 5-32)
-	 *            ||||||\--- ? MAYBE related to the dir rom PIXEL WRT or an active low /CLR on the WRT L line [active low, sync addr 011]
-	 *            |||||\---- ? MAYBE related to the dir rom PIXEL WRT or an active low /CLR on the WRT L line [active low, sync addr 011]
-	 *            ||||\----- /LD ERROR (strobes a value into the vgERR register)
-	 *            |||\------ likely CLK ERROR, also strobes a value into the vgERR register but from the adder and not the bus
-	 *            ||\------- ? possibly drives a4 on the sync rom, only low for VG_MOVE?
-	 *            |\-------- C0 (high during DVM read, low otherwise)
-	 *            \--------- ? (active low at same cycle as bit 4)
+	 *            |||||||\-- /WRITE aka WRITE L (fig 5-20, page 5-32, writes the post-pattern-converted value back to vram at X,Y)
+	 *            ||||||\--- ? vector clk 
+	 *            |||||\---- ? vector clk
+	 *            ||||\----- /LD ERROR aka STROBE ERROR L (strobes the adder result value into the vgERR register)
+	 *            |||\------ ? d-load?
+	 *            ||\------- ERASE L (forces a4 on the sync rom low and maybe drives /WE low to make the crtc refresh blank all of ram)
+	 *            |\-------- C0 aka C IN (high during DVM read, low otherwise, likely a carry in to the adder so DVM is converted from 1s to 2s complement)
+	 *            \--------- ? done l?
+	 *
+	 * According to the vt125 tech manual (vt100 tech manual rev 3, page 6-85) the 8 signals here are:
+	 * ERASE L - d5
+	 * SHIFT ENA
+	 * C IN - d6
+	 * D LOAD
+	 * WRITE L - d0
+	 * DONE L
+	 * VECTOR CLK
+	 * STROBE ERROR L - d3
 	 */
 	ROM_LOAD( "wb8146_058b1.6309.pr1.ic99", 0x0200, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))  // label verified from nigwil's and andy's board
 	/* this is the "SYNC ROM" == mb6331 (32x8, 82s123)
 	 * It generates the ram RAS/CAS and a few other signals, see figure 5-20 on page 5-32
 	 * The exact pins for each signal are not documented.
+	 * control bits:
+	 *            /CE1 -- GND(Unused)
 	 * addr bits: 43210
 	 *            |\\\\-- To sync counter, which counts 0xC 0x3 0x2 0x1 0x0 0x5 0x4 0xB 0xA 0x9 0x8 0xD in that order
-	 *            \------ likely tied to /RESET, /GO, vblank, or possibly a read of SYSTAT A or writes to the vector regs
+	 *            \------ from vector rom d5, only low during VG_MODE == ER (ERase Screen)
 	 *                      when high: the sync rom matches figure 5-20 (page 5-32) and 5-23 (page 5-38)
 	 *                      when low: RA/RB is fixed on WOPS in the register file
-	 *                                LD SHFR does NOT output pulses
-	 *                                WRT/RD is held at /RD so writes to vram do nothing
-	 *                    it is also possible this is tied to vector rom d5
+	 *                                LD SHFR does NOT output pulses (effectively blanking the screen)
+	 *                                WRT/RD is held at /RD so vg to vram do nothing,
+	 *                                however while the crtc is refreshing the screen it instead is writing zeroes to every location
 	 * data bits: 76543210
 	 *            |||||||\-- WRT/RD (write high when x,y (vg) drives vram, read low when ma (crtc) drives vram)
-	 *            ||||||\--- /RAS
-	 *            |||||\---- STROBE aka STROBE L
-	 *            ||||\----- LD SHFR
-	 *            |||\------ /CAS
+	 *            ||||||\--- /RAS (for vram)
+	 *            |||||\---- STROBE aka STROBE L aka VG STROBE(latches the carry bit from the adder to the direction rom AND causes the data at the X,Y address of vram to be read into the holding register before pattern is applied)
+	 *            ||||\----- LD SHFR (loads the 12-bit shift register of data to be shifted to screen)
+	 *            |||\------ /CAS (for vram)
 	 *            ||\------- RA\__selects which slot of the 8x4 register file (du, dvm, dir, or wops) is selected
 	 *            |\-------- RB/
-	 *            \--------- vector rom "write signal"? (mentioned on page 5-35 last paragraph?) (this is off by one cycle though...) [active low, sync addr 011]
+	 *            \--------- VG vector rom "enable"? (mentioned on page 5-31 last paragraph?) (this is off by one cycle though...) [active low, sync addr 011]
+	 *                       This may actually have to do with gating the DCNT DONE L signal to make the FINISH signal which unsets the /GO register
+	 * The VT125 proms E64/E66 and their respective latches E65 and E83 are roughly
+	 * but not completely equivalent to the sync rom
 	 */
 	ROM_LOAD( "wb8-14_297a1.74s288.pr6.ic89", 0x0300, 0x0020, CRC(e2f7c566) SHA1(a4c3dc5d07667141ad799168a862cb3c489b4934)) // label verified from nigwil's and andy's board
 ROM_END
