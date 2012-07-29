@@ -62,7 +62,7 @@ static READ8_DEVICE_HANDLER (llc1_port1_a_r)
 	if (data & 0xf0)
 		data = (data >> 4) | 0x80;
 
-	return data;
+	return data | (state->m_porta & 0x70);
 }
 
 static WRITE8_DEVICE_HANDLER (llc1_port1_a_w)
@@ -98,7 +98,9 @@ static WRITE8_DEVICE_HANDLER (llc1_port1_b_w)
 	}
 }
 
-
+// timer 0 irq does digit display, and timer 3 irq does scan of the
+// monitor keyboard. Currently the keyboard is being scanned too fast.
+// No idea how the CTC is connected, so guessed. 
 Z80CTC_INTERFACE( llc1_ctc_intf )
 {
 	0,

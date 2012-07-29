@@ -1,10 +1,35 @@
-/***************************************************************************
+/******************************************************************************
 
         LLC driver by Miodrag Milanovic
 
         17/04/2009 Preliminary driver.
 
-****************************************************************************/
+        July 2012, updates by Robbbert
+
+        Very little info available on these computers.
+
+        LLC1:
+        To start BASIC, G0800 (cold start) G0803 (warm start)
+        To see a monitor logo, G13BE
+        This machine has an 8-digit LED display with hex keyboard,
+        and also a 64x16 monochrome screen with full keyboard.
+        The monitor uses the hex keyboard, while Basic uses the full keyboard.
+        Monitor output is on the digits, but the single-step command displays
+        a running register dump on the main screen.
+        There are no storage facilities, and no sound.
+        The user instructions (in German) are here:
+        http://www.jens-mueller.org/jkcemu/llc1.html
+
+        ToDo:
+        - LLC1: Get good dump of monitor rom, has a number of bad bytes
+        - LLC1: In Basic, pressing enter several times causes the start
+          of the line to be shifted 1 or 2 characters to the right.
+        - LLC1: Go command crashes
+        - LLC1: Keyboard is horrible
+        - All keyboards are incomplete
+        - Lots of other things
+
+*******************************************************************************/
 
 
 #include "emu.h"
@@ -65,19 +90,19 @@ static INPUT_PORTS_START( llc1 )
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6")PORT_CODE(KEYCODE_6)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REG") PORT_CODE(KEYCODE_G)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("START") PORT_CODE(KEYCODE_H)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("i")PORT_CODE(KEYCODE_I)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("j") PORT_CODE(KEYCODE_J)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REG") PORT_CODE(KEYCODE_R)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M (Mem)") PORT_CODE(KEYCODE_M)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ST (Start)")PORT_CODE(KEYCODE_ENTER)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) // resets
 	PORT_START("X6") // out F4,EF
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
 		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A")PORT_CODE(KEYCODE_A)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("k") PORT_CODE(KEYCODE_K)
-		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ES") PORT_CODE(KEYCODE_L)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("HP")PORT_CODE(KEYCODE_M)
-		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("n") PORT_CODE(KEYCODE_N)
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ES (Step)") PORT_CODE(KEYCODE_S)
+		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DL (Go)") PORT_CODE(KEYCODE_X)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("HP (BP)")PORT_CODE(KEYCODE_P)
+		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) // does nothing
 	PORT_START("LINE0")
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -412,11 +437,13 @@ MACHINE_CONFIG_END
 
 ROM_START( llc1 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	// bad dump ROM_LOAD( "llc1-monitor.rom", 0x0000, 0x0800, CRC(0e81378d) SHA1(0fbb6eca016d0f439ea1c9aa0cb0affb5f49ea69) )
-	ROM_LOAD( "llc1mon.bin", 0x0000, 0x0800, CRC(e291dd63) SHA1(31a71bef84f7c164a270d0895cb645e078e9c6f2) )
+	//ROM_LOAD( "llc1-monitor.rom", 0x0000, 0x0800, BAD_DUMP CRC(0e81378d) SHA1(0fbb6eca016d0f439ea1c9aa0cb0affb5f49ea69) )
+	ROM_LOAD( "llc1mon.bin", 0x0000, 0x0800, BAD_DUMP CRC(e291dd63) SHA1(31a71bef84f7c164a270d0895cb645e078e9c6f2) )
 	ROM_LOAD( "llc1_tb1.bin", 0x0800, 0x0400, CRC(0d9d4039) SHA1(b515e385af57f4faf3a9f7b4a1edd59a1c1ea260) )
 	ROM_LOAD( "llc1_tb2.bin", 0x0c00, 0x0400, CRC(28bfea2a) SHA1(a68a8b87bfc931627ddd8d124b153e511477fbaf) )
 	ROM_LOAD( "llc1_tb3.bin", 0x1000, 0x0400, CRC(fe5e3132) SHA1(cc3b191e41f5772a4b86b8eb0ebe6fce67872df6) )
+	ROM_FILL(0x23b, 1, 0x00) // don't reboot when typing in the monitor
+	ROM_FILL(0x2dc, 1, 0x0f) // fix display of AF in the reg command
 	ROM_REGION(0x0400, "chargen",0)
 	ROM_LOAD ("llc1_zg.bin", 0x0000, 0x0400, CRC(fa2cd659) SHA1(1fa5f9992f35929f656c4ce55ed6980c5da1772b) )
 ROM_END
