@@ -9,8 +9,11 @@
         Very little info available on these computers.
 
         LLC1:
-        To start BASIC, G0800 (cold start) G0803 (warm start)
-        To see a monitor logo, G13BE
+        Handy addresses (set the pc register in the debugger, because the
+        monitor's Go command has problems):
+        0800 = BASIC cold start
+        0803 = BASIC warm start
+        13BE = display Monitor logo
         This machine has an 8-digit LED display with hex keyboard,
         and also a 64x16 monochrome screen with full keyboard.
         The monitor uses the hex keyboard, while Basic uses the full keyboard.
