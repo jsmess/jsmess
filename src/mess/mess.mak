@@ -1830,6 +1830,10 @@ $(MESSOBJ)/veb.a:				\
 
 $(MESSOBJ)/vidbrain.a:			\
 	$(MESS_DRIVERS)/vidbrain.o	\
+	$(MESS_MACHINE)/vidbrain_exp.o	\
+	$(MESS_MACHINE)/vb_std.o	\
+	$(MESS_MACHINE)/vb_money_minder.o	\
+	$(MESS_MACHINE)/vb_timeshare.o	\
 	$(MESS_VIDEO)/uv201.o		\
 
 $(MESSOBJ)/videoton.a:			\

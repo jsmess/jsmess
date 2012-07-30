@@ -16,6 +16,7 @@
 
     TODO:
 
+	- wait states (UV201: 2.9us, memory except RES1: 1.65us)
     - interlaced video?
     - pinball background colors
     - Y-zoom starting on odd scanline only 1 line high
@@ -26,11 +27,10 @@
     - reset on cartridge unload
     - use machine/f3853.h
     - joystick scan timer 555
-    - expander 1 (cassette, RS-232)
+    - expander 1 (F3870 CPU, cassette, RS-232)
     - expander 2 (modem)
 
 */
-
 
 #include "includes/vidbrain.h"
 #include "vidbrain.lh"
@@ -234,14 +234,13 @@ WRITE8_MEMBER( vidbrain_state::f3853_w )
 
 static ADDRESS_MAP_START( vidbrain_mem, AS_PROGRAM, 8, vidbrain_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
+	AM_RANGE(0x0000, 0x07ff) AM_ROM AM_REGION("res1", 0)
 	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x2300) AM_DEVREADWRITE(UV201_TAG, uv201_device, read, write)
 	AM_RANGE(0x0c00, 0x0fff) AM_MIRROR(0x2000) AM_RAM
-	AM_RANGE(0x1000, 0x17ff) AM_ROM
-	AM_RANGE(0x1800, 0x1fff) AM_ROM // RAM for Timeshare
-	AM_RANGE(0x2000, 0x27ff) AM_ROM
-	AM_RANGE(0x3000, 0x37ff) AM_UNMAP
-	AM_RANGE(0x3800, 0x3fff) AM_RAM // RAM for Money Minder
+	AM_RANGE(0x1000, 0x17ff) AM_DEVREADWRITE(VIDEOBRAIN_EXPANSION_SLOT_TAG, videobrain_expansion_slot_device, cs1_r, cs1_w)
+	AM_RANGE(0x1800, 0x1fff) AM_DEVREADWRITE(VIDEOBRAIN_EXPANSION_SLOT_TAG, videobrain_expansion_slot_device, cs2_r, cs2_w)
+	AM_RANGE(0x2000, 0x27ff) AM_ROM AM_REGION("res2", 0)
+	AM_RANGE(0x3000, 0x3fff) AM_DEVREADWRITE(VIDEOBRAIN_EXPANSION_SLOT_TAG, videobrain_expansion_slot_device, unmap_r, unmap_w)
 ADDRESS_MAP_END
 
 
@@ -461,6 +460,22 @@ static UV201_INTERFACE( uv_intf )
 };
 
 
+//-------------------------------------------------
+//  VIDEOBRAIN_EXPANSION_INTERFACE( expansion_intf )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( expansion_cards )
+	SLOT_INTERFACE_INTERNAL("standard", VB_STD)
+	SLOT_INTERFACE_INTERNAL("moneyminder", VB_MONEY_MINDER)
+	SLOT_INTERFACE_INTERNAL("timeshare", VB_TIMESHARE)
+SLOT_INTERFACE_END
+
+static VIDEOBRAIN_EXPANSION_INTERFACE( expansion_intf )
+{
+	DEVCB_NULL
+};
+
+
 
 //**************************************************************************
 //  MACHINE INITIALIZATION
@@ -574,9 +589,7 @@ static MACHINE_CONFIG_START( vidbrain, vidbrain_state )
 	MCFG_F3853_ADD(F3853_TAG, XTAL_4MHz/2, smi_intf)
 
 	// cartridge
-	MCFG_CARTSLOT_ADD("cart")
-	MCFG_CARTSLOT_EXTENSION_LIST("bin")
-	MCFG_CARTSLOT_INTERFACE("vidbrain_cart")
+	MCFG_VIDEOBRAIN_EXPANSION_SLOT_ADD(VIDEOBRAIN_EXPANSION_SLOT_TAG, expansion_intf, expansion_cards, NULL, NULL)
 
 	// software lists
 	MCFG_SOFTWARE_LIST_ADD("cart_list", "vidbrain")
@@ -597,10 +610,14 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 ROM_START( vidbrain )
-    ROM_REGION( 0x3000, F3850_TAG, 0 )
-	ROM_LOAD( "uvres 1n.d67", 0x0000, 0x0800, CRC(065fe7c2) SHA1(9776f9b18cd4d7142e58eff45ac5ee4bc1fa5a2a) )
-	ROM_CART_LOAD( "cart", 0x1000, 0x1000, 0 )
-	ROM_LOAD( "resn2.e5",     0x2000, 0x0800, CRC(1d85d7be) SHA1(26c5a25d1289dedf107fa43aa8dfc14692fd9ee6) )
+    ROM_REGION( 0x800, "res1", 0 )
+	ROM_LOAD( "uvres 1n.d67", 0x000, 0x800, CRC(065fe7c2) SHA1(9776f9b18cd4d7142e58eff45ac5ee4bc1fa5a2a) )
+
+    ROM_REGION( 0x800, "res2", 0 )
+	ROM_LOAD( "resn2.e5", 0x000, 0x800, CRC(1d85d7be) SHA1(26c5a25d1289dedf107fa43aa8dfc14692fd9ee6) )
+
+	ROM_REGION( 0x800, F3870_TAG, 0 )
+	ROM_LOAD( "expander1.bin", 0x0000, 0x0800, CRC(dac31abc) SHA1(e1ac7a9d654c2a70979effc744d98f21d13b4e05) )
 ROM_END
 
 

@@ -2,42 +2,46 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!--
 
-  Undumped cartridges:
+	Undumped cartridges
+	
+	Money Management Series:
+	APL/S   The Computational Language
 
-  Expanders
-  EXP 2   Expander 2
 
-  Money Management Series
-  APL/S   The Computational Language
-  VB-59   The Programmable
-  VB-1100 Budget System
-  VB-1200 Information Manager
+	Advertised but never released cartridges
+	
+	Money Management Series:
+	VB-59   The Programmable
+	VB-1100 Budget System
+	VB-1200 Information Manager
 
-  Education Series
-  ED07    Musicianship 1
-  ED08    Number Cross
-  ED09    Historical Simulation - France in the Old Regime
+	Education Series:
+	ED07    Musicianship 1
+	ED08    Number Cross
+	ED09    Historical Simulation - France in the Old Regime
 
-  Entertainment Series
-  EN07    Challenge Racer
-  EN08    Music Programmer
-  EN09    Programmable Football
-  EN10    Computer Life
+	Entertainment Series:
+	EN07    Challenge Racer
+	EN08    Music Programmer
+	EN09    Programmable Football
+	EN10    Computer Life
 
 -->
 <softwarelist name="vidbrain" description="VideoBrain Family Computer cartridges">
 
 	<!-- Communication Series -->
 
-	<software name="timeshar">
+	<software name="timeshar" supported="no">
 		<description>Timeshare</description>
 		<year>1978</year>
 		<publisher>VideoBrain Computer Company</publisher>
 		<info name="serial" value="CM01"/>
 		<part name="cart" interface="vidbrain_cart">
+			<feature name="slot" value="timeshare" />
 			<dataarea name="rom" size="0x800">
 				<rom name="timeshare (1978)(videobrain computer company)(videobrain)(cart)[cm01].bin" size="0x800" crc="957d7246" sha1="cb8eb48f7bf895b87975f2386451286143087fff" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="0x800"/>
 		</part>
 	</software>
 
@@ -203,15 +207,17 @@
 		</part>
 	</software>
 
-	<software name="moneyman">
-		<description>Money Manager</description>
+	<software name="moneymin" supported="no">
+		<description>Money Minder</description>
 		<year>1978</year>
 		<publisher>VideoBrain Computer Company</publisher>
 		<info name="serial" value="VB-1000"/>
 		<part name="cart" interface="vidbrain_cart">
+			<feature name="slot" value="moneyminder" />
 			<dataarea name="rom" size="0x1000">
 				<rom name="moneymanager-vb1000.bin" size="0x1000" crc="4f588081" sha1="afb95754d4710b2989689c877b775706b2a7a43d" offset="0" />
 			</dataarea>
+			<dataarea name="ram" size="0x800"/>
 		</part>
 	</software>
 
@@ -225,20 +231,6 @@
 		<part name="cart" interface="vidbrain_cart">
 			<dataarea name="rom" size="0x1000">
 				<rom name="demonstration (197x)(videobrain computer company)(videobrain)(cart)[st01].bin" size="0x1000" crc="a59eb765" sha1="ca8f8d2088477b901d5e7f04a1b6c6b71494eec3" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<!-- Expanders -->
-
-	<software name="exp1">
-		<description>Expander 1</description>
-		<year>1978</year>
-		<publisher>VideoBrain Computer Company</publisher>
-		<info name="serial" value="EXP1"/>
-		<part name="cart" interface="vidbrain_cart">
-			<dataarea name="rom" size="0x800">
-				<rom name="exp1.bin" size="0x800" crc="dac31abc" sha1="e1ac7a9d654c2a70979effc744d98f21d13b4e05" offset="0" />
 			</dataarea>
 		</part>
 	</software>

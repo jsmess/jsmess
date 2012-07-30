@@ -8,12 +8,17 @@
 #include "imagedev/cartslot.h"
 #include "machine/f3853.h"
 #include "machine/ram.h"
+#include "machine/vidbrain_exp.h"
+#include "machine/vb_std.h"
+#include "machine/vb_money_minder.h"
+#include "machine/vb_timeshare.h"
 #include "sound/dac.h"
 #include "sound/discrete.h"
 #include "video/uv201.h"
 
 #define F3850_TAG			"cd34"
 #define F3853_TAG			"cd5"
+#define F3870_TAG			"f3870"
 #define UV201_TAG			"uv201"
 #define SCREEN_TAG			"screen"
 #define DISCRETE_TAG		"discrete"
@@ -29,7 +34,7 @@ public:
 		  m_uv(*this, UV201_TAG),
 		  m_discrete(*this, DISCRETE_TAG),
 	      m_dac(*this, DAC_TAG),
-		  m_screen(*this, SCREEN_TAG)
+	      m_exp(*this, VIDEOBRAIN_EXPANSION_SLOT_TAG)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -37,7 +42,7 @@ public:
 	required_device<uv201_device> m_uv;
 	required_device<device_t> m_discrete;
 	required_device<device_t> m_dac;
-	required_device<screen_device> m_screen;
+	required_device<videobrain_expansion_slot_device> m_exp;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void machine_start();
