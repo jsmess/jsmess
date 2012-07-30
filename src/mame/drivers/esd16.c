@@ -81,11 +81,6 @@ ToDo:
 
 ***************************************************************************/
 
-WRITE16_MEMBER(esd16_state::esd16_spriteram_w)
-{
-	COMBINE_DATA(&m_spriteram[offset]);
-}
-
 WRITE16_MEMBER(esd16_state::esd16_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
@@ -95,59 +90,6 @@ WRITE16_MEMBER(esd16_state::esd16_sound_command_w)
 		device_spin_until_time(&space.device(), attotime::from_usec(50));	// Allow the other CPU to reply
 	}
 }
-
-/*
- Lines starting with an empty comment in the following MemoryReadAddress
- arrays are there for debug (e.g. the game does not read from those ranges
- AFAIK)
-*/
-
-static ADDRESS_MAP_START( multchmp_map, AS_PROGRAM, 16, esd16_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM									// ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM									// RAM
-	AM_RANGE(0x200000, 0x2005ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
-/**/AM_RANGE(0x300000, 0x3007ff) AM_RAM AM_SHARE("spriteram")							// Sprites (Mirrored)
-/**/AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(esd16_vram_0_w) AM_SHARE("vram_0")				// Layers
-/**/AM_RANGE(0x420000, 0x423fff) AM_RAM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1")				//
-/**/AM_RANGE(0x500000, 0x500003) AM_RAM AM_SHARE("scroll_0")							// Scroll
-/**/AM_RANGE(0x500004, 0x500007) AM_RAM AM_SHARE("scroll_1")							//
-	AM_RANGE(0x500008, 0x500009) AM_WRITEONLY AM_SHARE("platform_x")
-	AM_RANGE(0x50000a, 0x50000b) AM_WRITEONLY AM_SHARE("platform_y")
-	AM_RANGE(0x50000c, 0x50000d) AM_WRITENOP								// ??
-	AM_RANGE(0x50000e, 0x50000f) AM_WRITEONLY AM_SHARE("head_layersize")					// ??
-	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x600006, 0x600007) AM_READ_PORT("DSW")
-	AM_RANGE(0x600008, 0x600009) AM_WRITE(esd16_tilemap0_color_w)						// Flip Screen + Tilemap0 palette banking
-	AM_RANGE(0x60000a, 0x60000b) AM_WRITENOP								// ? 2
-	AM_RANGE(0x60000c, 0x60000d) AM_WRITE(esd16_sound_command_w)						// To Sound CPU
-	AM_RANGE(0x700008, 0x70000b) AM_READNOP									// ? Only read once
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( jumppop_map, AS_PROGRAM, 16, esd16_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x120000, 0x123fff) AM_RAM
-	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")
-/**/AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")							// Sprites
-	AM_RANGE(0x160800, 0x160807) AM_WRITE(esd16_spriteram_w)						// Sprites (Mirrored)
-	AM_RANGE(0x180000, 0x180001) AM_NOP									// IRQ ack?
-	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("DSW")
-	AM_RANGE(0x180008, 0x180009) AM_WRITE(esd16_tilemap0_color_jumppop_w)					// Flip Screen + Tilemap0 palette banking
-	AM_RANGE(0x18000c, 0x18000d) AM_WRITE(esd16_sound_command_w)
-	AM_RANGE(0x1a0000, 0x1a7fff) AM_RAM
-/**/AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE(esd16_vram_0_w) AM_SHARE("vram_0")				// Layers
-/**/AM_RANGE(0x320000, 0x323fff) AM_RAM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1")				//
-/**/AM_RANGE(0x380000, 0x380003) AM_RAM AM_SHARE("scroll_0")							// Scroll
-/**/AM_RANGE(0x380004, 0x380007) AM_RAM AM_SHARE("scroll_1")							//
-	AM_RANGE(0x380008, 0x380009) AM_WRITEONLY AM_SHARE("platform_x")
-	AM_RANGE(0x38000a, 0x38000b) AM_WRITEONLY AM_SHARE("platform_y")
-	AM_RANGE(0x38000c, 0x38000d) AM_WRITENOP								// ??
-	AM_RANGE(0x38000e, 0x38000f) AM_WRITEONLY AM_SHARE("head_layersize")					// ??
-ADDRESS_MAP_END
-
 
 WRITE16_MEMBER(esd16_state::hedpanic_platform_w)
 {
@@ -177,86 +119,114 @@ WRITE16_MEMBER(esd16_state::esd_eeprom_w)
 //  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", cpu_get_pc(&space.device()), data, mem_mask);
 }
 
+
+#define ESD16_IO_AREA_DSW( _BASE ) \
+	AM_RANGE(_BASE + 0x0, _BASE + 0x1) AM_WRITENOP /* Irq Ack */ \
+	AM_RANGE(_BASE + 0x2, _BASE + 0x3) AM_READ_PORT("P1_P2") \
+	AM_RANGE(_BASE + 0x4, _BASE + 0x5) AM_READ_PORT("SYSTEM") \
+	AM_RANGE(_BASE + 0x6, _BASE + 0x7) AM_READ_PORT("DSW") \
+	AM_RANGE(_BASE + 0x8, _BASE + 0x9) AM_WRITE(esd16_tilemap0_color_w) \
+	AM_RANGE(_BASE + 0xa, _BASE + 0xb) AM_WRITENOP /* Unknown */ \
+	AM_RANGE(_BASE + 0xc, _BASE + 0xd) AM_WRITE(esd16_sound_command_w) \
+	AM_RANGE(_BASE + 0xe, _BASE + 0xf) AM_WRITENOP /* n/c */ \
+
+#define ESD16_IO_AREA_EEPROM( _BASE ) \
+	AM_RANGE(_BASE + 0x0, _BASE + 0x1) AM_WRITENOP /* Irq Ack */ \
+	AM_RANGE(_BASE + 0x2, _BASE + 0x3) AM_READ_PORT("P1_P2") \
+	AM_RANGE(_BASE + 0x4, _BASE + 0x5) AM_READ_PORT("SYSTEM") \
+	AM_RANGE(_BASE + 0x6, _BASE + 0x7) AM_READ(esd_eeprom_r) \
+	AM_RANGE(_BASE + 0x8, _BASE + 0x9) AM_WRITE(esd16_tilemap0_color_w) \
+	AM_RANGE(_BASE + 0xa, _BASE + 0xb) AM_WRITENOP /* Unknown */ \
+	AM_RANGE(_BASE + 0xc, _BASE + 0xd) AM_WRITE(esd16_sound_command_w) \
+	AM_RANGE(_BASE + 0xe, _BASE + 0xf) AM_WRITE(esd_eeprom_w) \
+
+#define ESD16_VID_ATTR_AREA( _BASE ) \
+	AM_RANGE(_BASE + 0x0, _BASE + 0x3) AM_WRITEONLY AM_SHARE("scroll_0") \
+	AM_RANGE(_BASE + 0x4, _BASE + 0x7) AM_WRITEONLY AM_SHARE("scroll_1") \
+	AM_RANGE(_BASE + 0x8, _BASE + 0x9) AM_WRITEONLY AM_SHARE("platform_x") \
+	AM_RANGE(_BASE + 0xa, _BASE + 0xb) AM_WRITEONLY AM_SHARE("platform_y") \
+	AM_RANGE(_BASE + 0xc, _BASE + 0xd) AM_WRITENOP \
+	AM_RANGE(_BASE + 0xe, _BASE + 0xf) AM_WRITEONLY AM_SHARE("head_layersize") \
+
+#define ESD16_PALETTE_AREA( _BASE ) \
+	AM_RANGE(_BASE + 0x000, _BASE + 0xfff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram") \
+
+#define ESD16_SPRITE_AREA( _BASE ) \
+	AM_RANGE(_BASE + 0x000, _BASE + 0x7ff) AM_WRITEONLY AM_SHARE("spriteram") AM_MIRROR(0x000800) \
+
+#define ESD16_VRAM_AREA( _BASE ) \
+	AM_RANGE(_BASE + 0x00000, _BASE + 0x03fff) AM_WRITE(esd16_vram_0_w) AM_SHARE("vram_0") AM_MIRROR(0x4000) \
+	AM_RANGE(_BASE + 0x20000, _BASE + 0x23fff) AM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1") AM_MIRROR(0x4000) \
+
+/*** Memory Maps ***/
+
+static ADDRESS_MAP_START( multchmp_map, AS_PROGRAM, 16, esd16_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM
+
+	ESD16_PALETTE_AREA(  0x200000 )
+	ESD16_SPRITE_AREA(   0x300000 )
+	ESD16_VRAM_AREA(     0x400000 )
+	ESD16_VID_ATTR_AREA( 0x500000 )
+	ESD16_IO_AREA_DSW(   0x600000 )
+
+	AM_RANGE(0x700008, 0x70000b) AM_READNOP	// unused protection?
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( jumppop_map, AS_PROGRAM, 16, esd16_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x120000, 0x123fff) AM_RAM
+	AM_RANGE(0x1a0000, 0x1a7fff) AM_RAM
+
+	AM_RANGE(0x180008, 0x180009) AM_WRITE(esd16_tilemap0_color_jumppop_w) // todo
+
+	ESD16_PALETTE_AREA(  0x140000 ) 
+	ESD16_SPRITE_AREA(   0x160000 )
+	ESD16_IO_AREA_DSW(   0x180000 )
+	ESD16_VRAM_AREA(     0x300000 )
+	ESD16_VID_ATTR_AREA( 0x380000 )
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( hedpanic_map, AS_PROGRAM, 16, esd16_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM									// ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM									// RAM
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
-	AM_RANGE(0x900000, 0x9007ff) AM_WRITEONLY AM_SHARE("spriteram")						// Sprites
-	AM_RANGE(0x900800, 0x900807) AM_WRITE(esd16_spriteram_w)						// Sprites (Mirrored)
-	AM_RANGE(0xa00000, 0xa03fff) AM_WRITE(esd16_vram_0_w) AM_SHARE("vram_0")				// Layers
-	AM_RANGE(0xa20000, 0xa23fff) AM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1")				//
-	AM_RANGE(0xa24000, 0xa27fff) AM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1")				// mirror?
-	AM_RANGE(0xb00000, 0xb00003) AM_WRITEONLY AM_SHARE("scroll_0")						// Scroll
-	AM_RANGE(0xb00004, 0xb00007) AM_WRITEONLY AM_SHARE("scroll_1")						//
-	AM_RANGE(0xb00008, 0xb00009) AM_WRITEONLY AM_SHARE("platform_x")
-	AM_RANGE(0xb0000a, 0xb0000b) AM_WRITEONLY AM_SHARE("platform_y")
-	AM_RANGE(0xb0000c, 0xb0000d) AM_WRITENOP								// ??
-	AM_RANGE(0xb0000e, 0xb0000f) AM_WRITEONLY AM_SHARE("head_layersize")					// ??
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP								// IRQ Ack
-	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0xc00004, 0xc00005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xc00006, 0xc00007) AM_READ(esd_eeprom_r)
-	AM_RANGE(0xc00008, 0xc00009) AM_WRITE(esd16_tilemap0_color_w)						// Flip Screen + Tileamp0 palette banking
-	AM_RANGE(0xc0000a, 0xc0000b) AM_WRITENOP								// ? 2 not checked
-	AM_RANGE(0xc0000c, 0xc0000d) AM_WRITE(esd16_sound_command_w)						// To Sound CPU // ok
-	AM_RANGE(0xc0000e, 0xc0000f) AM_WRITE(esd_eeprom_w)
-	AM_RANGE(0xd00008, 0xd00009) AM_WRITE(hedpanic_platform_w)
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM
+
+	ESD16_PALETTE_AREA(   0x800000 )
+	ESD16_SPRITE_AREA(    0x900000 )
+	ESD16_VRAM_AREA(      0xa00000 )
+	ESD16_VID_ATTR_AREA(  0xb00000 )
+	ESD16_IO_AREA_EEPROM( 0xc00000 )
+
+	AM_RANGE(0xd00008, 0xd00009) AM_WRITE(hedpanic_platform_w) // protection
 ADDRESS_MAP_END
 
 /* Multi Champ Deluxe, like Head Panic but different addresses */
 
 static ADDRESS_MAP_START( mchampdx_map, AS_PROGRAM, 16, esd16_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM									// ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM									// RAM
-	AM_RANGE(0x300000, 0x303fff) AM_WRITE(esd16_vram_0_w) AM_SHARE("vram_0")				// Layers
-	AM_RANGE(0x320000, 0x323fff) AM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1")				//
-	AM_RANGE(0x324000, 0x327fff) AM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1")				// mirror?
-	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// Palette
-	AM_RANGE(0x500000, 0x500001) AM_WRITENOP								// IRQ Ack
-	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x500006, 0x500007) AM_READ(esd_eeprom_r)
-	AM_RANGE(0x500008, 0x500009) AM_WRITE(esd16_tilemap0_color_w)						// Flip Screen + Tileamp0 palette banking
-	AM_RANGE(0x50000a, 0x50000b) AM_WRITENOP								// ? 2 not checked
-	AM_RANGE(0x50000c, 0x50000d) AM_WRITE(esd16_sound_command_w)						// To Sound CPU // ok
-	AM_RANGE(0x50000e, 0x50000f) AM_WRITE(esd_eeprom_w)
-	AM_RANGE(0x600000, 0x6007ff) AM_WRITEONLY AM_SHARE("spriteram")						// Sprites
-	AM_RANGE(0x600800, 0x600807) AM_WRITE(esd16_spriteram_w)						// Sprites (Mirrored)
-	AM_RANGE(0x700000, 0x700003) AM_WRITEONLY AM_SHARE("scroll_0")						// Scroll
-	AM_RANGE(0x700004, 0x700007) AM_WRITEONLY AM_SHARE("scroll_1")						//
-	AM_RANGE(0x700008, 0x700009) AM_WRITEONLY AM_SHARE("platform_x")					// not used in mchampdx?
-	AM_RANGE(0x70000a, 0x70000b) AM_WRITEONLY AM_SHARE("platform_y")					// not used in mchampdx?
-	AM_RANGE(0x70000c, 0x70000d) AM_WRITENOP								// ??
-	AM_RANGE(0x70000e, 0x70000f) AM_WRITEONLY AM_SHARE("head_layersize")					// ??
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM
+
+	ESD16_VRAM_AREA(      0x300000 )
+	ESD16_PALETTE_AREA(   0x400000 )
+	ESD16_IO_AREA_EEPROM( 0x500000 )
+	ESD16_SPRITE_AREA(    0x600000 )
+	ESD16_VID_ATTR_AREA(  0x700000 )
+
 	AM_RANGE(0xd00008, 0xd00009) AM_WRITE(hedpanic_platform_w)						// not used in mchampdx?
 ADDRESS_MAP_END
 
 /* Tang Tang & Deluxe 5 - like the others but again with different addresses */
 
 static ADDRESS_MAP_START( tangtang_map, AS_PROGRAM, 16, esd16_state )
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM									// ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_word_w) AM_SHARE("paletteram")	// RAM
-	AM_RANGE(0x200000, 0x2007ff) AM_WRITEONLY AM_SHARE("spriteram")						// Sprites
-	AM_RANGE(0x200800, 0x200807) AM_WRITE(esd16_spriteram_w)						// Sprites (Mirrored)
-	AM_RANGE(0x300000, 0x303fff) AM_WRITE(esd16_vram_0_w) AM_SHARE("vram_0")				// Layers
-	AM_RANGE(0x320000, 0x323fff) AM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1")				//
-	AM_RANGE(0x324000, 0x327fff) AM_WRITE(esd16_vram_1_w) AM_SHARE("vram_1")				// mirror?
-	AM_RANGE(0x400000, 0x400003) AM_WRITEONLY AM_SHARE("scroll_0")						// Scroll
-	AM_RANGE(0x400004, 0x400007) AM_WRITEONLY AM_SHARE("scroll_1")						//
-	AM_RANGE(0x400008, 0x400009) AM_WRITEONLY AM_SHARE("platform_x")					// not used in mchampdx?
-	AM_RANGE(0x40000a, 0x40000b) AM_WRITEONLY AM_SHARE("platform_y")					// not used in mchampdx?
-	AM_RANGE(0x40000c, 0x40000d) AM_WRITENOP								// ??
-	AM_RANGE(0x40000e, 0x40000f) AM_WRITEONLY AM_SHARE("head_layersize")					// ??
-	AM_RANGE(0x500000, 0x500001) AM_WRITENOP								// IRQ Ack
-	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x500004, 0x500005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x500006, 0x500007) AM_READ(esd_eeprom_r)
-	AM_RANGE(0x500008, 0x500009) AM_WRITE(esd16_tilemap0_color_w)   					// Flip Screen + Tileamp0 palette banking
-	AM_RANGE(0x50000a, 0x50000b) AM_WRITENOP								// ? 2 not checked
-	AM_RANGE(0x50000c, 0x50000d) AM_WRITE(esd16_sound_command_w)						// To Sound CPU // ok
-	AM_RANGE(0x50000e, 0x50000f) AM_WRITE(esd_eeprom_w)
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x700000, 0x70ffff) AM_RAM
+
+	ESD16_PALETTE_AREA(   0x100000 )
+	ESD16_SPRITE_AREA(    0x200000 )
+	ESD16_VRAM_AREA(      0x300000 )
+	ESD16_VID_ATTR_AREA(  0x400000 )
+	ESD16_IO_AREA_EEPROM( 0x500000 )
 	AM_RANGE(0x600008, 0x600009) AM_WRITE(hedpanic_platform_w)
-	AM_RANGE(0x700000, 0x70ffff) AM_RAM									// main ram
 ADDRESS_MAP_END
 
 
@@ -382,7 +352,7 @@ static INPUT_PORTS_START( jumppop )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( multchmp )
-	PORT_START("P1_P2")	// $600002.w
+	PORT_START("P1_P2")
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
@@ -401,7 +371,7 @@ static INPUT_PORTS_START( multchmp )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )	// Resets the test mode
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SYSTEM")	// $600005.b
+	PORT_START("SYSTEM")
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1   )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2   )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_START1  )
@@ -412,7 +382,7 @@ static INPUT_PORTS_START( multchmp )
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW")	// $600006.w
+	PORT_START("DSW")
 	PORT_SERVICE_DIPLOC(  0x0001, IP_ACTIVE_LOW, "SW1:1" )
 	PORT_DIPNAME( 0x0002, 0x0002, "Coinage Type" )			PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x0002, "1" )
@@ -462,7 +432,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( hedpanic )
-	PORT_START("P1_P2")	// $600002.w
+	PORT_START("P1_P2")
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
@@ -481,7 +451,7 @@ static INPUT_PORTS_START( hedpanic )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SYSTEM")	// $600005.b
+	PORT_START("SYSTEM")
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1   )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2   )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_START1  )
@@ -499,7 +469,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( swatpolc )
-	PORT_START("P1_P2")	// $600002.w
+	PORT_START("P1_P2")
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
@@ -518,7 +488,7 @@ static INPUT_PORTS_START( swatpolc )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SYSTEM")	// $600005.b
+	PORT_START("SYSTEM")
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1   )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2   )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_START1  )
@@ -542,18 +512,20 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-/* 16x16x5, made of four 8x8 tiles */
-static const gfx_layout layout_16x16x5 =
+
+
+static const gfx_layout jumppop_sprite_16x16x4 =
 {
 	16,16,
-	RGN_FRAC(1,5),
-	5,
-	{ RGN_FRAC(4,5),RGN_FRAC(3,5),RGN_FRAC(2,5),RGN_FRAC(1,5), RGN_FRAC(0,5) },
-	{ STEP8(8*16,1), STEP8(0,1) },
-	{ STEP16(0,8) },
-	16*16
+	RGN_FRAC(1,2),
+	4,
+	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0, 8, 0 },
+	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
+			0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
+			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	64*8
 };
-
 
 static const gfx_layout hedpanic_sprite_16x16x5 =
 {
@@ -591,40 +563,15 @@ static const gfx_layout hedpanic_layout_16x16x8 =
 	256*8,
 };
 
-static const gfx_layout layout_16x16x4 =
-{
-	16,16,
-	RGN_FRAC(1,2),
-	4,
-	{ RGN_FRAC(1,2)+8, RGN_FRAC(1,2)+0, 8, 0 },
-	{ 32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-			0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,
-			8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
-	64*8
-};
 
 static GFXDECODE_START( esd16 )
-	GFXDECODE_ENTRY( "spr", 0, layout_16x16x5, 0x200, 8 ) // [0] Sprites
+	GFXDECODE_ENTRY( "spr", 0, hedpanic_sprite_16x16x5, 0x200, 8 ) // [0] Sprites
 	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_8x8x8,   0x000, 2 ) // [1] Layers
 	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8,   0x000, 2 ) // [1] Layers
 GFXDECODE_END
 
-
-static GFXDECODE_START( hedpanic )
-	GFXDECODE_ENTRY( "spr", 0, hedpanic_sprite_16x16x5, 0x200, 8 ) // [0] Sprites
-	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_8x8x8,   0x000, 4 ) // [1] Layers
-	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8, 0x000, 4 ) // [2] Layers
-GFXDECODE_END
-
-static GFXDECODE_START( tangtang )
-	GFXDECODE_ENTRY( "spr", 0, layout_16x16x5, 0x200, 8 ) // [0] Sprites
-	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_8x8x8,   0x000, 4 ) // [1] Layers
-	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8, 0x000, 4 ) // [2] Layers
-GFXDECODE_END
-
 static GFXDECODE_START( jumppop )
-	GFXDECODE_ENTRY( "spr", 0, layout_16x16x4,		0x000, 0x40 )	/* Sprites 16x16 */ // has 4bpp sprites, unlike the others
+	GFXDECODE_ENTRY( "spr", 0, jumppop_sprite_16x16x4,	0x000, 0x40 )	/* Sprites 16x16 */ // has 4bpp sprites, unlike the others
 	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_8x8x8,	0x000, 4 )	/* Characters 8x8 */
 	GFXDECODE_ENTRY( "bgs", 0, hedpanic_layout_16x16x8,	0x000, 4 )	/* Tiles 16x16 */
 GFXDECODE_END
@@ -696,7 +643,7 @@ static MACHINE_CONFIG_START( esd16, esd16_state )
 	decospr_device::set_flipallx(*device, 1);
 
 	MCFG_GFXDECODE(esd16)
-	MCFG_PALETTE_LENGTH(768)
+	MCFG_PALETTE_LENGTH(0x1000/2)
 
 	MCFG_VIDEO_START(esd16)
 
@@ -730,51 +677,7 @@ static MACHINE_CONFIG_DERIVED( jumppop, esd16 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-
-static MACHINE_CONFIG_DERIVED( hedpanic, esd16 )
-
-	/* basic machine hardware */
-
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(hedpanic_map)
-
-	MCFG_EEPROM_93C46_ADD("eeprom")
-
-	MCFG_PALETTE_LENGTH(0x1000/2)
-
-	MCFG_GFXDECODE(hedpanic)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_UPDATE_STATIC(hedpanic)
-
-	MCFG_DEVICE_MODIFY("spritegen")
-	decospr_device::set_offsets(*device, -0x18,-0x100);
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_DERIVED( mchampdx, hedpanic )
-
-	/* basic machine hardware */
-
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(mchampdx_map)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( tangtang, hedpanic )
-
-	/* basic machine hardware */
-
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(tangtang_map)
-
-	MCFG_GFXDECODE(tangtang)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( swatpolc, hedpanic )
-
-	/* basic machine hardware */
-
-	MCFG_GFXDECODE(tangtang)
-MACHINE_CONFIG_END
+/* The ESD 05-28-99 PCB adds an EEPROM */
 
 static MACHINE_CONFIG_DERIVED( hedpanio, esd16 )
 	/* basic machine hardware */
@@ -782,11 +685,29 @@ static MACHINE_CONFIG_DERIVED( hedpanio, esd16 )
 	MCFG_CPU_PROGRAM_MAP(hedpanic_map)
 
 	MCFG_EEPROM_93C46_ADD("eeprom")
-
-	MCFG_PALETTE_LENGTH(0x1000/2)
-
-	MCFG_GFXDECODE(hedpanic)
 MACHINE_CONFIG_END
+
+/* The ESD 08-26-1999 PCBs take that further and modify the sprite offsets */
+
+static MACHINE_CONFIG_DERIVED( hedpanic, hedpanio )
+	MCFG_DEVICE_MODIFY("spritegen")
+	decospr_device::set_offsets(*device, -0x18,-0x100);
+MACHINE_CONFIG_END
+
+/* ESD 08-26-1999 PCBs with different memory maps */
+
+static MACHINE_CONFIG_DERIVED( mchampdx, hedpanic )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mchampdx_map)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( tangtang, hedpanic )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tangtang_map)
+MACHINE_CONFIG_END
+
+
+
 
 
 
@@ -863,12 +784,12 @@ ROM_START( multchmp )
 	ROM_REGION( 0x40000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x20000, CRC(7c178bd7) SHA1(8754d3c70d9b2bf369a5ce0cce4cc0696ed22750) )
 
-	ROM_REGION( 0x140000, "spr", 0 )	/* Sprites, 16x16x5 */
-	ROM_LOAD( "esd14.ju03", 0x000000, 0x040000, CRC(a6122225) SHA1(cbcf2b31c4c011daba21f0ae5fd3be63c9a87c00) )
-	ROM_LOAD( "esd15.ju04", 0x040000, 0x040000, CRC(88b7a97c) SHA1(0a57ec8f6a44c8e3aa3ef35499a415d6a2b7eb16) )
-	ROM_LOAD( "esd16.ju05", 0x080000, 0x040000, CRC(e670a6da) SHA1(47cbe45b6d5d0ca70d0c6787d589dde5d14fdba4) )
-	ROM_LOAD( "esd17.ju06", 0x0c0000, 0x040000, CRC(a69d4399) SHA1(06ae6c07cc6b7313e2e2aa3b994f7532d6994e1b) )
-	ROM_LOAD( "esd13.ju07", 0x100000, 0x040000, CRC(22071594) SHA1(c79102b250780d1da8c290d065d61fbbfa193366) )
+	ROM_REGION( 0x180000, "spr", 0 )	/* Sprites, 16x16x5 */
+	ROM_LOAD16_BYTE( "esd17.ju06", 0x000000, 0x040000, CRC(a69d4399) SHA1(06ae6c07cc6b7313e2e2aa3b994f7532d6994e1b) )
+	ROM_LOAD16_BYTE( "esd16.ju05", 0x000001, 0x040000, CRC(e670a6da) SHA1(47cbe45b6d5d0ca70d0c6787d589dde5d14fdba4) )
+	ROM_LOAD16_BYTE( "esd15.ju04", 0x080000, 0x040000, CRC(88b7a97c) SHA1(0a57ec8f6a44c8e3aa3ef35499a415d6a2b7eb16) )
+	ROM_LOAD16_BYTE( "esd14.ju03", 0x080001, 0x040000, CRC(a6122225) SHA1(cbcf2b31c4c011daba21f0ae5fd3be63c9a87c00) )
+	ROM_LOAD16_BYTE( "esd13.ju07", 0x100000, 0x040000, CRC(22071594) SHA1(c79102b250780d1da8c290d065d61fbbfa193366) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD32_BYTE( "esd9.fu28",  0x000000, 0x080000, CRC(6652c04a) SHA1(178e1d42847506d869ef79db2f7e10df05e9ef76) )
@@ -892,12 +813,12 @@ ROM_START( multchmpk )
 	ROM_REGION( 0x40000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x20000, CRC(7c178bd7) SHA1(8754d3c70d9b2bf369a5ce0cce4cc0696ed22750) )
 
-	ROM_REGION( 0x140000, "spr", 0 )	/* Sprites, 16x16x5 */
-	ROM_LOAD( "multchmp.u36", 0x000000, 0x040000, CRC(d8f06fa8) SHA1(f76912f93f99578529612a7f01d82ac7229a8e41) )
-	ROM_LOAD( "multchmp.u37", 0x040000, 0x040000, CRC(b1ae7f08) SHA1(37dd9d4cef8b9e1d09d7b46a9794fb2b777c9a01) )
-	ROM_LOAD( "multchmp.u38", 0x080000, 0x040000, CRC(88e252e8) SHA1(07d898379798c6be42b636762b0af61b9111a480) )
-	ROM_LOAD( "multchmp.u39", 0x0c0000, 0x040000, CRC(51f01067) SHA1(d5ebbc7d358b63724d2f24da8b2ce4a202be37a5) )
-	ROM_LOAD( "multchmp.u35", 0x100000, 0x040000, CRC(9d1590a6) SHA1(35f634dbf0df06ec62359c7bae43c7f5d14b0ab2) )
+	ROM_REGION( 0x180000, "spr", 0 )	/* Sprites, 16x16x5 */
+	ROM_LOAD16_BYTE( "multchmp.u39", 0x000000, 0x040000, CRC(51f01067) SHA1(d5ebbc7d358b63724d2f24da8b2ce4a202be37a5) )
+	ROM_LOAD16_BYTE( "multchmp.u38", 0x000001, 0x040000, CRC(88e252e8) SHA1(07d898379798c6be42b636762b0af61b9111a480) )
+	ROM_LOAD16_BYTE( "multchmp.u37", 0x080000, 0x040000, CRC(b1ae7f08) SHA1(37dd9d4cef8b9e1d09d7b46a9794fb2b777c9a01) )
+	ROM_LOAD16_BYTE( "multchmp.u36", 0x080001, 0x040000, CRC(d8f06fa8) SHA1(f76912f93f99578529612a7f01d82ac7229a8e41) )
+	ROM_LOAD16_BYTE( "multchmp.u35", 0x100000, 0x040000, CRC(9d1590a6) SHA1(35f634dbf0df06ec62359c7bae43c7f5d14b0ab2) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD32_BYTE( "multchmp.u31", 0x000000, 0x080000, CRC(b1e4e9e3) SHA1(1a7393e9073b028b4170393b3788ad8cb86c0c78) )
@@ -1262,12 +1183,12 @@ ROM_START( deluxe5 ) /* Deluxe 5 */
 	ROM_REGION( 0x40000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) ) /* AM27C020 mask rom */
 
-	ROM_REGION( 0x280000, "spr", 0 )	/* Sprites, 16x16x5 */
-	ROM_LOAD( "am27c020.ju03", 0x000000, 0x040000, CRC(aa130fd3) SHA1(46a55d8ca59a52e610600fdba76d9729528d2871) ) /* AM27C020 mask roms with no label */
-	ROM_LOAD( "am27c020.ju04", 0x080000, 0x040000, CRC(40fa2c2f) SHA1(b9d9bfdc9343f00bad9749c76472f064c509cfce) )
-	ROM_LOAD( "am27c020.ju05", 0x100000, 0x040000, CRC(bbe81779) SHA1(750387fb4aaa04b7f4f1d3985896f5e11219e3ea) )
-	ROM_LOAD( "am27c020.ju06", 0x180000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) )
-	ROM_LOAD( "am27c020.ju07", 0x200000, 0x040000, CRC(d414c3af) SHA1(9299b07a8c7a3e30a1bb6028204a049a7cb510f7) )
+	ROM_REGION( 0x180000, "spr", 0 )	/* Sprites, 16x16x5 */
+	ROM_LOAD16_BYTE( "am27c020.ju06", 0x000000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) ) /* AM27C020 mask roms with no label */
+	ROM_LOAD16_BYTE( "am27c020.ju05", 0x000001, 0x040000, CRC(bbe81779) SHA1(750387fb4aaa04b7f4f1d3985896f5e11219e3ea) )
+	ROM_LOAD16_BYTE( "am27c020.ju04", 0x080000, 0x040000, CRC(40fa2c2f) SHA1(b9d9bfdc9343f00bad9749c76472f064c509cfce) )
+	ROM_LOAD16_BYTE( "am27c020.ju03", 0x080001, 0x040000, CRC(aa130fd3) SHA1(46a55d8ca59a52e610600fdba76d9729528d2871) )
+	ROM_LOAD16_BYTE( "am27c020.ju07", 0x100000, 0x040000, CRC(d414c3af) SHA1(9299b07a8c7a3e30a1bb6028204a049a7cb510f7) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD16_BYTE( "fu35", 0x000000, 0x200000, CRC(ae10242a) SHA1(f3d18c0cb7951b5f7ee47aa2856b7554088328ed) ) /* No labels on the flash roms */
@@ -1338,12 +1259,12 @@ ROM_START( tangtang )
 	ROM_REGION( 0x40000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(d48ecc5c) SHA1(5015dd775980542eb29a08bffe1a09ea87d56272) )
 
-	ROM_REGION( 0x140000, "spr", 0 )	/* Sprites, 16x16x5 */
-	ROM_LOAD( "xju04.bin", 0x000000, 0x040000, CRC(f999b9d7) SHA1(9e4d0e68cdc429c7563b8ad51c072d68ffed09dc) )
-	ROM_LOAD( "xju05.bin", 0x040000, 0x040000, CRC(679302cf) SHA1(911c2f7e0e809ee28e4f2364788fd51d2bcef24e) )
-	ROM_LOAD( "xju06.bin", 0x080000, 0x040000, CRC(01f59ff7) SHA1(a62a2d5c2d107f67fecfc08fdb5d801ee39c3875) )
-	ROM_LOAD( "xju07.bin", 0x0c0000, 0x040000, CRC(556acac3) SHA1(10e919e63b434da80fb261db1d8967cb11e95e00) )
-	ROM_LOAD( "xju08.bin", 0x100000, 0x040000, CRC(ecc2d8c7) SHA1(1aabdf7204fcdff8d46cb50de8b097e3775dddf3) )
+	ROM_REGION( 0x180000, "spr", 0 )	/* Sprites, 16x16x5 */
+	ROM_LOAD16_BYTE( "xju07.bin", 0x000000, 0x040000, CRC(556acac3) SHA1(10e919e63b434da80fb261db1d8967cb11e95e00) )
+	ROM_LOAD16_BYTE( "xju06.bin", 0x000001, 0x040000, CRC(01f59ff7) SHA1(a62a2d5c2d107f67fecfc08fdb5d801ee39c3875) )
+	ROM_LOAD16_BYTE( "xju05.bin", 0x080000, 0x040000, CRC(679302cf) SHA1(911c2f7e0e809ee28e4f2364788fd51d2bcef24e) )
+	ROM_LOAD16_BYTE( "xju04.bin", 0x080001, 0x040000, CRC(f999b9d7) SHA1(9e4d0e68cdc429c7563b8ad51c072d68ffed09dc) )
+	ROM_LOAD16_BYTE( "xju08.bin", 0x100000, 0x040000, CRC(ecc2d8c7) SHA1(1aabdf7204fcdff8d46cb50de8b097e3775dddf3) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD16_BYTE( "fu35.bin", 0x000000, 0x200000, CRC(84f3f833) SHA1(f84e41d93dc47a58ada800b921a7e5902b7631cd) )
@@ -1411,12 +1332,12 @@ ROM_START( swatpolc ) /* SWAT Police */
 	ROM_REGION( 0x40000, "audiocpu", 0 )		/* Z80 Code */
 	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(80e97dbe) SHA1(d6fae689cd3737777f36c980b9a7d9e42b06a467) ) /* 2 roms on PCB with an ESD3 label */
 
-	ROM_REGION( 0x280000, "spr", 0 )	/* Sprites, 16x16x5 */
-	ROM_LOAD( "esd1.ju03", 0x000000, 0x080000, CRC(17fcc5e7) SHA1(ad57d2b0c0062f6f8c7732df57e4d12ca47c1bb8) )
-	ROM_LOAD( "esd2.ju04", 0x080000, 0x080000, CRC(9c1752f2) SHA1(2e8c377137258498564749413b49e156180e806a) )
-	ROM_LOAD( "esd3.ju05", 0x100000, 0x080000, CRC(e8d9c092) SHA1(80e1f1d4dad48c7be3d4b72c4a82d5388fd493c7) )
-	ROM_LOAD( "esd4.ju06", 0x180000, 0x080000, CRC(bde1b130) SHA1(e45a2257f8c4d107dfb7401b5ae1b79951052bc6) )
-	ROM_LOAD( "esd5.ju07", 0x200000, 0x080000, CRC(d2c27f03) SHA1(7cbdf7f7ff17df16ca81823f69e82ae1cf96b714) )
+	ROM_REGION( 0x300000, "spr", 0 )	/* Sprites, 16x16x5 */
+	ROM_LOAD16_BYTE( "esd4.ju06", 0x000000, 0x080000, CRC(bde1b130) SHA1(e45a2257f8c4d107dfb7401b5ae1b79951052bc6) )
+	ROM_LOAD16_BYTE( "esd3.ju05", 0x000001, 0x080000, CRC(e8d9c092) SHA1(80e1f1d4dad48c7be3d4b72c4a82d5388fd493c7) )
+	ROM_LOAD16_BYTE( "esd2.ju04", 0x100000, 0x080000, CRC(9c1752f2) SHA1(2e8c377137258498564749413b49e156180e806a) )
+	ROM_LOAD16_BYTE( "esd1.ju03", 0x100001, 0x080000, CRC(17fcc5e7) SHA1(ad57d2b0c0062f6f8c7732df57e4d12ca47c1bb8) )
+	ROM_LOAD16_BYTE( "esd5.ju07", 0x200000, 0x080000, CRC(d2c27f03) SHA1(7cbdf7f7ff17df16ca81823f69e82ae1cf96b714) )
 
 	ROM_REGION( 0x400000, "bgs", 0 )	/* Layers, 16x16x8 */
 	ROM_LOAD16_BYTE( "fu35", 0x000000, 0x200000, CRC(c55897c5) SHA1(f6e0ef1c2fcfe6a511fe787a3abeff4da16d1b54) ) /* No labels on the flash roms */
@@ -1588,5 +1509,5 @@ GAME( 2000, hedpanicf,hedpanic, hedpanic, hedpanic, 0, ROT0, "ESD / Fuuki", "Hea
 /* ESD - This PCB looks identical to the ESD 08-26-1999 PCB */
 GAME( 2000, deluxe5,  0,        tangtang, hedpanic, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000)", GAME_SUPPORTS_SAVE )
 GAME( 2000, tangtang, 0,        tangtang, hedpanic, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)", GAME_SUPPORTS_SAVE )
-GAME( 2001, swatpolc, 0,        swatpolc, swatpolc, 0, ROT0, "ESD",         "SWAT Police", GAME_SUPPORTS_SAVE )
+GAME( 2001, swatpolc, 0,        hedpanic, swatpolc, 0, ROT0, "ESD",         "SWAT Police", GAME_SUPPORTS_SAVE )
 
