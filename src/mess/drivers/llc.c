@@ -20,15 +20,20 @@
         Monitor output is on the digits, but the single-step command displays
         a running register dump on the main screen.
         There are no storage facilities, and no sound.
-        The user instructions (in German) are here:
+        BASIC is integer only (-32768 to 32767), about 6k of space, and all
+        input is to be in uppercase. It does have minimal string capability,
+        but there is no $ sign, so how to create a string variable is unknown.
+        The user instructions of the monitor (in German) are here:
         http://www.jens-mueller.org/jkcemu/llc1.html
+
+        LLC2:
+        The BEL character plays a short tune.
 
         ToDo:
         - LLC1: Get good dump of monitor rom, has a number of bad bytes
         - LLC1: In Basic, pressing enter several times causes the start
           of the line to be shifted 1 or 2 characters to the right.
         - LLC1: Go command crashes
-        - LLC1: Monitor keyboard is horrible
         - LLC2: Keyboard is incomplete
         - Lots of other things
 
@@ -51,7 +56,6 @@ static ADDRESS_MAP_START( llc1_mem, AS_PROGRAM, 8, llc_state )
 	AM_RANGE(0x0800, 0x13ff) AM_ROM // BASIC ROM
 	AM_RANGE(0x1400, 0x1bff) AM_RAM // RAM
 	AM_RANGE(0x1c00, 0x1fff) AM_RAM AM_SHARE("video_ram") // Video RAM
-	AM_RANGE(0x2000, 0xffff) AM_RAM // RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( llc1_io, AS_IO, 8, llc_state )
@@ -83,29 +87,29 @@ static INPUT_PORTS_START( llc1 )
 	PORT_START("X4") // out F4,BF
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2")PORT_CODE(KEYCODE_2)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E")PORT_CODE(KEYCODE_E)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)
 	PORT_START("X5") // out F4,DF
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6")PORT_CODE(KEYCODE_6)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REG") PORT_CODE(KEYCODE_R)
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M (Mem)") PORT_CODE(KEYCODE_M)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ST (Start)")PORT_CODE(KEYCODE_ENTER)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ST (Start)") PORT_CODE(KEYCODE_ENTER)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) // resets
 	PORT_START("X6") // out F4,EF
 		PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
 		PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
-		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A")PORT_CODE(KEYCODE_A)
+		PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
 		PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)
 		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ES (Step)") PORT_CODE(KEYCODE_S)
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DL (Go)") PORT_CODE(KEYCODE_X)
-		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("HP (BP)")PORT_CODE(KEYCODE_P)
+		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("HP (BP)") PORT_CODE(KEYCODE_P)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED) // does nothing
 INPUT_PORTS_END
 
@@ -251,9 +255,7 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 
 static const z80_daisy_config llc1_daisy_chain[] =
 {
-	{ "z80pio2" },
 	{ "z80ctc" },
-	{ "z80pio1" },
 	{ NULL }
 };
 
@@ -345,12 +347,15 @@ static MACHINE_CONFIG_START( llc2, llc_state )
 	MCFG_SCREEN_SIZE(64*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(llc2)
-
 	MCFG_GFXDECODE(llc2)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
-
 	MCFG_VIDEO_START(llc2)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_Z80PIO_ADD( "z80pio", XTAL_3MHz, llc2_z80pio_intf )
 	MCFG_Z80CTC_ADD( "z80ctc", XTAL_3MHz, llc2_ctc_intf )
@@ -389,4 +394,4 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY    FULLNAME       FLAGS */
 COMP( 1984, llc1,   0,      0,      llc1,       llc1,       llc1,    "SCCH",    "LLC-1", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
-COMP( 1984, llc2,   llc1,   0,      llc2,       k7659,      llc2,    "SCCH",    "LLC-2", GAME_NO_SOUND_HW)
+COMP( 1984, llc2,   llc1,   0,      llc2,       k7659,      llc2,    "SCCH",    "LLC-2", 0 )

@@ -13,7 +13,7 @@
 #include "machine/ram.h"
 
 
-
+// LLC1 BASIC keyboard
 static READ8_DEVICE_HANDLER (llc1_port2_b_r)
 {
 	llc_state *state = device->machine().driver_data<llc_state>();
@@ -35,6 +35,7 @@ static READ8_DEVICE_HANDLER (llc1_port2_a_r)
 	return 0;
 }
 
+// LLC1 Monitor keyboard
 static READ8_DEVICE_HANDLER (llc1_port1_a_r)
 {
 	llc_state *state = device->machine().driver_data<llc_state>();
@@ -48,7 +49,21 @@ static READ8_DEVICE_HANDLER (llc1_port1_a_r)
 	if (data & 0xf0)
 		data = (data >> 4) | 0x80;
 
-	return data | (state->m_porta & 0x70);
+	data |= (state->m_porta & 0x70);
+
+	// do not repeat key
+	if (data & 15)
+	{
+		if (data == state->m_llc1_key)
+			data &= 0x70;
+		else
+			state->m_llc1_key = data;
+	}
+	else
+	if ((data & 0x70) == (state->m_llc1_key & 0x70))
+		state->m_llc1_key = 0;
+
+	return data;
 }
 
 static WRITE8_DEVICE_HANDLER (llc1_port1_a_w)
@@ -119,6 +134,9 @@ DRIVER_INIT(llc1)
 
 MACHINE_RESET( llc1 )
 {
+	llc_state *state = machine.driver_data<llc_state>();
+	state->m_term_status = 0;
+	state->m_llc1_key = 0;
 }
 
 MACHINE_START(llc1)
@@ -199,6 +217,13 @@ static READ8_DEVICE_HANDLER (llc2_port_b_r)
 	return 0;
 }
 
+// bit 5 is to turn entire screen to reverse video
+static WRITE8_DEVICE_HANDLER (llc2_port_b_w)
+{
+	llc_state *state = device->machine().driver_data<llc_state>();
+	speaker_level_w(state->m_speaker, BIT(data, 6) );
+}
+
 static UINT8 key_pos(UINT8 val)
 {
 	if (BIT(val,0)) return 1;
@@ -271,7 +296,7 @@ Z80PIO_INTERFACE( llc2_z80pio_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_HANDLER(llc2_port_b_r),
-	DEVCB_NULL,
+	DEVCB_HANDLER(llc2_port_b_w),
 	DEVCB_NULL
 };
 

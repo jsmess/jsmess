@@ -9,21 +9,25 @@
 
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
+#include "sound/speaker.h"
 
 class llc_state : public driver_device
 {
 public:
 	llc_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) ,
-		m_video_ram(*this, "video_ram"){ }
+		: driver_device(mconfig, type, tag),
+	m_speaker(*this, SPEAKER_TAG),
+	m_video_ram(*this, "video_ram"){ }
 
-	optional_shared_ptr<UINT8> m_video_ram;
 	DECLARE_WRITE8_MEMBER(llc2_rom_disable_w);
 	DECLARE_WRITE8_MEMBER(llc2_basic_enable_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_porta;
 	UINT8 m_term_data;
 	UINT8 m_term_status;
+	UINT8 m_llc1_key;
+	optional_device<device_t> m_speaker;
+	optional_shared_ptr<UINT8> m_video_ram;
 private:
 };
 
