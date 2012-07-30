@@ -966,7 +966,7 @@ i.e. addr bits 9876543210
 	ROM_LOAD( "wb---0_060b1.6309.pr2.ic77", 0x0000, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label verified from nigwil's board
 
 	ROM_REGION( 0x400, "proms", ROMREGION_ERASEFF )
-	/* some sort of synchronizer or counter rom (256*4, 82s129)
+	/* some sort of "COUNTER ROM" involved with erasing VRAM dram to the background color? (256*4, 82s129)
 	 * control bits:
 	 *            /CE1 ----- ?
 	 *            /CE2 ----- ?
@@ -978,7 +978,7 @@ i.e. addr bits 9876543210
 	 *            |||\------ ?
 	 *            ||\------- ?
 	 *            |\-------- ?
-	 *            \--------- Connects to the SYNC ROM A4 (what drives this?)
+	 *            \--------- comes from the gated ERASE L/d5 on the vector rom [verified from tracing]
 	 * data bits: 3210
 	 *            |||\-- ?
 	 *            ||\--- ?
@@ -1018,7 +1018,7 @@ i.e. addr bits 9876543210
 	 *            /CE2 ----- ?
 	 * addr bits: 76543210
 	 *            ||||\\\\-- To sync counter, which counts 0xC 0x3 0x2 0x1 0x0 0x5 0x4 0xB 0xA 0x9 0x8 0xD in that order
-	 *            |||\------ A0\__Address lsb bits of the execute write, i.e. VG_MODE
+	 *            |||\------ A0\__Address lsb bits of the execute write, i.e. VG_MODE; these are INVERTED FIRST.
 	 *            ||\------- A1/
 	 *            |\-------- CARRY_IN (when set, only one /LD ERROR pulse occurs instead of two)
 	 *            \--------- ? possibly tied or somehow pulsed by sync rom d7? /LD ERROR only goes active (low) when this is unset
@@ -1029,7 +1029,7 @@ i.e. addr bits 9876543210
 	 *            |||||\---- ? vector clk
 	 *            ||||\----- /LD ERROR aka STROBE ERROR L (strobes the adder result value into the vgERR register)
 	 *            |||\------ ? d-load?
-	 *            ||\------- ERASE L (forces a4 on the sync rom low and maybe drives /WE low to make the crtc refresh blank all of ram)
+	 *            ||\------- ERASE L (latched, forces a4 on the sync rom low and also forces a7 on the counter rom; the counter rom may be involved in blanking all of vram) [verified from tracing]
 	 *            |\-------- C0 aka C IN (high during DVM read, low otherwise, likely a carry in to the adder so DVM is converted from 1s to 2s complement)
 	 *            \--------- ? done l?
 	 *
@@ -1051,7 +1051,7 @@ i.e. addr bits 9876543210
 	 *            /CE1 -- GND(Unused)
 	 * addr bits: 43210
 	 *            |\\\\-- To sync counter, which counts 0xC 0x3 0x2 0x1 0x0 0x5 0x4 0xB 0xA 0x9 0x8 0xD in that order
-	 *            \------ from vector rom d5, only low during VG_MODE == ER (ERase Screen)
+	 *            \------ comes from the gated ERASE L/d5 from the vector rom, only low during VG_MODE == ER (ERase Screen) [verified from tracing]
 	 *                      when high: the sync rom matches figure 5-20 (page 5-32) and 5-23 (page 5-38)
 	 *                      when low: RA/RB is fixed on WOPS in the register file
 	 *                                LD SHFR does NOT output pulses (effectively blanking the screen)
