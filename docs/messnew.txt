@@ -1,4 +1,172 @@
-﻿0.146u3
+﻿0.146u4
+
+MAMETesters Bugs Fixed
+----------------------
+(none)
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+Skeleton drivers:
+-----------------
+(none)
+
+
+System Driver Changes:
+----------------------
+-vt100: Fix vt100 to use beep instead of speaker. Some work still needs to be
+ done to beep.c since the phase needs to be reset in such a way that
+ keyclicks work consistently, in addition to beeps. [Lord Nightmare]
+
+-vt100: Added missing dot stretching to the DEC VT100's dc012 emulation. See
+ EK-VT100-TM-003 page 4-76 for a description. Note the stretching takes
+ place after the character rom but before invert or other attributes.
+ [Lord Nightmare]
+
+-vk100: hook up vblank interrupt (critical selftest now passes); add
+ layout for LEDS, beginning of skeleton keyboard support.
+ [Lord Nightmare]
+
+-exelvision: use correct vsm rom [robcfg, kevtris]
+
+-vk100: Correct the labels of several proms which were unreadable on the vk100
+ that they were dumped from [nigwil]
+
+-vk100: attach keyboard [Lord Nightmare]
+
+-vk100: miscellaneous progress, slight cleanup to keyboard, stubbed and
+ implemented a bunch of vector generator addresses [Lord Nightmare]
+
+-vk100: figured out pattern rom addressing [Lord Nightmare]
+
+-vk100: implemented stubs for the rest of the VG registers
+ [Lord Nightmare]
+
+-vk100: implemented or stubbed the rest of the io registers, left
+ SYSTAT_A commented for now since its behavior is unclear. Added and
+ attached the dipswitches to SYSTAT_B (though this may well be wrong)
+ Hooked up the i8251 uart preliminarily (ints not hooked up yet)
+ [Lord Nightmare]
+
+-mc1502: added cassette input, keyboard input fix. [shattered]
+
+-iskr1031, ec1841: split machine descriptions from pc16, remove hacks
+ from pc16 and ibm5550. [shattered]
+
+-ec1841: mirror chargen memory at b800:1000 -- fixes video test 501 on
+ TPS (diagnostics) disk. [shattered]
+
+-ec1841: implement memory controller (only for 1 board yet), no support
+ for remapping banks inside the board.  Memory test in POST passes.
+ [shattered]
+
+-vk100: WIP: preliminary gfx rendering; hooked up the i8251 interrupts.
+ Corrected dipswitch locations. [Lord Nightmare]
+
+-vk100: Initial implementation of the vector generator. Rather buggy, and not
+ really readable yet, but it definitely shows something on screen, and
+ you can type and see things change! (and you see a blinking cursor
+ too!) [Lord Nightmare]
+
+-vk100: further improvements to the vector generator, still not
+ completely correct. [Lord Nightmare]
+
+-vk100: FINALLY fixed the vector generator. Display looks relatively
+ sane now. Fixed shift and capslock being reversed and added
+ port_toggle to capslock. [Lord Nightmare]
+
+-vk100: preliminary direction support for basic vectors. doesn't quite
+ work right yet. [Lord Nightmare]
+
+-vk100: Add more debugging defines, remove some unneeded code, and
+ added more comments to TODO and to some registers. [Lord Nightmare]
+
+-vk100: vector generator uses "real" timing instead of drawing the
+ vector instantly. [Lord Nightmare]
+
+-vk100: update comments to reflect that the pr1 prom is clearly the
+ VECTOR ROM. Add notes about what each address bit does or is thought
+ to do. (the tech manual documentation is lousy, but is better than
+ nothing). [Lord Nightmare]
+
+-geniusiq: Added PCB layout for the German Version. [TeamEurope]
+
+-vk100: minor cleanups to variable names, documented as much of the
+ address info of the sync and direction proms as I could figure so far.
+ [Lord Nightmare]
+
+-vk100: vector timing callback rate is now definitely correct; the tech
+ manual had an annoying error which made this hard to figure out.
+ [Lord Nightmare]
+
+-vk100: figured out bits 3,2,1 of SOPS register and implemented
+ blinking and documented serial multiplexer based on these findings.
+ Also fixed a stupid bug in the display code which broke the reverse
+ video bit. [Lord Nightmare]
+
+-vk100: properly hooked up dipswitches through the SYSTAT_A register
+ bit d2. Got rid of some dead palette code. [Lord Nightmare]
+
+-vk100: Fixed the weird ordering of the dipswitches, so everything now
+ controls what it should. [Lord Nightmare]
+
+-vk100: Add the two previously-missing PROMs (not hooked up yet);
+ Update notes a bit, correct location for the main roms according to
+ tech manual (it turns out you count from the lower right corner
+ upward, not upper right downward). [Lord Nightmare, Balrog, Andy V.]
+
+-vk100: Comment wrangling and some analysis of the newly dumped proms.
+ Still some work to be done here especially on the vector prom.
+ [Lord Nightmare]
+
+-vidbrain: Fixed graphics corruption in Lemonade Stand. [Sean Riddle]
+
+-vidbrain: Fixed memory map, improved colors. [Sean Riddle]
+
+-mc1502: preliminary floppy support. Still not functional [shattered]
+
+-pc: fixes the sound in Arkanoid, which doesn't use the 8253 at all.
+ [shattered]
+
+-llc1:  [Robbbert]
+ * Identified monitor keys
+ * Turns out new monitor rom is also a bad dump
+ * Added patches to make the system usable
+
+-vk100: more comment updates based on shared info from VT125 tech
+ manual [Lord Nightmare]
+
+-vk100: slight documentation updates, traced sync rom A4 completely.
+ [Lord Nightmare]
+
+
+Software Lists:
+----------------
+-pico.xml: added more Japanese dumps [TeamEurope]
+
+-a800.xml: Another small addition to the a800 softlist. [K1W1]
+
+-apple1.xml: Added proper wav for aslite [Anon]
+
+Source Changes:
+----------------
+-m68k: Handle higher-value constants in FMOVECR [R. Belmont]
+
+-Moved TMS9901/9902 from mess/machine to emu/machine [Michael Zapf]
+
+-AM9517 DMA controller enhancements, adapted PC drivers to use it
+ [Carl]
+
+-pccga: ec1841 not only mirrors the chargen buffer, but also
+ byte-swaps it [shattered]
+
+
+0.146u3
 
 MAMETesters Bugs Fixed
 ----------------------
