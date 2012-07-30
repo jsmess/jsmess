@@ -29,12 +29,12 @@
     - Balance of Power: uses the SIO port for mouse polling;
     - Battle Entry: moans with a JP msg then dies if you try to press either numpad 1 or 2 (asks if the user wants to use the sound board (yes 1 / no 2)
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
-	- The Black Onyx: writes a katakana msg: "rino kata ha koko ni orimasen" then doesn't show up anything.
+    - The Black Onyx: writes a katakana msg: "rino kata ha koko ni orimasen" then doesn't show up anything.
     - Blue Moon Story: moans with a kanji msg;.
     - Bubblegum Crisis: crashes due of a spurious irq (works if you soft reset the emulation when it triggers the halt opcode);
     - Can Can Bunny: bitmap artifacts on intro, could be either ALU or floppy issues;
-	- Carrot: gfxs are messed up
-	- Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
+    - Carrot: gfxs are messed up
+    - Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Grobda: palette is ugly (parent pc8801 only);
     - Hang-On: typical busted attributes for a N-BASIC game
@@ -58,7 +58,7 @@
     - Kuronekosou Souzoku Satsujin Jiken ("Illegal function call in 105")
     - Jark (needs PC-8801MC)
     - MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
-	- Mr. Pro Yakyuu
+    - Mr. Pro Yakyuu
     - Space Harrier
     - The Return of Ishtar
     - Tobira wo Akete (random crashes in parent pc8801 only)

@@ -265,7 +265,7 @@ READ8_MEMBER( digel804_state::ip43 )
     */
 	// HACK to dump display contents to stderr
 //  FIXME : not sure what to do here with the new device! 201207
-//	fprintf(stderr,"%s\n",ROC10937_get_string(0));
+//  fprintf(stderr,"%s\n",ROC10937_get_string(0));
 #ifdef PORT43_R_VERBOSE
 	logerror("Digel804: returning %02X for port 43 status read\n", port43_rtn);
 #endif

@@ -84,9 +84,9 @@
  * 'reconfiguration code' (inverted number of failing memory bank) to
  * the register.
 
- * bit 1-0	'reconfiguration code'
- * bit 2	enable read access
- * bit 3 	enable write access
+ * bit 1-0  'reconfiguration code'
+ * bit 2    enable read access
+ * bit 3    enable write access
  */
 
 READ8_MEMBER(pc_state::ec1841_memboard_r)
@@ -940,11 +940,11 @@ static TIMER_CALLBACK( mc1502_keyb_signal_callback )
 	DBG_LOG(1,"mc1502_k_s_c",("= %02X (%d) %s\n", key, mc1502_keyb.pulsing,
 		(key || mc1502_keyb.pulsing) ? " will IRQ" : ""));
 
-	/* 
-	   If a key is pressed and we're not pulsing yet, start pulsing the IRQ1; 
-	   keep pulsing while any key is pressed, and pulse one time after all keys
-	   are released.
-	 */
+	/*
+       If a key is pressed and we're not pulsing yet, start pulsing the IRQ1;
+       keep pulsing while any key is pressed, and pulse one time after all keys
+       are released.
+     */
 	if (key) {
 		if (mc1502_keyb.pulsing < 2) {
 			mc1502_keyb.pulsing += 2;
@@ -996,15 +996,15 @@ static READ8_DEVICE_HANDLER ( mc1502_ppi_portc_r )
 	int data = 0xff;
 	double tap_val = (device->machine().device<cassette_image_device>(CASSETTE_TAG)->input());
 
-//	0x80 -- serial RxD
-//	0x40 -- CASS IN, also loops back T2OUT (gated by CASWR)
+//  0x80 -- serial RxD
+//  0x40 -- CASS IN, also loops back T2OUT (gated by CASWR)
 	data = ( data & ~0x40 ) | ( tap_val < 0 ? 0x40 : 0x00 ) | ( (BIT(st->m_ppi_portb, 7) && timer2_output) ? 0x40 : 0x00 );
-//	0x20 -- T2OUT
+//  0x20 -- T2OUT
 	data = ( data & ~0x20 ) | ( timer2_output ? 0x20 : 0x00 );
-//	0x10 -- SNDOUT
+//  0x10 -- SNDOUT
 	data = ( data & ~0x10 ) | ( (BIT(st->m_ppi_portb, 1) && timer2_output) ? 0x10 : 0x00 );
 
-	DBG_LOG(2,"mc1502_ppi_portc_r",("= %02X (tap_val %f t2out %d) at %s\n", 
+	DBG_LOG(2,"mc1502_ppi_portc_r",("= %02X (tap_val %f t2out %d) at %s\n",
 		data, tap_val, timer2_output, machine.describe_context()));
 	return data;
 }
@@ -1480,12 +1480,12 @@ MACHINE_START( mc1502 )
 	st->m_dma8237 = NULL;
 	st->m_pit8253 = machine.device("pit8253");
 
-	/* 
+	/*
            Keyboard polling circuit holds IRQ1 high until a key is
            pressed, then it starts a timer that pulses IRQ1 low each
            40ms (check) for 20ms (check) until all keys are released.
            Last pulse causes BIOS to write a 'break' scancode into port 60h.
-	 */
+     */
 	pic8259_ir1_w(st->m_pic8259, 1);
 	memset(&mc1502_keyb, 0, sizeof(mc1502_keyb));
 	mc1502_keyb.keyb_signal_timer = machine.scheduler().timer_alloc(FUNC(mc1502_keyb_signal_callback));

@@ -167,7 +167,7 @@ void uv201_device::device_start()
 void uv201_device::device_reset()
 {
 	m_out_ext_int_func(CLEAR_LINE);
-	
+
 	m_out_hblank_func(1);
 	m_timer_hblank_off->adjust(attotime::from_ticks( HBLANK_END, m_clock ));
 }

@@ -131,7 +131,7 @@ static TIMER_DEVICE_CALLBACK(keyboard_callback)
 
 WRITE8_MEMBER( vt100_state::vt100_keyboard_w )
 {
-	beep_set_frequency( m_speaker, 786 ); // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz 
+	beep_set_frequency( m_speaker, 786 ); // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
 	output_set_value("online_led",BIT(data, 5) ? 0 : 1);
 	output_set_value("local_led", BIT(data, 5));
 	output_set_value("locked_led",BIT(data, 4) ? 0 : 1);

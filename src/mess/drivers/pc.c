@@ -246,15 +246,15 @@ static ADDRESS_MAP_START(ec1841_io, AS_IO, 16, pc_state)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,				pc_page_w, 0xffff)
 	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8( pc_nmi_enable_w, 0x00ff )
 	AM_RANGE(0x0210, 0x0217) AM_NOP	// expansion chassis interface
-//	AM_RANGE(0x0230, 0x021f) 	// mouse
+//  AM_RANGE(0x0230, 0x021f)    // mouse
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE8(pc_rtc_r,				pc_rtc_w, 0xffff)
 	AM_RANGE(0x02b0, 0x02b3) AM_READWRITE8(ec1841_memboard_r, ec1841_memboard_w, 0xffff);
-//	AM_RANGE(0x02f8, 0x02f8) AM_DEVREADWRITE8_LEGACY("upd8251_1", i8251_device, data_r, data_w, 0x00ff)
-//	AM_RANGE(0x02f9, 0x02f9) AM_DEVREADWRITE8_LEGACY("upd8251_1", i8251_device, status_r, control_w, 0xff00)
+//  AM_RANGE(0x02f8, 0x02f8) AM_DEVREADWRITE8_LEGACY("upd8251_1", i8251_device, data_r, data_w, 0x00ff)
+//  AM_RANGE(0x02f9, 0x02f9) AM_DEVREADWRITE8_LEGACY("upd8251_1", i8251_device, status_r, control_w, 0xff00)
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8_LEGACY(pc_fdc_r,				pc_fdc_w, 0xffff)
-//	AM_RANGE(0x03f8, 0x03f9) AM_DEVREADWRITE8_LEGACY("upd8251_0", i8251_device, data_r, data_w, 0x00ff)
-//	AM_RANGE(0x03f8, 0x03f9) AM_DEVREADWRITE8_LEGACY("upd8251_0", i8251_device, status_r, control_w, 0xff00)
+//  AM_RANGE(0x03f8, 0x03f9) AM_DEVREADWRITE8_LEGACY("upd8251_0", i8251_device, data_r, data_w, 0x00ff)
+//  AM_RANGE(0x03f8, 0x03f9) AM_DEVREADWRITE8_LEGACY("upd8251_0", i8251_device, status_r, control_w, 0xff00)
 ADDRESS_MAP_END
 
 
@@ -266,13 +266,13 @@ static ADDRESS_MAP_START(iskr1031_io, AS_IO, 16, pc_state)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE8("ppi8255", i8255_device, read, write, 0xffff)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,				pc_page_w, 0xffff)
 	AM_RANGE(0x00a0, 0x00a1) AM_WRITE8( pc_nmi_enable_w, 0x00ff )
-//	AM_RANGE(0x0200, 0x0207) AM_READWRITE8_LEGACY(pc_JOY_r,	pc_JOY_w, 0xffff)
+//  AM_RANGE(0x0200, 0x0207) AM_READWRITE8_LEGACY(pc_JOY_r, pc_JOY_w, 0xffff)
 	AM_RANGE(0x0240, 0x0257) AM_READWRITE8(pc_rtc_r,				pc_rtc_w, 0xffff)
-//	AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_device, ins8250_r, ins8250_w, 0xffff)
+//  AM_RANGE(0x02e8, 0x02ef) AM_DEVREADWRITE8("ins8250_3", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x0340, 0x0357) AM_NOP /* anonymous bios should not recogniced realtimeclock */
 	AM_RANGE(0x0378, 0x037f) AM_DEVREADWRITE8_LEGACY("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
-//	AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_device, ins8250_r, ins8250_w, 0xffff)
+//  AM_RANGE(0x03e8, 0x03ef) AM_DEVREADWRITE8("ins8250_2", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8_LEGACY(pc_fdc_r,				pc_fdc_w, 0xffff)
 	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_device, ins8250_r, ins8250_w, 0xffff)
 ADDRESS_MAP_END
@@ -1316,7 +1316,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mc1502, pc_state )
 	/* basic machine hardware */
-//	MCFG_CPU_PC(mc1502, mc1502, I8088, XTAL_16MHz/3, pcjr_frame_interrupt)	/* check frame_interrupt */
+//  MCFG_CPU_PC(mc1502, mc1502, I8088, XTAL_16MHz/3, pcjr_frame_interrupt)  /* check frame_interrupt */
 	MCFG_CPU_ADD("maincpu", I8088, XTAL_16MHz/3)
 	MCFG_CPU_PROGRAM_MAP(mc1502_map)
 	MCFG_CPU_IO_MAP(mc1502_io)
@@ -1361,7 +1361,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ec1841, pc_state )
 	/* basic machine hardware */
 	MCFG_CPU_PC(ec1841, ec1841, I8086, 4096000, pc_frame_interrupt)	// correct but slow
-//	MCFG_CPU_PC(ec1841, ec1841, I8086, 4772720, pc_frame_interrupt)
+//  MCFG_CPU_PC(ec1841, ec1841, I8086, 4772720, pc_frame_interrupt)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
@@ -1377,8 +1377,8 @@ static MACHINE_CONFIG_START( ec1841, pc_state )
 
 	MCFG_I8255_ADD( "ppi8255", ibm5160_ppi8255_interface )
 
-//	MCFG_I8251_ADD( "upd8251_0", default_i8251_interface )	// modeled after BSC adapter?
-//	MCFG_I8251_ADD( "upd8251_1", default_i8251_interface )
+//  MCFG_I8251_ADD( "upd8251_0", default_i8251_interface )  // modeled after BSC adapter?
+//  MCFG_I8251_ADD( "upd8251_1", default_i8251_interface )
 
 	/* video hardware -- supports font uploads */
 	MCFG_FRAGMENT_ADD( pcvideo_cga )
@@ -1403,7 +1403,7 @@ static MACHINE_CONFIG_START( ec1841, pc_state )
 	/* internal ram -- up to 4 banks of 512K */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
-//	MCFG_RAM_EXTRA_OPTIONS("640K,1024K,1576K,2048K")
+//  MCFG_RAM_EXTRA_OPTIONS("640K,1024K,1576K,2048K")
 MACHINE_CONFIG_END
 
 

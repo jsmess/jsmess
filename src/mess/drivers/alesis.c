@@ -34,7 +34,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(sr16_mem, AS_PROGRAM, 8, alesis_state)
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(0x0006, 0x0007 )	// LCD interface?
+//  AM_RANGE(0x0006, 0x0007 )   // LCD interface?
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
