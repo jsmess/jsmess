@@ -11,6 +11,7 @@
     for the moment.
 
     Screen goes crazy during the memory test, just ignore it.
+    System freezes if ^G pressed.
 
     25/04/2011 Added partial keyboard.
     26/06/2011 Added modifier keys.
@@ -29,9 +30,8 @@ class beehive_state : public driver_device
 public:
 	beehive_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-	m_maincpu(*this, "maincpu")
-	,
-		m_p_videoram(*this, "p_videoram"){ }
+	m_maincpu(*this, "maincpu"),
+	m_p_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER(beehive_60_r);
@@ -64,7 +64,7 @@ WRITE8_MEMBER(beehive_state::beehive_62_w)
 static ADDRESS_MAP_START(beehive_mem, AS_PROGRAM, 8, beehive_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x17ff ) AM_ROM
-	AM_RANGE( 0x8000, 0x8fff ) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE( 0x8000, 0x8fff ) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( beehive_io, AS_IO, 8, beehive_state)
@@ -318,6 +318,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 19??, beehive,  0,       0,	beehive,	beehive,	 0,  "BeeHive",   "DM3270", GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
+COMP( 19??, beehive, 0,      0,       beehive,   beehive, 0,     "BeeHive", "DM3270", GAME_NO_SOUND)
 

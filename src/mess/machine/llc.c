@@ -7,72 +7,66 @@
 ****************************************************************************/
 
 
-#include "emu.h"
-#include "cpu/z80/z80.h"
 #include "includes/llc.h"
-#include "machine/ram.h"
 
 
 // LLC1 BASIC keyboard
-static READ8_DEVICE_HANDLER (llc1_port2_b_r)
+READ8_MEMBER(llc_state::llc1_port2_b_r)
 {
-	llc_state *state = device->machine().driver_data<llc_state>();
 	UINT8 retVal = 0;
 
-	if (state->m_term_status)
+	if (m_term_status)
 	{
-		retVal = state->m_term_status;
-		state->m_term_status = 0;
+		retVal = m_term_status;
+		m_term_status = 0;
 	}
 	else
-		retVal = state->m_term_data;
+		retVal = m_term_data;
 
 	return retVal;
 }
 
-static READ8_DEVICE_HANDLER (llc1_port2_a_r)
+READ8_MEMBER(llc_state::llc1_port2_a_r)
 {
 	return 0;
 }
 
 // LLC1 Monitor keyboard
-static READ8_DEVICE_HANDLER (llc1_port1_a_r)
+READ8_MEMBER(llc_state::llc1_port1_a_r)
 {
-	llc_state *state = device->machine().driver_data<llc_state>();
 	UINT8 data = 0;
-	if (!BIT(state->m_porta, 4))
-		data = state->ioport("X4")->read();
-	if (!BIT(state->m_porta, 5))
-		data = state->ioport("X5")->read();
-	if (!BIT(state->m_porta, 6))
-		data = state->ioport("X6")->read();
+	if (!BIT(m_porta, 4))
+		data = ioport("X4")->read();
+	if (!BIT(m_porta, 5))
+		data = ioport("X5")->read();
+	if (!BIT(m_porta, 6))
+		data = ioport("X6")->read();
 	if (data & 0xf0)
 		data = (data >> 4) | 0x80;
 
-	data |= (state->m_porta & 0x70);
+	data |= (m_porta & 0x70);
 
 	// do not repeat key
 	if (data & 15)
 	{
-		if (data == state->m_llc1_key)
+		if (data == m_llc1_key)
 			data &= 0x70;
 		else
-			state->m_llc1_key = data;
+			m_llc1_key = data;
 	}
 	else
-	if ((data & 0x70) == (state->m_llc1_key & 0x70))
-		state->m_llc1_key = 0;
+	if ((data & 0x70) == (m_llc1_key & 0x70))
+		m_llc1_key = 0;
 
 	return data;
 }
 
-static WRITE8_DEVICE_HANDLER (llc1_port1_a_w)
+WRITE8_MEMBER(llc_state::llc1_port1_a_w)
 {
-	llc_state *state = device->machine().driver_data<llc_state>();
-	state->m_porta = data;
+	m_porta = data;
 }
 
-static WRITE8_DEVICE_HANDLER (llc1_port1_b_w)
+WRITE8_MEMBER(llc_state::llc1_port1_b_w)
 {
 	static UINT8 count = 0, digit = 0;
 
@@ -95,7 +89,7 @@ static WRITE8_DEVICE_HANDLER (llc1_port1_b_w)
 }
 
 // timer 0 irq does digit display, and timer 3 irq does scan of the
-// monitor keyboard. Currently the keyboard is being scanned too fast.
+// monitor keyboard.
 // No idea how the CTC is connected, so guessed.
 Z80CTC_INTERFACE( llc1_ctc_intf )
 {
@@ -109,21 +103,21 @@ Z80CTC_INTERFACE( llc1_ctc_intf )
 Z80PIO_INTERFACE( llc1_z80pio1_intf )
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
-	DEVCB_HANDLER(llc1_port1_a_r),
-	DEVCB_HANDLER(llc1_port1_a_w),
+	DEVCB_DRIVER_MEMBER(llc_state, llc1_port1_a_r),
+	DEVCB_DRIVER_MEMBER(llc_state, llc1_port1_a_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(llc1_port1_b_w),
+	DEVCB_DRIVER_MEMBER(llc_state, llc1_port1_b_w),
 	DEVCB_NULL
 };
 
 Z80PIO_INTERFACE( llc1_z80pio2_intf )
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
-	DEVCB_HANDLER(llc1_port2_a_r),
+	DEVCB_DRIVER_MEMBER(llc_state, llc1_port2_a_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(llc1_port2_b_r),
+	DEVCB_DRIVER_MEMBER(llc_state, llc1_port2_b_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -157,7 +151,7 @@ Z80CTC_INTERFACE( llc2_ctc_intf )
 DRIVER_INIT(llc2)
 {
 	llc_state *state = machine.driver_data<llc_state>();
-	state->m_video_ram.set_target( machine.device<ram_device>(RAM_TAG)->pointer() + 0xc000,state->m_video_ram.bytes());
+	state->m_p_videoram.set_target( machine.device<ram_device>(RAM_TAG)->pointer() + 0xc000,state->m_p_videoram.bytes());
 }
 
 MACHINE_RESET( llc2 )
@@ -200,31 +194,32 @@ WRITE8_MEMBER(llc_state::llc2_rom_disable_w)
 
 WRITE8_MEMBER(llc_state::llc2_basic_enable_w)
 {
-
 	address_space *mem_space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	if (data & 0x02) {
+	if (data & 0x02)
+	{
 		mem_space->unmap_write(0x4000, 0x5fff);
 		membank("bank2")->set_base(machine().root_device().memregion("maincpu")->base() + 0x10000);
-	} else {
+	}
+	else
+	{
 		mem_space->install_write_bank(0x4000, 0x5fff, "bank2");
 		membank("bank2")->set_base(machine().device<ram_device>(RAM_TAG)->pointer() + 0x4000);
 	}
 
 }
 
-static READ8_DEVICE_HANDLER (llc2_port_b_r)
+READ8_MEMBER(llc_state::llc2_port1_b_r)
 {
 	return 0;
 }
 
-// bit 5 is to turn entire screen to reverse video
-static WRITE8_DEVICE_HANDLER (llc2_port_b_w)
+WRITE8_MEMBER(llc_state::llc2_port1_b_w)
 {
-	llc_state *state = device->machine().driver_data<llc_state>();
-	speaker_level_w(state->m_speaker, BIT(data, 6) );
+	speaker_level_w(m_speaker, BIT(data, 6) );
+	m_rv = BIT(data, 5);
 }
 
-static UINT8 key_pos(UINT8 val)
+UINT8 llc_state::key_pos(UINT8 val)
 {
 	if (BIT(val,0)) return 1;
 	if (BIT(val,1)) return 2;
@@ -237,22 +232,22 @@ static UINT8 key_pos(UINT8 val)
 	return 0;
 }
 
-static READ8_DEVICE_HANDLER (llc2_port_a_r)
+READ8_MEMBER(llc_state::llc2_port1_a_r)
 {
-	UINT8 *k7659 = device->machine().root_device().memregion("k7659")->base();
+	UINT8 *k7659 = machine().root_device().memregion("k7659")->base();
 	UINT8 retVal = 0;
-	UINT8 a1 = device->machine().root_device().ioport("A1")->read();
-	UINT8 a2 = device->machine().root_device().ioport("A2")->read();
-	UINT8 a3 = device->machine().root_device().ioport("A3")->read();
-	UINT8 a4 = device->machine().root_device().ioport("A4")->read();
-	UINT8 a5 = device->machine().root_device().ioport("A5")->read();
-	UINT8 a6 = device->machine().root_device().ioport("A6")->read();
-	UINT8 a7 = device->machine().root_device().ioport("A7")->read();
-	UINT8 a8 = device->machine().root_device().ioport("A8")->read();
-	UINT8 a9 = device->machine().root_device().ioport("A9")->read();
-	UINT8 a10 = device->machine().root_device().ioport("A10")->read();
-	UINT8 a11 = device->machine().root_device().ioport("A11")->read();
-	UINT8 a12 = device->machine().root_device().ioport("A12")->read();
+	UINT8 a1 = machine().root_device().ioport("A1")->read();
+	UINT8 a2 = machine().root_device().ioport("A2")->read();
+	UINT8 a3 = machine().root_device().ioport("A3")->read();
+	UINT8 a4 = machine().root_device().ioport("A4")->read();
+	UINT8 a5 = machine().root_device().ioport("A5")->read();
+	UINT8 a6 = machine().root_device().ioport("A6")->read();
+	UINT8 a7 = machine().root_device().ioport("A7")->read();
+	UINT8 a8 = machine().root_device().ioport("A8")->read();
+	UINT8 a9 = machine().root_device().ioport("A9")->read();
+	UINT8 a10 = machine().root_device().ioport("A10")->read();
+	UINT8 a11 = machine().root_device().ioport("A11")->read();
+	UINT8 a12 = machine().root_device().ioport("A12")->read();
 	UINT16 code = 0;
 	if (a1!=0)
 		code = 0x10 + key_pos(a1);
@@ -289,14 +284,30 @@ static READ8_DEVICE_HANDLER (llc2_port_a_r)
 }
 
 
-Z80PIO_INTERFACE( llc2_z80pio_intf )
+Z80PIO_INTERFACE( llc2_z80pio1_intf )
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
-	DEVCB_HANDLER(llc2_port_a_r),
+	DEVCB_DRIVER_MEMBER(llc_state, llc2_port1_a_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(llc2_port_b_r),
-	DEVCB_HANDLER(llc2_port_b_w),
+	DEVCB_DRIVER_MEMBER(llc_state, llc2_port1_b_r),
+	DEVCB_DRIVER_MEMBER(llc_state, llc2_port1_b_w),
+	DEVCB_NULL
+};
+
+READ8_MEMBER(llc_state::llc2_port2_a_r)
+{
+	return 0; // bit 2 low or hangs on ^Z^X^C sequence
+}
+
+Z80PIO_INTERFACE( llc2_z80pio2_intf )
+{
+	DEVCB_NULL,	/* callback when change interrupt status */
+	DEVCB_DRIVER_MEMBER(llc_state, llc2_port2_a_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
