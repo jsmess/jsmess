@@ -156,6 +156,7 @@ public:
 	UINT16 m_vgPAT_Mask; // current mask for PAT but <<1
 	UINT8 m_vgPMUL; // reload value for PMUL_Count
 	UINT8 m_vgPMUL_Count;
+	UINT8 m_vgDownCount; // down counter = number of pixels, loaded from vgDU on execute
 	UINT8 m_vgDU;
 	UINT8 m_vgDVM;
 	UINT8 m_vgDIR;
@@ -175,10 +176,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vgDVM);
 	DECLARE_WRITE8_MEMBER(vgDIR);
 	DECLARE_WRITE8_MEMBER(vgWOPS);
-	DECLARE_WRITE8_MEMBER(vgEX_MOV);
-	DECLARE_WRITE8_MEMBER(vgEX_DOT);
-	DECLARE_WRITE8_MEMBER(vgEX_VEC);
-	DECLARE_WRITE8_MEMBER(vgEX_ER);
+	DECLARE_WRITE8_MEMBER(vgEX);
 	DECLARE_WRITE8_MEMBER(KBDW);
 	DECLARE_WRITE8_MEMBER(BAUD);
 	DECLARE_READ8_MEMBER(vk100_keyboard_column_r);
@@ -218,9 +216,6 @@ static TIMER_CALLBACK( execute_vg )
 	// pattern rom addressing is a complex mess. see the pattern rom def later in this file.
 	UINT8 nybbleNum = (XFinal&0xC)>>2; // which of the four nybbles within the block to address. should NEVER be 3!
 	//printf("EA: %04X, nybblenum: %d X: %04X, X': %04X, Y: %04X\n", EA, nybbleNum, state->m_vgX, XFinal, state->m_vgY);
-	// patmask should be vg_patmask >>1 unless vg_patmask is 0x1 in which case it is 0x80
-	UINT8 PATMask = state->m_vgPAT_Mask >> 1;
-	if (PATMask == 0) PATMask = 0x80;
 	UINT8 thisNyb = 0;
 	UINT16 blockRemain = 0;
 	switch(nybbleNum)
@@ -228,21 +223,21 @@ static TIMER_CALLBACK( execute_vg )
 		case 2: // modify the right nybble only (from the first byte)
 			thisNyb = (block&0x0F00)>>8;
 			blockRemain = (block&0xF0FF); // save the rest of the block
-			thisNyb = state->m_pattern[((state->m_vgPAT&PATMask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
+			thisNyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Mask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
 			state->m_LASTVRAM = thisNyb;
 			block = blockRemain | (thisNyb<<8);
 			break;
 		case 1: // modify the left nybble only (from the second byte)
 			thisNyb = (block&0x00F0)>>4;
 			blockRemain = (block&0xFF0F); // save the rest of the block
-			thisNyb = state->m_pattern[((state->m_vgPAT&PATMask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
+			thisNyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Mask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
 			state->m_LASTVRAM = thisNyb;
 			block = blockRemain | (thisNyb<<4);
 			break;
 		case 0: // modify the right nybble only (from the second byte)
 			thisNyb = (block&0x000F);
 			blockRemain = (block&0xFFF0); // save the rest of the block
-			thisNyb = state->m_pattern[((state->m_vgPAT&PATMask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
+			thisNyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Mask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
 			state->m_LASTVRAM = thisNyb;
 			block = blockRemain | thisNyb;
 			break;
@@ -258,7 +253,7 @@ static TIMER_CALLBACK( execute_vg )
 		case 0: // move; adjusts the x and y but doesn't write anything. do nothing
 			break;
 		case 1: // dot: only write the LAST pixel in the chain TODO: some fallthrough magic here?
-			if ((state->m_vgPAT_Mask) == 0x01)
+			if ((state->m_vgDownCount) == 0x00)
 			{
 				state->m_vram[(EA<<1)+1] = block&0xFF;
 				state->m_vram[(EA<<1)] = (block&0xFF00)>>8;
@@ -268,9 +263,16 @@ static TIMER_CALLBACK( execute_vg )
 			state->m_vram[(EA<<1)+1] = block&0xFF;
 			state->m_vram[(EA<<1)] = (block&0xFF00)>>8;
 			break;
-		case 3: // er: erase?
-			state->m_vram[(EA<<1)+1] = 0;
-			state->m_vram[(EA<<1)] = (block&0xF000)>>8;
+		case 3: // er: erase: special case here: wipe the entire screen and then set done.
+			/* commented out for now
+			for (int i = 0; i < 0x8000; i++)
+			{
+				if (!(i&1))
+					state->m_vram[i] = state->m_vram[i]&0xF0;
+				else // (i&1)
+					state->m_vram[i] = 0;
+			}*/ 
+			state->m_vgGO = 0; // done
 			break;
 	}
 	// HACK: we need the proper direction rom dump for this!
@@ -305,11 +307,13 @@ static TIMER_CALLBACK( execute_vg )
 			state->m_vgY--;
 			break;
 	}
+	state->m_vgDownCount--;
+	if ((state->m_vgDownCount) == 0x00) state->m_vgGO = 0; // check if the down counter hit terminal count (0), if so we're done.
 	//printf("VG state: EA: %d, lastvram: %d, curvram: %d, pmulcount: %d
 	if (((++state->m_vgPMUL_Count)&0xF)==0) { // if pattern multiplier counter overflowed
 		state->m_vgPMUL_Count = state->m_vgPMUL; // reload counter
 		state->m_vgPAT_Mask >>= 1;
-		if ((state->m_vgPAT_Mask) == 0x00) state->m_vgGO = 0; // check if the pattern shifter is empty, if so we're done
+		if (state->m_vgPAT_Mask == 0) state->m_vgPAT_Mask = 0x80;
 		}
 	if (state->m_vgGO) machine.scheduler().timer_set(attotime::from_hz(XTAL_45_6192Mhz/3/12/2), FUNC(execute_vg)); // /3/12/2 is correct. the sync counter is clocked by the dot clock, despite the error on figure 5-21
 }
@@ -435,60 +439,25 @@ WRITE8_MEMBER(vk100_state::vgWOPS)
 #endif
 }
 
-/* port 0x64: "EX MOV" execute a move (start the state machine) */
-WRITE8_MEMBER(vk100_state::vgEX_MOV)
+/* port 0x64: "EX MOV" execute a move (relative move of x and y using du/dvm/dir/err, no writing) */
+/* port 0x65: "EX DOT" execute a dot (draw a dot at x,y?) */
+/* port 0x66: "EX VEC" execute a vector (draw a vector from x,y to a destination using du/dvm/dir/err ) */
+/* port 0x67: "EX ER" execute an erase (clear the screen to the bg color, i.e. fill vram with zeroes) */
+WRITE8_MEMBER(vk100_state::vgEX)
 {
 #ifdef VG60_VERBOSE
-	logerror("VG Execute Move 0x64 written with %d\n", data);
+	static const char *const ex_functions[] = { "Move", "Dot", "Vector", "Erase" };
+	logerror("VG Execute %s 0x%02X written with %d\n", ex_functions[offset&3], 0x67+offset, data);
+	fprintf(stderr, "VG Execute %s 0x%02X written with %d\n", ex_functions[offset&3], 0x67+offset, data);
 #endif
-	// TODO: what the heck does this DO? dump vector prom
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
-	m_vgPAT_Mask = 0x100;
-	m_VG_MODE = 0;
+	m_vgPAT_Mask = 0x80;
+	m_vgDownCount = m_vgDU; // set down counter to length of major vector
+	m_VG_MODE = offset&3;
 	m_vgGO = 1;
 	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg));
 }
 
-/* port 0x65: "EX DOT" execute a dot (start the state machine) */
-WRITE8_MEMBER(vk100_state::vgEX_DOT)
-{
-#ifdef VG60_VERBOSE
-	logerror("VG: 0x65: Execute Dot written with %d\n", data);
-#endif
-	// TODO: what the heck does this DO? dump vector prom
-	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
-	m_vgPAT_Mask = 0x100; // load vgPAT_Mask
-	m_VG_MODE = 1;
-	m_vgGO = 1;
-	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg));
-}
-
-/* port 0x66: "EX VEC" execute a pattern (8 fixed direction) vector (start the state machine) */
-WRITE8_MEMBER(vk100_state::vgEX_VEC)
-{
-#ifdef VG60_VERBOSE
-	logerror("VG: 0x66: Execute Vector written with %d\n", data);
-#endif
-	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
-	m_vgPAT_Mask = 0x100; // load vgPAT_Mask
-	m_VG_MODE = 2;
-	m_vgGO = 1;
-	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg));
-}
-
-/* port 0x67: "EX ER" execute an "erase"? */
-WRITE8_MEMBER(vk100_state::vgEX_ER)
-{
-#ifdef VG60_VERBOSE
-	logerror("VG: 0x67: Execute Arbitrary 'error' vector written with %d\n", data);
-#endif
-	// TODO: what the heck does this DO? dump vector prom
-	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
-	m_vgPAT_Mask = 0x100; // load vgPAT_Mask
-	m_VG_MODE = 3;
-	m_vgGO = 1;
-	machine().scheduler().timer_set(attotime::zero, FUNC(execute_vg));
-}
 
 /* port 0x68: "KBDW" d7 is beeper, d6 is keyclick, d5-d0 are keyboard LEDS */
 WRITE8_MEMBER(vk100_state::KBDW)
@@ -594,10 +563,7 @@ static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
 	AM_RANGE (0x61, 0x61) AM_WRITE(vgDVM)    //LD DVM (minor)
 	AM_RANGE (0x62, 0x62) AM_WRITE(vgDIR)    //LD DIR (direction)
 	AM_RANGE (0x63, 0x63) AM_WRITE(vgWOPS)   //LD WOPS (write options)
-	AM_RANGE (0x64, 0x64) AM_WRITE(vgEX_MOV)    //EX MOV
-	AM_RANGE (0x65, 0x65) AM_WRITE(vgEX_DOT)    //EX DOT
-	AM_RANGE (0x66, 0x66) AM_WRITE(vgEX_VEC)    //EX VEC
-	AM_RANGE (0x67, 0x67) AM_WRITE(vgEX_ER)     //EX ER
+	AM_RANGE (0x64, 0x67) AM_WRITE(vgEX)    //EX MOV, DOT, VEC, ER
 	AM_RANGE (0x68, 0x68) AM_WRITE(KBDW)   //KBDW (probably AM_MIRROR(0x03))
 	AM_RANGE (0x6C, 0x6C) AM_WRITE(BAUD)   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks) (probably AM_MIRROR(0x03))
 	AM_RANGE(0x70, 0x70) AM_DEVWRITE("i8251", i8251_device, data_w) //LD COMD (i8251 data reg)
@@ -965,6 +931,32 @@ i.e. addr bits 9876543210
 	// it contains a table of 256 values which skips every fourth value so 00 01 02 04 05 06 08.. etc, wraps at the end
 	ROM_LOAD( "wb---0_060b1.6309.pr2.ic77", 0x0000, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label verified from nigwil's board
 
+	ROM_REGION(0x100, "dir", ROMREGION_ERASEFF )
+     /* this is the "DIRECTION ROM"  == mb6309 (256x8, 82s135)
+     * see figure 5-24 on page 5-39
+     * It tells the direction and enable for counting on the X and Y counters
+     * and also handles the non-math related parts of the bresenham line algorithm
+     * control bits:
+     *            /CE1 ----- ? ENA ERROR L?
+     *            /CE2 ----- ? D COUNT 0?
+     * addr bits: 76543210
+     *            ||||\\\\-- DIR (vgDIR register low 4 bits)
+     *            |||\------ ERROR CARRY (strobed in by STROBE L from the error counter's adder)
+     *            ||\------- Y0 (the otherwise unused lsb of the Y register, used for bresenham)
+     *            |\-------- feedback bit from d5 gated by V CLK
+     *            \--------- GND; the second half of the prom is blank (0x00)
+     * data bits: 76543210
+     *            |||||||\-- ENA X (enables change on X counter)
+     *            ||||||\--- ENA Y (enables change on Y counter)
+     *            |||||\---- Y DIRECTION (high is count down, low is count up)
+     *            ||||\----- X DIRECTION (high is count down, low is count up)
+     *            |||\------ PIXEL WRT
+     *            ||\------- feedback bit to a6
+     *            |\-------- UNUSED, always 0
+     *            \--------- UNUSED, always 0
+     */
+	ROM_LOAD( "wb8141_059b1.tbp18s22.pr5.ic108", 0x0000, 0x0100, CRC(4b63857a) SHA1(3217247d983521f0b0499b5c4ef6b5de9844c465))  // label verified from andy's board
+
 	ROM_REGION( 0x400, "proms", ROMREGION_ERASEFF )
 	/* some sort of "COUNTER ROM" involved with erasing VRAM dram to the background color? (256*4, 82s129)
      * control bits:
@@ -986,30 +978,6 @@ i.e. addr bits 9876543210
      *            \----- ?
      */
 	ROM_LOAD( "wb8151_573a2.6301.pr3.ic44", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4)) // label verified from nigwil's and andy's board
-	/* this is the "DIRECTION ROM"  == mb6309 (256x8, 82s135)
-     * see figure 5-24 on page 5-39
-     * It tells the direction and enable for counting on the X and Y counters
-     * and also handles the non-math related parts of the bresenham line algorithm
-     * control bits:
-     *            /CE1 ----- ?
-     *            /CE2 ----- ?
-     * addr bits: 76543210
-     *            ||||\\\\-- DIR (vgDIR register low 4 bits)
-     *            |||\------ ERROR CARRY (strobed in by STROBE L from the error counter's adder)
-     *            ||\------- Y0 (the otherwise unused lsb of the Y register, used for bresenham)
-     *            |\-------- feedback bit from d5 gated by V CLK
-     *            \--------- GND; the second half of the prom is blank (0x00)
-     * data bits: 76543210
-     *            |||||||\-- ENA X (enables change on X counter)
-     *            ||||||\--- ENA Y (enables change on Y counter)
-     *            |||||\---- Y DIRECTION (high is count down, low is count up)
-     *            ||||\----- X DIRECTION (high is count down, low is count up)
-     *            |||\------ PIXEL WRT
-     *            ||\------- feedback bit to a6
-     *            |\-------- UNUSED, always 0
-     *            \--------- UNUSED, always 0
-     */
-	ROM_LOAD( "wb8141_059b1.tbp18s22.pr5.ic108", 0x0100, 0x0100, CRC(4b63857a) SHA1(3217247d983521f0b0499b5c4ef6b5de9844c465))  // label verified from andy's board
 	/* this is the "VECTOR ROM" (256*8, 82s135) which runs the vector generator state machine
      * the vector rom bits are complex and are unfortunately poorly documented
      * in the tech manual. see figure 5-23.
@@ -1028,22 +996,25 @@ i.e. addr bits 9876543210
      *            ||||||\--- ? vector clk
      *            |||||\---- ? vector clk
      *            ||||\----- /LD ERROR aka STROBE ERROR L (strobes the adder result value into the vgERR register)
-     *            |||\------ ? d-load?
+     *            |||\------ ? done l?
      *            ||\------- ERASE L (latched, forces a4 on the sync rom low and also forces a7 on the counter rom; the counter rom may be involved in blanking all of vram) [verified from tracing]
      *            |\-------- C0 aka C IN (high during DVM read, low otherwise, likely a carry in to the adder so DVM is converted from 1s to 2s complement)
-     *            \--------- ? done l?
+     *            \--------- ?D LOAD? (goes to the clock of a d-latch near the register file)
      *
-     * According to the vt125 tech manual (vt100 tech manual rev 3, page 6-85) the 8 signals here are:
+     * According to the VT125 tech manual (vt100 tech manual rev 3, page 6-85) the 8 signals here are:
      * ERASE L - d5
      * SHIFT ENA
      * C IN - d6
-     * D LOAD
+     * D LOAD - possibly d7?
      * WRITE L - d0
      * DONE L
-     * VECTOR CLK
+     * VECTOR CLK - likely d2 or d1
      * STROBE ERROR L - d3
+     *
+     * it is possible d2 or d1 is the SYNC bit instead of one of the above
+     * The VT125 prom E71 and its latch E70 is exactly equivalent to the vector prom
      */
-	ROM_LOAD( "wb8146_058b1.6309.pr1.ic99", 0x0200, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))  // label verified from nigwil's and andy's board
+	ROM_LOAD( "wb8146_058b1.6309.pr1.ic99", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))  // label verified from nigwil's and andy's board
 	/* this is the "SYNC ROM" == mb6331 (32x8, 82s123)
      * It generates the ram RAS/CAS and a few other signals, see figure 5-20 on page 5-32
      * The exact pins for each signal are not documented.
@@ -1070,7 +1041,7 @@ i.e. addr bits 9876543210
      * The VT125 proms E64/E66 and their respective latches E65 and E83 are roughly
      * but not completely equivalent to the sync rom
      */
-	ROM_LOAD( "wb8-14_297a1.74s288.pr6.ic89", 0x0300, 0x0020, CRC(e2f7c566) SHA1(a4c3dc5d07667141ad799168a862cb3c489b4934)) // label verified from nigwil's and andy's board
+	ROM_LOAD( "wb8014_297a1.74s288.pr6.ic89", 0x0200, 0x0020, CRC(e2f7c566) SHA1(a4c3dc5d07667141ad799168a862cb3c489b4934)) // label verified from nigwil's and andy's board
 ROM_END
 
 /* Driver */
