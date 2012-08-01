@@ -148,6 +148,7 @@ public:
 	UINT8* m_vram;
 	UINT8* m_trans;
 	UINT8* m_pattern;
+	UINT8* m_dir;
 	UINT16 m_vgX;
 	UINT16 m_vgY;
 	UINT16 m_vgERR; // error register can cause carries which need to be caught
@@ -184,9 +185,8 @@ public:
 	DECLARE_READ8_MEMBER(SYSTAT_B);
 };
 
-static TIMER_CALLBACK( execute_vg )
-{
-	/* figure out ram address based on tech manual page 5-24:
+// vram access functions:
+    /* figure out vram address based on tech manual page 5-24:
      * real address to 16-bit chunk a13 a12 | a11 a10 a9  a8 | a7  a6  a5  a4 | a3  a2  a1  a0
      * X+Y input                    Y8  Y7  | Y6  Y5  Y4  Y3 | Y2  Y1  X9' X8'| X7' X6' X5' X4'
      *          X3' and X2' choose a 4-bit block, X1 and X0 choose a bit within that.
@@ -206,75 +206,75 @@ static TIMER_CALLBACK( execute_vg )
      *      1  1 -> bit 3
      *
      */
+
+// returns one nybble from vram array based on X and Y regs
+static UINT8 vram_read(running_machine &machine)
+{
 	vk100_state *state = machine.driver_data<vk100_state>();
-	// XFinal is (X'&0x3FC)|(X&0x3)
+    // XFinal is (X'&0x3FC)|(X&0x3)
 	UINT16 XFinal = state->m_trans[(state->m_vgX&0x3FC)>>2]<<2|(state->m_vgX&0x3); // appears correct
-	// EA is the effective ram address for a 16-bit block
+    // EA is the effective ram address for a 16-bit block
 	UINT16 EA = ((state->m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
-	// block is the 16 bit block directly (note EA has to be <<1 to correctly index a byte)
+    // block is the 16 bit block directly (note EA has to be <<1 to correctly index a byte)
 	UINT16 block = state->m_vram[(EA<<1)+1] | (state->m_vram[(EA<<1)]<<8);
-	// pattern rom addressing is a complex mess. see the pattern rom def later in this file.
+    // pattern rom addressing is a complex mess. see the pattern rom def later in this file.
 	UINT8 nybbleNum = (XFinal&0xC)>>2; // which of the four nybbles within the block to address. should NEVER be 3!
-	//printf("EA: %04X, nybblenum: %d X: %04X, X': %04X, Y: %04X\n", EA, nybbleNum, state->m_vgX, XFinal, state->m_vgY);
-	UINT8 thisNyb = 0;
-	UINT16 blockRemain = 0;
-	switch(nybbleNum)
-	{
-		case 2: // modify the right nybble only (from the first byte)
-			thisNyb = (block&0x0F00)>>8;
-			blockRemain = (block&0xF0FF); // save the rest of the block
-			thisNyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Mask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
-			state->m_LASTVRAM = thisNyb;
-			block = blockRemain | (thisNyb<<8);
-			break;
-		case 1: // modify the left nybble only (from the second byte)
-			thisNyb = (block&0x00F0)>>4;
-			blockRemain = (block&0xFF0F); // save the rest of the block
-			thisNyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Mask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
-			state->m_LASTVRAM = thisNyb;
-			block = blockRemain | (thisNyb<<4);
-			break;
-		case 0: // modify the right nybble only (from the second byte)
-			thisNyb = (block&0x000F);
-			blockRemain = (block&0xFFF0); // save the rest of the block
-			thisNyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Mask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb];
-			state->m_LASTVRAM = thisNyb;
-			block = blockRemain | thisNyb;
-			break;
-		default: // should never EVER get here
-			fatalerror("ERROR: VK100 VG attempted to modify the attribute nybble!\n");
-			break;
-	}
+	return (block>>(4*nybbleNum))&0xF;
+}
+
+static void vram_write(running_machine &machine, UINT8 data)
+{
+	vk100_state *state = machine.driver_data<vk100_state>();
+    // XFinal is (X'&0x3FC)|(X&0x3)
+	UINT16 XFinal = state->m_trans[(state->m_vgX&0x3FC)>>2]<<2|(state->m_vgX&0x3); // appears correct
+    // EA is the effective ram address for a 16-bit block
+	UINT16 EA = ((state->m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
+    // block is the 16 bit block directly (note EA has to be <<1 to correctly index a byte)
+	UINT16 block = state->m_vram[(EA<<1)+1] | (state->m_vram[(EA<<1)]<<8);
+    // pattern rom addressing is a complex mess. see the pattern rom def later in this file.
+	UINT8 nybbleNum = (XFinal&0xC)>>2; // which of the four nybbles within the block to address. should NEVER be 3!
+	block &= ~((UINT16)0xF<<(nybbleNum*4)); // mask out the part we want to replace
+	block |= data<<(nybbleNum*4); // write the new part
+	// NOTE: this next part may have to be made conditional on VG_MODE
 	// check if the attribute nybble is supposed to be modified, and if so do so
 	if (state->m_vgWOPS&0x08) block = (block&0x0FFF)|(((UINT16)state->m_vgWOPS&0xF0)<<8);
+	state->m_vram[(EA<<1)+1] = block&0xFF; // write block back to vram
+	state->m_vram[(EA<<1)] = (block&0xFF00)>>8; // ''
+}
+
+static TIMER_CALLBACK( execute_vg )
+{
+	vk100_state *state = machine.driver_data<vk100_state>();
+	UINT8 thisNyb = vram_read(machine); // read in the nybble
+	state->m_LASTVRAM = thisNyb;
+	UINT8 newNyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Mask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb]; // calculate new nybble based on pattern rom
 	// finally write the block back to ram depending on the VG_MODE (sort of a hack until we get the vector and synd and dir roms all hooked up)
 	switch (state->m_VG_MODE)
 	{
 		case 0: // move; adjusts the x and y but doesn't write anything. do nothing
 			break;
-		case 1: // dot: only write the LAST pixel in the chain TODO: some fallthrough magic here?
+		case 1: // dot: only write the LAST pixel in the chain? TODO: some fallthrough magic here?
 			if ((state->m_vgDownCount) == 0x00)
 			{
-				state->m_vram[(EA<<1)+1] = block&0xFF;
-				state->m_vram[(EA<<1)] = (block&0xFF00)>>8;
+				vram_write(machine, newNyb); // write out the modified nybble
 			}
 			break;
 		case 2: // vec: draw the vector
-			state->m_vram[(EA<<1)+1] = block&0xFF;
-			state->m_vram[(EA<<1)] = (block&0xFF00)>>8;
+				vram_write(machine, newNyb); // write out the modified nybble
 			break;
-		case 3: // er: erase: special case here: wipe the entire screen and then set done.
-			/* commented out for now
+		case 3: // er: erase: special case here: wipe the entire screen (except for color/attrib?) and then set done.
 			for (int i = 0; i < 0x8000; i++)
 			{
-				if (!(i&1))
+				if (!(i&1)) // avoid stomping attribute
 					state->m_vram[i] = state->m_vram[i]&0xF0;
 				else // (i&1)
 					state->m_vram[i] = 0;
-			}*/ 
+			}
 			state->m_vgGO = 0; // done
 			break;
 	}
+	// direction rom:
+	
 	// HACK: we need the proper direction rom dump for this!
 	switch(state->m_vgDIR&0x7)
 	{
@@ -307,22 +307,16 @@ static TIMER_CALLBACK( execute_vg )
 			state->m_vgY--;
 			break;
 	}
-	state->m_vgDownCount--;
+	state->m_vgDownCount--; // decrement the down counter
 	if ((state->m_vgDownCount) == 0x00) state->m_vgGO = 0; // check if the down counter hit terminal count (0), if so we're done.
-	//printf("VG state: EA: %d, lastvram: %d, curvram: %d, pmulcount: %d
-	if (((++state->m_vgPMUL_Count)&0xF)==0) { // if pattern multiplier counter overflowed
+	if (((++state->m_vgPMUL_Count)&0xF)==0) // if pattern multiplier counter overflowed
+	{
 		state->m_vgPMUL_Count = state->m_vgPMUL; // reload counter
-		state->m_vgPAT_Mask >>= 1;
-		if (state->m_vgPAT_Mask == 0) state->m_vgPAT_Mask = 0x80;
-		}
+		state->m_vgPAT_Mask >>= 1; // shift the mask
+		if (state->m_vgPAT_Mask == 0) state->m_vgPAT_Mask = 0x80; // reset mask if it hits 0
+	}
 	if (state->m_vgGO) machine.scheduler().timer_set(attotime::from_hz(XTAL_45_6192Mhz/3/12/2), FUNC(execute_vg)); // /3/12/2 is correct. the sync counter is clocked by the dot clock, despite the error on figure 5-21
 }
-
-/*
-void drawVector(UINT16 px, UINT16 py, UINT16 x, UINT16 y, int pattern)
-{
-    UINT8 *gfx = machine.root_device().memregion("vram")->base();
-}*/
 
 /* ports 0x40 and 0x41: load low and high bytes of vector gen X register */
 WRITE8_MEMBER(vk100_state::vgLD_X)
@@ -448,7 +442,7 @@ WRITE8_MEMBER(vk100_state::vgEX)
 #ifdef VG60_VERBOSE
 	static const char *const ex_functions[] = { "Move", "Dot", "Vector", "Erase" };
 	logerror("VG Execute %s 0x%02X written with %d\n", ex_functions[offset&3], 0x67+offset, data);
-	fprintf(stderr, "VG Execute %s 0x%02X written with %d\n", ex_functions[offset&3], 0x67+offset, data);
+	//fprintf(stderr, "VG Execute %s 0x%02X written with %d\n", ex_functions[offset&3], 0x67+offset, data);
 #endif
 	m_vgPMUL_Count = m_vgPMUL; // load PMUL_Count
 	m_vgPAT_Mask = 0x80;
@@ -492,6 +486,11 @@ WRITE8_MEMBER(vk100_state::BAUD)
  *                                    Switch
  * d7     d6     d5     d4     d3     d2        d1     d0
  * bit3, 2, 1, 0 are the last 4 bits read by the vector generator from VRAM
+ * note: if the vector generator is not running, reading SYSTAT A will
+ * supposedly FORCE the vector generator to read one nybble from the
+ * current x,y! (how does this work schematicwise??? it may just read
+ * the last nybble read by the constantly running sync counter, in
+ * which case the hack here sort of works as well)
  * this appears to be the only way the vram can be READ by the cpu
  d2 is where the dipswitch values are read from, based on the offset
  d1 is unknown
@@ -508,6 +507,7 @@ READ8_MEMBER(vk100_state::SYSTAT_A)
 #ifdef SYSTAT_A_VERBOSE
 	if (cpu_get_pc(m_maincpu) != 0x31D) logerror("0x%04X: SYSTAT_A Read!\n", cpu_get_pc(m_maincpu));
 #endif
+	if (m_vgGO == 0) m_LASTVRAM = vram_read(machine());
 	return ((m_vgGO?0:1)<<7)|(m_LASTVRAM<<3)|(((ioport("SWITCHES")->read()>>dipswitchLUT[offset])&1)?0x4:0)|0x3;
 }
 
@@ -566,15 +566,15 @@ static ADDRESS_MAP_START(vk100_io, AS_IO, 8, vk100_state)
 	AM_RANGE (0x64, 0x67) AM_WRITE(vgEX)    //EX MOV, DOT, VEC, ER
 	AM_RANGE (0x68, 0x68) AM_WRITE(KBDW)   //KBDW (probably AM_MIRROR(0x03))
 	AM_RANGE (0x6C, 0x6C) AM_WRITE(BAUD)   //LD BAUD (baud rate clock divider setting for i8251 tx and rx clocks) (probably AM_MIRROR(0x03))
-	AM_RANGE(0x70, 0x70) AM_DEVWRITE("i8251", i8251_device, data_w) //LD COMD (i8251 data reg)
-	AM_RANGE(0x71, 0x71) AM_DEVWRITE("i8251", i8251_device, control_w) //LD COM (i8251 control reg)
+	AM_RANGE (0x70, 0x70) AM_DEVWRITE("i8251", i8251_device, data_w) //LD COMD (i8251 data reg)
+	AM_RANGE (0x71, 0x71) AM_DEVWRITE("i8251", i8251_device, control_w) //LD COM (i8251 control reg)
 	//AM_RANGE (0x74, 0x74) AM_WRITE(unknown_74)
 	//AM_RANGE (0x78, 0x78) AM_WRITE(kbdw)   //KBDW ?(mirror?)
 	//AM_RANGE (0x7C, 0x7C) AM_WRITE(unknown_7C)
 	AM_RANGE (0x40, 0x47) AM_READ(SYSTAT_A) // SYSTAT A (state machine done and last 4 bits of vram, as well as dipswitches)
 	AM_RANGE (0x48, 0x48) AM_READ(SYSTAT_B) // SYSTAT B (uart stuff)
-	AM_RANGE(0x50, 0x50) AM_DEVREAD("i8251", i8251_device, data_r) // UART O
-	AM_RANGE(0x51, 0x51) AM_DEVREAD("i8251", i8251_device, status_r) // UAR
+	AM_RANGE (0x50, 0x50) AM_DEVREAD("i8251", i8251_device, data_r) // UART O
+	AM_RANGE (0x51, 0x51) AM_DEVREAD("i8251", i8251_device, status_r) // UAR
 	//AM_RANGE (0x58, 0x58) AM_READ(unknown_58)
 	//AM_RANGE (0x60, 0x60) AM_READ(unknown_60)
 	//AM_RANGE (0x68, 0x68) AM_READ(unknown_68) // NOT USED
@@ -759,6 +759,7 @@ static MACHINE_RESET( vk100 )
 	state->m_vgPAT_Mask = 0x80;
 	state->m_vgPMUL = 0;
 	state->m_vgPMUL_Count = 0;
+	state->m_vgDownCount = 0;
 	state->m_vgDU = 0;
 	state->m_vgDVM = 0;
 	state->m_vgDIR = 0;
@@ -802,6 +803,7 @@ static VIDEO_START( vk100 )
 	state->m_vram = state->memregion("vram")->base();
 	state->m_trans = state->memregion("trans")->base();
 	state->m_pattern = state->memregion("pattern")->base();
+	state->m_dir = state->memregion("dir")->base();
 }
 
 static MC6845_UPDATE_ROW( vk100_update_row )
