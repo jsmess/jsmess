@@ -340,7 +340,6 @@ DRVLIBS += \
 	$(MESSOBJ)/palm.a \
 	$(MESSOBJ)/parker.a \
 	$(MESSOBJ)/pc.a \
-	$(MESSOBJ)/pcm.a \
 	$(MESSOBJ)/pcshare.a \
 	$(MESSOBJ)/pdp1.a \
 	$(MESSOBJ)/pel.a \
@@ -990,6 +989,7 @@ $(MESSOBJ)/ddr.a:				\
 	$(MESS_DRIVERS)/c80.o		\
 	$(MESS_DRIVERS)/huebler.o	\
 	$(MESS_DRIVERS)/jtc.o		\
+	$(MESS_MACHINE)/k7659kb.o	\
 	$(MESS_DRIVERS)/kramermc.o	\
 	$(MESS_MACHINE)/kramermc.o	\
 	$(MESS_VIDEO)/kramermc.o	\
@@ -997,6 +997,7 @@ $(MESSOBJ)/ddr.a:				\
 	$(MESS_VIDEO)/llc.o			\
 	$(MESS_MACHINE)/llc.o		\
 	$(MESS_DRIVERS)/nanos.o		\
+	$(MESS_DRIVERS)/pcm.o		\
 	$(MESS_DRIVERS)/vcs80.o		\
 
 $(MESSOBJ)/dec.a:				\
@@ -1408,9 +1409,6 @@ $(MESSOBJ)/pc.a:				\
 	$(MESS_MACHINE)/genpc.o		\
 	$(MESS_DRIVERS)/ibmpc.o		\
 	$(MESS_VIDEO)/pc_t1t.o		\
-
-$(MESSOBJ)/pcm.a:				\
-	$(MESS_DRIVERS)/pcm.o		\
 
 $(MESSOBJ)/pcshare.a:			\
 	$(MESS_MACHINE)/pc_turbo.o	\

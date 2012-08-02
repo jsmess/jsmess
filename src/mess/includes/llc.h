@@ -13,6 +13,7 @@
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
 #include "machine/ram.h"
+#include "machine/k7659kb.h"
 #include "sound/speaker.h"
 
 class llc_state : public driver_device
@@ -31,7 +32,6 @@ public:
 	DECLARE_READ8_MEMBER(llc1_port2_b_r);
 	DECLARE_WRITE8_MEMBER(llc1_port1_a_w);
 	DECLARE_WRITE8_MEMBER(llc1_port1_b_w);
-	DECLARE_READ8_MEMBER(llc2_port1_a_r);
 	DECLARE_READ8_MEMBER(llc2_port1_b_r);
 	DECLARE_READ8_MEMBER(llc2_port2_a_r);
 	DECLARE_WRITE8_MEMBER(llc2_port1_b_w);
@@ -42,7 +42,6 @@ public:
 	UINT8 m_term_status;
 	UINT8 m_llc1_key;
 private:
-	UINT8 key_pos(UINT8 val);
 	UINT8 m_porta;
 	UINT8 m_term_data;
 };

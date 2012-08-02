@@ -219,75 +219,10 @@ WRITE8_MEMBER(llc_state::llc2_port1_b_w)
 	m_rv = BIT(data, 5);
 }
 
-UINT8 llc_state::key_pos(UINT8 val)
-{
-	if (BIT(val,0)) return 1;
-	if (BIT(val,1)) return 2;
-	if (BIT(val,2)) return 3;
-	if (BIT(val,3)) return 4;
-	if (BIT(val,4)) return 5;
-	if (BIT(val,5)) return 6;
-	if (BIT(val,6)) return 7;
-	if (BIT(val,7)) return 8;
-	return 0;
-}
-
-READ8_MEMBER(llc_state::llc2_port1_a_r)
-{
-	UINT8 *k7659 = machine().root_device().memregion("k7659")->base();
-	UINT8 retVal = 0;
-	UINT8 a1 = machine().root_device().ioport("A1")->read();
-	UINT8 a2 = machine().root_device().ioport("A2")->read();
-	UINT8 a3 = machine().root_device().ioport("A3")->read();
-	UINT8 a4 = machine().root_device().ioport("A4")->read();
-	UINT8 a5 = machine().root_device().ioport("A5")->read();
-	UINT8 a6 = machine().root_device().ioport("A6")->read();
-	UINT8 a7 = machine().root_device().ioport("A7")->read();
-	UINT8 a8 = machine().root_device().ioport("A8")->read();
-	UINT8 a9 = machine().root_device().ioport("A9")->read();
-	UINT8 a10 = machine().root_device().ioport("A10")->read();
-	UINT8 a11 = machine().root_device().ioport("A11")->read();
-	UINT8 a12 = machine().root_device().ioport("A12")->read();
-	UINT16 code = 0;
-	if (a1!=0)
-		code = 0x10 + key_pos(a1);
-	else if (a2!=0)
-		code = 0x20 + key_pos(a2);
-	else if (a3!=0)
-		code = 0x30 + key_pos(a3);
-	else if (a4!=0)
-		code = 0x40 + key_pos(a4);
-	else if (a5!=0)
-		code = 0x50 + key_pos(a5);
-	else if (a6!=0)
-		code = 0x60 + key_pos(a6);
-	else if (a7!=0)
-		code = 0x70 + key_pos(a7);
-	else if (a9!=0)
-		code = 0x80 + key_pos(a9);
-	else if (a10!=0)
-		code = 0x90 + key_pos(a10);
-	else if (a11!=0)
-		code = 0xA0 + key_pos(a11);
-
-	if (code!=0)
-	{
-		if (BIT(a8,6) || BIT(a8,7))
-			code |= 0x100;
-		else
-		if (BIT(a12,6))
-			code |= 0x200;
-
-		retVal = k7659[code] | 0x80;
-	}
-	return retVal;
-}
-
-
 Z80PIO_INTERFACE( llc2_z80pio1_intf )
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
-	DEVCB_DRIVER_MEMBER(llc_state, llc2_port1_a_r),
+	DEVCB_DEVICE_MEMBER(K7659_KEYBOARD_TAG, k7659_keyboard_device, read),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(llc_state, llc2_port1_b_r),
