@@ -1003,6 +1003,7 @@ $(MESSOBJ)/dec.a:				\
 	$(MESS_DRIVERS)/dct11em.o	\
 	$(MESS_DRIVERS)/dectalk.o	\
 	$(MESS_DRIVERS)/pdp11.o		\
+	$(MESS_DRIVERS)/vax11.o		\
 	$(MESS_DRIVERS)/rainbow.o	\
 	$(MESS_DRIVERS)/vk100.o		\
 	$(MESS_DRIVERS)/vt100.o		\
