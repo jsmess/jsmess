@@ -774,17 +774,17 @@ UINT8 abc1600_state::read_supervisor_memory(offs_t offset)
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 	UINT8 data = 0;
 
-	if (!A2 & !A1)
+	if (!A2 && !A1)
 	{
 		// _EP
 		data = page_r(*program, offset);
 	}
-	else if (!A2 & A1 & A0)
+	else if (!A2 && A1 && A0)
 	{
 		// _ES
 		data = segment_r(*program, offset);
 	}
-	else if (A2 & A1 & A0)
+	else if (A2 && A1 && A0)
 	{
 		// _CAUSE
 		data = cause_r(*program, offset);
@@ -802,17 +802,17 @@ void abc1600_state::write_supervisor_memory(offs_t offset, UINT8 data)
 {
 	address_space *program = m_maincpu->memory().space(AS_PROGRAM);
 
-	if (!A2 & !A1)
+	if (!A2 && !A1)
 	{
 		// _WEP
 		page_w(*program, offset, data);
 	}
-	else if (!A2 & A1 & A0)
+	else if (!A2 && A1 && A0)
 	{
 		// _WES
 		segment_w(*program, offset, data);
 	}
-	else if (A2 & !A1 & A0)
+	else if (A2 && !A1 && A0)
 	{
 		// W(C)
 		task_w(*program, offset, data);
@@ -827,8 +827,8 @@ void abc1600_state::write_supervisor_memory(offs_t offset, UINT8 data)
 int abc1600_state::get_fc()
 {
 	UINT16 fc = m68k_get_fc(m_maincpu);
-
-	m_ifc2 = !(!(MAGIC | FC0) | FC2);
+	
+	m_ifc2 = !(!(MAGIC || FC0) || FC2);
 
 	return fc;
 }
