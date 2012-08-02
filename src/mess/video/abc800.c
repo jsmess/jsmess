@@ -5,11 +5,11 @@
  ****************************************************************************/
 
 /*
+	
+	TODO:
 
-    TODO:
-
-    - convert SAA5050 to C++ device and fix its memory interface
-    - ABC800C video: http://www.qsl.net/zl1vfo/teletext.htm
+	- color cursor
+	- color HR graphics
 
 */
 
@@ -29,7 +29,7 @@
 //**************************************************************************
 
 //-------------------------------------------------
-//  abc800_hrs_w - high resolution scanline write
+//  hrs_w - high resolution scanline write
 //-------------------------------------------------
 
 WRITE8_MEMBER( abc800_state::hrs_w )
@@ -39,7 +39,7 @@ WRITE8_MEMBER( abc800_state::hrs_w )
 
 
 //-------------------------------------------------
-//  abc800_hrc_w - high resolution color write
+//  hrc_w - high resolution color write
 //-------------------------------------------------
 
 WRITE8_MEMBER( abc800_state::hrc_w )
@@ -54,24 +54,60 @@ WRITE8_MEMBER( abc800_state::hrc_w )
 //**************************************************************************
 
 //-------------------------------------------------
-//  abc800m_hr_update - color high resolution
-//  screen update
+//  translate_trom_offset -
+//-------------------------------------------------
+
+offs_t abc800c_state::translate_trom_offset(offs_t offset)
+{
+	int row = offset >> 7;
+	int col = offset & 0x7f;
+
+	if (col >= 80) row += 16;
+	else if (col >= 40) row += 8;
+
+	col %= 40;
+
+	return (row * 40) + col;
+}
+
+
+//-------------------------------------------------
+//  char_ram_r - character RAM read
+//-------------------------------------------------
+
+READ8_MEMBER( abc800c_state::char_ram_r )
+{
+	return saa5050_videoram_r(m_trom, translate_trom_offset(offset));
+}
+
+
+//-------------------------------------------------
+//  char_ram_w - character RAM write
+//-------------------------------------------------
+
+WRITE8_MEMBER( abc800c_state::char_ram_w )
+{
+	saa5050_videoram_w(m_trom, translate_trom_offset(offset), data);
+}
+
+
+//-------------------------------------------------
+//  hr_update - high resolution screen update
 //-------------------------------------------------
 
 void abc800c_state::hr_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT16 addr = 0;
-	int sx, y, dot;
 
-	for (y = m_hrs; y < MIN(cliprect.max_y + 1, m_hrs + 240); y++)
+	for (int y = m_hrs; y < MIN(cliprect.max_y + 1, m_hrs + 240); y++)
 	{
 		int x = 0;
 
-		for (sx = 0; sx < 64; sx++)
+		for (int sx = 0; sx < 64; sx++)
 		{
 			UINT8 data = m_video_ram[addr++];
 
-			for (dot = 0; dot < 4; dot++)
+			for (int dot = 0; dot < 4; dot++)
 			{
 				UINT16 fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
 				int color = m_fgctl_prom[fgctl_addr] & 0x07;
@@ -86,7 +122,7 @@ void abc800c_state::hr_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 
 //-------------------------------------------------
-//  VIDEO_START( abc800c )
+//  VIDEO_START( abc800 )
 //-------------------------------------------------
 
 void abc800_state::video_start()
@@ -116,7 +152,7 @@ UINT32 abc800c_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	if (!BIT(m_fgctl, 7))
 	{
 		// draw text
-		//saa5050_update(m_trom, &bitmap, cliprect);
+		saa5050_update(m_trom, bitmap, cliprect);
 	}
 
 	return 0;
@@ -131,7 +167,7 @@ static const saa5050_interface trom_intf =
 {
 	SCREEN_TAG,
 	0,	// starting gfxnum
-	40, 24 - 1, 0x80,  // x, y, size
+	40, 24, 40,  // x, y, size
 	0	// rev y order
 };
 
@@ -146,8 +182,8 @@ MACHINE_CONFIG_FRAGMENT( abc800c_video )
 
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0,640-1, 0, 400-1)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
 	MCFG_PALETTE_LENGTH(128)
 	MCFG_PALETTE_INIT(saa5050)
@@ -175,25 +211,23 @@ static PALETTE_INIT( abc800m )
 
 
 //-------------------------------------------------
-//  abc800m_hr_update - monochrome high resolution
-//  screen update
+//  hr_update - high resolution screen update
 //-------------------------------------------------
 
 void abc800m_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
 	UINT16 addr = 0;
-	int sx, y, dot;
 
-	for (y = m_hrs + VERTICAL_PORCH_HACK; y < MIN(cliprect.max_y + 1, m_hrs + VERTICAL_PORCH_HACK + 240); y++)
+	for (int y = m_hrs + VERTICAL_PORCH_HACK; y < MIN(cliprect.max_y + 1, m_hrs + VERTICAL_PORCH_HACK + 240); y++)
 	{
 		int x = HORIZONTAL_PORCH_HACK;
 
-		for (sx = 0; sx < 64; sx++)
+		for (int sx = 0; sx < 64; sx++)
 		{
 			UINT8 data = m_video_ram[addr++];
 
-			for (dot = 0; dot < 4; dot++)
+			for (int dot = 0; dot < 4; dot++)
 			{
 				UINT16 fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
 				int color = (m_fgctl_prom[fgctl_addr] & 0x07) ? 1 : 0;

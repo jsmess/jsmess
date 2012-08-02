@@ -143,7 +143,6 @@ Notes:
 
 */
 
-
 #include "includes/abc80x.h"
 
 
@@ -423,11 +422,11 @@ WRITE8_MEMBER( abc806_state::mao_w )
 //  ADDRESS_MAP( abc800c_mem )
 //-------------------------------------------------
 
-static ADDRESS_MAP_START( abc800c_mem, AS_PROGRAM, 8, abc800_state )
+static ADDRESS_MAP_START( abc800c_mem, AS_PROGRAM, 8, abc800c_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("video_ram")
 	AM_RANGE(0x4000, 0x7bff) AM_ROM
-	AM_RANGE(0x7c00, 0x7fff) AM_DEVREADWRITE_LEGACY(SAA5052_TAG, saa5050_videoram_r, saa5050_videoram_w)
+	AM_RANGE(0x7c00, 0x7fff) AM_READWRITE(char_ram_r, char_ram_w)
 	AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -957,7 +956,6 @@ void abc802_state::machine_start()
 	// register for state saving
 	save_item(NAME(m_lrs));
 	save_item(NAME(m_pling));
-	save_item(NAME(m_keylatch));
 }
 
 
@@ -1015,7 +1013,6 @@ void abc806_state::machine_start()
 	save_item(NAME(m_eme));
 	save_item(NAME(m_fetch_charram));
 	save_item(NAME(m_map));
-	save_item(NAME(m_keylatch));
 }
 
 
@@ -1294,9 +1291,12 @@ ROM_START( abc800m )
 	ROM_LOAD( "abc 3-12.1j", 0x3000, 0x1000, CRC(3ea2b5ee) SHA1(5a51ac4a34443e14112a6bae16c92b5eb636603f) )
 	ROM_LOAD( "abc 4-12.2m", 0x4000, 0x1000, CRC(695cb626) SHA1(9603ce2a7b2d7b1cbeb525f5493de7e5c1e5a803) )
 	ROM_LOAD( "abc 5-12.2l", 0x5000, 0x1000, CRC(b4b02358) SHA1(95338efa3b64b2a602a03bffc79f9df297e9534a) )
-	ROM_LOAD_OPTIONAL( "abc 6-13.2k", 0x6000, 0x1000, CRC(6fa71fb6) SHA1(b037dfb3de7b65d244c6357cd146376d4237dab6) ) // 1982-07-19
-	ROM_LOAD_OPTIONAL( "abc 6-11 ufd.2k", 0x6000, 0x1000, CRC(2a45be80) SHA1(bf08a18a74e8bdaee2656a3c8246c0122398b58f) ) // 1983-05-31, should this be "ABC 6-5" or "ABC 6-51" instead of handwritten label "ABC 6-11 UFD"?
-	ROM_LOAD( "abc 6-52.2k", 0x6000, 0x1000, CRC(c311b57a) SHA1(4bd2a541314e53955a0d53ef2f9822a202daa485) ) // 1984-03-02
+	ROM_SYSTEM_BIOS( 0, "13", "? (1982-07-19)" )
+	ROMX_LOAD( "abc 6-13.2k", 0x6000, 0x1000, CRC(6fa71fb6) SHA1(b037dfb3de7b65d244c6357cd146376d4237dab6), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "11", "? (1983-05-31)" )
+	ROMX_LOAD( "abc 6-11 ufd.2k", 0x6000, 0x1000, CRC(2a45be80) SHA1(bf08a18a74e8bdaee2656a3c8246c0122398b58f), ROM_BIOS(2) ) // is this "ABC 6-5" or "ABC 6-51" instead?
+	ROM_SYSTEM_BIOS( 2, "52", "? (1984-03-02)" )
+	ROMX_LOAD( "abc 6-52.2k", 0x6000, 0x1000, CRC(c311b57a) SHA1(4bd2a541314e53955a0d53ef2f9822a202daa485), ROM_BIOS(3) )
 	ROM_LOAD_OPTIONAL( "abc 7-21.2j", 0x7000, 0x1000, CRC(fd137866) SHA1(3ac914d90db1503f61397c0ea26914eb38725044) )
 	ROM_LOAD( "abc 7-22.2j", 0x7000, 0x1000, CRC(774511ab) SHA1(5171e43213a402c2d96dee33453c8306ac1aafc8) )
 
@@ -1411,7 +1411,7 @@ ROM_END
 //  DRIVER_INIT( abc800c )
 //-------------------------------------------------
 
-DIRECT_UPDATE_MEMBER(abc800c_state::abc800c_direct_update_handler)
+DIRECT_UPDATE_MEMBER(abc800c_state::direct_update_handler)
 {
 	if (address >= 0x7c00 && address < 0x8000)
 	{
@@ -1439,7 +1439,7 @@ static DRIVER_INIT( abc800c )
 {
 	abc800c_state *state = machine.driver_data<abc800c_state>();
 	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate(FUNC(abc800c_state::abc800c_direct_update_handler), state));
+	program->set_direct_update_handler(direct_update_delegate(FUNC(abc800c_state::direct_update_handler), state));
 }
 
 
@@ -1447,7 +1447,7 @@ static DRIVER_INIT( abc800c )
 //  DRIVER_INIT( abc800m )
 //-------------------------------------------------
 
-DIRECT_UPDATE_MEMBER(abc800m_state::abc800m_direct_update_handler)
+DIRECT_UPDATE_MEMBER( abc800m_state::direct_update_handler )
 {
 	if (address >= 0x7800 && address < 0x8000)
 	{
@@ -1475,7 +1475,7 @@ static DRIVER_INIT( abc800m )
 {
 	abc800m_state *state = machine.driver_data<abc800m_state>();
 	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate(FUNC(abc800m_state::abc800m_direct_update_handler), state));
+	program->set_direct_update_handler(direct_update_delegate(FUNC(abc800m_state::direct_update_handler), state));
 }
 
 
@@ -1483,7 +1483,7 @@ static DRIVER_INIT( abc800m )
 //  DRIVER_INIT( abc802 )
 //-------------------------------------------------
 
-DIRECT_UPDATE_MEMBER(abc802_state::abc802_direct_update_handler)
+DIRECT_UPDATE_MEMBER( abc802_state::direct_update_handler )
 {
 	if (m_lrs)
 	{
@@ -1501,7 +1501,7 @@ static DRIVER_INIT( abc802 )
 {
 	abc802_state *state = machine.driver_data<abc802_state>();
 	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate(FUNC(abc802_state::abc802_direct_update_handler), state));
+	program->set_direct_update_handler(direct_update_delegate(FUNC(abc802_state::direct_update_handler), state));
 }
 
 
@@ -1509,7 +1509,7 @@ static DRIVER_INIT( abc802 )
 //  DRIVER_INIT( abc806 )
 //-------------------------------------------------
 
-DIRECT_UPDATE_MEMBER(abc806_state::abc806_direct_update_handler)
+DIRECT_UPDATE_MEMBER( abc806_state::direct_update_handler )
 {
 	if (address >= 0x7800 && address < 0x8000)
 	{
@@ -1537,7 +1537,7 @@ static DRIVER_INIT( abc806 )
 {
 	abc806_state *state = machine.driver_data<abc806_state>();
 	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate(FUNC(abc806_state::abc806_direct_update_handler), state));
+	program->set_direct_update_handler(direct_update_delegate(FUNC(abc806_state::direct_update_handler), state));
 }
 
 
@@ -1547,7 +1547,7 @@ static DRIVER_INIT( abc806 )
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS
-COMP( 1981, abc800c,    0,			0,      abc800c,    abc800, abc800c, "Luxor Datorer AB", "ABC 800 C/HR", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+COMP( 1981, abc800c,    0,			0,      abc800c,    abc800, abc800c, "Luxor Datorer AB", "ABC 800 C/HR", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 COMP( 1981, abc800m,    abc800c,	0,      abc800m,    abc800, abc800m, "Luxor Datorer AB", "ABC 800 M/HR", GAME_SUPPORTS_SAVE )
 COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802,  "Luxor Datorer AB", "ABC 802",		 GAME_SUPPORTS_SAVE )
 COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806,  "Luxor Datorer AB", "ABC 806",		 GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
