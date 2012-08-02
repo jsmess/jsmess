@@ -19,6 +19,7 @@
     - below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks the floppy ports. Wrong info?
     - PC-8801MC disk shows that bitmap and text colors mixes with additive blending (basically if the tv charset has white then the bitmap draws
       with inverted color output).
+	- clean-ups, banking and video in particular (i.e. hook-ups with memory region should go away and device models should be used instead)
 
     per-game specific TODO:
     - 177: gameplay is too fast (parent pc8801 only);
@@ -48,7 +49,7 @@
     - Bokosuka Wars (polls read ID command)
     - Bouken Roman
     - Bruce Lee
-    - Burning Point
+    - Burning Point (trips a spurious irq)
     - Burunet
     - Castle Excellent (sets sector 0xf4?)
     - Card Game Pro 8.8k Plus Unit 1 (prints Disk i/o error 135 in vram, not visible for whatever reason)
@@ -174,6 +175,9 @@
 #define IRQ_LOG(x) do { if (IRQ_DEBUG) printf x; } while (0)
 
 #define MASTER_CLOCK XTAL_4MHz
+/* TODO: clocks of this */
+#define PIXEL_CLOCK_15KHz XTAL_14_31818MHz
+#define PIXEL_CLOCK_24KHz XTAL_21_4772MHz
 
 #define I8214_TAG		"i8214"
 #define UPD1990A_TAG	"upd1990a"
@@ -352,7 +356,7 @@ CRTC command params:
 #define lines_per_char ((state->m_crtc.param[0][2] & 0x1f) + 1)
 
 #define vretrace (((state->m_crtc.param[0][3] & 0xe0) >> 5) + 1)
-#define hretrace ((state->m_crtc.param[0][3] & 0x1f) + 2)
+#define hretrace ((state->m_crtc.param[0][3] & 0x1f) + 2) * 8
 
 #define text_color_flag (state->m_crtc.param[0][4] & 0x40)
 #define monitor_24KHz ((state->m_gfx_ctrl & 0x19) == 0x08) /* TODO: this is most likely to be WRONG */
@@ -553,6 +557,7 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 				if(!machine.primary_screen->visible_area().contains(res_x, res_y))
 					continue;
 
+				/* TODO: fix this */
 				if(gfx_mode)
 				{
 					UINT8 mask;
@@ -565,20 +570,10 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 				{
 					UINT8 char_data;
 
-					if(y_double)
-					{
-						if(yi >= 16 || secret)
-							char_data = 0;
-						else
-							char_data = (gfx_rom[tile*8+(yi >> 1)] >> (7-xi)) & 1;
-					}
+					if(yi >= (1 << (y_double+3)) || secret)
+						char_data = 0;
 					else
-					{
-						if(yi >= 8 || secret)
-							char_data = 0;
-						else
-							char_data = (gfx_rom[tile*8+yi] >> (7-xi)) & 1;
-					}
+						char_data = (gfx_rom[tile*8+(yi >> y_double)] >> (7-xi)) & 1;
 
 					if(yi == 0 && upper)
 						char_data = 1;
@@ -696,6 +691,7 @@ static SCREEN_UPDATE_IND16( pc8801 )
 
 		//popmessage("%02x %02x",state->m_crtc.param[0][0],state->m_crtc.param[0][4]);
 
+		/* TODO: left-over, to be removed */
 		y_size = (state->m_crtc.param[0][1] & 0x3f) + 1;
 
 		if(y_size < 20) y_size = 20;
@@ -1052,18 +1048,27 @@ static void pc8801_dynamic_res_change(running_machine &machine)
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	rectangle visarea;
-	int xsize,ysize;
+	int xsize,ysize,xvis,yvis;
+	attoseconds_t refresh;;
 
-	//printf("H %d V %d (%d x %d) HR %d VR %d (%d %d)\n",screen_width,screen_height * lines_per_char,screen_height,lines_per_char,
-	//                                                   hretrace,vretrace, screen_width + hretrace,screen_height * lines_per_char + vretrace * lines_per_char);
-	//printf("%02x %02x dyn res\n",monitor_24KHz,state->m_gfx_ctrl);
+	/* bail out if screen params aren't valid */
+	if(!state->m_crtc.param[0][0] || !state->m_crtc.param[0][1] || !state->m_crtc.param[0][2] || !state->m_crtc.param[0][3])
+		return;
 
-	xsize = screen_width;
-	ysize = screen_height * lines_per_char;
+	xvis = screen_width;
+	yvis = screen_height * lines_per_char;
+	xsize = screen_width + hretrace;
+	ysize = screen_height * lines_per_char + vretrace * lines_per_char;
 
-	visarea.set(0, xsize - 1, 0, ysize - 1);
+//	popmessage("H %d V %d (%d x %d) HR %d VR %d (%d %d)\n",xvis,yvis,screen_height,lines_per_char,hretrace,vretrace, xsize,ysize);
 
-	machine.primary_screen->configure(640, 480, visarea, machine.primary_screen->frame_period().attoseconds);
+	visarea.set(0, xvis - 1, 0, yvis - 1);
+	if(ysize >= 400) /* TODO: correct bit for this (m_gfx_ctrl & 1?) */
+		refresh = HZ_TO_ATTOSECONDS(PIXEL_CLOCK_24KHz) * (xsize) * ysize;
+	else
+		refresh = HZ_TO_ATTOSECONDS(PIXEL_CLOCK_15KHz) * (xsize) * ysize;
+
+	machine.primary_screen->configure(xsize, ysize, visarea, refresh);
 }
 
 WRITE8_MEMBER(pc8801_state::pc8801_gfx_ctrl_w)
@@ -2143,7 +2148,7 @@ static MACHINE_RESET( pc8801 )
 	state->m_layer_mask = 0x00;
 	state->m_vram_sel = 3;
 
-	pc8801_dynamic_res_change(machine);
+//	pc8801_dynamic_res_change(machine);
 
 	state->m_fdc_irq_opcode = 0; //TODO: copied from PC-88VA, could be wrong here ... should be 0x7f ld a,a in the latter case
 
