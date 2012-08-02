@@ -317,16 +317,26 @@ public:
 
 };
 
+
+static void pc8801_dynamic_res_change(running_machine &machine);
+
 /*
 CRTC command params:
 0. CRTC reset
 
+[0] *--- ---- <unknown>
 [0] -xxx xxxx screen columns (+2)
+
 [1] xx-- ---- blink speed (in frame unit) (+1, << 3)
 [1] --xx xxxx screen lines (+1)
+
 [2] x--- ---- "skip line"
 [2] -x-- ---- cursor style (reverse on / underscore off)
 [2] --x- ---- cursor blink on/off
+[2] ---x xxxx lines per character (+1)
+
+[3] xxx- ---- Vertical Retrace (+1)
+[3] ---x xxxx Horizontal Retrace (+2)
 
 [4] x--- ---- attribute not separate flag
 [4] -x-- ---- attribute color flag
@@ -334,24 +344,39 @@ CRTC command params:
 [4] ---x xxxx attribute size (+1)
 */
 
+#define screen_width ((state->m_crtc.param[0][0] & 0x7f) + 2) * 8
+
 #define blink_speed ((((state->m_crtc.param[0][1] & 0xc0) >> 6) + 1) << 3)
+#define screen_height ((state->m_crtc.param[0][1] & 0x3f) + 1)
+
+#define lines_per_char ((state->m_crtc.param[0][2] & 0x1f) + 1)
+
+#define vretrace (((state->m_crtc.param[0][3] & 0xe0) >> 5) + 1)
+#define hretrace ((state->m_crtc.param[0][3] & 0x1f) + 2)
+
 #define text_color_flag (state->m_crtc.param[0][4] & 0x40)
-#define monitor_24KHz ((state->m_gfx_ctrl & 0x19) == 0x08)
+#define monitor_24KHz ((state->m_gfx_ctrl & 0x19) == 0x08) /* TODO: this is most likely to be WRONG */
 
 static VIDEO_START( pc8801 )
 {
 
 }
 
-static void draw_bitmap_3bpp(running_machine &machine, bitmap_ind16 &bitmap)
+static void draw_bitmap_3bpp(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
+	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int x,y,xi;
 	UINT32 count;
 	UINT8 *gvram = machine.root_device().memregion("gvram")->base();
+	UINT16 y_size;
+	UINT16 y_double;
 
 	count = 0;
 
-	for(y=0;y<200;y++)
+	y_double = ((lines_per_char & 0x10) >> 4); // TODO: true condition of this?
+	y_size = (y_double+1) * 200;
+
+	for(y=0;y<y_size;y+=(y_double+1))
 	{
 		for(x=0;x<640;x+=8)
 		{
@@ -366,7 +391,19 @@ static void draw_bitmap_3bpp(running_machine &machine, bitmap_ind16 &bitmap)
 				pen |= ((gvram[count+0x4000] >> (7-xi)) & 1) << 1;
 				pen |= ((gvram[count+0x8000] >> (7-xi)) & 1) << 2;
 
-				bitmap.pix16(y, x+xi) = machine.pens[pen & 7];
+				if(y_double)
+				{
+					if(cliprect.contains(x+xi, y+0))
+						bitmap.pix16(y+0, x+xi) = machine.pens[pen & 7];
+
+					if(cliprect.contains(x+xi, y+1))
+						bitmap.pix16(y+1, x+xi) = machine.pens[pen & 7];
+				}
+				else
+				{
+					if(cliprect.contains(x+xi, y+0))
+						bitmap.pix16(y, x+xi) = machine.pens[pen & 7];
+				}
 			}
 
 			count++;
@@ -490,10 +527,12 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int xi,yi;
 	UINT8 *vram = state->memregion("wram")->base();
+	UINT8 *gfx_rom = machine.root_device().memregion("gfx1")->base();
 	UINT8 is_cursor;
-	UINT8 y_height;
+	UINT8 y_height, y_double;
 
-	y_height = y_size == 20 ? 10 : 8;
+	y_height = lines_per_char;
+	y_double = (lines_per_char & 0x10) >> 4; // TODO: find correct condition
 
 	for(yi=0;yi<y_height;yi++)
 	{
@@ -511,6 +550,9 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 				res_x = x*8+xi*(width+1);
 				res_y = y*y_height*(height+1)+yi*(height+1);
 
+				if(!machine.primary_screen->visible_area().contains(res_x, res_y))
+					continue;
+
 				if(gfx_mode)
 				{
 					UINT8 mask;
@@ -522,12 +564,21 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 				else
 				{
 					UINT8 char_data;
-					UINT8 *gfx_rom = machine.root_device().memregion("gfx1")->base();
 
-					if(yi >= 8 || secret)
-						char_data = 0;
+					if(y_double)
+					{
+						if(yi >= 16 || secret)
+							char_data = 0;
+						else
+							char_data = (gfx_rom[tile*8+(yi >> 1)] >> (7-xi)) & 1;
+					}
 					else
-						char_data = (gfx_rom[tile*8+yi] >> (7-xi)) & 1;
+					{
+						if(yi >= 8 || secret)
+							char_data = 0;
+						else
+							char_data = (gfx_rom[tile*8+yi] >> (7-xi)) & 1;
+					}
 
 					if(yi == 0 && upper)
 						char_data = 1;
@@ -540,9 +591,6 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 					else
 						color = char_data ? pal : -1;
 				}
-
-				if(!machine.primary_screen->visible_area().contains(res_x, res_y))
-					continue;
 
 				if(color != -1)
 					bitmap.pix16(res_y, res_x) = machine.pens[color];
@@ -635,7 +683,7 @@ static SCREEN_UPDATE_IND16( pc8801 )
 	if(state->m_gfx_ctrl & 8)
 	{
 		if(state->m_gfx_ctrl & 0x10)
-			draw_bitmap_3bpp(screen.machine(),bitmap);
+			draw_bitmap_3bpp(screen.machine(),bitmap,cliprect);
 		else
 			draw_bitmap_1bpp(screen.machine(),bitmap);
 	}
@@ -1004,8 +1052,16 @@ static void pc8801_dynamic_res_change(running_machine &machine)
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	rectangle visarea;
+	int xsize,ysize;
 
-	visarea.set(0, 640 - 1, 0, ((monitor_24KHz) ? 400 : 200) - 1);
+	//printf("H %d V %d (%d x %d) HR %d VR %d (%d %d)\n",screen_width,screen_height * lines_per_char,screen_height,lines_per_char,
+	//                                                   hretrace,vretrace, screen_width + hretrace,screen_height * lines_per_char + vretrace * lines_per_char);
+	//printf("%02x %02x dyn res\n",monitor_24KHz,state->m_gfx_ctrl);
+
+	xsize = screen_width;
+	ysize = screen_height * lines_per_char;
+
+	visarea.set(0, xsize - 1, 0, ysize - 1);
 
 	machine.primary_screen->configure(640, 480, visarea, machine.primary_screen->frame_period().attoseconds);
 }
@@ -1174,6 +1230,9 @@ WRITE8_MEMBER(pc8801_state::pc88_crtc_param_w)
 	if(m_crtc.param_count < 5)
 	{
 		m_crtc.param[m_crtc.cmd][m_crtc.param_count] = data;
+		if(m_crtc.cmd == 0)
+			pc8801_dynamic_res_change(machine());
+
 		m_crtc.param_count++;
 	}
 }
