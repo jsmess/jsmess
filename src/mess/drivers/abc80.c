@@ -108,6 +108,7 @@ Notes:
 
     TODO:
 
+	- cassette interrupt routine samples the latch too soon
     - proper keyboard controller emulation
     - get BASIC v1 dump
     - MyAB 80-column card
@@ -499,10 +500,28 @@ static TIMER_DEVICE_CALLBACK( z80pio_astb_tick )
 {
 	abc80_state *state = timer.machine().driver_data<abc80_state>();
 
-	/* toggle ASTB every other video line */
+	// toggle ASTB every other video line
 	state->m_pio_astb = !state->m_pio_astb;
 
 	z80pio_astb_w(state->m_pio, state->m_pio_astb);
+}
+
+static TIMER_DEVICE_CALLBACK( cassette_tick )
+{
+	abc80_state *state = timer.machine().driver_data<abc80_state>();
+
+	int tape_in = state->m_cassette->input() > 0;
+	//logerror("tape bit %u\n", tape_in);
+
+	if (state->m_tape_in_latch && !state->m_tape_in && tape_in)
+	{
+		//logerror("-------- set tape in latch\n");
+		state->m_tape_in_latch = 0;
+	
+		z80pio_pb_w(state->m_pio, 0, state->m_tape_in_latch << 7);
+	}
+
+	state->m_tape_in = tape_in;
 }
 
 READ8_MEMBER( abc80_state::pio_pa_r )
@@ -546,14 +565,10 @@ READ8_MEMBER( abc80_state::pio_pb_r )
 
 	UINT8 data = 0;
 
-	/* serial receive */
-
-	/* clear to send */
-
-	/* data connection detect */
-
-	/* cassette data */
-	data |= ((m_cassette)->input() > +1.0) << 7;
+	// cassette data 
+	data |= m_tape_in_latch << 7;
+	
+	//logerror("read tape latch %u\n", m_tape_in_latch);
 
 	return data;
 };
@@ -575,15 +590,30 @@ WRITE8_MEMBER( abc80_state::pio_pb_w )
 
     */
 
-	/* transmit */
+	// cassette motor
+	if (BIT(data, 5))
+	{
+		m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		m_cassette_timer->enable(true);
+	}
+	else
+	{
+		m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		m_cassette_timer->enable(false);
+	}
 
-	/* request to send */
+	// cassette data
+	m_cassette->output(BIT(data, 6) ? -1.0 : +1.0);
 
-	/* cassette motor */
-	m_cassette->change_state(BIT(data,5) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+	// cassette input latch
+	if (BIT(data, 6))
+	{
+		//logerror("clear tape in latch\n");
 
-	/* cassette data */
-	m_cassette->output( BIT(data, 6) ? -1.0 : +1.0);
+		m_tape_in_latch = 1;
+	
+		z80pio_pb_w(m_pio, 0, m_tape_in_latch << 7);
+	}
 };
 
 static Z80PIO_INTERFACE( pio_intf )
@@ -670,6 +700,8 @@ void abc80_state::machine_start()
 	save_item(NAME(m_key_data));
 	save_item(NAME(m_key_strobe));
 	save_item(NAME(m_pio_astb));
+	save_item(NAME(m_tape_in));
+	save_item(NAME(m_tape_in_latch));
 }
 
 
@@ -698,13 +730,13 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_SOUND_CONFIG(csg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/* keyboard */
+	/* fake keyboard */
 	MCFG_TIMER_ADD_PERIODIC("keyboard", abc80_keyboard_tick, attotime::from_usec(2500))
 
 	/* devices */
 	MCFG_TIMER_ADD_SCANLINE("pio_astb", z80pio_astb_tick, SCREEN_TAG, 0, 1)
+	MCFG_TIMER_ADD_PERIODIC(TIMER_CASSETTE_TAG, cassette_tick, attotime::from_hz(44100))
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, ABC80_XTAL/2/2, pio_intf)
-	MCFG_PRINTER_ADD("printer")
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc80_cassette_interface)
 	MCFG_ABC830_ADD()
 	MCFG_ABC80_KEYBOARD_ADD(kb_intf)

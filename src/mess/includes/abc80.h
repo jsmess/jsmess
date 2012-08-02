@@ -55,11 +55,12 @@
 
 #define ABC80_CHAR_CURSOR		0x80
 
-#define SCREEN_TAG		"screen"
-#define Z80_TAG			"ab67"
-#define Z80PIO_TAG		"cd67"
-#define SN76477_TAG		"g8"
-#define ABCBUS_TAG		"abcbus"
+#define SCREEN_TAG			"screen"
+#define Z80_TAG				"ab67"
+#define Z80PIO_TAG			"cd67"
+#define SN76477_TAG			"g8"
+#define ABCBUS_TAG			"abcbus"
+#define TIMER_CASSETTE_TAG	"cass"
 
 class abc80_state : public driver_device
 {
@@ -71,7 +72,10 @@ public:
 		  m_psg(*this, SN76477_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_bus(*this, ABCBUS_TAG),
-		  m_ram(*this, RAM_TAG)
+		  m_ram(*this, RAM_TAG),
+		  m_cassette_timer(*this, TIMER_CASSETTE_TAG),
+		  m_tape_in(1),
+		  m_tape_in_latch(1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -80,6 +84,7 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<abcbus_slot_device> m_bus;
 	required_device<ram_device> m_ram;
+	required_device<timer_device> m_cassette_timer;
 
 	virtual void machine_start();
 
@@ -106,6 +111,10 @@ public:
 	UINT8 *m_video_ram;
 	UINT8 m_latch;
 	int m_blink;
+
+	// cassette state
+	int m_tape_in;
+	int m_tape_in_latch;
 
 	// memory regions
 	const UINT8 *m_mmu_rom;			// memory mapping ROM

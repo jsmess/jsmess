@@ -147,8 +147,9 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( abc80_keyboard )
-    MCFG_CPU_ADD(I8048_TAG, I8048, XTAL_5_9904MHz)
+    MCFG_CPU_ADD(I8048_TAG, I8048, 4000000)
     MCFG_CPU_IO_MAP(abc80_keyboard_io)
+    MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 
 
