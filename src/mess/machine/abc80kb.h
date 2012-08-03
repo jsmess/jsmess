@@ -66,7 +66,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 
-	DECLARE_READ8_MEMBER( data_r );
+	UINT8 data_r();
 
 protected:
     // device-level overrides

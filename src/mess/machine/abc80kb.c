@@ -222,7 +222,7 @@ void abc80_keyboard_device::device_reset()
 //  data_r - keyboard data read
 //-------------------------------------------------
 
-READ8_MEMBER( abc80_keyboard_device::data_r )
+UINT8 abc80_keyboard_device::data_r()
 {
     return 0;
 }

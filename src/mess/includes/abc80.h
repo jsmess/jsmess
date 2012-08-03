@@ -21,6 +21,7 @@
 #include "machine/abc_sio.h"
 #include "machine/lux10828.h"
 #include "machine/ram.h"
+#include "machine/serial.h"
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"
 
@@ -60,6 +61,7 @@
 #define Z80PIO_TAG			"cd67"
 #define SN76477_TAG			"g8"
 #define ABCBUS_TAG			"abcbus"
+#define RS232_TAG			"ser"
 #define TIMER_CASSETTE_TAG	"cass"
 
 class abc80_state : public driver_device
@@ -72,7 +74,9 @@ public:
 		  m_psg(*this, SN76477_TAG),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_bus(*this, ABCBUS_TAG),
+		  m_kb(*this, ABC80_KEYBOARD_TAG),
 		  m_ram(*this, RAM_TAG),
+		  m_rs232(*this, RS232_TAG),
 		  m_cassette_timer(*this, TIMER_CASSETTE_TAG),
 		  m_tape_in(1),
 		  m_tape_in_latch(1)
@@ -83,7 +87,9 @@ public:
 	required_device<device_t> m_psg;
 	required_device<cassette_image_device> m_cassette;
 	required_device<abcbus_slot_device> m_bus;
+	required_device<abc80_keyboard_device> m_kb;
 	required_device<ram_device> m_ram;
+	required_device<rs232_port_device> m_rs232;
 	required_device<timer_device> m_cassette_timer;
 
 	virtual void machine_start();
@@ -101,6 +107,8 @@ public:
 	DECLARE_READ8_MEMBER( pio_pa_r );
 	DECLARE_READ8_MEMBER( pio_pb_r );
 	DECLARE_WRITE8_MEMBER( pio_pb_w );
+	
+	DECLARE_WRITE_LINE_MEMBER( keydown_w );
 
 	// keyboard state
 	int m_key_data;
