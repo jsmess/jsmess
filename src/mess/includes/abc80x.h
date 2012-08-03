@@ -51,16 +51,16 @@
 #define ABC800_CHAR_WIDTH	6
 #define ABC800_CCLK			ABC800_X01/ABC800_CHAR_WIDTH
 
-#define SCREEN_TAG		"screen"
-#define Z80_TAG			"z80"
-#define E0516_TAG		"j13"
-#define MC6845_TAG		"b12"
-#define SAA5052_TAG		"5c"
-#define Z80CTC_TAG		"z80ctc"
-#define Z80SIO_TAG		"z80sio"
-#define Z80DART_TAG		"z80dart"
-#define ABCBUS_TAG		"abcbus"
-
+#define SCREEN_TAG			"screen"
+#define Z80_TAG				"z80"
+#define E0516_TAG			"j13"
+#define MC6845_TAG			"b12"
+#define SAA5052_TAG			"5c"
+#define Z80CTC_TAG			"z80ctc"
+#define Z80SIO_TAG			"z80sio"
+#define Z80DART_TAG			"z80dart"
+#define ABCBUS_TAG			"abcbus"
+#define TIMER_CASSETTE_TAG	"cass"
 
 
 //**************************************************************************
@@ -79,9 +79,18 @@ public:
 		  m_dart(*this, Z80DART_TAG),
 		  m_sio(*this, Z80SIO_TAG),
 		  m_discrete(*this, "discrete"),
+		  m_cassette(*this, CASSETTE_TAG),
 		  m_ram(*this, RAM_TAG),
+		  m_cassette_timer(*this, TIMER_CASSETTE_TAG),
 		  m_video_ram(*this, "video_ram"),
-		  m_char_ram(*this, "char_ram")
+		  m_char_ram(*this, "char_ram"),
+		  m_ctc_z0(0),
+		  m_sio_rxdb(1),
+		  m_sio_txcb(0),
+		  m_sio_txdb(1),
+		  m_sio_rtsb(1),
+		  m_dfd_out(0),
+		  m_tape_ctr(4)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -89,7 +98,9 @@ public:
 	required_device<z80dart_device> m_dart;
 	required_device<z80dart_device> m_sio;
 	optional_device<device_t> m_discrete;
+	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
+	required_device<timer_device> m_cassette_timer;
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -97,6 +108,7 @@ public:
 	virtual void video_start();
 
 	void bankswitch();
+	void clock_cassette(int state);
 
 	DECLARE_READ8_MEMBER( pling_r );
 	DECLARE_READ_LINE_MEMBER( keyboard_txd_r );
@@ -109,6 +121,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
+	DECLARE_READ_LINE_MEMBER( sio_rxdb_r );
+	DECLARE_WRITE_LINE_MEMBER( sio_txdb_w );
+	DECLARE_WRITE_LINE_MEMBER( sio_dtrb_w );
+	DECLARE_WRITE_LINE_MEMBER( sio_rtsb_w );
 
 	// cpu state
 	int m_fetch_charram;			// opcode fetched from character RAM region (0x7800-0x7fff)
@@ -126,8 +142,15 @@ public:
 
 	// serial state
 	UINT8 m_sb;
+	int m_ctc_z0;
+	int m_sio_rxdb;
 	int m_sio_rxcb;
 	int m_sio_txcb;
+	int m_sio_txdb;
+	int m_sio_rtsb;
+	int m_dfd_out;
+	int m_dfd_in;
+	int m_tape_ctr;
 };
 
 class abc800m_state : public abc800_state

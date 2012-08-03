@@ -646,31 +646,22 @@ WRITE_LINE_MEMBER( abc800_state::ctc_z0_w )
 {
 	if (BIT(m_sb, 2))
 	{
-		// connected to SIO/2 TxCA, CTC CLK/TRG3
 		z80dart_txca_w(m_sio, state);
 		z80ctc_trg3_w(m_ctc, state);
 	}
 
-	// connected to SIO/2 RxCB through a thingy
-	//m_sio_rxcb = ?
-	z80dart_rxcb_w(m_sio, m_sio_rxcb);
-
-	// connected to SIO/2 TxCB through a JK divide by 2
-	m_sio_txcb = !m_sio_txcb;
-	z80dart_txcb_w(m_sio, m_sio_txcb);
+	clock_cassette(state);
 }
 
 WRITE_LINE_MEMBER( abc800_state::ctc_z1_w )
 {
 	if (BIT(m_sb, 3))
 	{
-		// connected to SIO/2 RxCA
 		z80dart_rxca_w(m_sio, state);
 	}
 
 	if (BIT(m_sb, 4))
 	{
-		// connected to SIO/2 TxCA, CTC CLK/TRG3
 		z80dart_txca_w(m_sio, state);
 		z80ctc_trg3_w(m_ctc, state);
 	}
@@ -678,15 +669,14 @@ WRITE_LINE_MEMBER( abc800_state::ctc_z1_w )
 
 WRITE_LINE_MEMBER( abc800_state::ctc_z2_w )
 {
-	// connected to DART channel A clock inputs
 	z80dart_rxca_w(m_dart, state);
 	z80dart_txca_w(m_dart, state);
 }
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,              								// timer disables
-	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	// interrupt handler
+	0,              									// timer disables
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),		// interrupt handler
 	DEVCB_DRIVER_LINE_MEMBER(abc800_state, ctc_z0_w),	// ZC/TO0 callback
 	DEVCB_DRIVER_LINE_MEMBER(abc800_state, ctc_z1_w),	// ZC/TO1 callback
 	DEVCB_DRIVER_LINE_MEMBER(abc800_state, ctc_z2_w),	// ZC/TO2 callback
@@ -697,19 +687,81 @@ static Z80CTC_INTERFACE( ctc_intf )
 //  Z80DART_INTERFACE( sio_intf )
 //-------------------------------------------------
 
-static READ_LINE_DEVICE_HANDLER( dfd_in_r )
+void abc800_state::clock_cassette(int state)
 {
-	return dynamic_cast<cassette_image_device *>(device)->input() > 0.0;
+	if (m_ctc_z0 && !state)
+	{
+		m_sio_txcb = !m_sio_txcb;
+		z80dart_txcb_w(m_sio, !m_sio_txcb);
+
+		if (m_sio_txdb || m_sio_txcb)
+		{
+			m_dfd_out = !m_dfd_out;
+			m_cassette->output((m_dfd_out & m_sio_rtsb) ? +1.0 : -1.0);
+		}
+
+		if (m_tape_ctr < 15)
+		{
+			m_tape_ctr++;
+		}
+
+		z80dart_rxcb_w(m_sio, m_tape_ctr == 15);
+	}
+
+	m_ctc_z0 = state;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( dfd_out_w )
+static TIMER_DEVICE_CALLBACK( cassette_tick )
 {
-	dynamic_cast<cassette_image_device *>(device)->output(state ? +1.0 : -1.0);
+	abc800_state *state = timer.machine().driver_data<abc800_state>();
+
+	int dfd_in = state->m_cassette->input() > 0;
+
+	if (state->m_dfd_in && !dfd_in)
+	{
+		state->m_sio_rxdb = !(state->m_tape_ctr == 15);
+	}
+	
+	if (!dfd_in && (state->m_tape_ctr == 15))
+	{
+		state->m_tape_ctr = 4;
+	}
+
+	state->m_dfd_in = dfd_in;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( motor_control_w )
+READ_LINE_MEMBER( abc800_state::sio_rxdb_r )
 {
-	dynamic_cast<cassette_image_device *>(device)->change_state(state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+	return m_sio_rxdb;
+}
+
+WRITE_LINE_MEMBER( abc800_state::sio_txdb_w )
+{
+	m_sio_txdb = state;
+}
+
+WRITE_LINE_MEMBER( abc800_state::sio_dtrb_w )
+{
+	if (state)
+	{
+		m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		m_cassette_timer->enable(true);
+	}
+	else
+	{
+		m_cassette->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		m_cassette_timer->enable(false);
+	}
+}
+
+WRITE_LINE_MEMBER( abc800_state::sio_rtsb_w )
+{
+	m_sio_rtsb = state;
+
+	if (!m_sio_rtsb)
+	{
+		m_cassette->output(-1.0);
+	}
 }
 
 static Z80DART_INTERFACE( sio_intf )
@@ -723,10 +775,10 @@ static Z80DART_INTERFACE( sio_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, dfd_in_r),
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, dfd_out_w),
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, motor_control_w),
-	DEVCB_NULL,
+	DEVCB_DRIVER_LINE_MEMBER(abc800_state, sio_rxdb_r),
+	DEVCB_DRIVER_LINE_MEMBER(abc800_state, sio_txdb_w),
+	DEVCB_DRIVER_LINE_MEMBER(abc800_state, sio_dtrb_w),
+	DEVCB_DRIVER_LINE_MEMBER(abc800_state, sio_rtsb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 
@@ -916,8 +968,16 @@ void abc800_state::machine_start()
 	// register for state saving
 	save_item(NAME(m_fetch_charram));
 	save_item(NAME(m_pling));
+	save_item(NAME(m_sb));
+	save_item(NAME(m_ctc_z0));
+	save_item(NAME(m_sio_rxdb));
 	save_item(NAME(m_sio_rxcb));
 	save_item(NAME(m_sio_txcb));
+	save_item(NAME(m_sio_txdb));
+	save_item(NAME(m_sio_rtsb));
+	save_item(NAME(m_dfd_out));
+	save_item(NAME(m_dfd_in));
+	save_item(NAME(m_tape_ctr));
 }
 
 
@@ -948,6 +1008,16 @@ void abc802_state::machine_start()
 	// register for state saving
 	save_item(NAME(m_lrs));
 	save_item(NAME(m_pling));
+	save_item(NAME(m_sb));
+	save_item(NAME(m_ctc_z0));
+	save_item(NAME(m_sio_rxdb));
+	save_item(NAME(m_sio_rxcb));
+	save_item(NAME(m_sio_txcb));
+	save_item(NAME(m_sio_txdb));
+	save_item(NAME(m_sio_rtsb));
+	save_item(NAME(m_dfd_out));
+	save_item(NAME(m_dfd_in));
+	save_item(NAME(m_tape_ctr));
 }
 
 
@@ -1005,6 +1075,15 @@ void abc806_state::machine_start()
 	save_item(NAME(m_eme));
 	save_item(NAME(m_fetch_charram));
 	save_item(NAME(m_map));
+	save_item(NAME(m_ctc_z0));
+	save_item(NAME(m_sio_rxdb));
+	save_item(NAME(m_sio_rxcb));
+	save_item(NAME(m_sio_txcb));
+	save_item(NAME(m_sio_txdb));
+	save_item(NAME(m_sio_rtsb));
+	save_item(NAME(m_dfd_out));
+	save_item(NAME(m_dfd_in));
+	save_item(NAME(m_tape_ctr));
 }
 
 
@@ -1070,6 +1149,7 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// peripheral hardware
+	MCFG_TIMER_ADD_PERIODIC(TIMER_CASSETTE_TAG, cassette_tick, attotime::from_hz(44100))
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
@@ -1113,6 +1193,7 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// peripheral hardware
+	MCFG_TIMER_ADD_PERIODIC(TIMER_CASSETTE_TAG, cassette_tick, attotime::from_hz(44100))
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
@@ -1156,6 +1237,7 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// peripheral hardware
+	MCFG_TIMER_ADD_PERIODIC(TIMER_CASSETTE_TAG, cassette_tick, attotime::from_hz(44100))
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
@@ -1189,6 +1271,7 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	MCFG_FRAGMENT_ADD(abc806_video)
 
 	// peripheral hardware
+	MCFG_TIMER_ADD_PERIODIC(TIMER_CASSETTE_TAG, cassette_tick, attotime::from_hz(44100))
 	MCFG_E0516_ADD(E0516_TAG, ABC806_X02)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
 	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
