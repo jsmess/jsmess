@@ -543,7 +543,13 @@ READ8_MEMBER( abc80_state::pio_pa_r )
 
     */
 
-	return (m_key_strobe << 7) | m_key_data;
+    UINT8 data = 0;
+
+    //data |= m_kb->data_r();
+    data |= m_key_data;
+    data |= (m_key_strobe << 7);
+
+	return data;
 };
 
 READ8_MEMBER( abc80_state::pio_pb_r )
@@ -564,6 +570,15 @@ READ8_MEMBER( abc80_state::pio_pb_r )
     */
 
 	UINT8 data = 0;
+
+	// receive data
+	data |= m_rs232->rx();
+
+	// clear to send
+	data |= m_rs232->cts_r() << 1;
+
+	// data carrier detect
+	data |= m_rs232->dcd_r() << 2;
 
 	// cassette data 
 	data |= m_tape_in_latch << 7;
@@ -589,6 +604,12 @@ WRITE8_MEMBER( abc80_state::pio_pb_w )
         7  R    Cassette Data
 
     */
+
+    // transmit data
+    m_rs232->tx(BIT(data, 3));
+
+    // request to send
+    m_rs232->rts_w(BIT(data, 4));
 
 	// cassette motor
 	if (BIT(data, 5))
@@ -654,6 +675,23 @@ static const cassette_interface abc80_cassette_interface =
 
 
 //-------------------------------------------------
+//  ABC80_KEYBOARD_INTERFACE( kb_intf )
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( abc80_state::keydown_w )
+{
+	m_key_strobe = state;
+
+	z80pio_pa_w(m_pio, 0, m_key_strobe << 7);
+}
+
+static ABC80_KEYBOARD_INTERFACE( kb_intf )
+{
+	DEVCB_DRIVER_LINE_MEMBER(abc80_state, keydown_w)
+};
+
+
+//-------------------------------------------------
 //  ABCBUS_INTERFACE( abcbus_intf )
 //-------------------------------------------------
 
@@ -673,11 +711,18 @@ static ABCBUS_INTERFACE( abcbus_intf )
 
 
 //-------------------------------------------------
-//  ABC80_KEYBOARD_INTERFACE( kb_intf )
+//  rs232_port_interface rs232_intf
 //-------------------------------------------------
 
-static ABC80_KEYBOARD_INTERFACE( kb_intf )
+static SLOT_INTERFACE_START( rs232_devices )
+SLOT_INTERFACE_END
+
+static const rs232_port_interface rs232_intf =
 {
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -715,36 +760,35 @@ void abc80_state::machine_start()
 //-------------------------------------------------
 
 static MACHINE_CONFIG_START( abc80, abc80_state )
-	/* basic machine hardware */
+	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, ABC80_XTAL/2/2)	// 2.9952 MHz
 	MCFG_CPU_PROGRAM_MAP(abc80_mem)
 	MCFG_CPU_IO_MAP(abc80_io)
 	MCFG_CPU_CONFIG(abc80_daisy_chain)
 
-	/* video hardware */
+	// video hardware
 	MCFG_FRAGMENT_ADD(abc80_video)
 
-	/* sound hardware */
+	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(SN76477_TAG, SN76477, 0)
 	MCFG_SOUND_CONFIG(csg_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	/* fake keyboard */
+	// fake keyboard
 	MCFG_TIMER_ADD_PERIODIC("keyboard", abc80_keyboard_tick, attotime::from_usec(2500))
 
-	/* devices */
+	// devices
 	MCFG_TIMER_ADD_SCANLINE("pio_astb", z80pio_astb_tick, SCREEN_TAG, 0, 1)
 	MCFG_TIMER_ADD_PERIODIC(TIMER_CASSETTE_TAG, cassette_tick, attotime::from_hz(44100))
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, ABC80_XTAL/2/2, pio_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc80_cassette_interface)
 	MCFG_ABC830_ADD()
 	MCFG_ABC80_KEYBOARD_ADD(kb_intf)
-
-	// ABC bus
 	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abc80_abcbus_cards, "slow", NULL)
+	MCFG_RS232_PORT_ADD(RS232_TAG, rs232_intf, rs232_devices, NULL, NULL)
 
-	/* internal ram */
+	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
 
@@ -775,8 +819,8 @@ ROM_START( abc80 )
 	ROMX_LOAD( "dosdd80",  0x6000, 0x1000, CRC(36db4c15) SHA1(ae462633f3a9c142bb029beb14749a84681377fa), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "ufd20", "UFD-DOS v.20" ) // ABC 830
 	ROMX_LOAD( "ufddos20", 0x6000, 0x1000, CRC(69b09c0b) SHA1(403997a06cf6495b8fa13dc74eff6a64ef7aa53e), ROM_BIOS(4) )
-	ROM_LOAD( "iec",	   0x7000, 0x0400, NO_DUMP )
-	ROM_LOAD( "printer",   0x7800, 0x0400, NO_DUMP )
+//	ROM_LOAD( "iec",	   0x7000, 0x0400, NO_DUMP )
+//	ROM_LOAD( "printer",   0x7800, 0x0400, NO_DUMP )
 
 	ROM_REGION( 0xa00, "chargen", 0 )
 	ROM_LOAD( "sn74s263.h2", 0x0000, 0x0a00, BAD_DUMP CRC(9e064e91) SHA1(354783c8f2865f73dc55918c9810c66f3aca751f) ) // created by hand
