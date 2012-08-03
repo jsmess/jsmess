@@ -31,12 +31,47 @@ public:
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 
+	// optional information overrides
+	virtual machine_config_constructor device_mconfig_additions() const;	
 protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
-
+	
+	void command_write(UINT16 data);
+	UINT16 status_read();
+	
+	void data_write(UINT16 data);
+	UINT16 data_read();
+	
+	void service_command();
+	
+	void position_head();
+	void read_sector();
+	void write_sector(int ddam);
 private:
+	enum rx01_state {
+		RX01_FILL,
+		RX01_EMPTY,
+		RX01_SET_SECTOR,
+		RX01_SET_TRACK,
+		RX01_TRANSFER,
+		RX01_COMPLETE,
+		RX01_INIT
+	};
+	
+	device_t *m_image[2];
+	UINT8 m_buffer[128];
+	int m_buf_pos;
+	
+	UINT16 m_rxcs; // Command and Status Register
+	UINT16 m_rxdb; // Data Buffer Register
+	UINT16 m_rxta; // RX Track Address
+	UINT16 m_rxsa; // RX Sector Address
+	UINT16 m_rxes; // RX Error and Status 
+	int m_unit;
+	int m_interrupt;
+	rx01_state m_state;
 };
 
 // device type definition

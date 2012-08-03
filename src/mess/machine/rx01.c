@@ -11,7 +11,37 @@
 */
 
 #include "emu.h"
-#include "rx01.h"
+#include "machine/rx01.h"
+#include "imagedev/flopdrv.h"
+#include "formats/basicdsk.h"
+
+static LEGACY_FLOPPY_OPTIONS_START( rx01 )
+	LEGACY_FLOPPY_OPTION(rx01, "img", "RX01 image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+		HEADS([1])
+		TRACKS([77])
+		SECTORS([26])
+		SECTOR_LENGTH([128])
+		FIRST_SECTOR_ID([1]))
+LEGACY_FLOPPY_OPTIONS_END
+
+
+static const floppy_interface rx01_floppy_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_STANDARD_8_SSSD,
+	LEGACY_FLOPPY_OPTIONS_NAME(rx01),
+	"floppy_8",
+	NULL
+};
+
+
+MACHINE_CONFIG_FRAGMENT( rx01 )
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(rx01_floppy_interface)
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -28,6 +58,15 @@ rx01_device::rx01_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
+//-------------------------------------------------
+//  machine_config_additions - device-specific
+//  machine configurations
+//-------------------------------------------------
+
+machine_config_constructor rx01_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( rx01 );
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -35,6 +74,8 @@ rx01_device::rx01_device(const machine_config &mconfig, const char *tag, device_
 
 void rx01_device::device_start()
 {
+	m_image[0] = subdevice(FLOPPY_0);
+	m_image[1] = subdevice(FLOPPY_1);
 }
 
 
@@ -44,6 +85,12 @@ void rx01_device::device_start()
 
 void rx01_device::device_reset()
 {
+	for(int i=0;i<2;i++) 
+	{
+		floppy_mon_w(m_image[i], 0); // turn it on
+		floppy_drive_set_controller(m_image[i], this);
+		floppy_drive_set_rpm(m_image[i], 360.);
+	}
 }
 
 //-------------------------------------------------
@@ -52,7 +99,11 @@ void rx01_device::device_reset()
 
 READ16_MEMBER( rx01_device::read )
 {
-	return 040;
+	switch(offset & 1) {
+		case 0: return status_read(); break;
+		default: return data_read(); break;
+	}
+	
 }
 
 
@@ -62,5 +113,129 @@ READ16_MEMBER( rx01_device::read )
 
 WRITE16_MEMBER( rx01_device::write )
 {
+	switch(offset & 1) {
+		case 0: command_write(data); break;
+		case 1: data_write(data); break;
+	}
+}
+
+void rx01_device::command_write(UINT16 data)
+{
+	m_unit = BIT(data,4);
+	m_interrupt = BIT(data,6);
+	if (BIT(data,14)) // Initialize
+	{
+	}	
+	if (BIT(data,1)) // If GO bit is selected
+	{
+		m_rxcs &= ~(1<<5); // Clear done bit
+		m_buf_pos = 0; // Point to start of buffer
+		switch((data >> 1) & 7) {
+			case 0: // Fill Buffer
+					m_rxcs |= (1<<7); // Set TR Bit
+					m_state = RX01_FILL;
+					break;
+			case 1: // Empty Buffer					
+					m_state = RX01_EMPTY;
+					break;
+			case 2: // Write Sector
+					break;
+			case 3: // Read Sector
+					break;
+			case 4: // Not Used
+					break;
+			case 5: // Read Status
+					break;
+			case 6: // Write Deleted Data Sector
+					break;
+			case 7: // Read Error Register
+					break;
+		}
+	}
+}
+
+UINT16 rx01_device::status_read()
+{
+	return m_rxcs;
+}
+	
+void rx01_device::data_write(UINT16 data)
+{
+	// data can be written only if TR is set
+	if (BIT(m_rxcs,7)) m_rxdb = data;
+}
+
+UINT16 rx01_device::data_read()
+{	
+	if (m_state==RX01_EMPTY && BIT(m_rxcs,7)) m_rxcs &= (1<<7); // clear TR bit;
+	return m_rxdb;
+}
+
+void rx01_device::service_command()
+{
+	switch(m_state) {
+		case RX01_FILL :
+						m_buffer[m_buf_pos] = m_rxdb & 0xff;
+						m_buf_pos++;
+						if (m_buf_pos<128) 
+						{ 
+							m_rxcs |= (1<<7); // Set TR Bit
+						} else {
+							//finished
+						}
+						break;
+		case RX01_EMPTY :
+						if (m_buf_pos>=128) 
+						{ 
+							//finished
+						} else {
+							m_buffer[m_buf_pos] = m_rxdb & 0xff;
+							m_buf_pos++;
+							m_rxcs |= (1<<7); // Set TR Bit
+						}
+						break;
+		case RX01_SET_SECTOR:
+						m_rxsa = m_rxdb & 0x1f;
+						m_rxcs |= (1<<7); // Set TR Bit
+						m_state = RX01_SET_TRACK;		
+						break;
+		case RX01_SET_TRACK:
+						m_rxta = m_rxdb & 0x7f;
+						m_rxcs |= (1<<7); // Set TR Bit
+						m_state = RX01_TRANSFER;		
+						position_head();
+						break;
+		case RX01_TRANSFER:
+						break;						
+		case RX01_COMPLETE:
+						break;
+		case RX01_INIT:
+						break;
+	}
+}
+
+void rx01_device::position_head()
+{
+	int cur_track = floppy_drive_get_current_track(m_image[m_unit]);
+	int dir = (cur_track < m_rxta) ? +1 : -1;
+	
+	while (m_rxta != cur_track)
+	{
+		cur_track += dir;
+
+		floppy_drive_seek(m_image[m_unit], dir);
+	}	
+}
+
+void rx01_device::read_sector()
+{
+	/* read data */
+	floppy_drive_read_sector_data(m_image[m_unit], 0, m_rxsa, (char *)m_buffer, 128);
+}
+
+void rx01_device::write_sector(int ddam)
+{
+	/* write data */
+	floppy_drive_write_sector_data(m_image[m_unit], 0, m_rxsa, (char *)m_buffer, 128, ddam);
 }
 
