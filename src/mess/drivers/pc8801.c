@@ -54,9 +54,7 @@
     - Castle Excellent (sets sector 0xf4?)
     - Card Game Pro 8.8k Plus Unit 1 (prints Disk i/o error 135 in vram, not visible for whatever reason)
     - Cuby Panic (copy protection routine at 0x911A)
-    - Combat
     - Harakiri
-    - Kuronekosou Souzoku Satsujin Jiken ("Illegal function call in 105")
     - Jark (needs PC-8801MC)
     - MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
     - Mr. Pro Yakyuu
@@ -67,6 +65,9 @@
     games that needs to NOT have write-protect floppies (BTANBs):
     - Balance of Power
     - Tobira wo Akete (hangs at title screen)
+
+	other BTANBs
+	- Kuronekosou Souzoku Satsujin Jiken ("Illegal function call in 105" <- needs BASIC V1)
 
     Notes:
     - BIOS disk ROM defines what kind of floppies you could load:
@@ -557,13 +558,12 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 				if(!machine.primary_screen->visible_area().contains(res_x, res_y))
 					continue;
 
-				/* TODO: fix this */
 				if(gfx_mode)
 				{
 					UINT8 mask;
 
 					mask = (xi & 4) ? 0x10 : 0x01;
-					mask <<= ((yi & 6) >> 1);
+					mask <<= ((yi & (0x6 << y_double)) >> (1+y_double));
 					color = (tile & mask) ? pal : -1;
 				}
 				else
