@@ -121,12 +121,19 @@ WRITE16_MEMBER( rx01_device::write )
 
 void rx01_device::command_write(UINT16 data)
 {
+	printf("command_write %04x\n",data);
 	m_unit = BIT(data,4);
 	m_interrupt = BIT(data,6);
+	
+	floppy_drive_set_ready_state(m_image[m_unit], 1,0);
+	
+	
 	if (BIT(data,14)) // Initialize
 	{
+	   printf("initialize\n");
+	   m_state = RX01_INIT;
 	}	
-	if (BIT(data,1)) // If GO bit is selected
+	else if (BIT(data,1)) // If GO bit is selected
 	{
 		m_rxcs &= ~(1<<5); // Clear done bit
 		m_buf_pos = 0; // Point to start of buffer
@@ -139,40 +146,53 @@ void rx01_device::command_write(UINT16 data)
 					m_state = RX01_EMPTY;
 					break;
 			case 2: // Write Sector
-					break;
 			case 3: // Read Sector
+			case 6: // Write Deleted Data Sector
+					m_rxes &= ~(1<<6 | 1<<1 | 1<<0);// Reset bits 0, 1 and 6
+					m_state = RX01_SET_SECTOR;
 					break;
 			case 4: // Not Used
+					m_state = RX01_COMPLETE;
 					break;
 			case 5: // Read Status
-					break;
-			case 6: // Write Deleted Data Sector
+					m_state = RX01_COMPLETE;
+					m_rxdb = m_rxes;
 					break;
 			case 7: // Read Error Register
+					m_state = RX01_COMPLETE;
+					// set ready signal according to current drive status					
+					m_rxes |= floppy_drive_get_flag_state(m_image[m_unit], FLOPPY_DRIVE_READY) << 7;			
 					break;
 		}
 	}
+	machine().scheduler().timer_set(attotime::from_msec(100), FUNC(command_execution_callback), 0, this);
 }
 
 UINT16 rx01_device::status_read()
 {
+	//printf("status_read %04x\n",m_rxcs);
 	return m_rxcs;
 }
 	
 void rx01_device::data_write(UINT16 data)
 {
+	printf("data_write %04x\n",data);
 	// data can be written only if TR is set
 	if (BIT(m_rxcs,7)) m_rxdb = data;
+	machine().scheduler().timer_set(attotime::from_msec(100), FUNC(command_execution_callback), 0, this);
 }
 
 UINT16 rx01_device::data_read()
 {	
 	if (m_state==RX01_EMPTY && BIT(m_rxcs,7)) m_rxcs &= (1<<7); // clear TR bit;
+	printf("data_read %04x\n",m_rxdb);
 	return m_rxdb;
 }
 
 void rx01_device::service_command()
 {
+	printf("service_command %d\n",m_state);
+	m_rxes |= floppy_drive_get_flag_state(m_image[m_unit], FLOPPY_DRIVE_READY) << 7;
 	switch(m_state) {
 		case RX01_FILL :
 						m_buffer[m_buf_pos] = m_rxdb & 0xff;
@@ -210,6 +230,8 @@ void rx01_device::service_command()
 		case RX01_COMPLETE:
 						break;
 		case RX01_INIT:
+						m_rxes |= (1<<2); // Set init done flag
+						m_rxcs |= (1<<5); // Set operation done
 						break;
 	}
 }
