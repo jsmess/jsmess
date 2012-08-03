@@ -46,9 +46,7 @@
         - Add NMI generator
         - Find out if there really is any floppy-disk feature - the schematic
           has no mention of it.
-        - Check the screen - it only uses the first 16 lines.
         - Add the 6 LEDs.
-        - Replace the terminal keyboard with an inbuilt one.
 
 ****************************************************************************/
 
@@ -61,7 +59,7 @@
 #include "imagedev/cassette.h"
 #include "sound/speaker.h"
 #include "sound/wave.h"
-#include "machine/keyboard.h"
+#include "machine/k7659kb.h"
 
 #define MACHINE_RESET_MEMBER(name) void name::machine_reset()
 #define VIDEO_START_MEMBER(name) void name::video_start()
@@ -79,9 +77,8 @@ public:
 	m_ctc_s(*this, "z80ctc_s"),
 	m_ctc_u(*this, "z80ctc_u"),
 	m_speaker(*this, SPEAKER_TAG),
-	m_cass(*this, CASSETTE_TAG)
-	,
-		m_p_videoram(*this, "p_videoram"){ }
+	m_cass(*this, CASSETTE_TAG),
+	m_p_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio_s;
@@ -91,19 +88,16 @@ public:
 	required_device<z80ctc_device> m_ctc_u;
 	required_device<device_t> m_speaker;
 	required_device<cassette_image_device> m_cass;
-	DECLARE_READ8_MEMBER( pcm_84_r );
 	DECLARE_READ8_MEMBER( pcm_85_r );
 	DECLARE_WRITE_LINE_MEMBER( pcm_82_w );
 	DECLARE_WRITE8_MEMBER( pcm_85_w );
-	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 *m_p_chargen;
 	required_shared_ptr<UINT8> m_p_videoram;
-	UINT8 m_term_data;
-	UINT8 m_step;
-	UINT8 m_85;
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+private:
+	UINT8 m_85;
 };
 
 
@@ -132,16 +126,6 @@ B7 Load data
 There is also a HALT LED, connected directly to the processor.
 */
 
-READ8_MEMBER( pcm_state::pcm_84_r )
-{
-	UINT8 ret = m_term_data;
-	if (m_step < 2)
-	{
-		ret |= 0x80;
-		m_step++;
-	}
-	return ret;
-}
 
 READ8_MEMBER( pcm_state::pcm_85_r )
 {
@@ -170,7 +154,7 @@ static ADDRESS_MAP_START(pcm_mem, AS_PROGRAM, 8, pcm_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x1fff ) AM_ROM  // ROM
 	AM_RANGE( 0x2000, 0xf7ff ) AM_RAM  // RAM
-	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_SHARE("p_videoram") // Video RAM
+	AM_RANGE( 0xf800, 0xffff ) AM_RAM AM_SHARE("videoram") // Video RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pcm_io, AS_IO, 8, pcm_state)
@@ -191,17 +175,6 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( pcm )
 INPUT_PORTS_END
 
-WRITE8_MEMBER( pcm_state::kbd_put )
-{
-	m_term_data = data;
-	m_step = 0;
-}
-
-static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
-{
-	DEVCB_DRIVER_MEMBER(pcm_state, kbd_put)
-};
-
 MACHINE_RESET_MEMBER(pcm_state)
 {
 }
@@ -216,7 +189,7 @@ SCREEN_UPDATE16_MEMBER( pcm_state )
 	UINT8 y,ra,chr,gfx;
 	UINT16 sy=0,ma=0x400,x;
 
-	for (y = 0; y < 32; y++)
+	for (y = 0; y < 16; y++)
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
@@ -224,7 +197,7 @@ SCREEN_UPDATE16_MEMBER( pcm_state )
 
 			for (x = ma; x < ma + 64; x++)
 			{
-				chr = m_p_videoram[x & 0x7ff];
+				chr = m_p_videoram[x];
 
 				gfx = m_p_chargen[(chr<<3) | ra];
 
@@ -287,7 +260,7 @@ static Z80PIO_INTERFACE( pio_u_intf )
 static Z80PIO_INTERFACE( pio_s_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
-	DEVCB_DRIVER_MEMBER(pcm_state, pcm_84_r),			/* read port A */
+	DEVCB_DEVICE_MEMBER(K7659_KEYBOARD_TAG, k7659_keyboard_device, read),			/* read port A */
 	DEVCB_NULL,			/* write port A */
 	DEVCB_NULL,			/* portA ready active callback */
 	DEVCB_DRIVER_MEMBER(pcm_state, pcm_85_r),			/* read port B */
@@ -337,8 +310,8 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(pcm_state, screen_update)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
+	MCFG_SCREEN_SIZE(64*8, 16*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 16*8-1)
 	MCFG_GFXDECODE(pcm)
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
@@ -351,7 +324,7 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
+	MCFG_K7659_KEYBOARD_ADD()
 	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 	MCFG_Z80PIO_ADD( "z80pio_u", XTAL_10MHz /4, pio_u_intf )
 	MCFG_Z80PIO_ADD( "z80pio_s", XTAL_10MHz /4, pio_s_intf )
@@ -381,13 +354,9 @@ ROM_START( pcm )
 
 	ROM_REGION(0x0800, "chargen",0)
 	ROM_LOAD( "charrom.d113", 0x0000, 0x0800, CRC(5684b3c3) SHA1(418054aa70a0fd120611e32059eb2051d3b82b5a))
-
-	ROM_REGION(0x0800, "k7659",0) // keyboard encoder
-	ROM_LOAD ("k7659n.d8", 0x0000, 0x0800, CRC(7454bf0a) SHA1(b97e7df93778fa371b96b6f4fb1a5b1c8b89d7ba) )
 ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1988, pcm,	 0,       0,	 pcm,		pcm,	 0, 	 "Mugler/Mathes",   "PC/M", 0)
-
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY        FULLNAME       FLAGS */
+COMP( 1988, pcm,    0,      0,       pcm,       pcm,      0,  "Mugler/Mathes",  "PC/M", 0)

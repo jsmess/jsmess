@@ -224,6 +224,7 @@ k7659_keyboard_device::k7659_keyboard_device(const machine_config &mconfig, cons
 
 void k7659_keyboard_device::device_start()
 {
+	m_timer = timer_alloc();
 	// state saving
 	//save_item(NAME(m_y));
 	//save_item(NAME(m_so));
@@ -236,27 +237,14 @@ void k7659_keyboard_device::device_start()
 
 void k7659_keyboard_device::device_reset()
 {
-	m_keyvalue = 0;
+	m_lookup = 0;
 	m_p_rom = memregion("k7659")->base();
+	m_timer->adjust(attotime::from_hz(200), 0, attotime::from_hz(200));
 }
 
-
-UINT8 k7659_keyboard_device::key_pos(UINT8 val)
+void k7659_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if (BIT(val,0)) return 1;
-	if (BIT(val,1)) return 2;
-	if (BIT(val,2)) return 3;
-	if (BIT(val,3)) return 4;
-	if (BIT(val,4)) return 5;
-	if (BIT(val,5)) return 6;
-	if (BIT(val,6)) return 7;
-	if (BIT(val,7)) return 8;
-	return 0;
-}
-
-READ8_MEMBER(k7659_keyboard_device::read)
-{
-	UINT8 retVal = m_keyvalue;
+	UINT8 retVal = 0;//m_lookup;
 	UINT8 a1 = ioport("A1")->read();
 	UINT8 a2 = ioport("A2")->read();
 	UINT8 a3 = ioport("A3")->read();
@@ -299,8 +287,26 @@ READ8_MEMBER(k7659_keyboard_device::read)
 		if (BIT(a12,6))
 			code |= 0x200;
 
-		m_keyvalue = m_p_rom[code];
-		retVal = m_keyvalue | 0x80;
+		m_lookup = m_p_rom[code];
+		retVal = m_lookup | 0x80;
 	}
-	return retVal;
+	m_key = retVal;
+}
+
+UINT8 k7659_keyboard_device::key_pos(UINT8 val)
+{
+	if (BIT(val,0)) return 1;
+	if (BIT(val,1)) return 2;
+	if (BIT(val,2)) return 3;
+	if (BIT(val,3)) return 4;
+	if (BIT(val,4)) return 5;
+	if (BIT(val,5)) return 6;
+	if (BIT(val,6)) return 7;
+	if (BIT(val,7)) return 8;
+	return 0;
+}
+
+READ8_MEMBER(k7659_keyboard_device::read)
+{
+	return m_key;
 }
