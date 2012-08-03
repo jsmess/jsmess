@@ -143,7 +143,7 @@ READ8_MEMBER( dragon_alpha_state::ff20_read )
 {
 	UINT8 result = 0x00;
 
-	switch(offset & 0x07)
+	switch(offset & 0x0f)
 	{
 		case 0: case 1: case 2: case 3:
 			result = dragon_state::ff20_read(space, offset, mem_mask);
@@ -184,7 +184,7 @@ READ8_MEMBER( dragon_alpha_state::ff20_read )
 
 WRITE8_MEMBER( dragon_alpha_state::ff20_write )
 {
-	switch(offset & 0x07)
+	switch(offset & 0x0f)
 	{
 		case 0: case 1: case 2: case 3:
 			dragon_state::ff20_write(space, offset, data, mem_mask);

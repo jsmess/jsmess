@@ -596,7 +596,7 @@ static TIMER_DEVICE_CALLBACK( cassette_output_tick )
 {
 	atom_state *state = timer.machine().driver_data<atom_state>();
 
-	int level = !(!(!state->m_hz2400 & state->m_pc1) & state->m_pc0);
+	int level = !(!(!state->m_hz2400 && state->m_pc1) && state->m_pc0);
 
 	state->m_cassette->output(level ? -1.0 : +1.0);
 

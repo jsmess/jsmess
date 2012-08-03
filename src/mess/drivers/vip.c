@@ -464,7 +464,7 @@ READ_LINE_MEMBER( vip_state::ef2_r )
 
 READ_LINE_MEMBER( vip_state::ef3_r )
 {
-	return !BIT(ioport("KEYPAD")->read(), m_keylatch) | m_byteio_ef3 | m_exp_ef3;
+	return !BIT(ioport("KEYPAD")->read(), m_keylatch) || m_byteio_ef3 || m_exp_ef3;
 }
 
 READ_LINE_MEMBER( vip_state::ef4_r )

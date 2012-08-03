@@ -495,8 +495,8 @@ machine_config_constructor base_d9060_device::device_mconfig_additions() const
 inline void base_d9060_device::update_ieee_signals()
 {
 	int atn = m_bus->atn_r();
-	int nrfd = !(!(!(atn & m_atna) & m_rfdo) | !(atn | m_atna));
-	int ndac = !(m_daco | !(atn | m_atna));
+	int nrfd = !(!(!(atn && m_atna) && m_rfdo) || !(atn || m_atna));
+	int ndac = !(m_daco || !(atn || m_atna));
 
 	m_bus->nrfd_w(this, nrfd);
 	m_bus->ndac_w(this, ndac);

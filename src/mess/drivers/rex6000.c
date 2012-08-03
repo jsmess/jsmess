@@ -553,7 +553,7 @@ static TIMER_DEVICE_CALLBACK( sec_timer )
 
 WRITE_LINE_MEMBER( rex6000_state::alarm_irq )
 {
-	if (!(m_irq_mask & IRQ_FLAG_ALARM) & state)
+	if (!(m_irq_mask & IRQ_FLAG_ALARM) && state)
 	{
 		m_irq_flag |= IRQ_FLAG_ALARM;
 		device_set_input_line(m_maincpu, 0, HOLD_LINE);

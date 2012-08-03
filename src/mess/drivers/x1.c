@@ -1884,7 +1884,7 @@ WRITE8_MEMBER( x1_state::x1_portc_w )
 	/* set up the pixel clock according to the above divider */
 	m_crtc->set_clock(VDP_CLOCK/((m_hres_320) ? 48 : 24));
 
-	if(!BIT(data, 5) & BIT(m_io_switch, 5))
+	if(!BIT(data, 5) && BIT(m_io_switch, 5))
 		m_io_bank_mode = 1;
 
 	m_io_switch = data & 0x20;

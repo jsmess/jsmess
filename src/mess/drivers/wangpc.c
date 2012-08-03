@@ -773,14 +773,14 @@ static AM9517A_INTERFACE( dmac_intf )
 
 void wangpc_state::check_level1_interrupts()
 {
-	int state = !m_timer2_irq | m_epci->rxrdy_r() | m_epci->txemt_r() | !m_acknlg | !m_dav | !m_busy;
+	int state = !m_timer2_irq || m_epci->rxrdy_r() || m_epci->txemt_r() || !m_acknlg || !m_dav || !m_busy;
 
 	pic8259_ir1_w(m_pic, state);
 }
 
 void wangpc_state::check_level2_interrupts()
 {
-	int state = !m_dma_eop | m_uart_dr | m_uart_tbre | m_fdc_dd0 | m_fdc_dd1 | upd765_int_r(m_fdc) | m_fpu_irq | m_bus_irq2;
+	int state = !m_dma_eop || m_uart_dr || m_uart_tbre || m_fdc_dd0 || m_fdc_dd1 || upd765_int_r(m_fdc) || m_fpu_irq || m_bus_irq2;
 
 	pic8259_ir2_w(m_pic, state);
 }

@@ -60,7 +60,7 @@ WRITE8_MEMBER( mz80_state::mz80k_8255_portc_w )
 
 WRITE_LINE_MEMBER( mz80_state::pit_out0_changed )
 {
-	if(!m_prev_state & state)
+	if(!m_prev_state && state)
 		m_speaker_level++;
 
 	m_prev_state = state;

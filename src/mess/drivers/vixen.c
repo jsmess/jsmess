@@ -77,7 +77,7 @@ Notes:
 
 void vixen_state::update_interrupt()
 {
-	int state = (m_cmd_d1 & m_fdint) | m_vsync | (!m_enb_srq_int & !m_srq) | (!m_enb_atn_int & !m_atn) | (!m_enb_xmt_int & m_txrdy) | (!m_enb_rcv_int & m_rxrdy);
+	int state = (m_cmd_d1 && m_fdint) || m_vsync || (!m_enb_srq_int && !m_srq) || (!m_enb_atn_int && !m_atn) || (!m_enb_xmt_int && m_txrdy) || (!m_enb_rcv_int && m_rxrdy);
 
 	device_set_input_line(m_maincpu, INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 }
