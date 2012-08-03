@@ -4,15 +4,6 @@
  *
  ****************************************************************************/
 
-/*
-	
-	TODO:
-
-	- color cursor
-	- color HR graphics
-
-*/
-
 #include "includes/abc80x.h"
 
 
@@ -65,9 +56,7 @@ offs_t abc800c_state::translate_trom_offset(offs_t offset)
 	if (col >= 80) row += 16;
 	else if (col >= 40) row += 8;
 
-	col %= 40;
-
-	return (row * 40) + col;
+	return (row * 40) + (col % 40);
 }
 
 
@@ -99,7 +88,7 @@ void abc800c_state::hr_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	UINT16 addr = 0;
 
-	for (int y = m_hrs; y < MIN(cliprect.max_y + 1, m_hrs + 240); y++)
+	for (int y = m_hrs; y < MIN(cliprect.max_y + 1, m_hrs + 480); y += 2)
 	{
 		int x = 0;
 
@@ -110,11 +99,29 @@ void abc800c_state::hr_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
 			for (int dot = 0; dot < 4; dot++)
 			{
 				UINT16 fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
-				int color = m_fgctl_prom[fgctl_addr] & 0x07;
+				UINT8 fgctl = m_fgctl_prom[fgctl_addr];
+				int color = fgctl & 0x07;
 
-				bitmap.pix16(y, x++) = color;
+				if (color)
+				{
+					rgb_t rgb = palette_entry_get_color(machine().palette, bitmap.pix16(y, x));
+					bool black = !RGB_RED(rgb) && !RGB_GREEN(rgb) && !RGB_BLUE(rgb);
+					bool opaque = !BIT(fgctl, 3);
+
+					if (black || opaque)
+					{
+						color += 128;
+	
+						bitmap.pix16(y, x) = color;
+						bitmap.pix16(y, x + 1) = color;
+
+						bitmap.pix16(y + 1, x) = color;
+						bitmap.pix16(y + 1, x + 1) = color;
+					}
+				}
 
 				data <<= 2;
+				x += 2;
 			}
 		}
 	}
@@ -138,6 +145,26 @@ void abc800_state::video_start()
 
 
 //-------------------------------------------------
+//  VIDEO_START( abc800c )
+//-------------------------------------------------
+
+void abc800c_state::video_start()
+{
+	abc800_state::video_start();
+
+	// initialize palette
+	palette_set_color_rgb(machine(), 128+0, 0x00, 0x00, 0x00); // black
+	palette_set_color_rgb(machine(), 128+1, 0xff, 0x00, 0x00); // red
+	palette_set_color_rgb(machine(), 128+2, 0x00, 0xff, 0x00); // green
+	palette_set_color_rgb(machine(), 128+3, 0xff, 0xff, 0x00); // yellow
+	palette_set_color_rgb(machine(), 128+4, 0x00, 0x00, 0xff); // blue
+	palette_set_color_rgb(machine(), 128+5, 0xff, 0x00, 0xff); // magenta
+	palette_set_color_rgb(machine(), 128+6, 0x00, 0xff, 0xff); // cyan
+	palette_set_color_rgb(machine(), 128+7, 0xff, 0xff, 0xff); // white
+}
+
+
+//-------------------------------------------------
 //  SCREEN_UPDATE( abc800c )
 //-------------------------------------------------
 
@@ -146,14 +173,16 @@ UINT32 abc800c_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	// clear screen
 	bitmap.fill(get_black_pen(machine()), cliprect);
 
-	// draw HR graphics
-	hr_update(bitmap, cliprect);
-
+	// draw text
 	if (!BIT(m_fgctl, 7))
 	{
-		// draw text
 		saa5050_update(m_trom, bitmap, cliprect);
 	}
+
+	saa5050_frame_advance(m_trom);
+
+	// draw HR graphics
+	hr_update(bitmap, cliprect);
 
 	return 0;
 }
@@ -180,12 +209,12 @@ MACHINE_CONFIG_FRAGMENT( abc800c_video )
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(abc800c_state, screen_update)
 
-	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_SIZE(480, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 480-1, 0, 480-1)
 
-	MCFG_PALETTE_LENGTH(128)
+	MCFG_PALETTE_LENGTH(128+8)
 	MCFG_PALETTE_INIT(saa5050)
 
 	MCFG_GFXDECODE(saa5050)
@@ -321,9 +350,9 @@ UINT32 abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	// draw HR graphics
 	hr_update(bitmap, cliprect);
 
+	// draw text
 	if (!BIT(m_fgctl, 7))
 	{
-		// draw text
 		m_crtc->screen_update(screen, bitmap, cliprect);
 	}
 

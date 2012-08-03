@@ -6,9 +6,12 @@
 
 /*
 
-    TODO:
+	TODO:
 
-    - HRU II PROM reading
+	- HRU II PROM test
+	- flashing
+	- double height
+	- underline
 
 */
 
@@ -41,7 +44,7 @@ static PALETTE_INIT( abc806 )
 
 
 //-------------------------------------------------
-//  abc806_hrs_w - high resolution memory banking
+//  hrs_w - high resolution memory banking
 //-------------------------------------------------
 
 WRITE8_MEMBER( abc806_state::hrs_w )
@@ -66,7 +69,7 @@ WRITE8_MEMBER( abc806_state::hrs_w )
 
 
 //-------------------------------------------------
-//  abc806_hrc_w - high resolution color write
+//  hrc_w - high resolution color write
 //-------------------------------------------------
 
 WRITE8_MEMBER( abc806_state::hrc_w )
@@ -78,7 +81,7 @@ WRITE8_MEMBER( abc806_state::hrc_w )
 
 
 //-------------------------------------------------
-//  abc806_charram_r - character RAM read
+//  charram_r - character RAM read
 //-------------------------------------------------
 
 READ8_MEMBER( abc806_state::charram_r )
@@ -90,18 +93,19 @@ READ8_MEMBER( abc806_state::charram_r )
 
 
 //-------------------------------------------------
-//  abc806_charram_w - character RAM write
+//  charram_w - character RAM write
 //-------------------------------------------------
 
 WRITE8_MEMBER( abc806_state::charram_w )
 {
 	m_color_ram[offset] = m_attr_data;
+	
 	m_char_ram[offset] = data;
 }
 
 
 //-------------------------------------------------
-//  abc806_ami_r - attribute memory read
+//  ami_r - attribute memory read
 //-------------------------------------------------
 
 READ8_MEMBER( abc806_state::ami_r )
@@ -111,7 +115,7 @@ READ8_MEMBER( abc806_state::ami_r )
 
 
 //-------------------------------------------------
-//  abc806_amo_w - attribute memory write
+//  amo_w - attribute memory write
 //-------------------------------------------------
 
 WRITE8_MEMBER( abc806_state::amo_w )
@@ -121,7 +125,7 @@ WRITE8_MEMBER( abc806_state::amo_w )
 
 
 //-------------------------------------------------
-//  abc806_cli_r - palette PROM read
+//  cli_r - palette PROM read
 //-------------------------------------------------
 
 READ8_MEMBER( abc806_state::cli_r )
@@ -144,6 +148,8 @@ READ8_MEMBER( abc806_state::cli_r )
 	UINT16 hru2_addr = (m_hru2_a8 << 8) | (offset >> 8);
 	UINT8 data = m_hru2_prom[hru2_addr] & 0x0f;
 
+	logerror("HRU II %03x : %01x\n", hru2_addr, data);
+
 	data |= m_rtc->dio_r() << 7;
 
 	return data;
@@ -151,7 +157,7 @@ READ8_MEMBER( abc806_state::cli_r )
 
 
 //-------------------------------------------------
-//  abc806_sti_r - protection device read
+//  sti_r - protection device read
 //-------------------------------------------------
 
 READ8_MEMBER( abc806_state::sti_r )
@@ -176,7 +182,7 @@ READ8_MEMBER( abc806_state::sti_r )
 
 
 //-------------------------------------------------
-//  abc806_sto_w -
+//  sto_w -
 //-------------------------------------------------
 
 WRITE8_MEMBER( abc806_state::sto_w )
@@ -221,7 +227,7 @@ WRITE8_MEMBER( abc806_state::sto_w )
 
 
 //-------------------------------------------------
-//  abc806_sso_w - sync offset write
+//  sso_w - sync offset write
 //-------------------------------------------------
 
 WRITE8_MEMBER( abc806_state::sso_w )
@@ -513,7 +519,7 @@ UINT32 abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	screen.set_visible_area(0, 767, 0, 311);
 
 	// clear screen
-	bitmap.fill(0, cliprect);
+	bitmap.fill(get_black_pen(machine()), cliprect);
 
 	if (!m_txoff)
 	{
@@ -541,7 +547,7 @@ MACHINE_CONFIG_FRAGMENT( abc806_video )
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(768, 312)
-	MCFG_SCREEN_VISIBLE_AREA(0,768-1, 0, 312-1)
+	MCFG_SCREEN_VISIBLE_AREA(0, 768-1, 0, 312-1)
 
 	MCFG_PALETTE_LENGTH(8)
 
