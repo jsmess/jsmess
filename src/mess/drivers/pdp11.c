@@ -88,6 +88,12 @@ public:
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	UINT8 m_term_data;
 	UINT16 m_term_status;
+	
+	DECLARE_READ16_MEMBER( rxcs_r ) { return 040; } //m_rxcs; }
+	DECLARE_WRITE16_MEMBER( rxcs_w ) {   }
+	DECLARE_READ16_MEMBER( rxcs_2_r ) { return 00; } //m_rxcs; }
+	DECLARE_WRITE16_MEMBER( rxcs_2_w ) {  }
+	
 };
 
 WRITE16_MEMBER(pdp11_state::term_w)
@@ -119,6 +125,10 @@ static ADDRESS_MAP_START(pdp11_mem, AS_PROGRAM, 16, pdp11_state)
 	AM_RANGE( 0xff72, 0xff73 ) AM_READ(term_r)
 	AM_RANGE( 0xff74, 0xff75 ) AM_READ(term_tx_status_r)
 	AM_RANGE( 0xff76, 0xff77 ) AM_WRITE(term_w)
+	
+	AM_RANGE( 0xfe78, 0xfe79 ) AM_READWRITE(rxcs_r, rxcs_w)	
+	AM_RANGE( 0xfe7a, 0xfe7b ) AM_READWRITE(rxcs_2_r, rxcs_2_w)	
+	
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(pdp11qb_mem, AS_PROGRAM, 16, pdp11_state)
