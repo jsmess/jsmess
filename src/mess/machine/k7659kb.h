@@ -61,6 +61,8 @@ protected:
 
 private:
 	UINT8 key_pos(UINT8 val);
+	UINT8 m_keyvalue;
+	const UINT8 *m_p_rom;
 };
 
 
