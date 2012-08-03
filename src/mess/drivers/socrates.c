@@ -12,7 +12,7 @@ TODO:
     add waitstates for ram access (lack of this causes the system to run way too fast)
     find and hook up any timers/interrupt controls
     switch cartridges over to a CART system rather than abusing BIOS
-
+    keyboard IR decoder MCU is HLE'd for now, needs decap and cpu core (it is rather tms1000 or CIC-like)
 
 
   Socrates Educational Video System
@@ -80,7 +80,14 @@ class socrates_state : public driver_device
 {
 public:
 	socrates_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_screen(*this, "screen"),
+		m_sound(*this, "soc_snd")
+		{ }
+	required_device<cpu_device> m_maincpu;
+	required_device<screen_device> m_screen;
+	required_device<device_t> m_sound;
 
 	rgb_t m_palette[256];
 
@@ -92,6 +99,7 @@ public:
 	UINT8 m_kb_latch_low[2];
 	UINT8 m_kb_latch_high[2];
 	UINT8 m_kb_latch_mouse;
+	UINT8 m_kbmcu_rscount; // how many pokes the kbmcu has taken in the last frame
 	UINT8 m_io40_latch; // what was last written to speech reg (for open bus)?
 	UINT8 m_hblankstate; // are we in hblank?
 	UINT8 m_vblankstate; // are we in vblank?
@@ -106,7 +114,7 @@ public:
 	DECLARE_READ8_MEMBER(socrates_ram_bank_r);
 	DECLARE_WRITE8_MEMBER(socrates_ram_bank_w);
 	DECLARE_READ8_MEMBER(read_f3);
-	DECLARE_WRITE8_MEMBER(unknownlatch_30);
+	DECLARE_WRITE8_MEMBER(kbmcu_strobe);
 	DECLARE_READ8_MEMBER(status_and_speech);
 	DECLARE_WRITE8_MEMBER(speech_command);
 	DECLARE_READ8_MEMBER(socrates_keyboard_low_r);
@@ -207,6 +215,7 @@ static MACHINE_RESET( socrates )
  state->m_kb_latch_low[1] = 0x00;
  state->m_kb_latch_high[1] = 0x01;
  state->m_kb_latch_mouse = 0;
+ state->m_kbmcu_rscount = 0;
  state->m_io40_latch = 0;
  state->m_hblankstate = 0;
  state->m_vblankstate = 0;
@@ -231,9 +240,7 @@ static DRIVER_INIT( socrates )
 
 READ8_MEMBER(socrates_state::socrates_rom_bank_r)
 {
- UINT8 data = 0xFF;
- data = m_rom_bank;
- return data;
+ return m_rom_bank;
 }
 
 WRITE8_MEMBER(socrates_state::socrates_rom_bank_w)
@@ -244,9 +251,7 @@ WRITE8_MEMBER(socrates_state::socrates_rom_bank_w)
 
 READ8_MEMBER(socrates_state::socrates_ram_bank_r)
 {
- UINT8 data = 0xFF;
- data = m_ram_bank;
- return data;
+ return m_ram_bank;
 }
 
 WRITE8_MEMBER(socrates_state::socrates_ram_bank_w)
@@ -260,9 +265,19 @@ READ8_MEMBER(socrates_state::read_f3)// used for read-only i/o ports as mame/mes
  return 0xF3;
 }
 
-WRITE8_MEMBER(socrates_state::unknownlatch_30)// writes to i/o 0x3x do SOMETHING, possibly waitstate related (may halt cpu until vblank start?) or involve status reg bit 6
+WRITE8_MEMBER(socrates_state::kbmcu_strobe) // strobe the keyboard MCU
 {
-//logerror("write to i/o 0x30, data %x\n", data); // too annoying to leave enabled
+	//logerror("0x%04X: kbmcu written with %02X!\n", cpu_get_pc(m_maincpu), data); //if (cpu_get_pc(m_maincpu) != 0x31D)
+	// if two writes happen within one frame, reset the keyboard latches
+	m_kbmcu_rscount++;
+	if (m_kbmcu_rscount > 1)
+	{
+		m_kb_latch_low[0] = 0x00;
+		m_kb_latch_high[0] = 0x01;
+		m_kb_latch_low[1] = 0x00;
+		m_kb_latch_high[1] = 0x01;
+		m_kb_latch_mouse = 0;
+	}
 }
 
 READ8_MEMBER(socrates_state::status_and_speech)// read 0x4x, some sort of status reg
@@ -279,7 +294,7 @@ UINT8 *speechromint = memregion("speechint")->base();
 UINT8 *speechromext = memregion("speechext")->base();
 	int temp = 0;
 	temp |= (m_speech_running)?0x80:0;
-	temp |= 0x40; // unknown
+	temp |= 0x40; // unknown, possibly IR mcu busy
 	temp |= (m_vblankstate)?0:0x20;
 	temp |= (m_hblankstate)?0:0x10;
 	switch(m_io40_latch&0xF0) // what was last opcode sent?
@@ -688,7 +703,7 @@ static ADDRESS_MAP_START(z80_io, AS_IO, 8, socrates_state )
     0x21 - W - msb offset of screen display
     resulting screen line is one of 512 total offsets on 128-byte boundaries in the whole 64k ram
     */
-	AM_RANGE(0x30, 0x30) AM_READWRITE(read_f3, unknownlatch_30) AM_MIRROR (0xf) /* unknown, write only. may relate to waitstate timing? */
+	AM_RANGE(0x30, 0x30) AM_READWRITE(read_f3, kbmcu_strobe) AM_MIRROR (0xf) /* resets the keyboard IR decoder MCU */
 	AM_RANGE(0x40, 0x40) AM_READWRITE(status_and_speech, speech_command ) AM_MIRROR(0xf) /* reads status register for vblank/hblank/speech, also reads and writes speech module */
 	AM_RANGE(0x50, 0x50) AM_READWRITE(socrates_keyboard_low_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode low, latched on keypress, can be unlatched by writing anything here */
 	AM_RANGE(0x51, 0x51) AM_READWRITE(socrates_keyboard_high_r, socrates_keyboard_clear) AM_MIRROR(0xE) /* Keyboard keycode high, latched as above, unlatches same as above */
@@ -900,6 +915,7 @@ static INTERRUPT_GEN( assert_irq )
 	device->machine().scheduler().timer_set(downcast<cpu_device *>(device)->cycles_to_attotime(44), FUNC(clear_irq_cb));
 // 44 is a complete and total guess, need to properly measure how many clocks/microseconds the int line is high for.
 	state->m_vblankstate = 1;
+	state->m_kbmcu_rscount = 0; // clear the mcu poke count
 }
 
 static MACHINE_CONFIG_START( socrates, socrates_state )
@@ -995,6 +1011,9 @@ ROM_START(socrates)
 
     ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
 
+    ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
+    ROM_LOAD("tmp42c40p1844.bin", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
+
     /* english speech cart has a green QC sticker */
     ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
     ROM_LOAD_OPTIONAL("speech_internal.bin", 0x0000, 0x2000, CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // 8k on the speech chip itself
@@ -1013,6 +1032,9 @@ ROM_START(socratfc)
     ROM_LOAD_OPTIONAL("cartridge.bin", 0x40000, 0x20000, NO_DUMP)
 
     ROM_REGION(0x10000, "vram", ROMREGION_ERASEFF) /* fill with ff, driver_init changes this to the 'correct' startup pattern */
+
+    ROM_REGION(0x800, "kbmcu", ROMREGION_ERASEFF)
+    ROM_LOAD("tmp42c40p1844.bin", 0x000, 0x200, NO_DUMP) /* keyboard IR decoder MCU */
 
     ROM_REGION(0x2000, "speechint", ROMREGION_ERASE00) // speech data inside of the speech chip; fill with 00, if no speech cart is present socrates will see this
     ROM_LOAD_OPTIONAL("speech_fra_internal.bin", 0x0000, 0x2000, BAD_DUMP CRC(edc1fb3f) SHA1(78b4631fc3b1c038e14911047f9edd6c4e8bae58)) // probably same on french and english speech carts
