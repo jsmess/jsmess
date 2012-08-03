@@ -213,6 +213,8 @@ static SCREEN_UPDATE_IND16( p2000t )
 	device_t *saa5050 = screen.machine().device("saa5050");
 
 	saa5050_update(saa5050, bitmap, cliprect);
+	saa5050_frame_advance(saa5050);
+	
 	return 0;
 }
 
