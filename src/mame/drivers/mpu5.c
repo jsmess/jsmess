@@ -1,132 +1,10 @@
-/*
-    Many of the games in here also seem to exist on other hardware.
-
-    MPU5
-
-    Skeleton Driver
-
-     -- there are a wide range of titles running on this hardware
-
-     -- the driver does nothing, and currently only serves to act as a placeholder to document what existed on this hardware
-
-     -- the main CPU is a 68340, which is a 32-bit 680xx variant with modified opcodes etc. (CPU32 core)
-
-     -- Much of the communication is done via a 68681 DUART.
-
-     -- Help wanted, the MFME sources (which are based on MAME anyway) should be of some help here, if somebody
-        in the FM emu community wants to adopt this driver they're welcome to it.
-
-     -- As a result of games being on multiple systems, and some of the original sets being a mess there could be one or two
-        out of position here (eg MPU4 video instead of MPU5) or with missing roms if there was extra hardware (nothing has been
-        removed from the rom loading comments, so if there were extra roms present they're still commented)
-
-        Some duplicate roms have been commented out for now, please don't remove these lines until the sets are properly sorted.
-
-        Some games weren't even in the right zips, Eg the Red Hot Fever (MPU4) cotnained a mislabled MPU5 'Raise The Roof' set
-        with extra roms, probably actually from the MPU4 Red Hot Fever.  The game names are usually stored somewhat as plain
-        ASCII so spotting such problems is easy enough.
-
-        In general things have been added here if the rom structure and initial code looks like the MPU5 boot code
-
-
-
-    15/07/11 - rom loading for most games added, still some missing tho and clones still need sorting out properly.
-*/
-
+/* for MPU5 hardware emulation see mpu5hw.c, this just contains the set listing and per machine configs */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
 
+MACHINE_CONFIG_EXTERN( mpu5 );
+INPUT_PORTS_EXTERN( mpu5 );
 
-class mpu5_state : public driver_device
-{
-public:
-	mpu5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu")
-	{ }
-	UINT32* m_cpuregion;
-	UINT32* m_mainram;
-
-	DECLARE_READ32_MEMBER(mpu5_mem_r);
-	DECLARE_WRITE32_MEMBER(mpu5_mem_w);
-
-protected:
-
-	// devices
-	required_device<cpu_device> m_maincpu;
-};
-
-
-READ32_MEMBER(mpu5_state::mpu5_mem_r)
-{
-	int pc = cpu_get_pc(&space.device());
-	int cs = m68340_get_cs(m_maincpu, offset * 4);
-
-	switch ( cs )
-	{
-		case 1:
-			return m_cpuregion[offset];
-
-		case 4:
-			offset &=0x3fff;
-			return (m_mainram[offset]);
-
-		default:
-			logerror("%08x maincpu read access offset %08x mem_mask %08x cs %d\n", pc, offset*4, mem_mask, cs);
-
-	}
-
-	return 0x0000;
-}
-
-WRITE32_MEMBER(mpu5_state::mpu5_mem_w)
-{
-	int pc = cpu_get_pc(&space.device());
-	int cs = m68340_get_cs(m_maincpu, offset * 4);
-
-	switch ( cs )
-	{
-		case 4:
-			offset &=0x3fff;
-			COMBINE_DATA(&m_mainram[offset]);
-			break;
-
-
-
-		default:
-			logerror("%08x maincpu write access offset %08x data %08x mem_mask %08x cs %d\n", pc, offset*4, data, mem_mask, cs);
-
-	}
-
-}
-
-static ADDRESS_MAP_START( mpu5_map, AS_PROGRAM, 32, mpu5_state )
-	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(mpu5_mem_r, mpu5_mem_w)
-ADDRESS_MAP_END
-
-static INPUT_PORTS_START(  mpu5 )
-INPUT_PORTS_END
-
-
-static MACHINE_START( mpu5 )
-{
-	mpu5_state *state = machine.driver_data<mpu5_state>();
-	state->m_cpuregion = (UINT32*)state->memregion( "maincpu" )->base();
-	state->m_mainram = (UINT32*)auto_alloc_array_clear(machine, UINT32, 0x10000);
-
-}
-
-
-static MACHINE_CONFIG_START( mpu5, mpu5_state )
-	MCFG_CPU_ADD("maincpu", M68340, 16000000)	 // ?
-	MCFG_CPU_PROGRAM_MAP(mpu5_map)
-
-	MCFG_MACHINE_START( mpu5 )
-
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	/* unknown sound */
-MACHINE_CONFIG_END
 
 /* Empire
    Ace Of Clubs
@@ -264,12 +142,14 @@ ROM_START( m5honmon )
 	ROM_LOAD16_BYTE( "hmo_23l.p4", 0x100001, 0x80000, CRC(8443e257) SHA1(55c9dda40368914481b40b7224081c67758c5717) )
 	ROM_LOAD16_BYTE( "hmo_23l.p5", 0x200000, 0x80000, CRC(e1cdf0f4) SHA1(0a1d09fefced246ce0c7692171c56f45050c49fd) )
 	ROM_LOAD16_BYTE( "hmo_23l.p6", 0x200001, 0x80000, CRC(32496a48) SHA1(7c29020c1b35dd078e0807b86f67ec41432d84a1) )
-
-	ROM_REGION( 0x400000, "altrevs", 0 )
-	ROM_LOAD( "honey.p1", 0x0000, 0x080000, CRC(22ade9cd) SHA1(29600f23fbb55ff5624b97fb4d503adda4bdd8dc) )
-	ROM_LOAD( "honey.p2", 0x0000, 0x080000, CRC(065cba42) SHA1(46755e5ef4dbbba89fc57cdb09bb92c4a2213640) )
 ROM_END
 
+ROM_START( m5honmona )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "honey.p1", 0x00000, 0x080000, CRC(22ade9cd) SHA1(29600f23fbb55ff5624b97fb4d503adda4bdd8dc) )
+	ROM_LOAD16_BYTE( "honey.p2", 0x00001, 0x080000, CRC(065cba42) SHA1(46755e5ef4dbbba89fc57cdb09bb92c4a2213640) )
+	/* 3,4,5,6 */
+ROM_END
 
 /* Sets below haven't been split into parent / clones yet! */
 
@@ -977,11 +857,15 @@ ROM_START( m5bttf )
 	ROM_LOAD16_BYTE( "bfe_12l.p2", 0x000001, 0x080000, CRC(c020b40f) SHA1(4f2c6773fbf76aa71772ffeb2dfc52462f71d02c) )
 	ROM_LOAD16_BYTE( "bfe_12l.p3", 0x100000, 0x080000, CRC(7362219a) SHA1(de06b10d0e76376a50c3943be96ed13a19c051c0) )
 	ROM_LOAD16_BYTE( "bfe_12l.p4", 0x100001, 0x080000, CRC(ff5b3bd0) SHA1(3f02f4c8b440d7ad1ec10170c9b3b2de87aa98f5) )
-
-	ROM_REGION( 0x400000, "altrevs", 0 )
-	ROM_LOAD( "b_tofeat.p1", 0x0000, 0x080000, CRC(c203dd09) SHA1(141c65e3b00e2ac8188fffb8899b61384a3b4786) )
-	ROM_LOAD( "b_tofeat.p2", 0x0000, 0x080000, CRC(989fa928) SHA1(daee2fd9bed569de385b8beee51225e45610db52) )
 ROM_END
+
+ROM_START( m5bttfa )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "b_tofeat.p1", 0x00000, 0x080000, CRC(c203dd09) SHA1(141c65e3b00e2ac8188fffb8899b61384a3b4786) )
+	ROM_LOAD16_BYTE( "b_tofeat.p2", 0x00001, 0x080000, CRC(989fa928) SHA1(daee2fd9bed569de385b8beee51225e45610db52) )
+	/* 3+4 */
+ROM_END
+
 
 ROM_START( m5barkng )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -1166,34 +1050,55 @@ ROM_START( m5bigsht )
 	ROM_LOAD16_BYTE( "bsa10s.p4", 0x100001, 0x080000, CRC(18c1956b) SHA1(8c496f83609e281605377a191c35f379db53983a) )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "bsa04d.p1", 0x000000, 0x080000, CRC(363d6f3d) SHA1(33c1aea12f450c4489b0b1e7347f52ba724fee01) )
-	ROM_LOAD16_BYTE( "bsa04k.p1", 0x000000, 0x080000, CRC(9417aedd) SHA1(902bec2307f26c98e186236589998217dfe50f73) )
-	ROM_LOAD16_BYTE( "bsa04s.p1", 0x000000, 0x080000, CRC(b0d53f31) SHA1(f51db7c1341cd1d3e26f5409571c48a4ea91b918) )
-	ROM_LOAD16_BYTE( "bsa04s.p2", 0x000000, 0x080000, CRC(a635b46f) SHA1(e750f75366b1a3153f8872f3a9b4549b29a7d671) )
-	//ROM_LOAD16_BYTE( "bsa04s.p3", 0x000000, 0x080000, CRC(bbb9538a) SHA1(18feaf2d2bf4be9c3632ee210fdd2b8f1be676b1) )
-	//ROM_LOAD16_BYTE( "bsa04s.p4", 0x000000, 0x080000, CRC(18c1956b) SHA1(8c496f83609e281605377a191c35f379db53983a) )
 	ROM_LOAD16_BYTE( "bsa10d.p1", 0x000000, 0x080000, CRC(f719522a) SHA1(74e3d0b86edc22c3b931c73d4edd78a65dcaa516) )
 	ROM_LOAD16_BYTE( "bsa10k.p1", 0x000000, 0x080000, CRC(553393ca) SHA1(5c0c1fec3ff23ceff24c3c27d168640fe1bb755b) )
+ROM_END
+
+ROM_START( m5bigsht04 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "bsa04s.p1", 0x000000, 0x080000, CRC(b0d53f31) SHA1(f51db7c1341cd1d3e26f5409571c48a4ea91b918) )
+	ROM_LOAD16_BYTE( "bsa04s.p2", 0x000001, 0x080000, CRC(a635b46f) SHA1(e750f75366b1a3153f8872f3a9b4549b29a7d671) )
+	ROM_LOAD16_BYTE( "bsa04s.p3", 0x100000, 0x080000, CRC(bbb9538a) SHA1(18feaf2d2bf4be9c3632ee210fdd2b8f1be676b1) ) // == 10
+	ROM_LOAD16_BYTE( "bsa04s.p4", 0x100001, 0x080000, CRC(18c1956b) SHA1(8c496f83609e281605377a191c35f379db53983a) ) // == 10
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "bsa04d.p1", 0x000000, 0x080000, CRC(363d6f3d) SHA1(33c1aea12f450c4489b0b1e7347f52ba724fee01) )
+	ROM_LOAD16_BYTE( "bsa04k.p1", 0x000000, 0x080000, CRC(9417aedd) SHA1(902bec2307f26c98e186236589998217dfe50f73) )
+ROM_END
+
+ROM_START( m5bigsht11 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "bsa11s.p1", 0x000000, 0x080000, CRC(9e42a5eb) SHA1(292a6dddd046504e4f6ecccdf53472d95298663b) )
+	ROM_LOAD16_BYTE( "bsa11s.p2", 0x000001, 0x080000, CRC(72a36915) SHA1(3635e42ca3ac8913a306bd86e3d3d3dbdd32450e) )
+	ROM_LOAD16_BYTE( "bsa11s.p3", 0x100000, 0x080000, CRC(bbb9538a) SHA1(18feaf2d2bf4be9c3632ee210fdd2b8f1be676b1) ) // == 10
+	ROM_LOAD16_BYTE( "bsa11s.p4", 0x100001, 0x080000, CRC(18c1956b) SHA1(8c496f83609e281605377a191c35f379db53983a) ) // == 10
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "bsa11d.p1", 0x000000, 0x080000, CRC(18aaf5e7) SHA1(eb963f9cac3b19633062a42d673f1595765cfa76) )
 	ROM_LOAD16_BYTE( "bsa11k.p1", 0x000000, 0x080000, CRC(ba803407) SHA1(966ba90ee6e1b7bc512142ca26d11094e879d5f2) )
-	ROM_LOAD16_BYTE( "bsa11s.p1", 0x000000, 0x080000, CRC(9e42a5eb) SHA1(292a6dddd046504e4f6ecccdf53472d95298663b) )
-	ROM_LOAD16_BYTE( "bsa11s.p2", 0x000000, 0x080000, CRC(72a36915) SHA1(3635e42ca3ac8913a306bd86e3d3d3dbdd32450e) )
-	//ROM_LOAD16_BYTE( "bsa11s.p3", 0x000000, 0x080000, CRC(bbb9538a) SHA1(18feaf2d2bf4be9c3632ee210fdd2b8f1be676b1) )
-	//ROM_LOAD16_BYTE( "bsa11s.p4", 0x000000, 0x080000, CRC(18c1956b) SHA1(8c496f83609e281605377a191c35f379db53983a) )
+ROM_END
+
+ROM_START( m5bigsht13 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "bsh13s.p1", 0x000000, 0x080000, CRC(9ffcd5e4) SHA1(58a4ffe87cac83be2ae78e2b4bc02b5b43274acc) )
+	ROM_LOAD16_BYTE( "bsh13s.p2", 0x000001, 0x080000, CRC(f5ce2d0a) SHA1(979f17d3faedf25943c197625219c877ff51ab64) )
+	ROM_LOAD16_BYTE( "bsh13s.p3", 0x100000, 0x080000, CRC(78776cec) SHA1(7e0e8cfc650043fd84949df89ecc7a422c2a765e) )
+	ROM_LOAD16_BYTE( "bsh13s.p4", 0x100001, 0x080000, CRC(14bdc563) SHA1(391db5fa27fec4b8916aa2387c2c71fb7e09ae10) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "bsh13d.p1", 0x000000, 0x080000, CRC(191485e8) SHA1(a8528f89a2aabb65f9543b15b0332bbfdb0b1bb7) )
 	ROM_LOAD16_BYTE( "bsh13f.p1", 0x000000, 0x080000, CRC(bb3e4408) SHA1(572b6f22502f21f7483f6db09f0df3dd0016bd48) )
 	ROM_LOAD16_BYTE( "bsh13l.p1", 0x000000, 0x080000, CRC(be46c1e7) SHA1(9d2c268ca306ad741bc941b0b544e627f85d3bf6) )
 	ROM_LOAD16_BYTE( "bsh13m.p1", 0x000000, 0x080000, CRC(d679f63c) SHA1(e3fb7bcd25cb936443b039c51e9af8677a9ff1dd) )
 	ROM_LOAD16_BYTE( "bsh13o.p1", 0x000000, 0x080000, CRC(62995cc5) SHA1(0de8096c247e3550c8147d339fb64cef9a875d19) )
-	ROM_LOAD16_BYTE( "bsh13s.p1", 0x000000, 0x080000, CRC(9ffcd5e4) SHA1(58a4ffe87cac83be2ae78e2b4bc02b5b43274acc) )
-	ROM_LOAD16_BYTE( "bsh13s.p2", 0x000000, 0x080000, CRC(f5ce2d0a) SHA1(979f17d3faedf25943c197625219c877ff51ab64) )
-	ROM_LOAD16_BYTE( "bsh13s.p3", 0x000000, 0x080000, CRC(78776cec) SHA1(7e0e8cfc650043fd84949df89ecc7a422c2a765e) )
-	ROM_LOAD16_BYTE( "bsh13s.p4", 0x000000, 0x080000, CRC(14bdc563) SHA1(391db5fa27fec4b8916aa2387c2c71fb7e09ae10) )
-
-	ROM_LOAD( "b shot d.p1", 0x0000, 0x080000, CRC(c82e29f5) SHA1(91ce304240a4cda0284950372e3e91430ed52883) )
-	ROM_LOAD( "b shot d.p2", 0x0000, 0x080000, CRC(ffd1a5ea) SHA1(54fb030a323ba8eaf9782a679819f47047df4ebb) )
 ROM_END
 
+ROM_START( m5bigshta )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "b shot d.p1", 0x00000, 0x080000, CRC(c82e29f5) SHA1(91ce304240a4cda0284950372e3e91430ed52883) )
+	ROM_LOAD16_BYTE( "b shot d.p2", 0x00001, 0x080000, CRC(ffd1a5ea) SHA1(54fb030a323ba8eaf9782a679819f47047df4ebb) )
+	/* 3+4 */
+ROM_END
 
 ROM_START( m5blkwht )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -1248,11 +1153,15 @@ ROM_START( m5bnzclb )
 	ROM_LOAD16_BYTE( "cbon1_0.p2", 0x000001, 0x080000, CRC(07a3ed9b) SHA1(bfc04422b479a1a1bfdcf41b8f3431fcb07d4321) )
 	ROM_LOAD16_BYTE( "cbon1_0.p3", 0x100000, 0x080000, CRC(0d340237) SHA1(b5c34905cb2698b9752326de6082954a91480cdc) )
 	ROM_LOAD16_BYTE( "cbon1_0.p4", 0x100001, 0x080000, CRC(0be7ed51) SHA1(108944005cb1f75d45a5ce2e8e8139a3f2f067d7) )
-
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "cbon1_1.p1", 0x000000, 0x080000, CRC(4bc79ea8) SHA1(64ff6b7e5504c6d8cf216603dd721b9a09ca5eaa) )
-	ROM_LOAD16_BYTE( "cbon1_1.p2", 0x000000, 0x080000, CRC(7a9787f7) SHA1(715771d4411ed36efde5dfddf1d1171af9db0902) )
 ROM_END
+
+ROM_START( m5bnzclb11 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "cbon1_1.p1", 0x000000, 0x080000, CRC(4bc79ea8) SHA1(64ff6b7e5504c6d8cf216603dd721b9a09ca5eaa) )
+	ROM_LOAD16_BYTE( "cbon1_1.p2", 0x000001, 0x080000, CRC(7a9787f7) SHA1(715771d4411ed36efde5dfddf1d1171af9db0902) )
+	/* 3+4 */
+ROM_END
+
 
 ROM_START( m5bnkrs )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -1315,12 +1224,18 @@ ROM_START( m5bbank )
 	ROM_LOAD16_BYTE( "btb12d.p3", 0x000000, 0x080000, CRC(01b02f4e) SHA1(ca4ad7b2e244dbe91130373b8597d708ea0336d1) )
 	ROM_LOAD16_BYTE( "btb12e.p3", 0x000000, 0x080000, CRC(0b71779e) SHA1(eb0730b7ccf7d3afd7626cad0fc96453b288fb02) )
 	ROM_LOAD16_BYTE( "btb12k.p3", 0x000000, 0x080000, CRC(8255e382) SHA1(161bdeb22526c1baddb77adfca5cd62cabe20378) )
+ROM_END
+
+ROM_START( m5bbank13 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "btb13s.p1", 0x000000, 0x080000, CRC(77eb1f78) SHA1(cb41930662c0d234bcb2b162416e78134be8cc68) )
+	ROM_LOAD16_BYTE( "btb13s.p2", 0x000001, 0x080000, CRC(805bbd24) SHA1(0fcaa8cbc3048e1bb46db1427880d720d44dd093) )
+	ROM_LOAD16_BYTE( "btb13s.p3", 0x100000, 0x080000, CRC(f003c9d2) SHA1(f91052010aecaa18ab501ff9b9783d9afbb41df5) )
+	ROM_LOAD16_BYTE( "btb13s.p4", 0x100001, 0x080000, CRC(8f92c534) SHA1(4a28c6f687c017e8109867c5476860c3706d0aeb) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "btb13d.p1", 0x000000, 0x080000, CRC(f1034f74) SHA1(2f81d62d902ebcbc1304989919c198be9155669d) )
 	ROM_LOAD16_BYTE( "btb13k.p1", 0x000000, 0x080000, CRC(53298e94) SHA1(5d718c79c533c3ea06d0383caabc0bff8f3c0e59) )
-	ROM_LOAD16_BYTE( "btb13s.p1", 0x000000, 0x080000, CRC(77eb1f78) SHA1(cb41930662c0d234bcb2b162416e78134be8cc68) )
-	ROM_LOAD16_BYTE( "btb13s.p2", 0x000000, 0x080000, CRC(805bbd24) SHA1(0fcaa8cbc3048e1bb46db1427880d720d44dd093) )
-	ROM_LOAD16_BYTE( "btb13s.p3", 0x000000, 0x080000, CRC(f003c9d2) SHA1(f91052010aecaa18ab501ff9b9783d9afbb41df5) )
-	ROM_LOAD16_BYTE( "btb13s.p4", 0x000000, 0x080000, CRC(8f92c534) SHA1(4a28c6f687c017e8109867c5476860c3706d0aeb) )
 ROM_END
 
 
@@ -1386,14 +1301,28 @@ ROM_START( m5cshkcb )
 	ROM_LOAD16_BYTE( "csc____1.1_4", 0x100001, 0x080000, CRC(ca2fdd38) SHA1(962d9d44b33c06470916984f1873542bb8d1b790) )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "csc____1.2_1", 0x000000, 0x080000, CRC(bd137211) SHA1(bde355c613b757a7241c2b9e44e25fe345b4c8f9) )
-	ROM_LOAD16_BYTE( "csc____1.2_2", 0x000000, 0x080000, CRC(5a2a342c) SHA1(4678a6a47b815729cd82921a5a6533a021dcdd6a) )
-	ROM_LOAD16_BYTE( "csc____1.3_1", 0x000000, 0x080000, CRC(5c70939b) SHA1(051981d3ca01265f27cbc0d8c467748f4fa84b78) )
-	ROM_LOAD16_BYTE( "csc____1.3_2", 0x000000, 0x080000, CRC(bc0acb8d) SHA1(e3f89490b6a2a39a8c4707e40c110e9fa2c06d3d) )
-	ROM_LOAD16_BYTE( "csc____1.3_3", 0x000000, 0x080000, CRC(1751905a) SHA1(5a06d4528c823bd4f6f3d68ae100d414008fbe02) )
-	ROM_LOAD16_BYTE( "csc____1.3_4", 0x000000, 0x080000, CRC(384cdc37) SHA1(d37ef78aa38de8a010f0bbf369a5b10c1fb6b6bb) )
 	ROM_LOAD16_BYTE( "csc___d1.1_1", 0x000000, 0x080000, CRC(9a4dbc41) SHA1(d49db41f5ac743be2190d9fd0fe073edb73946be) )
+ROM_END
+
+ROM_START( m5cshkcb12 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "csc____1.2_1", 0x000000, 0x080000, CRC(bd137211) SHA1(bde355c613b757a7241c2b9e44e25fe345b4c8f9) )
+	ROM_LOAD16_BYTE( "csc____1.2_2", 0x000001, 0x080000, CRC(5a2a342c) SHA1(4678a6a47b815729cd82921a5a6533a021dcdd6a) )
+	/* 3+4 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "csc___d1.2_1", 0x000000, 0x080000, CRC(4214ee0b) SHA1(2dadf830fdf2e0648e68e4a91835b9d613ee8c03) )
+ROM_END
+
+
+ROM_START( m5cshkcb13 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "csc____1.3_1", 0x000000, 0x080000, CRC(5c70939b) SHA1(051981d3ca01265f27cbc0d8c467748f4fa84b78) )
+	ROM_LOAD16_BYTE( "csc____1.3_2", 0x000001, 0x080000, CRC(bc0acb8d) SHA1(e3f89490b6a2a39a8c4707e40c110e9fa2c06d3d) )
+	ROM_LOAD16_BYTE( "csc____1.3_3", 0x100000, 0x080000, CRC(1751905a) SHA1(5a06d4528c823bd4f6f3d68ae100d414008fbe02) )
+	ROM_LOAD16_BYTE( "csc____1.3_4", 0x100001, 0x080000, CRC(384cdc37) SHA1(d37ef78aa38de8a010f0bbf369a5b10c1fb6b6bb) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "csc___d1.3_1", 0x000000, 0x080000, CRC(5e0a3a44) SHA1(608d4d0372f83e8ec5d3944ecea4d42c005c5bb1) )
 ROM_END
 
@@ -1569,17 +1498,37 @@ ROM_START( m5centcl )
 	ROM_LOAD16_BYTE( "cent1_0.p2", 0x000001, 0x080000, CRC(ef9b8283) SHA1(6b1171ae3ee63a488424b8906ad8089bdcd6a381) )
 	ROM_LOAD16_BYTE( "cent1_0.p3", 0x100000, 0x080000, CRC(e573923b) SHA1(9d4f1e078f665fc2a58c3cf2075620632434f75d) )
 	ROM_LOAD16_BYTE( "cent1_0.p4", 0x100001, 0x080000, CRC(a9f01838) SHA1(265992f6a26b6cfd0b50c36e5ecc807415b979dd) )
-
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "cent2_0.p1", 0x000000, 0x080000, CRC(7fe522b4) SHA1(0741b4a718f096162c1f9e4ba781e173497eebec) )
-	ROM_LOAD16_BYTE( "cent2_0.p2", 0x000000, 0x080000, CRC(58814498) SHA1(608e2c2aa9aaa4e57eaae771d6745fe519f8caef) )
-	ROM_LOAD16_BYTE( "cent2_1.p1", 0x000000, 0x080000, CRC(bac9d8da) SHA1(663f11a95805c702a3781f64eef1619f982b0384) )
-	ROM_LOAD16_BYTE( "cent2_1.p2", 0x000000, 0x080000, CRC(e1a89664) SHA1(e4237cd94ac3b2292bcadeb25d392deab601055e) )
-	ROM_LOAD16_BYTE( "cent2_1d.p1", 0x000000, 0x080000, CRC(23880893) SHA1(6895d297242d0db2744b36ad82797e4032165909) )
-	ROM_LOAD16_BYTE( "cent2_1d.p2", 0x000000, 0x080000, CRC(50c1865b) SHA1(e04a51fa587e707254716624c09a07a887663d0e) )
-	ROM_LOAD16_BYTE( "cent_clu.p1", 0x0000, 0x080000, CRC(29f3fd66) SHA1(357dbe35c3221b0b400a1a9ab40ca17532f9fd51) )
-	ROM_LOAD16_BYTE( "cent_clu.p2", 0x0000, 0x080000, CRC(c4b29c39) SHA1(0ee39207b4b9e3d06571404f7eabcf513dd1488c) )
 ROM_END
+
+ROM_START( m5centcl20 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "cent2_0.p1", 0x000000, 0x080000, CRC(7fe522b4) SHA1(0741b4a718f096162c1f9e4ba781e173497eebec) )
+	ROM_LOAD16_BYTE( "cent2_0.p2", 0x000001, 0x080000, CRC(58814498) SHA1(608e2c2aa9aaa4e57eaae771d6745fe519f8caef) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5centcl21 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "cent2_1.p1", 0x000000, 0x080000, CRC(bac9d8da) SHA1(663f11a95805c702a3781f64eef1619f982b0384) )
+	ROM_LOAD16_BYTE( "cent2_1.p2", 0x000001, 0x080000, CRC(e1a89664) SHA1(e4237cd94ac3b2292bcadeb25d392deab601055e) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5centcl21a )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "cent2_1d.p1", 0x000000, 0x080000, CRC(23880893) SHA1(6895d297242d0db2744b36ad82797e4032165909) )
+	ROM_LOAD16_BYTE( "cent2_1d.p2", 0x000001, 0x080000, CRC(50c1865b) SHA1(e04a51fa587e707254716624c09a07a887663d0e) )
+	/* 3+4 */
+ROM_END
+
+
+ROM_START( m5centcla )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "cent_clu.p1", 0x00000, 0x080000, CRC(29f3fd66) SHA1(357dbe35c3221b0b400a1a9ab40ca17532f9fd51) )
+	ROM_LOAD16_BYTE( "cent_clu.p2", 0x00001, 0x080000, CRC(c4b29c39) SHA1(0ee39207b4b9e3d06571404f7eabcf513dd1488c) )
+	/* 3+4 */
+ROM_END
+
 
 ROM_START( m5clifhn )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -1590,11 +1539,7 @@ ROM_START( m5clifhn )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "chasjs0.4_1", 0x000000, 0x080000, CRC(c694e721) SHA1(55695c5869dd11970449f6127d6feb06edf0aa32) )
-	//ROM_LOAD16_BYTE( "chasjs0.4_2", 0x000000, 0x080000, CRC(e884b66b) SHA1(26f8f42b868a2a6d2fda6f8d598a50ef8627fc74) )
-	//ROM_LOAD16_BYTE( "chasjs0.4_3", 0x000000, 0x080000, CRC(08988ee0) SHA1(152b2ffde609dd0f2ebcebd751742437e765aaa4) )
-	//ROM_LOAD16_BYTE( "chasjs0.4_4", 0x000000, 0x080000, CRC(54586b5c) SHA1(59757c24db94ecc6fbd818e143e7f002c9870f63) )
 	ROM_LOAD16_BYTE( "chasjs0.4d1", 0x000000, 0x080000, CRC(20f4b45a) SHA1(a80511580cc544bbc2e0523d22415b354db31d7f) )
-	//ROM_LOAD16_BYTE( "chasjs0.4d2", 0x000000, 0x080000, CRC(e884b66b) SHA1(26f8f42b868a2a6d2fda6f8d598a50ef8627fc74) )
 ROM_END
 
 ROM_START( m5cworan )
@@ -1603,27 +1548,43 @@ ROM_START( m5cworan )
 	ROM_LOAD16_BYTE( "cloc0_1.p2", 0x000001, 0x080000, CRC(1eb44cf4) SHA1(774d6ceb118d516cc2faba11578f58a510360064) )
 	ROM_LOAD16_BYTE( "cloc0_1.p3", 0x100000, 0x080000, CRC(2f854915) SHA1(4bc30ccfa4dd5117b9e2f085140b8adaf94363e8) )
 	ROM_LOAD16_BYTE( "cloc0_1.p4", 0x100001, 0x080000, CRC(97bc80eb) SHA1(f641cc60c49e72c6604bd1cea555e9658f3f8f84) )
-
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "cloc1_2.p1", 0x000000, 0x080000, CRC(9762c4d9) SHA1(2c764484ee0b3097d2b98e78d5be0c05f4322a30) )
-	ROM_LOAD16_BYTE( "cloc1_2.p2", 0x000000, 0x080000, CRC(d8f87137) SHA1(1e4199eced9ec2488abd71d062cf7a93ea86977a) )
-	ROM_LOAD16_BYTE( "cloc1_2d.p1", 0x000000, 0x080000, CRC(809dd7ca) SHA1(e95380f4cb9c6829006c695adf481e0ccd0c3631) )
 ROM_END
 
+ROM_START( m5cworan12 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "cloc1_2.p1", 0x000000, 0x080000, CRC(9762c4d9) SHA1(2c764484ee0b3097d2b98e78d5be0c05f4322a30) )
+	ROM_LOAD16_BYTE( "cloc1_2.p2", 0x000001, 0x080000, CRC(d8f87137) SHA1(1e4199eced9ec2488abd71d062cf7a93ea86977a) )
+	/* 3+4 */
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "cloc1_2d.p1", 0x000000, 0x080000, CRC(809dd7ca) SHA1(e95380f4cb9c6829006c695adf481e0ccd0c3631) )
+ROM_END
 
 ROM_START( m5clbtro )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "trop1_0.p1", 0x000000, 0x080000, CRC(d5dea6b1) SHA1(279ebef8ac5705ac0bce0d0ce9a8573e47b08d36) )
 	ROM_LOAD16_BYTE( "trop1_0.p2", 0x000001, 0x080000, CRC(478045db) SHA1(25da8014902e5023fd7e6a7b4e92c106c0559e48) )
+ROM_END
+
+// 2_4 and 2_5 are either VERY similar, or there is a mistake here
+ROM_START( m5clbtro24 ) // or is it 25?
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "trop2_4.p1", 0x000000, 0x080000, CRC(731f2cfe) SHA1(c0cecda77f6726631982c5342ec2740c86432594) )
+	ROM_LOAD16_BYTE( "trop2_4.p2", 0x000001, 0x080000, CRC(c5f151f1) SHA1(4a6578e0b4afb46a4054f544fd996b5f3937bd24) )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "trop2_4.p1", 0x000000, 0x080000, CRC(731f2cfe) SHA1(c0cecda77f6726631982c5342ec2740c86432594) )
-	ROM_LOAD16_BYTE( "trop2_4.p2", 0x000000, 0x080000, CRC(c5f151f1) SHA1(4a6578e0b4afb46a4054f544fd996b5f3937bd24) )
 	ROM_LOAD16_BYTE( "trop2_4d.p1", 0x000000, 0x080000, CRC(a5eac7a4) SHA1(77fa99ae3a2ee7d4856a3d9918086a471e161a91) )
-	ROM_LOAD16_BYTE( "trop2_5.p1", 0x000000, 0x080000, CRC(731f2cfe) SHA1(c0cecda77f6726631982c5342ec2740c86432594) )
-	ROM_LOAD16_BYTE( "trop2_5.p2", 0x000000, 0x080000, CRC(665c2043) SHA1(32146abb066d50b901a110e8260c94ea4b9db4e9) )
-	//ROM_LOAD16_BYTE( "trop2_5d.p1", 0x000000, 0x080000, CRC(a5eac7a4) SHA1(77fa99ae3a2ee7d4856a3d9918086a471e161a91) ) // == trop2_4d.p1 ??
 ROM_END
+
+ROM_START( m5clbtro25 ) // or is it 24?
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "trop2_5.p1", 0x000000, 0x080000, CRC(731f2cfe) SHA1(c0cecda77f6726631982c5342ec2740c86432594) ) // == "trop2_4.p1 ??
+	ROM_LOAD16_BYTE( "trop2_5.p2", 0x000001, 0x080000, CRC(665c2043) SHA1(32146abb066d50b901a110e8260c94ea4b9db4e9) )
+	
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "trop2_5d.p1", 0x000000, 0x080000, CRC(a5eac7a4) SHA1(77fa99ae3a2ee7d4856a3d9918086a471e161a91) ) // == trop2_4d.p1 ??
+ROM_END
+
+
 
 
 ROM_START( m5cockdd )
@@ -1632,12 +1593,14 @@ ROM_START( m5cockdd )
 	ROM_LOAD16_BYTE( "cadd0_1.p2", 0x000001, 0x080000, CRC(f471001c) SHA1(c6b38ccc7d77a104d3107a6861c21cb168598b77) )
 	ROM_LOAD16_BYTE( "cadd0_1.p3", 0x100000, 0x080000, CRC(22092c41) SHA1(80dfc356d68811ba9f44926cb917568ca3f87cae) )
 	ROM_LOAD16_BYTE( "cadd0_1.p4", 0x100001, 0x080000, CRC(36b6d2ca) SHA1(3b7618f383e3d866a5040d74d921aca3f9708b6d) )
-
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "cadd0_5.p1", 0x000000, 0x080000, CRC(2da0d538) SHA1(37d664ed6fc84e7a7dfdd36e11792ecfe1f28570) )
-	ROM_LOAD16_BYTE( "cadd0_5.p2", 0x000000, 0x080000, CRC(bed0c1c8) SHA1(5461cc0786ee84e3e20658a840f9c0322893224e) )
 ROM_END
 
+ROM_START( m5cockdd05 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "cadd0_5.p1", 0x000000, 0x080000, CRC(2da0d538) SHA1(37d664ed6fc84e7a7dfdd36e11792ecfe1f28570) )
+	ROM_LOAD16_BYTE( "cadd0_5.p2", 0x000000, 0x080000, CRC(bed0c1c8) SHA1(5461cc0786ee84e3e20658a840f9c0322893224e) )
+	/* 3+4 */
+ROM_END
 
 
 ROM_START( m5codft )
@@ -1681,36 +1644,40 @@ ROM_START( m5cnct4 )
 	ROM_LOAD16_BYTE( "con_sjs2.1_4", 0x100001, 0x080000, CRC(d5bf39ba) SHA1(fab5c25c62588e856fb82eb3bb2ce5d6d54d2b66) )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "cfrsjs1.5_1", 0x000000, 0x080000, CRC(e080fa69) SHA1(47910af0e3577f442d41fe84674fecd4c9e09db8) )
-	ROM_LOAD16_BYTE( "cfrsjs1.5_2", 0x000000, 0x080000, CRC(0e0ea177) SHA1(3f530923b2b392d6b6e96415db75ed6ddefaebbd) )
-	ROM_LOAD16_BYTE( "cfrsjs1.5d1", 0x000000, 0x080000, CRC(9cb4c64b) SHA1(0b5e03d74fa63847e6a29a6a1c3d1bc042aef9ea) )
-	ROM_LOAD16_BYTE( "cfrsjs1.5d2", 0x000000, 0x080000, CRC(0e0ea177) SHA1(3f530923b2b392d6b6e96415db75ed6ddefaebbd) )
-	ROM_LOAD16_BYTE( "con_20h2.0d1", 0x000000, 0x080000, CRC(805e66f6) SHA1(a13083417f8eb75d0c1b07eb5aae6f54a79d0721) )
-	ROM_LOAD16_BYTE( "con_20h2.0d2", 0x000000, 0x080000, CRC(3423d8db) SHA1(b6a3a3c42f653a177d8a19a545e0444918d4881b) )
-	ROM_LOAD16_BYTE( "con_20h2.1d1", 0x000000, 0x080000, CRC(2c897ecf) SHA1(e9829a332241eee4ee977a2dcb5451b365b0a4fe) )
-	//ROM_LOAD16_BYTE( "con_20h2.1d2", 0x000000, 0x080000, CRC(a33722ee) SHA1(4eed78e616e9d364b62f4033f5e381b19eaba72b) )
-	ROM_LOAD16_BYTE( "con_sja2.0_1", 0x000000, 0x080000, CRC(ec739c62) SHA1(285d21faf3ec17475602e195ce8cf978c5971639) )
-	ROM_LOAD16_BYTE( "con_sja2.0_2", 0x000000, 0x080000, CRC(3423d8db) SHA1(b6a3a3c42f653a177d8a19a545e0444918d4881b) )
+	// all of these were paired with above, rv 2.1
 	ROM_LOAD16_BYTE( "con_sja2.1_1", 0x000000, 0x080000, CRC(aec7d5ea) SHA1(8edac7e4020fd445bdaee0702fb66022dd5352c1) )
-	//ROM_LOAD16_BYTE( "con_sja2.1_2", 0x000000, 0x080000, CRC(a33722ee) SHA1(4eed78e616e9d364b62f4033f5e381b19eaba72b) )
-	ROM_LOAD16_BYTE( "con_sjh2.0d1", 0x000000, 0x080000, CRC(d990627c) SHA1(24f03c70a6bfbc694e1afd74e298f21613ba0e45) )
-	ROM_LOAD16_BYTE( "con_sjh2.0d2", 0x000000, 0x080000, CRC(3423d8db) SHA1(b6a3a3c42f653a177d8a19a545e0444918d4881b) )
-	ROM_LOAD16_BYTE( "con_sjh2.1d1", 0x000000, 0x080000, CRC(1a577436) SHA1(2bf85eed468c29be5e5ca63696cc60576d9c31c3) )
-	//ROM_LOAD16_BYTE( "con_sjh2.1d2", 0x000000, 0x080000, CRC(a33722ee) SHA1(4eed78e616e9d364b62f4033f5e381b19eaba72b) )
-	ROM_LOAD16_BYTE( "con_sjk2.0_1", 0x000000, 0x080000, CRC(b55d4972) SHA1(b369df0f3027c7bedb9522ef376bade68c7807a3) )
-	ROM_LOAD16_BYTE( "con_sjk2.0_2", 0x000000, 0x080000, CRC(3423d8db) SHA1(b6a3a3c42f653a177d8a19a545e0444918d4881b) )
 	ROM_LOAD16_BYTE( "con_sjk2.1_1", 0x000000, 0x080000, CRC(6f36f7f1) SHA1(3675fc169b2a38752bae49ef0810c6c415be007d) )
-	//ROM_LOAD16_BYTE( "con_sjk2.1_2", 0x000000, 0x080000, CRC(a33722ee) SHA1(4eed78e616e9d364b62f4033f5e381b19eaba72b) )
-	ROM_LOAD16_BYTE( "con_sjl2.0d1", 0x000000, 0x080000, CRC(6f0b3e41) SHA1(69eab2ce970b8ac1c6afd3413e0701fddc7e8071) )
-	ROM_LOAD16_BYTE( "con_sjl2.0d2", 0x000000, 0x080000, CRC(3423d8db) SHA1(b6a3a3c42f653a177d8a19a545e0444918d4881b) )
+	ROM_LOAD16_BYTE( "con_sjh2.1d1", 0x000000, 0x080000, CRC(1a577436) SHA1(2bf85eed468c29be5e5ca63696cc60576d9c31c3) )
 	ROM_LOAD16_BYTE( "con_sjl2.1d1", 0x000000, 0x080000, CRC(4c55a4ac) SHA1(5937752f900ea4cf8beb044b4774d0cb368729db) )
-	//ROM_LOAD16_BYTE( "con_sjl2.1d2", 0x000000, 0x080000, CRC(a33722ee) SHA1(4eed78e616e9d364b62f4033f5e381b19eaba72b) )
-	ROM_LOAD16_BYTE( "con_sjs2.0_1", 0x000000, 0x080000, CRC(a7057e51) SHA1(5b9cec2a48c78ddc900dae907b2dd02169b1e811) )
-	ROM_LOAD16_BYTE( "con_sjs2.0_2", 0x000000, 0x080000, CRC(3423d8db) SHA1(b6a3a3c42f653a177d8a19a545e0444918d4881b) )
-	ROM_LOAD16_BYTE( "con_sjs2.0d1", 0x000000, 0x080000, CRC(cbc8555f) SHA1(3365543762a5e266aec2332e59d59f7d324039e2) )
-	ROM_LOAD16_BYTE( "con_sjs2.0d2", 0x000000, 0x080000, CRC(3423d8db) SHA1(b6a3a3c42f653a177d8a19a545e0444918d4881b) )
 	ROM_LOAD16_BYTE( "con_sjs2.1d1", 0x000000, 0x080000, CRC(9c428613) SHA1(702494a1b5fe8787d52812dfc7adcce806dad73d) )
-	//ROM_LOAD16_BYTE( "con_sjs2.1d2", 0x000000, 0x080000, CRC(a33722ee) SHA1(4eed78e616e9d364b62f4033f5e381b19eaba72b) )
+	ROM_LOAD16_BYTE( "con_20h2.1d1", 0x000000, 0x080000, CRC(2c897ecf) SHA1(e9829a332241eee4ee977a2dcb5451b365b0a4fe) )
+ROM_END
+
+
+ROM_START( m5cnct415 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "cfrsjs1.5_1", 0x000000, 0x080000, CRC(e080fa69) SHA1(47910af0e3577f442d41fe84674fecd4c9e09db8) )
+	ROM_LOAD16_BYTE( "cfrsjs1.5_2", 0x000001, 0x080000, CRC(0e0ea177) SHA1(3f530923b2b392d6b6e96415db75ed6ddefaebbd) )
+	/* 3+4 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "cfrsjs1.5d1", 0x000000, 0x080000, CRC(9cb4c64b) SHA1(0b5e03d74fa63847e6a29a6a1c3d1bc042aef9ea) )
+ROM_END
+
+ROM_START( m5cnct420 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "con_sjs2.0_1", 0x000000, 0x080000, CRC(a7057e51) SHA1(5b9cec2a48c78ddc900dae907b2dd02169b1e811) )
+	ROM_LOAD16_BYTE( "con_sjs2.0_2", 0x000001, 0x080000, CRC(3423d8db) SHA1(b6a3a3c42f653a177d8a19a545e0444918d4881b) )
+	/* 3+4 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	// all of these were paired with above, rv 2.0
+	ROM_LOAD16_BYTE( "con_sjs2.0d1", 0x000000, 0x080000, CRC(cbc8555f) SHA1(3365543762a5e266aec2332e59d59f7d324039e2) )
+	ROM_LOAD16_BYTE( "con_sjl2.0d1", 0x000000, 0x080000, CRC(6f0b3e41) SHA1(69eab2ce970b8ac1c6afd3413e0701fddc7e8071) )
+	ROM_LOAD16_BYTE( "con_sjk2.0_1", 0x000000, 0x080000, CRC(b55d4972) SHA1(b369df0f3027c7bedb9522ef376bade68c7807a3) )
+	ROM_LOAD16_BYTE( "con_sjh2.0d1", 0x000000, 0x080000, CRC(d990627c) SHA1(24f03c70a6bfbc694e1afd74e298f21613ba0e45) )
+	ROM_LOAD16_BYTE( "con_20h2.0d1", 0x000000, 0x080000, CRC(805e66f6) SHA1(a13083417f8eb75d0c1b07eb5aae6f54a79d0721) )
+	ROM_LOAD16_BYTE( "con_sja2.0_1", 0x000000, 0x080000, CRC(ec739c62) SHA1(285d21faf3ec17475602e195ce8cf978c5971639) )
 ROM_END
 
 
@@ -1785,8 +1752,14 @@ ROM_START( m5crocrk )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "croc0_3d.p1", 0x000000, 0x080000, CRC(fef5d3eb) SHA1(2ab5ae313d1bf4847350d146369540ab1a93a4ac) )
+ROM_END
+
+ROM_START( m5crocrk10 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "croc1_0.p1", 0x000000, 0x080000, CRC(e86e6f20) SHA1(4ec858b4217cec1c50e05df921d01435b3860f3b) )
-	ROM_LOAD16_BYTE( "croc1_0.p2", 0x000000, 0x080000, CRC(bb4c66be) SHA1(398a51dcc8fba725b0a035366262e85191692b57) )
+	ROM_LOAD16_BYTE( "croc1_0.p2", 0x000001, 0x080000, CRC(bb4c66be) SHA1(398a51dcc8fba725b0a035366262e85191692b57) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "croc1_0d.p1", 0x000000, 0x080000, CRC(2eeb8615) SHA1(97be222ddacf59dce0f9d597a2c486f3c9b20f5b) )
 ROM_END
 
@@ -1823,16 +1796,31 @@ ROM_START( m5dmnstr )
 	ROM_LOAD16_BYTE( "dst11k.p1", 0x000000, 0x080000, CRC(4fb0d9eb) SHA1(f11bba2ab9d6fe32ddb853cecc9ce776d87dd6c3) )
 ROM_END
 
+ROM_START( m5dmnstra )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "dst13s.p1", 0x000000, 0x080000, CRC(228af479) SHA1(a74ce5cbe9ac76d0681efbcff46cb883c94fed5c) )
+	ROM_LOAD16_BYTE( "dst13s.p2", 0x000001, 0x080000, CRC(11fc9375) SHA1(f6ef09285266671df1b72892590ea51a80ab33eb) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "dst13a.p1", 0x000000, 0x080000, CRC(59072d54) SHA1(c8c0f1c39a579105018eb40fe608bd634b36e663) )
+	ROM_LOAD16_BYTE( "dst13d.p1", 0x000000, 0x080000, CRC(a462a475) SHA1(5cc054fee775535b336bf572dcb4c611904eeec2) )
+	ROM_LOAD16_BYTE( "dst13k.p1", 0x000000, 0x080000, CRC(06486595) SHA1(b63645d1b16cef05952f4f5b8e8fd00f19341b36) )
+ROM_END
+
+
 ROM_START( m5dmnf )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "dafr0_3.p1", 0x000000, 0x080000, CRC(0bb7f48f) SHA1(4e76280f8090fbca96f5eb66b99e57e5aec07b17) )
 	ROM_LOAD16_BYTE( "dafr0_3.p2", 0x000001, 0x080000, CRC(010bef71) SHA1(3a6fc034bc11b6c745781376be96fc75756e4d8c) )
 	ROM_LOAD16_BYTE( "dafr0_3.p3", 0x100000, 0x080000, CRC(af57eaee) SHA1(bfd69bd917a4abf5a43398a7530ed164befd8331) )
 	ROM_LOAD16_BYTE( "dafr0_3.p4", 0x100001, 0x080000, CRC(882c2fca) SHA1(67098d7919b96ac67d2929388de614d3cd04c144) )
+ROM_END
 
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+ROM_START( m5dmnf10 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "dafr1_0.p1", 0x000000, 0x080000, CRC(97cd1946) SHA1(a31687b8cb4a38729b8bcc4c7dfaecc96539153b) )
-	ROM_LOAD16_BYTE( "dafr1_0.p2", 0x000000, 0x080000, CRC(effb87e0) SHA1(d7194d173fc5b66d2005a7e35bf5668029f64605) )
+	ROM_LOAD16_BYTE( "dafr1_0.p2", 0x000001, 0x080000, CRC(effb87e0) SHA1(d7194d173fc5b66d2005a7e35bf5668029f64605) )
+	/* 3+4 */
 ROM_END
 
 
@@ -1843,10 +1831,17 @@ ROM_START( m5dmnfcl )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "cdaf0_3d.p1", 0x000000, 0x080000, CRC(f696a608) SHA1(232b73a1c10642d67889e11f2feb663105ff352a) )
-	//ROM_LOAD16_BYTE( "cdaf0_4.p1", 0x000000, 0x080000, CRC(5d16e0a7) SHA1(476b719130f02e614a32740cac3a46c9da3551d5) )
-	ROM_LOAD16_BYTE( "cdaf0_4.p2", 0x000000, 0x080000, CRC(88ff8af1) SHA1(d691b23d0972c2794e6c844d027ce02b6819888f) )
-	ROM_LOAD16_BYTE( "cdaf0_4d.p1", 0x000000, 0x080000, CRC(f696a608) SHA1(232b73a1c10642d67889e11f2feb663105ff352a) )
 ROM_END
+
+ROM_START( m5dmnfcl04 ) // very similar to 0_3 or an error
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "cdaf0_4.p1", 0x000000, 0x080000, CRC(5d16e0a7) SHA1(476b719130f02e614a32740cac3a46c9da3551d5) ) // == 03
+	ROM_LOAD16_BYTE( "cdaf0_4.p2", 0x000001, 0x080000, CRC(88ff8af1) SHA1(d691b23d0972c2794e6c844d027ce02b6819888f) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "cdaf0_4d.p1", 0x000000, 0x080000, CRC(f696a608) SHA1(232b73a1c10642d67889e11f2feb663105ff352a) ) // == 03
+ROM_END
+
 
 ROM_START( m5doshpk )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -2008,15 +2003,27 @@ ROM_END
 ROM_START( m5extrmm )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "emad0_4m.p1", 0x000000, 0x080000, CRC(afbcce7c) SHA1(c34d2224a32cbd6900232675211fa854ff8da344) )
-	ROM_LOAD16_BYTE( "emad0_4m.p2", 0x000000, 0x080000, CRC(712e36be) SHA1(00dfefe980948f2834d47714482790aba02a62f3) )
+	ROM_LOAD16_BYTE( "emad0_4m.p2", 0x000001, 0x080000, CRC(712e36be) SHA1(00dfefe980948f2834d47714482790aba02a62f3) )
+ROM_END
+
+ROM_START( m5extrmm04a )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "emad0_4q.p1", 0x000000, 0x080000, CRC(4031b2c1) SHA1(55b802252c697d4e7b9c0d69b0b75480e6891e3c) )
+	ROM_LOAD16_BYTE( "emad0_4q.p2", 0x000001, 0x080000, CRC(27357b33) SHA1(461b481987b0992e117e8c8125b4806d39066722) )
+ROM_END
+
+ROM_START( m5extrmm04b )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "emad0_4x.p1", 0x000000, 0x080000, CRC(be72f2a9) SHA1(0448aced7049a19153452e7ee432498f22392a0e) )
+	ROM_LOAD16_BYTE( "emad0_4x.p2", 0x000001, 0x080000, CRC(27357b33) SHA1(461b481987b0992e117e8c8125b4806d39066722) )
+ROM_END
+
+ROM_START( m5extrmm10 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "emad1_0.p1", 0x000000, 0x080000, CRC(575b8cab) SHA1(78df3e4f1ee8b7cd9973eb0d79580b897c3c0044) )
+	ROM_LOAD16_BYTE( "emad1_0.p2", 0x000001, 0x080000, CRC(769125b8) SHA1(d45f3ad1a2ea1cd1e0b2fcc0eed325e879e460d4) )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "emad0_4q.p1", 0x000000, 0x080000, CRC(4031b2c1) SHA1(55b802252c697d4e7b9c0d69b0b75480e6891e3c) )
-	ROM_LOAD16_BYTE( "emad0_4q.p2", 0x000000, 0x080000, CRC(27357b33) SHA1(461b481987b0992e117e8c8125b4806d39066722) )
-	ROM_LOAD16_BYTE( "emad0_4x.p1", 0x000000, 0x080000, CRC(be72f2a9) SHA1(0448aced7049a19153452e7ee432498f22392a0e) )
-	ROM_LOAD16_BYTE( "emad0_4x.p2", 0x000000, 0x080000, CRC(27357b33) SHA1(461b481987b0992e117e8c8125b4806d39066722) )
-	ROM_LOAD16_BYTE( "emad1_0.p1", 0x000000, 0x080000, CRC(575b8cab) SHA1(78df3e4f1ee8b7cd9973eb0d79580b897c3c0044) )
-	ROM_LOAD16_BYTE( "emad1_0.p2", 0x000000, 0x080000, CRC(769125b8) SHA1(d45f3ad1a2ea1cd1e0b2fcc0eed325e879e460d4) )
 	ROM_LOAD16_BYTE( "emad1_0d.p1", 0x000000, 0x080000, CRC(86c999ed) SHA1(12944216f6d827ec97eb9dedd4cda00c9179b3b3) )
 ROM_END
 
@@ -2045,11 +2052,16 @@ ROM_START( m5fishdl )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "fful0_2d.p1", 0x000000, 0x080000, CRC(74efacea) SHA1(a2e55760b551d082b9df047b09529b8fbf5a0193) )
-	ROM_LOAD16_BYTE( "fful1_0.p1", 0x000000, 0x080000, CRC(04c0282a) SHA1(c229132de4789d00e097ff01922f6416bfed56dc) )
-	ROM_LOAD16_BYTE( "fful1_0.p2", 0x000000, 0x080000, CRC(3b314d3d) SHA1(b0897c8cf1c704877d24009083d32c7cf788820d) )
-	ROM_LOAD16_BYTE( "fful1_0d.p1", 0x000000, 0x080000, CRC(7f423604) SHA1(880f8916916e13d6fb757060bd6c6fb518265e27) )
 ROM_END
 
+ROM_START( m5fishdl10 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "fful1_0.p1", 0x000000, 0x080000, CRC(04c0282a) SHA1(c229132de4789d00e097ff01922f6416bfed56dc) )
+	ROM_LOAD16_BYTE( "fful1_0.p2", 0x000001, 0x080000, CRC(3b314d3d) SHA1(b0897c8cf1c704877d24009083d32c7cf788820d) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "fful1_0d.p1", 0x000000, 0x080000, CRC(7f423604) SHA1(880f8916916e13d6fb757060bd6c6fb518265e27) )
+ROM_END
 
 ROM_START( m5fishcl )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -2158,19 +2170,53 @@ ROM_START( m5fusir )
 ROM_END
 
 
+ROM_START( m5fusir11 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "fus11s.p1", 0x000000, 0x080000, CRC(b6cbe454) SHA1(4c635dd384d7dc271d3730ab28f5d7ef304e3185) )
+	ROM_LOAD16_BYTE( "fus11s.p2", 0x000001, 0x080000, CRC(13af10d5) SHA1(8f50de1003068070aef1e3d565a67b686d72eae9) )
+	/* 3+4 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "fus11d.p1", 0x000000, 0x080000, CRC(3023b458) SHA1(d61b301fc2974a0219d8acde48b6768a1645cdcc) )
+	ROM_LOAD16_BYTE( "fus11k.p1", 0x000000, 0x080000, CRC(920975b8) SHA1(826a28f3daa05f6d25c0639bb6048740cb7bad0c) )
+ROM_END
+
+
+ROM_START( m5fusir12 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "fus12s.p1", 0x000000, 0x080000, CRC(75c0172e) SHA1(89f61431c595bad0434863bc1fdf4312b7a24e33) )
+	ROM_LOAD16_BYTE( "fus12s.p2", 0x000001, 0x080000, CRC(eff4cfba) SHA1(7266e1c5a345ed6437f60eb2c364a4a0616526d8) )
+	/* 3+4 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "fus12d.p1", 0x000000, 0x080000, CRC(f3284722) SHA1(fa110781727b3c8d80a1d3b105222d7ef33c8567) )
+	ROM_LOAD16_BYTE( "fus12k.p1", 0x000000, 0x080000, CRC(510286c2) SHA1(68d3c5c1f3e73a3d3c24b06d9d34380a340e8af9) )
+ROM_END
+
 ROM_START( m5fmonty )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "full0_4.p1", 0x000000, 0x080000, CRC(d776135b) SHA1(def98d4a5bc1326bbf3215ed1b99878fd918acd3) )
 	ROM_LOAD16_BYTE( "full0_4.p2", 0x000001, 0x080000, CRC(c8733632) SHA1(77be639cd3dff6f651818b7c1767e641d4e0408c) )
+ROM_END
 
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+ROM_START( m5fmonty04a )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "full0_4m.p1", 0x000000, 0x080000, CRC(b00811be) SHA1(e29227fe856c6bf6f1ad342b7a0f5cce509ea906) )
-	//ROM_LOAD16_BYTE( "full0_4m.p2", 0x000000, 0x080000, CRC(c8733632) SHA1(77be639cd3dff6f651818b7c1767e641d4e0408c) )
+	ROM_LOAD16_BYTE( "full0_4m.p2", 0x000000, 0x080000, CRC(c8733632) SHA1(77be639cd3dff6f651818b7c1767e641d4e0408c) )
+ROM_END
+
+ROM_START( m5fmonty04b )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "full0_4q.p1", 0x000000, 0x080000, CRC(f4d0b17e) SHA1(98bb1855298f6fe808a0e697f664fc0ec35e8f7c) )
 	ROM_LOAD16_BYTE( "full0_4q.p2", 0x000000, 0x080000, CRC(718d454c) SHA1(9b9ee6bc464c6b20d083e2d3dfa2d63577bdfb46) )
+ROM_END
+
+ROM_START( m5fmonty04c )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "full0_4x.p1", 0x000000, 0x080000, CRC(ddffff04) SHA1(44410134011aaf672a9bbd2457aa9917136574aa) )
 	ROM_LOAD16_BYTE( "full0_4x.p2", 0x000000, 0x080000, CRC(718d454c) SHA1(9b9ee6bc464c6b20d083e2d3dfa2d63577bdfb46) )
 ROM_END
+
 
 
 ROM_START( m5fmount )
@@ -2219,23 +2265,30 @@ ROM_START( m5ggems )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "gge_20h2.2d1", 0x000000, 0x080000, CRC(7e161e06) SHA1(791e96d858038c5509f2513ad1f0bdebe7bd5be7) )
 	ROM_LOAD16_BYTE( "gge_20h2.2d2", 0x000001, 0x080000, CRC(1803d961) SHA1(c9cf4c4004e42b2fdc9664756c54673fb72cd1c7) )
+	/* 3+4 */
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "gge_sjs2.2_1", 0x000000, 0x080000, CRC(2589d1ec) SHA1(c44963790e0518a6dfe70e3190226620f7198168) )
 	ROM_LOAD16_BYTE( "gge_sjh2.2d1", 0x000000, 0x080000, CRC(8a2b8ebe) SHA1(b89bf6a8778421cf891cce8274d01b168e434e68) )
 	ROM_LOAD16_BYTE( "gge_sjk2.2_1", 0x000000, 0x080000, CRC(30e8d9aa) SHA1(cf70d3fb91d4f2f42af38293f218e14435f773f1) )
 	ROM_LOAD16_BYTE( "gge_sjl2.2d1", 0x000000, 0x080000, CRC(f755ffda) SHA1(b53ba6d4c6dda468997d9d36e2896a9a52bf8c26) )
-	ROM_LOAD16_BYTE( "gge_sjs2.0_1", 0x000000, 0x080000, CRC(8687720c) SHA1(daeeac77d453d35ad0c5189930536b8399b00589) )
-	ROM_LOAD16_BYTE( "gge_sjs2.0_2", 0x000000, 0x080000, CRC(6365f2fa) SHA1(d725a097469f82645cdee661a2d7a2705fbffe51) )
-	ROM_LOAD16_BYTE( "gge_sjs2.0_3", 0x000000, 0x080000, CRC(9e98350b) SHA1(dc0b8fc77a4218b0d45b3d295cf1207556e20854) )
-	ROM_LOAD16_BYTE( "gge_sjs2.0_4", 0x000000, 0x080000, CRC(8d7028c3) SHA1(9ffe1bc08ba09063fbd4d09c930d9b6e6cd9894e) )
-	ROM_LOAD16_BYTE( "gge_sjs2.0d1", 0x000000, 0x080000, CRC(a869fef6) SHA1(c0533674754e3712561a62dbb9a0777713883215) )
-	ROM_LOAD16_BYTE( "gge_sjs2.0d2", 0x000000, 0x080000, CRC(6365f2fa) SHA1(d725a097469f82645cdee661a2d7a2705fbffe51) )
-	ROM_LOAD16_BYTE( "gge_sjs2.2_1", 0x000000, 0x080000, CRC(2589d1ec) SHA1(c44963790e0518a6dfe70e3190226620f7198168) )
-	ROM_LOAD16_BYTE( "gia_gems.p1",  0x000000, 0x080000, CRC(c841d2f7) SHA1(480397141c917bce26cfdc8ba7fa8d21ab741770) )
-	ROM_LOAD16_BYTE( "gia_gems.p2",  0x000000, 0x080000, CRC(7824adf5) SHA1(99b59d28adb80d5cf3d70691cc134eba72288f20) )
-	ROM_LOAD16_BYTE( "gia_gems.p3",  0x000000, 0x008000, CRC(b5c915e1) SHA1(c716fa7cb6f4e01dc063cad9c42548f855d8440e) )
+	
+	// these just seem to be bad (sound) roms from something else
+	//ROM_LOAD16_BYTE( "gia_gems.p1",  0x000000, 0x080000, CRC(c841d2f7) SHA1(480397141c917bce26cfdc8ba7fa8d21ab741770) )
+	//ROM_LOAD16_BYTE( "gia_gems.p2",  0x000000, 0x080000, CRC(7824adf5) SHA1(99b59d28adb80d5cf3d70691cc134eba72288f20) )
+	//ROM_LOAD16_BYTE( "gia_gems.p3",  0x000000, 0x008000, CRC(b5c915e1) SHA1(c716fa7cb6f4e01dc063cad9c42548f855d8440e) )
 ROM_END
 
+ROM_START( m5ggems20 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "gge_sjs2.0_1", 0x000000, 0x080000, CRC(8687720c) SHA1(daeeac77d453d35ad0c5189930536b8399b00589) )
+	ROM_LOAD16_BYTE( "gge_sjs2.0_2", 0x000001, 0x080000, CRC(6365f2fa) SHA1(d725a097469f82645cdee661a2d7a2705fbffe51) )
+	ROM_LOAD16_BYTE( "gge_sjs2.0_3", 0x100000, 0x080000, CRC(9e98350b) SHA1(dc0b8fc77a4218b0d45b3d295cf1207556e20854) )
+	ROM_LOAD16_BYTE( "gge_sjs2.0_4", 0x100001, 0x080000, CRC(8d7028c3) SHA1(9ffe1bc08ba09063fbd4d09c930d9b6e6cd9894e) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "gge_sjs2.0d1", 0x000000, 0x080000, CRC(a869fef6) SHA1(c0533674754e3712561a62dbb9a0777713883215) )
+ROM_END
 
 ROM_START( m5gimmie )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -2713,8 +2766,14 @@ ROM_START( m5hocus )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "hopo0_4d.p1", 0x000000, 0x080000, CRC(6612e4a2) SHA1(a34d6d349b21ee782a409f4127022f7ddcb2dfff) )
+ROM_END
+
+ROM_START( m5hocus10 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "hopo1_0.p1", 0x000000, 0x080000, CRC(3532dd8a) SHA1(c724f7b58bd3b393cfc6f8faf0bbb7c6a0bb2f75) )
-	ROM_LOAD16_BYTE( "hopo1_0.p2", 0x000000, 0x080000, CRC(a1990fa1) SHA1(b8e12f279ef26cda5c685bee2f76047dfee79138) )
+	ROM_LOAD16_BYTE( "hopo1_0.p2", 0x000001, 0x080000, CRC(a1990fa1) SHA1(b8e12f279ef26cda5c685bee2f76047dfee79138) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "hopo1_0d.p1", 0x000000, 0x080000, CRC(fb913056) SHA1(78ff750a993b90a028baf0493ca948355ffc7e13) )
 ROM_END
 
@@ -2775,18 +2834,43 @@ ROM_START( m5hotsht )
 	ROM_LOAD16_BYTE( "hot07k.p2", 0x000001, 0x080000, CRC(44be98ff) SHA1(6793d56e4b115c7c0027583a5461aeccb6abf89f) )
 	ROM_LOAD16_BYTE( "hot05.p3", 0x100000, 0x080000, CRC(317fd043) SHA1(36e215813d2754d1e731dc443712f4cc520b0847) )
 	ROM_LOAD16_BYTE( "hot05.p4", 0x100001, 0x080000, CRC(d430bbe8) SHA1(af560dada5265a8ae9143565b8d5c8aae54e1074) )
-
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "hot07s.p1", 0x000000, 0x080000, CRC(9999812b) SHA1(ffe25252fc0b5d7c018c70a3552f4e73f357f94b) )
-	//ROM_LOAD16_BYTE( "hot07s.p2", 0x000000, 0x080000, CRC(44be98ff) SHA1(6793d56e4b115c7c0027583a5461aeccb6abf89f) )
-	ROM_LOAD16_BYTE( "hot08k.p1", 0x000000, 0x080000, CRC(c6fca638) SHA1(968e2b9296d9f6584fbe9d2d570a3ea25ad86f4d) )
-	ROM_LOAD16_BYTE( "hot08k.p2", 0x000000, 0x080000, CRC(401b11a3) SHA1(06b5f940db3329b31a66a2940180e465a8ac3566) )
-	ROM_LOAD16_BYTE( "hot08s.p1", 0x000000, 0x080000, CRC(e23e37d4) SHA1(5f296a17878b5e67771b6269e97eeff2116f3ddd) )
-	ROM_LOAD16_BYTE( "hot08s.p2", 0x000000, 0x080000, CRC(401b11a3) SHA1(06b5f940db3329b31a66a2940180e465a8ac3566) )
-	ROM_LOAD16_BYTE( "hot10k.p1", 0x000000, 0x080000, CRC(f2f48d42) SHA1(01ad7b95f2665cb2d59ff7a690034ed493f3fe44) )
-	ROM_LOAD16_BYTE( "hot10s.p1", 0x000000, 0x080000, CRC(d6361cae) SHA1(539104f7f7b0fb43bdb5c234f60b1926ac2ce6a9) )
-	ROM_LOAD16_BYTE( "hot10s.p2", 0x000000, 0x080000, CRC(46285a1b) SHA1(15def8bdbd00e114792f8ce2ef4859ad0a5d0678) )
 ROM_END
+
+ROM_START( m5hotsht07a )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "hot07s.p1", 0x000000, 0x080000, CRC(9999812b) SHA1(ffe25252fc0b5d7c018c70a3552f4e73f357f94b) )
+	ROM_LOAD16_BYTE( "hot07s.p2", 0x000001, 0x080000, CRC(44be98ff) SHA1(6793d56e4b115c7c0027583a5461aeccb6abf89f) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5hotsht08 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "hot08k.p1", 0x000000, 0x080000, CRC(c6fca638) SHA1(968e2b9296d9f6584fbe9d2d570a3ea25ad86f4d) )
+	ROM_LOAD16_BYTE( "hot08k.p2", 0x000001, 0x080000, CRC(401b11a3) SHA1(06b5f940db3329b31a66a2940180e465a8ac3566) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5hotsht08a )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "hot08s.p1", 0x000000, 0x080000, CRC(e23e37d4) SHA1(5f296a17878b5e67771b6269e97eeff2116f3ddd) )
+	ROM_LOAD16_BYTE( "hot08s.p2", 0x000001, 0x080000, CRC(401b11a3) SHA1(06b5f940db3329b31a66a2940180e465a8ac3566) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5hotsht10 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "hot10s.p1", 0x000000, 0x080000, CRC(d6361cae) SHA1(539104f7f7b0fb43bdb5c234f60b1926ac2ce6a9) )
+	ROM_LOAD16_BYTE( "hot10s.p2", 0x000001, 0x080000, CRC(46285a1b) SHA1(15def8bdbd00e114792f8ce2ef4859ad0a5d0678) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5hotsht10a )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "hot10k.p1", 0x000000, 0x080000, CRC(f2f48d42) SHA1(01ad7b95f2665cb2d59ff7a690034ed493f3fe44) )
+	ROM_LOAD16_BYTE( "hot10s.p2", 0x000001, 0x080000, CRC(46285a1b) SHA1(15def8bdbd00e114792f8ce2ef4859ad0a5d0678) )
+	/* 3+4 */
+ROM_END
+
 
 
 ROM_START( m5hotslt )
@@ -2831,13 +2915,17 @@ ROM_START( m5hula )
 	ROM_LOAD16_BYTE( "hula0_2.p2", 0x000001, 0x080000, CRC(56894430) SHA1(6fa830a4ffa581e64e6eda2ade5e42efea878ee3) )
 	ROM_LOAD16_BYTE( "hula0_2.p3", 0x100000, 0x080000, CRC(b3ae2298) SHA1(7427ca3046311ec10e9bb7ce4520c615b3713a47) )
 	ROM_LOAD16_BYTE( "hula0_2.p4", 0x100001, 0x080000, CRC(a3621910) SHA1(fe1cdb69cf92c072364c4159947c5e4585428f68) )
-
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "hula1_0.p1", 0x000000, 0x080000, CRC(791c8f04) SHA1(bb93909915c66d0f01d55d6b5bb803ade13c5560) )
-	ROM_LOAD16_BYTE( "hula1_0.p2", 0x000000, 0x080000, CRC(b2c69534) SHA1(bce8c18358bed68805cfe68397664d0cc221e384) )
-	ROM_LOAD16_BYTE( "hula1_0d.p1", 0x000000, 0x080000, CRC(e423761a) SHA1(12679fe5b9c9cbd35d453e0fef7cae610576c2d9) )
 ROM_END
 
+ROM_START( m5hula10 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "hula1_0.p1", 0x000000, 0x080000, CRC(791c8f04) SHA1(bb93909915c66d0f01d55d6b5bb803ade13c5560) )
+	ROM_LOAD16_BYTE( "hula1_0.p2", 0x000001, 0x080000, CRC(b2c69534) SHA1(bce8c18358bed68805cfe68397664d0cc221e384) )
+	/* 3+4 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "hula1_0d.p1", 0x000000, 0x080000, CRC(e423761a) SHA1(12679fe5b9c9cbd35d453e0fef7cae610576c2d9) )
+ROM_END
 
 ROM_START( m5hulacl )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -2897,12 +2985,17 @@ ROM_START( m5jackbx )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "jack0_2d.p1", 0x000000, 0x080000, CRC(e671d609) SHA1(ab2cfdb3c2596125e1ca9139425c4db4e871b1e7) )
+ROM_END
+
+ROM_START( m5jackbx03 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "jack0_3.p1", 0x000000, 0x080000, CRC(b82cc7b3) SHA1(ad133b519fda3a6363731b16c0f14b3bd4d4887a) )
-	ROM_LOAD16_BYTE( "jack0_3.p2", 0x000000, 0x080000, CRC(aa0b2d53) SHA1(25accf2255788755f424592d34b742308f30731f) )
+	ROM_LOAD16_BYTE( "jack0_3.p2", 0x000001, 0x080000, CRC(aa0b2d53) SHA1(25accf2255788755f424592d34b742308f30731f) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "jack0_3d.p1", 0x000000, 0x080000, CRC(c53eef26) SHA1(f7407a414e5a32e0dc52da22ae5700bf3b91f5be) )
 	ROM_LOAD16_BYTE( "jack0_3m.p1", 0x000000, 0x080000, CRC(da51e273) SHA1(1002a0affc0321ccfd3f37a2e86642d3fe20b86c) )
 ROM_END
-
 
 ROM_START( m5jackpt )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -3044,28 +3137,40 @@ ROM_START( m5jmpjok )
 	ROM_LOAD16_BYTE( "jjosjs1.2_4", 0x100001, 0x080000, CRC(f102335a) SHA1(87b82475ad6c0d085082c08946330a63c9311da4) )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "jjo20h1.2d1", 0x000000, 0x080000, CRC(539e0ae9) SHA1(600d4843f88fcd4c8dc32ab1ec3afa96a621d844) )
-	ROM_LOAD16_BYTE( "jjo_20h1.1d1", 0x000000, 0x080000, CRC(a08eb689) SHA1(44c161b41e8a3b932195a0f3282a56fbde3298b8) )
-	ROM_LOAD16_BYTE( "jjo___l1.1_2", 0x000000, 0x080000, CRC(57f1f30c) SHA1(fd290b25b693c18cbf5f923d86d59a1e585ab5a1) )
-	ROM_LOAD16_BYTE( "jjo___l1.1_3", 0x000000, 0x080000, CRC(f7476095) SHA1(b7ba15a348337f5b19f7f37e6761a2b11c5bad66) )
-	ROM_LOAD16_BYTE( "jjo___l1.1_4", 0x000000, 0x080000, CRC(e1038fb8) SHA1(4c75d039e40d91ca09dbb3851ce54b34b0f8b3d7) )
-	ROM_LOAD16_BYTE( "jjo_sjh1.1d1", 0x000000, 0x080000, CRC(6c572196) SHA1(c15d5b7ee89a4a37e7978dad71773428e854a857) )
-	ROM_LOAD16_BYTE( "jjo_sjk1.1_1", 0x000000, 0x080000, CRC(ed07ce44) SHA1(cccc5d978325d5d1eeae14eca0501d992bfd8cd9) )
-	ROM_LOAD16_BYTE( "jjo_sjl1.1d1", 0x000000, 0x080000, CRC(849c596b) SHA1(2a8e216316fdb48e400d703117c6dc88aa8b7c56) )
-	ROM_LOAD16_BYTE( "jjo_sjs1.1_1", 0x000000, 0x080000, CRC(19223905) SHA1(27efa4d96b77c1ca5c39465a4ce34e26ff625468) )
-	ROM_LOAD16_BYTE( "jjo_sjs1.1_2", 0x000000, 0x080000, CRC(57f1f30c) SHA1(fd290b25b693c18cbf5f923d86d59a1e585ab5a1) )
-	ROM_LOAD16_BYTE( "jjo_sjs1.1_3", 0x000000, 0x080000, CRC(f7476095) SHA1(b7ba15a348337f5b19f7f37e6761a2b11c5bad66) )
-	ROM_LOAD16_BYTE( "jjo_sjs1.1_4", 0x000000, 0x080000, CRC(e1038fb8) SHA1(4c75d039e40d91ca09dbb3851ce54b34b0f8b3d7) )
-	ROM_LOAD16_BYTE( "jjo_sjs1.1d1", 0x000000, 0x080000, CRC(9872d6d7) SHA1(50939a78084c6a0f94a7ffac6fe49bdb9646fff8) )
 	ROM_LOAD16_BYTE( "jjosjh1.2d1", 0x000000, 0x080000, CRC(0a4a302a) SHA1(f9aa8c03a967e2fc7a44f3dfe54b3d9b23dc2a98) )
 	ROM_LOAD16_BYTE( "jjosjk1.2_1", 0x000000, 0x080000, CRC(aa88520b) SHA1(35501bee2155befcaededb212b330093aa083f55) )
 	ROM_LOAD16_BYTE( "jjosjl1.2d1", 0x000000, 0x080000, CRC(c37a1ed1) SHA1(49702bae4b4db6dae88bbf62793e03244bf954fd) )
 	ROM_LOAD16_BYTE( "jjosjs1.2d1", 0x000000, 0x080000, CRC(b259c594) SHA1(78afb8f6865d4e7c5ac5d975e7e2a4cf6c32be39) )
-	// These two only two ROMs per set (?)
-	ROM_LOAD16_BYTE( "jj_dreg.p1", 0x0000, 0x080000, CRC(f6c8b395) SHA1(af815da23e8de9a91efc60134188827554991025) )//Deregulation update (new gaming rules)
-	ROM_LOAD16_BYTE( "jj_dreg.p2", 0x0000, 0x080000, CRC(b4f79d90) SHA1(b59fa9b28c80d4ef23dc75d48e0be66100782595) )
-	ROM_LOAD16_BYTE( "j_jokers.g1", 0x0000, 0x080000, CRC(e243c895) SHA1(9c114ea68ec4233da66d835fabe1f94534d4241f) )
-	ROM_LOAD16_BYTE( "j_jokers.g2", 0x0000, 0x080000, CRC(b2762f2b) SHA1(d8e347fae336d1dd0daa5f908d61223f1cdbb675) )
+	ROM_LOAD16_BYTE( "jjo20h1.2d1", 0x000000, 0x080000, CRC(539e0ae9) SHA1(600d4843f88fcd4c8dc32ab1ec3afa96a621d844) )
+ROM_END
+
+ROM_START( m5jmpjok11 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "jjo_20h1.1d1", 0x000000, 0x080000, CRC(a08eb689) SHA1(44c161b41e8a3b932195a0f3282a56fbde3298b8) )
+	ROM_LOAD16_BYTE( "jjo___l1.1_2", 0x000001, 0x080000, CRC(57f1f30c) SHA1(fd290b25b693c18cbf5f923d86d59a1e585ab5a1) )
+	ROM_LOAD16_BYTE( "jjo___l1.1_3", 0x100000, 0x080000, CRC(f7476095) SHA1(b7ba15a348337f5b19f7f37e6761a2b11c5bad66) )
+	ROM_LOAD16_BYTE( "jjo___l1.1_4", 0x100001, 0x080000, CRC(e1038fb8) SHA1(4c75d039e40d91ca09dbb3851ce54b34b0f8b3d7) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "jjo_sjh1.1d1", 0x000000, 0x080000, CRC(6c572196) SHA1(c15d5b7ee89a4a37e7978dad71773428e854a857) )
+	ROM_LOAD16_BYTE( "jjo_sjk1.1_1", 0x000000, 0x080000, CRC(ed07ce44) SHA1(cccc5d978325d5d1eeae14eca0501d992bfd8cd9) )
+	ROM_LOAD16_BYTE( "jjo_sjl1.1d1", 0x000000, 0x080000, CRC(849c596b) SHA1(2a8e216316fdb48e400d703117c6dc88aa8b7c56) )
+	ROM_LOAD16_BYTE( "jjo_sjs1.1_1", 0x000000, 0x080000, CRC(19223905) SHA1(27efa4d96b77c1ca5c39465a4ce34e26ff625468) )
+	ROM_LOAD16_BYTE( "jjo_sjs1.1d1", 0x000000, 0x080000, CRC(9872d6d7) SHA1(50939a78084c6a0f94a7ffac6fe49bdb9646fff8) )
+ROM_END
+
+ROM_START( m5jmpjoka )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "jj_dreg.p1", 0x00000, 0x080000, CRC(f6c8b395) SHA1(af815da23e8de9a91efc60134188827554991025) )//Deregulation update (new gaming rules)
+	ROM_LOAD16_BYTE( "jj_dreg.p2", 0x00001, 0x080000, CRC(b4f79d90) SHA1(b59fa9b28c80d4ef23dc75d48e0be66100782595) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5jmpjokb )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "j_jokers.g1", 0x00000, 0x080000, CRC(e243c895) SHA1(9c114ea68ec4233da66d835fabe1f94534d4241f) )
+	ROM_LOAD16_BYTE( "j_jokers.g2", 0x00001, 0x080000, CRC(b2762f2b) SHA1(d8e347fae336d1dd0daa5f908d61223f1cdbb675) )
+	/* 3+4 */
 ROM_END
 
 
@@ -3075,13 +3180,22 @@ ROM_START( m5jmpgem )
 	ROM_LOAD16_BYTE( "jgem0_4.p2", 0x000001, 0x080000, CRC(9b56e0bc) SHA1(22d03e8fe741c6bb6125dfafff953f3fbfbf2f66) )
 	ROM_LOAD16_BYTE( "jgem.p3", 0x100000, 0x080000, CRC(1074efce) SHA1(376912c0944f8053797dba6829ebdde6bae02a9a) )
 	ROM_LOAD16_BYTE( "jgem.p4", 0x100001, 0x080000, CRC(6cc9a209) SHA1(ec2679fb78d63e7366e5f0098dfff28aa8070eb0) )
-
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "jgem0_1.p1", 0x000000, 0x080000, CRC(a046f6a7) SHA1(8f6bbbb1e12c8eaf51312ead677dc1de6c676cf9) )
-	ROM_LOAD16_BYTE( "jgem0_1.p2", 0x000000, 0x080000, CRC(f933cc7d) SHA1(1b1f66365338c22e38e899e1660b6ea78aaa12bc) )
-	ROM_LOAD16_BYTE( "jgem0_3.p1", 0x000000, 0x080000, CRC(3de4286f) SHA1(dd40e5652db0130b05db7d3e4eecfaa83d13d8be) )
-	ROM_LOAD16_BYTE( "jgem0_3.p2", 0x000000, 0x080000, CRC(2b048f0b) SHA1(a9a2156b1fcc3fe0e02c0c48babc9cf5cfde0f07) )
 ROM_END
+
+ROM_START( m5jmpgem01 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "jgem0_1.p1", 0x000000, 0x080000, CRC(a046f6a7) SHA1(8f6bbbb1e12c8eaf51312ead677dc1de6c676cf9) )
+	ROM_LOAD16_BYTE( "jgem0_1.p2", 0x000001, 0x080000, CRC(f933cc7d) SHA1(1b1f66365338c22e38e899e1660b6ea78aaa12bc) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5jmpgem03 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "jgem0_3.p1", 0x000000, 0x080000, CRC(3de4286f) SHA1(dd40e5652db0130b05db7d3e4eecfaa83d13d8be) )
+	ROM_LOAD16_BYTE( "jgem0_3.p2", 0x000001, 0x080000, CRC(2b048f0b) SHA1(a9a2156b1fcc3fe0e02c0c48babc9cf5cfde0f07) )
+	/* 3+4 */
+ROM_END
+
 
 
 ROM_START( m5kaleid )
@@ -3100,14 +3214,17 @@ ROM_START( m5kcclb )
 	ROM_LOAD16_BYTE( "kcob0_1.p2", 0x000001, 0x080000, CRC(c4c0fe6d) SHA1(9946cdac0a5d338314ff0fbb6bb83fae81aac8fe) )
 	ROM_LOAD16_BYTE( "kcob0_1.p3", 0x100000, 0x080000, CRC(7d9a453f) SHA1(6b8c3016f23149b7fe76b76e2cc7d4a9a7bc6e0c) )
 	ROM_LOAD16_BYTE( "kcob0_1.p4", 0x100001, 0x080000, CRC(9ff61bef) SHA1(36ed1d3b6aa95f5bf1ead9c4c3c744cf49c739be) )
-
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "kcob2_4.p1", 0x000000, 0x080000, CRC(74c31371) SHA1(438411abd156ffa805787c24f46fe6680e998881) )
-	ROM_LOAD16_BYTE( "kcob2_4.p2", 0x000000, 0x080000, CRC(d7341c1e) SHA1(a4871f40037c5a6b35a1831841f2993c94e82077) )
-	ROM_LOAD16_BYTE( "kcob2_4d.p1", 0x000000, 0x080000, CRC(85d2c34d) SHA1(ef2e9221183b5cfb326147dbc8c8dd05ce6b247d) )
 ROM_END
 
+ROM_START( m5kcclb24 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "kcob2_4.p1", 0x000000, 0x080000, CRC(74c31371) SHA1(438411abd156ffa805787c24f46fe6680e998881) )
+	ROM_LOAD16_BYTE( "kcob2_4.p2", 0x000001, 0x080000, CRC(d7341c1e) SHA1(a4871f40037c5a6b35a1831841f2993c94e82077) )
+	/* 3+4 */
 
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "kcob2_4d.p1", 0x000000, 0x080000, CRC(85d2c34d) SHA1(ef2e9221183b5cfb326147dbc8c8dd05ce6b247d) )
+ROM_END
 
 ROM_START( m5kkebab )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -3125,16 +3242,29 @@ ROM_START( m5kkebab )
 	ROM_LOAD16_BYTE( "kbab11r.p1", 0x000000, 0x080000, CRC(1c196f38) SHA1(a45fbf1a2968ac46b856d1b9bcd5071d786cab93) )
 	ROM_LOAD16_BYTE( "kbab11s.p1", 0x000000, 0x080000, CRC(cd8b7ce7) SHA1(45542e6e40554d065992dcce9b2feec7dea22660) )
 	ROM_LOAD16_BYTE( "kbab11y.p1", 0x000000, 0x080000, CRC(5d1f5e6a) SHA1(75f641072c512d1bb7e4b22c384e2d6d09deac02) )
-	ROM_LOAD16_BYTE( "kktr10.p2", 0x000000, 0x080000, CRC(e08af965) SHA1(833d5151a5f2150d719dbee13daab6ab75402696) )
-	ROM_LOAD16_BYTE( "kebab.p2",   0x000000, 0x080000, CRC(660e8ecd) SHA1(a6c763643f3e3a2ffc9ff88675f71b3552337177) )//15GBP
-	//ROM_LOAD16_BYTE( "kktr10.p3", 0x000000, 0x080000, CRC(6da356d3) SHA1(03cfbda5a0c735e38bfa7761e9a9a1cf7d0d9611) )
-	//ROM_LOAD16_BYTE( "kktr10.p4", 0x000000, 0x080000, CRC(14f6db6e) SHA1(6540600ca92bdba575e8a7a37ef2a7db88a93a6d) )
+ROM_END
+
+ROM_START( m5kkebab10 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "kktr10s.p1", 0x000000, 0x080000, CRC(8b09764b) SHA1(d846b5af8c4288fd821e2d29a50328fd50838e5b) )
+	ROM_LOAD16_BYTE( "kktr10.p2", 0x000001, 0x080000, CRC(e08af965) SHA1(833d5151a5f2150d719dbee13daab6ab75402696) )
+	ROM_LOAD16_BYTE( "kktr10.p3", 0x100000, 0x080000, CRC(6da356d3) SHA1(03cfbda5a0c735e38bfa7761e9a9a1cf7d0d9611) ) // == 11
+	ROM_LOAD16_BYTE( "kktr10.p4", 0x100001, 0x080000, CRC(14f6db6e) SHA1(6540600ca92bdba575e8a7a37ef2a7db88a93a6d) ) // == 11
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "kktr10d.p1", 0x000000, 0x080000, CRC(5e2bd9a5) SHA1(3e5b3ea08018e45b511c784d9ffdc4619b7560f0) )
 	ROM_LOAD16_BYTE( "kktr10dy.p1", 0x000000, 0x080000, CRC(bd759992) SHA1(cc72271b968d3530d6a4532d2c2fb66db055e142) )
 	ROM_LOAD16_BYTE( "kktr10k.p1", 0x000000, 0x080000, CRC(bcb8ad4a) SHA1(8aebdede4092d2eb6135a9a0ea2ceb49a80887a4) )
-	ROM_LOAD16_BYTE( "kktr10s.p1", 0x000000, 0x080000, CRC(8b09764b) SHA1(d846b5af8c4288fd821e2d29a50328fd50838e5b) )
 	ROM_LOAD16_BYTE( "kktr10y.p1", 0x000000, 0x080000, CRC(6857367c) SHA1(f602b5ff4a6e716e76abe7fd462dcea07ccb1f92) )
 ROM_END
+
+
+ROM_START( m5kkebaba ) // doesn't appear to pair up with any of the above
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "kebab.p1",   0x000000, 0x080000, NO_DUMP )
+	ROM_LOAD16_BYTE( "kebab.p2",   0x000001, 0x080000, CRC(660e8ecd) SHA1(a6c763643f3e3a2ffc9ff88675f71b3552337177) )//15GBP
+ROM_END
+
 
 
 ROM_START( m5kingko )
@@ -3154,11 +3284,20 @@ ROM_START( m5kingko )
 	ROM_LOAD16_BYTE( "kiko03k.p1", 0x000000, 0x080000, CRC(afbe5c59) SHA1(f9291b13d0c9299c1e7f85b89e18e84f3de0011f) )
 	ROM_LOAD16_BYTE( "kiko03s.p1", 0x000000, 0x080000, CRC(60f5de26) SHA1(5a9471d611b833fef55ec9c46711e1138655686d) )
 	ROM_LOAD16_BYTE( "kiko03y.p1", 0x000000, 0x080000, CRC(7fc26788) SHA1(c228ec8c1f0e387c1e997b2bd9d3432b3f06d978) )
-	ROM_LOAD16_BYTE( "kiko04.p2", 0x000000, 0x080000, CRC(ba4f3829) SHA1(103d01c7222a731180c32819c3d52e3cc0f79027) )
-	//ROM_LOAD16_BYTE( "kiko04.p3", 0x000000, 0x080000, CRC(de726f52) SHA1(5fedb40e7d4ce9b6df1e59044d132f7ccafd3d6b) )
-	//ROM_LOAD16_BYTE( "kiko04.p4", 0x000000, 0x080000, CRC(9fd99906) SHA1(d69357927781de46bc74f7c4643ff3fbf0e5baa3) )
-	//ROM_LOAD16_BYTE( "kiko04.p5", 0x000000, 0x080000, CRC(360268ea) SHA1(3c4ae25580ad4403c38185b0c73036e1c96d39ff) )
-	//ROM_LOAD16_BYTE( "kiko04.p6", 0x000000, 0x080000, CRC(e743872a) SHA1(068b5c6ad573a8fada7cc1761e42e6b729c45be4) )
+
+ROM_END
+
+
+ROM_START( m5kingko04 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "kiko04s.p1", 0x000000, 0x080000, CRC(b89c10eb) SHA1(e163e078540cb74092bc02c6c0125598c88d7e1a) )
+	ROM_LOAD16_BYTE( "kiko04.p2", 0x000001, 0x080000, CRC(ba4f3829) SHA1(103d01c7222a731180c32819c3d52e3cc0f79027) )
+	ROM_LOAD16_BYTE( "kiko04.p3", 0x100000, 0x080000, CRC(de726f52) SHA1(5fedb40e7d4ce9b6df1e59044d132f7ccafd3d6b) ) // == 03
+	ROM_LOAD16_BYTE( "kiko04.p4", 0x100001, 0x080000, CRC(9fd99906) SHA1(d69357927781de46bc74f7c4643ff3fbf0e5baa3) ) // == 03
+	ROM_LOAD16_BYTE( "kiko04.p5", 0x200000, 0x080000, CRC(360268ea) SHA1(3c4ae25580ad4403c38185b0c73036e1c96d39ff) ) // == 03
+	ROM_LOAD16_BYTE( "kiko04.p6", 0x200001, 0x080000, CRC(e743872a) SHA1(068b5c6ad573a8fada7cc1761e42e6b729c45be4) ) // == 03
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "kiko04ad.p1", 0x000000, 0x080000, CRC(b93367b9) SHA1(95348198c385abfed859acc3387c70bc65c88724) )
 	ROM_LOAD16_BYTE( "kiko04b.p1", 0x000000, 0x080000, CRC(10babbb0) SHA1(f69db6cc600cc2ffa4f17fe95708ddc8013c800a) )
 	ROM_LOAD16_BYTE( "kiko04bd.p1", 0x000000, 0x080000, CRC(0550cfb9) SHA1(8243ea9de21d85b25fb8ef8a74ea948e6eb94e32) )
@@ -3166,9 +3305,16 @@ ROM_START( m5kingko )
 	ROM_LOAD16_BYTE( "kiko04dy.p1", 0x000000, 0x080000, CRC(f4216299) SHA1(d8daed04dfc66865782ca6c928e53a3a9649fbf8) )
 	ROM_LOAD16_BYTE( "kiko04k.p1", 0x000000, 0x080000, CRC(712730b4) SHA1(e8691e28faaf29d828202802708ac06398be45a9) )
 	ROM_LOAD16_BYTE( "kiko04r.p1", 0x000000, 0x080000, CRC(6abb7c02) SHA1(4fc18731ba2a7e0e0fc98af6f9e04d3fa398d9e1) )
-	ROM_LOAD16_BYTE( "kiko04s.p1", 0x000000, 0x080000, CRC(b89c10eb) SHA1(e163e078540cb74092bc02c6c0125598c88d7e1a) )
 	ROM_LOAD16_BYTE( "kiko04y.p1", 0x000000, 0x080000, CRC(89f4cae2) SHA1(c1931c0df7a0ecf973f0cc4e26110d83a609e27a) )
-	ROM_LOAD16_BYTE( "kiko05.p2", 0x000000, 0x080000, CRC(d4df0fd0) SHA1(23105c81aa13dd1273b0928b55d0fc1e1718e679) )
+ROM_END
+
+ROM_START( m5kingko05 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "kiko05s.p1", 0x000000, 0x080000, CRC(343b7d78) SHA1(7ec367f88ad187dd01404c3c9b599f40ee426b99) )
+	ROM_LOAD16_BYTE( "kiko05.p2", 0x000001, 0x080000, CRC(d4df0fd0) SHA1(23105c81aa13dd1273b0928b55d0fc1e1718e679) )
+	/* 3,4,5,6 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "kiko05ad.p1", 0x000000, 0x080000, CRC(8e315607) SHA1(f6f251d7052153eb2c86591ee40c4c2ac74378f9) )
 	ROM_LOAD16_BYTE( "kiko05b.p1", 0x000000, 0x080000, CRC(a02ee399) SHA1(4384b3ef46361ca2c4650387d7b22e427bb84671) )
 	ROM_LOAD16_BYTE( "kiko05bd.p1", 0x000000, 0x080000, CRC(b7ce59c7) SHA1(24052cf89c4bb17b6ccbc5dcfa73429359fa9702) )
@@ -3176,10 +3322,8 @@ ROM_START( m5kingko )
 	ROM_LOAD16_BYTE( "kiko05dy.p1", 0x000000, 0x080000, CRC(35627217) SHA1(70f446572abc5990af22ad56693db8316d637e3e) )
 	ROM_LOAD16_BYTE( "kiko05k.p1", 0x000000, 0x080000, CRC(d9f4b615) SHA1(a892cc7ee3fde63cf9d687636bec9eb6edc71d6d) )
 	ROM_LOAD16_BYTE( "kiko05r.p1", 0x000000, 0x080000, CRC(8190c924) SHA1(d1dc59249387d78788d691bc1bbda367edf5c65d) )
-	ROM_LOAD16_BYTE( "kiko05s.p1", 0x000000, 0x080000, CRC(343b7d78) SHA1(7ec367f88ad187dd01404c3c9b599f40ee426b99) )
 	ROM_LOAD16_BYTE( "kiko05y.p1", 0x000000, 0x080000, CRC(18d2e49d) SHA1(4721c34403685ce7275c92f4b35dd6665ff1cc80) )
 ROM_END
-
 
 
 ROM_START( m5kingqc )
@@ -3188,16 +3332,28 @@ ROM_START( m5kingqc )
 	ROM_LOAD16_BYTE( "king0_2.p2", 0x000001, 0x080000, CRC(81f4348f) SHA1(da05b0bda23a7e268c690469dee340c30be56f0f) )
 	ROM_LOAD16_BYTE( "king0_2.p3", 0x100000, 0x080000, CRC(a6fb2bfa) SHA1(d7ed94fc7d7eb27d49861af7e2e79a7065db7f57) )
 	ROM_LOAD16_BYTE( "king0_2.p4", 0x100001, 0x080000, CRC(da9c2148) SHA1(e178662775488d10830f0ac2af784f40c1f04ff0) )
-
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "king0_6.p1", 0x000000, 0x080000, CRC(eec01c60) SHA1(fae4e143932770afd64b6a1d6ec355daba503d2f) )
-	ROM_LOAD16_BYTE( "king0_6.p2", 0x000000, 0x080000, CRC(38adc121) SHA1(164c3acdf9b47ca75d7ae30048fc6efa6991296e) )
-	ROM_LOAD16_BYTE( "king0_7.p1", 0x000000, 0x080000, CRC(8f30e512) SHA1(de8cc69c3c89169c19f9cd548938b685df8ddada) )
-	ROM_LOAD16_BYTE( "king0_7.p2", 0x000000, 0x080000, CRC(c1a80819) SHA1(bc988be411c7b97a59ed0f0cdf83ec3cffa00490) )
-	ROM_LOAD16_BYTE( "king0_8.p1", 0x000000, 0x080000, CRC(a4ebbfc9) SHA1(0d23e2b0ad74a4002c294edaf61f52db8f79c5cb) )
-	ROM_LOAD16_BYTE( "king0_8.p2", 0x000000, 0x080000, CRC(71b336f0) SHA1(7a114d404cd7a567f42ad926610c68049cdb7eb1) )
 ROM_END
 
+ROM_START( m5kingqc06 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "king0_6.p1", 0x000000, 0x080000, CRC(eec01c60) SHA1(fae4e143932770afd64b6a1d6ec355daba503d2f) )
+	ROM_LOAD16_BYTE( "king0_6.p2", 0x000001, 0x080000, CRC(38adc121) SHA1(164c3acdf9b47ca75d7ae30048fc6efa6991296e) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5kingqc07 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "king0_7.p1", 0x000000, 0x080000, CRC(8f30e512) SHA1(de8cc69c3c89169c19f9cd548938b685df8ddada) )
+	ROM_LOAD16_BYTE( "king0_7.p2", 0x000001, 0x080000, CRC(c1a80819) SHA1(bc988be411c7b97a59ed0f0cdf83ec3cffa00490) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5kingqc08 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "king0_8.p1", 0x000000, 0x080000, CRC(a4ebbfc9) SHA1(0d23e2b0ad74a4002c294edaf61f52db8f79c5cb) )
+	ROM_LOAD16_BYTE( "king0_8.p2", 0x000001, 0x080000, CRC(71b336f0) SHA1(7a114d404cd7a567f42ad926610c68049cdb7eb1) )
+	/* 3+4 */
+ROM_END
 
 
 ROM_START( m5korma )
@@ -3206,11 +3362,15 @@ ROM_START( m5korma )
 	ROM_LOAD16_BYTE( "korm0_3.p2", 0x000001, 0x080000, CRC(9635367f) SHA1(89cfbf6afd556fd0381b7cfd7e835130ead9031f) )
 	ROM_LOAD16_BYTE( "korm0_3.p3", 0x100000, 0x080000, CRC(11049c22) SHA1(b535f7fc6b5d4f7ec31d80aba90b75d56f2abaae) )
 	ROM_LOAD16_BYTE( "korm0_3.p4", 0x100001, 0x080000, CRC(d124e705) SHA1(959612f7fec32c09e7d46fb67e6dfcbcd7b7afe6) )
-
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "korm1_2.p1", 0x000000, 0x080000, CRC(8d08dc36) SHA1(79e499c33e9d34741b73cea556077e2a4cfaa632) )
-	ROM_LOAD16_BYTE( "korm1_2.p2", 0x000000, 0x080000, CRC(0ff4f7c7) SHA1(69f1da01f6c00fbade573b9d6fa895e49f627fca) )
 ROM_END
+
+ROM_START( m5korma12 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "korm1_2.p1", 0x000000, 0x080000, CRC(8d08dc36) SHA1(79e499c33e9d34741b73cea556077e2a4cfaa632) )
+	ROM_LOAD16_BYTE( "korm1_2.p2", 0x000001, 0x080000, CRC(0ff4f7c7) SHA1(69f1da01f6c00fbade573b9d6fa895e49f627fca) )
+	/* 3+4 */
+ROM_END
+
 
 
 ROM_START( m5kormcl )
@@ -3233,13 +3393,32 @@ ROM_START( m5lock )
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "lnl11d.p1", 0x000000, 0x080000, CRC(504d67de) SHA1(c696305925256e6cbdd3758de137d9db7ef8e0d2) )
 	ROM_LOAD16_BYTE( "lnl11k.p1", 0x000000, 0x080000, CRC(f267a63e) SHA1(564326f7a865fd936cce6ad4d3dfabc92132236a) )
+ROM_END
+
+ROM_START( m5lock12 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "lnl12s.p1", 0x000000, 0x080000, CRC(3f0b5101) SHA1(2cbc9ebb361b928aad79c3f1f48881c368ab97b2) )
+	ROM_LOAD16_BYTE( "lnl12s.p2", 0x000001, 0x080000, CRC(8a275bf5) SHA1(ca408e1083d34ea99f7da2d8bb7af7da67a5066d) )
+	ROM_LOAD16_BYTE( "lnl12s.p3", 0x100000, 0x080000, CRC(8159eb7d) SHA1(8150b8d00b97564d3d6e77acb2b4e283143a7515) ) // == 11
+	ROM_LOAD16_BYTE( "lnl12s.p4", 0x100001, 0x080000, CRC(0dec842c) SHA1(92c18edc41059ce38e1c77abdce20896ff6de8fc) ) // == 11
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "lnl12d.p1", 0x000000, 0x080000, CRC(b9e3010d) SHA1(33d42458a5aa8f2519f0af9221ddcef570c5d6e1) )
 	ROM_LOAD16_BYTE( "lnl12k.p1", 0x000000, 0x080000, CRC(1bc9c0ed) SHA1(e9b87c93280e6a94b38b9b895caa35bd30f65dfe) )
-	ROM_LOAD16_BYTE( "lnl12s.p1", 0x000000, 0x080000, CRC(3f0b5101) SHA1(2cbc9ebb361b928aad79c3f1f48881c368ab97b2) )
-	ROM_LOAD16_BYTE( "lnl12s.p2", 0x000000, 0x080000, CRC(8a275bf5) SHA1(ca408e1083d34ea99f7da2d8bb7af7da67a5066d) )
-	//ROM_LOAD16_BYTE( "lnl12s.p3", 0x000000, 0x080000, CRC(8159eb7d) SHA1(8150b8d00b97564d3d6e77acb2b4e283143a7515) )
-	//ROM_LOAD16_BYTE( "lnl12s.p4", 0x000000, 0x080000, CRC(0dec842c) SHA1(92c18edc41059ce38e1c77abdce20896ff6de8fc) )
 ROM_END
+
+ROM_START( m5lock13 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "lnl13s.p1", 0x000000, 0x080000, CRC(355ebd1d) SHA1(306df0c40c909ed2f86f5a81c67e340e4416df1f) )
+	ROM_LOAD16_BYTE( "lnl13s.p2", 0x000001, 0x080000, CRC(ef2e5c42) SHA1(09f281689364c384d9ddb03d2821095670eec977) )
+	/* 3+4 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "lnl13d.p1", 0x000000, 0x080000, CRC(b3b6ed11) SHA1(48ef0ce6acc045e1da2400903533f5748ca4dfb7) )
+	ROM_LOAD16_BYTE( "lnl13k.p1", 0x000000, 0x080000, CRC(119c2cf1) SHA1(e871530d704b9a395dca2f00e5915d8f259ea270) )
+ROM_END
+
+
 
 
 ROM_START( m5lockcl )
@@ -3255,17 +3434,36 @@ ROM_START( m5lockcl )
 	ROM_LOAD16_BYTE( "lnc13l.p1", 0x000000, 0x080000, CRC(1be8e314) SHA1(8c8104c976ba57d06081450d0f50eadde0e8f286) )
 	ROM_LOAD16_BYTE( "lnc13m.p1", 0x000000, 0x080000, CRC(4be5b833) SHA1(734fc50a439dc433ae9ec2d5eb83e4783c5fdd06) )
 	ROM_LOAD16_BYTE( "lnc13o.p1", 0x000000, 0x080000, CRC(2829408b) SHA1(ef6afec6acab3a67739ee64c799cc4dd0aa22b9a) )
+ROM_END
+
+ROM_START( m5lockcl14 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "lnc14s.p1", 0x000000, 0x080000, CRC(9271768d) SHA1(6caf9f6ea2da6a51c83da5897aabe1a76f0828bf) )
+	ROM_LOAD16_BYTE( "lnc14s.p2", 0x000001, 0x080000, CRC(4951fe08) SHA1(8d4f9be119b8b1fb6d38f22daf0ddaef8049b910) )
+	ROM_LOAD16_BYTE( "lnc14s.p3", 0x100000, 0x080000, CRC(36158197) SHA1(28f5a90026fc528eb82e8767cb4c503306e0220a) ) // == 13
+	ROM_LOAD16_BYTE( "lnc14s.p4", 0x100001, 0x080000, CRC(2becfc30) SHA1(5f302648071a6167f6bf06f8a96bd6a84aef9a27) ) // == 13
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "lnc14d.p1", 0x000000, 0x080000, CRC(aea57f1a) SHA1(180b58a8fef5de25ebe772c4b03866bf84d8c52f) )
 	ROM_LOAD16_BYTE( "lnc14f.p1", 0x000000, 0x080000, CRC(f05f3b74) SHA1(9bd1da5a8ffbc4fcaa1928a56bbedd528a576f5e) )
 	ROM_LOAD16_BYTE( "lnc14l.p1", 0x000000, 0x080000, CRC(0620b658) SHA1(6049ec2d125be23ac60f83a49f62b38648927a89) )
 	ROM_LOAD16_BYTE( "lnc14m.p1", 0x000000, 0x080000, CRC(562ded7f) SHA1(8081efa138a3b30ec867d0feb7f2a967b6ee8813) )
 	ROM_LOAD16_BYTE( "lnc14o.p1", 0x000000, 0x080000, CRC(35e115c7) SHA1(ee7ced3b2be6a3217a5dfb3843127afe0c7f81a7) )
-	ROM_LOAD16_BYTE( "lnc14s.p1", 0x000000, 0x080000, CRC(9271768d) SHA1(6caf9f6ea2da6a51c83da5897aabe1a76f0828bf) )
-	ROM_LOAD16_BYTE( "lnc14s.p2", 0x000000, 0x080000, CRC(4951fe08) SHA1(8d4f9be119b8b1fb6d38f22daf0ddaef8049b910) )
-	//ROM_LOAD16_BYTE( "lnc14s.p3", 0x000000, 0x080000, CRC(36158197) SHA1(28f5a90026fc528eb82e8767cb4c503306e0220a) )
-	//ROM_LOAD16_BYTE( "lnc14s.p4", 0x000000, 0x080000, CRC(2becfc30) SHA1(5f302648071a6167f6bf06f8a96bd6a84aef9a27) )
 ROM_END
 
+ROM_START( m5lockcl15 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "lnc15s.p1", 0x000000, 0x080000, CRC(a78cfab4) SHA1(52c9567bd47c7dcf6616bf33b9026c51d09d17d4) )
+	ROM_LOAD16_BYTE( "lnc15s.p2", 0x000001, 0x080000, CRC(7d408d93) SHA1(1b9806f5ac476eb40489bce25c8977d98b9c06f3) )
+	/* 3+4 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "lnc15d.p1", 0x000000, 0x080000, CRC(9b58f323) SHA1(25b13c0d17a5d64af7e377f5b6bc918203b768e4) )
+	ROM_LOAD16_BYTE( "lnc15f.p1", 0x000000, 0x080000, CRC(c5a2b74d) SHA1(f927a30a5ee3c307f384d6dccf1f091b63957e2e) )
+	ROM_LOAD16_BYTE( "lnc15l.p1", 0x000000, 0x080000, CRC(33dd3a61) SHA1(d8bf5f169c453ab586aee2d2d5f25384f66affb4) )
+	ROM_LOAD16_BYTE( "lnc15m.p1", 0x000000, 0x080000, CRC(63d06146) SHA1(61b7f6b189221856b1eacbe6e1ced11e9fa0fcfc) )
+	ROM_LOAD16_BYTE( "lnc15o.p1", 0x000000, 0x080000, CRC(001c99fe) SHA1(3306a89cb2794a0a552f01b10376b538f48edafa) )
+ROM_END
 
 
 ROM_START( m5loony )
@@ -3277,9 +3475,6 @@ ROM_START( m5loony )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "lju_sjs1.3d1", 0x000000, 0x080000, CRC(77d8646c) SHA1(1d1c73348ff5295e9d03d9a35f9d850edc0dcc20) )
-	//ROM_LOAD16_BYTE( "lju_sjs1.3d2", 0x000000, 0x080000, CRC(c472acd8) SHA1(bb1af9e428aaebb3c0a7cbc0f2d4968c495b1bce) )
-	//ROM_LOAD16_BYTE( "lju_sjs1.3d3", 0x000000, 0x080000, CRC(2d308353) SHA1(e5ad545214c675f7047ee4ff45176072c8a4321b) )
-	//ROM_LOAD16_BYTE( "lju_sjs1.3d4", 0x000000, 0x080000, CRC(11762cfa) SHA1(bdce1cebb7f893149d7742432cad8729ccca0ebd) )
 ROM_END
 
 
@@ -3336,7 +3531,15 @@ ROM_START( m5martns )
 	ROM_LOAD16_BYTE( "mmma06r.p1", 0x000000, 0x080000, CRC(febb826f) SHA1(caae46a9a3a53298e1a3b2d99b7cc6cc959c0995) )
 	ROM_LOAD16_BYTE( "mmma06s.p1", 0x000000, 0x080000, CRC(2fbf3a22) SHA1(54d14a34e6b6c8e4ee0d1858871503a9e8e1f2d8) )
 	ROM_LOAD16_BYTE( "mmma06y.p1", 0x000000, 0x080000, CRC(30aa2f40) SHA1(e2f1ecee7280247ae4f68ba5066011ddf66b511e) )
-	ROM_LOAD16_BYTE( "mmma07.p2", 0x000000, 0x080000, CRC(11bda2ba) SHA1(81d2476ae658f06ddecbeb6ec99ba3829d1888ee) )
+ROM_END
+
+ROM_START( m5martns07 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "mmma07s.p1", 0x000000, 0x080000, CRC(03198c78) SHA1(ffbcc782403a6b372b1aff6a48621ab9155816ba) )
+	ROM_LOAD16_BYTE( "mmma07.p2", 0x000001, 0x080000, CRC(11bda2ba) SHA1(81d2476ae658f06ddecbeb6ec99ba3829d1888ee) )
+	/* 3+4 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "mmma07ad.p1", 0x000000, 0x080000, CRC(33b841e2) SHA1(2140bae7596e8431778f24468b8b9ba6c0dcec3b) )
 	ROM_LOAD16_BYTE( "mmma07b.p1", 0x000000, 0x080000, CRC(b773ee4c) SHA1(a71cb2c6d49856f5f02f573dfc2279aea79b5b1a) )
 	ROM_LOAD16_BYTE( "mmma07bd.p1", 0x000000, 0x080000, CRC(c15af452) SHA1(24263c105190a138f772d9ff001617214cdc6282) )
@@ -3344,10 +3547,8 @@ ROM_START( m5martns )
 	ROM_LOAD16_BYTE( "mmma07dy.p1", 0x000000, 0x080000, CRC(9c9679b4) SHA1(583014f26c982c1bdb97e1d68cd2c5702c711592) )
 	ROM_LOAD16_BYTE( "mmma07k.p1", 0x000000, 0x080000, CRC(0bf61171) SHA1(3d34640b460121c3176c8dba427239b303448a11) )
 	ROM_LOAD16_BYTE( "mmma07r.p1", 0x000000, 0x080000, CRC(10f463c0) SHA1(cb7935d6457fb6df57ccdaf1c42c1422bc14ad8e) )
-	ROM_LOAD16_BYTE( "mmma07s.p1", 0x000000, 0x080000, CRC(03198c78) SHA1(ffbcc782403a6b372b1aff6a48621ab9155816ba) )
 	ROM_LOAD16_BYTE( "mmma07y.p1", 0x000000, 0x080000, CRC(c6940f04) SHA1(815b6f3b9d840e4c4e94c5adaf234da8dba4fe9c) )
 ROM_END
-
 
 ROM_START( m5mmak )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -3365,9 +3566,16 @@ ROM_START( m5mmak )
 	ROM_LOAD16_BYTE( "mmak05r.p1", 0x000000, 0x080000, CRC(b120b9ab) SHA1(31a1acb1c9420a8bf84b0e27a85e176f41024138) )
 	ROM_LOAD16_BYTE( "mmak05s.p1", 0x000000, 0x080000, CRC(5a0524db) SHA1(3b52c2a4edaa2ba89cc6735e96ca2fec85500f6a) )
 	ROM_LOAD16_BYTE( "mmak05y.p1", 0x000000, 0x080000, CRC(e24e80fd) SHA1(49ce174a3213208a0b8e79ce48c8e221e2e07ed7) )
-	ROM_LOAD16_BYTE( "mmak06.p2", 0x000000, 0x080000, CRC(24ad42b1) SHA1(5189199316cf5f896fbdc00f15cf9abcba2489c6) )
-	//ROM_LOAD16_BYTE( "mmak06.p3", 0x000000, 0x080000, CRC(1048ceca) SHA1(f6a6790ed3c7b60cbe31db9eb1ed7da5ac81c0fd) )
-	//ROM_LOAD16_BYTE( "mmak06.p4", 0x000000, 0x080000, CRC(50f7100c) SHA1(b7e0199bf183b7954416eb091a5aa8ed5c44143b) )
+ROM_END
+
+ROM_START( m5mmak06 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "mmak06s.p1", 0x000000, 0x080000, CRC(c8e43a9c) SHA1(fe667ffe7df132c1a625b69c82ff8e7defce1317) )
+	ROM_LOAD16_BYTE( "mmak06.p2", 0x000001, 0x080000, CRC(24ad42b1) SHA1(5189199316cf5f896fbdc00f15cf9abcba2489c6) )
+	ROM_LOAD16_BYTE( "mmak06.p3", 0x100000, 0x080000, CRC(1048ceca) SHA1(f6a6790ed3c7b60cbe31db9eb1ed7da5ac81c0fd) ) // == 05
+	ROM_LOAD16_BYTE( "mmak06.p4", 0x100001, 0x080000, CRC(50f7100c) SHA1(b7e0199bf183b7954416eb091a5aa8ed5c44143b) ) // == 05
+	
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "mmak06ad.p1", 0x000000, 0x080000, CRC(fe92d3b3) SHA1(70bade6ac8a524ff640923960d6b33720d10945e) )
 	ROM_LOAD16_BYTE( "mmak06b.p1", 0x000000, 0x080000, CRC(4c283966) SHA1(97a6d2b7778998067f9556f412cc116999a37fae) )
 	ROM_LOAD16_BYTE( "mmak06bd.p1", 0x000000, 0x080000, CRC(d9f39761) SHA1(51e501ced84149b66602905dc526b7af69a6ce48) )
@@ -3375,13 +3583,8 @@ ROM_START( m5mmak )
 	ROM_LOAD16_BYTE( "mmak06dy.p1", 0x000000, 0x080000, CRC(5faaea66) SHA1(d5d5fb1ce508a1e97262bf14ea106592e5544d39) )
 	ROM_LOAD16_BYTE( "mmak06h.p1", 0x000000, 0x080000, CRC(fa912ebb) SHA1(e6117cf7ef2f0428927c7d45bc53e5102ac685fb) )
 	ROM_LOAD16_BYTE( "mmak06r.p1", 0x000000, 0x080000, CRC(e52e7181) SHA1(edee4b59afc56a110ed9f3d10ed6e771016b51e5) )
-	ROM_LOAD16_BYTE( "mmak06s.p1", 0x000000, 0x080000, CRC(c8e43a9c) SHA1(fe667ffe7df132c1a625b69c82ff8e7defce1317) )
 	ROM_LOAD16_BYTE( "mmak06y.p1", 0x000000, 0x080000, CRC(ad45ec70) SHA1(c837d2d2474457d20d5985645551e361a481f903) )
-
-
-	//ROM_LOAD16_BYTE( "moneymaker-v16.bin", 0x000000, 0x010000, CRC(77f52665) SHA1(48a67b651385834658f1acb11ccde12b73393ced) )
 ROM_END
-
 
 ROM_START( m5monty )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -3514,9 +3717,16 @@ ROM_START( m5fiddle )
 	ROM_LOAD16_BYTE( "fidl08r.p1", 0x000000, 0x080000, CRC(4c7083b5) SHA1(8c38650439594203fe0ee86cddf03425d4d0aeb4) )
 	ROM_LOAD16_BYTE( "fidl08s.p1", 0x000000, 0x080000, CRC(43db59b5) SHA1(95146315dee00fb6afbeed571d00e13a8f8cf974) )
 	ROM_LOAD16_BYTE( "fidl08y.p1", 0x000000, 0x080000, CRC(d5567381) SHA1(1968d33170b1099fd4d48ec44d13abb0f095dba3) )
-	ROM_LOAD16_BYTE( "oftr03.p2", 0x000000, 0x080000, CRC(e01e1b54) SHA1(23903aceb618eafeefd52a4e9074de83262d587d) )
-	ROM_LOAD16_BYTE( "oftr03.p3", 0x000000, 0x080000, CRC(f05df967) SHA1(3de235d0841cd17d5f817ba7a45e7e1552f3bf28) )
-	ROM_LOAD16_BYTE( "oftr03.p4", 0x000000, 0x080000, CRC(0abf20e5) SHA1(028aa8377e01e5de81bfdb1afc0ebce8a3eee2a5) )
+ROM_END
+
+ROM_START( m5fiddle03 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "oftr03s.p1", 0x000000, 0x080000, CRC(7c3c174c) SHA1(19a1d2c89753aa70abcf44ab6997760910366ce9) )
+	ROM_LOAD16_BYTE( "oftr03.p2", 0x000001, 0x080000, CRC(e01e1b54) SHA1(23903aceb618eafeefd52a4e9074de83262d587d) )
+	ROM_LOAD16_BYTE( "oftr03.p3", 0x100000, 0x080000, CRC(f05df967) SHA1(3de235d0841cd17d5f817ba7a45e7e1552f3bf28) )
+	ROM_LOAD16_BYTE( "oftr03.p4", 0x100001, 0x080000, CRC(0abf20e5) SHA1(028aa8377e01e5de81bfdb1afc0ebce8a3eee2a5) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "oftr03ad.p1", 0x000000, 0x080000, CRC(ad325e8c) SHA1(33452592e6813154d5a2f30e2b81b053dd28875e) )
 	ROM_LOAD16_BYTE( "oftr03b.p1", 0x000000, 0x080000, CRC(24fea5f1) SHA1(bc938017daa27ad6a2a54578ba0d6c05c9fe15ee) )
 	ROM_LOAD16_BYTE( "oftr03bd.p1", 0x000000, 0x080000, CRC(73cea690) SHA1(0bd3b99980d5b9936f9f8dd47946dd32923a78b5) )
@@ -3524,7 +3734,6 @@ ROM_START( m5fiddle )
 	ROM_LOAD16_BYTE( "oftr03dy.p1", 0x000000, 0x080000, CRC(bb027b0f) SHA1(d133b9db5766e8494b90d76ff2ca8661ae6cb34c) )
 	ROM_LOAD16_BYTE( "oftr03k.p1", 0x000000, 0x080000, CRC(180e25fc) SHA1(4eba34872f6d60146b38d9302d0e153aec425d32) )
 	ROM_LOAD16_BYTE( "oftr03r.p1", 0x000000, 0x080000, CRC(b49c58ac) SHA1(a11b9b981dfd71929b214a303df60f26ed026aae) )
-	ROM_LOAD16_BYTE( "oftr03s.p1", 0x000000, 0x080000, CRC(7c3c174c) SHA1(19a1d2c89753aa70abcf44ab6997760910366ce9) )
 	ROM_LOAD16_BYTE( "oftr03y.p1", 0x000000, 0x080000, CRC(96ed6ec8) SHA1(d9939c1243b1ae1f400392a08c92a61b047ce02b) )
 ROM_END
 
@@ -3536,8 +3745,6 @@ ROM_START( m5oohaah )
 	ROM_LOAD16_BYTE( "oadg11.p4", 0x100001, 0x080000, CRC(ba3d740e) SHA1(1b035b057a844e19abe869adbea95b6cbed7e8a1) )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "oadg01.p1", 0x000000, 0x080000, CRC(1a4076fd) SHA1(5d79524ac3e40d82dcf67f2d2e4e4300b1594d28) )
-	ROM_LOAD16_BYTE( "oadg01.p2", 0x000000, 0x080000, CRC(fc34684f) SHA1(88a7276993e95356b10ae3f9a4efa770c9430420) )
 	ROM_LOAD16_BYTE( "oadg11b.p1", 0x000000, 0x080000, CRC(2ff74577) SHA1(2525471274a30e2abbdd8a6882dddfad3d52ae30) )
 	ROM_LOAD16_BYTE( "oadg11bd.p1", 0x000000, 0x080000, CRC(75ae17bd) SHA1(c27456f7f77c1b08f6c039baf5f41041fed840a8) )
 	ROM_LOAD16_BYTE( "oadg11d.p1", 0x000000, 0x080000, CRC(416f52c9) SHA1(1c679c91acd07d71aeac92d1d78a8a491a11ea7a) )
@@ -3547,6 +3754,14 @@ ROM_START( m5oohaah )
 	ROM_LOAD16_BYTE( "oadg11s.p1", 0x000000, 0x080000, CRC(0b06bc2e) SHA1(589b861ddb847757fa90e82fba169b19f61830db) )
 	ROM_LOAD16_BYTE( "oadg11y.p1", 0x000000, 0x080000, CRC(16319f24) SHA1(1f14c6f5ab5a77ab5fc774871a8cca2143cf6a69) )
 ROM_END
+
+ROM_START( m5oohaah01 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "oadg01.p1", 0x000000, 0x080000, CRC(1a4076fd) SHA1(5d79524ac3e40d82dcf67f2d2e4e4300b1594d28) )
+	ROM_LOAD16_BYTE( "oadg01.p2", 0x000001, 0x080000, CRC(fc34684f) SHA1(88a7276993e95356b10ae3f9a4efa770c9430420) )
+	/* 3+4 */
+ROM_END
+
 
 
 
@@ -3580,54 +3795,77 @@ ROM_START( m5openbx )
 	ROM_LOAD16_BYTE( "obtr02.p8", 0x300001, 0x080000, CRC(5de27262) SHA1(c941275ce21506ab322ac0917725409a14660011) )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "oboj06.p2", 0x000000, 0x080000, CRC(2c1821aa) SHA1(874b1b377dcf21cb65f33f1823a48906c2a90d1d) )
-	ROM_LOAD16_BYTE( "oboj06.p3", 0x000000, 0x080000, CRC(e93ecb5a) SHA1(ca65f9304bbdd1bbbc42a1bb062e9b32051400e8) )
-	//ROM_LOAD16_BYTE( "oboj06.p4", 0x000000, 0x080000, CRC(e905381b) SHA1(dcc93723e1d9ad118810bde5282bfa16c718a5f7) )
-	//ROM_LOAD16_BYTE( "oboj06.p5", 0x000000, 0x080000, CRC(5c634269) SHA1(231659180e44a3161ab9b27bf3336b8165cd7c75) )
-	//ROM_LOAD16_BYTE( "oboj06.p6", 0x000000, 0x080000, CRC(b151d179) SHA1(0a3bfde2310478c341b5ddae142f5efc9469a51c) )
-	// p7?
-	//ROM_LOAD16_BYTE( "oboj06.p8", 0x000000, 0x080000, CRC(5de27262) SHA1(c941275ce21506ab322ac0917725409a14660011) )
-	ROM_LOAD16_BYTE( "oboj06ad.p1", 0x000000, 0x080000, CRC(ebf9d0b2) SHA1(cf1d3378d8a6e42b267a8d3e5c8f1cd48cccf3c0) )
-	ROM_LOAD16_BYTE( "oboj06b.p1", 0x000000, 0x080000, CRC(bc0aaac3) SHA1(d22e9696e05fb57be8e01e0771678dec3a0d0080) )
-	ROM_LOAD16_BYTE( "oboj06bd.p1", 0x000000, 0x080000, CRC(8fabe267) SHA1(62f55953a557429b0592440d8c87943271647cfb) )
-	ROM_LOAD16_BYTE( "oboj06d.p1", 0x000000, 0x080000, CRC(cb82b47c) SHA1(15dd75e1e17002d2d365506b279d39c0a8f4fe12) )
-	ROM_LOAD16_BYTE( "oboj06dy.p1", 0x000000, 0x080000, CRC(5fe9fcd0) SHA1(b7f1aa37dd4197c684d75efb31d75d9149559a50) )
-	ROM_LOAD16_BYTE( "oboj06r.p1", 0x000000, 0x080000, CRC(a98a8838) SHA1(62efe36cf89e2d388da9d5ae5d4b6f464d610c41) )
-	ROM_LOAD16_BYTE( "oboj06s.p1", 0x000000, 0x080000, CRC(5a73185e) SHA1(13ea115d9dbb5d3eb3e509538598e38e64443135) )
-	ROM_LOAD16_BYTE( "oboj06y.p1", 0x000000, 0x080000, CRC(ce1850f2) SHA1(e5216a70d7030f57f3e6c3c31fad7d3c159deaad) )
-	ROM_LOAD16_BYTE( "obox05.p2", 0x000000, 0x080000, CRC(973a8bc5) SHA1(c18f0b8c86f0c21dad1cd911eecc8311bbd6d0e2) )
-	ROM_LOAD16_BYTE( "obox05ad.p1", 0x000000, 0x080000, CRC(3c26cb93) SHA1(9dc212f71d2d60398b6f3c62935168823b32599e) )
-	ROM_LOAD16_BYTE( "obox05b.p1", 0x000000, 0x080000, CRC(fdc11791) SHA1(5963f8e9f7bb3773a4ee40f6394aa87c96091205) )
-	ROM_LOAD16_BYTE( "obox05bd.p1", 0x000000, 0x080000, CRC(dd8ca413) SHA1(d21b08b14d3595166fcd341e08341c4c79e4b98e) )
-	ROM_LOAD16_BYTE( "obox05d.p1", 0x000000, 0x080000, CRC(399d0384) SHA1(bf5372baf55fbd69a5aab49a7bc265a487b19c94) )
-	ROM_LOAD16_BYTE( "obox05dy.p1", 0x000000, 0x080000, CRC(637fa940) SHA1(bafd071df4da8f9c20efa13f49bf94e105d3a9fd) )
-	ROM_LOAD16_BYTE( "obox05r.p1", 0x000000, 0x080000, CRC(9b02cc32) SHA1(dd80648a9f4c4a342730a63bf988ffdf5ea00a2b) )
-	ROM_LOAD16_BYTE( "obox05s.p1", 0x000000, 0x080000, CRC(f2defe83) SHA1(213ca25fd4b1efa3da0955e844e9439ba58d2be2) )
-	ROM_LOAD16_BYTE( "obox05y.p1", 0x000000, 0x080000, CRC(a83c5447) SHA1(3c925fb6e53cf8569fe8f6af62662a6f510d5a3c) )
-	ROM_LOAD16_BYTE( "obtr01.p2", 0x000000, 0x080000, CRC(87a1b987) SHA1(3c7b55cf7eb231fb1100677190800eb73d900cad) )
-	ROM_LOAD16_BYTE( "obtr01.p3", 0x000000, 0x080000, CRC(e93ecb5a) SHA1(ca65f9304bbdd1bbbc42a1bb062e9b32051400e8) )
-	//ROM_LOAD16_BYTE( "obtr01.p4", 0x000000, 0x080000, CRC(e905381b) SHA1(dcc93723e1d9ad118810bde5282bfa16c718a5f7) )
-	ROM_LOAD16_BYTE( "obtr01.p5", 0x000000, 0x07ca32, BAD_DUMP CRC(257ae97e) SHA1(dc7ce7cfa73b095751d557ebabf28569476a839b) ) // assume to be the same
-	//ROM_LOAD16_BYTE( "obtr01.p6", 0x000000, 0x080000, CRC(b151d179) SHA1(0a3bfde2310478c341b5ddae142f5efc9469a51c) )
-	//ROM_LOAD16_BYTE( "obtr01.p7", 0x000000, 0x080000, CRC(163ba007) SHA1(94a8618143910b63f70cd0e7339b337d6e81ef33) )
-	//ROM_LOAD16_BYTE( "obtr01.p8", 0x000000, 0x080000, CRC(5de27262) SHA1(c941275ce21506ab322ac0917725409a14660011) )
-	ROM_LOAD16_BYTE( "obtr01ad.p1", 0x000000, 0x080000, CRC(00ebc5e7) SHA1(9a6a0de8a34cddabdd7f0481925cf2563ecaec16) )
-	ROM_LOAD16_BYTE( "obtr01b.p1", 0x000000, 0x080000, CRC(00ad35e9) SHA1(6ee3c78b3aac115a90dc0fccc1a016197675c466) )
-	ROM_LOAD16_BYTE( "obtr01bd.p1", 0x000000, 0x080000, CRC(c65d260d) SHA1(c0ebf204e4d983b2a8a0f8d83126eb661860e0c5) )
-	ROM_LOAD16_BYTE( "obtr01d.p1", 0x000000, 0x080000, CRC(7e950ce2) SHA1(b36852fcb39b04d0b72e09d3b1bcc8cfca463a2b) )
-	ROM_LOAD16_BYTE( "obtr01dy.p1", 0x000000, 0x080000, CRC(10864d45) SHA1(07026c5bfaefa85f2ce1f8f33fec0ea1c4834f9b) )
-	ROM_LOAD16_BYTE( "obtr01k.p1", 0x000000, 0x080000, CRC(0854dfec) SHA1(b905bb50f1005565c469e30fcde908fdc76d492f) )
-	ROM_LOAD16_BYTE( "obtr01s.p1", 0x000000, 0x080000, CRC(7ac858fc) SHA1(900e6d9c4ba994372f56a27f320ac76a9f794ccf) )
-	ROM_LOAD16_BYTE( "obtr01y.p1", 0x000000, 0x080000, CRC(14db195b) SHA1(fc36de23d6106ddb23d53f84943d725ad0005f7f) )
+	ROM_LOAD16_BYTE( "obtr02s.p1", 0x000000, 0x080000, CRC(decd39f4) SHA1(3b50b2c66fdfa59c9f2c646d9ff9586154d3ba0f) )
 	ROM_LOAD16_BYTE( "obtr02b.p1", 0x000000, 0x080000, CRC(ffccc472) SHA1(d3346a1fe51d16833f071b1780a7cef8086bc385) )
 	ROM_LOAD16_BYTE( "obtr02bd.p1", 0x000000, 0x080000, CRC(2562d2bd) SHA1(bd23e7d4065b6ec7037524f32d7a2904ea8e5594) )
 	ROM_LOAD16_BYTE( "obtr02d.p1", 0x000000, 0x080000, CRC(1431f9dc) SHA1(6c186bc6f70a7dd2fba9eefe97640dbef0e21e1b) )
 	ROM_LOAD16_BYTE( "obtr02dy.p1", 0x000000, 0x080000, CRC(eaf1771b) SHA1(78257088087050e1bbd7b6157f0ba702db25eb23) )
 	ROM_LOAD16_BYTE( "obtr02k.p1", 0x000000, 0x080000, CRC(0e6e90e0) SHA1(e3cde3e95120297acc868339f7d82bb91787361c) )
 	ROM_LOAD16_BYTE( "obtr02r.p1", 0x000000, 0x080000, CRC(f5de32f1) SHA1(dd5873f7cf2f73ef8a6ab5d620650e534ec19d91) )
-	ROM_LOAD16_BYTE( "obtr02s.p1", 0x000000, 0x080000, CRC(decd39f4) SHA1(3b50b2c66fdfa59c9f2c646d9ff9586154d3ba0f) )
 	ROM_LOAD16_BYTE( "obtr02y.p1", 0x000000, 0x080000, CRC(200db733) SHA1(3203a88357df7c75976d7525e2a2853695a72aa4) )
+
+
 ROM_END
+
+ROM_START( m5openbx06 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "oboj06s.p1", 0x000000, 0x080000, CRC(5a73185e) SHA1(13ea115d9dbb5d3eb3e509538598e38e64443135) )
+	ROM_LOAD16_BYTE( "oboj06.p2", 0x000001, 0x080000, CRC(2c1821aa) SHA1(874b1b377dcf21cb65f33f1823a48906c2a90d1d) )
+	ROM_LOAD16_BYTE( "oboj06.p3", 0x100000, 0x080000, CRC(e93ecb5a) SHA1(ca65f9304bbdd1bbbc42a1bb062e9b32051400e8) ) // == 02
+	ROM_LOAD16_BYTE( "oboj06.p4", 0x100001, 0x080000, CRC(e905381b) SHA1(dcc93723e1d9ad118810bde5282bfa16c718a5f7) ) // == 02
+	ROM_LOAD16_BYTE( "oboj06.p5", 0x200000, 0x080000, CRC(5c634269) SHA1(231659180e44a3161ab9b27bf3336b8165cd7c75) ) // == 02
+	ROM_LOAD16_BYTE( "oboj06.p6", 0x200001, 0x080000, CRC(b151d179) SHA1(0a3bfde2310478c341b5ddae142f5efc9469a51c) ) // == 02
+	ROM_LOAD16_BYTE( "obtr06.p7", 0x300000, 0x080000, CRC(163ba007) SHA1(94a8618143910b63f70cd0e7339b337d6e81ef33) ) // missing but assumed the same
+	ROM_LOAD16_BYTE( "oboj06.p8", 0x300001, 0x080000, CRC(5de27262) SHA1(c941275ce21506ab322ac0917725409a14660011) ) // == 02
+	
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "oboj06ad.p1", 0x000000, 0x080000, CRC(ebf9d0b2) SHA1(cf1d3378d8a6e42b267a8d3e5c8f1cd48cccf3c0) )
+	ROM_LOAD16_BYTE( "oboj06b.p1", 0x000000, 0x080000, CRC(bc0aaac3) SHA1(d22e9696e05fb57be8e01e0771678dec3a0d0080) )
+	ROM_LOAD16_BYTE( "oboj06bd.p1", 0x000000, 0x080000, CRC(8fabe267) SHA1(62f55953a557429b0592440d8c87943271647cfb) )
+	ROM_LOAD16_BYTE( "oboj06d.p1", 0x000000, 0x080000, CRC(cb82b47c) SHA1(15dd75e1e17002d2d365506b279d39c0a8f4fe12) )
+	ROM_LOAD16_BYTE( "oboj06dy.p1", 0x000000, 0x080000, CRC(5fe9fcd0) SHA1(b7f1aa37dd4197c684d75efb31d75d9149559a50) )
+	ROM_LOAD16_BYTE( "oboj06r.p1", 0x000000, 0x080000, CRC(a98a8838) SHA1(62efe36cf89e2d388da9d5ae5d4b6f464d610c41) )
+	ROM_LOAD16_BYTE( "oboj06y.p1", 0x000000, 0x080000, CRC(ce1850f2) SHA1(e5216a70d7030f57f3e6c3c31fad7d3c159deaad) )
+ROM_END
+
+ROM_START( m5openbx05 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "obox05s.p1", 0x000000, 0x080000, CRC(f2defe83) SHA1(213ca25fd4b1efa3da0955e844e9439ba58d2be2) )
+	ROM_LOAD16_BYTE( "obox05.p2", 0x000001, 0x080000, CRC(973a8bc5) SHA1(c18f0b8c86f0c21dad1cd911eecc8311bbd6d0e2) )
+	/* 3,4,5,6,7,8 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "obox05ad.p1", 0x000000, 0x080000, CRC(3c26cb93) SHA1(9dc212f71d2d60398b6f3c62935168823b32599e) )
+	ROM_LOAD16_BYTE( "obox05b.p1", 0x000000, 0x080000, CRC(fdc11791) SHA1(5963f8e9f7bb3773a4ee40f6394aa87c96091205) )
+	ROM_LOAD16_BYTE( "obox05bd.p1", 0x000000, 0x080000, CRC(dd8ca413) SHA1(d21b08b14d3595166fcd341e08341c4c79e4b98e) )
+	ROM_LOAD16_BYTE( "obox05d.p1", 0x000000, 0x080000, CRC(399d0384) SHA1(bf5372baf55fbd69a5aab49a7bc265a487b19c94) )
+	ROM_LOAD16_BYTE( "obox05dy.p1", 0x000000, 0x080000, CRC(637fa940) SHA1(bafd071df4da8f9c20efa13f49bf94e105d3a9fd) )
+	ROM_LOAD16_BYTE( "obox05r.p1", 0x000000, 0x080000, CRC(9b02cc32) SHA1(dd80648a9f4c4a342730a63bf988ffdf5ea00a2b) )
+	ROM_LOAD16_BYTE( "obox05y.p1", 0x000000, 0x080000, CRC(a83c5447) SHA1(3c925fb6e53cf8569fe8f6af62662a6f510d5a3c) )
+ROM_END
+
+ROM_START( m5openbx01 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "obtr01s.p1", 0x000000, 0x080000, CRC(7ac858fc) SHA1(900e6d9c4ba994372f56a27f320ac76a9f794ccf) )
+	ROM_LOAD16_BYTE( "obtr01.p2", 0x000001, 0x080000, CRC(87a1b987) SHA1(3c7b55cf7eb231fb1100677190800eb73d900cad) )
+	ROM_LOAD16_BYTE( "obtr01.p3", 0x100000, 0x080000, CRC(e93ecb5a) SHA1(ca65f9304bbdd1bbbc42a1bb062e9b32051400e8) ) // == 02
+	ROM_LOAD16_BYTE( "obtr01.p4", 0x100001, 0x080000, CRC(e905381b) SHA1(dcc93723e1d9ad118810bde5282bfa16c718a5f7) ) // == 02
+	ROM_LOAD16_BYTE( "oboj06.p5", 0x200000, 0x080000, CRC(5c634269) SHA1(231659180e44a3161ab9b27bf3336b8165cd7c75) ) // dump was bad, but assume to be the same
+	ROM_LOAD16_BYTE( "obtr01.p6", 0x200001, 0x080000, CRC(b151d179) SHA1(0a3bfde2310478c341b5ddae142f5efc9469a51c) ) // == 02
+	ROM_LOAD16_BYTE( "obtr01.p7", 0x300000, 0x080000, CRC(163ba007) SHA1(94a8618143910b63f70cd0e7339b337d6e81ef33) ) // == 02
+	ROM_LOAD16_BYTE( "obtr01.p8", 0x300001, 0x080000, CRC(5de27262) SHA1(c941275ce21506ab322ac0917725409a14660011) ) // == 02
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "obtr01ad.p1", 0x000000, 0x080000, CRC(00ebc5e7) SHA1(9a6a0de8a34cddabdd7f0481925cf2563ecaec16) )
+	ROM_LOAD16_BYTE( "obtr01b.p1", 0x000000, 0x080000, CRC(00ad35e9) SHA1(6ee3c78b3aac115a90dc0fccc1a016197675c466) )
+	ROM_LOAD16_BYTE( "obtr01bd.p1", 0x000000, 0x080000, CRC(c65d260d) SHA1(c0ebf204e4d983b2a8a0f8d83126eb661860e0c5) )
+	ROM_LOAD16_BYTE( "obtr01d.p1", 0x000000, 0x080000, CRC(7e950ce2) SHA1(b36852fcb39b04d0b72e09d3b1bcc8cfca463a2b) )
+	ROM_LOAD16_BYTE( "obtr01dy.p1", 0x000000, 0x080000, CRC(10864d45) SHA1(07026c5bfaefa85f2ce1f8f33fec0ea1c4834f9b) )
+	ROM_LOAD16_BYTE( "obtr01k.p1", 0x000000, 0x080000, CRC(0854dfec) SHA1(b905bb50f1005565c469e30fcde908fdc76d492f) )
+	ROM_LOAD16_BYTE( "obtr01y.p1", 0x000000, 0x080000, CRC(14db195b) SHA1(fc36de23d6106ddb23d53f84943d725ad0005f7f) )
+ROM_END
+
+
 
 ROM_START( m5overld )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -3645,18 +3883,32 @@ ROM_START( m5overld )
 	ROM_LOAD16_BYTE( "over04r.p1", 0x000000, 0x080000, CRC(556c71a2) SHA1(b76f856204344eca847af5c4b49c37866627e95f) )
 	ROM_LOAD16_BYTE( "over04s.p1", 0x000000, 0x080000, CRC(2ec75337) SHA1(17b4b1ed772cd98cbcbe90ad660ad326b30dbd07) )
 	ROM_LOAD16_BYTE( "over04y.p1", 0x000000, 0x080000, CRC(5c87a2e8) SHA1(8bf6bd8ec7f7cddc4b9d9ef1ee1a14ad0f9bd520) )
-	ROM_LOAD16_BYTE( "ovtr02.p2", 0x000000, 0x080000, CRC(98e952cf) SHA1(17cd3e983ce5fc926b97b14165822f1368b21fc0) )
-	//ROM_LOAD16_BYTE( "ovtr02.p3", 0x000000, 0x080000, CRC(8f3820d5) SHA1(6936cb9cbcf3ad8256b2117a9258264d3b9ae510) )
-	//ROM_LOAD16_BYTE( "ovtr02.p4", 0x000000, 0x080000, CRC(a51dce10) SHA1(e9f992c0110df7d472262a2b42adae256021fb3b) )
+ROM_END
+
+ROM_START( m5overld02 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ovtr02s.p1", 0x000000, 0x080000, CRC(df8e97ec) SHA1(32184106840f9a108589b0fa39b213656ad2be9a) )
+	ROM_LOAD16_BYTE( "ovtr02.p2", 0x000001, 0x080000, CRC(98e952cf) SHA1(17cd3e983ce5fc926b97b14165822f1368b21fc0) )
+	ROM_LOAD16_BYTE( "ovtr02.p3", 0x100000, 0x080000, CRC(8f3820d5) SHA1(6936cb9cbcf3ad8256b2117a9258264d3b9ae510) ) // == 04
+	ROM_LOAD16_BYTE( "ovtr02.p4", 0x100001, 0x080000, CRC(a51dce10) SHA1(e9f992c0110df7d472262a2b42adae256021fb3b) ) // == 04
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "ovtr02ad.p1", 0x000000, 0x080000, CRC(0e212027) SHA1(5f942a5a1770219cf3af5832d5e4f505d2760f05) )
 	ROM_LOAD16_BYTE( "ovtr02b.p1", 0x000000, 0x080000, CRC(388bc4a2) SHA1(0bb059783d0f066e107270688e99107f3a6e884e) )
 	ROM_LOAD16_BYTE( "ovtr02bd.p1", 0x000000, 0x080000, CRC(5d86e2f0) SHA1(5e424c2f74cfeb83df725b2505e65623770ffe59) )
 	ROM_LOAD16_BYTE( "ovtr02d.p1", 0x000000, 0x080000, CRC(fb5de9a7) SHA1(dda866d39bdec1f3557cad512bc2d817c020d7eb) )
 	ROM_LOAD16_BYTE( "ovtr02dy.p1", 0x000000, 0x080000, CRC(dfc55faf) SHA1(3056c1845a3631c2e9475f1370768d9e70aaedc0) )
 	ROM_LOAD16_BYTE( "ovtr02k.p1", 0x000000, 0x080000, CRC(3819d62b) SHA1(bdcac76c95d77d84d69cfe8acfa60dc6fe2be240) )
-	ROM_LOAD16_BYTE( "ovtr02s.p1", 0x000000, 0x080000, CRC(df8e97ec) SHA1(32184106840f9a108589b0fa39b213656ad2be9a) )
 	ROM_LOAD16_BYTE( "ovtr02y.p1", 0x000000, 0x080000, CRC(fb1621e4) SHA1(8525f9ad1d62ad56c6a87e6b4b298182d59b858b) )
-	ROM_LOAD16_BYTE( "ovtr10.p2", 0x000000, 0x080000, CRC(59ea2bfb) SHA1(0e70cc772d2a9812ad975496e6183e6e0cdf5992) )
+ROM_END
+
+ROM_START( m5overld10 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ovtr10s.p1", 0x000000, 0x080000, CRC(492d7256) SHA1(d0d8d7716dda58dbc4c2742989d65b9fd7aec874) )
+	ROM_LOAD16_BYTE( "ovtr10.p2", 0x000001, 0x080000, CRC(59ea2bfb) SHA1(0e70cc772d2a9812ad975496e6183e6e0cdf5992) )
+	/* 3+4 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "ovtr10ad.p1", 0x000000, 0x080000, CRC(fe7244ac) SHA1(4495788540663baec60e0cd7622ca486b689b6ab) )
 	ROM_LOAD16_BYTE( "ovtr10b.p1", 0x000000, 0x080000, CRC(fb3ca925) SHA1(67ebc6c6ed59b9f34e8685788899ec19f2df3ff6) )
 	ROM_LOAD16_BYTE( "ovtr10bd.p1", 0x000000, 0x080000, CRC(9bd2c3b3) SHA1(f49815f134514d696940ec45d1ebe93ea51fb0f7) )
@@ -3664,9 +3916,17 @@ ROM_START( m5overld )
 	ROM_LOAD16_BYTE( "ovtr10dy.p1", 0x000000, 0x080000, CRC(680a2bc6) SHA1(489cfc45f04e6cba08a8cc376fef7d0d58761057) )
 	ROM_LOAD16_BYTE( "ovtr10k.p1", 0x000000, 0x080000, CRC(55add8e7) SHA1(b5a96ea588fbb396128bc7c7ba652aa09efee5a1) )
 	ROM_LOAD16_BYTE( "ovtr10r.p1", 0x000000, 0x080000, CRC(2ae78420) SHA1(11877ff2c2fa7d9423b00e2b7ab72eaedd5ecb75) )
-	ROM_LOAD16_BYTE( "ovtr10s.p1", 0x000000, 0x080000, CRC(492d7256) SHA1(d0d8d7716dda58dbc4c2742989d65b9fd7aec874) )
 	ROM_LOAD16_BYTE( "ovtr10y.p1", 0x000000, 0x080000, CRC(5b8e61cf) SHA1(8f089f886ec2ca4bbcaec8ccc61471f059fe11ed) )
-	ROM_LOAD16_BYTE( "ovtr11.p2", 0x000000, 0x080000, CRC(738eaac3) SHA1(12353c1dbf7fb9e2832cc2175b39346fe51b64bb) )
+ROM_END
+
+
+ROM_START( m5overld11 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ovtr11s.p1", 0x000000, 0x080000, CRC(d90d0474) SHA1(f6264b9363b67c8d4f6ca187bf356f618b2d5b3d) )
+	ROM_LOAD16_BYTE( "ovtr11.p2", 0x000001, 0x080000, CRC(738eaac3) SHA1(12353c1dbf7fb9e2832cc2175b39346fe51b64bb) )
+	/* 3+4 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "ovtr11ad.p1", 0x000000, 0x080000, CRC(a8927c08) SHA1(27204136500686f05c9166832a5d01347acbe140) )
 	ROM_LOAD16_BYTE( "ovtr11b.p1", 0x000000, 0x080000, CRC(abd0f33c) SHA1(ddba1f5187310538d10fd23588d48ab8bf5e20db) )
 	ROM_LOAD16_BYTE( "ovtr11bd.p1", 0x000000, 0x080000, CRC(d184b0d6) SHA1(2f0fb7b3595190077bf71922d2e7efdefdb5fe8a) )
@@ -3674,7 +3934,6 @@ ROM_START( m5overld )
 	ROM_LOAD16_BYTE( "ovtr11dy.p1", 0x000000, 0x080000, CRC(4f4d0a62) SHA1(f533a1df6b27663a399a0a1815237c949316ddbc) )
 	ROM_LOAD16_BYTE( "ovtr11k.p1", 0x000000, 0x080000, CRC(82a19750) SHA1(4d77bf448615786a2a485d1d05d09a64effd9720) )
 	ROM_LOAD16_BYTE( "ovtr11r.p1", 0x000000, 0x080000, CRC(22da998e) SHA1(9c41846c0fd6756f97b6071b2a94ffaadbf843f5) )
-	ROM_LOAD16_BYTE( "ovtr11s.p1", 0x000000, 0x080000, CRC(d90d0474) SHA1(f6264b9363b67c8d4f6ca187bf356f618b2d5b3d) )
 	ROM_LOAD16_BYTE( "ovtr11y.p1", 0x000000, 0x080000, CRC(7eaa414b) SHA1(615aa48eeba17e9095dd45a6fcf3260fe63dac10) )
 ROM_END
 
@@ -3695,16 +3954,20 @@ ROM_START( m5ptyani )
 	ROM_LOAD16_BYTE( "pani03r.p1", 0x000000, 0x080000, CRC(88cd0a8f) SHA1(13f2edf275b8dc0e7a19c062267222bb6291f7c1) )
 	ROM_LOAD16_BYTE( "pani03s.p1", 0x000000, 0x080000, CRC(b9322dc1) SHA1(7611162717ab6e524cdc85657e84f705a6a6b11d) )
 	ROM_LOAD16_BYTE( "pani03y.p1", 0x000000, 0x080000, CRC(af5b4ac0) SHA1(a54d32092e7bebf8edcbc2accf20b35397faa9a8) )
-	ROM_LOAD16_BYTE( "patr01.p2", 0x000000, 0x080000, CRC(aacd9a52) SHA1(0bc676d9708148f02ae121185a5b4f6eae34f3d4) )
-	//ROM_LOAD16_BYTE( "patr01.p3", 0x000000, 0x080000, CRC(76eb81df) SHA1(6fd6376eedf74330aa2b019ad0044ce39210610a) )
-	//ROM_LOAD16_BYTE( "patr01.p4", 0x000000, 0x080000, CRC(64f081ec) SHA1(22fc6ea30bb503247fe108e645c197e0fc90063a) )
-	ROM_LOAD16_BYTE( "patr01d.p1", 0x000000, 0x080000, CRC(71085bfa) SHA1(87dd1334077da967796c1847e3010de1acc8c32f) )
-	ROM_LOAD16_BYTE( "patr01dy.p1", 0x000000, 0x080000, CRC(a9be6297) SHA1(b5d8b6e26d19a9af98665429d29bfcda7f3d4bfa) )
-	ROM_LOAD16_BYTE( "patr01s.p1", 0x000000, 0x080000, CRC(0ff04c56) SHA1(c670b36b01d3e344a113f2195811de5b90144e85) )
-	ROM_LOAD16_BYTE( "patr01y.p1", 0x000000, 0x080000, CRC(d746753b) SHA1(c01b30937dd4d32ce7a306dcd6a2eb58bae39034) )
 ROM_END
 
-
+ROM_START( m5ptyani01 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "patr01s.p1", 0x000000, 0x080000, CRC(0ff04c56) SHA1(c670b36b01d3e344a113f2195811de5b90144e85) )
+	ROM_LOAD16_BYTE( "patr01.p2", 0x000001, 0x080000, CRC(aacd9a52) SHA1(0bc676d9708148f02ae121185a5b4f6eae34f3d4) )
+	ROM_LOAD16_BYTE( "patr01.p3", 0x100000, 0x080000, CRC(76eb81df) SHA1(6fd6376eedf74330aa2b019ad0044ce39210610a) ) // == 03
+	ROM_LOAD16_BYTE( "patr01.p4", 0x100001, 0x080000, CRC(64f081ec) SHA1(22fc6ea30bb503247fe108e645c197e0fc90063a) ) // == 03
+	
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "patr01d.p1", 0x000000, 0x080000, CRC(71085bfa) SHA1(87dd1334077da967796c1847e3010de1acc8c32f) )
+	ROM_LOAD16_BYTE( "patr01dy.p1", 0x000000, 0x080000, CRC(a9be6297) SHA1(b5d8b6e26d19a9af98665429d29bfcda7f3d4bfa) )
+	ROM_LOAD16_BYTE( "patr01y.p1", 0x000000, 0x080000, CRC(d746753b) SHA1(c01b30937dd4d32ce7a306dcd6a2eb58bae39034) )
+ROM_END
 
 ROM_START( m5peepsh )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -3733,20 +3996,37 @@ ROM_START( m5piefac )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "pfa20h2.7d1", 0x000000, 0x080000, CRC(fcdb0cd6) SHA1(267511de78c917f835bebb7885aed6e32d29954b) )
-	ROM_LOAD16_BYTE( "pfa_sjs2.3_1", 0x000000, 0x080000, CRC(208b6374) SHA1(e86da312b5974ed8d2bd607366544bc928616d01) )
-	ROM_LOAD16_BYTE( "pfa_sjs2.3_2", 0x000000, 0x080000, CRC(1e3bfab1) SHA1(3faed74e454feb7892931ee7b5297d9a9e0eb1a9) )
-	ROM_LOAD16_BYTE( "pfa_sjs2.3_3", 0x000000, 0x080000, CRC(f377dfea) SHA1(cf287d37c1b2cf39d91aa7879505a7608f1f9f87) )
-	ROM_LOAD16_BYTE( "pfa_sjs2.3_4", 0x000000, 0x080000, CRC(e87ecff2) SHA1(a5c3200fd4171e45bd90580086f417ac807716d9) )
-	ROM_LOAD16_BYTE( "pfa_sjs2.3d1", 0x000000, 0x080000, CRC(46a29cd2) SHA1(e6896d7b96a8ef4b92d84b80bbc405629f1909aa) )
-	ROM_LOAD16_BYTE( "pfa_sjs2.3d2", 0x000000, 0x080000, CRC(1e3bfab1) SHA1(3faed74e454feb7892931ee7b5297d9a9e0eb1a9) )
 	ROM_LOAD16_BYTE( "pfasjh2.7d1", 0x000000, 0x080000, CRC(b00f044e) SHA1(933592ed5858c37ffa3362298c7f9e93dd52300c) )
 	ROM_LOAD16_BYTE( "pfasjk2.7_1", 0x000000, 0x080000, CRC(5e4c58c6) SHA1(f1b86d44389598a101d5149414a5c22838a308be) )
-	ROM_LOAD16_BYTE( "pfasjs1.2_1", 0x000000, 0x080000, CRC(5a8fa986) SHA1(19b0a4aa21926846af506b63945bf9e57c2a51e0) )
-	ROM_LOAD16_BYTE( "pfasjs1.2_2", 0x000000, 0x080000, CRC(f35723c4) SHA1(83654a2f591c0c337ab02d628a4e818d91474e07) )
 	ROM_LOAD16_BYTE( "pfasjs2.7_1", 0x000000, 0x080000, CRC(470e2ce5) SHA1(7a726eeeb7b2000e7e438f42bf7f81fac9cedec7) )
 	ROM_LOAD16_BYTE( "pfasjs2.7_2", 0x000000, 0x080000, CRC(260c96bb) SHA1(41d142b1ca00d62cf30a9048b50f9ef8f3a94323) )
 	ROM_LOAD16_BYTE( "pfasjs2.7d1", 0x000000, 0x080000, CRC(a94d706d) SHA1(a47bed0a1a1e7bbf4de91c578d7f350c43d4313b) )
-	ROM_LOAD( "p fac.p1", 0x0000, 0x080000, CRC(9fc9ca62) SHA1(c8b84c61877206ec1f78bb104b2d69f74f446a9d) )
+ROM_END
+
+ROM_START( m5piefac23 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "pfa_sjs2.3_1", 0x000000, 0x080000, CRC(208b6374) SHA1(e86da312b5974ed8d2bd607366544bc928616d01) )
+	ROM_LOAD16_BYTE( "pfa_sjs2.3_2", 0x000001, 0x080000, CRC(1e3bfab1) SHA1(3faed74e454feb7892931ee7b5297d9a9e0eb1a9) )
+	ROM_LOAD16_BYTE( "pfa_sjs2.3_3", 0x100000, 0x080000, CRC(f377dfea) SHA1(cf287d37c1b2cf39d91aa7879505a7608f1f9f87) )
+	ROM_LOAD16_BYTE( "pfa_sjs2.3_4", 0x100001, 0x080000, CRC(e87ecff2) SHA1(a5c3200fd4171e45bd90580086f417ac807716d9) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "pfa_sjs2.3d1", 0x000000, 0x080000, CRC(46a29cd2) SHA1(e6896d7b96a8ef4b92d84b80bbc405629f1909aa) )
+	ROM_LOAD16_BYTE( "pfa_sjs2.3d2", 0x000000, 0x080000, CRC(1e3bfab1) SHA1(3faed74e454feb7892931ee7b5297d9a9e0eb1a9) )
+ROM_END
+
+ROM_START( m5piefac12 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "pfasjs1.2_1", 0x000000, 0x080000, CRC(5a8fa986) SHA1(19b0a4aa21926846af506b63945bf9e57c2a51e0) )
+	ROM_LOAD16_BYTE( "pfasjs1.2_2", 0x000001, 0x080000, CRC(f35723c4) SHA1(83654a2f591c0c337ab02d628a4e818d91474e07) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5piefaca )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "p fac.p1", 0x0000, 0x080000, CRC(9fc9ca62) SHA1(c8b84c61877206ec1f78bb104b2d69f74f446a9d) )
+	ROM_LOAD16_BYTE( "p fac.p2", 0x0001, 0x080000, NO_DUMP )
+	/* 3+4 */
 ROM_END
 
 ROM_START( m5piefc2 )
@@ -3763,11 +4043,22 @@ ROM_START( m5piefc2 )
 	ROM_LOAD16_BYTE( "pf2sjk1.0_1", 0x000000, 0x080000, CRC(53d04513) SHA1(4c51023f30a18c5fccf928bd727cf46b055e6867) )
 	ROM_LOAD16_BYTE( "pf2sjl1.0d1", 0x000000, 0x080000, CRC(1b9ef9fa) SHA1(d4782d44f81f03821fb7e10ad77403a5c2c6f6dd) )
 	ROM_LOAD16_BYTE( "pf2sjs1.0d1", 0x000000, 0x080000, CRC(e135e5dc) SHA1(9578dda7d2b3c2101b744dd8b42513ad1e85b792) )
-	ROM_LOAD16_BYTE( "p fac2.p1",   0x000000, 0x080000, CRC(4182af62) SHA1(3db0e6f752f9d5195327fdeb859997a6e0da9c78) )
-	ROM_LOAD16_BYTE( "p fac2.p2",   0x000000, 0x080000, CRC(a77513c5) SHA1(0a11d73f50036293d5d03bced8633c30d80566ae) )
-	ROM_LOAD16_BYTE( "pie fac2.p1", 0x000000, 0x080000, CRC(fc802f6e) SHA1(6924f7e06653afee9a338f85d1403c1692f85a05) )
-	ROM_LOAD16_BYTE( "pie fac2.p2", 0x000000, 0x080000, CRC(287fe650) SHA1(51c78838bb7d3268cc91ff01e3b8eb531b6d6976) )
 ROM_END
+
+ROM_START( m5piefc2a )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "p fac2.p1",   0x000000, 0x080000, CRC(4182af62) SHA1(3db0e6f752f9d5195327fdeb859997a6e0da9c78) )
+	ROM_LOAD16_BYTE( "p fac2.p2",   0x000001, 0x080000, CRC(a77513c5) SHA1(0a11d73f50036293d5d03bced8633c30d80566ae) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5piefc2b )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "pie fac2.p1", 0x000000, 0x080000, CRC(fc802f6e) SHA1(6924f7e06653afee9a338f85d1403c1692f85a05) )
+	ROM_LOAD16_BYTE( "pie fac2.p2", 0x000001, 0x080000, CRC(287fe650) SHA1(51c78838bb7d3268cc91ff01e3b8eb531b6d6976) )
+	/* 3+4 */
+ROM_END
+
 
 ROM_START( m5piefcr )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -3776,9 +4067,7 @@ ROM_START( m5piefcr )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "pfrsjbd2.0_1", 0x000000, 0x080000, CRC(ba1b45c9) SHA1(fffed1b6c8702baf7f6726b2fef8741b22b69342) )
-	//ROM_LOAD16_BYTE( "pfrsjbd2.0_2", 0x000000, 0x080000, CRC(0fc2503e) SHA1(5a18b699159f6c98c692be0123b4d4d4aaadedde) )
 	ROM_LOAD16_BYTE( "pfrsjbg2.0_1", 0x000000, 0x080000, CRC(b43f188c) SHA1(22a9f32dfcd753911bbc3b112d51deeb4be9c49a) )
-	//ROM_LOAD16_BYTE( "pfrsjbg2.0_2", 0x000000, 0x080000, CRC(0fc2503e) SHA1(5a18b699159f6c98c692be0123b4d4d4aaadedde) )
 ROM_END
 
 
@@ -3800,9 +4089,16 @@ ROM_START( m5qshot )
 	ROM_LOAD16_BYTE( "qstr02r.p1", 0x000000, 0x080000, CRC(36d69b6a) SHA1(6dc043520c0096320d95832ac18f66d9e871874b) )
 	ROM_LOAD16_BYTE( "qstr02s.p1", 0x000000, 0x080000, CRC(a0379286) SHA1(fc47fbabea1ac0529d90947328703682cb0ed508) )
 	ROM_LOAD16_BYTE( "qstr02y.p1", 0x000000, 0x080000, CRC(deca0922) SHA1(35c28f9a705bf9e9494a2c33812cd11942cae17f) )
-	ROM_LOAD16_BYTE( "quac04.p2", 0x000000, 0x080000, CRC(f03d404a) SHA1(6ee348eecded01fe6da5ff6e84d9c0a9473cd363) )
-	ROM_LOAD16_BYTE( "quac04.p3", 0x000000, 0x080000, CRC(a76440d1) SHA1(24121278713ac7462a704c17919f54e02c4ef65e) )
-	ROM_LOAD16_BYTE( "quac04.p4", 0x000000, 0x080000, CRC(31a978ee) SHA1(47019625bce45d4c706bb9d53f41138c1f92a960) )
+ROM_END
+
+ROM_START( m5qshot04 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "quac04s.p1", 0x000000, 0x080000, CRC(6aba0288) SHA1(c7970330c326a58cb96f632052a09c34ad066786) )
+	ROM_LOAD16_BYTE( "quac04.p2", 0x000001, 0x080000, CRC(f03d404a) SHA1(6ee348eecded01fe6da5ff6e84d9c0a9473cd363) )
+	ROM_LOAD16_BYTE( "quac04.p3", 0x100000, 0x080000, CRC(a76440d1) SHA1(24121278713ac7462a704c17919f54e02c4ef65e) )
+	ROM_LOAD16_BYTE( "quac04.p4", 0x100001, 0x080000, CRC(31a978ee) SHA1(47019625bce45d4c706bb9d53f41138c1f92a960) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "quac04ad.p1", 0x000000, 0x080000, CRC(68cd7556) SHA1(23fa9af40cbad627664779743c87d712886924d8) )
 	ROM_LOAD16_BYTE( "quac04b.p1", 0x000000, 0x080000, CRC(e28f3def) SHA1(4d7cad57f5eada5d2c10539533754aab87e08e29) )
 	ROM_LOAD16_BYTE( "quac04bd.p1", 0x000000, 0x080000, CRC(3fd43dd5) SHA1(804ceccaecd2cce6e2a446edb80ea402d9892f19) )
@@ -3811,9 +4107,9 @@ ROM_START( m5qshot )
 	ROM_LOAD16_BYTE( "quac04h.p1", 0x000000, 0x080000, CRC(f1397c21) SHA1(c6ddc11e9df1093a5fe5e15dd3d3b4900ef249ec) )
 	ROM_LOAD16_BYTE( "quac04k.p1", 0x000000, 0x080000, CRC(58664d66) SHA1(0d0908730a728689e581778c1071e1ebdff816a8) )
 	ROM_LOAD16_BYTE( "quac04r.p1", 0x000000, 0x080000, CRC(4a2febe8) SHA1(c5ed21f47c34ba79a32923467bf57fca3173ee27) )
-	ROM_LOAD16_BYTE( "quac04s.p1", 0x000000, 0x080000, CRC(6aba0288) SHA1(c7970330c326a58cb96f632052a09c34ad066786) )
 	ROM_LOAD16_BYTE( "quac04y.p1", 0x000000, 0x080000, CRC(1c7f751c) SHA1(b8f9b47a710b73fae5e44640fa52111c5fffae10) )
 ROM_END
+
 
 ROM_START( m5qdraw )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -3823,20 +4119,45 @@ ROM_START( m5qdraw )
 	ROM_LOAD16_BYTE( "qdr_sjs1.3_4", 0x100001, 0x080000, CRC(28faa2a7) SHA1(debfa564e89c516a3c1de60dcdbfc26744797238) )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "qdr_sjs1.2_1", 0x000000, 0x080000, CRC(65cdc371) SHA1(e3d2de755ceb8e6144f316b49e5117d9c5e71e2e) )
-	ROM_LOAD16_BYTE( "qdr_sjs1.2_2", 0x000000, 0x080000, CRC(661b6d33) SHA1(0ec2a2efc7ba28c7b1c40c471f2dda46b278f6ed) )
 	ROM_LOAD16_BYTE( "qdr_sjs1.3d1", 0x000000, 0x080000, CRC(f6a68804) SHA1(cce19e59e477fa9ee01636840030d1e2ad6e6d5b) )
-	//ROM_LOAD16_BYTE( "qdr_sjs1.3d2", 0x000000, 0x080000, CRC(0801be78) SHA1(d32e849d0ecf69c688dd85fffc55eacc907da998) )
-	ROM_LOAD16_BYTE( "qdr_sjs1.4_1", 0x000000, 0x080000, CRC(59d1cf89) SHA1(d4e6b66589f6ac3ae99c4ac8a4fceafd1b3a9041) )
-	ROM_LOAD16_BYTE( "qdr_sjs1.4_2", 0x000000, 0x080000, CRC(400099b2) SHA1(29fc0066393e28c949d513e972b7bd906151096d) )
-	ROM_LOAD16_BYTE( "qdr_sjs1.5_1", 0x000000, 0x080000, CRC(4b67abc5) SHA1(5c8453b7abb16f2f19c2340748ef87a2966868d8) )
-	ROM_LOAD16_BYTE( "qdr_sjs1.5_2", 0x000000, 0x080000, CRC(a0d0a773) SHA1(5c2f4511b086dbf3376d5ae0d332bd0ee66d3db1) )
-
-	ROM_LOAD16_BYTE( "q_draw_pound8.p1", 0x0000, 0x080000, CRC(e093cb39) SHA1(d1de5249ee72c3ef589c08b712a2bf12b5d77785) )
-	ROM_LOAD16_BYTE( "q_draw_pound8.p2", 0x0000, 0x080000, CRC(42fad134) SHA1(79d51b4fc3196b7c24ea2ce8bc4b4d3ef0326aa8) )
-	ROM_LOAD16_BYTE( "q_draw.p1", 0x0000, 0x080000, CRC(4647847f) SHA1(da84faf9f98a29e36e1fcb2236c1e294fee91ed7) )
-	ROM_LOAD16_BYTE( "q_draw.p2", 0x0000, 0x080000, CRC(61747051) SHA1(9f556913b70cb5113e81bf112215e14b4a199a14) )
 ROM_END
+
+ROM_START( m5qdraw12 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "qdr_sjs1.2_1", 0x000000, 0x080000, CRC(65cdc371) SHA1(e3d2de755ceb8e6144f316b49e5117d9c5e71e2e) )
+	ROM_LOAD16_BYTE( "qdr_sjs1.2_2", 0x000001, 0x080000, CRC(661b6d33) SHA1(0ec2a2efc7ba28c7b1c40c471f2dda46b278f6ed) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5qdraw14 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "qdr_sjs1.4_1", 0x000000, 0x080000, CRC(59d1cf89) SHA1(d4e6b66589f6ac3ae99c4ac8a4fceafd1b3a9041) )
+	ROM_LOAD16_BYTE( "qdr_sjs1.4_2", 0x000001, 0x080000, CRC(400099b2) SHA1(29fc0066393e28c949d513e972b7bd906151096d) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5qdraw15 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "qdr_sjs1.5_1", 0x000000, 0x080000, CRC(4b67abc5) SHA1(5c8453b7abb16f2f19c2340748ef87a2966868d8) )
+	ROM_LOAD16_BYTE( "qdr_sjs1.5_2", 0x000001, 0x080000, CRC(a0d0a773) SHA1(5c2f4511b086dbf3376d5ae0d332bd0ee66d3db1) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5qdrawa )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "q_draw_pound8.p1", 0x0000, 0x080000, CRC(e093cb39) SHA1(d1de5249ee72c3ef589c08b712a2bf12b5d77785) )
+	ROM_LOAD16_BYTE( "q_draw_pound8.p2", 0x0001, 0x080000, CRC(42fad134) SHA1(79d51b4fc3196b7c24ea2ce8bc4b4d3ef0326aa8) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5qdrawb )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "q_draw.p1", 0x0000, 0x080000, CRC(4647847f) SHA1(da84faf9f98a29e36e1fcb2236c1e294fee91ed7) )
+	ROM_LOAD16_BYTE( "q_draw.p2", 0x0001, 0x080000, CRC(61747051) SHA1(9f556913b70cb5113e81bf112215e14b4a199a14) )
+	/* 3+4 */
+ROM_END
+
+
 
 ROM_START( m5rainrn )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -3850,6 +4171,20 @@ ROM_START( m5rainrn )
 	ROM_LOAD16_BYTE( "rar11d.p1", 0x000000, 0x080000, CRC(bb6f9166) SHA1(64329c7c6b6398eb5efa91e18c3bf69a79b19e8f) )
 	ROM_LOAD16_BYTE( "rar11k.p1", 0x000000, 0x080000, CRC(19455086) SHA1(5cb1a6ebcaa03d021fe043a7f963da2151e4a022) )
 ROM_END
+
+
+ROM_START( m5rainrna )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rar12s.p1", 0x000000, 0x080000, CRC(643f1f75) SHA1(3662f61c1ff24e469dcd44099b0358d65b2e55ec) )
+	ROM_LOAD16_BYTE( "rar12s.p2", 0x000001, 0x080000, CRC(5448175c) SHA1(ca5217dcbf9c25f9fe09899feb9d1707a2fca63b) )
+	/* 3+4 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "rar12a.p1", 0x000000, 0x080000, CRC(1fb2c658) SHA1(d0f7270023adfcbea747489375425c93e02632cb) )
+	ROM_LOAD16_BYTE( "rar12d.p1", 0x000000, 0x080000, CRC(e2d74f79) SHA1(3b1bd26555c48beb744d8f7db57d4cf8f613dee0) )
+	ROM_LOAD16_BYTE( "rar12k.p1", 0x000000, 0x080000, CRC(40fd8e99) SHA1(e5b80705d0ceea85b09384a4af1f286ab96a1595) )
+ROM_END
+
 
 ROM_START( m5ramrd )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -3879,20 +4214,31 @@ ROM_START( m5rampg )
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "ram10d.p1", 0x000000, 0x080000, CRC(fdd7a3e2) SHA1(5a60ea931272fc3c9d940a12acf4ab62dbf567a1) )
 	ROM_LOAD16_BYTE( "ram10k.p1", 0x000000, 0x080000, CRC(5ffd6202) SHA1(27f7cdcdb4e6688ddcd01cd4acb07a2f59909069) )
-	ROM_LOAD16_BYTE( "ram11d.p1", 0x000000, 0x080000, CRC(eb0df245) SHA1(0e33abdba5327c0759181aebb4cf3a2abe443f0c) )
-	ROM_LOAD16_BYTE( "ram11k.p1", 0x000000, 0x080000, CRC(492733a5) SHA1(8df4c05cd962b73f368f99770350233f12aedfc5) )
-	ROM_LOAD16_BYTE( "ram11s.p1", 0x000000, 0x080000, CRC(6de5a249) SHA1(066e22e4c952aad2e0cf1662abf9717c7d566fc7) )
-	ROM_LOAD16_BYTE( "ram11s.p2", 0x000000, 0x080000, CRC(7d767a18) SHA1(edfdb4f9106755206b9793a3d915f78ec528dac2) )
-	//ROM_LOAD16_BYTE( "ram11s.p3", 0x000000, 0x080000, CRC(7f6506f3) SHA1(cdddd27e4a08c2096615fdda139eecb9f0f7b9c9) )
-	//ROM_LOAD16_BYTE( "ram11s.p4", 0x000000, 0x080000, CRC(6c064d79) SHA1(636e76daf22d1b879a71a6fb53a42e0d6e72fa02) )
-	ROM_LOAD16_BYTE( "ram12d.p1", 0x000000, 0x080000, CRC(9f7befff) SHA1(0d95e21fc751ffcb671c49cfe48ab7f79d9a1f92) )
-	ROM_LOAD16_BYTE( "ram12k.p1", 0x000000, 0x080000, CRC(3d512e1f) SHA1(f441f7b01882497b7334abf91aefb2cd218ba440) )
-	ROM_LOAD16_BYTE( "ram12s.p1", 0x000000, 0x080000, CRC(1993bff3) SHA1(914fe7dc038fa16bff9dc01fb1eaca6fe8247427) )
-	ROM_LOAD16_BYTE( "ram12s.p2", 0x000000, 0x080000, CRC(fa643375) SHA1(c360f28c4c268e674e12fc4c82ef82c3861bcfc6) )
-	//ROM_LOAD16_BYTE( "ram12s.p3", 0x000000, 0x080000, CRC(7f6506f3) SHA1(cdddd27e4a08c2096615fdda139eecb9f0f7b9c9) )
-	//ROM_LOAD16_BYTE( "ram12s.p4", 0x000000, 0x080000, CRC(6c064d79) SHA1(636e76daf22d1b879a71a6fb53a42e0d6e72fa02) )
 ROM_END
 
+ROM_START( m5rampg11 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ram11s.p1", 0x000000, 0x080000, CRC(6de5a249) SHA1(066e22e4c952aad2e0cf1662abf9717c7d566fc7) )
+	ROM_LOAD16_BYTE( "ram11s.p2", 0x000001, 0x080000, CRC(7d767a18) SHA1(edfdb4f9106755206b9793a3d915f78ec528dac2) )
+	ROM_LOAD16_BYTE( "ram11s.p3", 0x100000, 0x080000, CRC(7f6506f3) SHA1(cdddd27e4a08c2096615fdda139eecb9f0f7b9c9) ) // == 10
+	ROM_LOAD16_BYTE( "ram11s.p4", 0x100001, 0x080000, CRC(6c064d79) SHA1(636e76daf22d1b879a71a6fb53a42e0d6e72fa02) ) // == 10
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "ram11d.p1", 0x000000, 0x080000, CRC(eb0df245) SHA1(0e33abdba5327c0759181aebb4cf3a2abe443f0c) )
+	ROM_LOAD16_BYTE( "ram11k.p1", 0x000000, 0x080000, CRC(492733a5) SHA1(8df4c05cd962b73f368f99770350233f12aedfc5) )
+ROM_END
+
+ROM_START( m5rampg12 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ram12s.p1", 0x000000, 0x080000, CRC(1993bff3) SHA1(914fe7dc038fa16bff9dc01fb1eaca6fe8247427) )
+	ROM_LOAD16_BYTE( "ram12s.p2", 0x000001, 0x080000, CRC(fa643375) SHA1(c360f28c4c268e674e12fc4c82ef82c3861bcfc6) )
+	ROM_LOAD16_BYTE( "ram12s.p3", 0x100000, 0x080000, CRC(7f6506f3) SHA1(cdddd27e4a08c2096615fdda139eecb9f0f7b9c9) ) // == 10
+	ROM_LOAD16_BYTE( "ram12s.p4", 0x100001, 0x080000, CRC(6c064d79) SHA1(636e76daf22d1b879a71a6fb53a42e0d6e72fa02) ) // == 10
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "ram12d.p1", 0x000000, 0x080000, CRC(9f7befff) SHA1(0d95e21fc751ffcb671c49cfe48ab7f79d9a1f92) )
+	ROM_LOAD16_BYTE( "ram12k.p1", 0x000000, 0x080000, CRC(3d512e1f) SHA1(f441f7b01882497b7334abf91aefb2cd218ba440) )
+ROM_END
 
 ROM_START( m5ratpk )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -3900,11 +4246,13 @@ ROM_START( m5ratpk )
 	ROM_LOAD16_BYTE( "rpa_11l.p2", 0x000001, 0x080000, CRC(1a42be5f) SHA1(8917d7d9640d33bb6d017aee10df72bc9d3bf94a) )
 	ROM_LOAD16_BYTE( "rpa_11l.p3", 0x100000, 0x080000, CRC(80b1ff60) SHA1(d076bfb0aa1fdf98b9cffde2778e2d29477628bf) )
 	ROM_LOAD16_BYTE( "rpa_11l.p4", 0x100001, 0x080000, CRC(b590ac98) SHA1(342d5d930826b882a607088fd5e87949a0e0509a) )
+ROM_END
 
-	ROM_REGION( 0x400000, "altrevs", 0 )
-	ROM_LOAD( "rat pack.p1", 0x0000, 0x080000, CRC(1f35dd38) SHA1(2767b168957b6c6eb906137a3d3f19b45f351ada) )
-	ROM_LOAD( "ratpack.p2", 0x0000, 0x080000, CRC(b038b966) SHA1(b272f741ac3bc0e9c65829246ea28b2384b5f7c0) )
-
+ROM_START( m5ratpka )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rat pack.p1", 0x0000, 0x080000, CRC(1f35dd38) SHA1(2767b168957b6c6eb906137a3d3f19b45f351ada) )
+	ROM_LOAD16_BYTE( "ratpack.p2",  0x0001, 0x080000, CRC(b038b966) SHA1(b272f741ac3bc0e9c65829246ea28b2384b5f7c0) )
+	/* 3+4 */
 ROM_END
 
 
@@ -3919,21 +4267,34 @@ ROM_START( m5razdz )
 	ROM_LOAD16_BYTE( "razd0_1f.p1", 0x000000, 0x080000, CRC(670bcb60) SHA1(c583b0bf9bee9d7f80358cb00e8f87a9ab496fbd) )
 	ROM_LOAD16_BYTE( "razd0_1s.p1", 0x000000, 0x080000, CRC(3f4ada4c) SHA1(d9aa2c9ea921a922cbcc7154888527b29852fb2e) )
 	ROM_LOAD16_BYTE( "razd0_1z.p1", 0x000000, 0x080000, CRC(125de68d) SHA1(61b34737a1be840e66d9dd9424ead2d6f10cd804) )
+ROM_END
+
+
+ROM_START( m5razdz10 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "razd10s.p1", 0x000000, 0x080000, CRC(73e1c88f) SHA1(eba35b684c49f57cf9d187fe7f45afc9cb42b579) )
-	ROM_LOAD16_BYTE( "razd11.p2", 0x000000, 0x080000, CRC(18d92ffe) SHA1(2255db0988579cba11a67de33d84a5d4a2dc1ec2) )
-	//ROM_LOAD16_BYTE( "razd11.p3", 0x000000, 0x080000, CRC(797b287c) SHA1(6ba19a64012a11d1fbc419ca19de3f10f23c2fba) )
-	//ROM_LOAD16_BYTE( "razd11.p4", 0x000000, 0x080000, CRC(4ea310f5) SHA1(a551eaa7ec60357467f2f064c2532c8e2e3ee847) )
-	ROM_LOAD16_BYTE( "razd11d.p1", 0x000000, 0x080000, CRC(94b4738c) SHA1(68b5f8cfeec7ae5ce0fc7c1ed01a20fa665a722d) )
-	ROM_LOAD16_BYTE( "razd11dz.p1", 0x000000, 0x080000, CRC(a3eae895) SHA1(7bc1144ab90a87186b93d9a627a20d199783f378) )
-	ROM_LOAD16_BYTE( "razd11f.p1", 0x000000, 0x080000, CRC(835bc34c) SHA1(a87c734b43ba00ba908abf13eb9cc00e151c65f7) )
-	ROM_LOAD16_BYTE( "razd11s.p1", 0x000000, 0x080000, CRC(24ff1d6f) SHA1(5e48bce3531077a91523e1b1a0f33f20f127bcc3) )
-	ROM_LOAD16_BYTE( "razd11z.p1", 0x000000, 0x080000, CRC(edb2fb16) SHA1(57f33a7df1c76991d42cd24079e007b2f923f6b8) )
-	ROM_LOAD16_BYTE( "razd1_0.p2", 0x000000, 0x080000, CRC(261a6659) SHA1(d35eb70a75d3b42e6a88572ed9066e7463ba3da4) )
-	//ROM_LOAD16_BYTE( "razd1_0.p3", 0x000000, 0x080000, CRC(797b287c) SHA1(6ba19a64012a11d1fbc419ca19de3f10f23c2fba) )
-	//ROM_LOAD16_BYTE( "razd1_0.p4", 0x000000, 0x080000, CRC(4ea310f5) SHA1(a551eaa7ec60357467f2f064c2532c8e2e3ee847) )
+	ROM_LOAD16_BYTE( "razd1_0.p2", 0x000001, 0x080000, CRC(261a6659) SHA1(d35eb70a75d3b42e6a88572ed9066e7463ba3da4) )
+	ROM_LOAD16_BYTE( "razd1_0.p3", 0x100000, 0x080000, CRC(797b287c) SHA1(6ba19a64012a11d1fbc419ca19de3f10f23c2fba) ) // == 01
+	ROM_LOAD16_BYTE( "razd1_0.p4", 0x100001, 0x080000, CRC(4ea310f5) SHA1(a551eaa7ec60357467f2f064c2532c8e2e3ee847) ) // == 01
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "razd1_0d.p1", 0x000000, 0x080000, CRC(a1a8f5c8) SHA1(ebb7335014f159086c09f0613a2ee4cf44973085) )
 	ROM_LOAD16_BYTE( "razd1_0f.p1", 0x000000, 0x080000, CRC(8c50c7e1) SHA1(3108eff77132ac4f3afbc1bc28e60fa5ac850112) )
 	ROM_LOAD16_BYTE( "razd1_0z.p1", 0x000000, 0x080000, CRC(96079b30) SHA1(00c7b73c950545e33f237508cd9489159904150e) )
+ROM_END
+
+ROM_START( m5razdz11 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "razd11s.p1", 0x000000, 0x080000, CRC(24ff1d6f) SHA1(5e48bce3531077a91523e1b1a0f33f20f127bcc3) )
+	ROM_LOAD16_BYTE( "razd11.p2", 0x000001, 0x080000, CRC(18d92ffe) SHA1(2255db0988579cba11a67de33d84a5d4a2dc1ec2) )
+	ROM_LOAD16_BYTE( "razd11.p3", 0x100000, 0x080000, CRC(797b287c) SHA1(6ba19a64012a11d1fbc419ca19de3f10f23c2fba) ) // == 01
+	ROM_LOAD16_BYTE( "razd11.p4", 0x100001, 0x080000, CRC(4ea310f5) SHA1(a551eaa7ec60357467f2f064c2532c8e2e3ee847) ) // == 01
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "razd11d.p1", 0x000000, 0x080000, CRC(94b4738c) SHA1(68b5f8cfeec7ae5ce0fc7c1ed01a20fa665a722d) )
+	ROM_LOAD16_BYTE( "razd11dz.p1", 0x000000, 0x080000, CRC(a3eae895) SHA1(7bc1144ab90a87186b93d9a627a20d199783f378) )
+	ROM_LOAD16_BYTE( "razd11f.p1", 0x000000, 0x080000, CRC(835bc34c) SHA1(a87c734b43ba00ba908abf13eb9cc00e151c65f7) )
+	ROM_LOAD16_BYTE( "razd11z.p1", 0x000000, 0x080000, CRC(edb2fb16) SHA1(57f33a7df1c76991d42cd24079e007b2f923f6b8) )
 ROM_END
 
 
@@ -3954,9 +4315,16 @@ ROM_START( m5redrck )
 	ROM_LOAD16_BYTE( "rtro03r.p1", 0x000000, 0x080000, CRC(61c44f77) SHA1(30957a46198bab6b57319f720f549f4c5120eaa1) )
 	ROM_LOAD16_BYTE( "rtro03s.p1", 0x000000, 0x080000, CRC(2ed29353) SHA1(3b4e7a85a0f45167f115e24511b443532926bb3b) )
 	ROM_LOAD16_BYTE( "rtro03y.p1", 0x000000, 0x080000, CRC(ebc87446) SHA1(7193718c21fc73d76665941e1d58fe0c98eb0daa) )
-	ROM_LOAD16_BYTE( "rttr10.p2", 0x000000, 0x080000, CRC(38066b10) SHA1(116b8dac97ed2060243e78ed94bc121076c66dfe) )
-	//ROM_LOAD16_BYTE( "rttr10.p3", 0x000000, 0x080000, CRC(9519dc05) SHA1(32c46c95ccedb99f1e517242bc89249020fbd66c) )
-	//ROM_LOAD16_BYTE( "rttr10.p4", 0x000000, 0x080000, CRC(5af465d8) SHA1(e484e495a4fe92ab6ccdfc3069ce528293d4f277) )
+ROM_END
+
+ROM_START( m5redrck10 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rttr10s.p1", 0x000000, 0x080000, CRC(60229f1d) SHA1(653d6f11bf1a5665a203137a8129e03632bee22b) )
+	ROM_LOAD16_BYTE( "rttr10.p2", 0x000001, 0x080000, CRC(38066b10) SHA1(116b8dac97ed2060243e78ed94bc121076c66dfe) )
+	ROM_LOAD16_BYTE( "rttr10.p3", 0x100000, 0x080000, CRC(9519dc05) SHA1(32c46c95ccedb99f1e517242bc89249020fbd66c) )
+	ROM_LOAD16_BYTE( "rttr10.p4", 0x100001, 0x080000, CRC(5af465d8) SHA1(e484e495a4fe92ab6ccdfc3069ce528293d4f277) )
+	
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "rttr10ad.p1", 0x000000, 0x080000, CRC(28ebaa1a) SHA1(5f93efc9b089680cfcf854f9ce91a7fabcd0646c) )
 	ROM_LOAD16_BYTE( "rttr10b.p1", 0x000000, 0x080000, CRC(05e3597f) SHA1(fe5b6f71f1dc84be90ed4c687c0f07bed7ab9fce) )
 	ROM_LOAD16_BYTE( "rttr10bd.p1", 0x000000, 0x080000, CRC(03117f03) SHA1(e92491e25df2744b5c6de06acf4f4144d9b481a7) )
@@ -3964,11 +4332,14 @@ ROM_START( m5redrck )
 	ROM_LOAD16_BYTE( "rttr10dy.p1", 0x000000, 0x080000, CRC(58f38053) SHA1(3edbf81c1c402b14f1055947b862c5d7eb962631) )
 	ROM_LOAD16_BYTE( "rttr10k.p1", 0x000000, 0x080000, CRC(e775d2ab) SHA1(074601f7f13db908bed2e42f4c7e4940b062767c) )
 	ROM_LOAD16_BYTE( "rttr10r.p1", 0x000000, 0x080000, CRC(b314837b) SHA1(f3c2e607cfc4c8056915771f4d67a6c990f29aa0) )
-	ROM_LOAD16_BYTE( "rttr10s.p1", 0x000000, 0x080000, CRC(60229f1d) SHA1(653d6f11bf1a5665a203137a8129e03632bee22b) )
 	ROM_LOAD16_BYTE( "rttr10y.p1", 0x000000, 0x080000, CRC(ce187484) SHA1(bce0c86418efd7f15ef75c5d73e95ed1b10ac458) )
+ROM_END
 
-	ROM_LOAD16_BYTE( "r_trock.p1", 0x0000, 0x080000, CRC(ba0b2f5d) SHA1(e4ac11da00f5c0b2b2a3bc68d429870039583036) )
-
+ROM_START( m5redrcka )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "r_trock.p1", 0x00000, 0x080000, CRC(ba0b2f5d) SHA1(e4ac11da00f5c0b2b2a3bc68d429870039583036) ) // don't know what this pairs with
+	ROM_LOAD16_BYTE( "r_trock.p2", 0x00001, 0x080000, NO_DUMP )
+	/* 3+4 */
 ROM_END
 
 
@@ -4018,8 +4389,13 @@ ROM_START( m5rhrg )
 	ROM_LOAD16_BYTE( "grhr08r.p1", 0x000000, 0x080000, CRC(9522d0e1) SHA1(f082d665c35a10d713de802d8648fde8f210c31e) )
 	ROM_LOAD16_BYTE( "grhr08s.p1", 0x000000, 0x080000, CRC(ab11f041) SHA1(ca901f3d738c18bf3f412e4141198d0b3e39b855) )
 	ROM_LOAD16_BYTE( "grhr08y.p1", 0x000000, 0x080000, CRC(896484cf) SHA1(53fc51848ff3816a9bb3c4197cdd450e7c9273ea) )
-	ROM_LOAD16_BYTE( "rhr_gold.p1", 0x0000, 0x080000, CRC(2ddaedaa) SHA1(0a96d0faffec393bf3d719829a33f0efb98f393d) )
-	ROM_LOAD16_BYTE( "rhr_gold.p2", 0x0000, 0x080000, CRC(b90b0f08) SHA1(2b83ed20fd229fb32da68bc04af14216335fb1cb) )
+ROM_END
+
+ROM_START( m5rhrga )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rhr_gold.p1", 0x00000, 0x080000, CRC(2ddaedaa) SHA1(0a96d0faffec393bf3d719829a33f0efb98f393d) )
+	ROM_LOAD16_BYTE( "rhr_gold.p2", 0x00001, 0x080000, CRC(b90b0f08) SHA1(2b83ed20fd229fb32da68bc04af14216335fb1cb) )
+	/* 3+4 */
 ROM_END
 
 
@@ -4031,12 +4407,24 @@ ROM_START( m5rhrgt )
 	ROM_LOAD16_BYTE( "rhrt13.p4", 0x100001, 0x080000, CRC(eb880b1f) SHA1(65402cd0a5cdc95e5c3a7be2f100e1e19eb45152) )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "rhrb02.p1", 0x000000, 0x080000, CRC(eca8267f) SHA1(f503b98c2b6000128c8a32b097e69316922263ca) )
-	ROM_LOAD16_BYTE( "rhrb02.p2", 0x000000, 0x080000, CRC(4966f2fc) SHA1(2e334a344ddf0779d2d663f13560c17befd5888a) )
+
+	ROM_LOAD16_BYTE( "rhrt13b.p1", 0x000000, 0x080000, CRC(a13b98b6) SHA1(908667963b144be7f8c1a2f3fe56bfb01dc50546) )
+	ROM_LOAD16_BYTE( "rhrt13bd.p1", 0x000000, 0x080000, CRC(2fecaf4d) SHA1(f5817e81c407c03a207e76671f0dab8185ee7316) )
+	ROM_LOAD16_BYTE( "rhrt13d.p1", 0x000000, 0x080000, CRC(5b1e28f1) SHA1(143ccab26b2b0f65f7d45041dcf8f3600bc0f4f6) )
+	ROM_LOAD16_BYTE( "rhrt13dy.p1", 0x000000, 0x080000, CRC(2ef881d1) SHA1(0b876e09257dbb26460cca4a3b6137eca46618aa) )
+	ROM_LOAD16_BYTE( "rhrt13k.p1", 0x000000, 0x080000, CRC(bff8c28a) SHA1(ff43032c7943ab39acde84fe5deb5c2e82b8c85f) )
+	ROM_LOAD16_BYTE( "rhrt13r.p1", 0x000000, 0x080000, CRC(5cc0bb5a) SHA1(611ea18816046d385ab3b7bf37c7be9f672f7d32) )
+	ROM_LOAD16_BYTE( "rhrt13s.p1", 0x000000, 0x080000, CRC(7755253c) SHA1(d3a35796c5bfb5523ca73fd4cdd1462695cb10c9) )
+ROM_END
+
+ROM_START( m5rhrgt12 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rhrt12.p1", 0x000000, 0x080000, CRC(c0a03387) SHA1(e6613ad6a969276566d6d408d49f7cd88bde6f0c) )
-	ROM_LOAD16_BYTE( "rhrt12.p2", 0x000000, 0x080000, CRC(9a9a9c45) SHA1(2b178bbc57a1dd8bf347002f9deb7f1690e89423) )
-	//ROM_LOAD16_BYTE( "rhrt12.p3", 0x000000, 0x080000, CRC(77a16da8) SHA1(1598e547b39d4fe58e8f05aea5f949d2b0a9678d) )
-	//ROM_LOAD16_BYTE( "rhrt12.p4", 0x000000, 0x080000, CRC(eb880b1f) SHA1(65402cd0a5cdc95e5c3a7be2f100e1e19eb45152) )
+	ROM_LOAD16_BYTE( "rhrt12.p2", 0x000001, 0x080000, CRC(9a9a9c45) SHA1(2b178bbc57a1dd8bf347002f9deb7f1690e89423) )
+	ROM_LOAD16_BYTE( "rhrt12.p3", 0x100000, 0x080000, CRC(77a16da8) SHA1(1598e547b39d4fe58e8f05aea5f949d2b0a9678d) ) // == 13
+	ROM_LOAD16_BYTE( "rhrt12.p4", 0x100001, 0x080000, CRC(eb880b1f) SHA1(65402cd0a5cdc95e5c3a7be2f100e1e19eb45152) ) // == 13
+	
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "rhrt12ad.p1", 0x000000, 0x080000, CRC(65d6d9dd) SHA1(d53278b0b5e8b3bcab8bc9da008b016e1b3a2dfa) )
 	ROM_LOAD16_BYTE( "rhrt12b.p1", 0x000000, 0x080000, CRC(7643fca7) SHA1(03916131ce827e2b903644b1857c20dc8af6dc20) )
 	ROM_LOAD16_BYTE( "rhrt12bd.p1", 0x000000, 0x080000, CRC(433a5db5) SHA1(dafbbd7c3eb694ecad346d52f9b43283ca261e61) )
@@ -4046,14 +4434,15 @@ ROM_START( m5rhrgt )
 	ROM_LOAD16_BYTE( "rhrt12r.p1", 0x000000, 0x080000, CRC(19e13c56) SHA1(435dd10d46ba2561d4c90bf83666f2740e88efa0) )
 	ROM_LOAD16_BYTE( "rhrt12s.p1", 0x000000, 0x080000, CRC(c0a03387) SHA1(e6613ad6a969276566d6d408d49f7cd88bde6f0c) )
 	ROM_LOAD16_BYTE( "rhrt12y.p1", 0x000000, 0x080000, CRC(cb2a1b90) SHA1(4a633db25be468336bc61bcf272571ab587eac00) )
-	ROM_LOAD16_BYTE( "rhrt13b.p1", 0x000000, 0x080000, CRC(a13b98b6) SHA1(908667963b144be7f8c1a2f3fe56bfb01dc50546) )
-	ROM_LOAD16_BYTE( "rhrt13bd.p1", 0x000000, 0x080000, CRC(2fecaf4d) SHA1(f5817e81c407c03a207e76671f0dab8185ee7316) )
-	ROM_LOAD16_BYTE( "rhrt13d.p1", 0x000000, 0x080000, CRC(5b1e28f1) SHA1(143ccab26b2b0f65f7d45041dcf8f3600bc0f4f6) )
-	ROM_LOAD16_BYTE( "rhrt13dy.p1", 0x000000, 0x080000, CRC(2ef881d1) SHA1(0b876e09257dbb26460cca4a3b6137eca46618aa) )
-	ROM_LOAD16_BYTE( "rhrt13k.p1", 0x000000, 0x080000, CRC(bff8c28a) SHA1(ff43032c7943ab39acde84fe5deb5c2e82b8c85f) )
-	ROM_LOAD16_BYTE( "rhrt13r.p1", 0x000000, 0x080000, CRC(5cc0bb5a) SHA1(611ea18816046d385ab3b7bf37c7be9f672f7d32) )
-	ROM_LOAD16_BYTE( "rhrt13s.p1", 0x000000, 0x080000, CRC(7755253c) SHA1(d3a35796c5bfb5523ca73fd4cdd1462695cb10c9) )
 ROM_END
+
+ROM_START( m5rhrgt02 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rhrb02.p1", 0x000000, 0x080000, CRC(eca8267f) SHA1(f503b98c2b6000128c8a32b097e69316922263ca) )
+	ROM_LOAD16_BYTE( "rhrb02.p2", 0x000001, 0x080000, CRC(4966f2fc) SHA1(2e334a344ddf0779d2d663f13560c17befd5888a) )
+	/* 3+4 */
+ROM_END
+
 
 
 ROM_START( m5redx )
@@ -4067,13 +4456,20 @@ ROM_START( m5redx )
 	ROM_LOAD16_BYTE( "rex10d.p1", 0x000000, 0x080000, CRC(579a7f43) SHA1(e8334e664febb06b1ab6cc64ac95f1796cadc99d) )
 	ROM_LOAD16_BYTE( "rex10e.p1", 0x000000, 0x080000, CRC(c31367b9) SHA1(a35bc9b9cf18db23be9d30dce586223819d5347b) )
 	ROM_LOAD16_BYTE( "rex10k.p1", 0x000000, 0x080000, CRC(f5b0bea3) SHA1(7090b39296169f21b68c4dc6ea2d91f7338ecfc6) )
+ROM_END
+
+ROM_START( m5redx12 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rex12s.p1", 0x000000, 0x080000, CRC(4174b386) SHA1(93aed5290d88e1950cc6fecbfa22cf046a550d50) )
+	ROM_LOAD16_BYTE( "rex12s.p2", 0x000001, 0x080000, CRC(69a353d7) SHA1(5bbe832a0bfc6e8a96c282db310c262da90b6ca5) )
+	ROM_LOAD16_BYTE( "rex12s.p3", 0x100000, 0x080000, CRC(bbb762ca) SHA1(0cf47a2484cc8f9247bfbade15fdc3c59d40908b) ) // == 10
+	ROM_LOAD16_BYTE( "rex12s.p4", 0x100001, 0x080000, CRC(354cf631) SHA1(55975fb404415764e4a968a97f9ea6b9fea55166) ) // == 10
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "rex12d.p1", 0x000000, 0x080000, CRC(c79ce38a) SHA1(f3a79598c3b2790601bb4d23f609e5f2733c3c54) )
 	ROM_LOAD16_BYTE( "rex12k.p1", 0x000000, 0x080000, CRC(65b6226a) SHA1(56d2f881d23d8d4c157d4519f39f154777bbd1a7) )
-	ROM_LOAD16_BYTE( "rex12s.p1", 0x000000, 0x080000, CRC(4174b386) SHA1(93aed5290d88e1950cc6fecbfa22cf046a550d50) )
-	ROM_LOAD16_BYTE( "rex12s.p2", 0x000000, 0x080000, CRC(69a353d7) SHA1(5bbe832a0bfc6e8a96c282db310c262da90b6ca5) )
-	//ROM_LOAD16_BYTE( "rex12s.p3", 0x000000, 0x080000, CRC(bbb762ca) SHA1(0cf47a2484cc8f9247bfbade15fdc3c59d40908b) )
-	//ROM_LOAD16_BYTE( "rex12s.p4", 0x000000, 0x080000, CRC(354cf631) SHA1(55975fb404415764e4a968a97f9ea6b9fea55166) )
 ROM_END
+
 
 ROM_START( m5thtsmg )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -4090,11 +4486,23 @@ ROM_START( m5ronr )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "reel0_4d.p1", 0x000000, 0x080000, CRC(97220bfd) SHA1(b5b4801a908ba8900f7bdf63a9dbefe46a89019c) )
+ROM_END
+
+ROM_START( m5ronr05 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "reel0_5.p1", 0x000000, 0x080000, CRC(b189633b) SHA1(f446a4c09db67acf08abdcccdd6691fb054abc2f) )
-	ROM_LOAD16_BYTE( "reel0_5.p2", 0x000000, 0x080000, CRC(e3b1a2fc) SHA1(0f862f024a415afde9017b5cb365d2af6b7d90c8) )
+	ROM_LOAD16_BYTE( "reel0_5.p2", 0x000001, 0x080000, CRC(e3b1a2fc) SHA1(0f862f024a415afde9017b5cb365d2af6b7d90c8) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "reel0_5d.p1", 0x000000, 0x080000, CRC(399d294c) SHA1(dd1c0921ecac5b4f4c6687e9b329da18b8d0ccc0) )
+ROM_END
+
+ROM_START( m5ronr07 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "reel0_7.p1", 0x000000, 0x080000, CRC(c0b67cd9) SHA1(f7e906f29ee66a95e3ca823ddfd0e1fa6051fd10) )
-	ROM_LOAD16_BYTE( "reel0_7.p2", 0x000000, 0x080000, CRC(6f3c3513) SHA1(42881d4deccb9d4ea82f68555d84504b5769b48e) )
+	ROM_LOAD16_BYTE( "reel0_7.p2", 0x000001, 0x080000, CRC(6f3c3513) SHA1(42881d4deccb9d4ea82f68555d84504b5769b48e) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "reel0_7d.p1", 0x000000, 0x080000, CRC(7201e47c) SHA1(f0d92b6d0ff528ca6de19be3262ff47f9c486a22) )
 ROM_END
 
@@ -4128,9 +4536,16 @@ ROM_START( m5revo )
 	ROM_LOAD16_BYTE( "retr01k.p1", 0x000000, 0x080000, CRC(e2b24e4b) SHA1(9923e12a40a69fff200d8d57a3e85b1bdae16cc8) )
 	ROM_LOAD16_BYTE( "retr01s.p1", 0x000000, 0x080000, CRC(0a7cd89f) SHA1(a749fda39311699cfdd001ca5c58574c857fff26) )
 	ROM_LOAD16_BYTE( "retr01y.p1", 0x000000, 0x080000, CRC(aefd83f8) SHA1(a1aacdc4ba66eaffb92cb2a9f0a3cd46150b47d3) )
-	ROM_LOAD16_BYTE( "revl13.p2", 0x000000, 0x080000, CRC(44bb41e0) SHA1(3a55312369e13f007e3541e6cbe4cf0694c681a4) )
-	//ROM_LOAD16_BYTE( "revl13.p3", 0x000000, 0x080000, CRC(594cd05f) SHA1(6183a9e3c9c14e19245ca457a3267ceceb8490b3) )
-	//ROM_LOAD16_BYTE( "revl13.p4", 0x000000, 0x080000, CRC(d80f34a2) SHA1(87d3bd9809a1fa96217e27de3778b231ef6c41a1) )
+ROM_END
+
+ROM_START( m5revo13 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "revl13s.p1", 0x000000, 0x080000, CRC(c0bb81e9) SHA1(32ae7ec84fd4dcef09e86af9af21fd07301c0ffc) )
+	ROM_LOAD16_BYTE( "revl13.p2", 0x000001, 0x080000, CRC(44bb41e0) SHA1(3a55312369e13f007e3541e6cbe4cf0694c681a4) )
+	ROM_LOAD16_BYTE( "revl13.p3", 0x100000, 0x080000, CRC(594cd05f) SHA1(6183a9e3c9c14e19245ca457a3267ceceb8490b3) ) // == 01
+	ROM_LOAD16_BYTE( "revl13.p4", 0x100001, 0x080000, CRC(d80f34a2) SHA1(87d3bd9809a1fa96217e27de3778b231ef6c41a1) ) // == 01
+	
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "revl13ad.p1", 0x000000, 0x080000, CRC(48eb39a1) SHA1(c78145688c66215d971d18fcf7a5ff593efe4aff) )
 	ROM_LOAD16_BYTE( "revl13b.p1", 0x000000, 0x080000, CRC(45555b0c) SHA1(6483bd52cc82f2943e261f9fd8ec0409222deb25) )
 	ROM_LOAD16_BYTE( "revl13bd.p1", 0x000000, 0x080000, CRC(f656251f) SHA1(b74d17498b6432cc8baa5a86b072ad29605d316b) )
@@ -4139,10 +4554,14 @@ ROM_START( m5revo )
 	ROM_LOAD16_BYTE( "revl13h.p1", 0x000000, 0x080000, CRC(e9249a08) SHA1(244c58ba795f5ee9c403e9fd4da82358992a9092) )
 	ROM_LOAD16_BYTE( "revl13k.p1", 0x000000, 0x080000, CRC(4149b71b) SHA1(cb4ffe1d971d54d48bc27709a6ca21c53b5dd20f) )
 	ROM_LOAD16_BYTE( "revl13r.p1", 0x000000, 0x080000, CRC(cc878b86) SHA1(e6e3a4535647f695d16678660e6d7f0e129d81ea) )
-	ROM_LOAD16_BYTE( "revl13s.p1", 0x000000, 0x080000, CRC(c0bb81e9) SHA1(32ae7ec84fd4dcef09e86af9af21fd07301c0ffc) )
 	ROM_LOAD16_BYTE( "revl13y.p1", 0x000000, 0x080000, CRC(37015c85) SHA1(168f5c280f5cb9ab4923b136b9e4984f609bc6fb) )
-	ROM_LOAD16_BYTE( "revltn.p1", 0x0000, 0x080000, CRC(c78ed23e) SHA1(918d4a7c44c493a50edf8af0f1e8a4fdfbc1561d) )
-	ROM_LOAD16_BYTE( "revltn.p2", 0x0000, 0x080000, CRC(57fc569a) SHA1(b93dc5366a914855a6f640145ec6be37556259bb) )
+ROM_END
+
+ROM_START( m5revoa )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "revltn.p1", 0x00000, 0x080000, CRC(c78ed23e) SHA1(918d4a7c44c493a50edf8af0f1e8a4fdfbc1561d) )
+	ROM_LOAD16_BYTE( "revltn.p2", 0x00001, 0x080000, CRC(57fc569a) SHA1(b93dc5366a914855a6f640145ec6be37556259bb) )
+	/* 3+4 */
 ROM_END
 
 
@@ -4159,59 +4578,100 @@ ROM_START( m5rgclb )
 	ROM_LOAD16_BYTE( "rgrd10f.p1", 0x000000, 0x080000, CRC(31c94199) SHA1(b44e4a97b6aff7d861e32d54fee7a2b779210594) )
 	ROM_LOAD16_BYTE( "rgrd10s.p1", 0x000000, 0x080000, CRC(ab0e679e) SHA1(dc1a0c9a0054f5bf164cd8c96dae56856764ab5e) )
 	ROM_LOAD16_BYTE( "rgrd10z.p1", 0x000000, 0x080000, CRC(b7898460) SHA1(d592cb3b26d043fcb10eacd92ebff4a72084a4db) )
-	ROM_LOAD16_BYTE( "rgrd11.p2", 0x000000, 0x080000, CRC(78baf476) SHA1(6b8f26a2de236637838940649886fdcf55ac44f6) )
-	ROM_LOAD16_BYTE( "rgrd11.p3", 0x000000, 0x080000, CRC(3a4500da) SHA1(91a136802e8dbd97f9fffcc7fb141883be095357) )
-	ROM_LOAD16_BYTE( "rgrd11.p4", 0x000000, 0x080000, CRC(3f41a551) SHA1(d5d005b4bd52d940d77c174d43a00c530b1048ac) )
+ROM_END
+
+ROM_START( m5rgclb11 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rgrd11s.p1", 0x000000, 0x080000, CRC(e2585ef6) SHA1(db8bf9bcd73146c816e8f26693051944c71b1fdb) )
+	ROM_LOAD16_BYTE( "rgrd11.p2", 0x000001, 0x080000, CRC(78baf476) SHA1(6b8f26a2de236637838940649886fdcf55ac44f6) )
+	ROM_LOAD16_BYTE( "rgrd11.p3", 0x100000, 0x080000, CRC(3a4500da) SHA1(91a136802e8dbd97f9fffcc7fb141883be095357) )
+	ROM_LOAD16_BYTE( "rgrd11.p4", 0x100001, 0x080000, CRC(3f41a551) SHA1(d5d005b4bd52d940d77c174d43a00c530b1048ac) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "rgrd11ad.p1", 0x000000, 0x080000, CRC(5a34decf) SHA1(13327305fec5ad9b552ba27ec212e4e5298e8d5b) )
 	ROM_LOAD16_BYTE( "rgrd11d.p1", 0x000000, 0x080000, CRC(37fc7036) SHA1(05834a773b15a9fd0b2d117f3092e3f189fc4d8c) )
 	ROM_LOAD16_BYTE( "rgrd11dz.p1", 0x000000, 0x080000, CRC(ac6e4a62) SHA1(43f69ec6c60bf85d4a71f223f81a2d7a11634187) )
 	ROM_LOAD16_BYTE( "rgrd11f.p1", 0x000000, 0x080000, CRC(7ae309e6) SHA1(570c4ee2ddd554708929bd8e0aa2efadfe08d854) )
-	ROM_LOAD16_BYTE( "rgrd11s.p1", 0x000000, 0x080000, CRC(e2585ef6) SHA1(db8bf9bcd73146c816e8f26693051944c71b1fdb) )
 	ROM_LOAD16_BYTE( "rgrd11z.p1", 0x000000, 0x080000, CRC(33bd923d) SHA1(49421cb956b2cba1869909e5eedab4431b66db56) )
-	ROM_LOAD16_BYTE( "rgrd12.p2", 0x000000, 0x080000, CRC(7f9d77c5) SHA1(06f00dbc8aab75658d2286b8a6167700ec9d81fb) )
-	ROM_LOAD16_BYTE( "rgrd12.p3", 0x000000, 0x080000, CRC(3a4500da) SHA1(91a136802e8dbd97f9fffcc7fb141883be095357) )
-	ROM_LOAD16_BYTE( "rgrd12.p4", 0x000000, 0x080000, CRC(3f41a551) SHA1(d5d005b4bd52d940d77c174d43a00c530b1048ac) )
+ROM_END
+
+ROM_START( m5rgclb12 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rgrd12s.p1", 0x000000, 0x080000, CRC(c80320b4) SHA1(3320e3be578fa50c5c99b1bb805eca5e5706672f) )
+	ROM_LOAD16_BYTE( "rgrd12.p2", 0x000001, 0x080000, CRC(7f9d77c5) SHA1(06f00dbc8aab75658d2286b8a6167700ec9d81fb) )
+	ROM_LOAD16_BYTE( "rgrd12.p3", 0x100000, 0x080000, CRC(3a4500da) SHA1(91a136802e8dbd97f9fffcc7fb141883be095357) ) // == 11
+	ROM_LOAD16_BYTE( "rgrd12.p4", 0x100001, 0x080000, CRC(3f41a551) SHA1(d5d005b4bd52d940d77c174d43a00c530b1048ac) ) // == 11
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "rgrd12d.p1", 0x000000, 0x080000, CRC(c5d288d2) SHA1(216683139b197b106b8ff6fc59b03f13364457b2) )
 	ROM_LOAD16_BYTE( "rgrd12dz.p1", 0x000000, 0x080000, CRC(4b5ece49) SHA1(b5a5cd4071d7fc0389d58c90dcdbb15161a51506) )
 	ROM_LOAD16_BYTE( "rgrd12f.p1", 0x000000, 0x080000, CRC(ca522928) SHA1(ea6992946f9f02af068fae04f8db736a92d52353) )
-	ROM_LOAD16_BYTE( "rgrd12s.p1", 0x000000, 0x080000, CRC(c80320b4) SHA1(3320e3be578fa50c5c99b1bb805eca5e5706672f) )
 	ROM_LOAD16_BYTE( "rgrd12z.p1", 0x000000, 0x080000, CRC(3ad02c75) SHA1(f7b6b571316c1d997cb4b1ad97c025869b76b21f) )
+ROM_END
+
+ROM_START( m5rgclb20 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rgrd2_0s.p1", 0x000000, 0x080000, CRC(117b145c) SHA1(a1436433ab19309f7b414d0373ff0cddb8c22574) )
+	ROM_LOAD16_BYTE( "rgrd2_0.p2", 0x000001, 0x080000, CRC(84f814a6) SHA1(f3a8331776bb4bea8c85bf1ceef253b6ca86b6be) )
+	ROM_LOAD16_BYTE( "rgrd2_0.p3", 0x100000, 0x080000, CRC(3a4500da) SHA1(91a136802e8dbd97f9fffcc7fb141883be095357) ) // == 11
+	ROM_LOAD16_BYTE( "rgrd2_0.p4", 0x100001, 0x080000, CRC(3f41a551) SHA1(d5d005b4bd52d940d77c174d43a00c530b1048ac) ) // == 11
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "rgrd2_0d.p1", 0x000000, 0x080000, CRC(dfb791a9) SHA1(1d88a77cf0167dd2b62d1489f8829fdbf07fb066) )
+	ROM_LOAD16_BYTE( "rgrd2_0f.p1", 0x000000, 0x080000, CRC(a7233ad4) SHA1(98856761bdad41ecd5b5f95caab976bae3de8336) )
+	ROM_LOAD16_BYTE( "rgrd2_0z.p1", 0x000000, 0x080000, CRC(45d1d501) SHA1(60a8999c6de449d53643445035b884501d7745d8) )
 	ROM_LOAD16_BYTE( "rgrd20dz.p1", 0x000000, 0x080000, CRC(0680d075) SHA1(06a2902b6dbb0367a960b072821684c792e248d4) )
+ROM_END
+
+ROM_START( m5rgclb21 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rgrd21s.p1", 0x000000, 0x080000, CRC(5c588df6) SHA1(9f70f8d0b8bd784aa45080e2bbf90cdc71f795dd) )
 	ROM_LOAD16_BYTE( "rgrd21.p2", 0x000000, 0x080000, CRC(481a686d) SHA1(9acab4b87b112fcbf5b124d7101e4937ca754c80) )
-	ROM_LOAD16_BYTE( "rgrd21.p3", 0x000000, 0x080000, CRC(3a4500da) SHA1(91a136802e8dbd97f9fffcc7fb141883be095357) )
-	ROM_LOAD16_BYTE( "rgrd21.p4", 0x000000, 0x080000, CRC(3f41a551) SHA1(d5d005b4bd52d940d77c174d43a00c530b1048ac) )
+	ROM_LOAD16_BYTE( "rgrd21.p3", 0x000000, 0x080000, CRC(3a4500da) SHA1(91a136802e8dbd97f9fffcc7fb141883be095357) ) // == 11
+	ROM_LOAD16_BYTE( "rgrd21.p4", 0x000000, 0x080000, CRC(3f41a551) SHA1(d5d005b4bd52d940d77c174d43a00c530b1048ac) ) // == 11
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "rgrd21d.p1", 0x000000, 0x080000, CRC(bcffa73e) SHA1(ea6c37ec35b80364b872153fdbdc502587a3ba70) )
 	ROM_LOAD16_BYTE( "rgrd21dz.p1", 0x000000, 0x080000, CRC(22b3818c) SHA1(45679c82c0aba39a8cdf3d09f45ca8ec60f5a38e) )
 	ROM_LOAD16_BYTE( "rgrd21f.p1", 0x000000, 0x080000, CRC(20001df3) SHA1(c4fdba37e7ef3a1903dd9d14bc3b1fccd5be8cda) )
-	ROM_LOAD16_BYTE( "rgrd21s.p1", 0x000000, 0x080000, CRC(5c588df6) SHA1(9f70f8d0b8bd784aa45080e2bbf90cdc71f795dd) )
 	ROM_LOAD16_BYTE( "rgrd21z.p1", 0x000000, 0x080000, CRC(c1033c4e) SHA1(956bb4e9ac0a9116e4c86ae920669e4f042c2fa8) )
-	ROM_LOAD16_BYTE( "rgrd2_0.p2", 0x000000, 0x080000, CRC(84f814a6) SHA1(f3a8331776bb4bea8c85bf1ceef253b6ca86b6be) )
-	ROM_LOAD16_BYTE( "rgrd2_0.p3", 0x000000, 0x080000, CRC(3a4500da) SHA1(91a136802e8dbd97f9fffcc7fb141883be095357) )
-	ROM_LOAD16_BYTE( "rgrd2_0.p4", 0x000000, 0x080000, CRC(3f41a551) SHA1(d5d005b4bd52d940d77c174d43a00c530b1048ac) )
-	ROM_LOAD16_BYTE( "rgrd2_0d.p1", 0x000000, 0x080000, CRC(dfb791a9) SHA1(1d88a77cf0167dd2b62d1489f8829fdbf07fb066) )
-	ROM_LOAD16_BYTE( "rgrd2_0f.p1", 0x000000, 0x080000, CRC(a7233ad4) SHA1(98856761bdad41ecd5b5f95caab976bae3de8336) )
-	ROM_LOAD16_BYTE( "rgrd2_0s.p1", 0x000000, 0x080000, CRC(117b145c) SHA1(a1436433ab19309f7b414d0373ff0cddb8c22574) )
-	ROM_LOAD16_BYTE( "rgrd2_0z.p1", 0x000000, 0x080000, CRC(45d1d501) SHA1(60a8999c6de449d53643445035b884501d7745d8) )
-	ROM_LOAD16_BYTE( "trgb03.p2", 0x000000, 0x080000, CRC(097fb87a) SHA1(100eb1235508fb84a0c70b91f4eaefd5da47f6cb) )
-	ROM_LOAD16_BYTE( "trgb03.p3", 0x000000, 0x080000, CRC(97d97647) SHA1(2dd1af527e614703690fb3c881c88602e6f7636e) )
-	ROM_LOAD16_BYTE( "trgb03.p4", 0x000000, 0x080000, CRC(58a7a86f) SHA1(a5847bc90b6ae3f013b7954b6cdb379997f820c6) )
+ROM_END
+
+ROM_START( m5rgclb03 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "trgb03s.p1", 0x000000, 0x080000, CRC(443282e6) SHA1(d904554fffd0bdc79fc29b38a00fa6abbf1bb877) )
+	ROM_LOAD16_BYTE( "trgb03.p2", 0x000001, 0x080000, CRC(097fb87a) SHA1(100eb1235508fb84a0c70b91f4eaefd5da47f6cb) )
+	ROM_LOAD16_BYTE( "trgb03.p3", 0x100000, 0x080000, CRC(97d97647) SHA1(2dd1af527e614703690fb3c881c88602e6f7636e) )
+	ROM_LOAD16_BYTE( "trgb03.p4", 0x100001, 0x080000, CRC(58a7a86f) SHA1(a5847bc90b6ae3f013b7954b6cdb379997f820c6) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "trgb03d.p1", 0x000000, 0x080000, CRC(2d04f3b2) SHA1(6b63d701b99b25b2014683a8dfb4b565ed58207b) )
 	ROM_LOAD16_BYTE( "trgb03dz.p1", 0x000000, 0x080000, CRC(9e522f80) SHA1(7192fef47f2c0dae04fb3810faa0c41e765994fb) )
 	ROM_LOAD16_BYTE( "trgb03f.p1", 0x000000, 0x080000, CRC(0a7c741c) SHA1(a36bd9d14d3e6ca72f71ed964e5eaad538324abe) )
-	ROM_LOAD16_BYTE( "trgb03s.p1", 0x000000, 0x080000, CRC(443282e6) SHA1(d904554fffd0bdc79fc29b38a00fa6abbf1bb877) )
 	ROM_LOAD16_BYTE( "trgb03z.p1", 0x000000, 0x080000, CRC(453d4aeb) SHA1(4802695999a2dc402d484d698bbde387a1a368af) )
-	ROM_LOAD16_BYTE( "trgb0_1.p2", 0x000000, 0x080000, CRC(0b52162a) SHA1(41e84d3fa1f5ab148d59dadb91a1ce9690255a14) )
-	ROM_LOAD16_BYTE( "trgb0_1.p3", 0x000000, 0x080000, CRC(97d97647) SHA1(2dd1af527e614703690fb3c881c88602e6f7636e) )
-	ROM_LOAD16_BYTE( "trgb0_1.p4", 0x000000, 0x080000, CRC(58a7a86f) SHA1(a5847bc90b6ae3f013b7954b6cdb379997f820c6) )
+ROM_END
+
+ROM_START( m5rgclb01 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "trgb0_1s.p1", 0x000000, 0x080000, CRC(22438be4) SHA1(ff6c1ddacb59283cbcf2a78de24586863bf6c224) )
+	ROM_LOAD16_BYTE( "trgb0_1.p2", 0x000001, 0x080000, CRC(0b52162a) SHA1(41e84d3fa1f5ab148d59dadb91a1ce9690255a14) )
+	ROM_LOAD16_BYTE( "trgb0_1.p3", 0x100000, 0x080000, CRC(97d97647) SHA1(2dd1af527e614703690fb3c881c88602e6f7636e) ) // == 03
+	ROM_LOAD16_BYTE( "trgb0_1.p4", 0x100001, 0x080000, CRC(58a7a86f) SHA1(a5847bc90b6ae3f013b7954b6cdb379997f820c6) ) // == 03
+	
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "trgb0_1d.p1", 0x000000, 0x080000, CRC(5c3f22d9) SHA1(b5c09c5b913958ca723c6e15d29c57437e8bdf22) )
 	ROM_LOAD16_BYTE( "trgb0_1f.p1", 0x000000, 0x080000, CRC(d7a4f6c6) SHA1(666b9444e3d49bfc6754c4ca93eb0ccc80fd7db3) )
-	ROM_LOAD16_BYTE( "trgb0_1s.p1", 0x000000, 0x080000, CRC(22438be4) SHA1(ff6c1ddacb59283cbcf2a78de24586863bf6c224) )
 	ROM_LOAD16_BYTE( "trgb0_1z.p1", 0x000000, 0x080000, CRC(e48a6483) SHA1(b5348b720f4f7e1d229214777527503c4a204665) )
-	ROM_LOAD16_BYTE( "trgt0_1.p1", 0x000000, 0x080000, CRC(f95ef3cd) SHA1(39138eb9d93e3384cd00ed0b373d798eb39ff14a) )
-	ROM_LOAD16_BYTE( "trgt0_1.p2", 0x000000, 0x080000, CRC(cf639023) SHA1(ffbbdfb728db82c9ed09d626ef0fe34bf4011c0c) )
-	ROM_LOAD16_BYTE( "trgt0_1.p3", 0x000000, 0x080000, CRC(475dbfba) SHA1(3777ec1cd5e7c8c2a5e059e71680a7e51e217af6) )
-	ROM_LOAD16_BYTE( "trgt0_1.p4", 0x000000, 0x080000, CRC(e3762417) SHA1(dec2b476019520aff5a1343db4bbd86473d74e43) )
 ROM_END
+
+ROM_START( m5rgclb01a )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "trgt0_1.p1", 0x000000, 0x080000, CRC(f95ef3cd) SHA1(39138eb9d93e3384cd00ed0b373d798eb39ff14a) )
+	ROM_LOAD16_BYTE( "trgt0_1.p2", 0x000001, 0x080000, CRC(cf639023) SHA1(ffbbdfb728db82c9ed09d626ef0fe34bf4011c0c) )
+	ROM_LOAD16_BYTE( "trgt0_1.p3", 0x100000, 0x080000, CRC(475dbfba) SHA1(3777ec1cd5e7c8c2a5e059e71680a7e51e217af6) )
+	ROM_LOAD16_BYTE( "trgt0_1.p4", 0x100001, 0x080000, CRC(e3762417) SHA1(dec2b476019520aff5a1343db4bbd86473d74e43) )
+ROM_END
+
 
 
 ROM_START( m5rollup )
@@ -4234,12 +4694,15 @@ ROM_START( m5rollx )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "roll0_1d.p1", 0x000000, 0x080000, CRC(62c7bc9f) SHA1(175c05bb14fa64df1cbae1029ba48b965f3cbeb6) )
+ROM_END
+
+ROM_START( m5rollx12 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "roll1_2.p1", 0x000000, 0x080000, CRC(e03478f4) SHA1(730a5d6b496d7295e42c6a08817ccc4e224142e2) )
-	ROM_LOAD16_BYTE( "roll1_2.p2", 0x000000, 0x080000, CRC(6a2ac261) SHA1(a33737f8a586da07f2363b6af4a6d6325c95729b) )
+	ROM_LOAD16_BYTE( "roll1_2.p2", 0x000001, 0x080000, CRC(6a2ac261) SHA1(a33737f8a586da07f2363b6af4a6d6325c95729b) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "roll1_2d.p1", 0x000000, 0x080000, CRC(f0b08f9b) SHA1(e00dcbcc6466bc6e76ce5b65db5accab2a0e7def) )
-	ROM_LOAD16_BYTE( "rolx101.bin", 0x000000, 0x080000, CRC(60723c2b) SHA1(3764c989cd835e66ebde70b45ae005346b0a278c) )
-	ROM_LOAD16_BYTE( "rolx101d.bin", 0x000000, 0x080000, CRC(6989a398) SHA1(c853b57c93b93325913027733b0da67091e480e2) )
-	ROM_LOAD16_BYTE( "rolx101g.bin", 0x000000, 0x080000, CRC(08bdd139) SHA1(38606f53179536886a2ad47c248c3a46503311e9) )
 ROM_END
 
 
@@ -4296,10 +4759,17 @@ ROM_START( m5rfymc )
 	ROM_LOAD16_BYTE( "rmnc05s.p1", 0x000000, 0x080000, CRC(a589ebde) SHA1(3389275b7be1b413db79365b7af69395621e8f40) )
 	ROM_LOAD16_BYTE( "rmnc05y.p1", 0x000000, 0x080000, CRC(e8937cd3) SHA1(d205e78d61f1b73f74b8980dab404d78df4b5919) )
 	ROM_LOAD16_BYTE( "rmnc05z.p1", 0x000000, 0x080000, CRC(1d1d3709) SHA1(d8b5302cd078096b117a98106433c914abdd2245) )
-	ROM_LOAD16_BYTE( "rmnc06.p2", 0x000000, 0x080000, CRC(b32b6828) SHA1(21a4a3ef187e3b7abe0c2d2e13d70e80e641eee4) )
+ROM_END
+
+ROM_START( m5rfymc06 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rmnc06s.p1", 0x000000, 0x080000, CRC(e5484915) SHA1(4f3fdbcd5a51d1f8f1c52590bbc20a02492446ee) )
+	ROM_LOAD16_BYTE( "rmnc06.p2", 0x000001, 0x080000, CRC(b32b6828) SHA1(21a4a3ef187e3b7abe0c2d2e13d70e80e641eee4) )
+	/* 3+4 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "rmnc06d.p1", 0x000000, 0x080000, CRC(b3b0bf0f) SHA1(2fd76e51b49b3170ccc8eeef204d1e98e379e9c2) )
 	ROM_LOAD16_BYTE( "rmnc06dz.p1", 0x000000, 0x080000, CRC(e58d950c) SHA1(1a7ee76bb0086f539e96f86ae240c82dc065b27a) )
-	ROM_LOAD16_BYTE( "rmnc06s.p1", 0x000000, 0x080000, CRC(e5484915) SHA1(4f3fdbcd5a51d1f8f1c52590bbc20a02492446ee) )
 	ROM_LOAD16_BYTE( "rmnc06z.p1", 0x000000, 0x080000, CRC(1e899db6) SHA1(c0f93bde0b973e604f3fc84cb62664d03b8ab4a7) )
 ROM_END
 
@@ -4339,9 +4809,16 @@ ROM_START( m5silver )
 	ROM_LOAD16_BYTE( "silv05r.p1", 0x000000, 0x080000, CRC(4f81a1ec) SHA1(b2429f8e3c154369a6c390d4efe1cd6c5ae0fb62) )
 	ROM_LOAD16_BYTE( "silv05s.p1", 0x000000, 0x080000, CRC(07cea32b) SHA1(054bb836f3a4b70202205d4e8e2b96e52bfc8494) )
 	ROM_LOAD16_BYTE( "silv05y.p1", 0x000000, 0x080000, CRC(221304ca) SHA1(1554abed77aa7a5893f2e7bb3874530fc73213b3) )
-	ROM_LOAD16_BYTE( "silv06.p2", 0x000000, 0x080000, CRC(52346eee) SHA1(b6e1603694a06bf956d9c032a9ec34a56d59b9e5) )
-	//ROM_LOAD16_BYTE( "silv06.p3", 0x000000, 0x080000, CRC(eaf54d45) SHA1(16e416d3075921074873850edde4bc82ca2623ec) )
-	//ROM_LOAD16_BYTE( "silv06.p4", 0x000000, 0x080000, CRC(75b51281) SHA1(f8bf611b4712f4315bc060cbbc1d5515788e0a8d) )
+ROM_END
+
+ROM_START( m5silver06 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "silv06s.p1", 0x000000, 0x080000, CRC(d6e8defd) SHA1(82594f867dc62a5a0c7f24bfb831c13fbbd0f039) )
+	ROM_LOAD16_BYTE( "silv06.p2", 0x000001, 0x080000, CRC(52346eee) SHA1(b6e1603694a06bf956d9c032a9ec34a56d59b9e5) )
+	ROM_LOAD16_BYTE( "silv06.p3", 0x100000, 0x080000, CRC(eaf54d45) SHA1(16e416d3075921074873850edde4bc82ca2623ec) ) // == 05
+	ROM_LOAD16_BYTE( "silv06.p4", 0x100001, 0x080000, CRC(75b51281) SHA1(f8bf611b4712f4315bc060cbbc1d5515788e0a8d) ) // == 05
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "silv06ad.p1", 0x000000, 0x080000, CRC(1c83328d) SHA1(3db07ae710dcefacf489f075452cea638e533648) )
 	ROM_LOAD16_BYTE( "silv06b.p1", 0x000000, 0x080000, CRC(c04177c3) SHA1(1baeec7da7faafe3b6a249adb051dcecb4293f1d) )
 	ROM_LOAD16_BYTE( "silv06bd.p1", 0x000000, 0x080000, CRC(01ab7909) SHA1(9032c0778330c4f557297fe4e8d1b9a5d8e39c46) )
@@ -4349,11 +4826,17 @@ ROM_START( m5silver )
 	ROM_LOAD16_BYTE( "silv06dy.p1", 0x000000, 0x080000, CRC(3b907d85) SHA1(ffbfbeb790cd7edee6219aa377e52a5dee452d33) )
 	ROM_LOAD16_BYTE( "silv06h.p1", 0x000000, 0x080000, CRC(782d55b3) SHA1(fa3fd52d7e58fbd15b535859d9abf4a1387c7494) )
 	ROM_LOAD16_BYTE( "silv06r.p1", 0x000000, 0x080000, CRC(d30f59b2) SHA1(878b68c465a213e048b9d7545bf65917ffc11a4d) )
-	ROM_LOAD16_BYTE( "silv06s.p1", 0x000000, 0x080000, CRC(d6e8defd) SHA1(82594f867dc62a5a0c7f24bfb831c13fbbd0f039) )
 	ROM_LOAD16_BYTE( "silv06y.p1", 0x000000, 0x080000, CRC(ccb21d02) SHA1(c70be2c7ea3585d5a28dacf79294feafdf12596d) )
-	ROM_LOAD16_BYTE( "slvd03.p2", 0x000000, 0x080000, CRC(c7015d69) SHA1(347a2ec78f7bcef1f3eab8c054e696ac8be50e1c) )
-	ROM_LOAD16_BYTE( "slvd03.p3", 0x000000, 0x080000, CRC(1fa52e9a) SHA1(4d38abeee540e79abd7a09d7a8ffa5762c96acc4) )
-	ROM_LOAD16_BYTE( "slvd03.p4", 0x000000, 0x080000, CRC(ba4c1994) SHA1(b1c0c0d8997976fafde4e6e7e2967bc90e264590) )
+ROM_END
+
+ROM_START( m5silver03 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "slvd03s.p1", 0x000000, 0x080000, CRC(d5875f82) SHA1(e564e1aed9e91a9c768f0f1c430abd0c2c30b3ae) )
+	ROM_LOAD16_BYTE( "slvd03.p2", 0x000001, 0x080000, CRC(c7015d69) SHA1(347a2ec78f7bcef1f3eab8c054e696ac8be50e1c) )
+	ROM_LOAD16_BYTE( "slvd03.p3", 0x100000, 0x080000, CRC(1fa52e9a) SHA1(4d38abeee540e79abd7a09d7a8ffa5762c96acc4) )
+	ROM_LOAD16_BYTE( "slvd03.p4", 0x100001, 0x080000, CRC(ba4c1994) SHA1(b1c0c0d8997976fafde4e6e7e2967bc90e264590) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "slvd03ad.p1", 0x000000, 0x080000, CRC(1f355253) SHA1(7d8e6fe968e252848903ae6d75052cfcce53ba52) )
 	ROM_LOAD16_BYTE( "slvd03b.p1", 0x000000, 0x080000, CRC(c275d848) SHA1(8dbf4244507de3a25eb80c1102f654ee0b20ca86) )
 	ROM_LOAD16_BYTE( "slvd03bd.p1", 0x000000, 0x080000, CRC(f11cb0bc) SHA1(f6a88b5f91aa20155a992d6704848eaf4e5dc2eb) )
@@ -4361,10 +4844,8 @@ ROM_START( m5silver )
 	ROM_LOAD16_BYTE( "slvd03dy.p1", 0x000000, 0x080000, CRC(d27180c6) SHA1(d51a9d7485a4d802fbe55aafb4a9f28198831368) )
 	ROM_LOAD16_BYTE( "slvd03h.p1", 0x000000, 0x080000, CRC(39969460) SHA1(94a3c5566a1f7fc2a632176c1071d957d7f57bc8) )
 	ROM_LOAD16_BYTE( "slvd03r.p1", 0x000000, 0x080000, CRC(67a5dc00) SHA1(b9be078e12a319a181ddd007ab7b3422b35c5cd5) )
-	ROM_LOAD16_BYTE( "slvd03s.p1", 0x000000, 0x080000, CRC(d5875f82) SHA1(e564e1aed9e91a9c768f0f1c430abd0c2c30b3ae) )
 	ROM_LOAD16_BYTE( "slvd03y.p1", 0x000000, 0x080000, CRC(f8a52068) SHA1(d59c12307b0eed20ea06e5288d1682b49bcd83b3) )
 ROM_END
-
 
 
 ROM_START( m5skulcl )
@@ -4373,14 +4854,26 @@ ROM_START( m5skulcl )
 	ROM_LOAD16_BYTE( "skul1_0.p2", 0x000001, 0x080000, CRC(befa4888) SHA1(6f1edfe7c49c16e6cd5486999aba5c2f4a165690) )
 	ROM_LOAD16_BYTE( "skul1_0.p3", 0x100000, 0x080000, CRC(3d8ca5d1) SHA1(0f2271a8518b7b39a94a0027066d49034bc3a658) )
 	ROM_LOAD16_BYTE( "skul1_0.p4", 0x100001, 0x080000, CRC(f86c5a73) SHA1(36dc61e7e56c0d778294a967921e09fc0364cc76) )
+ROM_END
+
+ROM_START( m5skulcl20 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "skul2_0.p1", 0x000000, 0x080000, CRC(1b9c8153) SHA1(8ed78aba934309fa6e1aecf8c5ce5e2186dea406) )
+	ROM_LOAD16_BYTE( "skul2_0.p2", 0x000001, 0x080000, CRC(28d599b6) SHA1(073293ff314fbcf94acf5b160257968ab93afccc) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5skulcl23 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "skul2_3.p1", 0x000000, 0x080000, CRC(d852cec9) SHA1(cc9c1af8e2fbedd12f7908cde70bfa620d763e73) )
+	ROM_LOAD16_BYTE( "skul2_3.p2", 0x000001, 0x080000, CRC(a4c949de) SHA1(3efc6cc2557f1ea83785ce6ca59b8aafe3efe716) )
+	/* 3+4 */
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "skul2_0.p1", 0x000000, 0x080000, CRC(1b9c8153) SHA1(8ed78aba934309fa6e1aecf8c5ce5e2186dea406) )
-	ROM_LOAD16_BYTE( "skul2_0.p2", 0x000000, 0x080000, CRC(28d599b6) SHA1(073293ff314fbcf94acf5b160257968ab93afccc) )
-	ROM_LOAD16_BYTE( "skul2_3.p1", 0x000000, 0x080000, CRC(d852cec9) SHA1(cc9c1af8e2fbedd12f7908cde70bfa620d763e73) )
-	ROM_LOAD16_BYTE( "skul2_3.p2", 0x000000, 0x080000, CRC(a4c949de) SHA1(3efc6cc2557f1ea83785ce6ca59b8aafe3efe716) )
 	ROM_LOAD16_BYTE( "skul2_3d.p1", 0x000000, 0x080000, CRC(653e17d7) SHA1(dd1abcc4ba1250c433b6cb6fc7a3d70580dce611) )
 ROM_END
+
+
 
 ROM_START( m5sondr )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -4400,9 +4893,19 @@ ROM_START( m5sondr )
 	ROM_LOAD16_BYTE( "sdtr01dy.p1", 0x000000, 0x080000, CRC(61d4cb2d) SHA1(f63594141f2d8692cf6ac1acbeb8faef954802c1) )
 	ROM_LOAD16_BYTE( "sdtr01s.p1", 0x000000, 0x080000, CRC(2b8dc04d) SHA1(dfe7c7a4a14cbb26da691c77b240999a87912361) )
 	ROM_LOAD16_BYTE( "sdtr01y.p1", 0x000000, 0x080000, CRC(b38b52ab) SHA1(58fabe1778f9da4fad952f29e97190fa88bcbca7) )
-	ROM_LOAD16_BYTE( "sono05.p2", 0x000000, 0x080000, CRC(8ffae24a) SHA1(0a20ea91fb8241f9da665cc9b2bc86a66b153b8c) )
-	//ROM_LOAD16_BYTE( "sono05.p3", 0x000000, 0x080000, CRC(868d1a96) SHA1(0ebca6a12b1ae912d836c2ee86b555dbdf6fe16f) )
-	//ROM_LOAD16_BYTE( "sono05.p4", 0x000000, 0x080000, CRC(b4a37232) SHA1(c85a185786ad5e0a0a2fb7c525f9be8c0c376d3e) )
+
+
+	ROM_LOAD16_BYTE( "sonofdracula25.bin", 0x000000, 0x080000, CRC(0f3a5421) SHA1(990f4557775942a806c36fdcd9e4db9b1e62e702) ) // corrupt or not MPU5 (encrypted?)
+ROM_END
+
+ROM_START( m5sondr05 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sono05s.p1", 0x000000, 0x080000, CRC(1f4d2bd4) SHA1(bbda8cac21e472cd406f945f78ee2e43d334bec5) )
+	ROM_LOAD16_BYTE( "sono05.p2", 0x000001, 0x080000, CRC(8ffae24a) SHA1(0a20ea91fb8241f9da665cc9b2bc86a66b153b8c) )
+	ROM_LOAD16_BYTE( "sono05.p3", 0x100000, 0x080000, CRC(868d1a96) SHA1(0ebca6a12b1ae912d836c2ee86b555dbdf6fe16f) ) // == 01
+	ROM_LOAD16_BYTE( "sono05.p4", 0x100001, 0x080000, CRC(b4a37232) SHA1(c85a185786ad5e0a0a2fb7c525f9be8c0c376d3e) ) // == 01
+	
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "sono05ad.p1", 0x000000, 0x080000, CRC(4e162d7f) SHA1(9533f8ac7ca385b9b5aeaa0767628e16a6ee8e5d) )
 	ROM_LOAD16_BYTE( "sono05b.p1", 0x000000, 0x080000, CRC(d62b4d88) SHA1(6760752341091c4aeb5b908c89de7c868af4e455) )
 	ROM_LOAD16_BYTE( "sono05bd.p1", 0x000000, 0x080000, CRC(fcadc29b) SHA1(608803bc1295f7cfc1f67758d68cda9e0d450e3a) )
@@ -4410,10 +4913,10 @@ ROM_START( m5sondr )
 	ROM_LOAD16_BYTE( "sono05dy.p1", 0x000000, 0x080000, CRC(ba776295) SHA1(4baccf14b7297d747ab4e6115c5a6656059c11e7) )
 	ROM_LOAD16_BYTE( "sono05h.p1", 0x000000, 0x080000, CRC(0fcfef69) SHA1(fa93ebf1deb0616e25e511dddd9e170d547d9ef7) )
 	ROM_LOAD16_BYTE( "sono05r.p1", 0x000000, 0x080000, CRC(d8291bc1) SHA1(846f887d4726927393895096222429bc77600a19) )
-	ROM_LOAD16_BYTE( "sono05s.p1", 0x000000, 0x080000, CRC(1f4d2bd4) SHA1(bbda8cac21e472cd406f945f78ee2e43d334bec5) )
 	ROM_LOAD16_BYTE( "sono05y.p1", 0x000000, 0x080000, CRC(90f1ed86) SHA1(d383206ff62a8f699569f1310daee48fa5b50647) )
-	ROM_LOAD16_BYTE( "sonofdracula25.bin", 0x000000, 0x080000, CRC(0f3a5421) SHA1(990f4557775942a806c36fdcd9e4db9b1e62e702) )
 ROM_END
+
+
 
 ROM_START( m5sondra )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -4461,8 +4964,6 @@ ROM_START( m5spicer )
 	ROM_LOAD16_BYTE( "tsir08.p4", 0x100001, 0x080000, CRC(a368587c) SHA1(398ea3c308c823429b79d23e9ee6e3b4ca55cdd9) )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "tsir06.bin", 0x000000, 0x080000, CRC(418cbe74) SHA1(7013a838860bdb7b2f9486bcd31241002f6af934) )
-	ROM_LOAD16_BYTE( "tsir06s", 0x000000, 0x080000, CRC(3189d73d) SHA1(1a149334c5798f2956b98382894c2a0f1de2cbee) )
 	ROM_LOAD16_BYTE( "tsir08b.p1", 0x000000, 0x080000, CRC(7939acb2) SHA1(35bf98ab8cf7237c1f4dc56e248e4cbbe121a839) )
 	ROM_LOAD16_BYTE( "tsir08bd.p1", 0x000000, 0x080000, CRC(0256a97b) SHA1(d0ab0c20097b7912dc8b14f3abe4a0fe6f06bbe6) )
 	ROM_LOAD16_BYTE( "tsir08d.p1", 0x000000, 0x080000, CRC(f290d7f8) SHA1(3059fded06652a6bc6b2b063d771fd2fa86c9855) )
@@ -4472,6 +4973,14 @@ ROM_START( m5spicer )
 	ROM_LOAD16_BYTE( "tsir08s.p1", 0x000000, 0x080000, CRC(89ffd231) SHA1(f9a56ca145a022730debdbb05e230a666c0cd005) )
 	ROM_LOAD16_BYTE( "tsir08y.p1", 0x000000, 0x080000, CRC(51048fca) SHA1(3edc45d1dd0db88a93b4f35c6864b5c74b2caea5) )
 ROM_END
+
+ROM_START( m5spicer06 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "tsir06s.p1", 0x000000, 0x080000, CRC(3189d73d) SHA1(1a149334c5798f2956b98382894c2a0f1de2cbee) )
+	ROM_LOAD16_BYTE( "tsir06.p2", 0x000001, 0x080000, CRC(418cbe74) SHA1(7013a838860bdb7b2f9486bcd31241002f6af934) )
+	/* 3+4 */
+ROM_END
+
 
 ROM_START( m5spiker )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -4489,26 +4998,37 @@ ROM_START( m5spiker )
 	ROM_LOAD16_BYTE( "bike03r.p1", 0x000000, 0x080000, CRC(b76bbc4e) SHA1(0c9d7296547dc870145fd21ffd79ce478d8eaa72) )
 	ROM_LOAD16_BYTE( "bike03s.p1", 0x000000, 0x080000, CRC(f40433f9) SHA1(8c4f41b0a1c0ef0f1ec7ae479724e2144994be64) )
 	ROM_LOAD16_BYTE( "bike03y.p1", 0x000000, 0x080000, CRC(2599113b) SHA1(5dab7a12c7823cbc3ffcbc51ec09394942107a4c) )
-	ROM_LOAD16_BYTE( "sbtr02.p2", 0x000000, 0x080000, CRC(00ada2e2) SHA1(d6979b9d29d3a5da04d9d9910ca2f2af91f5531e) )
-	//ROM_LOAD16_BYTE( "sbtr02.p3", 0x000000, 0x080000, CRC(cbd103db) SHA1(a4b49e74a5a37c8779d9f6e960c7d904fc9b4a9a) )
-	//ROM_LOAD16_BYTE( "sbtr02.p4", 0x000000, 0x080000, CRC(0d5a7af8) SHA1(14dde9f4f2437b40ad5756931bb4428b571acc2c) )
+ROM_END
+
+ROM_START( m5spiker02 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sbtr02s.p1", 0x000000, 0x080000, CRC(83564725) SHA1(1808294d25426dc407572692531f81cbb3d20c83) )
+	ROM_LOAD16_BYTE( "sbtr02.p2", 0x000001, 0x080000, CRC(00ada2e2) SHA1(d6979b9d29d3a5da04d9d9910ca2f2af91f5531e) )
+	ROM_LOAD16_BYTE( "sbtr02.p3", 0x100000, 0x080000, CRC(cbd103db) SHA1(a4b49e74a5a37c8779d9f6e960c7d904fc9b4a9a) ) // == 03
+	ROM_LOAD16_BYTE( "sbtr02.p4", 0x100001, 0x080000, CRC(0d5a7af8) SHA1(14dde9f4f2437b40ad5756931bb4428b571acc2c) ) // == 03
+	
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "sbtr02ad.p1", 0x000000, 0x080000, CRC(cad3e3bd) SHA1(f6076754bcd560aaf09730bd23fb3c94138579c0) )
 	ROM_LOAD16_BYTE( "sbtr02b.p1", 0x000000, 0x080000, CRC(6a3bfc70) SHA1(202d453cd3e44337168e9e023f2d5daefcbe2c6c) )
 	ROM_LOAD16_BYTE( "sbtr02bd.p1", 0x000000, 0x080000, CRC(48289f9a) SHA1(8533bf4027c9cbd529d6515bfe0f2f0479641c2c) )
 	ROM_LOAD16_BYTE( "sbtr02d.p1", 0x000000, 0x080000, CRC(a14524cf) SHA1(0b3ed43f5de4a44015ea5a345aef43a823cb46a9) )
 	ROM_LOAD16_BYTE( "sbtr02dy.p1", 0x000000, 0x080000, CRC(d87090f7) SHA1(842eb81c83793f74e9075dfeae8033403913d7c5) )
 	ROM_LOAD16_BYTE( "sbtr02k.p1", 0x000000, 0x080000, CRC(30fe78a8) SHA1(e36c51340c5044fb1a4e63a0f98b48eec598417e) )
-	ROM_LOAD16_BYTE( "sbtr02s.p1", 0x000000, 0x080000, CRC(83564725) SHA1(1808294d25426dc407572692531f81cbb3d20c83) )
 	ROM_LOAD16_BYTE( "sbtr02y.p1", 0x000000, 0x080000, CRC(fa63f31d) SHA1(7b1ec05a24a64d83e04738baf1d408d84a08dc06) )
-	ROM_LOAD16_BYTE( "sbtro1.bin", 0x000000, 0x080000, CRC(45c80d46) SHA1(ee5fc418fad5b3a27b025dac38cfa93619a4c058) )
-	ROM_LOAD16_BYTE( "sbtro2.bin", 0x000000, 0x080000, CRC(bf8727c3) SHA1(a647f3ff8291b96acb194f4d362e216efdcf9312) )
-	ROM_LOAD16_BYTE( "sbtro3.bin", 0x000000, 0x080000, CRC(cbd103db) SHA1(a4b49e74a5a37c8779d9f6e960c7d904fc9b4a9a) )
-	ROM_LOAD16_BYTE( "sbtro4.bin", 0x000000, 0x080000, CRC(0d5a7af8) SHA1(14dde9f4f2437b40ad5756931bb4428b571acc2c) )
 ROM_END
+
+ROM_START( m5spikera )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sbtro1.bin", 0x000000, 0x080000, CRC(45c80d46) SHA1(ee5fc418fad5b3a27b025dac38cfa93619a4c058) )
+	ROM_LOAD16_BYTE( "sbtro2.bin", 0x000001, 0x080000, CRC(bf8727c3) SHA1(a647f3ff8291b96acb194f4d362e216efdcf9312) )
+	ROM_LOAD16_BYTE( "sbtro3.bin", 0x100000, 0x080000, CRC(cbd103db) SHA1(a4b49e74a5a37c8779d9f6e960c7d904fc9b4a9a) ) // == 03
+	ROM_LOAD16_BYTE( "sbtro4.bin", 0x100001, 0x080000, CRC(0d5a7af8) SHA1(14dde9f4f2437b40ad5756931bb4428b571acc2c) ) // == 03
+ROM_END
+
 
 ROM_START( m5squids )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "sqid04ad.p1", 0x000000, 0x080000, CRC(53d58b54) SHA1(6b68e23e2e6d7ec2bda08e6fae16500536a31031) )
+	ROM_LOAD16_BYTE( "sqid04s.p1", 0x000000, 0x080000, CRC(79a6658c) SHA1(258605c3abb70c2b326fc2ef51bc43f720363e70) )
 	ROM_LOAD16_BYTE( "sqid04.p2", 0x000001, 0x080000, CRC(a9b674c5) SHA1(ad0fa8c9fb3b7eb3bb98a8a68da544b6d791a8fd) )
 	ROM_LOAD16_BYTE( "sqid04.p3", 0x100000, 0x080000, CRC(2808fd4a) SHA1(1f75987b42f83b54dd2eb376cc9ce0fccfbb693c) )
 	ROM_LOAD16_BYTE( "sqid04.p4", 0x100001, 0x080000, CRC(5983db8c) SHA1(1cf396ea35a6b947fd7fd827fc79e8bf2ef95811) )
@@ -4520,24 +5040,18 @@ ROM_START( m5squids )
 	ROM_LOAD16_BYTE( "sqid04dy.p1", 0x000000, 0x080000, CRC(0d40179c) SHA1(dcaf5427c5e29ddf2eb7ceed7ccd0250bd8d8004) )
 	ROM_LOAD16_BYTE( "sqid04h.p1", 0x000000, 0x080000, CRC(40e9a2f2) SHA1(78dfabf91adcbe8fb45103a06bd9683807776b18) )
 	ROM_LOAD16_BYTE( "sqid04r.p1", 0x000000, 0x080000, CRC(b204b129) SHA1(7afd47c64c75e33c2247c6ea5afd03f94a681b62) )
-	ROM_LOAD16_BYTE( "sqid04s.p1", 0x000000, 0x080000, CRC(79a6658c) SHA1(258605c3abb70c2b326fc2ef51bc43f720363e70) )
+	ROM_LOAD16_BYTE( "sqid04ad.p1", 0x000000, 0x080000, CRC(53d58b54) SHA1(6b68e23e2e6d7ec2bda08e6fae16500536a31031) )
 	ROM_LOAD16_BYTE( "sqid04y.p1", 0x000000, 0x080000, CRC(6171aa46) SHA1(d4b570b97caec10d39ad813653fa6b2b4c96e99f) )
-	ROM_LOAD16_BYTE( "sqid05.p2", 0x000000, 0x080000, CRC(3a5c50cc) SHA1(082b2918fbb0718d567bc4ed1f7f03034138f5c1) )
-	//ROM_LOAD16_BYTE( "sqid05.p3", 0x000000, 0x080000, CRC(2808fd4a) SHA1(1f75987b42f83b54dd2eb376cc9ce0fccfbb693c) )
-	//ROM_LOAD16_BYTE( "sqid05.p4", 0x000000, 0x080000, CRC(5983db8c) SHA1(1cf396ea35a6b947fd7fd827fc79e8bf2ef95811) )
-	ROM_LOAD16_BYTE( "sqid05ad.p1", 0x000000, 0x080000, CRC(15051db0) SHA1(b4cfb41aa9f218144511e5e54630c67d8fd744c5) )
-	ROM_LOAD16_BYTE( "sqid05b.p1", 0x000000, 0x080000, CRC(6ea2eb9e) SHA1(28a1c92688daf90a8363798d797035b661282189) )
-	ROM_LOAD16_BYTE( "sqid05bd.p1", 0x000000, 0x080000, CRC(ccd892cb) SHA1(eb6a243e5caa182597180b9136bf80641b34a92c) )
-	ROM_LOAD16_BYTE( "sqid05d.p1", 0x000000, 0x080000, CRC(efc8a569) SHA1(3ff21cad27c7fd9e9d0427168040edfe7bfc10f9) )
-	ROM_LOAD16_BYTE( "sqid05dy.p1", 0x000000, 0x080000, CRC(bd2d6a22) SHA1(154dccbf7475c85eaf0dd3bab0c9d0f2cafefcc3) )
-	ROM_LOAD16_BYTE( "sqid05h.p1", 0x000000, 0x080000, CRC(9c7840d3) SHA1(865f6130746ae72f558644029f168607bef08c6b) )
-	ROM_LOAD16_BYTE( "sqid05r.p1", 0x000000, 0x080000, CRC(c83f5627) SHA1(5d36d5ac3f23a993ad418afa20a83ae9447b9ceb) )
-	ROM_LOAD16_BYTE( "sqid05s.p1", 0x000000, 0x080000, CRC(01e41c6b) SHA1(ff8aef917292fab4b3cc95354bc3c05548dbfd67) )
-	ROM_LOAD16_BYTE( "sqid05y.p1", 0x000000, 0x080000, CRC(0a9253c1) SHA1(01171c1b1ae79a973553e3e897e038fcb7748c10) )
+ROM_END
+
+ROM_START( m5squids04a )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sqin04.p1", 0x000000, 0x080000, CRC(8682df90) SHA1(d11b6cad477f7ae0545f73c871e1f3595d38564e) )
-	ROM_LOAD16_BYTE( "sqin04.p2", 0x000000, 0x080000, CRC(8fa6544e) SHA1(1299f72ed30ad6c5bde99c566e36845cbe6e5835) )
-	ROM_LOAD16_BYTE( "sqin04.p3", 0x000000, 0x080000, CRC(ef3b411e) SHA1(eb38c441aebc82451675d9e52a95eaded484ed4f) )
-	ROM_LOAD16_BYTE( "sqin04.p4", 0x000000, 0x080000, CRC(4f5d9fe1) SHA1(5cf60c0702b5d01f734ae112e6b57f1397647fe1) )
+	ROM_LOAD16_BYTE( "sqin04.p2", 0x000001, 0x080000, CRC(8fa6544e) SHA1(1299f72ed30ad6c5bde99c566e36845cbe6e5835) )
+	ROM_LOAD16_BYTE( "sqin04.p3", 0x100000, 0x080000, CRC(ef3b411e) SHA1(eb38c441aebc82451675d9e52a95eaded484ed4f) )
+	ROM_LOAD16_BYTE( "sqin04.p4", 0x100001, 0x080000, CRC(4f5d9fe1) SHA1(5cf60c0702b5d01f734ae112e6b57f1397647fe1) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "sqin04a.p1", 0x000000, 0x080000, CRC(5a82309b) SHA1(6502d59710af150084438769a5f2abe392eac3cf) )
 	ROM_LOAD16_BYTE( "sqin04b.p1", 0x000000, 0x080000, CRC(70a2e02f) SHA1(d5371a610e0b1e70d4ef192c7e67cc55cbfaabf6) )
 	ROM_LOAD16_BYTE( "sqin04d.p1", 0x000000, 0x080000, CRC(2f4d036e) SHA1(33a33f81a4c7a8b699315de52c9292790c250420) )
@@ -4545,9 +5059,34 @@ ROM_START( m5squids )
 	ROM_LOAD16_BYTE( "sqin04h.p1", 0x000000, 0x080000, CRC(b6f84795) SHA1(c1b131f4e39ab57b3582cd65cef78be380cdda08) )
 	ROM_LOAD16_BYTE( "sqin04k.p1", 0x000000, 0x080000, CRC(cd0f0878) SHA1(144123581afed313a61f920ab1148b604f67510f) )
 	ROM_LOAD16_BYTE( "sqin04r.p1", 0x000000, 0x080000, CRC(5bbb6a6c) SHA1(1cd6772354517b4b193225cb5c099e2e3ba91a34) )
-	ROM_LOAD16_BYTE( "sqin06.p2", 0x000000, 0x080000, CRC(2b21434a) SHA1(fa8f35bc56d0bdc19680d913e4cc720f73cbca57) )
-	ROM_LOAD16_BYTE( "sqin06.p3", 0x000000, 0x080000, CRC(ef3b411e) SHA1(eb38c441aebc82451675d9e52a95eaded484ed4f) )
-	ROM_LOAD16_BYTE( "sqin06.p4", 0x000000, 0x080000, CRC(4f5d9fe1) SHA1(5cf60c0702b5d01f734ae112e6b57f1397647fe1) )
+ROM_END
+
+ROM_START( m5squids05 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sqid05s.p1", 0x000000, 0x080000, CRC(01e41c6b) SHA1(ff8aef917292fab4b3cc95354bc3c05548dbfd67) )
+	ROM_LOAD16_BYTE( "sqid05.p2", 0x000001, 0x080000, CRC(3a5c50cc) SHA1(082b2918fbb0718d567bc4ed1f7f03034138f5c1) )
+	ROM_LOAD16_BYTE( "sqid05.p3", 0x100000, 0x080000, CRC(2808fd4a) SHA1(1f75987b42f83b54dd2eb376cc9ce0fccfbb693c) ) // == 04
+	ROM_LOAD16_BYTE( "sqid05.p4", 0x100001, 0x080000, CRC(5983db8c) SHA1(1cf396ea35a6b947fd7fd827fc79e8bf2ef95811) ) // == 04
+	
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "sqid05ad.p1", 0x000000, 0x080000, CRC(15051db0) SHA1(b4cfb41aa9f218144511e5e54630c67d8fd744c5) )
+	ROM_LOAD16_BYTE( "sqid05b.p1", 0x000000, 0x080000, CRC(6ea2eb9e) SHA1(28a1c92688daf90a8363798d797035b661282189) )
+	ROM_LOAD16_BYTE( "sqid05bd.p1", 0x000000, 0x080000, CRC(ccd892cb) SHA1(eb6a243e5caa182597180b9136bf80641b34a92c) )
+	ROM_LOAD16_BYTE( "sqid05d.p1", 0x000000, 0x080000, CRC(efc8a569) SHA1(3ff21cad27c7fd9e9d0427168040edfe7bfc10f9) )
+	ROM_LOAD16_BYTE( "sqid05dy.p1", 0x000000, 0x080000, CRC(bd2d6a22) SHA1(154dccbf7475c85eaf0dd3bab0c9d0f2cafefcc3) )
+	ROM_LOAD16_BYTE( "sqid05h.p1", 0x000000, 0x080000, CRC(9c7840d3) SHA1(865f6130746ae72f558644029f168607bef08c6b) )
+	ROM_LOAD16_BYTE( "sqid05r.p1", 0x000000, 0x080000, CRC(c83f5627) SHA1(5d36d5ac3f23a993ad418afa20a83ae9447b9ceb) )
+	ROM_LOAD16_BYTE( "sqid05y.p1", 0x000000, 0x080000, CRC(0a9253c1) SHA1(01171c1b1ae79a973553e3e897e038fcb7748c10) )
+ROM_END
+
+ROM_START( m5squids06 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sqin06s.p1", 0x000000, 0x080000, CRC(3848674c) SHA1(6da13e4f68254f6061492e7464c8d22791b9e9fc) )
+	ROM_LOAD16_BYTE( "sqin06.p2", 0x000001, 0x080000, CRC(2b21434a) SHA1(fa8f35bc56d0bdc19680d913e4cc720f73cbca57) )
+	ROM_LOAD16_BYTE( "sqin06.p3", 0x100000, 0x080000, CRC(ef3b411e) SHA1(eb38c441aebc82451675d9e52a95eaded484ed4f) ) // == 04a
+	ROM_LOAD16_BYTE( "sqin06.p4", 0x100001, 0x080000, CRC(4f5d9fe1) SHA1(5cf60c0702b5d01f734ae112e6b57f1397647fe1) ) // == 04a
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "sqin06ad.p1", 0x000000, 0x080000, CRC(ac1f33e5) SHA1(08db8d6da76befe22e730294b1c9b7a2a4b1ce7a) )
 	ROM_LOAD16_BYTE( "sqin06b.p1", 0x000000, 0x080000, CRC(44fe0cf0) SHA1(7ebc4399e31f874c47593face44c80919d2a76d2) )
 	ROM_LOAD16_BYTE( "sqin06bd.p1", 0x000000, 0x080000, CRC(eb374da9) SHA1(028eec7ad58647a6294878b95839f3174544d866) )
@@ -4555,15 +5094,11 @@ ROM_START( m5squids )
 	ROM_LOAD16_BYTE( "sqin06dy.p1", 0x000000, 0x080000, CRC(7f07e409) SHA1(6279417c44bff598b9ba4023545c54d648d5cfb2) )
 	ROM_LOAD16_BYTE( "sqin06h.p1", 0x000000, 0x080000, CRC(48ecf8dd) SHA1(0bf743302e52eb9b22c11eef247c5f8ee450183b) )
 	ROM_LOAD16_BYTE( "sqin06r.p1", 0x000000, 0x080000, CRC(ac5d79c9) SHA1(98805372e5ffa6bbafa0a18a8f7efbcec3817c0b) )
-	ROM_LOAD16_BYTE( "sqin06s.p1", 0x000000, 0x080000, CRC(3848674c) SHA1(6da13e4f68254f6061492e7464c8d22791b9e9fc) )
 	ROM_LOAD16_BYTE( "sqin06y.p1", 0x000000, 0x080000, CRC(34e8a047) SHA1(855aeccf82d62e7a43c02d077b5308d2a4809299) )
-	// these belong to a different game / hw type?
-	//ROM_LOAD16_BYTE( "squidsin.bin", 0x000000, 0x020000, CRC(be369b43) SHA1(e5c7b7a858b264db2f8f726396ddeb42004d7cb9) )
-	//ROM_LOAD16_BYTE( "squidsnd.p1", 0x000000, 0x080000, CRC(44cebe30) SHA1(a93f64897b4ba333d044649f28fa5dd68d3d2e94) )
-	//ROM_LOAD16_BYTE( "squidsnd.p2", 0x000000, 0x080000, CRC(d2a1b073) SHA1(d4931f18d369e89492fe72a7a1c511c8d3c23a71) )
 ROM_END
 
-ROM_START( m5stars )
+
+ROM_START( m5stars ) // ssss filenames
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "ssssjb_1.3_1", 0x000000, 0x080000, CRC(49518254) SHA1(db7dadb54adba0171489cc9388c6f8ad89bcf752) )
 	ROM_LOAD16_BYTE( "ssssjb_1.3_2", 0x000001, 0x080000, CRC(78b4423e) SHA1(50e8f355db91078d50c53abe98bc7c4cf5625064) )
@@ -4576,44 +5111,88 @@ ROM_START( m5stars )
 	ROM_LOAD16_BYTE( "ssssjbd1.3_1", 0x000000, 0x080000, CRC(d702ccb0) SHA1(3a0dfa0a4b8f2ab077694371fa29df61117864ff) )
 	ROM_LOAD16_BYTE( "ssssjbg1.3_1", 0x000000, 0x080000, CRC(3a2dbf8a) SHA1(07f23adcb3799cd9056bd013bf657cb81d6fec60) )
 	ROM_LOAD16_BYTE( "ssssjbt1.3_1", 0x000000, 0x080000, CRC(135e834f) SHA1(181dc93bf285d2699aed45fecb2e7a0dbac5a299) )
-	ROM_LOAD16_BYTE( "sstsja_2.2_1", 0x000000, 0x080000, CRC(fe415e44) SHA1(63cdb5ca7216e3c75b15260c678a22f2c040f9d9) )
-	ROM_LOAD16_BYTE( "sstsja_2.5_1", 0x000000, 0x080000, CRC(9990bc2e) SHA1(d5349297d0a144b465fbb5e0b9c9b9d2c9bd227b) )
-	ROM_LOAD16_BYTE( "sstsja_2.6_1", 0x000000, 0x080000, CRC(956a9648) SHA1(d21263f09a51523cad8b02d913ea3762dbd8df98) )
-	ROM_LOAD16_BYTE( "sstsjad1.0_1", 0x000000, 0x080000, CRC(3e98505c) SHA1(2790ff41b5a1056c05a116935beeba49a480f880) )
-	ROM_LOAD16_BYTE( "sstsjad1.0_2", 0x000000, 0x080000, CRC(9a3269ef) SHA1(5d3e2945cf3ab11083fc0e736556691c9538d68d) )
-	ROM_LOAD16_BYTE( "sstsjad2.2_1", 0x000000, 0x080000, CRC(8aa7bcb3) SHA1(1a0152e44ce3fbdfc7c9ad6a6b8584afb474901b) )
-	ROM_LOAD16_BYTE( "sstsjad2.5_1", 0x000000, 0x080000, CRC(27976b30) SHA1(4eb25b89178ef4d1f14fa0e95410401fa60a0e0c) )
-	ROM_LOAD16_BYTE( "sstsjad2.6_1", 0x000000, 0x080000, CRC(75936712) SHA1(e5c1fd167be6490074105029ede4a60bf362bbce) )
-	ROM_LOAD16_BYTE( "sstsjb_1.3_1", 0x000000, 0x080000, CRC(bbef5d7c) SHA1(86ab7d247e9d9fef9eaf66fedc8becf2d6e48fac) )
-	ROM_LOAD16_BYTE( "sstsjb_1.3_3", 0x000000, 0x080000, CRC(161c6cd2) SHA1(b9e86b041c68221e2c420992222d5b4959dae73d) )
-	ROM_LOAD16_BYTE( "sstsjb_1.3_4", 0x000000, 0x080000, CRC(350faf02) SHA1(1a52a66fa533f136630ae25a6d7f604db443b071) )
-	ROM_LOAD16_BYTE( "sstsjb_2.0_1", 0x000000, 0x080000, CRC(40ae8934) SHA1(2be06fff15b66d76a14474cd4d09e18ed990930d) )
-	ROM_LOAD16_BYTE( "sstsjb_2.0_2", 0x000000, 0x080000, CRC(2bcec185) SHA1(900a7f9ac7b601b04618f6a6b6359d3917f4c732) )
-	ROM_LOAD16_BYTE( "sstsjb_2.2_1", 0x000000, 0x080000, CRC(bd666849) SHA1(1b66d346dc8592e9ffc86dabce361c548de4d634) )
-	ROM_LOAD16_BYTE( "sstsjb_2.2_2", 0x000000, 0x080000, CRC(3a80af6c) SHA1(88a772fb5112b8730558fa5b45edeef86413be08) )
-	ROM_LOAD16_BYTE( "sstsjb_2.5_1", 0x000000, 0x080000, CRC(e995cf70) SHA1(b742fc741d11a5f0c6f42b22d78a73a10b9908bf) )
-	ROM_LOAD16_BYTE( "sstsjb_2.5_2", 0x000000, 0x080000, CRC(c5337c56) SHA1(cd6f22e3c89c448538cdfec13c587ffd6213a038) )
-	ROM_LOAD16_BYTE( "sstsjb_2.6_1", 0x000000, 0x080000, CRC(0336c2de) SHA1(b6f7a4f470743d09c80207aeaa9830aec1ce7fd2) )
-	ROM_LOAD16_BYTE( "sstsjb_2.6_2", 0x000000, 0x080000, CRC(c00ebd69) SHA1(7d52d3ee09cb866186e1872987c63c5d5986c355) )
-	//ROM_LOAD16_BYTE( "sstsjb_2.6_3", 0x000000, 0x080000, CRC(867fbcc7) SHA1(ee8091ee5caee5b5920f3e5ad85b4cdb7a6fd785) )
-	//ROM_LOAD16_BYTE( "sstsjb_2.6_4", 0x000000, 0x080000, CRC(04ee9dd4) SHA1(49ec743bac7eb8aedce6a908745535ecad88fcfc) )
+ROM_END
+
+ROM_START( m5stars13a ) // why has this got alt 3+4 roms, but ssts filenames closer to the other sets?
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sstsjbd1.3_1", 0x000000, 0x080000, CRC(6b1d8456) SHA1(766a5de930bf50b9e0e595c5cd5b242bd71987df) )
-	ROM_LOAD16_BYTE( "sstsjbd1.3_2", 0x000000, 0x080000, CRC(361b8185) SHA1(7b6b9272c320714373af2778343160cfc276588f) )
-	ROM_LOAD16_BYTE( "sstsjbd2.2_1", 0x000000, 0x080000, CRC(c9808abe) SHA1(a21e89e191f4e3ad89934ad12fe36a756e666fd3) )
-	ROM_LOAD16_BYTE( "sstsjbd2.5_1", 0x000000, 0x080000, CRC(5792186e) SHA1(2f0675bf71004a07909c6f88f353e5919ba762b3) )
+	ROM_LOAD16_BYTE( "sstsjbd1.3_2", 0x000001, 0x080000, CRC(361b8185) SHA1(7b6b9272c320714373af2778343160cfc276588f) )
+	ROM_LOAD16_BYTE( "sstsjb_1.3_3", 0x100000, 0x080000, CRC(161c6cd2) SHA1(b9e86b041c68221e2c420992222d5b4959dae73d) )
+	ROM_LOAD16_BYTE( "sstsjb_1.3_4", 0x100001, 0x080000, CRC(350faf02) SHA1(1a52a66fa533f136630ae25a6d7f604db443b071) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "sstsjb_1.3_1", 0x000000, 0x080000, CRC(bbef5d7c) SHA1(86ab7d247e9d9fef9eaf66fedc8becf2d6e48fac) )
+ROM_END
+
+ROM_START( m5stars26 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sstsjb_2.6_1", 0x000000, 0x080000, CRC(0336c2de) SHA1(b6f7a4f470743d09c80207aeaa9830aec1ce7fd2) )
+	ROM_LOAD16_BYTE( "sstsjb_2.6_2", 0x000001, 0x080000, CRC(c00ebd69) SHA1(7d52d3ee09cb866186e1872987c63c5d5986c355) )
+	ROM_LOAD16_BYTE( "sstsjb_2.6_3", 0x100000, 0x080000, CRC(867fbcc7) SHA1(ee8091ee5caee5b5920f3e5ad85b4cdb7a6fd785) )
+	ROM_LOAD16_BYTE( "sstsjb_2.6_4", 0x100001, 0x080000, CRC(04ee9dd4) SHA1(49ec743bac7eb8aedce6a908745535ecad88fcfc) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "sstsja_2.6_1", 0x000000, 0x080000, CRC(956a9648) SHA1(d21263f09a51523cad8b02d913ea3762dbd8df98) )
 	ROM_LOAD16_BYTE( "sstsjbd2.6_1", 0x000000, 0x080000, CRC(e3cf3384) SHA1(c35b38dfbe2dc47b2ec76d047656c9fd64f09d3c) )
-	ROM_LOAD16_BYTE( "sstsjbg1.0_1", 0x000000, 0x080000, CRC(17e894bd) SHA1(c1c656b4c9a3b9a1e10a4d0d709802ee7b3d72d5) )
-	ROM_LOAD16_BYTE( "sstsjbg1.0_2", 0x000000, 0x080000, CRC(40f7d1b0) SHA1(815e73288b24f9c7d0a78b087b3227a1cc02558a) )
-	ROM_LOAD16_BYTE( "sstsjbg2.2_1", 0x000000, 0x080000, CRC(a760160a) SHA1(47cf45763fd3e16fad5bd419a32b63d80016aaf3) )
-	ROM_LOAD16_BYTE( "sstsjbg2.6_1", 0x000000, 0x080000, CRC(2b612733) SHA1(f8bb2019545b15f9abf6c4ede71f82ccd64ce493) )
-	ROM_LOAD16_BYTE( "sstsjbt2.2_1", 0x000000, 0x080000, CRC(b7f782d4) SHA1(9d5a2a6fa8b194adad5776ddc4bfcc98e669a45c) )
 	ROM_LOAD16_BYTE( "sstsjbt2.6_1", 0x000000, 0x080000, CRC(af1a352c) SHA1(200ab5a8921b0c99afdf2df58ffc98569afa8e6b) )
+	ROM_LOAD16_BYTE( "sstsjbg2.6_1", 0x000000, 0x080000, CRC(2b612733) SHA1(f8bb2019545b15f9abf6c4ede71f82ccd64ce493) )
+	ROM_LOAD16_BYTE( "sstsjad2.6_1", 0x000000, 0x080000, CRC(75936712) SHA1(e5c1fd167be6490074105029ede4a60bf362bbce) )
+ROM_END
+
+ROM_START( m5stars25a ) // sstw filenames
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sstwjb_2.5_1", 0x000000, 0x080000, CRC(6f2d65a2) SHA1(b1c8b28496e1ad3f53cb23f5dd825c47cf4f2d59) )
+	ROM_LOAD16_BYTE( "sstwjb_2.5_2", 0x000001, 0x080000, CRC(b5399cc8) SHA1(ad3b256d2b40b070b77639fd7a636ad2e7f212ff) )
+	/* 3+4 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "sstwja_2.5_1", 0x000000, 0x080000, CRC(20bfa3ea) SHA1(3f1e76788912d9bc0f1c5b9bf728c87970d4862d) )
 	ROM_LOAD16_BYTE( "sstwjad2.5_1", 0x000000, 0x080000, CRC(7108e9d0) SHA1(e080ea274ff0a3ced1c0047f59c5be7a1b5a0e60) )
-	ROM_LOAD16_BYTE( "sstwjb_2.5_1", 0x000000, 0x080000, CRC(6f2d65a2) SHA1(b1c8b28496e1ad3f53cb23f5dd825c47cf4f2d59) )
-	ROM_LOAD16_BYTE( "sstwjb_2.5_2", 0x000000, 0x080000, CRC(b5399cc8) SHA1(ad3b256d2b40b070b77639fd7a636ad2e7f212ff) )
 	ROM_LOAD16_BYTE( "sstwjbd2.5_1", 0x000000, 0x080000, CRC(3e9a2f98) SHA1(59ac08784cff6b12559d7eedb0cf25a02bc675bd) )
 ROM_END
+
+ROM_START( m5stars25 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sstsjb_2.5_1", 0x000000, 0x080000, CRC(e995cf70) SHA1(b742fc741d11a5f0c6f42b22d78a73a10b9908bf) )
+	ROM_LOAD16_BYTE( "sstsjb_2.5_2", 0x000000, 0x080000, CRC(c5337c56) SHA1(cd6f22e3c89c448538cdfec13c587ffd6213a038) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "sstsja_2.5_1", 0x000000, 0x080000, CRC(9990bc2e) SHA1(d5349297d0a144b465fbb5e0b9c9b9d2c9bd227b) )
+	ROM_LOAD16_BYTE( "sstsjbd2.5_1", 0x000000, 0x080000, CRC(5792186e) SHA1(2f0675bf71004a07909c6f88f353e5919ba762b3) )
+	ROM_LOAD16_BYTE( "sstsjad2.5_1", 0x000000, 0x080000, CRC(27976b30) SHA1(4eb25b89178ef4d1f14fa0e95410401fa60a0e0c) )
+ROM_END
+
+ROM_START( m5stars22 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sstsjb_2.2_1", 0x000000, 0x080000, CRC(bd666849) SHA1(1b66d346dc8592e9ffc86dabce361c548de4d634) )
+	ROM_LOAD16_BYTE( "sstsjb_2.2_2", 0x000000, 0x080000, CRC(3a80af6c) SHA1(88a772fb5112b8730558fa5b45edeef86413be08) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "sstsjbd2.2_1", 0x000000, 0x080000, CRC(c9808abe) SHA1(a21e89e191f4e3ad89934ad12fe36a756e666fd3) )
+	ROM_LOAD16_BYTE( "sstsjbg2.2_1", 0x000000, 0x080000, CRC(a760160a) SHA1(47cf45763fd3e16fad5bd419a32b63d80016aaf3) )
+	ROM_LOAD16_BYTE( "sstsjbt2.2_1", 0x000000, 0x080000, CRC(b7f782d4) SHA1(9d5a2a6fa8b194adad5776ddc4bfcc98e669a45c) )
+	ROM_LOAD16_BYTE( "sstsja_2.2_1", 0x000000, 0x080000, CRC(fe415e44) SHA1(63cdb5ca7216e3c75b15260c678a22f2c040f9d9) )
+	ROM_LOAD16_BYTE( "sstsjad2.2_1", 0x000000, 0x080000, CRC(8aa7bcb3) SHA1(1a0152e44ce3fbdfc7c9ad6a6b8584afb474901b) )
+ROM_END
+
+ROM_START( m5stars20 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sstsjb_2.0_1", 0x000000, 0x080000, CRC(40ae8934) SHA1(2be06fff15b66d76a14474cd4d09e18ed990930d) )
+	ROM_LOAD16_BYTE( "sstsjb_2.0_2", 0x000001, 0x080000, CRC(2bcec185) SHA1(900a7f9ac7b601b04618f6a6b6359d3917f4c732) )
+ROM_END
+
+ROM_START( m5stars10 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sstsjad1.0_1", 0x000000, 0x080000, CRC(3e98505c) SHA1(2790ff41b5a1056c05a116935beeba49a480f880) )
+	ROM_LOAD16_BYTE( "sstsjad1.0_2", 0x000001, 0x080000, CRC(9a3269ef) SHA1(5d3e2945cf3ab11083fc0e736556691c9538d68d) )
+ROM_END
+
+ROM_START( m5stars10a ) // why is rom 2 different?
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "sstsjbg1.0_1", 0x000000, 0x080000, CRC(17e894bd) SHA1(c1c656b4c9a3b9a1e10a4d0d709802ee7b3d72d5) )
+	ROM_LOAD16_BYTE( "sstsjbg1.0_2", 0x000001, 0x080000, CRC(40f7d1b0) SHA1(815e73288b24f9c7d0a78b087b3227a1cc02558a) )
+ROM_END
+
 
 ROM_START( m5starcl )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -4624,23 +5203,14 @@ ROM_START( m5starcl )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "rwc____1.3_1", 0x000000, 0x080000, CRC(b53925a7) SHA1(95646d99aec69bb2442eb36a976a6526c9423cf9) )
-	ROM_LOAD16_BYTE( "rwc____1.3_2", 0x000000, 0x080000, CRC(85d2d9ed) SHA1(e8631e808e8238256b7def1ee924c68a97462799) )
 	ROM_LOAD16_BYTE( "rwc___d1.3_1", 0x000000, 0x080000, CRC(53f4d3dc) SHA1(764f1649dc3fe31480b13cfca81e728becaefe69) )
-	ROM_LOAD16_BYTE( "rwc___d1.3_2", 0x000000, 0x080000, CRC(85d2d9ed) SHA1(e8631e808e8238256b7def1ee924c68a97462799) )
 	ROM_LOAD16_BYTE( "rwc__cd1.3_1", 0x000000, 0x080000, CRC(0fc3c890) SHA1(dee7789aac3968a91259f7313e60326c7717eef9) )
-	ROM_LOAD16_BYTE( "rwc__cd1.3_2", 0x000000, 0x080000, CRC(85d2d9ed) SHA1(e8631e808e8238256b7def1ee924c68a97462799) )
 	ROM_LOAD16_BYTE( "rwc_h__1.3_1", 0x000000, 0x080000, CRC(c4f6ae1f) SHA1(76521aaf72959df42617aa979bcb65f44453ccf9) )
-	ROM_LOAD16_BYTE( "rwc_h__1.3_2", 0x000000, 0x080000, CRC(85d2d9ed) SHA1(e8631e808e8238256b7def1ee924c68a97462799) )
 	ROM_LOAD16_BYTE( "rwc_h_d1.3_1", 0x000000, 0x080000, CRC(e8b102f5) SHA1(37ad23cde7dc03a7fc2067509ec866337b2ad902) )
-	ROM_LOAD16_BYTE( "rwc_h_d1.3_2", 0x000000, 0x080000, CRC(85d2d9ed) SHA1(e8631e808e8238256b7def1ee924c68a97462799) )
 	ROM_LOAD16_BYTE( "rwc_hc_1.3_1", 0x000000, 0x080000, CRC(98c1b553) SHA1(b19e05fed1984bc25444ec8da705b80371127894) )
-	ROM_LOAD16_BYTE( "rwc_hc_1.3_2", 0x000000, 0x080000, CRC(85d2d9ed) SHA1(e8631e808e8238256b7def1ee924c68a97462799) )
 	ROM_LOAD16_BYTE( "rwc_hcd1.3_1", 0x000000, 0x080000, CRC(b48619b9) SHA1(1577d2a4142280aba8cb8506b089ba94b9b728fc) )
-	ROM_LOAD16_BYTE( "rwc_hcd1.3_2", 0x000000, 0x080000, CRC(85d2d9ed) SHA1(e8631e808e8238256b7def1ee924c68a97462799) )
 	ROM_LOAD16_BYTE( "rwc_lc_1.3_1", 0x000000, 0x080000, CRC(451e1488) SHA1(2f53e08b080233fd504c522959146731a9bb4d45) )
-	ROM_LOAD16_BYTE( "rwc_lc_1.3_2", 0x000000, 0x080000, CRC(85d2d9ed) SHA1(e8631e808e8238256b7def1ee924c68a97462799) )
 	ROM_LOAD16_BYTE( "rwc_lcd1.3_1", 0x000000, 0x080000, CRC(a3d3e2f3) SHA1(6815bb4cb84aa350466b484f235fa08a1feec5e5) )
-	ROM_LOAD16_BYTE( "rwc_lcd1.3_2", 0x000000, 0x080000, CRC(85d2d9ed) SHA1(e8631e808e8238256b7def1ee924c68a97462799) )
 ROM_END
 
 ROM_START( m5startr )
@@ -4683,9 +5253,16 @@ ROM_START( m5scharg )
 	ROM_LOAD16_BYTE( "scha04r.p1", 0x000000, 0x080000, CRC(5929c975) SHA1(af10d3c9eada1e0854365ccb4c69cf41b398ec56) )
 	ROM_LOAD16_BYTE( "scha04s.p1", 0x000000, 0x080000, CRC(92537e63) SHA1(482118f11478463dd1061ed29bfc458462de0dea) )
 	ROM_LOAD16_BYTE( "scha04y.p1", 0x000000, 0x080000, CRC(5ba1f21a) SHA1(729baf64e52697f3e5e790235984ee594a2e4dfe) )
-	ROM_LOAD16_BYTE( "scha05.p2", 0x000000, 0x080000, CRC(8101d89d) SHA1(1bca2e5242c6b2ea7972c9c227fa53d8b67556a4) )
-	ROM_LOAD16_BYTE( "scha05.p3", 0x000000, 0x080000, CRC(9276e73f) SHA1(dc4d1bf6ed29c9a82b89d98ac9d216a2257d504b) )
-	ROM_LOAD16_BYTE( "scha05.p4", 0x000000, 0x080000, CRC(799408c4) SHA1(42fc19c4c93f5ee9bdcf9cc6bad3e0c506c81bd3) )
+ROM_END
+
+ROM_START( m5scharg05 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "scha05s.p1", 0x000000, 0x080000, CRC(c0c9115f) SHA1(6ae4080775692bdca6b800addc5d9b429a9db05c) )
+	ROM_LOAD16_BYTE( "scha05.p2", 0x000001, 0x080000, CRC(8101d89d) SHA1(1bca2e5242c6b2ea7972c9c227fa53d8b67556a4) )
+	ROM_LOAD16_BYTE( "scha05.p3", 0x100000, 0x080000, CRC(9276e73f) SHA1(dc4d1bf6ed29c9a82b89d98ac9d216a2257d504b) ) // == 04
+	ROM_LOAD16_BYTE( "scha05.p4", 0x100001, 0x080000, CRC(799408c4) SHA1(42fc19c4c93f5ee9bdcf9cc6bad3e0c506c81bd3) ) // == 04
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "scha05ad.p1", 0x000000, 0x080000, CRC(2b4ae3c9) SHA1(d1f15d886b24c74d467a493e02eedc38464c1317) )
 	ROM_LOAD16_BYTE( "scha05b.p1", 0x000000, 0x080000, CRC(e0227cbd) SHA1(8615cb719e5e99861b974ca3a9b5def34cc29898) )
 	ROM_LOAD16_BYTE( "scha05bd.p1", 0x000000, 0x080000, CRC(e74228b8) SHA1(677c83f4f26660e5dd3bbcf3be2c8d95511e4550) )
@@ -4693,20 +5270,32 @@ ROM_START( m5scharg )
 	ROM_LOAD16_BYTE( "scha05dy.p1", 0x000000, 0x080000, CRC(4c63b53e) SHA1(f979007de6088f018d98ffe824959e530857bb0c) )
 	ROM_LOAD16_BYTE( "scha05k.p1", 0x000000, 0x080000, CRC(0d3821aa) SHA1(a0eab6165ad0aa632b2f396dc8a845d8e50ab449) )
 	ROM_LOAD16_BYTE( "scha05r.p1", 0x000000, 0x080000, CRC(a832eb63) SHA1(5e11e07fcef78cae9c168b1ad742823ea29c1df5) )
-	ROM_LOAD16_BYTE( "scha05s.p1", 0x000000, 0x080000, CRC(c0c9115f) SHA1(6ae4080775692bdca6b800addc5d9b429a9db05c) )
 	ROM_LOAD16_BYTE( "scha05y.p1", 0x000000, 0x080000, CRC(f70e81ef) SHA1(403e019005803af77c361c91e16e9bf2fb5606b1) )
+ROM_END
+
+ROM_START( m5scharg06 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "scha06s.p1", 0x000000, 0x080000, CRC(9877e0fb) SHA1(afa371ebcf42cce3ce24b78951c28025b09dd617) )
+	ROM_LOAD16_BYTE( "scha0_6.p2", 0x000001, 0x080000, CRC(0bd01c27) SHA1(56c078a48a6ae281e0779513b66d3a3d31d187b0) )
+	/* 3+4 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "scha06ad.p1", 0x000000, 0x080000, CRC(f6daac46) SHA1(f2e1d6c1f6c563b043d80937e8dc033f88ada00e) )
 	ROM_LOAD16_BYTE( "scha06bd.p1", 0x000000, 0x080000, CRC(5d96adc6) SHA1(abf1318f7b371561aad5d485a9231a18aa949b84) )
 	ROM_LOAD16_BYTE( "scha06d.p1", 0x000000, 0x080000, CRC(7f8f6c13) SHA1(acd6774246650a0b267bbd57f0838407c67e07cc) )
 	ROM_LOAD16_BYTE( "scha06dy.p1", 0x000000, 0x080000, CRC(f2ed6790) SHA1(d3d52bb6b194e4f9d7f049d676fe25433230b1a8) )
 	ROM_LOAD16_BYTE( "scha06k.p1", 0x000000, 0x080000, CRC(0dd3a506) SHA1(fdeafb0fe705dd11d35602ad3006ea58d7d445f2) )
 	ROM_LOAD16_BYTE( "scha06r.p1", 0x000000, 0x080000, CRC(5a62fe06) SHA1(6d7dc55e980dbcd9829f4ade6360cbb4ddba081d) )
-	ROM_LOAD16_BYTE( "scha06s.p1", 0x000000, 0x080000, CRC(9877e0fb) SHA1(afa371ebcf42cce3ce24b78951c28025b09dd617) )
 	ROM_LOAD16_BYTE( "scha06y.p1", 0x000000, 0x080000, CRC(1515eb78) SHA1(f92ed6a02e4883c9b4b9c03373cb222f56ffe688) )
-	ROM_LOAD16_BYTE( "scha0_6.p2", 0x000000, 0x080000, CRC(0bd01c27) SHA1(56c078a48a6ae281e0779513b66d3a3d31d187b0) )
-	ROM_LOAD16_BYTE( "su_charg.p1", 0x0000, 0x080000, CRC(31a6dd3f) SHA1(1d4eb8d8fe230c39fb49cdd170ac1385fd9e86b7) )
-	ROM_LOAD16_BYTE( "su_charg.p2", 0x0000, 0x080000, CRC(6ffd53df) SHA1(9ff711290511a689eb8a168bb43dac4f4949a80d) )
 ROM_END
+
+ROM_START( m5scharga )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "su_charg.p1", 0x00000, 0x080000, CRC(31a6dd3f) SHA1(1d4eb8d8fe230c39fb49cdd170ac1385fd9e86b7) )
+	ROM_LOAD16_BYTE( "su_charg.p2", 0x00001, 0x080000, CRC(6ffd53df) SHA1(9ff711290511a689eb8a168bb43dac4f4949a80d) )
+	/* 3+4 */
+ROM_END
+
 
 ROM_START( m5supro )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -4715,9 +5304,14 @@ ROM_START( m5supro )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "srosjbd3.0_1", 0x000000, 0x080000, CRC(2cff5336) SHA1(ed194276ee1b45743006043331d49cde1d89a71b) )
-	ROM_LOAD16_BYTE( "srt____3.0_1", 0x000000, 0x080000, CRC(3ec58187) SHA1(e4b3f355f0b14b40aab5cbc1a6182e1af3c0ddd2) )
-	ROM_LOAD16_BYTE( "srt____3.0_2", 0x000000, 0x080000, CRC(7e67a377) SHA1(121171a1660338e998c188ff890df320f43e5642) )
 ROM_END
+
+ROM_START( m5suproa )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "srt____3.0_1", 0x000000, 0x080000, CRC(3ec58187) SHA1(e4b3f355f0b14b40aab5cbc1a6182e1af3c0ddd2) )
+	ROM_LOAD16_BYTE( "srt____3.0_2", 0x000001, 0x080000, CRC(7e67a377) SHA1(121171a1660338e998c188ff890df320f43e5642) )
+ROM_END
+
 
 ROM_START( m5supstr )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -4735,9 +5329,15 @@ ROM_START( m5supstr )
 	ROM_LOAD16_BYTE( "ssta02r.p1", 0x000000, 0x080000, CRC(c10750c2) SHA1(3ef557488fe1295d3a4760c911009bcbd588213b) )
 	ROM_LOAD16_BYTE( "ssta02s.p1", 0x000000, 0x080000, CRC(8e93cda1) SHA1(639c4ea0281de69cb3e4f8ba2dd22c1273e25943) )
 	ROM_LOAD16_BYTE( "ssta02y.p1", 0x000000, 0x080000, CRC(968fe42e) SHA1(4ca0807e3c0465c755a097c6b179ec03e84d5404) )
-	ROM_LOAD16_BYTE( "s_star.p1", 0x0000, 0x080000, CRC(bd14a2b2) SHA1(71c1a14111f473d8440ad0b9b6a03d1d29d7c500) )
-	ROM_LOAD16_BYTE( "s_star.p2", 0x0000, 0x080000, CRC(45b0aea0) SHA1(8cf7ac02ce97e94c07e21b1d7f66e8897b92b641) )
 ROM_END
+
+ROM_START( m5supstra )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "s_star.p1", 0x00000, 0x080000, CRC(bd14a2b2) SHA1(71c1a14111f473d8440ad0b9b6a03d1d29d7c500) )
+	ROM_LOAD16_BYTE( "s_star.p2", 0x00001, 0x080000, CRC(45b0aea0) SHA1(8cf7ac02ce97e94c07e21b1d7f66e8897b92b641) )
+	/* 3+4 */
+ROM_END
+
 
 ROM_START( m5sstrk )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -4747,8 +5347,6 @@ ROM_START( m5sstrk )
 	ROM_LOAD16_BYTE( "strt02.p4", 0x100001, 0x080000, CRC(c73f0a2a) SHA1(7bbc80d5e5fb2ebd312bb3c6bcb4be358eb978d4) )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "strb0_2.p1", 0x000000, 0x080000, CRC(2b058cf8) SHA1(816c3a4a85570fd9991822383bd515a616b67e6d) )
-	ROM_LOAD16_BYTE( "strb0_2.p2", 0x000000, 0x080000, CRC(04ec1ef6) SHA1(48c94c4886d2c7c25bd0743b40544e806a7272d8) )
 	ROM_LOAD16_BYTE( "strt02ad.p1", 0x000000, 0x080000, CRC(7fc3adf2) SHA1(3a7a0ac9924d4fae3fd4486c54b5913a62d1eb50) )
 	ROM_LOAD16_BYTE( "strt02b.p1", 0x000000, 0x080000, CRC(fc8d1019) SHA1(1a96b3a4f57cb67e367e7efb53b8659f9ce511c2) )
 	ROM_LOAD16_BYTE( "strt02bd.p1", 0x000000, 0x080000, CRC(5a3adb3b) SHA1(a20fd98940bab6de5cbcea97549a77253c2b83d0) )
@@ -4757,6 +5355,14 @@ ROM_START( m5sstrk )
 	ROM_LOAD16_BYTE( "strt02s.p1", 0x000000, 0x080000, CRC(8d174ce4) SHA1(4cf3400e36dbd8af7fdd67791b9ae7f0846233db) )
 	ROM_LOAD16_BYTE( "strt02y.p1", 0x000000, 0x080000, CRC(3427574e) SHA1(7d575efb123d0afb0de8bc3652e949a5cdfcbf3c) )
 ROM_END
+
+ROM_START( m5sstrk02a )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "strb0_2.p1", 0x000000, 0x080000, CRC(2b058cf8) SHA1(816c3a4a85570fd9991822383bd515a616b67e6d) )
+	ROM_LOAD16_BYTE( "strb0_2.p2", 0x000001, 0x080000, CRC(04ec1ef6) SHA1(48c94c4886d2c7c25bd0743b40544e806a7272d8) )
+	/* 3+4 */
+ROM_END
+
 
 ROM_START( m5tempp )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -4784,20 +5390,38 @@ ROM_START( m5tempt )
 	ROM_LOAD16_BYTE( "t1tr10dy.p1", 0x000000, 0x080000, CRC(a28ea617) SHA1(6901835a50dd031061c38eae80fde6a4b27e356d) )
 	ROM_LOAD16_BYTE( "t1tr10s.p1", 0x000000, 0x080000, CRC(3e044d74) SHA1(62d72686a307556b7f1e592fa7ec724c9c60e013) )
 	ROM_LOAD16_BYTE( "t1tr10y.p1", 0x000000, 0x080000, CRC(2453e774) SHA1(6bf24a7f046b2d7a1887ba199487f1a0829c28ac) )
-	ROM_LOAD16_BYTE( "totr05.p2", 0x000000, 0x080000, CRC(052afdcb) SHA1(c9c2531d9c7a9cfd0b60f29d54efab06c72e64dd) )
-	ROM_LOAD16_BYTE( "totr05.p3", 0x000000, 0x080000, CRC(c6714248) SHA1(d531c3535aa97f4d08e5629e85018d380c07f92c) )
-	ROM_LOAD16_BYTE( "totr05.p4", 0x000000, 0x080000, CRC(ccd6599b) SHA1(96bcc9404ba3e6186be18f322ae6531bc863e589) )
+ROM_END
+
+ROM_START( m5tempt05 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "totr05y.p1", 0x000000, 0x080000, CRC(26487d03) SHA1(595a39724c587c7bb7d8b10e3838be1d5c8b3d3e) )
+	ROM_LOAD16_BYTE( "totr05.p2", 0x000001, 0x080000, CRC(052afdcb) SHA1(c9c2531d9c7a9cfd0b60f29d54efab06c72e64dd) )
+	ROM_LOAD16_BYTE( "totr05.p3", 0x100000, 0x080000, CRC(c6714248) SHA1(d531c3535aa97f4d08e5629e85018d380c07f92c) ) // == 10
+	ROM_LOAD16_BYTE( "totr05.p4", 0x100001, 0x080000, CRC(ccd6599b) SHA1(96bcc9404ba3e6186be18f322ae6531bc863e589) ) // == 10
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "totr05b.p1", 0x000000, 0x080000, CRC(b780ea14) SHA1(8431404ed39d49665bd67a75a88bd4cdd2fab2b4) )
 	ROM_LOAD16_BYTE( "totr05bd.p1", 0x000000, 0x080000, CRC(90f2449c) SHA1(71cce259af2438477a009cc06a21dd5c9d5661d3) )
 	ROM_LOAD16_BYTE( "totr05d.p1", 0x000000, 0x080000, CRC(ff0dc97e) SHA1(48749a3b7de5829139901b9bb3bd52146978d0a0) )
 	ROM_LOAD16_BYTE( "totr05dy.p1", 0x000000, 0x080000, CRC(013ad38b) SHA1(d0bd6805d825f3ac1075a229bfc6e1ca8c8503b4) )
 	ROM_LOAD16_BYTE( "totr05k.p1", 0x000000, 0x080000, CRC(fc24ed59) SHA1(0d8fcd8aeaf3bddd7797bfe004ca68ebd7c685ce) )
-	ROM_LOAD16_BYTE( "totr05y.p1", 0x000000, 0x080000, CRC(26487d03) SHA1(595a39724c587c7bb7d8b10e3838be1d5c8b3d3e) )
-	ROM_LOAD16_BYTE( "tot_1mux.p1", 0x0000, 0x080000, CRC(f13cbb76) SHA1(9a401efe7b4c1ac8b76180455408ed94cd5c1244) )
-	ROM_LOAD16_BYTE( "tot_1mux.p2", 0x0000, 0x080000, CRC(a422cdd6) SHA1(cfcd63ce66de881a7184c68fa468fe1350579c4d) )
-	ROM_LOAD( "tot_1mux.p1_a", 0x0000, 0x080000, CRC(171c1380) SHA1(efac1f8711f60c53ec3f5604207cc320307f345e) )
-	ROM_LOAD( "tot_1mux.p2_a", 0x0000, 0x080000, CRC(b538dd51) SHA1(358a2319a54b38300b9ed5398abe96fcdb9773bc) )
 ROM_END
+
+ROM_START( m5tempta )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "tot_1mux.p1", 0x00000, 0x080000, CRC(f13cbb76) SHA1(9a401efe7b4c1ac8b76180455408ed94cd5c1244) )
+	ROM_LOAD16_BYTE( "tot_1mux.p2", 0x00001, 0x080000, CRC(a422cdd6) SHA1(cfcd63ce66de881a7184c68fa468fe1350579c4d) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5temptb )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "tot_1mux.p1_a", 0x00000, 0x080000, CRC(171c1380) SHA1(efac1f8711f60c53ec3f5604207cc320307f345e) )
+	ROM_LOAD16_BYTE( "tot_1mux.p2_a", 0x00001, 0x080000, CRC(b538dd51) SHA1(358a2319a54b38300b9ed5398abe96fcdb9773bc) )
+	/* 3+4 */
+ROM_END
+
+
 
 ROM_START( m5tempt2 )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -4810,9 +5434,16 @@ ROM_START( m5tempt2 )
 	ROM_LOAD16_BYTE( "t2tr10dy.p1", 0x000000, 0x080000, CRC(a800d477) SHA1(ccbba560c7ea0b7fa0efe66fefe2527e1fef4cfc) )
 	ROM_LOAD16_BYTE( "t2tr10s.p1", 0x000000, 0x080000, CRC(8f67c4b7) SHA1(14cbf15dcffe054cee285034b16a11f0dcac6213) )
 	ROM_LOAD16_BYTE( "t2tr10y.p1", 0x000000, 0x080000, CRC(dbcaea49) SHA1(01463d5e4a003cb2b9d8e8f8304285781c7e15d5) )
-	ROM_LOAD16_BYTE( "tot203.p2", 0x000000, 0x080000, CRC(d9bc060a) SHA1(97d7c083f62066456380e96ad9c0020562845a5f) )
-	ROM_LOAD16_BYTE( "tot203.p3", 0x000000, 0x080000, CRC(c6714248) SHA1(d531c3535aa97f4d08e5629e85018d380c07f92c) )
-	ROM_LOAD16_BYTE( "tot203.p4", 0x000000, 0x080000, CRC(ccd6599b) SHA1(96bcc9404ba3e6186be18f322ae6531bc863e589) )
+ROM_END
+
+ROM_START( m5tempt203 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "tot203s.p1", 0x000000, 0x080000, CRC(100ba124) SHA1(9716a5a430a2f811f093acd776b6342530613fd6) )
+	ROM_LOAD16_BYTE( "tot203.p2", 0x000001, 0x080000, CRC(d9bc060a) SHA1(97d7c083f62066456380e96ad9c0020562845a5f) )
+	ROM_LOAD16_BYTE( "tot203.p3", 0x100000, 0x080000, CRC(c6714248) SHA1(d531c3535aa97f4d08e5629e85018d380c07f92c) ) // == 10
+	ROM_LOAD16_BYTE( "tot203.p4", 0x100001, 0x080000, CRC(ccd6599b) SHA1(96bcc9404ba3e6186be18f322ae6531bc863e589) ) // == 10
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "tot203b.p1", 0x000000, 0x080000, CRC(d56f9fc9) SHA1(2a1fff24ce515bd06924e95996946e3b84779e5d) )
 	ROM_LOAD16_BYTE( "tot203bd.p1", 0x000000, 0x080000, CRC(e258b0da) SHA1(8a2eaa1253da8f03edb5fb20c78e32e74b29a28a) )
 	ROM_LOAD16_BYTE( "tot203d.p1", 0x000000, 0x080000, CRC(273c8e37) SHA1(7efa094c73b879cb55cb4c996850c64ecd134508) )
@@ -4820,11 +5451,16 @@ ROM_START( m5tempt2 )
 	ROM_LOAD16_BYTE( "tot203h.p1", 0x000000, 0x080000, CRC(7f67a2c8) SHA1(e7790dbadeffd01039f1ceef84b8a57f59b593d8) )
 	ROM_LOAD16_BYTE( "tot203k.p1", 0x000000, 0x080000, CRC(35db2f99) SHA1(4c1e8bce8ed1e31883acf906adfaf8e0323f74a3) )
 	ROM_LOAD16_BYTE( "tot203r.p1", 0x000000, 0x080000, CRC(0ec20b5b) SHA1(1e919fb4e5b22c95b642cfe6d61db6c8def8adce) )
-	ROM_LOAD16_BYTE( "tot203s.p1", 0x000000, 0x080000, CRC(100ba124) SHA1(9716a5a430a2f811f093acd776b6342530613fd6) )
 	ROM_LOAD16_BYTE( "tot203y.p1", 0x000000, 0x080000, CRC(6dae907b) SHA1(8033fd901ac25ebbbe0b3562eb3c55cde607fe99) )
-	ROM_LOAD16_BYTE( "tot_2mux.p1", 0x0000, 0x080000, CRC(b851e2f3) SHA1(7fbb2fd9cb03e7d16ba8b3aeb8dc17d72304c7df) )
-	ROM_LOAD16_BYTE( "tot_2mux.p2", 0x0000, 0x080000, CRC(57ce89bf) SHA1(e7b666700ee2f6bfa1dbca7c32d7e92fd10101c2) )
-	ROM_LOAD( "tot_2mux.p2_a", 0x0000, 0x080000, CRC(a0874f29) SHA1(0e29fb2703fdc34244d5ba6169d774abd0cacf70) )
+ROM_END
+
+ROM_START( m5tempt2a )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "tot_2mux.p1", 0x00000, 0x080000, CRC(b851e2f3) SHA1(7fbb2fd9cb03e7d16ba8b3aeb8dc17d72304c7df) )
+	ROM_LOAD16_BYTE( "tot_2mux.p2", 0x00001, 0x080000, CRC(57ce89bf) SHA1(e7b666700ee2f6bfa1dbca7c32d7e92fd10101c2) )
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "tot_2mux.p2_a", 0x00001, 0x080000, CRC(a0874f29) SHA1(0e29fb2703fdc34244d5ba6169d774abd0cacf70) )
 ROM_END
 
 ROM_START( m5tempcl )
@@ -4894,9 +5530,16 @@ ROM_START( m5topdog )
 	ROM_LOAD16_BYTE( "tdog03r.p1", 0x000000, 0x080000, CRC(fc431f59) SHA1(6030aa6f5b736cf0bc033cda741b4d144ea2e390) )
 	ROM_LOAD16_BYTE( "tdog03s.p1", 0x000000, 0x080000, CRC(2b4766ea) SHA1(26541113ba75adaf5813752d93e93dde1dd5e758) )
 	ROM_LOAD16_BYTE( "tdog03y.p1", 0x000000, 0x080000, CRC(cc02dcd6) SHA1(0bfbe6d714af67cb9454af9a90703b4008c170e8) )
-	ROM_LOAD16_BYTE( "tdog04.p2", 0x000000, 0x080000, CRC(4b4e13f3) SHA1(fa1d834b1fd7cdcdf8df282a943e3a83eecf57e8) )
-	ROM_LOAD16_BYTE( "tdog04.p3", 0x000000, 0x080000, CRC(a44fe7d2) SHA1(628ac27fc24d69f3e7e1f3cab7d0a920b92235c9) )
-	ROM_LOAD16_BYTE( "tdog04.p4", 0x000000, 0x080000, CRC(353a5f78) SHA1(f011b457ec0291a9d1d091dc0ce85d2a83acd3b0) )
+ROM_END
+
+ROM_START( m5topdog04 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "tdog04s.p1", 0x000000, 0x080000, CRC(aa37190c) SHA1(b3d11d0ff3b75b6a037acb1fd815f34128db55ae) )
+	ROM_LOAD16_BYTE( "tdog04.p2", 0x000001, 0x080000, CRC(4b4e13f3) SHA1(fa1d834b1fd7cdcdf8df282a943e3a83eecf57e8) )
+	ROM_LOAD16_BYTE( "tdog04.p3", 0x100000, 0x080000, CRC(a44fe7d2) SHA1(628ac27fc24d69f3e7e1f3cab7d0a920b92235c9) ) // == 03
+	ROM_LOAD16_BYTE( "tdog04.p4", 0x100001, 0x080000, CRC(353a5f78) SHA1(f011b457ec0291a9d1d091dc0ce85d2a83acd3b0) ) // == 03
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "tdog04ad.p1", 0x000000, 0x080000, CRC(aa83dca6) SHA1(8d92d071d773ecb191d5bab7371f868cbfc84e85) )
 	ROM_LOAD16_BYTE( "tdog04b.p1", 0x000000, 0x080000, CRC(9d43f02a) SHA1(818d76061074af2d4790c19cfc42be00d93ac755) )
 	ROM_LOAD16_BYTE( "tdog04bd.p1", 0x000000, 0x080000, CRC(889de7e6) SHA1(2f4ec93a72864ef577b3b8911e2534e8ddd5f9fc) )
@@ -4904,12 +5547,16 @@ ROM_START( m5topdog )
 	ROM_LOAD16_BYTE( "tdog04dy.p1", 0x000000, 0x080000, CRC(0fa3032b) SHA1(99a315274bf323ad3921f73c1d6113d2f3589544) )
 	ROM_LOAD16_BYTE( "tdog04k.p1", 0x000000, 0x080000, CRC(dd7314ce) SHA1(3cf26aa5c86627396f0c36cfaeca8e61f1657d69) )
 	ROM_LOAD16_BYTE( "tdog04r.p1", 0x000000, 0x080000, CRC(df8b18c0) SHA1(7cf8fab80b2d76bc23f0a3ba361eae0a39a95fa5) )
-	ROM_LOAD16_BYTE( "tdog04s.p1", 0x000000, 0x080000, CRC(aa37190c) SHA1(b3d11d0ff3b75b6a037acb1fd815f34128db55ae) )
 	ROM_LOAD16_BYTE( "tdog04y.p1", 0x000000, 0x080000, CRC(14314195) SHA1(5d5289f806590f731b3a4ee706a962482a934078) )
-
-	ROM_LOAD( "top_dog.p1", 0x0000, 0x080000, CRC(c869752f) SHA1(2a5318a968b6d1de07926f3f33f72fa5533fc6b7) )
-	ROM_LOAD( "top_dog.p2", 0x0000, 0x080000, CRC(8fca93e2) SHA1(712a3b4877d9703f7a846231332961518ed2ae76) )
 ROM_END
+
+ROM_START( m5topdoga )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "top_dog.p1", 0x00000, 0x080000, CRC(c869752f) SHA1(2a5318a968b6d1de07926f3f33f72fa5533fc6b7) )
+	ROM_LOAD16_BYTE( "top_dog.p2", 0x00001, 0x080000, CRC(8fca93e2) SHA1(712a3b4877d9703f7a846231332961518ed2ae76) )
+	/* 3+4 */
+ROM_END
+
 
 ROM_START( m5topdol )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -4921,10 +5568,16 @@ ROM_START( m5topdol )
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "tpd13d.p1", 0x000000, 0x080000, CRC(c878b025) SHA1(3c594a94b53491edc42e91b5f7ff80c5194d38e1) )
 	ROM_LOAD16_BYTE( "tpd13k.p1", 0x000000, 0x080000, CRC(6a5271c5) SHA1(1b576d4de1ce7d2da37e17143eb3719d6bc703c8) )
-	// alt roms? (were paired with tpd13s.p1 / tpd13s.p2 with t doller.p1 / t doller.p2 labels
-	ROM_LOAD( "t doller.p3", 0x0000, 0x080000, CRC(11ce71f0) SHA1(30603a897d5226d3d5c064b77d3c6314d21fe709) )
-	ROM_LOAD( "t doller.p4", 0x0000, 0x080000, CRC(abd514e0) SHA1(a42f35b57ad41a02a9f6969fbeb380152b5b8bf0) )
 ROM_END
+
+ROM_START( m5topdola ) // only has alt sound roms? are they bad?
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "t doller.p1", 0x000000, 0x080000, CRC(4e90e029) SHA1(252c308d034d03c7e89ef2b581b5651dedd13888) )
+	ROM_LOAD16_BYTE( "t doller.p2", 0x000001, 0x080000, CRC(31fc8222) SHA1(efd08b7162f85b6505738908b28eaddb54554aba) )
+	ROM_LOAD16_BYTE( "t doller.p3", 0x100000, 0x080000, CRC(11ce71f0) SHA1(30603a897d5226d3d5c064b77d3c6314d21fe709) )
+	ROM_LOAD16_BYTE( "t doller.p4", 0x100001, 0x080000, CRC(abd514e0) SHA1(a42f35b57ad41a02a9f6969fbeb380152b5b8bf0) )
+ROM_END
+
 
 ROM_START( m5trail )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -4953,15 +5606,28 @@ ROM_START( m5ttop )
 	ROM_LOAD16_BYTE( "treb0_1.p2", 0x000001, 0x080000, CRC(076a8a59) SHA1(f702d1b3599d05f456c86ce6bc2f14bdd50cf092) )
 	ROM_LOAD16_BYTE( "treb0_1.p3", 0x100000, 0x080000, CRC(c9d4f59c) SHA1(4d98ba26295955be86f74c0a557c4ae0509edd04) )
 	ROM_LOAD16_BYTE( "treb0_1.p4", 0x100001, 0x080000, CRC(7870b15a) SHA1(773ad400a6f7d453b57d46341e7f20f5eed322f7) )
+ROM_END
+
+ROM_START( m5ttop04 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "treb0_4.p1", 0x000000, 0x080000, CRC(63586be3) SHA1(15f258a8c7d3478f0492dc0ae03c348440ae1423) )
+	ROM_LOAD16_BYTE( "treb0_4.p2", 0x000001, 0x080000, CRC(300962d5) SHA1(84e29456057a75ef6e89f44b42560c2a0eeb6a65) )
+	/* 3+4 */
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "treb0_4.p1", 0x000000, 0x080000, CRC(63586be3) SHA1(15f258a8c7d3478f0492dc0ae03c348440ae1423) )
-	ROM_LOAD16_BYTE( "treb0_4.p2", 0x000000, 0x080000, CRC(300962d5) SHA1(84e29456057a75ef6e89f44b42560c2a0eeb6a65) )
 	ROM_LOAD16_BYTE( "treb0_4d.p1", 0x000000, 0x080000, CRC(14a72539) SHA1(13b6fceba88ebf4a45960ece1d5b3c0441f8393e) )
+ROM_END
+
+ROM_START( m5ttop10 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "treb1_0.p1", 0x000000, 0x080000, CRC(1c349abc) SHA1(04b80982f4c5ec0545549410b1ef8128c459a5e4) )
-	ROM_LOAD16_BYTE( "treb1_0.p2", 0x000000, 0x080000, CRC(8ea40d3e) SHA1(56fc6f1cb4b1cc5d475d332fe8f19ceaeac2a1f4) )
+	ROM_LOAD16_BYTE( "treb1_0.p2", 0x000001, 0x080000, CRC(8ea40d3e) SHA1(56fc6f1cb4b1cc5d475d332fe8f19ceaeac2a1f4) )
+	/* 3+4 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "treb1_0d.p1", 0x000000, 0x080000, CRC(a10546a6) SHA1(a4bb0dd99d5c0122be73db34278109846eaed334) )
 ROM_END
+
 
 ROM_START( m5ttopcl )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -4998,28 +5664,42 @@ ROM_START( m5ultimo )
 	ROM_LOAD16_BYTE( "ulti03r.p1", 0x000000, 0x080000, CRC(119fc875) SHA1(2eed3458e5a49ac4a8bb78154c8a4f260a4ee336) )
 	ROM_LOAD16_BYTE( "ulti03s.p1", 0x000000, 0x080000, CRC(a36a7616) SHA1(0ae8ffe9c5daf6ae4373eeed3e4bfc893b9199c2) )
 	ROM_LOAD16_BYTE( "ulti03y.p1", 0x000000, 0x080000, CRC(285d7bed) SHA1(1198555279ad2c4d66f13a03d372125118232c40) )
-	ROM_LOAD16_BYTE( "ultr03.p2", 0x000000, 0x080000, CRC(b78b8f57) SHA1(ce1c20e8a97727c2b37983edb47c0603ac21a59a) )
-	ROM_LOAD16_BYTE( "ultr03.p3", 0x000000, 0x080000, CRC(bfc649eb) SHA1(85f31848918e35385ab96cbadadbc33ddb1e42b1) )
-	ROM_LOAD16_BYTE( "ultr03.p4", 0x000000, 0x080000, CRC(8579127e) SHA1(5ba966008c0f7b4c910eddc6400ed2178c70e096) )
+ROM_END
+
+ROM_START( m5ultimo03a )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ultr03s.p1", 0x000000, 0x080000, CRC(cfc11235) SHA1(0c09e9860d2ac3589cf75a11ca43bd755a9a432f) )
+	ROM_LOAD16_BYTE( "ultr03.p2", 0x000001, 0x080000, CRC(b78b8f57) SHA1(ce1c20e8a97727c2b37983edb47c0603ac21a59a) )
+	ROM_LOAD16_BYTE( "ultr03.p3", 0x100000, 0x080000, CRC(bfc649eb) SHA1(85f31848918e35385ab96cbadadbc33ddb1e42b1) ) // == 03
+	ROM_LOAD16_BYTE( "ultr03.p4", 0x100001, 0x080000, CRC(8579127e) SHA1(5ba966008c0f7b4c910eddc6400ed2178c70e096) ) // == 03
+	
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "ultr03ad.p1", 0x000000, 0x080000, CRC(94e18680) SHA1(80e7024464abff00a880c0f88f2b336e168ad025) )
 	ROM_LOAD16_BYTE( "ultr03b.p1", 0x000000, 0x080000, CRC(8c66b958) SHA1(cd6a5c931bb432169ffe337ca6b2ffdd08d3fc5a) )
 	ROM_LOAD16_BYTE( "ultr03bd.p1", 0x000000, 0x080000, CRC(07b7b114) SHA1(37035e750cc76b6e9e58c68e4e0bbbf201e48a8b) )
 	ROM_LOAD16_BYTE( "ultr03d.p1", 0x000000, 0x080000, CRC(10907f74) SHA1(34f7e6b6f504816a4f055ad7faf8ffa9c88a6d2b) )
 	ROM_LOAD16_BYTE( "ultr03dy.p1", 0x000000, 0x080000, CRC(b27c237b) SHA1(dc3a44e831243374fc9f9663489a277dea9bbd99) )
 	ROM_LOAD16_BYTE( "ultr03k.p1", 0x000000, 0x080000, CRC(973a4942) SHA1(de1839d04fd1d7e8fb8a8ce75747084767786858) )
-	ROM_LOAD16_BYTE( "ultr03s.p1", 0x000000, 0x080000, CRC(cfc11235) SHA1(0c09e9860d2ac3589cf75a11ca43bd755a9a432f) )
 	ROM_LOAD16_BYTE( "ultr03y.p1", 0x000000, 0x080000, CRC(6d2d4e3a) SHA1(6b223415b70c8d372212ef88541ac921586cb46b) )
+ROM_END
+
+ROM_START( m5ultimo04 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "ultr0_4s.p1", 0x000000, 0x080000, CRC(8d657946) SHA1(2bbb12ee9c30a7c53d0befc8ce55b006fedb7d57) )
+	ROM_LOAD16_BYTE( "ultr0_4.p2", 0x000001, 0x080000, CRC(46b55954) SHA1(6cbfbb15ba3aafbd691e8f4a937a9a2a1c449072) )
+	/* 3+4 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "ultr04ad.p1", 0x000000, 0x080000, CRC(f9770f88) SHA1(3ad37ceff574053b7054b47b33ed17c103bd627d) )
 	ROM_LOAD16_BYTE( "ultr04bd.p1", 0x000000, 0x080000, CRC(b3485628) SHA1(3251a8a33037f9c26a53ec83cfaac544cd2dbc1b) )
 	ROM_LOAD16_BYTE( "ultr04dy.p1", 0x000000, 0x080000, CRC(c0a52dd3) SHA1(9efd7daf47e906cc1063cadfbeeeca62a05e1e69) )
-	ROM_LOAD16_BYTE( "ultr0_4.p2", 0x000000, 0x080000, CRC(46b55954) SHA1(6cbfbb15ba3aafbd691e8f4a937a9a2a1c449072) )
 	ROM_LOAD16_BYTE( "ultr0_4b.p1", 0x000000, 0x080000, CRC(57ac885a) SHA1(cf5e677d11073a8a6ad7e53e55724afbe475bdaf) )
 	ROM_LOAD16_BYTE( "ultr0_4d.p1", 0x000000, 0x080000, CRC(ac2aad1e) SHA1(28dbc41bc951346c7cdeb04df591b53967d02946) )
 	ROM_LOAD16_BYTE( "ultr0_4k.p1", 0x000000, 0x080000, CRC(1c660fbb) SHA1(f01980a023c7c171f6b9b6e962fa7a34a17b45d1) )
 	ROM_LOAD16_BYTE( "ultr0_4r.p1", 0x000000, 0x080000, CRC(e0ded0f6) SHA1(d0253768e4890a9c04519614248b8eae0fb43c73) )
-	ROM_LOAD16_BYTE( "ultr0_4s.p1", 0x000000, 0x080000, CRC(8d657946) SHA1(2bbb12ee9c30a7c53d0befc8ce55b006fedb7d57) )
 	ROM_LOAD16_BYTE( "ultr0_4y.p1", 0x000000, 0x080000, CRC(e1eaf98b) SHA1(a3cbfe52deb737cf350b84f97c2261d216e6e127) )
 ROM_END
+
 
 ROM_START( m5upover )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -5037,9 +5717,14 @@ ROM_START( m5upover )
 	ROM_LOAD16_BYTE( "upov04r.p1", 0x000000, 0x080000, CRC(d79a2e73) SHA1(08bd94f552431ab827afa31915d2684b201d7042) )
 	ROM_LOAD16_BYTE( "upov04s.p1", 0x000000, 0x080000, CRC(7f47acb0) SHA1(b9ee1879c4be48c33559ca5debb27323a22bccd0) )
 	ROM_LOAD16_BYTE( "upov04y.p1", 0x000000, 0x080000, CRC(6df4b1eb) SHA1(34cda403ffea53b2ef19400a0ceeffce2f96251f) )
-	ROM_LOAD16_BYTE( "upov15f", 0x000000, 0x080000, CRC(f98d4f46) SHA1(0ce2a177d05de481115ba63397b8cce2785ac2ba) )
-
 ROM_END
+
+ROM_START( m5upover15 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "upov15f.p1", 0x000000, 0x080000, CRC(f98d4f46) SHA1(0ce2a177d05de481115ba63397b8cce2785ac2ba) )
+	ROM_LOAD16_BYTE( "upov15f.p2", 0x000001, 0x080000, NO_DUMP )
+ROM_END
+
 
 ROM_START( m5vampup )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -5081,8 +5766,13 @@ ROM_START( m5wking )
 	ROM_LOAD16_BYTE( "witr02r.p1", 0x000000, 0x080000, CRC(0189c25d) SHA1(3d1eb417a1c26121160a2ef7f1f526208b07bd2d) )
 	ROM_LOAD16_BYTE( "witr02s.p1", 0x000000, 0x080000, CRC(4586f27f) SHA1(2de55da99621edb2e25509a9c5ac20a5deea95ee) )
 	ROM_LOAD16_BYTE( "witr02y.p1", 0x000000, 0x080000, CRC(b24467a2) SHA1(c592c296cd7a5e85bde73d57e6b07a5dd3aaad71) )
+ROM_END
+
+ROM_START( m5wking05 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "wild05.p1", 0x000000, 0x080000, CRC(990329d3) SHA1(7ddce7826614b95fbefb848d5c5b8d68d3977516) )
-	ROM_LOAD16_BYTE( "wild05.p2", 0x000000, 0x080000, CRC(ed676a88) SHA1(3321edd3c4e1f04c0227aacdf430310c05c9afd4) )
+	ROM_LOAD16_BYTE( "wild05.p2", 0x000001, 0x080000, CRC(ed676a88) SHA1(3321edd3c4e1f04c0227aacdf430310c05c9afd4) )
+	/* 3+4 */
 ROM_END
 
 ROM_START( m5wthing )
@@ -5091,13 +5781,22 @@ ROM_START( m5wthing )
 	ROM_LOAD16_BYTE( "wtc1_0.p2", 0x000001, 0x080000, CRC(258f8ee5) SHA1(0d52961b062c7d0600786be487d13dd568ab26cd) )
 	ROM_LOAD16_BYTE( "wtc1_0.p3", 0x100000, 0x080000, CRC(b5e07ec4) SHA1(a49eca5d19d7f7591a91dd38ca49b5d7dafbf2cf) )
 	ROM_LOAD16_BYTE( "wtc1_0.p4", 0x100001, 0x080000, CRC(435df5f6) SHA1(a5908514b7687180df31f882dc27510b439de59c) )
-
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "wtc1_1.p1", 0x000000, 0x080000, CRC(243ae248) SHA1(a6520bf65d7522830318145175969d3c258073ac) )
-	ROM_LOAD16_BYTE( "wtc1_1.p2", 0x000000, 0x080000, CRC(f7825c0c) SHA1(511a065dd8e507e825268dd5aa073c669968fbe3) )
-	ROM_LOAD16_BYTE( "wtc2_0.p1", 0x000000, 0x080000, CRC(5b4ab64c) SHA1(92c8342b891d226725f26ec3952b5be2b23ead79) )
-	ROM_LOAD16_BYTE( "wtc2_0.p2", 0x000000, 0x080000, CRC(68bb5fef) SHA1(11c7837e1bac5751c89d8094c9a6d9e31368d38b) )
 ROM_END
+
+ROM_START( m5wthing11 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "wtc1_1.p1", 0x000000, 0x080000, CRC(243ae248) SHA1(a6520bf65d7522830318145175969d3c258073ac) )
+	ROM_LOAD16_BYTE( "wtc1_1.p2", 0x000001, 0x080000, CRC(f7825c0c) SHA1(511a065dd8e507e825268dd5aa073c669968fbe3) )
+	/* 3+4 */
+ROM_END
+
+ROM_START( m5wthing20 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "wtc2_0.p1", 0x000000, 0x080000, CRC(5b4ab64c) SHA1(92c8342b891d226725f26ec3952b5be2b23ead79) )
+	ROM_LOAD16_BYTE( "wtc2_0.p2", 0x000001, 0x080000, CRC(68bb5fef) SHA1(11c7837e1bac5751c89d8094c9a6d9e31368d38b) )
+	/* 3+4 */
+ROM_END
+
 
 ROM_START( m5xfact )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -5105,22 +5804,36 @@ ROM_START( m5xfact )
 	ROM_LOAD16_BYTE( "xfac0_1.p2", 0x000001, 0x080000, CRC(42093263) SHA1(b0e8542916e832f29a4032e2b0308229bba25bce) )
 	ROM_LOAD16_BYTE( "xfac0_1.p3", 0x100000, 0x080000, CRC(d32dd45e) SHA1(57f43df56ea2813471d39e5131193dd681a5d5ba) )
 	ROM_LOAD16_BYTE( "xfac0_1.p4", 0x100001, 0x080000, CRC(fd6469e9) SHA1(52eb3ab7b375b576070bbf2ab4c5e101e3879408) )
-
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "xfac0_2.p1", 0x000000, 0x080000, CRC(ab2ddbe1) SHA1(39d65eb00aea8753db6964ec60715055962b7e39) )
-	ROM_LOAD16_BYTE( "xfac0_2.p2", 0x000000, 0x080000, CRC(f941e22e) SHA1(fe7ba6a304aaeaf802df1aa2fd11e935da793b31) )
-	ROM_LOAD16_BYTE( "xfac0_2.p3", 0x000000, 0x080000, CRC(d32dd45e) SHA1(57f43df56ea2813471d39e5131193dd681a5d5ba) )
-	ROM_LOAD16_BYTE( "xfac0_2.p4", 0x000000, 0x080000, CRC(fd6469e9) SHA1(52eb3ab7b375b576070bbf2ab4c5e101e3879408) )
-	ROM_LOAD16_BYTE( "xfac0_4.p1", 0x000000, 0x080000, CRC(2336356e) SHA1(4332fada68b55f9e70d6b059509ab82715ec1ac0) )
-	ROM_LOAD16_BYTE( "xfac0_4.p2", 0x000000, 0x080000, CRC(bc2296d6) SHA1(d3fe3f806300e1de907288180a6af87e1ca75033) )
-	ROM_LOAD16_BYTE( "xfac0_4d.p1", 0x000000, 0x080000, CRC(61c805a5) SHA1(1465117ae0f9d7982db70bc1dec657cb3e1940fb) )
-	ROM_LOAD16_BYTE( "xfac0_4m.p1", 0x000000, 0x080000, CRC(509d7101) SHA1(6ed398307758d8268d2c92c84b95137f2af0d493) )
-	ROM_LOAD16_BYTE( "xfac1_1.p1", 0x000000, 0x080000, CRC(f3303449) SHA1(61284a5e950df86efc72aef436b81a80a8370380) )
-	ROM_LOAD16_BYTE( "xfac1_1.p2", 0x000000, 0x080000, CRC(c1508630) SHA1(1ad9f38ddef32bc5a64db434c681b06967edd988) )
-	ROM_LOAD16_BYTE( "xfac1_1d.p1", 0x000000, 0x080000, CRC(ffbcb9f2) SHA1(a57760ff5b092d7550a5b2d69065782cbdd056e4) )
 ROM_END
 
+ROM_START( m5xfact02 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "xfac0_2.p1", 0x000000, 0x080000, CRC(ab2ddbe1) SHA1(39d65eb00aea8753db6964ec60715055962b7e39) )
+	ROM_LOAD16_BYTE( "xfac0_2.p2", 0x000001, 0x080000, CRC(f941e22e) SHA1(fe7ba6a304aaeaf802df1aa2fd11e935da793b31) )
+	ROM_LOAD16_BYTE( "xfac0_2.p3", 0x100000, 0x080000, CRC(d32dd45e) SHA1(57f43df56ea2813471d39e5131193dd681a5d5ba) )
+	ROM_LOAD16_BYTE( "xfac0_2.p4", 0x100001, 0x080000, CRC(fd6469e9) SHA1(52eb3ab7b375b576070bbf2ab4c5e101e3879408) )
+ROM_END
 
+ROM_START( m5xfact04 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "xfac0_4.p1", 0x000000, 0x080000, CRC(2336356e) SHA1(4332fada68b55f9e70d6b059509ab82715ec1ac0) )
+	ROM_LOAD16_BYTE( "xfac0_4.p2", 0x000001, 0x080000, CRC(bc2296d6) SHA1(d3fe3f806300e1de907288180a6af87e1ca75033) )
+	/* 3+4 */
+
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "xfac0_4d.p1", 0x000000, 0x080000, CRC(61c805a5) SHA1(1465117ae0f9d7982db70bc1dec657cb3e1940fb) )
+	ROM_LOAD16_BYTE( "xfac0_4m.p1", 0x000000, 0x080000, CRC(509d7101) SHA1(6ed398307758d8268d2c92c84b95137f2af0d493) )
+ROM_END
+
+ROM_START( m5xfact11 )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "xfac1_1.p1", 0x000000, 0x080000, CRC(f3303449) SHA1(61284a5e950df86efc72aef436b81a80a8370380) )
+	ROM_LOAD16_BYTE( "xfac1_1.p2", 0x000001, 0x080000, CRC(c1508630) SHA1(1ad9f38ddef32bc5a64db434c681b06967edd988) )
+	/* 3+4 */
+	
+	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
+	ROM_LOAD16_BYTE( "xfac1_1d.p1", 0x000000, 0x080000, CRC(ffbcb9f2) SHA1(a57760ff5b092d7550a5b2d69065782cbdd056e4) )
+ROM_END
 
 
 
@@ -5560,7 +6273,6 @@ ROM_START( m5devil ) // devil_of_a_deal_(vivid)_[c01_800_25jp].hex
 	ROM_REGION( 0x400000, "altrevs", 0 )
 	ROM_LOAD( "devil_de.p1", 0x0000, 0x080000, CRC(0b8408f7) SHA1(7460a4619fe2217e99d360121c45eb680a3a3e3a) )
 	ROM_LOAD( "deal2.2p1", 0x0000, 0x080000, CRC(e1f2dc1d) SHA1(629d82e2bb9e1c6a1bc961e54edea87d070b93cd) )
-
 ROM_END
 
 
@@ -5647,11 +6359,15 @@ ROM_START( m5shark ) // shark_raving_mad_(vivid)_[c01_800_25jp].hex
 	ROM_LOAD16_BYTE( "m5shark_p2", 0x000001, 0x080000, CRC(eb5d1814) SHA1(3dcb3e77cb546d8f77b3ba0e9d2a0f9831c5e83e) )
 	ROM_LOAD16_BYTE( "m5shark_p3", 0x100000, 0x080000, CRC(6552161c) SHA1(31fc00ecb64777cdeb54c7a15df0a5f160724fd8) )
 	ROM_LOAD16_BYTE( "m5shark_p4", 0x100001, 0x080000, CRC(b4e8137e) SHA1(000bbe4a8dedad0f752eecee6208cc0250c0e742) )
+ROM_END
 
-	ROM_REGION( 0x400000, "altrevs", 0 )
+ROM_START( m5sharka )
+	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "sharkrav.p1", 0x00000, 0x080000, CRC(8a672a5f) SHA1(04349940a3b8e2d282f256fed205c0ff97371541) )
 	ROM_LOAD16_BYTE( "sharkrav.p2", 0x00001, 0x080000, CRC(650ea6c6) SHA1(c6569d6e0163116c4997250a9db8658fed1e1cdd) )
+	/* 3+4 */
 ROM_END
+
 
 ROM_START( m5supnov ) // supernova_(barcrest)_[c01_800_25jp].hex
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -5659,12 +6375,14 @@ ROM_START( m5supnov ) // supernova_(barcrest)_[c01_800_25jp].hex
 	ROM_LOAD16_BYTE( "m5supnov_p2", 0x000001, 0x080000, CRC(c58d5fa0) SHA1(2e90c811977be290c020184ebd27f4a47e272ea7) )
 	ROM_LOAD16_BYTE( "m5supnov_p3", 0x100000, 0x080000, CRC(1ec42684) SHA1(20c73adbcbbfbe2df6a87e6c9aa112d7fdfd5b6f) )
 	ROM_LOAD16_BYTE( "m5supnov_p4", 0x100001, 0x080000, CRC(4e1ad394) SHA1(ef051be5b13585fd61cc185f4c279a322d1d1f94) )
-
-	ROM_REGION( 0x400000, "altrevs", 0 )
-	ROM_LOAD16_BYTE( "s_nova.p1", 0x00000, 0x080000, CRC(b4ccd869) SHA1(e93edeae1689b684f35fd299d9377ccd87bf2bb5) )
-	ROM_LOAD16_BYTE( "s_nova.p2", 0x00001, 0x080000, CRC(dd433e0a) SHA1(cdf2ab3e5d8921797e5041e5feeb4a235031c3b8) )
 ROM_END
 
+ROM_START( m5supnova )
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "s_nova.p1", 0x00000, 0x080000, CRC(b4ccd869) SHA1(e93edeae1689b684f35fd299d9377ccd87bf2bb5) )
+	ROM_LOAD16_BYTE( "s_nova.p2", 0x00001, 0x080000, CRC(dd433e0a) SHA1(cdf2ab3e5d8921797e5041e5feeb4a235031c3b8) )
+	/* 3+4 */
+ROM_END
 
 
 ROM_START( m5xchn ) // exchanges_unlimited_(barcrest)_[mpu5]_[dx01_1280_5jp].hex
@@ -5693,17 +6411,14 @@ ROM_START( m5carwsh )
 	ROM_REGION( 0x400000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "cwa_sjh1.1d1", 0x000000, 0x080000, CRC(920c6cba) SHA1(5bb91bc79c26db06b04802e009389de84f93cdab) )
 	ROM_LOAD16_BYTE( "cwa_sjh1.1d2", 0x000001, 0x080000, CRC(00ebc167) SHA1(5b52260b4f459f4ebf4f65d912c747b0b4a1bff9) )
+	ROM_LOAD16_BYTE( "cwa_sjs1.1_3", 0x100000, 0x080000, CRC(09d0464b) SHA1(2a59284dbb546ccf4fa4dcae4ec21c4a74ebe694) )
+	ROM_LOAD16_BYTE( "cwa_sjs1.1_4", 0x100001, 0x080000, CRC(2aa7cb3f) SHA1(3ac7c4685eaccab1fef55ffb823f6ed6436f4e99) )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "cwa_sjk1.1_1", 0x000000, 0x080000, CRC(550d44f2) SHA1(e310b655c64bd58a29c5928465d551fb98ea510e) )
-	ROM_LOAD16_BYTE( "cwa_sjk1.1_2", 0x000000, 0x080000, CRC(00ebc167) SHA1(5b52260b4f459f4ebf4f65d912c747b0b4a1bff9) )
 	ROM_LOAD16_BYTE( "cwa_sjs1.1_1", 0x000000, 0x080000, CRC(b2ef674b) SHA1(b5234236f1cb7d2c70b245f22473e4aefa653cfe) )
-	ROM_LOAD16_BYTE( "cwa_sjs1.1_2", 0x000000, 0x080000, CRC(00ebc167) SHA1(5b52260b4f459f4ebf4f65d912c747b0b4a1bff9) )
-	ROM_LOAD16_BYTE( "cwa_sjs1.1_3", 0x000000, 0x080000, CRC(09d0464b) SHA1(2a59284dbb546ccf4fa4dcae4ec21c4a74ebe694) )
-	ROM_LOAD16_BYTE( "cwa_sjs1.1_4", 0x000000, 0x080000, CRC(2aa7cb3f) SHA1(3ac7c4685eaccab1fef55ffb823f6ed6436f4e99) )
 	ROM_LOAD16_BYTE( "cwa_sjs1.1d1", 0x000000, 0x080000, CRC(75ee4f03) SHA1(ca08bbc221a3fd8e295265fcab63e0186ef65e46) )
-
-	ROM_LOAD( "carwash.p1", 0x0000, 0x080000, CRC(04aac0c7) SHA1(17d973152cbec43de9c6933299d518448e6d7e01) )
+	ROM_LOAD16_BYTE( "carwash.p1",   0x000000, 0x080000, CRC(04aac0c7) SHA1(17d973152cbec43de9c6933299d518448e6d7e01) ) // seems to be a 1.1 rom
 ROM_END
 
 ROM_START( m5carwsh10 )
@@ -5722,23 +6437,19 @@ ROM_START( m5casfev )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "cfc11d.p1", 0x000000, 0x080000, CRC(ae943f15) SHA1(2c469ba205bdcaedb9714db101bc41a1ab66ec15) )
-	ROM_LOAD16_BYTE( "cfc12d.p1", 0x000000, 0x080000, CRC(b1638d8a) SHA1(b6b56df6e96a84d6b733f20e130def79a83eb96f) )
-	ROM_LOAD16_BYTE( "cfc12s.p1", 0x000000, 0x080000, CRC(8db7841d) SHA1(2875405ec0cfd1433cf62f6cf776e92f862ec93b) )
-	ROM_LOAD16_BYTE( "cfc12s.p2", 0x000000, 0x080000, CRC(40bd95ac) SHA1(a6013b0b2d74ff5b303a514a9b69283ba02640f2) )
-	ROM_LOAD16_BYTE( "cfc12s.p3", 0x000000, 0x080000, CRC(97f65982) SHA1(ffdd993adcbb06ffd1998d50dccbdc9b0d827181) )
-	ROM_LOAD16_BYTE( "cfc12s.p4", 0x000000, 0x080000, CRC(b014e6d0) SHA1(bd0ad74d6527c00fe4121ec8a7a9af778f2c8d22) )
 ROM_END
 
-ROM_START( m5dmnstra )
+ROM_START( m5casfev12 )
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "dst13s.p1", 0x000000, 0x080000, CRC(228af479) SHA1(a74ce5cbe9ac76d0681efbcff46cb883c94fed5c) )
-	ROM_LOAD16_BYTE( "dst13s.p2", 0x000001, 0x080000, CRC(11fc9375) SHA1(f6ef09285266671df1b72892590ea51a80ab33eb) )
+	ROM_LOAD16_BYTE( "cfc12s.p1", 0x000000, 0x080000, CRC(8db7841d) SHA1(2875405ec0cfd1433cf62f6cf776e92f862ec93b) )
+	ROM_LOAD16_BYTE( "cfc12s.p2", 0x000001, 0x080000, CRC(40bd95ac) SHA1(a6013b0b2d74ff5b303a514a9b69283ba02640f2) )
+	ROM_LOAD16_BYTE( "cfc12s.p3", 0x100000, 0x080000, CRC(97f65982) SHA1(ffdd993adcbb06ffd1998d50dccbdc9b0d827181) )
+	ROM_LOAD16_BYTE( "cfc12s.p4", 0x100001, 0x080000, CRC(b014e6d0) SHA1(bd0ad74d6527c00fe4121ec8a7a9af778f2c8d22) )
 
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "dst13a.p1", 0x000000, 0x080000, CRC(59072d54) SHA1(c8c0f1c39a579105018eb40fe608bd634b36e663) )
-	ROM_LOAD16_BYTE( "dst13d.p1", 0x000000, 0x080000, CRC(a462a475) SHA1(5cc054fee775535b336bf572dcb4c611904eeec2) )
-	ROM_LOAD16_BYTE( "dst13k.p1", 0x000000, 0x080000, CRC(06486595) SHA1(b63645d1b16cef05952f4f5b8e8fd00f19341b36) )
+	ROM_LOAD16_BYTE( "cfc12d.p1", 0x000000, 0x080000, CRC(b1638d8a) SHA1(b6b56df6e96a84d6b733f20e130def79a83eb96f) )
 ROM_END
+
 
 ROM_START( m5dblfun )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -5841,20 +6552,6 @@ ROM_END
 
 
 
-ROM_START( m5fusira )
-	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "fus11s.p1", 0x000000, 0x080000, CRC(b6cbe454) SHA1(4c635dd384d7dc271d3730ab28f5d7ef304e3185) )
-	ROM_LOAD16_BYTE( "fus11s.p2", 0x000001, 0x080000, CRC(13af10d5) SHA1(8f50de1003068070aef1e3d565a67b686d72eae9) )
-
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "fus11d.p1", 0x000000, 0x080000, CRC(3023b458) SHA1(d61b301fc2974a0219d8acde48b6768a1645cdcc) )
-	ROM_LOAD16_BYTE( "fus11k.p1", 0x000000, 0x080000, CRC(920975b8) SHA1(826a28f3daa05f6d25c0639bb6048740cb7bad0c) )
-	ROM_LOAD16_BYTE( "fus12d.p1", 0x000000, 0x080000, CRC(f3284722) SHA1(fa110781727b3c8d80a1d3b105222d7ef33c8567) )
-	ROM_LOAD16_BYTE( "fus12k.p1", 0x000000, 0x080000, CRC(510286c2) SHA1(68d3c5c1f3e73a3d3c24b06d9d34380a340e8af9) )
-	ROM_LOAD16_BYTE( "fus12s.p1", 0x000000, 0x080000, CRC(75c0172e) SHA1(89f61431c595bad0434863bc1fdf4312b7a24e33) )
-	ROM_LOAD16_BYTE( "fus12s.p2", 0x000000, 0x080000, CRC(eff4cfba) SHA1(7266e1c5a345ed6437f60eb2c364a4a0616526d8) )
-ROM_END
-
 
 ROM_START( m5gpclub )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -5936,31 +6633,10 @@ ROM_START( m5lvwirea )
 ROM_END
 
 
-ROM_START( m5locka )
-	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "lnl13s.p1", 0x000000, 0x080000, CRC(355ebd1d) SHA1(306df0c40c909ed2f86f5a81c67e340e4416df1f) )
-	ROM_LOAD16_BYTE( "lnl13s.p2", 0x000001, 0x080000, CRC(ef2e5c42) SHA1(09f281689364c384d9ddb03d2821095670eec977) )
-
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "lnl13d.p1", 0x000000, 0x080000, CRC(b3b6ed11) SHA1(48ef0ce6acc045e1da2400903533f5748ca4dfb7) )
-	ROM_LOAD16_BYTE( "lnl13k.p1", 0x000000, 0x080000, CRC(119c2cf1) SHA1(e871530d704b9a395dca2f00e5915d8f259ea270) )
-ROM_END
 
 
 
 
-ROM_START( m5lockcla )
-	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "lnc15s.p1", 0x000000, 0x080000, CRC(a78cfab4) SHA1(52c9567bd47c7dcf6616bf33b9026c51d09d17d4) )
-	ROM_LOAD16_BYTE( "lnc15s.p2", 0x000001, 0x080000, CRC(7d408d93) SHA1(1b9806f5ac476eb40489bce25c8977d98b9c06f3) )
-
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "lnc15d.p1", 0x000000, 0x080000, CRC(9b58f323) SHA1(25b13c0d17a5d64af7e377f5b6bc918203b768e4) )
-	ROM_LOAD16_BYTE( "lnc15f.p1", 0x000000, 0x080000, CRC(c5a2b74d) SHA1(f927a30a5ee3c307f384d6dccf1f091b63957e2e) )
-	ROM_LOAD16_BYTE( "lnc15l.p1", 0x000000, 0x080000, CRC(33dd3a61) SHA1(d8bf5f169c453ab586aee2d2d5f25384f66affb4) )
-	ROM_LOAD16_BYTE( "lnc15m.p1", 0x000000, 0x080000, CRC(63d06146) SHA1(61b7f6b189221856b1eacbe6e1ced11e9fa0fcfc) )
-	ROM_LOAD16_BYTE( "lnc15o.p1", 0x000000, 0x080000, CRC(001c99fe) SHA1(3306a89cb2794a0a552f01b10376b538f48edafa) )
-ROM_END
 
 ROM_START( m5minesw )
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -6111,17 +6787,6 @@ ROM_END
 
 
 
-ROM_START( m5rainrna )
-	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "rar12s.p1", 0x000000, 0x080000, CRC(643f1f75) SHA1(3662f61c1ff24e469dcd44099b0358d65b2e55ec) )
-	ROM_LOAD16_BYTE( "rar12s.p2", 0x000001, 0x080000, CRC(5448175c) SHA1(ca5217dcbf9c25f9fe09899feb9d1707a2fca63b) )
-
-	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
-	ROM_LOAD16_BYTE( "rar12a.p1", 0x000000, 0x080000, CRC(1fb2c658) SHA1(d0f7270023adfcbea747489375425c93e02632cb) )
-	ROM_LOAD16_BYTE( "rar12d.p1", 0x000000, 0x080000, CRC(e2d74f79) SHA1(3b1bd26555c48beb744d8f7db57d4cf8f613dee0) )
-	ROM_LOAD16_BYTE( "rar12k.p1", 0x000000, 0x080000, CRC(40fd8e99) SHA1(e5b80705d0ceea85b09384a4af1f286ab96a1595) )
-ROM_END
-
 
 ROM_START( m5roofa ) // these were in a zip called RED Hot Fever, but it's clearly 'Raise The Roof' (see strings in ROM)
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -6132,18 +6797,6 @@ ROM_START( m5roofa ) // these were in a zip called RED Hot Fever, but it's clear
 	ROM_REGION( 0x100000, "altrevs", 0 ) /* Alternate revision Prg ROMs, to be sorted into clones */
 	ROM_LOAD16_BYTE( "rtr_sjs1.4d1", 0x000000, 0x080000, CRC(b2cff48f) SHA1(5233e80db90873707e31375f264e0f910cbca474) )
 	ROM_LOAD16_BYTE( "rtr_sjs1.4d2", 0x000001, 0x080000, CRC(fd7c7292) SHA1(3dd6109cc201879840d88d8948552ad13cc77f71) )
-
-	// these are probably the real Red Hot Fever roms, on different HW
-	//ROM_LOAD16_BYTE( "rf_____.1_1", 0x000000, 0x080000, CRC(ac8d539d) SHA1(8baf14bece50774f93ae9eaf3effabb6882d2c43) )
-	//ROM_LOAD16_BYTE( "rf_____.1_2", 0x000001, 0x080000, CRC(cc2fadd8) SHA1(681850e2e6164cf8af8e7501ac44f475cc07b742) )
-	//ROM_LOAD16_BYTE( "rf_____.1_3", 0x100000, 0x080000, CRC(165aaf9f) SHA1(815224fe94a77628cef1dd0d8a238edcb4813006) )
-	//ROM_LOAD16_BYTE( "rf_____.1_4", 0x100001, 0x080000, CRC(4f7e7b49) SHA1(f9d421eeab73e0c795a08cf166c8807e0b14ec82) )
-	//ROM_LOAD16_BYTE( "rt_sj___.7_0", 0x000000, 0x040000, CRC(3dd895ef) SHA1(433ecc268956c94c51dbccefd006b72e0ad8567b) )
-	//ROM_LOAD16_BYTE( "rt_sja__.7_0", 0x000000, 0x040000, CRC(0ab59402) SHA1(485b4d2efd8f99085ed6ce5b7e07ede001c982c4) )
-	//ROM_LOAD16_BYTE( "rt_sjs__.7_0", 0x000000, 0x040000, CRC(1a8feafb) SHA1(83151f63b7ebe1c538f9334e9c3d6889d0730144) )
-	//ROM_LOAD16_BYTE( "rt_vc___.1_0", 0x000000, 0x040000, CRC(2a8df147) SHA1(df0e7021e9d169575a1297f9851b5a64e20d1a40) )
-	//ROM_LOAD16_BYTE( "rt_vc_d_.1_0", 0x000000, 0x040000, CRC(7adef22b) SHA1(d6a584581745c0ce64f646ef0b49cb68343990d0) )
-	//ROM_LOAD16_BYTE( "rtv.p1", 0x000000, 0x008000, CRC(7b78f3f2) SHA1(07ef8e6a08fd70ee48e4463672a1230ecc669532) )
 ROM_END
 
 ROM_START( m5rwb ) // red_white_&_blue_(barcrest)_[c01_800_15jp].hex
@@ -6752,112 +7405,274 @@ GAME( 199?, m5jlyjwl02	,m5jlyjwl,	mpu5, mpu5, 0, ROT0, "Barcrest","Jolly Jewels 
 GAME( 199?, m5jlyrog	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Jolly Roger (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5jlyroga	,m5jlyrog,	mpu5, mpu5, 0, ROT0, "Barcrest","Jolly Roger (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
 
-GAME( 199?, m5kkebab	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","King Kebab (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5kingko	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","King KO (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kkebab	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","King Kebab (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kkebab10	,m5kkebab,	mpu5, mpu5, 0, ROT0, "Barcrest","King Kebab (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kkebaba	,m5kkebab,	mpu5, mpu5, 0, ROT0, "Barcrest","King Kebab (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5kingko	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","King KO (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kingko04	,m5kingko,	mpu5, mpu5, 0, ROT0, "Barcrest","King KO (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kingko05	,m5kingko,	mpu5, mpu5, 0, ROT0, "Barcrest","King KO (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5lotta		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Lotta Luck (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5mega		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Mega Zone (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5martns	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Money Mad Martians (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5mmak		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Money Maker (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5monjok	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Monedin Joker (Spanish) (Barcrest) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5monjoka	,m5monjok,	mpu5, mpu5, 0, ROT0, "Barcrest","Monedin Joker (Spanish) (Barcrest) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5martns	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Money Mad Martians (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5martns07	,m5martns,	mpu5, mpu5, 0, ROT0, "Barcrest","Money Mad Martians (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5mmak		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Money Maker (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5mmak06	,m5mmak,	mpu5, mpu5, 0, ROT0, "Barcrest","Money Maker (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5monjok	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Monedin Joker (Spanish) (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5monjoka	,m5monjok,	mpu5, mpu5, 0, ROT0, "Barcrest","Monedin Joker (Spanish) (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5monty		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Monty Python (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5mprio		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Monty Python Rio (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5mpfc		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Monty Python's Flying Circus (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5mpfccl	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Monty Python's Flying Circus Club (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5neptun	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Neptunes Treasure (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5nnww		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Nudge Nudge Wink Wink (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5nnwwgl	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Nudge Nudge Wink Wink Gold (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5fiddle	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","On The Fiddle (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5oohaah	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Ooh Aah Dracula (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5fiddle	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","On The Fiddle (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fiddle03	,m5fiddle,	mpu5, mpu5, 0, ROT0, "Barcrest","On The Fiddle (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5oohaah	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Ooh Aah Dracula (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5oohaah01	,m5oohaah,	mpu5, mpu5, 0, ROT0, "Barcrest","Ooh Aah Dracula (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5oohrio	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Ooh Ahh Dracula Rio (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5openbx	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Open The Box (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5overld	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Overload (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5ptyani	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Party Animal (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5openbx	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Open The Box (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5openbx06	,m5openbx,	mpu5, mpu5, 0, ROT0, "Barcrest","Open The Box (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5openbx05	,m5openbx,	mpu5, mpu5, 0, ROT0, "Barcrest","Open The Box (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5openbx01	,m5openbx,	mpu5, mpu5, 0, ROT0, "Barcrest","Open The Box (Barcrest) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5overld	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Overload (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5overld02	,m5overld,	mpu5, mpu5, 0, ROT0, "Barcrest","Overload (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5overld10	,m5overld,	mpu5, mpu5, 0, ROT0, "Barcrest","Overload (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5overld11	,m5overld,	mpu5, mpu5, 0, ROT0, "Barcrest","Overload (Barcrest) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5ptyani	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Party Animal (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ptyani01	,m5ptyani,	mpu5, mpu5, 0, ROT0, "Barcrest","Party Animal (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5peepsh	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Peep Show (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5psy2	    ,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Psycho Cash Beast 2 (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5qshot		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Quack Shot (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5roof		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Raise The Roof (Barcrest) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5roofa		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Raise The Roof (Barcrest) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5razdz		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Razzle Dazzle Club (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5redrck	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Ready To Rock (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5qshot		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Quack Shot (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5qshot04	,m5qshot,	mpu5, mpu5, 0, ROT0, "Barcrest","Quack Shot (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5roof		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Raise The Roof (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5roofa		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Raise The Roof (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5razdz		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Razzle Dazzle Club (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5razdz10	,m5razdz,	mpu5, mpu5, 0, ROT0, "Barcrest","Razzle Dazzle Club (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5razdz11	,m5razdz,	mpu5, mpu5, 0, ROT0, "Barcrest","Razzle Dazzle Club (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5redrck	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Ready To Rock (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5redrck10	,m5redrck,	mpu5, mpu5, 0, ROT0, "Barcrest","Ready To Rock (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5redrcka	,m5redrck,	mpu5, mpu5, 0, ROT0, "Barcrest","Ready To Rock (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5rhkni		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Red Hot Knights (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rhrg		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Red Hot Roll Gold (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rhrgt		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Red Hot Roll Triple (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5revo		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Revolution (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rgclb		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rcx		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Royal Exchange Club (Barcrest) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rcxa		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Royal Exchange Club (Barcrest) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5rhrg		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Red Hot Roll Gold (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rhrga		,m5rhrg,	mpu5, mpu5, 0, ROT0, "Barcrest","Red Hot Roll Gold (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5rhrgt		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Red Hot Roll Triple (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rhrgt12	,m5rhrgt,	mpu5, mpu5, 0, ROT0, "Barcrest","Red Hot Roll Triple (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rhrgt02	,m5rhrgt,	mpu5, mpu5, 0, ROT0, "Barcrest","Red Hot Roll Triple (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5revo		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Revolution (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5revo13	,m5revo,	mpu5, mpu5, 0, ROT0, "Barcrest","Revolution (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5revoa		,m5revo,	mpu5, mpu5, 0, ROT0, "Barcrest","Revolution (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5rgclb		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rgclb11	,m5rgclb,	mpu5, mpu5, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rgclb12	,m5rgclb,	mpu5, mpu5, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rgclb20	,m5rgclb,	mpu5, mpu5, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rgclb21	,m5rgclb,	mpu5, mpu5, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rgclb03	,m5rgclb,	mpu5, mpu5, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rgclb01	,m5rgclb,	mpu5, mpu5, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rgclb01a	,m5rgclb,	mpu5, mpu5, 0, ROT0, "Barcrest","Rio Grande Club (Barcrest) (MPU5) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5rcx		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Royal Exchange Club (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rcxa		,m5rcx,		mpu5, mpu5, 0, ROT0, "Barcrest","Royal Exchange Club (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5rub		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Rubies & Diamonds (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5ritj		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Rumble In The Jungle (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rfymc		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Run For Your Money Club (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5rfymc		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Run For Your Money Club (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rfymc06	,m5rfymc,	mpu5, mpu5, 0, ROT0, "Barcrest","Run For Your Money Club (Barcrest) (MPU5) (Set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5seven		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Seven Deadly Spins (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5sheik		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Sheik Yer Money (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5showtm	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Showtime (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5silver	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Silver Screen (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sondr		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Son Of Dracula (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sondra	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Son Of Dracula (Barcrest) (MPU5) (15GBP Jackpot)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5spicer	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","The Spice Is Right (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5spiker	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Spiker The Biker (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5silver	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Silver Screen (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5silver06	,m5silver,	mpu5, mpu5, 0, ROT0, "Barcrest","Silver Screen (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5silver03	,m5silver,	mpu5, mpu5, 0, ROT0, "Barcrest","Silver Screen (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5sondr		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Son Of Dracula (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sondr05	,m5sondr,	mpu5, mpu5, 0, ROT0, "Barcrest","Son Of Dracula (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sondra	,m5sondr,	mpu5, mpu5, 0, ROT0, "Barcrest","Son Of Dracula (Barcrest) (MPU5) (15GBP Jackpot)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5spicer	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","The Spice Is Right (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5spicer06	,m5spicer,	mpu5, mpu5, 0, ROT0, "Barcrest","The Spice Is Right (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5spiker	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Spiker The Biker (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5spiker02	,m5spiker,	mpu5, mpu5, 0, ROT0, "Barcrest","Spiker The Biker (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5spikera	,m5spiker,	mpu5, mpu5, 0, ROT0, "Barcrest","Spiker The Biker (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5spins		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Spinsation (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5squids	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Squids In (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5squids	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Squids In (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5squids04a	,m5squids,	mpu5, mpu5, 0, ROT0, "Barcrest","Squids In (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5squids05	,m5squids,	mpu5, mpu5, 0, ROT0, "Barcrest","Squids In (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5squids06	,m5squids,	mpu5, mpu5, 0, ROT0, "Barcrest","Squids In (Barcrest) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5stax		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Stax Of Cash (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5scharg	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Super Charged (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5supstr	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Super Star (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5sstrk		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Super Streak (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5supnov	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Supernova (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5tempt		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Temple Of Treasure (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5tempt2	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Temple Of Treasure 2 (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5scharg	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Super Charged (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5scharg05	,m5scharg,	mpu5, mpu5, 0, ROT0, "Barcrest","Super Charged (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5scharg06	,m5scharg,	mpu5, mpu5, 0, ROT0, "Barcrest","Super Charged (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5scharga	,m5scharg,	mpu5, mpu5, 0, ROT0, "Barcrest","Super Charged (Barcrest) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5supstr	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Super Star (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5supstra	,m5supstr,	mpu5, mpu5, 0, ROT0, "Barcrest","Super Star (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5sstrk		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Super Streak (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sstrk02a	,m5sstrk,	mpu5, mpu5, 0, ROT0, "Barcrest","Super Streak (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5supnov	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Supernova (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5supnova	,m5supnov,	mpu5, mpu5, 0, ROT0, "Barcrest","Supernova (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5tempt		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Temple Of Treasure (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tempt05	,m5tempt,	mpu5, mpu5, 0, ROT0, "Barcrest","Temple Of Treasure (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tempta	,m5tempt,	mpu5, mpu5, 0, ROT0, "Barcrest","Temple Of Treasure (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5temptb	,m5tempt,	mpu5, mpu5, 0, ROT0, "Barcrest","Temple Of Treasure (Barcrest) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5tempt2	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Temple Of Treasure 2 (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tempt203	,m5tempt2,	mpu5, mpu5, 0, ROT0, "Barcrest","Temple Of Treasure 2 (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5tempt2a	,m5tempt2,	mpu5, mpu5, 0, ROT0, "Barcrest","Temple Of Treasure 2 (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5tempcl	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Temple Of Treasure Club (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5tbird		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Thunderbird (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5topdog	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Top Dog (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5topdog	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Top Dog (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5topdog04	,m5topdog,	mpu5, mpu5, 0, ROT0, "Barcrest","Top Dog (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5topdoga	,m5topdog,	mpu5, mpu5, 0, ROT0, "Barcrest","Top Dog (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5trail		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Trailblazer Club (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5ultimo	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Ultimo (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5upover	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Up & Over (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5ultimo	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Ultimo (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ultimo03a	,m5ultimo,	mpu5, mpu5, 0, ROT0, "Barcrest","Ultimo (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ultimo04	,m5ultimo,	mpu5, mpu5, 0, ROT0, "Barcrest","Ultimo (Barcrest) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5upover	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Up & Over (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5upover15	,m5upover,	mpu5, mpu5, 0, ROT0, "Barcrest","Up & Over (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5vampup	,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Vamp It Up (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5wking		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Wild King (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5wking		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Wild King (Barcrest) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5wking05	,m5wking,	mpu5, mpu5, 0, ROT0, "Barcrest","Wild King (Barcrest) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5costa		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Costa Del Cash (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5ttwo		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Take Two (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5horn		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Whitbread","Horn Of Plenty (Barcrest / Whitbread) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5hotrk		,0,			mpu5, mpu5, 0, ROT0, "Barcrest","Hot Rocks (Barcrest) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
 
 /* Barcrest / Red Gaming */
 
 GAME( 199?, m5ashock	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Aftershock (Barcrest - Red Gaming) (MPU5, v1.2)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5ashocka	,m5ashock,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Aftershock (Barcrest - Red Gaming) (MPU5, v1.3)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5bigsht	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Big Shot (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5bigsht	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Big Shot (Barcrest - Red Gaming) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bigsht04	,m5bigsht,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Big Shot (Barcrest - Red Gaming) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bigsht11	,m5bigsht,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Big Shot (Barcrest - Red Gaming) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bigsht13	,m5bigsht,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Big Shot (Barcrest - Red Gaming) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bigshta	,m5bigsht,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Big Shot (Barcrest - Red Gaming) (MPU5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5bnkrs		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Bonkers (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5bbank		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Break The Bank (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5casfev	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Casino Fever (Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5bbank		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Break The Bank (Barcrest - Red Gaming) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bbank13	,m5bbank,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Break The Bank (Barcrest - Red Gaming) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5casfev	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Casino Fever (Red Gaming) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5casfev12	,m5casfev,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Casino Fever (Red Gaming) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5dmnstr	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Demon Streak (Barcrest - Red Gaming) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5dmnstra	,m5dmnstr,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Demon Streak (Barcrest - Red Gaming) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5dbubl		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Double Bubble (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5dragnd	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Dragon Drop (Barcrest - Red Gaming) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5dragnda	,m5dragnd,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Dragon Drop (Barcrest - Red Gaming) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5fnfair	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Funfair (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5fnfaird	,m5fnfair,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Funfair (Barcrest - Red Gaming) (MPU5) (Datapak)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5fusir		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Fruits U Sir (Barcrest - Red Gaming) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5fusira	,m5fusir,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Fruits U Sir (Barcrest - Red Gaming) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5fusir		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Fruits U Sir (Barcrest - Red Gaming) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fusir11	,m5fusir,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Fruits U Sir (Barcrest - Red Gaming) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fusir12	,m5fusir,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Fruits U Sir (Barcrest - Red Gaming) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5hypalx	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Hypalinx (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5invad		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Invaders (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5jcptgn	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Jackpot Genie (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5jlstrk	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Jewel Strike (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5lock		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load (Barcrest - Red Gaming) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5locka		,m5lock,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load (Barcrest - Red Gaming) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5lockcl	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load Club (Barcrest - Red Gaming) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5lockcla	,m5lockcl,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load Club (Barcrest - Red Gaming) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5lock		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load (Barcrest - Red Gaming) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5lock13	,m5lock,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load (Barcrest - Red Gaming) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5lock12	,m5lock,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load (Barcrest - Red Gaming) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5lockcl	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load Club (Barcrest - Red Gaming) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5lockcl15	,m5lockcl,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load Club (Barcrest - Red Gaming) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5lockcl14	,m5lockcl,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Lock 'n' Load Club (Barcrest - Red Gaming) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5nitro		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Nitro (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5paint		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Paint The Town Red (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5quake		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Quake (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5rainrn	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Rainbow Runner (Barcrest - Red Gaming) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5rainrna	,m5rainrn,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Rainbow Runner (Barcrest - Red Gaming) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rampg		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Rampage (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5rampg		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Rampage (Barcrest - Red Gaming) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rampg11	,m5rampg,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Rampage (Barcrest - Red Gaming) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rampg12	,m5rampg,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Rampage (Barcrest - Red Gaming) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5rdwarf	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Red Dwarf (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5redx		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Red X (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5redx		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Red X (Barcrest - Red Gaming) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5redx12	,m5redx,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Red X (Barcrest - Red Gaming) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5thtsmg	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","That's Magic (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5topdol	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Top Dollar (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5topdol	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Top Dollar (Barcrest - Red Gaming) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5topdola	,m5topdol,	mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Top Dollar (Barcrest - Red Gaming) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5zigzag	,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Zig Zag (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5cmass		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Critical Mass (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5sblz		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Snail Blazer (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5slide		,0,			mpu5, mpu5, 0, ROT0, "Barcrest / Red Gaming","Slider (Barcrest - Red Gaming) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
 
 /* Vivid */
@@ -6895,52 +7710,123 @@ GAME( 199?, m5all41m	,m5all41,	mpu5, mpu5, 0, ROT0, "Vivid","All 4 One (Vivid) (
 
 GAME( 199?, m5atlan		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Atlantic (Vivid) (MPU5, v1.4)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5atlana	,m5atlan,	mpu5, mpu5, 0, ROT0, "Vivid","Atlantic (Vivid) (MPU5, v1.2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5bttf		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Back To The Features (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5bttf		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Back To The Features (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bttfa		,m5bttf,	mpu5, mpu5, 0, ROT0, "Vivid","Back To The Features (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5btlbnk	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Bottle Bank (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5caesc		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Caesar's Cash (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5card		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Card Shark (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5cshkcb	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Card Shark Club (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5cshkcb	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Card Shark Club (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cshkcb12	,m5cshkcb,	mpu5, mpu5, 0, ROT0, "Vivid","Card Shark Club (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cshkcb13	,m5cshkcb,	mpu5, mpu5, 0, ROT0, "Vivid","Card Shark Club (Vivid) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5clifhn	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Cliffhanger (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5cnct4		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Connect 4 (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5cnct4		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Connect 4 (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cnct415	,m5cnct4,	mpu5, mpu5, 0, ROT0, "Vivid","Connect 4 (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cnct420	,m5cnct4,	mpu5, mpu5, 0, ROT0, "Vivid","Connect 4 (Vivid) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5devil		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Devil Of A Deal (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5elband	,0,			mpu5, mpu5, 0, ROT0, "Vivid","El Bandido Club (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5fair		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Fairground Attraction (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5ggems		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Giant Gems (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5ggems		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Giant Gems (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ggems20	,m5ggems,	mpu5, mpu5, 0, ROT0, "Vivid","Giant Gems (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5groll		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Golden Roll (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5hilok		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Hi Lo Karate (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5hiclau	,0,			mpu5, mpu5, 0, ROT0, "Vivid","High Claudius (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5honmon	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Honey Money (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5honmon	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Honey Money (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5honmona	,m5honmon,	mpu5, mpu5, 0, ROT0, "Vivid","Honey Money (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5hopidl	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Hop Idol (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5hypno		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Hypnotic (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5jmpjok	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Jumpin Jokers (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5jmpjok	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Jumpin Jokers (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jmpjok11	,m5jmpjok,	mpu5, mpu5, 0, ROT0, "Vivid","Jumpin Jokers (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jmpjoka	,m5jmpjok,	mpu5, mpu5, 0, ROT0, "Vivid","Jumpin Jokers (Vivid) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jmpjokb	,m5jmpjok,	mpu5, mpu5, 0, ROT0, "Vivid","Jumpin Jokers (Vivid) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5loony		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Loony Juice (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5loot		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Loot 'n' Khamun (Vivid) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL ) // aka 3-in-1 ?
 GAME( 199?, m5loota		,m5loot,	mpu5, mpu5, 0, ROT0, "Vivid","Loot 'n' Khamun (Vivid) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL ) // aka 3-in-1 ?
+
 GAME( 199?, m5mag7s		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Magnificent 7s (Vivid) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5mag7sa	,m5mag7s,	mpu5, mpu5, 0, ROT0, "Vivid","Magnificent 7s (Vivid) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5mag7sb	,m5mag7s,	mpu5, mpu5, 0, ROT0, "Vivid","Magnificent 7s (Vivid) (MPU5, set 3)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5mag7sc	,m5mag7s,	mpu5, mpu5, 0, ROT0, "Vivid","Magnificent 7s (Vivid) (MPU5, set 4)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5mag7sd	,m5mag7s,	mpu5, mpu5, 0, ROT0, "Vivid","Magnificent 7s (Vivid) (MPU5, set 5)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5mag7se	,m5mag7s,	mpu5, mpu5, 0, ROT0, "Vivid","Magnificent 7s (Vivid) (MPU5, set 6)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5msf		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Manic Streak Features (Vivid) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5msfa		,m5msf,		mpu5, mpu5, 0, ROT0, "Vivid","Manic Streak Features (Vivid) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5piefac	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Pie Factory (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5piefc2	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Pie Factory 2 (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5piefac	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Pie Factory (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5piefac23	,m5piefac,	mpu5, mpu5, 0, ROT0, "Vivid","Pie Factory (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5piefac12	,m5piefac,	mpu5, mpu5, 0, ROT0, "Vivid","Pie Factory (Vivid) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5piefaca	,m5piefac,	mpu5, mpu5, 0, ROT0, "Vivid","Pie Factory (Vivid) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5piefc2	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Pie Factory 2 (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5piefc2a	,m5piefc2,	mpu5, mpu5, 0, ROT0, "Vivid","Pie Factory 2 (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5piefc2b	,m5piefc2,	mpu5, mpu5, 0, ROT0, "Vivid","Pie Factory 2 (Vivid) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5piefcr	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Pie Factory Rio (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5qdraw		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5qdraw		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5qdraw12	,m5qdraw,	mpu5, mpu5, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5qdraw14	,m5qdraw,	mpu5, mpu5, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5qdraw15	,m5qdraw,	mpu5, mpu5, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5qdrawa	,m5qdraw,	mpu5, mpu5, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5qdrawb	,m5qdraw,	mpu5, mpu5, 0, ROT0, "Vivid","Quick On The Draw (Vivid) (MPU5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5redbal	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Random Red Ball (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5ratpk		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Rat Pack (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5ratpk		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Rat Pack (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ratpka	,m5ratpk,	mpu5, mpu5, 0, ROT0, "Vivid","Rat Pack (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5rawin		,0,			mpu5, mpu5, 0, ROT0, "Vivid / Whitbread","Reel A Win (Vivid / Whitbread) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5rollup	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Roll Up Roll Up (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5shark		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Shark Raving Mad (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5shark		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Shark Raving Mad (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5sharka	,m5shark,	mpu5, mpu5, 0, ROT0, "Vivid","Shark Raving Mad (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5speccl	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Spectrum Club (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5spddmn	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Speed Demon (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5stars		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5stars		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5stars13a	,m5stars,	mpu5, mpu5, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5stars26	,m5stars,	mpu5, mpu5, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5stars25a	,m5stars,	mpu5, mpu5, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5stars25	,m5stars,	mpu5, mpu5, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5stars22	,m5stars,	mpu5, mpu5, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5stars20	,m5stars,	mpu5, mpu5, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 7)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5stars10	,m5stars,	mpu5, mpu5, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 8)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5stars10a	,m5stars,	mpu5, mpu5, 0, ROT0, "Vivid","Stars & Stripes (Vivid) (MPU5) (set 9)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5starcl	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Stars & Stripes Club (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5startr	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Stars & Stripes Triple (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5supro		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Super Roulette (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5supro		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Super Roulette (Vivid) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5suproa	,m5supro,	mpu5, mpu5, 0, ROT0, "Vivid","Super Roulette (Vivid) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5tempp		,0,			mpu5, mpu5, 0, ROT0, "Vivid","Temple Of Pleasure (Vivid) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5whdres	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Who Dares Spins (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5winway	,0,			mpu5, mpu5, 0, ROT0, "Vivid","Winning Ways (MPU5)", GAME_IS_SKELETON_MECHANICAL )
 
 
@@ -6953,68 +7839,173 @@ GAME( 199?, m5fewmorb	,m5fewmor,	mpu5, mpu5, 0, ROT0, "Empire","A Few Dollars Mo
 GAME( 199?, m5fewmorc	,m5fewmor,	mpu5, mpu5, 0, ROT0, "Empire","A Few Dollars More (Empire) (MPU5) (v0.3, set 2)", GAME_IS_SKELETON_MECHANICAL )
 
 GAME( 199?, m5wonga		,0,			mpu5, mpu5, 0, ROT0, "Empire","A Fish Called Wonga (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5aceclb	,0,			mpu5, mpu5, 0, ROT0, "Empire","Ace Of Clubs (Empire) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5aceclba	,m5aceclb,	mpu5, mpu5, 0, ROT0, "Empire","Ace Of Clubs (Empire) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, m5aceclbb	,m5aceclb,	mpu5, mpu5, 0, ROT0, "Empire","Ace Of Clubs (Empire) (MPU5, set 3)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5barxdx	,0,			mpu5, mpu5, 0, ROT0, "Empire","Bar X Deluxe (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5bnzclb	,0,			mpu5, mpu5, 0, ROT0, "Empire","Bonanza Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5bnzclb	,0,			mpu5, mpu5, 0, ROT0, "Empire","Bonanza Club (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5bnzclb11	,m5bnzclb,	mpu5, mpu5, 0, ROT0, "Empire","Bonanza Club (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5bukroo	,0,			mpu5, mpu5, 0, ROT0, "Empire","Buckaroo (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5cbrun		,0,			mpu5, mpu5, 0, ROT0, "Empire","Cannonball Run (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5carou		,0,			mpu5, mpu5, 0, ROT0, "Empire","Carousel (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5casroc	,0,			mpu5, mpu5, 0, ROT0, "Empire","Casino Royale Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5centcl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Centurion Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5cworan	,0,			mpu5, mpu5, 0, ROT0, "Empire","Clockwork Oranges (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5clbtro	,0,			mpu5, mpu5, 0, ROT0, "Empire","Club Tropicana (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5cockdd	,0,			mpu5, mpu5, 0, ROT0, "Empire","Cock A Doodle Dough! (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5centcl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Centurion Club (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5centcl20	,m5centcl,	mpu5, mpu5, 0, ROT0, "Empire","Centurion Club (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5centcl21	,m5centcl,	mpu5, mpu5, 0, ROT0, "Empire","Centurion Club (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5centcl21a	,m5centcl,	mpu5, mpu5, 0, ROT0, "Empire","Centurion Club (Empire) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5centcla	,m5centcl,	mpu5, mpu5, 0, ROT0, "Empire","Centurion Club (Empire) (MPU5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5cworan	,0,			mpu5, mpu5, 0, ROT0, "Empire","Clockwork Oranges (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cworan12	,m5cworan,	mpu5, mpu5, 0, ROT0, "Empire","Clockwork Oranges (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5clbtro	,0,			mpu5, mpu5, 0, ROT0, "Empire","Club Tropicana (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5clbtro24	,m5clbtro,	mpu5, mpu5, 0, ROT0, "Empire","Club Tropicana (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5clbtro25	,m5clbtro,	mpu5, mpu5, 0, ROT0, "Empire","Club Tropicana (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5cockdd	,0,			mpu5, mpu5, 0, ROT0, "Empire","Cock A Doodle Dough! (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5cockdd05	,m5cockdd,	mpu5, mpu5, 0, ROT0, "Empire","Cock A Doodle Dough! (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5coloss	,0,			mpu5, mpu5, 0, ROT0, "Empire","Colossus Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5crocrk	,0,			mpu5, mpu5, 0, ROT0, "Empire","Crocodile Rock (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5crocrk	,0,			mpu5, mpu5, 0, ROT0, "Empire","Crocodile Rock (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5crocrk10	,m5crocrk,	mpu5, mpu5, 0, ROT0, "Empire","Crocodile Rock (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5croclb	,0,			mpu5, mpu5, 0, ROT0, "Empire","Crocodile Rock Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5crsfir	,0,			mpu5, mpu5, 0, ROT0, "Empire","Crossfire (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5dmnf		,0,			mpu5, mpu5, 0, ROT0, "Empire","Diamonds Are Forever (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5dmnfcl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Diamonds Are Forever Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5dmnf		,0,			mpu5, mpu5, 0, ROT0, "Empire","Diamonds Are Forever (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5dmnf10	,m5dmnf,	mpu5, mpu5, 0, ROT0, "Empire","Diamonds Are Forever (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5dmnfcl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Diamonds Are Forever Club (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5dmnfcl04	,m5dmnfcl,	mpu5, mpu5, 0, ROT0, "Empire","Diamonds Are Forever Club (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5extrm		,0,			mpu5, mpu5, 0, ROT0, "Empire","Extreme (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5extrmm	,0,			mpu5, mpu5, 0, ROT0, "Empire","Extreme Madness (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5extrmm	,0,			mpu5, mpu5, 0, ROT0, "Empire","Extreme Madness (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5extrmm04a	,m5extrmm,	mpu5, mpu5, 0, ROT0, "Empire","Extreme Madness (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5extrmm04b	,m5extrmm,	mpu5, mpu5, 0, ROT0, "Empire","Extreme Madness (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5extrmm10	,m5extrmm,	mpu5, mpu5, 0, ROT0, "Empire","Extreme Madness (Empire) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5fatcat	,0,			mpu5, mpu5, 0, ROT0, "Empire","Fat Cat (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5fishdl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Fish Full Of Dollars (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5fishdl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Fish Full Of Dollars (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fishdl10	,m5fishdl,	mpu5, mpu5, 0, ROT0, "Empire","Fish Full Of Dollars (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5fishcl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Fish Full Of Dollars Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5fmonty	,0,			mpu5, mpu5, 0, ROT0, "Empire","The Full Monty (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5fmonty	,0,			mpu5, mpu5, 0, ROT0, "Empire","The Full Monty (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fmonty04a	,m5fmonty,	mpu5, mpu5, 0, ROT0, "Empire","The Full Monty (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fmonty04b	,m5fmonty,	mpu5, mpu5, 0, ROT0, "Empire","The Full Monty (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5fmonty04c	,m5fmonty,	mpu5, mpu5, 0, ROT0, "Empire","The Full Monty (Empire) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5fmount	,0,			mpu5, mpu5, 0, ROT0, "Empire","Full Mountie (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5gophr		,0,			mpu5, mpu5, 0, ROT0, "Empire","Gopher Gold (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5gophcl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Gopher Gold Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5hisprt	,0,			mpu5, mpu5, 0, ROT0, "Empire","High Spirits (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5hocus		,0,			mpu5, mpu5, 0, ROT0, "Empire","Hocus Pocus (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5hocus		,0,			mpu5, mpu5, 0, ROT0, "Empire","Hocus Pocus (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hocus10	,m5hocus,	mpu5, mpu5, 0, ROT0, "Empire","Hocus Pocus (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5hocscl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Hocus Pocus Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5hotsht	,0,			mpu5, mpu5, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5hula		,0,			mpu5, mpu5, 0, ROT0, "Empire","Hula Moolah (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5hotsht	,0,			mpu5, mpu5, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hotsht07a	,m5hotsht,	mpu5, mpu5, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hotsht08	,m5hotsht,	mpu5, mpu5, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hotsht08a	,m5hotsht,	mpu5, mpu5, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hotsht10	,m5hotsht,	mpu5, mpu5, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5) (set 5)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hotsht10a	,m5hotsht,	mpu5, mpu5, 0, ROT0, "Empire","Hot Shots (Empire) (MPU5) (set 6)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5hula		,0,			mpu5, mpu5, 0, ROT0, "Empire","Hula Moolah (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5hula10	,m5hula,	mpu5, mpu5, 0, ROT0, "Empire","Hula Moolah (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5hulacl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Hula Moolah Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5jackbx	,0,			mpu5, mpu5, 0, ROT0, "Empire","Jack In The Box (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5jackbx	,0,			mpu5, mpu5, 0, ROT0, "Empire","Jack In The Box (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jackbx03	,m5jackbx,	mpu5, mpu5, 0, ROT0, "Empire","Jack In The Box (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5jcy		,0,			mpu5, mpu5, 0, ROT0, "Empire","Juicy Fruits (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5jmpgem	,0,			mpu5, mpu5, 0, ROT0, "Empire","Jumping Gems (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5jmpgem	,0,			mpu5, mpu5, 0, ROT0, "Empire","Jumping Gems (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jmpgem01	,m5jmpgem,	mpu5, mpu5, 0, ROT0, "Empire","Jumping Gems (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5jmpgem03	,m5jmpgem,	mpu5, mpu5, 0, ROT0, "Empire","Jumping Gems (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5jmpgmc	,0,			mpu5, mpu5, 0, ROT0, "Empire","Jumping Gems Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5kaleid	,0,			mpu5, mpu5, 0, ROT0, "Empire","Kaleidoscope Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5kcclb		,0,			mpu5, mpu5, 0, ROT0, "Empire","King Cobra Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5kingqc	,0,			mpu5, mpu5, 0, ROT0, "Empire","Kings & Queens Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5korma		,0,			mpu5, mpu5, 0, ROT0, "Empire","Korma Chameleon (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5kcclb		,0,			mpu5, mpu5, 0, ROT0, "Empire","King Cobra Club (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kcclb24	,m5kcclb,	mpu5, mpu5, 0, ROT0, "Empire","King Cobra Club (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5kingqc	,0,			mpu5, mpu5, 0, ROT0, "Empire","Kings & Queens Club (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kingqc06	,m5kingqc,	mpu5, mpu5, 0, ROT0, "Empire","Kings & Queens Club (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kingqc07	,m5kingqc,	mpu5, mpu5, 0, ROT0, "Empire","Kings & Queens Club (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5kingqc08	,m5kingqc,	mpu5, mpu5, 0, ROT0, "Empire","Kings & Queens Club (Empire) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5korma		,0,			mpu5, mpu5, 0, ROT0, "Empire","Korma Chameleon (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5korma12	,m5korma,	mpu5, mpu5, 0, ROT0, "Empire","Korma Chameleon (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5kormcl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Korma Chameleon Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5monmst	,0,			mpu5, mpu5, 0, ROT0, "Empire","Money Monster (Empire) (MPU5, set 1)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5monmsta	,m5monmst,	mpu5, mpu5, 0, ROT0, "Empire","Money Monster (Empire) (MPU5, set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5monmst	,0,			mpu5, mpu5, 0, ROT0, "Empire","Money Monster (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5monmsta	,m5monmst,	mpu5, mpu5, 0, ROT0, "Empire","Money Monster (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5ramrd		,0,			mpu5, mpu5, 0, ROT0, "Empire","Ram Raid (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5ramrcl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Ram Raid Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5ronr		,0,			mpu5, mpu5, 0, ROT0, "Empire","Reel Or No Reel (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5ronr		,0,			mpu5, mpu5, 0, ROT0, "Empire","Reel Or No Reel (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ronr05	,0,			mpu5, mpu5, 0, ROT0, "Empire","Reel Or No Reel (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ronr07	,0,			mpu5, mpu5, 0, ROT0, "Empire","Reel Or No Reel (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5resfrg	,0,			mpu5, mpu5, 0, ROT0, "Empire","Reservoir Frogs (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5rthh		,0,			mpu5, mpu5, 0, ROT0, "Empire","Return To The Haunted House (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5rollx		,0,			mpu5, mpu5, 0, ROT0, "Empire","Roll X (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5skulcl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Skullduggery Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5rollx		,0,			mpu5, mpu5, 0, ROT0, "Empire","Roll X (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5rollx12	,m5rollx,	mpu5, mpu5, 0, ROT0, "Empire","Roll X (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5skulcl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Skullduggery Club (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5skulcl20	,m5skulcl,	mpu5, mpu5, 0, ROT0, "Empire","Skullduggery Club (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5skulcl23	,m5skulcl,	mpu5, mpu5, 0, ROT0, "Empire","Skullduggery Club (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5tball		,0,			mpu5, mpu5, 0, ROT0, "Empire","Thunderball (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5tomb		,0,			mpu5, mpu5, 0, ROT0, "Empire","Tomb Raiders (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5trclb		,0,			mpu5, mpu5, 0, ROT0, "Empire","Tomb Raiders Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5ttop		,0,			mpu5, mpu5, 0, ROT0, "Empire","Treble Top (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5ttop		,0,			mpu5, mpu5, 0, ROT0, "Empire","Treble Top (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ttop04	,m5ttop,	mpu5, mpu5, 0, ROT0, "Empire","Treble Top (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5ttop10	,m5ttop,	mpu5, mpu5, 0, ROT0, "Empire","Treble Top (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5ttopcl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Treble Top Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5tsar		,0,			mpu5, mpu5, 0, ROT0, "Empire","Tsar Wars (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5vertgo	,0,			mpu5, mpu5, 0, ROT0, "Empire","Vertigo (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, m5vertcl	,0,			mpu5, mpu5, 0, ROT0, "Empire","Vertigo Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5wthing	,0,			mpu5, mpu5, 0, ROT0, "Empire","Wild Thing Club (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, m5xfact		,0,			mpu5, mpu5, 0, ROT0, "Empire","X Factor (Empire) (MPU5)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5wthing	,0,			mpu5, mpu5, 0, ROT0, "Empire","Wild Thing Club (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5wthing11	,m5wthing,	mpu5, mpu5, 0, ROT0, "Empire","Wild Thing Club (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5wthing20	,m5wthing,	mpu5, mpu5, 0, ROT0, "Empire","Wild Thing Club (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, m5xfact		,0,			mpu5, mpu5, 0, ROT0, "Empire","X Factor (Empire) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5xfact02	,m5xfact,	mpu5, mpu5, 0, ROT0, "Empire","X Factor (Empire) (MPU5) (set 2)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5xfact04	,m5xfact,	mpu5, mpu5, 0, ROT0, "Empire","X Factor (Empire) (MPU5) (set 3)", GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, m5xfact11	,m5xfact,	mpu5, mpu5, 0, ROT0, "Empire","X Factor (Empire) (MPU5) (set 4)", GAME_IS_SKELETON_MECHANICAL )
 
 /* Bwb */
 GAME( 199?, m5carwsh	,0,			mpu5, mpu5, 0, ROT0, "Bwb","Car Wash (Bwb) (MPU5) (set 1)", GAME_IS_SKELETON_MECHANICAL )

@@ -343,73 +343,152 @@ MACHINE_CONFIG_END
 ROM_START( pr_bears )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "bs8pv26.rom", 0x0000, 0x008000, CRC(d6f7c02c) SHA1(d6549a5d47d644366c1c21ca2455ece3f282f5a5) )
+ROM_END
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "p_bs37.bin", 0x0000, 0x008000, CRC(03f7f043) SHA1(437085466d8f1efa0359593e7f9c2616ed4033cb) )
+ROM_START( pr_bearsa )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "p_bs47.bin", 0x0000, 0x008000, CRC(fa6fded4) SHA1(3dac6afcc03fce9f0c33d9776eb3b96e34d50ce5) )
 ROM_END
 
+ROM_START( pr_bearsb )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "p_bs37.bin", 0x0000, 0x008000, CRC(03f7f043) SHA1(437085466d8f1efa0359593e7f9c2616ed4033cb) )
+ROM_END
 
 ROM_START( pr_bearx )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "bear x 2.3 8.bin", 0x0000, 0x008000, CRC(db781396) SHA1(5b1755b481c1ccb02508d17fc2738878a5fe5f44) )
-
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "bear x v1-3 (27256)", 0x0000, 0x008000, CRC(c81fd801) SHA1(4833fdeeb8fc4d5e5a087a1077482ddb811cded8) )
-	ROM_LOAD( "bear x v2-2 (27256)", 0x0000, 0x008000, CRC(86ec85b1) SHA1(49304d0c6cffc34a28a4205c3ed9893dabb95246) )
-	ROM_LOAD( "bx10pse.rom", 0x0000, 0x008000, CRC(2bea6aa4) SHA1(fc8cebe6be44c2806dd851ef52d4209a51ceb805) )
-	ROM_LOAD( "bx10psec.rom", 0x0000, 0x008000, CRC(485fc104) SHA1(89bbb5411da9cfb91ab2f58285829948dba64776) )
-	ROM_LOAD( "bx10s10p.rom", 0x0000, 0x008000, CRC(0be7cf73) SHA1(ff7e4eb1b985a9085fba2a342e138a6045db6bde) )
-	ROM_LOAD( "bx10s20p.rom", 0x0000, 0x008000, CRC(03bce92b) SHA1(09ea35ba2dc41e96c94892532b5162796482a485) )
-	ROM_LOAD( "bx1c20n7.bin", 0x0000, 0x008000, CRC(e9212049) SHA1(215038324baa928b3c41495e78a2be68c8a1a767) )
-	ROM_LOAD( "bx20pse.rom", 0x0000, 0x008000, CRC(23b14cfc) SHA1(46534d21aa507de0677c5419aa281ec3184f9738) )
-	ROM_LOAD( "bx20psec.rom", 0x0000, 0x008000, CRC(4004e75c) SHA1(d1a73869df937519682824095eddcbe5439a3764) )
-	ROM_LOAD( "bx3110p.rom", 0x0000, 0x008000, CRC(0fca5c5f) SHA1(8dad9995c8c46bd82afe38bb1474b766fd6b2bc8) )
-	ROM_LOAD( "bx813c10.bin", 0x0000, 0x008000, CRC(abaa73a1) SHA1(b83a9bb0ad83c148cb58a8ec66fce076f8335736) )
-	ROM_LOAD( "bx8t10n6.bin", 0x0000, 0x008000, CRC(829dcc99) SHA1(014b53999becb241a3fcd34e802be8b58bfeb3c4) )
-	ROM_LOAD( "bx_v31~1.bin", 0x0000, 0x008000, CRC(0be7cf73) SHA1(ff7e4eb1b985a9085fba2a342e138a6045db6bde) )
-	ROM_LOAD( "bx_v4_1p.bin", 0x0000, 0x010000, CRC(6adb5508) SHA1(9d2276d13c82f9d82bdd5103e8043c463845e514) )
-	ROM_LOAD( "p_bx31.bin", 0x0000, 0x008000, CRC(07917a07) SHA1(4fc51550a3e16073762f92dd2b81987dd4285570) )
-	ROM_LOAD( "p_bx41.bin", 0x0000, 0x008000, CRC(e9212049) SHA1(215038324baa928b3c41495e78a2be68c8a1a767) )
 ROM_END
 
+ROM_START( pr_bearxa )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "bear x v2-2 (27256)", 0x0000, 0x008000, CRC(86ec85b1) SHA1(49304d0c6cffc34a28a4205c3ed9893dabb95246) )
+ROM_END
 
+ROM_START( pr_bearxb )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "bear x v1-3 (27256)", 0x0000, 0x008000, CRC(c81fd801) SHA1(4833fdeeb8fc4d5e5a087a1077482ddb811cded8) )
+ROM_END
 
+ROM_START( pr_bearxc )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "bx20psec.rom", 0x0000, 0x008000, CRC(4004e75c) SHA1(d1a73869df937519682824095eddcbe5439a3764) )
+ROM_END
+
+ROM_START( pr_bearxd )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "bx20pse.rom", 0x0000, 0x008000, CRC(23b14cfc) SHA1(46534d21aa507de0677c5419aa281ec3184f9738) )
+ROM_END
+
+ROM_START( pr_bearxe )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "bx_v31~1.bin", 0x0000, 0x008000, CRC(0be7cf73) SHA1(ff7e4eb1b985a9085fba2a342e138a6045db6bde) )//bx10s10p.rom
+ROM_END
+
+ROM_START( pr_bearxf )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "bx10psec.rom", 0x0000, 0x008000, CRC(485fc104) SHA1(89bbb5411da9cfb91ab2f58285829948dba64776) )
+ROM_END
+
+ROM_START( pr_bearxg )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "bx10pse.rom", 0x0000, 0x008000, CRC(2bea6aa4) SHA1(fc8cebe6be44c2806dd851ef52d4209a51ceb805) )
+ROM_END
+
+ROM_START( pr_bearxh )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "bx10s20p.rom", 0x0000, 0x008000, CRC(03bce92b) SHA1(09ea35ba2dc41e96c94892532b5162796482a485) )
+ROM_END
+
+ROM_START( pr_bearxi )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "bx3110p.rom", 0x0000, 0x008000, CRC(0fca5c5f) SHA1(8dad9995c8c46bd82afe38bb1474b766fd6b2bc8) )
+ROM_END
+
+ROM_START( pr_bearxj )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "bx813c10.bin", 0x0000, 0x008000, CRC(abaa73a1) SHA1(b83a9bb0ad83c148cb58a8ec66fce076f8335736) )
+ROM_END
+
+ROM_START( pr_bearxk )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "bx8t10n6.bin", 0x0000, 0x008000, CRC(829dcc99) SHA1(014b53999becb241a3fcd34e802be8b58bfeb3c4) )
+ROM_END
+	
+ROM_START( pr_bearxl )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "p_bx41.bin", 0x0000, 0x008000, CRC(e9212049) SHA1(215038324baa928b3c41495e78a2be68c8a1a767) )//bx1c20n7.bin
+ROM_END
+
+ROM_START( pr_bearxlp )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "bx_v4_1p.bin", 0x0000, 0x010000, CRC(6adb5508) SHA1(9d2276d13c82f9d82bdd5103e8043c463845e514) )
+ROM_END
+
+ROM_START( pr_bearxm )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "p_bx31.bin", 0x0000, 0x008000, CRC(07917a07) SHA1(4fc51550a3e16073762f92dd2b81987dd4285570) )
+ROM_END
 
 ROM_START( pr_fspot )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "fspot_v1.1", 0x0000, 0x008000, CRC(d826951e) SHA1(9476936987555aad4cf5432072c1841702b507cf) )
-
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "fspot_v2.1", 0x0000, 0x008000, CRC(8ed27c1b) SHA1(31ff8dd2fbcac2b19b64196256de7de2f6cf8d66) )
-	ROM_LOAD( "funspot v1.1 20p po 82%.bin", 0x0000, 0x008000, CRC(9c50b37a) SHA1(cffd52ba9c452e51df0cab0e4766534b6b8a1386) )
-	ROM_LOAD( "funspot v1.1 6 button.bin", 0x0000, 0x008000, CRC(ee3de053) SHA1(e4f6901aadf918ec19f475c1df440a3f09142c01) )
-	ROM_LOAD( "funspot v2.1 20p po 82%.bin", 0x0000, 0x008000, CRC(caa45a7f) SHA1(7b04be4157750817e77217ebad2c4d2092496347) )
-	ROM_LOAD( "funspot v2.1 7 button.bin", 0x0000, 0x008000, CRC(b8c90956) SHA1(dbf51ffee21b2a2017dd713b75029110d8cace33) )
-	ROM_LOAD( "p_fs31.bin", 0x0000, 0x008000, CRC(c9ae0199) SHA1(a67c99eb37e5e534d0fd64f1d8f43af3cfe2beb5) )
 	ROM_LOAD( "p_fs41.bin", 0x0000, 0x008000, CRC(fa93c9b5) SHA1(e7a33963730dc14c1d1e513d064e1a341f104339) )
 ROM_END
 
+ROM_START( pr_fspota )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "p_fs31.bin", 0x0000, 0x008000, CRC(c9ae0199) SHA1(a67c99eb37e5e534d0fd64f1d8f43af3cfe2beb5) )
+ROM_END
 
+ROM_START( pr_fspotb )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "fspot_v2.1", 0x0000, 0x008000, CRC(8ed27c1b) SHA1(31ff8dd2fbcac2b19b64196256de7de2f6cf8d66) )
+ROM_END
+
+ROM_START( pr_fspotc )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "funspot v2.1 20p po 82%.bin", 0x0000, 0x008000, CRC(caa45a7f) SHA1(7b04be4157750817e77217ebad2c4d2092496347) )
+ROM_END
+
+ROM_START( pr_fspotd )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "funspot v2.1 7 button.bin", 0x0000, 0x008000, CRC(b8c90956) SHA1(dbf51ffee21b2a2017dd713b75029110d8cace33) )
+ROM_END
+
+ROM_START( pr_fspote )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "fspot_v1.1", 0x0000, 0x008000, CRC(d826951e) SHA1(9476936987555aad4cf5432072c1841702b507cf) )
+ROM_END
+
+ROM_START( pr_fspotf )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "funspot v1.1 20p po 82%.bin", 0x0000, 0x008000, CRC(9c50b37a) SHA1(cffd52ba9c452e51df0cab0e4766534b6b8a1386) )
+ROM_END
+
+ROM_START( pr_fspotg )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "funspot v1.1 6 button.bin", 0x0000, 0x008000, CRC(ee3de053) SHA1(e4f6901aadf918ec19f475c1df440a3f09142c01) )
+ROM_END
 
 ROM_START( pr_gnuc )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "nugget12.bin", 0x0000, 0x008000, CRC(dc7411b2) SHA1(fb0d2ab936965b66aad8401c79ccadec225a60b2) )
-
-	ROM_REGION( 0x80000, "altrevs", 0 )
 	ROM_LOAD( "nugget22.bin", 0x0000, 0x008000, CRC(b289a4d0) SHA1(d7b52602ce126f4b6ae2d6f842a7bef26400f96f) )
 ROM_END
 
+ROM_START( pr_gnuca )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "nugget12.bin", 0x0000, 0x008000, CRC(dc7411b2) SHA1(fb0d2ab936965b66aad8401c79ccadec225a60b2) )
+ROM_END
 
 
 ROM_START( pr_magln )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "magic lines v1-1.bin", 0x0000, 0x008000, CRC(ff7103d0) SHA1(9c926d8f97d3cd95bd721cfb751f583ef610c6e2) )
-
-	ROM_REGION( 0x80000, "altrevs", 0 )
 	ROM_LOAD( "magic lines v2-1.bin", 0x0000, 0x008000, CRC(b2619fac) SHA1(7a6603f538fde3ebda8025589bb562ee35a8a097) )
-	ROM_LOAD( "magic11.bin", 0x0000, 0x008000, CRC(ff7103d0) SHA1(9c926d8f97d3cd95bd721cfb751f583ef610c6e2) )
-	ROM_LOAD( "magic21.bin", 0x0000, 0x008000, CRC(b2619fac) SHA1(7a6603f538fde3ebda8025589bb562ee35a8a097) )
+ROM_END
+
+ROM_START( pr_maglna )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "magic lines v1-1.bin", 0x0000, 0x008000, CRC(ff7103d0) SHA1(9c926d8f97d3cd95bd721cfb751f583ef610c6e2) )
 ROM_END
 
 ROM_START( pr_swop )
@@ -418,10 +497,13 @@ ROM_START( pr_swop )
 ROM_END
 
 
-
 ROM_START( pr_lday )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "lday72c", 0x0000, 0x010000, CRC(eec97b47) SHA1(ff9bb493146779883587457c9cf1f36f7f6a734a) )
+ROM_END
+
+ROM_START( pr_ldaya )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "lday72t", 0x0000, 0x010000, CRC(ac12e1ed) SHA1(2be3fff875958b9699fc07c830b7e76f0aeea0e7) )
 ROM_END
 
@@ -436,37 +518,122 @@ ROM_END
 ROM_START( pr_7hvn )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "7 heaven v170 (27256)", 0x0000, 0x008000, CRC(6605c956) SHA1(ffa663dc9a5e6d9138aeef9f65c8d5ee4bd3a308) )
+ROM_END
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "777 heaven 892a10pn-370", 0x0000, 0x008000, CRC(26c875df) SHA1(fd5fbadd1d8455f855c60213c54e9976d4763227) )
-	ROM_LOAD( "777 heaven 892a10pn-380 (27256)", 0x0000, 0x008000, CRC(ca9d2108) SHA1(ebbb54c6640c67ce905a2dbf83f9f2fde31d342f) )
-	ROM_LOAD( "777 heaven 892a10po-340", 0x0000, 0x008000, CRC(ddd7c3e4) SHA1(853a3d41492392470d619701987bdb95ae01acdc) )
-	ROM_LOAD( "777 heaven 892a20pn-390 (27256)", 0x0000, 0x008000, CRC(ffd1a8e0) SHA1(4b3a72c855d5b28d8be5db13166c58a44a1cbb59) )
-	ROM_LOAD( "777 heaven 8t 5c 10p (27512)", 0x0000, 0x010000, CRC(dadbb559) SHA1(f8bb6579446548f1d0519555eabfa0c076885832) )
-	ROM_LOAD( "777 heaven pc90 10 (27512)", 0x0000, 0x010000, CRC(91d67978) SHA1(de57a4095c814d6c396b3fa80f66fc3eb912d42f) )
-	ROM_LOAD( "777 heaven pc90 8t 4c (27512)", 0x0000, 0x010000, CRC(b813bec1) SHA1(3926b9cd9f452f3291ee26c14809b0a717c794b9) )
-	ROM_LOAD( "777 heaven pc90 8t 4c 20p (27512)", 0x0000, 0x010000, CRC(7cadbd6c) SHA1(fb0ec1b8e43e772b2fd2b71b82fafc6c06d4d3a4) )
-	ROM_LOAD( "777 heaven pc90 8t 4c 5p (27512)", 0x0000, 0x010000, CRC(b813bec1) SHA1(3926b9cd9f452f3291ee26c14809b0a717c794b9) )
-	ROM_LOAD( "777 heaven pc90 8t 5c 5p (27512)", 0x0000, 0x010000, CRC(47214e06) SHA1(318f7d9891e7d37e2956c462bd04137af5bf972b) )
-	ROM_LOAD( "777 heaven pc90 v110 (27256)", 0x0000, 0x008000, CRC(2c7966a4) SHA1(67b10adf1440fd31e94c88b61f341734b381ca3f) )
-	ROM_LOAD( "777 heaven pc90 v23-0 (27256)", 0x0000, 0x008000, CRC(68c01ea5) SHA1(744346bedc54cda397f3974b93f932f1ffec4411) )
+
+ROM_START( pr_7hvna )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "777heaven10pd", 0x0000, 0x008000, CRC(9532dc9a) SHA1(6e8f763e523a5e1ec72665c11518350d533bec39) )//10GBP
+ROM_END
+
+ROM_START( pr_7hvnb )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "777h20p6_72.bin", 0x0000, 0x008000, CRC(c8b3f54d) SHA1(5e6f734970009131fc4ed0623854993baec08555) )//20p 6GBP 72%
+ROM_END
+
+ROM_START( pr_7hvnc )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "7h10p3c_380.bin", 0x0000, 0x010000, CRC(9fafd2a1) SHA1(7da1fa02005e0e232b7bb01088b180c32f271b00) )//10p 3 pound cash rom 380
+ROM_END
+	
+ROM_START( pr_7hvnd )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "7775prb", 0x0000, 0x010000, CRC(cc6cb41e) SHA1(7b9e4d9cfdb4071c83081a1306ffa7e0be3938aa) )//5p 3 pound cash 105
-	ROM_LOAD( "777620p", 0x0000, 0x008000, CRC(83f3f72e) SHA1(ffa8a63bd81b5d316d21b3834939318a4079e024) )
-	ROM_LOAD( "777h54", 0x0000, 0x010000, CRC(b813bec1) SHA1(3926b9cd9f452f3291ee26c14809b0a717c794b9) )
-	ROM_LOAD( "777hea5p", 0x0000, 0x008000, CRC(cbbccb11) SHA1(3ed9bc244bafdb059c2d7d0303cc3483a9f12d62) )
-	ROM_LOAD( "777heav1020p.bin", 0x0000, 0x010000, CRC(a885298e) SHA1(eb378af28562a028d388cba5ead98644d5c9532f) )
-	ROM_LOAD( "777heaven.bin", 0x0000, 0x008000, CRC(68c01ea5) SHA1(744346bedc54cda397f3974b93f932f1ffec4411) )
-	ROM_LOAD( "777heaven10pd", 0x0000, 0x008000, CRC(9532dc9a) SHA1(6e8f763e523a5e1ec72665c11518350d533bec39) )
+ROM_END
+	
+ROM_START( pr_7hvne )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "777 heaven 892a20pn-390 (27256)", 0x0000, 0x008000, CRC(ffd1a8e0) SHA1(4b3a72c855d5b28d8be5db13166c58a44a1cbb59) )
+ROM_END
+	
+ROM_START( pr_7hvnf )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "777 heaven 892a10pn-380 (27256)", 0x0000, 0x008000, CRC(ca9d2108) SHA1(ebbb54c6640c67ce905a2dbf83f9f2fde31d342f) )
+ROM_END
+
+ROM_START( pr_7hvng )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "777 heaven 892a10pn-370", 0x0000, 0x008000, CRC(26c875df) SHA1(fd5fbadd1d8455f855c60213c54e9976d4763227) )
+ROM_END
+
+ROM_START( pr_7hvnh )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "777 heaven 892a10po-340", 0x0000, 0x008000, CRC(ddd7c3e4) SHA1(853a3d41492392470d619701987bdb95ae01acdc) )
+ROM_END
+
+ROM_START( pr_7hvni )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "777 heaven pc90 v23-0 (27256)", 0x0000, 0x008000, CRC(68c01ea5) SHA1(744346bedc54cda397f3974b93f932f1ffec4411) )
+ROM_END
+
+ROM_START( pr_7hvnj )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "777 heaven pc90 v110 (27256)", 0x0000, 0x008000, CRC(2c7966a4) SHA1(67b10adf1440fd31e94c88b61f341734b381ca3f) )
+ROM_END
+
+ROM_START( pr_7hvnk )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "777heaven5p(27256)", 0x0000, 0x008000, CRC(d5a0a06d) SHA1(e6209d406319617d7b1462f788a4e68fa7142cde) )
+ROM_END
+
+ROM_START( pr_7hvnl )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "777620p", 0x0000, 0x008000, CRC(83f3f72e) SHA1(ffa8a63bd81b5d316d21b3834939318a4079e024) )
+ROM_END
+
+ROM_START( pr_7hvnm )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "777hea5p", 0x0000, 0x008000, CRC(cbbccb11) SHA1(3ed9bc244bafdb059c2d7d0303cc3483a9f12d62) )
+ROM_END
+
+ROM_START( pr_7hvnn )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "777heav1020p.bin", 0x0000, 0x010000, CRC(a885298e) SHA1(eb378af28562a028d388cba5ead98644d5c9532f) )
+ROM_END
+
+ROM_START( pr_7hvno )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "777 heaven 8t 5c 10p (27512)", 0x0000, 0x010000, CRC(dadbb559) SHA1(f8bb6579446548f1d0519555eabfa0c076885832) )
+ROM_END
+
+ROM_START( pr_7hvnp )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "777 heaven pc90 10 (27512)", 0x0000, 0x010000, CRC(91d67978) SHA1(de57a4095c814d6c396b3fa80f66fc3eb912d42f) )
+ROM_END
+
+ROM_START( pr_7hvnq )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "777 heaven pc90 8t 4c 20p (27512)", 0x0000, 0x010000, CRC(7cadbd6c) SHA1(fb0ec1b8e43e772b2fd2b71b82fafc6c06d4d3a4) )
+ROM_END
+
+ROM_START( pr_7hvnr )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "777 heaven pc90 8t 4c 5p (27512)", 0x0000, 0x010000, CRC(b813bec1) SHA1(3926b9cd9f452f3291ee26c14809b0a717c794b9) )
+ROM_END
+
+ROM_START( pr_7hvns )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "777 heaven pc90 8t 5c 5p (27512)", 0x0000, 0x010000, CRC(47214e06) SHA1(318f7d9891e7d37e2956c462bd04137af5bf972b) )
+ROM_END
+
+ROM_START( pr_7hvnt )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "77h5pcbs", 0x0000, 0x010000, CRC(15a61bbe) SHA1(3c98f43c6f229da9a3fc334568cdce4d39bd6563) )
+ROM_END
+
+ROM_START( pr_7hvnu )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "cl7h1020", 0x0000, 0x010000, CRC(b12e3219) SHA1(634f6984d9ef6ef9964841b5586143d82d8b52f7) )
 ROM_END
 
+	
 ROM_START( pr_alwy9 )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "always 9 10p.bin", 0x0000, 0x010000, CRC(aff337c0) SHA1(a335a857c1bba696150d51cabfd39a2996c1092f) )
+ROM_END
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
+ROM_START( pr_alwy9a )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "always9.bin", 0x0000, 0x010000, CRC(6372d4d6) SHA1(7e767fe531c50e6d8f810193d7cdb55703114914) )
 ROM_END
 
@@ -475,33 +642,59 @@ ROM_START( pr_barbl )
 	ROM_LOAD( "bars and bells.bin", 0x0000, 0x010000, CRC(a5d65329) SHA1(e28954a4555b8d7f0781cb26f2a10390e142af34) )
 ROM_END
 
+#define pr_batls_sound \
+	ROM_REGION( 0x80000, "snd", 0 )\
+	ROM_LOAD( "080snd1.bin", 0x0000, 0x020000, CRC(011170ab) SHA1(60a174c09261c2ee230c4194d918173b41f267de) )\
+	ROM_LOAD( "080snd2.bin", 0x020000, 0x020000, CRC(9189793b) SHA1(b47a3c214eb01595581f1e9d18c154560ee02ca1) )\
+	
 ROM_START( pr_batls )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "batt72c", 0x0000, 0x010000, CRC(6c6ab1f1) SHA1(6e0663fcdfa1948d9d74b6df388d09fed73f0ed2) )
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
+	pr_batls_sound
+ROM_END
+
+ROM_START( pr_batlsa )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "batt72t", 0x0000, 0x010000, CRC(e823e506) SHA1(6de98a585546b4005ef547a37dc27542df0fef0c) )
+
+	pr_batls_sound
+ROM_END
+
+ROM_START( pr_batlsb )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "battleships5p10p20p8.bin", 0x0000, 0x010000, CRC(3a1491a9) SHA1(c3fbffb66ac8d576edf17027dfa360089d8eb14c) )
 
-	ROM_REGION( 0x80000, "snd", 0 )
-	ROM_LOAD( "080snd1.bin", 0x0000, 0x020000, CRC(011170ab) SHA1(60a174c09261c2ee230c4194d918173b41f267de) )
-	ROM_LOAD( "080snd2.bin", 0x020000, 0x020000, CRC(9189793b) SHA1(b47a3c214eb01595581f1e9d18c154560ee02ca1) )
+	pr_batls_sound
 ROM_END
 
 ROM_START( pr_btwar )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "beatthewarden.bin", 0x0000, 0x010000, CRC(d2bcb356) SHA1(d2c3230395ca5c7e713bb7122db33b66ad83eb2c) )
+ROM_END
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
+ROM_START( pr_btwara )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "btw72c", 0x0000, 0x010000, CRC(12e4eceb) SHA1(9be20b54f3d1edba3a21a89dbb22c33f52362870) )
+ROM_END
+
+ROM_START( pr_btwarb )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "btw72t", 0x0000, 0x010000, CRC(96adb81c) SHA1(d43925b6cc01ddd9050bd023902f7ec37e1fbf52) )
 ROM_END
+
 
 ROM_START( pr_bigdp )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "962a206n.368", 0x0000, 0x010000, CRC(a59a22c9) SHA1(d1500dfab69ec3e19dbb709122a55227cfef05a1) )
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_REGION( 0x80000, "snd", 0 )
+	ROM_LOAD( "962snd1.050", 0x000000, 0x020000, CRC(618003a0) SHA1(01d5ab57dbe481729ef5dccca53c458eadaf042e) )
+	ROM_LOAD( "962snd2.050", 0x020000, 0x020000, CRC(510dd26d) SHA1(02f1c9b10d08da838120457cac02f552e162c056) )
+ROM_END
+
+ROM_START( pr_bigdpa )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "big dipper ndp.bin", 0x0000, 0x010000, CRC(23f483c6) SHA1(acc45b30aaa22c35f6cfe44bf92997c8ac1a3cff) )
 
 	ROM_REGION( 0x80000, "snd", 0 )
@@ -509,30 +702,49 @@ ROM_START( pr_bigdp )
 	ROM_LOAD( "962snd2.050", 0x020000, 0x020000, CRC(510dd26d) SHA1(02f1c9b10d08da838120457cac02f552e162c056) )
 ROM_END
 
+//first rom == bullseyesnd
+#define pr_bulls_sound \
+	ROM_REGION( 0x80000, "snd", 0 )\
+	ROM_LOAD( "010snd1 316e.bin" , 0x0000, 0x020000, CRC(5e3cfdc6) SHA1(32db10e7bacc6a4728d8821e77789cf146e2a277) )\
+	ROM_LOAD( "010snd2 9e9a.bin" , 0x0000, 0x020000, CRC(496a9d51) SHA1(703631d3cb2e3c7fa676cb5a31903bf39ee6c44f) )\
+	
+	
 ROM_START( pr_bulls )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "beye58c", 0x0000, 0x010000, CRC(5fc52311) SHA1(dd4d3f29ec608c37d3d644bfbfa3ba06cc134b59) )
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "bullseye std 6 tok 6de7.bin", 0x0000, 0x010000, CRC(c3b6e153) SHA1(03a3a4e781f1b9029bfbe976a8223df1bacb0f67) )
-	ROM_LOAD( "bullseye10", 0x0000, 0x010000, CRC(de43085c) SHA1(bdd1e22545680c9a2cc3cb4244a4887cb0f5519e) )
-
 	ROM_REGION( 0x80000, "unknown", 0 ) // don't know what this is, doesn't look the same
 	ROM_LOAD( "bb10p1", 0x0000, 0x020000, CRC(afe7b7bb) SHA1(dcf65e2113354171dc8858c6bfd8b97955b470a0) )
 
-	ROM_REGION( 0x80000, "snd", 0 )
-//  ROM_LOAD( "bullseyesnd.p1", 0x0000, 0x020000, CRC(5e3cfdc6) SHA1(32db10e7bacc6a4728d8821e77789cf146e2a277) )
-//  ROM_LOAD( "bullseyesnd.p2", 0x0000, 0x020000, CRC(496a9d51) SHA1(703631d3cb2e3c7fa676cb5a31903bf39ee6c44f) )
-	ROM_LOAD( "010snd1 316e.bin", 0x0000, 0x020000, CRC(5e3cfdc6) SHA1(32db10e7bacc6a4728d8821e77789cf146e2a277) )
-	ROM_LOAD( "010snd2 9e9a.bin", 0x0000, 0x020000, CRC(496a9d51) SHA1(703631d3cb2e3c7fa676cb5a31903bf39ee6c44f) )
+	pr_bulls_sound
+ROM_END
+
+ROM_START( pr_bullsa )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "bullseye std 6 tok 6de7.bin", 0x0000, 0x010000, CRC(c3b6e153) SHA1(03a3a4e781f1b9029bfbe976a8223df1bacb0f67) )
+
+	pr_bulls_sound
+ROM_END
+
+ROM_START( pr_bullsb )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "bullseye10", 0x0000, 0x010000, CRC(de43085c) SHA1(bdd1e22545680c9a2cc3cb4244a4887cb0f5519e) )
+
+	pr_bulls_sound
 ROM_END
 
 ROM_START( pr_bulbn )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "bbn72c", 0x0000, 0x010000, CRC(488d8f4f) SHA1(1168763072b6a89d9c4e315474fb74be3018c530) )
+ROM_END
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
+ROM_START( pr_bulbna )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "bbn72t", 0x0000, 0x010000, CRC(38659c4c) SHA1(e27f7ae532cc4a0cee3c40b8c9bae6c10e52e45d) )
+ROM_END
+
+ROM_START( pr_bulbnb )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "bully5sw", 0x0000, 0x010000, CRC(b85c2f32) SHA1(c600e81930dba642f226a2a0e06a017629745abf) )
 ROM_END
 
@@ -540,7 +752,13 @@ ROM_START( pr_buljp )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "121a20pn.038", 0x0000, 0x010000, CRC(0cbce459) SHA1(2e37528991ec465f6fcb6540d76fe422f74b2973) )
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_REGION( 0x80000, "snd", 0 )
+	ROM_LOAD( "076snd1.010", 0x0000, 0x020000, CRC(a33f9778) SHA1(a3961e1058037971d4f0ddea23be0a6715834e46) )
+	ROM_LOAD( "076snd2.010", 0x0000, 0x020000, CRC(702f3977) SHA1(9612f25abb51693f8e4ff52bc193d1d18e7d774a) )
+ROM_END
+
+ROM_START( pr_buljpa )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "bjp58c", 0x0000, 0x010000, CRC(d999d635) SHA1(875244e44ecbe8618d676ecaae9f260073b326f0) )
 
 	ROM_REGION( 0x80000, "snd", 0 )
@@ -561,25 +779,51 @@ ROM_START( pr_cas7 )
 	ROM_LOAD( "244a30pn-140_15", 0x0000, 0x010000, CRC(21f26490) SHA1(4b616fce289892264aa9e7c5521e481b2ae288d7) )
 ROM_END
 
+#define pr_chico_sound\
+	ROM_REGION( 0x80000, "snd", 0 )\
+	ROM_LOAD( "006snd1.000", 0x0000, 0x020000, CRC(f906857a) SHA1(cfa47a3e887e6788c577d31bb567f7fbaaf0bbf3) )\
+	ROM_LOAD( "006snd2.000", 0x0000, 0x020000, CRC(8445d0ef) SHA1(fd2ecc96f74e99e8f5ea7c7772fbd451ce52e889) )\
+	
 ROM_START( pr_chico )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "006a20pn.810", 0x0000, 0x010000, CRC(c4b491b7) SHA1(7629857cf6f1f69fb9ccf82a290a491cf695d373) )
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "006a25pn.810", 0x0000, 0x010000, CRC(d765215c) SHA1(22fe8d4b387e9fbc34a72ea1583b1c040f7761bc) )
-	ROM_LOAD( "chic8c", 0x0000, 0x010000, CRC(2d5628be) SHA1(0c3f60f72a4d4eb458cac8ca4fe7d5584cbe4f18) )
-
-	ROM_REGION( 0x80000, "snd", 0 )
-	ROM_LOAD( "006snd1.000", 0x0000, 0x020000, CRC(f906857a) SHA1(cfa47a3e887e6788c577d31bb567f7fbaaf0bbf3) )
-	ROM_LOAD( "006snd2.000", 0x0000, 0x020000, CRC(8445d0ef) SHA1(fd2ecc96f74e99e8f5ea7c7772fbd451ce52e889) )
+	pr_chico_sound
 ROM_END
+
+ROM_START( pr_chicoa )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "006a25pn.810", 0x0000, 0x010000, CRC(d765215c) SHA1(22fe8d4b387e9fbc34a72ea1583b1c040f7761bc) )
+	
+	pr_chico_sound
+ROM_END
+
+ROM_START( pr_chicob )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "chic8c", 0x0000, 0x010000, CRC(2d5628be) SHA1(0c3f60f72a4d4eb458cac8ca4fe7d5584cbe4f18) )	
+
+	pr_chico_sound
+ROM_END
+
 
 ROM_START( pr_coolm )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "cm5p5ro", 0x0000, 0x010000, CRC(5a784345) SHA1(fbfd550e61ca3a683a66f372e37c9d21a43a59e2) )
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
+	ROM_REGION( 0x80000, "snd", 0 )
+	ROM_LOAD( "cmsnd.bin", 0x0000, 0x080000, CRC(db79a326) SHA1(afe19eaa5d63c871ed80ffdfc8fb991a8c16cb36) )
+ROM_END
+
+ROM_START( pr_coolma )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "cm5pndan", 0x0000, 0x010000, CRC(e0697fe6) SHA1(d4b66272030dd64c86834f0546376dd02cfb0cc4) )
+	
+	ROM_REGION( 0x80000, "snd", 0 )
+	ROM_LOAD( "cmsnd.bin", 0x0000, 0x080000, CRC(db79a326) SHA1(afe19eaa5d63c871ed80ffdfc8fb991a8c16cb36) )
+ROM_END
+
+ROM_START( pr_coolmb )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "cmil5.5r", 0x0000, 0x010000, CRC(c9bfec79) SHA1(a2856caf6052b1e05dd1de3af5bf0da0b4b7098f) )
 
 	ROM_REGION( 0x80000, "snd", 0 )
@@ -594,7 +838,12 @@ ROM_END
 ROM_START( pr_crzbr )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "crazybars.bin", 0x0000, 0x010000, CRC(896ad5d3) SHA1(6df42dc8016d50239f9467af016e3a4224065599) )
-	ROM_REGION( 0x80000, "altrevs", 0 ) // 'PCP' Super Bars seems to be the same thing
+
+ROM_END
+
+// 'PCP' Super Bars seems to be the same thing
+ROM_START( pr_supbr )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "s bars 052a20p0.050 procon.bin", 0x0000, 0x010000, CRC(037a6a82) SHA1(6f804e80e529293f9de540623cd4e4c5a4fd1022) )
 ROM_END
 
@@ -602,7 +851,10 @@ ROM_START( pr_coyot )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "crazycoyotev810ptube.bin", 0x0000, 0x010000, CRC(9903a0b8) SHA1(124dc1d8de8c0384a42fbf347aefd193706dcc1a) )
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
+ROM_END
+
+ROM_START( pr_coyota )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "crazycoyotev820ptube.bin", 0x0000, 0x010000, CRC(fc251903) SHA1(93d6e49c40420f7d645d392bcc48839f977bd87c) )
 ROM_END
 
@@ -624,7 +876,6 @@ ROM_START( pr_dblup )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
 	ROM_LOAD( "double up 5p.bin", 0x0000, 0x008000, CRC(bd7802ad) SHA1(0d4a2f91a687bd38dcae9ffaf07f2bbd4c2690a7) )
-//  ROM_LOAD( "doubleupprocon5p(27256)", 0x0000, 0x008000, CRC(bd7802ad) SHA1(0d4a2f91a687bd38dcae9ffaf07f2bbd4c2690a7) )
 ROM_END
 
 ROM_START( pr_fire )
@@ -755,7 +1006,6 @@ ROM_END
 ROM_START( pr_hotsp )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "hot spots 5p.bin", 0x0000, 0x008000, CRC(456ba6bf) SHA1(b28d6fe63650e6ce17c279fdb217ce4e9cdd4f2f) )
-	ROM_LOAD( "hotspotsprocon5p(27256)", 0x0000, 0x008000, CRC(456ba6bf) SHA1(b28d6fe63650e6ce17c279fdb217ce4e9cdd4f2f) )
 ROM_END
 
 ROM_START( pr_jkpt7 )
@@ -787,7 +1037,10 @@ ROM_START( pr_jumpj )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "j jacks 994a20pn-040 (27512)", 0x0000, 0x010000, CRC(e6ffe171) SHA1(6fdb413621dd6e3f4185ff1f33af2f52b530a0a8) )
 
-	ROM_REGION( 0x80000, "altrevs", 0 )
+ROM_END
+
+ROM_START( pr_jumpja )
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD( "jumping.bin", 0x0000, 0x010000, CRC(3d11a584) SHA1(580450b8bf3adc62ff71e2c3b5b086e702e3345f) )
 ROM_END
 
@@ -828,8 +1081,7 @@ ROM_START( pr_reflx )
 	ROM_LOAD( "reflex 5p.bin", 0x0000, 0x010000, CRC(172d00b8) SHA1(b0eb70d273664428994c4bfff4ccdfb023a842ee) )
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
-	ROM_LOAD( "reflex pc90 v0-36 (27256)", 0x0000, 0x008000, CRC(25eca9b0) SHA1(32ee614a2c82d872346633104d221977fec390a5) )
-	ROM_LOAD( "reflex_4_80_20p.bin", 0x0000, 0x008000, CRC(25eca9b0) SHA1(32ee614a2c82d872346633104d221977fec390a5) )
+	ROM_LOAD( "reflex pc90 v0-36 (27256)", 0x0000, 0x008000, CRC(25eca9b0) SHA1(32ee614a2c82d872346633104d221977fec390a5) )//reflex_4_80_20p.bin
 	ROM_LOAD( "reflex_5p (27512)", 0x0000, 0x010000, CRC(0788e2cc) SHA1(1ff6f517536e6394a92efdea0a90f8013871dab1) )
 	ROM_LOAD( "reflexprocon5p(27256)", 0x0000, 0x008000, CRC(da5db154) SHA1(f549169bdcce0a556e3d65fbbe4f69b175a82a9a) )
 	ROM_LOAD( "reflx54", 0x0000, 0x010000, CRC(f6668f0e) SHA1(8d033de303d5474588c8e2e55a066e79bb68668e) )
@@ -842,13 +1094,12 @@ ROM_END
 
 ROM_START( pr_roll )
 	ROM_REGION( 0x80000, "maincpu", 0 )
-	ROM_LOAD( "roll.bin", 0x0000, 0x010000, CRC(7e092f85) SHA1(3c90d6a7189aae034fe23f3f916fbd575e0f10ab) )
+	ROM_LOAD( "roll.bin", 0x0000, 0x010000, CRC(7e092f85) SHA1(3c90d6a7189aae034fe23f3f916fbd575e0f10ab) )//5p5rd
 
 	ROM_REGION( 0x80000, "altrevs", 0 )
 	ROM_LOAD( "roll10.bin", 0x0000, 0x010000, CRC(ae92129c) SHA1(438245533bb05e86a051d1fbd59802cb109f6a0a) )
 	ROM_LOAD( "roll20p8t.bin", 0x0000, 0x010000, CRC(cbfa85f0) SHA1(d15dbb8c7334f3a2758a1fe4e4a83247cfd282b5) )
 	ROM_LOAD( "roll5p5.bin", 0x0000, 0x010000, CRC(4ab5991b) SHA1(10894908be7ae0fa05bafbff031348dd2acd9cb8) )
-	ROM_LOAD( "roll5p5rd.bin", 0x0000, 0x010000, CRC(7e092f85) SHA1(3c90d6a7189aae034fe23f3f916fbd575e0f10ab) )
 
 	ROM_REGION( 0x80000, "snd", 0 )
 	ROM_LOAD( "rollsnd1.bin", 0x000000, 0x020000, CRC(53dea2e5) SHA1(cbc275f4cd6f415b090298772188bca4ba4c2b32) )
@@ -971,24 +1222,66 @@ DRIVER_INIT( proconn )
 {
 }
 
-GAME( 199?, pr_lday			,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "'L' Of A Day (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_lday			,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "'L' Of A Day (Project) (Cash set) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_ldaya		,pr_lday	,proconn	,proconn	,proconn	,ROT0	,"Project", "'L' Of A Day (Project) (Token set) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_5xcsh		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "5x Cash (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_7hvn			,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_alwy9		,0			,proconn	,proconn	,proconn	,ROT0	,"PCP"    , "Always Nine (Pcp) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvna		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (10GBP Jackpot) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnb		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (20p 6GBP Jackpot Version 114) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnc		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (10p 3GBP Jackpot Version 380) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnd		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (5p 3GBP Jackpot Version 105) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvne		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 6) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnf		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 7) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvng		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 8) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnh		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 9) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvni		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 10) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnj		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 11) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnk		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 12) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnl		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 13) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnm		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 14) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnn		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 15) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvno		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 16) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnp		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 17) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnq		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 18) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnr		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 19) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvns		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 20) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnt		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 21) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_7hvnu		,pr_7hvn	,proconn	,proconn	,proconn	,ROT0	,"Project", "777 Heaven (Project) (set 22) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, pr_alwy9		,0			,proconn	,proconn	,proconn	,ROT0	,"PCP"    , "Always Nine (Pcp) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_alwy9a		,pr_alwy9	,proconn	,proconn	,proconn	,ROT0	,"PCP"    , "Always Nine (Pcp) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_barbl		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Bars & Bells (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_batls		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Battleships (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_btwar		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Beat The Warden (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bigdp		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Big Dipper (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bulls		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Bullseye (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_batls		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Battleships (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_batlsa		,pr_batls	,proconn	,proconn	,proconn	,ROT0	,"Project", "Battleships (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_batlsb		,pr_batls	,proconn	,proconn	,proconn	,ROT0	,"Project", "Battleships (Project) (set 3) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_btwar		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Beat The Warden (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_btwara		,pr_btwar	,proconn	,proconn	,proconn	,ROT0	,"Project", "Beat The Warden (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_btwarb		,pr_btwar	,proconn	,proconn	,proconn	,ROT0	,"Project", "Beat The Warden (Project) (set 3) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bigdp		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Big Dipper (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bigdpa		,pr_bigdp	,proconn	,proconn	,proconn	,ROT0	,"Project", "Big Dipper (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bulls		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Bullseye (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bullsa		,pr_bulls	,proconn	,proconn	,proconn	,ROT0	,"Project", "Bullseye (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bullsb		,pr_bulls	,proconn	,proconn	,proconn	,ROT0	,"Project", "Bullseye (Project) (set 3) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_bulbn		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Bully's Big Night (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_buljp		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Bully's Jackpot (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bulbna		,pr_bulbn	,proconn	,proconn	,proconn	,ROT0	,"Project", "Bully's Big Night (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bulbnb		,pr_bulbn	,proconn	,proconn	,proconn	,ROT0	,"Project", "Bully's Big Night (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_buljp		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Bully's Jackpot (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_buljpa		,pr_buljp	,proconn	,proconn	,proconn	,ROT0	,"Project", "Bully's Jackpot (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_cashb		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Cash Back (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_cas7			,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Casino Jackpot 7s (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_chico		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Chico the Bandit (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_coolm		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Cool Million (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_chico		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Chico the Bandit (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_chicoa		,pr_chico	,proconn	,proconn	,proconn	,ROT0	,"Project", "Chico the Bandit (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_chicob		,pr_chico	,proconn	,proconn	,proconn	,ROT0	,"Project", "Chico the Bandit (Project) (set 3) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_coolm		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Cool Million (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_coolma		,pr_coolm	,proconn	,proconn	,proconn	,ROT0	,"Project", "Cool Million (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_coolmb		,pr_coolm	,proconn	,proconn	,proconn	,ROT0	,"Project", "Cool Million (Project) (set 3) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_crz77		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Crazy 777s (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_crzbr		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Crazy Bars / Super Bars (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_coyot		,0			,proconn	,proconn	,proconn	,ROT0	,"PCP"    , "Crazy Coyote (Pcp) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_crzbr		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Crazy Bars (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_supbr		,0			,proconn	,proconn	,proconn	,ROT0	,"PCP", 	"Super Bars (PCP) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, pr_coyot		,0			,proconn	,proconn	,proconn	,ROT0	,"PCP"    , "Crazy Coyote (Pcp) (10p) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_coyota		,pr_coyot	,proconn	,proconn	,proconn	,ROT0	,"PCP"    , "Crazy Coyote (Pcp) (20p) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+
 GAME( 199?, pr_crzpy		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Crazy Pays (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_dblup		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Double Up (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_fire			,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Fircecracker (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
@@ -1007,7 +1300,8 @@ GAME( 199?, pr_hotcs		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Hot Cas
 GAME( 199?, pr_hotsp		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Hot Spots (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_jkpt7		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Jackpot 7's (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_jkrwd		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Jokers Wild (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_jumpj		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Jumping Jacks (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_jumpj		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Jumping Jacks (Project) (set 1) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_jumpja		,pr_jumpj	,proconn	,proconn	,proconn	,ROT0	,"Project", "Jumping Jacks (Project) (set 2) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_medl			,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Medalist (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_megmn		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Mega Money (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_nudxs		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Nudge XS (Project) (PROCONN)",GAME_IS_SKELETON_MECHANICAL )
@@ -1031,9 +1325,36 @@ GAME( 199?, pr_upnun		,0			,proconn	,proconn	,proconn	,ROT0	,"Project", "Up & Un
 GAME( 199?, pr_sptb			,0			,proconn	,proconn	,proconn	,ROT0	,"Pcp", "Simply the Best (Pcp) (PROCONN?)",GAME_IS_SKELETON_MECHANICAL ) // not 100% sure this belongs here
 
 // Some of these are PC98 hardware.. I don't know how / if that differs
-GAME( 199?, pr_bears		,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear Streak (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_bearx		,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear X (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_fspot		,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Fun Spot (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_gnuc			,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Golden Nugget (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
-GAME( 199?, pr_magln		,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Magic Lines (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bears		,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear Streak (set 1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearsa		,pr_bears	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear Streak (set 2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearsb		,pr_bears	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear Streak (set 3) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearx		,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear X (Version 2.3) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxa		,pr_bearx	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear X (Version 2.2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxb		,pr_bearx	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear X (Version 1.3) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxc		,pr_bearx	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear X (20p set 1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxd		,pr_bearx	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear X (20p set 2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxe		,pr_bearx	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear X (10p set 1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxf		,pr_bearx	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear X (10p set 2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxg		,pr_bearx	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear X (10p set 3) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxh		,pr_bearx	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear X (10p set 4?) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxi		,pr_bearx	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear X (10p set 5) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxj		,pr_bearx	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear X (code 813) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxk		,pr_bearx	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear X (8GBP Token?) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxl		,pr_bearx	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear X (Version 41) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxlp		,pr_bearx	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear X (Version 41, Protocol) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_bearxm		,pr_bearx	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Bear X (Version 31) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, pr_fspot		,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Fun Spot (Version 4.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_fspota		,pr_fspot	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Fun Spot (Version 3.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_fspotb		,pr_fspot	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Fun Spot (Version 2.1, set 1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_fspotc		,pr_fspot	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Fun Spot (Version 2.1, 20p stake, 82%) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_fspotd		,pr_fspot	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Fun Spot (Version 2.1, 7 button) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_fspote		,pr_fspot	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Fun Spot (Version 1.1, set 1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_fspotf		,pr_fspot	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Fun Spot (Version 1.1, 20p stake, 82%) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_fspotg		,pr_fspot	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Fun Spot (Version 1.1, 6 button) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+
+GAME( 199?, pr_gnuc			,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Golden Nugget (Version 2.2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_gnuca		,pr_gnuc	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Golden Nugget (Version 1.2) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_magln		,0			,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Magic Lines (Version 2.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
+GAME( 199?, pr_maglna		,pr_magln	,proconn	,proconn	,proconn	,ROT0	,"Coinworld", "Magic Lines (Version 1.1) (Coinworld)",GAME_IS_SKELETON_MECHANICAL )
 GAME( 199?, pr_swop			,0			,proconn	,proconn	,proconn	,ROT0	,"Ace", "Swop It (Ace)",GAME_IS_SKELETON_MECHANICAL )

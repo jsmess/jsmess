@@ -1,4 +1,42 @@
-/***************************************************************************
+/**************************************************************************************************************************************
+
+
+  Jockey Club II driver
+
+  various hardware revisions
+  all use a MC68EC020FG16 CPU
+
+	extra customs
+
+  jclub2  : SETA ST-0032 (video + sound? **1),                       SETA ST-0013, SETA ST-0017     ( PCB E79-001 rev 01a )
+  jclub2o : SETA ST-0020 (video), SETA ST-0016 (sound + video? **2), SETA ST-0013, SETA ST-0017     ( E06-00409 /  E06-00407 )
+  darkhors: (bootleg hardware)
+
+  ------
+
+  ST-0020 is a zooming sprite / blitter chip, also used by gdfs in ssv.c (see st0020.c)
+  ST-0016 is a z80 with integrated video + sound capabilities **1
+  ST-0017 is also used in srmp6.c, what is it? I/O? RLE?
+
+  ST-0013 doesn't seem to be used anywhere else?
+  ST-0032 doesn't seem to be used anywhere else? **2
+
+  ------
+
+  **1 ST-0032 seems to be similar to ST-0020 but the ram / list formats aren't the same, maybe it handles sound as there doesn't
+   seem to be any other dedicated sound chip
+
+  **2 ST-0016 video functionality is probably not used 
+
+
+
+**************************************************************************************************************************************/
+
+
+
+
+
+/*
 
                             -= Dark Horse =-
 
@@ -61,7 +99,7 @@ To do:
 #include "sound/st0016.h"
 #include "includes/st0016.h"
 #include "cpu/z80/z80.h"
-
+#include "video/st0020.h"
 
 class darkhors_state : public st0016_state
 {
@@ -72,8 +110,8 @@ public:
 		m_tmapscroll(*this, "tmapscroll"),
 		m_tmapram2(*this, "tmapram2"),
 		m_tmapscroll2(*this, "tmapscroll2"),
-		m_jclub2_tileram(*this, "jclub2_tileram"),
 		m_spriteram(*this, "spriteram"),
+		m_gdfs_st0020(*this, "st0020_spr"),
 		m_maincpu(*this, "maincpu") { }
 
 	virtual void machine_start()
@@ -88,10 +126,9 @@ public:
 	optional_shared_ptr<UINT32> m_tmapram2;
 	optional_shared_ptr<UINT32> m_tmapscroll2;
 	UINT32 m_input_sel;
-	optional_shared_ptr<UINT32> m_jclub2_tileram;
 	int m_jclub2_gfx_index;
 	optional_shared_ptr<UINT32> m_spriteram;
-
+	optional_device<st0020_device> m_gdfs_st0020;
 	required_device<cpu_device> m_maincpu;
 	DECLARE_WRITE32_MEMBER(darkhors_tmapram_w);
 	DECLARE_WRITE32_MEMBER(darkhors_tmapram2_w);
@@ -99,7 +136,6 @@ public:
 	DECLARE_WRITE32_MEMBER(darkhors_input_sel_w);
 	DECLARE_READ32_MEMBER(darkhors_input_sel_r);
 	DECLARE_WRITE32_MEMBER(darkhors_unk1_w);
-	DECLARE_WRITE32_MEMBER(jclub2_tileram_w);
 	DECLARE_WRITE32_MEMBER(darkhors_eeprom_w);
 };
 
@@ -246,20 +282,6 @@ static SCREEN_UPDATE_IND16( darkhors )
 
 ***************************************************************************/
 
-static const eeprom_interface eeprom_intf =
-{
-	7,				// address bits 7
-	8,				// data bits    8
-	"*110",			// read         1 10 aaaaaaa
-	"*101",			// write        1 01 aaaaaaa dddddddd
-	"*111",			// erase        1 11 aaaaaaa
-	"*10000xxxx",	// lock         1 00 00xxxx
-	"*10011xxxx",	// unlock       1 00 11xxxx
-	1,
-//  "*10001xxxx"    // write all    1 00 01xxxx dddddddd
-//  "*10010xxxx"    // erase all    1 00 10xxxx
-};
-
 WRITE32_MEMBER(darkhors_state::darkhors_eeprom_w)
 {
 	device_t *device = machine().device("eeprom");
@@ -353,12 +375,6 @@ static ADDRESS_MAP_START( darkhors_map, AS_PROGRAM, 32, darkhors_state )
 ADDRESS_MAP_END
 
 
-WRITE32_MEMBER(darkhors_state::jclub2_tileram_w)
-{
-	COMBINE_DATA(&m_jclub2_tileram[offset]);
-	gfx_element_mark_dirty(machine().gfx[m_jclub2_gfx_index], offset/(256/4));
-
-}
 
 static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
@@ -375,21 +391,38 @@ static ADDRESS_MAP_START( jclub2_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x580400, 0x580403) AM_READ_PORT("580400")
 	AM_RANGE(0x580420, 0x580423) AM_READ_PORT("580420")
 
-	AM_RANGE(0x800000, 0x87ffff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x800000, 0x87ffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_sprram_r, st0020_sprram_w, 0xffffffff );
 
 	AM_RANGE(0x880000, 0x89ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w)
 	AM_RANGE(0x8a0000, 0x8bffff) AM_WRITEONLY	// this should still be palette ram!
 
-	AM_RANGE(0x8C0000, 0x8C01ff) AM_RAM
+	AM_RANGE(0x8C0000, 0x8C00ff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_blitram_r, st0020_blitram_w, 0xffffffff );
 	AM_RANGE(0x8E0000, 0x8E01ff) AM_RAM
 
-	AM_RANGE(0x900000, 0x90ffff) AM_RAM_WRITE(jclub2_tileram_w) AM_SHARE("jclub2_tileram") // tile data gets decompressed here by main cpu?
+	AM_RANGE(0x900000, 0x9fffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_gfxram_r, st0020_gfxram_w, 0xffffffff );
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( jclub2o_map, AS_PROGRAM, 32, darkhors_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 	AM_RANGE(0x400000, 0x41ffff) AM_RAM
+
+	AM_RANGE(0x490040, 0x490043) AM_WRITE(darkhors_eeprom_w)
+	AM_RANGE(0x4e0080, 0x4e0083) AM_READ_PORT("4e0080") AM_WRITE(darkhors_unk1_w)
+
+	AM_RANGE(0x580000, 0x580003) AM_READ_PORT("580000")
+	AM_RANGE(0x580004, 0x580007) AM_READ_PORT("580004")
+	AM_RANGE(0x580008, 0x58000b) AM_READ(darkhors_input_sel_r)
+	AM_RANGE(0x58000c, 0x58000f) AM_WRITE(darkhors_input_sel_w)
+	AM_RANGE(0x580200, 0x580203) AM_READNOP
+	AM_RANGE(0x580400, 0x580403) AM_READ_PORT("580400")
+	AM_RANGE(0x580420, 0x580423) AM_READ_PORT("580420")
+
+	AM_RANGE(0x600000, 0x67ffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_sprram_r, st0020_sprram_w, 0xffffffff );
+	AM_RANGE(0x680000, 0x69ffff) AM_WRITE(paletteram32_xBBBBBGGGGGRRRRR_dword_w)
+	AM_RANGE(0x6a0000, 0x6bffff) AM_RAM
+	AM_RANGE(0x6C0000, 0x6C00ff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_blitram_r, st0020_blitram_w, 0xffffffff );
+	AM_RANGE(0x700000, 0x7fffff) AM_DEVREADWRITE16( "st0020_spr", st0020_device, st0020_gfxram_r, st0020_gfxram_w, 0xffffffff );
 
 ADDRESS_MAP_END
 
@@ -628,21 +661,6 @@ static GFXDECODE_START( darkhors )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x8, 0, 0x10000/64 )	// color codes should be doubled
 GFXDECODE_END
 
-// wrong
-static const gfx_layout layout_16x16x8_jclub2 =
-{
-	16,16,
-	0x10000/256,
-	8,
-	{ 0,1,2,3,4,5,6,7 },
-	{ 24,16,8,0,  56,48,40,32,  88,80,72,64,  120, 112, 104, 96},
-	{ 0*128,1*128,2*128,3*128,4*128,5*128,6*128,7*128,8*128,9*128,10*128,11*128,12*128,13*128,14*128,15*128 },
-	256*8
-};
-
-static GFXDECODE_START( jclub2 )
-	//GFXDECODE_ENTRY( "maincpu", 0, layout_16x16x8_jclub2, 0, 0x10000/64 ) // color codes should be doubled
-GFXDECODE_END
 
 
 /***************************************************************************
@@ -664,7 +682,7 @@ static TIMER_DEVICE_CALLBACK( darkhors_irq )
 	if(scanline == 0)
 		device_set_input_line(state->m_maincpu, 3, HOLD_LINE);
 
-	if(scanline >= 1 && scanline <= 247)
+	if(scanline == 128)
 		device_set_input_line(state->m_maincpu, 4, HOLD_LINE);
 }
 
@@ -673,7 +691,7 @@ static MACHINE_CONFIG_START( darkhors, darkhors_state )
 	MCFG_CPU_PROGRAM_MAP(darkhors_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", darkhors_irq, "screen", 0, 1)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -699,22 +717,16 @@ MACHINE_CONFIG_END
 
 static VIDEO_START(jclub2)
 {
-	darkhors_state *state = machine.driver_data<darkhors_state>();
-	/* find first empty slot to decode gfx */
-	for (state->m_jclub2_gfx_index = 0; state->m_jclub2_gfx_index < MAX_GFX_ELEMENTS; state->m_jclub2_gfx_index++)
-		if (machine.gfx[state->m_jclub2_gfx_index] == 0)
-			break;
-
-	assert(state->m_jclub2_gfx_index != MAX_GFX_ELEMENTS);
-
-	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine.gfx[state->m_jclub2_gfx_index] = gfx_element_alloc(machine, &layout_16x16x8_jclub2, reinterpret_cast<UINT8 *>(state->m_jclub2_tileram.target()), machine.total_colors() / 16, 0);
-
 
 }
 
 static SCREEN_UPDATE_IND16(jclub2)
 {
+	darkhors_state *state = screen.machine().driver_data<darkhors_state>();
+
+	// this isn't an st0020..
+	state->m_gdfs_st0020->st0020_draw_all(screen.machine(), bitmap, cliprect);
+
 	return 0;
 }
 
@@ -723,7 +735,7 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_CPU_PROGRAM_MAP(jclub2_map)
 	MCFG_TIMER_ADD_SCANLINE("scantimer", darkhors_irq, "screen", 0, 1)
 
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -733,11 +745,17 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
 	MCFG_SCREEN_UPDATE_STATIC(jclub2)
 
-	MCFG_GFXDECODE(jclub2)
+	// NOT an ST0020 but instead ST0032, ram format isn't compatible at least
+	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
+	st0020_device::set_is_st0032(*device, 1);
+	st0020_device::set_is_jclub2o(*device, 1); // offsets
+
 	MCFG_PALETTE_LENGTH(0x10000)
 
 	MCFG_VIDEO_START(jclub2)
 MACHINE_CONFIG_END
+
+
 
 static ADDRESS_MAP_START( st0016_mem, AS_PROGRAM, 8, darkhors_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -770,19 +788,22 @@ static VIDEO_START(jclub2o)
 
 static SCREEN_UPDATE_IND16(jclub2o)
 {
+	darkhors_state *state = screen.machine().driver_data<darkhors_state>();
+	state->m_gdfs_st0020->st0020_draw_all(screen.machine(), bitmap, cliprect);
 	return 0;
 }
 
 static MACHINE_CONFIG_START( jclub2o, darkhors_state )
+	MCFG_CPU_ADD("maincpu", M68EC020, 12000000)
+	MCFG_CPU_PROGRAM_MAP(jclub2o_map)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", darkhors_irq, "screen", 0, 1)
+
 	MCFG_CPU_ADD("st0016",Z80,8000000)
 	MCFG_CPU_PROGRAM_MAP(st0016_mem)
 	MCFG_CPU_IO_MAP(st0016_io)
 	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MCFG_CPU_ADD("maincpu", M68EC020, 12000000)
-	MCFG_CPU_PROGRAM_MAP(jclub2o_map)
-
-	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_EEPROM_ADD("eeprom", eeprom_interface_93C46_8bit)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -792,8 +813,9 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 0x190-1, 8, 0x100-8-1)
 	MCFG_SCREEN_UPDATE_STATIC(jclub2o)
 
-	MCFG_GFXDECODE(jclub2)
 	MCFG_PALETTE_LENGTH(0x10000)
+	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
+	st0020_device::set_is_jclub2o(*device, 1);
 
 	MCFG_VIDEO_START(jclub2o)
 
@@ -856,9 +878,11 @@ Jockey Club II by SETA 1996
 
 PCB E79-001 rev 01a (Newer)
 
-Main CPU : SETA ST-0032 70C600JF505
+Main CPU : MC68EC020FG16
 
-Others : MC68EC020FG16
+Graphics : SETA ST-0032 70C600JF505
+
+Others : 
      SETA ST-0013
      SETA ST-0017
 
@@ -917,11 +941,13 @@ Other hardware version (older):
 Main PCB: E06-00409
 Sub PCb : E06-00407 (I/O nothing else)
 
-Main CPU : SETA ST-0020
+Main CPU :  MC68EC020FG16
 
 Many XTAL : 48.0000 MHz,33.3333 MHz,4.91520 MHz,42.9545 MHz(x2),105.0000 MHz (this 105.0000 Xtal is sometimes replaced by a tiny pcb silscreened 108.0000 MHz(!), with ICS ICS1494N, MB3771 and 14.3181 MHz Xtal)
 
-Others : MC68EC020FG16
+Graphics: SETA ST-0020
+
+Others :
      SETA ST-0013
      SETA ST-0016  <-- z80 core + simple gfx + sound, see st0016.c
      SETA ST-0017
@@ -965,22 +991,26 @@ ROM_END
 
 static DRIVER_INIT( darkhors )
 {
-	UINT32 *rom    = (UINT32 *) machine.root_device().memregion("maincpu")->base();
-//  UINT8  *eeprom = (UINT8 *)  machine.root_device().memregion("eeprom")->base();
-//  int i;
+	// the dumped eeprom bytes are in a different order to how MAME expects them to be
+	// (offset 0x00, 0x40, 0x01, 0x41, 0x02, 0x42 ..... )
+	// I guess this is the difference between the internal organization on the real
+	// device, and how MAME represents it?
 
-#if 1
-	// eeprom error patch
-	rom[0x0444c/4]	=	0x02b34e71;
-	rom[0x04450/4]	=	0x4e710839;
-
-	rom[0x045fc/4]	=	0xbe224e71;
-	rom[0x04600/4]	=	0x4e714eb9;
-#endif
-
-//  if (eeprom != NULL)
-//      for (i = 0; i < (1<<7); i++)
-//          eeprom[i] = eeprom[i*2];
+	// the eeprom contains the game ID, which must be valid for it to boot
+	// is there a way (key sequence) to reprogram it??
+	// I bet the original sets need similar get further in their boot sequence
+	UINT8  *eeprom = (UINT8 *)  machine.root_device().memregion("eeprom")->base();
+	if (eeprom != NULL)	
+	{
+		size_t len = machine.root_device().memregion("eeprom")->bytes();
+		UINT8* temp = (UINT8*)auto_alloc_array(machine, UINT8, len);
+		int i;
+		for (i = 0; i < len; i++)
+			temp[i] = eeprom[BITSWAP8(i,7,5,4,3,2,1,0,6)];
+		
+		memcpy(eeprom, temp, len);
+		auto_free(machine, temp);
+	}
 }
 
 GAME( 199?, jclub2,   0,      jclub2,  darkhors, 0,        ROT0, "Seta", "Jockey Club II (newer hardware)", GAME_NOT_WORKING | GAME_NO_SOUND )

@@ -333,9 +333,6 @@ void z80pio_device::pio_port::reset()
 
 	// clear ready line
 	set_rdy(false);
-
-	// read port value
-	m_input = m_in_p_func(0);
 }
 
 
