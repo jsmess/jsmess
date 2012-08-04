@@ -577,7 +577,7 @@ READ8_MEMBER( ti99_8::read_by_9901 )
 		//
 		// bit 26: high
 		// bit 27: tape input
-		int answer = 4;
+		answer = 4;
 		if ((machine().device<cassette_image_device>(CASSETTE_TAG))->input() > 0)
 			answer |= 8;
 		break;

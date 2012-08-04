@@ -25,13 +25,11 @@ READ16_MEMBER( isa16_ide_cd_device::atapi_status_r )
 	UINT8 *atapi_regs = m_atapi_regs;
 	int shift;
 	shift = 0;
-	int reg = offset<<1;
 	switch(mem_mask)
 	{
 	case 0x000000ff:
 		break;
 	case 0x0000ff00:
-		reg+=1;
 		shift=8;
 		break;
 	}
