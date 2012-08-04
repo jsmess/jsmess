@@ -1064,7 +1064,7 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 	}
 	if(physical == 0x36 || physical == 0x37)
 	{
-		if(state->m_init_rom_en && (state->m_type != SYS_FM11 || state->m_type != SYS_FM16))
+		if(state->m_init_rom_en && (state->m_type != SYS_FM11 && state->m_type != SYS_FM16))
 		{
 			RAM = space->machine().root_device().memregion("init")->base();
 			space->install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);
@@ -1075,7 +1075,7 @@ static void fm7_update_bank(address_space* space, int bank, UINT8 physical)
 	}
 	if(physical > 0x37 && physical <= 0x3f)
 	{
-		if(state->m_basic_rom_en && (state->m_type != SYS_FM11 || state->m_type != SYS_FM16))
+		if(state->m_basic_rom_en && (state->m_type != SYS_FM11 && state->m_type != SYS_FM16))
 		{
 			RAM = space->machine().root_device().memregion("fbasic")->base();
 			space->install_read_bank(bank*0x1000,(bank*0x1000)+size,bank_name);

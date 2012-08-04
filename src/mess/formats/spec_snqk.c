@@ -131,7 +131,7 @@ SNAPSHOT_LOAD(spectrum)
     }
     else if (!mame_stricmp(file_type, "sp"))
     {
-        if ((snapshot_data[0] != 'S' && snapshot_data[1] != 'P') && (snapshot_size != SP_NEW_SIZE_16K || snapshot_size != SP_NEW_SIZE_48K))
+        if ((snapshot_data[0] != 'S' && snapshot_data[1] != 'P') && (snapshot_size != SP_NEW_SIZE_16K && snapshot_size != SP_NEW_SIZE_48K))
         {
             if (snapshot_size != SP_OLD_SIZE)
             {
@@ -161,7 +161,7 @@ SNAPSHOT_LOAD(spectrum)
     }
     else if (!mame_stricmp(file_type, "plusd"))
     {
-        if ((snapshot_size != PLUSD48_SIZE) || (snapshot_size != PLUSD128_SIZE))
+        if ((snapshot_size != PLUSD48_SIZE) && (snapshot_size != PLUSD128_SIZE))
         {
             logerror("Invalid .PLUSD file size.\n");
             goto error;
