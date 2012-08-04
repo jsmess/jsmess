@@ -241,10 +241,7 @@ WRITE8_MEMBER( rex6000_state::beep_w )
 
 			m_beep_mode = BIT(data, 0);
 			break;
-		break;
 	}
-
-
 }
 
 READ8_MEMBER( rex6000_state::lcd_base_r )

@@ -380,7 +380,7 @@ bool cococart_slot_device::call_load()
 
 bool cococart_slot_device::call_softlist_load(char *swlist, char *swname, rom_entry *start_entry)
 {
-	load_software_part_region(this, swlist, swname, start_entry ); return TRUE;
+	load_software_part_region(this, swlist, swname, start_entry );
 	return TRUE;
 }
 
