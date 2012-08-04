@@ -2096,6 +2096,7 @@ $(MESS_DRIVERS)/coco3.o:	$(MESS_LAYOUT)/coco3.lh
 $(MESS_DRIVERS)/cosmicos.o:	$(MESS_LAYOUT)/cosmicos.lh
 $(MESS_DRIVERS)/c80.o:		$(MESS_LAYOUT)/c80.lh
 $(MESS_DRIVERS)/dectalk.o:	$(MESS_LAYOUT)/dectalk.lh
+$(MESS_DRIVERS)/dmv.o:		$(MESS_LAYOUT)/dmv.lh
 $(MESS_DRIVERS)/dolphunk.o:	$(MESS_LAYOUT)/dolphunk.lh
 $(MESS_DRIVERS)/eacc.o:		$(MESS_LAYOUT)/eacc.lh
 $(MESS_DRIVERS)/elf.o:		$(MESS_LAYOUT)/elf2.lh

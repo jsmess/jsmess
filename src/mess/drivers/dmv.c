@@ -14,6 +14,7 @@
 #include "machine/8237dma.h"
 #include "video/upd7220.h"
 #include "formats/basicdsk.h"
+#include "dmv.lh"
 
 class dmv_state : public driver_device
 {
@@ -37,6 +38,7 @@ public:
 	virtual void video_start();
 	virtual void machine_reset();
 
+	DECLARE_WRITE8_MEMBER(leds_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
 	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
 	DECLARE_WRITE8_MEMBER(fdd_motor_w);
@@ -46,6 +48,26 @@ public:
 	int 		m_fdc_int_line;
 };
 
+
+WRITE8_MEMBER(dmv_state::leds_w)
+{
+	/*
+        LEDs    Value       Significance
+        ---------------------------------------
+        None    0xFF        Check complete
+        1+8     0x7E        Sumcheck error
+        2+8     0xBE        GDC error
+        3+8     0xDE        Disk drive error
+        4+8     0xEE        16-bit processor error
+        5+8     0xF6        Keyboard error
+        6+8     0xFA        DMA error
+        7+8     0xFC        Memory error
+        All     0x00        Processor error
+    */
+
+	for(int i=0; i<8; i++)
+		output_set_led_value(8-i, BIT(data, i));
+}
 
 WRITE_LINE_MEMBER(dmv_state::fdc_irq_w)
 {
@@ -123,6 +145,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dmv_io , AS_IO, 8, dmv_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_WRITE(leds_w)
 	AM_RANGE(0x13, 0x13) AM_READ(sys_status_r)
 	AM_RANGE(0x14, 0x14) AM_WRITE(fdd_motor_w)
 	AM_RANGE(0x20, 0x2f) AM_DEVREADWRITE_LEGACY("dma8237", i8237_r, i8237_w)
@@ -130,7 +153,6 @@ static ADDRESS_MAP_START( dmv_io , AS_IO, 8, dmv_state)
 	AM_RANGE(0x51, 0x51) AM_DEVREADWRITE_LEGACY("upd765", upd765_data_r, upd765_data_w)
 	AM_RANGE(0xa0, 0xa1) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
 
-	//AM_RANGE(0x00, 0x00) panel LEDs
 	//AM_RANGE(0x10, 0x11) boot ROM bankswitch (0x0000-0x1fff)
 	//AM_RANGE(0x12, 0x12) pulse FDC TC line
 	//AM_RANGE(0x40, 0x41) Keyboard
@@ -261,6 +283,7 @@ static MACHINE_CONFIG_START( dmv, dmv_state )
 	MCFG_GFXDECODE(dmv)
     MCFG_PALETTE_LENGTH(2)
     MCFG_PALETTE_INIT(black_and_white)
+	MCFG_DEFAULT_LAYOUT(layout_dmv)
 
 	// devices
 	MCFG_UPD7220_ADD( "upd7220", XTAL_4MHz, hgdc_intf, upd7220_map )
