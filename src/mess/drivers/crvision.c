@@ -141,7 +141,7 @@ READ8_MEMBER( crvision_state::centronics_status_r )
 
 	data |= m_centronics->busy_r() << 7;
 
-	return 0;
+	return data;
 }
 
 /*-------------------------------------------------
