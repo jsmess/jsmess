@@ -65,8 +65,6 @@ public:
 	UINT8 m_pr_counter;
 	UINT8 m_pr_state;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
 	DECLARE_READ8_MEMBER( mc10_bfff_r );
 	DECLARE_WRITE8_MEMBER( mc10_bfff_w );
 	DECLARE_READ8_MEMBER( alice90_bfff_r );
@@ -222,16 +220,6 @@ READ8_MEMBER( mc10_state::mc10_mc6847_videoram_r )
 	m_mc6847->as_w(BIT(m_ram_base[offset], 7));
 
 	return m_ram_base[offset];
-}
-
-UINT32 mc10_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
-{
-	if (m_mc6847)		//mc10, alice
-		return m_mc6847->screen_update(screen, bitmap, cliprect);
-	else if (m_ef9345)	//alice32
-		return m_ef9345->screen_update(screen, bitmap, cliprect);
-
-	return 0;
 }
 
 static TIMER_DEVICE_CALLBACK( alice32_scanline )
@@ -557,7 +545,7 @@ static MACHINE_CONFIG_START( alice32, mc10_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_UPDATE_DRIVER(mc10_state, screen_update)
+	MCFG_SCREEN_UPDATE_DEVICE("ef9345", ef9345_device, screen_update)
 	MCFG_SCREEN_SIZE(336, 270)
 	MCFG_SCREEN_VISIBLE_AREA(00, 336-1, 00, 270-1)
 	MCFG_PALETTE_LENGTH(8)
