@@ -4,15 +4,44 @@
 
         22/04/2009 Preliminary driver.
 
-Monitor commands
-B - Registers
-D - Dump memory
-E - Registers
-L - Load Cassette
-M - Modify Memory
-S - Save Cassette
+The 8x4 keyboard contains letters A-W, enter, cursor right/left, space, and
+4 shift keys.
+S1 - X-Z, numbers
+S2 - a-w
+S3 - z-z, punctuation
+S4 - control keys
 
-There are others which just hang or reboot the system, due to no input checking.
+Control Keys:
+G - Graphics
+A - Alpha
+T - clear screen
+U - enter
+P - cursor left
+Q - cursor right
+
+Monitor commands (debug)
+R - registers
+B - breakpoint
+E - execute
+G - resume after breakpoint
+N - single-step
+
+Monitor commands (general)
+H - switch to hex keyboard (H to Q become 0 to 9)
+A - switch back to normal alpha keyboard
+C - Compare memory blocks
+D - Dump memory
+F - Find bytes in memory
+T - Copy memory block
+M - Modify bytes (; to exit)
+I - reboot
+J - Jump to address
+K - Fill memory (K by itself fills all of memory)
+L - Load Cassette
+S - Save Cassette
+W - window (example: W EF00 EFFF)
+
+Due to no input checking, misuse of commands can crash the system.
 
 
 
@@ -33,7 +62,7 @@ public:
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
 	m_cass(*this, CASSETTE_TAG),
-	m_p_videoram(*this, "p_videoram"){ }
+	m_p_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
@@ -51,7 +80,7 @@ public:
 /* Address maps */
 static ADDRESS_MAP_START(z1013_mem, AS_PROGRAM, 8, z1013_state)
 	AM_RANGE( 0x0000, 0xebff ) AM_RAM
-	AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0xf000, 0xffff ) AM_ROM //  ROM
 ADDRESS_MAP_END
 
