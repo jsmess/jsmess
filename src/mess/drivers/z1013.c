@@ -8,7 +8,7 @@ The 8x4 keyboard contains letters A-W, enter, cursor right/left, space, and
 4 shift keys.
 S1 - X-Z, numbers
 S2 - a-w
-S3 - z-z, punctuation
+S3 - x-z, punctuation
 S4 - control keys
 
 Control Keys:
