@@ -440,11 +440,6 @@ WRITE_LINE_MEMBER( bigbord2_state::frame )
 
 
 
-static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
-{
-	z80ctc_trg3_w(device, state);
-}
-
 static Z80CTC_INTERFACE( ctca_intf )
 {
 	0,              			/* timer disables */
@@ -460,7 +455,7 @@ static Z80CTC_INTERFACE( ctcb_intf )
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
 	DEVCB_NULL,		/* ZC/TO0 callback - SIO channel B clock */
 	DEVCB_NULL,		/* ZC/TO1 callback - SIO channel A clock */
-	DEVCB_DEVICE_LINE(Z80CTCB_TAG, ctc_z2_w) /* ZC/TO2 callback */
+	DEVCB_DEVICE_LINE(Z80CTCB_TAG, z80ctc_trg3_w) /* ZC/TO2 callback */
 };
 
 /* Z80 Daisy Chain */
