@@ -17,16 +17,22 @@ Some other control keys:
 ^H backspace
 ^L clear screen
 
+
+ToDo:
+- cassette in
+- proper keyboard
+- get rid of temporary code
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-//#include "machine/z80pio.h"
-//#include "machine/z80ctc.h"
-//#include "cpu/z80/z80daisy.h"
-//#include "sound/wave.h"
-//#include "imagedev/cassette.h"
-//#include "sound/speaker.h"
+#include "machine/z80pio.h"
+#include "machine/z80ctc.h"
+#include "cpu/z80/z80daisy.h"
+#include "sound/wave.h"
+#include "imagedev/cassette.h"
+#include "sound/beep.h"
 
 // temporary
 #include "machine/keyboard.h"
@@ -40,17 +46,24 @@ class z9001_state : public driver_device
 public:
 	z9001_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		  m_maincpu(*this, "maincpu"),
-		  m_framecnt(0),
-		  m_p_colorram(*this, "p_colorram"),
-		  m_p_videoram(*this, "p_videoram"){ }
+	m_maincpu(*this, "maincpu"),
+	m_framecnt(0),
+	m_beeper(*this, BEEPER_TAG),
+	m_cass(*this, CASSETTE_TAG),
+	m_p_colorram(*this, "colorram"),
+	m_p_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	UINT8 m_framecnt;
+	required_device<device_t> m_beeper;
+	required_device<cassette_image_device> m_cass;
 	required_shared_ptr<const UINT8> m_p_colorram;
 	required_shared_ptr<const UINT8> m_p_videoram;
 	DECLARE_WRITE8_MEMBER(kbd_put);
+	DECLARE_WRITE8_MEMBER(port88_w);
+	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	const UINT8 *m_p_chargen;
+	bool m_cassbit;
 	virtual void machine_reset();
 	//virtual void machine_start();
 	virtual void video_start();
@@ -59,27 +72,77 @@ public:
 static ADDRESS_MAP_START(z9001_mem, AS_PROGRAM, 8, z9001_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0xe7ff ) AM_RAM
-	AM_RANGE( 0xe800, 0xebff ) AM_RAM AM_SHARE("p_colorram")
-	AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE( 0xe800, 0xebff ) AM_RAM AM_SHARE("colorram")
+	AM_RANGE( 0xec00, 0xefff ) AM_RAM AM_SHARE("videoram")
 	AM_RANGE( 0xf000, 0xffff ) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z9001_io, AS_IO, 8, z9001_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	// AM_RANGE(0x80, 0x83) AM_MIRROR(4) z80-ctc
-	// AM_RANGE(0x88, 0x8B) AM_MIRROR(4) z80-pio1 (both pios: A0 -> A/B; A1 -> C/D)
-	// AM_RANGE(0x90, 0x93) AM_MIRROR(4) z80-pio2
+	AM_RANGE(0x80, 0x83) AM_MIRROR(4) AM_DEVREADWRITE_LEGACY("z80ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x88, 0x8B) AM_MIRROR(4) AM_DEVREADWRITE_LEGACY("z80pio1", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x90, 0x93) AM_MIRROR(4) AM_DEVREADWRITE_LEGACY("z80pio2", z80pio_cd_ba_r, z80pio_cd_ba_w)
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( z9001 )
 INPUT_PORTS_END
 
-//pio1 port B for user expansion
-//pio1 port A bits0,1,2 not connected; 3,4,5 go to a connector; 6 goes to 'graphics' LED; 7 goes to speaker.
-//pio2 ports A & B connect to the keyboard
-//all 3 devices use IM2 and are daisy chained
+static const z80_daisy_config z9001_daisy_chain[] =
+{
+	{ "z80pio2" },
+	{ "z80pio1" },
+	{ "z80ctc" },
+	{ NULL }
+};
+
+static Z80CTC_INTERFACE( ctc_intf )
+{
+	0,				/* timer disablers */
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
+	DEVCB_DRIVER_LINE_MEMBER(z9001_state, cass_w),			/* ZC/TO0 callback */
+	DEVCB_NULL,			/* ZC/TO1 callback */
+	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg3_w)	/* ZC/TO2 callback */
+};
+
+static Z80PIO_INTERFACE( pio1_intf )
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
+	DEVCB_NULL,			/* read port A */
+	DEVCB_DRIVER_MEMBER(z9001_state, port88_w),			/* write port A */
+	DEVCB_NULL,			/* portA ready active callback */
+	DEVCB_NULL,			/* read port B - user expansion */
+	DEVCB_NULL,			/* write port B - user expansion */
+	DEVCB_NULL			/* portB ready active callback */
+};
+
+static Z80PIO_INTERFACE( pio2_intf ) // keyboard PIO
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
+	DEVCB_NULL,			/* read port A */
+	DEVCB_NULL,			/* write port A */
+	DEVCB_NULL,			/* portA ready active callback */
+	DEVCB_NULL,			/* read port B */
+	DEVCB_NULL,			/* write port B */
+	DEVCB_NULL			/* portB ready active callback */
+};
+
+//Bits0,1 not connected; 2,3,4,5 go to a connector; 6 goes to 'graphics' LED; 7 goes to speaker.
+WRITE8_MEMBER( z9001_state::port88_w )
+{
+	beep_set_state(m_beeper, BIT(data, 7));
+}
+
+WRITE_LINE_MEMBER( z9001_state::cass_w )
+{
+	if (state)
+	{
+		m_cassbit ^= 1;
+		m_cass->output( m_cassbit ? -1.0 : +1.0);
+	}
+}
+
 
 // temporary (prevent freezing when you type an invalid filename)
 static TIMER_DEVICE_CALLBACK( timer_callback )
@@ -90,6 +153,7 @@ static TIMER_DEVICE_CALLBACK( timer_callback )
 
 MACHINE_RESET_MEMBER( z9001_state )
 {
+	beep_set_frequency(m_beeper, 800);
 	cpu_set_reg(m_maincpu, Z80_PC, 0xf000);
 }
 
@@ -176,6 +240,7 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_9_8304MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(z9001_mem)
 	MCFG_CPU_IO_MAP(z9001_io)
+	MCFG_CPU_CONFIG(z9001_daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -186,8 +251,21 @@ static MACHINE_CONFIG_START( z9001, z9001_state )
 	MCFG_SCREEN_UPDATE_STATIC(z9001)
 	MCFG_GFXDECODE(z9001)
 	MCFG_PALETTE_LENGTH(16)
+
+	/* Sound */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_WAVE_ADD(WAVE_TAG, CASSETTE_TAG)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	/* Devices */
 	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 	MCFG_TIMER_ADD_PERIODIC("z9001_timer", timer_callback, attotime::from_msec(10))
+	MCFG_Z80PIO_ADD( "z80pio1", XTAL_9_8304MHz / 4, pio1_intf )
+	MCFG_Z80PIO_ADD( "z80pio2", XTAL_9_8304MHz / 4, pio2_intf )
+	MCFG_Z80CTC_ADD( "z80ctc", XTAL_9_8304MHz / 4, ctc_intf )
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, default_cassette_interface )
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -251,10 +329,10 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT    INIT  COMPANY      FULLNAME       FLAGS */
-COMP( 1984, z9001,    0,       0,       z9001,     z9001, z9001_state,   0,   "Robotron", "Z9001 (KC 85/1.10)", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1986, kc85_111, z9001,   0,       z9001,     z9001, z9001_state,   0,   "Robotron", "KC 85/1.11", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1987, kc87_10,  z9001,   0,       z9001,     z9001, z9001_state,   0,   "Robotron", "KC 87.10", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1987, kc87_11,  z9001,   0,       z9001,     z9001, z9001_state,   0,   "Robotron", "KC 87.11", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1987, kc87_20,  z9001,   0,       z9001,     z9001, z9001_state,   0,   "Robotron", "KC 87.20", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1987, kc87_21,  z9001,   0,       z9001,     z9001, z9001_state,   0,   "Robotron", "KC 87.21", GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT    CLASS        INIT  COMPANY      FULLNAME       FLAGS */
+COMP( 1984, z9001,    0,       0,       z9001,     z9001, z9001_state,   0,   "Robotron", "Z9001 (KC 85/1.10)", GAME_NOT_WORKING )
+COMP( 1986, kc85_111, z9001,   0,       z9001,     z9001, z9001_state,   0,   "Robotron", "KC 85/1.11", GAME_NOT_WORKING )
+COMP( 1987, kc87_10,  z9001,   0,       z9001,     z9001, z9001_state,   0,   "Robotron", "KC 87.10", GAME_NOT_WORKING )
+COMP( 1987, kc87_11,  z9001,   0,       z9001,     z9001, z9001_state,   0,   "Robotron", "KC 87.11", GAME_NOT_WORKING )
+COMP( 1987, kc87_20,  z9001,   0,       z9001,     z9001, z9001_state,   0,   "Robotron", "KC 87.20", GAME_NOT_WORKING )
+COMP( 1987, kc87_21,  z9001,   0,       z9001,     z9001, z9001_state,   0,   "Robotron", "KC 87.21", GAME_NOT_WORKING )
