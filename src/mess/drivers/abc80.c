@@ -848,4 +848,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                             FULLNAME    FLAGS
-COMP( 1978, abc80,  0,      0,      abc80,  abc80,  0,      "Luxor Datorer AB",					"ABC 80",	GAME_SUPPORTS_SAVE )
+COMP( 1978, abc80,  0,      0,      abc80,  abc80, abc80_state,  0,      "Luxor Datorer AB",					"ABC 80",	GAME_SUPPORTS_SAVE )

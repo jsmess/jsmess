@@ -503,9 +503,9 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1987,	ppc512,     ibm5150,	0,	ppc512,		pc200,	ppc512,	"Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
-COMP(  1987,	ppc640,     ibm5150,	0,	ppc640,		pc200,	ppc512,	"Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
-COMP(  1988,	pc20,       ibm5150,	0,	pc200,		pc200,	pc200,	"Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
-COMP(  1988,	pc200,      ibm5150,	0,	pc200,		pc200,	pc200,	"Sinclair Research Ltd",  "PC200 Professional Series", GAME_NOT_WORKING)
-COMP(  1988,	pc2086,     ibm5150,	0,	pc200,      pc200,	pc200,	"Amstrad plc",  "Amstrad PC2086", GAME_NOT_WORKING )
-COMP(  1990,	pc3086,     ibm5150,	0,	pc200,      pc200,	pc200,	"Amstrad plc",  "Amstrad PC3086", GAME_NOT_WORKING )
+COMP(  1987,	ppc512,     ibm5150,	0,	ppc512,		pc200, pc_state,	ppc512,	"Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
+COMP(  1987,	ppc640,     ibm5150,	0,	ppc640,		pc200, pc_state,	ppc512,	"Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
+COMP(  1988,	pc20,       ibm5150,	0,	pc200,		pc200, pc_state,	pc200,	"Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
+COMP(  1988,	pc200,      ibm5150,	0,	pc200,		pc200, pc_state,	pc200,	"Sinclair Research Ltd",  "PC200 Professional Series", GAME_NOT_WORKING)
+COMP(  1988,	pc2086,     ibm5150,	0,	pc200,      pc200, pc_state,	pc200,	"Amstrad plc",  "Amstrad PC2086", GAME_NOT_WORKING )
+COMP(  1990,	pc3086,     ibm5150,	0,	pc200,      pc200, pc_state,	pc200,	"Amstrad plc",  "Amstrad PC3086", GAME_NOT_WORKING )

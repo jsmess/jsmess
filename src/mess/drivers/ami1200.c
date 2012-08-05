@@ -411,5 +411,5 @@ static DRIVER_INIT( a1200 )
 /***************************************************************************************************/
 
 /*    YEAR  NAME     PARENT   COMPAT  MACHINE INPUT   INIT      COMPANY       FULLNAME */
-COMP( 1992, a1200n,  0,       0,      a1200n, a1200,  a1200,  "Commodore Business Machines",  "Amiga 1200 (NTSC)" , GAME_NOT_WORKING )
-COMP( 1992, a1200p,  a1200n,  0,      a1200p, a1200,  a1200,  "Commodore Business Machines",  "Amiga 1200 (PAL)" , GAME_NOT_WORKING  )
+COMP( 1992, a1200n,  0,       0,      a1200n, a1200, ami1200_state,  a1200,  "Commodore Business Machines",  "Amiga 1200 (NTSC)" , GAME_NOT_WORKING )
+COMP( 1992, a1200p,  a1200n,  0,      a1200p, a1200, ami1200_state,  a1200,  "Commodore Business Machines",  "Amiga 1200 (PAL)" , GAME_NOT_WORKING  )

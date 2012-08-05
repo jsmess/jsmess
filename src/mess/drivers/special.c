@@ -576,10 +576,10 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME        PARENT    COMPAT   MACHINE    INPUT       INIT        COMPANY      FULLNAME       FLAGS */
-COMP( 1985, special,    0,        0,       special,   special,    special,   "<unknown>", "Specialist", GAME_NOT_WORKING )
-COMP( 1985, specialm,   special,  0,       special,   special,    special,   "<unknown>", "Specialist M", 0 )
-COMP( 1985, pioner,     special,  0,       special,   special,    special,   "<unknown>", "Pioner", GAME_NOT_WORKING )
-COMP( 1985, specialp,   special,  0,       specialp,  specialp,   special,   "<unknown>", "Specialist + hires graph", GAME_NOT_WORKING )
-COMP( 1985, lik,        special,  0,       special,   lik,        special,   "<unknown>", "Lik", GAME_NOT_WORKING )
-COMP( 1985, specimx,    special,  0,       specimx,   specimx,    0,         "<unknown>", "Specialist MX", 0)
-COMP( 1994, erik,       special,  0,       erik,      special,    erik,      "<unknown>", "Erik", GAME_NOT_WORKING )
+COMP( 1985, special,    0,        0,       special,   special, special_state,    special,   "<unknown>", "Specialist", GAME_NOT_WORKING )
+COMP( 1985, specialm,   special,  0,       special,   special, special_state,    special,   "<unknown>", "Specialist M", 0 )
+COMP( 1985, pioner,     special,  0,       special,   special, special_state,    special,   "<unknown>", "Pioner", GAME_NOT_WORKING )
+COMP( 1985, specialp,   special,  0,       specialp,  specialp, special_state,   special,   "<unknown>", "Specialist + hires graph", GAME_NOT_WORKING )
+COMP( 1985, lik,        special,  0,       special,   lik, special_state,        special,   "<unknown>", "Lik", GAME_NOT_WORKING )
+COMP( 1985, specimx,    special,  0,       specimx,   specimx, special_state,    0,         "<unknown>", "Specialist MX", 0)
+COMP( 1994, erik,       special,  0,       erik,      special, special_state,    erik,      "<unknown>", "Erik", GAME_NOT_WORKING )

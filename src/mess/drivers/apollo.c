@@ -1361,14 +1361,14 @@ ROM_END
 //#define DSP_FLAGS GAME_NO_SOUND
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY     FULLNAME                         FLAGS */
-COMP( 1989, dn3500,     0,      0,      dn3500_19i, dn3500, dn3500, "Apollo",   "Apollo DN3500 19\" Monochrome", DN_FLAGS )
-COMP( 1989, dsp3500,    dn3500, 0,      dsp3500,    dsp3500,dsp3500,"Apollo",   "Apollo DSP3500",                DSP_FLAGS )
-COMP( 1989, dn3500_15i, dn3500, 0,      dn3500_15i, dn3500, dn3500, "Apollo",   "Apollo DN3500 15\" Monochrome", DN_FLAGS )
+COMP( 1989, dn3500,     0,      0,      dn3500_19i, dn3500, apollo_state, dn3500, "Apollo",   "Apollo DN3500 19\" Monochrome", DN_FLAGS )
+COMP( 1989, dsp3500,    dn3500, 0,      dsp3500,    dsp3500, apollo_state,dsp3500,"Apollo",   "Apollo DSP3500",                DSP_FLAGS )
+COMP( 1989, dn3500_15i, dn3500, 0,      dn3500_15i, dn3500, apollo_state, dn3500, "Apollo",   "Apollo DN3500 15\" Monochrome", DN_FLAGS )
 
-COMP( 1988, dn3000,     dn3500, 0,      dn3000_19i, dn3500, dn3000, "Apollo",   "Apollo DN3000 19\" Monochrome", DN_FLAGS )
-COMP( 1988, dsp3000,    dn3500, 0,      dsp3000,    dsp3500,dsp3000,"Apollo",   "Apollo DSP3000",                DSP_FLAGS )
-COMP( 1988, dn3000_15i, dn3500, 0,      dn3000_15i, dn3500, dn3000, "Apollo",   "Apollo DN3000 15\" Monochrome", DN_FLAGS )
+COMP( 1988, dn3000,     dn3500, 0,      dn3000_19i, dn3500, apollo_state, dn3000, "Apollo",   "Apollo DN3000 19\" Monochrome", DN_FLAGS )
+COMP( 1988, dsp3000,    dn3500, 0,      dsp3000,    dsp3500, apollo_state,dsp3000,"Apollo",   "Apollo DSP3000",                DSP_FLAGS )
+COMP( 1988, dn3000_15i, dn3500, 0,      dn3000_15i, dn3500, apollo_state, dn3000, "Apollo",   "Apollo DN3000 15\" Monochrome", DN_FLAGS )
 
-COMP( 1991, dn5500,     dn3500, 0,      dn5500_19i, dn3500, dn5500, "Apollo",   "Apollo DN5500 19\" Monochrome", GAME_NOT_WORKING )
-COMP( 1991, dsp5500,    dn3500, 0,      dsp5500,    dsp3500,dsp5500,"Apollo",   "Apollo DSP5500",                GAME_NOT_WORKING )
-COMP( 1991, dn5500_15i, dn3500, 0,      dn5500_15i, dn3500, dn5500, "Apollo",   "Apollo DN5500 15\" Monochrome", GAME_NOT_WORKING )
+COMP( 1991, dn5500,     dn3500, 0,      dn5500_19i, dn3500, apollo_state, dn5500, "Apollo",   "Apollo DN5500 19\" Monochrome", GAME_NOT_WORKING )
+COMP( 1991, dsp5500,    dn3500, 0,      dsp5500,    dsp3500, apollo_state,dsp5500,"Apollo",   "Apollo DSP5500",                GAME_NOT_WORKING )
+COMP( 1991, dn5500_15i, dn3500, 0,      dn5500_15i, dn3500, apollo_state, dn5500, "Apollo",   "Apollo DN5500 15\" Monochrome", GAME_NOT_WORKING )

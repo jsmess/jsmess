@@ -248,4 +248,4 @@ static DRIVER_INIT( casloopy )
 	state->m_bios_rom[4/4] = 0xffffff0; //SSP
 }
 
-GAME( 1995, casloopy,  0,   casloopy,  casloopy,  casloopy, ROT0, "Casio", "Loopy", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1995, casloopy,  0,   casloopy,  casloopy, casloopy_state,  casloopy, ROT0, "Casio", "Loopy", GAME_NOT_WORKING | GAME_NO_SOUND )

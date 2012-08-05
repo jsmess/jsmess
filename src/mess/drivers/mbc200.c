@@ -289,5 +289,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, mbc200,  0,       0,	mbc200, 	mbc200, 	 0,	 "Sanyo",   "MBC-200",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, mbc200,  0,       0,	mbc200, 	mbc200, mbc200_state, 	 0,	 "Sanyo",   "MBC-200",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

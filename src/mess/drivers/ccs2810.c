@@ -147,4 +147,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1980, ccs2810,  0,    0,       ccs2810,   ccs2810,  0,   "California Computer Systems", "CCS Model 2810", GAME_NO_SOUND_HW)
+COMP( 1980, ccs2810,  0,    0,       ccs2810,   ccs2810, ccs2810_state,  0,   "California Computer Systems", "CCS Model 2810", GAME_NO_SOUND_HW)

@@ -614,4 +614,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    INIT    COMPANY                          FULLNAME        FLAGS
-COMP( 1983, super6,  0,      0,      super6,  super6,  0,      "Advanced Digital Corporation",	"Super Six",	GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1983, super6,  0,      0,      super6,  super6, super6_state,  0,      "Advanced Digital Corporation",	"Super Six",	GAME_NOT_WORKING | GAME_NO_SOUND_HW )

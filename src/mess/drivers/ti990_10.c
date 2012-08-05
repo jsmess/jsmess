@@ -304,4 +304,4 @@ static INPUT_PORTS_START(ti990_10)
 INPUT_PORTS_END
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY                 FULLNAME */
-COMP( 1975,	ti990_10,	0,		0,		ti990_10,	ti990_10,	ti990_10,	"Texas Instruments",	"TI Model 990/10 Minicomputer System" , GAME_NOT_WORKING )
+COMP( 1975,	ti990_10,	0,		0,		ti990_10,	ti990_10, ti990_10_state,	ti990_10,	"Texas Instruments",	"TI Model 990/10 Minicomputer System" , GAME_NOT_WORKING )

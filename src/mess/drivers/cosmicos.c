@@ -631,4 +631,4 @@ static DRIVER_INIT( cosmicos )
 }
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME    FLAGS */
-COMP( 1979, cosmicos,	0,		0,		cosmicos,	cosmicos,	cosmicos,	"Radio Bulletin",	"Cosmicos",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+COMP( 1979, cosmicos,	0,		0,		cosmicos,	cosmicos, cosmicos_state,	cosmicos,	"Radio Bulletin",	"Cosmicos",	GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )

@@ -885,40 +885,40 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT     COMPAT  MACHINE          INPUT   INIT       COMPANY   FULLNAME */
-CONS( 1989, genesis,    0,         0,      ms_megadriv,     md,     genesis,   "Sega",   "Genesis (USA, NTSC)", 0)
-CONS( 1990, megadriv,   genesis,   0,      ms_megadpal,     md,     md_eur,    "Sega",   "Mega Drive (Europe, PAL)", 0)
-CONS( 1988, megadrij,   genesis,   0,      ms_megadriv,     md,     md_jpn,    "Sega",   "Mega Drive (Japan, NTSC)", 0)
+CONS( 1989, genesis,    0,         0,      ms_megadriv,     md, md_cons_state,     genesis,   "Sega",   "Genesis (USA, NTSC)", 0)
+CONS( 1990, megadriv,   genesis,   0,      ms_megadpal,     md, md_cons_state,     md_eur,    "Sega",   "Mega Drive (Europe, PAL)", 0)
+CONS( 1988, megadrij,   genesis,   0,      ms_megadriv,     md, md_cons_state,     md_jpn,    "Sega",   "Mega Drive (Japan, NTSC)", 0)
 
 // these should not exist, the SVP hardware is in the cart and should be installed dynamically when selected from the Software List
 // this however involves installing entire CPUs at run/load time and I don't think we can do that.
-CONS( 1993, gensvp,     genesis,   0,      ms_megdsvp,      md,     genesis,   "Sega",   "Genesis (USA, NTSC, for SVP cart)", 0)
-CONS( 1990, mdsvp,      genesis,   0,      ms_megdsvppal,   md,     md_eur,    "Sega",   "Mega Drive (Europe, PAL, for SVP cart)", 0)
-CONS( 1988, mdsvpj,     genesis,   0,      ms_megdsvp,      md,     md_jpn,    "Sega",   "Mega Drive (Japan, NTSC, for SVP cart)", 0)
+CONS( 1993, gensvp,     genesis,   0,      ms_megdsvp,      md, mdsvp_state,     genesis,   "Sega",   "Genesis (USA, NTSC, for SVP cart)", 0)
+CONS( 1990, mdsvp,      genesis,   0,      ms_megdsvppal,   md, mdsvp_state,     md_eur,    "Sega",   "Mega Drive (Europe, PAL, for SVP cart)", 0)
+CONS( 1988, mdsvpj,     genesis,   0,      ms_megdsvp,      md, mdsvp_state,     md_jpn,    "Sega",   "Mega Drive (Japan, NTSC, for SVP cart)", 0)
 
 // the 32X plugged in the cart slot, games plugged into the 32x.  Maybe it should be handled as an expansion device?
-CONS( 1994, 32x,        0,         0,      ms_32x,          md, mess_32x,      "Sega",   "32X (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1994, 32xe,       32x,       0,      ms_32x_pal,      md, mess_32x_eur,  "Sega",   "32X (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1994, 32xj,       32x,       0,      ms_32x,          md, mess_32x_jpn,  "Sega",   "32X (Japan, NTSC)", GAME_NOT_WORKING )
+CONS( 1994, 32x,        0,         0,      ms_32x,          md, md_cons_state, mess_32x,      "Sega",   "32X (USA, NTSC)", GAME_NOT_WORKING )
+CONS( 1994, 32xe,       32x,       0,      ms_32x_pal,      md, md_cons_state, mess_32x_eur,  "Sega",   "32X (Europe, PAL)", GAME_NOT_WORKING )
+CONS( 1994, 32xj,       32x,       0,      ms_32x,          md, md_cons_state, mess_32x_jpn,  "Sega",   "32X (Japan, NTSC)", GAME_NOT_WORKING )
 
 // the SegaCD plugged into the expansion port..
-CONS( 1992, segacd,     0,         0,      genesis_scd_scd, md,     genesis,   "Sega",   "Sega CD (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1993, megacd,     segacd,    0,      genesis_scd_mcd, md,     md_eur,    "Sega",   "Mega-CD (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1991, megacdj,    segacd,    0,      genesis_scd_mcdj,md,     md_jpn,    "Sega",   "Mega-CD (Japan, NTSC)", GAME_NOT_WORKING ) // this bios doesn't work with our ram interleave needed by a few games?!
-CONS( 1991, megacda,    segacd,    0,      genesis_scd_mcdj,md,     md_eur,    "Sega",   "Mega-CD (Asia, PAL)", GAME_NOT_WORKING )
-CONS( 1993, segacd2,    0,         0,      genesis_scd_scd, md,     genesis,   "Sega",   "Sega CD 2 (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1993, megacd2,    segacd2,   0,      genesis_scd_mcd, md,     md_eur,    "Sega",   "Mega-CD 2 (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1993, megacd2j,   segacd2,   0,      genesis_scd_mcdj,md,     md_jpn,    "Sega",   "Mega-CD 2 (Japan, NTSC)", GAME_NOT_WORKING )
-CONS( 1993, laseract,   0,         0,      genesis_scd,     md,     genesis,   "Pioneer","LaserActive (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1993, laseractj,  laseract,  0,      genesis_scd,     md,     md_jpn,    "Pioneer","LaserActive (Japan, NTSC)", GAME_NOT_WORKING )
-CONS( 1993, xeye,       0,         0,      genesis_scd,     md,     genesis,   "JVC",    "X'eye (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1992, wmega,      xeye,      0,      genesis_scd,     md,     md_jpn,    "Sega",   "Wondermega (Japan, NTSC)", GAME_NOT_WORKING )
-CONS( 1993, wmegam2,    xeye,      0,      genesis_scd,     md,     md_jpn,    "Victor", "Wondermega M2 (Japan, NTSC)", GAME_NOT_WORKING )
-CONS( 1994, cdx,        0,         0,      genesis_scd,     md,     genesis,   "Sega",   "CDX (USA, NTSC)", GAME_NOT_WORKING )
-CONS( 1994, multmega,   cdx,       0,      genesis_scd,     md,     md_eur,    "Sega",   "Multi-Mega (Europe, PAL)", GAME_NOT_WORKING )
-CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md, mess_32x,  "Sega",   "Sega CD (USA, NTSC, w/32X)", GAME_NOT_WORKING )
+CONS( 1992, segacd,     0,         0,      genesis_scd_scd, md, md_cons_state,     genesis,   "Sega",   "Sega CD (USA, NTSC)", GAME_NOT_WORKING )
+CONS( 1993, megacd,     segacd,    0,      genesis_scd_mcd, md, md_cons_state,     md_eur,    "Sega",   "Mega-CD (Europe, PAL)", GAME_NOT_WORKING )
+CONS( 1991, megacdj,    segacd,    0,      genesis_scd_mcdj,md, md_cons_state,     md_jpn,    "Sega",   "Mega-CD (Japan, NTSC)", GAME_NOT_WORKING ) // this bios doesn't work with our ram interleave needed by a few games?!
+CONS( 1991, megacda,    segacd,    0,      genesis_scd_mcdj,md, md_cons_state,     md_eur,    "Sega",   "Mega-CD (Asia, PAL)", GAME_NOT_WORKING )
+CONS( 1993, segacd2,    0,         0,      genesis_scd_scd, md, md_cons_state,     genesis,   "Sega",   "Sega CD 2 (USA, NTSC)", GAME_NOT_WORKING )
+CONS( 1993, megacd2,    segacd2,   0,      genesis_scd_mcd, md, md_cons_state,     md_eur,    "Sega",   "Mega-CD 2 (Europe, PAL)", GAME_NOT_WORKING )
+CONS( 1993, megacd2j,   segacd2,   0,      genesis_scd_mcdj,md, md_cons_state,     md_jpn,    "Sega",   "Mega-CD 2 (Japan, NTSC)", GAME_NOT_WORKING )
+CONS( 1993, laseract,   0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Pioneer","LaserActive (USA, NTSC)", GAME_NOT_WORKING )
+CONS( 1993, laseractj,  laseract,  0,      genesis_scd,     md, md_cons_state,     md_jpn,    "Pioneer","LaserActive (Japan, NTSC)", GAME_NOT_WORKING )
+CONS( 1993, xeye,       0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "JVC",    "X'eye (USA, NTSC)", GAME_NOT_WORKING )
+CONS( 1992, wmega,      xeye,      0,      genesis_scd,     md, md_cons_state,     md_jpn,    "Sega",   "Wondermega (Japan, NTSC)", GAME_NOT_WORKING )
+CONS( 1993, wmegam2,    xeye,      0,      genesis_scd,     md, md_cons_state,     md_jpn,    "Victor", "Wondermega M2 (Japan, NTSC)", GAME_NOT_WORKING )
+CONS( 1994, cdx,        0,         0,      genesis_scd,     md, md_cons_state,     genesis,   "Sega",   "CDX (USA, NTSC)", GAME_NOT_WORKING )
+CONS( 1994, multmega,   cdx,       0,      genesis_scd,     md, md_cons_state,     md_eur,    "Sega",   "Multi-Mega (Europe, PAL)", GAME_NOT_WORKING )
+CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md, md_cons_state, 	   mess_32x,  "Sega",   "Sega CD (USA, NTSC, w/32X)", GAME_NOT_WORKING )
 
 // this is a standalone system based on the md-like hardware (same vdp etc.)
 
-CONS( 1994, pico,       0,         0,      picopal,         pico,   md_eur,    "Sega",   "Pico (Europe, PAL)", 0)
-CONS( 1994, picou,      pico,      0,      pico,            pico,   genesis,   "Sega",   "Pico (USA, NTSC)", 0)
-CONS( 1993, picoj,      pico,      0,      pico,            pico,   md_jpn,    "Sega",   "Pico (Japan, NTSC)", 0)
+CONS( 1994, pico,       0,         0,      picopal,         pico, pico_state,   md_eur,    "Sega",   "Pico (Europe, PAL)", 0)
+CONS( 1994, picou,      pico,      0,      pico,            pico, pico_state,   genesis,   "Sega",   "Pico (USA, NTSC)", 0)
+CONS( 1993, picoj,      pico,      0,      pico,            pico, pico_state,   md_jpn,    "Sega",   "Pico (Japan, NTSC)", 0)

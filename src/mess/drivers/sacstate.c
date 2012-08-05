@@ -118,4 +118,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY      FULLNAME       FLAGS */
-COMP( ????, sacstate,  0,       0,   sacstate,  sacstate,  0,  "SacState", "SacState 8008", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, sacstate,  0,       0,   sacstate,  sacstate, sacstate_state,  0,  "SacState", "SacState 8008", GAME_NOT_WORKING | GAME_NO_SOUND)

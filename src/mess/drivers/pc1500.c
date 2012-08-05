@@ -314,4 +314,4 @@ ROM_START( pc1500 )
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE INPUT   INIT         COMPANY     FULLNAME */
-COMP( 198?, pc1500,	0,	0,	pc1500,	pc1500,	0,	 "Sharp", "Pocket Computer 1500", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 198?, pc1500,	0,	0,	pc1500,	pc1500, pc1500_state,	0,	 "Sharp", "Pocket Computer 1500", GAME_NOT_WORKING | GAME_NO_SOUND )

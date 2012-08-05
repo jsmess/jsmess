@@ -158,4 +158,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY     FULLNAME       FLAGS */
-COMP( 1983, chaos,  0,      0,       chaos,     chaos,   0,     "<unknown>",  "Chaos 2", GAME_NO_SOUND_HW )
+COMP( 1983, chaos,  0,      0,       chaos,     chaos, chaos_state,   0,     "<unknown>",  "Chaos 2", GAME_NO_SOUND_HW )

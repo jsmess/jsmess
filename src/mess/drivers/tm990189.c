@@ -1017,5 +1017,5 @@ static INPUT_PORTS_START(tm990_189)
 INPUT_PORTS_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT       INIT    COMPANY                 FULLNAME */
-COMP( 1978, 990189,   0,        0,      tm990_189,   tm990_189,  0, "Texas Instruments", "TM 990/189 University Board microcomputer" , 0)
-COMP( 1980, 990189v,  990189,   0,      tm990_189_v, tm990_189,  0, "Texas Instruments", "TM 990/189 University Board microcomputer with Video Board Interface" , 0)
+COMP( 1978, 990189,   0,        0,      tm990_189,   tm990_189, tm990189,  0, "Texas Instruments", "TM 990/189 University Board microcomputer" , 0)
+COMP( 1980, 990189v,  990189,   0,      tm990_189_v, tm990_189, tm990189,  0, "Texas Instruments", "TM 990/189 University Board microcomputer with Video Board Interface" , 0)

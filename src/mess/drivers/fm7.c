@@ -2424,12 +2424,12 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   INIT  COMPANY      FULLNAME        FLAGS */
-COMP( 1981, fm8,      0,      0,      fm8,     fm8,    fm7,  "Fujitsu",   "FM-8",         0)
-COMP( 1982, fm7,      0,      0,      fm7,     fm7,    fm7,  "Fujitsu",   "FM-7",         0)
-COMP( 1982, fm7a,     fm7,    0,      fm7,     fm7,    fm7,  "Fujitsu",   "FM-7 (alternate)", 0)
-COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7,    fm7,  "Fujitsu",   "FM-77AV",      GAME_IMPERFECT_GRAPHICS)
-COMP( 1985, fm7740sx, fm7,    0,      fm77av,  fm7,    fm7,  "Fujitsu",   "FM-77AV40SX",  GAME_NOT_WORKING)
+COMP( 1981, fm8,      0,      0,      fm8,     fm8, fm7_state,    fm7,  "Fujitsu",   "FM-8",         0)
+COMP( 1982, fm7,      0,      0,      fm7,     fm7, fm7_state,    fm7,  "Fujitsu",   "FM-7",         0)
+COMP( 1982, fm7a,     fm7,    0,      fm7,     fm7, fm7_state,    fm7,  "Fujitsu",   "FM-7 (alternate)", 0)
+COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7, fm7_state,    fm7,  "Fujitsu",   "FM-77AV",      GAME_IMPERFECT_GRAPHICS)
+COMP( 1985, fm7740sx, fm7,    0,      fm77av,  fm7, fm7_state,    fm7,  "Fujitsu",   "FM-77AV40SX",  GAME_NOT_WORKING)
 
 // These may be separated into a separate driver, depending on how different they are to the FM-8/FM-7
-COMP( 1982, fm11,     0,      0,      fm11,     fm7,    fm7,       "Fujitsu",   "FM-11 EX",      GAME_NOT_WORKING)
-COMP( 1982, fm16beta, 0,      0,      fm16beta, fm7,    fm7,       "Fujitsu",   "FM-16\xCE\xB2", GAME_NOT_WORKING)
+COMP( 1982, fm11,     0,      0,      fm11,     fm7, fm7_state,    fm7,       "Fujitsu",   "FM-11 EX",      GAME_NOT_WORKING)
+COMP( 1982, fm16beta, 0,      0,      fm16beta, fm7, fm7_state,    fm7,       "Fujitsu",   "FM-16\xCE\xB2", GAME_NOT_WORKING)

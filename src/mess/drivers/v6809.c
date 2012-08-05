@@ -295,4 +295,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY      FULLNAME       FLAGS */
-COMP( 1982, v6809,  0,      0,       v6809,     v6809,   0,      "Microkit", "Vegas 6809", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, v6809,  0,      0,       v6809,     v6809, v6809_state,   0,      "Microkit", "Vegas 6809", GAME_NOT_WORKING | GAME_NO_SOUND)

@@ -544,6 +544,6 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY                 FULLNAME */
-COMP( 1985, ep64,  0,      0,      ep64,    ep64, 0,     "Intelligent Software", "Enterprise 64", GAME_IMPERFECT_SOUND )
-COMP( 1985, ep128, ep64,   0,      ep128,   ep64, 0,     "Intelligent Software", "Enterprise 128", GAME_IMPERFECT_SOUND )
-COMP( 1985, phc64, ep64,   0,      ep64,    ep64, 0,     "Hegener & Glaser",     "Mephisto PHC 64", GAME_IMPERFECT_SOUND )
+COMP( 1985, ep64,  0,      0,      ep64,    ep64, ep_state, 0,     "Intelligent Software", "Enterprise 64", GAME_IMPERFECT_SOUND )
+COMP( 1985, ep128, ep64,   0,      ep128,   ep64, ep_state, 0,     "Intelligent Software", "Enterprise 128", GAME_IMPERFECT_SOUND )
+COMP( 1985, phc64, ep64,   0,      ep64,    ep64, ep_state, 0,     "Hegener & Glaser",     "Mephisto PHC 64", GAME_IMPERFECT_SOUND )

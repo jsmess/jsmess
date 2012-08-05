@@ -743,14 +743,14 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE      INPUT   INIT      COMPANY     FULLNAME                            FLAGS */
-CONS( 1984, sg1000m3,   sms,        0,      sg1000m3,    smsj,   sg1000m3, "Sega",     "SG-1000 Mark III",                 0 )
-CONS( 1986, sms1,       sms,        0,      sms1_ntsc,   sms1,   sms1,     "Sega",     "Master System I",                  0 )
-CONS( 1986, sms1pal,    sms,        0,      sms1_pal,    sms1,   sms1,     "Sega",     "Master System I (PAL)" ,           0 )
-CONS( 1986, smssdisp,   sms,        0,      sms_sdisp,   sms,    smssdisp, "Sega",     "Master System Store Display Unit", GAME_NOT_WORKING )
-CONS( 1987, smsj,       sms,        0,      sms_fm,      smsj,   smsj,     "Sega",     "Master System (Japan)",            0 )
-CONS( 1990, sms,        0,          0,      sms2_ntsc,   sms,    sms1,     "Sega",     "Master System II",                 0 )
-CONS( 1990, smspal,     sms,        0,      sms2_pal,    sms,    sms1,     "Sega",     "Master System II (PAL)",           0 )
-CONS( 1990, sms2kr,     sms,        0,      sms2_fm,     sms,    sms2kr,   "Samsung",  "Gam*Boy II (Korea)",               0 )
+CONS( 1984, sg1000m3,   sms,        0,      sg1000m3,    smsj, sms_state,   sg1000m3, "Sega",     "SG-1000 Mark III",                 0 )
+CONS( 1986, sms1,       sms,        0,      sms1_ntsc,   sms1, sms_state,   sms1,     "Sega",     "Master System I",                  0 )
+CONS( 1986, sms1pal,    sms,        0,      sms1_pal,    sms1, sms_state,   sms1,     "Sega",     "Master System I (PAL)" ,           0 )
+CONS( 1986, smssdisp,   sms,        0,      sms_sdisp,   sms, sms_state,    smssdisp, "Sega",     "Master System Store Display Unit", GAME_NOT_WORKING )
+CONS( 1987, smsj,       sms,        0,      sms_fm,      smsj, sms_state,   smsj,     "Sega",     "Master System (Japan)",            0 )
+CONS( 1990, sms,        0,          0,      sms2_ntsc,   sms, sms_state,    sms1,     "Sega",     "Master System II",                 0 )
+CONS( 1990, smspal,     sms,        0,      sms2_pal,    sms, sms_state,    sms1,     "Sega",     "Master System II (PAL)",           0 )
+CONS( 1990, sms2kr,     sms,        0,      sms2_fm,     sms, sms_state,    sms2kr,   "Samsung",  "Gam*Boy II (Korea)",               0 )
 
-CONS( 1990, gamegear,   0,          sms,    gamegear,    gg,     gamegear, "Sega",     "Game Gear (Europe/America)",       0 )
-CONS( 1990, gamegeaj,   gamegear,   0,      gamegear,    gg,     gamegeaj, "Sega",     "Game Gear (Japan)",                0 )
+CONS( 1990, gamegear,   0,          sms,    gamegear,    gg, sms_state,     gamegear, "Sega",     "Game Gear (Europe/America)",       0 )
+CONS( 1990, gamegeaj,   gamegear,   0,      gamegear,    gg, sms_state,     gamegeaj, "Sega",     "Game Gear (Japan)",                0 )

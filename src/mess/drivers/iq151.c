@@ -490,4 +490,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 198?, iq151,  0,       0,      iq151,     iq151,   iq151, "ZPA Novy Bor", "IQ-151", 0 )
+COMP( 198?, iq151,  0,       0,      iq151,     iq151, iq151_state,   iq151, "ZPA Novy Bor", "IQ-151", 0 )

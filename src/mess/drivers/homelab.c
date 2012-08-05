@@ -907,8 +907,8 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME        PARENT     COMPAT  MACHINE      INPUT      INIT       COMPANY                    FULLNAME   FLAGS */
-COMP( 1982, homelab2,   0,         0,      homelab,     homelab,   0,        "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
-COMP( 1983, homelab3,   homelab2,  0,      homelab3,    homelab3,  0,        "Jozsef and Endre Lukacs", "Homelab 3", GAME_NOT_WORKING )
-COMP( 1984, homelab4,   homelab2,  0,      homelab3,    homelab3,  0,        "Jozsef and Endre Lukacs", "Homelab 4", GAME_NOT_WORKING )
-COMP( 1984, brailab4,   homelab2,  0,      brailab4,    brailab4,  brailab4, "Jozsef and Endre Lukacs", "Brailab 4", GAME_NOT_WORKING )
-COMP( 1988, braiplus,   homelab2,  0,      brailab4,    brailab4,  brailab4, "Jozsef and Endre Lukacs", "Brailab Plus", GAME_NOT_WORKING | GAME_IS_SKELETON )
+COMP( 1982, homelab2,   0,         0,      homelab,     homelab, homelab_state,   0,        "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1983, homelab3,   homelab2,  0,      homelab3,    homelab3, homelab_state,  0,        "Jozsef and Endre Lukacs", "Homelab 3", GAME_NOT_WORKING )
+COMP( 1984, homelab4,   homelab2,  0,      homelab3,    homelab3, homelab_state,  0,        "Jozsef and Endre Lukacs", "Homelab 4", GAME_NOT_WORKING )
+COMP( 1984, brailab4,   homelab2,  0,      brailab4,    brailab4, homelab_state,  brailab4, "Jozsef and Endre Lukacs", "Brailab 4", GAME_NOT_WORKING )
+COMP( 1988, braiplus,   homelab2,  0,      brailab4,    brailab4, homelab_state,  brailab4, "Jozsef and Endre Lukacs", "Brailab Plus", GAME_NOT_WORKING | GAME_IS_SKELETON )

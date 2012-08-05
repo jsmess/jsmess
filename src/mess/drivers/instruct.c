@@ -314,4 +314,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     INIT    COMPANY     FULLNAME                    FLAGS */
-COMP( 1978, instruct,  0,       0,       instruct,  instruct, 0,    "Signetics", "Signetics Instructor 50", 0 )
+COMP( 1978, instruct,  0,       0,       instruct,  instruct, instruct_state, 0,    "Signetics", "Signetics Instructor 50", 0 )

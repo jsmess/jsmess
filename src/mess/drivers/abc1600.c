@@ -1994,4 +1994,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY     FULLNAME     FLAGS
-COMP( 1985, abc1600, 0,      0,      abc1600, abc1600, 0,    "Luxor", "ABC 1600", GAME_NOT_WORKING )
+COMP( 1985, abc1600, 0,      0,      abc1600, abc1600, abc1600_state, 0,    "Luxor", "ABC 1600", GAME_NOT_WORKING )

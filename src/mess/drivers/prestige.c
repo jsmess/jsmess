@@ -517,4 +517,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1998, prestige,  0,       0,	prestige,	prestige,	 0,  "VTech",   "PreComputer Prestige Elite",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1998, prestige,  0,       0,	prestige,	prestige, prestige_state,	 0,  "VTech",   "PreComputer Prestige Elite",		GAME_NOT_WORKING | GAME_NO_SOUND)

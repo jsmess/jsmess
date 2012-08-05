@@ -102,4 +102,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                  FULLNAME       FLAGS */
-COMP( 1982, cortex, 0,      0,       cortex,    cortex,  0,    "Powertran Cybernetics",   "Cortex", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, cortex, 0,      0,       cortex,    cortex, cortex_state,  0,    "Powertran Cybernetics",   "Cortex", GAME_NOT_WORKING | GAME_NO_SOUND)

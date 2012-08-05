@@ -449,4 +449,4 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT     INIT COMPANY   FULLNAME    FLAGS
-CONS( 1983, pv2000,  0,      0,      pv2000,  pv2000,   0,   "Casio",  "PV-2000",  GAME_NOT_WORKING )
+CONS( 1983, pv2000,  0,      0,      pv2000,  pv2000, pv2000_state,   0,   "Casio",  "PV-2000",  GAME_NOT_WORKING )

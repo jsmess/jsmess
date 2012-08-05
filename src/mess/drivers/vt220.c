@@ -79,4 +79,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                      FULLNAME       FLAGS */
-COMP( 1983, vt220,  0,      0,       vt220,     vt220,   0,  "Digital Equipment Corporation", "VT220", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1983, vt220,  0,      0,       vt220,     vt220, vt220_state,   0,  "Digital Equipment Corporation", "VT220", GAME_NOT_WORKING | GAME_NO_SOUND)

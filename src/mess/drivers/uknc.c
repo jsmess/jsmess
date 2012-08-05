@@ -90,4 +90,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-COMP( 1987, uknc,   0,      0,       uknc,      uknc,    0,    "<unknown>",  "UKNC", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1987, uknc,   0,      0,       uknc,      uknc, uknc_state,    0,    "<unknown>",  "UKNC", GAME_NOT_WORKING | GAME_NO_SOUND)

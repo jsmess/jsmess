@@ -695,4 +695,4 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME     PARENT    COMPAT  MACHINE    INPUT     INIT     COMPANY         FULLNAME      FLAGS
-COMP( 1981, jupace,     0,        0,      ace,       ace,      0,   "Jupiter Cantab", "Jupiter Ace" , 0 )
+COMP( 1981, jupace,     0,        0,      ace,       ace, ace_state,      0,   "Jupiter Cantab", "Jupiter Ace" , 0 )

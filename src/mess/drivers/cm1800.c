@@ -114,5 +114,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1981, cm1800,  0,       0,    cm1800,    cm1800,     0,  "<unknown>", "CM-1800", GAME_NO_SOUND_HW)
+COMP( 1981, cm1800,  0,       0,    cm1800,    cm1800, cm1800_state,     0,  "<unknown>", "CM-1800", GAME_NO_SOUND_HW)
 

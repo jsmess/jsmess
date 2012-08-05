@@ -391,6 +391,6 @@ void get_ram_expansion_settings(address_space *space, int &ram_expansion_install
  *************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY                FULLNAME                     FLAGS */
-CONS( 1978, astrocde, 0,        0,        astrocde, astrocde, astrocde, "Bally Manufacturing", "Bally Professional Arcade", GAME_SUPPORTS_SAVE )
-CONS( 1977, astrocdl, astrocde, 0,        astrocde, astrocde, astrocde, "Bally Manufacturing", "Bally Home Library Computer", GAME_SUPPORTS_SAVE )
-CONS( 1977, astrocdw, astrocde, 0,        astrocde, astrocde, astrocde, "Bally Manufacturing", "Bally Computer System", GAME_SUPPORTS_SAVE )
+CONS( 1978, astrocde, 0,        0,        astrocde, astrocde, astrocde_state, astrocde, "Bally Manufacturing", "Bally Professional Arcade", GAME_SUPPORTS_SAVE )
+CONS( 1977, astrocdl, astrocde, 0,        astrocde, astrocde, astrocde_state, astrocde, "Bally Manufacturing", "Bally Home Library Computer", GAME_SUPPORTS_SAVE )
+CONS( 1977, astrocdw, astrocde, 0,        astrocde, astrocde, astrocde_state, astrocde, "Bally Manufacturing", "Bally Computer System", GAME_SUPPORTS_SAVE )

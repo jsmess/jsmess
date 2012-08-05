@@ -2199,6 +2199,6 @@ ROM_END
 
 /* Driver */
 
-COMP( 1985, mz2500,   0,        	 0,      mz2500,   mz2500,        0,      "Sharp",     "MZ-2500", 0 )
-COMP( 1985, mz2520,   mz2500,        0,      mz2500,   mz2500,        0,      "Sharp",     "MZ-2520", 0 ) // looks a stripped down version of the regular MZ-2500, with only two floppies drives and no cassette interface
+COMP( 1985, mz2500,   0,        	 0,      mz2500,   mz2500, mz2500_state,        0,      "Sharp",     "MZ-2500", 0 )
+COMP( 1985, mz2520,   mz2500,        0,      mz2500,   mz2500, mz2500_state,        0,      "Sharp",     "MZ-2520", 0 ) // looks a stripped down version of the regular MZ-2500, with only two floppies drives and no cassette interface
 

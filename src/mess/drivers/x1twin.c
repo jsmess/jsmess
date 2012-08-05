@@ -639,4 +639,4 @@ ROM_START( x1twin )
 	ROM_CART_LOAD("cart", 0x0000, 0xffffff, ROM_OPTIONAL | ROM_NOMIRROR)
 ROM_END
 
-COMP( 1986, x1twin,    x1,     0,       x1twin, 	 x1twin,         x1_kanji,"Sharp",  "X1 Twin (CZ-830C)",    GAME_NOT_WORKING )
+COMP( 1986, x1twin,    x1,     0,       x1twin, 	 x1twin, x1twin_state,         x1_kanji,"Sharp",  "X1 Twin (CZ-830C)",    GAME_NOT_WORKING )

@@ -251,5 +251,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME       PARENT    COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME       FLAGS */
-COMP( 1989, ut88mini,  0,        0,      ut88mini,   ut88mini,   ut88mini, "<unknown>", "UT-88 mini", 0)
-COMP( 1989, ut88,      ut88mini, 0,      ut88,       ut88,       ut88,     "<unknown>", "UT-88", 0)
+COMP( 1989, ut88mini,  0,        0,      ut88mini,   ut88mini, ut88_state,   ut88mini, "<unknown>", "UT-88 mini", 0)
+COMP( 1989, ut88,      ut88mini, 0,      ut88,       ut88, ut88_state,       ut88,     "<unknown>", "UT-88", 0)

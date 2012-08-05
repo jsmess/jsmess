@@ -481,4 +481,4 @@ ROM_END
 
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE INPUT  INIT   COMPANY  FULLNAME  FLAGS */
-COMP( 1986, ex800,      0,      0, ex800,  ex800, 0,     "Epson", "EX-800", GAME_NO_SOUND | GAME_NOT_WORKING)
+COMP( 1986, ex800,      0,      0, ex800,  ex800, ex800_state, 0,     "Epson", "EX-800", GAME_NO_SOUND | GAME_NOT_WORKING)

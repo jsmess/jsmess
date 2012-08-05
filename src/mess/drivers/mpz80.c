@@ -852,4 +852,4 @@ static DRIVER_INIT( mpz80 )
 //**************************************************************************
 
 //    YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT    INIT    COMPANY                          FULLNAME        FLAGS
-COMP( 1980, mpz80,  0,      0,      mpz80,  mpz80,  mpz80,      "Morrow Designs",	"MPZ80",	GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1980, mpz80,  0,      0,      mpz80,  mpz80, mpz80_state,  mpz80,      "Morrow Designs",	"MPZ80",	GAME_NOT_WORKING | GAME_NO_SOUND_HW )

@@ -826,4 +826,4 @@ static DRIVER_INIT( z100 )
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, z100,   0,      0,       z100,      z100,    z100,  "Zenith", "Z-100", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, z100,   0,      0,       z100,      z100, z100_state,    z100,  "Zenith", "Z-100", GAME_NOT_WORKING | GAME_NO_SOUND)

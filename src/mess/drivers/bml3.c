@@ -948,5 +948,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY         FULLNAME           FLAGS */
-COMP( 1980, bml3,   0,      0,       bml3,      bml3,    0,      "Hitachi", "Basic Master Level 3", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1980, bml3,   0,      0,       bml3,      bml3, bml3_state,    0,      "Hitachi", "Basic Master Level 3", GAME_NOT_WORKING | GAME_NO_SOUND)
 

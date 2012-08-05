@@ -1001,4 +1001,4 @@ ROM_END
 // System Drivers
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY                     FULLNAME        FLAGS
-COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, 0,    "Victor Business Products", "Victor 9000",	GAME_NOT_WORKING )
+COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, victor9k_state, 0,    "Victor Business Products", "Victor 9000",	GAME_NOT_WORKING )

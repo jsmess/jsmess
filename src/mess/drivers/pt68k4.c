@@ -88,4 +88,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY             FULLNAME       FLAGS */
-COMP( 1990, pt68k4,  0,       0,     pt68k4,    pt68k4,  0,  "Peripheral Technology", "PT68K4", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1990, pt68k4,  0,       0,     pt68k4,    pt68k4, pt68k4_state,  0,  "Peripheral Technology", "PT68K4", GAME_NOT_WORKING | GAME_NO_SOUND)

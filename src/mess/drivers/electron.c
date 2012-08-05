@@ -203,4 +203,4 @@ MACHINE_CONFIG_END
 
 
 /*     YEAR  NAME      PARENT COMPAT    MACHINE   INPUT     INIT  COMPANY  FULLNAME */
-COMP ( 1983, electron, 0,     0,        electron, electron, 0,    "Acorn", "Acorn Electron", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+COMP ( 1983, electron, 0,     0,        electron, electron, electron_state, 0,    "Acorn", "Acorn Electron", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

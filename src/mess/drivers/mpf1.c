@@ -484,6 +484,6 @@ static DRIVER_INIT( mpf1 )
 	state->m_maincpu->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(mpf1_state::mpf1_direct_update_handler), state));
 }
 
-COMP( 1979, mpf1,  0,    0, mpf1, mpf1,  mpf1, "Multitech", "Micro Professor 1", 0)
-COMP( 1979, mpf1b, mpf1, 0, mpf1b,mpf1b, mpf1, "Multitech", "Micro Professor 1B", 0)
-COMP( 1982, mpf1p, mpf1, 0, mpf1p,mpf1b, mpf1, "Multitech", "Micro Professor 1 Plus", GAME_NOT_WORKING)
+COMP( 1979, mpf1,  0,    0, mpf1, mpf1, mpf1_state,  mpf1, "Multitech", "Micro Professor 1", 0)
+COMP( 1979, mpf1b, mpf1, 0, mpf1b,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1B", 0)
+COMP( 1982, mpf1p, mpf1, 0, mpf1p,mpf1b, mpf1_state, mpf1, "Multitech", "Micro Professor 1 Plus", GAME_NOT_WORKING)

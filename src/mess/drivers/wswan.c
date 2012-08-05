@@ -198,6 +198,6 @@ ROM_START( wscolor )
 ROM_END
 
 /*     YEAR  NAME     PARENT  COMPAT  MACHINE  INPUT  INIT COMPANY   FULLNAME*/
-CONS( 1999, wswan,   0,      0,      wswan,   wswan, 0,    "Bandai", "WonderSwan",       GAME_IMPERFECT_SOUND )
-CONS( 2000, wscolor, wswan,  0,      wscolor, wswan, 0,    "Bandai", "WonderSwan Color", GAME_IMPERFECT_SOUND )
+CONS( 1999, wswan,   0,      0,      wswan,   wswan, wswan_state, 0,    "Bandai", "WonderSwan",       GAME_IMPERFECT_SOUND )
+CONS( 2000, wscolor, wswan,  0,      wscolor, wswan, wswan_state, 0,    "Bandai", "WonderSwan Color", GAME_IMPERFECT_SOUND )
 

@@ -949,7 +949,7 @@ Version 4.3 E
 */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY                             FULLNAME                            FLAGS */
-CONS( 1994, psj,    0,      0,      psxntsc,    psx,    psx,    "Sony Computer Entertainment Inc", "Sony PlayStation (Japan)",         GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-CONS( 1995, pse,    psj,    0,      psxpal,     psx,    psx,    "Sony Computer Entertainment Inc", "Sony PlayStation (Europe)",        GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-CONS( 1995, psu,    psj,    0,      psxntsc,    psx,    psx,    "Sony Computer Entertainment Inc", "Sony PlayStation (USA)",           GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-CONS( 1995, psa,    psj,    0,      psxntsc,    psx,    psx,    "Sony Computer Entertainment Inc", "Sony PlayStation (Asia-Pacific)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+CONS( 1994, psj,    0,      0,      psxntsc,    psx, psx1_state,    psx,    "Sony Computer Entertainment Inc", "Sony PlayStation (Japan)",         GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+CONS( 1995, pse,    psj,    0,      psxpal,     psx, psx1_state,    psx,    "Sony Computer Entertainment Inc", "Sony PlayStation (Europe)",        GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+CONS( 1995, psu,    psj,    0,      psxntsc,    psx, psx1_state,    psx,    "Sony Computer Entertainment Inc", "Sony PlayStation (USA)",           GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+CONS( 1995, psa,    psj,    0,      psxntsc,    psx, psx1_state,    psx,    "Sony Computer Entertainment Inc", "Sony PlayStation (Asia-Pacific)",  GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

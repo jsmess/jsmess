@@ -205,11 +205,11 @@ extern const game_driver GAME_NAME(NAME) =	\
 #else
 
 // standard GAME() macro
-#define GAME(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS)	\
-	GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,((const char *)0))
+#define GAME(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS)	\
+	GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,((const char *)0))
 
 // standard macro with additional layout
-#define GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,LAYOUT)	\
+#define GAMEL(YEAR,NAME,PARENT,MACHINE,INPUT,CLASS,INIT,MONITOR,COMPANY,FULLNAME,FLAGS,LAYOUT)	\
 extern const game_driver GAME_NAME(NAME) =	\
 {											\
 	__FILE__,								\
@@ -228,7 +228,7 @@ extern const game_driver GAME_NAME(NAME) =	\
 };
 
 // standard console definition macro
-#define CONS(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,COMPANY,FULLNAME,FLAGS)	\
+#define CONS(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)	\
 extern const game_driver GAME_NAME(NAME) =	\
 {											\
 	__FILE__,								\
@@ -247,7 +247,7 @@ extern const game_driver GAME_NAME(NAME) =	\
 };
 
 // standard computer definition macro
-#define COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,COMPANY,FULLNAME,FLAGS)	\
+#define COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)	\
 extern const game_driver GAME_NAME(NAME) =	\
 {											\
 	__FILE__,								\
@@ -266,7 +266,7 @@ extern const game_driver GAME_NAME(NAME) =	\
 };
 
 // standard system definition macro
-#define SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,COMPANY,FULLNAME,FLAGS)	\
+#define SYST(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,CLASS,INIT,COMPANY,FULLNAME,FLAGS)	\
 extern const game_driver GAME_NAME(NAME) =	\
 {											\
 	__FILE__,								\

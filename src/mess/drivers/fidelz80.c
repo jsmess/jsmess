@@ -1438,10 +1438,10 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                                                    FLAGS */
-COMP( 1978, cc10,       0,          0,      cc10,  fidelz80, 0,      "Fidelity Electronics",   "Chess Challenger 10 (Model CC10/BCC)", GAME_NOT_WORKING )
-COMP( 1979, vcc,        0,          0,      vcc,   fidelz80, 0,      "Fidelity Electronics",   "Talking Chess Challenger (model VCC)", GAME_NOT_WORKING )
-COMP( 1979, vbc,        0,          0,      abc,   abc,      0,      "Fidelity Electronics",   "Bridge Challenger (model VBC)",	GAME_NOT_WORKING )
-COMP( 1980, uvc,        vcc,        0,      vcc,   fidelz80, 0,      "Fidelity Electronics",   "Advanced Talking Chess Challenger (model UVC)", GAME_NOT_WORKING )
-COMP( 1980, abc,        vbc,        0,      abc,   abc,      0,      "Fidelity Electronics",   "Advanced Bridge Challenger (model ABC)", GAME_NOT_WORKING )
-COMP( 1980, vsc,        0,          0,      vsc,   vsc,      0,      "Fidelity Electronics",   "Sensory Chess Challenger (model VSC)", GAME_NOT_WORKING )
+COMP( 1978, cc10,       0,          0,      cc10,  fidelz80, fidelz80_state, 0,      "Fidelity Electronics",   "Chess Challenger 10 (Model CC10/BCC)", GAME_NOT_WORKING )
+COMP( 1979, vcc,        0,          0,      vcc,   fidelz80, fidelz80_state, 0,      "Fidelity Electronics",   "Talking Chess Challenger (model VCC)", GAME_NOT_WORKING )
+COMP( 1979, vbc,        0,          0,      abc,   abc, fidelz80_state,      0,      "Fidelity Electronics",   "Bridge Challenger (model VBC)",	GAME_NOT_WORKING )
+COMP( 1980, uvc,        vcc,        0,      vcc,   fidelz80, fidelz80_state, 0,      "Fidelity Electronics",   "Advanced Talking Chess Challenger (model UVC)", GAME_NOT_WORKING )
+COMP( 1980, abc,        vbc,        0,      abc,   abc, fidelz80_state,      0,      "Fidelity Electronics",   "Advanced Bridge Challenger (model ABC)", GAME_NOT_WORKING )
+COMP( 1980, vsc,        0,          0,      vsc,   vsc, fidelz80_state,      0,      "Fidelity Electronics",   "Sensory Chess Challenger (model VSC)", GAME_NOT_WORKING )
 

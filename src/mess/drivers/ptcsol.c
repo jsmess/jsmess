@@ -768,4 +768,4 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE  INPUT  INIT               COMPANY                 FULLNAME  FLAGS */
-COMP( 1976, sol20,  0,      0,      sol20,   sol20, sol20, "Processor Technology Corporation", "SOL-20", 0 )
+COMP( 1976, sol20,  0,      0,      sol20,   sol20, sol20_state, sol20, "Processor Technology Corporation", "SOL-20", 0 )

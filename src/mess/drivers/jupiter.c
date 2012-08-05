@@ -390,5 +390,5 @@ static DRIVER_INIT( jupiter3 )
 //**************************************************************************
 
 //    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT      COMPANY          FULLNAME       FLAGS
-COMP( 1976, jupiter2, 0,      0,       jupiter,   jupiter, jupiter, "Wave Mate",   "Jupiter II",  GAME_NOT_WORKING | GAME_NO_SOUND_HW )
-COMP( 1976, jupiter3, 0,      0,       jupiter3,  jupiter, jupiter3,"Wave Mate",   "Jupiter III", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1976, jupiter2, 0,      0,       jupiter,   jupiter, jupiter2_state, jupiter, "Wave Mate",   "Jupiter II",  GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1976, jupiter3, 0,      0,       jupiter3,  jupiter, jupiter3_state, jupiter3,"Wave Mate",   "Jupiter III", GAME_NOT_WORKING | GAME_NO_SOUND_HW )

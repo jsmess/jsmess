@@ -1782,6 +1782,6 @@ ROM_START( neocdz )
 ROM_END
 
 /*    YEAR  NAME  PARENT COMPAT MACHINE INPUT  INIT     COMPANY      FULLNAME            FLAGS */
-CONS( 1990, aes,    0,		0,   aes,      aes,   neogeo,  "SNK", "Neo-Geo AES", 0)
-CONS( 1994, neocd,  0,		0,   neocd,    aes,   neogeo,  "SNK", "Neo-Geo CD", GAME_NOT_WORKING )
-CONS( 1996, neocdz, neocd,	0,   neocd,    aes,   neogeo,  "SNK", "Neo-Geo CDZ", GAME_NOT_WORKING )
+CONS( 1990, aes,    0,		0,   aes,      aes, ng_aes_state,   neogeo,  "SNK", "Neo-Geo AES", 0)
+CONS( 1994, neocd,  0,		0,   neocd,    aes, ng_aes_state,   neogeo,  "SNK", "Neo-Geo CD", GAME_NOT_WORKING )
+CONS( 1996, neocdz, neocd,	0,   neocd,    aes, ng_aes_state,   neogeo,  "SNK", "Neo-Geo CDZ", GAME_NOT_WORKING )

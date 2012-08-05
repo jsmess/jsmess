@@ -673,4 +673,4 @@ static DRIVER_INIT( sage2 )
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY                             FULLNAME    FLAGS
-COMP( 1982, sage2,  0,       0,      sage2,     sage2,    sage2, "Sage Technology", "Sage II", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1982, sage2,  0,       0,      sage2,     sage2, sage2_state,    sage2, "Sage Technology", "Sage II", GAME_NOT_WORKING | GAME_NO_SOUND )

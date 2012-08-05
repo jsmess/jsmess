@@ -372,4 +372,4 @@ ROM_END
 
 
 /*    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT      INIT    COMPANY       FULLNAME       FLAGS */
-COMP ( 198?,paso1600,   0,      0,       paso1600,  paso1600,  0,     "Toshiba",  "Pasopia 1600" , GAME_NOT_WORKING|GAME_NO_SOUND)
+COMP ( 198?,paso1600,   0,      0,       paso1600,  paso1600, paso1600_state,  0,     "Toshiba",  "Pasopia 1600" , GAME_NOT_WORKING|GAME_NO_SOUND)

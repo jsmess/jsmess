@@ -1498,7 +1498,7 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME        FLAGS
-COMP( 1986, pc1512,		0,			0,		pc1512,		pc1512,		0,		"Amstrad plc",	"PC1512 (V1)",	GAME_SUPPORTS_SAVE )
-COMP( 1987, pc1512v2,	pc1512,		0,		pc1512,		pc1512,		0,		"Amstrad plc",	"PC1512 (V2)",	GAME_SUPPORTS_SAVE )
-COMP( 1989, pc1512v3,	pc1512,		0,		pc1512,		pc1512,		0,		"Amstrad plc",	"PC1512 (V3)",	GAME_NOT_WORKING )
-COMP( 1987, pc1640,		0,			0,		pc1640,		pc1640,		0,		"Amstrad plc",	"PC1640",		GAME_NOT_WORKING )
+COMP( 1986, pc1512,		0,			0,		pc1512,		pc1512, pc1512_state,		0,		"Amstrad plc",	"PC1512 (V1)",	GAME_SUPPORTS_SAVE )
+COMP( 1987, pc1512v2,	pc1512,		0,		pc1512,		pc1512, pc1512_state,		0,		"Amstrad plc",	"PC1512 (V2)",	GAME_SUPPORTS_SAVE )
+COMP( 1989, pc1512v3,	pc1512,		0,		pc1512,		pc1512, pc1512_state,		0,		"Amstrad plc",	"PC1512 (V3)",	GAME_NOT_WORKING )
+COMP( 1987, pc1640,		0,			0,		pc1640,		pc1640, pc1640_state,		0,		"Amstrad plc",	"PC1640",		GAME_NOT_WORKING )

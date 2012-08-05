@@ -78,4 +78,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY                       FULLNAME       FLAGS */
-COMP( 1983, dct11em,  0,      0,       dct11em,   dct11em, 0,   "Digital Equipment Corporation", "DCT11-EM", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1983, dct11em,  0,      0,       dct11em,   dct11em, dct11em_state, 0,   "Digital Equipment Corporation", "DCT11-EM", GAME_NOT_WORKING | GAME_NO_SOUND)

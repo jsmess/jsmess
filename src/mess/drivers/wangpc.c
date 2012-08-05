@@ -1307,4 +1307,4 @@ ROM_END
 //  GAME DRIVERS
 //**************************************************************************
 
-COMP( 1985, wangpc, 0, 0, wangpc, wangpc, 0, "Wang Laboratories", "Wang Professional Computer", GAME_SUPPORTS_SAVE )
+COMP( 1985, wangpc, 0, 0, wangpc, wangpc, wangpc_state, 0, "Wang Laboratories", "Wang Professional Computer", GAME_SUPPORTS_SAVE )

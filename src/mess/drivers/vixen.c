@@ -943,4 +943,4 @@ static DRIVER_INIT( vixen )
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS
-COMP( 1984, vixen,  0,       0, 	vixen,	vixen,	 vixen,  "Osborne",   "Vixen",		GAME_NOT_WORKING )
+COMP( 1984, vixen,  0,       0, 	vixen,	vixen, vixen_state,	 vixen,  "Osborne",   "Vixen",		GAME_NOT_WORKING )

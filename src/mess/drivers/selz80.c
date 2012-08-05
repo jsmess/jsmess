@@ -168,4 +168,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1985, selz80,  0,       0,     selz80,    selz80,   0,       "SEL", "Z80 Trainer", GAME_NO_SOUND_HW)
+COMP( 1985, selz80,  0,       0,     selz80,    selz80, selz80_state,   0,       "SEL", "Z80 Trainer", GAME_NO_SOUND_HW)

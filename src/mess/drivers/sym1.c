@@ -166,4 +166,4 @@ ROM_END
  Drivers
 ******************************************************************************/
 /*    YEAR  NAME  PARENT COMPAT MACHINE INPUT INIT  COMPANY                   FULLNAME          FLAGS */
-COMP( 1978, sym1, 0,     0,     sym1,   sym1, sym1, "Synertek Systems Corp.", "SYM-1/SY-VIM-1", 0 )
+COMP( 1978, sym1, 0,     0,     sym1,   sym1, sym1_state, sym1, "Synertek Systems Corp.", "SYM-1/SY-VIM-1", 0 )

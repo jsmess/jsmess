@@ -691,7 +691,7 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_DERIVED( ntsc )
+//  MACHINE_CONFIG_DERIVED( ntsc, m5 )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( ntsc, m5 )
@@ -703,7 +703,7 @@ MACHINE_CONFIG_END
 
 
 //-------------------------------------------------
-//  MACHINE_CONFIG_DERIVED( pal )
+//  MACHINE_CONFIG_DERIVED( pal, m5 )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( pal, m5 )
@@ -776,5 +776,5 @@ static DRIVER_INIT( pal )
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME            FLAGS
-COMP( 1983, m5,		0,		0,		ntsc,	m5,		ntsc,	"Sord",		"m.5 (Japan)",		0 )
-COMP( 1983, m5p,	m5,		0,		pal,	m5,		pal,	"Sord",		"m.5 (Europe)",		0 )
+COMP( 1983, m5,		0,		0,		ntsc,	m5, m5_state,		ntsc,	"Sord",		"m.5 (Japan)",		0 )
+COMP( 1983, m5p,	m5,		0,		pal,	m5, m5_state,		pal,	"Sord",		"m.5 (Europe)",		0 )

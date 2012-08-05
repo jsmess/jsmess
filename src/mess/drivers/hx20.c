@@ -133,5 +133,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1983, ehx20,  0,       0,      ehx20,     ehx20,    0,     "Epson", "HX20", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1983, ehx20,  0,       0,      ehx20,     ehx20, hx20_state,    0,     "Epson", "HX20", GAME_NOT_WORKING | GAME_NO_SOUND )
 

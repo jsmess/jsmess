@@ -524,5 +524,5 @@ static DRIVER_INIT( rx78 )
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1983, rx78,	0,       0,  rx78,      rx78,    rx78,  "Bandai",   "Gundam RX-78", 0)
+COMP( 1983, rx78,	0,       0,  rx78,      rx78, rx78_state,    rx78,  "Bandai",   "Gundam RX-78", 0)
 

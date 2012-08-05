@@ -412,5 +412,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT    INIT     COMPANY  FULLNAME      FLAGS */
-COMP( 1983, apricot,   0,       0,      apricot,   apricot, apricot, "ACT",   "Apricot PC", GAME_NOT_WORKING )
-COMP( 1984, apricotxi, apricot, 0,      apricotxi, apricot, apricot, "ACT",   "Apricot Xi", GAME_NOT_WORKING )
+COMP( 1983, apricot,   0,       0,      apricot,   apricot, apricot_state, apricot, "ACT",   "Apricot PC", GAME_NOT_WORKING )
+COMP( 1984, apricotxi, apricot, 0,      apricotxi, apricot, apricot_state, apricot, "ACT",   "Apricot Xi", GAME_NOT_WORKING )

@@ -627,10 +627,10 @@ static DRIVER_INIT(sq1)
     state->m_system_type = SQ1;
 }
 
-CONS( 1988, eps,   0, 0, eps,   vfx, eps,    "Ensoniq", "EPS", GAME_NOT_WORKING )   // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
-CONS( 1989, vfx,   0, 0, vfx,   vfx, common, "Ensoniq", "VFX", GAME_NOT_WORKING )       // 2x40 VFD
-CONS( 1989, vfxsd, 0, 0, vfxsd, vfx, common, "Ensoniq", "VFX-SD", GAME_NOT_WORKING )    // 2x40 VFD
-CONS( 1990, sd1,   0, 0, vfxsd, vfx, common, "Ensoniq", "SD-1", GAME_NOT_WORKING )      // 2x40 VFD
-CONS( 1990, sd132, 0, 0, vfxsd, vfx, common, "Ensoniq", "SD-1 32", GAME_NOT_WORKING )   // 2x40 VFD
-CONS( 1990, sq1,   0, 0, sq1,   vfx, sq1,    "Ensoniq", "SQ-1", GAME_NOT_WORKING )      // LCD of some sort
+CONS( 1988, eps,   0, 0, eps,   vfx, esq5505_state, eps,    "Ensoniq", "EPS", GAME_NOT_WORKING )   // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)
+CONS( 1989, vfx,   0, 0, vfx,   vfx, esq5505_state, common, "Ensoniq", "VFX", GAME_NOT_WORKING )       // 2x40 VFD
+CONS( 1989, vfxsd, 0, 0, vfxsd, vfx, esq5505_state, common, "Ensoniq", "VFX-SD", GAME_NOT_WORKING )    // 2x40 VFD
+CONS( 1990, sd1,   0, 0, vfxsd, vfx, esq5505_state, common, "Ensoniq", "SD-1", GAME_NOT_WORKING )      // 2x40 VFD
+CONS( 1990, sd132, 0, 0, vfxsd, vfx, esq5505_state, common, "Ensoniq", "SD-1 32", GAME_NOT_WORKING )   // 2x40 VFD
+CONS( 1990, sq1,   0, 0, sq1,   vfx, esq5505_state, sq1,    "Ensoniq", "SQ-1", GAME_NOT_WORKING )      // LCD of some sort
 

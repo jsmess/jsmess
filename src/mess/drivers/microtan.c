@@ -284,4 +284,4 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      COMPANY      FULLNAME
-COMP( 1979, microtan, 0,		0,		microtan, microtan, microtan, "Tangerine", "Microtan 65" , 0)
+COMP( 1979, microtan, 0,		0,		microtan, microtan, microtan_state, microtan, "Tangerine", "Microtan 65" , 0)

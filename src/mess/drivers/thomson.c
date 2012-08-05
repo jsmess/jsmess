@@ -708,9 +708,9 @@ static MACHINE_CONFIG_DERIVED( t9000, to7 )
 MACHINE_CONFIG_END
 
 
-COMP ( 1982, to7, 0, 0, to7, to7, 0,  "Thomson", "TO7", 0 )
+COMP ( 1982, to7, 0, 0, to7, to7, thomson_state, 0,  "Thomson", "TO7", 0 )
 
-COMP ( 1980, t9000, to7, 0, t9000, t9000,  0, "Thomson", "T9000", 0 )
+COMP ( 1980, t9000, to7, 0, t9000, t9000, thomson_state,  0, "Thomson", "T9000", 0 )
 
 
 /***************************** TO7/70 *********************************
@@ -886,9 +886,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( to770a, to770 )
 MACHINE_CONFIG_END
 
-COMP ( 1984, to770, 0, 0, to770, to770, 0, "Thomson", "TO7/70", 0 )
+COMP ( 1984, to770, 0, 0, to770, to770, thomson_state, 0, "Thomson", "TO7/70", 0 )
 
-COMP ( 1984, to770a, to770, 0, to770a, to770a, 0, "Thomson", "TO7/70 (Arabic)", 0 )
+COMP ( 1984, to770a, to770, 0, to770a, to770a, thomson_state, 0, "Thomson", "TO7/70 (Arabic)", 0 )
 
 
 /************************* MO5 / MO5E *********************************
@@ -1071,9 +1071,9 @@ static MACHINE_CONFIG_DERIVED( mo5e, mo5 )
 MACHINE_CONFIG_END
 
 
-COMP ( 1984, mo5, 0, 0, mo5, mo5, 0, "Thomson", "MO5", 0 )
+COMP ( 1984, mo5, 0, 0, mo5, mo5, thomson_state, 0, "Thomson", "MO5", 0 )
 
-COMP ( 1986, mo5e, mo5, 0, mo5e, mo5e, 0, "Thomson", "MO5E", 0 )
+COMP ( 1986, mo5e, mo5, 0, mo5e, mo5e, thomson_state, 0, "Thomson", "MO5E", 0 )
 
 
 /********************************* TO9 *******************************
@@ -1404,7 +1404,7 @@ static MACHINE_CONFIG_DERIVED( to9, to7 )
 MACHINE_CONFIG_END
 
 
-COMP ( 1985, to9, 0, 0, to9, to9, 0, "Thomson", "TO9", GAME_IMPERFECT_COLORS )
+COMP ( 1985, to9, 0, 0, to9, to9, thomson_state, 0, "Thomson", "TO9", GAME_IMPERFECT_COLORS )
 
 
 /******************************** TO8 ********************************
@@ -1623,9 +1623,9 @@ static MACHINE_CONFIG_DERIVED( to8d, to8 )
 MACHINE_CONFIG_END
 
 
-COMP ( 1986, to8, 0, 0, to8, to8, 0, "Thomson", "TO8", 0 )
+COMP ( 1986, to8, 0, 0, to8, to8, thomson_state, 0, "Thomson", "TO8", 0 )
 
-COMP ( 1987, to8d, to8, 0, to8d, to8d, 0, "Thomson", "TO8D", 0 )
+COMP ( 1987, to8d, to8, 0, to8d, to8d, thomson_state, 0, "Thomson", "TO8D", 0 )
 
 
 /******************************** TO9+ *******************************
@@ -1765,7 +1765,7 @@ static MACHINE_CONFIG_DERIVED( to9p, to7 )
 	MCFG_RAM_DEFAULT_SIZE("512K")
 MACHINE_CONFIG_END
 
-COMP ( 1986, to9p, 0, 0, to9p, to9p, 0, "Thomson", "TO9+", 0 )
+COMP ( 1986, to9p, 0, 0, to9p, to9p, thomson_state, 0, "Thomson", "TO9+", 0 )
 
 
 
@@ -2105,9 +2105,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( pro128, mo6 )
 MACHINE_CONFIG_END
 
-COMP ( 1986, mo6, 0, 0, mo6, mo6, 0, "Thomson", "MO6", 0 )
+COMP ( 1986, mo6, 0, 0, mo6, mo6, thomson_state, 0, "Thomson", "MO6", 0 )
 
-COMP ( 1986, pro128, mo6, 0, pro128, pro128, 0, "Olivetti / Thomson", "Prodest PC 128", 0 )
+COMP ( 1986, pro128, mo6, 0, pro128, pro128, thomson_state, 0, "Olivetti / Thomson", "Prodest PC 128", 0 )
 
 
 
@@ -2327,4 +2327,4 @@ static MACHINE_CONFIG_DERIVED( mo5nr, to7 )
 	MCFG_RAM_DEFAULT_SIZE("128K")
 MACHINE_CONFIG_END
 
-COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, 0, "Thomson", "MO5 NR", 0 )
+COMP ( 1986, mo5nr, 0, 0, mo5nr, mo5nr, thomson_state, 0, "Thomson", "MO5 NR", 0 )

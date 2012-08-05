@@ -2233,43 +2233,43 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT       INIT        COMPANY            FULLNAME */
-COMP( 1984, dgone,      ibm5150,    0,          pccga,      pccga,      pccga,      "Data General", "Data General/One" , GAME_NOT_WORKING)/* CGA, 2x 3.5" disk drives */
-COMP( 1985, bw230,      ibm5150,    0,          pccga,      bondwell,   bondwell,   "Bondwell Holding", "BW230 (PRO28 Series)", 0 )
-COMP( 1988, europc,     ibm5150,    0,          europc,     europc,     europc,     "Schneider Rdf. AG", "EURO PC", GAME_NOT_WORKING)
+COMP( 1984, dgone,      ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Data General", "Data General/One" , GAME_NOT_WORKING)/* CGA, 2x 3.5" disk drives */
+COMP( 1985, bw230,      ibm5150,    0,          pccga,      bondwell, pc_state,   bondwell,   "Bondwell Holding", "BW230 (PRO28 Series)", 0 )
+COMP( 1988, europc,     ibm5150,    0,          europc,     europc, pc_state,     europc,     "Schneider Rdf. AG", "EURO PC", GAME_NOT_WORKING)
 
 // pcjr (better graphics, better sound)
-COMP( 1983, ibmpcjr,    ibm5150,    0,          ibmpcjr,    tandy1t,    pcjr,       "International Business Machines", "IBM PC Jr", GAME_IMPERFECT_COLORS )
-COMP( 1985, ibmpcjx,    ibm5150,    0,          ibmpcjx,    tandy1t,    pcjr,       "International Business Machines", "IBM PC JX", GAME_IMPERFECT_COLORS | GAME_NOT_WORKING)
+COMP( 1983, ibmpcjr,    ibm5150,    0,          ibmpcjr,    tandy1t, pc_state,    pcjr,       "International Business Machines", "IBM PC Jr", GAME_IMPERFECT_COLORS )
+COMP( 1985, ibmpcjx,    ibm5150,    0,          ibmpcjx,    tandy1t, pc_state,    pcjr,       "International Business Machines", "IBM PC JX", GAME_IMPERFECT_COLORS | GAME_NOT_WORKING)
 
 // tandy 1000
-COMP( 1987, t1000hx,    ibm5150,    0,          t1000hx,    tandy1t,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 HX", 0)
-COMP( 1987, t1000sx,    ibm5150,    0,          t1000hx,    tandy1t,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 SX", GAME_NOT_WORKING)
-COMP( 1987, t1000tx,    ibm5150,    0,          t1000_286,  tandy1t,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 TX", 0)
-COMP( 1989, t1000rl,    ibm5150,    0,          t1000_16,   tandy1t,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 RL", 0)
-COMP( 1989, t1000tl2,   ibm5150,    0,          t1000_286,  tandy1t,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 TL/2", 0)
+COMP( 1987, t1000hx,    ibm5150,    0,          t1000hx,    tandy1t, pc_state,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 HX", 0)
+COMP( 1987, t1000sx,    ibm5150,    0,          t1000hx,    tandy1t, pc_state,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 SX", GAME_NOT_WORKING)
+COMP( 1987, t1000tx,    ibm5150,    0,          t1000_286,  tandy1t, pc_state,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 TX", 0)
+COMP( 1989, t1000rl,    ibm5150,    0,          t1000_16,   tandy1t, pc_state,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 RL", 0)
+COMP( 1989, t1000tl2,   ibm5150,    0,          t1000_286,  tandy1t, pc_state,    t1000hx,    "Tandy Radio Shack", "Tandy 1000 TL/2", 0)
 
-COMP( 1989, iskr1031,   ibm5150,    0,          iskr1031,   pccga,      pccga,      "Schetmash", "Iskra 1031", GAME_NOT_WORKING)
-COMP( 1989, iskr1030m,  ibm5150,    0,          iskr1031,   pccga,      pccga,      "Schetmash", "Iskra 1030M", GAME_NOT_WORKING)
-COMP( 1992, iskr3104,   ibm5150,    0,          iskr3104,   pcega,      pccga,      "Schetmash", "Iskra 3104", GAME_NOT_WORKING)
-COMP( 1987, ec1840,     ibm5150,    0,          iskr1031,   pccga,      pccga,      "<unknown>", "EC-1840", GAME_NOT_WORKING)
-COMP( 1987, ec1841,     ibm5150,    0,          ec1841,     pccga,      pccga,      "<unknown>", "EC-1841", GAME_NOT_WORKING)
-COMP( 1989, ec1845,     ibm5150,    0,          iskr1031,   pccga,      pccga,      "<unknown>", "EC-1845", GAME_NOT_WORKING)
-COMP( 1989, mk88,       ibm5150,    0,          iskr1031,   pccga,      pccga,      "<unknown>", "MK-88", GAME_NOT_WORKING)
-COMP( 1990, poisk1,     ibm5150,    0,          iskr1031,   pccga,      pccga,      "<unknown>", "Poisk-1", GAME_NOT_WORKING)
-COMP( 1991, poisk2,     ibm5150,    0,          poisk2,     pccga,      pccga,      "<unknown>", "Poisk-2", GAME_NOT_WORKING)
-COMP( 1990, mc1702,     ibm5150,    0,          pccga,      pccga,      pccga,      "<unknown>", "Elektronika MC-1702", GAME_NOT_WORKING)
-COMP( 1989, mc1502,     ibm5150,    0,          mc1502,     mc1502,     mc1502,     "NPO Microprocessor", "Elektronika MC-1502", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1989, iskr1031,   ibm5150,    0,          iskr1031,   pccga, pc_state,      pccga,      "Schetmash", "Iskra 1031", GAME_NOT_WORKING)
+COMP( 1989, iskr1030m,  ibm5150,    0,          iskr1031,   pccga, pc_state,      pccga,      "Schetmash", "Iskra 1030M", GAME_NOT_WORKING)
+COMP( 1992, iskr3104,   ibm5150,    0,          iskr3104,   pcega, pc_state,      pccga,      "Schetmash", "Iskra 3104", GAME_NOT_WORKING)
+COMP( 1987, ec1840,     ibm5150,    0,          iskr1031,   pccga, pc_state,      pccga,      "<unknown>", "EC-1840", GAME_NOT_WORKING)
+COMP( 1987, ec1841,     ibm5150,    0,          ec1841,     pccga, pc_state,      pccga,      "<unknown>", "EC-1841", GAME_NOT_WORKING)
+COMP( 1989, ec1845,     ibm5150,    0,          iskr1031,   pccga, pc_state,      pccga,      "<unknown>", "EC-1845", GAME_NOT_WORKING)
+COMP( 1989, mk88,       ibm5150,    0,          iskr1031,   pccga, pc_state,      pccga,      "<unknown>", "MK-88", GAME_NOT_WORKING)
+COMP( 1990, poisk1,     ibm5150,    0,          iskr1031,   pccga, pc_state,      pccga,      "<unknown>", "Poisk-1", GAME_NOT_WORKING)
+COMP( 1991, poisk2,     ibm5150,    0,          poisk2,     pccga, pc_state,      pccga,      "<unknown>", "Poisk-2", GAME_NOT_WORKING)
+COMP( 1990, mc1702,     ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "<unknown>", "Elektronika MC-1702", GAME_NOT_WORKING)
+COMP( 1989, mc1502,     ibm5150,    0,          mc1502,     mc1502, pc_state,     mc1502,     "NPO Microprocessor", "Elektronika MC-1502", GAME_NOT_WORKING | GAME_NO_SOUND)
 
-COMP( 1987, zdsupers,   ibm5150,    0,          zenith,     pccga,      pccga,      "Zenith Data Systems", "SuperSport", 0)
+COMP( 1987, zdsupers,   ibm5150,    0,          zenith,     pccga, pc_state,      pccga,      "Zenith Data Systems", "SuperSport", 0)
 
-COMP( 1983, m24,        ibm5150,    0,          olivetti,   pccga,      pccga,      "Olivetti", "M24", GAME_NOT_WORKING)
-COMP( 1987, m240,       ibm5150,    0,          olivetti,   pccga,      pccga,      "Olivetti", "M240", GAME_NOT_WORKING)
-COMP( 198?, olivm15,    ibm5150,    0,          olivm15,    0,  	    0,  		"Olivetti", "M15", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1983, m24,        ibm5150,    0,          olivetti,   pccga, pc_state,      pccga,      "Olivetti", "M24", GAME_NOT_WORKING)
+COMP( 1987, m240,       ibm5150,    0,          olivetti,   pccga, pc_state,      pccga,      "Olivetti", "M240", GAME_NOT_WORKING)
+COMP( 198?, olivm15,    ibm5150,    0,          olivm15,    0, pc_state,  	    0,  		"Olivetti", "M15", GAME_NOT_WORKING | GAME_NO_SOUND)
 
-COMP( 1983, ibm5550,    ibm5150,    0,          ibm5550,    pccga,      pccga,      "International Business Machines", "IBM 5550", GAME_NOT_WORKING)
+COMP( 1983, ibm5550,    ibm5150,    0,          ibm5550,    pccga, pc_state,      pccga,      "International Business Machines", "IBM 5550", GAME_NOT_WORKING)
 
-COMP( 1985, pc7000,     ibm5150,    0,          pccga,      pccga,      pccga,      "Sharp", "PC-7000", GAME_NOT_WORKING)
+COMP( 1985, pc7000,     ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Sharp", "PC-7000", GAME_NOT_WORKING)
 
-COMP( 198?, pcd,        ibm5150,    0,          pccga,      pccga,      pccga,      "Siemens", "PC-D", GAME_NOT_WORKING)
-COMP( 198?, olypeopl,   ibm5150,    0,          pccga,      pccga,      pccga,      "Olympia", "People PC", GAME_NOT_WORKING)
-COMP( 1988, sx16,       ibm5150,    0,          pccga,      pccga,      pccga,      "Sanyo", "SX-16", GAME_NOT_WORKING)
+COMP( 198?, pcd,        ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Siemens", "PC-D", GAME_NOT_WORKING)
+COMP( 198?, olypeopl,   ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Olympia", "People PC", GAME_NOT_WORKING)
+COMP( 1988, sx16,       ibm5150,    0,          pccga,      pccga, pc_state,      pccga,      "Sanyo", "SX-16", GAME_NOT_WORKING)

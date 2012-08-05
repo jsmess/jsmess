@@ -259,4 +259,4 @@ static DRIVER_INIT( gmaster )
 }
 
 /*    YEAR      NAME            PARENT  MACHINE   INPUT     INIT  COMPANY                 FULLNAME */
-CONS( 1990, gmaster,       0,          0, gmaster,  gmaster,    gmaster,    "Hartung", "Game Master", GAME_IMPERFECT_SOUND)
+CONS( 1990, gmaster,       0,          0, gmaster,  gmaster, gmaster_state,    gmaster,    "Hartung", "Game Master", GAME_IMPERFECT_SOUND)

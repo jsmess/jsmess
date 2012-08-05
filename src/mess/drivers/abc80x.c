@@ -1622,7 +1622,7 @@ static DRIVER_INIT( abc806 )
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS
-COMP( 1981, abc800c,    0,			0,      abc800c,    abc800, abc800c, "Luxor Datorer AB", "ABC 800 C/HR", GAME_SUPPORTS_SAVE )
-COMP( 1981, abc800m,    abc800c,	0,      abc800m,    abc800, abc800m, "Luxor Datorer AB", "ABC 800 M/HR", GAME_SUPPORTS_SAVE )
-COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802,  "Luxor Datorer AB", "ABC 802",		 GAME_SUPPORTS_SAVE )
-COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806,  "Luxor Datorer AB", "ABC 806",		 GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+COMP( 1981, abc800c,    0,			0,      abc800c,    abc800, abc800c_state, abc800c, "Luxor Datorer AB", "ABC 800 C/HR", GAME_SUPPORTS_SAVE )
+COMP( 1981, abc800m,    abc800c,	0,      abc800m,    abc800, abc800m_state, abc800m, "Luxor Datorer AB", "ABC 800 M/HR", GAME_SUPPORTS_SAVE )
+COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802_state, abc802,  "Luxor Datorer AB", "ABC 802",		 GAME_SUPPORTS_SAVE )
+COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806_state, abc806,  "Luxor Datorer AB", "ABC 806",		 GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )

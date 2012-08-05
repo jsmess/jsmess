@@ -2882,11 +2882,11 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    INIT    COMPANY      FULLNAME            FLAGS */
-COMP( 1989, fmtowns,  0,    	0,		towns,		towns,	 0,  "Fujitsu",   "FM-Towns",		 GAME_NOT_WORKING)
-COMP( 1989, fmtownsa, fmtowns,	0,		towns,		towns,	 0,  "Fujitsu",   "FM-Towns (alternate)", GAME_NOT_WORKING)
-COMP( 1991, fmtownsux,fmtowns,	0,		townsux,	towns,	 0,  "Fujitsu",   "FM-Towns II UX", GAME_NOT_WORKING)
-COMP( 1992, fmtownshr,fmtowns,	0,		townshr,	towns,	 0,  "Fujitsu",   "FM-Towns II HR", GAME_NOT_WORKING)
-COMP( 19??, fmtownssj,fmtowns,	0,		townssj,	towns,	 0,  "Fujitsu",   "FM-Towns II SJ", GAME_NOT_WORKING)
-CONS( 1993, fmtmarty, 0,    	0,		marty,		marty,	 0,  "Fujitsu",   "FM-Towns Marty",	 GAME_NOT_WORKING)
-CONS( 1994, carmarty, fmtmarty,	0,		marty,		marty,	 0,  "Fujitsu",   "FM-Towns Car Marty",	 GAME_NOT_WORKING)
+COMP( 1989, fmtowns,  0,    	0,		towns,		towns, towns_state,	 0,  "Fujitsu",   "FM-Towns",		 GAME_NOT_WORKING)
+COMP( 1989, fmtownsa, fmtowns,	0,		towns,		towns, towns_state,	 0,  "Fujitsu",   "FM-Towns (alternate)", GAME_NOT_WORKING)
+COMP( 1991, fmtownsux,fmtowns,	0,		townsux,	towns, towns_state,	 0,  "Fujitsu",   "FM-Towns II UX", GAME_NOT_WORKING)
+COMP( 1992, fmtownshr,fmtowns,	0,		townshr,	towns, towns_state,	 0,  "Fujitsu",   "FM-Towns II HR", GAME_NOT_WORKING)
+COMP( 19??, fmtownssj,fmtowns,	0,		townssj,	towns, towns_state,	 0,  "Fujitsu",   "FM-Towns II SJ", GAME_NOT_WORKING)
+CONS( 1993, fmtmarty, 0,    	0,		marty,		marty, marty_state,	 0,  "Fujitsu",   "FM-Towns Marty",	 GAME_NOT_WORKING)
+CONS( 1994, carmarty, fmtmarty,	0,		marty,		marty, marty_state,	 0,  "Fujitsu",   "FM-Towns Car Marty",	 GAME_NOT_WORKING)
 

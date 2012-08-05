@@ -653,16 +653,16 @@ ROM_END
 
 /*    YEAR  NAME  PARENT COMPAT MACHINE     INPUT      INIT      COMPANY                         FULLNAME            FLAGS */
 
-COMP( 1984, c16,      0,     0,  c16,       c16,       c16,      "Commodore Business Machines",  "Commodore 16 (PAL)", 0)
-COMP( 1984, c16hun,   c16,   0,  c16,       c16,       c16,      "Commodore Business Machines",  "Commodore 16 Novotrade (PAL, Hungary)", 0)
+COMP( 1984, c16,      0,     0,  c16,       c16, c16_state,       c16,      "Commodore Business Machines",  "Commodore 16 (PAL)", 0)
+COMP( 1984, c16hun,   c16,   0,  c16,       c16, c16_state,       c16,      "Commodore Business Machines",  "Commodore 16 Novotrade (PAL, Hungary)", 0)
 
-COMP( 1984, c116,     c16,   0,  c16,       c16,       c16,      "Commodore Business Machines",  "Commodore 116 (PAL)", 0)
+COMP( 1984, c116,     c16,   0,  c16,       c16, c16_state,       c16,      "Commodore Business Machines",  "Commodore 116 (PAL)", 0)
 
-COMP( 1984, plus4,    c16,   0,  plus4,     plus4,     plus4,    "Commodore Business Machines",  "Commodore Plus/4 (NTSC)", 0)
+COMP( 1984, plus4,    c16,   0,  plus4,     plus4, c16_state,     plus4,    "Commodore Business Machines",  "Commodore Plus/4 (NTSC)", 0)
 
-COMP( 1984, c232,     c16,   0,  c16,       c16,       c16,      "Commodore Business Machines",  "Commodore 232 (Prototype)", 0)
-COMP( 1984, c264,     c16,   0,  c264,      plus4,     plus4,    "Commodore Business Machines",  "Commodore 264 (Prototype)", 0)
-COMP( 1984, c364,     c16,   0,  c364,      plus4,     plus4,    "Commodore Business Machines",  "Commodore V364 (Prototype)", GAME_IMPERFECT_SOUND)
+COMP( 1984, c232,     c16,   0,  c16,       c16, c16_state,       c16,      "Commodore Business Machines",  "Commodore 232 (Prototype)", 0)
+COMP( 1984, c264,     c16,   0,  c264,      plus4, c16_state,     plus4,    "Commodore Business Machines",  "Commodore 264 (Prototype)", 0)
+COMP( 1984, c364,     c16,   0,  c364,      plus4, c16_state,     plus4,    "Commodore Business Machines",  "Commodore V364 (Prototype)", GAME_IMPERFECT_SOUND)
 
-COMP( 1984, c16sid,   c16,   0,  c16sid,    c16sid,    c16sid,   "Commodore Business Machines",  "Commodore 16 (PAL, SID Card)", GAME_UNOFFICIAL | GAME_IMPERFECT_SOUND)
-COMP( 1984, plus4sid, c16,   0,  plus4sid,  plus4sid,  plus4sid, "Commodore Business Machines",  "Commodore Plus/4 (NTSC, SID Card)", GAME_UNOFFICIAL | GAME_IMPERFECT_SOUND)
+COMP( 1984, c16sid,   c16,   0,  c16sid,    c16sid, c16_state,    c16sid,   "Commodore Business Machines",  "Commodore 16 (PAL, SID Card)", GAME_UNOFFICIAL | GAME_IMPERFECT_SOUND)
+COMP( 1984, plus4sid, c16,   0,  plus4sid,  plus4sid, c16_state,  plus4sid, "Commodore Business Machines",  "Commodore Plus/4 (NTSC, SID Card)", GAME_UNOFFICIAL | GAME_IMPERFECT_SOUND)

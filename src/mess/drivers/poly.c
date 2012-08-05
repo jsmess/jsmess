@@ -231,4 +231,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR   NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1981,  poly1,  0,      0,       poly,      poly,    0,      "Polycorp",  "Poly-1 Educational Computer", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981,  poly1,  0,      0,       poly,      poly, poly_state,    0,      "Polycorp",  "Poly-1 Educational Computer", GAME_NOT_WORKING | GAME_NO_SOUND )

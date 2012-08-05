@@ -109,4 +109,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY                          FULLNAME       FLAGS */
-COMP( 19??, ccs2422,  0,       0,    ccs2422,   ccs2422,  0,   "California Computer Systems", "CCS Model 2422B", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 19??, ccs2422,  0,       0,    ccs2422,   ccs2422, ccs2422_state,  0,   "California Computer Systems", "CCS Model 2422B", GAME_NOT_WORKING | GAME_NO_SOUND)

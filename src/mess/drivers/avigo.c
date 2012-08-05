@@ -1031,9 +1031,9 @@ ROM_START(avigo_it)
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY   FULLNAME */
-COMP(1997,	avigo,  	0,  		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA",         	GAME_SUPPORTS_SAVE)
-COMP(1997,	avigo_de,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (German)",	GAME_SUPPORTS_SAVE)
-COMP(1997,	avigo_fr,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (French)",	GAME_SUPPORTS_SAVE)
-COMP(1997,	avigo_es,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (Spanish)",	GAME_SUPPORTS_SAVE)
-COMP(1997,	avigo_it,	avigo,		0,		avigo,	avigo,	0,		"Texas Instruments", "TI Avigo 10 PDA (Italian)",	GAME_SUPPORTS_SAVE)
+COMP(1997,	avigo,  	0,  		0,		avigo,	avigo, avigo_state,	0,		"Texas Instruments", "TI Avigo 10 PDA",         	GAME_SUPPORTS_SAVE)
+COMP(1997,	avigo_de,	avigo,		0,		avigo,	avigo, avigo_state,	0,		"Texas Instruments", "TI Avigo 10 PDA (German)",	GAME_SUPPORTS_SAVE)
+COMP(1997,	avigo_fr,	avigo,		0,		avigo,	avigo, avigo_state,	0,		"Texas Instruments", "TI Avigo 10 PDA (French)",	GAME_SUPPORTS_SAVE)
+COMP(1997,	avigo_es,	avigo,		0,		avigo,	avigo, avigo_state,	0,		"Texas Instruments", "TI Avigo 10 PDA (Spanish)",	GAME_SUPPORTS_SAVE)
+COMP(1997,	avigo_it,	avigo,		0,		avigo,	avigo, avigo_state,	0,		"Texas Instruments", "TI Avigo 10 PDA (Italian)",	GAME_SUPPORTS_SAVE)
 

@@ -203,4 +203,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-COMP( 1984, savia84,  0,       0,    savia84,   savia84, 0,     "JT Hyan", "Savia 84", GAME_NO_SOUND_HW)
+COMP( 1984, savia84,  0,       0,    savia84,   savia84, savia84_state, 0,     "JT Hyan", "Savia 84", GAME_NO_SOUND_HW)

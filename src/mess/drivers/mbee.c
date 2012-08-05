@@ -1133,16 +1133,16 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT       COMPANY         FULLNAME */
-COMP( 1982, mbee,     0,	0,	mbee,     mbee,     mbee,   		"Applied Technology",  "Microbee 16 Standard" , 0 )
-COMP( 1982, mbeeic,   mbee,	0,	mbeeic,   mbee,     mbeeic, 		"Applied Technology",  "Microbee 32 IC" , 0 )
-COMP( 1982, mbeepc,   mbee,	0,	mbeepc,   mbee,     mbeepc, 		"Applied Technology",  "Microbee Personal Communicator" , 0 )
-COMP( 1985, mbeepc85, mbee,	0,	mbeepc85, mbee,     mbeepc85,		"Applied Technology",  "Microbee PC85" , 0 )
-COMP( 1985, mbeepc85b,mbee,	0,	mbeepc85b,mbee,     mbeepc85,		"Applied Technology",  "Microbee PC85 (New version)" , 0 )
-COMP( 1985, mbeepc85s,mbee,	0,	mbeepc85, mbee,     mbeepc85,		"Applied Technology",  "Microbee PC85 (Swedish)" , 0 )
-COMP( 1986, mbeeppc,  mbee,	0,	mbeeppc,  mbee,     mbeeppc,		"Applied Technology",  "Microbee Premium PC85" , 0 )
-COMP( 1986, mbeett,   mbee,	0,	mbeett,   mbee256,  mbeett,		"Applied Technology",  "Microbee Teleterm" , GAME_NOT_WORKING )
-COMP( 1986, mbee56,   mbee,	0,	mbee56,   mbee,     mbee56, 		"Applied Technology",  "Microbee 56k" , GAME_NOT_WORKING )
-COMP( 1986, mbee64,   mbee,	0,	mbee64,   mbee,     mbee64, 		"Applied Technology",  "Microbee 64k" , GAME_NOT_WORKING )
-COMP( 1986, mbee128,  mbee,	0,	mbee128,  mbee,     mbee128,		"Applied Technology",  "Microbee 128k" , GAME_NOT_WORKING )
-COMP( 1987, mbee256,  mbee,	0,	mbee256,  mbee256,  mbee256,		"Applied Technology",  "Microbee 256TC" , GAME_NOT_WORKING )
+COMP( 1982, mbee,     0,	0,	mbee,     mbee, mbee_state,     mbee,   		"Applied Technology",  "Microbee 16 Standard" , 0 )
+COMP( 1982, mbeeic,   mbee,	0,	mbeeic,   mbee, mbee_state,     mbeeic, 		"Applied Technology",  "Microbee 32 IC" , 0 )
+COMP( 1982, mbeepc,   mbee,	0,	mbeepc,   mbee, mbee_state,     mbeepc, 		"Applied Technology",  "Microbee Personal Communicator" , 0 )
+COMP( 1985, mbeepc85, mbee,	0,	mbeepc85, mbee, mbee_state,     mbeepc85,		"Applied Technology",  "Microbee PC85" , 0 )
+COMP( 1985, mbeepc85b,mbee,	0,	mbeepc85b,mbee, mbee_state,     mbeepc85,		"Applied Technology",  "Microbee PC85 (New version)" , 0 )
+COMP( 1985, mbeepc85s,mbee,	0,	mbeepc85, mbee, mbee_state,     mbeepc85,		"Applied Technology",  "Microbee PC85 (Swedish)" , 0 )
+COMP( 1986, mbeeppc,  mbee,	0,	mbeeppc,  mbee, mbee_state,     mbeeppc,		"Applied Technology",  "Microbee Premium PC85" , 0 )
+COMP( 1986, mbeett,   mbee,	0,	mbeett,   mbee256, mbee_state,  mbeett,		"Applied Technology",  "Microbee Teleterm" , GAME_NOT_WORKING )
+COMP( 1986, mbee56,   mbee,	0,	mbee56,   mbee, mbee_state,     mbee56, 		"Applied Technology",  "Microbee 56k" , GAME_NOT_WORKING )
+COMP( 1986, mbee64,   mbee,	0,	mbee64,   mbee, mbee_state,     mbee64, 		"Applied Technology",  "Microbee 64k" , GAME_NOT_WORKING )
+COMP( 1986, mbee128,  mbee,	0,	mbee128,  mbee, mbee_state,     mbee128,		"Applied Technology",  "Microbee 128k" , GAME_NOT_WORKING )
+COMP( 1987, mbee256,  mbee,	0,	mbee256,  mbee256, mbee_state,  mbee256,		"Applied Technology",  "Microbee 256TC" , GAME_NOT_WORKING )
 

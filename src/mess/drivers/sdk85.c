@@ -143,5 +143,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1977, sdk85,  0,       0,      sdk85,     sdk85,     0,  "Intel",   "SDK-85", GAME_NO_SOUND_HW)
+COMP( 1977, sdk85,  0,       0,      sdk85,     sdk85, sdk85_state,     0,  "Intel",   "SDK-85", GAME_NO_SOUND_HW)
 

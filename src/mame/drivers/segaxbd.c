@@ -711,7 +711,7 @@ static void smgp_iochip0_motor_w(running_machine &machine, UINT8 data)
 
 
 // Last Survivor
-static UINT8 lastsurv_iochip0_port_r(running_machine &machine, UINT8 data)
+static UINT8 lastsurv_iochip1_port_r(running_machine &machine, UINT8 data)
 {
 	static const char * const port_names[] = { "MUX0", "MUX1", "MUX2", "MUX3" };
 	segaxbd_state *state = machine.driver_data<segaxbd_state>();
@@ -722,6 +722,7 @@ static void lastsurv_iochip0_muxer_w(running_machine &machine, UINT8 data)
 {
 	segaxbd_state *state = machine.driver_data<segaxbd_state>();
 	state->m_lastsurv_mux = (data >> 5) & 3;
+	generic_iochip0_lamps_w(machine, data & 0x9f);
 }
 
 
@@ -3203,7 +3204,7 @@ static DRIVER_INIT( lastsurv )
 	segaxbd_state *state = machine.driver_data<segaxbd_state>();
 
 	DRIVER_INIT_CALL( generic_xboard );
-	state->m_iochip_custom_io_r[1][1] = lastsurv_iochip0_port_r;
+	state->m_iochip_custom_io_r[1][1] = lastsurv_iochip1_port_r;
 	state->m_iochip_custom_io_w[0][3] = lastsurv_iochip0_muxer_w;
 }
 
@@ -3272,25 +3273,25 @@ static DRIVER_INIT( gprider )
  *************************************/
 
 //    YEAR, NAME,     PARENT,   MACHINE,       INPUT,    INIT,           MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, aburner2, 0,        xboard,        aburner2, aburner2,       ROT0,   "Sega", "After Burner II", 0 )
-GAME( 1987, aburner,  aburner2, xboard,        aburner,  aburner2,       ROT0,   "Sega", "After Burner (Japan)", 0 )
-GAME( 1987, thndrbld, 0,        xboard_fd1094, thndrbld, generic_xboard, ROT0,   "Sega", "Thunder Blade (upright, FD1094 317-0056)", 0 )
-GAME( 1987, thndrbld1,thndrbld, xboard,        thndrbd1, generic_xboard, ROT0,   "Sega", "Thunder Blade (deluxe/standing, unprotected)", 0 )
-GAME( 1989, lastsurv, 0,        xboard_fd1094, lastsurv, lastsurv,       ROT0,   "Sega", "Last Survivor (FD1094 317-0083)", 0 )
-GAME( 1989, loffire,  0,        xboard_fd1094, loffire,  loffire,        ROT0,   "Sega", "Line of Fire / Bakudan Yarou (World, FD1094 317-0136)", 0 )
-GAME( 1989, loffireu, loffire,  xboard_fd1094, loffire,  loffire,        ROT0,   "Sega", "Line of Fire / Bakudan Yarou (US, FD1094 317-0135)", 0 )
-GAME( 1989, loffirej, loffire,  xboard_fd1094, loffire,  loffire,        ROT0,   "Sega", "Line of Fire / Bakudan Yarou (Japan, FD1094 317-0134)", 0 )
-GAME( 1989, rachero,  0,        xboard_fd1094, rachero,  generic_xboard, ROT0,   "Sega", "Racing Hero (FD1094 317-0144)", 0 )
-GAME( 1989, smgp,     0,        smgp_fd1094,   smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (World, Rev B, FD1094 317-0126a)", 0 )
-GAME( 1989, smgp6,    smgp,     smgp_fd1094,   smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (World, Rev A, FD1094 317-0126a)", 0 )
-GAME( 1989, smgp5,    smgp,     smgp_fd1094,   smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (World, FD1094 317-0126)", 0 )
-GAME( 1989, smgpu,    smgp,     smgp_fd1094,   smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (US, Rev C, FD1094 317-0125a)", 0 )
-GAME( 1989, smgpu1,   smgp,     smgp_fd1094,   smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (US, Rev B, FD1094 317-0125a)", 0 )
-GAME( 1989, smgpu2,   smgp,     smgp_fd1094,   smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (US, Rev A, FD1094 317-0125a)", 0 )
-GAME( 1989, smgpj,    smgp,     smgp_fd1094,   smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (Japan, Rev B, FD1094 317-0124a)", 0 )
-GAME( 1989, smgpja,   smgp,     smgp_fd1094,   smgp,     smgp,           ROT0,   "Sega", "Super Monaco GP (Japan, Rev A, FD1094 317-0124a)", 0 )
-GAME( 1990, abcop,    0,        xboard_fd1094, abcop,    generic_xboard, ROT0,   "Sega", "A.B. Cop (FD1094 317-0169b)", 0 )
-GAME( 1990, gprider,  0,        xboard_fd1094, gprider,  gprider,        ROT0,   "Sega", "GP Rider (World, FD1094 317-0163)", 0 )
-GAME( 1990, gprideru, gprider,  xboard_fd1094, gprider,  gprider,        ROT0,   "Sega", "GP Rider (US, FD1094 317-0162)", 0 )
-GAME( 1990, gpriderj, gprider,  xboard_fd1094, gprider,  gprider,        ROT0,   "Sega", "GP Rider (Japan, FD1094 317-0161)", 0 )
-GAME( 1991, rascot,   0,        rascot,        rascot,   rascot,         ROT0,   "Sega", "Royal Ascot (Japan, terminal?)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1987, aburner2, 0,        xboard,        aburner2, segaxbd_state, aburner2,       ROT0,   "Sega", "After Burner II", 0 )
+GAME( 1987, aburner,  aburner2, xboard,        aburner, segaxbd_state,  aburner2,       ROT0,   "Sega", "After Burner (Japan)", 0 )
+GAME( 1987, thndrbld, 0,        xboard_fd1094, thndrbld, segaxbd_state, generic_xboard, ROT0,   "Sega", "Thunder Blade (upright, FD1094 317-0056)", 0 )
+GAME( 1987, thndrbld1,thndrbld, xboard,        thndrbd1, segaxbd_state, generic_xboard, ROT0,   "Sega", "Thunder Blade (deluxe/standing, unprotected)", 0 )
+GAME( 1989, lastsurv, 0,        xboard_fd1094, lastsurv, segaxbd_state, lastsurv,       ROT0,   "Sega", "Last Survivor (FD1094 317-0083)", 0 )
+GAME( 1989, loffire,  0,        xboard_fd1094, loffire, segaxbd_state,  loffire,        ROT0,   "Sega", "Line of Fire / Bakudan Yarou (World, FD1094 317-0136)", 0 )
+GAME( 1989, loffireu, loffire,  xboard_fd1094, loffire, segaxbd_state,  loffire,        ROT0,   "Sega", "Line of Fire / Bakudan Yarou (US, FD1094 317-0135)", 0 )
+GAME( 1989, loffirej, loffire,  xboard_fd1094, loffire, segaxbd_state,  loffire,        ROT0,   "Sega", "Line of Fire / Bakudan Yarou (Japan, FD1094 317-0134)", 0 )
+GAME( 1989, rachero,  0,        xboard_fd1094, rachero, segaxbd_state,  generic_xboard, ROT0,   "Sega", "Racing Hero (FD1094 317-0144)", 0 )
+GAME( 1989, smgp,     0,        smgp_fd1094,   smgp, segaxbd_state,     smgp,           ROT0,   "Sega", "Super Monaco GP (World, Rev B, FD1094 317-0126a)", 0 )
+GAME( 1989, smgp6,    smgp,     smgp_fd1094,   smgp, segaxbd_state,     smgp,           ROT0,   "Sega", "Super Monaco GP (World, Rev A, FD1094 317-0126a)", 0 )
+GAME( 1989, smgp5,    smgp,     smgp_fd1094,   smgp, segaxbd_state,     smgp,           ROT0,   "Sega", "Super Monaco GP (World, FD1094 317-0126)", 0 )
+GAME( 1989, smgpu,    smgp,     smgp_fd1094,   smgp, segaxbd_state,     smgp,           ROT0,   "Sega", "Super Monaco GP (US, Rev C, FD1094 317-0125a)", 0 )
+GAME( 1989, smgpu1,   smgp,     smgp_fd1094,   smgp, segaxbd_state,     smgp,           ROT0,   "Sega", "Super Monaco GP (US, Rev B, FD1094 317-0125a)", 0 )
+GAME( 1989, smgpu2,   smgp,     smgp_fd1094,   smgp, segaxbd_state,     smgp,           ROT0,   "Sega", "Super Monaco GP (US, Rev A, FD1094 317-0125a)", 0 )
+GAME( 1989, smgpj,    smgp,     smgp_fd1094,   smgp, segaxbd_state,     smgp,           ROT0,   "Sega", "Super Monaco GP (Japan, Rev B, FD1094 317-0124a)", 0 )
+GAME( 1989, smgpja,   smgp,     smgp_fd1094,   smgp, segaxbd_state,     smgp,           ROT0,   "Sega", "Super Monaco GP (Japan, Rev A, FD1094 317-0124a)", 0 )
+GAME( 1990, abcop,    0,        xboard_fd1094, abcop, segaxbd_state,    generic_xboard, ROT0,   "Sega", "A.B. Cop (FD1094 317-0169b)", 0 )
+GAME( 1990, gprider,  0,        xboard_fd1094, gprider, segaxbd_state,  gprider,        ROT0,   "Sega", "GP Rider (World, FD1094 317-0163)", 0 )
+GAME( 1990, gprideru, gprider,  xboard_fd1094, gprider, segaxbd_state,  gprider,        ROT0,   "Sega", "GP Rider (US, FD1094 317-0162)", 0 )
+GAME( 1990, gpriderj, gprider,  xboard_fd1094, gprider, segaxbd_state,  gprider,        ROT0,   "Sega", "GP Rider (Japan, FD1094 317-0161)", 0 )
+GAME( 1991, rascot,   0,        rascot,        rascot, segaxbd_state,   rascot,         ROT0,   "Sega", "Royal Ascot (Japan, terminal?)", GAME_NOT_WORKING | GAME_NO_SOUND )

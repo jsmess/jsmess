@@ -330,4 +330,4 @@ ROM_START( concept )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    INIT  COMPANY           FULLNAME */
-COMP( 1982, concept,  0,	0,	concept,  concept, 0,    "Corvus Systems", "Concept" , GAME_NO_SOUND)
+COMP( 1982, concept,  0,	0,	concept,  concept, concept_state, 0,    "Corvus Systems", "Concept" , GAME_NO_SOUND)

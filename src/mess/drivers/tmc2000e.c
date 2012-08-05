@@ -288,4 +288,4 @@ ROM_START( tmc2000e )
 ROM_END
 
 //    YEAR  NAME      PARENT   COMPAT   MACHINE   INPUT     INIT    COMPANY        FULLNAME
-COMP( 1980, tmc2000e, 0,       0,	    tmc2000e, tmc2000e, 0,		"Telercas Oy", "Telmac 2000E", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+COMP( 1980, tmc2000e, 0,       0,	    tmc2000e, tmc2000e, tmc2000e_state, 0,		"Telercas Oy", "Telmac 2000E", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

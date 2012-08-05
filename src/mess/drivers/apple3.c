@@ -192,5 +192,5 @@ ROM_START(apple3)
 ROM_END
 
 /*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT    INIT    COMPANY             FULLNAME */
-COMP( 1980,	apple3,		0,		0,		apple3,    apple3,	apple3,		"Apple Computer",	"Apple ///", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1980,	apple3,		0,		0,		apple3,    apple3, apple3_state,	apple3,		"Apple Computer",	"Apple ///", GAME_NOT_WORKING | GAME_NO_SOUND )
 

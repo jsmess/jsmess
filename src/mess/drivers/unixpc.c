@@ -244,4 +244,4 @@ ROM_END
 ***************************************************************************/
 
 //    YEAR  NAME  PARENT  COMPAT  MACHINE  INPUT   INIT  COMPANY  FULLNAME  FLAGS
-COMP( 1985, 3b1,  0,      0,      unixpc,  unixpc, 0,    "AT&T",  "3B1",    GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1985, 3b1,  0,      0,      unixpc,  unixpc, unixpc_state, 0,    "AT&T",  "3B1",    GAME_NOT_WORKING | GAME_NO_SOUND )

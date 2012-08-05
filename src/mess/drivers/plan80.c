@@ -248,5 +248,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY          FULLNAME       FLAGS */
-COMP( 1988, plan80,  0,       0,     plan80,    plan80, plan80,   "Tesla Eltos",   "Plan-80", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1988, plan80,  0,       0,     plan80,    plan80, plan80_state, plan80,   "Tesla Eltos",   "Plan-80", GAME_NOT_WORKING | GAME_NO_SOUND)
 

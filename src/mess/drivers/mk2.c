@@ -225,5 +225,5 @@ ROM_END
 
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY               FULLNAME */
-CONS( 1979, ccmk2,    0,      0,      mk2,    mk2,    0, "Quelle International", "Chess Champion MK II", 0)
+CONS( 1979, ccmk2,    0,      0,      mk2,    mk2, mk2_state,    0, "Quelle International", "Chess Champion MK II", 0)
 // second design sold (same computer/program?)

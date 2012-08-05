@@ -138,4 +138,4 @@ ROM_END
 /* Driver */
 
 /*   YEAR   NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY     FULLNAME       FLAGS */
-COMP( 198?, mes,    0,      0,       mes,     mes,   0,       "Schleicher",   "MES", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, mes,    0,      0,       mes,     mes, mes_state,   0,       "Schleicher",   "MES", GAME_NOT_WORKING | GAME_NO_SOUND)

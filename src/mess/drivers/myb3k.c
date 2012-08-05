@@ -300,4 +300,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1982, myb3k,  0,      0,       myb3k,     myb3k,    0,     "Panasonic",   "MyBrain 3000", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, myb3k,  0,      0,       myb3k,     myb3k, myb3k_state,    0,     "Panasonic",   "MyBrain 3000", GAME_NOT_WORKING | GAME_NO_SOUND)

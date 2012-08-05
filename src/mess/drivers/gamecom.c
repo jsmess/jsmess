@@ -154,4 +154,4 @@ ROM_START( gamecom )
 ROM_END
 
 /*    YEAR  NAME     PARENT COMPAT MACHINE  INPUT    INIT    COMPANY  FULLNAME */
-CONS( 1997, gamecom, 0,     0,     gamecom, gamecom, gamecom,"Tiger", "Game.com", GAME_NOT_WORKING | GAME_NO_SOUND)
+CONS( 1997, gamecom, 0,     0,     gamecom, gamecom, gamecom_state, gamecom,"Tiger", "Game.com", GAME_NOT_WORKING | GAME_NO_SOUND)

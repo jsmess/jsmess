@@ -398,5 +398,5 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME                            FLAGS */
-COMP( 1988?, rvoicepc,   0,          0,      rvoicepc,   rvoicepc, rvoicepc,      "Adaptive Communication Systems",        "Realvoice PC", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1988?, rvoicepc,   0,          0,      rvoicepc,   rvoicepc, rvoice_state, rvoicepc,      "Adaptive Communication Systems",        "Realvoice PC", GAME_NOT_WORKING | GAME_NO_SOUND)
 

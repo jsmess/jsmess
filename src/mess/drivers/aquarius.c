@@ -520,6 +520,6 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME         PARENT    COMPAT  MACHINE      INPUT     INIT      COMPANY   FULLNAME                         FLAGS */
-COMP( 1983, aquarius,    0,        0,      aquarius,    aquarius, aquarius, "Mattel", "Aquarius (NTSC)",               0 )
-COMP( 1983, aquarius_qd, aquarius, 0,      aquarius_qd, aquarius, aquarius, "Mattel", "Aquarius w/ Quick Disk (NTSC)", 0 )
-//COMP( 1984,   aquariu2,   aquarius,   0,      aquarius,   aquarius,   0,  "Mattel",   "Aquarius II",  GAME_NOT_WORKING )
+COMP( 1983, aquarius,    0,        0,      aquarius,    aquarius, aquarius_state, aquarius, "Mattel", "Aquarius (NTSC)",               0 )
+COMP( 1983, aquarius_qd, aquarius, 0,      aquarius_qd, aquarius, aquarius_state, aquarius, "Mattel", "Aquarius w/ Quick Disk (NTSC)", 0 )
+//COMP( 1984,   aquariu2,   aquarius,   0,      aquarius,   aquarius, aquarius_state,   0,  "Mattel",   "Aquarius II",  GAME_NOT_WORKING )

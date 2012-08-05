@@ -981,8 +981,8 @@ static MACHINE_CONFIG_START( bbcm, bbc_state )
 MACHINE_CONFIG_END
 
 /*     YEAR  NAME      PARENT    COMPAT MACHINE   INPUT  INIT      COMPANY  FULLNAME */
-COMP ( 1981, bbca,	   0,		 0,		bbca,     bbca,   bbc,     "Acorn","BBC Micro Model A" , 0)
-COMP ( 1981, bbcb,     bbca,	 0,		bbcb,     bbca,   bbc,	   "Acorn","BBC Micro Model B" , 0)
-COMP ( 1985, bbcbp,    bbca,	 0,		bbcbp,    bbca,   bbc,     "Acorn","BBC Micro Model B+ 64K" , 0)
-COMP ( 1985, bbcbp128, bbca,     0,		bbcbp128, bbca,   bbc,     "Acorn","BBC Micro Model B+ 128k" , 0)
-COMP ( 1986, bbcm,     bbca,     0,		bbcm,     bbca,   bbcm,    "Acorn","BBC Master" , 0)
+COMP ( 1981, bbca,	   0,		 0,		bbca,     bbca, bbc_state,   bbc,     "Acorn","BBC Micro Model A" , 0)
+COMP ( 1981, bbcb,     bbca,	 0,		bbcb,     bbca, bbc_state,   bbc,	   "Acorn","BBC Micro Model B" , 0)
+COMP ( 1985, bbcbp,    bbca,	 0,		bbcbp,    bbca, bbc_state,   bbc,     "Acorn","BBC Micro Model B+ 64K" , 0)
+COMP ( 1985, bbcbp128, bbca,     0,		bbcbp128, bbca, bbc_state,   bbc,     "Acorn","BBC Micro Model B+ 128k" , 0)
+COMP ( 1986, bbcm,     bbca,     0,		bbcm,     bbca, bbc_state,   bbcm,    "Acorn","BBC Master" , 0)

@@ -275,5 +275,5 @@ ROM_START (galaxyp)
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY FULLNAME */
-COMP(1983,	galaxy,		0,		0,	galaxy,	galaxy,	galaxy,	"Elektronika inzenjering",			"Galaksija",	  0)
-COMP(1985,	galaxyp,	galaxy,	0,	galaxyp,galaxyp,galaxyp,"Elektronika inzenjering",			"Galaksija plus", 0)
+COMP(1983,	galaxy,		0,		0,	galaxy,	galaxy, galaxy_state,	galaxy,	"Elektronika inzenjering",			"Galaksija",	  0)
+COMP(1985,	galaxyp,	galaxy,	0,	galaxyp,galaxyp, galaxy_state,galaxyp,"Elektronika inzenjering",			"Galaksija plus", 0)

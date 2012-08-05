@@ -172,5 +172,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE     INPUT    INIT    COMPANY           FULLNAME       FLAGS */
-COMP( 1982, a5120,  0,      0,       a5120,      a5120,   0,      "VEB Robotron",   "A5120", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1983, a5130,  a5120,  0,       a5130,      a5130,   0,      "VEB Robotron",   "A5130", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, a5120,  0,      0,       a5120,      a5120, a51xx_state,   0,      "VEB Robotron",   "A5120", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1983, a5130,  a5120,  0,       a5130,      a5130, a51xx_state,   0,      "VEB Robotron",   "A5130", GAME_NOT_WORKING | GAME_NO_SOUND)

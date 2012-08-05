@@ -291,5 +291,5 @@ static DRIVER_INIT(mirage)
     }
 }
 
-CONS( 1984, enmirage, 0, 0, mirage, mirage, mirage, "Ensoniq", "Ensoniq Mirage", GAME_NOT_WORKING )
+CONS( 1984, enmirage, 0, 0, mirage, mirage, mirage_state, mirage, "Ensoniq", "Ensoniq Mirage", GAME_NOT_WORKING )
 

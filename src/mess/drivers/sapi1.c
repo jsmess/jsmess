@@ -268,6 +268,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE     INPUT       INIT      COMPANY    FULLNAME       FLAGS */
-COMP( 1985, sapi1,    0,       0,      sapi1,      sapi1,      sapi1,    "Tesla", "SAPI-1 ZPS 1", GAME_NO_SOUND_HW)
-COMP( 1985, sapizps2, sapi1,   0,      sapi2,      sapi1,      sapi1,    "Tesla", "SAPI-1 ZPS 2", GAME_NO_SOUND_HW)
-COMP( 1985, sapizps3, sapi1,   0,      sapi3,      sapi1,      sapizps3, "Tesla", "SAPI-1 ZPS 3", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1985, sapi1,    0,       0,      sapi1,      sapi1, sapi1_state,      sapi1,    "Tesla", "SAPI-1 ZPS 1", GAME_NO_SOUND_HW)
+COMP( 1985, sapizps2, sapi1,   0,      sapi2,      sapi1, sapi1_state,      sapi1,    "Tesla", "SAPI-1 ZPS 2", GAME_NO_SOUND_HW)
+COMP( 1985, sapizps3, sapi1,   0,      sapi3,      sapi1, sapi1_state,      sapizps3, "Tesla", "SAPI-1 ZPS 3", GAME_NOT_WORKING | GAME_NO_SOUND_HW)

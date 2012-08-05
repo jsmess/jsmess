@@ -139,4 +139,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     INIT    COMPANY     FULLNAME       FLAGS */
-COMP( ????, m79152pc,  0,       0,       m79152pc,  m79152pc, 0,   "Mera-Elzab", "79152pc", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, m79152pc,  0,       0,       m79152pc,  m79152pc, m79152pc_state, 0,   "Mera-Elzab", "79152pc", GAME_NOT_WORKING | GAME_NO_SOUND)

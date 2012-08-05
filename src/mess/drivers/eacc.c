@@ -283,5 +283,5 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT      COMPANY                     FULLNAME        FLAGS */
-COMP( 1982, eacc,       0,          0,      eacc,       eacc,   0,     "Electronics Australia", "EA Car Computer", GAME_NO_SOUND_HW)
+COMP( 1982, eacc,       0,          0,      eacc,       eacc, eacc_state,   0,     "Electronics Australia", "EA Car Computer", GAME_NO_SOUND_HW)
 

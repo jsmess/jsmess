@@ -185,5 +185,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY          FULLNAME       FLAGS */
-COMP( 1989, ondrat, 0,		0,		ondra,		ondra,		0,       "Tesla",		 "Ondra",		0)
-COMP( 1989, ondrav, ondrat,	0,		ondra,		ondra,		0,       "ViLi",		 "Ondra ViLi",	0)
+COMP( 1989, ondrat, 0,		0,		ondra,		ondra, ondra_state,		0,       "Tesla",		 "Ondra",		0)
+COMP( 1989, ondrav, ondrat,	0,		ondra,		ondra, ondra_state,		0,       "ViLi",		 "Ondra ViLi",	0)

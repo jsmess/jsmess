@@ -359,4 +359,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY        FULLNAME       FLAGS */
-COMP( 1988, pcm,    0,      0,       pcm,       pcm,      0,  "Mugler/Mathes",  "PC/M", 0)
+COMP( 1988, pcm,    0,      0,       pcm,       pcm, pcm_state,      0,  "Mugler/Mathes",  "PC/M", 0)

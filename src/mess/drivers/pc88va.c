@@ -1757,6 +1757,6 @@ ROM_END
 
 
 
-COMP( 1987, pc88va,         0,		0,     pc88va,   pc88va,  0,    "Nippon Electronic Company",  "PC-88VA", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1988, pc88va2,        pc88va, 0,     pc88va,   pc88va,  0,    "Nippon Electronic Company",  "PC-88VA2", GAME_NOT_WORKING | GAME_NO_SOUND )
-//COMP( 1988, pc88va3,      pc88va, 0,     pc88va,   pc88va,  0,    "Nippon Electronic Company",  "PC-88VA3", GAME_NOT_WORKING )
+COMP( 1987, pc88va,         0,		0,     pc88va,   pc88va, pc88va_state,  0,    "Nippon Electronic Company",  "PC-88VA", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1988, pc88va2,        pc88va, 0,     pc88va,   pc88va, pc88va_state,  0,    "Nippon Electronic Company",  "PC-88VA2", GAME_NOT_WORKING | GAME_NO_SOUND )
+//COMP( 1988, pc88va3,      pc88va, 0,     pc88va,   pc88va, pc88va_state,  0,    "Nippon Electronic Company",  "PC-88VA3", GAME_NOT_WORKING )

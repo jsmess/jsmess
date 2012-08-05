@@ -1093,13 +1093,13 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                   FULLNAME */
-CONS( 1982,	crvision,   0,          0,		pal,		crvision,	0,		"Video Technology",			"CreatiVision", 0 )
-CONS( 1982,	fnvision,   crvision,   0,		pal,		crvision,	0,		"Video Technology",			"FunVision", 0 )
-CONS( 1982,	crvisioj,   crvision,   0,		ntsc,		crvision,	0,		"Cheryco",					"CreatiVision (Japan)", 0 )
-CONS( 1982,	wizzard,    crvision,   0,		pal,		crvision,	0,		"Dick Smith Electronics",	"Wizzard (Oceania)", 0 )
-CONS( 1982,	rameses,    crvision,   0,		pal,		crvision,	0,		"Hanimex",					"Rameses (Oceania)", 0 )
-CONS( 1983,	vz2000,     crvision,   0,		pal,		crvision,	0,		"Dick Smith Electronics",	"VZ 2000 (Oceania)", 0 )
-CONS( 1983,	crvisio2,   crvision,   0,		pal,		crvision,	0,		"Video Technology",			"CreatiVision MK-II (Europe)", 0 )
-//COMP( 1983, lasr2001,   0,          0,      lasr2001,   lasr2001,   0,      "Video Technology",         "Laser 2001", GAME_NOT_WORKING )
-//COMP( 1983, vz2001,     lasr2001,   0,      lasr2001,   lasr2001,   0,      "Dick Smith Electronics",   "VZ 2001 (Oceania)", GAME_NOT_WORKING )
-COMP( 1983,	manager,	0,			0,		lasr2001,	manager,	0,		"Salora",					"Manager (Finland)", 0 )
+CONS( 1982,	crvision,   0,          0,		pal,		crvision, crvision_state,	0,		"Video Technology",			"CreatiVision", 0 )
+CONS( 1982,	fnvision,   crvision,   0,		pal,		crvision, crvision_state,	0,		"Video Technology",			"FunVision", 0 )
+CONS( 1982,	crvisioj,   crvision,   0,		ntsc,		crvision, crvision_state,	0,		"Cheryco",					"CreatiVision (Japan)", 0 )
+CONS( 1982,	wizzard,    crvision,   0,		pal,		crvision, crvision_state,	0,		"Dick Smith Electronics",	"Wizzard (Oceania)", 0 )
+CONS( 1982,	rameses,    crvision,   0,		pal,		crvision, crvision_state,	0,		"Hanimex",					"Rameses (Oceania)", 0 )
+CONS( 1983,	vz2000,     crvision,   0,		pal,		crvision, crvision_state,	0,		"Dick Smith Electronics",	"VZ 2000 (Oceania)", 0 )
+CONS( 1983,	crvisio2,   crvision,   0,		pal,		crvision, crvision_state,	0,		"Video Technology",			"CreatiVision MK-II (Europe)", 0 )
+//COMP( 1983, lasr2001,   0,          0,      lasr2001,   lasr2001, laser2001_state,   0,      "Video Technology",         "Laser 2001", GAME_NOT_WORKING )
+//COMP( 1983, vz2001,     lasr2001,   0,      lasr2001,   lasr2001, laser2001_state,   0,      "Dick Smith Electronics",   "VZ 2001 (Oceania)", GAME_NOT_WORKING )
+COMP( 1983,	manager,	0,			0,		lasr2001,	manager, laser2001_state,	0,		"Salora",					"Manager (Finland)", 0 )

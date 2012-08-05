@@ -809,6 +809,6 @@ ROM_START(pyuutajr)
 ROM_END
 
 /*   YEAR    NAME      PARENT      COMPAT  MACHINE     INPUT      INIT    COMPANY     FULLNAME */
-COMP(1983?,  tutor,    0,          0,      tutor,      tutor,     tutor,  "Tomy",   "Tomy Tutor" , 0)
-COMP(1982,   pyuuta,   tutor,      0,      tutor,      tutor,     pyuuta, "Tomy",   "Tomy Pyuuta" , 0)
-COMP(1983,   pyuutajr, tutor,      0,      pyuutajr,   pyuutajr,  pyuuta, "Tomy",   "Tomy Pyuuta Jr." , 0)
+COMP(1983?,  tutor,    0,          0,      tutor,      tutor, tutor_state,     tutor,  "Tomy",   "Tomy Tutor" , 0)
+COMP(1982,   pyuuta,   tutor,      0,      tutor,      tutor, tutor_state,     pyuuta, "Tomy",   "Tomy Pyuuta" , 0)
+COMP(1983,   pyuutajr, tutor,      0,      pyuutajr,   pyuutajr, tutor_state,  pyuuta, "Tomy",   "Tomy Pyuuta Jr." , 0)

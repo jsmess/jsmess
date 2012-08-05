@@ -213,7 +213,7 @@ static DRIVER_INIT( vt240 )
 }
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                      FULLNAME       FLAGS */
-//COMP( 1983, vt240,  0,      0,       vt220,     vt220,   0,  "Digital Equipment Corporation", "VT240", GAME_NOT_WORKING | GAME_NO_SOUND)
-//COMP( 1983, vt241,  0,      0,       vt220,     vt220,   0,  "Digital Equipment Corporation", "VT241", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1983, mc7105, 0,      0,       vt240,     vt240,   vt240,  "Elektronika",                  "MC7105", GAME_NOT_WORKING | GAME_NO_SOUND)
+//COMP( 1983, vt240,  0,      0,       vt220,     vt220, vt220_state,   0,  "Digital Equipment Corporation", "VT240", GAME_NOT_WORKING | GAME_NO_SOUND)
+//COMP( 1983, vt241,  0,      0,       vt220,     vt220, vt220_state,   0,  "Digital Equipment Corporation", "VT241", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1983, mc7105, 0,      0,       vt240,     vt240, vt240_state,   vt240,  "Elektronika",                  "MC7105", GAME_NOT_WORKING | GAME_NO_SOUND)
 

@@ -518,5 +518,5 @@ ROM_START(sorcererd)
 ROM_END
 
 /*   YEAR  NAME       PARENT    COMPAT    MACHINE    INPUT     INIT        COMPANY     FULLNAME */
-COMP(1979, sorcerer,  0,        0,        sorcerer,  sorcerer, sorcerer, "Exidy Inc", "Sorcerer", 0 )
-COMP(1979, sorcererd, sorcerer, 0,        sorcererd, sorcerer, sorcerer, "Exidy Inc", "Sorcerer (with floppy disks)", 0 )
+COMP(1979, sorcerer,  0,        0,        sorcerer,  sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer", 0 )
+COMP(1979, sorcererd, sorcerer, 0,        sorcererd, sorcerer, sorcerer_state, sorcerer, "Exidy Inc", "Sorcerer (with floppy disks)", 0 )

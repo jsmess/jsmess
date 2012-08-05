@@ -333,4 +333,4 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY         FULLNAME    FLAGS */
-COMP( 1978, elf2,	0,		0,		elf2,	elf2,	0,		"Netronics",	"Elf II",	GAME_SUPPORTS_SAVE | GAME_NO_SOUND)
+COMP( 1978, elf2,	0,		0,		elf2,	elf2, elf2_state,	0,		"Netronics",	"Elf II",	GAME_SUPPORTS_SAVE | GAME_NO_SOUND)

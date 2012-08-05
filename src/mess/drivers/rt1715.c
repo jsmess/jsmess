@@ -419,6 +419,6 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY     FULLNAME                             FLAGS */
-COMP( 1986, rt1715,   0,      0,      rt1715,  k7658, 0,    "Robotron",	"Robotron PC-1715",                  GAME_NOT_WORKING | GAME_NO_SOUND_HW)
-COMP( 1986, rt1715lc, rt1715, 0,      rt1715,  k7658, 0,    "Robotron",	"Robotron PC-1715 (latin/cyrillic)", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
-COMP( 1986, rt1715w,  rt1715, 0,      rt1715w, k7658, 0,    "Robotron",	"Robotron PC-1715W",                 GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1986, rt1715,   0,      0,      rt1715,  k7658, rt1715_state, 0,    "Robotron",	"Robotron PC-1715",                  GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1986, rt1715lc, rt1715, 0,      rt1715,  k7658, rt1715_state, 0,    "Robotron",	"Robotron PC-1715 (latin/cyrillic)", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1986, rt1715w,  rt1715, 0,      rt1715w, k7658, rt1715_state, 0,    "Robotron",	"Robotron PC-1715W",                 GAME_NOT_WORKING | GAME_NO_SOUND_HW)

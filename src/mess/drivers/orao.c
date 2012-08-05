@@ -216,5 +216,5 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT           COMPANY          FULLNAME       FLAGS */
-COMP( 1984, orao,     0,      0,		orao,	orao,	orao,	   "PEL Varazdin", "Orao 102",		 0)
-COMP( 1985, orao103,  orao,   0,		orao,	orao,	orao103,   "PEL Varazdin", "Orao 103",		 0)
+COMP( 1984, orao,     0,      0,		orao,	orao, orao_state,	orao,	   "PEL Varazdin", "Orao 102",		 0)
+COMP( 1985, orao103,  orao,   0,		orao,	orao, orao_state,	orao103,   "PEL Varazdin", "Orao 103",		 0)

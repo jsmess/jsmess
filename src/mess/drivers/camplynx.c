@@ -550,6 +550,6 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME       PARENT     COMPAT   MACHINE    INPUT     INIT         COMPANY     FULLNAME     FLAGS */
-COMP( 1983, lynx48k,   0,         0,       lynx48k,   lynx48k,  lynx48k,  "Camputers",  "Lynx 48k",   GAME_NOT_WORKING)
-COMP( 1983, lynx96k,   lynx48k,   0,       lynx48k,   lynx48k,  lynx48k,  "Camputers",  "Lynx 96k",   GAME_NOT_WORKING)
-COMP( 1983, lynx128k,  lynx48k,   0,       lynx128k,  lynx48k,  0,        "Camputers",  "Lynx 128k",  GAME_NOT_WORKING)
+COMP( 1983, lynx48k,   0,         0,       lynx48k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 48k",   GAME_NOT_WORKING)
+COMP( 1983, lynx96k,   lynx48k,   0,       lynx48k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 96k",   GAME_NOT_WORKING)
+COMP( 1983, lynx128k,  lynx48k,   0,       lynx128k,  lynx48k, camplynx_state,  0,        "Camputers",  "Lynx 128k",  GAME_NOT_WORKING)
