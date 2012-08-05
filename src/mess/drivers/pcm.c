@@ -92,6 +92,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( pcm_82_w );
 	DECLARE_WRITE8_MEMBER( pcm_85_w );
 	UINT8 *m_p_chargen;
+	bool m_cone;
 	required_shared_ptr<UINT8> m_p_videoram;
 	virtual void machine_reset();
 	virtual void video_start();
@@ -103,7 +104,11 @@ private:
 
 WRITE_LINE_MEMBER( pcm_state::pcm_82_w )
 {
-	speaker_level_w(m_speaker, state);
+	if (state)
+	{
+		m_cone ^= 1;
+		speaker_level_w(m_speaker, m_cone);
+	}
 }
 
 
@@ -217,7 +222,6 @@ SCREEN_UPDATE16_MEMBER( pcm_state )
 }
 
 
-// someone please check this
 static const z80_daisy_config pcm_daisy_chain[] =
 {
 	{ "z80ctc_s" },		/* System ctc */
@@ -228,7 +232,7 @@ static const z80_daisy_config pcm_daisy_chain[] =
 	{ NULL }
 };
 
-static Z80CTC_INTERFACE( ctc_u_intf )
+static Z80CTC_INTERFACE( ctc_u_intf ) // all pins go to expansion socket
 {
 	0,				/* timer disablers */
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
@@ -246,7 +250,7 @@ static Z80CTC_INTERFACE( ctc_s_intf )
 	DEVCB_DRIVER_LINE_MEMBER(pcm_state, pcm_82_w) /* ZC/TO2 callback - speaker */
 };
 
-static Z80PIO_INTERFACE( pio_u_intf )
+static Z80PIO_INTERFACE( pio_u_intf ) // all pins go to expansion socket
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
 	DEVCB_NULL,			/* read port A */
@@ -274,8 +278,8 @@ static const z80sio_interface sio_intf =
 	0,			/* DTR changed handler */
 	0,			/* RTS changed handler */
 	0,			/* BREAK changed handler */
-	0,			/* transmit handler - which channel is this for? */
-	0			/* receive handler - which channel is this for? */
+	0,			/* transmit handler */
+	0			/* receive handler */
 };
 
 
@@ -329,8 +333,8 @@ static MACHINE_CONFIG_START( pcm, pcm_state )
 	MCFG_Z80PIO_ADD( "z80pio_u", XTAL_10MHz /4, pio_u_intf )
 	MCFG_Z80PIO_ADD( "z80pio_s", XTAL_10MHz /4, pio_s_intf )
 	MCFG_Z80SIO_ADD( "z80sio", 4800, sio_intf ) // clocks come from the system ctc
-	MCFG_Z80CTC_ADD( "z80ctc_u", 1379310.344828, ctc_u_intf ) // numbers need to be corrected
-	MCFG_Z80CTC_ADD( "z80ctc_s", 1379310.344828, ctc_s_intf ) // numbers need to be corrected
+	MCFG_Z80CTC_ADD( "z80ctc_u", XTAL_10MHz /4, ctc_u_intf )
+	MCFG_Z80CTC_ADD( "z80ctc_s", XTAL_10MHz /4, ctc_s_intf )
 MACHINE_CONFIG_END
 
 /* ROM definition */
