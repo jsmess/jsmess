@@ -34,7 +34,7 @@
     - Balance of Power: uses the SIO port for mouse polling;
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
     - The Black Onyx: writes a katakana msg: "rino kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
-    - Brunette: No sound, eventually hangs at gameplay;
+    - Campaign Ban Daisenryaku 2: Hangs at title screen?
     - Can Can Bunny: bitmap artifacts on intro, could be either ALU or floppy issues;
     - Carrot: gfxs are messed up
     - Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
@@ -56,9 +56,16 @@
     - Arcus 2 (at PCM loading)
     - Attacker
     - Autumn Park (BASIC error)
+    - Battle Gorilla
+    - Belloncho Shintai Kensa
+	- Bishoujo Noriko Part I (writes to FDC CPU ROM then expects some strict values, taken from floppy image)
+	- Blassty (attempts to read at 0x801b)
     - Bokosuka Wars (polls read ID command)
+    - Boukenshatachi
     - Bruce Lee (fdccpu reads port C in a weird fashion)
-    - Castle Excellent (sets sector 0xf4?)
+    - Can Can Bunny Superior
+    - Carmine
+    - Castle Excellent (sets sector 0xf4? Jumps to 0xa100 and it shouldn't)
     - Card Game Pro 8.8k Plus Unit 1 (prints Disk i/o error 135 in vram, not visible for whatever reason)
     - Cuby Panic (copy protection routine at 0x911A)
     - Door Door MK-2 (sets up TC in the middle of execution phase read then wants status bit 6 to be low PC=0x7050 of fdc cpu)
@@ -73,6 +80,7 @@
 	- 100yen Disk 2 / Jumper 2: Sound BGM dies pretty soon;
 	- Alpha (demo): stuck note in title screen, doesn't seem to go further;
     - Ayumi: black screen after new game / load game screen;
+    - Brunette: No sound, eventually hangs at gameplay;
 
 
     games that needs to NOT have write-protect floppies (BTANBs):
