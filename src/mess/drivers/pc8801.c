@@ -20,6 +20,8 @@
     - PC-8801MC disk shows that bitmap and text colors mixes with additive blending (basically if the tv charset has white then the bitmap draws
       with inverted color output).
 	- clean-ups, banking and video in particular (i.e. hook-ups with memory region should go away and device models should be used instead)
+	- OPNA needs dumping of YM2608 deltat ROM
+	- YMF288 support;
 
     per-game specific TODO:
     - 100yen Disk 2 / Jumper 2: Sound BGM dies pretty soon;
@@ -40,7 +42,7 @@
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Grobda: palette is ugly (parent pc8801 only);
     - Hang-On: typical busted attributes for a N-BASIC game
-	- Music Collection Vol. 2 - Final Fantasy Tokushuu: Accesses 0xa8-0xad OPNA ports
+	- Music Collection Vol. 2 - Final Fantasy Tokushuu: Tries to read to ADPCM delta-T ROM
     - Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
     - Xevious: game is too fast (parent pc8801 only)
 
@@ -168,6 +170,7 @@
 #include "machine/i8214.h"
 #include "machine/i8251.h"
 #include "sound/2203intf.h"
+#include "sound/2608intf.h"
 #include "sound/beep.h"
 //#include "includes/pc8801.h"
 
@@ -323,7 +326,10 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
 	DECLARE_READ_LINE_MEMBER(dsr_r);
 	DECLARE_WRITE_LINE_MEMBER(rxrdy_w);
-
+	DECLARE_READ8_MEMBER(pc8801_sound_board_r);
+	DECLARE_WRITE8_MEMBER(pc8801_sound_board_w);
+	DECLARE_READ8_MEMBER(pc8801_opna_r);
+	DECLARE_WRITE8_MEMBER(pc8801_opna_w);
 };
 
 
@@ -1479,6 +1485,46 @@ WRITE8_MEMBER(pc8801_state::pc8801_rtc_w)
 	/* TODO: remaining bits */
 }
 
+READ8_MEMBER(pc8801_state::pc8801_sound_board_r)
+{
+	UINT8 has_opna = machine().root_device().ioport("BOARD_CONFIG")->read() & 1;
+
+	if(has_opna)
+		return ym2608_r(machine().device("opna"), offset);
+
+	return (offset & 2) ? 0xff : ym2203_r(machine().device("opn"), offset);
+}
+
+WRITE8_MEMBER(pc8801_state::pc8801_sound_board_w)
+{
+	UINT8 has_opna = machine().root_device().ioport("BOARD_CONFIG")->read() & 1;
+
+	if(has_opna)
+		ym2608_w(machine().device("opna"), offset,data);
+	else if((offset & 2) == 0)
+		ym2203_w(machine().device("opn"), offset,data);
+}
+
+READ8_MEMBER(pc8801_state::pc8801_opna_r)
+{
+	UINT8 has_opna = machine().root_device().ioport("BOARD_CONFIG")->read() & 1;
+
+	if(has_opna && (offset & 2) == 0)
+		return ym2608_r(machine().device("opna"), (offset & 1) | ((offset & 4) >> 1));
+
+	return 0xff;
+}
+
+WRITE8_MEMBER(pc8801_state::pc8801_opna_w)
+{
+	UINT8 has_opna = machine().root_device().ioport("BOARD_CONFIG")->read() & 1;
+
+	if(has_opna && (offset & 2) == 0)
+		ym2608_w(machine().device("opna"), (offset & 1) | ((offset & 4) >> 1),data);
+	else if(has_opna && offset == 2)
+		m_sound_irq_mask = ((data & 0x80) == 0);
+}
+
 static ADDRESS_MAP_START( pc8801_io, AS_IO, 8, pc8801_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -1509,8 +1555,7 @@ static ADDRESS_MAP_START( pc8801_io, AS_IO, 8, pc8801_state )
 	AM_RANGE(0x34, 0x34) AM_WRITE(pc8801_alu_ctrl1_w)
 	AM_RANGE(0x35, 0x35) AM_WRITE(pc8801_alu_ctrl2_w)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(pc8801_ctrl_r, pc8801_ctrl_w)
-	AM_RANGE(0x44, 0x45) AM_DEVREADWRITE_LEGACY("opn", ym2203_r,ym2203_w)
-//  AM_RANGE(0x46, 0x47) AM_NOP                                     /* OPNA extra port */
+	AM_RANGE(0x44, 0x47) AM_READWRITE(pc8801_sound_board_r,pc8801_sound_board_w) /* OPN / OPNA ports */
 	AM_RANGE(0x50, 0x50) AM_READWRITE(pc8801_crtc_param_r, pc88_crtc_param_w)
 	AM_RANGE(0x51, 0x51) AM_READWRITE(pc8801_crtc_status_r, pc88_crtc_cmd_w)
 	AM_RANGE(0x52, 0x52) AM_WRITE(pc8801_bgpal_w)
@@ -1527,7 +1572,7 @@ static ADDRESS_MAP_START( pc8801_io, AS_IO, 8, pc8801_state )
 	AM_RANGE(0x78, 0x78) AM_WRITE(pc8801_window_bank_inc_w)
 	AM_RANGE(0x90, 0x9f) AM_READWRITE(pc8801_cdrom_r,pc8801_cdrom_w)
 //  AM_RANGE(0xa0, 0xa3) AM_NOP                                     /* music & network */
-//  AM_RANGE(0xa8, 0xad) AM_NOP                                     /* second sound board */
+	AM_RANGE(0xa8, 0xad) AM_READWRITE(pc8801_opna_r,pc8801_opna_w)  /* second sound board */
 //  AM_RANGE(0xb4, 0xb5) AM_NOP                                     /* Video art board */
 //  AM_RANGE(0xc1, 0xc1) AM_NOP                                     /* (unknown) */
 //  AM_RANGE(0xc2, 0xcf) AM_NOP                                     /* music */
@@ -1927,6 +1972,11 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_CONFSETTING(    0x0b, "1.1M (PIO-8234H-1M x 1 + PC-8801-02N x 1)" )
 	PORT_CONFSETTING(    0x0c, "2.1M (PIO-8234H-2M x 1 + PC-8801-02N x 1)" )
 	PORT_CONFSETTING(    0x0d, "4.1M (PIO-8234H-2M x 2 + PC-8801-02N x 1)" )
+
+	PORT_START("BOARD_CONFIG")
+	PORT_CONFNAME( 0x01, 0x00, "Sound Board" )
+	PORT_CONFSETTING(    0x00, "OPN (YM2203)" )
+	PORT_CONFSETTING(    0x01, "OPNA (YM2608)" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc88sr )
@@ -2296,6 +2346,19 @@ static const ym2203_interface pc88_ym2203_intf =
 	pc8801_sound_irq
 };
 
+static const ym2608_interface pc88_ym2608_intf =
+{
+	{
+		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_HANDLER(opn_porta_r),
+		DEVCB_HANDLER(opn_portb_r),
+		DEVCB_NULL,
+		DEVCB_NULL
+	},
+	pc8801_sound_irq
+};
+
 /* Cassette Configuration */
 READ_LINE_MEMBER( pc8801_state::rxdata_callback )
 {
@@ -2393,6 +2456,10 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_SOUND_CONFIG(pc88_ym2203_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
+	MCFG_SOUND_ADD("opna", YM2608, MASTER_CLOCK)
+	MCFG_SOUND_CONFIG(pc88_ym2608_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
@@ -2418,7 +2485,9 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 ) \
 	ROM_REGION( 0x1000, "hiwram", ROMREGION_ERASE00 ) \
 	ROM_REGION( 0x40000, "ewram", ROMREGION_ERASE00 ) \
-	ROM_REGION( 0xc000, "gvram", ROMREGION_ERASE00 )
+	ROM_REGION( 0xc000, "gvram", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x100000, "ymsnd", ROMREGION_ERASEFF ) \
+	ROM_LOAD( "opna.rom",  0x00000, 0x20000, NO_DUMP )
 
 
 ROM_START( pc8801 )
