@@ -29,12 +29,8 @@ M modify memory (. to exit)
 
 ToDo:
 
-- Fix the video, it is currently a complete hackfest.
--- Cursor not working
--- Colours are a guess
--- Doesn't scroll properly.
--- Please note, the colour bytes are intermingled with the characters,
-   this appears to be the most likely mode of operation.
+- Colours (a photo shows colours but the schematic doesn't
+           have any ram for colours).
 
 - Connect the devices (RTC, FDC, PIAs, ACIAs, timer).
 
@@ -71,7 +67,6 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
-	DECLARE_READ8_MEMBER(videoram_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -83,55 +78,8 @@ public:
 	UINT16 m_video_address;
 	UINT8 m_video_index;
 	UINT8 m_term_data;
+	UINT8 m_vidbyte;
 };
-
-
-READ8_MEMBER( v6809_state::videoram_r )
-{
-	return m_p_videoram[m_video_address & 0xfff];
-}
-
-READ8_MEMBER( v6809_state::key_r )
-{
-	UINT8 ret = m_term_data;
-	m_term_data = 0;
-	return ret;
-}
-
-READ8_MEMBER( v6809_state::status_r )
-{
-	return (m_term_data) ? 0x80 : 0;
-}
-
-WRITE8_MEMBER( v6809_state::videoram_w )
-{
-	m_p_videoram[m_video_address & 0xfff] = data;
-}
-
-WRITE8_MEMBER( v6809_state::v6809_address_w )
-{
-	m_crtc->address_w( space, 0, data );
-
-	m_video_index = data & 0x1f;
-
-	// increment address so we can store the colour byte next
-	if (m_video_index == 31)
-		m_video_address++;
-}
-
-WRITE8_MEMBER( v6809_state::v6809_register_w )
-{
-	UINT16 temp = m_video_address >> 1;
-
-	m_crtc->register_w( space, 0, data );
-
-	// Get transparent address
-	if (m_video_index == 18)
-		m_video_address = (((data & 0x3f) << 8 ) | (temp & 0xff)) << 1;
-	else
-	if (m_video_index == 19)
-		m_video_address = (data | (temp & 0xff00)) << 1;
-}
 
 
 static ADDRESS_MAP_START(v6809_mem, AS_PROGRAM, 8, v6809_state)
@@ -139,7 +87,7 @@ static ADDRESS_MAP_START(v6809_mem, AS_PROGRAM, 8, v6809_state)
 	AM_RANGE(0x0000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0xfe) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(v6809_address_w)
 	AM_RANGE(0xf001, 0xf001) AM_MIRROR(0xfe) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(v6809_register_w)
-	AM_RANGE(0xf200, 0xf200) AM_MIRROR(0xff) AM_READWRITE(videoram_r,videoram_w)
+	AM_RANGE(0xf200, 0xf200) AM_MIRROR(0xff) AM_WRITE(videoram_w)
 	//AM_RANGE(0xf505, 0xf506) acia-1 (modem)
 	//AM_RANGE(0xf50c, 0xf50d) acia-2 (printer)
 	//AM_RANGE(0xf600, 0xf603) AM_MIRROR(0x3c) disk controller
@@ -163,10 +111,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( v6809 )
 INPUT_PORTS_END
 
-
-static MACHINE_RESET(v6809)
-{
-}
+// **** Video ****
 
 /* F4 Character Displayer */
 static const gfx_layout v6809_charlayout =
@@ -183,47 +128,43 @@ static const gfx_layout v6809_charlayout =
 };
 
 static GFXDECODE_START( v6809 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, v6809_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, v6809_charlayout, 0, 4 )
 GFXDECODE_END
 
 MC6845_UPDATE_ROW( v6809_update_row )
 {
 	v6809_state *state = device->machine().driver_data<v6809_state>();
 	const rgb_t *palette = palette_entry_list_raw(bitmap.palette());
-	UINT8 chr,gfx,col,bg,fg;
+	UINT8 chr,gfx;
 	UINT16 mem,x;
 	UINT32 *p = &bitmap.pix32(y);
 
-	ma &= 0x7ff;
-
 	for (x = 0; x < x_count; x++)
 	{
-		mem = (ma + x) << 1;
-		chr = state->m_p_videoram[mem++];
-		if (!chr) chr=0x20; // remove when we get the correct chargen
-
-		col = state->m_p_videoram[mem];
-		fg = col >> 4;
-		bg = col & 15;
-
-		/* get pattern of pixels for that character scanline */
-		gfx = state->m_p_chargen[(chr<<4) | ra] ^ ((x == cursor_x) ? 0xff : 0);
+		mem = (ma + x) & 0x7ff;
+		chr = state->m_p_videoram[mem];
+		if (x == cursor_x)
+			gfx = 0xff;
+		else
+			gfx = state->m_p_chargen[(chr<<4) | ra];
 
 		/* Display a scanline of a character (8 pixels) */
-		*p++ = palette[BIT(gfx, 7) ? fg : bg];
-		*p++ = palette[BIT(gfx, 6) ? fg : bg];
-		*p++ = palette[BIT(gfx, 5) ? fg : bg];
-		*p++ = palette[BIT(gfx, 4) ? fg : bg];
-		*p++ = palette[BIT(gfx, 3) ? fg : bg];
-		*p++ = palette[BIT(gfx, 2) ? fg : bg];
-		*p++ = palette[BIT(gfx, 1) ? fg : bg];
-		*p++ = palette[BIT(gfx, 0) ? fg : bg];
+		*p++ = palette[BIT(gfx, 7)];
+		*p++ = palette[BIT(gfx, 6)];
+		*p++ = palette[BIT(gfx, 5)];
+		*p++ = palette[BIT(gfx, 4)];
+		*p++ = palette[BIT(gfx, 3)];
+		*p++ = palette[BIT(gfx, 2)];
+		*p++ = palette[BIT(gfx, 1)];
+		*p++ = palette[BIT(gfx, 0)];
 	}
 }
 
 MC6845_ON_UPDATE_ADDR_CHANGED( v6809_update_addr )
 {
 /* not sure what goes in here - parameters passed are device, address, strobe */
+	v6809_state *state = device->machine().driver_data<v6809_state>();
+	state->m_video_address = address & 0x7ff;
 }
 
 static VIDEO_START( v6809 )
@@ -246,6 +187,49 @@ static const mc6845_interface v6809_crtc = {
 	v6809_update_addr		/* handler to process transparent mode */
 };
 
+WRITE8_MEMBER( v6809_state::videoram_w )
+{
+	m_vidbyte = data;
+}
+
+WRITE8_MEMBER( v6809_state::v6809_address_w )
+{
+	m_crtc->address_w( space, 0, data );
+
+	m_video_index = data & 0x1f;
+
+	if (m_video_index == 31)
+		m_p_videoram[m_video_address] = m_vidbyte;
+}
+
+WRITE8_MEMBER( v6809_state::v6809_register_w )
+{
+	UINT16 temp = m_video_address;
+
+	m_crtc->register_w( space, 0, data );
+
+	// Get transparent address
+	if (m_video_index == 18)
+		m_video_address = ((data & 7) << 8 ) | (temp & 0xff);
+	else
+	if (m_video_index == 19)
+		m_video_address = data | (temp & 0xff00);
+}
+
+// **** Keyboard ****
+
+READ8_MEMBER( v6809_state::key_r )
+{
+	UINT8 ret = m_term_data;
+	m_term_data = 0;
+	return ret;
+}
+
+READ8_MEMBER( v6809_state::status_r )
+{
+	return (m_term_data) ? 0x80 : 0;
+}
+
 WRITE8_MEMBER( v6809_state::kbd_put )
 {
 	m_term_data = data;
@@ -255,6 +239,12 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 {
 	DEVCB_DRIVER_MEMBER(v6809_state, kbd_put)
 };
+
+// *** Machine ****
+
+static MACHINE_RESET(v6809)
+{
+}
 
 static MACHINE_CONFIG_START( v6809, v6809_state )
 	/* basic machine hardware */
@@ -272,7 +262,8 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
 	MCFG_VIDEO_START(v6809)
-	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_LENGTH(2)
+	MCFG_PALETTE_INIT(black_and_white)
 	MCFG_GFXDECODE(v6809)
 
 	/* Devices */
