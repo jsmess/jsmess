@@ -31,12 +31,16 @@ public:
 
 static ADDRESS_MAP_START(ms0515_mem, AS_PROGRAM, 16, ms0515_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0000000, 0037777) AM_RAMBANK("bank0") // RAM
-	AM_RANGE(0040000, 0077777) AM_RAMBANK("bank1") // RAM
-	AM_RANGE(0100000, 0137777) AM_RAMBANK("bank2") // RAM
-	AM_RANGE(0140000, 0157777) AM_RAMBANK("bank3") // RAM
+	AM_RANGE(0000000, 0017777) AM_RAMBANK("bank0") // RAM
+	AM_RANGE(0020000, 0037777) AM_RAMBANK("bank1") // RAM
+	AM_RANGE(0040000, 0057777) AM_RAMBANK("bank2") // RAM
+	AM_RANGE(0060000, 0077777) AM_RAMBANK("bank3") // RAM
+	AM_RANGE(0100000, 0117777) AM_RAMBANK("bank4") // RAM
+	AM_RANGE(0120000, 0137777) AM_RAMBANK("bank5") // RAM
+	AM_RANGE(0140000, 0157777) AM_RAMBANK("bank6") // RAM
+
 	AM_RANGE(0160000, 0177377) AM_ROM	
-	
+
 	AM_RANGE(0177400, 0177437) AM_WRITE(ms0515_bank_w) // Register for RAM expansion
 	
 	//AM_RANGE(0177440, 0177441)  // read data
@@ -74,30 +78,43 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(ms0515_state::ms0515_bank_w)
 {
-	switch((data >> 10) % 3)
-	{
-		case 0: // 000000 - 037777
-				break;
-		case 1: // 040000 - 077777
-				break;
-		case 2: 
-		case 3: // 100000 - 137777
-				break;
-	}
-	
+	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	membank("bank0")->set_base(ram + 0000000 + BIT(data,0) * 0160000);
+	membank("bank1")->set_base(ram + 0020000 + BIT(data,1) * 0160000);
+	membank("bank2")->set_base(ram + 0040000 + BIT(data,2) * 0160000);
+	membank("bank3")->set_base(ram + 0060000 + BIT(data,3) * 0160000);
+	membank("bank4")->set_base(ram + 0100000 + BIT(data,4) * 0160000);
+	membank("bank5")->set_base(ram + 0120000 + BIT(data,5) * 0160000);
+	membank("bank6")->set_base(ram + 0140000 + BIT(data,6) * 0160000);
+	if (BIT(data,7)) {
+		switch((data >> 10) % 3)
+		{
+			case 0: // 000000 - 037777
+					membank("bank0")->set_base(ram + 0000000 + 0340000);
+					membank("bank1")->set_base(ram + 0020000 + 0340000);
+					break;
+			case 1: // 040000 - 077777
+					membank("bank2")->set_base(ram + 0000000 + 0340000);
+					membank("bank3")->set_base(ram + 0020000 + 0340000);
+					break;
+			case 2: 
+			case 3: // 100000 - 137777
+					membank("bank4")->set_base(ram + 0000000 + 0340000);
+					membank("bank5")->set_base(ram + 0020000 + 0340000);
+					break;
+		}
+	}	
 	printf("bank[%d] %02x video %d\n",((data >> 10) % 3),data & 0x7f, BIT(data,7));
 }
 
 void ms0515_state::machine_reset()
 {
 	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
-	membank("bank0")->set_base(ram + 0000000);
-	membank("bank1")->set_base(ram + 0040000);
-	membank("bank2")->set_base(ram + 0100000);
-	membank("bank3")->set_base(ram + 0140000);
+	ms0515_bank_w(*machine().memory().first_space(),0,0);
 	
-	m_video_ram = ram + 0040000;
+	m_video_ram = ram + 0000000 + 0340000;
 }
+
 /* Input ports */
 static INPUT_PORTS_START( ms0515 )
 INPUT_PORTS_END
