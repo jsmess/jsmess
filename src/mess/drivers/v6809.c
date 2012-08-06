@@ -117,7 +117,7 @@ INPUT_PORTS_END
 static const gfx_layout v6809_charlayout =
 {
 	8, 10,					/* 8 x 10 characters */
-	128,					/* 128 characters */
+	256,					/* 128 characters */
 	1,					/* 1 bits per pixel */
 	{ 0 },					/* no bitplanes */
 	/* x offsets */
@@ -128,7 +128,7 @@ static const gfx_layout v6809_charlayout =
 };
 
 static GFXDECODE_START( v6809 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, v6809_charlayout, 0, 4 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, v6809_charlayout, 0, 1 )
 GFXDECODE_END
 
 MC6845_UPDATE_ROW( v6809_update_row )
@@ -276,11 +276,12 @@ ROM_START( v6809 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "v6809.rom", 0xf800, 0x0800, CRC(54bf5f32) SHA1(10d1d70f0b51e2b90e5c29249d3eab4c6b0033a1) )
 
-	ROM_REGION( 0x1000, "videoram", ROMREGION_ERASE00 )
+	ROM_REGION( 0x800, "videoram", ROMREGION_ERASE00 )
 
 	/* character generator not dumped, using the one from 'h19' for now */
-	ROM_REGION( 0x2000, "chargen", 0 )
+	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, BAD_DUMP CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+	ROM_RELOAD(0x0800, 0x0800)
 ROM_END
 
 /* Driver */
