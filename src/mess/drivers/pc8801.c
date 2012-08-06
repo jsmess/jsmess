@@ -37,13 +37,14 @@
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Grobda: palette is ugly (parent pc8801 only);
     - Hang-On: typical busted attributes for a N-BASIC game
+	- Music Collection Vol. 2 - Final Fantasy Tokushuu: Accesses 0xa8-0xad OPNA ports
     - Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
     - Xevious: game is too fast (parent pc8801 only)
 
     list of games that crashes due of floppy issues:
     - Agni no Ishi
     - American Truck / American Truck SR (polls read deleted data command)
-    - Bersekers Front Gaiden 3
+    - Bersekers Front Gaiden 3 (0x9000 RAM uploads ONLY odd bytes)
     - Bokosuka Wars (polls read ID command)
     - Bouken Roman
     - Bruce Lee
