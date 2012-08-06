@@ -43,10 +43,10 @@
 
     list of games that crashes due of floppy issues:
     - Agni no Ishi
+    - Amazoness no Hihou (takes invalid data from floppy)
     - American Truck / American Truck SR (polls read deleted data command)
     - Bokosuka Wars (polls read ID command)
-    - Bouken Roman
-    - Bruce Lee
+    - Bruce Lee (fdccpu reads port C in a weird fashion)
     - Burning Point (trips a spurious irq)
     - Burunet
     - Castle Excellent (sets sector 0xf4?)
