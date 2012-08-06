@@ -1569,11 +1569,12 @@ static WRITE8_DEVICE_HANDLER( cpu_8255_c_w )
 	state->m_i8255_0_pc = data;
 }
 
+
 static I8255A_INTERFACE( master_fdd_intf )
 {
 	DEVCB_DEVICE_MEMBER("d8255_slave", i8255_device, pb_r),	// Port A read
 	DEVCB_NULL,							// Port A write
-	DEVCB_NULL,							// Port B read
+	DEVCB_DEVICE_MEMBER("d8255_slave", i8255_device, pa_r), // Port B read
 	DEVCB_NULL,							// Port B write
 	DEVCB_HANDLER(cpu_8255_c_r),		// Port C read
 	DEVCB_HANDLER(cpu_8255_c_w)			// Port C write
@@ -1599,7 +1600,7 @@ static I8255A_INTERFACE( slave_fdd_intf )
 {
 	DEVCB_DEVICE_MEMBER("d8255_master", i8255_device, pb_r),	// Port A read
 	DEVCB_NULL,							// Port A write
-	DEVCB_NULL,							// Port B read
+	DEVCB_DEVICE_MEMBER("d8255_master", i8255_device, pa_r),	// Port B read
 	DEVCB_NULL,							// Port B write
 	DEVCB_HANDLER(fdc_8255_c_r),		// Port C read
 	DEVCB_HANDLER(fdc_8255_c_w)			// Port C write
