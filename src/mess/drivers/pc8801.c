@@ -28,9 +28,9 @@
     - American Success: reads the light pen?
     - Alpha (demo): stuck note in title screen, doesn't seem to go further;
     - Balance of Power: uses the SIO port for mouse polling;
-    - Battle Entry: moans with a JP msg then dies if you try to press either numpad 1 or 2 (asks if the user wants to use the sound board (yes 1 / no 2)
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
-    - The Black Onyx: writes a katakana msg: "rino kata ha koko ni orimasen" then doesn't show up anything.
+    - The Black Onyx: writes a katakana msg: "rino kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
+    - Brunette: No sound, eventually hangs at gameplay;
     - Can Can Bunny: bitmap artifacts on intro, could be either ALU or floppy issues;
     - Carrot: gfxs are messed up
     - Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
@@ -48,7 +48,6 @@
     - Bokosuka Wars (polls read ID command)
     - Bruce Lee (fdccpu reads port C in a weird fashion)
     - Burning Point (trips a spurious irq)
-    - Burunet
     - Castle Excellent (sets sector 0xf4?)
     - Card Game Pro 8.8k Plus Unit 1 (prints Disk i/o error 135 in vram, not visible for whatever reason)
     - Cuby Panic (copy protection routine at 0x911A)
@@ -57,7 +56,6 @@
     - Jark (needs PC-8801MC)
     - MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
     - Mr. Pro Yakyuu
-    - Space Harrier
     - The Return of Ishtar
     - Tobira wo Akete (random crashes in parent pc8801 only)
 
