@@ -2,7 +2,7 @@
 
     PC-8801 (c) 1981 NEC
 
-    preliminary driver by Angelo Salese, original MESS PC-88SR driver by ???
+    driver by Angelo Salese, original MESS PC-88SR driver by ???
 
     TODO:
     - implement proper i8214 routing, also add irq latch mechanism;
@@ -22,7 +22,10 @@
 	- clean-ups, banking and video in particular (i.e. hook-ups with memory region should go away and device models should be used instead)
 
     per-game specific TODO:
+    - 100yen Disk 2 / Jumper 2: Sound BGM dies pretty soon;
+    - 100yen Soft 8 Revival Special: tight loop with vblank bit, but vblank irq takes too much time to execute its code;
     - 177: gameplay is too fast (parent pc8801 only);
+    - 1942: missing sound, enables a masked irq;
     - Acro Jet: hangs waiting for an irq (floppy issue);
     - Advanced Fantasian: wants an irq that can't happen (I is equal to 0x3f)
     - American Success: reads the light pen?
@@ -60,6 +63,7 @@
     - Tobira wo Akete (random crashes in parent pc8801 only)
 
     games that needs to NOT have write-protect floppies (BTANBs):
+    - 100 Yen Disk 7: (doesn't boot in V2 mode)
     - Balance of Power
     - Blue Moon Story: moans with a kanji msg;.
     - Tobira wo Akete (hangs at title screen)
@@ -1603,6 +1607,7 @@ static I8255A_INTERFACE( slave_fdd_intf )
 	DEVCB_HANDLER(fdc_8255_c_w)			// Port C write
 };
 
+
 static ADDRESS_MAP_START( pc8801fdc_mem, AS_PROGRAM, 8, pc8801_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
@@ -1636,6 +1641,7 @@ READ8_MEMBER(pc8801_state::upd765_tc_r)
 
 WRITE8_MEMBER(pc8801_state::fdc_irq_vector_w)
 {
+	popmessage("Write to FDC IRQ vector I/O %02x, contact MESSdev\n",data);
 	m_fdc_irq_opcode = data;
 }
 
@@ -2100,6 +2106,8 @@ static IRQ_CALLBACK( pc8801_irq_callback )
 static void pc8801_sound_irq( device_t *device, int irq )
 {
 	pc8801_state *state = device->machine().driver_data<pc8801_state>();
+
+//	printf("%02x %02x %02x\n",state->m_sound_irq_mask,state->m_i8214_irq_level,irq);
 	if(state->m_sound_irq_mask && state->m_i8214_irq_level >= 5 && irq)
 	{
 		state->m_sound_irq_latch = 1;
