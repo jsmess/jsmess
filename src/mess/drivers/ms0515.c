@@ -120,6 +120,8 @@ void ms0515_state::machine_reset()
 	
 	m_video_ram = ram + 0000000 + 0340000;
 	m_blink = 0;
+	
+	floppy_mon_w(machine().device(FLOPPY_0), 0); // turn it on	
 }
 
 /* Input ports */
@@ -141,7 +143,7 @@ static const wd17xx_interface ms0515_wd17xx_interface =
 
 
 static LEGACY_FLOPPY_OPTIONS_START(ms0515)
-	LEGACY_FLOPPY_OPTION(ms0515, "dz", "MS0515 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
+	LEGACY_FLOPPY_OPTION(ms0515, "dsk", "MS0515 disk image", basicdsk_identify_default, basicdsk_construct_default, NULL,
 		HEADS([1])
 		TRACKS([80])
 		SECTORS([10])
