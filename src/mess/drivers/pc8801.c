@@ -32,6 +32,8 @@
     - Advanced Fantasian: wants an irq that can't happen (I is equal to 0x3f)
     - American Success: reads the light pen?
     - Alpha (demo): stuck note in title screen, doesn't seem to go further;
+    - Arion: random hang, FDC CPU communication issue?
+    - Art of War: spurious sound irq;
     - Balance of Power: uses the SIO port for mouse polling;
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
     - The Black Onyx: writes a katakana msg: "rino kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
@@ -50,6 +52,11 @@
     - Agni no Ishi
     - Amazoness no Hihou (takes invalid data from floppy)
     - American Truck / American Truck SR (polls read deleted data command)
+    - Ankokujou
+    - Ao No Sekizou (fdc CPU irq doesn't fire anymore)
+    - Arcus
+    - Arcus (demo) (After Wolf Team logo)
+    - Arcus 2 (at PCM loading)
     - Bokosuka Wars (polls read ID command)
     - Bruce Lee (fdccpu reads port C in a weird fashion)
     - Burning Point (trips a spurious irq)
@@ -1132,7 +1139,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_irq_level_w)
 	else
 		m_i8214_irq_level = data & 7;
 
-	//IRQ_LOG(("%02x LV\n",m_i8214_irq_level));
+	IRQ_LOG(("%02x LV\n",m_i8214_irq_level));
 }
 
 
@@ -1147,10 +1154,10 @@ WRITE8_MEMBER(pc8801_state::pc8801_irq_mask_w)
 	if(m_vrtc_irq_mask == 0)
 		m_vrtc_irq_latch = 0;
 
-	if(m_timer_irq_mask == 0 && m_vrtc_irq_mask == 0)
+	if(m_timer_irq_latch == 0 && m_vrtc_irq_latch == 0 && m_sound_irq_latch == 0)
 		cputag_set_input_line(machine(),"maincpu",0,CLEAR_LINE);
 
-	//IRQ_LOG(("%02x MASK\n",data));
+	IRQ_LOG(("%02x MASK (%02x %02x)\n",data,m_timer_irq_latch,m_vrtc_irq_latch));
 
 	//if(data & 4)
 	//  printf("IRQ mask %02x\n",data);
@@ -1189,6 +1196,9 @@ WRITE8_MEMBER(pc8801_state::pc8801_misc_ctrl_w)
 
 	if(m_sound_irq_mask == 0)
 		m_sound_irq_latch = 0;
+
+	if(m_timer_irq_latch == 0 && m_vrtc_irq_latch == 0 && m_sound_irq_latch == 0)
+		cputag_set_input_line(machine(),"maincpu",0,CLEAR_LINE);
 	#endif
 }
 
@@ -2161,7 +2171,7 @@ static void pc8801_sound_irq( device_t *device, int irq )
 	if(state->m_sound_irq_mask && state->m_i8214_irq_level >= 5 && irq)
 	{
 		state->m_sound_irq_latch = 1;
-		//IRQ_LOG(("sound\n"));
+		IRQ_LOG(("sound\n"));
 		cputag_set_input_line(device->machine(),"maincpu",0,HOLD_LINE);
 	}
 }
@@ -2172,7 +2182,7 @@ static TIMER_DEVICE_CALLBACK( pc8801_rtc_irq )
 	if(state->m_timer_irq_mask && state->m_i8214_irq_level >= 3)
 	{
 		state->m_timer_irq_latch = 1;
-		//IRQ_LOG(("timer\n"));
+		IRQ_LOG(("timer\n"));
 		cputag_set_input_line(timer.machine(),"maincpu",0,HOLD_LINE);
 	}
 }
@@ -2183,7 +2193,7 @@ static INTERRUPT_GEN( pc8801_vrtc_irq )
 	if(state->m_vrtc_irq_mask && state->m_i8214_irq_level >= 2)
 	{
 		state->m_vrtc_irq_latch = 1;
-		//IRQ_LOG(("vrtc\n"));
+		IRQ_LOG(("vrtc\n"));
 		device_set_input_line(device,0,HOLD_LINE);
 	}
 }
