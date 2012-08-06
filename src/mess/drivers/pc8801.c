@@ -33,13 +33,13 @@
     - American Success: reads the light pen?
     - Alpha (demo): stuck note in title screen, doesn't seem to go further;
     - Arion: random hang, FDC CPU communication issue?
-    - Art of War: spurious sound irq;
     - Balance of Power: uses the SIO port for mouse polling;
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
     - The Black Onyx: writes a katakana msg: "rino kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
     - Brunette: No sound, eventually hangs at gameplay;
     - Can Can Bunny: bitmap artifacts on intro, could be either ALU or floppy issues;
     - Carrot: gfxs are messed up
+	- Castle Excellent: hard-crashes my OS if attempts it to boot in 15 KHz Monitor Mode (???)
     - Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Grobda: palette is ugly (parent pc8801 only);
@@ -59,7 +59,6 @@
     - Arcus 2 (at PCM loading)
     - Bokosuka Wars (polls read ID command)
     - Bruce Lee (fdccpu reads port C in a weird fashion)
-    - Burning Point (trips a spurious irq)
     - Castle Excellent (sets sector 0xf4?)
     - Card Game Pro 8.8k Plus Unit 1 (prints Disk i/o error 135 in vram, not visible for whatever reason)
     - Cuby Panic (copy protection routine at 0x911A)
@@ -302,7 +301,9 @@ public:
 	DECLARE_WRITE8_MEMBER(pc88_crtc_param_w);
 	DECLARE_READ8_MEMBER(pc8801_crtc_status_r);
 	DECLARE_WRITE8_MEMBER(pc88_crtc_cmd_w);
+	DECLARE_READ8_MEMBER(pc8801_dmac_r);
 	DECLARE_WRITE8_MEMBER(pc8801_dmac_w);
+	DECLARE_READ8_MEMBER(pc8801_dmac_status_r);
 	DECLARE_WRITE8_MEMBER(pc8801_dmac_mode_w);
 	DECLARE_READ8_MEMBER(pc8801_extram_mode_r);
 	DECLARE_WRITE8_MEMBER(pc8801_extram_mode_w);
@@ -647,6 +648,8 @@ static void draw_text(running_machine &machine, bitmap_ind16 &bitmap,int y_size,
 	UINT8 blink;
 	int pal;
 
+	popmessage("%02x",state->m_crtc.param[0][4]);
+
 	for(y=0;y<y_size;y++)
 	{
 		for(x=0;x<80;x++)
@@ -691,6 +694,8 @@ static SCREEN_UPDATE_IND16( pc8801 )
 {
 	pc8801_state *state = screen.machine().driver_data<pc8801_state>();
 	bitmap.fill(screen.machine().pens[0], cliprect);
+
+//	popmessage("%04x %04x %02x",state->m_dma_address[2],state->m_dma_counter[2],state->m_dmac_mode);
 
 	if(state->m_gfx_ctrl & 8)
 	{
@@ -1322,9 +1327,14 @@ WRITE8_MEMBER(pc8801_state::pc88_crtc_cmd_w)
 	//  printf("CRTC cmd %s polled\n",crtc_command[data >> 5]);
 }
 
+READ8_MEMBER(pc8801_state::pc8801_dmac_r)
+{
+	printf("DMAC R %08x\n",offset);
+	return 0xff;
+}
+
 WRITE8_MEMBER(pc8801_state::pc8801_dmac_w)
 {
-
 	if(offset & 1)
 		m_dma_counter[offset >> 1] = (m_dmac_ff) ? (m_dma_counter[offset >> 1]&0xff)|(data<<8) : (m_dma_counter[offset >> 1]&0xff00)|(data&0xff);
 	else
@@ -1333,9 +1343,19 @@ WRITE8_MEMBER(pc8801_state::pc8801_dmac_w)
 	m_dmac_ff ^= 1;
 }
 
+READ8_MEMBER(pc8801_state::pc8801_dmac_status_r)
+{
+	printf("DMAC R STATUS\n");
+	return 0xff;
+}
+
 WRITE8_MEMBER(pc8801_state::pc8801_dmac_mode_w)
 {
 	m_dmac_mode = data;
+	m_dmac_ff = 0;
+
+	if(data != 0xe4 && data != 0xa0)
+		printf("%02x DMAC mode\n",data);
 }
 
 READ8_MEMBER(pc8801_state::pc8801_extram_mode_r)
@@ -1573,8 +1593,8 @@ static ADDRESS_MAP_START( pc8801_io, AS_IO, 8, pc8801_state )
 	AM_RANGE(0x54, 0x5b) AM_WRITE(pc8801_palram_w)
 	AM_RANGE(0x5c, 0x5c) AM_READ(pc8801_vram_select_r)
 	AM_RANGE(0x5c, 0x5f) AM_WRITE(pc8801_vram_select_w)
-	AM_RANGE(0x60, 0x67) AM_WRITE(pc8801_dmac_w)
-	AM_RANGE(0x68, 0x68) AM_WRITE(pc8801_dmac_mode_w)
+	AM_RANGE(0x60, 0x67) AM_READWRITE(pc8801_dmac_r,pc8801_dmac_w)
+	AM_RANGE(0x68, 0x68) AM_READWRITE(pc8801_dmac_status_r,pc8801_dmac_mode_w)
 	AM_RANGE(0x6e, 0x6e) AM_READ(pc8801_cpuclock_r)
 	AM_RANGE(0x6f, 0x6f) AM_READWRITE(pc8801_baudrate_r,pc8801_baudrate_w)
 	AM_RANGE(0x70, 0x70) AM_READWRITE(pc8801_window_bank_r, pc8801_window_bank_w)
@@ -2448,10 +2468,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK_15KHz,896,0,640,256,0,200)
 	MCFG_SCREEN_UPDATE_STATIC(pc8801)
 
 	MCFG_GFXDECODE( pc8801 )
