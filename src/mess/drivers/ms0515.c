@@ -12,6 +12,7 @@
 #include "imagedev/flopdrv.h"
 #include "formats/basicdsk.h"
 #include "machine/ram.h"
+#include "machine/i8255.h"
 
 class ms0515_state : public driver_device
 {
@@ -23,10 +24,14 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	
-	DECLARE_WRITE16_MEMBER(ms0515_bank_w);
+	DECLARE_WRITE16_MEMBER(ms0515_bank_w);	
+	DECLARE_WRITE8_MEMBER(ms0515_sys_w);
+	
 	virtual void machine_reset();
 	
 	UINT8 *m_video_ram;
+	UINT8 m_sysreg;
+	int m_blink;
 };
 
 static ADDRESS_MAP_START(ms0515_mem, AS_PROGRAM, 16, ms0515_state)
@@ -57,11 +62,8 @@ static ADDRESS_MAP_START(ms0515_mem, AS_PROGRAM, 16, ms0515_state)
 	//AM_RANGE(0177542, 0177543)
 	//AM_RANGE(0177544, 0177545)  // i8255 for MS-7007 Keyboard
 	//AM_RANGE(0177546, 0177547)
-
-	//AM_RANGE(0177600, 0177601)
-	//AM_RANGE(0177602, 0177603)
-	//AM_RANGE(0177604, 0177605)  // i8255 for parallel port
-	//AM_RANGE(0177606, 0177607)
+	
+	AM_RANGE(0177600, 0177607) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0x00ff) 
 	
 	AM_RANGE(0177640, 0177641) AM_DEVREADWRITE8_LEGACY("vg93", wd17xx_status_r, wd17xx_command_w,0x00ff)
 	AM_RANGE(0177642, 0177643) AM_DEVREADWRITE8_LEGACY("vg93", wd17xx_track_r, wd17xx_track_w,0x00ff)
@@ -104,7 +106,11 @@ WRITE16_MEMBER(ms0515_state::ms0515_bank_w)
 					break;
 		}
 	}	
-	printf("bank[%d] %02x video %d\n",((data >> 10) % 3),data & 0x7f, BIT(data,7));
+}
+
+WRITE8_MEMBER(ms0515_state::ms0515_sys_w)
+{
+	m_sysreg = data;
 }
 
 void ms0515_state::machine_reset()
@@ -113,6 +119,7 @@ void ms0515_state::machine_reset()
 	ms0515_bank_w(*machine().memory().first_space(),0,0);
 	
 	m_video_ram = ram + 0000000 + 0340000;
+	m_blink = 0;
 }
 
 /* Input ports */
@@ -157,27 +164,87 @@ static const floppy_interface ms0515_floppy_interface =
 
 static SCREEN_UPDATE_IND16( ms0515 )
 {
-	ms0515_state *state = screen.machine().driver_data<ms0515_state>();
-	UINT8 code;
-	int y, x, b;
-
+	ms0515_state *state = screen.machine().driver_data<ms0515_state>();	
+	int y, x, b;	
 	int addr = 0;
-	for (y = 0; y < 200; y++)
-	{
-		int horpos = 0;
-		for (x = 0; x < 40; x++)
+	if (BIT(state->m_sysreg,3))  {
+		for (y = 0; y < 200; y++)
 		{
-			code = state->m_video_ram[addr]; addr+=2;
-			for (b = 0; b < 8; b++)
+			int horpos = 0;
+			for (x = 0; x < 40; x++)
 			{
-				// In lower res mode we will just double pixels
-				bitmap.pix16(y, horpos++) =  (code >> (7-b)) & 0x01;
-				bitmap.pix16(y, horpos++) =  (code >> (7-b)) & 0x01;
+				UINT16 code = (state->m_video_ram[addr++] << 8);
+				code += state->m_video_ram[addr++];
+				for (b = 0; b < 16; b++)
+				{
+					// In lower res mode we will just double pixels
+					bitmap.pix16(y, horpos++) =  ((code >> (15-b)) & 0x01) ? 0 : 7;
+				}
+			}
+		}
+	} else {
+		for (y = 0; y < 200; y++)
+		{
+			int horpos = 0;
+			for (x = 0; x < 40; x++)
+			{
+				UINT8 code = state->m_video_ram[addr++]; 
+				UINT8 attr = state->m_video_ram[addr++]; 			
+				UINT8 fg = (attr & 7) + BIT(attr,14)*8;
+				UINT8 bg = ((attr >> 3) & 7) + BIT(attr,14)*8;
+				if (BIT(attr,15) && (state->m_blink == 20)) {
+					UINT8 tmp = fg;
+					fg = bg; bg = tmp;
+					state->m_blink = -1;
+				}
+				for (b = 0; b < 8; b++)
+				{
+					// In lower res mode we will just double pixels
+					bitmap.pix16(y, horpos++) =  ((code >> (7-b)) & 0x01) ? fg : bg;
+					bitmap.pix16(y, horpos++) =  ((code >> (7-b)) & 0x01) ? fg : bg;
+				}
 			}
 		}
 	}
+	state->m_blink++;
 	return 0;
 }
+
+static PALETTE_INIT( ms0515 )
+{
+	palette_set_color(machine, 0, MAKE_RGB(0, 0, 0));
+	palette_set_color(machine, 1, MAKE_RGB(0, 0, 127));
+	palette_set_color(machine, 2, MAKE_RGB(127, 0, 0));
+	palette_set_color(machine, 3, MAKE_RGB(127, 0, 127));
+	palette_set_color(machine, 4, MAKE_RGB(0, 127, 0));
+	palette_set_color(machine, 5, MAKE_RGB(0, 127, 127));
+	palette_set_color(machine, 6, MAKE_RGB(127, 127, 0));
+	palette_set_color(machine, 7, MAKE_RGB(127, 127, 127));
+	
+	palette_set_color(machine, 8, MAKE_RGB(127, 127, 127));
+	palette_set_color(machine, 9, MAKE_RGB(127, 127, 255));
+	palette_set_color(machine, 10, MAKE_RGB(255, 127, 127));
+	palette_set_color(machine, 11, MAKE_RGB(255, 127, 255));
+	palette_set_color(machine, 12, MAKE_RGB(127, 255, 127));
+	palette_set_color(machine, 13, MAKE_RGB(127, 255, 255));
+	palette_set_color(machine, 14, MAKE_RGB(255, 255, 127));
+	palette_set_color(machine, 15, MAKE_RGB(255, 255, 255));	
+}
+
+static WRITE8_DEVICE_HANDLER(ms0515_portc_w)
+{
+	ms0515_state *state = device->machine().driver_data<ms0515_state>();
+	state->m_sysreg = data;
+}
+I8255A_INTERFACE( ms0515_ppi8255_interface_1 )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(ms0515_portc_w)
+};
 
 static MACHINE_CONFIG_START( ms0515, ms0515_state )
 	/* basic machine hardware */
@@ -197,8 +264,11 @@ static MACHINE_CONFIG_START( ms0515, ms0515_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
     MCFG_SCREEN_UPDATE_STATIC(ms0515)
 	
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_PALETTE_LENGTH(16)
+	MCFG_PALETTE_INIT(ms0515)
+	
+	MCFG_I8255_ADD( "ppi8255_1", ms0515_ppi8255_interface_1 )
+	//MCFG_I8255_ADD( "ppi8255_2", ms0515_ppi8255_interface_2 )
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
