@@ -24,14 +24,12 @@
 	- YMF288 support;
 
     per-game specific TODO:
-    - 100yen Disk 2 / Jumper 2: Sound BGM dies pretty soon;
     - 100yen Soft 8 Revival Special: tight loop with vblank bit, but vblank irq takes too much time to execute its code;
     - 177: gameplay is too fast (parent pc8801 only);
     - 1942: missing sound, enables a masked irq;
     - Acro Jet: hangs waiting for an irq (floppy issue);
     - Advanced Fantasian: wants an irq that can't happen (I is equal to 0x3f)
     - American Success: reads the light pen?
-    - Alpha (demo): stuck note in title screen, doesn't seem to go further;
     - Arion: random hang, FDC CPU communication issue?
     - Balance of Power: uses the SIO port for mouse polling;
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
@@ -39,7 +37,6 @@
     - Brunette: No sound, eventually hangs at gameplay;
     - Can Can Bunny: bitmap artifacts on intro, could be either ALU or floppy issues;
     - Carrot: gfxs are messed up
-	- Castle Excellent: hard-crashes my OS if attempts it to boot in 15 KHz Monitor Mode (???)
     - Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Grobda: palette is ugly (parent pc8801 only);
@@ -57,6 +54,8 @@
     - Arcus
     - Arcus (demo) (After Wolf Team logo)
     - Arcus 2 (at PCM loading)
+    - Attacker
+    - Autumn Park (BASIC error)
     - Bokosuka Wars (polls read ID command)
     - Bruce Lee (fdccpu reads port C in a weird fashion)
     - Castle Excellent (sets sector 0xf4?)
@@ -70,6 +69,12 @@
     - The Return of Ishtar
     - Tobira wo Akete (random crashes in parent pc8801 only)
 
+	list of games that doesn't like i8214_irq_level == 5 in sound irq
+	- 100yen Disk 2 / Jumper 2: Sound BGM dies pretty soon;
+	- Alpha (demo): stuck note in title screen, doesn't seem to go further;
+    - Ayumi: black screen after new game / load game screen;
+
+
     games that needs to NOT have write-protect floppies (BTANBs):
     - 100 Yen Disk 7: (doesn't boot in V2 mode)
     - Balance of Power
@@ -77,7 +82,8 @@
     - Tobira wo Akete (hangs at title screen)
 
 	other BTANBs
-	- Kuronekosou Souzoku Satsujin Jiken ("Illegal function call in 105" <- needs BASIC V1)
+	- Attack Hirokochan: returns to BASIC after an initial animation, needs BASIC V1:
+	- Kuronekosou Souzoku Satsujin Jiken: "Illegal function call in 105", needs BASIC V1;
 
     Notes:
     - BIOS disk ROM defines what kind of floppies you could load:
@@ -434,7 +440,7 @@ static void draw_bitmap_3bpp(running_machine &machine, bitmap_ind16 &bitmap,cons
 	}
 }
 
-static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap)
+static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int x,y,xi;
@@ -455,7 +461,8 @@ static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap)
 				/* TODO: dunno if state->m_layer_mask is correct here */
 				if(!(state->m_layer_mask & 2)) { pen = ((gvram[count+0x0000] >> (7-xi)) & 1) << 0; }
 
-				bitmap.pix16(y, x+xi) = machine.pens[pen ? 7 : 0];
+				if(cliprect.contains(x+xi, y))
+					bitmap.pix16(y, x+xi) = machine.pens[pen ? 7 : 0];
 			}
 
 			count++;
@@ -478,7 +485,8 @@ static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap)
 					/* TODO: dunno if state->m_layer_mask is correct here */
 					if(!(state->m_layer_mask & 4)) { pen = ((gvram[count+0x4000] >> (7-xi)) & 1) << 0; }
 
-					bitmap.pix16(y, x+xi) = machine.pens[pen ? 7 : 0];
+					if(cliprect.contains(x+xi, y))
+						bitmap.pix16(y, x+xi) = machine.pens[pen ? 7 : 0];
 				}
 
 				count++;
@@ -648,7 +656,7 @@ static void draw_text(running_machine &machine, bitmap_ind16 &bitmap,int y_size,
 	UINT8 blink;
 	int pal;
 
-	popmessage("%02x",state->m_crtc.param[0][4]);
+//	popmessage("%02x",state->m_crtc.param[0][4]);
 
 	for(y=0;y<y_size;y++)
 	{
@@ -702,7 +710,7 @@ static SCREEN_UPDATE_IND16( pc8801 )
 		if(state->m_gfx_ctrl & 0x10)
 			draw_bitmap_3bpp(screen.machine(),bitmap,cliprect);
 		else
-			draw_bitmap_1bpp(screen.machine(),bitmap);
+			draw_bitmap_1bpp(screen.machine(),bitmap,cliprect);
 	}
 
 	//popmessage("%02x %02x %02x %02x %02x",state->m_layer_mask,state->m_dmac_mode,state->m_crtc.status,state->m_crtc.irq_mask,state->m_gfx_ctrl);
@@ -1354,7 +1362,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_dmac_mode_w)
 	m_dmac_mode = data;
 	m_dmac_ff = 0;
 
-	if(data != 0xe4 && data != 0xa0)
+	if(data != 0xe4 && data != 0xa0 && data != 0xc4 && data != 0x80)
 		printf("%02x DMAC mode\n",data);
 }
 
@@ -2188,7 +2196,8 @@ static void pc8801_sound_irq( device_t *device, int irq )
 	pc8801_state *state = device->machine().driver_data<pc8801_state>();
 
 //	printf("%02x %02x %02x\n",state->m_sound_irq_mask,state->m_i8214_irq_level,irq);
-	if(state->m_sound_irq_mask && state->m_i8214_irq_level >= 5 && irq)
+	/* TODO: correct i8214 irq level? */
+	if(state->m_sound_irq_mask && irq)
 	{
 		state->m_sound_irq_latch = 1;
 		IRQ_LOG(("sound\n"));
