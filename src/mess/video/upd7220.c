@@ -1346,6 +1346,11 @@ void upd7220_device::process_fifo()
 			//  printf("DIR %02x\n",m_pr[1]);
 		}
 
+		// the Decision Mate V during start-up test upload only 2 params before execute the
+		// RDAT command, so I assume this is the expected behaviour, but this needs to be verified.
+		if (m_param_ptr == 3)
+			m_figs.m_dc = (m_pr[2]) | (m_figs.m_dc & 0x3f00);
+
 		if (m_param_ptr == 4)
 			m_figs.m_dc = (m_pr[2]) | ((m_pr[3] & 0x3f) << 8);
 
