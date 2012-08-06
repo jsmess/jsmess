@@ -727,6 +727,8 @@ WRITE_LINE_MEMBER( abc800_state::sio_dtrb_w )
 
 WRITE_LINE_MEMBER( abc800_state::sio_rtsb_w )
 {
+	if (m_cassette == NULL) return;
+
 	m_sio_rtsb = state;
 
 	if (!m_sio_rtsb)
@@ -941,19 +943,21 @@ void abc800_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		break;
 
 	case TIMER_ID_CASSETTE:
-		int dfd_in = m_cassette->input() > 0;
-
-		if (m_dfd_in && !dfd_in)
 		{
-			m_sio_rxdb = !(m_tape_ctr == 15);
-		}
-		
-		if (!dfd_in && (m_tape_ctr == 15))
-		{
-			m_tape_ctr = 4;
-		}
+			int dfd_in = m_cassette->input() > 0;
 
-		m_dfd_in = dfd_in;
+			if (m_dfd_in && !dfd_in)
+			{
+				m_sio_rxdb = !(m_tape_ctr == 15);
+			}
+			
+			if (!dfd_in && (m_tape_ctr == 15))
+			{
+				m_tape_ctr = 4;
+			}
+
+			m_dfd_in = dfd_in;
+		}
 		break;
 	}
 }
@@ -1418,9 +1422,9 @@ ROM_START( abc802 )
 	ROM_LOAD(  "abc 22-11.12f", 0x4000, 0x2000, CRC(8dcb1cc7) SHA1(535cfd66c84c0370fd022d6edf702d3d1ad1b113) )
 	ROM_SYSTEM_BIOS( 0, "12", "?" )
 	ROMX_LOAD( "abc 32-12.14f", 0x6000, 0x2000, CRC(23cd0f43) SHA1(639daec4565dcdb4de408b808d0c6cd97baa35d2), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "21", "UDF-DOS v6.19" )
+	ROM_SYSTEM_BIOS( 1, "21", "UFD-DOS v6.19" )
 	ROMX_LOAD( "abc 32-21.14f", 0x6000, 0x2000, CRC(57050b98) SHA1(b977e54d1426346a97c98febd8a193c3e8259574), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "31", "UDF-DOS v6.20" )
+	ROM_SYSTEM_BIOS( 2, "31", "UFD-DOS v6.20" )
 	ROMX_LOAD( "abc 32-31.14f", 0x6000, 0x2000, CRC(fc8be7a8) SHA1(a1d4cb45cf5ae21e636dddfa70c99bfd2050ad60), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS( 3, "mica", "MICA DOS v6.20" )
 	ROMX_LOAD( "mica820.14f",   0x6000, 0x2000, CRC(edf998af) SHA1(daae7e1ff6ef3e0ddb83e932f324c56f4a98f79b), ROM_BIOS(4) )
@@ -1438,16 +1442,16 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( abc806 )
-	ROM_REGION( 0x8000, Z80_TAG, 0 )
+	ROM_REGION( 0x10000, Z80_TAG, 0 )
 	ROM_LOAD( "abc 06-11.1m",  0x0000, 0x1000, CRC(27083191) SHA1(9b45592273a5673e4952c6fe7965fc9398c49827) ) // BASIC PROM ABC 06-11 "64 90231-02"
 	ROM_LOAD( "abc 16-11.1l",  0x1000, 0x1000, CRC(eb0a08fd) SHA1(f0b82089c5c8191fbc6a3ee2c78ce730c7dd5145) ) // BASIC PROM ABC 16-11 "64 90232-02"
 	ROM_LOAD( "abc 26-11.1k",  0x2000, 0x1000, CRC(97a95c59) SHA1(013bc0a2661f4630c39b340965872bf607c7bd45) ) // BASIC PROM ABC 26-11 "64 90233-02"
 	ROM_LOAD( "abc 36-11.1j",  0x3000, 0x1000, CRC(b50e418e) SHA1(991a59ed7796bdcfed310012b2bec50f0b8df01c) ) // BASIC PROM ABC 36-11 "64 90234-02"
 	ROM_LOAD( "abc 46-11.2m",  0x4000, 0x1000, CRC(17a87c7d) SHA1(49a7c33623642b49dea3d7397af5a8b9dde8185b) ) // BASIC PROM ABC 46-11 "64 90235-02"
 	ROM_LOAD( "abc 56-11.2l",  0x5000, 0x1000, CRC(b4b02358) SHA1(95338efa3b64b2a602a03bffc79f9df297e9534a) ) // BASIC PROM ABC 56-11 "64 90236-02"
-	ROM_SYSTEM_BIOS( 0, "v19",		"UDF-DOS v.19" )
+	ROM_SYSTEM_BIOS( 0, "v19",		"UFD-DOS v.19" )
 	ROMX_LOAD( "abc 66-21.2k", 0x6000, 0x1000, CRC(c311b57a) SHA1(4bd2a541314e53955a0d53ef2f9822a202daa485), ROM_BIOS(1) ) // DOS PROM ABC 66-21 "64 90314-01"
-	ROM_SYSTEM_BIOS( 1, "v20",		"UDF-DOS v.20" )
+	ROM_SYSTEM_BIOS( 1, "v20",		"UFD-DOS v.20" )
 	ROMX_LOAD( "abc 66-31.2k", 0x6000, 0x1000, CRC(a2e38260) SHA1(0dad83088222cb076648e23f50fec2fddc968883), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "mica",		"MICA DOS v.20" )
 	ROMX_LOAD( "mica2006.2k",  0x6000, 0x1000, CRC(58bc2aa8) SHA1(0604bd2396f7d15fcf3d65888b4b673f554037c0), ROM_BIOS(3) )
