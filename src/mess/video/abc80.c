@@ -36,42 +36,6 @@ GFXDECODE_END
 
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK( blink_tick )
-//-------------------------------------------------
-
-static TIMER_DEVICE_CALLBACK( blink_tick )
-{
-	abc80_state *state = timer.machine().driver_data<abc80_state>();
-
-	state->m_blink = !state->m_blink;
-}
-
-
-//-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK( vsync_on_tick )
-//-------------------------------------------------
-
-static TIMER_DEVICE_CALLBACK( vsync_on_tick )
-{
-	abc80_state *state = timer.machine().driver_data<abc80_state>();
-
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
-}
-
-
-//-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK( vsync_off_tick )
-//-------------------------------------------------
-
-static TIMER_DEVICE_CALLBACK( vsync_off_tick )
-{
-	abc80_state *state = timer.machine().driver_data<abc80_state>();
-
-	device_set_input_line(state->m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
-}
-
-
-//-------------------------------------------------
 //  update_screen -
 //-------------------------------------------------
 
@@ -200,6 +164,21 @@ void abc80_state::update_screen(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 void abc80_state::video_start()
 {
+	screen_device *screen = machine().device<screen_device>(SCREEN_TAG);
+
+	// start timers
+	m_pio_timer = timer_alloc(TIMER_ID_PIO);
+	m_pio_timer->adjust(screen->time_until_pos(0, 0), 0, screen->scan_period());
+
+	m_blink_timer = timer_alloc(TIMER_ID_BLINK);
+	m_blink_timer->adjust(attotime::from_hz(XTAL_11_9808MHz/2/6/64/312/16), 0, attotime::from_hz(XTAL_11_9808MHz/2/6/64/312/16));
+
+	m_vsync_on_timer = timer_alloc(TIMER_ID_VSYNC_ON);
+	m_vsync_on_timer->adjust(screen->time_until_pos(0, 0), 0, screen->frame_period());
+
+	m_vsync_off_timer = timer_alloc(TIMER_ID_VSYNC_OFF);
+	m_vsync_on_timer->adjust(screen->time_until_pos(16, 0), 0, screen->frame_period());
+
 	// allocate memory
 	m_video_ram = auto_alloc_array(machine(), UINT8, 0x400);
 
@@ -233,10 +212,6 @@ UINT32 abc80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 //-------------------------------------------------
 
 MACHINE_CONFIG_FRAGMENT( abc80_video )
-	MCFG_TIMER_ADD_PERIODIC("blink", blink_tick, attotime::from_hz(ABC80_XTAL/2/6/64/312/16))
-	MCFG_TIMER_ADD_SCANLINE("vsync_on", vsync_on_tick, SCREEN_TAG, 0, ABC80_VTOTAL)
-	MCFG_TIMER_ADD_SCANLINE("vsync_off", vsync_off_tick, SCREEN_TAG, 16, ABC80_VTOTAL)
-
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(abc80_state, screen_update)
 
@@ -245,5 +220,5 @@ MACHINE_CONFIG_FRAGMENT( abc80_video )
 	MCFG_PALETTE_LENGTH(2)
 	MCFG_PALETTE_INIT(black_and_white)
 
-	MCFG_SCREEN_RAW_PARAMS(ABC80_XTAL/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_11_9808MHz/2, ABC80_HTOTAL, ABC80_HBEND, ABC80_HBSTART, ABC80_VTOTAL, ABC80_VBEND, ABC80_VBSTART)
 MACHINE_CONFIG_END

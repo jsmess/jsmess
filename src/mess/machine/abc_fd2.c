@@ -129,6 +129,19 @@ static const z80_daisy_config daisy_chain[] =
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
+static const floppy_interface fd2_floppy_interface =
+{
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    FLOPPY_STANDARD_5_25_SSSD,
+    LEGACY_FLOPPY_OPTIONS_NAME(default),
+    "floppy_5_25",
+	NULL
+};
+
 static const wd17xx_interface fdc_intf =
 {
 	DEVCB_NULL,
@@ -149,6 +162,7 @@ static MACHINE_CONFIG_FRAGMENT( abc_fd2 )
 	MCFG_CPU_CONFIG(daisy_chain)
 
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, pio_intf) // ?
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(fd2_floppy_interface)
 	MCFG_FD1771_ADD(FD1771_TAG, fdc_intf)
 MACHINE_CONFIG_END
 
@@ -178,7 +192,9 @@ abc_fd2_device::abc_fd2_device(const machine_config &mconfig, const char *tag, d
 	  device_abcbus_card_interface(mconfig, *this),
 	  m_maincpu(*this, Z80_TAG),
 	  m_pio(*this, Z80PIO_TAG),
-	  m_fdc(*this, FD1771_TAG)
+	  m_fdc(*this, FD1771_TAG),
+	  m_image0(*this, FLOPPY_0),
+	  m_image1(*this, FLOPPY_1)
 {
 }
 
@@ -189,9 +205,6 @@ abc_fd2_device::abc_fd2_device(const machine_config &mconfig, const char *tag, d
 
 void abc_fd2_device::device_start()
 {
-	// find floppy image devices
-	m_image0 = machine().device(FLOPPY_0);
-	m_image1 = machine().device(FLOPPY_1);
 }
 
 

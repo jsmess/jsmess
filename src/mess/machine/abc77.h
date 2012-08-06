@@ -32,6 +32,11 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
+#define MCFG_ABC55_ADD(_config) \
+    MCFG_DEVICE_ADD(ABC77_TAG, ABC55, 0) \
+	MCFG_DEVICE_CONFIG(_config)
+
+
 #define MCFG_ABC77_ADD(_config) \
     MCFG_DEVICE_ADD(ABC77_TAG, ABC77, 0) \
 	MCFG_DEVICE_CONFIG(_config)
@@ -50,7 +55,6 @@
 
 struct abc77_interface
 {
-	devcb_write_line	m_out_txd_cb;
 	devcb_write_line	m_out_clock_cb;
 	devcb_write_line	m_out_keydown_cb;
 };
@@ -63,6 +67,7 @@ class abc77_device :  public device_t,
 {
 public:
     // construction/destruction
+    abc77_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
     abc77_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
 	// optional information overrides
@@ -89,7 +94,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void device_config_complete();
 
-private:
 	static const device_timer_id TIMER_SERIAL = 0;
 	static const device_timer_id TIMER_RESET = 1;
 
@@ -97,7 +101,6 @@ private:
 	inline void serial_clock();
 	inline void key_down(int state);
 
-	devcb_resolved_write_line	m_out_txd_func;
 	devcb_resolved_write_line	m_out_clock_func;
 	devcb_resolved_write_line	m_out_keydown_func;
 
@@ -119,8 +122,20 @@ private:
 };
 
 
+class abc55_device :  public abc77_device
+{
+public:
+    // construction/destruction
+    abc55_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// optional information overrides
+	virtual ioport_constructor device_input_ports() const;
+};
+
+
 // device type definition
 extern const device_type ABC77;
+extern const device_type ABC55;
 
 
 

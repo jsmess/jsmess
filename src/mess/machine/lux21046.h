@@ -96,8 +96,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80dma_device> m_dma;
 	required_device<device_t> m_fdc;
-	device_t *m_image0;
-	device_t *m_image1;
+	required_device<legacy_floppy_image_device> m_image0;
+	required_device<legacy_floppy_image_device> m_image1;
 
 	bool m_cs;					// card selected
 	UINT8 m_status;				// ABC BUS status
@@ -112,6 +112,14 @@ private:
 
 // device type definition
 extern const device_type LUXOR_55_21046;
+
+
+// default input ports
+extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME( abc830_fast )[];
+extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME( abc832_fast )[];
+extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME( abc834_fast )[];
+extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME( abc838_fast )[];
+extern const input_device_default DEVICE_INPUT_DEFAULTS_NAME( abc850_fast )[];
 
 
 

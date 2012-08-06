@@ -628,20 +628,6 @@ INPUT_PORTS_END
 //  Z80CTC_INTERFACE( ctc_intf )
 //-------------------------------------------------
 
-static TIMER_DEVICE_CALLBACK( ctc_tick )
-{
-	device_t *z80ctc = timer.machine().device(Z80CTC_TAG);
-
-	z80ctc_trg0_w(z80ctc, 1);
-	z80ctc_trg0_w(z80ctc, 0);
-
-	z80ctc_trg1_w(z80ctc, 1);
-	z80ctc_trg1_w(z80ctc, 0);
-
-	z80ctc_trg2_w(z80ctc, 1);
-	z80ctc_trg2_w(z80ctc, 0);
-}
-
 WRITE_LINE_MEMBER( abc800_state::ctc_z0_w )
 {
 	if (BIT(m_sb, 2))
@@ -689,6 +675,8 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 void abc800_state::clock_cassette(int state)
 {
+	if (m_cassette == NULL) return;
+
 	if (m_ctc_z0 && !state)
 	{
 		m_sio_txcb = !m_sio_txcb;
@@ -711,25 +699,6 @@ void abc800_state::clock_cassette(int state)
 	m_ctc_z0 = state;
 }
 
-static TIMER_DEVICE_CALLBACK( cassette_tick )
-{
-	abc800_state *state = timer.machine().driver_data<abc800_state>();
-
-	int dfd_in = state->m_cassette->input() > 0;
-
-	if (state->m_dfd_in && !dfd_in)
-	{
-		state->m_sio_rxdb = !(state->m_tape_ctr == 15);
-	}
-	
-	if (!dfd_in && (state->m_tape_ctr == 15))
-	{
-		state->m_tape_ctr = 4;
-	}
-
-	state->m_dfd_in = dfd_in;
-}
-
 READ_LINE_MEMBER( abc800_state::sio_rxdb_r )
 {
 	return m_sio_rxdb;
@@ -742,6 +711,8 @@ WRITE_LINE_MEMBER( abc800_state::sio_txdb_w )
 
 WRITE_LINE_MEMBER( abc800_state::sio_dtrb_w )
 {
+	if (m_cassette == NULL) return;
+
 	if (state)
 	{
 		m_cassette->change_state(CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
@@ -884,24 +855,22 @@ static Z80DART_INTERFACE( abc806_dart_intf )
 
 
 //-------------------------------------------------
-//  ABC800_KEYBOARD_INTERFACE( kb_intf )
+//  ABC800_KEYBOARD_INTERFACE( abc800_kb_intf )
 //-------------------------------------------------
 
-static ABC800_KEYBOARD_INTERFACE( kb_intf )
+static ABC800_KEYBOARD_INTERFACE( abc800_kb_intf )
 {
-	DEVCB_NULL,
 	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rxtxcb_w),
 	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_dcdb_w)
 };
 
 
 //-------------------------------------------------
-//  ABC77_INTERFACE( abc77_intf )
+//  ABC77_INTERFACE( kb_intf )
 //-------------------------------------------------
 
-static ABC77_INTERFACE( abc77_intf )
+static ABC77_INTERFACE( kb_intf )
 {
-	DEVCB_NULL,
 	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rxtxcb_w),
 	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_dcdb_w)
 };
@@ -938,13 +907,6 @@ static const cassette_interface abc800_cassette_interface =
 //  ABCBUS_INTERFACE( abcbus_intf )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( abc800_abcbus_cards )
-	SLOT_INTERFACE("fast", LUXOR_55_21046)
-	SLOT_INTERFACE("uni800", ABC_UNI800)
-	SLOT_INTERFACE("slutprov", ABC_SLUTPROV)
-SLOT_INTERFACE_END
-
-
 static ABCBUS_INTERFACE( abcbus_intf )
 {
 	DEVCB_NULL,
@@ -960,11 +922,57 @@ static ABCBUS_INTERFACE( abcbus_intf )
 //**************************************************************************
 
 //-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void abc800_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_ID_CTC:
+		z80ctc_trg0_w(m_ctc, 1);
+		z80ctc_trg0_w(m_ctc, 0);
+
+		z80ctc_trg1_w(m_ctc, 1);
+		z80ctc_trg1_w(m_ctc, 0);
+
+		z80ctc_trg2_w(m_ctc, 1);
+		z80ctc_trg2_w(m_ctc, 0);
+		break;
+
+	case TIMER_ID_CASSETTE:
+		int dfd_in = m_cassette->input() > 0;
+
+		if (m_dfd_in && !dfd_in)
+		{
+			m_sio_rxdb = !(m_tape_ctr == 15);
+		}
+		
+		if (!dfd_in && (m_tape_ctr == 15))
+		{
+			m_tape_ctr = 4;
+		}
+
+		m_dfd_in = dfd_in;
+		break;
+	}
+}
+
+
+//-------------------------------------------------
 //  machine_start
 //-------------------------------------------------
 
 void abc800_state::machine_start()
 {
+	// start timers
+	m_ctc_timer = timer_alloc(TIMER_ID_CTC);
+	m_ctc_timer->adjust(attotime::from_hz(ABC800_X01/2/2/2), 0, attotime::from_hz(ABC800_X01/2/2/2));
+
+	m_cassette_timer = timer_alloc(TIMER_ID_CASSETTE);
+	m_cassette_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
+	m_cassette_timer->enable(false);
+
 	// register for state saving
 	save_item(NAME(m_fetch_charram));
 	save_item(NAME(m_pling));
@@ -1005,6 +1013,13 @@ void abc800_state::machine_reset()
 
 void abc802_state::machine_start()
 {
+	// start timers
+	m_ctc_timer = timer_alloc(TIMER_ID_CTC);
+	m_ctc_timer->adjust(attotime::from_hz(ABC800_X01/2/2/2), 0, attotime::from_hz(ABC800_X01/2/2/2));
+
+	m_cassette_timer = timer_alloc(TIMER_ID_CASSETTE);
+	m_cassette_timer->adjust(attotime::from_hz(44100), 0, attotime::from_hz(44100));
+
 	// register for state saving
 	save_item(NAME(m_lrs));
 	save_item(NAME(m_pling));
@@ -1054,12 +1069,16 @@ void abc802_state::machine_reset()
 
 void abc806_state::machine_start()
 {
+	// start timers
+	m_ctc_timer = timer_alloc(TIMER_ID_CTC);
+	m_ctc_timer->adjust(attotime::from_hz(ABC800_X01/2/2/2), 0, attotime::from_hz(ABC800_X01/2/2/2));
+
+	// setup memory banking
 	UINT8 *mem = memregion(Z80_TAG)->base();
 	UINT32 videoram_size = m_ram->size() - (32 * 1024);
 	int bank;
 	char bank_name[10];
 
-	// setup memory banking
 	m_video_ram.allocate(videoram_size);
 
 	for (bank = 1; bank <= 16; bank++)
@@ -1144,23 +1163,19 @@ static MACHINE_CONFIG_START( abc800c, abc800c_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
 	MCFG_SOUND_CONFIG_DISCRETE(abc800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// peripheral hardware
-	MCFG_TIMER_ADD_PERIODIC(TIMER_CASSETTE_TAG, cassette_tick, attotime::from_hz(44100))
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
-	MCFG_PRINTER_ADD("printer")
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_interface)
-	MCFG_ABC832_ADD()
-	MCFG_ABC800_KEYBOARD_ADD(kb_intf)
+	MCFG_ABC800_KEYBOARD_ADD(abc800_kb_intf)
 
 	// ABC bus
-	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abc800_abcbus_cards, "fast", abc830_fast)
+	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abcbus_cards, "fast", abc830_fast)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1188,23 +1203,19 @@ static MACHINE_CONFIG_START( abc800m, abc800m_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
 	MCFG_SOUND_CONFIG_DISCRETE(abc800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// peripheral hardware
-	MCFG_TIMER_ADD_PERIODIC(TIMER_CASSETTE_TAG, cassette_tick, attotime::from_hz(44100))
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
-	MCFG_PRINTER_ADD("printer")
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_interface)
-	MCFG_ABC832_ADD()
-	MCFG_ABC800_KEYBOARD_ADD(kb_intf)
+	MCFG_ABC800_KEYBOARD_ADD(abc800_kb_intf)
 
 	// ABC bus
-	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abc800_abcbus_cards, "fast", abc830_fast)
+	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abcbus_cards, "fast", abc830_fast)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1232,23 +1243,19 @@ static MACHINE_CONFIG_START( abc802, abc802_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_ADD(DISCRETE_TAG, DISCRETE, 0)
 	MCFG_SOUND_CONFIG_DISCRETE(abc800)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	// peripheral hardware
-	MCFG_TIMER_ADD_PERIODIC(TIMER_CASSETTE_TAG, cassette_tick, attotime::from_hz(44100))
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc802_dart_intf)
-	MCFG_ABC77_ADD(abc77_intf)
-	MCFG_PRINTER_ADD("printer")
+	MCFG_ABC55_ADD(kb_intf)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_interface)
-	MCFG_ABC834_ADD()
 
 	// ABC bus
-	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abc800_abcbus_cards, "fast", abc834_fast)
+	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abcbus_cards, "fast", abc834_fast)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1271,19 +1278,14 @@ static MACHINE_CONFIG_START( abc806, abc806_state )
 	MCFG_FRAGMENT_ADD(abc806_video)
 
 	// peripheral hardware
-	MCFG_TIMER_ADD_PERIODIC(TIMER_CASSETTE_TAG, cassette_tick, attotime::from_hz(44100))
 	MCFG_E0516_ADD(E0516_TAG, ABC806_X02)
 	MCFG_Z80CTC_ADD(Z80CTC_TAG, ABC800_X01/2/2, ctc_intf)
-	MCFG_TIMER_ADD_PERIODIC("ctc", ctc_tick, attotime::from_hz(ABC800_X01/2/2/2))
 	MCFG_Z80SIO2_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MCFG_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc806_dart_intf)
-	MCFG_ABC77_ADD(abc77_intf)
-	MCFG_PRINTER_ADD("printer")
-	MCFG_CASSETTE_ADD(CASSETTE_TAG, abc800_cassette_interface)
-	MCFG_ABC832_ADD()
+	MCFG_ABC77_ADD(kb_intf)
 
 	// ABC bus
-	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abc800_abcbus_cards, "fast", abc832_fast)
+	MCFG_ABCBUS_SLOT_ADD(ABCBUS_TAG, abcbus_intf, abcbus_cards, "fast", abc832_fast)
 
 	// internal ram
 	MCFG_RAM_ADD(RAM_TAG)
@@ -1436,7 +1438,7 @@ ROM_END
 //-------------------------------------------------
 
 ROM_START( abc806 )
-	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_REGION( 0x8000, Z80_TAG, 0 )
 	ROM_LOAD( "abc 06-11.1m",  0x0000, 0x1000, CRC(27083191) SHA1(9b45592273a5673e4952c6fe7965fc9398c49827) ) // BASIC PROM ABC 06-11 "64 90231-02"
 	ROM_LOAD( "abc 16-11.1l",  0x1000, 0x1000, CRC(eb0a08fd) SHA1(f0b82089c5c8191fbc6a3ee2c78ce730c7dd5145) ) // BASIC PROM ABC 16-11 "64 90232-02"
 	ROM_LOAD( "abc 26-11.1k",  0x2000, 0x1000, CRC(97a95c59) SHA1(013bc0a2661f4630c39b340965872bf607c7bd45) ) // BASIC PROM ABC 26-11 "64 90233-02"
@@ -1486,7 +1488,7 @@ ROM_END
 //  DRIVER_INIT( abc800c )
 //-------------------------------------------------
 
-DIRECT_UPDATE_MEMBER(abc800c_state::direct_update_handler)
+DIRECT_UPDATE_MEMBER( abc800c_state::direct_update_handler )
 {
 	if (address >= 0x7c00 && address < 0x8000)
 	{
@@ -1510,11 +1512,9 @@ DIRECT_UPDATE_MEMBER(abc800c_state::direct_update_handler)
 	return address;
 }
 
-static DRIVER_INIT( abc800c )
+void abc800c_state::driver_init()
 {
-	abc800c_state *state = machine.driver_data<abc800c_state>();
-	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate(FUNC(abc800c_state::direct_update_handler), state));
+	m_maincpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(abc800c_state::direct_update_handler), this));
 }
 
 
@@ -1546,11 +1546,9 @@ DIRECT_UPDATE_MEMBER( abc800m_state::direct_update_handler )
 	return address;
 }
 
-static DRIVER_INIT( abc800m )
+void abc800m_state::driver_init()
 {
-	abc800m_state *state = machine.driver_data<abc800m_state>();
-	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate(FUNC(abc800m_state::direct_update_handler), state));
+	m_maincpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(abc800m_state::direct_update_handler), this));
 }
 
 
@@ -1572,11 +1570,9 @@ DIRECT_UPDATE_MEMBER( abc802_state::direct_update_handler )
 	return address;
 }
 
-static DRIVER_INIT( abc802 )
+void abc802_state::driver_init()
 {
-	abc802_state *state = machine.driver_data<abc802_state>();
-	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate(FUNC(abc802_state::direct_update_handler), state));
+	m_maincpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(abc802_state::direct_update_handler), this));
 }
 
 
@@ -1608,11 +1604,9 @@ DIRECT_UPDATE_MEMBER( abc806_state::direct_update_handler )
 	return address;
 }
 
-static DRIVER_INIT( abc806 )
+void abc806_state::driver_init()
 {
-	abc806_state *state = machine.driver_data<abc806_state>();
-	address_space *program = machine.device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate(FUNC(abc806_state::direct_update_handler), state));
+	m_maincpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(abc806_state::direct_update_handler), this));
 }
 
 
@@ -1621,8 +1615,8 @@ static DRIVER_INIT( abc806 )
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT     COMPANY             FULLNAME        FLAGS
-COMP( 1981, abc800c,    0,			0,      abc800c,    abc800, abc800c_state, abc800c, "Luxor Datorer AB", "ABC 800 C/HR", GAME_SUPPORTS_SAVE )
-COMP( 1981, abc800m,    abc800c,	0,      abc800m,    abc800, abc800m_state, abc800m, "Luxor Datorer AB", "ABC 800 M/HR", GAME_SUPPORTS_SAVE )
-COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802_state, abc802,  "Luxor Datorer AB", "ABC 802",		 GAME_SUPPORTS_SAVE )
-COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806_state, abc806,  "Luxor Datorer AB", "ABC 806",		 GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+//    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT                         COMPANY             FULLNAME        FLAGS
+COMP( 1981, abc800c,    0,			0,      abc800c,    abc800, abc800c_state, 	driver_init, "Luxor Datorer AB", "ABC 800 C/HR", GAME_SUPPORTS_SAVE )
+COMP( 1981, abc800m,    abc800c,	0,      abc800m,    abc800, abc800m_state, 	driver_init, "Luxor Datorer AB", "ABC 800 M/HR", GAME_SUPPORTS_SAVE )
+COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802_state, 	driver_init, "Luxor Datorer AB", "ABC 802",		 GAME_SUPPORTS_SAVE )
+COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806_state, 	driver_init, "Luxor Datorer AB", "ABC 806",		 GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )

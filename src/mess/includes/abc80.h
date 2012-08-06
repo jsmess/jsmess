@@ -17,15 +17,10 @@
 #include "machine/abcbus.h"
 #include "machine/abc80kb.h"
 #include "machine/abc830.h"
-#include "machine/abc_fd2.h"
-#include "machine/abc_sio.h"
-#include "machine/lux10828.h"
 #include "machine/ram.h"
 #include "machine/serial.h"
 #include "machine/z80pio.h"
 #include "sound/sn76477.h"
-
-#define ABC80_XTAL		11980800.0
 
 #define ABC80_HTOTAL	384
 #define ABC80_HBEND		35
@@ -60,7 +55,6 @@
 #define Z80_TAG				"ab67"
 #define Z80PIO_TAG			"cd67"
 #define SN76477_TAG			"g8"
-#define ABCBUS_TAG			"abcbus"
 #define RS232_TAG			"ser"
 #define TIMER_CASSETTE_TAG	"cass"
 
@@ -77,20 +71,31 @@ public:
 		  m_kb(*this, ABC80_KEYBOARD_TAG),
 		  m_ram(*this, RAM_TAG),
 		  m_rs232(*this, RS232_TAG),
-		  m_cassette_timer(*this, TIMER_CASSETTE_TAG),
 		  m_tape_in(1),
 		  m_tape_in_latch(1)
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_pio;
+	required_device<z80pio_device> m_pio;
 	required_device<device_t> m_psg;
 	required_device<cassette_image_device> m_cassette;
 	required_device<abcbus_slot_device> m_bus;
 	required_device<abc80_keyboard_device> m_kb;
 	required_device<ram_device> m_ram;
 	required_device<rs232_port_device> m_rs232;
-	required_device<timer_device> m_cassette_timer;
+
+	enum
+	{
+		TIMER_ID_PIO,
+		TIMER_ID_CASSETTE,
+		TIMER_ID_BLINK,
+		TIMER_ID_VSYNC_ON,
+		TIMER_ID_VSYNC_OFF,
+		TIMER_ID_FAKE_KEYBOARD_SCAN,
+		TIMER_ID_FAKE_KEYBOARD_CLEAR
+	};
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	virtual void machine_start();
 
@@ -98,6 +103,8 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void update_screen(bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	void scan_keyboard();
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -131,6 +138,14 @@ public:
 	const UINT8 *m_vsync_prom;		// horizontal sync PROM
 	const UINT8 *m_line_prom;		// line address PROM
 	const UINT8 *m_attr_prom;		// character attribute PROM
+
+	// timers
+	emu_timer *m_pio_timer;
+	emu_timer *m_cassette_timer;
+	emu_timer *m_blink_timer;
+	emu_timer *m_vsync_on_timer;
+	emu_timer *m_vsync_off_timer;
+	emu_timer *m_kb_timer;
 };
 
 //----------- defined in video/abc80.c -----------

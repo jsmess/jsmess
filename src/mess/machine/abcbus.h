@@ -70,7 +70,7 @@
 //  CONSTANTS
 //**************************************************************************
 
-#define ABCBUS_TAG			"abcbus"
+#define ABCBUS_TAG			"bus"
 
 
 
@@ -148,6 +148,19 @@ public:
 	// construction/destruction
 	abcbus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
+    // computer interface
+    void cs_w(UINT8 data);
+    UINT8 rst_r();
+    UINT8 inp_r();
+    void utp_w(UINT8 data);
+    UINT8 stat_r();
+    void c1_w(UINT8 data);
+    void c2_w(UINT8 data);
+    void c3_w(UINT8 data);
+    void c4_w(UINT8 data);
+    UINT8 xmemfl_r(offs_t offset);
+    void xmemw_w(offs_t offset, UINT8 data);
+
 	DECLARE_WRITE8_MEMBER( cs_w );
 	DECLARE_READ8_MEMBER( rst_r );
 	DECLARE_READ8_MEMBER( inp_r );
@@ -160,6 +173,7 @@ public:
 	DECLARE_READ8_MEMBER( xmemfl_r );
 	DECLARE_WRITE8_MEMBER( xmemw_w );
 
+    // peripheral interface
 	DECLARE_WRITE_LINE_MEMBER( int_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 	DECLARE_WRITE_LINE_MEMBER( rdy_w );
@@ -182,6 +196,19 @@ private:
 
 // device type definition
 extern const device_type ABCBUS_SLOT;
+
+
+// ABC bus slot devices
+#include "machine/abc890.h"
+#include "machine/abc_dos.h"
+#include "machine/abc_fd2.h"
+#include "machine/abc_uni800.h"
+#include "machine/abc_sio.h"
+#include "machine/abc_slutprov.h"
+#include "machine/lux10828.h"
+#include "machine/lux21046.h"
+
+SLOT_INTERFACE_EXTERN( abcbus_cards );
 
 
 

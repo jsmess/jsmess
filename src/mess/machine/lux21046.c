@@ -74,6 +74,14 @@ Notes:
 
 */
 
+/*
+
+	TODO:
+
+	- 8" floppy is not supported, but there are no dumps available either
+
+*/
+
 #include "lux21046.h"
 
 
@@ -212,7 +220,7 @@ WRITE_LINE_MEMBER( luxor_55_21046_device::dma_int_w )
 	m_dma_irq = state;
 
 	// FDC and DMA interrupts are wire-ORed to the Z80
-	device_set_input_line(m_maincpu, INPUT_LINE_IRQ0, m_fdc_irq | m_dma_irq);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_fdc_irq | m_dma_irq);
 }
 
 static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
@@ -234,12 +242,25 @@ static Z80DMA_INTERFACE( dma_intf )
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
+static const floppy_interface lux21046_floppy_interface =
+{
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    FLOPPY_STANDARD_5_25_DSDD,
+    LEGACY_FLOPPY_OPTIONS_NAME(default),
+    "floppy_5_25",
+	NULL
+};
+
 WRITE_LINE_MEMBER( luxor_55_21046_device::fdc_intrq_w )
 {
 	m_fdc_irq = state;
 
 	// FDC and DMA interrupts are wire-ORed to the Z80
-	device_set_input_line(m_maincpu, INPUT_LINE_IRQ0, m_fdc_irq | m_dma_irq);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_fdc_irq | m_dma_irq);
 }
 
 static const wd17xx_interface fdc_intf =
@@ -247,7 +268,7 @@ static const wd17xx_interface fdc_intf =
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, luxor_55_21046_device, fdc_intrq_w),
 	DEVCB_DEVICE_LINE(Z80DMA_TAG, z80dma_rdy_w),
-	{ ":"FLOPPY_0, ":"FLOPPY_1, NULL, NULL }
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
 
@@ -263,6 +284,7 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_21046 )
 
 	// devices
 	MCFG_Z80DMA_ADD(Z80DMA_TAG, XTAL_16MHz/4, dma_intf)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(lux21046_floppy_interface)
 	MCFG_FD1793_ADD(SAB1793_TAG, fdc_intf)
 MACHINE_CONFIG_END
 
@@ -374,6 +396,8 @@ luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, cons
 	  m_maincpu(*this, Z80_TAG),
 	  m_dma(*this, Z80DMA_TAG),
 	  m_fdc(*this, SAB1793_TAG),
+	  m_image0(*this, FLOPPY_0),
+	  m_image1(*this, FLOPPY_1),
 	  m_cs(false),
 	  m_fdc_irq(0),
 	  m_dma_irq(0),
@@ -389,10 +413,6 @@ luxor_55_21046_device::luxor_55_21046_device(const machine_config &mconfig, cons
 
 void luxor_55_21046_device::device_start()
 {
-	// find floppy image devices
-	m_image0 = machine().device(FLOPPY_0);
-	m_image1 = machine().device(FLOPPY_1);
-
 	// state saving
 	save_item(NAME(m_cs));
 	save_item(NAME(m_status));
@@ -512,8 +532,8 @@ void luxor_55_21046_device::abcbus_c1(UINT8 data)
 {
 	if (m_cs)
 	{
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, ASSERT_LINE);
-		device_set_input_line(m_maincpu, INPUT_LINE_NMI, CLEAR_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}
 }
 
@@ -526,8 +546,7 @@ void luxor_55_21046_device::abcbus_c3(UINT8 data)
 {
 	if (m_cs)
 	{
-		device_set_input_line(m_maincpu, INPUT_LINE_RESET, ASSERT_LINE);
-		device_set_input_line(m_maincpu, INPUT_LINE_RESET, CLEAR_LINE);
+		m_maincpu->reset();
 	}
 }
 
@@ -712,3 +731,62 @@ READ8_MEMBER( luxor_55_21046_device::_9a_r )
 
 	return data ^ 0xff;
 }
+
+
+//**************************************************************************
+//  LUXOR 55 21046 DEVICE INPUT DEFAULTS
+//**************************************************************************
+
+//-------------------------------------------------
+//  DEVICE_INPUT_DEFAULTS( abc830_fast_intf )
+//-------------------------------------------------
+
+DEVICE_INPUT_DEFAULTS_START( abc830_fast )
+	DEVICE_INPUT_DEFAULTS("SW1", 0x0f, 0x03)
+	DEVICE_INPUT_DEFAULTS("SW2", 0x0f, DRIVE_BASF_6106_08)
+	DEVICE_INPUT_DEFAULTS("SW3", 0x7f, ADDRESS_ABC830)
+DEVICE_INPUT_DEFAULTS_END
+
+
+//-------------------------------------------------
+//  DEVICE_INPUT_DEFAULTS( abc832_fast )
+//-------------------------------------------------
+
+DEVICE_INPUT_DEFAULTS_START( abc832_fast )
+	DEVICE_INPUT_DEFAULTS("SW1", 0x0f, 0x03)
+	DEVICE_INPUT_DEFAULTS("SW2", 0x0f, DRIVE_TEAC_FD55F)
+	DEVICE_INPUT_DEFAULTS("SW3", 0x7f, ADDRESS_ABC832)
+DEVICE_INPUT_DEFAULTS_END
+
+
+//-------------------------------------------------
+//  DEVICE_INPUT_DEFAULTS( abc834_fast )
+//-------------------------------------------------
+
+DEVICE_INPUT_DEFAULTS_START( abc834_fast )
+	DEVICE_INPUT_DEFAULTS("SW1", 0x0f, 0x03)
+	DEVICE_INPUT_DEFAULTS("SW2", 0x0f, DRIVE_TEAC_FD55F)
+	DEVICE_INPUT_DEFAULTS("SW3", 0x7f, ADDRESS_ABC832)
+DEVICE_INPUT_DEFAULTS_END
+
+
+//-------------------------------------------------
+//  DEVICE_INPUT_DEFAULTS( abc838_fast )
+//-------------------------------------------------
+
+DEVICE_INPUT_DEFAULTS_START( abc838_fast )
+	DEVICE_INPUT_DEFAULTS("SW1", 0x0f, 0x03)
+	DEVICE_INPUT_DEFAULTS("SW2", 0x0f, DRIVE_BASF_6105)
+	DEVICE_INPUT_DEFAULTS("SW3", 0x7f, ADDRESS_ABC838)
+DEVICE_INPUT_DEFAULTS_END
+
+
+//-------------------------------------------------
+//  DEVICE_INPUT_DEFAULTS( abc850_fast )
+//-------------------------------------------------
+
+DEVICE_INPUT_DEFAULTS_START( abc850_fast )
+	DEVICE_INPUT_DEFAULTS("SW1", 0x0f, 0x03)
+	DEVICE_INPUT_DEFAULTS("SW2", 0x0f, DRIVE_BASF_6138)
+	DEVICE_INPUT_DEFAULTS("SW3", 0x7f, ADDRESS_ABC830)
+DEVICE_INPUT_DEFAULTS_END

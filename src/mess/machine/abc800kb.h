@@ -49,7 +49,6 @@
 
 struct abc800_keyboard_interface
 {
-	devcb_write_line	m_out_txd_cb;
 	devcb_write_line	m_out_clock_cb;
 	devcb_write_line	m_out_keydown_cb;
 };
@@ -86,7 +85,6 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
-	devcb_resolved_write_line	m_out_txd_func;
 	devcb_resolved_write_line	m_out_clock_func;
 	devcb_resolved_write_line	m_out_keydown_func;
 

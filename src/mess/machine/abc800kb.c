@@ -104,7 +104,6 @@ void abc800_keyboard_device::device_config_complete()
     // or initialize to defaults if none provided
     else
     {
-        memset(&m_out_txd_cb, 0, sizeof(m_out_txd_cb));
         memset(&m_out_clock_cb, 0, sizeof(m_out_clock_cb));
         memset(&m_out_keydown_cb, 0, sizeof(m_out_keydown_cb));
     }
@@ -316,8 +315,6 @@ inline void abc800_keyboard_device::serial_output(int state)
     if (m_txd != state)
     {
         m_txd = state;
-
-        m_out_txd_func(m_txd);
     }
 }
 
@@ -381,7 +378,6 @@ void abc800_keyboard_device::device_start()
     m_serial_timer->adjust(attotime::from_hz(XTAL_5_9904MHz/(3*5)/20), 0, attotime::from_hz(XTAL_5_9904MHz/(3*5)/20)); // ???
 
     // resolve callbacks
-    m_out_txd_func.resolve(m_out_txd_cb, *this);
     m_out_clock_func.resolve(m_out_clock_cb, *this);
     m_out_keydown_func.resolve(m_out_keydown_cb, *this);
 

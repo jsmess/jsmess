@@ -8,7 +8,6 @@
 
 	TODO:
 
-	- HRU II PROM test
 	- flashing
 	- double height
 	- underline
@@ -99,7 +98,7 @@ READ8_MEMBER( abc806_state::charram_r )
 WRITE8_MEMBER( abc806_state::charram_w )
 {
 	m_color_ram[offset] = m_attr_data;
-	
+
 	m_char_ram[offset] = data;
 }
 

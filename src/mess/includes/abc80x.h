@@ -4,20 +4,18 @@
 #define __ABC800__
 
 
+#define MODERN_DRIVER_INIT
+
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/cassette.h"
-#include "imagedev/printer.h"
 #include "machine/abc77.h"
 #include "machine/abc800kb.h"
 #include "machine/abc830.h"
 #include "machine/abcbus.h"
-#include "machine/abc_uni800.h"
-#include "machine/abc_slutprov.h"
 #include "machine/e0516.h"
-#include "machine/lux21046.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "machine/ram.h"
@@ -59,8 +57,7 @@
 #define Z80CTC_TAG			"z80ctc"
 #define Z80SIO_TAG			"z80sio"
 #define Z80DART_TAG			"z80dart"
-#define ABCBUS_TAG			"abcbus"
-#define TIMER_CASSETTE_TAG	"cass"
+#define DISCRETE_TAG		"discrete"
 
 
 //**************************************************************************
@@ -81,7 +78,6 @@ public:
 		  m_discrete(*this, "discrete"),
 		  m_cassette(*this, CASSETTE_TAG),
 		  m_ram(*this, RAM_TAG),
-		  m_cassette_timer(*this, TIMER_CASSETTE_TAG),
 		  m_video_ram(*this, "video_ram"),
 		  m_char_ram(*this, "char_ram"),
 		  m_ctc_z0(0),
@@ -98,9 +94,16 @@ public:
 	required_device<z80dart_device> m_dart;
 	required_device<z80dart_device> m_sio;
 	optional_device<device_t> m_discrete;
-	required_device<cassette_image_device> m_cassette;
+	optional_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
-	required_device<timer_device> m_cassette_timer;
+	
+	enum
+	{
+		TIMER_ID_CTC,
+		TIMER_ID_CASSETTE
+	};
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -151,6 +154,10 @@ public:
 	int m_dfd_out;
 	int m_dfd_in;
 	int m_tape_ctr;
+
+	// timers
+	emu_timer *m_ctc_timer;
+	emu_timer *m_cassette_timer;
 };
 
 class abc800m_state : public abc800_state
@@ -162,6 +169,8 @@ public:
 	{ }
 
 	required_device<mc6845_device> m_crtc;
+
+	virtual void driver_init();
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -179,6 +188,8 @@ public:
 	{ }
 
 	required_device<device_t> m_trom;
+
+	virtual void driver_init();
 
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -205,6 +216,7 @@ public:
 	required_device<mc6845_device> m_crtc;
 	optional_device<device_t> m_abc77;
 
+	virtual void driver_init();
 	virtual void machine_start();
 	virtual void machine_reset();
 
@@ -247,6 +259,7 @@ public:
 	required_device<e0516_device> m_rtc;
 	optional_device<device_t> m_abc77;
 
+	virtual void driver_init();
 	virtual void machine_start();
 	virtual void machine_reset();
 

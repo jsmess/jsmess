@@ -45,7 +45,7 @@ protected:
     // device-level overrides
     virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete() { m_shortname = "abcfd2"; }
+    virtual void device_config_complete() { m_shortname = "abc_fd2"; }
 
 	// device_abcbus_interface overrides
 	virtual void abcbus_cs(UINT8 data);
@@ -55,8 +55,8 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<device_t> m_fdc;
-	device_t* m_image0;
-	device_t* m_image1;
+	required_device<legacy_floppy_image_device> m_image0;
+	required_device<legacy_floppy_image_device> m_image1;
 };
 
 

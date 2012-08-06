@@ -104,7 +104,7 @@ void abcbus_slot_device::device_start()
 //  cs_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abcbus_slot_device::cs_w )
+void abcbus_slot_device::cs_w(UINT8 data)
 {
 	if (m_card != NULL)
 	{
@@ -112,12 +112,17 @@ WRITE8_MEMBER( abcbus_slot_device::cs_w )
 	}
 }
 
+WRITE8_MEMBER( abcbus_slot_device::cs_w )
+{
+	cs_w(data);
+}
+
 
 //-------------------------------------------------
 //  rst_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abcbus_slot_device::rst_r )
+UINT8 abcbus_slot_device::rst_r()
 {
 	if (m_card != NULL)
 	{
@@ -128,12 +133,17 @@ READ8_MEMBER( abcbus_slot_device::rst_r )
 	return 0xff;
 }
 
+READ8_MEMBER( abcbus_slot_device::rst_r )
+{
+	return rst_r();
+}
+
 
 //-------------------------------------------------
 //  inp_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abcbus_slot_device::inp_r )
+UINT8 abcbus_slot_device::inp_r()
 {
 	UINT8 data = 0xff;
 
@@ -145,12 +155,17 @@ READ8_MEMBER( abcbus_slot_device::inp_r )
 	return data;
 }
 
+READ8_MEMBER( abcbus_slot_device::inp_r )
+{
+	return inp_r();
+}
+
 
 //-------------------------------------------------
 //  utp_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abcbus_slot_device::utp_w )
+void abcbus_slot_device::utp_w(UINT8 data)
 {
 	if (m_card != NULL)
 	{
@@ -158,12 +173,17 @@ WRITE8_MEMBER( abcbus_slot_device::utp_w )
 	}
 }
 
+WRITE8_MEMBER( abcbus_slot_device::utp_w )
+{
+	utp_w(data);
+}
+
 
 //-------------------------------------------------
 //  stat_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abcbus_slot_device::stat_r )
+UINT8 abcbus_slot_device::stat_r()
 {
 	UINT8 data = 0xff;
 
@@ -175,12 +195,17 @@ READ8_MEMBER( abcbus_slot_device::stat_r )
 	return data;
 }
 
+READ8_MEMBER( abcbus_slot_device::stat_r )
+{
+	return stat_r();
+}
+
 
 //-------------------------------------------------
 //  c1_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abcbus_slot_device::c1_w )
+void abcbus_slot_device::c1_w(UINT8 data)
 {
 	if (m_card != NULL)
 	{
@@ -188,12 +213,17 @@ WRITE8_MEMBER( abcbus_slot_device::c1_w )
 	}
 }
 
+WRITE8_MEMBER( abcbus_slot_device::c1_w )
+{
+	c1_w(data);
+}
+
 
 //-------------------------------------------------
 //  c2_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abcbus_slot_device::c2_w )
+void abcbus_slot_device::c2_w(UINT8 data)
 {
 	if (m_card != NULL)
 	{
@@ -201,12 +231,17 @@ WRITE8_MEMBER( abcbus_slot_device::c2_w )
 	}
 }
 
+WRITE8_MEMBER( abcbus_slot_device::c2_w )
+{
+	c2_w(data);
+}
+
 
 //-------------------------------------------------
 //  c3_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abcbus_slot_device::c3_w )
+void abcbus_slot_device::c3_w(UINT8 data)
 {
 	if (m_card != NULL)
 	{
@@ -214,12 +249,17 @@ WRITE8_MEMBER( abcbus_slot_device::c3_w )
 	}
 }
 
+WRITE8_MEMBER( abcbus_slot_device::c3_w )
+{
+	c3_w(data);
+}
+
 
 //-------------------------------------------------
 //  c4_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abcbus_slot_device::c4_w )
+void abcbus_slot_device::c4_w(UINT8 data)
 {
 	if (m_card != NULL)
 	{
@@ -227,12 +267,17 @@ WRITE8_MEMBER( abcbus_slot_device::c4_w )
 	}
 }
 
+WRITE8_MEMBER( abcbus_slot_device::c4_w )
+{
+	c4_w(data);
+}
+
 
 //-------------------------------------------------
 //  xmemfl_r -
 //-------------------------------------------------
 
-READ8_MEMBER( abcbus_slot_device::xmemfl_r )
+UINT8 abcbus_slot_device::xmemfl_r(offs_t offset)
 {
 	UINT8 data = 0xff;
 
@@ -244,17 +289,27 @@ READ8_MEMBER( abcbus_slot_device::xmemfl_r )
 	return data;
 }
 
+READ8_MEMBER( abcbus_slot_device::xmemfl_r )
+{
+	return xmemfl_r(offset);
+}
+
 
 //-------------------------------------------------
 //  xmemw_w -
 //-------------------------------------------------
 
-WRITE8_MEMBER( abcbus_slot_device::xmemw_w )
+void abcbus_slot_device::xmemw_w(offs_t offset, UINT8 data)
 {
 	if (m_card != NULL)
 	{
 		m_card->abcbus_xmemw(offset, data);
 	}
+}
+
+WRITE8_MEMBER( abcbus_slot_device::xmemw_w )
+{
+	xmemw_w(offset, data);
 }
 
 
@@ -296,3 +351,21 @@ WRITE_LINE_MEMBER( abcbus_slot_device::resin_w )
 {
 	m_out_resin_func(state);
 }
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( abcbus_cards )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( abcbus_cards )
+	SLOT_INTERFACE("exp", ABC890)
+	SLOT_INTERFACE("exp3", ABC894)
+	SLOT_INTERFACE("hdd", ABC850)
+	SLOT_INTERFACE("dos", ABC_DOS)
+	SLOT_INTERFACE("fd2", ABC_FD2)
+	SLOT_INTERFACE("sio", ABC_SIO)
+	SLOT_INTERFACE("slow", LUXOR_55_10828)
+	SLOT_INTERFACE("fast", LUXOR_55_21046)
+	SLOT_INTERFACE("uni800", ABC_UNI800)
+	SLOT_INTERFACE("slutprov", ABC_SLUTPROV)
+SLOT_INTERFACE_END

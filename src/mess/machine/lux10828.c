@@ -147,18 +147,25 @@ const device_type LUXOR_55_10828 = &device_creator<luxor_55_10828_device>;
 //-------------------------------------------------
 
 ROM_START( luxor_55_10828 )
-	ROM_REGION( 0x800, "abc830", 0 )
-	ROM_LOAD_OPTIONAL( "basf .02.7c", 0x0000, 0x0800, CRC(5daba200) SHA1(7881933760bed3b94f27585c0a6fc43e5d5153f5) ) // BASF 6106/08
-	ROM_LOAD_OPTIONAL( "mpi .02.7c",  0x0000, 0x0800, CRC(2aac9296) SHA1(c01a62e7933186bdf7068d2e9a5bc36590544349) ) // MPI 51 (55 10760-01)
-	ROM_LOAD( "new mpi .02.7c",       0x0000, 0x0800, CRC(ab788171) SHA1(c8e29965c04c85f2f2648496ea10c9c7ff95392f) ) // MPI 51 (55 10760-01)
-
-	ROM_REGION( 0x800, "abc832", 0 )
-	ROM_LOAD_OPTIONAL( "micr 1.4.7c", 0x0000, 0x0800, CRC(a7bc05fa) SHA1(6ac3e202b7ce802c70d89728695f1cb52ac80307) ) // Micropolis 1015 (v1.4)
-	ROM_LOAD_OPTIONAL( "micr 2.3.7c", 0x0000, 0x0800, CRC(f2fc5ccc) SHA1(86d6baadf6bf1d07d0577dc1e092850b5ff6dd1b) ) // Micropolis 1115 (v2.3)
-	ROM_LOAD_OPTIONAL( "basf 1.2.7c", 0x0000, 0x0800, CRC(9ca1a1eb) SHA1(04973ad69de8da403739caaebe0b0f6757e4a6b1) ) // BASF 6118 (v1.2)
-
-	ROM_REGION( 0x800, "abc838", 0 )
-	ROM_LOAD_OPTIONAL( "basf 8 1.0.7c", 0x0000, 0x0800, NO_DUMP ) // BASF 6104, BASF 6115 (v1.0)
+	ROM_REGION( 0x800, Z80_TAG, 0 )
+    ROM_DEFAULT_BIOS("mpi02n")
+    // ABC 830
+    ROM_SYSTEM_BIOS(0, "basf6106", "BASF 6106/08" )
+	ROMX_LOAD( "basf .02.7c", 0x000, 0x800, CRC(5daba200) SHA1(7881933760bed3b94f27585c0a6fc43e5d5153f5), ROM_BIOS(1) )
+    ROM_SYSTEM_BIOS(1, "mpi02", "MPI 51" )
+	ROMX_LOAD( "mpi .02.7c",  0x000, 0x800, CRC(2aac9296) SHA1(c01a62e7933186bdf7068d2e9a5bc36590544349), ROM_BIOS(2) )
+    ROM_SYSTEM_BIOS(2, "mpi02n", "MPI 51 (newer)" )
+	ROMX_LOAD( "new mpi .02.7c", 0x000, 0x800, CRC(ab788171) SHA1(c8e29965c04c85f2f2648496ea10c9c7ff95392f), ROM_BIOS(3) )
+	// ABC 832
+    ROM_SYSTEM_BIOS(3, "micr1015", "Micropolis 1015 (v1.4)" )
+	ROMX_LOAD( "micr 1.4.7c", 0x000, 0x800, CRC(a7bc05fa) SHA1(6ac3e202b7ce802c70d89728695f1cb52ac80307), ROM_BIOS(4) )
+    ROM_SYSTEM_BIOS(4, "micr1115", "Micropolis 1115 (v2.3)" )
+	ROMX_LOAD( "micr 2.3.7c", 0x000, 0x800, CRC(f2fc5ccc) SHA1(86d6baadf6bf1d07d0577dc1e092850b5ff6dd1b), ROM_BIOS(5) )
+    ROM_SYSTEM_BIOS(5, "basf6118", "BASF 6118 (v1.2)" )
+	ROMX_LOAD( "basf 1.2.7c", 0x000, 0x800, CRC(9ca1a1eb) SHA1(04973ad69de8da403739caaebe0b0f6757e4a6b1), ROM_BIOS(6) )
+	// ABC 838
+    ROM_SYSTEM_BIOS(6, "basf6104", "BASF 6104, BASF 6115 (v1.0)" )
+	ROMX_LOAD( "basf 8 1.0.7c", 0x000, 0x800, NO_DUMP, ROM_BIOS(7) )
 ROM_END
 
 
@@ -178,7 +185,7 @@ const rom_entry *luxor_55_10828_device::device_rom_region() const
 
 static ADDRESS_MAP_START( luxor_55_10828_mem, AS_PROGRAM, 8, luxor_55_10828_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION("abc830", 0)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION(Z80_TAG, 0)
 	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM
 ADDRESS_MAP_END
 
@@ -304,6 +311,19 @@ static const z80_daisy_config daisy_chain[] =
 //  wd17xx_interface fdc_intf
 //-------------------------------------------------
 
+static const floppy_interface lux10828_floppy_interface =
+{
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    DEVCB_NULL,
+    FLOPPY_STANDARD_5_25_DSDD,
+    LEGACY_FLOPPY_OPTIONS_NAME(default),
+    "floppy_5_25",
+	NULL
+};
+
 WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_intrq_w )
 {
 	m_fdc_irq = state;
@@ -341,6 +361,7 @@ static MACHINE_CONFIG_FRAGMENT( luxor_55_10828 )
 
 	// devices
 	MCFG_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, pio_intf)
+	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(lux10828_floppy_interface)
 	MCFG_FD1791_ADD(FD1791_TAG, fdc_intf)
 MACHINE_CONFIG_END
 
@@ -407,6 +428,8 @@ luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, cons
 	  m_maincpu(*this, Z80_TAG),
 	  m_pio(*this, Z80PIO_TAG),
 	  m_fdc(*this, FD1791_TAG),
+	  m_image0(*this, FLOPPY_0),
+	  m_image1(*this, FLOPPY_1),
 	  m_cs(false),
 	  m_fdc_irq(0),
 	  m_fdc_drq(0),
@@ -423,10 +446,6 @@ luxor_55_10828_device::luxor_55_10828_device(const machine_config &mconfig, cons
 
 void luxor_55_10828_device::device_start()
 {
-	// find floppy image devices
-	m_image0 = machine().device(FLOPPY_0);
-	m_image1 = machine().device(FLOPPY_1);
-
 	// state saving
 	save_item(NAME(m_cs));
 	save_item(NAME(m_status));
@@ -438,7 +457,7 @@ void luxor_55_10828_device::device_start()
 	save_item(NAME(m_sel1));
 
 	// patch out protection checks
-	UINT8 *rom = memregion("abc830")->base();
+	UINT8 *rom = memregion(Z80_TAG)->base();
 	rom[0x00fa] = 0xff;
 	rom[0x0336] = 0xff;
 	rom[0x0718] = 0xff;
@@ -568,8 +587,7 @@ void luxor_55_10828_device::abcbus_c3(UINT8 data)
 {
 	if (m_cs)
 	{
-		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
-		m_maincpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		m_maincpu->reset();
 	}
 }
 
@@ -699,3 +717,18 @@ WRITE8_MEMBER( luxor_55_10828_device::fdc_w )
 	case 3: wd17xx_data_w(m_fdc, 0, data);    break;
 	}
 }
+
+
+
+//**************************************************************************
+//  LUXOR 55 10828 DEVICE INPUT DEFAULTS
+//**************************************************************************
+
+//-------------------------------------------------
+//  DEVICE_INPUT_DEFAULTS( abc830_slow )
+//-------------------------------------------------
+
+DEVICE_INPUT_DEFAULTS_START( abc830_slow )
+	DEVICE_INPUT_DEFAULTS("SW1", 0x0f, 0x03)
+	DEVICE_INPUT_DEFAULTS("S1", 0x01, 0x01)
+DEVICE_INPUT_DEFAULTS_END
