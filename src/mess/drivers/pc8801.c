@@ -44,7 +44,6 @@
     list of games that crashes due of floppy issues:
     - Agni no Ishi
     - American Truck / American Truck SR (polls read deleted data command)
-    - Bersekers Front Gaiden 3 (0x9000 RAM uploads ONLY odd bytes)
     - Bokosuka Wars (polls read ID command)
     - Bouken Roman
     - Bruce Lee
