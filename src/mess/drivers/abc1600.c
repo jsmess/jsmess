@@ -1751,7 +1751,6 @@ static const wd17xx_interface fdc_intf =
 
 static ABC99_INTERFACE( abc99_intf )
 {
-	DEVCB_NULL,
 	DEVCB_DEVICE_LINE(Z8470AB1_TAG, z80dart_rxtxcb_w),
 	DEVCB_DEVICE_LINE(Z8470AB1_TAG, z80dart_dcdb_w)
 };

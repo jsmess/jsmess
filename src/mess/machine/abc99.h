@@ -48,7 +48,6 @@
 
 struct abc99_interface
 {
-	devcb_write_line	m_out_txd_cb;
 	devcb_write_line	m_out_clock_cb;
 	devcb_write_line	m_out_keydown_cb;
 };
@@ -100,7 +99,6 @@ private:
 	inline void key_down(int state);
 	inline void scan_mouse();
 
-	devcb_resolved_write_line	m_out_txd_func;
 	devcb_resolved_write_line	m_out_clock_func;
 	devcb_resolved_write_line	m_out_keydown_func;
 

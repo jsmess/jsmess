@@ -106,7 +106,6 @@ void abc99_device::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		memset(&m_out_txd_cb, 0, sizeof(m_out_txd_cb));
 		memset(&m_out_clock_cb, 0, sizeof(m_out_clock_cb));
 		memset(&m_out_keydown_cb, 0, sizeof(m_out_keydown_cb));
 	}
@@ -476,8 +475,6 @@ inline void abc99_device::serial_output()
 	if (m_so != so)
 	{
 		m_so = so;
-
-		m_out_txd_func(m_so);
 	}
 }
 
@@ -557,7 +554,6 @@ void abc99_device::device_start()
 	m_mouse_timer = timer_alloc(TIMER_MOUSE);
 
 	// resolve callbacks
-    m_out_txd_func.resolve(m_out_txd_cb, *this);
     m_out_clock_func.resolve(m_out_clock_cb, *this);
     m_out_keydown_func.resolve(m_out_keydown_cb, *this);
 
