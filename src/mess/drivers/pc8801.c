@@ -31,8 +31,6 @@
     - Battle Entry: moans with a JP msg then dies if you try to press either numpad 1 or 2 (asks if the user wants to use the sound board (yes 1 / no 2)
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
     - The Black Onyx: writes a katakana msg: "rino kata ha koko ni orimasen" then doesn't show up anything.
-    - Blue Moon Story: moans with a kanji msg;.
-    - Bubblegum Crisis: crashes due of a spurious irq (works if you soft reset the emulation when it triggers the halt opcode);
     - Can Can Bunny: bitmap artifacts on intro, could be either ALU or floppy issues;
     - Carrot: gfxs are messed up
     - Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
@@ -54,6 +52,7 @@
     - Castle Excellent (sets sector 0xf4?)
     - Card Game Pro 8.8k Plus Unit 1 (prints Disk i/o error 135 in vram, not visible for whatever reason)
     - Cuby Panic (copy protection routine at 0x911A)
+    - Door Door MK-2 (sets up TC in the middle of execution phase read then wants status bit 6 to be low PC=0x7050 of fdc cpu)
     - Harakiri
     - Jark (needs PC-8801MC)
     - MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
@@ -64,6 +63,7 @@
 
     games that needs to NOT have write-protect floppies (BTANBs):
     - Balance of Power
+    - Blue Moon Story: moans with a kanji msg;.
     - Tobira wo Akete (hangs at title screen)
 
 	other BTANBs
@@ -195,11 +195,13 @@ class pc8801_state : public driver_device
 public:
 	pc8801_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_fdccpu(*this, "fdccpu"),
 		  m_pic(*this, I8214_TAG),
 		  m_rtc(*this, UPD1990A_TAG),
 		  m_cassette(*this, CASSETTE_TAG)
 	{ }
 
+	required_device<cpu_device> m_fdccpu;
 	optional_device<i8214_device> m_pic;
 	required_device<upd1990a_device> m_rtc;
 	required_device<cassette_image_device> m_cassette;
@@ -1611,6 +1613,7 @@ static TIMER_CALLBACK( pc8801fd_upd765_tc_to_zero )
 {
 //  pc88va_state *state = machine.driver_data<pc88va_state>();
 
+	//printf("0\n");
 	upd765_tc_w(machine.device("upd765"), 0);
 }
 
@@ -1624,6 +1627,7 @@ WRITE8_MEMBER(pc8801_state::upd765_mc_w)
 
 READ8_MEMBER(pc8801_state::upd765_tc_r)
 {
+	//printf("%04x 1\n",cpu_get_pc(m_fdccpu));
 
 	upd765_tc_w(machine().device("upd765"), 1);
 	 //TODO: I'm not convinced that this works correctly with current hook-up ... 1000 usec is needed by Aploon, a bigger value breaks Alpha.
