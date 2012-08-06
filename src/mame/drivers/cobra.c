@@ -154,7 +154,7 @@
 
 	Gfx:
 	-
-	Fails on memcheck_teximage(), memcheck_framebuf(), drawcheck()
+	Fails on drawcheck()
 	0x3806dc():   Waits for [0x7f7ffc] to change (in main)
 
 
@@ -170,10 +170,21 @@
 		0xa0 0xa4 0xa8 0xac
 		0xb0 0xb4 0xb8 0xbc
 
+		0x00114:		High word: framebuffer pitch?   Low word: framebuffer pixel size?
+		0x00118:		High word: FB pixel read X pos,   Low word: FB pixel read Y pos
+		0x0011c:		Same as above?
+
+		0x40018:		Set to 0x0001040a by mode_stipple()
+		0x400d0:		Set to 0x80000000 by mode_stipple()
+		0x40114:		Set to 0x00080000 by mode_scissor()
+		0x40138:		Set to 0x88800000 by mode_viewclip()
 		0x40160:		Some viewport register? (high word: 192, low word: 150)
 		0x40164:		Some viewport register? (high word: 352, low word: 275)
 		0x40170:		Some viewport register? (high word: 160, low word: 125)
 		0x40174:		Some viewport register? (high word: 320, low word: 250)
+		0x40198:		Set to 0x80800000 by mode_alphatest()
+		0x4019c:		Set to 0x88000000 by mode_fog()
+		0x80020:		Set to 0x00020000 by mode_depthtest()
 		0xc0c00..fff:	Texture RAM readback
 		0xc3020:		Start address for texram writes?
 		0xc3028:		Reads address from texram?
@@ -203,16 +214,36 @@ struct cobra_polydata
 class cobra_renderer : public poly_manager<float, cobra_polydata, 6, 10000>
 {
 public:
-	cobra_renderer(running_machine &machine, bitmap_rgb32 *fb)
+	cobra_renderer(running_machine &machine)
 		: poly_manager<float, cobra_polydata, 6, 10000>(machine)
 	{
-		m_fb = fb;
+		m_texture_ram = auto_alloc_array(machine, UINT32, 0x100000);
 
-		m_texture_ram = auto_alloc_array(machine, UINT32, 0x1000000);
+		m_framebuffer = auto_bitmap_rgb32_alloc(machine, 1024, 1024);
+		m_backbuffer = auto_bitmap_rgb32_alloc(machine, 1024, 1024);
+		m_overlay = auto_bitmap_rgb32_alloc(machine, 1024, 1024);
+		m_zbuffer = auto_bitmap_ind32_alloc(machine, 1024, 1024);
+		m_stencil = auto_bitmap_ind32_alloc(machine, 1024, 1024);
 
 		// TODO: these are probably set by some 3D registers
 		m_texture_width = 128;
 		m_texture_height = 8;
+
+		m_gfx_regmask = auto_alloc_array(machine, UINT32, 0x100);
+		for (int i=0; i < 0x100; i++)
+		{
+			UINT32 mask = 0;
+			if (i & 0x01) mask |= 0x0000000f;
+			if (i & 0x02) mask |= 0x000000f0;
+			if (i & 0x04) mask |= 0x00000f00;
+			if (i & 0x08) mask |= 0x0000f000;
+			if (i & 0x10) mask |= 0x000f0000;
+			if (i & 0x20) mask |= 0x00f00000;
+			if (i & 0x40) mask |= 0x0f000000;
+			if (i & 0x80) mask |= 0xf0000000;
+
+			m_gfx_regmask[i] = mask;
+		}
 	}
 
 	void render_texture_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid);
@@ -224,16 +255,23 @@ public:
 	void gfx_reset(running_machine &machine);
 	void gfx_fifo_exec(running_machine &machine);
 	UINT32 gfx_read_gram(UINT32 address);
-	void gfx_write_gram(UINT32 address, UINT32 data);
+	void gfx_write_gram(UINT32 address, UINT32 mask, UINT32 data);
+
+	void display(bitmap_rgb32 *bitmap, const rectangle &cliprect);
 
 private:
-	bitmap_rgb32 *m_fb;
+	bitmap_rgb32 *m_framebuffer;
+	bitmap_rgb32 *m_backbuffer;
+	bitmap_rgb32 *m_overlay;
+	bitmap_ind32 *m_zbuffer;
+	bitmap_ind32 *m_stencil;
 
 	UINT32 *m_texture_ram;
 	int m_texture_width;
 	int m_texture_height;
 
 	UINT32 *m_gfx_gram;
+	UINT32 *m_gfx_regmask;
 };
 
 class cobra_fifo
@@ -340,8 +378,6 @@ public:
 	UINT32 *m_comram[2];
 	int m_comram_page;
 
-	bitmap_rgb32 *m_framebuffer;
-
 	int m_main_debug_state;
 	int m_main_debug_state_wc;
 	int m_sub_debug_state;
@@ -372,7 +408,7 @@ public:
 void cobra_renderer::render_color_scan(INT32 scanline, const extent_t &extent, const cobra_polydata &extradata, int threadid)
 {
 	/*
-	UINT32 *fb = &m_fb->pix32(scanline);
+	UINT32 *fb = &m_framebuffer->pix32(scanline);
 
 	UINT32 color = 0xffff0000; // TODO
 
@@ -389,7 +425,7 @@ void cobra_renderer::render_texture_scan(INT32 scanline, const extent_t &extent,
 	float v = extent.param[1].start;
 	float du = extent.param[0].dpdx;
 	float dv = extent.param[1].dpdx;
-	UINT32 *fb = &m_fb->pix32(scanline);
+	UINT32 *fb = &m_framebuffer->pix32(scanline);
 
 	for (int x = extent.startx; x < extent.stopx; x++)
 	{
@@ -429,7 +465,7 @@ void cobra_renderer::draw_point(const rectangle &visarea, vertex_t &v, UINT32 co
 	if (x >= visarea.min_x && x <= visarea.max_x &&
 		y >= visarea.min_y && y <= visarea.max_y)
 	{
-		UINT32 *fb = &m_fb->pix32(y);
+		UINT32 *fb = &m_framebuffer->pix32(y);
 		fb[x] = color;
 	}
 }
@@ -457,7 +493,7 @@ void cobra_renderer::draw_line(const rectangle &visarea, vertex_t &v1, vertex_t 
 		{
 			int y = y1 + (dy * (float)(x - x1) / (float)(dx));
 
-			UINT32 *fb = &m_fb->pix32(y);
+			UINT32 *fb = &m_framebuffer->pix32(y);
 			fb[x] = color;
 
 			x++;
@@ -470,7 +506,7 @@ void cobra_renderer::draw_line(const rectangle &visarea, vertex_t &v1, vertex_t 
 		{
 			int x = x1 + (dx * (float)(y - y1) / (float)(dy));
 
-			UINT32 *fb = &m_fb->pix32(y);
+			UINT32 *fb = &m_framebuffer->pix32(y);
 			fb[x] = color;
 
 			y++;
@@ -488,9 +524,7 @@ VIDEO_START( cobra )
 
 	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cobra_video_exit), &machine));
 
-	cobra->m_framebuffer = auto_bitmap_rgb32_alloc(machine, 512, 384);
-
-	cobra->m_renderer = auto_alloc(machine, cobra_renderer(machine, cobra->m_framebuffer));
+	cobra->m_renderer = auto_alloc(machine, cobra_renderer(machine));
 	cobra->m_renderer->gfx_init(machine);
 }
 
@@ -498,7 +532,7 @@ SCREEN_UPDATE_RGB32( cobra )
 {
 	cobra_state *cobra = screen.machine().driver_data<cobra_state>();
 
-	copybitmap_trans(bitmap, *cobra->m_framebuffer, 0, 0, 0, 0, cliprect, 0);
+	cobra->m_renderer->display(&bitmap, cliprect);
 	return 0;
 }
 
@@ -1386,6 +1420,11 @@ ADDRESS_MAP_END
 #define RE_STATUS_IDLE			0
 #define RE_STATUS_COMMAND		1
 
+void cobra_renderer::display(bitmap_rgb32 *bitmap, const rectangle &cliprect)
+{
+	copybitmap_trans(*bitmap, *m_framebuffer, 0, 0, 0, 0, cliprect, 0);
+}
+
 void cobra_renderer::gfx_init(running_machine &machine)
 {
 	cobra_state *cobra = machine.driver_data<cobra_state>();
@@ -1433,7 +1472,7 @@ UINT32 cobra_renderer::gfx_read_gram(UINT32 address)
 	return m_gfx_gram[address/4];
 }
 
-void cobra_renderer::gfx_write_gram(UINT32 address, UINT32 data)
+void cobra_renderer::gfx_write_gram(UINT32 address, UINT32 mask, UINT32 data)
 {
 	if (address & 3)
 	{
@@ -1445,7 +1484,8 @@ void cobra_renderer::gfx_write_gram(UINT32 address, UINT32 data)
 	{
 	}
 
-	m_gfx_gram[address/4] = data;
+	m_gfx_gram[address/4] &= ~mask;
+	m_gfx_gram[address/4] |= data & mask;
 }
 
 void cobra_renderer::gfx_fifo_exec(running_machine &machine)
@@ -1876,11 +1916,10 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 
 			case 0xe8:
 			{
-				// Write into a pixelbuffer?
+				// Write into a pixelbuffer
 
 				int num = w2;
 				int i;
-				//int c=0;
 
 				if (fifo_in->current_num() < num)
 				{
@@ -1888,30 +1927,45 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 					return;
 				}
 
-				if (num > 0)
+				if (num & 3)
+					fatalerror("gfxfifo_exec: e8 with num %d\n", num);
+
+				int x = (m_gfx_gram[0x118/4] >> 16) & 0xffff;
+				int y = m_gfx_gram[0x118/4] & 0xffff;
+
+				for (i=0; i < num; i+=4)
 				{
-					printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
+					UINT32 *buffer;
+					switch (m_gfx_gram[0x80104/4])
+					{
+						case 0x800000:		buffer = &m_framebuffer->pix32(y); break;
+						case 0x200000:		buffer = &m_backbuffer->pix32(y); break;
+						case 0x0e0000:		buffer = &m_overlay->pix32(y); break;
+						case 0x000800:		buffer = &m_zbuffer->pix32(y); break;
+						case 0x000200:		buffer = &m_stencil->pix32(y); break;
+						
+						default:
+						{
+							fatalerror("gfxfifo_exec: fb write to buffer %08X!\n", m_gfx_gram[0x80100/4]);
+						}
+					}
+
+					UINT64 param[4];
+					param[0] = param[1] = param[2] = param[3] = 0;
+					fifo_in->pop(NULL, &param[0]);
+					fifo_in->pop(NULL, &param[1]);
+					fifo_in->pop(NULL, &param[2]);
+					fifo_in->pop(NULL, &param[3]);
+
+					buffer[x+0] = (UINT32)(param[0]);
+					buffer[x+1] = (UINT32)(param[1]);
+					buffer[x+2] = (UINT32)(param[2]);
+					buffer[x+3] = (UINT32)(param[3]);
+
+					//printf("gfx: fb write %d, %d: %08X %08X %08X %08X\n", x, y, (UINT32)(param[0]), (UINT32)(param[1]), (UINT32)(param[2]), (UINT32)(param[3]));
+
+					y++;
 				}
-
-				for (i=0; i < num; i++)
-				{
-					UINT64 param;
-					fifo_in->pop(NULL, &param);
-
-					/*
-                    if (c == 0)
-                        printf("       ");
-                    printf("%08X ", (UINT32)(param));
-
-                    c++;
-
-                    if (c == 8)
-                    {
-                        printf("\n");
-                        c = 0;
-                    }*/
-				}
-				//printf("\n");
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
 				break;
@@ -1919,20 +1973,32 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 
 			case 0xe9:
 			{
-				// Read a specified pixel position from a pixelbuffer?
+				// Read a specified pixel position from a pixelbuffer
 
-			//  printf("gfxfifo_exec: unhandled %08X %08X\n", w1, w2);
+//				printf("GFX: FB read X: %d, Y: %d\n", (UINT16)(m_gfx_gram[0x118/4] >> 16), (UINT16)(m_gfx_gram[0x118/4]));
 
-				/*{
-                    int y = (gfx_gram[0x11c] << 8) | (gfx_gram[0x11d]);
-                    int x = (gfx_gram[0x11e] << 8) | (gfx_gram[0x11f]);
-                    printf("GFX: E9 on X: %d, Y: %d\n", x, y);
-                }*/
+				int x = (m_gfx_gram[0x118/4] >> 16) & 0xffff;
+				int y = m_gfx_gram[0x118/4] & 0xffff;
 
-				fifo_out->push(NULL, 0);
-				fifo_out->push(NULL, 0);
-				fifo_out->push(NULL, 0);
-				fifo_out->push(NULL, 0);
+				UINT32 *buffer;
+				switch (m_gfx_gram[0x80104/4])
+				{
+					case 0x800000:		buffer = &m_framebuffer->pix32(y); break;
+					case 0x200000:		buffer = &m_backbuffer->pix32(y); break;
+					case 0x0e0000:		buffer = &m_overlay->pix32(y); break;
+					case 0x000800:		buffer = &m_zbuffer->pix32(y); break;
+					case 0x000200:		buffer = &m_stencil->pix32(y); break;
+						
+					default:
+					{
+						fatalerror("gfxfifo_exec: fb read from buffer %08X!\n", m_gfx_gram[0x80100/4]);
+					}
+				}
+
+				fifo_out->push(NULL, buffer[x+0]);
+				fifo_out->push(NULL, buffer[x+1]);
+				fifo_out->push(NULL, buffer[x+2]);
+				fifo_out->push(NULL, buffer[x+3]);
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
 				break;
@@ -1996,12 +2062,13 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 				//                     0xa40000FF 0x00000001
 
 				int reg = (w1 >> 8) & 0xfffff;
+				UINT32 mask = m_gfx_regmask[w1 & 0xff];
 
-				gfx_write_gram(reg, w2);
+				gfx_write_gram(reg, mask, w2);
 
 				if (reg != 0x118 && reg != 0x114 && reg != 0x11c)
 				{
-					printf("gfxfifo_exec: ram write %05X: %08X (%f)\n", reg, w2, u2f(w2));
+					printf("gfxfifo_exec: ram write %05X (mask %08X): %08X (%f)\n", reg, mask, w2, u2f(w2));
 				}
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
@@ -2031,7 +2098,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 					UINT64 value = 0;
 					fifo_in->pop(NULL, &value);
 
-					gfx_write_gram(reg + (i*4), value);
+					gfx_write_gram(reg + (i*4), 0xffffffff, value);
 				}
 
 				cobra->m_gfx_re_status = RE_STATUS_IDLE;
@@ -2099,7 +2166,8 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 
 				cobra->m_gfx_unk_status |= 0x400;
 
-				printf("gfxfifo_exec: tex_ints %d words left\n", num-cobra->m_gfx_re_word_count);
+				if (cobra->m_gfx_re_word_count == 0)
+					printf("gfxfifo_exec: tex_ints %d words left\n", num - cobra->m_gfx_re_word_count);
 
 				for (int i=0; i < num_left; i++)
 				{
