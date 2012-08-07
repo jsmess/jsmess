@@ -5,7 +5,7 @@ Undumped protos:
   - Crazy Faces
 
 The following games existed according to VGRebirth
-  - CJ Elephant Fugitive (Euro, USA) by Codemasters
+  - CJ Elephant Fugitive (USA) by Codemasters
   - FIFA 95 (USA) by Electronic Arts
   - NBA Jam T.E. (Jpn) by Acclaim
   - NFL Quarterback Club 95 (Jpn) by Acclaim
@@ -1655,6 +1655,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
+	<software name="cj">
+		<description>CJ Elephant Fugitive (Euro)</description>
+		<year>1991</year>
+		<publisher>Codemasters</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="cj elephant fugitive.bin" size="262144" crc="72981057" sha1="a60815aa0c6ec2bc5ad7f817668b74a42bb64026" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cliffh">
 		<description>Cliffhanger (USA)</description>
 		<year>1993</year>
@@ -1757,7 +1768,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="cosmic">
+	<software name="cosmic" supported="partial">
 		<description>Cosmic Spacehead (Euro)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
@@ -2226,7 +2237,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="ecco">
+	<software name="ecco" supported="no">
 		<description>Ecco the Dolphin (Euro, USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -3501,7 +3512,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="kishin">
+	<software name="zenki">
 		<description>Kishin Douji Zenki (Jpn)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
@@ -3734,7 +3745,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="lionkingp9" cloneof="lionking">
-		<description>The Lion King (Prototype, 19940803)</description>
+		<description>Disney's The Lion King (Prototype, 19940803)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3745,7 +3756,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="lionkingp8" cloneof="lionking">
-		<description>The Lion King (Prototype, 19940811)</description>
+		<description>Disney's The Lion King (Prototype, 19940811)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3756,7 +3767,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="lionkingp7" cloneof="lionking">
-		<description>The Lion King (Prototype, 19940812)</description>
+		<description>Disney's The Lion King (Prototype, 19940812)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3767,7 +3778,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="lionkingp6" cloneof="lionking">
-		<description>The Lion King (Prototype, 19940813)</description>
+		<description>Disney's The Lion King (Prototype, 19940813)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3778,7 +3789,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="lionkingp5" cloneof="lionking">
-		<description>The Lion King (Prototype, 19940814)</description>
+		<description>Disney's The Lion King (Prototype, 19940814)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3790,7 +3801,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- same as aug 14 proto. was a mistake by drx? -->
 	<!--software name="lionkingp5b" cloneof="lionking">
-		<description>The Lion King (Prototype, 19940815)</description>
+		<description>Disney's The Lion King (Prototype, 19940815)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3801,7 +3812,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software-->
 
 	<software name="lionkingp4" cloneof="lionking">
-		<description>The Lion King (Prototype, 19940816)</description>
+		<description>Disney's The Lion King (Prototype, 19940816)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4200,7 +4211,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="micromac">
+	<software name="micromac" supported="partial">
 		<description>Micro Machines (Euro)</description>
 		<year>1993</year>
 		<publisher>Codemasters</publisher>
@@ -4211,7 +4222,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="micromc2">
+	<software name="micromc2" supported="partial">
 		<description>Micro Machines 2 - Turbo Tournament (Euro)</description>
 		<year>1995</year>
 		<publisher>Codemasters</publisher>
@@ -4955,7 +4966,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="nfl95p06" cloneof="nfl95">
-		<description>NFL '95 (PrototypeM 19940910)</description>
+		<description>NFL '95 (Prototype, 19940910)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5557,7 +5568,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="psampras">
+	<software name="sampras">
 		<description>Pete Sampras Tennis (Euro)</description>
 		<year>1994</year>
 		<publisher>Codemasters</publisher>
@@ -5716,7 +5727,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="pokerf3">
+	<software name="pokerfs">
 		<description>Poker Face Paul's Solitaire (USA)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -6102,12 +6113,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- Alt. Title: Ristar The Shooting Star (Jpn Box?) -->
 	<software name="ristar">
-		<description>Ristar (World)</description>
+		<description>Ristar - The Shooting Star (World)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-3365 (JPN), 2543"/>
 		<info name="release" value="19950217 (JPN)"/>
-		<info name="alt_title" value="リスター ザ・シューティングスター"/>
+		<info name="alt_title" value="リスター ザ・シューティングスター, Ristar (US/Euro Box)"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="ristar - the shooting star (world).bin" size="524288" crc="efe65b3b" sha1="d0d950097471553b6a96dc9cf0fb14ddb3a7dda2" offset="000000" />
@@ -6116,7 +6127,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="ristarp2" cloneof="ristar">
-		<description>Ristar (Prototype, 19941101)</description>
+		<description>Ristar - The Shooting Star (Prototype, 19941101)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6127,7 +6138,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="ristarp1" cloneof="ristar">
-		<description>Ristar (Prototype, 19941102)</description>
+		<description>Ristar - The Shooting Star (Prototype, 19941102)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6138,7 +6149,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="ristarp4" cloneof="ristar">
-		<description>Ristar (Prototype, 19941019)</description>
+		<description>Ristar - The Shooting Star (Prototype, 19941019)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6149,7 +6160,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="ristarp3" cloneof="ristar">
-		<description>Ristar (Prototype, 19941026)</description>
+		<description>Ristar - The Shooting Star (Prototype, 19941026)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6160,7 +6171,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="ristarp5" cloneof="ristar">
-		<description>Ristar (Prototype, 19940909)</description>
+		<description>Ristar - The Shooting Star (Prototype, 19940909)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7245,172 +7256,9 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sporttrvp17" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950403-2MEG)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 03,  1995 - 2meg).bin" size="262144" crc="3e3d6728" sha1="8fc968be19d8da9335bf3a6dac97657058ef5a78" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp16" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950403-QTEST)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 03,  1995 - qtest).bin" size="262144" crc="c68762e6" sha1="dbab3669da5a204ce78af3fc5a1749a08c39262e" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp15" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950404-2MEG)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 04,  1995 - 2meg).bin" size="262144" crc="d61a366f" sha1="463dbaafd144c430f3b62dbb53578f26441bfdb8" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp14" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950405-2MEG-B)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 05,  1995 - 2meg - b).bin" size="262144" crc="818ec54c" sha1="48ff2e462d0b17022c8085133447dd7eedac898b" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp13" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950405-2MEG-C)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 05,  1995 - 2meg - c).bin" size="262144" crc="f88a55f4" sha1="c857bef7eed535d1f827ad439df112b3b0c05cf8" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
+<!-- Apparently, the development of both Sports Trivia and Sports Trivia CE went on in parallel... hard to say which 
+     version the QTEST/ALOGTEST/etc. protos were for (more info are needed on these, or some code analysis/comparison) -->
 	<software name="sporttrvp12" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950405-QTEST)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 05,  1995 - qtest).bin" size="262144" crc="93b98f19" sha1="a57c18adfa86e86b3e43f605617205a219aafdfb" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp11" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950406-2MEG)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 06,  1995 - 2meg).bin" size="262144" crc="cab74070" sha1="aa61ae6b979d30757b1192118796878e3e1c082f" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp10" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950407-2MEG)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 07,  1995 - 2meg).bin" size="262144" crc="352e8b8c" sha1="e4938d6b435fce12b4b73591447422342b919e9f" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp09" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950407-QTEST)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 07,  1995 - qtest).bin" size="262144" crc="961ae378" sha1="34986c53709ef347a8ec620dbe7b35fef8ff3ef0" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp08" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950411-2MEG)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 11,  1995 - 2meg).bin" size="262144" crc="8bdb184d" sha1="203f4ebd0ca75bbeeb3723372500336415f59da4" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp07" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950412-2MEG)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 12,  1995 - 2meg).bin" size="262144" crc="1e360a20" sha1="5ced41cadede9959775f1d6cf229a19c0d739c88" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp06" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950425-1MEG)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="131072">
-				<rom name="sports trivia (prototype - apr 25,  1995 - 1meg).bin" size="131072" crc="895af58a" sha1="8e42323155c0e0f0cd050e66f89f821cb884f7a1" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp05" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950425-QTEST)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="131072">
-				<rom name="sports trivia (prototype - apr 25,  1995 - qtest).bin" size="131072" crc="7524957c" sha1="90834a82aa40f69abf57d34d1910d829d8632af0" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp04" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950427-1MEG)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="131072">
-				<rom name="sports trivia (prototype - apr 27,  1995 - 1meg).bin" size="131072" crc="7898919f" sha1="36d665e221ecf7c0d5f3af1edc83c9e56f3256af" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp03" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950428-2MEG)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - apr 28,  1995 - 2meg).bin" size="262144" crc="26470d2b" sha1="23a9d5dee62d64eed1de6e35ac75cbe5786a0c06" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp36" cloneof="sporttrv">
 		<description>Sports Trivia (Prototype, 19950308)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
@@ -7421,7 +7269,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sporttrvp35" cloneof="sporttrv">
+	<software name="sporttrvp11" cloneof="sporttrv">
 		<description>Sports Trivia (Prototype, 19950309)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
@@ -7432,7 +7280,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sporttrvp34" cloneof="sporttrv">
+	<software name="sporttrvp10" cloneof="sporttrv">
 		<description>Sports Trivia (Prototype, 19950313)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
@@ -7443,7 +7291,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sporttrvp33" cloneof="sporttrv">
+	<software name="sporttrvp09" cloneof="sporttrv">
 		<description>Sports Trivia (Prototype, 19950316-1MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
@@ -7454,7 +7302,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sporttrvp32" cloneof="sporttrv">
+	<software name="sporttrvp08" cloneof="sporttrv">
 		<description>Sports Trivia (Prototype, 19950316-2MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
@@ -7465,7 +7313,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sporttrvp31" cloneof="sporttrv">
+	<software name="sporttrvp07" cloneof="sporttrv">
 		<description>Sports Trivia (Prototype, 19950317-2MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
@@ -7476,7 +7324,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sporttrvp30" cloneof="sporttrv">
+	<software name="sporttrvp06" cloneof="sporttrv">
 		<description>Sports Trivia (Prototype, 19950320-2MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
@@ -7487,7 +7335,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sporttrvp29" cloneof="sporttrv">
+	<software name="sporttrvp05" cloneof="sporttrv">
 		<description>Sports Trivia (Prototype, 19950320-QTEST)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
@@ -7498,139 +7346,40 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sporttrvp28" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950321-2MEG)</description>
+	<software name="sporttrvp04" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950425-1MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 21,  1995 - 2meg).bin" size="262144" crc="18cf6145" sha1="400a91d37ad6eaf54d2b4057d562876507ea715e" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="sports trivia (prototype - apr 25,  1995 - 1meg).bin" size="131072" crc="895af58a" sha1="8e42323155c0e0f0cd050e66f89f821cb884f7a1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sporttrvp27" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950323-2MEG)</description>
+	<software name="sporttrvp03" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950425-QTEST)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 23,  1995 - 2meg).bin" size="262144" crc="27816c09" sha1="5ad1ed30fcc414b237c6a9057e3f43913c3ebf23" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="sports trivia (prototype - apr 25,  1995 - qtest).bin" size="131072" crc="7524957c" sha1="90834a82aa40f69abf57d34d1910d829d8632af0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sporttrvp26" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950323-ALGOTEST)</description>
+	<software name="sporttrvp02" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950427-1MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
 		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 23,  1995 - algotest).bin" size="262144" crc="9a8ad5ca" sha1="7a9dfd2ca7ecba07ef141ad9f2428052b441e200" offset="000000" />
+			<dataarea name="rom" size="131072">
+				<rom name="sports trivia (prototype - apr 27,  1995 - 1meg).bin" size="131072" crc="7898919f" sha1="36d665e221ecf7c0d5f3af1edc83c9e56f3256af" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sporttrvp25" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950323-QTEST)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 23,  1995 - qtest).bin" size="262144" crc="acb7e580" sha1="227f12188ceaa0577cd6604804d1228e342c67a2" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp24" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950327-2MEG)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 27,  1995 - 2meg).bin" size="262144" crc="517bd817" sha1="3ae00363f54b73c47d6e6125e3a7d3741f33fccf" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp23" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950327-ALGOTEST)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 27,  1995 - algotest).bin" size="262144" crc="511b1d24" sha1="b7ba8f1c6ec2958da3a040ab56f9915f13723a70" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp22" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950329-2MEG)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 29,  1995 - 2meg).bin" size="262144" crc="e906fbd8" sha1="3410bafb1757988f1cb270745dfa9ac22212539b" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp21" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950329-ALGOTEST)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 29,  1995 - algotest).bin" size="262144" crc="e80459b3" sha1="cfcb94207728f781602ff8375cda3c2de25b7eed" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp20" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950329-QTEST)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 29,  1995 - qtest).bin" size="262144" crc="05047357" sha1="50cce09ee3c077feaf7ad9df1e2a9f4fde0e7691" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp19" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950330-2MEG-D)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 30,  1995 - 2meg - d).bin" size="262144" crc="302b9b36" sha1="d462337a78f85882e7ebcb95e129ab18e75e44a4" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp18" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950330-QTEST)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - mar 30,  1995 - qtest).bin" size="262144" crc="f3f9a87b" sha1="0ac64a9077ddcb53d2d35748f13b9d462f27ab51" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp02" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype, 19950502-2MEG)</description>
-		<year>1995</year>
-		<publisher>Sega?</publisher>
-		<part name="cart" interface="gamegear_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="sports trivia (prototype - may 02,  1995 - 2meg).bin" size="262144" crc="15e7e261" sha1="03b4e8d8afc14d8df113043c3d53130df6eb769e" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sporttrvp01" cloneof="sporttrv">
+	<software name="sporttrvp01" cloneof="sprtrvce">
 		<description>Sports Trivia (Prototype, 19950504-1MEG)</description>
 		<year>1995</year>
 		<publisher>Sega?</publisher>
@@ -7652,11 +7401,276 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
+	<software name="sprtrvcep01" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950502-2MEG)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - may 02,  1995 - 2meg).bin" size="262144" crc="15e7e261" sha1="03b4e8d8afc14d8df113043c3d53130df6eb769e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep13" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950403-2MEG)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - apr 03,  1995 - 2meg).bin" size="262144" crc="3e3d6728" sha1="8fc968be19d8da9335bf3a6dac97657058ef5a78" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep12" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950403-QTEST)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - apr 03,  1995 - qtest).bin" size="262144" crc="c68762e6" sha1="dbab3669da5a204ce78af3fc5a1749a08c39262e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep11" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950404-2MEG)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - apr 04,  1995 - 2meg).bin" size="262144" crc="d61a366f" sha1="463dbaafd144c430f3b62dbb53578f26441bfdb8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep10" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950405-2MEG-B)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - apr 05,  1995 - 2meg - b).bin" size="262144" crc="818ec54c" sha1="48ff2e462d0b17022c8085133447dd7eedac898b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep09" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950405-2MEG-C)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - apr 05,  1995 - 2meg - c).bin" size="262144" crc="f88a55f4" sha1="c857bef7eed535d1f827ad439df112b3b0c05cf8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep08" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950405-QTEST)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - apr 05,  1995 - qtest).bin" size="262144" crc="93b98f19" sha1="a57c18adfa86e86b3e43f605617205a219aafdfb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep07" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950406-2MEG)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - apr 06,  1995 - 2meg).bin" size="262144" crc="cab74070" sha1="aa61ae6b979d30757b1192118796878e3e1c082f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep06" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950407-2MEG)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - apr 07,  1995 - 2meg).bin" size="262144" crc="352e8b8c" sha1="e4938d6b435fce12b4b73591447422342b919e9f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep05" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950407-QTEST)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - apr 07,  1995 - qtest).bin" size="262144" crc="961ae378" sha1="34986c53709ef347a8ec620dbe7b35fef8ff3ef0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep04" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950411-2MEG)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - apr 11,  1995 - 2meg).bin" size="262144" crc="8bdb184d" sha1="203f4ebd0ca75bbeeb3723372500336415f59da4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep03" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950412-2MEG)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - apr 12,  1995 - 2meg).bin" size="262144" crc="1e360a20" sha1="5ced41cadede9959775f1d6cf229a19c0d739c88" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep02" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950428-2MEG)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - apr 28,  1995 - 2meg).bin" size="262144" crc="26470d2b" sha1="23a9d5dee62d64eed1de6e35ac75cbe5786a0c06" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep24" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950321-2MEG)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - mar 21,  1995 - 2meg).bin" size="262144" crc="18cf6145" sha1="400a91d37ad6eaf54d2b4057d562876507ea715e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep23" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950323-2MEG)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - mar 23,  1995 - 2meg).bin" size="262144" crc="27816c09" sha1="5ad1ed30fcc414b237c6a9057e3f43913c3ebf23" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep22" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950323-ALGOTEST)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - mar 23,  1995 - algotest).bin" size="262144" crc="9a8ad5ca" sha1="7a9dfd2ca7ecba07ef141ad9f2428052b441e200" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep21" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950323-QTEST)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - mar 23,  1995 - qtest).bin" size="262144" crc="acb7e580" sha1="227f12188ceaa0577cd6604804d1228e342c67a2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep20" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950327-2MEG)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - mar 27,  1995 - 2meg).bin" size="262144" crc="517bd817" sha1="3ae00363f54b73c47d6e6125e3a7d3741f33fccf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep19" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950327-ALGOTEST)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - mar 27,  1995 - algotest).bin" size="262144" crc="511b1d24" sha1="b7ba8f1c6ec2958da3a040ab56f9915f13723a70" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep18" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950329-2MEG)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - mar 29,  1995 - 2meg).bin" size="262144" crc="e906fbd8" sha1="3410bafb1757988f1cb270745dfa9ac22212539b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep17" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950329-ALGOTEST)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - mar 29,  1995 - algotest).bin" size="262144" crc="e80459b3" sha1="cfcb94207728f781602ff8375cda3c2de25b7eed" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep16" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950329-QTEST)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - mar 29,  1995 - qtest).bin" size="262144" crc="05047357" sha1="50cce09ee3c077feaf7ad9df1e2a9f4fde0e7691" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep15" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950330-2MEG-D)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - mar 30,  1995 - 2meg - d).bin" size="262144" crc="302b9b36" sha1="d462337a78f85882e7ebcb95e129ab18e75e44a4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sprtrvcep14" cloneof="sprtrvce">
+		<description>Sports Trivia (Prototype, 19950330-QTEST)</description>
+		<year>1995</year>
+		<publisher>Sega?</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sports trivia (prototype - mar 30,  1995 - qtest).bin" size="262144" crc="f3f9a87b" sha1="0ac64a9077ddcb53d2d35748f13b9d462f27ab51" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="stng">
-		<description>Star Trek - The Next Generation - The Advanced Holodeck Tutorial (USA)</description>
+		<description>Star Trek - The Next Generation (USA)</description>
 		<year>1994</year>
 		<publisher>Absolute Entertainment</publisher>
 		<info name="serial" value="T-86038"/>
+		<info name="alt_title" value="Star Trek - The Next Generation - The Advanced Holodeck Tutorial (Box)"/>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="star trek - the next generation - the advanced holodeck tutorial (usa).bin" size="262144" crc="80156323" sha1="a508ff0ea93390e42e2440ed4aca531047281c23" offset="000000" />
@@ -9260,7 +9274,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="yuyuhaku">
+	<software name="yuyu">
 		<description>Yu Yu Hakusho - Horobishimono no Gyakushuu (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -9274,7 +9288,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="yuyuhak2">
+	<software name="yuyu2">
 		<description>Yu Yu Hakusho 2 - Gekitou! Nanakyou no Tatakai (Jpn)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
