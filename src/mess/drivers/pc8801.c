@@ -30,7 +30,6 @@
     - Acro Jet: hangs waiting for an irq (floppy issue);
     - Advanced Fantasian: wants an irq that can't happen (I is equal to 0x3f)
     - American Success: reads the light pen?
-    - Arion: random hang, FDC CPU communication issue?
     - Balance of Power: uses the SIO port for mouse polling;
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
     - The Black Onyx: writes a katakana msg: "rino kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
@@ -52,8 +51,6 @@
     - Ankokujou
     - Ao No Sekizou (fdc CPU irq doesn't fire anymore)
     - Arcus
-    - Arcus (demo) (After Wolf Team logo)
-    - Arcus 2 (at PCM loading)
     - Attacker
     - Autumn Park (BASIC error)
     - Battle Gorilla
@@ -62,15 +59,14 @@
 	- Blassty (attempts to read at 0x801b)
     - Bokosuka Wars (polls read ID command)
     - Boukenshatachi
-    - Bruce Lee (fdccpu reads port C in a weird fashion)
     - Can Can Bunny Superior
     - Carmine
+	(Casablanca)
     - Castle Excellent (sets sector 0xf4? Jumps to 0xa100 and it shouldn't)
     - Card Game Pro 8.8k Plus Unit 1 (prints Disk i/o error 135 in vram, not visible for whatever reason)
     - Cuby Panic (copy protection routine at 0x911A)
     - Door Door MK-2 (sets up TC in the middle of execution phase read then wants status bit 6 to be low PC=0x7050 of fdc cpu)
     - Harakiri
-    - Jark (needs PC-8801MC)
     - MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
     - Mr. Pro Yakyuu
     - The Return of Ishtar
@@ -82,7 +78,6 @@
     - Ayumi: black screen after new game / load game screen;
     - Brunette: No sound, eventually hangs at gameplay;
 
-
     games that needs to NOT have write-protect floppies (BTANBs):
     - 100 Yen Disk 7: (doesn't boot in V2 mode)
     - Balance of Power
@@ -91,6 +86,7 @@
 
 	other BTANBs
 	- Attack Hirokochan: returns to BASIC after an initial animation, needs BASIC V1:
+    - Jark (needs PC-8801MC)
 	- Kuronekosou Souzoku Satsujin Jiken: "Illegal function call in 105", needs BASIC V1;
 
     Notes:
@@ -1160,7 +1156,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_irq_level_w)
 	else
 		m_i8214_irq_level = data & 7;
 
-	IRQ_LOG(("%02x LV\n",m_i8214_irq_level));
+//	IRQ_LOG(("%02x LV\n",m_i8214_irq_level));
 }
 
 
@@ -1178,7 +1174,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_irq_mask_w)
 	if(m_timer_irq_latch == 0 && m_vrtc_irq_latch == 0 && m_sound_irq_latch == 0)
 		cputag_set_input_line(machine(),"maincpu",0,CLEAR_LINE);
 
-	IRQ_LOG(("%02x MASK (%02x %02x)\n",data,m_timer_irq_latch,m_vrtc_irq_latch));
+//	IRQ_LOG(("%02x MASK (%02x %02x)\n",data,m_timer_irq_latch,m_vrtc_irq_latch));
 
 	//if(data & 4)
 	//  printf("IRQ mask %02x\n",data);
@@ -2208,7 +2204,7 @@ static void pc8801_sound_irq( device_t *device, int irq )
 	if(state->m_sound_irq_mask && irq)
 	{
 		state->m_sound_irq_latch = 1;
-		IRQ_LOG(("sound\n"));
+		//IRQ_LOG(("sound\n"));
 		cputag_set_input_line(device->machine(),"maincpu",0,HOLD_LINE);
 	}
 }
@@ -2219,7 +2215,7 @@ static TIMER_DEVICE_CALLBACK( pc8801_rtc_irq )
 	if(state->m_timer_irq_mask && state->m_i8214_irq_level >= 3)
 	{
 		state->m_timer_irq_latch = 1;
-		IRQ_LOG(("timer\n"));
+		//IRQ_LOG(("timer\n"));
 		cputag_set_input_line(timer.machine(),"maincpu",0,HOLD_LINE);
 	}
 }
@@ -2230,7 +2226,7 @@ static INTERRUPT_GEN( pc8801_vrtc_irq )
 	if(state->m_vrtc_irq_mask && state->m_i8214_irq_level >= 2)
 	{
 		state->m_vrtc_irq_latch = 1;
-		IRQ_LOG(("vrtc\n"));
+		//IRQ_LOG(("vrtc\n"));
 		device_set_input_line(device,0,HOLD_LINE);
 	}
 }
@@ -2396,7 +2392,7 @@ static const ym2203_interface pc88_ym2203_intf =
 static const ym2608_interface pc88_ym2608_intf =
 {
 	{
-		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
+		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
 		DEVCB_HANDLER(opn_porta_r),
 		DEVCB_HANDLER(opn_portb_r),
@@ -2501,7 +2497,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_SOUND_CONFIG(pc88_ym2203_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("opna", YM2608, MASTER_CLOCK)
+	MCFG_SOUND_ADD("opna", YM2608, MASTER_CLOCK*2) // TODO: irq timing issue?
 	MCFG_SOUND_CONFIG(pc88_ym2608_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
