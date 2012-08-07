@@ -528,12 +528,13 @@ static UINT8 calc_cursor_pos(running_machine &machine,int x,int y,int yi)
 
 
 
-static UINT8 extract_text_attribute(running_machine &machine,UINT32 address,int x)
+static UINT8 extract_text_attribute(running_machine &machine,UINT32 address,int x, UINT8 width)
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	UINT8 *vram = state->memregion("wram")->base();
 	int i;
 	int fifo_size;
+	int offset;
 
 	if(state->m_crtc.param[0][4] & 0x80)
 	{
@@ -542,11 +543,12 @@ static UINT8 extract_text_attribute(running_machine &machine,UINT32 address,int 
 	}
 
 	fifo_size = (state->m_crtc.param[0][4] & 0x20) ? 0 : ((state->m_crtc.param[0][4] & 0x1f) + 1);
+	/* TODO: correct or hack-ish? Certainly having 0 as a attribute X is weird in any case. */
+	offset = (vram[address] == 0) ? 2 : 0;
 
 	for(i=0;i<fifo_size;i++)
 	{
-		/* TODO: DMA timing bug? N-BASIC attributes doesn't work without +2 here ... */
-		if(x < vram[address])
+		if(x < vram[address+offset])
 		{
 			return vram[address+1];
 		}
@@ -554,7 +556,7 @@ static UINT8 extract_text_attribute(running_machine &machine,UINT32 address,int 
 			address+=2;
 	}
 
-	return 0;
+	return vram[address-3+offset];
 }
 
 static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int height,int width)
@@ -660,8 +662,6 @@ static void draw_text(running_machine &machine, bitmap_ind16 &bitmap,int y_size,
 	UINT8 blink;
 	int pal;
 
-//	popmessage("%02x",state->m_crtc.param[0][4]);
-
 	for(y=0;y<y_size;y++)
 	{
 		for(x=0;x<80;x++)
@@ -669,7 +669,7 @@ static void draw_text(running_machine &machine, bitmap_ind16 &bitmap,int y_size,
 			if(x & 1 && !width)
 				continue;
 
-			attr = extract_text_attribute(machine,(((y*120)+80+state->m_dma_address[2]) & 0xffff),(x));
+			attr = extract_text_attribute(machine,(((y*120)+80+state->m_dma_address[2]) & 0xffff),(x),width);
 
 			if(text_color_flag) // color mode
 			{
@@ -1264,6 +1264,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_layer_masking_w)
 
 READ8_MEMBER(pc8801_state::pc8801_crtc_param_r)
 {
+	printf("CRTC param reading\n");
 	return 0xff;
 }
 
@@ -1336,7 +1337,7 @@ WRITE8_MEMBER(pc8801_state::pc88_crtc_cmd_w)
 	}
 
 	//if((data >> 5) != 4)
-	//  printf("CRTC cmd %s polled\n",crtc_command[data >> 5]);
+	//  printf("CRTC cmd %s polled %02x\n",crtc_command[data >> 5],data & 0x1f);
 }
 
 READ8_MEMBER(pc8801_state::pc8801_dmac_r)
