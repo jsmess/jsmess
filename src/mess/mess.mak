@@ -1227,9 +1227,12 @@ $(MESSOBJ)/luxor.a:				\
 	$(MESS_MACHINE)/abcbus.o	\
 	$(MESS_MACHINE)/abc_dos.o	\
 	$(MESS_MACHINE)/abc_fd2.o	\
+	$(MESS_MACHINE)/abc_hdc.o	\
 	$(MESS_MACHINE)/abc_uni800.o	\
 	$(MESS_MACHINE)/abc_sio.o	\
 	$(MESS_MACHINE)/abc_slutprov.o	\
+	$(MESS_MACHINE)/abc_turbo.o	\
+	$(MESS_MACHINE)/abc_xebec.o	\
 	$(MESS_MACHINE)/abc77.o		\
 	$(MESS_MACHINE)/abc99.o		\
 	$(MESS_MACHINE)/lux10828.o	\

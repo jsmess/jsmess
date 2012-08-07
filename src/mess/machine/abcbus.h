@@ -202,9 +202,12 @@ extern const device_type ABCBUS_SLOT;
 #include "machine/abc890.h"
 #include "machine/abc_dos.h"
 #include "machine/abc_fd2.h"
+#include "machine/abc_hdc.h"
 #include "machine/abc_uni800.h"
 #include "machine/abc_sio.h"
 #include "machine/abc_slutprov.h"
+#include "machine/abc_turbo.h"
+#include "machine/abc_xebec.h"
 #include "machine/lux10828.h"
 #include "machine/lux21046.h"
 

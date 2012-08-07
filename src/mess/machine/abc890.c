@@ -107,7 +107,7 @@ machine_config_constructor abc894_device::device_mconfig_additions() const
 
 static MACHINE_CONFIG_FRAGMENT( abc850 )
 	MCFG_ABCBUS_SLOT_ADD("io1", abcbus_intf, abcbus_cards, "fast", abc850_fast)
-	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_intf, abcbus_cards, NULL, NULL) // TODO winchester controller
+	MCFG_ABCBUS_SLOT_ADD("io2", abcbus_intf, abcbus_cards, "hdc", NULL)
 	MCFG_ABCBUS_SLOT_ADD("io3", abcbus_intf, abcbus_cards, NULL, NULL)
 	MCFG_ABCBUS_SLOT_ADD("io4", abcbus_intf, abcbus_cards, NULL, NULL)
 	MCFG_ABCBUS_SLOT_ADD("io5", abcbus_intf, abcbus_cards, NULL, NULL)
