@@ -36,7 +36,7 @@
     - The Black Onyx: writes a katakana msg: "rino kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
     - Campaign Ban Daisenryaku 2: Hangs at title screen?
     - Can Can Bunny: bitmap artifacts on intro, could be either ALU or floppy issues;
-    - Carrot: gfxs are messed up
+    - Carrot: gfxs are messed up during floppy loading
     - Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Grobda: palette is ugly (parent pc8801 only);
@@ -1648,7 +1648,7 @@ ADDRESS_MAP_END
 static READ8_DEVICE_HANDLER( cpu_8255_c_r )
 {
 	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-	device->machine().scheduler().synchronize(); // force resync
+//	device->machine().scheduler().synchronize(); // force resync
 
 	return state->m_i8255_1_pc >> 4;
 }
@@ -1656,7 +1656,7 @@ static READ8_DEVICE_HANDLER( cpu_8255_c_r )
 static WRITE8_DEVICE_HANDLER( cpu_8255_c_w )
 {
 	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-	device->machine().scheduler().synchronize(); // force resync
+//	device->machine().scheduler().synchronize(); // force resync
 
 	state->m_i8255_0_pc = data;
 }
@@ -1675,7 +1675,7 @@ static I8255A_INTERFACE( master_fdd_intf )
 static READ8_DEVICE_HANDLER( fdc_8255_c_r )
 {
 	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-	device->machine().scheduler().synchronize(); // force resync
+//	device->machine().scheduler().synchronize(); // force resync
 
 	return state->m_i8255_0_pc >> 4;
 }
@@ -1683,7 +1683,7 @@ static READ8_DEVICE_HANDLER( fdc_8255_c_r )
 static WRITE8_DEVICE_HANDLER( fdc_8255_c_w )
 {
 	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-	device->machine().scheduler().synchronize(); // force resync
+//	device->machine().scheduler().synchronize(); // force resync
 
 	state->m_i8255_1_pc = data;
 }
@@ -2463,6 +2463,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_CPU_IO_MAP(pc8801fdc_io)
 
 	//MCFG_QUANTUM_TIME(attotime::from_hz(300000))
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_MACHINE_START( pc8801 )
 	MCFG_MACHINE_RESET( pc8801 )
