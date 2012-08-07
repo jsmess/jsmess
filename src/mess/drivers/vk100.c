@@ -27,6 +27,10 @@ There's a technical manual dated 1982 here:
 http://web.archive.org/web/20091015205827/http://www.computer.museum.uq.edu.au/pdf/EK-VK100-TM-001%20VK100%20Technical%20Manual.pdf
 Installation and owner's manual is at:
 http://www.bitsavers.org/pdf/dec/terminal/gigi/EK-VK100-IN-002_GIGI_Terminal_Installation_and_Owners_Manual_Apr81.pdf
+An enormous amount of useful info can be derived from the VT125 technical manual:
+http://www.bitsavers.org/pdf/dec/terminal/vt100/EK-VT100-TM-003_VT100_Technical_Manual_Jul82.pdf starting on page 6-70, pdf page 316
+And its schematics:
+http://bitsavers.org/pdf/dec/terminal/vt125/MP01053_VT125_Mar82.pdf
 
 PCB Layout
 ----------
@@ -164,7 +168,6 @@ public:
 	UINT8 m_vgWOPS;
 	UINT8 m_BAUD;
 	UINT8 m_VG_MODE;
-	UINT8 m_LASTVRAM;
 	UINT8 m_vgGO;
 
 	DECLARE_WRITE8_MEMBER(vgLD_X);
@@ -195,7 +198,7 @@ public:
      * so:
      * vram: a14 a13 a12 | a11 a10 a9  a8 | a7  a6  a5  a4 | a3  a2  a1  a0
      * vg:   Y8  Y7  Y6  | Y5  Y4  Y3  Y2 | Y1  X9' X8' X7'| X6' X5' X4'(x3') x2' x1 x0
-     *     X3' is handled by the nybblenum statement, as is X2'
+     *     X3' is handled by the nybbleNum statement, as is X2'
      *     X1 and X0 are handled by the pattern rom directly:
      *     x0 -> a0, x1 -> a1
      *     this handles bits like:
@@ -204,35 +207,34 @@ public:
      *      0  1 -> bit 1
      *      1  0 -> bit 2
      *      1  1 -> bit 3
-     *
      */
 
 // returns one nybble from vram array based on X and Y regs
 static UINT8 vram_read(running_machine &machine)
 {
 	vk100_state *state = machine.driver_data<vk100_state>();
-    // XFinal is (X'&0x3FC)|(X&0x3)
+	// XFinal is (X'&0x3FC)|(X&0x3)
 	UINT16 XFinal = state->m_trans[(state->m_vgX&0x3FC)>>2]<<2|(state->m_vgX&0x3); // appears correct
-    // EA is the effective ram address for a 16-bit block
+	// EA is the effective ram address for a 16-bit block
 	UINT16 EA = ((state->m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
-    // block is the 16 bit block directly (note EA has to be <<1 to correctly index a byte)
+	// block is the 16 bit block directly (note EA has to be <<1 to correctly index a byte)
 	UINT16 block = state->m_vram[(EA<<1)+1] | (state->m_vram[(EA<<1)]<<8);
-    // pattern rom addressing is a complex mess. see the pattern rom def later in this file.
-	UINT8 nybbleNum = (XFinal&0xC)>>2; // which of the four nybbles within the block to address. should NEVER be 3!
+	// nybbleNum is which of the four nybbles within the block to address. should NEVER be 3!
+	UINT8 nybbleNum = (XFinal&0xC)>>2;
 	return (block>>(4*nybbleNum))&0xF;
 }
 
 static void vram_write(running_machine &machine, UINT8 data)
 {
 	vk100_state *state = machine.driver_data<vk100_state>();
-    // XFinal is (X'&0x3FC)|(X&0x3)
+	// XFinal is (X'&0x3FC)|(X&0x3)
 	UINT16 XFinal = state->m_trans[(state->m_vgX&0x3FC)>>2]<<2|(state->m_vgX&0x3); // appears correct
-    // EA is the effective ram address for a 16-bit block
+	// EA is the effective ram address for a 16-bit block
 	UINT16 EA = ((state->m_vgY&0x1FE)<<5)|(XFinal>>4); // appears correct
-    // block is the 16 bit block directly (note EA has to be <<1 to correctly index a byte)
+	// block is the 16 bit block directly (note EA has to be <<1 to correctly index a byte)
 	UINT16 block = state->m_vram[(EA<<1)+1] | (state->m_vram[(EA<<1)]<<8);
-    // pattern rom addressing is a complex mess. see the pattern rom def later in this file.
-	UINT8 nybbleNum = (XFinal&0xC)>>2; // which of the four nybbles within the block to address. should NEVER be 3!
+	// nybbleNum is which of the four nybbles within the block to address. should NEVER be 3!
+	UINT8 nybbleNum = (XFinal&0xC)>>2;
 	block &= ~((UINT16)0xF<<(nybbleNum*4)); // mask out the part we want to replace
 	block |= data<<(nybbleNum*4); // write the new part
 	// NOTE: this next part may have to be made conditional on VG_MODE
@@ -246,7 +248,7 @@ static TIMER_CALLBACK( execute_vg )
 {
 	vk100_state *state = machine.driver_data<vk100_state>();
 	UINT8 thisNyb = vram_read(machine); // read in the nybble
-	state->m_LASTVRAM = thisNyb;
+	// pattern rom addressing is a complex mess. see the pattern rom def later in this file.   
 	UINT8 newNyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Mask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb]; // calculate new nybble based on pattern rom
 	// finally write the block back to ram depending on the VG_MODE (sort of a hack until we get the vector and synd and dir roms all hooked up)
 	switch (state->m_VG_MODE)
@@ -273,8 +275,30 @@ static TIMER_CALLBACK( execute_vg )
 			state->m_vgGO = 0; // done
 			break;
 	}
-	// direction rom:
-	
+	/* this is the "DIRECTION ROM"  == mb6309 (256x8, 82s135)
+     * see figure 5-24 on page 5-39
+     * It tells the direction and enable for counting on the X and Y counters
+     * and also handles the non-math related parts of the bresenham line algorithm
+     * control bits:
+     *            /CE1 ----- ? ENA ERROR L?
+     *            /CE2 ----- ? D COUNT 0?
+     * addr bits: 76543210
+     *            ||||\\\\-- DIR (vgDIR register low 4 bits)
+     *            |||\------ ERROR CARRY (strobed in by STROBE L from the error counter's adder)
+     *            ||\------- Y0 (the otherwise unused lsb of the Y register, used for bresenham)
+     *            |\-------- feedback bit from d5 gated by V CLK
+     *            \--------- GND; the second half of the prom is blank (0x00)
+     * data bits: 76543210
+     *            |||||||\-- ENA X (enables change on X counter)
+     *            ||||||\--- ENA Y (enables change on Y counter)
+     *            |||||\---- Y DIRECTION (high is count down, low is count up)
+     *            ||||\----- X DIRECTION (high is count down, low is count up)
+     *            |||\------ PIXEL WRT
+     *            ||\------- feedback bit to a6
+     *            |\-------- UNUSED, always 0
+     *            \--------- UNUSED, always 0
+     */
+	//UINT8 direction_rom = state->m_dir[];
 	// HACK: we need the proper direction rom dump for this!
 	switch(state->m_vgDIR&0x7)
 	{
@@ -507,8 +531,7 @@ READ8_MEMBER(vk100_state::SYSTAT_A)
 #ifdef SYSTAT_A_VERBOSE
 	if (cpu_get_pc(m_maincpu) != 0x31D) logerror("0x%04X: SYSTAT_A Read!\n", cpu_get_pc(m_maincpu));
 #endif
-	if (m_vgGO == 0) m_LASTVRAM = vram_read(machine());
-	return ((m_vgGO?0:1)<<7)|(m_LASTVRAM<<3)|(((ioport("SWITCHES")->read()>>dipswitchLUT[offset])&1)?0x4:0)|0x3;
+	return ((m_vgGO?0:1)<<7)|(vram_read(machine())<<3)|(((ioport("SWITCHES")->read()>>dipswitchLUT[offset])&1)?0x4:0)|0x3;
 }
 
 /* port 0x48: "SYSTAT B"; NOT documented in the tech manual at all.
@@ -766,7 +789,6 @@ static MACHINE_RESET( vk100 )
 	state->m_vgWOPS = 0;
 	state->m_BAUD = 0;
 	state->m_VG_MODE = 0;
-	state->m_LASTVRAM = 0xF;
 	state->m_vgGO = 0;
 }
 
@@ -931,7 +953,8 @@ i.e. addr bits 9876543210
 	ROM_REGION(0x100, "trans", ROMREGION_ERASEFF )
 	// this is the "TRANSLATOR ROM" described in figure 5-17 on page 5-27 (256*8, 82s135)
 	// it contains a table of 256 values which skips every fourth value so 00 01 02 04 05 06 08.. etc, wraps at the end
-	ROM_LOAD( "wb---0_060b1.6309.pr2.ic77", 0x0000, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label verified from nigwil's board
+	// The VT125 prom @ E60 is literally identical to this, the same exact part: 23-060B1
+	ROM_LOAD( "wb---0_060b1.mmi6309.pr2.ic77", 0x0000, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae)) // label verified from nigwil's board
 
 	ROM_REGION(0x100, "dir", ROMREGION_ERASEFF )
      /* this is the "DIRECTION ROM"  == mb6309 (256x8, 82s135)
@@ -956,11 +979,12 @@ i.e. addr bits 9876543210
      *            ||\------- feedback bit to a6
      *            |\-------- UNUSED, always 0
      *            \--------- UNUSED, always 0
+     * The VT125 prom @ E41 is literally identical to this, the same exact part: 23-059B1
      */
 	ROM_LOAD( "wb8141_059b1.tbp18s22.pr5.ic108", 0x0000, 0x0100, CRC(4b63857a) SHA1(3217247d983521f0b0499b5c4ef6b5de9844c465))  // label verified from andy's board
 
 	ROM_REGION( 0x400, "proms", ROMREGION_ERASEFF )
-	/* some sort of "COUNTER ROM" involved with erasing VRAM dram to the background color? (256*4, 82s129)
+	/* this is the "RAS/ERASE ROM" involved with erasing VRAM dram to the background color and driving the RAS lines (256*4, 82s129)
      * control bits:
      *            /CE1 ----- ?
      *            /CE2 ----- ?
@@ -974,12 +998,30 @@ i.e. addr bits 9876543210
      *            |\-------- ?
      *            \--------- comes from the gated ERASE L/d5 on the vector rom [verified from tracing]
      * data bits: 3210
-     *            |||\-- ?
-     *            ||\--- ?
-     *            |\---- ?
-     *            \----- ?
+     *            |||\-- ? wr_1?
+     *            ||\--- ? wr_2?
+     *            |\---- ? wr_3?
+     *            \----- ? wr_4?
+     * According to the VT125 Schematics, the inputs are:
+     *  (X'10 NOR X'11)
+     *  (Y9 NOR Y10)
+     *  Y11
+     *  X8 (aka PX8)
+     *  X9 (aka PX9)
+     *  ERASE L - a7
+     *  X'3
+     *  X'2
+     * and the outputs are:
+     *  MWR 2
+     *  MWR 1
+     *  MWR 0
+     * since the vt125 has ram laid out differently than the vk100 and
+       only has 3 banks (but 2 planes of 3 banks), I (LN) assume there
+       are four wr banks on the v100, one per nybble, and the X'3 and
+       X'2 inputs lend credence to this.
+     * The VT125 prom E93 is mostly equivalent to the ras/erase prom
      */
-	ROM_LOAD( "wb8151_573a2.6301.pr3.ic44", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4)) // label verified from nigwil's and andy's board
+	ROM_LOAD( "wb8151_573a2.mmi6301.pr3.ic44", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4)) // label verified from nigwil's and andy's board
 	/* this is the "VECTOR ROM" (256*8, 82s135) which runs the vector generator state machine
      * the vector rom bits are complex and are unfortunately poorly documented
      * in the tech manual. see figure 5-23.
@@ -999,7 +1041,7 @@ i.e. addr bits 9876543210
      *            |||||\---- ? vector clk
      *            ||||\----- /LD ERROR aka STROBE ERROR L (strobes the adder result value into the vgERR register)
      *            |||\------ ? done l?
-     *            ||\------- ERASE L (latched, forces a4 on the sync rom low and also forces a7 on the counter rom; the counter rom may be involved in blanking all of vram) [verified from tracing]
+     *            ||\------- ERASE L (latched, forces a4 on the sync rom low and also forces a7 on the ras/erase rom; the counter rom may be involved in blanking all of vram) [verified from tracing]
      *            |\-------- C0 aka C IN (high during DVM read, low otherwise, likely a carry in to the adder so DVM is converted from 1s to 2s complement)
      *            \--------- ?D LOAD? (goes to the clock of a d-latch near the register file)
      *
@@ -1014,9 +1056,9 @@ i.e. addr bits 9876543210
      * STROBE ERROR L - d3
      *
      * it is possible d2 or d1 is the SYNC bit instead of one of the above
-     * The VT125 prom E71 and its latch E70 is exactly equivalent to the vector prom
+     * The VT125 prom E71 and its latch E70 is mostly equivalent to the vector prom, but the address order is different
      */
-	ROM_LOAD( "wb8146_058b1.6309.pr1.ic99", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))  // label verified from nigwil's and andy's board
+	ROM_LOAD( "wb8146_058b1.mmi6309.pr1.ic99", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))  // label verified from nigwil's and andy's board
 	/* this is the "SYNC ROM" == mb6331 (32x8, 82s123)
      * It generates the ram RAS/CAS and a few other signals, see figure 5-20 on page 5-32
      * The exact pins for each signal are not documented.
@@ -1038,10 +1080,8 @@ i.e. addr bits 9876543210
      *            |||\------ /CAS (for vram)
      *            ||\------- RA\__selects which slot of the 8x4 register file (du, dvm, dir, or wops) is selected
      *            |\-------- RB/
-     *            \--------- VG vector rom "enable"? (mentioned on page 5-31 last paragraph?) (this is off by one cycle though...) [active low, sync addr 011]
-     *                       This may actually have to do with gating the DCNT DONE L signal to make the FINISH signal which unsets the /GO register
-     * The VT125 proms E64/E66 and their respective latches E65 and E83 are roughly
-     * but not completely equivalent to the sync rom
+     *            \--------- SYNC (latches the EXECUTE signal from an EXEC * write to activate the GO signal and enable the Vector rom)
+     * The VT125 proms E64/E66 and their respective latches E65 and E83 are mostly equivalent to the sync rom
      */
 	ROM_LOAD( "wb8014_297a1.74s288.pr6.ic89", 0x0200, 0x0020, CRC(e2f7c566) SHA1(a4c3dc5d07667141ad799168a862cb3c489b4934)) // label verified from nigwil's and andy's board
 ROM_END
