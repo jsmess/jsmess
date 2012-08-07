@@ -35,12 +35,10 @@
     - The Black Onyx: writes a katakana msg: "rino kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
     - Campaign Ban Daisenryaku 2: Hangs at title screen?
     - Can Can Bunny: bitmap artifacts on intro, could be either ALU or floppy issues;
-    - Carrot: gfxs are messed up during floppy loading
     - Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Grobda: palette is ugly (parent pc8801 only);
-    - Hang-On: typical busted attributes for a N-BASIC game
-	- Music Collection Vol. 2 - Final Fantasy Tokushuu: Tries to read to ADPCM delta-T ROM
+	- Music Collection Vol. 2 - Final Fantasy Tokushuu: sound irq dies pretty soon
     - Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
     - Xevious: game is too fast (parent pc8801 only)
 
@@ -1565,7 +1563,15 @@ WRITE8_MEMBER(pc8801_state::pc8801_opna_w)
 	if(has_opna && (offset & 2) == 0)
 		ym2608_w(machine().device("opna"), (offset & 1) | ((offset & 4) >> 1),data);
 	else if(has_opna && offset == 2)
+	{
 		m_sound_irq_mask = ((data & 0x80) == 0);
+
+		if(m_sound_irq_mask == 0)
+			m_sound_irq_latch = 0;
+
+		if(m_timer_irq_latch == 0 && m_vrtc_irq_latch == 0 && m_sound_irq_latch == 0)
+			cputag_set_input_line(machine(),"maincpu",0,CLEAR_LINE);
+	}
 }
 
 static ADDRESS_MAP_START( pc8801_io, AS_IO, 8, pc8801_state )
@@ -2528,7 +2534,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x1000, "hiwram", ROMREGION_ERASE00 ) \
 	ROM_REGION( 0x40000, "ewram", ROMREGION_ERASE00 ) \
 	ROM_REGION( 0xc000, "gvram", ROMREGION_ERASE00 ) \
-	ROM_REGION( 0x100000, "opna", ROMREGION_ERASEFF )
+	ROM_REGION( 0x100000, "opna", ROMREGION_ERASE00 )
 
 
 ROM_START( pc8801 )
