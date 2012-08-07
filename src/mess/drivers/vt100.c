@@ -5,11 +5,16 @@
         29/04/2009 Preliminary driver.
 
         TODO: keyboard doesn't work properly, kb uart comms issue?
+        TODO: split keyboard off as a synchronous serial device?
         TODO: vt100 gives a '2' error on startup indicating bad nvram checksum
               adding the serial nvram support should fix this
         TODO: support for the on-AVO character set roms
         TODO: finish support for the on-cpu board alternate character set rom
 
+        An enormous amount of useful info can be derived from the VT125 technical manual:
+        http://www.bitsavers.org/pdf/dec/terminal/vt100/EK-VT100-TM-003_VT100_Technical_Manual_Jul82.pdf starting on page 6-70, pdf page 316
+        And its schematics:
+        http://bitsavers.org/pdf/dec/terminal/vt125/MP01053_VT125_Mar82.pdf
 ****************************************************************************/
 
 #include "emu.h"
@@ -340,8 +345,9 @@ static MACHINE_RESET(vt100)
 	state->m_keyboard_int = 0;
 	state->m_receiver_int = 0;
 	state->m_vertical_int = 0;
+	beep_set_frequency( state->m_speaker, 786 ); // 7.945us per serial clock = ~125865.324hz, / 160 clocks per char = ~ 786 hz
 	output_set_value("online_led",1);
-	output_set_value("local_led", 1);
+	output_set_value("local_led", 0);
 	output_set_value("locked_led",1);
 	output_set_value("l1_led", 1);
 	output_set_value("l2_led", 1);
@@ -684,7 +690,27 @@ ROM_START( vt125 ) // This is from bitsavers and vt100.net, as the vt125 schemat
 	ROM_REGION(0x1000, "chargen", 0)
 	ROM_LOAD( "23-018e2-00.e4", 0x0000, 0x0800, BAD_DUMP CRC(6958458b) SHA1(103429674fc01c215bbc2c91962ae99231f8ae53)) // probably correct but needs redump
 	ROM_LOAD_OPTIONAL ( "23-094e2-00.e9", 0x0800, 0x0800, NO_DUMP) // optional (comes default with some models) alternate character set rom
-//GPO board roms go here!
+
+	// "GPO" aka vt125 "mono board" roms and proms
+	ROM_REGION(0x10000, "monocpu", ROMREGION_ERASEFF) // roms for the 8085 subcpu
+	ROM_LOAD( "23-043e4-00.e22", 0x0000, 0x2000, NO_DUMP) // 2364/MK36xxx mask rom 
+	ROM_LOAD( "23-043e4-00.e23", 0x2000, 0x2000, NO_DUMP) // 2364/MK36xxx mask rom
+	ROM_LOAD( "23-045e4-00.e24", 0x4000, 0x2000, NO_DUMP) // 2364/MK36xxx mask rom
+	// E25 socket is empty
+
+	ROM_REGION(0x100, "dir", ROMREGION_ERASEFF ) // vt125 direction prom, same as on vk100, 82s135 equiv
+	ROM_LOAD( "23-059b1.e41", 0x0000, 0x0100, CRC(4b63857a) SHA1(3217247d983521f0b0499b5c4ef6b5de9844c465))
+
+	ROM_REGION(0x100, "trans", ROMREGION_ERASEFF ) // vt125 x translate prom, same as on vk100, 82s135 equiv
+	ROM_LOAD( "23-060b1.e60", 0x0000, 0x0100, CRC(198317fc) SHA1(00e97104952b3fbe03a4f18d800d608b837d10ae))
+
+	ROM_REGION(0x500, "proms", ROMREGION_ERASEFF) // vt125 mono board proms
+	ROM_LOAD( "23-067b1.e135", 0x0000, 0x0100, NO_DUMP) // 82s135, waitstate prom
+	ROM_LOAD( "23-068b1.e64", 0x0100, 0x0100, NO_DUMP) // 82s135, sync_a prom
+	ROM_LOAD( "23-069b1.e66", 0x0200, 0x0100, NO_DUMP) // 82s135, sync_b prom
+	ROM_LOAD( "23-070b1.e71", 0x0300, 0x0100, NO_DUMP) // 82s135, vector prom
+	ROM_LOAD( "23-582a2.e93", 0x0300, 0x0100, NO_DUMP) // 82s129, ras/erase prom
+
 ROM_END
 
 ROM_START( vt101 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 mainboard
