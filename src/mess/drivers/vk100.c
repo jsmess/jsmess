@@ -9,8 +9,8 @@
               * fix vector generator hardware enough to pass the startup self test
                 the tests are described on page 6-5 thru 6-8 of the tech reference
               * hook up the direction and sync prom to the sync counter
-              * figure out the correct meaning of systat b register
-              * hook up smc_5016t baud generator to i8251 rx and tx clocks
+              * figure out the correct meaning of systat b register - needed for communications selftest
+              * hook up smc_5016t baud generator to i8251 rx and tx clocks - begun
 
  Tony DiCenzo, now the director of standards and architecture at Oracle, was on the team that developed the VK100
  see http://startup.nmnaturalhistory.org/visitorstories/view.php?ii=79
@@ -166,9 +166,11 @@ public:
 	UINT8 m_vgDVM;
 	UINT8 m_vgDIR;
 	UINT8 m_vgWOPS;
-	UINT8 m_BAUD;
-	UINT8 m_VG_MODE;
-	UINT8 m_vgGO;
+	UINT8 m_VG_MODE; // latched on EXEC
+	UINT8 m_vgGO; // activated on next SYNC pulse after EXEC
+	UINT8 m_ACTS;
+	UINT16 m_RXDivisor;
+	UINT16 m_TXDivisor;
 
 	DECLARE_WRITE8_MEMBER(vgLD_X);
 	DECLARE_WRITE8_MEMBER(vgLD_Y);
@@ -496,12 +498,38 @@ WRITE8_MEMBER(vk100_state::KBDW)
 #endif
 }
 
-/* port 0x6C: "BAUD" controls the smc 5016t baud generator which
- * sets the dividers for the rx and tx clocks on the 8251 */
+/* port 0x6C: "BAUD" controls the smc5016t dual baud generator which
+ * controls the divisors for the rx and tx clocks on the 8251 from the
+ * 5.0688Mhz cpu xtal :
+ * The baud divisor lookup table has 16 entries, but only entries 2,5,6,7,A,C,E,F are documented/used in the vk100 tech manual
+ * The others are based on page 13 of http://www.hartetechnologies.com/manuals/Tarbell/Tarbell%20Z80%20CPU%20Board%20Model%203033.pdf
+ * D C B A   Divisor                                Expected Baud
+ * 0 0 0 0 - 6336 (5068800 / 6336 = 16*50         = 50 baud
+ * 0 0 0 1 - 4224 (5068800 / 4224 = 16*75)        = 75 baud
+ * 0 0 1 0 - 2880 (5068800 / 2880 = 16*110)       = 110 baud
+ * 0 0 1 1 - 2355 (5068800 / 2355 = 16*134.5223) ~= 134.5 baud
+ * 0 1 0 0 - 2112 (5068800 / 2112 = 16*150)       = 150 baud
+ * 0 1 0 1 - 1056 (5068800 / 1056 = 16*300)       = 300 baud
+ * 0 1 1 0 - 528  (5068800 / 528 = 16*600)        = 600 baud
+ * 0 1 1 1 - 264  (5068800 / 264 = 16*1200)       = 1200 baud
+ * 1 0 0 0 - 176  (5068800 / 176 = 16*1800)       = 1800 baud
+ * 1 0 0 1 - 158  (5068800 / 158 = 16*2005.0633) ~= 2000 baud
+ * 1 0 1 0 - 132  (5068800 / 132 = 16*2400)       = 2400 baud
+ * 1 0 1 1 - 88   (5068800 / 88 = 16*3600)        = 3600 baud
+ * 1 1 0 0 - 66   (5068800 / 66 = 16*4800)        = 4800 baud
+ * 1 1 0 1 - 44   (5068800 / 44 = 16*7200)        = 7200 baud
+ * 1 1 1 0 - 33   (5068800 / 33 = 16*9600)        = 9600 baud
+ * 1 1 1 1 - 16   (5068800 / 16 = 16*19800)      ~= 19200 baud
+ */
 WRITE8_MEMBER(vk100_state::BAUD)
 {
-	m_BAUD = data;
-	logerror("IO: 0x6C: write of %02X, TODO: set the i8251 clocks as appropriate here!\n", m_BAUD);
+	static const UINT16 baudDivisors[16] = {
+		6336, 4224, 2880, 2355, 2112, 1056,  528,  264,
+		 176,  158,  132,   88,   66,   44,   33,   16
+		};
+	m_RXDivisor = baudDivisors[data&0xF];
+	m_TXDivisor = baudDivisors[(data&0xF0)>>4];
+	logerror("BAUD: 0x6C: write of %02X, RX baud: %d, TX baud: %d \n", data, (5068800/m_RXDivisor)/16, (5068800/m_TXDivisor)/16);
 	//TODO: adjust the rate of the rx and tx timers here
 }
 
@@ -535,10 +563,17 @@ READ8_MEMBER(vk100_state::SYSTAT_A)
 }
 
 /* port 0x48: "SYSTAT B"; NOT documented in the tech manual at all.
- * ?      ?      ?      ?      ?      ?      ?      ?
- * d7     d6     d5     d4     d3     d2     d1     d0
- * according to the code at 606, the systat b register has something
- * to do with the uart 8251, though what exactly is unclear.
+ * when in loopback/test mode, SYSTAT_B is read and expected the following, around 0x606:
+ * reset 8751, modewrite of 0x5E
+ * write command -> 0x20 (normal, normal, /RTS is 0, normal, normal, recieve off, /DTR is 1, transmit off)
+ * read SYSTAT B (and xor with 0xe), expect d7 to be CLEAR or jump to error
+ * write command -> 0x05 (normal, normal, /RTS is 1, normal, normal, recieve ON, /DTR is 0, transmit off)
+ * read SYSTAT B (and xor with 0xe), expect d7 to be SET or jump to error
+ * after this it does something and waits for an rxrdy interrupt
+ 
+ shows the results of:
+ * ACTS (/CTS)  ?      ?      ?      ?      ?      ?      ?
+ * d7           d6     d5     d4     d3     d2     d1     d0
  * the ACTS (inverse of DCTS) signal lives in one of these bits (see 5-62)
  * it XORs the read of systat_b with the E register (which holds 0x6)
  * and checks the result
@@ -548,7 +583,7 @@ READ8_MEMBER(vk100_state::SYSTAT_B)
 #ifdef SYSTAT_B_VERBOSE
 	logerror("0x%04X: SYSTAT_B Read!\n", cpu_get_pc(m_maincpu));
 #endif
-	return 0xFF;
+	return (m_ACTS<<7)|0x7F;
 }
 
 READ8_MEMBER(vk100_state::vk100_keyboard_column_r)
@@ -787,9 +822,11 @@ static MACHINE_RESET( vk100 )
 	state->m_vgDVM = 0;
 	state->m_vgDIR = 0;
 	state->m_vgWOPS = 0;
-	state->m_BAUD = 0;
 	state->m_VG_MODE = 0;
 	state->m_vgGO = 0;
+	state->m_ACTS = 1;
+	state->m_RXDivisor = 6336;
+	state->m_TXDivisor = 6336;
 }
 
 static INTERRUPT_GEN( vk100_vertical_interrupt )
@@ -811,12 +848,21 @@ static WRITE_LINE_DEVICE_HANDLER(i8251_txrdy_int)
 	device_set_input_line(m_state->m_maincpu, I8085_RST55_LINE, state?ASSERT_LINE:CLEAR_LINE);
 }
 
+static WRITE_LINE_DEVICE_HANDLER(i8251_rts)
+{
+	vk100_state *m_state = device->machine().driver_data<vk100_state>();
+	logerror("callback: RTS state changed to %d\n", state);
+	// TODO: only change this during loopback mode!
+	m_state->m_ACTS = state;
+}
+
 static DRIVER_INIT( vk100 )
 {
 	// figure out how the heck to initialize the timers here
 	//m_i8251_rx_timer = timer_alloc(TID_I8251_RX);
 	//m_i8251_tx_timer = timer_alloc(TID_I8251_TX);
 	//m_i8251_sync_timer = timer_alloc(TID_SYNC);
+	//machine.scheduler().timer_set(attotime::from_hz(10000), FUNC(i8251_rx_clk));
 }
 
 static VIDEO_START( vk100 )
@@ -880,7 +926,7 @@ static const i8251_interface i8251_intf =
 	//TODO: DEVCB_DRIVER_LINE_MEMBER(vk100_state, i8251_tx), // out_txd_cb
 	DEVCB_NULL, // in_dsr_cb
 	DEVCB_NULL, // out_dtr_cb
-	DEVCB_NULL, // out_rts_cb
+	DEVCB_LINE(i8251_rts), // out_rts_cb
 	DEVCB_LINE(i8251_rxrdy_int), // out_rxrdy_cb
 	DEVCB_LINE(i8251_txrdy_int), // out_txrdy_cb
 	DEVCB_NULL, // out_txempty_cb
