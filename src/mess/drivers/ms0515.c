@@ -192,9 +192,9 @@ static SCREEN_UPDATE_IND16( ms0515 )
 			{
 				UINT8 code = state->m_video_ram[addr++]; 
 				UINT8 attr = state->m_video_ram[addr++]; 			
-				UINT8 fg = (attr & 7) + BIT(attr,14)*8;
-				UINT8 bg = ((attr >> 3) & 7) + BIT(attr,14)*8;
-				if (BIT(attr,15) && (state->m_blink == 20)) {
+				UINT8 fg = (attr & 7) + BIT(attr,6)*8;
+				UINT8 bg = ((attr >> 3) & 7) + BIT(attr,6)*8;
+				if (BIT(attr,7) && (state->m_blink == 20)) {
 					UINT8 tmp = fg;
 					fg = bg; bg = tmp;
 					state->m_blink = -1;
