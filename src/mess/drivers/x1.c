@@ -434,7 +434,7 @@ static void draw_fgtilemap(running_machine &machine, bitmap_rgb32 &bitmap,const 
 
 						pcg_pen = pen[2]<<2|pen[1]<<1|pen[0]<<0;
 
-						if(color & 0x10 &&	machine.primary_screen->frame_number() & 0x10) //reverse flickering
+						if(color & 0x10 && machine.primary_screen->frame_number() & 0x10) //reverse flickering
 							pcg_pen^=7;
 
 						if(pcg_pen == 0 && (!(color & 8)))

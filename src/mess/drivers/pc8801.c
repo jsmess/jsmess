@@ -34,7 +34,7 @@
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
     - The Black Onyx: writes a katakana msg: "rino kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
     - Campaign Ban Daisenryaku 2: Hangs at title screen?
-    - Can Can Bunny: bitmap artifacts on intro, could be either ALU or floppy issues;
+    - Can Can Bunny: bitmap artifacts on intro, caused by a fancy useage of the attribute vram;
     - Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Grobda: palette is ugly (parent pc8801 only);
@@ -385,7 +385,7 @@ CRTC command params:
 #define vretrace (((state->m_crtc.param[0][3] & 0xe0) >> 5) + 1)
 #define hretrace ((state->m_crtc.param[0][3] & 0x1f) + 2) * 8
 
-#define text_color_flag (state->m_crtc.param[0][4] & 0x40)
+#define text_color_flag ((state->m_crtc.param[0][4] & 0xe0) == 0x40)
 #define monitor_24KHz ((state->m_gfx_ctrl & 0x19) == 0x08) /* TODO: this is most likely to be WRONG */
 
 static VIDEO_START( pc8801 )
@@ -502,6 +502,7 @@ static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap,cons
 static UINT8 calc_cursor_pos(running_machine &machine,int x,int y,int yi)
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
+
 	if(!(state->m_crtc.cursor_on)) // don't bother if cursor is off
 		return 0;
 
@@ -541,6 +542,13 @@ static UINT8 extract_text_attribute(running_machine &machine,UINT32 address,int 
 	}
 
 	fifo_size = (state->m_crtc.param[0][4] & 0x20) ? 0 : ((state->m_crtc.param[0][4] & 0x1f) + 1);
+
+	if(fifo_size == 0)
+	{
+		popmessage("Using non-special mode for text tilemap, contact MESSdev");
+		return 0;
+	}
+
 	/* TODO: correct or hack-ish? Certainly having 0 as a attribute X is weird in any case. */
 	offset = (vram[address] == 0) ? 2 : 0;
 
@@ -599,8 +607,13 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 				else
 				{
 					UINT8 char_data;
+					UINT8 blink_mask;
 
-					if(yi >= (1 << (y_double+3)) || secret)
+					blink_mask = 0;
+					if(blink && ((machine.primary_screen->frame_number() / blink_speed) & 3) == 1)
+						blink_mask = 1;
+
+					if(yi >= (1 << (y_double+3)) || secret || blink_mask)
 						char_data = 0;
 					else
 						char_data = (gfx_rom[tile*8+(yi >> y_double)] >> (7-xi)) & 1;
@@ -611,10 +624,13 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 					if(yi == y_height && lower)
 						char_data = 1;
 
-					if(is_cursor || reverse)
-						color = char_data ? -1 : pal;
-					else
-						color = char_data ? pal : -1;
+					if(is_cursor)
+						char_data^=1;
+
+					if(reverse)
+						char_data^=1;
+
+					color = char_data ? pal : -1;
 				}
 
 				if(color != -1)
@@ -669,9 +685,9 @@ static void draw_text(running_machine &machine, bitmap_ind16 &bitmap,int y_size,
 
 			attr = extract_text_attribute(machine,(((y*120)+80+state->m_dma_address[2]) & 0xffff),(x),width);
 
-			if(text_color_flag) // color mode
+			if(text_color_flag && (attr & 8)) // color mode
 			{
-				pal = (attr & 8) ? ((attr & 0xe0) >> 5) : 7;  // Alpha behaves on this
+				pal =  ((attr & 0xe0) >> 5);
 				gfx_mode = (attr & 0x10) >> 4;
 				reverse = 0;
 				secret = 0;
@@ -682,7 +698,7 @@ static void draw_text(running_machine &machine, bitmap_ind16 &bitmap,int y_size,
 			}
 			else // monochrome
 			{
-				pal = (state->m_txt_color) ? 7 : 0;
+				pal = (state->m_txt_color) ? 7 : 0; // TODO: annoyingly, Alpha color is currently black with this
 				gfx_mode = 0;
 				reverse = (attr & 4) >> 2;
 				secret = (attr & 1);
@@ -695,7 +711,7 @@ static void draw_text(running_machine &machine, bitmap_ind16 &bitmap,int y_size,
 					popmessage("Warning: mono gfx mode enabled, contact MESSdev");
 			}
 
-			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,upper,lower,blink,y_size,monitor_24KHz,!width);
+			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,blink,upper,lower,y_size,monitor_24KHz,!width);
 		}
 	}
 }
