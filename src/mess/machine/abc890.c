@@ -46,10 +46,10 @@ WRITE_LINE_MEMBER( abc890_device::resin_w )
 
 static ABCBUS_INTERFACE( abcbus_intf )
 {
-	DEVCB_LINE_MEMBER(abc890_device, int_w),
-	DEVCB_LINE_MEMBER(abc890_device, nmi_w),
-	DEVCB_LINE_MEMBER(abc890_device, rdy_w),
-	DEVCB_LINE_MEMBER(abc890_device, resin_w)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, abc890_device, int_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, abc890_device, nmi_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, abc890_device, rdy_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, abc890_device, resin_w)
 };
 
 
