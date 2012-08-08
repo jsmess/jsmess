@@ -726,18 +726,18 @@ TIMER_DEVICE_CALLBACK( kc_scanline )
 	int scanline = (int)param;
 
 	/* set clock input for channel 0 and 1 to ctc */
-	z80ctc_trg0_w(state->m_z80ctc, 1);
-	z80ctc_trg0_w(state->m_z80ctc, 0);
-	z80ctc_trg1_w(state->m_z80ctc, 1);
-	z80ctc_trg1_w(state->m_z80ctc, 0);
+	state->m_z80ctc->trg0(1);
+	state->m_z80ctc->trg0(0);
+	state->m_z80ctc->trg1(1);
+	state->m_z80ctc->trg1(0);
 
 	if (scanline == 256)
 	{
 		/* set clock input for channel 2 and 3 to ctc */
-		z80ctc_trg2_w(state->m_z80ctc, 1);
-		z80ctc_trg2_w(state->m_z80ctc, 0);
-		z80ctc_trg3_w(state->m_z80ctc, 1);
-		z80ctc_trg3_w(state->m_z80ctc, 0);
+		state->m_z80ctc->trg2(1);
+		state->m_z80ctc->trg2(0);
+		state->m_z80ctc->trg3(1);
+		state->m_z80ctc->trg3(0);
 	}
 }
 

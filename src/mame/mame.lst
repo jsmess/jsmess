@@ -9353,7 +9353,6 @@ j80myspn	// Mystery Spin (Jpm)
 j80nudg2	// Nudge Double Up MkII (Jpm)
 j80rr		// Road Runner (Jpm)
 j80rra		//
-j80r66		// Route 66 (Jpm)
 j80supst	// Supa Steppa (Jpm)
 j80supbk	// Superbank (Jpm)
 j80topsp	// Top Sprint (Jpm)
@@ -12250,6 +12249,7 @@ sc1chaina
 sc1potp		// Pick Of The Pack (Bellfruit)
 sc1potpa	// Double Dealer (Bellfruit)?
 sc1scunk	//
+sc1wud		// What's Up Dr
 
 // Scorpion 1 + Adder Video board
 
@@ -12318,7 +12318,6 @@ sc2catms1p
 sc2catms2
 sc2catms2p
 sc2catms3
-sc2catms4
 sc2ctms2	// Cat & Mouse (Mark 2 - Bellfruit)
 sc2ctms21
 sc2ctms21p
@@ -12628,7 +12627,6 @@ sc2luvv1
 sc2luvv1p
 sc2luvv2
 sc2luvv2p
-sc2luvv3
 sc2luvv4
 sc2luvv5p
 sc2luvv6p
@@ -12661,7 +12659,6 @@ sc2ptytm1
 sc2ptytm1p
 sc2cops		// Cops 'n' Robbers (Bellfruit)
 sc2copsp
-sc2cops1
 sc2cops1p
 sc2cops2
 sc2cops3
@@ -17953,7 +17950,6 @@ ep_cormna	//
 ep_cycl		// Cyclone Club (Maygay)
 ep_cycla	//
 ep_cyclb	//
-ep_cyclc	//
 ep_duff		// Duff Beer Guide (Maygay)
 ep_duffa	//
 ep_duffb	//
@@ -18031,7 +18027,6 @@ ep_highvf	//
 ep_hogmn	// Hog Money (Maygay - Impulse)
 ep_hogmna	//
 ep_hogmnb	//
-ep_hogmnc	//
 ep_homer	// Homer's Meltdown (Maygay)
 ep_homera	//
 ep_homerb	//
@@ -18138,112 +18133,439 @@ ep_ozzief	//
 ep_ozzieg	//
 ep_ozzieh	//
 ep_pascl	// Passport To Riches Classic Club (Maygay)
+ep_pascla	//
 ep_passp	// Passport To Riches Club (Maygay)
+ep_passpa	//
+ep_passpb	//
+ep_passpc	//
 ep_pharo	// Pharaoh's Treasure (Maygay)
+ep_pharoa	//
 ep_pesos	// Pick Yer Pesos (Maygay - Impulse)
+ep_pesosa	//
+ep_pesosb	//
+ep_pesosc	//
 ep_baskr	// Pounds Of The Baskervilles (Maygay)
+ep_baskra	//
+ep_baskrb	//
+ep_baskrc	//
+ep_baskrd	//
+ep_baskre	//
 ep_pwrpl	// Power Play (Maygay)
+ep_pwrpla	//
 ep_rags		// Rags To Riches Club (Maygay)
+ep_ragsa	//
 ep_react	// Reactor (Maygay - Impulse)
+ep_reacta	//
+ep_reactb	//
+ep_reactc	//
+ep_reactd	//
+ep_reacte	//
 ep_roost	// Roosters Millions (Maygay)
+ep_roosta	//
 ep_rtt		// Round The Twist (Maygay)
+ep_rtta		//
 ep_royrl	// Royal Roulette (Maygay)
+ep_royrla	//
+ep_royrlb	//
+ep_royrlc	//
+ep_royrld	//
+ep_royrle	//
 ep_scrm		// Screamin Demon (Maygay)
+ep_scrma	//
+ep_scrmb	//
+ep_scrmc	//
 ep_secag	// Secret Agent (Maygay)
+ep_secaga	//
+ep_secagb	//
 ep_simfr	// Simply Fruits (Maygay)
+ep_simfra	//
 ep_srwin	// Sir Winalot (Maygay)
+ep_srwina	//
+ep_srwinb	//
+ep_srwinc	//
+ep_srwind	//
 ep_spart	// Spartacash (Maygay - Impulse)
+ep_sparta	//
+ep_spartb	//
 ep_spcbw	// Special Brew (Maygay)
+ep_spcbwa	//
+ep_spcbwb	//
+ep_spcbwc	//
+ep_spcbwd	//
+ep_spcbwe	//
+ep_spcbwf	//
+ep_spcbwg	//
+ep_spcbwh	//
+ep_spcbwi	//
+ep_spcbwj	//
+ep_spcbwk	//
+ep_spcbwl	//
+ep_spcbwm	//
 ep_spec		// Spectre (Maygay)
+ep_speca	//
+ep_specb	//
 ep_spntn	// Spin & Tonic (Maygay - Impulse)
+ep_spntna	//
+ep_spntnb	//
+ep_spntnc	//
 ep_spin		// Spin On It (Maygay - Impulse)
+ep_spina	//
+ep_spinb	//
+ep_spinc	//
+ep_spind	//
+ep_spine	//
 ep_step		// Stepping Stones (Maygay)
+ep_stepa	//
 ep_strat	// Stratagem (Maygay)
+ep_strata	//
 ep_subb		// Subbuteo (Maygay)
+ep_subba	//
+ep_subbb	//
+ep_subbc	//
+ep_subbd	//
+ep_subbe	//
+ep_subbf	//
+ep_subbg	//
 ep_snw		// Super Nudge Wink (Maygay - Union)
+ep_snwa		//
+ep_snwb		//
+ep_snwc		//
+ep_snwd		//
 ep_survi	// Survival (Maygay)
+ep_survia	//
 ep_tak5		// Take Five (Maygay - Union)
+ep_tak5a	//
 ep_tits		// Title Shot Club (Maygay)
+ep_titsa	//
+ep_titsb	//
 ep_tortr	// Torture TV (Maygay)
+ep_tortra	//
 ep_trail	// Trailblazer (Maygay - Impulse)
+ep_traila	//
+ep_trailb	//
 ep_tree		// Tree Amigos (Maygay)
+ep_treea	//
 ep_trics	// Triple Cash (Maygay - Union)
+ep_tricsa	//
 ep_tp		// Trivial Pursuit (Maygay)
+ep_tpa		//
+ep_tpb		//
 ep_tp2		// Trivial Pursuit 2 (Maygay)
+ep_tp2a		//
 ep_tutcl	// Tutankhamun Club (Maygay)
+ep_tutcla	//
+ep_tutclb	//
 ep_21clb	// Twenty One Club (Maygay)
+ep_21clba	//
 ep_vipjv	// Viper Jive (Maygay - Extreme)
+ep_vipjva	//
+ep_vipjvb	//
+ep_vipjvc	//
+ep_vipjvd	//
 ep_wildf	// Wildfire (Maygay - Impulse)
+ep_wildfa	//
 ep_xspot	// X Marks The Spot (Maygay)
+ep_xspota	//
+ep_xspotb	//
 ep_braid	// Bank Raid (Unk)
+ep_braida	//
+ep_braidb	//
+ep_braidc	//
+ep_braidd	//
+ep_braide	//
 ep_bathl	// Bat Outa Hell (Global)
+ep_bathla	//
+ep_bathlb	//
+ep_bathlc	//
+ep_bathld	//
+ep_bathle	//
+ep_bathlf	//
+ep_bathlg	//
+ep_bathlh	//
 ep_beavr	// Casino Beaver Las Vegas (Global)
 ep_beavra	//
+ep_beavrb	//
+ep_beavrc	//
+ep_beavrd	//
+ep_beavre	//
+ep_beavrf	//
+ep_beavrg	//
+ep_beavrh	//
+ep_beavri	//
+ep_beavrj	//
+ep_beavrk	//
+ep_beavrl	//
+ep_beavrm	//
+ep_beavrn	//
+ep_beavro	//
+ep_beav3	//
+ep_beav3a	//
+ep_beav3b	//
+ep_beav3c	//
 ep_bvrcl	// Beaver Las Vegas Club (Global)
+ep_bvrcla	//
+ep_bvrclb	//
+ep_bvrclc	//
+ep_bvrcld	//
+ep_bvrcle	//
+ep_bvrclf	//
+ep_bvrclg	//
+ep_bvrclh	//
+ep_bvrcli	//
+ep_bvrclj	//
+ep_bvrclk	//
 ep_bvruc	// Beaver Uncovered (Global)
+ep_bvruca	//
+ep_bvrucb	//
+ep_bvrucc	//
 ep_bjclb	// Blackjack Club, The (Global)
 ep_cbrun	// Cannonball Run (Global)
+ep_cbruna	//
+ep_cbrunb	//
+ep_cbrunc	//
+ep_cbrund	//
+ep_cbrune	//
 ep_cbrcl	// Cannonball Run Club (Global)
+ep_cbrcla	//
+ep_cbrclb	//
+ep_cbrclc	//
+ep_cbrcld	//
+ep_cbrcle	//
+ep_cbrclf	//
+ep_cbrclg	//
+ep_cbrclh	//
+ep_cbrcli	//
+ep_cbrclj	//
+ep_cbrclk	//
 ep_cclas	// Casino Classic (Global)
+ep_cclasa	//
 ep_cgrc		// Casino Grand Classic (Unk)
+ep_cgrca	//
 ep_cgred	// Club Greed (Global)
+ep_cgreda	//
 ep_cstrk	// Crazy Streak Club (Global)
+ep_cstrka	//
+ep_cstrkb	//
+ep_cstrkc	//
+ep_cstrkd	//
+ep_cstrke	//
+ep_cstrkf	//
+ep_cstrkg	//
 ep_ctc		// Cut Throat Cash (Global)
+ep_ctca		//
 ep_cyc		// Cyclone (Unk)
+ep_cyca		//
+ep_cycb		//
+ep_cycc		//
+ep_cycd		//
+ep_cyce		//
 ep_dmbus	// Dambusters (Impulse)
+ep_dmbusa	//
+ep_dmbusb	//
+ep_dmbusc	//
+ep_dmbusd	//
+ep_dmbuse	//
+ep_dmbusf	//
 ep_ddq		// Dungeons & Drag Queens (Global)
+ep_ddqa		//
+ep_ddqb		//
+ep_ddqc		//
+ep_ddqd		//
+ep_ddqe		//
+ep_ddqf		//
+ep_ddqg		//
+ep_ddqh		//
+ep_ddqi		//
 ep_ddqcl	// Dungeons & Drag Queens Club (Global)
+ep_ddqcla	//
+ep_ddqclb	//
+ep_ddqclc	//
+ep_ddqcld	//
+ep_ddqcle	//
+ep_ddqclf	//
+ep_ddqclg	//
 ep_fog		// Fields of Gold (Global)
+ep_foga		//
 ep_fmf		// Full Moon Fever (Global)
+ep_fmfa		//
 ep_gtrot	// Globe Trotter (Unk)
+ep_gtrota	//
 ep_greed	// Greed (Global)
+ep_greeda	//
 ep_grun		// Grid Runner (Global)
+ep_gruna	//
 ep_grncl	// Grid Runner Club (Global)
+ep_grncla	//
+ep_grnclb	//
+ep_grnclc	//
 ep_heybg	// Hey Big Spender (Global)
+ep_heybga	//
+ep_heybgb	//
+ep_heybgc	//
 ep_heybc	// Hey Big Spender Club (Global)
+ep_heybca	//
 ep_hispr	// Hi Spirits (Global)
+ep_hispra	//
+ep_hisprb	//
+ep_hisprc	//
+ep_hisprd	//
+ep_hispre	//
 ep_hiscl	// Hi Spirits Club (Global)
+ep_hiscla	//
 ep_spirt	// High Spirits (Global)
+ep_spirta	//
+ep_spirtb	//
 ep_smoke	// Holy Smoke! (Impulse)
+ep_smokea	//
+ep_smokeb	//
+ep_smokec	//
+ep_smoked	//
+ep_smokee	//
+ep_smokef	//
+ep_smokeg	//
+ep_smokeh	//
+ep_smokei	//
+ep_smokej	//
 ep_hur		// Hurricane (Global)
+ep_hura		//
+ep_hurb		//
 ep_ifern	// Inferno (Impulse)
+ep_iferna	//
 ep_kopcl	// Knockout Punch Club (Global)
+ep_kopcla	//
+ep_kopclb	//
 ep_ltt		// Licence To Thrill (Global)
+ep_ltta		//
 ep_ll		// Lucky Ladders (Unk)
+ep_lla		//
 ep_monrt	// Money Returns Club, The (Global)
+ep_monrta	//
+ep_monrtb	//
+ep_monrtc	//
+ep_monrtd	//
+ep_monrte	//
+ep_monrtf	//
 ep_monsh	// Moonshine Club, The (Unk)
+ep_monsha	//
+ep_monshb	//
+ep_monshc	//
+ep_monshd	//
+ep_monshe	//
+ep_monshf	//
 ep_mummy	// Mummy Talks (Impulse)
+ep_mummya	//
+ep_mummyb	//
+ep_mummyc	//
+ep_mummyd	//
+ep_mummye	//
+ep_mummyf	//
 ep_pkni		// The Phoenix Knights (Global)
+ep_pknia	//
+ep_pknib	//
+ep_pknic	//
+ep_pknid	//
+ep_pknie	//
+ep_pknif	//
 ep_redl		// Red Line (Unk)
+ep_redla	//
 ep_rchik	// Rich Chics Club (Unk)
+ep_rchika	//
 ep_royrc	// Royal Roulette Club (Unk)
 ep_snbev	// Saturday Night Beaver (Global)
+ep_snbeva	//
+ep_snbevb	//
+ep_snbevc	//
+ep_snbevd	//
+ep_snbeve	//
 ep_spook	// Spooky Hollow (Global)
+ep_spooka	//
+ep_spookb	//
 ep_sdcla	// Spotted Dick Classic (Global)
+ep_sdclaa	//
+ep_sdclab	//
+ep_sdclac	//
+ep_sdclad	//
+ep_sdclae	//
+ep_sdclaf	//
+ep_sdclag	//
 ep_sdclb	// Spotted Dick Club (Global)
+ep_sdclba	//
 ep_stm		// Storm Force (Global)
+ep_stma		//
+ep_stmb		//
+ep_stmc		//
 ep_stmcl	// Storm Force Club (Global)
+ep_stmcla	//
 ep_snset	// Sunset Strip (Unk)
+ep_snseta	//
 ep_twarp	// Time Warp (Unk)
+ep_twarpa	//
+ep_twarpb	//
+ep_twarpc	//
 ep_tod		// Truth Or Dare (Global)
+ep_toda		//
 ep_utnut	// Utter Nutter (Global)
+ep_utnuta	//
+ep_utnutb	//
+ep_utnutc	//
 ep_utncl	// Utter Nutter Club (Global)
+ep_utncla	//
 ep_wleek	// Weakest Leek Club (Global)
+ep_wleeka	//
 ep_wud		// What's Up Doc (Global)
+ep_wuda		//
+ep_wudb		//
+ep_wudc		//
+ep_wudd		//
+ep_wude		//
 ep_milhr	// Who Wants To Be A Millionhare? (Global)
+ep_milhra	//
+ep_milhrb	//
+ep_milhrc	//
+ep_milhrd	//
+ep_milhre	//
+ep_milhrf	//
+ep_milhrg	//
 ep_mlhrc	// Who Whats To Be A Millionhare Club (Global)
+ep_mlhrca	//
+ep_mlhrcb	//
+ep_mlhrcc	//
+ep_mlhrcd	//
+ep_mlhrce	//
 ep_wf		// Wildfire (Global)
+ep_wfa		//
+ep_wfb		//
+ep_wfc		//
+ep_wfd		//
+ep_wfe		//
+ep_wff		//
+ep_wfg		//
 ep_bbars	// Balloon Bars (Maygay)
+ep_bbarsa	//
+ep_bbarsb	//
+ep_bbarsc	//
 ep_cslay	// Cash Slayer (Global)
+ep_cslaya	//
 ep_monky	// Monkey Business (Global)
+ep_monkya	//
 ep_makmv	// Make Your Move (Global)
+ep_makmva	//
 ep_lug		// London Underground (Maygay)
+ep_luga		//
+ep_lugb		//
+ep_lugc		//
 ep_crzbn	// Crazy Bingo (Maygay)
+ep_crzbna	//
+ep_crzbnb	//
+ep_crzbnc	//
 ep_cascz	// Casino Crazy (Global)
+ep_cascza	//
 ep_wside	// Wildside (Global)
+ep_wsidea	//
 ep_goldf	// Gold Fever (Impulse)
 ep_imj		// I'm A Jackpot (Global)
 ep_party
+
 
 // MPU2
 
@@ -18357,10 +18679,11 @@ m4clr		// MPU4 Meter Clear ROM
 m4tenten	// 10 X 10 (Barcrest)
 m421club	// 21 Club (Barcrest)
 m4actbnk	// Action Bank (Barcrest)
-m4actbnka
+m4actbnka	//
+m4actbnkb	//
 m4actclb	// Action Club (Barcrest)
+m4actclba	//
 m4actnot	// Action Note (Barcrest)
-m4actnota	//
 m4actpak	// Action Pack (Barcrest)
 m4actpaka	//
 m4addr		// Adders & Ladders (Barcrest)
@@ -18411,7 +18734,6 @@ m4addr4c_b	//
 m4addrd		//
 m4addrc		// Adders & Ladders Classic (Barcrest)
 m4addrcc	// Adders & Ladders Classic Club (Barcrest)
-m4addrcb	// Adders & Ladders Club (Barcrest)
 m4alladv	// All Cash Advance (Barcrest)
 m4alpha		// Alphabet (Barcrest)
 m4ambass	// Ambassador (Barcrest)
@@ -18611,6 +18933,8 @@ m4bjsma		//
 m4blstbk	// Blast A Bank (Barcrest)
 m4bluedm	// Blue Diamond (Barcrest)
 m4bluemn	// Blue Moon (Barcrest)
+m4bluemna	//
+m4bluemnb	//
 m4bdash		// Boulder Dash (Barcrest)
 m4brktak	// Break & Take (Barcrest)
 m4brdway	// Broadway (Barcrest) [Dutch]
@@ -18644,6 +18968,9 @@ m4chasei	// Chase Invaders (Barcrest)
 m4cheryo	// Cherryo (Barcrest)
 m4click		// Clickity Click (Barcrest)
 m4c999		// Cloud 999 (Barcrest)
+m4c999a		//
+m4c999b		//
+m4c999c		//
 m4c9		// Cloud Nine (Barcrest)
 m4c9c		// Cloud Nine Club (Barcrest)
 m4clbcls	// Club Classic (Barcrest)
@@ -18667,6 +18994,38 @@ m4crjwl2	// Crown Jewels Mk II Club (Barcrest)
 m4crdome	// Crystal Dome (Barcrest)
 m4crmaze	// Crystal Maze (Barcrest)
 m4denmen	// Dennis The Menace (Barcrest)
+m4denmen_h2	//
+m4denmendnc	//
+m4denmendnd	//
+m4denmendnk	//
+m4denmendnb	//
+m4denmendny	//
+m4denmend5ad	//
+m4denmend5b	//
+m4denmend5bd	//
+m4denmend5d	//
+m4denmend5kd	//
+m4denmend5yd	//
+m4denmend5k	//
+m4denmend5	//
+m4denmend5y	//
+m4denmend8c	//
+m4denmend8d	//
+m4denmend8yd	//
+m4denmend8k	//
+m4denmend8	//
+m4denmend8y	//
+m4denmendtad	//
+m4denmendtb	//
+m4denmendtbd	//
+m4denmendtd	//
+m4denmendtkd	//
+m4denmendtyd	//
+m4denmendtk	//
+m4denmendt	//
+m4denmendty	//
+m4denmen_h1	//
+m4denmen_h3	//
 m4dbl9		// Double 9's (Barcrest)
 m4dbldmn	// Double Diamond Club (Barcrest)
 m4dblup		// Double Up (Barcrest)
@@ -18767,7 +19126,6 @@ m4gclue		// Give Us A Clue (Barcrest)
 m4gldstr	// Gold Strike (Barcrest)
 m4gldgat	// Golden Gate (Barcrest)
 m4gldjok	// Golden Joker (Barcrest)
-m4gldnud	// Golden Nudger (Barcrest)
 m4grbbnk	// Grab The Bank (Barcrest)
 m4grbbnka	//
 m4grbbnkb	//
@@ -18808,6 +19166,8 @@ m4goodtm	// Let The Good Times Roll (Barcrest)
 m4libty		// Liberty (Barcrest)
 m4lineup	// Line Up (Bwb - Barcrest)
 m4loadmn	// Loads A Money (Barcrest)
+m4loadmna	//
+m4loadmnb	//
 m4luck7		// Lucky 7 (Barcrest)
 m4luckdv	// Lucky Devil (Barcrest) [Czech]
 m4luckdvd	//
@@ -18820,7 +19180,6 @@ m4madhse	// Mad House (Barcrest)
 m4magdrg	// Magic Dragon (Barcrest)
 m4maglin	// Magic Liner (Barcrest)
 m4magrep	// Magic Replay DeLuxe (Barcrest)
-m4magtbo	// Magic Turbo  (Barcrest)
 m4mag7s		// Magnificent 7's (Barcrest)
 m4makmnt	// Make A Mint (Barcrest)
 m4megbks	// Mega Bucks (Barcrest)
@@ -18851,13 +19210,13 @@ m4nudup		// Nudge Up (Barcrest)
 m4num1		// Number One (Barcrest)
 m4oldtmr	// Old Timer (Barcrest)
 m4casot		// Casino Old Timer (Barcrest)
-m4blkwht	// Black & White (Barcrest)
 m4jpmcla	// JPM Classic (Barcrest)
 m4omega		// Omega (Barcrest)
 m4ordmnd	// Oriental Diamonds (Barcrest)
 m4overmn	// Over The Moon (Barcrest)
 m4placbt	// Place Your Bets (Barcrest)
 m4pont		// Pontoon Club (Barcrest)
+m4ponta		//
 m4potblk	// Pot Black (Barcrest)
 m4ptblkc	// Pot Black Casino (Bwb - Barcrest)
 m4potlck	// Pot Luck Club (Barcrest)
@@ -18962,7 +19321,6 @@ m4sss		// Spend Spend Spend (Barcrest)
 m4squid		// Squids In (Barcrest)
 m4stakeu	// Stake Up Club (Barcrest)
 m4stakeua	//
-m4str300	// Star Play 300 (Barcrest)
 m4stards	// Stardust (Barcrest)
 m4starbr	// Stars And Bars (Barcrest)
 m4steptm	// Step Timer (Barcrest)
@@ -19028,6 +19386,7 @@ m4tropcl	// Tropicana Club (Barcrest)
 m4tupen		// Tuppenny Cracker (Barcrest - Bootleg)
 m4tbplay	// Turbo Play (Barcrest)
 m4tbreel	// Turbo Reel (Barcrest)
+m4tbreela	//
 m4tbrldx	// Turbo Reel Deluxe (Barcrest)
 m4tutfrt	// Tutti Fruity (Barcrest)
 m4tutcl		// Tutti Fruity Classic (Barcrest)
@@ -19048,7 +19407,6 @@ m4viz		// Viz (Barcrest)
 m4voodoo	// Voodoo 1000 (Barcrest)
 m4wayin		// Way In (Barcrest)
 m4wayina	//
-m4whaton	// What's On (Barcrest)
 m4wildms	// Wild Mystery (Barcrest)
 m4wildtm	// Wild Timer (Barcrest)
 m4wta		// Winner Takes All (Barcrest)
@@ -19281,8 +19639,6 @@ m4supjstb
 m4supjstc
 m4supjstd
 m4supjste
-m4supjstf
-m4supjstg
 
 /* Nova - German licensed Barcrest / Bwb sets? */
 
@@ -19348,7 +19704,6 @@ m4screwb
 m4bigben	// Big Ben (Coinworld)
 m4bigbena	//
 m4bigbenb	//
-m4bigbenc	//
 m4bigbend	//
 m4bigbene	//
 m4kqclub	// Kings & Queens Club (Newby)
@@ -19767,6 +20122,7 @@ m5mega		// Mega Zone (Barcrest)
 m5martns	// Money Mad Martians (Barcrest)
 m5martns07	//
 m5mmak		// Money Maker (Barcrest)
+m5mmak06	//
 m5monjok	// Monedin Joker (Spanish) (Barcrest)
 m5monjoka	//
 m5monty		// Monty Python (Barcrest)
@@ -21189,6 +21545,10 @@ hg_frd		// Fruit Deuce
 
 /* Global Games 'Stealth' */
 
+gl_snbev
+gl_snbeva
+gl_grncl
+gl_grncla
 gl_dow		// Deals On Wheels (Global)
 gl_dowp
 gl_dowcl	// Deals On Wheels Club (Global)

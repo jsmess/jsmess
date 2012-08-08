@@ -1397,7 +1397,6 @@ static const ay8910_interface demon_ay8910_interface_3 =
 
 static Z80CTC_INTERFACE( demon_z80ctc_interface )
 {
-	0,               /* timer disables */
 	DEVCB_CPU_INPUT_LINE("audiocpu", INPUT_LINE_IRQ0),   /* interrupt handler */
 	DEVCB_NULL,     /* ZC/TO0 callback */
 	DEVCB_NULL,		/* ZC/TO1 callback */
@@ -1435,8 +1434,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( demon_sound_ports, AS_IO, 8, driver_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVWRITE_LEGACY("ctc", z80ctc_w)
-	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE_LEGACY("ctc", z80ctc_w)
+	AM_RANGE(0x00, 0x03) AM_DEVWRITE("ctc", z80ctc_device, write)
+	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE("ctc", z80ctc_device, write)
 ADDRESS_MAP_END
 
 

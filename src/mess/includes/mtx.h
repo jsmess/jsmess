@@ -10,6 +10,7 @@
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
 #include "machine/ctronics.h"
+#include "machine/z80ctc.h"
 
 #define Z80_TAG			"z80"
 #define Z80CTC_TAG		"z80ctc"
@@ -38,7 +39,7 @@ public:
 	UINT8 m_sound_latch;
 
 	/* devices */
-	device_t *m_z80ctc;
+	z80ctc_device *m_z80ctc;
 	device_t *m_z80dart;
 	cassette_image_device *m_cassette;
 	centronics_device *m_centronics;

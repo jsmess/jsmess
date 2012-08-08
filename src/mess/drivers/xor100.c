@@ -271,7 +271,7 @@ static ADDRESS_MAP_START( xor100_io, AS_IO, 8, xor100_state )
 	AM_RANGE(0x09, 0x09) AM_WRITE(prom_toggle_w)
 	AM_RANGE(0x0a, 0x0a) AM_READ(prom_disable_r)
 	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("DSW0") AM_WRITE(baud_w)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE_LEGACY(WD1795_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0xfc, 0xfc) AM_READWRITE(fdc_wait_r, fdc_dcont_w)
 	AM_RANGE(0xfd, 0xfd) AM_WRITE(fdc_dsel_w)
@@ -477,7 +477,6 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,              	/* timer disables */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
 	DEVCB_LINE(ctc_z0_w),			/* ZC/TO0 callback */
 	DEVCB_LINE(ctc_z1_w),			/* ZC/TO1 callback */
@@ -489,7 +488,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 WRITE_LINE_MEMBER( xor100_state::fdc_irq_w )
 {
 	m_fdc_irq = state;
-	z80ctc_trg0_w(m_ctc, state);
+	m_ctc->trg0(state);
 
 	if (state)
 	{

@@ -1,6 +1,8 @@
 #ifndef __M5__
 #define __M5__
 
+#include "machine/z80ctc.h"
+
 #define Z80_TAG			"ic17"
 #define Z80CTC_TAG		"ic19"
 #define SN76489AN_TAG	"ic15"
@@ -30,7 +32,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_fd5cpu;
-	required_device<device_t> m_ctc;
+	required_device<z80ctc_device> m_ctc;
 	required_device<i8255_device> m_ppi;
 	required_device<device_t> m_fdc;
 	required_device<cassette_image_device> m_cassette;

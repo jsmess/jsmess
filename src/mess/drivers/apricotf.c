@@ -179,7 +179,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( act_f1_io, AS_IO, 16, f1_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x000f) AM_WRITE8(system_w, 0xffff)
-	AM_RANGE(0x0010, 0x0017) AM_DEVREADWRITE8_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w, 0x00ff)
+	AM_RANGE(0x0010, 0x0017) AM_DEVREADWRITE8(Z80CTC_TAG, z80ctc_device, read, write, 0x00ff)
 	AM_RANGE(0x0020, 0x0027) AM_DEVREADWRITE8_LEGACY(Z80SIO2_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w, 0x00ff)
 //  AM_RANGE(0x0030, 0x0031) AM_WRITE8_LEGACY(ctc_ack_w, 0x00ff)
 	AM_RANGE(0x0040, 0x0047) AM_DEVREADWRITE8_LEGACY(WD2797_TAG, wd17xx_r, wd17xx_w, 0x00ff)
@@ -272,7 +272,6 @@ WRITE_LINE_MEMBER( f1_state::ctc_z2_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,					// timer disables
 	DEVCB_DRIVER_LINE_MEMBER(f1_state, ctc_int_w),		// interrupt handler
 	DEVCB_NULL,		// ZC/TO0 callback
 	DEVCB_DRIVER_LINE_MEMBER(f1_state, ctc_z1_w),	// ZC/TO1 callback

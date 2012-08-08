@@ -31,17 +31,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-const int NOTIMER_0 = (1<<0);
-const int NOTIMER_1 = (1<<1);
-const int NOTIMER_2 = (1<<2);
-const int NOTIMER_3 = (1<<3);
-
-
-
-//**************************************************************************
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
@@ -64,7 +53,6 @@ const int NOTIMER_3 = (1<<3);
 
 struct z80ctc_interface
 {
-	UINT8				m_notimer;	// timer disabler mask
 	devcb_write_line	m_intr_cb;	// callback when change interrupt status
 	devcb_write_line	m_zc0_cb;	// ZC/TO0 callback
 	devcb_write_line	m_zc1_cb;	// ZC/TO1 callback
@@ -90,6 +78,14 @@ public:
 	UINT8 read(int ch) { return m_channel[ch].read(); }
 	void write(int ch, UINT8 data) { m_channel[ch].write(data); }
 	void trigger(int ch, UINT8 data) { m_channel[ch].trigger(data); }
+	
+	// read/write handlers
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_WRITE_LINE_MEMBER( trg0 );
+	DECLARE_WRITE_LINE_MEMBER( trg1 );
+	DECLARE_WRITE_LINE_MEMBER( trg2 );
+	DECLARE_WRITE_LINE_MEMBER( trg3 );
 
 private:
 	// device-level overrides
@@ -112,7 +108,7 @@ private:
 	public:
 		ctc_channel();
 
-		void start(z80ctc_device *device, int index, bool notimer, const devcb_write_line &write_line);
+		void start(z80ctc_device *device, int index, const devcb_write_line &write_line);
 		void reset();
 
 		UINT8 read();
@@ -125,7 +121,6 @@ private:
 		z80ctc_device *	m_device;				// pointer back to our device
 		int				m_index;				// our channel index
 		devcb_resolved_write_line m_zc;			// zero crossing callbacks
-		bool			m_notimer;				// timer disabled?
 		UINT16			m_mode;					// current mode
 		UINT16			m_tconst;				// time constant
 		UINT16			m_down;					// down counter (clock mode only)
@@ -149,20 +144,6 @@ private:
 
 // device type definition
 extern const device_type Z80CTC;
-
-
-
-//**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
-
-WRITE8_DEVICE_HANDLER( z80ctc_w );
-READ8_DEVICE_HANDLER( z80ctc_r );
-
-WRITE_LINE_DEVICE_HANDLER( z80ctc_trg0_w );
-WRITE_LINE_DEVICE_HANDLER( z80ctc_trg1_w );
-WRITE_LINE_DEVICE_HANDLER( z80ctc_trg2_w );
-WRITE_LINE_DEVICE_HANDLER( z80ctc_trg3_w );
 
 
 #endif

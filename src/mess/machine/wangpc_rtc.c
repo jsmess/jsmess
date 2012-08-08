@@ -70,7 +70,7 @@ static ADDRESS_MAP_START( wangpc_rtc_io, AS_IO, 8, wangpc_rtc_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_cd_ba_r, z80dart_cd_ba_w)
 	AM_RANGE(0x10, 0x1f) AM_DEVREADWRITE(AM9517A_TAG, am9517a_device, read, write)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_LEGACY(Z80CTC_0_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE(Z80CTC_0_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x30, 0x30) //AM_WRITE(clear_char_w)
 	AM_RANGE(0x31, 0x31) //AM_WRITE(set_char_w)
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("SW1") //AM_WRITE(control_w)
@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( wangpc_rtc_io, AS_IO, 8, wangpc_rtc_device )
 	AM_RANGE(0x51, 0x52) //AM_WRITE(status_w)
 	AM_RANGE(0x54, 0x54) //AM_WRITE(enable_inbound_data_w)
 	AM_RANGE(0x51, 0x52) //AM_WRITE(inbound_data_w)
-	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE_LEGACY(Z80CTC_1_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x60, 0x63) AM_DEVREADWRITE(Z80CTC_1_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x70, 0x70) //AM_READWRITE(led_toggle_r, odd_parity_w)
 	AM_RANGE(0x71, 0x71) //AM_WRITE(even_parity_w)
 ADDRESS_MAP_END
@@ -131,7 +131,6 @@ static I8237_INTERFACE( dmac_intf )
 
 static Z80CTC_INTERFACE( ctc0_intf )
 {
-	0,
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -145,7 +144,6 @@ static Z80CTC_INTERFACE( ctc0_intf )
 
 static Z80CTC_INTERFACE( ctc1_intf )
 {
-	0,
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
 	DEVCB_NULL,
 	DEVCB_NULL,

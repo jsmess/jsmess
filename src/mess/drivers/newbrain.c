@@ -1015,7 +1015,7 @@ static ADDRESS_MAP_START( newbrain_ei_io_map, AS_IO, 8, newbrain_eim_state )
 	AM_RANGE(0x17, 0x17) AM_MIRROR(0xff00) AM_READWRITE(usbs_r, usbs_w)
 	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, status_read, control_write)
 	AM_RANGE(0x19, 0x19) AM_MIRROR(0xff00) AM_DEVREADWRITE(MC6850_TAG, acia6850_device, data_read, data_write)
-	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0xff, 0xff) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_WRITE(paging_w)
 ADDRESS_MAP_END
 
@@ -1214,13 +1214,12 @@ WRITE_LINE_MEMBER( newbrain_eim_state::ctc_z1_w )
 WRITE_LINE_MEMBER( newbrain_eim_state::ctc_z2_w )
 {
 	/* connected to CTC channel 0/1 clock inputs */
-	z80ctc_trg0_w(m_ctc, state);
-	z80ctc_trg1_w(m_ctc, state);
+	m_ctc->trg0(state);
+	m_ctc->trg1(state);
 }
 
 static Z80CTC_INTERFACE( newbrain_ctc_intf )
 {
-	0,              		/* timer disables */
 	DEVCB_NULL,				/* interrupt handler */
 	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, ctc_z0_w),	/* ZC/TO0 callback */
 	DEVCB_DRIVER_LINE_MEMBER(newbrain_eim_state, ctc_z1_w),	/* ZC/TO1 callback */
@@ -1231,8 +1230,8 @@ static TIMER_DEVICE_CALLBACK( ctc_c2_tick )
 {
 	newbrain_eim_state *state = timer.machine().driver_data<newbrain_eim_state>();
 
-	z80ctc_trg2_w(state->m_ctc, 1);
-	z80ctc_trg2_w(state->m_ctc, 0);
+	state->m_ctc->trg2(1);
+	state->m_ctc->trg2(0);
 }
 
 inline int newbrain_state::get_reset_t()

@@ -32,7 +32,7 @@ static ADDRESS_MAP_START(kc_d004_io, AS_IO, 8, kc_d004_device)
 	AM_RANGE(0xf4, 0xf4) AM_READ(hw_input_gate_r)
 	AM_RANGE(0xf6, 0xf7) AM_WRITE(fdd_select_w)
 	AM_RANGE(0xf8, 0xf9) AM_WRITE(hw_terminal_count_w)
-	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(kc_d004_gide_io, AS_IO, 8, kc_d004_gide_device)
@@ -43,7 +43,7 @@ static ADDRESS_MAP_START(kc_d004_gide_io, AS_IO, 8, kc_d004_gide_device)
 	AM_RANGE(0x00f4, 0x00f4) AM_MIRROR(0xff00)	AM_READ(hw_input_gate_r)
 	AM_RANGE(0x00f6, 0x00f7) AM_MIRROR(0xff00)	AM_WRITE(fdd_select_w)
 	AM_RANGE(0x00f8, 0x00f9) AM_MIRROR(0xff00)	AM_WRITE(hw_terminal_count_w)
-	AM_RANGE(0x00fc, 0x00ff) AM_MIRROR(0xff00)	AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x00fc, 0x00ff) AM_MIRROR(0xff00)	AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(gide_r, gide_w)
 ADDRESS_MAP_END
 
@@ -104,11 +104,10 @@ static const z80_daisy_config kc_d004_daisy_chain[] =
 
 static Z80CTC_INTERFACE( kc_d004_ctc_intf )
 {
-	0,												/* timer disablers */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, 0),				/* interrupt callback */
-	DEVCB_DEVICE_LINE(Z80CTC_TAG, z80ctc_trg1_w),	/* ZC/TO0 callback */
-	DEVCB_DEVICE_LINE(Z80CTC_TAG, z80ctc_trg2_w),	/* ZC/TO1 callback */
-	DEVCB_DEVICE_LINE(Z80CTC_TAG, z80ctc_trg3_w)	/* ZC/TO2 callback */
+	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg1),	/* ZC/TO0 callback */
+	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg2),	/* ZC/TO1 callback */
+	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg3)	/* ZC/TO2 callback */
 };
 
 static MACHINE_CONFIG_FRAGMENT(kc_d004)

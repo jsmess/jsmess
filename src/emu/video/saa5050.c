@@ -214,8 +214,6 @@ void saa5050_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 
 	for (sy = 0; sy <= saa5050->y; sy++)
 	{
-		bool dblhi = false;
-		
 		/* Set start of line state */
 		saa5050->flags = 0;
 		saa5050->prvchr = 32;
@@ -267,7 +265,6 @@ void saa5050_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 					break;
 				case 0x0d:
 					saa5050->flags |= SAA5050_DBLHI;
-					dblhi = true;
 					break;
 				case 0x18:
 					saa5050->flags |= SAA5050_CONCEAL;
@@ -322,19 +319,20 @@ void saa5050_update( device_t *device, bitmap_ind16 &bitmap, const rectangle &cl
 			{
 				if (saa5050->flags & SAA5050_DBLHI)
 				{
-					drawgfxzoom_opaque(bitmap, cliprect, saa5050->screen->machine().gfx[saa5050->gfxnum + 1], code & 0x7f, colour, 0, 0, sx * 12, ssy * 20, 0x20000, 0x20000);
-					drawgfxzoom_opaque(bitmap, cliprect, saa5050->screen->machine().gfx[saa5050->gfxnum + 2], code & 0x7f, colour, 0, 0, sx * 12, (ssy + 1) * 20, 0x20000, 0x20000);
+					drawgfxzoom_opaque(bitmap, cliprect, saa5050->screen->machine().gfx[saa5050->gfxnum + 1], code, colour, 0, 0, sx * 12, ssy * 20, 0x20000, 0x20000);
+					drawgfxzoom_opaque(bitmap, cliprect, saa5050->screen->machine().gfx[saa5050->gfxnum + 2], code, colour, 0, 0, sx * 12, (ssy + 1) * 20, 0x20000, 0x20000);
 				}
 				else
 				{
-					drawgfxzoom_opaque(bitmap, cliprect, saa5050->screen->machine().gfx[saa5050->gfxnum + 0], code & 0x7f, colour, 0, 0, sx * 12, ssy * 20, 0x20000, 0x20000);
+					drawgfxzoom_opaque(bitmap, cliprect, saa5050->screen->machine().gfx[saa5050->gfxnum + 0], code, colour, 0, 0, sx * 12, ssy * 20, 0x20000, 0x20000);
 				}
 			}
 		}
 
-		if (dblhi)
+		if (saa5050->flags & SAA5050_DBLHI)
 		{
 			sy++;
+			saa5050->flags &= ~SAA5050_DBLHI;
 		}
 	}
 }

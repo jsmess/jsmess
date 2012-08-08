@@ -565,7 +565,7 @@ static ADDRESS_MAP_START( bullet_io, AS_IO, 8, bullet_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x03) AM_READWRITE(win_r, wstrobe_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY(MB8877_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x14, 0x14) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
@@ -595,7 +595,7 @@ static ADDRESS_MAP_START( bulletf_io, AS_IO, 8, bulletf_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x3f)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY(MB8877_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x14, 0x14) AM_WRITE(xdma0_w)
 	AM_RANGE(0x16, 0x16) AM_WRITE(xfdc_w)
@@ -674,14 +674,14 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
 	bullet_state *state = timer.machine().driver_data<bullet_state>();
 
-	z80ctc_trg0_w(state->m_ctc, 1);
-	z80ctc_trg0_w(state->m_ctc, 0);
-
-	z80ctc_trg1_w(state->m_ctc, 1);
-	z80ctc_trg1_w(state->m_ctc, 0);
-
-	z80ctc_trg2_w(state->m_ctc, 1);
-	z80ctc_trg2_w(state->m_ctc, 0);
+	state->m_ctc->trg0(1);
+	state->m_ctc->trg0(0);
+                
+	state->m_ctc->trg1(1);
+	state->m_ctc->trg1(0);
+                
+	state->m_ctc->trg2(1);
+	state->m_ctc->trg2(0);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( dart_rxtxca_w )
@@ -692,11 +692,10 @@ static WRITE_LINE_DEVICE_HANDLER( dart_rxtxca_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,              									// timer disables
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),		// interrupt handler
 	DEVCB_DEVICE_LINE(Z80DART_TAG, dart_rxtxca_w),		// ZC/TO0 callback
 	DEVCB_DEVICE_LINE(Z80DART_TAG, z80dart_rxtxcb_w),	// ZC/TO1 callback
-	DEVCB_LINE(z80ctc_trg3_w)							// ZC/TO2 callback
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg3)							// ZC/TO2 callback
 };
 
 

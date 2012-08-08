@@ -378,7 +378,7 @@ MACHINE_START( mtx512 )
 	ram_device *messram = machine.device<ram_device>(RAM_TAG);
 
 	/* find devices */
-	state->m_z80ctc = machine.device(Z80CTC_TAG);
+	state->m_z80ctc = machine.device<z80ctc_device>(Z80CTC_TAG);
 	state->m_z80dart = machine.device(Z80DART_TAG);
 	state->m_cassette = machine.device<cassette_image_device>(CASSETTE_TAG);
 

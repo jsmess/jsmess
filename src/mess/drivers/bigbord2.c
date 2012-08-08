@@ -178,8 +178,8 @@ WRITE8_MEMBER( bigbord2_state::bigbord2_kbd_put )
 	{
 		m_term_data = data;
 		m_term_status = 8;
-		z80ctc_trg0_w(m_ctca, 0);
-		z80ctc_trg0_w(m_ctca, 1);
+		m_ctca->trg0(0);
+		m_ctca->trg0(1);
 		if (space.read_byte(0xf13d) == 0x4d)
 		{
 			// simulate interrupt by saving current pc on
@@ -347,8 +347,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bigbord2_io, AS_IO, 8, bigbord2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80sio_ba_cd_r, z80sio_ba_cd_w)
-	//AM_RANGE(0x84, 0x87) AM_DEVREADWRITE_LEGACY(Z80CTCA_TAG, z80ctc_r, z80ctc_w) //has issues
-	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE_LEGACY(Z80CTCB_TAG, z80ctc_r, z80ctc_w)
+	//AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(Z80CTCA_TAG, z80ctc_device, read, write) //has issues
+	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE(Z80CTCB_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
 	//AM_RANGE(0xC0, 0xC3)   eprom programming port
 	AM_RANGE(0xC4, 0xC7) AM_READ(portc4_r)
@@ -406,10 +406,10 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
 	bigbord2_state *state = timer.machine().driver_data<bigbord2_state>();
 
-	z80ctc_trg0_w(state->m_ctcb, 1);
-	z80ctc_trg1_w(state->m_ctcb, 1);
-	z80ctc_trg0_w(state->m_ctcb, 0);
-	z80ctc_trg1_w(state->m_ctcb, 0);
+	state->m_ctcb->trg0(1);
+	state->m_ctcb->trg1(1);
+	state->m_ctcb->trg0(0);
+	state->m_ctcb->trg1(0);
 }
 
 WRITE_LINE_MEMBER( bigbord2_state::frame )
@@ -442,7 +442,6 @@ WRITE_LINE_MEMBER( bigbord2_state::frame )
 
 static Z80CTC_INTERFACE( ctca_intf )
 {
-	0,              			/* timer disables */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
 	DEVCB_NULL,		/* ZC/TO0 callback - KBDCLK */
 	DEVCB_NULL,		/* ZC/TO1 callback - not connected */
@@ -451,11 +450,10 @@ static Z80CTC_INTERFACE( ctca_intf )
 
 static Z80CTC_INTERFACE( ctcb_intf )
 {
-	0,              			/* timer disables */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
 	DEVCB_NULL,		/* ZC/TO0 callback - SIO channel B clock */
 	DEVCB_NULL,		/* ZC/TO1 callback - SIO channel A clock */
-	DEVCB_DEVICE_LINE(Z80CTCB_TAG, z80ctc_trg3_w) /* ZC/TO2 callback */
+	DEVCB_DEVICE_LINE_MEMBER(Z80CTCB_TAG, z80ctc_device, trg3) /* ZC/TO2 callback */
 };
 
 /* Z80 Daisy Chain */
@@ -671,7 +669,7 @@ static const mc6845_interface bigbord2_crtc = {
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_DRIVER_LINE_MEMBER(bigbord2_state, frame), //DEVCB_DEVICE_LINE(Z80CTCA_TAG, z80ctc_trg3_w), // vsync
+	DEVCB_DRIVER_LINE_MEMBER(bigbord2_state, frame), //DEVCB_DEVICE_LINE(Z80CTCA_TAG, z80ctc_device, trg3), // vsync
 	NULL
 };
 

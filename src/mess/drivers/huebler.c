@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( amu880_io, AS_IO, 8, amu880_state )
 	AM_RANGE(0x08, 0x09) AM_MIRROR(0x02) AM_READ(keyboard_r)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY(Z80PIO2_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY(Z80PIO1_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
-	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 ADDRESS_MAP_END
 
@@ -268,7 +268,6 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,              	/* timer disables */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
 	DEVCB_LINE(ctc_z0_w),	/* ZC/TO0 callback */
 	DEVCB_DEVICE_LINE(Z80SIO_TAG, z80dart_rxtxcb_w),	/* ZC/TO1 callback */

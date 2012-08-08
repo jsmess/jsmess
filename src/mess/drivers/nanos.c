@@ -92,7 +92,6 @@ WRITE_LINE_MEMBER( nanos_state::ctc_z2_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,              	/* timer disables */
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* interrupt handler */
 	DEVCB_DRIVER_LINE_MEMBER(nanos_state, ctc_z0_w),	/* ZC/TO0 callback */
 	DEVCB_DRIVER_LINE_MEMBER(nanos_state, ctc_z1_w),	/* ZC/TO1 callback */
@@ -166,7 +165,7 @@ static ADDRESS_MAP_START( nanos_io , AS_IO, 8, nanos_state)
 	AM_RANGE(0x86, 0x86) AM_DEVREADWRITE_LEGACY("z80sio_0", z80sio_d_r, z80sio_d_w)
 	AM_RANGE(0x87, 0x87) AM_DEVREADWRITE_LEGACY("z80sio_0", z80sio_c_r, z80sio_c_w)
 	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE_LEGACY("z80pio_1", z80pio_cd_ba_r, z80pio_cd_ba_w)
-	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE_LEGACY("z80ctc_0", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE("z80ctc_0", z80ctc_device, read, write)
 
 	/* FDC card */
 	AM_RANGE(0x92, 0x92) AM_WRITE(nanos_tc_w)
@@ -177,7 +176,7 @@ static ADDRESS_MAP_START( nanos_io , AS_IO, 8, nanos_state)
 	AM_RANGE(0xA1, 0xA1) AM_DEVREADWRITE_LEGACY("z80sio_1", z80sio_c_r, z80sio_c_w)
 	AM_RANGE(0xA2, 0xA2) AM_DEVREADWRITE_LEGACY("z80sio_1", z80sio_d_r, z80sio_d_w)
 	AM_RANGE(0xA3, 0xA3) AM_DEVREADWRITE_LEGACY("z80sio_1", z80sio_c_r, z80sio_c_w)
-	AM_RANGE(0xA4, 0xA7) AM_DEVREADWRITE_LEGACY("z80ctc_1", z80ctc_r, z80ctc_w)
+	AM_RANGE(0xA4, 0xA7) AM_DEVREADWRITE("z80ctc_1", z80ctc_device, read, write)
 
 	/* 256-k RAM card I  -  64k OS-Memory + 192k-RAM-Floppy */
 	//AM_RANGE(0xC0, 0xC7)

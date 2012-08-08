@@ -222,7 +222,7 @@ static ADDRESS_MAP_START( tiki100_io, AS_IO, 8, tiki100_state )
 	AM_RANGE(0x14, 0x14) AM_MIRROR(0x01) AM_WRITE(palette_w)
 	AM_RANGE(0x16, 0x16) AM_DEVWRITE_LEGACY(AY8912_TAG, ay8910_address_w)
 	AM_RANGE(0x17, 0x17) AM_DEVREADWRITE_LEGACY(AY8912_TAG, ay8910_r, ay8910_data_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x1c, 0x1c) AM_MIRROR(0x03) AM_WRITE(system_w)
 //  AM_RANGE(0x20, 0x27) winchester controller
 //  AM_RANGE(0x60, 0x6f) analog I/O (SINTEF)
@@ -487,11 +487,11 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
 	tiki100_state *state = timer.machine().driver_data<tiki100_state>();
 
-	z80ctc_trg0_w(state->m_ctc, 1);
-	z80ctc_trg0_w(state->m_ctc, 0);
-
-	z80ctc_trg1_w(state->m_ctc, 1);
-	z80ctc_trg1_w(state->m_ctc, 0);
+	state->m_ctc->trg0(1);
+	state->m_ctc->trg0(0);
+                
+	state->m_ctc->trg1(1);
+	state->m_ctc->trg1(0);
 }
 
 WRITE_LINE_MEMBER( tiki100_state::ctc_z1_w )
@@ -500,11 +500,10 @@ WRITE_LINE_MEMBER( tiki100_state::ctc_z1_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,              			/* timer disables */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_LINE(z80ctc_trg2_w),	/* ZC/TO0 callback */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF,z80ctc_device, trg2),	/* ZC/TO0 callback */
 	DEVCB_DRIVER_LINE_MEMBER(tiki100_state, ctc_z1_w),		/* ZC/TO1 callback */
-	DEVCB_LINE(z80ctc_trg3_w)	/* ZC/TO2 callback */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF,z80ctc_device, trg3)	/* ZC/TO2 callback */
 };
 
 /* FD1797 Interface */

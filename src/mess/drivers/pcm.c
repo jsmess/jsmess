@@ -165,10 +165,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(pcm_io, AS_IO, 8, pcm_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY("z80ctc_s", z80ctc_r, z80ctc_w) // system CTC
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80ctc_s", z80ctc_device, read, write) // system CTC
 	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE_LEGACY("z80pio_s", z80pio_cd_ba_r, z80pio_cd_ba_w) // system PIO
 	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE_LEGACY("z80sio", z80sio_cd_ba_r, z80sio_cd_ba_w) // SIO
-	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE_LEGACY("z80ctc_u", z80ctc_r, z80ctc_w) // user CTC
+	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE("z80ctc_u", z80ctc_device, read, write) // user CTC
 	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE_LEGACY("z80pio_u", z80pio_cd_ba_r, z80pio_cd_ba_w) // user PIO
 	//AM_RANGE(0x94, 0x97) // bank select
 	//AM_RANGE(0x98, 0x9B) // NMI generator
@@ -234,7 +234,6 @@ static const z80_daisy_config pcm_daisy_chain[] =
 
 static Z80CTC_INTERFACE( ctc_u_intf ) // all pins go to expansion socket
 {
-	0,				/* timer disablers */
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
 	DEVCB_NULL,			/* ZC/TO0 callback */
 	DEVCB_NULL,			/* ZC/TO1 callback */
@@ -243,7 +242,6 @@ static Z80CTC_INTERFACE( ctc_u_intf ) // all pins go to expansion socket
 
 static Z80CTC_INTERFACE( ctc_s_intf )
 {
-	0,				/* timer disablers */
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
 	DEVCB_NULL,			/* ZC/TO0 callback - SIO channel A clock */
 	DEVCB_NULL,			/* ZC/TO1 callback - SIO channel B clock */

@@ -278,8 +278,8 @@ static TIMER_DEVICE_CALLBACK( einstein_ctc_trigger_callback )
 	/* toggle line status */
 	einstein->m_ctc_trigger ^= 1;
 
-	z80ctc_trg0_w(einstein->m_ctc, einstein->m_ctc_trigger);
-	z80ctc_trg1_w(einstein->m_ctc, einstein->m_ctc_trigger);
+	einstein->m_ctc->trg0(einstein->m_ctc_trigger);
+	einstein->m_ctc->trg1(einstein->m_ctc_trigger);
 }
 
 
@@ -427,7 +427,7 @@ static MACHINE_RESET( einstein )
 
 	/* save pointers to our devices */
 	state->m_color_screen = machine.device("screen");
-	state->m_ctc = machine.device(IC_I058);
+	state->m_ctc = machine.device<z80ctc_device>(IC_I058);
 
 	/* initialize memory mapping */
 	state->membank("bank2")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
@@ -534,7 +534,7 @@ static ADDRESS_MAP_START( einstein_io, AS_IO, 8, einstein_state )
 	AM_RANGE(0x24, 0x24) AM_MIRROR(0xff00) AM_WRITE(einstein_rom_w)
 	AM_RANGE(0x25, 0x25) AM_MIRROR(0xff00) AM_WRITE(einstein_fire_int_w)
 	/* block 5, z80ctc */
-	AM_RANGE(0x28, 0x2b) AM_MIRROR(0xff04) AM_DEVREADWRITE_LEGACY(IC_I058, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x28, 0x2b) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I058, z80ctc_device, read, write)
 	/* block 6, z80pio */
 	AM_RANGE(0x30, 0x33) AM_MIRROR(0xff04) AM_DEVREADWRITE_LEGACY(IC_I063, z80pio_cd_ba_r, z80pio_cd_ba_w)
 #if 0
@@ -700,11 +700,10 @@ INPUT_PORTS_END
 
 static Z80CTC_INTERFACE( einstein_ctc_intf )
 {
-	0,
 	DEVCB_NULL,
 	DEVCB_LINE(einstein_serial_transmit_clock),
 	DEVCB_LINE(einstein_serial_receive_clock),
-	DEVCB_LINE(z80ctc_trg3_w)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF, z80ctc_device, trg3)
 };
 
 

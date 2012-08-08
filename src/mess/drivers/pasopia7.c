@@ -674,7 +674,7 @@ READ8_MEMBER( pasopia7_state::pasopia7_io_r )
 	}
 	else
 	if(io_port >= 0x28 && io_port <= 0x2b)
-		return z80ctc_r(m_ctc, io_port & 3);
+		return m_ctc->read(space,io_port & 3);
 	else
 	if(io_port >= 0x30 && io_port <= 0x33)
 		return z80pio_cd_ba_r(m_pio, io_port & 3);
@@ -728,7 +728,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 	}
 	else
 	if(io_port >= 0x28 && io_port <= 0x2b)
-		z80ctc_w(m_ctc, io_port & 3, data);
+		m_ctc->write(space, io_port & 3, data);
 	else
 	if(io_port >= 0x30 && io_port <= 0x33)
 		z80pio_cd_ba_w(m_pio, io_port & 3, data);
@@ -811,11 +811,10 @@ static const mc6845_interface mc6845_intf =
 
 static Z80CTC_INTERFACE( z80ctc_intf )
 {
-	0,					// timer disables
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),		// interrupt handler
-	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg1_w),		// ZC/TO0 callback
-	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg2_w),		// ZC/TO1 callback, beep interface
-	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg3_w)		// ZC/TO2 callback
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg1),		// ZC/TO0 callback
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg2),		// ZC/TO1 callback, beep interface
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3)		// ZC/TO2 callback
 };
 
 READ8_MEMBER( pasopia7_state::test_r )

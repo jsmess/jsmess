@@ -62,7 +62,7 @@ static ADDRESS_MAP_START( llc1_io, AS_IO, 8, llc_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xEC, 0xEF) AM_DEVREADWRITE_LEGACY("z80pio2", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0xF4, 0xF7) AM_DEVREADWRITE_LEGACY("z80pio1", z80pio_cd_ba_r, z80pio_cd_ba_w)
-	AM_RANGE(0xF8, 0xFB) AM_DEVREADWRITE_LEGACY("z80ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0xF8, 0xFB) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( llc2_mem, AS_PROGRAM, 8, llc_state )
@@ -79,7 +79,7 @@ static ADDRESS_MAP_START( llc2_io, AS_IO, 8, llc_state )
 	AM_RANGE(0xE4, 0xE7) AM_DEVREADWRITE_LEGACY("z80pio2", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0xE8, 0xEB) AM_DEVREADWRITE_LEGACY("z80pio1", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0xEC, 0xEC) AM_WRITE(llc2_basic_enable_w)
-	AM_RANGE(0xF8, 0xFB) AM_DEVREADWRITE_LEGACY("z80ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0xF8, 0xFB) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */

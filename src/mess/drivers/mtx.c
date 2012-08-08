@@ -65,7 +65,7 @@ static ADDRESS_MAP_START( mtx_io, AS_IO, 8, mtx_state )
 	AM_RANGE(0x05, 0x05) AM_READWRITE(mtx_key_lo_r, mtx_sense_w)
 	AM_RANGE(0x06, 0x06) AM_READWRITE(mtx_key_hi_r, mtx_sound_latch_w)
 //  AM_RANGE(0x07, 0x07) PIO
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x30, 0x31) AM_WRITE(hrx_address_w)
 	AM_RANGE(0x32, 0x32) AM_READWRITE(hrx_data_r, hrx_data_w)
 	AM_RANGE(0x33, 0x33) AM_READWRITE(hrx_attr_r, hrx_attr_w)
@@ -214,10 +214,10 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
 	mtx_state *state = timer.machine().driver_data<mtx_state>();
 
-	z80ctc_trg1_w(state->m_z80ctc, 1);
-	z80ctc_trg1_w(state->m_z80ctc, 0 );
-	z80ctc_trg2_w(state->m_z80ctc, 1);
-	z80ctc_trg2_w(state->m_z80ctc, 0 );
+	state->m_z80ctc->trg1(1);
+	state->m_z80ctc->trg1(0);
+	state->m_z80ctc->trg2(1);
+	state->m_z80ctc->trg2(0);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_trg1_w )
@@ -243,7 +243,6 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_trg2_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
 	DEVCB_NULL,
 	DEVCB_LINE(ctc_trg1_w),
@@ -308,7 +307,7 @@ static TIMER_DEVICE_CALLBACK( cassette_tick )
 	mtx_state *state = timer.machine().driver_data<mtx_state>();
 	int data = ((state->m_cassette)->input() > +0.0) ? 0 : 1;
 
-	z80ctc_trg3_w(state->m_z80ctc, data);
+	state->m_z80ctc->trg3(data);
 }
 
 static const cassette_interface mtx_cassette_interface =
@@ -328,7 +327,7 @@ static WRITE_LINE_DEVICE_HANDLER(mtx_tms9929a_interrupt)
 {
     mtx_state *drv_state = device->machine().driver_data<mtx_state>();
 
-    z80ctc_trg0_w(drv_state->m_z80ctc, state ? 0 : 1);
+    drv_state->m_z80ctc->trg0(state ? 0 : 1);
 }
 
 static TMS9928A_INTERFACE(mtx_tms9928a_interface)

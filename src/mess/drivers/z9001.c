@@ -80,7 +80,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z9001_io, AS_IO, 8, z9001_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(4) AM_DEVREADWRITE_LEGACY("z80ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x80, 0x83) AM_MIRROR(4) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
 	AM_RANGE(0x88, 0x8B) AM_MIRROR(4) AM_DEVREADWRITE_LEGACY("z80pio1", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0x90, 0x93) AM_MIRROR(4) AM_DEVREADWRITE_LEGACY("z80pio2", z80pio_cd_ba_r, z80pio_cd_ba_w)
 ADDRESS_MAP_END
@@ -99,11 +99,10 @@ static const z80_daisy_config z9001_daisy_chain[] =
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,				/* timer disablers */
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), // interrupt callback
 	DEVCB_DRIVER_LINE_MEMBER(z9001_state, cass_w),			/* ZC/TO0 callback */
 	DEVCB_NULL,			/* ZC/TO1 callback */
-	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg3_w)	/* ZC/TO2 callback */
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3)	/* ZC/TO2 callback */
 };
 
 static Z80PIO_INTERFACE( pio1_intf )

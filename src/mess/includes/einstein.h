@@ -11,6 +11,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "imagedev/floppy.h"
 #include "machine/wd1772.h"
+#include "machine/z80ctc.h"
 
 /***************************************************************************
     CONSTANTS
@@ -49,7 +50,7 @@ public:
 
 	required_device<wd1770_t> m_fdc;
 	device_t *m_color_screen;
-	device_t *m_ctc;
+	z80ctc_device *m_ctc;
 
 	int m_rom_enabled;
 	int m_interrupt;

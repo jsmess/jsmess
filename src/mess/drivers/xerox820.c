@@ -253,7 +253,7 @@ static ADDRESS_MAP_START( xerox820_io, AS_IO, 8, xerox820_state )
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff03) AM_DEVWRITE(COM8116_TAG, com8116_device, stt_w)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(FD1797_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x14, 0x14) AM_MIRROR(0xff03) AM_MASK(0xff00) AM_WRITE(scroll_w)
-	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(Z80KBPIO_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
 ADDRESS_MAP_END
 
@@ -557,8 +557,8 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
 	xerox820_state *state = timer.machine().driver_data<xerox820_state>();
 
-	z80ctc_trg0_w(state->m_ctc, 1);
-	z80ctc_trg0_w(state->m_ctc, 0);
+	state->m_ctc->trg0(1);
+	state->m_ctc->trg0(0);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
@@ -573,10 +573,9 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,              			/* timer disables */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
 	DEVCB_DEVICE_LINE(Z80CTC_TAG, ctc_z0_w),		/* ZC/TO0 callback */
-	DEVCB_DEVICE_LINE(Z80CTC_TAG, z80ctc_trg2_w),	/* ZC/TO1 callback */
+	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg2),	/* ZC/TO1 callback */
 	DEVCB_DEVICE_LINE(Z80CTC_TAG, ctc_z2_w)		/* ZC/TO2 callback */
 };
 

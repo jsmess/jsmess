@@ -93,10 +93,9 @@ WRITE8_MEMBER(llc_state::llc1_port1_b_w)
 // No idea how the CTC is connected, so guessed.
 Z80CTC_INTERFACE( llc1_ctc_intf )
 {
-	0,
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
-	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg1_w),
-	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg3_w),
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg1),
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3),
 	DEVCB_NULL
 };
 
@@ -139,7 +138,6 @@ MACHINE_START(llc1)
 
 Z80CTC_INTERFACE( llc2_ctc_intf )
 {
-	0,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

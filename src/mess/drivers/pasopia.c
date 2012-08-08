@@ -123,7 +123,7 @@ static ADDRESS_MAP_START(pasopia_io, AS_IO, 8, pasopia_state)
 //  0x18 - 0x1b pac2
 //  0x1c - 0x1f something
 	AM_RANGE(0x20,0x23) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE(0x28,0x2b) AM_DEVREADWRITE_LEGACY("z80ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x28,0x2b) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
 	AM_RANGE(0x30,0x33) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_ba_cd_r, z80pio_cd_ba_w)
 //  0x38 printer
 	AM_RANGE(0x3c,0x3c) AM_WRITE(pasopia_ctrl_w)
@@ -236,11 +236,10 @@ static I8255A_INTERFACE( ppi8255_intf_2 )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,					// timer disables
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),		// interrupt handler
-	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg1_w),		// ZC/TO0 callback
-	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg2_w),		// ZC/TO1 callback, beep interface
-	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg3_w)		// ZC/TO2 callback
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg1),		// ZC/TO0 callback
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg2),		// ZC/TO1 callback, beep interface
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3)		// ZC/TO2 callback
 };
 
 READ8_MEMBER( pasopia_state::testa_r )

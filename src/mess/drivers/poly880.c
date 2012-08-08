@@ -73,7 +73,7 @@ static ADDRESS_MAP_START( poly880_io, AS_IO, 8, poly880_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xaf)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY(Z80PIO1_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE_LEGACY(Z80PIO2_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
-	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_WRITE(cldig_w)
 ADDRESS_MAP_END
 
@@ -140,11 +140,10 @@ WRITE_LINE_MEMBER( poly880_state::ctc_z1_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,              	/* timer disables */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
 	DEVCB_DRIVER_LINE_MEMBER(poly880_state, ctc_z0_w),	/* ZC/TO0 callback */
 	DEVCB_DRIVER_LINE_MEMBER(poly880_state, ctc_z1_w),	/* ZC/TO1 callback */
-	DEVCB_LINE(z80ctc_trg3_w)    /* ZC/TO2 callback */
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF,z80ctc_device, trg3)    /* ZC/TO2 callback */
 };
 
 /* Z80-PIO Interface */

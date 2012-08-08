@@ -284,7 +284,7 @@ static ADDRESS_MAP_START( super6_io, AS_IO, 8, super6_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY(WD2793_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x03) AM_DEVREADWRITE_LEGACY(Z80DMA_TAG, z80dma_r, z80dma_w)
 	AM_RANGE(0x14, 0x14) AM_READWRITE(fdc_r, fdc_w)
@@ -353,13 +353,12 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
 	super6_state *state = timer.machine().driver_data<super6_state>();
 
-	z80ctc_trg0_w(state->m_ctc, 1);
-	z80ctc_trg0_w(state->m_ctc, 0);
+	state->m_ctc->trg0(1);
+	state->m_ctc->trg0(0);
 }
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -403,7 +402,7 @@ static void memory_write_byte(address_space *space, offs_t address, UINT8 data) 
 static Z80DMA_INTERFACE( dma_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_HALT),
-	DEVCB_DEVICE_LINE(Z80CTC_TAG, z80ctc_trg2_w),
+	DEVCB_DEVICE_LINE_MEMBER(Z80CTC_TAG, z80ctc_device, trg2),
 	DEVCB_NULL,
 	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_read_byte),
 	DEVCB_MEMORY_HANDLER(Z80_TAG, PROGRAM, memory_write_byte),
@@ -437,7 +436,7 @@ WRITE_LINE_MEMBER( super6_state::fr_w )
 	z80dart_rxca_w(m_dart, state);
 	z80dart_txca_w(m_dart, state);
 
-	z80ctc_trg1_w(m_ctc, state);
+	m_ctc->trg1(state);
 }
 
 static COM8116_INTERFACE( brg_intf )
@@ -476,7 +475,7 @@ WRITE_LINE_MEMBER( super6_state::intrq_w )
 {
 	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 
-	z80ctc_trg3_w(m_ctc, !state);
+	m_ctc->trg3(!state);
 }
 
 WRITE_LINE_MEMBER( super6_state::drq_w )

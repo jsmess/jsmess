@@ -33,13 +33,12 @@ WRITE_LINE_MEMBER( mc80_state::ctc_z1_w )
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
 {
-	z80ctc_trg0_w(device, state);
-	z80ctc_trg1_w(device, state);
+	downcast<z80ctc_device *>(device)->trg0(state);
+	downcast<z80ctc_device *>(device)->trg1(state);
 }
 
 Z80CTC_INTERFACE( mc8020_ctc_intf )
 {
-	0,
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
 	DEVCB_DRIVER_LINE_MEMBER(mc80_state, ctc_z0_w),
 	DEVCB_DRIVER_LINE_MEMBER(mc80_state, ctc_z1_w),
@@ -178,7 +177,6 @@ Z80PIO_INTERFACE( mc8030_asp_z80pio_intf )
 
 Z80CTC_INTERFACE( mc8030_zve_z80ctc_intf )
 {
-	0,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -187,7 +185,6 @@ Z80CTC_INTERFACE( mc8030_zve_z80ctc_intf )
 
 Z80CTC_INTERFACE( mc8030_asp_z80ctc_intf )
 {
-	0,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

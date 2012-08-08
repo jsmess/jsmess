@@ -75,7 +75,6 @@ const rom_entry *abc_sio_device::device_rom_region() const
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

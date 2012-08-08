@@ -4,6 +4,7 @@
 #define __XOR100__
 
 #include "machine/ram.h"
+#include "machine/z80ctc.h"
 
 #define SCREEN_TAG		"screen"
 #define Z80_TAG			"5b"
@@ -35,7 +36,7 @@ public:
 	required_device<com8116_device> m_dbrg;
 	required_device<i8251_device> m_uart_b;
 	required_device<device_t> m_fdc;
-	required_device<device_t> m_ctc;
+	required_device<z80ctc_device> m_ctc;
 	required_device<ram_device> m_ram;
 	required_device<generic_terminal_device> m_terminal;
 	required_device<device_t> m_floppy0;

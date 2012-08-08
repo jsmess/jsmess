@@ -252,7 +252,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( m5_io, AS_IO, 8, m5_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0e) AM_DEVREADWRITE("tms9928a", tms9928a_device, vram_read, vram_write)
 	AM_RANGE(0x11, 0x11) AM_MIRROR(0x0e) AM_DEVREADWRITE("tms9928a", tms9928a_device, register_read, register_write)
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_DEVWRITE_LEGACY(SN76489AN_TAG, sn76496_w)
@@ -407,7 +407,6 @@ INPUT_PORTS_END
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -439,8 +438,8 @@ static WRITE_LINE_DEVICE_HANDLER(sordm5_video_interrupt_callback)
 
 	if (state)
 	{
-		z80ctc_trg3_w(driver_state->m_ctc, 1);
-		z80ctc_trg3_w(driver_state->m_ctc, 0);
+		driver_state->m_ctc->trg3(1);
+		driver_state->m_ctc->trg3(0);
 	}
 }
 

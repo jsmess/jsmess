@@ -441,7 +441,7 @@ static ADDRESS_MAP_START( abc800c_io, AS_IO, 8, abc800_state )
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_DEVREAD(ABCBUS_TAG, abcbus_slot_device, rst_r) AM_WRITE(hrc_w)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -502,7 +502,7 @@ static ADDRESS_MAP_START( abc802_io, AS_IO, 8, abc802_state )
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_device, register_w)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -554,7 +554,7 @@ static ADDRESS_MAP_START( abc806_io, AS_IO, 8, abc806_state )
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff00) AM_DEVWRITE(MC6845_TAG, mc6845_device, address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0xff00) AM_DEVWRITE(MC6845_TAG, mc6845_device, register_w)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0xff1c) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff1c) AM_DEVREADWRITE_LEGACY(Z80CTC_TAG, z80ctc_r, z80ctc_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -633,7 +633,7 @@ WRITE_LINE_MEMBER( abc800_state::ctc_z0_w )
 	if (BIT(m_sb, 2))
 	{
 		z80dart_txca_w(m_sio, state);
-		z80ctc_trg3_w(m_ctc, state);
+		m_ctc->trg3(state);
 	}
 
 	clock_cassette(state);
@@ -649,7 +649,7 @@ WRITE_LINE_MEMBER( abc800_state::ctc_z1_w )
 	if (BIT(m_sb, 4))
 	{
 		z80dart_txca_w(m_sio, state);
-		z80ctc_trg3_w(m_ctc, state);
+		m_ctc->trg3(state);
 	}
 }
 
@@ -661,7 +661,6 @@ WRITE_LINE_MEMBER( abc800_state::ctc_z2_w )
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,              									// timer disables
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),		// interrupt handler
 	DEVCB_DRIVER_LINE_MEMBER(abc800_state, ctc_z0_w),	// ZC/TO0 callback
 	DEVCB_DRIVER_LINE_MEMBER(abc800_state, ctc_z1_w),	// ZC/TO1 callback
@@ -932,14 +931,14 @@ void abc800_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	switch (id)
 	{
 	case TIMER_ID_CTC:
-		z80ctc_trg0_w(m_ctc, 1);
-		z80ctc_trg0_w(m_ctc, 0);
+		m_ctc->trg0(1);
+		m_ctc->trg0(0);
 
-		z80ctc_trg1_w(m_ctc, 1);
-		z80ctc_trg1_w(m_ctc, 0);
+		m_ctc->trg1(1);
+		m_ctc->trg1(0);
 
-		z80ctc_trg2_w(m_ctc, 1);
-		z80ctc_trg2_w(m_ctc, 0);
+		m_ctc->trg2(1);
+		m_ctc->trg2(0);
 		break;
 
 	case TIMER_ID_CASSETTE:

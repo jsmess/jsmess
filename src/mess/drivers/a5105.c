@@ -321,7 +321,7 @@ static ADDRESS_MAP_START(a5105_io, AS_IO, 8, a5105_state)
 	AM_RANGE(0x41, 0x41) AM_DEVREADWRITE_LEGACY("upd765", upd765_data_r, upd765_data_w)
 	AM_RANGE(0x48, 0x4f) AM_WRITE(a5105_upd765_w)
 
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY("z80ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
 	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0x98, 0x99) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
 
@@ -555,11 +555,10 @@ static const upd765_interface a5105_interface =
 
 static Z80CTC_INTERFACE( a5105_ctc_intf )
 {
-	0,												/* timer disablers */
 	DEVCB_CPU_INPUT_LINE("maincpu", 0),				/* interrupt callback */
-	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg2_w),		/* ZC/TO0 callback */
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg2),		/* ZC/TO0 callback */
 	DEVCB_NULL,										/* ZC/TO1 callback */
-	DEVCB_DEVICE_LINE("z80ctc", z80ctc_trg3_w)		/* ZC/TO2 callback */
+	DEVCB_DEVICE_LINE_MEMBER("z80ctc", z80ctc_device, trg3)		/* ZC/TO2 callback */
 };
 
 static Z80PIO_INTERFACE( a5105_pio_intf )

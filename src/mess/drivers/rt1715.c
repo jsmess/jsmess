@@ -194,7 +194,7 @@ static ADDRESS_MAP_START( rt1715_io, AS_IO, 8, rt1715_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("a71", z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE_LEGACY("a72", z80pio_ba_cd_r, z80pio_ba_cd_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("a30", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("a30", z80ctc_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY("a29", z80sio_ba_cd_r, z80sio_ba_cd_w)
 	AM_RANGE(0x18, 0x19) AM_DEVREADWRITE_LEGACY("a26", i8275_r, i8275_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(rt1715_floppy_enable)
@@ -265,7 +265,6 @@ INPUT_PORTS_END
 
 static const z80ctc_interface rt1715_ctc_intf =
 {
-	0,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,

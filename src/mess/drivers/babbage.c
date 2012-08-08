@@ -92,7 +92,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( babbage_io, AS_IO, 8, babbage_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("z80ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("z80pio_1", z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_LEGACY("z80pio_2", z80pio_ba_cd_r, z80pio_ba_cd_w)
 ADDRESS_MAP_END
@@ -152,7 +152,6 @@ WRITE_LINE_MEMBER( babbage_state::ctc_z2_w )
 
 static Z80CTC_INTERFACE( babbage_ctc_intf )
 {
-	0,              	/* timer disables */
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* interrupt handler */
 	DEVCB_DRIVER_LINE_MEMBER(babbage_state, ctc_z0_w),	/* ZC/TO0 callback */
 	DEVCB_DRIVER_LINE_MEMBER(babbage_state, ctc_z1_w),	/* ZC/TO1 callback */

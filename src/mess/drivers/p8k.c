@@ -109,7 +109,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(p8k_iomap, AS_IO, 8, p8k_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_READWRITE(p8k_port0_r,p8k_port0_w) // MH7489
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE_LEGACY("z80ctc_0", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80ctc_0", z80ctc_device, read, write)
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY("z80pio_0", z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE_LEGACY("z80pio_1", z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE_LEGACY("z80pio_2", z80pio_ba_cd_r, z80pio_ba_cd_w)
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START(p8k_iomap, AS_IO, 8, p8k_state)
 	//AM_RANGE(0x24, 0x27) AM_DEVREADWRITE_LEGACY("z80sio_0", z80sio_ba_cd_r, z80sio_ba_cd_w)
 	AM_RANGE(0x24, 0x27) AM_READWRITE(p8k_port24_r,p8k_port24_w)
 	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE_LEGACY("z80sio_1", z80sio_ba_cd_r, z80sio_ba_cd_w)
-	AM_RANGE(0x2c, 0x2f) AM_DEVREADWRITE_LEGACY("z80ctc_1", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x2c, 0x2f) AM_DEVREADWRITE("z80ctc_1", z80ctc_device, read, write)
 	AM_RANGE(0x3c, 0x3c) AM_DEVREADWRITE_LEGACY("z80dma", z80dma_r, z80dma_w)
 ADDRESS_MAP_END
 
@@ -237,7 +237,6 @@ static Z80DMA_INTERFACE( p8k_dma_intf )
 
 static Z80CTC_INTERFACE( p8k_ctc_0_intf )
 {
-	0,			/* timer disables */
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* interrupt handler */
 	DEVCB_NULL,			/* ZC/TO0 callback */
 	DEVCB_NULL,			/* ZC/TO1 callback */
@@ -251,7 +250,6 @@ static Z80CTC_INTERFACE( p8k_ctc_0_intf )
 
 static Z80CTC_INTERFACE( p8k_ctc_1_intf )
 {
-	0,			/* timer disables */
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* interrupt handler */
 	DEVCB_NULL,			/* ZC/TO0 callback */
 	DEVCB_NULL,			/* ZC/TO1 callback */
@@ -512,12 +510,12 @@ static WRITE16_DEVICE_HANDLER( p8k_16_pio_w )
 
 static READ16_DEVICE_HANDLER( p8k_16_ctc_r )
 {
-	return (UINT16)z80ctc_r(device, (offset & 0x06) >> 1);
+	return (UINT16)downcast<z80ctc_device *>(device)->read(*device->machine().memory().first_space(),(offset & 0x06) >> 1);
 }
 
 static WRITE16_DEVICE_HANDLER( p8k_16_ctc_w )
 {
-	z80ctc_w(device, (offset & 0x06) >> 1, (UINT8)(data & 0xff));
+	downcast<z80ctc_device *>(device)->write(*device->machine().memory().first_space(), (offset & 0x06) >> 1, (UINT8)(data & 0xff));
 }
 
 READ16_MEMBER( p8k_state::portff82_r )
@@ -578,7 +576,6 @@ static void p8k_16_daisy_interrupt(device_t *device, int state)
 
 static Z80CTC_INTERFACE( p8k_16_ctc_0_intf )
 {
-	0,				/* timer disables */
 	DEVCB_LINE(p8k_16_daisy_interrupt),	/* interrupt handler */
 	DEVCB_NULL,				/* ZC/TO0 callback */
 	DEVCB_NULL,				/* ZC/TO1 callback */
@@ -589,7 +586,6 @@ static Z80CTC_INTERFACE( p8k_16_ctc_0_intf )
 
 static Z80CTC_INTERFACE( p8k_16_ctc_1_intf )
 {
-	0,				/* timer disables */
 	DEVCB_LINE(p8k_16_daisy_interrupt),	/* interrupt handler */
 	DEVCB_NULL,				/* ZC/TO0 callback */
 	DEVCB_NULL,				/* ZC/TO1 callback */

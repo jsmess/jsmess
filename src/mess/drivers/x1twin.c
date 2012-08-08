@@ -420,11 +420,10 @@ GFXDECODE_END
 
 static Z80CTC_INTERFACE( ctc_intf )
 {
-	0,					// timer disables
 	DEVCB_CPU_INPUT_LINE("x1_cpu", INPUT_LINE_IRQ0),		// interrupt handler
-	DEVCB_DEVICE_LINE("ctc", z80ctc_trg3_w),		// ZC/TO0 callback
-	DEVCB_DEVICE_LINE("ctc", z80ctc_trg1_w),		// ZC/TO1 callback
-	DEVCB_DEVICE_LINE("ctc", z80ctc_trg2_w),		// ZC/TO2 callback
+	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg3),		// ZC/TO0 callback
+	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg1),		// ZC/TO1 callback
+	DEVCB_DEVICE_LINE_MEMBER("ctc", z80ctc_device, trg2),		// ZC/TO2 callback
 };
 
 #if 0
