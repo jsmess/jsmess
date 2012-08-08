@@ -80,8 +80,8 @@ public:
 	virtual ~plus4_user_port_device();
 
 	// computer interface
-	DECLARE_READ8_MEMBER( p_r );
-	DECLARE_WRITE8_MEMBER( p_w );
+	UINT8 p_r();
+	void p_w(UINT8 data);
 	DECLARE_READ_LINE_MEMBER( rxd_r );
 	DECLARE_READ_LINE_MEMBER( dcd_r );
 	DECLARE_READ_LINE_MEMBER( dsr_r );
@@ -89,6 +89,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( dtr_w );
 	DECLARE_WRITE_LINE_MEMBER( rts_w );
 	DECLARE_WRITE_LINE_MEMBER( rxc_w );
+	DECLARE_WRITE_LINE_MEMBER( atn_w );
 
 	// cartridge interface
 	DECLARE_WRITE_LINE_MEMBER( reset_w );
@@ -115,8 +116,8 @@ public:
 	device_plus4_user_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_plus4_user_port_interface();
 
-	virtual UINT8 plus4_p_r(address_space &space, offs_t offset) { return 0xff; };
-	virtual void plus4_p_w(address_space &space, offs_t offset, UINT8 data) { };
+	virtual UINT8 plus4_p_r() { return 0xff; };
+	virtual void plus4_p_w(UINT8 data) { };
 
 	virtual int plus4_rxd_r() { return 1; };
 	virtual int plus4_dcd_r() { return 0; };
@@ -125,6 +126,7 @@ public:
 	virtual void plus4_dtr_w(int level) { };
 	virtual void plus4_rts_w(int level) { };
 	virtual void plus4_rxc_w(int level) { };
+	virtual void plus4_atn_w(int level) { };
 
 	// reset
 	virtual void plus4_reset_w(int level) { };
