@@ -34,7 +34,9 @@
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
     - The Black Onyx: writes a katakana msg: "rino kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
     - Campaign Ban Daisenryaku 2: Hangs at title screen?
-    - Can Can Bunny: bitmap artifacts on intro, caused by a fancy useage of the attribute vram;
+    - Can Can Bunny: bitmap artifacts on intro, caused by a fancy usage of the attribute vram;
+    - Can Can Bunny: no sound (regression);
+    - Chitei Tanken: 200 B/W Mode, gfxs looks misplaced
     - Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Grobda: palette is ugly (parent pc8801 only);
@@ -59,9 +61,13 @@
     - Boukenshatachi
     - Can Can Bunny Superior
     - Carmine
-	(Casablanca)
     - Castle Excellent (sets sector 0xf4? Jumps to 0xa100 and it shouldn't)
     - Card Game Pro 8.8k Plus Unit 1 (prints Disk i/o error 135 in vram, not visible for whatever reason)
+	- Championship Lode Runner (fdc CPU irq doesn't fire anymore)
+	- Change Vol. 1 (fdc CPU irq doesn't fire anymore)
+	- Chikyuu Boueigun (disk i/o error during "ESDF SYSTEM LOADING")
+	- Chikyuu Senshi Rayieza (fdc CPU crashes)
+	(Chitei Tanken)
     - Cuby Panic (copy protection routine at 0x911A)
     - Door Door MK-2 (sets up TC in the middle of execution phase read then wants status bit 6 to be low PC=0x7050 of fdc cpu)
     - Harakiri
@@ -459,22 +465,31 @@ static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap,cons
 			{
 				int pen;
 
-				pen = 0;
-				/* TODO: dunno if state->m_layer_mask is correct here */
-				if(!(state->m_layer_mask & 2)) { pen = ((gvram[count+0x0000] >> (7-xi)) & 1) << 0; }
+				pen = ((gvram[count+0x0000] >> (7-xi)) & 1) << 0;
 
-				if(cliprect.contains(x+xi, y))
-					bitmap.pix16(y, x+xi) = machine.pens[pen ? 7 : 0];
+				if(state->m_gfx_ctrl & 1)
+				{
+					if(cliprect.contains(x+xi, y*2+0))
+						bitmap.pix16(y*2+0, x+xi) = machine.pens[pen ? 7 & ((state->m_layer_mask ^ 0xe) >> 1) : 0];
+
+					if(cliprect.contains(x+xi, y*2+1))
+						bitmap.pix16(y*2+1, x+xi) = machine.pens[pen ? 7 & ((state->m_layer_mask ^ 0xe) >> 1) : 0];
+				}
+				else
+				{
+					if(cliprect.contains(x+xi, y))
+						bitmap.pix16(y, x+xi) = machine.pens[pen ? 7 & ((state->m_layer_mask ^ 0xe) >> 1) : 0];
+				}
 			}
 
 			count++;
 		}
 	}
 
-	count = 0;
-
 	if(!(state->m_gfx_ctrl & 1)) // 400 lines
 	{
+		count = 0;
+
 		for(y=200;y<400;y++)
 		{
 			for(x=0;x<640;x+=8)
@@ -483,20 +498,16 @@ static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap,cons
 				{
 					int pen;
 
-					pen = 0;
-					/* TODO: dunno if state->m_layer_mask is correct here */
-					if(!(state->m_layer_mask & 4)) { pen = ((gvram[count+0x4000] >> (7-xi)) & 1) << 0; }
+					pen = ((gvram[count+0x4000] >> (7-xi)) & 1) << 0;
 
 					if(cliprect.contains(x+xi, y))
-						bitmap.pix16(y, x+xi) = machine.pens[pen ? 7 : 0];
+						bitmap.pix16(y, x+xi) = machine.pens[pen ? 7 & ((state->m_layer_mask ^ 0xe) >> 1) : 0];
 				}
 
 				count++;
 			}
 		}
 	}
-	else
-		popmessage("200 lines B/W mode selected, check me");
 }
 
 static UINT8 calc_cursor_pos(running_machine &machine,int x,int y,int yi)
