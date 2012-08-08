@@ -75,13 +75,12 @@ const device_type COMX_EB = &device_creator<comx_eb_device>;
 
 ROM_START( comx_eb )
 	ROM_REGION( 0x1000, "e000", 0 )
-	ROM_LOAD( "expansion.e5",		  0x0000, 0x1000, CRC(52cb44e2) SHA1(3f9a3d9940b36d4fee5eca9f1359c99d7ed545b9) )
-
-	ROM_REGION( 0x1000, "fm31", 0 )
-	ROM_LOAD( "f&m.expansion.3.1.e5", 0x0000, 0x1000, CRC(818ca2ef) SHA1(ea000097622e7fd472d53e7899e3c83773433045) )
-
-	ROM_REGION( 0x1000, "fm32", 0 )
-	ROM_LOAD( "f&m.expansion.3.2.e5", 0x0000, 0x1000, CRC(0f0fc960) SHA1(eb6b6e7bc9e761d13554482025d8cb5e260c0619) )
+	ROM_SYSTEM_BIOS( 0, "comx", "Original" )
+	ROMX_LOAD( "expansion.e5",		   0x0000, 0x1000, CRC(52cb44e2) SHA1(3f9a3d9940b36d4fee5eca9f1359c99d7ed545b9), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "fm31", "F&M 3.1" )
+	ROMX_LOAD( "f&m.expansion.3.1.e5", 0x0000, 0x1000, CRC(818ca2ef) SHA1(ea000097622e7fd472d53e7899e3c83773433045), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "fm32", "F&M 3.2" )
+	ROMX_LOAD( "f&m.expansion.3.2.e5", 0x0000, 0x1000, CRC(0f0fc960) SHA1(eb6b6e7bc9e761d13554482025d8cb5e260c0619), ROM_BIOS(3) )
 ROM_END
 
 
@@ -180,7 +179,7 @@ void comx_eb_device::set_int(const char *tag, int state)
 
 	for (slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
-		if (!strcmp(tag, m_slot[slot]->tag())) break;
+		if (!strcmp(tag, m_expansion_slot[slot]->tag())) break;
 	}
 
 	assert(slot < MAX_EB_SLOTS);
@@ -194,7 +193,7 @@ void comx_eb_device::set_int(const char *tag, int state)
 		irq |= m_int[slot];
 	}
 
-	m_owner_slot->int_w(irq);
+	m_slot->int_w(irq);
 }
 
 
@@ -208,7 +207,7 @@ void comx_eb_device::set_ef4(const char *tag, int state)
 
 	for (slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
-		if (!strcmp(tag, m_slot[slot]->tag())) break;
+		if (!strcmp(tag, m_expansion_slot[slot]->tag())) break;
 	}
 
 	assert(slot < MAX_EB_SLOTS);
@@ -222,7 +221,7 @@ void comx_eb_device::set_ef4(const char *tag, int state)
 		ef4 |= m_ef4[slot];
 	}
 
-	m_owner_slot->ef4_w(ef4);
+	m_slot->ef4_w(ef4);
 }
 
 
@@ -249,12 +248,10 @@ comx_eb_device::comx_eb_device(const machine_config &mconfig, const char *tag, d
 
 void comx_eb_device::device_start()
 {
-	m_owner_slot = dynamic_cast<comx_expansion_slot_device *>(owner());
-
-	m_slot[0] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT1_TAG));
-	m_slot[1] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT2_TAG));
-	m_slot[2] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT3_TAG));
-	m_slot[3] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT4_TAG));
+	m_expansion_slot[0] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT1_TAG));
+	m_expansion_slot[1] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT2_TAG));
+	m_expansion_slot[2] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT3_TAG));
+	m_expansion_slot[3] = dynamic_cast<comx_expansion_slot_device *>(subdevice(SLOT4_TAG));
 
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
@@ -283,9 +280,9 @@ void comx_eb_device::comx_q_w(int state)
 {
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
-		if (BIT(m_select, slot) && m_slot[slot] != NULL)
+		if (BIT(m_select, slot) && m_expansion_slot[slot] != NULL)
 		{
-			m_slot[slot]->q_w(state);
+			m_expansion_slot[slot]->q_w(state);
 		}
 	}
 }
@@ -312,9 +309,9 @@ UINT8 comx_eb_device::comx_mrd_r(offs_t offset, int *extrom)
 	{
 		for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 		{
-			if (BIT(m_select, slot) && m_slot[slot] != NULL)
+			if (BIT(m_select, slot) && m_expansion_slot[slot] != NULL)
 			{
-				data |= m_slot[slot]->mrd_r(offset, extrom);
+				data |= m_expansion_slot[slot]->mrd_r(offset, extrom);
 			}
 		}
 	}
@@ -331,9 +328,9 @@ void comx_eb_device::comx_mwr_w(offs_t offset, UINT8 data)
 {
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
-		if (BIT(m_select, slot) && m_slot[slot] != NULL)
+		if (BIT(m_select, slot) && m_expansion_slot[slot] != NULL)
 		{
-			m_slot[slot]->mwr_w(offset, data);
+			m_expansion_slot[slot]->mwr_w(offset, data);
 		}
 	}
 }
@@ -349,9 +346,9 @@ UINT8 comx_eb_device::comx_io_r(offs_t offset)
 
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
-		if (BIT(m_select, slot) && m_slot[slot] != NULL)
+		if (BIT(m_select, slot) && m_expansion_slot[slot] != NULL)
 		{
-			data |= m_slot[slot]->io_r(offset);
+			data |= m_expansion_slot[slot]->io_r(offset);
 		}
 	}
 
@@ -371,18 +368,18 @@ void comx_eb_device::comx_io_w(offs_t offset, UINT8 data)
 
 		for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 		{
-			if (m_slot[slot] != NULL)
+			if (m_expansion_slot[slot] != NULL)
 			{
-				m_slot[slot]->ds_w(BIT(m_select, slot));
+				m_expansion_slot[slot]->ds_w(BIT(m_select, slot));
 			}
 		}
 	}
 
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
-		if (BIT(m_select, slot) && m_slot[slot] != NULL)
+		if (BIT(m_select, slot) && m_expansion_slot[slot] != NULL)
 		{
-			m_slot[slot]->io_w(offset, data);
+			m_expansion_slot[slot]->io_w(offset, data);
 		}
 	}
 }
@@ -398,9 +395,9 @@ UINT32 comx_eb_device::comx_screen_update(screen_device &screen, bitmap_ind16 &b
 
 	for (int slot = 0; slot < MAX_EB_SLOTS; slot++)
 	{
-		if (BIT(m_select, slot) && m_slot[slot] != NULL)
+		if (BIT(m_select, slot) && m_expansion_slot[slot] != NULL)
 		{
-			m_slot[slot]->screen_update(screen, bitmap, cliprect);
+			m_expansion_slot[slot]->screen_update(screen, bitmap, cliprect);
 		}
 	}
 

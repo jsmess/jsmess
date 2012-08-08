@@ -80,7 +80,6 @@ comx_joy_device::comx_joy_device(const machine_config &mconfig, const char *tag,
 
 void comx_joy_device::device_start()
 {
-	m_slot = dynamic_cast<comx_expansion_slot_device *>(owner());
 }
 
 

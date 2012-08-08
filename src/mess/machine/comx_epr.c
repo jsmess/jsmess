@@ -71,8 +71,6 @@ comx_epr_device::comx_epr_device(const machine_config &mconfig, const char *tag,
 
 void comx_epr_device::device_start()
 {
-	m_slot = dynamic_cast<comx_expansion_slot_device *>(owner());
-
 	m_rom = memregion("f800")->base();
 	m_eprom = memregion("eprom")->base();
 

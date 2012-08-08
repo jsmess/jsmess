@@ -193,8 +193,6 @@ comx_fd_device::comx_fd_device(const machine_config &mconfig, const char *tag, d
 
 void comx_fd_device::device_start()
 {
-	m_slot = dynamic_cast<comx_expansion_slot_device *>(owner());
-
 	m_rom = memregion("c000")->base();
 
 	// state saving

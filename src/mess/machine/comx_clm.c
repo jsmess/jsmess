@@ -216,8 +216,6 @@ comx_clm_device::comx_clm_device(const machine_config &mconfig, const char *tag,
 
 void comx_clm_device::device_start()
 {
-	m_slot = dynamic_cast<comx_expansion_slot_device *>(owner());
-
 	m_rom = memregion("c000")->base();
 	m_char_rom = memregion(MC6845_TAG)->base();
 	m_video_ram = auto_alloc_array(machine(), UINT8, VIDEORAM_SIZE);

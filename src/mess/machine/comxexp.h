@@ -79,34 +79,9 @@ struct comx_expansion_slot_interface
 };
 
 
-// ======================> device_comx_expansion_card_interface
-
-// class representing interface-specific live comx_expansion card
-class device_comx_expansion_card_interface : public device_slot_card_interface
-{
-public:
-	// construction/destruction
-	device_comx_expansion_card_interface(const machine_config &mconfig, device_t &device);
-	virtual ~device_comx_expansion_card_interface();
-
-	// signals
-	virtual void comx_ds_w(int state) { };
-	virtual void comx_q_w(int state) { };
-
-	// memory access
-	virtual UINT8 comx_mrd_r(offs_t offset, int *extrom) { return 0; };
-	virtual void comx_mwr_w(offs_t offset, UINT8 data) { };
-
-	// I/O access
-	virtual UINT8 comx_io_r(offs_t offset) { return 0; };
-	virtual void comx_io_w(offs_t offset, UINT8 data) { };
-
-	// video
-	virtual UINT32 comx_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return false; }
-};
-
-
 // ======================> comx_expansion_slot_device
+
+class device_comx_expansion_card_interface;
 
 class comx_expansion_slot_device : public device_t,
 								   public comx_expansion_slot_interface,
@@ -145,6 +120,38 @@ protected:
 	devcb_resolved_write_line	m_out_clear_func;
 
 	device_comx_expansion_card_interface *m_card;
+};
+
+
+// ======================> device_comx_expansion_card_interface
+
+// class representing interface-specific live comx_expansion card
+class device_comx_expansion_card_interface : public device_slot_card_interface
+{
+	friend class comx_expansion_slot_device;
+
+public:
+	// construction/destruction
+	device_comx_expansion_card_interface(const machine_config &mconfig, device_t &device);
+	virtual ~device_comx_expansion_card_interface();
+
+protected:
+	// signals
+	virtual void comx_ds_w(int state) { };
+	virtual void comx_q_w(int state) { };
+
+	// memory access
+	virtual UINT8 comx_mrd_r(offs_t offset, int *extrom) { return 0; };
+	virtual void comx_mwr_w(offs_t offset, UINT8 data) { };
+
+	// I/O access
+	virtual UINT8 comx_io_r(offs_t offset) { return 0; };
+	virtual void comx_io_w(offs_t offset, UINT8 data) { };
+
+	// video
+	virtual UINT32 comx_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return false; }
+
+	comx_expansion_slot_device *m_slot;
 };
 
 

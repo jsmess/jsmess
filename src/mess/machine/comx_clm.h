@@ -52,9 +52,6 @@ protected:
 	virtual void comx_mwr_w(offs_t offset, UINT8 data);
 
 private:
-	// internal state
-	comx_expansion_slot_device *m_slot;
-
 	required_device<mc6845_device> m_crtc;
 
 	int m_ds;				// device select

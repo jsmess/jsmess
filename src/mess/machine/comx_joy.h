@@ -42,10 +42,6 @@ protected:
 
 	// device_comx_expansion_card_interface overrides
 	virtual UINT8 comx_io_r(offs_t offset);
-
-private:
-	// internal state
-	comx_expansion_slot_device *m_slot;
 };
 
 
