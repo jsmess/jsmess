@@ -4,11 +4,28 @@
 
         03/12/2009 Skeleton driver.
 
+        2012-08-08 Made to work [Robbbert]
+
 BASIC-52 is an official Intel release.
 
 BASIC-31 (and variants) as found on the below url, are homebrews.
 
 http://dsaprojects.110mb.com/electronics/8031-ah/8031-bas.html
+
+
+The driver is working, however there are issues with the cpu serial code.
+When started, you are supposed to press Space and the system works out
+the baud rate and boots up.
+
+However, the way the cpu is written, it actually passes bytes around, so
+the auto-speed detection doesn't work as intended.
+
+So, as it stands, start the driver, then press d and g in turn until
+something starts happening. Basic-52 usually starts at a very slow rate,
+about 1 character per second, while Basic-31 is much faster.
+
+Once the system starts, all input must be in uppercase. Read the manual
+to discover the special features of this Basic.
 
 ****************************************************************************/
 
@@ -22,22 +39,23 @@ class basic52_state : public driver_device
 {
 public:
 	basic52_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_maincpu(*this, "maincpu"),
+	m_terminal(*this, TERMINAL_TAG) { }
 
 	DECLARE_WRITE8_MEMBER(kbd_put);
+	DECLARE_READ8_MEMBER(unk_r);
 	UINT8 m_term_data;
+	required_device<cpu_device> m_maincpu;
+	required_device<generic_terminal_device> m_terminal;
 };
 
-// may need AS_DATA as well..
-
-// according to my reading of the mcs51 cpu source, AS_PROGRAM is for
-// external RAM, AS_DATA for internal RAM, and AS_IO for the IO ports
 
 static ADDRESS_MAP_START(basic52_mem, AS_PROGRAM, 8, basic52_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x9fff) AM_ROM // EPROM
+	//AM_RANGE(0x8000, 0x9fff) AM_ROM // EPROM
 	//AM_RANGE(0xc000, 0xdfff) // Expansion block
 	//AM_RANGE(0xe000, 0xffff) // Expansion block
 ADDRESS_MAP_END
@@ -49,19 +67,43 @@ static ADDRESS_MAP_START(basic52_io, AS_IO, 8, basic52_state)
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)  // PPI-8255
 	//AM_RANGE(0xc000, 0xdfff) // Expansion block
 	//AM_RANGE(0xe000, 0xffff) // Expansion block
+	AM_RANGE(0x20003, 0x20003) AM_READ(unk_r);
 ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( basic52 )
 INPUT_PORTS_END
 
+// won't compile unless these are static
+static void to_term(device_t *device, int data )
+{
+	basic52_state *state = device->machine().driver_data<basic52_state>();
+	address_space *space = device->memory().space(AS_PROGRAM);
+	state->m_terminal->write(*space, 0, data);
+}
+
+static int from_term(device_t *device)
+{
+	basic52_state *state = device->machine().driver_data<basic52_state>();
+	return state->m_term_data;
+}
+
+READ8_MEMBER( basic52_state::unk_r)
+{
+	return m_term_data; // won't boot without this
+}
 
 static MACHINE_RESET( basic52 )
 {
+	basic52_state *state = machine.driver_data<basic52_state>();
+	i8051_set_serial_tx_callback(state->m_maincpu, to_term);
+	i8051_set_serial_rx_callback(state->m_maincpu, from_term);
 }
 
 WRITE8_MEMBER( basic52_state::kbd_put )
 {
+	cputag_set_input_line(machine(), "maincpu", MCS51_RX_LINE, ASSERT_LINE);
+	cputag_set_input_line(machine(), "maincpu", MCS51_RX_LINE, CLEAR_LINE);
 	m_term_data = data;
 }
 
@@ -128,7 +170,6 @@ ROM_START( basic31 )
 ROM_END
 
 /* Driver */
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1985, basic52,  0,       0,    basic52,   basic52, basic52_state,  0,    "Intel", "MCS BASIC 52", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1985, basic31,  basic52, 0,    basic31,   basic52, basic52_state,  0,    "Intel", "MCS BASIC 31", GAME_NOT_WORKING | GAME_NO_SOUND)
-
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    CLASS          INIT    COMPANY   FULLNAME       FLAGS */
+COMP( 1985, basic52,  0,       0,    basic52,   basic52, basic52_state,  0,    "Intel", "MCS BASIC 52", GAME_NO_SOUND_HW)
+COMP( 1985, basic31,  basic52, 0,    basic31,   basic52, basic52_state,  0,    "Intel", "MCS BASIC 31", GAME_NO_SOUND_HW)
