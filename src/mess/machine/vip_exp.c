@@ -232,3 +232,22 @@ WRITE_LINE_MEMBER( vip_expansion_slot_device::run_w ) { if (m_cart != NULL) m_ca
 WRITE_LINE_MEMBER( vip_expansion_slot_device::interrupt_w ) { m_out_interrupt_func(state); }
 WRITE_LINE_MEMBER( vip_expansion_slot_device::dma_out_w ) { m_out_dma_out_func(state); }
 WRITE_LINE_MEMBER( vip_expansion_slot_device::dma_in_w ) { m_out_dma_in_func(state); }
+
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE vip_expansion_cards )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( vip_expansion_cards )
+    SLOT_INTERFACE("super", VP550)
+    //SLOT_INTERFACE("eprom", VP560)
+    //SLOT_INTERFACE("eprommer", VP565)
+    SLOT_INTERFACE("ram", VP570)
+    SLOT_INTERFACE("exp", VP575)
+    //SLOT_INTERFACE("exp2", VP576_EXP)
+    //SLOT_INTERFACE("basic", VP700)
+    SLOT_INTERFACE("keypad", VP585)
+    SLOT_INTERFACE("color", VP590)
+    SLOT_INTERFACE("simple", VP595)
+SLOT_INTERFACE_END

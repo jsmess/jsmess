@@ -59,7 +59,6 @@ Notes:
     - cassette loading
     - 20K RAM for Floating Point BASIC
     - VP-111 has 1K RAM, no byte I/O, no expansion
-    - VP-551 Super Sound Board (4 channel sound)
     - VP-601/611 ASCII Keyboard (VP-601 58 keys, VP611 58 keys + 16 keys numerical keypad)
     - VP-700 Expanded Tiny Basic Board (4 KB ROM expansion)
 
@@ -601,11 +600,6 @@ static const cassette_interface vip_cassette_interface =
 //  VIP_BYTEIO_PORT_INTERFACE( byteio_intf )
 //-------------------------------------------------
 
-static SLOT_INTERFACE_START( vip_byteio_cards )
-    // VP576
-    // VP620
-SLOT_INTERFACE_END
-
 WRITE_LINE_MEMBER( vip_state::byteio_inst_w )
 {
     if (!state)
@@ -623,20 +617,6 @@ static VIP_BYTEIO_PORT_INTERFACE( byteio_intf )
 //-------------------------------------------------
 //  VIP_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
-
-static SLOT_INTERFACE_START( vip_expansion_cards )
-    SLOT_INTERFACE("vp550", VP550)
-    // VP551
-    // VP560
-    // VP565
-    // VP570
-    // VP575
-    // VP576
-    // VP700
-    SLOT_INTERFACE("vp585", VP585)
-    SLOT_INTERFACE("vp590", VP590)
-    SLOT_INTERFACE("vp595", VP595)
-SLOT_INTERFACE_END
 
 WRITE_LINE_MEMBER( vip_state::exp_int_w )
 {
@@ -843,9 +823,6 @@ MACHINE_CONFIG_END
 ROM_START( vip )
 	ROM_REGION( 0x200, CDP1802_TAG, 0 )
 	ROM_LOAD( "cdpr566.u10", 0x0000, 0x0200, CRC(5be0a51f) SHA1(40266e6d13e3340607f8b3dcc4e91d7584287c06) )
-
-	ROM_REGION( 0x1000, "vp700", 0)
-	ROM_LOAD( "vp700.bin", 0x0000, 0x1000, NO_DUMP )
 
 	ROM_REGION( 0x200, "chip8", 0 )
 	ROM_LOAD( "chip8.bin", 0x0000, 0x0200, CRC(438ec5d5) SHA1(8aa634c239004ff041c9adbf9144bd315ab5fc77) )

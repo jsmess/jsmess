@@ -166,5 +166,16 @@ protected:
 extern const device_type VIP_EXPANSION_SLOT;
 
 
+// slot devices
+#include "machine/vp550.h"
+#include "machine/vp570.h"
+#include "machine/vp575.h"
+#include "machine/vp585.h"
+#include "machine/vp590.h"
+#include "machine/vp595.h"
+
+SLOT_INTERFACE_EXTERN( vip_expansion_cards );
+
+
 
 #endif

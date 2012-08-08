@@ -120,3 +120,13 @@ READ_LINE_MEMBER( vip_byteio_port_device::ef4_r ) { int state = CLEAR_LINE; if (
 WRITE_LINE_MEMBER( vip_byteio_port_device::q_w ) { if (m_cart != NULL) m_cart->vip_q_w(state); }
 
 WRITE_LINE_MEMBER( vip_byteio_port_device::inst_w ) { m_out_inst_func(state); }
+
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( vip_byteio_cards )
+//-------------------------------------------------
+
+SLOT_INTERFACE_START( vip_byteio_cards )
+    //SLOT_INTERFACE("exp2", VP576_BYTEIO)
+    SLOT_INTERFACE("ascii", VP620)
+SLOT_INTERFACE_END

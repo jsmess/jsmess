@@ -10,10 +10,6 @@
 #include "machine/ram.h"
 #include "machine/vip_byteio.h"
 #include "machine/vip_exp.h"
-#include "machine/vp550.h"
-#include "machine/vp585.h"
-#include "machine/vp590.h"
-#include "machine/vp595.h"
 #include "sound/discrete.h"
 #include "video/cdp1861.h"
 

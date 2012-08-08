@@ -1493,9 +1493,12 @@ $(MESSOBJ)/rca.a:				\
 	$(MESS_MACHINE)/vip_byteio.o	\
 	$(MESS_MACHINE)/vip_exp.o	\
 	$(MESS_MACHINE)/vp550.o		\
+	$(MESS_MACHINE)/vp570.o		\
+	$(MESS_MACHINE)/vp575.o		\
 	$(MESS_MACHINE)/vp585.o		\
 	$(MESS_MACHINE)/vp590.o		\
 	$(MESS_MACHINE)/vp595.o		\
+	$(MESS_MACHINE)/vp620.o		\
 
 $(MESSOBJ)/rm.a:				\
 	$(MESS_DRIVERS)/rm380z.o	\

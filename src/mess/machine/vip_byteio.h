@@ -138,5 +138,11 @@ protected:
 extern const device_type VIP_BYTEIO_PORT;
 
 
+// slot devices
+#include "machine/vp620.h"
+
+SLOT_INTERFACE_EXTERN( vip_byteio_cards );
+
+
 
 #endif
