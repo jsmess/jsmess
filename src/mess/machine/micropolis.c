@@ -180,7 +180,7 @@ void micropolis_set_drive(device_t *device, UINT8 drive)
 READ8_DEVICE_HANDLER( micropolis_status_r )
 {
 	micropolis_state *w = get_safe_token(device);
-	static bool inv = 0;
+	static int inv = 0;
 
 	if (offset)
 		return w->status | w->drive_num;

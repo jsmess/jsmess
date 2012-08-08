@@ -2947,8 +2947,8 @@ static TIMER_CALLBACK(mouse_callback)
     {
         state->m_reg0a4 &= 0xF0;
         state->m_reg0a4 |= ( mxb & 0x01) << 3; // XB
-        state->m_reg0a4 |= (!mxb & 0x01) << 2; // XA
-        state->m_reg0a4 |= (!myb & 0x01) << 1; // YA
+        state->m_reg0a4 |= (~mxb & 0x01) << 2; // XA
+        state->m_reg0a4 |= (~myb & 0x01) << 1; // YA
         state->m_reg0a4 |= ( myb & 0x01) << 0; // YB
     }
 

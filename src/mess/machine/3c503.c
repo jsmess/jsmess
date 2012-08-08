@@ -42,7 +42,7 @@ void el2_3c503_device::device_start() {
 	// TODO: This is wrong, fix if anything actually uses it
 	//  DMA can change in runtime
 	int chan = 0, idcfr = m_regs.idcfr & 0x0f;
-	if((m_regs.streg | 0x08)) {
+	if((m_regs.streg & 0x08)) {
 		while(idcfr) {
 			chan++;
 			idcfr >>= 1;
