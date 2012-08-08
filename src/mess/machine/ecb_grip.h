@@ -19,6 +19,7 @@
 #include "machine/ctronics.h"
 #include "machine/ecbbus.h"
 #include "machine/i8255.h"
+#include "machine/keyboard.h"
 #include "machine/z80sti.h"
 #include "sound/speaker.h"
 #include "video/mc6845.h"
@@ -59,6 +60,7 @@ public:
 	DECLARE_WRITE8_MEMBER( ppi_pc_w );
 	DECLARE_READ8_MEMBER( sti_gpio_r );
 	DECLARE_WRITE_LINE_MEMBER( speaker_w );
+	DECLARE_WRITE8_MEMBER( kb_w );
 
 	void crtc_update_row(mc6845_device *device, bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 ma, UINT8 ra, UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
 
@@ -67,7 +69,6 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
     virtual void device_config_complete() { m_shortname = "grip"; }
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	// device_ecbbus_card_interface overrides
 	virtual UINT8 ecbbus_io_r(offs_t offset);
@@ -80,8 +81,6 @@ private:
 	required_device<mc6845_device> m_crtc;
 	required_device<centronics_device> m_centronics;
 	required_device<device_t> m_speaker;
-
-	void scan_keyboard();
 
 	// sound state
 	int m_vol0;
