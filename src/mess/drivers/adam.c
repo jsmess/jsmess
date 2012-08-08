@@ -178,11 +178,7 @@
     TODO:
 
     - sound (PSG RDY -> Z80 WAIT)
-    - tape
-        - add track selection to cassette input/output
-        - add motor speed/direction controls
-        - DDP format converter
-    - floppy
+    - floppy ROM dump
     - printer
     - SPI
 

@@ -1551,7 +1551,7 @@ static Z80DART_INTERFACE( dart_intf )
 
 void abc1600_state::scc_irq(bool status)
 {
-	m_maincpu->set_input_line(M68K_IRQ_5, status);
+	m_maincpu->set_input_line(M68K_IRQ_5, status ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
