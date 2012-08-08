@@ -39,9 +39,9 @@ WRITE_LINE_MEMBER( vic1010_device::res_w )
 
 static VIC20_EXPANSION_INTERFACE( expansion_intf )
 {
-	DEVCB_LINE_MEMBER(vic1010_device, irq_w),
-	DEVCB_LINE_MEMBER(vic1010_device, nmi_w),
-	DEVCB_LINE_MEMBER(vic1010_device, res_w)
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vic1010_device, irq_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vic1010_device, nmi_w),
+	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, vic1010_device, res_w)
 };
 
 
