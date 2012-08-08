@@ -158,7 +158,7 @@ public:
 	UINT16 m_vgERR; // error register can cause carries which need to be caught
 	UINT8 m_vgSOPS;
 	UINT8 m_vgPAT;
-	UINT16 m_vgPAT_Mask; // current mask for PAT but <<1
+	UINT16 m_vgPAT_Mask; // current mask for PAT
 	UINT8 m_vgPMUL; // reload value for PMUL_Count
 	UINT8 m_vgPMUL_Count;
 	UINT8 m_vgDownCount; // down counter = number of pixels, loaded from vgDU on execute
@@ -1072,8 +1072,8 @@ i.e. addr bits 9876543210
      * the vector rom bits are complex and are unfortunately poorly documented
      * in the tech manual. see figure 5-23.
      * control bits:
-     *            /CE1 ----- ?
-     *            /CE2 ----- ?
+     *            /CE1 ----- /GO aka GO L
+     *            /CE2 ----- GND
      * addr bits: 76543210
      *            ||||\\\\-- To sync counter, which counts 0xC 0x3 0x2 0x1 0x0 0x5 0x4 0xB 0xA 0x9 0x8 0xD in that order
      *            |||\------ A0\__Address lsb bits of the execute write, i.e. VG_MODE; these are INVERTED FIRST.
@@ -1083,22 +1083,22 @@ i.e. addr bits 9876543210
      *
      * data bits: 76543210
      *            |||||||\-- /WRITE aka WRITE L (fig 5-20, page 5-32, writes the post-pattern-converted value back to vram at X,Y)
-     *            ||||||\--- ? vector clk
-     *            |||||\---- ? vector clk
+     *            ||||||\--- DONE L [verified via tracing]
+     *            |||||\---- VECTOR CLK [verified via tracing]
      *            ||||\----- /LD ERROR aka STROBE ERROR L (strobes the adder result value into the vgERR register)
-     *            |||\------ ? done l?
+     *            |||\------ D-LOAD [by process of elimination and limited tracing]
      *            ||\------- ERASE L (latched, forces a4 on the sync rom low and also forces a7 on the ras/erase rom; the counter rom may be involved in blanking all of vram) [verified from tracing]
-     *            |\-------- C0 aka C IN (high during DVM read, low otherwise, likely a carry in to the adder so DVM is converted from 1s to 2s complement)
-     *            \--------- ?D LOAD? (goes to the clock of a d-latch near the register file)
-     *
+     *            |\-------- C0 aka C IN (high during DVM read, low otherwise, a carry in to the adder so DVM is converted from 1s to 2s complement)
+     *            \--------- SHIFT ENA [verified via tracing]
+     * The data bits all have pull-ups to +5v if the /CE1 pin is not low
      * According to the VT125 tech manual (vt100 tech manual rev 3, page 6-85) the 8 signals here are:
      * ERASE L - d5
-     * SHIFT ENA
+     * SHIFT ENA - d7
      * C IN - d6
-     * D LOAD - possibly d7?
+     * D LOAD - d4
      * WRITE L - d0
-     * DONE L
-     * VECTOR CLK - likely d2 or d1
+     * DONE L - d1
+     * VECTOR CLK - d2
      * STROBE ERROR L - d3
      *
      * it is possible d2 or d1 is the SYNC bit instead of one of the above
