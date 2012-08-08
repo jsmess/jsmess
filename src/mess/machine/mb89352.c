@@ -309,7 +309,7 @@ READ8_MEMBER( mb89352_device::mb89352_r )
 	case 0x08:  // PCTL - Phase Control
 		return ((m_busfree_int_enable) ? (m_line_status & 0x07) | 0x80 : (m_line_status & 0x07));
 	case 0x0a:  // DREG - Data register (for data transfers)
-		if(m_spc_status | SSTS_XFER_IN_PROGRESS)
+		if(m_spc_status & SSTS_XFER_IN_PROGRESS)
 		{
 			m_data = m_buffer[m_transfer_index % 512];
 			m_transfer_index++;
@@ -594,7 +594,7 @@ WRITE8_MEMBER( mb89352_device::mb89352_w )
 			}
 			return;
 		}
-		if(m_spc_status | SSTS_XFER_IN_PROGRESS)
+		if(m_spc_status & SSTS_XFER_IN_PROGRESS)
 		{
 			m_buffer[m_transfer_index % 512] = data;
 			m_spc_status |= SSTS_DREG_EMPTY;  // DREG is empty once sent
