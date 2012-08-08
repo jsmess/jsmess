@@ -18,7 +18,8 @@ When started, you are supposed to press Space and the system works out
 the baud rate and boots up.
 
 However, the way the cpu is written, it actually passes bytes around, so
-the auto-speed detection doesn't work as intended.
+the auto-speed detection doesn't work as intended. Also the cpu interface
+is horribly outdated and needs to be brought up to date.
 
 So, as it stands, start the driver, then press d and g in turn until
 something starts happening. Basic-52 usually starts at a very slow rate,
