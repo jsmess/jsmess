@@ -879,10 +879,9 @@ static void draw_sprites(running_machine &machine, const rectangle* rect)
 		else
 		{
 			poffset = (attr & 0x3ff) << 7;
-			coffset = (colour & 0xfff) << 5;
 #ifdef SPR_DEBUG
-			printf("Sprite16 #%i, X %i Y %i Attr %04x Col %04x Poff %08x Coff %08x\n",
-				n,x,y,attr,colour,poffset,coffset);
+			printf("Sprite16 #%i, X %i Y %i Attr %04x Col %04x Poff %08x",
+				n,x,y,attr,colour,poffset);
 #endif
 			if(!(colour & 0x2000))
 				render_sprite_16(machine,(poffset)&0x1ffff,x,y,attr&0x2000,attr&0x1000,rect);
