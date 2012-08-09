@@ -696,7 +696,7 @@ void coco_state::update_sound(void)
 	/* determine the value to send to the DAC */
 	m_dac_output = (m_pia_1->a_output() & 0xFC) >> 2;
 	UINT8 sound_output = single_bit_sound + (status == SOUNDMUX_ENABLE ? m_dac_output << 1 : 0);
-	dac_data_w(m_dac, sound_output);
+	m_dac->write_unsigned8(sound_output);
 
 	/* determine the cassette sound status */
 	cassette_state cas_sound = (status == (SOUNDMUX_ENABLE | SOUNDMUX_SEL1))

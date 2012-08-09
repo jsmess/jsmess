@@ -38,7 +38,7 @@ public:
 
 	device_t *m_s3c2440;
 	nand_device *m_nand;
-	device_t *m_dac[2];
+	dac_device *m_dac[2];
 
 	UINT32 m_port[9];
 };
@@ -136,7 +136,7 @@ static WRITE8_DEVICE_HANDLER( s3c2440_nand_data_w )
 static WRITE16_DEVICE_HANDLER( s3c2440_i2s_data_w )
 {
 	mini2440_state *state = device->machine().driver_data<mini2440_state>();
-	dac_signed_data_16_w( state->m_dac[offset], data + 0x8000);
+	state->m_dac[offset]->write_signed16(data + 0x8000);
 }
 
 // ADC
@@ -166,10 +166,10 @@ static INPUT_CHANGED( mini2440_input_changed )
 static MACHINE_START( mini2440 )
 {
 	mini2440_state *state = machine.driver_data<mini2440_state>();
-	state->m_s3c2440 = machine.device( "s3c2440");
-	state->m_nand = machine.device<nand_device>( "nand");
-	state->m_dac[0] = machine.device( "dac1");
-	state->m_dac[1] = machine.device( "dac2");
+	state->m_s3c2440 = machine.device("s3c2440");
+	state->m_nand = machine.device<nand_device>("nand");
+	state->m_dac[0] = machine.device<dac_device>("dac1");
+	state->m_dac[1] = machine.device<dac_device>("dac2");
 	state->m_nand->set_data_ptr(state->memregion("nand")->base());
 }
 

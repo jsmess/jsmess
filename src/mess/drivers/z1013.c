@@ -86,7 +86,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(z1013_io, AS_IO, 8, z1013_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE( 0x00, 0x03 ) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
 	AM_RANGE( 0x08, 0x08 ) AM_WRITE(z1013_keyboard_w)
 ADDRESS_MAP_END
 

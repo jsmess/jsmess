@@ -119,7 +119,7 @@ static MACHINE_START( a310 )
 	archimedes_init(machine);
 
 	// reset the DAC to centerline
-	//dac_signed_data_w(machine.device("dac"), 0x80);
+	//machine.device<dac_device>("dac")->write_signed8(0x80);
 }
 
 static MACHINE_RESET( a310 )

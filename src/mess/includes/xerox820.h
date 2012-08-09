@@ -41,7 +41,7 @@ public:
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_kbpio;
+	required_device<z80pio_device> m_kbpio;
 	required_device<z80ctc_device> m_ctc;
 	required_device<device_t> m_fdc;
 	optional_device<device_t> m_speaker;

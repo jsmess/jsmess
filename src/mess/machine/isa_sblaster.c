@@ -600,7 +600,7 @@ void sb8_device::device_timer(emu_timer &timer, device_timer_id tid, int param, 
 {
 //    printf("DMA timer expire\n");
 
-    dac_data_w(m_dac, m_dsp.data[m_dsp.d_rptr]);
+    m_dac->write_unsigned8(m_dsp.data[m_dsp.d_rptr]);
     m_dsp.data[m_dsp.d_rptr++] = 0x80;
     m_dsp.d_rptr %= 128;
 

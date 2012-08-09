@@ -21,7 +21,7 @@ static ADDRESS_MAP_START(kc85_4_io, AS_IO, 8, kc85_4_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0084, 0x0085) AM_MIRROR(0xff00) AM_READWRITE(kc85_4_84_r, kc85_4_84_w)
 	AM_RANGE(0x0086, 0x0087) AM_MIRROR(0xff00) AM_READWRITE(kc85_4_86_r, kc85_4_86_w)
-	AM_RANGE(0x0088, 0x008b) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x0088, 0x008b) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
 	AM_RANGE(0x008c, 0x008f) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
 
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(expansion_io_read, expansion_io_write)
@@ -48,7 +48,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(kc85_3_io, AS_IO, 8, kc_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0088, 0x008b) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x0088, 0x008b) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
 	AM_RANGE(0x008c, 0x008f) AM_MIRROR(0xff00) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
 
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(expansion_io_read, expansion_io_write)

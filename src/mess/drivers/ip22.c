@@ -1078,7 +1078,7 @@ static TIMER_CALLBACK(ip22_dma)
 		UINT16 temp16 = ( state->m_mainram[(state->m_PBUS_DMA.nCurPtr - 0x08000000)/4] & 0xffff0000 ) >> 16;
 		INT16 stemp16 = (INT16)((temp16 >> 8) | (temp16 << 8));
 
-		dac_signed_data_16_w(machine.device("dac"), stemp16 ^ 0x8000);
+		machine.device<dac_device>("dac")->write_signed16(stemp16 ^ 0x8000);
 
 		state->m_PBUS_DMA.nCurPtr += 4;
 

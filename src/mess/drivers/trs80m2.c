@@ -410,7 +410,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_io, AS_IO, 8, trs80m2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read, write)
 	AM_RANGE(0xe4, 0xe7) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0xef, 0xef) AM_WRITE(drvslt_w)
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
@@ -797,7 +797,7 @@ static Z80PIO_INTERFACE( pio_intf )
 
 static const centronics_interface centronics_intf =
 {
-	DEVCB_DEVICE_LINE(Z80PIO_TAG, z80pio_bstb_w),	// ACK output
+	DEVCB_DEVICE_LINE_MEMBER(Z80PIO_TAG, z80pio_device, strobe_b),	// ACK output
 	DEVCB_NULL,										// BUSY output
 	DEVCB_NULL										// NOT BUSY output
 };
@@ -875,7 +875,7 @@ static const floppy_interface trs80m2_floppy_interface =
 
 WRITE_LINE_MEMBER( trs80m2_state::fdc_intrq_w )
 {
-	z80pio_pa_w(m_pio, 0, state);
+	m_pio->port_a_write(state);
 }
 
 static const wd17xx_interface fdc_intf =

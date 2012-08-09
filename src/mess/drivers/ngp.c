@@ -144,8 +144,8 @@ public:
 	device_t *m_tlcs900;
 	device_t *m_z80;
 	device_t *m_t6w28;
-	device_t *m_dac_l;
-	device_t *m_dac_r;
+	dac_device *m_dac_l;
+	dac_device *m_dac_r;
 	device_t *m_k1ge;
 
 	DECLARE_READ8_MEMBER( ngp_io_r );
@@ -234,10 +234,10 @@ WRITE8_MEMBER( ngp_state::ngp_io_w )
 		break;
 
 	case 0x22:		/* DAC right */
-		dac_w( m_dac_r, 0, data );
+		m_dac_r->write_unsigned8(data );
 		break;
 	case 0x23:		/* DAC left */
-		dac_w( m_dac_l, 0, data );
+		m_dac_l->write_unsigned8(data );
 		break;
 
 	/* Internal eeprom related? */
@@ -613,8 +613,8 @@ void ngp_state::machine_reset()
 	m_tlcs900 = machine().device( "maincpu" );
 	m_z80 = machine().device( "soundcpu" );
 	m_t6w28 = machine().device( "t6w28" );
-	m_dac_l = machine().device( "dac_l" );
-	m_dac_r = machine().device( "dac_r" );
+	m_dac_l = machine().device<dac_device>( "dac_l" );
+	m_dac_r = machine().device<dac_device>( "dac_r" );
 	m_k1ge = machine().device( "k1ge" );
 
 	device_suspend( m_z80, SUSPEND_REASON_HALT, 1 );

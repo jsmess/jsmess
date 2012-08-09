@@ -836,7 +836,7 @@ WRITE32_MEMBER(pockstat_state::ps_audio_w)
 
 WRITE32_MEMBER(pockstat_state::ps_dac_w)
 {
-	dac_data_16_w(machine().device("dac"), (UINT16)((data + 0x8000) & 0x0000ffff));
+	machine().device<dac_device>("dac")->write_unsigned16((UINT16)((data + 0x8000) & 0x0000ffff));
 }
 
 static ADDRESS_MAP_START(pockstat_mem, AS_PROGRAM, 32, pockstat_state )

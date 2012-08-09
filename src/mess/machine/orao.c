@@ -74,7 +74,7 @@ WRITE8_MEMBER(orao_state::orao_io_w)
 {
 	if (offset == 0x0800)
 	{
-		device_t *dac_device = machine().device("dac");
-		dac_data_w(dac_device, data); //beeper
+		dac_device *dac = machine().device<dac_device>("dac");
+		dac->write_unsigned8(data); //beeper
 	}
 }

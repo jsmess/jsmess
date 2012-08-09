@@ -50,7 +50,7 @@ public:
 	UINT32 port[9];
 	device_t *s3c44b0;
 	smc_t smc;
-	device_t *dac;
+	dac_device *dac;
 	#if defined(JUICEBOX_ENTER_DEBUG_MENU) || defined(JUICEBOX_DISPLAY_ROM_ID)
 	int port_g_read_count;
 	#endif
@@ -230,7 +230,7 @@ WRITE32_MEMBER(juicebox_state::juicebox_nand_w)
 static WRITE16_DEVICE_HANDLER( s3c44b0_i2s_data_w )
 {
 	juicebox_state *juicebox = device->machine().driver_data<juicebox_state>();
-	dac_signed_data_16_w( juicebox->dac, data ^ 0x8000);
+	juicebox->dac->write_signed16(data ^ 0x8000);
 }
 
 // ...
@@ -249,7 +249,7 @@ static MACHINE_START( juicebox )
 	juicebox_state *juicebox = machine.driver_data<juicebox_state>();
 	juicebox->s3c44b0 = machine.device( "s3c44b0");
 	smc_init( machine);
-	juicebox->dac = machine.device( "dac");
+	juicebox->dac = machine.device<dac_device>( "dac");
 }
 
 static MACHINE_RESET( juicebox )

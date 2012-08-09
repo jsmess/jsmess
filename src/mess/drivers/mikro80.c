@@ -38,12 +38,10 @@ static ADDRESS_MAP_START( kristall_io , AS_IO, 8, mikro80_state )
 	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
 ADDRESS_MAP_END
 
-static WRITE8_DEVICE_HANDLER( radio99_dac_w )	{ dac_data_w(device, data); }
-
 static ADDRESS_MAP_START( radio99_io , AS_IO, 8, mikro80_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x01, 0x01) AM_READWRITE(mikro80_tape_r, mikro80_tape_w )
-	AM_RANGE( 0x04, 0x04) AM_DEVWRITE_LEGACY("dac", radio99_dac_w )
+	AM_RANGE( 0x04, 0x04) AM_DEVWRITE("dac", dac_device, write_unsigned8)
 	AM_RANGE( 0x05, 0x05) AM_READWRITE(mikro80_8255_portc_r, mikro80_8255_portc_w )
 	AM_RANGE( 0x06, 0x06) AM_READ(mikro80_8255_portb_r)
 	AM_RANGE( 0x07, 0x07) AM_WRITE(mikro80_8255_porta_w)

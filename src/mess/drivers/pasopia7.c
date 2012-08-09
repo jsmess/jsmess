@@ -677,7 +677,7 @@ READ8_MEMBER( pasopia7_state::pasopia7_io_r )
 		return m_ctc->read(space,io_port & 3);
 	else
 	if(io_port >= 0x30 && io_port <= 0x33)
-		return z80pio_cd_ba_r(m_pio, io_port & 3);
+		return m_pio->read_alt(space, io_port & 3);
 //  else if(io_port == 0x3a)                    { SN1 }
 //  else if(io_port == 0x3b)                    { SN2 }
 //  else if(io_port == 0x3c)                    { bankswitch }
@@ -731,7 +731,7 @@ WRITE8_MEMBER( pasopia7_state::pasopia7_io_w )
 		m_ctc->write(space, io_port & 3, data);
 	else
 	if(io_port >= 0x30 && io_port <= 0x33)
-		z80pio_cd_ba_w(m_pio, io_port & 3, data);
+		m_pio->write_alt(space, io_port & 3, data);
 	else
 	if(io_port == 0x3a)
 		sn76496_w(m_sn1, 0, data);

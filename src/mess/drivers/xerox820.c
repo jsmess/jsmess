@@ -123,8 +123,8 @@ void xerox820_state::scan_keyboard()
 					m_keydata = keydata;
 
 					/* strobe in keyboard data */
-					z80pio_bstb_w(m_kbpio, 0);
-					z80pio_bstb_w(m_kbpio, 1);
+					m_kbpio->strobe_b(0);
+					m_kbpio->strobe_b(1);
 				}
 			}
 		}
@@ -249,12 +249,12 @@ static ADDRESS_MAP_START( xerox820_io, AS_IO, 8, xerox820_state )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff03) AM_DEVWRITE(COM8116_TAG, com8116_device, str_w)
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff02) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_d_r, z80dart_d_w)
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0xff02) AM_DEVREADWRITE_LEGACY(Z80SIO_TAG, z80dart_c_r, z80dart_c_w)
-	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(Z80GPPIO_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80GPPIO_TAG, z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff03) AM_DEVWRITE(COM8116_TAG, com8116_device, stt_w)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(FD1797_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x14, 0x14) AM_MIRROR(0xff03) AM_MASK(0xff00) AM_WRITE(scroll_w)
 	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY(Z80KBPIO_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80KBPIO_TAG, z80pio_device, read_alt, write_alt)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xerox820ii_mem, AS_PROGRAM, 8, xerox820ii_state )
@@ -411,7 +411,7 @@ READ8_MEMBER( xerox820_state::kbpio_pa_r )
 
     */
 
-	return (m_dsdd << 5) | (m_8n5 << 4) | (z80pio_brdy_r(m_kbpio) << 3);
+	return (m_dsdd << 5) | (m_8n5 << 4) | (m_kbpio->rdy_b() << 3);
 };
 
 void xerox820_state::common_kbpio_pa_w(UINT8 data)

@@ -100,11 +100,11 @@ READ8_MEMBER( advision_state::sound_cmd_r )
 void advision_state::update_dac()
 {
 	if (m_sound_g == 0 && m_sound_d == 0)
-		dac_data_w(m_dac, 0xff);
+		m_dac->write_unsigned8(0xff);
 	else if (m_sound_g == 1 && m_sound_d == 1)
-		dac_data_w(m_dac, 0x80);
+		m_dac->write_unsigned8(0x80);
 	else
-		dac_data_w(m_dac, 0x00);
+		m_dac->write_unsigned8(0x00);
 }
 
 WRITE8_MEMBER( advision_state::sound_g_w )

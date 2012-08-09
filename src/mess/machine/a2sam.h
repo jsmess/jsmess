@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "machine/a2bus.h"
+#include "sound/dac.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -28,7 +29,7 @@ public:
     // optional information overrides
     virtual machine_config_constructor device_mconfig_additions() const;
 
-    required_device<device_t> m_dac;
+    required_device<dac_device> m_dac;
 
 protected:
     virtual void device_start();

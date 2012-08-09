@@ -162,22 +162,22 @@ WRITE8_MEMBER( ace_state::ppi_control_w )
 
 static READ8_DEVICE_HANDLER( pio_ad_r )
 {
-	return z80pio_d_r(device, 0);
+	return dynamic_cast<z80pio_device*>(device)->data_read(0);
 }
 
 static READ8_DEVICE_HANDLER( pio_bd_r )
 {
-	return z80pio_d_r(device, 1);
+	return dynamic_cast<z80pio_device*>(device)->data_read(1);
 }
 
 static READ8_DEVICE_HANDLER( pio_ac_r )
 {
-	return z80pio_c_r(device, 0);
+	return dynamic_cast<z80pio_device*>(device)->control_read();
 }
 
 static READ8_DEVICE_HANDLER( pio_bc_r )
 {
-	return z80pio_c_r(device, 1);
+	return dynamic_cast<z80pio_device*>(device)->control_read();
 }
 
 
@@ -187,22 +187,22 @@ static READ8_DEVICE_HANDLER( pio_bc_r )
 
 static WRITE8_DEVICE_HANDLER( pio_ad_w )
 {
-	z80pio_d_w(device, 0, data);
+	dynamic_cast<z80pio_device*>(device)->data_write(0, data);
 }
 
 static WRITE8_DEVICE_HANDLER( pio_bd_w )
 {
-	z80pio_d_w(device, 1, data);
+	dynamic_cast<z80pio_device*>(device)->data_write(1, data);
 }
 
 static WRITE8_DEVICE_HANDLER( pio_ac_w )
 {
-	z80pio_c_w(device, 0, data);
+	dynamic_cast<z80pio_device*>(device)->control_write(0, data);
 }
 
 static WRITE8_DEVICE_HANDLER( pio_bc_w )
 {
-	z80pio_c_w(device, 1, data);
+	dynamic_cast<z80pio_device*>(device)->control_write(1, data);
 }
 
 

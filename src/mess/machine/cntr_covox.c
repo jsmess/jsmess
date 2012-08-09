@@ -49,12 +49,12 @@ machine_config_constructor centronics_covox_device::device_mconfig_additions() c
 
 void centronics_covox_device::device_start()
 {
-	m_dac = subdevice("dac");
+	m_dac = subdevice<dac_device>("dac");
 }
 
 void centronics_covox_device::write(UINT8 data)
 {
-	dac_w(m_dac, 0, data);
+	m_dac->write_unsigned8(data);
 }
 
 //**************************************************************************
@@ -101,12 +101,12 @@ machine_config_constructor centronics_covox_stereo_device::device_mconfig_additi
 
 void centronics_covox_stereo_device::device_start()
 {
-	m_dac_left  = subdevice("dac_left");
-	m_dac_right = subdevice("dac_right");
+	m_dac_left  = subdevice<dac_device>("dac_left");
+	m_dac_right = subdevice<dac_device>("dac_right");
 }
 
 void centronics_covox_stereo_device::write(UINT8 data)
 {
-	if (m_strobe)  dac_w(m_dac_left, 0, data);
-	if (m_auto_fd) dac_w(m_dac_right, 0, data);
+	if (m_strobe)  m_dac_left->write_unsigned8(data);
+	if (m_auto_fd) m_dac_right->write_unsigned8(data);
 }

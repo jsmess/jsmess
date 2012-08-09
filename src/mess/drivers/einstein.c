@@ -536,7 +536,7 @@ static ADDRESS_MAP_START( einstein_io, AS_IO, 8, einstein_state )
 	/* block 5, z80ctc */
 	AM_RANGE(0x28, 0x2b) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I058, z80ctc_device, read, write)
 	/* block 6, z80pio */
-	AM_RANGE(0x30, 0x33) AM_MIRROR(0xff04) AM_DEVREADWRITE_LEGACY(IC_I063, z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x30, 0x33) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I063, z80pio_device, read, write)
 #if 0
 	/* block 7, adc */
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff07) AM_DEVREADWRITE_LEGACY(IC_I050, adc0844_r, adc0844_w)
@@ -730,7 +730,7 @@ static const ay8910_interface einstein_ay_interface =
 
 static const centronics_interface einstein_centronics_config =
 {
-	DEVCB_DEVICE_LINE(IC_I063, z80pio_astb_w),
+	DEVCB_DEVICE_LINE_MEMBER(IC_I063, z80pio_device, strobe_a),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

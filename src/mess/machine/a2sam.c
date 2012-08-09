@@ -78,7 +78,7 @@ void a2bus_sam_device::device_reset()
 
 void a2bus_sam_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
 {
-    dac_data_w(m_dac, data);
+    m_dac->write_unsigned8(data);
 }
 
 bool a2bus_sam_device::take_c800()

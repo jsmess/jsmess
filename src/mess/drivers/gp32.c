@@ -1572,12 +1572,12 @@ WRITE32_MEMBER(gp32_state::s3c240x_iis_w)
 			}
 			if (m_s3c240x_iis.fifo_index == 2)
 			{
-				device_t *dac[2];
-				dac[0] = machine().device( "dac1");
-				dac[1] = machine().device( "dac2");
+				dac_device *dac[2];
+				dac[0] = machine().device<dac_device>("dac1");
+				dac[1] = machine().device<dac_device>("dac2");
 				m_s3c240x_iis.fifo_index = 0;
-				dac_signed_data_16_w( dac[0], m_s3c240x_iis.fifo[0] + 0x8000);
-				dac_signed_data_16_w( dac[1], m_s3c240x_iis.fifo[1] + 0x8000);
+				dac[0]->write_signed16(m_s3c240x_iis.fifo[0] + 0x8000);
+				dac[1]->write_signed16(m_s3c240x_iis.fifo[1] + 0x8000);
 			}
 		}
 		break;

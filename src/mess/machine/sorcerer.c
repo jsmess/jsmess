@@ -219,7 +219,7 @@ WRITE8_MEMBER(sorcerer_state::sorcerer_ff_w)
 	switch (m_iop_config->read() & 0x06)
 	{
 		case 0: /* speaker */
-			dac_data_w(m_dac, data);
+			m_dac->write_unsigned8(data);
 			break;
 
 		case 2: /* Centronics 7-bit printer */

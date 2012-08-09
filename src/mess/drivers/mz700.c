@@ -137,8 +137,7 @@ static ADDRESS_MAP_START( mz800_io, AS_IO, 8, mz_state )
 	AM_RANGE(0xf0, 0xf0) AM_READ_PORT("atari_joy1") AM_WRITE(mz800_palette_w)
 	AM_RANGE(0xf1, 0xf1) AM_READ_PORT("atari_joy2")
 	AM_RANGE(0xf2, 0xf2) AM_DEVWRITE_LEGACY("sn76489n", sn76496_w)
-	AM_RANGE(0xfc, 0xfd) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_c_r, z80pio_c_w)
-	AM_RANGE(0xfe, 0xff) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_d_r, z80pio_d_w)
+	AM_RANGE(0xfc, 0xff) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
 ADDRESS_MAP_END
 
 /***************************************************************************

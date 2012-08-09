@@ -256,7 +256,7 @@ void abc80_state::scan_keyboard()
 					/* latch key data */
 					m_key_data = keydata;
 
-					z80pio_pa_w(m_pio, 0, pio_data);
+					m_pio->port_a_write(pio_data);
 					return;
 				}
 			}
@@ -265,7 +265,7 @@ void abc80_state::scan_keyboard()
 
 	if (!m_key_strobe && m_key_data)
 	{
-		z80pio_pa_w(m_pio, 0, m_key_data);
+		m_pio->port_a_write(m_key_data);
 
 		timer_set(attotime::from_msec(50), TIMER_ID_FAKE_KEYBOARD_CLEAR);
 	}
@@ -375,7 +375,7 @@ static ADDRESS_MAP_START( abc80_io, AS_IO, 8, abc80_state )
 	AM_RANGE(0x05, 0x05) AM_DEVWRITE(ABCBUS_TAG, abcbus_slot_device, c4_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE_PORT("SN76477")
 	AM_RANGE(0x07, 0x07) AM_DEVREAD(ABCBUS_TAG, abcbus_slot_device, rst_r)
-	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read_alt, write_alt)
 ADDRESS_MAP_END
 
 
@@ -598,7 +598,7 @@ WRITE8_MEMBER( abc80_state::pio_pb_w )
 
 		m_tape_in_latch = 1;
 	
-		z80pio_pb_w(m_pio, 0, m_tape_in_latch << 7);
+		m_pio->port_b_write(m_tape_in_latch << 7);
 	}
 };
 
@@ -647,7 +647,7 @@ WRITE_LINE_MEMBER( abc80_state::keydown_w )
 {
 	m_key_strobe = state;
 
-	z80pio_pa_w(m_pio, 0, m_key_strobe << 7);
+	m_pio->port_a_write(m_key_strobe << 7);
 }
 
 static ABC80_KEYBOARD_INTERFACE( kb_intf )
@@ -702,7 +702,7 @@ void abc80_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	case TIMER_ID_PIO:
 		m_pio_astb = !m_pio_astb;
 
-		z80pio_astb_w(m_pio, m_pio_astb);
+		m_pio->strobe_a(m_pio_astb);
 		break;
 
 	case TIMER_ID_CASSETTE:
@@ -715,7 +715,7 @@ void abc80_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 				//logerror("-------- set tape in latch\n");
 				m_tape_in_latch = 0;
 			
-				z80pio_pb_w(m_pio, 0, m_tape_in_latch << 7);
+				m_pio->port_b_write(m_tape_in_latch << 7);
 			}
 
 			m_tape_in = tape_in;

@@ -24,7 +24,7 @@ static ADDRESS_MAP_START(mc8020_io, AS_IO, 8, mc80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mc8030_mem, AS_PROGRAM, 8, mc80_state)
@@ -41,12 +41,12 @@ static ADDRESS_MAP_START(mc8030_io, AS_IO, 8, mc80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	//ADDRESS_MAP_GLOBAL_MASK(0xff)
 	//AM_RANGE(0x80, 0x84) AM_MIRROR(0xff00) AM_DEVREADWRITE("zve_ctc", z80ctc_device, read, write)
-	//AM_RANGE(0x84, 0x87) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY("zve_pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	//AM_RANGE(0x84, 0x87) AM_MIRROR(0xff00) AM_DEVREADWRITE("zve_pio", z80pio_device, read, write)
 	AM_RANGE(0x8c, 0x8c) AM_MIRROR(0xff00) AM_WRITE(mc8030_zve_write_protect_w)
 	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(mc8030_vis_w) AM_MASK(0xffff)
 	//AM_RANGE(0xd0, 0xd3) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_sio", z80ctc_device, read, write)
 	AM_RANGE(0xd4, 0xd7) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_ctc", z80ctc_device, read, write)
-	AM_RANGE(0xd8, 0xdb) AM_MIRROR(0xff00) AM_DEVREADWRITE_LEGACY("asp_pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0xd8, 0xdb) AM_MIRROR(0xff00) AM_DEVREADWRITE("asp_pio", z80pio_device, read, write)
 	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(mc8030_eprom_prog_w)
 ADDRESS_MAP_END
 

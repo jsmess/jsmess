@@ -7,6 +7,8 @@
 #ifndef __ADVISION__
 #define __ADVISION__
 
+#include "sound/dac.h"
+
 #define SCREEN_TAG	"screen"
 #define I8048_TAG	"i8048"
 #define COP411_TAG	"cop411"
@@ -23,7 +25,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
-	required_device<device_t> m_dac;
+	required_device<dac_device> m_dac;
 
 	virtual void machine_start();
 	virtual void machine_reset();

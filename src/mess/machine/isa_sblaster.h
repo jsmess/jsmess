@@ -5,6 +5,7 @@
 
 #include "emu.h"
 #include "machine/isa.h"
+#include "sound/dac.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -40,7 +41,7 @@ public:
         // construction/destruction
         sb8_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name);
 
-        required_device<device_t> m_dac;
+        required_device<dac_device> m_dac;
 
         void process_fifo(UINT8 cmd);
         void queue(UINT8 data);

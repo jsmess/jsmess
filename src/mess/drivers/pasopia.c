@@ -124,7 +124,7 @@ static ADDRESS_MAP_START(pasopia_io, AS_IO, 8, pasopia_state)
 //  0x1c - 0x1f something
 	AM_RANGE(0x20,0x23) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
 	AM_RANGE(0x28,0x2b) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-	AM_RANGE(0x30,0x33) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_ba_cd_r, z80pio_cd_ba_w)
+	AM_RANGE(0x30,0x33) AM_DEVREADWRITE("z80pio", z80pio_device, read_alt, write_alt)
 //  0x38 printer
 	AM_RANGE(0x3c,0x3c) AM_WRITE(pasopia_ctrl_w)
 ADDRESS_MAP_END

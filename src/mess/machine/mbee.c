@@ -26,7 +26,7 @@ WRITE_LINE_MEMBER( mbee_state::pio_ardy )
 WRITE8_MEMBER( mbee_state::pio_port_a_w )
 {
 	/* hardware strobe driven by PIO ARDY, bit 7..0 = data */
-	z80pio_astb_w( m_pio, 1);	/* needed - otherwise nothing prints */
+	m_pio->strobe_a(1);	/* needed - otherwise nothing prints */
 	m_printer->write(space, 0, data);
 };
 
@@ -577,7 +577,7 @@ INTERRUPT_GEN( mbee_interrupt )
         The line below does what the interrupt should be doing. */
 	/* But it would break any program loaded to that area of memory, such as CP/M programs */
 
-	//z80pio_astb_w( state->m_z80pio, centronics_busy_r(state->m_printer)); /* signal int when not busy (L->H) */
+	//state->m_z80pio->strobe_a(centronics_busy_r(state->m_printer)); /* signal int when not busy (L->H) */
 	//space->write_byte(0x109, centronics_busy_r(state->m_printer));
 
 

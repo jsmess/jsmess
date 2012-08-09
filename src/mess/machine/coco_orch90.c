@@ -48,8 +48,8 @@ coco_orch90_device::coco_orch90_device(const machine_config &mconfig, const char
 
 void coco_orch90_device::device_start()
 {
-	m_left_dac = subdevice("dac_left");
-	m_right_dac = subdevice("dac_right");
+	m_left_dac = subdevice<dac_device>("dac_left");
+	m_right_dac = subdevice<dac_device>("dac_right");
 }
 
 //-------------------------------------------------
@@ -72,12 +72,12 @@ WRITE8_MEMBER(coco_orch90_device::write)
 	{
 		case 0x3A:
 			/* left channel write */
-			dac_data_w(m_left_dac, data);
+			m_left_dac->write_unsigned8(data);
 			break;
 
 		case 0x3B:
 			/* right channel write */
-			dac_data_w(m_right_dac, data);
+			m_right_dac->write_unsigned8(data);
 			break;
 	}
 }

@@ -71,7 +71,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cass;
 	required_device<device_t> m_pia;
-	required_device<device_t> m_dac;
+	required_device<dac_device> m_dac;
 	required_shared_ptr<UINT8> m_videoram;
 private:
 	UINT8 m_kbd_s;
@@ -237,7 +237,7 @@ WRITE8_MEMBER( d6800_state::d6800_cassette_w )
 
 	m_cass->output(BIT(data, 0) ? -1.0 : +1.0);
 
-	dac_data_w(m_dac, data);
+	m_dac->write_unsigned8(data);
 	m_portb = data;
 }
 

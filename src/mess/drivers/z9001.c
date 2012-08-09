@@ -81,8 +81,8 @@ static ADDRESS_MAP_START( z9001_io, AS_IO, 8, z9001_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_MIRROR(4) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-	AM_RANGE(0x88, 0x8B) AM_MIRROR(4) AM_DEVREADWRITE_LEGACY("z80pio1", z80pio_cd_ba_r, z80pio_cd_ba_w)
-	AM_RANGE(0x90, 0x93) AM_MIRROR(4) AM_DEVREADWRITE_LEGACY("z80pio2", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x88, 0x8B) AM_MIRROR(4) AM_DEVREADWRITE("z80pio1", z80pio_device, read, write)
+	AM_RANGE(0x90, 0x93) AM_MIRROR(4) AM_DEVREADWRITE("z80pio2", z80pio_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */

@@ -156,15 +156,12 @@ static ADDRESS_MAP_START( nanos_io , AS_IO, 8, nanos_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* CPU card */
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
 
 	/* I/O card */
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE_LEGACY("z80pio_0", z80pio_cd_ba_r, z80pio_cd_ba_w)
-	AM_RANGE(0x84, 0x84) AM_DEVREADWRITE_LEGACY("z80sio_0", z80sio_d_r, z80sio_d_w)
-	AM_RANGE(0x85, 0x85) AM_DEVREADWRITE_LEGACY("z80sio_0", z80sio_c_r, z80sio_c_w)
-	AM_RANGE(0x86, 0x86) AM_DEVREADWRITE_LEGACY("z80sio_0", z80sio_d_r, z80sio_d_w)
-	AM_RANGE(0x87, 0x87) AM_DEVREADWRITE_LEGACY("z80sio_0", z80sio_c_r, z80sio_c_w)
-	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE_LEGACY("z80pio_1", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80pio_0", z80pio_device, read, write)
+	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("z80sio_0", z80sio_device, read_alt, write_alt)
+	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE("z80pio_1", z80pio_device, read, write)
 	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE("z80ctc_0", z80ctc_device, read, write)
 
 	/* FDC card */
@@ -172,10 +169,7 @@ static ADDRESS_MAP_START( nanos_io , AS_IO, 8, nanos_state)
 	AM_RANGE(0x94, 0x94) AM_DEVREAD_LEGACY("upd765", upd765_status_r)
 	AM_RANGE(0x95, 0x95) AM_DEVREADWRITE_LEGACY("upd765", upd765_data_r, upd765_data_w)
 	/* V24+IFSS card */
-	AM_RANGE(0xA0, 0xA0) AM_DEVREADWRITE_LEGACY("z80sio_1", z80sio_d_r, z80sio_d_w)
-	AM_RANGE(0xA1, 0xA1) AM_DEVREADWRITE_LEGACY("z80sio_1", z80sio_c_r, z80sio_c_w)
-	AM_RANGE(0xA2, 0xA2) AM_DEVREADWRITE_LEGACY("z80sio_1", z80sio_d_r, z80sio_d_w)
-	AM_RANGE(0xA3, 0xA3) AM_DEVREADWRITE_LEGACY("z80sio_1", z80sio_c_r, z80sio_c_w)
+	AM_RANGE(0xA0, 0xA3) AM_DEVREADWRITE("z80sio_0", z80sio_device, read_alt, write_alt)
 	AM_RANGE(0xA4, 0xA7) AM_DEVREADWRITE("z80ctc_1", z80ctc_device, read, write)
 
 	/* 256-k RAM card I  -  64k OS-Memory + 192k-RAM-Floppy */

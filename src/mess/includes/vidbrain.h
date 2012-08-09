@@ -41,7 +41,7 @@ public:
 	required_device<f3853_device> m_smi;
 	required_device<uv201_device> m_uv;
 	required_device<device_t> m_discrete;
-	required_device<device_t> m_dac;
+	required_device<dac_device> m_dac;
 	required_device<videobrain_expansion_slot_device> m_exp;
 
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);

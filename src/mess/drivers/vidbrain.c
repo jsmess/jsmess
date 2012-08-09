@@ -153,7 +153,7 @@ WRITE8_MEMBER( vidbrain_state::sound_w )
 		case 3: dac_data = 0xff; break;
 		}
 
-		dac_data_w(m_dac, dac_data);
+		m_dac->write_unsigned8(dac_data);
 	}
 
 	m_sound_clk = sound_clk;

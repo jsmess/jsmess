@@ -110,14 +110,14 @@ static ADDRESS_MAP_START(p8k_iomap, AS_IO, 8, p8k_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x07) AM_READWRITE(p8k_port0_r,p8k_port0_w) // MH7489
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80ctc_0", z80ctc_device, read, write)
-	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE_LEGACY("z80pio_0", z80pio_ba_cd_r, z80pio_ba_cd_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE_LEGACY("z80pio_1", z80pio_ba_cd_r, z80pio_ba_cd_w)
-	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE_LEGACY("z80pio_2", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE("z80pio_0", z80pio_device, read_alt, write_alt)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("z80pio_1", z80pio_device, read_alt, write_alt)
+	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80pio_2", z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE_LEGACY("i8272", upd765_data_r, upd765_data_w)
 	AM_RANGE(0x21, 0x21) AM_DEVREAD_LEGACY("i8272", upd765_status_r)
-	//AM_RANGE(0x24, 0x27) AM_DEVREADWRITE_LEGACY("z80sio_0", z80sio_ba_cd_r, z80sio_ba_cd_w)
+	//AM_RANGE(0x24, 0x27) AM_DEVREADWRITE("z80sio_0", z80sio_device, read_alt, write_alt)
 	AM_RANGE(0x24, 0x27) AM_READWRITE(p8k_port24_r,p8k_port24_w)
-	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE_LEGACY("z80sio_1", z80sio_ba_cd_r, z80sio_ba_cd_w)
+	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("z80sio_1", z80sio_device, read_alt, write_alt)
 	AM_RANGE(0x2c, 0x2f) AM_DEVREADWRITE("z80ctc_1", z80ctc_device, read, write)
 	AM_RANGE(0x3c, 0x3c) AM_DEVREADWRITE_LEGACY("z80dma", z80dma_r, z80dma_w)
 ADDRESS_MAP_END
@@ -348,9 +348,9 @@ static const z80_daisy_config p8k_daisy_chain[] =
 
 static WRITE_LINE_DEVICE_HANDLER( p8k_i8272_irq_w )
 {
-	device_t *z80pio = device->machine().device("z80pio_2");
+	z80pio_device *z80pio = device->machine().device<z80pio_device>("z80pio_2");
 
-	z80pio_pb_w(z80pio, 0, (state) ? 0x10 : 0x00);
+	z80pio->port_b_write((state) ? 0x10 : 0x00);
 }
 
 static const struct upd765_interface p8k_i8272_intf =
@@ -465,13 +465,13 @@ static READ16_DEVICE_HANDLER( p8k_16_sio_r )
 	switch (offset & 0x06)
 	{
 	case 0x00:
-		return (UINT16)z80sio_d_r(device, 0);
+		return (UINT16)dynamic_cast<z80sio_device*>(device)->data_read(0);
 	case 0x02:
-		return (UINT16)z80sio_d_r(device, 1);
+		return (UINT16)dynamic_cast<z80sio_device*>(device)->data_read(1);
 	case 0x04:
-		return (UINT16)z80sio_c_r(device, 0);
+		return (UINT16)dynamic_cast<z80sio_device*>(device)->control_read(0);
 	case 0x06:
-		return (UINT16)z80sio_c_r(device, 1);
+		return (UINT16)dynamic_cast<z80sio_device*>(device)->control_read(1);
 	}
 
 	return 0;
@@ -484,16 +484,16 @@ static WRITE16_DEVICE_HANDLER( p8k_16_sio_w )
 	switch (offset & 0x06)
 	{
 	case 0x00:
-		z80sio_d_w(device, 0, (UINT8)data);
+		dynamic_cast<z80sio_device*>(device)->data_write(0, (UINT8)data);
 		break;
 	case 0x02:
-		z80sio_d_w(device, 1, (UINT8)data);
+		dynamic_cast<z80sio_device*>(device)->data_write(1, (UINT8)data);
 		break;
 	case 0x04:
-		z80sio_c_w(device, 0, (UINT8)data);
+		dynamic_cast<z80sio_device*>(device)->control_write(0, (UINT8)data);
 		break;
 	case 0x06:
-		z80sio_c_w(device, 1, (UINT8)data);
+		dynamic_cast<z80sio_device*>(device)->control_write(1, (UINT8)data);
 		break;
 	}
 }

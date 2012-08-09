@@ -78,7 +78,7 @@ public:
 	required_device<cassette_image_device> m_cass2;
 	required_device<device_t> m_wave1;
 	required_device<device_t> m_wave2;
-	required_device<device_t> m_dac;
+	required_device<dac_device> m_dac;
 	required_device<device_t> m_uart;
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;

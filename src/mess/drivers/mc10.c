@@ -50,7 +50,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<mc6847_base_device> m_mc6847;
 	optional_device<ef9345_device> m_ef9345;
-	required_device<device_t> m_dac;
+	required_device<dac_device> m_dac;
 	required_device<ram_device> m_ram;
 	required_device<cassette_image_device> m_cassette;
 	required_device<printer_image_device> m_printer;
@@ -131,13 +131,13 @@ WRITE8_MEMBER( mc10_state::mc10_bfff_w )
 	m_mc6847->css_w(BIT(data, 6));
 
 	/* bit 7, dac output */
-	dac_data_w(m_dac, BIT(data, 7));
+	m_dac->write_unsigned8(BIT(data, 7));
 }
 
 WRITE8_MEMBER( mc10_state::alice32_bfff_w )
 {
 	/* bit 7, dac output */
-	dac_data_w(m_dac, BIT(data, 7));
+	m_dac->write_unsigned8(BIT(data, 7));
 }
 
 

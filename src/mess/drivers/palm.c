@@ -30,7 +30,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_lsi;
-	required_device<device_t> m_dac;
+	required_device<dac_device> m_dac;
 	required_device<ram_device> m_ram;
 	// mc68328 needs modernising
 	//DECLARE_WRITE8_MEMBER(palm_dac_transition);
@@ -160,7 +160,7 @@ ADDRESS_MAP_END
 static WRITE8_DEVICE_HANDLER( palm_dac_transition )
 {
 	palm_state *state = device->machine().driver_data<palm_state>();
-	dac_data_w( state->m_dac, 0x7f * data );
+	state->m_dac->write_unsigned8(0x7f * data );
 }
 
 

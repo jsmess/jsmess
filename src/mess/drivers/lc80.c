@@ -62,8 +62,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lc80_io, AS_IO, 8, lc80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
-	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE_LEGACY(Z80PIO1_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
-	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE_LEGACY(Z80PIO2_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_device, read, write)
+	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_device, read, write)
 	AM_RANGE(0xec, 0xef) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 ADDRESS_MAP_END
 

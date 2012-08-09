@@ -89,7 +89,7 @@ WRITE8_MEMBER( ut88_state::ut88_keyboard_w )
 
 WRITE8_MEMBER( ut88_state::ut88_sound_w )
 {
-	dac_data_w(m_dac, data); //beeper
+	m_dac->write_unsigned8(data); //beeper
 	m_cass->output(BIT(data, 0) ? 1 : -1);
 }
 

@@ -74,7 +74,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<i8255_device> m_ppi;
 	optional_device<device_t> m_fdc;
-	optional_device<device_t> m_dac;
+	optional_device<dac_device> m_dac;
 	optional_device<cassette_image_device> m_cass;
 	optional_device<ram_device> m_ram;
 	optional_shared_ptr<UINT8> m_p_videoram;

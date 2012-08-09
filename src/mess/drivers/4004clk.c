@@ -21,7 +21,7 @@ public:
 		{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<device_t> m_dac;
+	required_device<dac_device> m_dac;
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( nixie_w );
 	DECLARE_WRITE8_MEMBER( neon_w );
@@ -81,7 +81,7 @@ WRITE8_MEMBER(nixieclock_state::neon_w)
 
 WRITE8_MEMBER(nixieclock_state::relays_w)
 {
-	dac_data_w(m_dac, (data & 1) ? 0x80 : 0x40); //tick - tock
+	m_dac->write_unsigned8((data & 1) ? 0x80 : 0x40); //tick - tock
 }
 
 static ADDRESS_MAP_START(4004clk_rom, AS_PROGRAM, 8, nixieclock_state)

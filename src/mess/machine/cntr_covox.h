@@ -8,6 +8,7 @@
 #define __CENTRONICS_COVOX_H__
 
 #include "machine/ctronics.h"
+#include "sound/dac.h"
 
 // ======================> centronics_covox_device
 
@@ -28,7 +29,7 @@ protected:
     virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "covox"; }
 private:
-	device_t *m_dac;
+	dac_device *m_dac;
 };
 // device type definition
 extern const device_type CENTRONICS_COVOX;
@@ -52,8 +53,8 @@ protected:
     virtual void device_start();
 	virtual void device_config_complete() { m_shortname = "covox_stereo"; }
 private:
-	device_t *m_dac_left;
-	device_t *m_dac_right;
+	dac_device *m_dac_left;
+	dac_device *m_dac_right;
 };
 // device type definition
 extern const device_type CENTRONICS_COVOX_STEREO;

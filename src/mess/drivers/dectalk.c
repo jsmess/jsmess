@@ -698,13 +698,13 @@ INPUT_PORTS_END
 static TIMER_CALLBACK( outfifo_read_cb )
 {
 	UINT16 data;
-	device_t *speaker = machine.device("dac");
+	dac_device *speaker = machine.device<dac_device>("dac");
 	data = dectalk_outfifo_r(machine);
 #ifdef VERBOSE
 	if (data!= 0x8000) logerror("sample output: %04X\n", data);
 #endif
 	machine.scheduler().timer_set(attotime::from_hz(10000), FUNC(outfifo_read_cb));
-	dac_signed_data_16_w( speaker, data );
+	speaker->write_signed16(data);
 }
 
 /* Driver init: stuff that needs setting up which isn't directly affected by reset */

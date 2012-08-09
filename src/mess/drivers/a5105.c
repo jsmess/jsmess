@@ -322,7 +322,7 @@ static ADDRESS_MAP_START(a5105_io, AS_IO, 8, a5105_state)
 	AM_RANGE(0x48, 0x4f) AM_WRITE(a5105_upd765_w)
 
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE_LEGACY("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("z80pio", z80pio_device, read, write)
 	AM_RANGE(0x98, 0x99) AM_DEVREADWRITE("upd7220", upd7220_device, read, write)
 
 	AM_RANGE(0x9c, 0x9c) AM_WRITE(pcg_val_w)

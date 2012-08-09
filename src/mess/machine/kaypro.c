@@ -238,14 +238,14 @@ const z80sio_interface kaypro_sio_intf =
 READ8_DEVICE_HANDLER( kaypro_sio_r )
 {
 	if (!offset)
-		return z80sio_d_r(device, 0);
+		return dynamic_cast<z80sio_device*>(device)->data_read(0);
 	else
 	if (offset == 1)
 //      return z80sio_d_r(device, 1);
 		return kay_kbd_d_r(device->machine());
 	else
 	if (offset == 2)
-		return z80sio_c_r(device, 0);
+		return dynamic_cast<z80sio_device*>(device)->control_read(0);
 	else
 //      return z80sio_c_r(device, 1);
 		return kay_kbd_c_r(device->machine());
@@ -254,16 +254,16 @@ READ8_DEVICE_HANDLER( kaypro_sio_r )
 WRITE8_DEVICE_HANDLER( kaypro_sio_w )
 {
 	if (!offset)
-		z80sio_d_w(device, 0, data);
+		dynamic_cast<z80sio_device*>(device)->data_write(0, data);
 	else
 	if (offset == 1)
 //      z80sio_d_w(device, 1, data);
 		kay_kbd_d_w(device->machine(), data);
 	else
 	if (offset == 2)
-		z80sio_c_w(device, 0, data);
+		dynamic_cast<z80sio_device*>(device)->control_write(0, data);
 	else
-		z80sio_c_w(device, 1, data);
+		dynamic_cast<z80sio_device*>(device)->control_write(1, data);
 }
 
 
@@ -318,7 +318,7 @@ const wd17xx_interface kaypro_wd1793_interface =
 MACHINE_START( kayproii )
 {
 	kaypro_state *state = machine.driver_data<kaypro_state>();
-	z80pio_astb_w(state->m_pio_s, 0);
+	state->m_pio_s->strobe_a(0);
 }
 
 MACHINE_RESET( kayproii )

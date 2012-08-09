@@ -976,7 +976,7 @@ static MACHINE_RESET( craft )
     AVR8_TCNT1H = 0;
     AVR8_TCNT1L = 0;
 
-    dac_data_w(machine.device("dac"), 0x00);
+    machine.device<dac_device>("dac")->write_unsigned8(0x00);
 }
 
 static MACHINE_CONFIG_START( craft, craft_state )

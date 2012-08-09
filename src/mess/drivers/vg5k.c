@@ -71,7 +71,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ef9345_device> m_ef9345;
-	required_device<device_t> m_dac;
+	required_device<dac_device> m_dac;
 	required_device<printer_image_device> m_printer;
 	required_device<cassette_image_device> m_cassette;
 
@@ -130,7 +130,7 @@ READ8_MEMBER ( vg5k_state::cassette_r )
 
 WRITE8_MEMBER ( vg5k_state::cassette_w )
 {
-	dac_data_w(m_dac, data <<2);
+	m_dac->write_unsigned8(data <<2);
 
 	if (data == 0x03)
 		m_cassette->output(+1);

@@ -166,10 +166,10 @@ static ADDRESS_MAP_START(pcm_io, AS_IO, 8, pcm_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80ctc_s", z80ctc_device, read, write) // system CTC
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE_LEGACY("z80pio_s", z80pio_cd_ba_r, z80pio_cd_ba_w) // system PIO
-	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE_LEGACY("z80sio", z80sio_cd_ba_r, z80sio_cd_ba_w) // SIO
+	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("z80pio_s", z80pio_device, read, write) // system PIO
+	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE("z80sio", z80sio_device, read, write) // SIO
 	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE("z80ctc_u", z80ctc_device, read, write) // user CTC
-	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE_LEGACY("z80pio_u", z80pio_cd_ba_r, z80pio_cd_ba_w) // user PIO
+	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE("z80pio_u", z80pio_device, read, write) // user PIO
 	//AM_RANGE(0x94, 0x97) // bank select
 	//AM_RANGE(0x98, 0x9B) // NMI generator
 	//AM_RANGE(0x9C, 0x9F) // io ports available to the user

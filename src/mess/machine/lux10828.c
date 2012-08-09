@@ -196,7 +196,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( luxor_55_10828_io, AS_IO, 8, luxor_55_10828_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVREADWRITE_LEGACY(Z80PIO_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_device, read_alt, write_alt)
 	AM_RANGE(0xb0, 0xb3) AM_MIRROR(0x0c) AM_READWRITE(fdc_r, fdc_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_WRITE(status_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_WRITE(ctrl_w)
@@ -327,7 +327,7 @@ static const floppy_interface lux10828_floppy_interface =
 WRITE_LINE_MEMBER( luxor_55_10828_device::fdc_intrq_w )
 {
 	m_fdc_irq = state;
-	z80pio_pb_w(m_pio, 0, state << 7);
+	m_pio->port_b_write(state << 7);
 
 	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 }
@@ -517,7 +517,7 @@ UINT8 luxor_55_10828_device::abcbus_stat()
 
 	if (m_cs)
 	{
-		data = (m_status & 0xfe) | z80pio_ardy_r(m_pio);
+		data = (m_status & 0xfe) | m_pio->rdy_a();
 	}
 
 	return data;
@@ -539,8 +539,8 @@ UINT8 luxor_55_10828_device::abcbus_inp()
 			data = m_data;
 		}
 
-		z80pio_astb_w(m_pio, 0);
-		z80pio_astb_w(m_pio, 1);
+		m_pio->strobe_a(0);
+		m_pio->strobe_a(1);
 	}
 
 	return data;
@@ -560,8 +560,8 @@ void luxor_55_10828_device::abcbus_utp(UINT8 data)
 		m_data = data;
 	}
 
-	z80pio_astb_w(m_pio, 0);
-	z80pio_astb_w(m_pio, 1);
+	m_pio->strobe_a(0);
+	m_pio->strobe_a(1);
 }
 
 

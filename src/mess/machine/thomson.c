@@ -519,7 +519,7 @@ static WRITE8_DEVICE_HANDLER ( to7_timer_port_out )
 
 static WRITE8_DEVICE_HANDLER ( to7_timer_cp2_out )
 {
-	dac_data_w( device->machine().device("buzzer"), data ? 0x80 : 0); /* 1-bit buzzer */
+	device->machine().device<dac_device>("buzzer")->write_unsigned8(data ? 0x80 : 0); /* 1-bit buzzer */
 }
 
 
@@ -1029,7 +1029,7 @@ static UINT8 to7_get_mouse_signal( running_machine &machine )
 
 static void to7_game_sound_update ( running_machine &machine )
 {
-	dac_data_w( machine.device("dac"), to7_game_mute ? 0 : (to7_game_sound << 2) );
+	machine.device<dac_device>("dac")->write_unsigned8(to7_game_mute ? 0 : (to7_game_sound << 2) );
 }
 
 
@@ -1859,7 +1859,7 @@ static READ8_DEVICE_HANDLER ( mo5_sys_porta_in )
 
 static WRITE8_DEVICE_HANDLER ( mo5_sys_portb_out )
 {
-	dac_data_w( device->machine().device("buzzer"), (data & 1) ? 0x80 : 0); /* 1-bit buzzer */
+	device->machine().device<dac_device>("buzzer")->write_unsigned8((data & 1) ? 0x80 : 0); /* 1-bit buzzer */
 }
 
 
@@ -4891,7 +4891,7 @@ static WRITE8_DEVICE_HANDLER ( mo6_sys_porta_out )
 
 static WRITE8_DEVICE_HANDLER ( mo6_sys_portb_out )
 {
-	dac_data_w( device->machine().device("buzzer"), (data & 1) ? 0x80 : 0); /* bit 0: buzzer */
+	device->machine().device<dac_device>("buzzer")->write_unsigned8((data & 1) ? 0x80 : 0); /* bit 0: buzzer */
 }
 
 

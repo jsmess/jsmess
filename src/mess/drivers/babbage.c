@@ -93,8 +93,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( babbage_io, AS_IO, 8, babbage_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80ctc", z80ctc_device, read, write)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE_LEGACY("z80pio_1", z80pio_ba_cd_r, z80pio_ba_cd_w)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE_LEGACY("z80pio_2", z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("z80pio_1", z80pio_device, read_alt, write_alt)
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("z80pio_2", z80pio_device, read_alt, write_alt)
 ADDRESS_MAP_END
 
 

@@ -4,6 +4,7 @@
 #define __COCO_ORCH90_H__
 
 #include "emu.h"
+#include "sound/dac.h"
 #include "machine/cococart.h"
 
 //**************************************************************************
@@ -29,8 +30,8 @@ protected:
 		virtual DECLARE_WRITE8_MEMBER(write);
 private:
         // internal state
-		device_t *m_left_dac;
-		device_t *m_right_dac;
+		dac_device *m_left_dac;
+		dac_device *m_right_dac;
 };
 
 

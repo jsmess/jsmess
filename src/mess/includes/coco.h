@@ -86,7 +86,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<pia6821_device> m_pia_0;
 	required_device<pia6821_device> m_pia_1;
-	required_device<device_t> m_dac;
+	required_device<dac_device> m_dac;
 	required_device<device_t> m_wave;
 	required_device<cococart_slot_device> m_cococart;
 	required_device<ram_device> m_ram;
