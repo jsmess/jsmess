@@ -235,8 +235,6 @@ bool vic20_expansion_slot_device::call_load()
 
 		if (software_entry() == NULL)
 		{
-			size = length();
-
 			if (!mame_stricmp(filetype(), "20")) fread(m_cart->vic20_blk1_pointer(machine(), 0x2000), 0x2000);
 			else if (!mame_stricmp(filetype(), "40")) fread(m_cart->vic20_blk2_pointer(machine(), 0x2000), 0x2000);
 			else if (!mame_stricmp(filetype(), "60")) fread(m_cart->vic20_blk3_pointer(machine(), 0x2000), 0x2000);
