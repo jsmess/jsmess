@@ -63,6 +63,7 @@
 #include "sound/speaker.h"
 #include "machine/roc10937.h"
 #include "machine/6551acia.h"
+#include "digel804.lh"
 
 
 class digel804_state : public driver_device
@@ -323,6 +324,8 @@ WRITE8_MEMBER( digel804_state::op44 ) // state write
 	// latch vfd data on falling edge of clock only; this should really be part of the 10937 device, not here!
 	if ((vfd_old&1) && ((data&1)==0))
 	{
+		m_vfd->shift_data((data & 0x80) ? 0 : 1);
+
 		vfd_data <<= 1;
 		vfd_data |= (data&0x80)?1:0;
 		vfd_count++;
@@ -331,7 +334,6 @@ WRITE8_MEMBER( digel804_state::op44 ) // state write
 #ifdef VFD_VERBOSE
 			logerror("Digel804: Full byte written to port 44 vfd: %02X '%c'\n", vfd_data, vfd_data);
 #endif
-			m_vfd->shift_data(vfd_data? 1 : 0);
 			vfd_data = 0;
 			vfd_count = 0;
 		}
@@ -556,6 +558,8 @@ static MACHINE_CONFIG_START( digel804, digel804_state )
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, digel804_terminal_intf)
 
+	MCFG_DEFAULT_LAYOUT(layout_digel804)
+
 	/* acia */
 	MCFG_ACIA6551_ADD("acia")
 
@@ -577,6 +581,8 @@ static MACHINE_CONFIG_START( ep804, digel804_state )
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, digel804_terminal_intf)
+
+	MCFG_DEFAULT_LAYOUT(layout_digel804)
 
 	/* acia */
 	MCFG_ACIA6551_ADD("acia")
