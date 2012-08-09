@@ -240,7 +240,6 @@ MSX_SLOT_INIT(konami)
 	{
 		logerror ("konami: warning: truncating to 2mb\n");
 		size = 0x200000;
-		return 1;
 	}
 	banks = size / 0x2000;
 	if (size != banks * 0x2000 || (~(banks - 1) % banks))
@@ -324,7 +323,6 @@ MSX_SLOT_INIT(konami_scc)
 	{
 		logerror ("konami_scc: warning: truncating to 2mb\n");
 		size = 0x200000;
-		return 1;
 	}
 	banks = size / 0x2000;
 	if (size != banks * 0x2000 || (~(banks - 1) % banks))
@@ -473,7 +471,6 @@ MSX_SLOT_INIT(ascii8)
 	{
 		logerror ("ascii8: warning: truncating to 2mb\n");
 		size = 0x200000;
-		return 1;
 	}
 	banks = size / 0x2000;
 	if (size != banks * 0x2000 || (~(banks - 1) % banks))
@@ -626,7 +623,6 @@ MSX_SLOT_INIT(ascii8_sram)
 	{
 		logerror ("ascii8_sram: warning: truncating to 1mb\n");
 		size = 0x100000;
-		return 1;
 	}
 	banks = size / 0x2000;
 	if (size != banks * 0x2000 || (~(banks - 1) % banks))

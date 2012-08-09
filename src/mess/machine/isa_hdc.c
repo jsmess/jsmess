@@ -399,7 +399,7 @@ void isa8_hdc_device::pc_hdc_dack_w(int data)
 
 void isa8_hdc_device::execute_read()
 {
-	hard_disk_file *disk = pc_hdc_file(drv);
+	hard_disk_file *disk = NULL;
 	int size = sector_cnt[drv] * 512;
 	int read_ = 0;
 
@@ -428,7 +428,7 @@ void isa8_hdc_device::execute_read()
 
 void isa8_hdc_device::execute_write()
 {
-	hard_disk_file *disk = pc_hdc_file(drv);
+	hard_disk_file *disk = NULL;
 	int size = sector_cnt[drv] * 512;
 	int write_ = 512;
 

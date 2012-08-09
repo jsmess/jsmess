@@ -351,8 +351,7 @@ static int get_dir_data(const char *pathname, UINT8 *packet_buffer) {
 		lineLength = 99;
 		while ((dir = path.next()) != NULL)
 		{
-			int length = strlen(dir->name);
-			LOG1(("##### %d %s",length, dir->name));
+			LOG1(("##### %d %s", (int)strlen(dir->name), dir->name));
 
 			if (strcmp(dir->name, ".") != 0 && strcmp(dir->name, "..") != 0)
 			{

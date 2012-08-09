@@ -1962,6 +1962,8 @@ DEVICE_IMAGE_LOAD( bbcb_cart )
 	{
 	case 0x2000:
 		read_ = image.fread(mem + addr, size);
+		if (read_ != size)
+			return 1;
 		image.fseek(0, SEEK_SET);
 		read_ = image.fread(mem + addr + 0x2000, size);
 		break;

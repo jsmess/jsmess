@@ -115,7 +115,6 @@ READ8_MEMBER( mephisto_state::read_keys )
 				{ "KEY2_0", "KEY2_1", "KEY2_2", "KEY2_3", "KEY2_4", "KEY2_5", "KEY2_6", "KEY2_7" }
 			};
 
-	data = 0xff;
 	if (((m_led_status & 0x80) == 0x00))
 		data=ioport(keynames[0][offset])->read();
 	else

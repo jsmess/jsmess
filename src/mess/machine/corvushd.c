@@ -1142,10 +1142,9 @@ static UINT8 corvus_format_drive(running_machine &machine, UINT8 *pattern, UINT1
 	if(len < 512) {
 		memset(tbuffer, *pattern, 512);
 		pattern = tbuffer;
-		len = 512;
 	}
 
-	LOG(("corvus_format_drive: Formatting drive with 0x%5.5x sectors, pattern buffer (passed length: %d)follows\n", max_sector, len));
+	LOG(("corvus_format_drive: Formatting drive with 0x%5.5x sectors, pattern buffer (passed length: %d)follows\n", max_sector, 512));
 	LOG_BUFFER(pattern, 512);
 
 	for(sector = 0; sector <= max_sector; sector++) {

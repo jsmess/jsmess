@@ -415,12 +415,16 @@ READ8_MEMBER( zx8302_device::rtc_r )
 	{
 	case 0:
 		data = (m_ctr >> 24) & 0xff;
+		break;
 	case 1:
 		data = (m_ctr >> 16) & 0xff;
+		break;
 	case 2:
 		data = (m_ctr >> 8) & 0xff;
+		break;
 	case 3:
 		data = m_ctr & 0xff;
+		break;
 	}
 
 	return data;
