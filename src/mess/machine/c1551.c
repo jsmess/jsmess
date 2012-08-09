@@ -17,7 +17,6 @@
 */
 
 #include "c1551.h"
-#include "machine/devhelpr.h"
 
 
 
@@ -29,6 +28,7 @@
 #define M6523_0_TAG		"u3"
 #define M6523_1_TAG		"ci_u2"
 #define C64H156_TAG		"u6"
+#define PLA_TAG			"u1"
 
 enum
 {
@@ -46,38 +46,15 @@ const device_type C1551 = &device_creator<c1551_device>;
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void c1551_device::device_config_complete()
-{
-	m_shortname = "c1551";
-}
-
-
-//-------------------------------------------------
-//  static_set_config - configuration helper
-//-------------------------------------------------
-
-void c1551_device::static_set_config(device_t &device, int address)
-{
-	c1551_device &c1551 = downcast<c1551_device &>(device);
-
-	assert((address > 7) && (address < 10));
-
-	c1551.m_jp1 = address - 8;
-}
-
-
-//-------------------------------------------------
 //  ROM( c1551 )
 //-------------------------------------------------
 
 ROM_START( c1551 ) // schematic 251860
-	ROM_REGION( 0x4000, "c1551", 0 )
+	ROM_REGION( 0x4000, M6510T_TAG, 0 )
 	ROM_LOAD( "318001-01.u4", 0x0000, 0x4000, CRC(6d16d024) SHA1(fae3c788ad9a6cc2dbdfbcf6c0264b2ca921d55e) )
+
+	ROM_REGION( 0xf5, PLA_TAG, 0 ) // schematic 251925
+	ROM_LOAD( "251641-03.u1", 0x00, 0xf5, NO_DUMP )
 ROM_END
 
 
@@ -230,7 +207,7 @@ READ8_MEMBER( c1551_device::tpi0_pc_r )
 	UINT8 data = 0;
 
 	// JP1
-	data |= m_jp1 << 5;
+	data |= ioport("JP1")->read() << 5;
 
 	// SYNC detect line
 	data |= m_ga->sync_r() << 6;
@@ -263,7 +240,7 @@ WRITE8_MEMBER( c1551_device::tpi0_pc_w )
 	m_status = data & 0x03;
 
 	// TCBM device number
-	set_tcbm_dev(BIT(data, 2));
+	m_dev = BIT(data, 2);
 
 	// TCBM acknowledge
 	m_ack = BIT(data, 3);
@@ -381,7 +358,7 @@ static const tpi6525_interface tpi1_intf =
 static ADDRESS_MAP_START( c1551_mem, AS_PROGRAM, 8, c1551_device )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_RAM
 	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_DEVREADWRITE_LEGACY(M6523_0_TAG, tpi6525_r, tpi6525_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1551", 0)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(M6510T_TAG, 0)
 ADDRESS_MAP_END
 
 
@@ -434,6 +411,7 @@ static MACHINE_CONFIG_FRAGMENT( c1551 )
 	MCFG_CPU_PROGRAM_MAP(c1551_mem)
 	MCFG_CPU_CONFIG(m6510t_intf)
 
+	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_TPI6525_ADD(M6523_0_TAG, tpi0_intf)
 	MCFG_TPI6525_ADD(M6523_1_TAG, tpi1_intf)
 
@@ -453,28 +431,25 @@ machine_config_constructor c1551_device::device_mconfig_additions() const
 }
 
 
-
-//**************************************************************************
-//  INLINE HELPERS
-//**************************************************************************
-
 //-------------------------------------------------
-//  c1551_device - constructor
+//  INPUT_PORTS( c1551 )
 //-------------------------------------------------
 
-inline void c1551_device::set_tcbm_dev(int dev)
+static INPUT_PORTS_START( c1551 )
+	PORT_START("JP1")
+	PORT_DIPNAME( 0x01, 0x00, "Device Number" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x01, "9" )
+INPUT_PORTS_END
+
+
+//-------------------------------------------------
+//  input_ports - device-specific input ports
+//-------------------------------------------------
+
+ioport_constructor c1551_device::device_input_ports() const
 {
-	if (m_dev != dev)
-	{
-		address_space *program = machine().firstcpu->memory().space(AS_PROGRAM);
-		offs_t start_address = dev ? 0xfef0 : 0xfec0;
-
-		program->unmap_readwrite(0xfec0, 0xfec7);
-		program->unmap_readwrite(0xfef0, 0xfef7);
-		program->install_legacy_readwrite_handler(*m_tpi1, start_address, start_address + 5, FUNC(tpi6525_r), FUNC(tpi6525_w));
-
-		m_dev = dev;
-	}
+	return INPUT_PORTS_NAME( c1551 );
 }
 
 
@@ -489,6 +464,7 @@ inline void c1551_device::set_tcbm_dev(int dev)
 
 c1551_device::c1551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
     : device_t(mconfig, C1551, "C1551", tag, owner, clock),
+      device_plus4_expansion_card_interface(mconfig, *this),
 	  m_maincpu(*this, M6510T_TAG),
 	  m_tpi0(*this, M6523_0_TAG),
 	  m_tpi1(*this, M6523_1_TAG),
@@ -498,7 +474,7 @@ c1551_device::c1551_device(const machine_config &mconfig, const char *tag, devic
 	  m_status(1),
 	  m_dav(1),
 	  m_ack(1),
-	  m_dev(-1)
+	  m_dev(0)
 {
 }
 
@@ -512,9 +488,6 @@ void c1551_device::device_start()
 	// allocate timers
 	m_irq_timer = timer_alloc();
 	m_irq_timer->adjust(attotime::zero, CLEAR_LINE);
-
-	// map to host CPU memory space
-	set_tcbm_dev(1);
 
 	// install image callbacks
 	floppy_install_unload_proc(m_image, c1551_device::on_disk_change);
@@ -559,6 +532,40 @@ void c1551_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 	{
 		// Tm = 0.7*(R1+R2)*C1 = 0.7*(120K+100R)*0.1uF = 0.008407s
 		m_irq_timer->adjust(attotime::from_usec(8407), ASSERT_LINE);
+	}
+}
+
+
+//-------------------------------------------------
+//  plus4_cd_r - cartridge data read
+//-------------------------------------------------
+
+UINT8 c1551_device::plus4_cd_r(address_space &space, offs_t offset, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
+{
+	UINT8 data = 0;
+
+	offs_t start_address = m_dev ? 0xfef0 : 0xfec0;
+
+	if (offset >= start_address && offset < (start_address + 8))
+	{
+		data = tpi6525_r(m_tpi1, offset & 0x07);
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  plus4_cd_w - cartridge data write
+//-------------------------------------------------
+
+void c1551_device::plus4_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h)
+{
+	offs_t start_address = m_dev ? 0xfef0 : 0xfec0;
+
+	if (offset >= start_address && offset < (start_address + 8))
+	{
+		tpi6525_w(m_tpi1, offset & 0x07, data);
 	}
 }
 

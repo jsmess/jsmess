@@ -20,24 +20,8 @@
 #include "formats/g64_dsk.h"
 #include "machine/64h156.h"
 #include "machine/6525tpi.h"
-
-
-
-//**************************************************************************
-//  MACROS / CONSTANTS
-//**************************************************************************
-
-#define C1551_TAG			"c1551"
-
-
-
-//**************************************************************************
-//  INTERFACE CONFIGURATION MACROS
-//**************************************************************************
-
-#define MCFG_C1551_ADD(_tag, _address) \
-    MCFG_DEVICE_ADD(_tag, C1551, 0) \
-	c1551_device::static_set_config(*device, _address);
+#include "machine/pls100.h"
+#include "machine/plus4exp.h"
 
 
 
@@ -47,17 +31,17 @@
 
 // ======================> c1551_device
 
-class c1551_device :  public device_t
+class c1551_device :  public device_t,
+					  public device_plus4_expansion_card_interface
 {
 public:
     // construction/destruction
     c1551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 
-	static void static_set_config(device_t &device, int address);
-
 	// optional information overrides
 	virtual const rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual ioport_constructor device_input_ports() const;
 
 	// not really public
 	static void on_disk_change(device_image_interface &image);
@@ -81,11 +65,13 @@ protected:
     virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-    virtual void device_config_complete();
+    virtual void device_config_complete() { m_shortname = "c1551"; }
+
+    // device_plus4_expansion_card_interface overrides
+	virtual UINT8 plus4_cd_r(address_space &space, offs_t offset, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
+	virtual void plus4_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
 
 private:
-	inline void set_tcbm_dev(int dev);
-
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_tpi0;
 	required_device<device_t> m_tpi1;
@@ -101,9 +87,6 @@ private:
 
 	// timers
 	emu_timer *m_irq_timer;
-
-    const char *m_cpu_tag;
-	int m_jp1;
 };
 
 

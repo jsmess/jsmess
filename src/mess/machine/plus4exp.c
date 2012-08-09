@@ -176,7 +176,7 @@ UINT8* device_plus4_expansion_card_interface::plus4_nvram_pointer(running_machin
 //-------------------------------------------------
 
 plus4_expansion_slot_device::plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-        device_t(mconfig, PLUS4_EXPANSION_SLOT, "Plus/4 expansion port", tag, owner, clock),
+        device_t(mconfig, PLUS4_EXPANSION_SLOT, "Expansion Port", tag, owner, clock),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this)
 {
@@ -213,8 +213,7 @@ void plus4_expansion_slot_device::device_config_complete()
     	memset(&m_in_dma_cd_cb, 0, sizeof(m_in_dma_cd_cb));
     	memset(&m_out_dma_cd_cb, 0, sizeof(m_out_dma_cd_cb));
     	memset(&m_out_irq_cb, 0, sizeof(m_out_irq_cb));
-    	memset(&m_out_dma_cb, 0, sizeof(m_out_dma_cb));
-    	memset(&m_out_reset_cb, 0, sizeof(m_out_reset_cb));
+    	memset(&m_out_aec_cb, 0, sizeof(m_out_aec_cb));
 	}
 
 	// set brief and instance name
@@ -234,8 +233,7 @@ void plus4_expansion_slot_device::device_start()
 	m_in_dma_cd_func.resolve(m_in_dma_cd_cb, *this);
 	m_out_dma_cd_func.resolve(m_out_dma_cd_cb, *this);
 	m_out_irq_func.resolve(m_out_irq_cb, *this);
-	m_out_dma_func.resolve(m_out_dma_cb, *this);
-	m_out_reset_func.resolve(m_out_reset_cb, *this);
+	m_out_aec_func.resolve(m_out_aec_cb, *this);
 }
 
 
@@ -369,8 +367,7 @@ void plus4_expansion_slot_device::dma_cd_w(offs_t offset, UINT8 data)
 
 
 WRITE_LINE_MEMBER( plus4_expansion_slot_device::irq_w ) { m_out_irq_func(state); }
-WRITE_LINE_MEMBER( plus4_expansion_slot_device::dma_w ) { m_out_dma_func(state); }
-WRITE_LINE_MEMBER( plus4_expansion_slot_device::reset_w ) { m_out_reset_func(state); }
+WRITE_LINE_MEMBER( plus4_expansion_slot_device::aec_w ) { m_out_aec_func(state); }
 
 
 //-------------------------------------------------

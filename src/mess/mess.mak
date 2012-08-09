@@ -865,10 +865,10 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/vic1210.o	\
 	$(MESS_AUDIO)/ted7360.o		\
 	$(MESS_AUDIO)/t6721.o		\
-	$(MESS_DRIVERS)/c16.o		\
-	$(MESS_MACHINE)/c16.o		\
+	$(MESS_DRIVERS)/plus4.o		\
 	$(MESS_MACHINE)/plus4exp.o	\
 	$(MESS_MACHINE)/plus4user.o	\
+	$(MESS_MACHINE)/plus4_std.o	\
 	$(MESS_DRIVERS)/cbmb.o		\
 	$(MESS_MACHINE)/cbmb.o		\
 	$(MESS_VIDEO)/cbmb.o		\

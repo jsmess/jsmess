@@ -1223,6 +1223,10 @@ SLOT_INTERFACE_START( c128_expansion_cards )
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START( plus4_expansion_cards )
+	SLOT_INTERFACE("c1551", C1551)
+
+	// the following need ROMs from the software list
+	SLOT_INTERFACE_INTERNAL("standard", PLUS4_STD)
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START( plus4_user_port_cards )

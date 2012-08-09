@@ -621,15 +621,14 @@ cbm720	// Commodore CBM 720
 cbm720se  // Commodore CBM 720 (Sweden / Finland)
 p500	  // Commodore P500 (proto, a.k.a. C128-40, PET-II)
 
-c16	   // Commodore 16
-c16hun	// Commodore 16 Novotrade (Hungarian Character Set)
-c116	  // Commodore 116
-plus4	 // Commodore +4
-c232	  // Commodore 232 - Prototype
-c264	  // Commodore 264 - Prototype
-c364	  // Commodore V364 - Prototype
-c16sid	   // Commodore 16  sid card
-plus4sid	 // Commodore +4  sid card
+c264
+plus4n
+plus4p
+c16
+c16h
+c116
+c232
+v364
 
 c128	  // Commodore 128 - NTSC
 c128cr	// Commodore 128CR - NTSC (proto?)

@@ -43,13 +43,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define PLUS4_USER_PORT_INTERFACE(_name) \
-	const plus4_user_port_interface (_name) =
-
-
-#define MCFG_PLUS4_USER_PORT_ADD(_tag, _config, _slot_intf, _def_slot, _def_inp) \
+#define MCFG_PLUS4_USER_PORT_ADD(_tag, _slot_intf, _def_slot, _def_inp) \
     MCFG_DEVICE_ADD(_tag, PLUS4_USER_PORT, 0) \
-    MCFG_DEVICE_CONFIG(_config) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, _def_inp, false)
 
 
@@ -58,20 +53,11 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> plus4_user_port_interface
-
-struct plus4_user_port_interface
-{
-    devcb_write_line	m_out_reset_cb;
-};
-
-
 // ======================> plus4_user_port_device
 
 class device_plus4_user_port_interface;
 
 class plus4_user_port_device : public device_t,
-						       public plus4_user_port_interface,
 						       public device_slot_interface
 {
 public:
@@ -98,7 +84,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
+	virtual void device_config_complete() { };
 
     devcb_resolved_write_line	m_out_reset_func;
 

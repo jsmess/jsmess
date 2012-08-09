@@ -78,8 +78,7 @@ struct plus4_expansion_slot_interface
 	devcb_read8			m_in_dma_cd_cb;
 	devcb_write8		m_out_dma_cd_cb;
     devcb_write_line	m_out_irq_cb;
-    devcb_write_line	m_out_dma_cb;
-    devcb_write_line	m_out_reset_cb;
+    devcb_write_line	m_out_aec_cb;
 };
 
 
@@ -106,11 +105,9 @@ public:
 	UINT8 dma_cd_r(offs_t offset);
 	void dma_cd_w(offs_t offset, UINT8 data);
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( dma_w );
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
+	DECLARE_WRITE_LINE_MEMBER( aec_w );
 	int phi2();
 	int dotclock();
-
 
 protected:
 	// device-level overrides
@@ -138,8 +135,7 @@ protected:
 	devcb_resolved_read8		m_in_dma_cd_func;
 	devcb_resolved_write8		m_out_dma_cd_func;
 	devcb_resolved_write_line	m_out_irq_func;
-	devcb_resolved_write_line	m_out_dma_func;
-	devcb_resolved_write_line	m_out_reset_func;
+	devcb_resolved_write_line	m_out_aec_func;
 
 	device_plus4_expansion_card_interface *m_cart;
 };
