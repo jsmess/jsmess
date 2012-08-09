@@ -53,6 +53,7 @@ public:
 		  m_loram(1),
 		  m_hiram(1),
 		  m_charen(1),
+		  m_color_ram(*this, "color_ram"),
 		  m_va14(1),
 		  m_va15(1),
 		  m_cia1_irq(CLEAR_LINE),
@@ -80,6 +81,7 @@ public:
 	optional_device<timer_device> m_cassette_timer;
 
 	virtual void machine_start();
+	virtual void machine_reset();
 
 	void check_interrupts();
 	void bankswitch(offs_t offset, offs_t va, int rw, int aec, int ba, int cas, int *casram, int *basic, int *kernal, int *charom, int *grw, int *io, int *roml, int *romh);
@@ -89,7 +91,6 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	DECLARE_READ8_MEMBER( vic_videoram_r );
-	DECLARE_READ8_MEMBER( vic_colorram_r );
 	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
 	DECLARE_READ8_MEMBER( vic_lightpen_x_cb );
 	DECLARE_READ8_MEMBER( vic_lightpen_y_cb );
@@ -114,6 +115,7 @@ public:
 	DECLARE_WRITE8_MEMBER( exp_dma_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
 	DECLARE_WRITE_LINE_MEMBER( exp_nmi_w );
+	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
 
 	// memory state
 	int m_loram;
@@ -124,7 +126,7 @@ public:
 	UINT8 *m_charom;
 
 	// video state
-	UINT8 *m_color_ram;
+	required_shared_ptr<UINT8> m_color_ram;
 	int m_va14;
 	int m_va15;
 

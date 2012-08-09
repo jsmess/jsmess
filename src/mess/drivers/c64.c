@@ -90,8 +90,7 @@ void c64_state::bankswitch(offs_t offset, offs_t va, int rw, int aec, int ba, in
 
 UINT8 c64_state::read_memory(address_space &space, offs_t offset, int ba, int casram, int basic, int kernal, int charom, int io, int roml, int romh)
 {
-	int io1 = 1;
-	int io2 = 1;
+	int io1 = 1, io2 = 1;
 
 	UINT8 data = 0;
 
@@ -124,7 +123,7 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int ba, int ca
 			break;
 
 		case 2: // COLOR
-			data = m_color_ram[offset & 0x3ff];
+			data = m_color_ram[offset & 0x3ff] | 0xf0;
 			break;
 
 		case 3: // CIAS
@@ -167,11 +166,13 @@ UINT8 c64_state::read_memory(address_space &space, offs_t offset, int ba, int ca
 
 READ8_MEMBER( c64_state::read )
 {
+	offs_t va = 0;
+	int rw = 1, aec = 0, ba = 1, cas = 0;
 	int casram, basic, kernal, charom, grw, io, roml, romh;
 
-	bankswitch(offset, 0, 1, 0, 1, 0, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
+	bankswitch(offset, va, rw, aec, ba, cas, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
 
-	return read_memory(space, offset, 1, casram, basic, kernal, charom, io, roml, romh);
+	return read_memory(space, offset, ba, casram, basic, kernal, charom, io, roml, romh);
 }
 
 
@@ -181,12 +182,12 @@ READ8_MEMBER( c64_state::read )
 
 WRITE8_MEMBER( c64_state::write )
 {
-	int io1 = 1;
-	int io2 = 1;
-
+	offs_t va = 0;
+	int rw = 0, aec = 0, ba = 1, cas = 0;
+	int io1 = 1, io2 = 1;
 	int casram, basic, kernal, charom, grw, io, roml, romh;
 
-	bankswitch(offset, 0, 0, 0, 1, 0, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
+	bankswitch(offset, va, rw, aec, ba, cas, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
 
 	if (!casram)
 	{
@@ -205,7 +206,7 @@ WRITE8_MEMBER( c64_state::write )
 			break;
 
 		case 2: // COLOR
-			if (!grw) m_color_ram[offset & 0x3ff] = 0xf0 | data;
+			if (!grw) m_color_ram[offset & 0x3ff] = data & 0x0f;
 			break;
 
 		case 3: // CIAS
@@ -231,7 +232,7 @@ WRITE8_MEMBER( c64_state::write )
 		}
 	}
 
-	m_exp->cd_w(space, offset, data, 1, roml, romh, io1, io2);
+	m_exp->cd_w(space, offset, data, ba, roml, romh, io1, io2);
 }
 
 
@@ -243,20 +244,11 @@ READ8_MEMBER( c64_state::vic_videoram_r )
 {
 	offset = (!m_va15 << 15) | (!m_va14 << 14) | offset;
 
+	int rw = 1, aec = 1, ba = 0, cas = 0;
 	int casram, basic, kernal, charom, grw, io, roml, romh;
-	bankswitch(0, offset, 1, 1, 0, 0, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
+	bankswitch(0xffff, offset, rw, aec, ba, cas, &casram, &basic, &kernal, &charom, &grw, &io, &roml, &romh);
 
 	return read_memory(space, offset, 0, casram, basic, kernal, charom, io, roml, romh);
-}
-
-
-//-------------------------------------------------
-//  vic_colorram_r -
-//-------------------------------------------------
-
-READ8_MEMBER( c64_state::vic_colorram_r )
-{
-	return m_color_ram[offset];
 }
 
 
@@ -288,7 +280,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( vic_colorram_map, AS_1, 8, c64_state )
-	AM_RANGE(0x000, 0x3ff) AM_READ(vic_colorram_r)
+	AM_RANGE(0x000, 0x3ff) AM_RAM AM_SHARE("color_ram")
 ADDRESS_MAP_END
 
 
@@ -983,6 +975,14 @@ WRITE_LINE_MEMBER( c64_state::exp_nmi_w )
 	check_interrupts();
 }
 
+WRITE_LINE_MEMBER( c64_state::exp_reset_w )
+{
+	if (state == ASSERT_LINE)
+	{
+		machine_reset();
+	}
+}
+
 static C64_EXPANSION_INTERFACE( expansion_intf )
 {
 	DEVCB_DRIVER_MEMBER(c64_state, exp_dma_r),
@@ -990,7 +990,7 @@ static C64_EXPANSION_INTERFACE( expansion_intf )
 	DEVCB_DRIVER_LINE_MEMBER(c64_state, exp_irq_w),
 	DEVCB_DRIVER_LINE_MEMBER(c64_state, exp_nmi_w),
 	DEVCB_CPU_INPUT_LINE(M6510_TAG, INPUT_LINE_HALT),
-	DEVCB_CPU_INPUT_LINE(M6510_TAG, INPUT_LINE_RESET)
+	DEVCB_DRIVER_LINE_MEMBER(c64_state, exp_reset_w)
 };
 
 
@@ -1005,7 +1005,7 @@ static C64_USER_PORT_INTERFACE( user_intf )
 	DEVCB_DEVICE_LINE(MOS6526_2_TAG, mos6526_sp_w),
 	DEVCB_DEVICE_LINE(MOS6526_2_TAG, mos6526_cnt_w),
 	DEVCB_DEVICE_LINE(MOS6526_2_TAG, mos6526_flag_w),
-	DEVCB_CPU_INPUT_LINE(M6510_TAG, INPUT_LINE_RESET)
+	DEVCB_DRIVER_LINE_MEMBER(c64_state, exp_reset_w)
 };
 
 
@@ -1027,14 +1027,10 @@ void c64_state::machine_start()
 	m_kernal = memregion("kernal")->base();
 	m_charom = memregion("charom")->base();
 
-	// allocate memory
-	m_color_ram = auto_alloc_array(machine(), UINT8, 0x400);
-
 	// state saving
 	save_item(NAME(m_loram));
 	save_item(NAME(m_hiram));
 	save_item(NAME(m_charen));
-	save_pointer(NAME(m_color_ram), 0x400);
 	save_item(NAME(m_va14));
 	save_item(NAME(m_va15));
 	save_item(NAME(m_cia1_irq));
@@ -1068,6 +1064,18 @@ void c64c_state::machine_start()
 void c64gs_state::machine_start()
 {
 	c64c_state::machine_start();
+}
+
+
+//-------------------------------------------------
+//  MACHINE_RESET( c64 )
+//-------------------------------------------------
+
+void c64_state::machine_reset()
+{
+	m_maincpu->reset();
+
+	m_iec->reset();
 }
 
 
