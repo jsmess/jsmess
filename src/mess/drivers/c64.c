@@ -1076,6 +1076,8 @@ void c64_state::machine_reset()
 	m_maincpu->reset();
 
 	m_iec->reset();
+	m_exp->reset();
+	m_user->reset();
 }
 
 

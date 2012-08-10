@@ -90,6 +90,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( pa2_r );
 	DECLARE_WRITE_LINE_MEMBER( pa2_w );
 	DECLARE_WRITE_LINE_MEMBER( pc2_w );
+	DECLARE_WRITE_LINE_MEMBER( port_reset_w );
 
 	// cartridge interface
 	DECLARE_WRITE_LINE_MEMBER( sp1_w );
@@ -102,9 +103,9 @@ public:
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete();
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete();
 
 	devcb_resolved_write_line	m_out_cnt1_func;
 	devcb_resolved_write_line	m_out_sp1_func;

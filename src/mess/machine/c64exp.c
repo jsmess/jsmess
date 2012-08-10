@@ -206,6 +206,17 @@ void c64_expansion_slot_device::device_start()
 
 
 //-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void c64_expansion_slot_device::device_reset()
+{
+	port_reset_w(ASSERT_LINE);
+	port_reset_w(CLEAR_LINE);
+}
+
+
+//-------------------------------------------------
 //  call_load -
 //-------------------------------------------------
 
@@ -415,6 +426,8 @@ UINT32 c64_expansion_slot_device::screen_update(screen_device &screen, bitmap_in
 
 	return value;
 }
+
+WRITE_LINE_MEMBER( c64_expansion_slot_device::port_reset_w ) { if (m_cart != NULL) m_cart->c64_reset_w(state); }
 
 
 //-------------------------------------------------

@@ -102,6 +102,7 @@ public:
 	int game_r(offs_t offset, int ba, int rw, int hiram);
 	int exrom_r(offs_t offset, int ba, int rw, int hiram);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER( port_reset_w );
 
 	// cartridge interface
 	UINT8 dma_cd_r(offs_t offset);
@@ -117,6 +118,7 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
+	virtual void device_reset();
 
 	// image-level overrides
 	virtual bool call_load();
@@ -170,7 +172,7 @@ protected:
 	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int roml, int romh, int io1, int io2) { };
 	virtual int c64_game_r(offs_t offset, int ba, int rw, int hiram) { return m_game; }
 	virtual int c64_exrom_r(offs_t offset, int ba, int rw, int hiram) { return m_exrom; }
-	virtual void c64_reset_w() { };
+	virtual void c64_reset_w(int state) { };
 	virtual UINT32 c64_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return 0; }
 
 	c64_expansion_slot_device *m_slot;

@@ -120,6 +120,8 @@ void c64_user_port_device::device_start()
 
 void c64_user_port_device::device_reset()
 {
+	port_reset_w(ASSERT_LINE);
+	port_reset_w(CLEAR_LINE);
 }
 
 
@@ -129,6 +131,7 @@ READ_LINE_MEMBER( c64_user_port_device::pa2_r ) { int state = 1; if (m_cart != N
 WRITE_LINE_MEMBER( c64_user_port_device::pa2_w ) { if (m_cart != NULL) m_cart->c64_pa2_w(state); }
 WRITE_LINE_MEMBER( c64_user_port_device::pc2_w ) { if (m_cart != NULL) m_cart->c64_pc2_w(state); }
 WRITE_LINE_MEMBER( c64_user_port_device::atn_w ) { if (m_cart != NULL) m_cart->c64_atn_w(state); }
+WRITE_LINE_MEMBER( c64_user_port_device::port_reset_w ) { if (m_cart != NULL) m_cart->c64_reset_w(state); }
 
 WRITE_LINE_MEMBER( c64_user_port_device::cnt1_w ) { m_out_cnt1_func(state); }
 WRITE_LINE_MEMBER( c64_user_port_device::sp1_w ) { m_out_sp1_func(state); }
