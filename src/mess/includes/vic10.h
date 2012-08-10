@@ -48,6 +48,7 @@ public:
 	optional_device<timer_device> m_cassette_timer;
 
 	virtual void machine_start();
+	virtual void machine_reset();
 
 	void check_interrupts();
 

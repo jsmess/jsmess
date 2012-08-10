@@ -168,6 +168,17 @@ void vic10_expansion_slot_device::device_start()
 
 
 //-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void vic10_expansion_slot_device::device_reset()
+{
+	res_w(ASSERT_LINE);
+	res_w(CLEAR_LINE);
+}
+
+
+//-------------------------------------------------
 //  call_load -
 //-------------------------------------------------
 
@@ -305,6 +316,7 @@ void vic10_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT
 	}
 }
 
+WRITE_LINE_MEMBER( vic10_expansion_slot_device::port_res_w ) { if (m_cart != NULL) m_cart->vic10_res_w(state); }
 
 READ_LINE_MEMBER( vic10_expansion_slot_device::p0_r ) { int state = 0; if (m_cart != NULL) state = m_cart->vic10_p0_r(); return state; }
 WRITE_LINE_MEMBER( vic10_expansion_slot_device::p0_w ) { if (m_cart != NULL) m_cart->vic10_p0_w(state); }
