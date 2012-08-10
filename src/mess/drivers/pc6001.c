@@ -25,6 +25,7 @@
                   but, according to an original video reference that I've seen, that screen should actually some kind of weird garbage on it ...
     - AX6 - Powered Knight: doesn't work too well, according to the asm code it asks the player to press either 'B' or 'C' then a number but
                             nothing is shown on screen, other emus behaves the same, bad dump?
+    - Dawn Patrol (cart): presumably too slow;
     (Mk2 mode 5 games)
     - 3D Golf Simulation Super Version: gameplay / inputs looks broken
     - American Truck: Screen is offset at the loading screen, loading bug?
@@ -267,6 +268,9 @@ static void draw_gfx_mode4(running_machine &machine, bitmap_ind16 &bitmap,const 
 	};
 	col_setting = machine.root_device().ioport("MODE4_DSW")->read() & 7;
 
+	if((attr & 0x0c) != 0x0c)
+		popmessage("Mode 4 vram attr != 0x0c, contact MESSdev");
+
 	for(y=0;y<192;y++)
 	{
 		for(x=0;x<32;x++)
@@ -310,22 +314,50 @@ static void draw_bitmap_2bpp(running_machine &machine, bitmap_ind16 &bitmap,cons
 	int w = (shrink_x == 8) ? 32 : 16;
 	int col_bank = ((attr & 2)<<1);
 
-	for(y=0;y<(192/shrink_y);y++)
+	if(attr & 4)
 	{
-		for(x=0;x<w;x++)
+		for(y=0;y<(192/shrink_y);y++)
 		{
-			int tile = state->m_video_ram[(x+(y*32))+0x200];
-
-			for(yi=0;yi<shrink_y;yi++)
+			for(x=0;x<w;x++)
 			{
-				for(xi=0;xi<shrink_x;xi++)
-				{
-					int i;
-					i = (shrink_x == 8) ? (xi & 0x06) : (xi & 0x0c)>>1;
-					color = ((tile >> i) & 3)+8;
-					color+= col_bank;
+				int tile = state->m_video_ram[(x+(y*32))+0x200];
 
-					bitmap.pix16(((y*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = machine.pens[color];
+				for(yi=0;yi<shrink_y;yi++)
+				{
+					for(xi=0;xi<shrink_x;xi++)
+					{
+						int i;
+						i = (shrink_x == 8) ? (xi & 0x06) : (xi & 0x0c)>>1;
+						color = ((tile >> i) & 3)+8;
+						color+= col_bank;
+
+						bitmap.pix16(((y*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = machine.pens[color];
+					}
+				}
+			}
+		}
+	}
+	else /* TODO: clean this up */
+	{
+		for(y=0;y<(192/shrink_y);y+=3)
+		{
+			for(x=0;x<w;x++)
+			{
+				int tile = state->m_video_ram[(x+((y/3)*32))+0x200];
+
+				for(yi=0;yi<shrink_y;yi++)
+				{
+					for(xi=0;xi<shrink_x;xi++)
+					{
+						int i;
+						i = (shrink_x == 8) ? (xi & 0x06) : (xi & 0x0c)>>1;
+						color = ((tile >> i) & 3)+8;
+						color+= col_bank;
+
+						bitmap.pix16((((y+0)*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = machine.pens[color];
+						bitmap.pix16((((y+1)*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = machine.pens[color];
+						bitmap.pix16((((y+2)*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = machine.pens[color];
+					}
 				}
 			}
 		}
