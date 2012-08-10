@@ -170,7 +170,7 @@ public:
 
 	required_device<mc6845_device> m_crtc;
 
-	virtual void driver_init();
+	DECLARE_DRIVER_INIT(driver_init);
 
 	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -189,7 +189,7 @@ public:
 
 	required_device<device_t> m_trom;
 
-	virtual void driver_init();
+	DECLARE_DRIVER_INIT(driver_init);
 
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -216,7 +216,7 @@ public:
 	required_device<mc6845_device> m_crtc;
 	optional_device<device_t> m_abc77;
 
-	virtual void driver_init();
+	DECLARE_DRIVER_INIT(driver_init);
 	virtual void machine_start();
 	virtual void machine_reset();
 
@@ -259,7 +259,7 @@ public:
 	required_device<e0516_device> m_rtc;
 	optional_device<device_t> m_abc77;
 
-	virtual void driver_init();
+	DECLARE_DRIVER_INIT(driver_init);
 	virtual void machine_start();
 	virtual void machine_reset();
 

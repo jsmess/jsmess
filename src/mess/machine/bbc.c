@@ -1988,17 +1988,15 @@ DEVICE_IMAGE_LOAD( bbcb_cart )
    Machine Initialisation functions
 ***************************************/
 
-DRIVER_INIT( bbc )
+DRIVER_INIT_MEMBER(bbc_state,bbc)
 {
-	bbc_state *state = machine.driver_data<bbc_state>();
-	state->m_Master=0;
-	state->m_tape_timer = machine.scheduler().timer_alloc(FUNC(bbc_tape_timer_cb));
+	m_Master=0;
+	m_tape_timer = machine().scheduler().timer_alloc(FUNC(bbc_tape_timer_cb));
 }
-DRIVER_INIT( bbcm )
+DRIVER_INIT_MEMBER(bbc_state,bbcm)
 {
-	bbc_state *state = machine.driver_data<bbc_state>();
-	state->m_Master=1;
-	state->m_tape_timer = machine.scheduler().timer_alloc(FUNC(bbc_tape_timer_cb));
+	m_Master=1;
+	m_tape_timer = machine().scheduler().timer_alloc(FUNC(bbc_tape_timer_cb));
 }
 
 MACHINE_START( bbca )

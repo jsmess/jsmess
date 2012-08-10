@@ -1561,7 +1561,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 
@@ -1582,6 +1582,7 @@ static const ym2203_interface kageki_ym2203_interface =
 		DEVCB_NULL,
 		DEVCB_DRIVER_MEMBER(tnzs_state,kageki_csport_w)
 	},
+	DEVCB_NULL
 };
 
 static const ym2203_interface ym2203b_interface =
@@ -1591,7 +1592,7 @@ static const ym2203_interface ym2203b_interface =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static const ym2203_interface kabukiz_ym2203_interface =
@@ -1604,7 +1605,7 @@ static const ym2203_interface kabukiz_ym2203_interface =
 		DEVCB_DRIVER_MEMBER(tnzs_state,kabukiz_sound_bank_w),
 		DEVCB_DRIVER_MEMBER(tnzs_state,kabukiz_sample_w)
 	},
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static const samples_interface tnzs_samples_interface =
@@ -2705,4 +2706,4 @@ GAME( 1988, kabukiz,   0,        kabukiz,  kabukiz, tnzs_state,  kabukiz,  ROT0,
 GAME( 1988, kabukizj,  kabukiz,  kabukiz,  kabukizj, tnzs_state, kabukiz,  ROT0,   "Kaneko / Taito Corporation", "Kabuki-Z (Japan)", 0 )
 GAME( 1989, insectx,   0,        insectx,  insectx, tnzs_state,  insectx,  ROT0,   "Taito Corporation Japan", "Insector X (World)", 0 )
 GAME( 1989, insectxj,  insectx,  insectx,  insectxj, tnzs_state, insectx,  ROT0,   "Taito Corporation", "Insector X (Japan)", 0 )
-GAME( 1992, jpopnics,  0,        jpopnics, jpopnics, tnzs_state, 0,        ROT0,   "bootleg (Nics)", "Jumping Pop (Nics, Korean bootleg of Plump Pop)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1992, jpopnics,  0,        jpopnics, jpopnics, driver_device, 0,        ROT0,   "bootleg (Nics)", "Jumping Pop (Nics, Korean bootleg of Plump Pop)", GAME_IMPERFECT_GRAPHICS )

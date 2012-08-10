@@ -60,6 +60,7 @@ public:
 
 	UINT32 m_port[9];
 	device_t *m_s3c2440;
+	DECLARE_DRIVER_INIT(gizmondo);
 };
 
 /*******************************************************************************
@@ -164,7 +165,7 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 *******************************************************************************/
 
-static DRIVER_INIT( gizmondo )
+DRIVER_INIT_MEMBER(gizmondo_state,gizmondo)
 {
 	// do nothing
 }

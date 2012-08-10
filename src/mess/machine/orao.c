@@ -14,16 +14,14 @@
 
 
 /* Driver initialization */
-DRIVER_INIT(orao)
+DRIVER_INIT_MEMBER(orao_state,orao)
 {
-	orao_state *state = machine.driver_data<orao_state>();
-	memset(state->m_memory,0xff,0x6000);
+	memset(m_memory,0xff,0x6000);
 }
 
-DRIVER_INIT(orao103)
+DRIVER_INIT_MEMBER(orao_state,orao103)
 {
-	orao_state *state = machine.driver_data<orao_state>();
-	memset(state->m_memory,0xff,0x6000);
+	memset(m_memory,0xff,0x6000);
 }
 
 MACHINE_RESET( orao )

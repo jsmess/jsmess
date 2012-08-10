@@ -109,4 +109,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                FULLNAME               FLAGS */
-COMP( 2002, 68ksbc,   0,       0,    c68ksbc,   c68ksbc, c68ksbc_state,  0,  "Ichit Sirichote", "68k Single Board Computer", GAME_NO_SOUND_HW)
+COMP( 2002, 68ksbc,   0,       0,    c68ksbc,   c68ksbc, driver_device,  0,  "Ichit Sirichote", "68k Single Board Computer", GAME_NO_SOUND_HW)

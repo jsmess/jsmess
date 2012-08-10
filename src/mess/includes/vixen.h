@@ -103,6 +103,7 @@ public:
 	required_shared_ptr<UINT8> m_video_ram;
 	const UINT8 *m_sync_rom;
 	const UINT8 *m_char_rom;
+	DECLARE_DRIVER_INIT(vixen);
 };
 
 #endif

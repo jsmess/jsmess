@@ -610,7 +610,7 @@ DEVICE_IMAGE_LOAD( intv_cart )
 }
 
 #ifdef UNUSED_FUNCTION
-DRIVER_INIT( intv )
+DRIVER_INIT_MEMBER(intv_state,intv)
 {
 }
 #endif

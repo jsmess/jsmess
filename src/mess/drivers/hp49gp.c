@@ -43,6 +43,7 @@ public:
 	device_t *m_s3c2410;
 	required_shared_ptr<UINT32> m_steppingstone;
 	lcd_spi_t m_lcd_spi;
+	DECLARE_DRIVER_INIT(hp49gp);
 };
 
 /***************************************************************************
@@ -264,12 +265,11 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static DRIVER_INIT( hp49gp )
+DRIVER_INIT_MEMBER(hp49gp_state,hp49gp)
 {
-	hp49gp_state *hp49gp = machine.driver_data<hp49gp_state>();
-	UINT8 *rom = (UINT8 *)machine.root_device().memregion( "maincpu")->base();
-	memcpy( hp49gp->m_steppingstone, rom, 1024);
-	lcd_spi_init( machine);
+	UINT8 *rom = (UINT8 *)machine().root_device().memregion( "maincpu")->base();
+	memcpy( m_steppingstone, rom, 1024);
+	lcd_spi_init( machine());
 }
 
 static S3C2410_INTERFACE( hp49gp_s3c2410_intf )

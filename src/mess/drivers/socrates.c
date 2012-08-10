@@ -123,6 +123,7 @@ public:
 	DECLARE_WRITE8_MEMBER(reset_speech);
 	DECLARE_WRITE8_MEMBER(socrates_scroll_w);
 	DECLARE_WRITE8_MEMBER(socrates_sound_w);
+	DECLARE_DRIVER_INIT(socrates);
 };
 
 
@@ -227,15 +228,15 @@ static MACHINE_RESET( socrates )
  state->m_speech_load_settings_count = 0;
 }
 
-static DRIVER_INIT( socrates )
+DRIVER_INIT_MEMBER(socrates_state,socrates)
 {
-	UINT8 *gfx = machine.root_device().memregion("vram")->base();
+	UINT8 *gfx = machine().root_device().memregion("vram")->base();
 	int i;
     /* fill vram with its init powerup bit pattern, so startup has the checkerboard screen */
     for (i = 0; i < 0x10000; i++)
         gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
 // init sound channels to both be on lowest pitch and max volume
-    machine.device("maincpu")->set_clock_scale(0.45f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
+    machine().device("maincpu")->set_clock_scale(0.45f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
 READ8_MEMBER(socrates_state::socrates_rom_bank_r)

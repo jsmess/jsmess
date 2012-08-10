@@ -656,7 +656,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static MACHINE_CONFIG_START( psychic5, psychic5_state )
@@ -903,6 +903,6 @@ ROM_START( bombsa )
 ROM_END
 
 
-GAME( 1987, psychic5,  0,        psychic5, psychic5, psychic5_state, 0, ROT270, "Jaleco", "Psychic 5 (set 1)", 0 )
-GAME( 1987, psychic5a, psychic5, psychic5, psychic5, psychic5_state, 0, ROT270, "Jaleco", "Psychic 5 (set 2)", 0 ) // player doesn't die as early in attract mode on this set..
-GAME( 1988, bombsa,    0,        bombsa,   bombsa, psychic5_state,   0, ROT270, "Jaleco", "Bombs Away", GAME_NOT_WORKING )
+GAME( 1987, psychic5,  0,        psychic5, psychic5, driver_device, 0, ROT270, "Jaleco", "Psychic 5 (set 1)", 0 )
+GAME( 1987, psychic5a, psychic5, psychic5, psychic5, driver_device, 0, ROT270, "Jaleco", "Psychic 5 (set 2)", 0 ) // player doesn't die as early in attract mode on this set..
+GAME( 1988, bombsa,    0,        bombsa,   bombsa, driver_device,   0, ROT270, "Jaleco", "Bombs Away", GAME_NOT_WORKING )

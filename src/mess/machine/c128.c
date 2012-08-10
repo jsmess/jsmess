@@ -1180,51 +1180,50 @@ static void c128_common_driver_init( running_machine &machine )
 		state->m_datasette_timer = machine.scheduler().timer_alloc(FUNC(c64_tape_timer));
 }
 
-DRIVER_INIT( c128 )
+DRIVER_INIT_MEMBER(c128_state,c128)
 {
-	device_t *vic2e = machine.device("vic2e");
-	device_t *vdc8563 = machine.device("vdc8563");
+	device_t *vic2e = machine().device("vic2e");
+	device_t *vdc8563 = machine().device("vdc8563");
 
-	c128_common_driver_init(machine);
+	c128_common_driver_init(machine());
 
 	vic2_set_rastering(vic2e, 0);
 	vdc8563_set_rastering(vdc8563, 1);
 }
 
-DRIVER_INIT( c128pal )
+DRIVER_INIT_MEMBER(c128_state,c128pal)
 {
-	c128_state *state = machine.driver_data<c128_state>();
-	device_t *vic2e = machine.device("vic2e");
-	device_t *vdc8563 = machine.device("vdc8563");
+	device_t *vic2e = machine().device("vic2e");
+	device_t *vdc8563 = machine().device("vdc8563");
 
-	c128_common_driver_init(machine);
-	state->m_pal = 1;
+	c128_common_driver_init(machine());
+	m_pal = 1;
 
 	vic2_set_rastering(vic2e, 1);
 	vdc8563_set_rastering(vdc8563, 0);
 }
 
-DRIVER_INIT( c128d )
+DRIVER_INIT_MEMBER(c128_state,c128d)
 {
 	DRIVER_INIT_CALL( c128 );
 }
 
-DRIVER_INIT( c128dpal )
+DRIVER_INIT_MEMBER(c128_state,c128dpal)
 {
 	DRIVER_INIT_CALL( c128pal );
 }
 
-DRIVER_INIT( c128dcr )
+DRIVER_INIT_MEMBER(c128_state,c128dcr)
 {
 	DRIVER_INIT_CALL( c128 );
 }
 
-DRIVER_INIT( c128dcrp )
+DRIVER_INIT_MEMBER(c128_state,c128dcrp)
 {
 	DRIVER_INIT_CALL( c128pal );
 }
 
-DRIVER_INIT( c128d81 )
+DRIVER_INIT_MEMBER(c128_state,c128d81)
 {
 	DRIVER_INIT_CALL( c128 );
 }

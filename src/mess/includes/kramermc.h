@@ -16,12 +16,12 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	UINT8 m_key_row;
+	DECLARE_DRIVER_INIT(kramermc);
 };
 
 
 /*----------- defined in machine/kramermc.c -----------*/
 
-DRIVER_INIT( kramermc );
 MACHINE_RESET( kramermc );
 
 extern const z80pio_interface kramermc_z80pio_intf;

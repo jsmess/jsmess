@@ -80,30 +80,26 @@ const struct pit8253_config mz800_pit8253_config =
     INITIALIZATIoN
 ***************************************************************************/
 
-DRIVER_INIT( mz700 )
+DRIVER_INIT_MEMBER(mz_state,mz700)
 {
-	mz_state *state = machine.driver_data<mz_state>();
-	mz_state *mz = machine.driver_data<mz_state>();
-	mz->m_mz700 = TRUE;
-	mz->m_mz700_mode = TRUE;
+	m_mz700 = TRUE;
+	m_mz700_mode = TRUE;
 
-	state->m_videoram = auto_alloc_array(machine, UINT8, 0x800);
-	mz->m_colorram = auto_alloc_array(machine, UINT8, 0x800);
+	m_videoram = auto_alloc_array(machine(), UINT8, 0x800);
+	m_colorram = auto_alloc_array(machine(), UINT8, 0x800);
 }
 
-DRIVER_INIT( mz800 )
+DRIVER_INIT_MEMBER(mz_state,mz800)
 {
-	mz_state *state = machine.driver_data<mz_state>();
-	mz_state *mz = machine.driver_data<mz_state>();
-	mz->m_mz700 = FALSE;
-	mz->m_mz700_mode = FALSE;
+	m_mz700 = FALSE;
+	m_mz700_mode = FALSE;
 
 	/* video ram */
-	state->m_videoram = auto_alloc_array(machine, UINT8, 0x4000);
-	mz->m_colorram = state->m_videoram + 0x800;
+	m_videoram = auto_alloc_array(machine(), UINT8, 0x4000);
+	m_colorram = m_videoram + 0x800;
 
 	/* character generator ram */
-	mz->m_cgram = auto_alloc_array(machine, UINT8, 0x1000);
+	m_cgram = auto_alloc_array(machine(), UINT8, 0x1000);
 }
 
 MACHINE_START( mz700 )

@@ -197,6 +197,8 @@ public:
 	DECLARE_WRITE8_MEMBER(vtech1_latch_w);
 	DECLARE_WRITE8_MEMBER(vtech1_memory_bank_w);
 	DECLARE_WRITE8_MEMBER(vtech1_video_bank_w);
+	DECLARE_DRIVER_INIT(vtech1h);
+	DECLARE_DRIVER_INIT(vtech1);
 };
 
 
@@ -624,74 +626,72 @@ static READ8_DEVICE_HANDLER( vtech1_mc6847_videoram_r )
     DRIVER INIT
 ***************************************************************************/
 
-static DRIVER_INIT( vtech1 )
+DRIVER_INIT_MEMBER(vtech1_state,vtech1)
 {
-	vtech1_state *state = machine.driver_data<vtech1_state>();
-	address_space *prg = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *prg = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	int id;
 
 	/* ram */
-	state->m_ram = machine.device<ram_device>(RAM_TAG)->pointer();
-	state->m_ram_size = machine.device<ram_device>(RAM_TAG)->size();
+	m_ram = machine().device<ram_device>(RAM_TAG)->pointer();
+	m_ram_size = machine().device<ram_device>(RAM_TAG)->size();
 
 	/* setup memory banking */
-	state->membank("bank1")->set_base(state->m_ram);
+	membank("bank1")->set_base(m_ram);
 
 	/* 16k memory expansion? */
-	if (state->m_ram_size == 18*1024 || state->m_ram_size == 22*1024 || state->m_ram_size == 32*1024)
+	if (m_ram_size == 18*1024 || m_ram_size == 22*1024 || m_ram_size == 32*1024)
 	{
-		offs_t base = 0x7800 + (state->m_ram_size - 0x4000);
+		offs_t base = 0x7800 + (m_ram_size - 0x4000);
 		prg->install_readwrite_bank(base, base + 0x3fff, "bank2");
-		state->membank("bank2")->set_base(state->m_ram + base - 0x7800);
+		membank("bank2")->set_base(m_ram + base - 0x7800);
 	}
 
 	/* 64k expansion? */
-	if (state->m_ram_size >= 66*1024)
+	if (m_ram_size >= 66*1024)
 	{
 		/* install fixed first bank */
 		prg->install_readwrite_bank(0x8000, 0xbfff, "bank2");
-		state->membank("bank2")->set_base(state->m_ram + 0x800);
+		membank("bank2")->set_base(m_ram + 0x800);
 
 		/* install the others, dynamically banked in */
 		prg->install_readwrite_bank(0xc000, 0xffff, "bank3");
-		state->membank("bank3")->configure_entries(0, (state->m_ram_size - 0x4800) / 0x4000, state->m_ram + 0x4800, 0x4000);
-		state->membank("bank3")->set_entry(0);
+		membank("bank3")->configure_entries(0, (m_ram_size - 0x4800) / 0x4000, m_ram + 0x4800, 0x4000);
+		membank("bank3")->set_entry(0);
 	}
 
 	/* initialize floppy */
-	state->m_drive = -1;
-	state->m_fdc_track_x2[0] = 80;
-	state->m_fdc_track_x2[1] = 80;
-	state->m_fdc_wrprot[0] = 0x80;
-	state->m_fdc_wrprot[1] = 0x80;
-	state->m_fdc_status = 0;
-	state->m_fdc_edge = 0;
-	state->m_fdc_bits = 8;
-	state->m_fdc_start = 0;
-	state->m_fdc_write = 0;
-	state->m_fdc_offs = 0;
-	state->m_fdc_latch = 0;
+	m_drive = -1;
+	m_fdc_track_x2[0] = 80;
+	m_fdc_track_x2[1] = 80;
+	m_fdc_wrprot[0] = 0x80;
+	m_fdc_wrprot[1] = 0x80;
+	m_fdc_status = 0;
+	m_fdc_edge = 0;
+	m_fdc_bits = 8;
+	m_fdc_start = 0;
+	m_fdc_write = 0;
+	m_fdc_offs = 0;
+	m_fdc_latch = 0;
 
 	for(id=0;id<2;id++)
 	{
-		floppy_install_load_proc(floppy_get_device(machine, id), vtech1_load_proc);
+		floppy_install_load_proc(floppy_get_device(machine(), id), vtech1_load_proc);
 	}
 }
 
-static DRIVER_INIT( vtech1h )
+DRIVER_INIT_MEMBER(vtech1_state,vtech1h)
 {
-	vtech1_state *state = machine.driver_data<vtech1_state>();
-	address_space *prg = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *prg = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	DRIVER_INIT_CALL(vtech1);
 
 	/* the SHRG mod replaces the standard videoram chip with an 8k chip */
-	//state->m_videoram_size = 0x2000;
-	//state->m_videoram = auto_alloc_array(machine, UINT8, state->m_videoram_size);
+	//m_videoram_size = 0x2000;
+	//m_videoram = auto_alloc_array(machine(), UINT8, m_videoram_size);
 
 	prg->install_readwrite_bank(0x7000, 0x77ff, "bank4");
-	state->membank("bank4")->configure_entries(0, 4, state->m_videoram, 0x800);
-	state->membank("bank4")->set_entry(0);
+	membank("bank4")->configure_entries(0, 4, m_videoram, 0x800);
+	membank("bank4")->set_entry(0);
 }
 
 /***************************************************************************

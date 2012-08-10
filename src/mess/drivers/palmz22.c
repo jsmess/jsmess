@@ -98,6 +98,7 @@ public:
 	nand_device *m_nand;
 
 	UINT32 m_port[8];
+	DECLARE_DRIVER_INIT(palmz22);
 };
 
 /***************************************************************************
@@ -264,7 +265,7 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static DRIVER_INIT( palmz22 )
+DRIVER_INIT_MEMBER(palmz22_state,palmz22)
 {
 }
 

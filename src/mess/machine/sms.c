@@ -2120,65 +2120,59 @@ static void sms_set_zero_flag( running_machine &machine )
 	state->m_has_fm = 0;
 }
 
-DRIVER_INIT( sg1000m3 )
+DRIVER_INIT_MEMBER(sms_state,sg1000m3)
 {
-	sms_state *state = machine.driver_data<sms_state>();
-	sms_set_zero_flag(machine);
-	state->m_is_region_japan = 1;
-	state->m_has_fm = 1;
+	sms_set_zero_flag(machine());
+	m_is_region_japan = 1;
+	m_has_fm = 1;
 }
 
 
-DRIVER_INIT( sms1 )
+DRIVER_INIT_MEMBER(sms_state,sms1)
 {
-	sms_state *state = machine.driver_data<sms_state>();
-	sms_set_zero_flag(machine);
-	state->m_has_bios_full = 1;
+	sms_set_zero_flag(machine());
+	m_has_bios_full = 1;
 }
 
 
-DRIVER_INIT( smsj )
+DRIVER_INIT_MEMBER(sms_state,smsj)
 {
-	sms_state *state = machine.driver_data<sms_state>();
-	sms_set_zero_flag(machine);
-	state->m_is_region_japan = 1;
-	state->m_has_bios_2000 = 1;
-	state->m_has_fm = 1;
+	sms_set_zero_flag(machine());
+	m_is_region_japan = 1;
+	m_has_bios_2000 = 1;
+	m_has_fm = 1;
 }
 
 
-DRIVER_INIT( sms2kr )
+DRIVER_INIT_MEMBER(sms_state,sms2kr)
 {
-	sms_state *state = machine.driver_data<sms_state>();
-	sms_set_zero_flag(machine);
-	state->m_is_region_japan = 1;
-	state->m_has_bios_full = 1;
-	state->m_has_fm = 1;
+	sms_set_zero_flag(machine());
+	m_is_region_japan = 1;
+	m_has_bios_full = 1;
+	m_has_fm = 1;
 }
 
 
-DRIVER_INIT( smssdisp )
+DRIVER_INIT_MEMBER(sms_state,smssdisp)
 {
-	sms_set_zero_flag(machine);
+	sms_set_zero_flag(machine());
 }
 
 
-DRIVER_INIT( gamegear )
+DRIVER_INIT_MEMBER(sms_state,gamegear)
 {
-	sms_state *state = machine.driver_data<sms_state>();
-	sms_set_zero_flag(machine);
-	state->m_is_gamegear = 1;
-	state->m_has_bios_0400 = 1;
+	sms_set_zero_flag(machine());
+	m_is_gamegear = 1;
+	m_has_bios_0400 = 1;
 }
 
 
-DRIVER_INIT( gamegeaj )
+DRIVER_INIT_MEMBER(sms_state,gamegeaj)
 {
-	sms_state *state = machine.driver_data<sms_state>();
-	sms_set_zero_flag(machine);
-	state->m_is_region_japan = 1;
-	state->m_is_gamegear = 1;
-	state->m_has_bios_0400 = 1;
+	sms_set_zero_flag(machine());
+	m_is_region_japan = 1;
+	m_is_gamegear = 1;
+	m_has_bios_0400 = 1;
 }
 
 

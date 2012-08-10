@@ -43,6 +43,7 @@ public:
 	int m_blink_on;
 	DECLARE_READ8_MEMBER(apple1_cassette_r);
 	DECLARE_WRITE8_MEMBER(apple1_cassette_w);
+	DECLARE_DRIVER_INIT(apple1);
 };
 
 
@@ -50,7 +51,6 @@ public:
 
 extern const pia6821_interface apple1_pia0;
 
-DRIVER_INIT( apple1 );
 MACHINE_RESET( apple1 );
 SNAPSHOT_LOAD( apple1 );
 

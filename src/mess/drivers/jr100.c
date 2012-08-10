@@ -406,5 +406,5 @@ ROM_END
 /* Driver */
 
 /*   YEAR  NAME    PARENT  COMPAT   MACHINE  INPUT  INIT        COMPANY   FULLNAME       FLAGS */
-COMP( 1981, jr100,  0,  	  0,	jr100,	jr100, jr100_state,	 0, 	  "National",   "JR-100",		0)
-COMP( 1981, jr100u, jr100,    0,	jr100,	jr100, jr100_state,	 0, 	  "Panasonic",   "JR-100U",		0)
+COMP( 1981, jr100,  0,  	  0,	jr100,	jr100, driver_device,	 0, 	  "National",   "JR-100",		0)
+COMP( 1981, jr100u, jr100,    0,	jr100,	jr100, driver_device,	 0, 	  "Panasonic",   "JR-100U",		0)

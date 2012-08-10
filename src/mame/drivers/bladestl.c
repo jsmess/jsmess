@@ -287,7 +287,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_DEVICE_HANDLER("upd", upd7759_port_w),
 		DEVCB_DRIVER_MEMBER(bladestl_state,bladestl_port_B_w)
 	},
-	NULL
+	DEVCB_NULL
 };
 
 static const k007342_interface bladestl_k007342_intf =
@@ -448,6 +448,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1987, bladestl,  0,        bladestl, bladestl, bladestl_state, 0, ROT90, "Konami", "Blades of Steel (version T)", GAME_SUPPORTS_SAVE )
-GAME( 1987, bladestll, bladestl, bladestl, bladestle, bladestl_state,0, ROT90, "Konami", "Blades of Steel (version L)", GAME_SUPPORTS_SAVE )
-GAME( 1987, bladestle, bladestl, bladestl, bladestle, bladestl_state,0, ROT90, "Konami", "Blades of Steel (version E)", GAME_SUPPORTS_SAVE )
+GAME( 1987, bladestl,  0,        bladestl, bladestl, driver_device, 0, ROT90, "Konami", "Blades of Steel (version T)", GAME_SUPPORTS_SAVE )
+GAME( 1987, bladestll, bladestl, bladestl, bladestle, driver_device,0, ROT90, "Konami", "Blades of Steel (version L)", GAME_SUPPORTS_SAVE )
+GAME( 1987, bladestle, bladestl, bladestl, bladestle, driver_device,0, ROT90, "Konami", "Blades of Steel (version E)", GAME_SUPPORTS_SAVE )

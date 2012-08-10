@@ -132,6 +132,10 @@ public:
 	void vii_switch_bank(UINT32 bank);
 	void vii_do_i2c();
 	void spg_do_dma(UINT32 len);
+	DECLARE_DRIVER_INIT(vsmile);
+	DECLARE_DRIVER_INIT(walle);
+	DECLARE_DRIVER_INIT(vii);
+	DECLARE_DRIVER_INIT(batman);
 };
 
 enum
@@ -1157,36 +1161,32 @@ static MACHINE_CONFIG_START( batman, vii_state )
 	MCFG_PALETTE_LENGTH(32768)
 MACHINE_CONFIG_END
 
-static DRIVER_INIT( vii )
+DRIVER_INIT_MEMBER(vii_state,vii)
 {
-	vii_state *state = machine.driver_data<vii_state>();
 
-	state->m_spg243_mode = SPG243_VII;
-	state->m_centered_coordinates = 1;
+	m_spg243_mode = SPG243_VII;
+	m_centered_coordinates = 1;
 }
 
-static DRIVER_INIT( batman )
+DRIVER_INIT_MEMBER(vii_state,batman)
 {
-	vii_state *state = machine.driver_data<vii_state>();
 
-	state->m_spg243_mode = SPG243_BATMAN;
-	state->m_centered_coordinates = 1;
+	m_spg243_mode = SPG243_BATMAN;
+	m_centered_coordinates = 1;
 }
 
-static DRIVER_INIT( vsmile )
+DRIVER_INIT_MEMBER(vii_state,vsmile)
 {
-	vii_state *state = machine.driver_data<vii_state>();
 
-	state->m_spg243_mode = SPG243_VSMILE;
-	state->m_centered_coordinates = 1;
+	m_spg243_mode = SPG243_VSMILE;
+	m_centered_coordinates = 1;
 }
 
-static DRIVER_INIT( walle )
+DRIVER_INIT_MEMBER(vii_state,walle)
 {
-	vii_state *state = machine.driver_data<vii_state>();
 
-	state->m_spg243_mode = SPG243_BATMAN;
-	state->m_centered_coordinates = 0;
+	m_spg243_mode = SPG243_BATMAN;
+	m_centered_coordinates = 0;
 }
 
 ROM_START( vii )

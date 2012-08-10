@@ -67,6 +67,7 @@ public:
 #endif
 	UINT8 m_screens[ HP48_NB_SCREENS ][ 64 ][ 144 ];
 	int m_cur_screen;
+	DECLARE_DRIVER_INIT(hp48);
 };
 
 
@@ -177,7 +178,6 @@ extern const device_type HP48_PORT;
 
 /****************************** machine ******************************/
 
-extern DRIVER_INIT( hp48 );
 
 extern MACHINE_START( hp48s  );
 extern MACHINE_START( hp48sx );

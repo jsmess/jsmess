@@ -878,51 +878,45 @@ static void pmd85_common_driver_init (running_machine &machine)
 	state->m_cassette_timer->adjust(attotime::zero, 0, attotime::from_hz(2400));
 }
 
-DRIVER_INIT ( pmd851 )
+DRIVER_INIT_MEMBER(pmd85_state,pmd851)
 {
-	pmd85_state *state = machine.driver_data<pmd85_state>();
-	state->m_model = PMD85_1;
-	state->update_memory = pmd851_update_memory;
-	pmd85_common_driver_init(machine);
+	m_model = PMD85_1;
+	update_memory = pmd851_update_memory;
+	pmd85_common_driver_init(machine());
 }
 
-DRIVER_INIT ( pmd852a )
+DRIVER_INIT_MEMBER(pmd85_state,pmd852a)
 {
-	pmd85_state *state = machine.driver_data<pmd85_state>();
-	state->m_model = PMD85_2A;
-	state->update_memory = pmd852a_update_memory;
-	pmd85_common_driver_init(machine);
+	m_model = PMD85_2A;
+	update_memory = pmd852a_update_memory;
+	pmd85_common_driver_init(machine());
 }
 
-DRIVER_INIT ( pmd853 )
+DRIVER_INIT_MEMBER(pmd85_state,pmd853)
 {
-	pmd85_state *state = machine.driver_data<pmd85_state>();
-	state->m_model = PMD85_3;
-	state->update_memory = pmd853_update_memory;
-	pmd85_common_driver_init(machine);
+	m_model = PMD85_3;
+	update_memory = pmd853_update_memory;
+	pmd85_common_driver_init(machine());
 }
 
-DRIVER_INIT ( alfa )
+DRIVER_INIT_MEMBER(pmd85_state,alfa)
 {
-	pmd85_state *state = machine.driver_data<pmd85_state>();
-	state->m_model = ALFA;
-	state->update_memory = alfa_update_memory;
-	pmd85_common_driver_init(machine);
+	m_model = ALFA;
+	update_memory = alfa_update_memory;
+	pmd85_common_driver_init(machine());
 }
 
-DRIVER_INIT ( mato )
+DRIVER_INIT_MEMBER(pmd85_state,mato)
 {
-	pmd85_state *state = machine.driver_data<pmd85_state>();
-	state->m_model = MATO;
-	state->update_memory = mato_update_memory;
+	m_model = MATO;
+	update_memory = mato_update_memory;
 }
 
-DRIVER_INIT ( c2717 )
+DRIVER_INIT_MEMBER(pmd85_state,c2717)
 {
-	pmd85_state *state = machine.driver_data<pmd85_state>();
-	state->m_model = C2717;
-	state->update_memory = c2717_update_memory;
-	pmd85_common_driver_init(machine);
+	m_model = C2717;
+	update_memory = c2717_update_memory;
+	pmd85_common_driver_init(machine());
 }
 
 static TIMER_CALLBACK( setup_machine_state )

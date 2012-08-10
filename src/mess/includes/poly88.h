@@ -30,12 +30,12 @@ public:
 	DECLARE_WRITE8_MEMBER(poly88_baud_rate_w);
 	DECLARE_READ8_MEMBER(poly88_keyboard_r);
 	DECLARE_WRITE8_MEMBER(poly88_intr_w);
+	DECLARE_DRIVER_INIT(poly88);
 };
 
 
 /*----------- defined in machine/poly88.c -----------*/
 
-DRIVER_INIT(poly88);
 MACHINE_RESET(poly88);
 INTERRUPT_GEN( poly88_interrupt );
 

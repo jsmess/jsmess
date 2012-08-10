@@ -20,15 +20,15 @@ public:
 	required_shared_ptr<UINT8> m_video_ram;
 	DECLARE_READ8_MEMBER(orao_io_r);
 	DECLARE_WRITE8_MEMBER(orao_io_w);
+	DECLARE_DRIVER_INIT(orao);
+	DECLARE_DRIVER_INIT(orao103);
 };
 
 
 /*----------- defined in machine/orao.c -----------*/
 
-extern DRIVER_INIT( orao );
 extern MACHINE_RESET( orao );
 
-extern DRIVER_INIT( orao103 );
 
 
 

@@ -153,16 +153,15 @@ SNAPSHOT_LOAD( galaxy )
   Driver Initialization
 ***************************************************************************/
 
-DRIVER_INIT( galaxy )
+DRIVER_INIT_MEMBER(galaxy_state,galaxy)
 {
-	galaxy_state *state = machine.driver_data<galaxy_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	space->install_readwrite_bank( 0x2800, 0x2800 + machine.device<ram_device>(RAM_TAG)->size() - 1, "bank1");
-	state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	space->install_readwrite_bank( 0x2800, 0x2800 + machine().device<ram_device>(RAM_TAG)->size() - 1, "bank1");
+	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 
-	if (machine.device<ram_device>(RAM_TAG)->size() < (6 + 48) * 1024)
+	if (machine().device<ram_device>(RAM_TAG)->size() < (6 + 48) * 1024)
 	{
-		space->nop_readwrite( 0x2800 + machine.device<ram_device>(RAM_TAG)->size(), 0xffff);
+		space->nop_readwrite( 0x2800 + machine().device<ram_device>(RAM_TAG)->size(), 0xffff);
 	}
 }
 
@@ -190,7 +189,7 @@ MACHINE_RESET( galaxy )
 	state->m_interrupts_enabled = TRUE;
 }
 
-DRIVER_INIT( galaxyp )
+DRIVER_INIT_MEMBER(galaxy_state,galaxyp)
 {
 	DRIVER_INIT_CALL(galaxy);
 }

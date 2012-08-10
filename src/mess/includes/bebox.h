@@ -35,6 +35,7 @@ public:
 	UINT16 m_dma_offset[2][4];
 	UINT8 m_at_pages[0x10];
 	UINT32 m_scsi53c810_data[0x100 / 4];
+	DECLARE_DRIVER_INIT(bebox);
 };
 
 
@@ -52,7 +53,6 @@ extern const ins8250_interface bebox_uart_inteface_3;
 
 MACHINE_START( bebox );
 MACHINE_RESET( bebox );
-DRIVER_INIT( bebox );
 
 READ64_HANDLER( bebox_cpu0_imask_r );
 READ64_HANDLER( bebox_cpu1_imask_r );

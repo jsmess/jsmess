@@ -223,7 +223,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static void goal92_adpcm_int( device_t *device )
@@ -418,4 +418,4 @@ ROM_END
 
 
 
-GAME( 1992, goal92,   cupsoc, goal92,   goal92, goal92_state, 0, ROT0, "bootleg", "Goal! '92", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1992, goal92,   cupsoc, goal92,   goal92, driver_device, 0, ROT0, "bootleg", "Goal! '92", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

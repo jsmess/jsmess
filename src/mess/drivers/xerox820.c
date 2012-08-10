@@ -993,8 +993,8 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME        FLAGS */
-COMP( 1981, xerox820,   0,          0,      xerox820,   xerox820, xerox820_state,   0,      "Xerox",                        "Xerox 820",    GAME_NO_SOUND_HW)
-COMP( 1983, xerox820ii, xerox820,   0,      xerox820ii, xerox820, xerox820ii_state,   0,      "Xerox",                        "Xerox 820-II", GAME_NOT_WORKING )
-COMP( 1983, xerox168,   xerox820,   0,      xerox168,   xerox820, xerox820ii_state,   0,      "Xerox",                        "Xerox 16/8",   GAME_NOT_WORKING )
-COMP( 1980, bigboard,   0,          0,      xerox820,   xerox820, xerox820_state,   0,      "Digital Research Computers",   "Big Board",    GAME_NOT_WORKING )
-COMP( 198?, mk83,       0,          0,      mk83,       xerox820, xerox820_state,   0,      "Scomar",                       "MK-83",        GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 1981, xerox820,   0,          0,      xerox820,   xerox820, driver_device,   0,      "Xerox",                        "Xerox 820",    GAME_NO_SOUND_HW)
+COMP( 1983, xerox820ii, xerox820,   0,      xerox820ii, xerox820, driver_device,   0,      "Xerox",                        "Xerox 820-II", GAME_NOT_WORKING )
+COMP( 1983, xerox168,   xerox820,   0,      xerox168,   xerox820, driver_device,   0,      "Xerox",                        "Xerox 16/8",   GAME_NOT_WORKING )
+COMP( 1980, bigboard,   0,          0,      xerox820,   xerox820, driver_device,   0,      "Digital Research Computers",   "Big Board",    GAME_NOT_WORKING )
+COMP( 198?, mk83,       0,          0,      mk83,       xerox820, driver_device,   0,      "Scomar",                       "MK-83",        GAME_NOT_WORKING | GAME_NO_SOUND_HW)

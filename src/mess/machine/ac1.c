@@ -110,7 +110,7 @@ Z80PIO_INTERFACE( ac1_z80pio_intf )
 };
 
 /* Driver initialization */
-DRIVER_INIT(ac1)
+DRIVER_INIT_MEMBER(ac1_state,ac1)
 {
 }
 

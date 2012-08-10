@@ -396,4 +396,4 @@ ROM_START( d6800 )
 ROM_END
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE   INPUT       INIT        COMPANY             FULLNAME      FLAGS */
-COMP( 1979, d6800, 0,      0,      d6800,    d6800, d6800_state,      0,   "Electronics Australia", "Dream 6800", GAME_NOT_WORKING )
+COMP( 1979, d6800, 0,      0,      d6800,    d6800, driver_device,      0,   "Electronics Australia", "Dream 6800", GAME_NOT_WORKING )

@@ -79,6 +79,7 @@ public:
 	UINT8 m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
+	DECLARE_DRIVER_INIT(p8k);
 };
 
 /***************************************************************************
@@ -406,26 +407,25 @@ static MACHINE_RESET( p8k )
 	state->membank("bank15")->set_entry(0);
 }
 
-static DRIVER_INIT( p8k )
+DRIVER_INIT_MEMBER(p8k_state,p8k)
 {
-	p8k_state *state = machine.driver_data<p8k_state>();
-	UINT8 *RAM = state->memregion("maincpu")->base();
-	state->membank("bank0")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank1")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank2")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank3")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank4")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank5")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank6")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank7")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank8")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank9")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank10")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank11")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank12")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank13")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank14")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
-	state->membank("bank15")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	UINT8 *RAM = memregion("maincpu")->base();
+	membank("bank0")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	membank("bank1")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	membank("bank2")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	membank("bank3")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	membank("bank4")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	membank("bank5")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	membank("bank6")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	membank("bank7")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	membank("bank8")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	membank("bank9")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	membank("bank10")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	membank("bank11")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	membank("bank12")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	membank("bank13")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	membank("bank14")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
+	membank("bank15")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
 }
 
 
@@ -791,4 +791,4 @@ ROM_END
 
 /*    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                   FULLNAME       FLAGS */
 COMP( 1989, p8000,      0,      0,       p8k,       p8k, p8k_state,     p8k,    "EAW electronic Treptow", "P8000 (8bit Board)",  GAME_NOT_WORKING)
-COMP( 1989, p8000_16,   p8000,  0,       p8k_16,    p8k, p8k_state,     0,      "EAW electronic Treptow", "P8000 (16bit Board)",  GAME_NOT_WORKING)
+COMP( 1989, p8000_16,   p8000,  0,       p8k_16,    p8k, driver_device,     0,      "EAW electronic Treptow", "P8000 (16bit Board)",  GAME_NOT_WORKING)

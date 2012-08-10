@@ -763,5 +763,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME     PARENT  COMPAT  MACHINE             INPUT               INIT         COMPANY               FULLNAME */
-COMP(1977, apfimag,  0,      0,      apf_imagination,    apf_imagination, apf_state,    0,   "APF Electronics Inc", "APF Imagination Machine" , GAME_NOT_WORKING )
-CONS(1978, apfm1000, 0,      0,      apf_m1000,          apf_m1000, apf_state,          0,   "APF Electronics Inc", "APF M-1000" , GAME_NOT_WORKING)
+COMP(1977, apfimag,  0,      0,      apf_imagination,    apf_imagination, driver_device,    0,   "APF Electronics Inc", "APF Imagination Machine" , GAME_NOT_WORKING )
+CONS(1978, apfm1000, 0,      0,      apf_m1000,          apf_m1000, driver_device,          0,   "APF Electronics Inc", "APF M-1000" , GAME_NOT_WORKING)

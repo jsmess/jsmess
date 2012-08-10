@@ -56,6 +56,7 @@ public:
 	#endif
 	DECLARE_READ32_MEMBER(juicebox_nand_r);
 	DECLARE_WRITE32_MEMBER(juicebox_nand_w);
+	DECLARE_DRIVER_INIT(juicebox);
 };
 
 /***************************************************************************
@@ -272,7 +273,7 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static DRIVER_INIT( juicebox )
+DRIVER_INIT_MEMBER(juicebox_state,juicebox)
 {
 	// do nothing
 }

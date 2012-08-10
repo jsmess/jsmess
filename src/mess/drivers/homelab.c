@@ -65,7 +65,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<device_t> m_speaker;
 	required_device<cassette_image_device> m_cass;
-private:
+	DECLARE_DRIVER_INIT(brailab4);
 };
 
 static INTERRUPT_GEN( homelab_frame )
@@ -828,11 +828,10 @@ static MACHINE_CONFIG_START( brailab4, homelab_state )
 	MCFG_QUICKLOAD_ADD("quickload", homelab, "htp", 18)
 MACHINE_CONFIG_END
 
-static DRIVER_INIT( brailab4 )
+DRIVER_INIT_MEMBER(homelab_state,brailab4)
 {
-	homelab_state *state = machine.driver_data<homelab_state>();
-	UINT8 *RAM = state->memregion("maincpu")->base();
-	state->membank("bank1")->configure_entries(0, 2, &RAM[0xf800], 0x8000);
+	UINT8 *RAM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 2, &RAM[0xf800], 0x8000);
 }
 
 /* ROM definition */
@@ -907,8 +906,8 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME        PARENT     COMPAT  MACHINE      INPUT      INIT       COMPANY                    FULLNAME   FLAGS */
-COMP( 1982, homelab2,   0,         0,      homelab,     homelab, homelab_state,   0,        "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
-COMP( 1983, homelab3,   homelab2,  0,      homelab3,    homelab3, homelab_state,  0,        "Jozsef and Endre Lukacs", "Homelab 3", GAME_NOT_WORKING )
-COMP( 1984, homelab4,   homelab2,  0,      homelab3,    homelab3, homelab_state,  0,        "Jozsef and Endre Lukacs", "Homelab 4", GAME_NOT_WORKING )
+COMP( 1982, homelab2,   0,         0,      homelab,     homelab, driver_device,   0,        "Jozsef and Endre Lukacs", "Homelab 2 / Aircomp 16", GAME_NOT_WORKING | GAME_NO_SOUND_HW )
+COMP( 1983, homelab3,   homelab2,  0,      homelab3,    homelab3, driver_device,  0,        "Jozsef and Endre Lukacs", "Homelab 3", GAME_NOT_WORKING )
+COMP( 1984, homelab4,   homelab2,  0,      homelab3,    homelab3, driver_device,  0,        "Jozsef and Endre Lukacs", "Homelab 4", GAME_NOT_WORKING )
 COMP( 1984, brailab4,   homelab2,  0,      brailab4,    brailab4, homelab_state,  brailab4, "Jozsef and Endre Lukacs", "Brailab 4", GAME_NOT_WORKING )
 COMP( 1988, braiplus,   homelab2,  0,      brailab4,    brailab4, homelab_state,  brailab4, "Jozsef and Endre Lukacs", "Brailab Plus", GAME_NOT_WORKING | GAME_IS_SKELETON )

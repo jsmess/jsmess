@@ -406,7 +406,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, pdp11ub,  0,       0,	pdp11,	  pdp11, pdp11_state,	 0,   "Digital Equipment Corporation",   "PDP-11 [Unibus](M9301-YA)",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( ????, pdp11ub2, pdp11ub, 0,	pdp11ub2, pdp11, pdp11_state,	 0,   "Digital Equipment Corporation",   "PDP-11 [Unibus](M9312)",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( ????, pdp11qb,  pdp11ub, 0,	pdp11qb,  pdp11, pdp11_state,	 0,   "Digital Equipment Corporation",   "PDP-11 [Q-BUS] (M7195 - MXV11)",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, pdp11ub,  0,       0,	pdp11,	  pdp11, driver_device,	 0,   "Digital Equipment Corporation",   "PDP-11 [Unibus](M9301-YA)",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, pdp11ub2, pdp11ub, 0,	pdp11ub2, pdp11, driver_device,	 0,   "Digital Equipment Corporation",   "PDP-11 [Unibus](M9312)",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, pdp11qb,  pdp11ub, 0,	pdp11qb,  pdp11, driver_device,	 0,   "Digital Equipment Corporation",   "PDP-11 [Q-BUS] (M7195 - MXV11)",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

@@ -124,6 +124,8 @@ public:
 	int m_tape_interrupts_enabled;
 	int m_tape_unknown_write[6];
 	int m_tape_motor_mode;
+	DECLARE_DRIVER_INIT(intvkbd);
+	DECLARE_DRIVER_INIT(intv);
 };
 
 /*----------- defined in video/intv.c -----------*/

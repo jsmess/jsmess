@@ -192,6 +192,7 @@ public:
 	DECLARE_READ16_MEMBER(spc_infifo_data_r);
 	DECLARE_WRITE16_MEMBER(spc_outfifo_data_w);
 	DECLARE_READ16_MEMBER(spc_semaphore_r);
+	DECLARE_DRIVER_INIT(dectalk);
 };
 
 
@@ -708,12 +709,11 @@ static TIMER_CALLBACK( outfifo_read_cb )
 }
 
 /* Driver init: stuff that needs setting up which isn't directly affected by reset */
-static DRIVER_INIT( dectalk )
+DRIVER_INIT_MEMBER(dectalk_state,dectalk)
 {
-	dectalk_state *state = machine.driver_data<dectalk_state>();
-	dectalk_clear_all_fifos(machine);
-	state->m_simulate_outfifo_error = 0;
-	machine.scheduler().timer_set(attotime::from_hz(10000), FUNC(outfifo_read_cb));
+	dectalk_clear_all_fifos(machine());
+	m_simulate_outfifo_error = 0;
+	machine().scheduler().timer_set(attotime::from_hz(10000), FUNC(outfifo_read_cb));
 }
 
 static WRITE8_DEVICE_HANDLER( dectalk_kbd_put )

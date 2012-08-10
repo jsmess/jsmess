@@ -159,6 +159,8 @@ public:
 	DECLARE_READ8_MEMBER(px4_ramdisk_data_r);
 	DECLARE_WRITE8_MEMBER(px4_ramdisk_data_w);
 	DECLARE_READ8_MEMBER(px4_ramdisk_control_r);
+	DECLARE_DRIVER_INIT(px4);
+	DECLARE_DRIVER_INIT(px4p);
 };
 
 
@@ -1069,47 +1071,45 @@ static SCREEN_UPDATE_IND16( px4 )
     DRIVER INIT
 ***************************************************************************/
 
-static DRIVER_INIT( px4 )
+DRIVER_INIT_MEMBER(px4_state,px4)
 {
-	px4_state *state = machine.driver_data<px4_state>();
 
 	/* find devices */
-	state->m_ram = machine.device<ram_device>(RAM_TAG);
+	m_ram = machine().device<ram_device>(RAM_TAG);
 
 	/* init 7508 */
-	state->m_one_sec_int_enabled = TRUE;
-	state->m_key_int_enabled = TRUE;
-	state->m_alarm_int_enabled = TRUE;
+	m_one_sec_int_enabled = TRUE;
+	m_key_int_enabled = TRUE;
+	m_alarm_int_enabled = TRUE;
 
 	/* art */
-	state->m_receive_timer = machine.scheduler().timer_alloc(FUNC(receive_data));
-	state->m_transmit_timer = machine.scheduler().timer_alloc(FUNC(transmit_data));
+	m_receive_timer = machine().scheduler().timer_alloc(FUNC(receive_data));
+	m_transmit_timer = machine().scheduler().timer_alloc(FUNC(transmit_data));
 
 	/* printer */
-	state->m_centronics = machine.device<centronics_device>("centronics");
+	m_centronics = machine().device<centronics_device>("centronics");
 
 	/* external cassette or barcode reader */
-	state->m_ext_cas_timer = machine.scheduler().timer_alloc(FUNC(ext_cassette_read));
-	state->m_ext_cas = machine.device<cassette_image_device>("extcas");
-	state->m_ear_last_state = 0;
+	m_ext_cas_timer = machine().scheduler().timer_alloc(FUNC(ext_cassette_read));
+	m_ext_cas = machine().device<cassette_image_device>("extcas");
+	m_ear_last_state = 0;
 
 	/* external devices */
-	state->m_sio_device = machine.device("floppy");
-	state->m_rs232c_device = NULL;
+	m_sio_device = machine().device("floppy");
+	m_rs232c_device = NULL;
 
 	/* map os rom and last half of memory */
-	state->membank("bank1")->set_base(machine.root_device().memregion("os")->base());
-	state->membank("bank2")->set_base(state->m_ram->pointer() + 0x8000);
+	membank("bank1")->set_base(machine().root_device().memregion("os")->base());
+	membank("bank2")->set_base(m_ram->pointer() + 0x8000);
 }
 
-static DRIVER_INIT( px4p )
+DRIVER_INIT_MEMBER(px4_state,px4p)
 {
-	px4_state *px4 = machine.driver_data<px4_state>();
 
 	DRIVER_INIT_CALL(px4);
 
 	/* reserve memory for external ram-disk */
-	px4->m_ramdisk = auto_alloc_array(machine, UINT8, 0x20000);
+	m_ramdisk = auto_alloc_array(machine(), UINT8, 0x20000);
 }
 
 static MACHINE_RESET( px4 )

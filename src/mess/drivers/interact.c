@@ -323,5 +323,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP(1979, interact, 0, 		0,	interact,	interact, interact_state, 0,	 "Interact",   "Interact Family Computer", GAME_IMPERFECT_SOUND)
-COMP(1983, hector1,  interact,	0,	 hector1,	interact, interact_state, 0,	 "Micronique", "Hector 1",	GAME_IMPERFECT_SOUND)
+COMP(1979, interact, 0, 		0,	interact,	interact, driver_device, 0,	 "Interact",   "Interact Family Computer", GAME_IMPERFECT_SOUND)
+COMP(1983, hector1,  interact,	0,	 hector1,	interact, driver_device, 0,	 "Micronique", "Hector 1",	GAME_IMPERFECT_SOUND)

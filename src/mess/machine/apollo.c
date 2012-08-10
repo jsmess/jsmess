@@ -1432,9 +1432,9 @@ MACHINE_CONFIG_FRAGMENT( apollo )
 	MCFG_THREECOM3C505_ADD(APOLLO_ETH_TAG, apollo_3c505_config)
 MACHINE_CONFIG_END
 
-DRIVER_INIT( apollo )
+DRIVER_INIT_MEMBER(apollo_state,apollo)
 {
-	MLOG1(("driver_init_apollo"));
+	//MLOG1(("driver_init_apollo"));
 }
 
 MACHINE_START( apollo )

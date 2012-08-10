@@ -97,22 +97,22 @@ public:
 	DECLARE_WRITE8_MEMBER(ti99_2_write_misc_cru);
 	DECLARE_READ8_MEMBER(ti99_2_read_kbd);
 	DECLARE_READ8_MEMBER(ti99_2_read_misc_cru);
+	DECLARE_DRIVER_INIT(ti99_2_24);
+	DECLARE_DRIVER_INIT(ti99_2_32);
 };
 
 
 
-static DRIVER_INIT( ti99_2_24 )
+DRIVER_INIT_MEMBER(ti99_2_state,ti99_2_24)
 {
-	ti99_2_state *state = machine.driver_data<ti99_2_state>();
 	/* no ROM paging */
-	state->m_ROM_paged = 0;
+	m_ROM_paged = 0;
 }
 
-static DRIVER_INIT( ti99_2_32 )
+DRIVER_INIT_MEMBER(ti99_2_state,ti99_2_32)
 {
-	ti99_2_state *state = machine.driver_data<ti99_2_state>();
 	/* ROM paging enabled */
-	state->m_ROM_paged = 1;
+	m_ROM_paged = 1;
 }
 
 #define TI99_2_32_ROMPAGE0 (machine().root_device().memregion("maincpu")->base()+0x4000)

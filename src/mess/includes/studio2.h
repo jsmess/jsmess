@@ -48,6 +48,7 @@ public:
 
 	/* keyboard state */
 	UINT8 m_keylatch;
+	DECLARE_DRIVER_INIT(studio2);
 };
 
 class visicom_state : public studio2_state

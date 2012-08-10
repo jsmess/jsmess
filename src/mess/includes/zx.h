@@ -50,12 +50,12 @@ public:
 	DECLARE_DIRECT_UPDATE_MEMBER(zx_setdirect);
 	DECLARE_DIRECT_UPDATE_MEMBER(pc8300_setdirect);
 	DECLARE_DIRECT_UPDATE_MEMBER(pow3000_setdirect);
+	DECLARE_DRIVER_INIT(zx);
 };
 
 
 /*----------- defined in machine/zx.c -----------*/
 
-DRIVER_INIT( zx );
 MACHINE_RESET( zx80 );
 MACHINE_RESET( pow3000 );
 MACHINE_RESET( pc8300 );

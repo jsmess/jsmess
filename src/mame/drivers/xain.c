@@ -563,7 +563,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	irqhandler
+	DEVCB_LINE(irqhandler)
 };
 
 static MACHINE_START( xsleena )
@@ -793,6 +793,6 @@ ROM_START( solarwar )
 ROM_END
 
 
-GAME( 1986, xsleena,  0,       xsleena,  xsleena, xain_state, 0, ROT0, "Technos Japan", "Xain'd Sleena", 0 )
-GAME( 1986, xsleenab, xsleena, xsleenab, xsleena, xain_state, 0, ROT0, "bootleg", "Xain'd Sleena (bootleg)", 0 )
-GAME( 1986, solarwar, xsleena, xsleena,  xsleena, xain_state, 0, ROT0, "Technos Japan / Taito (Memetron license)", "Solar-Warrior", 0 )
+GAME( 1986, xsleena,  0,       xsleena,  xsleena, driver_device, 0, ROT0, "Technos Japan", "Xain'd Sleena", 0 )
+GAME( 1986, xsleenab, xsleena, xsleenab, xsleena, driver_device, 0, ROT0, "bootleg", "Xain'd Sleena (bootleg)", 0 )
+GAME( 1986, solarwar, xsleena, xsleena,  xsleena, driver_device, 0, ROT0, "Technos Japan / Taito (Memetron license)", "Solar-Warrior", 0 )

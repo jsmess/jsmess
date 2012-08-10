@@ -69,6 +69,7 @@ public:
 	DECLARE_WRITE8_MEMBER(svi318_writemem4);
 	DECLARE_READ8_MEMBER(svi318_io_ext_r);
 	DECLARE_WRITE8_MEMBER(svi318_io_ext_w);
+	DECLARE_DRIVER_INIT(svi318);
 };
 
 
@@ -78,7 +79,6 @@ extern const i8255_interface svi318_ppi8255_interface;
 extern const ins8250_interface svi318_ins8250_interface[2];
 extern const wd17xx_interface svi_wd17xx_interface;
 
-DRIVER_INIT( svi318 );
 MACHINE_START( svi318_pal );
 MACHINE_START( svi318_ntsc );
 MACHINE_RESET( svi318 );

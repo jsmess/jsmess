@@ -145,6 +145,7 @@ public:
 	int m_pos;
 	int m_case_shift;
 	device_t *m_crt;
+	DECLARE_DRIVER_INIT(tx0);
 };
 
 

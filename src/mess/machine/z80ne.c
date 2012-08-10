@@ -76,43 +76,41 @@ static TIMER_CALLBACK(z80ne_cassette_tc)
 }
 
 
-DRIVER_INIT( z80ne )
+DRIVER_INIT_MEMBER(z80ne_state,z80ne)
 {
-	z80ne_state *state = machine.driver_data<z80ne_state>();
 	/* first two entries point to rom on reset */
-	UINT8 *RAM = state->memregion("z80ne")->base();
-	state->membank("bank1")->configure_entry(0, &RAM[0x00000]); /* RAM   at 0x0000 */
-	state->membank("bank1")->configure_entry(1, &RAM[0x14000]); /* ep382 at 0x0000 */
-	state->membank("bank2")->configure_entry(0, &RAM[0x14000]); /* ep382 at 0x8000 */
+	UINT8 *RAM = memregion("z80ne")->base();
+	membank("bank1")->configure_entry(0, &RAM[0x00000]); /* RAM   at 0x0000 */
+	membank("bank1")->configure_entry(1, &RAM[0x14000]); /* ep382 at 0x0000 */
+	membank("bank2")->configure_entry(0, &RAM[0x14000]); /* ep382 at 0x8000 */
 }
 
-DRIVER_INIT( z80net )
+DRIVER_INIT_MEMBER(z80ne_state,z80net)
 {
 	DRIVER_INIT_CALL(z80ne);
 }
 
-DRIVER_INIT( z80netb )
+DRIVER_INIT_MEMBER(z80ne_state,z80netb)
 {
 }
 
-DRIVER_INIT( z80netf )
+DRIVER_INIT_MEMBER(z80ne_state,z80netf)
 {
-	z80ne_state *state = machine.driver_data<z80ne_state>();
 	/* first two entries point to rom on reset */
-	UINT8 *RAM = state->memregion("z80ne")->base();
-	state->membank("bank1")->configure_entry(0, &RAM[0x00000]); /* RAM   at 0x0000-0x03FF */
-	state->membank("bank1")->configure_entries(1, 3, &RAM[0x14400], 0x0400); /* ep390, ep1390, ep2390 at 0x0000-0x03FF */
-	state->membank("bank1")->configure_entry(4, &RAM[0x14000]); /* ep382 at 0x0000-0x03FF */
-	state->membank("bank1")->configure_entry(5, &RAM[0x10000]); /* ep548 at 0x0000-0x03FF */
+	UINT8 *RAM = memregion("z80ne")->base();
+	membank("bank1")->configure_entry(0, &RAM[0x00000]); /* RAM   at 0x0000-0x03FF */
+	membank("bank1")->configure_entries(1, 3, &RAM[0x14400], 0x0400); /* ep390, ep1390, ep2390 at 0x0000-0x03FF */
+	membank("bank1")->configure_entry(4, &RAM[0x14000]); /* ep382 at 0x0000-0x03FF */
+	membank("bank1")->configure_entry(5, &RAM[0x10000]); /* ep548 at 0x0000-0x03FF */
 
-	state->membank("bank2")->configure_entry(0, &RAM[0x00400]); /* RAM   at 0x0400 */
-	state->membank("bank2")->configure_entry(1, &RAM[0x10400]); /* ep548 at 0x0400-0x3FFF */
+	membank("bank2")->configure_entry(0, &RAM[0x00400]); /* RAM   at 0x0400 */
+	membank("bank2")->configure_entry(1, &RAM[0x10400]); /* ep548 at 0x0400-0x3FFF */
 
-	state->membank("bank3")->configure_entry(0, &RAM[0x08000]); /* RAM   at 0x8000 */
-	state->membank("bank3")->configure_entry(1, &RAM[0x14000]); /* ep382 at 0x8000 */
+	membank("bank3")->configure_entry(0, &RAM[0x08000]); /* RAM   at 0x8000 */
+	membank("bank3")->configure_entry(1, &RAM[0x14000]); /* ep382 at 0x8000 */
 
-	state->membank("bank4")->configure_entry(0, &RAM[0x0F000]); /* RAM   at 0xF000 */
-	state->membank("bank4")->configure_entries(1, 3, &RAM[0x14400], 0x0400); /* ep390, ep1390, ep2390 at 0xF000 */
+	membank("bank4")->configure_entry(0, &RAM[0x0F000]); /* RAM   at 0xF000 */
+	membank("bank4")->configure_entries(1, 3, &RAM[0x14400], 0x0400); /* ep390, ep1390, ep2390 at 0xF000 */
 
 }
 

@@ -94,6 +94,7 @@ public:
 	DECLARE_READ8_MEMBER(pcw9512_parallel_r);
 	DECLARE_WRITE8_MEMBER(pcw9512_parallel_w);
 	void mcu_transmit_serial(UINT8 bit);
+	DECLARE_DRIVER_INIT(pcw);
 };
 
 

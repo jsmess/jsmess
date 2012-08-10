@@ -58,6 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(rset_callback);
 	DECLARE_WRITE8_MEMBER(ckon_ckof_callback);
 	DECLARE_WRITE8_MEMBER(lrex_callback);
+	DECLARE_DRIVER_INIT(ti990_4);
 };
 
 
@@ -330,12 +331,12 @@ ROM_START(ti990_4)
 
 ROM_END
 
-static DRIVER_INIT( ti990_4 )
+DRIVER_INIT_MEMBER(ti990_4_state,ti990_4)
 {
 #if VIDEO_911
-	vdt911_init(machine);
+	vdt911_init(machine());
 #else
-	asr733_init(machine);
+	asr733_init(machine());
 #endif
 }
 

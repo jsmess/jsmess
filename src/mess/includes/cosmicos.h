@@ -120,6 +120,7 @@ public:
 	int m_dmaout;
 	int m_efx;
 	int m_video_on;
+	DECLARE_DRIVER_INIT(cosmicos);
 };
 
 #endif

@@ -188,6 +188,7 @@ public:
 	DECLARE_READ8_MEMBER(vk100_keyboard_column_r);
 	DECLARE_READ8_MEMBER(SYSTAT_A);
 	DECLARE_READ8_MEMBER(SYSTAT_B);
+	DECLARE_DRIVER_INIT(vk100);
 };
 
 // vram access functions:
@@ -856,13 +857,13 @@ static WRITE_LINE_DEVICE_HANDLER(i8251_rts)
 	m_state->m_ACTS = state;
 }
 
-static DRIVER_INIT( vk100 )
+DRIVER_INIT_MEMBER(vk100_state,vk100)
 {
 	// figure out how the heck to initialize the timers here
 	//m_i8251_rx_timer = timer_alloc(TID_I8251_RX);
 	//m_i8251_tx_timer = timer_alloc(TID_I8251_TX);
 	//m_i8251_sync_timer = timer_alloc(TID_SYNC);
-	//machine.scheduler().timer_set(attotime::from_hz(10000), FUNC(i8251_rx_clk));
+	//machine().scheduler().timer_set(attotime::from_hz(10000), FUNC(i8251_rx_clk));
 }
 
 static VIDEO_START( vk100 )

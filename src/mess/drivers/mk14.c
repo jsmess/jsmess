@@ -165,4 +165,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY              FULLNAME     FLAGS */
-COMP( 1977, mk14,  0,       0,      mk14,      mk14, mk14_state,      0, "Science of Cambridge", "MK-14", GAME_NO_SOUND)
+COMP( 1977, mk14,  0,       0,      mk14,      mk14, driver_device,      0, "Science of Cambridge", "MK-14", GAME_NO_SOUND)

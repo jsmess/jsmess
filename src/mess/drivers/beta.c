@@ -291,4 +291,4 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY    FULLNAME    FLAGS */
-COMP( 1984, beta,   0,      0,      beta,   beta, beta_state,   0,    "Pitronics", "Beta", GAME_SUPPORTS_SAVE )
+COMP( 1984, beta,   0,      0,      beta,   beta, driver_device,   0,    "Pitronics", "Beta", GAME_SUPPORTS_SAVE )

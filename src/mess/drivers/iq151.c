@@ -96,6 +96,7 @@ public:
 	UINT8 m_cassette_clk;
 	UINT8 m_cassette_data;
 	iq151cart_slot_device * m_carts[5];
+	DECLARE_DRIVER_INIT(iq151);
 };
 
 READ8_MEMBER(iq151_state::keyboard_row_r)
@@ -344,22 +345,21 @@ static TIMER_DEVICE_CALLBACK( cassette_timer )
 	state->m_cassette->output((state->m_cassette_data & 1) ^ (state->m_cassette_clk & 1) ? +1 : -1);
 }
 
-DRIVER_INIT( iq151 )
+DRIVER_INIT_MEMBER(iq151_state,iq151)
 {
-	iq151_state *state = machine.driver_data<iq151_state>();
 
-	UINT8 *RAM = state->memregion("maincpu")->base();
-	state->membank("boot")->configure_entry(0, RAM + 0xf800);
-	state->membank("boot")->configure_entry(1, RAM + 0x0000);
+	UINT8 *RAM = memregion("maincpu")->base();
+	membank("boot")->configure_entry(0, RAM + 0xf800);
+	membank("boot")->configure_entry(1, RAM + 0x0000);
 
-	device_set_irq_callback(state->m_maincpu, iq151_irq_callback);
+	device_set_irq_callback(m_maincpu, iq151_irq_callback);
 
 	// keep machine pointers to slots
-	state->m_carts[0] = machine.device<iq151cart_slot_device>("slot1");
-	state->m_carts[1] = machine.device<iq151cart_slot_device>("slot2");
-	state->m_carts[2] = machine.device<iq151cart_slot_device>("slot3");
-	state->m_carts[3] = machine.device<iq151cart_slot_device>("slot4");
-	state->m_carts[4] = machine.device<iq151cart_slot_device>("slot5");
+	m_carts[0] = machine().device<iq151cart_slot_device>("slot1");
+	m_carts[1] = machine().device<iq151cart_slot_device>("slot2");
+	m_carts[2] = machine().device<iq151cart_slot_device>("slot3");
+	m_carts[3] = machine().device<iq151cart_slot_device>("slot4");
+	m_carts[4] = machine().device<iq151cart_slot_device>("slot5");
 }
 
 MACHINE_RESET_MEMBER( iq151_state )

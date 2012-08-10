@@ -25,23 +25,21 @@ void radio86_init_keyboard(running_machine &machine)
 }
 
 /* Driver initialization */
-DRIVER_INIT(radio86)
+DRIVER_INIT_MEMBER(radio86_state,radio86)
 {
-	radio86_state *state = machine.driver_data<radio86_state>();
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = state->memregion("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	memset(RAM,0x0000,0x1000); // make frist page empty by default
-	state->membank("bank1")->configure_entries(1, 2, RAM, 0x0000);
-	state->membank("bank1")->configure_entries(0, 2, RAM, 0xf800);
-	radio86_init_keyboard(machine);
+	membank("bank1")->configure_entries(1, 2, RAM, 0x0000);
+	membank("bank1")->configure_entries(0, 2, RAM, 0xf800);
+	radio86_init_keyboard(machine());
 }
 
-DRIVER_INIT(radioram)
+DRIVER_INIT_MEMBER(radio86_state,radioram)
 {
-	radio86_state *state = machine.driver_data<radio86_state>();
 	DRIVER_INIT_CALL(radio86);
-	state->m_radio_ram_disk = auto_alloc_array(machine, UINT8, 0x20000);
-	memset(state->m_radio_ram_disk,0,0x20000);
+	m_radio_ram_disk = auto_alloc_array(machine(), UINT8, 0x20000);
+	memset(m_radio_ram_disk,0,0x20000);
 }
 static READ8_DEVICE_HANDLER (radio86_8255_portb_r2 )
 {

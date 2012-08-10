@@ -35,6 +35,7 @@ public:
 	/* keyboard state */
 	int m_keylatch;
 	int m_keyclk;
+	DECLARE_DRIVER_INIT(vcs80);
 };
 
 #endif

@@ -51,12 +51,12 @@ public:
 	required_shared_ptr<const UINT8> m_p_ram;
 	const UINT8 *m_p_chargen;
 	required_shared_ptr<const UINT8> m_p_videoram;
+	DECLARE_DRIVER_INIT(mz80k);
 };
 
 
 /*----------- defined in machine/mz80.c -----------*/
 
-extern DRIVER_INIT( mz80k );
 extern MACHINE_RESET( mz80k );
 extern const i8255_interface mz80k_8255_int;
 extern const struct pit8253_config mz80k_pit8253_config;

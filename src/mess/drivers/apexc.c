@@ -27,6 +27,7 @@ public:
 
 	int m_letters;
 	int m_pos;
+	DECLARE_DRIVER_INIT(apexc);
 };
 
 
@@ -724,7 +725,7 @@ enum
 };
 
 /* apexc driver init : builds a font for use by the teletyper */
-static DRIVER_INIT(apexc)
+DRIVER_INIT_MEMBER(apexc_state,apexc)
 {
 	UINT8 *dst;
 
@@ -820,7 +821,7 @@ static DRIVER_INIT(apexc)
 		0x00
 	};
 
-	dst = machine.root_device().memregion("chargen")->base();
+	dst = machine().root_device().memregion("chargen")->base();
 
 	memcpy(dst, fontdata6x8, apexcfontdata_size);
 }
@@ -900,5 +901,5 @@ ROM_START(apexc)
 ROM_END
 
 //     YEAR     NAME        PARENT    COMPAT  MACHINE     INPUT   INIT  COMPANY     FULLNAME */
-//COMP(  1951,    apexc53,    0,        0,      apexc53,    apexc, XXX_CLASS,  apexc, "Andrew Donald Booth", "All Purpose Electronic X-ray Computer (as described in 1953)" , GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+//COMP(  1951,    apexc53,    0,        0,      apexc53,    apexc, apexc_state,  apexc, "Andrew Donald Booth", "All Purpose Electronic X-ray Computer (as described in 1953)" , GAME_NOT_WORKING | GAME_NO_SOUND_HW)
 COMP(  1955,    apexc,      0,        0,      apexc,      apexc, apexc_state,  apexc, "Andrew Donald Booth", "All Purpose Electronic X-ray Computer (as described in 1957)" , GAME_NO_SOUND_HW)

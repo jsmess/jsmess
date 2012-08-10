@@ -716,24 +716,23 @@ const applefdc_interface apple3_fdc_interface =
 
 
 
-DRIVER_INIT( apple3 )
+DRIVER_INIT_MEMBER(apple3_state,apple3)
 {
-	apple3_state *state = machine.driver_data<apple3_state>();
 	/* hack to get around VIA problem */
-	state->memregion("maincpu")->base()[0x0685] = 0x00;
+	memregion("maincpu")->base()[0x0685] = 0x00;
 
-	state->m_enable_mask = 0;
-	apple3_update_drives(machine.device("fdc"));
+	m_enable_mask = 0;
+	apple3_update_drives(machine().device("fdc"));
 
-	AY3600_init(machine);
+	AY3600_init(machine());
 
 	apple3_profile_init();
 
-	state->m_flags = 0;
-	state->m_via_0_a = ~0;
-	state->m_via_1_a = ~0;
-	state->m_via_1_irq = 0;
-	apple3_update_memory(machine);
+	m_flags = 0;
+	m_via_0_a = ~0;
+	m_via_1_a = ~0;
+	m_via_1_irq = 0;
+	apple3_update_memory(machine());
 
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(apple3_state::apple3_opbase), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(apple3_state::apple3_opbase), this));
 }

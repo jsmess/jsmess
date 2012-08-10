@@ -856,5 +856,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY           FULLNAME                FLAGS
-COMP( 1981, mm1m6,		0,		0,		mm1m6,		mm1, mm1_state,		0,		"Nokia Data",		"MikroMikko 1 M6",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
-COMP( 1981, mm1m7,		mm1m6,	0,		mm1m6,		mm1, mm1_state,		0,		"Nokia Data",		"MikroMikko 1 M7",		GAME_NOT_WORKING)
+COMP( 1981, mm1m6,		0,		0,		mm1m6,		mm1, driver_device,		0,		"Nokia Data",		"MikroMikko 1 M6",		GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND)
+COMP( 1981, mm1m7,		mm1m6,	0,		mm1m6,		mm1, driver_device,		0,		"Nokia Data",		"MikroMikko 1 M7",		GAME_NOT_WORKING)

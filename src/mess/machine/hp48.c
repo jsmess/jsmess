@@ -1090,20 +1090,19 @@ void hp48_port_image_device::device_config_complete()
     MACHINES
 ***************************************************************************/
 
-DRIVER_INIT( hp48 )
+DRIVER_INIT_MEMBER(hp48_state,hp48)
 {
-	hp48_state *state = machine.driver_data<hp48_state>();
 	int i;
 	LOG(( "hp48: driver init called\n" ));
 	for ( i = 0; i < 6; i++ )
 	{
-		state->m_modules[i].off_mask = 0x00fff;  /* 2 KB */
-		state->m_modules[i].read     = NULL;
-		state->m_modules[i].write    = NULL;
-		state->m_modules[i].data     = NULL;
+		m_modules[i].off_mask = 0x00fff;  /* 2 KB */
+		m_modules[i].read     = NULL;
+		m_modules[i].write    = NULL;
+		m_modules[i].data     = NULL;
 	}
-	state->m_port_size[0] = 0;
-	state->m_port_size[1] = 0;
+	m_port_size[0] = 0;
+	m_port_size[1] = 0;
 }
 
 MACHINE_RESET( hp48 )

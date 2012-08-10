@@ -10,7 +10,7 @@
 
 
 /* Driver initialization */
-DRIVER_INIT(sapi1)
+DRIVER_INIT_MEMBER(sapi1_state,sapi1)
 {
 }
 
@@ -48,9 +48,8 @@ MACHINE_RESET( sapizps3 )
 	state->membank("bank1")->set_entry(1);
 }
 
-DRIVER_INIT( sapizps3 )
+DRIVER_INIT_MEMBER(sapi1_state,sapizps3)
 {
-	sapi1_state *state = machine.driver_data<sapi1_state>();
-	UINT8 *RAM = state->memregion("maincpu")->base();
-	state->membank("bank1")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
+	UINT8 *RAM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 }

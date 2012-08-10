@@ -24,6 +24,8 @@ public:
 	UINT8 m_outb;
 	int m_power;
 	UINT8 m_reg[0x100];
+
+	DECLARE_DRIVER_INIT(pc1251);
 };
 
 
@@ -38,7 +40,6 @@ int pc1251_brk(device_t *device);
 int pc1251_ina(device_t *device);
 int pc1251_inb(device_t *device);
 
-DRIVER_INIT( pc1251 );
 MACHINE_START( pc1251 );
 
 

@@ -366,16 +366,14 @@ static MACHINE_RESET( spectrum_plus3 )
 	spectrum_plus3_update_memory(machine);
 }
 
-static DRIVER_INIT( plus3 )
+DRIVER_INIT_MEMBER(spectrum_state,plus3)
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
-	state->m_floppy = 1;
+	m_floppy = 1;
 }
 
-static DRIVER_INIT( plus2 )
+DRIVER_INIT_MEMBER(spectrum_state,plus2)
 {
-	spectrum_state *state = machine.driver_data<spectrum_state>();
-	state->m_floppy = 0;
+	m_floppy = 0;
 }
 
 static const floppy_interface specpls3_floppy_interface =

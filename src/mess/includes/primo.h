@@ -28,14 +28,14 @@ public:
 	DECLARE_WRITE8_MEMBER(primo_ki_1_w);
 	DECLARE_WRITE8_MEMBER(primo_ki_2_w);
 	DECLARE_WRITE8_MEMBER(primo_FD_w);
+	DECLARE_DRIVER_INIT(primo48);
+	DECLARE_DRIVER_INIT(primo64);
+	DECLARE_DRIVER_INIT(primo32);
 };
 
 
 /*----------- defined in machine/primo.c -----------*/
 
-extern DRIVER_INIT ( primo32 );
-extern DRIVER_INIT ( primo48 );
-extern DRIVER_INIT ( primo64 );
 extern MACHINE_RESET( primoa );
 extern MACHINE_RESET( primob );
 extern INTERRUPT_GEN( primo_vblank_interrupt );

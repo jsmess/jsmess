@@ -88,4 +88,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-COMP( 1986, mk85,   0,      0,       mk85,      mk85, mk85_state,    0,   "Elektronika", "MK-85", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1986, mk85,   0,      0,       mk85,      mk85, driver_device,    0,   "Elektronika", "MK-85", GAME_NOT_WORKING | GAME_NO_SOUND)

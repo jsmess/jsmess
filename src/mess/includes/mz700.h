@@ -74,6 +74,8 @@ public:
 	DECLARE_WRITE8_MEMBER(mz800_ramaddr_w);
 	DECLARE_WRITE8_MEMBER(mz800_palette_w);
 	DECLARE_WRITE8_MEMBER(mz800_cgram_w);
+	DECLARE_DRIVER_INIT(mz800);
+	DECLARE_DRIVER_INIT(mz700);
 };
 
 
@@ -84,8 +86,6 @@ extern const struct pit8253_config mz800_pit8253_config;
 extern const i8255_interface mz700_ppi8255_interface;
 extern const z80pio_interface mz800_z80pio_config;
 
-DRIVER_INIT( mz700 );
-DRIVER_INIT( mz800 );
 MACHINE_START( mz700 );
 
 /* bank switching */

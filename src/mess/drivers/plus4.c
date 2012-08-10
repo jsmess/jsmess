@@ -1309,11 +1309,11 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT                    COMPANY                         FULLNAME                        FLAGS
-COMP( 1983, c264,	0,		0,		ntsc,	plus4,	plus4_state,	0,		"Commodore Business Machines",	"Commodore 264 (Prototype)",	GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-COMP( 1984, plus4n,	c264,	0,		ntsc,	plus4,	plus4_state,	0,		"Commodore Business Machines",	"Plus/4 (NTSC)",				GAME_SUPPORTS_SAVE )
-COMP( 1984, plus4p,	c264,	0,		pal,	plus4,	plus4_state,	0,		"Commodore Business Machines",	"Plus/4 (PAL)",					GAME_SUPPORTS_SAVE )
-COMP( 1984, c16,	c264,	0,		c16,	c16,	plus4_state,	0,		"Commodore Business Machines",	"Commodore 16",					GAME_SUPPORTS_SAVE )
-COMP( 1984, c16h,	c264,	0,		c16,	c16,	plus4_state,	0,		"Commodore Business Machines",	"Commodore 16 (Hungary)",		GAME_SUPPORTS_SAVE )
-COMP( 1984, c116,	c264,	0,		c16,	c16,	plus4_state,	0,		"Commodore Business Machines",	"Commodore 116",				GAME_SUPPORTS_SAVE )
-COMP( 1984, c232,	c264,	0,		c232,	plus4,	plus4_state,	0,		"Commodore Business Machines",	"Commodore 232 (Prototype)",	GAME_SUPPORTS_SAVE )
-COMP( 1985, v364,	c264,	0,		v364,	plus4,	plus4_state,	0,		"Commodore Business Machines",	"Commodore V364 (Prototype)",	GAME_SUPPORTS_SAVE )
+COMP( 1983, c264,	0,		0,		ntsc,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Commodore 264 (Prototype)",	GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+COMP( 1984, plus4n,	c264,	0,		ntsc,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Plus/4 (NTSC)",				GAME_SUPPORTS_SAVE )
+COMP( 1984, plus4p,	c264,	0,		pal,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Plus/4 (PAL)",					GAME_SUPPORTS_SAVE )
+COMP( 1984, c16,	c264,	0,		c16,	c16,	driver_device,	0,		"Commodore Business Machines",	"Commodore 16",					GAME_SUPPORTS_SAVE )
+COMP( 1984, c16h,	c264,	0,		c16,	c16,	driver_device,	0,		"Commodore Business Machines",	"Commodore 16 (Hungary)",		GAME_SUPPORTS_SAVE )
+COMP( 1984, c116,	c264,	0,		c16,	c16,	driver_device,	0,		"Commodore Business Machines",	"Commodore 116",				GAME_SUPPORTS_SAVE )
+COMP( 1984, c232,	c264,	0,		c232,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Commodore 232 (Prototype)",	GAME_SUPPORTS_SAVE )
+COMP( 1985, v364,	c264,	0,		v364,	plus4,	driver_device,	0,		"Commodore Business Machines",	"Commodore V364 (Prototype)",	GAME_SUPPORTS_SAVE )

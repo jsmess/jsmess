@@ -1452,20 +1452,19 @@ MACHINE_CONFIG_FRAGMENT( bsx_cartslot )
 //  MCFG_SOFTWARE_LIST_ADD("cart_list","snes")
 MACHINE_CONFIG_END
 
-DRIVER_INIT( snes_mess )
+DRIVER_INIT_MEMBER(snes_state,snes_mess)
 {
-	snes_ram = machine.root_device().memregion("maincpu")->base();
+	snes_ram = machine().root_device().memregion("maincpu")->base();
 	memset(snes_ram, 0, 0x1000000);
 }
 
-DRIVER_INIT( snesst )
+DRIVER_INIT_MEMBER(snes_state,snesst)
 {
-	snes_state *state = machine.driver_data<snes_state>();
-	UINT8 *STBIOS = state->memregion("sufami")->base();
+	UINT8 *STBIOS = memregion("sufami")->base();
 	int i, j;
 
-	state->m_cart[0].slot_in_use = 0;
-	state->m_cart[1].slot_in_use = 0;
+	m_cart[0].slot_in_use = 0;
+	m_cart[1].slot_in_use = 0;
 
 	DRIVER_INIT_CALL(snes_mess);
 

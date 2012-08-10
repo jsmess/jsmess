@@ -167,4 +167,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT  COMPANY                 FULLNAME   FLAGS */
-COMP( 1981, galeb,     0,      0,	galeb,	galeb, galeb_state,	0, "PEL Varazdin", "Galeb",		 0)
+COMP( 1981, galeb,     0,      0,	galeb,	galeb, driver_device,	0, "PEL Varazdin", "Galeb",		 0)

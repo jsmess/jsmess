@@ -44,6 +44,7 @@ public:
 	UINT8 *m_videoram;
 	playfield_t m_playfield;
 	lcd_t m_lcd;
+	DECLARE_DRIVER_INIT(ssystem3);
 };
 
 

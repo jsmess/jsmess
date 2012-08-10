@@ -755,7 +755,7 @@ ROM_END
 //  ROM( ntsc )
 //-------------------------------------------------
 
-static DRIVER_INIT( ntsc )
+DRIVER_INIT_MEMBER(m5_state,ntsc)
 {
 }
 
@@ -764,7 +764,7 @@ static DRIVER_INIT( ntsc )
 //  ROM( pal )
 //-------------------------------------------------
 
-static DRIVER_INIT( pal )
+DRIVER_INIT_MEMBER(m5_state,pal)
 {
 }
 

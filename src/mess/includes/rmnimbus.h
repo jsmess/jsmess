@@ -220,6 +220,7 @@ public:
 	DECLARE_WRITE8_MEMBER(nimbus_mouse_js_w);
 	DECLARE_READ16_MEMBER(nimbus_video_io_r);
 	DECLARE_WRITE16_MEMBER(nimbus_video_io_w);
+	DECLARE_DRIVER_INIT(nimbus);
 };
 
 
@@ -230,7 +231,6 @@ extern const unsigned char nimbus_palette[SCREEN_NO_COLOURS][3];
 
 /*----------- defined in machine/rmnimbus.c -----------*/
 
-DRIVER_INIT(nimbus);
 MACHINE_RESET(nimbus);
 MACHINE_START(nimbus);
 

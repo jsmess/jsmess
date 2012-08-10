@@ -423,5 +423,5 @@ ROM_START(tecjmon)
 ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT       COMPANY                     FULLNAME */
-COMP( 1984, tec1,     0,      0,      tec1,       tec1, tec1_state,    0,    "Talking Electronics magazine",  "TEC-1" , 0 )
-COMP( 1984, tecjmon,  tec1,   0,      tecjmon,    tec1, tec1_state,    0,    "Talking Electronics magazine",  "TEC-1A with JMON" , 0 )
+COMP( 1984, tec1,     0,      0,      tec1,       tec1, driver_device,    0,    "Talking Electronics magazine",  "TEC-1" , 0 )
+COMP( 1984, tecjmon,  tec1,   0,      tecjmon,    tec1, driver_device,    0,    "Talking Electronics magazine",  "TEC-1A with JMON" , 0 )

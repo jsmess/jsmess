@@ -730,16 +730,16 @@ ROM_END
 
 ***************************************************************************/
 
-static DRIVER_INIT( arcadia )
+DRIVER_INIT_MEMBER(arcadia_state,arcadia)
 {
 	int i;
-	UINT8 *gfx=machine.root_device().memregion("gfx1")->base();
+	UINT8 *gfx=machine().root_device().memregion("gfx1")->base();
 	for (i=0; i<256; i++) gfx[i]=i;
 #if 0
 	// this is here to allow developement of some simple testroutines
 	// for a real console
 	{
-		UINT8 *rom=machine.root_device().memregion("maincpu")->base();
+		UINT8 *rom=machine().root_device().memregion("maincpu")->base();
 		/* this is a simple routine to display all rom characters
            on the display for a snapshot */
 		static const UINT8 prog[]={ // address 0 of course

@@ -11,10 +11,9 @@
 
 
 /* Driver initialization */
-DRIVER_INIT(irisha)
+DRIVER_INIT_MEMBER(irisha_state,irisha)
 {
-	irisha_state *state = machine.driver_data<irisha_state>();
-	state->m_keyboard_mask = 0;
+	m_keyboard_mask = 0;
 }
 
 

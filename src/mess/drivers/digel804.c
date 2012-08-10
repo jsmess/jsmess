@@ -126,6 +126,7 @@ public:
 	UINT8 m_powerfail_state;
 	UINT8 m_chipinsert_state;
 	UINT8 m_op41;
+	DECLARE_DRIVER_INIT(digel804);
 };
 
 /*
@@ -161,27 +162,26 @@ static TIMER_CALLBACK( ep804_kbd_callback )
 	}
 }
 
-static DRIVER_INIT( digel804 )
+DRIVER_INIT_MEMBER(digel804_state,digel804)
 {
-	digel804_state *state = machine.driver_data<digel804_state>();
-	state->vfd_old = state->vfd_data = state->vfd_count = 0;
-	state->m_speaker_state = 0;
-	//state->port43_rtn = 0xEE;//0xB6;
-	state->m_kbd = 0;
-	state->m_kbd_row = 0;
-	state->m_acia_intq = 1; // /INT source 1
-	state->m_overload_state = 0; // OVLD
-	state->m_debug_x5_state = 1; // "/DEBUG"
-	state->m_key_intq = 1; // /INT source 2
-	state->m_remote_mode = 1; // /REM
-	state->m_key_mode = 0; // /KEY
-	state->m_sim_mode = 1; // /SIM
-	state->m_powerfail_state = 1; // "O11"
-	state->m_chipinsert_state = 0; // PIN
-	state->m_ram_bank = 0;
-	state->m_op41 = 0;
-	state->membank( "bankedram" )->set_base( state->memregion("user_ram")->base() + ( state->m_ram_bank * 0x10000 ));
-	machine.scheduler().timer_set(attotime::from_hz(10000), FUNC(ep804_kbd_callback));
+	vfd_old = vfd_data = vfd_count = 0;
+	m_speaker_state = 0;
+	//port43_rtn = 0xEE;//0xB6;
+	m_kbd = 0;
+	m_kbd_row = 0;
+	m_acia_intq = 1; // /INT source 1
+	m_overload_state = 0; // OVLD
+	m_debug_x5_state = 1; // "/DEBUG"
+	m_key_intq = 1; // /INT source 2
+	m_remote_mode = 1; // /REM
+	m_key_mode = 0; // /KEY
+	m_sim_mode = 1; // /SIM
+	m_powerfail_state = 1; // "O11"
+	m_chipinsert_state = 0; // PIN
+	m_ram_bank = 0;
+	m_op41 = 0;
+	membank( "bankedram" )->set_base( memregion("user_ram")->base() + ( m_ram_bank * 0x10000 ));
+	machine().scheduler().timer_set(attotime::from_hz(10000), FUNC(ep804_kbd_callback));
 }
 
 static MACHINE_RESET( digel804 )

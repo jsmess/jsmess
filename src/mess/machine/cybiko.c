@@ -45,22 +45,22 @@ static void init_ram_handler(running_machine &machine, offs_t start, offs_t size
 	machine.root_device().membank( "bank1" )->set_base( machine.device<ram_device>(RAM_TAG)->pointer());
 }
 
-DRIVER_INIT( cybikov1 )
+DRIVER_INIT_MEMBER(cybiko_state,cybikov1)
 {
 	_logerror( 0, ("init_cybikov1\n"));
-	init_ram_handler(machine, 0x200000, machine.device<ram_device>(RAM_TAG)->size(), 0x200000);
+	init_ram_handler(machine(), 0x200000, machine().device<ram_device>(RAM_TAG)->size(), 0x200000);
 }
 
-DRIVER_INIT( cybikov2 )
+DRIVER_INIT_MEMBER(cybiko_state,cybikov2)
 {
 	_logerror( 0, ("init_cybikov2\n"));
-	init_ram_handler(machine, 0x200000, machine.device<ram_device>(RAM_TAG)->size(), 0x200000);
+	init_ram_handler(machine(), 0x200000, machine().device<ram_device>(RAM_TAG)->size(), 0x200000);
 }
 
-DRIVER_INIT( cybikoxt )
+DRIVER_INIT_MEMBER(cybiko_state,cybikoxt)
 {
 	_logerror( 0, ("init_cybikoxt\n"));
-	init_ram_handler(machine, 0x400000, machine.device<ram_device>(RAM_TAG)->size(), 0x200000);
+	init_ram_handler(machine(), 0x400000, machine().device<ram_device>(RAM_TAG)->size(), 0x200000);
 }
 
 ///////////////////

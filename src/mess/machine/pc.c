@@ -1301,35 +1301,35 @@ void mess_init_pc_common(running_machine &machine, UINT32 flags, void (*set_keyb
 }
 
 
-DRIVER_INIT( ibm5150 )
+DRIVER_INIT_MEMBER(pc_state,ibm5150)
 {
-	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
-	pc_rtc_init(machine);
+	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
+	pc_rtc_init(machine());
 }
 
 
-DRIVER_INIT( pccga )
+DRIVER_INIT_MEMBER(pc_state,pccga)
 {
-	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
-	pc_rtc_init(machine);
+	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
+	pc_rtc_init(machine());
 }
 
 
-DRIVER_INIT( bondwell )
+DRIVER_INIT_MEMBER(pc_state,bondwell)
 {
-	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
-	pc_turbo_setup(machine, machine.firstcpu, "DSW2", 0x02, 4.77/12, 1);
+	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, NULL, pc_set_irq_line);
+	pc_turbo_setup(machine(), machine().firstcpu, "DSW2", 0x02, 4.77/12, 1);
 }
 
-DRIVER_INIT( pcmda )
+DRIVER_INIT_MEMBER(pc_state,pcmda)
 {
-	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 
-DRIVER_INIT( europc )
+DRIVER_INIT_MEMBER(pc_state,europc)
 {
-	UINT8 *gfx = &machine.root_device().memregion("gfx1")->base()[0x8000];
-	UINT8 *rom = &machine.root_device().memregion("maincpu")->base()[0];
+	UINT8 *gfx = &machine().root_device().memregion("gfx1")->base()[0x8000];
+	UINT8 *rom = &machine().root_device().memregion("maincpu")->base()[0];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
@@ -1347,82 +1347,82 @@ DRIVER_INIT( europc )
 		rom[0xfffff]=256-a;
 	}
 
-	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 
-	europc_rtc_init(machine);
-//  europc_rtc_set_time(machine);
+	europc_rtc_init(machine());
+//  europc_rtc_set_time(machine());
 }
 
-DRIVER_INIT( t1000hx )
+DRIVER_INIT_MEMBER(pc_state,t1000hx)
 {
-	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
-	pc_turbo_setup(machine, machine.firstcpu, "DSW2", 0x02, 4.77/12, 1);
+	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	pc_turbo_setup(machine(), machine().firstcpu, "DSW2", 0x02, 4.77/12, 1);
 }
 
-DRIVER_INIT( pc200 )
+DRIVER_INIT_MEMBER(pc_state,pc200)
 {
-	UINT8 *gfx = &machine.root_device().memregion("gfx1")->base()[0x8000];
+	UINT8 *gfx = &machine().root_device().memregion("gfx1")->base()[0x8000];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
     for (i = 0; i < 256; i++)
 		gfx[i] = i;
 
-	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 
-DRIVER_INIT( ppc512 )
+DRIVER_INIT_MEMBER(pc_state,ppc512)
 {
-	UINT8 *gfx = &machine.root_device().memregion("gfx1")->base()[0x8000];
+	UINT8 *gfx = &machine().root_device().memregion("gfx1")->base()[0x8000];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
     for (i = 0; i < 256; i++)
 		gfx[i] = i;
 
-	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
-DRIVER_INIT( pc1512 )
+DRIVER_INIT_MEMBER(pc_state,pc1512)
 {
-	UINT8 *gfx = &machine.root_device().memregion("gfx1")->base()[0x8000];
+	UINT8 *gfx = &machine().root_device().memregion("gfx1")->base()[0x8000];
 	int i;
 
     /* just a plain bit pattern for graphics data generation */
     for (i = 0; i < 256; i++)
 		gfx[i] = i;
 
-	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 
 
-DRIVER_INIT( pcjr )
+DRIVER_INIT_MEMBER(pc_state,pcjr)
 {
-	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pcjr_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pcjr_set_keyb_int, pc_set_irq_line);
 }
 
-DRIVER_INIT( mc1502 )
+DRIVER_INIT_MEMBER(pc_state,mc1502)
 {
-	mess_init_pc_common(machine, 0, NULL, pc_set_irq_line);
+	mess_init_pc_common(machine(), 0, NULL, pc_set_irq_line);
 }
 
 static READ8_HANDLER( input_port_0_r ) { return space->machine().root_device().ioport("IN0")->read(); }
 
-DRIVER_INIT( pc1640 )
+DRIVER_INIT_MEMBER(pc_state,pc1640)
 {
-	address_space *io_space = machine.firstcpu->memory().space( AS_IO );
+	address_space *io_space = machine().firstcpu->memory().space( AS_IO );
 
 	io_space->install_legacy_read_handler(0x278, 0x27b, FUNC(pc1640_port278_r), 0xffff);
 	io_space->install_legacy_read_handler(0x4278, 0x427b, FUNC(pc1640_port4278_r), 0xffff);
 
-	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 }
 
-DRIVER_INIT( pc_vga )
+DRIVER_INIT_MEMBER(pc_state,pc_vga)
 {
-	mess_init_pc_common(machine, PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
+	mess_init_pc_common(machine(), PCCOMMON_KEYBOARD_PC, pc_set_keyb_int, pc_set_irq_line);
 
-	pc_vga_init(machine, input_port_0_r, NULL);
-	pc_vga_io_init(machine, machine.device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine.device("maincpu")->memory().space(AS_IO), 0x0000);
+	pc_vga_init(machine(), ::input_port_0_r, NULL);
+	pc_vga_io_init(machine(), machine().device("maincpu")->memory().space(AS_PROGRAM), 0xa0000, machine().device("maincpu")->memory().space(AS_IO), 0x0000);
 }
 
 static IRQ_CALLBACK(pc_irq_callback)

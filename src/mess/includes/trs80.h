@@ -105,6 +105,11 @@ public:
 	UINT16 m_start_address;
 	UINT8 m_crtc_reg;
 	UINT8 m_size_store;
+	DECLARE_DRIVER_INIT(trs80m4);
+	DECLARE_DRIVER_INIT(trs80l2);
+	DECLARE_DRIVER_INIT(trs80m4p);
+	DECLARE_DRIVER_INIT(lnw80);
+	DECLARE_DRIVER_INIT(trs80);
 };
 
 

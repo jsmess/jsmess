@@ -658,4 +658,4 @@ ROM_START( ssem )
 ROM_END
 
 /*   YEAR  NAME     PARENT    COMPAT   MACHINE  INPUT  INIT        COMPANY                       FULLNAME */
-COMP(1948, ssem,    0,        0,       ssem,    ssem, ssem_state,  0,   "Manchester University", "Small-Scale Experimental Machine (SSEM), 'Baby'", GAME_NO_SOUND_HW )
+COMP(1948, ssem,    0,        0,       ssem,    ssem, driver_device,  0,   "Manchester University", "Small-Scale Experimental Machine (SSEM), 'Baby'", GAME_NO_SOUND_HW )

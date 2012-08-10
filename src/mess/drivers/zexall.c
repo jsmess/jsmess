@@ -48,15 +48,15 @@ public:
 	UINT8 m_out_req; // byte written to 0xFFFE
 	UINT8 m_out_req_last; // old value at 0xFFFE before the most recent write
 	UINT8 m_out_ack; // byte written to 0xFFFC
+	DECLARE_DRIVER_INIT(zexall);
 };
 
-static DRIVER_INIT( zexall )
+DRIVER_INIT_MEMBER(zexall_state,zexall)
 {
-	zexall_state *state = machine.driver_data<zexall_state>();
-	state->m_out_ack = 0;
-	state->m_out_req = 0;
-	state->m_out_req_last = 0;
-	state->m_out_data = 0;
+	m_out_ack = 0;
+	m_out_req = 0;
+	m_out_req_last = 0;
+	m_out_data = 0;
 }
 
 static MACHINE_RESET( zexall )

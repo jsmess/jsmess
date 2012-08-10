@@ -14,22 +14,20 @@
 #include "includes/mikro80.h"
 
 /* Driver initialization */
-DRIVER_INIT(mikro80)
+DRIVER_INIT_MEMBER(mikro80_state,mikro80)
 {
-	mikro80_state *state = machine.driver_data<mikro80_state>();
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = state->memregion("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	memset(RAM,0x0000,0x0800); // make frist page empty by default
-	state->membank("bank1")->configure_entries(1, 2, RAM, 0x0000);
-	state->membank("bank1")->configure_entries(0, 2, RAM, 0xf800);
-	state->m_key_mask = 0x7f;
+	membank("bank1")->configure_entries(1, 2, RAM, 0x0000);
+	membank("bank1")->configure_entries(0, 2, RAM, 0xf800);
+	m_key_mask = 0x7f;
 }
 
-DRIVER_INIT(radio99)
+DRIVER_INIT_MEMBER(mikro80_state,radio99)
 {
-	mikro80_state *state = machine.driver_data<mikro80_state>();
 	DRIVER_INIT_CALL(mikro80);
-	state->m_key_mask = 0xff;
+	m_key_mask = 0xff;
 }
 
 READ8_MEMBER(mikro80_state::mikro80_8255_portb_r)

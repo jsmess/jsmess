@@ -369,4 +369,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE   INPUT     INIT    COMPANY     FULLNAME */
-CONS( 1977, mekd2,	0,	0,  mekd2,    mekd2, mekd2_state,	0,	"Motorola", "MEK6800D2" , GAME_NOT_WORKING )
+CONS( 1977, mekd2,	0,	0,  mekd2,    mekd2, driver_device,	0,	"Motorola", "MEK6800D2" , GAME_NOT_WORKING )

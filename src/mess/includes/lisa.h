@@ -157,6 +157,9 @@ public:
 	DECLARE_WRITE16_MEMBER(lisa_IO_w);
 
 	void set_scc_interrupt(bool value);
+	DECLARE_DRIVER_INIT(lisa210);
+	DECLARE_DRIVER_INIT(mac_xl);
+	DECLARE_DRIVER_INIT(lisa2);
 };
 
 
@@ -170,9 +173,6 @@ SCREEN_UPDATE_IND16( lisa );
 
 extern NVRAM_HANDLER(lisa);
 
-DRIVER_INIT( lisa2 );
-DRIVER_INIT( lisa210 );
-DRIVER_INIT( mac_xl );
 
 MACHINE_START( lisa );
 MACHINE_RESET( lisa );

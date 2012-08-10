@@ -2699,64 +2699,61 @@ static MACHINE_START( x68030 )
 	state->m_led_timer->adjust(attotime::zero, 0, attotime::from_msec(400));
 }
 
-static DRIVER_INIT( x68000 )
+DRIVER_INIT_MEMBER(x68k_state,x68000)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
-	unsigned char* rom = machine.root_device().memregion("maincpu")->base();
-	unsigned char* user2 = machine.root_device().memregion("user2")->base();
+	unsigned char* rom = machine().root_device().memregion("maincpu")->base();
+	unsigned char* user2 = machine().root_device().memregion("user2")->base();
 	//FIXME
-//  state->m_gvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
-//  state->m_tvram = auto_alloc_array(machine, UINT16, 0x080000/sizeof(UINT16));
-	state->m_sram = auto_alloc_array(machine, UINT16, 0x4000/sizeof(UINT16));
+//  m_gvram = auto_alloc_array(machine(), UINT16, 0x080000/sizeof(UINT16));
+//  m_tvram = auto_alloc_array(machine(), UINT16, 0x080000/sizeof(UINT16));
+	m_sram = auto_alloc_array(machine(), UINT16, 0x4000/sizeof(UINT16));
 
-	state->m_spritereg = auto_alloc_array_clear(machine, UINT16, 0x8000/sizeof(UINT16));
+	m_spritereg = auto_alloc_array_clear(machine(), UINT16, 0x8000/sizeof(UINT16));
 
 #ifdef USE_PREDEFINED_SRAM
 	{
-		unsigned char* ramptr = state->memregion("user3")->base();
-		memcpy(state->m_sram,ramptr,0x4000);
+		unsigned char* ramptr = memregion("user3")->base();
+		memcpy(m_sram,ramptr,0x4000);
 	}
 #endif
 
 	// copy last half of BIOS to a user region, to use for inital startup
 	memcpy(user2,(rom+0xff0000),0x10000);
 
-	mfp_init(machine);
+	mfp_init(machine());
 
-	device_set_irq_callback(machine.device("maincpu"), x68k_int_ack);
+	device_set_irq_callback(machine().device("maincpu"), x68k_int_ack);
 
 	// init keyboard
-	state->m_keyboard.delay = 500;  // 3*100+200
-	state->m_keyboard.repeat = 110;  // 4^2*5+30
-	state->m_kb_timer = machine.scheduler().timer_alloc(FUNC(x68k_keyboard_poll));
-	state->m_scanline_timer = machine.scheduler().timer_alloc(FUNC(x68k_hsync));
-	state->m_raster_irq = machine.scheduler().timer_alloc(FUNC(x68k_crtc_raster_irq));
-	state->m_vblank_irq = machine.scheduler().timer_alloc(FUNC(x68k_crtc_vblank_irq));
-	state->m_mouse_timer = machine.scheduler().timer_alloc(FUNC(x68k_scc_ack));
-	state->m_led_timer = machine.scheduler().timer_alloc(FUNC(x68k_led_callback));
-	state->m_net_timer = machine.scheduler().timer_alloc(FUNC(x68k_net_irq));
+	m_keyboard.delay = 500;  // 3*100+200
+	m_keyboard.repeat = 110;  // 4^2*5+30
+	m_kb_timer = machine().scheduler().timer_alloc(FUNC(x68k_keyboard_poll));
+	m_scanline_timer = machine().scheduler().timer_alloc(FUNC(x68k_hsync));
+	m_raster_irq = machine().scheduler().timer_alloc(FUNC(x68k_crtc_raster_irq));
+	m_vblank_irq = machine().scheduler().timer_alloc(FUNC(x68k_crtc_vblank_irq));
+	m_mouse_timer = machine().scheduler().timer_alloc(FUNC(x68k_scc_ack));
+	m_led_timer = machine().scheduler().timer_alloc(FUNC(x68k_led_callback));
+	m_net_timer = machine().scheduler().timer_alloc(FUNC(x68k_net_irq));
 
 	// Initialise timers for 6-button MD controllers
-	md_6button_init(machine);
+	md_6button_init(machine());
 
-	state->m_sysport.cputype = 0xff;  // 68000, 10MHz
-	state->m_is_32bit = false;
+	m_sysport.cputype = 0xff;  // 68000, 10MHz
+	m_is_32bit = false;
 }
 
-static DRIVER_INIT( x68kxvi )
+DRIVER_INIT_MEMBER(x68k_state,x68kxvi)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
 	DRIVER_INIT_CALL( x68000 );
-	state->m_sysport.cputype = 0xfe; // 68000, 16MHz
-	state->m_is_32bit = false;
+	m_sysport.cputype = 0xfe; // 68000, 16MHz
+	m_is_32bit = false;
 }
 
-static DRIVER_INIT( x68030 )
+DRIVER_INIT_MEMBER(x68k_state,x68030)
 {
-	x68k_state *state = machine.driver_data<x68k_state>();
 	DRIVER_INIT_CALL( x68000 );
-	state->m_sysport.cputype = 0xdc; // 68030, 25MHz
-	state->m_is_32bit = true;
+	m_sysport.cputype = 0xdc; // 68030, 25MHz
+	m_is_32bit = true;
 }
 
 static MACHINE_CONFIG_FRAGMENT( x68000_base )

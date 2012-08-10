@@ -230,7 +230,7 @@ ROM_START( atmtb2 )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1991, atm,	spec128,	0,		atm,	spec_plus, atm_state,	0,			"MicroART",		"ATM", GAME_NOT_WORKING)
-//COMP( 1991, atmtb1,   spec128,    0,      atm,    spec_plus, atm_state,  0,      "MicroART",     "ATM-turbo1", GAME_NOT_WORKING)
-COMP( 1993, atmtb2, spec128,	0,		atmtb2,	spec_plus, atm_state,	0,			"MicroART",		"ATM-turbo2", GAME_NOT_WORKING)
-//COMP( 1994, turbo2, spec128,  0,      atm,    spec_plus, atm_state,  0,          "MicroART",     "TURBO 2+", GAME_NOT_WORKING)
+COMP( 1991, atm,	spec128,	0,		atm,	spec_plus, driver_device,	0,			"MicroART",		"ATM", GAME_NOT_WORKING)
+//COMP( 1991, atmtb1,   spec128,    0,      atm,    spec_plus, driver_device,  0,      "MicroART",     "ATM-turbo1", GAME_NOT_WORKING)
+COMP( 1993, atmtb2, spec128,	0,		atmtb2,	spec_plus, driver_device,	0,			"MicroART",		"ATM-turbo2", GAME_NOT_WORKING)
+//COMP( 1994, turbo2, spec128,  0,      atm,    spec_plus, driver_device,  0,          "MicroART",     "TURBO 2+", GAME_NOT_WORKING)

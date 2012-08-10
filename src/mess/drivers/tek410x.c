@@ -141,5 +141,5 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME            FLAGS */
-COMP( 1983, tek4107a,   0,          0,      tek4107a,   tek4107a, tek4107a_state,   0,    "Tektronix", "Tektronix 4107A", GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1983, tek4109a,   tek4107a,   0,      tek4109a,   tek4107a, tek4107a_state,   0,    "Tektronix", "Tektronix 4109A", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1983, tek4107a,   0,          0,      tek4107a,   tek4107a, driver_device,   0,    "Tektronix", "Tektronix 4107A", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1983, tek4109a,   tek4107a,   0,      tek4109a,   tek4107a, driver_device,   0,    "Tektronix", "Tektronix 4109A", GAME_NOT_WORKING | GAME_NO_SOUND )

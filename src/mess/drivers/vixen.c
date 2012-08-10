@@ -929,11 +929,10 @@ DIRECT_UPDATE_MEMBER(vixen_state::vixen_direct_update_handler)
 	return address;
 }
 
-static DRIVER_INIT( vixen )
+DRIVER_INIT_MEMBER(vixen_state,vixen)
 {
-	vixen_state *state = machine.driver_data<vixen_state>();
-	address_space *program = machine.device<cpu_device>(Z8400A_TAG)->space(AS_PROGRAM);
-	program->set_direct_update_handler(direct_update_delegate(FUNC(vixen_state::vixen_direct_update_handler), state));
+	address_space *program = machine().device<cpu_device>(Z8400A_TAG)->space(AS_PROGRAM);
+	program->set_direct_update_handler(direct_update_delegate(FUNC(vixen_state::vixen_direct_update_handler), this));
 }
 
 

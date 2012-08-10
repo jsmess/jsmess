@@ -875,6 +875,6 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      COMPANY   FULLNAME */
-COMP( 1979, atom,     0,        0,		atom,     atom, atom_state,     0,        "Acorn",  "Atom" , 0)
-COMP( 1979, atomeb,   atom,     0,		atomeb,   atom, atomeb_state,     0,        "Acorn",  "Atom with Eprom Box" , 0)
-//COMP( 1983, prophet2, atom,     0,        atom,     atom, atom_state,     0,        "Busicomputers",  "Prophet 2" , 0)
+COMP( 1979, atom,     0,        0,		atom,     atom, driver_device,     0,        "Acorn",  "Atom" , 0)
+COMP( 1979, atomeb,   atom,     0,		atomeb,   atom, driver_device,     0,        "Acorn",  "Atom with Eprom Box" , 0)
+//COMP( 1983, prophet2, atom,     0,        atom,     atom, driver_device,     0,        "Busicomputers",  "Prophet 2" , 0)

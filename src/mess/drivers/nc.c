@@ -1737,6 +1737,6 @@ ROM_START(nc200)
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY         FULLNAME    FLAGS */
-COMP( 1992, nc100,  0,      0,      nc100,  nc100, nc_state,  0,      "Amstrad plc",  "NC100",    0 )
-COMP( 1992, nc150,  nc100,  0,      nc100,  nc100, nc_state,  0,      "Amstrad plc",  "NC150",    0 )
-COMP( 1993, nc200,  0,      0,      nc200,  nc200, nc_state,  0,      "Amstrad plc",  "NC200",    GAME_NOT_WORKING ) // boot hangs while checking the MC146818 UIP (update in progress) bit
+COMP( 1992, nc100,  0,      0,      nc100,  nc100, driver_device,  0,      "Amstrad plc",  "NC100",    0 )
+COMP( 1992, nc150,  nc100,  0,      nc100,  nc100, driver_device,  0,      "Amstrad plc",  "NC150",    0 )
+COMP( 1993, nc200,  0,      0,      nc200,  nc200, driver_device,  0,      "Amstrad plc",  "NC200",    GAME_NOT_WORKING ) // boot hangs while checking the MC146818 UIP (update in progress) bit

@@ -334,6 +334,6 @@ ROM_END
 //  SYSTEM DRIVERS
 //**************************************************************************
 
-COMP(  1986,    coco3,      coco,   0,      coco3,     coco3, coco3_state,     0,      "Tandy Radio Shack",	         "Color Computer 3 (NTSC)", 0)
-COMP(  1986,    coco3p,     coco,   0,      coco3p,    coco3, coco3_state,     0,      "Tandy Radio Shack",	         "Color Computer 3 (PAL)", 0)
-COMP(  19??,    coco3h,     coco,   0,      coco3h,    coco3, coco3_state,     0,      "Tandy Radio Shack",	         "Color Computer 3 (NTSC; HD6309)", GAME_UNOFFICIAL)
+COMP(  1986,    coco3,      coco,   0,      coco3,     coco3, driver_device,     0,      "Tandy Radio Shack",	         "Color Computer 3 (NTSC)", 0)
+COMP(  1986,    coco3p,     coco,   0,      coco3p,    coco3, driver_device,     0,      "Tandy Radio Shack",	         "Color Computer 3 (PAL)", 0)
+COMP(  19??,    coco3h,     coco,   0,      coco3h,    coco3, driver_device,     0,      "Tandy Radio Shack",	         "Color Computer 3 (NTSC; HD6309)", GAME_UNOFFICIAL)

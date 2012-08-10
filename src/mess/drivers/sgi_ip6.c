@@ -37,6 +37,7 @@ public:
 	DECLARE_WRITE32_MEMBER(ip6_unk2_w);
 	DECLARE_READ32_MEMBER(ip6_unk3_r);
 	DECLARE_WRITE32_MEMBER(ip6_unk3_w);
+	DECLARE_DRIVER_INIT(sgi_ip6);
 };
 
 
@@ -251,7 +252,7 @@ static INPUT_PORTS_START( sgi_ip6 )
 	PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static DRIVER_INIT( sgi_ip6 )
+DRIVER_INIT_MEMBER(sgi_ip6_state,sgi_ip6)
 {
 }
 

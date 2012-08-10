@@ -172,6 +172,9 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 	DECLARE_READ8_MEMBER(pc_dma_read_word);
 	DECLARE_WRITE8_MEMBER(pc_dma_write_word);
+
+	DECLARE_DRIVER_INIT(atcga);
+	DECLARE_DRIVER_INIT(atvga);
 };
 
 
@@ -184,8 +187,6 @@ extern const am9517a_interface at_dma8237_1_config;
 extern const am9517a_interface at_dma8237_2_config;
 
 
-DRIVER_INIT( atcga );
-DRIVER_INIT( atvga );
 
 MACHINE_START( at );
 MACHINE_RESET( at );

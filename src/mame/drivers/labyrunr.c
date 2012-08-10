@@ -163,7 +163,7 @@ static const ym2203_interface ym2203_interface_1 =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 static const ym2203_interface ym2203_interface_2 =
@@ -176,7 +176,7 @@ static const ym2203_interface ym2203_interface_2 =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 
@@ -292,6 +292,6 @@ ROM_START( labyrunrk )
 ROM_END
 
 
-GAME( 1987, tricktrp, 0,        labyrunr, labyrunr, labyrunr_state, 0, ROT90, "Konami", "Trick Trap (World?)", GAME_SUPPORTS_SAVE )
-GAME( 1987, labyrunr, tricktrp, labyrunr, labyrunr, labyrunr_state, 0, ROT90, "Konami", "Labyrinth Runner (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1987, labyrunrk,tricktrp, labyrunr, labyrunr, labyrunr_state, 0, ROT90, "Konami", "Labyrinth Runner (World Ver. K)", GAME_SUPPORTS_SAVE )
+GAME( 1987, tricktrp, 0,        labyrunr, labyrunr, driver_device, 0, ROT90, "Konami", "Trick Trap (World?)", GAME_SUPPORTS_SAVE )
+GAME( 1987, labyrunr, tricktrp, labyrunr, labyrunr, driver_device, 0, ROT90, "Konami", "Labyrinth Runner (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, labyrunrk,tricktrp, labyrunr, labyrunr, driver_device, 0, ROT90, "Konami", "Labyrinth Runner (World Ver. K)", GAME_SUPPORTS_SAVE )

@@ -85,6 +85,12 @@ public:
 	UINT8 *m_io_ram_r_ptr;
 	c64_cart_t m_cart;
 	int m_nmilevel;
+	
+	DECLARE_DRIVER_INIT( c64 );
+	DECLARE_DRIVER_INIT( c64pal );
+	DECLARE_DRIVER_INIT( ultimax );
+	DECLARE_DRIVER_INIT( c64gs );
+	DECLARE_DRIVER_INIT( sx64 );	
 };
 
 
@@ -97,12 +103,6 @@ extern WRITE8_DEVICE_HANDLER(c64_m6510_port_write);
 
 READ8_HANDLER ( c64_colorram_read );
 WRITE8_HANDLER ( c64_colorram_write );
-
-DRIVER_INIT( c64 );
-DRIVER_INIT( c64pal );
-DRIVER_INIT( ultimax );
-DRIVER_INIT( c64gs );
-DRIVER_INIT( sx64 );
 
 MACHINE_START( c64 );
 MACHINE_RESET( c64 );

@@ -257,4 +257,4 @@ ROM_START(dai)
 ROM_END
 
 /*    YEAR  NAME PARENT  COMPAT MACHINE INPUT   INIT     COMPANY                FULLNAME */
-COMP( 1978, dai, 0,      0,	dai,	dai, dai_state,	0,		"Data Applications International", "DAI Personal Computer", 0)
+COMP( 1978, dai, 0,      0,	dai,	dai, driver_device,	0,		"Data Applications International", "DAI Personal Computer", 0)

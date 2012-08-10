@@ -141,13 +141,12 @@ static const UINT8 apple1_control_keymap[] =
 **  DRIVER_INIT:  driver-specific setup, executed once at MESS startup.
 *****************************************************************************/
 
-DRIVER_INIT( apple1 )
+DRIVER_INIT_MEMBER(apple1_state,apple1)
 {
-	apple1_state *state = machine.driver_data<apple1_state>();
-	address_space* space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space* space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	/* Set up the handlers for MESS's dynamically-sized RAM. */
-	space->install_readwrite_bank(0x0000, machine.device<ram_device>(RAM_TAG)->size() - 1, "bank1");
-	state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
+	space->install_readwrite_bank(0x0000, machine().device<ram_device>(RAM_TAG)->size() - 1, "bank1");
+	membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 
 	/* Poll the keyboard input ports periodically.  These include both
        ordinary keys and the RESET and CLEAR SCREEN pushbutton
@@ -159,7 +158,7 @@ DRIVER_INIT( apple1 )
 
        A 120-Hz poll rate seems to be fast enough to ensure no
        keystrokes are missed. */
-	machine.scheduler().timer_pulse(attotime::from_hz(120), FUNC(apple1_kbd_poll));
+	machine().scheduler().timer_pulse(attotime::from_hz(120), FUNC(apple1_kbd_poll));
 }
 
 

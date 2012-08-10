@@ -93,6 +93,7 @@ public:
 	static const floppy_format_type floppy_formats[];
 
     void fdc_intrq_w(bool state);
+	DECLARE_DRIVER_INIT(mirage);
 };
 
 const floppy_format_type mirage_state::floppy_formats[] = {
@@ -276,16 +277,15 @@ ROM_START( enmirage )
 	ROM_REGION(0x20000, "es5503", ROMREGION_ERASE)
 ROM_END
 
-static DRIVER_INIT(mirage)
+DRIVER_INIT_MEMBER(mirage_state,mirage)
 {
-    mirage_state *state = machine.driver_data<mirage_state>();
 
-    floppy_connector *con = machine.device<floppy_connector>("fd0");
+    floppy_connector *con = machine().device<floppy_connector>("fd0");
 	floppy_image_device *floppy = con ? con->get_device() : 0;
     if (floppy)
     {
-        state->m_fdc->set_floppy(floppy);
-        state->m_fdc->setup_intrq_cb(wd1772_t::line_cb(FUNC(mirage_state::fdc_intrq_w), state));
+        m_fdc->set_floppy(floppy);
+        m_fdc->setup_intrq_cb(wd1772_t::line_cb(FUNC(mirage_state::fdc_intrq_w), this));
 
         floppy->ss_w(0);
     }

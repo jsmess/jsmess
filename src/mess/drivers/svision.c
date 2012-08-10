@@ -423,26 +423,24 @@ static INTERRUPT_GEN( svision_frame_int )
 	svision_sound_decrement(state->m_sound);
 }
 
-static DRIVER_INIT( svision )
+DRIVER_INIT_MEMBER(svision_state,svision)
 {
-	svision_state *state = machine.driver_data<svision_state>();
-	state->m_svision.timer1 = machine.scheduler().timer_alloc(FUNC(svision_timer));
-	state->m_sound = machine.device("custom");
-	state->m_dma_finished = svision_dma_finished(state->m_sound);
-	state->m_pet.on = FALSE;
-	state->membank("bank2")->set_base(state->memregion("user1")->base() + 0x1c000);
+	m_svision.timer1 = machine().scheduler().timer_alloc(FUNC(svision_timer));
+	m_sound = machine().device("custom");
+	m_dma_finished = svision_dma_finished(m_sound);
+	m_pet.on = FALSE;
+	membank("bank2")->set_base(memregion("user1")->base() + 0x1c000);
 }
 
-static DRIVER_INIT( svisions )
+DRIVER_INIT_MEMBER(svision_state,svisions)
 {
-	svision_state *state = machine.driver_data<svision_state>();
-	state->m_svision.timer1 = machine.scheduler().timer_alloc(FUNC(svision_timer));
-	state->m_sound = machine.device("custom");
-	state->m_dma_finished = svision_dma_finished(state->m_sound);
-	state->membank("bank2")->set_base(state->memregion("user1")->base() + 0x1c000);
-	state->m_svision.timer1 = machine.scheduler().timer_alloc(FUNC(svision_timer));
-	state->m_pet.on = TRUE;
-	state->m_pet.timer = machine.scheduler().timer_alloc(FUNC(svision_pet_timer));
+	m_svision.timer1 = machine().scheduler().timer_alloc(FUNC(svision_timer));
+	m_sound = machine().device("custom");
+	m_dma_finished = svision_dma_finished(m_sound);
+	membank("bank2")->set_base(memregion("user1")->base() + 0x1c000);
+	m_svision.timer1 = machine().scheduler().timer_alloc(FUNC(svision_timer));
+	m_pet.on = TRUE;
+	m_pet.timer = machine().scheduler().timer_alloc(FUNC(svision_pet_timer));
 }
 
 static DEVICE_IMAGE_LOAD( svision_cart )

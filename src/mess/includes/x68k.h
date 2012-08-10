@@ -254,6 +254,9 @@ public:
 	int m_sprite_shift;
 	int m_oddscanline;
 	bool m_is_32bit;
+	DECLARE_DRIVER_INIT(x68kxvi);
+	DECLARE_DRIVER_INIT(x68030);
+	DECLARE_DRIVER_INIT(x68000);
 };
 
 

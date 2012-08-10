@@ -26,12 +26,13 @@ public:
 	bitmap_ind16 m_bitmap;
 	DECLARE_READ8_MEMBER(galaxy_keyboard_r);
 	DECLARE_WRITE8_MEMBER(galaxy_latch_w);
+	DECLARE_DRIVER_INIT(galaxy);
+	DECLARE_DRIVER_INIT(galaxyp);
 };
 
 
 /*----------- defined in machine/galaxy.c -----------*/
 
-DRIVER_INIT( galaxy );
 MACHINE_RESET( galaxy );
 INTERRUPT_GEN( galaxy_interrupt );
 SNAPSHOT_LOAD( galaxy );
@@ -39,7 +40,6 @@ SNAPSHOT_LOAD( galaxy );
 MACHINE_RESET( galaxyp );
 
 
-DRIVER_INIT( galaxyp );
 
 /*----------- defined in video/galaxy.c -----------*/
 

@@ -254,6 +254,7 @@ public:
 	DECLARE_READ8_MEMBER(nes_fds_r);
 	DECLARE_WRITE8_MEMBER(nes_fds_w);
 	DECLARE_WRITE8_MEMBER(nes_vh_sprite_dma_w);
+	DECLARE_DRIVER_INIT(famicom);
 };
 
 
@@ -270,7 +271,6 @@ DEVICE_IMAGE_UNLOAD(nes_disk);
 MACHINE_START( nes );
 MACHINE_RESET( nes );
 
-DRIVER_INIT( famicom );
 
 
 int nes_ppu_vidaccess( device_t *device, int address, int data );

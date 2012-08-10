@@ -68,6 +68,7 @@ public:
 	DECLARE_WRITE8_MEMBER(vg230_io_w);
 	struct _vg230_t m_vg230;
 	struct _ems_t m_ems;
+	DECLARE_DRIVER_INIT(pasogo);
 };
 
 
@@ -542,13 +543,12 @@ ROM_START(pasogo)
 ROM_END
 
 
-static DRIVER_INIT( pasogo )
+DRIVER_INIT_MEMBER(pasogo_state,pasogo)
 {
-	pasogo_state *state = machine.driver_data<pasogo_state>();
-	vg230_init(machine);
-	memset(&state->m_ems, 0, sizeof(state->m_ems));
-	state->membank( "bank27" )->set_base( machine.root_device().memregion("user1")->base() + 0x00000 );
-	state->membank( "bank28" )->set_base( state->memregion("maincpu")->base() + 0xb8000/*?*/ );
+	vg230_init(machine());
+	memset(&m_ems, 0, sizeof(m_ems));
+	membank( "bank27" )->set_base( machine().root_device().memregion("user1")->base() + 0x00000 );
+	membank( "bank28" )->set_base( memregion("maincpu")->base() + 0xb8000/*?*/ );
 }
 
 //    YEAR   NAME    PARENT  COMPAT    MACHINE   INPUT     INIT      COMPANY  FULLNAME          FLAGS

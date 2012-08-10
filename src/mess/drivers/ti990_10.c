@@ -84,6 +84,7 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	device_t *m_terminal;
+	DECLARE_DRIVER_INIT(ti990_10);
 };
 
 
@@ -288,15 +289,15 @@ ROM_START(ti990_10)
 
 ROM_END
 
-static DRIVER_INIT( ti990_10 )
+DRIVER_INIT_MEMBER(ti990_10_state,ti990_10)
 {
 #if 0
 	/* load specific ti990/12 rom page */
 	const int page = 3;
 
-	memmove(machine.root_device().memregion("maincpu")->base()+0x1FFC00, machine.root_device().memregion("maincpu")->base()+0x1FFC00+(page*0x400), 0x400);
+	memmove(machine().root_device().memregion("maincpu")->base()+0x1FFC00, machine().root_device().memregion("maincpu")->base()+0x1FFC00+(page*0x400), 0x400);
 #endif
-	vdt911_init(machine);
+	vdt911_init(machine());
 }
 
 static INPUT_PORTS_START(ti990_10)

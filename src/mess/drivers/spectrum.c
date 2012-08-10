@@ -618,11 +618,11 @@ INPUT_PORTS_END
 
 /* Machine initialization */
 
-DRIVER_INIT( spectrum )
+DRIVER_INIT_MEMBER(spectrum_state,spectrum)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	switch (machine.device<ram_device>(RAM_TAG)->size())
+	switch (machine().device<ram_device>(RAM_TAG)->size())
 	{
 	    case 48*1024:
 		space->install_ram(0x8000, 0xffff, NULL); // Fall through

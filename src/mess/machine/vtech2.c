@@ -81,24 +81,23 @@ static const char *const mwa_bank_hard[4] =
     "bank4"   /* mapped in c000-ffff */
 };
 
-DRIVER_INIT(laser)
+DRIVER_INIT_MEMBER(vtech2_state,laser)
 {
-	vtech2_state *state = machine.driver_data<vtech2_state>();
-	UINT8 *gfx = machine.root_device().memregion("gfx2")->base();
+	UINT8 *gfx = machine().root_device().memregion("gfx2")->base();
 	int i;
 
-	state->m_laser_track_x2[0] = state->m_laser_track_x2[1] = 80;
-	state->m_laser_fdc_bits = 8;
-	state->m_laser_drive = -1;
+	m_laser_track_x2[0] = m_laser_track_x2[1] = 80;
+	m_laser_fdc_bits = 8;
+	m_laser_drive = -1;
 
 	for (i = 0; i < 256; i++)
 		gfx[i] = i;
 
-	state->m_laser_latch = -1;
-	state->m_mem = state->memregion("maincpu")->base();
+	m_laser_latch = -1;
+	m_mem = memregion("maincpu")->base();
 
-	for (i = 0; i < ARRAY_LENGTH(state->m_laser_bank); i++)
-		state->m_laser_bank[i] = -1;
+	for (i = 0; i < ARRAY_LENGTH(m_laser_bank); i++)
+		m_laser_bank[i] = -1;
 }
 
 

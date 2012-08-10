@@ -3207,10 +3207,9 @@ DIRECT_UPDATE_MEMBER(gba_state::gba_direct)
 	return address;
 }
 
-static DRIVER_INIT(gbadv)
+DRIVER_INIT_MEMBER(gba_state,gbadv)
 {
-	gba_state *state = machine.driver_data<gba_state>();
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(gba_state::gba_direct), state));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(gba_state::gba_direct), this));
 }
 
 /*    YEAR  NAME PARENT COMPAT MACHINE INPUT   INIT   COMPANY     FULLNAME */

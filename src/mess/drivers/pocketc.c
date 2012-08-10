@@ -1007,8 +1007,8 @@ COMP( 1982, pc1260,	0,	0,	pc1260,	pc1251, pc1251_state,	pc1251,	 "Sharp", "Pocke
 COMP( 1982, pc1261,	pc1260,	0,	pc1261,	pc1251, pc1251_state,	pc1251,	 "Sharp", "Pocket Computer 1261/1262", GAME_NOT_WORKING  | GAME_NO_SOUND)
 
 /* pc1261/pc1262 */
-COMP( 1984, pc1350,	0,	0,	pc1350,	pc1350, pc1350_state,	0,	 "Sharp", "Pocket Computer 1350", GAME_NO_SOUND )
-COMP( 198?, pc1450,	0,	0,	pc1350,	pc1350, pc1350_state,	0,	 "Sharp", "Pocket Computer 1450", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1984, pc1350,	0,	0,	pc1350,	pc1350, driver_device,	0,	 "Sharp", "Pocket Computer 1350", GAME_NO_SOUND )
+COMP( 198?, pc1450,	0,	0,	pc1350,	pc1350, driver_device,	0,	 "Sharp", "Pocket Computer 1450", GAME_NOT_WORKING | GAME_NO_SOUND )
 
 COMP( 1983, pc1401,	0,	0,	pc1401,	pc1401, pc1401_state,	pc1401,	"Sharp", "Pocket Computer 1401", GAME_NO_SOUND)
 COMP( 1984, pc1402,	pc1401,	0,	pc1402,	pc1401, pc1401_state,	pc1401,	 "Sharp", "Pocket Computer 1402", GAME_NO_SOUND)

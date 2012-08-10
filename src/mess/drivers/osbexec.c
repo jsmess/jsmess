@@ -107,6 +107,7 @@ public:
 	DECLARE_WRITE8_MEMBER(osbexec_c000_w);
 	DECLARE_READ8_MEMBER(osbexec_kbd_r);
 	DECLARE_READ8_MEMBER(osbexec_rtc_r);
+	DECLARE_DRIVER_INIT(osbexec);
 };
 
 
@@ -602,20 +603,19 @@ static TIMER_CALLBACK( osbexec_video_callback )
 }
 
 
-static DRIVER_INIT( osbexec )
+DRIVER_INIT_MEMBER(osbexec_state,osbexec)
 {
-	osbexec_state *state = machine.driver_data<osbexec_state>();
 
-	state->m_fontram_region = machine.memory().region_alloc( "fontram", 0x1000, 1, ENDIANNESS_LITTLE);
-	state->m_vram_region = machine.memory().region_alloc( "vram", 0x2000, 1, ENDIANNESS_LITTLE );
-	state->m_vram = state->m_vram_region->base();
-	state->m_fontram = state->m_fontram_region->base();
+	m_fontram_region = machine().memory().region_alloc( "fontram", 0x1000, 1, ENDIANNESS_LITTLE);
+	m_vram_region = machine().memory().region_alloc( "vram", 0x2000, 1, ENDIANNESS_LITTLE );
+	m_vram = m_vram_region->base();
+	m_fontram = m_fontram_region->base();
 
 
-	memset( state->m_fontram, 0x00, 0x1000 );
-	memset( state->m_vram, 0x00, 0x2000 );
+	memset( m_fontram, 0x00, 0x1000 );
+	memset( m_vram, 0x00, 0x2000 );
 
-	state->m_video_timer = machine.scheduler().timer_alloc(FUNC(osbexec_video_callback));
+	m_video_timer = machine().scheduler().timer_alloc(FUNC(osbexec_video_callback));
 }
 
 

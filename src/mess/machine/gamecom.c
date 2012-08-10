@@ -535,11 +535,10 @@ void gamecom_update_timers( device_t *device, int cycles )
 	}
 }
 
-DRIVER_INIT( gamecom )
+DRIVER_INIT_MEMBER(gamecom_state,gamecom)
 {
-	gamecom_state *state = machine.driver_data<gamecom_state>();
-	state->m_clock_timer = machine.scheduler().timer_alloc(FUNC(gamecom_clock_timer_callback));
-	state->m_p_ram = state->memregion("maincpu")->base(); // required here because pio_w gets called before machine_reset
+	m_clock_timer = machine().scheduler().timer_alloc(FUNC(gamecom_clock_timer_callback));
+	m_p_ram = memregion("maincpu")->base(); // required here because pio_w gets called before machine_reset
 }
 
 DEVICE_IMAGE_LOAD( gamecom_cart1 )

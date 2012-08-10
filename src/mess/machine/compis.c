@@ -1364,12 +1364,11 @@ static IRQ_CALLBACK( compis_irq_callback )
 }
 
 
-DRIVER_INIT( compis )
+DRIVER_INIT_MEMBER(compis_state,compis)
 {
-	compis_state *state = machine.driver_data<compis_state>();
 
-	device_set_irq_callback(machine.device("maincpu"), compis_irq_callback);
-	memset (&state->m_compis, 0, sizeof (state->m_compis) );
+	device_set_irq_callback(machine().device("maincpu"), compis_irq_callback);
+	memset (&m_compis, 0, sizeof (m_compis) );
 }
 
 MACHINE_START( compis )

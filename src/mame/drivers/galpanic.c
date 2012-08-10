@@ -22,7 +22,6 @@ TODO:
 - There is a vector for IRQ4. The function does nothing in galpanic but is
   more complicated in the Comad ones. However I'm not triggering it, and
   they seems to work anyway...
-- Four unknown ROMs in fantasia. The game seems to work fine without them.
 - There was a ROM in the newfant set, obj2_14.rom, which was identical to
   Terminator 2's t2.107. I can only assume this was a mistake of the dumper.
 - lots of unknown reads and writes, also in galpanic but particularly in
@@ -51,7 +50,6 @@ For this version of Gals Panic see the expro02.c driver
 
 Stephh's additional notes :
 
-  - The games might not work correctly if sound is disabled.
   - There seems to exist 3 versions of 'galpanic' (Japan, US and World),
     and we seem to have a World version according to the coinage.
     Version is stored at 0x03ffff.b :
@@ -80,7 +78,7 @@ Stephh's additional notes :
       * In this version, there is a "Coin Mode" Dip Switch, but no
         "Character Test" Dip Switch.
       * Area 0xe00000-0xe00014 is a "calculator" area. I've tried to
-        simulate it (see 'galpanib_calc*' handlers) by comparing the code
+        simulate it (see machine/kaneko_hit.c) by comparing the code
         with the other set. I don't know if there are some other unmapped
         reads, but the game seems to run fine with what I've done.
       * When you press the "Tilt" button, the game enters in an endless
@@ -122,6 +120,7 @@ The current set of Super Model is an example of type C
 #include "includes/kaneko16.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h"
+#include "machine/kaneko_hit.h"
 #include "includes/galpanic.h"
 #include "includes/galpnipt.h"
 
@@ -189,19 +188,6 @@ WRITE16_MEMBER(galpanic_state::galpanica_6295_bankswitch_w)
 	}
 }
 
-#ifdef UNUSED_FUNCTION
-WRITE16_MEMBER(galpanic_state::galpanica_misc_w)
-{
-	device_t *pandora = machine.device("pandora");
-
-	if (ACCESSING_BITS_0_7)
-	{
-		pandora_set_clear_bitmap(pandora, data & 0x0004);
-	}
-
-	// other bits unknown !
-}
-#endif
 
 WRITE16_MEMBER(galpanic_state::galpanic_coin_w)
 {
@@ -241,7 +227,7 @@ static ADDRESS_MAP_START( galpanic_map, AS_PROGRAM, 16, galpanic_state )
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITENOP	/* ??? */
-	AM_RANGE(0xe00000, 0xe00015) AM_READWRITE(galpanib_calc_r,galpanib_calc_w) /* CALC1 MCU interaction (simulated) */
+	AM_RANGE(0xe00000, 0xe00015) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
 ADDRESS_MAP_END
 
 READ16_MEMBER(galpanic_state::comad_timer_r)
@@ -588,6 +574,12 @@ static MACHINE_CONFIG_START( galpanic, galpanic_state )
 	MCFG_PALETTE_LENGTH(1024 + 32768)
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", galpanic_pandora_config)
+	
+	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
+	kaneko_hit_device::set_type(*device, 0);
+
+
+	
 
 	MCFG_PALETTE_INIT(galpanic)
 	MCFG_VIDEO_START(galpanic)
@@ -1007,15 +999,15 @@ ROM_START( supmodel )
 	ROM_LOAD( "music2.2", 0xc0000, 0x80000, CRC(cccae65a) SHA1(5e4e2e51884eaf191f103aa189ff33371fc91d6d) )
 ROM_END
 
-GAME( 1990, galpanic, 0,        galpanic, galpanic, galpanic_state, 0, ROT90, "Kaneko", "Gals Panic (Unprotected)", GAME_NO_COCKTAIL )
-GAME( 1990, galpanica,galpanic, galpanica,galpanica, galpanic_state,0, ROT90, "Kaneko", "Gals Panic (MCU Protected)", GAME_NO_COCKTAIL )
-GAME( 1994, supmodel, 0,        supmodel, fantasia, galpanic_state, 0, ROT90, "Comad & New Japan System", "Super Model",GAME_NO_COCKTAIL )
-GAME( 1995, newfant,  0,        comad,    fantasia, galpanic_state, 0, ROT90, "Comad & New Japan System", "New Fantasia", GAME_NO_COCKTAIL )
-GAME( 1995, fantsy95, 0,        comad,    fantasia, galpanic_state, 0, ROT90, "Hi-max Technology Inc.", "Fantasy '95", GAME_NO_COCKTAIL )
-GAME( 1996, missw96,  0,        comad,    missw96, galpanic_state,  0, ROT0,  "Comad", "Miss World '96 (Nude)", GAME_NO_COCKTAIL )
-GAME( 1996, missmw96, missw96,  comad,    missw96, galpanic_state,  0, ROT0,  "Comad", "Miss Mister World '96 (Nude)", GAME_NO_COCKTAIL )
-GAME( 1997, fantsia2, 0,        fantsia2, missw96, galpanic_state,  0, ROT0,  "Comad", "Fantasia II (Explicit)", GAME_NO_COCKTAIL )
-GAME( 1997, fantsia2a,fantsia2, fantsia2, missw96, galpanic_state,  0, ROT0,  "Comad", "Fantasia II (Less Explicit)", GAME_NO_COCKTAIL )
-GAME( 2002, wownfant, 0,        fantsia2, missw96, galpanic_state,  0, ROT0,  "Comad", "WOW New Fantasia", GAME_NO_COCKTAIL )
-GAME( 1997, galhustl, 0,        galhustl, galhustl, galpanic_state, 0, ROT0,  "ACE International", "Gals Hustler", 0 )
-GAME( 1995, zipzap,   0,        zipzap,   zipzap, galpanic_state,   0, ROT90, "Barko Corp", "Zip & Zap", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1990, galpanic, 0,        galpanic, galpanic, driver_device, 0, ROT90, "Kaneko", "Gals Panic (Unprotected)", GAME_NO_COCKTAIL )
+GAME( 1990, galpanica,galpanic, galpanica,galpanica, driver_device,0, ROT90, "Kaneko", "Gals Panic (MCU Protected)", GAME_NO_COCKTAIL )
+GAME( 1994, supmodel, 0,        supmodel, fantasia, driver_device, 0, ROT90, "Comad & New Japan System", "Super Model",GAME_NO_COCKTAIL )
+GAME( 1995, newfant,  0,        comad,    fantasia, driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia", GAME_NO_COCKTAIL )
+GAME( 1995, fantsy95, 0,        comad,    fantasia, driver_device, 0, ROT90, "Hi-max Technology Inc.", "Fantasy '95", GAME_NO_COCKTAIL )
+GAME( 1996, missw96,  0,        comad,    missw96, driver_device,  0, ROT0,  "Comad", "Miss World '96 (Nude)", GAME_NO_COCKTAIL )
+GAME( 1996, missmw96, missw96,  comad,    missw96, driver_device,  0, ROT0,  "Comad", "Miss Mister World '96 (Nude)", GAME_NO_COCKTAIL )
+GAME( 1997, fantsia2, 0,        fantsia2, missw96, driver_device,  0, ROT0,  "Comad", "Fantasia II (Explicit)", GAME_NO_COCKTAIL )
+GAME( 1997, fantsia2a,fantsia2, fantsia2, missw96, driver_device,  0, ROT0,  "Comad", "Fantasia II (Less Explicit)", GAME_NO_COCKTAIL )
+GAME( 2002, wownfant, 0,        fantsia2, missw96, driver_device,  0, ROT0,  "Comad", "WOW New Fantasia", GAME_NO_COCKTAIL )
+GAME( 1997, galhustl, 0,        galhustl, galhustl, driver_device, 0, ROT0,  "ACE International", "Gals Hustler", 0 )
+GAME( 1995, zipzap,   0,        zipzap,   zipzap, driver_device,   0, ROT90, "Barko Corp", "Zip & Zap", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )

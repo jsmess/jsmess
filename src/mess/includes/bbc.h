@@ -261,6 +261,8 @@ public:
 	DECLARE_READ8_MEMBER(bbc_fe_r);
 	DECLARE_DIRECT_UPDATE_MEMBER(bbcbp_direct_handler);
 	DECLARE_DIRECT_UPDATE_MEMBER(bbcm_direct_handler);
+	DECLARE_DRIVER_INIT(bbc);
+	DECLARE_DRIVER_INIT(bbcm);
 };
 
 
@@ -273,8 +275,6 @@ extern const mc6845_interface bbc_mc6845_intf;
 extern const via6522_interface bbcb_system_via;
 extern const via6522_interface bbcb_user_via;
 extern const wd17xx_interface bbc_wd17xx_interface;
-DRIVER_INIT( bbc );
-DRIVER_INIT( bbcm );
 
 MACHINE_START( bbca );
 MACHINE_START( bbcb );

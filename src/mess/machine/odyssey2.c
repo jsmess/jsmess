@@ -43,20 +43,19 @@ READ8_MEMBER(odyssey2_state::odyssey2_t0_r){
 	return ( m_the_voice_lrq_state == ASSERT_LINE ) ? 0 : 1;
 }
 
-DRIVER_INIT( odyssey2 )
+DRIVER_INIT_MEMBER(odyssey2_state,odyssey2)
 {
-	odyssey2_state *state = machine.driver_data<odyssey2_state>();
 	int i;
 	int size = 0;
-	UINT8 *gfx = state->memregion("gfx1")->base();
-	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart"));
+	UINT8 *gfx = memregion("gfx1")->base();
+	device_image_interface *image = dynamic_cast<device_image_interface *>(machine().device("cart"));
 
-	state->m_ram        = auto_alloc_array(machine, UINT8, 256);
+	m_ram        = auto_alloc_array(machine(), UINT8, 256);
 
 	for (i = 0; i < 256; i++)
     {
 		gfx[i] = i;     /* TODO: Why i and not 0? */
-		state->m_ram[i] = 0;
+		m_ram[i] = 0;
     }
 
 	if (image->exists())
@@ -70,7 +69,7 @@ DRIVER_INIT( odyssey2 )
 			size = image->get_software_region_length("rom");
 		}
 	}
-	state->m_cart_size = size;
+	m_cart_size = size;
 }
 
 MACHINE_RESET( odyssey2 )

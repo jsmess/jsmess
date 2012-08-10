@@ -414,40 +414,36 @@ static void c16_common_driver_init( running_machine &machine )
 	state->m_mem2c000 = rom + 0x2c000;
 }
 
-DRIVER_INIT( c16 )
+DRIVER_INIT_MEMBER(c16_state,c16)
 {
-	c16_state *state = machine.driver_data<c16_state>();
-	c16_common_driver_init(machine);
+	c16_common_driver_init(machine());
 
-	state->m_sidcard = 0;
-	state->m_pal = 1;
+	m_sidcard = 0;
+	m_pal = 1;
 }
 
-DRIVER_INIT( plus4 )
+DRIVER_INIT_MEMBER(c16_state,plus4)
 {
-	c16_state *state = machine.driver_data<c16_state>();
-	c16_common_driver_init(machine);
+	c16_common_driver_init(machine());
 
-	state->m_sidcard = 0;
-	state->m_pal = 0;
+	m_sidcard = 0;
+	m_pal = 0;
 }
 
-DRIVER_INIT( c16sid )
+DRIVER_INIT_MEMBER(c16_state,c16sid)
 {
-	c16_state *state = machine.driver_data<c16_state>();
-	c16_common_driver_init(machine);
+	c16_common_driver_init(machine());
 
-	state->m_sidcard = 1;
-	state->m_pal = 1;
+	m_sidcard = 1;
+	m_pal = 1;
 }
 
-DRIVER_INIT( plus4sid )
+DRIVER_INIT_MEMBER(c16_state,plus4sid)
 {
-	c16_state *state = machine.driver_data<c16_state>();
-	c16_common_driver_init(machine);
+	c16_common_driver_init(machine());
 
-	state->m_sidcard = 1;
-	state->m_pal = 0;
+	m_sidcard = 1;
+	m_pal = 0;
 }
 
 MACHINE_RESET( c16 )

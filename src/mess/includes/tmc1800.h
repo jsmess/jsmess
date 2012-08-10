@@ -50,6 +50,7 @@ public:
 
 	/* keyboard state */
 	int m_keylatch;			/* key latch */
+	DECLARE_DRIVER_INIT(tmc1800);
 };
 
 class osc1000b_state : public driver_device

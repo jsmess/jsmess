@@ -19,6 +19,7 @@ public:
 	alesis_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag) { }
 
+	DECLARE_DRIVER_INIT(hr16);
 };
 
 
@@ -142,11 +143,11 @@ ROM_START( sr16 )
 ROM_END
 
 
-static DRIVER_INIT( hr16 )
+DRIVER_INIT_MEMBER(alesis_state,hr16)
 {
 	int i;
-	UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
-	UINT8 *orig = machine.root_device().memregion("user1")->base();
+	UINT8 *ROM = machine().root_device().memregion("maincpu")->base();
+	UINT8 *orig = machine().root_device().memregion("user1")->base();
 	for (i = 0; i < 0x8000; i++)
 	{
 		ROM[BITSWAP16(i,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7)] = orig[i];
@@ -157,4 +158,4 @@ static DRIVER_INIT( hr16 )
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY    FULLNAME       FLAGS */
 SYST( 1987, hr16,  0,       0,       hr16,      alesis, alesis_state,  hr16,   "Alesis",  "HR-16",       GAME_NOT_WORKING | GAME_NO_SOUND)
 SYST( 1989, hr16b, hr16,    0,       hr16,      alesis, alesis_state,  hr16,   "Alesis",  "HR-16B",      GAME_NOT_WORKING | GAME_NO_SOUND)
-SYST( 1990, sr16,  0,       0,       sr16,      alesis, alesis_state,  0,      "Alesis",  "SR-16",       GAME_NOT_WORKING | GAME_NO_SOUND)
+SYST( 1990, sr16,  0,       0,       sr16,      alesis, driver_device,  0,      "Alesis",  "SR-16",       GAME_NOT_WORKING | GAME_NO_SOUND)

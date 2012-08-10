@@ -2303,5 +2303,5 @@ ROM_END
 #define rom_a2600p rom_a2600
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME */
-CONS( 1977,	a2600,	0,		0,		a2600,	a2600, a2600_state,	0,		"Atari",	"Atari 2600 (NTSC)" , 0)
-CONS( 1978,	a2600p,	a2600,	0,		a2600p,	a2600, a2600_state,	0,		"Atari",    "Atari 2600 (PAL)",   0)
+CONS( 1977,	a2600,	0,		0,		a2600,	a2600, driver_device,	0,		"Atari",	"Atari 2600 (NTSC)" , 0)
+CONS( 1978,	a2600p,	a2600,	0,		a2600p,	a2600, driver_device,	0,		"Atari",    "Atari 2600 (PAL)",   0)

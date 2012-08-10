@@ -48,12 +48,12 @@ public:
 	DECLARE_WRITE8_MEMBER(laser_bg_mode_w);
 	DECLARE_WRITE8_MEMBER(laser_two_color_w);
 	DECLARE_READ8_MEMBER(laser_fdc_r);
+	DECLARE_DRIVER_INIT(laser);
 };
 
 
 /*----------- defined in machine/vtech2.c -----------*/
 
-DRIVER_INIT(laser);
 MACHINE_RESET( laser350 );
 MACHINE_RESET( laser500 );
 MACHINE_RESET( laser700 );

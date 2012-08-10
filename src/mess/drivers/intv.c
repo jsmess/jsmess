@@ -986,20 +986,18 @@ static void intvkbd_cassette_getinfo(const mess_device_class *devclass, UINT32 s
 }
 #endif
 
-static DRIVER_INIT( intv )
+DRIVER_INIT_MEMBER(intv_state,intv)
 {
-	intv_state *state = machine.driver_data<intv_state>();
 
-	state->m_x_scale = INTV_X_SCALE;
-	state->m_y_scale = INTV_Y_SCALE;
+	m_x_scale = INTV_X_SCALE;
+	m_y_scale = INTV_Y_SCALE;
 }
 
-static DRIVER_INIT( intvkbd )
+DRIVER_INIT_MEMBER(intv_state,intvkbd)
 {
-	intv_state *state = machine.driver_data<intv_state>();
 
-	state->m_x_scale = INTVKBD_X_SCALE;
-	state->m_y_scale = INTVKBD_Y_SCALE;
+	m_x_scale = INTVKBD_X_SCALE;
+	m_y_scale = INTVKBD_Y_SCALE;
 }
 
 /***************************************************************************

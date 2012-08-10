@@ -245,7 +245,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	shootout_snd_irq
+	DEVCB_LINE(shootout_snd_irq)
 };
 
 static const ym2203_interface ym2203_interface2 =
@@ -258,7 +258,7 @@ static const ym2203_interface ym2203_interface2 =
 		DEVCB_DRIVER_MEMBER(shootout_state, shootout_bankswitch_w),
 		DEVCB_DRIVER_MEMBER(shootout_state, shootout_flipscreen_w)
 	},
-	shootout_snd2_irq
+	DEVCB_LINE(shootout_snd2_irq)
 };
 
 static MACHINE_CONFIG_START( shootout, shootout_state )
@@ -406,12 +406,12 @@ ROM_START( shootoutb )
 ROM_END
 
 
-static DRIVER_INIT( shootout )
+DRIVER_INIT_MEMBER(shootout_state,shootout)
 {
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
-	int length = machine.root_device().memregion("maincpu")->bytes();
-	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length - 0x8000);
-	UINT8 *rom = machine.root_device().memregion("maincpu")->base();
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	int length = machine().root_device().memregion("maincpu")->bytes();
+	UINT8 *decrypt = auto_alloc_array(machine(), UINT8, length - 0x8000);
+	UINT8 *rom = machine().root_device().memregion("maincpu")->base();
 	int A;
 
 	space->set_decrypted_region(0x8000, 0xffff, decrypt);
@@ -419,13 +419,13 @@ static DRIVER_INIT( shootout )
 	for (A = 0x8000;A < length;A++)
 		decrypt[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x40) >> 1) | ((rom[A] & 0x20) << 1);
 
-	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
-	machine.root_device().membank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x8000, 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(0, 16, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	machine().root_device().membank("bank1")->configure_decrypted_entries(0, 16, decrypt + 0x8000, 0x4000);
 }
 
-static DRIVER_INIT( shootouj )
+DRIVER_INIT_MEMBER(shootout_state,shootouj)
 {
-	machine.root_device().membank("bank1")->configure_entries(0, 16, machine.root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
+	machine().root_device().membank("bank1")->configure_entries(0, 16, machine().root_device().memregion("maincpu")->base() + 0x10000, 0x4000);
 }
 
 

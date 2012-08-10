@@ -79,12 +79,13 @@ public:
 	rvoicepc_t m_rvoicepc;
 	DECLARE_READ8_MEMBER(main_hd63701_internal_registers_r);
 	DECLARE_WRITE8_MEMBER(main_hd63701_internal_registers_w);
+	DECLARE_DRIVER_INIT(rvoicepc);
 };
 
 
 /* Devices */
 
-static DRIVER_INIT( rvoicepc )
+DRIVER_INIT_MEMBER(rvoice_state,rvoicepc)
 {
 }
 

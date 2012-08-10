@@ -41,6 +41,7 @@ public:
 	dac_device *m_dac[2];
 
 	UINT32 m_port[9];
+	DECLARE_DRIVER_INIT(mini2440);
 };
 
 /***************************************************************************
@@ -193,7 +194,7 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static DRIVER_INIT( mini2440 )
+DRIVER_INIT_MEMBER(mini2440_state,mini2440)
 {
 	// do nothing
 }

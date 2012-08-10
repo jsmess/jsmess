@@ -1573,4 +1573,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME    FLAGS */
-COMP( 1983, x07,    0,      0,       x07,       x07, x07_state,     0,      "Canon",  "X-07",     GAME_SUPPORTS_SAVE)
+COMP( 1983, x07,    0,      0,       x07,       x07, driver_device,     0,      "Canon",  "X-07",     GAME_SUPPORTS_SAVE)

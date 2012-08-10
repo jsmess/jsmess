@@ -16,14 +16,13 @@
 
 
 /* Driver initialization */
-DRIVER_INIT(ut88)
+DRIVER_INIT_MEMBER(ut88_state,ut88)
 {
 	/* set initially ROM to be visible on first bank */
-	ut88_state *state = machine.driver_data<ut88_state>();
-	UINT8 *RAM = state->memregion("maincpu")->base();
+	UINT8 *RAM = memregion("maincpu")->base();
 	memset(RAM,0x0000,0x0800); // make first page empty by default
-	state->membank("bank1")->configure_entries(1, 2, RAM, 0x0000);
-	state->membank("bank1")->configure_entries(0, 2, RAM, 0xf800);
+	membank("bank1")->configure_entries(1, 2, RAM, 0x0000);
+	membank("bank1")->configure_entries(0, 2, RAM, 0xf800);
 }
 
 READ8_MEMBER( ut88_state::ut88_8255_portb_r )
@@ -159,7 +158,7 @@ static TIMER_CALLBACK( update_display )
 }
 
 
-DRIVER_INIT(ut88mini)
+DRIVER_INIT_MEMBER(ut88_state,ut88mini)
 {
 }
 

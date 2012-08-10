@@ -260,8 +260,8 @@ ROM_START(dgnalpha)
 ROM_END
 
 
-COMP(  1982,    dragon32,   coco,   0,      dragon32,  dragon32, dragon_state,  0,      "Dragon Data Ltd",            "Dragon 32", 0)
-COMP(  1983,    dragon64,   coco,   0,      dragon64,  dragon32, dragon64_state,  0,      "Dragon Data Ltd",            "Dragon 64", 0)
-COMP(  1983,    d64plus,    coco,   0,      d64plus,   dragon32, dragon64_state,  0,      "Dragon Data Ltd",            "Dragon 64 Plus", 0)
-COMP(  1983,    tanodr64,   coco,   0,      tanodr64,  dragon32, dragon_state,  0,      "Dragon Data Ltd / Tano Ltd", "Tano Dragon 64 (NTSC)", 0)
-COMP(  1984,    dgnalpha,   coco,   0,      dgnalpha,  dragon32, dragon_alpha_state,  0,      "Dragon Data Ltd",            "Dragon Alpha Prototype", 0)
+COMP(  1982,    dragon32,   coco,   0,      dragon32,  dragon32, driver_device,  0,      "Dragon Data Ltd",            "Dragon 32", 0)
+COMP(  1983,    dragon64,   coco,   0,      dragon64,  dragon32, driver_device,  0,      "Dragon Data Ltd",            "Dragon 64", 0)
+COMP(  1983,    d64plus,    coco,   0,      d64plus,   dragon32, driver_device,  0,      "Dragon Data Ltd",            "Dragon 64 Plus", 0)
+COMP(  1983,    tanodr64,   coco,   0,      tanodr64,  dragon32, driver_device,  0,      "Dragon Data Ltd / Tano Ltd", "Tano Dragon 64 (NTSC)", 0)
+COMP(  1984,    dgnalpha,   coco,   0,      dgnalpha,  dragon32, driver_device,  0,      "Dragon Data Ltd",            "Dragon Alpha Prototype", 0)

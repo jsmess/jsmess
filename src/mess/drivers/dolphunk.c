@@ -200,4 +200,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME       PARENT   COMPAT   MACHINE    INPUT     INIT     COMPANY    FULLNAME       FLAGS */
-COMP( 1979, dolphunk,  0,       0,       dolphunk,  dolphunk, dolphunk_state, 0,     "<unknown>", "Dolphin", 0 )
+COMP( 1979, dolphunk,  0,       0,       dolphunk,  dolphunk, driver_device, 0,     "<unknown>", "Dolphin", 0 )

@@ -13,7 +13,7 @@
 /*
     driver init function
 */
-static DRIVER_INIT( tx0 )
+DRIVER_INIT_MEMBER(tx0_state,tx0)
 {
 	UINT8 *dst;
 
@@ -70,7 +70,7 @@ static DRIVER_INIT( tx0 )
 	};
 
 	/* set up our font */
-	dst = machine.root_device().memregion("gfx1")->base();
+	dst = machine().root_device().memregion("gfx1")->base();
 
 	memcpy(dst, fontdata6x8, tx0_fontdata_size);
 }

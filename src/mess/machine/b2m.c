@@ -277,10 +277,9 @@ static WRITE_LINE_DEVICE_HANDLER( b2m_pic_set_int_line )
 }
 
 /* Driver initialization */
-DRIVER_INIT( b2m )
+DRIVER_INIT_MEMBER(b2m_state,b2m)
 {
-	b2m_state *state = machine.driver_data<b2m_state>();
-	state->m_vblank_state = 0;
+	m_vblank_state = 0;
 }
 
 WRITE8_MEMBER(b2m_state::b2m_palette_w)

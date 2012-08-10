@@ -62,6 +62,7 @@ public:
 	bool m_display_on;
 	bool m_display_enabled;
 	required_shared_ptr<UINT16> m_screen_buffer;
+	DECLARE_DRIVER_INIT(apricot);
 };
 
 
@@ -253,21 +254,20 @@ static const mc6845_interface apricot_mc6845_intf =
     DRIVER INIT
 ***************************************************************************/
 
-static DRIVER_INIT( apricot )
+DRIVER_INIT_MEMBER(apricot_state,apricot)
 {
-	apricot_state *state = machine.driver_data<apricot_state>();
-	address_space *prg = state->m_maincpu->memory().space(AS_PROGRAM);
+	address_space *prg = m_maincpu->memory().space(AS_PROGRAM);
 
-	UINT8 *ram = state->m_ram->pointer();
-	UINT32 ram_size = state->m_ram->size();
+	UINT8 *ram = m_ram->pointer();
+	UINT32 ram_size = m_ram->size();
 
 	prg->unmap_readwrite(0x40000, 0xeffff);
 	prg->install_ram(0x00000, ram_size - 1, ram);
 
-	device_set_irq_callback(state->m_maincpu, apricot_irq_ack);
+	device_set_irq_callback(m_maincpu, apricot_irq_ack);
 
-	state->m_video_mode = 0;
-	state->m_display_on = 1;
+	m_video_mode = 0;
+	m_display_on = 1;
 }
 
 

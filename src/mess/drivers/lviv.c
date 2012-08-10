@@ -482,4 +482,4 @@ ROM_START(lviv)
 ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY         FULLNAME    FLAGS */
-COMP( 1989, lviv,   0,      0,      lviv,   lviv, lviv_state,   0,      "V. I. Lenin",  "Lviv" ,    0 )
+COMP( 1989, lviv,   0,      0,      lviv,   lviv, driver_device,   0,      "V. I. Lenin",  "Lviv" ,    0 )

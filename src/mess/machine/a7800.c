@@ -92,15 +92,15 @@ static void a7800_driver_init(running_machine &machine, int ispal, int lines)
 }
 
 
-DRIVER_INIT( a7800_ntsc )
+DRIVER_INIT_MEMBER(a7800_state,a7800_ntsc)
 {
-	a7800_driver_init(machine, FALSE, 262);
+	a7800_driver_init(machine(), FALSE, 262);
 }
 
 
-DRIVER_INIT( a7800_pal )
+DRIVER_INIT_MEMBER(a7800_state,a7800_pal)
 {
-	a7800_driver_init(machine, TRUE, 312);
+	a7800_driver_init(machine(), TRUE, 312);
 }
 
 

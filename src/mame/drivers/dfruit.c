@@ -375,7 +375,7 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		DEVCB_INPUT_PORT("IN4"), DEVCB_INPUT_PORT("IN5"), DEVCB_NULL, DEVCB_NULL,
 	},
-	0
+	DEVCB_NULL
 };
 
 
@@ -428,4 +428,4 @@ ROM_START( dfruit )
 	ROM_LOAD( "c2.ic10", 0x00000, 0x80000, CRC(d869ab24) SHA1(382e874a846855a7f6f8811625aaa30d9dfa1ce2) )
 ROM_END
 
-GAME( 1993, dfruit,  0,   dfruit, dfruit, dfruit_state,  0, ROT0, "Nippon Data Kiki / Star Fish", "Fruit Dream (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, dfruit,  0,   dfruit, dfruit, driver_device,  0, ROT0, "Nippon Data Kiki / Star Fish", "Fruit Dream (Japan)", GAME_IMPERFECT_GRAPHICS )

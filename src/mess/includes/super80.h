@@ -75,6 +75,8 @@ public:
 	UINT8 *m_p_colorram;
 	UINT8 *m_p_pcgram;
 	void mc6845_cursor_configure();
+	DECLARE_DRIVER_INIT(super80);
+	DECLARE_DRIVER_INIT(super80v);
 };
 
 
@@ -94,8 +96,6 @@ MC6845_UPDATE_ROW( super80v_update_row );
 /*----------- defined in machine/super80.c -----------*/
 
 MACHINE_RESET( super80 );
-DRIVER_INIT( super80 );
-DRIVER_INIT( super80v );
 
 extern const z80pio_interface super80_pio_intf;
 

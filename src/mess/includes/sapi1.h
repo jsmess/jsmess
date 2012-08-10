@@ -35,13 +35,13 @@ public:
 	DECLARE_WRITE8_MEMBER(sapi3_25_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT8 m_term_data;
+	DECLARE_DRIVER_INIT(sapi1);
+	DECLARE_DRIVER_INIT(sapizps3);
 };
 
 
 /*----------- defined in machine/sapi1.c -----------*/
 
-extern DRIVER_INIT( sapi1 );
-extern DRIVER_INIT( sapizps3 );
 extern MACHINE_START( sapi1 );
 extern MACHINE_RESET( sapi1 );
 extern MACHINE_RESET( sapizps3 );

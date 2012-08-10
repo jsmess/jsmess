@@ -71,6 +71,7 @@ public:
 	INT32 m_timer2_increment;
 	DECLARE_READ8_MEMBER(avr8_read);
 	DECLARE_WRITE8_MEMBER(avr8_write);
+	DECLARE_DRIVER_INIT(craft);
 };
 
 void craft_state::machine_start()
@@ -958,7 +959,7 @@ static SCREEN_UPDATE_RGB32( craft )
 * Machine definition                                 *
 \****************************************************/
 
-static DRIVER_INIT( craft )
+DRIVER_INIT_MEMBER(craft_state,craft)
 {
 }
 

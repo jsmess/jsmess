@@ -1085,24 +1085,23 @@ static MACHINE_RESET( pcw )
 	state->m_printer_shift_output = 0;
 }
 
-static DRIVER_INIT(pcw)
+DRIVER_INIT_MEMBER(pcw_state,pcw)
 {
-	pcw_state *state = machine.driver_data<pcw_state>();
-	device_set_input_line_vector(machine.device("maincpu"), 0, 0x0ff);
+	device_set_input_line_vector(machine().device("maincpu"), 0, 0x0ff);
 
 	/* lower 4 bits are interrupt counter */
-	state->m_system_status = 0x000;
-	state->m_system_status &= ~((1<<6) | (1<<5) | (1<<4));
+	m_system_status = 0x000;
+	m_system_status &= ~((1<<6) | (1<<5) | (1<<4));
 
-	state->m_interrupt_counter = 0;
+	m_interrupt_counter = 0;
 
-	state->m_roller_ram_offset = 0;
+	m_roller_ram_offset = 0;
 
 	/* timer interrupt */
-	machine.scheduler().timer_set(attotime::zero, FUNC(setup_beep));
+	machine().scheduler().timer_set(attotime::zero, FUNC(setup_beep));
 
-	state->m_prn_stepper = machine.scheduler().timer_alloc(FUNC(pcw_stepper_callback));
-	state->m_prn_pins = machine.scheduler().timer_alloc(FUNC(pcw_pins_callback));
+	m_prn_stepper = machine().scheduler().timer_alloc(FUNC(pcw_stepper_callback));
+	m_prn_pins = machine().scheduler().timer_alloc(FUNC(pcw_pins_callback));
 }
 
 

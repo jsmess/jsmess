@@ -64,6 +64,7 @@ public:
 	bool m_video_wl;
 	bool m_ram_bank;
 	UINT8 *m_p_vram;
+	DECLARE_DRIVER_INIT(pasopia);
 };
 
 static VIDEO_START( pasopia )
@@ -324,16 +325,15 @@ static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
 	DEVCB_DRIVER_MEMBER(pasopia_state, kbd_put)
 };
 
-DRIVER_INIT( pasopia )
+DRIVER_INIT_MEMBER(pasopia_state,pasopia)
 {
 /*
 We preset all banks here, so that bankswitching will incur no speed penalty.
 0000 indicates ROMs, 10000 indicates RAM.
 */
-	pasopia_state *state = machine.driver_data<pasopia_state>();
-	UINT8 *p_ram = state->memregion("maincpu")->base();
-	state->membank("bank1")->configure_entries(0, 2, &p_ram[0x00000], 0x10000);
-	state->membank("bank2")->configure_entry(0, &p_ram[0x10000]);
+	UINT8 *p_ram = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 2, &p_ram[0x00000], 0x10000);
+	membank("bank2")->configure_entry(0, &p_ram[0x10000]);
 }
 
 static MACHINE_CONFIG_START( pasopia, pasopia_state )

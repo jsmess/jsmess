@@ -304,10 +304,9 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( astrocde )
+DRIVER_INIT_MEMBER(astrocde_state,astrocde)
 {
-	astrocde_state *state = machine.driver_data<astrocde_state>();
-	state->m_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS;
+	m_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS;
 }
 
 MACHINE_RESET( astrocde )

@@ -679,48 +679,44 @@ static void pet_common_driver_init( running_machine &machine )
 }
 
 
-DRIVER_INIT( pet2001 )
+DRIVER_INIT_MEMBER(pet_state,pet2001)
 {
-	pet_state *state = machine.driver_data<pet_state>();
-	state->m_memory.set_target(machine.device<ram_device>(RAM_TAG)->pointer(),state->m_memory.bytes());
-	pet_common_driver_init(machine);
-	state->m_pet_basic1 = 1;
-	pet_vh_init(machine);
+	m_memory.set_target(machine().device<ram_device>(RAM_TAG)->pointer(),m_memory.bytes());
+	pet_common_driver_init(machine());
+	m_pet_basic1 = 1;
+	pet_vh_init(machine());
 }
 
-DRIVER_INIT( pet )
+DRIVER_INIT_MEMBER(pet_state,pet)
 {
-	pet_state *state = machine.driver_data<pet_state>();
-	state->m_memory.set_target(machine.device<ram_device>(RAM_TAG)->pointer(),state->m_memory.bytes());
-	pet_common_driver_init(machine);
-	pet_vh_init(machine);
+	m_memory.set_target(machine().device<ram_device>(RAM_TAG)->pointer(),m_memory.bytes());
+	pet_common_driver_init(machine());
+	pet_vh_init(machine());
 }
 
-DRIVER_INIT( pet80 )
+DRIVER_INIT_MEMBER(pet_state,pet80)
 {
-	pet_state *state = machine.driver_data<pet_state>();
-	state->m_memory.set_target(state->memregion("maincpu")->base(),state->m_memory.bytes());
+	m_memory.set_target(memregion("maincpu")->base(),m_memory.bytes());
 
-	pet_common_driver_init(machine);
-	state->m_cbm8096 = 1;
-	state->m_videoram.set_target(&state->m_memory[0x8000],state->m_videoram.bytes());
-	pet80_vh_init(machine);
+	pet_common_driver_init(machine());
+	m_cbm8096 = 1;
+	m_videoram.set_target(&m_memory[0x8000],m_videoram.bytes());
+	pet80_vh_init(machine());
 
 }
 
-DRIVER_INIT( superpet )
+DRIVER_INIT_MEMBER(pet_state,superpet)
 {
-	pet_state *state = machine.driver_data<pet_state>();
-	state->m_memory.set_target(machine.device<ram_device>(RAM_TAG)->pointer(),state->m_memory.bytes());
-	pet_common_driver_init(machine);
-	state->m_superpet = 1;
+	m_memory.set_target(machine().device<ram_device>(RAM_TAG)->pointer(),m_memory.bytes());
+	pet_common_driver_init(machine());
+	m_superpet = 1;
 
-	state->m_supermemory = auto_alloc_array(machine, UINT8, 0x10000);
+	m_supermemory = auto_alloc_array(machine(), UINT8, 0x10000);
 
-	state->membank("bank1")->configure_entries(0, 16, state->m_supermemory, 0x1000);
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entries(0, 16, m_supermemory, 0x1000);
+	membank("bank1")->set_entry(0);
 
-	superpet_vh_init(machine);
+	superpet_vh_init(machine());
 }
 
 MACHINE_RESET( pet )

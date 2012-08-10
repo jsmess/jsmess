@@ -51,6 +51,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_DRIVER_INIT(argo);
 };
 
 // write to videoram if following 'out b9,61' otherwise write to the unknown 'extra' ram
@@ -263,11 +264,10 @@ MACHINE_RESET_MEMBER(argo_state)
 	machine().scheduler().timer_set(attotime::from_usec(5), FUNC(argo_boot));
 }
 
-DRIVER_INIT( argo )
+DRIVER_INIT_MEMBER(argo_state,argo)
 {
-	argo_state *state = machine.driver_data<argo_state>();
-	UINT8 *RAM = state->memregion("maincpu")->base();
-	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
+	UINT8 *RAM = memregion("maincpu")->base();
+	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 }
 
 VIDEO_START_MEMBER( argo_state )

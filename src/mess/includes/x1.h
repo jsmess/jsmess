@@ -193,6 +193,7 @@ public:
 	required_device<device_t> m_fdc;
 	required_device<mc6845_device> m_crtc;
 	required_device<z80ctc_device> m_ctc;
+	DECLARE_DRIVER_INIT(x1_kanji);
 };
 
 
@@ -211,7 +212,6 @@ MACHINE_RESET( x1turbo );
 MACHINE_START( x1 );
 PALETTE_INIT(x1);
 
-DRIVER_INIT( x1_kanji );
 
 
 /*----------- defined in machine/x1.c -----------*/

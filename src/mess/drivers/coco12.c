@@ -343,8 +343,8 @@ ROM_END
 //**************************************************************************
 
 /*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT      INIT    COMPANY                 FULLNAME */
-COMP(  1980,    coco,       0,      0,      coco,      coco, coco12_state,      0,      "Tandy Radio Shack",    "Color Computer", 0)
-COMP(  1981,    cocoe,      coco,   0,      cocoe,     coco, coco12_state,      0,      "Tandy Radio Shack",    "Color Computer (Extended BASIC 1.0)", 0)
-COMP(  1983,    coco2,      coco,   0,      coco2,     coco, coco12_state,      0,      "Tandy Radio Shack",	  "Color Computer 2", 0)
-COMP(  1985?,   coco2b,     coco,   0,      coco2b,    coco, coco12_state,      0,      "Tandy Radio Shack",	  "Color Computer 2B", 0)
-COMP(  1984,    cp400,      coco,   0,      cp400,     coco, coco12_state,      0,      "Prologica",            "CP400", 0)
+COMP(  1980,    coco,       0,      0,      coco,      coco, driver_device,      0,      "Tandy Radio Shack",    "Color Computer", 0)
+COMP(  1981,    cocoe,      coco,   0,      cocoe,     coco, driver_device,      0,      "Tandy Radio Shack",    "Color Computer (Extended BASIC 1.0)", 0)
+COMP(  1983,    coco2,      coco,   0,      coco2,     coco, driver_device,      0,      "Tandy Radio Shack",	  "Color Computer 2", 0)
+COMP(  1985?,   coco2b,     coco,   0,      coco2b,    coco, driver_device,      0,      "Tandy Radio Shack",	  "Color Computer 2B", 0)
+COMP(  1984,    cp400,      coco,   0,      cp400,     coco, driver_device,      0,      "Prologica",            "CP400", 0)

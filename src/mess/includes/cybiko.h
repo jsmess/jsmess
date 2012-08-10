@@ -76,15 +76,15 @@ public:
 	required_device<device_t> m_speaker;
 	required_device<device_t> m_rtc;
 	optional_device<device_t> m_flash1;
+	DECLARE_DRIVER_INIT(cybikoxt);
+	DECLARE_DRIVER_INIT(cybikov1);
+	DECLARE_DRIVER_INIT(cybikov2);
 };
 
 
 /*----------- defined in machine/cybiko.c -----------*/
 
 // driver init
-DRIVER_INIT( cybikov1 );
-DRIVER_INIT( cybikov2 );
-DRIVER_INIT( cybikoxt );
 
 // machine start
 MACHINE_START( cybikov1 );

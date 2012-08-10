@@ -47,6 +47,7 @@ public:
 	UINT8 *m_p_chargen;
 	UINT8 m_xor_display;
 	UINT8 m_key_mux;
+	DECLARE_DRIVER_INIT(bmjr);
 };
 
 
@@ -385,7 +386,7 @@ ROM_START( bmjr )
 ROM_END
 
 /* Driver */
-static DRIVER_INIT( bmjr )
+DRIVER_INIT_MEMBER(bmjr_state,bmjr)
 {
 
 }

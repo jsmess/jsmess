@@ -48,6 +48,10 @@ public:
 	emu_timer *m_datasette2_timer;
 	spet_t m_spet;
 	int m_pia_level;
+	DECLARE_DRIVER_INIT(superpet);
+	DECLARE_DRIVER_INIT(pet80);
+	DECLARE_DRIVER_INIT(pet);
+	DECLARE_DRIVER_INIT(pet2001);
 };
 
 /*----------- defined in video/pet.c -----------*/
@@ -74,10 +78,6 @@ WRITE8_HANDLER(cbm8096_w);
 extern READ8_HANDLER(superpet_r);
 extern WRITE8_HANDLER(superpet_w);
 
-DRIVER_INIT( pet2001 );
-DRIVER_INIT( pet );
-DRIVER_INIT( pet80 );
-DRIVER_INIT( superpet );
 MACHINE_RESET( pet );
 INTERRUPT_GEN( pet_frame_interrupt );
 

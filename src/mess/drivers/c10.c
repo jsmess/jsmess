@@ -31,6 +31,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_DRIVER_INIT(c10);
 };
 
 
@@ -156,11 +157,10 @@ static MACHINE_CONFIG_START( c10, c10_state )
 	MCFG_PALETTE_INIT(black_and_white)
 MACHINE_CONFIG_END
 
-DRIVER_INIT( c10 )
+DRIVER_INIT_MEMBER(c10_state,c10)
 {
-	c10_state *state = machine.driver_data<c10_state>();
-	UINT8 *RAM = state->memregion("maincpu")->base();
-	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x8000);
+	UINT8 *RAM = memregion("maincpu")->base();
+	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x8000);
 }
 
 /* ROM definition */

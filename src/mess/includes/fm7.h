@@ -230,6 +230,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fm7_kanji_w);
 	void fm77av_encoder_setup_command();
 	void fm77av_encoder_handle_command();
+	DECLARE_DRIVER_INIT(fm7);
 };
 
 

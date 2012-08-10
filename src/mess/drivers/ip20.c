@@ -57,6 +57,7 @@ public:
 	DECLARE_WRITE32_MEMBER(hpc_w);
 	DECLARE_READ32_MEMBER(int_r);
 	DECLARE_WRITE32_MEMBER(int_w);
+	DECLARE_DRIVER_INIT(ip204415);
 };
 
 
@@ -492,7 +493,7 @@ static const struct WD33C93interface scsi_intf =
 	&scsi_irq,		/* command completion IRQ */
 };
 
-static DRIVER_INIT( ip204415 )
+DRIVER_INIT_MEMBER(ip20_state,ip204415)
 {
 }
 

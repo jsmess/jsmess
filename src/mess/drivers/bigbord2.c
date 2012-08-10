@@ -144,6 +144,7 @@ public:
 	required_device<device_t> m_floppy2;
 	required_device<device_t> m_floppy3;
 	required_device<device_t> m_beeper;
+	DECLARE_DRIVER_INIT(bigbord2);
 };
 
 /* Status port
@@ -560,13 +561,12 @@ void bigbord2_state::machine_reset()
 	membank("banka")->set_entry(0);
 }
 
-static DRIVER_INIT( bigbord2 )
+DRIVER_INIT_MEMBER(bigbord2_state,bigbord2)
 {
-	bigbord2_state *state = machine.driver_data<bigbord2_state>();
-	UINT8 *RAM = state->memregion(Z80_TAG)->base();
-	state->membank("bankr")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
-	state->membank("bankv")->configure_entries(0, 2, &RAM[0x6000], 0x10000);
-	state->membank("banka")->configure_entries(0, 2, &RAM[0x7000], 0x10000);
+	UINT8 *RAM = memregion(Z80_TAG)->base();
+	membank("bankr")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
+	membank("bankv")->configure_entries(0, 2, &RAM[0x6000], 0x10000);
+	membank("banka")->configure_entries(0, 2, &RAM[0x7000], 0x10000);
 }
 
 static LEGACY_FLOPPY_OPTIONS_START( bigbord2 )

@@ -317,14 +317,14 @@ static void init_at_common(running_machine &machine)
 	state->m_at_offset1 = 0xff;
 }
 
-DRIVER_INIT( atcga )
+DRIVER_INIT_MEMBER(at_state,atcga)
 {
-	init_at_common(machine);
+	init_at_common(machine());
 }
 
-DRIVER_INIT( atvga)
+DRIVER_INIT_MEMBER(at_state,atvga)
 {
-	init_at_common(machine);
+	init_at_common(machine());
 }
 
 static IRQ_CALLBACK(at_irq_callback)

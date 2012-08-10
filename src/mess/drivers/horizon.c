@@ -117,6 +117,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( 1979, horizdd,  0,       0,    horizon,   horizon, horizon_state, 0,  "NorthStar", "Horizon (DD drive)", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1979, horizsd,  horizdd, 0,    horizsd,   horizon, horizon_state, 0,  "NorthStar", "Horizon (SD drive)", GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1979, vector1,  horizdd, 0,    horizon,   horizon, horizon_state, 0,  "Vector Graphic", "Vector 1+ (DD drive)", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1979, horizdd,  0,       0,    horizon,   horizon, driver_device, 0,  "NorthStar", "Horizon (DD drive)", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1979, horizsd,  horizdd, 0,    horizsd,   horizon, driver_device, 0,  "NorthStar", "Horizon (SD drive)", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1979, vector1,  horizdd, 0,    horizon,   horizon, driver_device, 0,  "Vector Graphic", "Vector 1+ (DD drive)", GAME_NOT_WORKING | GAME_NO_SOUND)

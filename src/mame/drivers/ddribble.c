@@ -235,7 +235,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_DRIVER_MEMBER(ddribble_state,ddribble_vlm5030_ctrl_w),
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 static const vlm5030_interface vlm5030_config =
@@ -403,5 +403,5 @@ ROM_START( ddribblep )
 	ROM_LOAD( "voice_10.d7", 0x10000, 0x10000, CRC(b4c97494) SHA1(93f7c3c93f6f790c3f480e183da0105b5ac3593b) )
 ROM_END
 
-GAME( 1986, ddribble,  0,        ddribble, ddribble, ddribble_state, 0, ROT0, "Konami", "Double Dribble", GAME_SUPPORTS_SAVE )
-GAME( 1986, ddribblep, ddribble, ddribble, ddribble, ddribble_state, 0, ROT0, "Konami", "Double Dribble (prototype?)", GAME_SUPPORTS_SAVE )
+GAME( 1986, ddribble,  0,        ddribble, ddribble, driver_device, 0, ROT0, "Konami", "Double Dribble", GAME_SUPPORTS_SAVE )
+GAME( 1986, ddribblep, ddribble, ddribble, ddribble, driver_device, 0, ROT0, "Konami", "Double Dribble (prototype?)", GAME_SUPPORTS_SAVE )

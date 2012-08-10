@@ -84,4 +84,5 @@ public:
 	int m_fdie;
 	int m_sl0;
 	int m_sl1;
+	DECLARE_DRIVER_INIT(sage2);
 };

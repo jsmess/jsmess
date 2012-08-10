@@ -1994,7 +1994,7 @@ static const ym2203_interface ym2203_interface_1 =
 		DEVCB_DEVICE_HANDLER("ym", opn_porta_w),	// write A
 		DEVCB_NULL					// write B
 	},
-	NULL
+	DEVCB_NULL
 };
 
 static PALETTE_INIT( mz2500 )
@@ -2199,6 +2199,6 @@ ROM_END
 
 /* Driver */
 
-COMP( 1985, mz2500,   0,        	 0,      mz2500,   mz2500, mz2500_state,        0,      "Sharp",     "MZ-2500", 0 )
-COMP( 1985, mz2520,   mz2500,        0,      mz2500,   mz2500, mz2500_state,        0,      "Sharp",     "MZ-2520", 0 ) // looks a stripped down version of the regular MZ-2500, with only two floppies drives and no cassette interface
+COMP( 1985, mz2500,   0,        	 0,      mz2500,   mz2500, driver_device,        0,      "Sharp",     "MZ-2500", 0 )
+COMP( 1985, mz2520,   mz2500,        0,      mz2500,   mz2500, driver_device,        0,      "Sharp",     "MZ-2520", 0 ) // looks a stripped down version of the regular MZ-2500, with only two floppies drives and no cassette interface
 

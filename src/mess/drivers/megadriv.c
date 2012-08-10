@@ -408,13 +408,13 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT( mess_md_common )
+DRIVER_INIT_MEMBER(md_cons_state,mess_md_common)
 {
 	megadrive_io_read_data_port_ptr = mess_md_io_read_data_port;
 	megadrive_io_write_data_port_ptr = mess_md_io_write_data_port;
 }
 
-static DRIVER_INIT( genesis )
+DRIVER_INIT_MEMBER(md_cons_state,genesis)
 {
 	DRIVER_INIT_CALL(megadriv);
 	DRIVER_INIT_CALL(mess_md_common);
@@ -422,7 +422,7 @@ static DRIVER_INIT( genesis )
 	megadrive_region_pal = 0;
 }
 
-static DRIVER_INIT( md_eur )
+DRIVER_INIT_MEMBER(md_cons_state,md_eur)
 {
 	DRIVER_INIT_CALL(megadrie);
 	DRIVER_INIT_CALL(mess_md_common);
@@ -430,7 +430,7 @@ static DRIVER_INIT( md_eur )
 	megadrive_region_pal = 1;
 }
 
-static DRIVER_INIT( md_jpn )
+DRIVER_INIT_MEMBER(md_cons_state,md_jpn)
 {
 	DRIVER_INIT_CALL(megadrij);
 	DRIVER_INIT_CALL(mess_md_common);
@@ -443,7 +443,7 @@ static DRIVER_INIT( md_jpn )
 /* Very preliminary skeleton code from David Haywood, borrowed for MESS by Fabio Priuli */
 /* These are only included to document BIOS informations currently available */
 
-static DRIVER_INIT( mess_32x )
+DRIVER_INIT_MEMBER(md_cons_state,mess_32x)
 {
 	DRIVER_INIT_CALL(_32x);
 	DRIVER_INIT_CALL(mess_md_common);
@@ -451,7 +451,7 @@ static DRIVER_INIT( mess_32x )
 	megadrive_region_pal = 0;
 }
 
-static DRIVER_INIT( mess_32x_eur )
+DRIVER_INIT_MEMBER(md_cons_state,mess_32x_eur)
 {
 	DRIVER_INIT_CALL(_32x);
 	DRIVER_INIT_CALL(mess_md_common);
@@ -460,7 +460,7 @@ static DRIVER_INIT( mess_32x_eur )
 }
 
 
-static DRIVER_INIT( mess_32x_jpn )
+DRIVER_INIT_MEMBER(md_cons_state,mess_32x_jpn)
 {
 	DRIVER_INIT_CALL(_32x);
 	DRIVER_INIT_CALL(mess_md_common);
@@ -891,9 +891,9 @@ CONS( 1988, megadrij,   genesis,   0,      ms_megadriv,     md, md_cons_state,  
 
 // these should not exist, the SVP hardware is in the cart and should be installed dynamically when selected from the Software List
 // this however involves installing entire CPUs at run/load time and I don't think we can do that.
-CONS( 1993, gensvp,     genesis,   0,      ms_megdsvp,      md, mdsvp_state,     genesis,   "Sega",   "Genesis (USA, NTSC, for SVP cart)", 0)
-CONS( 1990, mdsvp,      genesis,   0,      ms_megdsvppal,   md, mdsvp_state,     md_eur,    "Sega",   "Mega Drive (Europe, PAL, for SVP cart)", 0)
-CONS( 1988, mdsvpj,     genesis,   0,      ms_megdsvp,      md, mdsvp_state,     md_jpn,    "Sega",   "Mega Drive (Japan, NTSC, for SVP cart)", 0)
+CONS( 1993, gensvp,     genesis,   0,      ms_megdsvp,      md, md_cons_state,     genesis,   "Sega",   "Genesis (USA, NTSC, for SVP cart)", 0)
+CONS( 1990, mdsvp,      genesis,   0,      ms_megdsvppal,   md, md_cons_state,     md_eur,    "Sega",   "Mega Drive (Europe, PAL, for SVP cart)", 0)
+CONS( 1988, mdsvpj,     genesis,   0,      ms_megdsvp,      md, md_cons_state,     md_jpn,    "Sega",   "Mega Drive (Japan, NTSC, for SVP cart)", 0)
 
 // the 32X plugged in the cart slot, games plugged into the 32x.  Maybe it should be handled as an expansion device?
 CONS( 1994, 32x,        0,         0,      ms_32x,          md, md_cons_state, mess_32x,      "Sega",   "32X (USA, NTSC)", GAME_NOT_WORKING )
@@ -919,6 +919,6 @@ CONS( 1994, 32x_scd,    0,         0,      genesis_32x_scd, md, md_cons_state, 	
 
 // this is a standalone system based on the md-like hardware (same vdp etc.)
 
-CONS( 1994, pico,       0,         0,      picopal,         pico, pico_state,   md_eur,    "Sega",   "Pico (Europe, PAL)", 0)
-CONS( 1994, picou,      pico,      0,      pico,            pico, pico_state,   genesis,   "Sega",   "Pico (USA, NTSC)", 0)
-CONS( 1993, picoj,      pico,      0,      pico,            pico, pico_state,   md_jpn,    "Sega",   "Pico (Japan, NTSC)", 0)
+CONS( 1994, pico,       0,         0,      picopal,         pico, md_cons_state,   md_eur,    "Sega",   "Pico (Europe, PAL)", 0)
+CONS( 1994, picou,      pico,      0,      pico,            pico, md_cons_state,   genesis,   "Sega",   "Pico (USA, NTSC)", 0)
+CONS( 1993, picoj,      pico,      0,      pico,            pico, md_cons_state,   md_jpn,    "Sega",   "Pico (Japan, NTSC)", 0)

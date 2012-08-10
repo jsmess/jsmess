@@ -37,6 +37,7 @@ public:
 	int m_cd32_shifter[2];
 	int m_oldstate[2];
 	DECLARE_WRITE32_MEMBER(aga_overlay_w);
+	DECLARE_DRIVER_INIT(a1200);
 };
 
 
@@ -381,9 +382,8 @@ ROM_END
 
 /***************************************************************************************************/
 
-static DRIVER_INIT( a1200 )
+DRIVER_INIT_MEMBER(ami1200_state,a1200)
 {
-	ami1200_state *state = machine.driver_data<ami1200_state>();
 	static const amiga_machine_interface cd32_intf =
 	{
 		AGA_CHIP_RAM_MASK,
@@ -397,14 +397,14 @@ static DRIVER_INIT( a1200 )
 	};
 
 	/* configure our Amiga setup */
-	amiga_machine_config(machine, &cd32_intf);
+	amiga_machine_config(machine(), &cd32_intf);
 
 	/* set up memory */
-	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
+	membank("bank1")->configure_entry(0, m_chip_ram);
+	membank("bank1")->configure_entry(1, machine().root_device().memregion("user1")->base());
 
 	/* initialize keyboard */
-	amigakbd_init(machine);
+	amigakbd_init(machine());
 }
 
 

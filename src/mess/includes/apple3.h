@@ -56,6 +56,7 @@ public:
 	UINT8 apple3_profile_r(offs_t offset);
 	void apple3_profile_w(offs_t offset, UINT8 data);
 	DECLARE_DIRECT_UPDATE_MEMBER(apple3_opbase);
+	DECLARE_DRIVER_INIT(apple3);
 };
 
 
@@ -66,7 +67,6 @@ extern const via6522_interface apple3_via_0_intf;
 extern const via6522_interface apple3_via_1_intf;
 
 MACHINE_RESET( apple3 );
-DRIVER_INIT( apple3 );
 INTERRUPT_GEN( apple3_interrupt );
 
 

@@ -185,6 +185,7 @@ public:
 	DECLARE_READ16_MEMBER(read_unknown3);
 	DECLARE_READ32_MEMBER(read_1800000);
 	DECLARE_WRITE32_MEMBER(write_1000000);
+	DECLARE_DRIVER_INIT(polgar);
 };
 
 static const hd44780_interface chess_display =
@@ -1959,37 +1960,36 @@ ROM_START( lond030 )
 
 ROM_END
 
-static DRIVER_INIT( polgar )
+DRIVER_INIT_MEMBER(polgar_state,polgar)
 {
-	polgar_state *state = machine.driver_data<polgar_state>();
-	state->led_status=0;
+	led_status=0;
 }
 
 /*       YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     INIT     COMPANY                      FULLNAME                     FLAGS */
   CONS(  1986, polgar,   0,       0,      polgar,    polgar, polgar_state,   polgar,  "Hegener & Glaser",          "Mephisto Polgar Schachcomputer", GAME_REQUIRES_ARTWORK)
-  CONS(  1987, sfortea,  0,       0,      sfortea,   sfortea, polgar_state,  0,       "Novag",                     "Novag Super Forte A Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
-  CONS(  1988, alm16,    van16,   0,      alm16,     van16, polgar_state,    0,       "Hegener & Glaser Muenchen", "Mephisto Almeria 68000", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-  CONS(  1988, alm32,    van16,   0,      alm32,     van32, polgar_state,    0,       "Hegener & Glaser Muenchen", "Mephisto Alimera 68020", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-  CONS(  1988, sforteb,  sfortea, 0,      sfortea,   sfortea, polgar_state,  0,       "Novag",                     "Novag Super Forte B Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
-  CONS(  1988, sforteba, sfortea, 0,      sfortea,   sfortea, polgar_state,  0,       "Novag",                     "Novag Super Forte B Chess Computer (ALT)", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
-  CONS(  1988, sexpertb, sfortea, 0,      sfortea,   sfortea, polgar_state,  0,       "Novag",                     "Novag Expert B Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
-  CONS(  1989, academy,  0,       0,      academy,   academy, polgar_state,  0,       "Hegener & Glaser",          "Mephisto Academy Schachcomputer", GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING )
-  CONS(  1989, megaiv,   0,       0,      megaiv,    megaiv, polgar_state,   0,       "Hegener & Glaser",          "Mephisto Mega IV Schachcomputer", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
+  CONS(  1987, sfortea,  0,       0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte A Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
+  CONS(  1988, alm16,    van16,   0,      alm16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Almeria 68000", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+  CONS(  1988, alm32,    van16,   0,      alm32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Alimera 68020", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+  CONS(  1988, sforteb,  sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte B Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
+  CONS(  1988, sforteba, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte B Chess Computer (ALT)", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
+  CONS(  1988, sexpertb, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Expert B Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
+  CONS(  1989, academy,  0,       0,      academy,   academy, driver_device,  0,       "Hegener & Glaser",          "Mephisto Academy Schachcomputer", GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING )
+  CONS(  1989, megaiv,   0,       0,      megaiv,    megaiv, driver_device,   0,       "Hegener & Glaser",          "Mephisto Mega IV Schachcomputer", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
   CONS(  1989, milano,   polgar,  0,      milano,    polgar, polgar_state,   polgar,  "Hegener & Glaser",          "Mephisto Milano Schachcomputer", GAME_REQUIRES_ARTWORK )
-//CONS(  1989, montec4,  0,       0,      monteciv,  monteciv, polgar_state, 0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
-  CONS(  1989, sfortec,  sfortea, 0,      sfortea,   sfortea, polgar_state,  0,       "Novag",                     "Novag Super Forte C Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
-  CONS(  1989, sexpertc, sfortea, 0,      sfortea,   sfortea, polgar_state,  0,       "Novag",                     "Novag Super Expert C Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
-  CONS(  1990, lyon16,   van16,   0,      alm16,     van16, polgar_state,    0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68000", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-  CONS(  1990, lyon32,   van16,   0,      alm32,     van32, polgar_state,    0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68020", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-  CONS(  1990, monteciv, 0,       0,      monteciv,  monteciv, polgar_state, 0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV LE Schachcomputer", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
-  CONS(  1991, diablo68, 0,       0,      diablo68,  sfortea, polgar_state,  0,       "Novag",                     "Novag Diablo 68000 Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
-  CONS(  1991, van16,    0,       0,      van16,     van16, polgar_state,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68000", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-  CONS(  1991, van32,    van16,   0,      van32,     van32, polgar_state,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68020", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-  CONS(  1992, risc,     0,       0,      risc,      van16, polgar_state,    0,       "Saitek",                    "RISC2500", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING )
-  CONS(  1993, gen32,    van16,   0,      gen32,     gen32, polgar_state,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.00", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-  CONS(  1993, gen32_41, van16,   0,      gen32,     gen32, polgar_state,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.01", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-  CONS(  1993, gen32_oc, van16,   0,      gen32_oc,  gen32, polgar_state,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.01OC", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_UNOFFICIAL )
-  CONS(  1994, berlinp,  van16,   0,      bpl32,     bpl32, polgar_state,    0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro 68020", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-  CONS(  1996, bpl32,    van16,   0,      bpl32,     bpl32, polgar_state,    0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro London Upgrade V5.00", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-  CONS(  1996, lond020,  van16,   0,      van32,     van32, polgar_state,    0,       "Hegener & Glaser Muenchen", "Mephisto London 68020 32 Bit", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
-  CONS(  1996, lond030,  van16,   0,      gen32,     gen32, polgar_state,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 London Upgrade V5.00", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+//CONS(  1989, montec4,  0,       0,      monteciv,  monteciv, driver_device, 0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
+  CONS(  1989, sfortec,  sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte C Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
+  CONS(  1989, sexpertc, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Expert C Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
+  CONS(  1990, lyon16,   van16,   0,      alm16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68000", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+  CONS(  1990, lyon32,   van16,   0,      alm32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68020", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+  CONS(  1990, monteciv, 0,       0,      monteciv,  monteciv, driver_device, 0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV LE Schachcomputer", GAME_SUPPORTS_SAVE|GAME_NOT_WORKING|GAME_REQUIRES_ARTWORK )
+  CONS(  1991, diablo68, 0,       0,      diablo68,  sfortea, driver_device,  0,       "Novag",                     "Novag Diablo 68000 Chess Computer", GAME_NO_SOUND|GAME_SUPPORTS_SAVE|GAME_NOT_WORKING )
+  CONS(  1991, van16,    0,       0,      van16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68000", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+  CONS(  1991, van32,    van16,   0,      van32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68020", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+  CONS(  1992, risc,     0,       0,      risc,      van16, driver_device,    0,       "Saitek",                    "RISC2500", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_NOT_WORKING )
+  CONS(  1993, gen32,    van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.00", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+  CONS(  1993, gen32_41, van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.01", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+  CONS(  1993, gen32_oc, van16,   0,      gen32_oc,  gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.01OC", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK|GAME_UNOFFICIAL )
+  CONS(  1994, berlinp,  van16,   0,      bpl32,     bpl32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro 68020", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+  CONS(  1996, bpl32,    van16,   0,      bpl32,     bpl32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro London Upgrade V5.00", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+  CONS(  1996, lond020,  van16,   0,      van32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto London 68020 32 Bit", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )
+  CONS(  1996, lond030,  van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 London Upgrade V5.00", GAME_SUPPORTS_SAVE|GAME_REQUIRES_ARTWORK )

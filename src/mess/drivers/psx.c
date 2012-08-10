@@ -53,6 +53,7 @@ public:
 	DECLARE_WRITE8_MEMBER(psx_cd_w);
 	DECLARE_DIRECT_UPDATE_MEMBER(psx_default);
 	DECLARE_DIRECT_UPDATE_MEMBER(psx_setopbase);
+	DECLARE_DRIVER_INIT(psx);
 };
 
 
@@ -705,9 +706,9 @@ static MACHINE_RESET( psx )
 	psx_sio_install_handler( machine, 0, psx_sio0 );
 }
 
-static DRIVER_INIT( psx )
+DRIVER_INIT_MEMBER(psx1_state,psx)
 {
-	psx_driver_init(machine);
+	psx_driver_init(machine());
 }
 
 static INPUT_PORTS_START( psx )

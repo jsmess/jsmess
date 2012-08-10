@@ -181,6 +181,7 @@ public:
 	void compis_fdc_tc(int state);
 
 	required_shared_ptr<UINT8> m_video_ram;
+	DECLARE_DRIVER_INIT(compis);
 };
 
 
@@ -194,7 +195,6 @@ extern const struct pic8259_interface compis_pic8259_slave_config;
 extern const i8251_interface compis_usart_interface;
 extern const upd765_interface compis_fdc_interface;
 
-DRIVER_INIT(compis);
 MACHINE_START(compis);
 MACHINE_RESET(compis);
 INTERRUPT_GEN(compis_vblank_int);

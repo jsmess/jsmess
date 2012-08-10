@@ -16,6 +16,7 @@ public:
 		: driver_device(mconfig, type, tag)
 	{
 	}
+	DECLARE_DRIVER_INIT(uzebox);
 };
 /****************************************************\
 * Address maps                                       *
@@ -50,7 +51,7 @@ static SCREEN_UPDATE_RGB32( uzebox )
 * Machine definition                                 *
 \****************************************************/
 
-static DRIVER_INIT( uzebox )
+DRIVER_INIT_MEMBER(uzebox_state,uzebox)
 {
 }
 

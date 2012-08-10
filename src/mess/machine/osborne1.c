@@ -446,19 +446,18 @@ MACHINE_RESET( osborne1 )
 }
 
 
-DRIVER_INIT( osborne1 )
+DRIVER_INIT_MEMBER(osborne1_state,osborne1)
 {
-	osborne1_state *state = machine.driver_data<osborne1_state>();
 
-	state->m_empty_4K = auto_alloc_array(machine, UINT8, 0x1000 );
-	memset( state->m_empty_4K, 0xFF, 0x1000 );
+	m_empty_4K = auto_alloc_array(machine(), UINT8, 0x1000 );
+	memset( m_empty_4K, 0xFF, 0x1000 );
 
 	/* Configure the 6850 ACIA */
 //  acia6850_config( 0, &osborne1_6850_config );
-	state->m_video_timer = machine.scheduler().timer_alloc(FUNC(osborne1_video_callback));
-	state->m_video_timer->adjust(machine.primary_screen->time_until_pos(1, 0 ));
+	m_video_timer = machine().scheduler().timer_alloc(FUNC(osborne1_video_callback));
+	m_video_timer->adjust(machine().primary_screen->time_until_pos(1, 0 ));
 
-	machine.scheduler().timer_set(attotime::zero, FUNC(setup_osborne1));
+	machine().scheduler().timer_set(attotime::zero, FUNC(setup_osborne1));
 }
 
 

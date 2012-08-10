@@ -2264,7 +2264,7 @@ COMP( 1987, zdsupers,   ibm5150,    0,          zenith,     pccga, pc_state,    
 
 COMP( 1983, m24,        ibm5150,    0,          olivetti,   pccga, pc_state,      pccga,      "Olivetti", "M24", GAME_NOT_WORKING)
 COMP( 1987, m240,       ibm5150,    0,          olivetti,   pccga, pc_state,      pccga,      "Olivetti", "M240", GAME_NOT_WORKING)
-COMP( 198?, olivm15,    ibm5150,    0,          olivm15,    0, pc_state,  	    0,  		"Olivetti", "M15", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, olivm15,    ibm5150,    0,          olivm15,    0, driver_device,  	    0,  		"Olivetti", "M15", GAME_NOT_WORKING | GAME_NO_SOUND)
 
 COMP( 1983, ibm5550,    ibm5150,    0,          ibm5550,    pccga, pc_state,      pccga,      "International Business Machines", "IBM 5550", GAME_NOT_WORKING)
 

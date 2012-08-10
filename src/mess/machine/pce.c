@@ -250,22 +250,19 @@ DEVICE_IMAGE_LOAD(pce_cart)
 	return 0;
 }
 
-DRIVER_INIT( mess_pce )
+DRIVER_INIT_MEMBER(pce_state,mess_pce)
 {
-	pce_state *state = machine.driver_data<pce_state>();
-	state->m_io_port_options = PCE_JOY_SIG | CONST_SIG;
+	m_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
 
-DRIVER_INIT( tg16 )
+DRIVER_INIT_MEMBER(pce_state,tg16)
 {
-	pce_state *state = machine.driver_data<pce_state>();
-	state->m_io_port_options = TG_16_JOY_SIG | CONST_SIG;
+	m_io_port_options = TG_16_JOY_SIG | CONST_SIG;
 }
 
-DRIVER_INIT( sgx )
+DRIVER_INIT_MEMBER(pce_state,sgx)
 {
-	pce_state *state = machine.driver_data<pce_state>();
-	state->m_io_port_options = PCE_JOY_SIG | CONST_SIG;
+	m_io_port_options = PCE_JOY_SIG | CONST_SIG;
 }
 
 MACHINE_START( pce )

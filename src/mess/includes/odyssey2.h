@@ -110,6 +110,7 @@ public:
 	DECLARE_WRITE8_MEMBER(odyssey2_video_w);
 	DECLARE_WRITE8_MEMBER(odyssey2_lum_w);
 	DECLARE_READ8_MEMBER(odyssey2_t1_r);
+	DECLARE_DRIVER_INIT(odyssey2);
 };
 
 
@@ -130,7 +131,6 @@ DECLARE_LEGACY_SOUND_DEVICE(ODYSSEY2, odyssey2_sound);
 
 /*----------- defined in machine/odyssey2.c -----------*/
 
-DRIVER_INIT( odyssey2 );
 MACHINE_RESET( odyssey2 );
 
 /* i/o ports */

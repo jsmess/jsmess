@@ -41,6 +41,8 @@ public:
 	optional_shared_ptr<UINT8> m_p_videoram;
 	int m_keyboard_mask;
 	int m_lcd_digit[6];
+	DECLARE_DRIVER_INIT(ut88);
+	DECLARE_DRIVER_INIT(ut88mini);
 };
 
 
@@ -48,11 +50,9 @@ public:
 
 extern const i8255_interface ut88_ppi8255_interface;
 
-extern DRIVER_INIT( ut88 );
 extern MACHINE_RESET( ut88 );
 extern MACHINE_START( ut88mini );
 extern MACHINE_RESET( ut88mini );
-extern DRIVER_INIT( ut88mini );
 
 /*----------- defined in video/ut88.c -----------*/
 

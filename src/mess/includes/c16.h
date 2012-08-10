@@ -43,6 +43,10 @@ public:
 	cassette_image_device *m_cassette;
 	ram_device *m_messram;
 	device_t *m_sid;
+	DECLARE_DRIVER_INIT(plus4sid);
+	DECLARE_DRIVER_INIT(c16sid);
+	DECLARE_DRIVER_INIT(c16);
+	DECLARE_DRIVER_INIT(plus4);
 };
 
 
@@ -71,10 +75,6 @@ extern void c16_interrupt(running_machine &machine, int level);
 extern int c16_dma_read(running_machine &machine, int offset);
 extern int c16_dma_read_rom(running_machine &machine, int offset);
 
-extern DRIVER_INIT( c16 );
-extern DRIVER_INIT( plus4 );
-extern DRIVER_INIT( c16sid );
-extern DRIVER_INIT( plus4sid );
 extern MACHINE_RESET( c16 );
 extern INTERRUPT_GEN( c16_frame_interrupt );
 

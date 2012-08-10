@@ -30,6 +30,12 @@ public:
 	DECLARE_READ8_MEMBER(mato_io_r);
 	DECLARE_WRITE8_MEMBER(mato_io_w);
 	DECLARE_DIRECT_UPDATE_MEMBER(pmd85_opbaseoverride);
+	DECLARE_DRIVER_INIT(mato);
+	DECLARE_DRIVER_INIT(pmd852a);
+	DECLARE_DRIVER_INIT(pmd851);
+	DECLARE_DRIVER_INIT(pmd853);
+	DECLARE_DRIVER_INIT(alfa);
+	DECLARE_DRIVER_INIT(c2717);
 };
 
 
@@ -40,12 +46,6 @@ extern const i8255_interface pmd85_ppi8255_interface[4];
 extern const i8255_interface alfa_ppi8255_interface[3];
 extern const i8255_interface mato_ppi8255_interface;
 
-DRIVER_INIT ( pmd851 );
-DRIVER_INIT ( pmd852a );
-DRIVER_INIT ( pmd853 );
-DRIVER_INIT ( alfa );
-DRIVER_INIT ( mato );
-DRIVER_INIT ( c2717 );
 extern MACHINE_RESET( pmd85 );
 
 

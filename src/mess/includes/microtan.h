@@ -47,6 +47,7 @@ public:
 	DECLARE_READ8_MEMBER(microtan_bffx_r);
 	DECLARE_WRITE8_MEMBER(microtan_bffx_w);
 	DECLARE_WRITE8_MEMBER(microtan_videoram_w);
+	DECLARE_DRIVER_INIT(microtan);
 };
 
 
@@ -55,7 +56,6 @@ public:
 extern const via6522_interface microtan_via6522_0;
 extern const via6522_interface microtan_via6522_1;
 
-DRIVER_INIT( microtan );
 MACHINE_RESET( microtan );
 
 SNAPSHOT_LOAD( microtan );

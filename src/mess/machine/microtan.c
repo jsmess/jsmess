@@ -511,12 +511,11 @@ INTERRUPT_GEN( microtan_interrupt )
     }
 }
 
-DRIVER_INIT( microtan )
+DRIVER_INIT_MEMBER(microtan_state,microtan)
 {
-	microtan_state *state = machine.driver_data<microtan_state>();
-    UINT8 *dst = state->memregion("gfx2")->base();
+    UINT8 *dst = memregion("gfx2")->base();
     int i;
-    address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+    address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
     for (i = 0; i < 256; i++)
     {
@@ -554,7 +553,7 @@ DRIVER_INIT( microtan )
         dst += 4;
     }
 
-    switch (read_dsw(machine) & 3)
+    switch (read_dsw(machine()) & 3)
     {
         case 0:  // 1K only :)
             space->nop_readwrite(0x0400, 0xbbff);
@@ -568,7 +567,7 @@ DRIVER_INIT( microtan )
             break;
     }
 
-	state->m_timer = machine.scheduler().timer_alloc(FUNC(microtan_read_cassette));
+	m_timer = machine().scheduler().timer_alloc(FUNC(microtan_read_cassette));
 }
 
 MACHINE_RESET( microtan )

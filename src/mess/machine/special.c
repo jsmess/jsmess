@@ -13,14 +13,13 @@
 
 
 /* Driver initialization */
-DRIVER_INIT(special)
+DRIVER_INIT_MEMBER(special_state,special)
 {
-	special_state *state = machine.driver_data<special_state>();
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = machine.root_device().memregion("maincpu")->base();
+	UINT8 *RAM = machine().root_device().memregion("maincpu")->base();
 	memset(RAM,0x0000,0x3000); // make first page empty by default
-	state->membank("bank1")->configure_entries(1, 2, RAM, 0x0000);
-	state->membank("bank1")->configure_entries(0, 2, RAM, 0xc000);
+	membank("bank1")->configure_entries(1, 2, RAM, 0x0000);
+	membank("bank1")->configure_entries(0, 2, RAM, 0xc000);
 }
 
 READ8_MEMBER( special_state::specialist_8255_porta_r )
@@ -341,12 +340,11 @@ void special_state::erik_set_bank()
 	}
 }
 
-DRIVER_INIT( erik )
+DRIVER_INIT_MEMBER(special_state,erik)
 {
-	special_state *state = machine.driver_data<special_state>();
-	state->m_erik_color_1 = 0;
-	state->m_erik_color_2 = 0;
-	state->m_erik_background = 0;
+	m_erik_color_1 = 0;
+	m_erik_color_2 = 0;
+	m_erik_background = 0;
 }
 
 MACHINE_RESET( erik )

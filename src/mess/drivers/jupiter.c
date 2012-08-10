@@ -346,9 +346,9 @@ ROM_END
 //  DRIVER_INIT( jupiter )
 //-------------------------------------------------
 
-static DRIVER_INIT( jupiter )
+DRIVER_INIT_MEMBER(jupiter2_state,jupiter)
 {
-	UINT8 *rom = machine.root_device().memregion(MCM6571AP_TAG)->base();
+	UINT8 *rom = machine().root_device().memregion(MCM6571AP_TAG)->base();
 	UINT8 inverted[0x1000];
 
 	memcpy(inverted, rom, 0x1000);
@@ -368,9 +368,9 @@ static DRIVER_INIT( jupiter )
 //  DRIVER_INIT( jupiter3 )
 //-------------------------------------------------
 
-static DRIVER_INIT( jupiter3 )
+DRIVER_INIT_MEMBER(jupiter3_state,jupiter3)
 {
-	UINT8 *rom = machine.root_device().memregion(Z80_TAG)->base();
+	UINT8 *rom = machine().root_device().memregion(Z80_TAG)->base();
 	UINT8 inverted[0x1000];
 
 	memcpy(inverted, rom, 0x1000);

@@ -103,6 +103,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lynx48k_bank_w);
 	DECLARE_WRITE8_MEMBER(lynx128k_bank_w);
 	DECLARE_WRITE8_MEMBER(lynx128k_irq);
+	DECLARE_DRIVER_INIT(lynx48k);
 };
 
 /* These bankswitch handlers are very incomplete, just enough to get the
@@ -512,11 +513,10 @@ static MACHINE_CONFIG_START( lynx128k, camplynx_state )
 	MCFG_MC6845_ADD("crtc", MC6845, XTAL_12MHz / 8 /*? dot clock divided by dots per char */, lynx128k_crtc6845_interface)
 MACHINE_CONFIG_END
 
-static DRIVER_INIT( lynx48k )
+DRIVER_INIT_MEMBER(camplynx_state,lynx48k)
 {
-	camplynx_state *state = machine.driver_data<camplynx_state>();
-	UINT8 *RAM = state->memregion("maincpu")->base();
-	state->membank("bank1")->configure_entries(0, 3, &RAM[0x8000],  0x8000);
+	UINT8 *RAM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 3, &RAM[0x8000],  0x8000);
 }
 
 
@@ -552,4 +552,4 @@ ROM_END
 /*    YEAR  NAME       PARENT     COMPAT   MACHINE    INPUT     INIT         COMPANY     FULLNAME     FLAGS */
 COMP( 1983, lynx48k,   0,         0,       lynx48k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 48k",   GAME_NOT_WORKING)
 COMP( 1983, lynx96k,   lynx48k,   0,       lynx48k,   lynx48k, camplynx_state,  lynx48k,  "Camputers",  "Lynx 96k",   GAME_NOT_WORKING)
-COMP( 1983, lynx128k,  lynx48k,   0,       lynx128k,  lynx48k, camplynx_state,  0,        "Camputers",  "Lynx 128k",  GAME_NOT_WORKING)
+COMP( 1983, lynx128k,  lynx48k,   0,       lynx128k,  lynx48k, driver_device,  0,        "Camputers",  "Lynx 128k",  GAME_NOT_WORKING)

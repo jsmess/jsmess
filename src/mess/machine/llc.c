@@ -121,7 +121,7 @@ Z80PIO_INTERFACE( llc1_z80pio2_intf )
 	DEVCB_NULL
 };
 
-DRIVER_INIT(llc1)
+DRIVER_INIT_MEMBER(llc_state,llc1)
 {
 }
 
@@ -146,10 +146,9 @@ Z80CTC_INTERFACE( llc2_ctc_intf )
 
 
 /* Driver initialization */
-DRIVER_INIT(llc2)
+DRIVER_INIT_MEMBER(llc_state,llc2)
 {
-	llc_state *state = machine.driver_data<llc_state>();
-	state->m_p_videoram.set_target( machine.device<ram_device>(RAM_TAG)->pointer() + 0xc000,state->m_p_videoram.bytes());
+	m_p_videoram.set_target( machine().device<ram_device>(RAM_TAG)->pointer() + 0xc000,m_p_videoram.bytes());
 }
 
 MACHINE_RESET( llc2 )

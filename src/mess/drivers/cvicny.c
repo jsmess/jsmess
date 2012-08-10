@@ -144,4 +144,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY     FULLNAME       FLAGS */
-COMP( 1984, cvicny, 0,      0,       cvicny,    cvicny, cvicny_state,  0,     "<unknown>", "Practice-z80", GAME_NO_SOUND_HW)
+COMP( 1984, cvicny, 0,      0,       cvicny,    cvicny, driver_device,  0,     "<unknown>", "Practice-z80", GAME_NO_SOUND_HW)

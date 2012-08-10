@@ -106,6 +106,10 @@ private:
     UINT32  es5510_dadr_latch;
     UINT32  es5510_gpr_latch;
     UINT8   es5510_ram_sel;
+public:	
+	DECLARE_DRIVER_INIT(eps);
+	DECLARE_DRIVER_INIT(common);
+	DECLARE_DRIVER_INIT(sq1);
 };
 
 const floppy_format_type esq5505_state::floppy_formats[] = {
@@ -595,36 +599,33 @@ ROM_START( eps )
     ROM_REGION(0x200000, "waverom", ROMREGION_ERASE00)  // EPS-16 has no ROM sounds
 ROM_END
 
-static DRIVER_INIT(common)
+DRIVER_INIT_MEMBER(esq5505_state,common)
 {
-    esq5505_state *state = machine.driver_data<esq5505_state>();
 
-    state->m_system_type = GENERIC;
-    state->m_duart_io = 0;
+    m_system_type = GENERIC;
+    m_duart_io = 0;
 
-	floppy_connector *con = machine.device<floppy_connector>("fd0");
+	floppy_connector *con = machine().device<floppy_connector>("fd0");
 	floppy_image_device *floppy = con ? con->get_device() : 0;
     if (floppy)
     {
-        state->m_fdc->set_floppy(floppy);
+        m_fdc->set_floppy(floppy);
         floppy->ss_w(0);
     }
 }
 
-static DRIVER_INIT(eps)
+DRIVER_INIT_MEMBER(esq5505_state,eps)
 {
-    esq5505_state *state = machine.driver_data<esq5505_state>();
 
     DRIVER_INIT_CALL(common);
-    state->m_system_type = EPS;
+    m_system_type = EPS;
 }
 
-static DRIVER_INIT(sq1)
+DRIVER_INIT_MEMBER(esq5505_state,sq1)
 {
-    esq5505_state *state = machine.driver_data<esq5505_state>();
 
     DRIVER_INIT_CALL(common);
-    state->m_system_type = SQ1;
+    m_system_type = SQ1;
 }
 
 CONS( 1988, eps,   0, 0, eps,   vfx, esq5505_state, eps,    "Ensoniq", "EPS", GAME_NOT_WORKING )   // custom VFD: one alphanumeric 22-char row, one graphics-capable row (alpha row can also do bar graphs)

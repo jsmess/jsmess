@@ -84,6 +84,7 @@ public:
 	required_device<ram_device> m_ram;
 	required_ioport m_iop_config;
 	required_ioport m_iop_vs;
+	DECLARE_DRIVER_INIT(sorcerer);
 };
 
 

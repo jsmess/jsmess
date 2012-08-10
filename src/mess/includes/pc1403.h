@@ -27,6 +27,8 @@ public:
 	int m_DOWN;
 	int m_RIGHT;
 	UINT8 m_reg[0x100];
+
+	DECLARE_DRIVER_INIT(pc1403);
 };
 
 
@@ -40,7 +42,6 @@ void pc1403_outc(device_t *device, int data);
 int pc1403_ina(device_t *device);
 //int pc1403_inb(device_t *device);
 
-DRIVER_INIT( pc1403 );
 MACHINE_START( pc1403 );
 
 READ8_HANDLER(pc1403_asic_read);

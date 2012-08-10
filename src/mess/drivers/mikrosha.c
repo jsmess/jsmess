@@ -24,7 +24,6 @@ class mikrosha_state : public radio86_state
 public:
 	mikrosha_state(const machine_config &mconfig, device_type type, const char *tag)
 		: radio86_state(mconfig, type, tag) { }
-
 };
 
 
@@ -251,5 +250,5 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME      PARENT  COMPAT    MACHINE     INPUT       INIT        COMPANY     FULLNAME        FLAGS */
-COMP( 1987, mikrosha, radio86,0,		mikrosha,	mikrosha, mikrosha_state,	radio86,	"Lianozovo Electromechanical Factory",		"Mikrosha",		0)
-COMP( 1987, m86rk,	  radio86,0,		mikrosha,	mikrosha, mikrosha_state,	radio86,	"<unknown>",		"Mikrosha-86RK",		0)
+COMP( 1987, mikrosha, radio86,0,		mikrosha,	mikrosha, radio86_state,	radio86,	"Lianozovo Electromechanical Factory",		"Mikrosha",		0)
+COMP( 1987, m86rk,	  radio86,0,		mikrosha,	mikrosha, radio86_state,	radio86,	"<unknown>",		"Mikrosha-86RK",		0)

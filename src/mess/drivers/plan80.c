@@ -46,6 +46,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_DRIVER_INIT(plan80);
 };
 
 READ8_MEMBER( plan80_state::plan80_04_r )
@@ -154,11 +155,10 @@ MACHINE_RESET_MEMBER( plan80_state )
 	machine().scheduler().timer_set(attotime::from_usec(10), FUNC(plan80_boot));
 }
 
-DRIVER_INIT( plan80 )
+DRIVER_INIT_MEMBER(plan80_state,plan80)
 {
-	plan80_state *state = machine.driver_data<plan80_state>();
-	UINT8 *RAM = state->memregion("maincpu")->base();
-	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
+	UINT8 *RAM = memregion("maincpu")->base();
+	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 }
 
 VIDEO_START_MEMBER( plan80_state )

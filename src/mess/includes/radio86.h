@@ -34,6 +34,8 @@ public:
 	DECLARE_READ8_MEMBER(radio_io_r);
 	DECLARE_WRITE8_MEMBER(radio_io_w);
 	DECLARE_WRITE8_MEMBER(radio86_pagesel);
+	DECLARE_DRIVER_INIT(radioram);
+	DECLARE_DRIVER_INIT(radio86);
 };
 
 
@@ -45,8 +47,6 @@ INPUT_PORTS_EXTERN( ms7007 );
 
 /*----------- defined in machine/radio86.c -----------*/
 
-extern DRIVER_INIT( radio86 );
-extern DRIVER_INIT( radioram );
 extern MACHINE_RESET( radio86 );
 
 

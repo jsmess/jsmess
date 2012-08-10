@@ -77,6 +77,7 @@ public:
 		} d;
 	} m_reg;
 	bitmap_ind16 *m_bitmap;
+	DECLARE_DRIVER_INIT(arcadia);
 };
 
 

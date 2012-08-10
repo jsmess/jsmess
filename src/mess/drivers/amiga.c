@@ -603,9 +603,8 @@ static void amiga_reset(running_machine &machine)
 	}
 }
 
-static DRIVER_INIT( amiga )
+DRIVER_INIT_MEMBER(amiga_state,amiga)
 {
-	amiga_state *state = machine.driver_data<amiga_state>();
 	static const amiga_machine_interface amiga_intf =
 	{
 		ANGUS_CHIP_RAM_MASK,
@@ -618,21 +617,21 @@ static DRIVER_INIT( amiga )
 		0                                        /* flags */
 	};
 
-	amiga_machine_config(machine, &amiga_intf);
+	amiga_machine_config(machine(), &amiga_intf);
 
 	/* set up memory */
-	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
+	membank("bank1")->configure_entry(0, m_chip_ram);
+	membank("bank1")->configure_entry(1, machine().root_device().memregion("user1")->base());
 
 	/* initialize cartridge (if present) */
-	amiga_cart_init(machine);
+	amiga_cart_init(machine());
 
 	/* initialize keyboard */
-	amigakbd_init(machine);
+	amigakbd_init(machine());
 }
 
 #ifdef UNUSED_FUNCTION
-static DRIVER_INIT( amiga_ecs )
+DRIVER_INIT_MEMBER(apollo_state,amiga_ecs)
 {
 	static const amiga_machine_interface amiga_intf =
 	{
@@ -650,23 +649,22 @@ static DRIVER_INIT( amiga_ecs )
 		0                                        /* flags */
 	};
 
-	amiga_machine_config(machine, &amiga_intf);
+	amiga_machine_config(machine(), &amiga_intf);
 
 	/* set up memory */
-	1.root_device().membank(0)->configure_entries(1, state->m_chip_ram, 0);
-	1.root_device().membank(1)->configure_entries(1, machine.root_device().memregion("user1")->base(), 0);
+	1.root_device().membank(0)->configure_entries(1, m_chip_ram, 0);
+	1.root_device().membank(1)->configure_entries(1, machine().root_device().memregion("user1")->base(), 0);
 
 	/* initialize Action Replay (if present) */
-	amiga_cart_init(machine);
+	amiga_cart_init(machine());
 
 	/* initialize keyboard */
-	amigakbd_init(machine);
+	amigakbd_init(machine());
 }
 #endif
 
-static DRIVER_INIT( cdtv )
+DRIVER_INIT_MEMBER(amiga_state,cdtv)
 {
-	amiga_state *state = machine.driver_data<amiga_state>();
 	static const amiga_machine_interface amiga_intf =
 	{
 		ECS_CHIP_RAM_MASK,
@@ -679,14 +677,14 @@ static DRIVER_INIT( cdtv )
 		0                                        /* flags */
 	};
 
-	amiga_machine_config(machine, &amiga_intf);
+	amiga_machine_config(machine(), &amiga_intf);
 
 	/* set up memory */
-	state->membank("bank1")->configure_entry(0, state->m_chip_ram);
-	state->membank("bank1")->configure_entry(1, machine.root_device().memregion("user1")->base());
+	membank("bank1")->configure_entry(0, m_chip_ram);
+	membank("bank1")->configure_entry(1, machine().root_device().memregion("user1")->base());
 
 	/* initialize keyboard - in cdtv we can use a standard Amiga keyboard*/
-	amigakbd_init(machine);
+	amigakbd_init(machine());
 }
 
 

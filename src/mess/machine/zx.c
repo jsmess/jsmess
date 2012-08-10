@@ -42,14 +42,13 @@ READ8_MEMBER( zx_state::zx_ram_r )
 	return RAM[offset | 0xc000];
 }
 
-DRIVER_INIT( zx )
+DRIVER_INIT_MEMBER(zx_state,zx)
 {
-	zx_state *state = machine.driver_data<zx_state>();
-	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-	space->install_read_bank(0x4000, 0x4000 + machine.device<ram_device>(RAM_TAG)->size() - 1, "bank1");
-	space->install_write_handler(0x4000, 0x4000 + machine.device<ram_device>(RAM_TAG)->size() - 1, write8_delegate(FUNC(zx_state::zx_ram_w),state));
-	state->membank("bank1")->set_base(state->memregion("maincpu")->base() + 0x4000);
+	space->install_read_bank(0x4000, 0x4000 + machine().device<ram_device>(RAM_TAG)->size() - 1, "bank1");
+	space->install_write_handler(0x4000, 0x4000 + machine().device<ram_device>(RAM_TAG)->size() - 1, write8_delegate(FUNC(zx_state::zx_ram_w),this));
+	membank("bank1")->set_base(memregion("maincpu")->base() + 0x4000);
 }
 
 DIRECT_UPDATE_MEMBER(zx_state::zx_setdirect)

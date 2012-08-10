@@ -97,6 +97,7 @@ public:
 	int m_trap_stop;
 	int m_trap_aux;
 	UINT8 *m_map_ram;
+	DECLARE_DRIVER_INIT(mpz80);
 };
 
 #endif

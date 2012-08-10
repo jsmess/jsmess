@@ -54,6 +54,7 @@ public:
 	UINT8 m_lednum;
 
 	emu_timer *m_led_refresh_timer;
+	DECLARE_DRIVER_INIT(mpf1);
 };
 
 #endif

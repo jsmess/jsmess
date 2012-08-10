@@ -779,59 +779,54 @@ static void c64_common_driver_init( running_machine &machine )
 	}
 }
 
-DRIVER_INIT( c64 )
+DRIVER_INIT_MEMBER(legacy_c64_state,c64)
 {
-	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
-	state->m_ultimax = 0;
-	state->m_is_sx64 = 0;
-	state->m_pal = 0;
-	state->m_cia1_on = 1;
-	state->m_tape_on = 1;
-	c64_common_driver_init(machine);
+	m_ultimax = 0;
+	m_is_sx64 = 0;
+	m_pal = 0;
+	m_cia1_on = 1;
+	m_tape_on = 1;
+	c64_common_driver_init(machine());
 }
 
-DRIVER_INIT( c64pal )
+DRIVER_INIT_MEMBER(legacy_c64_state,c64pal)
 {
-	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
-	state->m_ultimax = 0;
-	state->m_is_sx64 = 0;
-	state->m_pal = 1;
-	state->m_cia1_on = 1;
-	state->m_tape_on = 1;
-	c64_common_driver_init(machine);
+	m_ultimax = 0;
+	m_is_sx64 = 0;
+	m_pal = 1;
+	m_cia1_on = 1;
+	m_tape_on = 1;
+	c64_common_driver_init(machine());
 }
 
-DRIVER_INIT( ultimax )
+DRIVER_INIT_MEMBER(legacy_c64_state,ultimax)
 {
-	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
-	state->m_ultimax = 1;
-	state->m_is_sx64 = 0;
-	state->m_pal = 0;
-	state->m_cia1_on = 0;
-	state->m_tape_on = 1;
-	c64_common_driver_init(machine);
+	m_ultimax = 1;
+	m_is_sx64 = 0;
+	m_pal = 0;
+	m_cia1_on = 0;
+	m_tape_on = 1;
+	c64_common_driver_init(machine());
 }
 
-DRIVER_INIT( c64gs )
+DRIVER_INIT_MEMBER(legacy_c64_state,c64gs)
 {
-	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
-	state->m_ultimax = 0;
-	state->m_is_sx64 = 0;
-	state->m_pal = 1;
-	state->m_cia1_on = 1;
-	state->m_tape_on = 0;
-	c64_common_driver_init(machine);
+	m_ultimax = 0;
+	m_is_sx64 = 0;
+	m_pal = 1;
+	m_cia1_on = 1;
+	m_tape_on = 0;
+	c64_common_driver_init(machine());
 }
 
-DRIVER_INIT( sx64 )
+DRIVER_INIT_MEMBER(legacy_c64_state,sx64)
 {
-	legacy_c64_state *state = machine.driver_data<legacy_c64_state>();
-	state->m_ultimax = 0;
-	state->m_is_sx64 = 1;
-	state->m_pal = 1;
-	state->m_cia1_on = 1;
-	state->m_tape_on = 0;
-	c64_common_driver_init(machine);
+	m_ultimax = 0;
+	m_is_sx64 = 1;
+	m_pal = 1;
+	m_cia1_on = 1;
+	m_tape_on = 0;
+	c64_common_driver_init(machine());
 }
 
 MACHINE_START( c64 )

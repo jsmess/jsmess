@@ -992,46 +992,43 @@ void init_lisa1(void)
 }
 #endif
 
-DRIVER_INIT( lisa2 )
+DRIVER_INIT_MEMBER(lisa_state,lisa2)
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
-	state->m_ram_ptr = machine.root_device().memregion("maincpu")->base() + RAM_OFFSET;
-	state->m_rom_ptr = state->memregion("maincpu")->base() + ROM_OFFSET;
-	state->m_model = lisa2;
-	state->m_features.has_fast_timers = 0;
-	state->m_features.floppy_hardware = sony_lisa2;
-	state->m_features.has_double_sided_floppy = 0;
-	state->m_features.has_mac_xl_video = 0;
+	m_ram_ptr = machine().root_device().memregion("maincpu")->base() + RAM_OFFSET;
+	m_rom_ptr = memregion("maincpu")->base() + ROM_OFFSET;
+	m_model = lisa2;
+	m_features.has_fast_timers = 0;
+	m_features.floppy_hardware = sony_lisa2;
+	m_features.has_double_sided_floppy = 0;
+	m_features.has_mac_xl_video = 0;
 
-	state->m_bad_parity_table = auto_alloc_array(machine, UINT8, 0x40000);  /* 1 bit per byte of CPU RAM */
+	m_bad_parity_table = auto_alloc_array(machine(), UINT8, 0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
-DRIVER_INIT( lisa210 )
+DRIVER_INIT_MEMBER(lisa_state,lisa210)
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
-	state->m_ram_ptr = machine.root_device().memregion("maincpu")->base() + RAM_OFFSET;
-	state->m_rom_ptr = state->memregion("maincpu")->base() + ROM_OFFSET;
-	state->m_model = lisa210;
-	state->m_features.has_fast_timers = 1;
-	state->m_features.floppy_hardware = sony_lisa210;
-	state->m_features.has_double_sided_floppy = 0;
-	state->m_features.has_mac_xl_video = 0;
+	m_ram_ptr = machine().root_device().memregion("maincpu")->base() + RAM_OFFSET;
+	m_rom_ptr = memregion("maincpu")->base() + ROM_OFFSET;
+	m_model = lisa210;
+	m_features.has_fast_timers = 1;
+	m_features.floppy_hardware = sony_lisa210;
+	m_features.has_double_sided_floppy = 0;
+	m_features.has_mac_xl_video = 0;
 
-	state->m_bad_parity_table = auto_alloc_array(machine, UINT8, 0x40000);  /* 1 bit per byte of CPU RAM */
+	m_bad_parity_table = auto_alloc_array(machine(), UINT8, 0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
-DRIVER_INIT( mac_xl )
+DRIVER_INIT_MEMBER(lisa_state,mac_xl)
 {
-	lisa_state *state = machine.driver_data<lisa_state>();
-	state->m_ram_ptr = machine.root_device().memregion("maincpu")->base() + RAM_OFFSET;
-	state->m_rom_ptr = state->memregion("maincpu")->base() + ROM_OFFSET;
-	state->m_model = mac_xl;
-	state->m_features.has_fast_timers = 1;
-	state->m_features.floppy_hardware = sony_lisa210;
-	state->m_features.has_double_sided_floppy = 0;
-	state->m_features.has_mac_xl_video = 1;
+	m_ram_ptr = machine().root_device().memregion("maincpu")->base() + RAM_OFFSET;
+	m_rom_ptr = memregion("maincpu")->base() + ROM_OFFSET;
+	m_model = mac_xl;
+	m_features.has_fast_timers = 1;
+	m_features.floppy_hardware = sony_lisa210;
+	m_features.has_double_sided_floppy = 0;
+	m_features.has_mac_xl_video = 1;
 
-	state->m_bad_parity_table = auto_alloc_array(machine, UINT8, 0x40000);  /* 1 bit per byte of CPU RAM */
+	m_bad_parity_table = auto_alloc_array(machine(), UINT8, 0x40000);  /* 1 bit per byte of CPU RAM */
 }
 
 MACHINE_START( lisa )

@@ -1830,17 +1830,16 @@ static INPUT_PORTS_START( fm8 )
 	PORT_CONFSETTING(0x01,"Dempa Shinbunsha Joystick")
 INPUT_PORTS_END
 
-static DRIVER_INIT(fm7)
+DRIVER_INIT_MEMBER(fm7_state,fm7)
 {
-	fm7_state *state = machine.driver_data<fm7_state>();
-//  state->m_shared_ram = auto_alloc_array(machine,UINT8,0x80);
-	state->m_video_ram = auto_alloc_array(machine,UINT8,0x18000);  // 2 pages on some systems
-	state->m_timer = machine.scheduler().timer_alloc(FUNC(fm7_timer_irq));
-	state->m_subtimer = machine.scheduler().timer_alloc(FUNC(fm7_subtimer_irq));
-	state->m_keyboard_timer = machine.scheduler().timer_alloc(FUNC(fm7_keyboard_poll));
-	state->m_fm77av_vsync_timer = machine.scheduler().timer_alloc(FUNC(fm77av_vsync));
-	device_set_irq_callback(machine.device("maincpu"),fm7_irq_ack);
-	device_set_irq_callback(machine.device("sub"),fm7_sub_irq_ack);
+//  m_shared_ram = auto_alloc_array(machine(),UINT8,0x80);
+	m_video_ram = auto_alloc_array(machine(),UINT8,0x18000);  // 2 pages on some systems
+	m_timer = machine().scheduler().timer_alloc(FUNC(fm7_timer_irq));
+	m_subtimer = machine().scheduler().timer_alloc(FUNC(fm7_subtimer_irq));
+	m_keyboard_timer = machine().scheduler().timer_alloc(FUNC(fm7_keyboard_poll));
+	m_fm77av_vsync_timer = machine().scheduler().timer_alloc(FUNC(fm77av_vsync));
+	device_set_irq_callback(machine().device("maincpu"),fm7_irq_ack);
+	device_set_irq_callback(machine().device("sub"),fm7_sub_irq_ack);
 }
 
 static MACHINE_START(fm7)
@@ -2006,7 +2005,7 @@ static const ym2203_interface fm7_ym_intf =
 		DEVCB_NULL,					/* portA write */
 		DEVCB_NULL					/* portB write */
 	},
-	fm77av_fmirq
+	DEVCB_LINE(fm77av_fmirq)
 };
 
 static const cassette_interface fm7_cassette_interface =

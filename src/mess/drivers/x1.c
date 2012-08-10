@@ -2760,11 +2760,11 @@ ROM_END
 
 
 /* Convert the ROM interleaving into something usable by the write handlers */
-DRIVER_INIT( x1_kanji )
+DRIVER_INIT_MEMBER(x1_state,x1_kanji)
 {
 	UINT32 i,j,k,l;
-	UINT8 *kanji = machine.root_device().memregion("kanji")->base();
-	UINT8 *raw_kanji = machine.root_device().memregion("raw_kanji")->base();
+	UINT8 *kanji = machine().root_device().memregion("kanji")->base();
+	UINT8 *raw_kanji = machine().root_device().memregion("raw_kanji")->base();
 
 	k = 0;
 	for(l=0;l<2;l++)
@@ -2783,7 +2783,7 @@ DRIVER_INIT( x1_kanji )
 
 
 /*    YEAR  NAME       PARENT  COMPAT   MACHINE  INPUT       INIT      COMPANY    FULLNAME      FLAGS */
-COMP( 1982, x1,        0,      0,       x1,      x1, x1_state,         0,        "Sharp", "X1 (CZ-800C)", 0 )
+COMP( 1982, x1,        0,      0,       x1,      x1, driver_device,         0,        "Sharp", "X1 (CZ-800C)", 0 )
 // x1twin in x1twin.c
 COMP( 1984, x1turbo,   x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 Turbo (CZ-850C)", GAME_NOT_WORKING ) //model 10
 COMP( 1985, x1turbo40, x1,     0,       x1turbo, x1turbo, x1_state,    x1_kanji, "Sharp", "X1 Turbo (CZ-862C)", 0 ) //model 40

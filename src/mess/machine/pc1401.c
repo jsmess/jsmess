@@ -130,11 +130,10 @@ static TIMER_CALLBACK(pc1401_power_up)
 	state->m_power = 0;
 }
 
-DRIVER_INIT( pc1401 )
+DRIVER_INIT_MEMBER(pc1401_state,pc1401)
 {
-	pc1401_state *state = machine.driver_data<pc1401_state>();
 	int i;
-	UINT8 *gfx=state->memregion("gfx1")->base();
+	UINT8 *gfx=memregion("gfx1")->base();
 #if 0
 	static const char sucker[]={
 		/* this routine dump the memory (start 0)
@@ -234,6 +233,6 @@ DRIVER_INIT( pc1401 )
 	for (i=0; i<128; i++)
 		gfx[i]=i;
 
-	state->m_power = 1;
-	machine.scheduler().timer_set(attotime::from_seconds(1), FUNC(pc1401_power_up));
+	m_power = 1;
+	machine().scheduler().timer_set(attotime::from_seconds(1), FUNC(pc1401_power_up));
 }

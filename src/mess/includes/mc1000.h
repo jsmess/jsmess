@@ -78,6 +78,7 @@ public:
 	required_shared_ptr<UINT8> m_mc6845_video_ram;
 	required_shared_ptr<UINT8> m_mc6847_video_ram;
 	UINT8 m_mc6847_attr;
+	DECLARE_DRIVER_INIT(mc1000);
 };
 
 #endif

@@ -345,5 +345,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY        FULLNAME       FLAGS */
-COMP( 1980, phunsy,  0,       0,     phunsy,    phunsy, phunsy_state,   0, "J.F.P. Philipse", "PHUNSY", GAME_NOT_WORKING )
+COMP( 1980, phunsy,  0,       0,     phunsy,    phunsy, driver_device,   0, "J.F.P. Philipse", "PHUNSY", GAME_NOT_WORKING )
 

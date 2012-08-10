@@ -46,6 +46,7 @@ public:
 	DECLARE_READ8_MEMBER(nascom1_port_01_r);
 	DECLARE_WRITE8_MEMBER(nascom1_port_01_w);
 	DECLARE_READ8_MEMBER(nascom1_port_02_r);
+	DECLARE_DRIVER_INIT(nascom1);
 };
 
 
@@ -53,7 +54,6 @@ public:
 
 extern const wd17xx_interface nascom2_wd17xx_interface;
 
-DRIVER_INIT( nascom1 );
 DEVICE_IMAGE_LOAD( nascom1_cassette );
 DEVICE_IMAGE_UNLOAD( nascom1_cassette );
 SNAPSHOT_LOAD( nascom1 );

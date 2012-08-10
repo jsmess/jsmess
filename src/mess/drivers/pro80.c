@@ -166,4 +166,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-COMP( 1981, pro80,  0,      0,       pro80,     pro80, pro80_state,   0,      "Protec",   "Pro-80", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, pro80,  0,      0,       pro80,     pro80, driver_device,   0,      "Protec",   "Pro-80", GAME_NOT_WORKING | GAME_NO_SOUND)

@@ -380,7 +380,7 @@ static void set_ram_size(running_machine &machine)
 	space->install_readwrite_bank(BLUE_PLANE_MEMBASE, BLUE_PLANE_MEMBASE+(COLOUR_PLANE_SIZE-1), BLUE_PLANE_TAG);
 }
 
-DRIVER_INIT(mbc55x)
+DRIVER_INIT_MEMBER(mbc55x_state,mbc55x)
 {
 }
 

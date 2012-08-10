@@ -68,6 +68,8 @@ public:
 	int m_intra;
 	int m_ibfa;
 	int m_obfa;
+	DECLARE_DRIVER_INIT(pal);
+	DECLARE_DRIVER_INIT(ntsc);
 };
 
 #endif

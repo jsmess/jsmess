@@ -80,6 +80,7 @@ public:
 	required_shared_ptr<UINT8> m_p_videoram;
 	virtual void machine_reset();
 	virtual void video_start();
+	DECLARE_DRIVER_INIT(okean240);
 };
 
 // okean240 requires bit 4 to change
@@ -381,11 +382,10 @@ static GENERIC_TERMINAL_INTERFACE( terminal_intf )
 	DEVCB_DRIVER_MEMBER(okean240_state, kbd_put)
 };
 
-DRIVER_INIT( okean240 )
+DRIVER_INIT_MEMBER(okean240_state,okean240)
 {
-	okean240_state *state = machine.driver_data<okean240_state>();
-	UINT8 *RAM = state->memregion("maincpu")->base();
-	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xe000);
+	UINT8 *RAM = memregion("maincpu")->base();
+	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xe000);
 }
 
 VIDEO_START_MEMBER( okean240_state )

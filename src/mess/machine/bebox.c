@@ -1046,23 +1046,22 @@ MACHINE_START( bebox )
 	lsi53c810_init(machine, &scsi53c810_intf);
 }
 
-DRIVER_INIT( bebox )
+DRIVER_INIT_MEMBER(bebox_state,bebox)
 {
-	bebox_state *state = machine.driver_data<bebox_state>();
-	address_space *space_0 = machine.device("ppc1")->memory().space(AS_PROGRAM);
-	address_space *space_1 = machine.device("ppc2")->memory().space(AS_PROGRAM);
+	address_space *space_0 = machine().device("ppc1")->memory().space(AS_PROGRAM);
+	address_space *space_1 = machine().device("ppc2")->memory().space(AS_PROGRAM);
 	offs_t vram_begin;
 	offs_t vram_end;
 
 	/* set up boot and flash ROM */
-	state->membank("bank2")->set_base(machine.root_device().memregion("user2")->base());
+	membank("bank2")->set_base(machine().root_device().memregion("user2")->base());
 
 	/* install MESS managed RAM */
-	space_0->install_readwrite_bank(0, machine.device<ram_device>(RAM_TAG)->size() - 1, 0, 0x02000000, "bank3");
-	space_1->install_readwrite_bank(0, machine.device<ram_device>(RAM_TAG)->size() - 1, 0, 0x02000000, "bank3");
-	state->membank("bank3")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
+	space_0->install_readwrite_bank(0, machine().device<ram_device>(RAM_TAG)->size() - 1, 0, 0x02000000, "bank3");
+	space_1->install_readwrite_bank(0, machine().device<ram_device>(RAM_TAG)->size() - 1, 0, 0x02000000, "bank3");
+	membank("bank3")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 
-	kbdc8042_init(machine, &bebox_8042_interface);
+	kbdc8042_init(machine(), &bebox_8042_interface);
 
 	/* install VGA memory */
 	vram_begin = 0xC1000000;
@@ -1089,6 +1088,6 @@ DRIVER_INIT( bebox )
 			U64(0x4E80042000000000)
 		};
 		space_1->install_read_bank(0x9421FFF0, 0x9421FFFF, "bank1");
-		state->membank("bank1")->set_base(ops);
+		membank("bank1")->set_base(ops);
 	}
 }

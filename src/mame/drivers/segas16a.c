@@ -175,8 +175,6 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 
 ***************************************************************************/
 
-#define MODERN_DRIVER_INIT
-
 #include "emu.h"
 #include "includes/segas16a.h"
 #include "machine/segacrp2.h"
@@ -199,6 +197,81 @@ static I8255_INTERFACE(single_ppi_intf)
 	DEVCB_NULL,
 	DEVCB_DRIVER_MEMBER(segas16a_state, tilemap_sound_w)
 };
+
+
+
+//**************************************************************************
+//	PPI READ/WRITE CALLBACKS
+//**************************************************************************
+
+//-------------------------------------------------
+//  misc_control_w - miscellaneous video controls
+//-------------------------------------------------
+
+WRITE8_MEMBER( segas16a_state::misc_control_w )
+{
+	//
+    //  PPI port B
+	//
+    //  D7 : Screen flip (1= flip, 0= normal orientation)
+    //  D6 : To 8751 pin 13 (/INT1)
+    //  D5 : To 315-5149 pin 17.
+    //  D4 : Screen enable (1= display, 0= blank)
+    //  D3 : Lamp #2 (1= on, 0= off)
+    //  D2 : Lamp #1 (1= on, 0= off)
+    //  D1 : Coin meter #2
+    //  D0 : Coin meter #1
+    //
+
+	// bits 2 & 3: control the lamps, allowing for overrides
+	if (((m_video_control ^ data) & 0x0c) && !m_lamp_changed_w.isnull())
+		m_lamp_changed_w(m_video_control ^ data, data);
+	set_led_status(machine(), 1, data & 0x08);
+	set_led_status(machine(), 0, data & 0x04);
+
+	m_video_control = data;
+
+	// bit 7: screen flip
+	segaic16_tilemap_set_flip(machine(), 0, data & 0x80);
+	segaic16_sprites_set_flip(machine(), 0, data & 0x80);
+
+	// bit 6: set 8751 interrupt line
+	if (m_mcu != NULL)
+		m_mcu->set_input_line(MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+
+	// bit 4: enable display
+	segaic16_set_display_enable(machine(), data & 0x10);
+	
+	// bits 0 & 1: update coin counters
+	coin_counter_w(machine(), 1, data & 0x02);
+	coin_counter_w(machine(), 0, data & 0x01);
+}
+
+
+//-------------------------------------------------
+//  tilemap_sound_w - tilemap and sound control
+//-------------------------------------------------
+
+WRITE8_MEMBER( segas16a_state::tilemap_sound_w )
+{
+	//
+    //  PPI port C
+	//
+    //  D7 : Port A handshaking signal /OBF
+    //  D6 : Port A handshaking signal ACK
+    //  D5 : Port A handshaking signal IBF
+    //  D4 : Port A handshaking signal /STB
+    //  D3 : Port A handshaking signal INTR
+    //  D2 : To PAL 315-5107 pin 9 (SCONT1)
+    //  D1 : To PAL 315-5108 pin 19 (SCONT0)
+    //  D0 : To MUTE input on MB3733 amplifier.
+    //       0= Sound is disabled
+    //       1= sound is enabled
+    //
+	m_soundcpu->set_input_line(INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	segaic16_tilemap_set_colscroll(machine(), 0, ~data & 0x04);
+	segaic16_tilemap_set_rowscroll(machine(), 0, ~data & 0x02);
+}
 
 
 
@@ -271,76 +344,6 @@ WRITE16_MEMBER( segas16a_state::misc_io_w )
 {
 	// just call custom handler
 	m_custom_io_w(space, offset, data, mem_mask);
-}
-
-
-//-------------------------------------------------
-//  misc_control_w - miscellaneous video controls
-//-------------------------------------------------
-
-WRITE8_MEMBER( segas16a_state::misc_control_w )
-{
-	//
-    //  PPI port B
-	//
-    //  D7 : Screen flip (1= flip, 0= normal orientation)
-    //  D6 : To 8751 pin 13 (/INT1)
-    //  D5 : To 315-5149 pin 17.
-    //  D4 : Screen enable (1= display, 0= blank)
-    //  D3 : Lamp #2 (1= on, 0= off)
-    //  D2 : Lamp #1 (1= on, 0= off)
-    //  D1 : Coin meter #2
-    //  D0 : Coin meter #1
-    //
-
-	// bits 2 & 3: control the lamps, allowing for overrides
-	if (((m_video_control ^ data) & 0x0c) && !m_lamp_changed_w.isnull())
-		m_lamp_changed_w(m_video_control ^ data, data);
-	set_led_status(machine(), 1, data & 0x08);
-	set_led_status(machine(), 0, data & 0x04);
-
-	m_video_control = data;
-
-	// bit 7: screen flip
-	segaic16_tilemap_set_flip(machine(), 0, data & 0x80);
-	segaic16_sprites_set_flip(machine(), 0, data & 0x80);
-
-	// bit 6: set 8751 interrupt line
-	if (m_mcu != NULL)
-		m_mcu->set_input_line(MCS51_INT1_LINE, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
-
-	// bit 4: enable display
-	segaic16_set_display_enable(machine(), data & 0x10);
-	
-	// bits 0 & 1: update coin counters
-	coin_counter_w(machine(), 1, data & 0x02);
-	coin_counter_w(machine(), 0, data & 0x01);
-}
-
-
-//-------------------------------------------------
-//  tilemap_sound_w - tilemap and sound control
-//-------------------------------------------------
-
-WRITE8_MEMBER( segas16a_state::tilemap_sound_w )
-{
-	//
-    //  PPI port C
-	//
-    //  D7 : Port A handshaking signal /OBF
-    //  D6 : Port A handshaking signal ACK
-    //  D5 : Port A handshaking signal IBF
-    //  D4 : Port A handshaking signal /STB
-    //  D3 : Port A handshaking signal INTR
-    //  D2 : To PAL 315-5107 pin 9 (SCONT1)
-    //  D1 : To PAL 315-5108 pin 19 (SCONT0)
-    //  D0 : To MUTE input on MB3733 amplifier.
-    //       0= Sound is disabled
-    //       1= sound is enabled
-    //
-	m_soundcpu->set_input_line(INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-	segaic16_tilemap_set_colscroll(machine(), 0, ~data & 0x04);
-	segaic16_tilemap_set_rowscroll(machine(), 0, ~data & 0x02);
 }
 
 
@@ -1930,7 +1933,7 @@ static const ym2151_interface ym2151_config =
 //**************************************************************************
 
 static GFXDECODE_START( segas16a )
-	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar,	0, 1024 )
+	GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x3_planar, 0, 1024 )
 GFXDECODE_END
 
 
@@ -3447,7 +3450,7 @@ ROM_END
 //  init_generic - common initialization
 //-------------------------------------------------
 
-void segas16a_state::init_generic()
+DRIVER_INIT_MEMBER(segas16a_state,generic)
 {
 	// configure the NVRAM to point to our workram
 	m_nvram->set_base(m_workram, m_workram.bytes());
@@ -3478,49 +3481,49 @@ void segas16a_state::init_generic()
 //  init_* - game-specific initialization
 //-------------------------------------------------
 
-void segas16a_state::init_aceattaa()
+DRIVER_INIT_MEMBER(segas16a_state,aceattaa)
 {
 	init_generic();
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::aceattaa_custom_io_r), this);
 }
 
-void segas16a_state::init_dumpmtmt()
+DRIVER_INIT_MEMBER(segas16a_state,dumpmtmt)
 {
 	init_generic();
 	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16a_state::dumpmtmt_i8751_sim), this);
 }
 
-void segas16a_state::init_mjleague()
+DRIVER_INIT_MEMBER(segas16a_state,mjleague)
 {
 	init_generic();
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::mjleague_custom_io_r), this);
 }
 
-void segas16a_state::init_passsht16a()
+DRIVER_INIT_MEMBER(segas16a_state,passsht16a)
 {
 	init_generic();
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::passsht16a_custom_io_r), this);
 }
 
-void segas16a_state::init_quartet()
+DRIVER_INIT_MEMBER(segas16a_state,quartet)
 {
 	init_generic();
 	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16a_state::quartet_i8751_sim), this);
 }
 
-void segas16a_state::init_fantzonep()
+DRIVER_INIT_MEMBER(segas16a_state,fantzonep)
 {
 	init_generic();
 	sega_315_5177_decode(machine(), "soundcpu");
 }
 
-void segas16a_state::init_sdi()
+DRIVER_INIT_MEMBER(segas16a_state,sdi)
 {
 	init_generic();
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::sdi_custom_io_r), this);
 }
 
-void segas16a_state::init_sjryukoa()
+DRIVER_INIT_MEMBER(segas16a_state,sjryukoa)
 {
 	init_generic();
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::sjryuko_custom_io_r), this);
@@ -3535,35 +3538,35 @@ void segas16a_state::init_sjryukoa()
 
 //    YEAR, NAME,       PARENT,   MACHINE,                  INPUT,      INIT,                            MONITOR,COMPANY,FULLNAME,FLAGS
 // "Pre-System 16"
-GAME( 1986, bodyslam,   0,        system16a_i8751,          bodyslam,   segas16a_state,init_generic,     ROT0,   "Sega", "Body Slam (8751 317-0015)", GAME_SUPPORTS_SAVE )
-GAME( 1986, dumpmtmt,   bodyslam, system16a_i8751,          bodyslam,   segas16a_state,init_dumpmtmt,    ROT0,   "Sega", "Dump Matsumoto (Japan, 8751 317-0011a)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1985, mjleague,   0,        system16a,                mjleague,   segas16a_state,init_mjleague,    ROT270, "Sega", "Major League", GAME_SUPPORTS_SAVE )
-GAME( 1986, quartet,    0,        system16a_i8751,          quartet,    segas16a_state,init_quartet,     ROT0,   "Sega", "Quartet (Rev A, 8751 315-5194)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1986, quarteta,   quartet,  system16a_i8751,          quartet,    segas16a_state,init_quartet,     ROT0,   "Sega", "Quartet (8751 315-5194)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1986, quartet2,   quartet,  system16a_i8751,          quart2,     segas16a_state,init_generic,     ROT0,   "Sega", "Quartet 2 (8751 317-0010)", GAME_SUPPORTS_SAVE )
-GAME( 1986, quartet2a,  quartet,  system16a,                quart2,     segas16a_state,init_generic,     ROT0,   "Sega", "Quartet 2 (unprotected)", GAME_SUPPORTS_SAVE )
+GAME( 1986, bodyslam,   0,        system16a_i8751,          bodyslam,   segas16a_state,generic,     ROT0,   "Sega", "Body Slam (8751 317-0015)", GAME_SUPPORTS_SAVE )
+GAME( 1986, dumpmtmt,   bodyslam, system16a_i8751,          bodyslam,   segas16a_state,dumpmtmt,    ROT0,   "Sega", "Dump Matsumoto (Japan, 8751 317-0011a)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1985, mjleague,   0,        system16a,                mjleague,   segas16a_state,mjleague,    ROT270, "Sega", "Major League", GAME_SUPPORTS_SAVE )
+GAME( 1986, quartet,    0,        system16a_i8751,          quartet,    segas16a_state,quartet,     ROT0,   "Sega", "Quartet (Rev A, 8751 315-5194)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1986, quarteta,   quartet,  system16a_i8751,          quartet,    segas16a_state,quartet,     ROT0,   "Sega", "Quartet (8751 315-5194)", GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1986, quartet2,   quartet,  system16a_i8751,          quart2,     segas16a_state,generic,     ROT0,   "Sega", "Quartet 2 (8751 317-0010)", GAME_SUPPORTS_SAVE )
+GAME( 1986, quartet2a,  quartet,  system16a,                quart2,     segas16a_state,generic,     ROT0,   "Sega", "Quartet 2 (unprotected)", GAME_SUPPORTS_SAVE )
 
 // System 16A
-GAME( 1987, aliensyn5,  aliensyn, system16a_fd1089b,        aliensyn,   segas16a_state,init_generic,     ROT0,   "Sega", "Alien Syndrome (set 5, System 16A, FD1089B 317-0037)", GAME_SUPPORTS_SAVE )
-GAME( 1987, aliensyn2,  aliensyn, system16a_fd1089a,        aliensyn,   segas16a_state,init_generic,     ROT0,   "Sega", "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", GAME_SUPPORTS_SAVE )
-GAME( 1987, aliensynjo, aliensyn, system16a_fd1089a,        aliensynj,  segas16a_state,init_generic,     ROT0,   "Sega", "Alien Syndrome (set 1, Japan, old, System 16A, FD1089A 317-0033)", GAME_SUPPORTS_SAVE )
-GAME( 1988, aceattaca,  aceattac, system16a_fd1094,         aceattaa,   segas16a_state,init_aceattaa,    ROT270, "Sega", "Ace Attacker (Japan, System 16A, FD1094 317-0060)", GAME_SUPPORTS_SAVE )
-GAME( 1986, afighter,   0,        system16a_fd1089a_no7751, afighter,   segas16a_state,init_generic,     ROT270, "Sega", "Action Fighter (FD1089A 317-0018)", GAME_SUPPORTS_SAVE )
-GAME( 1986, alexkidd,   0,        system16a,                alexkidd,   segas16a_state,init_generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 2, unprotected)", GAME_SUPPORTS_SAVE )
-GAME( 1986, alexkidd1,  alexkidd, system16a_fd1089a,        alexkidd,   segas16a_state,init_generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 1, FD1089A 317-0021)", GAME_SUPPORTS_SAVE )
-GAME( 1986, fantzone,   0,        system16a_no7751,         fantzone,   segas16a_state,init_generic,     ROT0,   "Sega", "Fantasy Zone (Rev A, unprotected)", GAME_SUPPORTS_SAVE )
-GAME( 1986, fantzone1,  fantzone, system16a_no7751,         fantzone,   segas16a_state,init_generic,     ROT0,   "Sega", "Fantasy Zone (unprotected)", GAME_SUPPORTS_SAVE )
-GAME( 1986, fantzonep,  fantzone, system16a_no7751,         fantzone,   segas16a_state,init_fantzonep,   ROT0,   "Sega", "Fantasy Zone (317-5000)", GAME_SUPPORTS_SAVE )
-GAME( 1988, passsht16a, passsht,  system16a_fd1094,         passsht16a, segas16a_state,init_passsht16a,  ROT270, "Sega", "Passing Shot (Japan, 4 Players, System 16A, FD1094 317-0071)", GAME_SUPPORTS_SAVE )
-GAME( 1987, sdi,        0,        system16a_fd1089b_no7751, sdi,        segas16a_state,init_sdi,         ROT0,   "Sega", "SDI - Strategic Defense Initiative (Japan, old, System 16A, FD1089B 317-0027)", GAME_SUPPORTS_SAVE )
-GAME( 1987, shinobi,    0,        system16a,                shinobi,    segas16a_state,init_generic,     ROT0,   "Sega", "Shinobi (set 6, System 16A, unprotected)", GAME_SUPPORTS_SAVE )
-GAME( 1987, shinobi1,   shinobi,  system16a_fd1094,         shinobi,    segas16a_state,init_generic,     ROT0,   "Sega", "Shinobi (set 1, System 16A, FD1094 317-0050)", GAME_SUPPORTS_SAVE )
-GAME( 1987, shinobls,   shinobi,  system16a,                shinobi,    segas16a_state,init_generic,     ROT0,   "bootleg (Star)", "Shinobi (Star bootleg, System 16A)", GAME_SUPPORTS_SAVE )
-GAME( 1987, shinoblb,   shinobi,  system16a,                shinobi,    segas16a_state,init_generic,     ROT0,   "bootleg (Beta)", "Shinobi (Beta bootleg)", GAME_SUPPORTS_SAVE ) // should have different sound hw? using original ATM
-GAME( 1987, sjryuko1,   sjryuko,  system16a_fd1089b,        sjryuko,    segas16a_state,init_sjryukoa,    ROT0,   "White Board", "Sukeban Jansi Ryuko (set 1, System 16A, FD1089B 317-5021)", GAME_SUPPORTS_SAVE )
-GAME( 1988, tetris,     0,        system16a_fd1094_no7751,  tetris,     segas16a_state,init_generic,     ROT0,   "Sega", "Tetris (set 4, Japan, System 16A, FD1094 317-0093)", GAME_SUPPORTS_SAVE )
-GAME( 1988, tetris3,    tetris,   system16a_fd1094_no7751,  tetris,     segas16a_state,init_generic,     ROT0,   "Sega", "Tetris (set 3, Japan, System 16A, FD1094 317-0093a)", GAME_SUPPORTS_SAVE )
-GAME( 1987, timescan1,  timescan, system16a_fd1089b,        timescan,   segas16a_state,init_generic,     ROT270, "Sega", "Time Scanner (set 1, System 16A, FD1089B 317-0024)", GAME_SUPPORTS_SAVE )
-GAME( 1988, wb31,       wb3,      system16a_fd1094_no7751,  wb3,        segas16a_state,init_generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 1, System 16A, FD1094 317-0084)", GAME_SUPPORTS_SAVE )
-GAME( 1988, wb35,       wb3,      system16a_fd1089a_no7751, wb3,        segas16a_state,init_generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 5, System 16A, FD1089A 317-xxxx, bad dump?)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1988, wb35a,      wb3,      system16a_fd1089a_no7751, wb3,        segas16a_state,init_generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 6, System 16A, FD1089A 317-xxxx)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1987, aliensyn5,  aliensyn, system16a_fd1089b,        aliensyn,   segas16a_state,generic,     ROT0,   "Sega", "Alien Syndrome (set 5, System 16A, FD1089B 317-0037)", GAME_SUPPORTS_SAVE )
+GAME( 1987, aliensyn2,  aliensyn, system16a_fd1089a,        aliensyn,   segas16a_state,generic,     ROT0,   "Sega", "Alien Syndrome (set 2, System 16A, FD1089A 317-0033)", GAME_SUPPORTS_SAVE )
+GAME( 1987, aliensynjo, aliensyn, system16a_fd1089a,        aliensynj,  segas16a_state,generic,     ROT0,   "Sega", "Alien Syndrome (set 1, Japan, old, System 16A, FD1089A 317-0033)", GAME_SUPPORTS_SAVE )
+GAME( 1988, aceattaca,  aceattac, system16a_fd1094,         aceattaa,   segas16a_state,aceattaa,    ROT270, "Sega", "Ace Attacker (Japan, System 16A, FD1094 317-0060)", GAME_SUPPORTS_SAVE )
+GAME( 1986, afighter,   0,        system16a_fd1089a_no7751, afighter,   segas16a_state,generic,     ROT270, "Sega", "Action Fighter (FD1089A 317-0018)", GAME_SUPPORTS_SAVE )
+GAME( 1986, alexkidd,   0,        system16a,                alexkidd,   segas16a_state,generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 2, unprotected)", GAME_SUPPORTS_SAVE )
+GAME( 1986, alexkidd1,  alexkidd, system16a_fd1089a,        alexkidd,   segas16a_state,generic,     ROT0,   "Sega", "Alex Kidd: The Lost Stars (set 1, FD1089A 317-0021)", GAME_SUPPORTS_SAVE )
+GAME( 1986, fantzone,   0,        system16a_no7751,         fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (Rev A, unprotected)", GAME_SUPPORTS_SAVE )
+GAME( 1986, fantzone1,  fantzone, system16a_no7751,         fantzone,   segas16a_state,generic,     ROT0,   "Sega", "Fantasy Zone (unprotected)", GAME_SUPPORTS_SAVE )
+GAME( 1986, fantzonep,  fantzone, system16a_no7751,         fantzone,   segas16a_state,fantzonep,   ROT0,   "Sega", "Fantasy Zone (317-5000)", GAME_SUPPORTS_SAVE )
+GAME( 1988, passsht16a, passsht,  system16a_fd1094,         passsht16a, segas16a_state,passsht16a,  ROT270, "Sega", "Passing Shot (Japan, 4 Players, System 16A, FD1094 317-0071)", GAME_SUPPORTS_SAVE )
+GAME( 1987, sdi,        0,        system16a_fd1089b_no7751, sdi,        segas16a_state,sdi,         ROT0,   "Sega", "SDI - Strategic Defense Initiative (Japan, old, System 16A, FD1089B 317-0027)", GAME_SUPPORTS_SAVE )
+GAME( 1987, shinobi,    0,        system16a,                shinobi,    segas16a_state,generic,     ROT0,   "Sega", "Shinobi (set 6, System 16A, unprotected)", GAME_SUPPORTS_SAVE )
+GAME( 1987, shinobi1,   shinobi,  system16a_fd1094,         shinobi,    segas16a_state,generic,     ROT0,   "Sega", "Shinobi (set 1, System 16A, FD1094 317-0050)", GAME_SUPPORTS_SAVE )
+GAME( 1987, shinobls,   shinobi,  system16a,                shinobi,    segas16a_state,generic,     ROT0,   "bootleg (Star)", "Shinobi (Star bootleg, System 16A)", GAME_SUPPORTS_SAVE )
+GAME( 1987, shinoblb,   shinobi,  system16a,                shinobi,    segas16a_state,generic,     ROT0,   "bootleg (Beta)", "Shinobi (Beta bootleg)", GAME_SUPPORTS_SAVE ) // should have different sound hw? using original ATM
+GAME( 1987, sjryuko1,   sjryuko,  system16a_fd1089b,        sjryuko,    segas16a_state,sjryukoa,    ROT0,   "White Board", "Sukeban Jansi Ryuko (set 1, System 16A, FD1089B 317-5021)", GAME_SUPPORTS_SAVE )
+GAME( 1988, tetris,     0,        system16a_fd1094_no7751,  tetris,     segas16a_state,generic,     ROT0,   "Sega", "Tetris (set 4, Japan, System 16A, FD1094 317-0093)", GAME_SUPPORTS_SAVE )
+GAME( 1988, tetris3,    tetris,   system16a_fd1094_no7751,  tetris,     segas16a_state,generic,     ROT0,   "Sega", "Tetris (set 3, Japan, System 16A, FD1094 317-0093a)", GAME_SUPPORTS_SAVE )
+GAME( 1987, timescan1,  timescan, system16a_fd1089b,        timescan,   segas16a_state,generic,     ROT270, "Sega", "Time Scanner (set 1, System 16A, FD1089B 317-0024)", GAME_SUPPORTS_SAVE )
+GAME( 1988, wb31,       wb3,      system16a_fd1094_no7751,  wb3,        segas16a_state,generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 1, System 16A, FD1094 317-0084)", GAME_SUPPORTS_SAVE )
+GAME( 1988, wb35,       wb3,      system16a_fd1089a_no7751, wb3,        segas16a_state,generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 5, System 16A, FD1089A 317-xxxx, bad dump?)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1988, wb35a,      wb3,      system16a_fd1089a_no7751, wb3,        segas16a_state,generic,     ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 6, System 16A, FD1089A 317-xxxx)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

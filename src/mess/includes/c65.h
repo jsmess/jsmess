@@ -57,6 +57,8 @@ public:
 	expansion_ram_t m_expansion_ram;
 	int m_io_on;
 	int m_io_dc00_on;
+	DECLARE_DRIVER_INIT(c65);
+	DECLARE_DRIVER_INIT(c65pal);
 };
 
 
@@ -77,8 +79,6 @@ int c65_dma_read_color(running_machine &machine, int offset);
 void c65_vic_interrupt(running_machine &machine, int level);
 void c65_bankswitch_interface(running_machine &machine, int value);
 
-DRIVER_INIT( c65 );
-DRIVER_INIT( c65pal );
 MACHINE_START( c65 );
 INTERRUPT_GEN( c65_frame_interrupt );
 

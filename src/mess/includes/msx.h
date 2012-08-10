@@ -119,6 +119,7 @@ public:
 	DECLARE_READ8_MEMBER(msx_psg_port_b_r);
 	DECLARE_WRITE8_MEMBER(msx_psg_port_a_w);
 	DECLARE_WRITE8_MEMBER(msx_psg_port_b_w);
+	DECLARE_DRIVER_INIT(msx);
 };
 
 
@@ -127,7 +128,6 @@ public:
 extern const i8255_interface msx_ppi8255_interface;
 extern const wd17xx_interface msx_wd17xx_interface;
 /* start/stop functions */
-extern DRIVER_INIT( msx );
 extern MACHINE_START( msx );
 extern MACHINE_START( msx2 );
 extern MACHINE_RESET( msx );

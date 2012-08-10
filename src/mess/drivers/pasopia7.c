@@ -101,6 +101,8 @@ public:
 	UINT8 m_screen_type;
 	int m_addr_latch;
 	void pasopia_nmi_trap();
+	DECLARE_DRIVER_INIT(p7_lcd);
+	DECLARE_DRIVER_INIT(p7_raster);
 };
 
 #define VDP_CLOCK XTAL_3_579545MHz/4
@@ -1146,18 +1148,16 @@ ROM_START( pasopia7lcd )
 ROM_END
 
 
-static DRIVER_INIT( p7_raster )
+DRIVER_INIT_MEMBER(pasopia7_state,p7_raster)
 {
-	pasopia7_state *state = machine.driver_data<pasopia7_state>();
 
-	state->m_screen_type = 1;
+	m_screen_type = 1;
 }
 
-static DRIVER_INIT( p7_lcd )
+DRIVER_INIT_MEMBER(pasopia7_state,p7_lcd)
 {
-	pasopia7_state *state = machine.driver_data<pasopia7_state>();
 
-	state->m_screen_type = 0;
+	m_screen_type = 0;
 }
 
 

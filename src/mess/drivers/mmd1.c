@@ -168,6 +168,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(mmd2_inte_callback);
 	UINT8 m_return_code;
 	UINT8 m_digit;
+	DECLARE_DRIVER_INIT(mmd2);
 };
 
 
@@ -457,38 +458,37 @@ static MACHINE_RESET( mmd2 )
 	state->membank("bank8")->set_entry(0);
 }
 
-DRIVER_INIT( mmd2 )
+DRIVER_INIT_MEMBER(mmd1_state,mmd2)
 {
 /*
 We preset all banks here, so that bankswitching will incur no speed penalty.
 0000/0400 indicate ROMs, D800/DC00/E400 indicate RAM, 8000 is a dummy write area for ROM banks.
 */
-	mmd1_state *state = machine.driver_data<mmd1_state>();
-	UINT8 *p_ram = machine.root_device().memregion("maincpu")->base();
-	state->membank("bank1")->configure_entry(0, &p_ram[0x0000]);
-	state->membank("bank1")->configure_entry(1, &p_ram[0xd800]);
-	state->membank("bank1")->configure_entry(2, &p_ram[0x0c00]);
-	state->membank("bank2")->configure_entry(0, &p_ram[0x8000]);
-	state->membank("bank2")->configure_entry(1, &p_ram[0xd800]);
-	state->membank("bank2")->configure_entry(2, &p_ram[0x8000]);
-	state->membank("bank3")->configure_entry(0, &p_ram[0x0400]);
-	state->membank("bank3")->configure_entry(1, &p_ram[0xdc00]);
-	state->membank("bank3")->configure_entry(2, &p_ram[0xdc00]);
-	state->membank("bank4")->configure_entry(0, &p_ram[0x8000]);
-	state->membank("bank4")->configure_entry(1, &p_ram[0xdc00]);
-	state->membank("bank4")->configure_entry(2, &p_ram[0xdc00]);
-	state->membank("bank5")->configure_entry(0, &p_ram[0xd800]);
-	state->membank("bank5")->configure_entry(1, &p_ram[0x0000]);
-	state->membank("bank5")->configure_entry(2, &p_ram[0x0000]);
-	state->membank("bank6")->configure_entry(0, &p_ram[0xd800]);
-	state->membank("bank6")->configure_entry(1, &p_ram[0x8000]);
-	state->membank("bank6")->configure_entry(2, &p_ram[0x8000]);
-	state->membank("bank7")->configure_entry(0, &p_ram[0xe400]);
-	state->membank("bank7")->configure_entry(1, &p_ram[0x0c00]);
-	state->membank("bank7")->configure_entry(2, &p_ram[0xd800]);
-	state->membank("bank8")->configure_entry(0, &p_ram[0xe400]);
-	state->membank("bank8")->configure_entry(1, &p_ram[0x8000]);
-	state->membank("bank8")->configure_entry(2, &p_ram[0xd800]);
+	UINT8 *p_ram = machine().root_device().memregion("maincpu")->base();
+	membank("bank1")->configure_entry(0, &p_ram[0x0000]);
+	membank("bank1")->configure_entry(1, &p_ram[0xd800]);
+	membank("bank1")->configure_entry(2, &p_ram[0x0c00]);
+	membank("bank2")->configure_entry(0, &p_ram[0x8000]);
+	membank("bank2")->configure_entry(1, &p_ram[0xd800]);
+	membank("bank2")->configure_entry(2, &p_ram[0x8000]);
+	membank("bank3")->configure_entry(0, &p_ram[0x0400]);
+	membank("bank3")->configure_entry(1, &p_ram[0xdc00]);
+	membank("bank3")->configure_entry(2, &p_ram[0xdc00]);
+	membank("bank4")->configure_entry(0, &p_ram[0x8000]);
+	membank("bank4")->configure_entry(1, &p_ram[0xdc00]);
+	membank("bank4")->configure_entry(2, &p_ram[0xdc00]);
+	membank("bank5")->configure_entry(0, &p_ram[0xd800]);
+	membank("bank5")->configure_entry(1, &p_ram[0x0000]);
+	membank("bank5")->configure_entry(2, &p_ram[0x0000]);
+	membank("bank6")->configure_entry(0, &p_ram[0xd800]);
+	membank("bank6")->configure_entry(1, &p_ram[0x8000]);
+	membank("bank6")->configure_entry(2, &p_ram[0x8000]);
+	membank("bank7")->configure_entry(0, &p_ram[0xe400]);
+	membank("bank7")->configure_entry(1, &p_ram[0x0c00]);
+	membank("bank7")->configure_entry(2, &p_ram[0xd800]);
+	membank("bank8")->configure_entry(0, &p_ram[0xe400]);
+	membank("bank8")->configure_entry(1, &p_ram[0x8000]);
+	membank("bank8")->configure_entry(2, &p_ram[0xd800]);
 }
 
 static MACHINE_CONFIG_START( mmd1, mmd1_state )
@@ -536,5 +536,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY            FULLNAME       FLAGS */
-COMP( 1976, mmd1,    0,       0,     mmd1,      mmd1, mmd1_state,     0,   "E&L Instruments Inc", "MMD-1", GAME_NO_SOUND_HW)
+COMP( 1976, mmd1,    0,       0,     mmd1,      mmd1, driver_device,     0,   "E&L Instruments Inc", "MMD-1", GAME_NO_SOUND_HW)
 COMP( 1976, mmd2,    mmd1,    0,     mmd2,      mmd2, mmd1_state,    mmd2, "E&L Instruments Inc", "MMD-2", GAME_NO_SOUND_HW)

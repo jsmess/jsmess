@@ -284,18 +284,17 @@ const via6522_interface sym1_via2 =
 ******************************************************************************/
 
 
-DRIVER_INIT( sym1 )
+DRIVER_INIT_MEMBER(sym1_state,sym1)
 {
-	sym1_state *state = machine.driver_data<sym1_state>();
 	/* wipe expansion memory banks that are not installed */
-	if (machine.device<ram_device>(RAM_TAG)->size() < 4*1024)
+	if (machine().device<ram_device>(RAM_TAG)->size() < 4*1024)
 	{
-		machine.device( "maincpu")->memory().space( AS_PROGRAM )->nop_readwrite(
-			machine.device<ram_device>(RAM_TAG)->size(), 0x0fff);
+		machine().device( "maincpu")->memory().space( AS_PROGRAM )->nop_readwrite(
+			machine().device<ram_device>(RAM_TAG)->size(), 0x0fff);
 	}
 
 	/* allocate a timer to refresh the led display */
-	state->m_led_update = machine.scheduler().timer_alloc(FUNC(led_refresh));
+	m_led_update = machine().scheduler().timer_alloc(FUNC(led_refresh));
 }
 
 

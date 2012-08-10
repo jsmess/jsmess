@@ -719,6 +719,6 @@ ROM_START(uk2086)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1984, tc2048,   spectrum, 0,		tc2048,		spectrum, spectrum_state,	0,		"Timex of Portugal",	"TC-2048" , 0)
-COMP( 1983, ts2068,   spectrum, 0,		ts2068,		spectrum, spectrum_state,	0,		"Timex Sinclair",		"TS-2068" , 0)
-COMP( 1986, uk2086,   spectrum, 0,		uk2086,		spectrum, spectrum_state,	0,		"Unipolbrit",			"UK-2086 ver. 1.2" , 0)
+COMP( 1984, tc2048,   spectrum, 0,		tc2048,		spectrum, driver_device,	0,		"Timex of Portugal",	"TC-2048" , 0)
+COMP( 1983, ts2068,   spectrum, 0,		ts2068,		spectrum, driver_device,	0,		"Timex Sinclair",		"TS-2068" , 0)
+COMP( 1986, uk2086,   spectrum, 0,		uk2086,		spectrum, driver_device,	0,		"Unipolbrit",			"UK-2086 ver. 1.2" , 0)

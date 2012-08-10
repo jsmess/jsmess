@@ -23,12 +23,12 @@ public:
 	DECLARE_WRITE8_MEMBER(partner_floppy_w);
 	DECLARE_WRITE8_MEMBER(partner_win_memory_page_w);
 	DECLARE_WRITE8_MEMBER(partner_mem_page_w);
+	DECLARE_DRIVER_INIT(partner);
 };
 
 
 /*----------- defined in machine/partner.c -----------*/
 
-extern DRIVER_INIT( partner );
 extern MACHINE_RESET( partner );
 extern MACHINE_START( partner );
 

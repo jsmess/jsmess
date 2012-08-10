@@ -74,6 +74,7 @@ public:
 	DECLARE_READ8_MEMBER( mc10_port2_r );
 	DECLARE_WRITE8_MEMBER( mc10_port2_w );
 	DECLARE_READ8_MEMBER( mc10_mc6847_videoram_r );
+	DECLARE_DRIVER_INIT(mc10);
 };
 
 
@@ -233,34 +234,33 @@ static TIMER_DEVICE_CALLBACK( alice32_scanline )
     DRIVER INIT
 ***************************************************************************/
 
-static DRIVER_INIT( mc10 )
+DRIVER_INIT_MEMBER(mc10_state,mc10)
 {
-	mc10_state *state = machine.driver_data<mc10_state>();
-	address_space *prg = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	address_space *prg = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	/* initialize keyboard strobe */
-	state->m_keyboard_strobe = 0x00;
+	m_keyboard_strobe = 0x00;
 
 	/* initialize memory */
-	state->m_ram_base = state->m_ram->pointer();
-	state->m_ram_size = state->m_ram->size();
-	state->m_pr_state = PRINTER_WAIT;
+	m_ram_base = m_ram->pointer();
+	m_ram_size = m_ram->size();
+	m_pr_state = PRINTER_WAIT;
 
-	state->membank("bank1")->set_base(state->m_ram_base);
+	membank("bank1")->set_base(m_ram_base);
 
 	/* initialize memory expansion */
-	if (state->m_ram_size == 20*1024)
-		state->membank("bank2")->set_base(state->m_ram_base + 0x1000);
-	else if (state->m_ram_size == 24*1024)
-		state->membank("bank2")->set_base(state->m_ram_base + 0x2000);
-	else  if (state->m_ram_size != 32*1024)		//ensure that is not alice90
+	if (m_ram_size == 20*1024)
+		membank("bank2")->set_base(m_ram_base + 0x1000);
+	else if (m_ram_size == 24*1024)
+		membank("bank2")->set_base(m_ram_base + 0x2000);
+	else  if (m_ram_size != 32*1024)		//ensure that is not alice90
 		prg->nop_readwrite(0x5000, 0x8fff);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->m_keyboard_strobe);
+	state_save_register_global(machine(), m_keyboard_strobe);
 
 	//for alice32 force port4 DDR to 0xff at startup
-	if (!strcmp(machine.system().name, "alice32") || !strcmp(machine.system().name, "alice90"))
+	if (!strcmp(machine().system().name, "alice32") || !strcmp(machine().system().name, "alice90"))
 		m6801_io_w(prg, 0x05, 0xff);
 }
 

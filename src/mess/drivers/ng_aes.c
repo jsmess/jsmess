@@ -87,6 +87,7 @@ public:
 	DECLARE_READ16_MEMBER(aes_in0_r);
 	DECLARE_READ16_MEMBER(aes_in1_r);
 	DECLARE_READ16_MEMBER(aes_in2_r);
+	DECLARE_DRIVER_INIT(neogeo);
 };
 
 
@@ -1694,7 +1695,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static DRIVER_INIT( neogeo )
+DRIVER_INIT_MEMBER(ng_aes_state,neogeo)
 {
 }
 

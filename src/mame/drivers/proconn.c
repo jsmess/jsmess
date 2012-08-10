@@ -110,6 +110,52 @@ public:
 	DECLARE_READ8_MEMBER( pio5_r2 ) { return m_z80pio_5->read(space, 2); }
 	DECLARE_READ8_MEMBER( pio5_r3 ) { return m_z80pio_5->read(space, 3); }
 
+	/* PIO 1 */
+
+	DECLARE_WRITE_LINE_MEMBER(pio_1_m_out_int_w)	{ /* logerror("pio_1_m_out_int_w %02x\n", state); */ }
+	DECLARE_READ8_MEMBER(pio_1_m_in_pa_r)			{ logerror("pio_1_m_in_pa_r (INPUT MATRIX)\n"); return space.machine().rand(); }
+	DECLARE_WRITE8_MEMBER(pio_1_m_out_pa_w)			{ logerror("pio_1_m_out_pa_w %02x\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_1_m_out_ardy_w)	{ logerror("pio_1_m_out_ardy_w %02x\n", state); }
+	DECLARE_READ8_MEMBER(pio_1_m_in_pb_r)			{ logerror("pio_1_m_in_pb_r\n"); return 0x00; }
+	DECLARE_WRITE8_MEMBER(pio_1_m_out_pb_w)			{ logerror("pio_1_m_out_pb_w %02x (REELS)\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_1_m_out_brdy_w)	{ logerror("pio_1_m_out_brdy_w %02x\n", state); }
+
+	/* PIO 2 */
+	DECLARE_WRITE_LINE_MEMBER(pio_2_m_out_int_w)	{ /* logerror("pio_2_m_out_int_w %02x\n", state); */ }
+	DECLARE_READ8_MEMBER(pio_2_m_in_pa_r)			{ logerror("pio_2_m_in_pa_r\n"); return 0x00; }
+	DECLARE_WRITE8_MEMBER(pio_2_m_out_pa_w)			{ logerror("pio_2_m_out_pa_w %02x\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_2_m_out_ardy_w)	{ logerror("pio_2_m_out_ardy_w %02x\n", state); }
+	DECLARE_READ8_MEMBER(pio_2_m_in_pb_r)			{ logerror("pio_2_m_in_pb_r\n"); return 0x00; }
+	DECLARE_WRITE8_MEMBER(pio_2_m_out_pb_w)			{ logerror("pio_2_m_out_pb_w %02x (ALPHA)\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_2_m_out_brdy_w)	{ logerror("pio_2_m_out_brdy_w %02x\n", state); }
+
+	/* PIO 3 */
+	DECLARE_WRITE_LINE_MEMBER(pio_3_m_out_int_w)	{ /* logerror("pio_3_m_out_int_w %02x\n", state); */ }
+	DECLARE_READ8_MEMBER(pio_3_m_in_pa_r)			{ logerror("pio_3_m_in_pa_r (REEL OPTICS)\n"); return 0x00; }
+	DECLARE_WRITE8_MEMBER(pio_3_m_out_pa_w)			{ logerror("pio_3_m_out_pa_w %02x (STROBE)\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_3_m_out_ardy_w)	{ logerror("pio_3_m_out_ardy_w %02x\n", state); }
+	DECLARE_READ8_MEMBER(pio_3_m_in_pb_r)			{ logerror("pio_3_m_in_pb_r (COIN INPUT)\n"); return 0x00; }
+	DECLARE_WRITE8_MEMBER(pio_3_m_out_pb_w)			{ logerror("pio_3_m_out_pb_w %02x\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_3_m_out_brdy_w)	{ logerror("pio_3_m_out_brdy_w %02x\n", state); }
+
+	/* PIO 4 */
+	DECLARE_WRITE_LINE_MEMBER(pio_4_m_out_int_w)	{ /* logerror("pio_4_m_out_int_w %02x\n", state); */ }
+	DECLARE_READ8_MEMBER(pio_4_m_in_pa_r)			{ logerror("pio_4_m_in_pa_r\n"); return 0x00; }
+	DECLARE_WRITE8_MEMBER(pio_4_m_out_pa_w)			{ logerror("pio_4_m_out_pa_w %02x (TRIAC)\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_4_m_out_ardy_w)	{ logerror("pio_4_m_out_ardy_w %02x\n", state); }
+	DECLARE_READ8_MEMBER(pio_4_m_in_pb_r)			{ logerror("pio_4_m_in_pb_r\n"); return 0x00; }
+	DECLARE_WRITE8_MEMBER(pio_4_m_out_pb_w)			{ logerror("pio_4_m_out_pb_w %02x (7SEG)\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_4_m_out_brdy_w)	{ logerror("pio_4_m_out_brdy_w %02x\n", state); }
+
+	/* PIO 5 */
+	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_int_w)	{ /* logerror("pio_5_m_out_int_w %02x\n", state); */ }
+	DECLARE_READ8_MEMBER(pio_5_m_in_pa_r)			{ logerror("pio_5_m_in_pa_r\n"); return 0x00; }
+	DECLARE_WRITE8_MEMBER(pio_5_m_out_pa_w)			{ logerror("pio_5_m_out_pa_w %02x (LAMPS0)\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_ardy_w)	{ logerror("pio_5_m_out_ardy_w %02x\n", state); }
+	DECLARE_READ8_MEMBER(pio_5_m_in_pb_r)			{ logerror("pio_5_m_in_pb_r\n"); return 0x00; }
+	DECLARE_WRITE8_MEMBER(pio_5_m_out_pb_w)			{ logerror("pio_5_m_out_pb_w %02x (LAMPS1)\n", data); }
+	DECLARE_WRITE_LINE_MEMBER(pio_5_m_out_brdy_w)	{ logerror("pio_5_m_out_brdy_w %02x\n", state); }
+
 protected:
 
 	// devices
@@ -122,7 +168,8 @@ protected:
 	required_device<z80ctc_device> m_z80ctc;
 	required_device<z80sio_device> m_z80sio;
 	required_device<ay8910_device> m_ay;
-
+public:
+	DECLARE_DRIVER_INIT(proconn);
 };
 
 static ADDRESS_MAP_START( proconn_map, AS_PROGRAM, 8, proconn_state )
@@ -193,59 +240,61 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( proconn )
 INPUT_PORTS_END
 
+
+
 static Z80PIO_INTERFACE( pio_interface_1 )
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DRIVER_LINE_MEMBER(proconn_state,pio_1_m_out_int_w),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_1_m_in_pa_r),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_1_m_out_pa_w),
+	DEVCB_DRIVER_LINE_MEMBER(proconn_state,pio_1_m_out_ardy_w),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_1_m_in_pb_r),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_1_m_out_pb_w),
+	DEVCB_DRIVER_LINE_MEMBER(proconn_state,pio_1_m_out_brdy_w),
 };
 
 static Z80PIO_INTERFACE( pio_interface_2 )
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DRIVER_LINE_MEMBER(proconn_state,pio_2_m_out_int_w),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_2_m_in_pa_r),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_2_m_out_pa_w),
+	DEVCB_DRIVER_LINE_MEMBER(proconn_state,pio_2_m_out_ardy_w),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_2_m_in_pb_r),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_2_m_out_pb_w),
+	DEVCB_DRIVER_LINE_MEMBER(proconn_state,pio_2_m_out_brdy_w),
 };
 
 static Z80PIO_INTERFACE( pio_interface_3 )
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DRIVER_LINE_MEMBER(proconn_state,pio_3_m_out_int_w),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_3_m_in_pa_r),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_3_m_out_pa_w),
+	DEVCB_DRIVER_LINE_MEMBER(proconn_state,pio_3_m_out_ardy_w),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_3_m_in_pb_r),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_3_m_out_pb_w),
+	DEVCB_DRIVER_LINE_MEMBER(proconn_state,pio_3_m_out_brdy_w),
 };
 
 static Z80PIO_INTERFACE( pio_interface_4 )
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DRIVER_LINE_MEMBER(proconn_state,pio_4_m_out_int_w),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_4_m_in_pa_r),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_4_m_out_pa_w),
+	DEVCB_DRIVER_LINE_MEMBER(proconn_state,pio_4_m_out_ardy_w),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_4_m_in_pb_r),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_4_m_out_pb_w),
+	DEVCB_DRIVER_LINE_MEMBER(proconn_state,pio_4_m_out_brdy_w),
 };
 
 static Z80PIO_INTERFACE( pio_interface_5 )
 {
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_DRIVER_LINE_MEMBER(proconn_state,pio_5_m_out_int_w),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_5_m_in_pa_r),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_5_m_out_pa_w),
+	DEVCB_DRIVER_LINE_MEMBER(proconn_state,pio_5_m_out_ardy_w),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_5_m_in_pb_r),
+	DEVCB_DRIVER_MEMBER(proconn_state,pio_5_m_out_pb_w),
+	DEVCB_DRIVER_LINE_MEMBER(proconn_state,pio_5_m_out_brdy_w),
 };
 
 
@@ -264,6 +313,8 @@ static WRITE8_DEVICE_HANDLER( serial_transmit )
 //Don't like the look of this, should be a clock somewhere
 //  if (offset == 0)
 //      state->m_vfd->write_char( data );
+
+	// should probably be in the pios above
 
 	for (int i=0; i<8;i++)
 	{
@@ -1217,7 +1268,7 @@ ROM_START( pr_trktp )
 	ROM_LOAD( "305a30pn.990", 0x00000, 0x010000, CRC(5448e7d5) SHA1(81414083341364c011ab814a3f57d0831edb3036) )
 ROM_END
 
-DRIVER_INIT( proconn )
+DRIVER_INIT_MEMBER(proconn_state,proconn)
 {
 }
 

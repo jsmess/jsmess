@@ -86,6 +86,7 @@ public:
 	virtual void machine_reset();
 	virtual void video_start();
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_DRIVER_INIT(rx78);
 };
 
 
@@ -512,10 +513,10 @@ ROM_START( rx78 )
 	ROM_REGION( 6 * 0x2000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
-static DRIVER_INIT( rx78 )
+DRIVER_INIT_MEMBER(rx78_state,rx78)
 {
-	UINT32 ram_size = machine.device<ram_device>(RAM_TAG)->size();
-	address_space *prg = machine.device("maincpu")->memory().space(AS_PROGRAM);
+	UINT32 ram_size = machine().device<ram_device>(RAM_TAG)->size();
+	address_space *prg = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
 	if(ram_size == 0x4000)
 		prg->unmap_readwrite(0x6000, 0xafff);

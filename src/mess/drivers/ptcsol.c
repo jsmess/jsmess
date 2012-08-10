@@ -182,6 +182,8 @@ private:
 	const UINT8 *m_p_chargen;
 	UINT8 m_framecnt;
 	emu_timer *m_cassette_timer;
+public:	
+	DECLARE_DRIVER_INIT(sol20);
 };
 
 
@@ -603,11 +605,10 @@ MACHINE_RESET_MEMBER( sol20_state )
 	machine().scheduler().timer_set(attotime::from_usec(9), FUNC(sol20_boot));
 }
 
-static DRIVER_INIT( sol20 )
+DRIVER_INIT_MEMBER(sol20_state,sol20)
 {
-	sol20_state *state = machine.driver_data<sol20_state>();
-	UINT8 *RAM = state->memregion("maincpu")->base();
-	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
+	UINT8 *RAM = memregion("maincpu")->base();
+	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xc000);
 }
 
 VIDEO_START_MEMBER( sol20_state )

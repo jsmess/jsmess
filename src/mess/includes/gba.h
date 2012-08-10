@@ -236,6 +236,7 @@ public:
 	DECLARE_WRITE32_MEMBER(flash_w);
 	DECLARE_READ32_MEMBER(eeprom_r);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
+	DECLARE_DRIVER_INIT(gbadv);
 };
 
 /*----------- defined in video/gba.c -----------*/

@@ -56,6 +56,11 @@ public:
 	int m_irq_level;
 	int m_font;
 	DECLARE_WRITE8_MEMBER(cbmb_colorram_w);
+	DECLARE_DRIVER_INIT(cbm600);
+	DECLARE_DRIVER_INIT(p500);
+	DECLARE_DRIVER_INIT(cbm600hu);
+	DECLARE_DRIVER_INIT(cbm600pal);
+	DECLARE_DRIVER_INIT(cbm700);
 };
 
 /*----------- defined in machine/cbmb.c -----------*/
@@ -81,11 +86,6 @@ int cbmb_dma_read_color(running_machine &machine, int offset);
 
 WRITE_LINE_DEVICE_HANDLER( cbmb_change_font );
 
-DRIVER_INIT( p500 );
-DRIVER_INIT( cbm600 );
-DRIVER_INIT( cbm600pal );
-DRIVER_INIT( cbm600hu );
-DRIVER_INIT( cbm700 );
 MACHINE_RESET( cbmb );
 
 MACHINE_CONFIG_EXTERN( cbmb_cartslot );

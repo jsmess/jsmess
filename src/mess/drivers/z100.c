@@ -199,6 +199,7 @@ public:
 	UINT8 m_z207_cur_drive;
 
 	mc6845_device *m_mc6845;
+	DECLARE_DRIVER_INIT(z100);
 };
 
 #define mc6845_h_char_total 	(state->m_crtc_vreg[0])
@@ -812,9 +813,9 @@ ROM_START( z100 )
 	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
-static DRIVER_INIT( z100 )
+DRIVER_INIT_MEMBER(z100_state,z100)
 {
-	UINT8 *ROM = machine.root_device().memregion("ipl")->base();
+	UINT8 *ROM = machine().root_device().memregion("ipl")->base();
 
 	ROM[0xfc116 & 0x3fff] = 0x90; // patch parity IRQ check
 	ROM[0xfc117 & 0x3fff] = 0x90;

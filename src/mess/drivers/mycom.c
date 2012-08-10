@@ -112,6 +112,7 @@ public:
 	virtual void machine_reset();
 	virtual void machine_start();
 	virtual void video_start();
+	DECLARE_DRIVER_INIT(mycom);
 };
 
 
@@ -560,11 +561,10 @@ MACHINE_RESET_MEMBER(mycom_state)
 	m_0a = 0;
 }
 
-static DRIVER_INIT( mycom )
+DRIVER_INIT_MEMBER(mycom_state,mycom)
 {
-	mycom_state *state = machine.driver_data<mycom_state>();
-	UINT8 *RAM = state->memregion("maincpu")->base();
-	state->membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
+	UINT8 *RAM = memregion("maincpu")->base();
+	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0x10000);
 }
 
 static MACHINE_CONFIG_START( mycom, mycom_state )

@@ -43,7 +43,7 @@ Z80PIO_INTERFACE( kramermc_z80pio_intf )
 };
 
 /* Driver initialization */
-DRIVER_INIT(kramermc)
+DRIVER_INIT_MEMBER(kramermc_state,kramermc)
 {
 }
 

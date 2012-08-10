@@ -214,14 +214,14 @@ static void driver_init_common( running_machine &machine )
 	machine.scheduler().timer_pulse(attotime::from_hz(200000), FUNC(super80_timer));	/* timer for keyboard and cassette */
 }
 
-DRIVER_INIT( super80 )
+DRIVER_INIT_MEMBER(super80_state,super80)
 {
-	machine.scheduler().timer_pulse(attotime::from_hz(100), FUNC(super80_halfspeed));	/* timer for 1MHz slowdown */
-	driver_init_common(machine);
+	machine().scheduler().timer_pulse(attotime::from_hz(100), FUNC(super80_halfspeed));	/* timer for 1MHz slowdown */
+	driver_init_common(machine());
 }
 
-DRIVER_INIT( super80v )
+DRIVER_INIT_MEMBER(super80_state,super80v)
 {
-	driver_init_common(machine);
+	driver_init_common(machine());
 }
 

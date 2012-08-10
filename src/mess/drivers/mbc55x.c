@@ -286,4 +286,4 @@ ROM_END
 
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE INPUT   INIT  COMPANY  FULLNAME   FLAGS */
-COMP( 1983, mbc55x,     0,      0,      mbc55x, mbc55x, mbc55x_state, 0,   "Sanyo",  "MBC-55x",  0 /*GAME_NO_SOUND*/)
+COMP( 1983, mbc55x,     0,      0,      mbc55x, mbc55x, driver_device, 0,   "Sanyo",  "MBC-55x",  0 /*GAME_NO_SOUND*/)

@@ -253,11 +253,10 @@ DIRECT_UPDATE_MEMBER(vcs80_state::vcs80_direct_update_handler)
 	return address;
 }
 
-static DRIVER_INIT( vcs80 )
+DRIVER_INIT_MEMBER(vcs80_state,vcs80)
 {
-	vcs80_state *state = machine.driver_data<vcs80_state>();
-	machine.device(Z80_TAG)->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(vcs80_state::vcs80_direct_update_handler), state));
-	machine.device(Z80_TAG)->memory().space(AS_IO)->set_direct_update_handler(direct_update_delegate(FUNC(vcs80_state::vcs80_direct_update_handler), state));
+	machine().device(Z80_TAG)->memory().space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate(FUNC(vcs80_state::vcs80_direct_update_handler), this));
+	machine().device(Z80_TAG)->memory().space(AS_IO)->set_direct_update_handler(direct_update_delegate(FUNC(vcs80_state::vcs80_direct_update_handler), this));
 }
 
 /* System Drivers */

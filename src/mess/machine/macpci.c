@@ -172,9 +172,9 @@ static void mac_driver_init(running_machine &machine, model_t model)
 }
 
 #define MAC_DRIVER_INIT(label, model)	\
-DRIVER_INIT( label )	\
+DRIVER_INIT_MEMBER(macpci_state,label)  \
 {	\
-	mac_driver_init(machine, model );	\
+	mac_driver_init(machine(), model );	\
 }
 
 MAC_DRIVER_INIT(pippin, PCIMODEL_MAC_PIPPIN)

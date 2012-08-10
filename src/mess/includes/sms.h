@@ -170,6 +170,13 @@ public:
 	DECLARE_READ8_MEMBER(sms_store_select2);
 	DECLARE_READ8_MEMBER(sms_store_control_r);
 	DECLARE_WRITE8_MEMBER(sms_store_control_w);
+	DECLARE_DRIVER_INIT(sg1000m3);
+	DECLARE_DRIVER_INIT(gamegear);
+	DECLARE_DRIVER_INIT(gamegeaj);
+	DECLARE_DRIVER_INIT(sms2kr);
+	DECLARE_DRIVER_INIT(smsj);
+	DECLARE_DRIVER_INIT(sms1);
+	DECLARE_DRIVER_INIT(smssdisp);
 };
 
 
@@ -198,13 +205,6 @@ MACHINE_RESET( sms );
 #define IO_CHIP         (0x04)	/* I/O chip disabled (1= disabled, 0= enabled) */
 
 
-DRIVER_INIT( sg1000m3 );
-DRIVER_INIT( sms1 );
-DRIVER_INIT( smsj );
-DRIVER_INIT( sms2kr );
-DRIVER_INIT( smssdisp );
-DRIVER_INIT( gamegear );
-DRIVER_INIT( gamegeaj );
 
 VIDEO_START( sms1 );
 VIDEO_START( gamegear );

@@ -425,12 +425,12 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY         FULLNAME       FLAGS */
-COMP( 198?, sun3_50,   0,       0,       sun3,      sun3, sun3_state,     0,  "Sun Microsystems", "Sun 3/50", GAME_NOT_WORKING | GAME_NO_SOUND) // Model 25
-COMP( 198?, sun3_60,   0,       0,       sun3,      sun3, sun3_state,     0,  "Sun Microsystems", "Sun 3/60", GAME_NOT_WORKING | GAME_NO_SOUND) // Ferrari
-COMP( 198?, sun3_110,  0,       0,       sun3,      sun3, sun3_state,     0,  "Sun Microsystems", "Sun 3/110", GAME_NOT_WORKING | GAME_NO_SOUND) // Prism
-COMP( 198?, sun3_150,  0,       0,       sun3,      sun3, sun3_state,     0,  "Sun Microsystems", "Sun 3/75/140/150/160/180", GAME_NOT_WORKING | GAME_NO_SOUND) // AKA Carrera
-COMP( 198?, sun3_260,  0,       0,       sun3,      sun3, sun3_state,     0,  "Sun Microsystems", "Sun 3/260/280", GAME_NOT_WORKING | GAME_NO_SOUND) // Prism
-COMP( 198?, sun3_e,    0,       0,       sun3,      sun3, sun3_state,     0,  "Sun Microsystems", "Sun 3/E", GAME_NOT_WORKING | GAME_NO_SOUND) // Polaris
+COMP( 198?, sun3_50,   0,       0,       sun3,      sun3, driver_device,     0,  "Sun Microsystems", "Sun 3/50", GAME_NOT_WORKING | GAME_NO_SOUND) // Model 25
+COMP( 198?, sun3_60,   0,       0,       sun3,      sun3, driver_device,     0,  "Sun Microsystems", "Sun 3/60", GAME_NOT_WORKING | GAME_NO_SOUND) // Ferrari
+COMP( 198?, sun3_110,  0,       0,       sun3,      sun3, driver_device,     0,  "Sun Microsystems", "Sun 3/110", GAME_NOT_WORKING | GAME_NO_SOUND) // Prism
+COMP( 198?, sun3_150,  0,       0,       sun3,      sun3, driver_device,     0,  "Sun Microsystems", "Sun 3/75/140/150/160/180", GAME_NOT_WORKING | GAME_NO_SOUND) // AKA Carrera
+COMP( 198?, sun3_260,  0,       0,       sun3,      sun3, driver_device,     0,  "Sun Microsystems", "Sun 3/260/280", GAME_NOT_WORKING | GAME_NO_SOUND) // Prism
+COMP( 198?, sun3_e,    0,       0,       sun3,      sun3, driver_device,     0,  "Sun Microsystems", "Sun 3/E", GAME_NOT_WORKING | GAME_NO_SOUND) // Polaris
 
-COMP( 198?, sun3_80,   0,       0,       sun3x,     sun3, sun3_state,     0,  "Sun Microsystems", "Sun 3x/80", GAME_NOT_WORKING | GAME_NO_SOUND) // Hydra
-COMP( 198?, sun3_460,  0,       0,       sun3x,     sun3, sun3_state,     0,  "Sun Microsystems", "Sun 3x/460/470/480", GAME_NOT_WORKING | GAME_NO_SOUND) // Pegasus
+COMP( 198?, sun3_80,   0,       0,       sun3x,     sun3, driver_device,     0,  "Sun Microsystems", "Sun 3x/80", GAME_NOT_WORKING | GAME_NO_SOUND) // Hydra
+COMP( 198?, sun3_460,  0,       0,       sun3x,     sun3, driver_device,     0,  "Sun Microsystems", "Sun 3x/460/470/480", GAME_NOT_WORKING | GAME_NO_SOUND) // Pegasus

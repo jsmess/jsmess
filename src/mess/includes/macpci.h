@@ -72,7 +72,6 @@ typedef enum
 
 extern const via6522_interface pcimac_via6522_intf;
 
-DRIVER_INIT(pippin);
 
 /* Mac driver data */
 
@@ -148,6 +147,7 @@ public:
 	DECLARE_READ64_MEMBER ( unk1_r );
 	DECLARE_READ64_MEMBER ( unk2_r );
 
+	DECLARE_DRIVER_INIT(pippin);
 private:
     // wait states for accessing the VIA
     int m_via_cycles;

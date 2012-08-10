@@ -292,44 +292,39 @@ static void cbmb_common_driver_init( running_machine &machine )
 	state->m_cbm700 = 0;
 }
 
-DRIVER_INIT( cbm600 )
+DRIVER_INIT_MEMBER(cbmb_state,cbm600)
 {
-	cbmb_state *state = machine.driver_data<cbmb_state>();
-	cbmb_common_driver_init(machine);
-	state->m_cbm_ntsc = 1;
-	cbm600_vh_init(machine);
+	cbmb_common_driver_init(machine());
+	m_cbm_ntsc = 1;
+	cbm600_vh_init(machine());
 }
 
-DRIVER_INIT( cbm600pal )
+DRIVER_INIT_MEMBER(cbmb_state,cbm600pal)
 {
-	cbmb_state *state = machine.driver_data<cbmb_state>();
-	cbmb_common_driver_init(machine);
-	state->m_cbm_ntsc = 0;
-	cbm600_vh_init(machine);
+	cbmb_common_driver_init(machine());
+	m_cbm_ntsc = 0;
+	cbm600_vh_init(machine());
 }
 
-DRIVER_INIT( cbm600hu )
+DRIVER_INIT_MEMBER(cbmb_state,cbm600hu)
 {
-	cbmb_state *state = machine.driver_data<cbmb_state>();
-	cbmb_common_driver_init(machine);
-	state->m_cbm_ntsc = 0;
+	cbmb_common_driver_init(machine());
+	m_cbm_ntsc = 0;
 }
 
-DRIVER_INIT( cbm700 )
+DRIVER_INIT_MEMBER(cbmb_state,cbm700)
 {
-	cbmb_state *state = machine.driver_data<cbmb_state>();
-	cbmb_common_driver_init(machine);
-	state->m_cbm700 = 1;
-	state->m_cbm_ntsc = 0;
-	cbm700_vh_init(machine);
+	cbmb_common_driver_init(machine());
+	m_cbm700 = 1;
+	m_cbm_ntsc = 0;
+	cbm700_vh_init(machine());
 }
 
-DRIVER_INIT( p500 )
+DRIVER_INIT_MEMBER(cbmb_state,p500)
 {
-	cbmb_state *state = machine.driver_data<cbmb_state>();
-	cbmb_common_driver_init(machine);
-	state->m_p500 = 1;
-	state->m_cbm_ntsc = 1;
+	cbmb_common_driver_init(machine());
+	m_p500 = 1;
+	m_cbm_ntsc = 1;
 }
 
 MACHINE_RESET( cbmb )

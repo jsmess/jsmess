@@ -261,36 +261,35 @@ MACHINE_RESET( nascom1 )
 	ay31015_set_input_pin( state->m_hd6402, AY31015_CS, 1 );
 }
 
-DRIVER_INIT( nascom1 )
+DRIVER_INIT_MEMBER(nascom1_state,nascom1)
 {
-	nascom1_state *state = machine.driver_data<nascom1_state>();
-	switch (machine.device<ram_device>(RAM_TAG)->size())
+	switch (machine().device<ram_device>(RAM_TAG)->size())
 	{
 	case 1 * 1024:
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(
 			0x1400, 0x9000);
 		break;
 
 	case 16 * 1024:
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(
 			0x1400, 0x4fff, "bank1");
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(
 			0x5000, 0xafff);
-		state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
+		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 		break;
 
 	case 32 * 1024:
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(
 			0x1400, 0x8fff, "bank1");
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->nop_readwrite(
 			0x9000, 0xafff);
-		state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
+		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 		break;
 
 	case 40 * 1024:
-		machine.device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(
+		machine().device("maincpu")->memory().space(AS_PROGRAM)->install_readwrite_bank(
 			0x1400, 0xafff, "bank1");
-		state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
+		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 		break;
 	}
 }

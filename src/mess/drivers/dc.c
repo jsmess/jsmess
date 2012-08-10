@@ -60,21 +60,21 @@ static READ64_HANDLER( dcjp_idle_skip_r )
 	return dc_ram[0x2302f8/8];
 }
 
-static DRIVER_INIT(dc)
+DRIVER_INIT_MEMBER(dc_state,dc)
 {
-	dreamcast_atapi_init(machine);
+	dreamcast_atapi_init(machine());
 }
 
-static DRIVER_INIT(dcus)
+DRIVER_INIT_MEMBER(dc_state,dcus)
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2303b0, 0xc2303b7, FUNC(dcus_idle_skip_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2303b0, 0xc2303b7, FUNC(dcus_idle_skip_r));
 
 	DRIVER_INIT_CALL(dc);
 }
 
-static DRIVER_INIT(dcjp)
+DRIVER_INIT_MEMBER(dc_state,dcjp)
 {
-	machine.device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2302f8, 0xc2302ff, FUNC(dcjp_idle_skip_r));
+	machine().device("maincpu")->memory().space(AS_PROGRAM)->install_legacy_read_handler(0xc2302f8, 0xc2302ff, FUNC(dcjp_idle_skip_r));
 
 	DRIVER_INIT_CALL(dc);
 }

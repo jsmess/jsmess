@@ -265,7 +265,7 @@ static const ym2203_interface ym2203_interface_1 =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 static const ym2203_interface ym2203_interface_2 =
@@ -278,7 +278,7 @@ static const ym2203_interface ym2203_interface_2 =
 		DEVCB_HANDLER(xxmissio_scroll_x_w),
 		DEVCB_HANDLER(xxmissio_scroll_y_w)
 	},
-	NULL
+	DEVCB_NULL
 };
 
 static MACHINE_CONFIG_START( xxmissio, xxmissio_state )
@@ -352,4 +352,4 @@ ROM_START( xxmissio )
 	ROM_LOAD16_BYTE( "xx11.4b", 0x0001,  0x8000, CRC(d9dd827c) SHA1(aea3a5abd871adf7f75ad4d6cc57eff0833135c7) )
 ROM_END
 
-GAME( 1986, xxmissio, 0, xxmissio, xxmissio, xxmissio_state, 0, ROT90, "UPL", "XX Mission", 0 )
+GAME( 1986, xxmissio, 0, xxmissio, xxmissio, driver_device, 0, ROT90, "UPL", "XX Mission", 0 )

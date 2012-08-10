@@ -202,6 +202,8 @@ public:
 	emu_timer *m_tape_interrupt_timer;
 	UINT8 m_printer_data;
 	char m_printer_strobe;
+	DECLARE_DRIVER_INIT(tutor);
+	DECLARE_DRIVER_INIT(pyuuta);
 };
 
 
@@ -220,22 +222,20 @@ enum
 };
 
 
-static DRIVER_INIT(tutor)
+DRIVER_INIT_MEMBER(tutor_state,tutor)
 {
-	tutor_state *state = machine.driver_data<tutor_state>();
-	state->m_tape_interrupt_timer = machine.scheduler().timer_alloc(FUNC(tape_interrupt_handler));
+	m_tape_interrupt_timer = machine().scheduler().timer_alloc(FUNC(tape_interrupt_handler));
 
-	state->membank("bank1")->configure_entry(0, machine.root_device().memregion("maincpu")->base() + basic_base);
-	state->membank("bank1")->configure_entry(1, state->memregion("maincpu")->base() + cartridge_base);
-	state->membank("bank1")->set_entry(0);
+	membank("bank1")->configure_entry(0, machine().root_device().memregion("maincpu")->base() + basic_base);
+	membank("bank1")->configure_entry(1, memregion("maincpu")->base() + cartridge_base);
+	membank("bank1")->set_entry(0);
 }
 
 
-static DRIVER_INIT(pyuuta)
+DRIVER_INIT_MEMBER(tutor_state,pyuuta)
 {
 	DRIVER_INIT_CALL(tutor);
-	tutor_state *state = machine.driver_data<tutor_state>();
-	state->membank("bank1")->set_entry(1);
+	membank("bank1")->set_entry(1);
 }
 
 

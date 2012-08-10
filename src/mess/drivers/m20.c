@@ -91,6 +91,8 @@ private:
 	int m_kbrecv_bitcount;
 	UINT16 m_kbrecv_data;
 	UINT8 m_port21;
+public:	
+	DECLARE_DRIVER_INIT(m20);
 };
 
 
@@ -352,7 +354,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( m20 )
 INPUT_PORTS_END
 
-static DRIVER_INIT( m20 )
+DRIVER_INIT_MEMBER(m20_state,m20)
 {
 }
 

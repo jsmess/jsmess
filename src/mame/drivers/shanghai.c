@@ -419,7 +419,7 @@ static const ym2203_interface sh_ym2203_interface =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 
@@ -431,7 +431,7 @@ static const ym2203_interface kothello_ym2203_interface =
 		DEVCB_INPUT_PORT("DSW"),
 		DEVCB_NULL, DEVCB_NULL, DEVCB_NULL
 	},
-	seibu_ym2203_irqhandler
+	DEVCB_LINE(seibu_ym2203_irqhandler)
 };
 
 static const hd63484_interface shanghai_hd63484_intf = { 0 };
@@ -638,7 +638,7 @@ ROM_END
 
 
 
-GAME( 1988, shanghai, 0, shanghai, shanghai, shanghai_state, 0, ROT0, "Sunsoft", "Shanghai (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1989, shangha2, 0, shangha2, shangha2, shanghai_state, 0, ROT0, "Sunsoft", "Shanghai II (Japan)", 0 )
-GAME( 1990, kothello, 0, kothello, kothello, shanghai_state, 0, ROT0, "Success", "Kyuukyoku no Othello", GAME_IMPERFECT_GRAPHICS )
+GAME( 1988, shanghai, 0, shanghai, shanghai, driver_device, 0, ROT0, "Sunsoft", "Shanghai (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1989, shangha2, 0, shangha2, shangha2, driver_device, 0, ROT0, "Sunsoft", "Shanghai II (Japan)", 0 )
+GAME( 1990, kothello, 0, kothello, kothello, driver_device, 0, ROT0, "Success", "Kyuukyoku no Othello", GAME_IMPERFECT_GRAPHICS )
 

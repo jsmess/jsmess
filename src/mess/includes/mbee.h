@@ -118,6 +118,16 @@ public:
 	void sy6545_cursor_configure();
 	void keyboard_matrix_r(int offs);
 	void mbee_video_kbd_scan(int param);
+	DECLARE_DRIVER_INIT(mbeepc85);
+	DECLARE_DRIVER_INIT(mbee256);
+	DECLARE_DRIVER_INIT(mbee56);
+	DECLARE_DRIVER_INIT(mbeett);
+	DECLARE_DRIVER_INIT(mbeeppc);
+	DECLARE_DRIVER_INIT(mbee);
+	DECLARE_DRIVER_INIT(mbeepc);
+	DECLARE_DRIVER_INIT(mbeeic);
+	DECLARE_DRIVER_INIT(mbee128);
+	DECLARE_DRIVER_INIT(mbee64);
 };
 
 
@@ -126,16 +136,6 @@ public:
 extern const wd17xx_interface mbee_wd17xx_interface;
 extern const z80pio_interface mbee_z80pio_intf;
 
-DRIVER_INIT( mbee );
-DRIVER_INIT( mbeeic );
-DRIVER_INIT( mbeepc );
-DRIVER_INIT( mbeepc85 );
-DRIVER_INIT( mbeeppc );
-DRIVER_INIT( mbee56 );
-DRIVER_INIT( mbee64 );
-DRIVER_INIT( mbee128 );
-DRIVER_INIT( mbee256 );
-DRIVER_INIT( mbeett );
 MACHINE_RESET( mbee );
 MACHINE_RESET( mbee56 );
 MACHINE_RESET( mbee64 );

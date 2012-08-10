@@ -152,6 +152,7 @@ public:
 		m_bios_rom(*this, "bios_rom"){ }
 
 	required_shared_ptr<UINT32> m_bios_rom;
+	DECLARE_DRIVER_INIT(casloopy);
 };
 
 
@@ -240,12 +241,11 @@ ROM_START( casloopy )
 	ROM_CART_LOAD("cart",    0x00000, 0x200000, ROM_NOMIRROR)
 ROM_END
 
-static DRIVER_INIT( casloopy )
+DRIVER_INIT_MEMBER(casloopy_state,casloopy)
 {
-	casloopy_state *state = machine.driver_data<casloopy_state>();
 	/* load hand made bios data*/
-	state->m_bios_rom[0/4] = 0x6000964; //SPC
-	state->m_bios_rom[4/4] = 0xffffff0; //SSP
+	m_bios_rom[0/4] = 0x6000964; //SPC
+	m_bios_rom[4/4] = 0xffffff0; //SSP
 }
 
 GAME( 1995, casloopy,  0,   casloopy,  casloopy, casloopy_state,  casloopy, ROT0, "Casio", "Loopy", GAME_NOT_WORKING | GAME_NO_SOUND )

@@ -406,9 +406,9 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY             FULLNAME                            FLAGS
-CONS( 1982, coleco,   0,        0,      coleco,   coleco, coleco_state,   0,       "Coleco",           "ColecoVision",                     0 )
-CONS( 1982, colecoa,  coleco,   0,      coleco,   coleco, coleco_state,   0,       "Coleco",           "ColecoVision (Thick Characters)",  0 )
-CONS( 1983, colecob,  coleco,   0,      coleco,   coleco, coleco_state,   0,       "Spectravideo",     "SVI-603 Coleco Game Adapter",      0 )
-CONS( 1986, czz50,    0,   coleco,      czz50,	  czz50, coleco_state,    0,       "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
-CONS( 1988, dina,     czz50,    0,      dina,	  czz50, coleco_state,    0,       "Telegames",        "Dina",                             0 )
-CONS( 1988, prsarcde, czz50,    0,      czz50,    czz50, coleco_state,    0,       "Telegames",        "Personal Arcade",                  0 )
+CONS( 1982, coleco,   0,        0,      coleco,   coleco, driver_device,   0,       "Coleco",           "ColecoVision",                     0 )
+CONS( 1982, colecoa,  coleco,   0,      coleco,   coleco, driver_device,   0,       "Coleco",           "ColecoVision (Thick Characters)",  0 )
+CONS( 1983, colecob,  coleco,   0,      coleco,   coleco, driver_device,   0,       "Spectravideo",     "SVI-603 Coleco Game Adapter",      0 )
+CONS( 1986, czz50,    0,   coleco,      czz50,	  czz50, driver_device,    0,       "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
+CONS( 1988, dina,     czz50,    0,      dina,	  czz50, driver_device,    0,       "Telegames",        "Dina",                             0 )
+CONS( 1988, prsarcde, czz50,    0,      czz50,    czz50, driver_device,    0,       "Telegames",        "Personal Arcade",                  0 )

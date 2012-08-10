@@ -150,6 +150,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mbc55x_disk_w);
 	DECLARE_READ8_MEMBER(mbc55x_kb_usart_r);
 	DECLARE_WRITE8_MEMBER(mbc55x_kb_usart_w);
+	DECLARE_DRIVER_INIT(mbc55x);
 };
 
 /* IO chips */
@@ -172,7 +173,6 @@ extern const i8255_interface mbc55x_ppi8255_interface;
 extern const i8251_interface mbc55x_i8251a_interface;
 extern const i8251_interface mbc55x_i8251b_interface;
 
-DRIVER_INIT(mbc55x);
 MACHINE_RESET(mbc55x);
 MACHINE_START(mbc55x);
 

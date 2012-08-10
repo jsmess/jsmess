@@ -23,7 +23,6 @@ class apogee_state : public radio86_state
 public:
 	apogee_state(const machine_config &mconfig, device_type type, const char *tag)
 		: radio86_state(mconfig, type, tag) { }
-
 };
 
 
@@ -205,4 +204,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1989, apogee, radio86,0,		 apogee,	apogee, apogee_state,radio86, "Zavod BRA",	"Apogee BK-01",	0)
+COMP( 1989, apogee, radio86,0,		 apogee,	apogee, radio86_state,radio86, "Zavod BRA",	"Apogee BK-01",	0)

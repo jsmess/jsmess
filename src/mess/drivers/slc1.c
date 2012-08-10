@@ -282,4 +282,4 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT      COMPANY    FULLNAME */
-COMP( 1989, slc1,     0,      0,      slc1,       slc1, slc1_state,    0,      "Dr. Dieter Scheuschner",  "SLC-1" , 0 )
+COMP( 1989, slc1,     0,      0,      slc1,       slc1, driver_device,    0,      "Dr. Dieter Scheuschner",  "SLC-1" , 0 )

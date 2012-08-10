@@ -1677,36 +1677,35 @@ static void nes_unload_proc( device_image_interface &image )
 	state->m_fds_sides =  0;
 }
 
-DRIVER_INIT( famicom )
+DRIVER_INIT_MEMBER(nes_state,famicom)
 {
-	nes_state *state = machine.driver_data<nes_state>();
 
 	/* clear some of the variables we don't use */
-	state->m_trainer = 0;
-	state->m_battery = 0;
-	state->m_prg_ram = 0;
-	state->m_four_screen_vram = 0;
-	state->m_hard_mirroring = 0;
-	state->m_prg_chunks = state->m_chr_chunks = 0;
+	m_trainer = 0;
+	m_battery = 0;
+	m_prg_ram = 0;
+	m_four_screen_vram = 0;
+	m_hard_mirroring = 0;
+	m_prg_chunks = m_chr_chunks = 0;
 
 	/* initialize the disk system */
-	state->m_disk_expansion = 1;
-	state->m_pcb_id = NO_BOARD;
+	m_disk_expansion = 1;
+	m_pcb_id = NO_BOARD;
 
-	state->m_fds_sides = 0;
-	state->m_fds_last_side = 0;
-	state->m_fds_count = 0;
-	state->m_fds_motor_on = 0;
-	state->m_fds_door_closed = 0;
-	state->m_fds_current_side = 1;
-	state->m_fds_head_position = 0;
-	state->m_fds_status0 = 0;
-	state->m_fds_read_mode = state->m_fds_write_reg = 0;
+	m_fds_sides = 0;
+	m_fds_last_side = 0;
+	m_fds_count = 0;
+	m_fds_motor_on = 0;
+	m_fds_door_closed = 0;
+	m_fds_current_side = 1;
+	m_fds_head_position = 0;
+	m_fds_status0 = 0;
+	m_fds_read_mode = m_fds_write_reg = 0;
 
-	state->m_fds_data = auto_alloc_array_clear(machine, UINT8, 65500 * 2);
-	state->m_fds_ram = auto_alloc_array_clear(machine, UINT8, 0x8000);
-	state->save_pointer(NAME(state->m_fds_ram), 0x8000);
+	m_fds_data = auto_alloc_array_clear(machine(), UINT8, 65500 * 2);
+	m_fds_ram = auto_alloc_array_clear(machine(), UINT8, 0x8000);
+	save_pointer(NAME(m_fds_ram), 0x8000);
 
-	floppy_install_load_proc(floppy_get_device(machine, 0), nes_load_proc);
-	floppy_install_unload_proc(floppy_get_device(machine, 0), nes_unload_proc);
+	floppy_install_load_proc(floppy_get_device(machine(), 0), nes_load_proc);
+	floppy_install_unload_proc(floppy_get_device(machine(), 0), nes_unload_proc);
 }

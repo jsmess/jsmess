@@ -457,6 +457,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT     INIT     COMPANY                        FULLNAME       FLAGS */
-COMP( 1976, tk80,     0,      0,       tk80,      tk80, tk80bs_state,     0,       "Nippon Electronic Company", "TK-80", GAME_NO_SOUND_HW)
-COMP( 1980, tk80bs,   tk80,   0,       tk80bs,    tk80bs, tk80bs_state,   0,       "Nippon Electronic Company", "TK-80BS", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
-COMP( 19??, mikrolab, tk80,   0,       mikrolab,  mikrolab, tk80bs_state, 0,       "<unknown>", "Mikrolab KR580IK80", GAME_NO_SOUND_HW)
+COMP( 1976, tk80,     0,      0,       tk80,      tk80, driver_device,     0,       "Nippon Electronic Company", "TK-80", GAME_NO_SOUND_HW)
+COMP( 1980, tk80bs,   tk80,   0,       tk80bs,    tk80bs, driver_device,   0,       "Nippon Electronic Company", "TK-80BS", GAME_NOT_WORKING | GAME_NO_SOUND_HW)
+COMP( 19??, mikrolab, tk80,   0,       mikrolab,  mikrolab, driver_device, 0,       "<unknown>", "Mikrolab KR580IK80", GAME_NO_SOUND_HW)

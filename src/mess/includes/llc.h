@@ -44,11 +44,13 @@ public:
 private:
 	UINT8 m_porta;
 	UINT8 m_term_data;
+public:
+	DECLARE_DRIVER_INIT(llc2);
+	DECLARE_DRIVER_INIT(llc1);
 };
 
 
 /*----------- defined in machine/llc.c -----------*/
-extern DRIVER_INIT( llc1 );
 extern MACHINE_START( llc1 );
 extern MACHINE_RESET( llc1 );
 
@@ -60,7 +62,6 @@ extern const z80pio_interface llc2_z80pio2_intf;
 extern const z80ctc_interface llc1_ctc_intf;
 extern const z80ctc_interface llc2_ctc_intf;
 
-extern DRIVER_INIT( llc2 );
 extern MACHINE_RESET( llc2 );
 
 /*----------- defined in video/llc.c -----------*/

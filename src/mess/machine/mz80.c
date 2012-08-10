@@ -10,7 +10,7 @@
 
 
 /* Driver initialization */
-DRIVER_INIT(mz80k)
+DRIVER_INIT_MEMBER(mz80_state,mz80k)
 {
 }
 

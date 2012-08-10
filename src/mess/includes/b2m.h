@@ -43,6 +43,7 @@ public:
 	DECLARE_READ8_MEMBER(b2m_palette_r);
 	DECLARE_WRITE8_MEMBER(b2m_localmachine_w);
 	DECLARE_READ8_MEMBER(b2m_localmachine_r);
+	DECLARE_DRIVER_INIT(b2m);
 };
 
 /*----------- defined in machine/b2m.c -----------*/
@@ -54,7 +55,6 @@ extern const i8255_interface b2m_ppi8255_interface_1;
 extern const i8255_interface b2m_ppi8255_interface_2;
 extern const i8255_interface b2m_ppi8255_interface_3;
 
-extern DRIVER_INIT( b2m );
 extern MACHINE_START( b2m );
 extern MACHINE_RESET( b2m );
 extern INTERRUPT_GEN( b2m_vblank_interrupt );

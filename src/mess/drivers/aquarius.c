@@ -211,16 +211,15 @@ WRITE8_MEMBER(aquarius_state::floppy_w)
     DRIVER INIT
 ***************************************************************************/
 
-static DRIVER_INIT( aquarius )
+DRIVER_INIT_MEMBER(aquarius_state,aquarius)
 {
-	aquarius_state *state = machine.driver_data<aquarius_state>();
 	/* install expansion memory if available */
-	if (machine.device<ram_device>(RAM_TAG)->size() > 0x1000)
+	if (machine().device<ram_device>(RAM_TAG)->size() > 0x1000)
 	{
-		address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
+		address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 
-		space->install_readwrite_bank(0x4000, 0x4000 + machine.device<ram_device>(RAM_TAG)->size() - 0x1000 - 1, "bank1");
-		state->membank("bank1")->set_base(machine.device<ram_device>(RAM_TAG)->pointer());
+		space->install_readwrite_bank(0x4000, 0x4000 + machine().device<ram_device>(RAM_TAG)->size() - 0x1000 - 1, "bank1");
+		membank("bank1")->set_base(machine().device<ram_device>(RAM_TAG)->pointer());
 	}
 }
 
@@ -522,4 +521,4 @@ ROM_END
 /*    YEAR  NAME         PARENT    COMPAT  MACHINE      INPUT     INIT      COMPANY   FULLNAME                         FLAGS */
 COMP( 1983, aquarius,    0,        0,      aquarius,    aquarius, aquarius_state, aquarius, "Mattel", "Aquarius (NTSC)",               0 )
 COMP( 1983, aquarius_qd, aquarius, 0,      aquarius_qd, aquarius, aquarius_state, aquarius, "Mattel", "Aquarius w/ Quick Disk (NTSC)", 0 )
-//COMP( 1984,   aquariu2,   aquarius,   0,      aquarius,   aquarius, aquarius_state,   0,  "Mattel",   "Aquarius II",  GAME_NOT_WORKING )
+//COMP( 1984,   aquariu2,   aquarius,   0,      aquarius,   aquarius, driver_device,   0,  "Mattel",   "Aquarius II",  GAME_NOT_WORKING )

@@ -1020,19 +1020,17 @@ static void c65_common_driver_init( running_machine &machine )
 	/*memset(state->m_memory + 0x40000, 0, 0x800000 - 0x40000); */
 }
 
-DRIVER_INIT( c65 )
+DRIVER_INIT_MEMBER(c65_state,c65)
 {
-	c65_state *state = machine.driver_data<c65_state>();
-	state->m_dma.version = 2;
-	c65_common_driver_init(machine);
+	m_dma.version = 2;
+	c65_common_driver_init(machine());
 }
 
-DRIVER_INIT( c65pal )
+DRIVER_INIT_MEMBER(c65_state,c65pal)
 {
-	c65_state *state = machine.driver_data<c65_state>();
-	state->m_dma.version = 1;
-	c65_common_driver_init(machine);
-	state->m_pal = 1;
+	m_dma.version = 1;
+	c65_common_driver_init(machine());
+	m_pal = 1;
 }
 
 MACHINE_START( c65 )

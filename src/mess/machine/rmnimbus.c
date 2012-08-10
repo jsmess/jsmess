@@ -1264,7 +1264,7 @@ MACHINE_RESET(nimbus)
 	mouse_js_reset(machine);
 }
 
-DRIVER_INIT(nimbus)
+DRIVER_INIT_MEMBER(rmnimbus_state,nimbus)
 {
 }
 

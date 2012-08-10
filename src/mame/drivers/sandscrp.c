@@ -78,7 +78,7 @@ Is there another alt program rom set labeled 9 & 10?
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 #include "video/kan_pand.h"
-
+#include "machine/kaneko_hit.h"
 
 class sandscrp_state : public kaneko16_state
 {
@@ -258,7 +258,7 @@ static ADDRESS_MAP_START( sandscrp, AS_PROGRAM, 16, sandscrp_state )
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(sandscrp_irq_cause_w)	// IRQ Ack
 
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM		// RAM
-	AM_RANGE(0x200000, 0x20001f) AM_READWRITE(galpanib_calc_r,galpanib_calc_w)	// Protection
+	AM_RANGE(0x200000, 0x20001f) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
 	AM_RANGE(0x300000, 0x30001f) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_regs_r, kaneko_tmap_regs_w)
 	AM_RANGE(0x400000, 0x403fff) AM_DEVREADWRITE("view2_0", kaneko_view2_tilemap_device,  kaneko_tmap_vram_r, kaneko_tmap_vram_w )
 	AM_RANGE(0x500000, 0x501fff) AM_DEVREADWRITE_LEGACY("pandora", pandora_spriteram_LSB_r, pandora_spriteram_LSB_w ) // sprites
@@ -478,7 +478,7 @@ static const ym2203_interface ym2203_intf_sandscrp =
 		DEVCB_NULL,	/* Port A Write */
 		DEVCB_NULL,	/* Port B Write */
 	},
-	irq_handler	/* IRQ handler */
+	DEVCB_LINE(irq_handler)	/* IRQ handler */
 };
 
 
@@ -520,6 +520,8 @@ static MACHINE_CONFIG_START( sandscrp, sandscrp_state )
 	kaneko_view2_tilemap_device::set_gfx_region(*device, 1);
 	kaneko_view2_tilemap_device::set_offset(*device, 0x5b, 0, 256, 224);
 
+	MCFG_DEVICE_ADD("calc1_mcu", KANEKO_HIT, 0)
+	kaneko_hit_device::set_type(*device, 0);
 
 	MCFG_KANEKO_PANDORA_ADD("pandora", sandscrp_pandora_config)
 
@@ -608,6 +610,6 @@ ROM_START( sandscrpb ) /* Different rev PCB */
 ROM_END
 
 
-GAME( 1992, sandscrp,  0,        sandscrp, sandscrp, sandscrp_state, 0,          ROT90, "Face",   "Sand Scorpion", 0 )
-GAME( 1992, sandscrpa, sandscrp, sandscrp, sandscrp, sandscrp_state, 0,          ROT90, "Face",   "Sand Scorpion (Earlier)", 0 )
-GAME( 1992, sandscrpb, sandscrp, sandscrp, sandscrp, sandscrp_state, 0,          ROT90, "Face",   "Sand Scorpion (Chinese Title Screen, Revised Hardware)", 0 )
+GAME( 1992, sandscrp,  0,        sandscrp, sandscrp, driver_device, 0,          ROT90, "Face",   "Sand Scorpion", 0 )
+GAME( 1992, sandscrpa, sandscrp, sandscrp, sandscrp, driver_device, 0,          ROT90, "Face",   "Sand Scorpion (Earlier)", 0 )
+GAME( 1992, sandscrpb, sandscrp, sandscrp, sandscrp, driver_device, 0,          ROT90, "Face",   "Sand Scorpion (Chinese Title Screen, Revised Hardware)", 0 )

@@ -666,11 +666,11 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( 1986, psioncm,	0,       0, 	psioncm,		psion, psion_state,	 0,   "Psion",   "Organiser II CM",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1986, psionla,	psioncm, 0, 	psionla,	    psion, psion_state,	 0,   "Psion",   "Organiser II LA",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1986, psionp350,	psioncm, 0, 	psionp350,	    psion, psion_state,	 0,   "Psion",   "Organiser II P350",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1986, psionlam,	psioncm, 0, 	psionlam,	    psion, psion_state,	 0,   "Psion",   "Organiser II LAM",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1989, psionlz,	0,		 0, 	psionlz,	    psion, psion_state,	 0,   "Psion",   "Organiser II LZ",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1989, psionlz64,  psionlz, 0, 	psionlz,	    psion, psion_state,	 0,   "Psion",   "Organiser II LZ64",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1989, psionlz64s,	psionlz, 0, 	psionlz,	    psion, psion_state,	 0,   "Psion",   "Organiser II LZ64S",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
-COMP( 1989, psionp464,	psionlz, 0, 	psionlz,	    psion, psion_state,	 0,   "Psion",   "Organiser II P464",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1986, psioncm,	0,       0, 	psioncm,		psion, driver_device,	 0,   "Psion",   "Organiser II CM",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1986, psionla,	psioncm, 0, 	psionla,	    psion, driver_device,	 0,   "Psion",   "Organiser II LA",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1986, psionp350,	psioncm, 0, 	psionp350,	    psion, driver_device,	 0,   "Psion",   "Organiser II P350",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1986, psionlam,	psioncm, 0, 	psionlam,	    psion, driver_device,	 0,   "Psion",   "Organiser II LAM",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionlz,	0,		 0, 	psionlz,	    psion, driver_device,	 0,   "Psion",   "Organiser II LZ",		GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionlz64,  psionlz, 0, 	psionlz,	    psion, driver_device,	 0,   "Psion",   "Organiser II LZ64",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionlz64s,	psionlz, 0, 	psionlz,	    psion, driver_device,	 0,   "Psion",   "Organiser II LZ64S",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)
+COMP( 1989, psionp464,	psionlz, 0, 	psionlz,	    psion, driver_device,	 0,   "Psion",   "Organiser II P464",	GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS)

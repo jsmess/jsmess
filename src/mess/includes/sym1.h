@@ -39,6 +39,7 @@ public:
 	UINT8 m_riot_port_a;
 	UINT8 m_riot_port_b;
 	emu_timer *m_led_update;
+	DECLARE_DRIVER_INIT(sym1);
 };
 
 
@@ -55,7 +56,6 @@ extern const via6522_interface sym1_via0;
 extern const via6522_interface sym1_via1;
 extern const via6522_interface sym1_via2;
 
-DRIVER_INIT( sym1 );
 MACHINE_RESET( sym1 );
 
 

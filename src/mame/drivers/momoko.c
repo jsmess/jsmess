@@ -222,7 +222,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 static MACHINE_START( momoko )
@@ -344,4 +344,4 @@ ROM_START( momoko )
 	ROM_LOAD( "momoko-b.bin", 0x0100,  0x0020, CRC(427b0e5c) SHA1(aa2797b899571527cc96013fd3420b841954ee67) )
 ROM_END
 
-GAME( 1986, momoko, 0, momoko, momoko, momoko_state, 0, ROT0, "Jaleco", "Momoko 120%", GAME_SUPPORTS_SAVE )
+GAME( 1986, momoko, 0, momoko, momoko, driver_device, 0, ROT0, "Jaleco", "Momoko 120%", GAME_SUPPORTS_SAVE )

@@ -42,12 +42,12 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	void update_speaker();
 
+	DECLARE_DRIVER_INIT(irisha);
 };
 
 
 /*----------- defined in machine/irisha.c -----------*/
 
-extern DRIVER_INIT( irisha );
 extern MACHINE_START( irisha );
 extern MACHINE_RESET( irisha );
 extern const i8255_interface irisha_ppi8255_interface;

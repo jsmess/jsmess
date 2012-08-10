@@ -89,6 +89,7 @@ public:
 	//UINT8 *m_p_ram;
 	UINT8 m_led7;
 	UINT8 m_allowNMI;
+	DECLARE_DRIVER_INIT(mephisto);
 };
 
 
@@ -491,10 +492,9 @@ ROM_START(mm50)
 ROM_END
 
 
-static DRIVER_INIT( mephisto )
+DRIVER_INIT_MEMBER(mephisto_state,mephisto)
 {
-	mephisto_state *state = machine.driver_data<mephisto_state>();
-	state->m_lcd_shift_counter = 3;
+	m_lcd_shift_counter = 3;
 }
 
 /***************************************************************************

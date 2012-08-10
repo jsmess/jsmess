@@ -138,6 +138,7 @@ public:
 	int m_exp_nmi;
 	int m_cass_rd;
 	int m_iec_srq;
+	DECLARE_DRIVER_INIT(c64pal);
 };
 
 

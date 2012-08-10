@@ -150,6 +150,7 @@ public:
 	DECLARE_WRITE8_MEMBER(amstrad_cpc_io_w);
 	DECLARE_READ8_MEMBER(amstrad_psg_porta_read);
 	void amstrad_plus_seqcheck(int data);
+	DECLARE_DRIVER_INIT(aleste);
 };
 
 

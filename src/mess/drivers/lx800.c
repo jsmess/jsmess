@@ -293,4 +293,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT  INIT  COMPANY  FULLNAME  FLAGS */
-COMP( 1987, lx800, 0,      0,      lx800,   lx800, lx800_state, 0,    "Epson", "LX-800 Printer", GAME_NOT_WORKING )
+COMP( 1987, lx800, 0,      0,      lx800,   lx800, driver_device, 0,    "Epson", "LX-800 Printer", GAME_NOT_WORKING )

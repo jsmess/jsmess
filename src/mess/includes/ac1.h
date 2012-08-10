@@ -17,12 +17,12 @@ public:
 		: driver_device(mconfig, type, tag) { }
 
 	cassette_image_device *m_cassette;
+	DECLARE_DRIVER_INIT(ac1);
 };
 
 
 /*----------- defined in machine/ac1.c -----------*/
 
-DRIVER_INIT( ac1 );
 MACHINE_RESET( ac1 );
 
 extern const z80pio_interface ac1_z80pio_intf;

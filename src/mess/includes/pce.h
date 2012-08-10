@@ -132,6 +132,9 @@ public:
 	DECLARE_WRITE8_MEMBER(pce_cd_acard_w);
 	DECLARE_READ8_MEMBER(pce_cd_acard_wram_r);
 	DECLARE_WRITE8_MEMBER(pce_cd_acard_wram_w);
+	DECLARE_DRIVER_INIT(sgx);
+	DECLARE_DRIVER_INIT(tg16);
+	DECLARE_DRIVER_INIT(mess_pce);
 };
 
 
@@ -141,9 +144,6 @@ DEVICE_IMAGE_LOAD(pce_cart);
 
 extern const msm5205_interface pce_cd_msm5205_interface;
 
-DRIVER_INIT( mess_pce );
-DRIVER_INIT( tg16 );
-DRIVER_INIT( sgx );
 MACHINE_START( pce );
 MACHINE_RESET( mess_pce );
 

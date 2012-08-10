@@ -181,7 +181,7 @@ static const ym2203_interface ym2203_config =
 		DEVCB_NULL,
 		DEVCB_NULL
 	},
-	NULL
+	DEVCB_NULL
 };
 
 
@@ -336,9 +336,9 @@ ROM_END
 
 
 
-static DRIVER_INIT( citycon )
+DRIVER_INIT_MEMBER(citycon_state,citycon)
 {
-	UINT8 *rom = machine.root_device().memregion("gfx1")->base();
+	UINT8 *rom = machine().root_device().memregion("gfx1")->base();
 	int i;
 
 	/*

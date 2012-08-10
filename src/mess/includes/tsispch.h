@@ -42,6 +42,7 @@ public:
 	DECLARE_WRITE16_MEMBER(dsp_data_w);
 	DECLARE_READ16_MEMBER(dsp_status_r);
 	DECLARE_WRITE16_MEMBER(dsp_status_w);
+	DECLARE_DRIVER_INIT(prose2k);
 };
 
 

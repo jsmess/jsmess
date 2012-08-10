@@ -622,12 +622,11 @@ DIRECT_UPDATE_MEMBER(cosmicos_state::cosmicos_direct_update_handler)
 	return address;
 }
 
-static DRIVER_INIT( cosmicos )
+DRIVER_INIT_MEMBER(cosmicos_state,cosmicos)
 {
-	cosmicos_state *state = machine.driver_data<cosmicos_state>();
-	address_space *program = machine.device(CDP1802_TAG)->memory().space(AS_PROGRAM);
+	address_space *program = machine().device(CDP1802_TAG)->memory().space(AS_PROGRAM);
 
-	program->set_direct_update_handler(direct_update_delegate(FUNC(cosmicos_state::cosmicos_direct_update_handler), state));
+	program->set_direct_update_handler(direct_update_delegate(FUNC(cosmicos_state::cosmicos_direct_update_handler), this));
 }
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME    FLAGS */

@@ -873,43 +873,38 @@ ROM_START( meritum_net )
 	ROM_LOAD( "char.bin", 0x0000, 0x1000, CRC(2c09a5a7) SHA1(146891b3ddfc2de95e6a5371536394a657880054))
 ROM_END
 
-static DRIVER_INIT( trs80 )
+DRIVER_INIT_MEMBER(trs80_state,trs80)
 {
-	trs80_state *state = machine.driver_data<trs80_state>();
-	state->m_mode = 0;
-	state->m_model4 = 0;
+	m_mode = 0;
+	m_model4 = 0;
 }
 
-static DRIVER_INIT( trs80l2 )
+DRIVER_INIT_MEMBER(trs80_state,trs80l2)
 {
-	trs80_state *state = machine.driver_data<trs80_state>();
-	state->m_mode = 2;
-	state->m_model4 = 0;
+	m_mode = 2;
+	m_model4 = 0;
 }
 
-static DRIVER_INIT( trs80m4 )
+DRIVER_INIT_MEMBER(trs80_state,trs80m4)
 {
-	trs80_state *state = machine.driver_data<trs80_state>();
-	state->m_mode = 0;
-	state->m_model4 = 2;
-	state->m_p_videoram.set_target(state->memregion("maincpu")->base()+0x4000,state->m_p_videoram.bytes());
+	m_mode = 0;
+	m_model4 = 2;
+	m_p_videoram.set_target(memregion("maincpu")->base()+0x4000,m_p_videoram.bytes());
 }
 
-static DRIVER_INIT( trs80m4p )
+DRIVER_INIT_MEMBER(trs80_state,trs80m4p)
 {
-	trs80_state *state = machine.driver_data<trs80_state>();
-	state->m_mode = 0;
-	state->m_model4 = 4;
-	state->m_p_videoram.set_target(state->memregion("maincpu")->base()+0x4000,state->m_p_videoram.bytes());
+	m_mode = 0;
+	m_model4 = 4;
+	m_p_videoram.set_target(memregion("maincpu")->base()+0x4000,m_p_videoram.bytes());
 }
 
-static DRIVER_INIT( lnw80 )
+DRIVER_INIT_MEMBER(trs80_state,lnw80)
 {
-	trs80_state *state = machine.driver_data<trs80_state>();
-	state->m_mode = 0;
-	state->m_model4 = 0;
-	state->m_p_gfxram = machine.root_device().memregion("gfx2")->base();
-	state->m_p_videoram.set_target(state->memregion("maincpu")->base()+0x4000,state->m_p_videoram.bytes());
+	m_mode = 0;
+	m_model4 = 0;
+	m_p_gfxram = machine().root_device().memregion("gfx2")->base();
+	m_p_videoram.set_target(memregion("maincpu")->base()+0x4000,m_p_videoram.bytes());
 }
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE     INPUT    INIT         COMPANY           FULLNAME */
