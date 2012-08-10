@@ -63,6 +63,7 @@
 #include "sound/speaker.h"
 #include "machine/roc10937.h"
 #include "machine/6551acia.h"
+#include "machine/mm74c922.h"
 #include "digel804.lh"
 
 
@@ -75,7 +76,8 @@ public:
 		  m_terminal(*this, TERMINAL_TAG),
 		  m_speaker(*this, "speaker"),
 		  m_acia(*this, "acia"),
-		  m_vfd(*this, "vfd")
+		  m_vfd(*this, "vfd"),
+		  m_kb(*this, "74c923")
 		//, m_main_ram(*this, "main_ram")
 		{ }
 
@@ -84,6 +86,7 @@ public:
 	required_device<device_t> m_speaker;
 	required_device<acia6551_device> m_acia;
 	required_device<roc10937_t> m_vfd;
+	required_device<mm74c922_device> m_kb;
 	DECLARE_READ8_MEMBER( ip40 );
 	DECLARE_WRITE8_MEMBER( op40 );
 	DECLARE_WRITE8_MEMBER( op41 );
@@ -103,7 +106,7 @@ public:
 	DECLARE_WRITE8_MEMBER( acia_command_w );
 	DECLARE_READ8_MEMBER( acia_control_r );
 	DECLARE_WRITE8_MEMBER( acia_control_w );
-	UINT8 digel804_convert_col_to_bin( UINT8 col, UINT8 row );
+	DECLARE_WRITE_LINE_MEMBER( da_w );
 	// vfd helper stuff for port 44, should be unnecessary after 10937 gets a proper device
 	UINT8 vfd_data;
 	UINT8 vfd_old;
@@ -129,39 +132,6 @@ public:
 	DECLARE_DRIVER_INIT(digel804);
 };
 
-/*
- 74c923 handler by Robbbert copied more or less from tec1.c
-*/
-static TIMER_CALLBACK( ep804_kbd_callback )
-{
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3" };
-	digel804_state *state = machine.driver_data<digel804_state>();
-
-	machine.scheduler().timer_set(attotime::from_hz(10000), FUNC(ep804_kbd_callback));
-    // 74C923 4 by 5 key encoder.
-    // if previous key is still held, bail out
-	if (machine.root_device().ioport(keynames[state->m_kbd_row])->read())
-		if (state->digel804_convert_col_to_bin(machine.root_device().ioport(keynames[state->m_kbd_row])->read(), state->m_kbd_row) == state->m_kbd)
-			return;
-
-	state->m_kbd_row++;
-	state->m_kbd_row &= 3;
-
-	/* see if a key pressed */
-	if (machine.root_device().ioport(keynames[state->m_kbd_row])->read())
-	{
-		fprintf(stderr,"DEBUG: key was pressed!\n");
-		state->m_kbd = state->digel804_convert_col_to_bin(machine.root_device().ioport(keynames[state->m_kbd_row])->read(), state->m_kbd_row);
-		state->m_key_intq = 0;
-		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);//ASSERT_LINE);
-	}
-	else
-	{
-		state->m_key_intq = 1;
-		//if (state->m_acia_intq == 1) cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
-	}
-}
-
 DRIVER_INIT_MEMBER(digel804_state,digel804)
 {
 	vfd_old = vfd_data = vfd_count = 0;
@@ -181,7 +151,6 @@ DRIVER_INIT_MEMBER(digel804_state,digel804)
 	m_ram_bank = 0;
 	m_op41 = 0;
 	membank( "bankedram" )->set_base( memregion("user_ram")->base() + ( m_ram_bank * 0x10000 ));
-	machine().scheduler().timer_set(attotime::from_hz(10000), FUNC(ep804_kbd_callback));
 }
 
 static MACHINE_RESET( digel804 )
@@ -189,25 +158,6 @@ static MACHINE_RESET( digel804 )
 	digel804_state *state = machine.driver_data<digel804_state>();
 	state->m_vfd->reset();
 	state->vfd_old = state->vfd_data = state->vfd_count = 0;
-}
-
-UINT8 digel804_state::digel804_convert_col_to_bin( UINT8 col, UINT8 row )
-{
-	UINT8 data = row;
-
-	if (BIT(col, 1))
-		data |= 4;
-	else
-	if (BIT(col, 2))
-		data |= 8;
-	else
-	if (BIT(col, 3))
-		data |= 12;
-	else
-	if (BIT(col, 4))
-		data |= 16;
-
-	return data;
 }
 
 READ8_MEMBER( digel804_state::ip40 ) // eprom data bus read
@@ -270,14 +220,14 @@ READ8_MEMBER( digel804_state::ip43 )
 #ifdef PORT43_R_VERBOSE
 	logerror("Digel804: returning %02X for port 43 status read\n", port43_rtn);
 #endif
-	return ((m_overload_state<<7)
-		|(m_debug_x5_state<<6)
-		|((m_key_intq&m_acia_intq)<<5)
-		|(m_remote_mode<<4)
-		|(m_key_mode<<3)
-		|(m_sim_mode<<2)
-		|(m_powerfail_state<<1)
-		|(m_chipinsert_state));
+	return ((m_overload_state<<0)
+		|(m_debug_x5_state<<1)
+		|((m_key_intq&m_acia_intq)<<2)
+		|(m_remote_mode<<3)
+		|(m_key_mode<<4)
+		|(m_sim_mode<<5)
+		|(m_powerfail_state<<6)
+		|(m_chipinsert_state<<7));
 
 }
 
@@ -366,7 +316,9 @@ READ8_MEMBER( digel804_state::ip46 ) // keypad read
 #ifdef PORT46_R_VERBOSE
 	logerror("Digel804: returning %02X for port 46 keypad read\n", m_kbd);
 #endif
-	return m_kbd;
+	UINT8 kbd = m_kb->data_out_r();
+
+	return BITSWAP8(kbd,7,6,5,4,1,0,3,2);	// verified from schematics
 }
 
 WRITE8_MEMBER( digel804_state::op46 )
@@ -501,32 +453,32 @@ ADDRESS_MAP_END
 ******************************************************************************/
 static INPUT_PORTS_START( digel804 )
 	PORT_START("LINE0") /* KEY ROW 0, 'X1' */
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)	PORT_CHAR('0')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)	PORT_CHAR('1')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)	PORT_CHAR('2')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)	PORT_CHAR('3')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTR/INCR") PORT_CODE(KEYCODE_ENTER)	PORT_CHAR('^')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)	PORT_CHAR('0')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)	PORT_CHAR('1')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)	PORT_CHAR('2')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)	PORT_CHAR('3')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTR/INCR") PORT_CODE(KEYCODE_ENTER)	PORT_CHAR('^')
 
 	PORT_START("LINE1") /* KEY ROW 1, 'X2' */
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)	PORT_CHAR('4')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)	PORT_CHAR('5')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)	PORT_CHAR('6')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)	PORT_CHAR('7')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("NEXT/DECR") PORT_CODE(KEYCODE_DOWN)	PORT_CHAR('V')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)	PORT_CHAR('4')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)	PORT_CHAR('5')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)	PORT_CHAR('6')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)	PORT_CHAR('7')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("NEXT/DECR") PORT_CODE(KEYCODE_DOWN)	PORT_CHAR('V')
 
 	PORT_START("LINE2") /* KEY ROW 2, 'X3' */
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)	PORT_CHAR('8')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)	PORT_CHAR('9')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)	PORT_CHAR('A')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)	PORT_CHAR('B')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("REPT") PORT_CODE(KEYCODE_X)	PORT_CHAR('X')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)	PORT_CHAR('8')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)	PORT_CHAR('9')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)	PORT_CHAR('A')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)	PORT_CHAR('B')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REPT") PORT_CODE(KEYCODE_X)	PORT_CHAR('X')
 
 	PORT_START("LINE3") /* KEY ROW 3, 'X4' */
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)	PORT_CHAR('C')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)	PORT_CHAR('D')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)	PORT_CHAR('E')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)	PORT_CHAR('F')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CLR") PORT_CODE(KEYCODE_MINUS)	PORT_CHAR('-')
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)	PORT_CHAR('C')
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)	PORT_CHAR('D')
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)	PORT_CHAR('E')
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)	PORT_CHAR('F')
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CLR") PORT_CODE(KEYCODE_MINUS)	PORT_CHAR('-')
 
 	PORT_START("MODE") // TODO, connects entirely separately from the keypad through some complicated latching logic
 	PORT_BIT(0xFF, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -546,6 +498,24 @@ static GENERIC_TERMINAL_INTERFACE( digel804_terminal_intf )
 	DEVCB_HANDLER(digel804_serial_put)
 };
 
+WRITE_LINE_MEMBER( digel804_state::da_w )
+{
+	//m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
+
+}
+static MM74C923_INTERFACE( digel804_keypad_intf )
+{
+	0,	// FIXME
+	0,	// FIXME
+	DEVCB_DRIVER_LINE_MEMBER(digel804_state, da_w),
+	DEVCB_INPUT_PORT("LINE0"),
+	DEVCB_INPUT_PORT("LINE1"),
+	DEVCB_INPUT_PORT("LINE2"),
+	DEVCB_INPUT_PORT("LINE3"),
+	DEVCB_NULL
+};
+
 static MACHINE_CONFIG_START( digel804, digel804_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_6864MHz/2) /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
@@ -559,6 +529,8 @@ static MACHINE_CONFIG_START( digel804, digel804_state )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, digel804_terminal_intf)
 
 	MCFG_DEFAULT_LAYOUT(layout_digel804)
+
+	MCFG_MM74C923_ADD("74c923", digel804_keypad_intf)
 
 	/* acia */
 	MCFG_ACIA6551_ADD("acia")
@@ -583,6 +555,8 @@ static MACHINE_CONFIG_START( ep804, digel804_state )
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, digel804_terminal_intf)
 
 	MCFG_DEFAULT_LAYOUT(layout_digel804)
+
+	MCFG_MM74C923_ADD("74c923", digel804_keypad_intf)
 
 	/* acia */
 	MCFG_ACIA6551_ADD("acia")
