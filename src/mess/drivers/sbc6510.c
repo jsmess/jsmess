@@ -19,20 +19,33 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/6526cia.h"
 #include "sound/ay8910.h"
+#include "machine/terminal.h"
 
 
 class sbc6510_state : public driver_device
 {
 public:
 	sbc6510_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+	m_terminal(*this, TERMINAL_TAG) { }
 
+	DECLARE_WRITE8_MEMBER(data_w);
+	DECLARE_READ8_MEMBER(nop_r);
+	UINT8 m_term_data;
+	required_device<generic_terminal_device> m_terminal;
 };
 
 
 static ADDRESS_MAP_START( sbc6510_mem, AS_PROGRAM, 8, sbc6510_state )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xdfff) AM_RAM
+	AM_RANGE(0x0000, 0x0002) AM_RAM_WRITE(data_w)
+	AM_RANGE(0x0003, 0xdfff) AM_RAM
+	//AM_RANGE(0xE001, 0xE001) keyboard
+	AM_RANGE(0xEA00, 0xEA00) AM_READ(nop_r)
+	//AM_RANGE(0x0000, 0xdfff) AM_RAM
+	//AM_RANGE(0xE000, 0xE00F) a device
+	//AM_RANGE(0xE800, 0xE801) a device
+	//AM_RANGE(0xEA00, 0xEA01) a device
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -40,18 +53,25 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( sbc6510 )
 INPUT_PORTS_END
 
+READ8_MEMBER( sbc6510_state::nop_r )
+{
+	return 0x7f;
+}
+
+WRITE8_MEMBER( sbc6510_state::data_w )
+{
+	if (offset == 2)
+		m_terminal->write(space, 0, data);
+}
+
+static GENERIC_TERMINAL_INTERFACE( terminal_intf )
+{
+	DEVCB_NULL
+};
+
 
 static MACHINE_RESET(sbc6510)
 {
-}
-
-static VIDEO_START( sbc6510 )
-{
-}
-
-static SCREEN_UPDATE_IND16( sbc6510 )
-{
-	return 0;
 }
 
 static const m6502_interface sbc6510_m6510_interface =
@@ -91,17 +111,7 @@ static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
 	MCFG_MACHINE_RESET(sbc6510)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(50)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(640, 480)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MCFG_SCREEN_UPDATE_STATIC(sbc6510)
-
-	MCFG_PALETTE_LENGTH(2)
-	MCFG_PALETTE_INIT(black_and_white)
-
-	MCFG_VIDEO_START(sbc6510)
+	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -124,5 +134,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY          FULLNAME       FLAGS */
+/*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY          FULLNAME       FLAGS */
 COMP( 2009, sbc6510,  0,      0,       sbc6510,   sbc6510, driver_device, 0,   "Josip Perusanec", "SBC6510", GAME_NOT_WORKING)
