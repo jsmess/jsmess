@@ -1030,31 +1030,32 @@ i.e. addr bits 9876543210
 	ROM_LOAD( "wb8141_059b1.tbp18s22.pr5.ic108", 0x0000, 0x0100, CRC(4b63857a) SHA1(3217247d983521f0b0499b5c4ef6b5de9844c465))  // label verified from andy's board
 
 	ROM_REGION( 0x400, "proms", ROMREGION_ERASEFF )
-	/* this is the "RAS/ERASE ROM" involved with erasing VRAM dram to the background color and driving the RAS lines (256*4, 82s129)
+	/* this is the "RAS/ERASE ROM" involved with driving the RAS lines and erasing VRAM dram (256*4, 82s129)
      * control bits:
-     *            /CE1 ----- ?
-     *            /CE2 ----- ?
+     *            /CE1 ----- /WRITE aka WRITE L (pin 6 of vector rom after being latched by its ls273) [verified from tracing and vt125 schematic]
+     *            /CE2 ----- /ENA WRITE aka ENA WRITE L [verified from tracing and vt125 schematic]
+     *                       (INHIBIT WRITE L (pin 5 of ls74 to extreme left edge of translate prom) XOR STROBE D COUNT (pin 5 of ls74 near the 20ma port) (pin 3 of the ls86 above the crtc)
      * addr bits: 76543210
-     *            |||||||\-- ?
-     *            ||||||\--- ?
-     *            |||||\---- ?
-     *            ||||\----- ?
-     *            |||\------ ?
-     *            ||\------- ?
-     *            |\-------- ?
-     *            \--------- comes from the gated ERASE L/d5 on the vector rom [verified from tracing]
+     *            |||||||\-- X'2 [verified from tracing]
+     *            ||||||\--- X'3 [verified from tracing]
+     *            |||||\---- register file bit 3/upper file MSB (DIR prom pin 4, ls191 2nd from left edge left of the hd46505 pin 9, upper ls670n pin 6, ls283 at the left edge left of the hd46505 pin 15) [verified from tracing]
+     *            ||||\----- (Y8 NOR !(X10 NAND X9)) (pins 4,5,6 of ls32 left of 8085, and pins 1,2 of the ls04 in the lower left corner, pins 10,9,8 of the ls00 at the left edge drawn from the ls74 between the 8251 and 8202) [verified from tracing]
+     *            |||\------ (X10 NOR Y10) (pins 10,9,8 of ;s32 left of 8085) [verified from tracing]
+     *            ||\------- X11 (D out of ls191 left of ls191 left of hd46505) [verified from tracing]
+     *            |\-------- Y11 (D out of ls191 left of hd46505) [verified from tracing]
+     *            \--------- ERASE L/d5 on the vector rom [verified from tracing]
      * data bits: 3210
      *            |||\-- ? wr_1?
      *            ||\--- ? wr_2?
      *            |\---- ? wr_3?
      *            \----- ? wr_4?
-     * According to the VT125 Schematics, the inputs are:
+     * The VT125 prom E93 is mostly equivalent to the ras/erase prom; On the vt125 version, the inputs are:
      *  (X'10 NOR X'11)
      *  (Y9 NOR Y10)
      *  Y11
      *  X8 (aka PX8)
      *  X9 (aka PX9)
-     *  ERASE L - a7
+     *  ERASE L 
      *  X'3
      *  X'2
      * and the outputs are:
@@ -1065,9 +1066,10 @@ i.e. addr bits 9876543210
        only has 3 banks (but 2 planes of 3 banks), I (LN) assume there
        are four wr banks on the v100, one per nybble, and the X'3 and
        X'2 inputs lend credence to this.
-     * The VT125 prom E93 is mostly equivalent to the ras/erase prom
+     * 
      */
 	ROM_LOAD( "wb8151_573a2.mmi6301.pr3.ic44", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4)) // label verified from nigwil's and andy's board
+	// WARNING: it is possible that the first two bytes of this prom are bad!
 	/* this is the "VECTOR ROM" (256*8, 82s135) which runs the vector generator state machine
      * the vector rom bits are complex and are unfortunately poorly documented
      * in the tech manual. see figure 5-23.
@@ -1079,14 +1081,14 @@ i.e. addr bits 9876543210
      *            |||\------ A0\__Address lsb bits of the execute write, i.e. VG_MODE; these are INVERTED FIRST.
      *            ||\------- A1/
      *            |\-------- CARRY_IN (when set, only one /LD ERROR pulse occurs instead of two)
-     *            \--------- ? possibly tied or somehow pulsed by sync rom d7? /LD ERROR only goes active (low) when this is unset
+     *            \--------- ??? (/LD ERROR only goes active (low) when this is unset)
      *
      * data bits: 76543210
      *            |||||||\-- /WRITE aka WRITE L (fig 5-20, page 5-32, writes the post-pattern-converted value back to vram at X,Y)
      *            ||||||\--- DONE L [verified via tracing]
-     *            |||||\---- VECTOR CLK [verified via tracing]
+     *            |||||\---- VECTOR CLK aka V CLK [verified via tracing]
      *            ||||\----- /LD ERROR aka STROBE ERROR L (strobes the adder result value into the vgERR register)
-     *            |||\------ D-LOAD [by process of elimination and limited tracing]
+     *            |||\------ D LOAD [by process of elimination and limited tracing]
      *            ||\------- ERASE L (latched, forces a4 on the sync rom low and also forces a7 on the ras/erase rom; the counter rom may be involved in blanking all of vram) [verified from tracing]
      *            |\-------- C0 aka C IN (high during DVM read, low otherwise, a carry in to the adder so DVM is converted from 1s to 2s complement)
      *            \--------- SHIFT ENA [verified via tracing]
@@ -1101,7 +1103,6 @@ i.e. addr bits 9876543210
      * VECTOR CLK - d2
      * STROBE ERROR L - d3
      *
-     * it is possible d2 or d1 is the SYNC bit instead of one of the above
      * The VT125 prom E71 and its latch E70 is mostly equivalent to the vector prom, but the address order is different
      */
 	ROM_LOAD( "wb8146_058b1.mmi6309.pr1.ic99", 0x0100, 0x0100, CRC(71b01864) SHA1(e552f5b0bc3f443299282b1da7e9dbfec60e12bf))  // label verified from nigwil's and andy's board
@@ -1126,7 +1127,7 @@ i.e. addr bits 9876543210
      *            |||\------ /CAS (for vram)
      *            ||\------- RA\__selects which slot of the 8x4 register file (du, dvm, dir, or wops) is selected
      *            |\-------- RB/
-     *            \--------- SYNC (latches the EXECUTE signal from an EXEC * write to activate the GO signal and enable the Vector rom)
+     *            \--------- SYNC (latches the EXECUTE signal from an EXEC * write to activate the GO signal and enable the Vector rom) [verified via tracing]
      * The VT125 proms E64/E66 and their respective latches E65 and E83 are mostly equivalent to the sync rom
      */
 	ROM_LOAD( "wb8014_297a1.74s288.pr6.ic89", 0x0200, 0x0020, CRC(e2f7c566) SHA1(a4c3dc5d07667141ad799168a862cb3c489b4934)) // label verified from nigwil's and andy's board
