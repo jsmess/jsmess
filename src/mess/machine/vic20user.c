@@ -114,6 +114,8 @@ void vic20_user_port_device::device_start()
 
 void vic20_user_port_device::device_reset()
 {
+	port_reset_w(ASSERT_LINE);
+	port_reset_w(CLEAR_LINE);
 }
 
 
@@ -127,6 +129,7 @@ READ_LINE_MEMBER( vic20_user_port_device::cassette_switch_r ) { int state = 1; i
 WRITE_LINE_MEMBER( vic20_user_port_device::cb1_w ) { if (m_cart != NULL) m_cart->vic20_cb1_w(state); }
 WRITE_LINE_MEMBER( vic20_user_port_device::cb2_w ) { if (m_cart != NULL) m_cart->vic20_cb2_w(state); }
 WRITE_LINE_MEMBER( vic20_user_port_device::atn_w ) { if (m_cart != NULL) m_cart->vic20_atn_w(state); }
+WRITE_LINE_MEMBER( vic20_user_port_device::port_reset_w ) { if (m_cart != NULL) m_cart->vic20_reset_w(state); }
 
 WRITE_LINE_MEMBER( vic20_user_port_device::via_cb1_w ) { m_out_cb1_func(state); }
 WRITE_LINE_MEMBER( vic20_user_port_device::via_cb2_w ) { m_out_cb2_func(state); }

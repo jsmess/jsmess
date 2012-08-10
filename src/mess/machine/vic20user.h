@@ -92,6 +92,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cb1_w );
 	DECLARE_WRITE_LINE_MEMBER( cb2_w );
 	DECLARE_WRITE_LINE_MEMBER( atn_w );
+	DECLARE_WRITE_LINE_MEMBER( port_reset_w );
 
 	// cartridge interface
 	DECLARE_WRITE_LINE_MEMBER( via_cb1_w );

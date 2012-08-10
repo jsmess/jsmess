@@ -130,3 +130,33 @@ void vic1010_device::vic20_cd_w(address_space &space, offs_t offset, UINT8 data,
 		m_expansion_slot[i]->cd_w(space, offset, data, ram1, ram2, ram3, blk1, blk2, blk3, blk5, io2, io3);
 	}
 }
+
+
+//-------------------------------------------------
+//  vic20_screen_update - screen update
+//-------------------------------------------------
+
+UINT32 vic1010_device::vic20_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	UINT32 data = 0;
+
+	for (int i = 0; i < MAX_SLOTS; i++)
+	{
+		data |= m_expansion_slot[i]->screen_update(screen, bitmap, cliprect);
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  vic20_res_w - reset write
+//-------------------------------------------------
+
+void vic1010_device::vic20_res_w(int state)
+{
+	for (int i = 0; i < MAX_SLOTS; i++)
+	{
+		m_expansion_slot[i]->port_res_w(state);
+	}
+}

@@ -92,38 +92,22 @@ public:
 	vic20_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	virtual ~vic20_expansion_slot_device();
 
+	// computer interface
 	UINT8 cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);
 	void cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER( port_res_w );
 
-	DECLARE_READ8_MEMBER( ram1_r );
-	DECLARE_WRITE8_MEMBER( ram1_w );
-	DECLARE_READ8_MEMBER( ram2_r );
-	DECLARE_WRITE8_MEMBER( ram2_w );
-	DECLARE_READ8_MEMBER( ram3_r );
-	DECLARE_WRITE8_MEMBER( ram3_w );
-	DECLARE_READ8_MEMBER( blk1_r );
-	DECLARE_WRITE8_MEMBER( blk1_w );
-	DECLARE_READ8_MEMBER( blk2_r );
-	DECLARE_WRITE8_MEMBER( blk2_w );
-	DECLARE_READ8_MEMBER( blk3_r );
-	DECLARE_WRITE8_MEMBER( blk3_w );
-	DECLARE_READ8_MEMBER( blk5_r );
-	DECLARE_WRITE8_MEMBER( blk5_w );
-	DECLARE_READ8_MEMBER( io2_r );
-	DECLARE_WRITE8_MEMBER( io2_w );
-	DECLARE_READ8_MEMBER( io3_r );
-	DECLARE_WRITE8_MEMBER( io3_w );
-
+	// cartridge interface
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
 	DECLARE_WRITE_LINE_MEMBER( res_w );
-
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
+	virtual void device_reset();
 
 	// image-level overrides
 	virtual bool call_load();
@@ -176,6 +160,7 @@ protected:
 	virtual UINT8 vic20_cd_r(address_space &space, offs_t offset, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { return 0; };
 	virtual void vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { };
 	virtual UINT32 vic20_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return 0; }
+	virtual void vic20_res_w(int state) { };
 
 	vic20_expansion_slot_device *m_slot;
 

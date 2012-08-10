@@ -732,11 +732,19 @@ static const mos6560_interface vic_pal_intf =
 //  VIC20_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
+WRITE_LINE_MEMBER( vic20_state::exp_reset_w )
+{
+	if (state == ASSERT_LINE)
+	{
+		machine_reset();
+	}
+}
+
 static VIC20_EXPANSION_INTERFACE( expansion_intf )
 {
 	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0),
 	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_NMI),
-	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_RESET)
+	DEVCB_DRIVER_LINE_MEMBER(vic20_state, exp_reset_w)
 };
 
 
@@ -748,7 +756,7 @@ static VIC20_USER_PORT_INTERFACE( user_intf )
 {
 	DEVCB_DEVICE_LINE_MEMBER(M6522_0_TAG, via6522_device, write_cb1),
 	DEVCB_DEVICE_LINE_MEMBER(M6522_0_TAG, via6522_device, write_cb2),
-	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_RESET)
+	DEVCB_DRIVER_LINE_MEMBER(vic20_state, exp_reset_w)
 };
 
 
@@ -773,6 +781,20 @@ void vic20_state::machine_start()
 
 	// state saving
 	save_item(NAME(m_key_col));
+}
+
+
+//-------------------------------------------------
+//  MACHINE_RESET( vic20 )
+//-------------------------------------------------
+
+void vic20_state::machine_reset()
+{
+	m_maincpu->reset();
+
+	m_iec->reset();
+	m_exp->reset();
+	m_user->reset();
 }
 
 

@@ -224,6 +224,17 @@ void vic20_expansion_slot_device::device_start()
 
 
 //-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void vic20_expansion_slot_device::device_reset()
+{
+	port_res_w(ASSERT_LINE);
+	port_res_w(CLEAR_LINE);
+}
+
+
+//-------------------------------------------------
 //  call_load -
 //-------------------------------------------------
 
@@ -356,6 +367,8 @@ UINT32 vic20_expansion_slot_device::screen_update(screen_device &screen, bitmap_
 
 	return value;
 }
+
+WRITE_LINE_MEMBER( vic20_expansion_slot_device::port_res_w ) { if (m_cart != NULL) m_cart->vic20_res_w(state); }
 
 WRITE_LINE_MEMBER( vic20_expansion_slot_device::irq_w ) { m_out_irq_func(state); }
 WRITE_LINE_MEMBER( vic20_expansion_slot_device::nmi_w ) { m_out_nmi_func(state); }
