@@ -491,6 +491,7 @@ READ8_HANDLER ( pc_fdc_r )
 		case 0: /* status register a */
 		case 1: /* status register b */
 			data = 0x00;
+			break;
 		case 2:
 			data = fdc->digital_output_register;
 			break;
