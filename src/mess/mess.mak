@@ -863,8 +863,8 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/vic1111.o	\
 	$(MESS_MACHINE)/vic1112.o	\
 	$(MESS_MACHINE)/vic1210.o	\
-	$(MESS_AUDIO)/ted7360.o		\
 	$(MESS_AUDIO)/t6721.o		\
+	$(MESS_AUDIO)/mos7360.o		\
 	$(MESS_DRIVERS)/plus4.o		\
 	$(MESS_MACHINE)/plus4exp.o	\
 	$(MESS_MACHINE)/plus4user.o	\

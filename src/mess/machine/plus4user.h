@@ -66,8 +66,8 @@ public:
 	virtual ~plus4_user_port_device();
 
 	// computer interface
-	UINT8 p_r();
-	void p_w(UINT8 data);
+	DECLARE_READ8_MEMBER( p_r );
+	DECLARE_WRITE8_MEMBER( p_w );
 	DECLARE_READ_LINE_MEMBER( rxd_r );
 	DECLARE_READ_LINE_MEMBER( dcd_r );
 	DECLARE_READ_LINE_MEMBER( dsr_r );
@@ -76,17 +76,13 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rts_w );
 	DECLARE_WRITE_LINE_MEMBER( rxc_w );
 	DECLARE_WRITE_LINE_MEMBER( atn_w );
-
-	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
+	DECLARE_WRITE_LINE_MEMBER( breset_w );
 
 protected:
 	// device-level overrides
+	virtual void device_config_complete() { };
 	virtual void device_start();
 	virtual void device_reset();
-	virtual void device_config_complete() { };
-
-    devcb_resolved_write_line	m_out_reset_func;
 
 	device_plus4_user_port_interface *m_cart;
 };
@@ -115,7 +111,7 @@ public:
 	virtual void plus4_atn_w(int level) { };
 
 	// reset
-	virtual void plus4_reset_w(int level) { };
+	virtual void plus4_breset_w(int level) { };
 
 protected:
 	plus4_user_port_device *m_slot;

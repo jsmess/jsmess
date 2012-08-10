@@ -2,13 +2,13 @@
 
 	TODO:
 
-	- diag264p: HIGH RAM BAD $FF40-7F DEVICE, bad kernal R5
+	- cassette
 	- c1551 won't load anything
-	- JiffyDOS boots to monitor
 	- clean up keyboard handling
 	- clean up TED
 	- dump PLA
 	- T6721 speech chip
+	- floating bus read (should return the previous byte read by TED)
 	- SID card (http://solder.dyndns.info/cgi-bin/showdir.pl?dir=files/commodore/plus4/hardware/SID-Card)
 
 */
@@ -152,7 +152,7 @@ void plus4_state::bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs
 			*cs0 = 0;
 			*cs1 = 1;
 		}
-		else if ((offset >= 0xc000 && offset < 0xfd00) || (offset >= 0xff40))
+		else if ((offset >= 0xc000 && offset < 0xfd00) || (offset >= 0xff20))
 		{
 			*cs0 = 1;
 			*cs1 = 0;
@@ -176,9 +176,16 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 	{
 		data = t6721_speech_r(m_t6721, offset & 0x03);
 	}
-	else if (!user && m_spi_user)
+	else if (!user)
 	{
-		data = m_spi_user->read(space, 0);
+		if (m_spi_user)
+		{
+			data = m_spi_user->read(space, 0);
+		}
+		else
+		{
+			data |= ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 2;
+		}
 	}
 	else if (!_6551 && m_acia)
 	{
@@ -245,9 +252,9 @@ UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int 
 	}
 	else if (offset >= 0xff00 && offset < 0xff20)
 	{
-		data = ted7360_port_r(m_ted, offset & 0x1f);
+		data = m_ted->read(space, offset & 0x1f);
 	}
-	else if (offset < 0xfd00 || offset > 0xff40)
+	else if (offset < 0xfd00 || offset >= 0xff20)
 	{
 		data = m_ram->pointer()[offset & m_ram->mask()];
 	}
@@ -309,21 +316,21 @@ WRITE8_MEMBER( plus4_state::write )
 	}
 	else if (offset >= 0xff00 && offset < 0xff20)
 	{
-		ted7360_port_w(m_ted, offset & 0x1f, data);
+		m_ted->write(space, offset & 0x1f, data);
 	}
 	else if (offset == 0xff3e)
 	{
 		m_rom_en = 1;
 		
-		ted7360_rom_switch_w(m_ted, m_rom_en);
+		m_ted->rom_switch_w(m_rom_en);
 	}
 	else if (offset == 0xff3f)
 	{
 		m_rom_en = 0;
 
-		ted7360_rom_switch_w(m_ted, m_rom_en);
+		m_ted->rom_switch_w(m_rom_en);
 	}
-	else if (offset < 0xfd00 || offset > 0xff40)
+	else if (offset < 0xfd00 || offset >= 0xff20)
 	{
 		m_ram->pointer()[offset & m_ram->mask()] = data;
 	}
@@ -441,6 +448,33 @@ READ8_MEMBER( plus4_state::cpu_r )
 	    4       CST RD
 	    5       
 	    6       IEC CLK IN
+	    7       IEC DATA IN, CST SENSE (Plus/4)
+	
+	*/
+
+	UINT8 data = 0x2f;
+
+	data |= (m_cassette->input() > +0.0) << 4;
+
+	data |= m_iec->clk_r() << 6;
+	data |= (m_iec->data_r() || ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED)) << 7;
+
+	return data;
+}
+
+READ8_MEMBER( plus4_state::c16_cpu_r )
+{
+	/*
+	
+	    bit     description
+	
+	    0       
+	    1       
+	    2       
+	    3       
+	    4       CST RD
+	    5       
+	    6       IEC CLK IN
 	    7       IEC DATA IN
 	
 	*/
@@ -462,7 +496,7 @@ WRITE8_MEMBER( plus4_state::cpu_w )
 	    bit     description
 	
 	    0       IEC DATA
-	    1       IEC CLK
+	    1       IEC CLK, CST WR
 	    2       IEC ATN
 	    3       CST MTR
 	    4       
@@ -472,13 +506,16 @@ WRITE8_MEMBER( plus4_state::cpu_w )
 	
 	*/
 
+	// serial bus
 	m_iec->data_w(!BIT(data, 0));
 	m_iec->clk_w(!BIT(data, 1));
 	m_iec->atn_w(!BIT(data, 2));
 
-	m_cassette->change_state(BIT(data, 7) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-
+	// cassette write
 	m_cassette->output(!BIT(data, 1) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+
+	// cassette motor
+	m_cassette->change_state(BIT(data, 3) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
 static const m6502_interface cpu_intf =
@@ -489,80 +526,23 @@ static const m6502_interface cpu_intf =
 	DEVCB_DRIVER_MEMBER(plus4_state, cpu_w)
 };
 
+static const m6502_interface c16_cpu_intf =
+{
+	NULL,
+	NULL,
+	DEVCB_DRIVER_MEMBER(plus4_state, c16_cpu_r),
+	DEVCB_DRIVER_MEMBER(plus4_state, cpu_w)
+};
 
 //-------------------------------------------------
 //  ted7360_interface ted_intf
 //-------------------------------------------------
 
-static const unsigned char ted7360_palette[] =
-{
-/* black, white, red, cyan */
-/* purple, green, blue, yellow */
-/* orange, light orange, pink, light cyan, */
-/* light violett, light green, light blue, light yellow */
-/* these 16 colors are 8 times here in different luminance (dark..light) */
-/* taken from digitized tv screenshot */
-	0x06, 0x01, 0x03, 0x2b, 0x2b, 0x2b, 0x67, 0x0e, 0x0f, 0x00, 0x3f, 0x42,
-	0x57, 0x00, 0x6d, 0x00, 0x4e, 0x00, 0x19, 0x1c, 0x94, 0x38, 0x38, 0x00,
-	0x56, 0x20, 0x00, 0x4b, 0x28, 0x00, 0x16, 0x48, 0x00, 0x69, 0x07, 0x2f,
-	0x00, 0x46, 0x26, 0x06, 0x2a, 0x80, 0x2a, 0x14, 0x9b, 0x0b, 0x49, 0x00,
-
-	0x00, 0x03, 0x02, 0x3d, 0x3d, 0x3d, 0x75, 0x1e, 0x20, 0x00, 0x50, 0x4f,
-	0x6a, 0x10, 0x78, 0x04, 0x5c, 0x00, 0x2a, 0x2a, 0xa3, 0x4c, 0x47, 0x00,
-	0x69, 0x2f, 0x00, 0x59, 0x38, 0x00, 0x26, 0x56, 0x00, 0x75, 0x15, 0x41,
-	0x00, 0x58, 0x3d, 0x15, 0x3d, 0x8f, 0x39, 0x22, 0xae, 0x19, 0x59, 0x00,
-
-	0x00, 0x03, 0x04, 0x42, 0x42, 0x42, 0x7b, 0x28, 0x20, 0x02, 0x56, 0x59,
-	0x6f, 0x1a, 0x82, 0x0a, 0x65, 0x09, 0x30, 0x34, 0xa7, 0x50, 0x51, 0x00,
-	0x6e, 0x36, 0x00, 0x65, 0x40, 0x00, 0x2c, 0x5c, 0x00, 0x7d, 0x1e, 0x45,
-	0x01, 0x61, 0x45, 0x1c, 0x45, 0x99, 0x42, 0x2d, 0xad, 0x1d, 0x62, 0x00,
-
-	0x05, 0x00, 0x02, 0x56, 0x55, 0x5a, 0x90, 0x3c, 0x3b, 0x17, 0x6d, 0x72,
-	0x87, 0x2d, 0x99, 0x1f, 0x7b, 0x15, 0x46, 0x49, 0xc1, 0x66, 0x63, 0x00,
-	0x84, 0x4c, 0x0d, 0x73, 0x55, 0x00, 0x40, 0x72, 0x00, 0x91, 0x33, 0x5e,
-	0x19, 0x74, 0x5c, 0x32, 0x59, 0xae, 0x59, 0x3f, 0xc3, 0x32, 0x76, 0x00,
-
-	0x02, 0x01, 0x06, 0x84, 0x7e, 0x85, 0xbb, 0x67, 0x68, 0x45, 0x96, 0x96,
-	0xaf, 0x58, 0xc3, 0x4a, 0xa7, 0x3e, 0x73, 0x73, 0xec, 0x92, 0x8d, 0x11,
-	0xaf, 0x78, 0x32, 0xa1, 0x80, 0x20, 0x6c, 0x9e, 0x12, 0xba, 0x5f, 0x89,
-	0x46, 0x9f, 0x83, 0x61, 0x85, 0xdd, 0x84, 0x6c, 0xef, 0x5d, 0xa3, 0x29,
-
-	0x02, 0x00, 0x0a, 0xb2, 0xac, 0xb3, 0xe9, 0x92, 0x92, 0x6c, 0xc3, 0xc1,
-	0xd9, 0x86, 0xf0, 0x79, 0xd1, 0x76, 0x9d, 0xa1, 0xff, 0xbd, 0xbe, 0x40,
-	0xdc, 0xa2, 0x61, 0xd1, 0xa9, 0x4c, 0x93, 0xc8, 0x3d, 0xe9, 0x8a, 0xb1,
-	0x6f, 0xcd, 0xab, 0x8a, 0xb4, 0xff, 0xb2, 0x9a, 0xff, 0x88, 0xcb, 0x59,
-
-	0x02, 0x00, 0x0a, 0xc7, 0xca, 0xc9, 0xff, 0xac, 0xac, 0x85, 0xd8, 0xe0,
-	0xf3, 0x9c, 0xff, 0x92, 0xea, 0x8a, 0xb7, 0xba, 0xff, 0xd6, 0xd3, 0x5b,
-	0xf3, 0xbe, 0x79, 0xe6, 0xc5, 0x65, 0xb0, 0xe0, 0x57, 0xff, 0xa4, 0xcf,
-	0x89, 0xe5, 0xc8, 0xa4, 0xca, 0xff, 0xca, 0xb3, 0xff, 0xa2, 0xe5, 0x7a,
-
-	0x01, 0x01, 0x01, 0xff, 0xff, 0xff, 0xff, 0xf6, 0xf2, 0xd1, 0xff, 0xff,
-	0xff, 0xe9, 0xff, 0xdb, 0xff, 0xd3, 0xfd, 0xff, 0xff, 0xff, 0xff, 0xa3,
-	0xff, 0xff, 0xc1, 0xff, 0xff, 0xb2, 0xfc, 0xff, 0xa2, 0xff, 0xee, 0xff,
-	0xd1, 0xff, 0xff, 0xeb, 0xff, 0xff, 0xff, 0xf8, 0xff, 0xed, 0xff, 0xbc
-};
-
-static PALETTE_INIT( plus4 )
-{
-	int i;
-
-	for (i = 0; i < sizeof(ted7360_palette) / 3; i++)
-		palette_set_color_rgb(machine, i, ted7360_palette[i * 3], ted7360_palette[i * 3 + 1], ted7360_palette[i * 3 + 2]);
-}
-
-UINT32 plus4_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	ted7360_video_update(m_ted, bitmap, cliprect);
-
-	return 0;
-}
-
 static INTERRUPT_GEN( c16_raster_interrupt )
 {
 	plus4_state *state = device->machine().driver_data<plus4_state>();
 
-	ted7360_raster_interrupt_gen(state->m_ted);
+	state->m_ted->raster_interrupt_gen();
 }
 
 static INTERRUPT_GEN( c16_frame_interrupt )
@@ -623,87 +603,67 @@ static INTERRUPT_GEN( c16_frame_interrupt )
 			state->m_keyline[9] = value;
 	}
 
-	ted7360_frame_interrupt_gen(state->m_ted);
+	state->m_ted->frame_interrupt_gen();
 }
 
-static int c16_dma_read( running_machine &machine, int offset )
+WRITE_LINE_MEMBER( plus4_state::ted_irq_w )
 {
-	plus4_state *state = machine.driver_data<plus4_state>();
-	address_space *space = state->m_maincpu->space(AS_PROGRAM);
+	m_ted_irq = state;
 
+	check_interrupts();
+}
+
+READ8_MEMBER( plus4_state::ted_ram_r )
+{
 	int phi0 = 1, mux = 0, ras = 1, ba = 0;
 	int speech, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1;
 
-	state->bankswitch(offset, phi0, mux, ras, &speech, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal, &cs0, &cs1);
+	bankswitch(offset, phi0, mux, ras, &speech, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal, &cs0, &cs1);
 
-	return state->read_memory(*space, offset, ba, speech, phi2, user, _6551, addr_clk, keyport, kernal, 1, 1);
+	return read_memory(space, offset, ba, speech, phi2, user, _6551, addr_clk, keyport, kernal, 1, 1);
 }
 
-static int c16_dma_read_rom( running_machine &machine, int offset )
+READ8_MEMBER( plus4_state::ted_rom_r )
 {
-	plus4_state *state = machine.driver_data<plus4_state>();
-	address_space *space = state->m_maincpu->space(AS_PROGRAM);
-
 	int phi0 = 1, mux = 0, ras = 1, ba = 0;
 	int speech, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1;
 
-	state->bankswitch(offset, phi0, mux, ras, &speech, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal, &cs0, &cs1);
+	bankswitch(offset, phi0, mux, ras, &speech, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal, &cs0, &cs1);
 
-	return state->read_memory(*space, offset, ba, speech, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1);
+	return read_memory(space, offset, ba, speech, phi2, user, _6551, addr_clk, keyport, kernal, cs0, cs1);
 }
 
-static void c16_interrupt( running_machine &machine, int level )
+READ8_MEMBER( plus4_state::ted_k_r )
 {
-	plus4_state *state = machine.driver_data<plus4_state>();
-
-	state->m_ted_irq = level;
-
-	state->check_interrupts();
-}
-
-static UINT8 c16_read_keyboard( running_machine &machine, int databus )
-{
-	plus4_state *state = machine.driver_data<plus4_state>();
-
 	UINT8 value = 0xff;
 	int i;
 
 	for (i = 0; i < 8; i++)
 	{
-		if (!BIT(state->m_port6529, i))
-			value &= state->m_keyline[i];
+		if (!BIT(m_port6529, i))
+			value &= m_keyline[i];
 	}
 
 	/* looks like joy 0 needs dataline2 low
      * and joy 1 needs dataline1 low
      * write to 0xff08 (value on databus) reloads latches */
-	if (!BIT(databus, 2))
-		value &= state->m_keyline[8];
+	if (!BIT(offset, 2))
+		value &= m_keyline[8];
 
-	if (!BIT(databus, 1))
-		value &= state->m_keyline[9];
+	if (!BIT(offset, 1))
+		value &= m_keyline[9];
 
 	return value;
 }
 
-static const ted7360_interface ntsc_ted_intf = 
+static MOS7360_INTERFACE( ted_intf )
 {
 	SCREEN_TAG,
-	TED7360_NTSC,
-	c16_dma_read,
-	c16_dma_read_rom,
-	c16_interrupt,
-	c16_read_keyboard
-};
-
-static const ted7360_interface pal_ted_intf = 
-{
-	SCREEN_TAG,
-	TED7360_PAL,
-	c16_dma_read,
-	c16_dma_read_rom,
-	c16_interrupt,
-	c16_read_keyboard
+	MOS7501_TAG,
+	DEVCB_DRIVER_LINE_MEMBER(plus4_state, ted_irq_w),
+	DEVCB_DRIVER_MEMBER(plus4_state, ted_ram_r),
+	DEVCB_DRIVER_MEMBER(plus4_state, ted_rom_r),
+	DEVCB_DRIVER_MEMBER(plus4_state, ted_k_r)
 };
 
 
@@ -711,60 +671,10 @@ static const ted7360_interface pal_ted_intf =
 //  MOS6529_INTERFACE( spi_user_intf )
 //-------------------------------------------------
 
-READ8_MEMBER( plus4_state::spi_user_r )
-{
-	/*
-	
-	    bit     description
-	
-	    0       USER PORT B
-	    1       
-	    2       USER PORT 4, CASS SENSE
-	    3       USER PORT 5
-	    4       USER PORT 6
-	    5       USER PORT 7
-	    6       USER PORT J
-	    7       USER PORT F
-	
-	*/
-
-	UINT8 data = m_user->p_r() & 0xfe;
-
-	// cassette sense
-	data &= ~0x04;
-	data |= ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 2;
-
-	return data;
-}
-
-WRITE8_MEMBER( plus4_state::spi_user_w )
-{
-	/*
-	
-	    bit     description
-	
-	    0       USER PORT B
-	    1       
-	    2       USER PORT 4, CASS SENSE
-	    3       USER PORT 5
-	    4       USER PORT 6
-	    5       USER PORT 7
-	    6       USER PORT J
-	    7       USER PORT F
-	
-	*/
-
-   	// cassette sense
-	data &= ~0x04;
-	data |= ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 2;
-
-	m_user->p_w(data & 0xfe);
-}
-
 static MOS6529_INTERFACE( spi_user_intf )
 {
-	DEVCB_DRIVER_MEMBER(plus4_state, spi_user_r),
-	DEVCB_DRIVER_MEMBER(plus4_state, spi_user_w)
+	DEVCB_DEVICE_MEMBER(PLUS4_USER_PORT_TAG, plus4_user_port_device, p_r),
+	DEVCB_DEVICE_MEMBER(PLUS4_USER_PORT_TAG, plus4_user_port_device, p_w)
 };
 
 
@@ -940,6 +850,18 @@ void plus4_state::machine_reset()
 
 	m_iec->reset();
 
+	if (m_acia)
+	{
+		m_acia->reset();
+	}
+
+	m_exp->reset();
+
+	if (m_user)
+	{
+		m_user->reset();
+	}
+
 	m_addr = 0;
 	m_rom_en = 1;
 
@@ -968,20 +890,9 @@ static MACHINE_CONFIG_START( ntsc, plus4_state )
 	MCFG_CPU_PERIODIC_INT(c16_raster_interrupt, TED7360_HRETRACERATE)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(TED7360PAL_VRETRACERATE)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(336, 216)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336 - 1, 0, 216 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(plus4_state, screen_update)
-
-	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(ted7360_palette) / 3)
-	MCFG_PALETTE_INIT(plus4)
-
-	// sound hardware 
+	// video and sound hardware 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_TED7360_ADD(MOS7360_TAG, ntsc_ted_intf)
+	MCFG_MOS7360_ADD(MOS7360_TAG, SCREEN_TAG, XTAL_14_31818MHz/4, ted_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
@@ -1018,20 +929,9 @@ static MACHINE_CONFIG_START( pal, plus4_state )
 	MCFG_CPU_PERIODIC_INT(c16_raster_interrupt, TED7360_HRETRACERATE)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(TED7360PAL_VRETRACERATE)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(336, 216)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336 - 1, 0, 216 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(plus4_state, screen_update)
-
-	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(ted7360_palette) / 3)
-	MCFG_PALETTE_INIT(plus4)
-
-	// sound hardware 
+	// video and sound hardware 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_TED7360_ADD(MOS7360_TAG, pal_ted_intf)
+	MCFG_MOS7360_ADD(MOS7360_TAG, SCREEN_TAG, XTAL_17_73447MHz/5, ted_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	// devices
@@ -1059,46 +959,17 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c16 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c16, plus4_state )
-	// basic machine hardware
-	MCFG_CPU_ADD(MOS7501_TAG, M7501, XTAL_17_73447MHz/20)
-	MCFG_CPU_PROGRAM_MAP(plus4_mem)
-	MCFG_CPU_CONFIG(cpu_intf)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, c16_frame_interrupt)
-	MCFG_CPU_PERIODIC_INT(c16_raster_interrupt, TED7360_HRETRACERATE)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+static MACHINE_CONFIG_DERIVED( c16, pal )
+	MCFG_DEVICE_REMOVE(MOS6551_TAG)
+	MCFG_DEVICE_REMOVE(MOS6529_USER_TAG)
+	MCFG_DEVICE_REMOVE(PLUS4_USER_PORT_TAG)
 
-	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(TED7360PAL_VRETRACERATE)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(336, 216)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336 - 1, 0, 216 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(plus4_state, screen_update)
+	MCFG_DEVICE_MODIFY(CBM_IEC_TAG)
+	MCFG_DEVICE_CONFIG(c16_iec_intf)
 
-	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(ted7360_palette) / 3)
-	MCFG_PALETTE_INIT(plus4)
-
-	// sound hardware 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_TED7360_ADD(MOS7360_TAG, pal_ted_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	// devices
-	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_MOS6529_ADD(MOS6529_KB_TAG, spi_kb_intf)
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_interface )
-	MCFG_CBM_IEC_ADD(c16_iec_intf, NULL)
-	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_17_73447MHz/20, expansion_intf, plus4_expansion_cards, NULL, NULL)
-
-	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("16K")
-
-	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "plus4_cart")
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "plus4_flop")
+	MCFG_RAM_EXTRA_OPTIONS("64K")
 MACHINE_CONFIG_END
 
 
@@ -1106,46 +977,9 @@ MACHINE_CONFIG_END
 //  MACHINE_CONFIG( c232 )
 //-------------------------------------------------
 
-static MACHINE_CONFIG_START( c232, plus4_state )
-	// basic machine hardware
-	MCFG_CPU_ADD(MOS7501_TAG, M7501, XTAL_14_31818MHz/16)
-	MCFG_CPU_PROGRAM_MAP(plus4_mem)
-	MCFG_CPU_CONFIG(cpu_intf)
-	MCFG_CPU_VBLANK_INT(SCREEN_TAG, c16_frame_interrupt)
-	MCFG_CPU_PERIODIC_INT(c16_raster_interrupt, TED7360_HRETRACERATE)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-
-	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
-	MCFG_SCREEN_REFRESH_RATE(TED7360PAL_VRETRACERATE)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(336, 216)
-	MCFG_SCREEN_VISIBLE_AREA(0, 336 - 1, 0, 216 - 1)
-	MCFG_SCREEN_UPDATE_DRIVER(plus4_state, screen_update)
-
-	MCFG_PALETTE_LENGTH(ARRAY_LENGTH(ted7360_palette) / 3)
-	MCFG_PALETTE_INIT(plus4)
-
-	// sound hardware 
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_TED7360_ADD(MOS7360_TAG, ntsc_ted_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-
-	// devices
-	MCFG_PLS100_ADD(PLA_TAG)
-	MCFG_MOS6529_ADD(MOS6529_KB_TAG, spi_kb_intf)
-	MCFG_QUICKLOAD_ADD("quickload", cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
-	MCFG_CASSETTE_ADD( CASSETTE_TAG, cbm_cassette_interface )
-	MCFG_CBM_IEC_ADD(c16_iec_intf, NULL)
-	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, XTAL_14_31818MHz/16, expansion_intf, plus4_expansion_cards, NULL, NULL)
-
-	// internal ram
-	MCFG_RAM_ADD(RAM_TAG)
+static MACHINE_CONFIG_DERIVED( c232, c16 )
+	MCFG_DEVICE_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
-
-	// software list
-	MCFG_SOFTWARE_LIST_ADD("cart_list", "plus4_cart")
-	MCFG_SOFTWARE_LIST_ADD("disk_list", "plus4_flop")
 MACHINE_CONFIG_END
 
 
@@ -1186,15 +1020,15 @@ ROM_END
 
 ROM_START( plus4n )
 	ROM_REGION( 0x8000, "kernal", 0 )
-	ROM_LOAD( "318006-01.u23", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
-
 	ROM_DEFAULT_BIOS("r5")
-	ROM_SYSTEM_BIOS( 0, "r4", "rev. 4" )
+	ROM_SYSTEM_BIOS( 0, "r4", "Revision 4" )
 	ROMX_LOAD( "318005-04.u24", 0x4000, 0x4000, CRC(799a633d) SHA1(5df52c693387c0e2b5d682613a3b5a65477311cf), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "r5", "rev. 5" )
+	ROM_SYSTEM_BIOS( 1, "r5", "Revision 5" )
 	ROMX_LOAD( "318005-05.u24", 0x4000, 0x4000, CRC(70295038) SHA1(a3d9e5be091b98de39a046ab167fb7632d053682), ROM_BIOS(2) )
 	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v6.01" )
-	ROMX_LOAD( "jiffydos plus4.u24", 0x0000, 0x8000, CRC(818d3f45) SHA1(9bc1b1c3da9ca642deae717905f990d8e36e6c3b), ROM_BIOS(3) )
+	ROMX_LOAD( "jiffydos plus4.u24", 0x0000, 0x8000, CRC(818d3f45) SHA1(9bc1b1c3da9ca642deae717905f990d8e36e6c3b), ROM_BIOS(3) ) // first half contains R5 kernal
+
+	ROM_LOAD( "318006-01.u23", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 
 	ROM_REGION( 0x8000, "function", 0 )
 	ROM_LOAD( "317053-01.u25", 0x0000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f) )
@@ -1209,7 +1043,25 @@ ROM_END
 //  ROM( plus4p )
 //-------------------------------------------------
 
-#define rom_plus4p rom_plus4n
+ROM_START( plus4p )
+	ROM_REGION( 0x8000, "kernal", 0 )
+	ROM_LOAD( "318006-01.u23", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
+
+	ROM_DEFAULT_BIOS("r5")
+	ROM_SYSTEM_BIOS( 0, "r3", "Revision 3" )
+	ROMX_LOAD( "318004-03.u4", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "r4", "Revision 4" )
+	ROMX_LOAD( "318004-04.u4", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS( 2, "r5", "Revision 5" )
+	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(3) )
+
+	ROM_REGION( 0x8000, "function", 0 )
+	ROM_LOAD( "317053-01.u25", 0x0000, 0x4000, CRC(4fd1d8cb) SHA1(3b69f6e7cb4c18bb08e203fb18b7dabfa853390f) )
+	ROM_LOAD( "317054-01.u26", 0x4000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693) )
+
+	ROM_REGION( 0xf5, PLA_TAG, 0 )
+	ROM_LOAD( "251641-02.u19", 0x00, 0xf5, NO_DUMP )
+ROM_END
 
 
 //-------------------------------------------------
@@ -1221,11 +1073,11 @@ ROM_START( c16 )
 	ROM_LOAD( "318006-01.u3", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 
 	ROM_DEFAULT_BIOS("r5")
-	ROM_SYSTEM_BIOS( 0, "r3", "rev. 3" )
+	ROM_SYSTEM_BIOS( 0, "r3", "Revision 3" )
 	ROMX_LOAD( "318004-03.u4", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "r4", "rev. 4" )
+	ROM_SYSTEM_BIOS( 1, "r4", "Revision 4" )
 	ROMX_LOAD( "318004-04.u4", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "r5", "rev. 5" )
+	ROM_SYSTEM_BIOS( 2, "r5", "Revision 5" )
 	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(3) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
@@ -1242,11 +1094,11 @@ ROM_START( c116 )
 	ROM_LOAD( "318006-01.u3", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 
 	ROM_DEFAULT_BIOS("r5")
-	ROM_SYSTEM_BIOS( 0, "r3", "rev. 3" )
+	ROM_SYSTEM_BIOS( 0, "r3", "Revision 3" )
 	ROMX_LOAD( "318004-03.u4", 0x4000, 0x4000, CRC(77bab934) SHA1(97814dab9d757fe5a3a61d357a9a81da588a9783), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS( 1, "r4", "rev. 4" )
+	ROM_SYSTEM_BIOS( 1, "r4", "Revision 4" )
 	ROMX_LOAD( "318004-04.u4", 0x4000, 0x4000, CRC(be54ed79) SHA1(514ad3c29d01a2c0a3b143d9c1d4143b1912b793), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS( 2, "r5", "rev. 5" )
+	ROM_SYSTEM_BIOS( 2, "r5", "Revision 5" )
 	ROMX_LOAD( "318004-05.u4", 0x4000, 0x4000, CRC(71c07bd4) SHA1(7c7e07f016391174a557e790c4ef1cbe33512cdb), ROM_BIOS(3) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
@@ -1261,7 +1113,12 @@ ROM_END
 ROM_START( c16h )
 	ROM_REGION( 0x8000, "kernal", 0 )
 	ROM_LOAD( "318006-01.u3", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
-	ROM_LOAD( "hungary.u4",   0x4000, 0x4000, CRC(775f60c5) SHA1(20cf3c4bf6c54ef09799af41887218933f2e27ee) )
+	
+	ROM_DEFAULT_BIOS("r2")
+	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
+	ROMX_LOAD( "318030-01.u4", 0x4000, 0x4000, NO_DUMP, ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "r2", "Revision 2" )
+	ROMX_LOAD( "318030-02.u4", 0x4000, 0x4000, CRC(775f60c5) SHA1(20cf3c4bf6c54ef09799af41887218933f2e27ee), ROM_BIOS(2) )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
 	ROM_LOAD( "251641-02.u16", 0x00, 0xf5, NO_DUMP )

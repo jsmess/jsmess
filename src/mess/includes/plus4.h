@@ -7,7 +7,7 @@
 #include "formats/cbm_snqk.h"
 #include "includes/cbm.h"
 #include "audio/t6721.h"
-#include "audio/ted7360.h"
+#include "audio/mos7360.h"
 #include "machine/6551acia.h"
 #include "machine/plus4exp.h"
 #include "machine/plus4user.h"
@@ -54,7 +54,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<pls100_device> m_pla;
-	required_device<device_t> m_ted;
+	required_device<mos7360_device> m_ted;
 	optional_device<acia6551_device> m_acia;
 	optional_device<mos6529_device> m_spi_user;
 	required_device<mos6529_device> m_spi_kb;
@@ -68,8 +68,6 @@ public:
 	virtual void machine_start();
 	virtual void machine_reset();
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-
 	void check_interrupts();
 	void bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal, int *cs0, int *cs1);
 	UINT8 read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal, int cs0, int cs1);
@@ -79,11 +77,14 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 
 	DECLARE_READ8_MEMBER( cpu_r );
+	DECLARE_READ8_MEMBER( c16_cpu_r );
 	DECLARE_WRITE8_MEMBER( cpu_w );
-
-	DECLARE_READ8_MEMBER( spi_user_r );
-	DECLARE_WRITE8_MEMBER( spi_user_w );
 	
+	DECLARE_WRITE_LINE_MEMBER( ted_irq_w );
+	DECLARE_READ8_MEMBER( ted_ram_r );
+	DECLARE_READ8_MEMBER( ted_rom_r );
+	DECLARE_READ8_MEMBER( ted_k_r );
+
 	DECLARE_READ8_MEMBER( spi_kb_r );
 	DECLARE_WRITE8_MEMBER( spi_kb_w );
 

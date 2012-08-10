@@ -100,6 +100,7 @@ public:
 	UINT8 cd_r(address_space &space, offs_t offset, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
 	void cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
 	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER( breset_w );
 
 	// cartridge interface
 	UINT8 dma_cd_r(offs_t offset);
@@ -113,6 +114,7 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete();
 	virtual void device_start();
+	virtual void device_reset();
 
 	// image-level overrides
 	virtual bool call_load();
@@ -160,11 +162,11 @@ public:
 	virtual UINT8* plus4_ram_pointer(running_machine &machine, size_t size);
 	virtual UINT8* plus4_nvram_pointer(running_machine &machine, size_t size);
 
-	// memory access
+	// runtime
 	virtual UINT8 plus4_cd_r(address_space &space, offs_t offset, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { return 0; };
 	virtual void plus4_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { };
-	virtual void plus4_reset_w() { };
 	virtual UINT32 plus4_screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect) { return 0; }
+	virtual void plus4_breset_w(int state) { };
 
 protected:
 	plus4_expansion_slot_device *m_slot;

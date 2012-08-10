@@ -238,6 +238,17 @@ void plus4_expansion_slot_device::device_start()
 
 
 //-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void plus4_expansion_slot_device::device_reset()
+{
+	breset_w(ASSERT_LINE);
+	breset_w(CLEAR_LINE);
+}
+
+
+//-------------------------------------------------
 //  call_load -
 //-------------------------------------------------
 
@@ -343,6 +354,19 @@ UINT32 plus4_expansion_slot_device::screen_update(screen_device &screen, bitmap_
 	}
 
 	return value;
+}
+
+
+//-------------------------------------------------
+//  breset_w - buffered reset write
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( plus4_expansion_slot_device::breset_w )
+{
+	if (m_cart != NULL)
+	{
+		m_cart->plus4_breset_w(state);
+	}
 }
 
 
