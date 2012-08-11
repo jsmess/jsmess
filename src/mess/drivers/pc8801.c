@@ -10,7 +10,7 @@
 
     - add differences between various models;
     - implement proper upd3301 / i8257 support;
-    - mouse support;
+    - fix "jumps" in mouse support pointer (noticeable in Balance of Power);
     - RTC support;
     - Add limits for extend work RAM;
     - What happens to the palette contents when the analog/digital palette mode changes?
@@ -39,6 +39,7 @@
     - Chitei Tanken: 200 B/W Mode, gfxs looks misplaced
     - Chou Bishoujo Densetsu CROQUIS: accesses ports 0xa0-0xa3 and 0xc2-0xc3
     - Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
+    - Cranston Manor (actually N88-Basic demo): no sound
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Grobda: palette is ugly (parent pc8801 only);
 	- Music Collection Vol. 2 - Final Fantasy Tokushuu: sound irq dies pretty soon
@@ -70,7 +71,14 @@
 	- Chikyuu Senshi Rayieza (fdc CPU crashes)
 	- Choplifter
 	- Columns (code at 0x28c8, copy protection)
+	- Corridor ("THIS SYSTEM NOT KOEI SYSTEM" printed on screen)
+	- Craze (returns to basic after logo pops up, tries to self-modify program data via the window offset?)
+	- Crimson
+	- Crimson 3
     - Cuby Panic (copy protection routine at 0x911A)
+    - Daidasso (prints "BOOT dekimasen" on screen, can't boot)
+    - Daikoukai Jidai
+	(Damages & Dice)
     - Door Door MK-2 (sets up TC in the middle of execution phase read then wants status bit 6 to be low PC=0x7050 of fdc cpu)
     - Harakiri
     - MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
@@ -718,8 +726,8 @@ static void draw_text(running_machine &machine, bitmap_ind16 &bitmap,int y_size,
 			}
 			else // monochrome
 			{
-				pal = (state->m_txt_color) ? 7 : 0; // TODO: annoyingly, Alpha color is currently black with this
-				gfx_mode = 0;
+				pal = 7; /* TODO: Bishoujo Baseball Gakuen wants this to be black somehow ... */
+				gfx_mode = (attr & 0x80) >> 7;
 				reverse = (attr & 4) >> 2;
 				secret = (attr & 1);
 				upper = (attr & 0x10) >> 4;
@@ -728,7 +736,9 @@ static void draw_text(running_machine &machine, bitmap_ind16 &bitmap,int y_size,
 				pal|=8; //text pal bank
 
 				if(attr & 0x80)
+				{
 					popmessage("Warning: mono gfx mode enabled, contact MESSdev");
+				}
 			}
 
 			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,blink,upper,lower,y_size,monitor_24KHz,!width);
@@ -953,7 +963,7 @@ READ8_MEMBER(pc8801_state::pc8801_mem_r)
 
 		window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
 
-		if((window_offset & 0xf000) == 0xf000)
+		if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
 			printf("Read from 0xf000 - 0xffff window offset\n"); //accessed by Castle Excellent, no noticeable quirk
 
 		if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
@@ -972,7 +982,9 @@ READ8_MEMBER(pc8801_state::pc8801_mem_r)
 
 		if(m_misc_ctrl & 0x40)
 		{
-			m_vram_sel = 3;
+			if(!space.debugger_access())
+				m_vram_sel = 3;
+
 			if(m_alu_ctrl2 & 0x80)
 				return pc8801_alu_r(space,offset & 0x3fff);
 		}
@@ -1012,7 +1024,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_mem_w)
 
 			window_offset = (offset & 0x3ff) + (m_window_offset_bank << 8);
 
-			if((window_offset & 0xf000) == 0xf000)
+			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
 				printf("Write to 0xf000 - 0xffff window offset\n"); //accessed by Castle Excellent, no noticeable quirk
 
 			if(((window_offset & 0xf000) == 0xf000) && (m_misc_ctrl & 0x10))
@@ -1032,7 +1044,9 @@ WRITE8_MEMBER(pc8801_state::pc8801_mem_w)
 	{
 		if(m_misc_ctrl & 0x40)
 		{
-			m_vram_sel = 3;
+			if(!space.debugger_access())
+				m_vram_sel = 3;
+
 			if(m_alu_ctrl2 & 0x80)
 			{
 				pc8801_alu_w(space,offset & 0x3fff,data);
@@ -1263,6 +1277,11 @@ READ8_MEMBER(pc8801_state::pc8801_misc_ctrl_r)
 
 WRITE8_MEMBER(pc8801_state::pc8801_misc_ctrl_w)
 {
+	/*
+	x--- ---- sound irq mask, active low
+	--x- ---- analog (1) / digital (0) palette select
+	*/
+
 	m_misc_ctrl = data;
 
 	#ifdef USE_PROPER_I8214
