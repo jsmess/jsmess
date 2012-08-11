@@ -4730,7 +4730,7 @@ ExtractDisk  [04]"Disk 2		  " -> "battle gorilla_04.d88"
 	</software>
 
 	<software name="bokensha">
-		<description>Bokensha-tachi - Kenja no Yuigon</description>
+		<description>Boukensha-tachi - Kenja no Yuigon</description>
 		<year>1986</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<!-- PC8801 -->
@@ -4755,7 +4755,7 @@ ExtractDisk  [04]"Disk 2		  " -> "battle gorilla_04.d88"
 	</software>
 
 	<software name="bokenshaa" cloneof="bokensha">
-		<description>Bokensha-tachi - Kenja no Yuigon (Alt)</description>
+		<description>Boukensha-tachi - Kenja no Yuigon (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<!--combined image-->
@@ -22898,7 +22898,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	</software>
 
 	<software name="moritash">
-		<description>Morita Kazuro no Shogi</description>
+		<description>Morita Kazuro no Shougi</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801 -->
@@ -22912,7 +22912,7 @@ ExtractDisk  [03]"USER_DISK	   " -> "maha-kala_03.d88"
 	</software>
 
 	<software name="moritasha" cloneof="moritash">
-		<description>Morita Kazuro no Shogi (Alt)</description>
+		<description>Morita Kazuro no Shougi (Alt)</description>
 		<year>1985</year>
 		<publisher>エニックス (Enix)</publisher>
 		<!-- PC8801 -->
@@ -30103,7 +30103,7 @@ ExtractDisk  [04]"disk 4		  " -> "shiryo sensen 2_04.d88"
 	</software>
 
 	<software name="shogi">
-		<description>Shogi</description>
+		<description>Shougi</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<!-- PC8801 -->
@@ -30117,7 +30117,7 @@ ExtractDisk  [04]"disk 4		  " -> "shiryo sensen 2_04.d88"
 	</software>
 
 	<software name="shogia" cloneof="shogi">
-		<description>Shogi (Alt?)</description>
+		<description>Shougi (Alt?)</description>
 		<year>1984</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<!-- PC8801 -->
@@ -30131,7 +30131,7 @@ ExtractDisk  [04]"disk 4		  " -> "shiryo sensen 2_04.d88"
 	</software>
 
 	<software name="shogi88">
-		<description>Shogi88</description>
+		<description>Shougi88</description>
 		<year>1987</year>
 		<publisher>システムソフト (System Soft)</publisher>
 		<!-- PC8801 -->

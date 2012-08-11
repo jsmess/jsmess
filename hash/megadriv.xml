@@ -10,7 +10,6 @@
     AWESOME POSSUM				JAPAN
     BATTLE SQUADRON				PAL
     BEAVIS & BUTTHEAD				PAL
-    CAPTAIN LANG				JAPAN
     CAPTAIN PLANET				ASIA
     CENTURION					USA/PAL		needs proper dump
     DAVIS CUP TENNIS				JAPAN
@@ -25,7 +24,6 @@
     GAIN GROUND					PAL		revision order check
     GALAXY FORCE II				ALL		we have Rev B, Rev 0 and Rev A needed (does it exist?)
     GO NET					JAPAN
-    HOOK					PAL
     INTERNATIONAL SUPERSTAR SOCCER		BRAZIL
     JEWEL MASTER				USA/PAL		we have Rev A, Rev 0 needed (does it match Japanese release?)
     MARBLE MADNESS				JAPAN
@@ -34,7 +32,6 @@
     OSAKA BANK MY LINE				JAPAN
     OSAKA BANK MY LINE DEMO			JAPAN
     OUTBACK JOEY - PERSONAL TRAINER		???		http://www.guardiana.net/MDG-Database/Mega%20Drive/Outback%20Joey/#v3553
-    PAC-PANIC					PAL
     PGA TOUR GOLF				USA/PAL		we have v1.1 and v1.2, v1.0 needed (does it exist?)
     PHANTASY STAR IV				PAL
     ROAD RASH					JAPAN
@@ -4391,6 +4388,20 @@ better to use names related to the actual pcb, possibly even reverting to use th
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="captain america and the avengers (usa) (beta).bin" size="1048576" crc="baac59c0" sha1="af8271c0c99637413006bdd8c66a7b5412e0ebd7" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="captlang" cloneof="havoc">
+		<description>Captain Lang (Jpn)</description>
+		<year>1994</year>
+		<publisher>Data East</publisher>
+		<info name="serial" value="T-13103"/>
+		<info name="release" value="19940422"/>
+		<info name="alt_title" value="キャプテンラング"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="captain lang (japan).bin" size="1048576" crc="61ba8199" sha1="7c305a4b8cc220f5321eac80ea3fc104a9f5897a" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -9819,6 +9830,17 @@ better to use names related to the actual pcb, possibly even reverting to use th
 	</software>
 
 	<software name="hook">
+		<description>Hook (Euro)</description>
+		<year>1992</year>
+		<publisher>Sony Imagesoft</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="hook (euro).bin" size="1048576" crc="a154433a" sha1="da5da918e92211d9a4108c2b39b29b8583242cbb" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hooku" cloneof="hook">
 		<description>Hook (USA)</description>
 		<year>1992</year>
 		<publisher>Sony Imagesoft</publisher>
@@ -15617,7 +15639,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="pacattak">
+	<software name="pacattak" cloneof="pacpanic">
 		<description>Pac-Attack (USA)</description>
 		<year>1993</year>
 		<publisher>Namco</publisher>
@@ -15646,6 +15668,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="mpr-14392.bin" size="262144" crc="74bba09b" sha1="e21546f653607d95f2747305703ddd6bf118f90a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacpanic">
+		<description>Pac-Panic (Euro)</description>
+		<year>1993</year>
+		<publisher>Namco</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="pac-panic (euro).bin" size="262144" crc="3c427882" sha1="47f0f5b49b5f9bc0a22d352486d9488e6c93b167" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -27042,13 +27075,57 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="ben10">
+		<description>Ben 10 (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="ben 10 (unl)[rus].bin" size="1048576" crc="c8be0b26" sha1="83a49560eb1174b17c9d5ed8837d74a7006b7e9c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bomber">
+		<description>Bomber</description>
+		<year>2005</year>
+		<publisher>TecToy</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="bomber [!].bin" size="131072" crc="6389a658" sha1="fe6415e4cd3754316606cae0f0d85856d8ee00e0" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="chess">
-		<description>Chess</description>
+		<description>Chess (Rus)</description>
 		<year>1998</year>
 		<publisher>BSComp</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="chess (unl).bin" size="524288" crc="47380edd" sha1="42e56fc5543dcb40da73447b582c84c4ff50a825" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chessa" cloneof="chess">
+		<description>Chess (Rus, Alt)</description>
+		<year>1998</year>
+		<publisher>BSComp</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="chess (unl) [rus].bin" size="524288" crc="a5cef7b6" sha1="78328499b4c6c061556c509d7cba8f41918e23a1" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chessb" cloneof="chess">
+		<description>Chess (Rus, v1.05)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="chess (unl) [rus v1.05].bin" size="1048576" crc="10683e83" sha1="6610b21216d5784d9ed80bca2445e1b7b9693f50" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -27288,6 +27365,18 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="indyrus" cloneof="rickdang">
+		<description>Indiana Jones - Koridory Vremeni (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="Индиана Джонс Коридоры времени"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="indiana jones - corridors of time (unl).bin" size="4194304" crc="54f82c76" sha1="c54370066b3afeed05226e33881746d86c33154a" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="iraqwar">
 		<description>Iraq War 2003</description>
 		<year>199?</year>
@@ -27414,6 +27503,30 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="mafia (unl).bin" size="1048576" crc="ede60834" sha1="a2f04a4c87f9e08442d3117e8ea0e94a6b8189f0" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mario3">
+		<description>Mario 3 Vokrug Sveta (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="Mario 3 Вокруг света"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="mario 3 (unl).bin" size="2097152" crc="69f5b02f" sha1="7c2ebe7c88503bc719d5bcecae183619a7be503c" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mario4">
+		<description>Mario 4 - Kosmicheskaya Odissyeya (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="Mario 4 Космическая одиссея"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="mario 4 (unl).bin" size="2097152" crc="96b0ecd9" sha1="6c9444268413b76d698ea432cbceb4cdc9a6cfaf" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -27562,6 +27675,17 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
+	<software name="rickdang">
+		<description>Rick Dangerous (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="4063232">
+				<rom name="rick dangerous (unl).bin" size="4063232" crc="545cbbe4" sha1="9698dfa5d10509ded6952a88445e8db53c440de8" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="shrek" cloneof="yogibear">
 		<description>Shrek (Rus)</description>
 		<year>199?</year>
@@ -27617,6 +27741,18 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="snow queen (unl).bin" size="2097152" crc="e6c07946" sha1="69dfe717498179d82d14749db642305d12f213fc" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spongbob" cloneof="coolspot">
+		<description>Sponge Bob (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<info name="alt_title" value="Губка Боб"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="sponge bob.bin" size="1048576" crc="c5437496" sha1="1f6fc731c958957d0e28115bac0376b9fd35af81" offset="00000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -27731,6 +27867,18 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="tiny toon adventures 3 (unl).bin" size="1048576" crc="d65d83d4" sha1="47b1ad463389d709fb49c7cef8fd033a6f95a301" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmntru">
+		<description>Teenage Mutant Ninja Turtles - Vozvrashchenie Legendy (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="TMNT Возвращение легенды"/>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="tmnt (unl).bin" size="1048576" crc="7fb1356e" sha1="04542a22531ceb784727ee5ef399786313dcf22f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>

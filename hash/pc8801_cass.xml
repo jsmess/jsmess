@@ -998,7 +998,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 
 	<software name="shogid2">
 		<!-- Or Igo Dojo 2? -->
-		<description>Shogi Dojo 2</description>
+		<description>Shougi Dojo 2</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="alt_title" value="将棋道場２"/>
@@ -1010,7 +1010,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 	</software>
 
 	<software name="shogimei">
-		<description>Shogi Meijin</description>
+		<description>Shougi Meijin</description>
 		<year>1985</year>
 		<publisher>ソフトプロ (Soft Pro) / アポロテクニカ (Apollo Technica)</publisher>
 		<!-- PC8801 -->
@@ -1025,7 +1025,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 
 	<software name="shogita2">
 		<!-- or Igo Taikyoku V2? -->
-		<description>Shogi Taikyoku V2</description>
+		<description>Shougi Taikyoku V2</description>
 		<year>1984</year>
 		<publisher>コムパック (Compaq)</publisher>
 		<!-- PC8801 -->
