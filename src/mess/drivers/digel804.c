@@ -107,6 +107,7 @@ public:
 	DECLARE_READ8_MEMBER( acia_control_r );
 	DECLARE_WRITE8_MEMBER( acia_control_w );
 	DECLARE_WRITE_LINE_MEMBER( da_w );
+	DECLARE_INPUT_CHANGED_MEMBER(mode_change);
 	// vfd helper stuff for port 44, should be unnecessary after 10937 gets a proper device
 	UINT8 vfd_data;
 	UINT8 vfd_old;
@@ -128,9 +129,14 @@ public:
 	UINT8 m_sim_mode;
 	UINT8 m_powerfail_state;
 	UINT8 m_chipinsert_state;
+	UINT8 m_keyen_state;
 	UINT8 m_op41;
 	DECLARE_DRIVER_INIT(digel804);
 };
+
+
+enum { MODE_OFF, MODE_KEY, MODE_REM, MODE_SIM };
+
 
 DRIVER_INIT_MEMBER(digel804_state,digel804)
 {
@@ -150,6 +156,7 @@ DRIVER_INIT_MEMBER(digel804_state,digel804)
 	m_chipinsert_state = 0; // PIN
 	m_ram_bank = 0;
 	m_op41 = 0;
+	m_keyen_state = 1; // /KEYEN
 	membank( "bankedram" )->set_base( memregion("user_ram")->base() + ( m_ram_bank * 0x10000 ));
 }
 
@@ -268,6 +275,7 @@ WRITE8_MEMBER( digel804_state::op44 ) // state write
      * all writes to port 44 will reset the powerfail state
      */
 	m_powerfail_state = 0; // writes to port 44 clear powerfail state
+	m_keyen_state = BIT(data, 1);
 #ifdef PORT44_W_VERBOSE
 	logerror("Digel804: port 0x44 vfd/state control had %02x written to it!\n", data);
 #endif
@@ -351,6 +359,33 @@ WRITE8_MEMBER( digel804_state::op47 ) // eprom timing/power and control write
 	logerror("Digel804: port 47, eprom timing/power and control had %02X written to it!\n", data);
 }
 
+INPUT_CHANGED_MEMBER( digel804_state::mode_change )
+{
+	if (!newval && !m_keyen_state)
+	{
+		switch ((int)(FPTR)param)
+		{
+			case MODE_OFF:
+				m_key_mode = m_remote_mode = m_sim_mode = 1;
+				break;
+			case MODE_KEY:
+				m_remote_mode = m_sim_mode = 1;
+				m_key_mode = 0;
+				break;
+			case MODE_REM:
+				m_key_mode = m_sim_mode = 1;
+				m_remote_mode = 0;
+				break;
+			case MODE_SIM:
+				m_remote_mode = m_key_mode = 1;
+				m_sim_mode = 0;
+				break;
+		}
+	}
+
+	// press one of those keys reset the Z80
+	m_maincpu->set_input_line(INPUT_LINE_RESET, (!newval && !m_keyen_state) ? ASSERT_LINE : CLEAR_LINE);
+}
 
 /* ACIA Trampolines */
 READ8_MEMBER( digel804_state::acia_rxd_r )
@@ -488,7 +523,10 @@ static INPUT_PORTS_START( digel804 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CLR") PORT_CODE(KEYCODE_MINUS)	PORT_CHAR('-')
 
 	PORT_START("MODE") // TODO, connects entirely separately from the keypad through some complicated latching logic
-	PORT_BIT(0xFF, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("KEY") PORT_CODE(KEYCODE_K)	PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_KEY )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REM") PORT_CODE(KEYCODE_R)	PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_REM )
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SIM") PORT_CODE(KEYCODE_S)	PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_SIM )
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("OFF") PORT_CODE(KEYCODE_O)	PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_OFF )
 INPUT_PORTS_END
 
 /******************************************************************************
