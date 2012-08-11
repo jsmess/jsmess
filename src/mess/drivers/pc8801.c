@@ -30,13 +30,14 @@
     - Acro Jet: hangs waiting for an irq (floppy issue);
     - Advanced Fantasian: wants an irq that can't happen (I is equal to 0x3f)
     - American Success: reads the light pen?
-    - Balance of Power: uses the SIO port for mouse polling;
+    - Balance of Power: uses the SIO port for something ...
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
     - The Black Onyx: writes a katakana msg: "rino kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
     - Campaign Ban Daisenryaku 2: Hangs at title screen?
     - Can Can Bunny: bitmap artifacts on intro, caused by a fancy usage of the attribute vram;
     - Can Can Bunny: no sound (regression);
     - Chitei Tanken: 200 B/W Mode, gfxs looks misplaced
+    - Chou Bishoujo Densetsu CROQUIS: accesses ports 0xa0-0xa3 and 0xc2-0xc3
     - Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Grobda: palette is ugly (parent pc8801 only);
@@ -67,7 +68,8 @@
 	- Change Vol. 1 (fdc CPU irq doesn't fire anymore)
 	- Chikyuu Boueigun (disk i/o error during "ESDF SYSTEM LOADING")
 	- Chikyuu Senshi Rayieza (fdc CPU crashes)
-	(Chitei Tanken)
+	- Choplifter
+	- Columns (code at 0x28c8, copy protection)
     - Cuby Panic (copy protection routine at 0x911A)
     - Door Door MK-2 (sets up TC in the middle of execution phase read then wants status bit 6 to be low PC=0x7050 of fdc cpu)
     - Harakiri
@@ -83,10 +85,12 @@
     - Brunette: No sound, eventually hangs at gameplay;
 
     games that needs to NOT have write-protect floppies (BTANBs):
-    - 100 Yen Disk 7: (doesn't boot in V2 mode)
     - Balance of Power
     - Blue Moon Story: moans with a kanji msg;.
     - Tobira wo Akete (hangs at title screen)
+
+    games that needs to HAVE write-protect floppies (BTANBs):
+    - 100 Yen Disk 7: (doesn't boot in V2 mode)
 
 	other BTANBs
 	- Attack Hirokochan: returns to BASIC after an initial animation, needs BASIC V1:
@@ -276,6 +280,11 @@ public:
 	struct { UINT8 r, g, b; } m_palram[8];
 	UINT8 m_dmac_ff;
 	UINT32 m_knj_addr[2];
+	struct{
+		UINT8 phase;
+		UINT8 x,y;
+		attotime time;
+	}m_mouse;
 	DECLARE_READ8_MEMBER(pc8801_alu_r);
 	DECLARE_WRITE8_MEMBER(pc8801_alu_w);
 	DECLARE_READ8_MEMBER(pc8801_wram_r);
@@ -1072,12 +1081,14 @@ WRITE8_MEMBER(pc8801_state::pc8801_ctrl_w)
     x--- ---- SING (buzzer mask?)
     -x-- ---- mouse latch (JOP1, routes on OPN sound port A)
     --x- ---- beeper
+    ---x ---- ghs mode
+    ---- x--- crtc i/f sync mode
     ---- -x-- upd1990a clock bit
     ---- --x- upd1990a strobe bit
+    ---- ---x printer strobe
     */
 
-
-	m_rtc->stb_w((data & 2) >> 1);
+	m_rtc->stb_w(~((data & 2) >> 1));
 	m_rtc->clk_w((data & 4) >> 2);
 
 	if(((m_device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
@@ -1085,6 +1096,29 @@ WRITE8_MEMBER(pc8801_state::pc8801_ctrl_w)
 
 	if(((m_device_ctrl_data & 0x20) == 0x20) && ((data & 0x20) == 0x00))
 		beep_set_state(machine().device(BEEPER_TAG),0);
+
+	if((m_device_ctrl_data & 0x40) != (data & 0x40))
+	{
+		attotime new_time = machine().time();
+
+		if(m_mouse.phase == 0)
+		{
+			m_mouse.x = machine().root_device().ioport("MOUSEX")->read();
+			m_mouse.y = machine().root_device().ioport("MOUSEY")->read();
+		}
+
+		if(data & 0x40 && (new_time - m_mouse.time) > attotime::from_hz(900))
+		{
+			m_mouse.phase = 0;
+		}
+		else
+		{
+			m_mouse.phase++;
+			m_mouse.phase &= 3;
+		}
+
+		m_mouse.time = machine().time();
+	}
 
 	/* TODO: is SING a buzzer mask? Bastard Special relies on this ... */
 	if(m_device_ctrl_data & 0x80)
@@ -1392,7 +1426,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_dmac_mode_w)
 	m_dmac_mode = data;
 	m_dmac_ff = 0;
 
-	if(data != 0xe4 && data != 0xa0 && data != 0xc4 && data != 0x80)
+	if(data != 0xe4 && data != 0xa0 && data != 0xc4 && data != 0x80 && data != 0x00)
 		printf("%02x DMAC mode\n",data);
 }
 
@@ -2021,16 +2055,24 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_DIPSETTING(    0x00, "8MHz" )
 
 	PORT_START("OPN_PA")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("OPN_PB")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 1") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Joystick Button 2") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x00)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Mouse Button 1") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Mouse Button 2") PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("MOUSEX")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_RESET PORT_REVERSE PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
+
+	PORT_START("MOUSEY")
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_RESET PORT_REVERSE PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
 
 	PORT_START("MEM")
 	PORT_CONFNAME( 0x1f, 0x00, "Extension memory" )
@@ -2050,9 +2092,12 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_CONFSETTING(    0x0d, "4.1M (PIO-8234H-2M x 2 + PC-8801-02N x 1)" )
 
 	PORT_START("BOARD_CONFIG")
-	PORT_CONFNAME( 0x01, 0x00, "Sound Board" )
+	PORT_CONFNAME( 0x01, 0x00, "Sound Board" ) /* TODO: is it possible to have BOTH sound chips in there? */
 	PORT_CONFSETTING(    0x00, "OPN (YM2203)" )
 	PORT_CONFSETTING(    0x01, "OPNA (YM2608)" )
+	PORT_CONFNAME( 0x02, 0x00, "Port 1 Connection" )
+	PORT_CONFSETTING(    0x00, "Joystick" )
+	PORT_CONFSETTING(    0x02, "Mouse" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pc88sr )
@@ -2289,6 +2334,7 @@ static MACHINE_RESET( pc8801 )
 //	pc8801_dynamic_res_change(machine);
 
 	state->m_fdc_irq_opcode = 0; //TODO: copied from PC-88VA, could be wrong here ... should be 0x7f ld a,a in the latter case
+	state->m_mouse.phase = 0;
 
 	device_set_input_line_vector(machine.device("fdccpu"), 0, 0);
 
@@ -2407,7 +2453,25 @@ static const struct upd765_interface pc8801_upd765_interface =
 /* YM2203 Interface */
 
 /* TODO: mouse routing (that's why I don't use DEVCB_INPUT_PORT here) */
-static READ8_DEVICE_HANDLER( opn_porta_r ) { return device->machine().root_device().ioport("OPN_PA")->read(); }
+static READ8_DEVICE_HANDLER( opn_porta_r )
+{
+	pc8801_state *state = device->machine().driver_data<pc8801_state>();
+
+	if(device->machine().root_device().ioport("BOARD_CONFIG")->read() & 2)
+	{
+		UINT8 shift,res;
+
+		shift = (state->m_mouse.phase & 1) ? 0 : 4;
+		res = (state->m_mouse.phase & 2) ? state->m_mouse.y : state->m_mouse.x;
+
+//		popmessage("%02x %02x",state->m_mouse.x,state->m_mouse.y);
+//		printf("%d\n",state->m_mouse.phase);
+
+		return ((res >> shift) & 0x0f) | 0xf0;
+	}
+
+	return device->machine().root_device().ioport("OPN_PA")->read();
+}
 static READ8_DEVICE_HANDLER( opn_portb_r ) { return device->machine().root_device().ioport("OPN_PB")->read(); }
 
 static const ym2203_interface pc88_ym2203_intf =
