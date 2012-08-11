@@ -81,7 +81,7 @@
     - Daikoukai Jidai
 	- Day Dream (hangs at the CrossMedia Soft logo)
 	- Demons Ring
-	(Dennou Suikoden)
+	- Dennou Tsuushin
     - Door Door MK-2 (sets up TC in the middle of execution phase read then wants status bit 6 to be low PC=0x7050 of fdc cpu)
     - Harakiri
     - MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
@@ -94,6 +94,8 @@
 	- Alpha (demo): stuck note in title screen, doesn't seem to go further;
     - Ayumi: black screen after new game / load game screen;
     - Brunette: No sound, eventually hangs at gameplay;
+    - Digital Devil Story Megami Tensei: hangs at gameplay (sound irq issue)
+    - Double Face: hangs at logo (sound irq issue)
 
     games that needs to NOT have write-protect floppies (BTANBs):
     - Balance of Power
@@ -280,6 +282,7 @@ public:
 	UINT8 m_timer_irq_latch;
 	UINT8 m_sound_irq_mask;
 	UINT8 m_sound_irq_latch;
+	UINT8 m_sound_irq_pending;
 #endif
 	UINT8 m_has_clock_speed;
 	UINT8 m_clock_setting;
@@ -1299,6 +1302,14 @@ WRITE8_MEMBER(pc8801_state::pc8801_misc_ctrl_w)
 
 	if(m_timer_irq_latch == 0 && m_vrtc_irq_latch == 0 && m_sound_irq_latch == 0)
 		cputag_set_input_line(machine(),"maincpu",0,CLEAR_LINE);
+
+	if(m_sound_irq_mask && m_sound_irq_pending)
+	{
+		cputag_set_input_line(machine(),"maincpu",0,HOLD_LINE);
+		m_sound_irq_latch = 1;
+		m_sound_irq_pending = 0;
+	}
+
 	#endif
 }
 
@@ -1656,6 +1667,13 @@ WRITE8_MEMBER(pc8801_state::pc8801_opna_w)
 
 		if(m_timer_irq_latch == 0 && m_vrtc_irq_latch == 0 && m_sound_irq_latch == 0)
 			cputag_set_input_line(machine(),"maincpu",0,CLEAR_LINE);
+
+		if(m_sound_irq_mask && m_sound_irq_pending)
+		{
+			cputag_set_input_line(machine(),"maincpu",0,HOLD_LINE);
+			m_sound_irq_latch = 1;
+			m_sound_irq_pending = 0;
+		}
 	}
 }
 
@@ -2304,11 +2322,17 @@ static void pc8801_sound_irq( device_t *device, int irq )
 
 //	printf("%02x %02x %02x\n",state->m_sound_irq_mask,state->m_i8214_irq_level,irq);
 	/* TODO: correct i8214 irq level? */
-	if(state->m_sound_irq_mask && irq)
+	if(irq)
 	{
-		state->m_sound_irq_latch = 1;
-		//IRQ_LOG(("sound\n"));
-		cputag_set_input_line(device->machine(),"maincpu",0,HOLD_LINE);
+		if(state->m_sound_irq_mask)
+		{
+			state->m_sound_irq_latch = 1;
+			state->m_sound_irq_pending = 0;
+			//IRQ_LOG(("sound\n"));
+			cputag_set_input_line(device->machine(),"maincpu",0,HOLD_LINE);
+		}
+		else
+			state->m_sound_irq_pending = 1;
 	}
 }
 
@@ -2397,6 +2421,7 @@ static MACHINE_RESET( pc8801 )
 		state->m_sound_irq_mask = 0;
 		state->m_sound_irq_latch = 0;
 		state->m_i8214_irq_level = 0;
+		state->m_sound_irq_pending = 0;
 	}
 	#endif
 
