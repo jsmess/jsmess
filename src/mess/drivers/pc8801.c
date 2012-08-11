@@ -40,6 +40,7 @@
     - Chou Bishoujo Densetsu CROQUIS: accesses ports 0xa0-0xa3 and 0xc2-0xc3
     - Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
     - Cranston Manor (actually N88-Basic demo): no sound
+    - Datenshi Kyouko: gfx garbage on the right edge?
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Grobda: palette is ugly (parent pc8801 only);
 	- Music Collection Vol. 2 - Final Fantasy Tokushuu: sound irq dies pretty soon
@@ -78,7 +79,9 @@
     - Cuby Panic (copy protection routine at 0x911A)
     - Daidasso (prints "BOOT dekimasen" on screen, can't boot)
     - Daikoukai Jidai
-	(Damages & Dice)
+	- Day Dream (hangs at the CrossMedia Soft logo)
+	- Demons Ring
+	(Dennou Suikoden)
     - Door Door MK-2 (sets up TC in the middle of execution phase read then wants status bit 6 to be low PC=0x7050 of fdc cpu)
     - Harakiri
     - MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
@@ -111,7 +114,9 @@
       * with 0x2000 ROM size you can load 2d and 2hd floppies;
     - Later models have palette bugs with some games (Alphos, Tokyo Nampa Street).
       This is because you have to set up the V1 / V2 DIP-SW to V1 for those games (it's the BIOS that sets up to analog and never changes back otherwise).
-    - password for "AY-1: Fortress Solomon" is "123" then press enter, any other key pressed makes it to fail the check (you must soft reset the machine)
+    - Password for "AY-1: Fortress Solomon" is "123" then press enter, any other key pressed makes it to fail the check (you must soft reset the machine)
+	- Pressing Home in Dennou Gakuen during gameplay makes it to show a fake DASM screen. That's supposed to be a panic button and it's also in the
+	  sequels (with different screens);
 
     Bankswitch Notes:
     - 0x31 - graphic banking
