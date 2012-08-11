@@ -507,6 +507,10 @@ void c1551_device::device_start()
 
 void c1551_device::device_reset()
 {
+	m_maincpu->reset();
+
+	m_tpi0->reset();
+
 	// initialize gate array
 	m_ga->test_w(1);
 	m_ga->soe_w(1);
@@ -566,6 +570,19 @@ void c1551_device::plus4_cd_w(address_space &space, offs_t offset, UINT8 data, i
 	if (offset >= start_address && offset < (start_address + 8))
 	{
 		tpi6525_w(m_tpi1, offset & 0x07, data);
+	}
+}
+
+
+//-------------------------------------------------
+//  plus4_breset_w - buffered reset write
+//-------------------------------------------------
+
+void c1551_device::plus4_breset_w(int state)
+{
+	if (state == ASSERT_LINE)
+	{
+		device_reset();
 	}
 }
 

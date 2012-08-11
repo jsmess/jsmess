@@ -497,6 +497,10 @@ void c2031_device::device_start()
 
 void c2031_device::device_reset()
 {
+    m_maincpu->reset();
+    
+    m_via0->reset();
+    m_via1->reset();
 }
 
 

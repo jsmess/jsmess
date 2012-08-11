@@ -1651,9 +1651,18 @@ void base_c2040_device::device_start()
 
 void base_c2040_device::device_reset()
 {
-	// toggle M6502 SO
-	m_fdccpu->set_input_line(M6502_SET_OVERFLOW, ASSERT_LINE);
-	m_fdccpu->set_input_line(M6502_SET_OVERFLOW, CLEAR_LINE);
+    m_maincpu->reset();
+
+   	// toggle M6502 SO
+	m_maincpu->set_input_line(M6502_SET_OVERFLOW, ASSERT_LINE);
+	m_maincpu->set_input_line(M6502_SET_OVERFLOW, CLEAR_LINE);
+
+    m_fdccpu->reset();
+    
+    m_riot0->reset();
+    m_riot1->reset();
+    m_miot->reset();
+    m_via->reset();
 
 	// turn off spindle motors
 	m_unit[0].m_mtr = m_unit[1].m_mtr = 1;

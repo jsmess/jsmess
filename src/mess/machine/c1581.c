@@ -446,6 +446,13 @@ void base_c1581_device::device_start()
 
 void base_c1581_device::device_reset()
 {
+    m_maincpu->reset();
+    
+    m_cia->reset();	
+    
+	wd17xx_mr_w(m_fdc, 0);
+	wd17xx_mr_w(m_fdc, 1);
+
 	m_sp_out = 1;
 	m_cnt_out = 1;
 }
