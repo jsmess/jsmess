@@ -123,7 +123,7 @@ inline void hd64610_device::check_alarm()
 	// clear alarm flag
 	m_regs[REG_CRA] &= ~CRA_AF;
 
-	if (m_regs[REG_64HZ_ALARM] & ALARM_ENB || m_regs[REG_SECOND_ALARM] & ALARM_ENB || m_regs[REG_SECOND_ALARM] & ALARM_ENB ||
+	if (m_regs[REG_64HZ_ALARM] & ALARM_ENB || m_regs[REG_SECOND_ALARM] & ALARM_ENB || m_regs[REG_MINUTE_ALARM] & ALARM_ENB ||
 		m_regs[REG_HOUR_ALARM] & ALARM_ENB || m_regs[REG_DAY_OF_THE_WEEK_ALARM] & ALARM_ENB || m_regs[REG_DAY_ALARM] & ALARM_ENB)
 	{
 		// at least one ENB is active
