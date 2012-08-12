@@ -1496,7 +1496,7 @@ static TIMER_CALLBACK(gb_lcd_timer_proc)
 			LCDSTAT = ( LCDSTAT & 0xFC ) | 0x02;
 			state->m_lcd.oam_locked = LOCKED;
 			/* Generate lcd interrupt if requested */
-			if ( ( LCDSTAT & 0x20 ) && ! state->m_lcd.line_irq && ! state->m_lcd.line_irq )
+			if ( ( LCDSTAT & 0x20 ) && ! state->m_lcd.line_irq )
 			{
 				cputag_set_input_line( machine, "maincpu", LCD_INT, ASSERT_LINE );
 			}
@@ -1788,7 +1788,7 @@ static TIMER_CALLBACK(gbc_lcd_timer_proc)
 			LCDSTAT = ( LCDSTAT & 0xFC ) | 0x02;
 			state->m_lcd.oam_locked = LOCKED;
 			/* Generate lcd interrupt if requested */
-			if ( ( LCDSTAT & 0x20 ) && ! state->m_lcd.line_irq && ! state->m_lcd.line_irq )
+			if ( ( LCDSTAT & 0x20 ) && ! state->m_lcd.line_irq )
 			{
 				cputag_set_input_line( machine, "maincpu", LCD_INT, ASSERT_LINE );
 			}
