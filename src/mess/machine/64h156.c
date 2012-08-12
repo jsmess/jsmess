@@ -27,7 +27,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 0
+#define LOG 1
 
 #define SYNC \
 	!(m_oe && m_sync)
@@ -392,7 +392,8 @@ READ_LINE_MEMBER( c64h156_device::atn_r )
 
 WRITE_LINE_MEMBER( c64h156_device::atni_w )
 {
-	logerror("ATNI %u\n", state);
+	if (LOG) logerror("ATNI %u\n", state);
+
 	m_atni = state;
 
 	set_atn_line();
@@ -405,7 +406,8 @@ WRITE_LINE_MEMBER( c64h156_device::atni_w )
 
 WRITE_LINE_MEMBER( c64h156_device::atna_w )
 {
-	logerror("ATNA %u\n", state);
+	if (LOG) logerror("ATNA %u\n", state);
+
 	m_atna = state;
 
 	set_atn_line();
