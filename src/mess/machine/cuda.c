@@ -34,7 +34,7 @@
 */
 
 
-//#define CUDA_SUPER_VERBOSE
+#define CUDA_SUPER_VERBOSE
 
 #include "emu.h"
 #include "cuda.h"
@@ -55,9 +55,10 @@
 const device_type CUDA = &device_creator<cuda_device>;
 
 ROM_START( cuda )
-	ROM_REGION(0x3300, CUDA_CPU_TAG, 0)
+	ROM_REGION(0x4400, CUDA_CPU_TAG, 0)
     ROM_LOAD( "341s0060.bin", 0x1100, 0x1100, CRC(0f5e7b4a) SHA1(972b3778146d9787b18c3a9874d505cf606b3e15) )
     ROM_LOAD( "341s0788.bin", 0x2200, 0x1100, CRC(df6e1b43) SHA1(ec23cc6214c472d61b98964928c40589517a3172) )
+    ROM_LOAD( "341s0417.bin", 0x3300, 0x1100, CRC(571f24c9) SHA1(a2ae12492389a00e5f4b1ef19b267d6f3a8eadc3) ) 
 ROM_END
 
 //-------------------------------------------------
@@ -81,7 +82,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( cuda )
-	MCFG_CPU_ADD(CUDA_CPU_TAG, M68HC05EG, XTAL_32_768kHz*128)	// 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
+	MCFG_CPU_ADD(CUDA_CPU_TAG, M68HC05EG, XTAL_32_768kHz*192)	// 32.768 kHz input clock, can be PLL'ed to x128 = 4.1 MHz under s/w control
 	MCFG_CPU_PROGRAM_MAP(cuda_map)
 MACHINE_CONFIG_END
 
@@ -219,6 +220,7 @@ READ8_MEMBER( cuda_device::ports_r )
 			break;
 
         case 1:		// port B
+//            printf("Read: byteack %d tip %d via_data %d\n", byteack, tip, via_data);
             incoming |= 0x01;   // +5v sense
             incoming |= byteack<<2;
             incoming |= tip<<3;

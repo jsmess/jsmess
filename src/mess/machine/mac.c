@@ -487,7 +487,7 @@ void mac_state::set_memory_overlay(int overlay)
 			m_overlay = overlay;
 			v8_resize();
 		}
-		else if ((m_model >= MODEL_MAC_POWERMAC_6100) && (m_model >= MODEL_MAC_POWERMAC_8100))
+		else if ((m_model >= MODEL_MAC_POWERMAC_6100) && (m_model <= MODEL_MAC_POWERMAC_8100))
 		{
 			mac_install_memory(machine(), 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
@@ -2232,7 +2232,7 @@ void mac_state::vblank_irq()
 	}
 
 	/* signal VBlank on CA1 input on the VIA */
-	if ((m_model < MODEL_MAC_II) || (m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_PB140) || (m_model == MODEL_MAC_PB160) || (m_model == MODEL_MAC_QUADRA_700))
+	if ((m_model < MODEL_MAC_II) || (m_model == MODEL_MAC_PB140) || (m_model == MODEL_MAC_PB160) || (m_model == MODEL_MAC_QUADRA_700))
 	{
 		ca1_data ^= 1;
 		m_via1->write_ca1(ca1_data);

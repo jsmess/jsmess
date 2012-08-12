@@ -94,7 +94,7 @@ typedef enum
 	MODEL_MAC_PB160,    // 160/180/165 all have the same machine ID too
 	MODEL_MAC_PB165c,
 	MODEL_MAC_PB180c,
-	MODEL_MAC_PB150,
+	MODEL_MAC_PB150,    // 150 is fairly radically different from the other 1x0s
 
 	MODEL_MAC_PBDUO_210,	// 68030 PowerBook Duos
 	MODEL_MAC_PBDUO_230,
@@ -120,7 +120,7 @@ typedef enum
 	MODEL_MAC_PB190,
 	MODEL_MAC_PB190cs,
 
-	MODEL_MAC_POWERMAC_6100,	// original-series PowerMacs
+	MODEL_MAC_POWERMAC_6100,	// NuBus PowerMacs
 	MODEL_MAC_POWERMAC_7100,
 	MODEL_MAC_POWERMAC_8100
 } model_t;

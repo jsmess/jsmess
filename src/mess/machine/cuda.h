@@ -13,8 +13,9 @@
 
 #define CUDA_TAG	"cuda"
 
-#define CUDA_341S0060   0x1100  // v2.40
-#define CUDA_341S0788   0x2200  // v2.37
+#define CUDA_341S0060   0x1100  // v2.40 (Most common: Performa/Quadra 6xx, PowerMac x200, x400, x500, Pippin, Gossamer G3)
+#define CUDA_341S0788   0x2200  // v2.37 (LC 475/575/Quadra 605, Quadra 660AV/840AV, PowerMac x200)
+#define CUDA_341S0417   0x3300  // v2.35 (Color Classic)
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
