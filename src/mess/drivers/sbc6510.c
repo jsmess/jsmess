@@ -23,7 +23,7 @@ L - (unknown)
 R - (unknown)
 S - (unknown)
 
-Some command expect a filename enclosed in double quotes. If the quotes
+Some commands expect a filename enclosed in double quotes. If the quotes
 are not there, it loops forever looking for them. Good example of bad
 programming. There is no help and no error messages.
 
@@ -46,7 +46,8 @@ public:
 
 	DECLARE_READ8_MEMBER(a2_r);
 	DECLARE_WRITE8_MEMBER(a2_w);
-	DECLARE_READ8_MEMBER(nop_r);
+	DECLARE_READ8_MEMBER(psg_a_r);
+	DECLARE_READ8_MEMBER(psg_b_r);
 	DECLARE_WRITE8_MEMBER(key_w);
 	DECLARE_READ8_MEMBER(key_r);
 	UINT8 m_term_data;
@@ -61,13 +62,10 @@ static ADDRESS_MAP_START( sbc6510_mem, AS_PROGRAM, 8, sbc6510_state )
 	AM_RANGE(0x0000, 0x0001) AM_RAM
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(a2_r,a2_w)
 	AM_RANGE(0x0003, 0xdfff) AM_RAM
-	//AM_RANGE(0xE000, 0xE000) AM_WRITE(key_w)
-	//AM_RANGE(0xE001, 0xE001) AM_READ(key_r)
-	AM_RANGE(0xEA00, 0xEA00) AM_READ(nop_r)
 	//AM_RANGE(0x0000, 0xdfff) AM_RAM
-	AM_RANGE(0xE000, 0xE00F) AM_DEVREADWRITE_LEGACY("cia6526", mos6526_r, mos6526_w)
-	//AM_RANGE(0xE800, 0xE801) a device
-	//AM_RANGE(0xEA00, 0xEA01) a device
+	AM_RANGE(0xE000, 0xE00F) AM_MIRROR(0x1f0) AM_DEVREADWRITE_LEGACY("cia6526", mos6526_r, mos6526_w)
+	AM_RANGE(0xE800, 0xE800) AM_MIRROR(0x1ff) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
+	AM_RANGE(0xEA00, 0xEA00) AM_MIRROR(0x1ff) AM_DEVREADWRITE_LEGACY("ay8910", ay8910_r, ay8910_data_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -161,7 +159,12 @@ static INPUT_PORTS_START( sbc6510 ) // cbm keyboard
 INPUT_PORTS_END
 
 
-READ8_MEMBER( sbc6510_state::nop_r )
+READ8_MEMBER( sbc6510_state::psg_a_r )
+{
+	return 0xff;
+}
+
+READ8_MEMBER( sbc6510_state::psg_b_r )
 {
 	return 0x7f;
 }
@@ -214,17 +217,21 @@ static const m6502_interface sbc6510_m6510_interface =
 	DEVCB_NULL
 };
 
+// Ports A and B connect to the IDE socket
 static const ay8910_interface sbc6510_ay_interface =
 {
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL
+	AY8910_LEGACY_OUTPUT,	// flags
+	AY8910_DEFAULT_LOADS,	// channel load in ohms
+	DEVCB_DRIVER_MEMBER(sbc6510_state, psg_a_r),		// port A read
+	DEVCB_DRIVER_MEMBER(sbc6510_state, psg_b_r),		// port B read
+	DEVCB_NULL,		// port A write
+	DEVCB_NULL		// port B write
 };
 
-const mos6526_interface sbc6510_ntsc_cia0 =
+const mos6526_interface cia_intf =
 {
 	10,		// time-of-day clock 1/10 second - no idea about this
-	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE), // irq M6502_IRQ_LINE
+	DEVCB_CPU_INPUT_LINE("maincpu", M6502_IRQ_LINE), // irq
 	DEVCB_NULL,	// pc (timer related) not connected
 	DEVCB_NULL,	// cnt (serial related) not connected
 	DEVCB_NULL,	// sp (serial related) not connected
@@ -251,7 +258,7 @@ static MACHINE_CONFIG_START( sbc6510, sbc6510_state )
 	MCFG_SOUND_CONFIG(sbc6510_ay_interface)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_MOS6526R1_ADD("cia6526", XTAL_1MHz, sbc6510_ntsc_cia0)
+	MCFG_MOS6526R1_ADD("cia6526", XTAL_1MHz, cia_intf)
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -267,4 +274,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    CLASS         INIT    COMPANY          FULLNAME       FLAGS */
-COMP( 2009, sbc6510,  0,      0,       sbc6510,   sbc6510, driver_device, 0,   "Josip Perusanec", "SBC6510", GAME_NOT_WORKING)
+COMP( 2009, sbc6510,  0,      0,       sbc6510,   sbc6510, driver_device, 0,   "Josip Perusanec", "SBC6510", 0 )
