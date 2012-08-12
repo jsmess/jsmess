@@ -201,6 +201,11 @@ UINT32 teleprinter_device::tp_update(screen_device &device, bitmap_rgb32 &bitmap
 	return 0;
 }
 
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
+{
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, generic_terminal_device, kbd_put)
+};
+
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
@@ -211,11 +216,12 @@ MACHINE_CONFIG_FRAGMENT( generic_teleprinter )
 	MCFG_SCREEN_SIZE(TELEPRINTER_WIDTH*8, TELEPRINTER_HEIGHT*8)
 	MCFG_SCREEN_VISIBLE_AREA(0, TELEPRINTER_WIDTH*8-1, 0, TELEPRINTER_HEIGHT*8-1)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, teleprinter_device, tp_update)
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
 machine_config_constructor teleprinter_device::device_mconfig_additions() const
 {
-      return MACHINE_CONFIG_NAME(generic_teleprinter);
+	return MACHINE_CONFIG_NAME(generic_teleprinter);
 }
 
 /*-------------------------------------------------

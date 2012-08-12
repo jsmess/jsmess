@@ -19,7 +19,7 @@
 	MCFG_DEVICE_CONFIG(_intrf)
 
 #define MCFG_GENERIC_TELEPRINTER_REMOVE(_tag)		\
-    MCFG_DEVICE_REMOVE(_tag)
+	MCFG_DEVICE_REMOVE(_tag)
 
 /***************************************************************************
     FUNCTION PROTOTYPES

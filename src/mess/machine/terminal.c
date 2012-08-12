@@ -322,7 +322,7 @@ MACHINE_CONFIG_END
 
 machine_config_constructor generic_terminal_device::device_mconfig_additions() const
 {
-      return MACHINE_CONFIG_NAME(generic_terminal);
+	return MACHINE_CONFIG_NAME(generic_terminal);
 }
 
 void generic_terminal_device::device_start()
