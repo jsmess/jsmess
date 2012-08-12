@@ -93,7 +93,7 @@ static TIMER_CALLBACK(zx_ula_nmi)
      */
 	screen_device *screen = machine.first_screen();
 	int height = screen->height();
-	const rectangle r1 = screen->visible_area();
+	const rectangle& r1 = screen->visible_area();
 	rectangle r;
 
 	bitmap_ind16 &bitmap = state->m_bitmap;
