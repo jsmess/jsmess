@@ -178,7 +178,7 @@ static int parse_zillion_hex(UINT8 *snapshot_buff, char *src)
                     /*row++;*/
                     line[column] = '\0';
                     n = sscanf(line, "G%x", (unsigned int *) &addr);
-                    if (n == 1 && !snapshot_buff[8192+64+1] && !snapshot_buff[8192+64+1])
+                    if (n == 1 && !snapshot_buff[8192+64+0] && !snapshot_buff[8192+64+1])
                     {
                         logerror("microtan_hexfile_init: go addr %04X\n", addr);
                         snapshot_buff[8192+64+0] = addr & 0xff;

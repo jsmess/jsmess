@@ -210,7 +210,7 @@ WRITE8_MEMBER( c2031_device::via0_pb_w )
 	// attention acknowledge
 	m_atna = atna;
 
-	if (!m_bus->atn_r() ^ atna)
+	if ((!m_bus->atn_r()) ^ atna)
 	{
 		nrfd = ndac = 0;
 	}
@@ -515,7 +515,7 @@ void c2031_device::ieee488_atn(int state)
 
 	m_via0->write_ca1(!state);
 
-	if (!state ^ m_atna)
+	if ((!state) ^ m_atna)
 	{
 		nrfd = ndac = 0;
 	}

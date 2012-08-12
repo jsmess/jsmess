@@ -364,7 +364,7 @@ machine_config_constructor base_c1581_device::device_mconfig_additions() const
 inline void base_c1581_device::set_iec_data()
 {
 	int atn = m_bus->atn_r();
-	int data = !m_data_out & !(m_atn_ack & !atn);
+	int data = !m_data_out && !(m_atn_ack && !atn);
 
 	// fast serial data
 	if (m_fast_ser_dir) data &= m_sp_out;

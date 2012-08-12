@@ -686,7 +686,7 @@ machine_config_constructor base_c1571_device::device_mconfig_additions() const
 
 inline void base_c1571_device::set_iec_data()
 {
-	int data = !m_data_out & !m_ga->atn_r();
+	int data = !m_data_out && !m_ga->atn_r();
 
 	// fast serial data
 	if (m_ser_dir) data &= m_sp_out;

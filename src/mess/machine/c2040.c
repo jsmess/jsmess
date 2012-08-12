@@ -653,7 +653,7 @@ WRITE8_MEMBER( base_c2040_device::via_pb_w )
 	int s0 = (data >> 2) & 0x03;
 	micropolis_step_motor(0, s0);
 
-	m_bit_timer->enable(!mtr1 | !mtr0);
+	m_bit_timer->enable(!mtr1 || !mtr0);
 }
 
 
@@ -771,7 +771,7 @@ WRITE8_MEMBER( base_c2040_device::c8050_via_pb_w )
 	int s0 = (data >> 2) & 0x03;
 	mpi_step_motor(0, s0);
 
-	m_bit_timer->enable(!mtr1 | !mtr0);
+	m_bit_timer->enable(!mtr1 || !mtr0);
 }
 
 

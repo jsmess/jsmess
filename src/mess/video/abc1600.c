@@ -838,7 +838,7 @@ inline UINT16 abc1600_state::get_wrmsk()
 
     */
 
-	UINT16 wrmsk_addr = (m_wrms1 << 11) | (m_wrms0 << 10) | ((!m_wrms1 & !m_wrms0) << 9) | (m_udx << 8) | ((m_xsize & 0x0f) << 4) | (m_xto & 0x0f);
+	UINT16 wrmsk_addr = (m_wrms1 << 11) | (m_wrms0 << 10) | ((!m_wrms1 && !m_wrms0) << 9) | (m_udx << 8) | ((m_xsize & 0x0f) << 4) | (m_xto & 0x0f);
 	UINT8 wrmskl = m_wrmsk_rom[wrmsk_addr];
 	UINT8 wrmskh = m_wrmsk_rom[wrmsk_addr + 0x1000];
 	UINT16 wrmsk = (wrmskh << 8) | wrmskl;
