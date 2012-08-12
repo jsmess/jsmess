@@ -132,8 +132,6 @@ protected:
 	inline void set_sync_line();
 	inline void set_byte_line();
 	inline void read_current_track();
-	inline void spindle_motor(int mtr);
-	inline void step_motor(int mtr, int stp);
 	inline void receive_bit();
 
 private:
