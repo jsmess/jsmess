@@ -526,7 +526,13 @@ static floperr_t d64_read_track(floppy_image_legacy *floppy, int head, int track
 		}
 
 		/* copy GCR track data to buffer */
-		memcpy(buffer, gcr_track_data, gcr_track_size);
+		memcpy((UINT8*)buffer, gcr_track_data, gcr_track_size);
+
+		// create a speed block with the same speed zone for the whole track
+		UINT8 speed = tag->speed_zone[track] & 0x03;
+		UINT8 speed_byte = (speed << 6) | (speed << 4) | (speed << 2) | speed;
+
+		memset(((UINT8*)buffer) + gcr_track_size, speed_byte, G64_SPEED_BLOCK_SIZE);
 	}
 	else	/* half tracks */
 	{
