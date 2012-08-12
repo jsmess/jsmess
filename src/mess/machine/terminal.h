@@ -3,6 +3,8 @@
 
 #include "emu.h"
 #include "machine/serial.h"
+#include "machine/keyboard.h"
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -53,6 +55,7 @@ public:
 	generic_terminal_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 	generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 	DECLARE_WRITE8_MEMBER(write) { term_write(data); }
+	DECLARE_WRITE8_MEMBER(kbd_put);
 	UINT32 update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	virtual ioport_constructor device_input_ports() const;
@@ -68,16 +71,12 @@ protected:
 	UINT8 m_x_pos;
 	emu_timer *m_timer;
 private:
-	UINT8 keyboard_handler(UINT8 last_code, UINT8 *scan_line);
 	void scroll_line();
 	void write_char(UINT8 data);
 	void clear();
-	UINT8 row_number(UINT8 code);
 
 	UINT8 m_framecnt;
 	UINT8 m_y_pos;
-	UINT8 m_last_code;
-	UINT8 m_scan_line;
 
 	devcb_resolved_write8 m_keyboard_func;
 };

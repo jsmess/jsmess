@@ -291,127 +291,20 @@ UINT32 generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bitm
 	return 0;
 }
 
-UINT8 generic_terminal_device::row_number(UINT8 code) {
-	if BIT(code,0) return 0;
-	if BIT(code,1) return 1;
-	if BIT(code,2) return 2;
-	if BIT(code,3) return 3;
-	if BIT(code,4) return 4;
-	if BIT(code,5) return 5;
-	if BIT(code,6) return 6;
-	if BIT(code,7) return 7;
-	return 0;
-}
-
-UINT8 generic_terminal_device::keyboard_handler(UINT8 last_code, UINT8 *scan_line)
-{
-	static const char *const keynames[] = { "TERM_LINE0", "TERM_LINE1", "TERM_LINE2", "TERM_LINE3", "TERM_LINE4", "TERM_LINE5", "TERM_LINE6", "TERM_LINE7" };
-	int i;
-	UINT8 code;
-	UINT8 key_code = 0;
-	UINT8 retVal = 0;
-	UINT8 shift = BIT(ioport("TERM_LINEC")->read(), 1);
-	UINT8 caps  = BIT(ioport("TERM_LINEC")->read(), 2);
-	UINT8 ctrl  = BIT(ioport("TERM_LINEC")->read(), 0);
-	i = *scan_line;
-	{
-		code =	ioport(keynames[i])->read();
-		if (code != 0)
-		{
-			if (i==0 && shift==0) {
-				key_code = 0x30 + row_number(code) + 8*i; // for numbers and some signs
-			}
-			if (i==0 && shift==1) {
-				key_code = 0x20 + row_number(code) + 8*i; // for shifted numbers
-			}
-			if (i==1 && shift==0) {
-				if (row_number(code) < 4) {
-					key_code = 0x30 + row_number(code) + 8*i; // for numbers and some signs
-				} else {
-					key_code = 0x20 + row_number(code) + 8*i; // for numbers and some signs
-				}
-			}
-			if (i==1 && shift==1) {
-				if (row_number(code) < 4) {
-					key_code = 0x20 + row_number(code) + 8*i; // for numbers and some signs
-				} else {
-					key_code = 0x30 + row_number(code) + 8*i; // for numbers and some signs
-				}
-			}
-			if (i>=2 && i<=4 && (shift ^ caps)==0 && ctrl==0) {
-				key_code = 0x60 + row_number(code) + (i-2)*8; // for small letters
-			}
-			if (i>=2 && i<=4 && (shift ^ caps)==1 && ctrl==0) {
-				key_code = 0x40 + row_number(code) + (i-2)*8; // for big letters
-			}
-			if (i>=2 && i<=4 && ctrl==1) {
-				key_code = 0x00 + row_number(code) + (i-2)*8; // for CTRL + letters
-			}
-			if (i==5 && shift==1 && ctrl==0) {
-				if (row_number(code)<7) {
-					if (row_number(code)<3) {
-						key_code = (caps ? 0x60 : 0x40) + row_number(code) + (i-2)*8; // for big letters
-					} else {
-						key_code = 0x60 + row_number(code) + (i-2)*8; // for upper symbols letters
-					}
-				} else {
-					key_code = 0x40 + row_number(code) + (i-2)*8; // for DEL it is switched
-				}
-			}
-			if (i==5 && shift==0 && ctrl==0) {
-				if (row_number(code)<7) {
-					if (row_number(code)<3) {
-						key_code = (caps ? 0x40 : 0x60) + row_number(code) + (i-2)*8; // for small letters
-					} else {
-						key_code = 0x40 + row_number(code) + (i-2)*8; // for lower symbols letters
-					}
-				} else {
-					key_code = 0x60 + row_number(code) + (i-2)*8; // for DEL it is switched
-				}
-			}
-			if (i==5 && shift==1 && ctrl==1) {
-				key_code = 0x00 + row_number(code) + (i-2)*8; // for letters + ctrl
-			}
-			if (i==6) {
-				switch(row_number(code))
-				{
-/*                  case 0: key_code = 0x11; break;
-                    case 1: key_code = 0x12; break;
-                    case 2: key_code = 0x13; break;
-                    case 3: key_code = 0x14; break;*/
-					case 4: key_code = 0x20; break; // Space
-					case 5: key_code = 0x0A; break; // LineFeed
-					case 6: key_code = 0x09; break; // TAB
-					case 7: key_code = 0x0D; break; // Enter
-				}
-			}
-			if (i==7)
-			{
-				switch(row_number(code))
-				{
-					case 0: key_code = 0x1B; break; // Escape
-					case 1: key_code = 0x08; break; // Backspace
-				}
-			}
-			retVal = key_code;
-		} else {
-			*scan_line += 1;
-			if (*scan_line==8) {
-				*scan_line = 0;
-			}
-		}
-	}
-	return retVal;
-}
-
 void generic_terminal_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	UINT8 new_code;
-	new_code = keyboard_handler(m_last_code, &m_scan_line);
-	if ((m_last_code != new_code) && (new_code))
-		send_key(new_code);
-	m_last_code = new_code;
 }
+
+WRITE8_MEMBER( generic_terminal_device::kbd_put )
+{
+	if (data)
+		send_key(data);
+}
+
+static ASCII_KEYBOARD_INTERFACE( keyboard_intf )
+{
+	DEVCB_DEVICE_MEMBER(DEVICE_SELF_OWNER, generic_terminal_device, kbd_put)
+};
 
 /***************************************************************************
     VIDEO HARDWARE
@@ -424,6 +317,7 @@ static MACHINE_CONFIG_FRAGMENT( generic_terminal )
 	MCFG_SCREEN_SIZE(TERMINAL_WIDTH*8, TERMINAL_HEIGHT*10)
 	MCFG_SCREEN_VISIBLE_AREA(0, TERMINAL_WIDTH*8-1, 0, TERMINAL_HEIGHT*10-1)
 	MCFG_SCREEN_UPDATE_DEVICE(DEVICE_SELF, generic_terminal_device, update)
+	MCFG_ASCII_KEYBOARD_ADD(KEYBOARD_TAG, keyboard_intf)
 MACHINE_CONFIG_END
 
 machine_config_constructor generic_terminal_device::device_mconfig_additions() const
@@ -453,9 +347,7 @@ void generic_terminal_device::device_config_complete()
 void generic_terminal_device::device_reset()
 {
 	clear();
-	m_last_code = 0;
-	m_scan_line = 0;
-	m_timer->adjust(attotime::from_hz(2400), 0, attotime::from_hz(2400));
+	//m_timer->adjust(attotime::from_hz(2400), 0, attotime::from_hz(2400));
 }
 
 /*
@@ -496,90 +388,6 @@ Char  Dec  Oct  Hex | Char  Dec  Oct  Hex | Char  Dec  Oct  Hex | Char Dec  Oct 
 
 */
 static INPUT_PORTS_START( generic_terminal )
-	PORT_START("TERM_LINEC")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Ctrl") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)  PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Caps Lock")  PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
-
-	PORT_START("TERM_LINE0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
-
-	PORT_START("TERM_LINE1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-') PORT_CHAR('=')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-
-	PORT_START("TERM_LINE2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_END) PORT_CHAR('`') PORT_CHAR('@')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_B) PORT_CHAR('b') PORT_CHAR('B')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('c') PORT_CHAR('C')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_CHAR('d') PORT_CHAR('D')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_CHAR('e') PORT_CHAR('E')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_F) PORT_CHAR('f') PORT_CHAR('F')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_G) PORT_CHAR('g') PORT_CHAR('G')
-
-	PORT_START("TERM_LINE3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_H) PORT_CHAR('h') PORT_CHAR('H')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_J) PORT_CHAR('j') PORT_CHAR('J')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_M) PORT_CHAR('m') PORT_CHAR('M')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_N) PORT_CHAR('n') PORT_CHAR('N')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_O) PORT_CHAR('o') PORT_CHAR('O')
-
-	PORT_START("TERM_LINE4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_P) PORT_CHAR('p') PORT_CHAR('P')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_R) PORT_CHAR('r') PORT_CHAR('R')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_T) PORT_CHAR('t') PORT_CHAR('T')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_U) PORT_CHAR('u') PORT_CHAR('U')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_V) PORT_CHAR('v') PORT_CHAR('V')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
-
-	PORT_START("TERM_LINE5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('y') PORT_CHAR('Y')
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_CHAR('z') PORT_CHAR('Z')
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[') PORT_CHAR('{')
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\') PORT_CHAR('|')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']') PORT_CHAR('}')
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TILDE) PORT_CHAR('^') PORT_CHAR('~')
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("DEL")PORT_CODE(KEYCODE_DEL)
-
-	PORT_START("TERM_LINE6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LF") PORT_CODE(KEYCODE_RALT) PORT_CHAR(10)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-
-	PORT_START("TERM_LINE7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Escape") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE)
-
 	PORT_START("TERM_CONF")
 	PORT_CONFNAME( 0x01, 0x01, "Cursor")
 	PORT_CONFSETTING(    0x00, DEF_STR(No))
