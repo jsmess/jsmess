@@ -370,6 +370,8 @@ WRITE_LINE_MEMBER( c64h156_device::oe_w )
 
 WRITE_LINE_MEMBER( c64h156_device::soe_w )
 {
+	if (LOG) logerror("SOE %u\n", state);
+
 	m_soe = state;
 
 	set_byte_line();
