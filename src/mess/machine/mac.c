@@ -487,10 +487,6 @@ void mac_state::set_memory_overlay(int overlay)
 			m_overlay = overlay;
 			v8_resize();
 		}
-		else if ((m_model >= MODEL_MAC_POWERMAC_6100) && (m_model <= MODEL_MAC_POWERMAC_8100))
-		{
-			mac_install_memory(machine(), 0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
-		}
 		else if ((m_model == MODEL_MAC_IICI) || (m_model == MODEL_MAC_IISI))
 		{
 			// ROM is OK to flood to 3fffffff

@@ -34,7 +34,7 @@
 */
 
 
-#define CUDA_SUPER_VERBOSE
+//#define CUDA_SUPER_VERBOSE
 
 #include "emu.h"
 #include "cuda.h"
