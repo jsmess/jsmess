@@ -83,6 +83,8 @@
 	- Demons Ring
 	- Dennou Tsuushin
     - Door Door MK-2 (sets up TC in the middle of execution phase read then wants status bit 6 to be low PC=0x7050 of fdc cpu)
+	- Dragon Slayer - The Legend of Heroes 2
+	- (DraSle Login)
     - Harakiri
     - MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
     - Mr. Pro Yakyuu
@@ -99,7 +101,8 @@
 
     games that needs to NOT have write-protect floppies (BTANBs):
     - Balance of Power
-    - Blue Moon Story: moans with a kanji msg;.
+    - Blue Moon Story: moans with a kanji msg;
+    - Mahjong Clinic Zoukangou
     - Tobira wo Akete (hangs at title screen)
 
     games that needs to HAVE write-protect floppies (BTANBs):
@@ -582,7 +585,7 @@ static UINT8 extract_text_attribute(running_machine &machine,UINT32 address,int 
 	if(fifo_size == 0)
 	{
 		popmessage("Using non-special mode for text tilemap, contact MESSdev");
-		return 0;
+		return 0xe8;
 	}
 
 	/* TODO: correct or hack-ish? Certainly having 0 as a attribute X is weird in any case. */
