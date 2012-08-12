@@ -3,6 +3,7 @@
         SBC6510 from Josip Perusanec
 
         18/12/2009 Skeleton driver.
+        2012-08-12 Working [Robbbert]
 
     CPU MOS 6510 (1MHz)
     ROM 4KB
@@ -26,6 +27,23 @@ S - (unknown)
 Some commands expect a filename enclosed in double quotes. If the quotes
 are not there, it loops forever looking for them. Good example of bad
 programming. There is no help and no error messages.
+
+ToDo:
+
+- The ATMEGA8 is a CPU with Timer, 4 IO ports, UART, ADC, Watchdog all
+  built in. This enormously complex device needs to be emulated. It also
+  contains some (4k?) RAM, of which certain addresses have special meaning.
+  For example bytes 0 and 1 control the serial video stream of bits.
+
+- When the system boots, there is a Y in the top corner. This is actually
+  Esc-Y, which our terminal does not understand.
+
+- IDE interface.
+
+- Find out the proper way to use the monitor, there are no instructions
+  and the slightest mistake can freeze the system.
+
+- No software to test with.
 
 
 ****************************************************************************/
@@ -62,7 +80,6 @@ static ADDRESS_MAP_START( sbc6510_mem, AS_PROGRAM, 8, sbc6510_state )
 	AM_RANGE(0x0000, 0x0001) AM_RAM
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(a2_r,a2_w)
 	AM_RANGE(0x0003, 0xdfff) AM_RAM
-	//AM_RANGE(0x0000, 0xdfff) AM_RAM
 	AM_RANGE(0xE000, 0xE00F) AM_MIRROR(0x1f0) AM_DEVREADWRITE_LEGACY("cia6526", mos6526_r, mos6526_w)
 	AM_RANGE(0xE800, 0xE800) AM_MIRROR(0x1ff) AM_DEVWRITE_LEGACY("ay8910", ay8910_address_w)
 	AM_RANGE(0xEA00, 0xEA00) AM_MIRROR(0x1ff) AM_DEVREADWRITE_LEGACY("ay8910", ay8910_r, ay8910_data_w)
@@ -159,16 +176,6 @@ static INPUT_PORTS_START( sbc6510 ) // cbm keyboard
 INPUT_PORTS_END
 
 
-READ8_MEMBER( sbc6510_state::psg_a_r )
-{
-	return 0xff;
-}
-
-READ8_MEMBER( sbc6510_state::psg_b_r )
-{
-	return 0x7f;
-}
-
 READ8_MEMBER( sbc6510_state::a2_r )
 {
 	return m_2;
@@ -178,25 +185,6 @@ WRITE8_MEMBER( sbc6510_state::a2_w )
 {
 	m_2 = data;
 	m_terminal->write(space, 0, data);
-}
-
-READ8_MEMBER( sbc6510_state::key_r )
-{
-	UINT8 i,data=0;
-	char kbdrow[6];
-
-	for (i = 0; i < 8; i++)
-	if (!BIT(m_key_row, i))
-	{
-		sprintf(kbdrow,"X%X",i);
-		data |= ioport(kbdrow)->read();
-	}
-	return ~data;
-}
-
-WRITE8_MEMBER( sbc6510_state::key_w )
-{
-	m_key_row = data;
 }
 
 static GENERIC_TERMINAL_INTERFACE( terminal_intf )
@@ -217,6 +205,16 @@ static const m6502_interface sbc6510_m6510_interface =
 	DEVCB_NULL
 };
 
+READ8_MEMBER( sbc6510_state::psg_a_r )
+{
+	return 0xff;
+}
+
+READ8_MEMBER( sbc6510_state::psg_b_r )
+{
+	return 0x7f;
+}
+
 // Ports A and B connect to the IDE socket
 static const ay8910_interface sbc6510_ay_interface =
 {
@@ -227,6 +225,25 @@ static const ay8910_interface sbc6510_ay_interface =
 	DEVCB_NULL,		// port A write
 	DEVCB_NULL		// port B write
 };
+
+READ8_MEMBER( sbc6510_state::key_r )
+{
+	UINT8 i,data=0;
+	char kbdrow[6];
+
+	for (i = 0; i < 8; i++)
+	if (!BIT(m_key_row, i))
+	{
+		sprintf(kbdrow,"X%X",i);
+		data |= ioport(kbdrow)->read();
+	}
+	return ~data;
+}
+
+WRITE8_MEMBER( sbc6510_state::key_w )
+{
+	m_key_row = data;
+}
 
 const mos6526_interface cia_intf =
 {
