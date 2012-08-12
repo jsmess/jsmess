@@ -1052,13 +1052,13 @@ static INTERRUPT_GEN( vii_vblank )
 //      verboselog(device->machine(), 0, "audio 1 IRQ\n");
 //      cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ1_LINE, ASSERT_LINE);
 //  }
-	if(state->m_io_regs[0x22] & state->m_io_regs[0x22] & 0x0c00)
+    if(state->m_io_regs[0x22] & state->m_io_regs[0x21] & 0x0c00)
 	{
 		verboselog(device->machine(), 0, "timerA, timer B IRQ\n");
 		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ2_LINE, ASSERT_LINE);
 	}
 
-	//if(state->m_io_regs[0x22] & state->m_io_regs[0x22] & 0x2100)
+    //if(state->m_io_regs[0x22] & state->m_io_regs[0x21] & 0x2100)
 	// For now trigger always if any enabled
 	if(state->VII_CTLR_IRQ_ENABLE)
 	{
@@ -1070,17 +1070,17 @@ static INTERRUPT_GEN( vii_vblank )
 //      cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ4_LINE, ASSERT_LINE);
 //  }
 
-	if(state->m_io_regs[0x22] & state->m_io_regs[0x22] & 0x1200)
+    if(state->m_io_regs[0x22] & state->m_io_regs[0x21] & 0x1200)
 	{
 		verboselog(device->machine(), 0, "External IRQ\n");
 		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ5_LINE, ASSERT_LINE);
 	}
-	if(state->m_io_regs[0x22] & state->m_io_regs[0x22] & 0x0070)
+    if(state->m_io_regs[0x22] & state->m_io_regs[0x21] & 0x0070)
 	{
 		verboselog(device->machine(), 0, "1024Hz, 2048HZ, 4096HZ IRQ\n");
 		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ6_LINE, ASSERT_LINE);
 	}
-	if(state->m_io_regs[0x22] & state->m_io_regs[0x22] & 0x008b)
+    if(state->m_io_regs[0x22] & state->m_io_regs[0x21] & 0x008b)
 	{
 		verboselog(device->machine(), 0, "TMB1, TMB2, 4Hz, key change IRQ\n");
 		cputag_set_input_line(device->machine(), "maincpu", UNSP_IRQ7_LINE, ASSERT_LINE);
