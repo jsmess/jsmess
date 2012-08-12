@@ -87,6 +87,8 @@ public:
 	required_device<acia6551_device> m_acia;
 	required_device<roc10937_t> m_vfd;
 	required_device<mm74c922_device> m_kb;
+
+	virtual void machine_reset();
 	DECLARE_READ8_MEMBER( ip40 );
 	DECLARE_WRITE8_MEMBER( op40 );
 	DECLARE_WRITE8_MEMBER( op41 );
@@ -118,11 +120,8 @@ public:
 	UINT8 m_ram_bank;
 	//required_shared_ptr<UINT8> m_main_ram;
 	// states
-	UINT8 m_kbd;
-	UINT8 m_kbd_row;
 	UINT8 m_acia_intq;
 	UINT8 m_overload_state;
-	UINT8 m_debug_x5_state;
 	UINT8 m_key_intq;
 	UINT8 m_remote_mode;
 	UINT8 m_key_mode;
@@ -143,11 +142,8 @@ DRIVER_INIT_MEMBER(digel804_state,digel804)
 	vfd_old = vfd_data = vfd_count = 0;
 	m_speaker_state = 0;
 	//port43_rtn = 0xEE;//0xB6;
-	m_kbd = 0;
-	m_kbd_row = 0;
 	m_acia_intq = 1; // /INT source 1
 	m_overload_state = 0; // OVLD
-	m_debug_x5_state = 1; // "/DEBUG"
 	m_key_intq = 1; // /INT source 2
 	m_remote_mode = 1; // /REM
 	m_key_mode = 0; // /KEY
@@ -160,11 +156,10 @@ DRIVER_INIT_MEMBER(digel804_state,digel804)
 	membank( "bankedram" )->set_base( memregion("user_ram")->base() + ( m_ram_bank * 0x10000 ));
 }
 
-static MACHINE_RESET( digel804 )
+void digel804_state::machine_reset()
 {
-	digel804_state *state = machine.driver_data<digel804_state>();
-	state->m_vfd->reset();
-	state->vfd_old = state->vfd_data = state->vfd_count = 0;
+	m_vfd->reset();
+	vfd_old = vfd_data = vfd_count = 0;
 }
 
 READ8_MEMBER( digel804_state::ip40 ) // eprom data bus read
@@ -228,7 +223,7 @@ READ8_MEMBER( digel804_state::ip43 )
 	logerror("Digel804: returning %02X for port 43 status read\n", port43_rtn);
 #endif
 	return ((m_overload_state<<0)
-		|(m_debug_x5_state<<1)
+		|((ioport("DEBUG")->read()&1)<<1)
 		|((m_key_intq&m_acia_intq)<<2)
 		|(m_remote_mode<<3)
 		|(m_key_mode<<4)
@@ -321,10 +316,10 @@ READ8_MEMBER( digel804_state::ip46 ) // keypad read
      * this value auto-latches on a key press and remains through multiple reads
      * this is done by a 74C923 integrated circuit
     */
-#ifdef PORT46_R_VERBOSE
-	logerror("Digel804: returning %02X for port 46 keypad read\n", m_kbd);
-#endif
 	UINT8 kbd = m_kb->data_out_r();
+#ifdef PORT46_R_VERBOSE
+	logerror("Digel804: returning %02X for port 46 keypad read\n", kbd);
+#endif
 
 	return BITSWAP8(kbd,7,6,5,4,1,0,3,2);	// verified from schematics
 }
@@ -527,6 +522,11 @@ static INPUT_PORTS_START( digel804 )
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("REM") PORT_CODE(KEYCODE_R)	PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_REM )
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SIM") PORT_CODE(KEYCODE_S)	PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_SIM )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("OFF") PORT_CODE(KEYCODE_O)	PORT_CHANGED_MEMBER( DEVICE_SELF, digel804_state, mode_change, MODE_OFF )
+
+	PORT_START("DEBUG")	// debug jumper on the board
+	PORT_DIPNAME( 0x01, 0x01, "Debug Mode" )
+	PORT_DIPSETTING( 0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /******************************************************************************
@@ -545,9 +545,8 @@ static GENERIC_TERMINAL_INTERFACE( digel804_terminal_intf )
 
 WRITE_LINE_MEMBER( digel804_state::da_w )
 {
-	//m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
-
+	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+	m_key_intq = state ? 0 : 1;
 }
 static MM74C923_INTERFACE( digel804_keypad_intf )
 {
@@ -567,7 +566,7 @@ static MACHINE_CONFIG_START( digel804, digel804_state )
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_4)
 	MCFG_CPU_IO_MAP(z80_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_MACHINE_RESET(digel804)
+
 	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)
 
 	/* video hardware */
@@ -593,7 +592,7 @@ static MACHINE_CONFIG_START( ep804, digel804_state )
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_2)
 	MCFG_CPU_IO_MAP(z80_io)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
-	MCFG_MACHINE_RESET(digel804)
+
 	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)
 
 	/* video hardware */
