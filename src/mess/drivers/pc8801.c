@@ -32,11 +32,10 @@
     - American Success: reads the light pen?
     - Balance of Power: uses the SIO port for something ...
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
-    - The Black Onyx: writes a katakana msg: "rino kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
+    - The Black Onyx: writes a katakana msg: "sono kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
     - Campaign Ban Daisenryaku 2: Hangs at title screen?
     - Can Can Bunny: bitmap artifacts on intro, caused by a fancy usage of the attribute vram;
     - Can Can Bunny: no sound (regression);
-    - Chitei Tanken: 200 B/W Mode, gfxs looks misplaced
     - Chou Bishoujo Densetsu CROQUIS: accesses ports 0xa0-0xa3 and 0xc2-0xc3
     - Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
     - Cranston Manor (actually N88-Basic demo): no sound
@@ -84,7 +83,7 @@
 	- Dennou Tsuushin
     - Door Door MK-2 (sets up TC in the middle of execution phase read then wants status bit 6 to be low PC=0x7050 of fdc cpu)
 	- Dragon Slayer - The Legend of Heroes 2
-	- (DraSle Login)
+	- Dungeon Buster
     - Harakiri
     - MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
     - Mr. Pro Yakyuu
@@ -235,6 +234,7 @@ typedef struct
 {
 	UINT8 cmd,param_count,cursor_on,status,irq_mask;
 	UINT8 param[8][5];
+	UINT8 inverse;
 } crtc_t;
 
 class pc8801_state : public driver_device
@@ -745,6 +745,7 @@ static void draw_text(running_machine &machine, bitmap_ind16 &bitmap,int y_size,
 				lower = (attr & 0x20) >> 5;
 				blink = (attr & 2) >> 1;
 				pal|=8; //text pal bank
+				reverse ^= state->m_crtc.inverse;
 
 				if(attr & 0x80)
 				{
@@ -1415,8 +1416,10 @@ WRITE8_MEMBER(pc8801_state::pc88_crtc_cmd_w)
 		case 1:  // start display
 			m_crtc.status |= 0x10;
 			m_crtc.status &= (~0x08);
-			if(data & 1)
-				printf("CRTC reverse display ON\n");
+			m_crtc.inverse = data & 1;
+
+			if(data & 1) /* Ink Pot uses it, but I want another test case before removing this log */
+				printf("CRTC inverse mode ON\n");
 			break;
 		case 2:  // set irq mask
 			m_crtc.irq_mask = data & 3;
