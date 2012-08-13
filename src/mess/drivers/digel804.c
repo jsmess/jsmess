@@ -52,9 +52,6 @@
 
 // port 47 write is tim0-tim7
 
-// collated serial data sent to vfd
-#undef VFD_VERBOSE
-
 
 /* Core includes */
 #include "emu.h"
@@ -64,6 +61,7 @@
 #include "machine/roc10937.h"
 #include "machine/6551acia.h"
 #include "machine/mm74c922.h"
+#include "machine/ram.h"
 #include "digel804.lh"
 
 
@@ -77,7 +75,8 @@ public:
 		  m_speaker(*this, "speaker"),
 		  m_acia(*this, "acia"),
 		  m_vfd(*this, "vfd"),
-		  m_kb(*this, "74c923")
+		  m_kb(*this, "74c923"),
+		  m_ram(*this, RAM_TAG)
 		//, m_main_ram(*this, "main_ram")
 		{ }
 
@@ -87,14 +86,18 @@ public:
 	required_device<acia6551_device> m_acia;
 	required_device<roc10937_t> m_vfd;
 	required_device<mm74c922_device> m_kb;
+	required_device<ram_device> m_ram;
 
 	virtual void machine_reset();
+	DECLARE_DRIVER_INIT(digel804);
+	DECLARE_WRITE8_MEMBER( op00 );
 	DECLARE_READ8_MEMBER( ip40 );
 	DECLARE_WRITE8_MEMBER( op40 );
 	DECLARE_WRITE8_MEMBER( op41 );
 	DECLARE_WRITE8_MEMBER( op42 );
 	DECLARE_READ8_MEMBER( ip43 );
 	DECLARE_WRITE8_MEMBER( op43 );
+	DECLARE_WRITE8_MEMBER( op43_1_4 );
 	DECLARE_WRITE8_MEMBER( op44 );
 	DECLARE_WRITE8_MEMBER( op45 );
 	DECLARE_READ8_MEMBER( ip46 );
@@ -111,9 +114,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( da_w );
 	DECLARE_INPUT_CHANGED_MEMBER(mode_change);
 	// vfd helper stuff for port 44, should be unnecessary after 10937 gets a proper device
-	UINT8 vfd_data;
-	UINT8 vfd_old;
-	UINT8 vfd_count;
+	UINT8 m_vfd_sclk;
 	// current speaker state for port 45
 	UINT8 m_speaker_state;
 	// ram stuff for banking
@@ -130,7 +131,6 @@ public:
 	UINT8 m_chipinsert_state;
 	UINT8 m_keyen_state;
 	UINT8 m_op41;
-	DECLARE_DRIVER_INIT(digel804);
 };
 
 
@@ -139,7 +139,6 @@ enum { MODE_OFF, MODE_KEY, MODE_REM, MODE_SIM };
 
 DRIVER_INIT_MEMBER(digel804_state,digel804)
 {
-	vfd_old = vfd_data = vfd_count = 0;
 	m_speaker_state = 0;
 	//port43_rtn = 0xEE;//0xB6;
 	m_acia_intq = 1; // /INT source 1
@@ -153,13 +152,14 @@ DRIVER_INIT_MEMBER(digel804_state,digel804)
 	m_ram_bank = 0;
 	m_op41 = 0;
 	m_keyen_state = 1; // /KEYEN
-	membank( "bankedram" )->set_base( memregion("user_ram")->base() + ( m_ram_bank * 0x10000 ));
+
+	membank( "bankedram" )->set_base(m_ram->pointer());
 }
 
 void digel804_state::machine_reset()
 {
 	m_vfd->reset();
-	vfd_old = vfd_data = vfd_count = 0;
+	m_vfd_sclk = 0;
 }
 
 READ8_MEMBER( digel804_state::ip40 ) // eprom data bus read
@@ -178,7 +178,7 @@ WRITE8_MEMBER( digel804_state::op41 ) // eprom address low write AND SIM write, 
 {
 	// TODO: would be nice to have a 'fake eprom' here
 	logerror("Digel804: port 41, eprom address low/sim/memorybank had %02X written to it!\n", data);
-	fprintf(stderr,"op41 write of %02X, ram mapper bit is %d\n", data, (data&0x40)?1:0);
+	//fprintf(stderr,"op41 write of %02X, ram mapper bit is %d\n", data, (data&0x40)?1:0);
 	m_op41 = data;
 }
 
@@ -216,9 +216,7 @@ READ8_MEMBER( digel804_state::ip43 )
      0xFE 11111110
 
     */
-	// HACK to dump display contents to stderr
-//  FIXME : not sure what to do here with the new device! 201207
-//  fprintf(stderr,"%s\n",ROC10937_get_string(0));
+
 #ifdef PORT43_R_VERBOSE
 	logerror("Digel804: returning %02X for port 43 status read\n", port43_rtn);
 #endif
@@ -231,6 +229,12 @@ READ8_MEMBER( digel804_state::ip43 )
 		|(m_powerfail_state<<6)
 		|(m_chipinsert_state<<7));
 
+}
+
+WRITE8_MEMBER( digel804_state::op00 )
+{
+	m_ram_bank = data;
+	membank( "bankedram" )->set_base(m_ram->pointer() + ((m_ram_bank * 0x8000) & m_ram->mask()));
 }
 
 WRITE8_MEMBER( digel804_state::op43 )
@@ -250,8 +254,13 @@ WRITE8_MEMBER( digel804_state::op43 )
 	m_ram_bank = data&7;
 	if ((data&0xF8)!=0)
 		logerror("Digel804: port 0x43 ram bank had unexpected data %02x written to it!\n", data);
-	membank( "bankedram" )->set_base( memregion("user_ram")->base() + ( m_ram_bank * 0x10000 ));
 
+	membank( "bankedram" )->set_base(m_ram->pointer() + ((m_ram_bank * 0x8000) & m_ram->mask()));
+}
+
+WRITE8_MEMBER( digel804_state::op43_1_4 )
+{
+	m_overload_state = 0; // writes to port 43 clear overload state
 }
 
 WRITE8_MEMBER( digel804_state::op44 ) // state write
@@ -275,23 +284,11 @@ WRITE8_MEMBER( digel804_state::op44 ) // state write
 	logerror("Digel804: port 0x44 vfd/state control had %02x written to it!\n", data);
 #endif
 	// latch vfd data on falling edge of clock only; this should really be part of the 10937 device, not here!
-	if ((vfd_old&1) && ((data&1)==0))
+	if (m_vfd_sclk && ((data&1)==0))
 	{
 		m_vfd->shift_data((data & 0x80) ? 0 : 1);
-
-		vfd_data <<= 1;
-		vfd_data |= (data&0x80)?1:0;
-		vfd_count++;
-		if (vfd_count == 8)
-		{
-#ifdef VFD_VERBOSE
-			logerror("Digel804: Full byte written to port 44 vfd: %02X '%c'\n", vfd_data, vfd_data);
-#endif
-			vfd_data = 0;
-			vfd_count = 0;
-		}
 	}
-	vfd_old = data;
+	m_vfd_sclk = data & 1;
 }
 
 WRITE8_MEMBER( digel804_state::op45 ) // speaker write
@@ -337,7 +334,7 @@ WRITE8_MEMBER( digel804_state::op46 )
 #ifdef PORT46_W_VERBOSE
 	 logerror("Digel804: port 0x46 LED control had %02x written to it!\n", data);
 #endif
-	 popmessage("LEDS: %s %s %s Func: %s%d\n", (data&0x80)?"INPUT":"-----", (data&0x40)?"BUSY":"----", (data&0x20)?"ERROR":"-----", (data&0x10)?"None":"", (data&0x10)?-1:(~data&0xF));
+	 //popmessage("LEDS: %s %s %s Func: %s%d\n", (data&0x80)?"INPUT":"-----", (data&0x40)?"BUSY":"----", (data&0x20)?"ERROR":"-----", (data&0x10)?"None":"", (data&0x10)?-1:(~data&0xF));
 	 //fprintf("LEDS: %s %s %s Func: %s%d\n", (data&0x80)?"INPUT":"-----", (data&0x40)?"BUSY":"----", (data&0x20)?"ERROR":"-----", (data&0x10)?"None":"", (data&0x10)?-1:(~data&0xF));
 
 	output_set_value("input_led", BIT(data,7));
@@ -457,7 +454,35 @@ static ADDRESS_MAP_START(z80_mem_804_1_2, AS_PROGRAM, 8, digel804_state)
 	// d800-ffff is open bus in mapper, 7f
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(z80_io, AS_IO, 8, digel804_state)
+static ADDRESS_MAP_START(z80_io_1_4, AS_IO, 8, digel804_state)
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	// io bits: x 1 x x x * * *
+	// writes to 47, 4e, 57, 5e, 67, 6e, 77, 7e, c7, ce, d7, de, e7, ee, f7, fe all go to 47, same with reads
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xB8) AM_WRITE(op00) // W, banked ram
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0xB8) AM_READWRITE(ip40, op40) // RW, eprom socket data bus input/output value
+	AM_RANGE(0x41, 0x41) AM_MIRROR(0xB8) AM_WRITE(op41) // W, eprom socket address low out
+	AM_RANGE(0x42, 0x42) AM_MIRROR(0xB8) AM_WRITE(op42) // W, eprom socket address hi/control out
+	AM_RANGE(0x43, 0x43) AM_MIRROR(0xB8) AM_READWRITE(ip43, op43_1_4) // RW, mode and status register, also checks if keypad is pressed; write is unknown
+	AM_RANGE(0x44, 0x44) AM_MIRROR(0xB8) AM_WRITE(op44) // W, 10937 vfd controller, z80 power and state control reg
+	AM_RANGE(0x45, 0x45) AM_MIRROR(0xB8) AM_WRITE(op45) // W, speaker bit; every write inverts state
+	AM_RANGE(0x46, 0x46) AM_MIRROR(0xB8) AM_READWRITE(ip46, op46) // RW, reads keypad, writes controls the front panel leds.
+	AM_RANGE(0x47, 0x47) AM_MIRROR(0xB8) AM_WRITE(op47) // W eprom socket power and timing control
+	// io bits: 1 0 x x x * * *
+	// writes to 80, 88, 90, 98, a0, a8, b0, b8 all go to 80, same with reads
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x38) AM_WRITE(acia_txd_w) // (ACIA xmit reg)
+	AM_RANGE(0x81, 0x81) AM_MIRROR(0x38) AM_READ(acia_rxd_r) // (ACIA rcv reg)
+	AM_RANGE(0x82, 0x82) AM_MIRROR(0x38) AM_WRITE(acia_reset_w) // (ACIA reset reg)
+	AM_RANGE(0x83, 0x83) AM_MIRROR(0x38) AM_READ(acia_status_r) // (ACIA status reg)
+	AM_RANGE(0x84, 0x84) AM_MIRROR(0x38) AM_WRITE(acia_command_w) // (ACIA command reg)
+	AM_RANGE(0x85, 0x85) AM_MIRROR(0x38) AM_READ(acia_command_r) // (ACIA command reg)
+	AM_RANGE(0x86, 0x86) AM_MIRROR(0x38) AM_WRITE(acia_control_w) // (ACIA control reg)
+	AM_RANGE(0x87, 0x87) AM_MIRROR(0x38) AM_READ(acia_control_r) // (ACIA control reg)
+	//AM_RANGE(0x80,0x87) AM_MIRROR(0x38) AM_SHIFT(-1) AM_DEVREADWRITE("acia", acia6551_device, read, write) // this doesn't work since we lack an AM_SHIFT command
+
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(z80_io_1_2, AS_IO, 8, digel804_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// io bits: x 1 x x x * * *
@@ -564,7 +589,7 @@ static MACHINE_CONFIG_START( digel804, digel804_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_6864MHz/2) /* Z80A, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_4)
-	MCFG_CPU_IO_MAP(z80_io)
+	MCFG_CPU_IO_MAP(z80_io_1_4)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
 	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)
@@ -578,6 +603,10 @@ static MACHINE_CONFIG_START( digel804, digel804_state )
 
 	/* acia */
 	MCFG_ACIA6551_ADD("acia")
+
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("256K")
+	MCFG_RAM_EXTRA_OPTIONS("32K,64K,128K")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -585,30 +614,15 @@ static MACHINE_CONFIG_START( digel804, digel804_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-/* TODO: make this copy the digel804 machine config and modify the program map! */
-static MACHINE_CONFIG_START( ep804, digel804_state )
+static MACHINE_CONFIG_DERIVED( ep804, digel804 )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_6864MHz/2) /* Z80, X1(aka E0 on schematics): 3.6864Mhz */
+	MCFG_CPU_MODIFY("maincpu")	/* Z80, X1(aka E0 on schematics): 3.6864Mhz */
 	MCFG_CPU_PROGRAM_MAP(z80_mem_804_1_2)
-	MCFG_CPU_IO_MAP(z80_io)
-	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+	MCFG_CPU_IO_MAP(z80_io_1_2)
 
-	MCFG_ROC10937_ADD("vfd",0,RIGHT_TO_LEFT)
-
-	/* video hardware */
-	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, digel804_terminal_intf)
-
-	MCFG_DEFAULT_LAYOUT(layout_digel804)
-
-	MCFG_MM74C923_ADD("74c923", digel804_keypad_intf)
-
-	/* acia */
-	MCFG_ACIA6551_ADD("acia")
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_RAM_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("32K")
+	MCFG_RAM_EXTRA_OPTIONS("64K")
 MACHINE_CONFIG_END
 
 
@@ -660,7 +674,6 @@ If the ram expansion is not installed (i.e. only 32k of base ram on the mainboar
 */
 
 ROM_START(digel804) // address mapper 804-1-4
-	ROM_REGION(0x80000, "user_ram", ROMREGION_ERASEFF)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("1-04__76f1.27128.d41", 0x0000, 0x4000, CRC(61b50b61) SHA1(ad717fcbf3387b0a8fb0546025d3c527792eb3f0))
 	// the second rom here is loaded bizarrely: the first 3/4 appears at e000-f7ff and the last 1/4 appears at d800-dfff
@@ -671,7 +684,6 @@ ROM_START(digel804) // address mapper 804-1-4
 ROM_END
 
 ROM_START(ep804) // address mapper 804-1-2
-	ROM_REGION(0x80000, "user_ram", ROMREGION_ERASEFF)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_DEFAULT_BIOS("ep804_v1.6")
 	ROM_SYSTEM_BIOS( 0, "ep804_v1.6", "Wavetek/Digelec EP804 FWv1.6") // hardware 1.1
