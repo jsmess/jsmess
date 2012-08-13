@@ -452,12 +452,19 @@ READ8_MEMBER( plus4_state::cpu_r )
 	
 	*/
 
-	UINT8 data = 0x2f;
+	UINT8 data = 0xff;
+	UINT8 c16_port7501 = m6510_get_port(m_maincpu);
 
-	data |= (m_cassette->input() > +0.0) << 4;
+	if (BIT(c16_port7501, 0) || !m_iec->data_r() || ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED))
+		data &= ~0x80;
 
-	data |= m_iec->clk_r() << 6;
-	data |= (m_iec->data_r() || ((m_cassette->get_state() & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED)) << 7;
+	if (BIT(c16_port7501, 1) || !m_iec->clk_r())
+		data &= ~0x40;
+
+	if (m_cassette->input() > +0.0)
+		data |=  0x10;
+	else
+		data &= ~0x10;
 
 	return data;
 }
@@ -479,12 +486,19 @@ READ8_MEMBER( plus4_state::c16_cpu_r )
 	
 	*/
 
-	UINT8 data = 0x2f;
+	UINT8 data = 0xff;
+	UINT8 c16_port7501 = m6510_get_port(m_maincpu);
 
-	data |= (m_cassette->input() > +0.0) << 4;
+	if (BIT(c16_port7501, 0) || !m_iec->data_r())
+		data &= ~0x80;
 
-	data |= m_iec->clk_r() << 6;
-	data |= m_iec->data_r() << 7;
+	if (BIT(c16_port7501, 1) || !m_iec->clk_r())
+		data &= ~0x40;
+
+	if (m_cassette->input() > +0.0)
+		data |=  0x10;
+	else
+		data &= ~0x10;
 
 	return data;
 }
@@ -960,6 +974,9 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_DERIVED( c16, pal )
+	MCFG_CPU_MODIFY(MOS7501_TAG)
+	MCFG_CPU_CONFIG(c16_cpu_intf)
+
 	MCFG_DEVICE_REMOVE(MOS6551_TAG)
 	MCFG_DEVICE_REMOVE(MOS6529_USER_TAG)
 	MCFG_DEVICE_REMOVE(PLUS4_USER_PORT_TAG)

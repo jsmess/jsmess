@@ -52,7 +52,7 @@ public:
 		  m_exp_irq(CLEAR_LINE)
 	{ }
 
-	required_device<cpu_device> m_maincpu;
+	required_device<legacy_cpu_device> m_maincpu;
 	required_device<pls100_device> m_pla;
 	required_device<mos7360_device> m_ted;
 	optional_device<acia6551_device> m_acia;
