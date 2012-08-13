@@ -17,7 +17,7 @@
     - waitstates;
     - dipswitches needs to be controlled;
     - below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks the floppy ports. Wrong info?
-    - PC-8801MC disk shows that bitmap and text colors mixes with additive blending (basically if the tv charset has white then the bitmap draws
+    - Basic Nihongo disks shows that bitmap and text colors mixes with additive blending (basically if the tv charset has white then the bitmap draws
       with inverted color output).
 	- clean-ups, banking and video in particular (i.e. hook-ups with memory region should go away and device models should be used instead)
 	- OPNA needs dumping of YM2608 deltat ROM
@@ -44,10 +44,11 @@
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Grobda: palette is ugly (parent pc8801 only);
 	- Music Collection Vol. 2 - Final Fantasy Tokushuu: sound irq dies pretty soon
+	- N88 Basic Nihongo (app): background is currently purple for whatever reason;
     - Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
     - Xevious: game is too fast (parent pc8801 only)
 
-    list of games that crashes due of floppy issues:
+    list of games/apps that crashes due of floppy issues:
     - Agni no Ishi
     - Amazoness no Hihou (takes invalid data from floppy)
     - American Truck / American Truck SR (polls read deleted data command)
@@ -86,13 +87,19 @@
     - Door Door MK-2 (sets up TC in the middle of execution phase read then wants status bit 6 to be low PC=0x7050 of fdc cpu)
 	- Dragon Slayer - The Legend of Heroes 2
 	- Dungeon Buster
+	- El Dorado Denki
+	- Elevator Action
+	(Elthlead)
     - Harakiri
     - Kaseijin (app) (code snippet is empty at some point)
     - MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
     - Mr. Pro Yakyuu
+    - PC-8034 (app)
+    - PC-8037SR (app)
     - P1 (app)
     - Pattern Editor 88 (app)
-    - Super Shunbo II (Load error)
+    - Super Shunbo II (app) (Load error)
+    - Super TII (app)
     - The Return of Ishtar
     - Tobira wo Akete (random crashes in parent pc8801 only)
 
@@ -572,7 +579,7 @@ static UINT8 calc_cursor_pos(running_machine &machine,int x,int y,int yi)
 
 
 
-static UINT8 extract_text_attribute(running_machine &machine,UINT32 address,int x, UINT8 width)
+static UINT8 extract_text_attribute(running_machine &machine,UINT32 address,int x, UINT8 width, UINT8 &non_special)
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	UINT8 *vram = state->memregion("wram")->base();
@@ -580,6 +587,7 @@ static UINT8 extract_text_attribute(running_machine &machine,UINT32 address,int 
 	int fifo_size;
 	int offset;
 
+	non_special = 0;
 	if(state->m_crtc.param[0][4] & 0x80)
 	{
 		popmessage("Using non-separate mode for text tilemap, contact MESSdev");
@@ -590,8 +598,8 @@ static UINT8 extract_text_attribute(running_machine &machine,UINT32 address,int 
 
 	if(fifo_size == 0)
 	{
-		popmessage("Using non-special mode for text tilemap, contact MESSdev");
-		return 0xe8;
+		non_special = 1;
+		return (text_color_flag) ? 0xe8 : 0;
 	}
 
 	/* TODO: correct or hack-ish? Certainly having 0 as a attribute X is weird in any case. */
@@ -610,7 +618,7 @@ static UINT8 extract_text_attribute(running_machine &machine,UINT32 address,int 
 	return vram[address-3+offset];
 }
 
-static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int height,int width)
+static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int height,int width, UINT8 non_special)
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int xi,yi;
@@ -618,9 +626,11 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 	UINT8 *gfx_rom = machine.root_device().memregion("gfx1")->base();
 	UINT8 is_cursor;
 	UINT8 y_height, y_double;
+	UINT8 y_step;
 
 	y_height = lines_per_char;
 	y_double = (lines_per_char & 0x10) >> 4; // TODO: find correct condition
+	y_step = (non_special) ? 80 : 120; // Elthlead uses this
 
 	for(yi=0;yi<y_height;yi++)
 	{
@@ -633,7 +643,7 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 			int color;
 
 			{
-				tile = vram[x+(y*120)+state->m_dma_address[2]];
+				tile = vram[x+(y*y_step)+state->m_dma_address[2]];
 
 				res_x = x*8+xi*(width+1);
 				res_y = y*y_height*(height+1)+yi*(height+1);
@@ -720,6 +730,7 @@ static void draw_text(running_machine &machine, bitmap_ind16 &bitmap,int y_size,
 	UINT8 lower;
 	UINT8 blink;
 	int pal;
+	UINT8 non_special;
 
 	for(y=0;y<y_size;y++)
 	{
@@ -728,7 +739,7 @@ static void draw_text(running_machine &machine, bitmap_ind16 &bitmap,int y_size,
 			if(x & 1 && !width)
 				continue;
 
-			attr = extract_text_attribute(machine,(((y*120)+80+state->m_dma_address[2]) & 0xffff),(x),width);
+			attr = extract_text_attribute(machine,(((y*120)+80+state->m_dma_address[2]) & 0xffff),(x),width,non_special);
 
 			if(text_color_flag && (attr & 8)) // color mode
 			{
@@ -754,12 +765,11 @@ static void draw_text(running_machine &machine, bitmap_ind16 &bitmap,int y_size,
 				reverse ^= state->m_crtc.inverse;
 
 				if(attr & 0x80)
-				{
 					popmessage("Warning: mono gfx mode enabled, contact MESSdev");
-				}
+
 			}
 
-			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,blink,upper,lower,y_size,monitor_24KHz,!width);
+			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,blink,upper,lower,y_size,monitor_24KHz,!width,non_special);
 		}
 	}
 }
@@ -1185,7 +1195,7 @@ static void pc8801_dynamic_res_change(running_machine &machine)
 	xsize = screen_width + hretrace;
 	ysize = screen_height * lines_per_char + vretrace * lines_per_char;
 
-	popmessage("H %d V %d (%d x %d) HR %d VR %d (%d %d)\n",xvis,yvis,screen_height,lines_per_char,hretrace,vretrace, xsize,ysize);
+//	popmessage("H %d V %d (%d x %d) HR %d VR %d (%d %d)\n",xvis,yvis,screen_height,lines_per_char,hretrace,vretrace, xsize,ysize);
 
 	visarea.set(0, xvis - 1, 0, yvis - 1);
 	if(ysize >= 400) /* TODO: correct bit for this (m_gfx_ctrl & 1?) */
