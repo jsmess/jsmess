@@ -97,6 +97,7 @@ struct c64h156_interface
 // ======================> c64h156_device
 
 class c64h156_device :  public device_t,
+						public device_execute_interface,
 						public c64h156_interface
 {
 public:
@@ -124,15 +125,17 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-    virtual void device_config_complete();
+
+    // device_execute_interface overrides
+	virtual void execute_run();
+
+    int m_icount;
 
 	inline void set_atn_line();
-	inline void set_sync_line();
-	inline void set_byte_line();
 	inline void read_current_track();
-	inline void receive_bit();
 
 private:
 	devcb_resolved_write_line	m_out_atn_func;
@@ -152,20 +155,33 @@ private:
 	offs_t m_buffer_pos;					// current byte position within track buffer
 	int m_bit_pos;							// current bit position within track buffer byte
 	int m_bit_count;						// current data byte bit counter
-	UINT16 m_data;							// data shift register
-	UINT8 m_yb;								// GCR data byte
+	UINT8 m_speed;
 
 	// signals
 	int m_accl;								// 1/2 MHz select
 	int m_ds;								// density select
 	int m_soe;								// s? output enable
-	int m_byte;								// byte ready
 	int m_oe;								// output enable (0 = write, 1 = read)
-	int m_sync;								// sync character found
 
 	// IEC
 	int m_atni;								// attention input
 	int m_atna;								// attention acknowledge
+
+	// logic
+	UINT16 m_shift;
+	int m_last_bit_sync;
+	int m_bit_sync;
+	int m_byte_sync;
+	int m_block_sync;
+	int m_ue7;
+	int m_ue7_tc;
+	int m_uf4;
+	int m_uf4_qb;
+	UINT8 m_ud2;
+	int m_u4a;
+	int m_u4b;
+	int m_ue3;
+	int m_uc1b;
 
 	// timers
 	emu_timer *m_bit_timer;
