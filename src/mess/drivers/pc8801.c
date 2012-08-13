@@ -34,6 +34,7 @@
     - Bishoujo Baseball Gakuen: checks ym2608 after intro screen;
     - The Black Onyx: writes a katakana msg: "sono kata ha koko ni orimasen" then doesn't show up anything. (Needs user disk?)
     - Campaign Ban Daisenryaku 2: Hangs at title screen?
+    - Carigraph: inputs doesn't work?
     - Can Can Bunny: bitmap artifacts on intro, caused by a fancy usage of the attribute vram;
     - Can Can Bunny: no sound (regression);
     - Chou Bishoujo Densetsu CROQUIS: accesses ports 0xa0-0xa3 and 0xc2-0xc3
@@ -78,6 +79,7 @@
     - Cuby Panic (copy protection routine at 0x911A)
     - Daidasso (prints "BOOT dekimasen" on screen, can't boot)
     - Daikoukai Jidai
+	- Databox (app)
 	- Day Dream (hangs at the CrossMedia Soft logo)
 	- Demons Ring
 	- Dennou Tsuushin
@@ -85,8 +87,12 @@
 	- Dragon Slayer - The Legend of Heroes 2
 	- Dungeon Buster
     - Harakiri
+    - Kaseijin (app) (code snippet is empty at some point)
     - MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
     - Mr. Pro Yakyuu
+    - P1 (app)
+    - Pattern Editor 88 (app)
+    - Super Shunbo II (Load error)
     - The Return of Ishtar
     - Tobira wo Akete (random crashes in parent pc8801 only)
 
@@ -1114,7 +1120,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_ctrl_w)
     ---- ---x printer strobe
     */
 
-	m_rtc->stb_w(~((data & 2) >> 1));
+	m_rtc->stb_w((data & 2) >> 1);
 	m_rtc->clk_w((data & 4) >> 2);
 
 	if(((m_device_ctrl_data & 0x20) == 0x00) && ((data & 0x20) == 0x20))
@@ -1179,7 +1185,7 @@ static void pc8801_dynamic_res_change(running_machine &machine)
 	xsize = screen_width + hretrace;
 	ysize = screen_height * lines_per_char + vretrace * lines_per_char;
 
-//	popmessage("H %d V %d (%d x %d) HR %d VR %d (%d %d)\n",xvis,yvis,screen_height,lines_per_char,hretrace,vretrace, xsize,ysize);
+	popmessage("H %d V %d (%d x %d) HR %d VR %d (%d %d)\n",xvis,yvis,screen_height,lines_per_char,hretrace,vretrace, xsize,ysize);
 
 	visarea.set(0, xvis - 1, 0, yvis - 1);
 	if(ysize >= 400) /* TODO: correct bit for this (m_gfx_ctrl & 1?) */
