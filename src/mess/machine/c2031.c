@@ -8,6 +8,7 @@
 **********************************************************************/
 
 
+#include "c1541.h"
 #include "c2031.h"
 
 
@@ -35,18 +36,6 @@ enum
 //**************************************************************************
 
 const device_type C2031 = &device_creator<c2031_device>;
-
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void c2031_device::device_config_complete()
-{
-	m_shortname = "c2031";
-}
 
 
 //-------------------------------------------------
@@ -90,9 +79,8 @@ WRITE_LINE_MEMBER( c2031_device::via0_irq_w )
 {
 	m_via0_irq = state;
 
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq | m_via1_irq) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
-
 
 READ8_MEMBER( c2031_device::via0_pa_r )
 {
@@ -114,7 +102,6 @@ READ8_MEMBER( c2031_device::via0_pa_r )
 	return m_bus->dio_r();
 }
 
-
 WRITE8_MEMBER( c2031_device::via0_pa_w )
 {
 	/*
@@ -134,7 +121,6 @@ WRITE8_MEMBER( c2031_device::via0_pa_w )
 
 	m_bus->dio_w(this, data);
 }
-
 
 READ8_MEMBER( c2031_device::via0_pb_r )
 {
@@ -172,7 +158,6 @@ READ8_MEMBER( c2031_device::via0_pb_r )
 
 	return data;
 }
-
 
 WRITE8_MEMBER( c2031_device::via0_pb_w )
 {
@@ -221,18 +206,15 @@ WRITE8_MEMBER( c2031_device::via0_pb_w )
 	m_via0->write_ca2(get_device_number());
 }
 
-
 READ_LINE_MEMBER( c2031_device::via0_ca1_r )
 {
 	return !m_bus->atn_r();
 }
 
-
 READ_LINE_MEMBER( c2031_device::via0_ca2_r )
 {
 	return get_device_number();
 }
-
 
 static const via6522_interface via0_intf =
 {
@@ -262,9 +244,8 @@ WRITE_LINE_MEMBER( c2031_device::via1_irq_w )
 {
 	m_via1_irq = state;
 
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq | m_via1_irq) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
-
 
 READ8_MEMBER( c2031_device::via1_pb_r )
 {
@@ -293,7 +274,6 @@ READ8_MEMBER( c2031_device::via1_pb_r )
 
 	return data;
 }
-
 
 WRITE8_MEMBER( c2031_device::via1_pb_w )
 {
@@ -325,7 +305,6 @@ WRITE8_MEMBER( c2031_device::via1_pb_w )
 	m_ga->ds_w((data >> 5) & 0x03);
 }
 
-
 static const via6522_interface via1_intf =
 {
 	DEVCB_DEVICE_MEMBER(C64H156_TAG, c64h156_device, yb_r),
@@ -353,44 +332,15 @@ static const via6522_interface via1_intf =
 WRITE_LINE_MEMBER( c2031_device::byte_w )
 {
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, state);
+	
 	m_via1->write_ca1(state);
 }
-
 
 static C64H156_INTERFACE( ga_intf )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, c2031_device, byte_w)
-};
-
-
-
-//-------------------------------------------------
-//  LEGACY_FLOPPY_OPTIONS( c2031 )
-//-------------------------------------------------
-
-static LEGACY_FLOPPY_OPTIONS_START( c2031 )
-	LEGACY_FLOPPY_OPTION( c2031, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
-	LEGACY_FLOPPY_OPTION( c2031, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
-LEGACY_FLOPPY_OPTIONS_END
-
-
-//-------------------------------------------------
-//  floppy_interface c2031_floppy_interface
-//-------------------------------------------------
-
-static const floppy_interface c2031_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(c2031),
-	"floppy_5_25",
-	NULL
 };
 
 
@@ -401,11 +351,12 @@ static const floppy_interface c2031_floppy_interface =
 static MACHINE_CONFIG_FRAGMENT( c2031 )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c2031_mem)
+	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
 	MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, via0_intf)
 	MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, via1_intf)
 
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c2031_floppy_interface)
+	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_interface)
 	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
 MACHINE_CONFIG_END
 
@@ -436,7 +387,7 @@ inline int c2031_device::get_device_number()
 
 	switch (m_address)
 	{
-	case 8: state = (m_atna & m_nrfd_out);	break;
+	case 8: state = (m_atna && m_nrfd_out);	break;
 	case 9: state = m_nrfd_out;				break;
 	case 10: state = m_atna;				break;
 	case 11: state = 1;						break;

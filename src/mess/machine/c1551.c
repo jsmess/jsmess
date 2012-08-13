@@ -16,6 +16,7 @@
 
 */
 
+#include "c1541.h"
 #include "c1551.h"
 
 
@@ -363,34 +364,6 @@ ADDRESS_MAP_END
 
 
 //-------------------------------------------------
-//  LEGACY_FLOPPY_OPTIONS( c1551 )
-//-------------------------------------------------
-
-static LEGACY_FLOPPY_OPTIONS_START( c1551 )
-	LEGACY_FLOPPY_OPTION( c1551, "g64", "Commodore 1551 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
-	LEGACY_FLOPPY_OPTION( c1551, "d64", "Commodore 1551 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
-LEGACY_FLOPPY_OPTIONS_END
-
-
-//-------------------------------------------------
-//  floppy_interface c1551_floppy_interface
-//-------------------------------------------------
-
-static const floppy_interface c1551_floppy_interface =
-{
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_SSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(c1551),
-	"floppy_5_25",
-	NULL
-};
-
-
-//-------------------------------------------------
 //  C64H156_INTERFACE( ga_intf )
 //-------------------------------------------------
 
@@ -410,12 +383,13 @@ static MACHINE_CONFIG_FRAGMENT( c1551 )
 	MCFG_CPU_ADD(M6510T_TAG, M6510T, XTAL_16MHz/8)
 	MCFG_CPU_PROGRAM_MAP(c1551_mem)
 	MCFG_CPU_CONFIG(m6510t_intf)
+	MCFG_QUANTUM_PERFECT_CPU(M6510T_TAG)
 
 	MCFG_PLS100_ADD(PLA_TAG)
 	MCFG_TPI6525_ADD(M6523_0_TAG, tpi0_intf)
 	MCFG_TPI6525_ADD(M6523_1_TAG, tpi1_intf)
 
-	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1551_floppy_interface)
+	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, c1541_floppy_interface)
 	MCFG_64H156_ADD(C64H156_TAG, XTAL_16MHz, ga_intf)
 MACHINE_CONFIG_END
 

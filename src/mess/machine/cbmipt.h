@@ -70,6 +70,7 @@
 #include "machine/cmdhd.h"
 #include "machine/fd2000.h"
 #include "machine/interpod.h"
+#include "machine/plus4_sid.h"
 #include "machine/plus4_std.h"
 #include "machine/serialbox.h"
 #include "machine/softbox.h"

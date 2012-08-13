@@ -65,13 +65,13 @@ void base_c1581_device::device_config_complete()
 ROM_START( c1581 )
 	ROM_REGION( 0x8000, M6502_TAG, 0 )
     ROM_DEFAULT_BIOS("r2")
-    ROM_SYSTEM_BIOS(0, "beta", "Beta" )
+    ROM_SYSTEM_BIOS( 0, "beta", "Beta" )
 	ROMX_LOAD( "beta.u2",	       0x0000, 0x8000, CRC(ecc223cd) SHA1(a331d0d46ead1f0275b4ca594f87c6694d9d9594), ROM_BIOS(1) )
-    ROM_SYSTEM_BIOS(1, "r1", "Revision 1" )
+    ROM_SYSTEM_BIOS( 1, "r1", "Revision 1" )
 	ROMX_LOAD( "318045-01.u2",	   0x0000, 0x8000, CRC(113af078) SHA1(3fc088349ab83e8f5948b7670c866a3c954e6164), ROM_BIOS(2) )
-    ROM_SYSTEM_BIOS(2, "r2", "Revision 2" )
+    ROM_SYSTEM_BIOS( 2, "r2", "Revision 2" )
 	ROMX_LOAD( "318045-02.u2",	   0x0000, 0x8000, CRC(a9011b84) SHA1(01228eae6f066bd9b7b2b6a7fa3f667e41dad393), ROM_BIOS(3) )
-	ROM_SYSTEM_BIOS(3, "jiffydos", "JiffyDOS v6.01" )
+	ROM_SYSTEM_BIOS( 3, "jiffydos", "JiffyDOS v6.01" )
 	ROMX_LOAD( "jiffydos 1581.u2", 0x0000, 0x8000, CRC(98873d0f) SHA1(65bbf2be7bcd5bdcbff609d6c66471ffb9d04bfe), ROM_BIOS(4) )
 ROM_END
 
@@ -128,7 +128,6 @@ WRITE_LINE_MEMBER( base_c1581_device::cnt_w )
 	set_iec_srq();
 }
 
-
 WRITE_LINE_MEMBER( base_c1581_device::sp_w )
 {
 	// fast serial data out
@@ -136,7 +135,6 @@ WRITE_LINE_MEMBER( base_c1581_device::sp_w )
 
 	set_iec_data();
 }
-
 
 READ8_MEMBER( base_c1581_device::cia_pa_r )
 {
@@ -169,7 +167,6 @@ READ8_MEMBER( base_c1581_device::cia_pa_r )
 	return data;
 }
 
-
 WRITE8_MEMBER( base_c1581_device::cia_pa_w )
 {
 	/*
@@ -201,7 +198,6 @@ WRITE8_MEMBER( base_c1581_device::cia_pa_w )
 	// activity led
 	output_set_led_value(LED_ACT, BIT(data, 6));
 }
-
 
 READ8_MEMBER( base_c1581_device::cia_pb_r )
 {
@@ -237,7 +233,6 @@ READ8_MEMBER( base_c1581_device::cia_pb_r )
 	return data;
 }
 
-
 WRITE8_MEMBER( base_c1581_device::cia_pb_w )
 {
 	/*
@@ -270,7 +265,6 @@ WRITE8_MEMBER( base_c1581_device::cia_pb_w )
 	set_iec_data();
 	set_iec_srq();
 }
-
 
 static MOS8520_INTERFACE( cia_intf )
 {

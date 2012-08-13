@@ -65,15 +65,15 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete();
 
 	// device_cbm_iec_interface overrides
-	void cbm_iec_srq(int state);
-	void cbm_iec_atn(int state);
-	void cbm_iec_data(int state);
-	void cbm_iec_reset(int state);
+	virtual void cbm_iec_srq(int state);
+	virtual void cbm_iec_atn(int state);
+	virtual void cbm_iec_data(int state);
+	virtual void cbm_iec_reset(int state);
 
 	inline void set_iec_data();
 	inline void set_iec_srq();
@@ -81,7 +81,7 @@ protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<mos6526_device> m_cia;
 	required_device<device_t> m_fdc;
-	required_device<device_t> m_image;
+	required_device<legacy_floppy_image_device> m_image;
 
 	int m_data_out;				// serial data out
 	int m_atn_ack;				// attention acknowledge

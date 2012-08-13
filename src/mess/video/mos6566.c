@@ -25,6 +25,7 @@
     - 1:1 sync with CPU
     - remove RDY hack
     - VIC IIe
+    - http://hitmen.c02.at/temp/palstuff/
 
 */
 

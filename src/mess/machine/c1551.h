@@ -62,10 +62,10 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete() { m_shortname = "c1551"; }
     virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-    virtual void device_config_complete() { m_shortname = "c1551"; }
 
     // device_plus4_expansion_card_interface overrides
 	virtual UINT8 plus4_cd_r(address_space &space, offs_t offset, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
@@ -77,7 +77,7 @@ private:
 	required_device<device_t> m_tpi0;
 	required_device<device_t> m_tpi1;
 	required_device<c64h156_device> m_ga;
-	required_device<device_t> m_image;
+	required_device<legacy_floppy_image_device> m_image;
 
 	// TCBM bus
 	UINT8 m_tcbm_data;						// data

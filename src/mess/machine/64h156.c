@@ -27,7 +27,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define LOG 1
+#define LOG 0
 
 #define SYNC \
 	!(m_oe && m_sync)

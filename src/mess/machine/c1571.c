@@ -17,6 +17,7 @@
 
 */
 
+#include "c1541.h"
 #include "c1571.h"
 
 
@@ -98,11 +99,11 @@ ROM_END
 ROM_START( c1571 )
 	ROM_REGION( 0x8000, M6502_TAG, 0 )
     ROM_DEFAULT_BIOS("r5")
-    ROM_SYSTEM_BIOS(0, "r3", "Revision 3" )
+    ROM_SYSTEM_BIOS( 0, "r3", "Revision 3" )
 	ROMX_LOAD( "310654-03.u2", 0x0000, 0x8000, CRC(3889b8b8) SHA1(e649ef4419d65829d2afd65e07d31f3ce147d6eb), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "r5", "Revision 5" )
+	ROM_SYSTEM_BIOS( 1, "r5", "Revision 5" )
 	ROMX_LOAD( "310654-05.u2", 0x0000, 0x8000, CRC(5755bae3) SHA1(f1be619c106641a685f6609e4d43d6fc9eac1e70), ROM_BIOS(2) )
-	ROM_SYSTEM_BIOS(2, "jiffydos", "JiffyDOS v6.01" )
+	ROM_SYSTEM_BIOS( 2, "jiffydos", "JiffyDOS v6.01" )
 	ROMX_LOAD( "jiffydos 1571.u2", 0x0000, 0x8000, CRC(fe6cac6d) SHA1(d4b79b60cf1eaa399d0932200eb7811e00455249), ROM_BIOS(3) )
 ROM_END
 
@@ -114,9 +115,9 @@ ROM_END
 ROM_START( c1571cr )
 	ROM_REGION( 0x8000, M6502_TAG, 0 )
 	ROM_DEFAULT_BIOS("cbm")
-    ROM_SYSTEM_BIOS(0, "cbm", "Commodore" )
+    ROM_SYSTEM_BIOS( 0, "cbm", "Commodore" )
 	ROMX_LOAD( "318047-01.u102", 0x0000, 0x8000, CRC(f24efcc4) SHA1(14ee7a0fb7e1c59c51fbf781f944387037daa3ee), ROM_BIOS(1) )
-	ROM_SYSTEM_BIOS(1, "jiffydos", "JiffyDOS v6.01" )
+	ROM_SYSTEM_BIOS( 1, "jiffydos", "JiffyDOS v6.01" )
 	ROMX_LOAD( "jiffydos 1571d.u102", 0x0000, 0x8000, CRC(9cba146d) SHA1(823b178561302b403e6bfd8dd741d757efef3958), ROM_BIOS(2) )
 ROM_END
 
@@ -177,9 +178,8 @@ WRITE_LINE_MEMBER( base_c1571_device::via0_irq_w )
 {
 	m_via0_irq = state;
 
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq | m_via1_irq | m_cia_irq) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq || m_cia_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
-
 
 READ8_MEMBER( base_c1571_device::via0_pa_r )
 {
@@ -208,7 +208,6 @@ READ8_MEMBER( base_c1571_device::via0_pa_r )
 
 	return data;
 }
-
 
 WRITE8_MEMBER( base_c1571_device::via0_pa_w )
 {
@@ -267,7 +266,6 @@ WRITE8_MEMBER( base_c1571_device::via0_pa_w )
 	m_bus->atn_w(this, !BIT(data, 6));
 }
 
-
 READ8_MEMBER( base_c1571_device::via0_pb_r )
 {
 	/*
@@ -302,7 +300,6 @@ READ8_MEMBER( base_c1571_device::via0_pb_r )
 	return data;
 }
 
-
 WRITE8_MEMBER( base_c1571_device::via0_pb_w )
 {
 	/*
@@ -330,18 +327,15 @@ WRITE8_MEMBER( base_c1571_device::via0_pb_w )
 	m_bus->clk_w(this, !BIT(data, 3));
 }
 
-
 READ_LINE_MEMBER( base_c1571_device::atn_in_r )
 {
 	return !m_bus->atn_r();
 }
 
-
 READ_LINE_MEMBER( base_c1571_device::wprt_r )
 {
 	return !floppy_wpt_r(m_image);
 }
-
 
 static const via6522_interface via0_intf =
 {
@@ -371,9 +365,8 @@ WRITE_LINE_MEMBER( base_c1571_device::via1_irq_w )
 {
 	m_via1_irq = state;
 
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq | m_via1_irq | m_cia_irq) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq || m_cia_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
-
 
 READ8_MEMBER( base_c1571_device::via1_pb_r )
 {
@@ -433,7 +426,6 @@ WRITE8_MEMBER( base_c1571_device::via1_pb_w )
 	m_ga->ds_w((data >> 5) & 0x03);
 }
 
-
 static const via6522_interface via1_intf =
 {
 	DEVCB_DEVICE_MEMBER(C64H156_TAG, c64h156_device, yb_r),
@@ -462,9 +454,8 @@ WRITE_LINE_MEMBER( base_c1571_device::cia_irq_w )
 {
 	m_cia_irq = state;
 
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq | m_via1_irq | m_cia_irq) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq || m_cia_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
-
 
 WRITE_LINE_MEMBER( base_c1571_device::cia_pc_w )
 {
@@ -474,14 +465,12 @@ WRITE_LINE_MEMBER( base_c1571_device::cia_pc_w )
     }
 }
 
-
 WRITE_LINE_MEMBER( base_c1571_device::cia_cnt_w )
 {
 	// fast serial clock out
 	m_cnt_out = state;
 	set_iec_srq();
 }
-
 
 WRITE_LINE_MEMBER( base_c1571_device::cia_sp_w )
 {
@@ -490,12 +479,10 @@ WRITE_LINE_MEMBER( base_c1571_device::cia_sp_w )
 	set_iec_data();
 }
 
-
 READ8_MEMBER( base_c1571_device::cia_pb_r )
 {
 	return m_parallel_data;
 }
-
 
 WRITE8_MEMBER( base_c1571_device::cia_pb_w )
 {
@@ -504,7 +491,6 @@ WRITE8_MEMBER( base_c1571_device::cia_pb_w )
 		m_other->parallel_data_w(data);
 	}
 }
-
 
 static MOS6526_INTERFACE( cia_intf )
 {
@@ -529,13 +515,12 @@ WRITE_LINE_MEMBER( base_c1571_device::atn_w )
 	set_iec_data();
 }
 
-
 WRITE_LINE_MEMBER( base_c1571_device::byte_w )
 {
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, state);
+	
 	m_via1->write_ca1(state);
 }
-
 
 static C64H156_INTERFACE( ga_intf )
 {
@@ -578,7 +563,6 @@ WRITE_LINE_MEMBER( base_c1571_device::wpt_w )
 	m_via0->write_ca2(!state);
 }
 
-
 static const floppy_interface c1571_floppy_interface =
 {
 	DEVCB_NULL,
@@ -594,16 +578,6 @@ static const floppy_interface c1571_floppy_interface =
 
 
 //-------------------------------------------------
-//  LEGACY_FLOPPY_OPTIONS( c1570 )
-//-------------------------------------------------
-
-static LEGACY_FLOPPY_OPTIONS_START( c1570 )
-	LEGACY_FLOPPY_OPTION( c1570, "g64", "Commodore 1541 GCR Disk Image", g64_dsk_identify, g64_dsk_construct, NULL, NULL )
-	LEGACY_FLOPPY_OPTION( c1570, "d64", "Commodore 1541 Disk Image", d64_dsk_identify, d64_dsk_construct, NULL, NULL )
-LEGACY_FLOPPY_OPTIONS_END
-
-
-//-------------------------------------------------
 //  floppy_interface c1570_floppy_interface
 //-------------------------------------------------
 
@@ -615,7 +589,7 @@ static const floppy_interface c1570_floppy_interface =
 	DEVCB_DEVICE_LINE_MEMBER(DEVICE_SELF_OWNER, base_c1571_device, wpt_w),
 	DEVCB_NULL,
 	FLOPPY_STANDARD_5_25_SSDD,
-	LEGACY_FLOPPY_OPTIONS_NAME(c1570),
+	LEGACY_FLOPPY_OPTIONS_NAME(c1541),
 	"floppy_5_25",
 	NULL
 };
@@ -628,6 +602,7 @@ static const floppy_interface c1570_floppy_interface =
 static MACHINE_CONFIG_FRAGMENT( c1571 )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c1571_mem)
+	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
 	MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, via0_intf)
 	MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, via1_intf)
@@ -646,6 +621,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( c1570 )
 	MCFG_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MCFG_CPU_PROGRAM_MAP(c1571_mem)
+	MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
 	MCFG_VIA6522_ADD(M6522_0_TAG, XTAL_16MHz/16, via0_intf)
 	MCFG_VIA6522_ADD(M6522_1_TAG, XTAL_16MHz/16, via1_intf)
@@ -735,9 +711,9 @@ base_c1571_device::base_c1571_device(const machine_config &mconfig, device_type 
 	  m_ser_dir(0),
 	  m_sp_out(1),
 	  m_cnt_out(1),
-	  m_via0_irq(0),
-	  m_via1_irq(0),
-	  m_cia_irq(0),
+	  m_via0_irq(CLEAR_LINE),
+	  m_via1_irq(CLEAR_LINE),
+	  m_cia_irq(CLEAR_LINE),
 	  m_variant(variant)
 {
 }

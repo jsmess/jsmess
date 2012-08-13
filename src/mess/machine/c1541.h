@@ -37,16 +37,15 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> c1541_device
+// ======================> base_c1541_device
 
-class c1541_device :  public device_t,
-					  public device_cbm_iec_interface,
-					  public device_c64_floppy_parallel_interface
+class base_c1541_device :  public device_t,
+					  	   public device_cbm_iec_interface,
+					  	   public device_c64_floppy_parallel_interface
 {
 public:
     // construction/destruction
-	c1541_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
-    c1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	base_c1541_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant);
 
 	enum
 	{
@@ -55,7 +54,11 @@ public:
 		TYPE_1541C,
 		TYPE_1541II,
 		TYPE_SX1541,
-		TYPE_OC118
+		TYPE_FSD2,
+
+		// extended hardware
+		TYPE_1541_DOLPHIN_DOS,
+		TYPE_1541_PROFESSIONAL_DOS_V1
 	};
 
 	// not really public
@@ -80,17 +83,17 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
 	virtual void device_reset();
-    virtual void device_config_complete();
 
 	// device_cbm_iec_interface overrides
-	void cbm_iec_atn(int state);
-	void cbm_iec_reset(int state);
+	virtual void cbm_iec_atn(int state);
+	virtual void cbm_iec_reset(int state);
 
 	// device_c64_floppy_parallel_interface overrides
-	void parallel_data_w(UINT8 data);
-	void parallel_strobe_w(int state);
+	virtual void parallel_data_w(UINT8 data);
+	virtual void parallel_strobe_w(int state);
 
 	inline void set_iec_data();
 
@@ -98,7 +101,7 @@ protected:
 	required_device<via6522_device> m_via0;
 	required_device<via6522_device> m_via1;
 	required_device<c64h156_device> m_ga;
-	required_device<device_t> m_image;
+	required_device<legacy_floppy_image_device> m_image;
 
 	// IEC bus
 	int m_data_out;							// serial data out
@@ -113,7 +116,7 @@ protected:
 
 // ======================> c1540_device
 
-class c1540_device :  public c1541_device
+class c1540_device :  public base_c1541_device
 {
 public:
     // construction/destruction
@@ -121,13 +124,24 @@ public:
 };
 
 
+// ======================> c1541_device
+
+class c1541_device :  public base_c1541_device
+{
+public:
+    // construction/destruction
+    c1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
 // ======================> c1541c_device
 
-class c1541c_device :  public c1541_device
+class c1541c_device :  public base_c1541_device
 {
 public:
     // construction/destruction
     c1541c_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
 	// not really public
 	DECLARE_READ8_MEMBER( via0_pa_r );
 };
@@ -135,7 +149,7 @@ public:
 
 // ======================> c1541ii_device
 
-class c1541ii_device :  public c1541_device
+class c1541ii_device :  public base_c1541_device
 {
 public:
     // construction/destruction
@@ -145,7 +159,7 @@ public:
 
 // ======================> sx1541_device
 
-class sx1541_device :  public c1541_device
+class sx1541_device :  public base_c1541_device
 {
 public:
     // construction/destruction
@@ -153,13 +167,36 @@ public:
 };
 
 
-// ======================> oc118_device
+// ======================> fsd2_device
 
-class oc118_device :  public c1541_device
+class fsd2_device :  public base_c1541_device
 {
 public:
     // construction/destruction
-    oc118_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+    fsd2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+    // device-level overrides
+    virtual void device_start();
+};
+
+
+// ======================> c1541_dolphin_dos_device
+
+class c1541_dolphin_dos_device :  public base_c1541_device
+{
+public:
+    // construction/destruction
+    c1541_dolphin_dos_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+};
+
+
+// ======================> c1541_professional_dos_v1_device
+
+class c1541_professional_dos_v1_device :  public base_c1541_device
+{
+public:
+    // construction/destruction
+    c1541_professional_dos_v1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
 };
 
 
@@ -169,7 +206,14 @@ extern const device_type C1541;
 extern const device_type C1541C;
 extern const device_type C1541II;
 extern const device_type SX1541;
-extern const device_type OC118;
+extern const device_type FSD2;
+extern const device_type C1541_DOLPHIN_DOS;
+extern const device_type C1541_PROFESSIONAL_DOS_V1;
+
+
+// floppy interface
+LEGACY_FLOPPY_OPTIONS_EXTERN( c1541 );
+extern const floppy_interface c1541_floppy_interface;
 
 
 

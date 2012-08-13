@@ -80,14 +80,14 @@ public:
 
 protected:
     // device-level overrides
+    virtual void device_config_complete();
     virtual void device_start();
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
-    virtual void device_config_complete();
 
 	// device_ieee488_interface overrides
-	void ieee488_atn(int state);
-	void ieee488_ifc(int state);
+	virtual void ieee488_atn(int state);
+	virtual void ieee488_ifc(int state);
 
 	inline void update_ieee_signals();
 	inline void update_gcr_data();
@@ -103,8 +103,8 @@ protected:
 	required_device<riot6532_device> m_riot1;
 	required_device<device_t> m_miot;
 	required_device<via6522_device> m_via;
-	required_device<device_t> m_image0;
-	optional_device<device_t> m_image1;
+	required_device<legacy_floppy_image_device> m_image0;
+	optional_device<legacy_floppy_image_device> m_image1;
 
 	struct {
 		// motors
