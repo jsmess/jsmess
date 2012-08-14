@@ -497,5 +497,6 @@ void c2031_device::on_disk_change(device_image_interface &image)
 {
     c2031_device *c2031 = static_cast<c2031_device *>(image.device().owner());
 
-	c2031->m_ga->on_disk_changed();
+    int wp = floppy_wpt_r(image);
+	c2031->m_ga->on_disk_changed(wp);
 }

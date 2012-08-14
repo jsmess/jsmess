@@ -13,12 +13,6 @@
 
     - c1540 fails to load the directory intermittently
 
-    - get these running and we're golden
-        - Defender of the Crown (V-MAX! v2, density checks)
-        - Bounty Bob Strikes Back (Spiradisc-like, track alignment)
-        - Test Drive / Cabal (HLS, sub-cycle jitter)
-        - Galaxian (?, needs 100% accurate VIA)
-
     - hardware extensions
         - Dolphin-DOS 2.0
         - Dolphin-DOS 3.0
@@ -1031,5 +1025,6 @@ void base_c1541_device::on_disk_change(device_image_interface &image)
 {
     base_c1541_device *c1541 = static_cast<base_c1541_device *>(image.device().owner());
 
-	c1541->m_ga->on_disk_changed();
+    int wp = floppy_wpt_r(image);
+	c1541->m_ga->on_disk_changed(wp);
 }

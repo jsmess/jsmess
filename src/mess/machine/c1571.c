@@ -876,5 +876,6 @@ void base_c1571_device::on_disk_change(device_image_interface &image)
 {
     base_c1571_device *c1571 = static_cast<base_c1571_device *>(image.device().owner());
 
-	c1571->m_ga->on_disk_changed();
+    int wp = floppy_wpt_r(image);
+	c1571->m_ga->on_disk_changed(wp);
 }

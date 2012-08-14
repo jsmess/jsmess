@@ -63,6 +63,20 @@
 		</part>
 	</software>
 
+	<software name="bbsb">
+		<description>Bounty Bob Strikes Back! v1.2</description>
+		<year>1985</year>
+		<publisher>Big Five</publisher>
+		<info name="protection" value="halftrack" />
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="206864">
+				<rom name="bbsb.g64" size="206864" crc="612e0325" sha1="7a8be7b2f04a5fb63f23839c11a3801cff8e022c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="buddy64">
 		<description>Buddy System 64 v10</description>
 		<year>1992</year>
@@ -83,6 +97,28 @@
 		<part name="flop" interface="floppy_5_25">
 			<dataarea name="flop" size="333744">
 				<rom name="commando[elite_1985](pal).g64" size="333744" crc="e5679217" sha1="05be404ba9d6b1685935a44291420014f1c3959f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dotc" supported="no">
+		<description>Defender of the Crown</description>
+		<year>1987</year>
+		<publisher>Cinemaware</publisher>
+		<info name="protection" value="vmaxv2" />
+		<sharedfeat name="compatibility" value="NTSC,PAL"/>
+	
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Side A"/>
+			<dataarea name="flop" size="278234">
+				<rom name="DefenderOfTheCrown_s0.g64" size="278234" crc="131759d0" sha1="2c8695caee776b2082a01856d13a0eeb99f9859f" offset="0" />
+			</dataarea>
+		</part>
+	
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Side B"/>
+			<dataarea name="flop" size="323404">
+				<rom name="DefenderOfTheCrown_s1.g64" size="323404" crc="677e8b8b" sha1="fcf9b5db97a7cc48e3d8bf49ed07f29caabafb77" offset="0" />
 			</dataarea>
 		</part>
 	</software>

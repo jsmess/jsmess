@@ -93,7 +93,7 @@ READ8_MEMBER( c1551_device::port_r )
 	UINT8 data = 0;
 
 	// write protect sense
-	data |= (!floppy_wpt_r(m_image)) << 4;
+	data |= !floppy_wpt_r(m_image) << 4;
 
 	// byte latched
 	data |= m_ga->atn_r() << 7;
@@ -569,5 +569,6 @@ void c1551_device::on_disk_change(device_image_interface &image)
 {
     c1551_device *c1551 = static_cast<c1551_device *>(image.device().owner());
 
-	c1551->m_ga->on_disk_changed();
+    int wp = floppy_wpt_r(image);
+	c1551->m_ga->on_disk_changed(wp);
 }
