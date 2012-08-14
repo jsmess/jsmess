@@ -256,7 +256,7 @@ ROM_START( c1541 )
     ROM_SYSTEM_BIOS( 7, "speeddos", "SpeedDOS-Plus+" )
     ROMX_LOAD( "speed-dosplus.uab5", 0x0000, 0x4000, CRC(f9db1eac) SHA1(95407e59a9c1d26a0e4bcf2c244cfe8942576e2c), ROM_BIOS(8) )
     ROM_SYSTEM_BIOS( 8, "rolo27", "Rolo DOS v2.7" )
-    ROMX_LOAD( "rolo27.uab5", 0x0000, 0x2000, CRC(1fc4793f) SHA1(fa28a7e318712b32959b2d39a56da68406b8a69a), ROM_BIOS(9) )
+    ROMX_LOAD( "rolo27.uab5", 0x0000, 0x2000, CRC(171c7962) SHA1(04c892c4b3d7c74750576521fa081f07d8ca8557), ROM_BIOS(9) )
     ROM_SYSTEM_BIOS( 9, "tt34", "TurboTrans v3.4" )
     ROMX_LOAD( "ttd34.uab5", 0x0000, 0x8000, CRC(518d34a1) SHA1(4d6ffdce6ab122e9627b0a839861687bcd4e03ec), ROM_BIOS(10) )
 ROM_END
