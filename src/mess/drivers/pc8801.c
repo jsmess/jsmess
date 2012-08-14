@@ -17,8 +17,6 @@
     - dipswitches needs to be controlled;
     - below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks the floppy ports. Wrong info?
 	- clean-ups, banking and video in particular (i.e. hook-ups with memory region should go away and device models should be used instead)
-	- OPNA needs dumping of YM2608 deltat ROM
-	- YMF288 support;
 
     per-game specific TODO:
     - 100yen Soft 8 Revival Special: tight loop with vblank bit, but vblank irq takes too much time to execute its code;
@@ -92,7 +90,7 @@
 	- Explosion (fails to load ADPCM data?)
 	- F-15 Strike Eagle
 	- F2 Grand Prix ("Boot dekimasen")
-	(Fancy Promenade)
+	- Fangs - The Saga of Wolf Blood (Crashes at the first random battle)
 
     - Harakiri
     - Kaseijin (app) (code snippet is empty at some point)
@@ -324,6 +322,8 @@ public:
 	struct { UINT8 r, g, b; } m_palram[8];
 	UINT8 m_dmac_ff;
 	UINT32 m_knj_addr[2];
+	UINT32 m_extram_size;
+	UINT8 m_has_opna;
 
 	DECLARE_READ8_MEMBER(pc8801_alu_r);
 	DECLARE_WRITE8_MEMBER(pc8801_alu_w);
@@ -375,7 +375,6 @@ public:
 	DECLARE_WRITE8_MEMBER(pc8801_alu_ctrl1_w);
 	DECLARE_WRITE8_MEMBER(pc8801_alu_ctrl2_w);
 	DECLARE_WRITE8_MEMBER(pc8801_pcg8100_w);
-	DECLARE_READ8_MEMBER(sio_status_r);
 	DECLARE_WRITE8_MEMBER(pc8801_txt_cmt_ctrl_w);
 	DECLARE_READ8_MEMBER(pc8801_kanji_r);
 	DECLARE_WRITE8_MEMBER(pc8801_kanji_w);
@@ -401,6 +400,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pc8801_sound_board_w);
 	DECLARE_READ8_MEMBER(pc8801_opna_r);
 	DECLARE_WRITE8_MEMBER(pc8801_opna_w);
+	DECLARE_READ8_MEMBER(pc8801_unk_r);
+	DECLARE_WRITE8_MEMBER(pc8801_unk_w);
 
 	UINT8 pc8801_pixel_clock(void);
 	void pc8801_dynamic_res_change(void);
@@ -899,18 +900,18 @@ READ8_MEMBER(pc8801_state::pc8801_ext_wram_r)
 {
 	UINT8 *ext_work_ram = memregion("ewram")->base();
 
-	/* TODO: check max range here */
+	if(offset < m_extram_size)
+		return ext_work_ram[offset];
 
-	return ext_work_ram[offset];
+	return 0xff;
 }
 
 WRITE8_MEMBER(pc8801_state::pc8801_ext_wram_w)
 {
 	UINT8 *ext_work_ram = memregion("ewram")->base();
 
-	/* TODO: check max range here */
-
-	ext_work_ram[offset] = data;
+	if(offset < m_extram_size)
+		ext_work_ram[offset] = data;
 }
 
 READ8_MEMBER(pc8801_state::pc8801_nbasic_rom_r)
@@ -1541,12 +1542,6 @@ WRITE8_MEMBER(pc8801_state::pc8801_pcg8100_w)
 		printf("Write to PCG-8100 %02x %02x\n",offset,data);
 }
 
-/* Balance of Power temp work-around */
-READ8_MEMBER(pc8801_state::sio_status_r)
-{
-	return 0;
-}
-
 WRITE8_MEMBER(pc8801_state::pc8801_txt_cmt_ctrl_w)
 {
 	/* bits 2 to 5 are cmt related */
@@ -1659,9 +1654,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_rtc_w)
 
 READ8_MEMBER(pc8801_state::pc8801_sound_board_r)
 {
-	UINT8 has_opna = machine().root_device().ioport("BOARD_CONFIG")->read() & 1;
-
-	if(has_opna)
+	if(m_has_opna)
 		return ym2608_r(machine().device("opna"), offset);
 
 	return (offset & 2) ? 0xff : ym2203_r(machine().device("opn"), offset);
@@ -1669,9 +1662,7 @@ READ8_MEMBER(pc8801_state::pc8801_sound_board_r)
 
 WRITE8_MEMBER(pc8801_state::pc8801_sound_board_w)
 {
-	UINT8 has_opna = machine().root_device().ioport("BOARD_CONFIG")->read() & 1;
-
-	if(has_opna)
+	if(m_has_opna)
 		ym2608_w(machine().device("opna"), offset,data);
 	else if((offset & 2) == 0)
 		ym2203_w(machine().device("opn"), offset,data);
@@ -1679,9 +1670,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_sound_board_w)
 
 READ8_MEMBER(pc8801_state::pc8801_opna_r)
 {
-	UINT8 has_opna = machine().root_device().ioport("BOARD_CONFIG")->read() & 1;
-
-	if(has_opna && (offset & 2) == 0)
+	if(m_has_opna && (offset & 2) == 0)
 		return ym2608_r(machine().device("opna"), (offset & 1) | ((offset & 4) >> 1));
 
 	return 0xff;
@@ -1689,11 +1678,9 @@ READ8_MEMBER(pc8801_state::pc8801_opna_r)
 
 WRITE8_MEMBER(pc8801_state::pc8801_opna_w)
 {
-	UINT8 has_opna = machine().root_device().ioport("BOARD_CONFIG")->read() & 1;
-
-	if(has_opna && (offset & 2) == 0)
+	if(m_has_opna && (offset & 2) == 0)
 		ym2608_w(machine().device("opna"), (offset & 1) | ((offset & 4) >> 1),data);
-	else if(has_opna && offset == 2)
+	else if(m_has_opna && offset == 2)
 	{
 		m_sound_irq_mask = ((data & 0x80) == 0);
 
@@ -1710,6 +1697,17 @@ WRITE8_MEMBER(pc8801_state::pc8801_opna_w)
 			m_sound_irq_pending = 0;
 		}
 	}
+}
+
+READ8_MEMBER(pc8801_state::pc8801_unk_r)
+{
+	printf("Read port 0x33\n");
+	return 0xff;
+}
+
+WRITE8_MEMBER(pc8801_state::pc8801_unk_w)
+{
+	printf("Write port 0x33\n");
 }
 
 static ADDRESS_MAP_START( pc8801_io, AS_IO, 8, pc8801_state )
@@ -1738,7 +1736,7 @@ static ADDRESS_MAP_START( pc8801_io, AS_IO, 8, pc8801_state )
 	AM_RANGE(0x30, 0x30) AM_READ_PORT("DSW1") AM_WRITE(pc8801_txt_cmt_ctrl_w)
 	AM_RANGE(0x31, 0x31) AM_READ_PORT("DSW2") AM_WRITE(pc8801_gfx_ctrl_w)
 	AM_RANGE(0x32, 0x32) AM_READWRITE(pc8801_misc_ctrl_r, pc8801_misc_ctrl_w)
-	//0x33, 0x33 sets something kanji related
+	AM_RANGE(0x33, 0x33) AM_READWRITE(pc8801_unk_r,pc8801_unk_w)
 	AM_RANGE(0x34, 0x34) AM_WRITE(pc8801_alu_ctrl1_w)
 	AM_RANGE(0x35, 0x35) AM_WRITE(pc8801_alu_ctrl2_w)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(pc8801_ctrl_r, pc8801_ctrl_w)
@@ -2092,13 +2090,11 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_DIPNAME( 0x20, 0x20, "Duplex" )
 	PORT_DIPSETTING(    0x20, "Half" )
 	PORT_DIPSETTING(    0x00, "Full" )
-/*  PORT_DIPNAME( 0x80, 0x80, "Disable floppy" )
-    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )*/
 	PORT_DIPNAME( 0xc0, 0x40, "Basic mode" )
-	PORT_DIPSETTING(    0x80, "N-BASIC" )
-	PORT_DIPSETTING(    0xc0, "N88-BASIC (V1)" )
+	PORT_DIPSETTING(    0x80, "N88-BASIC (V1L)" )
+	PORT_DIPSETTING(    0xc0, "N88-BASIC (V1H)" )
 	PORT_DIPSETTING(    0x40, "N88-BASIC (V2)" )
+//	PORT_DIPSETTING(    0x00, "N88-BASIC (V2)" )
 
 	PORT_START("CTRL")
 	PORT_DIPNAME( 0x02, 0x02, "Monitor Type" )
@@ -2152,7 +2148,7 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_RESET PORT_REVERSE PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
 
 	PORT_START("MEM")
-	PORT_CONFNAME( 0x1f, 0x00, "Extension memory" )
+	PORT_CONFNAME( 0x0f, 0x0a, "Extension memory" )
 	PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 	PORT_CONFSETTING(    0x01, "32KB (PC-8012-02 x 1)" )
 	PORT_CONFSETTING(    0x02, "64KB (PC-8012-02 x 2)" )
@@ -2169,7 +2165,7 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_CONFSETTING(    0x0d, "4.1M (PIO-8234H-2M x 2 + PC-8801-02N x 1)" )
 
 	PORT_START("BOARD_CONFIG")
-	PORT_CONFNAME( 0x01, 0x00, "Sound Board" ) /* TODO: is it possible to have BOTH sound chips in there? */
+	PORT_CONFNAME( 0x01, 0x01, "Sound Board" ) /* TODO: is it possible to have BOTH sound chips in there? */
 	PORT_CONFSETTING(    0x00, "OPN (YM2203)" )
 	PORT_CONFSETTING(    0x01, "OPNA (YM2608)" )
 	PORT_CONFNAME( 0x02, 0x00, "Port 1 Connection" )
@@ -2407,6 +2403,12 @@ static MACHINE_START( pc8801 )
 static MACHINE_RESET( pc8801 )
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
+	#define kB 1024
+	#define MB 1024*1024
+	const UINT32 extram_type[] = { 0*kB, 32*kB,64*kB,128*kB,128*kB,256*kB,512*kB,1*MB,2*MB,4*MB,8*MB,1*MB+128*kB,2*MB+128*kB,4*MB+128*kB, 0*kB, 0*kB };
+	#undef kB
+	#undef MB
+
 	state->m_ext_rom_bank = 0xff;
 	state->m_gfx_ctrl = 0x31;
 	state->m_window_offset_bank = 0x80;
@@ -2480,6 +2482,8 @@ static MACHINE_RESET( pc8801 )
 	state->m_has_dictionary = 0;
 	state->m_has_cdrom = 0;
 
+	state->m_extram_size = extram_type[machine.root_device().ioport("MEM")->read() & 0x0f];
+	state->m_has_opna = machine.root_device().ioport("BOARD_CONFIG")->read() & 1;
 }
 
 static MACHINE_RESET( pc8801_clock_speed )
