@@ -44,6 +44,7 @@
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Grobda: palette is ugly (parent pc8801 only);
 	- Music Collection Vol. 2 - Final Fantasy Tokushuu: sound irq dies pretty soon
+	- N88 Nihongo BASIC (app): cursor is too big?
     - Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
     - Xevious: game is too fast (parent pc8801 only)
 
@@ -396,6 +397,8 @@ public:
 	DECLARE_WRITE8_MEMBER(pc8801_sound_board_w);
 	DECLARE_READ8_MEMBER(pc8801_opna_r);
 	DECLARE_WRITE8_MEMBER(pc8801_opna_w);
+
+	UINT8 pc8801_pixel_clock(void);
 };
 
 
@@ -454,7 +457,7 @@ static void draw_bitmap_3bpp(running_machine &machine, bitmap_ind16 &bitmap,cons
 
 	count = 0;
 
-	y_double = (state->m_gfx_ctrl & 0x20) >> 5; // TODO: true condition of this?
+	y_double = (state->pc8801_pixel_clock());
 	y_size = (y_double+1) * 200;
 
 	for(y=0;y<y_size;y+=(y_double+1))
@@ -513,7 +516,7 @@ static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap,cons
 
 				pen = ((gvram[count+0x0000] >> (7-xi)) & 1) << 0;
 
-				if(state->m_gfx_ctrl & 0x20) // pixel clock select
+				if(state->pc8801_pixel_clock())
 				{
 					if(cliprect.contains(x+xi, y*2+0))
 						bitmap.pix16(y*2+0, x+xi) = machine.pens[pen ? color : 0];
@@ -634,7 +637,7 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 	UINT8 y_step;
 
 	y_height = lines_per_char;
-	y_double = (state->m_gfx_ctrl & 0x20) >> 5;
+	y_double = (state->pc8801_pixel_clock());
 	y_step = (non_special) ? 80 : 120; // trusted by Elthlead
 
 	for(yi=0;yi<y_height;yi++)
@@ -1176,6 +1179,13 @@ WRITE8_MEMBER(pc8801_state::pc8801_ext_rom_bank_w)
 	m_ext_rom_bank = data;
 }
 
+UINT8 pc8801_state::pc8801_pixel_clock(void)
+{
+	int ysize = machine().primary_screen->height(); /* TODO: correct condition*/
+
+	return (ysize >= 400);
+}
+
 static void pc8801_dynamic_res_change(running_machine &machine)
 {
 	pc8801_state *state = machine.driver_data<pc8801_state>();
@@ -1195,7 +1205,7 @@ static void pc8801_dynamic_res_change(running_machine &machine)
 //	popmessage("H %d V %d (%d x %d) HR %d VR %d (%d %d)\n",xvis,yvis,screen_height,lines_per_char,hretrace,vretrace, xsize,ysize);
 
 	visarea.set(0, xvis - 1, 0, yvis - 1);
-	if(state->m_gfx_ctrl & 0x20) /* TODO: correct bit for this (m_gfx_ctrl & 1?) */
+	if(state->pc8801_pixel_clock())
 		refresh = HZ_TO_ATTOSECONDS(PIXEL_CLOCK_24KHz) * (xsize) * ysize;
 	else
 		refresh = HZ_TO_ATTOSECONDS(PIXEL_CLOCK_15KHz) * (xsize) * ysize;
@@ -1206,7 +1216,7 @@ static void pc8801_dynamic_res_change(running_machine &machine)
 WRITE8_MEMBER(pc8801_state::pc8801_gfx_ctrl_w)
 {
 	/*
-    --x- ---- Pixel clock select?
+    --x- ---- ???
     ---x ---- graphic color yes (1) / no (0)
     ---- x--- graphic display yes (1) / no (0)
     ---- -x-- Basic N (1) / N88 (0)
@@ -1338,7 +1348,6 @@ WRITE8_MEMBER(pc8801_state::pc8801_bgpal_w)
 
 WRITE8_MEMBER(pc8801_state::pc8801_palram_w)
 {
-
 	if(m_misc_ctrl & 0x20) //analog palette
 	{
 		if((data & 0x40) == 0)
