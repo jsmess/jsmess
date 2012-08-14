@@ -173,6 +173,7 @@ extern const device_type VIP_EXPANSION_SLOT;
 #include "machine/vp585.h"
 #include "machine/vp590.h"
 #include "machine/vp595.h"
+#include "machine/vp700.h"
 
 SLOT_INTERFACE_EXTERN( vip_expansion_cards );
 

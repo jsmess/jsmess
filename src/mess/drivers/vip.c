@@ -56,6 +56,7 @@ Notes:
 
     TODO:
 
+    - Tiny BASIC
     - cassette loading
     - 20K RAM for Floating Point BASIC
     - VP-111 has 1K RAM, no byte I/O, no expansion
@@ -265,13 +266,16 @@ READ8_MEMBER( vip_state::read )
 
     UINT8 data = m_exp->program_r(space, offset, cs, cdef, &minh);
 
-    if (cs)
+    if (!minh)
     {
-        data = memregion(CDP1802_TAG)->base()[offset & 0x1ff];
-    }
-    else if (!minh)
-    {
-        data = m_ram->pointer()[offset & (m_ram->size() - 1)];
+        if (cs)
+        {
+            data = memregion(CDP1802_TAG)->base()[offset & 0x1ff];
+        }
+        else
+        {
+            data = m_ram->pointer()[offset & m_ram->mask()];
+        }
     }
 
     return data;
@@ -292,7 +296,7 @@ WRITE8_MEMBER( vip_state::write )
 
     if (!cs && !minh)
     {
-        m_ram->pointer()[offset & (m_ram->size() - 1)] = data;
+        m_ram->pointer()[offset & m_ram->mask()] = data;
     }
 }
 
