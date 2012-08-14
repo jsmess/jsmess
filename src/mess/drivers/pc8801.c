@@ -44,7 +44,6 @@
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
     - Grobda: palette is ugly (parent pc8801 only);
 	- Music Collection Vol. 2 - Final Fantasy Tokushuu: sound irq dies pretty soon
-	- N88 Basic Nihongo (app): background is currently purple for whatever reason;
     - Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
     - Xevious: game is too fast (parent pc8801 only)
 
@@ -89,7 +88,11 @@
 	- Dungeon Buster
 	- El Dorado Denki
 	- Elevator Action
-	(Elthlead)
+	- Emerald Densetsu
+    - Emerald Dragon (it seems to miss a timer)
+    - Emmy
+	(Exective he no Michi)
+
     - Harakiri
     - Kaseijin (app) (code snippet is empty at some point)
     - MakaiMura (attempts to r/w the sio ports, but it's clearly crashed)
@@ -451,7 +454,7 @@ static void draw_bitmap_3bpp(running_machine &machine, bitmap_ind16 &bitmap,cons
 
 	count = 0;
 
-	y_double = ((lines_per_char & 0x10) >> 4); // TODO: true condition of this?
+	y_double = (state->m_gfx_ctrl & 0x20) >> 5; // TODO: true condition of this?
 	y_size = (y_double+1) * 200;
 
 	for(y=0;y<y_size;y+=(y_double+1))
@@ -495,8 +498,10 @@ static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap,cons
 	int x,y,xi;
 	UINT32 count;
 	UINT8 *gvram = state->memregion("gvram")->base();
+	UINT8 color;
 
 	count = 0;
+	color = (state->m_gfx_ctrl & 1) ? 7 & ((state->m_layer_mask ^ 0xe) >> 1) : 7;
 
 	for(y=0;y<200;y++)
 	{
@@ -508,18 +513,18 @@ static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap,cons
 
 				pen = ((gvram[count+0x0000] >> (7-xi)) & 1) << 0;
 
-				if(state->m_gfx_ctrl & 1)
+				if(state->m_gfx_ctrl & 0x20) // pixel clock select
 				{
 					if(cliprect.contains(x+xi, y*2+0))
-						bitmap.pix16(y*2+0, x+xi) = machine.pens[pen ? 7 & ((state->m_layer_mask ^ 0xe) >> 1) : 0];
+						bitmap.pix16(y*2+0, x+xi) = machine.pens[pen ? color : 0];
 
 					if(cliprect.contains(x+xi, y*2+1))
-						bitmap.pix16(y*2+1, x+xi) = machine.pens[pen ? 7 & ((state->m_layer_mask ^ 0xe) >> 1) : 0];
+						bitmap.pix16(y*2+1, x+xi) = machine.pens[pen ? color : 0];
 				}
 				else
 				{
 					if(cliprect.contains(x+xi, y))
-						bitmap.pix16(y, x+xi) = machine.pens[pen ? 7 & ((state->m_layer_mask ^ 0xe) >> 1) : 0];
+						bitmap.pix16(y, x+xi) = machine.pens[pen ? color : 0];
 				}
 			}
 
@@ -542,7 +547,7 @@ static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap,cons
 					pen = ((gvram[count+0x4000] >> (7-xi)) & 1) << 0;
 
 					if(cliprect.contains(x+xi, y))
-						bitmap.pix16(y, x+xi) = machine.pens[pen ? 7 & ((state->m_layer_mask ^ 0xe) >> 1) : 0];
+						bitmap.pix16(y, x+xi) = machine.pens[pen ? 7 : 0];
 				}
 
 				count++;
@@ -629,8 +634,8 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 	UINT8 y_step;
 
 	y_height = lines_per_char;
-	y_double = (lines_per_char & 0x10) >> 4; // TODO: find correct condition
-	y_step = (non_special) ? 80 : 120; // Elthlead uses this
+	y_double = (state->m_gfx_ctrl & 0x20) >> 5;
+	y_step = (non_special) ? 80 : 120; // trusted by Elthlead
 
 	for(yi=0;yi<y_height;yi++)
 	{
@@ -793,17 +798,9 @@ static SCREEN_UPDATE_IND16( pc8801 )
 
 	if(!(state->m_layer_mask & 1) && state->m_dmac_mode & 4 && state->m_crtc.status & 0x10 && state->m_crtc.irq_mask == 3)
 	{
-		int y_size;
-
 		//popmessage("%02x %02x",state->m_crtc.param[0][0],state->m_crtc.param[0][4]);
 
-		/* TODO: left-over, to be removed */
-		y_size = (state->m_crtc.param[0][1] & 0x3f) + 1;
-
-		if(y_size < 20) y_size = 20;
-		if(y_size > 25) y_size = 25;
-
-		draw_text(screen.machine(),bitmap,y_size,state->m_txt_width);
+		draw_text(screen.machine(),bitmap,screen_height,state->m_txt_width);
 	}
 
 	return 0;
@@ -1198,7 +1195,7 @@ static void pc8801_dynamic_res_change(running_machine &machine)
 //	popmessage("H %d V %d (%d x %d) HR %d VR %d (%d %d)\n",xvis,yvis,screen_height,lines_per_char,hretrace,vretrace, xsize,ysize);
 
 	visarea.set(0, xvis - 1, 0, yvis - 1);
-	if(ysize >= 400) /* TODO: correct bit for this (m_gfx_ctrl & 1?) */
+	if(state->m_gfx_ctrl & 0x20) /* TODO: correct bit for this (m_gfx_ctrl & 1?) */
 		refresh = HZ_TO_ATTOSECONDS(PIXEL_CLOCK_24KHz) * (xsize) * ysize;
 	else
 		refresh = HZ_TO_ATTOSECONDS(PIXEL_CLOCK_15KHz) * (xsize) * ysize;
@@ -1209,12 +1206,12 @@ static void pc8801_dynamic_res_change(running_machine &machine)
 WRITE8_MEMBER(pc8801_state::pc8801_gfx_ctrl_w)
 {
 	/*
-    --x- ---- VRAM y 25 (1) / 20 (0)
+    --x- ---- Pixel clock select?
     ---x ---- graphic color yes (1) / no (0)
     ---- x--- graphic display yes (1) / no (0)
     ---- -x-- Basic N (1) / N88 (0)
     ---- --x- RAM select yes (1) / no (0)
-    ---- ---x VRAM 200 lines (1) / 400 lines (0), 15 KHz / 24 KHz
+    ---- ---x VRAM 200 lines (1) / 400 lines (0) in 1bpp mode
     */
 
 	m_gfx_ctrl = data;
