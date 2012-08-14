@@ -16,8 +16,6 @@
     - waitstates;
     - dipswitches needs to be controlled;
     - below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks the floppy ports. Wrong info?
-    - Basic Nihongo disks shows that bitmap and text colors mixes with additive blending (basically if the tv charset has white then the bitmap draws
-      with inverted color output).
 	- clean-ups, banking and video in particular (i.e. hook-ups with memory region should go away and device models should be used instead)
 	- OPNA needs dumping of YM2608 deltat ROM
 	- YMF288 support;
@@ -518,19 +516,26 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 	UINT32 count;
 	UINT8 *gvram = machine().root_device().memregion("gvram")->base();
 	UINT8 color;
+	UINT8 is_cursor;
 
 	count = 0;
 	color = (m_gfx_ctrl & 1) ? 7 & ((m_layer_mask ^ 0xe) >> 1) : 7;
+	is_cursor = 0;
 
 	for(y=0;y<200;y++)
 	{
 		for(x=0;x<640;x+=8)
 		{
+			if(!(m_gfx_ctrl & 1))
+				is_cursor = calc_cursor_pos(x/8,y/lines_per_char,y & (lines_per_char-1));
+
 			for(xi=0;xi<8;xi++)
 			{
 				int pen;
 
-				pen = ((gvram[count+0x0000] >> (7-xi)) & 1) << 0;
+				pen = ((gvram[count+0x0000] >> (7-xi)) & 1);
+				if(is_cursor)
+					pen^=1;
 
 				if((m_gfx_ctrl & 1))
 				{
@@ -559,11 +564,16 @@ void pc8801_state::draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &clipre
 		{
 			for(x=0;x<640;x+=8)
 			{
+				if(!(m_gfx_ctrl & 1))
+					is_cursor = calc_cursor_pos(x/8,y/lines_per_char,y & (lines_per_char-1));
+
 				for(xi=0;xi<8;xi++)
 				{
 					int pen;
 
-					pen = ((gvram[count+0x4000] >> (7-xi)) & 1) << 0;
+					pen = ((gvram[count+0x4000] >> (7-xi)) & 1);
+					if(is_cursor)
+						pen^=1;
 
 					if(cliprect.contains(x+xi, y))
 						bitmap.pix16(y, x+xi) = machine().pens[pen ? 7 : 0];
@@ -651,10 +661,12 @@ void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UIN
 	y_height = lines_per_char;
 	y_double = (pc8801_pixel_clock());
 	y_step = (non_special) ? 80 : 120; // trusted by Elthlead
+	is_cursor = 0;
 
 	for(yi=0;yi<y_height;yi++)
 	{
-		is_cursor = calc_cursor_pos(x,y,yi);
+		if(m_gfx_ctrl & 1)
+			is_cursor = calc_cursor_pos(x,y,yi);
 
 		for(xi=0;xi<8;xi++)
 		{
