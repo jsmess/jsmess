@@ -80,6 +80,8 @@ public:
 	DECLARE_READ8_MEMBER(pcw16_superio_fdc_data_r);
 	DECLARE_READ8_MEMBER(pcw16_superio_fdc_main_status_register_r);
 	DECLARE_READ8_MEMBER(pcw16_superio_fdc_digital_input_register_r);
+	DECLARE_READ8_MEMBER(pcw16_mem_r);
+	DECLARE_WRITE8_MEMBER(pcw16_mem_w);
 	void pcw16_keyboard_init();
 	void pcw16_keyboard_refresh_outputs();
 	void pcw16_keyboard_set_clock_state(int state);
@@ -89,6 +91,10 @@ public:
 	void pcw16_keyboard_signal_byte_received(int data);
 	void pcw16_refresh_ints();
 	void rtc_setup_max_days();
+	UINT8 pcw16_read_mem(UINT8 bank, UINT16 offset);
+	void pcw16_write_mem(UINT8 bank, UINT16 offset, UINT8 data);
+	UINT8 read_bank_data(UINT8 type, UINT16 offset);
+	void write_bank_data(UINT8 type, UINT16 offset, UINT8 data);
 };
 
 

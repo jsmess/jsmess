@@ -152,10 +152,11 @@ static TIMER_DEVICE_CALLBACK(pcw16_timer_callback)
 }
 
 static ADDRESS_MAP_START(pcw16_map, AS_PROGRAM, 8, pcw16_state )
-	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
-	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
-	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
-	AM_RANGE(0xc000, 0xffff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank8")
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(pcw16_mem_r, pcw16_mem_w)
+//	AM_RANGE(0x0000, 0x3fff) AM_READ_BANK("bank1") AM_WRITE_BANK("bank5")
+//	AM_RANGE(0x4000, 0x7fff) AM_READ_BANK("bank2") AM_WRITE_BANK("bank6")
+//	AM_RANGE(0x8000, 0xbfff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank7")
+//	AM_RANGE(0xc000, 0xffff) AM_READ_BANK("bank4") AM_WRITE_BANK("bank8")
 ADDRESS_MAP_END
 
 
@@ -365,19 +366,20 @@ READ8_MEMBER(pcw16_state::pcw16_no_mem_r)
 	return 0x0ff;
 }
 
+/*
 static void pcw16_set_bank_handlers(running_machine &machine, int bank, PCW16_RAM_TYPE type)
 {
 	address_space *space = machine.device("maincpu")->memory().space(AS_PROGRAM);
 	pcw16_state *state = machine.driver_data<pcw16_state>();
 	switch (type) {
 	case PCW16_MEM_ROM:
-		/* rom */
+		// rom
 		space->install_read_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_read_handler_dram[bank]);
 		space->nop_write((bank * 0x4000), (bank * 0x4000) + 0x3fff);
 		break;
 
 	case PCW16_MEM_FLASH_1:
-		/* sram */
+		// sram
 		space->install_legacy_read_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_flash0_bank_handlers_r[bank].func, pcw16_flash0_bank_handlers_r[bank].name);
 		space->install_legacy_write_handler((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_flash0_bank_handlers_w[bank].func, pcw16_flash0_bank_handlers_w[bank].name);
 		break;
@@ -394,7 +396,7 @@ static void pcw16_set_bank_handlers(running_machine &machine, int bank, PCW16_RA
 
 	default:
 	case PCW16_MEM_DRAM:
-		/* dram */
+		// dram
 		space->install_read_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_read_handler_dram[bank]);
 		space->install_write_bank((bank * 0x4000), (bank * 0x4000) + 0x3fff, pcw16_write_handler_dram[bank]);
 		break;
@@ -411,7 +413,7 @@ static void pcw16_update_bank(running_machine &machine, int bank)
 	char bank1[10];
 	char bank2[10];
 
-	/* get memory bank */
+	// get memory bank
 	bank_id = state->m_banks[bank];
 
 
@@ -421,15 +423,15 @@ static void pcw16_update_bank(running_machine &machine, int bank)
 
 		if (bank_id<4)
 		{
-			/* lower 4 banks are write protected. Use the rom
-            loaded */
+			//lower 4 banks are write protected. Use the rom
+            //loaded
 			mem_ptr = &state->memregion("maincpu")->base()[0x010000];
 		}
 		else
 		{
 			intelfsh8_device *flashdev;
 
-			/* nvram */
+			// nvram
 			if ((bank_id & 0x040)==0)
 			{
 				flashdev = machine.device<intelfsh8_device>("flash0");
@@ -446,7 +448,7 @@ static void pcw16_update_bank(running_machine &machine, int bank)
 	else
 	{
 		bank_offs = 128;
-		/* dram */
+		 //dram
 		mem_ptr = machine.device<ram_device>(RAM_TAG)->pointer();
 	}
 
@@ -459,16 +461,16 @@ static void pcw16_update_bank(running_machine &machine, int bank)
 
 	if ((bank_id & 0x080)==0)
 	{
-		/* selections 0-3 within the first 64k are write protected */
+		// selections 0-3 within the first 64k are write protected
 		if (bank_id<4)
 		{
-			/* rom */
+			// rom
 			pcw16_set_bank_handlers(machine, bank, PCW16_MEM_ROM);
 		}
 		else
 		{
-			/* selections 0-63 are for flash-rom 0, selections
-            64-128 are for flash-rom 1 */
+			// selections 0-63 are for flash-rom 0, selections
+            // 64-128 are for flash-rom 1
 			if ((bank_id & 0x040)==0)
 			{
 				pcw16_set_bank_handlers(machine, bank, PCW16_MEM_FLASH_1);
@@ -484,16 +486,128 @@ static void pcw16_update_bank(running_machine &machine, int bank)
 		pcw16_set_bank_handlers(machine, bank, PCW16_MEM_DRAM);
 	}
 }
-
+*/
 
 /* update memory h/w */
 static void pcw16_update_memory(running_machine &machine)
 {
-	pcw16_update_bank(machine, 0);
-	pcw16_update_bank(machine, 1);
-	pcw16_update_bank(machine, 2);
-	pcw16_update_bank(machine, 3);
+//	pcw16_update_bank(machine, 0);
+//	pcw16_update_bank(machine, 1);
+//	pcw16_update_bank(machine, 2);
+//	pcw16_update_bank(machine, 3);
 
+}
+
+UINT8 pcw16_state::read_bank_data(UINT8 type, UINT16 offset)
+{
+	if(type & 0x80) // DRAM
+	{
+		UINT8* RAM = machine().device<ram_device>(RAM_TAG)->pointer();
+		return RAM[((type & 0x7f)*0x4000) + offset];
+	}
+	else  // ROM / Flash
+	{
+		if(type < 4)
+		{
+			UINT8* ROM = memregion("maincpu")->base();
+			return ROM[((type & 0x03)*0x4000)+offset+0x10000];
+		}
+		if(type < 0x40)  // first flash
+		{
+			intel_e28f008sa_device* flash = machine().device<intel_e28f008sa_device>("flash0");
+			return flash->read(((type & 0x3f)*0x4000)+offset);
+		}
+		else  // second flash
+		{
+			intel_e28f008sa_device* flash = machine().device<intel_e28f008sa_device>("flash1");
+			return flash->read(((type & 0x3f)*0x4000)+offset);
+		}
+	}
+}
+
+void pcw16_state::write_bank_data(UINT8 type, UINT16 offset, UINT8 data)
+{
+	if(type & 0x80) // DRAM
+	{
+		UINT8* RAM = machine().device<ram_device>(RAM_TAG)->pointer();
+		RAM[((type & 0x7f)*0x4000) + offset] = data;
+	}
+	else  // ROM / Flash
+	{
+		if(type < 4)
+			return;  // first four sectors are write protected
+		if(type < 0x40)  // first flash
+		{
+			intel_e28f008sa_device* flash = machine().device<intel_e28f008sa_device>("flash0");
+			flash->write(((type & 0x3f)*0x4000)+offset,data);
+		}
+		else  // second flash
+		{
+			intel_e28f008sa_device* flash = machine().device<intel_e28f008sa_device>("flash1");
+			flash->write(((type & 0x3f)*0x4000)+offset,data);
+		}
+	}
+}
+
+UINT8 pcw16_state::pcw16_read_mem(UINT8 bank, UINT16 offset)
+{
+	switch(bank)
+	{
+	case 0:
+		return read_bank_data(m_banks[bank],offset);
+	case 1:
+		return read_bank_data(m_banks[bank],offset);
+	case 2:
+		return read_bank_data(m_banks[bank],offset);
+	case 3:
+		return read_bank_data(m_banks[bank],offset);
+	}
+	return 0xff;
+}
+
+void pcw16_state::pcw16_write_mem(UINT8 bank, UINT16 offset, UINT8 data)
+{
+	switch(bank)
+	{
+	case 0:
+		write_bank_data(m_banks[bank],offset,data);
+		break;
+	case 1:
+		write_bank_data(m_banks[bank],offset,data);
+		break;
+	case 2:
+		write_bank_data(m_banks[bank],offset,data);
+		break;
+	case 3:
+		write_bank_data(m_banks[bank],offset,data);
+		break;
+	}
+}
+
+READ8_MEMBER(pcw16_state::pcw16_mem_r)
+{
+	if(offset < 0x4000)
+		return pcw16_read_mem(0,offset);
+	if(offset >= 0x4000 && offset < 0x8000)
+		return pcw16_read_mem(1,offset-0x4000);
+	if(offset >= 0x8000 && offset < 0xc000)
+		return pcw16_read_mem(2,offset-0x8000);
+	if(offset >= 0xc000 && offset < 0x10000)
+		return pcw16_read_mem(3,offset-0xc000);
+
+	return 0xff;
+}
+
+WRITE8_MEMBER(pcw16_state::pcw16_mem_w)
+{
+	if(offset < 0x4000)
+		pcw16_write_mem(0,offset,data);
+	if(offset >= 0x4000 && offset < 0x8000)
+		pcw16_write_mem(1,offset-0x4000,data);
+	if(offset >= 0x8000 && offset < 0xc000)
+		pcw16_write_mem(2,offset-0x8000,data);
+	if(offset >= 0xc000 && offset < 0x10000)
+		pcw16_write_mem(3,offset-0xc000,data);
 }
 
 READ8_MEMBER(pcw16_state::pcw16_bankhw_r)
@@ -785,7 +899,7 @@ static TIMER_DEVICE_CALLBACK(pcw16_keyboard_timer_callback)
 		}
 	}
 	// TODO: fix
-	state->subdevice<ns16550_device>("ns16550_2")->ri_w(timer.machine().root_device().ioport("EXTRA")->read() & 0x040);
+	state->subdevice<ns16550_device>("ns16550_2")->ri_w((timer.machine().root_device().ioport("EXTRA")->read() & 0x040) ? 0 : 1);
 }
 
 
@@ -1292,7 +1406,7 @@ static void pcw16_reset(running_machine &machine)
 	pc_fdc_set_tc_state(machine, 0);
 	/* select first rom page */
 	state->m_banks[0] = 0;
-	pcw16_update_memory(machine);
+//	pcw16_update_memory(machine);
 
 	/* temp rtc setup */
 	state->m_rtc_seconds = 0;
