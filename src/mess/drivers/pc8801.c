@@ -11,7 +11,6 @@
     - add differences between various models;
     - implement proper upd3301 / i8257 support;
     - fix "jumps" in mouse support pointer (noticeable in Balance of Power);
-    - RTC support;
     - Add limits for extend work RAM;
     - What happens to the palette contents when the analog/digital palette mode changes?
     - waitstates;
@@ -92,7 +91,10 @@
 	- Emerald Densetsu
     - Emerald Dragon (it seems to miss a timer)
     - Emmy
-	(Exective he no Michi)
+	- Explosion (fails to load ADPCM data?)
+	- F-15 Strike Eagle
+	- F2 Grand Prix ("Boot dekimasen")
+
 
     - Harakiri
     - Kaseijin (app) (code snippet is empty at some point)
@@ -516,7 +518,7 @@ static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap,cons
 
 				pen = ((gvram[count+0x0000] >> (7-xi)) & 1) << 0;
 
-				if(state->pc8801_pixel_clock())
+				if((state->m_gfx_ctrl & 1))
 				{
 					if(cliprect.contains(x+xi, y*2+0))
 						bitmap.pix16(y*2+0, x+xi) = machine.pens[pen ? color : 0];
@@ -2700,7 +2702,7 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF ) \
 	ROM_REGION( 0x10000, "wram", ROMREGION_ERASE00 ) \
 	ROM_REGION( 0x1000, "hiwram", ROMREGION_ERASE00 ) \
-	ROM_REGION( 0x40000, "ewram", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x8000*0x100, "ewram", ROMREGION_ERASE00 ) \
 	ROM_REGION( 0xc000, "gvram", ROMREGION_ERASE00 ) \
 	ROM_REGION( 0x100000, "opna", ROMREGION_ERASE00 )
 
