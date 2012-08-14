@@ -94,7 +94,7 @@
 	- Explosion (fails to load ADPCM data?)
 	- F-15 Strike Eagle
 	- F2 Grand Prix ("Boot dekimasen")
-
+	(Fancy Promenade)
 
     - Harakiri
     - Kaseijin (app) (code snippet is empty at some point)
@@ -256,6 +256,13 @@ typedef struct
 	UINT8 inverse;
 } crtc_t;
 
+typedef struct
+{
+	UINT8 phase;
+	UINT8 x,y;
+	attotime time;
+} mouse_t;
+
 class pc8801_state : public driver_device
 {
 public:
@@ -315,14 +322,11 @@ public:
 	UINT8 m_has_cdrom;
 	UINT8 m_cdrom_reg[0x10];
 	crtc_t m_crtc;
+	mouse_t m_mouse;
 	struct { UINT8 r, g, b; } m_palram[8];
 	UINT8 m_dmac_ff;
 	UINT32 m_knj_addr[2];
-	struct{
-		UINT8 phase;
-		UINT8 x,y;
-		attotime time;
-	}m_mouse;
+
 	DECLARE_READ8_MEMBER(pc8801_alu_r);
 	DECLARE_WRITE8_MEMBER(pc8801_alu_w);
 	DECLARE_READ8_MEMBER(pc8801_wram_r);
@@ -401,10 +405,22 @@ public:
 	DECLARE_WRITE8_MEMBER(pc8801_opna_w);
 
 	UINT8 pc8801_pixel_clock(void);
+	void pc8801_dynamic_res_change(void);
+	void draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	void draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &cliprect);
+	UINT8 calc_cursor_pos(int x,int y,int yi);
+	UINT8 extract_text_attribute(UINT32 address,int x, UINT8 width, UINT8 &non_special);
+	void pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,
+	                       UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int width, UINT8 non_special);
+	void draw_text(bitmap_ind16 &bitmap,int y_size, UINT8 width);
+
+	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+protected:
+
+	virtual void video_start();
 };
 
-
-static void pc8801_dynamic_res_change(running_machine &machine);
 
 /*
 CRTC command params:
@@ -430,36 +446,35 @@ CRTC command params:
 [4] ---x xxxx attribute size (+1)
 */
 
-#define screen_width ((state->m_crtc.param[0][0] & 0x7f) + 2) * 8
+#define screen_width ((m_crtc.param[0][0] & 0x7f) + 2) * 8
 
-#define blink_speed ((((state->m_crtc.param[0][1] & 0xc0) >> 6) + 1) << 3)
-#define screen_height ((state->m_crtc.param[0][1] & 0x3f) + 1)
+#define blink_speed ((((m_crtc.param[0][1] & 0xc0) >> 6) + 1) << 3)
+#define screen_height ((m_crtc.param[0][1] & 0x3f) + 1)
 
-#define lines_per_char ((state->m_crtc.param[0][2] & 0x1f) + 1)
+#define lines_per_char ((m_crtc.param[0][2] & 0x1f) + 1)
 
-#define vretrace (((state->m_crtc.param[0][3] & 0xe0) >> 5) + 1)
-#define hretrace ((state->m_crtc.param[0][3] & 0x1f) + 2) * 8
+#define vretrace (((m_crtc.param[0][3] & 0xe0) >> 5) + 1)
+#define hretrace ((m_crtc.param[0][3] & 0x1f) + 2) * 8
 
-#define text_color_flag ((state->m_crtc.param[0][4] & 0xe0) == 0x40)
-#define monitor_24KHz ((state->m_gfx_ctrl & 0x19) == 0x08) /* TODO: this is most likely to be WRONG */
+#define text_color_flag ((m_crtc.param[0][4] & 0xe0) == 0x40)
+//#define monitor_24KHz ((m_gfx_ctrl & 0x19) == 0x08) /* TODO: this is most likely to be WRONG */
 
-static VIDEO_START( pc8801 )
+void pc8801_state::video_start()
 {
 
 }
 
-static void draw_bitmap_3bpp(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void pc8801_state::draw_bitmap_3bpp(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int x,y,xi;
 	UINT32 count;
-	UINT8 *gvram = machine.root_device().memregion("gvram")->base();
+	UINT8 *gvram = machine().root_device().memregion("gvram")->base();
 	UINT16 y_size;
 	UINT16 y_double;
 
 	count = 0;
 
-	y_double = (state->pc8801_pixel_clock());
+	y_double = (pc8801_pixel_clock());
 	y_size = (y_double+1) * 200;
 
 	for(y=0;y<y_size;y+=(y_double+1))
@@ -480,15 +495,15 @@ static void draw_bitmap_3bpp(running_machine &machine, bitmap_ind16 &bitmap,cons
 				if(y_double)
 				{
 					if(cliprect.contains(x+xi, y+0))
-						bitmap.pix16(y+0, x+xi) = machine.pens[pen & 7];
+						bitmap.pix16(y+0, x+xi) = machine().pens[pen & 7];
 
 					if(cliprect.contains(x+xi, y+1))
-						bitmap.pix16(y+1, x+xi) = machine.pens[pen & 7];
+						bitmap.pix16(y+1, x+xi) = machine().pens[pen & 7];
 				}
 				else
 				{
 					if(cliprect.contains(x+xi, y+0))
-						bitmap.pix16(y, x+xi) = machine.pens[pen & 7];
+						bitmap.pix16(y, x+xi) = machine().pens[pen & 7];
 				}
 			}
 
@@ -497,16 +512,15 @@ static void draw_bitmap_3bpp(running_machine &machine, bitmap_ind16 &bitmap,cons
 	}
 }
 
-static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap,const rectangle &cliprect)
+void pc8801_state::draw_bitmap_1bpp(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int x,y,xi;
 	UINT32 count;
-	UINT8 *gvram = state->memregion("gvram")->base();
+	UINT8 *gvram = machine().root_device().memregion("gvram")->base();
 	UINT8 color;
 
 	count = 0;
-	color = (state->m_gfx_ctrl & 1) ? 7 & ((state->m_layer_mask ^ 0xe) >> 1) : 7;
+	color = (m_gfx_ctrl & 1) ? 7 & ((m_layer_mask ^ 0xe) >> 1) : 7;
 
 	for(y=0;y<200;y++)
 	{
@@ -518,18 +532,18 @@ static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap,cons
 
 				pen = ((gvram[count+0x0000] >> (7-xi)) & 1) << 0;
 
-				if((state->m_gfx_ctrl & 1))
+				if((m_gfx_ctrl & 1))
 				{
 					if(cliprect.contains(x+xi, y*2+0))
-						bitmap.pix16(y*2+0, x+xi) = machine.pens[pen ? color : 0];
+						bitmap.pix16(y*2+0, x+xi) = machine().pens[pen ? color : 0];
 
 					if(cliprect.contains(x+xi, y*2+1))
-						bitmap.pix16(y*2+1, x+xi) = machine.pens[pen ? color : 0];
+						bitmap.pix16(y*2+1, x+xi) = machine().pens[pen ? color : 0];
 				}
 				else
 				{
 					if(cliprect.contains(x+xi, y))
-						bitmap.pix16(y, x+xi) = machine.pens[pen ? color : 0];
+						bitmap.pix16(y, x+xi) = machine().pens[pen ? color : 0];
 				}
 			}
 
@@ -537,7 +551,7 @@ static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap,cons
 		}
 	}
 
-	if(!(state->m_gfx_ctrl & 1)) // 400 lines
+	if(!(m_gfx_ctrl & 1)) // 400 lines
 	{
 		count = 0;
 
@@ -552,7 +566,7 @@ static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap,cons
 					pen = ((gvram[count+0x4000] >> (7-xi)) & 1) << 0;
 
 					if(cliprect.contains(x+xi, y))
-						bitmap.pix16(y, x+xi) = machine.pens[pen ? 7 : 0];
+						bitmap.pix16(y, x+xi) = machine().pens[pen ? 7 : 0];
 				}
 
 				count++;
@@ -561,24 +575,22 @@ static void draw_bitmap_1bpp(running_machine &machine, bitmap_ind16 &bitmap,cons
 	}
 }
 
-static UINT8 calc_cursor_pos(running_machine &machine,int x,int y,int yi)
+UINT8 pc8801_state::calc_cursor_pos(int x,int y,int yi)
 {
-	pc8801_state *state = machine.driver_data<pc8801_state>();
-
-	if(!(state->m_crtc.cursor_on)) // don't bother if cursor is off
+	if(!(m_crtc.cursor_on)) // don't bother if cursor is off
 		return 0;
 
-	if(x == state->m_crtc.param[4][0] && y == state->m_crtc.param[4][1]) /* check if position matches */
+	if(x == m_crtc.param[4][0] && y == m_crtc.param[4][1]) /* check if position matches */
 	{
 		/* don't pass through if we are using underscore */
-		if((!(state->m_crtc.param[0][2] & 0x40)) && yi != 7)
+		if((!(m_crtc.param[0][2] & 0x40)) && yi != 7)
 			return 0;
 
 		/* finally check if blinking is currently active high */
-		if(!(state->m_crtc.param[0][2] & 0x20))
+		if(!(m_crtc.param[0][2] & 0x20))
 			return 1;
 
-		if(((machine.primary_screen->frame_number() / blink_speed) & 1) == 0)
+		if(((machine().primary_screen->frame_number() / blink_speed) & 1) == 0)
 			return 1;
 
 		return 0;
@@ -589,22 +601,21 @@ static UINT8 calc_cursor_pos(running_machine &machine,int x,int y,int yi)
 
 
 
-static UINT8 extract_text_attribute(running_machine &machine,UINT32 address,int x, UINT8 width, UINT8 &non_special)
+UINT8 pc8801_state::extract_text_attribute(UINT32 address,int x, UINT8 width, UINT8 &non_special)
 {
-	pc8801_state *state = machine.driver_data<pc8801_state>();
-	UINT8 *vram = state->memregion("wram")->base();
+	UINT8 *vram = machine().root_device().memregion("wram")->base();
 	int i;
 	int fifo_size;
 	int offset;
 
 	non_special = 0;
-	if(state->m_crtc.param[0][4] & 0x80)
+	if(m_crtc.param[0][4] & 0x80)
 	{
 		popmessage("Using non-separate mode for text tilemap, contact MESSdev");
 		return 0;
 	}
 
-	fifo_size = (state->m_crtc.param[0][4] & 0x20) ? 0 : ((state->m_crtc.param[0][4] & 0x1f) + 1);
+	fifo_size = (m_crtc.param[0][4] & 0x20) ? 0 : ((m_crtc.param[0][4] & 0x1f) + 1);
 
 	if(fifo_size == 0)
 	{
@@ -628,23 +639,22 @@ static UINT8 extract_text_attribute(running_machine &machine,UINT32 address,int 
 	return vram[address-3+offset];
 }
 
-static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int height,int width, UINT8 non_special)
+void pc8801_state::pc8801_draw_char(bitmap_ind16 &bitmap,int x,int y,int pal,UINT8 gfx_mode,UINT8 reverse,UINT8 secret,UINT8 blink,UINT8 upper,UINT8 lower,int y_size,int width, UINT8 non_special)
 {
-	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int xi,yi;
-	UINT8 *vram = state->memregion("wram")->base();
-	UINT8 *gfx_rom = machine.root_device().memregion("gfx1")->base();
+	UINT8 *vram = machine().root_device().memregion("wram")->base();
+	UINT8 *gfx_rom = machine().root_device().memregion("gfx1")->base();
 	UINT8 is_cursor;
 	UINT8 y_height, y_double;
 	UINT8 y_step;
 
 	y_height = lines_per_char;
-	y_double = (state->pc8801_pixel_clock());
+	y_double = (pc8801_pixel_clock());
 	y_step = (non_special) ? 80 : 120; // trusted by Elthlead
 
 	for(yi=0;yi<y_height;yi++)
 	{
-		is_cursor = calc_cursor_pos(machine,x,y,yi);
+		is_cursor = calc_cursor_pos(x,y,yi);
 
 		for(xi=0;xi<8;xi++)
 		{
@@ -653,12 +663,12 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 			int color;
 
 			{
-				tile = vram[x+(y*y_step)+state->m_dma_address[2]];
+				tile = vram[x+(y*y_step)+m_dma_address[2]];
 
 				res_x = x*8+xi*(width+1);
-				res_y = y*y_height*(height+1)+yi*(height+1);
+				res_y = y*y_height+yi;
 
-				if(!machine.primary_screen->visible_area().contains(res_x, res_y))
+				if(!machine().primary_screen->visible_area().contains(res_x, res_y))
 					continue;
 
 				if(gfx_mode)
@@ -675,7 +685,7 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 					UINT8 blink_mask;
 
 					blink_mask = 0;
-					if(blink && ((machine.primary_screen->frame_number() / blink_speed) & 3) == 1)
+					if(blink && ((machine().primary_screen->frame_number() / blink_speed) & 3) == 1)
 						blink_mask = 1;
 
 					if(yi >= (1 << (y_double+3)) || secret || blink_mask)
@@ -699,38 +709,23 @@ static void pc8801_draw_char(running_machine &machine,bitmap_ind16 &bitmap,int x
 				}
 
 				if(color != -1)
-					bitmap.pix16(res_y, res_x) = machine.pens[color];
-
-				if(width)
 				{
-					if(!machine.primary_screen->visible_area().contains(res_x+1, res_y))
-						continue;
+					bitmap.pix16(res_y, res_x) = machine().pens[color];
+					if(width)
+					{
+						if(!machine().primary_screen->visible_area().contains(res_x+1, res_y))
+							continue;
 
-					if(color != -1)
-						bitmap.pix16(res_y, res_x+1) = machine.pens[color];
-				}
-				if(height)
-				{
-					if(!machine.primary_screen->visible_area().contains(res_x, res_y+1))
-						continue;
-
-					if(color != -1)
-						bitmap.pix16(res_y+1, res_x) = machine.pens[color];
-
-					if(!machine.primary_screen->visible_area().contains(res_x+1, res_y+1))
-						continue;
-
-					if(color != -1)
-						bitmap.pix16(res_y+1, res_x+1) = machine.pens[color];
+						bitmap.pix16(res_y, res_x+1) = machine().pens[color];
+					}
 				}
 			}
 		}
 	}
 }
 
-static void draw_text(running_machine &machine, bitmap_ind16 &bitmap,int y_size, UINT8 width)
+void pc8801_state::draw_text(bitmap_ind16 &bitmap,int y_size, UINT8 width)
 {
-	pc8801_state *state = machine.driver_data<pc8801_state>();
 	int x,y;
 	UINT8 attr;
 	UINT8 reverse;
@@ -749,7 +744,7 @@ static void draw_text(running_machine &machine, bitmap_ind16 &bitmap,int y_size,
 			if(x & 1 && !width)
 				continue;
 
-			attr = extract_text_attribute(machine,(((y*120)+80+state->m_dma_address[2]) & 0xffff),(x),width,non_special);
+			attr = extract_text_attribute((((y*120)+80+m_dma_address[2]) & 0xffff),(x),width,non_special);
 
 			if(text_color_flag && (attr & 8)) // color mode
 			{
@@ -772,40 +767,39 @@ static void draw_text(running_machine &machine, bitmap_ind16 &bitmap,int y_size,
 				lower = (attr & 0x20) >> 5;
 				blink = (attr & 2) >> 1;
 				pal|=8; //text pal bank
-				reverse ^= state->m_crtc.inverse;
+				reverse ^= m_crtc.inverse;
 
 				if(attr & 0x80)
 					popmessage("Warning: mono gfx mode enabled, contact MESSdev");
 
 			}
 
-			pc8801_draw_char(machine,bitmap,x,y,pal,gfx_mode,reverse,secret,blink,upper,lower,y_size,monitor_24KHz,!width,non_special);
+			pc8801_draw_char(bitmap,x,y,pal,gfx_mode,reverse,secret,blink,upper,lower,y_size,!width,non_special);
 		}
 	}
 }
 
-static SCREEN_UPDATE_IND16( pc8801 )
+UINT32 pc8801_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	pc8801_state *state = screen.machine().driver_data<pc8801_state>();
 	bitmap.fill(screen.machine().pens[0], cliprect);
 
-//	popmessage("%04x %04x %02x",state->m_dma_address[2],state->m_dma_counter[2],state->m_dmac_mode);
+//	popmessage("%04x %04x %02x",m_dma_address[2],m_dma_counter[2],m_dmac_mode);
 
-	if(state->m_gfx_ctrl & 8)
+	if(m_gfx_ctrl & 8)
 	{
-		if(state->m_gfx_ctrl & 0x10)
-			draw_bitmap_3bpp(screen.machine(),bitmap,cliprect);
+		if(m_gfx_ctrl & 0x10)
+			draw_bitmap_3bpp(bitmap,cliprect);
 		else
-			draw_bitmap_1bpp(screen.machine(),bitmap,cliprect);
+			draw_bitmap_1bpp(bitmap,cliprect);
 	}
 
 	//popmessage("%02x %02x %02x %02x %02x",state->m_layer_mask,state->m_dmac_mode,state->m_crtc.status,state->m_crtc.irq_mask,state->m_gfx_ctrl);
 
-	if(!(state->m_layer_mask & 1) && state->m_dmac_mode & 4 && state->m_crtc.status & 0x10 && state->m_crtc.irq_mask == 3)
+	if(!(m_layer_mask & 1) && m_dmac_mode & 4 && m_crtc.status & 0x10 && m_crtc.irq_mask == 3)
 	{
-		//popmessage("%02x %02x",state->m_crtc.param[0][0],state->m_crtc.param[0][4]);
+		//popmessage("%02x %02x",m_crtc.param[0][0],m_crtc.param[0][4]);
 
-		draw_text(screen.machine(),bitmap,screen_height,state->m_txt_width);
+		draw_text(bitmap,screen_height,m_txt_width);
 	}
 
 	return 0;
@@ -1188,15 +1182,14 @@ UINT8 pc8801_state::pc8801_pixel_clock(void)
 	return (ysize >= 400);
 }
 
-static void pc8801_dynamic_res_change(running_machine &machine)
+void pc8801_state::pc8801_dynamic_res_change(void)
 {
-	pc8801_state *state = machine.driver_data<pc8801_state>();
 	rectangle visarea;
 	int xsize,ysize,xvis,yvis;
 	attoseconds_t refresh;;
 
 	/* bail out if screen params aren't valid */
-	if(!state->m_crtc.param[0][0] || !state->m_crtc.param[0][1] || !state->m_crtc.param[0][2] || !state->m_crtc.param[0][3])
+	if(!m_crtc.param[0][0] || !m_crtc.param[0][1] || !m_crtc.param[0][2] || !m_crtc.param[0][3])
 		return;
 
 	xvis = screen_width;
@@ -1207,12 +1200,12 @@ static void pc8801_dynamic_res_change(running_machine &machine)
 //	popmessage("H %d V %d (%d x %d) HR %d VR %d (%d %d)\n",xvis,yvis,screen_height,lines_per_char,hretrace,vretrace, xsize,ysize);
 
 	visarea.set(0, xvis - 1, 0, yvis - 1);
-	if(state->pc8801_pixel_clock())
+	if(pc8801_pixel_clock())
 		refresh = HZ_TO_ATTOSECONDS(PIXEL_CLOCK_24KHz) * (xsize) * ysize;
 	else
 		refresh = HZ_TO_ATTOSECONDS(PIXEL_CLOCK_15KHz) * (xsize) * ysize;
 
-	machine.primary_screen->configure(xsize, ysize, visarea, refresh);
+	machine().primary_screen->configure(xsize, ysize, visarea, refresh);
 }
 
 WRITE8_MEMBER(pc8801_state::pc8801_gfx_ctrl_w)
@@ -1228,7 +1221,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_gfx_ctrl_w)
 
 	m_gfx_ctrl = data;
 
-	pc8801_dynamic_res_change(machine());
+	pc8801_dynamic_res_change();
 }
 
 READ8_MEMBER(pc8801_state::pc8801_vram_select_r)
@@ -1396,7 +1389,7 @@ WRITE8_MEMBER(pc8801_state::pc88_crtc_param_w)
 	{
 		m_crtc.param[m_crtc.cmd][m_crtc.param_count] = data;
 		if(m_crtc.cmd == 0)
-			pc8801_dynamic_res_change(machine());
+			pc8801_dynamic_res_change();
 
 		m_crtc.param_count++;
 	}
@@ -1842,7 +1835,7 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( pc8801fd_upd765_tc_to_zero )
 {
-//  pc88va_state *state = machine.driver_data<pc88va_state>();
+//  pc8801_state *state = machine.driver_data<pc8801_state>();
 
 	//printf("0\n");
 	upd765_tc_w(machine.device("upd765"), 0);
@@ -2660,13 +2653,13 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK_24KHz,848,0,640,448,0,400)
-	MCFG_SCREEN_UPDATE_STATIC(pc8801)
+	MCFG_SCREEN_UPDATE_DRIVER(pc8801_state, screen_update)
 
 	MCFG_GFXDECODE( pc8801 )
 	MCFG_PALETTE_LENGTH(0x10)
 	MCFG_PALETTE_INIT( pc8801 )
 
-	MCFG_VIDEO_START(pc8801)
+//	MCFG_VIDEO_START(pc8801)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
