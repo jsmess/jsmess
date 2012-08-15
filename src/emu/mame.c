@@ -175,6 +175,7 @@ int mame_execute(emu_options &options, osd_interface &osd)
 			valid.check_shared_source(*system);
 		}
 
+		ui_show_mouse(false);
 
 		// create the machine configuration
 		machine_config config(*system, options);
