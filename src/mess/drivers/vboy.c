@@ -101,7 +101,8 @@ public:
 	bitmap_ind16 m_bg_map[16];
 	bitmap_ind16 m_screen_output;
 
-	void timer_tick(UINT8 setting);
+	void m_timer_tick(UINT8 setting);
+	void m_scanline_tick(int scanline);
 };
 
 READ32_MEMBER( vboy_state::port_02_read )
@@ -681,7 +682,6 @@ static SCREEN_UPDATE_IND16( vboy_left )
 		if (display_world(state, i, state->m_screen_output, 0)) break;
 
 	copybitmap(bitmap, state->m_screen_output, 0, 0, 0, 0, cliprect);
-	state->m_vip_regs.DPSTTS = ((state->m_vip_regs.DPCTRL&0x0302)|0x7c);
 	return 0;
 }
 
@@ -694,7 +694,6 @@ static SCREEN_UPDATE_IND16( vboy_right )
 		if (display_world(state, i, state->m_screen_output, 1)) break;
 
 	copybitmap(bitmap, state->m_screen_output, 0, 0, 0, 0, cliprect);
-	state->m_vip_regs.DPSTTS = ((state->m_vip_regs.DPCTRL&0x0302)|0x7c);
 	return 0;
 }
 
@@ -705,7 +704,7 @@ static TIMER_DEVICE_CALLBACK( video_tick )
 	state->m_vip_regs.XPSTTS = (state->m_vip_regs.XPSTTS==0) ? 0x0c : 0x00;
 }
 
-void vboy_state::timer_tick(UINT8 setting)
+void vboy_state::m_timer_tick(UINT8 setting)
 {
 	if(m_vboy_regs.tcr & 1 && ((m_vboy_regs.tcr & 0x10) == setting))
 	{
@@ -730,14 +729,14 @@ static TIMER_DEVICE_CALLBACK( timer_100us_tick )
 {
 	vboy_state *state = timer.machine().driver_data<vboy_state>();
 
-	state->timer_tick(0x00);
+	state->m_timer_tick(0x00);
 }
 
 static TIMER_DEVICE_CALLBACK( timer_20us_tick )
 {
 	vboy_state *state = timer.machine().driver_data<vboy_state>();
 
-	state->timer_tick(0x10);
+	state->m_timer_tick(0x10);
 }
 
 static PALETTE_INIT( vboy )
@@ -748,15 +747,56 @@ static PALETTE_INIT( vboy )
 	palette_set_color(machine, 3, RGB_BLACK);
 }
 
-static INTERRUPT_GEN( vboy_interrupt )
+void vboy_state::m_scanline_tick(int scanline)
 {
-	vboy_state *state = device->machine().driver_data<vboy_state>();
+	int frame_num = machine().primary_screen->frame_number();
 
-	if(state->m_vip_regs.INTENB & 0x4000)
+	if(scanline == 0)
+		m_vip_regs.DPSTTS = (m_vip_regs.DPCTRL&0x0302)|0xc0;
+
+	if(scanline == 144)
 	{
-		cputag_set_input_line(device->machine(), "maincpu", 4, ASSERT_LINE);
-		state->m_vip_regs.INTPND |= 0x4000;
+		m_vip_regs.DPSTTS  = m_vip_regs.DPCTRL&0x0302;
+		m_vip_regs.DPSTTS |= frame_num & 1 ? 0xd0 : 0xc4;
 	}
+
+	if(scanline == 224)
+	{
+		if(m_vip_regs.INTENB & 0x4000)
+		{
+			device_set_input_line(m_maincpu, 4, ASSERT_LINE);
+			m_vip_regs.INTPND |= 0x4000;
+		}
+	}
+
+	if(scanline == 232)
+	{
+		m_vip_regs.DPSTTS = (m_vip_regs.DPCTRL&0x0302)|0xc0;
+	}
+
+	if(scanline == 240)
+	{
+		m_vip_regs.DPSTTS = (m_vip_regs.DPCTRL&0x0302)|0x40;
+	}
+
+	if(scanline == 248)
+	{
+		m_vip_regs.DPSTTS  = (m_vip_regs.DPCTRL&0x0302);
+		m_vip_regs.DPSTTS |= frame_num & 1 ? 0x60 : 0x48;
+	}
+
+	if(scanline == 256)
+	{
+		m_vip_regs.DPSTTS  = (m_vip_regs.DPCTRL&0x0302)|0x40;
+	}
+}
+
+static TIMER_DEVICE_CALLBACK( vboy_scanline )
+{
+	vboy_state *state = timer.machine().driver_data<vboy_state>();
+	int scanline = param;
+
+	state->m_scanline_tick(scanline);
 }
 
 static MACHINE_CONFIG_START( vboy, vboy_state )
@@ -765,7 +805,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_CPU_ADD( "maincpu", V810, XTAL_20MHz )
 	MCFG_CPU_PROGRAM_MAP(vboy_mem)
 	MCFG_CPU_IO_MAP(vboy_io)
-	MCFG_CPU_VBLANK_INT("3dleft", vboy_interrupt)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", vboy_scanline, "3dleft", 0, 1)
 
 	MCFG_MACHINE_RESET(vboy)
 
@@ -783,7 +823,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_SCREEN_ADD("3dleft", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50.2)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(384, 224)
+	MCFG_SCREEN_SIZE(512, 264) // FIXME: hblank duration
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(vboy_left)
 
@@ -791,7 +831,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_SCREEN_ADD("3dright", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50.2)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
-	MCFG_SCREEN_SIZE(384, 224)
+	MCFG_SCREEN_SIZE(512, 264) // FIXME: hblank duration
 	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 224-1)
 	MCFG_SCREEN_UPDATE_STATIC(vboy_right)
 
