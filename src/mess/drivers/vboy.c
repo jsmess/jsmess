@@ -164,13 +164,11 @@ WRITE32_MEMBER( vboy_state::port_02_write )
 			/*
 				111- ---- always 1
 				---x ---- timer select (1=20 us, 0=100 us)
+				---- x--- timer irq
 				---- -x-- resets timer zero flag
 				---- --x- timer is zero flag
 				---- ---x enables timer
 			*/
-			if(((data & 5) == 4) && ((m_vboy_regs.tcr & 1) == 1))
-				break;
-
 			if(data & 1)
 			{
 				m_vboy_regs.tlb = m_vboy_timer.latch & 0xff;
@@ -179,7 +177,7 @@ WRITE32_MEMBER( vboy_state::port_02_write )
 			}
 
 			m_vboy_regs.tcr = (data & 0xfd) | (0xe4) | (m_vboy_regs.tcr & 2);	// according to docs: bits 5, 6 & 7 are unused and set to 1, bit 1 is read only.
-			if(data & 4 && ((m_vboy_regs.tcr & 1) == 0))
+			if(data & 4)
 				m_vboy_regs.tcr &= 0xfd;
 			break;
 		case 0x24:	// WCR (Wait State Control Reg)
@@ -233,8 +231,25 @@ READ16_MEMBER( vboy_state::vip_r )
 					return m_vip_regs.FRMCYC;
 		case 0x30:	//CTA
 					return m_vip_regs.CTA;
-		case 0x40:	//XPSTTS
-					return m_vip_regs.XPSTTS;
+		case 0x40:	//XPSTTS, piXel Processor STaTuS
+		{
+			/*
+			---- ---- ---- x--- XPBSY1 (second framebuffer busy flag)
+			---- ---- ---- -x-- XPBSY0 (first framebfuffer busy flag)
+			*/
+			int frame_num = machine().primary_screen->frame_number() & 1;
+			//int row_num = (machine().primary_screen->vpos() / 8) & 0x1f;
+			UINT16 res;
+
+			//printf("%d\n",row_num);
+
+			res =  m_vip_regs.XPSTTS & 0x00f3;
+			res |= frame_num ? 0x0c : 0x00;
+			//if(m_vip_regs.XPCTRL & 2) /* FIXME: this crashes emulation in boundh and some other games */
+			//	res |= ((row_num)<<8);
+
+			return res;
+		}
 		case 0x42:	//XPCTRL
 					return m_vip_regs.XPCTRL;
 		case 0x44:	//VER
@@ -275,22 +290,35 @@ READ16_MEMBER( vboy_state::vip_r )
 WRITE16_MEMBER( vboy_state::vip_w )
 {
 	switch(offset << 1) {
+		/*
+			x--- ---- ---- ---- TIME_ERR
+			-x-- ---- ---- ---- XP_END
+			--x- ---- ---- ---- SB_HIT
+			---- ---- ---x ---- FRAME_START
+			---- ---- ---- x--- GAME_START
+			---- ---- ---- -x-- RFB_END
+			---- ---- ---- --x- LFB_END
+			---- ---- ---- ---x SCAN_ERR
+		*/
 		case 0x00:	//INTPND
 					logerror("Error writing INTPND\n");
 					break;
 		case 0x02:	//INTENB
 					m_vip_regs.INTENB = data;
+					m_set_irq(0);
 					//printf("%04x ENB\n",data);
 					break;
 		case 0x04:	//INTCLR
 					m_vip_regs.INTPND &= ~data;
-					cputag_set_input_line(machine(), "maincpu", 4, CLEAR_LINE);
-					//printf("%04x ACK\n",data);
+					m_set_irq(0);
+					//else
+					//	printf("%04x\n",m_vip_regs.INTPND);
 					break;
 		case 0x20:	//DPSTTS
 					logerror("Error writing DPSTTS\n");
 					break;
 		case 0x22:	//DPCTRL
+					//printf("%04x DPCTRL\n",data);
 					m_vip_regs.DPCTRL = data;
 					break;
 		case 0x24:	//BRTA
@@ -309,6 +337,7 @@ WRITE16_MEMBER( vboy_state::vip_w )
 					m_vip_regs.REST = data;
 					break;
 		case 0x2E:	//FRMCYC
+					//printf("%d\n",data);
 					m_vip_regs.FRMCYC = data;
 					break;
 		case 0x30:	//CTA
@@ -650,11 +679,13 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	else
 	if (mode==2)
 	{
-
+		popmessage("Mode 2 used");
 	}
 	else
 	if (mode==3)
 	{
+		popmessage("Mode 3 used");
+
 		// just for test
 		for(i=state->m_vip_regs.SPT[3];i>=state->m_vip_regs.SPT[2];i--)
 		{
@@ -696,13 +727,6 @@ static SCREEN_UPDATE_IND16( vboy_right )
 
 	copybitmap(bitmap, state->m_screen_output, 0, 0, 0, 0, cliprect);
 	return 0;
-}
-
-static TIMER_DEVICE_CALLBACK( video_tick )
-{
-	vboy_state *state = timer.machine().driver_data<vboy_state>();
-
-	state->m_vip_regs.XPSTTS = (state->m_vip_regs.XPSTTS==0) ? 0x0c : 0x00;
 }
 
 void vboy_state::m_timer_tick(UINT8 setting)
@@ -750,10 +774,13 @@ static PALETTE_INIT( vboy )
 
 void vboy_state::m_set_irq(UINT16 irq_vector)
 {
-	if(m_vip_regs.INTENB & irq_vector)
+	m_vip_regs.INTPND |= irq_vector;
+
+	if(m_vip_regs.INTENB & m_vip_regs.INTPND)
 		device_set_input_line(m_maincpu, 4, ASSERT_LINE);
 
-	m_vip_regs.INTPND |= irq_vector;
+	if((m_vip_regs.INTENB & m_vip_regs.INTPND) == 0)
+		device_set_input_line(m_maincpu, 4, CLEAR_LINE);
 }
 
 void vboy_state::m_scanline_tick(int scanline)
@@ -815,7 +842,6 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 
 	MCFG_MACHINE_RESET(vboy)
 
-	MCFG_TIMER_ADD_PERIODIC("video", video_tick, attotime::from_hz(100))
 	MCFG_TIMER_ADD_PERIODIC("timer_100us", timer_100us_tick, attotime::from_usec(100))
 	MCFG_TIMER_ADD_PERIODIC("timer_20us", timer_20us_tick, attotime::from_usec(20))
 
