@@ -103,6 +103,7 @@ public:
 
 	void m_timer_tick(UINT8 setting);
 	void m_scanline_tick(int scanline);
+	void m_set_irq(UINT16 irq_vector);
 };
 
 READ32_MEMBER( vboy_state::port_02_read )
@@ -747,6 +748,14 @@ static PALETTE_INIT( vboy )
 	palette_set_color(machine, 3, RGB_BLACK);
 }
 
+void vboy_state::m_set_irq(UINT16 irq_vector)
+{
+	if(m_vip_regs.INTENB & irq_vector)
+		device_set_input_line(m_maincpu, 4, ASSERT_LINE);
+
+	m_vip_regs.INTPND |= irq_vector;
+}
+
 void vboy_state::m_scanline_tick(int scanline)
 {
 	int frame_num = machine().primary_screen->frame_number();
@@ -761,28 +770,25 @@ void vboy_state::m_scanline_tick(int scanline)
 	}
 
 	if(scanline == 224)
-	{
-		if(m_vip_regs.INTENB & 0x4000)
-		{
-			device_set_input_line(m_maincpu, 4, ASSERT_LINE);
-			m_vip_regs.INTPND |= 0x4000;
-		}
-	}
+		m_set_irq(0x4000); // XPEND
 
 	if(scanline == 232)
 	{
 		m_vip_regs.DPSTTS = (m_vip_regs.DPCTRL&0x0302)|0xc0;
+		m_set_irq(0x0002); // LFBEND
 	}
 
 	if(scanline == 240)
 	{
 		m_vip_regs.DPSTTS = (m_vip_regs.DPCTRL&0x0302)|0x40;
+		m_set_irq(0x0004); // RFBEND
 	}
 
 	if(scanline == 248)
 	{
 		m_vip_regs.DPSTTS  = (m_vip_regs.DPCTRL&0x0302);
 		m_vip_regs.DPSTTS |= frame_num & 1 ? 0x60 : 0x48;
+		m_set_irq(0x2000); // SBHIT
 	}
 
 	if(scanline == 256)
