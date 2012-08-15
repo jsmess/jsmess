@@ -103,6 +103,8 @@ public:
 	bitmap_ind16 m_bg_map[16];
 	bitmap_ind16 m_screen_output;
 	UINT16 m_frame_count;
+	UINT8 m_displayfb;
+	UINT8 m_display_count;
 
 	void m_timer_tick(UINT8 setting);
 	void m_scanline_tick(int scanline, UINT8 screen_type);
@@ -219,20 +221,28 @@ READ16_MEMBER( vboy_state::vip_r )
 					logerror("Error reading INTCLR\n");
 					break;
 		case 0x20:	//DPSTTS
-					return m_vip_regs.DPSTTS;
+		{
+			UINT16 res;
+
+			res = m_vip_regs.DPCTRL & 0x0702;
+			if(m_vip_regs.DPCTRL & 2 && m_display_count & 1)
+			{
+				if(m_display_count & 2)
+					res |= 8 << (m_displayfb*2);
+			}
+
+			res |= 0x40;
+			return res;
+		}
 		case 0x22:	//DPCTRL
 					return m_vip_regs.DPCTRL;
 		case 0x24:	//BRTA
-					printf("R A\n");
 					return m_vip_regs.BRTA;
 		case 0x26:	//BRTB
-					printf("R B\n");
 					return m_vip_regs.BRTB;
 		case 0x28:	//BRTC
-					printf("R C\n");
 					return m_vip_regs.BRTC;
 		case 0x2A:	//REST
-					printf("R D\n");
 					return m_vip_regs.REST;
 		case 0x2E:	//FRMCYC
 					return m_vip_regs.FRMCYC;
@@ -250,7 +260,7 @@ READ16_MEMBER( vboy_state::vip_r )
 
 			//printf("%d\n",row_num);
 
-			res =  m_vip_regs.XPSTTS & 0x00f3;
+			res =  m_vip_regs.XPSTTS & 0x00f3; // empty ^^'
 			res |= frame_num ? 0x0c : 0x00;
 			//if(m_vip_regs.DPCTRL & 2) /* FIXME: this crashes emulation in boundh and some other games */
 			//	res |= ((row_num)<<8);
@@ -325,8 +335,13 @@ WRITE16_MEMBER( vboy_state::vip_w )
 					logerror("Error writing DPSTTS\n");
 					break;
 		case 0x22:	//DPCTRL
-					//printf("%04x DPCTRL\n",data);
-					m_vip_regs.DPCTRL = data;
+					m_vip_regs.DPCTRL = data & 0x0702;
+
+					if(data & 1)
+					{
+						m_vip_regs.INTPND &= 0xe000; // reset FRAME_START, GAME_START, RFB_END, LFB_END and SCAN_ERR irqs
+						m_set_irq(0);
+					}
 					break;
 		case 0x24:	//BRTA
 					m_vip_regs.BRTA = data;
@@ -353,8 +368,21 @@ WRITE16_MEMBER( vboy_state::vip_w )
 		case 0x40:	//XPSTTS
 					logerror("Error writing XPSTTS\n");
 					break;
-		case 0x42:	//XPCTRL
-					m_vip_regs.XPCTRL = data;
+		case 0x42:	//XPCTRL, w/o
+					/*
+					---- ---- ---- --x-
+					---- ---- ---- ---x Reset Pixel Processor
+					*/
+					m_vip_regs.XPCTRL = data & 0x1f02;
+
+					if(data & 0x1f00)
+						printf("%04x SBCMP\n",data);
+
+					if(data & 1)
+					{
+						m_vip_regs.INTPND &= 0x1fff; // reset SB_HIT, XP_END and TIME_ERR irqs
+						m_set_irq(0);
+					}
 					break;
 		case 0x44:	//VER
 					m_vip_regs.VER = data;
@@ -793,13 +821,12 @@ void vboy_state::m_set_irq(UINT16 irq_vector)
 /* TODO: obviously all of this needs clean-ups and better implementation ... */
 void vboy_state::m_scanline_tick(int scanline, UINT8 screen_type)
 {
-	int frame_num = machine().primary_screen->frame_number();
+	//int frame_num = machine().primary_screen->frame_number();
 
 	if(screen_type == 1)
 	{
 		if(scanline == 240)
 		{
-			m_vip_regs.DPSTTS = (m_vip_regs.DPCTRL&0x0302)|0x40;
 			m_set_irq(0x0004); // RFBEND
 		}
 
@@ -808,23 +835,28 @@ void vboy_state::m_scanline_tick(int scanline, UINT8 screen_type)
 
 	if(scanline == 0)
 	{
-		m_vip_regs.DPSTTS = (m_vip_regs.DPCTRL&0x0302)|0xc0;
 		if(m_vip_regs.DPCTRL & 2)
 			m_set_irq(0x0010); // FRAME_START
 
 		m_frame_count++;
 
+		m_display_count ++;
+		m_display_count &= 3;
+
 		if(m_frame_count > m_vip_regs.FRMCYC)
 		{
 			m_set_irq(0x0008); // GAME_START
 			m_frame_count = 0;
+			if(m_vip_regs.XPCTRL & 2)
+			{
+				m_displayfb ^= 1;
+			}
 		}
 	}
 
 	if(scanline == 144)
 	{
-		m_vip_regs.DPSTTS  = m_vip_regs.DPCTRL&0x0302;
-		m_vip_regs.DPSTTS |= frame_num & 1 ? 0xd0 : 0xc4;
+		// ...
 	}
 
 	if(scanline == 224)
@@ -832,20 +864,17 @@ void vboy_state::m_scanline_tick(int scanline, UINT8 screen_type)
 
 	if(scanline == 232)
 	{
-		m_vip_regs.DPSTTS = (m_vip_regs.DPCTRL&0x0302)|0xc0;
 		m_set_irq(0x0002); // LFBEND
 	}
 
 	if(scanline == 248)
 	{
-		m_vip_regs.DPSTTS  = (m_vip_regs.DPCTRL&0x0302);
-		m_vip_regs.DPSTTS |= frame_num & 1 ? 0x60 : 0x48;
-		m_set_irq(0x2000); // SBHIT
+		//m_set_irq(0x2000); // SBHIT
 	}
 
 	if(scanline == 256)
 	{
-		m_vip_regs.DPSTTS  = (m_vip_regs.DPCTRL&0x0302)|0x40;
+		// ...
 	}
 }
 
