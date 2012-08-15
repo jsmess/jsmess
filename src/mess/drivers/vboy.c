@@ -100,9 +100,10 @@ public:
 	timer_t m_vboy_timer;
 	bitmap_ind16 m_bg_map[16];
 	bitmap_ind16 m_screen_output;
+	UINT16 m_frame_count;
 
 	void m_timer_tick(UINT8 setting);
-	void m_scanline_tick(int scanline);
+	void m_scanline_tick(int scanline, UINT8 screen_type);
 	void m_set_irq(UINT16 irq_vector);
 };
 
@@ -245,7 +246,7 @@ READ16_MEMBER( vboy_state::vip_r )
 
 			res =  m_vip_regs.XPSTTS & 0x00f3;
 			res |= frame_num ? 0x0c : 0x00;
-			//if(m_vip_regs.XPCTRL & 2) /* FIXME: this crashes emulation in boundh and some other games */
+			//if(m_vip_regs.DPCTRL & 2) /* FIXME: this crashes emulation in boundh and some other games */
 			//	res |= ((row_num)<<8);
 
 			return res;
@@ -684,7 +685,7 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	else
 	if (mode==3)
 	{
-		popmessage("Mode 3 used");
+		//popmessage("Mode 3 used");
 
 		// just for test
 		for(i=state->m_vip_regs.SPT[3];i>=state->m_vip_regs.SPT[2];i--)
@@ -783,12 +784,36 @@ void vboy_state::m_set_irq(UINT16 irq_vector)
 		device_set_input_line(m_maincpu, 4, CLEAR_LINE);
 }
 
-void vboy_state::m_scanline_tick(int scanline)
+/* TODO: obviously all of this needs clean-ups and better implementation ... */
+void vboy_state::m_scanline_tick(int scanline, UINT8 screen_type)
 {
 	int frame_num = machine().primary_screen->frame_number();
 
+	if(screen_type == 1)
+	{
+		if(scanline == 240)
+		{
+			m_vip_regs.DPSTTS = (m_vip_regs.DPCTRL&0x0302)|0x40;
+			m_set_irq(0x0004); // RFBEND
+		}
+
+		return;
+	}
+
 	if(scanline == 0)
+	{
 		m_vip_regs.DPSTTS = (m_vip_regs.DPCTRL&0x0302)|0xc0;
+		if(m_vip_regs.DPCTRL & 2)
+			m_set_irq(0x0010); // FRAME_START
+
+		m_frame_count++;
+
+		if(m_frame_count > m_vip_regs.FRMCYC)
+		{
+			m_set_irq(0x0008); // GAME_START
+			m_frame_count = 0;
+		}
+	}
 
 	if(scanline == 144)
 	{
@@ -805,12 +830,6 @@ void vboy_state::m_scanline_tick(int scanline)
 		m_set_irq(0x0002); // LFBEND
 	}
 
-	if(scanline == 240)
-	{
-		m_vip_regs.DPSTTS = (m_vip_regs.DPCTRL&0x0302)|0x40;
-		m_set_irq(0x0004); // RFBEND
-	}
-
 	if(scanline == 248)
 	{
 		m_vip_regs.DPSTTS  = (m_vip_regs.DPCTRL&0x0302);
@@ -824,12 +843,20 @@ void vboy_state::m_scanline_tick(int scanline)
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( vboy_scanline )
+static TIMER_DEVICE_CALLBACK( vboy_scanlineL )
 {
 	vboy_state *state = timer.machine().driver_data<vboy_state>();
 	int scanline = param;
 
-	state->m_scanline_tick(scanline);
+	state->m_scanline_tick(scanline,0);
+}
+
+static TIMER_DEVICE_CALLBACK( vboy_scanlineR )
+{
+	vboy_state *state = timer.machine().driver_data<vboy_state>();
+	int scanline = param;
+
+	state->m_scanline_tick(scanline,1);
 }
 
 static MACHINE_CONFIG_START( vboy, vboy_state )
@@ -838,7 +865,8 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_CPU_ADD( "maincpu", V810, XTAL_20MHz )
 	MCFG_CPU_PROGRAM_MAP(vboy_mem)
 	MCFG_CPU_IO_MAP(vboy_io)
-	MCFG_TIMER_ADD_SCANLINE("scantimer", vboy_scanline, "3dleft", 0, 1)
+	MCFG_TIMER_ADD_SCANLINE("scantimer_l", vboy_scanlineL, "3dleft", 0, 1)
+	MCFG_TIMER_ADD_SCANLINE("scantimer_r", vboy_scanlineR, "3dright", 0, 1)
 
 	MCFG_MACHINE_RESET(vboy)
 
