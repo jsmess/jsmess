@@ -36,10 +36,14 @@
     - Combat: mono gfx mode enabled, but I don't see any noticeable quirk?
     - Cranston Manor (actually N88-Basic demo): no sound
     - Datenshi Kyouko: gfx garbage on the right edge?
+    - Final Crisis: sound stuck with OPNA?
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
+	- Gegege no Kitarou: title screen text/bitmap contrast is pretty ugly (BTANB?);
     - Grobda: palette is ugly (parent pc8801 only);
 	- Music Collection Vol. 2 - Final Fantasy Tokushuu: sound irq dies pretty soon
-	- N88 Nihongo BASIC (app): cursor is too big?
+	- N-BASIC: cursor doesn't show up;
+	- Star Cruiser: bad kanji data?
+	- Star Cruiser: reads at i/o 0x8e?
     - Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
     - Xevious: game is too fast (parent pc8801 only)
 
@@ -91,6 +95,27 @@
 	- F-15 Strike Eagle
 	- F2 Grand Prix ("Boot dekimasen")
 	- Fangs - The Saga of Wolf Blood (Crashes at the first random battle)
+	- Fantasian
+	- Final Zone
+	- Final Zone (demo)
+	- Fruit Panic
+	- FSD Sample Ongaku Shuu Vol. 1-7
+	- Gaia no Kiba
+	- Gaiflame
+	- Gambler Jiko Chuushin ha
+	- Gambler Jiko Chuushin ha 2
+	- Gambler Jiko Chuushin ha 3
+	- Gambler Jiko Chuushin ha 3 (demo)
+	- Gambler Jiko Chuushin ha Mahjong Puzzle Collection
+	- Gambler Jiko Chuushin ha Mahjong Puzzle Collection (demo)
+	- Game Music Library
+	- Gaudi - Barcelona no Kaze (bad Wolfteam logo then black screen)
+	- GC-clusterz Music Disk Vol. 1-7
+	- Genji
+	- Gokuraku Tengoku
+	- Grodius 3 (might not be floppy)
+	- Gun Ship (at gameplay)
+	(Hacker)
 
     - Harakiri
     - Kaseijin (app) (code snippet is empty at some point)
@@ -772,7 +797,7 @@ void pc8801_state::draw_text(bitmap_ind16 &bitmap,int y_size, UINT8 width)
 			}
 			else // monochrome
 			{
-				pal = 7; /* TODO: Bishoujo Baseball Gakuen wants this to be black somehow ... */
+				pal = 7; /* TODO: Bishoujo Baseball Gakuen Pasoket logo wants this to be black somehow ... */
 				gfx_mode = (attr & 0x80) >> 7;
 				reverse = (attr & 4) >> 2;
 				secret = (attr & 1);
@@ -2142,10 +2167,10 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("MOUSEX")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_RESET PORT_REVERSE PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X ) PORT_RESET PORT_REVERSE PORT_SENSITIVITY(20) PORT_KEYDELTA(20) PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
 
 	PORT_START("MOUSEY")
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_RESET PORT_REVERSE PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y ) PORT_RESET PORT_REVERSE PORT_SENSITIVITY(20) PORT_KEYDELTA(20) PORT_PLAYER(1) PORT_CONDITION("BOARD_CONFIG", 0x02, EQUALS, 0x02)
 
 	PORT_START("MEM")
 	PORT_CONFNAME( 0x0f, 0x0a, "Extension memory" )
@@ -2540,7 +2565,6 @@ static const struct upd765_interface pc8801_upd765_interface =
 
 /* YM2203 Interface */
 
-/* TODO: mouse routing (that's why I don't use DEVCB_INPUT_PORT here) */
 static READ8_DEVICE_HANDLER( opn_porta_r )
 {
 	pc8801_state *state = device->machine().driver_data<pc8801_state>();
@@ -2552,7 +2576,6 @@ static READ8_DEVICE_HANDLER( opn_porta_r )
 		shift = (state->m_mouse.phase & 1) ? 0 : 4;
 		res = (state->m_mouse.phase & 2) ? state->m_mouse.y : state->m_mouse.x;
 
-//		popmessage("%02x %02x",state->m_mouse.x,state->m_mouse.y);
 //		printf("%d\n",state->m_mouse.phase);
 
 		return ((res >> shift) & 0x0f) | 0xf0;
@@ -2681,11 +2704,11 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("opn", YM2203, MASTER_CLOCK)
 	MCFG_SOUND_CONFIG(pc88_ym2203_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MCFG_SOUND_ADD("opna", YM2608, MASTER_CLOCK*2) // TODO: irq timing issue?
+	MCFG_SOUND_ADD("opna", YM2608, MASTER_CLOCK*2)
 	MCFG_SOUND_CONFIG(pc88_ym2608_intf)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MCFG_SOUND_ADD(BEEPER_TAG, BEEP, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
