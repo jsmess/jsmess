@@ -19,11 +19,13 @@
 #include "vboy.lh"
 
 typedef struct _vboy_regs_t vboy_regs_t;
+
+/* FIXME: most if not all of these must be UINT8 */
 struct _vboy_regs_t
 {
 	UINT32 lpc, lpc2, lpt, lpr;
 	UINT32 khb, klb;
-	UINT32 thb, tlb;
+	UINT8 thb, tlb;
 	UINT32 tcr, wcr, kcr;
 };
 
@@ -50,15 +52,24 @@ struct _vip_regs_t
 	UINT16 BKCOL;
 };
 
+typedef struct
+{
+	UINT16 count;
+	UINT16 latch;
+} timer_t;
+
 class vboy_state : public driver_device
 {
 public:
 	vboy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
+		  m_maincpu(*this, "maincpu"),
 		  m_l_frame_0(*this,"l_frame_0"),
 		  m_l_frame_1(*this,"l_frame_1"),
 		  m_r_frame_0(*this,"r_frame_0"),
 		  m_r_frame_1(*this,"r_frame_1") { }
+
+	required_device<cpu_device> m_maincpu;
 
 	DECLARE_READ32_MEMBER(port_02_read);
 	DECLARE_WRITE32_MEMBER(port_02_write);
@@ -86,8 +97,11 @@ public:
 	UINT16 *m_objects;
 	vboy_regs_t m_vboy_regs;
 	vip_regs_t m_vip_regs;
+	timer_t m_vboy_timer;
 	bitmap_ind16 m_bg_map[16];
 	bitmap_ind16 m_screen_output;
+
+	void timer_tick(UINT8 setting);
 };
 
 READ32_MEMBER( vboy_state::port_02_read )
@@ -102,6 +116,12 @@ READ32_MEMBER( vboy_state::port_02_read )
 		case 0x14:	// KHB (Keypad High Byte)
 			value = m_vboy_regs.khb;
 			break;
+		case 0x18:	// TLB (Timer Low Byte)
+			value = m_vboy_regs.tlb;
+			break;
+		case 0x1c:	// THB (Timer High Byte)
+			value = m_vboy_regs.thb;
+			break;
 		case 0x20:	// TCR (Timer Control Reg)
 			value = m_vboy_regs.tcr;
 			break;
@@ -115,8 +135,6 @@ READ32_MEMBER( vboy_state::port_02_read )
 		case 0x04:	// LPC2 (Link Port Control Reg)
 		case 0x08:	// LPT (Link Port Transmit)
 		case 0x0c:	// LPR (Link Port Receive)
-		case 0x18:	// TLB (Timer Low Byte)
-		case 0x1c:	// THB (Timer High Byte)
 		default:
 			logerror("Unemulated read: offset %08x\n", 0x02000000 + (offset << 2));
 			break;
@@ -132,8 +150,35 @@ WRITE32_MEMBER( vboy_state::port_02_write )
 		case 0x14:	// KHB (Keypad High Byte)
 			//logerror("Ilegal write: offset %02x should be only read\n", offset);
 			break;
+		case 0x18:	// TLB (Timer Low Byte)
+			m_vboy_regs.tlb = data;
+			m_vboy_timer.latch = m_vboy_regs.tlb | (m_vboy_timer.latch & 0xff00);
+			break;
+		case 0x1c:	// THB (Timer High Byte)
+			m_vboy_regs.thb = data;
+			m_vboy_timer.latch = (m_vboy_regs.thb<<8) | (m_vboy_timer.latch & 0xff);
+			break;
 		case 0x20:	// TCR (Timer Control Reg)
-			m_vboy_regs.kcr = (data | 0xe0) & 0xfd;	// according to docs: bits 5, 6 & 7 are unused and set to 1, bit 1 is read only.
+			/*
+				111- ---- always 1
+				---x ---- timer select (1=20 us, 0=100 us)
+				---- -x-- resets timer zero flag
+				---- --x- timer is zero flag
+				---- ---x enables timer
+			*/
+			if(((data & 5) == 4) && ((m_vboy_regs.tcr & 1) == 1))
+				break;
+
+			if(data & 1)
+			{
+				m_vboy_regs.tlb = m_vboy_timer.latch & 0xff;
+				m_vboy_regs.thb = m_vboy_timer.latch >> 8;
+				m_vboy_timer.count = m_vboy_timer.latch;
+			}
+
+			m_vboy_regs.tcr = (data & 0xfd) | (0xe4) | (m_vboy_regs.tcr & 2);	// according to docs: bits 5, 6 & 7 are unused and set to 1, bit 1 is read only.
+			if(data & 4 && ((m_vboy_regs.tcr & 1) == 0))
+				m_vboy_regs.tcr &= 0xfd;
 			break;
 		case 0x24:	// WCR (Wait State Control Reg)
 			m_vboy_regs.wcr = data | 0xfc;	// according to docs: bits 2 to 7 are unused and set to 1.
@@ -154,8 +199,6 @@ WRITE32_MEMBER( vboy_state::port_02_write )
 		case 0x00:	// LPC (Link Port Control Reg)
 		case 0x04:	// LPC2 (Link Port Control Reg)
 		case 0x08:	// LPT (Link Port Transmit)
-		case 0x18:	// TLB (Timer Low Byte)
-		case 0x1c:	// THB (Timer High Byte)
 		default:
 			logerror("Unemulated write: offset %08x, data %04x\n", 0x02000000 + (offset << 2), data);
 			break;
@@ -662,6 +705,41 @@ static TIMER_DEVICE_CALLBACK( video_tick )
 	state->m_vip_regs.XPSTTS = (state->m_vip_regs.XPSTTS==0) ? 0x0c : 0x00;
 }
 
+void vboy_state::timer_tick(UINT8 setting)
+{
+	if(m_vboy_regs.tcr & 1 && ((m_vboy_regs.tcr & 0x10) == setting))
+	{
+		if(m_vboy_timer.count != 0)
+		{
+			m_vboy_timer.count--;
+			m_vboy_regs.tlb = m_vboy_timer.count & 0xff;
+			m_vboy_regs.thb = m_vboy_timer.count >> 8;
+		}
+		else
+		{
+			m_vboy_timer.count = m_vboy_timer.latch;
+			//printf("Zero timer trigger\n");
+			m_vboy_regs.tcr |= 0x02;
+			if(m_vboy_regs.tcr & 8)
+				device_set_input_line(m_maincpu, 1, HOLD_LINE);
+		}
+	}
+}
+
+static TIMER_DEVICE_CALLBACK( timer_100us_tick )
+{
+	vboy_state *state = timer.machine().driver_data<vboy_state>();
+
+	state->timer_tick(0x00);
+}
+
+static TIMER_DEVICE_CALLBACK( timer_20us_tick )
+{
+	vboy_state *state = timer.machine().driver_data<vboy_state>();
+
+	state->timer_tick(0x10);
+}
+
 static PALETTE_INIT( vboy )
 {
 	palette_set_color(machine, 0, RGB_BLACK);
@@ -674,9 +752,9 @@ static INTERRUPT_GEN( vboy_interrupt )
 {
 	vboy_state *state = device->machine().driver_data<vboy_state>();
 
-	if(state->m_vip_regs.INTENB)
+	if(state->m_vip_regs.INTENB & 0x4000)
 	{
-		cputag_set_input_line(device->machine(), "maincpu", 4, HOLD_LINE);
+		cputag_set_input_line(device->machine(), "maincpu", 4, ASSERT_LINE);
 		state->m_vip_regs.INTPND |= 0x4000;
 	}
 }
@@ -692,6 +770,8 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_MACHINE_RESET(vboy)
 
 	MCFG_TIMER_ADD_PERIODIC("video", video_tick, attotime::from_hz(100))
+	MCFG_TIMER_ADD_PERIODIC("timer_100us", timer_100us_tick, attotime::from_usec(100))
+	MCFG_TIMER_ADD_PERIODIC("timer_20us", timer_20us_tick, attotime::from_usec(20))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_vboy)
