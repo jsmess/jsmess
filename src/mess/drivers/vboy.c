@@ -221,12 +221,16 @@ READ16_MEMBER( vboy_state::vip_r )
 		case 0x22:	//DPCTRL
 					return m_vip_regs.DPCTRL;
 		case 0x24:	//BRTA
+					printf("R A\n");
 					return m_vip_regs.BRTA;
 		case 0x26:	//BRTB
+					printf("R B\n");
 					return m_vip_regs.BRTB;
 		case 0x28:	//BRTC
+					printf("R C\n");
 					return m_vip_regs.BRTC;
 		case 0x2A:	//REST
+					printf("R D\n");
 					return m_vip_regs.REST;
 		case 0x2E:	//FRMCYC
 					return m_vip_regs.FRMCYC;
@@ -390,7 +394,7 @@ WRITE16_MEMBER( vboy_state::vip_w )
 					m_vip_regs.JPLT[3] = data;
 					break;
 		case 0x70:	//BKCOL
-					m_vip_regs.BKCOL = data;
+					m_vip_regs.BKCOL = data & 3;
 					break;
 		default:
 					logerror("Unemulated write: addr %08x, data %04x\n", offset * 2 + 0x0005f800, data);
