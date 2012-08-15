@@ -52,11 +52,13 @@ struct _vip_regs_t
 	UINT16 BKCOL;
 };
 
-typedef struct
+struct _vboy_timer_t
 {
 	UINT16 count;
 	UINT16 latch;
-} timer_t;
+};
+
+typedef struct _vboy_timer_t timer_t;
 
 class vboy_state : public driver_device
 {
