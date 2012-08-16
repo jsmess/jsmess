@@ -361,17 +361,21 @@ WRITE16_MEMBER( vboy_state::vip_w )
 		case 0x24:	//BRTA
 					m_vip_regs.BRTA = data;
 					palette_set_color_rgb(machine(), 1,(m_vip_regs.BRTA) & 0xff,0,0);
+					//printf("%02x A\n",data);
 					break;
 		case 0x26:	//BRTB
 					m_vip_regs.BRTB = data;
 					palette_set_color_rgb(machine(), 2,(m_vip_regs.BRTA + m_vip_regs.BRTB) & 0xff,0,0);
+					//printf("%02x B\n",data);
 					break;
 		case 0x28:	//BRTC
 					m_vip_regs.BRTC = data;
 					palette_set_color_rgb(machine(), 3,(m_vip_regs.BRTA + m_vip_regs.BRTB + m_vip_regs.BRTC) & 0xff,0,0);
+					//printf("%02x C\n",data);
 					break;
 		case 0x2A:	//REST
 					m_vip_regs.REST = data;
+					//printf("%02x %08x D\n",data,cpu_get_pc(m_maincpu));
 					break;
 		case 0x2E:	//FRMCYC
 					//printf("%d\n",data);
@@ -400,7 +404,7 @@ WRITE16_MEMBER( vboy_state::vip_w )
 					}
 					break;
 		case 0x44:	//VER
-					m_vip_regs.VER = data;
+					//m_vip_regs.VER = data;
 					break;
 		case 0x48:	//SPT0
 					m_vip_regs.SPT[0] = data;
@@ -708,7 +712,7 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	if(def & 0x40) // END flag
 		return 1;
 
-	if (mode < 2)
+	if (mode < 3)
 	{
 		fill_bg_map(state, bg_map_num, state->m_bg_map[bg_map_num]);
 		if (BIT(def,15) && (!right))
@@ -758,7 +762,7 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	else
 	if (mode==2)
 	{
-		popmessage("Mode 2 used");
+		//popmessage("Mode 2 used");
 	}
 	else
 	if (mode==3)
@@ -832,7 +836,7 @@ void vboy_state::m_timer_tick(UINT8 setting)
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( timer_100us_tick )
+static TIMER_DEVICE_CALLBACK( timer_100ms_tick )
 {
 	vboy_state *state = timer.machine().driver_data<vboy_state>();
 
@@ -956,7 +960,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 
 	MCFG_MACHINE_RESET(vboy)
 
-	MCFG_TIMER_ADD_PERIODIC("timer_100us", timer_100us_tick, attotime::from_usec(100))
+	MCFG_TIMER_ADD_PERIODIC("timer_100ms", timer_100ms_tick, attotime::from_msec(100)) // otherwise vproyak / vleague keeps going into auto pause
 	MCFG_TIMER_ADD_PERIODIC("timer_20us", timer_20us_tick, attotime::from_usec(20))
 
 	/* video hardware */
