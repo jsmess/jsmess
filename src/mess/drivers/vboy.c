@@ -699,7 +699,7 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	num <<= 4;
 	UINT16 def = state->m_world[num];
 	UINT8 lon = (def >> 15) & 1;
-	//UINT8 ron = (def >> 14) & 1;
+	UINT8 ron = (def >> 14) & 1;
 	INT16 gx  = state->m_world[num+1];
 	INT16 gp  = state->m_world[num+2];
 	INT16 gy  = state->m_world[num+3];
@@ -811,7 +811,7 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 			i &= 0x3ff;
 		}while(i != end_offs);
 
-		if((lon && !right || (ron && right))
+		if((lon && !right) || (ron && right))
 			cur_spt --;
 	}
 
