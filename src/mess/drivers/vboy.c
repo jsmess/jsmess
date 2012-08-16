@@ -2,14 +2,14 @@
 
     Nintendo Virtual Boy
 
-    12/05/2009 Skeleton driver.
+	driver by Miodrag Milanovic & Angelo Salese
 
     Great info at http://www.goliathindustries.com/vb/
     and http://www.vr32.de/modules/dokuwiki/doku.php?
 
     TODO:
-    - finish V810 irq support;
-    - understand irqs on this HW;
+    - fix graphics (many things to add!)
+	- vleague / vproyak: keeps going into auto pause with 100 usec timer?
 
 ****************************************************************************/
 
@@ -218,7 +218,7 @@ READ16_MEMBER( vboy_state::vip_r )
 {
 	switch(offset << 1) {
 		case 0x00:	//INTPND
-					return m_vip_regs.INTPND & m_vip_regs.INTENB;
+					return m_vip_regs.INTPND;
 		case 0x02:	//INTENB
 					return m_vip_regs.INTENB;
 		case 0x04:	//INTCLR
@@ -836,7 +836,7 @@ void vboy_state::m_timer_tick(UINT8 setting)
 	}
 }
 
-static TIMER_DEVICE_CALLBACK( timer_100ms_tick )
+static TIMER_DEVICE_CALLBACK( timer_100us_tick )
 {
 	vboy_state *state = timer.machine().driver_data<vboy_state>();
 
@@ -960,7 +960,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 
 	MCFG_MACHINE_RESET(vboy)
 
-	MCFG_TIMER_ADD_PERIODIC("timer_100ms", timer_100ms_tick, attotime::from_msec(100)) // otherwise vproyak / vleague keeps going into auto pause
+	MCFG_TIMER_ADD_PERIODIC("timer_100us", timer_100us_tick, attotime::from_usec(100))
 	MCFG_TIMER_ADD_PERIODIC("timer_20us", timer_20us_tick, attotime::from_usec(20))
 
 	/* video hardware */
