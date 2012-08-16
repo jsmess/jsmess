@@ -4438,6 +4438,32 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
+	<software name="arctic">
+		<description>Arctic</description>
+		<year>1988</year>
+		<publisher>アートディンク (Artdink)</publisher>
+		<!-- Turbo only -->
+		<info name="alt_title" value="アークティック"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="arcteac.d88" size="348848" crc="ca77e6bd" sha1="09de89a6ef8f264cd3984ecb3e20cada77e8d6b7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteka">
+		<description>Asteka</description>
+		<year>1985</year>
+		<publisher>日本ファルコム (Nihon Falcom)</publisher>
+		<!-- Turbo only -->
+		<info name="alt_title" value="アステカ"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="436912">
+				<rom name="asteka.d88" size="436912" crc="86e6bca1" sha1="8f4a50fd616a7141c85007fce5ec85c6c83cc2e5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="balonfgt">
 		<description>Balloon Fight</description>
 		<year>198?</year>
@@ -4463,6 +4489,25 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
+	<software name="bgorilla">
+		<description>Battle Gorilla</description>
+		<year>1988</year>
+		<publisher>クリスタルソフト (Xtal Soft)</publisher>
+		<!-- Turbo only -->
+		<info name="alt_title" value="バトルゴリラ"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="battle gorilla disk1.d88" size="348848" crc="ed20dd15" sha1="057f2fde335869f15209ad33672393471230b14e" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="battle gorilla disk2.d88" size="348848" crc="1600f910" sha1="b2c0092e62ff0374308aba55007c7f15db7b5de0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="byaku">
 		<description>Byakuya Monogatari - Winchester-ke no Matsuei</description>
 		<year>1988</year>
@@ -4483,6 +4528,26 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="byakuya3.d88" size="348848" crc="5ca007dd" sha1="77e0abc173c0dee9a3b446b4791124e9fb601f7c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="casablan" supported="partial">
+		<description>Casablanca</description>
+		<year>1986</year>
+		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
+		<!-- Turbo only -->
+		<info name="alt_title" value="カサブランカに愛を"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="413296">
+				<rom name="casablanca a.d88" size="413296" crc="bbf765e5" sha1="d054a88b3f77f8a68f356a0a03610da2f57161c3" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="416688">
+				<rom name="casablanca b.d88" size="416688" crc="1f11b796" sha1="53df2cd5fe4736c55f186645d6b8291c8e739a9f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4653,6 +4718,32 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
+<!-- Does it need a user disk or something else? -->
+	<software name="ishinara" supported="no">
+		<description>Ishin no Arashi</description>
+		<year>1989</year>
+		<publisher>光栄 (Koei)</publisher>
+		<!-- Turbo only -->
+		<info name="alt_title" value="維新の嵐"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="380864">
+				<rom name="ishin_a.d88" size="380864" crc="b7247c22" sha1="bfa79e8cf49bc4cd9eb5aed2fc2ca6027890f4c5" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="380848">
+				<rom name="ishin_b.d88" size="380848" crc="385e9a88" sha1="f4eaeccd2c80768367bbc985e76d13f701078525" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="380848">
+				<rom name="ishin_c.d88" size="380848" crc="9b5d5072" sha1="0c91b2a0d991f7d1e80d967432e85eb08933635a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="jotunn">
 		<description>Jotunn</description>
 		<year>1988</year>
@@ -4684,6 +4775,37 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="392368">
 				<rom name="kaleid-1.d88" size="392368" crc="0d277fb1" sha1="624f95de386289d45e107f8d14760a0bd336ea52" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kohakuir" supported="partial">
+		<description>Kohakuiro no Yuigon</description>
+		<year>1988</year>
+		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
+		<!-- Turbo only -->
+		<info name="alt_title" value="琥珀色の遺言"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="415840">
+				<rom name="kohaku1.d88" size="415840" crc="b3bbee13" sha1="d9d989427ddeb37c8e0d348d7b278569bc169fa5" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="415840">
+				<rom name="kohaku2.d88" size="415840" crc="d0b91e08" sha1="e892fa5065ff64a2d528a461a72385741f6dac78" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="415856">
+				<rom name="kohaku3.d88" size="415856" crc="e8d9100d" sha1="c8b39ec0974158e6d4e50bac64c5414a837bb864" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size="415072">
+				<rom name="kohaku4.d88" size="415072" crc="7d202c23" sha1="d9765f35fe6cadda60039c65844878dc6e524979" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4747,6 +4869,25 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		</part>
 	</software>
 
+	<software name="melonsod" supported="no">
+		<description>Melon Soda</description>
+		<year>1987</year>
+		<publisher>パスカル２ (Pascal2)</publisher>
+		<!-- Turbo only -->
+		<info name="alt_title" value="メロンソーダ"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="melonsoda1(cz8fb02).d88" size="348848" crc="8b600959" sha1="0686f026b9cf7d7eeafadde0499cd528264e8cc9" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="melonsoda2.d88" size="348848" crc="57b0e4d8" sha1="14faabd54c836bce58aad463a94c5cc3f93b7344" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="nukenind">
 		<description>Nukenin Densetsu</description>
 		<year>1987</year>
@@ -4797,6 +4938,19 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="pw.d88" size="348848" crc="96909c3c" sha1="da8a03405ee5f84a86bf0f79233936972ee5a733" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="produce" supported="no">
+		<description>Produce</description>
+		<year>1987</year>
+		<publisher>デービーソフト (dB-Soft)</publisher>
+		<!-- Turbo only -->
+		<info name="alt_title" value="プロデュース"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="produce.d88" size="348848" crc="a57a9bdc" sha1="a4d9d802369da8886fe4389bc36c3e4f093a861a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4876,6 +5030,31 @@ Plus, some games crash MESS at exit (e.g. some sorcer disks or some arcus disks)
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="327680">
 				<rom name="sangok_b.2d" size="327680" crc="b269d889" sha1="277aeac334efca9663e4d3df6dce6134bef67fe2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="satsujin" supported="no">
+		<description>Satsujin wa Tegami ni Notte</description>
+		<year>1988</year>
+		<publisher>ツインソフト (Twin Soft)</publisher>
+		<!-- Turbo only -->
+		<info name="alt_title" value="殺人は手紙にのって"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="344496">
+				<rom name="satu-a.d88" size="344496" crc="7d03c298" sha1="8fff26bef8afff72beebb2accd16f08fe33806fa" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="satu-b.d88" size="348848" crc="f3870d1d" sha1="eaea51ba3cc9102818a48a3ac7b5483d6998d59c" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size="348848">
+				<rom name="satu-c.d88" size="348848" crc="59023ed2" sha1="9160977e6ff8c970d429010a043948cbef32e845" offset="0" />
 			</dataarea>
 		</part>
 	</software>
