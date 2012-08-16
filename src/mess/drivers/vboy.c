@@ -58,7 +58,7 @@ struct _vboy_timer_t
 	UINT16 latch;
 };
 
-typedef struct _vboy_timer_t timer_t;
+typedef struct _vboy_timer_t vboy_timer_t;
 
 class vboy_state : public driver_device
 {
@@ -99,16 +99,20 @@ public:
 	UINT16 *m_objects;
 	vboy_regs_t m_vboy_regs;
 	vip_regs_t m_vip_regs;
-	timer_t m_vboy_timer;
+	vboy_timer_t m_vboy_timer;
 	bitmap_ind16 m_bg_map[16];
 	bitmap_ind16 m_screen_output;
 	UINT16 m_frame_count;
 	UINT8 m_displayfb;
 	UINT8 m_display_count;
+	UINT8 m_row_num;
 
 	void m_timer_tick(UINT8 setting);
 	void m_scanline_tick(int scanline, UINT8 screen_type);
 	void m_set_irq(UINT16 irq_vector);
+
+	void m_pcg_debug(UINT16 offset,UINT16 data,UINT16 mem_mask);
+
 };
 
 READ32_MEMBER( vboy_state::port_02_read )
@@ -225,13 +229,19 @@ READ16_MEMBER( vboy_state::vip_r )
 			UINT16 res;
 
 			res = m_vip_regs.DPCTRL & 0x0702;
-			if(m_vip_regs.DPCTRL & 2 && m_display_count & 1)
+
+			if(m_vip_regs.DPCTRL & 2)
 			{
-				if(m_display_count & 2)
-					res |= 8 << (m_displayfb*2);
+				UINT8 DPBSY = machine().rand() & 3;
+
+				if(DPBSY & 2)
+					res |= 0x20;
+				else if(DPBSY & 1)
+					res |= 0x08;
 			}
 
 			res |= 0x40;
+			//printf("%04x\n",res);
 			return res;
 		}
 		case 0x22:	//DPCTRL
@@ -254,15 +264,20 @@ READ16_MEMBER( vboy_state::vip_r )
 			---- ---- ---- x--- XPBSY1 (second framebuffer busy flag)
 			---- ---- ---- -x-- XPBSY0 (first framebfuffer busy flag)
 			*/
-			int frame_num = machine().primary_screen->frame_number() & 1;
-			//int row_num = (machine().primary_screen->vpos() / 8) & 0x1f;
+			UINT8 drawfb = ((m_displayfb ^ 1) + 1) << 2;
 			UINT16 res;
 
 			//printf("%d\n",row_num);
 
 			res =  m_vip_regs.XPSTTS & 0x00f3; // empty ^^'
-			res |= frame_num ? 0x0c : 0x00;
-			//if(m_vip_regs.DPCTRL & 2) /* FIXME: this crashes emulation in boundh and some other games */
+			if(m_vip_regs.XPCTRL & 2 && m_row_num < 224/8) // screen active
+				res |= drawfb;
+
+			{
+				res |= 0x8000;
+				res |= m_row_num<<8;
+			}
+			//if(m_vip_regs.DPCTRL & 2)
 			//	res |= ((row_num)<<8);
 
 			return res;
@@ -375,8 +390,8 @@ WRITE16_MEMBER( vboy_state::vip_w )
 					*/
 					m_vip_regs.XPCTRL = data & 0x1f02;
 
-					if(data & 0x1f00)
-						printf("%04x SBCMP\n",data);
+					//if(data & 0x1f00)
+					//	printf("%04x SBCMP\n",data);
 
 					if(data & 1)
 					{
@@ -432,24 +447,50 @@ WRITE16_MEMBER( vboy_state::vip_w )
 	}
 }
 
+
+void vboy_state::m_pcg_debug(UINT16 offset,UINT16 data,UINT16 mem_mask)
+{
+	UINT8 *pcg_ram = memregion("pcg")->base();
+
+	if(mem_mask & 0x00ff)
+		pcg_ram[(offset<<1)+1] = (data & 0x00ff);
+
+	if(mem_mask & 0xff00)
+		pcg_ram[(offset<<1)+0] = (data & 0xff00) >> 8;
+
+	gfx_element_mark_dirty(machine().gfx[0], offset >> 4);
+}
+
 WRITE16_MEMBER( vboy_state::vboy_font0_w )
 {
 	m_font[offset] = data | (m_font[offset] & (mem_mask ^ 0xffff));
+
+	if(1)
+		m_pcg_debug(offset,data,mem_mask);
 }
 
 WRITE16_MEMBER( vboy_state::vboy_font1_w )
 {
 	m_font[offset + 0x1000] = data | (m_font[offset + 0x1000] & (mem_mask ^ 0xffff));
+
+	if(1)
+		m_pcg_debug(offset+0x1000,data,mem_mask);
 }
 
 WRITE16_MEMBER( vboy_state::vboy_font2_w )
 {
 	m_font[offset + 0x2000] = data | (m_font[offset + 0x2000] & (mem_mask ^ 0xffff));
+
+	if(1)
+		m_pcg_debug(offset+0x2000,data,mem_mask);
 }
 
 WRITE16_MEMBER( vboy_state::vboy_font3_w )
 {
 	m_font[offset + 0x3000] = data | (m_font[offset + 0x3000] & (mem_mask ^ 0xffff));
+
+	if(1)
+		m_pcg_debug(offset+0x3000,data,mem_mask);
 }
 
 READ16_MEMBER( vboy_state::vboy_font0_r )
@@ -664,6 +705,9 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 
 	vboy_paramtab = state->m_bgmap + param_base;
 
+	if(def & 0x40) // END flag
+		return 1;
+
 	if (mode < 2)
 	{
 		fill_bg_map(state, bg_map_num, state->m_bg_map[bg_map_num]);
@@ -729,15 +773,18 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 			INT16 jp = state->m_objects[start_ndx+1] & 0x3fff;
 			INT16 jy = state->m_objects[start_ndx+2] & 0x1ff;
 			UINT16 val = state->m_objects[start_ndx+3];
+			UINT8 jlon = (state->m_objects[start_ndx+1] & 0x8000) >> 15;
+			UINT8 jron = (state->m_objects[start_ndx+1] & 0x4000) >> 14;
 
-			if (!right)
+			if (!right && jlon)
 				put_char(state, bitmap, (jx-jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), 1, state->m_vip_regs.JPLT[(val>>14) & 3]);
-			else
+
+			if(right && jron)
 				put_char(state, bitmap, (jx+jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), 1, state->m_vip_regs.JPLT[(val>>14) & 3]);
 		}
 	}
-	// Return END world status
-	return BIT(def,6);
+
+	return 0;
 }
 
 static SCREEN_UPDATE_IND16( vboy_left )
@@ -823,15 +870,8 @@ void vboy_state::m_scanline_tick(int scanline, UINT8 screen_type)
 {
 	//int frame_num = machine().primary_screen->frame_number();
 
-	if(screen_type == 1)
-	{
-		if(scanline == 240)
-		{
-			m_set_irq(0x0004); // RFBEND
-		}
-
-		return;
-	}
+	if(screen_type == 0)
+		m_row_num = (scanline / 8) & 0x1f;
 
 	if(scanline == 0)
 	{
@@ -847,35 +887,26 @@ void vboy_state::m_scanline_tick(int scanline, UINT8 screen_type)
 		{
 			m_set_irq(0x0008); // GAME_START
 			m_frame_count = 0;
-			if(m_vip_regs.XPCTRL & 2)
-			{
-				m_displayfb ^= 1;
-			}
 		}
-	}
 
-	if(scanline == 144)
-	{
-		// ...
+		if(m_vip_regs.XPCTRL & 2)
+			m_displayfb ^= 1;
 	}
 
 	if(scanline == 224)
 		m_set_irq(0x4000); // XPEND
 
 	if(scanline == 232)
-	{
 		m_set_irq(0x0002); // LFBEND
-	}
+
+	if(scanline == 240)
+		m_set_irq(0x0004); // RFBEND
 
 	if(scanline == 248)
 	{
 		//m_set_irq(0x2000); // SBHIT
 	}
 
-	if(scanline == 256)
-	{
-		// ...
-	}
 }
 
 static TIMER_DEVICE_CALLBACK( vboy_scanlineL )
@@ -886,13 +917,33 @@ static TIMER_DEVICE_CALLBACK( vboy_scanlineL )
 	state->m_scanline_tick(scanline,0);
 }
 
+#if 0
 static TIMER_DEVICE_CALLBACK( vboy_scanlineR )
 {
 	vboy_state *state = timer.machine().driver_data<vboy_state>();
 	int scanline = param;
 
-	state->m_scanline_tick(scanline,1);
+	//state->m_scanline_tick(scanline,1);
 }
+#endif
+
+
+static const gfx_layout vboy_pcg_8x8 =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	2,
+	{ 0, 1 },
+	{ 7*2, 6*2, 5*2, 4*2, 3*2, 2*2, 1*2, 0*2 },
+	{ STEP8(0,8*2) },
+	8*8*2
+};
+
+/* decoded for debugging purpose, this will be nuked in the end... */
+static GFXDECODE_START( vboy )
+	GFXDECODE_ENTRY( "pcg",     0x00000, vboy_pcg_8x8,      0, 1 )
+GFXDECODE_END
+
 
 static MACHINE_CONFIG_START( vboy, vboy_state )
 
@@ -901,7 +952,7 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_CPU_PROGRAM_MAP(vboy_mem)
 	MCFG_CPU_IO_MAP(vboy_io)
 	MCFG_TIMER_ADD_SCANLINE("scantimer_l", vboy_scanlineL, "3dleft", 0, 1)
-	MCFG_TIMER_ADD_SCANLINE("scantimer_r", vboy_scanlineR, "3dright", 0, 1)
+	//MCFG_TIMER_ADD_SCANLINE("scantimer_r", vboy_scanlineR, "3dright", 0, 1)
 
 	MCFG_MACHINE_RESET(vboy)
 
@@ -936,6 +987,8 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 	MCFG_CARTSLOT_MANDATORY
 	MCFG_CARTSLOT_INTERFACE("vboy_cart")
 
+	MCFG_GFXDECODE(vboy)
+
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vboy")
 MACHINE_CONFIG_END
@@ -944,6 +997,8 @@ MACHINE_CONFIG_END
 ROM_START( vboy )
 	ROM_REGION( 0x200000, "user1", 0 )
 	ROM_CART_LOAD("cart", 0x0000, 0x200000, ROM_MIRROR)
+
+	ROM_REGION( 0x8000, "pcg", ROMREGION_ERASE00 )
 ROM_END
 
 /* Driver */
