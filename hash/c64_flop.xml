@@ -111,14 +111,14 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="278234">
-				<rom name="DefenderOfTheCrown_s0.g64" size="278234" crc="131759d0" sha1="2c8695caee776b2082a01856d13a0eeb99f9859f" offset="0" />
+				<rom name="defenderofthecrown_s0.g64" size="278234" crc="131759d0" sha1="2c8695caee776b2082a01856d13a0eeb99f9859f" offset="0" />
 			</dataarea>
 		</part>
 	
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="323404">
-				<rom name="DefenderOfTheCrown_s1.g64" size="323404" crc="677e8b8b" sha1="fcf9b5db97a7cc48e3d8bf49ed07f29caabafb77" offset="0" />
+				<rom name="defenderofthecrown_s1.g64" size="323404" crc="677e8b8b" sha1="fcf9b5db97a7cc48e3d8bf49ed07f29caabafb77" offset="0" />
 			</dataarea>
 		</part>
 	</software>
