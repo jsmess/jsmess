@@ -660,7 +660,7 @@ static VIDEO_START( vboy )
 static void put_char(vboy_state *state, bitmap_ind16 &bitmap, int x, int y, UINT16 ch, bool flipx, bool flipy, bool trans, UINT8 pal)
 {
 	UINT16 data, code = ch;
-	UINT8 yi, xi, dat, col;
+	UINT8 yi, xi, dat;
 
 	for (yi = 0; yi < 8; yi++)
 	{
@@ -678,16 +678,16 @@ static void put_char(vboy_state *state, bitmap_ind16 &bitmap, int x, int y, UINT
 			else
 				dat = ((data >> ((7-xi) << 1)) & 0x03);
 
-			col = (pal >> (dat*2)) & 3;
+			//col = (pal >> (dat*2)) & 3; // TODO: check what this is for!
 
 			res_x = x + xi;
 			res_y = y + yi;
 
-//			if(res_x > (384*2) || res_y > 224 || res_x < (0) || res_y < 0)
-//				continue;
+			//if(res_x > (384) || res_y > 224 || res_x < (0) || res_y < 0)
+			//	continue;
 
 			if (!trans || (trans && dat))
-				bitmap.pix16((res_y), (res_x)) =  col;
+				bitmap.pix16((res_y), (res_x)) = state->machine().pens[dat];
 		}
 	}
 }
