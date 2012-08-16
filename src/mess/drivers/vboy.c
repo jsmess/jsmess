@@ -407,16 +407,16 @@ WRITE16_MEMBER( vboy_state::vip_w )
 					//m_vip_regs.VER = data;
 					break;
 		case 0x48:	//SPT0
-					m_vip_regs.SPT[0] = data;
+					m_vip_regs.SPT[0] = data & 0x3ff;
 					break;
 		case 0x4A:	//SPT1
-					m_vip_regs.SPT[1] = data;
+					m_vip_regs.SPT[1] = data & 0x3ff;
 					break;
 		case 0x4C:	//SPT2
-					m_vip_regs.SPT[2] = data;
+					m_vip_regs.SPT[2] = data & 0x3ff;
 					break;
 		case 0x4E:	//SPT3
-					m_vip_regs.SPT[3] = data;
+					m_vip_regs.SPT[3] = data & 0x3ff;
 					break;
 		case 0x60:	//GPLT0
 					m_vip_regs.GPLT[0] = data;
@@ -647,28 +647,34 @@ static VIDEO_START( vboy )
 static void put_char(vboy_state *state, bitmap_ind16 &bitmap, int x, int y, UINT16 ch, bool flipx, bool flipy, bool trans, UINT8 pal)
 {
 	UINT16 data, code = ch;
-	UINT8 i, b, dat, col;
+	UINT8 yi, xi, dat, col;
 
-	for (i = 0; i < 8; i++)
+	for (yi = 0; yi < 8; yi++)
 	{
 		if (!flipy)
-			 data = state->m_font[code * 8 + i];
+			 data = state->m_font[code * 8 + yi];
 		else
-			 data = state->m_font[code * 8 + (7-i)];
+			 data = state->m_font[code * 8 + (7-yi)];
 
-		for (b = 0; b < 8; b++)
+		for (xi = 0; xi < 8; xi++)
 		{
+			int res_x,res_y;
+
 			if (!flipx)
-				dat = ((data >> (b << 1)) & 0x03);
+				dat = ((data >> (xi << 1)) & 0x03);
 			else
-				dat = ((data >> ((7-b) << 1)) & 0x03);
+				dat = ((data >> ((7-xi) << 1)) & 0x03);
 
 			col = (pal >> (dat*2)) & 3;
-			// This is how emulator works, but need to check
-			if (!dat) col=0;
 
-			if (!trans || ( trans && col ))
-				bitmap.pix16((y + i) & 0x1ff, (x + b) & 0x1ff) =  col;
+			res_x = x + xi;
+			res_y = y + yi;
+
+//			if(res_x > (384*2) || res_y > 224 || res_x < (0) || res_y < 0)
+//				continue;
+
+			if (!trans || (trans && dat))
+				bitmap.pix16((res_y), (res_x)) =  col;
 		}
 	}
 }
@@ -683,7 +689,7 @@ static void fill_bg_map(vboy_state *state, int num, bitmap_ind16 &bitmap)
 		for (j = 0; j < 64; j++)
 		{
 			UINT16 val = state->m_bgmap[j + 64 * i + (num * 0x1000)];
-			put_char(state, bitmap, j * 8, i * 8, val & 0x7ff, BIT(val,13), BIT(val,12), 0, state->m_vip_regs.GPLT[(val >> 14) & 3]);
+			put_char(state, bitmap, j * 8, i * 8, val & 0x7ff, BIT(val,13), BIT(val,12), false, state->m_vip_regs.GPLT[(val >> 14) & 3]);
 		}
 	}
 }
@@ -703,9 +709,10 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	UINT16 param_base = state->m_world[num+9] & 0xfff0;
 //  UINT16 overplane = state->m_world[num+10];
 	UINT8 bg_map_num = def & 0x0f;
-	INT16 x,y,i;
+	INT16 x,y;
 	UINT8 mode = (def >> 12) & 3;
 	UINT16 *vboy_paramtab;
+	int i;
 
 	vboy_paramtab = state->m_bgmap + param_base;
 
@@ -767,24 +774,39 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	else
 	if (mode==3)
 	{
-		//popmessage("Mode 3 used");
+		int cur_spt;
 
-		// just for test
-		for(i=state->m_vip_regs.SPT[3];i>=state->m_vip_regs.SPT[2];i--)
+		for(cur_spt = 3; cur_spt >= 0;cur_spt--)
 		{
-			UINT16 start_ndx = i * 4;
-			INT16 jx = state->m_objects[start_ndx+0];
-			INT16 jp = state->m_objects[start_ndx+1] & 0x3fff;
-			INT16 jy = state->m_objects[start_ndx+2] & 0x1ff;
-			UINT16 val = state->m_objects[start_ndx+3];
-			UINT8 jlon = (state->m_objects[start_ndx+1] & 0x8000) >> 15;
-			UINT8 jron = (state->m_objects[start_ndx+1] & 0x4000) >> 14;
+			int start_offs, end_offs;
 
-			if (!right && jlon)
-				put_char(state, bitmap, (jx-jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), 1, state->m_vip_regs.JPLT[(val>>14) & 3]);
+			start_offs = state->m_vip_regs.SPT[cur_spt];
 
-			if(right && jron)
-				put_char(state, bitmap, (jx+jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), 1, state->m_vip_regs.JPLT[(val>>14) & 3]);
+			end_offs = 0x3ff;
+			if(cur_spt != 0)
+				end_offs = state->m_vip_regs.SPT[cur_spt-1];
+
+			i = start_offs;
+
+			do
+			{
+				UINT16 start_ndx = i * 4;
+				INT16 jx = state->m_objects[start_ndx+0];
+				INT16 jp = state->m_objects[start_ndx+1] & 0x3fff;
+				INT16 jy = state->m_objects[start_ndx+2] & 0x1ff;
+				UINT16 val = state->m_objects[start_ndx+3];
+				UINT8 jlon = (state->m_objects[start_ndx+1] & 0x8000) >> 15;
+				UINT8 jron = (state->m_objects[start_ndx+1] & 0x4000) >> 14;
+
+				if (!right && jlon)
+					put_char(state, bitmap, (jx-jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), true, state->m_vip_regs.JPLT[(val>>14) & 3]);
+
+				if(right && jron)
+					put_char(state, bitmap, (jx+jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), true, state->m_vip_regs.JPLT[(val>>14) & 3]);
+
+				i --;
+				i &= 0x3ff;
+			}while(i != end_offs);
 		}
 	}
 
