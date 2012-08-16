@@ -694,10 +694,12 @@ static void fill_bg_map(vboy_state *state, int num, bitmap_ind16 &bitmap)
 	}
 }
 
-static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, bool right)
+static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, bool right, int &cur_spt)
 {
 	num <<= 4;
 	UINT16 def = state->m_world[num];
+	UINT8 lon = (def >> 15) & 1;
+	//UINT8 ron = (def >> 14) & 1;
 	INT16 gx  = state->m_world[num+1];
 	INT16 gp  = state->m_world[num+2];
 	INT16 gy  = state->m_world[num+3];
@@ -774,40 +776,43 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	else
 	if (mode==3)
 	{
-		int cur_spt;
+		int start_offs, end_offs;
 
-		for(cur_spt = 3; cur_spt >= 0;cur_spt--)
+		if(cur_spt == -1)
 		{
-			int start_offs, end_offs;
-
-			start_offs = state->m_vip_regs.SPT[cur_spt];
-
-			end_offs = 0x3ff;
-			if(cur_spt != 0)
-				end_offs = state->m_vip_regs.SPT[cur_spt-1];
-
-			i = start_offs;
-
-			do
-			{
-				UINT16 start_ndx = i * 4;
-				INT16 jx = state->m_objects[start_ndx+0];
-				INT16 jp = state->m_objects[start_ndx+1] & 0x3fff;
-				INT16 jy = state->m_objects[start_ndx+2] & 0x1ff;
-				UINT16 val = state->m_objects[start_ndx+3];
-				UINT8 jlon = (state->m_objects[start_ndx+1] & 0x8000) >> 15;
-				UINT8 jron = (state->m_objects[start_ndx+1] & 0x4000) >> 14;
-
-				if (!right && jlon)
-					put_char(state, bitmap, (jx-jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), true, state->m_vip_regs.JPLT[(val>>14) & 3]);
-
-				if(right && jron)
-					put_char(state, bitmap, (jx+jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), true, state->m_vip_regs.JPLT[(val>>14) & 3]);
-
-				i --;
-				i &= 0x3ff;
-			}while(i != end_offs);
+			popmessage("Cur spt used with -1 pointer!");
+			return 0;
 		}
+
+		start_offs = state->m_vip_regs.SPT[cur_spt];
+
+		end_offs = 0x3ff;
+		if(cur_spt != 0)
+			end_offs = state->m_vip_regs.SPT[cur_spt-1];
+
+		i = start_offs;
+		do
+		{
+			UINT16 start_ndx = i * 4;
+			INT16 jx = state->m_objects[start_ndx+0];
+			INT16 jp = state->m_objects[start_ndx+1] & 0x3fff;
+			INT16 jy = state->m_objects[start_ndx+2] & 0x1ff;
+			UINT16 val = state->m_objects[start_ndx+3];
+			UINT8 jlon = (state->m_objects[start_ndx+1] & 0x8000) >> 15;
+			UINT8 jron = (state->m_objects[start_ndx+1] & 0x4000) >> 14;
+
+			if (!right && jlon)
+				put_char(state, bitmap, (jx-jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), true, state->m_vip_regs.JPLT[(val>>14) & 3]);
+
+			if(right && jron)
+				put_char(state, bitmap, (jx+jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), true, state->m_vip_regs.JPLT[(val>>14) & 3]);
+
+			i --;
+			i &= 0x3ff;
+		}while(i != end_offs);
+
+		if((lon && !right) /*|| (ron && right)*/)
+			cur_spt --;
 	}
 
 	return 0;
@@ -817,9 +822,11 @@ static SCREEN_UPDATE_IND16( vboy_left )
 {
 	vboy_state *state = screen.machine().driver_data<vboy_state>();
 	state->m_screen_output.fill(state->m_vip_regs.BKCOL, cliprect);
+	int cur_spt;
 
+	cur_spt = 3;
 	for(int i=31; i>=0; i--)
-		if (display_world(state, i, state->m_screen_output, 0)) break;
+		if (display_world(state, i, state->m_screen_output, 0,cur_spt)) break;
 
 	copybitmap(bitmap, state->m_screen_output, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -829,9 +836,11 @@ static SCREEN_UPDATE_IND16( vboy_right )
 {
 	vboy_state *state = screen.machine().driver_data<vboy_state>();
 	state->m_screen_output.fill(state->m_vip_regs.BKCOL, cliprect);
+	int cur_spt;
 
+	cur_spt = 3;
 	for(int i=31; i>=0; i--)
-		if (display_world(state, i, state->m_screen_output, 1)) break;
+		if (display_world(state, i, state->m_screen_output, 1,cur_spt)) break;
 
 	copybitmap(bitmap, state->m_screen_output, 0, 0, 0, 0, cliprect);
 	return 0;
