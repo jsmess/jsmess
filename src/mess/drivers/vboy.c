@@ -431,16 +431,16 @@ WRITE16_MEMBER( vboy_state::vip_w )
 					m_vip_regs.GPLT[3] = data;
 					break;
 		case 0x68:	//JPLT0
-					m_vip_regs.JPLT[0] = data;
+					m_vip_regs.JPLT[0] = data & 0xfc;
 					break;
 		case 0x6A:	//JPLT1
-					m_vip_regs.JPLT[1] = data;
+					m_vip_regs.JPLT[1] = data & 0xfc;
 					break;
 		case 0x6C:	//JPLT2
-					m_vip_regs.JPLT[2] = data;
+					m_vip_regs.JPLT[2] = data & 0xfc;
 					break;
 		case 0x6E:	//JPLT3
-					m_vip_regs.JPLT[3] = data;
+					m_vip_regs.JPLT[3] = data & 0xfc;
 					break;
 		case 0x70:	//BKCOL
 					m_vip_regs.BKCOL = data & 3;
@@ -811,7 +811,7 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 			i &= 0x3ff;
 		}while(i != end_offs);
 
-		if((lon && !right) /*|| (ron && right)*/)
+		if((lon && !right || (ron && right))
 			cur_spt --;
 	}
 
