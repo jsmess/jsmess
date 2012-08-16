@@ -106,6 +106,7 @@ public:
 	UINT8 m_displayfb;
 	UINT8 m_display_count;
 	UINT8 m_row_num;
+	attotime m_input_latch_time;
 
 	void m_timer_tick(UINT8 setting);
 	void m_scanline_tick(int scanline, UINT8 screen_type);
@@ -140,7 +141,14 @@ READ32_MEMBER( vboy_state::port_02_read )
 			value = m_vboy_regs.wcr;
 			break;
 		case 0x28:	// KCR (Keypad Control Reg)
-			value = m_vboy_regs.kcr;
+			{
+//				attotime new_time = machine().time();
+
+//				if((new_time - m_input_latch_time) < m_maincpu->cycles_to_attotime(640))
+					value |= machine().rand() & 2;
+
+				value = m_vboy_regs.kcr | 0x4c;
+			}
 			break;
 		case 0x00:	// LPC (Link Port Control Reg)
 		case 0x04:	// LPC2 (Link Port Control Reg)
@@ -195,14 +203,19 @@ WRITE32_MEMBER( vboy_state::port_02_write )
 		case 0x28:	// KCR (Keypad Control Reg)
 			if (data & 0x04 )
 			{
-				m_vboy_regs.klb = (data & 0x01) ? 0 : (ioport("INPUT")->read() & 0x00ff);
-				m_vboy_regs.khb = (data & 0x01) ? 0 : (ioport("INPUT")->read() & 0xff00) >> 8;
-			}
-			else if (data & 0x20)
-			{
-				m_vboy_regs.klb = ioport("INPUT")->read() & 0x00ff;
+				m_vboy_regs.klb = (ioport("INPUT")->read() & 0x00ff);
 				m_vboy_regs.khb = (ioport("INPUT")->read() & 0xff00) >> 8;
+				//m_input_latch_time = machine().time();
 			}
+
+			if (data & 1)
+			{
+				m_vboy_regs.klb = 0;
+				m_vboy_regs.khb = 0;
+				//m_input_latch_time = attotime::zero;
+			}
+
+
 			m_vboy_regs.kcr = (data | 0x48) & 0xfd;	// according to docs: bit 6 & bit 3 are unused and set to 1, bit 1 is read only.
 			break;
 		case 0x00:	// LPC (Link Port Control Reg)
