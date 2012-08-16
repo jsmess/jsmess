@@ -181,7 +181,6 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 * はたらくくるま ダイヤペットだいしゅうごう - Hataraku Kuruma Daiya Pet Daishuugou (Yonezawa - 19950925 - T-193010)
 * でんしゃ だいしゅうごう! - Densha Daishuugou! (Yonezawa - ???? - T-193020)
 * シルバニアファミリー もりのなかまとたのしいおたんじょうびかい - Silvanian Family - Mori no Nakama to Tanoshii Otanjoubikai (Epoch - 2001xxxx - T-198010)
-* がんばれ!ぼくらのコンパチヒーローズ - Ganbare! Bokura no Compati Heroes (Banpresto - 1996xxxx - T-206010)
 * ドラえもん タイムマシンで大冒険! - Doraemon Time Machine de Daibouken! (Shogakukan - 19951027 - T-226010)
 * ドラえもん ようちえんはたのしいな - Doraemon Youchien Hata no Shiina (Shogakukan - ???? - T-226020)
 * ドラえもん よめたよ･かけたよ ひらがな カタカナ - Doraemon Yometayo-Kaketayo Hiragana Katakana (Shogakukan - 199908xx - T-226040)
@@ -230,8 +229,10 @@ Games for the MIXT BOOK PLAYER COPERA
 		<info name="serial" value="HPC-6039"/>
 		<info name="alt_title" value="101匹わんちゃん わんちゃんだいこうしん!"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-19623 J32" />
 			<dataarea name="rom" size="1048576">
-				<rom name="101piki wanchan daikoushin (japan).bin" size="1048576" crc="27bb0b0a" sha1="f9e2bde5351f34cd565c03a1cad3d1baedd8c7c3" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-19623 j32.ic1" size="1048576" crc="27bb0b0a" sha1="f9e2bde5351f34cd565c03a1cad3d1baedd8c7c3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -364,8 +365,10 @@ Games for the MIXT BOOK PLAYER COPERA
 		<publisher>Sega</publisher>
 		<info name="serial" value="49036-06" />
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6586A" />
+			<feature name="ic1" value="MPR-18581 J39" />
 			<dataarea name="rom" size="1048576">
-				<rom name="un dia en la escuela con los ositos berenstain (spain).bin" size="1048576" crc="0ec21b68" sha1="06bb9053e3a9a6eb3e56475964ad4d745f92617f" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18581 j39.ic1" size="1048576" crc="0ec21b68" sha1="06bb9053e3a9a6eb3e56475964ad4d745f92617f" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -391,8 +394,10 @@ Games for the MIXT BOOK PLAYER COPERA
 		<info name="release" value="19950725"/>
 		<info name="alt_title" value="ちびまる子ちゃん いっしょにあそぼうよ"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18117-H" />
 			<dataarea name="rom" size="524288">
-				<rom name="chibi maruko chan issho ni asobouyo (japan).bin" size="524288" crc="c81acb46" sha1="d4a51f8894157dc8ef845931366d2ab482d43839" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18117-h.ic1" size="524288" crc="c81acb46" sha1="d4a51f8894157dc8ef845931366d2ab482d43839" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -404,8 +409,10 @@ Games for the MIXT BOOK PLAYER COPERA
 		<info name="serial" value="MMGS-6"/>
 		<info name="alt_title" value="コペラのこのおとなあに"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6586A" />
+			<feature name="ic1" value="MPR-17438 J11" />
 			<dataarea name="rom" size="1048576">
-				<rom name="copera no kono otonaani (japan).bin" size="1048576" crc="1041e52a" sha1="422f46d670a5f8094267984051ed6f90babe2dce" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17438 j11.ic1" size="1048576" crc="1041e52a" sha1="422f46d670a5f8094267984051ed6f90babe2dce" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -428,15 +435,17 @@ Games for the MIXT BOOK PLAYER COPERA
 	</software>
 
 	<software name="donaldts">
-		<description>Donald no Terebi Show (Jpn)</description>
+		<description>Donald no Terebi Show (Jpn, Rev. 2)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
-		<info name="serial" value="HPC-6033"/>
+		<info name="serial" value="HPC-6033-02"/>
 		<info name="release" value="199512xx"/>
 		<info name="alt_title" value="ドナルドのテレビショー"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18678 J43" />
 			<dataarea name="rom" size="1048576">
-				<rom name="donald no terebi shou (japan).bin" size="1048576" crc="c11a2b37" sha1="9d3d17c0ec4798730bba4670bef1723ed6a46b98" offset="0" loadflag="load16_word_swap" />
+				<rom name="mpr-18678 j43.ic1" size="1048576" crc="c11a2b37" sha1="9d3d17c0ec4798730bba4670bef1723ed6a46b98" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -448,8 +457,10 @@ Games for the MIXT BOOK PLAYER COPERA
 		<info name="serial" value="T-226060"/>
 		<info name="alt_title" value="ドラえもん えいごであそぼう ＡＢＣ"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
 			<dataarea name="rom" size="2097152">
-				<rom name="doraemon eigo de asobou abc (japan).bin" size="2097152" crc="efd5d261" sha1="5addf4ea6cd6c022286a7979f758478eec0331f0" offset="000000" loadflag="load16_word_swap" />
+				<rom name="epoxy block u1.ic1" size="2097152" crc="efd5d261" sha1="5addf4ea6cd6c022286a7979f758478eec0331f0" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -538,8 +549,10 @@ Games for the MIXT BOOK PLAYER COPERA
 		<publisher>Sega</publisher>
 		<info name="serial" value="49022-06" />
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17735-H" />
 			<dataarea name="rom" size="524288">
-				<rom name="ecco jr. y la gran busqueda del tesoro en el oceano! (spain).bin" size="524288" crc="f11b9f3f" sha1="7b518e8c6b97cc68958084b65cbe3a74f34df914" offset="0" loadflag="load16_word_swap" />
+				<rom name="mpr-17735-h.ic1" size="524288" crc="f11b9f3f" sha1="7b518e8c6b97cc68958084b65cbe3a74f34df914" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -581,8 +594,10 @@ Games for the MIXT BOOK PLAYER COPERA
 		<info name="release" value="200209xx"/>
 		<info name="alt_title" value="学研 アンパンマンと知能アップ！"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
 			<dataarea name="rom" size="2097152">
-				<rom name="gakken anpanman to chinou up! (japan).bin" size="2097152" crc="2a8da73b" sha1="eff1447d20fa7532af948df8267261e51d14589c" offset="0" loadflag="load16_word_swap" />
+				<rom name="epoxy block u1.ic1" size="2097152" crc="2a8da73b" sha1="eff1447d20fa7532af948df8267261e51d14589c" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -594,8 +609,10 @@ Games for the MIXT BOOK PLAYER COPERA
 		<info name="serial" value="T-169060"/>
 		<info name="alt_title" value="学研のおべんきょうソフト えいご ＡＢＣ"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-19309 J15" />
 			<dataarea name="rom" size="1048576">
-				<rom name="gakken no obenkyou soft - eigo abc (japan).bin" size="1048576" crc="1259f360" sha1="82ffe0b0b6b0131f06e4f4cb6b535ee45559f0f4" offset="0" loadflag="load16_word_swap" />
+				<rom name="mpr-19309 j15.ic1" size="1048576" crc="1259f360" sha1="82ffe0b0b6b0131f06e4f4cb6b535ee45559f0f4" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -622,8 +639,10 @@ Games for the MIXT BOOK PLAYER COPERA
 		<info name="serial" value="T-169010"/>
 		<info name="alt_title" value="学研のおべんきょうソフト かんじ"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-17508-T" />
 			<dataarea name="rom" size="524288">
-				<rom name="gakken no obenkyou soft - kanji (japan).bin" size="524288" crc="68aacb63" sha1="40ae0e0b6f644511e8864acd1d1965de8151c7a6" offset="0" loadflag="load16_word_swap" />
+				<rom name="mpr-17508-t.ic1" size="524288" crc="68aacb63" sha1="40ae0e0b6f644511e8864acd1d1965de8151c7a6" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -635,8 +654,10 @@ Games for the MIXT BOOK PLAYER COPERA
 		<info name="serial" value="T-169040"/>
 		<info name="alt_title" value="学研のおべんきょうソフト かけざん 九九"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18698 J37" />
 			<dataarea name="rom" size="1048576">
-				<rom name="gakken no obenkyou soft - kakezan kuku (japan).bin" size="1048576" crc="6470b56e" sha1="6f5af8dfcdcea5f79a451e611e23b3e88432ef81" offset="0" loadflag="load16_word_swap" />
+				<rom name="mpr-18698 j37.ic1" size="1048576" crc="6470b56e" sha1="6f5af8dfcdcea5f79a451e611e23b3e88432ef81" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -649,8 +670,10 @@ Games for the MIXT BOOK PLAYER COPERA
 		<info name="release" value="199512xx"/>
 		<info name="alt_title" value="学研のおべんきょうソフト かず･すうじ"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="MPR-18585-16MX" />
 			<dataarea name="rom" size="2097152">
-				<rom name="gakken no obenkyou soft - kazu-suuji (japan).bin" size="2097152" crc="dd4f5471" sha1="0eb13ae5f4b4649b107f4e105c3ae63475b75ee8" offset="0" loadflag="load16_word_swap" />
+				<rom name="mpr-18585-16mx.ic1" size="2097152" crc="dd4f5471" sha1="0eb13ae5f4b4649b107f4e105c3ae63475b75ee8" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -662,8 +685,10 @@ Games for the MIXT BOOK PLAYER COPERA
 		<info name="serial" value="T-169090"/>
 		<info name="alt_title" value="学研ピコで科学1 はっけんむしのひみつ"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="9KO-0043-RV" />
 			<dataarea name="rom" size="2097152">
-				<rom name="gakken pico de kagaku 1 - hakken mushi no himitsu (japan).bin" size="2097152" crc="26029ad3" sha1="6c01cf26acc58307ac2f0f74a6c64a96318db3bb" offset="0" loadflag="load16_word_swap" />
+				<rom name="9ko-0043-rv.ic1" size="2097152" crc="26029ad3" sha1="6c01cf26acc58307ac2f0f74a6c64a96318db3bb" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -682,6 +707,21 @@ Games for the MIXT BOOK PLAYER COPERA
 		</part>
 	</software>
 
+	<software name="comphero">
+		<description>Ganbare! Bokura no Compati Heroes (Jpn)</description>
+		<year>1996</year>
+		<publisher>Banpresto</publisher>
+		<info name="serial" value="T-206010"/>
+		<info name="alt_title" value="がんばれ!ぼくらのコンパチヒーローズ"/>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-19067-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-19067-t.ic1" size="524288" crc="bbae26f2" sha1="eb28ad4558efd2b20e5b26ba0ccd81781a275fe0" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="carrangr">
 		<description>Gekisou Sentai CarRanger (Jpn)</description>
 		<year>199?</year>
@@ -689,8 +729,10 @@ Games for the MIXT BOOK PLAYER COPERA
 		<info name="serial" value="T-133160"/>
 		<info name="alt_title" value="激走戦隊カーレンジャー"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18883-T" />
 			<dataarea name="rom" size="524288">
-				<rom name="gekisou sentai carranger (japan).bin" size="524288" crc="8ed536bc" sha1="b4f276d4ecc300b38b73bf1d7030f6820786fe55" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18883-t.ic1" size="524288" crc="8ed536bc" sha1="b4f276d4ecc300b38b73bf1d7030f6820786fe55" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -732,8 +774,10 @@ Games for the MIXT BOOK PLAYER COPERA
 		<info name="release" value="19951031"/>
 		<info name="alt_title" value="右脳開発シリーズ1 Richard Scarry's ハックルとローリー"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-17858 J02" />
 			<dataarea name="flop" size="1048576">
-				<rom name="unou kaihatsu series 1 - richard scarry's huckle to lowly (japan).bin" size="1048576" crc="1b46e52f" sha1="83f33c26ec829d85b3226f85b2e0da78f7f65ff2" offset="0" loadflag="load16_word_swap" />
+				<rom name="mpr-17858 j02.ic1" size="1048576" crc="1b46e52f" sha1="83f33c26ec829d85b3226f85b2e0da78f7f65ff2" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -760,8 +804,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<publisher>Sega?</publisher>
 		<info name="serial" value="49028-09" />
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6586A" />
+			<feature name="ic1" value="MPR-17779 J19" />
 			<dataarea name="flop" size="1048576">
-				<rom name="richard scarry's une journee bien remplie pour cassis et asticot (france).bin" size="1048576" crc="53f94256" sha1="9d9cdd8281e7dadb6668f35692e42fbde74d6349" offset="0" loadflag="load16_word_swap" />
+				<rom name="mpr-17779 j19.ic1" size="1048576" crc="53f94256" sha1="9d9cdd8281e7dadb6668f35692e42fbde74d6349" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -783,8 +829,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<publisher>Sega?</publisher>
 		<info name="serial" value="49028-06" />
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6586A" />
+			<feature name="ic1" value="MPR-17778 J18" />
 			<dataarea name="rom" size="1048576">
-				<rom name="richard scarry's - el dia mas ajetreado de las vidas de felipe y gusy (spain).bin" size="1048576" crc="d529aacd" sha1="e65c808a51499c254ec24cbf9fb611a10e7505ff" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17778 j18.ic1" size="1048576" crc="d529aacd" sha1="e65c808a51499c254ec24cbf9fb611a10e7505ff" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -827,8 +875,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="release" value="200004xx"/>
 		<info name="alt_title" value="七田 眞 監修 右脳イメージトレーニング ひらがな・カタカナ カジノでモジャベガスドリーム (Shichida Makoto Kanshuu Unou Image Training Hiragana - Katakana Kajino de Moja Vegas Dream)"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="9KO-0019-MK-08" />
 			<dataarea name="rom" size="1048576">
-				<rom name="shichida makoto kanshuu unou image training hiragana - katakana kajino de mojabegasudoriimu (japan).bin" size="1048576" crc="8e12c06d" sha1="88d1f8ce5ef824f1a989bed02f4dbf9b7861ee05" offset="0" loadflag="load16_word_swap" />
+				<rom name="9ko-0019-mk-08.ic1" size="1048576" crc="8e12c06d" sha1="88d1f8ce5ef824f1a989bed02f4dbf9b7861ee05" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -840,8 +890,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="serial" value="HPC-6055"/>
 		<info name="alt_title" value="かわいいなかまを育てよう! ３つのしっぽ"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="MPR-20905-S" />
 			<dataarea name="rom" size="2097152">
-				<rom name="kawaii nakama wo sodate you! 3-tsu no shippo (japan).bin" size="2097152" crc="a6dea807" sha1="0a5cb3a917880b755465d3bd9d110dffcb52a2a3" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-20905-s.ic1" size="2097152" crc="a6dea807" sha1="0a5cb3a917880b755465d3bd9d110dffcb52a2a3" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -854,8 +906,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="release" value="19951104"/>
 		<info name="alt_title" value="右脳開発シリーズ4 けろけろけろっぴのいろかたち"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18013 J11" />
 			<dataarea name="rom" size="1048576">
-				<rom name="unou kaihatsu series 4 - kerokero keroppi no irokatachi (japan).bin" size="1048576" crc="37dae2f5" sha1="874e8d0466e0585fa7db3b70df871875ddf29cb2" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18013 j11.ic1" size="1048576" crc="37dae2f5" sha1="874e8d0466e0585fa7db3b70df871875ddf29cb2" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -867,8 +921,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="serial" value="HPC-6015"/>
 		<info name="alt_title" value="キテレツ大百科 えどにいってキテレツさいさまにあうナリ"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17436-H" />
 			<dataarea name="rom" size="524288">
-				<rom name="kiteretsu daihyakka edoniitte kiteretsu saisamaniau nari (japan).bin" size="524288" crc="85f80871" sha1="e13ad62f7dbd270f74a4dbbe881d1ca619899d31" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17436-h.ic1" size="524288" crc="85f80871" sha1="e13ad62f7dbd270f74a4dbbe881d1ca619899d31" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -880,8 +936,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="serial" value="T-255040"/>
 		<info name="alt_title" value="くまのプーさん クリストファー･ロビンを さがせ!"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-21835-S" />
 			<dataarea name="rom" size="1048576">
-				<rom name="kuma no pooh-san christfer robin wo sagase (japan).bin" size="1048576" crc="40e2cdfc" sha1="14f757263f138cbe02e03c48748935224805edf1" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-21835-s.ic1" size="1048576" crc="40e2cdfc" sha1="14f757263f138cbe02e03c48748935224805edf1" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -894,8 +952,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="release" value="199512xx"/>
 		<info name="alt_title" value="ＬＥＧＯ ＦＵＮ ＴＯ ＢＵＩＬＤ"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18686-U" />
 			<dataarea name="rom" size="1048576">
-				<rom name="lego fun to build (japan).bin" size="1048576" crc="cbcc377c" sha1="2f269325deef0db0a14e3b0d3cdf9a0c06436a70" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18686-u.ic1" size="1048576" crc="cbcc377c" sha1="2f269325deef0db0a14e3b0d3cdf9a0c06436a70" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -917,8 +977,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<publisher>&lt;unknown&gt;</publisher>
 		<info name="serial" value="49037-06"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-18571 J32" />
 			<dataarea name="rom" size="1048576">
-				<rom name="las aventuras del rey leon (spain).bin" size="1048576" crc="ca5534bc" sha1="f3eb0844b49329e2f522e595d887adee7171e88b"  offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18571 j32.ic1" size="1048576" crc="ca5534bc" sha1="f3eb0844b49329e2f522e595d887adee7171e88b"  offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -944,8 +1006,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="serial" value="T-255050"/>
 		<info name="alt_title" value="ミッキーのぼくはめいたんてい"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="9KO-0021-MX" />
 			<dataarea name="rom" size="2097152">
-				<rom name="mickey no boku wa meitantei (japan).bin" size="2097152" crc="2eb957b3" sha1="b11e35b71a3d24fddad746b60c1f79ea011d39c1" offset="000000" loadflag="load16_word_swap" />
+				<rom name="9ko-0021-mx.ic1" size="2097152" crc="2eb957b3" sha1="b11e35b71a3d24fddad746b60c1f79ea011d39c1" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -958,8 +1022,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="release" value="19930626"/>
 		<info name="alt_title" value="ミッキーのゆかいなぼうけん"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-15644-H" />
 			<dataarea name="rom" size="524288">
-				<rom name="mickey no yukai na bouken (japan).bin" size="524288" crc="5a6767a9" sha1="bb35a699c883121dbe5b16877531c2ba8e1d2242" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-15644-h.ic1" size="524288" crc="5a6767a9" sha1="bb35a699c883121dbe5b16877531c2ba8e1d2242" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -986,8 +1052,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="serial" value="T-255030"/>
 		<info name="alt_title" value="ミッキーとうたうとりのしま ミニーをさがしてわくわくだいぼうけん! (Mickey to Utau Tori no Shima - Minnie wo Sagashite Wakuwaku Daibouken!)"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-21120-S" />
 			<dataarea name="rom" size="1048576">
-				<rom name="mickey toutautorino shima minnie wo sagashite wakuwaku daibouken! (japan).bin" size="1048576" crc="643700aa" sha1="d47298e7dab451218cede56fd758401e356e6b2b" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-21120-s.ic1" size="1048576" crc="643700aa" sha1="d47298e7dab451218cede56fd758401e356e6b2b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1023,8 +1091,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<publisher>Sega</publisher>
 		<info name="serial" value="49024-09" />
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17784-H" />
 			<dataarea name="rom" size="524288">
-				<rom name="mickey - fait un voyage eclair dans le passe (france).bin" size="524288" crc="fafee898" sha1="6cacd57339ad8dcdbc40f08abffb6fa0f00b5ae5" offset="0" loadflag="load16_word_swap" />
+				<rom name="mpr-17784-h.ic1" size="524288" crc="fafee898" sha1="6cacd57339ad8dcdbc40f08abffb6fa0f00b5ae5" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1038,8 +1108,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="release" value="19951205"/>
 		<info name="alt_title" value="右脳開発シリーズ9 日本昔ばなし"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-17803-H" />
 			<dataarea name="rom" size="524288">
-				<rom name="unou kaihatsu series 9 - nihon mukashi banashi (japan).bin" size="524288" crc="b62514d0" sha1="5c128fcc3ce49434e1e3c834a9fcec7b28c5480e" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17803-h.ic1" size="524288" crc="b62514d0" sha1="5c128fcc3ce49434e1e3c834a9fcec7b28c5480e" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1123,8 +1195,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="release" value="199709xx"/>
 		<info name="alt_title" value="ピーターパン ネバーランドへ いこう!"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-20085-S" />
 			<dataarea name="rom" size="1048576">
-				<rom name="peter pan - neverland e ikou! (japan).bin" size="1048576" crc="e91ef80a" sha1="68acb94634912e38d3d25385bd00b3832042eedc" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-20085-s.ic1" size="1048576" crc="e91ef80a" sha1="68acb94634912e38d3d25385bd00b3832042eedc" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1136,8 +1210,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="serial" value="HPC-6018"/>
 		<info name="alt_title" value="ピコサッカー めざせサッカーせんしゅ"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-17844 J17" />
 			<dataarea name="rom" size="1048576">
-				<rom name="pico soccer - mezase soccer senshu (japan).bin" size="1048576" crc="02c3c4fd" sha1="94a10f18bcf6bea864f8223638850a55aa2be285" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17844 j17.ic1" size="1048576" crc="02c3c4fd" sha1="94a10f18bcf6bea864f8223638850a55aa2be285" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1168,14 +1244,16 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 	</software>
 
 	<software name="poohhaji">
-		<description>Pooh-san no Hajimete no Eigo (Jpn)</description>
+		<description>Pooh-san no Hajimete no Eigo (Jpn, Rev. 1)</description>
 		<year>2001</year>
 		<publisher>Kodansha</publisher>
-		<info name="serial" value="T-255060"/>
+		<info name="serial" value="T-255060-01"/>
 		<info name="alt_title" value="プーさんの はじめてのえいご"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
 			<dataarea name="rom" size="2097152">
-				<rom name="pooh-san no hajimete no eigo (japan).bin" size="2097152" crc="265a764a" sha1="a6fc3b973518678caf89605f841cad6407c7e861" offset="000000" loadflag="load16_word_swap" />
+				<rom name="epoxy block u1.ic1" size="2097152" crc="265a764a" sha1="a6fc3b973518678caf89605f841cad6407c7e861" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1207,9 +1285,12 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<description>Professor Pico e l'Enigma della Scatola di Pastelli (Ita)</description>
 		<year>1995</year>
 		<publisher>Sega</publisher>
+		<info name="serial" value="49041-13" />
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-17939-U" />
 			<dataarea name="rom" size="524288">
-				<rom name="professor pico e l'enigma della scatola di pastelli (italy).bin" size="524288" crc="8aa99b73" sha1="831816248c39133f5251b0a4bf5d92515932d536" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17939-u.ic1" size="524288" crc="8aa99b73" sha1="831816248c39133f5251b0a4bf5d92515932d536" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1263,8 +1344,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="release" value="19951002"/>
 		<info name="alt_title" value="左脳開発シリーズ3 比較・分類"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6882A" />
+			<feature name="ic1" value="MPR-18304-T" />
 			<dataarea name="rom" size="524288">
-				<rom name="sanou kaihatsu series 3 hikaku - bunrui (japan).bin" size="524288" crc="c8a23b22" sha1="03dc707836be4ceaeea1ddedc5b909d8c577b504" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-18304-t.ic1" size="524288" crc="c8a23b22" sha1="03dc707836be4ceaeea1ddedc5b909d8c577b504" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1331,8 +1414,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="serial" value="HPC-6071"/>
 		<info name="alt_title" value="それいけ!アンパンマン アンパンマンとことばあそび"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="MPR-21837-S" />
 			<dataarea name="rom" size="2097152">
-				<rom name="anpanman to kotobaasobi (japan).bin" size="2097152" crc="9ccd5cae" sha1="99bcf3eb0ca4671629739bd575e2356634cee466" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-21837-s.ic1" size="2097152" crc="9ccd5cae" sha1="99bcf3eb0ca4671629739bd575e2356634cee466" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1344,8 +1429,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="serial" value="HPC-6067"/>
 		<info name="alt_title" value="アンパンマンのドライブピコ それいけ!アンパンマン アンパンマンとたのしいドライブ！ (Anpanman no Drive Pico with Soreike! Anpanman - Anpanman to Tanoshii Drive!)"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6883A" />
+			<feature name="ic1" value="MPR-21077-S" />
 			<dataarea name="rom" size="1048576">
-				<rom name="anpanman to tanoshii drive! (japan).bin" size="1048576" crc="ad3ef418" sha1="000808ad7fa7120976f2d579c23ce8662e721b92" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-21077-s.ic1" size="1048576" crc="ad3ef418" sha1="000808ad7fa7120976f2d579c23ce8662e721b92" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1357,8 +1444,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="serial" value="HPC-6017"/>
 		<info name="alt_title" value="それいけ! アンパンマン えいごとなかよし２ たのしいカーニバル"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6586A" />
+			<feature name="ic1" value="MPR-17522 J13" />
 			<dataarea name="rom" size="1048576">
-				<rom name="soreike! anpanman - eigo to nakayoshi 2 - tanoshii carnival (japan).bin" size="1048576" crc="1b28d597" sha1="b61bb5b7ef0572b50c806d4a7ea01f8db04f814d" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17522 j13.ic1" size="1048576" crc="1b28d597" sha1="b61bb5b7ef0572b50c806d4a7ea01f8db04f814d" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1411,8 +1500,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<publisher>Sega</publisher>
 		<info name="serial" value="49023-09" />
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17726-H" />
 			<dataarea name="rom" size="524288">
-				<rom name="tails et le faiseur de musique (france).bin" size="524288" crc="8cec50fa" sha1="3f1ec0e7e55c7b1c1e4577f516c24ab1068d77ef" offset="0" loadflag="load16_word_swap" />
+				<rom name="mpr-17726-h.ic1" size="524288" crc="8cec50fa" sha1="3f1ec0e7e55c7b1c1e4577f516c24ab1068d77ef" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1423,8 +1514,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<publisher>Sega</publisher>
 		<info name="serial" value="49023-06" />
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17725-H" />
 			<dataarea name="rom" size="524288">
-				<rom name="tails y el musico (spain).bin" size="524288" crc="1281c3a4" sha1="832a77f8e6c59b8d0e3bbc606b6b93aa303857b6" offset="0" loadflag="load16_word_swap" />
+				<rom name="mpr-17725-h.ic1" size="524288" crc="1281c3a4" sha1="832a77f8e6c59b8d0e3bbc606b6b93aa303857b6" offset="0" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1481,8 +1574,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="release" value="200210xx"/>
 		<info name="alt_title" value="東京ディズニーシー ミッキーとあそぼう！"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK IC1" />
 			<dataarea name="rom" size="2097152">
-				<rom name="tokyo disney sea mickey to asobou! (japan).bin" size="2097152" crc="38b713b3" sha1="ad29728e7421d4b7505159dc69ba5978964c6c35" offset="000000" loadflag="load16_word_swap" />
+				<rom name="epoxy block ic1.ic1" size="2097152" crc="38b713b3" sha1="ad29728e7421d4b7505159dc69ba5978964c6c35" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1495,8 +1590,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="release" value="200112xx"/>
 		<info name="alt_title" value="とっとこハム太郎 はる･なつ･あき･ふゆ とっとこなかよし! ハムちゃんず!"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7090A" />
+			<feature name="ic1" value="EPOXY BLOCK U1" />
 			<dataarea name="rom" size="2097152">
-				<rom name="tottoko hamtarou haru natsu aki fuyu tottoko nakayoshi! ham-chans! (japan).bin" size="2097152" crc="71f39f19" sha1="faa6a6c997c9a5a8f9da30b0db44df01097c12b8" offset="000000" loadflag="load16_word_swap" />
+				<rom name="epoxy block u1.ic1" size="2097152" crc="71f39f19" sha1="faa6a6c997c9a5a8f9da30b0db44df01097c12b8" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
@@ -1523,8 +1620,10 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 		<info name="serial" value="T-133070"/>
 		<info name="alt_title" value="ウルトラマン VSかいじゅうぐんだん!!"/>
 		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-6434C" />
+			<feature name="ic1" value="MPR-17507-H" />
 			<dataarea name="rom" size="524288">
-				<rom name="ultraman vs. kaijuu gundan!! (japan).bin" size="524288" crc="7f90e769" sha1="e650590a209a396fff6f3ebd7cd22ac9a62e42db" offset="000000" loadflag="load16_word_swap" />
+				<rom name="mpr-17507-h.ic1" size="524288" crc="7f90e769" sha1="e650590a209a396fff6f3ebd7cd22ac9a62e42db" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
 	</software>
