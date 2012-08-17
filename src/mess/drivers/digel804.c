@@ -15,14 +15,15 @@
 *  hook up leds on front panel (done to stderr for now)
 *  hook up r6551 serial and attach terminal for sending to ep804
 *  /nmi is emulated correctly (i.e. its tied to +5v. that was easy!)
+*  hook up keypad via 74C923 and mode buttons via logic gate mess
 *
 *  TODO:
 *  minor finishing touches to i/o map
-*  figure out why banked ram on 4.x causes glitches/sys errors; it works on 2.2
-*  actually hook up interrupts: they should fire on keypresses and 6551/ACIA receives
+*  hook up 6551/ACIA interrupt (currently ACIA device doesn't have a callback for /IRQ line)
 *  attach terminal to 6551/ACIA serial for recieving from ep804
 *  correctly hook up 10937 vfd controller: por is not hooked up (relates to /MEMEN)
-*  hook up keypad via 74C923 and mode buttons via logic gate mess
+*  SCLK line should be handled inside the 10937 device
+*  EPROM socket stuff (ports 0x40, 0x41, 0x42 and 0x47)
 *  artwork
 *
 ******************************************************************************/
