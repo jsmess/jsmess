@@ -100,7 +100,7 @@ public:
 	vboy_regs_t m_vboy_regs;
 	vip_regs_t m_vip_regs;
 	vboy_timer_t m_vboy_timer;
-	bitmap_ind16 m_bg_map[16];
+	int m_bg_map[0x200*0x200];
 	bitmap_ind16 m_screen_output;
 	UINT16 m_frame_count;
 	UINT8 m_displayfb;
@@ -565,7 +565,7 @@ static ADDRESS_MAP_START( vboy_mem, AS_PROGRAM, 32, vboy_state )
 	AM_RANGE( 0x02000000, 0x0200002b ) AM_MIRROR(0x0ffff00) AM_READWRITE(port_02_read, port_02_write) // Hardware control registers mask 0xff
 	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM // Main RAM - 64K mask 0xffff
-	AM_RANGE( 0x06000000, 0x06003fff ) AM_RAM // Cart RAM - 8K
+	AM_RANGE( 0x06000000, 0x06003fff ) AM_RAM // Cart RAM - 8K NVRAM
 	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_ROM AM_REGION("user1", 0) /* ROM */
 ADDRESS_MAP_END
 
@@ -594,7 +594,7 @@ static ADDRESS_MAP_START( vboy_io, AS_IO, 32, vboy_state )
 	AM_RANGE( 0x02000000, 0x0200002b ) AM_MIRROR(0x0ffff00) AM_READWRITE(port_02_read, port_02_write) // Hardware control registers mask 0xff
 	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM // Main RAM - 64K mask 0xffff
-	AM_RANGE( 0x06000000, 0x06003fff ) AM_RAM // Cart RAM - 8K
+	AM_RANGE( 0x06000000, 0x06003fff ) AM_RAM // Cart RAM - 8K NVRAM
 	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_ROM AM_REGION("user1", 0) /* ROM */
 ADDRESS_MAP_END
 
@@ -613,8 +613,8 @@ static INPUT_PORTS_START( vboy )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_JOYSTICKRIGHT_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("L") PORT_PLAYER(1) // Left button on back
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("R") PORT_PLAYER(1) // Right button on back
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("A") PORT_PLAYER(1) // A button (or B?)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("B") PORT_PLAYER(1) // B button (or A?)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("B") PORT_PLAYER(1) // B button (Mario Clash Jump button)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("A") PORT_PLAYER(1) // A button
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_UNUSED ) // Always 1
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNUSED ) // Battery low
 INPUT_PORTS_END
@@ -642,11 +642,10 @@ static MACHINE_RESET(vboy)
 static VIDEO_START( vboy )
 {
 	vboy_state *state = machine.driver_data<vboy_state>();
-	int i;
+	//int i;
 
 	// Allocate memory for temporary screens
-	for(i = 0; i < 16; i++)
-		state->m_bg_map[i].allocate(512, 512, BITMAP_FORMAT_IND16);
+	//state->m_bg_map[384*224];
 
 	state->m_screen_output.allocate(384, 224, BITMAP_FORMAT_IND16);
 	state->m_font  = auto_alloc_array(machine, UINT16, 2048 * 8);
@@ -657,10 +656,10 @@ static VIDEO_START( vboy )
 	state->m_world = state->m_bgmap + (0x1d800 >> 1);
 }
 
-static void put_char(vboy_state *state, bitmap_ind16 &bitmap, int x, int y, UINT16 ch, bool flipx, bool flipy, bool trans, UINT8 pal)
+static void put_obj(vboy_state *state, bitmap_ind16 &bitmap, int x, int y, UINT16 ch, bool flipx, bool flipy, bool trans, UINT8 pal)
 {
 	UINT16 data, code = ch;
-	UINT8 yi, xi, dat;
+	UINT8 yi, xi, dat, col;
 
 	for (yi = 0; yi < 8; yi++)
 	{
@@ -678,21 +677,60 @@ static void put_char(vboy_state *state, bitmap_ind16 &bitmap, int x, int y, UINT
 			else
 				dat = ((data >> ((7-xi) << 1)) & 0x03);
 
-			//col = (pal >> (dat*2)) & 3; // TODO: check what this is for!
-
 			res_x = x + xi;
 			res_y = y + yi;
 
-			//if(res_x > (384) || res_y > 224 || res_x < (0) || res_y < 0)
-			//	continue;
+			if(trans) // obj
+			{
+				col = (pal >> (dat*2)) & 3;
 
-			if (!trans || (trans && dat))
-				bitmap.pix16((res_y), (res_x)) = state->machine().pens[dat];
+				if (dat)
+					bitmap.pix16((res_y), (res_x)) = state->machine().pens[col];
+			}
+			else // bg
+			{
+				bitmap.pix16((res_y), (res_x)) = dat;
+			}
 		}
 	}
 }
 
-static void fill_bg_map(vboy_state *state, int num, bitmap_ind16 &bitmap)
+static void put_char(vboy_state *state, int x, int y, UINT16 ch, bool flipx, bool flipy, bool trans, UINT8 pal)
+{
+	UINT16 data, code = ch;
+	UINT8 yi, xi, dat;
+	int col;
+
+	for (yi = 0; yi < 8; yi++)
+	{
+		if (!flipy)
+			 data = state->m_font[code * 8 + yi];
+		else
+			 data = state->m_font[code * 8 + (7-yi)];
+
+		for (xi = 0; xi < 8; xi++)
+		{
+			int res_x,res_y;
+
+			if (!flipx)
+				dat = ((data >> (xi << 1)) & 0x03);
+			else
+				dat = ((data >> ((7-xi) << 1)) & 0x03);
+
+			res_x = x + xi;
+			res_y = y + yi;
+
+			col = (pal >> (dat*2)) & 3;
+
+			if(dat == 0)
+				col = -1;
+
+			state->m_bg_map[res_y*0x200+res_x] = col;
+		}
+	}
+}
+
+static void fill_bg_map(vboy_state *state, int num)
 {
 	int i, j;
 
@@ -702,7 +740,7 @@ static void fill_bg_map(vboy_state *state, int num, bitmap_ind16 &bitmap)
 		for (j = 0; j < 64; j++)
 		{
 			UINT16 val = state->m_bgmap[j + 64 * i + (num * 0x1000)];
-			put_char(state, bitmap, j * 8, i * 8, val & 0x7ff, BIT(val,13), BIT(val,12), false, state->m_vip_regs.GPLT[(val >> 14) & 3]);
+			put_char(state, j * 8, i * 8, val & 0x7ff, BIT(val,13), BIT(val,12), false, state->m_vip_regs.GPLT[(val >> 14) & 3]);
 		}
 	}
 }
@@ -736,7 +774,7 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 
 	if (mode < 3)
 	{
-		fill_bg_map(state, bg_map_num, state->m_bg_map[bg_map_num]);
+		fill_bg_map(state, bg_map_num);
 		if (BIT(def,15) && (!right))
 		{
 			// Left screen
@@ -746,15 +784,16 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 				{
 					INT16 y1 = (y+gy);
 					INT16 x1 = (x+gx-gp);
-					UINT16 pix = 0;
+					int pix = 0;
 					if (mode==1)
 						x1 += vboy_paramtab[y*2];
 
-					pix = state->m_bg_map[bg_map_num].pix16((y+my) & 0x1ff, (x+mx-mp) & 0x1ff);
-					if (pix)
+					pix = state->m_bg_map[((y+my) & 0x1ff)*0x200+((x+mx-mp) & 0x1ff)];
+
+					if(pix != -1)
 						if (y1>=0 && y1<224)
 							if (x1>=0 && x1<384)
-								bitmap.pix16(y1, x1) = pix;
+								bitmap.pix16(y1, x1) = state->machine().pens[pix & 3];
 				}
 			}
 		}
@@ -768,15 +807,16 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 				{
 					INT16 y1 = (y+gy);
 					INT16 x1 = (x+gx+gp);
-					UINT16 pix = 0;
+					int pix = 0;
 					if (mode==1)
 						x1 += vboy_paramtab[y*2+1];
 
-					pix = state->m_bg_map[bg_map_num].pix16((y+my) & 0x1ff, (x+mx+mp) & 0x1ff);
-					if (pix)
+					pix = state->m_bg_map[((y+my) & 0x1ff)*0x200+((x+mx+mp) & 0x1ff)];
+
+					if(pix != -1)
 						if (y1>=0 && y1<224)
 							if (x1>=0 && x1<384)
-								bitmap.pix16(y1, x1) = pix;
+								bitmap.pix16(y1, x1) = state->machine().pens[pix & 3];
 				}
 			}
 		}
@@ -815,10 +855,10 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 			UINT8 jron = (state->m_objects[start_ndx+1] & 0x4000) >> 14;
 
 			if (!right && jlon)
-				put_char(state, bitmap, (jx-jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), true, state->m_vip_regs.JPLT[(val>>14) & 3]);
+				put_obj(state, bitmap, (jx-jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), true, state->m_vip_regs.JPLT[(val>>14) & 3]);
 
 			if(right && jron)
-				put_char(state, bitmap, (jx+jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), true, state->m_vip_regs.JPLT[(val>>14) & 3]);
+				put_obj(state, bitmap, (jx+jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), true, state->m_vip_regs.JPLT[(val>>14) & 3]);
 
 			i --;
 			i &= 0x3ff;
