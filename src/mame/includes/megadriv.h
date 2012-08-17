@@ -14,6 +14,8 @@
 #include "machine/nvram.h"
 #include "cpu/ssp1601/ssp1601.h"
 
+#include "machine/megavdp.h"
+
 #define MASTER_CLOCK_NTSC 53693175
 #define MASTER_CLOCK_PAL  53203424
 #define SEGACD_CLOCK      12500000
@@ -49,15 +51,12 @@ MACHINE_CONFIG_EXTERN( md_bootleg );	// for topshoot.c & hshavoc.c
 
 extern UINT16* megadriv_backupram;
 extern int megadriv_backupram_length;
-extern UINT16* megadrive_ram;
 
 extern UINT8 megatech_bios_port_cc_dc_r(running_machine &machine, int offset, int ctrl);
-extern void megadriv_stop_scanline_timer(void);
+extern void megadriv_stop_scanline_timer(running_machine &machine);
 
 void megatech_set_megadrive_z80_as_megadrive_z80(running_machine &machine, const char* tag);
 
-extern READ16_HANDLER( megadriv_vdp_r );
-extern WRITE16_HANDLER( megadriv_vdp_w );
 
 /* These handlers are needed by megaplay.c */
 extern READ16_HANDLER( megadriv_68k_io_read );
@@ -81,31 +80,10 @@ SCREEN_UPDATE_RGB32( megadriv );
 SCREEN_VBLANK( megadriv );
 
 
-struct genesis_z80_vars
-{
-	int z80_is_reset;
-	int z80_has_bus;
-	UINT32 z80_bank_addr;
-	UINT8* z80_prgram;
-};
 
-extern genesis_z80_vars genz80;
 
-extern UINT16* megadrive_vdp_palette_lookup;
-extern UINT16* megadrive_vdp_palette_lookup_sprite; // for C2
-extern UINT16* megadrive_vdp_palette_lookup_shadow;
-extern UINT16* megadrive_vdp_palette_lookup_highlight;
-
-extern int segac2_bg_pal_lookup[4];
-extern int segac2_sp_pal_lookup[4];
-
-extern int genvdp_use_cram;
-extern int genesis_always_irq6;
-extern int genesis_other_hacks;
 
 extern int megadrive_6buttons_pad;
-extern int megadrive_region_export;
-extern int megadrive_region_pal;
 
 /* Megaplay - Megatech specific */
 /* It might be possible to move the following structs in the drivers */
@@ -117,8 +95,11 @@ class md_base_state : public driver_device
 {
 public:
 	md_base_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag) { }
-	
+	: driver_device(mconfig, type, tag),
+		m_vdp(*this,"gen_vdp")
+	{ }
+	required_device<sega_genesis_vdp_device> m_vdp;
+
 	DECLARE_DRIVER_INIT(megadriv_c2);
 	DECLARE_DRIVER_INIT(megadrie);
 	DECLARE_DRIVER_INIT(megadriv);
@@ -430,9 +411,6 @@ extern cpu_device *_32x_master_cpu;
 extern cpu_device *_32x_slave_cpu;
 
 // called from out main scanline timers...
-extern void _32x_scanline_cb0(running_machine& machine);
-extern void _32x_scanline_cb1(void);
-extern void _32x_check_framebuffer_swap(void);
 
 extern int _32x_fifo_available_callback(device_t *device, UINT32 src, UINT32 dst, UINT32 data, int size);
 extern MACHINE_RESET( _32x );
@@ -440,13 +418,8 @@ ADDRESS_MAP_EXTERN( sh2_main_map, driver_device );
 ADDRESS_MAP_EXTERN( sh2_slave_map, driver_device );
 extern emu_timer *_32x_pwm_timer;
 extern TIMER_CALLBACK( _32x_pwm_callback );
-UINT32* _32x_render_videobuffer_to_screenbuffer_helper(running_machine &machine, int scanline);
 
-extern int _32x_displaymode;
-extern int _32x_videopriority;
-extern int _32x_hcount_compare_val;
 extern int megadrive_vblank_flag;
-extern UINT16 get_hposition(void);
 extern int genesis_scanline_counter;
 
 class segacd_state : public _32x_state	// use _32x_state as base to make easier the combo 32X + SCD
@@ -478,25 +451,24 @@ MACHINE_START( md_sram );
 extern WRITE16_HANDLER( jcart_ctrl_w );
 extern READ16_HANDLER( jcart_ctrl_r );
 
-/* vdp / video */
-extern UINT16 (*vdp_get_word_from_68k_mem)(running_machine &machine, UINT32 source);
-extern UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source);
-extern int megadrive_visible_scanlines;
-extern int megadrive_irq6_scanline;
-extern int megadrive_z80irq_scanline;
-extern int megadrive_imode;
+/* machine/megavdp.c */
+extern UINT16 (*vdp_get_word_from_68k_mem)(running_machine &machine, UINT32 source, address_space* space);
+extern UINT16 vdp_get_word_from_68k_mem_default(running_machine &machine, UINT32 source, address_space* space);
 extern int megadriv_framerate;
 extern int megadrive_total_scanlines;
 extern int megadrive_vblank_flag;
 extern int genesis_scanline_counter;
-extern timer_device* megadriv_render_timer;
+extern UINT16* megadrive_vdp_palette_lookup;
+extern UINT16* megadrive_vdp_palette_lookup_sprite; // for C2
+extern UINT16* megadrive_vdp_palette_lookup_shadow;
+extern UINT16* megadrive_vdp_palette_lookup_highlight;
+extern int segac2_bg_pal_lookup[4];
+extern int segac2_sp_pal_lookup[4];
+extern int genvdp_use_cram;
+extern int megadrive_region_export;
+extern int megadrive_region_pal;
+TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback );
+
+/* machine/megadriv.c */
 extern TIMER_DEVICE_CALLBACK( megadriv_scanline_timer_callback );
-extern TIMER_DEVICE_CALLBACK( megadriv_render_timer_callback );
-extern TIMER_DEVICE_CALLBACK( irq6_on_callback );
-extern int megadrive_irq6_pending;
-extern int megadrive_irq4_pending;
-extern bitmap_ind16* megadriv_render_bitmap;
 extern timer_device* megadriv_scanline_timer;
-extern timer_device* irq6_on_timer;
-extern timer_device* irq4_on_timer;
-extern void megadriv_reset_vdp(void);

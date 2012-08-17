@@ -454,13 +454,23 @@ static MACHINE_RESET( mpu4 )
 	state->m_chr_value		= 0;
 
 
-	/* init rom bank, some games don't set this, and will assume bank 0,set 0 */
 	{
 		UINT8 *rom = state->memregion("maincpu")->base();
+		size_t romsize = state->memregion("maincpu")->bytes();
+
+		if (romsize < 0x10000)
+			fatalerror("maincpu ROM region is < 0x10000 bytes, check ROM\n");
+
+		int numbanks = romsize / 0x10000;
 
 		state->membank("bank1")->configure_entries(0, 8, &rom[0x01000], 0x10000);
 
-		state->membank("bank1")->set_entry(0);
+		// some Bwb games must default to the last bank, does anything not like this
+		// behavior?
+		// some Bwb games don't work anyway tho, they seem to dislike something else
+		// about the way the regular banking behaves, not related to the CB2 stuff
+		state->membank("bank1")->set_entry(numbanks-1);
+
 		machine.device("maincpu")->reset();
 	}
 }
@@ -502,8 +512,9 @@ used in some cabinets instead of the main control.
 */
 WRITE8_MEMBER(mpu4_state::bankswitch_w)
 {
-//  printf("bank %02x\n", data);
+//	printf("bankswitch_w %02x\n", data);
 
+	// m_pageset is never even set??
 	m_pageval = (data & 0x03);
 	membank("bank1")->set_entry((m_pageval + (m_pageset ? 4 : 0)) & 0x07);
 }
@@ -517,6 +528,11 @@ READ8_MEMBER(mpu4_state::bankswitch_r)
 
 WRITE8_MEMBER(mpu4_state::bankset_w)
 {
+
+//	printf("bankset_w %02x\n", data);
+
+	// m_pageset is never even set??
+
 	m_pageval = (data - 2);//writes 2 and 3, to represent 0 and 1 - a hangover from the half page design?
 	membank("bank1")->set_entry((m_pageval + (m_pageset ? 4 : 0)) & 0x07);
 }
@@ -1513,6 +1529,7 @@ WRITE_LINE_MEMBER(mpu4_state::pia_gb_cb2_w)
 	//Some BWB games use this to drive the bankswitching
 	if (m_bwb_bank)
 	{
+		//printf("pia_gb_cb2_w %d\n", state);
 		m_pageval = state;
 		membank("bank1")->set_entry((m_pageval + (m_pageset ? 4 : 0)) & 0x07);
 	}
@@ -2476,6 +2493,20 @@ DRIVER_INIT_MEMBER(mpu4_state,m_oldtmr)
 	m_current_chr_table = oldtmr_data;
 }
 
+DRIVER_INIT_MEMBER(mpu4_state,m4altreels)
+{
+	m_reel_mux=SIX_REEL_1TO8;
+	m_reels = 6;
+
+	stepper_config(machine(), 0, &barcrest_opto1_interface);
+	stepper_config(machine(), 1, &barcrest_opto1_interface);
+	stepper_config(machine(), 2, &barcrest_opto1_interface);
+	stepper_config(machine(), 3, &barcrest_opto1_interface);
+	stepper_config(machine(), 4, &barcrest_opto1_interface);
+	stepper_config(machine(), 5, &barcrest_opto1_interface);
+}
+
+
 DRIVER_INIT_MEMBER(mpu4_state,m_ccelbr)
 {
 	m_reel_mux=STANDARD_REEL;
@@ -2561,13 +2592,22 @@ DRIVER_INIT_MEMBER(mpu4_state,m4default_alt)
 }
 
 
-DRIVER_INIT_MEMBER(mpu4_state,m4default_bigbank)
+DRIVER_INIT_MEMBER(mpu4_state,m4default_big)
 {
 	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	DRIVER_INIT_CALL(m4default);
-	m_bwb_bank=1;
-	space->install_write_handler(0x0858, 0x0858, 0, 0, write8_delegate(FUNC(mpu4_state::bankswitch_w),this));
-	space->install_write_handler(0x0878, 0x0878, 0, 0, write8_delegate(FUNC(mpu4_state::bankset_w),this));
+
+	int size = machine().root_device().memregion( "maincpu" )->bytes();
+	if (size<=0x10000)
+	{
+		printf("extended banking selected on set <=0x10000 in size, ignoring");
+	}
+	else
+	{
+		m_bwb_bank=1;
+		space->install_write_handler(0x0858, 0x0858, 0, 0, write8_delegate(FUNC(mpu4_state::bankswitch_w),this));
+		space->install_write_handler(0x0878, 0x0878, 0, 0, write8_delegate(FUNC(mpu4_state::bankset_w),this));
+	}
 }
 
 
@@ -2587,7 +2627,7 @@ WRITE8_MEMBER(mpu4_state::crystal_sound_w)
 DRIVER_INIT_MEMBER(mpu4_state,m_frkstn)
 {
 	address_space *space = machine().device("maincpu")->memory().space(AS_PROGRAM);
-	DRIVER_INIT_CALL(m4default_bigbank);
+	DRIVER_INIT_CALL(m4default_big);
 	space->install_read_handler(0x0880, 0x0880, 0, 0, read8_delegate(FUNC(mpu4_state::crystal_sound_r),this));
 	space->install_write_handler(0x0881, 0x0881, 0, 0, write8_delegate(FUNC(mpu4_state::crystal_sound_w),this));
 }

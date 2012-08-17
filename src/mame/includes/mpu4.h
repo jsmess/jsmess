@@ -232,7 +232,7 @@ public:
 	DECLARE_DRIVER_INIT(m4tst2);
 	DECLARE_DRIVER_INIT(crystal);
 	DECLARE_DRIVER_INIT(m_frkstn);
-	DECLARE_DRIVER_INIT(m4default_bigbank);
+	DECLARE_DRIVER_INIT(m4default_big);
 	DECLARE_DRIVER_INIT(m4default);
 	DECLARE_DRIVER_INIT(m_blsbys);
 	DECLARE_DRIVER_INIT(m_oldtmr);
@@ -242,10 +242,13 @@ public:
 	DECLARE_DRIVER_INIT(m_grtecp);
 	DECLARE_DRIVER_INIT(m4debug);
 	DECLARE_DRIVER_INIT(m4_showstring);
+	DECLARE_DRIVER_INIT(m4_showstring_mod4yam);
+	DECLARE_DRIVER_INIT(m4_debug_mod4yam);
 	DECLARE_DRIVER_INIT(m4_showstring_mod2);
 	DECLARE_DRIVER_INIT(m4_showstring_big);
 	DECLARE_DRIVER_INIT(m_grtecpss);
 	DECLARE_DRIVER_INIT(connect4);
+	DECLARE_DRIVER_INIT(m4altreels);
 };
 
 /* mpu4.c, used by mpu4vid.c */

@@ -2443,7 +2443,7 @@ ROM_START( scuda )	/* step 1.5, Sega game ID# is 833-13041, ROM board ID# 834-13
 	ROM_LOAD( "epr-19338a.bin", 0x000000, 0x010000, CRC(c9fac464) SHA1(47b9ab7921a685c01629afb592d597faa11d2bd6) )
 ROM_END
 
-ROM_START( scudplus )	/* step 1.5 */
+ROM_START( scudplus )	/* step 1.5, Sega game ID# is 833-13260 SCUD PLUS, ROM board ID# 834-13261 SCUD PLUS */
 	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20092a.17",  0x0600006,  0x80000, CRC(a94ec57e) SHA1(bda1d9cb38e10a25f7cdde38f30ae13541fdbc5e) )
@@ -2524,7 +2524,7 @@ ROM_START( scudplus )	/* step 1.5 */
 	ROM_LOAD( "epr-19338.bin", 0x000000, 0x010000, CRC(dbf88de6) SHA1(8f5c83e82c26a37a1ed0476d7dfeb698b8417899) )
 ROM_END
 
-ROM_START( scudplusa )	/* step 1.5 */
+ROM_START( scudplusa )	/* step 1.5, Sega game ID# is 833-13260 SCUD PLUS, ROM board ID# 834-13261 SCUD PLUS */
 	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20092.17",  0x0600006,  0x80000, CRC(6f9161c1) SHA1(b1c66eeb1bb67664aafa78ad62515204f231f09b) )
@@ -2899,7 +2899,7 @@ ROM_START( bass )	/* step 1.0, Sega game ID# is 833-13317, ROM board ID# 834-133
 	ROM_FILL( 0x000000, 0x80000, 0 )
 ROM_END
 
-ROM_START( getbass )	/* step 1.0, Sega game ID# is 833-13416 GET BASS STD */
+ROM_START( getbass )	/* step 1.0, Sega game ID# is 833-13416 GET BASS STD, ROM board ID# 834-13417 */
 	ROM_REGION64_BE( 0x4800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20309.17",  0x600006, 0x080000, CRC(a42e1033) SHA1(a834eb973e9529338413220a2d8e66ce98d6cb31) )

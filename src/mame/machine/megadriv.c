@@ -47,23 +47,37 @@ Known Non-Issues (confirmed on Real Genesis)
 #include "cpu/ssp1601/ssp1601.h"
 #include "megacd.lh"
 
-
-
+#include "machine/megavdp.h"
 
 
 
 
 static cpu_device *_genesis_snd_z80_cpu;
+int genesis_other_hacks = 0; // misc hacks
 
 timer_device* megadriv_scanline_timer;
-timer_device* irq6_on_timer;
-timer_device* irq4_on_timer;
-bitmap_ind16* megadriv_render_bitmap;
-//emu_timer* vblankirq_off_timer;
+UINT16* megadrive_ram = NULL;
 
-
+struct genesis_z80_vars
+{
+	int z80_is_reset;
+	int z80_has_bus;
+	UINT32 z80_bank_addr;
+	UINT8* z80_prgram;
+};
 
 genesis_z80_vars genz80;
+
+void megadriv_z80_hold(running_machine &machine)
+{
+	if ((genz80.z80_has_bus == 1) && (genz80.z80_is_reset == 0))
+		cputag_set_input_line(machine, ":genesis_snd_z80", 0, HOLD_LINE);
+}
+
+void megadriv_z80_clear(running_machine &machine)
+{
+	cputag_set_input_line(machine, ":genesis_snd_z80", 0, CLEAR_LINE);
+}
 
 static void megadriv_z80_bank_w(UINT16 data)
 {
@@ -92,6 +106,22 @@ static WRITE16_HANDLER( megadriv_68k_write_z80_ram );
 static WRITE16_HANDLER( megadriv_68k_req_z80_reset );
 
 
+
+READ8_DEVICE_HANDLER( megadriv_68k_YM2612_read)
+{
+	//mame_printf_debug("megadriv_68k_YM2612_read %02x %04x\n",offset,mem_mask);
+	if ( (genz80.z80_has_bus==0) && (genz80.z80_is_reset==0) )
+	{
+		return ym2612_r(device, offset);
+	}
+	else
+	{
+		logerror("%s: 68000 attempting to access YM2612 (read) without bus\n", device->machine().describe_context());
+		return 0;
+	}
+
+	return -1;
+}
 
 
 WRITE8_DEVICE_HANDLER( megadriv_68k_YM2612_write)
@@ -551,8 +581,8 @@ static ADDRESS_MAP_START( megadriv_map, AS_PROGRAM, 16, driver_device )
 //  AM_RANGE(0xb10000, 0xb1007f) AM_RAM AM_BASE_LEGACY(&megadrive_vdp_vsram)
 //  AM_RANGE(0xb10100, 0xb1017f) AM_RAM AM_BASE_LEGACY(&megadrive_vdp_cram)
 
-	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE_LEGACY(megadriv_vdp_r,megadriv_vdp_w)
-	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE_LEGACY(megadriv_vdp_r,megadriv_vdp_w) // the earth defend
+	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
+	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w) // the earth defend
 
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE_LEGACY(&megadrive_ram)
 //  AM_RANGE(0xff0000, 0xffffff) AM_READONLY
@@ -850,8 +880,8 @@ static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, driver_device )
 	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE_LEGACY(megadriv_68k_check_z80_bus, megadriv_68k_req_z80_bus)
 	AM_RANGE(0xa11200, 0xa11201) AM_WRITE_LEGACY(megadriv_68k_req_z80_reset)
 
-	AM_RANGE(0xc00000, 0xc0001f) AM_READWRITE_LEGACY(megadriv_vdp_r, megadriv_vdp_w)
-	AM_RANGE(0xd00000, 0xd0001f) AM_READWRITE_LEGACY(megadriv_vdp_r, megadriv_vdp_w) // the earth defend
+	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
+	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega_genesis_vdp_device, megadriv_vdp_r,megadriv_vdp_w)
 
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE_LEGACY(&megadrive_ram)
 ADDRESS_MAP_END
@@ -904,13 +934,29 @@ MACHINE_CONFIG_END
 
 SCREEN_UPDATE_RGB32(megadriv)
 {
+	sega_genesis_vdp_device *vdp = screen.machine().device<sega_genesis_vdp_device>("gen_vdp"); // yuck
+
 	/* Copy our screen buffer here */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
+	{
+		UINT32* desty = &bitmap.pix32(y, 0);
+		UINT16* srcy;
+		
+		if (!vdp->m_use_alt_timing)
+		{
+			srcy = &vdp->m_render_bitmap->pix(y, 0);
+		}
+		else
+		{
+			srcy = vdp->m_render_line;
+		}
+
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			UINT16 src = megadriv_render_bitmap->pix(y, x);
-			bitmap.pix32(y, x) = MAKE_RGB(pal5bit(src >> 10), pal5bit(src >> 5), pal5bit(src >> 0));
+			UINT16 src = srcy[x];
+			desty[x] = MAKE_RGB(pal5bit(src >> 10), pal5bit(src >> 5), pal5bit(src >> 0));
 		}
+	}
 
 	return 0;
 }
@@ -924,17 +970,9 @@ SCREEN_UPDATE_RGB32(megadriv)
 
 
 
-static TIMER_DEVICE_CALLBACK( irq4_on_callback )
-{
-	//mame_printf_debug("irq4 active on %d\n",genesis_scanline_counter);
-	cputag_set_input_line(timer.machine(), "maincpu", 4, HOLD_LINE);
-}
 
 /*****************************************************************************************/
 
-static int hazemdchoice_megadrive_region_export;
-static int hazemdchoice_megadrive_region_pal;
-static int hazemdchoice_megadriv_framerate;
 
 MACHINE_START( megadriv )
 {
@@ -944,10 +982,10 @@ MACHINE_START( megadriv )
 
 MACHINE_RESET( megadriv )
 {
+	md_base_state *state = machine.driver_data<md_base_state>();
+
 	/* default state of z80 = reset, with bus */
 	mame_printf_debug("Resetting Megadrive / Genesis\n");
-
-	megadriv_framerate = hazemdchoice_megadriv_framerate;
 
 	if (machine.device("genesis_snd_z80") != NULL)
 	{
@@ -960,23 +998,21 @@ MACHINE_RESET( megadriv )
 
 	megadrive_reset_io(machine);
 
-	megadriv_scanline_timer = machine.device<timer_device>("md_scan_timer");
-	megadriv_render_timer = machine.device<timer_device>("md_render_timer");
-
-	irq6_on_timer = machine.device<timer_device>("irq6_timer");
-	irq4_on_timer = machine.device<timer_device>("irq4_timer");
-
-	megadriv_scanline_timer->adjust(attotime::zero);
+	if (!state->m_vdp->m_use_alt_timing)
+	{
+		megadriv_scanline_timer = machine.device<timer_device>("md_scan_timer");
+		megadriv_scanline_timer->adjust(attotime::zero);
+	}
 
 	if (genesis_other_hacks)
 	{
 	//  set_refresh_rate(megadriv_framerate);
 	//  machine.device("maincpu")->set_clock_scale(0.9950f); /* Fatal Rewind is very fussy... (and doesn't work now anyway, so don't bother with this) */
-
-		memset(megadrive_ram,0x00,0x10000);
+		if (megadrive_ram)
+			memset(megadrive_ram,0x00,0x10000);
 	}
 
-	megadriv_reset_vdp();
+	megadriv_reset_vdp(machine);
 
 
 
@@ -1003,20 +1039,14 @@ MACHINE_RESET( megadriv )
 	}
 }
 
-void megadriv_stop_scanline_timer(void)
+void megadriv_stop_scanline_timer(running_machine &machine)
 {
-	megadriv_scanline_timer->reset();
+	md_base_state *state = machine.driver_data<md_base_state>();
+
+	if (!state->m_vdp->m_use_alt_timing)
+		megadriv_scanline_timer->reset();
 }
 
-/*
- 999999999999999960
-1000000000000000000 subseconds = 1 second
-
-/ 60
-
-*/
-
-/* VIDEO_EOF is used to resync the scanline counters */
 
 
 UINT16* megadriv_backupram;
@@ -1045,12 +1075,62 @@ static NVRAM_HANDLER( megadriv )
 }
 
 
+// this comes from the VDP on lines 240 (on) 241 (off) and is connected to the z80 irq 0
+void genesis_vdp_sndirqline_callback_genesis_z80(running_machine &machine, bool state)
+{
+	if (machine.device(":genesis_snd_z80") != NULL)
+	{
+		if (state == true)
+		{
+			megadriv_z80_hold(machine);
+		}
+		else if (state == false)
+		{
+			megadriv_z80_clear(machine);
+		}
+	}
+}
+
+// this comes from the vdp, and is connected to 68k irq level 6 (main vbl interrupt)
+void genesis_vdp_lv6irqline_callback_genesis_68k(running_machine &machine, bool state)
+{
+	if (state==true)
+		cputag_set_input_line(machine, "maincpu", 6, HOLD_LINE);
+	else
+		cputag_set_input_line(machine, "maincpu", 6, CLEAR_LINE);
+}
+
+// this comes from the vdp, and is connected to 68k irq level 4 (raster interrupt)
+void genesis_vdp_lv4irqline_callback_genesis_68k(running_machine &machine, bool state)
+{
+	if (state==true)
+		cputag_set_input_line(machine, "maincpu", 4, HOLD_LINE);
+	else
+		cputag_set_input_line(machine, "maincpu", 4, CLEAR_LINE);
+}
+
+/* Callback when the 68k takes an IRQ */
+static IRQ_CALLBACK(genesis_int_callback)
+{
+	md_base_state *state = device->machine().driver_data<md_base_state>();
+
+	if (irqline==4)
+	{
+		state->m_vdp->vdp_clear_irq4_pending();
+	}
+
+	if (irqline==6)
+	{
+		state->m_vdp->vdp_clear_irq6_pending();
+	}
+
+	return (0x60+irqline*4)/4; // vector address
+}
+
 MACHINE_CONFIG_FRAGMENT( megadriv_timers )
 	MCFG_TIMER_ADD("md_scan_timer", megadriv_scanline_timer_callback)
-	MCFG_TIMER_ADD("md_render_timer", megadriv_render_timer_callback)
-	MCFG_TIMER_ADD("irq6_timer", irq6_on_callback)
-	MCFG_TIMER_ADD("irq4_timer", irq4_on_callback)
 MACHINE_CONFIG_END
+
 
 
 MACHINE_CONFIG_FRAGMENT( md_ntsc )
@@ -1068,13 +1148,22 @@ MACHINE_CONFIG_FRAGMENT( md_ntsc )
 
 	MCFG_FRAGMENT_ADD(megadriv_timers)
 
+	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
+	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, genesis_vdp_sndirqline_callback_genesis_z80);
+	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, genesis_vdp_lv6irqline_callback_genesis_68k);
+	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, genesis_vdp_lv4irqline_callback_genesis_68k);
+
+
+
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
-	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_SIZE(64*8, 620)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(megadriv) /* Copies a bitmap */
 	MCFG_SCREEN_VBLANK_STATIC(megadriv) /* Used to Sync the timing */
+
+	MCFG_TIMER_ADD_SCANLINE("scantimer", megadriv_scanline_timer_callback_alt_timing, "megadriv", 0, 1)
 
 	MCFG_NVRAM_HANDLER(megadriv)
 
@@ -1116,10 +1205,15 @@ MACHINE_CONFIG_FRAGMENT( md_pal )
 
 	MCFG_FRAGMENT_ADD(megadriv_timers)
 
+	MCFG_DEVICE_ADD("gen_vdp", SEGA_GEN_VDP, 0)
+	sega_genesis_vdp_device::set_genesis_vdp_sndirqline_callback(*device, genesis_vdp_sndirqline_callback_genesis_z80);
+	sega_genesis_vdp_device::set_genesis_vdp_lv6irqline_callback(*device, genesis_vdp_lv6irqline_callback_genesis_68k);
+	sega_genesis_vdp_device::set_genesis_vdp_lv4irqline_callback(*device, genesis_vdp_lv4irqline_callback_genesis_68k);
+
 	MCFG_SCREEN_ADD("megadriv", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
-	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_SIZE(64*8, 620)
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 	MCFG_SCREEN_UPDATE_STATIC(megadriv) /* Copies a bitmap */
 	MCFG_SCREEN_VBLANK_STATIC(megadriv) /* Used to Sync the timing */
@@ -1320,22 +1414,7 @@ MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 MACHINE_CONFIG_END
 
 
-/* Callback when the genesis enters interrupt code */
-static IRQ_CALLBACK(genesis_int_callback)
-{
-	if (irqline==4)
-	{
-		megadrive_irq4_pending = 0;
-	}
 
-	if (irqline==6)
-	{
-		megadrive_irq6_pending = 0;
-	//  mame_printf_debug("clear pending!\n");
-	}
-
-	return (0x60+irqline*4)/4; // vector address
-}
 
 static int megadriv_tas_callback(device_t *device)
 {
@@ -1454,13 +1533,10 @@ static void megadriv_init_common(running_machine &machine)
 DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)
 {
 	genvdp_use_cram = 0;
-	genesis_always_irq6 = 1;
 	genesis_other_hacks = 0;
 
 	megadriv_init_common(machine());
-	hazemdchoice_megadrive_region_export = 1;
-	hazemdchoice_megadrive_region_pal = 0;
-	hazemdchoice_megadriv_framerate = 60;
+	megadriv_framerate = 60;
 }
 
 
@@ -1468,37 +1544,28 @@ DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)
 DRIVER_INIT_MEMBER(md_base_state,megadriv)
 {
 	genvdp_use_cram = 1;
-	genesis_always_irq6 = 0;
 	genesis_other_hacks = 1;
 
 	megadriv_init_common(machine());
-	hazemdchoice_megadrive_region_export = 1;
-	hazemdchoice_megadrive_region_pal = 0;
-	hazemdchoice_megadriv_framerate = 60;
+	megadriv_framerate = 60;
 }
 
 DRIVER_INIT_MEMBER(md_base_state,megadrij)
 {
 	genvdp_use_cram = 1;
-	genesis_always_irq6 = 0;
 	genesis_other_hacks = 1;
 
 	megadriv_init_common(machine());
-	hazemdchoice_megadrive_region_export = 0;
-	hazemdchoice_megadrive_region_pal = 0;
-	hazemdchoice_megadriv_framerate = 60;
+	megadriv_framerate = 60;
 }
 
 DRIVER_INIT_MEMBER(md_base_state,megadrie)
 {
 	genvdp_use_cram = 1;
-	genesis_always_irq6 = 0;
 	genesis_other_hacks = 1;
 
 	megadriv_init_common(machine());
-	hazemdchoice_megadrive_region_export = 1;
-	hazemdchoice_megadrive_region_pal = 1;
-	hazemdchoice_megadriv_framerate = 50;
+	megadriv_framerate = 50;
 }
 
 DRIVER_INIT_MEMBER(md_base_state,mpnew)
@@ -1550,9 +1617,6 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine &machine, const
 	machine.device(tag)->memory().space(AS_PROGRAM)->install_ram(0x0000, 0x1fff, genz80.z80_prgram);
 
 
-	// not allowed??
-//  machine.device(tag)->memory().space(AS_PROGRAM)->install_readwrite_bank(0x2000, 0x3fff, "bank1");
-
 	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(*ym, 0x4000, 0x4003, FUNC(ym2612_r), FUNC(ym2612_w));
 	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_write_handler    (0x6000, 0x6000, FUNC(megadriv_z80_z80_bank_w));
 	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_write_handler    (0x6001, 0x6001, FUNC(megadriv_z80_z80_bank_w));
@@ -1561,6 +1625,25 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine &machine, const
 	machine.device(tag)->memory().space(AS_PROGRAM)->install_legacy_readwrite_handler(0x8000, 0xffff, FUNC(z80_read_68k_banked_data), FUNC(z80_write_68k_banked_data));
 }
 
-// these are tests for 'special case' hardware to make sure I don't break anything while rearranging things
-//
 
+
+
+
+
+SCREEN_VBLANK(megadriv)
+{
+	md_base_state *state = screen.machine().driver_data<md_base_state>();
+
+	if (screen.machine().root_device().ioport(":RESET")->read_safe(0x00) & 0x01)
+		cputag_set_input_line(screen.machine(), ":maincpu", INPUT_LINE_RESET, PULSE_LINE);
+
+	// rising edge
+	if (vblank_on)
+	{
+		if (!state->m_vdp->m_use_alt_timing)
+		{
+			state->m_vdp->vdp_handle_eof(screen.machine());
+			megadriv_scanline_timer->adjust(attotime::zero);
+		}
+	}
+}

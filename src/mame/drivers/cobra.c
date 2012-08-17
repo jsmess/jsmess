@@ -143,32 +143,13 @@
 	0x000cba6c: glTexParameteri
 
 
-	Main:
-	-
-	0x1b14():
-		-> 0xa6a8():   loop at 0xa7e0, waiting for [0x1790e8] to != 1
-
-	Sub:
-	-
-	State 0xc00: waiting for?
-
-	Gfx:
-	-
-	Fails on drawcheck()
-	0x3806dc():   Waits for [0x7f7ffc] to change (in main)
-
 
 	GFX Registers:
 
-		0x00090:	Floating-point register (seen values 1.0f and 128.0f)
-		0x0009c:	Floating-point register (seen values 0.0f and 256.0f)
-		0x000a4:	Floating-point register (seen values 1.0f and -100.0f)
-		0x000ac:	Floating-point register (seen values 0.0f and 200.0f)
-
-		maybe a matrix?
-		0x90 0x94 0x98 0x9c
-		0xa0 0xa4 0xa8 0xac
-		0xb0 0xb4 0xb8 0xbc
+		0x00090:		Viewport width / 2?
+		0x0009c:		Viewport center X
+		0x000a4:		Viewport height / 2?
+		0x000ac:		Viewport center Y
 
 		0x00114:		High word: framebuffer pitch?   Low word: framebuffer pixel size?
 		
@@ -197,7 +178,9 @@
 		0x40018:		Set to 0x0001040a (0xc0) by mode_stipple()		(bits 24..27 = stipple pattern?)
 		0x400d0:		Set to 0x80000000 (0x80) by mode_stipple()
 		0x400f4:		Set to 0x40000000 (0x80) by texselect()
-		0x40114:		Set to 0x00080000 (0x10) by mode_scissor()
+
+		0x40114:		-------- ----x--- -------- --------				Scissor enable
+
 		0x40138:		Set to 0x88800000 (0xe0) by mode_viewclip()
 		
 		0x40160:		xxxxxxxx xxxxxxxx -------- --------				Scissor Left
@@ -216,7 +199,8 @@
 						-------- xxx----- -------- --------				Alpha test function (0 = never, 1 = less, 2 = lequal, 3 = greater,
 																							 4 = gequal, 5 = equal, 6 = notequal, 7 = always)
 		
-		0x4019c:		Set to 0x88000000 (0xc0) by mode_fog()			(bit 31: 0 = linear fog, 1 = table fog)
+		0x4019c:		x------- -------- -------- --------				Fog enable
+						----x--- -------- -------- --------				0 = table fog, 1 = linear fog
 
 		0x401bc:														Texture env mode
 						xxx----- -------- -------- --------				?
@@ -275,6 +259,17 @@
 		0xc4c00..fff:	Texture RAM readback
 		0xc8c00..fff:	Texture RAM readback
 		0xccc00..fff:	Texture RAM readback
+
+
+
+		Bujutsu status:
+
+		Main:
+			 0xe948 ->  0x1ea4(): Waiting for [0x168700] != 1  @ 0x1ebc
+
+		Gfx:
+			0x3b1a0 -> 0x3ad70(): Waiting for [0x132000] != 0  @ 0x3adf4
+			
 */
 
 
@@ -332,6 +327,7 @@ public:
 	void draw_line(const rectangle &visarea, vertex_t &v1, vertex_t &v2);
 
 	void gfx_init(running_machine &machine);
+	void gfx_exit(running_machine &machine);
 	void gfx_reset(running_machine &machine);
 	void gfx_fifo_exec(running_machine &machine);
 	UINT32 gfx_read_gram(UINT32 address);
@@ -350,12 +346,27 @@ private:
 
 	UINT32 *m_gfx_gram;
 	UINT32 *m_gfx_regmask;
+
+	enum
+	{
+		RE_STATUS_IDLE				= 0,
+		RE_STATUS_COMMAND			= 1,
+	};
 };
 
 class cobra_fifo
 {
 public:
-	cobra_fifo(running_machine &machine, int capacity, const char *name, bool verbose)
+	typedef enum
+	{
+		EVENT_EMPTY,
+		EVENT_HALF_FULL,
+		EVENT_FULL,
+	} EventType;
+
+	typedef delegate<void (EventType)> event_delegate;
+
+	cobra_fifo(running_machine &machine, int capacity, const char *name, bool verbose, event_delegate event_callback)
 	{
 		m_data = auto_alloc_array(machine, UINT64, capacity);
 
@@ -366,6 +377,8 @@ public:
 		m_num = 0;
 
 		m_verbose = verbose;
+
+		m_event_callback = event_callback;
 	}
 
 	void push(const device_t *cpu, UINT64 data);
@@ -386,6 +399,7 @@ private:
 	bool m_verbose;
 	const char *m_name;
 	UINT64 *m_data;
+	event_delegate m_event_callback;
 };
 
 class cobra_state : public driver_device
@@ -446,8 +460,14 @@ public:
 	cobra_fifo *m_m2sfifo;
 	cobra_fifo *m_s2mfifo;
 
+	void gfxfifo_in_event_callback(cobra_fifo::EventType event);
+	void gfxfifo_out_event_callback(cobra_fifo::EventType event);
+	void m2sfifo_event_callback(cobra_fifo::EventType event);
+	void s2mfifo_event_callback(cobra_fifo::EventType event);
+
 	UINT8 m_m2s_int_enable;
 	UINT8 m_s2m_int_enable;
+	UINT8 m_vblank_enable;
 
 	int m2sfifo_unk_flag;
 	int s2mfifo_unk_flag;
@@ -476,7 +496,7 @@ public:
 
 	int m_gfx_register_select;
 	UINT64 *m_gfx_register;
-	UINT64 m_gfx_fifo_mem[4];
+	UINT64 m_gfx_fifo_mem[256];
 	int m_gfx_fifo_cache_addr;
 	int m_gfx_fifo_loopback;
 	int m_gfx_unknown_v1;
@@ -600,6 +620,8 @@ void cobra_renderer::draw_line(const rectangle &visarea, vertex_t &v1, vertex_t 
 
 static void cobra_video_exit(running_machine *machine)
 {
+	cobra_state *state = machine->driver_data<cobra_state>();
+	state->m_renderer->gfx_exit(*machine);
 }
 
 VIDEO_START( cobra )
@@ -721,6 +743,11 @@ void cobra_fifo::push(const device_t *cpu, UINT64 data)
 	}
 
 	m_num++;
+
+	if (m_num >= m_size)
+		m_event_callback(EVENT_FULL);
+	if (m_num == (m_size / 2))
+		m_event_callback(EVENT_HALF_FULL);
 }
 
 bool cobra_fifo::pop(const device_t *cpu, UINT64 *result)
@@ -776,6 +803,11 @@ bool cobra_fifo::pop(const device_t *cpu, UINT64 *result)
 
 	m_num--;
 
+	if (m_num == 0)
+		m_event_callback(EVENT_EMPTY);
+	if (m_num == (m_size / 2))
+		m_event_callback(EVENT_HALF_FULL);
+
 	*result = r;
 
 	return true;
@@ -819,10 +851,52 @@ void cobra_fifo::flush()
 	m_num = 0;
 	m_rpos = 0;
 	m_wpos = 0;
+
+	m_event_callback(EVENT_EMPTY);
 }
 
 
 /*****************************************************************************/
+
+void cobra_state::m2sfifo_event_callback(cobra_fifo::EventType event)
+{
+	switch (event)
+	{
+		case cobra_fifo::EVENT_EMPTY:
+			break;
+		
+		case cobra_fifo::EVENT_HALF_FULL:
+			break;
+
+		case cobra_fifo::EVENT_FULL:
+			break;
+	}
+}
+
+void cobra_state::s2mfifo_event_callback(cobra_fifo::EventType event)
+{
+	switch (event)
+	{
+		case cobra_fifo::EVENT_EMPTY:
+			break;
+		
+		case cobra_fifo::EVENT_HALF_FULL:
+			break;
+
+		case cobra_fifo::EVENT_FULL:
+			break;
+	}
+}
+
+void cobra_state::gfxfifo_in_event_callback(cobra_fifo::EventType event)
+{
+
+}
+
+void cobra_state::gfxfifo_out_event_callback(cobra_fifo::EventType event)
+{
+
+}
 
 /*****************************************************************************/
 // Main board (PPC603)
@@ -847,6 +921,11 @@ void cobra_fifo::flush()
 // DBAT3 U: 0xc0000fff L: 0xc0000002    (0xc0000000, 128MB)
 
 // RPA: 0x8010C000
+
+// Interrupts (0xFFFF0003):
+// 0x01: M2S FIFO
+// 0x02: S2M FIFO
+// 0x04: Vblank?
 
 static UINT32 mpc106_regs[256/4];
 static UINT32 mpc106_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
@@ -936,14 +1015,6 @@ READ64_MEMBER(cobra_state::main_fifo_r)
 		}
 
 		r |= (UINT64)(value & 0xff) << 40;
-
-
-		/*
-        if (fifo_is_empty(S2MFIFO))
-        {
-            device_spin_until_time(machine().device("subcpu"), attotime::from_usec(80));
-        }
-        */
 	}
 	if (ACCESSING_BITS_32_39)
 	{
@@ -988,7 +1059,7 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 
 		m_m2sfifo->push(&space.device(), (UINT8)(data >> 40));
 
-	//	cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+		cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ0, ASSERT_LINE);
 
 		// this is a hack...
 		// MAME has a small interrupt latency, which prevents the IRQ bit from being set in
@@ -1032,7 +1103,13 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 		//----------------
 		// x                    ?
 
-		printf("main_fifo_w: 0xffff0004: %02X\n", (UINT8)(data >> 24));
+		m_vblank_enable = (UINT8)(data >> 24);
+
+		if ((m_vblank_enable & 0x80) == 0)
+		{
+			// clear the interrupt
+			cputag_set_input_line(space.machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+		}
 	}
 	if (ACCESSING_BITS_16_23)
 	{
@@ -1051,6 +1128,13 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 			cputag_set_input_line(space.machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 		}
 	}
+	if (ACCESSING_BITS_8_15)
+	{
+		// Register 0xffff0007:
+		// ???
+
+		printf("main_fifo_w: 0xffff0006: %02X\n", (UINT8)(data >> 8));
+	}
 	if (ACCESSING_BITS_0_7)
 	{
 		// Register 0xffff0007:
@@ -1062,19 +1146,24 @@ WRITE64_MEMBER(cobra_state::main_fifo_w)
 
 		m_m2s_int_enable = (UINT8)(data);
 
-		printf("main_fifo_w: 0xffff0007: %02X\n", (UINT8)(data >> 0));
+		if ((m_m2s_int_enable & 0x80) == 0)
+		{
+			// clear the interrupt
+			cputag_set_input_line(space.machine(), "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+		}
 	}
-
-	// Register 0xffff0000,1
-	// Debug state write
 
 	if (ACCESSING_BITS_56_63)
 	{
+		// Register 0xffff0000
+		// Debug state write
 		m_main_debug_state |= decode_debug_state_value((data >> 56) & 0xff) << 4;
 		m_main_debug_state_wc++;
 	}
 	if (ACCESSING_BITS_48_55)
 	{
+		// Register 0xffff0001
+		// Debug state write
 		m_main_debug_state |= decode_debug_state_value((data >> 48) & 0xff);
 		m_main_debug_state_wc++;
 	}
@@ -1123,6 +1212,17 @@ WRITE64_MEMBER(cobra_state::main_comram_w)
 	m_comram[page][(offset << 1) + 1] = (w2 & ~m2) | (d2 & m2);
 }
 
+static void main_cpu_dc_store(device_t *device, UINT32 address)
+{
+	cobra_state *cobra = device->machine().driver_data<cobra_state>();
+
+	if ((address & 0xf0000000) == 0xc0000000)
+	{
+		// force sync when writing to GFX board main ram
+		device_spin_until_time(cobra->m_maincpu, attotime::from_usec(80));
+	}
+}
+
 static ADDRESS_MAP_START( cobra_main_map, AS_PROGRAM, 64, cobra_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x07c00000, 0x07ffffff) AM_RAM
@@ -1137,6 +1237,16 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 // Sub board (PPC403)
+
+// Interrupts:
+
+// Serial Transmit		JVS
+// DMA0:				Sound-related (TMS57002?)
+// DMA2:				SCSI?
+// DMA3:				JVS
+// External IRQ0		M2SFIFO
+// External IRQ1		S2MFIFO (mostly dummy, only disables the interrupt)
+// External IRQ2		SCSI Interrupt?
 
 //static int ucount = 0;
 
@@ -1183,7 +1293,15 @@ READ32_MEMBER(cobra_state::sub_mainbd_r)
 
 		if (m_m2sfifo->is_empty())
 		{
-	//      cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+			cputag_set_input_line(space.machine(), "subcpu", INPUT_LINE_IRQ0, CLEAR_LINE);
+
+			// give sub cpu a bit more time to stabilize on the current fifo status
+			device_spin_until_time(machine().device("maincpu"), attotime::from_usec(1));
+
+			if (m_m2s_int_enable & 0x80)
+			{
+				cputag_set_input_line(space.machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+			}
 
 			// this is a hack...
 			// MAME has a small interrupt latency, which prevents the IRQ bit from being cleared in
@@ -1192,13 +1310,6 @@ READ32_MEMBER(cobra_state::sub_mainbd_r)
 		}
 
 		r |= (value & 0xff) << 24;
-
-		/*
-        if (fifo_is_empty(M2SFIFO))
-        {
-            device_spin_until_time(machine().device("maincpu"), attotime::from_usec(80));
-        }
-        */
 	}
 	if (ACCESSING_BITS_16_23)
 	{
@@ -1214,6 +1325,7 @@ READ32_MEMBER(cobra_state::sub_mainbd_r)
 		//       x            M2S FIFO full flag
 		//     x              M2S FIFO empty flag
 		//   x                M2S FIFO half-full flag
+		// x				  Comram page
 
 		UINT32 value = 0x00;
 		value |= m_s2mfifo->is_full() ? 0x00 : 0x01;
@@ -1450,6 +1562,11 @@ static void sub_unknown_dma_w(device_t *device, int width, UINT32 data)
 	printf("DMA write to unknown: size %d, data %08X\n", width, data);
 }
 
+static void sub_jvs_w(device_t *device, UINT8 data)
+{
+	printf("sub_jvs_w: %02X\n", data);
+}
+
 static ADDRESS_MAP_START( cobra_sub_map, AS_PROGRAM, 32, cobra_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_MIRROR(0x80000000) AM_RAM											// Main RAM
 	AM_RANGE(0x70000000, 0x7003ffff) AM_MIRROR(0x80000000) AM_READWRITE(sub_comram_r, sub_comram_w)			// Double buffered shared RAM between Main and Sub
@@ -1502,9 +1619,6 @@ ADDRESS_MAP_END
 // SR12: 0x0000000c  SR13: 0x0000000d  SR14: 0x0000000e  SR15: 0x0000000f
 
 
-#define RE_STATUS_IDLE			0
-#define RE_STATUS_COMMAND		1
-
 void cobra_renderer::display(bitmap_rgb32 *bitmap, const rectangle &cliprect)
 {
 	copybitmap_trans(*bitmap, *m_framebuffer, 0, 0, 0, 0, cliprect, 0);
@@ -1517,6 +1631,22 @@ void cobra_renderer::gfx_init(running_machine &machine)
 	m_gfx_gram = auto_alloc_array(machine, UINT32, 0x40000);
 	
 	cobra->m_gfx_register = auto_alloc_array(machine, UINT64, 0x3000);
+}
+
+void cobra_renderer::gfx_exit(running_machine &machine)
+{
+	/*
+	FILE *file;
+	file = fopen("texture_ram.bin","wb");
+	for (int i=0; i < 0x100000; i++)
+	{
+		fputc((UINT8)(m_texture_ram[i] >> 24), file);
+		fputc((UINT8)(m_texture_ram[i] >> 16), file);
+		fputc((UINT8)(m_texture_ram[i] >> 8), file);
+		fputc((UINT8)(m_texture_ram[i] >> 0), file);
+	}
+	fclose(file);
+	*/
 }
 
 void cobra_renderer::gfx_reset(running_machine &machine)
@@ -1559,14 +1689,22 @@ UINT32 cobra_renderer::gfx_read_gram(UINT32 address)
 
 void cobra_renderer::gfx_write_gram(UINT32 address, UINT32 mask, UINT32 data)
 {
+	switch ((address >> 16) & 0xf)
+	{
+		case 0x4:		// 0x4xxxx
+		{
+			if (address == 0x40fff)
+			{
+				printf("gfx: reg 40fff = %d, %d\n", (UINT16)(data >> 16), (UINT16)(data));
+			}
+			break;
+		}
+	}
+
 	if (address & 3)
 	{
 		printf("gfx_write_gram: %08X, %08X, not dword aligned!\n", address, data);
 		return;
-	}
-
-	switch (address)
-	{
 	}
 
 	m_gfx_gram[address/4] &= ~mask;
@@ -1580,7 +1718,7 @@ void cobra_renderer::gfx_fifo_exec(running_machine &machine)
 	if (cobra->m_gfx_fifo_loopback != 0)
 		return;
 
-	const rectangle visarea = machine.primary_screen->visible_area();
+	const rectangle& visarea = machine.primary_screen->visible_area();
 	vertex_t vert[8];
 
 	cobra_fifo *fifo_in = cobra->m_gfxfifo_in;
@@ -2339,19 +2477,22 @@ static void gfx_cpu_dc_store(device_t *device, UINT32 address)
 {
 	cobra_state *cobra = device->machine().driver_data<cobra_state>();
 
-	if (address == 0x10000000 || address == 0x18000000 || address == 0x1e000000)
+	UINT32 addr = address >> 24;
+	if (addr == 0x10 || addr == 0x18 || addr == 0x1e)
 	{
 		UINT64 i = (UINT64)(cobra->m_gfx_fifo_cache_addr) << 32;
 		cobra_fifo *fifo_in = cobra->m_gfxfifo_in;
 
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[0] >> 32) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[0] >>  0) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[1] >> 32) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[1] >>  0) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[2] >> 32) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[2] >>  0) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[3] >> 32) | i);
-		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[3] >>  0) | i);
+		UINT32 a = (address / 8) & 0xff;
+
+		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+0] >> 32) | i);
+		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+0] >>  0) | i);
+		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+1] >> 32) | i);
+		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+1] >>  0) | i);
+		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+2] >> 32) | i);
+		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+2] >>  0) | i);
+		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+3] >> 32) | i);
+		fifo_in->push(device, (UINT32)(cobra->m_gfx_fifo_mem[a+3] >>  0) | i);
 
 		cobra->m_renderer->gfx_fifo_exec(device->machine());
 	}
@@ -2394,9 +2535,9 @@ WRITE64_MEMBER(cobra_state::gfx_debug_state_w)
 static ADDRESS_MAP_START( cobra_gfx_map, AS_PROGRAM, 64, cobra_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("gfx_main_ram_0")
 	AM_RANGE(0x07c00000, 0x07ffffff) AM_RAM AM_SHARE("gfx_main_ram_1")
-	AM_RANGE(0x10000000, 0x1000001f) AM_WRITE(gfx_fifo0_w)
-	AM_RANGE(0x18000000, 0x1800001f) AM_WRITE(gfx_fifo1_w)
-	AM_RANGE(0x1e000000, 0x1e00001f) AM_WRITE(gfx_fifo2_w)
+	AM_RANGE(0x10000000, 0x100007ff) AM_WRITE(gfx_fifo0_w)
+	AM_RANGE(0x18000000, 0x180007ff) AM_WRITE(gfx_fifo1_w)
+	AM_RANGE(0x1e000000, 0x1e0007ff) AM_WRITE(gfx_fifo2_w)
 	AM_RANGE(0x20000000, 0x20000007) AM_WRITE(gfx_buf_w)							// this might really map to 0x1e000000, depending on the pagetable
 	AM_RANGE(0x7f000000, 0x7f00ffff) AM_RAM AM_SHARE("pagetable")
 	AM_RANGE(0xfff00000, 0xfff7ffff) AM_ROM AM_REGION("user3", 0)					/* Boot ROM */
@@ -2453,7 +2594,13 @@ static void ide_interrupt(device_t *device, int state)
 
 static INTERRUPT_GEN( cobra_vblank )
 {
-	///cpunum_set_input_line(MAIN_CPU_ID, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cobra_state *cobra = device->machine().driver_data<cobra_state>();
+
+	if (cobra->m_vblank_enable & 0x80)
+	{
+		cputag_set_input_line(device->machine(), "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+		cobra->m_gfx_unk_flag = 0x80;
+	}
 }
 
 
@@ -2489,7 +2636,7 @@ static MACHINE_CONFIG_START( cobra, cobra_state )
 	MCFG_CPU_CONFIG(gfx_ppc_cfg)
 	MCFG_CPU_PROGRAM_MAP(cobra_gfx_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(10000))
+	MCFG_QUANTUM_TIME(attotime::from_hz(15005))
 
 	MCFG_MACHINE_RESET( cobra )
 
@@ -2522,21 +2669,49 @@ MACHINE_CONFIG_END
 
 /*****************************************************************************/
 
-DRIVER_INIT_MEMBER(cobra_state,cobra)
+DRIVER_INIT_MEMBER(cobra_state, cobra)
 {
 
-	m_gfxfifo_in	 = auto_alloc(machine(), cobra_fifo(machine(), 8192, "GFXFIFO_IN", GFXFIFO_IN_VERBOSE != 0));
-	m_gfxfifo_out = auto_alloc(machine(), cobra_fifo(machine(), 8192, "GFXFIFO_IN", GFXFIFO_OUT_VERBOSE != 0));
-	m_m2sfifo     = auto_alloc(machine(), cobra_fifo(machine(), 2048, "M2SFIFO", M2SFIFO_VERBOSE != 0));
-	m_s2mfifo     = auto_alloc(machine(), cobra_fifo(machine(), 2048, "S2MFIFO", S2MFIFO_VERBOSE != 0));
+	m_gfxfifo_in  = auto_alloc(machine(),
+							   cobra_fifo(machine(),
+							   8192,
+							   "GFXFIFO_IN",
+							   GFXFIFO_IN_VERBOSE != 0,
+							   cobra_fifo::event_delegate(FUNC(cobra_state::gfxfifo_in_event_callback), this))
+							   );
 
+	m_gfxfifo_out = auto_alloc(machine(),
+							   cobra_fifo(machine(),
+							   8192,
+							   "GFXFIFO_OUT",
+							   GFXFIFO_OUT_VERBOSE != 0,
+							   cobra_fifo::event_delegate(FUNC(cobra_state::gfxfifo_out_event_callback), this))
+							   );
+
+	m_m2sfifo     = auto_alloc(machine(),
+							   cobra_fifo(machine(),
+							   2048,
+							   "M2SFIFO",
+							   M2SFIFO_VERBOSE != 0,
+							   cobra_fifo::event_delegate(FUNC(cobra_state::m2sfifo_event_callback), this))
+							   );
+
+	m_s2mfifo     = auto_alloc(machine(),
+							   cobra_fifo(machine(),
+							   2048,
+							   "S2MFIFO",
+							   S2MFIFO_VERBOSE != 0,
+							   cobra_fifo::event_delegate(FUNC(cobra_state::s2mfifo_event_callback), this))
+							   );
+
+	ppc_set_dcstore_callback(m_maincpu, main_cpu_dc_store);
 
 	ppc_set_dcstore_callback(m_gfxcpu, gfx_cpu_dc_store);
 
 
 	ppc4xx_set_dma_read_handler(m_subcpu, 0, sub_unknown_dma_r);
 	ppc4xx_set_dma_write_handler(m_subcpu, 0, sub_unknown_dma_w);
-
+	ppc4xx_spu_set_tx_handler(m_subcpu, sub_jvs_w);
 
 
 	m_comram[0] = auto_alloc_array(machine(), UINT32, 0x40000/4);
@@ -2608,6 +2783,9 @@ DRIVER_INIT_MEMBER(cobra_state,bujutsu)
 		rom[0x0e] = (UINT8)(sum >> 8);
 		rom[0x0f] = (UINT8)(sum);
 	}
+
+	// hd patches
+	// 0x18932c = 0x38600000			skips check_one_scene()
 }
 
 DRIVER_INIT_MEMBER(cobra_state,racjamdx)

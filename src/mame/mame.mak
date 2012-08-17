@@ -512,6 +512,14 @@ $(MAMEOBJ)/barcrest.a: \
 	$(DRIVERS)/mpu4plasma.o \
 	$(DRIVERS)/mpu4dealem.o \
 	$(DRIVERS)/mpu4vid.o \
+	$(DRIVERS)/mpu4avan.o \
+	$(DRIVERS)/mpu4union.o \
+	$(DRIVERS)/mpu4concept.o \
+	$(DRIVERS)/mpu4empire.o \
+	$(DRIVERS)/mpu4mdm.o \
+	$(DRIVERS)/mpu4crystal.o \
+	$(DRIVERS)/mpu4bwb.o \
+	$(DRIVERS)/mpu4misc.o \
 	$(VIDEO)/scn2674.o \
 	$(DRIVERS)/mpu5hw.o $(DRIVERS)/mpu5.o \
 	$(VIDEO)/awpvid.o \
@@ -843,13 +851,15 @@ $(MAMEOBJ)/kaneko.a: \
 	$(DRIVERS)/galpanic.o $(VIDEO)/galpanic.o \
 	$(DRIVERS)/galpani2.o $(VIDEO)/galpani2.o \
 	$(DRIVERS)/galpani3.o \
+	$(VIDEO)/kaneko_grap2.o \
 	$(DRIVERS)/hvyunit.o \
 	$(DRIVERS)/jchan.o \
-	$(DRIVERS)/kaneko16.o $(MACHINE)/kaneko16.o $(VIDEO)/kaneko16.o \
+	$(DRIVERS)/kaneko16.o $(VIDEO)/kaneko16.o \
 	$(VIDEO)/kaneko_tmap.o \
 	$(VIDEO)/kaneko_spr.o \
 	$(MACHINE)/kaneko_hit.o \
 	$(MACHINE)/kaneko_calc3.o \
+	$(MACHINE)/kaneko_toybox.o \
 	$(DRIVERS)/sandscrp.o \
 	$(DRIVERS)/suprnova.o $(VIDEO)/suprnova.o \
 	$(VIDEO)/sknsspr.o \
