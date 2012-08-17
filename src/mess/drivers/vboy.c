@@ -656,7 +656,7 @@ static VIDEO_START( vboy )
 	state->m_world = state->m_bgmap + (0x1d800 >> 1);
 }
 
-static void put_obj(vboy_state *state, bitmap_ind16 &bitmap, int x, int y, UINT16 ch, bool flipx, bool flipy, bool trans, UINT8 pal)
+static void put_obj(vboy_state *state, bitmap_ind16 &bitmap, int x, int y, UINT16 ch, bool flipx, bool flipy, UINT8 pal)
 {
 	UINT16 data, code = ch;
 	UINT8 yi, xi, dat, col;
@@ -680,22 +680,15 @@ static void put_obj(vboy_state *state, bitmap_ind16 &bitmap, int x, int y, UINT1
 			res_x = x + xi;
 			res_y = y + yi;
 
-			if(trans) // obj
-			{
-				col = (pal >> (dat*2)) & 3;
+			col = (pal >> (dat*2)) & 3;
 
-				if (dat)
-					bitmap.pix16((res_y), (res_x)) = state->machine().pens[col];
-			}
-			else // bg
-			{
-				bitmap.pix16((res_y), (res_x)) = dat;
-			}
+			if (dat)
+				bitmap.pix16((res_y), (res_x)) = state->machine().pens[col];
 		}
 	}
 }
 
-static void put_char(vboy_state *state, int x, int y, UINT16 ch, bool flipx, bool flipy, bool trans, UINT8 pal)
+static void put_char(vboy_state *state, int x, int y, UINT16 ch, bool flipx, bool flipy, UINT8 pal)
 {
 	UINT16 data, code = ch;
 	UINT8 yi, xi, dat;
@@ -740,7 +733,7 @@ static void fill_bg_map(vboy_state *state, int num)
 		for (j = 0; j < 64; j++)
 		{
 			UINT16 val = state->m_bgmap[j + 64 * i + (num * 0x1000)];
-			put_char(state, j * 8, i * 8, val & 0x7ff, BIT(val,13), BIT(val,12), false, state->m_vip_regs.GPLT[(val >> 14) & 3]);
+			put_char(state, j * 8, i * 8, val & 0x7ff, BIT(val,13), BIT(val,12), state->m_vip_regs.GPLT[(val >> 14) & 3]);
 		}
 	}
 }
@@ -855,10 +848,10 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 			UINT8 jron = (state->m_objects[start_ndx+1] & 0x4000) >> 14;
 
 			if (!right && jlon)
-				put_obj(state, bitmap, (jx-jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), true, state->m_vip_regs.JPLT[(val>>14) & 3]);
+				put_obj(state, bitmap, (jx-jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), state->m_vip_regs.JPLT[(val>>14) & 3]);
 
 			if(right && jron)
-				put_obj(state, bitmap, (jx+jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), true, state->m_vip_regs.JPLT[(val>>14) & 3]);
+				put_obj(state, bitmap, (jx+jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), state->m_vip_regs.JPLT[(val>>14) & 3]);
 
 			i --;
 			i &= 0x3ff;
