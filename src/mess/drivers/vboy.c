@@ -374,17 +374,17 @@ WRITE16_MEMBER( vboy_state::vip_w )
 		case 0x24:	//BRTA
 					m_vip_regs.BRTA = data;
 					palette_set_color_rgb(machine(), 1,(m_vip_regs.BRTA) & 0xff,0,0);
-					//printf("%02x A\n",data);
+//					popmessage("%02x %02x %02x",m_vip_regs.BRTA,m_vip_regs.BRTB,m_vip_regs.BRTC);
 					break;
 		case 0x26:	//BRTB
 					m_vip_regs.BRTB = data;
 					palette_set_color_rgb(machine(), 2,(m_vip_regs.BRTA + m_vip_regs.BRTB) & 0xff,0,0);
-					//printf("%02x B\n",data);
+//					popmessage("%02x %02x %02x",m_vip_regs.BRTA,m_vip_regs.BRTB,m_vip_regs.BRTC);
 					break;
 		case 0x28:	//BRTC
 					m_vip_regs.BRTC = data;
 					palette_set_color_rgb(machine(), 3,(m_vip_regs.BRTA + m_vip_regs.BRTB + m_vip_regs.BRTC) & 0xff,0,0);
-					//printf("%02x C\n",data);
+//					popmessage("%02x %02x %02x",m_vip_regs.BRTA,m_vip_regs.BRTB,m_vip_regs.BRTC);
 					break;
 		case 0x2A:	//REST
 					m_vip_regs.REST = data;
@@ -636,6 +636,7 @@ static MACHINE_RESET(vboy)
 	state->m_vboy_regs.tcr = 0xe4;
 	state->m_vboy_regs.wcr = 0xfc;
 	state->m_vboy_regs.kcr = 0x4c;
+	state->m_vip_regs.DPCTRL = 2; // ssquash relies on this at boot otherwise no frame_start irq is fired
 }
 
 
