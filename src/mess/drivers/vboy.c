@@ -243,10 +243,10 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	if(def & 0x40) // END flag
 		return 1;
 
-	if (mode < 3)
+	if (mode < 2)
 	{
 		fill_bg_map(state, bg_map_num);
-		if (BIT(def,15) && (!right))
+		if (lon && (!right))
 		{
 			// Left screen
 			for(y=0;y<=h;y++)
@@ -269,7 +269,7 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 			}
 		}
 
-		if (BIT(def,14) && (right))
+		if (ron && (right))
 		{
 			// Right screen
 			for(y=0;y<=h;y++)
@@ -295,7 +295,79 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	else
 	if (mode==2)
 	{
-		//popmessage("Mode 2 used");
+		fill_bg_map(state, bg_map_num);
+
+		if (lon && (!right))
+		{
+			// Left screen
+			for(y=0;y<=h;y++)
+			{
+				float h_skw = vboy_paramtab[y*8+0];
+				int prlx = vboy_paramtab[y*8+1];
+				float v_skw = vboy_paramtab[y*8+2];
+				float h_scl = vboy_paramtab[y*8+3];
+				float v_scl = vboy_paramtab[y*8+4];
+
+				INT32 mx = (INT32)h_skw / 8;
+				INT32 my = (INT32)v_skw / 8;
+				INT32 dx = (INT32)h_scl / 512;
+				INT32 dy = (INT32)v_scl / 512;
+
+				for(x=0;x<=w;x++)
+				{
+					int src_x,src_y;
+					INT16 y1 = (y+gy);
+					INT16 x1 = (x+gx-gp);
+					int pix = 0;
+
+					src_x = (mx + prlx) + (dx * x);
+					src_y = (my) + (dy * y);
+
+					pix = state->m_bg_map[((src_y) & 0x1ff)*0x200+((src_x) & 0x1ff)];
+
+					if(pix != -1)
+						if (y1>=0 && y1<224)
+							if (x1>=0 && x1<384)
+								bitmap.pix16(y1, x1) = state->machine().pens[pix & 3];
+				}
+			}
+		}
+
+		if (ron && (right))
+		{
+			// Right screen
+			for(y=0;y<=h;y++)
+			{
+				float h_skw = vboy_paramtab[y*8+0];
+				int prlx = vboy_paramtab[y*8+1];
+				float v_skw = vboy_paramtab[y*8+2];
+				float h_scl = vboy_paramtab[y*8+3];
+				float v_scl = vboy_paramtab[y*8+4];
+
+				INT32 mx = (INT32)h_skw / 8;
+				INT32 my = (INT32)v_skw / 8;
+				INT32 dx = (INT32)h_scl / 512;
+				INT32 dy = (INT32)v_scl / 512;
+
+				for(x=0;x<=w;x++)
+				{
+					int src_x,src_y;
+					INT16 y1 = (y+gy);
+					INT16 x1 = (x+gx+gp);
+					int pix = 0;
+
+					src_x = (mx - prlx) + (dx * x);
+					src_y = (my) + (dy * y);
+
+					pix = state->m_bg_map[((src_y) & 0x1ff)*0x200+((src_x) & 0x1ff)];
+
+					if(pix != -1)
+						if (y1>=0 && y1<224)
+							if (x1>=0 && x1<384)
+								bitmap.pix16(y1, x1) = state->machine().pens[pix & 3];
+				}
+			}
+		}
 	}
 	else
 	if (mode==3)
