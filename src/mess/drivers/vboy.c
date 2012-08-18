@@ -1118,8 +1118,8 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 
 	MCFG_MACHINE_RESET(vboy)
 
-	MCFG_TIMER_ADD_PERIODIC("timer_100us", timer_100us_tick, attotime::from_usec(100))
-	MCFG_TIMER_ADD_PERIODIC("timer_20us", timer_20us_tick, attotime::from_usec(20))
+	MCFG_TIMER_ADD_PERIODIC("timer_100us", timer_100us_tick, attotime::from_usec(1000))
+	MCFG_TIMER_ADD_PERIODIC("timer_20us", timer_20us_tick, attotime::from_msec(20))
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_vboy)
