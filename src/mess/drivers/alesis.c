@@ -25,6 +25,7 @@ public:
 	virtual void machine_reset();
 
 	DECLARE_DRIVER_INIT(hr16);
+	DECLARE_WRITE8_MEMBER( led_w );
 	DECLARE_WRITE8_MEMBER( kb_matrix_w );
 	DECLARE_READ8_MEMBER( kb_r );
 
@@ -56,6 +57,18 @@ READ8_MEMBER( alesis_state::kb_r )
 	return data;
 }
 
+WRITE8_MEMBER( alesis_state::led_w )
+{
+	output_set_value("patt_led",  data & 0x01 ? 1 : 0);
+	output_set_value("song_led",  data & 0x01 ? 0 : 1);
+	output_set_value("play_led",  data & 0x02 ? 0 : 1);
+	output_set_value("record_led",data & 0x04 ? 0 : 1);
+	output_set_value("voice_led", data & 0x08 ? 0 : 1);
+	output_set_value("tune_led",  data & 0x10 ? 0 : 1);
+	output_set_value("mix_led",   data & 0x20 ? 0 : 1);
+	output_set_value("tempo_led", data & 0x40 ? 0 : 1);
+	output_set_value("midi_led",  data & 0x80 ? 0 : 1);
+}
 
 static ADDRESS_MAP_START(hr16_mem, AS_PROGRAM, 8, alesis_state)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -67,6 +80,7 @@ static ADDRESS_MAP_START(hr16_io, AS_IO, 8, alesis_state)
 	AM_RANGE(0x0000, 0x0000) AM_READ(kb_r)
 	AM_RANGE(0x0006, 0x0006) AM_DEVREADWRITE("hd44780", hd44780_device, control_read, control_write)
 	AM_RANGE(0x0007, 0x0007) AM_DEVREADWRITE("hd44780", hd44780_device, data_read, data_write)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(led_w)
 	AM_RANGE(0x0008, 0x0008) AM_WRITE(kb_matrix_w)
 	AM_RANGE(0x8000, 0xffff) AM_RAM		/* 32Kx8 SRAM */
 ADDRESS_MAP_END
