@@ -263,29 +263,31 @@ static void draw_affine_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vbo
 {
 	int x,y;
 
-	for(y=0;y<=h;y++)
-	{
-		float h_skw = vboy_paramtab[y*8+0] / 8.0;
-		int prlx = vboy_paramtab[y*8+1];
-		float v_skw = vboy_paramtab[y*8+2] / 8.0;
-		float h_scl = vboy_paramtab[y*8+3] / 512.0;
-		float v_scl = vboy_paramtab[y*8+4] / 512.0;
+    for(y=0;y<=h;y++)
+    {
+		float h_skw = (INT16)vboy_paramtab[y*8+0] / 8.0;
+		float prlx = (INT16)vboy_paramtab[y*8+1] / 8.0;
+		float v_skw = (INT16)vboy_paramtab[y*8+2] / 8.0;
+		float h_scl = (INT16)vboy_paramtab[y*8+3] / 512.0;
+		float v_scl = (INT16)vboy_paramtab[y*8+4] / 512.0;
+
+		h_skw += right ? -prlx : prlx;
 
 		for(x=0;x<=w;x++)
 		{
-			int src_x,src_y;
+			INT32 src_x,src_y;
 			INT16 y1 = (y+gy);
 			INT16 x1 = (x+gx);
 			int pix = 0;
 
 			x1 += right ? -gp : gp;
-			x1 += right ? prlx : -prlx;
+
 			src_x = (INT32)((h_skw) + (h_scl * x));
-			src_y = (INT32)((v_skw) + (v_scl * y));
+			src_y = (INT32)((v_skw) + (v_scl * x));
 
 			pix = state->m_bg_map[((src_y) & 0x1ff)*0x200+((src_x) & 0x1ff)];
 
-			if(pix != -1)
+            if(pix != -1)
 				if (y1>=0 && y1<224)
 					if (x1>=0 && x1<384)
 						bitmap.pix16(y1, x1) = state->machine().pens[pix & 3];
