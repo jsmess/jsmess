@@ -27,6 +27,7 @@
 #include "emu.h"
 #include "cpu/v810/v810.h"
 #include "imagedev/cartslot.h"
+#include "audio/vboy.h"
 #include "vboy.lh"
 
 typedef struct _vboy_regs_t vboy_regs_t;
@@ -893,7 +894,7 @@ static ADDRESS_MAP_START( vboy_mem, AS_PROGRAM, 32, vboy_state )
 	AM_RANGE( 0x0007c000, 0x0007dfff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535 mirror
 	AM_RANGE( 0x0007e000, 0x0007ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047 mirror
 
-	AM_RANGE( 0x01000000, 0x010005ff ) AM_RAM // Sound RAM
+	AM_RANGE( 0x01000000, 0x010005ff ) AM_DEVREADWRITE8("vbsnd", vboysnd_device, read, write, 0xffffffff)
 	AM_RANGE( 0x02000000, 0x0200002b ) AM_MIRROR(0x0ffff00) AM_READWRITE(io_r, io_w) // Hardware control registers mask 0xff
 	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM AM_SHARE("wram")// Main RAM - 64K mask 0xffff
@@ -922,7 +923,7 @@ static ADDRESS_MAP_START( vboy_io, AS_IO, 32, vboy_state )
 	AM_RANGE( 0x0007c000, 0x0007dfff ) AM_READWRITE16(vboy_font2_r, vboy_font2_w, 0xffffffff) // Font 1024-1535 mirror
 	AM_RANGE( 0x0007e000, 0x0007ffff ) AM_READWRITE16(vboy_font3_r, vboy_font3_w, 0xffffffff) // Font 1536-2047 mirror
 
-	AM_RANGE( 0x01000000, 0x010005ff ) AM_RAM // Sound RAM
+	AM_RANGE( 0x01000000, 0x010005ff ) AM_DEVREADWRITE8("vbsnd", vboysnd_device, read, write, 0xffffffff)
 	AM_RANGE( 0x02000000, 0x0200002b ) AM_MIRROR(0x0ffff00) AM_READWRITE(io_r, io_w) // Hardware control registers mask 0xff
 	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM AM_SHARE("wram") // Main RAM - 64K mask 0xffff
@@ -1152,6 +1153,12 @@ static MACHINE_CONFIG_START( vboy, vboy_state )
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","vboy")
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_VBOYSND_ADD("vbsnd")
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /* ROM definition */
