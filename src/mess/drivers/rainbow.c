@@ -1,9 +1,62 @@
 /***************************************************************************
 
-        DEC Rainbow 100
+    DEC Rainbow 100
 
-        Driver-in-progress by R. Belmont and Miodrag Milanovic
+    Driver-in-progress by R. Belmont and Miodrag Milanovic
+ 
+ 
+    Meaning of Diagnostics LEDs (from PC100ESV1.PDF found, e.g.,
+    on ftp://ftp.update.uu.se/pub/rainbow/doc/rainbow-docs/
 
+    Internal Diagnostic Messages
+    Msg	Message	 					        Lights Display 
+    No.								        * = on o = off 
+    								        - = on or off
+    								        1 2 3 4 5 6 7
+    --------------------------------------------------------------
+     1	Main Board (Video)				    o * * o * o *
+     2	Main Board* (unsolicited interrupt)	* * * * o * o
+     3	Drive A or B (index)				o o * o o * *
+     4	Drive A or B (motor)				* * o o o * *
+     5	Drive A or B (seek)				    o * o o o * *
+     6	Drive A or B (read)				    * o o o o * *
+     7	Drive A or B (restore)			    o * * o o * *
+     8	Drive A or B (step)				    * o * o o * *
+     9	System Load incomplete+ (System Load)	o o o o o o o
+    10	Main Board (video, vfr)			    * * * o * o *
+    11	System Load incomplete+ (Boot Load)	o o o o o o o
+    12	Drive A or B (not ready)			o o o o o * *
+    13	Keyboard						    * * o * o * o
+    14	Main Board (nvm data)				* * * * o * *
+    15	(no msg. 15 in that table)
+    16	Interrupts off*					    * * * o o o o
+    17	Main Board (video RAM)			    * * * o * * o
+    18	Main Board (Z80 crc)				* * * * o o *
+    19	Main Board RAM (0-64K)			    - - - * * o *
+    20	Main Board (unsolicited int., Z80)  * * * * o o o *
+    21	Drive Not Ready+					o o o o o o o
+    22	Remove Card or Diskette			    o * * o o o *
+    23	Non-System Diskette+				o o o o o o o
+    24	new memory size = nnnK			    o o o o o o o
+    25	Set Up Defaults stored			    o o o o o o o
+    26	Main Board (RAM arbitration)		* * * o * o o
+    27	Main Board (RAM option)			    - - - * * o o
+    28	RX50 controller board				* * * o o * *
+    29	Main Board* (Z80 response)			* * * * o o o
+    30	Main Board (ROM crc, ROM 0)			* * * * * * *
+    31	Main Board (ROM crc, ROM 1)			* * * * * * o
+    -	Main Board (ROM crc, ROM 2)			* * * o * * *
+    33	Main Board (contention)			    o o o o o * o
+    40	Main Board (printer port)			* o * * o * o
+    50	Main Board (keyboard port)			o o * * o * o
+    60	Main Board (comm port)			    o * * * o * o
+
+    --------------------------------------------------------------
+    *	These errors can occur at any time because the circuits
+    	are monitored constantly
+    +	These messages may occur during power-up if auto boot is 
+    	selected
+ 
 ****************************************************************************/
 
 #include "emu.h"
@@ -13,6 +66,7 @@
 #include "machine/wd17xx.h"
 #include "imagedev/flopdrv.h"
 #include "machine/i8251.h"
+#include "machine/dec_lk201.h"
 
 class rainbow_state : public driver_device
 {
@@ -24,15 +78,18 @@ public:
         m_z80(*this, "subcpu"),
         m_fdc(*this, "wd1793"),
         m_kbd8251(*this, "kbdser"),
+        m_lk201(*this, LK201_TAG),
 		m_p_ram(*this, "p_ram"),
         m_shared(*this, "sh_ram")
     { }
+
 
 	required_device<device_t> m_crtc;
     required_device<device_t> m_i8088;
     required_device<device_t> m_z80;
     required_device<device_t> m_fdc;
     required_device<i8251_device> m_kbd8251;
+    required_device<lk201_device> m_lk201;
 	required_shared_ptr<UINT8> m_p_ram;
 	required_shared_ptr<UINT8> m_shared;
 	UINT8 m_diagnostic;
@@ -313,19 +370,29 @@ READ_LINE_MEMBER(rainbow_state::kbd_rx)
 
 WRITE_LINE_MEMBER(rainbow_state::kbd_tx)
 {
-//    printf("%02x to keyboard\n", state);
+    printf("%02x to keyboard\n", state);
 }
 
 WRITE_LINE_MEMBER(rainbow_state::kbd_rxready_w)
 {
+//    printf("rxready %d\n", state);
     m_kbd_rx_ready = (state == 1) ? true : false;
     update_kbd_irq();
 }
 
 WRITE_LINE_MEMBER(rainbow_state::kbd_txready_w)
 {
+//    printf("txready %d\n", state);
     m_kbd_tx_ready = (state == 1) ? true : false;
     update_kbd_irq();
+}
+
+static TIMER_DEVICE_CALLBACK( keyboard_tick )
+{
+	rainbow_state *state = timer.machine().driver_data<rainbow_state>();
+
+    state->m_kbd8251->transmit_clock();
+    state->m_kbd8251->receive_clock();
 }
 
 static const vt_video_interface video_interface =
@@ -418,6 +485,9 @@ static MACHINE_CONFIG_START( rainbow, rainbow_state )
 	MCFG_LEGACY_FLOPPY_2_DRIVES_ADD(floppy_intf)
 
 	MCFG_I8251_ADD("kbdser", i8251_intf)
+	MCFG_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, attotime::from_hz(4800))
+
+    MCFG_LK201_ADD()
 MACHINE_CONFIG_END
 
 /* ROM definition */
@@ -437,5 +507,5 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY                         FULLNAME       FLAGS */
+/*    YEAR  NAME     PARENT  COMPAT   MACHINE    INPUT    STATE          INIT COMPANY                         FULLNAME       FLAGS */
 COMP( 1982, rainbow, 0,      0,       rainbow,   rainbow, driver_device, 0,  "Digital Equipment Corporation", "Rainbow 100B", GAME_NOT_WORKING | GAME_NO_SOUND)

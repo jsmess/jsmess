@@ -666,6 +666,7 @@ $(MESSOBJ)/apple.a:				\
     $(MESS_MACHINE)/a2alfam2.o \
     $(MESS_MACHINE)/laser128.o \
     $(MESS_MACHINE)/a2echoii.o \
+    $(MESS_MACHINE)/a2graphtab.o \
 	$(MESS_MACHINE)/lisa.o		\
 	$(MESS_DRIVERS)/lisa.o		\
 	$(MESS_MACHINE)/nubus.o     \
@@ -1015,6 +1016,7 @@ $(MESSOBJ)/dec.a:				\
 	$(MESS_DRIVERS)/vt320.o		\
 	$(MESS_DRIVERS)/vt520.o		\
 	$(MESS_VIDEO)/vtvideo.o		\
+    $(MESS_MACHINE)/dec_lk201.o \
 
 $(MESSOBJ)/dicksmth.a:			\
 	$(MESS_DRIVERS)/super80.o	\
