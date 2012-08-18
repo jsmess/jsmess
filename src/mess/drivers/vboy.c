@@ -9,6 +9,7 @@
 
     TODO:
     - fix Affine rotation
+    - per-game NVRAM hook-up (wariolnd, vleague, golf, others?)
     - galactic: ball isn't shown?
     - galactic: on the rotation layer, half of it isn't shown;
     - innsmout: arrow OBJ graphics are misplaced;
@@ -18,6 +19,8 @@
 	- ssquash: gameplay seems busted;
 	- vleague / vproyak: keeps going into auto pause with 100 usec timer?
 	- wariolnd: brightness gets suddently darker during intro, CPU bug?
+	- wariolnd: Wario sprite appears "enabled" when it really shouldn't
+	            during the second intro;
 
 ****************************************************************************/
 
@@ -253,9 +256,10 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 
 	if (mode < 2) // Normal / Hbias Mode
 	{
-		fill_bg_map(state, bg_map_num);
 		if (lon && (!right))
 		{
+			fill_bg_map(state, bg_map_num);
+
 			// Left screen
 			for(y=0;y<=h;y++)
 			{
@@ -279,6 +283,8 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 
 		if (ron && (right))
 		{
+			fill_bg_map(state, bg_map_num);
+
 			// Right screen
 			for(y=0;y<=h;y++)
 			{
@@ -303,10 +309,10 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	else
 	if (mode==2) // Affine Mode
 	{
-		fill_bg_map(state, bg_map_num);
-
 		if (lon && (!right))
 		{
+			fill_bg_map(state, bg_map_num);
+
 			// Left screen
 			for(y=0;y<=h;y++)
 			{
@@ -338,6 +344,8 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 
 		if (ron && (right))
 		{
+			fill_bg_map(state, bg_map_num);
+
 			// Right screen
 			for(y=0;y<=h;y++)
 			{
@@ -888,8 +896,8 @@ static ADDRESS_MAP_START( vboy_mem, AS_PROGRAM, 32, vboy_state )
 	AM_RANGE( 0x01000000, 0x010005ff ) AM_RAM // Sound RAM
 	AM_RANGE( 0x02000000, 0x0200002b ) AM_MIRROR(0x0ffff00) AM_READWRITE(io_r, io_w) // Hardware control registers mask 0xff
 	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
-	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM // Main RAM - 64K mask 0xffff
-	AM_RANGE( 0x06000000, 0x06003fff ) AM_RAM // Cart RAM - 8K NVRAM
+	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM AM_SHARE("wram")// Main RAM - 64K mask 0xffff
+	AM_RANGE( 0x06000000, 0x06003fff ) AM_RAM AM_SHARE("nvram") // Cart RAM - 8K NVRAM
 	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_ROM AM_REGION("user1", 0) /* ROM */
 ADDRESS_MAP_END
 
@@ -917,8 +925,8 @@ static ADDRESS_MAP_START( vboy_io, AS_IO, 32, vboy_state )
 	AM_RANGE( 0x01000000, 0x010005ff ) AM_RAM // Sound RAM
 	AM_RANGE( 0x02000000, 0x0200002b ) AM_MIRROR(0x0ffff00) AM_READWRITE(io_r, io_w) // Hardware control registers mask 0xff
 	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
-	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM // Main RAM - 64K mask 0xffff
-	AM_RANGE( 0x06000000, 0x06003fff ) AM_RAM // Cart RAM - 8K NVRAM
+	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM AM_SHARE("wram") // Main RAM - 64K mask 0xffff
+	AM_RANGE( 0x06000000, 0x06003fff ) AM_RAM AM_SHARE("nvram") // Cart RAM - 8K NVRAM
 	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_ROM AM_REGION("user1", 0) /* ROM */
 ADDRESS_MAP_END
 
