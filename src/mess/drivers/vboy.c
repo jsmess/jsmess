@@ -172,7 +172,7 @@ static void put_obj(vboy_state *state, bitmap_ind16 &bitmap, int x, int y, UINT1
 
 			col = (pal >> (dat*2)) & 3;
 
-			if (dat)
+			if (dat && res_x < 384 && res_y < 224)
 				bitmap.pix16((res_y), (res_x)) = state->machine().pens[col];
 		}
 	}
@@ -228,6 +228,71 @@ static void fill_bg_map(vboy_state *state, int num)
 	}
 }
 
+static void draw_bg_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int mode, int gx, int gp, int gy, int mx, int mp, int my, int h, int w, bool right)
+{
+	int x,y;
+
+	for(y=0;y<=h;y++)
+	{
+		for(x=0;x<=w;x++)
+		{
+			int src_x,src_y;
+			INT16 y1 = (y+gy);
+			INT16 x1 = (x+gx);
+			int pix = 0;
+
+			x1 += right ? -gp : gp;
+			if (mode==1)
+				x1 += vboy_paramtab[y*2];
+
+			src_x = x+mx;
+			src_y = y+my;
+			src_x += right ? -mp : mp;
+
+			pix = state->m_bg_map[((src_y) & 0x1ff)*0x200+((src_x) & 0x1ff)];
+
+			if(pix != -1)
+				if (y1>=0 && y1<224)
+					if (x1>=0 && x1<384)
+						bitmap.pix16(y1, x1) = state->machine().pens[pix & 3];
+		}
+	}
+}
+
+static void draw_affine_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int gx, int gp, int gy, int h, int w, bool right)
+{
+	int x,y;
+
+	for(y=0;y<=h;y++)
+	{
+		float h_skw = vboy_paramtab[y*8+0] / 8.0;
+		int prlx = vboy_paramtab[y*8+1];
+		float v_skw = vboy_paramtab[y*8+2] / 8.0;
+		float h_scl = vboy_paramtab[y*8+3] / 512.0;
+		float v_scl = vboy_paramtab[y*8+4] / 512.0;
+
+		for(x=0;x<=w;x++)
+		{
+			int src_x,src_y;
+			INT16 y1 = (y+gy);
+			INT16 x1 = (x+gx);
+			int pix = 0;
+
+			x1 += right ? -gp : gp;
+			x1 += right ? prlx : -prlx;
+			src_x = (INT32)((h_skw) + (h_scl * x));
+			src_y = (INT32)((v_skw) + (v_scl * y));
+
+			pix = state->m_bg_map[((src_y) & 0x1ff)*0x200+((src_x) & 0x1ff)];
+
+			if(pix != -1)
+				if (y1>=0 && y1<224)
+					if (x1>=0 && x1<384)
+						bitmap.pix16(y1, x1) = state->machine().pens[pix & 3];
+		}
+	}
+}
+
 static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, bool right, int &cur_spt)
 {
 	num <<= 4;
@@ -245,7 +310,6 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	UINT16 param_base = state->m_world[num+9] & 0xfff0;
 //  UINT16 overplane = state->m_world[num+10];
 	UINT8 bg_map_num = def & 0x0f;
-	INT16 x,y;
 	UINT8 mode = (def >> 12) & 3;
 	UINT16 *vboy_paramtab;
 	int i;
@@ -260,124 +324,30 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 		if (lon && (!right))
 		{
 			fill_bg_map(state, bg_map_num);
-
-			// Left screen
-			for(y=0;y<=h;y++)
-			{
-				for(x=0;x<=w;x++)
-				{
-					INT16 y1 = (y+gy);
-					INT16 x1 = (x+gx-gp);
-					int pix = 0;
-					if (mode==1)
-						x1 += vboy_paramtab[y*2];
-
-					pix = state->m_bg_map[((y+my) & 0x1ff)*0x200+((x+mx-mp) & 0x1ff)];
-
-					if(pix != -1)
-						if (y1>=0 && y1<224)
-							if (x1>=0 && x1<384)
-								bitmap.pix16(y1, x1) = state->machine().pens[pix & 3];
-				}
-			}
+			draw_bg_map(state, bitmap, vboy_paramtab, mode, gx, gp, gy, mx, mp, my, h,w, right);
 		}
 
 		if (ron && (right))
 		{
 			fill_bg_map(state, bg_map_num);
-
-			// Right screen
-			for(y=0;y<=h;y++)
-			{
-				for(x=0; x<=w; x++)
-				{
-					INT16 y1 = (y+gy);
-					INT16 x1 = (x+gx+gp);
-					int pix = 0;
-					if (mode==1)
-						x1 += vboy_paramtab[y*2+1];
-
-					pix = state->m_bg_map[((y+my) & 0x1ff)*0x200+((x+mx+mp) & 0x1ff)];
-
-					if(pix != -1)
-						if (y1>=0 && y1<224)
-							if (x1>=0 && x1<384)
-								bitmap.pix16(y1, x1) = state->machine().pens[pix & 3];
-				}
-			}
+			draw_bg_map(state, bitmap, vboy_paramtab, mode, gx, gp, gy, mx, mp, my, h,w, right);
 		}
 	}
-	else
-	if (mode==2) // Affine Mode
+	else if (mode==2) // Affine Mode
 	{
 		if (lon && (!right))
 		{
 			fill_bg_map(state, bg_map_num);
-
-			// Left screen
-			for(y=0;y<=h;y++)
-			{
-				float h_skw = vboy_paramtab[y*8+0] / 8.0;
-				int prlx = vboy_paramtab[y*8+1];
-				float v_skw = vboy_paramtab[y*8+2] / 8.0;
-				float h_scl = vboy_paramtab[y*8+3] / 512.0;
-				float v_scl = vboy_paramtab[y*8+4] / 512.0;
-
-				for(x=0;x<=w;x++)
-				{
-					int src_x,src_y;
-					INT16 y1 = (y+gy);
-					INT16 x1 = (x+gx-gp+prlx);
-					int pix = 0;
-
-					src_x = (INT32)((h_skw) + (h_scl * x));
-					src_y = (INT32)((v_skw) + (v_scl * y));
-
-					pix = state->m_bg_map[((src_y) & 0x1ff)*0x200+((src_x) & 0x1ff)];
-
-					if(pix != -1)
-						if (y1>=0 && y1<224)
-							if (x1>=0 && x1<384)
-								bitmap.pix16(y1, x1) = state->machine().pens[pix & 3];
-				}
-			}
+			draw_affine_map(state, bitmap, vboy_paramtab, gx, gp, gy, h,w, right);
 		}
 
 		if (ron && (right))
 		{
 			fill_bg_map(state, bg_map_num);
-
-			// Right screen
-			for(y=0;y<=h;y++)
-			{
-				float h_skw = vboy_paramtab[y*8+0] / 8.0;
-				int prlx = vboy_paramtab[y*8+1];
-				float v_skw = vboy_paramtab[y*8+2] / 8.0;
-				float h_scl = vboy_paramtab[y*8+3] / 512.0;
-				float v_scl = vboy_paramtab[y*8+4] / 512.0;
-
-				for(x=0;x<=w;x++)
-				{
-					int src_x,src_y;
-					INT16 y1 = (y+gy);
-					INT16 x1 = (x+gx+gp-prlx);
-					int pix = 0;
-
-					src_x = (INT32)((h_skw) + (h_scl * x));
-					src_y = (INT32)((v_skw) + (v_scl * y));
-
-					pix = state->m_bg_map[((src_y) & 0x1ff)*0x200+((src_x) & 0x1ff)];
-
-					if(pix != -1)
-						if (y1>=0 && y1<224)
-							if (x1>=0 && x1<384)
-								bitmap.pix16(y1, x1) = state->machine().pens[pix & 3];
-				}
-			}
+			draw_affine_map(state, bitmap, vboy_paramtab, gx, gp, gy, h,w, right);
 		}
 	}
-	else
-	if (mode==3) // OBJ Mode
+	else if (mode==3) // OBJ Mode
 	{
 		int start_offs, end_offs;
 
