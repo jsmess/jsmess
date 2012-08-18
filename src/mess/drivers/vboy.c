@@ -8,8 +8,16 @@
     and http://www.vr32.de/modules/dokuwiki/doku.php?
 
     TODO:
-    - fix graphics (many things to add!)
+    - fix Affine rotation
+    - galactic: ball isn't shown?
+    - galactic: on the rotation layer, half of it isn't shown;
+    - innsmout: arrow OBJ graphics are misplaced;
+	- spaceinv: Taito logo only if you press the button, framebuffer?
+	- spaceinv: missing shots
+	- ssquash: misplaced map;
+	- ssquash: gameplay seems busted;
 	- vleague / vproyak: keeps going into auto pause with 100 usec timer?
+	- wariolnd: brightness gets suddently darker during intro, CPU bug?
 
 ****************************************************************************/
 
@@ -243,7 +251,7 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	if(def & 0x40) // END flag
 		return 1;
 
-	if (mode < 2)
+	if (mode < 2) // Normal / Hbias Mode
 	{
 		fill_bg_map(state, bg_map_num);
 		if (lon && (!right))
@@ -293,7 +301,7 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 		}
 	}
 	else
-	if (mode==2)
+	if (mode==2) // Affine Mode
 	{
 		fill_bg_map(state, bg_map_num);
 
@@ -302,16 +310,11 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 			// Left screen
 			for(y=0;y<=h;y++)
 			{
-				float h_skw = vboy_paramtab[y*8+0];
+				float h_skw = vboy_paramtab[y*8+0] / 8.0;
 				int prlx = vboy_paramtab[y*8+1];
-				float v_skw = vboy_paramtab[y*8+2];
-				float h_scl = vboy_paramtab[y*8+3];
-				float v_scl = vboy_paramtab[y*8+4];
-
-				INT32 mx = (INT32)h_skw / 8;
-				INT32 my = (INT32)v_skw / 8;
-				INT32 dx = (INT32)h_scl / 512;
-				INT32 dy = (INT32)v_scl / 512;
+				float v_skw = vboy_paramtab[y*8+2] / 8.0;
+				float h_scl = vboy_paramtab[y*8+3] / 512.0;
+				float v_scl = vboy_paramtab[y*8+4] / 512.0;
 
 				for(x=0;x<=w;x++)
 				{
@@ -320,8 +323,8 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 					INT16 x1 = (x+gx-gp);
 					int pix = 0;
 
-					src_x = (mx + prlx) + (dx * x);
-					src_y = (my) + (dy * y);
+					src_x = (INT32)((h_skw + prlx) + (h_scl * x));
+					src_y = (INT32)((v_skw) + (v_scl * y));
 
 					pix = state->m_bg_map[((src_y) & 0x1ff)*0x200+((src_x) & 0x1ff)];
 
@@ -338,16 +341,11 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 			// Right screen
 			for(y=0;y<=h;y++)
 			{
-				float h_skw = vboy_paramtab[y*8+0];
+				float h_skw = vboy_paramtab[y*8+0] / 8.0;
 				int prlx = vboy_paramtab[y*8+1];
-				float v_skw = vboy_paramtab[y*8+2];
-				float h_scl = vboy_paramtab[y*8+3];
-				float v_scl = vboy_paramtab[y*8+4];
-
-				INT32 mx = (INT32)h_skw / 8;
-				INT32 my = (INT32)v_skw / 8;
-				INT32 dx = (INT32)h_scl / 512;
-				INT32 dy = (INT32)v_scl / 512;
+				float v_skw = vboy_paramtab[y*8+2] / 8.0;
+				float h_scl = vboy_paramtab[y*8+3] / 512.0;
+				float v_scl = vboy_paramtab[y*8+4] / 512.0;
 
 				for(x=0;x<=w;x++)
 				{
@@ -356,8 +354,8 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 					INT16 x1 = (x+gx+gp);
 					int pix = 0;
 
-					src_x = (mx - prlx) + (dx * x);
-					src_y = (my) + (dy * y);
+					src_x = (INT32)((h_skw - prlx) + (h_scl * x));
+					src_y = (INT32)((v_skw) + (v_scl * y));
 
 					pix = state->m_bg_map[((src_y) & 0x1ff)*0x200+((src_x) & 0x1ff)];
 
@@ -370,7 +368,7 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 		}
 	}
 	else
-	if (mode==3)
+	if (mode==3) // OBJ Mode
 	{
 		int start_offs, end_offs;
 
