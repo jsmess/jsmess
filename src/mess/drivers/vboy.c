@@ -13,14 +13,13 @@
     - galactic: ball isn't shown?
     - galactic: on the rotation layer, half of it isn't shown;
     - innsmout: arrow OBJ graphics are misplaced;
+    - panicbom: brightness 10 overflows
 	- spaceinv: Taito logo only if you press the button, framebuffer?
 	- spaceinv: missing shots
 	- ssquash: misplaced map;
 	- ssquash: gameplay seems busted;
 	- vleague / vproyak: keeps going into auto pause with 100 usec timer?
 	- wariolnd: brightness gets suddently darker during intro, CPU bug?
-	- wariolnd: Wario sprite appears "enabled" when it really shouldn't
-	            during the second intro;
 
 ****************************************************************************/
 
