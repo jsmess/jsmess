@@ -370,7 +370,7 @@ READ_LINE_MEMBER(rainbow_state::kbd_rx)
 
 WRITE_LINE_MEMBER(rainbow_state::kbd_tx)
 {
-    printf("%02x to keyboard\n", state);
+//    printf("%02x to keyboard\n", state);
 }
 
 WRITE_LINE_MEMBER(rainbow_state::kbd_rxready_w)
