@@ -320,10 +320,10 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 				{
 					int src_x,src_y;
 					INT16 y1 = (y+gy);
-					INT16 x1 = (x+gx-gp);
+					INT16 x1 = (x+gx-gp+prlx);
 					int pix = 0;
 
-					src_x = (INT32)((h_skw + prlx) + (h_scl * x));
+					src_x = (INT32)((h_skw) + (h_scl * x));
 					src_y = (INT32)((v_skw) + (v_scl * y));
 
 					pix = state->m_bg_map[((src_y) & 0x1ff)*0x200+((src_x) & 0x1ff)];
@@ -351,10 +351,10 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 				{
 					int src_x,src_y;
 					INT16 y1 = (y+gy);
-					INT16 x1 = (x+gx+gp);
+					INT16 x1 = (x+gx+gp-prlx);
 					int pix = 0;
 
-					src_x = (INT32)((h_skw - prlx) + (h_scl * x));
+					src_x = (INT32)((h_skw) + (h_scl * x));
 					src_y = (INT32)((v_skw) + (v_scl * y));
 
 					pix = state->m_bg_map[((src_y) & 0x1ff)*0x200+((src_x) & 0x1ff)];
