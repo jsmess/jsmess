@@ -431,7 +431,7 @@ Titles, publishers and release dates taken from:
 		</part>
 	</software>
 
-<!-- is thi broken? program does not load -->
+<!-- is this broken? program does not load -->
 	<software name="poibos" supported="no">
 		<description>Poibos Part-1 - Dasshutsu</description>
 		<year>1985</year>
@@ -1555,6 +1555,327 @@ Titles, publishers and release dates taken from:
 		<part name="cass" interface="x1_cass">
 			<dataarea name="side1" size="240004">
 				<rom name="unk_tape.tap" size="240004" crc="b7c49de9" sha1="432cddf082e2dd74a958a4f843f71d84cae76389" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- to sort -->
+
+	<software name="atamano">
+		<description>Atama no Taisou</description>
+		<year>19??</year>
+		<publisher>ハドソン (Hudson Soft)</publisher>
+		<info name="alt_title" value="頭の体操"/>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="89834">
+				<rom name="atamano.tap" size="89834" crc="a208f897" sha1="786678e607fe519991e09db3e9bb8c76b703b298" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="barricad">
+		<description>Barricade</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="73713">
+				<rom name="barricade.tap" size="73713" crc="4f0e0451" sha1="bbf96d327ffca1351f2b0b76532fdbbd1c339090" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bat1">
+		<description>BAT (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="300004">
+				<rom name="bat.tap" size="300004" crc="8c2dd2d6" sha1="929d969d8b30039d7b731f71be4e7efcbd160709" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="choplift">
+		<description>Choplifter</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="300004">
+				<rom name="choplifter.tap" size="300004" crc="c5fda23f" sha1="9e6d165943fc8ec6675a67ab23d3c419cd401db0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="macadam">
+		<description>Macadam</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="1440004">
+				<rom name="macadam.tap" size="1440004" crc="09260e03" sha1="a94e9e9999903f8076d7f34be060475001981e63" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="creamy">
+		<description>Magical Angel Creamy Mami</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="クリーミーマミ"/>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="134746">
+				<rom name="magical angel creamy.tap" size="134746" crc="b99bc36f" sha1="9daeb406f16b2e0088d6ba863fc3e8e008102a77" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pentan">
+		<description>Ganbare Pentan</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="がんばれペンタン"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="358800">
+				<rom name="pentan.tap" size="358800" crc="fa80e7a0" sha1="ec24cce27847e655ec46d65435dd022ae70247e1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scarlett">
+		<description>Scarlett 7</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="600004">
+				<rom name="scarlett7.tap" size="600004" crc="f2d3b93a" sha1="a4679a3bcd4a6e904f298be789b6f47a502f6a54" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supermar">
+		<description>Super Mario SP</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="900004">
+				<rom name="super mario sp.tap" size="900004" crc="e6a9ae8c" sha1="4e4e2df2a3ff020b7c938d16b0cf21c74171f75f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="15puzzle">
+		<description>15 Puzzle</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="90592">
+				<rom name="15puzzle.tap" size="90592" crc="60b81543" sha1="fba956a2a12b0f529f9aad80ba8da9c9842e9a98" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="castlee">
+		<description>Castle Excellent</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="265608">
+				<rom name="castle-e.tap" size="265608" crc="2602402c" sha1="179b07bcec7d8698fd961dcc9b584df39a47bb2c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coron">
+		<description>Coron</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="188744">
+				<rom name="coron.tap" size="188744" crc="fddba8ae" sha1="7a835fa93f03f1ad12822d16bbb7ffd1ebec8830" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="daidsso">
+		<description>Daidasso</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="232810">
+				<rom name="daidsso.tap" size="232810" crc="1f823ce0" sha1="c6509b2f6d25eaa5be28df3cba5b66ba2f48f608" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diamond">
+		<description>Diamond</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In db-BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:dbbasic"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="188643">
+				<rom name="diamond.tap" size="188643" crc="988d36e6" sha1="ab5bfa46a481d41076d33bcb46d251fbf1ff2460" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="escape">
+		<description>Escape</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="120004">
+				<rom name="escape.tap" size="120004" crc="723ed369" sha1="bca94c3167d4208a8c3c98e9250e850e94735f4c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f2">
+		<description>F2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="245537">
+				<rom name="f2.tap" size="245537" crc="a65426af" sha1="6793a1fe2c06e3cca72ee91e68ab84fd70667980" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="insectwa">
+		<description>Insect War</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="313499">
+				<rom name="insect war.tap" size="313499" crc="9ca2ce80" sha1="6757402535b8c7bee2400550dc5b2121256f5025" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minami" supported="no">
+		<description>Minami Taihei-yo Adventure</description>
+		<year>19??</year>
+		<publisher>デービーソフト (dB-Soft)</publisher>
+		<info name="alt_title" value="南太平洋アドベンチャー"/>
+		<info name="usage" value="In db-BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:dbbasic"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="201088">
+				<rom name="minami.tap" size="201088" crc="557b33ad" sha1="3420f91b918af4dabb1fd59828866827eacc8b49" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sangokai">
+		<description>Sango Kaikaisen</description>
+		<year>19??</year>
+		<publisher>デービーソフト (dB-Soft)</publisher>
+		<info name="alt_title" value="珊瑚海海戦"/>
+		<info name="usage" value="In db-BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:dbbasic"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="158544">
+				<rom name="sangokai.tap" size="158544" crc="257a03e5" sha1="93a56a66043cfe4896371528fccecd57e25b13ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starwrld">
+		<description>Star World 2</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="67761">
+				<rom name="starwrld2.tap" size="67761" crc="9344e997" sha1="a7b442ad058b05d225c265ba99915650cf2ff34d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttunnel">
+		<description>Time Tunnel</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="155382">
+				<rom name="t-tunnel.tap" size="155382" crc="57709be0" sha1="5f1dfa6bbaafc7bca8402f43a6e1db0e10eaf935" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tanuki">
+		<description>Tanuki</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="126822">
+				<rom name="tanuki.tap" size="126822" crc="a03d72a7" sha1="b1599334c919eee1b5cf51331dad198886d1bcab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tennis">
+		<description>Tennis Freak</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="313808">
+				<rom name="tennis.tap" size="313808" crc="1ec30b0a" sha1="0dc95de73337019646ed40dc2acfa1ca6eb741af" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tgif">
+		<description>Thank God It's Friday - Arigato Kinyobi</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="T.G.I.F. ありがとう金曜日"/>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="158090">
+				<rom name="tgif.tap" size="158090" crc="90994d57" sha1="edcb3e4223f5b75ca067967bec526e9f7fc6e415" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tantan">
+		<description>TanTan</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="258976">
+				<rom name="tt-a.tap" size="258976" crc="82fa39f3" sha1="f4dd12274e1ec814a1c6e1fc1498a1eb9e5a996c" offset="0" />
+			</dataarea>
+		</part>
+
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side2" size="258879">
+				<rom name="tt-b.tap" size="258879" crc="2b8f40ff" sha1="f90ec9d3616e2b84296fb826000222b2f4603525" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yumepyak">
+		<description>Yume no Pro Yakyu</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<info name="alt_title" value="夢のプロ野球"/>
+		<info name="usage" value="In BASIC, type LOAD and then RUN"/>
+		<sharedfeat name="requirement" value="x1_flop:tapbas"/>
+		<part name="cass" interface="x1_cass">
+			<dataarea name="side1" size="91925">
+				<rom name="yume_no.tap" size="91925" crc="fa748fe2" sha1="771b35261e0f77c962f12ec2be95864fe7d46e4f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
