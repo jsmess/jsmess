@@ -446,8 +446,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 ROM_START( pce )
-	ROM_REGION( PCE_ROM_MAXSIZE, "user1", 0 )		/* Cartridge ROM area */
-	ROM_FILL( 0, PCE_ROM_MAXSIZE, 0xFF )
+	ROM_REGION( PCE_ROM_MAXSIZE, "user1", ROMREGION_ERASEFF )		/* Cartridge ROM area */
 ROM_END
 
 #define rom_tg16 rom_pce
