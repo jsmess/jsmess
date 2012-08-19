@@ -9,6 +9,32 @@
 #ifndef _PSION_H_
 #define _PSION_H_
 
+#include "cpu/m6800/m6800.h"
+#include "machine/psion_pack.h"
+#include "video/hd44780.h"
+#include "sound/beep.h"
+
+#define MCFG_PSION_CUSTOM_LCDC_ADD( _tag , _config) \
+	MCFG_DEVICE_ADD( _tag, PSION_CUSTOM_LCDC, 0 ) \
+	MCFG_DEVICE_CONFIG(_config)
+
+// ======================> psion_custom_lcdc
+
+class psion_custom_lcdc :	public hd44780_device
+{
+
+public:
+	// construction/destruction
+	psion_custom_lcdc(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+
+	// hd44780_device overrides
+	virtual DECLARE_WRITE8_MEMBER(control_write);
+	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+};
+
+
+// ======================> psion_state
+
 class psion_state : public driver_device
 {
 public:
@@ -59,5 +85,8 @@ public:
 	DECLARE_WRITE8_MEMBER( io_w );
 	DECLARE_READ8_MEMBER( io_r );
 };
+
+// device type definition
+extern const device_type PSION_CUSTOM_LCDC;
 
 #endif	// _PSION_H_

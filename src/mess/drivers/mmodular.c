@@ -188,11 +188,10 @@ public:
 	DECLARE_DRIVER_INIT(polgar);
 };
 
-static const hd44780_interface chess_display =
+static HD44780_INTERFACE( chess_display )
 {
     2,                  // number of lines
-    16,                 // chars for line
-    NULL                // custom display layout
+    16                  // chars for line
 };
 
 static UINT8 convert_imputmask(UINT8 input)

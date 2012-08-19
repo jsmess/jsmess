@@ -316,11 +316,10 @@ static GFXDECODE_START( pc2000 )
 	GFXDECODE_ENTRY( "hd44780", 0x0000, hd44780_charlayout, 0, 1 )
 GFXDECODE_END
 
-static const hd44780_interface pc2000_display =
+static HD44780_INTERFACE( pc2000_display )
 {
 	2,					// number of lines
-	20,					// chars for line
-	NULL				// custom display layout
+	20					// chars for line
 };
 
 static MACHINE_CONFIG_START( pc2000, pc2000_state )

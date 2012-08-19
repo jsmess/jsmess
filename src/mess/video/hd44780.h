@@ -17,6 +17,9 @@
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+	
+#define HD44780_INTERFACE(name) \
+	const hd44780_interface (name) =
 
 // ======================> hd44780_interface
 
@@ -24,7 +27,6 @@ struct hd44780_interface
 {
 	UINT8 height;			// number of lines
 	UINT8 width;			// chars for line
-	const UINT8 *custom_layout;	// custom display layout (NULL for default)
 };
 
 // ======================> hd44780_device
@@ -36,14 +38,15 @@ class hd44780_device :	public device_t,
 public:
 	// construction/destruction
 	hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd44780_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock);
 
 	// device interface
-	DECLARE_WRITE8_MEMBER(control_write);
-	DECLARE_READ8_MEMBER(control_read);
-	DECLARE_WRITE8_MEMBER(data_write);
-	DECLARE_READ8_MEMBER(data_read);
+	virtual DECLARE_WRITE8_MEMBER(control_write);
+	virtual DECLARE_READ8_MEMBER(control_read);
+	virtual DECLARE_WRITE8_MEMBER(data_write);
+	virtual DECLARE_READ8_MEMBER(data_read);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -51,9 +54,8 @@ protected:
 	virtual void device_reset();
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 	virtual void device_config_complete();
-	virtual void device_validity_check(validity_checker &valid) const;
 
-private:
+protected:
 	// internal helper
 	void set_busy_flag(UINT16 usec);
 	void update_ac(void);

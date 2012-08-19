@@ -37,21 +37,9 @@ void hd44780_device::device_config_complete()
 	else
 	{
 		height = width = 0;
-		custom_layout = NULL;
 	}
 }
 
-//-------------------------------------------------
-//  device_validity_check - perform validity checks
-//  on this device
-//-------------------------------------------------
-
-void hd44780_device::device_validity_check(validity_checker &valid) const
-{
-	// display with more than 2 lines requires a layout
-	if ((custom_layout == NULL && height > 2) || height == 0 || width == 0)
-		mame_printf_error("Configured with invalid parameter\n");
-}
 
 //**************************************************************************
 //  live device
@@ -66,6 +54,10 @@ hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
+hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock) :
+	device_t(mconfig, type, name, tag, owner, clock)
+{
+}
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -170,21 +162,16 @@ UINT32 hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 				UINT8 line_size = (m_num_line) ? 40 : 80;
 				INT8 char_pos = line_base + i;
 
-				// if specified uses the custom layout
-				if (custom_layout != NULL)
-					char_pos = custom_layout[l*width + i];
-				else
-				{
-					char_pos += m_disp_shift;
+				char_pos += m_disp_shift;
 
-					while (char_pos < 0 || (char_pos - line_base) >= line_size)
-					{
-						if (char_pos < 0)
-							char_pos += line_size;
-						else if (char_pos - line_base >= line_size)
-							char_pos -= line_size;
-					}
+				while (char_pos < 0 || (char_pos - line_base) >= line_size)
+				{
+					if (char_pos < 0)
+						char_pos += line_size;
+					else if (char_pos - line_base >= line_size)
+						char_pos -= line_size;
 				}
+
 				for (int y=0; y<8; y++)
 					for (int x=0; x<5; x++)
 						if (m_ddram[char_pos] <= 0x10)
@@ -224,7 +211,6 @@ UINT32 hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 			}
 
 	return 0;
-
 }
 
 WRITE8_MEMBER(hd44780_device::control_write)
@@ -233,8 +219,7 @@ WRITE8_MEMBER(hd44780_device::control_write)
 	{
 		m_ac_mode = 0;
 		m_ac = data & 0x7f;
-		if (data != 0x81) // not in datasheet spec
-			m_cursor_pos = m_ac;
+		m_cursor_pos = m_ac;
 		set_busy_flag(37);
 	}
 	else if (BIT(data, 6)) // Set CGRAM Address

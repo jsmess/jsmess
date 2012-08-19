@@ -188,11 +188,10 @@ static SCREEN_UPDATE_IND16( alesis )
 	return 0;
 }
 
-static const hd44780_interface hr16_display =
+static HD44780_INTERFACE( hr16_display )
 {
 	2,					// number of lines
-	16,					// chars for line
-	NULL				// custom display layout
+	16					// chars for line
 };
 
 static const cassette_interface hr16_cassette_interface =
