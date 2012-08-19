@@ -816,7 +816,7 @@ void huc6270_device::device_start()
 
 	assert( ! m_irq_changed.isnull() );
 
-	m_vram = (UINT16 *)machine().memory().region_alloc( tag(), vram_size, 1, ENDIANNESS_LITTLE )->base();
+	m_vram = (UINT16 *)(machine().memory().region_alloc( tag(), vram_size, 1, ENDIANNESS_LITTLE ));
 }
 
 
