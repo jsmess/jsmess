@@ -21165,7 +21165,7 @@
 	</software>
 
 	<software name="mjrpg">
-		<description>Mahjong RPG Dora Dora Dora (Jpn)</description>
+		<description>Mahjong RPG Dora³ (Jpn)</description>
 		<year>1991</year>
 		<publisher>Natsume</publisher>
 		<info name="serial" value="NAT-3R"/>
@@ -23131,7 +23131,7 @@
 		</part>
 	</software>
 
-	<software name="miraclep">
+	<software name="miraclep" supported="no">
 		<description>The Miracle Piano Teaching System (USA)</description>
 		<year>1990</year>
 		<publisher>The Software Toolworks</publisher>
@@ -23152,7 +23152,7 @@
 		</part>
 	</software>
 
-	<software name="miraclepf" cloneof="miraclep">
+	<software name="miraclepf" cloneof="miraclep" supported="no">
 		<description>The Miracle Piano Teaching System (Fra)</description>
 		<year>1991</year>
 		<publisher>Mindscape</publisher>
@@ -23239,7 +23239,7 @@
 	</software>
 
 	<software name="missimpu" cloneof="missimp">
-		<description>Mission - Impossible (USA)</description>
+		<description>Mission: Impossible (USA)</description>
 		<year>1990</year>
 		<publisher>Ultra Games</publisher>
 		<info name="serial" value="NES-U4-USA"/>
@@ -23257,7 +23257,7 @@
 	</software>
 
 	<software name="missimpf" cloneof="missimp">
-		<description>Mission - Impossible (Fra)</description>
+		<description>Mission: Impossible (Fra)</description>
 		<year>1991</year>
 		<publisher>Palcom</publisher>
 		<info name="serial" value="NES-U4-FRA"/>
@@ -23275,7 +23275,7 @@
 	</software>
 
 	<software name="missimp">
-		<description>Mission - Impossible (Euro)</description>
+		<description>Mission: Impossible (Euro)</description>
 		<year>1991</year>
 		<publisher>Palcom</publisher>
 		<info name="serial" value="NES-U4 (SCN/NOE)"/>
@@ -23408,7 +23408,7 @@
 		</part>
 	</software>
 
-	<software name="moejudo">
+	<software name="moejudo" supported="partial">
 		<description>Moero!! Juudou Warriors (Jpn)</description>
 		<year>1990</year>
 		<publisher>Jaleco</publisher>
@@ -23806,7 +23806,7 @@
 		</part>
 	</software>
 
-	<software name="mother" cloneof="earthbnd">
+	<software name="mother" cloneof="earthbnd" supported="partial">
 		<description>Mother (Jpn)</description>
 		<year>1989</year>
 		<publisher>Nintendo</publisher>
@@ -24022,8 +24022,8 @@
 		</part>
 	</software>
 
-	<software name="mutantv">
-		<description>The Mutant Virus - Crisis in a Computer World (USA)</description>
+	<software name="mutantv" supported="no">
+		<description>The Mutant Virus (USA)</description>
 		<year>1992</year>
 		<publisher>American Softworks</publisher>
 		<info name="serial" value="NES-6M-USA"/>
@@ -24040,7 +24040,7 @@
 		</part>
 	</software>
 
-	<software name="mylife">
+	<software name="mylife" supported="partial">
 		<description>My Life My Love - Boku no Yume - Watashi no Negai (Jpn)</description>
 		<year>1991</year>
 		<publisher>Banpresto</publisher>
@@ -24306,7 +24306,8 @@
 		</part>
 	</software>
 
-	<software name="nantbb">
+<!-- Mirroring issues? -->
+	<software name="nantbb" supported="partial">
 		<description>Nantettatte!! Baseball (Jpn)</description>
 		<year>1990</year>
 		<publisher>Sunsoft</publisher>
@@ -44125,7 +44126,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="mmansioni" cloneof="mmansion">
-		<description>Maniac Mansion (Italy)</description>
+		<description>Maniac Mansion (Ita)</description>
 		<year>1992</year>
 		<publisher>Jaleco</publisher>
 		<part name="cart" interface="nes_cart">
@@ -44410,8 +44411,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="miraclepg" cloneof="miraclep">
-		<description>The Miracle Piano Teaching System (Germany)</description>
+	<software name="miraclepg" cloneof="miraclep" supported="no">
+		<description>The Miracle Piano Teaching System (Ger)</description>
 		<year>1991</year>
 		<publisher>Mindscape</publisher>
 		<part name="cart" interface="nes_cart">
@@ -44434,6 +44435,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="ミシシッピー殺人事件"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="JALECO-JF-11" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="prg" size="131072">
 				<rom name="mississippi satsujin jiken (japan) (rev a).prg" size="131072" crc="c0605945" sha1="5505e239b1317816b3608f973bf46117084216cc" offset="00000" status="baddump" />
 			</dataarea>
@@ -44684,7 +44686,8 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="nantbbs" cloneof="nantbb">
+<!-- Mirroring issues? -->
+	<software name="nantbbs" cloneof="nantbb" supported="partial">
 		<description>Nantettatte!! Baseball (Jpn, Sample)</description>
 		<year>1990</year>
 		<publisher>Sunsoft</publisher>
@@ -45051,7 +45054,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 	<software name="piratesg" cloneof="pirates">
-		<description>Pirates! (Germany)</description>
+		<description>Pirates! (Ger)</description>
 		<year>1991</year>
 		<publisher>Palcom</publisher>
 		<part name="cart" interface="nes_cart">
@@ -48512,7 +48515,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 	</software>
 
 <!-- These have wrong CHR order, probably. Bad dump or different board? I have to investigate....  -->
-	<software name="mnq1" cloneof="mnq">
+	<software name="mnq1" cloneof="mnq" supported="no">
 		<description>Mei Nu Quan (Tw, Alt)</description>
 		<year>1990</year>
 		<publisher>Sachen</publisher>
@@ -48530,7 +48533,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="mnq2" cloneof="mnq">
+	<software name="mnq2" cloneof="mnq" supported="no">
 		<description>Mei Nu Quan (Tw, Alt 2)</description>
 		<year>1990</year>
 		<publisher>Sachen</publisher>
@@ -48556,7 +48559,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<info name="alt_title" value="Honey Peach"/>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="UNL-SACHEN-74LS374N-A" /> <!-- is this correct? -->
-			<feature name="mirroring" value="horizontal" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="131072">
 				<rom name="honey_peach.chr" size="131072" crc="8c125ea5" sha1="6b145bc221fca5c911e372b401c6579e45606daa" offset="00000" status="baddump" />
 			</dataarea>
@@ -49334,7 +49337,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		</part>
 	</software>
 
-	<software name="mstrshot">
+	<software name="mstrshot" supported="no">
 		<description>Master Shooter (Asia)</description>
 		<year>1993</year>
 		<publisher>NTDEC</publisher>
@@ -53997,6 +54000,7 @@ preliminary proto for the PAL version, still running on NTSC systems) or the gfx
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="NES-NROM-256" />
+			<feature name="mirroring" value="vertical" />
 			<dataarea name="chr" size="8192">
 				<rom name="multiplication.chr" size="8192" crc="fbeefede" sha1="e91ae0a9fe56075b2db8349b7c2d1f73368a6ebe" offset="00000" status="baddump" />
 			</dataarea>
@@ -63544,7 +63548,7 @@ resulting in tons of glitches? -->
 	</software>
 
 	<software name="missimph" cloneof="missimp">
-		<description>Mission - Impossible (Pirate)</description>
+		<description>Mission: Impossible (Pirate)</description>
 		<year>19??</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="nes_cart">
@@ -66304,7 +66308,7 @@ be better to redump them properly. -->
 		</part>
 	</software>
 
-	<software name="mkv96">
+	<software name="mkv96" supported="partial">
 		<description>Mortal Kombat V1996 Turbo 30 Peoples (Asia)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

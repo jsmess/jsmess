@@ -1853,13 +1853,13 @@ Titles, publishers and release dates taken from:
 		<description>TanTan</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cass" interface="x1_cass">
+		<part name="cass1" interface="x1_cass">
 			<dataarea name="side1" size="258976">
 				<rom name="tt-a.tap" size="258976" crc="82fa39f3" sha1="f4dd12274e1ec814a1c6e1fc1498a1eb9e5a996c" offset="0" />
 			</dataarea>
 		</part>
 
-		<part name="cass" interface="x1_cass">
+		<part name="cass2" interface="x1_cass">
 			<dataarea name="side2" size="258879">
 				<rom name="tt-b.tap" size="258879" crc="2b8f40ff" sha1="f90ec9d3616e2b84296fb826000222b2f4603525" offset="0" />
 			</dataarea>

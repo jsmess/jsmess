@@ -15,17 +15,17 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cass1" interface="pc8801_cass">
 			<dataarea name="cass" size="114341">
-				<rom name="pac-land_a.t88" size="114341" crc="42e990c5" sha1="46cbd8e91421ff701e9f0e98444a27a526e33867"/>
+				<rom name="pac-land_a.t88" size="114341" crc="42e990c5" sha1="46cbd8e91421ff701e9f0e98444a27a526e33867" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="pc8801_cass">
 			<dataarea name="cass" size="106404">
-				<rom name="pac-land_b.t88" size="106404" crc="0c8a5a96" sha1="ea71b6f51c8cd2fdcd7d62e31fbd5ad356df8168"/>
+				<rom name="pac-land_b.t88" size="106404" crc="0c8a5a96" sha1="ea71b6f51c8cd2fdcd7d62e31fbd5ad356df8168" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass3" interface="pc8801_cass">
 			<dataarea name="cass" size="110004">
-				<rom name="pac-land_c.t88" size="110004" crc="5c29c64a" sha1="4e1a9dc18a026be4add67db8724ef05da1275e1a"/>
+				<rom name="pac-land_c.t88" size="110004" crc="5c29c64a" sha1="4e1a9dc18a026be4add67db8724ef05da1275e1a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass4" interface="pc8801_cass">
@@ -46,7 +46,7 @@ NOTE: This list is here only to document available dumps and it's not used (yet)
 		<info name="alt_title" value="ザ・ブラックオニキス"/>
 		<part name="cass1" interface="pc8801_cass">
 			<dataarea name="cass" size="64295">
-				<rom name="the_black_onyx_v80.t88" size="64295" crc="3671cfd9" sha1="5e7289c85cd12cb3012533077ceb4355cc151349"/>
+				<rom name="the_black_onyx_v80.t88" size="64295" crc="3671cfd9" sha1="5e7289c85cd12cb3012533077ceb4355cc151349" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="pc8801_cass">

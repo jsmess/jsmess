@@ -2264,10 +2264,10 @@ static const floppy_interface pc88_floppy_interface =
 
 static const cassette_interface pc88_cassette_interface =
 {
-	cassette_default_formats,
+	cassette_default_formats,	// we need T88 format support!
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
-	NULL,
+	"pc8801_cass",
 	NULL
 };
 
@@ -2683,6 +2683,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, pc8801_upd1990a_intf)
 	//MCFG_CENTRONICS_PRINTER_ADD("centronics", standard_centronics)
 	MCFG_CASSETTE_ADD(CASSETTE_TAG, pc8801_cassette_interface)
+	MCFG_SOFTWARE_LIST_ADD("tape_list","pc8801_cass")
 
 	MCFG_I8251_ADD(I8251_TAG, uart_intf)
 
