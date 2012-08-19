@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "cpu/mcs51/mcs51.h"
+#include "imagedev/cassette.h"
 #include "video/hd44780.h"
 #include "rendlay.h"
 
@@ -19,7 +20,11 @@ class alesis_state : public driver_device
 {
 public:
 	alesis_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag) { }
+		: driver_device(mconfig, type, tag),
+		  m_cassette(*this, CASSETTE_TAG)
+		{ }
+
+	optional_device<cassette_image_device> m_cassette;
 
 	virtual void palette_init();
 	virtual void machine_reset();
@@ -28,6 +33,8 @@ public:
 	DECLARE_WRITE8_MEMBER( led_w );
 	DECLARE_WRITE8_MEMBER( kb_matrix_w );
 	DECLARE_READ8_MEMBER( kb_r );
+	DECLARE_READ8_MEMBER( p3_r );
+	DECLARE_WRITE8_MEMBER( p3_w );
 
 	UINT8 m_kb_matrix;
 };
@@ -70,6 +77,16 @@ WRITE8_MEMBER( alesis_state::led_w )
 	output_set_value("midi_led",  data & 0x80 ? 0 : 1);
 }
 
+READ8_MEMBER( alesis_state::p3_r )
+{
+	return (m_cassette->input() > 0.01) ? 0x00 : 0x08;
+}
+
+WRITE8_MEMBER( alesis_state::p3_w )
+{
+	m_cassette->output(data & 0x04 ? -1.0 : +1.0);
+}
+
 static ADDRESS_MAP_START(hr16_mem, AS_PROGRAM, 8, alesis_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -82,6 +99,7 @@ static ADDRESS_MAP_START(hr16_io, AS_IO, 8, alesis_state)
 	AM_RANGE(0x0007, 0x0007) AM_DEVREADWRITE("hd44780", hd44780_device, data_read, data_write)
 	AM_RANGE(0x0004, 0x0004) AM_WRITE(led_w)
 	AM_RANGE(0x0008, 0x0008) AM_WRITE(kb_matrix_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(p3_r, p3_w)
 	AM_RANGE(0x8000, 0xffff) AM_RAM		/* 32Kx8 SRAM */
 ADDRESS_MAP_END
 
@@ -177,6 +195,15 @@ static const hd44780_interface hr16_display =
 	NULL				// custom display layout
 };
 
+static const cassette_interface hr16_cassette_interface =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_STOPPED),
+	"hr16_cass",
+	NULL
+};
+
 static MACHINE_CONFIG_START( hr16, alesis_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",I8031, XTAL_12MHz)
@@ -193,6 +220,8 @@ static MACHINE_CONFIG_START( hr16, alesis_state )
 	MCFG_SCREEN_UPDATE_DEVICE("hd44780", hd44780_device, screen_update)
 
 	MCFG_PALETTE_LENGTH(2)
+
+	MCFG_CASSETTE_ADD( CASSETTE_TAG, hr16_cassette_interface )
 
 	MCFG_HD44780_ADD("hd44780", hr16_display)
 MACHINE_CONFIG_END
