@@ -9,7 +9,8 @@
 
 #include "emu.h"
 #include "cpu/v810/v810.h"
-#include "video/vdc.h"
+#include "video/huc6260.h"
+#include "video/huc6270.h"
 
 
 class pcfx_state : public driver_device
@@ -39,8 +40,8 @@ static ADDRESS_MAP_START( pcfx_io, AS_IO, 32, pcfx_state )
 	AM_RANGE( 0x00000100, 0x000001FF ) AM_NOP	/* HuC6230 */
 	AM_RANGE( 0x00000200, 0x000002FF ) AM_NOP	/* HuC6271 */
 	AM_RANGE( 0x00000300, 0x000003FF ) AM_NOP	/* HuC6261 */
-	AM_RANGE( 0x00000400, 0x000004FF ) AM_NOP	/* HuC6270-A */
-	AM_RANGE( 0x00000500, 0x000005FF ) AM_NOP	/* HuC6270-B */
+	AM_RANGE( 0x00000400, 0x000004FF ) AM_DEVREADWRITE8( "huc6270_a", huc6270_device, read, write, 0xff )	/* HuC6270-A */
+	AM_RANGE( 0x00000500, 0x000005FF ) AM_DEVREADWRITE8( "huc6270_b", huc6270_device, read, write, 0xff )	/* HuC6270-B */
 	AM_RANGE( 0x00000600, 0x000006FF ) AM_NOP	/* HuC6272 */
 	AM_RANGE( 0x00000C80, 0x00000C83 ) AM_NOP
 	AM_RANGE( 0x00000E00, 0x00000EFF ) AM_NOP
@@ -51,6 +52,25 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pcfx )
 INPUT_PORTS_END
+
+
+static WRITE_LINE_DEVICE_HANDLER( pcfx_irq_changed )
+{
+}
+
+
+static const huc6270_interface pcfx_huc6270_a_config =
+{
+	0x20000,
+	DEVCB_LINE(pcfx_irq_changed),
+};
+
+
+static const huc6270_interface pcfx_huc6270_b_config =
+{
+	0x20000,
+	DEVCB_LINE(pcfx_irq_changed),
+};
 
 
 void pcfx_state::machine_reset()
@@ -64,13 +84,17 @@ UINT32 pcfx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 }
 
 static MACHINE_CONFIG_START( pcfx, pcfx_state )
-	MCFG_CPU_ADD( "maincpu", V810, 21477270 )
+	MCFG_CPU_ADD( "maincpu", V810, XTAL_21_4772MHz )
 	MCFG_CPU_PROGRAM_MAP( pcfx_mem)
 	MCFG_CPU_IO_MAP( pcfx_io)
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_UPDATE_DRIVER(pcfx_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(21477270/2, VDC_WPF, 70, 70 + 512 + 32, VDC_LPF, 14, 14+242)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, HUC6260_WPF, 64, 64 + 1024 + 64, HUC6260_LPF, 18, 18 + 242)
+
+	MCFG_HUC6270_ADD( "huc6270_a", pcfx_huc6270_a_config )
+	MCFG_HUC6270_ADD( "huc6270_b", pcfx_huc6270_b_config )
+
 MACHINE_CONFIG_END
 
 
