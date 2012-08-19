@@ -135,6 +135,7 @@ private:
 	int m_sprite_row_index;
 	UINT16	m_sprite_row[1024];
 	UINT16	*m_vram;
+	UINT16	m_vram_mask;
 
 	const static UINT8 vram_increments[4];
 };

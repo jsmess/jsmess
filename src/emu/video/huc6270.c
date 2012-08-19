@@ -122,11 +122,11 @@ inline void huc6270_device::fetch_bat_tile_row()
 	UINT16 bat_data, data1, data2, data3, data4, tile_palette;
 	int i;
 
-	bat_data = m_vram[ m_bat_address % vram_size ];
+	bat_data = m_vram[ m_bat_address & m_vram_mask ];
 	tile_palette = ( bat_data >> 8 ) & 0xF0;
-	data1 = m_vram[ ( ( ( bat_data & 0x0FFF ) << 4 ) + m_bat_row + 0 ) % vram_size ];
+	data1 = m_vram[ ( ( ( bat_data & 0x0FFF ) << 4 ) + m_bat_row + 0 ) & m_vram_mask ];
 	data2 = ( data1 >> 7 ) & 0x1FE;
-	data3 = m_vram[ ( ( ( bat_data & 0x0FFF ) << 4 ) + m_bat_row + 8 ) % vram_size ];
+	data3 = m_vram[ ( ( ( bat_data & 0x0FFF ) << 4 ) + m_bat_row + 8 ) & m_vram_mask ];
 	data4 = ( data3 >> 5 ) & 0x7F8;
 	data3 <<= 2;
 
@@ -166,23 +166,23 @@ void huc6270_device::add_sprite( int index, int x, int pattern, int line, int fl
 		{
 			if ( ! sat_lsb )
 			{
-				b0 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x00 ) % vram_size ];
-				b1 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x10 ) % vram_size ] << 1;
+				b0 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x00 ) & m_vram_mask ];
+				b1 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x10 ) & m_vram_mask ] << 1;
 			}
 			else
 			{
-				b0 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x20 ) % vram_size ];
-				b1 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x30 ) % vram_size ] << 1;
+				b0 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x20 ) & m_vram_mask ];
+				b1 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x30 ) & m_vram_mask ] << 1;
 			}
 			b2 = 0;
 			b3 = 0;
 		}
 		else
 		{
-			b0 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x00 ) % vram_size ];
-			b1 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x10 ) % vram_size ] << 1;
-			b2 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x20 ) % vram_size ] << 2;
-			b3 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x30 ) % vram_size ] << 3;
+			b0 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x00 ) & m_vram_mask ];
+			b1 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x10 ) & m_vram_mask ] << 1;
+			b2 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x20 ) & m_vram_mask ] << 2;
+			b3 = m_vram[ ( ( pattern * 0x40 ) + ( line & 0x0F ) + 0x30 ) & m_vram_mask ] << 3;
 		}
 
 		for ( j = 15; j >= 0; j-- )
@@ -317,10 +317,10 @@ inline void huc6270_device::handle_vblank()
 			if (LOG) logerror("SATB transfer from %05x\n", m_dvssr << 1 );
 			for ( i = 0; i < 4 * 64; i += 4 )
 			{
-				m_sat[i + 0] = m_vram[ ( m_dvssr + i + 0 ) % vram_size ] & 0x03FF;
-				m_sat[i + 1] = m_vram[ ( m_dvssr + i + 1 ) % vram_size ] & 0x03FF;
-				m_sat[i + 2] = m_vram[ ( m_dvssr + i + 2 ) % vram_size ] & 0x07FF;
-				m_sat[i + 3] = m_vram[ ( m_dvssr + i + 3 ) % vram_size ];
+				m_sat[i + 0] = m_vram[ ( m_dvssr + i + 0 ) & m_vram_mask ] & 0x03FF;
+				m_sat[i + 1] = m_vram[ ( m_dvssr + i + 1 ) & m_vram_mask ] & 0x03FF;
+				m_sat[i + 2] = m_vram[ ( m_dvssr + i + 2 ) & m_vram_mask ] & 0x07FF;
+				m_sat[i + 3] = m_vram[ ( m_dvssr + i + 3 ) & m_vram_mask ];
 			}
 			m_dvssr_written = 0;
 
@@ -521,8 +521,8 @@ WRITE_LINE_MEMBER( huc6270_device::vsync_changed )
 
 				if (LOG) logerror("doing dma sour = %04x, desr = %04x, lenr = %04x\n", m_sour, m_desr, m_lenr );
 				do {
-					UINT16 data = m_vram[ m_sour % vram_size ];
-					m_vram[ m_desr % vram_size ] = data;
+					UINT16 data = m_vram[ m_sour & m_vram_mask ];
+					m_vram[ m_desr & m_vram_mask ] = data;
 					m_sour += sour_inc;
 					m_desr += desr_inc;
 					m_lenr -= 1;
@@ -608,7 +608,7 @@ READ8_MEMBER( huc6270_device::read )
 			if ( m_register_index == VxR )
 			{
 				m_marr += vram_increments[ ( m_cr >> 11 ) & 3 ];
-				m_vrr = m_vram[ m_marr % vram_size ];
+				m_vrr = m_vram[ m_marr & m_vram_mask ];
 			}
 			break;
 	}
@@ -635,7 +635,7 @@ WRITE8_MEMBER( huc6270_device::write )
 
 				case MARR:		/* memory address read register LSB */
 					m_marr = ( m_marr & 0xFF00 ) | data;
-					m_vrr = m_vram[ m_marr % vram_size ];
+					m_vrr = m_vram[ m_marr & m_vram_mask ];
 					break;
 
 				case VxR:		/* vram write data LSB */
@@ -724,12 +724,12 @@ WRITE8_MEMBER( huc6270_device::write )
 
 				case MARR:		/* memory address read register MSB */
 					m_marr = ( m_marr & 0x00FF ) | ( data << 8 );
-					m_vrr = m_vram[ m_marr % vram_size ];
+					m_vrr = m_vram[ m_marr & m_vram_mask ];
 					break;
 
 				case VxR:		/* vram write data MSB */
 					m_vwr = ( m_vwr & 0x00FF ) | ( data << 8 );
-					m_vram[ m_mawr % vram_size ] = m_vwr;
+					m_vram[ m_mawr & m_vram_mask ] = m_vwr;
 					m_mawr += vram_increments[ ( m_cr >> 11 ) & 3 ];
 					break;
 
@@ -816,7 +816,8 @@ void huc6270_device::device_start()
 
 	assert( ! m_irq_changed.isnull() );
 
-	m_vram = (UINT16 *)machine().memory().region_alloc( tag(), vram_size, 2, ENDIANNESS_LITTLE )->base();
+	m_vram = (UINT16 *)machine().memory().region_alloc( tag(), vram_size, 1, ENDIANNESS_LITTLE )->base();
+	m_vram_mask = ( vram_size >> 1 ) - 1;
 }
 
 
