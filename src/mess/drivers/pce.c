@@ -63,6 +63,8 @@ Super System Card:
 #include "sound/c6280.h"
 #include "sound/cdda.h"
 #include "sound/msm5205.h"
+#include "video/huc6270.h"
+#include "video/huc6202.h"
 
 
 static ADDRESS_MAP_START( pce_mem , AS_PROGRAM, 8, pce_state )
@@ -439,6 +441,225 @@ static MACHINE_CONFIG_START( sgx, pce_state )
 	MCFG_FRAGMENT_ADD( pce_cdslot )
 MACHINE_CONFIG_END
 
+
+
+static ADDRESS_MAP_START( pce_mem_new , AS_PROGRAM, 8, pce_state )
+	AM_RANGE( 0x000000, 0x07FFFF) AM_ROMBANK("bank1")
+	AM_RANGE( 0x080000, 0x087FFF) AM_ROMBANK("bank2")
+	AM_RANGE( 0x088000, 0x0CFFFF) AM_ROMBANK("bank3")
+	AM_RANGE( 0x0D0000, 0x0FFFFF) AM_ROMBANK("bank4")
+	AM_RANGE( 0x100000, 0x10FFFF) AM_RAM AM_SHARE("cd_ram")
+	AM_RANGE( 0x110000, 0x1EDFFF) AM_NOP
+	AM_RANGE( 0x1EE000, 0x1EE7FF) AM_ROMBANK("bank10") AM_WRITE(pce_cd_bram_w )
+	AM_RANGE( 0x1EE800, 0x1EFFFF) AM_NOP
+	AM_RANGE( 0x1F0000, 0x1F1FFF) AM_RAM AM_MIRROR(0x6000) AM_SHARE("user_ram")
+	AM_RANGE( 0x1FE000, 0x1FE3FF) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
+	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_DEVREADWRITE( "huc6260", huc6260_device, read, write )
+	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE_LEGACY( C6280_TAG, c6280_r, c6280_w )
+	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE_LEGACY( h6280_timer_r, h6280_timer_w )
+	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE( mess_pce_joystick_r, mess_pce_joystick_w )
+	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE_LEGACY( h6280_irq_status_r, h6280_irq_status_w )
+	AM_RANGE( 0x1FF800, 0x1FFBFF) AM_READWRITE( pce_cd_intf_r, pce_cd_intf_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( pce_io_new , AS_IO, 8, pce_state )
+	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6270", huc6270_device, read, write )
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( sgx_mem_new , AS_PROGRAM, 8, pce_state )
+	AM_RANGE( 0x000000, 0x07FFFF) AM_ROMBANK("bank1")
+	AM_RANGE( 0x080000, 0x087FFF) AM_ROMBANK("bank2")
+	AM_RANGE( 0x088000, 0x0CFFFF) AM_ROMBANK("bank3")
+	AM_RANGE( 0x0D0000, 0x0FFFFF) AM_ROMBANK("bank4")
+	AM_RANGE( 0x100000, 0x10FFFF) AM_RAM AM_SHARE("cd_ram")
+	AM_RANGE( 0x110000, 0x1EDFFF) AM_NOP
+	AM_RANGE( 0x1EE000, 0x1EE7FF) AM_ROMBANK("bank10") AM_WRITE(pce_cd_bram_w )
+	AM_RANGE( 0x1EE800, 0x1EFFFF) AM_NOP
+	AM_RANGE( 0x1F0000, 0x1F7FFF) AM_RAM AM_SHARE("user_ram")
+	AM_RANGE( 0x1FE000, 0x1FE007) AM_DEVREADWRITE( "huc6270_0", huc6270_device, read, write ) AM_MIRROR(0x03E0)
+	AM_RANGE( 0x1FE008, 0x1FE00F) AM_DEVREADWRITE( "huc6202", huc6202_device, read, write ) AM_MIRROR(0x03E0)
+	AM_RANGE( 0x1FE010, 0x1FE017) AM_DEVREADWRITE( "huc6270_1", huc6270_device, read, write ) AM_MIRROR(0x03E0)
+	AM_RANGE( 0x1FE400, 0x1FE7FF) AM_DEVREADWRITE( "huc6260", huc6260_device, read, write )
+	AM_RANGE( 0x1FE800, 0x1FEBFF) AM_DEVREADWRITE_LEGACY(C6280_TAG, c6280_r, c6280_w )
+	AM_RANGE( 0x1FEC00, 0x1FEFFF) AM_READWRITE_LEGACY(h6280_timer_r, h6280_timer_w )
+	AM_RANGE( 0x1FF000, 0x1FF3FF) AM_READWRITE(mess_pce_joystick_r, mess_pce_joystick_w )
+	AM_RANGE( 0x1FF400, 0x1FF7FF) AM_READWRITE_LEGACY(h6280_irq_status_r, h6280_irq_status_w )
+	AM_RANGE( 0x1FF800, 0x1FFBFF) AM_READWRITE(pce_cd_intf_r, pce_cd_intf_w )
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( sgx_io_new , AS_IO, 8, pce_state )
+	AM_RANGE( 0x00, 0x03) AM_DEVREADWRITE( "huc6202", huc6202_device, io_read, io_write )
+ADDRESS_MAP_END
+
+
+UINT32 pce_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	m_huc6260->video_update( bitmap, cliprect );
+	return 0;
+}
+
+
+static WRITE_LINE_DEVICE_HANDLER( pce_irq_changed )
+{
+	cputag_set_input_line( device->machine(), "maincpu", 0, state);
+}
+
+
+static const huc6270_interface pce_huc6270_config =
+{
+	0x10000,
+	DEVCB_LINE(pce_irq_changed)
+};
+
+
+static const huc6260_interface pce_huc6260_config =
+{
+	"screen",
+	DEVCB_DEVICE_MEMBER16( "huc6270", huc6270_device, next_pixel ),
+	DEVCB_DEVICE_MEMBER16( "huc6270", huc6270_device, time_until_next_event ),
+	DEVCB_DEVICE_LINE_MEMBER( "huc6270", huc6270_device, vsync_changed ),
+	DEVCB_DEVICE_LINE_MEMBER( "huc6270", huc6270_device, hsync_changed )
+};
+
+
+static const huc6270_interface sgx_huc6270_0_config =
+{
+	0x10000,
+	DEVCB_LINE(pce_irq_changed)
+};
+
+
+static const huc6270_interface sgx_huc6270_1_config =
+{
+	0x10000,
+	DEVCB_LINE(pce_irq_changed)
+};
+
+
+static const huc6202_interface sgx_huc6202_config =
+{
+	DEVCB_DEVICE_MEMBER16( "huc6270_0", huc6270_device, next_pixel ),
+	DEVCB_DEVICE_MEMBER16( "huc6270_0", huc6270_device, time_until_next_event ),
+	DEVCB_DEVICE_LINE_MEMBER( "huc6270_0", huc6270_device, vsync_changed ),
+	DEVCB_DEVICE_LINE_MEMBER( "huc6270_0", huc6270_device, hsync_changed ),
+	DEVCB_DEVICE_MEMBER( "huc6270_0", huc6270_device, read ),
+	DEVCB_DEVICE_MEMBER( "huc6270_0", huc6270_device, write ),
+	DEVCB_DEVICE_MEMBER16( "huc6270_1", huc6270_device, next_pixel ),
+	DEVCB_DEVICE_MEMBER16( "huc6270_1", huc6270_device, time_until_next_event ),
+	DEVCB_DEVICE_LINE_MEMBER( "huc6270_1", huc6270_device, vsync_changed ),
+	DEVCB_DEVICE_LINE_MEMBER( "huc6270_1", huc6270_device, hsync_changed ),
+	DEVCB_DEVICE_MEMBER( "huc6270_1", huc6270_device, read ),
+	DEVCB_DEVICE_MEMBER( "huc6270_1", huc6270_device, write ),
+};
+
+
+static const huc6260_interface sgx_huc6260_config =
+{
+	"screen",
+	DEVCB_DEVICE_MEMBER16( "huc6202", huc6202_device, next_pixel ),
+	DEVCB_DEVICE_MEMBER16( "huc6202", huc6202_device, time_until_next_event ),
+	DEVCB_DEVICE_LINE_MEMBER( "huc6202", huc6202_device, vsync_changed ),
+	DEVCB_DEVICE_LINE_MEMBER( "huc6202", huc6202_device, hsync_changed )
+};
+
+static MACHINE_CONFIG_START( pce_common_new, pce_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
+	MCFG_CPU_PROGRAM_MAP(pce_mem_new)
+	MCFG_CPU_IO_MAP(pce_io_new)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	MCFG_MACHINE_START( pce )
+	MCFG_MACHINE_RESET( mess_pce )
+
+    /* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, HUC6260_WPF, 64, 64 + 1024 + 64, HUC6260_LPF, 18, 18 + 242)
+	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
+
+	MCFG_PALETTE_LENGTH( HUC6260_PALETTE_SIZE )
+	MCFG_PALETTE_INIT( huc6260 )
+
+	MCFG_HUC6260_ADD( "huc6260", MAIN_CLOCK, pce_huc6260_config )
+	MCFG_HUC6270_ADD( "huc6270", pce_huc6270_config )
+ 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD(C6280_TAG, C6280, MAIN_CLOCK/6)
+	MCFG_SOUND_CONFIG(c6280_config)
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+
+	MCFG_SOUND_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
+	MCFG_SOUND_CONFIG( pce_cd_msm5205_interface )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 0.50 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 0.50 )
+
+	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( pce_new, pce_common_new )
+	MCFG_FRAGMENT_ADD( pce_cartslot )
+	MCFG_FRAGMENT_ADD( pce_cdslot )
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( tg16_new, pce_common_new )
+	MCFG_FRAGMENT_ADD( tg16_cartslot )
+	MCFG_FRAGMENT_ADD( pce_cdslot )
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( sgx_new, pce_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
+	MCFG_CPU_PROGRAM_MAP(sgx_mem_new)
+	MCFG_CPU_IO_MAP(sgx_io_new)
+	MCFG_QUANTUM_TIME(attotime::from_hz(60))
+
+	MCFG_MACHINE_START( pce )
+	MCFG_MACHINE_RESET( mess_pce )
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(MAIN_CLOCK, HUC6260_WPF, 64, 64 + 1024 + 64, HUC6260_LPF, 18, 18 + 242)
+	MCFG_SCREEN_UPDATE_DRIVER( pce_state, screen_update )
+
+	MCFG_PALETTE_LENGTH( HUC6260_PALETTE_SIZE )
+	MCFG_PALETTE_INIT( huc6260 )
+
+	MCFG_HUC6260_ADD( "huc6260", MAIN_CLOCK, sgx_huc6260_config )
+	MCFG_HUC6270_ADD( "huc6270_0", sgx_huc6270_0_config )
+	MCFG_HUC6270_ADD( "huc6270_1", sgx_huc6270_1_config )
+	MCFG_HUC6202_ADD( "huc6202", sgx_huc6202_config )
+ 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD(C6280_TAG, C6280, MAIN_CLOCK/6)
+	MCFG_SOUND_CONFIG(c6280_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)
+
+	MCFG_SOUND_ADD( "msm5205", MSM5205, PCE_CD_CLOCK / 6 )
+	MCFG_SOUND_CONFIG( pce_cd_msm5205_interface )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 0.00 )
+	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 0.00 )
+
+	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+
+	MCFG_FRAGMENT_ADD( sgx_cartslot )
+	MCFG_FRAGMENT_ADD( pce_cdslot )
+MACHINE_CONFIG_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -456,3 +677,12 @@ ROM_END
 CONS( 1987, pce,    0,      0,      pce,    pce, pce_state,     mess_pce,   "Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_SOUND)
 CONS( 1989, tg16,   pce,    0,      tg16,   pce, pce_state,     tg16,		 "Nippon Electronic Company", "TurboGrafx 16", GAME_IMPERFECT_SOUND)
 CONS( 1989, sgx,    pce,    0,      sgx,    pce, pce_state,     sgx,		 "Nippon Electronic Company", "SuperGrafx", GAME_IMPERFECT_SOUND)
+
+/* Experimental versions of drivers using newer but slower device implementation of the video chips */
+#define rom_pce_new rom_pce
+#define rom_tg16_new rom_pce
+#define rom_sgx_new rom_pce
+CONS( 1987, pce_new,    0,      0,      pce_new,    pce, pce_state,     mess_pce,   "Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_SOUND)
+CONS( 1989, tg16_new,   pce_new,    0,      tg16_new,   pce, pce_state,     tg16,        "Nippon Electronic Company", "TurboGrafx 16", GAME_IMPERFECT_SOUND)
+CONS( 1989, sgx_new,    pce_new,    0,      sgx_new,    pce, pce_state,     sgx,         "Nippon Electronic Company", "SuperGrafx", GAME_IMPERFECT_SOUND)
+
