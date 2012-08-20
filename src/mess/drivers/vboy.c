@@ -11,14 +11,10 @@
     - fix Affine rotation
     - per-game NVRAM hook-up (wariolnd, vleague, golf, others?)
     - boundh: game is way too fast
-    - boundh: death animation has missing gfxs
-    - innsmout: arrow OBJ graphics are misplaced;
     - marioten: title screen logo is misplaced if Mario completes his animation
     - panicbom: brightness 10 overflows
     - spaceinv: Taito logo only if you press the button, framebuffer?
     - spaceinv: missing shots
-    - ssquash: misplaced map;
-    - ssquash: gameplay seems busted;
     - vleague / vproyak: keeps going into auto pause with 100 usec timer?
     - wariolnd: brightness gets suddently darker during intro, CPU bug?
 
@@ -126,6 +122,16 @@ public:
 
 	void m_pcg_debug(UINT16 offset,UINT16 data,UINT16 mem_mask);
 
+	void put_obj(bitmap_ind16 &bitmap, int x, int y, UINT16 code, bool flipx, bool flipy, UINT8 pal);
+	void put_char(int x, int y, UINT16 code, bool flipx, bool flipy, UINT8 pal);
+	void fill_ovr_char(UINT16 code, bool flipx, bool flipy, UINT8 pal);
+	void fill_bg_map(int num, UINT16 scx, UINT16 scy);
+	void draw_bg_map(bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int mode, int gx, int gp, int gy, int mx, int mp, int my,int h, int w,
+	                                       UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right);
+	void draw_affine_map(bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int gx, int gp, int gy, int h, int w,
+	                                           UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right);
+	UINT8 display_world(int num, bitmap_ind16 &bitmap, bool right, int &cur_spt);
+
 };
 
 
@@ -146,7 +152,7 @@ static VIDEO_START( vboy )
 	state->m_world = state->m_bgmap + (0x1d800 >> 1);
 }
 
-static void put_obj(vboy_state *state, bitmap_ind16 &bitmap, int x, int y, UINT16 code, bool flipx, bool flipy, UINT8 pal)
+void vboy_state::put_obj(bitmap_ind16 &bitmap, int x, int y, UINT16 code, bool flipx, bool flipy, UINT8 pal)
 {
 	UINT16 data;
 	UINT8 yi, xi, dat, col;
@@ -154,9 +160,9 @@ static void put_obj(vboy_state *state, bitmap_ind16 &bitmap, int x, int y, UINT1
 	for (yi = 0; yi < 8; yi++)
 	{
 		if (!flipy)
-			 data = state->m_font[code * 8 + yi];
+			 data = m_font[code * 8 + yi];
 		else
-			 data = state->m_font[code * 8 + (7-yi)];
+			 data = m_font[code * 8 + (7-yi)];
 
 		for (xi = 0; xi < 8; xi++)
 		{
@@ -173,12 +179,12 @@ static void put_obj(vboy_state *state, bitmap_ind16 &bitmap, int x, int y, UINT1
 			col = (pal >> (dat*2)) & 3;
 
 			if (dat && res_x < 384 && res_y < 224)
-				bitmap.pix16((res_y), (res_x)) = state->machine().pens[col];
+				bitmap.pix16((res_y), (res_x)) = machine().pens[col];
 		}
 	}
 }
 
-static void put_char(vboy_state *state, int x, int y, UINT16 code, bool flipx, bool flipy, UINT8 pal)
+void vboy_state::put_char(int x, int y, UINT16 code, bool flipx, bool flipy, UINT8 pal)
 {
 	UINT16 data;
 	UINT8 yi, xi, dat;
@@ -187,9 +193,9 @@ static void put_char(vboy_state *state, int x, int y, UINT16 code, bool flipx, b
 	for (yi = 0; yi < 8; yi++)
 	{
 		if (!flipy)
-			 data = state->m_font[code * 8 + yi];
+			 data = m_font[code * 8 + yi];
 		else
-			 data = state->m_font[code * 8 + (7-yi)];
+			 data = m_font[code * 8 + (7-yi)];
 
 		for (xi = 0; xi < 8; xi++)
 		{
@@ -208,12 +214,12 @@ static void put_char(vboy_state *state, int x, int y, UINT16 code, bool flipx, b
 			if(dat == 0)
 				col = -1;
 
-			state->m_bg_map[res_y*0x1000+res_x] = col;
+			m_bg_map[res_y*0x1000+res_x] = col;
 		}
 	}
 }
 
-static void fill_ovr_char(vboy_state *state, UINT16 code, bool flipx, bool flipy, UINT8 pal)
+void vboy_state::fill_ovr_char(UINT16 code, bool flipx, bool flipy, UINT8 pal)
 {
 	UINT16 data;
 	UINT8 yi, xi, dat;
@@ -222,9 +228,9 @@ static void fill_ovr_char(vboy_state *state, UINT16 code, bool flipx, bool flipy
 	for (yi = 0; yi < 8; yi++)
 	{
 		if (!flipy)
-			 data = state->m_font[code * 8 + yi];
+			 data = m_font[code * 8 + yi];
 		else
-			 data = state->m_font[code * 8 + (7-yi)];
+			 data = m_font[code * 8 + (7-yi)];
 
 		for (xi = 0; xi < 8; xi++)
 		{
@@ -238,12 +244,12 @@ static void fill_ovr_char(vboy_state *state, UINT16 code, bool flipx, bool flipy
 			if(dat == 0)
 				col = -1;
 
-			state->m_ovr_map[yi*8+xi] = col;
+			m_ovr_map[yi*8+xi] = col;
 		}
 	}
 }
 
-static void fill_bg_map(vboy_state *state, int num, UINT16 scx, UINT16 scy)
+void vboy_state::fill_bg_map(int num, UINT16 scx, UINT16 scy)
 {
 	int x, y;
 	UINT8 stepx, stepy;
@@ -255,13 +261,14 @@ static void fill_bg_map(vboy_state *state, int num, UINT16 scx, UINT16 scy)
 		{
 			stepx = (x & 0x1c0) >> 6;
 			stepy = ((y & 0x1c0) >> 6) * (stepx+1);
-			UINT16 val = state->m_bgmap[(x & 0x3f) + (64 * (y & 0x3f)) + ((num + stepx + stepy) * 0x1000)];
-			put_char(state, x * 8, y * 8, val & 0x7ff, BIT(val,13), BIT(val,12), state->m_vip_regs.GPLT[(val >> 14) & 3]);
+			UINT16 val = m_bgmap[(x & 0x3f) + (64 * (y & 0x3f)) + ((num + stepx + stepy) * 0x1000)];
+			put_char(x * 8, y * 8, val & 0x7ff, BIT(val,13), BIT(val,12), m_vip_regs.GPLT[(val >> 14) & 3]);
 		}
 	}
 }
 
-static void draw_bg_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int mode, int gx, int gp, int gy, int mx, int mp, int my, int h, int w, UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right)
+void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int mode, int gx, int gp, int gy, int mx, int mp, int my, int h, int w,
+                                                   UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right)
 {
 	int x,y;
 
@@ -283,19 +290,20 @@ static void draw_bg_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vboy_pa
 			src_x += right ? -mp : mp;
 
 			if(ovr && (src_x > x_mask || src_y > y_mask || src_x < 0 || src_y < 0))
-				pix = state->m_ovr_map[(src_y & 7)*8+(src_x & 7)];
+				pix = m_ovr_map[(src_y & 7)*8+(src_x & 7)];
 			else
-				pix = state->m_bg_map[(src_y & y_mask)*0x1000+(src_x & x_mask)];
+				pix = m_bg_map[(src_y & y_mask)*0x1000+(src_x & x_mask)];
 
 			if(pix != -1)
 				if (y1>=0 && y1<224)
 					if (x1>=0 && x1<384)
-						bitmap.pix16(y1, x1) = state->machine().pens[pix & 3];
+						bitmap.pix16(y1, x1) = machine().pens[pix & 3];
 		}
 	}
 }
 
-static void draw_affine_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int gx, int gp, int gy, int h, int w, UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right)
+void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int gx, int gp, int gy, int h, int w,
+                                                       UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right)
 {
 	int x,y;
 
@@ -322,14 +330,14 @@ static void draw_affine_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vbo
 			src_y = (INT32)((v_skw) + (v_scl * x));
 
 			if(ovr && (src_y > y_mask || src_x > x_mask || src_x < 0 || src_y < 0))
-				pix = state->m_ovr_map[(src_y & 7)*8+(src_x & 7)];
+				pix = m_ovr_map[(src_y & 7)*8+(src_x & 7)];
 			else
-				pix = state->m_bg_map[(src_y & y_mask)*0x1000+(src_x & x_mask)];
+				pix = m_bg_map[(src_y & y_mask)*0x1000+(src_x & x_mask)];
 
             if(pix != -1)
 				if (y1>=0 && y1<224)
 					if (x1>=0 && x1<384)
-						bitmap.pix16(y1, x1) = state->machine().pens[pix & 3];
+						bitmap.pix16(y1, x1) = machine().pens[pix & 3];
 		}
 	}
 }
@@ -346,10 +354,10 @@ x--- ---- ---- ---- [0] LON
 ---- ---- ---- xxxx     BGMAP_BASE
 */
 
-static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, bool right, int &cur_spt)
+UINT8 vboy_state::display_world(int num, bitmap_ind16 &bitmap, bool right, int &cur_spt)
 {
 	num <<= 4;
-	UINT16 def = state->m_world[num];
+	UINT16 def = m_world[num];
 	UINT8 lon = (def >> 15) & 1;
 	UINT8 ron = (def >> 14) & 1;
 	UINT8 mode = (def >> 12) & 3;
@@ -357,21 +365,21 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	UINT16 scy = 64 << ((def >> 8) & 3);
 	UINT8 ovr = (def >> 7) & 1;
 	UINT8 end = (def >> 6) & 1;
-	INT16 gx  = state->m_world[num+1];
-	INT16 gp  = state->m_world[num+2];
-	INT16 gy  = state->m_world[num+3];
-	INT16 mx  = state->m_world[num+4];
-	INT16 mp  = state->m_world[num+5];
-	INT16 my  = state->m_world[num+6];
-	UINT16 w  = state->m_world[num+7];
-	UINT16 h  = state->m_world[num+8];
-	UINT16 param_base = state->m_world[num+9] & 0xfff0;
-	UINT16 ovr_char = state->m_world[num+10];
+	INT16 gx  = m_world[num+1];
+	INT16 gp  = m_world[num+2];
+	INT16 gy  = m_world[num+3];
+	INT16 mx  = m_world[num+4];
+	INT16 mp  = m_world[num+5];
+	INT16 my  = m_world[num+6];
+	UINT16 w  = m_world[num+7];
+	UINT16 h  = m_world[num+8];
+	UINT16 param_base = m_world[num+9] & 0xfff0;
+	UINT16 ovr_char = m_world[num+10];
 	UINT8 bg_map_num = def & 0x0f;
 	UINT16 *vboy_paramtab;
 	int i;
 
-	vboy_paramtab = state->m_bgmap + param_base;
+	vboy_paramtab = m_bgmap + param_base;
 
 	if(end)
 		return 1;
@@ -379,35 +387,35 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	if (mode < 2) // Normal / HBias Mode
 	{
 		if(ovr)
-			fill_ovr_char(state, ovr_char & 0x7ff,BIT(ovr_char,13), BIT(ovr_char,12), state->m_vip_regs.GPLT[(ovr_char >> 14) & 3]);
+			fill_ovr_char(ovr_char & 0x7ff,BIT(ovr_char,13), BIT(ovr_char,12), m_vip_regs.GPLT[(ovr_char >> 14) & 3]);
 
 		if (lon && (!right))
 		{
-			fill_bg_map(state, bg_map_num, scx, scy);
-			draw_bg_map(state, bitmap, vboy_paramtab, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, ovr, right);
+			fill_bg_map(bg_map_num, scx, scy);
+			draw_bg_map(bitmap, vboy_paramtab, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, ovr, right);
 		}
 
 		if (ron && (right))
 		{
-			fill_bg_map(state, bg_map_num, scx, scy);
-			draw_bg_map(state, bitmap, vboy_paramtab, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, ovr, right);
+			fill_bg_map(bg_map_num, scx, scy);
+			draw_bg_map(bitmap, vboy_paramtab, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, ovr, right);
 		}
 	}
 	else if (mode==2) // Affine Mode
 	{
 		if(ovr)
-			fill_ovr_char(state, ovr_char & 0x7ff,BIT(ovr_char,13), BIT(ovr_char,12), state->m_vip_regs.GPLT[(ovr_char >> 14) & 3]);
+			fill_ovr_char(ovr_char & 0x7ff,BIT(ovr_char,13), BIT(ovr_char,12), m_vip_regs.GPLT[(ovr_char >> 14) & 3]);
 
 		if (lon && (!right))
 		{
-			fill_bg_map(state, bg_map_num, scx, scy);
-			draw_affine_map(state, bitmap, vboy_paramtab, gx, gp, gy, h,w, scx*8-1, scy*8-1, ovr, right);
+			fill_bg_map(bg_map_num, scx, scy);
+			draw_affine_map(bitmap, vboy_paramtab, gx, gp, gy, h,w, scx*8-1, scy*8-1, ovr, right);
 		}
 
 		if (ron && (right))
 		{
-			fill_bg_map(state, bg_map_num, scx, scy);
-			draw_affine_map(state, bitmap, vboy_paramtab, gx, gp, gy, h,w, scx*8-1, scy*8-1, ovr, right);
+			fill_bg_map(bg_map_num, scx, scy);
+			draw_affine_map(bitmap, vboy_paramtab, gx, gp, gy, h,w, scx*8-1, scy*8-1, ovr, right);
 		}
 	}
 	else if (mode==3) // OBJ Mode
@@ -420,28 +428,28 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 			return 0;
 		}
 
-		start_offs = state->m_vip_regs.SPT[cur_spt];
+		start_offs = m_vip_regs.SPT[cur_spt];
 
 		end_offs = 0x3ff;
 		if(cur_spt != 0)
-			end_offs = state->m_vip_regs.SPT[cur_spt-1];
+			end_offs = m_vip_regs.SPT[cur_spt-1];
 
 		i = start_offs;
 		do
 		{
 			UINT16 start_ndx = i * 4;
-			INT16 jx = state->m_objects[start_ndx+0];
-			INT16 jp = state->m_objects[start_ndx+1] & 0x3fff;
-			INT16 jy = state->m_objects[start_ndx+2] & 0x1ff;
-			UINT16 val = state->m_objects[start_ndx+3];
-			UINT8 jlon = (state->m_objects[start_ndx+1] & 0x8000) >> 15;
-			UINT8 jron = (state->m_objects[start_ndx+1] & 0x4000) >> 14;
+			INT16 jx = m_objects[start_ndx+0];
+			INT16 jp = m_objects[start_ndx+1] & 0x3fff;
+			INT16 jy = m_objects[start_ndx+2] & 0x1ff;
+			UINT16 val = m_objects[start_ndx+3];
+			UINT8 jlon = (m_objects[start_ndx+1] & 0x8000) >> 15;
+			UINT8 jron = (m_objects[start_ndx+1] & 0x4000) >> 14;
 
 			if (!right && jlon)
-				put_obj(state, bitmap, (jx-jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), state->m_vip_regs.JPLT[(val>>14) & 3]);
+				put_obj(bitmap, (jx-jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), m_vip_regs.JPLT[(val>>14) & 3]);
 
 			if(right && jron)
-				put_obj(state, bitmap, (jx+jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), state->m_vip_regs.JPLT[(val>>14) & 3]);
+				put_obj(bitmap, (jx+jp) & 0x1ff, jy, val & 0x7ff, BIT(val,13), BIT(val,12), m_vip_regs.JPLT[(val>>14) & 3]);
 
 			i --;
 			i &= 0x3ff;
@@ -462,7 +470,7 @@ static SCREEN_UPDATE_IND16( vboy_left )
 
 	cur_spt = 3;
 	for(int i=31; i>=0; i--)
-		if (display_world(state, i, bitmap, 0, cur_spt)) break;
+		if (state->display_world(i, bitmap, false, cur_spt)) break;
 
 	return 0;
 }
@@ -475,7 +483,7 @@ static SCREEN_UPDATE_IND16( vboy_right )
 
 	cur_spt = 3;
 	for(int i=31; i>=0; i--)
-		if (display_world(state, i, bitmap, 0, cur_spt)) break;
+		if (state->display_world(i, bitmap, true, cur_spt)) break;
 
 	return 0;
 }
