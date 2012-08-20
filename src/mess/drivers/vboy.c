@@ -113,6 +113,7 @@ public:
 	vip_regs_t m_vip_regs;
 	vboy_timer_t m_vboy_timer;
 	int *m_bg_map;
+	int *m_ovr_map;
 	UINT16 m_frame_count;
 	UINT8 m_displayfb;
 	UINT8 m_display_count;
@@ -135,6 +136,7 @@ static VIDEO_START( vboy )
 
 	// Allocate memory for temporary screens
 	state->m_bg_map = auto_alloc_array_clear(machine, int, 0x1000*0x1000);
+	state->m_ovr_map = auto_alloc_array_clear(machine, int, 8*8);
 
 	state->m_font  = auto_alloc_array(machine, UINT16, 2048 * 8);
 	state->m_bgmap = auto_alloc_array(machine, UINT16, 0x20000 >> 1);
@@ -144,9 +146,9 @@ static VIDEO_START( vboy )
 	state->m_world = state->m_bgmap + (0x1d800 >> 1);
 }
 
-static void put_obj(vboy_state *state, bitmap_ind16 &bitmap, int x, int y, UINT16 ch, bool flipx, bool flipy, UINT8 pal)
+static void put_obj(vboy_state *state, bitmap_ind16 &bitmap, int x, int y, UINT16 code, bool flipx, bool flipy, UINT8 pal)
 {
-	UINT16 data, code = ch;
+	UINT16 data;
 	UINT8 yi, xi, dat, col;
 
 	for (yi = 0; yi < 8; yi++)
@@ -176,9 +178,9 @@ static void put_obj(vboy_state *state, bitmap_ind16 &bitmap, int x, int y, UINT1
 	}
 }
 
-static void put_char(vboy_state *state, int x, int y, UINT16 ch, bool flipx, bool flipy, UINT8 pal)
+static void put_char(vboy_state *state, int x, int y, UINT16 code, bool flipx, bool flipy, UINT8 pal)
 {
-	UINT16 data, code = ch;
+	UINT16 data;
 	UINT8 yi, xi, dat;
 	int col;
 
@@ -211,6 +213,35 @@ static void put_char(vboy_state *state, int x, int y, UINT16 ch, bool flipx, boo
 	}
 }
 
+static void fill_ovr_char(vboy_state *state, UINT16 code, bool flipx, bool flipy, UINT8 pal)
+{
+	UINT16 data;
+	UINT8 yi, xi, dat;
+	int col;
+
+	for (yi = 0; yi < 8; yi++)
+	{
+		if (!flipy)
+			 data = state->m_font[code * 8 + yi];
+		else
+			 data = state->m_font[code * 8 + (7-yi)];
+
+		for (xi = 0; xi < 8; xi++)
+		{
+			if (!flipx)
+				dat = ((data >> (xi << 1)) & 0x03);
+			else
+				dat = ((data >> ((7-xi) << 1)) & 0x03);
+
+			col = (pal >> (dat*2)) & 3;
+
+			if(dat == 0)
+				col = -1;
+
+			state->m_ovr_map[yi*8+xi] = col;
+		}
+	}
+}
 
 static void fill_bg_map(vboy_state *state, int num, UINT16 scx, UINT16 scy)
 {
@@ -230,7 +261,7 @@ static void fill_bg_map(vboy_state *state, int num, UINT16 scx, UINT16 scy)
 	}
 }
 
-static void draw_bg_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int mode, int gx, int gp, int gy, int mx, int mp, int my, int h, int w, UINT16 x_mask, UINT16 y_mask, bool right)
+static void draw_bg_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int mode, int gx, int gp, int gy, int mx, int mp, int my, int h, int w, UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right)
 {
 	int x,y;
 
@@ -245,13 +276,16 @@ static void draw_bg_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vboy_pa
 
 			x1 += right ? -gp : gp;
 			if (mode==1)
-				x1 += vboy_paramtab[y*2];
+				x1 += vboy_paramtab[y*2+(right ^ 1)];
 
 			src_x = x+mx;
 			src_y = y+my;
 			src_x += right ? -mp : mp;
 
-			pix = state->m_bg_map[(src_y & y_mask)*0x1000+(src_x & x_mask)];
+			if(ovr && (src_x > x_mask || src_y > y_mask || src_x < 0 || src_y < 0))
+				pix = state->m_ovr_map[(src_y & 7)*8+(src_x & 7)];
+			else
+				pix = state->m_bg_map[(src_y & y_mask)*0x1000+(src_x & x_mask)];
 
 			if(pix != -1)
 				if (y1>=0 && y1<224)
@@ -261,7 +295,7 @@ static void draw_bg_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vboy_pa
 	}
 }
 
-static void draw_affine_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int gx, int gp, int gy, int h, int w, UINT16 x_mask, UINT16 y_mask, bool right)
+static void draw_affine_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int gx, int gp, int gy, int h, int w, UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right)
 {
 	int x,y;
 
@@ -287,7 +321,10 @@ static void draw_affine_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vbo
 			src_x = (INT32)((h_skw) + (h_scl * x));
 			src_y = (INT32)((v_skw) + (v_scl * x));
 
-			pix = state->m_bg_map[(src_y & y_mask)*0x1000+(src_x & x_mask)];
+			if(ovr && (src_y > y_mask || src_x > x_mask || src_x < 0 || src_y < 0))
+				pix = state->m_ovr_map[(src_y & 7)*8+(src_x & 7)];
+			else
+				pix = state->m_bg_map[(src_y & y_mask)*0x1000+(src_x & x_mask)];
 
             if(pix != -1)
 				if (y1>=0 && y1<224)
@@ -300,13 +337,13 @@ static void draw_affine_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vbo
 /*
 x--- ---- ---- ---- [0] LON
 -x-- ---- ---- ----     RON
---xx ---- ---- ---- BGM type
----- xx-- ---- ---- SCX
----- --xx ---- ---- SCY
----- ---- x--- ---- OVR
----- ---- -x-- ---- END
+--xx ---- ---- ----     BGM type
+---- xx-- ---- ----     SCX
+---- --xx ---- ----     SCY
+---- ---- x--- ----     OVR
+---- ---- -x-- ----     END
 ---- ---- --00 ----
----- ---- ---- xxxx BGMAP_BASE
+---- ---- ---- xxxx     BGMAP_BASE
 */
 
 static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, bool right, int &cur_spt)
@@ -318,6 +355,8 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	UINT8 mode = (def >> 12) & 3;
 	UINT16 scx = 64 << ((def >> 10) & 3);
 	UINT16 scy = 64 << ((def >> 8) & 3);
+	UINT8 ovr = (def >> 7) & 1;
+	UINT8 end = (def >> 6) & 1;
 	INT16 gx  = state->m_world[num+1];
 	INT16 gp  = state->m_world[num+2];
 	INT16 gy  = state->m_world[num+3];
@@ -327,14 +366,14 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	UINT16 w  = state->m_world[num+7];
 	UINT16 h  = state->m_world[num+8];
 	UINT16 param_base = state->m_world[num+9] & 0xfff0;
-//  UINT16 overplane = state->m_world[num+10];
+	UINT16 ovr_char = state->m_world[num+10];
 	UINT8 bg_map_num = def & 0x0f;
 	UINT16 *vboy_paramtab;
 	int i;
 
 	vboy_paramtab = state->m_bgmap + param_base;
 
-	if(def & 0x40) // END flag
+	if(end)
 		return 1;
 
 	if (mode < 2) // Normal / Hbias Mode
@@ -342,30 +381,36 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 		if(mode == 1)
 			popmessage("mode == 1, check");
 
+		if(ovr)
+			fill_ovr_char(state, ovr_char & 0x7ff,BIT(ovr_char,13), BIT(ovr_char,12), state->m_vip_regs.GPLT[(ovr_char >> 14) & 3]);
+
 		if (lon && (!right))
 		{
 			fill_bg_map(state, bg_map_num, scx, scy);
-			draw_bg_map(state, bitmap, vboy_paramtab, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, right);
+			draw_bg_map(state, bitmap, vboy_paramtab, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, ovr, right);
 		}
 
 		if (ron && (right))
 		{
 			fill_bg_map(state, bg_map_num, scx, scy);
-			draw_bg_map(state, bitmap, vboy_paramtab, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, right);
+			draw_bg_map(state, bitmap, vboy_paramtab, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, ovr, right);
 		}
 	}
 	else if (mode==2) // Affine Mode
 	{
+		if(ovr)
+			fill_ovr_char(state, ovr_char & 0x7ff,BIT(ovr_char,13), BIT(ovr_char,12), state->m_vip_regs.GPLT[(ovr_char >> 14) & 3]);
+
 		if (lon && (!right))
 		{
 			fill_bg_map(state, bg_map_num, scx, scy);
-			draw_affine_map(state, bitmap, vboy_paramtab, gx, gp, gy, h,w, scx*8-1, scy*8-1, right);
+			draw_affine_map(state, bitmap, vboy_paramtab, gx, gp, gy, h,w, scx*8-1, scy*8-1, ovr, right);
 		}
 
 		if (ron && (right))
 		{
 			fill_bg_map(state, bg_map_num, scx, scy);
-			draw_affine_map(state, bitmap, vboy_paramtab, gx, gp, gy, h,w, scx*8-1, scy*8-1, right);
+			draw_affine_map(state, bitmap, vboy_paramtab, gx, gp, gy, h,w, scx*8-1, scy*8-1, ovr, right);
 		}
 	}
 	else if (mode==3) // OBJ Mode
