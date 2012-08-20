@@ -256,7 +256,7 @@ public:
 	WRITE_LINE_MEMBER( intb );
 	WRITE_LINE_MEMBER( ext_ready );
 	WRITE_LINE_MEMBER( mapper_ready );
-	
+
 	DECLARE_DRIVER_INIT(geneve);
 
 	void	set_tms9901_INT2_from_v9938(v99x8_device &vdp, int state);

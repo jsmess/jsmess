@@ -14,16 +14,16 @@ These are different depending on the terminal type chosen. The codes
 need to be understood and emulated before this system makes sense.
 
 Known Monitor commands: (from the disassembly)
-!	write buffer to AD000
-*	set RAM036 flag
-+	increment AD000 by 1
-+n	increment AD000 by n
--	decrement AD000 by 1
--n	decrement AD000 by n
-:	clear RAM036 flag
-=	display AD000
-=nnn	set AD000 to nnn
-@	fill buffer with 026
+!   write buffer to AD000
+*   set RAM036 flag
++   increment AD000 by 1
++n  increment AD000 by n
+-   decrement AD000 by 1
+-n  decrement AD000 by n
+:   clear RAM036 flag
+=   display AD000
+=nnn    set AD000 to nnn
+@   fill buffer with 026
 
 unknown commands: / & d e l r s t u z \ ^ | ~
 

@@ -99,8 +99,8 @@ UINT8 vp620_device::vip_in_r()
 int vp620_device::vip_ef3_r()
 {
 	int state = m_keystb;
-	
+
 	m_keystb = CLEAR_LINE;
-	
+
 	return state;
 }

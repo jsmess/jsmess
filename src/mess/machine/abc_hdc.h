@@ -1,9 +1,9 @@
 /**********************************************************************
 
-	Luxor ABC 850 Winchester controller card emulation
+    Luxor ABC 850 Winchester controller card emulation
 
-	Copyright MESS Team.
-	Visit http://mamedev.org for licensing and usage restrictions.
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
 

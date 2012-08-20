@@ -106,7 +106,7 @@ private:
     UINT32  es5510_dadr_latch;
     UINT32  es5510_gpr_latch;
     UINT8   es5510_ram_sel;
-public:	
+public:
 	DECLARE_DRIVER_INIT(eps);
 	DECLARE_DRIVER_INIT(common);
 	DECLARE_DRIVER_INIT(sq1);

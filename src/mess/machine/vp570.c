@@ -114,5 +114,5 @@ void vp570_device::vip_program_w(address_space &space, offs_t offset, UINT8 data
 		{
 			m_ram[offset & 0xfff] = data;
 		}
-	}	
+	}
 }

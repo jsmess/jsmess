@@ -1653,12 +1653,12 @@ void base_c2040_device::device_reset()
 {
     m_maincpu->reset();
 
-   	// toggle M6502 SO
+	// toggle M6502 SO
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, ASSERT_LINE);
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, CLEAR_LINE);
 
     m_fdccpu->reset();
-    
+
     m_riot0->reset();
     m_riot1->reset();
     m_miot->reset();

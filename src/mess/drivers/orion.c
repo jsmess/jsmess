@@ -358,9 +358,9 @@ ROM_END
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT      COMPANY              FULLNAME   FLAGS */
 COMP( 1990, orion128,	 0, 		0,		orion128,	radio86, driver_device,	0,        "<unknown>",				 "Orion 128",	 0)
-COMP( 1990, orionms,	 orion128,	0,		orion128ms,	ms7007, driver_device, 	0,        "<unknown>",				 "Orion 128 (MS7007)",	 0)
+COMP( 1990, orionms,	 orion128,	0,		orion128ms,	ms7007, driver_device,	0,        "<unknown>",				 "Orion 128 (MS7007)",	 0)
 COMP( 1990, orionz80,	 orion128,	0,		orionz80,	radio86, driver_device,	0,        "<unknown>",				 "Orion 128 + Z80 Card II",	 0)
 COMP( 1990, orionide,	 orion128,	0,		orionz80,	radio86, driver_device,	0,        "<unknown>",				 "Orion 128 + Z80 Card II + IDE",	 0)
-COMP( 1990, orionzms,	 orion128,	0,		orionz80ms,	ms7007, driver_device, 	0,        "<unknown>",				 "Orion 128 + Z80 Card II (MS7007)",	 0)
-COMP( 1990, orionidm,	 orion128,	0,		orionz80ms,	ms7007, driver_device, 	0,        "<unknown>",				 "Orion 128 + Z80 Card II + IDE (MS7007)",	 0)
+COMP( 1990, orionzms,	 orion128,	0,		orionz80ms,	ms7007, driver_device,	0,        "<unknown>",				 "Orion 128 + Z80 Card II (MS7007)",	 0)
+COMP( 1990, orionidm,	 orion128,	0,		orionz80ms,	ms7007, driver_device,	0,        "<unknown>",				 "Orion 128 + Z80 Card II + IDE (MS7007)",	 0)
 COMP( 1994, orionpro,	 orion128,	0,		orionpro,	radio86, driver_device,	0,        "<unknown>",				 "Orion Pro",	 0)

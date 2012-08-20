@@ -1080,7 +1080,7 @@ static MACHINE_START( dn3500 ) {
 
 DRIVER_INIT_MEMBER(apollo_state,dn3500)
 {
-//	MLOG1(("driver_init_dn3500"));
+//  MLOG1(("driver_init_dn3500"));
 
 	device_set_irq_callback(machine().device(MAINCPU), apollo_irq_acknowledge);
 
@@ -1099,7 +1099,7 @@ DRIVER_INIT_MEMBER(apollo_state,dn3500)
 DRIVER_INIT_MEMBER(apollo_state,dsp3500)
 {
 	DRIVER_INIT_CALL( dn3500 );
-//	MLOG1(("driver_init_dsp3500"));
+//  MLOG1(("driver_init_dsp3500"));
 	node_type = NODE_TYPE_DSP3500;
 	dsp_terminal = machine().device(TERMINAL_TAG);
 }
@@ -1107,7 +1107,7 @@ DRIVER_INIT_MEMBER(apollo_state,dsp3500)
 DRIVER_INIT_MEMBER(apollo_state,dn3000)
 {
 	DRIVER_INIT_CALL( dn3500 );
-//	MLOG1(("driver_init_dn3000"));
+//  MLOG1(("driver_init_dn3000"));
 
 	ram_base_address = DN3000_RAM_BASE;
 	ram_end_address = DN3000_RAM_END;
@@ -1119,7 +1119,7 @@ DRIVER_INIT_MEMBER(apollo_state,dn3000)
 DRIVER_INIT_MEMBER(apollo_state,dsp3000)
 {
 	DRIVER_INIT_CALL( dn3000 );
-//	MLOG1(("driver_init_dsp3000"));
+//  MLOG1(("driver_init_dsp3000"));
 	node_type = NODE_TYPE_DSP3000;
 	dsp_terminal = machine().device(TERMINAL_TAG);
 }
@@ -1127,7 +1127,7 @@ DRIVER_INIT_MEMBER(apollo_state,dsp3000)
 DRIVER_INIT_MEMBER(apollo_state,dn5500)
 {
 	DRIVER_INIT_CALL( dn3500 );
-//	MLOG1(("driver_init_dn5500"));
+//  MLOG1(("driver_init_dn5500"));
 
 	ram_base_address = DN5500_RAM_BASE;
 	ram_end_address = DN5500_RAM_END;
@@ -1139,7 +1139,7 @@ DRIVER_INIT_MEMBER(apollo_state,dn5500)
 DRIVER_INIT_MEMBER(apollo_state,dsp5500)
 {
 	DRIVER_INIT_CALL( dn5500 );
-//	MLOG1(("driver_init_dsp5500"));
+//  MLOG1(("driver_init_dsp5500"));
 	node_type = NODE_TYPE_DSP5500;
 	dsp_terminal = machine().device(TERMINAL_TAG);
 }

@@ -182,7 +182,7 @@ private:
 	const UINT8 *m_p_chargen;
 	UINT8 m_framecnt;
 	emu_timer *m_cassette_timer;
-public:	
+public:
 	DECLARE_DRIVER_INIT(sol20);
 };
 

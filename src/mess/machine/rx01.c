@@ -85,7 +85,7 @@ void rx01_device::device_start()
 
 void rx01_device::device_reset()
 {
-	for(int i=0;i<2;i++) 
+	for(int i=0;i<2;i++)
 	{
 		floppy_mon_w(m_image[i], 0); // turn it on
 		floppy_drive_set_controller(m_image[i], this);
@@ -103,7 +103,7 @@ READ16_MEMBER( rx01_device::read )
 		case 0: return status_read(); break;
 		default: return data_read(); break;
 	}
-	
+
 }
 
 
@@ -124,15 +124,15 @@ void rx01_device::command_write(UINT16 data)
 	printf("command_write %04x\n",data);
 	m_unit = BIT(data,4);
 	m_interrupt = BIT(data,6);
-	
+
 	floppy_drive_set_ready_state(m_image[m_unit], 1,0);
-	
-	
+
+
 	if (BIT(data,14)) // Initialize
 	{
 	   printf("initialize\n");
 	   m_state = RX01_INIT;
-	}	
+	}
 	else if (BIT(data,1)) // If GO bit is selected
 	{
 		m_rxcs &= ~(1<<5); // Clear done bit
@@ -142,7 +142,7 @@ void rx01_device::command_write(UINT16 data)
 					m_rxcs |= (1<<7); // Set TR Bit
 					m_state = RX01_FILL;
 					break;
-			case 1: // Empty Buffer					
+			case 1: // Empty Buffer
 					m_state = RX01_EMPTY;
 					break;
 			case 2: // Write Sector
@@ -160,8 +160,8 @@ void rx01_device::command_write(UINT16 data)
 					break;
 			case 7: // Read Error Register
 					m_state = RX01_COMPLETE;
-					// set ready signal according to current drive status					
-					m_rxes |= floppy_drive_get_flag_state(m_image[m_unit], FLOPPY_DRIVE_READY) << 7;			
+					// set ready signal according to current drive status
+					m_rxes |= floppy_drive_get_flag_state(m_image[m_unit], FLOPPY_DRIVE_READY) << 7;
 					break;
 		}
 	}
@@ -173,7 +173,7 @@ UINT16 rx01_device::status_read()
 	//printf("status_read %04x\n",m_rxcs);
 	return m_rxcs;
 }
-	
+
 void rx01_device::data_write(UINT16 data)
 {
 	printf("data_write %04x\n",data);
@@ -183,7 +183,7 @@ void rx01_device::data_write(UINT16 data)
 }
 
 UINT16 rx01_device::data_read()
-{	
+{
 	if (m_state==RX01_EMPTY && BIT(m_rxcs,7)) m_rxcs &= (1<<7); // clear TR bit;
 	printf("data_read %04x\n",m_rxdb);
 	return m_rxdb;
@@ -197,16 +197,16 @@ void rx01_device::service_command()
 		case RX01_FILL :
 						m_buffer[m_buf_pos] = m_rxdb & 0xff;
 						m_buf_pos++;
-						if (m_buf_pos<128) 
-						{ 
+						if (m_buf_pos<128)
+						{
 							m_rxcs |= (1<<7); // Set TR Bit
 						} else {
 							//finished
 						}
 						break;
 		case RX01_EMPTY :
-						if (m_buf_pos>=128) 
-						{ 
+						if (m_buf_pos>=128)
+						{
 							//finished
 						} else {
 							m_buffer[m_buf_pos] = m_rxdb & 0xff;
@@ -217,16 +217,16 @@ void rx01_device::service_command()
 		case RX01_SET_SECTOR:
 						m_rxsa = m_rxdb & 0x1f;
 						m_rxcs |= (1<<7); // Set TR Bit
-						m_state = RX01_SET_TRACK;		
+						m_state = RX01_SET_TRACK;
 						break;
 		case RX01_SET_TRACK:
 						m_rxta = m_rxdb & 0x7f;
 						m_rxcs |= (1<<7); // Set TR Bit
-						m_state = RX01_TRANSFER;		
+						m_state = RX01_TRANSFER;
 						position_head();
 						break;
 		case RX01_TRANSFER:
-						break;						
+						break;
 		case RX01_COMPLETE:
 						break;
 		case RX01_INIT:
@@ -240,13 +240,13 @@ void rx01_device::position_head()
 {
 	int cur_track = floppy_drive_get_current_track(m_image[m_unit]);
 	int dir = (cur_track < m_rxta) ? +1 : -1;
-	
+
 	while (m_rxta != cur_track)
 	{
 		cur_track += dir;
 
 		floppy_drive_seek(m_image[m_unit], dir);
-	}	
+	}
 }
 
 void rx01_device::read_sector()

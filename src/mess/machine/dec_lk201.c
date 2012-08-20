@@ -1,7 +1,7 @@
-/* 
-    DEC LK-201 keyboard 
+/*
+    DEC LK-201 keyboard
     Emulation by R. Belmont
- 
+
     This is currently the 6805 version; there's also an 8048 version.
 */
 
@@ -23,7 +23,7 @@ const device_type LK201 = &device_creator<lk201_device>;
 
 ROM_START( lk201 )
 	ROM_REGION(0x2000, LK201_CPU_TAG, 0)
-    ROM_LOAD( "23-00159-00.bin", 0x0000, 0x2000, CRC(be293c51) SHA1(a11ae004d2d6055d7279da3560c3e56610a19fdb) ) 
+    ROM_LOAD( "23-00159-00.bin", 0x0000, 0x2000, CRC(be293c51) SHA1(a11ae004d2d6055d7279da3560c3e56610a19fdb) )
 ROM_END
 
 //-------------------------------------------------
@@ -255,10 +255,10 @@ WRITE8_MEMBER( lk201_device::spi_w )
 }
 
 /*
- 
+
 SCI 01 to 4 (PC=24b)        firmware ID
 SCI 00 to 4 (PC=cb2)        hardware jumpers ID (port C & 0x30)
 SCI 00 to 4 (PC=cb2)        self-test result OK
 SCI 00 to 4 (PC=cb2)        keycode if there was a self-test error
- 
+
 */

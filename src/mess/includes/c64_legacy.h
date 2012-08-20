@@ -85,12 +85,12 @@ public:
 	UINT8 *m_io_ram_r_ptr;
 	c64_cart_t m_cart;
 	int m_nmilevel;
-	
+
 	DECLARE_DRIVER_INIT( c64 );
 	DECLARE_DRIVER_INIT( c64pal );
 	DECLARE_DRIVER_INIT( ultimax );
 	DECLARE_DRIVER_INIT( c64gs );
-	DECLARE_DRIVER_INIT( sx64 );	
+	DECLARE_DRIVER_INIT( sx64 );
 };
 
 

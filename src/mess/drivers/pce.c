@@ -584,7 +584,7 @@ static MACHINE_CONFIG_START( pce_common_new, pce_state )
 
 	MCFG_HUC6260_ADD( "huc6260", MAIN_CLOCK, pce_huc6260_config )
 	MCFG_HUC6270_ADD( "huc6270", pce_huc6270_config )
- 
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -638,7 +638,7 @@ static MACHINE_CONFIG_START( sgx_new, pce_state )
 	MCFG_HUC6270_ADD( "huc6270_0", sgx_huc6270_0_config )
 	MCFG_HUC6270_ADD( "huc6270_1", sgx_huc6270_1_config )
 	MCFG_HUC6202_ADD( "huc6202", sgx_huc6202_config )
- 
+
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

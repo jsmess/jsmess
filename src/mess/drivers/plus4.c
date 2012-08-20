@@ -1,15 +1,15 @@
 /*
 
-	TODO:
+    TODO:
 
-	- cassette
-	- c1551 won't load anything
-	- clean up keyboard handling
-	- clean up TED
-	- dump PLA
-	- T6721 speech chip
-	- floating bus read (should return the previous byte read by TED)
-	- SID card (http://solder.dyndns.info/cgi-bin/showdir.pl?dir=files/commodore/plus4/hardware/SID-Card)
+    - cassette
+    - c1551 won't load anything
+    - clean up keyboard handling
+    - clean up TED
+    - dump PLA
+    - T6721 speech chip
+    - floating bus read (should return the previous byte read by TED)
+    - SID card (http://solder.dyndns.info/cgi-bin/showdir.pl?dir=files/commodore/plus4/hardware/SID-Card)
 
 */
 
@@ -76,16 +76,16 @@ void plus4_state::check_interrupts()
 void plus4_state::bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal, int *cs0, int *cs1)
 {
 	UINT16 i = ras << 15 | BA10 << 14 | BA11 << 13 | BA13 << 12 | BA9 << 11 | BA8 << 10 | BA14 << 9 | mux << 8 | BA12 << 7 | BA7 << 6 | BA6 << 5 | BA5 << 4 | BA4 << 3 | BA15 << 2 | phi0 << 1 | 1;
-/*	UINT8 data = m_pla->read(i);
+/*  UINT8 data = m_pla->read(i);
 
-	*scs = BIT(data, 0);
-	*phi2 = BIT(data, 1);
-	*user = BIT(data, 2);
-	*_6551 = BIT(data, 3);
-	*addr_clk = BIT(data, 4);
-	*keyport = BIT(data, 5);
-	*kernal = BIT(data, 6);
-	*f7 = BIT(data, 7);*/
+    *scs = BIT(data, 0);
+    *phi2 = BIT(data, 1);
+    *user = BIT(data, 2);
+    *_6551 = BIT(data, 3);
+    *addr_clk = BIT(data, 4);
+    *keyport = BIT(data, 5);
+    *kernal = BIT(data, 6);
+    *f7 = BIT(data, 7);*/
 
 	// the following code is on loan from http://www.zimmers.net/anonftp/pub/cbm/firmware/computers/plus4/pla.c until we get the PLA dumped
 
@@ -108,28 +108,28 @@ void plus4_state::bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs
 	#define A10	I(14)
 	#define RAS_	I(15)
 
-	/* unused_	0 when 0111 011x 1001 011x */
+	/* unused_  0 when 0111 011x 1001 011x */
 	#define F0	RAS_ || !A10 || !A11 || !A13 || A9 || !A8 || !A14 ||	\
 			!A12 || A7 || A6 || !A5 || A4 || !A15 || !PHI0
-	/* PHI2		1 when 0xxx xxxx xxxx xx11 */
+	/* PHI2     1 when 0xxx xxxx xxxx xx11 */
 	#define F1	!RAS_ && PHI0 && I0_F7
-	/* USER_	0 when 0111 011x 1000 1111 */
+	/* USER_    0 when 0111 011x 1000 1111 */
 	#define F2	RAS_ || !A10 || !A11 || !A13 || A9 || !A8 || !A14 ||	 \
 			!A12 || A7 || A6 || A5 || !A4 || !A15 || !PHI0 || !I0_F7
-	/* 6551_	0 when x111 011x 1000 011x */
+	/* 6551_    0 when x111 011x 1000 011x */
 	#define F3	!A10 || !A11 || !A13 || A9 || !A8 || !A14 ||	\
 			!A12 || A7 || A6 || A5 || A4 || !A15 || !PHI0
-	/* ADDR_CLK	0 when 1111 011x 1110 1111 */
+	/* ADDR_CLK 0 when 1111 011x 1110 1111 */
 	#define F4	RAS_ || !A10 || !A11 || !A13 || A9 || !A8 || !A14 ||	\
 			!A12 || !A7 || !A6 || A5 || !A4 || !A15 || !PHI0 || !I0_F7
-	/* KEYPORT_	0 when 0111 011x 1001 1111 */
+	/* KEYPORT_ 0 when 0111 011x 1001 1111 */
 	#define F5	RAS_ || !A10 || !A11 || !A13 || A9 || !A8 || !A14 ||	\
 			!A12 || A7 || A6 || !A5 || !A4 || !A15 || !PHI0 || !I0_F7
-	/* KERNAL_	1 when x111 001x 1xxx x1xx */
+	/* KERNAL_  1 when x111 001x 1xxx x1xx */
 	#define F6	A10 && A11 && A13 && !A9 && !A8 && A14 &&	\
 			A12 && A15
-	/* I0_F7	1 when xxxx xxx1 xxxx xxxx or
-			  when 0xxx xxxx xxxx xx11 */
+	/* I0_F7    1 when xxxx xxx1 xxxx xxxx or
+              when 0xxx xxxx xxxx xx11 */
 	#define F7	MUX || (F1)
 
 	*scs = F0;
@@ -291,7 +291,7 @@ WRITE8_MEMBER( plus4_state::write )
 	int c1l = 1, c1h = 1, c2l = 1, c2h = 1;
 
 	bankswitch(offset, phi0, mux, ras, &scs, &phi2, &user, &_6551, &addr_clk, &keyport, &kernal, &cs0, &cs1);
-	
+
 	//logerror("write offset %04x data %02x user %u 6551 %u addr_clk %u keyport %u kernal %u cs0 %u cs1 %u m_rom_en %u\n", offset,data,user,_6551,addr_clk,keyport,kernal,cs0,cs1,m_rom_en);
 
 	if (!scs && m_t6721)
@@ -321,7 +321,7 @@ WRITE8_MEMBER( plus4_state::write )
 	else if (offset == 0xff3e)
 	{
 		m_rom_en = 1;
-		
+
 		m_ted->rom_switch_w(m_rom_en);
 	}
 	else if (offset == 0xff3f)
@@ -438,19 +438,19 @@ INPUT_PORTS_END
 READ8_MEMBER( plus4_state::cpu_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       CST RD
-	    5       
-	    6       IEC CLK IN
-	    7       IEC DATA IN, CST SENSE (Plus/4)
-	
-	*/
+
+        bit     description
+
+        0
+        1
+        2
+        3
+        4       CST RD
+        5
+        6       IEC CLK IN
+        7       IEC DATA IN, CST SENSE (Plus/4)
+
+    */
 
 	UINT8 data = 0xff;
 	UINT8 c16_port7501 = m6510_get_port(m_maincpu);
@@ -472,19 +472,19 @@ READ8_MEMBER( plus4_state::cpu_r )
 READ8_MEMBER( plus4_state::c16_cpu_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       CST RD
-	    5       
-	    6       IEC CLK IN
-	    7       IEC DATA IN
-	
-	*/
+
+        bit     description
+
+        0
+        1
+        2
+        3
+        4       CST RD
+        5
+        6       IEC CLK IN
+        7       IEC DATA IN
+
+    */
 
 	UINT8 data = 0xff;
 	UINT8 c16_port7501 = m6510_get_port(m_maincpu);
@@ -506,19 +506,19 @@ READ8_MEMBER( plus4_state::c16_cpu_r )
 WRITE8_MEMBER( plus4_state::cpu_w )
 {
 	/*
-	
-	    bit     description
-	
-	    0       IEC DATA
-	    1       IEC CLK, CST WR
-	    2       IEC ATN
-	    3       CST MTR
-	    4       
-	    5       
-	    6       
-	    7       
-	
-	*/
+
+        bit     description
+
+        0       IEC DATA
+        1       IEC CLK, CST WR
+        2       IEC ATN
+        3       CST MTR
+        4
+        5
+        6
+        7
+
+    */
 
 	// serial bus
 	m_iec->data_w(!BIT(data, 0));
@@ -722,19 +722,19 @@ UINT8 plus4_state::read_keyboard(UINT8 databus)
 READ8_MEMBER( plus4_state::spi_kb_r )
 {
 	/*
-	
-	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       
-	    7       
-	
-	*/
+
+        bit     description
+
+        0
+        1
+        2
+        3
+        4
+        5
+        6
+        7
+
+    */
 
 	return m_port6529 & (read_keyboard (0xff /*databus */ ) | (m_port6529 ^ 0xff));
 }
@@ -742,19 +742,19 @@ READ8_MEMBER( plus4_state::spi_kb_r )
 WRITE8_MEMBER( plus4_state::spi_kb_w )
 {
 	/*
-	
-	    bit     description
-	
-	    0       
-	    1       
-	    2       
-	    3       
-	    4       
-	    5       
-	    6       
-	    7       
-	
-	*/
+
+        bit     description
+
+        0
+        1
+        2
+        3
+        4
+        5
+        6
+        7
+
+    */
 
 	m_port6529 = data;
 }
@@ -904,7 +904,7 @@ static MACHINE_CONFIG_START( ntsc, plus4_state )
 	MCFG_CPU_PERIODIC_INT(c16_raster_interrupt, TED7360_HRETRACERATE)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	// video and sound hardware 
+	// video and sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_MOS7360_ADD(MOS7360_TAG, SCREEN_TAG, XTAL_14_31818MHz/4, ted_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -943,7 +943,7 @@ static MACHINE_CONFIG_START( pal, plus4_state )
 	MCFG_CPU_PERIODIC_INT(c16_raster_interrupt, TED7360_HRETRACERATE)
 	MCFG_QUANTUM_TIME(attotime::from_hz(60))
 
-	// video and sound hardware 
+	// video and sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_MOS7360_ADD(MOS7360_TAG, SCREEN_TAG, XTAL_17_73447MHz/5, ted_intf)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -1023,7 +1023,7 @@ ROM_START( c264 )
 	ROM_REGION( 0x8000, "kernal", 0 )
 	ROM_LOAD( "basic-264.bin", 0x0000, 0x4000, CRC(6a2fc8e3) SHA1(473fce23afa07000cdca899fbcffd6961b36a8a0) )
 	ROM_LOAD( "kernal-264.bin", 0x4000, 0x4000, CRC(8f32abe7) SHA1(d481faf5fcbb331878dc7851c642d04f26a32873) )
-	
+
 	ROM_REGION( 0x8000, "function", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )
@@ -1130,7 +1130,7 @@ ROM_END
 ROM_START( c16h )
 	ROM_REGION( 0x8000, "kernal", 0 )
 	ROM_LOAD( "318006-01.u3", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
-	
+
 	ROM_DEFAULT_BIOS("r2")
 	ROM_SYSTEM_BIOS( 0, "r1", "Revision 1" )
 	ROMX_LOAD( "318030-01.u4", 0x4000, 0x4000, NO_DUMP, ROM_BIOS(1) )
@@ -1150,7 +1150,7 @@ ROM_START( c232 )
 	ROM_REGION( 0x8000, "kernal", 0 )
 	ROM_LOAD( "318006-01.u4", 0x0000, 0x4000, CRC(74eaae87) SHA1(161c96b4ad20f3a4f2321808e37a5ded26a135dd) )
 	ROM_LOAD( "318004-01.u5", 0x4000, 0x4000, CRC(dbdc3319) SHA1(3c77caf72914c1c0a0875b3a7f6935cd30c54201) )
-	
+
 	ROM_REGION( 0x8000, "function", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0xf5, PLA_TAG, 0 )

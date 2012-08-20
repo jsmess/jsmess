@@ -1,9 +1,9 @@
 /**********************************************************************
 
-	Unknown Xebec Winchester controller card emulation
+    Unknown Xebec Winchester controller card emulation
 
-	Copyright MESS Team.
-	Visit http://mamedev.org for licensing and usage restrictions.
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
 

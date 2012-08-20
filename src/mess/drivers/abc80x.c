@@ -949,7 +949,7 @@ void abc800_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 			{
 				m_sio_rxdb = !(m_tape_ctr == 15);
 			}
-			
+
 			if (!dfd_in && (m_tape_ctr == 15))
 			{
 				m_tape_ctr = 4;
@@ -1600,7 +1600,7 @@ DRIVER_INIT_MEMBER(abc806_state,driver_init)
 //**************************************************************************
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT                         COMPANY             FULLNAME        FLAGS
-COMP( 1981, abc800c,    0,			0,      abc800c,    abc800, abc800c_state, 	driver_init, "Luxor Datorer AB", "ABC 800 C/HR", GAME_SUPPORTS_SAVE )
-COMP( 1981, abc800m,    abc800c,	0,      abc800m,    abc800, abc800m_state, 	driver_init, "Luxor Datorer AB", "ABC 800 M/HR", GAME_SUPPORTS_SAVE )
-COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802_state, 	driver_init, "Luxor Datorer AB", "ABC 802",		 GAME_SUPPORTS_SAVE )
-COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806_state, 	driver_init, "Luxor Datorer AB", "ABC 806",		 GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
+COMP( 1981, abc800c,    0,			0,      abc800c,    abc800, abc800c_state,	driver_init, "Luxor Datorer AB", "ABC 800 C/HR", GAME_SUPPORTS_SAVE )
+COMP( 1981, abc800m,    abc800c,	0,      abc800m,    abc800, abc800m_state,	driver_init, "Luxor Datorer AB", "ABC 800 M/HR", GAME_SUPPORTS_SAVE )
+COMP( 1983, abc802,     0,          0,      abc802,     abc802, abc802_state,	driver_init, "Luxor Datorer AB", "ABC 802",		 GAME_SUPPORTS_SAVE )
+COMP( 1983, abc806,     0,          0,      abc806,     abc806, abc806_state,	driver_init, "Luxor Datorer AB", "ABC 806",		 GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )

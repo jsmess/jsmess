@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Elektronika MS-0515
 
         06/08/2012 Skeleton driver.
@@ -23,12 +23,12 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	
-	DECLARE_WRITE16_MEMBER(ms0515_bank_w);	
+
+	DECLARE_WRITE16_MEMBER(ms0515_bank_w);
 	DECLARE_WRITE8_MEMBER(ms0515_sys_w);
-	
+
 	virtual void machine_reset();
-	
+
 	UINT8 *m_video_ram;
 	UINT8 m_sysreg;
 	int m_blink;
@@ -44,37 +44,37 @@ static ADDRESS_MAP_START(ms0515_mem, AS_PROGRAM, 16, ms0515_state)
 	AM_RANGE(0120000, 0137777) AM_RAMBANK("bank5") // RAM
 	AM_RANGE(0140000, 0157777) AM_RAMBANK("bank6") // RAM
 
-	AM_RANGE(0160000, 0177377) AM_ROM	
+	AM_RANGE(0160000, 0177377) AM_ROM
 
 	AM_RANGE(0177400, 0177437) AM_WRITE(ms0515_bank_w) // Register for RAM expansion
-	
+
 	//AM_RANGE(0177440, 0177441)  // read data
 	//AM_RANGE(0177460, 0177461)  // write data   Elektronika MS-7004 Keyboard
 	//AM_RANGE(0177442, 0177443)  // read
-	//AM_RANGE(0177462, 0177463)  // write 
-	
+	//AM_RANGE(0177462, 0177463)  // write
+
 	//AM_RANGE(0177500, 0177501)
 	//AM_RANGE(0177502, 0177503)
 	//AM_RANGE(0177504, 0177505)  // i8253
 	//AM_RANGE(0177506, 0177507)
-	
+
 	//AM_RANGE(0177540, 0177541)
 	//AM_RANGE(0177542, 0177543)
 	//AM_RANGE(0177544, 0177545)  // i8255 for MS-7007 Keyboard
 	//AM_RANGE(0177546, 0177547)
-	
-	AM_RANGE(0177600, 0177607) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0x00ff) 
-	
+
+	AM_RANGE(0177600, 0177607) AM_DEVREADWRITE8("ppi8255_1", i8255_device, read, write, 0x00ff)
+
 	AM_RANGE(0177640, 0177641) AM_DEVREADWRITE8_LEGACY("vg93", wd17xx_status_r, wd17xx_command_w,0x00ff)
 	AM_RANGE(0177642, 0177643) AM_DEVREADWRITE8_LEGACY("vg93", wd17xx_track_r, wd17xx_track_w,0x00ff)
 	AM_RANGE(0177644, 0177645) AM_DEVREADWRITE8_LEGACY("vg93", wd17xx_sector_r, wd17xx_sector_w,0x00ff)
-	AM_RANGE(0177646, 0177647) AM_DEVREADWRITE8_LEGACY("vg93", wd17xx_data_r, wd17xx_data_w,0x00ff)	
-	
+	AM_RANGE(0177646, 0177647) AM_DEVREADWRITE8_LEGACY("vg93", wd17xx_data_r, wd17xx_data_w,0x00ff)
+
 	//AM_RANGE(0177700, 0177701) // read data
 	//AM_RANGE(0177720, 0177721) // write data     // protocol S2
 	//AM_RANGE(0177702, 0177703) // read status
-	//AM_RANGE(0177722, 0177723) // write control 
-	
+	//AM_RANGE(0177722, 0177723) // write control
+
 	//AM_RANGE(0177770, 0177771) // read/write
 ADDRESS_MAP_END
 
@@ -99,13 +99,13 @@ WRITE16_MEMBER(ms0515_state::ms0515_bank_w)
 					membank("bank2")->set_base(ram + 0000000 + 0340000);
 					membank("bank3")->set_base(ram + 0020000 + 0340000);
 					break;
-			case 2: 
+			case 2:
 			case 3: // 100000 - 137777
 					membank("bank4")->set_base(ram + 0000000 + 0340000);
 					membank("bank5")->set_base(ram + 0020000 + 0340000);
 					break;
 		}
-	}	
+	}
 }
 
 WRITE8_MEMBER(ms0515_state::ms0515_sys_w)
@@ -117,11 +117,11 @@ void ms0515_state::machine_reset()
 {
 	UINT8 *ram = machine().device<ram_device>(RAM_TAG)->pointer();
 	ms0515_bank_w(*machine().memory().first_space(),0,0);
-	
+
 	m_video_ram = ram + 0000000 + 0340000;
 	m_blink = 0;
-	
-	floppy_mon_w(machine().device(FLOPPY_0), 0); // turn it on	
+
+	floppy_mon_w(machine().device(FLOPPY_0), 0); // turn it on
 }
 
 /* Input ports */
@@ -166,8 +166,8 @@ static const floppy_interface ms0515_floppy_interface =
 
 static SCREEN_UPDATE_IND16( ms0515 )
 {
-	ms0515_state *state = screen.machine().driver_data<ms0515_state>();	
-	int y, x, b;	
+	ms0515_state *state = screen.machine().driver_data<ms0515_state>();
+	int y, x, b;
 	int addr = 0;
 	if (BIT(state->m_sysreg,3))  {
 		for (y = 0; y < 200; y++)
@@ -190,8 +190,8 @@ static SCREEN_UPDATE_IND16( ms0515 )
 			int horpos = 0;
 			for (x = 0; x < 40; x++)
 			{
-				UINT8 code = state->m_video_ram[addr++]; 
-				UINT8 attr = state->m_video_ram[addr++]; 			
+				UINT8 code = state->m_video_ram[addr++];
+				UINT8 attr = state->m_video_ram[addr++];
 				UINT8 fg = (attr & 7) + BIT(attr,6)*8;
 				UINT8 bg = ((attr >> 3) & 7) + BIT(attr,6)*8;
 				if (BIT(attr,7) && (state->m_blink == 20)) {
@@ -222,7 +222,7 @@ static PALETTE_INIT( ms0515 )
 	palette_set_color(machine, 5, MAKE_RGB(0, 127, 127));
 	palette_set_color(machine, 6, MAKE_RGB(127, 127, 0));
 	palette_set_color(machine, 7, MAKE_RGB(127, 127, 127));
-	
+
 	palette_set_color(machine, 8, MAKE_RGB(127, 127, 127));
 	palette_set_color(machine, 9, MAKE_RGB(127, 127, 255));
 	palette_set_color(machine, 10, MAKE_RGB(255, 127, 127));
@@ -230,7 +230,7 @@ static PALETTE_INIT( ms0515 )
 	palette_set_color(machine, 12, MAKE_RGB(127, 255, 127));
 	palette_set_color(machine, 13, MAKE_RGB(127, 255, 255));
 	palette_set_color(machine, 14, MAKE_RGB(255, 255, 127));
-	palette_set_color(machine, 15, MAKE_RGB(255, 255, 255));	
+	palette_set_color(machine, 15, MAKE_RGB(255, 255, 255));
 }
 
 static WRITE8_DEVICE_HANDLER(ms0515_portc_w)
@@ -253,11 +253,11 @@ static MACHINE_CONFIG_START( ms0515, ms0515_state )
 	MCFG_CPU_ADD("maincpu",T11, XTAL_4MHz) // Need proper CPU here
 	MCFG_CPU_CONFIG(ms0515_data)
 	MCFG_CPU_PROGRAM_MAP(ms0515_mem)
-	
+
 	MCFG_FD1793_ADD( "vg93", ms0515_wd17xx_interface )
-	
+
 	MCFG_LEGACY_FLOPPY_DRIVE_ADD(FLOPPY_0, ms0515_floppy_interface)
-	
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -265,10 +265,10 @@ static MACHINE_CONFIG_START( ms0515, ms0515_state )
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
     MCFG_SCREEN_UPDATE_STATIC(ms0515)
-	
+
 	MCFG_PALETTE_LENGTH(16)
 	MCFG_PALETTE_INIT(ms0515)
-	
+
 	MCFG_I8255_ADD( "ppi8255_1", ms0515_ppi8255_interface_1 )
 	//MCFG_I8255_ADD( "ppi8255_2", ms0515_ppi8255_interface_2 )
 
@@ -286,6 +286,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    			COMPANY   FULLNAME       FLAGS */
-COMP( ????, ms0515,  0,       0, 	ms0515, 	ms0515,  driver_device, 0,  	"Elektronika",   "MS-0515",		GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT               COMPANY   FULLNAME       FLAGS */
+COMP( ????, ms0515,  0,       0,	ms0515, 	ms0515,  driver_device, 0,  	"Elektronika",   "MS-0515",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

@@ -141,6 +141,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( sdgndmps )
 	PORT_INCLUDE( common )
 
+	PORT_MODIFY("SYSTEM")
+	PORT_SERVICE_NO_TOGGLE( 0x0100, IP_ACTIVE_LOW )
+
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x000f, 0x000f, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 4C_1C ) )
@@ -187,7 +190,7 @@ static INPUT_PORTS_START( sdgndmps )
 	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) ) // plays a jingle at the game intro (why?)
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Allow_Continue ) )

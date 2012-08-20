@@ -3,60 +3,60 @@
     DEC Rainbow 100
 
     Driver-in-progress by R. Belmont and Miodrag Milanovic
- 
- 
+
+
     Meaning of Diagnostics LEDs (from PC100ESV1.PDF found, e.g.,
     on ftp://ftp.update.uu.se/pub/rainbow/doc/rainbow-docs/
 
     Internal Diagnostic Messages
-    Msg	Message	 					        Lights Display 
-    No.								        * = on o = off 
-    								        - = on or off
-    								        1 2 3 4 5 6 7
+    Msg Message                             Lights Display
+    No.                                     * = on o = off
+                                            - = on or off
+                                            1 2 3 4 5 6 7
     --------------------------------------------------------------
-     1	Main Board (Video)				    o * * o * o *
-     2	Main Board* (unsolicited interrupt)	* * * * o * o
-     3	Drive A or B (index)				o o * o o * *
-     4	Drive A or B (motor)				* * o o o * *
-     5	Drive A or B (seek)				    o * o o o * *
-     6	Drive A or B (read)				    * o o o o * *
-     7	Drive A or B (restore)			    o * * o o * *
-     8	Drive A or B (step)				    * o * o o * *
-     9	System Load incomplete+ (System Load)	o o o o o o o
-    10	Main Board (video, vfr)			    * * * o * o *
-    11	System Load incomplete+ (Boot Load)	o o o o o o o
-    12	Drive A or B (not ready)			o o o o o * *
-    13	Keyboard						    * * o * o * o
-    14	Main Board (nvm data)				* * * * o * *
-    15	(no msg. 15 in that table)
-    16	Interrupts off*					    * * * o o o o
-    17	Main Board (video RAM)			    * * * o * * o
-    18	Main Board (Z80 crc)				* * * * o o *
-    19	Main Board RAM (0-64K)			    - - - * * o *
-    20	Main Board (unsolicited int., Z80)  * * * * o o o *
-    21	Drive Not Ready+					o o o o o o o
-    22	Remove Card or Diskette			    o * * o o o *
-    23	Non-System Diskette+				o o o o o o o
-    24	new memory size = nnnK			    o o o o o o o
-    25	Set Up Defaults stored			    o o o o o o o
-    26	Main Board (RAM arbitration)		* * * o * o o
-    27	Main Board (RAM option)			    - - - * * o o
-    28	RX50 controller board				* * * o o * *
-    29	Main Board* (Z80 response)			* * * * o o o
-    30	Main Board (ROM crc, ROM 0)			* * * * * * *
-    31	Main Board (ROM crc, ROM 1)			* * * * * * o
-    -	Main Board (ROM crc, ROM 2)			* * * o * * *
-    33	Main Board (contention)			    o o o o o * o
-    40	Main Board (printer port)			* o * * o * o
-    50	Main Board (keyboard port)			o o * * o * o
-    60	Main Board (comm port)			    o * * * o * o
+     1  Main Board (Video)                  o * * o * o *
+     2  Main Board* (unsolicited interrupt) * * * * o * o
+     3  Drive A or B (index)                o o * o o * *
+     4  Drive A or B (motor)                * * o o o * *
+     5  Drive A or B (seek)                 o * o o o * *
+     6  Drive A or B (read)                 * o o o o * *
+     7  Drive A or B (restore)              o * * o o * *
+     8  Drive A or B (step)                 * o * o o * *
+     9  System Load incomplete+ (System Load)   o o o o o o o
+    10  Main Board (video, vfr)             * * * o * o *
+    11  System Load incomplete+ (Boot Load) o o o o o o o
+    12  Drive A or B (not ready)            o o o o o * *
+    13  Keyboard                            * * o * o * o
+    14  Main Board (nvm data)               * * * * o * *
+    15  (no msg. 15 in that table)
+    16  Interrupts off*                     * * * o o o o
+    17  Main Board (video RAM)              * * * o * * o
+    18  Main Board (Z80 crc)                * * * * o o *
+    19  Main Board RAM (0-64K)              - - - * * o *
+    20  Main Board (unsolicited int., Z80)  * * * * o o o *
+    21  Drive Not Ready+                    o o o o o o o
+    22  Remove Card or Diskette             o * * o o o *
+    23  Non-System Diskette+                o o o o o o o
+    24  new memory size = nnnK              o o o o o o o
+    25  Set Up Defaults stored              o o o o o o o
+    26  Main Board (RAM arbitration)        * * * o * o o
+    27  Main Board (RAM option)             - - - * * o o
+    28  RX50 controller board               * * * o o * *
+    29  Main Board* (Z80 response)          * * * * o o o
+    30  Main Board (ROM crc, ROM 0)         * * * * * * *
+    31  Main Board (ROM crc, ROM 1)         * * * * * * o
+    -   Main Board (ROM crc, ROM 2)         * * * o * * *
+    33  Main Board (contention)             o o o o o * o
+    40  Main Board (printer port)           * o * * o * o
+    50  Main Board (keyboard port)          o o * * o * o
+    60  Main Board (comm port)              o * * * o * o
 
     --------------------------------------------------------------
-    *	These errors can occur at any time because the circuits
-    	are monitored constantly
-    +	These messages may occur during power-up if auto boot is 
-    	selected
- 
+    *   These errors can occur at any time because the circuits
+        are monitored constantly
+    +   These messages may occur during power-up if auto boot is
+        selected
+
 ****************************************************************************/
 
 #include "emu.h"

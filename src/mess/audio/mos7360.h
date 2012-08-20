@@ -200,7 +200,7 @@ protected:
 	m_noisesize,		  /* number of samples */
 	m_noisepos,         /* pos of tone */
 	m_noisesamples;	  /* count of samples to give out per tone */
-	
+
 	int m_variant;
 };
 

@@ -69,7 +69,7 @@
 		<publisher>Big Five</publisher>
 		<info name="protection" value="halftrack" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-	
+
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="206864">
 				<rom name="bbsb.g64" size="206864" crc="612e0325" sha1="7a8be7b2f04a5fb63f23839c11a3801cff8e022c" offset="0" />
@@ -107,14 +107,14 @@
 		<publisher>Cinemaware</publisher>
 		<info name="protection" value="vmaxv2" />
 		<sharedfeat name="compatibility" value="NTSC,PAL"/>
-	
+
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side A"/>
 			<dataarea name="flop" size="278234">
 				<rom name="defenderofthecrown_s0.g64" size="278234" crc="131759d0" sha1="2c8695caee776b2082a01856d13a0eeb99f9859f" offset="0" />
 			</dataarea>
 		</part>
-	
+
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side B"/>
 			<dataarea name="flop" size="323404">

@@ -518,7 +518,7 @@ WRITE_LINE_MEMBER( base_c1571_device::atn_w )
 WRITE_LINE_MEMBER( base_c1571_device::byte_w )
 {
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, state);
-	
+
 	m_via1->write_ca1(state);
 }
 
@@ -780,11 +780,11 @@ void base_c1571_device::device_start()
 void base_c1571_device::device_reset()
 {
     m_maincpu->reset();
-    
+
     m_via0->reset();
-    m_via1->reset();	
-    m_cia->reset();	
-    
+    m_via1->reset();
+    m_cia->reset();
+
 	wd17xx_mr_w(m_fdc, 0);
 	wd17xx_mr_w(m_fdc, 1);
 

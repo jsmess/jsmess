@@ -63,7 +63,7 @@ Notes:
 
     TODO:
 
-	- cassette interrupt routine samples the latch too soon
+    - cassette interrupt routine samples the latch too soon
     - proper keyboard controller emulation
     - MyAB 80-column card
     - GeJo 80-column card
@@ -545,9 +545,9 @@ READ8_MEMBER( abc80_state::pio_pb_r )
 	// data carrier detect
 	data |= m_rs232->dcd_r() << 2;
 
-	// cassette data 
+	// cassette data
 	data |= m_tape_in_latch << 7;
-	
+
 	//logerror("read tape latch %u\n", m_tape_in_latch);
 
 	return data;
@@ -597,7 +597,7 @@ WRITE8_MEMBER( abc80_state::pio_pb_w )
 		//logerror("clear tape in latch\n");
 
 		m_tape_in_latch = 1;
-	
+
 		m_pio->port_b_write(m_tape_in_latch << 7);
 	}
 };
@@ -714,7 +714,7 @@ void abc80_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 			{
 				//logerror("-------- set tape in latch\n");
 				m_tape_in_latch = 0;
-			
+
 				m_pio->port_b_write(m_tape_in_latch << 7);
 			}
 

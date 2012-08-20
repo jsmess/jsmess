@@ -843,6 +843,9 @@ $(MAMEOBJ)/jpm.a: \
 	$(DRIVERS)/jpmimpct.o $(VIDEO)/jpmimpct.o \
 	$(DRIVERS)/pluto5.o \
 	$(DRIVERS)/jpmsys7.o \
+	$(VIDEO)/awpvid.o \
+	$(MACHINE)/meters.o \
+	$(MACHINE)/steppers.o \
 
 $(MAMEOBJ)/kaneko.a: \
 	$(DRIVERS)/airbustr.o $(VIDEO)/airbustr.o \
@@ -2061,6 +2064,10 @@ $(DRIVERS)/igspoker.o:	$(LAYOUT)/igspoker.lh
 
 $(DRIVERS)/jankenmn.o:	$(LAYOUT)/jankenmn.lh
 
+$(DRIVERS)/jpmimpct.o:	$(LAYOUT)/awpvid16.lh
+
+$(DRIVERS)/jpmsys5.o:	$(LAYOUT)/awpvid16.lh
+
 $(DRIVERS)/kas89.o:	$(LAYOUT)/kas89.lh
 
 $(DRIVERS)/kingdrby.o:	$(LAYOUT)/kingdrby.lh
@@ -2085,7 +2092,7 @@ $(DRIVERS)/mcr3.o:	$(LAYOUT)/turbotag.lh
 $(DRIVERS)/mpoker.o:	$(LAYOUT)/mpoker.lh
 
 $(DRIVERS)/mpu4mod2sw.o:	$(LAYOUT)/connect4.lh \
-			
+
 $(DRIVERS)/mpu4mod4yam.o: $(LAYOUT)/gamball.lh \
 
 $(DRIVERS)/mpu4hw.o:	$(LAYOUT)/mpu4.lh \

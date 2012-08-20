@@ -78,7 +78,7 @@ public:
 
 	virtual void machine_start();
 
-	DECLARE_WRITE8_MEMBER( osi630_ctrl_w );	
+	DECLARE_WRITE8_MEMBER( osi630_ctrl_w );
 	DECLARE_WRITE8_MEMBER( osi630_sound_w );
 	DECLARE_DRIVER_INIT(c1p);
 };

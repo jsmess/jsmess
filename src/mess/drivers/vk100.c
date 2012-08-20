@@ -251,7 +251,7 @@ static TIMER_CALLBACK( execute_vg )
 {
 	vk100_state *state = machine.driver_data<vk100_state>();
 	UINT8 thisNyb = vram_read(machine); // read in the nybble
-	// pattern rom addressing is a complex mess. see the pattern rom def later in this file.   
+	// pattern rom addressing is a complex mess. see the pattern rom def later in this file.
 	UINT8 newNyb = state->m_pattern[((state->m_vgPAT&state->m_vgPAT_Mask)?0x200:0)|((state->m_vgWOPS&7)<<6)|((state->m_vgX&3)<<4)|thisNyb]; // calculate new nybble based on pattern rom
 	// finally write the block back to ram depending on the VG_MODE (sort of a hack until we get the vector and synd and dir roms all hooked up)
 	switch (state->m_VG_MODE)
@@ -571,7 +571,7 @@ READ8_MEMBER(vk100_state::SYSTAT_A)
  * write command -> 0x05 (normal, normal, /RTS is 1, normal, normal, recieve ON, /DTR is 0, transmit off)
  * read SYSTAT B (and xor with 0xe), expect d7 to be SET or jump to error
  * after this it does something and waits for an rxrdy interrupt
- 
+
  shows the results of:
  * ACTS (/CTS)  ?      ?      ?      ?      ?      ?      ?
  * d7           d6     d5     d4     d3     d2     d1     d0
@@ -1056,7 +1056,7 @@ i.e. addr bits 9876543210
      *  Y11
      *  X8 (aka PX8)
      *  X9 (aka PX9)
-     *  ERASE L 
+     *  ERASE L
      *  X'3
      *  X'2
      * and the outputs are:
@@ -1067,7 +1067,7 @@ i.e. addr bits 9876543210
        only has 3 banks (but 2 planes of 3 banks), I (LN) assume there
        are four wr banks on the v100, one per nybble, and the X'3 and
        X'2 inputs lend credence to this.
-     * 
+     *
      */
 	ROM_LOAD( "wb8151_573a2.mmi6301.pr3.ic44", 0x0000, 0x0100, CRC(75885a9f) SHA1(c721dad6a69c291dd86dad102ed3a8ddd620ecc4)) // label verified from nigwil's and andy's board
 	// WARNING: it is possible that the first two bytes of this prom are bad!

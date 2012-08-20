@@ -79,7 +79,7 @@ public:
 	DECLARE_READ8_MEMBER( cpu_r );
 	DECLARE_READ8_MEMBER( c16_cpu_r );
 	DECLARE_WRITE8_MEMBER( cpu_w );
-	
+
 	DECLARE_WRITE_LINE_MEMBER( ted_irq_w );
 	DECLARE_READ8_MEMBER( ted_ram_r );
 	DECLARE_READ8_MEMBER( ted_rom_r );

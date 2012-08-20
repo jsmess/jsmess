@@ -2,7 +2,7 @@
 
     Commodore Plus/4 SID cartridge emulation
 
-	http://solder.dyndns.info/cgi-bin/showdir.pl?dir=files/commodore/plus4/hardware/SID-Card
+    http://solder.dyndns.info/cgi-bin/showdir.pl?dir=files/commodore/plus4/hardware/SID-Card
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -11,10 +11,10 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- GAL16V8 dump
-	- get SID clock from expansion port
+    - GAL16V8 dump
+    - get SID clock from expansion port
 
 */
 
@@ -113,7 +113,7 @@ plus4_sid_cartridge_device::plus4_sid_cartridge_device(const machine_config &mco
 	device_t(mconfig, PLUS4_SID, "Plus/4 SID cartridge", tag, owner, clock),
 	device_plus4_expansion_card_interface(mconfig, *this),
 	m_sid(*this, MOS8580_TAG),
-  	m_joy(*this, CONTROL1_TAG)
+	m_joy(*this, CONTROL1_TAG)
 {
 }
 

@@ -135,7 +135,7 @@ vp575_device::vp575_device(const machine_config &mconfig, const char *tag, devic
 	{
 		m_int[i] = CLEAR_LINE;
 		m_dma_out[i] = CLEAR_LINE;
-		m_dma_in[i] = CLEAR_LINE;		
+		m_dma_in[i] = CLEAR_LINE;
 	}
 }
 

@@ -489,7 +489,7 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 
 	state->m_ctc->trg0(1);
 	state->m_ctc->trg0(0);
-                
+
 	state->m_ctc->trg1(1);
 	state->m_ctc->trg1(0);
 }

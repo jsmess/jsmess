@@ -826,7 +826,7 @@ void abc1600_state::write_supervisor_memory(offs_t offset, UINT8 data)
 int abc1600_state::get_fc()
 {
 	UINT16 fc = m68k_get_fc(m_maincpu);
-	
+
 	m_ifc2 = !(!(MAGIC || FC0) || FC2);
 
 	return fc;

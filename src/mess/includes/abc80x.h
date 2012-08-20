@@ -96,7 +96,7 @@ public:
 	optional_device<device_t> m_discrete;
 	optional_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
-	
+
 	enum
 	{
 		TIMER_ID_CTC,

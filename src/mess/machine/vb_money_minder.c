@@ -59,7 +59,7 @@ UINT8 videobrain_money_minder_cartridge_device::videobrain_bo_r(address_space &s
 	{
 		data = m_ram[offset & m_ram_mask];
 	}
-	
+
 	return data;
 }
 

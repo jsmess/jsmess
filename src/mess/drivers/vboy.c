@@ -2,7 +2,7 @@
 
     Nintendo Virtual Boy
 
-	driver by Miodrag Milanovic & Angelo Salese
+    driver by Miodrag Milanovic & Angelo Salese
 
     Great info at http://www.goliathindustries.com/vb/
     and http://www.vr32.de/modules/dokuwiki/doku.php?
@@ -10,20 +10,20 @@
     TODO:
     - fix Affine rotation
     - per-game NVRAM hook-up (wariolnd, vleague, golf, others?)
-	- boundh: game is way too fast
-	- boundh: death animation has missing gfxs
+    - boundh: game is way too fast
+    - boundh: death animation has missing gfxs
     - galactic: ball isn't shown?
     - galactic: on the rotation layer, half of it isn't shown;
       (http://pastebin.com/9sVT9BbB)
     - innsmout: arrow OBJ graphics are misplaced;
     - marioten: title screen logo is misplaced if Mario completes his animation
     - panicbom: brightness 10 overflows
-	- spaceinv: Taito logo only if you press the button, framebuffer?
-	- spaceinv: missing shots
-	- ssquash: misplaced map;
-	- ssquash: gameplay seems busted;
-	- vleague / vproyak: keeps going into auto pause with 100 usec timer?
-	- wariolnd: brightness gets suddently darker during intro, CPU bug?
+    - spaceinv: Taito logo only if you press the button, framebuffer?
+    - spaceinv: missing shots
+    - ssquash: misplaced map;
+    - ssquash: gameplay seems busted;
+    - vleague / vproyak: keeps going into auto pause with 100 usec timer?
+    - wariolnd: brightness gets suddently darker during intro, CPU bug?
 
 ****************************************************************************/
 
@@ -509,9 +509,9 @@ READ32_MEMBER( vboy_state::io_r )
 			break;
 		case 0x28:	// KCR (Keypad Control Reg)
 			{
-//				attotime new_time = machine().time();
+//              attotime new_time = machine().time();
 
-//				if((new_time - m_input_latch_time) < m_maincpu->cycles_to_attotime(640))
+//              if((new_time - m_input_latch_time) < m_maincpu->cycles_to_attotime(640))
 					value |= machine().rand() & 2;
 
 				value = m_vboy_regs.kcr | 0x4c;
@@ -546,13 +546,13 @@ WRITE32_MEMBER( vboy_state::io_w )
 			break;
 		case 0x20:	// TCR (Timer Control Reg)
 			/*
-				111- ---- always 1
-				---x ---- timer select (1=20 us, 0=100 us)
-				---- x--- timer irq
-				---- -x-- resets timer zero flag
-				---- --x- timer is zero flag
-				---- ---x enables timer
-			*/
+                111- ---- always 1
+                ---x ---- timer select (1=20 us, 0=100 us)
+                ---- x--- timer irq
+                ---- -x-- resets timer zero flag
+                ---- --x- timer is zero flag
+                ---- ---x enables timer
+            */
 			if(data & 1)
 			{
 				m_vboy_regs.tlb = m_vboy_timer.latch & 0xff;
@@ -641,9 +641,9 @@ READ16_MEMBER( vboy_state::vip_r )
 		case 0x40:	//XPSTTS, piXel Processor STaTuS
 		{
 			/*
-			---- ---- ---- x--- XPBSY1 (second framebuffer busy flag)
-			---- ---- ---- -x-- XPBSY0 (first framebfuffer busy flag)
-			*/
+            ---- ---- ---- x--- XPBSY1 (second framebuffer busy flag)
+            ---- ---- ---- -x-- XPBSY0 (first framebfuffer busy flag)
+            */
 			UINT8 drawfb = ((m_displayfb ^ 1) + 1) << 2;
 			UINT16 res;
 
@@ -658,7 +658,7 @@ READ16_MEMBER( vboy_state::vip_r )
 				res |= m_row_num<<8;
 			}
 			//if(m_vip_regs.DPCTRL & 2)
-			//	res |= ((row_num)<<8);
+			//  res |= ((row_num)<<8);
 
 			return res;
 		}
@@ -703,15 +703,15 @@ WRITE16_MEMBER( vboy_state::vip_w )
 {
 	switch(offset << 1) {
 		/*
-			x--- ---- ---- ---- TIME_ERR
-			-x-- ---- ---- ---- XP_END
-			--x- ---- ---- ---- SB_HIT
-			---- ---- ---x ---- FRAME_START
-			---- ---- ---- x--- GAME_START
-			---- ---- ---- -x-- RFB_END
-			---- ---- ---- --x- LFB_END
-			---- ---- ---- ---x SCAN_ERR
-		*/
+            x--- ---- ---- ---- TIME_ERR
+            -x-- ---- ---- ---- XP_END
+            --x- ---- ---- ---- SB_HIT
+            ---- ---- ---x ---- FRAME_START
+            ---- ---- ---- x--- GAME_START
+            ---- ---- ---- -x-- RFB_END
+            ---- ---- ---- --x- LFB_END
+            ---- ---- ---- ---x SCAN_ERR
+        */
 		case 0x00:	//INTPND
 					logerror("Error writing INTPND\n");
 					break;
@@ -724,7 +724,7 @@ WRITE16_MEMBER( vboy_state::vip_w )
 					m_vip_regs.INTPND &= ~data;
 					m_set_irq(0);
 					//else
-					//	printf("%04x\n",m_vip_regs.INTPND);
+					//  printf("%04x\n",m_vip_regs.INTPND);
 					break;
 		case 0x20:	//DPSTTS
 					logerror("Error writing DPSTTS\n");
@@ -741,17 +741,17 @@ WRITE16_MEMBER( vboy_state::vip_w )
 		case 0x24:	//BRTA
 					m_vip_regs.BRTA = data;
 					palette_set_color_rgb(machine(), 1,(m_vip_regs.BRTA) & 0xff,0,0);
-//					popmessage("%02x %02x %02x",m_vip_regs.BRTA,m_vip_regs.BRTB,m_vip_regs.BRTC);
+//                  popmessage("%02x %02x %02x",m_vip_regs.BRTA,m_vip_regs.BRTB,m_vip_regs.BRTC);
 					break;
 		case 0x26:	//BRTB
 					m_vip_regs.BRTB = data;
 					palette_set_color_rgb(machine(), 2,(m_vip_regs.BRTA + m_vip_regs.BRTB) & 0xff,0,0);
-//					popmessage("%02x %02x %02x",m_vip_regs.BRTA,m_vip_regs.BRTB,m_vip_regs.BRTC);
+//                  popmessage("%02x %02x %02x",m_vip_regs.BRTA,m_vip_regs.BRTB,m_vip_regs.BRTC);
 					break;
 		case 0x28:	//BRTC
 					m_vip_regs.BRTC = data;
 					palette_set_color_rgb(machine(), 3,(m_vip_regs.BRTA + m_vip_regs.BRTB + m_vip_regs.BRTC) & 0xff,0,0);
-//					popmessage("%02x %02x %02x",m_vip_regs.BRTA,m_vip_regs.BRTB,m_vip_regs.BRTC);
+//                  popmessage("%02x %02x %02x",m_vip_regs.BRTA,m_vip_regs.BRTB,m_vip_regs.BRTC);
 					break;
 		case 0x2A:	//REST
 					m_vip_regs.REST = data;
@@ -769,13 +769,13 @@ WRITE16_MEMBER( vboy_state::vip_w )
 					break;
 		case 0x42:	//XPCTRL, w/o
 					/*
-					---- ---- ---- --x-
-					---- ---- ---- ---x Reset Pixel Processor
-					*/
+                    ---- ---- ---- --x-
+                    ---- ---- ---- ---x Reset Pixel Processor
+                    */
 					m_vip_regs.XPCTRL = data & 0x1f02;
 
 					//if(data & 0x1f00)
-					//	printf("%04x SBCMP\n",data);
+					//  printf("%04x SBCMP\n",data);
 
 					if(data & 1)
 					{
@@ -959,7 +959,7 @@ static ADDRESS_MAP_START( vboy_io, AS_IO, 32, vboy_state )
 
 	AM_RANGE( 0x01000000, 0x010005ff ) AM_DEVREADWRITE8("vbsnd", vboysnd_device, read, write, 0xffffffff)
 	AM_RANGE( 0x02000000, 0x0200002b ) AM_MIRROR(0x0ffff00) AM_READWRITE(io_r, io_w) // Hardware control registers mask 0xff
-//	AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
+//  AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM AM_SHARE("wram") // Main RAM - 64K mask 0xffff
 	AM_RANGE( 0x06000000, 0x06003fff ) AM_RAM AM_SHARE("nvram") // Cart RAM - 8K NVRAM
 	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_ROM AM_REGION("user1", 0) /* ROM */

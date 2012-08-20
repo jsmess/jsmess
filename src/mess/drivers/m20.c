@@ -91,7 +91,7 @@ private:
 	int m_kbrecv_bitcount;
 	UINT16 m_kbrecv_data;
 	UINT8 m_port21;
-public:	
+public:
 	DECLARE_DRIVER_INIT(m20);
 };
 

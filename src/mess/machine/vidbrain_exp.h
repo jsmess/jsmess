@@ -84,9 +84,9 @@ struct videobrain_expansion_slot_interface
 class device_videobrain_expansion_card_interface;
 
 class videobrain_expansion_slot_device : public device_t,
-								  		 public videobrain_expansion_slot_interface,
-								  		 public device_slot_interface,
-								  		 public device_image_interface
+										 public videobrain_expansion_slot_interface,
+										 public device_slot_interface,
+										 public device_image_interface
 {
 public:
 	// construction/destruction

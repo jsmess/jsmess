@@ -26,7 +26,7 @@
 // ======================> plus4_standard_cartridge_device
 
 class plus4_standard_cartridge_device : public device_t,
-									  	public device_plus4_expansion_card_interface
+										public device_plus4_expansion_card_interface
 {
 public:
 	// construction/destruction

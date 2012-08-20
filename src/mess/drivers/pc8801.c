@@ -16,7 +16,7 @@
     - waitstates;
     - dipswitches needs to be controlled;
     - below notes states that plain PC-8801 doesn't have a disk CPU, but the BIOS clearly checks the floppy ports. Wrong info?
-	- clean-ups, banking and video in particular (i.e. hook-ups with memory region should go away and device models should be used instead)
+    - clean-ups, banking and video in particular (i.e. hook-ups with memory region should go away and device models should be used instead)
 
     per-game specific TODO:
     - 100yen Soft 8 Revival Special: tight loop with vblank bit, but vblank irq takes too much time to execute its code;
@@ -38,12 +38,12 @@
     - Datenshi Kyouko: gfx garbage on the right edge?
     - Final Crisis: sound stuck with OPNA?
     - Fire Hawk: tries to r/w the opn ports (probably crashed due to floppy?)
-	- Gegege no Kitarou: title screen text/bitmap contrast is pretty ugly (BTANB?);
+    - Gegege no Kitarou: title screen text/bitmap contrast is pretty ugly (BTANB?);
     - Grobda: palette is ugly (parent pc8801 only);
-	- Music Collection Vol. 2 - Final Fantasy Tokushuu: sound irq dies pretty soon
-	- N-BASIC: cursor doesn't show up;
-	- Star Cruiser: bad kanji data?
-	- Star Cruiser: reads at i/o 0x8e?
+    - Music Collection Vol. 2 - Final Fantasy Tokushuu: sound irq dies pretty soon
+    - N-BASIC: cursor doesn't show up;
+    - Star Cruiser: bad kanji data?
+    - Star Cruiser: reads at i/o 0x8e?
     - Wanderers from Ys: user data disk looks screwed? It loads with everything as maximum as per now ...
     - Xevious: game is too fast (parent pc8801 only)
 
@@ -58,64 +58,64 @@
     - Autumn Park (BASIC error)
     - Battle Gorilla
     - Belloncho Shintai Kensa
-	- Bishoujo Noriko Part I (writes to FDC CPU ROM then expects some strict values, taken from floppy image)
-	- Blassty (attempts to read at 0x801b)
+    - Bishoujo Noriko Part I (writes to FDC CPU ROM then expects some strict values, taken from floppy image)
+    - Blassty (attempts to read at 0x801b)
     - Bokosuka Wars (polls read ID command)
     - Boukenshatachi
     - Can Can Bunny Superior
     - Carmine
     - Castle Excellent (sets sector 0xf4? Jumps to 0xa100 and it shouldn't)
     - Card Game Pro 8.8k Plus Unit 1 (prints Disk i/o error 135 in vram, not visible for whatever reason)
-	- Championship Lode Runner (fdc CPU irq doesn't fire anymore)
-	- Change Vol. 1 (fdc CPU irq doesn't fire anymore)
-	- Chikyuu Boueigun (disk i/o error during "ESDF SYSTEM LOADING")
-	- Chikyuu Senshi Rayieza (fdc CPU crashes)
-	- Choplifter
-	- Columns (code at 0x28c8, copy protection)
-	- Corridor ("THIS SYSTEM NOT KOEI SYSTEM" printed on screen)
-	- Craze (returns to basic after logo pops up, tries to self-modify program data via the window offset?)
-	- Crimson
-	- Crimson 3
+    - Championship Lode Runner (fdc CPU irq doesn't fire anymore)
+    - Change Vol. 1 (fdc CPU irq doesn't fire anymore)
+    - Chikyuu Boueigun (disk i/o error during "ESDF SYSTEM LOADING")
+    - Chikyuu Senshi Rayieza (fdc CPU crashes)
+    - Choplifter
+    - Columns (code at 0x28c8, copy protection)
+    - Corridor ("THIS SYSTEM NOT KOEI SYSTEM" printed on screen)
+    - Craze (returns to basic after logo pops up, tries to self-modify program data via the window offset?)
+    - Crimson
+    - Crimson 3
     - Cuby Panic (copy protection routine at 0x911A)
     - Daidasso (prints "BOOT dekimasen" on screen, can't boot)
     - Daikoukai Jidai
-	- Databox (app)
-	- Day Dream (hangs at the CrossMedia Soft logo)
-	- Demons Ring
-	- Dennou Tsuushin
+    - Databox (app)
+    - Day Dream (hangs at the CrossMedia Soft logo)
+    - Demons Ring
+    - Dennou Tsuushin
     - Door Door MK-2 (sets up TC in the middle of execution phase read then wants status bit 6 to be low PC=0x7050 of fdc cpu)
-	- Dragon Slayer - The Legend of Heroes 2
-	- Dungeon Buster
-	- El Dorado Denki
-	- Elevator Action
-	- Emerald Densetsu
+    - Dragon Slayer - The Legend of Heroes 2
+    - Dungeon Buster
+    - El Dorado Denki
+    - Elevator Action
+    - Emerald Densetsu
     - Emerald Dragon (it seems to miss a timer)
     - Emmy
-	- Explosion (fails to load ADPCM data?)
-	- F-15 Strike Eagle
-	- F2 Grand Prix ("Boot dekimasen")
-	- Fangs - The Saga of Wolf Blood (Crashes at the first random battle)
-	- Fantasian
-	- Final Zone
-	- Final Zone (demo)
-	- Fruit Panic
-	- FSD Sample Ongaku Shuu Vol. 1-7
-	- Gaia no Kiba
-	- Gaiflame
-	- Gambler Jiko Chuushin ha
-	- Gambler Jiko Chuushin ha 2
-	- Gambler Jiko Chuushin ha 3
-	- Gambler Jiko Chuushin ha 3 (demo)
-	- Gambler Jiko Chuushin ha Mahjong Puzzle Collection
-	- Gambler Jiko Chuushin ha Mahjong Puzzle Collection (demo)
-	- Game Music Library
-	- Gaudi - Barcelona no Kaze (bad Wolfteam logo then black screen)
-	- GC-clusterz Music Disk Vol. 1-7
-	- Genji
-	- Gokuraku Tengoku
-	- Grodius 3 (might not be floppy)
-	- Gun Ship (at gameplay)
-	(Hacker)
+    - Explosion (fails to load ADPCM data?)
+    - F-15 Strike Eagle
+    - F2 Grand Prix ("Boot dekimasen")
+    - Fangs - The Saga of Wolf Blood (Crashes at the first random battle)
+    - Fantasian
+    - Final Zone
+    - Final Zone (demo)
+    - Fruit Panic
+    - FSD Sample Ongaku Shuu Vol. 1-7
+    - Gaia no Kiba
+    - Gaiflame
+    - Gambler Jiko Chuushin ha
+    - Gambler Jiko Chuushin ha 2
+    - Gambler Jiko Chuushin ha 3
+    - Gambler Jiko Chuushin ha 3 (demo)
+    - Gambler Jiko Chuushin ha Mahjong Puzzle Collection
+    - Gambler Jiko Chuushin ha Mahjong Puzzle Collection (demo)
+    - Game Music Library
+    - Gaudi - Barcelona no Kaze (bad Wolfteam logo then black screen)
+    - GC-clusterz Music Disk Vol. 1-7
+    - Genji
+    - Gokuraku Tengoku
+    - Grodius 3 (might not be floppy)
+    - Gun Ship (at gameplay)
+    (Hacker)
 
     - Harakiri
     - Kaseijin (app) (code snippet is empty at some point)
@@ -130,9 +130,9 @@
     - The Return of Ishtar
     - Tobira wo Akete (random crashes in parent pc8801 only)
 
-	list of games that doesn't like i8214_irq_level == 5 in sound irq
-	- 100yen Disk 2 / Jumper 2: Sound BGM dies pretty soon;
-	- Alpha (demo): stuck note in title screen, doesn't seem to go further;
+    list of games that doesn't like i8214_irq_level == 5 in sound irq
+    - 100yen Disk 2 / Jumper 2: Sound BGM dies pretty soon;
+    - Alpha (demo): stuck note in title screen, doesn't seem to go further;
     - Ayumi: black screen after new game / load game screen;
     - Brunette: No sound, eventually hangs at gameplay;
     - Digital Devil Story Megami Tensei: hangs at gameplay (sound irq issue)
@@ -147,10 +147,10 @@
     games that needs to HAVE write-protect floppies (BTANBs):
     - 100 Yen Disk 7: (doesn't boot in V2 mode)
 
-	other BTANBs
-	- Attack Hirokochan: returns to BASIC after an initial animation, needs BASIC V1:
+    other BTANBs
+    - Attack Hirokochan: returns to BASIC after an initial animation, needs BASIC V1:
     - Jark (needs PC-8801MC)
-	- Kuronekosou Souzoku Satsujin Jiken: "Illegal function call in 105", needs BASIC V1;
+    - Kuronekosou Souzoku Satsujin Jiken: "Illegal function call in 105", needs BASIC V1;
 
     Notes:
     - BIOS disk ROM defines what kind of floppies you could load:
@@ -159,8 +159,8 @@
     - Later models have palette bugs with some games (Alphos, Tokyo Nampa Street).
       This is because you have to set up the V1 / V2 DIP-SW to V1 for those games (it's the BIOS that sets up to analog and never changes back otherwise).
     - Password for "AY-1: Fortress Solomon" is "123" then press enter, any other key pressed makes it to fail the check (you must soft reset the machine)
-	- Pressing Home in Dennou Gakuen during gameplay makes it to show a fake DASM screen. That's supposed to be a panic button and it's also in the
-	  sequels (with different screens);
+    - Pressing Home in Dennou Gakuen during gameplay makes it to show a fake DASM screen. That's supposed to be a panic button and it's also in the
+      sequels (with different screens);
 
     Bankswitch Notes:
     - 0x31 - graphic banking
@@ -821,7 +821,7 @@ UINT32 pc8801_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap,
 {
 	bitmap.fill(screen.machine().pens[0], cliprect);
 
-//	popmessage("%04x %04x %02x",m_dma_address[2],m_dma_counter[2],m_dmac_mode);
+//  popmessage("%04x %04x %02x",m_dma_address[2],m_dma_counter[2],m_dmac_mode);
 
 	if(m_gfx_ctrl & 8)
 	{
@@ -1235,7 +1235,7 @@ void pc8801_state::pc8801_dynamic_res_change(void)
 	xsize = screen_width + hretrace;
 	ysize = screen_height * lines_per_char + vretrace * lines_per_char;
 
-//	popmessage("H %d V %d (%d x %d) HR %d VR %d (%d %d)\n",xvis,yvis,screen_height,lines_per_char,hretrace,vretrace, xsize,ysize);
+//  popmessage("H %d V %d (%d x %d) HR %d VR %d (%d %d)\n",xvis,yvis,screen_height,lines_per_char,hretrace,vretrace, xsize,ysize);
 
 	visarea.set(0, xvis - 1, 0, yvis - 1);
 	if(pc8801_pixel_clock())
@@ -1297,7 +1297,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_irq_level_w)
 	else
 		m_i8214_irq_level = data & 7;
 
-//	IRQ_LOG(("%02x LV\n",m_i8214_irq_level));
+//  IRQ_LOG(("%02x LV\n",m_i8214_irq_level));
 }
 
 
@@ -1315,7 +1315,7 @@ WRITE8_MEMBER(pc8801_state::pc8801_irq_mask_w)
 	if(m_timer_irq_latch == 0 && m_vrtc_irq_latch == 0 && m_sound_irq_latch == 0)
 		cputag_set_input_line(machine(),"maincpu",0,CLEAR_LINE);
 
-//	IRQ_LOG(("%02x MASK (%02x %02x)\n",data,m_timer_irq_latch,m_vrtc_irq_latch));
+//  IRQ_LOG(("%02x MASK (%02x %02x)\n",data,m_timer_irq_latch,m_vrtc_irq_latch));
 
 	//if(data & 4)
 	//  printf("IRQ mask %02x\n",data);
@@ -1346,9 +1346,9 @@ READ8_MEMBER(pc8801_state::pc8801_misc_ctrl_r)
 WRITE8_MEMBER(pc8801_state::pc8801_misc_ctrl_w)
 {
 	/*
-	x--- ---- sound irq mask, active low
-	--x- ---- analog (1) / digital (0) palette select
-	*/
+    x--- ---- sound irq mask, active low
+    --x- ---- analog (1) / digital (0) palette select
+    */
 
 	m_misc_ctrl = data;
 
@@ -1812,7 +1812,7 @@ ADDRESS_MAP_END
 static READ8_DEVICE_HANDLER( cpu_8255_c_r )
 {
 	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-//	device->machine().scheduler().synchronize(); // force resync
+//  device->machine().scheduler().synchronize(); // force resync
 
 	return state->m_i8255_1_pc >> 4;
 }
@@ -1820,7 +1820,7 @@ static READ8_DEVICE_HANDLER( cpu_8255_c_r )
 static WRITE8_DEVICE_HANDLER( cpu_8255_c_w )
 {
 	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-//	device->machine().scheduler().synchronize(); // force resync
+//  device->machine().scheduler().synchronize(); // force resync
 
 	state->m_i8255_0_pc = data;
 }
@@ -1839,7 +1839,7 @@ static I8255A_INTERFACE( master_fdd_intf )
 static READ8_DEVICE_HANDLER( fdc_8255_c_r )
 {
 	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-//	device->machine().scheduler().synchronize(); // force resync
+//  device->machine().scheduler().synchronize(); // force resync
 
 	return state->m_i8255_0_pc >> 4;
 }
@@ -1847,7 +1847,7 @@ static READ8_DEVICE_HANDLER( fdc_8255_c_r )
 static WRITE8_DEVICE_HANDLER( fdc_8255_c_w )
 {
 	pc8801_state *state = device->machine().driver_data<pc8801_state>();
-//	device->machine().scheduler().synchronize(); // force resync
+//  device->machine().scheduler().synchronize(); // force resync
 
 	state->m_i8255_1_pc = data;
 }
@@ -2119,7 +2119,7 @@ static INPUT_PORTS_START( pc8001 )
 	PORT_DIPSETTING(    0x80, "N88-BASIC (V1L)" )
 	PORT_DIPSETTING(    0xc0, "N88-BASIC (V1H)" )
 	PORT_DIPSETTING(    0x40, "N88-BASIC (V2)" )
-//	PORT_DIPSETTING(    0x00, "N88-BASIC (V2)" )
+//  PORT_DIPSETTING(    0x00, "N88-BASIC (V2)" )
 
 	PORT_START("CTRL")
 	PORT_DIPNAME( 0x02, 0x02, "Monitor Type" )
@@ -2376,7 +2376,7 @@ static void pc8801_sound_irq( device_t *device, int irq )
 {
 	pc8801_state *state = device->machine().driver_data<pc8801_state>();
 
-//	printf("%02x %02x %02x\n",state->m_sound_irq_mask,state->m_i8214_irq_level,irq);
+//  printf("%02x %02x %02x\n",state->m_sound_irq_mask,state->m_i8214_irq_level,irq);
 	/* TODO: correct i8214 irq level? */
 	if(irq)
 	{
@@ -2441,7 +2441,7 @@ static MACHINE_RESET( pc8801 )
 	state->m_layer_mask = 0x00;
 	state->m_vram_sel = 3;
 
-//	pc8801_dynamic_res_change(machine);
+//  pc8801_dynamic_res_change(machine);
 
 	state->m_fdc_irq_opcode = 0; //TODO: copied from PC-88VA, could be wrong here ... should be 0x7f ld a,a in the latter case
 	state->m_mouse.phase = 0;
@@ -2576,7 +2576,7 @@ static READ8_DEVICE_HANDLER( opn_porta_r )
 		shift = (state->m_mouse.phase & 1) ? 0 : 4;
 		res = (state->m_mouse.phase & 2) ? state->m_mouse.y : state->m_mouse.x;
 
-//		printf("%d\n",state->m_mouse.phase);
+//      printf("%d\n",state->m_mouse.phase);
 
 		return ((res >> shift) & 0x0f) | 0xf0;
 	}
@@ -2699,7 +2699,7 @@ static MACHINE_CONFIG_START( pc8801, pc8801_state )
 	MCFG_PALETTE_LENGTH(0x10)
 	MCFG_PALETTE_INIT( pc8801 )
 
-//	MCFG_VIDEO_START(pc8801)
+//  MCFG_VIDEO_START(pc8801)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

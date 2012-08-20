@@ -114,7 +114,7 @@ public:
 	DECLARE_READ8_MEMBER( pio_pa_r );
 	DECLARE_READ8_MEMBER( pio_pb_r );
 	DECLARE_WRITE8_MEMBER( pio_pb_w );
-	
+
 	DECLARE_WRITE_LINE_MEMBER( keydown_w );
 
 	// keyboard state

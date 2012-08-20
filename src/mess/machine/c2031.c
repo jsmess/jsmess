@@ -332,7 +332,7 @@ static const via6522_interface via1_intf =
 WRITE_LINE_MEMBER( c2031_device::byte_w )
 {
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, state);
-	
+
 	m_via1->write_ca1(state);
 }
 
@@ -449,7 +449,7 @@ void c2031_device::device_start()
 void c2031_device::device_reset()
 {
     m_maincpu->reset();
-    
+
     m_via0->reset();
     m_via1->reset();
 }

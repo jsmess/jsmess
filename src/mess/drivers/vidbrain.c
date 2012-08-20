@@ -16,7 +16,7 @@
 
     TODO:
 
-	- wait states (UV201: 2.9us, memory except RES1: 1.65us)
+    - wait states (UV201: 2.9us, memory except RES1: 1.65us)
     - interlaced video?
     - pinball background colors
     - Y-zoom starting on odd scanline only 1 line high

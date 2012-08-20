@@ -1,9 +1,9 @@
 /**********************************************************************
 
-	Visual 1050 keyboard emulation
+    Visual 1050 keyboard emulation
 
-	Copyright MESS Team.
-	Visit http://mamedev.org for licensing and usage restrictions.
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
 *********************************************************************/
 
@@ -400,18 +400,18 @@ WRITE8_MEMBER( v1050_keyboard_device::kb_p2_w )
 {
 	/*
 
-		bit     description
+        bit     description
 
-		P20     Z8 A8 (8039 external ROM)
-		P21     Z8 A9
-		P22     Z8 A10
-		P23
-		P24
-		P25     led output
-		P26     speaker (NE555) output
-		P27     serial output
+        P20     Z8 A8 (8039 external ROM)
+        P21     Z8 A9
+        P22     Z8 A10
+        P23
+        P24
+        P25     led output
+        P26     speaker (NE555) output
+        P27     serial output
 
-	*/
+    */
 
 	// led output
 	output_set_led_value(0, BIT(data, 5));

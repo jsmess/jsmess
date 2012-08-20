@@ -1,6 +1,6 @@
 /*
-    vboy.h - Virtual Boy audio emulation 
- 
+    vboy.h - Virtual Boy audio emulation
+
     By Richard Bannister and Gil Pedersen.
     MESS device adaptation by R. Belmont
 */
@@ -42,7 +42,7 @@ typedef struct {
 	UINT8		volRight;			// Right output volume
 	UINT8		sample[580];		// sample to play
 	int			sample_len;			// length of sample
-	
+
 	// values that change, as the sample is played
 	int			offset;				// current offset in sample
 	int			time;				// the duration that this sample is to be played

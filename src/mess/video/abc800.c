@@ -111,7 +111,7 @@ void abc800c_state::hr_update(bitmap_ind16 &bitmap, const rectangle &cliprect)
 					if (black || opaque)
 					{
 						color += 128;
-	
+
 						bitmap.pix16(y, x) = color;
 						bitmap.pix16(y, x + 1) = color;
 

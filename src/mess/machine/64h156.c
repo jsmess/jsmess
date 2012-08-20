@@ -13,14 +13,14 @@
 
     http://staff.washington.edu/rrcc/uwweb/1541early/1540-2.GIF
 
-	- model disk rotation for proper track alignment
+    - model disk rotation for proper track alignment
     - write circuitry
     - cycle exact M6502
     - cycle exact VIA
     - refactor to use modern floppy system
 
     - get these running and we're golden
-    	- Quiwi (speed change within track)
+        - Quiwi (speed change within track)
         - Defender of the Crown (V-MAX! v2, density checks)
         - Test Drive / Cabal (HLS, sub-cycle jitter)
         - Galaxian (?, needs 100% accurate VIA)
@@ -119,7 +119,7 @@ inline void c64h156_device::read_current_track()
 
 
 //-------------------------------------------------
-//  update_cycles_until_next_bit - 
+//  update_cycles_until_next_bit -
 //-------------------------------------------------
 
 inline void c64h156_device::update_cycles_until_next_bit()
@@ -169,7 +169,7 @@ inline void c64h156_device::receive_bit()
 				if (LOG) logerror("PHANTOM BIT SYNC 1 after %u cycles\n", m_zero_count);
 
 				m_bit_sync = 1;
-	
+
 				m_zero_count = 0;
 				m_cycles_until_random_flux = (rand() % 367) + 33;
 			}
@@ -180,7 +180,7 @@ inline void c64h156_device::receive_bit()
 
 			m_shift <<= 1;
 			m_shift |= m_bit_sync;
-			
+
 			m_bit_pos--;
 			m_bit_count++;
 
@@ -248,7 +248,7 @@ inline void c64h156_device::decode_bit()
 
 			if (LOG) logerror("++");
 		}
-		else 
+		else
 		{
 			if (LOG) logerror("  ");
 		}
@@ -256,7 +256,7 @@ inline void c64h156_device::decode_bit()
 
 	m_last_bit_sync = m_bit_sync;
 	m_ue7_tc = ue7_tc;
-	
+
 	int uf4_qa = BIT(m_uf4, 0);
 	int uf4_qb = BIT(m_uf4, 1);
 	int uf4_qc = BIT(m_uf4, 2);
@@ -278,7 +278,7 @@ inline void c64h156_device::decode_bit()
 
 		if (LOG) logerror("<<");
 	}
-	else 
+	else
 	{
 		if (LOG) logerror("  ");
 	}
@@ -288,7 +288,7 @@ inline void c64h156_device::decode_bit()
 	// UE3
 
 	int block_sync = !(m_oe && (m_ud2 == 0xff) && m_u4a && m_u4b);
-	
+
 	if (LOG) logerror("SYNC %u, ", block_sync);
 
 	if (!block_sync)
@@ -354,14 +354,14 @@ inline void c64h156_device::decode_bit()
 		}
 	}
 
-	// prepare for next cycle	
-	
+	// prepare for next cycle
+
 	if (m_block_sync != block_sync)
 	{
 		m_block_sync = block_sync;
 		m_out_sync_func(m_block_sync);
 	}
-	
+
 	if (m_byte_sync != byte_sync)
 	{
 		m_byte_sync = byte_sync;
@@ -595,7 +595,7 @@ WRITE_LINE_MEMBER( c64h156_device::mtr_w )
 WRITE_LINE_MEMBER( c64h156_device::oe_w )
 {
 	if (LOG) logerror("OE %u\n", state);
-	
+
 	m_oe = state;
 }
 

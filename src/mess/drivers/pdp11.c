@@ -120,7 +120,7 @@ static ADDRESS_MAP_START(pdp11_mem, AS_PROGRAM, 16, pdp11_state)
 	AM_RANGE( 0xff72, 0xff73 ) AM_READ(term_r)
 	AM_RANGE( 0xff74, 0xff75 ) AM_READ(term_tx_status_r)
 	AM_RANGE( 0xff76, 0xff77 ) AM_WRITE(term_w)
-	
+
 	AM_RANGE( 0xfe78, 0xfe7b ) AM_DEVREADWRITE("rx01", rx01_device, read, write)
 ADDRESS_MAP_END
 
@@ -330,7 +330,7 @@ static MACHINE_CONFIG_START( pdp11, pdp11_state )
 
 	/* video hardware */
 	MCFG_GENERIC_TERMINAL_ADD(TERMINAL_TAG, terminal_intf)
-	
+
 	MCFG_RX01_ADD("rx01")
 MACHINE_CONFIG_END
 

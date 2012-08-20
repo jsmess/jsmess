@@ -693,7 +693,7 @@ ROM_START( vt125 ) // This is from bitsavers and vt100.net, as the vt125 schemat
 
 	// "GPO" aka vt125 "mono board" roms and proms
 	ROM_REGION(0x10000, "monocpu", ROMREGION_ERASEFF) // roms for the 8085 subcpu
-	ROM_LOAD( "23-043e4-00.e22", 0x0000, 0x2000, NO_DUMP) // 2364/MK36xxx mask rom 
+	ROM_LOAD( "23-043e4-00.e22", 0x0000, 0x2000, NO_DUMP) // 2364/MK36xxx mask rom
 	ROM_LOAD( "23-043e4-00.e23", 0x2000, 0x2000, NO_DUMP) // 2364/MK36xxx mask rom
 	ROM_LOAD( "23-045e4-00.e24", 0x4000, 0x2000, NO_DUMP) // 2364/MK36xxx mask rom
 	// E25 socket is empty

@@ -214,7 +214,7 @@ static SCREEN_UPDATE_IND16( p2000t )
 
 	saa5050_update(saa5050, bitmap, cliprect);
 	saa5050_frame_advance(saa5050);
-	
+
 	return 0;
 }
 

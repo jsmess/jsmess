@@ -1522,7 +1522,7 @@ static ADDRESS_MAP_START( fm11_sub_mem, AS_PROGRAM, 8, fm7_state )
 	AM_RANGE(0x9000,0x9f7f) AM_RAM // Work RAM(?)
 	AM_RANGE(0x9f80,0x9fff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0xafe0,0xafe3) AM_RAM
-//	AM_RANGE(0xafe4,0xafe4) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
+//  AM_RANGE(0xafe4,0xafe4) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
 	AM_RANGE(0xafe6,0xafe6) AM_READWRITE(fm77av_video_flags_r,fm77av_video_flags_w)
 	AM_RANGE(0xaff0,0xaff0) AM_READWRITE(fm7_sub_busyflag_r,fm7_sub_busyflag_w)
 	AM_RANGE(0xc000,0xffff) AM_ROM // sybsystem ROM

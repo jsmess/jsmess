@@ -76,9 +76,9 @@ Notes:
 
 /*
 
-	TODO:
+    TODO:
 
-	- 8" floppy is not supported, but there are no dumps available either
+    - 8" floppy is not supported, but there are no dumps available either
 
 */
 
