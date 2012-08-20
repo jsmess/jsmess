@@ -9,7 +9,7 @@
 
 #include "emu.h"
 #include "cpu/v810/v810.h"
-#include "video/huc6260.h"
+#include "video/huc6261.h"
 #include "video/huc6270.h"
 
 
@@ -39,7 +39,7 @@ static ADDRESS_MAP_START( pcfx_io, AS_IO, 32, pcfx_state )
 	AM_RANGE( 0x00000000, 0x000000FF ) AM_NOP	/* PAD */
 	AM_RANGE( 0x00000100, 0x000001FF ) AM_NOP	/* HuC6230 */
 	AM_RANGE( 0x00000200, 0x000002FF ) AM_NOP	/* HuC6271 */
-	AM_RANGE( 0x00000300, 0x000003FF ) AM_NOP	/* HuC6261 */
+	AM_RANGE( 0x00000300, 0x000003FF ) AM_DEVREADWRITE16( "huc6261", huc6261_device, read, write, 0xffff )	/* HuC6261 */
 	AM_RANGE( 0x00000400, 0x000004FF ) AM_DEVREADWRITE8( "huc6270_a", huc6270_device, read, write, 0xff )	/* HuC6270-A */
 	AM_RANGE( 0x00000500, 0x000005FF ) AM_DEVREADWRITE8( "huc6270_b", huc6270_device, read, write, 0xff )	/* HuC6270-B */
 	AM_RANGE( 0x00000600, 0x000006FF ) AM_NOP	/* HuC6272 */
@@ -57,6 +57,14 @@ INPUT_PORTS_END
 static WRITE_LINE_DEVICE_HANDLER( pcfx_irq_changed )
 {
 }
+
+
+static const huc6261_interface pcfx_huc6261_config =
+{
+	"screen",
+	"huc6270_a",
+	"huc6270_b"
+};
 
 
 static const huc6270_interface pcfx_huc6270_a_config =
@@ -90,10 +98,11 @@ static MACHINE_CONFIG_START( pcfx, pcfx_state )
 
 	MCFG_SCREEN_ADD( "screen", RASTER )
 	MCFG_SCREEN_UPDATE_DRIVER(pcfx_state, screen_update)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, HUC6260_WPF, 64, 64 + 1024 + 64, HUC6260_LPF, 18, 18 + 242)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_21_4772MHz, HUC6261_WPF, 64, 64 + 1024 + 64, HUC6261_LPF, 18, 18 + 242)
 
 	MCFG_HUC6270_ADD( "huc6270_a", pcfx_huc6270_a_config )
 	MCFG_HUC6270_ADD( "huc6270_b", pcfx_huc6270_b_config )
+	MCFG_HUC6261_ADD( "huc6261", XTAL_21_4772MHz, pcfx_huc6261_config )
 
 MACHINE_CONFIG_END
 
