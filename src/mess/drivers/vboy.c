@@ -10,6 +10,8 @@
     TODO:
     - fix Affine rotation
     - per-game NVRAM hook-up (wariolnd, vleague, golf, others?)
+	- boundh: game is way too fast
+	- boundh: death animation has missing gfxs
     - galactic: ball isn't shown?
     - galactic: on the rotation layer, half of it isn't shown;
     - innsmout: arrow OBJ graphics are misplaced;
@@ -276,7 +278,7 @@ static void draw_bg_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vboy_pa
 
 			x1 += right ? -gp : gp;
 			if (mode==1)
-				x1 += vboy_paramtab[y*2+(right ^ 1)];
+				x1 += (INT16)vboy_paramtab[y*2+(right ^ 1)];
 
 			src_x = x+mx;
 			src_y = y+my;
@@ -376,11 +378,8 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	if(end)
 		return 1;
 
-	if (mode < 2) // Normal / Hbias Mode
+	if (mode < 2) // Normal / HBias Mode
 	{
-		if(mode == 1)
-			popmessage("mode == 1, check");
-
 		if(ovr)
 			fill_ovr_char(state, ovr_char & 0x7ff,BIT(ovr_char,13), BIT(ovr_char,12), state->m_vip_regs.GPLT[(ovr_char >> 14) & 3]);
 
