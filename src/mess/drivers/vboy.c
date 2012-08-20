@@ -14,6 +14,7 @@
 	- boundh: death animation has missing gfxs
     - galactic: ball isn't shown?
     - galactic: on the rotation layer, half of it isn't shown;
+      (http://pastebin.com/9sVT9BbB)
     - innsmout: arrow OBJ graphics are misplaced;
     - marioten: title screen logo is misplaced if Mario completes his animation
     - panicbom: brightness 10 overflows
