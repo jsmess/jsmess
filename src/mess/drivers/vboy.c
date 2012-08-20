@@ -113,7 +113,6 @@ public:
 	vip_regs_t m_vip_regs;
 	vboy_timer_t m_vboy_timer;
 	int *m_bg_map;
-	bitmap_ind16 m_screen_output;
 	UINT16 m_frame_count;
 	UINT8 m_displayfb;
 	UINT8 m_display_count;
@@ -137,7 +136,6 @@ static VIDEO_START( vboy )
 	// Allocate memory for temporary screens
 	state->m_bg_map = auto_alloc_array_clear(machine, int, 0x1000*0x1000);
 
-	state->m_screen_output.allocate(384, 224, BITMAP_FORMAT_IND16);
 	state->m_font  = auto_alloc_array(machine, UINT16, 2048 * 8);
 	state->m_bgmap = auto_alloc_array(machine, UINT16, 0x20000 >> 1);
 	state->m_objects = state->m_bgmap + (0x1e000 >> 1);
@@ -417,28 +415,26 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 static SCREEN_UPDATE_IND16( vboy_left )
 {
 	vboy_state *state = screen.machine().driver_data<vboy_state>();
-	state->m_screen_output.fill(state->m_vip_regs.BKCOL, cliprect);
+	bitmap.fill(state->m_vip_regs.BKCOL, cliprect);
 	int cur_spt;
 
 	cur_spt = 3;
 	for(int i=31; i>=0; i--)
-		if (display_world(state, i, state->m_screen_output, 0,cur_spt)) break;
+		if (display_world(state, i, bitmap, 0, cur_spt)) break;
 
-	copybitmap(bitmap, state->m_screen_output, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
 static SCREEN_UPDATE_IND16( vboy_right )
 {
 	vboy_state *state = screen.machine().driver_data<vboy_state>();
-	state->m_screen_output.fill(state->m_vip_regs.BKCOL, cliprect);
+	bitmap.fill(state->m_vip_regs.BKCOL, cliprect);
 	int cur_spt;
 
 	cur_spt = 3;
 	for(int i=31; i>=0; i--)
-		if (display_world(state, i, state->m_screen_output, 1,cur_spt)) break;
+		if (display_world(state, i, bitmap, 0, cur_spt)) break;
 
-	copybitmap(bitmap, state->m_screen_output, 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
