@@ -131,7 +131,7 @@ public:
 	void draw_affine_map(bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int gx, int gp, int gy, int h, int w,
 	                                           UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right);
 	UINT8 display_world(int num, bitmap_ind16 &bitmap, bool right, int &cur_spt);
-
+	void m_set_brightness(void);
 };
 
 
@@ -488,6 +488,12 @@ static SCREEN_UPDATE_IND16( vboy_right )
 	return 0;
 }
 
+/**********************************
+ *
+ * I/O
+ *
+ *********************************/
+
 READ32_MEMBER( vboy_state::io_r )
 {
 	UINT32 value = 0x00;
@@ -532,6 +538,7 @@ READ32_MEMBER( vboy_state::io_r )
 	}
 	return value;
 }
+
 WRITE32_MEMBER( vboy_state::io_w )
 {
 	switch (offset<<2)
@@ -599,6 +606,37 @@ WRITE32_MEMBER( vboy_state::io_w )
 	}
 }
 
+
+/**********************************
+ *
+ * VIP
+ *
+ *********************************/
+/*
+TODO: brightness presumably isn't a linear algorythm, also REST needs to be taken into account (needs a working example)
+*/
+void vboy_state::m_set_brightness(void)
+{
+	int a,b,c;
+
+	//d = (m_vip_regs.BRTA + m_vip_regs.BRTB + m_vip_regs.BRTC + m_vip_regs.REST);
+	a = (0xff * (m_vip_regs.BRTA)) / 0x80;
+	b = (0xff * (m_vip_regs.BRTA + m_vip_regs.BRTB)) / 0x80;
+	c = (0xff * (m_vip_regs.BRTA + m_vip_regs.BRTB + m_vip_regs.BRTC)) / 0x80;
+
+	if(a < 0) { a = 0; }
+	if(b < 0) { b = 0; }
+	if(c < 0) { c = 0; }
+	if(a > 0xff) { a = 0xff; }
+	if(b > 0xff) { b = 0xff; }
+	if(c > 0xff) { c = 0xff; }
+
+//	popmessage("%02x %02x %02x %02x",m_vip_regs.BRTA,m_vip_regs.BRTB,m_vip_regs.BRTC,m_vip_regs.REST);
+	palette_set_color_rgb(machine(), 1, a,0,0);
+	palette_set_color_rgb(machine(), 2, b,0,0);
+	palette_set_color_rgb(machine(), 3, c,0,0);
+}
+
 READ16_MEMBER( vboy_state::vip_r )
 {
 	switch(offset << 1) {
@@ -642,6 +680,7 @@ READ16_MEMBER( vboy_state::vip_r )
 		case 0x2E:	//FRMCYC
 					return m_vip_regs.FRMCYC;
 		case 0x30:	//CTA
+					printf("Read CTA\n");
 					return m_vip_regs.CTA;
 		case 0x40:	//XPSTTS, piXel Processor STaTuS
 		{
@@ -670,6 +709,7 @@ READ16_MEMBER( vboy_state::vip_r )
 		case 0x42:	//XPCTRL
 					return m_vip_regs.XPCTRL;
 		case 0x44:	//VER
+					printf("%08x read VER\n",cpu_get_pc(m_maincpu));
 					return m_vip_regs.VER;
 		case 0x48:	//SPT0
 					return m_vip_regs.SPT[0];
@@ -706,6 +746,9 @@ READ16_MEMBER( vboy_state::vip_r )
 
 WRITE16_MEMBER( vboy_state::vip_w )
 {
+	if(mem_mask != 0xffff)
+		printf("%04x %02x\n",mem_mask,offset*2);
+
 	switch(offset << 1) {
 		/*
             x--- ---- ---- ---- TIME_ERR
@@ -745,22 +788,21 @@ WRITE16_MEMBER( vboy_state::vip_w )
 					break;
 		case 0x24:	//BRTA
 					m_vip_regs.BRTA = data;
-					palette_set_color_rgb(machine(), 1,(m_vip_regs.BRTA) & 0xff,0,0);
-//                  popmessage("%02x %02x %02x",m_vip_regs.BRTA,m_vip_regs.BRTB,m_vip_regs.BRTC);
+					m_set_brightness();
 					break;
 		case 0x26:	//BRTB
 					m_vip_regs.BRTB = data;
-					palette_set_color_rgb(machine(), 2,(m_vip_regs.BRTA + m_vip_regs.BRTB) & 0xff,0,0);
-//                  popmessage("%02x %02x %02x",m_vip_regs.BRTA,m_vip_regs.BRTB,m_vip_regs.BRTC);
+					m_set_brightness();
 					break;
 		case 0x28:	//BRTC
 					m_vip_regs.BRTC = data;
-					palette_set_color_rgb(machine(), 3,(m_vip_regs.BRTA + m_vip_regs.BRTB + m_vip_regs.BRTC) & 0xff,0,0);
-//                  popmessage("%02x %02x %02x",m_vip_regs.BRTA,m_vip_regs.BRTB,m_vip_regs.BRTC);
+					m_set_brightness();
 					break;
 		case 0x2A:	//REST
 					m_vip_regs.REST = data;
-					//printf("%02x %08x D\n",data,cpu_get_pc(m_maincpu));
+					m_set_brightness();
+					if(data)
+						printf("%04x REST\n",data);
 					break;
 		case 0x2E:	//FRMCYC
 					//printf("%d\n",data);
@@ -768,6 +810,7 @@ WRITE16_MEMBER( vboy_state::vip_w )
 					break;
 		case 0x30:	//CTA
 					m_vip_regs.CTA = data;
+					printf("%04x CTA\n",data);
 					break;
 		case 0x40:	//XPSTTS
 					logerror("Error writing XPSTTS\n");
