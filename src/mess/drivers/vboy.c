@@ -13,6 +13,7 @@
     - galactic: ball isn't shown?
     - galactic: on the rotation layer, half of it isn't shown;
     - innsmout: arrow OBJ graphics are misplaced;
+    - marioten: title screen logo is misplaced if Mario completes his animation
     - panicbom: brightness 10 overflows
 	- spaceinv: Taito logo only if you press the button, framebuffer?
 	- spaceinv: missing shots
@@ -111,7 +112,7 @@ public:
 	vboy_regs_t m_vboy_regs;
 	vip_regs_t m_vip_regs;
 	vboy_timer_t m_vboy_timer;
-	int m_bg_map[0x200*0x200];
+	int *m_bg_map;
 	bitmap_ind16 m_screen_output;
 	UINT16 m_frame_count;
 	UINT8 m_displayfb;
@@ -134,12 +135,12 @@ static VIDEO_START( vboy )
 	//int i;
 
 	// Allocate memory for temporary screens
-	//state->m_bg_map[384*224];
+	state->m_bg_map = auto_alloc_array_clear(machine, int, 0x1000*0x1000);
 
 	state->m_screen_output.allocate(384, 224, BITMAP_FORMAT_IND16);
 	state->m_font  = auto_alloc_array(machine, UINT16, 2048 * 8);
 	state->m_bgmap = auto_alloc_array(machine, UINT16, 0x20000 >> 1);
-	state->m_objects = state->m_bgmap + (0x1E000 >> 1);
+	state->m_objects = state->m_bgmap + (0x1e000 >> 1);
 	state->m_columntab1 = state->m_bgmap + (0x1dc00 >> 1);
 	state->m_columntab2 = state->m_bgmap + (0x1de00 >> 1);
 	state->m_world = state->m_bgmap + (0x1d800 >> 1);
@@ -207,27 +208,31 @@ static void put_char(vboy_state *state, int x, int y, UINT16 ch, bool flipx, boo
 			if(dat == 0)
 				col = -1;
 
-			state->m_bg_map[res_y*0x200+res_x] = col;
+			state->m_bg_map[res_y*0x1000+res_x] = col;
 		}
 	}
 }
 
-static void fill_bg_map(vboy_state *state, int num)
+
+static void fill_bg_map(vboy_state *state, int num, UINT16 scx, UINT16 scy)
 {
-	int i, j;
+	int x, y;
+	UINT8 stepx, stepy;
 
 	// Fill background map
-	for (i = 0; i < 64; i++)
+	for (y = 0; y < scy; y++)
 	{
-		for (j = 0; j < 64; j++)
+		for (x = 0; x < scx; x++)
 		{
-			UINT16 val = state->m_bgmap[j + 64 * i + (num * 0x1000)];
-			put_char(state, j * 8, i * 8, val & 0x7ff, BIT(val,13), BIT(val,12), state->m_vip_regs.GPLT[(val >> 14) & 3]);
+			stepx = (x & 0x1c0) >> 6;
+			stepy = ((y & 0x1c0) >> 6) * (stepx+1);
+			UINT16 val = state->m_bgmap[(x & 0x3f) + (64 * (y & 0x3f)) + ((num + stepx + stepy) * 0x1000)];
+			put_char(state, x * 8, y * 8, val & 0x7ff, BIT(val,13), BIT(val,12), state->m_vip_regs.GPLT[(val >> 14) & 3]);
 		}
 	}
 }
 
-static void draw_bg_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int mode, int gx, int gp, int gy, int mx, int mp, int my, int h, int w, bool right)
+static void draw_bg_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int mode, int gx, int gp, int gy, int mx, int mp, int my, int h, int w, UINT16 x_mask, UINT16 y_mask, bool right)
 {
 	int x,y;
 
@@ -248,7 +253,7 @@ static void draw_bg_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vboy_pa
 			src_y = y+my;
 			src_x += right ? -mp : mp;
 
-			pix = state->m_bg_map[((src_y) & 0x1ff)*0x200+((src_x) & 0x1ff)];
+			pix = state->m_bg_map[(src_y & y_mask)*0x1000+(src_x & x_mask)];
 
 			if(pix != -1)
 				if (y1>=0 && y1<224)
@@ -258,7 +263,7 @@ static void draw_bg_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vboy_pa
 	}
 }
 
-static void draw_affine_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int gx, int gp, int gy, int h, int w, bool right)
+static void draw_affine_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vboy_paramtab, int gx, int gp, int gy, int h, int w, UINT16 x_mask, UINT16 y_mask, bool right)
 {
 	int x,y;
 
@@ -284,7 +289,7 @@ static void draw_affine_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vbo
 			src_x = (INT32)((h_skw) + (h_scl * x));
 			src_y = (INT32)((v_skw) + (v_scl * x));
 
-			pix = state->m_bg_map[((src_y) & 0x1ff)*0x200+((src_x) & 0x1ff)];
+			pix = state->m_bg_map[(src_y & y_mask)*0x1000+(src_x & x_mask)];
 
             if(pix != -1)
 				if (y1>=0 && y1<224)
@@ -294,12 +299,27 @@ static void draw_affine_map(vboy_state *state, bitmap_ind16 &bitmap, UINT16 *vbo
 	}
 }
 
+/*
+x--- ---- ---- ---- [0] LON
+-x-- ---- ---- ----     RON
+--xx ---- ---- ---- BGM type
+---- xx-- ---- ---- SCX
+---- --xx ---- ---- SCY
+---- ---- x--- ---- OVR
+---- ---- -x-- ---- END
+---- ---- --00 ----
+---- ---- ---- xxxx BGMAP_BASE
+*/
+
 static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, bool right, int &cur_spt)
 {
 	num <<= 4;
 	UINT16 def = state->m_world[num];
 	UINT8 lon = (def >> 15) & 1;
 	UINT8 ron = (def >> 14) & 1;
+	UINT8 mode = (def >> 12) & 3;
+	UINT16 scx = 64 << ((def >> 10) & 3);
+	UINT16 scy = 64 << ((def >> 8) & 3);
 	INT16 gx  = state->m_world[num+1];
 	INT16 gp  = state->m_world[num+2];
 	INT16 gy  = state->m_world[num+3];
@@ -311,7 +331,6 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 	UINT16 param_base = state->m_world[num+9] & 0xfff0;
 //  UINT16 overplane = state->m_world[num+10];
 	UINT8 bg_map_num = def & 0x0f;
-	UINT8 mode = (def >> 12) & 3;
 	UINT16 *vboy_paramtab;
 	int i;
 
@@ -322,30 +341,33 @@ static UINT8 display_world(vboy_state *state, int num, bitmap_ind16 &bitmap, boo
 
 	if (mode < 2) // Normal / Hbias Mode
 	{
+		if(mode == 1)
+			popmessage("mode == 1, check");
+
 		if (lon && (!right))
 		{
-			fill_bg_map(state, bg_map_num);
-			draw_bg_map(state, bitmap, vboy_paramtab, mode, gx, gp, gy, mx, mp, my, h,w, right);
+			fill_bg_map(state, bg_map_num, scx, scy);
+			draw_bg_map(state, bitmap, vboy_paramtab, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, right);
 		}
 
 		if (ron && (right))
 		{
-			fill_bg_map(state, bg_map_num);
-			draw_bg_map(state, bitmap, vboy_paramtab, mode, gx, gp, gy, mx, mp, my, h,w, right);
+			fill_bg_map(state, bg_map_num, scx, scy);
+			draw_bg_map(state, bitmap, vboy_paramtab, mode, gx, gp, gy, mx, mp, my, h,w, scx*8-1, scy*8-1, right);
 		}
 	}
 	else if (mode==2) // Affine Mode
 	{
 		if (lon && (!right))
 		{
-			fill_bg_map(state, bg_map_num);
-			draw_affine_map(state, bitmap, vboy_paramtab, gx, gp, gy, h,w, right);
+			fill_bg_map(state, bg_map_num, scx, scy);
+			draw_affine_map(state, bitmap, vboy_paramtab, gx, gp, gy, h,w, scx*8-1, scy*8-1, right);
 		}
 
 		if (ron && (right))
 		{
-			fill_bg_map(state, bg_map_num);
-			draw_affine_map(state, bitmap, vboy_paramtab, gx, gp, gy, h,w, right);
+			fill_bg_map(state, bg_map_num, scx, scy);
+			draw_affine_map(state, bitmap, vboy_paramtab, gx, gp, gy, h,w, scx*8-1, scy*8-1, right);
 		}
 	}
 	else if (mode==3) // OBJ Mode
@@ -896,7 +918,7 @@ static ADDRESS_MAP_START( vboy_io, AS_IO, 32, vboy_state )
 
 	AM_RANGE( 0x01000000, 0x010005ff ) AM_DEVREADWRITE8("vbsnd", vboysnd_device, read, write, 0xffffffff)
 	AM_RANGE( 0x02000000, 0x0200002b ) AM_MIRROR(0x0ffff00) AM_READWRITE(io_r, io_w) // Hardware control registers mask 0xff
-	//AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
+//	AM_RANGE( 0x04000000, 0x04ffffff ) // Expansion area
 	AM_RANGE( 0x05000000, 0x0500ffff ) AM_MIRROR(0x0ff0000) AM_RAM AM_SHARE("wram") // Main RAM - 64K mask 0xffff
 	AM_RANGE( 0x06000000, 0x06003fff ) AM_RAM AM_SHARE("nvram") // Cart RAM - 8K NVRAM
 	AM_RANGE( 0x07000000, 0x071fffff ) AM_MIRROR(0x0e00000) AM_ROM AM_REGION("user1", 0) /* ROM */
@@ -1143,4 +1165,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-CONS( 1995, vboy,   0,      0,       vboy,      vboy, driver_device,    0,    "Nintendo", "Virtual Boy", GAME_NOT_WORKING | GAME_NO_SOUND)
+CONS( 1995, vboy,   0,      0,       vboy,      vboy, driver_device,    0,    "Nintendo", "Virtual Boy", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
