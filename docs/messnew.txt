@@ -1,4 +1,170 @@
-﻿0.146u4
+﻿0.146u5
+
+MAMETesters Bugs Fixed
+----------------------
+(none)
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+- SBC6510 [Robbbert]
+
+Skeleton drivers:
+-----------------
+- VAX 785 (LSI-11 board only) [Miodrag Milanovic]
+
+- Elektronika MS-0515 [KokaF77, Miodrag Milanovic]
+
+System Driver Changes:
+----------------------
+
+-llc1: fixed monitor keyboard LLC2: added speaker and annoying keyclick
+ [Robbbert]
+
+-vidbrain: Added expansion port interface. [Curt Coder]
+
+-vidbrain: Added expansion port pinout. (nw)
+
+-llc: modernised ; LLC2 added support for reverse video & added missing
+ pio. [Robbbert]
+
+-vk100: Some improvement to the HLE vector generator, now properly
+ emulates the down counter so the "blue screen" part of the POST looks
+ correct, as does the cursor width. [Lord Nightmare]
+
+-vk100: broke the vram access logic/math out of the vector generator
+ callback and into its own functions; fixed? the systat_a register to
+ read the vram nybble the x and y regs are currently pointing to.
+ [Lord Nightmare]
+
+-abc800c: Added character display, promoted driver to working.
+ [Curt Coder]
+
+-pcm: connected the k7659 keyboard, fixed screen size [Robbbert]
+
+-abc800c: Added high resolution graphics. [Curt Coder]
+
+-abc80: Added serial interface. [Curt Coder]
+
+-a6809: Added ASCII keyboard. [Curt Coder]
+
+-abc806: Used correct HRUII PROM. [Curt Coder]
+
+-socrates: document that an MCU dump is missing of the 4-bit TMP42C40P
+ that decodes the IR signal from the keyboard and buffers the 'second
+ stage' of the keyboard input. Changed code slightly to reflect this.
+ [Lord Nightmare, Balrog]
+
+-z9001 : added 2xpio, ctc, daisy-chain, beeper-sound, cassout
+ [Robbbert]
+
+-v6809 : various video improvements. [Robbbert]
+
+-abc80: Refactored legacy code, moved DOS ROMs to ABC bus DOS card,
+ added BASIC V1 dump, added ABC 890 bus expander device. [Curt Coder]
+
+-abc80x: Refactored legacy code, cleaned up keyboard interface, added
+ ABC894 bus expander device, added ABC 55 keyboard for ABC 802.
+ [Curt Coder]
+
+-vt100: add the GPO (aka VT125 mono board) roms and proms as a mix of
+ NO_DUMP and copies of the vk100 ones where identical [Lord Nightmare]
+
+-vk100: further comment updates, got rid of LASTVRAM in favor of doing
+ a single read at the current nybble pointed to by the X and Y
+ registers. [Lord Nightmare]
+
+-vk100: Implemented baud generator LUT for i8251, not hooked up yet;
+ added RTS callback which doesn't seem to work yet. [Lord Nightmare]
+
+-vk100: Doing further vector rom tracing with a meter on the board
+ using the vt125 schematics as a guide, figured out what all the vector
+ rom pins do (except perhaps D LOAD). [Lord Nightmare]
+
+-vip: Added VP-620 ASCII keyboard cable, VP-570 RAM expansion board,
+ and VP-575 bus expander board. [Curt Coder]
+
+-plus4: Rewrite of the C16/Plus+4 driver with improved memory mapping
+ and cartridge support. Refactored the Commodore 1551 floppy drive to
+ connect to the expansion port. [Curt Coder]
+
+-vk100: Documented all the inputs and enables of the RAS/ERASE prom
+ through tracing. Documented that the MSB bit of the SYNC prom is ...
+ SYNC. The VT125 Schematics were invaluable for this.
+ [Lord Nightmare, Al Kossow]
+
+-sbc6510: Connected up the keyboard and added ay-3-8910 chip [Robbbert]
+
+-vii: Fixing some warnings. Not 100% sure of the intended
+ functionality, but IRQ & IRQ_MASK & line seems probable and seems to
+ work. [MooglyGuy]
+
+-c64: Fixed C1541 and FSD-2, added Dolphin DOS 2.0 and
+ Professional-DOS V1 hardware. [Curt Coder] 
+
+-plus4: Added SID card emulation. [Curt Coder]
+
+-c64: Emulated the digital read circuitry of the Commodore 1541 disk
+ drive according to the long board schematics. This will allow
+ independent setting of the bitrate of incoming data and the sample
+ rate. Passing more advanced copy protections require a cycle exact
+ rewrite of the 6502 and VIA, but this is the first step toward proper
+ emulation. [Curt Coder]
+
+-vip: Added VP-700 Tiny BASIC board. [ekeefe, Curt Coder]
+
+-c64: Added support for per-byte speed zones in G64 images.
+ [Curt Coder]
+
+-sacstate: Added comments. Fixed input ports. [Robbbert]
+
+-hr16: Hooked up LCD controller and added keypad inputs. [Sandro Ronco]
+
+-rainbow:
+ * Get closer to LK201 emulation [R. Belmont, Lord Nightmare, Balrog]
+ * Add documentation for system error codes and diagnostic LEDs
+    [rfka01]
+
+-vboy: various driver improvements [Angelo Salese]
+
+-vboy: preliminary audio hookup [Richard Bannister, Gil Pedersen, R. Belmont]
+
+-x1: added support for old TAP format to the driver, so that all newly 
+ added tapes work (high sample rate tapes are still not supported, though) 
+ [Fabio Priuli]
+
+
+Software Lists:
+----------------
+-pico.xml: added new Jpn dumps [TeamEurope] 
+
+-pico.xml: started documenting PCBs and ROM labels [TeamEurope]
+
+-x1_flop: first round of new dumps [Starscreamer the 2nd]
+
+-x1_cass: some more new dumps [Starscreamer the 2nd]
+
+Source Changes:
+----------------
+-new device k7659 keyboard; modified LLC2 to work with it [Robbbert]
+
+-k7659kb - added more keys, added port_char, added return value when no
+ key pressed [Robbbert]
+
+-terminal: Replaced internal keyboard with the Ascii keyboard, since
+ they were identical. [Robbbert]
+
+-nscsi: documentation [O. Galibert]
+
+-rp5c15: Initialize at power-on (makes the x68k boot reliable) [O. Galibert]
+
+-roc10935/7: correct an error in the lookup table for the '7' character [Lord Nightmare]
+
+
+0.146u4
 
 MAMETesters Bugs Fixed
 ----------------------
