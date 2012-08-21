@@ -19,7 +19,6 @@
     - redalarm: gameplay doesn't work
     - spaceinv: Taito logo only if you press the button, framebuffer?
     - spaceinv: missing shots
-    - vforce: hangs at title screen
 	- vlab: doesn't boot (irq issue?)
     - wariolnd: brightness gets suddently darker during intro, CPU bug?
 	- waterwld: doesn't accept start input at title screen;
