@@ -149,7 +149,7 @@ static VIDEO_START( vboy )
 	state->m_bg_map = auto_alloc_array_clear(machine, int, 0x1000*0x1000);
 	state->m_ovr_map = auto_alloc_array_clear(machine, int, 8*8);
 
-	state->m_font  = auto_alloc_array(machine, UINT16, 2048 * 8);
+	state->m_font  = auto_alloc_array_clear(machine, UINT16, 2048 * 8);
 	state->m_bgmap = auto_alloc_array(machine, UINT16, 0x20000 >> 1);
 	state->m_objects = state->m_bgmap + (0x1e000 >> 1);
 	state->m_columntab1 = state->m_bgmap + (0x1dc00 >> 1);
@@ -379,7 +379,7 @@ UINT8 vboy_state::display_world(int num, bitmap_ind16 &bitmap, bool right, int &
 	UINT16 w  = m_world[num+7];
 	UINT16 h  = m_world[num+8];
 	UINT16 param_base = m_world[num+9] & 0xfff0;
-	UINT16 ovr_char = m_world[num+10];
+	UINT16 ovr_char = m_bgmap[m_world[num+10]]; // perhaps x 2?
 	UINT8 bg_map_num = def & 0x0f;
 	UINT16 *vboy_paramtab;
 	int i;
@@ -912,6 +912,7 @@ WRITE16_MEMBER( vboy_state::vip_w )
 void vboy_state::m_pcg_debug(UINT16 offset,UINT16 data,UINT16 mem_mask)
 {
 	UINT8 *pcg_ram = memregion("pcg")->base();
+	int i;
 
 	if(mem_mask & 0x00ff)
 		pcg_ram[(offset<<1)+1] = (data & 0x00ff);
@@ -920,6 +921,9 @@ void vboy_state::m_pcg_debug(UINT16 offset,UINT16 data,UINT16 mem_mask)
 		pcg_ram[(offset<<1)+0] = (data & 0xff00) >> 8;
 
 	gfx_element_mark_dirty(machine().gfx[0], offset >> 4);
+	for(i=0;i<0x800;i++)
+		gfx_element_mark_dirty(machine().gfx[0], i);
+
 }
 
 WRITE16_MEMBER( vboy_state::vboy_font0_w )
