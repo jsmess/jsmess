@@ -379,7 +379,7 @@ UINT8 vboy_state::display_world(int num, bitmap_ind16 &bitmap, bool right, int &
 	UINT16 w  = m_world[num+7];
 	UINT16 h  = m_world[num+8];
 	UINT16 param_base = m_world[num+9] & 0xfff0;
-	UINT16 ovr_char = m_bgmap[m_world[num+10]]; // perhaps x 2?
+	UINT16 ovr_char = m_bgmap[m_world[num+10]];
 	UINT8 bg_map_num = def & 0x0f;
 	UINT16 *vboy_paramtab;
 	int i;
