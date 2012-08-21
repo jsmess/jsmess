@@ -8,15 +8,21 @@
     and http://www.vr32.de/modules/dokuwiki/doku.php?
 
     TODO:
-    - fix Affine rotation
+	- 100us / 20us timers
+	- sound
     - per-game NVRAM hook-up (wariolnd, vleague, golf, others?)
     - boundh: game is way too fast
+    - galactic: ball goes out of bounds sometimes?
     - marioten: title screen logo is misplaced if Mario completes his animation
+    - nesterfb: ball stops when thrown
     - panicbom: brightness 10 overflows
+    - redalarm: gameplay doesn't work
     - spaceinv: Taito logo only if you press the button, framebuffer?
     - spaceinv: missing shots
-    - vleague / vproyak: keeps going into auto pause with 100 usec timer?
+    - vforce: hangs at title screen
+	- vlab: doesn't boot (irq issue?)
     - wariolnd: brightness gets suddently darker during intro, CPU bug?
+	- waterwld: doesn't accept start input at title screen;
 
 ****************************************************************************/
 
@@ -647,6 +653,15 @@ READ16_MEMBER( vboy_state::vip_r )
 		case 0x04:	//INTCLR
 					logerror("Error reading INTCLR\n");
 					break;
+/*
+		---- -x-- ---- ---- LOCK (status column table address (CTA) lock)
+		---- --x- ---- ---- SYNCE (status of sync signal enable)
+		---- ---x ---- ---- RE (status of memory refresh cycle)
+		---- ---- x--- ---- FCLK
+        ---- ---- -x-- ---- SCANRDY (active low)
+		---- ---- --xx xx-- DPBSY (current framebuffer displayed)
+		---- ---- ---- --x- DISP
+*/
 		case 0x20:	//DPSTTS
 		{
 			UINT16 res;
@@ -685,8 +700,13 @@ READ16_MEMBER( vboy_state::vip_r )
 		case 0x40:	//XPSTTS, piXel Processor STaTuS
 		{
 			/*
+			x--- ---- ---- ---- SBOUT
+			---x xxxx ---- ---- SBCOUNT
+			---- ---- ---x ---- OVERTIME (process overflow)
             ---- ---- ---- x--- XPBSY1 (second framebuffer busy flag)
             ---- ---- ---- -x-- XPBSY0 (first framebfuffer busy flag)
+            ---- ---- ---- --x- XPEN (starts drawing at beginning of game frame)
+            ---- ---- ---- ---x XPRST (force drawing process to idle)
             */
 			UINT8 drawfb = ((m_displayfb ^ 1) + 1) << 2;
 			UINT16 res;
@@ -697,6 +717,7 @@ READ16_MEMBER( vboy_state::vip_r )
 			if(m_vip_regs.XPCTRL & 2 && m_row_num < 224/8) // screen active
 				res |= drawfb;
 
+			if(m_row_num < 224/8)
 			{
 				res |= 0x8000;
 				res |= m_row_num<<8;
@@ -764,6 +785,8 @@ WRITE16_MEMBER( vboy_state::vip_w )
 					logerror("Error writing INTPND\n");
 					break;
 		case 0x02:	//INTENB
+					if(data & 0x2000)
+						printf("SBHIT active\n");
 					m_vip_regs.INTENB = data;
 					m_set_irq(0);
 					//printf("%04x ENB\n",data);
@@ -777,6 +800,13 @@ WRITE16_MEMBER( vboy_state::vip_w )
 		case 0x20:	//DPSTTS
 					logerror("Error writing DPSTTS\n");
 					break;
+/*
+		---- -x-- ---- ---- LOCK (status column table address (CTA) lock)
+		---- --x- ---- ---- SYNCE (status of sync signal enable)
+		---- ---x ---- ---- RE (status of memory refresh cycle)
+		---- ---- ---- --x- DISP
+		---- ---- ---- ---x DPRST (Resets the VIP internal counter)
+*/
 		case 0x22:	//DPCTRL
 					m_vip_regs.DPCTRL = data & 0x0702;
 
