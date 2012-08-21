@@ -19,12 +19,12 @@ Titles, serial #s, publishers and release dates taken from:
 
 <!-- the alt set with crcs 63033bba and b1511bd6 only differs for d77 headers, but data in the disks are identical -->
 	<software name="9gyokudn">
-		<description>九玉伝</description>
+		<description>Ku Gyoku Den</description>
 		<year>1986</year>
 		<publisher>テクノソフト (TecnoSoft)</publisher>
 		<info name="serial" value="FUTJ-19002"/>
 		<info name="release" value="198610xx"/>
-		<info name="alt_title" value="Ku Gyoku Den"/>
+		<info name="alt_title" value="九玉伝"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
 				<rom name="9gyokuden_a.d77" size="416688" crc="c3757455" sha1="dcf9d2422daa7920d91c26171dd0334e65cf15f8" offset="000000" />
@@ -38,12 +38,12 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="9gyokudna" cloneof="9gyokudn">
-		<description>九玉伝 (Alt Disk 1)</description>
+		<description>Ku Gyoku Den (Alt Disk 1)</description>
 		<year>1986</year>
 		<publisher>テクノソフト (TecnoSoft)</publisher>
 		<info name="serial" value="FUTJ-19002"/>
 		<info name="release" value="198610xx"/>
-		<info name="alt_title" value="Ku Gyoku Den"/>
+		<info name="alt_title" value="九玉伝"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
 				<rom name="kugyokuden (1986)(tecno soft)(jp) (disk 1).d77" size="416688" crc="98160ebc" sha1="06933c513916a89888be7a67c45752cef5e9e7e6" offset="000000" />
@@ -110,11 +110,11 @@ Titles, serial #s, publishers and release dates taken from:
 <!-- According to Oh!FM-7 the game was released for the 77AV in 3.5" disks... does this change anything in the format? -->
 <!-- the alt set with crcs 9937fd56 and c84c5dac only differs for d77 headers, but data in the disks are identical -->
 	<software name="dforce" supported="no">
-		<description>デスフォース</description>
+		<description>Death Force</description>
 		<year>1987</year>
 		<publisher>リバーヒルソフト (Riverhill Software)</publisher>
 		<info name="serial" value="FURH-19001"/>
-		<info name="alt_title" value="Death Force"/>
+		<info name="alt_title" value="デスフォース"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="392880">
 				<rom name="dforce1.d77" size="392880" crc="968512c6" sha1="fe7fe9bec16949a4f24cbdb7b1e842c743d4688d" offset="000000" />
@@ -212,11 +212,11 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="hotdog">
-		<description>ホットドッグ</description>
+		<description>Hotdog</description>
 		<year>1986</year>
 		<publisher>ボーステック (Bothtec)</publisher>
 		<info name="serial" value="SD-7512"/>
-		<info name="alt_title" value="Hotdog"/>
+		<info name="alt_title" value="ホットドッグ"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="364976">
 				<rom name="hotdog.d77" size="364976" crc="4e63fa35" sha1="6f094715edbe60edbb091e3b5f8bcbf6e019be6c" offset="000000" />
@@ -410,11 +410,11 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="mike">
-		<description>少年マイクのひとり旅</description>
+		<description>Shonen Mike no Hitori Tabi</description>
 		<year>1986</year>
 		<publisher>日本ソフトバンク (Nihon SoftBank)</publisher>
 		<info name="serial" value="FUJE-19002"/>
-		<info name="alt_title" value="Shonen Mike no Hitori Tabi"/>
+		<info name="alt_title" value="少年マイクのひとり旅"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="348848">
 				<rom name="mike.d77" size="348848" crc="4ba9d06d" sha1="70eefd207ca9d146534c7d8f295b941415f5f9ec" offset="000000" />
@@ -529,11 +529,11 @@ Titles, serial #s, publishers and release dates taken from:
 	</software>
 
 	<software name="nobuzenk">
-		<description>信長の野望全国版</description>
+		<description>Nobunaga no Yabou - Zenkoku Ban</description>
 		<year>1987?</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="serial" value="FUKN19002"/>
-		<info name="alt_title" value="Nobunaga no Yabou - Zenkoku Ban"/>
+		<info name="alt_title" value="信長の野望全国版"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="380848">
 				<rom name="nobunaga_a.d77" size="380848" crc="32dff63d" sha1="9127dfcd4b42fc40581e32ceed1ce9d40c9c380b" offset="000000" />
@@ -552,11 +552,11 @@ Titles, serial #s, publishers and release dates taken from:
 　　　　　2P/ Rキー：↑　Vキー：↓　Gキー：→　Dキー：←
 　　　　　F1～F5：各種コマンド
 　　　　　操作の要領は基本的にファミスタ準拠 -->
-		<description>プロ野球ファン</description>
+		<description>Pro Yakyu Fan</description>
 		<year>1988</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="release" value="198803xx"/>
-		<info name="alt_title" value="Pro Yakyu Fan"/>
+		<info name="alt_title" value="プロ野球ファン"/>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="416688">
 				<rom name="probbfan_a.d77" size="416688" crc="be418ab5" sha1="10c250261fcd2e7a92d23338f3759f826da16f59" offset="000000" />
@@ -722,6 +722,19 @@ Titles, serial #s, publishers and release dates taken from:
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="473776">
 				<rom name="tetris (1988)(bps)(jp).d77" size="473776" crc="d20a12fb" sha1="f6ea48495e7d5b6d0851ac8dc6134777e1edc440" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetrisa" cloneof="tetris">
+		<description>Tetris (Alt)</description>
+		<year>1988</year>
+		<publisher>Ｂ・Ｐ・Ｓ (Bullet-Proof Software)</publisher>
+		<info name="release" value="198811xx"/>
+		<info name="alt_title" value="テトリス"/>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="347168">
+				<rom name="tetrisav.d77" size="347168" crc="86ab277e" sha1="c85a8cbdb05ca0472e5dce0887a5d52d62b96e9f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
