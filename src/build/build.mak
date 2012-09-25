@@ -57,9 +57,8 @@ FILE2STROBJS = \
 
 $(FILE2STR_TARGET): $(FILE2STROBJS) $(LIBOCORE)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
-
-
+	llvm-ld $(LDFLAGS) $^ $(LIBS) -o $@.bc
+	opt -O3 $@.bc -o $@
 
 #-------------------------------------------------
 # makedep
@@ -70,8 +69,8 @@ MAKEDEPOBJS = \
 
 $(MAKEDEP_TARGET): $(MAKEDEPOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
-
+	llvm-ld $(LDFLAGS) $^ $(LIBS) -o $@.bc
+	opt -O3 $@.bc -o $@
 
 
 #-------------------------------------------------
@@ -83,9 +82,8 @@ MAKELISTOBJS = \
 
 $(MAKELIST_TARGET): $(MAKELISTOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
-
-
+	llvm-ld $(LDFLAGS) $^ $(LIBS) -o $@.bc
+	opt -O3 $@.bc -o $@
 
 #-------------------------------------------------
 # png2bdc
@@ -96,9 +94,8 @@ PNG2BDCOBJS = \
 
 $(PNG2BDC_TARGET): $(PNG2BDCOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
-
-
+	llvm-ld $(LDFLAGS) $^ $(LIBS) -o $@.bc
+	opt -O3 $@.bc -o $@
 
 #-------------------------------------------------
 # verinfo
@@ -109,6 +106,7 @@ VERINFOOBJS = \
 
 $(VERINFO_TARGET): $(VERINFOOBJS) $(LIBOCORE)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+	llvm-ld $(LDFLAGS) $^ $(LIBS) -o $@.bc
+	opt -O3 $@.bc -o $@
 
 endif

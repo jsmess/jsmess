@@ -39,7 +39,6 @@ endif
 # src/osd/$(OSD)/$(OSD).mak
 #-------------------------------------------------
 
-OSD = osdmini
 ifndef OSD
 ifeq ($(OS),Windows_NT)
 OSD = windows
@@ -201,6 +200,7 @@ MACOSX_USE_LIBSDL = 1
 #-------------------------------------------------
 
 # uncomment next line if you are building for a 64-bit target
+# Note: With Emscripten, we are building for a 32-bit target, so we force this to 0.
 PTR64 = 0
 
 # uncomment next line if you are building for a big-endian target
@@ -298,9 +298,15 @@ BUILD_EXE = $(EXE)
 endif
 
 # compiler, linker and utilities
-#AR = @ar
-#CC = @gcc
-#LD = @g++
+ifndef AR
+AR = @ar
+endif
+ifndef CC
+CC = @gcc
+endif
+ifndef LD
+LD = @g++
+endif
 MD = -mkdir$(EXE)
 RM = @rm -f
 OBJDUMP = @objdump
@@ -486,9 +492,11 @@ CCOMFLAGS += \
 	-Wno-sizeof-pointer-memaccess \
 	-Wno-overloaded-virtual
 
+# TODO(jvilk): These are emscripten-specific hacks in this Makefile. Should relocate.
 CCOMFLAGS += -DSDLMAME_NOASM
 CCOMFLAGS += -DNOASM
 
+# TODO(jvilk): Why were these warnings disabled and others kept?
 #	-Wcast-align \
 #	-Wundef \
 # warnings only applicable to C compiles
@@ -501,7 +509,7 @@ CONLYFLAGS += \
 COBJFLAGS += \
 	-Wpointer-arith 
 
-
+# TODO(jvilk): Where are the CPPONLYFLAGS?
 
 #-------------------------------------------------
 # include paths
@@ -548,7 +556,7 @@ LDFLAGS =
 ifneq ($(TARGETOS),macosx)
 ifneq ($(TARGETOS),os2)
 ifneq ($(TARGETOS),solaris)
-LDFLAGS = -Wl,--warn-common
+#LDFLAGS = -Wl,--warn-common
 endif
 endif
 endif
@@ -568,10 +576,8 @@ endif
 
 # output a map file (emulator only)
 ifdef MAP
-LDFLAGSEMULATOR += -Wl,-Map,$(FULLNAME).map
+#LDFLAGSEMULATOR += -Wl,-Map,$(FULLNAME).map
 endif
-
-
 
 #-------------------------------------------------
 # define the standard object directory; other

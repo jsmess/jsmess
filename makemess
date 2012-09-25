@@ -1,4 +1,4 @@
 #!/bin/sh
 #put your path to emmake here
-alias emmake=~/emscripten/emmake
-emmake make TARGET=mess SUBTARGET=tiny OSD=sdl TARGETOS=emscripten NOWERROR=1 NOASM=1 NO_X11=1 NO_DEBUGGER=1 $*
+alias emmake=~/Code/emscripten/emmake
+emmake make TARGET=mess SUBTARGET=tiny OSD=sdl CROSSBUILD=1 TARGETOS=emscripten NOWERROR=1 NOASM=1 NO_X11=1 NO_DEBUGGER=1 $*
