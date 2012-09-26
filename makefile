@@ -66,7 +66,7 @@ ifeq ($(OS),Windows_NT)
 TARGETOS = win32
 else
 
-ifneq ($(CROSSBUILD),1)
+ifneq ($(CROSS_BUILD),1)
 
 ifneq ($(OS2_SHELL),)
 TARGETOS = os2
@@ -371,7 +371,11 @@ SRC = src
 # build the targets in different object dirs, so they can co-exist
 OBJ = obj/$(OSD)/$(FULLNAME)
 
-
+ifeq ($(CROSS_BUILD),1)
+ifndef NATIVE_OBJ
+NATIVE_OBJ = OBJ
+endif # NATIVE_OBJ
+endif # CROSS_BUILD
 
 #-------------------------------------------------
 # compile-time definitions
@@ -556,7 +560,7 @@ LDFLAGS =
 ifneq ($(TARGETOS),macosx)
 ifneq ($(TARGETOS),os2)
 ifneq ($(TARGETOS),solaris)
-#LDFLAGS = -Wl,--warn-common
+LDFLAGS = -Wl,--warn-common
 endif
 endif
 endif
@@ -576,7 +580,7 @@ endif
 
 # output a map file (emulator only)
 ifdef MAP
-#LDFLAGSEMULATOR += -Wl,-Map,$(FULLNAME).map
+LDFLAGSEMULATOR += -Wl,-Map,$(FULLNAME).map
 endif
 
 #-------------------------------------------------
@@ -658,6 +662,10 @@ all: default tools
 BUILDSRC = $(SRC)/build
 BUILDOBJ = $(OBJ)/build
 BUILDOUT = $(BUILDOBJ)
+
+ifdef NATIVE_OBJ
+BUILDOUT = $(NATIVE_OBJ)/build
+endif # NATIVE_OBJ
 
 
 
