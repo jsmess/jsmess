@@ -201,7 +201,7 @@ MACOSX_USE_LIBSDL = 1
 
 # uncomment next line if you are building for a 64-bit target
 # Note: With Emscripten, we are building for a 32-bit target, so we force this to 0.
-PTR64 = 0
+# PTR64 = 0
 
 # uncomment next line if you are building for a big-endian target
 # BIGENDIAN = 1

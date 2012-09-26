@@ -74,6 +74,14 @@ Building
   Edit ```~/.emscripten``` to point to your LLVM installation and Emscripten
   directory.
 
+* Java
+
+  Java is required to run the Closure compiler.
+
+#### MAME / MESS Dependencies ####
+* libsdl
+* libsdl_ttf
+
 ### Building ###
 
 1. Run ```make```. Go out for a walk; it'll take a bit.
