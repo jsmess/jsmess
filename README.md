@@ -18,6 +18,7 @@ Building
 
 ### Prerequisites ###
 * [LLVM and Clang 3.1](http://llvm.org/releases/download.html#3.1)
+
   Emscripten uses these to work its magic. As this is the latest version of LLVM
   and Clang, chances are you will need to compile it from scratch.
 
@@ -38,6 +39,7 @@ Building
   ```
 
 * [Node.js](http://nodejs.org)
+
   You can usually install this from your platform's package repository, e.g.:
 
   ```
@@ -56,6 +58,7 @@ Building
   To try out other games, try changing the hardcoded data in ```makefile```.
 
 * Set Up Emscripten
+
   First, because ```git``` is stupid, run this command to grab the emscripten
   sources:
 
