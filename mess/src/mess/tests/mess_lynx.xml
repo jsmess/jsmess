@@ -1,0 +1,13 @@
+<tests>
+
+<test name="lynx_000" driver="lynx" bios="default">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+<test name="lynx_001" driver="lynx" bios="a">
+  <wait time="5"/>
+  <checkblank/>
+</test>
+
+</tests>

@@ -1,0 +1,25 @@
+<tests>
+
+<imgtooltest name="ti99_old">
+	<createimage driver="ti99_old"/>
+	<checkdirectory/>
+<!--
+	<putfile name="FOO.TXT">'Hello World!'</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="12"/>
+	</checkdirectory>
+-->
+</imgtooltest>
+
+<imgtooltest name="ti99_v9t9">
+	<createimage driver="v9t9"/>
+	<checkdirectory/>
+<!--
+	<putfile name="FOO.TXT">'Hello World!'</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="12"/>
+	</checkdirectory>
+-->
+</imgtooltest>
+
+</tests>

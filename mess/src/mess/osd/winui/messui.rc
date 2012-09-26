@@ -1,0 +1,22 @@
+#include "resource.h"
+#include "resourcems.h"
+#include "windows.h"
+#include "commctrl.h"
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+//
+// Icon
+//
+
+IDI_ICON_MESS           ICON    DISCARDABLE     "../../osd/winui/res/mess.ico"
+#endif    // English (U.S.) resources
+
+#include "mameui.rc"

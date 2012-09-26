@@ -1,0 +1,536 @@
+<hashfile>
+	<!-- This MESS CRC file was generated from Cowering's Good databases (1.00) -->
+	<!-- Please keep this notice intact if editing this file -->
+	<hash crc32="6ddfb54c" name="3D Asteroids (Atari) (Prototype) [a1]">
+		<year>19xx</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="8c610e0f" name="3D Asteroids (Atari) (Prototype)">
+		<year>19xx</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="20c5db80" name="Ace of Aces (Atari) (PAL)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="05a2b94c" name="Ace of Aces (Atari)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="6a19f0fe" name="Alien Brigade (Atari) (PAL)">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="c8849d36" name="Alien Brigade (Atari)">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="dfb93f40" name="Asteroids (Atari)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="aff85565" name="Ballblazer (Atari-Lucasfilm) (PAL)">
+		<year>1987</year>
+		<manufacturer>Atari-Lucasfilm</manufacturer>
+	</hash>
+	<hash crc32="a4c4808b" name="Ballblazer (Atari-Lucasfilm)">
+		<year>1987</year>
+		<manufacturer>Atari-Lucasfilm</manufacturer>
+	</hash>
+	<hash crc32="02764a86" name="Barnyard Blaster (Atari) (PAL) [!]">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Requires Lightgun Support</status>
+	</hash>
+	<hash crc32="ed0a587d" name="Barnyard Blaster (Atari) [!]">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Requires Lightgun Support</status>
+	</hash>
+	<hash crc32="a4265d4b" name="Basketbrawl (Atari) (PAL)">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="c8b9d7b5" name="Basketbrawl (Atari)">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="33f8a8f6" name="Centipede (Atari) (PAL)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Corrupt Graphics at top screen</status>
+	</hash>
+	<hash crc32="020efe25" name="Centipede (Atari)">
+		<year>1987</year>
+		<status>Issue: Corrupt Graphics at top screen</status>
+	</hash>
+	<hash crc32="12efeb07" name="Choplifter (Atari) (PAL)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="419bff61" name="Choplifter (Atari)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="d98bc2f8" name="Color Selector Demo (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="7c211612" name="Commando (Atari) (PAL)">
+		<year>1989</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Timing to Fast</status>
+	</hash>
+	<hash crc32="cd1a98c5" name="Commando (Atari)">
+		<year>1989</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="50fd19cb" name="Crack'ed (Atari) (PAL)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="e645fd1f" name="Crack'ed (Atari)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="e93d8894" name="Crossbow (Atari) (PAL)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="d2ea5686" name="Crossbow (Atari)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="c93a563e" name="Dark Chambers (Atari) (PAL)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="366777f1" name="Dark Chambers (Atari)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="33991ee8" name="Desert Falcon (Atari) (PAL)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="a1dc0899" name="Desert Falcon (Atari)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="a1eaa7c1" name="Diagnostic Test Cartridge (Atari)">
+		<year>19xx</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="efab7077" name="Dig Dug (Atari) (PAL)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="50cb13f3" name="Dig Dug (Atari)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="0a43d1c5" name="Donkey Kong (Atari) (PAL)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="065e063f" name="Donkey Kong (Atari)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="c784dbac" name="Donkey Kong Jr (Atari) (PAL)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="1c5a1082" name="Donkey Kong Jr (Atari)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="f29abdb2" name="Double Dragon (Activision) (PAL)">
+		<year>1989</year>
+		<manufacturer>Activision</manufacturer>
+	</hash>
+	<hash crc32="aa265865" name="Double Dragon (Activision)">
+		<year>1989</year>
+		<manufacturer>Activision</manufacturer>
+	</hash>
+	<hash crc32="e5d714b0" name="F-18 Hornet (Absolute) (PAL)">
+		<year>1988</year>
+		<manufacturer>Absolute</manufacturer>
+	</hash>
+	<hash crc32="63d1c7c1" name="F-18 Hornet (Absolute) [!]">
+		<year>1988</year>
+		<manufacturer>Absolute</manufacturer>
+	</hash>
+	<hash crc32="ab3f631a" name="F-18 Hornet (Absolute)">
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="b8c7b744" name="F-18 Hornet (Absolute)">
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="2a0a93be" name="Fatal Run (Atari) (PAL)">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="a44df354" name="Fatal Run (Atari)">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="64d9c4be" name="Fight Night (Atari) (PAL)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="720ebc74" name="Fight Night (Atari)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="c64549ec" name="Food Fight (Atari) (PAL)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="e64a5cde" name="Food Fight (Atari)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="5990a9f8" name="Galaga (Atari) (PAL)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="1a0a3eb3" name="Galaga (Atari)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="057d9c3c" name="Hat Trick (Atari) (PAL)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="cf6f4a6c" name="Hat Trick (Atari)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="cb621cdc" name="Ikari Warriors (Atari) (PAL)">
+		<year>1989</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="8a6c1f15" name="Ikari Warriors (Atari)">
+		<year>1989</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="994af6e0" name="Impossible Mission (Atari) (PAL)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="3b1f2f47" name="Impossible Mission (Atari)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="9207ed3b" name="Jinks (Atari) (PAL)">
+		<year>1989</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Graphics Problems?</status>
+	</hash>
+	<hash crc32="0818d8cd" name="Jinks (Atari)">
+		<year>1989</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Graphics Problems?</status>
+	</hash>
+	<hash crc32="9b3be616" name="Joust (Atari) (PAL)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="2c430bce" name="Joust (Atari)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="6c8d9e68" name="Karateka (Atari) (PAL)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Timing too Fast</status>
+	</hash>
+	<hash crc32="fec21472" name="Karateka (Atari)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Timing too Fast</status>
+	</hash>
+	<hash crc32="fbc54a5b" name="Klax (Atari) (Prototype) [a1]">
+		<year>19xx</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="f26621e3" name="Klax (Atari) (Prototype)">
+		<year>19xx</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="c1531fc4" name="Kung Fu Master (Absolute) (PAL)">
+		<year>1989</year>
+		<manufacturer>Absolute</manufacturer>
+		<status>Issue: Severe Graphic issues</status>
+	</hash>
+	<hash crc32="297899bb" name="Kung Fu Master (Absolute) [!]">
+		<year>1989</year>
+		<manufacturer>Absolute</manufacturer>
+		<status>Issue: Severe Graphic issues</status>
+	</hash>
+	<hash crc32="efad3d9d" name="Mario Brothers (Atari) (PAL)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="8021a13b" name="Mario Brothers (Atari)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="065f3873" name="Mat Mania Challenge (Atari) (PAL)">
+		<year>1989</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="aba91829" name="Mat Mania Challenge (Atari)">
+		<year>1989</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="3cec4be8" name="Mean 18 Golf (Atari) (PAL)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="cf21d9ac" name="Mean 18 Golf (Atari) [!]">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="177fc850" name="Meltdown (Atari) (PAL)">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Requires Lightgun Support</status>
+	</hash>
+	<hash crc32="4a8f2171" name="Meltdown (Atari)">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Requires Lightgun Support</status>
+	</hash>
+	<hash crc32="7ca6d521" name="Midnight Mutants (Atari) (PAL)">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="187ec84e" name="Midnight Mutants (Atari)">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="38bb45ba" name="Motor Psycho (Atari) (PAL)">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="1e219482" name="Motor Psycho (Atari)">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="8421033a" name="Ms. Pac-Man (Atari) (PAL)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="e42fc700" name="Ms. Pac-Man (Atari)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="2b5382b7" name="Ninja Golf (Atari) (PAL)">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Graphic Glitches at Level Ends (?)</status>
+	</hash>
+	<hash crc32="cb48e8dc" name="Ninja Golf (Atari)">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Graphic Glitches at Level Ends (?)</status>
+	</hash>
+	<hash crc32="7a628295" name="One-on-One Basketball (Atari) (PAL)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Timing too Fast</status>
+	</hash>
+	<hash crc32="7d9370fb" name="One-on-One Basketball (Atari)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Timing too Fast</status>
+	</hash>
+	<hash crc32="68d48fdc" name="Pete Rose Baseball (Absolute) (PAL)">
+		<year>1989</year>
+		<manufacturer>Absolute</manufacturer>
+	</hash>
+	<hash crc32="f33d4dfa" name="Pete Rose Baseball (Absolute) [!]">
+		<year>1989</year>
+		<manufacturer>Absolute</manufacturer>
+	</hash>
+	<hash crc32="4ae0e7f6" name="Pit Fighter (Atari) (Prototype) [a1]">
+		<year>19xx</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="a5e75537" name="Pit Fighter (Atari) (Prototype) [a2]">
+		<year>19xx</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="22a88779" name="Pit Fighter (Atari) (Prototype)">
+		<year>19xx</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="95dc7e96" name="Planet Smashers (Atari) (PAL)">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Graphics at selection Screen</status>
+	</hash>
+	<hash crc32="4e3b9e64" name="Planet Smashers (Atari)">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Graphics at selection Screen</status>
+	</hash>
+	<hash crc32="d751c7a6" name="Pole Position II (Atari) (PAL)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="a85fb962" name="Pole Position II (Atari)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="39a316aa" name="Rampage (Activision)">
+		<year>1989</year>
+		<manufacturer>Activision</manufacturer>
+	</hash>
+	<hash crc32="61146b68" name="RealSports Baseball (Atari) [o1]">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="b1508030" name="RealSports Baseball (Atari)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="cb22305d" name="Robotron 2084 (Atari)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="46dd9662" name="Scrapyard Dog (Atari) (PAL)">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="5cc8c34f" name="Scrapyard Dog (Atari)">
+		<year>1990</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="25325142" name="Senso 7800 DX2 (Karolj Nadj) (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="d01553ff" name="Senso 7800 DX3 (Karolj Nadj) (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="a823cba5" name="Senso 7800 DX4 (Karolj Nadj) (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="151cb9a9" name="Senso 7800 Test 5 (Karolj Nadj) (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="2fddad78" name="Sentinel (Atari) [!]">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Requires Lightgun Support</status>
+	</hash>
+	<hash crc32="47340df9" name="Sentinel (Atari) (PAL) [!]">
+		<year>1991</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Requires Lightgun Support</status>
+	</hash>
+	<hash crc32="65c6df3f" name="Summer Games (Atari) [!]">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="6b27ea2c" name="Super Huey UH-IX (Atari) (PAL)">
+		<year>1989</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="71846500" name="Super Huey UH-IX (Atari)">
+		<year>1989</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="8f167ba9" name="Super Skateboardin' (Absolute) (PAL)">
+		<manufacturer>Absolute</manufacturer>
+		<year>1989</year>
+	</hash>
+	<hash crc32="13b68650" name="Super Skateboardin' (Absolute) [!]">
+		<manufacturer>Absolute</manufacturer>
+		<year>1989</year>
+	</hash>
+	<hash crc32="3fbe74ce" name="Symbolic Debug Monitor &amp; Downloader (Atari) [a1]">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="285bb0c1" name="Symbolic Debug Monitor &amp; Downloader (Atari)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="db91b181" name="Tank Command (Froggo) [!]">
+		<year>1988</year>
+		<manufacturer>Froggo</manufacturer>
+	</hash>
+	<hash crc32="0500e338" name="Tank Command (Froggo)">
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="9f9e1927" name="Tank Command (Froggo) [o1]">
+		<year>1988</year>
+	</hash>
+	<hash crc32="16b54d5b" name="Title Match Pro Wrestling (Absolute) (PAL)">
+		<manufacturer>Absolute</manufacturer>
+		<year>1989</year>
+	</hash>
+	<hash crc32="bc23c57b" name="Title Match Pro Wrestling (Absolute) [!]">
+		<manufacturer>Absolute</manufacturer>
+		<year>1989</year>
+	</hash>
+	<hash crc32="b01205bf" name="Tomcat - The F-14 (Absolute) (PAL)">
+		<manufacturer>Absolute</manufacturer>
+		<year>1989</year>
+	</hash>
+	<hash crc32="513cb9ee" name="Tomcat - The F-14 (Absolute) [!]">
+		<manufacturer>Absolute</manufacturer>
+		<year>1989</year>
+	</hash>
+	<hash crc32="aae12695" name="Touchdown Football (Atari)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="0f87fd7b" name="Tower Toppler (Atari) (PAL)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="f2d480cb" name="Tower Toppler (Atari) [o1]">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="4407ba04" name="Tower Toppler (Atari)">
+		<year>1988</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="d5850b97" name="Water Ski (Froggo)">
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="9f491fa0" name="Water Ski (Froggo) [o1]">
+		<year>1988</year>
+		<manufacturer>Froggo</manufacturer>
+	</hash>
+	<hash crc32="930b30df" name="Water Ski (Froggo)">
+		<year>1988</year>
+		<manufacturer>Froggo</manufacturer>
+	</hash>
+	<hash crc32="8981b531" name="Winter Games (Atari) [!]">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="cf0e44f1" name="Xenophobe (Atari) (PAL)">
+		<year>1989</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Flickering</status>
+	</hash>
+	<hash crc32="5fd9a141" name="Xenophobe (Atari) [!]">
+		<year>1989</year>
+		<manufacturer>Atari</manufacturer>
+		<status>Issue: Flickering</status>
+	</hash>
+	<hash crc32="d5ac738b" name="Xevious (Atari) (PAL)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="75fc124f" name="Xevious (Atari)">
+		<year>1987</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+</hashfile>

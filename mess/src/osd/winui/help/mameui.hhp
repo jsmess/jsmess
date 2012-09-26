@@ -1,0 +1,24 @@
+[OPTIONS]
+Binary Index=No
+Compatibility=1.1 or later
+Compiled file=MameUI.chm
+Contents file=mameui.hhc
+Default Window=Baseline
+Default topic=.\html\mameUI_changes.txt
+Display compile progress=No
+Full text search stop list file=stoplist.stp
+Full-text search=Yes
+Index file=mameui.hhk
+Language=0x409 English (United States)
+Title=MameUI Help
+
+[WINDOWS]
+Baseline="MameUI Help","mameUI.hhc",,"html\mameUI_changes.txt",,,,,,0x22520,260,0x300c,[100,100,974,615],,,,,,,0
+
+
+[TEXT POPUPS]
+cntx_help.txt
+reshelp.h
+
+[INFOTYPES]
+

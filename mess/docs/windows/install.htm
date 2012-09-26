@@ -1,0 +1,117 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="HTML Tidy for Cygwin (vers 1st September 2004), see www.w3.org" />
+<title>MESS Guide</title>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<link href="../style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h1>Installing MESS</h1>
+<p class="normal">This section deals with installing the MESS application. It includes where you can get MESS from, where to put it and what to
+expect when you extract it.</p>
+<br />
+<hr />
+<h2>Download and uncompress MESS</h2>
+<p class="normal">Download the latest Windows version of MESS from the homepage <a href="http://www.mess.org" target="_blank">here</a>.</p>
+<p class="normal">Unzip the file into a directory of your choice. MESS is distributed in a ZIP file format so depending on what version of Windows
+you have you may need a tool like <a href="http://www.winzip.com" target="_blank">Winzip</a>.</p>
+<hr />
+<h2>MESS folders and files</h2>
+<p class="normal">When you have uncompressed the ZIP file you should see some folders and a few other files. Here is an example of what MESS version
+0.105 (mess0105b.zip) looks like once it is uncompressed (actually some of them could appear after you run MESS the first time). The latest version 
+should be similar. However, if any folder is missing, and you need it, you can simply create it and MESS will use it as described below.</p>
+<p class="normal" align="center"><img src="images/tree.gif" alt="tree" border="2" name="Folder" id="Folder" /></p>
+<p class="normal">Below is a brief explanation each folder.</p>
+<table width="58%" border="1">
+<tr>
+<td width="15%" class="tablehead">artwork</td>
+<td width="85%" class="normal">Background artwork files for certain systems, e.g. overlays for vectrex games.</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">cfg</td>
+<td width="85%" class="normal">Configuration files for different systems.</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">cheat</td>
+<td width="85%" class="normal">Used for cheats for different games.</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">ctrlr</td>
+<td width="85%" class="normal">Used for custom controller configurations files.</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">hash</td>
+<td width="85%" class="normal">Contains files that MESS uses to identify software images.</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">ini</td>
+<td width="85%" class="normal">Where MESS saves its initialization files used for different systems.</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">memcard</td>
+<td width="85%" class="normal">Memory card files for selected games.</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">nvram</td>
+<td width="85%" class="normal">NVram files used to store system settings on certain games.</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">roms</td>
+<td width="85%" class="normal">The folder where you put the system ROM images.</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">snap</td>
+<td width="85%" class="normal">Screenshots made at emulation time</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">software</td>
+<td width="85%" class="normal">This is where you store your games and software.</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">tools</td>
+<td width="85%" class="normal">Contains some programs used to manipulate disk images.</td>
+</tr>
+</table>
+<p class="normal">If you prefer to use different directories for any of the above, you simply have to edit the corresponding
+entry in mess.ini.</p>
+<p class="normal">Below is a brief explanation each file.</p>
+<table width="58%" border="1">
+<tr>
+<td width="15%" class="tablehead">chdman.exe</td>
+<td width="85%" class="normal">This is a command line utility which allows to create blank Hard Disks in the CHD format 
+supported by MESS, for use with emulated systems which use Hard Disk (e.g. ti99_4a).</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">imgtool.exe</td>
+<td width="85%" class="normal">This is a command line utility to handle different file formats supported by MESS.</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">mess.chm</td>
+<td width="85%" class="normal">MESS help file, to be opened from the GUI when you click on 'Help'.</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">mess.exe</td>
+<td width="85%" class="normal">This is the command line version of the emulator.</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">messui.exe</td>
+<td width="85%" class="normal">This is the GUI version of the emulator.</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">messlib.dll</td>
+<td width="85%" class="normal">This is the .dll shared by the command line and GUI versions, i.e. the core of the emulator.</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">sysinfo.dat</td>
+<td width="85%" class="normal">This is a support file including informations about Features, Usage and History of the emulated 
+systems.</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">wimgtool.exe</td>
+<td width="85%" class="normal">This is the GUI version of imgtool.exe</td>
+</tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,3 @@
+[submodule "third_party/emscripten"]
+	path = third_party/emscripten
+	url = https://github.com/kripken/emscripten.git

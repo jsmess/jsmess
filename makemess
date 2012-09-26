@@ -1,6 +1,7 @@
 #!/bin/bash
 #put your path to emmake here
-emmake=~/Code/emscripten/emmake
+emmake=./third_party/emscripten/emmake
+closure=./third_party/closure/compiler.jar
 
 if [ "$*" == "clean" ];
 then
@@ -9,7 +10,9 @@ else
 	NATIVE_TARGET=buildtools
 fi
 
+cd mess
 # Make the tools natively first.
 make $NATIVE_TARGET OSD=sdl NOWERROR=1 NOASM=1 NO_X11=1 NO_DEBUGGER=1 CC=clang CXX=clang++ AR=ar LD=clang++ PREFIX=native
 # Do a cross_build targetting emscripten using the natively build tools.
 $emmake make TARGET=mess SUBTARGET=tiny OSD=sdl CROSS_BUILD=1 NATIVE_OBJ="./obj/sdl/nativemame" TARGETOS=emscripten NOWERROR=1 NOASM=1 NO_X11=1 NO_DEBUGGER=1 $*
+cd ..

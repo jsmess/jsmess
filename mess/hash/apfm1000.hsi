@@ -1,0 +1,63 @@
+<hashfile>
+	<!-- apf m1000 -->
+	<hash crc32="6baad95f" sha1="b63ad3a60b59aad9b4605ff96f77839565144278 " name="Catena">
+		<cartnumber>MG1001</cartnumber>
+		<chip></chip>
+	</hash>
+	<hash crc32="5d03a812" sha1="29db4ca3c8b76c413b84b6d2bfd3499a70eccd3d" name="Catena">
+		<cartnumber>MG1001</cartnumber>
+		<chip>MG1002</chip>
+	</hash>
+	<hash crc32="e58a5d5b" sha1="205d659db0e0ab0292d33b5b4a9c2b46ca9d1dd5" name="Hangman/Tic Tac Toe/Doddle">
+		<cartnumber>MG1003</cartnumber>
+		<chip>MG1003</chip>
+	</hash>
+	<hash crc32="cca5836b" sha1="4ff1c4ffa46c543bbf48a519a4285b5d2c697ae3" name="Bowling/Micro Match">
+		<cartnumber>MG1004</cartnumber>
+		<chip>MG1004</chip>
+	</hash>
+	<hash crc32="bc1f5b8b" sha1="3e2f1e93501cd0dd2c9b747c594b784360e5b175" name="Brickdown/Shooting Gallery">
+		<cartnumber>MG1005</cartnumber>
+		<chip>MG1005</chip>
+	</hash>
+	<hash crc32="1fb354b7" sha1="2c93d8e764b1e1dfdc1bde7888b385cc28064f86" name="Baseball">
+		<cartnumber>MG1006</cartnumber>
+		<chip></chip>
+	</hash>
+	<hash crc32="38faa709" sha1="1a99f4781ce4604a550f4ec9d8559e3456303464" name="Blackjack">
+		<cartnumber>MG1007</cartnumber>
+		<chip>MG1007</chip>
+	</hash>
+	<hash crc32="811c6269" sha1="f820334bb6df9b856f54f1957b60a5e70bdd6d7e" name="Backgammon">
+		<cartnumber>MG1008</cartnumber>
+		<chip></chip>
+	</hash>
+	<hash crc32="21d5f63f" sha1="fa34ebdb799ccd2bff9f63ce4189a4ee690706fa" name="Casino I:  Roulette/Keno/Slots">
+		<cartnumber>MG1009</cartnumber>
+		<chip>MG1009</chip>
+	</hash>
+	<hash crc32="0504d667" sha1="6e33593f9e7a4551bc31b347741d9ff87ce618ca" name="UFO/Sea Monster/Break It Down/Rebuild/Shoot">
+		<cartnumber>MG1010</cartnumber>
+		<chip>MG1010</chip>
+	</hash>
+	<hash crc32="3f4b8c83" sha1="1f5bca6e96777ccbe830d1143a3549f51a3e386e" name="Pinball/Dungeon Hunt/Blockout">
+		<cartnumber>MG1011</cartnumber>
+		<chip>MG1011</chip>
+	</hash>
+	<hash crc32="7121f8b1" sha1="e7ae8571b496444ded77aaaa3c1d5f5ee97c651f" name="Boxing">
+		<cartnumber>MG1012</cartnumber>
+		<chip>MG1012</chip>
+	</hash>
+<!--
+	<hash crc32="" sha1="" name="Space Destroyers">
+		<cartnumber>MG1013</cartnumber>
+		<chip></chip>
+	</hash>
+-->
+<!--
+	<hash crc32="" sha1="" name="">
+		<cartnumber></cartnumber>
+		<chip></chip>
+	</hash>
+-->
+</hashfile>

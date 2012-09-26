@@ -1,0 +1,8 @@
+<tests>
+
+<test name="ibm5160_000" driver="ibm5160">
+	<wait time="20"/>
+	<checkblank/>
+</test>
+
+</tests>

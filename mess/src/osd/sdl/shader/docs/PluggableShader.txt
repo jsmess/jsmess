@@ -1,0 +1,191 @@
+Pluggable GLSL Shaders for SDLMAME
+
+Besides the compiled-in basic GLSL shader, 
+each for type (IDX16, RGB32-Direct, RGB32-Palette):
+	- plain 1:1
+	- bilinear
+
+we support pluggable multipass GLSL shader.
+
+We need 4 texture units to do so ..
+
++++
+
+1.0 Pluggable Multipass Shader Architecture
+
+Multiple shader can be serialized to the original mame bitmap (mame-bmp)
+and the scaled screen bitmap (scrn-bmp).
+
+1.1 MAME-BMP Shader
+
+The mame-bmp is the mame engines bitmap as is,
+with it's original size and orientation.
+Since we have 3 types of mame-bmp render techniques:
+	- IDX16-LUT (color lookup table)
+	- RGB32-LUT (color lookup table)
+	- RGB32-DIR (direct)
+a shader set of 3 fragment shader and 1 vertex shader
+must be provided.
+
+Assume we have a plain 1:1 shader using the basename 'glsl_plain',
+you have to provide the following 4 files:
+
+glsl_plain.vsh		 // the vertex shader
+glsl_plain_idx16_lut.fsh // the idx16 lut shader
+glsl_plain_rgb32_lut.fsh // the rgb32 lut shader
+glsl_plain_rgb32_dir.fsh // the rgb32 dir shader
+
+The very first mame-bmp shader has the responsibility to 
+normalize the original mame bitmap to RGB32.
+
+The result will be stored either in the intermediate 
+'mpass_texture' if subsequent shader will follow,
+or straight in the visible framebuffer.
+
+In the case of the IDX16 and RGB32-LUT type, 
+the color table lookup (LUT) function must be exercised,
+see glsl_plain_idx16_lut.fsh and glsl_plain_rgb32_lut.fsh !
+
+In the case of the RGB32-DIR type,
+the brightness and contrast values shall be added to the result.
+
+If subsequent mame-bmp shaders follows up, 
+i.e. this is not the last mame-bmp shader in the chain,
+no scaling and no rotation will be applied.
+I.e. such intermediate shaders can not be used for certain
+filters, like bilinear filtering.
+
+The last mame-bmp shader will transform the mame-bmp
+to the screen sized result, the final rotation is included.
+Such a result can be the intermdiate screen-bmp,
+if screen-bmp shaders are in the chain,
+or the final visible framebuffer.
+
+1.1.1 MAME-BMP Shader Uniforms
+
+IDX16-LUT
+RGB32-LUT
+	uniform sampler2D colortable_texture;    // LUT texture
+	uniform vec2      colortable_sz;         // LUT size
+	uniform vec2      colortable_pow2_sz;    // LUT pow2 size
+	uniform sampler2D color_texture;	 // mame idx'ed texture
+	uniform vec2      color_texture_sz;      // textured size
+	uniform vec2      color_texture_pow2_sz; // textured pow2 size
+
+RGB32-DIR
+	uniform sampler2D color_texture;	 // mame idx'ed texture
+	uniform vec2      color_texture_sz;      // textured size
+	uniform vec2      color_texture_pow2_sz; // textured pow2 size
+	uniform vec4      vid_attributes;        // r=gamma, g=contrast, b=brightness
+
+If the mame-bmp shader is not the very first one, 
+the additional intermediate texture is available.
+This one stores the result of the previous shader:
+
+	uniform sampler2D mpass_texture;	// result of the previous shader
+
+it has the same size as 'color_texture_sz' and 'color_texture_pow2_sz'.
+
+
+1.1.2 MAME-BMP Example
+
+                     SRC          DST     
+A1: mame-bmp-shader0 mame-bmp     mame-bmp
+A2: mame-bmp-shader1 mame-bmp     screen
+
+sdlmame -gl_glsl \
+        -glsl_shader_mame0 /shader/glsl_plain \
+        -glsl_shader_mame1 /shader/custom/glsl_add_mamebm_bilinear \
+        puckman
+
+"-gl_glsl"
+	Enables GLSL
+
+"-glsl_shader_mame0 /shader/glsl_plain"
+	Loads the following MAME-BMP shader files
+		/shader/glsl_plain.vsh
+		/shader/glsl_plain_idx16_lut.fsh    
+		/shader/glsl_plain_rgb32_lut.fsh    
+		/shader/glsl_plain_rgb32_dir.fsh    
+
+"-glsl_shader_mame1 /shader/custom/glsl_add_mamebm_bilinear"
+	Loads the following MAME-BMP shader files
+		/shader/custom/glsl_add_mamebm_bilinear.vsh
+		/shader/custom/glsl_add_mamebm_bilinear_idx16_lut.fsh
+		/shader/custom/glsl_add_mamebm_bilinear_rgb32_lut.fsh
+		/shader/custom/glsl_add_mamebm_bilinear_rgb32_dir.fsh
+
+"glsl_plain" normalizes the mame bitmap, i.e. the color lookup table (LUT)
+or the RGB32-DIR brightness/contrast impact.
+
+"glsl_add_mamebm_bilinear" applies bilinear filtering to the 
+MAME-BMP -> screen transformation.
+
+
+1.2 SCREEN-BMP Shader
+
+Using SCREEN-BMP shader requires the usage of at least one MAME-BMP shader,
+which is applied before the SCREEN-BMP shader.
+
+The screen-bmp is the scaled and rotated screen bitmap
+in RGB32 true color mode.
+
+A shader set of 1 fragment shader and 1 vertex shader
+must be provided.
+
+Assume we have a scanline effect filter shader using the basename 'glsl_add_scanline',
+you have to provide the following 4 files:
+
+glsl_add_scanline.vsh // the vertex shader
+glsl_add_scanline.fsh // the rgb32 shader
+
+The result will be stored either in the intermediate 
+'mpass_texture' if subsequent shader will follow,
+or straight in the visible framebuffer.
+
+1.2.1 SCREEN-BMP Shader Uniforms
+
+RGB32
+	uniform sampler2D mpass_texture;	  // result of the previous shader
+	uniform vec2      screen_texture_sz;      // screen texture size
+	uniform vec2      screen_texture_pow2_sz; // screen texture pow2 size
+
+You still 'can' access the previous mame-bmp data:
+
+	uniform vec2      color_texture_sz;      // textured size
+	uniform vec2      color_texture_pow2_sz; // textured pow2 size
+
+
+1.2.2 SCREEN-BMP Example
+
+                     SRC          DST     
+A1: mame-bmp-shader0 mame-bmp     mame-bmp
+A3: mame-bmp-shader1 mame-bmp     scrn-bmp
+B1: scrn-bmp-shader0 scrn-bmp	  scrn-bmp
+B3: scrn-bmp-shader1 scrn-bmp	  screen
+
+sdlmame -gl_glsl \
+	-glsl_shader_mame0 /shader/glsl_plain \
+	-glsl_shader_mame1 /shader/custom/glsl_add_mamebm_bilinear \
+	-glsl_shader_screen0 /shader/custom/glsl_add_screenbm_hscanlines \
+	-glsl_shader_screen1 /shader/custom/glsl_add_screenbm_vscanlines \
+	puckman
+
+"-gl_glsl"
+"-glsl_shader_mame0 /shader/glsl_plain"
+	See MAME-BMP example above!
+
+"-glsl_shader_screen0 /shader/custom/glsl_add_screenbm_hscanlines"
+	Loads the following MAME-BMP shader files
+		/shader/custom/glsl_add_screenbm_hscanlines.vsh
+		/shader/custom/glsl_add_screenbm_hscanlines.fsh
+"-glsl_shader_screen1 /shader/custom/glsl_add_screen_vscanline"
+	Loads the following MAME-BMP shader files
+		/shader/custom/glsl_add_screenbm_vscanlines.vsh
+		/shader/custom/glsl_add_screenbm_vscanlines.fsh
+
+"glsl_add_screenbm_hscanlines" adds horizontal scanlines to the
+intermediate screen-bmp.
+
+"glsl_add_screenbm_vscanlines" adds vertical scanlines to the
+final screen. Final, because it's the last shader. 

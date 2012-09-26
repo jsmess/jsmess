@@ -1,0 +1,346 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="astrocde" description="Bally Professional Arcade cartridges">
+	<software name="280zzap">
+		<description>280 Zzzap / Dodgem</description>
+		<year>1978</year>
+		<publisher>Bally Mfg. Corp.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="280zzap.bin" size="2048" crc="e4d285e5" sha1="0de670d6f78e3011e84fefc65f70544cdad3320e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amazmaze">
+		<description>Amazing Maze / Tic-Tac-Toe</description>
+		<year>1979</year>
+		<publisher>Bally Mfg. Corp.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="amazmaze.bin" size="2048" crc="cd57c485" sha1="8c833f077830db847caad91a3f040ac7ddcd33f8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artiduel">
+		<description>Artillery Duel</description>
+		<year>1982</year>
+		<publisher>Astrocade Inc.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="artiduel.bin" size="4096" crc="4f372019" sha1="24f6accc59301773e7471a831a5e3312c61694b0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrobat">
+		<description>Astro Battle</description>
+		<year>1979</year>
+		<publisher>Bally Mfg. Corp.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="astrobat.bin" size="4096" crc="0b5298bc" sha1="cdf7a2a8608c3e90d0cc8a4b751276b76de72f8c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bbasic" supported="no">
+		<description>Bally Basic</description>
+		<year>1978</year>
+		<publisher>Bally Mfg. Corp.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="bbasic.bin" size="4096" crc="70514687" sha1="a2ac8995a6217b7190aa9b18f49261c0ed3c6b5a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ballypin">
+		<description>Bally Pin 1 / Bally Pin 2</description>
+		<year>1981</year>
+		<publisher>Bally Mfg. Corp.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="ballypin.bin" size="4096" crc="3f431613" sha1="05b680777aa9639620c790f0590d96416d49bf94" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baseball">
+		<description>Baseball / Handball / Hockey / Tennis</description>
+		<year>1978</year>
+		<publisher>Bally Mfg. Corp.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="baseball.bin" size="4096" crc="5be548cc" sha1="4dda98d6cf257652fd179eca137b69b67e38b8c6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blckjack">
+		<description>Blackjack / Acey Duecy / Poker</description>
+		<year>1979</year>
+		<publisher>Bally Mfg. Corp.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="blckjack.bin" size="4096" crc="78d45a11" sha1="7b92e3ad161e31926a730780d1f28015310dd7d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brbasic1">
+		<description>Blue RAM BASIC 1.0</description>
+		<!-- <note>Requires RAM expansion</note> -->
+		<year>1981</year>
+		<publisher>Perkins Eng.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="brbasic1.bin" size="8192" crc="50112e64" sha1="8e7f0ba7a7f37f09f1c808b50647af3a04e1a92e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstdroid">
+		<description>Blast Droids</description>
+		<year>1983</year>
+		<publisher>Esoterica</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="bstdroid.bin" size="4096" crc="79fe386b" sha1="addc89e0add729f2a93cd1774f6f5c1c693e6068" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="brckyard">
+		<description>Brickyard / Clowns</description>
+		<year>1978</year>
+		<publisher>Bally Mfg. Corp.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="brckyard.bin" size="4096" crc="28f9e502" sha1="4c1a9efcd4435f6a79dc2212c4d0d17ea753809c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sconquer">
+		<description>Solar Conqueror (Proto)</description>
+		<year>1983</year>
+		<publisher>Astrocade Inc.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="conquerr.bin" size="8192" crc="0709b022" sha1="90900ec2c1fb9d476db22fd479400a6315230f9f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conanp">
+		<description>Conan The Barbarian! (Proto)</description>
+		<year>1982</year>
+		<publisher>Astrocade Inc.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="conanp.bin" size="8192" crc="15b1afea" sha1="bc4f757271fca69e0de3973f43d363c4474e2fb7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmicrd">
+		<description>Cosmic Raider</description>
+		<year>1983</year>
+		<publisher>Astrocade Inc.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="cosmicrd.bin" size="8192" crc="2a77b3fb" sha1="09ae145e3dbfd132f5130a0cbb508f4fbcf35bee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmicrp">
+		<description>Cosmic Raider (Proto)</description>
+		<year>1983</year>
+		<publisher>Astrocade Inc.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="cosmicrp.bin" size="8192" crc="e3d723a0" sha1="337cdffe2260dc6d36d674fa35047cb5a3598bf9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dogpatch">
+		<description>Dogpatch</description>
+		<year>1980</year>
+		<publisher>Astrocade Inc.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="dogpatch.bin" size="2048" crc="77bed6ba" sha1="263e6372392bc37a2228eb455d1477dcd41d9104" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="football">
+		<description>Football</description>
+		<year>1978</year>
+		<publisher>Bally Mfg. Corp.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="football.bin" size="4096" crc="fc8998a9" sha1="1d07b45162fab5497fe0a3d4ccb1b33bfd47177a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaxian">
+		<description>Galaxian</description>
+		<year>1981</year>
+		<publisher>Astrovision Inc.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="galaxian.bin" size="4096" crc="d75e9672" sha1="fb13e40c9ebadcb68beb7294a732ecf1b2f2ec30" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grandprx">
+		<description>Grand Prix / Demolition Derby</description>
+		<year>1981</year>
+		<publisher>Astrovision Inc.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="grandprx.bin" size="4096" crc="7b3b7b70" sha1="fd133dc402b6ecbcc718ffb895a16e07979ab329" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="icbmatk">
+		<description>ICBM Attack</description>
+		<year>1982</year>
+		<publisher>Spectre Systems</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="icbmatk.bin" size="4096" crc="bc2b6fe3" sha1="a3ff72346366d518b6f5011ec7bf160c159a1b62" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lttrmtch">
+		<description>Letter Match / Spell'n Score / Crosswords</description>
+		<year>1978</year>
+		<publisher>Bally Mfg. Corp.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="lttrmtch.bin" size="4096" crc="2cf68f93" sha1="266f6978b8f9e6bad36dc21031193ca93cd55be4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mlangman">
+		<description>Machine Language Manager</description>
+		<year>1982</year>
+		<publisher>Bit Fiddlers</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="mlangman.bin" size="2048" crc="5393f920" sha1="d5249c6026dd8f277212d58209c1d03e8567d769" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="muncher">
+		<description>Muncher</description>
+		<year>1983</year>
+		<publisher>Esoterica</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="muncher.bin" size="8192" crc="e4726657" sha1="02f37ded48b1fb9ba0a2d7e45f5b0a85eaecb1c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="redbaron">
+		<description>Red Baron / Panzer Attack</description>
+		<year>1978</year>
+		<publisher>Bally Mfg. Corp.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="redbaron.bin" size="4096" crc="a1c7e129" sha1="e0602c7485f511d6aa29d669967b101de79ddb15" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seawolf">
+		<description>Seawolf / Missile</description>
+		<year>1977</year>
+		<publisher>Bally Mfg. Corp.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="seawolf.bin" size="8192" crc="ee3489ea" sha1="a0bfee170d0e8dc0b6fec60713e3bdf11d589527" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spacefrt">
+		<description>Space Fortress</description>
+		<year>1981</year>
+		<publisher>Astrovision Inc.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="spacefrt.bin" size="4096" crc="519cc707" sha1="d1d4527128cad5446cdd4d4f0dfa7194cb50aaef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spedmath">
+		<description>Speed Math / Bingo Math</description>
+		<year>1978</year>
+		<publisher>Bally Mfg. Corp.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="spedmath.bin" size="2048" crc="7d30312a" sha1="8f500f1e2144169bb94214eaa2863dcf6590b926" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starbttl">
+		<description>Star Battle (Overdumped?)</description>
+		<year>1979</year>
+		<publisher>Bally Mfg. Corp.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="starbttl.bin" size="8192" crc="ce15563b" sha1="8e10074e03169ce88327ace728f2718e90438be0" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wizard">
+		<description>The Wizard (Proto)</description>
+		<year>1982</year>
+		<publisher>Astrocade Inc.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="thewizrd.bin" size="8192" crc="1395b130" sha1="da366390c91e24206b5034bc525e98f2a3ce5f86" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="treasure">
+		<description>Treasure Cove</description>
+		<year>1983</year>
+		<publisher>Esoterica</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="treasure.bin" size="8192" crc="1447f854" sha1="3c2a01b0b73664be5b332db2a0d7a91bdee2fdab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viperbp">
+		<description>VIPERSoft BASIC (Proto)</description>
+		<!-- <note>Requires RAM expansion</note> -->
+		<year>198?</year>
+		<publisher>VIPERSoft</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="viperbp.bin" size="8192" crc="4cd1ee10" sha1="1d0d0ebf38b89ab9da95540d8c797c05388777e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

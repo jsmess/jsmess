@@ -1,0 +1,141 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="button" defstate="1"/>
+
+	<element name="digit" defstate="0">
+		<led7seg>
+			<color red="1.00" green="0.0" blue="0.0" />
+		</led7seg>
+	</element>
+
+	<view name="Standard">
+
+	<!-- Led address display -->
+		<bezel name="digit0" element="digit">
+			<bounds x="358" y="33" width="20" height="25" />
+		</bezel>
+		<bezel name="digit1" element="digit">
+			<bounds x="390" y="33" width="20" height="25" />
+		</bezel>
+		<bezel name="digit2" element="digit">
+			<bounds x="419" y="33" width="20" height="25" />
+		</bezel>
+		<bezel name="digit3" element="digit">
+			<bounds x="449" y="33" width="20" height="25" />
+		</bezel>
+
+		<!-- Led data display -->
+		<bezel name="digit4" element="digit">
+			<bounds x="478" y="33" width="20" height="25" />
+		</bezel>
+		<bezel name="digit5" element="digit">
+			<bounds x="508" y="33" width="20" height="25" />
+		</bezel>
+
+
+		<!-- Buttons -->
+		<!-- Column 1 : C 8 4 0 -->
+		<bezel element="button" inputtag="LINE1" inputmask="0x02">
+			<bounds x="342" y="230" width="26" height="23"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE1" inputmask="0x20">
+			<bounds x="342" y="281" width="26" height="23"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE0" inputmask="0x04">
+			<bounds x="342" y="331" width="26" height="23"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE0" inputmask="0x40">
+			<bounds x="342" y="382" width="26" height="23"/>
+		</bezel>
+
+
+		<!-- Column 2 : D 9 5 1 -->
+		<bezel element="button" inputtag="LINE1" inputmask="0x01">
+			<bounds x="380" y="230" width="26" height="23"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE1" inputmask="0x10">
+			<bounds x="380" y="281" width="26" height="23"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE0" inputmask="0x02">
+			<bounds x="380" y="331" width="26" height="23"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE0" inputmask="0x20">
+			<bounds x="380" y="382" width="26" height="23"/>
+		</bezel>
+
+
+		<!-- Column 3 : E A 6 2 -->
+		<bezel element="button" inputtag="LINE2" inputmask="0x40">
+			<bounds x="416" y="230" width="26" height="23"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE1" inputmask="0x08">
+			<bounds x="416" y="281" width="26" height="23"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE0" inputmask="0x01">
+			<bounds x="416" y="331" width="26" height="23"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE0" inputmask="0x10">
+			<bounds x="416" y="382" width="26" height="23"/>
+		</bezel>
+
+
+		<!-- Column 4 : F B 7 3 -->
+		<bezel element="button" inputtag="LINE2" inputmask="0x20">
+			<bounds x="453" y="230" width="26" height="23"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE1" inputmask="0x04">
+			<bounds x="453" y="281" width="26" height="23"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE1" inputmask="0x40">
+			<bounds x="453" y="331" width="26" height="23"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE0" inputmask="0x08">
+			<bounds x="453" y="382" width="26" height="23"/>
+		</bezel>
+
+
+		<!-- Column 5 : PC AD DA + -->
+		<bezel element="button" inputtag="LINE2" inputmask="0x01">
+			<bounds x="523" y="230" width="26" height="23"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE2" inputmask="0x10">
+			<bounds x="523" y="280" width="26" height="23"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE2" inputmask="0x08">
+			<bounds x="523" y="330" width="26" height="23"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE2" inputmask="0x04">
+			<bounds x="523" y="380" width="26" height="23"/>
+		</bezel>
+
+
+		<!-- Column 6 : GO ST RST -->
+		<bezel element="button" inputtag="LINE2" inputmask="0x02">
+			<bounds x="562" y="280" width="26" height="23"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE3" inputmask="0x40">
+			<bounds x="562" y="330" width="26" height="23"/>
+		</bezel>
+
+		<bezel element="button" inputtag="LINE3" inputmask="0x20">
+			<bounds x="562" y="380" width="26" height="23"/>
+		</bezel>
+
+	</view>
+</mamelayout>

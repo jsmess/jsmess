@@ -1,0 +1,45 @@
+<!-- Nintendo Pokemon Mini hashfile -->
+<!-- Based on No-Intro dat 20061117 by SolidSnake & Lukeage -->
+
+<hashfile>
+	<hash crc32="05c5c126" sha1="3511d1bf4a3570a4011ca9d7d9d77ea43cc7543d" name="Lunch Time (U) (GameCube)"/>
+	<hash crc32="00d8c968" sha1="6f9bded4842b451102083d181db9deac2a7696e4" name="Pichu Bros. Mini (J)"/>
+	<hash crc32="be22866a" sha1="1c928c1e989f37751536494e1e843ed01c7f2c93" name="Pichu Bros. Mini - Hoppip's Jump Match (J) (Preview)"/>
+	<hash crc32="a22d00a7" sha1="041b6bea48d316eb63efcf930a9bda0dd3bd6618" name="Pichu Bros. Mini - Netsukikyuu (J) (Preview)"/>
+	<hash crc32="dec65262" sha1="b36ed9e3c86d37b128bcefbeb6088c4c66f11c52" name="Pichu Bros. Mini - Skateboard (J) (Preview)"/>
+	<hash crc32="199d7ab1" sha1="2c3aee0d0db8b4a80083732b8db07b0cc72608a8" name="Pokemon Anime Card Daisakusen (J)"/>
+	<hash crc32="54acb670" sha1="58c3210187497cffe989debcc095cb99c465e970" name="Pokemon Party Mini (E)"/>
+	<hash crc32="938d3819" sha1="ac94ed80d6f857e9530d17cc77c43aa809bf0415" name="Pokemon Party Mini (U)"/>
+	<hash crc32="0e1e150b" sha1="a309e00b2a8d7290070f27ec2fe10cfaba048283" name="Pokemon Party Mini - Baseline Judge (E) (Gamecube)"/>
+	<hash crc32="f5192440" sha1="bdad2fc86506f18c16d2bd249cc1ad4ebf6113dd" name="Pokemon Party Mini - Baseline Judge (J) (Gamecube)"/>
+	<hash crc32="0cfb4d1c" sha1="20004ffc01eeb04e72402e70fc97170111aafa6a" name="Pokemon Party Mini - Baseline Judge (U) (GameCube)"/>
+	<hash crc32="ba504497" sha1="c9a5f335c93e9bacf198b976d430cf798bc517bc" name="Pokemon Party Mini - Chansey's Dribble (E) (GameCube)"/>
+	<hash crc32="f15964af" sha1="b1922f3d43f3a4e36876c3e0e8428809fd999efc" name="Pokemon Party Mini - Pikachu's Rocket Start (E) (GameCube)"/>
+	<hash crc32="d09db45c" sha1="88b60902f9cf779ebcba1caee7c8477fc2e22598" name="Pokemon Party Mini - Ricochet Dribble (J) (Gamecube)"/>
+	<hash crc32="3322ed38" sha1="ba1db1745933a941479d885fe0d1b52365b7f817" name="Pokemon Party Mini - Ricochet Dribble (U) (GameCube)"/>
+	<hash crc32="44c5271e" sha1="840d43fe55e8e056940ff0b7bc6d7e4e11b5e047" name="Pokemon Party Mini - Rocket Start (U) (GameCube)"/>
+	<hash crc32="9fd4d48b" sha1="e3bd506b97ea94e9291c2fa4e1395e1829bafeaf" name="Pokemon Party Mini - Slowking's Judge (E) (GameCube)"/>
+	<hash crc32="398d47de" sha1="57c78731f17f29d9cddfc7e21b4d8801e8569ca6" name="Pokemon Pinball Mini (J)"/>
+	<hash crc32="88ca8cc5" sha1="a4209afea584757055aa6d4a77e58f943d2d6c6d" name="Pokemon Pinball Mini (J) (Preview)"/>
+	<hash crc32="a0091534" sha1="3ec1e04de413c22e9034074789ff2c45646ec0ac" name="Pokemon Pinball Mini (U)"/>
+	<hash crc32="50ad9d57" sha1="6704e372e20f137a4b46e2ab2d5c1231900ce1d3" name="Pokemon Pinball Mini (U) (GameCube Preview)"/>
+	<hash crc32="7776f2bb" sha1="d748f54bb50622858ae65cba74ba0cc82415fcbc" name="Pokemon Puzzle Collection (F) (GameCube Preview)"/>
+	<hash crc32="22101046" sha1="7c83682f595dc6eafc9c438d92eba7920ff3b2ca" name="Pokemon Puzzle Collection (G)"/>
+	<hash crc32="0e7752e8" sha1="7dc61e11b482b873d58657c827e3b166b3882db2" name="Pokemon Puzzle Collection (G) (GameCube Preview)"/>
+	<hash crc32="95afae59" sha1="2da4d24ed3192a88ab0b71ade7aec387987c5000" name="Pokemon Puzzle Collection (J)"/>
+	<hash crc32="da278854" sha1="1ce915f0c03bc0ec2e505669336e6b6965f7476c" name="Pokemon Puzzle Collection (J) (Gamecube)"/>
+	<hash crc32="2b348340" sha1="9c5fa07cc9f93874b297f759a6c6fd98f6ec6f47" name="Pokemon Puzzle Collection (U)"/>
+	<hash crc32="6f8ae656" sha1="048bb1d30d6ff21be14dd123c52a375e12611238" name="Pokemon Puzzle Collection (U) (GameCube Preview)"/>
+	<hash crc32="76a1bbf8" sha1="11775bbac2e985ef90d4192ed6322dd3b8352ac9" name="Pokemon Puzzle Collection Vol. 2 (J)"/>
+	<hash crc32="f8c842b5" sha1="12bfbd2c8a810b49338148feb6162e29a540ac3a" name="Pokemon Race Mini (J)"/>
+	<hash crc32="8f731830" sha1="6b8dbaa68ede37e64a22ee4b1cbb722f038cf5b5" name="Pokemon Race Mini (J) (Preview)"/>
+	<hash crc32="b4b5cc20" sha1="e81c3576b0c96e6ca28b958f8dda11cea5fce078" name="Pokemon Shock Tetris (J)"/>
+	<hash crc32="d55fc4c8" sha1="3b87d4d61ba3db92190b6ffa055f463adea2363c" name="Pokemon Sodateyasan Mini (J)"/>
+	<hash crc32="2fb23527" sha1="5fd1198a4725e21629edd4869535b70edfe165d4" name="Pokemon Tetris (E) (M3)"/>
+	<hash crc32="830da957" sha1="7a8b3f6a3751cd39431d822fa3a8016ffd2d26d8" name="Pokemon Zany Cards (F)"/>
+	<hash crc32="c009d501" sha1="0922e0147ff097e56d5ec98bf66ef050539329fa" name="Pokemon Zany Cards (G)"/>
+	<hash crc32="b9324f30" sha1="22cc052d900909a9032b7c84a0c7ab7c366a4a57" name="Snorlax's Lunch Time (E) (GameCube)"/>
+	<hash crc32="0186ea70" sha1="a332feeca96c2b4cad2e1abd2d9b289804101a4a" name="Snorlax's Lunch Time (J) (Gamecube)"/>
+	<hash crc32="33b3492b" sha1="0f56e0a3e72180b1113b900a6d3e4f8e8f570bb3" name="Togepi no Daibouken (J)"/>
+	<hash crc32="8c557c89" sha1="db7d8209594c6e8edee5932f799f36ecf1cfac9f" name="Togepi no Daibouken (J) (Preview)"/>
+</hashfile>

@@ -1,0 +1,62 @@
+<hashfile>
+	<!-- Commodore MAX  Cartridge CRC List -->
+	<!-- Compiled by PeT -->
+	<!-- Note: This list is provided as a record of known dumps for this system. -->
+	<!-- These checksums have not been validated and cannot be assumed correct. -->
+	<!-- They are provided here as a database to help the emulation of this system. -->
+	<!-- Send corrections/submissions to: battlepriest@hotmail.com -->
+	<hash crc32="adf47a7c" name="avenger">
+		<year>1983</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="85aa080b" name="Clowns.hi">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+		<status>Uses Paddles in Port A</status>
+	</hash>
+	<hash crc32="56ffc481" name="Clowns.crt">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+		<status>Uses Paddles in Port A</status>
+		<extrainfo>(equal to 85aa080b)</extrainfo>
+	</hash>
+	<hash crc32="fc703ba1" name="Jupiter Lander">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="d7827f16" name="Kickman.crt">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="8b310e77" name="Lemans">
+		<year>1982</year>
+		<manufacturer>Commodore &amp; HAL</manufacturer>
+		<status>Paddles in Port A</status>
+	</hash>
+	<hash crc32="4048f163" name="Music Machine.crt">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="8af1b170" name="Pinball Spectacular">
+		<year>1983</year>
+		<manufacturer>Commodore &amp; HAL</manufacturer>
+		<status>Paddles</status>
+	</hash>
+	<hash crc32="3b0165a7" name="Radar Rat Race">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="aa571a8a" name="Visible Solar System">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<!-- modified -->
+	<hash crc32="f847b023" name="Seawolf">
+		<status>cracked version, input problems</status>
+	</hash>
+	<hash crc32="eade0831" name="Omega Race">
+		<year>1982</year>
+		<manufacturer>Commodore</manufacturer>
+		<status>Hack?</status>
+	</hash>
+</hashfile>

@@ -1,0 +1,7 @@
+<tests>
+
+<test name="avigo_000" driver="avigo">
+	<wait time="5"/>
+</test>
+
+</tests>

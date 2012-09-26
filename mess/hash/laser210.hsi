@@ -1,0 +1,781 @@
+<hashfile>
+	<!-- This MESS CRC file was generated from the latest available TOSEC datfiles -->
+	<!-- VTech VZx00 - Cassettes (TOSEC-v0.01_CM).dat -->
+	<!-- VTech VZx00 - Disks (TOSEC-v0.01_CM).dat -->
+	<!-- VTech VZx00 - Snapshots - Applications (TOSEC-v0.51_CM).dat -->
+	<!-- VTech VZx00 - Snapshots - Demos (TOSEC-v0.01_CM).dat -->
+	<!-- VTech VZx00 - Snapshots - Games (TOSEC-v0.51_CM).dat -->	
+	<!-- Please keep this notice intact if editing this file -->
+	<hash crc32="4adb43db" name="Demonstration Tape (19xx)(-)(File 01 of 18)(Demo Tape)">
+	</hash>
+	<hash crc32="838d3a35" name="Demonstration Tape (19xx)(-)(File 02 of 18)(Welcome)">
+	</hash>
+	<hash crc32="46c4cd4d" name="Demonstration Tape (19xx)(-)(File 03 of 18)(Char Set)">
+	</hash>
+	<hash crc32="bc65c2e1" name="Demonstration Tape (19xx)(-)(File 04 of 18)(Bar Chart 1)">
+	</hash>
+	<hash crc32="e61314a1" name="Demonstration Tape (19xx)(-)(File 05 of 18)(Bar Chart 2)">
+	</hash>
+	<hash crc32="f52fa5de" name="Demonstration Tape (19xx)(-)(File 06 of 18)(Graphics 1)">
+	</hash>
+	<hash crc32="4c48a89d" name="Demonstration Tape (19xx)(-)(File 07 of 18)(Color Demo)">
+	</hash>
+	<hash crc32="6d1b24e8" name="Demonstration Tape (19xx)(-)(File 08 of 18)(Graphics 2)">
+	</hash>
+	<hash crc32="545ff9d8" name="Demonstration Tape (19xx)(-)(File 09 of 18)(Picture)">
+	</hash>
+	<hash crc32="ccd5b8d4" name="Demonstration Tape (19xx)(-)(File 10 of 18)(Kaleidoscope)">
+	</hash>
+	<hash crc32="627f4b6a" name="Demonstration Tape (19xx)(-)(File 11 of 18)(Song 1)">
+	</hash>
+	<hash crc32="08079617" name="Demonstration Tape (19xx)(-)(File 12 of 18)(Song 2)">
+	</hash>
+	<hash crc32="ac3c3d6e" name="Demonstration Tape (19xx)(-)(File 13 of 18)(ST Lines 1)">
+	</hash>
+	<hash crc32="5ceb97ed" name="Demonstration Tape (19xx)(-)(File 14 of 18)(ST Lines 2)">
+	</hash>
+	<hash crc32="4c34e0c7" name="Demonstration Tape (19xx)(-)(File 15 of 18)(Drawing 1)">
+	</hash>
+	<hash crc32="d91c6119" name="Demonstration Tape (19xx)(-)(File 16 of 18)(Drawing 2)">
+	</hash>
+	<hash crc32="4a7b1e96" name="Demonstration Tape (19xx)(-)(File 17 of 18)(Marbles)">
+	</hash>
+	<hash crc32="066709c3" name="Demonstration Tape (19xx)(-)(File 18 of 18)(End)">
+	</hash>
+	<hash crc32="e8b4b8fe" name="Blank Disk (19xx)(-)">
+	</hash>
+	<hash crc32="d5c7d49b" name="Magnum Quest (19xx)(-)[o]">
+	</hash>
+	<hash crc32="e78c14c3" name="Music Disk (19xx)(-)">
+	</hash>
+	<hash crc32="e3e9ad5c" name="VZED Disk Magazine 1 (1990)(Jason Oakley - Sapphire Productions)">
+		<year>1990</year>
+		<manufacturer>Jason Oakley - Sapphire Productions</manufacturer>
+	</hash>
+	<hash crc32="7672313c" name="VZED Disk Magazine 2 (1990)(Jason Oakley - Sapphire Productions)">
+		<year>1990</year>
+		<manufacturer>Jason Oakley - Sapphire Productions</manufacturer>
+	</hash>
+	<hash crc32="6164218c" name="Assembly Language Tutorial (1990)(Jason Oakley - Sapphire Productions)[Part of VZED Diskmagazine 1]">
+		<year>1990</year>
+		<manufacturer>Jason Oakley - Sapphire Productions</manufacturer>
+	</hash>
+	<hash crc32="bdb439f8" name="Binary Copier (19xx)(-)">
+	</hash>
+	<hash crc32="c3bdf777" name="Check Disk (19xx)(Dave Mitchell)(File 1 of 2)">
+		<manufacturer>Dave Mitchell</manufacturer>
+	</hash>
+	<hash crc32="f157fd91" name="Check Disk (19xx)(Dave Mitchell)(File 2 of 2)">
+		<manufacturer>Dave Mitchell</manufacturer>
+	</hash>
+	<hash crc32="bcc3127a" name="CopyPro4 - Breakproof &amp; Filecopier (19xx)(-)">
+	</hash>
+	<hash crc32="65f06c3d" name="Dave's DOS v0.01 (19xx)(Dave)">
+		<manufacturer>Dave</manufacturer>
+	</hash>
+	<hash crc32="087fdafd" name="Decimal Listing (19xx)(-)">
+	</hash>
+	<hash crc32="2df06bfa" name="Disassembler (19xx)(-)">
+	</hash>
+	<hash crc32="2deb9c13" name="Disassembler v2.0 (19xx)(-)">
+	</hash>
+	<hash crc32="4b507658" name="Disk Copier (1984)(Sanyo)">
+		<year>1984</year>
+		<manufacturer>Sanyo</manufacturer>
+	</hash>
+	<hash crc32="9a6e1833" name="Disk Copy v2.0 (19xx)(-)">
+	</hash>
+	<hash crc32="e7f74b96" name="Disk Sector Editor (1985)(Sanyo)">
+		<year>1985</year>
+		<manufacturer>Sanyo</manufacturer>
+	</hash>
+	<hash crc32="c4e8530b" name="Disk Sektor Editor - Laser Link Version (19xx)(-)">
+	</hash>
+	<hash crc32="16aeabad" name="Diskette-Monitor (1985)(Sanyo)">
+		<year>1985</year>
+		<manufacturer>Sanyo</manufacturer>
+	</hash>
+	<hash crc32="4a7d0b57" name="DISKOPS4 (19xx)(Leslie Milburn)">
+		<manufacturer>Leslie Milburn</manufacturer>
+	</hash>
+	<hash crc32="4ebe0ff7" name="Epson Printer Patch v1.4 (1987)(Larry Taylor)">
+		<year>1987</year>
+		<manufacturer>Larry Taylor</manufacturer>
+	</hash>
+	<hash crc32="738b76ed" name="Extended Basic (19xx)(W. Obrist)">
+		<manufacturer>W. Obrist</manufacturer>
+	</hash>
+	<hash crc32="2ec634d2" name="Extended Basic - Instructions (19xx)(-)">
+	</hash>
+	<hash crc32="5a19b410" name="Extended DOS v1.3 (1988)(Dave Mitchell)">
+		<year>1988</year>
+		<manufacturer>Dave Mitchell</manufacturer>
+	</hash>
+	<hash crc32="8afb9317" name="Extended VZ Basic v2.5 (19xx)(Steve Olney)">
+		<manufacturer>Steve Olney</manufacturer>
+	</hash>
+	<hash crc32="dde3ed7c" name="Fast Disk v1.0 (19xx)(-)">
+	</hash>
+	<hash crc32="5b50bccc" name="Fast Disk v1.1 (19xx)(-)">
+	</hash>
+	<hash crc32="eed84eb7" name="Fast Disk v1.2 (19xx)(-)">
+	</hash>
+	<hash crc32="5b74f9b9" name="Fast Disk v1.2 - Demonstration (19xx)(-)">
+	</hash>
+	<hash crc32="d2974541" name="File Search v2.0 (1987)(Larry Taylor - VSoftwareZ)">
+		<year>1987</year>
+		<manufacturer>Larry Taylor - VSoftwareZ</manufacturer>
+	</hash>
+	<hash crc32="bb1bd6e4" name="File Search v2.0 (1987)(Larry Taylor - VSoftwareZ)[h]">
+		<year>1987</year>
+		<manufacturer>Larry Taylor - VSoftwareZ</manufacturer>
+	</hash>
+	<hash crc32="f0d11869" name="Hex Constants (1984)(VZ News)[m Dave Mitchell]">
+		<year>1984</year>
+		<manufacturer>VZ News</manufacturer>
+	</hash>
+	<hash crc32="b74dbe54" name="Hex Utilities (19xx)(Jim Rowe)">
+		<manufacturer>Jim Rowe</manufacturer>
+	</hash>
+	<hash crc32="cf8f99f4" name="Hexidecimal List (19xx)(-)">
+	</hash>
+	<hash crc32="a7d7fec6" name="High Score (19xx)(-)">
+	</hash>
+	<hash crc32="3173f6b3" name="Inventory Database (19xx)(-)">
+	</hash>
+	<hash crc32="262b0d9b" name="Label (19xx)(-)">
+	</hash>
+	<hash crc32="d8658b68" name="Label 2 (19xx)(-)">
+	</hash>
+	<hash crc32="059d2df1" name="Memory Map (19xx)(Richard Wilson)">
+		<manufacturer>Richard Wilson</manufacturer>
+	</hash>
+	<hash crc32="41bcafe4" name="Mon-300 (1986-01-01)(-)(File 1 of 2)">
+		<year>1986-01-01</year>
+	</hash>
+	<hash crc32="f13e14d7" name="Mon-300 (1986-01-01)(-)(File 2 of 2)">
+		<year>1986-01-01</year>
+	</hash>
+	<hash crc32="74bdda7d" name="New CLS (19xx)(-)">
+	</hash>
+	<hash crc32="a716d428" name="Park (19xx)(Dave Mitchell)">
+		<manufacturer>Dave Mitchell</manufacturer>
+	</hash>
+	<hash crc32="ece05d1d" name="Restore (19xx)(Dave Mitchell)">
+		<manufacturer>Dave Mitchell</manufacturer>
+	</hash>
+	<hash crc32="cbd04ac5" name="Retrieve (19xx)(-)">
+	</hash>
+	<hash crc32="5dd0428a" name="Review Of Russell Harrisons Extended Basic (1990)(Jason Oakley - Sapphire Productions)[Part of VZED Diskmagazine 1]">
+		<year>1990</year>
+		<manufacturer>Jason Oakley - Sapphire Productions</manufacturer>
+	</hash>
+	<hash crc32="776b2933" name="Single Track Format (19xx)(Dave Mitchell)">
+		<manufacturer>Dave Mitchell</manufacturer>
+	</hash>
+	<hash crc32="a776198e" name="Tape Disk Editor Assembler v1.2b (19xx)(Dubois &amp; McNamara)[m Mark Harwood]">
+		<manufacturer>Dubois &amp; McNamara</manufacturer>
+	</hash>
+	<hash crc32="67b77849" name="Tone Generator (19xx)(-)">
+	</hash>
+	<hash crc32="c7280111" name="VZ-200 Editor Assembler v1.2 (19xx)(Dubois &amp; McNamara)">
+		<manufacturer>Dubois &amp; McNamara</manufacturer>
+	</hash>
+	<hash crc32="305c340a" name="VZ-300 Disk Editor Assembler v6.0x (19xx)(Mark Harwood)">
+		<manufacturer>Mark Harwood</manufacturer>
+	</hash>
+	<hash crc32="0b18dcf4" name="Word Processor v3.0 (1988)(Russel Harrison)">
+		<year>1988</year>
+		<manufacturer>Russel Harrison</manufacturer>
+	</hash>
+	<hash crc32="5e830431" name="Word-300 (19xx)(-)(File 1 of 2)">
+	</hash>
+	<hash crc32="fa2cab97" name="Word-300 (19xx)(-)(File 2 of 2)">
+	</hash>
+	<hash crc32="011c3227" name="ZZZ-UNK-EXT16">
+	</hash>
+	<hash crc32="e8f59ad3" name="ZZZ-UNK-Extended Basic">
+	</hash>
+	<hash crc32="eae4da45" name="ZZZ-UNK-Extended Basic2">
+	</hash>
+	<hash crc32="d5f512cd" name="ZZZ-UNK-FIND">
+	</hash>
+	<hash crc32="82367743" name="ZZZ-UNK-line2 (19xx)(Richard Wilson)">
+		<manufacturer>Richard Wilson</manufacturer>
+	</hash>
+	<hash crc32="acc86f63" name="ZZZ-UNK-line3 (19xx)(Richard Wilson)">
+		<manufacturer>Richard Wilson</manufacturer>
+	</hash>
+	<hash crc32="48bae275" name="ZZZ-UNK-linein1 (19xx)(Richard Wilson)">
+		<manufacturer>Richard Wilson</manufacturer>
+	</hash>
+	<hash crc32="70615cae" name="ZZZ-UNK-SUITE">
+	</hash>
+	<hash crc32="f5aedd2e" name="ZZZ-UNK-try (19xx)(Richard Wilson)">
+		<manufacturer>Richard Wilson</manufacturer>
+	</hash>
+	<hash crc32="fd784e3b" name="ZZZ-UNK-works (19xx)(Richard Wilson)">
+		<manufacturer>Richard Wilson</manufacturer>
+	</hash>
+	<hash crc32="48a4b091" name="3D Pyramids (19xx)(-)">
+	</hash>
+	<hash crc32="50b8f527" name="Auto Lissajouse (19xx)(-)">
+	</hash>
+	<hash crc32="70dab655" name="B (2002-09-14)(Dave Maunder)">
+		<year>2002-09-14</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="2c53e530" name="Barbarian Music (2002-09-29)(Dave Maunder)">
+		<year>2002-09-29</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="88ca4f79" name="Barbarian Titlescreen (2002-09-18)(Jocke H)">
+		<year>2002-09-18</year>
+		<manufacturer>Jocke H</manufacturer>
+	</hash>
+	<hash crc32="5c6e217c" name="Bezier 1 (2002-05-18)(Dave Maunder)">
+		<year>2002-05-18</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="6a765dfd" name="Bezier 2 (2002-05-18)(Dave Maunder)">
+		<year>2002-05-18</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="3e0f9488" name="Cat, The (2002-07-12)(Dave Maunder)">
+		<year>2002-07-12</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="0faeabf1" name="Circle 9C (2002-08-22)(Dave Maunder)">
+		<year>2002-08-22</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="23feae0d" name="Circle 9D (2002-08-22)(Dave Maunder)">
+		<year>2002-08-22</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="b6b3d4eb" name="D1B (2002-07-18)(Dave Maunder)">
+		<year>2002-07-18</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="23414cc4" name="Dakar (2002-07-12)(Dave Maunder)">
+		<year>2002-07-12</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="e47ad4cc" name="Dudes (2002-10-10)(Dave Maunder)">
+		<year>2002-10-10</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="0057f4d9" name="Escape (2002-07-19)(Dave Maunder)">
+		<year>2002-07-19</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="7bdebee5" name="Escape 3 (2002-09-14)(Dave Maunder)">
+		<year>2002-09-14</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="496d7ee8" name="Gfx (2002-09-14)(Dave Maunder)">
+		<year>2002-09-14</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="c220d3d9" name="Gfx 2 (2002-09-14)(Dave Maunder)">
+		<year>2002-09-14</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="d2673904" name="Graphical Sinus Wave (19xx)(-)">
+	</hash>
+	<hash crc32="9ac35bcc" name="Grpahics Demonstration (1983)(Dick Smith)">
+		<year>1983</year>
+		<manufacturer>Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="6afa63c6" name="Hackers Delight (2002-07-29)(Dave Maunder)">
+		<year>2002-07-29</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="efa69e5e" name="Last Ninja Titlescreen (2002-08-19)(Dave Maunder)">
+		<year>2002-08-19</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="f1b071c2" name="Life (2002-05-31)(Dave Maunder)">
+		<year>2002-05-31</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="1cb9ebe7" name="Line 1 (2002-05-18)(Dave Maunder)">
+		<year>2002-05-18</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="2df66d13" name="Lines 5 (2002-05-18)(Dave Maunder)">
+		<year>2002-05-18</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="11a55294" name="Mandel (2002-09-14)(Dave Maunder)">
+		<year>2002-09-14</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="e4d0a7a2" name="Mystify 3 (2002-05-18)(Dave Maunder)">
+		<year>2002-05-18</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="967132df" name="Panic (2002-08-22)(Dave Maunder)">
+		<year>2002-08-22</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="131ff686" name="Panic v2 (2002-10-08)(Dave Maunder)">
+		<year>2002-10-08</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="b91a3626" name="Quintro (2002-05-18)(Dave Maunder)">
+		<year>2002-05-18</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="a970370d" name="Quintro 2 (2002-05-25)(Dave Maunder)">
+		<year>2002-05-25</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="7b375071" name="Rotating Cube (2002-09-14)(Dave Maunder)">
+		<year>2002-09-14</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="1528400b" name="Rotating Cube 2 (2002-09-14)(Dave Maunder)">
+		<year>2002-09-14</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="d4709787" name="Saturday Night Demo (2002-06-01)(Dave Maunder)">
+		<year>2002-06-01</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="a835accd" name="Smallg 2 (2002-09-14)(Dave Maunder)">
+		<year>2002-09-14</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="c2310b77" name="Smallgf 2 (2002-09-14)(Dave Maunder)">
+		<year>2002-09-14</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="2c85c5bc" name="Smallgf 3 (2002-09-14)(Dave Maunder)">
+		<year>2002-09-14</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="c3f7fb1e" name="Smile (2002-09-14)(Dave Maunder)">
+		<year>2002-09-14</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="3b776182" name="Snake (2002-07-18)(Dave Maunder)">
+		<year>2002-07-18</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="79de9765" name="Sorter (2002-09-14)(Dave Maunder)">
+		<year>2002-09-14</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="42dd6ec7" name="Sprite Test (2002-09-14)(Dave Maunder)">
+		<year>2002-09-14</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="0041b2c7" name="Star Field (2002-05-29)(Dave Maunder)">
+		<year>2002-05-29</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="dc930fb6" name="Star Wars Demo (19xx)(Bob Kitch)">
+		<manufacturer>Bob Kitch</manufacturer>
+	</hash>
+	<hash crc32="c3ac6b59" name="VZ Demo (2002-08-14)(Dave Maunder)">
+		<year>2002-08-14</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="62a2c520" name="VZ Megademo (2002-05-25)(Dave Maunder)">
+		<year>2002-05-25</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="1e82b9a7" name="Walk (2002-08-04)(Dave Maunder)">
+		<year>2002-08-04</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="58ea35ce" name="World (2002-09-14)(Dave Maunder)">
+		<year>2002-09-14</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="89d84b10" name="ZZZ-UNK-Colpict">
+	</hash>
+	<hash crc32="a326195d" name="Ace Of Aces (19xx)(-)">
+	</hash>
+	<hash crc32="88413978" name="Airstrip (19xx)(-)">
+	</hash>
+	<hash crc32="3968c1bd" name="Arkaball (2000)(Jason Oakley)(PD)">
+		<year>2000</year>
+		<manufacturer>Jason Oakley</manufacturer>
+	</hash>
+	<hash crc32="8ad5c44d" name="Arkaball (2000)(Jason Oakley)(PD)[newer version]">
+		<year>2000</year>
+		<manufacturer>Jason Oakley</manufacturer>
+	</hash>
+	<hash crc32="8d6d40e0" name="Asteroid Dodge (19xx)(-)(File 1 of 2)(Instructions)">
+	</hash>
+	<hash crc32="781aac4b" name="Asteroid Dodge (19xx)(-)(File 2 of 2)(Game)">
+	</hash>
+	<hash crc32="6ba04bec" name="Asteroids (19xx)(Dubois &amp; McNamara - Dick Smith)[VZ300 Games Disk #1]">
+		<manufacturer>Dubois &amp; McNamara - Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="91c13637" name="Attack Of The Killer Tomatoes (1984-01)(Apolon Ivankovic)">
+		<year>1984-01</year>
+		<manufacturer>Apolon Ivankovic</manufacturer>
+	</hash>
+	<hash crc32="1371bf2e" name="Backgammon (19xx)(-)(File 1 of 3)(Loader)">
+	</hash>
+	<hash crc32="8e575782" name="Backgammon (19xx)(-)(File 2 of 3)(Backgammon)">
+	</hash>
+	<hash crc32="aa6ea1e9" name="Backgammon (19xx)(-)(File 3 of 3)(Compgammon)">
+	</hash>
+	<hash crc32="1cd165be" name="Battleships (19xx)(M. J. Hall)">
+		<manufacturer>M. J. Hall</manufacturer>
+	</hash>
+	<hash crc32="21a37811" name="Bomber (19xx)(Stefano Bonaldo)(PD)">
+		<manufacturer>Stefano Bonaldo</manufacturer>
+	</hash>
+	<hash crc32="d11871cb" name="Bust Out (19xx)(-)">
+	</hash>
+	<hash crc32="68ea86ff" name="Camel (19xx)(Dave Maunder - ETI - Ken Clarke)">
+		<manufacturer>Dave Maunder - ETI - Ken Clarke</manufacturer>
+	</hash>
+	<hash crc32="e75ba372" name="Card Andy (19xx)(-)">
+	</hash>
+	<hash crc32="01f6615e" name="Chasm Capers (19xx)(-)">
+	</hash>
+	<hash crc32="f1f0b00a" name="Checkers (19xx)(-)">
+	</hash>
+	<hash crc32="fdaaff03" name="Chess (19xx)(Dick Smith)[VZ300 Games Disk #4]">
+		<manufacturer>Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="4df70bf4" name="Circus (19xx)(-)">
+	</hash>
+	<hash crc32="ebd1bc33" name="Concentration (19xx)(-)">
+	</hash>
+	<hash crc32="a807b1ac" name="Cos Res (19xx)(-)">
+	</hash>
+	<hash crc32="5b47f4ac" name="Craps (19xx)(-)">
+	</hash>
+	<hash crc32="90f5b47d" name="Crash (19xx)(-)">
+	</hash>
+	<hash crc32="8635eadd" name="Dawn Patrol (19xx)(Dick Smith)[VZ300 Games Disk #1]">
+		<manufacturer>Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="19e818b0" name="Decoy (19xx)(-)">
+	</hash>
+	<hash crc32="b49181c0" name="Defence Penetrator (1982)(Cosmic Software)">
+		<year>1982</year>
+		<manufacturer>Cosmic Software</manufacturer>
+	</hash>
+	<hash crc32="0bdb02e6" name="Defense Command (19xx)(Juergen Buchmueller)">
+		<manufacturer>Juergen Buchmueller</manufacturer>
+	</hash>
+	<hash crc32="2b46cca5" name="Deflect! (19xx)(-)">
+	</hash>
+	<hash crc32="bbca2224" name="Diamond House (2002)(Pingo)(PD)">
+		<year>2002</year>
+		<manufacturer>Pingo</manufacturer>
+	</hash>
+	<hash crc32="93baf095" name="Dig Out (19xx)(Dick Smith)[VZ300 Games Disk #1]">
+		<manufacturer>Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="6e2ee7fc" name="Dracula's Castle (19xx)(-)">
+	</hash>
+	<hash crc32="e98d0130" name="DStarz88 (1999-05-02)(Stefano Bodrato)">
+		<year>1999-05-02</year>
+		<manufacturer>Stefano Bodrato</manufacturer>
+	</hash>
+	<hash crc32="1cf2acc8" name="DStarz88 (19xx)(Stefano Bodrato)">
+		<manufacturer>Stefano Bodrato</manufacturer>
+	</hash>
+	<hash crc32="eabdd36d" name="Duel (19xx)(Dick Smith)[VZ300 Games Disk #4]">
+		<manufacturer>Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="287bf903" name="El Dopey Submarine (2002-07-30)(Dave Maunder)[unfinished]">
+		<year>2002-07-30</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="ed7cd23f" name="El Dopey Submarine (2002-09-14)(Dave Maunder)[unfinished]">
+		<year>2002-09-14</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="94d81001" name="Electronic Black Jack (19xx)(-)">
+	</hash>
+	<hash crc32="6ee66d5d" name="Electronic Tunnel (19xx)(-)">
+	</hash>
+	<hash crc32="d0b3d46b" name="Escape River (19xx)(Larry Taylor)">
+		<manufacturer>Larry Taylor</manufacturer>
+	</hash>
+	<hash crc32="e19c5b32" name="Factory (19xx)(-)">
+	</hash>
+	<hash crc32="6ab915b5" name="Formula One (1984)(Stephen Clarke - Dick Smith)[h DJ]">
+		<year>1984</year>
+		<manufacturer>Stephen Clarke - Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="90d32a85" name="Formula Uno (19xx)(Stefano Bonaldo)(PD)">
+		<manufacturer>Stefano Bonaldo</manufacturer>
+	</hash>
+	<hash crc32="78692641" name="Galactic Raiders (2002-06-22)(Dave Maunder)(PD)[unfinished]">
+		<year>2002-06-22</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="b8aa9286" name="Galactic Raiders (2002-06-26)(Dave Maunder)(PD)[unfinished]">
+		<year>2002-06-26</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="26a6c3ba" name="Galactic Raiders (2002-07-04)(Dave Maunder)(PD)[unfinished]">
+		<year>2002-07-04</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="4ea8be7f" name="Galactic Raiders (2002-07-09)(Dave Maunder)(PD)[unfinished]">
+		<year>2002-07-09</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="9faf258d" name="Galactic Trade (19xx)(-)">
+	</hash>
+	<hash crc32="926b0817" name="Galaxon (19xx)(-)[cr The Programmer]">
+	</hash>
+	<hash crc32="1bdcfcea" name="Ghost Hunter (19xx)(Dubois &amp; McNamara)(File 1 of 2)(Instructions)">
+		<manufacturer>Dubois &amp; McNamara</manufacturer>
+	</hash>
+	<hash crc32="eb78b261" name="Ghost Hunter (19xx)(Dubois &amp; McNamara)(File 2 of 2)(Game)">
+		<manufacturer>Dubois &amp; McNamara</manufacturer>
+	</hash>
+	<hash crc32="f5c3870e" name="Ghost Hunter (19xx)(Dubois &amp; McNamara)(File 2 of 2)(Game)[a]">
+		<manufacturer>Dubois &amp; McNamara</manufacturer>
+	</hash>
+	<hash crc32="71282054" name="Ghost Hunter (19xx)(Dubois &amp; McNamara)(File 2 of 2)(Game)[tr +2 Ben Hobson]">
+		<manufacturer>Dubois &amp; McNamara</manufacturer>
+	</hash>
+	<hash crc32="64a7ac21" name="Ghostblasters (19xx)(Grant Rowe - Dick Smith)">
+		<manufacturer>Grant Rowe - Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="11d3c854" name="Golf (19xx)(Gary McLean)">
+		<manufacturer>Gary McLean</manufacturer>
+	</hash>
+	<hash crc32="f5ea8417" name="Grand Prix (19xx)(M. Bryham &amp; S. Southon)">
+		<manufacturer>M. Bryham &amp; S. Southon</manufacturer>
+	</hash>
+	<hash crc32="43ca2975" name="Grand Prix (2002)(Pingo)(PD)">
+		<year>2002</year>
+		<manufacturer>Pingo</manufacturer>
+	</hash>
+	<hash crc32="d4970419" name="Grave Digger (19xx)(-)">
+	</hash>
+	<hash crc32="c95fcc12" name="Hamburger Sam (19xx)(Dick Smith)[VZ300 Games Disk #4]">
+		<manufacturer>Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="6d766a9f" name="Hangman (19xx)(-)">
+	</hash>
+	<hash crc32="7b69ba6a" name="Hangman (19xx)(-)[a]">
+	</hash>
+	<hash crc32="14421e49" name="High Mountains (19xx)(-)">
+	</hash>
+	<hash crc32="8a9e5b03" name="Hoppy (19xx)(Dubois &amp; McNamara - Dick Smith)[a][VZ300 Games Disk #2]">
+		<manufacturer>Dubois &amp; McNamara - Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="ea62b012" name="Hoppy (19xx)(Dubois &amp; McNamara - Dick Smith)[VZ300 Games Disk #2]">
+		<manufacturer>Dubois &amp; McNamara - Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="3ef16019" name="Horse Race (19xx)(-)">
+	</hash>
+	<hash crc32="3e84d2d7" name="Invaders (19xx)(Dick Smith)(File 1 of 2)(Instructions)[VZ300 Games Disk #1]">
+		<manufacturer>Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="fd40a481" name="Invaders (19xx)(Dick Smith)(File 2 of 2)(Game)[a][VZ300 Games Disk #1]">
+		<manufacturer>Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="792ae365" name="Invaders (19xx)(Dick Smith)(File 2 of 2)(Game)[VZ300 Games Disk #1]">
+		<manufacturer>Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="e7fe9b0e" name="Kamikaze Invaders (19xx)(Dick Smith)[VZ300 Games Disk #2]">
+		<manufacturer>Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="96e001bc" name="Key Hunt (19xx)(-)[b]">
+	</hash>
+	<hash crc32="a25bcc3b" name="Knights And Dragons (1983)(Philip Hayne)">
+		<year>1983</year>
+		<manufacturer>Philip Hayne</manufacturer>
+	</hash>
+	<hash crc32="cec4d15c" name="Ladder Challenge (19xx)(Dubois &amp; McNamara - Dick Smith)(File 1 of 2)(Instructions)[VZ300 Games Disk #3]">
+		<manufacturer>Dubois &amp; McNamara - Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="6e5e9b22" name="Ladder Challenge (19xx)(Dubois &amp; McNamara - Dick Smith)(File 2 of 2)(Game)[VZ300 Games Disk #3]">
+		<manufacturer>Dubois &amp; McNamara - Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="a42f0096" name="Laser (1990)(Jason Oakley - Sapphire Productions)[Part of VZED Diskmagazine 1]">
+		<year>1990</year>
+		<manufacturer>Jason Oakley - Sapphire Productions</manufacturer>
+	</hash>
+	<hash crc32="c1d72887" name="Laser Pong (19xx)(Stefano Bonaldo)(PD)">
+		<manufacturer>Stefano Bonaldo</manufacturer>
+	</hash>
+	<hash crc32="10d4e80a" name="Learjet (19xx)(Dick Smith)">
+		<manufacturer>Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="a4ea80d9" name="Lunar Lander (19xx)(Dick Smith)[VZ300 Games Disk #4]">
+		<manufacturer>Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="f4b31ad2" name="Madhouse (19xx)(-)">
+	</hash>
+	<hash crc32="2b363f94" name="Magnum Quest (19xx)(-)(File 1 of 2)(Loader)">
+	</hash>
+	<hash crc32="0993b48f" name="Magnum Quest (19xx)(-)(File 2 of 2)(Game)">
+	</hash>
+	<hash crc32="aecc300b" name="Magnum Quest (19xx)(-)(File 2 of 2)(Game)[Inversed]">
+	</hash>
+	<hash crc32="83b4e5af" name="Mars Patrol (1985)(Grant Rowe - Dick Smith)">
+		<year>1985</year>
+		<manufacturer>Grant Rowe - Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="ce235db9" name="Mastermind (1985-05)(Richard M. Wilson)">
+		<year>1985-05</year>
+		<manufacturer>Richard M. Wilson</manufacturer>
+	</hash>
+	<hash crc32="eccda3e9" name="Maths Armada (19xx)(Dick Smith)">
+		<manufacturer>Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="8bb855aa" name="Maze Generator (19xx)(-)">
+	</hash>
+	<hash crc32="320ec53e" name="Meat Pies (19xx)(Larry Taylor &amp; John D'Alton)">
+		<manufacturer>Larry Taylor &amp; John D'Alton</manufacturer>
+	</hash>
+	<hash crc32="afc006b5" name="Melbourne Cup (1984-09-09)(Stephen Clarke)">
+		<year>1984-09-09</year>
+		<manufacturer>Stephen Clarke</manufacturer>
+	</hash>
+	<hash crc32="4d998ccf" name="Meteor (2002)(Jaime Perry)(PD)">
+		<year>2002</year>
+		<manufacturer>Jaime Perry</manufacturer>
+	</hash>
+	<hash crc32="2475783c" name="Missile Attack (19xx)(Dick Smith)[VZ300 Games Disk #3]">
+		<manufacturer>Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="3cce3957" name="Missile Command (1983)(George Lui)">
+		<year>1983</year>
+		<manufacturer>George Lui</manufacturer>
+	</hash>
+	<hash crc32="b5b2de29" name="Monster (19xx)(Grant Rowe)">
+		<manufacturer>Grant Rowe</manufacturer>
+	</hash>
+	<hash crc32="1ff66539" name="Moon Lander (19xx)(-)">
+	</hash>
+	<hash crc32="e8e6df37" name="Moses (1991-10)(Ken Clarke)">
+		<year>1991-10</year>
+		<manufacturer>Ken Clarke</manufacturer>
+	</hash>
+	<hash crc32="5e652d71" name="Moving Targets (19xx)(Richard M. Wilson)">
+		<manufacturer>Richard M. Wilson</manufacturer>
+	</hash>
+	<hash crc32="d50e5965" name="Othello (19xx)(Peter Sek)(File 1 of 2)(Instructions)">
+		<manufacturer>Peter Sek</manufacturer>
+	</hash>
+	<hash crc32="e74a2804" name="Othello (19xx)(Peter Sek)(File 2 of 2)(Game)">
+		<manufacturer>Peter Sek</manufacturer>
+	</hash>
+	<hash crc32="8ca68bb8" name="Painter (19xx)(-)">
+	</hash>
+	<hash crc32="226bced1" name="Panik (19xx)(Dubois &amp; McNamara - Dick Smith)(File 1 of 2)(Instructions)[VZ300 Games Disk #2]">
+		<manufacturer>Dubois &amp; McNamara - Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="9d9664df" name="Panik (19xx)(Dubois &amp; McNamara - Dick Smith)(File 2 of 2)(Game)[a][VZ300 Games Disk #2]">
+		<manufacturer>Dubois &amp; McNamara - Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="303eda72" name="Panik (19xx)(Dubois &amp; McNamara - Dick Smith)(File 2 of 2)(Game)[VZ300 Games Disk #2]">
+		<manufacturer>Dubois &amp; McNamara - Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="b78bf2a3" name="Penguin (19xx)(-)">
+	</hash>
+	<hash crc32="dbde8a97" name="Pharaoh's Curse (19xx)(Dick Smith)(File 1 of 3)(Loader)">
+		<manufacturer>Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="21516aae" name="Pharaoh's Curse (19xx)(Dick Smith)(File 2 of 3)(Titlescreen)">
+		<manufacturer>Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="148cc850" name="Pharaoh's Curse (19xx)(Dick Smith)(File 3 of 3)(Game)">
+		<manufacturer>Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="3466f5bf" name="Ping (2002)(Jesper Lindstroem)(PD)">
+		<year>2002</year>
+		<manufacturer>Jesper Lindstroem</manufacturer>
+	</hash>
+	<hash crc32="1ec95dea" name="Poker Machine (19xx)(-)">
+	</hash>
+	<hash crc32="8090a89b" name="Punch (19xx)(-)">
+	</hash>
+	<hash crc32="5e82056f" name="Punch (19xx)(-)[a]">
+	</hash>
+	<hash crc32="b9d1f455" name="Pursuit (1983)(Software Concepts)[h Dave Mitchell]">
+		<year>1983</year>
+		<manufacturer>Software Concepts</manufacturer>
+	</hash>
+	<hash crc32="48db84c3" name="Quest, The (19xx)(-)">
+	</hash>
+	<hash crc32="34ed6f47" name="Rocket Command (19xx)(Stefano Bonaldo)(PD)">
+		<manufacturer>Stefano Bonaldo</manufacturer>
+	</hash>
+	<hash crc32="96af554a" name="Roulette (19xx)(Richard Wilson)">
+		<manufacturer>Richard Wilson</manufacturer>
+	</hash>
+	<hash crc32="34970834" name="Runha (19xx)(Grant Rowe - Dick Smith)">
+		<manufacturer>Grant Rowe - Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="68f7158d" name="Shoot Out II (19xx)(-)">
+	</hash>
+	<hash crc32="94abd7d0" name="Space (2002)(-)(PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="a7a4d4c6" name="Space 3 (2002)(-)(PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="d1297552" name="Space Ram (19xx)(-)">
+	</hash>
+	<hash crc32="86aae503" name="Space Station Defender (19xx)(-)">
+	</hash>
+	<hash crc32="42e341e5" name="Space Vice (19xx)(Stefano Bonaldo)(PD)">
+		<manufacturer>Stefano Bonaldo</manufacturer>
+	</hash>
+	<hash crc32="e78c461f" name="Star Blaster (19xx)(Dubois &amp; McNamara - Dick Smith)[VZ300 Games Disk #1]">
+		<manufacturer>Dubois &amp; McNamara - Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="ec0e575a" name="Star War (2002-05-18)(Dave Maunder)(PD)[unfinished]">
+		<year>2002-05-18</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="b82ae755" name="Super Snake (19xx)(Dick Smith)[VZ300 Games Disk #3]">
+		<manufacturer>Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="076dfeb6" name="Tennis (19xx)(-)">
+	</hash>
+	<hash crc32="ff2dca42" name="Totaliser Derby (1987)(Applied Software - Dick Smith)">
+		<year>1987</year>
+		<manufacturer>Applied Software - Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="f1a7ba16" name="Triffids 2048 A. D. (1985)(Grant Rowe - Dick Smith)">
+		<year>1985</year>
+		<manufacturer>Grant Rowe - Dick Smith</manufacturer>
+	</hash>
+	<hash crc32="b7a08b9c" name="Twisting Road (1985)(Richard M. Wilson)">
+		<year>1985</year>
+		<manufacturer>Richard M. Wilson</manufacturer>
+	</hash>
+	<hash crc32="e86ad61f" name="VZCave (2002)(Dave Maunder)(PD)">
+		<year>2002</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="0f068f7b" name="VZCave (2002)(Dave Maunder)(PD)[a]">
+		<year>2002</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="00338389" name="VZCave (2002)(Dave Maunder)(PD)[unfinished]">
+		<year>2002</year>
+		<manufacturer>Dave Maunder</manufacturer>
+	</hash>
+	<hash crc32="4fb1d97b" name="VZetris (2002)(Geoff Williams)(PD)">
+		<year>2002</year>
+		<manufacturer>Geoff Williams</manufacturer>
+	</hash>
+	<hash crc32="9250a477" name="Write A Story (19xx)(-)">
+	</hash>
+	<hash crc32="ff727b84" name="Wumpus (19xx)(-)">
+	</hash>
+	<hash crc32="e77abe0d" name="ZZZ-UNK-PP">
+	</hash>
+</hashfile>

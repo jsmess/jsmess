@@ -1,0 +1,34 @@
+<tests>
+
+<test name="coco3_000" driver="coco3">
+	<wait time="2"/>
+	<memverify start="0x70400" end="0x7040C">"DISK&#96;EXTENDED"</memverify>
+</test>
+
+<test name="coco3_001" driver="coco3" ramsize="128k">
+	<wait time="2"/>
+	<memverify start="0x10400" end="0x1040C">"DISK&#96;EXTENDED"</memverify>
+</test>
+
+<test name="coco3h_bug625" driver="coco3h">
+	<wait time="2"/>
+	<input>10 CLEAR 200, &amp;H6000&#13;</input>
+	<input>20 I =&amp;H6000&#13;</input>
+	<input>30 READ D&#13;</input>
+	<input>40 IF D&lt;&gt;-1 THEN POKE I,D:I=I+1:GOTO 30&#13;</input>
+	<input>50 EXEC &amp;H6000&#13;</input>
+	<input>100 DATA &amp;H86, &amp;H70&#13;</input>						<!-- LDA	#$70 -->
+	<input>110 DATA &amp;H1F, &amp;H8B&#13;</input>						<!-- TFR	A, DP -->
+	<input>120 DATA &amp;H7F, &amp;H70, &amp;H34&#13;</input>			<!-- CLR	$7034 -->
+	<input>130 DATA &amp;HC6, &amp;H80&#13;</input>						<!-- LDB	#%10000000 -->
+	<input>140 DATA &amp;H11, &amp;H37, &amp;HBF, &amp;H34&#13;</input>	<!-- STDT	B,7,7,$34 -->
+	<input>150 DATA &amp;H4F&#13;</input>								<!-- CLRA -->
+	<input>160 DATA &amp;H1F, &amp;H8B&#13;</input>						<!-- TFR	A, DP -->
+	<input>170 DATA &amp;H39&#13;</input>								<!-- RTS -->
+	<input>180 DATA -1&#13;</input>
+	<input>RUN&#13;</input>
+	<wait time="2"/>
+	<memverify start="0x77034" end="0x77034">0x80</memverify>
+</test>
+
+</tests>

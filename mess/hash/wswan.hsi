@@ -1,0 +1,1208 @@
+<hashfile>
+	<!-- This MESS HASH file was auto-generated from Cowering's GoodWSx database (V3.14)  -->
+	<!-- for the exclusive use of MESS.  Keep this notice intact if editing this file  -->
+
+	<hash crc32="14d19b25" sha1="5ad3c099614d8b0647378ced6a8410ba930926c2" name="#Wonderwitch Promo Demo by Dox (PD)"/>
+	<hash crc32="04e84608" sha1="a8c4ab53ae51ee1f7432dfca53bfd8eff9c362b4" name="#Wonderwitch Promo Demo V1.3 by Dox (PD)"/>
+	<hash crc32="9439802d" sha1="3b81949799514f7bc78e54b2143e3a0231dfd5db" name="#Wonderwitch Promo Demo V1.4 by Dox (PD)"/>
+	<hash crc32="2cbe41a6" sha1="28a0e1bccc4c10a57379f87c67c6c5ecf07fb0f4" name="#Wonderwitch Promo Beta Demo by Dox (PD)"/>
+	<hash crc32="a1f2d257" sha1="979d43f608e6e401a09f896f8fa6a2911b99d832" name="#Wonderwitch Promo Demo Vx.x by Dox (PD)"/>
+	<hash crc32="b18cdc0d" sha1="99d9d7f951ae589059f34e76aea7489ae4cd79f1" name="Alchemist Marie &amp; Elie - Futari no Atelier (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="425eb893" sha1="06447c248afce04c4f4a1c3b5f7a4ab6f383c94b" name="Anchor Field Z (J) [M]">
+		<year>1999-06-24</year>
+		<manufacturer>Sammy</manufacturer>
+	</hash>
+	<hash crc32="d022f6fd" sha1="3141d4869d594c2fffd79db3177a0f2e2eb6a794" name="Anchor Field Z (J) [M][f1]">
+		<year>1999-06-24</year>
+		<manufacturer>Sammy</manufacturer>
+	</hash>
+	<hash crc32="c11639af" sha1="ae5e4f06f07fe13a48f414a1cd437a816e9ad2e7" name="Armored Unit (J) [M]">
+		<year>1999-11-18</year>
+		<manufacturer>Sammy</manufacturer>
+	</hash>
+	<hash crc32="1b73df20" sha1="5db29519054c3e60516e4a496d3bfad8272cc330" name="Armored Unit (J) [M][f1]">
+		<year>1999-11-18</year>
+		<manufacturer>Sammy</manufacturer>
+	</hash>
+	<hash crc32="04366d92" sha1="1578669c1fcf59ab5f5e603c6a65121d7ae209b1" name="Armored Unit (J) [M]">
+		<year>1999-11-18</year>
+		<manufacturer>Sammy</manufacturer>
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="392dd813" sha1="821bb81917445b63ac663c706ab4ce27de28543f" name="Bakusou Dekatora Densetsu (J) [M]">
+		<year>1999-12-29</year>
+		<manufacturer>Kaga Tech Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="09590272" sha1="f4135027694c216613d763aae32d3c43f04b59b3" name="Bank Test by Sir Dragoon (PD)"/>
+	<hash crc32="324622c9" sha1="544e76133fa53fc0ae5e00e3465b9cf634f14fd0" name="Beat Mania (J) [M]">
+		<year>1999-04-28</year>
+		<manufacturer>Konami</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="99027238" sha1="02103fc5fc97c3a38834ced32a3cfe6523832535" name="Blue Wing Blitz (J)">
+		<year>2001-07-05</year>
+		<manufacturer>Square</manufacturer>
+	</hash>
+	<hash crc32="7da6acb9" sha1="ad77d2e8429d5ed926d514d926050086f4edbeee" name="Bokan Densetsu Buta Mo O Daterya Doronbou (J) [M]">
+		<year>2000-04-27</year>
+		<manufacturer>Banpresto</manufacturer>
+	</hash>
+	<hash crc32="b25a0635" sha1="35eea568f756bacf533bb9aaad7e3239ba00e411" name="Buffers Evolution (J) [M]">
+		<year>1999-12-09</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="122591f1" sha1="97735b54bf38364565c13121e65e62bb68a19da3" name="Buffers Evolution (J) [M][f1]">
+		<year>1999-12-09</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="7f3a14c0" sha1="39e9a897b681b2c326b052827d7c534f22290286" name="Card Captor Sakura - Sakura to Fushigi na Clow Card (J) [M]">
+		<year>1999-12-02</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="3d6951ca" sha1="f28a57a0f83aae19729cd00441ec6a533bff6faa" name="Chaos Demo V1.0 by Charles Doty (PD)"/>
+	<hash crc32="c06c68f6" sha1="145f1a74d3bb4a10e7fa4e4a9e3ddb8bebea221d" name="Chaos Demo V1.1 by Charles Doty (PD)"/>
+	<hash crc32="86f6a2a6" sha1="50cdb961b4037002515ee3aa83ad1a7d9ccdbf23" name="Chaos Demo V2.0 by Charles Doty (PD)"/>
+	<hash crc32="ad2b1d5a" sha1="0c3e5b937e4e2cba0d4ed77e2097b787b7b463a2" name="Chaos Demo V2.1 by Charles Doty (PD)"/>
+	<hash crc32="27b3cc18" sha1="e212bba4fac51bbfcf440966da0e67b1686dcfc5" name="Chaos Gear - Michibi Kareshi Mono (J) [M]">
+		<year>1999-06-10</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="56e2c069" sha1="c4436a59fd830ba6af2d63462f71e1ab1cfa3212" name="Cho Denki Card Battle Yofu Makai Kikuchi Shugo (J) [M]">
+		<year>1999-12-16</year>
+		<manufacturer>Kobunsha</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="ccaa4853" sha1="3b62fd2841602f1077270848ab7a3aad58712ee9" name="Chocobo no Fushigi na Dungeon (J) [M]">
+		<year>1999-03-04</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="7fff2520" sha1="eb538b82c5516fae8ce38778e41fb118aa5c830f" name="Chou Aniki - Otoko no Tamafuda (J) [M]">
+		<year>2000-02-10</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="62d419cd" sha1="211e051db3fd4d7ae1ea143e043f87cfbcec5f1c" name="Choujikuu Yousai Macross - True Love Song (J) [M]">
+		<year>2000-03-23</year>
+		<manufacturer>Upstar</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="a9936941" sha1="4ba44f23d3b43ee730ce34d56f4cadaf429b6d1b" name="Clock Tower (J) [M]">
+		<year>1999-12-09</year>
+		<manufacturer>Kaga Tech Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="4e8909d1" sha1="db9b3308336b59aeff7bd173d687953a37739381" name="Clock Tower (J) [M]">
+		<year>1999-12-09</year>
+		<manufacturer>Kaga Tech Co., Ltd.</manufacturer>
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="8d96c62e" sha1="471b43ed353d6add1c1a42621cebac141272c84c" name="Color Bars Demo by Sir Dragoon (PD)"/>
+	<hash crc32="22c786a0" sha1="3c5f4235129dbc36339aa8d0bb4534a8558895c4" name="Color Scrolling Demo by Charles Doty (PD)"/>
+	<hash crc32="318f11ad" sha1="14db0ccad4d823a1043f694b2df383a92be49fc2" name="Color Test Demo by Sir Dragoon (PD)"/>
+	<hash crc32="c995274b" sha1="67a80b7fb00c3afe0ce9b0f8975c6d250a2cd49d" name="Crazy Climber (J) [M]">
+		<year>1999-07-29</year>
+		<manufacturer>Nihon Bussan Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="0cb57376" sha1="a88882426bf435416616191902a26b2b066f2491" name="Crazy Climber (J) [M]">
+		<year>1999-07-29</year>
+		<manufacturer>Nihon Bussan Co., Ltd.</manufacturer>
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="12ae932c" sha1="c2188171dc0f78fb6a13bbb55b4e85bdf7b82fd5" name="Dark Eyes - Battle Gate (J)">
+		<year>2001-03-15</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="b62e5dd0" sha1="d3da0ae529c6f78162682141154a95879f288ca7" name="Densha de Go! (J) [M]">
+		<year>1999-03-04</year>
+		<manufacturer>Taito Corp.</manufacturer>
+	</hash>
+	<hash crc32="af9d8f42" sha1="c07f776ac4374b648d1a49efd9d6fcd0db2ac1fa" name="Densha de Go! 2 (J) [M]">
+		<year>1999-10-07</year>
+		<manufacturer>CyberFront</manufacturer>
+	</hash>
+	<hash crc32="6e9dd148" sha1="9db54826c2887dea07aac774bd15e092596e37af" name="Digimon Adventure - Anode Tamer (J) [M]">
+		<year>1999-12-16</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="42ad238b" sha1="0b54cc1d350ab92c42ce8214784389b994562bf6" name="Digimon Adventure - Cathode Tamer (J) [M]">
+		<year>2000-01-20</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="4d28637e" sha1="18d3dfe25d82964ab7bb61af363d368fd12f4d4b" name="Digimon Adventure 02 - D1 Tamers (J)">
+		<year>2000-12-09</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="6ededaf8" sha1="44a5502b70ea75926b87377e3f634c8093bc574a" name="Digimon Adventure 02 - Tag Tamers (J) [M]">
+		<year>2000-08-03</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="77689273" sha1="7a6411cf8a4d91e8a4e0532779f11bdd25b92363" name="Digimon Digital Monsters - Anode &amp; Cathode Tamer - Veedramon Version (As)">
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="94ea6ffc" sha1="5cc59ec1687fe83ec5fb048d3dfc37849747df34" name="Digimon Digital Monsters (As) [M]">
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="ab59de2e" sha1="ecea24db6e65254ab4d6e312de0eb951c7df716f" name="Digimon Digital Monsters (J) [M]">
+		<year>1999-03-25</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="603cb5e6" sha1="ba16a0770f7a71dd49e2879799fd04a4f04f7e60" name="Digimon Digital Monsters for WonderSwanColor (J)">
+		<year>2002-03-16</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="0b03ccde" sha1="af11458b7b5a0a6339adcef969ccfebaa5643451" name="Digimon Digital Monsters for WonderSwanColor (J) [f1]">
+		<year>2002-03-16</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="c927bfcb" sha1="757e92177385a14d979227edee1cb544b4c56bd6" name="Digimon Tamers - Battle Spirit (J)">
+		<year>2001-10-06</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="f1f4d41f" sha1="31a718cfbcff2dab56ab9606a0b5b2dfccecbbcb" name="Digimon Tamers - Brave Tamer (J)">
+		<year>2001-12-29</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="fa92418d" sha1="8638737e5a35c6be05a888dc81e504e0d80fd756" name="Digimon Tamers - Digimon Medley (J)">
+		<year>2001-07-12</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="224f688a" sha1="305fbcd98f99e215fd8ae8f95fd9eff01d412613" name="Digimon Tamers - Digimon Medley (J) [f1]">
+		<year>2001-07-12</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="b5e675ae" sha1="c622f6742ca3f0129fc12dce0a1c17d292388ffb" name="Digital Partner (J) [M]">
+		<year>2000-05-25</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="89e7d950" sha1="3d5a1ed77e721908eb1145aaedef17c0ee6355ae" name="Dokodemo Hamster (J) [M]">
+		<year>2000-01-06</year>
+		<manufacturer>Bec Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="93e19f13" sha1="66b4bd15ef67dc324736a1cc78d6aca335f03389" name="Dokodemo Hamster 3 - O Dekake Saffron (J)">
+		<year>2000-12-14</year>
+		<manufacturer>Bec Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="b1caec06" sha1="83e190af2e25fbb3e93b1d5835c52fe6f1d279ce" name="D's Garage 21 Koubo Game - Tane wo Maku Tori (J) [M]">
+		<year>1999-12-22</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="eba41a7f" sha1="9c524b5f346121c415bd32e12feb8ebd01bd97a8" name="D's Garage 21 Koubo Game - Tane wo Maku Tori (J) [M][f1]">
+		<year>1999-12-22</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="4e467626" sha1="f79451034b6d844f0e10c825306bbc26f26a5466" name="Engacho! (J) [M]">
+		<year>1999-10-28</year>
+		<manufacturer>Nihon Application Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="3dcb48bd" sha1="b9d460be83497a8aa9fca02bea7e44426ee3ffac" name="Engacho! (J) [M][f1]">
+		<year>1999-10-28</year>
+		<manufacturer>Nihon Application Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="8922dd0b" sha1="f26b0215c49e04cb8ef6f031b627dff6a49d2015" name="Fever Sankyo - Koushiki Pachinko Simulation (J) [M]">
+		<year>1999-12-09</year>
+		<manufacturer>Bec Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="a83eabfd" sha1="ba2de0223bad56a0a8f6e5259650ba49ee2b0efd" name="Fever Sankyo - Koushiki Pachinko Simulation (J) [M][f1]">
+		<year>1999-12-09</year>
+		<manufacturer>Bec Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="b7243e88" sha1="26628eb76c16880b6faf2e706778d91a60144078" name="Final Fantasy (J)">
+		<year>2000-12-09</year>
+		<manufacturer>Square</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="df94a149" sha1="08e70b98918df5e5cf2fe057908ce5e8a69e05fe" name="Final Fantasy (J) [T+Eng0.91_Kalas]">
+		<year>2000-12-09</year>
+		<manufacturer>Square</manufacturer>
+	</hash>
+	<hash crc32="f699d6d1" sha1="6d707e88c85d1b5ef708631e709668006a9ee244" name="Final Fantasy IV (J)">
+		<year>2002-03-28</year>
+		<manufacturer>Square</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="f09e752f" sha1="959321e3b971516e38a4cbf95b0fc3efc0b0a825" name="Final Fantasy II (J)">
+		<year>2001-05-03</year>
+		<manufacturer>Square</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="6045df59" sha1="f4cf414034e93fda707adf3e27941b4fb6bc77a5" name="Final Fantasy II (J) [T-Eng095_RPGOne]">
+		<year>2001-05-03</year>
+		<manufacturer>Square</manufacturer>
+	</hash>
+	<hash crc32="15ec0525" sha1="18f8fd447ff10e2c43b0a649dcd039b7d0f53f0d" name="Final Fantasy II (J) [T+Eng097_RPGOne]">
+		<year>2001-05-03</year>
+		<manufacturer>Square</manufacturer>
+	</hash>
+	<hash crc32="ce2f1a1d" sha1="cfcb14be6d2f1dbffdfcefb8c8d83b4f39bc102b" name="Final Lap 2000 (J) [M]">
+		<year>2000-03-23</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="459afb1d" sha1="dec32eba70625bd2663fa728bc7a4bac4fbc3d58" name="Final Lap 2000 (J) [M][f1]">
+		<year>2000-03-23</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="b07e6a56" sha1="4c3f092b095bdb0afdaf8d32d4c54b4d6c209c96" name="Final Lap Special (J)">
+		<year>2001-11-15</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="c940c482" sha1="5bc5b33a1c9162953671c373cabf853fb5188885" name="Final Lap Special (J) [f1]">
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="f246a68e" sha1="fbb745b016cc710ff6f82ec3091a181415d8de61" name="Fire Pro Wrestling (J) [M]">
+		<year>2000-08-31</year>
+		<manufacturer>Kaga Tech Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="a1fb16fc" sha1="f8f077da30f227f3793e97c7f1d656559f08b9d4" name="Fishing Freaks - Bass Rise (J) [M]">
+		<year>2000-02-24</year>
+		<manufacturer>Bec Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="69d8d433" sha1="a3d6717efdb8f243fe86b4c3d869a9734a2e02d3" name="Flash - Koibito Kun (J)">
+		<year>2000-12-28</year>
+		<manufacturer>Kobunsha</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="03a2288c" sha1="34bcd5195124b9fb9b21d3f4e5647f321b0f8e49" name="Flash - Koibito Kun (J) [f1]">
+		<year>2000-12-28</year>
+		<manufacturer>Kobunsha</manufacturer>
+	</hash>
+	<hash crc32="f2e362b8" sha1="99c831c27c478064e3d3fa8f9f089cc28f0e946f" name="From TV Animation - One Piece - Mezase Kaizoku Ou (J) [M]">
+		<year>2000-07-19</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="be3dde09" sha1="82bf780e994fb264642f670363d71e3d9eb471f7" name="From TV Animation - One Piece - Mezase Kaizoku Ou (J) [M][f1]">
+		<year>2000-07-19</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="427056c4" sha1="2410690ad46667c52b63402df9e95fc8a75cee62" name="From TV Animation - One Piece - Niji no Shima Densetsu (J)">
+		<year>2001-09-13</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="a193458c" sha1="cbf6455e89b20a000b6121e5c485be1a20d1f726" name="Ganso Jajamaru Kun (J) [M]">
+		<year>1999-04-15</year>
+		<manufacturer>Jaleco Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="446e2581" sha1="adbe6e38a0bc6a2d19da64a444071977b771f14f" name="Gensou Maden Saiyuuki Retribution (J)">
+		<year>2001-06-07</year>
+		<manufacturer>Movic</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="67cba5c9" sha1="4fba961b926932337f2c1877f87328222deae786" name="Gensou Maden Saiyuuki Retribution (J) [f1]">
+		<year>2001-06-07</year>
+		<manufacturer>Movic</manufacturer>
+	</hash>
+	<hash crc32="eaadc794" sha1="c3734376993719a8d35c45663978d4872eb3b8d1" name="Girl Demo by Dox (PD)"/>
+	<hash crc32="8fcd6d2c" sha1="e100d54e5c63512dbd655f0439870e08ced439dd" name="Glocal Hexcite (J) [M]">
+		<year>2000-06-29</year>
+		<manufacturer>Kaga Tech Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="4aed3911" sha1="837528b9d95e309f7b1e8c4ffd46ca3e2b68a5a3" name="Glocal Hexcite (J) [M]">
+		<year>2000-06-29</year>
+		<manufacturer>Kaga Tech Co., Ltd.</manufacturer>
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="bc944a98" sha1="87661841ca63e99b04c0f6dc4ba3454c897e0c6d" name="Golden Axe (J)">
+		<year>2002-02-28</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="6887257f" sha1="53c909e686e1ea1407a818a57d939da5cfb65014" name="Golden Axe (J) [t1]">
+		<year>2002-02-28</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="6cd1411e" sha1="867f23963e33b26a781aa96851748e483e41fcad" name="Gomoku Narabe &amp; Reversi Touryuumon (J) [M]">
+		<year>2000-01-13</year>
+		<manufacturer>Sammy</manufacturer>
+	</hash>
+	<hash crc32="00137e86" sha1="af3fe9da3f5ee0f5a7b06b0440223db88fcb3bf2" name="Gorakuoh TANGO! (J) [M]">
+		<year>1999-04-01</year>
+		<manufacturer>Moebius</manufacturer>
+	</hash>
+	<hash crc32="1485ab1d" sha1="e036720482ce1ff491b45f2d2295bf984682e211" name="Gorakuoh TANGO! (J) [M][f1]">
+		<year>1999-04-01</year>
+		<manufacturer>Moebius</manufacturer>
+	</hash>
+	<hash crc32="9750bc2a" sha1="6d8f8fd330f32374b55cf6b998196a7db2131073" name="Guilty Gear Petit (J)">
+		<year>2001-01-25</year>
+		<manufacturer>Sammy</manufacturer>
+	</hash>
+	<hash crc32="d7a12bd5" sha1="f7aeab6724154f7ef6a389f9f18b7100045e1064" name="Guilty Gear Petit 2 (J)">
+		<year>2001-09-27</year>
+		<manufacturer>Sammy</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="30dd9cee" sha1="dc497246747b36eb160bac3fda0a14514982f1e9" name="Guilty Gear Petit 2 (J) [t1]">
+		<year>2001-09-27</year>
+		<manufacturer>Sammy</manufacturer>
+	</hash>
+	<hash crc32="a1656bbb" sha1="ee4b777f029bac9561e60c19407d08360e733822" name="GunPey (J) [M]">
+		<year>1999-03-04</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="55df2cbb" sha1="0b5c143b7f467b616f10ffcc41447c221a005db6" name="GunPey (J) [M][f1]">
+		<year>1999-03-04</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="0c9cb12c" sha1="1eb729aa9ab0a7df6f8a3470a6fede59d7622d4a" name="GunPey Ex (J)">
+		<year>2000-12-09</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="a97dccd9" sha1="c528d02122208a636ab16bd42b2b24d0ac9f2cf7" name="GunPey Ex (J) [f1]">
+		<year>2000-12-09</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="8e027330" sha1="4504b62212e1637dfd92e4f985a8497fa38941cd" name="Hanafuda Shiyou Yo (J) [M]">
+		<year>2000-02-17</year>
+		<manufacturer>Kaga Tech Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="4b22270d" sha1="1eda3327eb9b5a5844a95ac789f71b669f4cb6a7" name="Hanafuda Shiyou Yo (J) [M]">
+		<year>2000-02-17</year>
+		<manufacturer>Kaga Tech Co., Ltd.</manufacturer>
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="31e09bed" sha1="2e3f221d6965f53b29586d2019ee81dec6d1ac30" name="Hanjyuku Hero - Aah Sekai yo Hanjuku Nare (J)">
+		<year>2002-02-14</year>
+		<manufacturer>Square</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="aa525c04" sha1="1f42c5694a798de8ff3c68f63dfc7395be1669a5" name="Harobots (J) [M]">
+		<year>1999-10-07</year>
+		<manufacturer>Sunrise Interactive</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="7a29e9a6" sha1="9bd63ed48926b27be70333fbe07da2ceed56328a" name="Hataraku Chocobo (J)">
+		<year>200-09-21</year>
+		<manufacturer>Square</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="f207546c" sha1="1db78ac860652e4a1380f2a850e6e32e992bc3dc" name="Hello World by Sir Dragoon (PD)"/>
+	<hash crc32="70aa800e" sha1="57b4278fc5812f52413ca65f45225922d4f2ec3d" name="Hunter X Hunter - Ichi O Tsugu Mono (J) [M]">
+		<year>2000-06-01</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="088db40c" sha1="ccd7df1bdc042060fe30935b628e7504535eac32" name="Hunter X Hunter - Ichi O Tsugu Mono (J) [M][f1]">
+		<year>2000-06-01</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="9402bca9" sha1="bc591fc24d3f8e94b70503fd8b6a35fa58151139" name="Hunter X Hunter - Michibi Kareshi Mono (J)">
+		<year>2001-08-23</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="92bb2e53" sha1="d4c9b82d2a2121071a4ff754505811c6146c77c3" name="Hunter X Hunter - Michibi Kareshi Mono (J) [f1]">
+		<year>2001-08-23</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="d0b20c5a" sha1="2da2a9bcff4813abcb5b2c88095258d89a575378" name="Hunter X Hunter - Sorezore no Ketsui (J)">
+		<year>2001-04-26</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="0f1d6710" sha1="5840689046e86dc77bc60d6308f2a4111f4f7a20" name="Hunter X Hunter - Sorezore no Ketsui (J) [f1]">
+		<year>2001-04-26</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="0c23d551" sha1="b4fbea1a2c50d8566685f72820b360af4b54f82f" name="Inu Yasha (J)">
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="ca3f0b00" sha1="38f708a4c0c4fcec0cf4d6ce051d1ff76466d617" name="Itou Jun Ni Uzumaki Noroi Simulation (J) [M]">
+		<year>2000-03-04</year>
+		<manufacturer>Omage Micott, Inc.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="700f4c84" sha1="f3f73644ee41fddc65f84f8882a474cd8741c912" name="Itou Jun Ni Uzumaki Noroi Simulation (J) [M][f1]">
+		<year>2000-03-04</year>
+		<manufacturer>Omage Micott, Inc.</manufacturer>
+	</hash>
+	<hash crc32="4d103236" sha1="b40fbc7b72921c9ac31330831c0f77e4133ec7d6" name="Kakuto Ryori Densetsu Bistro Recipe - Wonder Battle Hen (J) [M]">
+		<year>1999-09-30</year>
+		<manufacturer>Banpresto</manufacturer>
+	</hash>
+	<hash crc32="80c6ef12" sha1="207a3ceb9a09eabca6e455deeb7035e7e04c9795" name="Kaze no Klonoa - Moonlight Museum (J) [M]">
+		<year>1999-05-20</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="411da7a4" sha1="7d6ed2b5d9e484a633dc78870c40092666b62b97" name="Kaze no Klonoa - Moonlight Museum (J) [M][t1]">
+		<year>1999-05-20</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="517f962e" sha1="12d26522665cb8ecb3178bc242d984deae438e5c" name="Keiba Yosou Shien Shinkaron (J) [M]">
+		<year>1999-09-14</year>
+		<manufacturer>Media Entertainment Inc.</manufacturer>
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="08c0247b" sha1="29e72e7f96f145a0ff56e447f577310df2ec463b" name="Kidou Senshi Gundam Vol.1 -Side 7- (J)">
+		<year>2001-02-01</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="462f9275" sha1="81dd3124cce8a1aafd423bfe0814187fb7c646cb" name="Kinniku Man Second Generations Dream Tag Match (J)">
+		<year>2002-03-02</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="3b4c60c6" sha1="9ef89b6fe68c5a06d34344e8c783ec24114ad959" name="Kiss Yori... - Seaside Serenade (J) [M]">
+		<year>1999-12-02</year>
+		<manufacturer>Kid</manufacturer>
+	</hash>
+	<hash crc32="274719f5" sha1="9942d1b7d1c00126b9891e560e6a3e264f8fdc2e" name="Kurupara! (J)">
+		<year>2001-06-14</year>
+		<manufacturer>Tom Create</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="ecfbcb1d" sha1="a309a430fbbed6c42f41d8ccaf4aba82e96d6a7b" name="Kyoso Uma Ikusei Simulation Keiba (J) [M]">
+		<year>1999-11-18</year>
+		<manufacturer>Bec Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="9e0854e2" sha1="9fdf3f5821f2a4488139525fe49e87b23de4571f" name="Langrisser Millenium WS - The Last Century (J) [M]">
+		<year>2000-03-09</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="9b6177e3" sha1="e756b1bab89860f5ddfa2706a61f1ae1b8f16add" name="Last Alive (J) [f1]">
+		<year>2001-07-26</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="da4479bf" sha1="b019f41207e396d9fe3509dccdbe1cc6e7ac46bb" name="Last Alive (J)">
+		<year>2001-07-26</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="cccaf8a1" sha1="d524da01f2bfad92c2fa080950229955a3030ef2" name="LastStand (J) [M]">
+		<year>1999-05-27</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="e407cabf" sha1="91595cd5d5192db50eda883157852ff81994990c" name="Lode Runner (J) [M]">
+		<year>2000-04-20</year>
+		<manufacturer>Banpresto</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="21279e82" sha1="847f51592f181aa68061900700149b86cdba651b" name="Lode Runner (J) [M]">
+		<year>2000-04-20</year>
+		<manufacturer>Banpresto</manufacturer>
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="637ada93" sha1="a25944969068ee495254f94c2c48dfffcb66ce8d" name="Magical Drop (J) [M]">
+		<year>1999-10-14</year>
+		<manufacturer>Data East Corp.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="b096ae0a" sha1="d729d9cfffa77666c9d76bb00f8605c91856f179" name="Magical Drop (J) [M]">
+		<year>1999-10-14</year>
+		<manufacturer>Data East Corp.</manufacturer>
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="e7e7fd4c" sha1="281079b22cb213ee4dda5c304b5b5be028130929" name="Mahjong Touryuumon (J) [M]">
+		<year>1999-03-11</year>
+		<manufacturer>Sammy</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="1b6f5f30" sha1="6b7a9b810c932974cbda4de7178cf0ea5a90e628" name="Makai Toushi Sa-Ga (J)">
+		<year>2002-03-20</year>
+		<manufacturer>Square</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="00b31fbb" sha1="5eaeab859e5f647fac354dad285a311387ea126b" name="Makaimura (J) [M]">
+		<year>1999-07-22</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="b6ee35c8" sha1="0b867d04e24eb6948707d474f5d2fbc38d3f0da9" name="Makaimura (J) [M][t1]">
+		<year>1999-07-22</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="12fb8b28" sha1="509e5748e5efdfb56093c78ae886153dd1838215" name="Medarot - Perfect Edition Kabuto Version (J) [M]">
+		<year>1999-05-04</year>
+		<manufacturer>Imagineer Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="2b40745d" sha1="315061e4739e947175d6ad7f006498cd61a33f8c" name="Medarot - Perfect Edition Kuwagata Version (J) [M]">
+		<year>1999-05-04</year>
+		<manufacturer>Imagineer Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="92fbf7fb" sha1="8f3f97be31f3bd0e6922ab7795aa6f04bc5cfe2a" name="Meitantei Conan - Majutsushi no Chousenjou! (J) [M]">
+		<year>1999-08-05</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="e226863b" sha1="e5684789e81f9d739010db575022a12a448b5509" name="Meitantei Conan - Nishi no Meitantei Saidai no Kiki! (J) [M]">
+		<year>2000-07-27</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="9f6e3f8d" sha1="36d8bc2ce7920d940943358d48f056f81055ab34" name="Meitantei Conan - Yugure no Koujo (J)">
+		<year>2001-04-05</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="8e123373" sha1="f47b4ab9197999bbec351750601baa20fbbd7177" name="Memories of Festa (J)">
+		<year>2001-03-08</year>
+		<manufacturer>Kid</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="a3ead689" sha1="dc94e17a942acfdc1eb0c38d91bf72460a4bb8f9" name="Meta Communication Therapy nee Kiite! (J) [M]">
+		<year>2000-03-23</year>
+		<manufacturer>Kaga Tech Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="d75effc2" sha1="2358701531e8a38419859cd70bf2fbbd967b6745" name="Mikeneko Holme's Ghost Panic (J)">
+		<year>2001-04-26</year>
+		<manufacturer>Kobunsha</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="4e9020b3" sha1="2130c35f3a47b32655da08cad8cf694e6efe90ed" name="Mikeneko Holme's Ghost Panic (J) [f1]">
+		<year>2001-04-26</year>
+		<manufacturer>Kobunsha</manufacturer>
+	</hash>
+	<hash crc32="9baac7bb" sha1="c7230ef709f6ceaef9a220541c8cdc05c0cd549f" name="Mingle Magnet (J) [M]">
+		<year>1999-11-02</year>
+		<manufacturer>Hal Corporation</manufacturer>
+	</hash>
+	<hash crc32="39a1391a" sha1="df1a794f7e3992b1e1e9de14141b607746202202" name="Mobile Suit Gundam - Volume 2 - JABURO (J)">
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="53b9fef8" sha1="2688ca67ac31ce3d5c3523b0e11cad55e70fa257" name="Mobile Suit Gundam MSVS (J) [M]">
+		<year>1999-08-26</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="eb995e86" sha1="e88e659cc04fc08a04b8c881f62fe086c5cdab06" name="Moero !! Pro Yakyu Rookies (J) [M]">
+		<year>2000-03-30</year>
+		<manufacturer>Jaleco Ltd.</manufacturer>
+	</hash>
+	<hash crc32="d675c265" sha1="3ce41c90cfc1d53a89ade2c88e0b16cdc92c0268" name="Morita Shougi (J) [M]">
+		<year>1999-12-22</year>
+		<manufacturer>Yuki-Enterprise</manufacturer>
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="5555d95c" sha1="209232f1e91c05140529d466c0ef6b7ad3386de1" name="Mr. Driller (J)">
+		<year>2001-04-05</year>
+		<manufacturer>Namco Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="4ed8820c" sha1="b358c65bae818c4b3de6bf668d16c311534036c2" name="Nazo Ou Pocket (J) [M]">
+		<year>1999-11-18</year>
+		<manufacturer>Bandai Visual</manufacturer>
+	</hash>
+	<hash crc32="8d176482" sha1="9c841bb131c106e3ee2311dea90f60b302941047" name="Nazo Ou Pocket (J) [M][f1]">
+		<year>1999-11-18</year>
+		<manufacturer>Bandai Visual</manufacturer>
+	</hash>
+	<hash crc32="bf8d9212" sha1="ae31488cee1c91f383efbe3083b4abec092dda36" name="Neon Genesis Evangelion Shito Ikusei (J) [M]">
+		<year>1999-07-22</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="b5dbcf12" sha1="6a479ee45e69cd3d6cc6cdda5a60eff3077953b0" name="Nice On (J) [M]">
+		<year>1999-04-08</year>
+		<manufacturer>Sammy</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="7638a3db" sha1="72a412c70f4a11a1df24ed47aacfd79ab1277b43" name="Nice On (J) [M][f1]">
+		<year>1999-04-08</year>
+		<manufacturer>Sammy</manufacturer>
+	</hash>
+	<hash crc32="c1734309" sha1="b143cece1e7db9d9f660f4e9ca3a95b02a71dcd3" name="Nobunaga no Yabo (J) [M]">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="04531734" sha1="785ebb7528f5268e1a1fc10dffbe95ccf6d39560" name="Nobunaga no Yabo (J) [M]">
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="631bd97a" sha1="0f73d3112b1184f74e728cf1252ffbee6a146fa6" name="Ouchan no Oekaki Logic (J) [M]">
+		<year>2000-01-06</year>
+		<manufacturer>Sunsoft</manufacturer>
+	</hash>
+	<hash crc32="a16d1d16" sha1="b52424843f13bbf5708b20f450b22ac526ab27ec" name="Ouchan no Oekaki Logic (J) [M][f1]">
+		<year>2000-01-06</year>
+		<manufacturer>Sunsoft</manufacturer>
+	</hash>
+	<hash crc32="35361250" sha1="fb8d0f4e58a4192989ec71eb6e392d182aaa3eec" name="Pocket Fighter (J) [M]">
+		<year>2000-04-06</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="d3092e88" sha1="258887b59357c89f855380b4e032e6aaa43982e7" name="Pocket no Naka no Doraemon (J) [f1]">
+		<year>2001-05-24</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="2b61bb2b" sha1="57338999b949589c36ce116a30f433e9618685e4" name="Pocket no Naka no Doraemon (J)">
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="90f7e6d6" sha1="32013a7a745a3aa2fd63cc9427c5e1f2635655ed" name="Pro Mahjong Kiwame (J) [M]">
+		<year>1999-10-07</year>
+		<manufacturer>Athena</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="5a41a7ba" sha1="d72c1221c2ce3e281a0ee288a3d079aa8e1b714b" name="Puyo Puyo Tsu (J) [M]">
+		<year>1999-03-11</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="302499b9" sha1="5e7dabb66b0ca580481aa79ee8b8a5b0c6ce6592" name="Puzzle Bobble (J) [M]">
+		<year>1999-07-01</year>
+		<manufacturer>Sunsoft</manufacturer>
+	</hash>
+	<hash crc32="6a05c838" sha1="6a571d151f8df410953a50638cb8dc97d8a7bc39" name="Puzzle Bobble (J) [M][f1]">
+		<year>1999-07-01</year>
+		<manufacturer>Sunsoft</manufacturer>
+	</hash>
+	<hash crc32="8f8608ad" sha1="759deb79a3fc3befed705d7264e4b88adbadacc7" name="Rainbow Islands - Putty's Party (J) [M]">
+		<year>2000-06-29</year>
+		<manufacturer>MegaHouse</manufacturer>
+	</hash>
+	<hash crc32="fe4ff701" sha1="977d5830e45c78b9020e9d06a63a9ad6bc623745" name="Raku Jongg (J)">
+		<year>2001-05-31</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="76309525" sha1="38f94e5a7ca7e9f29330a9b462b19e37e1cba951" name="Raku Jongg (J) [f1]">
+		<year>2001-05-31</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="812b720d" sha1="59d904149c3f405357b2715468d509095388a194" name="Rekishi Simulation Sangokushi II (J) [M]">
+		<year>2000-04-06</year>
+		<manufacturer>Koei Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="60706555" sha1="5973306a864c3804ee10b209e45067807d39a4de" name="Rhyme Rider Kerorikan (J)">
+		<year>2000-12-09</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="14adbd4b" sha1="9896d93c97381dc06b6f044de6c9bd112ca0c94b" name="Ring Infinity (J) [M]">
+		<year>2000-08-10</year>
+		<manufacturer>Kid</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="ac8db6a3" sha1="d39928cecb73e073f11e296727adf5bba9443186" name="Ring Infinity (J) [M][f1]">
+		<year>2000-08-10</year>
+		<manufacturer>Kid</manufacturer>
+	</hash>
+	<hash crc32="be6be690" sha1="2117ed92e8cb4ae61868535f1d4d16851b480890" name="Robot Works (As) [M]">
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="6adf0e32" sha1="4d4d4a3fde6b1dbbc8f008fbd035fb59624dfba7" name="Robot Works (J) [M]">
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="cd206a9e" sha1="9f8829aa8ea523e8370cbb2acd2acce056bb7958" name="Rockman &amp; Forte - Mirai Kara no Chousen Sha (J) [M]">
+		<year>1999-10-28</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="9c98d97d" sha1="06fcc9aad3ae478db6eed27621af4f56a6488a67" name="Romancing Saga (J)">
+		<year>2001-12-20</year>
+		<manufacturer>Square</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="e385ee88" sha1="d064b94f31b15564c9a3dbd3a68690244ea043ac" name="Sangokushi (J) [M]">
+		<year>1999-04-01</year>
+		<manufacturer>Koei Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="ae83f873" sha1="ae54a1f8916a2d37a1e0c82c5a9b5d8fe0eeae51" name="SD Gundam - Emotional Jam (J) [M]">
+		<year>1999-05-27</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="c60e5162" sha1="ebd4b37ade6df717f7b637747a4d3c45a6cca037" name="SD Gundam Eiyuuden - Eiyuuden Kishi Densetsu (J)">
+		<year>2001-03-15</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="18ecffb8" sha1="d8097e25431f0ad5183b2479ee0837599677a300" name="SD Gundam Eiyuuden - Eiyuuden Musha Densetsu (J)">
+		<year>2001-03-15</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="e4eb3ab1" sha1="5e5db8b066e1b41c5c12a2d4ffa97b73ed6c3f03" name="SD Gundam G Generation - Gather Beat (J) [M]">
+		<year>2000-07-13</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="4d21a347" sha1="016ff46509cbfe57a7440a1755d3a41ef49c048f" name="SD Gundam G Generation - Gather Beat 2 (J)">
+		<year>2001-06-14</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="21eb4c59" sha1="e6899de5b53f73c8978e3330dca0f2daaf95f140" name="SD Gundam Gashapon Senki - Episode 1 (J) [M]">
+		<year>2000-02-24</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="07a3dd46" sha1="fc8b0b9b7efeac54812e7ae54153b7ae0cb9c12f" name="Senkaiden - TV Animation Senkaiden Houshin Engi Yori (J) [M]">
+		<year>2000-02-24</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="9f35d00f" sha1="df9e831842072d9af613effbee7162229849de58" name="Senkaiden Ni - TV Animation Senkaiden Houshin Engi Yori (J)">
+		<year>2000-12-21</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="301436ac" sha1="708288e70b3186f6c0ef07acaef1b50fe6b7ab22" name="Sennou Millenium (J) [M]">
+		<year>2000-03-16</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="3ef0b0c4" sha1="7e1c50312fa78e8bce8a9a3c23f2ddd4f71e4fd6" name="Sennou Millenium (J) [M][f1]">
+		<year>2000-03-16</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="1c489351" sha1="d64b9b2d567d1cea5960f64e5bdf83d4514446da" name="Shanghai Pocket (J) [M]">
+		<year>1999-04-01</year>
+		<manufacturer>Sunsoft</manufacturer>
+	</hash>
+	<hash crc32="5b76f901" sha1="7324c5939b8b64858c96bd9726f5b5c483a11e22" name="Shin Nihon Pro Wrestling Toukon Retsuden (J) [M]">
+		<year>1999-03-04</year>
+		<manufacturer>Tomy</manufacturer>
+	</hash>
+	<hash crc32="6021d9cc" sha1="28d876a7d1c4d78d4dcd2c644ca37125e625b4a5" name="Shin Nihon Pro Wrestling Toukon Retsuden (J) [M][f1]">
+		<year>1999-03-04</year>
+		<manufacturer>Tomy</manufacturer>
+	</hash>
+	<hash crc32="fff1c0d6" sha1="c42339590a6d7864cb4f5728b84c4cce09779f0a" name="Shogi Touryuumon (J) [M]">
+		<year>1999-10-28</year>
+		<manufacturer>Sammy</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="3ad194eb" sha1="0bc88b0affa97225e22c531306e9930ddb8f8905" name="Shogi Touryuumon (J) [M]">
+		<year>1999-10-28</year>
+		<manufacturer>Sammy</manufacturer>
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="8655269e" sha1="4a756dab81e0101475dc2e5494270f3df7dac1e6" name="Side Pocket (J) [M]">
+		<year>1999-11-25</year>
+		<manufacturer>Data East Corp.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="f00a0330" sha1="3e31beaca985ac5041c6e95e0d07f163168e190d" name="Slither Link (J) [M]">
+		<year>2000-04-20</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="f6e6fcee" sha1="7a891083e5f5300bb28ea16a283de3a068611aa0" name="Slither Link (J) [M][f1]">
+		<year>2000-04-20</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="352a570d" sha1="9a087b0e6031e7e5e6d133ac82fecb8faa30816a" name="Slither Link (J) [M]">
+		<year>2000-04-20</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="eaf7f3d9" sha1="f654144972a1bae0a5334df8d2300020b01ea9b3" name="Slither Link (J) [M][f1]">
+		<year>2000-04-20</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="d7438e58" sha1="6eec04244f4d85807988a2331e7031d0c3549646" name="Soccer Yarou! - Challenge the World (J) [M]">
+		<year>1999-08-12</year>
+		<manufacturer>Coconuts Japan Entertainment Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="1263da65" sha1="435f207cce79ad6ac5b564e8a37e0d4395bd3739" name="Soccer Yarou! - Challenge the World (J) [M][a1]">
+		<year>1999-08-12</year>
+		<manufacturer>Coconuts Japan Entertainment Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="0e467d97" sha1="983582fe8d18839df30b6d29fb75780a9e32f4ec" name="Soroban Gu (J)">
+		<year>2000-12-09</year>
+		<manufacturer>Kaga Tech Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="f016dfe1" sha1="e461762566d529d1b103f119da50353902d180d7" name="Sotsugyou (J) [M]">
+		<year>1999-12-16</year>
+		<manufacturer>Bandai Visual</manufacturer>
+	</hash>
+	<hash crc32="8d83014f" sha1="54dd6e3fe81a8a384a0ffdd7a39211a5de9174c7" name="Space Invaders (J) [M]">
+		<year>1999-05-13</year>
+		<manufacturer>Sunsoft</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="138d1018" sha1="2b2c2a0566646156bcdde2a00b728c5b8218aa23" name="Star Hearts (J)">
+		<year>2001-08-27</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="9874e9a2" sha1="44940ae0140df1bd91d742a166c459df1b6c2339" name="Star Hearts Taikenban (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="16e0d929" sha1="bf212cecbbc51ee32ee2655a072f55e7bf70b9ec" name="Super Robot Taisen Compact (J)">
+		<year>2001-12-13</year>
+		<manufacturer>Banpresto</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="7021d54f" sha1="e93d58ab5819992e54223f5d1c4d5aeb6983d6a3" name="Super Robot Taisen Compact (J) [M]">
+		<year>1999-04-28</year>
+		<manufacturer>Banpresto</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="782877bc" sha1="e6911e5bb0a742ba299e05b20ee81f2faa4854a5" name="Super Robot Taisen Compact 2 - Dai Ichibu - Chijou Gekidou Hen (J) [M]">
+		<year>2000-03-30</year>
+		<manufacturer>Banpresto</manufacturer>
+	</hash>
+	<hash crc32="ecbb46de" sha1="6014ac0b8978e710f26c9cc41180cdf788584743" name="Super Robot Taisen Compact 2 - Dai Nibu - Uchuu Gekishin Hen (J) [M]">
+		<year>2000-09-14</year>
+		<manufacturer>Banpresto</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="0b0f8981" sha1="d24d8cea57c5c487e877eaa523eefb0dd184556d" name="Super Robot Taisen Compact 2 - Dai Sanbu - Ginga Kessen Hen (J) [M]">
+		<year>2001-01-18</year>
+		<manufacturer>Banpresto</manufacturer>
+	</hash>
+	<hash crc32="8b74f59a" sha1="2f35d250b8ddeb98ca3a2704a4ad85713f4c71b0" name="Tanjou - Debut (J) [M]">
+		<year>2000-02-24</year>
+		<manufacturer>Bandai Visual</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="a5643aa3" sha1="9622c65c939f05a9dfae288919ec5bd15c348f14" name="Tare Pan no Gunpei (J) [M]">
+		<year>1999-12-09</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="d387c363" sha1="9ca2bbfc60d6f359b049af16859073f6227a7f89" name="Tare Pan no Gunpei (J) [M][f1]">
+		<year>1999-12-09</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="2fcf1443" sha1="a9ca9ffd0ddf9641040c73d2a17d30cae36ad332" name="Tare Pan no Gunpei (J) [M][f2]">
+		<year>1999-12-09</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="e7c608e5" sha1="96a9ce5e56dc0c9648027ad4454e6f35e88d9a07" name="Tekken Card Challenge (J) [M]">
+		<year>1999-06-17</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="ef5b6b82" sha1="7148d750f12b5da9a0efd99f5a5a7ccadecbdf60" name="Terrors (J) [M]">
+		<year>1999-08-05</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="9bd8f08c" sha1="9532113e14b03c95f034c015168e21273d42eff1" name="Terrors 2 (J)">
+		<year>2000-12-21</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="ad9d62fe" sha1="c4b0a8a0d058f393223077c1e0b5469dc3dd65a5" name="Terrors 2 (J) [f1]">
+		<year>2000-12-21</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="6f304dca" sha1="65c4c6aaa36328bba5d56419af59af5d3420ed78" name="Tetsujin 28 Gou (J) [M]">
+		<year>1999-12-22</year>
+		<manufacturer>MegaHouse</manufacturer>
+	</hash>
+	<hash crc32="82a07866" sha1="bba38b3ff29a8dde0180c384c43cb69a48d22f6a" name="Tetsujin 28 Gou (J) [M][f1]">
+		<year>1999-12-22</year>
+		<manufacturer>MegaHouse</manufacturer>
+	</hash>
+	<hash crc32="44b3e67c" sha1="4eefc5a51008c2ab33e8d04064ec9bdcbc03d036" name="Tetsuman (J) [M]">
+		<year>1999-07-15</year>
+		<manufacturer>Kaga Tech Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="91117d1b" sha1="866c67737a4fbb5f09a0b13bbdb89397bcab1f55" name="Tokyo Majin Gakuen Fuju Fuuroku (J) [M]">
+		<year>2000-10-12</year>
+		<manufacturer>Asmik Ace Entertainment Inc.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="47659b2c" sha1="fb53c28bd48174d3829467f1ab81d3f87f9a7f5b" name="Tonpusou (J)">
+		<year>2001-06-28</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="c31064f6" sha1="f7df3ee69903b5dc8923d94a2d53261186655bd0" name="Tonpusou (J) [f1]">
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="64aaf392" sha1="b25ff8fc79168e439ba913a2cea6195094be9ac2" name="Trump Collection 2 (J) [M]">
+		<year>2000-09-28</year>
+		<manufacturer>Bottom Up</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="07a3b862" sha1="ab3c925bf1bfd36403335af0c0365be8a2950ca8" name="Trump Collection Bottom Up Teki Trump Seikatsu (J) [M]">
+		<year>1999-07-01</year>
+		<manufacturer>Bottom Up</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="c283ec5f" sha1="9313e6d7090e91cca0304dc450b2f2f87329ae7a" name="Trump Collection Bottom Up Teki Trump Seikatsu (J) [M]">
+		<year>1999-07-01</year>
+		<manufacturer>Bottom Up</manufacturer>
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="0d5171f0" sha1="858f1f57b5522a1701cc8a0abae43cec948e26a6" name="Turntablist - DJ Battle (J) [M]">
+		<year>1999-11-25</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="a07482ac" sha1="e1bcf9b91d1ea914e227a616481455fc9661cd8e" name="Turntablist - DJ Battle (J) [M][f1]">
+		<year>1999-11-25</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="5793bdda" sha1="dd1878279a6667fb66dd1ac44a2cdb9a5acbe415" name="Uchuu Senkan Yamato (J)">
+		<year>2001-02-08</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="d56b4fd8" sha1="b9b9919d6b6f7a4a67accb649ced2f9a869310fb" name="Uchuu Senkan Yamato (J)">
+		<year>2001-02-08</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="de2208ab" sha1="bd107befe5ce6c5508d2da8be351b9984166ae1d" name="Ultraman - Hikari no Kuni no Shisha (J)">
+		<year>2001-06-21</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="86b56511" sha1="4f739292d11a45490851eaf40c0a7081824ad75a" name="Umizuri Ni Ikou (J) [M]">
+		<year>1999-04-01</year>
+		<manufacturer>Coconuts Japan Entertainment Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="812020ef" sha1="4c8166e0632bdb8c098d586a7b1522ed7b63b5f7" name="Uzumaki - Denshi Kaiki Hen (J) [M]">
+		<year>2000-02-03</year>
+		<manufacturer>Omage Micott, Inc.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="89cbaa7c" sha1="0398c08599a2fd2e3b71a2f25ea494907cb0e214" name="Uzumaki - Denshi Kaiki Hen (J) [M][f1]">
+		<year>2000-02-03</year>
+		<manufacturer>Omage Micott, Inc.</manufacturer>
+	</hash>
+	<hash crc32="8fc9e145" sha1="cfb877f0988920c8fe4da5cdd7583197799df621" name="Vaitz Blade (J) [M]">
+		<year>1999-06-24</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="1860b655" sha1="672cfc0e4547b2721d11b67476391b6e6cca81ae" name="Wasabi Produce - Street Dancer (J) [M]">
+		<year>2000-04-27</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="d9401f0a" sha1="ea878a485a20abd5251065fd66e82d9d8b8a669d" name="Wild Card (J)">
+		<year>2001-03-29</year>
+		<manufacturer>Square</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="e14e9d36" sha1="6a4f4a03c367ccf00aa7462191c929a2736eb44b" name="With You Mitsumete Itai (J)">
+		<year>2001-01-25</year>
+		<manufacturer>Cocktail Soft / F&amp;C Co. Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="a44b167e" sha1="92bf65f9f9a11cfd078e245a7469e3df0e832cc7" name="With You Mitsumete Itai (J) [f1]">
+		<year>2001-01-25</year>
+		<manufacturer>Cocktail Soft / F&amp;C Co. Ltd.</manufacturer>
+	</hash>
+	<hash crc32="15e55706" sha1="c1ad383d337dba8a63295cfb8c7ca8470c893c67" name="Wizardry - Scenario 1 - Kyounou no Shiren Jou (J)">
+		<year>2001-03-01</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="12f10b27" sha1="55b54944efd6e277fa7140925ed2457a8cfb40b8" name="Wonder Classic (J)">
+		<year>2001-01-18</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="23bc0309" sha1="cb9454a8277bb2a7d5a6e3b4ddc84194fcbb1231" name="Wonder Stadium (J) [M]">
+		<year>1999-03-11</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="e252919d" sha1="bb138765346d9f4d77615444d090b1328a59818a" name="Wonder Stadium '99 (J) [M]">
+		<year>1999-09-30</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="e529d0c1" sha1="f8e19b686bfc17c97d2a776ef377ef370db000a4" name="Wondersnake Beta by Dox (PD)"/>
+	<hash crc32="a0591f00" sha1="fec915b4993f2d84ea30bd0fa4d8575e9074d292" name="Wondersnake Final Sep 11 2001 by Dox &amp; Kojote (PD)"/>
+	<hash crc32="2ab9852d" sha1="70d65a936ee1dfc2b89c543312c205285d955efb" name="WonderSwan Handy Sonar (J) [M]">
+		<year>1999-05-13</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="7e0d787b" sha1="190486646e2f5242f72ac84c251043440655b3db" name="WonderSwan Register Diagnostic by Zalas (PD)"/>
+	<hash crc32="25e2ba75" sha1="97c29917a78918a6905fd61a1466971cfd2a33c6" name="XI (Sai) Little (J)">
+		<year>2001-12-20</year>
+		<manufacturer>Bandai Co., Ltd.</manufacturer>
+	</hash>
+	<hash crc32="6bd08da3" sha1="fba08686849986be83e7f896cc780dfafe9a608b" name="#Wonderwitch Promo Demo V1.2 by Dox (PD)"/>
+	<hash crc32="d7a0ab74" sha1="caf4a8de853ded732b2a72619acf2784eeceafc7" name="Anaza Hebun - Memory of Those Days (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="e2317345" sha1="68981c05d8118d4189100eed462ee6639328dc59" name="Arc The Lad - Kijin Fukkatsu (J)"/>
+	<hash crc32="8ba49dab" sha1="fffb1aea34e0a96113cd10ba9de515000d27bfe6" name="Battle Spirit Digimon Frontier (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="ab39e1b0" sha1="1d6a62fa40726dc464451144941369410922de0c" name="DIASWAN by Orion_ (PD)"/>
+	<hash crc32="d451ad81" sha1="9a37150d3a848bfcbfd065d3f9476dbe44e919b9" name="Dicing Knight (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="d28dc930" sha1="79658575c736fcad18e9225aa0e62398b086093b" name="Dicing Knight Period (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="56f4e554" sha1="106dca0fd84ba59dd98f13ee5ab6e4832105b8b3" name="Dicing Knight Period (J) [T+Eng1.0_AGTP]">
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="1887389c" sha1="1e4d8e8b3d16083968055cc76b604da91fa0a132" name="Dicing Knight Period (J)">
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="9cfe14f8" sha1="8128e90361bc1a6aeddfea6099d617c29a35c1df" name="Dicing Knight Period (J) [T+Eng1.0_AGTP]"/>
+	<hash crc32="55cc2128" sha1="16c9d006120996db33baf34fb0e5cc5c8695bfde" name="Digimon Adventure 02 - D1 Tamers (J)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="9ff6c122" sha1="91b6aeec3b081d9d6c47e3bfbc16029aa29259be" name="Digimon Adventure 02 - D1 Tamers (J) [T+Eng0.05_PmHacks]"/>
+	<hash crc32="66dcef91" sha1="ee9c7226a03d4eed0a27266719652e4c71ad0a35" name="Digimon Adventure 02 - Tag Tamers (J) [M][T+Eng0.35_PmHacks]"/>
+	<hash crc32="f100dfbf" sha1="bd816b8c55a9c024194ed5316f6938b5bacb737e" name="Digimon Adventure 02 - Tag Tamers (J) [M][T+Ger0.2_DigitalZeroDomain]"/>
+	<hash crc32="faaefbcb" sha1="3e8fffe1f607ea5f855397d9d877cecb285507f7" name="Digimon Digital Monsters - D Project (J)"/>
+	<hash crc32="6caad4a2" sha1="3f39ff494a3d8dd9d55a2e7cf86b47f1c8e8a156" name="Digimon Tamers - Battle Spirit V1.5 (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="7b4eb80d" sha1="bbcef220625a8b66a7af83f37dafe550545502ab" name="Digimon Tamers - Brave Tamer (J)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="48b9b16d" sha1="57f37e9a14e5d856e174ee0843f5157afe3f37f6" name="Display a Picture Sample 2 by Tharo Herberg (PD)"/>
+	<hash crc32="5b7fb3fe" sha1="de23dd3e30e8f1a1181cc1dbb07b8f0711296294" name="Display a Picture Sample by Tharo Herberg (PD) [a1]"/>
+	<hash crc32="89ac9e1e" sha1="b52232e2d70909d08588e827a796631b527b26d2" name="Display a Picture Sample by Tharo Herberg (PD)"/>
+	<hash crc32="067238d1" sha1="5384f9974c66e5e26129a4709976de0bb1ae1f17" name="Dragonball (J)"/>
+	<hash crc32="b082d799" sha1="f2f3446c64305edbf0aa244763a40f2da2eccb57" name="Fantaisie Impromptu by Chopin - Arranged by Atsushi Watanabe (PD) [C][a1]"/>
+	<hash crc32="0080671d" sha1="a98a076e6eb67aae5910b1735dd5d00444efcd91" name="Fantaisie Impromptu by Chopin - Arranged by Atsushi Watanabe (PD) [C]"/>
+	<hash crc32="89635cad" sha1="52a710ccbcc500260a9cfb646748d020a818608f" name="Final Fantasy II (J) [T+Eng010]"/>
+	<hash crc32="e677a591" sha1="1c8bbb23532454103ccecff1542acefc223125ea" name="Final Fantasy IV (J) [T+Eng05]"/>
+	<hash crc32="bbd3ea97" sha1="c8578ef7bd2687df75c39df65a421dc47c2561e0" name="Final Fantasy IV (J) [T-Eng04]"/>
+	<hash crc32="8e120b5a" sha1="221f48e97ec2c6d0046213956e1f36e923c0dec2" name="From TV Animation - One Piece - Chopper no Daibouken (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="205503c3" sha1="dd1e6e5467b72fcb5848f07a9747aa66bb207d45" name="From TV Animation - One Piece - Treasure Wars (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="0d1048f0" sha1="b7775e8f60fd62dc07f2865f8fad29a11e12dbb5" name="From TV Animation - One Piece - Treasure Wars 2 - Buggy Land e Youkoso (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="2f9e2560" sha1="3c752694ab651f9a00ccd39c334a2e3ff78f5cb2" name="Front Mission (J)"/>
+	<hash crc32="8a8b827c" sha1="1bc1e831b9e2aefc59f2cac5f19f7d22be574fc1" name="Gekitou Crash Gear Turbo Gear Champion League (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="af24f95c" sha1="3a4c5d1c08b74cf05b4cb64cbfd7c3dd8b1c3789" name="Gransta Chronicle (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="cf0366ff" sha1="c50abf0b9db7ef5a84f9b56da037aae04ab63c89" name="HBlank Interrupt Demo in NASM by Goldmomo (PD) [a1]"/>
+	<hash crc32="39501931" sha1="0eee73cc6518284dd44d2ba604fa5c2602384065" name="HBlank Interrupt Demo in NASM by Goldmomo (PD)"/>
+	<hash crc32="a487b7a8" sha1="f66335b5af87e7cb72ae311eb9b339534722f738" name="Hunter X Hunter - Greed Island (J)"/>
+	<hash crc32="3ff5791f" sha1="99d5bdde193685a1d09ea73bb79a54b4da82625d" name="Inu Yasha Fuu'un Emaki (J)"/>
+	<hash crc32="44453234" sha1="f7c8f8b6b6d036df8fc4bde72fcfac2846dffe35" name="Inu Yasha Kagome no Yumenikki (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="85c4c9a1" sha1="58c691cb31f96eea5689693fd23768d02e8b133f" name="Judgement Silversword (J) (REV.SC21)">
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="4fce380d" sha1="a1d910123b6be0b941f699ef70c745d16350d029" name="Judgement Silversword (J) (REV.SC21)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+
+	<hash crc32="60191872" sha1="657aea8377e207b9b5a182b13966a27f46633640" name="Judgement Silversword - Rebirth Edition (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+
+	<hash crc32="aa13e9de" sha1="1dc66ac8ac21eb651723428657c9b18cb80d9ee0" name="Judgement Silversword - Rebirth Edition (J)">
+		<status>Overdumped Image</status>		
+	</hash>
+	<hash crc32="945fc213" sha1="461f87e6e301b0dbb6324d908d4ca7efd7518e20" name="Keiba Yosou Shien Shinkaron (J) [M]">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="d4061551" sha1="20b671bc14a8ab6373deecc641479d09658ac21f" name="Kidou Senshi Gundam Giren no Yabou Tokubetsuhen Aoki no Hasha (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="b338cae2" sha1="be172f59176af9841cc6c2d9fcd019f01f76a265" name="Kidou Senshi Gundam Seed (J) [T+Chi_amuro]"/>
+	<hash crc32="bce15137" sha1="e933ff8eace56a462019ae4654b0bab1b21b1d6c" name="Kidou Senshi Gundam Seed (J)"/>
+	<hash crc32="a9f5bf54" sha1="35443e2ef8a20a0ad82da1274b2768c16239dd46" name="Kidou Senshi Gundum Vol.3 -A BAOA QU- (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="625cc49c" sha1="221f1ba6e173a61d446f410f030b0a00eb38abe1" name="Kinnikuman Nisei Choujin Seisenshi (J)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="6142fd9d" sha1="efcf8f92357ffc6f6ec0e4aa960cd97a5070836e" name="Kinnikuman Nisei Choujin Seisenshi (J)"/>
+	<hash crc32="4c48624c" sha1="52b154a3e36d01357649a9f7f614139ce6cc46b8" name="Kosodate Quiz Doko de mo My Angel (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="420b438f" sha1="7418a93e5a3030d3fb8d53f9e2073f5ee7e0c839" name="Little Fugue in G Minor by JS Bach - Arranged by Atsushi Watanabe (PD) [C]"/>
+	<hash crc32="b159c30d" sha1="d70fbc6be9a9a0f12cea8a9f7c98aa415e41aafd" name="Morita Shougi (J) [M]">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="61e7ed03" sha1="a6e40a8aac557c443a241c3cbc83a104e9ce7032" name="Mr. Driller (J) [T+Eng0.70_PmHacks]"/>
+	<hash crc32="8ce4652f" sha1="c48569fd0a46ab7b7ceafeb5698be90420cd4fbe" name="Namco Super Wars (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="6960b010" sha1="13fa767230b5a9e87bf3e73371d581530f95cb5d" name="Naruto (J)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="71556e6a" sha1="dbaa50fd56e69e72fdfe49362ef5fe4437d66667" name="Naruto (J)"/>
+	<hash crc32="f8a1dd2b" sha1="01e765bf356cdcb413bfd27c6321f7449465766a" name="One Piece - Grand Battle Swan Colloseum (J)"/>
+	<hash crc32="4288fca5" sha1="7fff4d4143da31c73a4b2ffde0dfcd5286fa1c24" name="Rockman &amp; Forte - Mirai Kara no Chousen Sha (J) [M][t1]"/>
+	<hash crc32="1f10ca75" sha1="9b4786adca7b83fe66a9d4b9fd4ffaf32abe7656" name="Rockman EXE N1 Battle (J)"/>
+	<hash crc32="a406c9e6" sha1="0b6729a6bd89f6cf6f5e115def698962a38dc712" name="Rockman EXE WS (J)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="658c4b98" sha1="b4a3ff3b72639f27d1a6f449b0335074aeb9e603" name="Rockman EXE WS (J)"/>
+	<hash crc32="15c4552e" sha1="3a41a3b8fc126da07e2a82c21056a45c15efbc98" name="RUN=DIM Return to Earth (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="6e8a792d" sha1="8542649963efe0976015759382c180b7c056be9a" name="Saint Seiya - Ougon Densetsu Hen Perfect Edition (J)"/>
+	<hash crc32="f0acda5c" sha1="152c4d63b1b17f2c717a43efc75d718b614f9ddc" name="SD Gundam - Operation U.C. (J)"/>
+	<hash crc32="6aca1f04" sha1="91e087056207fce21e782e25e383c203bc046897" name="SD Gundam G Generation - Mono-Eye Gundams (J)"/>
+	<hash crc32="6c029674" sha1="1e735d1e83a7bfa06c5c717c7e8a386d55a8e3f0" name="Shaman King Mirai E no Ishi (J) (V1.0)"/>
+	<hash crc32="34908cb4" sha1="473195666a633573c777d3be98d7e8f46569c84b" name="Shaman King Mirai E no Ishi (J) (V1.1)"/>
+	<hash crc32="6918c824" sha1="b579f204be604ebef4e8238e5883152b70399c4d" name="Super Robot Taisen Compact 3 (J) (V1.5)"/>
+	<hash crc32="188ca644" sha1="dd6fe0f278cdec2670d3be8552dbb0cf6a3a2841" name="Super Robot Taisen Compact 3 (J) (V1.6)"/>
+	<hash crc32="50b7a742" sha1="be4559d6f48d7cb9550c8776f877c5c9cda0efa1" name="Taikyoku Igo Heisei Kiin (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="7b0caea9" sha1="1a86403d7896d60fcb7a4c09367f5a976c7ea5a5" name="Tetris (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="ada0cb67" sha1="2809c818694788a7afdf8d992765655d941c0aaf" name="TextDemo by Goldmomo (PD)"/>
+	<hash crc32="a1fa7eff" sha1="f7916aca81d957ad76e9b57d7f04ac10583ab318" name="Walking Dudes Demo V1 by Zalas (PD)"/>
+	<hash crc32="80de367d" sha1="92d4a6ff6f2b1152d8935025f38f910155e5d709" name="Wondergate (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="e50f306b" sha1="21bd907ed9dce2e11625e51be8d0be61ff55b605" name="WonderPong by LiraNuna (PD)"/>
+	<hash crc32="acc7bf38" sha1="7b33385cb2a4f2f41adcbc1ba3b3185d2dec9100" name="WonderProject First Demo by Orion_ (PD)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="fdc25231" sha1="e1fef3ce7371fdb65ead1fd7023b2e31b323356f" name="WonderProject First Demo by Orion_ (PD)"/>
+	<hash crc32="d93ab792" sha1="4aefebd63691f22e5725d7590f6b971c7b26ae4a" name="Wondersnake 2 by Dox (PD)"/>
+	<hash crc32="bf8e0ebc" sha1="ad9add88bedf7c5faece6d8ccc009c91b6d8f34e" name="WWWLib - BG1 &amp; BG2 &amp; Sprite Test by Orion_ (PD)"/>
+	<hash crc32="47623cd8" sha1="c5665e81543c834cb9676fb19920eb78e042abba" name="WWWLib - Full Maptest by Orion_ (PD)"/>
+	<hash crc32="8ebf3dc4" sha1="902424830762e186a8412136b92113d249d5dea6" name="WWWLib - TestJB by Orion_ (PD)"/>
+	<hash crc32="1326da29" sha1="f966518b23b68646f66c8ef56b42ee8fe4450c43" name="WWWLib - TestJB16 by Orion_ (PD)"/>
+	<hash crc32="f8554c49" sha1="2b20f4651b99442f01d1569c32f61342e1e71c15" name="WWWLib - TestJB4 by Orion_ (PD)"/>
+	<hash crc32="66b617d5" sha1="c1ab4e24f261615ca59f937b866fcf7047b67796" name="X - Card of Fate (J)">
+		<status>GoodWSx Verified Image</status>
+	</hash>
+	<hash crc32="2460b45a" sha1="a8f8d3efc9b2d5741081e05f517d746ee5437f87" name="Yakusoku no Chi Riviera (J)"/>
+	<hash crc32="5c157bd6" sha1="ca961efd665f67898056abc0864d0a9d067acdb8" name="Ys 1 - Boss Out - Arranged by Atsushi Watanabe (PD) [C]"/>
+	<hash crc32="15522558" sha1="c277ba76375d870e30c69037be4c8a89e7758cbd" name="Ys 1 - Devil's Step - Arranged by Atsushi Watanabe (PD) [C]"/>
+	<hash crc32="752deb23" sha1="67c95d2a9c15bb94c710e524154d0012e48ae426" name="Ys 1 - Final Battle - Arranged by Atsushi Watanabe (PD) [C]"/>
+	<hash crc32="b4131249" sha1="820ebf6ea0b9b3ca10b230791e76636a9d135e0d" name="Ys 1 - First Step Towards Wars - Arranged by Atsushi Watanabe (PD) [C]"/>
+	<hash crc32="1f7e4629" sha1="7e8f04ada3c2e13cbc130605cfa9fba99a6576f6" name="Ys 1 - Fly with Me - Arranged by Atsushi Watanabe (PD) [C]"/>
+	<hash crc32="bbec8ff7" sha1="c26ca4bdfe490390389b4e155dbaaf53609c09fd" name="Ys 1 - Fountain of Love - Arranged by Atsushi Watanabe (PD) [C]"/>
+	<hash crc32="97f502ef" sha1="d6c25ed57b9d1491ce771bcc7899c7abc168e178" name="Ys 1 - Holders of Power - Arranged by Atsushi Watanabe (PD) [C]"/>
+	<hash crc32="d5497a19" sha1="aa4a925fac3f10858dff5eef0a86e3705e360dc3" name="Ys 1 - In the Memory - Arranged by Atsushi Watanabe (PD) [C]"/>
+	<hash crc32="437948b1" sha1="1fa27e1aa22776a6e22d61f93c108b9581da726d" name="Ys 1 - Lucky - Arranged by Atsushi Watanabe (PD) [C]"/>
+	<hash crc32="8558f7c8" sha1="d5fdf31d38b90dfe19386b262bc21d1112744c21" name="Ys 1 - Open Your Heart - Arranged by Atsushi Watanabe (PD) [C]"/>
+	<hash crc32="95cc47f3" sha1="360ca65e9c4e2f547eb8f0949db4c5fedf33599f" name="Ys 1 - Palace - Arranged by Atsushi Watanabe (PD) [C]"/>
+	<hash crc32="ddab15a1" sha1="7e92cba54de9d496063d3e2c0763740337164465" name="Ys 1 - Palace of Destruction - Arranged by Atsushi Watanabe (PD) [C]"/>
+	<hash crc32="7a4d54ce" sha1="94058ef53a89b7e1c66709524e8ba27ce53b0de0" name="Ys 1 - Rest in Peace - Arranged by Atsushi Watanabe (PD) [C]"/>
+	<hash crc32="8619d635" sha1="2d1836128423e8b856a0027b67877222a282b926" name="Ys 1 - Tears of Sylph - Arranged by Atsushi Watanabe (PD) [C]"/>
+	<hash crc32="4b96ac3e" sha1="bab9d8a726fa21c8c09d08ab924e1557e532eb8a" name="Ys 1 - Tension - Arranged by Atsushi Watanabe (PD) [C]"/>
+	<hash crc32="2939da2e" sha1="34073e29647005895a1158488cf526d9a54ae40b" name="Ys 1 - The Last Moment of the Dark - Arranged by Atsushi Watanabe (PD) [C]"/>
+	<hash crc32="a2e3bc80" sha1="804b45e3fe06dbb0dff8977c07a0d0e2e3b2bd47" name="Ys 1 - The Syonin - Arranged by Atsushi Watanabe (PD) [C]"/>
+</hashfile>
