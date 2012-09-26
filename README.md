@@ -71,7 +71,8 @@ Building
   ./emcc
   ```
 
-  Edit ```~/.emscripten``` to point to your LLVM installation.
+  Edit ```~/.emscripten``` to point to your LLVM installation and Emscripten
+  directory.
 
 ### Building ###
 
