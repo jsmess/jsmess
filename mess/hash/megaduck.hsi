@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- Undumped cartridges -->
+	<!-- Duck Adventure CB031/MD031 -->
+	<!-- Zipball CB037/MD037 -->
+	<!-- Dumped but image file not available -->
+	<!-- 2nd Space CB028/MD028 43272949 -->
+	<!-- Ant Soldiers CB026/MD026 4907c1d8 -->
+	<!-- Bomb Disposer CB003/MD003 cac582ad -->
+	<!-- Captain Knick Knack CB011/MD011 a17de1a3 -->
+	<!-- Magic Maze CB007/MD007 93c878be -->
+	<!-- Trap & Turn CB009/MD009 2b58d9a4 -->
+	<!-- Vex CB004/MD004 b26bb405 -->
+	<!-- Worm Visitor CB030/MD030 da4743e7 -->
+
+	<hash crc32="8046ea70" sha1="2a1c5bea602ab27ecf680c88cfe9884186b61438" name="4in1">
+		<year>1993</year>
+		<manufacturer>Sachen?</manufacturer>
+		<extrainfo>CB035/MD035</extrainfo>
+	</hash>
+	<hash crc32="ff0da355" sha1="fb4ba6c9823808c2705f597294b784837342cbcb" name="5in1">
+		<year>1993</year>
+		<manufacturer>Commin</manufacturer>
+		<extrainfo>CB036/MD036</extrainfo>
+	</hash>
+	<hash crc32="f88f2d25" sha1="4f3022126f33964e0fb5505fa0caeaa13b995309" name="Artic Zone">
+		<year>1993</year>
+		<manufacturer>Commin</manufacturer>
+		<extrainfo>CB006/MD006</extrainfo>
+	</hash>
+	<hash crc32="eca6c0ad" sha1="aa2c3774eb48df0854d4b61997653f79a810f4cc" name="Armour Force">
+		<year>1993</year>
+		<manufacturer>Commin</manufacturer>
+		<extrainfo>CB014/MD014</extrainfo>
+	</hash>
+	<hash crc32="2adb7253" sha1="51a5520a1757aded4bb3baf5993b5dc8" name="Beast Fighter">
+		<extrainfo>CB021/MD021</extrainfo>
+	</hash>
+	<hash crc32="211d268b" sha1="3d62acc2db46bb7b6a2909d640dec6ce095aeec3" name="Black Forest Tale">
+		<year>1993</year>
+		<manufacturer>Commin</manufacturer>
+	</hash>
+	<hash crc32="58efe338" sha1="9b050e41b9aa18dbf5c043f19b7c945c89811cc1" name="Brick Wall, The">
+		<year>1993</year>
+		<manufacturer>Timlex International</manufacturer>
+		<extrainfo>CB001/MD001</extrainfo>
+	</hash>
+	<hash crc32="98694021" sha1="6eefbf8742eba1279f943c321b5d55e45a727a67" name="Magical Tower">
+		<year>1993</year>
+		<manufacturer>Sachen</manufacturer>
+		<extrainfo>CB029/MD029</extrainfo>
+	</hash>
+	<hash crc32="d71f1770" sha1="475ef85a3329c9c7f79db9ea3ac74bd9" name="Pile Wonder">
+		<year>1993</year>
+		<manufacturer>Commin</manufacturer>
+		<extrainfo>CB010/MD010</extrainfo>
+	</hash>
+	<hash crc32="35fb1616" sha1="f2083d19412a8f1a688eedf3288d438b" name="Puppet Knight">
+		<extrainfo>CB008/MD008</extrainfo>
+	</hash>
+	<hash crc32="2bb6aeb9" sha1="f1a9a8365f1b78057ed5cc647fd68efafc0c49e8" name="Railway">
+		<year>1993</year>
+		<manufacturer>Sachen</manufacturer>
+		<extrainfo>CB019/MD019</extrainfo>
+	</hash>
+	<hash crc32="315ef9f2" sha1="0bd39f37e9589a4dec2b3ebf535ef7b7" name="Snake Roy">
+		<extrainfo>CB018/MD018</extrainfo>
+	</hash>
+	<hash crc32="74c3377f" sha1="9b7d69f9b0a44eeaa36971aabec553ebd3bfdc0e" name="Street Rider">
+		<year>1993</year>
+		<manufacturer>Commin</manufacturer>
+		<extrainfo>CB002/MD002</extrainfo>
+	</hash>
+	<hash crc32="cd2730ac" sha1="022d7e635ea64c6a525db5d31c30a7d8636f4c18" name="Suleiman's Treasure">
+		<year>1993</year>
+		<manufacturer>Commin</manufacturer>
+		<extrainfo>CB005/MD005</extrainfo>
+	</hash>
+</hashfile>
+

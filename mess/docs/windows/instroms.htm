@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="HTML Tidy for Cygwin (vers 1st September 2004), see www.w3.org" />
+<title>MESS Guide</title>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<link href="../style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h1>Installing BIOS Files and Software Images</h1>
+<p>First, it is important to make a distinction between the two types of files needed to run MESS systems.&nbsp; BIOS files contain code
+that exists in ROM chips built into the system unit, therefore they are always needed regardless of what software you want to run.&nbsp;
+The term "software" encompasses files containing any other data to be run on the system, for example dumps of ROM cartridges (so-called "ROMs")
+or images of floppy disks.</p>
+<hr align="center" width="98%" />
+<h2>Where to find them</h2>
+<p class="normal">Ideally, these files should be obtained by "dumping" the original data yourself, for example with an EPROM programmer or a serial cable connected to the original system.
+However, many people have already done this work, so BIOS files and software images are widely available on the Internet.&nbsp;
+It is important to remember, however, that both BIOS files and software images are subject to copyright law and it is illegal to download or have
+dumps of systems or software that you do not own genuine physical copies of (with the exception of software freely distributed by its authors, for example "homebrew" games).</p>
+<p class="normal">It is also worth noting that MESS expects BIOS files to be "pure"; in other words straight dumps from the ROM chips.&nbsp; Other
+emulators may concatenate files together or may prefix some kind of header.&nbsp; For this reason, BIOS files from the Internet may not work
+unless they are specifically intended for use with MESS.</p>
+<hr align="center" width="98%" />
+<h2>Where to put them</h2>
+<p class="normal">Zipped BIOS files are placed in the <span class="filename">roms</span> subfolder of your MESS folder, with filenames matching the short names of the systems.&nbsp; For
+example, your directory structure might look like this if you want to use the Apple ][, Color Computer 3, and Super NES drivers:</p>
+<ul>
+<li>
+<p class="filename">C:\MESS\roms\apple2.zip</p>
+</li>
+<li>
+<p class="filename">C:\MESS\roms\coco3.zip</p>
+</li>
+<li>
+<p class="filename">C:\MESS\roms\snes.zip</p>
+</li>
+</ul>
+<p class="normal">If the <span class="filename">roms</span> folder does not exist, create it.</p>
+<p class="normal">It is recommended to leave these files zipped for neatness' sake, however MESS will also recognize the files if they are extracted to subdirectories,
+e.g. <span class="filename">roms\coco3.zip</span> could be extracted to <span class="filename">roms\coco3\coco3.rom</span> and <span class="filename">roms\coco3\disk11.rom</span>.
+Extracting the files into the <span class="filename">roms</span> folder itself will not work.</p>
+<p class="normal">You can also put BIOS files elsewhere by changing the rompath option in mess.ini, see the help page "MESS Configuration Files" (or go to Options, Directories in the GUI).</p>
+<p class="normal">Software images can be placed in similar subdirectories (e.g. <span class="filename">software\coco3\MyCoolCocoGame.dsk</span>).&nbsp; The GUI will first look for software
+images in this directory.&nbsp; However, placing software images here is not mandatory and one can tell the GUI to look for software images
+elsewhere, and when using the command line the full path to the images must be specified regardless.</p>
+</body>
+</html>

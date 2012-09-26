@@ -1,0 +1,114 @@
+<!DOCTYPE tests
+[
+	<!ENTITY eoln SYSTEM "http://www.mess.org/messtest/">
+]>
+
+<tests>
+
+<imgtooltest name="vzdos_001">
+	<createimage driver="vtech1_vzdos"/>
+	<checkdirectory/>
+
+	<putfile name="FOO.TXT">'Hello World!'</putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="12"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT">'Hello World!'</checkfile>
+
+	<putfile name="BIG.TXT">'Abcde' * 1500 </putfile>
+	<checkdirectory>
+		<entry name="FOO.TXT" size="12"/>
+		<entry name="BIG.TXT" size="7500"/>
+	</checkdirectory>
+	<checkfile name="FOO.TXT">'Hello World!'</checkfile>
+	<checkfile name="BIG.TXT">'Abcde' * 1500 </checkfile>
+</imgtooltest>
+
+<imgtooltest name="vzdos_002">
+	<createimage driver="vtech1_vzdos"/>
+	<putfile name="01.TXT">'Alpha'</putfile>
+	<putfile name="02.TXT">'Bravo'</putfile>
+	<putfile name="03.TXT">'Charlie'</putfile>
+	<putfile name="04.TXT">'Delta'</putfile>
+	<putfile name="05.TXT">'Echo'</putfile>
+	<putfile name="06.TXT">'Foxtrot'</putfile>
+	<putfile name="07.TXT">'Golf'</putfile>
+	<putfile name="08.TXT">'Hotel'</putfile>
+	<putfile name="09.TXT">'Indigo'</putfile>
+	<putfile name="10.TXT">'Jackal'</putfile>
+	<putfile name="11.TXT">'Kilo'</putfile>
+	<putfile name="12.TXT">'Limo'</putfile>
+	<putfile name="13.TXT">'Money'</putfile>
+	<putfile name="14.TXT">'November'</putfile>
+	<putfile name="15.TXT">'Omega'</putfile>
+	<checkdirectory>
+		<entry name="01.TXT" size="5"/>
+		<entry name="02.TXT" size="5"/>
+		<entry name="03.TXT" size="7"/>
+		<entry name="04.TXT" size="5"/>
+		<entry name="05.TXT" size="4"/>
+		<entry name="06.TXT" size="7"/>
+		<entry name="07.TXT" size="4"/>
+		<entry name="08.TXT" size="5"/>
+		<entry name="09.TXT" size="6"/>
+		<entry name="10.TXT" size="6"/>
+		<entry name="11.TXT" size="4"/>
+		<entry name="12.TXT" size="4"/>
+		<entry name="13.TXT" size="5"/>
+		<entry name="14.TXT" size="8"/>
+		<entry name="15.TXT" size="5"/>
+	</checkdirectory>
+	<checkfile name="01.TXT">'Alpha'</checkfile>
+	<checkfile name="02.TXT">'Bravo'</checkfile>
+	<checkfile name="03.TXT">'Charlie'</checkfile>
+	<checkfile name="04.TXT">'Delta'</checkfile>
+	<checkfile name="05.TXT">'Echo'</checkfile>
+	<checkfile name="06.TXT">'Foxtrot'</checkfile>
+	<checkfile name="07.TXT">'Golf'</checkfile>
+	<checkfile name="08.TXT">'Hotel'</checkfile>
+	<checkfile name="09.TXT">'Indigo'</checkfile>
+	<checkfile name="10.TXT">'Jackal'</checkfile>
+	<checkfile name="11.TXT">'Kilo'</checkfile>
+	<checkfile name="12.TXT">'Limo'</checkfile>
+	<checkfile name="13.TXT">'Money'</checkfile>
+	<checkfile name="14.TXT">'November'</checkfile>
+	<checkfile name="15.TXT">'Omega'</checkfile>
+</imgtooltest>
+
+<imgtooltest name="vzdos_003">
+	<createimage driver="vtech1_vzdos"/>
+	<putfile name="01.TXT">'Alpha'</putfile>
+	<putfile name="02.TXT">'Bravo'</putfile>
+	<putfile name="03.TXT">'Charlie'</putfile>
+	<putfile name="04.TXT">'Delta'</putfile>
+	<putfile name="05.TXT">'Echo'</putfile>
+	<putfile name="06.TXT">'Foxtrot'</putfile>
+	<putfile name="07.TXT">'Golf'</putfile>
+	<putfile name="08.TXT">'Hotel'</putfile>
+	<putfile name="09.TXT">'Indigo'</putfile>
+	<putfile name="10.TXT">'Jackal'</putfile>
+	<putfile name="11.TXT">'Kilo'</putfile>
+	<putfile name="12.TXT">'Limo'</putfile>
+	<putfile name="13.TXT">'Money'</putfile>
+	<putfile name="14.TXT">'November'</putfile>
+	<putfile name="15.TXT">'Omega'</putfile>
+	<deletefile name="02.TXT"/>
+	<deletefile name="03.TXT"/>
+	<deletefile name="05.TXT"/>
+	<deletefile name="07.TXT"/>
+	<deletefile name="11.TXT"/>
+	<deletefile name="13.TXT"/>
+	<checkdirectory>
+		<entry name="01.TXT" size="5"/>
+		<entry name="04.TXT" size="5"/>
+		<entry name="06.TXT" size="7"/>
+		<entry name="08.TXT" size="5"/>
+		<entry name="09.TXT" size="6"/>
+		<entry name="10.TXT" size="6"/>
+		<entry name="12.TXT" size="4"/>
+		<entry name="14.TXT" size="8"/>
+		<entry name="15.TXT" size="5"/>
+	</checkdirectory>
+</imgtooltest>
+
+</tests>

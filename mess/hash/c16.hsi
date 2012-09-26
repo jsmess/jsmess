@@ -1,0 +1,3370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- Commodore C16, C116 &amp; Plus-4 - Educational Software - D64 (TOSEC-v0.01) -->
+	<hash crc32="63c977dc" md5="dc65d3f70d478ba1e5113edb9c08eba7" name="Gepi Kod Oktato (Hu)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<!-- Commodore C16, C116 &amp; Plus-4 - Educational Software - PRG (TOSEC-v0.01) -->
+	<hash crc32="1951dced" md5="ffdb1f4911d3c2aafe5955f67dad67b9" name="Eszak Amerika (Hu)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<!-- Commodore C16, C116 &amp; Plus-4 - Games - Prg (TOSEC-v0.41) -->
+	<hash crc32="cdca3275" name="3-D Ghost Chase">
+		<year>19??</year>
+		<manufacturer>Tynesoft</manufacturer>
+	</hash>
+	<hash crc32="063f6698" name="3-D Quasars">
+		<year>1986</year>
+		<manufacturer>Solar Software</manufacturer>
+	</hash>
+	<hash crc32="474cd585" name="3-D Quasars [a]">
+		<year>1986</year>
+		<manufacturer>Solar Software</manufacturer>
+	</hash>
+	<hash crc32="36cfe7cc" name="3D Construction Kit Demogame (demo) (19xx)(-)">
+	</hash>
+	<hash crc32="be70aa4c" name="3D Time Trek [G1000]">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="432246ad" name="7Up Spot (Plus4)[p]">
+		<year>1996</year>
+		<manufacturer>Assasins</manufacturer>
+	</hash>
+	<hash crc32="7973bf4c" name="A Bolcsek Kove [cr PPCS]">
+		<year>1988</year>
+		<manufacturer>Tihor Miklos</manufacturer>
+	</hash>
+	<hash crc32="5eef6555" name="A Bosszu - The Revenge (Plus4)[p](Hu)">
+		<year>19??</year>
+		<manufacturer>Science Fiction</manufacturer>
+	</hash>
+	<hash crc32="44e77b2a" name="A Gengszter (Hu)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="7f0f2226" name="A Pince (Hu)">
+		<year>1988</year>
+		<manufacturer>Angyal Jozsef</manufacturer>
+	</hash>
+	<hash crc32="2cf00650" name="A-07">
+		<year>1987</year>
+		<manufacturer>BrainTron Software</manufacturer>
+	</hash>
+	<hash crc32="1d963868" name="A-07 [a]">
+		<year>1987</year>
+		<manufacturer>BrainTron Software</manufacturer>
+	</hash>
+	<hash crc32="58c34af0" name="A.C.E. - Air Combat Emulator">
+		<year>1985</year>
+		<manufacturer>Section 16</manufacturer>
+	</hash>
+	<hash crc32="51af7392" name="Aardvark">
+		<year>1986</year>
+		<manufacturer>Bug-Byte</manufacturer>
+	</hash>
+	<hash crc32="1b5d6240" name="Aardvark [a]">
+		<year>1986</year>
+		<manufacturer>Bug-Byte</manufacturer>
+	</hash>
+	<hash crc32="af3f1afa" name="Aardvark [h Floppy Robby]">
+		<year>1986</year>
+		<manufacturer>Bug-Byte</manufacturer>
+	</hash>
+	<hash crc32="185d9ebf" name="Aardvark [SYS4992][title screen]">
+		<year>1986</year>
+		<manufacturer>Bug-Byte</manufacturer>
+	</hash>
+	<hash crc32="64fa84c9" name="Aardvark [title screen]">
+		<year>1986</year>
+		<manufacturer>Bug-Byte</manufacturer>
+	</hash>
+	<hash crc32="362daf55" name="Ace [cr CMS &amp; KNM]">
+		<year>1986</year>
+		<manufacturer>Cascade Games</manufacturer>
+	</hash>
+	<hash crc32="d05e23ab" name="Ace 2 [cr Bitsoft]">
+		<year>198?</year>
+		<manufacturer>Cascade Games</manufacturer>
+	</hash>
+	<hash crc32="a9c9bfe8" name="AcidFlipper (PD)">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="91620d1d" name="Ack Ack Attack [cr The Electronic Duo]">
+		<year>198?</year>
+		<manufacturer>Tynesoft</manufacturer>
+	</hash>
+	<hash crc32="f4b3fc33" name="Advinman (PD)[demo for adventure building system]">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="af2ef676" name="Affen Wurf (De)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="363ec57f" name="Against In The Underground [h Terrorists]">
+		<year>19??</year>
+		<manufacturer>SchinKengrell-Soft</manufacturer>
+	</hash>
+	<hash crc32="f682798d" name="Airwolf [t TTC]">
+		<year>1985</year>
+		<manufacturer>Elite</manufacturer>
+	</hash>
+	<hash crc32="87d7aed9" name="Airwolf II">
+		<year>1989</year>
+		<manufacturer>Elite</manufacturer>
+	</hash>
+	<hash crc32="28ce750e" name="Airwolf II [t Ed-Softworx]">
+		<year>1989</year>
+		<manufacturer>Elite</manufacturer>
+	</hash>
+	<hash crc32="c30b7ebc" name="Alex (Hu)">
+		<year>1988</year>
+		<manufacturer>Novotrade Deltasoft</manufacturer>
+	</hash>
+	<hash crc32="276970d3" name="Alien Attack [SYS8446]">
+		<year>1985</year>
+		<manufacturer>J.P. Shay</manufacturer>
+	</hash>
+	<hash crc32="aa73c142" name="Alien Invasion">
+		<year>1987</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="3d60aa6e" name="Alien Invasion [t]">
+		<year>1987</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="24c658fb" name="Aliens">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="fbc5a9bf" name="Almacska (Hu)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="4175fff8" name="Alom, Edes Alom (Hu)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="571e558c" name="Amoba (PD)">
+		<year>1992</year>
+		<manufacturer>EDC</manufacturer>
+	</hash>
+	<hash crc32="7580bc4f" name="Amoba (PD)">
+		<year>1992</year>
+		<manufacturer>TPSH</manufacturer>
+	</hash>
+	<hash crc32="e5ed24b0" name="Amoba (PD)(Hu)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="677accda" name="Amoba (Hu)">
+		<year>19??</year>
+		<manufacturer>Novotrade Rt. Deltasoft</manufacturer>
+	</hash>
+	<hash crc32="235dc087" name="Amoba - Two Players Version (PD)">
+		<year>1995</year>
+		<manufacturer>Scorpions</manufacturer>
+	</hash>
+	<hash crc32="437330ae" name="Amoba 2 (Plus4)(PD)">
+		<year>1996</year>
+		<manufacturer>Scorpions</manufacturer>
+	</hash>
+	<hash crc32="517c6307" name="Apollo Mission">
+		<year>1985</year>
+		<manufacturer>Tynesoft</manufacturer>
+	</hash>
+	<hash crc32="4b89f0b9" name="Arca-Noid (PD)">
+		<year>19??</year>
+		<manufacturer>M&amp;M</manufacturer>
+	</hash>
+	<hash crc32="1bad5b8e" name="Arca-Noid (PD)[a]">
+		<year>19??</year>
+		<manufacturer>M&amp;M</manufacturer>
+	</hash>
+	<hash crc32="42aa99ab" name="Archivum (Hu)">
+		<year>1988</year>
+		<manufacturer>Boszik Istvan</manufacturer>
+	</hash>
+	<hash crc32="718565f5" name="Arena 3000">
+		<year>1985</year>
+		<manufacturer>Microdeal</manufacturer>
+	</hash>
+	<hash crc32="3f72ae5b" name="Arena 3000 [SYS9708]">
+		<year>1985</year>
+		<manufacturer>Microdeal</manufacturer>
+	</hash>
+	<hash crc32="e0edf4a4" name="Aromo (Hu)">
+		<year>1986</year>
+		<manufacturer>Novotrade Software</manufacturer>
+	</hash>
+	<hash crc32="7967b148" name="Arrow Of Death Part 1 [p]">
+		<year>1990</year>
+		<manufacturer>Pigmy</manufacturer>
+	</hash>
+	<hash crc32="9aa3cf5d" name="Arrow Of Death Part 2 [p]">
+		<year>1990</year>
+		<manufacturer>Pigmy</manufacturer>
+	</hash>
+	<hash crc32="55e9405d" name="Arthur Noid">
+		<year>1988</year>
+		<manufacturer>Mr Chip</manufacturer>
+	</hash>
+	<hash crc32="e7fb11f2" name="Artur Kalandjai (Plus4)[cr Batya](Hu)">
+		<year>1988</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="09eda205" name="Assault Of The Cosmic Nippelzipps (De)">
+		<year>1986</year>
+		<manufacturer>Dillingersoft</manufacturer>
+	</hash>
+	<hash crc32="e1282477" name="Asteroid Belt [SYS11739]">
+		<year>1985</year>
+		<manufacturer>Argus Press Software</manufacturer>
+	</hash>
+	<hash crc32="2e1af2de" name="Astro Plumber">
+		<year>19??</year>
+		<manufacturer>Blue Ribbon Software</manufacturer>
+	</hash>
+	<hash crc32="723c7991" name="Astro Plumber [a]">
+		<year>19??</year>
+		<manufacturer>Blue Ribbon Software</manufacturer>
+	</hash>
+	<hash crc32="ed219f44" name="ATA (PD)">
+		<year>1992</year>
+		<manufacturer>TDC</manufacturer>
+	</hash>
+	<hash crc32="1db0a55c" name="Atlantis">
+		<year>1985</year>
+		<manufacturer>Anirog Software</manufacturer>
+	</hash>
+	<hash crc32="18006c75" name="Atlantis [cr Bramasoft Cracker Service]">
+		<year>1985</year>
+		<manufacturer>Anirog Software</manufacturer>
+	</hash>
+	<hash crc32="d64d4755" name="Atomix [p]">
+		<year>1990</year>
+		<manufacturer>VHS Team</manufacturer>
+	</hash>
+	<hash crc32="ad78cdd9" name="Atomix [t TMCH][p]">
+		<year>1990</year>
+		<manufacturer>VHS Team</manufacturer>
+	</hash>
+	<hash crc32="1df02cf8" name="Auf Wiedersehen Monty [cr The Raven]">
+		<year>19??</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="f91655aa" name="Auf Wiedersehen Monty [cr The Raven][a]">
+		<year>19??</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="8c3ec0ae" name="Auriga">
+		<year>1986</year>
+		<manufacturer>Players</manufacturer>
+	</hash>
+	<hash crc32="3d5c1e1f" name="Auto Zone">
+		<year>1987</year>
+		<manufacturer>Howlin Mad</manufacturer>
+	</hash>
+	<hash crc32="2385dd08" name="AutoBahn">
+		<year>19??</year>
+		<manufacturer>Patrick Strassen</manufacturer>
+	</hash>
+	<hash crc32="dd405442" name="Aztec Tomb [p]">
+		<year>19??</year>
+		<manufacturer>Pigmysoft</manufacturer>
+	</hash>
+	<hash crc32="d1080769" name="Baby Berks">
+		<year>19??</year>
+		<manufacturer>Jon Williams</manufacturer>
+	</hash>
+	<hash crc32="d2fb07f8" name="Baby Berks [a]">
+		<year>19??</year>
+		<manufacturer>Jon Williams</manufacturer>
+	</hash>
+	<hash crc32="c80dd76b" name="Ball (PD)">
+		<year>1996</year>
+		<manufacturer>Scorpions</manufacturer>
+	</hash>
+	<hash crc32="afbb089c" name="Ball-X (PD)">
+		<year>1991</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="1297f3b7" name="Bandits At Zero">
+		<year>1986</year>
+		<manufacturer>Mr Chip</manufacturer>
+	</hash>
+	<hash crc32="5729edc0" name="Barbarian (Plus4)[p]">
+		<year>19??</year>
+		<manufacturer>Muffbusters</manufacturer>
+	</hash>
+	<hash crc32="5bc32ded" name="Barbarian (Plus4)[p]">
+		<year>19??</year>
+		<manufacturer>SF</manufacturer>
+	</hash>
+	<hash crc32="c5cfcb89" name="Barbarian 3 [p]">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="de610f38" name="Baseball">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="7c6f4842" name="Baseball [a]">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="45a0afdd" name="Battle">
+		<year>1987</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="c3877267" name="Beamphobia (PD)">
+		<year>19??</year>
+		<manufacturer>GOTU Design</manufacturer>
+	</hash>
+	<hash crc32="2c6ae504" name="Berks">
+		<year>1985</year>
+		<manufacturer>CRL Group</manufacturer>
+	</hash>
+	<hash crc32="e79ca874" name="Berks III">
+		<year>1985</year>
+		<manufacturer>CRL Group</manufacturer>
+	</hash>
+	<hash crc32="4c230e78" name="Bernat Anyomozo (Hu)">
+		<year>1989</year>
+		<manufacturer>Novotrade Octasoft</manufacturer>
+	</hash>
+	<hash crc32="d49cd8ea" name="Big Mac">
+		<year>1985</year>
+		<manufacturer>Mastertronics</manufacturer>
+	</hash>
+	<hash crc32="25f2430e" name="Big Mac [a]">
+		<year>1985</year>
+		<manufacturer>Mastertronics</manufacturer>
+	</hash>
+	<hash crc32="e3a07156" name="Bigyulabolt (Hu)">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="a010e290" name="Bio Invaders">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="5288026d" name="Black Thunder">
+		<year>19??</year>
+		<manufacturer>BrainTron Software</manufacturer>
+	</hash>
+	<hash crc32="47d9c069" name="Blagger">
+		<year>1985</year>
+		<manufacturer>Brandon James</manufacturer>
+	</hash>
+	<hash crc32="6e157708" name="Blaze">
+		<year>1985</year>
+		<manufacturer>Romik Software</manufacturer>
+	</hash>
+	<hash crc32="f880b4ba" name="Blitz">
+		<year>1985</year>
+		<manufacturer>C.B.M. UK</manufacturer>
+	</hash>
+	<hash crc32="5b87e4de" name="Block Memory (PD)">
+		<year>19??</year>
+		<manufacturer>Skoro Design</manufacturer>
+	</hash>
+	<hash crc32="3ee5d9f1" name="Block Shoot (PD)">
+		<year>19??</year>
+		<manufacturer>NST</manufacturer>
+	</hash>
+	<hash crc32="38ed0c75" name="Blockout [p]">
+		<year>19??</year>
+		<manufacturer>CSORY</manufacturer>
+	</hash>
+	<hash crc32="d25befe7" name="Blue Angel (PD)">
+		<year>1991</year>
+		<manufacturer>The Vortex</manufacturer>
+	</hash>
+	<hash crc32="9502d5e2" name="BMX Simulator">
+		<year>1986</year>
+		<manufacturer>Codemasters</manufacturer>
+	</hash>
+	<hash crc32="ed5eb7f6" name="BMX Simulator [cr N.I.K.S.]">
+		<year>1986</year>
+		<manufacturer>Codemasters</manufacturer>
+	</hash>
+	<hash crc32="c4f29e40" name="Bobby Bearing [p]">
+		<year>19??</year>
+		<manufacturer>Plasma &amp; Ceekay</manufacturer>
+	</hash>
+	<hash crc32="f348cf21" name="Bombjack (Side A)">
+		<year>1986</year>
+		<manufacturer>Elite</manufacturer>
+	</hash>
+	<hash crc32="a7db3657" name="Bombjack (Side B)">
+		<year>1986</year>
+		<manufacturer>Elite</manufacturer>
+	</hash>
+	<hash crc32="fe3308c3" name="Bombjack II">
+		<year>19??</year>
+		<manufacturer>Elite</manufacturer>
+	</hash>
+	<hash crc32="58578048" name="Bongo">
+		<year>19??</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="b1b4a547" name="Boogie-Woogie Spiders">
+		<year>1986</year>
+		<manufacturer>Braintron</manufacturer>
+	</hash>
+	<hash crc32="0a3ed97b" name="Boogie-Woogie Spiders [a]">
+		<year>1986</year>
+		<manufacturer>Braintron</manufacturer>
+	</hash>
+	<hash crc32="d84a78b9" name="Boogieball (PD)">
+		<year>19??</year>
+		<manufacturer>Delta System</manufacturer>
+	</hash>
+	<hash crc32="24513ef0" name="Boomber II (PD)(Hu)">
+		<year>1993</year>
+		<manufacturer>St.GLS</manufacturer>
+	</hash>
+	<hash crc32="8868829e" name="Booty [SYS4120]">
+		<year>1986</year>
+		<manufacturer>Firebird</manufacturer>
+	</hash>
+	<hash crc32="dbdeef8b" name="Boulder Dash">
+		<year>1984</year>
+		<manufacturer>First Star Software</manufacturer>
+	</hash>
+	<hash crc32="f3945ad3" name="Boulder Dash [h Hawk]">
+		<year>1984</year>
+		<manufacturer>First Star Software</manufacturer>
+	</hash>
+	<hash crc32="f741e4cf" name="Boulder Dash II">
+		<year>1985</year>
+		<manufacturer>First Star Software</manufacturer>
+	</hash>
+	<hash crc32="f22f625d" name="Bowling">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="800517e2" name="Brainfade (PD)">
+		<year>1992</year>
+		<manufacturer>Skull Team</manufacturer>
+	</hash>
+	<hash crc32="8e1d6cf1" name="BrainTech [cr Absence]">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="c3003951" name="Break Dance [cr Headbanger Crackers](Hu)">
+		<year>1989</year>
+		<manufacturer>A.C. Softgroup</manufacturer>
+	</hash>
+	<hash crc32="bbdf3efb" name="Break Out">
+		<year>1988</year>
+		<manufacturer>Thomas Bohlen</manufacturer>
+	</hash>
+	<hash crc32="8fb867b9" name="Brians Soccer (Plus4)">
+		<year>1987</year>
+		<manufacturer>CDS</manufacturer>
+	</hash>
+	<hash crc32="fa08b5d7" name="Bridge Head - Legionnaire 2">
+		<year>1986</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="fab98064" name="Bubble Trouble">
+		<year>1986</year>
+		<manufacturer>Players</manufacturer>
+	</hash>
+	<hash crc32="03f21023" name="Bubble Trouble [a]">
+		<year>1986</year>
+		<manufacturer>Players</manufacturer>
+	</hash>
+	<hash crc32="c16490da" name="Bubble Works (PD)">
+		<year>1990</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="818ecaad" name="Burger House (Sp)">
+		<year>1986</year>
+		<manufacturer>Ed. Foglia</manufacturer>
+	</hash>
+	<hash crc32="984edc36" name="Cannon">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="c8eeb7cd" name="Canoe Slalom">
+		<year>1986</year>
+		<manufacturer>Anco</manufacturer>
+	</hash>
+	<hash crc32="23ee2b46" name="Captain Fizz Meets The Blastertrons [p]">
+		<year>1990</year>
+		<manufacturer>Muffbusters</manufacturer>
+	</hash>
+	<hash crc32="b83ef251" name="Carnage (PD)">
+		<year>1994</year>
+		<manufacturer>Scorpions</manufacturer>
+	</hash>
+	<hash crc32="2bedbf8b" name="Castle Master (Hu-En)[docs]">
+		<year>1992</year>
+		<manufacturer>TGMS Design</manufacturer>
+	</hash>
+	<hash crc32="9293304d" name="Castle Master [p]">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="079c41ba" name="Catacomb">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="b35cbdc3" name="Cave Fighter (Side A)[SYS8192]">
+		<year>1985</year>
+		<manufacturer>Bubble Bus Software</manufacturer>
+	</hash>
+	<hash crc32="e5eeaee2" name="Cave Fighter (Side B)">
+		<year>1985</year>
+		<manufacturer>Bubble Bus Software</manufacturer>
+	</hash>
+	<hash crc32="2de1570f" name="Cave Guennie (PD)">
+		<year>1990</year>
+		<manufacturer>A-System</manufacturer>
+	</hash>
+	<hash crc32="78e6b4f0" name="Championship Chase (PD)">
+		<year>19??</year>
+		<manufacturer>Plus 4 Club</manufacturer>
+	</hash>
+	<hash crc32="53ebbe15" name="Championship Wrestling [cr HCS]">
+		<year>1987</year>
+		<manufacturer>Epyx</manufacturer>
+	</hash>
+	<hash crc32="8fe71189" name="Chaos (1992-93)(Prisioners, Pound, EVS, S&amp;S, Muff)(PD)">
+	</hash>
+	<hash crc32="64bb7e6c" name="Chipy [cr Obelix]">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="48f34ebb" name="Choplifter [p]">
+		<year>1990</year>
+		<manufacturer>Muffbusters</manufacturer>
+	</hash>
+	<hash crc32="aea38043" name="Chopper War">
+		<year>1986</year>
+		<manufacturer>Illusion</manufacturer>
+	</hash>
+	<hash crc32="617e328f" name="Citadel Of Chaos (PD)(Hu)">
+		<year>1992</year>
+		<manufacturer>FYC</manufacturer>
+	</hash>
+	<hash crc32="a4d4c474" name="Climb It">
+		<year>19??</year>
+		<manufacturer>Tynesoft</manufacturer>
+	</hash>
+	<hash crc32="82f444cc" name="Clowns">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="ef59a427" name="Coloris (PD)">
+		<year>1992</year>
+		<manufacturer>Genius</manufacturer>
+	</hash>
+	<hash crc32="a3390e3f" name="Colossus 4 Chess">
+		<year>1985</year>
+		<manufacturer>M.Bryant</manufacturer>
+	</hash>
+	<hash crc32="b4a7ed49" name="Colossus 4 Chess [a]">
+		<year>1985</year>
+		<manufacturer>M.Bryant</manufacturer>
+	</hash>
+	<hash crc32="18d0a2c7" name="Columns [p]">
+		<year>1992</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="3dd8b9c9" name="Commando">
+		<year>1986</year>
+		<manufacturer>Elite</manufacturer>
+	</hash>
+	<hash crc32="5ea8fc60" name="Commando (Plus4)[p]">
+		<year>19??</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="b04ed388" name="Commando (Plus4)[p][a]">
+		<year>19??</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="c786a5e9" name="Convoy">
+		<year>19??</year>
+		<manufacturer>Colossus-Soft</manufacturer>
+	</hash>
+	<hash crc32="0fe6c679" name="Cops N' Robbers">
+		<year>1988</year>
+		<manufacturer>Atlantis Software</manufacturer>
+	</hash>
+	<hash crc32="8e6cf6bf" name="Corman">
+		<year>1985</year>
+		<manufacturer>C.B.M. UK</manufacturer>
+	</hash>
+	<hash crc32="8c8bf818" name="Corman [a]">
+		<year>1985</year>
+		<manufacturer>C.B.M. UK</manufacturer>
+	</hash>
+	<hash crc32="a6e0a6a6" name="Cosmic Terror (De-En)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="6ef89548" name="Cowboy Duell (De)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="6a598ccd" name="Crackball - The Second Version [p]">
+		<year>1988</year>
+		<manufacturer>48-tpi</manufacturer>
+	</hash>
+	<hash crc32="923fd5fb" name="Cracks Of Fire">
+		<year>19??</year>
+		<manufacturer>Supersoft</manufacturer>
+	</hash>
+	<hash crc32="c137245a" name="Crater (PD)">
+		<year>1990</year>
+		<manufacturer>CSM</manufacturer>
+	</hash>
+	<hash crc32="e70b49e3" name="Crazy Factory (De)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="caf65407" name="Crazy Golf">
+		<year>1984</year>
+		<manufacturer>CBM</manufacturer>
+	</hash>
+	<hash crc32="a67dd7af" name="Crazy Tennis">
+		<year>1988</year>
+		<manufacturer>Toman Zoltan</manufacturer>
+	</hash>
+	<hash crc32="787ed184" name="Creature Crawl">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="e717c21b" name="Crillion [cr Obelix]">
+		<year>1989</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="ab08bac1" name="Crillion [cr Obelix][a]">
+		<year>1989</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="7a2d6c96" name="Cross It II (PD)">
+		<year>1994</year>
+		<manufacturer>Gentlemen Software</manufacturer>
+	</hash>
+	<hash crc32="ab302f47" name="Cruncher">
+		<year>1985</year>
+		<manufacturer>J.P. Shay</manufacturer>
+	</hash>
+	<hash crc32="f1bf54b7" name="Crystals (PD)">
+		<year>1990</year>
+		<manufacturer>Olly</manufacturer>
+	</hash>
+	<hash crc32="12f9a797" name="Csavargas A Gombak Birodalmaban (Hu)">
+		<year>1988</year>
+		<manufacturer>Greensoft</manufacturer>
+	</hash>
+	<hash crc32="92bd166e" name="Csillagharcos (Hu)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="de65ac10" name="Cuthbert">
+		<year>19??</year>
+		<manufacturer>Microdeal</manufacturer>
+	</hash>
+	<hash crc32="9070ef01" name="Cuthbert in Space">
+		<year>19??</year>
+		<manufacturer>Microdeal</manufacturer>
+	</hash>
+	<hash crc32="e082b55a" name="Cyber Hordes Gold (PD)">
+		<year>1992</year>
+		<manufacturer>GOTU</manufacturer>
+	</hash>
+	<hash crc32="e2c8f9be" name="Cyborg">
+		<year>1985</year>
+		<manufacturer>Rino Marketing</manufacturer>
+	</hash>
+	<hash crc32="1b9dfd9f" name="Cyborg">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="3e9b6785" name="Cyborg Wars (En-De)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="6e48db14" name="Daley Thompson's Star Events (Side A)[G2111]">
+		<year>1985</year>
+		<manufacturer>Ocean</manufacturer>
+	</hash>
+	<hash crc32="fd557690" name="Daley Thompson's Star Events (Side B)">
+		<year>1985</year>
+		<manufacturer>Ocean</manufacturer>
+	</hash>
+	<hash crc32="76243127" name="Dame (PD)">
+		<year>1993</year>
+		<manufacturer>DCD</manufacturer>
+	</hash>
+	<hash crc32="916ad568" name="Dame (PD)[docs]">
+		<year>1993</year>
+		<manufacturer>DCD</manufacturer>
+	</hash>
+	<hash crc32="210a3aaf" name="Danger Diamonds">
+		<year>1986</year>
+		<manufacturer>CSJ Computersoft Jonigk</manufacturer>
+	</hash>
+	<hash crc32="e07fd388" name="Danger Zone">
+		<year>1986</year>
+		<manufacturer>Codemasters</manufacturer>
+	</hash>
+	<hash crc32="4287454d" name="Danger-Willi [cr Kali &amp; PPCS]">
+		<year>1987</year>
+		<manufacturer>Michael Potsch</manufacturer>
+	</hash>
+	<hash crc32="cc3110f5" name="Dangerous Mission (PD)">
+		<year>1992</year>
+		<manufacturer>Moldi</manufacturer>
+	</hash>
+	<hash crc32="138202a8" name="Dangerous Pyramid (De)">
+		<year>19??</year>
+		<manufacturer>AMA-Productions</manufacturer>
+	</hash>
+	<hash crc32="15b4c9ff" name="Dark Side, The (PD)">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="27498929" name="David's Midnight Magic">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="77dbedab" name="Death Race">
+		<year>1985</year>
+		<manufacturer>Atlantis Software</manufacturer>
+	</hash>
+	<hash crc32="402dfbb9" name="Death River [G1000]">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="e21fcf2d" name="DeathShips (PD)">
+		<year>1993</year>
+		<manufacturer>Kuni</manufacturer>
+	</hash>
+	<hash crc32="098f963e" name="DecStone (PD)">
+		<year>1992</year>
+		<manufacturer>TGH</manufacturer>
+	</hash>
+	<hash crc32="958f1f0b" name="Decton (PD)">
+		<year>1991</year>
+		<manufacturer>TGH</manufacturer>
+	</hash>
+	<hash crc32="2b621d94" name="Deeper Dungeon (It)">
+		<year>19??</year>
+		<manufacturer>International Education</manufacturer>
+	</hash>
+	<hash crc32="151957c8" name="Defender Of The Crown [p]">
+		<year>19??</year>
+		<manufacturer>SCH &amp; TMCH</manufacturer>
+	</hash>
+	<hash crc32="d6fa479e" name="Defender Of The Crown [p]">
+		<year>19??</year>
+		<manufacturer>SCH</manufacturer>
+	</hash>
+	<hash crc32="b4fe0472" name="Demolition [cr Bitsoft]">
+		<year>19??</year>
+		<manufacturer>Joerg Dierks</manufacturer>
+	</hash>
+	<hash crc32="b5fa6ae9" name="Demonok Birodalma [cr DDT][t DDT](Hu)">
+		<year>1989</year>
+		<manufacturer>Novotrade Rt. Octasoft</manufacturer>
+	</hash>
+	<hash crc32="0dd663c0" name="Demonok Birodalma [cr DDT][t DDT](Hu)[intro]">
+		<year>1989</year>
+		<manufacturer>Novotrade Rt. Octasoft</manufacturer>
+	</hash>
+	<hash crc32="9ea5a9cf" name="Demonsdom (PD)">
+		<year>19??</year>
+		<manufacturer>CSM</manufacturer>
+	</hash>
+	<hash crc32="80d9b2ac" name="Der Maurer (De)">
+		<year>19??</year>
+		<manufacturer>J Goy Guben</manufacturer>
+	</hash>
+	<hash crc32="7703d1f8" name="Dex [cr TTS][t TTS](Hu)">
+		<year>1989</year>
+		<manufacturer>Novotrade Deltasoft</manufacturer>
+	</hash>
+	<hash crc32="8cb97f8a" name="Dex II (PD)(Hu)">
+		<year>1990</year>
+		<manufacturer>TTS</manufacturer>
+	</hash>
+	<hash crc32="87d30658" name="Diabolo">
+		<year>1985</year>
+		<manufacturer>Jens Engel</manufacturer>
+	</hash>
+	<hash crc32="bcd4fb81" name="Diagon">
+		<year>1984</year>
+		<manufacturer>Bug-Byte</manufacturer>
+	</hash>
+	<hash crc32="8d84826f" name="Diamantenfieber (De)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="a0a95790" name="Diamond Mine">
+		<year>19??</year>
+		<manufacturer>Blue Ribbon Software</manufacturer>
+	</hash>
+	<hash crc32="f80672b8" name="Diamond Mine 2 [cr Great Byte LTD]">
+		<year>19??</year>
+		<manufacturer>Blue Ribbon Software</manufacturer>
+	</hash>
+	<hash crc32="bad148fd" name="Diamond Town (Hu)">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="d0ad4287" name="Die Maus (De)">
+		<year>19??</year>
+		<manufacturer>TW-Software</manufacturer>
+	</hash>
+	<hash crc32="72a86192" name="Die Seefahrt [cr Obelix]">
+		<year>1989</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="6b219448" name="Digital Ball">
+		<year>1989</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="2c4656c9" name="Digital Ball [a]">
+		<year>1989</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="56ee3f1f" name="Dingbat">
+		<year>1988</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="3ca6df71" name="Dingbat [G3000]">
+		<year>1988</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="44b4de27" name="Dirty Den">
+		<year>1986</year>
+		<manufacturer>Probe Software</manufacturer>
+	</hash>
+	<hash crc32="6b18f397" name="Dixi A Megmento (PD)(Hu)">
+		<year>1987</year>
+		<manufacturer>Kosir Attila</manufacturer>
+	</hash>
+	<hash crc32="795a0056" name="DizasterBlaster">
+		<year>19??</year>
+		<manufacturer>Shaun Southern</manufacturer>
+	</hash>
+	<hash crc32="43a50ab3" name="Dizzy - Prince Of The Yolkfolk [p]">
+		<year>19??</year>
+		<manufacturer>TGMS</manufacturer>
+	</hash>
+	<hash crc32="eab9f1a5" name="Dizzy 3 [f][p]">
+		<year>1992</year>
+		<manufacturer>TGMS</manufacturer>
+	</hash>
+	<hash crc32="4d412798" name="Dizzy 3 [p]">
+		<year>1992</year>
+		<manufacturer>TGMS</manufacturer>
+	</hash>
+	<hash crc32="36e7a74e" name="Dizzy 4 [p]">
+		<year>19??</year>
+		<manufacturer>TGMS</manufacturer>
+	</hash>
+	<hash crc32="174d5617" name="Dizzy Dice">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="b53658a9" name="Domingo (De)">
+		<year>1989</year>
+		<manufacturer>Wolfsoft Supertronic</manufacturer>
+	</hash>
+	<hash crc32="f5465cbb" name="Domino (Plus4)[p]">
+		<year>1991</year>
+		<manufacturer>TGMS</manufacturer>
+	</hash>
+	<hash crc32="9f8e99f1" name="Dooly [t Coby]">
+		<year>1987</year>
+		<manufacturer>Falcon Software</manufacturer>
+	</hash>
+	<hash crc32="a95daeef" name="Doomdark's Revenge [p]">
+		<year>19??</year>
+		<manufacturer>Pigmy</manufacturer>
+	</hash>
+	<hash crc32="1b299bf8" name="Dorks Dilemma">
+		<year>19??</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="70c6aced" name="Double Blocks (PD)">
+		<year>1993</year>
+		<manufacturer>TBC</manufacturer>
+	</hash>
+	<hash crc32="89c6b598" name="Driller (Plus4)[f][p]">
+		<year>1990</year>
+		<manufacturer>Pigmy</manufacturer>
+	</hash>
+	<hash crc32="32c4d6d1" name="Driller (Plus4)[p]">
+		<year>1990</year>
+		<manufacturer>Pigmy</manufacturer>
+	</hash>
+	<hash crc32="390b8c90" name="Droid One">
+		<year>1986</year>
+		<manufacturer>Bug-Byte</manufacturer>
+	</hash>
+	<hash crc32="c7a9167c" name="Dudaorro Patric [cr Muffbusters](Hu)">
+		<year>1989</year>
+		<manufacturer>Novotrade Octasoft</manufacturer>
+	</hash>
+	<hash crc32="752e1456" name="Dudaorro Patric [cr Muffbusters][a](Hu)">
+		<year>1989</year>
+		<manufacturer>Novotrade Octasoft</manufacturer>
+	</hash>
+	<hash crc32="6bc9742e" name="Duotris (Plus4)(PD)">
+		<year>1992</year>
+		<manufacturer>TYCB</manufacturer>
+	</hash>
+	<hash crc32="b8b1b4cd" name="Dynamoid">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="5ddf1c26" name="Dynamoid [a]">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="c9a082cb" name="Earth Invaders (PD)">
+		<year>1992</year>
+		<manufacturer>MOI</manufacturer>
+	</hash>
+	<hash crc32="5871386b" name="Elite (Plus4)[p]">
+		<year>19??</year>
+		<manufacturer>Pigmyspft</manufacturer>
+	</hash>
+	<hash crc32="eb8891f2" name="Elite Squad [p]">
+		<year>1991</year>
+		<manufacturer>EVS</manufacturer>
+	</hash>
+	<hash crc32="da8f5acf" name="Eliza (PD)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="8ec37ab9" name="Elvarazsolt Kastely (Hu)">
+		<year>1987</year>
+		<manufacturer>Vages Software</manufacturer>
+	</hash>
+	<hash crc32="eb2cfd14" name="Enchanted Isle (PD)">
+		<year>19??</year>
+		<manufacturer>Crackerbox</manufacturer>
+	</hash>
+	<hash crc32="b64278d3" name="EndZone 2 [p]">
+		<year>19??</year>
+		<manufacturer>Alternative</manufacturer>
+	</hash>
+	<hash crc32="9a4d2fd4" name="Eoroid Professional">
+		<year>19??</year>
+		<manufacturer>Deltaware</manufacturer>
+	</hash>
+	<hash crc32="c60007e8" name="Eoroid Professional [docs]">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="15fe0e43" name="Erik The Viking [p]">
+		<year>1990</year>
+		<manufacturer>Pigmy</manufacturer>
+	</hash>
+	<hash crc32="0fca8fec" name="European Games">
+		<year>1987</year>
+		<manufacturer>Crazyman Software</manufacturer>
+	</hash>
+	<hash crc32="9799a314" name="Ewox (PD)(Hu)">
+		<year>1993</year>
+		<manufacturer>GOTU</manufacturer>
+	</hash>
+	<hash crc32="72128cc8" name="Exorcist, The">
+		<year>1984</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="6c25cc33" name="Exorcist, The [a]">
+		<year>1984</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="5de5e1f9" name="Explosive Net (PD)">
+		<year>1994</year>
+		<manufacturer>Moldi</manufacturer>
+	</hash>
+	<hash crc32="14e25901" name="Exsperma (PD)">
+		<year>1990</year>
+		<manufacturer>FYC</manufacturer>
+	</hash>
+	<hash crc32="8c7988e9" name="Extasy (PD)">
+		<year>19??</year>
+		<manufacturer>Muffbusters</manufacturer>
+	</hash>
+	<hash crc32="9cd7dd0a" name="Extasy (PD)[m Terrorists]">
+		<year>19??</year>
+		<manufacturer>Muffbusters</manufacturer>
+	</hash>
+	<hash crc32="a2fe0828" name="Fantasmi (Hu)">
+		<year>1986</year>
+		<manufacturer>Editions Fermont</manufacturer>
+	</hash>
+	<hash crc32="fc8f4f19" name="Ferrox">
+		<year>1984</year>
+		<manufacturer>C.B.M. UK</manufacturer>
+	</hash>
+	<hash crc32="2ede8121" name="Finders Keepers">
+		<year>1986</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="cb93bfc8" name="Fire Ant [SYS6915]">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="920e5634" name="Firm Base (Plus4)(PD)[cr Skoro][t Skoro]">
+		<year>1990</year>
+		<manufacturer>CSM</manufacturer>
+	</hash>
+	<hash crc32="5b5c9339" name="Flash Gordon (PD)">
+		<year>1990</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="303ffe2e" name="Flipper Environment Editor (PD)">
+		<year>1992</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="fcbada60" name="Flipper Environment Editor (PD)[a]">
+		<year>1992</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="f216a9d2" name="Footballer Of The Year">
+		<year>1986</year>
+		<manufacturer>Gremlin</manufacturer>
+	</hash>
+	<hash crc32="0a739b6d" name="Formula 1 Simulator">
+		<year>1985</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="78c76313" name="Fortress Underground">
+		<year>1987</year>
+		<manufacturer>Joerg Dierks</manufacturer>
+	</hash>
+	<hash crc32="7023454f" name="Freddy Hardest In South Manhattan (Plus4)[p]">
+		<year>1990</year>
+		<manufacturer>TGMS</manufacturer>
+	</hash>
+	<hash crc32="67d43214" name="Freddy Hardest In South Manhattan (Plus4)[p][a]">
+		<year>1990</year>
+		<manufacturer>TGMS</manufacturer>
+	</hash>
+	<hash crc32="e009c31c" name="Frenesis">
+		<year>1987</year>
+		<manufacturer>Tony Takoushi</manufacturer>
+	</hash>
+	<hash crc32="fc4de529" name="Frog Jump">
+		<year>19??</year>
+		<manufacturer>Playvision Projects</manufacturer>
+	</hash>
+	<hash crc32="c276efd9" name="Fury">
+		<year>1986</year>
+		<manufacturer>Firebird</manufacturer>
+	</hash>
+	<hash crc32="66bcb18a" name="Future Knight [cr TTL]">
+		<year>198?</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="725de0e1" name="Galaxians">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="a7e90cb4" name="Giana Sister">
+		<year>1989</year>
+		<manufacturer>T+K Software</manufacturer>
+	</hash>
+	<hash crc32="19a1d3ff" name="Gibson Game '92 v1.1">
+		<year>19??</year>
+		<manufacturer>Coroners</manufacturer>
+	</hash>
+	<hash crc32="3954e852" name="Go Ahead! (PD)">
+		<year>1994</year>
+		<manufacturer>GS</manufacturer>
+	</hash>
+	<hash crc32="1a3c69a0" name="Golf [tr Hu]">
+		<year>1984</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="b65037c8" name="Golf Royal [cr Fish &amp; Wolf]">
+		<year>1989</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="3c182dd7" name="Grand Master">
+		<year>1982</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="a54d80ff" name="Grand Master [SYS1426]">
+		<year>1985</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="191194d2" name="Grand Master [G3793]">
+		<year>19??</year>
+		<manufacturer>Robot Software</manufacturer>
+	</hash>
+	<hash crc32="65272dbe" name="Gremlins (Plus4)[p]">
+		<year>19??</year>
+		<manufacturer>Pigmy</manufacturer>
+	</hash>
+	<hash crc32="9e655776" name="Gridrunner [p]">
+		<year>1989</year>
+		<manufacturer>Muffbusters</manufacturer>
+	</hash>
+	<hash crc32="320616cc" name="Gunlaw">
+		<year>1987</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="5aae4b93" name="Gunslinger">
+		<year>19??</year>
+		<manufacturer>Tynesoft</manufacturer>
+	</hash>
+	<hash crc32="71371ac5" name="Guzzler">
+		<year>1986</year>
+		<manufacturer>Players</manufacturer>
+	</hash>
+	<hash crc32="c9271aaf" name="Gwnn">
+		<year>1987</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="3c1893ed" name="Halallabirinthus (Hu)">
+		<year>1989</year>
+		<manufacturer>Novotrade</manufacturer>
+	</hash>
+	<hash crc32="e40fd12b" name="Harvey Headbanger">
+		<year>1986</year>
+		<manufacturer>Firebird</manufacturer>
+	</hash>
+	<hash crc32="29685fa6" name="Head Over Heels [p]">
+		<year>1990</year>
+		<manufacturer>Muffbusters</manufacturer>
+	</hash>
+	<hash crc32="9cf54630" name="HeadHunters (PD)">
+		<year>1992</year>
+		<manufacturer>Kuni</manufacturer>
+	</hash>
+	<hash crc32="60a2e74e" name="Helicopters (PD)(Hu-En)">
+		<year>1993</year>
+		<manufacturer>Skoro-soft</manufacturer>
+	</hash>
+	<hash crc32="83a36008" name="Helicopters 2 (PD)">
+		<year>1994</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="7b8676a5" name="Helix">
+		<year>1988</year>
+		<manufacturer>Falcon Soft</manufacturer>
+	</hash>
+	<hash crc32="f91a4e39" name="Helix (NTSC)">
+		<year>1988</year>
+		<manufacturer>Falcon Soft</manufacturer>
+	</hash>
+	<hash crc32="e2a049a0" name="Helix (PAL)">
+		<year>1988</year>
+		<manufacturer>Falcon Soft</manufacturer>
+	</hash>
+	<hash crc32="fc481415" name="Hell 2, The (PD)">
+		<year>19??</year>
+		<manufacturer>SCN</manufacturer>
+	</hash>
+	<hash crc32="add13e37" name="Hell 3, The (PD)">
+		<year>1995</year>
+		<manufacturer>SCN</manufacturer>
+	</hash>
+	<hash crc32="0db4a7f6" name="Hell, The (PD)">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="38973611" name="Hexaeder (Hu)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="dab82f4b" name="Hexenkuche (PD)">
+		<year>1990</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="c67dfc47" name="Hobbit, The [p]">
+		<year>1989</year>
+		<manufacturer>Pigmysoft</manufacturer>
+	</hash>
+	<hash crc32="ba0c7827" name="Hollywood Poker - Denise [h H.C.S.]">
+		<year>1987</year>
+		<manufacturer>Golden Games</manufacturer>
+	</hash>
+	<hash crc32="fd3a33e7" name="Hollywood Poker - Isabell [h H.C.S.]">
+		<year>1987</year>
+		<manufacturer>Golden Games</manufacturer>
+	</hash>
+	<hash crc32="3c4c6530" name="Hollywood Poker - Lorence [h H.C.S.]">
+		<year>1987</year>
+		<manufacturer>Golden Games</manufacturer>
+	</hash>
+	<hash crc32="10a50fce" name="Hollywood Poker - Stephanie [h H.C.S.]">
+		<year>1987</year>
+		<manufacturer>Golden Games</manufacturer>
+	</hash>
+	<hash crc32="57d6748b" name="Hos Lovag">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="d38c50ce" name="Hunter (PD)">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="3ad0ed2a" name="Hustler">
+		<year>1985</year>
+		<manufacturer>Bubble Bus Software</manufacturer>
+	</hash>
+	<hash crc32="8975fa0f" name="Hustler [a]">
+		<year>1985</year>
+		<manufacturer>Bubble Bus Software</manufacturer>
+	</hash>
+	<hash crc32="f2ceca22" name="Icicle Works">
+		<year>1985</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="64f43ff4" name="Idolabirintus [cr KNM &amp; CMS](Hu)">
+		<year>1987</year>
+		<manufacturer>Novotrade-Octasoft</manufacturer>
+	</hash>
+	<hash crc32="73269557" name="Idoregesz (Plus4)(PD)(Hu)">
+		<year>1989</year>
+		<manufacturer>Muffbusters</manufacturer>
+	</hash>
+	<hash crc32="635b998c" name="Ikari Warriors">
+		<year>1987</year>
+		<manufacturer>Elite</manufacturer>
+	</hash>
+	<hash crc32="1dbefc8c" name="Indoor Soccer">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="1a94e482" name="Indoor Sports">
+		<year>19??</year>
+		<manufacturer>Tynesoft</manufacturer>
+	</hash>
+	<hash crc32="60838134" name="Into The Deep">
+		<year>1986</year>
+		<manufacturer>B.O'Shaughnessy</manufacturer>
+	</hash>
+	<hash crc32="75e2c439" name="Into The Eagles Nest [p]">
+		<year>1990</year>
+		<manufacturer>Muffbusters</manufacturer>
+	</hash>
+	<hash crc32="48022ca2" name="Invaders">
+		<year>1984</year>
+		<manufacturer>C.B.M.</manufacturer>
+	</hash>
+	<hash crc32="6df6fb5a" name="Invincible, The (PD)(Hu)">
+		<year>1988</year>
+		<manufacturer>Kosir Attila</manufacturer>
+	</hash>
+	<hash crc32="9618d1ac" name="Jack Attack">
+		<year>1983</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="0b81225a" name="Jet Set Willy">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="174326a0" name="Jetbrix">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="30675b8a" name="Jumbo (Hu)">
+		<year>1988</year>
+		<manufacturer>Deltasoft</manufacturer>
+	</hash>
+	<hash crc32="cfa2c1d5" name="Kane [SYS15868]">
+		<year>1986</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="06f09ca2" name="Karate King">
+		<year>1986</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="324e23a0" name="Kazik And The Ghosts">
+		<year>1986</year>
+		<manufacturer>Braintron</manufacturer>
+	</hash>
+	<hash crc32="56a86c7f" name="Kenny Dalglish Soccer Manager (Plus4)[p]">
+		<year>1990</year>
+		<manufacturer>TGMS</manufacturer>
+	</hash>
+	<hash crc32="a9d4d592" name="Kikstart - Off-Road Simulator [SYS8192]">
+		<year>1986</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="813e48cd" name="Kikstart Strecken Editor [tr Nl]">
+		<year>1988</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="278323d1" name="Killapede">
+		<year>1986</year>
+		<manufacturer>Players</manufacturer>
+	</hash>
+	<hash crc32="0f30fdef" name="King Of Kings, The">
+		<year>19??</year>
+		<manufacturer>Hartmut Ott</manufacturer>
+	</hash>
+	<hash crc32="945fc57b" name="Knight's Move">
+		<year>1986</year>
+		<manufacturer>Livewire Software</manufacturer>
+	</hash>
+	<hash crc32="c937d1e4" name="Krakout (PD)[t TCFS]">
+		<year>19??</year>
+		<manufacturer>Thomas Sasvari</manufacturer>
+	</hash>
+	<hash crc32="66ba3da1" name="Kryptonite (PD)">
+		<year>19??</year>
+		<manufacturer>Terrorists</manufacturer>
+	</hash>
+	<hash crc32="3618a861" name="Kung Fu Kid">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="5cbf3090" name="Labirinth">
+		<year>19??</year>
+		<manufacturer>Skoro</manufacturer>
+	</hash>
+	<hash crc32="451cd932" name="Lancer-Lord (Plus4)[p]">
+		<year>1990</year>
+		<manufacturer>Muffbusters</manufacturer>
+	</hash>
+	<hash crc32="4f28bee6" name="Laser Squad II [p]">
+		<year>1992</year>
+		<manufacturer>TGMS</manufacturer>
+	</hash>
+	<hash crc32="42994f13" name="Laza! [cr Section 9]">
+		<year>19??</year>
+		<manufacturer>Mr Chip Software</manufacturer>
+	</hash>
+	<hash crc32="813b99c2" name="Leaper">
+		<year>1986</year>
+		<manufacturer>Bug-Byte</manufacturer>
+	</hash>
+	<hash crc32="42ada415" name="Legionnaire">
+		<year>19??</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="d08aa391" name="Leonardo [f][p]">
+		<year>19??</year>
+		<manufacturer>Coroners</manufacturer>
+	</hash>
+	<hash crc32="524f558b" name="Liberator">
+		<year>1986</year>
+		<manufacturer>Magnificent Seven Software</manufacturer>
+	</hash>
+	<hash crc32="494620b9" name="Lloyd Game (PD)">
+		<year>1992</year>
+		<manufacturer>Methabolix</manufacturer>
+	</hash>
+	<hash crc32="eca1ef95" name="Loco Co-Co">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="46245f03" name="Loco Co-Co [SYS5389]">
+		<year>1986</year>
+		<manufacturer>Illusion Software</manufacturer>
+	</hash>
+	<hash crc32="eee0d518" name="Locomotion">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="b279ba9a" name="Logic (PD)">
+		<year>1990</year>
+		<manufacturer>CSM</manufacturer>
+	</hash>
+	<hash crc32="462ff391" name="Logical Ball (PD)">
+		<year>1992</year>
+		<manufacturer>EDC</manufacturer>
+	</hash>
+	<hash crc32="31916a75" name="Logomaze (PD)">
+		<year>1996</year>
+		<manufacturer>Assassin</manufacturer>
+	</hash>
+	<hash crc32="8d10ba40" name="Mad Maze">
+		<year>1986</year>
+		<manufacturer>Axel Computing</manufacturer>
+	</hash>
+	<hash crc32="d26af22d" name="Magician's Curse 3, The">
+		<year>1988</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="0096ab84" name="Magician's Curse, The">
+		<year>1986</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="a9c20568" name="Magician's Curse, The [a]">
+		<year>1986</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="8ea1b13e" name="Magnet-X [p]">
+		<year>19??</year>
+		<manufacturer>EVS</manufacturer>
+	</hash>
+	<hash crc32="b6cc2ea3" name="Major Blink">
+		<year>1985</year>
+		<manufacturer>CRL Group</manufacturer>
+	</hash>
+	<hash crc32="fb26d669" name="Major Blink [t TTC]">
+		<year>1985</year>
+		<manufacturer>CRL Group</manufacturer>
+	</hash>
+	<hash crc32="deb409b3" name="Maltese Joe Plays 3-D Pool [p]">
+		<year>19??</year>
+		<manufacturer>Pigmy</manufacturer>
+	</hash>
+	<hash crc32="c573a478" name="Maltese Joe Plays 3-D Pool [p][a]">
+		<year>19??</year>
+		<manufacturer>Pigmy</manufacturer>
+	</hash>
+	<hash crc32="87fe0f5a" name="Maniac Garden, The">
+		<year>1989</year>
+		<manufacturer>HJD</manufacturer>
+	</hash>
+	<hash crc32="fdcae5f5" name="Maniax [cr Men Of Science]">
+		<year>19??</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="c842724a" name="Master Golf [cr Terrorists]">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="246ce78e" name="Master Mind">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="39c1000d" name="Master-Dame (De)">
+		<year>1989</year>
+		<manufacturer>P. Wirbelauer</manufacturer>
+	</hash>
+	<hash crc32="56d242d5" name="Matrix">
+		<year>1986</year>
+		<manufacturer>Llamasoft</manufacturer>
+	</hash>
+	<hash crc32="76d098c0" name="Matrix [t TTC]">
+		<year>1986</year>
+		<manufacturer>Llamasoft</manufacturer>
+	</hash>
+	<hash crc32="08128bad" name="Matrix (PD)">
+		<year>1994</year>
+		<manufacturer>Noldi</manufacturer>
+	</hash>
+	<hash crc32="43c876aa" name="Melyur (Hu)">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="94ff916e" name="Meno Jeno (Hu)">
+		<year>1988</year>
+		<manufacturer>Deltasoft</manufacturer>
+	</hash>
+	<hash crc32="3b48ecde" name="Mesel Az Erdo (Hu)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="6c7ef828" name="Microchess #3 (Plus4)">
+		<year>1988</year>
+		<manufacturer>Norgayer Software</manufacturer>
+	</hash>
+	<hash crc32="807fe750" name="Mindbreaker (Plus4)[p]">
+		<year>19??</year>
+		<manufacturer>United Force</manufacturer>
+	</hash>
+	<hash crc32="a2ea86f4" name="Mine Field (PD)">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="ac0d06aa" name="Mine Sweeper (Plus4)(PD)">
+		<year>1995</year>
+		<manufacturer>ATI</manufacturer>
+	</hash>
+	<hash crc32="9fe58636" name="Mine Sweeper (Plus4)(PD)[a]">
+		<year>1995</year>
+		<manufacturer>ATI</manufacturer>
+	</hash>
+	<hash crc32="5e38f147" name="Mitoszok Gyemantja (Hu)">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="2b7ce5a9" name="Molecule Man (Plus4)[cr Ko-Ko &amp; Boombay]">
+		<year>1987</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="1347fce9" name="Monty On The Run">
+		<year>19??</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="c17e86a5" name="Moon Buggy [cr Opi]">
+		<year>1985</year>
+		<manufacturer>Jef</manufacturer>
+	</hash>
+	<hash crc32="3bcfc50d" name="Motor Mania (PD)">
+		<year>1990</year>
+		<manufacturer>Muffbusters</manufacturer>
+	</hash>
+	<hash crc32="4280deb5" name="Mysterious Adventure No. 8 [p]">
+		<year>1989</year>
+		<manufacturer>Pigmysoft</manufacturer>
+	</hash>
+	<hash crc32="0b575907" name="Nathrium Chlorid (PD)">
+		<year>1989</year>
+		<manufacturer>FYC</manufacturer>
+	</hash>
+	<hash crc32="b7eecafe" name="Nautilus [t Dokysoft]">
+		<year>1988</year>
+		<manufacturer>MCB Software</manufacturer>
+	</hash>
+	<hash crc32="a0176ca4" name="Nautilus [t Dokysoft][a]">
+		<year>1988</year>
+		<manufacturer>MCB Software</manufacturer>
+	</hash>
+	<hash crc32="fee328a7" name="Nectar Of The Gods, The">
+		<year>19??</year>
+		<manufacturer>Doug Rogers</manufacturer>
+	</hash>
+	<hash crc32="e119f395" name="Nest Of Fleas, The">
+		<year>19??</year>
+		<manufacturer>Silver Ghost</manufacturer>
+	</hash>
+	<hash crc32="6e9ec264" name="Nibbly '92 [cr Success][t Success][p]">
+		<year>19??</year>
+		<manufacturer>Double Density</manufacturer>
+	</hash>
+	<hash crc32="e8c64ab0" name="Nibbly '92 [p]">
+		<year>19??</year>
+		<manufacturer>Pussycats</manufacturer>
+	</hash>
+	<hash crc32="c1a31a74" name="Ninja Master">
+		<year>1986</year>
+		<manufacturer>Firebird</manufacturer>
+	</hash>
+	<hash crc32="d17e269e" name="Nintendo Worx (PD)">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="20449c8b" name="Nuclear Ball (PD)">
+		<year>1991</year>
+		<manufacturer>Hawk</manufacturer>
+	</hash>
+	<hash crc32="7b89682f" name="Nucleon (PD)">
+		<year>1990</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="d6fe2322" name="Oliver Otthona (Hu)">
+		<year>1988</year>
+		<manufacturer>Novotrade Octasoft</manufacturer>
+	</hash>
+	<hash crc32="7677333a" name="Olympic Skier">
+		<year>19??</year>
+		<manufacturer>Shaun Southern</manufacturer>
+	</hash>
+	<hash crc32="b998c8cc" name="One On One [p]">
+		<year>1989</year>
+		<manufacturer>Crown</manufacturer>
+	</hash>
+	<hash crc32="420bc558" name="Othello (PD)">
+		<year>1993</year>
+		<manufacturer>ATI</manufacturer>
+	</hash>
+	<hash crc32="f75fa86e" name="Out On A Limb 1 [SYS4100]">
+		<year>1984</year>
+		<manufacturer>Anirog Software</manufacturer>
+	</hash>
+	<hash crc32="86377a40" name="Out On A Limb 2 [SYS4100]">
+		<year>1984</year>
+		<manufacturer>Anirog Software</manufacturer>
+	</hash>
+	<hash crc32="cde22c53" name="Out On A Limb 3 [SYS4100]">
+		<year>1984</year>
+		<manufacturer>Anirog Software</manufacturer>
+	</hash>
+	<hash crc32="b4af6cd2" name="Overload [cr SLW][t SLW]">
+		<year>19??</year>
+		<manufacturer>Sex'n'Spirit</manufacturer>
+	</hash>
+	<hash crc32="95511ed2" name="Overload [cr SLW][t SLW][a]">
+		<year>19??</year>
+		<manufacturer>Sex'n'Spirit</manufacturer>
+	</hash>
+	<hash crc32="40f14d47" name="P.O.D. - Proof Of Destruction">
+		<year>1986</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="145f091d" name="Pac Man (PD)">
+		<year>19??</year>
+		<manufacturer>Christian Prieth</manufacturer>
+	</hash>
+	<hash crc32="63baf46b" name="Pacmanic">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="92235780" name="Pancho">
+		<year>1985</year>
+		<manufacturer>C.B.M. UK</manufacturer>
+	</hash>
+	<hash crc32="9443c327" name="Panik 16">
+		<year>1986</year>
+		<manufacturer>Atlantis Software</manufacturer>
+	</hash>
+	<hash crc32="de2b272d" name="Paperboy">
+		<year>1986</year>
+		<manufacturer>Elite</manufacturer>
+	</hash>
+	<hash crc32="99c30eac" name="Paratroopers (Plus4)[p]">
+		<year>1989</year>
+		<manufacturer>Muffbusters</manufacturer>
+	</hash>
+	<hash crc32="57b25fb2" name="Paratroopers (Plus4)[p]">
+		<year>1992</year>
+		<manufacturer>FYC</manufacturer>
+	</hash>
+	<hash crc32="e0429153" name="Patt Ball (PD)(Hu)">
+		<year>1989</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="d133723c" name="Pegged (PD)">
+		<year>1997</year>
+		<manufacturer>Assassin</manufacturer>
+	</hash>
+	<hash crc32="de72806e" name="Pengo (PD)">
+		<year>1996</year>
+		<manufacturer>Absence</manufacturer>
+	</hash>
+	<hash crc32="9110f059" name="Petch">
+		<year>1984</year>
+		<manufacturer>Colosoftware</manufacturer>
+	</hash>
+	<hash crc32="2e15b004" name="PETChess 4000 [p]">
+		<year>19??</year>
+		<manufacturer>Scorpions</manufacturer>
+	</hash>
+	<hash crc32="d1a7c9be" name="PETChess 4000 [p][a]">
+		<year>19??</year>
+		<manufacturer>Scorpions</manufacturer>
+	</hash>
+	<hash crc32="e959d6d9" name="Pheenix">
+		<year>19??</year>
+		<manufacturer>Alternative Software</manufacturer>
+	</hash>
+	<hash crc32="89cdb317" name="Pin Point">
+		<year>1986</year>
+		<manufacturer>Home Soft</manufacturer>
+	</hash>
+	<hash crc32="b7b61621" name="Ping (PD)">
+		<year>1992</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="29767e9b" name="Ping (PD)">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="1f89024a" name="Pipe Dream (PD)">
+		<year>1992</year>
+		<manufacturer>TLS</manufacturer>
+	</hash>
+	<hash crc32="196797ab" name="Pipe Mania [p]">
+		<year>1992</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="e8de7553" name="Planet Search">
+		<year>19??</year>
+		<manufacturer>Simon Pick</manufacturer>
+	</hash>
+	<hash crc32="cc6d7efa" name="Platina [cr PPCS](Hu)">
+		<year>1989</year>
+		<manufacturer>Steve Soft</manufacturer>
+	</hash>
+	<hash crc32="5507d6b5" name="Play Your Cards Right [p]">
+		<year>19??</year>
+		<manufacturer>CSM</manufacturer>
+	</hash>
+	<hash crc32="bef8d18e" name="Poker (Hu)">
+		<year>1989</year>
+		<manufacturer>LBM System</manufacturer>
+	</hash>
+	<hash crc32="60be655b" name="Pokoli Torony (Hu)">
+		<year>1988</year>
+		<manufacturer>Peter Mutschler</manufacturer>
+	</hash>
+	<hash crc32="4210ac22" name="Ponk (PD)">
+		<year>1995</year>
+		<manufacturer>Proky</manufacturer>
+	</hash>
+	<hash crc32="62a54ceb" name="Powerball">
+		<year>1986</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="3d901210" name="Prisoner (PD)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="0f87ebc9" name="Professional Amoeba (PD)">
+		<year>1992</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="edf798dc" name="Project Nova">
+		<year>1986</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="46b3da05" name="Pulsar [SYS16304]">
+		<year>1984</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="832a8e23" name="Punchy">
+		<year>1984</year>
+		<manufacturer>Mr Micro</manufacturer>
+	</hash>
+	<hash crc32="d17ace90" name="Punchy [t Chronos]">
+		<year>1984</year>
+		<manufacturer>Mr Micro</manufacturer>
+	</hash>
+	<hash crc32="422e63e7" name="Punk Puzzle (PD)">
+		<year>1992</year>
+		<manufacturer>FYC</manufacturer>
+	</hash>
+	<hash crc32="a3ea88ea" name="Purple Turtles">
+		<year>1984</year>
+		<manufacturer>Quicksilva</manufacturer>
+	</hash>
+	<hash crc32="75baadfc" name="Purple Turtles [m][tr It]">
+		<year>1984</year>
+		<manufacturer>Quicksilva</manufacturer>
+	</hash>
+	<hash crc32="cc90d436" name="Puzzle (PD)">
+		<year>1994</year>
+		<manufacturer>Core</manufacturer>
+	</hash>
+	<hash crc32="9c6b3417" name="Puzzle 2 (PD)">
+		<year>1994</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="0808f065" name="Puzzle 3 (PD)">
+		<year>1995</year>
+		<manufacturer>Scorpions</manufacturer>
+	</hash>
+	<hash crc32="b53d28b8" name="Puzzle 4 (PD)">
+		<year>19??</year>
+		<manufacturer>Scorpions</manufacturer>
+	</hash>
+	<hash crc32="9356f6f7" name="Puzzle Shuffle (PD)">
+		<year>1990</year>
+		<manufacturer>Muffbusters</manufacturer>
+	</hash>
+	<hash crc32="33b195c4" name="Puzzlenoid (PD)">
+		<year>1991</year>
+		<manufacturer>Hawk</manufacturer>
+	</hash>
+	<hash crc32="38db5520" name="Puzznic [cr Chromance][t Chromance][p]">
+		<year>19??</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="26dec0f8" name="Pyramid Guy (PD)">
+		<year>19??</year>
+		<manufacturer>Terrorists</manufacturer>
+	</hash>
+	<hash crc32="9d0f6fe0" name="Rablo-Rulett (Hu)">
+		<year>1987</year>
+		<manufacturer>Novotrade Deltasoft</manufacturer>
+	</hash>
+	<hash crc32="95ef82ef" name="Raffles">
+		<year>19??</year>
+		<manufacturer>Tynesoft</manufacturer>
+	</hash>
+	<hash crc32="ad0257c3" name="Raid Over Russia [cr Dr. Mabuse]">
+		<year>1985</year>
+		<manufacturer>Scarabaeus</manufacturer>
+	</hash>
+	<hash crc32="b33675e4" name="Rakontakota (Hu)">
+		<year>1988</year>
+		<manufacturer>Riszpong Tilogramma Software</manufacturer>
+	</hash>
+	<hash crc32="96c23be1" name="Ramazuri (Plus4)(PD)(Hu)">
+		<year>1988</year>
+		<manufacturer>Muffbusters</manufacturer>
+	</hash>
+	<hash crc32="d539d0a2" name="Raster Runner [p]">
+		<year>1992</year>
+		<manufacturer>TCFS &amp; Chain</manufacturer>
+	</hash>
+	<hash crc32="c5e4e1b4" name="Reach For The Sky [SYS8192]">
+		<year>1986</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="2d06240a" name="Reflex">
+		<year>1988</year>
+		<manufacturer>Players</manufacturer>
+	</hash>
+	<hash crc32="b3744c56" name="Renaissance [p]">
+		<year>19??</year>
+		<manufacturer>FYC</manufacturer>
+	</hash>
+	<hash crc32="f919fea6" name="Rescue From Zylon">
+		<year>1985</year>
+		<manufacturer>Mark J. Moore</manufacturer>
+	</hash>
+	<hash crc32="19b95c36" name="Revs [p]">
+		<year>19??</year>
+		<manufacturer>Pigmy</manufacturer>
+	</hash>
+	<hash crc32="2f12401d" name="Rig Attack">
+		<year>19??</year>
+		<manufacturer>Tynesoft</manufacturer>
+	</hash>
+	<hash crc32="91923add" name="Road Warrior">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="ec4a4af6" name="Robin Of Sherwood [p]">
+		<year>19??</year>
+		<manufacturer>Pigmysoft</manufacturer>
+	</hash>
+	<hash crc32="3690e047" name="Robo Knight">
+		<year>1987</year>
+		<manufacturer>US Gold</manufacturer>
+	</hash>
+	<hash crc32="8ed8c6f8" name="Rockmania (PD)">
+		<year>1990</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="325b6c60" name="Rogue Trooper [p]">
+		<year>1993</year>
+		<manufacturer>CSORY</manufacturer>
+	</hash>
+	<hash crc32="792c6930" name="Roller Kong">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="3d8ab2d4" name="Rolling Stones 2, The (PD)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="7d78024f" name="Room Ten Leisure Complex [SYS16330]">
+		<year>19??</year>
+		<manufacturer>CRL Group</manufacturer>
+	</hash>
+	<hash crc32="c1448849" name="Rozsaszin Parduc (Hu)">
+		<year>1988</year>
+		<manufacturer>Novotrade</manufacturer>
+	</hash>
+	<hash crc32="02b1da24" name="Rubik Kocka (PD)(Hu)">
+		<year>1989</year>
+		<manufacturer>Sagi</manufacturer>
+	</hash>
+	<hash crc32="7d3e5f28" name="Saboteur">
+		<year>1987</year>
+		<manufacturer>Alternative Software</manufacturer>
+	</hash>
+	<hash crc32="c2d45280" name="Safe Guard [cr Skoro]">
+		<year>19??</year>
+		<manufacturer>G.Drees</manufacturer>
+	</hash>
+	<hash crc32="b4e9621b" name="Saloon Shootout (PD)">
+		<year>1987</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="ec582481" name="Sanxion [p]">
+		<year>1991</year>
+		<manufacturer>TYCB</manufacturer>
+	</hash>
+	<hash crc32="0c2d7339" name="Scroll Adventure [p]">
+		<year>1989</year>
+		<manufacturer>Muffbusters</manufacturer>
+	</hash>
+	<hash crc32="ec1982cf" name="Secret Mission [p]">
+		<year>1988</year>
+		<manufacturer>Andras Szigethy</manufacturer>
+	</hash>
+	<hash crc32="3afba053" name="Sensible Hugo In Transylvania (PD)">
+		<year>19??</year>
+		<manufacturer>EVS</manufacturer>
+	</hash>
+	<hash crc32="903d1b5c" name="Sensitive [t Chromance][p]">
+		<year>19??</year>
+		<manufacturer>W.C. Club</manufacturer>
+	</hash>
+	<hash crc32="1ef59e57" name="Shark Attack">
+		<year>1986</year>
+		<manufacturer>Firebird</manufacturer>
+	</hash>
+	<hash crc32="5da588b5" name="Shit Game (PD)">
+		<year>1991</year>
+		<manufacturer>220v</manufacturer>
+	</hash>
+	<hash crc32="a02936fb" name="Shoot Down (PD)">
+		<year>1990</year>
+		<manufacturer>CSM</manufacturer>
+	</hash>
+	<hash crc32="67dbf9fb" name="Simple Puzzle (PD)">
+		<year>1992</year>
+		<manufacturer>Moldi</manufacturer>
+	</hash>
+	<hash crc32="450c921d" name="Sir Knight">
+		<year>19??</year>
+		<manufacturer>Tynesoft</manufacturer>
+	</hash>
+	<hash crc32="cb712948" name="Skramble (It)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="d708c7f1" name="Skyhawk">
+		<year>1986</year>
+		<manufacturer>Bug-Byte</manufacturer>
+	</hash>
+	<hash crc32="229537a0" name="Slipper (PD)">
+		<year>1993</year>
+		<manufacturer>Scorpions</manufacturer>
+	</hash>
+	<hash crc32="65ee674a" name="Snooker">
+		<year>1987</year>
+		<manufacturer>Anco</manufacturer>
+	</hash>
+	<hash crc32="308feaab" name="Snowball">
+		<year>1983</year>
+		<manufacturer>Level 9</manufacturer>
+	</hash>
+	<hash crc32="2cb6245f" name="Soccer Boss (Plus4)[p]">
+		<year>1990</year>
+		<manufacturer>HOT</manufacturer>
+	</hash>
+	<hash crc32="284fd1a1" name="Soccer Director [p]">
+		<year>1990</year>
+		<manufacturer>Muffbusters</manufacturer>
+	</hash>
+	<hash crc32="4f3ae334" name="Soko-ban (Hu)">
+		<year>1988</year>
+		<manufacturer>Kocka</manufacturer>
+	</hash>
+	<hash crc32="904ec576" name="Space Fiends">
+		<year>1985</year>
+		<manufacturer>Magnificent Seven</manufacturer>
+	</hash>
+	<hash crc32="4709ea36" name="Space Warrior (PD)">
+		<year>1992</year>
+		<manufacturer>Kuni</manufacturer>
+	</hash>
+	<hash crc32="1d78b8e5" name="Spectipede">
+		<year>1985</year>
+		<manufacturer>T Kelly</manufacturer>
+	</hash>
+	<hash crc32="5cef0065" name="Spiky Harold">
+		<year>1986</year>
+		<manufacturer>Firebird</manufacturer>
+	</hash>
+	<hash crc32="217392fe" name="Spiky Harold 2">
+		<year>19??</year>
+		<manufacturer>Firebird</manufacturer>
+	</hash>
+	<hash crc32="5ffdf742" name="Squirm">
+		<year>1985</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="3e295884" name="Star Wars">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="3e09c35f" name="Starfight II (Hu)">
+		<year>1987</year>
+		<manufacturer>Kosir Attila</manufacturer>
+	</hash>
+	<hash crc32="97611bc2" name="Starforce Nova">
+		<year>1987</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="b6c24f50" name="Stellar 7 [p]">
+		<year>1990</year>
+		<manufacturer>Bubi</manufacturer>
+	</hash>
+	<hash crc32="6f581af4" name="Stone Age (PD)">
+		<year>1994</year>
+		<manufacturer>WLS</manufacturer>
+	</hash>
+	<hash crc32="e392aa7f" name="Stone Age (PD)[docs]">
+		<year>1994</year>
+		<manufacturer>WLS</manufacturer>
+	</hash>
+	<hash crc32="31cfbf63" name="Stonepuzzle [t Skoro]">
+		<year>1991</year>
+		<manufacturer>FYC</manufacturer>
+	</hash>
+	<hash crc32="999ebfd5" name="Stonepuzzle Editor v1.1 (Hu)">
+		<year>1993</year>
+		<manufacturer>Skoro</manufacturer>
+	</hash>
+	<hash crc32="8c2a661d" name="Strawberry Fields">
+		<year>1986</year>
+		<manufacturer>Frank Bingley</manufacturer>
+	</hash>
+	<hash crc32="2b340ad6" name="Street Olympics">
+		<year>1986</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="ce92ea57" name="Summer Time (PD)(Hu)">
+		<year>1993</year>
+		<manufacturer>Coroners</manufacturer>
+	</hash>
+	<hash crc32="9520bd80" name="SunStar [cr TBL]">
+		<year>1987</year>
+		<manufacturer>CRL</manufacturer>
+	</hash>
+	<hash crc32="6c5a9b61" name="Super Cobra [cr Supy](Hu)">
+		<year>1987</year>
+		<manufacturer>Novotrade-Octasoft</manufacturer>
+	</hash>
+	<hash crc32="f4cda4fa" name="Super Pipeline [p]">
+		<year>1993</year>
+		<manufacturer>CNS</manufacturer>
+	</hash>
+	<hash crc32="eb9c984f" name="Sword Of Destiny">
+		<year>1985</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="2c181957" name="Tapper">
+		<year>19??</year>
+		<manufacturer>Braintron</manufacturer>
+	</hash>
+	<hash crc32="4d01ec90" name="Taskforce [cr Obelix]">
+		<year>1989</year>
+		<manufacturer>Players</manufacturer>
+	</hash>
+	<hash crc32="12f92085" name="Taskforce [t Obelix]">
+		<year>1989</year>
+		<manufacturer>Players</manufacturer>
+	</hash>
+	<hash crc32="9c36b90c" name="Tazz">
+		<year>1986</year>
+		<manufacturer>Bubble Bus Software</manufacturer>
+	</hash>
+	<hash crc32="04b9c7fe" name="Terra Cognita [cr Cola]">
+		<year>198?</year>
+		<manufacturer>Code Masters</manufacturer>
+	</hash>
+	<hash crc32="e915859a" name="Terra-X (PD)">
+		<year>1990</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="fb77182a" name="Tervihar (Hu)">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="cb5aef3c" name="Tetris (PD)">
+		<year>1990</year>
+		<manufacturer>VTX</manufacturer>
+	</hash>
+	<hash crc32="71bcb178" name="Thrust">
+		<year>1987</year>
+		<manufacturer>Firebird</manufacturer>
+	</hash>
+	<hash crc32="1ac2e9b3" name="Time Cristal (PD)">
+		<year>1994</year>
+		<manufacturer>Reddi Design</manufacturer>
+	</hash>
+	<hash crc32="0d5ccb57" name="Time-Zone [p]">
+		<year>1990</year>
+		<manufacturer>T+K Software</manufacturer>
+	</hash>
+	<hash crc32="1083a5db" name="Timeslip [cr Floppy Robby]">
+		<year>19??</year>
+		<manufacturer>English Software</manufacturer>
+	</hash>
+	<hash crc32="d71f6bed" name="Tir Na Nog [p]">
+		<year>19??</year>
+		<manufacturer>Andras Szigelhy</manufacturer>
+	</hash>
+	<hash crc32="f88d4462" name="Tom Thumb">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="2933f99d" name="Tom Thumb [a]">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="eace1f08" name="Tomb Of Tarrabash, The">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="d896f339" name="Torpedo Alley">
+		<year>1986</year>
+		<manufacturer>Firebird</manufacturer>
+	</hash>
+	<hash crc32="d90350d3" name="Total Eclipse [p]">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="13b646f3" name="Total Eclipse 2 [p]">
+		<year>19??</year>
+		<manufacturer>Terrorists</manufacturer>
+	</hash>
+	<hash crc32="1f5ac5bb" name="ToyBalls (Plus4)(PD)">
+		<year>1992</year>
+		<manufacturer>DS</manufacturer>
+	</hash>
+	<hash crc32="35823faa" name="Trailblazer">
+		<year>1986</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="cbe5d6a7" name="Trailblazer - The Megablazer (PD)">
+		<year>1991</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="8df88ba6" name="Tramp Kid (PD)">
+		<year>19??</year>
+		<manufacturer>EDC</manufacturer>
+	</hash>
+	<hash crc32="01144902" name="Trans Logic (PD)">
+		<year>1995</year>
+		<manufacturer>GS</manufacturer>
+	</hash>
+	<hash crc32="8cd57648" name="Trans World [p]">
+		<year>1991</year>
+		<manufacturer>Pigmy</manufacturer>
+	</hash>
+	<hash crc32="79145e81" name="Trap (PD)">
+		<year>1992</year>
+		<manufacturer>TGH</manufacturer>
+	</hash>
+	<hash crc32="06bf2bbf" name="Trap (PD)[t Genius]">
+		<year>1992</year>
+		<manufacturer>TGH</manufacturer>
+	</hash>
+	<hash crc32="c1f79360" name="Treasure Island">
+		<year>1985</year>
+		<manufacturer>CBM &amp; Mr Micro</manufacturer>
+	</hash>
+	<hash crc32="959f531f" name="Trouble For Bubble">
+		<year>19??</year>
+		<manufacturer>Tronic</manufacturer>
+	</hash>
+	<hash crc32="1ecbcc76" name="Tube Runner">
+		<year>19??</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="36e85f83" name="Tutti Frutti">
+		<year>1985</year>
+		<manufacturer>Mr Chip</manufacturer>
+	</hash>
+	<hash crc32="1b228c8d" name="Twin Kingdom Valley">
+		<year>1985</year>
+		<manufacturer>Bug-Byte</manufacturer>
+	</hash>
+	<hash crc32="5fbb030f" name="Twin Kingdom Valley [p]">
+		<year>1989</year>
+		<manufacturer>Crown</manufacturer>
+	</hash>
+	<hash crc32="2e65f2a9" name="Twin-down">
+		<year>19??</year>
+		<manufacturer>Argus Designs</manufacturer>
+	</hash>
+	<hash crc32="b5e08701" name="Two To One [t Obelix]">
+		<year>1990</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="d942c4a1" name="Tycoon Tex [cr Illegal Alien]">
+		<year>1985</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="3bb74f59" name="Tycoon Tex [t TTC]">
+		<year>1985</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="91e7eaaa" name="Ufo Vadasz [cr CSM](Hu)">
+		<year>1988</year>
+		<manufacturer>Octasoft</manufacturer>
+	</hash>
+	<hash crc32="e77848d7" name="Uj Vadnyugat (Plus4)[p](Hu)">
+		<year>1990</year>
+		<manufacturer>SF</manufacturer>
+	</hash>
+	<hash crc32="0f0a805e" name="Ultimate Tron II (PD)">
+		<year>1990</year>
+		<manufacturer>Attila</manufacturer>
+	</hash>
+	<hash crc32="a5a15a6e" name="Umo, L'">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="c4fce6a8" name="Urkaland (Hu)">
+		<year>1989</year>
+		<manufacturer>Novotrade-Octasoft</manufacturer>
+	</hash>
+	<hash crc32="f7d033fb" name="Uveggolyo (Plus4)(PD)(Hu)">
+		<year>1989</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="44895cf2" name="Vegas Jackpot">
+		<year>1985</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="299093d5" name="Very Shit Game (PD)">
+		<year>1993</year>
+		<manufacturer>Skoro Design</manufacturer>
+	</hash>
+	<hash crc32="3b14f110" name="Video Meanies">
+		<year>1986</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="34abc532" name="Video Poker">
+		<year>1986</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="99e2198d" name="Voidrunner (PD)">
+		<year>19??</year>
+		<manufacturer>Yak</manufacturer>
+	</hash>
+	<hash crc32="ac6495f5" name="Volleyball - The Arcade Game (Plus4)(PD)">
+		<year>1997</year>
+		<manufacturer>Assassin</manufacturer>
+	</hash>
+	<hash crc32="395b762c" name="Volleyball - The Arcade Game (Plus4)(PD)(Hu-En)[docs]">
+		<year>1997</year>
+		<manufacturer>Assassin</manufacturer>
+	</hash>
+	<hash crc32="af241ff7" name="Walaki [cr TPPC](Hu)">
+		<year>1987</year>
+		<manufacturer>Octasoft</manufacturer>
+	</hash>
+	<hash crc32="599c1ad2" name="Way To Running (PD)">
+		<year>1994</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="59d7ed5b" name="Who Dares Wins II">
+		<year>1986</year>
+		<manufacturer>Tynesoft</manufacturer>
+	</hash>
+	<hash crc32="4d7f54e1" name="WildFire (PD)">
+		<year>1992</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="dda6d7a5" name="Wimbledon">
+		<year>19??</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="b465d144" name="Wizard Of Wor [p]">
+		<year>19??</year>
+		<manufacturer>TCFS</manufacturer>
+	</hash>
+	<hash crc32="51e27d59" name="Wolf Pack">
+		<year>1985</year>
+		<manufacturer>Illusion</manufacturer>
+	</hash>
+	<hash crc32="ecbe359f" name="World Cup [SYS14100]">
+		<year>1984</year>
+		<manufacturer>Artic Computing</manufacturer>
+	</hash>
+	<hash crc32="6b3ba726" name="Wrath Of Kahn, The">
+		<year>1987</year>
+		<manufacturer>Robsoft Programming</manufacturer>
+	</hash>
+	<hash crc32="c253c650" name="Xargon Wars">
+		<year>19??</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="17c8dba5" name="Xargon's Revenge [cr Opi]">
+		<year>1985</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="b64c055d" name="XCellor 8">
+		<year>1986</year>
+		<manufacturer>Gremlin Graphics</manufacturer>
+	</hash>
+	<hash crc32="6c65e40c" name="Xzap">
+		<year>19??</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="e19a28c6" name="Yie Ar Kung Fu">
+		<year>1987</year>
+		<manufacturer>Crazyman Software</manufacturer>
+	</hash>
+	<hash crc32="23b59e02" name="Zombie [p]">
+		<year>1991</year>
+		<manufacturer>Terrorists</manufacturer>
+	</hash>
+	<hash crc32="b4ad864e" name="ZZZ-UNK-african_adventure">
+	</hash>
+	<hash crc32="25a97be0" name="ZZZ-UNK-airwulf">
+	</hash>
+	<hash crc32="7b6663a7" name="ZZZ-UNK-Apollo_Mission">
+	</hash>
+	<hash crc32="e33985a4" name="ZZZ-UNK-astro_dif">
+	</hash>
+	<hash crc32="fc68dc9c" name="ZZZ-UNK-Atomic Mission">
+	</hash>
+	<hash crc32="c25c872a" name="ZZZ-UNK-Auriga">
+	</hash>
+	<hash crc32="c4ab6b57" name="ZZZ-UNK-auto_zone3">
+	</hash>
+	<hash crc32="1c637196" name="ZZZ-UNK-balloon_shoot">
+	</hash>
+	<hash crc32="14943785" name="ZZZ-UNK-baton">
+	</hash>
+	<hash crc32="4b542192" name="ZZZ-UNK-battle_star_g100a">
+	</hash>
+	<hash crc32="1491040d" name="ZZZ-UNK-big_apple">
+	</hash>
+	<hash crc32="5c865972" name="ZZZ-UNK-Bounder">
+	</hash>
+	<hash crc32="0449e963" name="ZZZ-UNK-bugs_bunny">
+	</hash>
+	<hash crc32="0e7badd2" name="ZZZ-UNK-chip_fabrik">
+	</hash>
+	<hash crc32="b2791735" name="ZZZ-UNK-chip_fatory">
+	</hash>
+	<hash crc32="f5ba82e1" name="ZZZ-UNK-circus">
+	</hash>
+	<hash crc32="30bbcad2" name="ZZZ-UNK-Cuthbert_Tombs">
+	</hash>
+	<hash crc32="9defc04e" name="ZZZ-UNK-destructor">
+	</hash>
+	<hash crc32="ba2c5e7a" name="ZZZ-UNK-Enterprise">
+	</hash>
+	<hash crc32="4d50f37d" name="ZZZ-UNK-GRAPHICS">
+	</hash>
+	<hash crc32="d4ec881d" name="ZZZ-UNK-Logictrn">
+	</hash>
+	<hash crc32="5d122ff9" name="ZZZ-UNK-Magic Monkey">
+	</hash>
+	<hash crc32="c193730b" name="ZZZ-UNK-Mr. Puniverse 3">
+	</hash>
+	<hash crc32="6450d87f" name="ZZZ-UNK-Pacmania">
+	</hash>
+	<hash crc32="bd268a8c" name="ZZZ-UNK-Sotet Mancs">
+	</hash>
+	<hash crc32="31290c3e" name="ZZZ-UNK-TRAILBLA">
+	</hash>
+	<hash crc32="976bf7d3" name="ZZZ-UNK-Twindown-loader">
+	</hash>
+	<!-- Commodore C16, C116 &amp; Plus-4 - Magazines - D64 (TOSEC-v0.01) -->
+	<hash crc32="903c44b9" md5="4e64c6321bdf55001650e176da05cb14" name="Divine Page #1 (Hu)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="8ce2b1ad" md5="7fe287a2c7ea296c14e30a63e46893cf" name="Divine Page #2 (Hu)">
+		<year>1992</year>
+		<manufacturer>Gods of the Universe</manufacturer>
+	</hash>
+	<hash crc32="c5c1e7d7" md5="5a8a391fdb38a16ad91032266513cf19" name="MTV Prime #01 (1992-10)(-)">
+	</hash>
+	<hash crc32="aedba469" md5="8ceb52e9a2ba181bdbbfe895783334bd" name="Naked Disc 2 and a half">
+		<year>19??</year>
+		<manufacturer>Dokey Prisoners</manufacturer>
+	</hash>
+	<hash crc32="68b169dd" md5="7bd434e756dba6f2aca0dd4a9b45ac53" name="Newsreel #26 (1995-12)(Wilds)">
+	</hash>
+	<hash crc32="50dcfaba" md5="a72d88c3b1e1384073d7b913986f0f60" name="SCN News #27 (Hu)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="d45c70a0" md5="3a631141f24544ecdf42d4647173b2fa" name="Signals #03 (Side A)">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="82eda589" md5="0230f12073e18665d0f4a45fe560fd3f" name="Signals #03 (Side B)">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="9e45d548" md5="db349b6964a32817a7a9b75995740046" name="Signals #04">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="32706173" md5="ee64c80ca93f83065b1b7bcd36be68fd" name="Signals #05">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="87b458c2" md5="1586ac225ee3e3effd9a64eaf64c0aa4" name="Signals #06">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="262ce4e0" md5="445943c16c366d1d48cf7c1d4d995659" name="Signals #07">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="132f5742" md5="a7588e2df6b91dcdc57897bfd160e5c7" name="Signals #08 (Side A)">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="23dfbb58" md5="5d75d8669f605ba33f70f9a104045d58" name="Signals #08 (Side B)">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="bf882854" md5="c3f31adc4c67ce1c9a51719677ce0cf2" name="Signals #09 (Side A)">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="1aa04938" md5="7b6de4dc21707c328253f040d8176c3f" name="Signals #09 (Side B)">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="1bb3d6de" md5="cdfb769feb0fc1014b4e850fe54aa869" name="Signals #10 (Side A)">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="d93bf0b5" md5="e91e79c2f6e601446c9a64434193c665" name="Signals #10 (Side B)">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="01c2a726" md5="e18735741d31eefc745b481335711913" name="Signals #11 (Side A)">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="4496fed6" md5="4a98129f52c72ea8ce161a4f2e757e7b" name="Signals #11 (Side B)">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="7d68a1a1" md5="f3484f3e4c04117bd86a5c2b165db415" name="Signals #12 (Side A)">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="a7fe5b92" md5="db4ce15e13fabc37ce12a4ea5bffeccc" name="Signals #12 (Side B)">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="22807b26" md5="8fecbf6fe3abe0947424b3dc114ff921" name="Signals #13 (Side A)">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="074ec25a" md5="1de361e833b7dd107d4bca90e3f8323a" name="Signals #13 (Side B)">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="ab8c9546" md5="b305677af7db69dc8a01e0b62fa3088b" name="Signals #14">
+		<year>19??</year>
+		<manufacturer>Synergy</manufacturer>
+	</hash>
+	<hash crc32="fa5f5b1b" md5="793417cdae7af35942c5ed12957bd621" name="Terror news #21 (Hu)">
+		<year>1991</year>
+		<manufacturer>Terrorists</manufacturer>
+	</hash>
+	<hash crc32="8b983ac1" md5="43216510191cceb0b7464a8ce9aa8d0a" name="Terror news #22 (Hu)">
+		<year>1991</year>
+		<manufacturer>Terrorists</manufacturer>
+	</hash>
+	<hash crc32="a994a144" md5="83903e92b345ee57ccdd27369638a516" name="Traffic Jam #04">
+		<year>19??</year>
+		<manufacturer>ACE</manufacturer>
+	</hash>
+	<!-- Commodore C16, C116 &amp; Plus-4 - TAP (TOSEC-v0.10) -->
+	<hash crc32="65e965a8" name="3-D Quasars">
+		<year>1986</year>
+		<manufacturer>Solar Software</manufacturer>
+	</hash>
+	<hash crc32="c5d97cfa" name="3D Glooper">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="eb572d12" name="Aardvark">
+		<year>1986</year>
+		<manufacturer>Bug-Byte Software</manufacturer>
+	</hash>
+	<hash crc32="083687ba" name="Ace 64k [fastload]">
+		<year>1986</year>
+		<manufacturer>Cascade Games</manufacturer>
+	</hash>
+	<hash crc32="e43676ed" name="Airwolf">
+		<year>1985</year>
+		<manufacturer>Elite</manufacturer>
+	</hash>
+	<hash crc32="c7ffd60a" name="Airwolf II">
+		<year>1989</year>
+		<manufacturer>Elite</manufacturer>
+	</hash>
+	<hash crc32="7fe81ba9" name="Apollo Rescue (Side A)">
+		<year>1985</year>
+		<manufacturer>Tynesoft</manufacturer>
+	</hash>
+	<hash crc32="2b0e1bb4" name="Apollo Rescue (Side B)">
+		<year>1985</year>
+		<manufacturer>Tynesoft</manufacturer>
+	</hash>
+	<hash crc32="b85b4697" name="Arthur Noid">
+		<year>1988</year>
+		<manufacturer>Mr Chip</manufacturer>
+	</hash>
+	<hash crc32="c62d6773" name="Auf Wiedersehen Monty">
+		<year>19??</year>
+		<manufacturer>Gremlin</manufacturer>
+	</hash>
+	<hash crc32="708d7b4d" name="Aurega (Side A)">
+		<year>1986</year>
+		<manufacturer>Players</manufacturer>
+	</hash>
+	<hash crc32="71e818d8" name="Aurega (Side B)">
+		<year>1986</year>
+		<manufacturer>Players</manufacturer>
+	</hash>
+	<hash crc32="68e95733" name="Auto Zone (Side A)">
+		<year>1987</year>
+		<manufacturer>Players</manufacturer>
+	</hash>
+	<hash crc32="6cc0a383" name="Auto Zone (Side B)">
+		<year>1987</year>
+		<manufacturer>Players</manufacturer>
+	</hash>
+	<hash crc32="21d6e44b" name="Backgammon">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="f817957a" name="Bandits At Zero">
+		<year>1986</year>
+		<manufacturer>Mr Chip</manufacturer>
+	</hash>
+	<hash crc32="d2682950" name="Bar Shootup">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="75a08127" name="Bic Mac [a]">
+		<year>1985</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="a75d2b10" name="Big Mac">
+		<year>1985</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="af95001b" name="Blagger">
+		<year>1985</year>
+		<manufacturer>Alligata</manufacturer>
+	</hash>
+	<hash crc32="02a8e9fe" name="Blockbusters C16">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="20e256a8" name="Blockbusters plus4">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="c6c8637b" name="Bmx Racers">
+		<year>1985</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="d7dc4d93" name="Bmx Racing">
+		<year>1985</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="059b8279" name="Bmx Simulator">
+		<year>1986</year>
+		<manufacturer>Codemasters</manufacturer>
+	</hash>
+	<hash crc32="734becb0" name="Bongo Constraction">
+		<year>19??</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="64e7ca10" name="Bongo Construction Set C-16">
+		<year>1986</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="7f21acd1" name="Bounce">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="7ebea268" name="Brands Hatch">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="11d13e82" name="Bridgehead Legionaire [t +4]">
+		<year>1986</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="ea1f8216" name="Buggy">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="b0c5293a" name="Care Chase">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="87bf0ccb" name="Cave Fighter (Side A)">
+		<year>1985</year>
+		<manufacturer>Bubble Bus Software</manufacturer>
+	</hash>
+	<hash crc32="914abc50" name="Cityrunner">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="838d2934" name="Coconut Swamp">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="8598b4d0" name="Cops N' Robbers">
+		<year>1988</year>
+		<manufacturer>Atlantis</manufacturer>
+	</hash>
+	<hash crc32="285d8389" name="Crazy Golf">
+		<year>1984</year>
+		<manufacturer>Mr Micro</manufacturer>
+	</hash>
+	<hash crc32="57b2bd5e" name="Crazy Jumpman">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="79ead8d4" name="Danger Zone">
+		<year>1986</year>
+		<manufacturer>Codemasters</manufacturer>
+	</hash>
+	<hash crc32="331f9830" name="Death Ships">
+		<year>1993</year>
+		<manufacturer>Kuni</manufacturer>
+	</hash>
+	<hash crc32="250bb400" name="Demolition">
+		<year>1987</year>
+		<manufacturer>Joerg Dierks</manufacturer>
+	</hash>
+	<hash crc32="af3bc810" name="Dingbat">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="c067c3bf" name="Dirty Den">
+		<year>1986</year>
+		<manufacturer>Probe</manufacturer>
+	</hash>
+	<hash crc32="00b9e4ac" name="Dizzy Dice (Side A)">
+		<year>1987</year>
+		<manufacturer>Players</manufacturer>
+	</hash>
+	<hash crc32="7161770c" name="Dizzy Dice (Side B)">
+		<year>1987</year>
+		<manufacturer>Players</manufacturer>
+	</hash>
+	<hash crc32="580dafa6" name="Dorks Dilemma">
+		<year>19??</year>
+		<manufacturer>Micro Projects</manufacturer>
+	</hash>
+	<hash crc32="4f7da919" name="Double">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="8a47c4fb" name="Draughts">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="4d14f72a" name="Driver">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="d9ece7af" name="Exorcist, The">
+		<year>1984</year>
+		<manufacturer>Mr Micro</manufacturer>
+	</hash>
+	<hash crc32="f6585dd3" name="Exorcist,the">
+		<year>1984</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="93746b13" name="Fingers Malone, The Exploits of">
+		<year>1986</year>
+		<manufacturer>British Soft</manufacturer>
+	</hash>
+	<hash crc32="3596944e" name="Fingers Malone, The Exploits of (Side A)">
+		<year>1986</year>
+		<manufacturer>British Soft</manufacturer>
+	</hash>
+	<hash crc32="aec3cbec" name="Fingers Malone, The Exploits of (Side B)">
+		<year>1986</year>
+		<manufacturer>British Soft</manufacturer>
+	</hash>
+	<hash crc32="65aff136" name="Fire Ant">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="c554a84f" name="Fireant">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="f6db80c9" name="Flight Sim">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="49c02517" name="Footballer of The Year [t +4]">
+		<year>1986</year>
+		<manufacturer>Gremlin</manufacturer>
+	</hash>
+	<hash crc32="cc6b7e04" name="Footy C16">
+		<year>19??</year>
+		<manufacturer>Side A</manufacturer>
+	</hash>
+	<hash crc32="a7fe5c93" name="Footy C16">
+		<year>19??</year>
+		<manufacturer>Side B</manufacturer>
+	</hash>
+	<hash crc32="1da5edff" name="Formula 1">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="bff3ebc0" name="Formula1 Simulator (Side A)">
+		<year>19??</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="d91bbec2" name="Formula1 Simulator (Side B)">
+		<year>19??</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="4120a247" name="Foty C16 Professional Football">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="b2b5fa6f" name="Frenesis">
+		<year>1987</year>
+		<manufacturer>Ttony Takoushi</manufacturer>
+	</hash>
+	<hash crc32="f77008e5" name="Frogs C16">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="d9cc2fcf" name="Fury">
+		<year>1986</year>
+		<manufacturer>Firebird</manufacturer>
+	</hash>
+	<hash crc32="57dbd0a4" name="Future Knight">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="9f0db333" name="G Man">
+		<year>1986</year>
+		<manufacturer>Codemasters</manufacturer>
+	</hash>
+	<hash crc32="f9d5e849" name="Galaxy">
+		<year>1984</year>
+		<manufacturer>Anirog</manufacturer>
+	</hash>
+	<hash crc32="3b301caf" name="Game of 7 Card Game">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="a19aa5b7" name="Ghost Town">
+		<year>1985</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="8eba55e4" name="Goldrush">
+		<year>19??</year>
+		<manufacturer>Firebird</manufacturer>
+	</hash>
+	<hash crc32="29ccac9d" name="Grand Master">
+		<year>1982</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="09610a60" name="Green Beret (Side A)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="ddaca7e9" name="Green Beret (Side B)">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="4764b2a2" name="Gullwing Falcon">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="b6b54ed0" name="Gunlaw">
+		<year>1987</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="4cc53fe8" name="Guzzler (Side A)">
+		<year>1986</year>
+		<manufacturer>Players</manufacturer>
+	</hash>
+	<hash crc32="917d1052" name="Guzzler (Side B)">
+		<year>1986</year>
+		<manufacturer>Players</manufacturer>
+	</hash>
+	<hash crc32="335090c9" name="Gwnn">
+		<year>1987</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="afa5e501" name="Hamtpon Curt">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="5b3c2544" name="Harbour Attack">
+		<year>1984</year>
+		<manufacturer>Mr Micro</manufacturer>
+	</hash>
+	<hash crc32="2ea63315" name="Head Basher">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="4951f1f0" name="Helmut">
+		<year>1986</year>
+		<manufacturer>Mr X</manufacturer>
+	</hash>
+	<hash crc32="01616977" name="Higher Lower">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="116763fd" name="Hustler">
+		<year>1985</year>
+		<manufacturer>Bubble Bus Software</manufacturer>
+	</hash>
+	<hash crc32="fd6041e9" name="Icicle Works">
+		<year>1985</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="cc0b0575" name="Invaders">
+		<year>1984</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="396d3693" name="Jackpot.">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="d92907ec" name="Jetbrix">
+		<year>1986</year>
+		<manufacturer>Mr Chip</manufacturer>
+	</hash>
+	<hash crc32="2e946524" name="Jumpshower">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="54347cb2" name="Kickstart (Side A)">
+		<year>19??</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="53ddf3ba" name="Kickstart (Side B)">
+		<year>19??</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="e87b7e73" name="Kikstart">
+		<year>1986</year>
+		<manufacturer>Mr Chip</manufacturer>
+	</hash>
+	<hash crc32="780843f4" name="Kikstart - Off-road Simulator">
+		<year>1986</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="a8d4731e" name="Knockout">
+		<year>19??</year>
+		<manufacturer>Solar Soft</manufacturer>
+	</hash>
+	<hash crc32="15c694c7" name="Kung Fu Kid (Side A)">
+		<year>1985</year>
+		<manufacturer>Gremlin</manufacturer>
+	</hash>
+	<hash crc32="2d1f5afd" name="Kung Fu Kid (Side B)">
+		<year>1985</year>
+		<manufacturer>Gremlin</manufacturer>
+	</hash>
+	<hash crc32="6ee46e7c" name="Las Vegas">
+		<year>1984</year>
+		<manufacturer>Anirog</manufacturer>
+	</hash>
+	<hash crc32="e2ef2000" name="Lazerzone">
+		<year>1986</year>
+		<manufacturer>Llamasoft</manufacturer>
+	</hash>
+	<hash crc32="f890960c" name="League Challenge Division 1">
+		<year>1986</year>
+		<manufacturer>Nigel Edwards</manufacturer>
+	</hash>
+	<hash crc32="15c66436" name="League Challenge Division 2">
+		<year>1986</year>
+		<manufacturer>Nigel Edwards</manufacturer>
+	</hash>
+	<hash crc32="d0fb56e0" name="League Challenge Division 3">
+		<year>1986</year>
+		<manufacturer>Nigel Edwards</manufacturer>
+	</hash>
+	<hash crc32="7fb8cc74" name="League Challenge Division 4">
+		<year>1986</year>
+		<manufacturer>Nigel Edwards</manufacturer>
+	</hash>
+	<hash crc32="874bf25f" name="Legionnaire">
+		<year>1986</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="440e0702" name="Liberator">
+		<year>1986</year>
+		<manufacturer>Magnificent Seven Software</manufacturer>
+	</hash>
+	<hash crc32="6590ea8d" name="Manic Death Chase (Side A)">
+		<year>1985</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="3385def0" name="Manic Death Chase (Side B)">
+		<year>1985</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="4db51eef" name="Mastermind">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="3be2e932" name="Matrix">
+		<year>1986</year>
+		<manufacturer>Llamasoft</manufacturer>
+	</hash>
+	<hash crc32="83df4ab5" name="Mayhem">
+		<year>1984</year>
+		<manufacturer>Mr Micro</manufacturer>
+	</hash>
+	<hash crc32="b37f7ac2" name="Mayhem [a]">
+		<year>1984</year>
+		<manufacturer>Mr Micro</manufacturer>
+	</hash>
+	<hash crc32="c8364cc8" name="Megabolt">
+		<year>1986</year>
+		<manufacturer>Mr Chip</manufacturer>
+	</hash>
+	<hash crc32="0e1f80ff" name="Megabolts">
+		<year>19??</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="d44acffd" name="Mercenary 2">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="6619f466" name="Mercenary 2 [a]">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="a05d9f1e" name="Mercenary, Escape From Targ">
+		<year>1986</year>
+		<manufacturer>Novagen</manufacturer>
+	</hash>
+	<hash crc32="82f505cf" name="Molecule Man">
+		<year>1987</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="08c18cf2" name="Monkey Magic">
+		<year>1985</year>
+		<manufacturer>Solarsoft</manufacturer>
+	</hash>
+	<hash crc32="fb3b6fe3" name="Monty On The Run">
+		<year>19??</year>
+		<manufacturer>Gremlin</manufacturer>
+	</hash>
+	<hash crc32="3d74f8f5" name="Moon Buggy">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="8b233b2e" name="Mr Puniverse">
+		<year>1985</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="7753c676" name="Mr Puniverse [a2]">
+		<year>1985</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="394daf4b" name="Mr Puniverse [a]">
+		<year>1985</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="1bcd6733" name="Myraid">
+		<year>19??</year>
+		<manufacturer>Marcel Wargowski</manufacturer>
+	</hash>
+	<hash crc32="5e0dc17d" name="Nailboard">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="b2c3fd21" name="Number Builder">
+		<year>1985</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="10439e15" name="Number Chaser">
+		<year>1985</year>
+		<manufacturer>Commodore</manufacturer>
+	</hash>
+	<hash crc32="cd7c7b73" name="Numbers">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="204215b5" name="Oblido">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="b8c09abd" name="One Man and his Droid">
+		<year>1986</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="8490f425" name="One Man and his Droid (Side A)">
+		<year>19??</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="12eaea65" name="One Man and his Droid (Side B)">
+		<year>19??</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="12fceb04" name="Othello">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="3f40f643" name="Pac Maina">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="a779ed77" name="Paintbox">
+		<year>19??</year>
+		<manufacturer>Kingsoft</manufacturer>
+	</hash>
+	<hash crc32="04a68e3c" name="Panic Penguin">
+		<year>1984</year>
+		<manufacturer>Colosoft</manufacturer>
+	</hash>
+	<hash crc32="77e12ba8" name="Paratrooper">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="b5caec06" name="Petals of Doom">
+		<year>19??</year>
+		<manufacturer>Micro Projects</manufacturer>
+	</hash>
+	<hash crc32="24b3f4ee" name="Petch Seite">
+		<year>1985</year>
+		<manufacturer>Anirog</manufacturer>
+	</hash>
+	<hash crc32="b9858603" name="Phantom (Side A)">
+		<year>1987</year>
+		<manufacturer>Thynesoft</manufacturer>
+	</hash>
+	<hash crc32="ece3ea6d" name="Phantom (Side B)">
+		<year>1987</year>
+		<manufacturer>Thynesoft</manufacturer>
+	</hash>
+	<hash crc32="4b1a33b5" name="Pharaohs Tomb">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="c78adcf7" name="Pod">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="78ff0c44" name="Power Ball">
+		<year>19??</year>
+		<manufacturer>P Strassen</manufacturer>
+	</hash>
+	<hash crc32="836d0c03" name="Powerball">
+		<year>19??</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="23a22bda" name="Prospector Pete">
+		<year>1986</year>
+		<manufacturer>British Soft</manufacturer>
+	</hash>
+	<hash crc32="0dad512f" name="Pyramide">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="e9cdf3d4" name="Quick Draw">
+		<year>1985</year>
+		<manufacturer>JP Shaw</manufacturer>
+	</hash>
+	<hash crc32="8d185cf3" name="Range Ball">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="94ee2d94" name="Reach For The Sky">
+		<year>1986</year>
+		<manufacturer>Gremlin</manufacturer>
+	</hash>
+	<hash crc32="27ac5d29" name="Rescue From Zylon">
+		<year>1985</year>
+		<manufacturer>Mark J. Moore</manufacturer>
+	</hash>
+	<hash crc32="1618d01e" name="Return of Rockman">
+		<year>1986</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="848d6aa7" name="Robo Knight">
+		<year>1986</year>
+		<manufacturer>US Gold</manufacturer>
+	</hash>
+	<hash crc32="38df09e4" name="Rockman">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="3c619a9e" name="Rockman [a]">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="7d914458" name="Roller Kong">
+		<year>19??</year>
+		<manufacturer>Melbourne</manufacturer>
+	</hash>
+	<hash crc32="62c63c36" name="Runner">
+		<year>1985</year>
+		<manufacturer>K A Moughtin</manufacturer>
+	</hash>
+	<hash crc32="13cbd485" name="Runner">
+		<year>19??</year>
+		<manufacturer>Firebird</manufacturer>
+	</hash>
+	<hash crc32="1b1104f2" name="S-o-s Sea Rescue">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="3b49df68" name="S.a.m">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="471401af" name="Saboteur">
+		<year>1987</year>
+		<manufacturer>Alternative</manufacturer>
+	</hash>
+	<hash crc32="867a890d" name="Saboteur [a]">
+		<year>1987</year>
+		<manufacturer>Alternative</manufacturer>
+	</hash>
+	<hash crc32="44500b4a" name="Savage Island (Side A)">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="88a2eb6c" name="Sea Strike">
+		<year>1985</year>
+		<manufacturer>Razorsoft</manufacturer>
+	</hash>
+	<hash crc32="bd14ba6e" name="Shark Attack">
+		<year>1986</year>
+		<manufacturer>Mr Micro</manufacturer>
+	</hash>
+	<hash crc32="7dd83af8" name="Smash">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="6d24109c" name="Snakey">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="afd39e14" name="Solitaire">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="ee0a836b" name="Space Mission">
+		<year>1986</year>
+		<manufacturer>Firebird</manufacturer>
+	</hash>
+	<hash crc32="0902fb74" name="Space Sweep">
+		<year>1984</year>
+		<manufacturer>Mr Micro</manufacturer>
+	</hash>
+	<hash crc32="fc21c2ad" name="Space Sweep [a]">
+		<year>1984</year>
+		<manufacturer>Mr Micro</manufacturer>
+	</hash>
+	<hash crc32="f7b8085a" name="Spacemaze">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="ac7170db" name="Spaceship">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="a9736669" name="Speed King">
+		<year>1986</year>
+		<manufacturer>Mr Chip</manufacturer>
+	</hash>
+	<hash crc32="4f258146" name="Spiky Harold">
+		<year>1986</year>
+		<manufacturer>Firebird</manufacturer>
+	</hash>
+	<hash crc32="e9dd5e04" name="Spore">
+		<year>1987</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="23ac9b03" name="Spy Vs Spy">
+		<year>19??</year>
+		<manufacturer>Tynesoft</manufacturer>
+	</hash>
+	<hash crc32="882984aa" name="Squirm">
+		<year>1985</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="050a3565" name="Squirm">
+		<year>1985</year>
+		<manufacturer>Mr Chip</manufacturer>
+	</hash>
+	<hash crc32="6c95a90f" name="Stack 16">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="d96ec882" name="Star Trader">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="c2f15e53" name="Steve Davis Snooker [Black Table]">
+		<year>19??</year>
+		<manufacturer>CDS</manufacturer>
+	</hash>
+	<hash crc32="74372965" name="Steve Davis Snooker [Green Table]">
+		<year>19??</year>
+		<manufacturer>CDS</manufacturer>
+	</hash>
+	<hash crc32="0d668355" name="Storm">
+		<year>1986</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="aa5511e7" name="Storm [a]">
+		<year>1986</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="61f7491a" name="Street Olympics">
+		<year>1986</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="9268dd92" name="Street Olypmics [a]">
+		<year>1986</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="9188fc5f" name="Strip Poker">
+		<year>1986</year>
+		<manufacturer>Artworx</manufacturer>
+	</hash>
+	<hash crc32="4789a5ec" name="Suicide Run">
+		<year>1985</year>
+		<manufacturer>J.P. Shay</manufacturer>
+	</hash>
+	<hash crc32="1a0ad166" name="Super Ball">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="9e7d30d1" name="Super Maze">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="2031ef3d" name="Superfrog">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="9ca7ad6c" name="Survivors, The">
+		<year>19??</year>
+		<manufacturer>Atlantis</manufacturer>
+	</hash>
+	<hash crc32="75c68ab9" name="Sword of Destiny">
+		<year>1985</year>
+		<manufacturer>Gremlin</manufacturer>
+	</hash>
+	<hash crc32="d0d2c674" name="Tennis">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="d6e9e35d" name="Terra Cognita">
+		<year>1986</year>
+		<manufacturer>Code Masters</manufacturer>
+	</hash>
+	<hash crc32="7c7dfbe8" name="Terra Cognita [a]">
+		<year>1986</year>
+		<manufacturer>Codemasters</manufacturer>
+	</hash>
+	<hash crc32="2f57bfd4" name="Thai Boxing (Side A)">
+		<year>19??</year>
+		<manufacturer>Anco</manufacturer>
+	</hash>
+	<hash crc32="ac6daf20" name="Thai Boxing (Side B)">
+		<year>19??</year>
+		<manufacturer>Anco</manufacturer>
+	</hash>
+	<hash crc32="01135aa5" name="Tic Tac Toe">
+		<year>19??</year>
+		<manufacturer>Mr X</manufacturer>
+	</hash>
+	<hash crc32="925772fb" name="Timeslip">
+		<year>19??</year>
+		<manufacturer>English Software</manufacturer>
+	</hash>
+	<hash crc32="cc24a27a" name="Tom Thumb">
+		<year>1986</year>
+		<manufacturer>Anirog</manufacturer>
+	</hash>
+	<hash crc32="9dd4e224" name="Tomcat">
+		<year>1989</year>
+		<manufacturer>Players</manufacturer>
+	</hash>
+	<hash crc32="2fb6f604" name="Topper">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="a05b85cf" name="Trailblazer">
+		<year>1986</year>
+		<manufacturer>Gremlin</manufacturer>
+	</hash>
+	<hash crc32="cd779ec2" name="Treasure Hunter">
+		<year>1986</year>
+		<manufacturer>Solar Software</manufacturer>
+	</hash>
+	<hash crc32="fa96fee1" name="Treasure Island">
+		<year>1985</year>
+		<manufacturer>Mr Micro</manufacturer>
+	</hash>
+	<hash crc32="575cc2e6" name="Tube Runner">
+		<year>19??</year>
+		<manufacturer>Gremlin</manufacturer>
+	</hash>
+	<hash crc32="774e1dbe" name="Tutti Frutti">
+		<year>1985</year>
+		<manufacturer>Mr Chip</manufacturer>
+	</hash>
+	<hash crc32="e149e199" name="Twin Kingdom Valley">
+		<year>1985</year>
+		<manufacturer>Bug-Byte</manufacturer>
+	</hash>
+	<hash crc32="3a6fa7b2" name="Tycon Tex Classic">
+		<year>1985</year>
+		<manufacturer>Gremlin</manufacturer>
+	</hash>
+	<hash crc32="f82dff6e" name="Tycoon Tex">
+		<year>1985</year>
+		<manufacturer>Gremlin</manufacturer>
+	</hash>
+	<hash crc32="3ab69cbc" name="Vegas Jackpot">
+		<year>1984</year>
+		<manufacturer>Mr Chip</manufacturer>
+	</hash>
+	<hash crc32="d769113b" name="Video Meanies">
+		<year>1986</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="43a5805c" name="Video Poker (Side A)">
+		<year>19??</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="fc4c1541" name="Video Poker (Side B)">
+		<year>19??</year>
+		<manufacturer>Mastertronic</manufacturer>
+	</hash>
+	<hash crc32="326786a9" name="Way of The Exploading Fist">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="c559d9c6" name="Xargon Wars">
+		<year>19??</year>
+		<manufacturer>Gremlin</manufacturer>
+	</hash>
+	<hash crc32="b6178942" name="Xargon Wars [a]">
+		<year>19??</year>
+		<manufacturer>Gremlin</manufacturer>
+	</hash>
+	<hash crc32="459db3e1" name="Xargons Revenge">
+		<year>1985</year>
+		<manufacturer>Micro Projects</manufacturer>
+	</hash>
+	<hash crc32="7e6e3243" name="Xcellor 8">
+		<year>1986</year>
+		<manufacturer>Gremlin</manufacturer>
+	</hash>
+	<hash crc32="f0defa57" name="Zagon Warrior">
+		<year>19??</year>
+		<manufacturer>Bug-Byte Software</manufacturer>
+	</hash>
+	<hash crc32="1b5d61c0" name="Zodiac">
+		<year>1985</year>
+		<manufacturer>Anirog</manufacturer>
+	</hash>
+	<!-- Commodore C16, C116 &amp; Plus-4 - Utilities - D64 (TOSEC-v0.01) -->
+	<hash crc32="b8bf679b" md5="fdfca37df38aff4475a41201ed8a95b9" name="3D Construction Kit">
+		<year>19??</year>
+		<manufacturer>Csory</manufacturer>
+	</hash>
+	<hash crc32="c7875f4f" md5="0aba25fd7c42db970c5dcfbb146b5db1" name="Adventure Building System">
+		<year>1993</year>
+		<manufacturer>Chain</manufacturer>
+	</hash>
+	<hash crc32="688386fe" md5="e01b96459d795f3214ca40af54a54b50" name="Best Writer, The">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="34f812a3" md5="b3243aaa8b5a5969b3119387840f9fe8" name="GEOS v3.52">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="09df743e" md5="d12f26b9ccaa40ebcb3a915cbca28c59" name="Mega Assembler v5.2">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="a8429825" md5="911af6a8f931bdd7b31b15537a4e3cdf" name="Mega Assembler v5.3">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="325de856" md5="3d050150e98d1e0889872b9e788768fb" name="Mega Assembler v5.4">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="8e1df17b" md5="dd56f9c2b5b096c17e7f7c03a154d643" name="Music Converters">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="8b06c058" md5="65852c374cc28af12355277a37d572dc" name="SIDwinder v0.123">
+		<year>2000</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+	<hash crc32="5dfc471b" md5="05f6d02f35b2310913284980b60e58ae" name="SVS Macroassembler v46d">
+		<year>19??</year>
+		<manufacturer>V.Zenari</manufacturer>
+	</hash>
+	<hash crc32="827311c7" md5="778d9857e6409828288f9f773741b101" name="SVS Macroassembler v46e-pc">
+		<year>19??</year>
+		<manufacturer>V.Zenari</manufacturer>
+	</hash>
+	<hash crc32="2c69af8c" md5="16f8ffb9edf5118979d5ef9c1b1fdcdd" name="SVS-OS v3.2">
+		<year>19??</year>
+		<manufacturer>unknown</manufacturer>
+	</hash>
+</hashfile>
+

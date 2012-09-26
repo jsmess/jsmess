@@ -1,0 +1,172 @@
+<hashfile>
+	<hash crc32="e6ef1ee1" name="Elektor TV-Spielcomputer">
+		<year>79</year>
+	</hash>
+	<hash crc32="2C770DC3" name="Autorennen">
+		<year>01</year>
+	</hash>
+	<hash crc32="EC2A91B3" name="Blackjack">
+		<year>02</year>
+	</hash>
+	<hash crc32="682B876A" name="Ballspiele">
+		<year>03</year>
+	</hash>
+	<hash crc32="468E4779" name="Panzerschlacht-Luftkampf">
+		<year>04</year>
+	</hash>
+	<hash crc32="4D37502D" name="Mathematik I">
+		<year>05</year>
+	</hash>
+	<hash crc32="66C5975E" name="Mathematik II">
+		<year>06</year>
+	</hash>
+	<hash crc32="F3D37699" name="Luftkampf-Seegefecht">
+		<year>07</year>
+	</hash>
+	<hash crc32="EA8F717F" name="Memory">
+		<year>08</year>
+	</hash>
+	<hash crc32="7B2B2B61" name="Labyrinth">
+		<year>09</year>
+	</hash>
+	<hash crc32="BDD652B7" name="Wintersport">
+		<year>10</year>
+	</hash>
+	<hash crc32="AAEA290F" name="Hippodrom">
+		<year>11</year>
+	</hash>
+	<hash crc32="31978AD4" name="Jagd">
+		<year>12</year>
+	</hash>
+	<hash crc32="E9C53288" name="Schach">
+		<year>13</year>
+	</hash>
+	<hash crc32="55011F0A" name="Motocross">
+		<year>14</year>
+	</hash>
+	<hash crc32="A0F5320A" name="Vier in einer Reihe-Intelligenz II">
+		<year>15</year>
+	</hash>
+	<hash crc32="52B8C6E7" name="Superhirn-Intelligenz III">
+		<year>16</year>
+	</hash>
+	<hash crc32="0AB80F3E" name="Circus">
+		<year>17</year>
+	</hash>
+	<hash crc32="922C9F0D" name="Boxkampf">
+		<year>18</year>
+	</hash>
+	<hash crc32="B1C31F9A" name="Krieg im Weltraum">
+		<year>19</year>
+	</hash>
+	<hash crc32="D68DA80A" name="Melodie Simon">
+		<year>20</year>
+	</hash>
+	<hash crc32="619C07C9" name="Attacke-Intelligenz IV">
+		<year>21</year>
+	</hash>
+	<hash crc32="1B948AEB" name="Schach II">
+		<year>22</year>
+	</hash>
+	<hash crc32="ADD99C6E" name="Flipper">
+		<year>23</year>
+	</hash>
+	<hash crc32="05AF8228" name="Fussball">
+		<year>24</year>
+	</hash>
+	<hash crc32="A47FE1BF" name="Kegeln-Bowling">
+		<year>25</year>
+	</hash>
+	<hash crc32="7B868473" name="Dame">
+		<year>26</year>
+	</hash>
+	<hash crc32="D399CE07" name="Golf">
+		<year>27</year>
+	</hash>
+	<hash crc32="11DD7F0D" name="Cockpit">
+		<year>28</year>
+	</hash>
+	<hash crc32="A640A330" name="Metropol-Intelligenz V">
+		<year>29</year>
+	</hash>
+	<hash crc32="08209D98" name="Solitaer-Intelligenz VI">
+		<year>30</year>
+	</hash>
+	<hash crc32="50FD6A18" name="Casino">
+		<year>31</year>
+	</hash>
+	<hash crc32="9497204A" name="Invasion aus dem Weltraum">
+		<year>32</year>
+	</hash>
+	<hash crc32="A46C2F9E" name="Super Invaders">
+		<year>33</year>
+	</hash>
+	<hash crc32="08CD8135" name="Backgammon">
+		<year>36</year>
+	</hash>
+	<hash crc32="27CCE96F" name="Monster-Man">
+		<year>37</year>
+	</hash>
+	<hash crc32="B3ED1129" name="Hyper Space">
+		<year>38</year>
+	</hash>
+	<hash crc32="306E37BB" name="Super Space">
+		<year>40</year>
+	</hash>
+	<!-- fountain 1392 -->
+	<!-- radofin -->
+	<!-- hanimex -->
+	<!-- acetronic -->
+	<!-- prinztronic -->
+	<hash crc32="5c7f11e0" name="Grand Prix">
+		<year>2</year>
+	</hash>
+	<hash crc32="5e8ee224" name="Tank/Plane Battle">
+		<year>4</year>
+	</hash>
+	<hash crc32="cb28b9fe" name="Air Sea Battle">
+		<year>5</year>
+	</hash>
+	<hash crc32="9c8e7de6" name="Shooting Gallery">
+		<year>6</year>
+	</hash>
+	<!-- 7   Math -->
+	<!-- 8   Math 2 -->
+	<!-- 9   Challenge -->
+	<!-- 10? Auto Sport -->
+	<!-- 10? Codebreaker -->
+	<!-- 11  Supermaze -->
+	<hash crc32="3da31bc5" name="Horse Racing">
+		<year>12</year>
+	</hash>
+	<!-- 14  Prizefight -->
+	<hash crc32="87977f92" name="Soccer">
+		<year>15</year>
+	</hash>
+	<!-- 16  Hobby Module (never released?) -->
+	<!-- 17  Musical Games -->
+	<!-- 18  Treasure Hunt -->
+	<!-- 19  Golf -->
+	<!-- 20  HeadOn -->
+	<!-- 21  Draughts -->
+	<!-- 22  Spiders Web -->
+	<!-- 23  Chess -->
+	<!-- 24  Othello -->
+	<hash crc32="c6b2cd9a" name="Electronic Pinball">
+		<year>25</year>
+	</hash>
+	<!-- 26  Super Knockout -->
+	<hash crc32="6ae47072" name="Invaders    (Pack-in Game)">
+		<year>27</year>
+	</hash>
+	<!-- 28  ? -->
+	<hash crc32="b589f093" name="Shootout">
+		<year>29</year>
+	</hash>
+	<!-- 31  Lazer Attack -->
+	<!-- 32  Backgammon -->
+	<!-- 33  Planet Defender -->
+	<!-- 34  Sea Wolf (never released?) -->
+	<!-- direct dump of the chips on vc4000 cartridges -->
+	<!-- (the first/above 13 were dumped with a complex S2650 cpu replacement) -->
+</hashfile>

@@ -1,0 +1,8 @@
+<tests>
+
+<test name="kccomp_000" driver="kccomp">
+	<wait time="5"/>
+	<checkblank/>
+</test>
+
+</tests>

@@ -1,8 +1,0 @@
-<tests>
-
-<test name="mc10_000" driver="mc10">
-	<wait time="2"/>
-	<memverify region="ram" start="0">"MICROCOLOR"</memverify>
-</test>
-
-</tests>

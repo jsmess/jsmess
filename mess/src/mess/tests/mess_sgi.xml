@@ -1,0 +1,13 @@
+<tests>
+
+<test name="ip204415_000" driver="ip204415">
+	<wait time="1"/>
+	<checkblank/>
+</test>
+
+<test name="ip225015_000" driver="ip225015">
+	<wait time="1"/>
+	<checkblank/>
+</test>
+
+</tests>

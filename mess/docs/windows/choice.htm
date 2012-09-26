@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="generator" content="HTML Tidy for Cygwin (vers 1st September 2004), see www.w3.org" />
+<title>MESS Guide</title>
+<meta http-equiv="Content-Type" content="text/html; charset=us-ascii" />
+<link href="../style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2><font size="6">Choosing which MESS</font></h2>
+<p class="normal">MESS for Windows comes in two flavors; a command line MESS and a MESS GUI.</p>
+<hr />
+
+<h2>Original Command Line MESS</h2>
+
+<p class="normal">Firstly for all you newbies, a command line program requires you to type in a command using the keyboard to make a program start.
+There is no mouse, little help and no lovely buttons to show you what you're doing. So beware this is not for the PC illiterate.</p>
+
+<p class="normal">However, if you want to give it a try, you can start MESS by simply typing <span class="command">mess system [devices]
+ [options]</span>, where</p>
+<table width="58%" border="1" align="center">
+<tr>
+<td width="15%" class="tablehead">system</td>
+<td width="85%" class="normal">is the system you want to emulate in MESS.</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">devices</td>
+<td width="85%" class="normal">is the optional list of devices supported by 'system' that you want to fill with an image (e.g. carts for a console or 
+floppies for an home computer) and the name of the image you want to load in each device. To know which devices are supported, you can launch <span 
+class="command">mess system -listmedia</span>. Notice that some systems require images in a device to start (e.g. tipically cartridges in a console)</td>
+</tr>
+<tr>
+<td width="15%" class="tablehead">options</td>
+<td width="85%" class="normal">is a list of additional MESS options (e.g. to run MESS in a window, to change the font of the internal UI, or to add .png 
+filters to the image). To know which devices are supported, you can simply launch <span class="command">mess -showusage</span>.</td>
+</tr>
+</table>
+
+<p class="normal">Here is an example of how to run a command line MESS:</p>
+
+<p align="center"><img src="images/command.gif" width="461" height="163" border="1" /></p>
+
+<p class="normal">This will run the Atari 2600 cartridge of Frogger using a 3D card like this:</p>
+
+<p align="center" class="Tutorial"><img src="images/frog.gif" width="293" height="282" /></p>
+
+<p class="normal">Notice that in this example: system is 'a2600', devices is '-cart frogger.a26' (here this is mandatory: a2600 would not run without 
+a cart inserted) and options is '-d3d'</p>
+
+<p class="normal">For a complete introduction to command line MESS, please refer to the <a href="win32cmd.htm" target="_blank">MESS W32 Commands</a> page.
+<p class="normal">&nbsp;</p>
+
+<hr />
+
+<h2>MESS GUI</h2>
+
+<p class="normal">The easiest version of MESS is MESS GUI (Graphical User Interface) which has a user friendly point and click interface . This
+version is more suited for the beginner as you can see everything that you are doing.</p>
+
+<p align="center"><img src="images/gui.gif" width="593" height="432" /></p>
+
+<p>&nbsp;</p>
+
+<p class="normal">It has all of the features of MESS and runs just as fast. The best part is that you have a nice list of all the systems and games
+you have, you can have preview pictures of your games and to run then you simply need to double click them.</p>
+</body>
+</html>

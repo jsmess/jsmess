@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="nixie" defstate="10">
+		<image file="0.png" state="0"/>
+		<image file="1.png" state="1"/>
+		<image file="2.png" state="2"/>
+		<image file="3.png" state="3"/>
+		<image file="4.png" state="4"/>
+		<image file="5.png" state="5"/>
+		<image file="6.png" state="6"/>
+		<image file="7.png" state="7"/>
+		<image file="8.png" state="8"/>
+		<image file="9.png" state="9"/>
+		<image file="empty.png" state="10"/>
+	</element>
+	<element name="neon" defstate="0">
+		<image file="off.png" state="0"/>
+		<image file="on.png" state="1"/>
+	</element>
+	<element name="background">
+		<rect>
+			<bounds left="0" top="0" right="1" bottom="1" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+	<view name="Clock">
+		<bezel element="background">
+			<bounds left="0" top="0" right="580" bottom="150" />
+		</bezel>
+		<bezel name="nixie0" element="nixie">
+			<bounds left="0" top="0" right="90" bottom="150" />
+		</bezel>
+		<bezel name="nixie1" element="nixie">
+			<bounds left="90" top="0" right="180" bottom="150" />
+		</bezel>
+
+		<bezel name="neon0" element="neon">
+			<bounds left="182" top="80" right="198" bottom="94" />
+		</bezel>
+		<bezel name="neon1" element="neon">
+			<bounds left="182" top="40" right="198" bottom="54" />
+		</bezel>
+
+		<bezel name="nixie2" element="nixie">
+			<bounds left="200" top="0" right="290" bottom="150" />
+		</bezel>
+		<bezel name="nixie3" element="nixie">
+			<bounds left="290" top="0" right="380" bottom="150" />
+		</bezel>
+
+		<bezel name="neon2" element="neon">
+			<bounds left="382" top="40" right="398" bottom="54" />
+		</bezel>
+		<bezel name="neon3" element="neon">
+			<bounds left="382" top="80" right="398" bottom="94" />
+		</bezel>
+
+		<bezel name="nixie4" element="nixie">
+			<bounds left="400" top="0" right="490" bottom="150" />
+		</bezel>
+		<bezel name="nixie5" element="nixie">
+			<bounds left="490" top="0" right="580" bottom="150" />
+		</bezel>
+	</view>
+</mamelayout>

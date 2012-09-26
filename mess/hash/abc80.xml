@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="abc80" description="Luxor ABC 80 disk images">
+	<software name="demo">
+		<description>Demo</description>
+		<year>19??</year>
+		<publisher>Luxor</publisher>
+		<part name="flop" interface="abc830">
+			<dataarea name="flop" size="82895">
+				<rom name="demo.td0" size="82895" crc="f581ce62" sha1="2e79e7371d767cb689d1e490f8e1c869dc390a03" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="system10">
+		<description>System disk v1.0</description>
+		<year>19??</year>
+		<publisher>Luxor</publisher>
+		<part name="flop" interface="abc830">
+			<dataarea name="flop" size="47013">
+				<rom name="system10.td0" size="47013" crc="be80a5ca" sha1="64bea62668e9b2604732810c0704f52f6c8c3f99" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

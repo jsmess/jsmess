@@ -1,0 +1,133 @@
+<hashfile>
+	<!-- This MESS HASH file was auto-generated from Cowering's GoodGCOM database (V3.14)  -->
+	<!-- for the exclusive use of MESS.  Keep this notice intact if editing this file  -->
+
+	<hash crc32="b336e530" sha1="066d5cddce9729044ad598ad3cc3489a834f5197" name="Batman and Robin">
+		<year>1997</year>
+		<manufacturer>Product # 71-709</manufacturer>
+	</hash>
+	<hash crc32="1a041ff0" sha1="b3d50e0cca6e2a539fba5883854aaf26424ab382" name="Centipede">
+		<year>1999</year>
+		<manufacturer>Product # 71-755</manufacturer>
+	</hash>
+	<hash crc32="884568d1" sha1="9aaa1cf3b12f14201079dfbdd4c17fe868972de6" name="Duke Nukem 3D">
+		<year>1997</year>
+		<manufacturer>Product # 71-712</manufacturer>
+	</hash>
+	<hash crc32="0142a7a2" sha1="f0ce0c92079baaa8e1fc757593ebd1a27949d1cc" name="Fighters MegaMix">
+		<status>Known Bad Image</status>
+		<year>1998</year>
+		<manufacturer>Product # 71-739</manufacturer>
+	</hash>
+	<hash crc32="061e943f" sha1="c165e5f4b61341ae0e8a4d141b28e18108942326" name="Fighters MegaMix">
+		<year>1998</year>
+		<manufacturer>Product # 71-739</manufacturer>
+	</hash>
+	<hash crc32="10e4c5cd" sha1="8224d3e71a3da2f4029bee8b62b4a0c108c054e4" name="Frogger">
+		<year>1999</year>
+		<manufacturer>Product # 71-756</manufacturer>
+	</hash>
+	<hash crc32="e235a589" sha1="97f782e72d738f4d7b861363266bf46b438d9b50" name="Game.com External BIOS">
+		<status>GoodGCOM Verified Image</status>
+		<year>1997</year>
+		<manufacturer>Product # 71-516</manufacturer>
+	</hash>
+	<hash crc32="c1031233" sha1="7a0165c4fb2ab0b8ba0e5c810f8f6f672a45bcf3" name="Game.com External BIOS">
+		<year>1997</year>
+		<manufacturer>Product # 71-516</manufacturer>
+	</hash>
+	<hash crc32="a0cec361" sha1="03368237e8fed4a8724f3b4a1596cf4b17c96d33" name="Game.com Internal BIOS">
+		<year>1997</year>
+		<manufacturer>Product # 71-516</manufacturer>
+	</hash>
+	<hash crc32="7e721a84" sha1="4c6b5b91a70397cb5e1add4ab53afe3ec0fe2072" name="Game.com Internet">
+		<year>1997</year>
+		<manufacturer>Product # 71-529</manufacturer>
+	</hash>
+	<hash crc32="75d3c8d8" sha1="b72a03af1dec0c621f9eda89ded3845724bb34ac" name="Henry">
+		<year>1997</year>
+		<manufacturer>Product # 71-728</manufacturer>
+	</hash>
+	<hash crc32="845ed281" sha1="117bfa1c831fbcf4a1d507cb70b6e0636c29bbd3" name="Indy 500">
+		<year>1997</year>
+		<manufacturer>Product # 71-525</manufacturer>
+	</hash>
+	<hash crc32="8c512912" sha1="c60ac5e59c3cc092506bc47adb60b40a9415bc97" name="Jeopardy!">
+		<year>1998</year>
+		<manufacturer>Product # 71-726</manufacturer>
+	</hash>
+	<hash crc32="496efa62" sha1="1d91b616caa2d35f53ec5680aada8f75e2f0ac43" name="Lights Out">
+		<year>1997</year>
+		<manufacturer>Product # 71-735</manufacturer>
+	</hash>
+	<hash crc32="b422c5f8" sha1="648badcac6c386d7ff40f917e34bd309e737c027" name="Lost World, The - Jurassic Park">
+		<year>1997</year>
+		<manufacturer>Product # 71-704</manufacturer>
+	</hash>
+	<hash crc32="d6a65a07" sha1="8057144f6995eafff6d893383114b48f4c77abc3" name="Monopoly">
+		<status>GoodGCOM Verified Image</status>
+		<year>1999</year>
+		<manufacturer>Product # 71-752</manufacturer>
+	</hash>
+	<hash crc32="bd29c844" sha1="a560ad2b916a9e4ace917d7e707cdcafbffe6e66" name="Mortal Kombat Trilogy">
+		<status>Known Bad Image</status>
+		<year>1997</year>
+		<manufacturer>Product # 71-711</manufacturer>
+	</hash>
+	<hash crc32="72893a77" sha1="d8a403a180f4a397098c8a598dd6cd5b45ef377a" name="Mortal Kombat Trilogy">
+		<year>1997</year>
+		<manufacturer>Product # 71-711</manufacturer>
+	</hash>
+	<hash crc32="0e018f6a" sha1="c9c4435bdcea2b9ddaa2768f28f286abd382608d" name="Quiz Wiz - Cyber Trivia">
+		<year>1997</year>
+		<manufacturer>Product # 71-524</manufacturer>
+	</hash>
+	<hash crc32="0984c7f5" sha1="e32357d08b07a6a8f6a7e64205cca35e50225269" name="Resident Evil 2">
+		<status>Known Bad Image</status>
+		<year>1998</year>
+		<manufacturer>Product # 71-745</manufacturer>
+	</hash>
+	<hash crc32="4f09457d" sha1="1d4d4ff13c8f7c228f30bddab174d4781b370ec9" name="Resident Evil 2">
+		<year>1998</year>
+		<manufacturer>Product # 71-745</manufacturer>
+	</hash>
+	<hash crc32="4d4ad909" sha1="2735d59964fe7c1d43bd260df86b9dfbc1bfd736" name="Scrabble">
+		<year>1999</year>
+		<manufacturer>Product # 71-754</manufacturer>
+	</hash>
+	<hash crc32="8c165064" sha1="80c693f3ae285bd84ba1fc4762bdee2676493096" name="Sonic Jam">
+		<status>Known Bad Image</status>
+		<year>1998</year>
+		<manufacturer>Product # 71-734</manufacturer>
+	</hash>
+	<hash crc32="8b4a63f9" sha1="393a98138c8825ed61990e1b15e1967f87068ac6" name="Sonic Jam">
+		<year>1998</year>
+		<manufacturer>Product # 71-734</manufacturer>
+	</hash>
+	<hash crc32="e7fb8fd9" sha1="3620491b531b9fce67545e822eff2f99c1adb4a4" name="Tiger Casino">
+		<status>Known Bad Image</status>
+		<year>1998</year>
+		<manufacturer>Product # 71-731</manufacturer>
+	</hash>
+	<hash crc32="ba698142" sha1="32ce1be96f7f367b8a0adb8cc61a8cca7d6b79dd" name="Tiger Casino">
+		<year>1998</year>
+		<manufacturer>Product # 71-731</manufacturer>
+	</hash>
+	<hash crc32="4c13e65b" sha1="d4e08fc050c006ed6c1a177a1f4c41b4a68c26bb" name="Tiger Web Link">
+		<year>1997</year>
+		<manufacturer>Product # 71-747</manufacturer>
+	</hash>
+	<hash crc32="048347a0" sha1="298c2b87754dd93481feea1d9e01585a1e269770" name="Wheel of Fortune">
+		<year>1997</year>
+		<manufacturer>Product # 71-523</manufacturer>
+	</hash>
+	<hash crc32="b91e2e32" sha1="30ddd349b8bdc21ef7ada4772ab1f3a9318ab0c8" name="Wheel of Fortune 2">
+		<status>GoodGCOM Verified Image</status>
+		<year>1998</year>
+		<manufacturer>Product # 71-527</manufacturer>
+	</hash>
+	<hash crc32="f894065d" sha1="5e2164fa76546b2795af7b04a766e31784b82eca" name="Williams Arcade Classics">
+		<year>1997</year>
+		<manufacturer>Product # 71-722</manufacturer>
+	</hash>
+</hashfile>

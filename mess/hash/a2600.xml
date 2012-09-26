@@ -1,0 +1,1218 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+Info from Atariage and Atarimania
+-->
+
+<softwarelist name="a2600" description="Atari 2600 cartridges">
+
+	<software name="2pakblac">
+        <!-- 2 Pak Special - Black Label -->
+		<description>2 Pak Special: Challenge + Surfing (PAL)</description>
+		<year>1990</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="771/333"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="2 pak special (black) - challenge, surfing.a26" size="16384" crc="07bfb506" sha1="05664dcc45d02ce585cd79d551c5c20fc2c7a833" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2pakblaca" cloneof="2pakblac">
+        <!-- 2 Pak Special - Black Label -->
+		<description>2 Pak Special: Challenge + Surfing (PAL, Alt)</description>
+		<year>1990</year>
+		<publisher>HES</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="2 pak special (black) - challenge, surfing (alt).a26" size="16384" crc="e2532342" sha1="f2fa7573b250c804ff2a19da43517687fe310c3f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2pakblue">
+        <!-- 2 Pak Special - Blue Label -->
+		<description>2 Pak Special: Dungeon Master + Creature Strike (PAL)</description>
+		<year>1992</year>
+		<publisher>HES</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="2 pak special (blue)- dungeon master, creature strike.a26" size="16384" crc="c9920339" sha1="96e42866669225c1a8c078c263e16703d080ffdf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
+	<software name="2pakdblu">
+        <!-- 2 Pak Special - Dark Blue Label -->
+		<description>2 Pak Special: Planet Patrol + Wall-Defender (PAL)</description>
+		<year>1990</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="771/406"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="2 pak special (dark blue) - planet patrol, wall-defender.a26" size="16384" crc="0c8c40f3" sha1="40058f86488c905a67cfb3f6595dbb4d62150011" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2pakdo">
+		<description>2 Pak Special: Dolphin + Oink</description>
+		<!-- Might be a hack -->
+		<year>1990</year>
+		<publisher>HES</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="2 pak special - dolphin, oink.a26" size="16384" crc="ddbc3ed4" sha1="0c5ed716e4477f8e22f6dd5e62756cd618ac154b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2pakgrne">
+        <!-- 2 Pak Special - Green Label -->
+		<description>2 Pak Special: Dolphin + Pigs 'N Wolf</description>
+		<year>1990</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="771/341"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="2 pak special (green) - dolphin, pigs 'n wolf.a26" size="16384" crc="0b8e3332" sha1="e4a26a828572ac877e50862fd92c21315c7f2ed2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2paklgrn">
+        <!-- 2 Pak Special - Light Green Label -->
+		<description>2 Pak Special: Hoppy + Alien Force</description>
+		<year>1992</year>
+		<publisher>HES</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="2 pak special (light green) - hoppy, alien force.a26" size="16384" crc="38c5b48f" sha1="b08c6e94becadd76a7be0d473622a698f00255ef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2pakmage">
+        <!-- 2 Pak Special - Magenta Label -->
+		<description>2 Pak Special: Cavern Blaster + City War</description>
+		<year>1992</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="771/867"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="2 pak special (magenta) - cavern blaster, city war.a26" size="16384" crc="00500b31" sha1="bf069a4dd5b65403beea6cc60d91206577ea1c0e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2pakoran">
+        <!-- 2 Pak Special - Orange Label -->
+		<description>2 Pak Special: Space Voyage + Fire Alert</description>
+		<year>1992</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="773/883"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="2 pak special (orange) - space voyage, fire alert.a26" size="16384" crc="989cd871" sha1="6ad5c412304ef92af37ede1d8fe42ec484dac004" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2pakred">
+        <!-- 2 Pak Special - Red Label -->
+		<description>2 Pak Special: Motocross + Boom Bang</description>
+		<year>1990</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="0701/157"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="2 pak special (red) - motocross, boom bang.a26" size="16384" crc="0a05d00c" sha1="bfcc35feee3713f5028122844d027c88a84772b6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="2pakyelo">
+        <!-- 2 Pak Special - Yellow Label -->
+		<description>2 Pak Special: Star Warrior + Frogger</description>
+		<year>1990</year>
+		<publisher>HES</publisher>
+		<info name="serial" value="771/422"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="2 pak special (yellow) - star warrior, frogger.a26" size="16384" crc="cb78caec" sha1="f4885610503bff2c4ca816f4f28d1fe517b92f35" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dtictac">
+		<description>3-D Tic-Tac-Toe</description>
+		<year>1978</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2618" />
+		<!--info name="serial2" value="49-75123" />	 Sears Version -->
+		<info name="programmer" value="Carol Shaw"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="3-d tic-tac-toe.a26" size="2048" crc="58805709" sha1="21d983f2f52b84c22ecae84b0943678ae2c31c10" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="3dtictacpal" cloneof="3dtictac">
+		<description>3-D Tic-Tac-Toe (PAL)</description>
+		<year>1978</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2618P" />
+		<info name="programmer" value="Carol Shaw"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="3-d tic-tac-toe (pal).a26" size="2048" crc="7322ebc6" sha1="6b163aa967e4204a5bd98a59bd8e80f159004e34" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="32in1">
+		<description>32-in-1</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26163P" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="32 in 1.a26" size="65536" crc="eaef28ea" sha1="97ffc252438a5c9361096a1151bdbf79bd717cb3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="32in1p" cloneof="32in1">
+		<description>32 in 1 Console ROM (Prototype 19890210)</description>
+		<year>1989</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="32 in 1 console rom (prototype) (02-10-1989).a26" size="65536" crc="05438099" sha1="8dccc90be602903a0196e85962eda62f99181a17" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4in1">
+		<description>4 in 1 - Canyon Bomber + Home Run + Night Driver + Sky Diver (Prototype 19870219)</description>
+		<year>1987</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26137" /> <!-- Not Sure About it. -->
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="4 in 1 - canyon bomber, home run, night driver, sky diver (02-19-1987) (atari) (cx26137) (prototype).a26" size="8192" crc="8b304851" sha1="bc60987b668d6fa26c49f5aba5815622710140d9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4game1">
+		<description>4 Game in One - Rodeo Champ + Open Sesame! + Bobby is Going Home + Festival</description>
+		<year>198?</year>
+		<publisher>Bitcorp</publisher>
+		<info name="serial" value="P460" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="4 game in one - rodeo champ, open sesame, bobby is going home, festival.a26" size="16384" crc="69ca1a92" sha1="b6193826df511f39077013369e625e56577f2f36" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="4game1a">
+		<description>4 Game in One - Ice Hockey + Phantom UFO + Spy Vs. Spy + Cosmic Avenger</description>
+		<year>198?</year>
+		<publisher>Bitcorp</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="4 game in one - ice hockey, phantom ufo, spy vs. spy, cosmic avenger.a26" size="16384" crc="caf86fa7" sha1="724c1ce352d0219699892f7c78083f825a71ac1a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="8in1">
+		<description>8 in 1 - Asteroids + Centipede + BattleZone + SwordQuest - EarthWorld + SwordQuest - FireWorld + RealSports Soccer + RealSports Tennis + Yars' Revenge (Prototype 19920116)</description>
+		<year>1988</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26193" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="8 in 1 (prototype).a26" size="65536" crc="5ddf79f5" sha1="c066942446c3fc7075ee8430a381d5da4adaec41" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ateam">
+		<description>The A-Team (Prototype 19840330)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26133" />
+		<info name="programmer" value="Howard Scott Warshaw"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="a-team, the (prototype) (3-30-84).a26" size="8192" crc="74ea91dd" sha1="53413577afe7def1d390e3892c45822405513c07" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ateamp1" cloneof="ateam">
+		<description>The A-Team (Prototype 19840508)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26133" />
+		<info name="programmer" value="Howard Scott Warshaw"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="a-team, the (prototype) (05-08-84).a26" size="8192" crc="389bd695" sha1="bcbd36389c56e9b408e8fc4bc595dc731aaf0e02" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ateamp2" cloneof="ateam">
+		<description>The A-Team (PAL, Prototype)</description>
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26133" />
+		<info name="programmer" value="Howard Scott Warshaw"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="a-team, the (prototype) (pal).a26" size="8192" crc="b2fd509a" sha1="a65f487740069640952803218b70580b2fb724b7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abrete" cloneof="opsesame">
+		<description>Abre-te, Sesamo!</description>
+		<year>1983</year>
+		<publisher>CCE</publisher>
+		<info name="serial" value="C-804" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="abre-te, sesamo.a26" size="4096" crc="8cf511a4" sha1="cc00c5138fd1a3b723c5f1acc90ff8e6e87942c1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="opsesame">
+		<description>Open, Sesame!</description>
+		<year>1983</year>
+		<publisher>Goliath</publisher>
+		<info name="serial" value="PG204" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="open sesame.a26" size="4096" crc="d01b5a1f" sha1="cc4d66da0182819a8067dbc6b73ff1bc33fc165b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aciddrop">
+		<description>Acid Drop</description>
+		<year>1992</year>
+		<publisher>Salu</publisher>
+		<info name="programmer" value="Dennis M. Kiss"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="acid drop.a26" size="16384" crc="14cddac7" sha1="d7c62df8300a68b21ce672cfaa4d0f2f4b3d0ce1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="actforce">
+		<description>Action Force (PAL)</description>
+		<year>1983</year>
+		<publisher>Parker Bros</publisher>
+		<info name="serial" value="931511" />
+		<info name="alttitle" value="Action Man - Action Force" />
+		<part name="cart" interface="a2600_cart">
+			<!--feature name="controller_type" value="Paddles"/-->
+			<dataarea name="rom" size="4096">
+				<rom name="action force.a26" size="4096" crc="896446cf" sha1="9e6fb047ee9fa0a454ca23673ed9693430032dc6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="decathln">
+		<description>The Activision Decathlon</description>
+		<year>1983</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="AZ-030" />
+		<info name="programmer" value="David Crane"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="activision decathlon.a26" size="8192" crc="3feb39b1" sha1="e0d47565df935c064bc4055636f37a0432ab3727" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adventur">
+		<description>Adventure</description>
+		<year>1978</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2613" />
+		<info name="programmer" value="Warren Robinett"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="adventure.a26" size="4096" crc="a6db4b3a" sha1="e07e48d463d30321239a8acc00c490f27f1f7422" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="adventurpal" cloneof="adventur">
+		<description>Adventure (PAL)</description>
+		<year>1978</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2613P" />
+		<info name="programmer" value="Warren Robinett"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="adventure (pal).a26" size="4096" crc="18dc23f9" sha1="ec23bbea83cf47277482e775ad58ac8e6d1483fe" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advtron">
+		<description>Adventures of Tron</description>
+		<year>1983</year>
+		<publisher>Mattel</publisher>
+		<info name="serial" value="4317" />
+		<info name="programmer" value="Hal Finney, Glenn Hightower"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="adventures of tron.a26" size="4096" crc="1b8019d6" sha1="03a495c7bfa0671e24aa4d9460d232731f68cb43" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advgx12" cloneof="advtron">
+		<description>Adventures on GX-12 (PAL)</description>
+		<year>1989</year>
+		<publisher>Telegames</publisher>
+		<info name="serial" value="4317 A009" />
+		<info name="programmer" value="Hal Finney, Glenn Hightower"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="adventures on gx-12 (pal).a26" size="4096" crc="4264eb6a" sha1="6e420544bf91f603639188824a2b570738bb7e02" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airraid">
+		<description>Air Raid (PAL)</description>
+		<year>1982</year>
+		<publisher>Men-A-Vision</publisher>
+		<info name="serial" value="M707" />
+		<info name="programmer" value="Garry Kitchen"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="air raid (pal).a26" size="4096" crc="b0e53814" sha1="3b02e7dacb418c44d0d3dc77d60a9663b90b0fbc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airraids">
+		<description>Air Raiders</description>
+		<year>1982</year>
+		<publisher>Mattel</publisher>
+		<info name="serial" value="5861" />
+		<info name="programmer" value="Larry Zwick"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="air raiders.a26" size="4096" crc="bb16539d" sha1="29f5c73d1fe806a4284547274dd73f9972a7ed70" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airraidp" cloneof="airraids">
+		<description>Air Raiders (PAL)</description>
+		<year>1982</year>
+		<publisher>Telegames</publisher>
+		<info name="programmer" value="Larry Zwick"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="air raiders (pal).a26" size="4096" crc="5d61b833" sha1="6e3af361bbf70a4a85d6c8d4ed4070e8fed963cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airseaba">
+		<description>Air-Sea Battle</description>
+		<year>1977</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2602" />
+		<info name="programmer" value="Larry Kaplan"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="air-sea battle.a26" size="2048" crc="1fc6c0f1" sha1="a746fdc82b336a9d499bf17f50b41e0193ba595e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airseabapal" cloneof="airseaba">
+		<description>Air-Sea Battle (PAL)</description>
+		<year>1977</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2602P" />
+		<info name="programmer" value="Larry Kaplan"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="air-sea battle (pal).a26" size="2048" crc="cf7f8944" sha1="b96c7a509bf610f61f82377bfd506db3dba2b423" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airlock">
+		<description>Airlock</description>
+		<year>1982</year>
+		<publisher>Data Age</publisher>
+		<info name="serial" value="DA1004" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="airlock.a26" size="4096" crc="25c90ce7" sha1="0376c242819b785310b8af43c03b1d1156bd5f02" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="airlockp" cloneof="airlock">
+		<description>Airlock (Prototype)</description>
+		<year>1982</year>
+		<publisher>Data Age</publisher>
+		<info name="serial" value="DA1004" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="airlock (proto).a26" size="4096" crc="b6ae31c6" sha1="09ae3715873a88386b3bc11e429f82919b91fa1a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliceabn" cloneof="lilyadv">
+		<description>Alices Abenteuer</description>
+		<year>1983</year>
+		<publisher>Starsoft</publisher>
+		<info name="serial" value="732.273 8" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="alice abenteuer.a26" size="4096" crc="f5feaa7b" sha1="7be2899d776cc28f1ca81584a02e5c228a4f603e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lilyadv">
+		<description>Lilly Adventure</description>
+		<year>1983</year>
+		<publisher>Home Vision</publisher>
+		<info name="serial" value="VCS 83117" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="lilly adventure.a26" size="4096" crc="3544c6d6" sha1="63f4776aa4c35d124001918b733cdb4d46dfbe9b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alien">
+		<description>Alien (20th Century Fox)</description>
+		<year>1982</year>
+		<publisher>20th Century Fox</publisher>
+		<info name="serial" value="11006" />
+		<info name="programmer" value="Douglas Neubauer"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="alien (20th century fox).a26" size="4096" crc="6d61059f" sha1="01d99bf307262825db58631e8002dd008a42cb1e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliencce" cloneof="alien">
+		<description>Alien (CCE)</description>
+		<year>1982</year>
+		<publisher>CCE</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="alien (cce).a26" size="4096" crc="e61021ec" sha1="abf186c0108791d998f7738324d0e49a977b015b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aliensc" cloneof="alien">
+		<description>Alien (Supercharger)</description>
+		<year>1982</year>
+		<publisher>Supercharger</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="alien (supercharger).a26" size="4096" crc="cd72c0a9" sha1="34ad05f170efe9eec29b84bcad30f99f3ce703f9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienret">
+		<description>Alien's Return</description>
+		<year>1983</year>
+		<publisher>ITT Family Games</publisher>
+		<info name="serial" value="554-33 391" />
+		<info name="alttitle" value="Go Go Home Monster" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="aliens return.a26" size="4096" crc="c161f53b" sha1="4c41379f0dd9880384fcbb46bad9fbaaf109a477" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alligatr">
+		<description>The Alligator People (Prototype)</description>
+		<year>1983</year>
+		<publisher>20th Century Fox</publisher>
+		<info name="programmer" value="John Russell"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="alligator people (prototype).a26" size="4096" crc="b3f6d395" sha1="a1795d6371ddb0bc93ba6df70299cc548dc88b99" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abwerniepal" cloneof="abwernie">
+		<description>Alpha Beam with Ernie (PAL)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26103" />
+		<info name="programmer" value="Michael Callahan"/>
+		<info name="Graphics" value="Preston Stuart"/>
+		<part name="cart" interface="a2600_cart">
+			<feature name="peripheral" value="kidscontroller" />
+			<dataarea name="rom" size="8192">
+				<rom name="alpha beam with ernie (pal).a26" size="8192" crc="d1ed3112" sha1="4be3ff4904fc75e047c72ec7e1b1b361c7ae6d50" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abwernie">
+		<description>Alpha Beam with Ernie</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26103" />
+		<info name="programmer" value="Michael Callahan"/>
+		<info name="Graphics" value="Preston Stuart"/>
+		<part name="cart" interface="a2600_cart">
+			<feature name="peripheral" value="kidscontroller" />
+			<dataarea name="rom" size="8192">
+				<rom name="alpha beam with ernie.a26" size="8192" crc="27c6b897" sha1="a1f660827ce291f19719a5672f2c5d277d903b03" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abwerniep" cloneof="abwernie">
+		<description>Alpha Beam with Ernie (Prototype 19831222)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26103" />
+		<info name="programmer" value="Michael Callahan"/>
+		<info name="Graphics" value="Preston Stuart"/>
+		<part name="cart" interface="a2600_cart">
+			<feature name="peripheral" value="kidscontroller" />
+			<dataarea name="rom" size="8192">
+				<rom name="alpha beam with ernie (prototype).a26" size="8192" crc="85f1cb08" sha1="7118f2401a0d34996762d9838d2f4bacf745fde3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abwernpalp" cloneof="abwernie">
+		<description>Alpha Beam with Ernie (PAL, Prototype 19830603)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX26103" />
+		<info name="programmer" value="Michael Callahan"/>
+		<info name="Graphics" value="Preston Stuart"/>
+		<part name="cart" interface="a2600_cart">
+			<feature name="peripheral" value="kidscontroller" />
+			<dataarea name="rom" size="8192">
+				<rom name="alpha beam with ernie (prototype) (pal).a26" size="8192" crc="1651f45e" sha1="ea1124a3eac39133f59d664545c33cc514022067" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amidar">
+		<description>Amidar</description>
+		<year>1983</year>
+		<publisher>Parker Bros</publisher>
+		<info name="serial" value="PB5310" />
+		<info name="programmer" value="Ed Temple"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="amidar.a26" size="4096" crc="8eb5bd72" sha1="b89a5ac6593e83fbebee1fe7d4cec81a7032c544" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amidarp" cloneof="amidar">
+		<description>Amidar (PAL)</description>
+		<year>1983</year>
+		<publisher>Parker Bros</publisher>
+		<info name="serial" value="931504" />
+		<info name="programmer" value="Ed Temple"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="amidar (pal).a26" size="4096" crc="e9b05565" sha1="fb9bba6556fc45904dac8750fa18155e6196b2c0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="andrmanp">
+		<description>AndroMan on the Moon (Prototype)</description>
+		<year>1984</year>
+		<publisher>Western Technologies</publisher>
+		<info name="programmer" value="Michael Case, Lenny Carlson"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="androman on the moon (prototype).a26" size="8192" crc="18344a20" sha1="3d3623fa0d87ea02f2a080d959a127223e757b3f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="angling">
+		<description>Angling</description>
+		<year>198?</year>
+		<publisher>Ariola</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="angling.a26" size="2048" crc="214f0076" sha1="a7638a2e79524b068038f0be035b46d0ce65f7ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="angriff" cloneof="mad">
+		<description>Angriff der Luftflotten</description>
+		<year>1983</year>
+		<publisher>Starsoft</publisher>
+		<info name="serial" value="495.463 2" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="angriff der luftflotten.a26" size="4096" crc="74fe8262" sha1="ac58ac94ceab78725a1182cc7b907376c011b0c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mad">
+		<description>M.A.D.</description>
+		<year>1982</year>
+		<publisher>US Games</publisher>
+		<info name="serial" value="VC1012" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="mad.a26" size="4096" crc="5cb68fe5" sha1="d6e2b7765a9d30f91c9b2b8d0adf61ec5dc2b30a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="madpal" cloneof="mad">
+		<description>M.A.D. (PAL)</description>
+		<year>1982</year>
+		<publisher>Carrere Video</publisher>
+		<info name="serial" value="USC1012" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="mad (pal).a26" size="4096" crc="a3ef9032" sha1="86df578e913485089d9b3b3e7384076b53a98450" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="appldols" cloneof="opsesame">
+		<description>Apples and Dolls</description>
+		<year>198?</year>
+		<publisher>CCE</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="apples and dolls.a26" size="4096" crc="e7514705" sha1="62e92508cf43acc28bff8b03a197137d56a5df79" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aquaventp" cloneof="aquavent">
+		<description>Aquaventure (Prototype)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="aquaventure (prototype).a26" size="8192" crc="87a8cb8b" sha1="7d132ab776ff755b86bf4f204165aa54e9e1f1cf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aquavent">
+		<!-- Might be bad -->
+		<description>Aquaventure</description>
+		<year>198?</year>
+		<publisher>CCE</publisher>
+		<info name="programmer" value="Gary Shannon"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="aquaventure.a26" size="8192" crc="7fa61fa0" sha1="cb400de2653e125e704abd8b0fe5dddb43e3438b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armoramb">
+		<description>Armor Ambush</description>
+		<year>1982</year>
+		<publisher>Mattel</publisher>
+		<info name="serial" value="5661" />
+		<info name="serial2" value="MT5661" />
+		<info name="programmer" value="Hal Finney"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="armor ambush.a26" size="4096" crc="fc35704b" sha1="9b6a54969240baf64928118741c3affee148d721" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="armorambt" cloneof="armoramb">
+		<description>Armor Ambush (PAL)</description>
+		<year>1989</year>
+		<publisher>Telegames</publisher>
+		<info name="serial" value="5661" />
+		<info name="programmer" value="Hal Finney"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="armor ambush (pal).a26" size="4096" crc="c974c21a" sha1="6122220c8fbf42fdf0437073ebe2407d6f875a40" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artduel">
+		<description>Artillery Duel</description>
+		<year>1983</year>
+		<publisher>Xonox</publisher>
+		<info name="serial" value="2-99004-8-4" />
+		<info name="programmer" value="John	Perkins"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="artillery duel.a26" size="8192" crc="1d0f7e8d" sha1="8c249e9eaa83fc6be16039f05ec304efdf987beb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="artduelp" cloneof="artduel">
+		<description>Artillery Duel (PAL)</description>
+		<!-- Side one of the double ender cartridge other side is Super Kung-Fu-->
+		<year>1983</year>
+		<publisher>Xonox</publisher>
+		<info name="serial" value="6230" />
+		<info name="programmer" value="John	Perkins"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="artillery duel (pal).a26" size="8192" crc="1708647c" sha1="013142aa1338d132724876c1d55a322a1d049380" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asesdoar" cloneof="skyjink">
+		<description>Ases do Ar</description>
+		<year>198?</year>
+		<publisher>Dismac</publisher>
+		<info name="programmer" value="Bob Whitehead"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="ases do ar.a26" size="2048" crc="931fb27e" sha1="4d0689a98008bf89caab949249ff0f543abf5e0c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skyjink">
+		<description>Sky Jinks</description>
+		<year>1982</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="AG-019" />
+		<info name="programmer" value="Bob Whitehead"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="sky jinks.a26" size="2048" crc="96f8cf59" sha1="105f722dcf9a89b683c10ddd7f684c5966c8e1db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skyjinkp" cloneof="skyjink">
+		<description>Sky Jinks (PAL)</description>
+		<year>1982</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="EAG-019" />
+		<info name="programmer" value="Bob Whitehead"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="sky jinks (pal).a26" size="2048" crc="12b0056d" sha1="dccde9899bdc063e77a99105131e3914181d72ad" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="skyjinkc" cloneof="skyjink">
+		<description>Sky Jinks </description>
+		<year>198?</year>
+		<publisher>CCE</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="sky jinks (cce).a26" size="2048" crc="fe6a0630" sha1="8e16d60d700fc7a2a021ae2b0e26438e61c3dd0c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="assault"><!-- cloneof="skyalien" Sky Alien is undumped-->
+		<description>Assault</description>
+		<year>1983</year>
+		<publisher>Bomb</publisher>
+		<info name="serial" value="CA281" />
+		<info name="programmer" value="Bob Whitehead"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="assault.a26" size="4096" crc="ab3a2b77" sha1="0c03eba97df5178eec5d4d0aea4a6fe2f961c88f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asterixp" cloneof="taz">
+		<description>Asterix (PAL)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2696" />
+		<info name="programmer" value="Steve Woita"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="asterix (pal).a26" size="8192" crc="2e3deb79" sha1="ff31d885ea3d96850547fdb8978d12d0965a2c1f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asterix" cloneof="taz">
+		<description>Asterix (NTSC, Prototype)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2696" />
+		<info name="programmer" value="Steve Woita"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="asterix.a26" size="8192" crc="b238706d" sha1="1a094f92e46a8127d9c29889b5389865561c0a6f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="taz">
+		<description>Taz</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2699" />
+		<info name="programmer" value="Steve Woita"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="taz.a26" size="8192" crc="c9d7ec9b" sha1="fa4aee79487036656aabb432d7c6e13ec21e3a3c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteriod">
+		<description>Asteroids</description>
+		<year>1981</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2649" />
+		<info name="programmer" value="Brad Stewart"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="asteroids.a26" size="8192" crc="0a2f8288" sha1="1cb8f057acad6dc65fef07d3202088ff4ae355cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteriodp" cloneof="asteriod">
+		<description>Asteroids (PAL)</description>
+		<year>1981</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2649P" />
+		<info name="programmer" value="Brad Stewart"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="asteroids (pal).a26" size="8192" crc="c7d64c94" sha1="d68937e57a367e61eaa4b44550ae8b9d69456661" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteriodp1" cloneof="asteriod">
+		<description>Asteroids (PAL, Older)</description>
+		<!-- According to the Programmer he didn't do the title screen, so it must have been added later on by another programmer -->
+		<year>1981</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2649P" />
+		<info name="programmer" value="Brad Stewart"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="asteroids (pal) (older).a26" size="8192" crc="ffcb5e99" sha1="7c0f522d5796c4f307dccf9ce515ab022778b3c7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astratt" cloneof="timewarp">
+		<description>Astro Attack</description>
+		<year>1983</year>
+		<publisher>Goliath</publisher>
+		<info name="serial" value="83-214" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="astro attack (pal).a26" size="4096" crc="32f16d22" sha1="90041b76b873d214276a567cca3af53bfa3222ac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="timewarp">
+		<description>Time Warp (PAL)</description>
+		<year>1982</year>
+		<publisher>Funvision - Fund. International Co.</publisher>
+		<info name="serial" value="83-214" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="time warp (pal).a26" size="4096" crc="551e2144" sha1="594db913e27509fe244c5c900b5dbf5991d19a3e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrblst">
+		<description>Astroblast</description>
+		<year>1982</year>
+		<publisher>Mattel</publisher>
+		<info name="serial" value="5666" />
+		<info name="programmer" value="Hal Finney"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="astroblast.a26" size="4096" crc="1de25331" sha1="8e83fd77e198b27eb5b02a6dc02a5ab37b5a76bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrblst1" cloneof="astrblst">
+		<description>Astroblast (Alt)</description>
+		<year>1982</year>
+		<publisher>Mattel</publisher>
+		<info name="serial" value="5666" />
+		<info name="programmer" value="Hal Finney"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="astroblast (alt).a26" size="4096" crc="d214f241" sha1="b850bd72d18906d9684e1c7251cb699588cbcf64" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrblstp" cloneof="astrblst">
+		<description>Astroblast (PAL)</description>
+		<year>1982</year>
+		<publisher>Mattel</publisher>
+		<info name="programmer" value="Hal Finney"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="astroblast (pal).a26" size="4096" crc="a1df435e" sha1="ab8af3c4e0d8858481f3e52b59b5040b18ceb4d7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrowar">
+		<description>Astrowar</description>
+		<year>1983</year>
+		<publisher>Starsoft</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="astrowar.a26" size="4096" crc="7b4b7eaf" sha1="b6f01797e3e8d80f4e33da73e64aa2935af96038" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="avcspop">
+		<description>Atari VCS Point-of-Purchase ROM</description>
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="2048">
+				<rom name="atari vcs point-of-purchase rom.a26" size="2048" crc="9d3cfba6" sha1="b84c34aaedd84fca30b6e8223ee062439acf4fe0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="avc">
+		<description>Atari Video Cube</description>
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<info name="serial" value="CX2670" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="atari video cube.a26" size="4096" crc="272ae37f" sha1="d1563c24208766cf8d28de7af995021a9f89d7e1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atlantisa" cloneof="atlantis">
+		<description>Atlantis (Activision)</description>
+		<year>1982</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="IX-010-04 / AIX-010" />
+		<info name="programmer" value="Dennis Koble"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="atlantis.a26" size="4096" crc="c22e6a25" sha1="87b234b3893d4e8e9f27ec2f2bb83e985e72b4b3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atlantis1" cloneof="atlantis">
+		<description>Atlantis (CCE)</description>
+		<year>1982</year>
+		<publisher>CCE</publisher>
+		<info name="serial" value="C-832" />
+		<info name="programmer" value="Dennis Koble"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="atlantis (cce).a26" size="4096" crc="f3ec0baf" sha1="e9d6ac3fd807cc71de6d9144177c18f3a7881b5b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atlantis">
+		<description>Atlantis (Imagic)</description>
+		<year>1982</year>
+		<publisher>Imagic</publisher>
+		<info name="serial" value="720103-1B / IA3203" />
+		<info name="programmer" value="Dennis Koble"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="atlantis (imagic).a26" size="4096" crc="92560498" sha1="c6b1dcdb2f024ab682316db45763bacc6949c33c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atlantisp" cloneof="atlantis">
+		<description>Atlantis (Imagic) (PAL)</description>
+		<year>1982</year>
+		<publisher>Imagic</publisher>
+		<info name="serial" value="720103-2A / IA3203P" />
+		<info name="programmer" value="Dennis Koble"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="atlantis (imagic) (pal).a26" size="4096" crc="85706802" sha1="7b9975dc1aabc34def2d19854b39f237e4afe088" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atlantisd" cloneof="atlantis">
+		<description>Atlantis (Digitel)</description>
+		<year>1982</year>
+		<publisher>Digitel</publisher>
+		<info name="programmer" value="Dennis Koble"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="atlantis (digitel).a26" size="4096" crc="e40f6c0f" sha1="086ca9c0bab692104590338ce8aaa061dfa2dde4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atlantisdy" cloneof="atlantis">
+		<description>Atlantis (Dynacom)</description>
+		<year>1982</year>
+		<publisher>Dynacom</publisher>
+		<info name="programmer" value="Dennis Koble"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="atlantis (dynacom).a26" size="4096" crc="78c57e9f" sha1="cbdace660923e0b2c6d97c24877b0dc16521d913" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atlantisda" cloneof="atlantis">
+		<description>Atlantis (Dactari / Milmar)</description>
+		<year>1982</year>
+		<publisher>Dactari - Milmar</publisher>
+		<info name="programmer" value="Dennis Koble"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="atlantis (dactari - milmar).a26" size="4096" crc="5e5e95bd" sha1="c22fde31c885b3b6f531bbee96f916907e5e3daf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atlantis2" cloneof="atlantis">
+		<description>Atlantis II</description>
+		<year>1982</year>
+		<publisher>Imagic</publisher>
+		<info name="serial" value="720103-1A / IA3203" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="atlantis ii.a26" size="4096" crc="ba5566aa" sha1="f4e838de9159c149ac080ab85e4f830d5b299963" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="auferzoo" cloneof="zoofun">
+		<description>Aufruhr im Zoo</description>
+		<year>1983</year>
+		<publisher>Starsoft</publisher>
+		<info name="serial" value="719.694 2" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="aufruhr im zoo.a26" size="4096" crc="99ce60e6" sha1="f14d270d429fc3ecf5dd04d71e87e79daf52fd5f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoofun">
+		<description>Zoo Fun</description>
+		<year>1983</year>
+		<publisher>HomeVision</publisher>
+		<info name="serial" value="VCS 831??" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="zoo fun.a26" size="4096" crc="c1da05f6" sha1="feb6bd37e5d722bd080433587972b980afff5fa5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="autorenn" cloneof="grandprx">
+		<description>Autorennen (PAL)</description>
+		<year>198?</year>
+		<publisher>Ariola</publisher>
+		<info name="serial" value="PGP232" />
+		<info name="programmer" value="David Crane"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="autorennen.a26" size="4096" crc="e5afda35" sha1="04359079d6960d0abc2f49330873fac10c9d9e21" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="grandprx">
+		<description>Grand Prix</description>
+		<year>1982</year>
+		<publisher>Activision</publisher>
+		<info name="serial" value="AX-014" />
+		<info name="programmer" value="David Crane"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="grand prix.a26" size="4096" crc="e855273d" sha1="24fab817728216582b6d95558c361ace66abf96f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="btcprty">
+		<description>Bachelor Party</description>
+		<year>1982</year>
+		<publisher>Mystique</publisher>
+		<info name="serial" value="1002" />
+		<info name="programmer" value="Joel H. Martin"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="bachelor party.a26" size="4096" crc="d9cd6c95" sha1="75e7efa861f7e7d8e367c09bf7c0cc351b472f03" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bchtprty" cloneof="btcprty">
+		<description>Bachelorette Party</description>
+		<year>1982</year>
+		<publisher>Mystique</publisher>
+		<info name="serial" value="1002" />
+		<info name="programmer" value="Joel H. Martin"/>
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="bachelorette party.a26" size="4096" crc="e8189eeb" sha1="b88ca823aaa10a7a4a3d325023881b2de969c156" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

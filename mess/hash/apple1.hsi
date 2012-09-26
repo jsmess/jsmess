@@ -1,0 +1,14 @@
+<hashfile>
+	<!-- Apple1 Snapshot CRC file -->
+	<!-- crc= Game Name | Year | Manufacturer | Emulation Status -->
+	<hash crc32="d25da095" name="Getting The System Running">
+		<year>1976</year>
+		<manufacturer>Apple (Steve Wozniak)</manufacturer>
+		<status>WORKING ('0R' to Execute) </status>
+	</hash>
+	<hash crc32="86972653" name="ASCII Hex Keyboard Print">
+		<year>????</year>
+		<manufacturer>Pom1</manufacturer>
+		<status>WORKING ('700R' to Execute) </status>
+	</hash>
+</hashfile>

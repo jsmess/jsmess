@@ -1,0 +1,10 @@
+<tests>
+
+<test name="ibm5150_000" driver="ibm5150" enabled="0">
+	<wait time="20"/>
+	<input>CLS:PRINT "HELLO MESS"&#13;</input>
+	<wait time="2"/>
+	<checkblank/>
+</test>
+
+</tests>

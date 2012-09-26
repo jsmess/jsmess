@@ -1,0 +1,242 @@
+<hashfile>
+	<!-- This MESS CRC file was is for the Arcadia 2001 family of systems. -->
+	<!-- Please keep this notice intact if editing this file -->
+	<!-- crc= Game Name | Year | Manufacturer | Emulation Status -->
+	<hash crc32="1cf08155" name="2001 Baseball">
+		<extrainfo>how to play?</extrainfo>
+	</hash>
+	<hash crc32="4da68df8" name="3D Soccer">
+		<status>c033</status>
+	</hash>
+	<hash crc32="1b5be22a" name="3D Soccer(set 2)">
+		<status>c033</status>
+	</hash>
+	<hash crc32="1f65b21e" name="Alien Invaders">
+		<year>1983</year>
+		<manufacturer>Emerson</manufacturer>
+		<status>c008</status>
+	</hash>
+	<hash crc32="ddcf5b2c" name="Astro Invaders">
+		<status>c028</status>
+		<extrainfo>rasterline effect</extrainfo>
+	</hash>
+	<hash crc32="99ac48ca" name="Autorace">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e93938f6" name="Basketball"/>
+	<hash crc32="f3c08e19" name="Bowling 3D">
+		<year>1982</year>
+		<manufacturer>Emerson</manufacturer>
+		<status>c011</status>
+	</hash>
+	<hash crc32="ca58b3f8" name="Brain Quiz (mind breaker,maxit,hangman)">
+		<year>1982</year>
+		<manufacturer>Emerson</manufacturer>
+		<status>c001</status>
+	</hash>
+	<hash crc32="33c348c1" name="Breakaway">
+		<year>1982</year>
+		<manufacturer>Emerson</manufacturer>
+		<status>c007</status>
+		<extrainfo>55s instead of 60 too slow</extrainfo>
+	</hash>
+	<hash crc32="aeb803e4" name="Capture">
+		<year>1982</year>
+		<manufacturer>Emerson</manufacturer>
+		<status>c012</status>
+		<extrainfo>timer too fast</extrainfo>
+	</hash>
+	<hash crc32="fd2cf496" name="Cat Trax">
+		<year>1982</year>
+		<manufacturer>Emerson</manufacturer>
+		<status>c017</status>
+	</hash>
+	<hash crc32="a6bffa9e" name="Combat"/>
+	<hash crc32="76e773fa" name="Crazy Climber">
+		<year>1982</year>
+	</hash>
+	<hash crc32="e84df2ef" name="Crazy Gobbler">
+		<year>1982</year>
+		<manufacturer>Leisure Vision</manufacturer>
+		<status>c002</status>
+	</hash>
+	<hash crc32="fc7eba76" name="Escape">
+		<year>1982</year>
+		<manufacturer>Emerson</manufacturer>
+		<status>c015</status>
+	</hash>
+	<hash crc32="22624414" name="Football">
+		<extrainfo>sound</extrainfo>
+	</hash>
+	<hash crc32="77c19320" name="Funky Fish">
+		<year>1983</year>
+		<manufacturer>Emerson</manufacturer>
+		<status>c023</status>
+	</hash>
+	<hash crc32="a23c7a01" name="Golf"/>
+	<hash crc32="8bf2dfa9" name="Grand Slam Tennis">
+		<year>1982</year>
+		<manufacturer>Emerson</manufacturer>
+		<status>c022</status>
+	</hash>
+	<hash crc32="5e033f9c" name="Grand Prix de Monaco">
+		<extrainfo>use keys for steering</extrainfo>
+	</hash>
+	<hash crc32="1cec4b21" name="Hobo">
+		<year>1983</year>
+		<manufacturer>Leisure Vision</manufacturer>
+		<status>c032</status>
+		<extrainfo>controls??, rasterline effect</extrainfo>
+	</hash>
+	<hash crc32="560daa7f" name="Horse Racing">
+		<extrainfo>how to play?</extrainfo>
+	</hash>
+	<!-- How To play Horse Racing: -->
+	<!-- Hit &quot;0&quot; then &quot;enter&quot; on the keypad, to start the horses racing. That's the big thing to know. -->
+
+	<!-- Before the race, multiple players can bid. Hit player number (1-6) then -->
+	<!-- enter, type in bet amount then enter, then pick &quot;W&quot; or &quot;E&quot; - I have no idea -->
+	<!-- what that is, other than maybe Win or Place or Show? - and then the color -->
+	<!-- of the horse (listed at the bottom). Then start the race. -->
+	<hash crc32="97060a54" name="Jump Bug">
+		<year>1982</year>
+		<manufacturer>Leisure Vision</manufacturer>
+		<status>c030</status>
+	</hash>
+	<hash crc32="dfb5dd55" name="Jungler">
+		<year>1982</year>
+		<manufacturer>Emerson</manufacturer>
+		<status>c019</status>
+	</hash>
+	<hash crc32="a615f068" name="Missile War">
+		<year>1982</year>
+		<manufacturer>Emerson</manufacturer>
+		<status>c016</status>
+	</hash>
+	<hash crc32="449e80cb" name="Ocean Battle">
+		<year>1982</year>
+		<extrainfo>how to play?</extrainfo>
+	</hash>
+	<hash crc32="4f19fd9b" name="Pleiades">
+		<year>1983</year>
+		<manufacturer>UA?</manufacturer>
+		<status>c024</status>
+	</hash>
+	<hash crc32="a0626e23" name="R2D Tank">
+		<year>1983</year>
+		<status>c031</status>
+	</hash>
+	<hash crc32="a06f284b" name="Red Clash">
+		<year>1982</year>
+		<manufacturer>Leisure Vision</manufacturer>
+		<status>c026</status>
+	</hash>
+	<hash crc32="4671b7f7" name="Robot Killer">
+		<year>1982</year>
+		<manufacturer>Leisure Vision</manufacturer>
+		<status>c004</status>
+	</hash>
+	<hash crc32="8169864e" name="Route 16">
+		<year>1983</year>
+	</hash>
+	<hash crc32="b0b98a92" name="Soccer">
+		<year>1982</year>
+		<manufacturer>Emerson</manufacturer>
+		<status>c013</status>
+		<extrainfo>hanging sound</extrainfo>
+	</hash>
+	<hash crc32="e3794a2c" name="Space Attack (PD)">
+		<year>1982</year>
+		<manufacturer>Choi Andrew</manufacturer>
+		<status>c003</status>
+	</hash>
+	<hash crc32="3ff224e5" name="Space Mission">
+		<year>1982</year>
+		<manufacturer>Emerson</manufacturer>
+		<status>c009</status>
+	</hash>
+	<hash crc32="88defacf" name="Space Raiders">
+		<year>1982</year>
+		<manufacturer>Emerson</manufacturer>
+		<status>c018</status>
+	</hash>
+	<hash crc32="caa5f449" name="Space Squadron">
+		<year>1982</year>
+		<manufacturer>Leisure Vision</manufacturer>
+		<status>c020</status>
+	</hash>
+	<hash crc32="7666a712" name="Space Vultures">
+		<year>1982</year>
+		<manufacturer>Emerson-Leisure Vision</manufacturer>
+		<status>c006</status>
+	</hash>
+	<hash crc32="bb88daea" name="Spiders">
+		<year>1982</year>
+		<manufacturer>Emerson</manufacturer>
+		<status>c025</status>
+		<extrainfo>rasterline effect</extrainfo>
+	</hash>
+	<hash crc32="83e6e40b" name="Star Chess">
+		<year>1982</year>
+		<manufacturer>Emerson</manufacturer>
+		<extrainfo>how to play?</extrainfo>
+	</hash>
+	<hash crc32="08d8b186" name="Super Gobbler">
+		<status>c005</status>
+	</hash>
+	<hash crc32="0076422e" name="Tanks a Lot">
+		<year>1982</year>
+		<manufacturer>Emerson</manufacturer>
+		<status>c014</status>
+	</hash>
+	<hash crc32="6818c8bd" name="Tankgame"/>
+	<hash crc32="e66f362d" name="The End">
+		<status>c027</status>
+		<extrainfo>rasterline effect</extrainfo>
+	</hash>
+	<hash crc32="7046e0bc" name="Turtles Turpin">
+		<status>c029</status>
+	</hash>
+	<!-- C021 ??? -->
+	<!-- [baddumps] -->
+	<!-- note: Some of these are in the TOSEC Arcadia 2001 db...??? -->
+	<hash crc32="df0bf3fb" name="Astro Invaders">
+		<status>c028</status>
+		<extrainfo>overdumped, remove last 4kbyte</extrainfo>
+	</hash>
+	<hash crc32="28ad5bcf" name="Autorace">
+		<extrainfo>overdumped, remove last 4kbyte</extrainfo>
+	</hash>
+	<hash crc32="82d049d7" name="Combat">
+		<extrainfo>overdumped, remove last 4kbyte</extrainfo>
+	</hash>
+	<hash crc32="9da024d3" name="Golf">
+		<extrainfo>overdumped, remove last 2 kbyte</extrainfo>
+	</hash>
+	<hash crc32="cca7a60b" name="Golf 0000">
+		<extrainfo>1st of 2 parts, merge with golf 4000</extrainfo>
+	</hash>
+	<hash crc32="a70ee568" name="Golf 4000">
+		<extrainfo>2nd of 2 parts, merge with golf 0000</extrainfo>
+	</hash>
+	<hash crc32="06a86f4a" name="Red Clash">
+		<status>c026</status>
+		<extrainfo>overdumped, remove last 4kbyte</extrainfo>
+	</hash>
+	<hash crc32="8c0c456e" name="Soccer">
+		<status>c013</status>
+		<extrainfo>overdumped, remove last 4kbyte</extrainfo>
+	</hash>
+	<hash crc32="f9d9ec5b" name="Spiders">
+		<status>c025</status>
+		<extrainfo>overdumped, remove last 4kbyte</extrainfo>
+	</hash>
+	<hash crc32="dd1facab" name="Super Gobbler">
+		<status>c005</status>
+		<extrainfo>overdumped, remove last 4kbyte</extrainfo>
+	</hash>
+	<hash crc32="306e39c1" name="Turtles">
+		<status>c029</status>
+		<extrainfo>overdumped, remove last 4kbyte</extrainfo>
+	</hash>
+</hashfile>

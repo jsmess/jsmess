@@ -1,7 +1,0 @@
-<tests>
-
-<test name="aquarius_000" driver="aquarius">
-	<wait time="5"/>
-</test>
-
-</tests>

@@ -1,0 +1,175 @@
+
+No GLSL filter:
+==================
+
+GLSL: brightness, contrast: -gl_glsl -gl_glsl_filter 0 -nofilter -gl_glsl_vid_attr spidman
+M54 
+  0.03s,    1 F, avrg game: 33.33 FPS 33.03 ms/f, avrg video: 25.00 FPS 41.33 ms/f, last video: 48.34 FPS 20.68 ms/f
+  1.06s,   32 F, avrg game: 30.19 FPS 33.31 ms/f, avrg video: 47.76 FPS 21.04 ms/f, last video: 48.62 FPS 20.57 ms/f
+  2.06s,   62 F, avrg game: 30.10 FPS 33.33 ms/f, avrg video: 47.69 FPS 21.06 ms/f, last video: 47.54 FPS 21.03 ms/f
+  3.10s,   93 F, avrg game: 30.00 FPS 33.34 ms/f, avrg video: 47.69 FPS 21.07 ms/f, last video: 47.55 FPS 21.03 ms/f
+  4.10s,  123 F, avrg game: 30.00 FPS 33.34 ms/f, avrg video: 47.49 FPS 21.06 ms/f, last video: 47.13 FPS 21.22 ms/f
+  5.13s,  154 F, avrg game: 30.02 FPS 33.33 ms/f, avrg video: 47.53 FPS 21.05 ms/f, last video: 47.52 FPS 21.04 ms/f
+  6.16s,  185 F, avrg game: 30.03 FPS 33.34 ms/f, avrg video: 47.56 FPS 21.07 ms/f, last video: 48.21 FPS 20.74 ms/f
+
+RV610 
+  0.01s,    1 F, avrg game: 100.00 FPS 16.66 ms/f, avrg video: 33.33 FPS 31.57 ms/f, last video: 62.04 FPS 16.12 ms/f
+  1.03s,   60 F, avrg game: 58.25 FPS 17.22 ms/f, avrg video: 61.86 FPS 16.17 ms/f, last video: 64.79 FPS 15.43 ms/f
+  2.03s,  116 F, avrg game: 57.14 FPS 17.53 ms/f, avrg video: 62.37 FPS 16.07 ms/f, last video: 63.12 FPS 15.84 ms/f
+  3.05s,  171 F, avrg game: 56.07 FPS 17.84 ms/f, avrg video: 62.64 FPS 16.01 ms/f, last video: 64.62 FPS 15.47 ms/f
+  4.05s,  225 F, avrg game: 55.56 FPS 18.00 ms/f, avrg video: 62.67 FPS 15.99 ms/f, last video: 63.79 FPS 15.68 ms/f
+  5.05s,  281 F, avrg game: 55.64 FPS 17.97 ms/f, avrg video: 62.58 FPS 15.98 ms/f, last video: 61.37 FPS 16.29 ms/f
+  6.08s,  332 F, avrg game: 54.61 FPS 18.32 ms/f, avrg video: 62.76 FPS 15.95 ms/f, last video: 63.48 FPS 15.75 ms/f
+
+
+GLSL: brightness, contrast, gamma: -gl_glsl -gl_glsl_filter 0 -nofilter -gl_glsl_vid_attr spidman  **************
+M54
+  0.03s,    1 F, avrg game: 33.33 FPS 34.12 ms/f, avrg video: 25.00 FPS 47.67 ms/f, last video: 41.85 FPS 23.90 ms/f
+  1.03s,   31 F, avrg game: 30.10 FPS 33.36 ms/f, avrg video: 41.33 FPS 24.40 ms/f, last video: 41.56 FPS 24.06 ms/f
+  2.05s,   62 F, avrg game: 30.24 FPS 33.07 ms/f, avrg video: 41.33 FPS 24.29 ms/f, last video: 41.53 FPS 24.08 ms/f
+  3.05s,   92 F, avrg game: 30.16 FPS 33.16 ms/f, avrg video: 41.26 FPS 24.27 ms/f, last video: 41.27 FPS 24.23 ms/f
+  4.08s,  123 F, avrg game: 30.15 FPS 33.21 ms/f, avrg video: 41.28 FPS 24.26 ms/f, last video: 41.39 FPS 24.16 ms/f
+  5.08s,  153 F, avrg game: 30.12 FPS 33.23 ms/f, avrg video: 41.35 FPS 24.24 ms/f, last video: 41.24 FPS 24.25 ms/f
+  6.11s,  184 F, avrg game: 30.11 FPS 33.24 ms/f, avrg video: 41.35 FPS 24.20 ms/f, last video: 42.55 FPS 23.50 ms/f
+
+RV610  **************
+  0.03s,    1 F, avrg game: 33.33 FPS 32.94 ms/f, avrg video: 33.33 FPS 33.92 ms/f, last video: 59.07 FPS 16.93 ms/f
+  1.04s,   37 F, avrg game: 35.58 FPS 28.37 ms/f, avrg video: 57.81 FPS 17.41 ms/f, last video: 60.34 FPS 16.57 ms/f
+  2.04s,   73 F, avrg game: 35.78 FPS 28.08 ms/f, avrg video: 58.40 FPS 17.17 ms/f, last video: 59.60 FPS 16.78 ms/f
+  3.04s,  110 F, avrg game: 36.18 FPS 27.73 ms/f, avrg video: 58.51 FPS 17.11 ms/f, last video: 58.98 FPS 16.95 ms/f
+  4.08s,  146 F, avrg game: 35.78 FPS 27.96 ms/f, avrg video: 58.63 FPS 17.08 ms/f, last video: 59.01 FPS 16.95 ms/f
+  5.10s,  185 F, avrg game: 36.27 FPS 27.57 ms/f, avrg video: 58.73 FPS 17.05 ms/f, last video: 58.57 FPS 17.07 ms/f
+  6.11s,  221 F, avrg game: 36.17 FPS 27.69 ms/f, avrg video: 58.78 FPS 17.02 ms/f, last video: 57.61 FPS 17.36 ms/f
+
+GLSL: paletted: -gl_glsl -gl_glsl_filter 0 -nofilter -nogl_glsl_vid_attr spidman
+RV610
+  0.03s,    1 F, avrg game: 33.33 FPS 33.78 ms/f, avrg video: 33.33 FPS 34.79 ms/f, last video: 57.85 FPS 17.29 ms/f
+  1.03s,   32 F, avrg game: 31.07 FPS 32.31 ms/f, avrg video: 56.14 FPS 18.03 ms/f, last video: 57.68 FPS 17.34 ms/f
+  2.03s,   62 F, avrg game: 30.54 FPS 32.81 ms/f, avrg video: 56.36 FPS 17.83 ms/f, last video: 56.03 FPS 17.85 ms/f
+  3.06s,   93 F, avrg game: 30.39 FPS 32.98 ms/f, avrg video: 56.36 FPS 17.75 ms/f, last video: 56.67 FPS 17.64 ms/f
+  4.06s,  123 F, avrg game: 30.30 FPS 33.07 ms/f, avrg video: 56.68 FPS 17.71 ms/f, last video: 56.62 FPS 17.66 ms/f
+  5.06s,  153 F, avrg game: 30.24 FPS 33.12 ms/f, avrg video: 56.67 FPS 17.69 ms/f, last video: 55.71 FPS 17.95 ms/f
+  6.08s,  184 F, avrg game: 30.26 FPS 33.06 ms/f, avrg video: 56.62 FPS 17.67 ms/f, last video: 58.34 FPS 17.14 ms/f
+  7.08s,  215 F, avrg game: 30.37 FPS 32.95 ms/f, avrg video: 56.73 FPS 17.63 ms/f, last video: 57.57 FPS 17.37 ms/f
+
+!GLSL: -nogl_glsl -nofilter spidman
+RV610
+  0.01s,    1 F, avrg game: 100.00 FPS 17.64 ms/f, avrg video: 33.33 FPS 33.38 ms/f, last video: 60.56 FPS 16.51 ms/f
+  1.01s,   41 F, avrg game: 40.59 FPS 24.84 ms/f, avrg video: 58.57 FPS 17.21 ms/f, last video: 56.98 FPS 17.55 ms/f
+  2.05s,   82 F, avrg game: 40.00 FPS 25.01 ms/f, avrg video: 58.99 FPS 17.01 ms/f, last video: 60.14 FPS 16.63 ms/f
+  3.06s,  122 F, avrg game: 39.87 FPS 25.15 ms/f, avrg video: 59.22 FPS 16.95 ms/f, last video: 58.73 FPS 17.03 ms/f
+  4.10s,  163 F, avrg game: 39.76 FPS 25.16 ms/f, avrg video: 59.27 FPS 16.88 ms/f, last video: 60.63 FPS 16.49 ms/f
+  5.11s,  203 F, avrg game: 39.73 FPS 25.21 ms/f, avrg video: 59.36 FPS 16.87 ms/f, last video: 59.08 FPS 16.93 ms/f
+  6.15s,  243 F, avrg game: 39.51 FPS 25.31 ms/f, avrg video: 59.41 FPS 16.86 ms/f, last video: 59.27 FPS 16.87 ms/f
+
+
+And the winner is:
+	GLSL: brightness, contrast: -gl_glsl -gl_glsl_filter 0 -nofilter -gl_glsl_vid_attr spidman
+	RV610: avrg game: 54.61 FPS 18.32 ms/f, avrg video: 62.76 FPS 15.95 ms/f, last video: 63.48 FPS 15.75 ms/f
+
+++++
+
+GLSL bilinear filter:
+==================
+
+spidman
+
+GLSL: brightness, contrast: -gl_glsl -gl_glsl_filter 1 -nofilter -gl_glsl_vid_attr spidman
+  0.03s,    1 F, avrg game: 33.33 FPS 33.79 ms/f, avrg video: 33.33 FPS 34.43 ms/f, last video: 58.45 FPS 17.11 ms/f
+  1.03s,   32 F, avrg game: 31.07 FPS 32.32 ms/f, avrg video: 56.14 FPS 17.97 ms/f, last video: 56.69 FPS 17.64 ms/f
+  2.04s,   63 F, avrg game: 30.88 FPS 32.54 ms/f, avrg video: 56.76 FPS 17.70 ms/f, last video: 57.84 FPS 17.29 ms/f
+  3.06s,   95 F, avrg game: 31.05 FPS 32.29 ms/f, avrg video: 56.89 FPS 17.60 ms/f, last video: 56.49 FPS 17.70 ms/f
+  4.10s,  126 F, avrg game: 30.73 FPS 32.54 ms/f, avrg video: 57.01 FPS 17.55 ms/f, last video: 57.31 FPS 17.45 ms/f
+  5.13s,  157 F, avrg game: 30.60 FPS 32.70 ms/f, avrg video: 57.30 FPS 17.51 ms/f, last video: 57.27 FPS 17.46 ms/f
+  6.14s,  188 F, avrg game: 30.62 FPS 32.71 ms/f, avrg video: 57.32 FPS 17.48 ms/f, last video: 57.80 FPS 17.30 ms/f
+
+
+GLSL: paletted: -gl_glsl -gl_glsl_filter 1 -nofilter -nogl_glsl_vid_attr spidman
+  0.03s,    1 F, avrg game: 33.33 FPS 33.01 ms/f, avrg video: 25.00 FPS 42.92 ms/f, last video: 46.60 FPS 21.46 ms/f
+  1.03s,   31 F, avrg game: 30.10 FPS 33.32 ms/f, avrg video: 45.59 FPS 21.98 ms/f, last video: 46.46 FPS 21.52 ms/f
+  2.03s,   61 F, avrg game: 30.05 FPS 33.34 ms/f, avrg video: 45.86 FPS 21.96 ms/f, last video: 45.60 FPS 21.93 ms/f
+  3.03s,   91 F, avrg game: 30.03 FPS 33.34 ms/f, avrg video: 45.73 FPS 21.95 ms/f, last video: 45.44 FPS 22.01 ms/f
+  4.06s,  122 F, avrg game: 30.05 FPS 33.34 ms/f, avrg video: 45.69 FPS 21.94 ms/f, last video: 46.14 FPS 21.67 ms/f
+  5.06s,  152 F, avrg game: 30.04 FPS 33.34 ms/f, avrg video: 45.65 FPS 21.94 ms/f, last video: 44.87 FPS 22.29 ms/f
+  6.10s,  183 F, avrg game: 30.00 FPS 33.33 ms/f, avrg video: 45.64 FPS 21.94 ms/f, last video: 46.47 FPS 21.52 ms/f
+
+
+!GLSL: -nogl_glsl -filter spidman  **************
+RV610  **************
+  0.03s,    1 F, avrg game: 33.33 FPS 32.18 ms/f, avrg video: 33.33 FPS 33.42 ms/f, last video: 61.35 FPS 16.30 ms/f
+  1.03s,   41 F, avrg game: 39.81 FPS 25.19 ms/f, avrg video: 59.42 FPS 17.06 ms/f, last video: 59.41 FPS 16.83 ms/f
+  2.04s,   82 F, avrg game: 40.20 FPS 24.99 ms/f, avrg video: 59.42 FPS 16.92 ms/f, last video: 61.21 FPS 16.34 ms/f
+  3.04s,  123 F, avrg game: 40.46 FPS 24.80 ms/f, avrg video: 59.42 FPS 16.85 ms/f, last video: 58.94 FPS 16.97 ms/f
+  4.08s,  164 F, avrg game: 40.20 FPS 24.89 ms/f, avrg video: 59.64 FPS 16.81 ms/f, last video: 60.10 FPS 16.64 ms/f
+  5.09s,  206 F, avrg game: 40.47 FPS 24.75 ms/f, avrg video: 59.54 FPS 16.80 ms/f, last video: 59.61 FPS 16.77 ms/f
+  6.11s,  248 F, avrg game: 40.59 FPS 24.66 ms/f, avrg video: 59.62 FPS 16.79 ms/f, last video: 59.09 FPS 16.92 ms/f
+
+++++++++++++++++++++
+++++++++++++++++++++
+
+propcycl
+GLSL: nofilter, brightness, contrast: -gl_glsl -gl_glsl_filter 0 -nofilter -gl_glsl_vid_attr propcycl **************
+RV610
+  0.08s,    1 F, avrg game: 12.50 FPS 85.02 ms/f, avrg video:  9.09 FPS 113.63 ms/f, last video: 17.61 FPS 56.79 ms/f
+  1.11s,   13 F, avrg game: 11.71 FPS 86.01 ms/f, avrg video: 16.25 FPS 61.88 ms/f, last video: 17.51 FPS 57.12 ms/f
+  2.18s,   25 F, avrg game: 11.47 FPS 87.42 ms/f, avrg video: 16.78 FPS 59.83 ms/f, last video: 17.39 FPS 57.51 ms/f
+  3.20s,   36 F, avrg game: 11.25 FPS 89.03 ms/f, avrg video: 16.98 FPS 59.06 ms/f, last video: 17.26 FPS 57.94 ms/f
+  4.24s,   47 F, avrg game: 11.08 FPS 90.23 ms/f, avrg video: 17.03 FPS 58.74 ms/f, last video: 16.72 FPS 59.80 ms/f
+  5.25s,   58 F, avrg game: 11.05 FPS 90.68 ms/f, avrg video: 17.11 FPS 58.50 ms/f, last video: 17.44 FPS 57.35 ms/f
+  6.28s,   69 F, avrg game: 10.99 FPS 91.03 ms/f, avrg video: 17.16 FPS 58.31 ms/f, last video: 17.30 FPS 57.79 ms/f
+  7.29s,   81 F, avrg game: 11.11 FPS 90.01 ms/f, avrg video: 17.20 FPS 58.26 ms/f, last video: 17.39 FPS 57.49 ms/f
+
+GLSL: FF bfilter, brightness, contrast: -gl_glsl -gl_glsl_filter 0 -filter -gl_glsl_vid_attr propcycl **********
+RV610 **********
+  0.08s,    1 F, avrg game: 12.50 FPS 84.68 ms/f, avrg video:  9.09 FPS 113.94 ms/f, last video: 17.57 FPS 56.91 ms/f
+  1.11s,   13 F, avrg game: 11.71 FPS 85.57 ms/f, avrg video: 16.46 FPS 61.52 ms/f, last video: 17.57 FPS 56.90 ms/f
+  2.17s,   25 F, avrg game: 11.52 FPS 86.89 ms/f, avrg video: 16.89 FPS 59.52 ms/f, last video: 17.70 FPS 56.51 ms/f
+  3.18s,   36 F, avrg game: 11.32 FPS 88.46 ms/f, avrg video: 17.06 FPS 58.81 ms/f, last video: 17.48 FPS 57.20 ms/f
+  4.18s,   47 F, avrg game: 11.24 FPS 89.09 ms/f, avrg video: 17.15 FPS 58.47 ms/f, last video: 17.11 FPS 58.46 ms/f
+  5.20s,   58 F, avrg game: 11.15 FPS 89.69 ms/f, avrg video: 17.21 FPS 58.22 ms/f, last video: 17.60 FPS 56.81 ms/f
+  6.22s,   69 F, avrg game: 11.09 FPS 90.21 ms/f, avrg video: 17.21 FPS 58.21 ms/f, last video: 16.52 FPS 60.52 ms/f
+
+GLSL: FF bfilter, brightness, contrast, gamma: -gl_glsl -gl_glsl_filter 0 -filter -gl_glsl_vid_attr propcycl
+RV610 
+  0.08s,    1 F, avrg game: 12.50 FPS 85.04 ms/f, avrg video:  9.09 FPS 119.44 ms/f, last video: 16.74 FPS 59.73 ms/f
+  1.11s,   13 F, avrg game: 11.71 FPS 86.11 ms/f, avrg video: 15.66 FPS 64.44 ms/f, last video: 16.61 FPS 60.20 ms/f
+  2.19s,   25 F, avrg game: 11.42 FPS 87.69 ms/f, avrg video: 16.03 FPS 62.60 ms/f, last video: 16.65 FPS 60.05 ms/f
+  3.21s,   36 F, avrg game: 11.21 FPS 89.21 ms/f, avrg video: 16.22 FPS 61.72 ms/f, last video: 16.78 FPS 59.60 ms/f
+  4.25s,   47 F, avrg game: 11.06 FPS 90.53 ms/f, avrg video: 16.32 FPS 61.33 ms/f, last video: 16.64 FPS 60.10 ms/f
+  5.28s,   58 F, avrg game: 10.98 FPS 91.05 ms/f, avrg video: 16.38 FPS 61.06 ms/f, last video: 17.00 FPS 58.83 ms/f
+  6.30s,   69 F, avrg game: 10.95 FPS 91.43 ms/f, avrg video: 16.43 FPS 60.91 ms/f, last video: 16.97 FPS 58.93 ms/f
+
+GLSL: FF bfilter, paletted: -gl_glsl -gl_glsl_filter 0 -filter -nogl_glsl_vid_attr propcycl
+RV610 
+  0.08s,    1 F, avrg game: 12.50 FPS 84.86 ms/f, avrg video:  9.09 FPS 118.60 ms/f, last video: 16.91 FPS 59.15 ms/f
+  1.11s,   13 F, avrg game: 11.71 FPS 86.15 ms/f, avrg video: 15.66 FPS 63.92 ms/f, last video: 17.00 FPS 58.82 ms/f
+  2.19s,   25 F, avrg game: 11.42 FPS 87.61 ms/f, avrg video: 16.23 FPS 61.65 ms/f, last video: 16.88 FPS 59.24 ms/f
+  3.22s,   36 F, avrg game: 11.18 FPS 89.48 ms/f, avrg video: 16.36 FPS 61.15 ms/f, last video: 14.86 FPS 67.31 ms/f
+  4.25s,   47 F, avrg game: 11.06 FPS 90.50 ms/f, avrg video: 16.49 FPS 60.72 ms/f, last video: 16.62 FPS 60.16 ms/f
+  5.29s,   58 F, avrg game: 10.96 FPS 91.27 ms/f, avrg video: 16.52 FPS 60.63 ms/f, last video: 15.98 FPS 62.56 ms/f
+  6.31s,   69 F, avrg game: 10.94 FPS 91.59 ms/f, avrg video: 16.55 FPS 60.52 ms/f, last video: 16.80 FPS 59.54 ms/f
+
+
+GLSL: GLSL bfilter, brightness, contrast: -gl_glsl -gl_glsl_filter 1 -nofilter -gl_glsl_vid_attr propcycl
+RV610
+  0.08s,    1 F, avrg game: 12.50 FPS 86.35 ms/f, avrg video:  9.09 FPS 119.48 ms/f, last video: 16.72 FPS 59.80 ms/f
+  1.12s,   13 F, avrg game: 11.61 FPS 86.58 ms/f, avrg video: 15.66 FPS 64.22 ms/f, last video: 16.44 FPS 60.82 ms/f
+  2.17s,   25 F, avrg game: 11.52 FPS 86.82 ms/f, avrg video: 16.23 FPS 61.90 ms/f, last video: 16.68 FPS 59.96 ms/f
+  3.19s,   36 F, avrg game: 11.29 FPS 88.71 ms/f, avrg video: 16.29 FPS 61.40 ms/f, last video: 16.58 FPS 60.31 ms/f
+  4.23s,   47 F, avrg game: 11.11 FPS 90.13 ms/f, avrg video: 16.38 FPS 61.12 ms/f, last video: 16.65 FPS 60.06 ms/f
+  5.24s,   58 F, avrg game: 11.07 FPS 90.46 ms/f, avrg video: 16.52 FPS 60.66 ms/f, last video: 25.23 FPS 39.64 ms/f
+  6.28s,   69 F, avrg game: 10.99 FPS 91.01 ms/f, avrg video: 16.51 FPS 60.61 ms/f, last video: 16.36 FPS 61.13 ms/f
+
+!GLSL: -nogl_glsl -filter propcycl
+RV610  
+  0.08s,    1 F, avrg game: 12.50 FPS 85.13 ms/f, avrg video:  8.33 FPS 120.67 ms/f, last video: 16.65 FPS 60.07 ms/f
+  1.15s,   13 F, avrg game: 11.30 FPS 89.12 ms/f, avrg video: 15.29 FPS 65.94 ms/f, last video: 16.75 FPS 59.70 ms/f
+  2.23s,   25 F, avrg game: 11.21 FPS 89.51 ms/f, avrg video: 15.92 FPS 63.14 ms/f, last video: 15.99 FPS 62.55 ms/f
+  3.24s,   36 F, avrg game: 11.11 FPS 90.23 ms/f, avrg video: 16.07 FPS 62.24 ms/f, last video: 16.37 FPS 61.10 ms/f
+  4.30s,   47 F, avrg game: 10.93 FPS 91.54 ms/f, avrg video: 16.21 FPS 61.80 ms/f, last video: 15.91 FPS 62.85 ms/f
+  5.33s,   58 F, avrg game: 10.88 FPS 92.06 ms/f, avrg video: 16.25 FPS 61.56 ms/f, last video: 16.40 FPS 60.98 ms/f
+  6.38s,   69 F, avrg game: 10.82 FPS 92.49 ms/f, avrg video: 16.27 FPS 61.46 ms/f, last video: 15.05 FPS 66.47 ms/f
+
+The point here is, a GLSL implementation beats the FF one at very high bandwidth .. !!
+
+

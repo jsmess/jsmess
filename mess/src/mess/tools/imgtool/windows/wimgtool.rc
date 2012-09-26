@@ -1,0 +1,265 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "wimgres.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include <windows.h>
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE
+BEGIN
+    "wimgres.h\0"
+END
+
+2 TEXTINCLUDE
+BEGIN
+    "#include <windows.h>\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_WIMGTOOL_MENU MENU
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "&Open\tCtrl+O",               ID_FILE_OPEN
+        MENUITEM "&Close\tCtrl+W",              ID_FILE_CLOSE
+    END
+    POPUP "&Image"
+    BEGIN
+        MENUITEM "&Insert File...\tCtrl+I",     ID_IMAGE_INSERT
+        MENUITEM "&Extract...\tCtrl+E",         ID_IMAGE_EXTRACT
+        MENUITEM "&New Directory...\tCtrl+Y",   ID_IMAGE_CREATEDIR
+        MENUITEM "&Delete\tDel",                ID_IMAGE_DELETE
+        MENUITEM "&View Sector Data...\tCtrl+V", ID_IMAGE_SECTORVIEW
+    END
+    POPUP "&View"
+    BEGIN
+        MENUITEM "&Icons",                      ID_VIEW_ICONS
+        MENUITEM "&List",                       ID_VIEW_LIST
+        MENUITEM "&Details",                    ID_VIEW_DETAILS
+        MENUITEM SEPARATOR
+        MENUITEM "&File Assocations...",        ID_VIEW_ASSOCIATIONS
+    END
+END
+
+IDR_FILECONTEXT_MENU MENU
+BEGIN
+    POPUP "Context Menu"
+    BEGIN
+        MENUITEM "&Extract...",                 ID_IMAGE_EXTRACT
+        MENUITEM "&New Directory...",           ID_IMAGE_CREATEDIR
+        MENUITEM "&Delete",                     ID_IMAGE_DELETE
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDA_WIMGTOOL_MENU ACCELERATORS
+BEGIN
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL, NOINVERT
+    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
+    "W",            ID_FILE_CLOSE,          VIRTKEY, CONTROL, NOINVERT
+    "I",            ID_IMAGE_INSERT,        VIRTKEY, CONTROL, NOINVERT
+    "E",            ID_IMAGE_EXTRACT,       VIRTKEY, CONTROL, NOINVERT
+    "Y",            ID_IMAGE_CREATEDIR,     VIRTKEY, CONTROL, NOINVERT
+    "V",            ID_IMAGE_SECTORVIEW,    VIRTKEY, CONTROL, NOINVERT
+    VK_DELETE,      ID_IMAGE_DELETE,        VIRTKEY, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_FILETEMPLATE DIALOGEX 0, 0, 186, 28
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_CLIPSIBLINGS | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&More >>",IDC_MORE,7,7,50,14
+END
+
+IDD_FILEOPTIONS DIALOGEX 0, 0, 186, 29
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "File Options"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,129,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,7,7,50,14
+END
+
+IDD_ASSOCIATIONS DIALOGEX 0, 0, 186, 28
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "File Associations"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,129,7,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,7,7,50,14
+END
+
+IDD_CREATEDIR DIALOGEX 0, 0, 186, 47
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "New Directory"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,129,26,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,7,26,50,14
+    LTEXT           "Directory Name:",IDC_STATIC,7,8,53,8
+    EDITTEXT        IDC_EDIT,63,7,116,14,ES_AUTOHSCROLL
+END
+
+IDD_SECTORVIEW DIALOGEX 0, 0, 366, 126
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Sector Viewer"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,309,105,50,14
+    LTEXT           "Track:",IDC_TRACKLABEL,7,108,23,11
+    EDITTEXT        IDC_TRACKEDIT,33,106,26,13,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Side:",IDC_HEADLABEL,73,108,17,11
+    EDITTEXT        IDC_HEADEDIT,95,106,26,13,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Sector:",IDC_SECTORLABEL,135,108,23,11
+    EDITTEXT        IDC_SECTOREDIT,161,106,26,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "",IDC_HEXVIEW,"hexview_class",0x0,7,6,352,96,0x200000L
+    CONTROL         "",IDC_TRACKSPIN,"msctls_updown32",UDS_SETBUDDYINT | UDS_ARROWKEYS,59,106,9,12
+    CONTROL         "",IDC_HEADSPIN,"msctls_updown32",UDS_SETBUDDYINT | UDS_ARROWKEYS,121,106,9,12
+    CONTROL         "",IDC_SECTORSPIN,"msctls_updown32",UDS_SETBUDDYINT | UDS_ARROWKEYS,187,106,9,12
+END
+
+IDD_EXTRACTOPTIONS DIALOG 0, 0, 182, 22
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_CLIPSIBLINGS | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "                       ",IDC_STATIC,500,500,48,8
+    LTEXT           "Mode:",IDC_STATIC,5,4,48,8
+    COMBOBOX        IDC_FILTERCOMBO,54,2,119,100,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_FILETEMPLATE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 21
+    END
+
+    IDD_FILEOPTIONS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 22
+    END
+
+    IDD_ASSOCIATIONS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 21
+    END
+
+    IDD_CREATEDIR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 40
+    END
+
+    IDD_SECTORVIEW, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 359
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 119
+    END
+
+    IDD_EXTRACTOPTIONS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 175
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 15
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_IMGTOOL             ICON                    "res/imgtool.ico"
+IDI_DOC                 ICON                    "res/doc.ico"
+IDI_READONLY            ICON                    "res/readonly.ico"
+IDI_DIRECTORY           ICON                    "res/dir.ico"
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

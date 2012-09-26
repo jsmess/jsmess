@@ -1,0 +1,3586 @@
+<hashfile>
+	<!-- This MESS HASH file was auto-generated from Cowering's GoodOric database (V3.14)  -->
+	<!-- for the exclusive use of MESS.  Keep this notice intact if editing this file  -->
+
+	<hash crc32="849aa8c9" sha1="96b55b2a61100a623c90154cded260ae53f8a800" name="0.did (Damsel in Distress) (UK)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="693b1888" sha1="e2b86ae997cbf944b5cd2c0d715d78875efa3f19" name="007 - Dangereusement Votre (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="78d573ff" sha1="a7e5f07be07cc8d3fd2ef32d02c87d3a47f65928" name="1.did (Damsel in Distress) (UK)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="53aa1cfe" sha1="344caba7cf447e06de474b94492b3b1b31f94ebd" name="2.did (Damsel in Distress) (UK)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="14cb32e5" sha1="3c1dcb031a73aec9204d8cee924d37a16002afb5" name="3.did (Damsel in Distress) (UK)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="de11fbe2" sha1="49cf3b9fc434c731c3174dd2356857c21dba0ce7" name="3D Editor by Loriciel (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="b58340df" sha1="838e36916647ba225dc489a55f99061d538e4d6a" name="3D Fongus (F) (Disk Version)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="c80a0843" sha1="f92e3eca92d51098c7363bc41325f9c450aadee7" name="3D Fongus (F) (Disk Version)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="e53a85d5" sha1="2ae70d5051613971ebe4146a454a825a36eaf8bb" name="3D Fongus (F)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="a132e45c" sha1="88408d8e0dd839c6dae27055ec668cef60ef5b40" name="3D Fongus (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="ec6b3af1" sha1="4b588eca0d9b3e89ef26ab168d7c859850b7176a" name="3D Luffar-Schack (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="e9b711c1" sha1="f0184d4df1d3b33e38f157acb32ae46f610d36d8" name="3D Maze (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="cddfc7fa" sha1="312f7d4f5900506c3c3f0e6bf3b3ceca4e460ac9" name="3D Munch (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="830ef5b3" sha1="b00acbcc840c7bfb31778c10df23ce4dadebcf22" name="3D Noughts and Crosses (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="9cee7b53" sha1="d2b4e8986cb3d031b0abaee873c72fcff6ddb351" name="3D Polygon Demo (F) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="1d34560c" sha1="620b45ca7b1e46f4bfc0358b877c735afbc3216e" name="3D Tunnel, The (F) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="968bf797" sha1="fa9e78cd45165577678134f990380f8858367eca" name="4 Games (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="cb9afa67" sha1="f61dc6840412c3642ca2aeb0dbbbc675096756b2" name="4.did (Damsel in Distress) (UK)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="e3685246" sha1="d542e17ee6fb6898c6c20ccdf4972a089d83d7a3" name="48k Oric Golf (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="1335cca5" sha1="fc52ce11b70ab3a95d7780b33e6ed95ae3aea150" name="4K Kong by Mickael Pointier (UK) (Atmos) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="06fc6d89" sha1="31c7b53cbd829408392a3452f12a333bf260020f" name="7eme Dan, Le (F) (File 1 of 4)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="930d6bc6" sha1="035bb6af6fae8ca7e62fb073764101ee1bd5f480" name="7eme Dan, Le (F) (File 2 of 4)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8b0d2073" sha1="51456418e528072a79990daf92a380721683d293" name="7eme Dan, Le (F) (File 3 of 4)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1efc1a1b" sha1="97a634c2c81c37f3826166314a348787b608f270" name="7eme Dan, Le (F) (File 4 of 4)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4edda739" sha1="9b40c851720f88309084910d2d21d8590abda58c" name="A.T.M - Air Terre Mer (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="1c4c124d" sha1="6c2bf97633a89efd403d2091a16797a179d9f97d" name="Acrobate (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="82fc8b85" sha1="3e10255407efee6907a1bfa31aa0b51f1b169eed" name="Adventure Quest (UK)">
+		<status>Known Bad Image</status>
+		<year>1983</year>
+	</hash>
+	<hash crc32="721e0461" sha1="a497f0f3bffda8273336c841a925c83aca55cced" name="Affaire En Or, Une (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8c09b81e" sha1="18f36efd88479c98e144a13a9b65df6ef4f74e70" name="Africa (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ee6938af" sha1="8e7a56bd7baa073f34fd722474cd18a67586f521" name="Agent 0013 (F) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="d978d7d4" sha1="c78718c0279b0d717f3538a4a26d2a708addc617" name="Agent 0013 (F) [a2]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="24e779e1" sha1="d17f91ddc4fdd1dce2325a8121609ab8da1f7e53" name="Agent 0013 (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="f2b58443" sha1="9a623dc24c83485d484051ead89b5ecbb1ced948" name="Aidez Cyprien a rammasser des lettres (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="375a52cd" sha1="766e34f1dcdac58fbdbfddb3f701a281ab56e6e5" name="Aigle D'Or, Le (F) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="76de857c" sha1="e8b5d417d482809a5145e1d160d01064721fe4e7" name="Aigle D'Or, Le (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="b8c53f69" sha1="71a8650b5d219dd9ed11474cd2092faf389391df" name="Aiglon (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="a7c0371f" sha1="ae8a34c43b65f87017ed351bf986ce167bc7ef47" name="Airfox (F) (File 1 of 2)">
+		<year>1988</year>
+	</hash>
+	<hash crc32="1e7973a2" sha1="c472b25b2cb8cd6cf7ccf241ddc9aea43fae1d4d" name="Airfox (F) (File 2 of 2)">
+		<year>1988</year>
+	</hash>
+	<hash crc32="fa08cc7c" sha1="dc3570aa7ca74bc31b5cacd993bc65c4ee5999eb" name="Airline (UK) (Oric-1)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="284d2f13" sha1="9deec74817b404fae047a4388e7fc3b5bd35b09d" name="ALCool (F) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2d89ac3e" sha1="c0bf4b54dc55b65c2d2216968589d7f2ef5249d0" name="Alien Storm (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e99cf2da" sha1="8c53666f4ff15807d6ffd18e03f4a3185d4c5f41" name="All In One Disk from Compo2003 (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="a85f6032" sha1="b920ebc900ba8c62f55ee4f19256ed264752448b" name="Alphabet (Loader) (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="22d2977f" sha1="0b18712fad2e95bc194cca1172d3172384f9df20" name="Alphabet (Loader) (G)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="3ea122d6" sha1="af611a49870931bcc9ae77dea07971aa3f46844f" name="Am-1 A Amnukor Travail (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="1f3a119e" sha1="7dc0159d9384571980c0247eb4cd44badfb7299b" name="Amazea (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="cfee8743" sha1="4de55a640680a99b5e36e90ca77bab8c7fb730a4" name="Ammnukor Master Prg Princip (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="6e6d0c74" sha1="70763ac3dfc72511cef4a6a2aa787b9a65b1db8d" name="Ammnukor Master Utilitaires (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="2c302d14" sha1="40a17e42400b76a72e8f6de86c3b616254f51350" name="Ammnukor Utilitaires - Side A (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d8f5d25b" sha1="b540ac377d93be2be6dc02624437d63c16a2f867" name="Ammnukor Utilitaires - Side B (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="8bc8895f" sha1="bf8911c1d4390f5671093323515d17e4039764a9" name="Amor's Pilar (SW)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="41eb151d" sha1="cb8c4f723ba0605c1ac843ff9eae7418c628b701" name="Anagram (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c9ff78f0" sha1="bb8f32b974b111ccdc7a259edb05ff19c7e505de" name="Animaciq (PD)"> </hash>
+	<hash crc32="1b813bc1" sha1="36b81a1ec2428bbef8ce77d0916910399278a995" name="Animations, The (for TeleStrat) (F) (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="3357f0be" sha1="1284dca856e35c1d0efc7ca6c26adff3c6cb8506" name="AntiISDA Warrior 1K Version by Ventzislav Tzvetkov (PD) [a1]"> </hash>
+	<hash crc32="2ff7f3a2" sha1="3497b20ff99fce3c436f8f7abbc1785dcb0894e6" name="AntiISDA Warrior 1K Version by Ventzislav Tzvetkov (PD) [a2]"> </hash>
+	<hash crc32="682f06d5" sha1="486c4148a99b23a8e6c4a40dc4a0822b22f24c69" name="AntiISDA Warrior 1K Version by Ventzislav Tzvetkov (PD)"> </hash>
+	<hash crc32="c8261855" sha1="f09b5c1534281f80800e9f80539e99481aaaa7e9" name="AntiISDA Warrior by Ventzislav Tzvetkov (PD)"> </hash>
+	<hash crc32="8c7049ae" sha1="bcd128337d154fc9a2e5ad7b495dde4ca3b2959d" name="Antre De La Peur, Le (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="58dd44e8" sha1="9382922a1478953ff5f31616e1bb5bdaee44fe3a" name="Apaches (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5e105553" sha1="61c60d7b44e3247c5551d5910df48d328c5243c0" name="Archeron's Rage (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="060f7f50" sha1="3d39b17a0de416a15850879d08cfcc86643f8877" name="Arena 3000 (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="bcf88c17" sha1="7a3564f6036299372082cde7499a66f35f9bf732" name="Arena 3000 (UK)">
+		<status>Known Bad Image</status>
+		<year>1984</year>
+	</hash>
+	<hash crc32="9e5d43f3" sha1="b9421cca5bcd15ebaf1fde11f489ba5a99fac03c" name="Arithmetic (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="11a61d91" sha1="ee7591c2603cfb6955c16dcdf48e8d9a071816b6" name="Arnak - Music from 'The Entertainer' by Marc Goldstein (PD)"> </hash>
+	<hash crc32="0f0b3ed5" sha1="45ec17de029e161c7478bbdc6f02b67c1a415b2e" name="Artist (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="455c4d95" sha1="68bdfdd5abd73dafd6a5ace35cc1273bd0824653" name="Assemblermonitor Wap V2.3 For Lab 6502 Assembler (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="c1bb714b" sha1="c63462526cafe146ed54e48bd18c8e258a4cc01c" name="Assembly 2002 Invite by Defense Force (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="7bb12b71" sha1="6f0cda060c0e5423b307af19da472b74b76efb6f" name="Astro Lander by A.P. Gardner (UK) (PD)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="55dc86d4" sha1="08ac5ff4e308a778ce1c2ed8d576e80be465eaae" name="Atlantid (F) (File 1 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2bb1a463" sha1="0c648f9c43ad2889823b7d6854ea5e64c1f26f7b" name="Atlantid (F) (File 2 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d441c7a2" sha1="bfd0ea0c934a69b09a67fdf446172480f1577bbc" name="Atlantid (F) (File 3 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="393b66bd" sha1="29b8d5c4f4a9c25fce0c795f8179159dbe66ddb0" name="Atlantis (F) [a1]">
+		<year>1985</year>
+	</hash>
+	<hash crc32="e6ab04e6" sha1="7c024eb02f9a0b2f93d18318268d4c5fd183a92e" name="Atlantis (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="17ac0ec4" sha1="5fef5ea5a85fcc5ded5f3a4d09aed024045fc1a1" name="Atmos 48k Backgammon (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="6ed2ddc9" sha1="ddbd02e7a089e8970873035397a92bb32826d882" name="Attack of The Cybermen (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="66a4b52b" sha1="0a9f73eecdf7a2b636f73ddbc51e1bc5f5c7e2de" name="Attack On Kixi (F) (File 1 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="29cfb527" sha1="7e1f966eab00f996ef13d571cd0cd6b4163b2bbb" name="Attack On Kixi (F) (File 2 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="1cf02a85" sha1="ae58ee1c42362130591c0f954343a75923638f2e" name="Attack On Kixi (F) (File 3 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d66eb961" sha1="539dbf101f528ea9d2d811a47671b154ca46b98d" name="Auloup (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5137e977" sha1="501e024a0865890db87058bd199451a35a9e2cfc" name="Author (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="e0bf8db2" sha1="680434e24be3a497122713e23a99de94dcf90f43" name="Auto-Ecole (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d1778942" sha1="2e7a99904dcbc1c43d818ff86ad9974d0205dcaa" name="Auto-Meca (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="97b9c61b" sha1="a12fa27fe816e5efa7e602d1bfbf47b72721e816" name="Aventures De Lilla Et Jacky, Les (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5c6a0c1b" sha1="915dfdeda6e7346b4d46680f801fbd2693f9e851" name="Awari (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="ecc15e30" sha1="d3b88b5ed91e95a475298a99c16234c9b351fda8" name="Backgammon (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="5716d1a2" sha1="5136a1ece49614cb6eb2c2e3726f5e5360954cda" name="Balles (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="c3eb2db4" sha1="17931f03f0cab6243d520524a1b83e77bf945e3b" name="BarbitOric by Defense Force (PD) [a1]">
+		<year>2002</year>
+	</hash>
+	<hash crc32="f7c2f4ef" sha1="76c1d21a3759ac00a90817b3a309d4613ba9052e" name="BarbitOric by Defense Force (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="ea74bf41" sha1="ed3afb0e359a9b6efd393bb04f8bbfd0a2d4dc2a" name="Base de Connaissances (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="900928da" sha1="d0e33d94420f6388d630379f7eb7abb2eab21eba" name="Basic Francais V1.0 (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="ff3154b3" sha1="38d25283bef5c0610f7503f3e02229ea9c9b106a" name="Basic Francais V1.0 (Oric-1) (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="f18710b4" sha1="333116e6884d85aaa4dfc7578a91cceeea66d016" name="BASIC V1.0"> </hash>
+	<hash crc32="c3a92bef" sha1="9451a1a09d8f75944dbd6f91193fc360f1de80ac" name="BASIC V1.1B"> </hash>
+	<hash crc32="07a5a667" sha1="b78e30e356a11b4a90b9b9af1a6a9ad4958f5b9e" name="BASIC V1.1de"> </hash>
+	<hash crc32="2539bb8d" sha1="ef757c7d64e79a5551a27e50e0790cf7cc00e4d3" name="BASIC V1.1es"> </hash>
+	<hash crc32="02bd82f5" sha1="dcc7894123c1e5b084e8dd6f0a4414a802e7a422" name="BASIC V1.1fr"> </hash>
+	<hash crc32="c593bee6" sha1="cf2328528aa7728ea654b62e3c0bf9f7aff1336d" name="BASIC V1.1se"> </hash>
+	<hash crc32="52b5ed9b" sha1="d008c127c914522fc329405fc20660f3fd5c62a7" name="BASIC V1.1uk"> </hash>
+	<hash crc32="f5f0dd52" sha1="75359302452ee7b19537698f124aaefd333688d0" name="BASIC V1.20de"> </hash>
+	<hash crc32="70de4aeb" sha1="b327418aa7d8a5a03c135e3d8acdd511df625893" name="BASIC V1.20es"> </hash>
+	<hash crc32="47a437fc" sha1="70271bc3ed5c3bf4d339d6f5de3de8c3c50ff573" name="BASIC V1.20fr"> </hash>
+	<hash crc32="100abe68" sha1="6211d5969c4d7a6acb86ed19c5e51a33a3bef431" name="BASIC V1.20se"> </hash>
+	<hash crc32="00fce8a6" sha1="d40558bdf61b8aba6260293c9424fd463be7fad8" name="BASIC V1.20uk"> </hash>
+	<hash crc32="dc4f22dc" sha1="845e1a893de3dc0f856fdf2f69c3b73770b4094f" name="BASIC V1.20"> </hash>
+	<hash crc32="94fe32bf" sha1="1024776d20030d602e432e50014502524658643a" name="BASIC V1.21de"> </hash>
+	<hash crc32="87ec679b" sha1="5de6a5f5121f69069c9b93d678046e814b5b64e9" name="BASIC V1.21es"> </hash>
+	<hash crc32="e683dec2" sha1="20df7ebc0f13aa835f286d50137f1a7ff7430c29" name="BASIC V1.21fr"> </hash>
+	<hash crc32="e6ad11c7" sha1="309c94a9861fcb770636dcde1801a5c68ca819b4" name="BASIC V1.21se"> </hash>
+	<hash crc32="75aa1aa9" sha1="ca99e244d9cbef625344c2054023504a4f9dcfe4" name="BASIC V1.21uk"> </hash>
+	<hash crc32="0a2860b1" sha1="b727d5c3bbc8cb1d510f224eb1e0d90d609e8506" name="BASIC V1.21"> </hash>
+	<hash crc32="9a42bd62" sha1="8a9c80f314daf4e5e64fa202e583b8a65796db8b" name="BASIC V1.22de"> </hash>
+	<hash crc32="9144f9e0" sha1="acf2094078af057e74a31d90d7010be51b9033fa" name="BASIC V1.22es"> </hash>
+	<hash crc32="370cfda4" sha1="fad9a0661256e59bcc2915578647573e4128e1bb" name="BASIC V1.22fr"> </hash>
+	<hash crc32="e7fd57a4" sha1="c75cbf7cfafaa02712dc7ca2f972220aef86fb8d" name="BASIC V1.22se"> </hash>
+	<hash crc32="9865bcd7" sha1="2a92e2d119463e682bf10647e3880e26656d65b5" name="BASIC V1.22uk"> </hash>
+	<hash crc32="5ef2a861" sha1="9ab6dc47b6e9dc65a4137ce0f0f12fc2b6ca8442" name="BASIC V1.22"> </hash>
+	<hash crc32="5aa120ef" sha1="844aff7ae19214850750b3207406e8870c6c8ba1" name="Bataille Des Couleurs (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="d0daddd5" sha1="d265126eb93c1c1cd2933a3e1349a309b7a3974f" name="Battle Flight 4 (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="1408ef58" sha1="29609169a5814a7eebc8d38191d338b1f46019ca" name="Binary2decimal (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="317a5b2b" sha1="afe4b28bfb813fc4a281753d65192f18af0f465b" name="Blackjack (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="3a3a29f0" sha1="d59b409434ae2d56fa43e209ab11bc3b89842ded" name="Blitz (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d306ffca" sha1="82fe7da03013354fd449ba72ca7df7788156454f" name="Blockbuster by A.P. Gardner (UK) (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="8bf2aa08" sha1="ace39f04384b643539a8a2310779e18c4608baea" name="Blood,hir (for Oric Demo 1) (UK) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="2efdb7fc" sha1="207b4141778486f194b67d1057b8f315114ac94f" name="Blue War (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="27c8da5c" sha1="f77faa3f1e7df02fb700a575f49148933134f6ff" name="Boite Noire (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="0bf0f04c" sha1="78b807e6094f359cfa52eb03b0921518061175af" name="Bomber (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e3911944" sha1="d1661f6591eb6576e13cd2cb8aac3c1fa371e3f2" name="Bombyx (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5d3ed9e7" sha1="e825ffe3a67bcc1fe775b3f0c5adb05dee3c4bd1" name="Boss, The (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="6f79133e" sha1="14619da5929eee5545b7c8fbb563654cd5c7c113" name="Bounce Sound Demo (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="9d13134e" sha1="b77b637a2c432f610ca92c0830df78aca99e80c6" name="Bouteille (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="505c3d21" sha1="af8d60f65cc0533c003b121d725ba3ec2ae8b6d2" name="Bowling Master by Ventzislav Tzvetkov (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="fe8bfe33" sha1="88062779730279ca4bbb49151321397da94bab68" name="BoxWorld by Stephane Geley (PD)">
+		<year>2004</year>
+	</hash>
+	<hash crc32="df800388" sha1="0efd9e116f3b2a7c37b540531eef5285fae712e5" name="Bozy Boa (F) (File 1 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7b44c577" sha1="41ca3ae86aacc015f5bc37aa857c2b3e334d6f94" name="Bozy Boa (F) (File 2 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="07e405f8" sha1="dd63ec326290ca3fad3357f45af43fe2462cdd37" name="Bozy Boa (F) (File 3 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8b76dfd8" sha1="f8f8340e4d55c187cf206febec4bda7a2ada9c05" name="Break Out (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="722cfc04" sha1="30c8ebfc6c2226c045290dc616668c204c9f8bea" name="Break-Out Machine (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2d9ba28f" sha1="16b6f158a73a173520ad5b38f264fa2a5951d8c2" name="BreakOric 1K by Ventzislav Tzvetkov (PD) [a1]">
+		<year>2003</year>
+	</hash>
+	<hash crc32="ca13db99" sha1="8ff86d595b8b60dcdc01f0bf7105bd9b017940a5" name="BreakOric 1K by Ventzislav Tzvetkov (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="4b091c5f" sha1="5f3524e1ab6d8734c256a482c8bfd05556d257aa" name="Breakout (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="13e36ea9" sha1="fcf540f8a6e7afe7a046236fc1bd4f0fea62129a" name="Breakout by Peter Shaw (UK) (PD)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d3a3856d" sha1="d7c599e984fe8b91888342f3ae274836deaf9468" name="Bricky (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="ea318889" sha1="62a12655616717c5bc4c40abd33e8d8d66e82787" name="Bucanneer (UK) (File 1 of 2)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="de93be19" sha1="af1207912c3f499e2540d1b5b6986a4ce68a71d9" name="Bucanneer (UK) (File 2 of 2)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="4aa32409" sha1="0e3808f50613ca3dbe444b535c1b865d7f8c797e" name="Bunker (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7f3dc3fd" sha1="82d73a2fe73464fe1fac6d15f97d9bb2f5627826" name="Business, The (Converted from BBC) (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="46e089f8" sha1="7bc36ff0bc04b68867de80dd3a52eed9d262a878" name="Byrakrater (F)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2094d75e" sha1="027a827e5a07ed544ecded3c8d078492508d9e9c" name="Bytes Voir Theoric No 13,14,15 (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c0aeebeb" sha1="cf5530d57e6b799254f4be993cb984dc13ffd63f" name="Bytes Voir Theoric No 15 (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="49c964fb" sha1="2c70ac5cd053daf2f910d5f771f295ae9d022a83" name="Calcul Mental (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="48cc767a" sha1="dd27760377efb775ddb720eac4b001cf23a9501b" name="Candyfloss (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="6d137b18" sha1="c4155ca303e765ccf0a8f2cd6441a91bf4c7137d" name="Cannonade - Tir Au Cannon (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8b41cda0" sha1="6c55cad74bd1dada376debfd229e5db93c5ae1d4" name="Capitals (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ffc43fec" sha1="915c96d129917cf349632841ca9838dd01ee2e41" name="Car Maniac (UK) (File 1 of 4)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b96ed171" sha1="c4fead6993f263bf7af0daf0302a60cf30d17067" name="Car Maniac (UK) (File 2 of 4)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a5b49084" sha1="d55aa40bec608165c13598f42cac989ff4f678d9" name="Car Maniac (UK) (File 3 of 4)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4625784a" sha1="22b80832582bca161191836d3f3458c9ab9bb2f9" name="Car Maniac (UK) (File 4 of 4)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="eb841612" sha1="ac11d4e2140cb77d628c1fd4b2b4bb4390888ef9" name="CarGen - Fonctions Principales (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="219d250f" sha1="5c74b4f64dc8d5c4ecf62a97a483a18a92c4b3be" name="Cargrec (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="256aa0dd" sha1="49d6ed04dd4e39dc033eaff034e2325ee7eca381" name="Caspak (F) (File 1 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="6ed2c540" sha1="33ccbd5f70181105699c5afa29549b2da5822a5b" name="Caspak (F) (File 2 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8c649735" sha1="891a82515e201fad2b39794edd833fd811163abd" name="Caspak (F) (File 3 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="305a14d6" sha1="2fe005ad83d000e98855d7dc140eb6802e8f7c11" name="Casse Briques (F) [a1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="efc45d71" sha1="900d4a275399c32774671954ce0ff6900085a1b1" name="Casse Briques (F) [a2]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="446a465b" sha1="19ca4641a4a898ed2920fe551383b42f0ac4a95f" name="Casse Briques (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="9c44c93d" sha1="82ae645e80dd8725ece62324a8be0b574b6a09a1" name="Cassette Mathematique (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d6462d6f" sha1="abdb095c28f185c2d7ab5b853757cde27d4dfe42" name="Categ-Oric (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="c7c80e4b" sha1="b34656f7a12f0d3f0173e01236241f8e0756014e" name="Caterpillar (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="cb70794c" sha1="5e03b4bbf1e41494299ea1eef8ebdb4cc8b88dee" name="Catroons (F) (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="4e5b318d" sha1="d66160cd8d21d0ed38cb4f6bda1492855dda2a11" name="Cavalier (Oriclisp Demo) (F) [a1]">
+		<year>1986-95 </year>
+	</hash>
+	<hash crc32="e31cfbf5" sha1="6d92f214f049dd7fbd1b38463e7af2738b9c04f5" name="Cavalier (Oriclisp Demo) (F)">
+		<year>1986-95 </year>
+	</hash>
+	<hash crc32="eb17855a" sha1="eed7ef97d7e17d1977ffe0710f1a3521b754afc3" name="Centipede (UK) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="6d6edff5" sha1="bcf466655221df157a3cad521b072860380dde4d" name="Centipede (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="6c8f2498" sha1="390302238d980da654c073b3cc64fa700717851f" name="CEO Clip Art 1 (F)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b1927fac" sha1="88cf77457b822c90724ce4278cc5e372528eb359" name="CEO Clip Art 1 (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="3276b7a1" sha1="a3c2028f7a360a4d17782f87ceae33abe06fce58" name="CEO Clip Art 2 (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4a247524" sha1="4ecf2e28cc5ced0cc67528850cf03d473c2cd7fe" name="CEO Clip Art 3 (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f95c79e7" sha1="3d6bf65730b4945b30104d1ea07ca639fca7df84" name="CEO Clip Art 4 (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5f38f3b8" sha1="28bbdf51acf9eeb3624c9a8a67344f4874d33e38" name="CEO Clip Art 5 (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5be904cc" sha1="3243d52820b36f6d015a20d81d6107b000e01e76" name="CEO Clip Art 6 (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2c7dcdd1" sha1="5121c51c6755618bcc4fba5fe98dd4046dbb2106" name="Challenge Voile (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="dfeec24b" sha1="5a2064082aac2872008164a07d5cb97f5a77205a" name="Character Define (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a2ee5514" sha1="7087896da0c1e866ee8620fd0c0dce25f60e0c1a" name="Character Definition Program (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="5473204a" sha1="faec0cb14250e21083ba112b40e7eec2767a8c30" name="Chared by Twilighte (PD)">
+		<year>199x</year>
+	</hash>
+	<hash crc32="ce3b0f7a" sha1="4a792626ee7e1e641d352d251aab5f72f0d1f977" name="Chase (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="3de69558" sha1="3e6379372f5741931278d9b7684a2a6a4953fa06" name="Chasse Au Tresor (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="2f6af3dc" sha1="ce4195297056b64ee4807318bf44c0578f0b17b0" name="Ched90 by Twilighte (UK)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="2751496e" sha1="e196fadaf37fa10a1c4d8f8e882dd6ea9f1eea35" name="Cheese-Snake (UK) (PD)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="6ad94dd9" sha1="2faa6c20b9f1f631418d6c0078a079f43b12930e" name="Chenille Infernale (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d1cf48d4" sha1="22acd275642cde86f404ef894d0d24d2e81b5fd8" name="Cheops (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="80f113e0" sha1="4d85d5db0d3d9d60323fa060e7fc0622f9f9c898" name="Chequebook (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b117c43e" sha1="79bd5a025242d100ed801b992b8b5ae0accb35e2" name="Chess 3.48 (UK) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="16e0c769" sha1="5389736c42b3c13cb9478c2a53765ec90a2f6ca3" name="Chess 3.48 (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="7726743a" sha1="a54221f96deb621a4eedf4f18e0e0adf7ff95d8b" name="Chess II (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="9395c7fa" sha1="e48431e2df0ad347dbf8147d3e2985801cc240cc" name="Chips (PD)"> </hash>
+	<hash crc32="b0d876c2" sha1="72ac96222a6c2ea3b924f1003f967f64be284737" name="Chopper (UK) (Disk Version)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="eb424ad6" sha1="5551765efce516d10371a10d1baf4c77fa14d444" name="Chopper (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="27f955a4" sha1="854f6caad42ca16d46a3237b71f92d731339be31" name="Chopper Bomber By Shingo Sugiura (UK) (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="486dc7e5" sha1="212b86bfd8fe5918c7266bbab485b1918e1a536e" name="Chopsticks (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a0f4775e" sha1="779adbd3a18ea2cc788050686271a2d4a77ae3e0" name="Chuckford (F) (File 1 of 2)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b23f6b00" sha1="32c2aa9dd0ee98967cec1bdf5dd711f91f5a0bed" name="Chuckford (F) (File 2 of 2)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c8c083da" sha1="5f584bfe03b263eb73c50aa4fc3d3ad084515b23" name="Circles (PD)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8c5d18a8" sha1="9d7d1a11ed91f84ee4e378de1cc136887f817e0e" name="Circuit Oric (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="f724a653" sha1="a8b85f876a0602cb15b5394178e5c2cde6106683" name="Ciro ou Les Envahisseurs Fous (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="263e09a4" sha1="d90c5c3b7b69a0a0c1d94a82854936b9ae6913c9" name="Citadelle (F) (File 1 of 2)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d6c700da" sha1="e41a96c5084953c72616157cdf23e2b7e4798019" name="Citadelle (F) (File 2 of 2)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="f6f9f980" sha1="05f4fbd947a71a80aa15817ceae65ffeaa7e450f" name="Citee Interdite, La (F) [a1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="43b7ed16" sha1="15b177a5dc701f25b8270464491f02a8994d94b6" name="Citee Interdite, La (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2d8b781c" sha1="bbe4de3091c082cac56a0c0f3d9b2895763ddfd7" name="Citee Maudite, La (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d2d98052" sha1="cc22131448f3d9032b03b9357e3ca4306463c14d" name="City Bomber (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c80d4bfe" sha1="e9de456de137cedcaa3212c8d12aa93a9506bb43" name="Classic Racing (UK) (File 1 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="328e4679" sha1="567937629af4d902ff5b9e97728195b1786d5cfc" name="Classic Racing (UK) (File 2 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="6a0d0e87" sha1="1ae82c4c45c5127b92b533f5c269709eaf718d17" name="Classic Racing (UK) (File 3 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="24aab7e3" sha1="fa28f361a3cb09fdfb7d059b8befac38861ecfae" name="Clementine (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ad936ae3" sha1="310edd40b7599c5ec6845851a35ffa0bb27bfcfc" name="Clock (UK) (PD)">
+		<year>199x</year>
+	</hash>
+	<hash crc32="594635c1" sha1="a7df57cfcd6dd63b6b4816d26342190b973a6bfd" name="Cobra Invader (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="409d013b" sha1="1b6ede2feb07eca0cd49da0433a971949934f338" name="Cobra Pinball 2 (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="27579435" sha1="b14c480f36a202189816d14785ac9914d193ae22" name="Cock' In (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="95739f05" sha1="fea9c6448a8593f7f66d9092947ead2b5156964d" name="Cock' In (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="ba357fd6" sha1="b38dbdc95c6c78ec4eacf5e09044739094561d67" name="Cocktail Maker, The (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="39aba1bb" sha1="437b734d8d1a2038e8f523529fffd90b0f7cb89d" name="Colossal (UK)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="3bebdc87" sha1="6c1c717a8a6b356f9ac9e7ec27850a29536a150f" name="Colour Match Game (UK) [a1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="31fe3319" sha1="82ffd025a8bea080e7006e4b003b9e26ee6c142d" name="Colour Match Game (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ceafc8f3" sha1="87ae0d67ed66d8a5ecdfa7c644c61f6dbc5210ab" name="Compilateur Lm Plus (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="37f70317" sha1="35197690147342dca08fbff47d424313898be105" name="Composer (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5c4872d4" sha1="90abf753244392d8cc1079c9c47339c184f91654" name="Contract Bridge (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="66ce657a" sha1="6afcbb60561233f0bb84c308f1919026fca23183" name="Contract Bridge Docs (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="a302a68a" sha1="a53cba2ce6c5344deda5be4ad269d40125fd964c" name="Conveyor Belt by A.P. Gardner (UK) (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="fac02b0d" sha1="e81ce1974de1f9732fa2435af0cd4ae1700b959f" name="Corsaires (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b61c676b" sha1="85fd2afaa441289ecf9ede4016ef31d973568e4e" name="Cosmic Chaos by A.P. Gardner (UK) (PD)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="68b71783" sha1="aa931270687437cc68fe0aec8c06bbf53c617a50" name="Courbes (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2dd93448" sha1="8164309995cf7905ed0f78ece7f2fbadf3f066a7" name="CPU Test (PD) [a1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="574488f1" sha1="c57f3a49004bbee1e93b512a24c93a13106cdab4" name="CPU Test (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f6eb4db4" sha1="1625d3e431a97f4adee83c46e1a59fd288658120" name="Crabes (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ea971c02" sha1="0a69762ad7bf96375030571459795208ccd2abf2" name="Cranes Breeding (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="71a3b4f6" sha1="cb6715f60097c1785ce71b756d5e881fc074e77c" name="Creat by Daniel Duffau (F) (Atmos)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="d17a21c4" sha1="216b830b9b9434ff246a6cf9e1fe82b057aef376" name="Creepy Castle (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="34507b8e" sha1="f9da6c7f07b912e5e68ec65703983c1b7c4ddacc" name="Crib Master by L. Rooke (UK) (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="37a20559" sha1="fc3db5ae3d73ef741ba99f272f6cd0ff56348d32" name="Crocky (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="acb2dd34" sha1="e161def98e5a9c92403aaf97576248dd05e4ec7b" name="Cumana Floppy Controller BIOS"> </hash>
+	<hash crc32="85823144" sha1="33db607edc9eda5078de64e58209071cd1440efb" name="Currency Converter (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="78e8b580" sha1="a4abca5c0d70989169d5ef5f4d9d67d4bd486055" name="Cursor (F) (PD)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="c046cddd" sha1="02545e3c955516fef93c2d23971962a7408d01b4" name="D(el) - E(dit) - N(um) by Andre Cheniere (PD)"> </hash>
+	<hash crc32="2d788712" sha1="14168916ed023ef82bd2f48bb719d7c0d2ab9b4c" name="Dallas (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="ac2a8e60" sha1="3443a65b6b01e0914b8cdf21f543a40149ff8d0a" name="Dames Anglaise (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a99c8d4d" sha1="dc3b187253f6a1e9d8380d280b62a32eb769b566" name="Damsel in Distress (One Parted) (UK)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="b3f88047" sha1="524d835369501b878d7da1a5913ce8c813d11912" name="Damsel in Distress Loader (UK)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="9e78f9a7" sha1="79df5efc6d6f64eaf4db71c74ecbe4b9bb005c2f" name="Damsel Pic for ULAPaint (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="7cfe7a3c" sha1="f0907236f1889d313789430a91153931f157d515" name="Danger Zone (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a046d609" sha1="1243451b61219798a0ea35883b1cb782ba1f5219" name="Death Driver (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ecd3275d" sha1="78702a4d6d546d7c818cc627d5657481edca2799" name="DeBlock V1.1 (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5d5999a6" sha1="aea4f47d6f54c5fab8e886757e2a043362fc35b1" name="Dedal (F) (File 1 of 4)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8637cf78" sha1="e9130f8c0ed151caaeec5da00b482f7ab9159a3e" name="Dedal (F) (File 2 of 4)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="41f7b5b3" sha1="c2256fab7f168204c9cf97be496e61a07a5e2a5b" name="Dedal (F) (File 3 of 4)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8b871ef0" sha1="fc60e510456837aec5c4d88bc775a9a77e582019" name="Dedal (F) (File 4 of 4)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5fcf5042" sha1="585664229243f71b60e38a2022e262068a1ed026" name="Dedal (F) (Multifile)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="acea67d5" sha1="33bb29b365480898bd886a28c3b6d4892f7bef22" name="Defender Force (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2c70634e" sha1="25cddf8b2ad962041c740f34869fa6cf2691b0f1" name="Defense Force (UK)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="57c1fb4c" sha1="5052cd8dd3e29f80134573c2199dd01039c42940" name="Defense Force (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c50d525a" sha1="18f7603003070f87b6b951fd305e01dfc222499d" name="Delta Force 4 - Space Invaders (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="869351dd" sha1="c8e2fc1d759abe04565a641b27b62fc14d85aaac" name="Demo KW (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="983d30bc" sha1="9d97f3c9f2712d8345e516ab19f7ce5205b84401" name="Dexterite (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8ad535ea" sha1="ae71295b96de16552d1325aa5ba45bac6cfa16c2" name="Diamant De Kheops, Le (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d3ec1118" sha1="bb7677cd90d54b4b769f160260309bff4548fb0a" name="Diamant De L' ile Maudite Demo, Le (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="5d5f05f8" sha1="a996d3c7b827f4a7a20b3eae96cb363b1dd567ae" name="Diamant De L' ile Maudite Part 1, Le (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="f0d3e490" sha1="47de0b7252b1eb69aa7a656c907144f9b4ca499c" name="Diamant De L' ile Maudite Part 2, Le (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="e3ef79e2" sha1="a720ffbc378b44ccc6f26c96ba910f7c9f79597a" name="Diamant De L' ile Maudite Part 3, Le (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="21b1bbb7" sha1="f78090c3b22a340f9a29ed818ef714e6f1d120fc" name="Diamond 1 Pic for ULAPaint (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="1f683783" sha1="417a422937f63c21d055cc20d614a4acd9d1bbd4" name="Diamond 2 Pic for ULAPaint (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="bfd97fe8" sha1="7cc4a95282e584ec2cd1a643a3319984e922c09d" name="Diamond 3 Pic for ULAPaint (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="31bbcba4" sha1="d7b08007d8fb8e8dc8e7608d1b53f221e4cc41ea" name="Dico Chimie (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="32f05730" sha1="78a3a7aad169521fc705d621700dfe4a71c0cdf6" name="Dig Dog (Atmos) (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="f018300c" sha1="132836c8ef46239aa6bf02cb74e7d2a8d977f13b" name="Dig Dog (Oric-1) (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="b3e68e47" sha1="04a24913a8fb8b321a97c6dee5473a9ff1ec1931" name="Digger (UK) (File 1 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="68a1ea71" sha1="80b0473556b93ea0982e964d6ab94b66c3428695" name="Digger (UK) (File 2 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="fb2459db" sha1="1c17fa0d9d2c37d11d584e8eb53a315cf5138713" name="Digger (UK) (File 3 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="3e36efc2" sha1="17d0ae914e264541ed4915855e2004cc8db38bbb" name="Digital Clock (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f45f2848" sha1="3530860e27e7accc8ac73c673eec3212ed0a4cd9" name="Dinky Kong (UK) (File 1 of 8)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="28c7abce" sha1="293aca01328146d0d463ed6256e4a2dbe350907d" name="Dinky Kong (UK) (File 2 of 8)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="160958fb" sha1="723b4bd6df774176b98e869e211c671a6063e502" name="Dinky Kong (UK) (File 3 of 8)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="30bc4df8" sha1="155f49862bb60339e1d59910445c009825187563" name="Dinky Kong (UK) (File 4 of 8)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a984cc33" sha1="b1b639ce92fa04f03980c1a97698922810af8939" name="Dinky Kong (UK) (File 5 of 8)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="79f29133" sha1="c0eef31de3174862db6512b967fd46e81e441b77" name="Dinky Kong (UK) (File 6 of 8)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="3925f7d6" sha1="178f83f39370d685bf66eda7004279a22fbb2aad" name="Dinky Kong (UK) (File 7 of 8)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="582a9e5c" sha1="666e26ea04f16bb1e4ac875090f8ac7b0ff990dc" name="Dinky Kong (UK) (File 8 of 8)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="fb32e7f0" sha1="2d72e25767be66851dc6b1c689a92ef5dcb78f64" name="Dinky Kong (UK) (One Parted)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d554463e" sha1="51130a771e6355bf6314e7337944696f5064f6fc" name="DiskMenu (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="108133c6" sha1="a2dcf19989d3457e8650419c6e2102d2b3d6c3c7" name="Dog (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="500239b4" sha1="43f2abc9fbf3dc57f225c3e391ba41591d1f837f" name="Doggy (F) (Disk Version)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d6469e8b" sha1="2390ac4333b995b060fa1100c11cc9d8fa9bd590" name="Doggy (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d057ed24" sha1="78673d37c73eb9db4c8c00d110eec380ffd18d93" name="Domino (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c72d1d77" sha1="8287ab44ad2611afd1dfbdf4c3512351e58eaf78" name="Don Juan (F) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="cffe5f78" sha1="4178dc51507d0de3415cdf7b407961abf3dd2170" name="Don Juan (F) [a2]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="10521f7b" sha1="a85ca9b6d47e6c40e422d26546bafba880e51198" name="Don Juan (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d6d717bb" sha1="1e196a93b0ba8c6efca427f240fc2a22b3ce11f9" name="Don Juan (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="a8e6182e" sha1="d353946d262142ad86eb2c61862b4f76002f8936" name="Don't Panic (UK) (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="683303f3" sha1="9c8be812893229a1e1d115d40a44fe36d69a7dbd" name="Don't Press Q (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f1a4972d" sha1="cf8abfb5f47b7f6d876e03d043ce90ea4b582f86" name="Dot-Man (UK) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="18e14ec0" sha1="57f9c4f40669fd9428f9fea23d42f68e90f4d5d0" name="Dot-Man Loader (UK) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="de797899" sha1="4d6d88fbb08f12b4f99f6bd7a8095144bfa3ab80" name="Dot-Man Source Part 1 (UK) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="b4ded367" sha1="d2a536c0887517067585a491d824bcb2939888dd" name="Dot-Man Source Part 2 (UK) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="2935818a" sha1="7ca0b104af18338345e927029a0964367e3e3beb" name="Dracula's Revenge (UK) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="7cb74ad0" sha1="ab048e26c6d13fa2bd58329727e11f383289c272" name="Dracula's Revenge (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="9048ffde" sha1="3b2553f82c215d6064f8a7033707579f999b783e" name="Dragon (F)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="3e1e0857" sha1="4d4b5a63a532461202749581941871efb61bd66c" name="Draughts V2.48 (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="eb952982" sha1="fb9872a4fb7644a8dc28eeb33d81ed6d9ef894ed" name="Draughtsman by B.D. &amp; S.L. Grayson (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="0cfcf7fb" sha1="e4d3fb26a6bf80f767c84e93f3e169531baf8ccf" name="Driver (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="80ef8130" sha1="dbb7e55a95b32d3c4eb73f045341a9c34cd90379" name="Drum Practice (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="32d24206" sha1="89962985550957280c8fee6e13d94d5aa6b817f9" name="Dump Variables and Values (PD)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="4864547b" sha1="711a6358b67a0e6c736eee6494ab2f777350ec7c" name="Dungeon Adventure (UK)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="47e76fb2" sha1="f01787290eef1be8230b1a733610ea60daf9d45b" name="Dungeon Master Preview (F) (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="94576aaf" sha1="8577b0ec688699333299025eb03136d88ab31f8c" name="Dungeon Master Preview (UK) (PD)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="696b90c0" sha1="0a20844e92177d8d22b6c306cb67904d9706b4e6" name="Egg Timer (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b0b5c004" sha1="3dd60a130c72520d74090e72e400a9b809bef618" name="Electric Eel (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f0f4da67" sha1="002a19a5608460f6b641cb221b1f07b99a4ed26b" name="Electronic Organ (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7d706108" sha1="9d7004598ba5fb6092de9ab3febe28ae480c9b3f" name="Elektro Storm (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="9d5f48b7" sha1="18fc05660620116e9e18c8b2be639451fef6d1ab" name="Ellipse by Peter TheSpider (UK) (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="1d198b68" sha1="19585342e1bbe3dc87463fa78312e2e80dc6b883" name="Encounter (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="934c17ef" sha1="ee0cb03684d419152af057068bd7ed5022105c31" name="Endurace (UK,F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="799d1d36" sha1="805e66028015e806cc08106bb8e9585fb615bc45" name="Enter (Music Demo) (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="967e57d5" sha1="696cbd8a13a2256c23bf9a84512f10b3e2f4a739" name="Entrapment (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="6da49c06" sha1="a1a5b083231de309f3a9c6d4f7becf0ea3a34012" name="Esquive (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4a5e1a8f" sha1="379d9463775a67f3112507ce869590b6930feb72" name="Fantasy Quest (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="8c436186" sha1="ba9fe856c778dea4ab05a882ff0e6f0baf8b93ff" name="Fantasy Quest (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="da20229f" sha1="620bca81c230c67e3e8ad15899ea48c508f2a2ef" name="Feux Croises (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="f72a6138" sha1="af2d771accc3441778fdd4cc046155f9c0af3fa6" name="Feux Croises (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="1d5ebd5b" sha1="c407967d927d81adf0d63f43de7b601774188eaa" name="Figures (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8edc9d51" sha1="8c05a01d467ddf1afa388325784bec55bd21fc11" name="Fillscreen by Radoslaw Isaew (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a2bba008" sha1="d9947dba10408fac21e07eb8cd2d5aaea575b8db" name="Fillscreenm by Radoslaw Isaew (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="18ddf305" sha1="c9f28bb2ff8b72ace27de6975a45fd57809c28f0" name="Final.hir (for Oric Demo 1) (UK) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="b2b0e9bc" sha1="ddcdef5e582b346c383831f12577af0dbe782148" name="Fire Flash (F) (Disk Version)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="764f23fc" sha1="6a404942cad5fd064c947f370c4bd70cfe5f919d" name="Fire Flash (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="3f46e827" sha1="08f4cbda5de1f7b95a13cc7c8d6e32edc77f986c" name="Fire Flash (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="b04c9432" sha1="1209a14ef13814a240ded4f8123dd47a72b32f07" name="Firework Display (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="0299f66f" sha1="59a0976fc42090f0ae9e529a9e29e4c1ef57e326" name="First Oric Demo Ever, The (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="67a32e6f" sha1="ffbe2d60404b27fec5f56b9ad6dd9654cbb3b10c" name="Flibustiers, Le (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="3be1b4df" sha1="0258596dd066ba124a008acc5bbe821169efe534" name="Oric Flight (UK) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="3821b70b" sha1="9645e71a6cbda0c3e4d4b81ee554870425a88d54" name="Oric Flight (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="5fe977d0" sha1="83310f9edeae585ed0f150f0fe4821f5be0f1729" name="Oric Flight (UK) [a2]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="54212dd4" sha1="52ef9021932d88eeaaae4b2b207a35c7bdfe1361" name="Flight Simulator (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c9b29046" sha1="c309752ae5ebcc9c33f154786c9db934221c0f8f" name="Fly For Your Life (UK) (File 1 of 4)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7d6df62d" sha1="e5f515069a274f03c1f27c4056d520c6f478ded7" name="Fly For Your Life (UK) (File 2 of 4)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4e69614c" sha1="b19d06f15fe78bc3751da9b340f51c4fb78c8ab7" name="Fly For Your Life (UK) (File 3 of 4)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f61d6176" sha1="23bb56bbaff6f826c5f8c2b3e05239e980161e52" name="Fly For Your Life (UK) (File 4 of 4)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5766afe5" sha1="743b7f767c74d11e9aaa752268b9b3c942cf7056" name="Font Editors V2.1 (UK) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="3f81a4df" sha1="fa8591f3841ba85531ee524107be9122e6cd5301" name="Football Manager (UK) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="2d9ed905" sha1="c05d50c3083e09e3e5bb5c7425569dc2fc8d5473" name="Football Manager (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="42fa6bac" sha1="934e7f9a81b5b7152be5e3b54774fcef7c5a8ba1" name="Forth 83 Compiler V2.0 (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="ba84bd5d" sha1="e0d01eee3fb759f493a003672e0257f0527ca70a" name="Forth 83 Compiler V2.4 (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="19a08ca4" sha1="32d3c44c41dcd2c546ba3840ff8cd86af49da52e" name="Forth 83 Compiler V3.1 (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="be761ec8" sha1="812fd18d56d3614623e96f60d2f07d98aea14d98" name="Forth 83 Compiler V3.1 (G)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="2c8ecacd" sha1="23f61b59774074ccf980299dc38352bf5dd4f0c1" name="Fragancia (S)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="6f948b10" sha1="973c1ac6922d66488a410335d0924490054f1005" name="Frelon (F) (File 1 of 2)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="b908816a" sha1="3d80f284345dc4eb00b7e2bacd3faa5ee2aaec85" name="Frelon (F) (File 2 of 2)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="fa50e53b" sha1="48b6b1fe141df7d40b1305b1821a85ca9c3ce327" name="Frelon (F) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="303491d0" sha1="b06352dd1b2744fadea99c1fb7e7edc3a0326abd" name="Frigate Commander (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1951f0dd" sha1="069a8f53933931078cef9ac5d1ba66678572890d" name="Frog-Hop (UK)">
+		<year>1983-84 </year>
+	</hash>
+	<hash crc32="2b393d50" sha1="4dc0d3ca2b0cf963c0a23908f532502de42e0dbf" name="FT-DOS (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="b726d1fe" sha1="f1d23858a4a5e41bdb414fca2538133fb240693a" name="Function (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="68b628c5" sha1="7884f88e44cda651b2fa7dec72144cf763c7509e" name="Fylle (SW)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="fd8a0a16" sha1="3ee81853f21292a80c3e470dd1d68630992e2616" name="Galactosmash (UK) (PD)">
+		<year>1989</year>
+	</hash>
+	<hash crc32="6c38e071" sha1="bdda1a9d5fd2da9f62a37bef0142a6e26d3db95b" name="Galaxians (UK,F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="bc998d27" sha1="3ce38936edfd9c3e3b9978ee9221eea652cffe3e" name="Galaxion (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a96b6f8e" sha1="bd4eafb53fab98d739868a341f83d45752d4c3b7" name="Galaxy (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="1dc3daee" sha1="286418ff6ba7c562424c3cd68c0e4405ec0553f4" name="Gastronon (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="90ad49d5" sha1="35f2d2e9db29c054361305b3c38721258872865b" name="Geffers Croll Demo (UK) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="98343da8" sha1="5f07f703daf5594bbc9e34ead60a8689b7c80518" name="General (Atmos) (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="80820831" sha1="fa621841db536d560451906d087b70542a4b2e11" name="General (Oric-1) (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="22dd015a" sha1="3fd4b6b5535626b72ce2a65d0f963c11f094a40f" name="Geography (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="ea58ac06" sha1="6f488f7b06501e4b64b47469a86b4d11a29e0299" name="Gestion De (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="de63f6f0" sha1="1e18b2e5d202e1a2404218a124184577988700e0" name="Ghost Gobbler (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="cd890bce" sha1="aa2ef0d8c7c15c4423851ede1cee9e453a628d8d" name="Ghostman (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="5da8b19b" sha1="0879e02444a5288f2ca38aef13d928c1178a2295" name="Ghostman (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="f22b0e6b" sha1="58967faf002e87796edef715ac90fef0e1b12215" name="Ghouls Music (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="05c26c83" sha1="16ea885c9ed57b53114b5d3241a24a500bb873ac" name="Ghouls Screen Edit (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1ac22b7b" sha1="c54015923fe1306c28051b8db0325a55d60eaac2" name="Ghousts and Ghouls (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c98a3f1f" sha1="27b7c339753036b6736c287179072dc58aa2f341" name="Gigabonux Minigame 1K Version by By Simon Guyart (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="f3e05b29" sha1="7077c3017dea00f8658f717b623ee2b321b36896" name="GodillOric (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4d0ff7d6" sha1="ea870a095a037a151dfd457b2c76bc59379c828c" name="Goog (F) (Disk Version)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="7d20e058" sha1="31f0df55c3b97842f531cf3417237ca37baa587d" name="Goog (F)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="048869c1" sha1="aafa207897b9af4dafa0fdec025b4238cd25c837" name="GoSnow Demo by Twilighte (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="f1e7b322" sha1="08af4efe20375bd6196a540ac2a2fe4b3b5863c7" name="Graphit (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="3d669f09" sha1="4ad545b01530b8f8a1f29614b5c699efd33eb99a" name="Gravitor (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="70592529" sha1="ebf63662a3b86fc4c1f3a2e5880a4a521a00dc6a" name="Great American Presidents (UK) (Disk Version)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="9750965d" sha1="0178336ad248e530fc5f3609ff5ef0850b3f774b" name="Great American Presidents (UK)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="090b3a36" sha1="9e1cce64a7fb1288d62f36b21e77eb6ceff36b6f" name="Green Cross Toad (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="4dec2d3c" sha1="5df7a1136bd7b03e55728a0447f5fa564b878a15" name="Greets.cod (for Oric Demo 1) (UK) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="d91234f8" sha1="82fcca651cca01d113a101be89d1bb60f1a6d174" name="Grendel (UK) (Disk Version) (PD)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="406452a7" sha1="f06b9873f287316c652bb9cd9cfc6f2e6ae62a04" name="Grendel (UK) (PD)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="e6158f19" sha1="94ccfaf2e1f0330c9e34a38e76dae088b1646c39" name="Gubbie (UK) (Disk Version)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="1fc3a053" sha1="eb9a9e2ebaf579e1532e7c638b6ad9a2cd6fc520" name="Gubbie (UK) (File 1 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="50da50a9" sha1="654a07b0ff0866398755427eddb9dd42c138e284" name="Gubbie (UK) (File 2 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="32fa8cc0" sha1="71efa7c34b2bcc45e85fe8f8f8193014c016e901" name="Gubbie (UK) (File 3 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="91046a9d" sha1="90056c86ac486a8c79ed9a69a58f5473b04134aa" name="Guess The Number (UK) (PD) [a1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f71c8331" sha1="eab89b8815bf9f18f43552cd96eb90d1b7538f51" name="Guess The Number (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c1ec0b69" sha1="c1182a09e2fa4c20208e2392f17067005afa2533" name="Hades Monitor V1.0 (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5bfcedd9" sha1="19b879ed1ed462e2af398afc1c90ffefd832a20e" name="Haiku Generator (UK) (PD)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="40f5d89e" sha1="f71bcdbad8197ef904446978db580c825291ea43" name="Hangman (UK) [a1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e3faec82" sha1="d53210cb394c294d91e5f040fd352a8d7d82c436" name="Hangman (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="bb409bc7" sha1="bf05094024213c9cc2afd4e6971eec2387821035" name="Happy Landings (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a685fcf2" sha1="da68acb3a1252b3872e66b16913ec1f2dd3f69c0" name="Harrier Attack (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="ec9a1a89" sha1="43e6a123936f7d21819b5a98641def934cec4d15" name="Hell's Temple (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="0e89cdc5" sha1="cb01eb6a1e4907120cb636e277612d422e2410dc" name="Hellion (F) (Disk Version)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="0a53732c" sha1="2d5852b60e0aa13e73232923b66ae502133d11d7" name="Hellion (F) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="a747aca6" sha1="09af05afff6f75bf6c65fad677e433016b57a997" name="Hellion (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="6859f65f" sha1="d2dd6de50b3ddc69e58195645511398af5ad0fdb" name="Hi-Res Copy (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e187c722" sha1="dada63d611026141b0604b518557f5863c1d106c" name="Hi-Res Text V2.1 (PD)"> </hash>
+	<hash crc32="1d14832c" sha1="44246922dd67f50c9156a0839a67ef2ffdaceea1" name="Hicopy for Epson (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="b4a36e12" sha1="9552058251e176b5f22a5db743541f99b7e28545" name="Hide (Hires-Inlay Dynamic Editor) V1.1 by Twilighte (PD)"> </hash>
+	<hash crc32="7c23032e" sha1="fcd17849c0b4819a3429430e9ec97979b7c35ba5" name="Hist'oric (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c164a97c" sha1="77a5439e347123c83638b585bfecd21960bdcfc4" name="Hobbit, The (UK)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="361ecf82" sha1="796a7682993afa6ae4a4bd7c5a10d6413b4f357e" name="Hollywood Director (UK) (Disk Version)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="d4808718" sha1="b044e6f41c675486cbded6153431d6b120f26041" name="Hollywood Director (UK)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="67af9a5f" sha1="62ea326b7f9d116fbfe07dc46b8ca00a94e0e67c" name="Holy Grail (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="f786ba3c" sha1="3d686a5be58e0ae2570644b6f48405b34250888e" name="Home Finance Analysis by David Nowotnik (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="56fc937a" sha1="2d3ef5f31edf32242f2bacf6afd96d753924b1cd" name="Home Finance Analysis by David Nowotnik (UK) (Oric-1)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="3a4e7cec" sha1="e9cfcbe138bc8eb2de7799b08d2a71bc1675ad10" name="Honey Kong (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ca42c80e" sha1="e70de9478bb5a1c3f0b96b870010178388dbd77d" name="Hop Frog (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="3d40041f" sha1="b9575b547ac8c2b7452d040678bd7f00a3c1c7f4" name="Hopper (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="021afb48" sha1="6f8edc6268bc88cdce3576d4760d54fb6a3f1112" name="House of Death (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="8c6fbbc0" sha1="f7cbadbd2f2c24b41499635e77952e9ca844bda4" name="Hover Rescue (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="dcbf90b8" sha1="b39a57c863cf4752f7967f2f744a15f54f99cdac" name="Hu-Bert (F) (Disk Version)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="a68fadec" sha1="d21f002bc04882ebd04b14dbf203cf46fa68233b" name="Hu-Bert (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="e336a7d9" sha1="6eb9930955388e47002a4cc8921ca1bcea15d262" name="Hu-Bert Menu (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="5660de47" sha1="9e83c0fe540e90a3c37f1bba554f3052b209b0b1" name="Huebert by T.W.Phoeng (UK) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d4d7d65a" sha1="bc865effd1554934c96695e003fb993b74e1cd52" name="Huebert by T.W.Phoeng (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="51ddcbd0" sha1="b96d939dd6eba0be77c84fb7f36f620850a852d9" name="Hunchback (UK) [a1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="33327eef" sha1="0a8df6827b979be41686d903eedf773644a7ceea" name="Hunchback (UK) [a2]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4a111fb7" sha1="f07d4c93925b325d3b3c6242bdbe29b4f6d1e083" name="Hunchback (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1d96ab50" sha1="f5f70a0eb59f8cd6c261e179ae78ef906f68ed63" name="Hyper BASIC V2.0"> </hash>
+	<hash crc32="1ae543c3" sha1="8e84537ed38f036757dfe7928f7e4c5f0f4d6ee4" name="Hyper Olympics (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="2e29c699" sha1="a891157b0abab6120087fcecc5460b228d057d96" name="HyperCat Disk Cataloger (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5cab03a5" sha1="6f5dfb85e48958cbd94868b9eb11271a83ee221b" name="HyperCat Disk Cataloger (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ad6197c9" sha1="1833a871e88eb8e8e596e1b03a544da606547bd0" name="Ice Giant (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="a270fb02" sha1="a67c5ad25f647812a007edf7babae2d00e83a5dc" name="Ikplus (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7cccd95d" sha1="7f18422971ea49815cc5e569a75d4025985f0250" name="Imonde Dr. Kokus, L' (F)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="a2e9465c" sha1="77744d3a8ca61c5424fbdf91f68a7c1b00336a81" name="Incrust (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f5a33a53" sha1="74c9f196cb6ae290630207f14a7cdea84af11aac" name="Indiana John's (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b22a6416" sha1="7ebbe117c9c5053e05706954792a4c9ee2511727" name="Infocom - Ballyhoo (UK)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="11643756" sha1="bed630471a01597e61b9f5b3c8cc59d6843fc1bd" name="Infocom - Cutthroats (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="7de846f3" sha1="e3ae20de4c5da8c1107e8934ad98d90874f1c1ff" name="Infocom - Deadline (UK)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="f7d739e4" sha1="cb928fd23a5bbb58ca9b3fa2bdc0343d3b389fce" name="Infocom - Enchanter (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="a60e8876" sha1="3c1aaf99d52171949b97585fd2e47bc96ef37fb0" name="Infocom - Hitchhiker's Guide To The Galaxy (UK)">
+		<status>Known Bad Image</status>
+		<year>1984</year>
+	</hash>
+	<hash crc32="9fd4f17c" sha1="c5f011ae148bdf5b2e31b7f30a531d6830b11228" name="Infocom - Hitchhiker's Guide To The Galaxy (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="3ae2de52" sha1="a02c6f3647af3833cbb14d9cfc527afd893b75e2" name="Infocom - Infidel (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="3603a16b" sha1="bdd238e4588330ce14e1bad6461a575564553528" name="Infocom - Leather Godesses of Phobos (UK)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="88177cea" sha1="b36755116be587dc48b320f7a36b443040d84ea8" name="Infocom - Moonmist (UK)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="2b37e616" sha1="fe7f1a8fa78d4c37bf051b32f01b88060d6a8e63" name="Infocom - Planetfall (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="79a57eac" sha1="ad0778696b6d1d3b5141361d1d71ee0ce998764c" name="Infocom - Plundered Hearts (UK)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="c0862ffb" sha1="f0dfb6ea9a8c432c4af5282aae5c2efa932aaea6" name="Infocom - Seastalker (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="0648459f" sha1="52392fc43bdda4989dfca95836da0f59ecb18b0b" name="Infocom - Sorcerer (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="59948a56" sha1="5d63f75e07d2a64c7ce052c3073b577cb339f7d8" name="Infocom - Spellbreaker (UK)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="c5d883de" sha1="e8fcda054133086e3305fb9d4fbfa6ba11b95046" name="Infocom - Starcross (UK)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="13fe56ed" sha1="cdabda92d480071edd7cfe301b43119c9995309a" name="Infocom - Stationfall (UK)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="1aacb53e" sha1="eeb6c4e0fe69334aeef10de94dcc66e13542019b" name="Infocom - Suspect (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="495f5d79" sha1="9aeb744c1a896cb50c1c423954de21c623a0894a" name="Infocom - Suspended (UK)">
+		<status>Known Bad Image</status>
+		<year>1983</year>
+	</hash>
+	<hash crc32="e3bb48b6" sha1="7c33d3b3177e4fcd170b6b5a7f8515ed0ace5c89" name="Infocom - Suspended (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="9eb3323d" sha1="e2083cde315df4a85554f0e4c3986a74b5e38548" name="Infocom - The Lurking Horror (UK)">
+		<status>Known Bad Image</status>
+		<year>1983</year>
+	</hash>
+	<hash crc32="f4c65c3f" sha1="e21d79c3e8a603a9e8ec111ff94ae7c2fdc4ec48" name="Infocom - The Lurking Horror (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="f15b8d5a" sha1="ef4dbc8e3ae3bb31b09ba3d715722854b2325875" name="Infocom - The Witness (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="bff66531" sha1="0e783c9d1d1d0b720b6af44507d6059cf46d0480" name="Infocom - Wishbringer - Magick Stone of Dreams (UK)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="79d48e8f" sha1="75eab990c347b0f447ca47f5d9b060e940c19ffd" name="Infocom - Zork II - The Wizard of Frobozz (UK)">
+		<year>1981</year>
+	</hash>
+	<hash crc32="a222308e" sha1="51c852c7c060450cb9a2a9ae09eeb153a46cc094" name="Infocom - Zork III - The Dungeon Master (UK)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="5d7bbfac" sha1="a31dec174255a4cf4ee7e7cc8ec186de78804844" name="Inkblots (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="00b161bc" sha1="60394e272cec0ba5aa18a640daacdd9adbcfa205" name="Insect Insanity (UK) (Disk Version)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="83b81430" sha1="ffd0e3f6b3ccb3def7f4306be7a97c56a8d5b8cb" name="Insect Insanity (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="0927e6af" sha1="dbee9812c1fd230cbf21f67709294b7268372689" name="Interference (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a7b27adc" sha1="43c5a8240d876c96f893c726fedb0d0622332fa5" name="Intertron (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="00c85096" sha1="67bbdc3bdae67596061e4f490b13c320749e6b48" name="Intro.did (Damsel in Distress) (UK)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="901be026" sha1="6a578befc318185652b1c9e603a1943c87185d7b" name="Invader (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b2ad4768" sha1="766b5d99661552a70605b0dd09d3bb5a765bcf3f" name="Invaders (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="fa3de464" sha1="166c385d6496c6562ab632e5b1855e838731a780" name="Invaders (UK) (Disk Version)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="8bc5bf8d" sha1="9351c29e6bdb0e7064885a46def3594e0245a55e" name="Invaders (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="19eba71d" sha1="acf6d02aebc8e283cbb780f0fbd8527c4c28c56e" name="Invasion (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d259deb8" sha1="ae081b1cbc700f744c475882bb8e36781f0fbd1e" name="Invasion Avant L'Aube (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="da3852c8" sha1="439b185fbde459cbdbdce4be3ff8d42d20f7ec27" name="Island of Death, The (Loader) (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="4f1a5423" sha1="7213374bd37122fe449fe864c4c5ebc5ca83a95e" name="Island of Death, The (UK) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="ffaef462" sha1="c6fd0669f96030acb1925233c499f4b77741ef55" name="Island of Death, The (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="865becc1" sha1="d0e6f7061ad8af8c9507fc2d5f41a98cad88ed85" name="Jack-Man (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="37220e89" sha1="70e59b8abd67092f050462abc6cb5271e4c15f01" name="Jasmin BIOS"> </hash>
+	<hash crc32="5a86e488" sha1="e2a48c25e919acb22e4e95775e67a5ab4f35aa94" name="Jet Attack (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="73837272" sha1="db117da5c1ea1631235e36c23c1f99a4ebd2e0a3" name="Jeu De La Vie (F)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="6786fc7c" sha1="c91e0052026da786548cd2bf52cb19d84cdc8a28" name="Jeu Du Gigabonux, Le (F) (PD) (V0.1)">
+		<year>1991-95 </year>
+	</hash>
+	<hash crc32="7215180a" sha1="2934fac3b2a0bf23162f8cb877b7a9f47a335fda" name="Jeu Du Gigabonux, Le (F) (PD) (V0.2)">
+		<year>1991-95 </year>
+	</hash>
+	<hash crc32="b933a80a" sha1="44bba84e23c545ce6918f0b2b369dab6b2b3bedd" name="Jeu Du Gigabonux, Le (F) (PD) (V0.3)">
+		<year>1991-95 </year>
+	</hash>
+	<hash crc32="6347fb48" sha1="e2b700c1293479de2519d79736975174e1a22c2a" name="Jeu Du Gigabonux, Le High Scores (F) (PD)">
+		<year>1991-95 </year>
+	</hash>
+	<hash crc32="cd496be6" sha1="8b061f30672dd28fef9725d1f8dbdcb3cc9ee27d" name="Jeu Du Pendu (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="78a98a7d" sha1="12b9bbcdb6d8124ea3b6b142a6874d1e83a879e9" name="Jeux Olympiques (F) (File 1 of 5)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="e7a2d040" sha1="23c47b5faddc0e1420232c38e21967a444cafbf5" name="Jeux Olympiques (F) (File 2 of 5)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="2f258965" sha1="ad0f299c7749593ceec9fa15441a66ffe2029f4e" name="Jeux Olympiques (F) (File 3 of 5)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="1b61c965" sha1="84b4ae8de7ab7d1ae896ed478f7c22027f842d44" name="Jeux Olympiques (F) (File 4 of 5)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="8c989dfe" sha1="438a0f772a21e0f59654c2a9e02342b799e049a3" name="Jeux Olympiques (F) (File 5 of 5)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="7c0ee117" sha1="13360bdb89849b7f5497f637b189122a64a51e06" name="JMOVIE (UK) (Loader)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="3ee2babd" sha1="a3e5f48600bd9fad21cc0609c50707f76e117563" name="JMOVIE2 (UK) (Part 2 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="54556e30" sha1="36c1a2cc041cb2eaa473680012f5d33959dca009" name="JMOVIE3 (UK) (Part 3 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="388ef681" sha1="8de3a2360bde607e94c14f4cbf200e10686d6b8c" name="Jogger (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="bb8acda2" sha1="bdd3349ee015eb6d9247b700e4792c5f9f6270e6" name="Jonhy (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2e986668" sha1="de65cd197c4ecd2b4c1f537b337f687700c52609" name="Jump (F) [a1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e3e3b2cf" sha1="ddd1f81858403dce516af2b0ecafad773576a06d" name="Jump (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5ad8950f" sha1="8852068837f68ffc4c664fb35a82b339adcfcd0e" name="Jumpfox (F)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="eefd105c" sha1="42ba0d40caeac4644e4d8db5feecdcdb04b18df3" name="Just2.hir (for Oric Demo 1) (UK) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="fb697d17" sha1="c0536b099474d76f2ec71725e2bb017384b86c26" name="Kaleidoscope (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c90123b4" sha1="b5ff076046853d2be42da6e6eb0a79a2df4a355f" name="Karate (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="156fefeb" sha1="6f9ab04f9974e2eba84b60420b5ae60116de386a" name="Keyboard Trainer (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="2cb09f3d" sha1="990ea4e8a3539da43dd94b4049b28b0fbd9bb8c0" name="Keys of Kraal, The (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="86f06692" sha1="bf0b580e5fdc3a9b7d5f5e1e63d8574d9c2a1132" name="Kilburn Encounter, The (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="16e9957e" sha1="eed6a223892d304b3b681db73ca964bd1ecb28ca" name="Killer Caver NS (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="3841e35f" sha1="e599f5750a77b5ce1d4acff73e86d66e6ee208a0" name="Killing in Sark (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="376d6cf3" sha1="87345de55570fd406fcf82bc999f3e850b5b2491" name="KoteNaKrystopyt (Cat at Crossroad) (PD)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="af8e61c5" sha1="b562538c09428f075a57c77f440991c14aa1a57e" name="Kp-Lotto (G)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="0c885ecc" sha1="6cf1a3cc7f162b389c116b54c544b8bf0f495442" name="Kryllys (Merged) (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="b8855129" sha1="f37f6477314e46094b002b3d93f46ba9de8dabf3" name="Kryllys (Pic for ULAPaint) (UK) (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="049fec49" sha1="c8f4fc7d186db738fb3f1ce2e6871a83f9334aec" name="Kryllys (UK) (File 1 of 4)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="041d0be3" sha1="800de6282f2bce5de2c56addff348aed03f838b6" name="Kryllys (UK) (File 2 of 4)">
+		<status>Known Bad Image</status>
+		<year>1984</year>
+	</hash>
+	<hash crc32="48d112d3" sha1="c0fc23c19765140a294f9e29b2a4445af61ae2f8" name="Kryllys (UK) (File 3 of 4)">
+		<status>Known Bad Image</status>
+		<year>1984</year>
+	</hash>
+	<hash crc32="9c05a7cc" sha1="024aa2166d305c7ab9f11b689457d7674e310c92" name="Kryllys (UK) (File 4 of 4)">
+		<status>Known Bad Image</status>
+		<year>1984</year>
+	</hash>
+	<hash crc32="f5dcb681" sha1="68145f8f4e019a2f36978292f4ead090fa5e33da" name="Krypton (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="cf5bae66" sha1="0db5f41e47a6fffeaddaa0cb1d21caa76e4a1b2e" name="Krystal Worlds Part 2 (UK) (PD) [a1]">
+		<year>1996</year>
+	</hash>
+	<hash crc32="05658ec4" sha1="178a999205caeac2bf66aa43958c2632f6134c22" name="Krystal Worlds Part 2 (UK) (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="c540c5ea" sha1="6a606db515f55e14dffa38aa98550a244a9d854d" name="L Contre L (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="83f0a97b" sha1="ed4a7f729ecddabf8499d16a546e177244e692df" name="La Crypte (F) (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="31460a51" sha1="cbafb901513408e22a1f2162f086fbacb2682850" name="La France Quiz (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c461faff" sha1="98f597e17bed4753f4f8a1353dfff72a35d79658" name="Labirinth (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="74b86e18" sha1="ba5c8e3ca18862619023c138a291b20543ffd476" name="Laby 5 by Jean-Michel Terrat (F) (PD) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="b465085b" sha1="e65ae50b20ca72015597e3fbf6e86dfe042d1511" name="Laby 5 by Jean-Michel Terrat (F) (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="317a8433" sha1="4f844646d905f6c3565fc53232e85cdfce00c40b" name="Labyrinthe by Marc le Hen (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="30a8239c" sha1="d9e5878625e6fe94e0bde67146727fe40a1e849a" name="Labyrinthes Amnukor + Utilitaires De Fabrication (F)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="daee1d1c" sha1="8417a260e49717268f88f9caeaad4a4f74982343" name="Lancelot (F) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="879b23f1" sha1="8d5b2db2532784afa750a8fcd3dfc76f49c4ba45" name="Lancelot (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="ee25e5e0" sha1="ded1c5ee11827a3b8e997e3a11010de3194ae8f7" name="Land of Illusion (UK)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="7329f590" sha1="072659a25d76d099f55045fc2ee881c7d27e542a" name="Las Vegas High by J.M. Haworth (UK) (PD)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="28a335e8" sha1="719400256d98c8f5c6d71d356a38556646abcd98" name="Lateral Scrolling (F) (PD)"> </hash>
+	<hash crc32="6558aebf" sha1="69808ee76770c426cc2ec10aadbc7300756524d8" name="LCAT by Andre Guichardon (F) (PD)"> </hash>
+	<hash crc32="51e19825" sha1="8e2d3adf7bfbb966cc968bd4b78b834f57fd72f8" name="Leopard Kongen (No)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5e309df9" sha1="b5ba018238bafdf62b4552d2b0e85e2bec890408" name="Leopard Lord (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="fd060957" sha1="c3bcca47028ec8f6fc795c7cf33db1eeedca3fb3" name="Les Drapeaux Aux Jeux Olympiques (F) (PD)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="6e196521" sha1="7e43f11612b311c9d2188f2b1cae2cf3c174d0da" name="Letter (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ecb8d096" sha1="7e7cbbde6e1a443be42f491e96c4bde5fe4732d4" name="Light Cycle (UK) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="131a0bbd" sha1="e7b8c374f9e7374ea73f06521765fb8d2ee03413" name="Light Cycle (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="c1145b20" sha1="a937cb0a10fedcb2b85c40117da85a15d4996293" name="Lightbikes (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="0157a238" sha1="7a5e263fe13afb612c23ae017c5c73da220b72ae" name="Lighttrack (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="c34062aa" sha1="b5552cf1acfaa0dbd568d61393aaa21b1d423049" name="Limerick by D. Elliot (UK) (PD)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="cf931bec" sha1="881d38546772bf3c1fea89c6553180bdd4ccd4d8" name="Line Bounce Demo by Peter TheSpider (UK) (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="ac8b805b" sha1="8225b803e64550329851dba0a375412dd5815483" name="Locus (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="f10ed1f0" sha1="3d68d63da7a548d76aca6dd10faf614aecfa90c2" name="Loki (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="d00e9fe8" sha1="062976bfc8a2a39d405e1ea4fbb10ca6ac5306da" name="Lone Raider (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ef9562c4" sha1="972689ee9ebacb445d44b7a2f1aef07a9f43422e" name="Lords of Time (UK)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="74a7ca49" sha1="c1fd26574eb8d19ef52453e5489f7f6dd752948a" name="Lorigraph (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="b400a0a4" sha1="9c3c0921f4fe3fcdea08d1f3ce53dc5a7d3d6ce9" name="LTP 4 Party Demo (UK) (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="af692c65" sha1="209764200dcadd66a00b2ea4eaaa727044de3b47" name="Luna Landa (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="62d9ffdd" sha1="392c994233f85e054073cd51e724a4375b3f97cd" name="Lunar Lander (UK) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="9bd55824" sha1="0371c0edd78bfb9f86ccfb81fb14e734b6d89c5f" name="Lunar Lander (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="9c137a07" sha1="c1198fcdda1c2438b2385ed13de75518433aa8c1" name="Lunar Mission (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f5671c8e" sha1="9386685f5b11300b453254a05182617654a767e5" name="M.A.R.C. (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="58296849" sha1="04be2dd1d928c828dbd6da8666b1f153209929a9" name="Machine Code Monitor (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d800463a" sha1="86a72bd0f246217bccef9142b5ad43f05505cd95" name="Madacam Bumper (F) [a1]">
+		<year>1985</year>
+	</hash>
+	<hash crc32="f0c230bf" sha1="dd0abef8f55a609b3eaad3380301d4afa2e21d11" name="Madacam Bumper (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="4972da11" sha1="b4d184d9727ab38eaa1d7c3e69a6b56b29cf4b09" name="Magnetix by Twilighte (UK) [a1]">
+		<year>1994</year>
+	</hash>
+	<hash crc32="edce36ac" sha1="98e2eed67ec1fbe69d443491436c76769812bb45" name="Magnetix by Twilighte (UK)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="d00b6c32" sha1="0131735d43dcad2903626a1826a8974dbec74ba8" name="Magnetix Demo by Twilighte (UK) (PD) [a1]">
+		<year>1994</year>
+	</hash>
+	<hash crc32="88b6bb98" sha1="803d318df5d07e442a270e06ecc68e68a3d02163" name="Magnetix Demo by Twilighte (UK) (PD)">
+		<status>Known Bad Image</status>
+		<year>1994</year>
+	</hash>
+	<hash crc32="92da62f0" sha1="519e86ab12f2a0feb3754348bd9bf6c24590bf86" name="Magnetix Demo by Twilighte (UK) (PD)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="fd9520a7" sha1="e0b616d2c77b2806952ff04e033b5ea897c6e214" name="Magnetix Outro by Twilighte (PD)"> </hash>
+	<hash crc32="a2630132" sha1="429f426102a3434c89bfbf33fa3bbf027963ebac" name="Magutils #1 (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="1afd1263" sha1="7875d03b37fbae562858ff58fb9e83302c2742c0" name="Manic Miner by Matthew Smith (F) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="0d7c4715" sha1="1bf5c57ad5c3bc41181e99a548bb9886b68b45cc" name="Manic Miner Conversion by N.Hawaworth (PD)"> </hash>
+	<hash crc32="333afe1f" sha1="5e82ccc774c6c179ec3b2f64bdbfa11e4b88836b" name="Manoir Du Dr. Genius, Le (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="407acd37" sha1="2e54bd3c0d7dc3a04bc5367ab495425db1c3f127" name="Marvel Adventure #1 - The Hulk (UK) [a1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="256198b8" sha1="8df4e85c42759718b3193153df2bf59954bce750" name="Marvel Adventure #1 - The Hulk (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="77a54c79" sha1="7370ad8af637d2cb9d1b53148913f74a55e7a6e5" name="Masque D'or Du Pharaon, Le (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="5f031dab" sha1="95de310907a0e3a0799b9930dee5e2dae503e592" name="Master Mind (UK) (PD)">
+		<status>Known Bad Image</status>
+		<year>1992</year>
+	</hash>
+	<hash crc32="6f1368bd" sha1="a590d44d0a74ec00d65a2399cbae40e06fed64ba" name="Master Tyrann Atmos, Le (F) (Side A)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="d0f94f03" sha1="6fa63ccfc24ee9b041ac09351a87abdf6c139c3b" name="Master Tyrann Atmos, Le (F) (Side B)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="d9e0b8b7" sha1="cf245289311f42beb0ac630c9dc5d85316cf820e" name="Maze Chase (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="91c533f2" sha1="86507ac932091d0239dc2e9d4fc51a510faf166a" name="Maze Rally (UK) (File 1 of 2)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="90ebd0e3" sha1="8b35880bfa1f81af519f47cc3e46aaed17563f3c" name="Maze Rally (UK) (File 2 of 2)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="cd203981" sha1="e2d5d854bfaffc81b1c919c698215693b3fcbde8" name="MazezaM (PD)"> </hash>
+	<hash crc32="d2d5d4e9" sha1="647997d59aa9f8adf33c8f3417ac346723525149" name="Mefies-Toi De Mephisto (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="eb9a6dc9" sha1="1a7dbe4fb99ec8fdba125244cbc7928376ee1ffa" name="Megabase (UK) (File 1 of 4)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="c80afea2" sha1="ba272e6e7cf2625d7f0238a7b1e7a2faa4267b70" name="Megabase (UK) (File 2 of 4)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="3d98bf50" sha1="3c478727662c06b32db83fcca3746fc0c3516bab" name="Megabase (UK) (File 3 of 4)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="be7c864b" sha1="d738cbabfdbdbaf53e6e507849755b72b0e467ae" name="Megabase (UK) (File 4 of 4)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="e6b854a0" sha1="691e9332c8f1a119bf5887782ff80ddf5413c856" name="Memoric Mag Type-in 1 (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d71e31bb" sha1="7558de32dcc11f8c75fafeb29c5414c640126d4d" name="Memoric Mag Type-in 2 (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1c3f5cde" sha1="9c88b056185f6e73a9f7808016372e487c683bf4" name="Memory Peek (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d4a79335" sha1="741d59ea3ce1e235f29ab4cee27c7769e11d1042" name="Mentor (F) (PD)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="6352db21" sha1="c50d672f469948e1782ea27d16c61a38824ec656" name="Menu Program (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1b3e1465" sha1="b99775776e180083802193ab89a43485f12be66d" name="Merry Christmas (UK) (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="4db40a87" sha1="51c6680ab1c380ad026e045e19c2e1d3aace215e" name="MES2 (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="87d61d85" sha1="bb479d95c2fc2dccad59e3623dd0a515d5b8b63b" name="Meteor Run (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4a8b6e6d" sha1="c02554e9813a5b3bca5f9b0a914b812c2f044784" name="Meteor Run by A.P. Gardner (UK) (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="d80a0883" sha1="06318619fa9b46314ba1a75700ea96e791b3ccbc" name="Metric Converter (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a7f5b456" sha1="39d5bfd5f54907c88a2231be81b5b95b67f89b68" name="Meurtre Au Manoir (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="6e5d47b9" sha1="55070fccbe82536ebee229ca1fbf5d7e05ea6ba7" name="Mill Bournes V1.1 (F) (PD)"> </hash>
+	<hash crc32="9885282a" sha1="e83ae62007ff4fbef957f3c160959791379de73c" name="Millionaire (F) (File 1 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="e80f1f86" sha1="a0fbecb5405e4fc7986ddecab51ce51230405cae" name="Millionaire (F) (File 2 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="c66f64a4" sha1="ae46bb7ead1667cb82d1f83ba1b022d64bdbc40b" name="Millionaire (F) (File 3 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="7bb23b8d" sha1="81be9333f9a7837ee05959e9dc52adc09dfcba0d" name="Mine Field by A.P. Gardner (UK) (PD)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="e34d2091" sha1="6eb360ae281ea66c891654cbcd7a725a883c9665" name="Mine Sweeper (UK) (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="e2b05bf2" sha1="72dbba358d1770707d0135c6c2b9184c31e94ed7" name="Mined Out V2 (UK) [f1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="96691a34" sha1="c63d419d6bb132069f955ea1e15de8a0b0921fe9" name="Miner (UK) (Disk Version)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="f775e0c8" sha1="212fa6b00f39f35a0720dd13ac98d2404d0f60f2" name="Miner (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="6ae04a6d" sha1="f014b3f30180437ffc2fc2165f9a7b2c35518420" name="Mines of Moria, The (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="88489774" sha1="209c1d08041b039d57a0187f956604391ab467cf" name="Mini Sedoric Menu V2.1 (UK) [a1]">
+		<year>1993</year>
+	</hash>
+	<hash crc32="be417c3c" sha1="758b128b14af0a52ea6fc2a97e63c39b855e93bd" name="Mini Sedoric Menu V2.1 (UK)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="53388c37" sha1="8be3d7853dfb4c5576c4431c171e2d0b18070245" name="Mini-Pengo (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="0d4ad5ad" sha1="46315d3f77ef318f55adb894efa8e13dc9bf2f74" name="Missile Defense (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ba16ca44" sha1="78926bf33ab520e4f53e02e993fed9b578257f57" name="Mission Delta (F) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="a414fea2" sha1="9024f5af095d25712c410fc4a709cadb74038601" name="Mission Delta (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="0480429a" sha1="f1e3dfe9d1b442480cb7e722bebdf027ee9648db" name="Mission Delta - Ecole De Pilotage (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="fe8cc6e8" sha1="3be1bb505ec2cb612e8f5d62be674623868e3ae0" name="Mission Delta Test (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="b66e6ab6" sha1="f879ee133a822a3cb23b5eeccb1cd8b7fa37551e" name="Mission Impossible! (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="c3a97231" sha1="e22d7957cd8c4537d5190ec29aa59df1598f2631" name="Mission Impossible! Demo (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="876c4e1a" sha1="5efab2d5fc8f4b360f17bd3ae70aaa027ec224a2" name="Mizar (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="bdedfbb2" sha1="95b9d7ee467e2ba14288d7c64f428e700b3781ae" name="Modem Utility Disk (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8052a488" sha1="9477ba10aed2f084f833f6b22e124baca85fdf38" name="MonAsm V1.1p (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1ecb222e" sha1="ed117fa71f3095d2c3ec2b872fb8f095c623ec43" name="MoneyBags (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="3f00e901" sha1="8412652b029dfc5076907be927bd723d24c95a0b" name="Monitor + Editor by Andre Cheniere (PD)"> </hash>
+	<hash crc32="169f8011" sha1="7cc9568d3fbf7c39793b871e1dbc2439a7b0ecb5" name="Moon Buggy (No) (PD)">
+		<year>1989</year>
+	</hash>
+	<hash crc32="b0136165" sha1="818add2d04cef6362b8fdc64d6368ce9a2ea7a33" name="Morpion (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="fc291b04" sha1="fc3126cd49b1bb17b031633fe7dfcaafd6589623" name="Morpion (Hebdogiciel Version) (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5195f15e" sha1="4214f296f54c3abe581162939a495c0ff8805f15" name="Morpion 10x10 (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="0639b4d5" sha1="6f6821fd14816cae2661772751c12f36e180be0b" name="Morpion 10x10 (Proriciel) (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="fe7a5ea6" sha1="30e901c37790f27383788e7c789bf141a27d178b" name="Morpion 3D (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5b367061" sha1="308472124b29fac732ad96da7f90d4b0cdf02680" name="Morse Code (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d518fde5" sha1="d7726b68f962066c0c0b5e29dcbeac968f3312ca" name="Morts-Subites (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="76924e5f" sha1="0ef427b653fe67b14838f048906af0b0403b11d0" name="Moyennes (F) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="dbfdb910" sha1="6ff79f5504095630a46de9f81bc0a3520ca2102a" name="Mr. Wimpy (UK) (Disk Version)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="59901634" sha1="a3ebb48ae8681ee928643b75ac9ee885569d3626" name="Mr. Wimpy (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="da300bff" sha1="ace937d84b6ac9a907c4f6782ad3531d16f9e443" name="Multifiler (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f4b4402d" sha1="32b8dd612a3000c7cab263aef349da24e564c481" name="Multigame Disk (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="efc1ae7a" sha1="879761fc2885693bf98758e2eac4f6150b276423" name="Multigames Disc by Loricels (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="6b50113b" sha1="9c978cd55a5115d6f6b498fe3f4af130da40aad3" name="Multigraf Programme de D.A.O. (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f9e4638b" sha1="f409ef5c9dcab8b82cfc708e162bb89181c72c86" name="Multiplication Tables (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f0032cef" sha1="1f90db758305bf9c1049032aa33ba4d9cc73ab29" name="Mumpye (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c71375fa" sha1="ff42a3413ce8b67a71ebb1f17a9983cc2cc882c6" name="Mused by Twilighte (UK)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="e0bc3694" sha1="0045c220abdb42a41c5088462fd61e5328d8e490" name="Mushroom Mania (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="18d55bdd" sha1="378bcce1c64ef2965d93e564330dc56cf65205a6" name="Mushroom Mania (UK) (PD) (Disk Version)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="1f364582" sha1="3e52b6cfa68c5bdb8b72be9daddc1d9808c87469" name="Mushroom Mania (UK) (PD)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="e86c515c" sha1="53d88dd140a831a2836986609714dc33e958bbd2" name="Musique Dance (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c9857e5d" sha1="e6bbcda59fe26dab670a9736982d72188c53aeb1" name="MYM Player - Arpy (UK) (20xx) (PD)"> </hash>
+	<hash crc32="7711fa0f" sha1="16769135aca2df54b6f5bd848b3e2605c1aa3fce" name="MYM Player - Cybernoid 1 (UK) (20xx) (PD)"> </hash>
+	<hash crc32="36cee7d9" sha1="8e057a00741a84ee5ad198a54daa8434876d2f58" name="MYM Player - Dragon Flight (UK) (20xx) (PD)"> </hash>
+	<hash crc32="ace22c85" sha1="084643300139d984ba5888f41cd87fddfa73c68e" name="MYM Player - Judgement (UK) (20xx) (PD)"> </hash>
+	<hash crc32="260fc735" sha1="aba3f1275d7173fd06ea71a702c543ef9b736571" name="MYM Player - Rollout (UK) (20xx) (PD)"> </hash>
+	<hash crc32="00f47ccb" sha1="0123d25c21fb1f4e135e54d098176c84539994d1" name="MYM Player - Warp (UK) (20xx) (PD)"> </hash>
+	<hash crc32="60f214ec" sha1="c88b6caedd9e6258bf3369250b626420a48be376" name="Mystere De Kikekankoi (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="cc14a0cf" sha1="f02002d309c7d5bbca946c546510a1458ec8eb69" name="Mystere de Kikekankoi, Le (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="4a570335" sha1="edd9889f4dba9149b1814968fe6325762e1c00df" name="Mystere de la Derniere Visu, Le (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7acb11f3" sha1="b48d10de5bbd210169ab83fa3b6405134f9ebb01" name="Mysterious Adventure #9 - Perseus and Andromeda (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="228e44b8" sha1="8af13f3d38e80ef4567db6c4a6c90e7e55f22815" name="Mysterious Adventures - Timemachine (UK) (1 of 2)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="06dab706" sha1="708217bf5d610312513e17fbebe1d750bf82cbe0" name="Mysterious Adventures - Timemachine (UK) (2 of 2)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5d5825fe" sha1="0157a6c003f3b242924b81c7b847eaf9d5dcf255" name="Mystery Tower (UK) (File 1 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5f6db756" sha1="3be394a41b67b39f97c84c91c1bd5885f2c64d9c" name="Mystery Tower (UK) (File 2 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e1e2753b" sha1="0b5e2de54e28dca49030681bf4ecf2d1c9d932c5" name="Mystery Tower (UK) (File 3 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a11211c6" sha1="276f7c3e52eb2c147c318df60b04a0585bd9b7e4" name="Neptune (F) (File 1 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="066f3347" sha1="ab79a39cf5252d48ced76ded984632f621d2c8f9" name="Neptune (F) (File 2 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="2d90686e" sha1="e5f32bb6f4a5251e42b95cb9c07422d2e0a3f4ad" name="Neptune (F) (File 3 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="08902abf" sha1="e4cdd3634543b328ff2589b75274db81e66e1b1d" name="Nibbler (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="e915880c" sha1="06c37af44b0fdb4ad1ed2990adcca4c047bb8092" name="Night Rider (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7823fac4" sha1="be506ff3456e92f3950e1fefb5b5988203b69d97" name="Night-Fight (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="58a5bb7f" sha1="17439ff921c68a474ba19893d58f50449e38b64a" name="Night-Fight (F) (Oric-1)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="2317a52c" sha1="0e17e1c36d00314570676c8abfbf56f81861d6d4" name="No...Not Anothere Ladder Game! (UK)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="47cb079c" sha1="a160f950a5a98883c776ee5cae1a38ca17d1afc4" name="Noah's Ark (PD)"> </hash>
+	<hash crc32="9ae771c4" sha1="793a47395d062f03fbac58e18e2337626db3070d" name="Nonos (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2c16f1bb" sha1="513b96b96a4ef886833a37ffece69ddf7897894e" name="Nowotnik Puzzle, The (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="521d6280" sha1="eed5bdbe1c753536a995ec20026eabebc2b61f33" name="Nuclear War (F) (File 1 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="0c4a76e8" sha1="3968f2eb6b54214ec5b82f13685e45541a19c6d4" name="Nuclear War (F) (File 2 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="eebb7047" sha1="3c75e77380b03542c31ce845ebc561b07dde1d36" name="Nuclear War (F) (File 3 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="402824af" sha1="f3d4d07d352e15f65f6683b854cd50e40e223a80" name="Nuclear War (F) (One Parted)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="0eaa44e5" sha1="e3b7176a2f9ae332c717140f2b5cedc21f24245a" name="OBED91 by Twilighte (UK)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="c375f858" sha1="239da1583a98b45d7e6e13ccba97d425b83ae01e" name="Obelix (F) (Atmos)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="9bfe124c" sha1="7a8097e82315ed8520ff78594988773292a6aba8" name="Objective Elysee (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="e0826940" sha1="3903ebe4b8d0e11baf9abf98353b2cab6274fc71" name="Objet (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="0aca7e3e" sha1="448147281a9e624d17057749a970c56a05e635a2" name="Objets Ok Ici Am-1_2 (F)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="a80ff9f5" sha1="9df1dc5304c673caff11098fa683b8182ef83c4b" name="Obstacle Course (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8ac5e2b9" sha1="1c542b1ce95927c39499647d579ff7ea4f8e82e2" name="Oil-Leak (F) [a1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="609e6ac4" sha1="93c72af4fc9e5510a7781596b7d649e4611b7756" name="Oil-Leak (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="40b9973d" sha1="4c723068d66d0ba48673d5bec78a339740310e55" name="Oirc Raid (F) (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="72f1ef6a" sha1="b8bede382c633921d578a4b5857ce8901e13b5ec" name="Old-Timer (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c88243cc" sha1="690bd0dbfbb8df0cba5cb6af3222fb4d7954a2d9" name="Omelette by Alan Downs (PD)"> </hash>
+	<hash crc32="aa1630f9" sha1="ebf0dd144f0940f5390cbd2bd47686043d41f7ea" name="Operation Gremlin (UK) (File 1 of 4)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="89008464" sha1="9411a342e6de11e906dfcff43562384d9e1285a1" name="Operation Gremlin (UK) (File 2 of 4)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="38bfd194" sha1="b40b16b352dc5563f50e880f86409aef29eb6e62" name="Operation Gremlin (UK) (File 3 of 4)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="fc8b5ff7" sha1="a693a87c26a2594307788b0c154280b44dc83e9d" name="Operation Gremlin (UK) (File 4 of 4)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="422c72c4" sha1="751c1af5946a5b70a752d5eee5cc732697fb2206" name="Ordbehandling (No) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f325195c" sha1="380309a6ad400edc670e6c1dc0a5b5169301cfd0" name="Orible (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="3a034c70" sha1="2a248509a9861ef33150d948aa86be9c9655356a" name="Oric 48K Reverse (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="d81e2edd" sha1="1968b0478606749e2c965a602d57f0d69d608c58" name="Oric Abilities Demo (PD)">
+		<status>Known Bad Image</status>
+	</hash>
+	<hash crc32="7cd4c13f" sha1="bd22b88794017b2eb73ea7c89f5933475b280fca" name="Oric Abilities Demo (PD)"> </hash>
+	<hash crc32="b2c4ae05" sha1="8d565b9a21b21e2cd07bada61e421a5bbd7d3ae5" name="Oric Animations (F) [a1]">
+		<year>1996</year>
+	</hash>
+	<hash crc32="78f15e2e" sha1="e42bcc702a7f2df2149a2d2a13f8455f89a0f8eb" name="Oric Animations (F)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="bcd8da69" sha1="e719c1fd7a3692ae2c6c9abe0e4642712afb8031" name="Oric Atmos (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="97c15c14" sha1="12e43d89ae19176d20c6f802222b3486d5151d6f" name="Oric Atmos Demonstration Program (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="4b10b79b" sha1="1ff1cf5f966babd74c553628fdd1f1ae98461c4d" name="Oric Bandit (UK) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="7db4ebb3" sha1="a9a0c1deda62809427bbecbfb1456ffc5bac8885" name="Oric Bandit (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="bde84604" sha1="f16bd61248995424fc2b1258b5855513b7f3e20f" name="Oric Base File Managment System (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="e486ec28" sha1="f9468a72ebfb92eaf30b577ea8c669b90050ea4e" name="Oric Basic Plus 1 (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="7af8608c" sha1="5e50d54a5b5800e030679cecfc8e18b49cbf30f2" name="Oric Bingo (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d4fe41b9" sha1="bc3d699191bb7fae5ab2d09a2552dca19f00ac8f" name="Oric Chess (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="9f5a01b5" sha1="b99688799b66988da0cf81eb511a7ef7a5ebc50b" name="Oric Delight by Twilighte (PD)"> </hash>
+	<hash crc32="136a1503" sha1="8fab5b63ef117f325fec796874c6c42cdf0803b5" name="Oric Demo 1 for Volcanic 4 Party Loader (UK) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="a9664a9c" sha1="0d2ef6e67322f48f4b7e08d8bbe68827e2074561" name="Oric DOS V0.6"> </hash>
+	<hash crc32="3f661016" sha1="531c23153c23d845bf775abb10a5f9b029cb673d" name="Oric DOS V1.13 (F)">
+		<year>1988</year>
+	</hash>
+	<hash crc32="cba97342" sha1="8fdd388fbcece14e43c3b38b8a94d0047e7c7a75" name="Oric DOS V1.13 (UK)">
+		<year>1988</year>
+	</hash>
+	<hash crc32="f1e206d2" sha1="d8b9dc17b8c81af3006e794e8d2ece814cc01e76" name="Oric Driver (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="9c06e364" sha1="a9671e5664e7259dfc74ec96e237a566001b6804" name="Oric Flight (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="59022d7d" sha1="4d887238535b8124ccb2b9a6dcddf8eb351156d2" name="Oric Forth V2 (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c7443e50" sha1="56b15f583c18a0394cb4696896bba5c74d61d1ad" name="Oric Invaders (UK) (Atmos)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="d8d6e1b0" sha1="d2498602dd0c0b40f7c42a3c2f6520075c34d1ce" name="Oric Invaders (UK) (Oric-1)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="e767729b" sha1="fc8bd1858f9520f717be1aa84a836d1119afc456" name="Oric Invaders (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="f4be8482" sha1="8cb05dbbaefe8c1ec1c8c021e5bda892be7990d7" name="Oric Lander (UK) (Disk Version)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="702b6af1" sha1="3d13ea52fb5bd0f8939ffb84cd8fee743c8e037a" name="Oric Mega Demo (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="cd142204" sha1="3b55350dbb85e758f07aaf7a45a1eda06594d3a1" name="Oric Music Effects (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7c3d939a" sha1="add75e4ebcc0eb14156ac1f8f86406f80156cc56" name="Oric Music Magic 1 (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="e9d97def" sha1="ae2b55156e1507cc7c114bffb178a1556842d336" name="Oric Musicien (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="883c336e" sha1="6c3c8db4a11e64c1826aef058c20d3be1278c875" name="Oric Parchen Kirchen (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="f49a1b27" sha1="4b47b68b347dd964eeb5f5ca963c5802584ff17f" name="Oric Piano (PD)"> </hash>
+	<hash crc32="80c1f35d" sha1="0455b57cc002f1b29e0f503c3f099bcbf169e09b" name="Oric Program Book, The (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="f425dd58" sha1="16ad418d8397dce06abd7d8d995a4ce21792e3ac" name="Oric Squash (UK) (File 1 of 2)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ef07f082" sha1="83a40eb1ad6c3ceab334c04fc2c6c43842547637" name="Oric Squash (UK) (File 2 of 2)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e8428d2e" sha1="c8eae181a5fab0db67d8fe2dba13f0213e30fe66" name="Oric Toolkit 4 (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="cccf9b84" sha1="5c4377f50c44cf15985f70e08a0fbfaea3ab2bee" name="Oric Worm (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="0f122dd9" sha1="8a4857d36c5b26682ee61515cfcb04ba309e0318" name="Oric-Calc (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="477d0a90" sha1="481727469fd078d715a703fe2df620eb5ad8c295" name="Oric-Calc (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="228f213c" sha1="510844e7dbbd8e8326ac54399d9916a6f52badd9" name="Oric-mon (UK) (File 1 of 2)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="839f2bde" sha1="482e855c705ffdf405b0ba0cf6890c8f9b38da20" name="Oric-mon (UK) (File 2 of 2)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="d3faf2c7" sha1="29737be6e2a7bf31ebf0f719b94757217c53502d" name="Orica (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f1afbec9" sha1="a00483a2ea8cbfd1defdaffc92fde52480ac15b0" name="Oricade (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="284a16ab" sha1="969d733f821ab521a9dd00c33f70ca6a52cc8c18" name="Oriclisp (F)">
+		<year>1986-95 </year>
+	</hash>
+	<hash crc32="abcff56b" sha1="6e9bd7d540fb1a1249bf7a646c04eba6cc92e46b" name="Oriclisp for 24K (F)">
+		<year>1986-95 </year>
+	</hash>
+	<hash crc32="fc266d8c" sha1="ca7d53fb199a8e788bae57461666c0387d4c4faa" name="Oricmunch (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="d33fd264" sha1="c3b5ff8c319ecac84b0b048b4b190fec08311d48" name="OricSound (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="55e9f53d" sha1="6ee3ca3b1c4c0497652050583fa8e2547f8f244d" name="Oricsrule (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f5bbb2e7" sha1="0e8192c63ac841ad7c17ed644b82e05c02b6ce22" name="Orion (F) (Disk Version)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="be3e83e4" sha1="ccec4dbb534c0bc729cf2af0aa05aa60696ff734" name="Orion (F) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="245ebff2" sha1="379a071076116eb1e0fcd432c6174056f5283626" name="Orion (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="367be610" sha1="60726a0efee705c56f88e5736ed0967e1aa7d1df" name="Orion 2 (F)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e29aab5e" sha1="cee8ef01b7e10287a7f35cf15b5e16439a546d98" name="Othello (F) (PD) (2 Players)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="5f66edec" sha1="898fb9d15c7916a756a263370145f606987db3ac" name="Othello - Reversi (UK,F)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="680a142f" sha1="5a031268a582669d1e0e279a2d82bb27e33d501a" name="Othello by Anders Bostrom (UK) (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="354b56e2" sha1="95cef4cfe8ac492875707d8ad2f5ff31ebf5ef39" name="Othello by Paul B Kaufman (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="7e561536" sha1="eba4f2d1037d691e297a981dbeee0bc91825e6dd" name="Othello by Stig Ronand (SW) (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="78a85970" sha1="0a733007838a1d1aa0245910f3a1ec3dd877f3b3" name="Oubliett (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d6830680" sha1="8b8a034b8d8c0b973e3c8d287df45322ec17eb42" name="OUM Demos (F) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7f441eb9" sha1="c23d6319c70b9d42d760f1b6ecfe0b7b118656ae" name="Pac-Man (F) (Disk Version)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2fe31b30" sha1="acd1576cd88f5373cc7b51197210ac33d5a80832" name="Pac-Man (F) (File 1 of 4)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c1e231c2" sha1="22d4409319ecb4945c34f3075680ebe80ae789fa" name="Pac-Man (F) (File 2 of 4)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c71fd260" sha1="fe3a18eb1482858454ba4b08242d2b3e3d643d42" name="Pac-Man (F) (File 3 of 4)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7e74a013" sha1="2cdba54de9cbc4ff486a5e862ffdce505345e704" name="Pac-Man (F) (File 4 of 4)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2bd3d040" sha1="c5304048dfd890aad629db573f5d2431f1392548" name="Pac-Oric (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="be14b3ef" sha1="fa96613d28f888fc7286073e35989cc71177a4e4" name="Paint by Petyr Miladinow (PD)"> </hash>
+	<hash crc32="7b962085" sha1="776b3b87d39b13c8a36d56f185214dc0fba1d23b" name="Painter (UK) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="4b73b09d" sha1="5e7e0b25f67be029a814c5e6d2a4a47bd39c19a4" name="Painter (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="8dc3df56" sha1="62fd6b6a5c0d12b8235a19b8b89741e77d9b55d8" name="Pallida (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="664b8e1b" sha1="33a191d54c6aebc5d796e4a6ec2bd0a01743e809" name="Panic (F) [a1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b31d6f7c" sha1="07176ac3d680d4adf3b5d071a68269e42c304c95" name="Panic (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d7f80cd7" sha1="52308c8a13ee77b25f765a61310d54b6d92d7ca5" name="Parabole (Test Parabola Data) (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ffd5ddbb" sha1="bda1bf14fac929c83a8dd83c1ca5485acad3f952" name="Parachute (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a23e3f64" sha1="f7325445ef99987fbc27b2584689a62d02576cab" name="Paranaud (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="811a225f" sha1="2f7d5c5ded9e570c39de442ae7c7f49c5369d52f" name="Paras (UK,F) (File 1 of 2)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="e184ea84" sha1="ac09c7b6e8a024e57495024ede3f2a195bc273e4" name="Paras (UK,F) (File 2 of 2) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="3c93cfe4" sha1="1703e86d96db4784c065f37d11afd597eca00da0" name="Paras (UK,F) (File 2 of 2)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="4b462a10" sha1="b3269452db5e84d04f7f9129abd3d2f3f1d45634" name="Parcours Du Combattant, Le (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="3ea5a6df" sha1="f042b8954c9a240bf7c41082bdffa149e448dc67" name="Parsec (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="accc334e" sha1="5ba15cf018497562a43dafcd0f9b4733b1442c22" name="Pasta Blasta (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="86be2bbf" sha1="275904d532a87918e477b2c3261e741f0615afa8" name="Patience (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b56e9f9a" sha1="f9d667ce7f156bff224742069c85e1eed0c41141" name="Patricia Music Demo (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="de8523df" sha1="929fdfd137ee029d741a90959bfee9316821e98d" name="Pendu (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7a272ad3" sha1="f0ce334fa03430e7063666c29505d53a21c2ad1c" name="Pengoric (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="2dc780b7" sha1="0dcf0e6acd7b289f026de8a08e54e5d29598b8c1" name="Pente (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="576aff95" sha1="afd6d40a27802b7b536a859f73acfa55ce9a6e0d" name="Personal Diet (F) (PD)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="a31c9543" sha1="dde3ad6423292552825239d94befbb96fbdd2c06" name="Picture Book (UK) (File 1 of 4)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="b290eb38" sha1="a76935cd2ea448b73d3a624f7e3d2ac9ee1c409d" name="Picture Book (UK) (File 2 of 4)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="17a80cd9" sha1="70ddcbc6021b2f6fb56ad325acccd11a04912b1a" name="Picture Book (UK) (File 3 of 4)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="4f5406f3" sha1="896eb0ad58380591002cc6c4d498f013a840c765" name="Picture Book (UK) (File 4 of 4)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="151fd53f" sha1="2ff3c9d11897be67ad1918c034c8a3af754173c6" name="Piedtruche (F)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="d6a18d29" sha1="512cddad68dd3341b02c1d424def91e3a18ea4a0" name="Pierre Etoile (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c2e8a82e" sha1="11215c07d75514825e9713140ffd8d5ba07e9ccd" name="Pilote (F) (PD) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="96ebc4b4" sha1="3393002fd512f2aa27eadfc53f5ae58df73ed8e1" name="Pilote (F) (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="b43ca79e" sha1="596613da5d4b8abf4f557d26200abb688a753c50" name="Pinforic (Bootdisk For Infocom Adventures) (UK)"> </hash>
+	<hash crc32="8032d148" sha1="8c717e26447d4256bf7818b5c6ef08f29dcc9575" name="Pinforic Interactive Tutor-Sampler 1 (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c4494db4" sha1="ec9971d3b1cbd26ee16d5b2b9dcf340b20b50876" name="Pinforic Interactive Tutor-Sampler 2 (UK)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="10c5eed9" sha1="3c072ad7693a4bb4cb2b6296a8742491b5d2f6da" name="Pinforic Interactive Tutor-Sampler 2 (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ac3b50c4" sha1="934336429fcd3d72ca602f5cadc5ec6503a67b49" name="Pinforic V1.01 (Bootdisk For Infocom Adventures) (UK)"> </hash>
+	<hash crc32="c4dff202" sha1="a57a9799f578d9760edd5e23b29805541c2a85e6" name="Planeten (SW)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f22787e0" sha1="84779dc6f07786bded32a0f708e6c3f436b49db1" name="Plasma.cod (for Oric Demo 1) (UK) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="d6aae9d2" sha1="b5faf079b9151068760f97fecd6b00aba75dca14" name="Playground 21 (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="df64306e" sha1="6b8cfcdd812975cb7a75dcb24e453ac585d73d21" name="Plouf (F) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b97dad05" sha1="46142e273f3ac41f73883ec4711b333aab0f3ed6" name="Plouf (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="3636eff2" sha1="a705523ed8b3796c9a15b80324cc63983397a456" name="Poker (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="0b4b05c3" sha1="2aedc9c34b40f53f76cd24efa3903ef3a430cd60" name="Polygone.cod (for Oric Demo 1) (UK) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="c7b4d841" sha1="89f1f0f21d979f06d90eaa0eccadfabf13b13140" name="Pontoon by A.P. Gardner (UK) (PD)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="872220b5" sha1="0add657f6370df53cdb885ce02c3a441b297289d" name="Pontoon Card Game (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e099ee9b" sha1="f726a5c2a2feb10087e31993c8681788a0012e7c" name="Ponts Levis (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="c795c046" sha1="1e5bb7446ce1e10cf4a8c2a6ca5c506b74b196af" name="Poopy (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="634d8e8e" sha1="7765d257cf52ab39ede6e1502de473e1d2f5b19b" name="Poule (F) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2cfc322b" sha1="0ab1bbfd7b0962fc1b3b57d2e6f7603886119d31" name="Poursuit (F) (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="09e53161" sha1="98b86db7c52feef860167a0dc7ed961ff43ea4bc" name="Print Using (PD)"> </hash>
+	<hash crc32="83587b1b" sha1="4cfffca0543239ee6fa37995f18244d53b23c40f" name="Prison Cosmoric (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f9cf29fc" sha1="e4255e58c98b99c4b326ee4b1611cfef07a1c0b6" name="Probe 3 (F) (Disk Version)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="37cb1750" sha1="d473be469eae121a7df414641018289545fb8974" name="Probe 3 (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="c9e7956d" sha1="8675ef63d565003c4dae2c9ddf46fac17f83d5d2" name="Probe 3 (UK)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="f6910858" sha1="951760a029024a514d6c62d9c0a8fd78d5e65390" name="Probleme Du Charpentier, Le (F) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8b3732bb" sha1="0cc6213422b9010262a57e8c22c9831ed3c038e5" name="Projectiles (UK)">
+		<status>Known Bad Image</status>
+		<year>1983</year>
+	</hash>
+	<hash crc32="93eecc00" sha1="36ef9d6de6d934b4ba36eeca1bd436a506cff423" name="Projectiles (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="1e02791a" sha1="531930f4e6cf94ffa9550a2c78aac1082591371f" name="Protector, Le (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d02c3615" sha1="26ade3f60b4462e51bb1bf35de345e1561fce274" name="Protopus Boot 1-2 Et 3 Avec Rfm + Objets (Atmos) (F)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="753b7e30" sha1="3035b52fb4530b88ba445eae1f8469bfb9971434" name="Protopus Sources (Atmos) (F)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="1c17288b" sha1="90a4bdadc47fe96c63fefd89d18519eb7e4d25b1" name="Psychiatric (F) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="4a1fb4e1" sha1="38eeb572602c299a104829496a2e87317d05946b" name="Psychiatric (F) [a2]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="f3d2a03d" sha1="3481e02ee107c4f2b1a6d94e5830c7877cc3639f" name="Psychiatric (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="db3538bd" sha1="22a00a7735398f62dce9e006671cf31f4814c60b" name="Puissance 4 (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="88a40592" sha1="e85ffc47060681b5c1a9f0c44dafdd7a974f8892" name="Pulsoids (F)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="53ec7e42" sha1="123f1e1fd3eff73081b93a0f1d5eb13701a72b16" name="Pulsoids (UK)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="acfb98c3" sha1="6efefa88cbe5eeb0d9bde9fc95a3c87b9aacbe1e" name="Quack A Jack (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="5e8e6b05" sha1="1de00c6af225dbc72177c23d12f1e6a5940daa1c" name="Quack A Jack (UK) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="27f14ba5" sha1="9a2dce06593494e96ed88612f6e22f927f7fb4fd" name="Quark Data Flight Simulator (UK) (File 1 of 2)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="74712f3b" sha1="f6addd22937f0fa45c77eb1b6e5d306e19044723" name="Quark Data Flight Simulator (UK) (File 2 of 2)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7fcd8b93" sha1="8102a02630e1b83050516e814bef8a6bbbf274ed" name="Quest (UK) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="faa7687a" sha1="5f4102a8f787db247522eaf96899ef9b064641c0" name="Quest (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="daf2c180" sha1="930363aabd140368331777ed7606ebda6f8112de" name="Quest of The Holy Grail (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e4dc7359" sha1="3f12a755ea404638053c5d8370d476de3fad2371" name="Quete Des Anneaux (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="f1046a01" sha1="cf17de4bdc7b314d101773bd10b7fa4b2c644d31" name="Quick Ched-Scned Combined (PD)"> </hash>
+	<hash crc32="1bb6fe13" sha1="975489c4b7de2559dac4e6831a6c9154618f0f20" name="QVC Word Processing V4.2 (UK)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="7b82a52b" sha1="9ab620a3da955b474fe01ddba032dc68645cd8cc" name="QVC Word Processing V4.3 (UK)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="a3bc1e5d" sha1="ce22b38bc6a054fcc51538f67b530555b58a0f9e" name="Qwerti by Peter TheSpider (UK) (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="84022822" sha1="8f7c11c3983e09b0e5664a4f4d3c0ae7fd22b21f" name="Rabbit (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="91bb0fc6" sha1="37417939e8fce8876dc9931a5e60262392c6f8fa" name="Racer Tracer (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="6426e039" sha1="813a57a9ca985d7d69a82db1786a6af1b9941a7a" name="Rally-Xs Music Demo (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="405eb1d5" sha1="282a9c39b02fea8f4b3e91eac2766a8827155525" name="Ramassem (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="65af50fb" sha1="260b91c7cabb9f19b69c1a531ea273b96c3e57ee" name="Random Sketch (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a95e67b9" sha1="b84e58d7c038465308a6202b08cf7bbdf64b30a4" name="RANDOS V1.0 (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="f24e768d" sha1="df310deec58b9686b86090e6ad0f704e95695feb" name="RANDOS V1.0 w-Utilities (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="918def15" sha1="5da193ddb53bb6e91bb20f3c3097989cf5514a3e" name="Rasters Demo (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b65bea90" sha1="57b721ffa7625a246fecad6c25ec1fd55018f411" name="Rat Splat (UK) (Disk Version)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="8639ae7d" sha1="bc78ebd9f695b622fd32ece2ccad2c52e5d5836e" name="Rat Splat 2c (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="c65ade98" sha1="ff8210755c65fd19f4cca14080b264c324d95069" name="Reaction Time (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d3e4c5b2" sha1="1fe67e0dcc02f656b8454cdec34ad1e03aaafadb" name="Rendevouz De La Terreur (F) (Demo)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="78039d6f" sha1="77906b7398d5e2e77f8ce4d2741e55a7807442dc" name="Rendevouz De La Terreur (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="a5a000b9" sha1="57cb1ccc70aed04ae42657f5577b24c2c17a1579" name="Renum Basic Program (F) (PD)"> </hash>
+	<hash crc32="d08de292" sha1="7b3247b3007a42d07cc7af084687fe4f66a750a5" name="Retour Du Dr. Genius, Le (F) (File 1 of 2)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="dfaf22de" sha1="9d2a2d5275dbac4a7d4a6be3674b489dfd04b12f" name="Retour Du Dr. Genius, Le (F) (File 2 of 2)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="0e306195" sha1="4f30add8ddff6448370118e9065d19d7df550901" name="Retour Du Dr. Genius, Le (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="15c0c3c7" sha1="863c363d5fb0bc99ecf98b72770d8c999407a122" name="Reverse (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="7117c9d5" sha1="0a8f1a1796bdd216608d9afc788e0e9a4a3e65ca" name="Reversi (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b15aff61" sha1="fdb7ed0217eed4d51a5923737d673f86c4e8e97c" name="Reversi by Paul B Kaufman (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="e7a53b89" sha1="1808c50842b078b5bf693ee21f4dd700660ef969" name="Reversi Champion (F) (File 1 of 2)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="f044c3e4" sha1="fb0ca83840dde1b4653b047034b96df1efb52124" name="Reversi Champion (F) (File 2 of 2)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="90dca874" sha1="84f305dbebff6e5e1b372b20bdf76ab0fd651e74" name="Reversi Champion (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="30f7f17a" sha1="15b171b1186a7ffa8d02c1fd0040b9426ed13beb" name="Reversi Champion (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="68b29aa4" sha1="39e94d18b55288041ede1de1555a4d47be562ae1" name="Ring of Darkness (UK) (File 1 of 5)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="0705f1f0" sha1="4e37a08601e13e9d03079505f72dd92beafc0043" name="Ring of Darkness (UK) (File 2 of 5)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="031c14ed" sha1="76927f52df2eacbc34bd5d4a4ef61ddc1a742d68" name="Ring of Darkness (UK) (File 3 of 5)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="2b4581be" sha1="da2863dcf70adc14ac668576c7ed1447620569ef" name="Ring of Darkness (UK) (File 4 of 5)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="cd394d66" sha1="577e37b18628486e1cfe060ed60420bf877945e4" name="Ring of Darkness (UK) (File 5 of 5)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="d504e12a" sha1="5979b2a30d1e0d1e4ad669973f5156c9cc6ec6d5" name="Ringo (UK) (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="34075cc9" sha1="2f6979b51a23f18f67773b9a2e1263c564922160" name="Road Frog (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a9cb6a3f" sha1="60af5d43535b1dd3e20048dbfec265915a490fe9" name="Road Runner (UK) (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="25c61a95" sha1="12272def7d4ca8c730b248e986e30f550eaefabf" name="Rock 'n Roll (UK)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d7e7b971" sha1="0f7277348fadd01deb45564e79ecb1a4cb6208a3" name="Rock by Karl Hardman (UK) (PD)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="e145e62d" sha1="810324ab821d2b552054e6d093f6efdd7f5200fa" name="Roland Garros (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="7b0ea311" sha1="fab8323287f946caf9a748a5e642d5f535dfbe37" name="Rosa Pantern (SW)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="da1f933a" sha1="7e834462345a9cac1a320d7e431ab1175512c6a8" name="Rush Hour (UK) [a1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="520188df" sha1="bdbfa7502c0d1932b54bbed27d44a86fc517f9f8" name="Rush Hour (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b0bae580" sha1="56ac4c00275e1687cb9beab232c24bfc4ce5d6ca" name="Rush Hour 4K for the Oric Atmos by F. Frances (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="d095b8c3" sha1="7f2330fb226f2641ea954118d18230cc82284bfd" name="Saga (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="a41c78c2" sha1="da2d410c513a7d9514128ce73e63afc5e5bdf865" name="Sample Group 01-39 by Twilighte (PD)"> </hash>
+	<hash crc32="e6b12be6" sha1="4ffa938a933529ffb96284db382d6fcdb40dfeb5" name="Sample Group 2 (Instruments 01-90) (PD)"> </hash>
+	<hash crc32="7abd2b34" sha1="1f7c7deb3be82a77057b578bad9765bfc025ae0a" name="Sample Group 40-69 by Twilighte (PD)"> </hash>
+	<hash crc32="3e7e6569" sha1="454bdee56cfc777cf872f5bc01365204f0f07f92" name="Sample Group 70-90 by Twilighte (PD)"> </hash>
+	<hash crc32="12dcc0d5" sha1="43273e6a826e20561d5eb51783972dede11ec1e4" name="Sate de Haies (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="bd3d5cc0" sha1="e28712fa5b6444505eba43451bb1b0802c60b0f6" name="Sauvegarde, Chargement, Arret Titre (F) (PD)"> </hash>
+	<hash crc32="46826c0c" sha1="95110cacbfefefa96373959e9209195e149b19a3" name="Sceptre D'Anubis, Le (F) [a1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b7b8c0a4" sha1="5af1b94055756375a2e4de721123e435f468b77e" name="Sceptre D'Anubis, Le (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8ede37c2" sha1="5c216b1316e0314f3106c8bad6b805e415577f70" name="Schtroumpfs (G) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c4318f76" sha1="93c792813aa378279f1de8e891fe6c2801b5b81c" name="Scorbutt (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1b5ba7a4" sha1="876721847977357d641a9160f7c1eaed5e603246" name="Scotland Yard (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="01c0e9cd" sha1="44f88371fb771c4710a84608a2890829fbca13b9" name="Scrappy.cod (for Oric Demo 1) (UK) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="678346dd" sha1="cce2cf1b86dffc81434f9085c4e2f4ead1c2ce8d" name="Screen Kit (Atmos) (F) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="04e31e31" sha1="b71153253265b609d9c4b121cad2e401c3642bdd" name="Screen Kit (Oric-1) (F) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1408ee65" sha1="b8c24bf2bee2d1384fed9c441900e83214491e41" name="Screen Print (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5d2ef689" sha1="94aec35d95641825462e6d8faf369fef5d5c9709" name="ScreenSaver (PD)"> </hash>
+	<hash crc32="622d381f" sha1="0885a58728933f6b0aff27bec1ec3f2b9d77505a" name="Scribe (F)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8dfd99a9" sha1="2e5e4d968d3a37a4341d6d4d1635796632224590" name="Scroll Screen by Peter TheSpider (UK) (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="217f6c5d" sha1="d28216dbaff613d198f756d03dd17d7a1eb27507" name="Scroll.cod (for Oric Demo 1) (UK) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="213fb3d8" sha1="2e4e934c0174eaaabb3de91bd39ee9c7fe62f475" name="Scuba Dive (UK) (Disk Version)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="8856f987" sha1="fc06a72fe4c4f3394b1100d64c565a0faf041262" name="Scuba Dive (UK) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="1029f874" sha1="3895d29b25ae9177b2d7efe6452574c6ece63da2" name="Scuba Dive (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="484faea8" sha1="88c89ad647a8453e0a51137ffae1aabdad0b498d" name="Sea Battle Ward (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="b4f9e746" sha1="6098028719884e0d47a473993c7ed9d376e3e9a9" name="Secret of Kaipur (Loader) (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="aba73533" sha1="f7b5d9ffa6d0378e2b5feeacbe323645b9be07c9" name="Secret of Pharaons (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="84832218" sha1="cf890c3841aefcb391200f9f50c0d1dfad56a55f" name="Sed by Twilighte (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="4cfddc0b" sha1="463c0bda24616316ef3f907980eb7b3783961fc0" name="Sedoric V2.1 (80 track patch) (F)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="23c9f804" sha1="4cc7c19ecf04300e49fb0b84ce64a2899632b3ab" name="Sedoric V3.006 (F)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="513ebf23" sha1="a86750dbca1e2ad34ff6c9a0573782534393e449" name="Sedoric V3.006 (UK)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="f0f0ed3f" sha1="1c0524c9a87f58ac9a1aea3a996268ad43dbb35f" name="Seige of Jerico (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="9217f8d3" sha1="fa0e529ef98059846a0e9c5d96f6f27081ec9529" name="Serpent (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ead62b0c" sha1="bab8265d91a91f3c5af94199cc0e6ff913df7fe0" name="Show-Jumping (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="5f694ff6" sha1="6205f949cec7abdc36edb807b924b72c74521cd0" name="Shuttle Simulator (UK) (Disk Version)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="f09f9738" sha1="aecde9b069b7495dc4158c46bde6bb262395eb2e" name="Shuttle Simulator (UK) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="e2b690ce" sha1="8fe947b8b5185b5b7ec256ddfa83a89e31b98f37" name="Shuttle Simulator (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="40b597df" sha1="b04c346cb2e59cc8b603804ddf90fc276860dd6c" name="Simon (UK) (PD) [a1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="22f4af3b" sha1="e524d36a617f6d95fc5c7dbc68d14c5ee3184a0b" name="Simon (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="35847f96" sha1="017a1403164ec25ba8201cb7b57219950d9c4b24" name="Sine-Patterns by Carsten Skjerk (No) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e6a1fcd3" sha1="7a6cfee3e00d0dfb78c52abea51e719f842116e5" name="Sinus Scroller Demo (UK) (PD) [a1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d298e3d5" sha1="b1cf2cf9912de0ac2b6a4ba4afb5b3684ca4ebc6" name="Sinus Scroller Demo (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="34eb2a8c" sha1="30d045f72aca669ca8ad169a47e7b4c810e101c6" name="Sjefen (No) (PD)">
+		<year>1989</year>
+	</hash>
+	<hash crc32="e2f45c5e" sha1="5b8bf2019cb0e7e50a3b3c5f312260d44868b47b" name="Sk1 (for Secret of Kaipur) (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="8f86fd4d" sha1="2811adbc9bfa942706b04e43d44a05f4a09e170c" name="Sk2 (for Secret of Kaipur) (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="a091f0b8" sha1="51052e8cffe0b3ca60e5cd99f0314d8da5d4ceb0" name="Sk3 (for Secret of Kaipur) (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="eabcd2f3" sha1="fd261adb13dd2bd83fb5455e5ff71fc8d4a6166a" name="Sk4 (for Secret of Kaipur) (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="03dad95c" sha1="ba06a41fe89baaafb7dd1ba39f45550636f9ada7" name="Sk5 (for Secret of Kaipur) (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="e3772a87" sha1="b378563a2fbd8be9ba2bad170c3be0b5e8ff03c0" name="Sk6 (for Secret of Kaipur) (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="59816238" sha1="fed6a19098028f3a42769c149575a34375560498" name="Skramble (UK) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="44fad553" sha1="c4e7b41f4e4c772f86e78ff7ecbc8246f5b55784" name="Skramble (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="1e90ed82" sha1="64b5e0890f673fdf53b800ce56ff26de2cc59ac3" name="Skrolnastrani (PD)"> </hash>
+	<hash crc32="fe895546" sha1="be6a82f4911a2963efb91f22fb1b4a691dbb4fc9" name="Slalom (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="fc124d07" sha1="b61709c53a0dc4b1e16f40c57b76efc79efe70f6" name="Slalom (UK) (File 1 of 3)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="26f54693" sha1="fcfaaf03555349716193e3975f555203d2948122" name="Slalom (UK) (File 2 of 3)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="6141b826" sha1="657587f6eaa6962fff63977589eb8c3c9c4838b8" name="Slalom (UK) (File 3 of 3)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="87ea3ffe" sha1="75c2d5d1b9dff23e078f404d425addb3852911aa" name="Smash (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a360668e" sha1="35bf67204c0539eefa86d4dea2df51fd22f4a396" name="Snake (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="77093dd0" sha1="a566f3a88391604736afe8a301112ae877ef6ba2" name="Snake by Czes Kosniowski (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e19e4ec5" sha1="7a8828824511473e43c40572b3596eba80445a61" name="Snake Venom (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="09da0124" sha1="d108426ac7dd47865b7fca489bbe92e06ee3e8db" name="SNAP! (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="82f174e1" sha1="d1a328848b72f254ae95c791a7a5de9df67bc2ff" name="Snowball (UK)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="c3ca537b" sha1="89234d400640a0b2af57a023ae15e40bb5c6b343" name="Sokobac by Andre C (F) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="dbcb33cd" sha1="3b7b73101b115ad5e1ff9ab22d0c92bf64423c1c" name="Sokobac by Andre C (UK) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="d69eddca" sha1="2a81ea7331aa688250f25d8f6d912d18fbac921e" name="Sokobac.000 (data screen) (F) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="e93f4dcc" sha1="cf35099f1cb854520b1eec60d8f48807938aeb38" name="Sokobac.000 (data screen) (UK) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="6977b23a" sha1="3bd715643d941fe804922d1410ba25e1f34f3608" name="Sokobac.001 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="98c7e6cd" sha1="a64b97d682316e75ecf69519b577bb4b3731521e" name="Sokobac.002 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="89f27e9b" sha1="bf4043e074c515e12aecf5c56f139f044a5e9f7c" name="Sokobac.003 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="8a2b3d07" sha1="085ed18ffba56f0d5685c88f5c7e8e89f5fd6889" name="Sokobac.004 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="70c62858" sha1="28198268651c69402503ca7571d5980e8e548590" name="Sokobac.005 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="5bd548f1" sha1="4606a647270564103155cda31355f08446485244" name="Sokobac.006 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="60e68fb7" sha1="dc56c0b9f28c06184f573854555c5f396068545c" name="Sokobac.007 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="89b292d2" sha1="0357719e2b432ad4c0554c62fffc0df9dfd106f3" name="Sokobac.008 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="9eacd64d" sha1="893eb2002169fe1462c280dd3f3c3dfa8cef3637" name="Sokobac.009 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="d3d24ebc" sha1="f4e7a7a409f1f993860d7acdf6655b1329650029" name="Sokobac.010 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="16c6ae42" sha1="6b4dfcbd08661765109703f9708dd838d4e72cc6" name="Sokobac.011 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="49582fae" sha1="cad9afab1a272661e113caff80e2466b44e4da7a" name="Sokobac.012 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="fe6511a3" sha1="5f5ab90423f3bd4530fd04f5c46911615ff8d98e" name="Sokobac.013 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="14733a2b" sha1="345555cd5a057dd29b8cfd16415ce2feab3b8d42" name="Sokobac.014 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="d2848596" sha1="9fb1407ded544a8afa4330bc91cd13d39a5ea056" name="Sokobac.015 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="4fe3c56d" sha1="746c2b7085332d69ac06e8f46b30b3d05888e134" name="Sokobac.016 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="fa3f0e70" sha1="525a884d4fd0f8deeb79a33d4c7d6d769cdd91b1" name="Sokobac.017 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="775a4945" sha1="da95c80464adc48188036c27923b5d23859a5ab8" name="Sokobac.018 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="a8cbd49c" sha1="c035e3892c4a2d5d249728b2b525018cd3e32812" name="Sokobac.019 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="a0e81a16" sha1="d08f644555edc950aa848e837db95094c8fb5c66" name="Sokobac.020 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="af7f73a4" sha1="9540cf331868c192361d7e0840e99ae4974a84bd" name="Sokobac.021 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="1dbee47e" sha1="62b59daa29d3c112b4cd68e34e1a811428c2efb7" name="Sokobac.022 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="0eb54ada" sha1="0211420b0f5a2a085a2005c744c9754fed80179c" name="Sokobac.023 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="f62aff90" sha1="914c969eb6a919038cf3defa2d607d2254518b2f" name="Sokobac.024 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="1d37f182" sha1="6c8c5c3cadc478a17dd3b63c7b8fb16320bfd1af" name="Sokobac.025 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="362b57d2" sha1="da1a98b1da406a74f65180d453728f376f4a75dc" name="Sokobac.026 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="9b1ac991" sha1="4f16539f4f75594be15d295b8010b2bf742271b5" name="Sokobac.027 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="5f24ea4e" sha1="8e81f7d7b3ba02f833056c5cea96e32b756304cb" name="Sokobac.028 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="2d8ae301" sha1="65cfad7472bf0ffc80cf01c38f98a05964f507b2" name="Sokobac.029 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="44542388" sha1="f3272ad8a9dcb65c5ed8e40810753d249d21a3d1" name="Sokobac.030 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="ea2351fc" sha1="89432d6eef434450873f806c5f4f8e7b441ab4b8" name="Sokobac.031 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="fbe36179" sha1="7f3f74c998615794665c5396de2b831b6fb72a47" name="Sokobac.032 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="47e84fa9" sha1="c780d2c7d82a70f478438b6319769d2d105254f8" name="Sokobac.033 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="51993770" sha1="689213d9b8f922fdf7600ffb82e6b9e0dcf27699" name="Sokobac.034 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="9398c0bf" sha1="63a01c77cb44d2b3b6f42b39f5535bfcf38d55b8" name="Sokobac.035 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="f68b5c3a" sha1="fa68c8fb437ab8d59f563e87b270ab8b81f6c901" name="Sokobac.036 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="20e59452" sha1="32ba474414939c1e7e0ffbf90e2570227230220b" name="Sokobac.037 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="b72b30de" sha1="e1ace5083955a440109726f482e8fc0523734051" name="Sokobac.038 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="c4b0e95f" sha1="b949ce7a4485b26e9133c9184b0b10dd9b81b035" name="Sokobac.039 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="7d15951e" sha1="b6a0c1ff9b0a5f68e5bde554edd11a4c129a0e65" name="Sokobac.040 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="b096c72f" sha1="8a308ef7065d8165b00e95f259b504a537d95429" name="Sokobac.041 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="74a740b2" sha1="feaa57d5ce45cead3d74bcdd2587ac92fc47a39b" name="Sokobac.042 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="449b5496" sha1="11975952aabc0ef30abde9f01b443f5c5f295fcb" name="Sokobac.043 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="c8132fe8" sha1="3c4d984f1ed302635f792e7e4320c8e9712ed0b4" name="Sokobac.044 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="14e691eb" sha1="0086448fd843af0b5052ca6df3b0619acf9f7062" name="Sokobac.045 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="740f013f" sha1="134cc64ac81dd8cac3add6bae6f40fa20f06dad9" name="Sokobac.046 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="4f21bdca" sha1="d9f70a64444b6173f0b3e1d39098fb84eb9e6e47" name="Sokobac.047 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="1eca8035" sha1="e3a1bc31bd8095aab9cc39bbdbf505c789a3da73" name="Sokobac.048 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="b6eeceda" sha1="e8790951d037d3ed2f888f2c376421ee50ff0b66" name="Sokobac.049 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="e414255b" sha1="dfa17c7f0b11362e41e36c9c0ca12d868ad2f224" name="Sokobac.050 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="55e5d22d" sha1="ca9bfe28627eb904f7e5f12c331733d7e2b4dc86" name="Sokobac.051 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="8c483025" sha1="b3052ad1c6a4534af83498a9e12dec27eb912837" name="Sokobac.052 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="a5b7f805" sha1="21d49849279c542659aa1a7e934caffc88d3816f" name="Sokobac.053 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="ee27be92" sha1="61cdd41f251851ed19a7d027203bad67d6f7d2b3" name="Sokobac.054 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="a4f47237" sha1="6e62db88574fae71d329e6aed8150e848d1b22bc" name="Sokobac.055 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="8cb4378f" sha1="dd88bb94dabd59dc50eccc38aad6a925e3499cf2" name="Sokobac.056 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="91068482" sha1="0e1a40ccffa40c6eee1b585ee7f11cfcddd29356" name="Sokobac.057 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="6c41eff0" sha1="c459d21db6c92e836d690b3a7cabd54a379fd017" name="Sokobac.058 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="93e3ba8a" sha1="e78bf455c3faecc635f1cb1d16e33a2b739baeaa" name="Sokobac.059 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="72f4e205" sha1="a731643595c0d260966d631881f4389548e90d30" name="Sokobac.060 (data screen) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="1474bf06" sha1="0b3dd6d7c3d105e2c203f76a65325ad1c9135e3e" name="Sokobac.chs for Sokobac (PD)"> </hash>
+	<hash crc32="e2e22a01" sha1="0d99e2e0a1433d869569cb9ad8608e17a86595a1" name="Solitaire (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="f1a7bdfe" sha1="1c7fdaff223de286e90457afecf3aa92463c8b27" name="Sonix Demo (PD)"> </hash>
+	<hash crc32="d88e9d7a" sha1="129eec84edab16a7bffcffecb225983cf17fde03" name="Sonix V3.5 (UK)"> </hash>
+	<hash crc32="b09fe69c" sha1="ee7e75bacd45efe35cc32addbb7bf83ce86404a8" name="Sonix V4.00 by Twilighte (PD)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="8bc75157" sha1="f6c1c12722a86742e6f60784e17f49bfb22c9a19" name="Sorvivor (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="29e7a071" sha1="dbf991333cb3c1658ec4e54794226a3dfca8229b" name="Sound Tracker Demo by Twilighte (PD)"> </hash>
+	<hash crc32="9cc5c6d2" sha1="e3ecd85dad10e7a51b7e54588fb59be8f33d8804" name="Soundtracker (UK)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="98bb5034" sha1="7b6b7136c4fe500b3ec94e9a58d4deacd35a8fa6" name="Space Crystal (UK) [a1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8304bcfe" sha1="3370f4ce943ae270a62866ba40d5f5109eae5dc6" name="Space Crystal (UK) [a2]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a9c6fbe3" sha1="b5a4dccdc512bf5a5c9f4a8db03dce74667406e1" name="Space Crystal (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="9f431fd1" sha1="59b3ae43174c8f386371a55051fff5510946fd32" name="Space Quest (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="ee58a485" sha1="e53a9d5a92eae71c70f9ce52890c2978013328c5" name="Spaint by Peter TheSpider (UK) (Disk Version) (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="a9668ad5" sha1="a4a733a259ba488ee4fa597fbd7f34300f81a0e7" name="Spaint by Peter TheSpider (UK) (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="4708216b" sha1="5a7675297088460476048d604a4d223afe84602a" name="Special Operations (F) (File 1 of 2)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="bfec5e9c" sha1="84fd61d86da87cac9477a1da626f4429efe6795f" name="Special Operations (F) (File 2 of 2)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="28ac3c92" sha1="685e27959be0ad48da7bf013aa1a2c5233f9adf2" name="Special Operations (F) (Loader)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="3c76eb35" sha1="647f53613437a952852fcdf9a1bce5a9e96e1e61" name="Special Operations (F) (One Parted)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="57b72a76" sha1="a2a2085fdc0e5c176a8a5a11f53345e9845dab87" name="Spelling Test (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="d4a8c05a" sha1="00533aaa2555b97ee8281da2b48294714f8fa3be" name="Spies Killer (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="23fe92f3" sha1="7d1a3fea0ec382665a7302f61980f8fdce938800" name="Spooky Mansion (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="98cfa39b" sha1="ae204e504589cef5e8fcfbb6086df1c4fd5bba92" name="Spots (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="918c1e72" sha1="297ee2773b7c33153fc37a61828908e061460fc9" name="Sprite Editor 2 by Twilighte (UK)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="f80b3bc5" sha1="432f36a76ae0cf2c10a1a22858ad401e2cd9aa70" name="Sprite Editor by Twilighte (UK)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="6e00c54d" sha1="8eb2af30411b5179d01666f0546484fe75074828" name="Sprity Dans La Cave (F) [a1]">
+		<year>1985</year>
+	</hash>
+	<hash crc32="db4f39f6" sha1="28d3cd37006949073b6a0b9526dea98885a801e3" name="Sprity Dans La Cave (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="cb381b47" sha1="773fd641366cfd923bbbf3408f7f3372623bf3d1" name="Squeek 1 (PD)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="fb48cbdd" sha1="a5103eeaff888554a963ec6c054dfd32464e559a" name="Squeek 2 (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="4d9a8e57" sha1="a124b5ec656f5b3d3b559769136cfdc643a595c5" name="ST Demo (PD)"> </hash>
+	<hash crc32="d1083878" sha1="d4c9b8d3c45e2fcec839cfe38bf0dd33b3be7c00" name="Star (UK)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="f32379cb" sha1="4defed51289bcf8bc2e76bc51050c3821d9f4844" name="Star Probe (UK)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="0a600a38" sha1="d17b2d85d0cf6963336dcbdf6091fd5230305fd5" name="Star Trek (SW)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="671ad9df" sha1="c4e11906fa41159602c9d956d2000806aef3a2e4" name="Star War 2000 (F) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="e54a044d" sha1="d26846fbd76be81edbdb7c447e81893a1e57a199" name="Star War 2000 (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="56540945" sha1="916adc977de193b916358d8ec0d5d6f311126e77" name="Starcruiser (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="e5aa34c7" sha1="f514fea881a585304130763a2d7593c15a038b0d" name="Starfighter (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="cd04feea" sha1="ba0efc290f63af20d0fbe66cb5f5b6581cacd783" name="Stars-War (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4420d402" sha1="82fecf88db869e198710b55d6e313b3838ba273d" name="Start in Green (UK) (PD) [a1]">
+		<year>2002</year>
+	</hash>
+	<hash crc32="f8016ea4" sha1="42ad5311b45859decda25c354641396993747f91" name="Start in Green (UK) (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="14a85bdf" sha1="ce0b9632716b794d17d45f7d669aa57b2facce80" name="Starter (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="13da6aab" sha1="87598baf6a6050c151fa38ddad4af007e4d4ede3" name="Starter (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="52017e9f" sha1="855592b85660f99c74ab9e8ecedecb0a8d703ed2" name="STNICCC 2000 Winner (F) (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="ba6a94bd" sha1="7259f1b7dcec4d9e48f46720de31cc82985b0efb" name="Stockmarket (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="09630f5c" sha1="617b8fb7bb08b7e2c23d5ffa6f9fdc90c3715e38" name="Story Book (UK) (File 1 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="212812b0" sha1="8d672db5cabdedbd68147dcef951ee223018ba6c" name="Story Book (UK) (File 2 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="f1984387" sha1="43da748d352c17f6bc8e6abe5f880fe19eb82685" name="Story Book (UK) (File 3 of 3)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="a06eb82d" sha1="2de039df66093dbbc2ab73f9955a401b341908b6" name="Story Book Example (Proverbs) (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="21fe20d8" sha1="d796887e9201c727e365d05f35dc6bfae8b0eea6" name="Stratoric V1.0"> </hash>
+	<hash crc32="13b696a4" sha1="e68d54fc3b9a9e36f9af78bdccfbdfed166dfdbd" name="Stratoric V3.0"> </hash>
+	<hash crc32="1645501f" sha1="a2504f424e6a56b1e937ba98a05c3a140277cfe5" name="Stratsed V2.0 (for TeleStrat) (F)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="d9c71c75" sha1="dadadd56d74ef37ee8ff7a178b783d6019bff300" name="Stress (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="95fc43e9" sha1="799ec274ad455e43c3f23948b1d4f7c595f30f5d" name="Strip 21 (F) (Atmos)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="32b42f40" sha1="63c495485d3961669e800706f71c938064fc9247" name="Strip 21 (F) (Oric-1)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e944f511" sha1="c34e093679ca80f7d65f97e1fd4015728ffe2af9" name="Strip 21 (F)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="6d889ea2" sha1="803327799cc74ece99cc9c53cfb3c27afef3923a" name="Styx (F) (Disk Version)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="24700ef6" sha1="0329f7e16d1b761bfcb0973312383f694d7dd7c7" name="Styx (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d760758f" sha1="bf219a77c4ca70d62f0609c1eeb6ec04325f0dd7" name="Suite Et Fin De Sip Et Sip (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="9b1e9c54" sha1="492a18042078d0b5f07ea9009f8bcbed7f09824c" name="Super Advanced Break-Out (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="b66cf926" sha1="2bd7408c433058b5943a3cb86c9a940b5e4c2afc" name="Super Fruit (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="61386890" sha1="c4cbf9120d7505e76b3254ebbc98a72cabe836eb" name="Super Jeep (F) (Disk Version)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="e395b81d" sha1="9bdad43afe2f134eca54f4990dda95f1ac985ce2" name="Super Jeep (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="4d780133" sha1="f3f2b31968f39fb49d75fd605748c43c75c2623e" name="Super Maze (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="c1f8485b" sha1="6d23c9af8b8eaf17d7b4e2b024c1abbc6e52945c" name="Super Meteors (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="84ff0bd8" sha1="edee2e7b41ca4c3532574513cadeb22a95b57b07" name="Surfaces &amp; Gauches (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7e44f736" sha1="d9271b4d981deb3ced54c40a7d45949eb8de74ad" name="Surfaces &amp; Gauches 2 (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a17868bf" sha1="3d5c946fe14cb7cf42981955434deb8e062819a1" name="Swerve by A.P. Gardner (UK) (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="6d566589" sha1="6987466cc99bec7d0a3712386f67e00689d0568d" name="Synthesizer Techniques (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="b8515f03" sha1="2e887da8485caea75fb4818a17382412978eafc5" name="Talisman (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="cc37c3b9" sha1="950c7b86e387a270391c0ea452a0eecada4f8eda" name="Tank (F) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="13925dd5" sha1="25c6e42eb6a0c70d839775286ef5c58dbe435395" name="Tank (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5f05b513" sha1="7fa31d2a6de4a31179f29bd0b7fb107ceb46d0c8" name="Tank Assult (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="889ebefa" sha1="fd51711ced8c84984915c898d4f8c17ea969c713" name="Tansoft Lang. Master Class French (UK) (01 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="c859e515" sha1="0798d7f8d212b3964226e8f7ccbf4f872c8a76c2" name="Tansoft Lang. Master Class French (UK) (02 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="b4cd3223" sha1="12a4bee1474fe567c8909e422b413fa666296c5b" name="Tansoft Lang. Master Class French (UK) (03 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="865f1da4" sha1="bc7dc763861214eb5e719f9ad2f0f442e413c5c0" name="Tansoft Lang. Master Class French (UK) (04 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="8757a7cb" sha1="9994aa6c5165e04a2efb05c17aef9e0f5596e837" name="Tansoft Lang. Master Class French (UK) (05 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="41bdfe5c" sha1="f14b247df595faa495e5e53e1dbb1e372703c3de" name="Tansoft Lang. Master Class French (UK) (06 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="3a256556" sha1="dc8f99f49320782ea8a0800d74971e486b7f479b" name="Tansoft Lang. Master Class French (UK) (07 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="39e2f816" sha1="635d7260d1a9b78d2eba258445e415929ba7b22a" name="Tansoft Lang. Master Class French (UK) (08 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="e1d69cd2" sha1="f9102c7314f1a463577bb74c006057a859ec25ae" name="Tansoft Lang. Master Class French (UK) (09 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="06c08192" sha1="01a0da4eae544234a51a6bc4e0b43477d974fba4" name="Tansoft Lang. Master Class French (UK) (10 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="464c0eef" sha1="6a2dfca3e9b09788e6cbf468b636309d4588f4f0" name="Tansoft Lang. Master Class German (UK) (01 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="b97426d7" sha1="129efd19ddc35690d5ae8a8248ba3dd3c35782bd" name="Tansoft Lang. Master Class German (UK) (02 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="1f8e9f82" sha1="88a7f9696bfd867f997c33877fa845424e4becd2" name="Tansoft Lang. Master Class German (UK) (03 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="fd920b67" sha1="151c71435068cae74dbb2cccf15325103c4db8b4" name="Tansoft Lang. Master Class German (UK) (04 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="a6fa7195" sha1="ff55a20c6d13f0d8647835c9e651f35e789b3b18" name="Tansoft Lang. Master Class German (UK) (05 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="2d702851" sha1="f1d34d22a173b97b57d50ce7d5ab21afde80485f" name="Tansoft Lang. Master Class German (UK) (06 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="4783ebe5" sha1="98e97f6a3944810ba79385e5559a77dde9abbb7e" name="Tansoft Lang. Master Class German (UK) (07 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="06748aa9" sha1="7a197c09443162bba04bfb856ef8d54dd2ab1b36" name="Tansoft Lang. Master Class German (UK) (08 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="bd92188a" sha1="a7ccc731b3ebf11b831c879b19a2e57efb60280c" name="Tansoft Lang. Master Class German (UK) (09 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="034ff6b2" sha1="0291237f4113f1ac64f288e5df2a7ddc6477117f" name="Tansoft Lang. Master Class German (UK) (10 of 10)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="1d70fcba" sha1="38abe28eead35154845c72838af98b30cea7fa29" name="Taquin (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="99347cc2" sha1="76f0fb037288575963dfe45d143e4d86cd3c97ba" name="Tarak (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="1f93f962" sha1="3437926b541d9f04a727d3ad71552fd27d6f962c" name="Tarakunda (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e02b5f1b" sha1="6df8b5cae0f6e4672075e2351f753416ff9ed914" name="Tarot (UK) (PD)">
+		<year>1988</year>
+	</hash>
+	<hash crc32="de83ed27" sha1="acbbefd6a4fb6a7c84cb5e21e70620906df27a29" name="Tea For Two Blitz Chess (UK) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="7579785e" sha1="374c8d4b3eaeda269f7b2cb9f924fde56c951d82" name="Teknis (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="68b0fde6" sha1="9e9af51dae3199cccf49ab3f0d47e2b9be4ba97d" name="TeleAss V1.0a"> </hash>
+	<hash crc32="bc729530" sha1="8c71da586c6a0b8b0e78db4a8c75210f90de676a" name="TeleForth V1.2 (F)">
+		<year>1989</year>
+	</hash>
+	<hash crc32="491c3839" sha1="92b3580716387da414fe4edb185ee2063f9b713e" name="TeleMatic V2.0b">
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="94358dc6" sha1="35f92a0477a88f5cf564971125047ffcfa02ec10" name="TeleMatic V2.0b"> </hash>
+	<hash crc32="cda92497" sha1="b39d4575e9150126dbd534cae159131b13c8b6b4" name="TeleMon V2.4f"> </hash>
+	<hash crc32="aa727c5d" sha1="86fc8dc0932f983efa199e31ae05a4424772f959" name="TeleMon V2.4"> </hash>
+	<hash crc32="d1588421" sha1="2031b6bcf3fb77b19b0515582e63fda57e5b3a4a" name="Tendre Poulet (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="bc718096" sha1="497b9dc8aeb1c87ab91bafa777a90d81bd6ab98f" name="Tenis (Loader) (S)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="4c5c4a8f" sha1="3402f7b5b878ad215ac837bc7d18ff489ab81e2a" name="Tenis (S) (Part of Tenis)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="3c6a24f3" sha1="9178a942e3e1ac6c49677183799bce5bf99c001d" name="Teniscm (S) (Part of Tenis)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="c346e815" sha1="c71cc1dfa2dc24b6f22306dbbdb599f280b834f0" name="Tenisgr (S) (Part of Tenis)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="a05aa62f" sha1="fbc34767ce8715c01f959638c10d23e5afd71fc7" name="Terminus (F) (Demo)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="aaaf93f3" sha1="962e489cc2cc9e7b98504e81b9cf4f8dd7dfc39a" name="Terminus (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="6bc433ed" sha1="5ea1abaa56a4fe7848340b43a3750fe9c9719a3f" name="Test Parabola (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="996db515" sha1="4c7d9cce246f15d5b7592f13f9223baed67ed081" name="Testeur De Tris (UK) (PD)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="aa9cc593" sha1="cb3cf2c6fcffe085b65a7751225e794435e42918" name="Tetris Gb (UK) (PD)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="d1b6796b" sha1="9862b97f864014378f015ae510185bfb3c5e0bed" name="Them, A Paranoid Fantasy (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="019f29a7" sha1="960b87412cc82b939cef4cf830dbf6304c2d555d" name="Third World War (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="b54d7ce4" sha1="ac310841aad34f7e1e6f922779eeb0842091588b" name="Tic-Tac-Toe (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="c896fc5c" sha1="d090a221246e716a6d02bb26276cbb8429d16609" name="TicTac (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="432a4145" sha1="6c758a8a0de30e591cfb835856353b98f04e7a4e" name="Tierce (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="ea40039b" sha1="761c92ed4cfb5d8ae3c992e5f2e37207d2e8c02e" name="Tigre (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="e9e5f89c" sha1="53df431da57ef263dc7df3fdabf5fe2dfd3d5346" name="Tiltman (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="91000cd1" sha1="fa0afe05042d982968cd4ce09489b4ddbb453502" name="Time Switch (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="ceb2e416" sha1="e05e511db0a28d1c22b48ebc83b64840fc374635" name="Tiouk (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="8134293a" sha1="04b3daa2c241c440350d83654ffd836c77114ce3" name="Tivoli Demos - Rambo (PD)"> </hash>
+	<hash crc32="e08af235" sha1="b633086af26646369c0f485bc36f412e22025eac" name="Toldemo3 (PD)"> </hash>
+	<hash crc32="6bc914cb" sha1="5ec26b332cae2ccba016a1b936bfa06e182ea2f7" name="Tombeau D'Axayacat, Le (F) [a1]">
+		<year>1985</year>
+	</hash>
+	<hash crc32="425f37e7" sha1="dd8eed7eb2e0ffe0243ee198a636308f7a304895" name="Tombeau D'Axayacat, Le (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="6640de6b" sha1="925cdf5e0f9eb84932185eb3f2d1389e0b87ffc0" name="Tommy (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="6d28e05d" sha1="257e31059c802d550ceb17bd73166dad04bdaad5" name="Touche (F)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="148e8dcf" sha1="8d8ce24745cb51c59e4ef8ad841773bc89a9fe0a" name="Tour Du Monde En 80 Jours, Le (F) (Demo)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="149771a1" sha1="7ee333536d880d5fbf6c2493c2df6b745bf11e6e" name="Tour Du Monde En 80 Jours, Le (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d3b4c819" sha1="21c956ba15a59aea96c2b4481a0b65d8b5b8368e" name="Toutou (F) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a42f0c56" sha1="af7e6734bcbac1ad896b826a0ab5e844d56e14e8" name="Towers of Hanoi (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="07928f06" sha1="277fc79d2d0212d123a28ecf9f0d4a16ee17d981" name="Toxic Slime - Considered Harmfull (UK) (PD) [a1]">
+		<year>1995</year>
+	</hash>
+	<hash crc32="8543dc4e" sha1="f43c4546cc52c6a01c6cf179231957f7533aa00f" name="Toxic Slime - Considered Harmfull (UK) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="c6b46abf" sha1="9fb5cb0845c83c53a145d6204c6b6b3554c043ef" name="Trace (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="47f240ce" sha1="2250fdbf27541d537e6f8a024b081057e4a3b4f0" name="Transat 1 (UK) (File 1 of 2)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="8f8508d2" sha1="0682d725b6b900df096ee4e6c1c21177217aec85" name="Transat 1 (UK) (File 2 of 2)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="a5207636" sha1="16a03ee6d519d820a7fded2986ae02399774c8dd" name="Trek (UK) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="47fe1582" sha1="64ba4a87c111c27b4e55d5252a06fc96be2ee903" name="Trek (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="f4070e34" sha1="62a1b1e973e7af3699f4e3b3439d4c7d6b9f8feb" name="Tri-Olymporic (Atmos) (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="e0917764" sha1="97c1f133562de67092d831d041d926fb4b6e89a8" name="Tri-Olymporic (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="3df7c515" sha1="35f65519ff49251270c89fe3d176a8086881d6bc" name="Triathlon (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="5497f6b9" sha1="731c7dbb88f8a2fc10666bc238239504c51d91ce" name="TrickShot (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="9df9c6bb" sha1="dab98d1c70696219a5f9205530e512c9fcca915d" name="Trident De Neptune, Le (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="12f9d8f5" sha1="e9e6ec83f69dd232b8ef83ca8eab14c123769d77" name="Trident De Neptune, Le (F) (Disk Version)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="88ae712f" sha1="938ffd625725a52067a58355d9e0b83439a25f27" name="Trouble in Store (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="912bf5f7" sha1="3a696e1a7d5e94b72d89ab73c90690b02c18023b" name="Turm Von Babilon (G) (PD)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="f0dd7395" sha1="55589e97c283c0a86d13713f20b1306b7b3151c3" name="Turtle Graphics Tutorial (UK) (File 2 of 2)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="3abc25d4" sha1="6783bbb9d4705e5e120472a3f2e592a3658803c2" name="Tyrann (F) (Disk Version)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="123359e3" sha1="6bdec1debcfaf3bfa885928e7234c7a304b37499" name="Tyrann (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="03891bbf" sha1="1c028b286467d2aed70d6c65eeb609d8001fa6ea" name="Tyrann (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="c4e8d25e" sha1="48f517a5cebd2161bba977f70d3af3e2bed68c0b" name="Tyrsach by Dimityr Borisow (PD)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="74a43a1f" sha1="c86a8cf7887ef6884601bc7eac3d545ae2b3d69b" name="UlaPaint V0.001 (UK)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="17581ed3" sha1="be24e97dbf0367710a8bb7b714993bd5613b322b" name="UlaPaint V0.002 (UK)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="786da726" sha1="5384ceb48f96406dfe723e2b16b52e55685c7afb" name="UlaPaint V0.003 (UK)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="d1575376" sha1="4f4b82aae824ea9a49a4115041ebcfd6a32e7955" name="UlaPaint V0.004 (UK)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="c77ea65e" sha1="b7979d25166edf860f6d120336f6db9dc73f5ece" name="UlaPaint V0.005 (UK)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="6be49188" sha1="c01a5506fe56df1ed40426927daccdc7f231e960" name="UlaPaint V0.006 (UK)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="3c491735" sha1="bced79c4c3c17a2e102aeda9f3cc4fe28164b38b" name="UlaPaint V0.007 (UK)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="c5afeab7" sha1="0e6d4f429d715c37267b80168897e3272853fe6e" name="UlaPaint V0.008 (UK)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="949a37bf" sha1="7071d2cd29495a7e5113c0f310d50f1adc7f773f" name="UlaPaint V0.009 (UK)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="0d7839a5" sha1="e343444534c373bb259ad84a463eaa64df45c8cb" name="UlaPaint V0.010 (UK)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="4e1bda74" sha1="4ab6f343b47ce94086517a95eef9984a36539e1f" name="Ultima Zone (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="4f249eaa" sha1="52796c8b386258416650861474bc4fab474e091f" name="Ultra (UK) (Disk Version)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4b2519d6" sha1="51cd3c65f31d3ac237489979a78751229dfa6730" name="Ultra (UK) [a1]">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a45726b7" sha1="fcc1cce201d9a9ee51a4446494cd80431068b425" name="Ultra (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="0af881e0" sha1="ff50a79c94afa23f915fb1bfb6aef5af45fc04e3" name="Useless Reports (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="3c79215f" sha1="e5dadf8cdeb01d18d6cc674d647b94479e38301a" name="Utilitaires Pour Obtf Et Listage Des Objets (F)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="75745336" sha1="0d27558635c55b7108a62c7b11fcb60749460f70" name="Utilities Disk (UK) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="512962e0" sha1="85dc80697e8d69aa7ec829cf50e1f8945169d846" name="Valley, The (UK)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="72e98f1b" sha1="8ddfcab681c53d4d0e486b7235bba3db48cfcb8c" name="Velnor's Lair (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="5b45085c" sha1="9bcd1f485a9f5c3ad8b46ffaea49d923a6bc4c02" name="Verb Practice (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="dcd79a05" sha1="bdd3f05963047a079930799e44ddff85db594926" name="Video Flipper (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="138152be" sha1="b5171c0fd604bbb1f22e5786382bc55d03ddf815" name="VIP3 Demo by Defense Force (PD) [a1]">
+		<year>2001</year>
+	</hash>
+	<hash crc32="9ea6c538" sha1="c5a54d85b44772dab851c69906a9f1f0108d18e3" name="VIP3 Demo by Defense Force (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="3704c53f" sha1="583e2889d7d1863ef599cdc5261ab9559a41fe80" name="VIP4 Demo by Defense Force (PD) [a1]">
+		<year>2001</year>
+	</hash>
+	<hash crc32="8cada71f" sha1="1b121064960f5019afa16808c7269c4d790d4fc4" name="VIP4 Demo by Defense Force (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="c5239419" sha1="b2613f2e0d9767d05560912283d52252cb69aff7" name="Vision (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="824b9ef1" sha1="6b093e99652d27d73a748ceb819e6ebd4e99498c" name="Visioric (F)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="431ce3bf" sha1="377be654415c738d9f34990121b240d06b35ea93" name="Wall Defence (PD)"> </hash>
+	<hash crc32="b1c1f0dc" sha1="ebe4071e7d18ea295764e2927a63d36f73711942" name="War Plane by A.P. Gardner (UK) (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="410e0938" sha1="65c32808bde160c3f2a0e116356aaa884d7105fc" name="Warangal (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="92aa14b0" sha1="7be49b344a37a031eed974475b1b782ba80adfae" name="Warlock's Mountain, The (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a384bccc" sha1="93c549c553deaf1368d694b0ad856edceef194af" name="Warlord (UK) [f1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="3ac12354" sha1="3d56df0d5b3987c5582f647290bed2befb913bd5" name="Warship (F) (Atmos)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="2c3465e4" sha1="44c375213f3663f8192c5b0428ed090536218916" name="Water Panic (F) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="f475a435" sha1="e95e20ad6acc3b8b45264f47a267ebd5a54b5579" name="Water Panic (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="5a66c800" sha1="1b9fb489bb25fef74bb125e686ab4c21363b927e" name="Way To King Kung Fu (for Oric-1 and Atmos) (No)">
+		<year>1989</year>
+	</hash>
+	<hash crc32="17872025" sha1="5502903c79e9cb06f11e77d9a5772aa05a004f9f" name="Waydor (F) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="69cc4c38" sha1="416a00cb4800732b1f7859e749ac16e15a5946de" name="Waydor (F)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="be35593a" sha1="ae82e9cb0756dbbd8defb7decdee11c71e7b7d65" name="Waydor (UK) (File 1 of 2)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="2cde4722" sha1="ab5a36ad3ea30e1ad25edb2fff609d9d9ae201c5" name="Waydor (UK) (File 2 of 2)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="72574bfe" sha1="4c4ccfc99199f37f1572981f5eee7931a57b019b" name="Weather Forecast (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="4fa2dce7" sha1="debe7ba28d387fa38cb375356241c0cc2267342f" name="WEB (UK) (PD)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="bcd6603d" sha1="85d34a357321c65c06af43a41fb72b827c2e16ce" name="Welcome to Oric Demo (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="35d77e1f" sha1="7a1309cb4b7854f8a0191ef75fcef3cd75a45623" name="Welcome.cod (for Oric Demo 1) (UK) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="09bab965" sha1="500dc1909ad6aa6a6d46df8d6f635b86fff885bc" name="White Barrows, The (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="bfbf7e41" sha1="20bb3668c37ad91de2d10e6cac9d3b1a88e34353" name="Wimpy (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="0037d3b2" sha1="9ece55525ff1eefef8b2dc9899b686bfb81773ea" name="Wimpy Loader (UK)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="2a5eba98" sha1="b550d4c9847f417ca5be789508d3009d32c1e630" name="Wimpyprg (UK) (Part of Wimpy)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="925778e3" sha1="33b418e8893d0326abe620b5fec30524f0666803" name="Wimpyscr (UK) (Part of Wimpy)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="a7a3ca36" sha1="6baad098f17348122b006367d1936d067ce6eee5" name="WMS (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="cd83c683" sha1="721b48aa4658827c9ea22f73ac73410b3f6507e8" name="Word Processor (UK)">
+		<status>Known Bad Image</status>
+		<year>19xx</year>
+	</hash>
+	<hash crc32="7b2306b6" sha1="35ae237495ebe13319d8d8a8eebaae228895277b" name="Words (UK) (File 1 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="a335ea8d" sha1="9818f077857025a8b5b2c1558188de8a337b551d" name="Words (UK) (File 2 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="55caf78f" sha1="bb2b46816921343c7b5544273ba0b02372d11ab6" name="Words (UK) (File 3 of 3)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="45b251d7" sha1="b302793c0adddaf265055f9d426f8e6f4e8eac80" name="Wordworth (UK) (File 1 of 2)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="9dc0cbc1" sha1="98475a510a79413715a000c74563da639ff36ba4" name="Wordworth (UK) (File 2 of 2)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="06fe448a" sha1="0367387f04d2a9987e30c2ccdece879678d38e99" name="Wurlde Demo (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="c1e9382f" sha1="57231048e4790b1f76a48a5798523fe4cbd82b80" name="X-Files, The (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="2040004d" sha1="31919a5fc4477d0186d6daf7ef87f8125cde8bca" name="Xenon 1 (UK) (Disk Version)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="cb0ded12" sha1="7c3d6933498edcc4e5a6f28743c20334b7603729" name="Xenon 1 (UK) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="e8536524" sha1="de6dc28770b8e900a427ccdf5c6d315a2ca93c0b" name="Xenon 1 (UK) [a2]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="ac9342ef" sha1="1acc057f7ce7d8432c59c7f43231b7e46c0213fa" name="Xenon 1 (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="cf9c051e" sha1="a1cd3988aaa307239f6545a47beca797495dd2a6" name="Xenon 3 - The Genesis Probe (UK)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="3ee8f949" sha1="27fe752be7698dc880ac5509fcd645c00b368a91" name="Xeragone (F) (File 1 of 2)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="50439bbb" sha1="791b071624f909af7450169724d1b2c1b7a36d55" name="Xeragone (F) (File 2 of 2)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="957468b2" sha1="0b99abf19f80f5c1e6fc02c95e0606b4085da07f" name="XL-DOS V0.6 (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="c6e64745" sha1="882012f24b263f84b5edb470235b3867bbc225de" name="Y.A.M. (F)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="4f1d1d1d" sha1="ee1fe2f57cd64bde2de9da3ac2a49df15428e214" name="Yatzy (G)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="884badec" sha1="3b087fbbb16f72caeb47c35778e000940c1ccff5" name="Yatzy (SW)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="8f2b82d2" sha1="11c2b3cf165e83edddd50bfaa483c2855b693575" name="Yessa (Pic for ULAPaint) (UK) [a1]">
+		<year>2003</year>
+	</hash>
+	<hash crc32="325c8998" sha1="ab7ad894d754d1cd91fec50c3f62bbd969ee56f7" name="Yessa (Pic for ULAPaint) (UK)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="0b23a62c" sha1="87bbc6bf05fd4cd3d150e56e61e41a3b7d480ff2" name="Zagorsk Adventure, The (UK)">
+		<year>19xx</year>
+	</hash>
+	<hash crc32="9bc5b409" sha1="00b7e42b9f7dafa2710f3dd329820c42c8af279c" name="Zamcopter (F) (File 1 of 2)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="81cef796" sha1="643a498bc2ec969be01544ab1a04d9f40d7bb009" name="Zamcopter (F) (File 2 of 2)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="425f9d0e" sha1="9e2ee6697679fa4d74cd510fc65bef8479ae6cc2" name="Zaxxon (F)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="46e2442b" sha1="54631e7d8999ae3b8f5edbe4cde9f749a68fab7f" name="Zebbie (UK) [a1]">
+		<year>1985</year>
+	</hash>
+	<hash crc32="321a4a0f" sha1="9e17558049f9675e49431cfd9c8c124caaf052f5" name="Zebbie (UK)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="8810e675" sha1="d02dcd90205f4237f9f8e9bd76f4d54216a052a8" name="Zebulon (UK) (PD)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="53ec6bce" sha1="63b53286265b802217e2d3d1e0d482178574012f" name="Zig Zag (F) (Oric-1)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="108282c6" sha1="944e554ff36a0c3e45260b2aba81d7bafdad6ef2" name="Zipnzap (F) (Mar 26 1999) (PD) (Disk Version)">
+		<year>1999</year>
+	</hash>
+	<hash crc32="87e7a41c" sha1="4cd5e6df9ed7a9fc8dcf4d56e993219be2f6081a" name="Zipnzap (UK) (Oct 07 1998) (PD) (Disk Version)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="579c6498" sha1="ef06510dea68350c8e5be086a62f1df6152fcb3c" name="Zipnzap (UK) (PD) (File 1 of 2)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="db19cf19" sha1="5c3c831ad9c7f660575f24c59f6fc623d35d6ea3" name="Zipnzap (UK) (PD) (File 2 of 2)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="dc314b5d" sha1="a3a576febfd98b8b7082f36ba892fe6de7e3da6b" name="Zipnzap (UK) (Mar 26 1999) (PD) (Disk Version)">
+		<year>1999</year>
+	</hash>
+	<hash crc32="646b06a5" sha1="28845e90307d7f8d9e3372f698a8319fc44a0808" name="Zodiac Adventure (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="2629433d" sha1="1ca8256267feab1466115a94bee1cc46a748bfa0" name="Zonga (F)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="7b77ff78" sha1="fdfd192bc2b52765562c70b81b5e876b858a60a9" name="Zoolympics (F)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="e1393521" sha1="29520b72b8a5e23bd56eeb7d4ace8cc2eec1460d" name="Zoom.cod (for Oric Demo 1) (UK) (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="448b7b0e" sha1="d7eacf3642d6ad8b84a85776edfe61592f23ecbc" name="Zorgon's Revenge (UK) (Disk Version)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="110ff38c" sha1="6a50dd8021e89f0fdb2b68242a5ddf4d7b23c61d" name="Zorgon's Revenge (UK) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="2a360e87" sha1="da2030369d925bafabc55f5977f18cc6deb94976" name="Zorgon's Revenge (UK)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="025dbcab" sha1="4bbe43b5cb99f67f9c1f9d3a84f0b336dd08e5fd" name="Zorgon's Revenge (UK)">
+		<year>1984</year>
+	</hash>
+</hashfile>

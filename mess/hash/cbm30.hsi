@@ -1,0 +1,40 @@
+<hashfile>
+	<!-- Commodore CBM30 image CRC List -->
+	<!-- Compiled by Stefano &quot;JoJo&quot; Priore -->
+	<!-- Note: This list is provided as a record of known dumps for this system. -->
+	<!-- These checksums have not been validated and cannot be assumed correct. -->
+	<!-- They are provided here as a database to help the emulation of this system. -->
+	<!-- Send corrections/submissions to: battlepriest@hotmail.com -->
+	<!-- These programs have been proved to work -->
+	<hash crc32="73995C95" name="BASIC Erweiterung 1 (SYS47100).b0"/>
+	<hash crc32="1C278618" name="BASIC Expand (SYS40960).a0"/>
+	<hash crc32="D8BACE2A" name="BASIC Programmer's Toolkit (SYS45056).b0">
+		<year>1979</year>
+		<manufacturer>Palo Alto ICs</manufacturer>
+	</hash>
+	<hash crc32="54406DDD" name="Disk Append (SYS826).prg"/>
+	<hash crc32="F112702A" name="NewTIM S (SYS36864).90"/>
+	<hash crc32="278D91E6" name="Steinchenspiel.prg"/>
+	<hash crc32="AD4BB7EB" name="Wordpro 3 Plus (Epson MX-80/FX-80).prg">
+		<manufacturer>Professional Software</manufacturer>
+	</hash>
+	<hash crc32="8E3A9C62" name="Wordpro 3 Plus (Microscan 15VC).prg">
+		<manufacturer>Professional Software</manufacturer>
+	</hash>
+	<!-- These programs haven't been tested, because their starting address -->
+	<!-- is unknown, or they could be just (hypothesis to be proved) part -->
+	<!-- of a &quot;BASIC prg+EPROM&quot; combo -->
+	<hash crc32="B9B768C7" name="Spellmaster.90">
+		<year>1982</year>
+	</hash>
+	<hash crc32="9BF3C9F8" name="Visicalc.90"/>
+	<hash crc32="D185AEB1" name="Wordcraft.90"/>
+	<hash crc32="8FB42B4D" name="Wordpro 4 Plus.a0">
+		<manufacturer>Professional Software</manufacturer>
+	</hash>
+	<!-- This is a BASIC program which is loaded at the wrong memory address -->
+	<!-- Can anyone get it to run? -->
+	<!-- If anybody succeeds, please could he test it on &quot;pet&quot; driver and eventually -->
+	<!-- move this entry to pet.crc? -->
+	<hash crc32="9CA60571" name="msvweigh.prg"/>
+</hashfile>

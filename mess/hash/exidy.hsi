@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- Exidy Sorcerer (TOSEC-v0.10) -->
+	<hash crc32="c758244a" name="Breakout">
+		<year>1980</year>
+		<manufacturer>Ray Bannon</manufacturer>
+	</hash>
+	<hash crc32="5d9f7caa" name="Chess">
+		<year>19??</year>
+	</hash>
+	<hash crc32="338bd4c5" name="Chomp">
+		<year>1981</year>
+		<manufacturer>Global Software Network</manufacturer>
+	</hash>
+	<hash crc32="7908c146" name="Galaxian">
+		<year>1978</year>
+		<manufacturer>Exidy Inc.</manufacturer>
+	</hash>
+	<hash crc32="7d9da712" name="Invaders">
+		<year>1978</year>
+		<manufacturer>Digital Research</manufacturer>
+	</hash>
+	<hash crc32="8cd145a7" name="Snake">
+		<year>1978</year>
+		<manufacturer>Digital Research</manufacturer>
+	</hash>
+</hashfile>
+
+

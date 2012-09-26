@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- Philips P2000T (TOSEC-v0.12) -->
+	<hash crc32="f3edc8b1" name="3D Doolhof 2 (Nl)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="b3d7ff52" name="Brick-Wall v3.0 (Nl)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="aadd88b3" name="Componist (Nl)">
+		<year>1984</year>
+		<manufacturer>A. Dobber</manufacturer>
+	</hash>
+	<hash crc32="dd95644d" name="Elevator Humpie (Nl)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="4ddf2e30" name="Ghost Hunter &amp; Racen v2.0 (NL)">
+		<year>19??</year>
+		<manufacturer>Errorsoft</manufacturer>
+	</hash>
+	<hash crc32="45dd7e0f" name="Kleurendemonstratie v3.9">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="8f322af1" name="Lazy Bug v6.0 (Nl)">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="1b2646fe" name="Macho Man v2.1">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="9a919e58" name="Monkey Kong v1.0 Deel II (Nl)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3288dca2" name="Snakeygame">
+		<year>19??</year>
+		<manufacturer>NOS-Thomas Hofmeister</manufacturer>
+	</hash>
+	<hash crc32="39a8b855" name="Space Attack (Nl)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="e5e974bf" name="Space Fight II - Fraxxon v1.0">
+		<year>1985</year>
+		<manufacturer>LBK Production</manufacturer>
+	</hash>
+	<hash crc32="59091f51" name="Space Fight v3.0 (Nl)">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="64907d33" name="Space Mission (Nl)">
+		<year>1984</year>
+		<manufacturer>P. v. H.</manufacturer>
+	</hash>
+	<hash crc32="b46b537e" name="Speelpaleis (Nl)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="8480161f" name="Startrek (Nl)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="74958e0a" name="Vlucht Simulator (Nl)">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+</hashfile>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<help title="MESS Help">
+	<topic		filepath="windows/main.htm"		text="Overview"/>
+	<topic		filepath="messnew.txt"			text="What's new?"/>
+	<topic		filepath="howto.htm"			text="MESS User's Manual"/>
+	<topic		filepath="windows/install.htm"	text="Installing MESS"/>
+	<topic		filepath="windows/choice.htm"	text="Choosing which MESS"/>
+	<topic		filepath="windows/update.htm"	text="Updating MESS"/>
+	<topic		filepath="windows/suppsys.htm"	text="Supported Systems"/>
+	<topic		filepath="windows/instroms.htm"	text="Installing ROM Files and Software Images"/>
+	<topic		filepath="windows/mgeroms.htm"	text="Managing ROM Files"/>
+	<topic		filepath="windows/runsw.htm"	text="Running Software"/>
+	<topic		filepath="windows/win32cmd.htm"	text="Using MESS at the Command Line"/>
+	<topic		filepath="windows/config.htm"	text="MESS Configuration Files"/>
+	
+	<folder text="The MESSUI Front End">
+		<topic	filepath="windows/guiconf.htm"	text="Configuration"/>
+		<topic	filepath="windows/guiuse.htm"	text="Usage"/>
+	</folder>
+	<folder text="While running MESS...">
+		<topic	filepath="windows/control.htm"	text="Controls"/>
+		<topic	filepath="windows/osmenu.htm"	text="On-screen menus"/>
+	</folder>
+
+	<topic		filepath="windows/compile.htm"	text="Compiling MESS"/>
+	<topic		filepath="faq.htm"				text="FAQ"/>
+	<topic		filepath="credits.htm"			text="Credits"/>
+
+	<datfile	srcpath="../sysinfo.dat"		text="Emulated Systems"		destpath="sysinfo"/>
+	
+	<file		filepath="windows/images/logo.gif"/>
+	<file		filepath="windows/images/command.gif"/>
+	<file		filepath="windows/images/frog.gif"/>
+	<file		filepath="windows/images/gui.gif"/>
+	<file		filepath="windows/images/guiaudit.gif"/>
+	<file		filepath="windows/images/iniicon.gif"/>
+	<file		filepath="windows/images/keybcnt.gif"/>
+	<file		filepath="windows/images/newmenu.gif"/>
+	<file		filepath="windows/images/oldmenu.gif"/>
+	<file		filepath="windows/images/prop.gif"/>
+	<file		filepath="windows/images/propadv.gif"/>
+	<file		filepath="windows/images/propctrlr.gif"/>
+	<file		filepath="windows/images/propd3d.gif"/>
+	<file		filepath="windows/images/propmisc.gif"/>
+	<file		filepath="windows/images/props.gif"/>
+	<file		filepath="windows/images/propsnd.gif"/>
+	<file		filepath="windows/images/propvec.gif"/>
+	<file		filepath="windows/images/startup.gif"/>
+	<file		filepath="windows/images/tree.gif"/>
+	<file		filepath="windows/images/propvec.gif"/>
+	<file		filepath="windows/images/wzip.gif"/>
+	<file		filepath="style.css"/>
+</help>

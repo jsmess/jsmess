@@ -1,0 +1,268 @@
+<hashfile>
+	<!-- This MESS HASH file was auto-generated from Cowering's GoodSV database (V3.14)  -->
+	<!-- for the exclusive use of MESS.  Keep this notice intact if editing this file  -->
+
+	<hash crc32="8dbb2c53" sha1="e20ae19d0555dc8d34da8f16d2d7bcce8c9856da" name="Alien">
+		<year>199x</year>
+		<manufacturer>Supervision</manufacturer>
+		<status>SV10010</status>
+	</hash>
+	<hash crc32="8188b755" sha1="2d58bb254bb79f47d64f1505336bf736c7b5a4d8" name="Balloon Fight">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+	</hash>
+	<hash crc32="7e05d84f" sha1="f2b7902b8c522f63858c99caa81d63f4cdcb60cb" name="Block Buster &amp; Cross High">
+		<year>199x</year>
+		<manufacturer>Supervision</manufacturer>
+		<status>SV10033</status>
+	</hash>
+	<hash crc32="0a3db285" sha1="639c69afa4a68236dfea263b51e9c032c1aa71be" name="Block Buster">
+		<year>199x</year>
+		<manufacturer>Supervision</manufacturer>
+		<status>SV10001</status>
+	</hash>
+	<hash crc32="5e6706b9" sha1="8a97572caa6cd91950bd333bcab5c61d60cf28d2" name="Brain Power">
+		<year>199x</year>
+		<manufacturer>Supervision</manufacturer>
+		<status>SV10023</status>
+	</hash>
+	<hash crc32="8847c439" sha1="fff0e56e3b9bb7799a8d2f1b9562aa86dc114502" name="Carrier">
+		<year>199x</year>
+		<manufacturer>Travellmate</manufacturer>
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="5ecfb674" sha1="13061b97c7b6d74990b766670f59dbf1e7598120" name="Carrier">
+		<year>199x</year>
+		<manufacturer>Travellmate</manufacturer>
+		<status>SV10004</status>
+	</hash>
+	<hash crc32="e0266ce7" sha1="af1232c2e781ac2ae12163dc200815a8579c269d" name="Cave Wonders">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+	</hash>
+	<hash crc32="c92382ce" sha1="70f7589fdf40c851cc34c0a5f644216f3765eb8c" name="Challenger Tank">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10017</status>
+	</hash>
+	<hash crc32="4a458aa8" sha1="c384062ce1284a4c80e8fbb1ad0e8fa924c6881b" name="Chimera">
+		<year>199x</year>
+		<manufacturer>Supervision</manufacturer>
+		<status>SV10016</status>
+	</hash>
+	<hash crc32="10dcc110" sha1="f23f53f7486857db36a959a0ecc71b6b688c7af1" name="Crystball">
+		<year>1991</year>
+		<manufacturer>Travellmate</manufacturer>
+	</hash>
+	<hash crc32="32ccdf89" sha1="ee68c188c41cf8f12f74458d6dd614afc7b8edbb" name="Delta Hero">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+		<status>SV10040</status>
+	</hash>
+	<hash crc32="01cb8364" sha1="226e8f14498be513b73f97b5e618a524209c4595" name="Eagle Plan">
+		<year>1992</year>
+		<manufacturer>GTC Inc</manufacturer>
+		<status>SV10005</status>
+	</hash>
+	<hash crc32="a6cbb074" sha1="8b0550dde96661b9b7317a1d247174ecca813698" name="Earth Defender">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+	</hash>
+	<hash crc32="917cab48" sha1="9c6282caa6b06c63f53910fdb11b7d0f83d29310" name="Fatal Craft">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+	</hash>
+	<hash crc32="465d78cd" sha1="ef87ef536bd82c1a9b707ffcb173beef74953cd5" name="Final Combat">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+	</hash>
+	<hash crc32="b494bc5c" sha1="7739826471d4ac2a69d34bdbd154bb6d748e90cc" name="Galactic Crusader">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10029</status>
+	</hash>
+	<hash crc32="581703be" sha1="721350e7c7761b9be13d2a236ebfc72e51755851" name="Galaxy Fighter">
+		<year>1992</year>
+		<manufacturer>Thin Chen Enterprise</manufacturer>
+	</hash>
+	<hash crc32="cef3f295" sha1="a6b93e0bbb0d037a0fe4b0d8056b6808aea7ae6c" name="Grand Prix">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+		<status>SV10021</status>
+	</hash>
+	<hash crc32="112f5eed" sha1="d8a78bb3cb492a90464f7a16bb2486566f7d4baa" name="Happy Pairs">
+		<year>1992</year>
+		<manufacturer>Sachen</manufacturer>
+	</hash>
+	<hash crc32="c1354952" sha1="bca1c05ebac50a1acd4a8d3b440a29867edc9826" name="Hash Blocks &amp; Eagle Plan">
+		<year>1992</year>
+		<manufacturer>GTC Inc</manufacturer>
+		<status>SV10024</status>
+	</hash>
+	<hash crc32="6bd7c885" sha1="d9836dfe4f113dca030b0472deb7a8d8bb9065dc" name="Hash Blocks">
+		<year>1991</year>
+		<manufacturer>GTC Inc</manufacturer>
+		<status>SV10002</status>
+	</hash>
+	<hash crc32="25ddd6e1" sha1="3e5de3350e3bcf75e057b970d7e1c56634699bb1" name="Hero Kid">
+		<year>1992</year>
+		<manufacturer>Hartung</manufacturer>
+		<status>SV10011</status>
+	</hash>
+	<hash crc32="e856875a" sha1="3412cb0d657c6c79eef71d29c6af06ac3082cb2f" name="Honey Bee">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10018</status>
+	</hash>
+	<hash crc32="7d8a607f" sha1="f7311ccca24811aa3595114d50e5c1ac5772b4c9" name="Jacky Lucky">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+	</hash>
+	<hash crc32="aa4372d4" sha1="212f577b0d1df539aadfecdec4e85404e4d57201" name="Jaguar Bomber">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+		<status>SV10025</status>
+	</hash>
+	<hash crc32="e9ea3ae0" sha1="b422814b073544b66f2ad86c76bae6403f7a4530" name="John Adventure">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10036</status>
+	</hash>
+	<hash crc32="32e68d6f" sha1="a5c8beecff5444183dfed9e46dd67150c12c8bfd" name="Juggler">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+		<status>SV10043</status>
+	</hash>
+	<hash crc32="2bc03096" sha1="517154e5340bf221392a99640733b0798c7490ee" name="Kabi Island">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+	</hash>
+	<hash crc32="6f8abaf9" sha1="9f80a72d967d2a35168250ca3da3941164164bfc" name="Linear Racing">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10007</status>
+	</hash>
+	<hash crc32="e406a91c" sha1="b7aec7d24175bdea1cfccc1359b5ab353e023d44" name="Magincross">
+		<year>1992</year>
+		<manufacturer>Thin Chen Enterprise</manufacturer>
+		<status>SV10039</status>
+	</hash>
+	<hash crc32="21864295" sha1="fb6af626a6496907d02a26b9bb5132f4be88bda9" name="Matta Blatta">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10020</status>
+	</hash>
+	<hash crc32="85dc8111" sha1="4b863616bb9b821adf397f20e0ea043a3daa026a" name="Olympic Trials">
+		<year>1992</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10019</status>
+	</hash>
+	<hash crc32="748f9dae" sha1="794ce6fb7084274c680b277a41f269840402e61b" name="P-52 Sea Battle">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10006</status>
+	</hash>
+	<hash crc32="1a89ac88" sha1="afa267bcced763cb51599cd5605062530ede1af3" name="PacBoy &amp; Mouse">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10008</status>
+	</hash>
+	<hash crc32="17a4ca40" sha1="ed532dd29212754d8c96539da04452b56e89d17b" name="Penguin Hideout">
+		<year>1992</year>
+		<manufacturer>Thin Chen Enterprise</manufacturer>
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="fe5f9774" sha1="9520221d8cfd3bdfb0fb6b7fb9fed66ba027a756" name="Penguin Hideout">
+		<year>1992</year>
+		<manufacturer>Thin Chen Enterprise</manufacturer>
+		<status>SV10032</status>
+	</hash>
+	<hash crc32="531f0b51" sha1="9fa06b4d171d9ade2f9e4a639e80feba15c963f9" name="Police Bust">
+		<year>199x</year>
+		<manufacturer>Bon Treasure</manufacturer>
+		<status>SV10014</status>
+	</hash>
+	<hash crc32="e0bfe163" sha1="8fab2b0d3e4485e156c78159b92fd70aabc02994" name="Pyramid">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+	</hash>
+	<hash crc32="be9b6f10" sha1="da02d8e119fbd38048f16c78ce9714abf93bbfd6" name="SSSnake">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+		<status>SV10009</status>
+	</hash>
+	<hash crc32="45204dc4" sha1="2b794e22f7d595902c515b3fd617980655a9d994" name="Soccer Champion">
+		<year>199x</year>
+		<manufacturer>Hartung</manufacturer>
+		<status>SV10034</status>
+	</hash>
+	<hash crc32="d46ab5e0" sha1="e16c13f1fe3a5bde2fa3a4d4c10d28514328b7c8" name="Super Block">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+		<status>Overdumped Image</status>
+	</hash>
+	<hash crc32="02e2c7ad" sha1="1fa3236ad83984d922893c294ed0d9e432201fb0" name="Super Block">
+		<year>1992</year>
+		<manufacturer>Bon Treasure</manufacturer>
+		<status>SV10022</status>
+	</hash>
+	<hash crc32="59c7ff64" sha1="6c59bc0d14a05b404292de8aba3a7da12d72f355" name="Super Kong">
+		<year>1992</year>
+		<manufacturer>Thin Chen Enterprise</manufacturer>
+		<status>SV10042</status>
+	</hash>
+	<hash crc32="3d5f3964" sha1="da884d97fbe7e7aca40dc1b5b0db6d7ff69377e3" name="Tasac 2010">
+		<year>1992</year>
+		<manufacturer>Thin Chen Enterprise</manufacturer>
+		<status>SV10026</status>
+	</hash>
+	<hash crc32="bd004cb7" sha1="386f555fcedaaf9fc4d81ddf59ec0320f42af988" name="Tennis Pro '92">
+		<year>1992</year>
+		<manufacturer>B.I.T.S</manufacturer>
+		<status>SV10015</status>
+	</hash>
+	<hash crc32="db35b809" sha1="baf24b026023f44968fd1352637f1c01cbb89f3e" name="Treasure Hunter">
+		<year>199x</year>
+		<manufacturer>Watara</manufacturer>
+	</hash>
+	<!-- watara supervision other (non GoodSV and undumped)-->
+	<hash crc32="b7d5db89" name="Chimera eprom read (scrambled)">
+		<status>Known Bad Dump</status>
+	</hash>
+	<hash crc32="62f39f8b" name="Delta Hero (1992) (Bon Treasure)">
+		<status>Known Bad Dump</status>
+	</hash>
+	<!-- SV10012 MahJongg -->
+	<!-- SV10017 Space Fighter -->
+	<!-- SV10027 Happy Race -->
+	<!-- SV10028 Super Pang -->
+	<!-- SV10030 Dancing Blocks -->
+	<!-- SV10031 Final Combat -->
+	<!-- SV10035 Happy Pair -->
+	<!-- SV10037 PaPo Team -->
+	<!-- SV10038 Chinese Checkers -->
+	<!-- SV10041 Recycle Design -->
+	<!-- hash block, jacky lucky, challenger tank, brain power -->
+	<!-- b52 battle -->
+	<!-- Box Carrier -->
+	<!-- bubble world -->
+	<!-- classic casino -->
+	<!-- climber -->
+	<!-- Devil Paradise -->
+	<!-- dream world -->
+	<!-- hero hawk -->
+	<!-- money bee -->
+	<!-- jade legend -->
+	<!-- Jouney to the West -->
+	<!-- kitchen war -->
+	<!-- Kung Fu Street -->
+	<!-- Lucky Jack (Jacky Lucky clone or a name mistake?) -->
+	<!-- pacific battle -->
+	<!-- pyramid -->
+	<!-- scaffolder -->
+	<!-- sonny xpress -->
+	<!-- thunder shooting -->
+	<!-- untouchable -->
+	<!-- usa sea battle -->
+	<!-- witty kitty -->
+</hashfile>

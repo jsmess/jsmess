@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- Commodore C128 - PRG (TOSEC-v0.01) -->
+	<hash crc32="2121ae13" name="Baseball Trivia Quiz">
+		<year>19??</year>
+	</hash>
+	<hash crc32="487f48fd" name="Casino">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="eb287ad6" name="Dominoes">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="41b0c789" name="Fighter, The">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3d8bf79d" name="G-Empire">
+		<year>19??</year>
+	</hash>
+	<hash crc32="20be4e0b" name="Invaders 128">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="6ec3e1ac" name="Oh! Tello">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="d7f8e9cc" name="Phazer v1.0">
+		<year>19??</year>
+	</hash>
+	<hash crc32="547dc3f4" name="Ultimate Risk">
+		<year>19??</year>
+		<manufacturer>G.C. Petereit</manufacturer>
+	</hash>
+	<hash crc32="e3a759c0" name="Unicron II">
+		<year>1990</year>
+		<manufacturer>E. Dashoey</manufacturer>
+	</hash>
+	<hash crc32="96924ae1" name="Uniquest (80 Column Mode)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3e34d248" name="World at War">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9a9cea5c" name="Yahtzee">
+		<year>19??</year>
+	</hash>
+	<!-- Commodore C128 - D64 (TOSEC-v0.02) -->
+	<hash crc32="fb504037" name="A Mind Forever Voyaging (Side A)">
+		<year>19??</year>
+		<manufacturer>Infocom</manufacturer>
+	</hash>
+	<hash crc32="78d8b433" name="A Mind Forever Voyaging (Side B)">
+		<year>19??</year>
+		<manufacturer>Infocom</manufacturer>
+	</hash>
+	<hash crc32="8e61d4d5" name="Backgammon (De)">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="7c2bc9ed" name="Beyond Zork (Side A)(80 Column Mode)">
+		<year>19??</year>
+		<manufacturer>Infocom</manufacturer>
+	</hash>
+	<hash crc32="7a0c63cf" name="Beyond Zork (Side B)(80 Column Mode)">
+		<year>19??</year>
+		<manufacturer>Infocom</manufacturer>
+	</hash>
+	<hash crc32="c92020e0" name="Bureaucracy (Side A)(80 Columns Mode)">
+		<year>1987</year>
+		<manufacturer>Infocom</manufacturer>
+	</hash>
+	<hash crc32="28ebdd80" name="Bureaucracy (Side B)(80 Columns Mode)">
+		<year>1987</year>
+		<manufacturer>Infocom</manufacturer>
+	</hash>
+	<hash crc32="ca2d87ee" name="Burgerwhop (PD)">
+		<year>19??</year>
+		<manufacturer>Brian L. Copeland</manufacturer>
+	</hash>
+	<hash crc32="72d7d809" name="Commodore 1571 Test, Demos Diskette with C128 DOS Shell">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="9361231d" name="Das Ding">
+		<year>1988</year>
+		<manufacturer>Commodore Disk</manufacturer>
+	</hash>
+	<hash crc32="02401077" name="Dice Poker (PD)">
+		<year>19??</year>
+		<manufacturer>Louis Avanz</manufacturer>
+	</hash>
+	<hash crc32="39d8cce5" name="Elite 128 (De-En)">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="42289f95" name="Elite128 v0.8 (De)">
+		<year>1985</year>
+		<manufacturer>Firebird</manufacturer>
+	</hash>
+	<hash crc32="d841b021" name="Elite128 v0.9">
+		<year>1985</year>
+		<manufacturer>Firebird</manufacturer>
+	</hash>
+	<hash crc32="a63007dd" name="Games 128 (Compilation)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="1c216f34" name="Hearts (80 Column Mode)">
+		<year>19??</year>
+	</hash>
+	<hash crc32="9b5ad06d" name="Invaders 128">
+		<year>19??</year>
+		<manufacturer>Spiceware</manufacturer>
+	</hash>
+	<hash crc32="aaf6975d" name="Kickstart 128 [cr Golden Griffin]">
+		<year>19??</year>
+		<manufacturer>Mr. Chip</manufacturer>
+	</hash>
+	<hash crc32="eec1436c" name="Kickstart 2">
+		<year>1985</year>
+		<manufacturer>Mr. Chip</manufacturer>
+	</hash>
+	<hash crc32="1122b92f" name="Last v8">
+		<year>19??</year>
+	</hash>
+	<hash crc32="5fccd7ac" name="Last v8">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="087bb1e5" name="Mah-Jong">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="b6eeb08b" name="Mikes Maze">
+		<year>19??</year>
+	</hash>
+	<hash crc32="3428d560" name="Millifoot 80">
+		<year>1988</year>
+		<manufacturer>L.K. Snyder</manufacturer>
+	</hash>
+	<hash crc32="d47087a4" name="Oh! Tello">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="46751650" name="Rocky Horror Picture Show 128, The">
+		<year>1986</year>
+		<manufacturer>CRL</manufacturer>
+	</hash>
+	<hash crc32="84a228fc" name="Seeraeuber">
+		<year>19??</year>
+		<manufacturer>Christian Baenke</manufacturer>
+	</hash>
+	<hash crc32="51632d49" name="Solitair 80">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="73ba25c1" name="Tetris 128">
+		<status>KNOWN BAD DUMP</status>
+	</hash>
+	<hash crc32="59c505a5" name="Thai Boxing 128">
+		<year>1986</year>
+		<manufacturer>Anco</manufacturer>
+	</hash>
+	<hash crc32="936653ae" name="Thai Boxing 128">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="b69bdc64" name="Trader v2.2">
+		<status>KNOWN BAD DUMP </status>
+	</hash>
+	<hash crc32="37f89e69" name="Trinity (Side A)">
+		<year>19??</year>
+		<manufacturer>Infocom</manufacturer>
+	</hash>
+	<hash crc32="a32435d7" name="Trinity (Side B)">
+		<year>19??</year>
+		<manufacturer>Infocom</manufacturer>
+	</hash>
+	<hash crc32="7496e0c6" name="Wumpus 2.0 (De)">
+		<year>19??</year>
+	</hash>
+	<!-- Commodore C128 - Demos - D64 (TOSEC-v0.01) -->
+	<hash crc32="b806c5b2" name="Risen from Oblivion (Side A)">
+		<year>2001</year>
+		<manufacturer>Crest</manufacturer>
+	</hash>
+	<hash crc32="ec66a17d" name="Risen from Oblivion (Side B)">
+		<year>2001</year>
+		<manufacturer>Crest</manufacturer>
+	</hash>
+</hashfile>

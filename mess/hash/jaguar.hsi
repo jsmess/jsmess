@@ -1,0 +1,562 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hashfile>
+	<!-- Good(JAG) Atari Jaguar 2.01 -->
+	<hash crc32="dc187f82" name="Alien vs Predator">
+		<year>1994</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="4242dfa7" name="Alien vs Predator (Alpha)"/>
+	<hash crc32="bc3c8272" name="Arkanna Demo">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="4750bbff" name="Assassin Demo, The - Release 2">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="0db47415" name="Assassin Demo, The Part 1">
+		<year>1999</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="d5c01e77" name="Assassin Demo, The Part 1 (for BJL)">
+		<year>1999</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="82629a5b" name="Asteroid">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="e28756de" name="Atari Karts">
+		<year>1995</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="cd5bf827" name="Attack of the Mutant Penguins">
+		<year>1996</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="f11d319b" name="BadCode0 by Badcoder (bin)">
+		<year>1999</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="466a92c8" name="BadCode0 by Badcoder (cof)">
+		<year>1999</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="008222ac" name="BadCode1 by Badcoder (bin)">
+		<year>1999</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="800d7c67" name="BadCode1 by Badcoder (cof)">
+		<year>1999</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="d69d1f02" name="BadCode2 by Badcoder (bin)">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="2a0c9443" name="BadCode2 by Badcoder (cof)">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="ac95ca6d" name="BadCode3 by Badcoder (bin)">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="ffbb1fa3" name="BadCode3 by Badcoder (jag)">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="8f1586a9" name="BadCode4 (Metal) by Badcoder (bin) [a1]">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="ba97c724" name="BadCode4 (Metal) by Badcoder (bin)">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="7d74b6f0" name="BadCode4 (Metal) by Badcoder (jag)">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="de51f0fe" name="BadCode4 (Metal) by Badcoder (rom)">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="111d4e2c" name="BadCode4 (Modified) by Badcoder (bin)">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="97757fc2" name="BadCode4 (Modified) by Badcoder (jag)">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="5e6d06b9" name="BadCode4 (Modified) by Badcoder (rom)">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="22178d94" name="BadCode4 by Badcoder (bin)">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="4491ec09" name="BadCode4 by Badcoder (jag)">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="75e3a725" name="BadCode4C by Badcoder (bin)">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="f4454efe" name="BadCode4C by Badcoder (jag)">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="b5a901df" name="BadCode4N by Badcoder (bin)">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="159ec9d3" name="BadCode4N by Badcoder (jag)badcde4n">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="bcb1a4bf" name="Brutal Sports Football">
+		<year>1994</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="2e17d5da" name="Bubsy - Fractured Furry Tails">
+		<year>1994</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="bda405c6" name="Cannon Fodder">
+		<year>1995</year>
+		<manufacturer>Computer West</manufacturer>
+	</hash>
+	<hash crc32="fa7775ae" name="Checkered Flag">
+		<year>1994</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="115254e1" name="Chroma-Luma Color Pick by Matthias Domin (bin)">
+		<year>1996</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="24ecb02b" name="Chroma-Luma Color Pick by Matthias Domin (jag) [a1]">
+		<year>1996</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="2e967b0c" name="Chroma-Luma Color Pick by Matthias Domin (jag)">
+		<year>1996</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="37df04ab" name="Chroma-Luma Color Pick (Mouse) by Matthias Domin">
+		<year>1996</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="eee8d61d" name="Club Drive">
+		<year>1994</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="a1b28439" name="CRZ Demo">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="bde67498" name="Cybermorph">
+		<year>1993</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="27594c6a" name="Defender 2000">
+		<year>1996</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="e89d0f72" name="DEMO1 (bin)">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="9e925a24" name="DEMO1">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="c7b6d7fc" name="DEMO1B [a1]">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="e1734368" name="DEMO1B">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="6acc377b" name="DEMO1C">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="5e2cdbc0" name="Doom - Evil Unleashed">
+		<year>1994</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="348e6449" name="Double Dragon V">
+		<year>1995</year>
+		<manufacturer>Williams</manufacturer>
+	</hash>
+	<hash crc32="8fea5ab0" name="Dragon - The Bruce Lee Story">
+		<year>1994</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="48537047" name="Drumpad by Robert Jurziga">
+		<year>2002</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="baf04511" name="Drumpad2 by Robert Jurziga">
+		<year>2002</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="0ec5369d" name="Evolution - Dino Dudes">
+		<year>1993</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="3615af6a" name="Fever Pitch Soccer">
+		<year>1995</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="c6c7ba62" name="Fight For Your Life [a1]">
+		<year>1996</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="2abadb3d" name="Fight For Your Life [a2]">
+		<year>1996</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="b14c4753" name="Fight For Your Life">
+		<year>1996</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="de55dcc7" name="Flashback">
+		<year>1995</year>
+		<manufacturer>U.S. Gold</manufacturer>
+	</hash>
+	<hash crc32="892bc67c" name="Flip Out">
+		<year>1995</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="1a68194c" name="FORCE Design - Legion Force Jidai Intro Demo 0!">
+		<year>2001</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="b4c74036" name="Gorf 2000">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="4899628f" name="Hover Strike">
+		<year>1995</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="2708d9fe" name="Hubble Fade by Robert Jurziga">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="72dd1cb8" name="Hubble Nebula by Robert Jurziga">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="97eb4651" name="I-War">
+		<year>1995</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="5a101212" name="International Sensible Soccer">
+		<year>1995</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="f7f3462b" name="Iron Soldier [a1]">
+		<year>1994</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="08f15576" name="Iron Soldier">
+		<year>1994</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="7dae6472" name="JagFest Demo">
+		<year>2001</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="1e68b4d1" name="JagMania (Apr 18)">
+		<year>1998</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="0e768b5a" name="JagMania (Aug 31)">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="1ed4c963" name="JagMania (Jan 06)">
+		<year>2001</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="88f4d5ed" name="JagMania (Jul 8)">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="d0cdbd65" name="JagMania (Sep 10)">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="ebafd0de" name="JagMarble">
+		<year>1999</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="1b57a623" name="JagMarble">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="c1d3612c" name="JagMarble (Jul 13)">
+		<year>1997</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="af81e751" name="Jaguar Server (Program Examples) - 27OBJ">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="be069593" name="Jaguar Server (Program Examples) - 50HZ">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="eb135948" name="Jaguar Server (Program Examples) - 60HZ">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="15df5cf9" name="Jaguar Server (Program Examples) - INTRO">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="ec130c25" name="Jaguar Server (Program Examples) - INTROMOD">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="60e86bf6" name="Jaguar Server (Program Examples) - SCALE">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="cd61879b" name="Jaguar Server (Program Examples) - SCALE3">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="44091752" name="Jaguar Server 1.08 UPDATE - JAGOS">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="6912ed13" name="Jaguar Server 1.08 UPDATE - KEYB">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="c539ef03" name="Jaguar Tetris">
+		<year>1995</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="effca60e" name="JDC Demo V1">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="8dc5d93c" name="JDC Demo V2">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="aa25060d" name="JDC Demo V3 - E-JagFest Demo by Lars Hannig">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="1187ff8f" name="JDC Example by Lars Hannig">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="2a65c0d4" name="Joypad-TeamTap Tester by Matthias Domin [a1]">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="29e9e6ab" name="Joypad-TeamTap Tester by Matthias Domin [a2]">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="239662f4" name="Joypad-TeamTap Tester by Matthias Domin">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="6d3bae95" name="JSSDemo (Jaguar Sound System) V1.0b (08.11.2002)">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="ffc859f8" name="JSSDemoII (Jaguar Sound System) V1.0b (10.11.2002)">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="ce5f0c11" name="Kasumi Ninja [a1]">
+		<year>1994</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="0957a072" name="Kasumi Ninja">
+		<year>1994</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="0eb3579b" name="Ladybug Demo">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="549844d6" name="Ladybug Demo (rom)">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="39181742" name="Mandelbrot Demo">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="d9ec011a" name="Memory Dump by Matthias Domin">
+		<year>1999</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="da9c4162" name="Missile Command 3D">
+		<year>1995</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="2ef95c65" name="Music Demo">
+		<year>2002</year>
+		<manufacturer>ScatoLOGIC</manufacturer>
+	</hash>
+	<hash crc32="85a70180" name="Native Demo (bin)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="b5bdffa5" name="Native Demo (jag)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="0ac83d77" name="NBA Jam TE">
+		<year>1996</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="27c7c6a3" name="Painter">
+		<year>1996</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="71269584" name="Painter (bin)">
+		<year>1996</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="3cf18719" name="PAULA Preview Demo 2 by Robert Jurziga">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="da061a4e" name="PAULA Preview Demo by Robert Jurziga">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="ea9b3fa7" name="Phase Zero [a1]">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="4203e23d" name="Phase Zero">
+		<year>2000</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="5cff14ab" name="Pinball Fantasies">
+		<year>1995</year>
+		<manufacturer>Computer West</manufacturer>
+	</hash>
+	<hash crc32="817a2273" name="Pitfall - The Mayan Adventure">
+		<year>1995</year>
+	</hash>
+	<hash crc32="0b216c1a" name="PlaySFX V1.0 by Robert Jurziga">
+		<year>2003</year>
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="1660f070" name="Power Drive Rally">
+		<year>1995</year>
+		<manufacturer>TWI</manufacturer>
+	</hash>
+	<hash crc32="bc62a2bf" name="QSOUND Demo">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="0509c85e" name="Raiden">
+		<year>1994</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="a9f8a00e" name="Rayman">
+		<year>1995</year>
+		<manufacturer>UBI Soft</manufacturer>
+	</hash>
+	<hash crc32="e6bd422c" name="Rayman Demo">
+		<year>1995</year>
+		<manufacturer>UBI Soft</manufacturer>
+	</hash>
+	<hash crc32="5b6bb205" name="Ruiner Pinball">
+		<year>1995</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="fbdeda89" name="SlamRacer Demo">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="63d6c1c6" name="SlamRacer Intro">
+		<manufacturer>Public Domain</manufacturer>
+	</hash>
+	<hash crc32="6f8b2547" name="Super Burnout">
+		<year>1995</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="ec22f572" name="Super Cross 3D [a1]">
+		<year>1995</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="4a08a2bd" name="Super Cross 3D">
+		<year>1995</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="58272540" name="Syndicate">
+		<year>1995</year>
+		<manufacturer>Ocean</manufacturer>
+	</hash>
+	<hash crc32="6b2b95ad" name="Tempest 2000">
+		<year>1994</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="47ebc158" name="Theme Park">
+		<year>1995</year>
+		<manufacturer>Ocean</manufacturer>
+	</hash>
+	<hash crc32="1e451446" name="Trevor McFur in the Crescent Galaxy">
+		<year>1993</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="38a130ed" name="Troy Aikman NFL Football">
+		<year>1995</year>
+		<manufacturer>Williams</manufacturer>
+	</hash>
+	<hash crc32="0f6a1c2c" name="Ultra Vortek">
+		<year>1995</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="a27823d8" name="Ultra Vortek (Beta)">
+		<year>1995</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="c9608717" name="Val D'Isere Skiing &amp; Snowboarding">
+		<year>1994</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="14915f20" name="White Men Can't Jump">
+		<year>1995</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="e91bd644" name="Wolfenstein 3D">
+		<year>1994</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="8975f48b" name="Zool 2">
+		<year>1994</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<hash crc32="c5562581" name="Zoop!">
+		<year>1996</year>
+		<manufacturer>Atari</manufacturer>
+	</hash>
+	<!-- These games are listed at atariage, but not in GoodJag 999.4. -->
+	
+	<!-- Cartirge -->
+	<!-- ####### = Air Cars | 1997 | ICD | -->
+	<!-- ####### = BattleSphere | 2000 | Atari | -->
+	<!-- ####### = BattleSphere Gold | 2002 | Atari | -->
+	<!-- ####### = Breakout 2000 | 1996 | Telegames | -->
+	<!-- ####### = Cybermorph (1 meg) | 1993 | Atari | -->
+	<!-- ####### = Cybermorph (2 meg) | 1993 | Atari | -->
+	<!-- ####### = Hyper Force | 2000 | Songbird Productions -->
+	<!-- ####### = Iron Soldier II | 1997 | Telegames | | -->
+	<!-- ####### = Memory Track | 1995 | Atari | -->
+	<!-- ####### = Protector | 1999 | Songbird Productions | -->
+	<!-- ####### = Protector: Special Edition | 2002 | Songbird Productions | -->
+	<!-- ####### = Skycopter | ???? | Carousel Entertainment | -->
+	<!-- ####### = Skyhammer | 2000 | Songbird Productions | -->
+	<!-- ####### = Soccer Kid | | Songbird Productions | -->
+	<!-- ####### = Space War 2000 | ???? | Atari | -->
+	<!-- ####### = Space War 2000 | 2001 | Self-published | -->
+	<!-- ####### = Speedster II | | Carousel Entertainment | -->
+	<!-- ####### = Zero 5 | 1997 | Telegames | -->
+	<!-- CD-ROM -->
+	<!-- ####### = Baldies | 1995 | Atari | -->
+	<!-- ####### = Batttlemorph | 1995 | Atari | -->
+	<!-- ####### = Blue Lightning | 1995 | 4Play/ScatoLOGIC | -->
+	<!-- ####### = BrainDead 13 | 1996 | Readysoft | -->
+	<!-- ####### = Dragon's Lair | 1995 | ReadySoft -->
+	<!-- ####### = Highlander | 1995 | Atari | -->
+	<!-- ####### = Hover Strike: Unconquered Lands | 1995 | Atari | -->
+	<!-- ####### = Iron Soldier II | 1997 | Telegames | | -->
+	<!-- ####### = Myst | 1995 | Atari | -->
+	<!-- ####### = Myst Demo | 1995 | Atari | -->
+	<!-- ####### = Primal Rage | 1995 | Time-Warner Interactive | -->
+	<!-- ####### = Space Ace | 1996 | ReadySoft | -->
+	<!-- ####### = Vid Grid | 1995 | Atari | -->
+	<!-- ####### = World Tour Racing | 1997 | Telegames | -->
+	<!-- ####### = Worms | 1998 | Telegames | -->
+	<!-- Audio CD? - Does this belong here? -->
+	<!-- ####### = Tempest 2000 Soundtrack | 1995 | Atari | -->
+</hashfile>

@@ -1,0 +1,1238 @@
+<hashfile>
+	<!-- This MESS HASH file was auto-generated from Cowering's GoodLynx database (V3.14)  -->
+	<!-- for the exclusive use of MESS.  Keep this notice intact if editing this file  -->
+	<!-- MESS keywords -->
+	<!-- ROTATE90DEGREE rotate display and pad 90 degree clockwise -->
+	<!-- ROTATE270DEGREE -->
+	<!-- undumped -->
+	<!-- ####### = Hyperdrome | 1999 | Telegames | -->
+	<!-- ####### = Lynx Othello | 1999 | Harry Dodgson -->
+	<!-- ####### = S.I.M.I.S. | 1998 | Self-published | -->
+	<!-- ####### = SokoMania | 1999 | MW Software | -->
+	
+	<hash crc32="d942d5c1" sha1="7b82223a03b8651c42193a0d16c6f10af55f878f" name="0uRaGaN Alpha 12 by Vince &amp; PiWi (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="acb61fdf" sha1="ab95b3293fa0e12a323d109f157bb14477ce4742" name="2001 Music (PD)"> </hash>
+	<hash crc32="de16e90a" sha1="7d5f9cf8a35b5b495c296b66d30330acb0f4f44a" name="2001 Music V2 (PD)"> </hash>
+	<hash crc32="b5c94576" sha1="e782d84f164a0cc45c4e1ec401cb8ee58e10d840" name="256 Color Demo by Bastian Schick (PD) [a1]">
+		<year>1997</year>
+	</hash>
+	<hash crc32="332cc736" sha1="4b3fa7afa9182135b2d681812f5e2d1aa2000c2b" name="256 Color Demo by Bastian Schick (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="8e890608" sha1="a85c017939811026b6b1b5ea49bdf8677a17555c" name="256 Color Mandelbrot Demo by Bastian Schick (PD) [a1]">
+		<year>1998</year>
+	</hash>
+	<hash crc32="ff009b34" sha1="b05af75bbbfeee9eef861aa6939e43d455f4575f" name="256 Color Mandelbrot Demo by Bastian Schick (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="a1e7840f" sha1="d8d024d80d4c10129f6634e0528fe765585d1afa" name="3D Demo (Jun 2003) (PD)"> </hash>
+	<hash crc32="d9b03b52" sha1="405e3bd6fab0405cd8c4f3579e98ab2781ad6ba6" name="3D Demo (PD)"> </hash>
+	<hash crc32="3ec9220e" sha1="418ffb7e24261e5bc6ae22bec30e86a878302cd0" name="80's Neon Nights by Sampo (PD)">
+		<year>2005</year>
+	</hash>
+	<hash crc32="2b3e97f5" sha1="250f360d11dbfa49cc8669de2edd451c163fcc32" name="ABCMusic Creator by Karri Kaksonen (PD)">
+		<year>2004</year>
+	</hash>
+	<hash crc32="540e9bb7" sha1="27427ed186d034d71e100cbff5d0072a717af9e0" name="Alien Vs Predator (Prototype)">
+		<status>GoodLynx Verified Image</status>
+		<year>1993</year>
+	</hash>
+	<hash crc32="7ea33ba4" sha1="fd345bfd360a75cce6089bb38b6f3b3768c0a121" name="Anti A-Bomb Aircraft Artillery by Sampo (PD)">
+		<year>2005</year>
+	</hash>
+	<hash crc32="dfe41168" sha1="f5c7e901137093e01f6d984199619d14f3661d13" name="APB - All Points Bulletin">
+		<status>Known Bad Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="f6fb48fb" sha1="c2bf00de769895cbed03c056eb9c8fa1a7ea59ef" name="APB - All Points Bulletin">
+		<year>1990</year>
+	</hash>
+	<hash crc32="f8d32d28" sha1="8e6eddd42f5e640e853e3024bb882ea56ad7ad57" name="Awesome Golf">
+		<status>Known Bad Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="0483cd2a" sha1="74441b96ce5bf2be68945fbe93bda259f97816b7" name="Awesome Golf">
+		<year>1991</year>
+	</hash>
+	<hash crc32="ac082945" sha1="b19557246639539b3bb4799d32e6f39c691cb9eb" name="Baseball Heroes">
+		<status>Known Bad Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="033d5225" sha1="76da4856eb15c092430f1031b228b8adb24df286" name="Baseball Heroes">
+		<year>1991</year>
+	</hash>
+	<hash crc32="f4348e05" sha1="970ca391e5a64e7768cfed98d6d7c7212b4b3011" name="Basketbrawl">
+		<status>Known Bad Image</status>
+		<year>1992</year>
+	</hash>
+	<hash crc32="d0ee9038" sha1="7f5e64fe35da3c4fd217ffff99a418e0d46b9067" name="Basketbrawl">
+		<status>Overdumped Image</status>
+		<year>1992</year>
+	</hash>
+	<hash crc32="4161bb4a" sha1="46ae8e1504e2944525d535280a3ed32e0873788a" name="Basketbrawl">
+		<year>1992</year>
+	</hash>
+	<hash crc32="b331e8ec" sha1="9ff1d6e801ae48d1a5d95c8cfd95cc316fbbc360" name="Batman Returns">
+		<status>Known Bad Image</status>
+		<year>1992</year>
+	</hash>
+	<hash crc32="277f82c2" sha1="2e25b17a221d4d9598811fbf84ab0da3016f26e4" name="Batman Returns">
+		<year>1992</year>
+	</hash>
+	<hash crc32="46729ae6" sha1="987056d6c1ff07e582fd76d4e72eeaa01570a331" name="Battle Wheels (Beyond Games)">
+		<status>Overdumped Image</status>
+		<year>1993</year>
+	</hash>
+	<hash crc32="779faece" sha1="4577550d20a22cb685d51b411396d5085a852be6" name="Battle Wheels (Beyond Games)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="30fee726" sha1="fb50ddee638aa316c7eae6d50961e3b69b112c4f" name="Battlezone 2000">
+		<year>1996</year>
+	</hash>
+	<hash crc32="cd665baf" sha1="47fe08288ed86b4ef88956afe5f822f5cde536c5" name="Befok (V20010831) by Jum Hig (PD)"> </hash>
+	<hash crc32="f4205d63" sha1="10f19771b155b432e461c7f5992f322eef4190cc" name="Befok (V20021012) by Jum Hig (PD)"> </hash>
+	<hash crc32="dc1719c4" sha1="0c69bb3715235132ae006bc49f3e84aa2e935c9d" name="Bill &amp; Ted's Excellent Adventure">
+		<status>Known Bad Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="143a313e" sha1="f09ce08d93a479feaceceb79eb48b337aff49fae" name="Bill &amp; Ted's Excellent Adventure">
+		<year>1991</year>
+	</hash>
+	<hash crc32="b5143a70" sha1="c1316c24f4dfb8dbb72bfc936278efb50a0d862b" name="Blobs by Vince Marchand (PD)">
+		<year>2004</year>
+	</hash>
+	<hash crc32="1ac56ac4" sha1="083bee8a0905bdf9e588cecb462629802270cd84" name="Block Out">
+		<status>Overdumped Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="3cd75df3" sha1="ae177cf76953b7e0a56b03096bb5c9c9c9051177" name="Block Out">
+		<year>1990</year>
+	</hash>
+	<hash crc32="2eaa9bfd" sha1="3a34e1c071eb7e658a87b3613c64274a066184f4" name="Blue Lightning">
+		<status>Overdumped Image</status>
+		<year>1989</year>
+	</hash>
+	<hash crc32="daf587b1" sha1="be08076586f76db368db1769380dcbb6de2a6513" name="Blue Lightning">
+		<year>1989</year>
+	</hash>
+	<hash crc32="30becfcf" sha1="7bf12bb335656420d1bfc821f72c63f4e9276265" name="Blue Lightning (Demo)">
+		<status>Overdumped Image</status>
+		<year>1989</year>
+	</hash>
+	<hash crc32="bfe36525" sha1="57ece74ac94d65d86a960a44d9896e17b816bbde" name="Blue Lightning (Demo)">
+		<year>1989</year>
+	</hash>
+	<hash crc32="4de61871" sha1="1dc716018f074e973f8adba8c56db6b079af8611" name="Boing Demo (PD) [a1]">
+		<year>199x</year>
+	</hash>
+	<hash crc32="b0fbbde2" sha1="f17d3a9952f30e1a2a2ec16fe524a76026138e82" name="Boing Demo (PD) [a2]">
+		<year>199x</year>
+	</hash>
+	<hash crc32="b6fe3dad" sha1="f22645e3541dc57e6fd71438a7587b907229b5c4" name="Boing Demo (PD) [a3]">
+		<year>199x</year>
+	</hash>
+	<hash crc32="e3399512" sha1="a9754a866b74cffd608df6b23eaeb801fbe16054" name="Boing Demo (PD)">
+		<year>199x</year>
+	</hash>
+	<hash crc32="7a4ca631" sha1="8ed669e556a2fc997acb8ebb5f971d9a1cd24945" name="Booster by Jum Hig (PD)">
+		<year>2005</year>
+	</hash>
+	<hash crc32="ada816a5" sha1="bc9f9d248fa720b8a2ca77bd44595bc6fd6523a2" name="Booster by Jum Hig (WIP 2005-11-23) (PD)"> </hash>
+	<hash crc32="8d7e4f93" sha1="470e4357fc47ab8c8352f9e22022ef4f3c7166e4" name="Booster by Jum Hig (WIP 2005-12-04) (PD)"> </hash>
+	<hash crc32="a8fd70a2" sha1="cf2937acca62ebbbfd0871f85ab42f49f5b25679" name="Booster by Jum Hig (WIP 2005-12-28) (PD)"> </hash>
+	<hash crc32="44f39979" sha1="ad6e311e86536697fc54358b270460a020823030" name="BRK Server Installer by Bastian Schick (PD) [a1]">
+		<year>1996</year>
+	</hash>
+	<hash crc32="f693c861" sha1="84cd5f72794304cfb6b280246f7fa9a1ffdd348f" name="BRK Server Installer by Bastian Schick (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="58d5c19a" sha1="17c3ac1ceb201619688f17934f2afb5068145b0a" name="Bubble Bobble V.2 Demo (PD)">
+		<year>199x</year>
+	</hash>
+	<hash crc32="333daece" sha1="cb9f78ffb02216979a03abb66301e4d3a8f01bfe" name="Bubble Trouble">
+		<manufacturer>Telegames</manufacturer>
+		<year>1997</year>
+	</hash>
+	<hash crc32="0b2f06fc" sha1="f4ac4985519b07a658530c353de1f3bfb538751a" name="Buildings by Fadest (PD)">
+		<year>2006</year>
+	</hash>
+	<hash crc32="fbcdda49" sha1="4837058a644d0089dee2f5b434bfb6b523b16b98" name="C65 - Demo0 (PD) [a1]">
+		<year>1998</year>
+	</hash>
+	<hash crc32="c8b61fee" sha1="a7c925543738034dbb7c6148d926a84e7f458c3a" name="C65 - Demo0 (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="df22335e" sha1="95728591d16a5b35d33dedd0f08730d3706906eb" name="C65 - Demo1 (PD) [a1]">
+		<year>1998</year>
+	</hash>
+	<hash crc32="ee8a72b0" sha1="e28c6898c8f2d2fb4385dbe8cd17749539521626" name="C65 - Demo1 (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="74f0fc36" sha1="5a4e0fced65a5ec8314646fed2e942c6e91f5aef" name="C65 - Demo2 (PD) [a1]">
+		<year>1998</year>
+	</hash>
+	<hash crc32="0a761ca9" sha1="f73d10b9b6b07af3c5466ddddfee528e25cd376a" name="C65 - Demo2 (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="d41ce620" sha1="430b06ccb45e7404be7a61782a1813caea7ffa39" name="C65 - Demo3 (PD) [a1]">
+		<year>1998</year>
+	</hash>
+	<hash crc32="459d95e4" sha1="73fab579237c51614a3d6f3da4d7e5ec378eff59" name="C65 - Demo3 (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="81b703cf" sha1="8a0edede48488454811b63a2cd23085beca519ae" name="C65 - GFXtest (PD) [a1]">
+		<year>1998</year>
+	</hash>
+	<hash crc32="abb0ddcf" sha1="159662fae3de29b250bc2408370baf4e960501db" name="C65 - GFXTest (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="f4991078" sha1="248b5d43ca65a3ca65ace3f356502c059049abac" name="C65 - Mandelbrot (PD) [a1]">
+		<year>1998</year>
+	</hash>
+	<hash crc32="89af234f" sha1="54a6aa77889c628338e62ed5c26e8f547260cb8c" name="C65 - Mandelbrot (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="7acd5e23" sha1="5f5b4a8310339cd143385cd156711673a5006c07" name="C65 - Mazedemo (PD) [a1]">
+		<year>1998</year>
+	</hash>
+	<hash crc32="4e0fdcfb" sha1="de83eed180dbf827d58e0cba6493a98fa9351f57" name="C65 - Mazedemo (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="643d1c04" sha1="94f0fbbdbde5dfc68408bef3005e909f4bde8c5b" name="C65 - Minimal (PD) [a1]">
+		<year>1998</year>
+	</hash>
+	<hash crc32="40934674" sha1="23fb90601aef881ff9ce1cc300e3f38a8451297c" name="C65 - Minimal (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="fd8d6696" sha1="437eaa956677a0672b453246f94e5d8fd0a961e7" name="C65 - Sprite (PD) [a1]">
+		<year>1998</year>
+	</hash>
+	<hash crc32="af552b7e" sha1="4ce92fc172194eb4733fb85abfa4cb8ef63a3ca0" name="C65 - Sprite (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="fe50b5d0" sha1="3414d8a57eda2989aa0864fea28dfa6d81aed92f" name="California Games">
+		<status>Overdumped Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="a08f0b59" sha1="f13e010102ca527a9c393acb52bb949a1ba93e3e" name="California Games">
+		<year>1991</year>
+	</hash>
+	<hash crc32="bb987837" sha1="3b8dc51bc265653678229a9f16cc047ed0140dee" name="Cart1"> </hash>
+	<hash crc32="b0735cc2" sha1="863c0347fa0f6cbd9da7a0d4596f03c5433d9196" name="Cartshow by Matthias Domin (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="3881d3b6" sha1="e2889253e618285589fa5339fc6240c3f8322eaf" name="Cart"> </hash>
+	<hash crc32="97501709" sha1="59a5185203e3550b1cad7b28489915bc8de80851" name="Centipede (Prototype)">
+		<year>1987</year>
+		<extrainfo>ROTATE270DEGREE</extrainfo>
+		<manufacturer>Shadowsoft</manufacturer>
+	</hash>
+	<hash crc32="e185253d" sha1="91c6083cc9bd8c58b4dd8c9464444ce0f53efe98" name="Charge Field - Oooh, What is it Going to be (PD)"> </hash>
+	<hash crc32="e74c1dd4" sha1="cc3276986c888d0d4e3320ea6f6510745de2aefb" name="Charge Field 2 - Charges Animated (PD)"> </hash>
+	<hash crc32="6c3fd844" sha1="9c820244f39ec1ecf3922cd64a76dc17b6f05508" name="Charge Field 2 - Meters (PD)"> </hash>
+	<hash crc32="be7370e4" sha1="2a383d4514641b88afc6a2b6a9828580818736c9" name="Check EEPROM by Bastian Schick (PD) [a1]">
+		<year>1996</year>
+	</hash>
+	<hash crc32="9480c028" sha1="81c1e20e9a23f4bf7a27764ed09b2f21b34a92ee" name="Check EEPROM by Bastian Schick (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="1d9d8a5c" sha1="ae38dd60e5964c6cb668b1897cd265afe3cae98c" name="Checkered Flag">
+		<status>Known Bad Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="19c5a7a5" sha1="f115bb5f98992d98c8d11b1daa68bb1961b59660" name="Checkered Flag">
+		<year>1991</year>
+	</hash>
+	<hash crc32="0785c9f2" sha1="3f175c27871aaf86c640aced4b4f8fa697e2d1a6" name="Chip's Challenge">
+		<status>Overdumped Image</status>
+		<year>1989</year>
+	</hash>
+	<hash crc32="6a5f53ed" sha1="6a90e6627086e13d99bacbcaafea7ab2f6aba8a0" name="Chip's Challenge">
+		<year>1989</year>
+	</hash>
+	<hash crc32="04b7eb75" sha1="5ee3e936bac7cdcd422f0252d84ac15adc968e8d" name="Chip8 Emulator Release 1 (PD)">
+		<year>2004</year>
+	</hash>
+	<hash crc32="9bc7cc03" sha1="d4f4664a0a759668148ebba3885b2c03547da58a" name="Chip8 Emulator Release 2 (PD)">
+		<year>2004</year>
+	</hash>
+	<hash crc32="f9660e4f" sha1="676ec00a5ab459b93d3687b34b7a0afc503c397b" name="Chip8 Emulator Release 3 (PD)">
+		<year>2004</year>
+	</hash>
+	<hash crc32="e3c8a5d7" sha1="88c4e753d76dedf271839143639c57c2c40bcdf1" name="Chip8 Emulator Release 4 (PD)">
+		<year>2004</year>
+	</hash>
+	<hash crc32="eba5e33d" sha1="8b5595f0ce20e9a1bac5434798b5ab038904bce2" name="Chip8 Emulator Release 5 (PD)">
+		<year>2004</year>
+	</hash>
+	<hash crc32="5c082dab" sha1="334ae94ff62ac308f6f0d57cb021dcd585f4aad7" name="Chip8 Emulator Release 6 (PD)">
+		<year>2004</year>
+	</hash>
+	<hash crc32="897342b2" sha1="179b275e18b59b7125b295ceb742a869f9481d19" name="Choplifter by Jum Hig (PD) [a1]">
+		<year>2000</year>
+	</hash>
+	<hash crc32="180ccffc" sha1="557eff72920bb646318e8883d36535550fb7e5ac" name="Choplifter by Jum Hig (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="1ab1793e" sha1="b3eaeb14d30a832a5e84885c8f3159078f50382c" name="Chopper X by Jum Hig (PD)">
+		<year>2005</year>
+	</hash>
+	<hash crc32="57d8f49b" sha1="1bafac6679af463bebed7a37e2f158fa6419cea7" name="Circle and Tunnel Demo (PD)">
+		<year>199x</year>
+	</hash>
+	<hash crc32="596fd81a" sha1="7b50085ae3b3c41d057b1bb275362fc7eb0c0886" name="Circle Draw Test (PD)">
+		<year>199x</year>
+	</hash>
+	<hash crc32="b55e6139" sha1="39f92626bcdb34192f0f3e759d5dc72e8d4d8991" name="Circle Tunnel by Bastian Schick (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="0c752b91" sha1="4839a4d5d59479c8dd34d76e0c3773da82372363" name="Clicks! by Matthias Domin (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="7bdadd44" sha1="f0b8bf8eb0c8619562b15328fcaf04fde7e2142d" name="Clicks! Demo V6 by Matthias Domin (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="b02821fa" sha1="87b683653dfe76af02a1920582b6362ee11a3715" name="Conquest of Zow (Harry Dodgson)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="89e427da" sha1="360baf89d501b835ad73c30bd65a22e3efe7e693" name="Conquistador by Sampo (PD)"> </hash>
+	<hash crc32="a1973918" sha1="90525e062460d4d52aed4c8995a1787cc38709db" name="Crystal Mines II">
+		<status>Overdumped Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="aec474c8" sha1="3364bde38508c5c4fed5575295cc80c6f72edebe" name="Crystal Mines II">
+		<year>1990</year>
+	</hash>
+	<hash crc32="99729395" sha1="5a3a21eb5de37367d294e057f70a1f325bf23c4a" name="Daemonsgate (Prototype) (Imagitec)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="a78dcb10" sha1="3a25bafe759da112790fbecad79978bca121ae7f" name="Deep, The (PD)"> </hash>
+	<hash crc32="3908081a" sha1="2bb6455eb6bc20808b753fa6f9b839e07eeda5c3" name="Demo 1 by Bastian Schick (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="7e039cc4" sha1="26c56d098f56a1e81294b49e5021bc6dd4774ac5" name="Demo 2 by Bastian Schick (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="dc09bf2f" sha1="3e2a981af307319392f2cc486bad4774c7b01e50" name="Demo 3 by Bastian Schick (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="4e3e4cb3" sha1="d5f4ba0e82e8be405de1c6eebbd01db0efc5a519" name="Demo 4 by Bastian Schick (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="64e84bb0" sha1="6857a239d4e4323d3b925a87caefe74f4473d2d5" name="Demo 5 by Bastian Schick (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="5ecbd136" sha1="4470ca86353be2055275ee2cd4be53a18349ae7b" name="Demo 6 by Bastian Schick (PD) [a1]">
+		<year>1996</year>
+	</hash>
+	<hash crc32="0d97505d" sha1="735d8b1141f1853fa03a3ecbe156a4f6012493c1" name="Demo 6 by Bastian Schick (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="0120eac4" sha1="8986c2039bc9f051cf036c8e8dff873acc2a94f3" name="Desert Strike - Return to the Gulf">
+		<status>Known Bad Image</status>
+		<year>1993</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="b9ac1fe5" sha1="3149d8ba5661fd61dc94d518a0cb6d7b3a8f319f" name="Desert Strike - Return to the Gulf">
+		<year>1993</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="777f45da" sha1="727ab4bd8311e60d0939c56ed51ece1c7bfc5291" name="Diaporama (Slideshow) (PD)"> </hash>
+	<hash crc32="a8e505e5" sha1="b652720e3b6e07d7f31f798c8e7330bc4e59b994" name="Digidemo 2 Bastian Schick (PD)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="2f54810d" sha1="7c25ff52f97120951785bd44a109a3a0816e2e3a" name="Digidemo by Bastian Schick (PD)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="ea6c6d7b" sha1="572a512b4eedce2e59c0c39faf83b54c9d72a50e" name="Dinolympics">
+		<status>Known Bad Image</status>
+		<year>1992</year>
+	</hash>
+	<hash crc32="50386cfa" sha1="0dad2286934c6a317407db066f00233c27f54bbe" name="Dinolympics">
+		<year>1992</year>
+	</hash>
+	<hash crc32="7b641963" sha1="6fb1382a9b9355f33e01b923fabd35990193b821" name="Dirty Larry - Renegade Cop">
+		<status>Known Bad Image</status>
+		<year>1992</year>
+	</hash>
+	<hash crc32="d565fbb7" sha1="ca856dc880663d7f105ae5aa2ff160b9fc209f92" name="Dirty Larry - Renegade Cop">
+		<year>1992</year>
+	</hash>
+	<hash crc32="c18169f7" sha1="b3f8d50d21de06686ea79a8b3e62ba044b6e5fd2" name="Double Dragon">
+		<status>Known Bad Image</status>
+		<year>1993</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="fbfc0f05" sha1="7fc3663bec878b138cfc51f14154823f9701c9e7" name="Double Dragon">
+		<year>1993</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="761ccd17" sha1="00eb0c4891f2e69febbeba89eb8ae76c7e796104" name="Dracula - The Undead">
+		<status>Known Bad Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="33bb74c7" sha1="8f393f0fa8ce832e6298db72f539ce4b961700e2" name="Dracula - The Undead">
+		<year>1991</year>
+	</hash>
+	<hash crc32="5598a4c9" sha1="fc802b8b6a62312e6f68065881d0e4f23a967451" name="Dragnet Music by Bastian Schick">
+		<year>1995</year>
+	</hash>
+	<hash crc32="cb4f387e" sha1="530cbeef8114ba732a235e3f590720e72ca0e2ba" name="Drawtest by Bastian Schick (PD)">
+		<year>199x</year>
+	</hash>
+	<hash crc32="5f61183e" sha1="516d7ce4455acfef25d11d0d24ad407b7d97f11e" name="Dungeon, The V.0x by Matthias Domin (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="4db4228e" sha1="79a7990d984edf4827218618d78d89876151c4a5" name="Dungeon, The V.11 by Matthias Domin (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="099c5b86" sha1="ce08121203ad80b540767ffc910d202ab736085c" name="Dungeon, The V.12 by Matthias Domin (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="e5d57a21" sha1="c95967aeefbeff0b8f9cde6acd90d7307b849272" name="Dynalynx v0.4 by Bjoern Spruck (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="c2e14e9d" sha1="7e9266fa0c7b01b2fe7cdc318305a08fca61a9b1" name="EEPROM Test I2C (PD)">
+		<year>199x</year>
+	</hash>
+	<hash crc32="44ee8069" sha1="03167cec65fe4f2329f2fe09a3b009ee3c651ce0" name="Electrocop">
+		<status>Overdumped Image</status>
+		<year>1989</year>
+	</hash>
+	<hash crc32="bd97116b" sha1="5bd6614bc98a882ec2f465278fe4f1ed6a4e972b" name="Electrocop">
+		<year>1989</year>
+	</hash>
+	<hash crc32="49d2eb22" sha1="06e134459ca045ba5554031c1e7dc141777558a9" name="European Soccer Challenge">
+		<status>Overdumped Image</status>
+		<year>1993</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="f83397f9" sha1="f1d0390a36055ef2b7cb5f7ce44f622a63d82e80" name="European Soccer Challenge">
+		<year>1993</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="6bceaa9c" sha1="65c0517a59e0e93bad91245ee8085b3483428707" name="Eye of the Beholder (Prototype) (NuFX)">
+		<year>1990</year>
+	</hash>
+	<hash crc32="9034ee27" sha1="766ed1a28528535338e176559a145afaffacf3ef" name="Fat Bobby">
+		<year>1997</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="b8f9be69" sha1="b2824e4c4563c54efca19eea650cd26dcbab04aa" name="Fidelity Ultimate Chess Challenge, The">
+		<status>Overdumped Image</status>
+		<year>1991</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="7e4b5945" sha1="f6afa50f161fffe5975cf5688a9314b8039d940f" name="Fidelity Ultimate Chess Challenge, The">
+		<year>1991</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="c3b03180" sha1="0be8892edef21e2279d87e1a74b478f3aaf35c2a" name="Fighter V.2 Demo by Vick (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="6b4e7aec" sha1="efec025ae9d3d1a5ba266c0122debc62c9ac8fcf" name="Fighter V.2 Demo by Vick (PD) [a1]">
+		<year>2002</year>
+	</hash>
+	<hash crc32="2566cae3" sha1="a336c5f7e47b57a71972f35fe38034942cc0e068" name="Fire (Fever) Demo by Bastian Schick (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="0dfe568f" sha1="8bd39069e09e857cb69b48ed6b3b7153cc94277b" name="Font Test 2 by Bastian Schick (PD) [a1]">
+		<year>199x</year>
+	</hash>
+	<hash crc32="20dbe5a2" sha1="c718146838793f144cf0bdce6b155b2dadd42bc3" name="Font Test 2 by Bastian Schick (PD)">
+		<year>199x</year>
+	</hash>
+	<hash crc32="d0514175" sha1="260fa337d97a5106001e3110aae2729ae0d5279d" name="Gates of Zendocon, The">
+		<status>Overdumped Image</status>
+		<year>1989</year>
+	</hash>
+	<hash crc32="494cc568" sha1="4eb4d3eb29231b2e36d8ef6ede64a568f469c5fe" name="Gates of Zendocon, The">
+		<year>1989</year>
+	</hash>
+	<hash crc32="ac564baa" sha1="2c3cfe49670f395626de4c9f9fab7a6f42d99c87" name="Gauntlet - The Third Encounter">
+		<status>Overdumped Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="7f0ec7ad" sha1="41d27f0717a93d05a9d3d1110f571f791d330f55" name="Gauntlet - The Third Encounter">
+		<year>1990</year>
+		<extrainfo>ROTATE90DEGREE</extrainfo>
+	</hash>
+	<hash crc32="fdfaf35e" sha1="4b970c50b60fb8bbcf1901b19ecd4b2154438ead" name="Ghouls 'n' Ghosts Plus V.2 Demo (PD)">
+		<year>199x</year>
+	</hash>
+	<hash crc32="bb955876" sha1="42ca2a6d1b3b69bc8911683078e264b339baf86a" name="Gnop V0.4SE (PD)"> </hash>
+	<hash crc32="e42680b4" sha1="6760eeaeb499a8d6c3db3ffc726bbcb3e0e37075" name="Gnop V0.6 (PD)"> </hash>
+	<hash crc32="eabd3210" sha1="cb535c87bff3a23a638b9f4a54cee3437744db19" name="Gordo 106 - The Mutated Lab Monkey">
+		<status>Known Bad Image</status>
+		<year>1993</year>
+	</hash>
+	<hash crc32="6d778383" sha1="1c84dcae88049c830dab7776889d48bbe291d132" name="Gordo 106 - The Mutated Lab Monkey">
+		<status>Known Bad Image</status>
+		<year>1993</year>
+	</hash>
+	<hash crc32="d20a85fc" sha1="298163cf4355d0e8aaba264cd7dcd828b1fc6bec" name="Gordo 106 - The Mutated Lab Monkey">
+		<year>1993</year>
+	</hash>
+	<hash crc32="c1b9e2a6" sha1="19eccd97a0e60b35f8f0a17346741c709966c9a8" name="Gotballs by Rajah Lone (Cart) (PD)">
+		<year>2005</year>
+	</hash>
+	<hash crc32="7ab501d4" sha1="b72274394a9b23c9d844abed46245e5146bc63a1" name="Gotballs by Rajah Lone (PD)">
+		<year>2005</year>
+	</hash>
+	<hash crc32="40e1a89d" sha1="6b0426524afa49d6f55989a830cfb894c1121610" name="Gravitar Physics Tech Demo by Jum Hig (PD)">
+		<year>2005</year>
+	</hash>
+	<hash crc32="b7bcae2e" sha1="075cd3548952d48342b6baf17a1bac5e032d6999" name="gwn_demo"> </hash>
+	<hash crc32="11db83c2" sha1="63d449f96a74555113716f2df7ad8af7b3e9ecc0" name="Hallo Welt! 2 by Bjoern Spruck (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="be82ced1" sha1="471845d081212230e04e21ee2c100a0a318e3c08" name="Hallo Welt! by Bjoern Spruck (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="6dcc5c79" sha1="e0a6a493a77d874ad647b012be800420839ac1a5" name="Hard Drivin'">
+		<status>Overdumped Image</status>
+		<year>1993</year>
+	</hash>
+	<hash crc32="6df63834" sha1="6d33abd50d46f900e8762d6e64b51e647ea98b07" name="Hard Drivin'">
+		<year>1993</year>
+	</hash>
+	<hash crc32="a96b08ba" sha1="9680566b18a1ebb43f185f178abf0f20eac0e6d9" name="Hockey">
+		<status>Known Bad Image</status>
+		<year>1992</year>
+	</hash>
+	<hash crc32="e8b45707" sha1="707af2b63c75b777ec519b63f0b8e86565356357" name="Hockey">
+		<year>1992</year>
+	</hash>
+	<hash crc32="04eec3d9" sha1="f5be4dc22112488ebfb6d7723aa98d041825c9f9" name="Hydra">
+		<status>Known Bad Image</status>
+		<year>1992</year>
+	</hash>
+	<hash crc32="e3041c6c" sha1="fc0c7cabf3a2ee821f7441b71d19d52205f97721" name="Hydra">
+		<year>1992</year>
+	</hash>
+	<hash crc32="de7e2d22" sha1="146ca183ab4c68b9d31fcccd54a333e00a3ccba3" name="I2C EEPROM Test by Bastian Schick (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="49169b17" sha1="ca083c7ea94cb663638235cc8d01bcf02daa926d" name="Insert Game Screen by Bastian Schick (PD)">
+		<year>199x</year>
+	</hash>
+	<hash crc32="63863be6" sha1="5b3210d5416799e1b440fd01234926803bf7fbf4" name="IRQ Test by Bastian Schick (PD) [a1]">
+		<year>1998</year>
+	</hash>
+	<hash crc32="0a8c01b9" sha1="f69d8fba72fa91aa3c032edc0b8122d23ba81b93" name="IRQ Test by Bastian Schick (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="d80e7d52" sha1="9aa4b613d09585d7f442571d652d15231b56fa82" name="Ishido - The Way of the Stones">
+		<status>Overdumped Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="5cf8bbf0" sha1="78c295af3a57b5bd7d7e1d13ab13ad67885c4e89" name="Ishido - The Way of the Stones">
+		<year>1991</year>
+	</hash>
+	<hash crc32="19bf94fe" sha1="7653c2fa0087e21bf040f82d5eaacc1f74225bbd" name="JellyBeans by Chris Martin (2005-08-24) (PD)"> </hash>
+	<hash crc32="bc3b9bb7" sha1="02eafe5b3dd9a3762222e327c6bd5f9ed946c84f" name="Jimmy Conners Tennis">
+		<status>Known Bad Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="03af03c6" sha1="1a5cef8032b51797a87b53ea5fc1bff0ec5a6412" name="Jimmy Conners Tennis">
+		<status>Known Bad Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="2455b6cf" sha1="d9c4220653b2dfbd6b26c0a0c81c40cb3108ee85" name="Jimmy Conners Tennis">
+		<year>1991</year>
+	</hash>
+	<hash crc32="f4ae42a1" sha1="21685cb38dd94afd80cbf40cc165464c111ba674" name="Joust (Williams)">
+		<status>Overdumped Image</status>
+		<year>1993</year>
+	</hash>
+	<hash crc32="5dba792a" sha1="ead01f532bcaf535065dfd66b26d04b484d0066e" name="Joust (Williams)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="2cb272d9" sha1="b3e697b47cbc52d41b21efcf3c82da3f1e3f82fb" name="JumTro #1 by Jum Hig (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="7439c453" sha1="aa1698f6f486f5597674dc1fe6391da13bebb138" name="Karateboy - MiniDemo by Sampo (PD)"> </hash>
+	<hash crc32="6a56a0b2" sha1="f0b5926f60f83fa61d1283257bc8b041aec75648" name="Kistenschieben v0.2 by Bjoern Spruck (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="eebadbe6" sha1="33b00526f6a1d4083073949e49f84cc38475ed8d" name="Klax">
+		<status>Known Bad Image</status>
+		<year>1990</year>
+		<extrainfo>ROTATE90DEGREE</extrainfo>
+	</hash>
+	<hash crc32="a53649f1" sha1="a1d2dc0771f4a30e539ab3261a21cc71adc71550" name="Klax">
+		<year>1990</year>
+		<extrainfo>ROTATE90DEGREE</extrainfo>
+	</hash>
+	<hash crc32="af76e804" sha1="24b17bfb82efbafdf523240fda055bdcb66cee15" name="Knight Moves by Cooper (PD)"> </hash>
+	<hash crc32="7d15ff9c" sha1="8007ee189980b33ece9dccd9bcd25a150efb9644" name="Knightmare - MiniDemo by Sampo (PD)"> </hash>
+	<hash crc32="967ca345" sha1="41e244e4f4ac0a1fbe1797e524ade545fe2668bf" name="Krazy Ace Minature Golf">
+		<status>Known Bad Image</status>
+		<year>1997</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="fb562789" sha1="8c458a9f0361c2f715bf2a063881650e1e104a65" name="Krazy Ace Minature Golf">
+		<status>Known Bad Image</status>
+		<year>1997</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="8146beda" sha1="92543e5180368a167ce84033cd882157f7763e5e" name="Krazy Ace Minature Golf">
+		<status>Known Bad Image</status>
+		<year>1997</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="bed5ba2b" sha1="20e9011c922f06d9c8823f15c71e005ac2268295" name="Krazy Ace Minature Golf">
+		<year>1997</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="542659fd" sha1="7510beca1063966e0c93a3f478f08748f0700939" name="Kung Food">
+		<status>Known Bad Image</status>
+		<year>1992</year>
+	</hash>
+	<hash crc32="cd1bd405" sha1="ae1bd18b30dd9ae67472c4c532f4d65d23324555" name="Kung Food">
+		<year>1992</year>
+	</hash>
+	<hash crc32="30f010ab" sha1="8ef8a37ae6f703578b3f43494ca931fbc7e3571e" name="Lemmings">
+		<status>Known Bad Image</status>
+		<year>1993</year>
+	</hash>
+	<hash crc32="39b9b8cc" sha1="4d430b1aacf207a631f81b2089688b82267d0394" name="Lemmings">
+		<year>1993</year>
+	</hash>
+	<hash crc32="0271b6e9" sha1="b973cee4a58dbae5ab2d540b38db90aae78ba323" name="Lexis (Songbird Productions)">
+		<year>1999</year>
+		<extrainfo>ROTATE270DEGREE</extrainfo>
+	</hash>
+	<hash crc32="4e36a035" sha1="03da1e1d9703a7e7f795873f62d009f86e1603a5" name="Lite (Fever) by Bastian Schick (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="d7130b2e" sha1="f35b1d0ac0a2a52039cb24f5d8d74f17938df94c" name="Lode Runner (Kurt Olsen)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="01a7609b" sha1="5f29576dde33fbb74b8d141053012319327d7764" name="Logon by Bastian Schick (PD) [a1]">
+		<year>1996</year>
+	</hash>
+	<hash crc32="e2c4a044" sha1="c2e0849453a50605c2f910a7867ed3829c4c3860" name="Logon by Bastian Schick (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="b1c25ef1" sha1="b43b0841a5d315d8e515ceaece29875ba6f9afbb" name="Loopz (Prototype) (Handmade Software)">
+		<year>1992</year>
+	</hash>
+	<hash crc32="913a2f72" sha1="5d8aa7862c55223988d20985fa7cc0e50bd189dd" name="Lunar by Fadest (PD)">
+		<year>2004</year>
+	</hash>
+	<hash crc32="848e2817" sha1="8d1800863a451fcf0fd7f7acc465385276c0bf29" name="Lynx Cart Demo 1.1"> </hash>
+	<hash crc32="cfd6e1c8" sha1="f16e290eeeb7f4f52deed0a3f2015d76cf64a6b7" name="Lynx Casino">
+		<status>Known Bad Image</status>
+		<year>1992</year>
+	</hash>
+	<hash crc32="1091a268" sha1="4b82a9bc02330c9213c2bbd74d547d520c4e6fa3" name="Lynx Casino">
+		<year>1992</year>
+	</hash>
+	<hash crc32="5a20efde" sha1="83cc7e96cbf1c746dbaadeb0d7247c2cd714132f" name="Lynx HiColor Testprograms - Bali 2 by Bjoern Spruck (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="6c6b2fa3" sha1="ba988cdbb4fd34512035faae06e26211435100fc" name="Lynx HiColor Testprograms - Cape 4 by Bjoern Spruck (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="264a785c" sha1="8e814366b9098665e34cb62a9c0f6a1e0b480d82" name="Lynx HiColor Testprograms - Devoe Cosmos Tea by Bjoern Spruck (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="3a2f3391" sha1="4dd8375add53513aaef7e876209a3691e45a3e3d" name="Lynx HiColor Testprograms - Disney by Bjoern Spruck (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="337f8ff7" sha1="98b7c2875c7fad18637cdcb872000f07bec26a8b" name="Lynx HiColor Testprograms - Dolphin by Bjoern Spruck (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="9db22476" sha1="c12ec25b5ee4b46833c37202c3e52631f3249ade" name="Lynx HiColor Testprograms - Fruit Basket by Bjoern Spruck (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="7a3b12a5" sha1="f7996ba03fe890688b3ef1d79dbdeff9984d927b" name="Lynx HiColor Testprograms - Kimura by Bjoern Spruck (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="ec56210a" sha1="fc8a8f043b964d6a8a7a8fece126eea3cb7e0a27" name="Lynx HiColor Testprograms - Seastars by Bjoern Spruck (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="e918269d" sha1="23e7a64c4ec398083049906ac2fd7867fb147c42" name="Lynx HiColor Testprograms - Shore by Bjoern Spruck (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="9a02e95b" sha1="ca5e6695b8e9b2b892ca14c8d89589afa1779c4e" name="Lynx HiColor Testprograms - Shuttle by Bjoern Spruck (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="ed631f51" sha1="29fff686238bcdbed9b8bce84f9f35f6f7741eae" name="Lynx HiColor Testprograms - The End by Bjoern Spruck (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="28ada019" sha1="c0d35fcfac44437cf3d6d56e6f8cea0dcb12a296" name="Lynx II Production Diagnostic Cart V0.02">
+		<year>1989</year>
+	</hash>
+	<hash crc32="8abead65" sha1="19af489f1eb625d4eb894f9434725356a3f90e5b" name="Lynx Lib Test Program by Matthias Domin (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="faab8285" sha1="e5411fc41d3588b0ef8a2aadbc5b8e70a4a7a3bc" name="Lynx Reloaded Demo by Bjoern Spruck (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="09a5d4e2" sha1="05a754355f4ef3c5a165e306c182a0418cb3f345" name="Lynx Tris (2005-04-11a) by Anata (PD)"> </hash>
+	<hash crc32="9bae6929" sha1="ee0ee6975117228003794844682f1f605162a5c6" name="Malibu Bikini Volleyball">
+		<status>Known Bad Image</status>
+		<year>1993</year>
+	</hash>
+	<hash crc32="aba6da3d" sha1="9c3d8037d347c0ff23d941eff8b575a4f2f051da" name="Malibu Bikini Volleyball">
+		<year>1993</year>
+	</hash>
+	<hash crc32="c96bedc6" sha1="5d6640ff4f460d4ca16ecd5206797789799ee0cb" name="MandelBrot Demo by Bastian Schick (PD) [a1]">
+		<year>1996</year>
+	</hash>
+	<hash crc32="146d9fb9" sha1="b6a6d12808bb0a11445ede3b3399d234b4d38f4d" name="MandelBrot Demo by Bastian Schick (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="ccaf3d49" sha1="6b42c0a37b0c23e1fd84f69c9ebcffd7d72fd755" name="Marble Madness by Matthias Domin (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="323af126" sha1="d1df1ed83e99c382ba5f5c36168ed9b9eb1436cc" name="Marble Madness by Matthias Domin (PD)">
+		<year>1999</year>
+	</hash>
+	<hash crc32="f77f615f" sha1="eb6a5cabafc7d397b5e9d8a0ac53af5c452bde6e" name="Mario Plus Demo (PD)">
+		<year>199x</year>
+	</hash>
+	<hash crc32="c3fa0d4d" sha1="26b18b706359b093d0b1bbca4dba9cd2d73e0372" name="Marlboro Go! (Demo) (Digital Image)">
+		<year>1993</year>
+	</hash>
+	<hash crc32="0b8159ec" sha1="ec233b3f144c64d69ca2c4d23afc1413222a171d" name="Mega Man Plus Demo (PD)">
+		<year>199x</year>
+	</hash>
+	<hash crc32="9df09761" sha1="51517a54e09331d44d4bb7e1294da5671990a2d3" name="Micro Font Data by Bastian Schick (PD)">
+		<year>1999</year>
+	</hash>
+	<hash crc32="64ff0cad" sha1="4a9f8afd7e0ccbf769ee926328f78390b220beae" name="Micro Font Dumper by Bastian Schick (PD)">
+		<year>199x</year>
+	</hash>
+	<hash crc32="e72a72a4" sha1="12b33305ceb0f92ed65a88cacf60d7f2ffe474a6" name="Mines 2 by Bastian Schick (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="12b2d022" sha1="b45a80fbf4665524fe846695680db6c26ed76284" name="Mini Demo 01 by Bastian Schick (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="d439de0a" sha1="ea8f715248a8d9e324cfcbe1289d944987572598" name="Mini Demo 02 by Bastian Schick (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="db97e256" sha1="f3e50ce0e37032f9becc9ac63477ce892f2abf79" name="Mini Demo 03 by Bastian Schick (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="d3993971" sha1="f49c1e4d290a81f3bf3160b54a86203d2eaa1660" name="Mini Demo 04 by Bastian Schick (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="82d5d0df" sha1="5361491aad7a75c4c1960975c3c6750ce3f933fa" name="Mini Demo 05 by Bastian Schick (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="6907bf82" sha1="5bd0611424996dedfe0a153ad66569a1e5dc7ea9" name="Mini Demo 06 by Bastian Schick (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="e817921a" sha1="91f6d737cc7cec5fc366aefefc9bfb8fe3358654" name="minimal"> </hash>
+	<hash crc32="9a068a2b" sha1="f61e6f150873cd0e2ff2358daaaf841a734696ed" name="Moon Runner (V20000821) by Jum Hig (PD)"> </hash>
+	<hash crc32="f50be596" sha1="b1e47fa27d0f50ce6cc0b1f7a683c2cffc24102b" name="Moon Runner (V20000829) by Jum Hig (PD)"> </hash>
+	<hash crc32="8ab01683" sha1="e4c63099bcdd1618e8fa96839aebaaa7325c6bad" name="Ms. Pac-Man">
+		<status>Known Bad Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="34f4b5ab" sha1="1a14aa39247e9c53479ba45967480a2b7c140e3c" name="Ms. Pac-Man">
+		<status>Overdumped Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="7de3783a" sha1="ff644034cd840f8c13b643c44ec2c685290e0326" name="Ms. Pac-Man">
+		<year>1990</year>
+	</hash>
+	<hash crc32="00206e3f" sha1="493cb924659a3967d4739f77d3e09d121b0bb0dc" name="Multi Pong 1K 1Player by Bjoern Spruck (Sep 07 2002) (PD)"> </hash>
+	<hash crc32="f79c4b9f" sha1="c9a504e899e54c967d3a2304ad2ad0436c836e58" name="Multi Pong 1K 1Player UPDATED by Bjoern Spruck (Sep 15 2002) (PD)"> </hash>
+	<hash crc32="fed3a5b8" sha1="34b065551f503f3c871690bf4d4cde9b12600920" name="Multi Pong 1K 2Player UPDATED by Bjoern Spruck (Sep 15 2002) (PD)"> </hash>
+	<hash crc32="68451aea" sha1="63086973aa742ed7b96f1c1346d31efd883c1298" name="Multicart Demo by Bjoern Spruck (PD)"> </hash>
+	<hash crc32="685375cf" sha1="f5cfe999390531e0ff78c55dfedeb3f1586a45bd" name="NFL Football">
+		<status>Known Bad Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="006fd398" sha1="caea445bddcf75bcbe13920718279220d1acb869" name="NFL Football">
+		<year>1990</year>
+		<extrainfo>ROTATE270DEGREE</extrainfo>
+	</hash>
+	<hash crc32="e54b48ba" sha1="104bcedc99c97e750b1eaa78d2d2f2749bce8b46" name="Ninja Gaiden">
+		<status>Known Bad Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="22d47d51" sha1="a40b5dabff9c2f6114fdbc587c72312704d7fabb" name="Ninja Gaiden">
+		<year>1990</year>
+	</hash>
+	<hash crc32="995f1eb3" sha1="4810d8bf3bab4edaaf491808bae600460df25964" name="Ninja Gaiden III - The Ancient Ship of Doom">
+		<status>Known Bad Image</status>
+		<year>1993</year>
+	</hash>
+	<hash crc32="a955faef" sha1="fe9a3055938c424146e9fdcbb747e71c1cf38d23" name="Ninja Gaiden III - The Ancient Ship of Doom">
+		<status>Known Bad Image</status>
+		<year>1993</year>
+	</hash>
+	<hash crc32="f3e3f811" sha1="37861cc3025d9addbace8d07c8f65961cba29eaa" name="Ninja Gaiden III - The Ancient Ship of Doom">
+		<year>1993</year>
+	</hash>
+	<hash crc32="294065df" sha1="e760a5b230204aa706e214a141185ef8c1b08031" name="Othello by FagEmul (Cart) (PD)"> </hash>
+	<hash crc32="85a05208" sha1="550a529dc2e3b52b586446398b8b44ef85f5d112" name="Othello by FagEmul (PD)"> </hash>
+	<hash crc32="4e0e3709" sha1="a70e295813f37ed6c15b88e3cb58b60d8c2ae24f" name="Ottelo by Karri Kaksonen (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="769d9ed0" sha1="7cadbceab76c2b5a84c3d0f740a8323a9b7b9c6d" name="Pac-Land">
+		<status>Overdumped Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="aa50dd22" sha1="58b57835703e3145a54e1c0ada38c9218bf4cd3d" name="Pac-Land">
+		<year>1991</year>
+	</hash>
+	<hash crc32="fa5d747a" sha1="942af94f9e5f5d26c841e7c0b4b1c5f7850a027b" name="Palette Demo by Vince (PD)"> </hash>
+	<hash crc32="c32dff68" sha1="358069baeaff6bf89ad9b1c13b3271be7c7a734a" name="Paperboy">
+		<status>Overdumped Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="4cdfbd57" sha1="537bae2c336dc9925f10505d4040965ca7434f5d" name="Paperboy">
+		<year>1990</year>
+	</hash>
+	<hash crc32="a7720568" sha1="c4661a041e50eafc9df1e4ada69d20fb66bfefcc" name="Para Lemi! v001 (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="bb76902e" sha1="a6e7cc7f04604eeae0ca01dc723cd5a4b54c57de" name="Para Lemi! v002 (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="3fe25576" sha1="6c5b62e2254c8bfd63133044012952f8735efbca" name="Para Lemi! v003 (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="3a7e4286" sha1="34ac487e0a65455e7b5b48c76b04d16618fd28ae" name="Para Lemi! v004 (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="ddc6bfff" sha1="90b77d719097375044c759f2ef4b48b344162950" name="Para Lemi! v005 (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="775fb8cc" sha1="84f416f37d175aedb7a99edd5b801041d89c0d8c" name="Paraply - MiniDemo by Sampo (PD)"> </hash>
+	<hash crc32="9b8eefd1" sha1="59843b31d37a5f2e0b58f7031a101cad1c3e54b3" name="Peugeot Video (from Taxi Movie) by Pastel Spirits (PD)">
+		<year>2005</year>
+	</hash>
+	<hash crc32="81da358f" sha1="86e4031266589dcb5312869a92058ac348f970db" name="Pinball Jam">
+		<status>Known Bad Image</status>
+		<year>1992</year>
+	</hash>
+	<hash crc32="14d38ca7" sha1="d9f911dc35a6b70ba38569d47c96da25ffc7f40e" name="Pinball Jam">
+		<year>1992</year>
+	</hash>
+	<hash crc32="6da7cc00" sha1="2239004b1f8f63595eb65f0bcfa74d740d497c5f" name="Pit Fighter - The Ultimate Competition">
+		<status>Known Bad Image</status>
+		<year>1992</year>
+	</hash>
+	<hash crc32="2393135f" sha1="30f8c7acf41a988578768b251e88b636462752cb" name="Pit Fighter - The Ultimate Competition">
+		<year>1992</year>
+	</hash>
+	<hash crc32="8e5f5668" sha1="807881a56056a9f6db1f18430001e91b1f80d463" name="Play Sound Sample by Bastian Schick (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="abe31d44" sha1="d61b442abb88a137c1d3b9777f3a0c1eef61a70b" name="Poker by Pastel Spirits (2005-06-20_256K) (PD)"> </hash>
+	<hash crc32="739e487a" sha1="7674ac6eabdc77f45729de154b2f9f11fe911cc1" name="Poker by Pastel Spirits (2005-06-20_512K) (PD)"> </hash>
+	<hash crc32="4be4b47d" sha1="f7a8e86c6c26c15b86afe9b1dabd96c2875e36db" name="Poker by Pastel Spirits (Cart) (PD)"> </hash>
+	<hash crc32="bad2c0df" sha1="f613dcdc922f767ba8f23ba54cc4dffbe3b40d44" name="Poker by Pastel Spirits (PD)"> </hash>
+	<hash crc32="912cc792" sha1="817f9ae4bd1c4ec037252a2c4be234d98e24b0a5" name="Poker Game (2005-06-20)"> </hash>
+	<hash crc32="fe2b6f24" sha1="1534639f0656dd1446ebb5a4975b0e941e089aa5" name="Poker Game (2005-07-10)"> </hash>
+	<hash crc32="b5022b5d" sha1="7259f1d73273a9fd391ac4ff63d6a4af88b695dd" name="Poker Game 256 (2005-07-10)"> </hash>
+	<hash crc32="9b45b340" sha1="b801d4bb5b4c6fc02180dc9f3749ddfeb78d1a49" name="Poker Game 512 (2005-07-10)"> </hash>
+	<hash crc32="35b2f84d" sha1="fb2fb2f6599220a48b37584735e9e9514506f441" name="Pong 4 Fun v2.0 by Bjoern Spruck (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="50122588" sha1="4cebb31f1cb59a87265f9eff1165224b3ecd2581" name="Pong5 by Carl Forhan (PD) [a1]">
+		<year>1997</year>
+	</hash>
+	<hash crc32="11c2f2d2" sha1="8644d2117a816c1d47d2c35e70f4cc5a7fac9a12" name="Pong5 by Carl Forhan (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="147fa7de" sha1="ae1bcc4ab3765aeb8111e9df8de8d0f772b89b15" name="Power Factor">
+		<status>Known Bad Image</status>
+		<year>1992</year>
+	</hash>
+	<hash crc32="99c42034" sha1="1ad5386f43f60d848a40ee1237e5bd153faea23f" name="Power Factor">
+		<year>1992</year>
+	</hash>
+	<hash crc32="82ee29b0" sha1="a7cd48d75a9bb34181900990a3f7216f461e5a8d" name="Puyo Puyo (PD)"> </hash>
+	<hash crc32="1eddd774" sha1="85297cac16b8bdaf2d90034dc600147acd4fd6f3" name="Puyo Puyo 2 (PD)"> </hash>
+	<hash crc32="75ad1173" sha1="188fb8d05047e821e8efb9d38b540a7c27fc8ae6" name="Puzzler 2000 - Air BGM by Markus Wuhl (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="1d508899" sha1="276ab0e3bc6202e08672358f13b2b71701ed6cb1" name="Puzzler 2000 - Entertainer BGM by Markus Wuhl (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="4affe501" sha1="eca32e6a4f4c625c2248d2dcea33165722af9a7a" name="Puzzler 2000 - Invent13 BGM by Markus Wuhl (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="f6f43c87" sha1="5c909b705b594b7cf8c7db940079d73c6b40ead3" name="Puzzler 2000 V.43 by Markus Wuhl (Aug 26) (PD)">
+		<year>1998</year>
+		<extrainfo>ROTATE270DEGREE</extrainfo>
+	</hash>
+	<hash crc32="811717a7" sha1="cb8f0d2d4376d1f43e90dcbb2855d9ab344b227c" name="Puzzler 2000 V.4x by Markus Wuhl (Aug 15) (PD)">
+		<year>1998</year>
+		<extrainfo>ROTATE270DEGREE</extrainfo>
+	</hash>
+	<hash crc32="4ed4e861" sha1="d569e17ddf94075bbd5263a9ed3aef7d6e5e4865" name="Puzzler 2000 V0.2 Demo by Markus Wuhl (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="9b5c4627" sha1="585a441d7f6e287604fcb6e8205e71906e36836e" name="Qix">
+		<status>Overdumped Image</status>
+		<year>1991</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="b9881423" sha1="30b8369ea396347d4847990691d880c313aacae7" name="Qix">
+		<year>1991</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="bcd10c3a" sha1="df48f69a7257a40844812e5b0bda9efdf093b7f6" name="Raiden">
+		<year>1997</year>
+		<extrainfo>ROTATE270DEGREE</extrainfo>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="7f139864" sha1="506fc06487dac325ddbf1e9b648eeeb44e1e64c2" name="Rampage">
+		<status>Known Bad Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="b10b7c8e" sha1="771dbf246386da37670324d34066671f3f43ac0e" name="Rampage">
+		<year>1991</year>
+	</hash>
+	<hash crc32="926a6f25" sha1="7421bd585c352f5470d9b25095bc406999008570" name="Rampart">
+		<status>Known Bad Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="139f301d" sha1="3c3a0729bb4ddecf5e5fd2d9ced4671d2e0e702e" name="Rampart">
+		<year>1991</year>
+	</hash>
+	<hash crc32="22ae9ce0" sha1="91b21f1bc283f7853c99be7ce93e9be587d72ac2" name="Rapide Racer by FagEmul (Cart) (PD)"> </hash>
+	<hash crc32="ebfc06c3" sha1="58ba31a6a1536e433589e4a5ec8e0186f9930b11" name="Rapide Racer by FagEmul (PD)"> </hash>
+	<hash crc32="293f9dec" sha1="cb20f876bcc56134c9fca36e43c739386079af6b" name="Raw by Bastian Schick (PD) [a1]">
+		<year>1997</year>
+	</hash>
+	<hash crc32="464b33b2" sha1="5730481eb726832f6039551f4de122baf6775f96" name="Raw by Bastian Schick (PD) [a2]">
+		<year>1997</year>
+	</hash>
+	<hash crc32="fdfea9da" sha1="33eed7ed3e93e8bba947cbd64ad73f4b0cf69d9a" name="Raw by Bastian Schick (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="9ee43b08" sha1="6945631580dca0760fa09dc0166ba30ecab850f0" name="Raycast Corridor by Matthias Domin (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="889ec57e" sha1="36c254c1eeee67cbfee54caf5bea7de98f9e2672" name="Remnant Planar Wars 3D Beta by Songbird (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="3c5309ea" sha1="9fab1f061926b1c0fb1d3d63fcddb9817751a8ee" name="Return of the Space Coyote, The (20060624) (PD)"> </hash>
+	<hash crc32="69959a3b" sha1="63978dfd86782acc101266d7bab8677e32d7ea8f" name="Road Riot 4WD (Beta)">
+		<year>1994</year>
+	</hash>
+	<hash crc32="1e9c3cd1" sha1="069f8821bce364e1d475a5c6c0c35dcda308d379" name="RoadBlasters">
+		<status>Known Bad Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="6867e80c" sha1="20233381f12a48bc61b2c4b7a8f602a2c8ebc8ba" name="RoadBlasters">
+		<year>1990</year>
+	</hash>
+	<hash crc32="d8569327" sha1="2a5c1daa094110c4367e236ddb706b701579fd6b" name="Robo-Squash">
+		<status>Overdumped Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="d1dff2b2" sha1="144e4aa67babc8f3e24c5547f8664c3c6cff8601" name="Robo-Squash">
+		<year>1990</year>
+	</hash>
+	<hash crc32="7a6049b5" sha1="04048aa47c0ff99647608d4d1ccf48ba881a0f89" name="Robotron 2084 (Williams)">
+		<year>1991</year>
+	</hash>
+	<hash crc32="abcf7789" sha1="9127fc6322a3b859b886bcd1a1a0a34745c54bdc" name="Rygar - Legendary Warrior">
+		<status>Known Bad Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="67e5bdba" sha1="8743769af583af681fd1d96aadb533d26b1b510d" name="Rygar - Legendary Warrior">
+		<year>1990</year>
+	</hash>
+	<hash crc32="0cda1f28" sha1="6ae266219bcd089e67873808630fef82e72545e6" name="S.T.U.N. Runner">
+		<status>Known Bad Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="8595c40b" sha1="aa570dbbf4682da3297286fc69617c3c9aca2f18" name="S.T.U.N. Runner">
+		<year>1991</year>
+	</hash>
+	<hash crc32="3a215bf0" sha1="4251ccfc0cfd1f9b9c3c4c09e5c5aff99425be2a" name="Scrapyard Dog">
+		<status>Known Bad Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="be166f3b" sha1="df57cd7f119fa6af8f9b24942f0f12314b301075" name="Scrapyard Dog">
+		<year>1991</year>
+	</hash>
+	<hash crc32="360a1ce9" sha1="2e3593f9265240cecb215e2aba31dc43cd6217f1" name="Shadow of the Beast">
+		<status>Known Bad Image</status>
+		<year>1992</year>
+	</hash>
+	<hash crc32="eb78baa3" sha1="8b891b5dafba71740294c8dc818717d3b00be3a5" name="Shadow of the Beast">
+		<year>1992</year>
+	</hash>
+	<hash crc32="6439a8ee" sha1="bd0c3b289ef37a728d8387ac2854d0f7397ba718" name="Shanghai">
+		<status>Overdumped Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="192bcd04" sha1="9e67e05545934a7d375597b0e8c469468c5748a4" name="Shanghai">
+		<year>1990</year>
+	</hash>
+	<hash crc32="7ef5c041" sha1="479c6cac0ebe85e2f48a426ae1567adaeeb3c7d6" name="Show King Tut by Bastian Schick (PD) [a1]">
+		<year>1996</year>
+	</hash>
+	<hash crc32="59084e79" sha1="6622dbf746b8654f2d84153dc720a07386543392" name="Show King Tut by Bastian Schick (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="c98a1fed" sha1="fab133250fa017a4dc512d7b56a05be9a7e1dfdc" name="SIN Scroller by Fadest (PD)"> </hash>
+	<hash crc32="99f57fe2" sha1="f3e37ec35114218e906e9436ad2719c9c73976ee" name="Snakebyte by Matthias Domin (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="2daf8375" sha1="7c17752e1c6a951fb983a58cc2efb086d1e42055" name="Solitaire (Test6) by Inca (PD)">
+		<year>2005</year>
+	</hash>
+	<hash crc32="04a63f60" sha1="f9ae58afd7a1ce0774db53e28dbf16ed31ba538d" name="Sound Demo by Bastian Schick (PD) [a1]">
+		<year>1997</year>
+	</hash>
+	<hash crc32="33a7ce80" sha1="0cb1cc5fa5329d6f4bf9ac9b327b576432850794" name="Sound Demo by Bastian Schick (PD)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="55e804f6" sha1="d00ca45672a87ae652cc84fec6bd1f29bffd9e4a" name="Sound Driver Demo - Nostalgia 1907 (PD)"> </hash>
+	<hash crc32="7b94911a" sha1="3ab654d0b7510c0c36d8e36cadf178ed8ecd5f89" name="Sound Driver Demo - R-Type (PD)"> </hash>
+	<hash crc32="7d9ea18a" sha1="79c6aef2780c2e20db466b4e4c5f05570745af50" name="Sound Driver Demo - SplatterHouse (PD)"> </hash>
+	<hash crc32="a319fe86" sha1="3bc6169c8f0bdbcac6f3842de9633c09815ded19" name="Space Lock &amp; Space Shoot by Fadest (2005-04-25) (PD)"> </hash>
+	<hash crc32="dc62df2d" sha1="706f0ae420838ccbae1412fab80ab136a1f52954" name="Space Lock &amp; Space Shoot by Fadest (2005-05-16) (PD)"> </hash>
+	<hash crc32="4504465e" sha1="d6fab5d5f0f3c1cdc8e096aae072af0a9498be6a" name="Space Lock by Fadest (Cart) (PD)">
+		<year>2004</year>
+	</hash>
+	<hash crc32="1dba890b" sha1="b00d01601d6ca8cce41eccc267554a5c9b156fc2" name="Space Lock by Fadest (PD)">
+		<year>2004</year>
+	</hash>
+	<hash crc32="8bd0619e" sha1="f7cd470920df730054a587ab3a28254b15ce42f9" name="Sprite Driver Demo - R-Type (PD)"> </hash>
+	<hash crc32="2e1378dd" sha1="66233a3e8e98588aa51c526d86b653e1396aa140" name="Sprite Ed by Bastian Schick (PD) [a1]">
+		<year>1996</year>
+	</hash>
+	<hash crc32="176d61c6" sha1="02bfa4039ac65cf9e4ae32ff41caca8894c0d9b1" name="Sprite Ed by Bastian Schick (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="5b074134" sha1="de9c56b8533e245e59e11e3c4e87a3428464bb57" name="Sprite-Demo 1 by Matthias Domin (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="4bf87651" sha1="fd3ce11ff8f357841d0845803c014cf770be9496" name="Sprite-Demo 2 by Matthias Domin (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="aec31bc3" sha1="47245bf5ab6abc283855f9a49106d3beddf53964" name="Sprite-Demo 3 by Matthias Domin (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="56aaf5f8" sha1="e86107afdae9161ecb2230f04e44e1b8b424755e" name="Sprite-Demo 4 by Matthias Domin (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="310db748" sha1="8434a856cf6d6f987b68beaf42e68e407830ab7f" name="Sprite-Demo 4b by Matthias Domin (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="5d1b9e3b" sha1="5920d8222d8b1c3e36a0960caef7dc49a8d2cefd" name="Sprite-Demo 5 by Matthias Domin (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="fda3ed1c" sha1="1a4e3ec03a236ddfd72c42aa70c437d3f925e5f1" name="Stardreamer (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="5f958c32" sha1="a12525cb16e19fb9cced2454f8139aba8eb35803" name="StarDreamer - Cutscene (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="44e2908d" sha1="2911e3fa44e8ddf408fe86844439d03a487d5cee" name="StarDreamer - Docked (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="82361e27" sha1="a51b742fb0c312fef27f01a7f242e2e755568856" name="StarDreamer - Flying (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="e40388cf" sha1="604ed8ccd306bac715f9d08a12124adc624df4a1" name="StarDreamer - Full Game (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="8efa4cb5" sha1="9a9b3603d41defb6e969f188cde9ec9edc827284" name="StarDreamer - Intro (PD)">
+		<year>2002</year>
+	</hash>
+	<hash crc32="c2ef30c5" sha1="17a3706c02d3e521639e9652eecf204134bee2bc" name="Stars Demo (PD)"> </hash>
+	<hash crc32="4e22275f" sha1="2529de6a0021a9e62f548a7d09c91147425ffbba" name="Steel Talons">
+		<status>Known Bad Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="5b2308ed" sha1="773946365ecf3c862cfa21167750140e4b1adad2" name="Steel Talons">
+		<year>1991</year>
+	</hash>
+	<hash crc32="5a5e86cc" sha1="c8cca697021a416c5a2e21f8dddba3cc12f09773" name="Super Asteroids &amp; Missile Command">
+		<status>Overdumped Image</status>
+		<year>1995</year>
+	</hash>
+	<hash crc32="2da7e2a8" sha1="d15c7382346cae6296e83ef494a8aec3adaf949c" name="Super Asteroids &amp; Missile Command">
+		<year>1995</year>
+	</hash>
+	<hash crc32="690caeb0" sha1="9bf10edfedde85467f159afb48d02f1ca43be8f4" name="Super Off-Road">
+		<year>1996</year>
+		<manufacturer>Telegames</manufacturer>
+	</hash>
+	<hash crc32="982cca4f" sha1="af1be7ff0d579c6c5d83fc61fbf7dda32e1b5a05" name="Super Skweek">
+		<status>Known Bad Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="dfa61571" sha1="d6c18bf5e625cbac7434ef0d600ad0da667f24cd" name="Super Skweek">
+		<year>1991</year>
+	</hash>
+	<hash crc32="72dc49d7" sha1="11f2bf52ea7163ab9c1c67110239bcd06054482a" name="Super Sprint Title Screen Demo (PD)">
+		<year>2000</year>
+	</hash>
+	<hash crc32="5e4df4e4" sha1="505e4fd9227797ed12c9a4fdb7f43ca46263c14f" name="Switchblade II">
+		<status>Known Bad Image</status>
+		<year>1992</year>
+	</hash>
+	<hash crc32="13657705" sha1="256d55e8e9478c53e340321c858df6710a9f69a6" name="Switchblade II">
+		<year>1992</year>
+	</hash>
+	<hash crc32="331bcdc9" sha1="e43be432187583fb12da7ea3e007229bfb392b76" name="T-Tris by Bastian Schick (PD) [a1]">
+		<year>1996</year>
+	</hash>
+	<hash crc32="0de85a1a" sha1="a951c727c9210f7280097e66b5b78512985e95fa" name="T-Tris by Bastian Schick (PD)">
+		<year>1996</year>
+	</hash>
+	<hash crc32="c6d2879d" sha1="e92318bb51a7a5e4a4eb846463c1e965fd4d94d6" name="Teen Dance by Fadest (Cart) (PD)">
+		<year>2004</year>
+	</hash>
+	<hash crc32="2a9e3cb0" sha1="e0fc86c2dba9dd255f48af04d6edde269bec1cc1" name="Teen Dance by Fadest (PD)">
+		<year>2004</year>
+	</hash>
+	<hash crc32="2d14b21d" sha1="1dcb75c5e29c62a9ff81ff8f6d3ad23a233498a3" name="Tempest Demo (PD)"> </hash>
+	<hash crc32="3ca0ed33" sha1="fa4ef9d058b068e6fa7e5b28025073f633e6f7d1" name="Tetris">
+		<status>Known Bad Image</status>
+		<year>1996</year>
+	</hash>
+	<hash crc32="372d8895" sha1="edef944cbb09d17697d10fc1b1dd7054c9797bc4" name="Tetris">
+		<status>Known Bad Image</status>
+		<year>1996</year>
+	</hash>
+	<hash crc32="663c01f2" sha1="a8e39c15d334b23f7af6db94a4e24ff8f039ed78" name="Tetris">
+		<status>Known Bad Image</status>
+		<year>1996</year>
+	</hash>
+	<hash crc32="84766393" sha1="abcf4c0ffd3b0b308008d32aa8cafe55bed580ed" name="tetris 2006-01-03"> </hash>
+	<hash crc32="d8128c49" sha1="e9f63774d73ea8b39bd86bba7b9dcdcd6d212ce1" name="tetris alt"> </hash>
+	<hash crc32="12a5935b" sha1="b2aa3d29c7555f8a2122a1b52123d22ff5cd2671" name="tetris"> </hash>
+	<hash crc32="42707a0e" sha1="1bb6a77b06c75221c59e7af96e9e091d3a755913" name="tettrisnoid alpha"> </hash>
+	<hash crc32="41efb022" sha1="4d1a33fc53c5c90fa7ab8097c551a746116491f0" name="Atari Lynx BIOS (Atari) [a1]">
+		<year>1989</year>
+	</hash>
+	<hash crc32="ad876009" sha1="108db549ccf428e9986b3829c4c1f62c4142b2eb" name="Atari Lynx BIOS (Atari)">
+		<year>1989</year>
+	</hash>
+	<hash crc32="c1e511ab" sha1="0d6e96b69ee21ddf3a5a5e020fd21b38abc1c4b6" name="Atari Lynx Handy Emu Fake BIOS (Keith Wilkins) (PD)">
+		<year>1999</year>
+	</hash>
+	<hash crc32="a3da285d" sha1="dbc2e2c58f13a43af3cf7df2c82550f9fd1cea5c" name="TextOut Test Program 2 by Matthias Domin (PD)">
+		<year>1998</year>
+	</hash>
+	<hash crc32="c7fc4104" sha1="50542180e61cccaf8b888a3295ea7e10a4869225" name="Tip Over by Fadest (PD)">
+		<year>2006</year>
+	</hash>
+	<hash crc32="02153c28" sha1="32213c2df433ff8387b7efab52a0ab440a45b6e1" name="Todd's Adventure in Slime World">
+		<status>Overdumped Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="ae267e29" sha1="2b9c665456d17726ea57fd06ce2754a14382dc99" name="Todd's Adventure in Slime World">
+		<year>1990</year>
+	</hash>
+	<hash crc32="c72fa98b" sha1="261bed79222f14a628df5a7cc3062e40d22f6cd7" name="Toki">
+		<status>Known Bad Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="156a4a4c" sha1="242fee76ea2ae263511df5d8bd3f7b0ddc81757d" name="Toki">
+		<year>1990</year>
+	</hash>
+	<hash crc32="e7b83517" sha1="5b054a071edc51724ecc073ac013651c5150f5f9" name="Tournament Cyberball 2072">
+		<status>Known Bad Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="0590a9e3" sha1="e63cc54e34840a4e3c1aa5bbce4e406895e44534" name="Tournament Cyberball 2072">
+		<year>1991</year>
+	</hash>
+	<hash crc32="7cdf6e74" sha1="b10a3703546715694abf92f1279cec437505b7e0" name="Tron 6 Fun v1.5 by Bjoern Spruck (PD)">
+		<year>2001</year>
+	</hash>
+	<hash crc32="588ec89a" sha1="68098c016061326ead4a456168bffc1fa7e6dcd3" name="TST_SPR2"> </hash>
+	<hash crc32="6b6d9d30" sha1="ae868d6077c33d9d3ef3519f1977010d0125375f" name="Turbo Sub">
+		<status>Overdumped Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="a4b924d6" sha1="1186b3216830c5bbeac6b39aab1039eef27f0785" name="Turbo Sub">
+		<year>1991</year>
+	</hash>
+	<hash crc32="8765e50a" sha1="fdfe3f25f2c026b49d524f5b12a8e8667b1b6e88" name="Unknown Demo with Blue Atari Logo (PD)"> </hash>
+	<hash crc32="ec5bbc61" sha1="87a12b4b1f0bb479a62a7798afd81ae27d0c12fb" name="Unknown Game 'T-RES'">
+		<status>Known Bad Image</status>
+		<year>199x</year>
+	</hash>
+	<hash crc32="39732e90" sha1="0bf86dd123b0ed2b0783dfb20f3ad9f84896c508" name="Viking Child">
+		<status>Known Bad Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="8d56828b" sha1="47c32e4d816dde797b6bba2019f2e296bdad02dd" name="Viking Child">
+		<year>1991</year>
+	</hash>
+	<hash crc32="b474d454" sha1="3704bb338bd091c993568fa250aef45c5fe5060a" name="VV2 v6SE by Vince Marchand (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="67c4349d" sha1="76d0443ffdd3cebb1b0c214e9d16a515b2698863" name="VV2 v7SE by Vince Marchand (PD)">
+		<year>2003</year>
+	</hash>
+	<hash crc32="3450ab05" sha1="4d660c67a77fbe3b19f88db51dc58b1906d6b1a8" name="Warbirds">
+		<status>Overdumped Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="b946ba49" sha1="2c376581ac20fb5de8538b51820e1f007cca8260" name="Warbirds">
+		<year>1990</year>
+	</hash>
+	<hash crc32="5e25157d" sha1="b813026a969d8f2f3ab030e9e780eeee2db2b854" name="WAV Sound Demo (PD)"> </hash>
+	<hash crc32="9ea8a8c4" sha1="c18d0de7110c7c7b2e37adcd90322d84d260de32" name="WAV Tutor (PD)"> </hash>
+	<hash crc32="bc0bdbc3" sha1="ab6e96903c35dc6fa69192355e6133d847443b1c" name="World Class Soccer">
+		<status>Known Bad Image</status>
+		<year>1992</year>
+	</hash>
+	<hash crc32="dfa1293b" sha1="e9a48f01ea905266431b94ed5e6d0dcc2e9bc0cb" name="World Class Soccer">
+		<status>Known Bad Image</status>
+		<year>1992</year>
+	</hash>
+	<hash crc32="91233794" sha1="40100a0db681b4efca4a491c88bf76a19105336f" name="World Class Soccer">
+		<year>1992</year>
+	</hash>
+	<hash crc32="ee52efae" sha1="a652aa597b51dabc8c20bece62ba9d3aa516ebba" name="Wuerfel 3 Demo (PD)">
+		<year>199x</year>
+	</hash>
+	<hash crc32="45edb4d7" sha1="d283b95a5615a5755200de5b5f71dead19d08ff9" name="Xenophobe [a1]">
+		<status>Overdumped Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="9bed736d" sha1="a1b4f7a4697310cafea1271bd4b41eeafae60ffa" name="Xenophobe [a1]">
+		<year>1990</year>
+	</hash>
+	<hash crc32="e0a1eea3" sha1="4d8c2c536bc77bc726378989323a02604e9608f7" name="Xenophobe">
+		<status>Overdumped Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="b5406a9a" sha1="1c6386c379f5e48f36b2252dbfbfd6a370d328b4" name="Xenophobe">
+		<year>1990</year>
+	</hash>
+	<hash crc32="e4f262f3" sha1="15555f946dc77d515c6ca814d7979f0e2345fdc0" name="Xybots">
+		<status>Known Bad Image</status>
+		<year>1991</year>
+	</hash>
+	<hash crc32="89e2a595" sha1="5ff3c39a6919db6d2270bb22e80e7680550c47ba" name="Xybots">
+		<year>1991</year>
+	</hash>
+	<hash crc32="b3747c71" sha1="530ea8c0a820746425017cbcc9f766531f5c6333" name="Zaku Public Demo by Penguinet (2005-11-13) (PD)"> </hash>
+	<hash crc32="1ae6e455" sha1="ad6ac06d14a2e0b75e1aa34200ecc04cb9a804a3" name="Zarlor Mercenary">
+		<status>Known Bad Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="577eb5ae" sha1="75d7de9d701050c202adfcb70bcafb0979fd6e1a" name="Zarlor Mercenary">
+		<status>Overdumped Image</status>
+		<year>1990</year>
+	</hash>
+	<hash crc32="cb27199d" sha1="7005cdfa0a2e4a9611266ce50493cbb32351e069" name="Zarlor Mercenary">
+		<year>1990</year>
+	</hash>
+</hashfile>
