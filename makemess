@@ -2,6 +2,6 @@
 #put your path to emmake here
 alias emmake=~/Code/emscripten/emmake
 # Make the tools natively first.
-make buildtools OSD=sdl NOWERROR=1 NOASM=1 NO_X11=1 NO_DEBUGGER=1 CC=clang CXX=clang++ AR=ar LD=clang++
+make buildtools OSD=sdl NOWERROR=1 NOASM=1 NO_X11=1 NO_DEBUGGER=1 CC=clang CXX=clang++ AR=ar LD=clang++ PREFIX=native
 # Do a cross_build targetting emscripten using the natively build tools.
-emmake make TARGET=mess SUBTARGET=tiny OSD=sdl CROSS_BUILD=1 NATIVE_OBJ="./obj/sdl/mame" TARGETOS=emscripten NOWERROR=1 NOASM=1 NO_X11=1 NO_DEBUGGER=1 $*
+emmake make TARGET=mess SUBTARGET=tiny OSD=sdl CROSS_BUILD=1 NATIVE_OBJ="./obj/sdl/nativemame" TARGETOS=emscripten NOWERROR=1 NOASM=1 NO_X11=1 NO_DEBUGGER=1 $*
