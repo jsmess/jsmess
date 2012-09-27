@@ -57,8 +57,8 @@ default:
 	cd mess; $(EMMAKE) make $(EMSCRIPTEN_MESS_FLAGS)
 	mv mess/messtiny mess/messtiny.bc
 	$(EMSCRIPTEN_DIR)/emcc -s DISABLE_EXCEPTION_CATCHING=0 mess/messtiny.bc \
-		-o messtiny.js --post-js post.js --embed-file ./bin/coleco.zip \
-		--embed-file ./bin/cosmofighter2.zip
+		-o messtiny.js --post-js post.js --embed-file $(BIOS) \
+		--embed-file $(GAME)
 	java -Xmx1536m -jar $(CLOSURE) --js messtiny.js \
 		--js_output_file mess_closure.js
 
