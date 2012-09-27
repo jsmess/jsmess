@@ -36,6 +36,9 @@ ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
 NATIVE_OBJ := $(NATIVE_OBJ)64
 endif
 
+GAME = "./bin/cosmofighter2.zip"
+BIOS = "./bin/coleco.zip"
+
 # Flags used to build the native tools.
 NATIVE_MESS_FLAGS = PREFIX=native OSD=sdl NOWERROR=1 NOASM=1 NO_X11=1 \
 										NO_DEBUGGER=1 CC=$(NATIVE_CC) CXX=$(NATIVE_CXX) \
@@ -48,6 +51,8 @@ EMSCRIPTEN_MESS_FLAGS = TARGET=mess SUBTARGET=tiny OSD=sdl CROSS_BUILD=1 \
 												NO_DEBUGGER=1 PTR64=0
 
 default:
+	@if [ ! -f $(GAME) ]; then echo "Missing game file: $(GAME)"; exit 1; fi
+	@if [ ! -f $(BIOS) ]; then echo "Missing BIOS: $(BIOS)"; exit 1; fi
 	cd mess; make $(NATIVE_MESS_FLAGS) buildtools
 	cd mess; $(EMMAKE) make $(EMSCRIPTEN_MESS_FLAGS)
 	mv mess/messtiny mess/messtiny.bc
