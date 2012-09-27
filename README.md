@@ -85,7 +85,7 @@ Building
 ### Building ###
 
 1. Run ```make```. Go out for a walk; it'll take a bit.
-2. Open up ```messtiny.html``` in a recent version of Chrome or Firefox.
+2. It'll produce a JavaScript file, which can be embedded into an existing JSMESS ColecoVision webpage. We're working on getting it to produce an HTML file. Stay tuned!
 
 Relevant Links
 --------------
