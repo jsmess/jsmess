@@ -6,10 +6,15 @@
 #
 ###########################################################################
 
+#-------------------------------------------------------------------------------
+# Variables
+#-------------------------------------------------------------------------------
+
 # Absolute directory path to emscripten / closure compiler.
 EMSCRIPTEN_DIR = $(CURDIR)/third_party/emscripten
 CLOSURE_DIR = $(EMSCRIPTEN_DIR)/third_party/closure-compiler
 
+# Path to specific tools invoked during the build process.
 EMMAKE = $(EMSCRIPTEN_DIR)/emmake
 CLOSURE = $(CLOSURE_DIR)/compiler.jar
 
@@ -36,25 +41,44 @@ ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
 NATIVE_OBJ := $(NATIVE_OBJ)64
 endif
 
-GAME = "./bin/cosmofighter2.zip"
-BIOS = "./bin/coleco.zip"
+# Flags shared between the native tools build and emscripten build.
+# TODO: Document why each of these are set / what they do.
+SHARED_FLAGS = OSD=sdl       \
+               NOWERROR=1    \
+               NOASM=1       \
+               NO_X11=1      \
+               NO_DEBUGGER=1 \
 
 # Flags used to build the native tools.
-NATIVE_MESS_FLAGS = PREFIX=native OSD=sdl NOWERROR=1 NOASM=1 NO_X11=1 \
-										NO_DEBUGGER=1 CC=$(NATIVE_CC) CXX=$(NATIVE_CXX) \
-										AR=$(NATIVE_AR) LD=$(NATIVE_LD)
+# TODO: Document why each of these are set / what they do.
+NATIVE_MESS_FLAGS = PREFIX=native     \
+                    CC=$(NATIVE_CC)   \
+                    CXX=$(NATIVE_CXX) \
+                    AR=$(NATIVE_AR)   \
+                    LD=$(NATIVE_LD)   \
+                    OPTIMIZE=3
 
 # Flags used to make the emscripten build
-EMSCRIPTEN_MESS_FLAGS = TARGET=mess SUBTARGET=tiny OSD=sdl CROSS_BUILD=1 \
-												NATIVE_OBJ="$(NATIVE_OBJ)" \
-												TARGETOS=emscripten NOWERROR=1 NOASM=1 NO_X11=1 \
-												NO_DEBUGGER=1 PTR64=0
+# TODO: Document why each of these are set / what they do.
+EMSCRIPTEN_MESS_FLAGS = TARGET=mess                \
+                        SUBTARGET=tiny             \
+                        CROSS_BUILD=1              \
+                        NATIVE_OBJ="$(NATIVE_OBJ)" \
+                        TARGETOS=emscripten        \
+                        PTR64=0                    \
+                        SYMLEVEL=2                 \
+                        VERBOSE=1                  \
+                        OPTIMIZE=0
+
+#-------------------------------------------------------------------------------
+# Build Rules
+#-------------------------------------------------------------------------------
 
 default:
 	@if [ ! -f $(GAME) ]; then echo "Missing game file: $(GAME)"; exit 1; fi
 	@if [ ! -f $(BIOS) ]; then echo "Missing BIOS: $(BIOS)"; exit 1; fi
-	cd mess; make $(NATIVE_MESS_FLAGS) buildtools
-	cd mess; $(EMMAKE) make $(EMSCRIPTEN_MESS_FLAGS)
+	cd mess; make $(SHARED_FLAGS) $(NATIVE_MESS_FLAGS) buildtools
+	cd mess; $(EMMAKE) make $(SHARED_FLAGS) $(EMSCRIPTEN_MESS_FLAGS)
 	mv mess/messtiny mess/messtiny.bc
 	$(EMSCRIPTEN_DIR)/emcc -s DISABLE_EXCEPTION_CATCHING=0 mess/messtiny.bc \
 		-o messtiny.js --post-js post.js --embed-file $(BIOS) \
@@ -63,6 +87,6 @@ default:
 		--js_output_file mess_closure.js
 
 clean:
-	cd mess; make $(NATIVE_MESS_FLAGS) clean
-	cd mess; $(EMMAKE) make $(EMSCRIPTEN_MESS_FLAGS) clean
+	cd mess; make $(SHARED_FLAGS) $(NATIVE_MESS_FLAGS) clean
+	cd mess; $(EMMAKE) make $(SHARED_FLAGS) $(EMSCRIPTEN_MESS_FLAGS) clean
 	rm mess/messtiny.bc messtiny.js mess_closure.js

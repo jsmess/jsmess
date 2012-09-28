@@ -217,7 +217,7 @@ BUILD_ZLIB = 1
 
 # specify symbols level or leave commented to use the default
 # (default is SYMLEVEL = 2 normally; use 1 if you only need backtrace)
-SYMLEVEL = 2
+# SYMLEVEL = 2
 
 # uncomment next line to dump the symbols to a .sym file
 # DUMPSYM = 1
@@ -229,11 +229,11 @@ SYMLEVEL = 2
 # MAP = 1
 
 # uncomment next line to generate verbose build information
-VERBOSE = 1
+# VERBOSE = 1
 
 # specify optimization level or leave commented to use the default
 # (default is OPTIMIZE = 3 normally, or OPTIMIZE = 0 with symbols)
-OPTIMIZE = 3
+# OPTIMIZE = 3
 
 
 ###########################################################################
@@ -284,7 +284,7 @@ endif
 #-------------------------------------------------
 
 # extension for executables
-EXE = 
+EXE =
 
 ifeq ($(TARGETOS),win32)
 EXE = .exe
@@ -408,7 +408,7 @@ endif
 ifdef DEBUG
 DEFS += -DMAME_DEBUG
 else
-DEFS += -DNDEBUG 
+DEFS += -DNDEBUG
 endif
 
 # define MAME_PROFILER if we are a profiling build
@@ -511,7 +511,7 @@ CONLYFLAGS += \
 
 # warnings only applicable to OBJ-C compiles
 COBJFLAGS += \
-	-Wpointer-arith 
+	-Wpointer-arith
 
 # TODO(jvilk): Where are the CPPONLYFLAGS?
 
