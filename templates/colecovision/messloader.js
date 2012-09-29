@@ -41,7 +41,7 @@ var Module = {
 				data = dataArray;
 			}
 
-			FS.createDataFile('/', gamename, data, true, false); 
+			FS.createDataFile('/', gamename, data, true, false);
 			try {
 				if ("undefined" !== typeof removeRunDependency) {
 					removeRunDependency();

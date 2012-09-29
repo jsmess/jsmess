@@ -102,7 +102,7 @@ GAME_NAME   := $(patsubst %.zip,%,$(GAME))
 HTML_OUTPUT := index.html
 
 # Final directory for built files.
-OBJ_DIR     := $(OBJ_DIR)/$(SYSTEM)_$(GAME_NAME)
+OBJ_DIR     := $(OBJ_DIR)/$(SYSTEM)/$(GAME_NAME)
 # The HTML template we'll be using.
 TEMPLATE_DIR := $(CURDIR)/templates/$(SYSTEM)
 # All of the files in the template directory. Allows for 'smart' HTML rebuilding
