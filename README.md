@@ -15,77 +15,13 @@ Why?
 
 Building
 --------
+To build JSMESS, check out the [Prerequisites and Dependencies](https://github.com/jsmess/jsmess/wiki/Prerequisites-and-Dependencies)
+page and the [Building](https://github.com/jsmess/jsmess/wiki/Building) page.
 
-### Prerequisites ###
-* [LLVM and Clang 3.1](http://llvm.org/releases/download.html#3.1)
-
-  Emscripten uses these to work its magic. As this is the latest version of LLVM
-  and Clang, chances are you will need to compile it from scratch.
-
-  Too lazy to read the LLVM build instructions? Make sure you have ```g++```
-  installed (not just ```gcc```!) and run these commands:
-
-  ```
-  wget http://llvm.org/releases/3.1/llvm-3.1.src.tar.gz
-  wget http://llvm.org/releases/3.1/clang-3.1.src.tar.gz
-  tar xf llvm-3.1.src.tar.gz
-  cd llvm-3.1.src/tools
-  tar xf ../../clang-3.1.src.tar.gz
-  mv clang-3.1.src clang
-  cd ..
-  ./configure
-  make
-  sudo make install
-  ```
-
-* [Node.js](http://nodejs.org)
-
-  You can usually install this from your platform's package repository, e.g.:
-
-  ```
-  sudo apt-get install nodejs
-  ```
-
-* ColecoVision BIOS and Cosmo Fighter 2
-
-  The ColecoVision BIOS should be in the ```bin``` directory with the filename
-  ```coleco.zip```, and Cosmo Fighter 2 should be in the ```bin``` directory
-  with the filename ```cosmofighter2.zip```. For legal reasons, we do not
-  distribute these with JSMESS.
-
-  [You can probably find them on your own, though.](http://lmgtfy.com/?q=ColecoVision+BIOS)
-
-  To try out other games, try changing the hardcoded data in ```makefile```.
-
-* Set Up Emscripten
-
-  First, because ```git``` is stupid, run this command to grab the emscripten
-  sources:
-
-  ```git submodule update --init --recursive```
-
-  Then, test out ```emcc```:
-
-  ```
-  cd third_party/emscripten
-  ./emcc
-  ```
-
-  Edit ```~/.emscripten``` to point to your LLVM installation and Emscripten
-  directory.
-
-* Java
-
-  Java is required to run the Closure compiler.
-
-#### MAME / MESS Dependencies ####
-* libsdl
-* libsdl_ttf
-
-### Building ###
-
-1. Run ```make```. Go out for a walk; it'll take a bit.
-2. It'll produce a JavaScript file, which can be embedded into an existing JSMESS ColecoVision webpage. We're working on getting it to produce an HTML file. Stay tuned!
+Status of JSMESS
+----------------
+You can check out the status of JSMESS here:
+<https://github.com/jsmess/jsmess/wiki/Status>
 
 Relevant Links
 --------------
