@@ -6,7 +6,7 @@
 /folders
 /ini
 /nvram
-/obj
+/mess/obj
 /*.exe
 /*.dll
 /*.ini
@@ -17,3 +17,5 @@
 /*.sym
 /games
 /bios
+/build
+*.bc
