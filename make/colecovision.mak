@@ -8,4 +8,4 @@ BIOS := coleco.zip
 SUBTARGET := colecovision
 
 # System-specific flags that should be passed to MESS's makefile.
-# MESS_MAKE_FLAGS :=
+# MESS_FLAGS +=
