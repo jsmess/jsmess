@@ -192,7 +192,7 @@ $(OBJ_DIR)/$(MESS_EXE).js: $(OBJ_DIR)/$(MESS_EXE)_unopt.js
 		--js_output_file $(OBJ_DIR)/$(MESS_EXE).js
 
 # Runs emcc on LLVM bitcode version of MESS.
-$(OBJ_DIR)/$(MESS_EXE)_unopt.js: $(OBJ_DIR)/$(MESS_EXE).bc $(EMBED_FILES)
+$(OBJ_DIR)/$(MESS_EXE)_unopt.js: $(OBJ_DIR)/$(MESS_EXE).bc post.js $(EMBED_FILES)
 	$(EMCC) -s $(EMCC_FLAGS) $< -o $(OBJ_DIR)/$(MESS_EXE)_unopt.js \
 	--post-js post.js $(EMBED_FILES_FLAG)
 
