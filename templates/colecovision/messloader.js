@@ -9,7 +9,7 @@ newCanvas.height = 256;
 var holder = document.getElementById('canvasholder');
 holder.appendChild(newCanvas);
 var url = $.url();
-var gamename = url.param('gamename') || 'GAME_NAME';
+var gamename = url.param('gamename') || 'GAME_FILE';
 var gameurl = url.param('gameurl') || 'GAME_FILE';
 
 var Module = {
@@ -25,7 +25,7 @@ var Module = {
 		};
 	})(),
 	canvas: document.getElementById('canvas'),
-	noInitialRun: true,
+	noInitialRun: false,
 	preRun: function() {
 		var ajaxArgs = {
 			url: gameurl,
