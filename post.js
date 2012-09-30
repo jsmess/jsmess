@@ -32,3 +32,6 @@ function _SDL_LockTexture() {}
 function _SDL_UnlockTexture() {}
 function _SDL_RenderCopy() {}
 function _SDL_RenderPresent() {}
+function _SDL_GL_LoadLibrary() {}
+function _SDL_GL_DeleteContext() {}
+function _SDL_GL_DestroyWindow() {}
