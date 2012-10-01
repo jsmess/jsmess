@@ -109,6 +109,13 @@ TEMPLATE_DIR := $(CURDIR)/templates/$(SYSTEM)
 TEMPLATE_FILES := $(shell ls $(TEMPLATE_DIR))
 TEMPLATE_FILES := $(foreach TFILE,$(TEMPLATE_FILES),$(TEMPLATE_DIR)/$(TFILE))
 
+# Function that generates a command to run sed with inplace replacement.
+# Unfortunately, it GNU and BSD sed are slightly different. BSD sed returns an
+# error code when you run --help, which we abuse in this statement.
+# Left command is GNU, right command is BSD.
+# As this is a function, do not use := for immediate resolution!
+SED_I = sed --help >/dev/null 2>&1 && sed -i $(1) || sed -i '' $(1)
+
 #-------------------------------------------------------------------------------
 # Flags on flags (emscripten / MESS / buildtools / Java flags)
 #-------------------------------------------------------------------------------
@@ -174,9 +181,9 @@ colecovision: $(OBJ_DIR)/$(HTML_OUTPUT)
 # give it an empty string. GNU sed's -i does not require an option.
 $(OBJ_DIR)/$(HTML_OUTPUT): $(OBJ_DIR) $(TEMPLATE_FILES) $(OBJ_DIR)/$(MESS_EXE).js
 	@cp -r $(TEMPLATE_DIR)/* $(OBJ_DIR)/
-	@sed -i '' 's/MESS_SRC/$(MESS_EXE).js/g' $(OBJ_DIR)/messloader.js
-	@sed -i '' 's/GAME_NAME/$(GAME_NAME)/g' $(OBJ_DIR)/messloader.js
-	@sed -i '' 's/GAME_FILE/$(GAME)/g' $(OBJ_DIR)/messloader.js
+	$(call SED_I,'s/MESS_SRC/$(MESS_EXE).js/g' $(OBJ_DIR)/messloader.js)
+	$(call SED_I,'s/GAME_NAME/$(GAME_NAME)/g' $(OBJ_DIR)/messloader.js)
+	$(call SED_I,'s/GAME_FILE/$(GAME)/g' $(OBJ_DIR)/messloader.js)
 	@echo "----------------------------------------------------------------------"
 	@echo "Compilation complete!"
 	@echo "System: $(SYSTEM)"
