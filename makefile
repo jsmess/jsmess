@@ -172,9 +172,10 @@ colecovision: $(OBJ_DIR)/$(HTML_OUTPUT)
 # Creates a final HTML file.
 $(OBJ_DIR)/$(HTML_OUTPUT): $(OBJ_DIR) $(TEMPLATE_FILES) $(OBJ_DIR)/$(MESS_EXE).js
 	@cp -r $(TEMPLATE_DIR)/* $(OBJ_DIR)/
-	@sed -i 's/MESS_SRC/$(MESS_EXE).js/g' $(OBJ_DIR)/messloader.js
-	@sed -i 's/GAME_NAME/$(GAME_NAME)/g' $(OBJ_DIR)/messloader.js
-	@sed -i 's/GAME_FILE/$(GAME)/g' $(OBJ_DIR)/messloader.js
+	@sed 's/MESS_SRC/$(MESS_EXE).js/g' $(OBJ_DIR)/messloader.js > $(OBJ_DIR)/messloader2.js
+	@sed 's/GAME_NAME/$(GAME_NAME)/g' $(OBJ_DIR)/messloader2.js > $(OBJ_DIR)/messloader.js
+	@sed 's/GAME_FILE/$(GAME)/g' $(OBJ_DIR)/messloader.js > $(OBJ_DIR)/messloader2.js
+	@mv $(OBJ_DIR)/messloader2.js $(OBJ_DIR)/messloader.js
 	@echo "----------------------------------------------------------------------"
 	@echo "Compilation complete!"
 	@echo "System: $(SYSTEM)"
