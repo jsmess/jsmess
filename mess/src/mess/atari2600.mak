@@ -1,8 +1,17 @@
 ###########################################################################
 #
-#   colecovision.mak
+#   atari2600.mak
 #
-# ColecoVision-specific Makefile
+# Atari 2600-specific Makefile
+#include "machine/6532riot.h"
+
+#include "sound/wave.h"
+#include "sound/tiaintf.h"
+#include "imagedev/cartslot.h"
+#include "imagedev/cassette.h"
+#include "formats/a26_cas.h"
+#include "video/tia.h"
+#include "hashfile.h"
 #
 ###########################################################################
 
@@ -19,9 +28,7 @@ include $(SRC)/mess/osd/$(OSD)/$(OSD).mak
 # drivers referenced in colecovision.lst
 #-------------------------------------------------
 
-CPUS += Z80
-CPUS += MCS48
-
+CPUS += M6502
 
 
 #-------------------------------------------------
@@ -29,9 +36,8 @@ CPUS += MCS48
 # drivers referenced in colecovision.lst
 #-------------------------------------------------
 
-SOUNDS += SN76496
-
-
+SOUNDS += WAVE
+SOUNDS += TIA
 
 #-------------------------------------------------
 # This is the list of files that are necessary
@@ -41,8 +47,7 @@ SOUNDS += SN76496
 
 DRVLIBS = \
 	$(EMUOBJ)/drivers/emudummy.o \
-	$(MESS_DRIVERS)/coleco.o \
-	$(MESS_MACHINE)/coleco.o \
+	$(MESS_DRIVERS)/a2600.o \
 
 
 #-------------------------------------------------
