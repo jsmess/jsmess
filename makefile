@@ -142,20 +142,31 @@ NATIVE_MESS_FLAGS += CC=$(NATIVE_CC) CXX=$(NATIVE_CXX) AR=$(NATIVE_AR) \
                      LD=$(NATIVE_LD) OPTIMIZE=3
 
 # Flags passed to the MESS makefile when building with emscripten.
-# Build the specific system in MESS. Do not build the buildtools; use the ones
-# we build natively.
-# We identify ourselves as the "emscripten" OS, allowing us to modify the MESS
-# Makefiles in a principled way.
-MESS_FLAGS += TARGET=mess SUBTARGET=$(SUBTARGET) CROSS_BUILD=1 \
-              NATIVE_OBJ="$(NATIVE_OBJ)" TARGETOS=emscripten
-MESS_FLAGS += PTR64=0    # Emscripten targets a 32-bit machine, since 64-bit
-                         # arithmetic is... troublesome in JavaScript.
+# Build the specific system in MESS.
+MESS_FLAGS += TARGET=mess SUBTARGET=$(SUBTARGET)
 MESS_FLAGS += SYMLEVEL=2 # TODO: Unsure why we set this.
 MESS_FLAGS += VERBOSE=1  # Gives us detailed build information to make debugging
                          # build fails easier.
-MESS_FLAGS += OPTIMIZE=0 # Emscripten ignores all optimization flags while
-                         # compiling C/C++ code.
 
+# The NATIVE_DEBUG flag allows us to build what emscripten is building natively.
+# This is invaluable when testing new build targets.
+# Thus, this flag guards adding the flags to MESS_FLAGS that enable special
+# emscripten things that may not work in a native build.
+ifdef NATIVE_DEBUG
+EMMAKE :=
+EMCC := echo
+MESS_FLAGS += CC=$(NATIVE_CC) CXX=$(NATIVE_CXX) AR=$(NATIVE_AR) \
+              LD=$(NATIVE_LD) OPTIMIZE=3
+else
+# Do not build the buildtools; use the ones we build natively.
+# We identify ourselves as the "emscripten" OS, allowing us to modify the MESS
+# Makefiles in a principled way.
+# Emscripten targets a 32-bit machine, since 64-bit arithmetic is...
+# troublesome in JavaScript.
+# Emscripten ignores all optimization flags while compiling C/C++ code.
+MESS_FLAGS += CROSS_BUILD=1 NATIVE_OBJ="$(NATIVE_OBJ)" TARGETOS=emscripten \
+              PTR64=0 OPTIMIZE=0
+endif
 
 MESS_FLAGS        := $(SHARED_MESS_FLAGS) $(MESS_FLAGS)
 NATIVE_MESS_FLAGS := $(SHARED_MESS_FLAGS) $(NATIVE_MESS_FLAGS)

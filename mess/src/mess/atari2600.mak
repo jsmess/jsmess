@@ -29,6 +29,8 @@ include $(SRC)/mess/osd/$(OSD)/$(OSD).mak
 #-------------------------------------------------
 
 CPUS += M6502
+CPUS += MCS48
+CPUS += Z80
 
 
 #-------------------------------------------------
@@ -46,8 +48,11 @@ SOUNDS += TIA
 #-------------------------------------------------
 
 DRVLIBS = \
-	$(EMUOBJ)/drivers/emudummy.o \
+  $(EMUOBJ)/drivers/emudummy.o \
+  $(EMUOBJ)/machine/6532riot.o \
+  $(OBJ)/lib/formats/a26_cas.o \
 	$(MESS_DRIVERS)/a2600.o \
+  $(MAME_VIDEO)/tia.o \
 
 
 #-------------------------------------------------
