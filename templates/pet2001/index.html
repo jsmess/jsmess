@@ -1,0 +1,28 @@
+<html>
+	<head>
+		<title>MESS in a browser!</title>
+<script type='text/javascript' src='modernizr-custom.js'></script>
+<script type='text/javascript'>
+Modernizr.addTest('typedarray', function(){
+  return (window.Float64Array != undefined);
+});
+Modernizr.load({
+	test: Modernizr.canvas && Modernizr.typedarray,
+	yep : [
+		'https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js',
+		'jquery.url.js',
+		'messloader.js'
+	],
+	nope : 'messfail.js'
+});
+</script>
+</head>
+<body>
+	<h1 style="text-align: center;">MESS in a browser!</h1>
+	<div id='canvasholder' style="text-align: center;">
+	</div>
+	<div id='status' style="display:block;"></div>
+	<div id='output' style="display:block;"></div>
+</body>
+</html>
+
