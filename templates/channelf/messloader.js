@@ -13,7 +13,7 @@ var gamename = url.param('gamename') || 'GAME_FILE';
 var gameurl = url.param('gameurl') || 'GAME_FILE';
 
 var Module = {
-	arguments: ['channelf','-verbose','-rompath','.','-cart',gamename,'-nokeepaspect'],
+	arguments: ['channelf','-verbose','-rompath','.','-cart',gamename,'-window','-resolution','102x58','-nokeepaspect'],
 	print: (function() {
 		var element = document.getElementById('output');
 		return function(text) {
