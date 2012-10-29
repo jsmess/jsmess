@@ -185,10 +185,12 @@ clean:
 	cd mess; $(EMMAKE) make $(SHARED_FLAGS) $(EMSCRIPTEN_MESS_FLAGS) clean
 #	rm -r $(OBJ_DIR)
 
+# TODO: Make this less dumb.
 colecovision: $(OBJ_DIR)/$(HTML_OUTPUT)
 atari2600: $(OBJ_DIR)/$(HTML_OUTPUT)
 channelf: $(OBJ_DIR)/$(HTML_OUTPUT)
 pet2001: $(OBJ_DIR)/$(HTML_OUTPUT)
+ti99_4: $(OBJ_DIR)/$(HTML_OUTPUT)
 
 # Creates a final HTML file.
 # Portability notes: sed on the Mac is BSD sed. -i requires an option, so we
