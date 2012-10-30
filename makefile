@@ -193,6 +193,7 @@ pet2001: $(OBJ_DIR)/$(HTML_OUTPUT)
 ti99_4: $(OBJ_DIR)/$(HTML_OUTPUT)
 ibm5150: $(OBJ_DIR)/$(HTML_OUTPUT)
 c64: $(OBJ_DIR)/$(HTML_OUTPUT)
+a800: $(OBJ_DIR)/$(HTML_OUTPUT)
 
 # Creates a final HTML file.
 # Portability notes: sed on the Mac is BSD sed. -i requires an option, so we
