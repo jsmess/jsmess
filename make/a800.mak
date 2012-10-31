@@ -3,7 +3,7 @@
 ################################################################################
 
 # ColecoVision has a bios that is required to run the system.
-BIOS := a800.zip
+BIOS := a800.zip a400.zip
 # SUBTARGET for the MESS makefile.
 SUBTARGET := a800
 
