@@ -125,12 +125,15 @@
 static device_scheduler * scheduler;
 
 void jsmess_main_loop() {
-	scheduler->timeslice();
+  attotime stoptime = scheduler->time() + attotime(0,HZ_TO_ATTOSECONDS(60));
+  while (scheduler->time() < stoptime) {
+	  scheduler->timeslice();
+  }
 }
 
 void jsmess_set_main_loop(device_scheduler &sched) {
 	scheduler = &sched;
-	emscripten_set_main_loop(&jsmess_main_loop, 0);
+	emscripten_set_main_loop(&jsmess_main_loop, 60);
 	abort();
 }
 #endif
