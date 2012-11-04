@@ -47,8 +47,10 @@ else
 SYSTEM := $(MAKECMDGOALS)
 endif
 
+ifneq ($(SYSTEM),buildtools)
 # Contains variables relevant to the target system.
 include $(CURDIR)/make/$(SYSTEM).mak
+endif
 
 # The name of the bitcode executable produced by making mess. It's always
 # mess$(SUBTARGET).
@@ -196,6 +198,7 @@ c64: $(OBJ_DIR)/$(HTML_OUTPUT)
 a800: $(OBJ_DIR)/$(HTML_OUTPUT)
 trs80: $(OBJ_DIR)/$(HTML_OUTPUT)
 odyssey2: $(OBJ_DIR)/$(HTML_OUTPUT)
+apple2c: $(OBJ_DIR)/$(HTML_OUTPUT)
 
 # Creates a final HTML file.
 # Portability notes: sed on the Mac is BSD sed. -i requires an option, so we
