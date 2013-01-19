@@ -6,7 +6,7 @@
 BIOS := pet2001.zip
 # SUBTARGET for the MESS makefile.
 SUBTARGET := pet2001
-MESS_ARGS := ["pet2001","-verbose","-rompath",".","-window"."-resolution","320x200","-nokeepaspect"]
+MESS_ARGS := ["pet2001","-verbose","-rompath",".","-window","-resolution","320x200","-nokeepaspect"]
 
 # System-specific flags that should be passed to MESS's makefile.
 # MESS_FLAGS +=
