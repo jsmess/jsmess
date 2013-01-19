@@ -6,7 +6,7 @@
 BIOS := c64.zip
 # SUBTARGET for the MESS makefile.
 SUBTARGET := c64
-MESS_ARGS := ["c64n","-verbose","-rompath",".","-window","-resolution","418x235","-nokeepaspect"]
+MESS_ARGS := ["c64","-verbose","-rompath",".","-window","-resolution","418x235","-nokeepaspect"]
 
 # System-specific flags that should be passed to MESS's makefile.
 # MESS_FLAGS +=

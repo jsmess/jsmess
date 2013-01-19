@@ -2,7 +2,13 @@ var gamename = 'GAME_FILE';
 var game_file = null;
 var bios_filenames = 'BIOS_FILES'.split(' ');
 var bios_files = {};
-var file_countdown = bios_filenames.length + 1;
+var file_countdown = 0;
+if (bios_filenames.length !== 0 && bios_filenames[0] !== '') {
+  file_countdown += bios_filenames.length;
+}
+if (gamename !== '') {
+  file_countdown++;
+}
 
 var newCanvas = document.createElement('canvas');
 newCanvas.id = 'canvas';
@@ -67,4 +73,6 @@ for (var i=0; i < bios_filenames.length; i++) {
   fetch_file(fname, function(data) { bios_files[fname] = data; update_countdown(); });
 }
 
-fetch_file(gamename, function(data) { game_file = data; update_countdown(); });
+if (gamename !== "") {
+  fetch_file(gamename, function(data) { game_file = data; update_countdown(); });
+}
