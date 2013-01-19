@@ -3,9 +3,10 @@
 ################################################################################
 
 # ColecoVision has a bios that is required to run the system.
-BIOS := trs80.zip trs80l2.zip
+BIOS := channelf.zip
 # SUBTARGET for the MESS makefile.
-SUBTARGET := trs80
+SUBTARGET := channelf
+MESS_ARGS := ["channelf","-verbose","-rompath",".","-cart",gamename,"-window","-resolution","102x58","-nokeepaspect"]
 
 # System-specific flags that should be passed to MESS's makefile.
 # MESS_FLAGS +=

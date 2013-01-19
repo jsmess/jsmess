@@ -217,7 +217,7 @@ BUILD_ZLIB = 1
 
 # specify symbols level or leave commented to use the default
 # (default is SYMLEVEL = 2 normally; use 1 if you only need backtrace)
-# SYMLEVEL = 2
+SYMLEVEL = 2
 
 # uncomment next line to dump the symbols to a .sym file
 # DUMPSYM = 1

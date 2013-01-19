@@ -1,11 +1,9 @@
 ################################################################################
-# Contains Makefile logic required when building Channel F
+# Contains Makefile logic required when building ColecoVision
 ################################################################################
 
-# ColecoVision has a bios that is required to run the system.
-BIOS := a800.zip a400.zip
-# SUBTARGET for the MESS makefile.
-SUBTARGET := a800
+SUBTARGET := atari2600
+MESS_ARGS := ["a2600","-verbose","-rompath",".","-cart",gamename,"-window","-resolution","176x223","-nokeepaspect"]
 
 # System-specific flags that should be passed to MESS's makefile.
 # MESS_FLAGS +=
