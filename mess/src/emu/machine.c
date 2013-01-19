@@ -133,7 +133,9 @@ void jsmess_main_loop() {
 
 void jsmess_set_main_loop(device_scheduler &sched) {
 	scheduler = &sched;
-	emscripten_set_main_loop(&jsmess_main_loop, 60);
+	emscripten_set_main_loop(&jsmess_main_loop, 60, 0);
+  jsmess_main_loop();
+  jsmess_main_loop();
 	abort();
 }
 #endif

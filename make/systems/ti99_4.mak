@@ -3,9 +3,10 @@
 ################################################################################
 
 # ColecoVision has a bios that is required to run the system.
-BIOS := apple2c.zip
+BIOS := ti99_4.zip
 # SUBTARGET for the MESS makefile.
-SUBTARGET := apple2c
+SUBTARGET := ti99_4
+MESS_ARGS := ["ti99_4","-verbose","-rompath",".","-window","-resolution","286x222","-cart1",gamename,"-nokeepaspect"]
 
 # System-specific flags that should be passed to MESS's makefile.
 # MESS_FLAGS +=

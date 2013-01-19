@@ -1,11 +1,12 @@
 ################################################################################
-# Contains Makefile logic required when building ColecoVision
+# Contains Makefile logic required when building Channel F
 ################################################################################
 
 # ColecoVision has a bios that is required to run the system.
-BIOS := coleco.zip
+BIOS := ibm5150.zip
 # SUBTARGET for the MESS makefile.
-SUBTARGET := colecovision
+SUBTARGET := ibm5150
+MESS_ARGS := ["ibm5150","-verbose","-rompath",".","-window","-resolution","320x200","-nokeepaspect"]
 
 # System-specific flags that should be passed to MESS's makefile.
 # MESS_FLAGS +=
