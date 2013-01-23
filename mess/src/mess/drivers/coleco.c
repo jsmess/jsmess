@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( coleco_io_map, AS_IO, 8, coleco_state )
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1e) AM_READWRITE_LEGACY(TMS9928A_vram_r, TMS9928A_vram_w)
 	AM_RANGE(0xa1, 0xa1) AM_MIRROR(0x1e) AM_READWRITE_LEGACY(TMS9928A_register_r, TMS9928A_register_w)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_WRITE(paddle_on_w)
-	//AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1f) AM_DEVWRITE_LEGACY("sn76489a", sn76496_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1f) AM_DEVWRITE_LEGACY("sn76489a", sn76496_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x1d) AM_READ(paddle_1_r)
 	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0x1d) AM_READ(paddle_2_r)
 ADDRESS_MAP_END
@@ -278,9 +278,9 @@ static MACHINE_CONFIG_START( coleco, coleco_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	// sound hardware
-	//MCFG_SPEAKER_STANDARD_MONO("mono")
-	//MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	/* 3.579545 MHz */
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	/* 3.579545 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
@@ -308,9 +308,9 @@ static MACHINE_CONFIG_START( czz50, coleco_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	// sound hardware
-	//MCFG_SPEAKER_STANDARD_MONO("mono")
-	//MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	// ???
-	//MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	// ???
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* cartridge */
 	MCFG_CARTSLOT_ADD("cart")
@@ -364,9 +364,9 @@ ROM_END
 /* System Drivers */
 
 //    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY             FULLNAME                            FLAGS
-CONS( 1982, coleco,   0,        0,      coleco,   coleco,   0,       "Coleco",           "ColecoVision",                     GAME_NO_SOUND )
-CONS( 1982, colecoa,  coleco,   0,      coleco,   coleco,   0,       "Coleco",           "ColecoVision (Thick Characters)",  GAME_NO_SOUND )
-CONS( 1983, colecob,  coleco,   0,      coleco,   coleco,   0,       "Spectravideo",     "SVI-603 Coleco Game Adapter",      GAME_NO_SOUND )
+CONS( 1982, coleco,   0,        0,      coleco,   coleco,   0,       "Coleco",           "ColecoVision",                     0 )
+CONS( 1982, colecoa,  coleco,   0,      coleco,   coleco,   0,       "Coleco",           "ColecoVision (Thick Characters)",  0 )
+CONS( 1983, colecob,  coleco,   0,      coleco,   coleco,   0,       "Spectravideo",     "SVI-603 Coleco Game Adapter",      0 )
 CONS( 1986, czz50,    0,   coleco,      czz50,	  czz50,    0,       "Bit Corporation",  "Chuang Zao Zhe 50",                0 )
 CONS( 1988, dina,     czz50,    0,      dina,	  czz50,    0,       "Telegames",        "Dina",                             0 )
 CONS( 1988, prsarcde, czz50,    0,      czz50,    czz50,    0,       "Telegames",        "Personal Arcade",                  0 )
