@@ -20,8 +20,6 @@ include $(SRC)/mess/osd/$(OSD)/$(OSD).mak
 #-------------------------------------------------
 
 CPUS += M6502
-CPUS += M68000
-CPUS += M680X0
 CPUS += COP400
 CPUS += Z80
 CPUS += MCS48
@@ -64,8 +62,6 @@ DRVLIBS = \
   $(MESS_DEVICES)/appldriv.o \
   $(MESS_DEVICES)/sonydriv.o \
   $(MESS_MACHINE)/ay3600.o \
-  $(MESS_DRIVERS)/lisa.o \
-  $(MESS_MACHINE)/lisa.o \
   $(EMUOBJ)/sound/ay8910.o \
   $(EMUOBJ)/machine/idectrl.o \
   $(EMUOBJ)/sound/speaker.o \
