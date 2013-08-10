@@ -49,7 +49,7 @@ endif
 #EMCC_FLAGS := -s DISABLE_EXCEPTION_CATCHING=0 -s ALLOW_MEMORY_GROWTH=1 -s RELOOP=1 -O1
 #-s LABEL_DEBUG=1
 #-O1 --llvm-opts 3 --llvm-lto 1 --closure 1
-EMCC_FLAGS := -O1 -s DISABLE_EXCEPTION_CATCHING=0
+EMCC_FLAGS := -O1 -s DISABLE_EXCEPTION_CATCHING=0 --llvm-opts 3 -s ALIASING_FUNCTION_POINTERS=1 --llvm-lto 3
 
 # Flags shared between the native tools build and emscripten build of MESS.
 SHARED_MESS_FLAGS := OSD=sdl       # Set the onscreen display to use SDL.
