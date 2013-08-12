@@ -1802,7 +1802,40 @@ static void init_port_types(running_machine &machine)
 	input_port_private *portdata = machine.input_port_data;
 
 	/* convert the array into a list of type states that can be modified */
-	construct_core_types(portdata->typelist);
+	construct_core_types_A(portdata->typelist);
+	construct_core_types_B(portdata->typelist);
+	construct_core_types_C(portdata->typelist);
+	construct_core_types_D(portdata->typelist);
+	construct_core_types_E(portdata->typelist);
+	construct_core_types_F(portdata->typelist);
+	construct_core_types_G(portdata->typelist);
+	construct_core_types_H(portdata->typelist);
+	construct_core_types_I(portdata->typelist);
+	construct_core_types_J(portdata->typelist);
+	construct_core_types_K(portdata->typelist);
+	construct_core_types_L(portdata->typelist);
+	construct_core_types_M(portdata->typelist);
+	construct_core_types_N(portdata->typelist);
+	construct_core_types_O(portdata->typelist);
+	construct_core_types_P(portdata->typelist);
+	construct_core_types_Q(portdata->typelist);
+	construct_core_types_R(portdata->typelist);
+	construct_core_types_S(portdata->typelist);
+	construct_core_types_T(portdata->typelist);
+	construct_core_types_U(portdata->typelist);
+	construct_core_types_V(portdata->typelist);
+	construct_core_types_W(portdata->typelist);
+	construct_core_types_X(portdata->typelist);
+	construct_core_types_Y(portdata->typelist);
+	construct_core_types_Z(portdata->typelist);
+	construct_core_types_AA(portdata->typelist);
+	construct_core_types_BB(portdata->typelist);
+	construct_core_types_CC(portdata->typelist);
+	construct_core_types_DD(portdata->typelist);
+	construct_core_types_EE(portdata->typelist);
+	construct_core_types_FF(portdata->typelist);
+	construct_core_types_GG(portdata->typelist);
+	construct_core_types_HH(portdata->typelist);
 
 	/* ask the OSD to customize the list */
 	machine.osd().customize_input_type_list(portdata->typelist);
