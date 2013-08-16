@@ -43,12 +43,13 @@ endif
 # put comments on multiline variable definitions. :(
 
 # Flags passed to emcc
-EMCC_FLAGS := -s DISABLE_EXCEPTION_CATCHING=0 -s ALLOW_MEMORY_GROWTH=1 -O2
+#EMCC_FLAGS := -s DISABLE_EXCEPTION_CATCHING=0 -s ALLOW_MEMORY_GROWTH=1 -O2
 #EMCC_FLAGS := -s DISABLE_EXCEPTION_CATCHING=0 -s ALLOW_MEMORY_GROWTH=1 -O2 --closure 0 -s RELOOP=0
 #EMCC_FLAGS := -s LABEL_DEBUG=1 -s HEADLESS=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ALLOW_MEMORY_GROWTH=1 -s RELOOP=1 -O1
 #EMCC_FLAGS := -s DISABLE_EXCEPTION_CATCHING=0 -s ALLOW_MEMORY_GROWTH=1 -s RELOOP=1 -O1
 #-s LABEL_DEBUG=1
 #-O1 --llvm-opts 3 --llvm-lto 1 --closure 1
+EMCC_FLAGS := -O1 -s DISABLE_EXCEPTION_CATCHING=0 --llvm-opts 3 -s ALIASING_FUNCTION_POINTERS=1
 
 # Flags shared between the native tools build and emscripten build of MESS.
 SHARED_MESS_FLAGS := OSD=sdl       # Set the onscreen display to use SDL.
@@ -71,6 +72,8 @@ NATIVE_MESS_FLAGS += CC=$(NATIVE_CC) CXX=$(NATIVE_CXX) AR=$(NATIVE_AR) \
 MESS_FLAGS += TARGET=mess SUBTARGET=$(SYSTEM)
 MESS_FLAGS += VERBOSE=1  # Gives us detailed build information to make debugging
                          # build fails easier.
+# Uncomment for -g support to get C source line numbers in JS
+#MESS_FLAGS += SYMBOLS=1
 
 # The NATIVE_DEBUG flag allows us to build what emscripten is building natively.
 # This is invaluable when testing new build targets.
