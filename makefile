@@ -30,6 +30,7 @@ OBJ_DIR := $(CURDIR)/build
 # End user configurable variables
 # The variables below are not intended to be changed by the user.
 #-------------------------------------------------------------------------------
+EMCC_FLAGS :=
 include $(CURDIR)/make/common.mak
 
 ifdef SYSTEM
@@ -49,7 +50,7 @@ endif
 #EMCC_FLAGS := -s DISABLE_EXCEPTION_CATCHING=0 -s ALLOW_MEMORY_GROWTH=1 -s RELOOP=1 -O1
 #-s LABEL_DEBUG=1
 #-O1 --llvm-opts 3 --llvm-lto 1 --closure 1
-EMCC_FLAGS := -O2 -s DISABLE_EXCEPTION_CATCHING=0 -s ALIASING_FUNCTION_POINTERS=1
+EMCC_FLAGS += -O2 -s DISABLE_EXCEPTION_CATCHING=0 -s ALIASING_FUNCTION_POINTERS=1
 
 # Flags shared between the native tools build and emscripten build of MESS.
 SHARED_MESS_FLAGS := OSD=sdl       # Set the onscreen display to use SDL.
