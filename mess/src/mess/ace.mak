@@ -1,8 +1,8 @@
 ###########################################################################
 #
-#   colecovision.mak
+#   ace.mak
 #
-# ColecoVision-specific Makefile
+# Jupiter Ace-specific Makefile
 #
 ###########################################################################
 
@@ -16,28 +16,33 @@ include $(SRC)/mess/emudummy.mak
 
 #-------------------------------------------------
 # Specify all the CPU cores necessary for the
-# drivers referenced in colecovision.lst
+# drivers referenced in ace.lst
 #-------------------------------------------------
 
-
+#CPUS += 
 
 #-------------------------------------------------
 # Specify all the sound cores necessary for the
-# drivers referenced in colecovision.lst
+# drivers referenced in ace.lst
 #-------------------------------------------------
 
-SOUNDS += SN76496
-
+SOUNDS += SPEAKER
+SOUNDS += WAVE
+SOUNDS += AY8910
+SOUNDS += SP0256
 
 #-------------------------------------------------
 # This is the list of files that are necessary
 # for building all of the drivers referenced
-# in colecovision.lst
+# in ace.lst
 #-------------------------------------------------
 
-DRVLIBS += $(MESS_DRIVERS)/coleco.o
-DRVLIBS += $(MESS_MACHINE)/coleco.o
-
+DRVLIBS += $(MESS_DRIVERS)/ace.o
+DRVLIBS += $(EMU_MACHINE)/ctronics.o
+DRVLIBS += $(EMU_MACHINE)/i8255.o
+DRVLIBS += $(EMU_MACHINE)/z80pio.o
+DRVLIBS += $(LIBOBJ)/formats/ace_tap.o
+DRVLIBS += $(MESS_FORMATS)/ace_ace.o
 
 #-------------------------------------------------
 # MESS special OSD rules
