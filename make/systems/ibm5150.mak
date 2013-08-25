@@ -10,3 +10,4 @@ MESS_ARGS := ["ibm5150","-verbose","-rompath",".","-window","-resolution","320x2
 
 # System-specific flags that should be passed to MESS's makefile.
 # MESS_FLAGS +=
+EMCC_FLAGS += -s ALLOW_MEMORY_GROWTH=1 -s ASM_JS=0
