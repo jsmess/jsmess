@@ -131,7 +131,7 @@ clean:
 $(OBJ_DIR)/index.html: $(OBJ_DIR) $(TEMPLATE_FILES) $(BIOS_FILES) $(OBJ_DIR)/$(MESS_EXE).js.gz
 	@cp -r $(TEMPLATE_DIR)/* $(OBJ_DIR)/
 	@$(call SED_I,'s/BIOS_FILES/$(BIOS)/g' $(OBJ_DIR)/messloader.js)
-	@$(call SED_I,'s/MESS_SRC/$(MESS_EXE).js.gz/g' $(OBJ_DIR)/messloader.js)
+	@$(call SED_I,'s/MESS_SRC/$(MESS_EXE).js/g' $(OBJ_DIR)/messloader.js)
 	@$(call SED_I,'s/MESS_ARGS/$(MESS_ARGS)/g' $(OBJ_DIR)/messloader.js)
 	@echo "----------------------------------------------------------------------"
 	@echo "Compilation complete!"
