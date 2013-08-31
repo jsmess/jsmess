@@ -1,8 +1,8 @@
 ###########################################################################
 #
-#   colecovision.mak
+#   cat.mak
 #
-# ColecoVision-specific Makefile
+#   Canon Cat-specific Makefile
 #
 ###########################################################################
 
@@ -12,23 +12,17 @@ MESSUI = 0
 # include MESS core defines
 include $(SRC)/mess/messcore.mak
 include $(SRC)/mess/osd/$(OSD)/$(OSD).mak
-
+include $(SRC)/mess/emudummy.mak
 
 #-------------------------------------------------
 # Specify all the CPU cores necessary for the
-# drivers referenced in colecovision.lst
+# drivers referenced in cat.lst
 #-------------------------------------------------
 
 CPUS += M680X0
-CPUS += 68681
-CPUS += Z80
-CPUS += MCS48
 
-DRVLIBS = \
-	$(EMUOBJ)/drivers/emudummy.o \
-	$(EMUOBJ)/machine/68681.o \
-	$(MESS_DRIVERS)/cat.o \
-
+DRVLIBS += $(MESS_DRIVERS)/cat.o
+DRVLIBS += $(EMU_MACHINE)/68681.o
 
 #-------------------------------------------------
 # MESS special OSD rules
