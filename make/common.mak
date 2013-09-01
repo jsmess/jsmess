@@ -42,7 +42,8 @@ NATIVE_LD := clang++
 NATIVE_AR := ar
 
 # Final directory for built files.
-OBJ_DIR     := $(OBJ_DIR)/$(SYSTEM)
+OBJ_DIR     := $(OBJ_DIR)/$(SUBTARGET)
+JS_OBJ_DIR     := $(OBJ_DIR)/$(SYSTEM)
 # The HTML template we'll be using.
 TEMPLATE_DIR := $(CURDIR)/templates/default
 # All of the files in the template directory. Allows for 'smart' HTML rebuilding
@@ -50,7 +51,7 @@ TEMPLATE_FILES := $(shell ls $(TEMPLATE_DIR))
 TEMPLATE_FILES := $(foreach TFILE,$(TEMPLATE_FILES),$(TEMPLATE_DIR)/$(TFILE))
 
 # The name of the bitcode executable produced by making mess.
-MESS_EXE := mess$(SYSTEM)
+MESS_EXE := mess$(SUBTARGET)
 
 ifeq ($(IS_64_BIT),1)
 NATIVE_OBJ := $(CURDIR)/mess/obj/sdl/nativemame64
