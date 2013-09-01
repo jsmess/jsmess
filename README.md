@@ -15,18 +15,15 @@ Why?
 
 Building
 --------
-To build JSMESS, check out the [Prerequisites and Dependencies](https://github.com/jsmess/jsmess/wiki/Prerequisites-and-Dependencies)
-page and the [Building](https://github.com/jsmess/jsmess/wiki/Building) page.
+To build JSMESS, read [How to build and test JSMESS](https://github.com/jsmess/jsmess/wiki/How-to-build-and-test-JSMESS).
 
 Status of JSMESS
 ----------------
-You can check out the status of JSMESS here:
-<https://github.com/jsmess/jsmess/wiki/Status>
+Jason Scott's [JSMESS](http://jsmess.textfiles.com) site has demos for most working systems now.
+We are working toward [v1.0](https://github.com/jsmess/jsmess/wiki/JSMESS-v1.0-Systems).
 
 Relevant Links
 --------------
 * [The blog post that started it all](http://ascii.textfiles.com/archives/3375)
-* [Wiki page](http://www.archiveteam.org/index.php?title=Javascript_Mess)
-
-
-
+* [Archive Team wiki page](http://www.archiveteam.org/index.php?title=Javascript_Mess)
+* [Full docs on the GitHub wiki](https://github.com/jsmess/jsmess/wiki)
