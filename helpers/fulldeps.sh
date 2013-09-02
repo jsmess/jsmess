@@ -42,7 +42,7 @@ do
 done
 
 ## make the output makefile-ready
-cat $1.deps.tmp | grep -v '^./emu/imagedev' | sed 's/\.\/mess\/drivers/$(MESS_DRIVERS)/g' |sed 's/\.\/lib\/formats/$(OBJ)\/lib\/formats/g' | sed 's/\.\/emu\/machine/$(EMUOBJ)\/machine/g' | sed 's/\.\/emu\/sound/$(EMUOBJ)\/sound/g' | sed 's/\.\/mess\/video/$(MESS_VIDEO)/g' | sed 's/\.\/mess\/devices/$(MESS_DEVICES)/g' | sed 's/\.\/emu\/cpu/$(EMUOBJ)\/cpu/g' | sed 's/\.\/mess\/machine/$(MESS_MACHINE)/g' | sed 's/\.\/mess\/formats/$(MESS_FORMATS)/g' | sed 's/\.\/emu\/video/$(EMU_VIDEO)/g' | sed 's/\.\/mame\/machine/$(MAME_MACHINE)/g' | sed 's/\.\/mame\/video/$(MAME_VIDEO)/g' > $1.newdeps.tmp
+cat $1.deps.tmp | grep -v '^./emu/imagedev' | sed 's/\.\/mess\/drivers/$(MESS_DRIVERS)/g' |sed 's/\.\/lib\/formats/$(OBJ)\/lib\/formats/g' | sed 's/\.\/emu\/machine/$(EMUOBJ)\/machine/g' | sed 's/\.\/emu\/sound/$(EMUOBJ)\/sound/g' | sed 's/\.\/mess\/video/$(MESS_VIDEO)/g' | sed 's/\.\/mess\/devices/$(MESS_DEVICES)/g' | sed 's/\.\/emu\/cpu/$(EMUOBJ)\/cpu/g' | sed 's/\.\/mess\/machine/$(MESS_MACHINE)/g' | sed 's/\.\/mess\/formats/$(MESS_FORMATS)/g' | sed 's/\.\/emu\/video/$(EMU_VIDEO)/g' | sed 's/\.\/mame\/machine/$(MAME_MACHINE)/g' | sed 's/\.\/mame\/video/$(MAME_VIDEO)/g' | sed 's/\.\/mess\/audio/$(MESS_MACHINE)/g' | sed 's/\.\/emu\/audio/$(EMU_AUDIO)/g' | sed 's/\.\/mame\/drivers/$(MAME_DRIVERS)/g' > $1.newdeps.tmp
 
 cat $1.newdeps.tmp | while read LINE
 do
