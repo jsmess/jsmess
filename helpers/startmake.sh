@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Take a MESS driver (system) name as the sole argument
 #
@@ -43,6 +43,15 @@ fi
 
 echo "Creating the $DRIVER makefiles."
 FULLNAME=`$MESS64PATH/$MESS64NAME -listxml $DRIVER | grep "<description>" | head -1 | sed 's/.*<description>//g' | sed 's/<\/description>.*//g'`
+if [ "$FULLNAME" == "" ]
+   then
+   echo ""
+   echo "Problem.  Couldn't find a system with that name."
+   echo "MESS may have provided some suggestions, try those?"
+   echo ""
+   exit 1
+fi
+
 width=`$MESS64PATH/$MESS64NAME -listxml $DRIVER | grep "<display " | sed 's/.*width=\"//g' | cut -f1 -d'"'`
 height=`$MESS64PATH/$MESS64NAME -listxml $DRIVER | grep "<display " | sed 's/.*height=\"//g' | cut -f1 -d'"'`
 RESOLUTION="${width}x${height}"
@@ -108,26 +117,6 @@ echo "# MESS_FLAGS +=" >>$O
 echo "# EMCC_FLAGS +=" >>$O
 echo "" >>$O
 
-## It's safe and easy to regenerate the .lst file
-
-echo "Creating the $MESSMAKE/${SOURCEFILE}.lst file."
-
-O=${MESSMAKE}/${SOURCEFILE}.lst
-
-echo "/******************************************************************************" >$O
-echo "" >> $O
-echo "     List of drivers $SOURCEFILE supports. This file is parsed by" >>$O
-echo "     makelist.exe, sorted, and output as C code describing the drivers." >>$O
-echo "" >> $O
-echo "******************************************************************************/" >>$O
-echo "" >> $O
-
-for AAA in $CHILDREN
-   do
-   BBB=`$MESS64PATH/$MESS64NAME -listxml $AAA | grep "<description>" | head -1 | sed 's/.*<description>//g' | sed 's/<\/description>.*//g'`
-   echo "${AAA} // ${BBB}" >>$O
-done
-
 if [ -f $MESSMAKE/$SOURCEFILE.mak ]
    then
    echo ""
@@ -159,6 +148,26 @@ echo "# DRVLIBS +=" >>$O
 ./fulldeps.sh $SOURCEFILE >> $O
 echo "" >>$O
 echo "include \$(SRC)/mess/osd/\$(OSD)/\$(OSD).mak" >>$O
+
+## It's safe and easy to regenerate the .lst file
+
+echo "Creating the $MESSMAKE/${SOURCEFILE}.lst file."
+
+O=${MESSMAKE}/${SOURCEFILE}.lst
+
+echo "/******************************************************************************" >$O
+echo "" >> $O
+echo "     List of drivers $SOURCEFILE supports. This file is parsed by" >>$O
+echo "     makelist.exe, sorted, and output as C code describing the drivers." >>$O
+echo "" >> $O
+echo "******************************************************************************/" >>$O
+echo "" >> $O
+
+for AAA in $CHILDREN
+   do
+   BBB=`$MESS64PATH/$MESS64NAME -listxml $AAA | grep "<description>" | head -1 | sed 's/.*<description>//g' | sed 's/<\/description>.*//g'`
+   echo "${AAA} // ${BBB}" >>$O
+done
 
 echo ""
 echo "You may need to edit ${MESSMAKE}/${SOURCEFILE}.mak"
