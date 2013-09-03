@@ -41,7 +41,6 @@ if [ -f $JSMESSMAKE/$DRIVER.mak ]
    exit 1
 fi
 
-echo "Creating the $DRIVER makefiles."
 FULLNAME=`$MESS64PATH/$MESS64NAME -listxml $DRIVER | grep "<description>" | head -1 | sed 's/.*<description>//g' | sed 's/<\/description>.*//g'`
 if [ "$FULLNAME" == "" ]
    then
@@ -51,6 +50,8 @@ if [ "$FULLNAME" == "" ]
    echo ""
    exit 1
 fi
+
+echo "Creating the $DRIVER makefiles."
 
 width=`$MESS64PATH/$MESS64NAME -listxml $DRIVER | grep "<display " | sed 's/.*width=\"//g' | cut -f1 -d'"'`
 height=`$MESS64PATH/$MESS64NAME -listxml $DRIVER | grep "<display " | sed 's/.*height=\"//g' | cut -f1 -d'"'`
