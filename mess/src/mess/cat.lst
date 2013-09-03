@@ -1,8 +1,9 @@
 /******************************************************************************
 
-    cat.lst
+     List of drivers cat supports. This file is parsed by
+     makelist.exe, sorted, and output as C code describing the drivers.
 
 ******************************************************************************/
 
-swyft
-cat
+swyft // Swyft
+cat // Cat
