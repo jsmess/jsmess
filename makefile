@@ -31,11 +31,12 @@ OBJ_DIR := $(CURDIR)/build
 # The variables below are not intended to be changed by the user.
 #-------------------------------------------------------------------------------
 EMCC_FLAGS :=
-include $(CURDIR)/make/common.mak
 
 ifdef SYSTEM
 include $(CURDIR)/make/systems/$(SYSTEM).mak
 endif
+
+include $(CURDIR)/make/common.mak
 
 #-------------------------------------------------------------------------------
 # Flags on flags (emscripten / MESS / buildtools / Java flags)
@@ -70,7 +71,7 @@ NATIVE_MESS_FLAGS += CC=$(NATIVE_CC) CXX=$(NATIVE_CXX) AR=$(NATIVE_AR) \
 
 # Flags passed to the MESS makefile when building with emscripten.
 # Build the specific system in MESS.
-MESS_FLAGS += TARGET=mess SUBTARGET=$(SYSTEM)
+MESS_FLAGS += TARGET=mess SUBTARGET=$(SUBTARGET) SYSTEM=$(SYSTEM)
 MESS_FLAGS += VERBOSE=1  # Gives us detailed build information to make debugging
                          # build fails easier.
 
@@ -112,12 +113,12 @@ BIOS_FILES := $(foreach BIOS_FILE,$(BIOS),$(BIOS_DIR)/$(BIOS_FILE))
 # of the target.
 .PHONY: default clean buildtools
 
-default: $(OBJ_DIR)/index.html
+default: $(JS_OBJ_DIR)/index.html
 
 # Runs a webserver so you can test a given system.
-test: $(OBJ_DIR)/index.html
+test: $(JS_OBJ_DIR)/index.html
 	@echo "Visit http://localhost:8000 to test $(SYSTEM). Use CTRL+C to kill the webserver"
-	cd $(OBJ_DIR); python -m SimpleHTTPServer 8000
+	cd $(JS_OBJ_DIR); python -m SimpleHTTPServer 8000
 
 # Compiles buildtools required by MESS.
 buildtools:
@@ -128,17 +129,20 @@ clean:
 	cd mess; $(EMMAKE) make $(SHARED_FLAGS) $(EMSCRIPTEN_MESS_FLAGS) clean
 
 # Creates a final HTML file.
-$(OBJ_DIR)/index.html: $(OBJ_DIR) $(TEMPLATE_FILES) $(BIOS_FILES) $(OBJ_DIR)/$(MESS_EXE).js.gz
-	@cp -r $(TEMPLATE_DIR)/* $(OBJ_DIR)/
-	@$(call SED_I,'s/BIOS_FILES/$(BIOS)/g' $(OBJ_DIR)/messloader.js)
-	@$(call SED_I,'s/MESS_SRC/$(MESS_EXE).js/g' $(OBJ_DIR)/messloader.js)
-	@$(call SED_I,'s/MESS_ARGS/$(MESS_ARGS)/g' $(OBJ_DIR)/messloader.js)
+$(JS_OBJ_DIR)/index.html: $(JS_OBJ_DIR) $(TEMPLATE_FILES) $(BIOS_FILES) $(OBJ_DIR)/$(MESS_EXE).js.gz
+	@cp $(OBJ_DIR)/$(MESS_EXE).js.gz $(JS_OBJ_DIR)/
+	@cp $(OBJ_DIR)/$(MESS_EXE).js $(JS_OBJ_DIR)/
+	@cp -r $(TEMPLATE_DIR)/* $(JS_OBJ_DIR)/
+	@$(call SED_I,'s/BIOS_FILES/$(BIOS)/g' $(JS_OBJ_DIR)/messloader.js)
+	@$(call SED_I,'s/MESS_SRC/$(MESS_EXE).js/g' $(JS_OBJ_DIR)/messloader.js)
+	@$(call SED_I,'s/MESS_ARGS/$(MESS_ARGS)/g' $(JS_OBJ_DIR)/messloader.js)
 	@echo "----------------------------------------------------------------------"
 	@echo "Compilation complete!"
 	@echo "System: $(SYSTEM)"
-	@echo "Output File: $(OBJ_DIR)/index.html"
+	@echo "Parent: $(SUBTARGET)"
+	@echo "Output File: $(JS_OBJ_DIR)/index.html"
 	@echo "----------------------------------------------------------------------"
-	@echo "In $(OBJ_DIR)/messloader.js,"
+	@echo "In $(JS_OBJ_DIR)/messloader.js,"
 	@echo "change 'gamename' at the top to the filename of a game in that"
 	@echo "directory!"
 	@echo "----------------------------------------------------------------------"
@@ -147,9 +151,12 @@ $(OBJ_DIR)/index.html: $(OBJ_DIR) $(TEMPLATE_FILES) $(BIOS_FILES) $(OBJ_DIR)/$(M
 $(OBJ_DIR):
 	@mkdir -p $(OBJ_DIR)
 
+$(JS_OBJ_DIR):
+	@mkdir -p $(JS_OBJ_DIR)
+
 # Compresses the executable.
 $(OBJ_DIR)/$(MESS_EXE).js.gz: $(OBJ_DIR)/$(MESS_EXE).js
-	gzip -f -c $(OBJ_DIR)/$(MESS_EXE).js > $(OBJ_DIR)/$(MESS_EXE).js.gz
+	gzip -f -c $< > $(OBJ_DIR)/$(MESS_EXE).js.gz
 
 # Runs emcc on LLVM bitcode version of MESS.
 $(OBJ_DIR)/$(MESS_EXE).js: mess/$(MESS_EXE).bc post.js
@@ -169,4 +176,4 @@ mess/$(MESS_EXE): buildtools
 # embedded file)
 $(BIOS_FILES)::
 	@if [ ! -f $@ ]; then echo "File $@ does not exist!"; exit 1; fi
-	@cp $@ $(OBJ_DIR)
+	@cp $@ $(JS_OBJ_DIR)
