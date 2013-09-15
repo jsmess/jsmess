@@ -166,8 +166,11 @@ echo "" >> $O
 
 for AAA in $CHILDREN
    do
-   BBB=`$MESS64PATH/$MESS64NAME -listxml $AAA | grep "<description>" | head -1 | sed 's/.*<description>//g' | sed 's/<\/description>.*//g'`
-   echo "${AAA} // ${BBB}" >>$O
+   BBB=`$MESS64PATH/$MESS64NAME -listxml $AAA 2>/dev/null | grep "<description>" | head -1 | sed 's/.*<description>//g' | sed 's/<\/description>.*//g'`
+   if [ "$BBB" != "" ]
+      then
+      echo "${AAA} // ${BBB}" >>$O
+   fi
 done
 
 echo ""
