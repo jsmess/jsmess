@@ -45,13 +45,7 @@ include $(CURDIR)/make/common.mak
 # put comments on multiline variable definitions. :(
 
 # Flags passed to emcc
-#EMCC_FLAGS := -s DISABLE_EXCEPTION_CATCHING=0 -s ALLOW_MEMORY_GROWTH=1 -O2
-#EMCC_FLAGS := -s DISABLE_EXCEPTION_CATCHING=0 -s ALLOW_MEMORY_GROWTH=1 -O2 --closure 0 -s RELOOP=0
-#EMCC_FLAGS := -s LABEL_DEBUG=1 -s HEADLESS=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ALLOW_MEMORY_GROWTH=1 -s RELOOP=1 -O1
-#EMCC_FLAGS := -s DISABLE_EXCEPTION_CATCHING=0 -s ALLOW_MEMORY_GROWTH=1 -s RELOOP=1 -O1
-#-s LABEL_DEBUG=1
-#-O1 --llvm-opts 3 --llvm-lto 1 --closure 1
-EMCC_FLAGS += -O2 -s DISABLE_EXCEPTION_CATCHING=0 -s ALIASING_FUNCTION_POINTERS=1
+EMCC_FLAGS += -O2 -s DISABLE_EXCEPTION_CATCHING=0 -s ALIASING_FUNCTION_POINTERS=1 -s OUTLINING_LIMIT=20000
 
 # Flags shared between the native tools build and emscripten build of MESS.
 SHARED_MESS_FLAGS := OSD=sdl       # Set the onscreen display to use SDL.
