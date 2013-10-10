@@ -1,0 +1,13 @@
+/******************************************************************************
+
+    colecovision.lst
+
+    List of all ColecoVision drivers in the system. This file is parsed by
+    makelist.exe, sorted, and output as C code describing the drivers.
+
+******************************************************************************/
+
+cpc464    // CPC 464
+cpc664    // CPC 664
+cpc6128   // CPC 6128
+
