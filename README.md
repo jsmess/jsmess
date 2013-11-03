@@ -13,14 +13,14 @@ Why?
 > possible to turn computer history and experience into the same embeddable
 > object as movies, documents, and audio enjoy.
 
-Building
---------
-To build JSMESS, read [How to build and test JSMESS](https://github.com/jsmess/jsmess/wiki/How-to-build-and-test-JSMESS-0.142).
-
 Status of JSMESS
 ----------------
 Jason Scott's [JSMESS](http://jsmess.textfiles.com) site has demos for most working systems now.
-We are working toward [v1.0](https://github.com/jsmess/jsmess/wiki/JSMESS-v1.0-Systems).
+Our "1.0" release has been tagged as JSMESS 0.142, and we are actively working on a new version.
+
+Building 0.142
+--------------
+To build JSMESS 0.142, start with [How to build and test JSMESS 0.142](https://github.com/jsmess/jsmess/wiki/How-to-build-and-test-JSMESS-0.142).
 
 Relevant Links
 --------------
