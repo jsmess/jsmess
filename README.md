@@ -15,7 +15,7 @@ Why?
 
 Building
 --------
-To build JSMESS, read [How to build and test JSMESS](https://github.com/jsmess/jsmess/wiki/How-to-build-and-test-JSMESS).
+To build JSMESS, read [How to build and test JSMESS](https://github.com/jsmess/jsmess/wiki/How-to-build-and-test-JSMESS-0.142).
 
 Status of JSMESS
 ----------------
