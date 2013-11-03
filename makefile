@@ -31,6 +31,7 @@ OBJ_DIR := $(CURDIR)/build
 # The variables below are not intended to be changed by the user.
 #-------------------------------------------------------------------------------
 EMCC_FLAGS :=
+DEBUG_NAME :=
 
 ifdef SYSTEM
 include $(CURDIR)/make/systems/$(SYSTEM).mak
@@ -69,9 +70,15 @@ MESS_FLAGS += TARGET=mess SUBTARGET=$(SUBTARGET) SYSTEM=$(SYSTEM)
 MESS_FLAGS += VERBOSE=1  # Gives us detailed build information to make debugging
                          # build fails easier.
 
-# Uncomment for -g support to get C source line numbers in JS
-#MESS_FLAGS += SYMBOLS=1
+# Uncomment for debug/profiling support
+#MESS_FLAGS += SYMBOLS=1 SYMLEVEL=2
 #EMCC_FLAGS += -g2
+#DEBUG_NAME := -debug
+
+# Uncomment for advanced debug support with source line numbers
+#MESS_FLAGS += SYMBOLS=1 SYMLEVEL=2
+#EMCC_FLAGS += --js-opts 0 -g4
+#DEBUG_NAME := -debug
 
 # The NATIVE_DEBUG flag allows us to build what emscripten is building natively.
 # This is invaluable when testing new build targets.
@@ -99,6 +106,10 @@ NATIVE_MESS_FLAGS := $(SHARED_MESS_FLAGS) $(NATIVE_MESS_FLAGS)
 
 BIOS_FILES := $(foreach BIOS_FILE,$(BIOS),$(BIOS_DIR)/$(BIOS_FILE))
 
+JSMESS_MESS_BUILD_VERSION := $(shell tail --lines=1 mess/src/version.c | cut -d '"' -f 2)$(shell date -u))
+JSMESS_EMCC_VERSION := $(shell third_party/emscripten/emcc --version | grep commit)
+
+
 #-------------------------------------------------------------------------------
 # Build Rules
 #-------------------------------------------------------------------------------
@@ -123,12 +134,13 @@ clean:
 	cd mess; $(EMMAKE) make $(SHARED_FLAGS) $(EMSCRIPTEN_MESS_FLAGS) clean
 
 # Creates a final HTML file.
-$(JS_OBJ_DIR)/index.html: $(JS_OBJ_DIR) $(TEMPLATE_FILES) $(BIOS_FILES) $(OBJ_DIR)/$(MESS_EXE).js.gz
-	@cp $(OBJ_DIR)/$(MESS_EXE).js.gz $(JS_OBJ_DIR)/
-	@cp $(OBJ_DIR)/$(MESS_EXE).js $(JS_OBJ_DIR)/
+$(JS_OBJ_DIR)/index.html: $(JS_OBJ_DIR) $(TEMPLATE_FILES) $(BIOS_FILES) $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz
+	@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz $(JS_OBJ_DIR)/
+	@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js $(JS_OBJ_DIR)/
+	-@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.map $(JS_OBJ_DIR)/
 	@cp -r $(TEMPLATE_DIR)/* $(JS_OBJ_DIR)/
 	@$(call SED_I,'s/BIOS_FILES/$(BIOS)/g' $(JS_OBJ_DIR)/messloader.js)
-	@$(call SED_I,'s/MESS_SRC/$(MESS_EXE).js/g' $(JS_OBJ_DIR)/messloader.js)
+	@$(call SED_I,'s/MESS_SRC/$(MESS_EXE)$(DEBUG_NAME).js/g' $(JS_OBJ_DIR)/messloader.js)
 	@$(call SED_I,'s/MESS_ARGS/$(MESS_ARGS)/g' $(JS_OBJ_DIR)/messloader.js)
 	@echo "----------------------------------------------------------------------"
 	@echo "Compilation complete!"
@@ -149,16 +161,20 @@ $(JS_OBJ_DIR):
 	@mkdir -p $(JS_OBJ_DIR)
 
 # Compresses the executable.
-$(OBJ_DIR)/$(MESS_EXE).js.gz: $(OBJ_DIR)/$(MESS_EXE).js
-	gzip -f -c $< > $(OBJ_DIR)/$(MESS_EXE).js.gz
+$(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz: $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js
+	@gzip -f -c $< > $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz
 
 # Runs emcc on LLVM bitcode version of MESS.
-$(OBJ_DIR)/$(MESS_EXE).js: mess/$(MESS_EXE).bc post.js
-	$(EMCC) $(EMCC_FLAGS) $< -o $(OBJ_DIR)/$(MESS_EXE).js --post-js post.js
+$(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js: mess/$(MESS_EXE)$(DEBUG_NAME).bc pre.js post.js
+	$(EMCC) $(EMCC_FLAGS) $< -o $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js --pre-js pre.js --post-js post.js
+	@$(call SED_I,'s/JSMESS_MESS_BUILD_VERSION/$(JSMESS_MESS_BUILD_VERSION)/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
+	@$(call SED_I,'s/JSMESS_EMCC_VERSION/$(JSMESS_EMCC_VERSION)/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
+	@$(call SED_I,'s/JSMESS_EMCC_FLAGS/$(EMCC_FLAGS)/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
+	@$(call SED_I,'s/JSMESS_MESS_FLAGS/$(subst ",\\", $(subst /,\/, $(MESS_FLAGS)))/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
 
 # Copies over the LLVM bitcode for MESS into a .bc file.
-mess/$(MESS_EXE).bc: mess/$(MESS_EXE)
-	@cp $< mess/$(MESS_EXE).bc
+mess/$(MESS_EXE)$(DEBUG_NAME).bc: mess/$(MESS_EXE)
+	@cp $< mess/$(MESS_EXE)$(DEBUG_NAME).bc
 
 # Compiles MESS to LLVM bitcode.
 mess/$(MESS_EXE): buildtools
