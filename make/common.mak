@@ -44,8 +44,13 @@ NATIVE_AR := ar
 # Final directory for built files.
 OBJ_DIR     := $(OBJ_DIR)/$(SUBTARGET)
 JS_OBJ_DIR     := $(OBJ_DIR)/$(SYSTEM)
+
+ifndef TEMPLATE
+TEMPLATE := default
+endif
+
 # The HTML template we'll be using.
-TEMPLATE_DIR := $(CURDIR)/templates/default
+TEMPLATE_DIR := $(CURDIR)/templates/$(TEMPLATE)
 # All of the files in the template directory. Allows for 'smart' HTML rebuilding
 TEMPLATE_FILES := $(shell ls $(TEMPLATE_DIR))
 TEMPLATE_FILES := $(foreach TFILE,$(TEMPLATE_FILES),$(TEMPLATE_DIR)/$(TFILE))

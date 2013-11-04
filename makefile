@@ -47,6 +47,8 @@ include $(CURDIR)/make/common.mak
 
 # Flags passed to emcc
 EMCC_FLAGS += -O2 -s DISABLE_EXCEPTION_CATCHING=0 -s ALIASING_FUNCTION_POINTERS=1 -s OUTLINING_LIMIT=20000
+EMCC_FLAGS += -s EXPORTED_FUNCTIONS="['_main', '_malloc', \
+'__Z15ui_set_show_fpsi', '__Z15ui_get_show_fpsv']"
 
 # Flags shared between the native tools build and emscripten build of MESS.
 SHARED_MESS_FLAGS := OSD=sdl       # Set the onscreen display to use SDL.
@@ -139,6 +141,8 @@ $(JS_OBJ_DIR)/index.html: $(JS_OBJ_DIR) $(TEMPLATE_FILES) $(BIOS_FILES) $(OBJ_DI
 	@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js $(JS_OBJ_DIR)/
 	-@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.map $(JS_OBJ_DIR)/
 	@cp -r $(TEMPLATE_DIR)/* $(JS_OBJ_DIR)/
+	@rm $(JS_OBJ_DIR)/pre.js
+	@rm $(JS_OBJ_DIR)/post.js
 	@$(call SED_I,'s/BIOS_FILES/$(BIOS)/g' $(JS_OBJ_DIR)/messloader.js)
 	@$(call SED_I,'s/MESS_SRC/$(MESS_EXE)$(DEBUG_NAME).js/g' $(JS_OBJ_DIR)/messloader.js)
 	@$(call SED_I,'s/MESS_ARGS/$(MESS_ARGS)/g' $(JS_OBJ_DIR)/messloader.js)
@@ -165,11 +169,11 @@ $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz: $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).j
 	@gzip -f -c $< > $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz
 
 # Runs emcc on LLVM bitcode version of MESS.
-$(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js: mess/$(MESS_EXE)$(DEBUG_NAME).bc pre.js post.js
-	$(EMCC) $(EMCC_FLAGS) $< -o $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js --pre-js pre.js --post-js post.js
+$(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js: mess/$(MESS_EXE)$(DEBUG_NAME).bc $(TEMPLATE_DIR)/pre.js $(TEMPLATE_DIR)/post.js
+	$(EMCC) $(EMCC_FLAGS) $< -o $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js --pre-js $(TEMPLATE_DIR)/pre.js --post-js $(TEMPLATE_DIR)/post.js
 	@$(call SED_I,'s/JSMESS_MESS_BUILD_VERSION/$(JSMESS_MESS_BUILD_VERSION)/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
 	@$(call SED_I,'s/JSMESS_EMCC_VERSION/$(JSMESS_EMCC_VERSION)/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
-	@$(call SED_I,'s/JSMESS_EMCC_FLAGS/$(EMCC_FLAGS)/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
+	@$(call SED_I,'s/JSMESS_EMCC_FLAGS/$(subst ",\\", $(EMCC_FLAGS))/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
 	@$(call SED_I,'s/JSMESS_MESS_FLAGS/$(subst ",\\", $(subst /,\/, $(MESS_FLAGS)))/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
 
 # Copies over the LLVM bitcode for MESS into a .bc file.
