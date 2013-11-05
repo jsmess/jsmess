@@ -31,7 +31,10 @@ OBJ_DIR := $(CURDIR)/build
 # The variables below are not intended to be changed by the user.
 #-------------------------------------------------------------------------------
 EMCC_FLAGS :=
+
+ifndef DEBUG_NAME
 DEBUG_NAME :=
+endif
 
 ifdef SYSTEM
 include $(CURDIR)/make/systems/$(SYSTEM).mak
