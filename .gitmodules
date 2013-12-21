@@ -1,3 +1,6 @@
 [submodule "third_party/emscripten"]
 	path = third_party/emscripten
 	url = https://github.com/kripken/emscripten.git
+[submodule "third_party/mame"]
+	path = third_party/mame
+	url = https://github.com/startaq/mame.git
