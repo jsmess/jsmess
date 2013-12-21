@@ -1,3 +1,0 @@
-DECLARE_LEGACY_SOUND_DEVICE(WIPING, wiping_sound);
-
-WRITE8_DEVICE_HANDLER( wiping_sound_w );
