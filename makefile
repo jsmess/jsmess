@@ -37,10 +37,70 @@ DEBUG_NAME :=
 endif
 
 ifdef SYSTEM
-include $(CURDIR)/make/systems/$(SYSTEM).mak
+include $(CURDIR)/systems/$(SYSTEM).mak
 endif
 
-include $(CURDIR)/make/common.mak
+#-------------------------------------------------------------------------------
+#   This is where we hide all of our dirty Makefile secrets. Namely, all of the
+#   gross details like 64-bit checking.
+#-------------------------------------------------------------------------------
+# Are we on a 64 bit platform? If so, mame will append '64' to the native_obj
+# directory.
+# Logic copied from MESS Makefile.
+UNAME := $(shell uname -a)
+ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
+IS_64_BIT := 1
+endif
+ifeq ($(firstword $(filter amd64,$(UNAME))),amd64)
+IS_64_BIT := 1
+endif
+ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
+IS_64_BIT := 1
+endif
+
+# Function that generates a command to run sed with inplace replacement.
+# Unfortunately, GNU and BSD sed are slightly different. BSD sed returns an
+# error code when you run --help, which we abuse in this statement.
+# Left command is GNU, right command is BSD.
+# As this is a function, do not use := for immediate resolution!
+SED_I = sed --help >/dev/null 2>&1 && sed -i $(1) || sed -i '' $(1)
+
+
+MAME_DIR := $(CURDIR)/third_party/mame
+EMSCRIPTEN_DIR := $(CURDIR)/third_party/emscripten
+EMMAKE := $(EMSCRIPTEN_DIR)/emmake
+EMCC := $(EMSCRIPTEN_DIR)/emcc
+
+# Used to build native tools. CC/CXX must be clang due to the additional flags
+# we supply to the compiler for warnings and such.
+NATIVE_CC := clang
+NATIVE_CXX := clang++
+NATIVE_LD := clang++
+NATIVE_AR := ar
+
+# Final directory for built files.
+OBJ_DIR     := $(OBJ_DIR)/$(SUBTARGET)
+JS_OBJ_DIR     := $(OBJ_DIR)/$(SYSTEM)
+
+ifndef TEMPLATE
+TEMPLATE := default
+endif
+
+# The HTML template we'll be using.
+TEMPLATE_DIR := $(CURDIR)/templates/$(TEMPLATE)
+# All of the files in the template directory. Allows for 'smart' HTML rebuilding
+TEMPLATE_FILES := $(shell ls $(TEMPLATE_DIR))
+TEMPLATE_FILES := $(foreach TFILE,$(TEMPLATE_FILES),$(TEMPLATE_DIR)/$(TFILE))
+
+# The name of the bitcode executable produced by making mess.
+MESS_EXE := mess$(SUBTARGET)
+
+ifeq ($(IS_64_BIT),1)
+NATIVE_OBJ := $(MAME_DIR)/obj/nativesdl64
+else
+NATIVE_OBJ := $(MAME_DIR)/obj/nativesdl
+endif
+
 
 #-------------------------------------------------------------------------------
 # Flags on flags (emscripten / MESS / buildtools / Java flags)
@@ -49,17 +109,13 @@ include $(CURDIR)/make/common.mak
 # put comments on multiline variable definitions. :(
 
 # Flags passed to emcc
-EMCC_FLAGS += -O2 -s DISABLE_EXCEPTION_CATCHING=0 -s ALIASING_FUNCTION_POINTERS=1 -s OUTLINING_LIMIT=20000
+EMCC_FLAGS += -O2 -s DISABLE_EXCEPTION_CATCHING=0 -s ALIASING_FUNCTION_POINTERS=1 -s OUTLINING_LIMIT=20000 -s TOTAL_MEMORY=33554432
 EMCC_FLAGS += -s EXPORTED_FUNCTIONS="['_main', '_malloc', \
 '__Z15ui_set_show_fpsi', '__Z15ui_get_show_fpsv']"
 
 # Flags shared between the native tools build and emscripten build of MESS.
 SHARED_MESS_FLAGS := OSD=sdl       # Set the onscreen display to use SDL.
 SHARED_MESS_FLAGS += NOWERROR=1    # Disables -Werror (c|cxx)flag.
-SHARED_MESS_FLAGS += NOASM=1       # No assembly allowed!
-SHARED_MESS_FLAGS += NO_X11=1      # Disable X11 support for the SDL OSD.
-SHARED_MESS_FLAGS += NO_DEBUGGER=1 # Mainly relevant to emscripten. Disables
-                                   # the GTK(?) debugger.
 
 # MESS makefile flags used to build the native tools.
 NATIVE_MESS_FLAGS := PREFIX=native # Prefix prevents us from accidentally
@@ -111,7 +167,7 @@ NATIVE_MESS_FLAGS := $(SHARED_MESS_FLAGS) $(NATIVE_MESS_FLAGS)
 
 BIOS_FILES := $(foreach BIOS_FILE,$(BIOS),$(BIOS_DIR)/$(BIOS_FILE))
 
-JSMESS_MESS_BUILD_VERSION := $(shell tail --lines=1 mess/src/version.c | cut -d '"' -f 2)$(shell date -u))
+JSMESS_MESS_BUILD_VERSION := $(shell tail --lines=1 third_party/mame/src/version.c | cut -d '"' -f 2)commit $(shell cat .git/modules/third_party/mame/HEAD))
 JSMESS_EMCC_VERSION := $(shell third_party/emscripten/emcc --version | grep commit)
 
 
@@ -132,11 +188,11 @@ test: $(JS_OBJ_DIR)/index.html
 
 # Compiles buildtools required by MESS.
 buildtools:
-	@cd mess; make $(NATIVE_MESS_FLAGS) buildtools
+	@cd $(MAME_DIR); make $(NATIVE_MESS_FLAGS) buildtools
 
 clean:
-	cd mess; make $(SHARED_FLAGS) $(NATIVE_MESS_FLAGS) clean
-	cd mess; $(EMMAKE) make $(SHARED_FLAGS) $(EMSCRIPTEN_MESS_FLAGS) clean
+	cd $(MAME_DIR); make $(SHARED_FLAGS) $(NATIVE_MESS_FLAGS) clean
+	cd $(MAME_DIR); $(EMMAKE) make $(SHARED_FLAGS) $(EMSCRIPTEN_MESS_FLAGS) clean
 
 # Creates a final HTML file.
 $(JS_OBJ_DIR)/index.html: $(JS_OBJ_DIR) $(TEMPLATE_FILES) $(BIOS_FILES) $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz
@@ -172,20 +228,20 @@ $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz: $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).j
 	@gzip -f -c $< > $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz
 
 # Runs emcc on LLVM bitcode version of MESS.
-$(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js: mess/$(MESS_EXE)$(DEBUG_NAME).bc $(TEMPLATE_DIR)/pre.js $(TEMPLATE_DIR)/post.js
+$(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js: $(MAME_DIR)/$(MESS_EXE)$(DEBUG_NAME).bc $(TEMPLATE_DIR)/pre.js $(TEMPLATE_DIR)/post.js
 	$(EMCC) $(EMCC_FLAGS) $< -o $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js --pre-js $(TEMPLATE_DIR)/pre.js --post-js $(TEMPLATE_DIR)/post.js
-	@$(call SED_I,'s/JSMESS_MESS_BUILD_VERSION/$(JSMESS_MESS_BUILD_VERSION)/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
+	@$(call SED_I,'s/JSMESS_MESS_BUILD_VERSION/$(subst /,\/, $(JSMESS_MESS_BUILD_VERSION))/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
 	@$(call SED_I,'s/JSMESS_EMCC_VERSION/$(JSMESS_EMCC_VERSION)/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
 	@$(call SED_I,'s/JSMESS_EMCC_FLAGS/$(subst ",\\", $(EMCC_FLAGS))/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
 	@$(call SED_I,'s/JSMESS_MESS_FLAGS/$(subst ",\\", $(subst /,\/, $(MESS_FLAGS)))/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
 
 # Copies over the LLVM bitcode for MESS into a .bc file.
-mess/$(MESS_EXE)$(DEBUG_NAME).bc: mess/$(MESS_EXE)
-	@cp $< mess/$(MESS_EXE)$(DEBUG_NAME).bc
+$(MAME_DIR)/$(MESS_EXE)$(DEBUG_NAME).bc: $(MAME_DIR)/$(MESS_EXE)
+	@cp $< $(MAME_DIR)/$(MESS_EXE)$(DEBUG_NAME).bc
 
 # Compiles MESS to LLVM bitcode.
-mess/$(MESS_EXE): buildtools
-	@cd mess; $(EMMAKE) make $(MESS_FLAGS)
+$(MAME_DIR)/$(MESS_EXE): buildtools
+	@cd $(MAME_DIR); $(EMMAKE) make $(MESS_FLAGS)
 
 # Ensures that required files actually exist and, if so, copies it over to the
 # build directory.

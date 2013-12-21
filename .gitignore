@@ -19,3 +19,6 @@
 /bios
 /build
 *.bc
+/systems/*.mak
+/helpers/*.txt
+/helpers/mess64

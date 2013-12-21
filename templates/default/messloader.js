@@ -33,10 +33,6 @@ var Module = {
 	print: (function() {
 		var element = document.getElementById('output');
 		return function(text) {
-			text = text.replace(/&/g, "&amp;");
-			text = text.replace(/</g, "&lt;");
-			text = text.replace(/>/g, "&gt;");
-			text = text.replace('\n', '<br>', 'g');
 			element.innerHTML += text + '<br>';
 		};
 	})(),
