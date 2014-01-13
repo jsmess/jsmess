@@ -1,8 +1,0 @@
-<tests>
-
-<test name="c65_000" driver="c65">
-	<wait time="5"/>
-	<checkblank/>
-</test>
-
-</tests>
