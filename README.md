@@ -16,11 +16,12 @@ Why?
 Status of JSMESS
 ----------------
 Jason Scott's [JSMESS](http://jsmess.textfiles.com) site has demos for most working systems now.
-Our "1.0" release has been tagged as JSMESS 0.142, and we are actively working on a new version.
+JSMESS is now tracking the latest versions of MESS, and sound and joystick support work in many
+cases.
 
-Building 0.142
---------------
-To build JSMESS 0.142, start with [How to build and test JSMESS 0.142](https://github.com/jsmess/jsmess/wiki/How-to-build-and-test-JSMESS-0.142).
+Building 0.151+
+---------------
+To build JSMESS 0.151+, start with [How to build and test JSMESS 0.151](https://github.com/jsmess/jsmess/wiki/How-to-build-and-test-JSMESS-0.151).
 
 Relevant Links
 --------------
