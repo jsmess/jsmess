@@ -109,7 +109,8 @@ endif
 # put comments on multiline variable definitions. :(
 
 # Flags passed to emcc
-EMCC_FLAGS += -O2 -s DISABLE_EXCEPTION_CATCHING=0 -s ALIASING_FUNCTION_POINTERS=1 -s OUTLINING_LIMIT=20000 -s TOTAL_MEMORY=33554432
+EMCC_FLAGS += -O3 -s DISABLE_EXCEPTION_CATCHING=2 -s TOTAL_MEMORY=33554432
+EMCC_FLAGS += -s EXCEPTION_CATCHING_WHITELIST='["__ZN15running_machine17start_all_devicesEv"]'
 EMCC_FLAGS += -s EXPORTED_FUNCTIONS="['_main', '_malloc', \
 '__Z15ui_set_show_fpsb', '__Z15ui_get_show_fpsv']"
 
