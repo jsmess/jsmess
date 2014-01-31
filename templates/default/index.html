@@ -6,6 +6,10 @@
 Modernizr.addTest('typedarray', function(){
   return (window.Float64Array != undefined);
 });
+Modernizr.addTest('mozsetup', function(){
+  var audio = new Audio();
+  return (typeof(audio['mozSetup']) === 'function');
+});
 Modernizr.load({
 	test: Modernizr.canvas && Modernizr.typedarray,
 	yep : [
