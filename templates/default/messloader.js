@@ -48,6 +48,15 @@ var Module = {
 		if (gamename !== "" && gamename !== "GAME_FILE") {
 			Module['FS_createDataFile']('/', gamename, game_file, true, true);
 		}
+		if (Modernizr.webaudio && !(Modernizr.audiodata && Modernizr.mozsetup)) {
+			var asample;
+			try {
+				asample = new AudioContext();
+			} catch (e) {
+				asample = new webkitAudioContext();
+			}
+			Module.arguments.push("-samplerate", asample.sampleRate.toString());
+		}
 	}
 };
 
