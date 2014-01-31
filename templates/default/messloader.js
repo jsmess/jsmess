@@ -38,6 +38,7 @@ var Module = {
 	})(),
 	canvas: document.getElementById('canvas'),
 	noInitialRun: false,
+	screenIsReadOnly: true,
 	preInit: function() {
 		// Load the downloaded binary files into the filesystem.
 		for (var bios_fname in bios_files) {
