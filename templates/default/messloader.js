@@ -1,3 +1,30 @@
+var JSMESS = JSMESS || {};
+JSMESS._readySet = false;
+JSMESS._readyList = [];
+JSMESS._runReadies = function() {
+	if (JSMESS._readyList) {
+		for (var r=0; r < JSMESS._readyList.length; r++) {
+			JSMESS._readyList[r].call(window, []);
+		};
+		JSMESS._readyList = [];
+	};
+};
+JSMESS._readyCheck = function() {
+	if (JSMESS.running) {
+		JSMESS._runReadies();
+	} else {
+		JSMESS._readySet = setTimeout(JSMESS._readyCheck, 10);
+	};
+};
+JSMESS.ready = function(r) {
+	if (JSMESS.running) {
+		r.call(window, []);
+	} else {
+		JSMESS._readyList.push(function() { return r.call(window, []); } );
+		if (!(JSMESS._readySet)) JSMESS._readyCheck();
+	};
+};
+
 var gamename = 'GAME_FILE';
 var game_file = null;
 var bios_filenames = 'BIOS_FILES'.split(' ');
