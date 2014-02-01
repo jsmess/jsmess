@@ -23,6 +23,8 @@
 
 # Where should we look for system BIOS?
 BIOS_DIR := bios
+# Where should we look for games?
+GAME_DIR := games
 # Where should we deposit all of the files we make?
 OBJ_DIR := $(CURDIR)/build
 
@@ -171,6 +173,11 @@ BIOS_FILES := $(foreach BIOS_FILE,$(BIOS),$(BIOS_DIR)/$(BIOS_FILE))
 JSMESS_MESS_BUILD_VERSION := $(shell tail --lines=1 third_party/mame/src/version.c | cut -d '"' -f 2)commit $(shell cat .git/modules/third_party/mame/HEAD))
 JSMESS_EMCC_VERSION := $(shell third_party/emscripten/emcc --version | grep commit)
 
+ifdef GAME
+GAME_FILE := $(GAME_DIR)/$(GAME)
+else
+GAME_FILE :=
+endif
 
 #-------------------------------------------------------------------------------
 # Build Rules
@@ -196,7 +203,7 @@ clean:
 	cd $(MAME_DIR); $(EMMAKE) make $(SHARED_FLAGS) $(EMSCRIPTEN_MESS_FLAGS) clean
 
 # Creates a final HTML file.
-$(JS_OBJ_DIR)/index.html: $(JS_OBJ_DIR) $(TEMPLATE_FILES) $(BIOS_FILES) $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz
+$(JS_OBJ_DIR)/index.html: $(JS_OBJ_DIR) $(TEMPLATE_FILES) $(BIOS_FILES) $(GAME_FILE) $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz
 	@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz $(JS_OBJ_DIR)/
 	@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js $(JS_OBJ_DIR)/
 	-@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.map $(JS_OBJ_DIR)/
@@ -204,6 +211,7 @@ $(JS_OBJ_DIR)/index.html: $(JS_OBJ_DIR) $(TEMPLATE_FILES) $(BIOS_FILES) $(OBJ_DI
 	@rm $(JS_OBJ_DIR)/pre.js
 	@rm $(JS_OBJ_DIR)/post.js
 	@$(call SED_I,'s/BIOS_FILES/$(BIOS)/g' $(JS_OBJ_DIR)/messloader.js)
+	@$(call SED_I,'s/GAME_FILE/$(GAME)/g' $(JS_OBJ_DIR)/messloader.js)
 	@$(call SED_I,'s/MESS_SRC/$(MESS_EXE)$(DEBUG_NAME).js/g' $(JS_OBJ_DIR)/messloader.js)
 	@$(call SED_I,'s/MESS_ARGS/$(MESS_ARGS)/g' $(JS_OBJ_DIR)/messloader.js)
 	@echo "----------------------------------------------------------------------"
@@ -212,7 +220,8 @@ $(JS_OBJ_DIR)/index.html: $(JS_OBJ_DIR) $(TEMPLATE_FILES) $(BIOS_FILES) $(OBJ_DI
 	@echo "Parent: $(SUBTARGET)"
 	@echo "Output File: $(JS_OBJ_DIR)/index.html"
 	@echo "----------------------------------------------------------------------"
-	@echo "In $(JS_OBJ_DIR)/messloader.js,"
+	@echo "If you didn't specify a GAME= file on the command line,"
+	@echo "in $(JS_OBJ_DIR)/messloader.js,"
 	@echo "change 'gamename' at the top to the filename of a game in that"
 	@echo "directory!"
 	@echo "----------------------------------------------------------------------"
@@ -249,5 +258,9 @@ $(MAME_DIR)/$(MESS_EXE): buildtools
 # Make it a double colon rule so it executes more than once (once for each
 # embedded file)
 $(BIOS_FILES)::
+	@if [ ! -f $@ ]; then echo "File $@ does not exist!"; exit 1; fi
+	@cp $@ $(JS_OBJ_DIR)
+
+$(GAME_FILE):
 	@if [ ! -f $@ ]; then echo "File $@ does not exist!"; exit 1; fi
 	@cp $@ $(JS_OBJ_DIR)

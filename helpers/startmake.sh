@@ -70,6 +70,11 @@ fi
 #resolution
 width=`$MESS64PATH/$MESS64NAME -listxml $DRIVER | grep "<display.*\"screen\"" | sed 's/.*width=\"//g' | cut -f1 -d'"'`
 height=`$MESS64PATH/$MESS64NAME -listxml $DRIVER | grep "<display.*\"screen\"" | sed 's/.*height=\"//g' | cut -f1 -d'"'`
+if [ "$width" == "" ]
+   then
+   width=`$MESS64PATH/$MESS64NAME -listxml $DRIVER | grep "<display.*\"raster\"" | sed 's/.*width=\"//g' | cut -f1 -d'"'`
+   height=`$MESS64PATH/$MESS64NAME -listxml $DRIVER | grep "<display.*\"raster\"" | sed 's/.*height=\"//g' | cut -f1 -d'"'`
+fi
 RESOLUTION="${width}x${height}"
 
 #files
