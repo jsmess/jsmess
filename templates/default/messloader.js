@@ -64,6 +64,7 @@ var Module = {
 		};
 	})(),
 	canvas: document.getElementById('canvas'),
+	screenIsReadOnly: true,
 	noInitialRun: false,
 	preInit: function() {
 		// Load the downloaded binary files into the filesystem.
