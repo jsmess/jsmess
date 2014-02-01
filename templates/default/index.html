@@ -7,8 +7,12 @@ Modernizr.addTest('typedarray', function(){
   return (window.Float64Array != undefined);
 });
 Modernizr.addTest('mozsetup', function(){
-  var audio = new Audio();
-  return (typeof(audio['mozSetup']) === 'function');
+  if (Modernizr.audiodata) {
+    var audio = new Audio();
+    return (typeof(audio['mozSetup']) === 'function');
+  } else {
+    return false;
+  };
 });
 Modernizr.load({
 	test: Modernizr.canvas && Modernizr.typedarray,

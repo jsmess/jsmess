@@ -6,7 +6,7 @@ var file_countdown = 0;
 if (bios_filenames.length !== 0 && bios_filenames[0] !== '') {
   file_countdown += bios_filenames.length;
 }
-if (gamename !== '' && gamename !== 'GAME_FILE') {
+if (gamename !== '') {
   file_countdown++;
 }
 
@@ -46,10 +46,10 @@ var Module = {
 				Module['FS_createDataFile']('/', bios_fname, bios_files[bios_fname], true, true);
 			}
 		}
-		if (gamename !== "" && gamename !== "GAME_FILE") {
+		if (gamename !== "") {
 			Module['FS_createDataFile']('/', gamename, game_file, true, true);
 		}
-		if (Modernizr.webaudio && !(Modernizr.audiodata && Modernizr.mozsetup)) {
+		if (Modernizr.webaudio && !(Modernizr.mozsetup)) {
 			var asample;
 			try {
 				asample = new AudioContext();
@@ -81,6 +81,6 @@ for (var i=0; i < bios_filenames.length; i++) {
   fetch_file(fname, function(data) { bios_files[fname] = data; update_countdown(); });
 }
 
-if (gamename !== "" && gamename !== "GAME_FILE") {
+if (gamename !== "") {
   fetch_file(gamename, function(data) { game_file = data; update_countdown(); });
 }
