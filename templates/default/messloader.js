@@ -65,6 +65,7 @@ var Module = {
 	})(),
 	canvas: document.getElementById('canvas'),
 	screenIsReadOnly: true,
+	SDL_numSimultaneouslyQueuedBuffers: 5,
 	noInitialRun: false,
 	preInit: function() {
 		// Load the downloaded binary files into the filesystem.
