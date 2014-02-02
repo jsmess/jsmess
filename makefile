@@ -114,7 +114,8 @@ endif
 EMCC_FLAGS += -O3 -s DISABLE_EXCEPTION_CATCHING=2 -s TOTAL_MEMORY=33554432
 EMCC_FLAGS += -s EXCEPTION_CATCHING_WHITELIST='["__ZN15running_machine17start_all_devicesEv"]'
 EMCC_FLAGS += -s EXPORTED_FUNCTIONS="['_main', '_malloc', \
-'__Z15ui_set_show_fpsb', '__Z15ui_get_show_fpsv']"
+'__Z14js_get_machinev', '__Z9js_get_uiv', \
+'__ZN10ui_manager12set_show_fpsEb', '__ZNK10ui_manager8show_fpsEv']"
 
 # Flags shared between the native tools build and emscripten build of MESS.
 SHARED_MESS_FLAGS := OSD=sdl       # Set the onscreen display to use SDL.

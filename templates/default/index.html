@@ -29,7 +29,7 @@ Modernizr.load({
 	<h1 style="text-align: center;">MESS in a browser!</h1>
 	<div id='canvasholder' style="text-align: center;">
 	</div>
-	<div><a href="javascript:JSMESS.ui_set_show_fps(!JSMESS.ui_get_show_fps());">Toggle MESS performance indicator</a></div>
+	<div><a href="javascript:JSMESS.ui_set_show_fps(JSMESS.get_ui(), !JSMESS.ui_get_show_fps(JSMESS.get_ui()));">Toggle MESS performance indicator</a></div>
 	<div id='status' style="display:block;"></div>
 	<div id='output' style="display:block;"></div>
 </body>
