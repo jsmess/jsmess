@@ -161,9 +161,9 @@ else
 # Emscripten targets a 32-bit machine, since 64-bit arithmetic is...
 # troublesome in JavaScript.
 # Emscripten ignores all optimization flags while compiling C/C++ code.
-# OPTIMIZE=2 should match -O2 in EMCC_FLAGS
+# OPTIMIZE=3 should match -O3 in EMCC_FLAGS
 MESS_FLAGS += CROSS_BUILD=1 NATIVE_OBJ="$(NATIVE_OBJ)" TARGETOS=emscripten \
-              PTR64=0 OPTIMIZE=2
+              PTR64=0 OPTIMIZE=3
 endif
 
 MESS_FLAGS        := $(SHARED_MESS_FLAGS) $(MESS_FLAGS)
