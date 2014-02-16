@@ -116,7 +116,7 @@ EMCC_FLAGS += -s EXCEPTION_CATCHING_WHITELIST='["__ZN15running_machine17start_al
 EMCC_FLAGS += -s EXPORTED_FUNCTIONS="['_main', '_malloc', \
 '__Z14js_get_machinev', '__Z9js_get_uiv', '__Z12js_get_soundv', \
 '__ZN10ui_manager12set_show_fpsEb', '__ZNK10ui_manager8show_fpsEv', \
-'__ZN13sound_manager4muteEbh']"
+'__ZN13sound_manager4muteEbh', 'SDL_PauseAudio']"
 
 # Flags shared between the native tools build and emscripten build of MESS.
 SHARED_MESS_FLAGS := OSD=sdl       # Set the onscreen display to use SDL.
@@ -164,7 +164,7 @@ else
 # Emscripten ignores all optimization flags while compiling C/C++ code.
 # OPTIMIZE=2 should match -O2 in EMCC_FLAGS
 MESS_FLAGS += CROSS_BUILD=1 NATIVE_OBJ="$(NATIVE_OBJ)" TARGETOS=emscripten \
-              PTR64=0 OPTIMIZE=2
+              PTR64=0 OPTIMIZE=3
 endif
 
 MESS_FLAGS        := $(SHARED_MESS_FLAGS) $(MESS_FLAGS)
@@ -206,6 +206,7 @@ clean:
 
 # Creates a final HTML file.
 $(JS_OBJ_DIR)/index.html: $(JS_OBJ_DIR) $(TEMPLATE_FILES) $(BIOS_FILES) $(GAME_FILE) $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz
+	-@cp $(GAME_FILE) $(JS_OBJ_DIR)/
 	@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz $(JS_OBJ_DIR)/
 	@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js $(JS_OBJ_DIR)/
 	-@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.map $(JS_OBJ_DIR)/
@@ -265,4 +266,4 @@ $(BIOS_FILES)::
 
 $(GAME_FILE):
 	@if [ ! -f $@ ]; then echo "File $@ does not exist!"; exit 1; fi
-	@cp $@ $(JS_OBJ_DIR)
+	@cp $@ $(JS_OBJ_DIR)/
