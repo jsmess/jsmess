@@ -64,6 +64,7 @@ var Module = {
 		};
 	})(),
 	canvas: document.getElementById('canvas'),
+	SDL_numSimultaneouslyQueuedBuffers: 5,
 	noInitialRun: false,
 	screenIsReadOnly: true,
 	preInit: function() {
