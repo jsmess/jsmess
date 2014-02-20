@@ -81,7 +81,7 @@ RESOLUTION="${width}x${height}"
 DEVICE=`$MESS64PATH/$MESS64NAME -listxml $DRIVER | grep briefname= | cut -f4 -d'"' | head -1`
 
 #parent
-SOURCEFILE=`$MESS64PATH/$MESS64NAME -listxml $DRIVER | grep "$DRIVER\".*sourcefile" | sed "s/.*sourcefile=\"\(.*\)\.c.*/\1/"`
+SOURCEFILE=`$MESS64PATH/$MESS64NAME -listxml $DRIVER | grep "\"$DRIVER\".*sourcefile" | sed "s/.*sourcefile=\"\(.*\)\.c.*/\1/"`
 echo "$DRIVER is part of $SOURCEFILE, along with:"
 
 #children
