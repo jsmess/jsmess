@@ -125,7 +125,7 @@ if [ "$DEVICE" != "" ]
    then
    echo -n "\"-${DEVICE}\",gamename," >>$O
 fi
-echo "\"-window\",\"-resolution\",\"${RESOLUTION}\",\"-nokeepaspect\"]" >> $O
+echo "\"-window\",\"-resolution\",\"${RESOLUTION}\",\"-nokeepaspect\",\"-autoframeskip\"]" >> $O
 echo "" >>$O
 echo "# MESS Compilation Flags" >>$O
 echo "# " >>$O
