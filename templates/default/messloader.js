@@ -106,7 +106,11 @@ for (var i=0; i < bios_filenames.length; i++) {
   if (fname === "") {
     continue;
   }
-  fetch_file(fname, function(data) { bios_files[fname] = data; update_countdown(); });
+  function getFunction(fname) {
+     // Wrapper function to avoid binding fname to loop variable
+     return function(data) { bios_files[fname] = data; update_countdown(); }
+  }
+  fetch_file(fname, getFunction(fname));
 }
 
 if (gamename !== "") {
