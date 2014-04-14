@@ -60,14 +60,6 @@ ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
 IS_64_BIT := 1
 endif
 
-# Function that generates a command to run sed with inplace replacement.
-# Unfortunately, GNU and BSD sed are slightly different. BSD sed returns an
-# error code when you run --help, which we abuse in this statement.
-# Left command is GNU, right command is BSD.
-# As this is a function, do not use := for immediate resolution!
-SED_I = sed --help >/dev/null 2>&1 && sed -i $(1) || sed -i '' $(1)
-
-
 MAME_DIR := $(CURDIR)/third_party/mame
 EMSCRIPTEN_DIR := $(CURDIR)/third_party/emscripten
 EMMAKE := $(EMSCRIPTEN_DIR)/emmake
@@ -214,10 +206,11 @@ $(JS_OBJ_DIR)/index.html: $(JS_OBJ_DIR) $(TEMPLATE_FILES) $(BIOS_FILES) $(GAME_F
 	@cp -r $(TEMPLATE_DIR)/* $(JS_OBJ_DIR)/
 	@rm $(JS_OBJ_DIR)/pre.js
 	@rm $(JS_OBJ_DIR)/post.js
-	@$(call SED_I,'s/BIOS_FILES/$(BIOS)/g' $(JS_OBJ_DIR)/messloader.js)
-	@$(call SED_I,'s/GAME_FILE/$(GAME)/g' $(JS_OBJ_DIR)/messloader.js)
-	@$(call SED_I,'s/MESS_SRC/$(MESS_EXE)$(DEBUG_NAME).js/g' $(JS_OBJ_DIR)/messloader.js)
-	@$(call SED_I,'s/MESS_ARGS/$(MESS_ARGS)/g' $(JS_OBJ_DIR)/messloader.js)
+	@sed -e 's/BIOS_FILES/$(BIOS)/g' \
+	     -e 's/GAME_FILE/$(GAME)/g' \
+	     -e 's/MESS_SRC/$(MESS_EXE)$(DEBUG_NAME).js/g' \
+	     -e 's/MESS_ARGS/$(MESS_ARGS)/g' \
+		 $(TEMPLATE_DIR)/messloader.js > $(JS_OBJ_DIR)/messloader.js
 	@echo "----------------------------------------------------------------------"
 	@echo "Compilation complete!"
 	@echo "System: $(SYSTEM)"
@@ -243,12 +236,14 @@ $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz: $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).j
 
 # Runs emcc on LLVM bitcode version of MESS.
 $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js: $(MAME_DIR)/$(MESS_EXE)$(DEBUG_NAME).bc $(TEMPLATE_DIR)/pre.js $(TEMPLATE_DIR)/post.js
-	$(EMCC) $(EMCC_FLAGS) $< -o $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js --pre-js $(TEMPLATE_DIR)/pre.js --post-js $(TEMPLATE_DIR)/post.js
-	@$(call SED_I,'s/JSMESS_JSMESS_VERSION/$(subst /,\/,$(JSMESS_VERSION))/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
-	@$(call SED_I,'s/JSMESS_MESS_BUILD_VERSION/$(subst /,\/,$(JSMESS_MESS_BUILD_VERSION))/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
-	@$(call SED_I,'s/JSMESS_EMCC_VERSION/$(JSMESS_EMCC_VERSION)/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
-	@$(call SED_I,'s/JSMESS_EMCC_FLAGS/$(subst ",\\", $(EMCC_FLAGS))/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
-	@$(call SED_I,'s/JSMESS_MESS_FLAGS/$(subst ",\\", $(subst /,\/, $(MESS_FLAGS)))/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
+	@sed -e 's/JSMESS_JSMESS_VERSION/$(subst /,\/,$(JSMESS_VERSION))/' \
+	     -e 's/JSMESS_MESS_BUILD_VERSION/$(subst /,\/,$(JSMESS_MESS_BUILD_VERSION))/' \
+	     -e 's/JSMESS_EMCC_VERSION/$(JSMESS_EMCC_VERSION)/' \
+	     -e 's/JSMESS_EMCC_FLAGS/$(subst ",\\",$(EMCC_FLAGS))/' \
+	     -e 's/JSMESS_MESS_FLAGS/$(subst ",\\",$(subst /,\/,$(MESS_FLAGS)))/' \
+	     $(TEMPLATE_DIR)/pre.js > $(OBJ_DIR)/pre.js
+	$(EMCC) $(EMCC_FLAGS) $< -o $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js --pre-js $(OBJ_DIR)/pre.js --post-js $(TEMPLATE_DIR)/post.js
+	@rm $(OBJ_DIR)/pre.js
 
 # Copies over the LLVM bitcode for MESS into a .bc file.
 $(MAME_DIR)/$(MESS_EXE)$(DEBUG_NAME).bc: $(MAME_DIR)/$(MESS_EXE)
