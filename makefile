@@ -172,6 +172,7 @@ NATIVE_MESS_FLAGS := $(SHARED_MESS_FLAGS) $(NATIVE_MESS_FLAGS)
 
 BIOS_FILES := $(foreach BIOS_FILE,$(BIOS),$(BIOS_DIR)/$(BIOS_FILE))
 
+JSMESS_VERSION := $(shell git rev-parse --abbrev-ref HEAD) (commit $(shell git rev-parse HEAD))
 JSMESS_MESS_BUILD_VERSION := $(shell tail --lines=1 third_party/mame/src/version.c | cut -d '"' -f 2)commit $(shell cat .git/modules/third_party/mame/HEAD))
 JSMESS_EMCC_VERSION := $(shell third_party/emscripten/emcc --version | grep commit)
 
@@ -243,7 +244,8 @@ $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz: $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).j
 # Runs emcc on LLVM bitcode version of MESS.
 $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js: $(MAME_DIR)/$(MESS_EXE)$(DEBUG_NAME).bc $(TEMPLATE_DIR)/pre.js $(TEMPLATE_DIR)/post.js
 	$(EMCC) $(EMCC_FLAGS) $< -o $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js --pre-js $(TEMPLATE_DIR)/pre.js --post-js $(TEMPLATE_DIR)/post.js
-	@$(call SED_I,'s/JSMESS_MESS_BUILD_VERSION/$(subst /,\/, $(JSMESS_MESS_BUILD_VERSION))/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
+	@$(call SED_I,'s/JSMESS_JSMESS_VERSION/$(subst /,\/,$(JSMESS_VERSION))/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
+	@$(call SED_I,'s/JSMESS_MESS_BUILD_VERSION/$(subst /,\/,$(JSMESS_MESS_BUILD_VERSION))/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
 	@$(call SED_I,'s/JSMESS_EMCC_VERSION/$(JSMESS_EMCC_VERSION)/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
 	@$(call SED_I,'s/JSMESS_EMCC_FLAGS/$(subst ",\\", $(EMCC_FLAGS))/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
 	@$(call SED_I,'s/JSMESS_MESS_FLAGS/$(subst ",\\", $(subst /,\/, $(MESS_FLAGS)))/' $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js)
