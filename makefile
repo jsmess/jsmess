@@ -109,6 +109,8 @@ EMCC_FLAGS += -s EXPORTED_FUNCTIONS="['_main', '_malloc', \
 '__Z14js_get_machinev', '__Z9js_get_uiv', '__Z12js_get_soundv', \
 '__ZN10ui_manager12set_show_fpsEb', '__ZNK10ui_manager8show_fpsEv', \
 '__ZN13sound_manager4muteEbh', 'SDL_PauseAudio']"
+# We added these because they are voodoo possibilities. Remove if an issue comes up.
+EMCC_FLAGS += -s NO_EXIT_RUNTIME=1 -s ASSERTIONS=0 -s COMPILER_ASSERTIONS=1 -s FORCE_ALIGNED_MEMORY=1 -s
 
 # Flags shared between the native tools build and emscripten build of MESS.
 SHARED_MESS_FLAGS := OSD=sdl       # Set the onscreen display to use SDL.
