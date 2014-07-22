@@ -47,7 +47,7 @@ do
 	rm $1.unr.tmp
 
 	## this list of things to pull out should grow as we cull additional stock files, like Z80 and MCS48
-	BADPATHS='^./lib/formats\|^./emu/imagedev\|^./emu/debug\|^./lib/expat\|^./lib/softfloat\|^./lib/util\|^./lib/zlib\|^./osd'
+	BADPATHS='^./lib/formats\|^./emu/imagedev\|^./emu/debug\|^./lib/libflac\|^./lib/expat\|^./lib/softfloat\|^./lib/util\|^./lib/zlib\|^./osd\|^./emu/ui'
 
 	sort -u $1.newdeps.tmp | grep -v $BADPATHS | awk -F '/' 'NF > 3' > $1.newerdeps.tmp
 	mv $1.newerdeps.tmp $1.newdeps.tmp
