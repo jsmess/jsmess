@@ -103,14 +103,15 @@ endif
 # put comments on multiline variable definitions. :(
 
 # Flags passed to emcc
-EMCC_FLAGS += -O3 -s DISABLE_EXCEPTION_CATCHING=2 -s TOTAL_MEMORY=33554432
+EMCC_FLAGS += -O3 -s DISABLE_EXCEPTION_CATCHING=0 -s TOTAL_MEMORY=315621376
+# MEMORY 157810688 33554432 (32mb) 315621376 (256mb) 
 EMCC_FLAGS += -s EXCEPTION_CATCHING_WHITELIST='["__ZN15running_machine17start_all_devicesEv"]'
 EMCC_FLAGS += -s EXPORTED_FUNCTIONS="['_main', '_malloc', \
 '__Z14js_get_machinev', '__Z9js_get_uiv', '__Z12js_get_soundv', \
 '__ZN10ui_manager12set_show_fpsEb', '__ZNK10ui_manager8show_fpsEv', \
 '__ZN13sound_manager4muteEbh', 'SDL_PauseAudio']"
 # We added these because they are voodoo possibilities. Remove if an issue comes up.
-EMCC_FLAGS += -s NO_EXIT_RUNTIME=1 -s ASSERTIONS=0 -s COMPILER_ASSERTIONS=1 -s FORCE_ALIGNED_MEMORY=1 -s
+EMCC_FLAGS += -s NO_EXIT_RUNTIME=1 -s ASSERTIONS=0 -s COMPILER_ASSERTIONS=1 -s FORCE_ALIGNED_MEMORY=1 
 
 # Flags shared between the native tools build and emscripten build of MESS.
 SHARED_MESS_FLAGS := OSD=sdl       # Set the onscreen display to use SDL.
@@ -204,6 +205,7 @@ $(JS_OBJ_DIR)/index.html: $(JS_OBJ_DIR) $(TEMPLATE_FILES) $(BIOS_FILES) $(GAME_F
 	-@cp $(GAME_FILE) $(JS_OBJ_DIR)/
 	@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz $(JS_OBJ_DIR)/
 	@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js $(JS_OBJ_DIR)/
+	@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.mem $(JS_OBJ_DIR)/
 	-@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.map $(JS_OBJ_DIR)/
 	@cp -r $(TEMPLATE_DIR)/* $(JS_OBJ_DIR)/
 	@rm $(JS_OBJ_DIR)/pre.js
