@@ -49,6 +49,7 @@ endif
 # Are we on a 64 bit platform? If so, mame will append '64' to the native_obj
 # directory.
 # Logic copied from MESS Makefile.
+
 UNAME := $(shell uname -a)
 ifeq ($(firstword $(filter x86_64,$(UNAME))),x86_64)
 IS_64_BIT := 1
@@ -67,12 +68,14 @@ EMCC := $(EMSCRIPTEN_DIR)/emcc
 
 # Used to build native tools. CC/CXX must be clang due to the additional flags
 # we supply to the compiler for warnings and such.
+
 NATIVE_CC := clang
 NATIVE_CXX := clang++
 NATIVE_LD := clang++
 NATIVE_AR := ar
 
 # Final directory for built files.
+
 OBJ_DIR     := $(OBJ_DIR)/$(SUBTARGET)
 JS_OBJ_DIR     := $(OBJ_DIR)/$(SYSTEM)
 
@@ -81,12 +84,16 @@ TEMPLATE := default
 endif
 
 # The HTML template we'll be using.
+
 TEMPLATE_DIR := $(CURDIR)/templates/$(TEMPLATE)
+
 # All of the files in the template directory. Allows for 'smart' HTML rebuilding
+
 TEMPLATE_FILES := $(shell ls $(TEMPLATE_DIR))
 TEMPLATE_FILES := $(foreach TFILE,$(TEMPLATE_FILES),$(TEMPLATE_DIR)/$(TFILE))
 
 # The name of the bitcode executable produced by making mess.
+
 MESS_EXE := mess$(SUBTARGET)
 
 ifeq ($(IS_64_BIT),1)
@@ -95,25 +102,41 @@ else
 NATIVE_OBJ := $(MAME_DIR)/obj/nativesdl
 endif
 
-
 #-------------------------------------------------------------------------------
 # Flags on flags (emscripten / MESS / buildtools / Java flags)
 #-------------------------------------------------------------------------------
 # We apply them one-at-a-time when we want to comment on them, since we can't
 # put comments on multiline variable definitions. :(
 
-# Flags passed to emcc
-EMCC_FLAGS += -O3 -s DISABLE_EXCEPTION_CATCHING=0 -s TOTAL_MEMORY=315621376
-# MEMORY 157810688 33554432 (32mb) 315621376 (256mb) 
+# EMCC Flags (Emscripten)
+# The second line consists of "voodoo settings". Change or remove if needed or testing.
+
+EMCC_FLAGS += -O3 -s DISABLE_EXCEPTION_CATCHING=0 
+EMCC_FLAGS += -s NO_EXIT_RUNTIME=1 -s ASSERTIONS=0 -s COMPILER_ASSERTIONS=1 -s FORCE_ALIGNED_MEMORY=1
+
+# Choose ONE of the following memory settings. (The least, the better.)
+# If you run the system and it crashes complaining about memory, go to the
+# next amount. (Eventually, this will be automatically chosen.)
+#
+# Hint: Most items appear to need at least 64mb of memory.
+
+# EMCC_FLAGS += -s TOTAL_MRMORY=16777216      # 16mb
+# EMCC_FLAGS += -s TOTAL_MEMORY=33554432      # 32mb
+# EMCC_FLAGS += -s TOTAL_MRMORY=67108864      # 64mb
+# EMCC_FLAGS += -s TOTAL_MEMORY=157810688     # 128mb
+EMCC_FLAGS += -s TOTAL_MEMORY=315621376     # 256mb
+
+# Additional controls and functions from the code, allowing direct JS manipulations.
+# If radical changes happen to MESS/MAME code, these may not work and be dormant.
+
 EMCC_FLAGS += -s EXCEPTION_CATCHING_WHITELIST='["__ZN15running_machine17start_all_devicesEv"]'
 EMCC_FLAGS += -s EXPORTED_FUNCTIONS="['_main', '_malloc', \
 '__Z14js_get_machinev', '__Z9js_get_uiv', '__Z12js_get_soundv', \
 '__ZN10ui_manager12set_show_fpsEb', '__ZNK10ui_manager8show_fpsEv', \
 '__ZN13sound_manager4muteEbh', 'SDL_PauseAudio']"
-# We added these because they are voodoo possibilities. Remove if an issue comes up.
-EMCC_FLAGS += -s NO_EXIT_RUNTIME=1 -s ASSERTIONS=0 -s COMPILER_ASSERTIONS=1 -s FORCE_ALIGNED_MEMORY=1 
 
 # Flags shared between the native tools build and emscripten build of MESS.
+
 SHARED_MESS_FLAGS := OSD=sdl       # Set the onscreen display to use SDL.
 SHARED_MESS_FLAGS += NOWERROR=1    # Disables -Werror (c|cxx)flag.
 
@@ -121,12 +144,15 @@ SHARED_MESS_FLAGS += NOWERROR=1    # Disables -Werror (c|cxx)flag.
 NATIVE_MESS_FLAGS := PREFIX=native # Prefix prevents us from accidentally
                                    # overwriting the tools when we build
                                    # emscripten.
+
 # Use the system's native tools, and optimize the build.
+
 NATIVE_MESS_FLAGS += CC=$(NATIVE_CC) CXX=$(NATIVE_CXX) AR=$(NATIVE_AR) \
                      LD=$(NATIVE_LD) OPTIMIZE=3
 
 # Flags passed to the MESS makefile when building with emscripten.
 # Build the specific system in MESS.
+
 MESS_FLAGS += TARGET=mess SUBTARGET=$(SUBTARGET) SYSTEM=$(SYSTEM)
 MESS_FLAGS += VERBOSE=1  # Gives us detailed build information to make debugging
                          # build fails easier.
@@ -145,12 +171,14 @@ MESS_FLAGS += VERBOSE=1  # Gives us detailed build information to make debugging
 # This is invaluable when testing new build targets.
 # Thus, this flag guards adding the flags to MESS_FLAGS that enable special
 # emscripten things that may not work in a native build.
+
 ifdef NATIVE_DEBUG
 EMMAKE :=
 EMCC := echo
 MESS_FLAGS += CC=$(NATIVE_CC) CXX=$(NATIVE_CXX) AR=$(NATIVE_AR) \
               LD=$(NATIVE_LD) OPTIMIZE=3
 else
+
 # Do not build the buildtools; use the ones we build natively.
 # We identify ourselves as the "emscripten" OS, allowing us to modify the MESS
 # Makefiles in a principled way.
@@ -158,6 +186,7 @@ else
 # troublesome in JavaScript.
 # Emscripten ignores all optimization flags while compiling C/C++ code.
 # OPTIMIZE=3 should match -O3 in EMCC_FLAGS
+
 MESS_FLAGS += CROSS_BUILD=1 NATIVE_OBJ="$(NATIVE_OBJ)" TARGETOS=emscripten \
               PTR64=0 OPTIMIZE=3
 endif
@@ -170,6 +199,8 @@ BIOS_FILES := $(foreach BIOS_FILE,$(BIOS),$(BIOS_DIR)/$(BIOS_FILE))
 JSMESS_VERSION := $(shell git rev-parse --abbrev-ref HEAD) (commit $(shell git rev-parse HEAD))
 JSMESS_MESS_BUILD_VERSION := $(shell tail --lines=1 third_party/mame/src/version.c | cut -d '"' -f 2)commit $(shell cat .git/modules/third_party/mame/HEAD))
 JSMESS_EMCC_VERSION := $(shell third_party/emscripten/emcc --version | grep commit)
+
+# Set the GAME variable for a ROM image in the "games" directory to have a playable game.
 
 ifdef GAME
 GAME_FILE := $(GAME_DIR)/$(GAME)
