@@ -111,7 +111,7 @@ endif
 # EMCC Flags (Emscripten)
 # The second line consists of "voodoo settings". Change or remove if needed or testing.
 
-EMCC_FLAGS += -O3 -s DISABLE_EXCEPTION_CATCHING=0 
+EMCC_FLAGS += -O3 -s DISABLE_EXCEPTION_CATCHING=2 
 EMCC_FLAGS += -s NO_EXIT_RUNTIME=1 -s ASSERTIONS=0 -s COMPILER_ASSERTIONS=1 -s FORCE_ALIGNED_MEMORY=1
 
 # Choose ONE of the following memory settings. (The least, the better.)
@@ -120,9 +120,9 @@ EMCC_FLAGS += -s NO_EXIT_RUNTIME=1 -s ASSERTIONS=0 -s COMPILER_ASSERTIONS=1 -s F
 #
 # Hint: Most items appear to need at least 64mb of memory.
 
-# EMCC_FLAGS += -s TOTAL_MRMORY=16777216      # 16mb
+# EMCC_FLAGS += -s TOTAL_MEMORY=16777216      # 16mb
 # EMCC_FLAGS += -s TOTAL_MEMORY=33554432      # 32mb
-# EMCC_FLAGS += -s TOTAL_MRMORY=67108864      # 64mb
+# EMCC_FLAGS += -s TOTAL_MEMORY=67108864      # 64mb
 # EMCC_FLAGS += -s TOTAL_MEMORY=157810688     # 128mb
 EMCC_FLAGS += -s TOTAL_MEMORY=315621376     # 256mb
 
