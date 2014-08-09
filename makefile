@@ -236,7 +236,7 @@ $(JS_OBJ_DIR)/index.html: $(JS_OBJ_DIR) $(TEMPLATE_FILES) $(BIOS_FILES) $(GAME_F
 	-@cp $(GAME_FILE) $(JS_OBJ_DIR)/
 	@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz $(JS_OBJ_DIR)/
 	@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js $(JS_OBJ_DIR)/
-	@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.mem $(JS_OBJ_DIR)/
+	-@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.mem $(JS_OBJ_DIR)/
 	-@cp $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.map $(JS_OBJ_DIR)/
 	@cp -r $(TEMPLATE_DIR)/* $(JS_OBJ_DIR)/
 	@rm $(JS_OBJ_DIR)/pre.js
