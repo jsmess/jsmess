@@ -44,6 +44,11 @@ newCanvas.height = 256;
 var holder = document.getElementById('canvasholder');
 holder.appendChild(newCanvas);
 
+var fullscreenbutton = document.getElementById('gofullscreen');
+if (fullscreenbutton) {
+  fullscreenbutton.addEventListener('click', gofullscreen);
+}
+
 var fetch_file = function(url, cb) {
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", url, true);
@@ -100,16 +105,8 @@ var update_countdown = function() {
   }
 };
 
-function getfullscreenenabler() {
-    return Module['canvas'].webkitRequestFullScreen || Module['canvas'].mozRequestFullScreen || Module['canvas'].requestFullScreen;
-}
-
-function isfullscreensupported() {
-   return !!(getfullscreenenabler());
-}
-
 function gofullscreen() {
-    getfullscreenenabler().call(Module['canvas']);
+  Module.requestFullScreen(1,0);
 }
 
 // Fetch the BIOS and the game we want to run.

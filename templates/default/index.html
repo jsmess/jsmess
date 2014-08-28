@@ -1,15 +1,6 @@
 <html>
 	<head>
 		<title>MESS in a browser!</title>
-<style>
-  :-webkit-full-screen {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100% !important;
-    height: 100% !important;
-  }
-</style>
 <script type='text/javascript' src='modernizr-custom.js'></script>
 <script type='text/javascript'>
 Modernizr.addTest('typedarray', function(){
@@ -39,7 +30,7 @@ Modernizr.load({
 	<h1 style="text-align: center;">MESS in a browser!</h1>
 	<div id='canvasholder' style="text-align: center;">
 	</div>
-	<div><a href="javascript:gofullscreen();">Fullscreen</a></div>
+	<div><a href="javascript:void(0);" id="gofullscreen">Fullscreen</a></div>
 	<div><a href="javascript:JSMESS.ui_set_show_fps(JSMESS.get_ui(), !JSMESS.ui_get_show_fps(JSMESS.get_ui()));">Toggle MESS performance indicator</a></div>
 	<div>MESS: <a href="javascript:JSMESS.sound_manager_mute(JSMESS.get_sound(), 1, 2);">Turn volume down</a> - <a href="javascript:JSMESS.sound_manager_mute(JSMESS.get_sound(), 0, 2);">Turn volume back up</a></div>
 	<div>Emscripten: <a href="javascript:JSMESS.sdl_pauseaudio(1);">Mute audio</a> - <a href="javascript:JSMESS.sdl_pauseaudio(0);">Unmute audio</a> (Chrome/latest Firefox only)</div>
