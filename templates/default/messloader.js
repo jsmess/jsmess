@@ -100,6 +100,18 @@ var update_countdown = function() {
   }
 };
 
+function getfullscreenenabler() {
+    return Module['canvas'].webkitRequestFullScreen || Module['canvas'].mozRequestFullScreen || Module['canvas'].requestFullScreen;
+}
+
+function isfullscreensupported() {
+   return !!(getfullscreenenabler());
+}
+
+function gofullscreen() {
+    getfullscreenenabler().call(Module['canvas']);
+}
+
 // Fetch the BIOS and the game we want to run.
 for (var i=0; i < bios_filenames.length; i++) {
   var fname = bios_filenames[i];
