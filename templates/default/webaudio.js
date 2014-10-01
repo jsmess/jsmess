@@ -13,7 +13,7 @@ var sampleScale = 32766;
 var prebufferDuration = 100 / 1000;
 
 function lazy_init () {
-  if (context)
+  if (context || typeof AudioContext == 'undefined')
     return;
 
   context = new AudioContext();
@@ -28,6 +28,7 @@ function set_mastervolume (
   attenuation_in_decibels
 ) {
   lazy_init();
+  if (!context) return;
 
   // http://stackoverflow.com/questions/22604500/web-audio-api-working-with-decibels
   // seemingly incorrect/broken. figures. welcome to Web Audio
@@ -50,6 +51,7 @@ function update_audio_stream (
   samples_this_frame // int. number of samples at pBuffer address.
 ) {
   lazy_init();
+  if (!context) return;
 
   var buffer = context.createBuffer(
     numChannels, samples_this_frame, 
@@ -133,10 +135,14 @@ function tick () {
       buffer_insert_point = now;
   }
 };
+function get_context() {
+  return context;
+};
 
 return {
   set_mastervolume: set_mastervolume,
-  update_audio_stream: update_audio_stream
+  update_audio_stream: update_audio_stream,
+  get_context: get_context
 };
 
 })();
