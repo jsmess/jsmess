@@ -26,9 +26,15 @@ JSMESS.ready = function(r) {
 	};
 };
 JSMESS.setScale = function() {
-        Module.canvas.style.width = Module.canvas.width * scale + 'px';
-        Module.canvas.style.height = Module.canvas.height * scale + 'px';
+	Module.canvas.style.width = Module.canvas.width * scale + 'px';
+	Module.canvas.style.height = Module.canvas.height * scale + 'px';
 };
+JSMESS.fullScreenChangeHandler = function() {
+	if (!(document.mozFullScreenElement || document.fullScreenElement)) {
+		setTimeout(JSMESS.setScale, 0);
+	}
+}
+
 
 var gamename = 'GAME_FILE';
 var game_file = null;
@@ -52,7 +58,14 @@ holder.appendChild(newCanvas);
 
 var fullscreenbutton = document.getElementById('gofullscreen');
 if (fullscreenbutton) {
-  fullscreenbutton.addEventListener('click', gofullscreen);
+	fullscreenbutton.addEventListener('click', gofullscreen);
+	if ('onfullscreenchange' in document) {
+		document.addEventListener('fullscreenchange', JSMESS.fullScreenChangeHandler);
+	} else if ('onmozfullscreenchange' in document) {
+		document.addEventListener('mozfullscreenchange', JSMESS.fullScreenChangeHandler);
+	} else if ('onwebkitfullscreenchange' in document) {
+		document.addEventListener('webkitfullscreenchange', JSMESS.fullScreenChangeHandler);
+	}
 }
 
 var fetch_file = function(url, cb) {
