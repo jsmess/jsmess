@@ -4,7 +4,7 @@
 	branch = incoming
 [submodule "third_party/mame"]
 	path = third_party/mame
-	url = https://github.com/startaq/mame.git
+	url = https://github.com/mamedev/mame.git
 	branch = master
 [submodule "third_party/emscripten-fastcomp"]
 	path = third_party/emscripten-fastcomp
