@@ -19,9 +19,9 @@ Jason Scott's [JSMESS](http://jsmess.textfiles.com) site has demos for most work
 JSMESS is now tracking the latest versions of MESS, and sound and joystick support work in many
 cases.
 
-Building 0.151+
+Building 0.153+
 ---------------
-To build JSMESS 0.151+, start with [How to build and test JSMESS 0.151](https://github.com/jsmess/jsmess/wiki/How-to-build-and-test-JSMESS-0.151).
+To build JSMESS 0.153+, start with [How to build and test JSMESS 0.153](https://github.com/jsmess/jsmess/wiki/How-to-build-and-test-JSMESS-0.153).
 
 Relevant Links
 --------------
