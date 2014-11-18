@@ -1,13 +1,18 @@
 CLARIFICATIONS ON THE NATURE OF JSMESS IN RELATION TO THE BELOW LICENSE:
 
-JSMESS is licensed GNU GPL v3.0. However, bear in mind that "JSMESS" consists of
+JSMESS is licensed GNU GPL v3.0. However, bear in mind that "JSMESS" only consists of
 a number of scripts and templates that allow the MAME/MESS project to be more 
-easily compiled by the Emscripten compiler environment. These include the following
-directories:
+easily compiled by the Emscripten compiler environment. 
+
+These include the following directories:
 
 /mamehelpers
 /helpers
 /templates
+
+All other code being interacted with (including MESS/MAME, LLVM, and Emscripten) are
+licensed under different schemes which may have differing compatibility with the
+GNU GPL v3.0 license.
 
 To view the differences between the original MESS makefile and the makefile in use
 with JSMESS, please do a diff between the following version:
