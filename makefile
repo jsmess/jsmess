@@ -112,7 +112,7 @@ endif
 # The second line consists of "voodoo settings". Change or remove if needed or testing.
 
 EMCC_FLAGS += -O3 -s DISABLE_EXCEPTION_CATCHING=2 
-EMCC_FLAGS += -s NO_EXIT_RUNTIME=1 -s ASSERTIONS=0 -s COMPILER_ASSERTIONS=1 -s FORCE_ALIGNED_MEMORY=1
+EMCC_FLAGS += -s NO_EXIT_RUNTIME=1 -s ASSERTIONS=0 -s COMPILER_ASSERTIONS=1
 
 # Choose ONE of the following memory settings. (The least, the better.)
 # If you run the system and it crashes complaining about memory, go to the
@@ -123,8 +123,8 @@ EMCC_FLAGS += -s NO_EXIT_RUNTIME=1 -s ASSERTIONS=0 -s COMPILER_ASSERTIONS=1 -s F
 # EMCC_FLAGS += -s TOTAL_MEMORY=16777216      # 16mb
 # EMCC_FLAGS += -s TOTAL_MEMORY=33554432      # 32mb
 # EMCC_FLAGS += -s TOTAL_MEMORY=67108864      # 64mb
-# EMCC_FLAGS += -s TOTAL_MEMORY=157810688     # 128mb
-EMCC_FLAGS += -s TOTAL_MEMORY=315621376     # 256mb
+# EMCC_FLAGS += -s TOTAL_MEMORY=134217728     # 128mb
+EMCC_FLAGS += -s TOTAL_MEMORY=268435456     # 256mb
 
 # Additional controls and functions from the code, allowing direct JS manipulations.
 # If radical changes happen to MESS/MAME code, these may not work and be dormant.
