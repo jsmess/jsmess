@@ -111,7 +111,7 @@ endif
 # EMCC Flags (Emscripten)
 # The second line consists of "voodoo settings". Change or remove if needed or testing.
 
-EMCC_FLAGS += -O3 -s DISABLE_EXCEPTION_CATCHING=2 -s USE_SDL=2
+EMCC_FLAGS += -O3 -s DISABLE_EXCEPTION_CATCHING=2 -s USE_SDL=2 --memory-init-file 0
 EMCC_FLAGS += -s NO_EXIT_RUNTIME=1 -s ASSERTIONS=0 -s COMPILER_ASSERTIONS=1
 
 # Choose ONE of the following memory settings. (The least, the better.)
