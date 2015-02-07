@@ -111,7 +111,7 @@ endif
 # EMCC Flags (Emscripten)
 # The second line consists of "voodoo settings". Change or remove if needed or testing.
 
-EMCC_FLAGS += -O3 -s DISABLE_EXCEPTION_CATCHING=2 
+EMCC_FLAGS += -O3 -s DISABLE_EXCEPTION_CATCHING=2 -s USE_SDL=2
 EMCC_FLAGS += -s NO_EXIT_RUNTIME=1 -s ASSERTIONS=0 -s COMPILER_ASSERTIONS=1
 
 # Choose ONE of the following memory settings. (The least, the better.)
@@ -133,11 +133,11 @@ EMCC_FLAGS += -s EXCEPTION_CATCHING_WHITELIST='["__ZN15running_machine17start_al
 EMCC_FLAGS += -s EXPORTED_FUNCTIONS="['_main', '_malloc', \
 '__Z14js_get_machinev', '__Z9js_get_uiv', '__Z12js_get_soundv', \
 '__ZN10ui_manager12set_show_fpsEb', '__ZNK10ui_manager8show_fpsEv', \
-'__ZN13sound_manager4muteEbh', 'SDL_PauseAudio']"
+'__ZN13sound_manager4muteEbh', '_SDL_PauseAudio']"
 
 # Flags shared between the native tools build and emscripten build of MESS.
 
-SHARED_MESS_FLAGS := OSD=sdl       # Set the onscreen display to use SDL.
+SHARED_MESS_FLAGS := OSD=sdl       # Set the OS-dependent layer to use SDL.
 SHARED_MESS_FLAGS += NOWERROR=1    # Disables -Werror (c|cxx)flag.
 
 # MESS makefile flags used to build the native tools.
@@ -156,6 +156,7 @@ NATIVE_MESS_FLAGS += CC=$(NATIVE_CC) CXX=$(NATIVE_CXX) AR=$(NATIVE_AR) \
 MESS_FLAGS += TARGET=mess SUBTARGET=$(SUBTARGET) SYSTEM=$(SYSTEM)
 MESS_FLAGS += VERBOSE=1  # Gives us detailed build information to make debugging
                          # build fails easier.
+MESS_FLAGS += SDL_INSTALL_ROOT=$(CURDIR)/third_party/emscripten/system
 
 # Uncomment for debug/profiling support
 #MESS_FLAGS += SYMBOLS=1 SYMLEVEL=2
