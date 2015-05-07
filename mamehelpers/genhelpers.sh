@@ -22,15 +22,15 @@ fi
 hash nm 2>/dev/null || { echo >&2 "'nm' required, not found."; exit 1; }
 
 echo ""
-echo "(1/5) Tidying up..."
+echo "(1/5) Generating dependencies..."
 echo ""
 cd "$MESS64PATH"
-#make TARGET=mess clean
+make TARGET=mame depend
 
 echo ""
-echo "(2/5) Rebuilding MESS with symbols..."
+echo "(2/5) Rebuilding MAME with symbols..."
 echo ""
-make TARGET=mame SYMBOLS=1 -j4
+make TARGET=mame SYMBOLS=1 NOWERROR=1 -j4
 if [ $? -ne 0 ]
    then
    echo ""
@@ -84,7 +84,7 @@ mv mangled-all-unresolved.txt ../../../../mamehelpers/
 mv all-resolved.txt ../../../../mamehelpers/
 
 cd ../..
-#make TARGET=mess clean
+#make TARGET=mame clean
 
 cd ../../mamehelpers
 
