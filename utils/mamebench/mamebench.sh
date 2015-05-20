@@ -31,7 +31,7 @@ if [ ! -d "$ROMDIR" ]; then
 	exit 1
 fi
 
-NUMROMS=$(ls "$ROMDIR" |wc -l)
+NUMROMS=$(ls "${ROMDIR}"/${PATTERN} |wc -l)
 
 echo "Benchmarking $NUMROMS roms in $ROMDIR for $BENCHTIME seconds ($THREADS threads)"
 
