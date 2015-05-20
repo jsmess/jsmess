@@ -20,6 +20,6 @@ while getopts "t:x:" opt; do
 done
 
 MAMEOUT=$(SDLMAME_DESKTOPDIM=800x600 SDL_VIDEODRIVER=dummy SDL_RENDER_DRIVER=software "${EXECUTABLE}" -rompath "$ROMDIR" -bench $BENCHTIME $GAME | tr -d '\n' | sed 's/.*Average speed: //' | sed 's/\% .*$/%/' )
-FULLNAME=$(mame -listfull $GAME |tail -1 |sed -r 's/^.*"(.*)"$/\1/g')
+FULLNAME=$("${EXECUTABLE}" -listfull $GAME |tail -1 |sed -r 's/^.*"(.*)"$/\1/g')
 echo "$GAME\t$FULLNAME\t$MAMEOUT" >> "${LOGFILE}"
 
