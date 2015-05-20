@@ -2,14 +2,17 @@ MAMEBench
 =========
 This is a set of shell scripts which make it simple to run parallel benchmarks on all roms in a directory.
 
-Usage: ./mamebench.sh <romdir> <benchfile> [-t <benchtime>] [-j <threads>] [-p <pattern>]
+Usage: ./mamebench.sh <romdir> <benchfile> [-t <benchtime>] [-j <processes>] [-p <pattern>] [-x <executable>]
 
 
 Examples:
 
-# Benchmark all roms in /data/roms for 45 seconds each, using 4 threads
+# Benchmark all roms in /data/roms for 45 seconds each, using 4 processes
 $ ./mamebench.sh /data/roms benchmark-20150519.tsv -t 45 -j 4
 
-# Benchmark all sf2 variants in /data/roms for 90 seconds each, using 6 threads
+# Benchmark all sf2 variants in /data/roms for 90 seconds each, using 32 processes
 $ ./mamebench.sh /data/roms benchmark-20150519.tsv -t 90 -j 6 -p sf2*
+
+# Benchmark all roms in /data/roms with an alternate executable
+$ ./mamebench.sh /data/roms benchmark-20150519.tsv -x ~/src/mame/mame64
 
