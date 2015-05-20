@@ -11,7 +11,7 @@ Examples:
 $ ./mamebench.sh /data/roms benchmark-20150519.tsv -t 45 -j 4
 
 # Benchmark all sf2 variants in /data/roms for 90 seconds each, using 32 processes
-$ ./mamebench.sh /data/roms benchmark-20150519.tsv -t 90 -j 6 -p sf2*
+$ ./mamebench.sh /data/roms benchmark-20150519.tsv -t 90 -j 32 -p sf2*
 
 # Benchmark all roms in /data/roms with an alternate executable
 $ ./mamebench.sh /data/roms benchmark-20150519.tsv -x ~/src/mame/mame64
