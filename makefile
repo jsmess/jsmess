@@ -274,7 +274,7 @@ $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js.gz: $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).j
 $(OBJ_DIR)/$(MESS_EXE)$(DEBUG_NAME).js: $(MAME_DIR)/$(MESS_EXE)$(DEBUG_NAME).bc $(TEMPLATE_DIR)/pre.js $(TEMPLATE_DIR)/post.js
 	@sed -e 's/JSMESS_JSMESS_VERSION/$(subst /,\/,$(JSMESS_VERSION))/' \
 	     -e 's/JSMESS_MESS_BUILD_VERSION/$(subst /,\/,$(JSMESS_MESS_BUILD_VERSION))/' \
-	     -e 's/JSMESS_EMCC_VERSION/$(JSMESS_EMCC_VERSION)/' \
+	     -e 's/JSMESS_EMCC_VERSION/$(subst /,\/,$(JSMESS_EMCC_VERSION))/' \
 	     -e 's/JSMESS_EMCC_FLAGS/$(subst ",\\",$(EMCC_FLAGS))/' \
 	     -e 's/JSMESS_MESS_FLAGS/$(subst ",\\",$(subst /,\/,$(MESS_FLAGS)))/' \
 	     $(TEMPLATE_DIR)/pre.js > $(OBJ_DIR)/pre.js
