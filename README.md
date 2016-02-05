@@ -1,3 +1,7 @@
+**The JSMESS project has been integrated into the upstream MAME repository at https://github.com/mamedev/mame and this repository is now defunct. Follow the instructions at https://raw.githubusercontent.com/mamedev/mame/master/docs/emscripten.txt to do an Emscripten compile with unmodified MAME source.**
+
+**Below is the out-of-date original README.**
+
 JSMESS
 ======
 JSMESS is an attempt to port [MESS](http://mess.org/) /
