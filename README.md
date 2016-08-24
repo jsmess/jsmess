@@ -1,4 +1,4 @@
-**The JSMESS project has been integrated into the upstream MAME repository at https://github.com/mamedev/mame and this repository is now defunct. Follow the instructions at https://raw.githubusercontent.com/mamedev/mame/master/docs/emscripten.txt to do an Emscripten compile with unmodified MAME source.**
+**The JSMESS project has been integrated into the upstream MAME repository at https://github.com/mamedev/mame and this repository is now defunct. Follow the instructions at http://docs.mamedev.org/initialsetup/compilingmame.html#emscripten-javascript-and-html to do an Emscripten compile with unmodified MAME source.**
 
 **Below is the out-of-date original README.**
 
